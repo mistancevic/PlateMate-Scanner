@@ -1,9 +1,12 @@
-export const resizeImageBase64 = (base64Str: string, maxWidth = 1080, maxHeight = 1080): Promise<string> => {
+export const resizeImageBase64 = (
+  base64Str: string,
+  maxWidth = 1080,
+  maxHeight = 1080,
+): Promise<string> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.src = base64Str;
     img.onload = () => {
-      const canvas = document.createElement('canvas');
+      const canvas = document.createElement("canvas");
       let width = img.width;
       let height = img.height;
 
@@ -21,16 +24,15 @@ export const resizeImageBase64 = (base64Str: string, maxWidth = 1080, maxHeight 
 
       canvas.width = width;
       canvas.height = height;
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       if (ctx) {
         ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.8));
+        resolve(canvas.toDataURL("image/jpeg", 0.8));
       } else {
-        reject(new Error('Failed to get canvas context'));
+        reject(new Error("Failed to get canvas context"));
       }
     };
-    img.onerror = (err) => {
-      reject(err);
-    };
+    img.onerror = () => reject(new Error("Could not read this image."));
+    img.src = base64Str;
   });
 };

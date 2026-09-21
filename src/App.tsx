@@ -1,916 +1,1667 @@
-import { useState, useRef, useEffect, useMemo, ChangeEvent } from 'react';
-import { Camera, Menu, X, RefreshCw, AlertCircle, ScanLine, UserCircle, Check, Image as ImageIcon, ShoppingBag, Layers } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
-import type { ScanResult, AppState, MealCartItem, ScannerMode } from './types';
-import { PROFILES, calculateScore, getLevel, getMealanChar, Level } from './profiles';
-import { CameraView } from './components/CameraView';
-import { MealCartModal } from './components/MealCartModal';
-import { DetailsModal } from './components/DetailsModal';
-
-import { resizeImageBase64 } from './utils/image';
-
-export default function App() {
-  const [state, setState] = useState<AppState>(() => {
-    const saved = localStorage.getItem('nutrition-scanner-v2');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        // Reset volatile view state on fresh load
-        return {
-          ...parsed,
-          view: parsed.scanData ? 'hud' : 'home',
-          isSidebarOpen: false,
-          error: null,
-          mealCart: parsed.mealCart || [],
-          scannerMode: parsed.scannerMode || 'label',
-          isCartOpen: false,
-          targetMissingItemId: null,
-        };
-      } catch (e) {}
-    }
-    return {
-      view: 'home',
-      isSidebarOpen: false,
-      activeProfileId: 'p1',
-      scanData: null,
-      imageUrl: null,
-      error: null,
-      scannerMode: 'label',
-      mealCart: [],
-      isCartOpen: false,
-      targetMissingItemId: null,
-    };
-  });
-
-  const activeProfile = PROFILES.find(p => p.id === state.activeProfileId) || PROFILES[0];
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
-
-  const showToast = (msg: string) => {
-    setToastMessage(msg);
-    setTimeout(() => {
-      setToastMessage(current => (current === msg ? null : current));
-    }, 4500);
-  };
-
-  const processGroupScan = async (rawImagesInput: string[] | string) => {
-    setState(prev => ({
-      ...prev,
-      view: 'scanning',
-      error: null,
-      scanData: null,
-      imageUrl: null,
-      isSidebarOpen: false,
-    }));
-
+import { useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  Camera,
+  Plus,
+  BookOpen,
+  Utensils,
+  SlidersHorizontal,
+  LockKeyhole,
+  Unlock,
+  Trash2,
+  Download,
+  Upload,
+  Check,
+  X,
+  Sparkles,
+  ArrowRight,
+  ScanBarcode,
+  Leaf,
+} from "lucide-react";
+import { CameraView } from "./components/CameraView";
+import { resizeImageBase64 } from "./utils/image";
+import type { ScannerMode } from "./types";
+import {
+  aggregate,
+  candidateFood,
+  category,
+  contribution,
+  density,
+  DENSITIES,
+  EMPTY,
+  Feedback,
+  Food,
+  freshState,
+  Goals,
+  Ingredient,
+  KEYS,
+  LABELS,
+  MACROS,
+  Meal,
+  numberInput,
+  parseState,
+  PilotState,
+  portionTotals,
+  solveIngredient,
+  symbol,
+  uid,
+  validateFood,
+} from "./pilot";
+const STORE = "platemate-pilot-v1";
+const fmt = (n: number | null, d = 1) =>
+  n === null ? "?" : n.toLocaleString(undefined, { maximumFractionDigits: d });
+let unreadableBackup: string | null = null;
+const load = () => {
+  try {
+    const raw = localStorage.getItem(STORE);
+    if (!raw) return freshState();
     try {
-      const rawImages = Array.isArray(rawImagesInput) ? rawImagesInput : [rawImagesInput];
-      if (rawImages.length === 0) {
-        throw new Error('No images provided for group scan');
-      }
-
-      const resizedImages = await Promise.all(
-        rawImages.map(img => resizeImageBase64(img))
+      return parseState(raw);
+    } catch {
+      unreadableBackup = raw;
+      return freshState();
+    }
+  } catch {
+    return freshState();
+  }
+};
+const inputValue = (x: number | null) => (x === null ? "" : String(x));
+function Modal({
+  title,
+  close,
+  children,
+}: {
+  title: string;
+  close: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="modal-backdrop">
+      <section
+        className="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title}
+      >
+        <header>
+          <h2>{title}</h2>
+          <button className="icon" aria-label="Close dialog" onClick={close}>
+            <X size={20} />
+          </button>
+        </header>
+        {children}
+      </section>
+    </div>
+  );
+}
+function Mealan({
+  items,
+  portion,
+  goals,
+  title,
+}: {
+  items: Ingredient[];
+  portion: number | null;
+  goals: Goals;
+  title: string;
+}) {
+  const data = portionTotals(items, portion),
+    pd = density(data.protein, data.calories),
+    total = aggregate(items),
+    valid = data.weight > 0;
+  return (
+    <section className="mealan-card">
+      <div className="eyebrow">MEALAN · SELECTED PORTION</div>
+      <h2>{title || "My meal"}</h2>
+      <div className="headline-metrics">
+        <span>
+          <b>{fmt(pd, 2)}</b> PD
+        </span>
+        <span>{fmt(data.weight)} g</span>
+        <span>{fmt(data.calories, 0)} kcal</span>
+      </div>
+      <p className="calorie-share">
+        CAL <strong>{fmt(contribution(data.calories, goals.calories))}%</strong>{" "}
+        of daily reference
+      </p>
+      <div className="macro-grid">
+        {MACROS.map((k) => (
+          <div key={k}>
+            <strong>{symbol(k, data, goals)}</strong>
+            <span>{fmt(contribution(data[k], goals[k]))}%</span>
+            <small>
+              {fmt(data[k])} g {LABELS[k].toLowerCase()}
+            </small>
+          </div>
+        ))}
+      </div>
+      {!valid && (
+        <p className="notice">
+          Choose a portion greater than zero and no larger than this recipe.
+        </p>
+      )}
+      <p className="small">
+        {portion === null
+          ? "Whole recipe selected."
+          : `Whole recipe: ${fmt(total.weight)} g. Portion assumes ingredients are evenly mixed.`}{" "}
+        Missing data is shown as ?.
+      </p>
+      <details>
+        <summary>How to read this</summary>
+        <p>
+          PD is grams of protein per 100 kcal. PD {fmt(pd, 2)} describes
+          concentration, not the total amount you eat. Percentages show this
+          portion's share of your daily targets. Letters compare nutrient
+          density with your plan: + above, capital near, lowercase below. The
+          pilot uses a ±10% band; it does not label a meal healthy or unhealthy.
+        </p>
+        <div className="density-list">
+          {MACROS.map((k) => (
+            <span key={k}>
+              {DENSITIES[k]} {fmt(density(data[k], data.calories), 2)}
+            </span>
+          ))}
+        </div>
+        <p className="small">
+          DS names the density family. Combined MD remains experimental and is
+          not used to rate meals. A ? may mean the nutrient or its daily target
+          is missing.
+        </p>
+      </details>
+    </section>
+  );
+}
+function FoodEditor({
+  food,
+  image,
+  close,
+  save,
+}: {
+  food: Food;
+  image?: string;
+  close: () => void;
+  save: (f: Food) => void;
+}) {
+  const [name, setName] = useState(food.name),
+    [brand, setBrand] = useState(food.brand),
+    [notes, setNotes] = useState(food.notes),
+    [ready, setReady] = useState(food.readyToEat),
+    [reviewed, setReviewed] = useState(false),
+    [errors, setErrors] = useState<string[]>([]);
+  const [values, setValues] = useState(
+    Object.fromEntries(KEYS.map((k) => [k, inputValue(food[k])])) as Record<
+      string,
+      string
+    >,
+  );
+  function submit() {
+    const f = {
+      ...food,
+      name: name.trim(),
+      brand: brand.trim(),
+      notes,
+      readyToEat: ready,
+      reviewedAt: new Date().toISOString(),
+      ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])),
+    } as Food;
+    const e = validateFood(f);
+    if (
+      KEYS.some(
+        (k) => values[k].trim() !== "" && numberInput(values[k]) === null,
+      )
+    )
+      e.push(
+        "Use a non-negative decimal number, or leave unknown values blank. Record trace or < values in the notes.",
       );
-
-      setState(prev => ({ ...prev, imageUrl: resizedImages[0] }));
-
-      const response = await fetch('/api/scan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          images: resizedImages,
-          imageBase64: resizedImages[0], 
-          mode: 'group',
-          prompt: "You are a strict food packaging identifier. Look at these multiple angles of the same group of items. Extract ONLY the Brand Name and Product Name for each distinct item. STRICTLY IGNORE marketing slogans. Return ONLY a JSON array of objects with 'brand' and 'product_name' keys."
-        }),
-      });
-
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || 'Failed to extract group items');
-      }
-
-      const rawResponse = await response.json();
-      const parsedEntities: Array<{ brand?: string; product_name?: string }> = Array.isArray(rawResponse) 
-        ? rawResponse 
-        : (rawResponse.entities || []);
-
-      const validEntities = parsedEntities.filter(
-        item => item.brand && item.brand.trim() !== '' && item.product_name && item.product_name.trim() !== ''
-      );
-
-      if (!validEntities || validEntities.length === 0) {
-        showToast("Ingredients not found in database. Please scan barcodes or labels individually.");
-        setState(prev => ({
-          ...prev,
-          view: 'camera',
-          scannerMode: 'group',
-          error: 'No valid food products detected. Please adjust lighting and try again.',
-        }));
-        return;
-      }
-
-      const newCartItems: MealCartItem[] = [];
-      let matchedCount = 0;
-
-      for (const item of validEntities) {
-        const rawBrand = item.brand.trim();
-        const rawProductName = item.product_name.trim();
-        const sanitizedBrand = sanitizeText(rawBrand);
-        const sanitizedProductName = sanitizeText(rawProductName);
-
-        let matched = false;
-        try {
-          const formula = `AND(SEARCH('${sanitizedBrand}', LOWER({Brand})) > 0, SEARCH('${sanitizedProductName}', LOWER({Product Name})) > 0)`;
-          const res = await fetch(`/api/check?filterByFormula=${encodeURIComponent(formula)}`);
-          
-          if (res.ok) {
-            const data = await res.json();
-            if (data.records && data.records.length > 0) {
-              matched = true;
-              matchedCount++;
-              const matchedFields = data.records[0].fields;
-              const calories = matchedFields['Calories'] ?? 0;
-              const protein = matchedFields['Protein'] ?? 0;
-              const fats = matchedFields['Fats'] ?? 0;
-              const carbs = matchedFields['Carbs'] ?? 0;
-              const fiber = matchedFields['Fiber'] ?? 0;
-              const xpScore = matchedFields['XP Score'] ?? (calories > 0 ? calculateScore(protein, calories) : 0);
-
-              newCartItems.push({
-                id: data.records[0].id || Math.random().toString(36).substring(2, 9),
-                brand: matchedFields['Brand'] || rawBrand,
-                product_name: matchedFields['Product Name'] || rawProductName,
-                weight: 100,
-                isMissingData: false,
-                calories,
-                protein,
-                fats,
-                carbs,
-                fiber,
-                xp: xpScore,
-                xf: matchedFields['XF Score'] ?? (calories > 0 ? calculateScore(fats, calories) : 0),
-                xc: matchedFields['XC Score'] ?? (calories > 0 ? calculateScore(carbs, calories) : 0),
-                xfi: matchedFields['XFi Score'] ?? (calories > 0 ? calculateScore(fiber, calories) : 0),
-                mealanString: matchedFields['Mealan String'],
-                rawRecord: matchedFields,
-              });
-            }
+    if (!reviewed)
+      e.push("Confirm the label and per-100-g basis before saving.");
+    setErrors(e);
+    if (!e.length) save(f);
+  }
+  return (
+    <Modal title="Review food data" close={close}>
+      {image && (
+        <img
+          className="label-preview"
+          src={image}
+          alt="Captured nutrition label"
+        />
+      )}
+      <p className="small">
+        Source: {food.source}. Check the actual package. All values below must
+        be <strong>per 100 g</strong>, with carbohydrate excluding fibre.
+      </p>
+      <label>
+        Product name
+        <input value={name} onChange={(e) => setName(e.target.value)} />
+      </label>
+      <label>
+        Brand
+        <input value={brand} onChange={(e) => setBrand(e.target.value)} />
+      </label>
+      <div className="form-grid">
+        {KEYS.map((k) => (
+          <label key={k}>
+            {LABELS[k]} ({k === "calories" ? "kcal" : "g"})
+            <input
+              inputMode="decimal"
+              value={values[k]}
+              placeholder="Unknown"
+              onChange={(e) =>
+                setValues((v) => ({ ...v, [k]: e.target.value }))
+              }
+            />
+          </label>
+        ))}
+      </div>
+      <label>
+        Label notes / preparation state
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="E.g. fibre not declared; as sold; contains milk. Do not enter client identifiers."
+        />
+      </label>
+      <label className="check">
+        <input
+          type="checkbox"
+          checked={ready}
+          onChange={(e) => setReady(e.target.checked)}
+        />{" "}
+        Ready to eat and suitable for cold mixing
+      </label>
+      <label className="check">
+        <input
+          type="checkbox"
+          checked={reviewed}
+          onChange={(e) => setReviewed(e.target.checked)}
+        />{" "}
+        I checked the values, per-100-g basis and carbohydrate/fibre convention.
+      </label>
+      <p className="small">
+        For a per-100-ml or per-serving label, convert from a known mass before
+        saving. Do not assume ml equals g. Leave undeclared nutrients blank.
+      </p>
+      {errors.map((e) => (
+        <p className="notice" key={e}>
+          {e}
+        </p>
+      ))}
+      <button className="primary wide" onClick={submit}>
+        <Check size={17} /> Confirm & save food
+      </button>
+    </Modal>
+  );
+}
+function GoalsEditor({
+  goals,
+  close,
+  save,
+}: {
+  goals: Goals;
+  close: () => void;
+  save: (g: Goals) => void;
+}) {
+  const [values, setValues] = useState(
+    Object.fromEntries(KEYS.map((k) => [k, inputValue(goals[k])])) as Record<
+      string,
+      string
+    >,
+  );
+  const [error, setError] = useState("");
+  return (
+    <Modal title="Your daily reference" close={close}>
+      <p>
+        Enter your existing plan or targets agreed with your coach. Blank fields
+        stay unknown. These are daily amounts, not one meal's targets.
+      </p>
+      <div className="form-grid">
+        {KEYS.map((k) => (
+          <label key={k}>
+            {LABELS[k]} ({k === "calories" ? "kcal" : "g"})
+            <input
+              inputMode="decimal"
+              value={values[k]}
+              placeholder="Not set"
+              onChange={(e) => setValues({ ...values, [k]: e.target.value })}
+            />
+          </label>
+        ))}
+      </div>
+      <p className="small">
+        Reference PD:{" "}
+        {fmt(
+          density(numberInput(values.protein), numberInput(values.calories)),
+          2,
+        )}{" "}
+        g protein per 100 kcal. Changing the reference does not change a food's
+        density.
+      </p>
+      {error && <p className="notice">{error}</p>}
+      <button
+        className="primary wide"
+        onClick={() => {
+          if (
+            KEYS.some(
+              (k) =>
+                values[k].trim() !== "" &&
+                (numberInput(values[k]) === null ||
+                  numberInput(values[k]) === 0),
+            )
+          ) {
+            setError("Enter positive targets, or leave a field blank.");
+            return;
           }
-        } catch (err) {
-          console.warn("Airtable search error for entity:", item, err);
-        }
-
-        if (!matched) {
-          // Graceful fallback for group mode:
-          // Do not attempt to guess macros for group items. They must either be pulled purely from Airtable, or the user must scan them individually.
-          newCartItems.push({
-            id: Math.random().toString(36).substring(2, 9),
-            brand: rawBrand,
-            product_name: rawProductName,
-            weight: 100,
-            isMissingData: true,
-            calories: undefined,
-            protein: undefined,
-            fats: undefined,
-            carbs: undefined,
-            fiber: undefined,
-          });
-        }
-      }
-
-      if (matchedCount === 0) {
-        showToast("Ingredients not found in database. Please scan barcodes or labels individually.");
-      }
-
-      setState(prev => ({
-        ...prev,
-        view: 'home',
-        mealCart: [...prev.mealCart, ...newCartItems],
-        isCartOpen: true,
-        error: null,
-      }));
-
-    } catch (error: any) {
-      showToast("Ingredients not found in database. Please scan barcodes or labels individually.");
-      setState(prev => ({
-        ...prev,
-        view: 'camera',
-        scannerMode: 'group',
-        error: error.message || 'Failed to process group scan.',
-      }));
-    }
-  };
-
-  const processImageBase64 = async (rawBase64Data: string) => {
-    setState(prev => ({
-      ...prev,
-      view: 'scanning',
-      error: null,
-      scanData: null,
-      imageUrl: null,
-      isSidebarOpen: false,
-    }));
-
-    try {
-      const base64Data = await resizeImageBase64(rawBase64Data);
-      setState(prev => ({ ...prev, imageUrl: base64Data }));
-      
-      const response = await fetch('/api/scan', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageBase64: base64Data, mode: 'label' }),
-      });
-
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || 'Failed to scan image');
-      }
-
-      const data: ScanResult = await response.json();
-      
-      if (data.success === false) {
-        setState(prev => ({
-          ...prev,
-          view: 'camera',
-          error: `Scan Failed: ${data.error_reason || 'Could not read label'}. Please adjust lighting and retake.`,
-        }));
-        return;
-      }
-
-      setState(prev => ({
-        ...prev,
-        view: 'hud',
-        scanData: data,
-      }));
-
-    } catch (error: any) {
-      setState(prev => ({
-        ...prev,
-        view: 'home',
-        error: error.message || 'An unexpected error occurred.',
-      }));
-    }
-  };
-
-  const processBarcode = async (barcode: string) => {
-    setState(prev => ({
-      ...prev,
-      view: 'scanning',
-      error: null,
-      scanData: null,
-      imageUrl: null,
-      isSidebarOpen: false,
-    }));
-
-    try {
-      const res = await fetch(`https://world.openfoodfacts.org/api/v0/product/${barcode}.json`);
-      if (!res.ok) throw new Error("Failed to fetch product data");
-      const data = await res.json();
-
-      if (data.status === 1 && data.product) {
-        const p = data.product;
-        const n = p.nutriments || {};
-        
-        const scanData: ScanResult = {
-          success: true,
-          barcode: barcode,
-          brand: p.brands || p.brand_owner || "Unknown",
-          product_name: p.product_name || "Unknown",
-          calories: n['energy-kcal_100g'] || 0,
-          protein: n['proteins_100g'] || 0,
-          fats: n['fat_100g'] || 0,
-          carbs: n['carbohydrates_100g'] || 0,
-          fiber: n['fiber_100g'] || 0,
-        };
-
-        setState(prev => ({
-          ...prev,
-          view: 'hud',
-          scanData,
-        }));
-      } else {
-        setState(prev => ({
-          ...prev,
-          view: 'camera',
-          scannerMode: 'label',
-          error: 'Product not found in database. Please use Label Scanner.'
-        }));
-      }
-    } catch (error: any) {
-      setState(prev => ({
-        ...prev,
-        view: 'camera',
-        scannerMode: 'label',
-        error: 'Failed to look up barcode. Please use Label Scanner.'
-      }));
-    }
-  };
-
-  const homeFileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleHomeFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = () => {
-      processImageBase64(reader.result as string);
-    };
-    reader.readAsDataURL(file);
-    
-    if (homeFileInputRef.current) {
-      homeFileInputRef.current.value = '';
-    }
-  };
-
+          save(
+            Object.fromEntries(
+              KEYS.map((k) => [k, numberInput(values[k])]),
+            ) as Goals,
+          );
+        }}
+      >
+        Save daily reference
+      </button>
+    </Modal>
+  );
+}
+export default function App() {
+  const [state, setState] = useState<PilotState>(load),
+    [tab, setTab] = useState<"meal" | "foods" | "notes">("meal"),
+    [camera, setCamera] = useState(false),
+    [mode, setMode] = useState<ScannerMode>("label"),
+    [busy, setBusy] = useState(""),
+    [message, setMessage] = useState(""),
+    [error, setError] = useState(""),
+    [edit, setEdit] = useState<Food | null>(null),
+    [image, setImage] = useState(""),
+    [goalsOpen, setGoalsOpen] = useState(false),
+    [pending, setPending] = useState<{ name: string; brand: string }[]>([]),
+    [barcode, setBarcode] = useState(""),
+    [query, setQuery] = useState(""),
+    [accessOpen, setAccessOpen] = useState(false),
+    [access, setAccess] = useState(
+      () => sessionStorage.getItem("platemate-access") || "",
+    ),
+    [limits, setLimits] = useState({
+      maxWeight: "",
+      minProtein: "",
+      maxKcal: "",
+    }),
+    [adjustId, setAdjustId] = useState(""),
+    [options, setOptions] = useState<
+      { food: Food; items: Ingredient[]; grams: number; explanation?: string }[]
+    >([]),
+    [reviewMeal, setReviewMeal] = useState<Meal | null>(null),
+    [feedback, setFeedback] = useState({
+      status: "prepared" as Feedback["status"],
+      taste: "",
+      notes: "",
+    }),
+    [services, setServices] = useState<{
+      ai: boolean;
+      airtable: boolean;
+    } | null>(null);
+  const importRef = useRef<HTMLInputElement>(null),
+    runRef = useRef(0);
   useEffect(() => {
     try {
-      localStorage.setItem('nutrition-scanner-v2', JSON.stringify({
-        activeProfileId: state.activeProfileId,
-        scanData: state.scanData,
-        imageUrl: state.imageUrl,
-        mealCart: state.mealCart,
-        scannerMode: state.scannerMode,
-      }));
-    } catch (e) {
-      console.warn("Failed to save state to localStorage (possibly due to quota exceeded with large image):", e);
-    }
-  }, [state.activeProfileId, state.scanData, state.imageUrl, state.mealCart, state.scannerMode]);
-
-  const handleRemoveCartItem = (id: string) => {
-    setState(prev => ({
-      ...prev,
-      mealCart: prev.mealCart.filter(item => item.id !== id),
-    }));
-  };
-
-  const updateItemWeight = (index: number, newWeight: number) => {
-    setState(prev => ({
-      ...prev,
-      mealCart: prev.mealCart.map((item, i) => {
-        if (i === index) {
-          return {
-            ...item,
-            weight: Math.max(0, isNaN(newWeight) ? 0 : newWeight),
-          };
-        }
-        return item;
-      }),
-    }));
-  };
-
-  const handleClearCart = () => {
-    setState(prev => ({
-      ...prev,
-      mealCart: [],
-    }));
-  };
-
-  const handleAddToCart = () => {
-    if (!state.scanData || !metrics) return;
-    const sanitizedBrand = state.scanData.brand || "Unknown Brand";
-    const sanitizedProductName = state.scanData.product_name || "Food Product";
-
-    const newItem: MealCartItem = {
-      id: Math.random().toString(36).substring(2, 9),
-      brand: sanitizedBrand,
-      product_name: sanitizedProductName,
-      weight: 100,
-      isMissingData: false,
-      calories: state.scanData.calories,
-      protein: state.scanData.protein,
-      fats: state.scanData.fats,
-      carbs: state.scanData.carbs,
-      fiber: state.scanData.fiber,
-      xp: metrics.xp,
-      xf: metrics.xf,
-      xc: metrics.xc,
-      xfi: metrics.xfi,
-      mealanString: metrics.mealanString,
-    };
-
-    setState(prev => ({
-      ...prev,
-      mealCart: [...prev.mealCart, newItem],
-      isCartOpen: true,
-    }));
-  };
-
-  const handleScanMissingItem = (item: MealCartItem) => {
-    setState(prev => ({
-      ...prev,
-      isCartOpen: false,
-      view: 'camera',
-      scannerMode: 'label',
-      targetMissingItemId: item.id,
-      error: null,
-    }));
-  };
-
-  const handleScanClick = () => {
-    setState(prev => ({ ...prev, view: 'camera' }));
-  };
-
-  const metrics = useMemo(() => {
-    if (!state.scanData) return null;
-    const sd = state.scanData;
-    const t = activeProfile.thresholds;
-    
-    const xp = calculateScore(sd.protein, sd.calories);
-    const xpLevel = getLevel(xp, t.XP);
-    const xpChar = getMealanChar(xpLevel, 'P', 'p');
-
-    const xf = calculateScore(sd.fats, sd.calories);
-    const xfLevel = getLevel(xf, t.XF);
-    const xfChar = getMealanChar(xfLevel, 'F', 'f');
-
-    const xc = calculateScore(sd.carbs, sd.calories);
-    const xcLevel = getLevel(xc, t.XC);
-    const xcChar = getMealanChar(xcLevel, 'C', 'c');
-
-    const xfi = calculateScore(sd.fiber, sd.calories);
-    const xfiLevel = getLevel(xfi, t.XFi);
-    const xfiChar = getMealanChar(xfiLevel, 'Fi', 'fi');
-
-    const mealanString = `[ ${xpChar} | ${xfChar} | ${xcChar} | ${xfiChar} ]`;
-
-    return {
-      xp, xpLevel, 
-      xf, xfLevel,
-      xc, xcLevel,
-      xfi, xfiLevel,
-      mealanString
-    };
-  }, [state.scanData, activeProfile]);
-
-  const sanitizeText = (str: string) => {
-    if (!str) return "";
-    return str
-      .toLowerCase()
-      .replace(/[^a-z0-9\s]/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
-  };
-
-  const saveToAirtable = async () => {
-    if (!metrics || !state.scanData) return;
-    setState(prev => ({ ...prev, isSaving: true }));
-    
-    const sanitizedBrand = sanitizeText(state.scanData.brand || "Unknown");
-    const sanitizedProductName = sanitizeText(state.scanData.product_name || "Unknown");
-    const barcode = state.scanData.barcode;
-
-    try {
-      // 1. Duplicate check via GET
-      let checkUrl = `/api/check?brand=${encodeURIComponent(sanitizedBrand)}&product=${encodeURIComponent(sanitizedProductName)}`;
-      if (barcode) {
-        checkUrl += `&barcode=${encodeURIComponent(barcode)}`;
-      }
-      const checkRes = await fetch(checkUrl);
-      if (!checkRes.ok) {
-        const err = await checkRes.json().catch(() => ({}));
-        throw new Error(err.error || "Failed to check for duplicates");
-      }
-      
-      const checkData = await checkRes.json();
-      if (checkData.exists) {
-        setState(prev => ({ ...prev, isSaving: false, saveError: "Product already exists in PlateMate." }));
-        setTimeout(() => {
-          setState(prev => ({ ...prev, saveError: null }));
-        }, 3000);
+      if (unreadableBackup !== null) {
+        setError(
+          "Stored pilot data could not be read. It has been preserved. Export the recovery backup before importing a valid backup or clearing this site's data.",
+        );
         return;
       }
-
-      // 2. Perform Save
-      const payload: any = {
-        "Brand": sanitizedBrand,
-        "Product Name": sanitizedProductName,
-        "XP Score": metrics.xp,
-        "XF Score": metrics.xf,
-        "XC Score": metrics.xc,
-        "XFi Score": metrics.xfi,
-        "Mealan String": metrics.mealanString,
-        "Calories": state.scanData.calories,
-        "Protein": state.scanData.protein,
-        "Fats": state.scanData.fats,
-        "Carbs": state.scanData.carbs,
-        "Fiber": state.scanData.fiber,
-        "Active Profile": activeProfile.name
-      };
-      
-      if (barcode) {
-        payload["Barcode"] = barcode;
-      }
-
-      const response = await fetch('/api/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || 'Failed to save to Airtable');
-      }
-      
-      // 3. Success UI Flow & update mealCart if resolving missing item
-      if (state.targetMissingItemId) {
-        setState(prev => ({
-          ...prev,
-          mealCart: prev.mealCart.map(item => {
-            if (item.id === prev.targetMissingItemId) {
-              return {
-                ...item,
-                brand: sanitizedBrand,
-                product_name: sanitizedProductName,
-                weight: item.weight ?? 100,
-                isMissingData: false,
-                calories: state.scanData?.calories,
-                protein: state.scanData?.protein,
-                fats: state.scanData?.fats,
-                carbs: state.scanData?.carbs,
-                fiber: state.scanData?.fiber,
-                xp: metrics.xp,
-                xf: metrics.xf,
-                xc: metrics.xc,
-                xfi: metrics.xfi,
-                mealanString: metrics.mealanString,
-              };
-            }
-            return item;
-          }),
-          targetMissingItemId: null,
-          isSaving: false,
-          saveSuccess: true,
-        }));
-      } else {
-        setState(prev => ({ ...prev, isSaving: false, saveSuccess: true }));
-      }
-      
-      setTimeout(() => {
-        setState(prev => ({ 
-          ...prev, 
-          saveSuccess: false, 
-          view: 'camera', 
-          scanData: null, 
-          imageUrl: null 
-        }));
-      }, 2000);
-
-    } catch (error: any) {
-      console.error(error);
-      setState(prev => ({ ...prev, isSaving: false, saveError: `Error saving: ${error.message}` }));
-      setTimeout(() => {
-        setState(prev => ({ ...prev, saveError: null }));
-      }, 3000);
+      localStorage.setItem(STORE, JSON.stringify(state));
+    } catch {
+      setError(
+        "This browser could not save your changes. Export a backup before leaving.",
+      );
     }
+  }, [state]);
+  useEffect(() => {
+    setOptions([]);
+  }, [state.items, state.goals, limits]);
+  async function api(url: string, body?: unknown) {
+    const res = await fetch(url, {
+      method: body === undefined ? "GET" : "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(access ? { Authorization: `Bearer ${access}` } : {}),
+      },
+      ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
+      signal: AbortSignal.timeout(65000),
+    });
+    const data = await res
+      .json()
+      .catch(() => ({ error: "The server returned an unreadable response." }));
+    if (res.status === 401) {
+      setAccessOpen(true);
+      throw new Error("Enter your pilot access key, then retry.");
+    }
+    if (!res.ok) throw new Error(data.error || "Request failed.");
+    return data;
+  }
+  useEffect(() => {
+    api("/api/status")
+      .then(setServices)
+      .catch(() => {});
+  }, [access]);
+  const notify = (s: string) => {
+    setMessage(s);
+    setError("");
   };
-
-  const resetSession = () => {
-    setState(prev => ({ ...prev, view: 'home', scanData: null, imageUrl: null }));
-  };
-
-  const getColorForLevel = (level: Level) => {
-    if (level === 'High') return 'text-[#39ff14]';
-    if (level === 'Moderate') return 'text-yellow-400';
-    return 'text-[#ff073a]';
-  };
-  
-  const getBgForLevel = (level: Level) => {
-    if (level === 'High') return 'bg-[#39ff14]';
-    if (level === 'Moderate') return 'bg-yellow-400';
-    return 'bg-[#ff073a]';
-  };
-
-  const renderSidebar = () => (
-    <AnimatePresence>
-      {state.isSidebarOpen && (
-        <>
-          <motion.div 
-            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-            onClick={() => setState(prev => ({ ...prev, isSidebarOpen: false }))}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-          />
-          <motion.div 
-            initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }}
-            transition={{ type: 'spring', bounce: 0, duration: 0.3 }}
-            className="fixed inset-y-0 left-0 w-72 max-w-[80vw] bg-neutral-900 border-r border-neutral-800 z-50 flex flex-col shadow-2xl"
+  function blank(name = "", brand = "") {
+    setImage("");
+    setEdit(candidateFood({ product_name: name, brand }, "Manual entry"));
+  }
+  function saveFood(f: Food) {
+    setState((s) => ({
+      ...s,
+      foods: s.foods.some((x) => x.id === f.id)
+        ? s.foods.map((x) => (x.id === f.id ? f : x))
+        : [f, ...s.foods],
+    }));
+    setEdit(null);
+    setPending((p) =>
+      p.filter((x) => x.name !== f.name || x.brand !== f.brand),
+    );
+    notify(
+      "Saved on this device. Existing recipes keep their original food data.",
+    );
+  }
+  function add(food: Food) {
+    setState((s) => ({
+      ...s,
+      items: [
+        ...s.items,
+        { id: uid(), food: { ...food }, grams: 100, locked: true },
+      ],
+      portion: null,
+    }));
+    setTab("meal");
+    notify(
+      "Added 100 g as a starting amount. Set the quantity you will actually use.",
+    );
+  }
+  async function scan(raw: string | string[], group = false) {
+    const run = ++runRef.current;
+    setBusy(group ? "Identifying products…" : "Reading label…");
+    setError("");
+    setCamera(false);
+    try {
+      const images = await Promise.all(
+        (Array.isArray(raw) ? raw : [raw])
+          .slice(0, 6)
+          .map((x) => resizeImageBase64(x, 1800, 1800)),
+      );
+      const data = await api("/api/scan", {
+        images,
+        mode: group ? "group" : "label",
+      });
+      if (run !== runRef.current) return;
+      if (group) {
+        setPending(
+          data.entities.map((x: any) => ({
+            name: x.product_name,
+            brand: x.brand || "",
+          })),
+        );
+        setTab("foods");
+        notify(
+          "Review each identified product. Photos do not establish nutrients or quantities.",
+        );
+      } else {
+        if (!data.success)
+          throw new Error(
+            data.error_reason ||
+              "Label could not be read. Try another photo or enter it manually.",
+          );
+        setImage(images[0]);
+        setEdit(candidateFood(data, "Label photo · review required"));
+      }
+    } catch (e: any) {
+      if (run === runRef.current)
+        setError(
+          e.message || "Scan failed. Your saved foods and meal are unchanged.",
+        );
+    } finally {
+      if (run === runRef.current) setBusy("");
+    }
+  }
+  async function lookup(code = barcode) {
+    if (!/^\d{8,14}$/.test(code.trim())) {
+      setError("Enter a numeric barcode with 8–14 digits.");
+      return;
+    }
+    const run = ++runRef.current;
+    setBusy("Looking up product…");
+    setCamera(false);
+    setError("");
+    setImage("");
+    try {
+      const local = state.foods.find((f) => f.barcode === code.trim());
+      if (local) {
+        setEdit({ ...local });
+        notify("Found your saved food. Check the package is still the same.");
+      } else {
+        const d = await api(`/api/product/${code.trim()}`);
+        if (run !== runRef.current) return;
+        setEdit(
+          candidateFood(d, d.source || "Product database · review required"),
+        );
+      }
+    } catch (e: any) {
+      if (run === runRef.current) setError(e.message);
+    } finally {
+      if (run === runRef.current) setBusy("");
+    }
+  }
+  function updateItem(id: string, patch: Partial<Ingredient>) {
+    setState((s) => ({
+      ...s,
+      items: s.items.map((x) => (x.id === id ? { ...x, ...patch } : x)),
+      portion: null,
+    }));
+  }
+  function saveMeal() {
+    const t = aggregate(state.items),
+      p = state.portion ?? t.weight;
+    if (!p || p > t.weight) {
+      setError("Set a valid portion before saving.");
+      return;
+    }
+    const meal: Meal = {
+      id: uid(),
+      title: state.title || "My meal",
+      items: structuredClone(state.items),
+      portion: p,
+      savedAt: new Date().toISOString(),
+    };
+    setState((s) => ({ ...s, meals: [meal, ...s.meals] }));
+    notify("Recipe saved. It has not been recorded as eaten.");
+  }
+  function mix() {
+    setError("");
+    const target = density(state.goals.protein, state.goals.calories);
+    if (target === null || target <= 0) {
+      setError("Set daily energy and protein targets first.");
+      return;
+    }
+    const selected = state.items.find((x) => x.id === adjustId);
+    if (!selected || selected.locked) {
+      setError(
+        "Unlock one supporting ingredient, then select it here. Other quantities stay fixed.",
+      );
+      return;
+    }
+    if (
+      !selected.food.readyToEat ||
+      state.items.some((x) => !x.food.readyToEat)
+    ) {
+      setError(
+        "This pilot mixes ready-to-eat foods only. Confirm each food’s preparation state in Saved foods, then add the reviewed versions to the meal.",
+      );
+      return;
+    }
+    if (
+      Object.values(limits).some(
+        (x) => x.trim() !== "" && numberInput(x) === null,
+      )
+    ) {
+      setError("Meal limits must be non-negative numbers, or blank.");
+      return;
+    }
+    const max = numberInput(limits.maxWeight),
+      minP = numberInput(limits.minProtein),
+      maxE = numberInput(limits.maxKcal);
+    let reason = "No candidate meets the selected constraints.";
+    const foods = [
+      selected.food,
+      ...state.foods.filter((f) => f.id !== selected.food.id && f.readyToEat),
+    ];
+    const results = [];
+    for (const food of foods) {
+      const candidate = state.items.map((x) =>
+          x.id === adjustId ? { ...x, food } : x,
+        ),
+        s = solveIngredient(candidate, adjustId, target, max);
+      if (s.ok === false) {
+        if (food.id === selected.food.id) reason = s.reason;
+        continue;
+      }
+      const t = aggregate(s.items);
+      if (
+        (minP !== null && (t.protein === null || t.protein < minP)) ||
+        (maxE !== null && (t.calories === null || t.calories > maxE))
+      )
+        continue;
+      results.push({ food, items: s.items, grams: s.grams });
+    }
+    setOptions(results.slice(0, 8));
+    if (!results.length)
+      setError(reason + " You can change a limit or choose another food.");
+  }
+  async function personalize() {
+    setBusy("Considering your taste preferences…");
+    try {
+      const data = await api("/api/chef", {
+        preferences: state.preferences,
+        feedback: state.feedback
+          .slice(0, 5)
+          .map((f) => ({ meal: f.meal.title, taste: f.taste, notes: f.notes })),
+        candidates: options.map((o) => ({
+          id: o.food.id,
+          name: o.food.name,
+          brand: o.food.brand,
+          grams: o.grams,
+          ingredients: o.items.map((i) => ({
+            name: i.food.name,
+            grams: i.grams,
+          })),
+        })),
+      });
+      setOptions((current) =>
+        data.suggestions
+          .map((r: any) => {
+            const o = current.find((c) => c.food.id === r.id);
+            return o ? { ...o, explanation: r.reason } : null;
+          })
+          .filter(Boolean),
+      );
+      notify(
+        "Suggestions ranked from the calculated options. Check ingredients and taste before choosing.",
+      );
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setBusy("");
+    }
+  }
+  function exportData() {
+    const url = URL.createObjectURL(
+      new Blob([unreadableBackup ?? JSON.stringify(state, null, 2)], {
+        type: "application/json",
+      }),
+    );
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `platemate-pilot-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  const totals = aggregate(state.items),
+    pdRef = density(state.goals.protein, state.goals.calories);
+  const selected = portionTotals(state.items, state.portion);
+  const matched =
+    selected.calories !== null &&
+    selected.protein !== null &&
+    pdRef !== null &&
+    Math.abs(density(selected.protein, selected.calories)! - pdRef) <= 0.05;
+  return (
+    <div className="app-shell">
+      <header className="topbar">
+        <a
+          className="brand"
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            setTab("meal");
+          }}
+        >
+          <span className="brand-mark">
+            <Leaf size={22} />
+          </span>
+          <span>
+            PlateMate<small>MEALAN PILOT</small>
+          </span>
+        </a>
+        <button className="subtle" onClick={() => setGoalsOpen(true)}>
+          <SlidersHorizontal size={17} />
+          <span>Daily reference</span>
+        </button>
+      </header>
+      <main>
+        <div className="intro">
+          <span className="eyebrow">
+            FOOD YOU ENJOY. A PLAN YOU CAN LIVE WITH.
+          </span>
+          <h1>Make it your meal.</h1>
+          <p>
+            Start with what you want to eat. See the portion. Find a mix that
+            works for you.
+          </p>
+        </div>
+        <div className="reference-strip">
+          <span>YOUR DAILY REFERENCE</span>
+          <b>{fmt(state.goals.calories, 0)} kcal</b>
+          <b>{fmt(state.goals.protein)} g protein</b>
+          <span className="pd-tag">PD {fmt(pdRef, 2)}</span>
+          <button onClick={() => setGoalsOpen(true)}>
+            Edit <ArrowRight size={13} />
+          </button>
+        </div>
+        {error && (
+          <div className="notice" role="alert">
+            {error}
+            <button
+              className="icon"
+              aria-label="Dismiss error"
+              onClick={() => setError("")}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+        {message && (
+          <div className="success" role="status">
+            {message}
+            <button
+              className="icon"
+              aria-label="Dismiss message"
+              onClick={() => setMessage("")}
+            >
+              <X size={16} />
+            </button>
+          </div>
+        )}
+        <nav className="tabs" aria-label="Workspace">
+          <button
+            className={tab === "meal" ? "active" : ""}
+            onClick={() => setTab("meal")}
           >
-            <div className="p-6 border-b border-neutral-800 flex items-center gap-4">
-              <div className="w-12 h-12 rounded-full bg-neutral-800 flex items-center justify-center shrink-0">
-                <UserCircle className="w-7 h-7 text-neutral-400" />
-              </div>
-              <div className="flex flex-col truncate">
-                <span className="text-xs text-neutral-400 uppercase tracking-wider">Welcome back,</span>
-                <span className="font-semibold text-neutral-50 truncate">Scanner</span>
-              </div>
-              <button 
-                onClick={() => setState(prev => ({ ...prev, isSidebarOpen: false }))}
-                className="ml-auto p-2 -mr-2 text-neutral-500 hover:text-neutral-300 transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <div className="flex-1 overflow-y-auto p-4">
-              <span className="text-[10px] font-bold text-neutral-500 uppercase tracking-widest mb-4 block px-2">Nutritional Profiles</span>
-              <div className="space-y-2">
-                {PROFILES.map(profile => (
+            <Utensils size={17} /> My meal{" "}
+            {state.items.length > 0 && <span>{state.items.length}</span>}
+          </button>
+          <button
+            className={tab === "foods" ? "active" : ""}
+            onClick={() => setTab("foods")}
+          >
+            <BookOpen size={17} /> Saved foods
+          </button>
+          <button
+            className={tab === "notes" ? "active" : ""}
+            onClick={() => setTab("notes")}
+          >
+            <Sparkles size={17} /> Recipes & taste
+          </button>
+        </nav>
+        {tab === "meal" && (
+          <div className="workspace">
+            <div className="main-column">
+              <section className="panel">
+                <div className="section-heading">
+                  <div>
+                    <span className="eyebrow">BUILD YOUR BOWL</span>
+                    <h2>Your ingredients</h2>
+                  </div>
+                  <button className="subtle" onClick={() => setTab("foods")}>
+                    <Plus size={16} /> Add food
+                  </button>
+                </div>
+                <label>
+                  Meal name
+                  <input
+                    value={state.title}
+                    onChange={(e) =>
+                      setState({ ...state, title: e.target.value })
+                    }
+                  />
+                </label>
+                {!state.items.length ? (
+                  <div className="empty">
+                    <Utensils size={34} />
+                    <h3>What are you craving?</h3>
+                    <p>
+                      Scan or enter a food, check its label, then add the amount
+                      you want.
+                    </p>
+                    <button
+                      className="primary"
+                      onClick={() => {
+                        setMode("label");
+                        setCamera(true);
+                      }}
+                    >
+                      <Camera size={17} /> Scan a label
+                    </button>
+                    <button className="subtle" onClick={() => blank()}>
+                      Enter a food manually
+                    </button>
+                  </div>
+                ) : (
+                  <div className="ingredient-list">
+                    {state.items.map((item) => (
+                      <article className="ingredient" key={item.id}>
+                        <div className="ingredient-name">
+                          <b>{item.food.name}</b>
+                          <small>
+                            {item.food.brand} · PD{" "}
+                            {fmt(
+                              density(item.food.protein, item.food.calories),
+                              2,
+                            )}
+                          </small>
+                        </div>
+                        <label className="quantity">
+                          Amount
+                          <input
+                            aria-label={`Grams of ${item.food.name}`}
+                            type="number"
+                            min="0"
+                            step="1"
+                            value={item.grams}
+                            onChange={(e) =>
+                              updateItem(item.id, {
+                                grams: Math.max(0, Number(e.target.value) || 0),
+                              })
+                            }
+                          />
+                          <span>g</span>
+                        </label>
+                        <button
+                          className={`icon ${item.locked ? "locked" : ""}`}
+                          aria-label={`${item.locked ? "Unlock" : "Lock"} ${item.food.name}`}
+                          title={
+                            item.locked
+                              ? "Amount locked"
+                              : "Available for adjustment"
+                          }
+                          onClick={() => {
+                            updateItem(item.id, { locked: !item.locked });
+                            if (item.locked) setAdjustId(item.id);
+                          }}
+                        >
+                          {item.locked ? (
+                            <LockKeyhole size={17} />
+                          ) : (
+                            <Unlock size={17} />
+                          )}
+                        </button>
+                        <button
+                          className="icon"
+                          aria-label={`Remove ${item.food.name}`}
+                          onClick={() =>
+                            setState((s) => ({
+                              ...s,
+                              items: s.items.filter((x) => x.id !== item.id),
+                              portion: null,
+                            }))
+                          }
+                        >
+                          <Trash2 size={17} />
+                        </button>
+                      </article>
+                    ))}
+                  </div>
+                )}
+                <div className="button-row">
                   <button
-                    key={profile.id}
-                    onClick={() => setState(prev => ({ ...prev, activeProfileId: profile.id, isSidebarOpen: false }))}
-                    className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all border ${
-                      state.activeProfileId === profile.id 
-                        ? 'bg-neutral-800 border-neutral-700 text-white' 
-                        : 'bg-transparent border-transparent text-neutral-400 hover:bg-neutral-800/50 hover:text-neutral-200'
-                    }`}
+                    className="subtle"
+                    onClick={() => {
+                      setMode("label");
+                      setCamera(true);
+                    }}
                   >
-                    <span className="font-medium text-sm">{profile.name}</span>
-                    {state.activeProfileId === profile.id && <Check className="w-5 h-5 text-neutral-50" />}
+                    <Camera size={16} /> Scan another
+                  </button>
+                  <button className="subtle" onClick={() => blank()}>
+                    <Plus size={16} /> Manual entry
+                  </button>
+                </div>
+              </section>
+              {state.items.length > 0 && (
+                <section className="panel chef">
+                  <span className="eyebrow">CHEF · KEEP THE FOOD YOU LOVE</span>
+                  <h2>Find a protein-friendly mix.</h2>
+                  <p>
+                    Lock the amounts you want to keep. Choose one ready-to-eat
+                    ingredient to adjust, or let the Chef compare your saved
+                    alternatives.
+                  </p>
+                  <label>
+                    Supporting ingredient
+                    <select
+                      aria-label="Supporting ingredient"
+                      value={adjustId}
+                      onChange={(e) => setAdjustId(e.target.value)}
+                    >
+                      <option value="">Select an unlocked ingredient</option>
+                      {state.items
+                        .filter((x) => !x.locked)
+                        .map((i) => (
+                          <option key={i.id} value={i.id}>
+                            {i.food.name}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                  <div className="form-grid three">
+                    <label>
+                      Whole recipe max (g)
+                      <input
+                        inputMode="decimal"
+                        value={limits.maxWeight}
+                        onChange={(e) =>
+                          setLimits({ ...limits, maxWeight: e.target.value })
+                        }
+                        placeholder="Optional"
+                      />
+                    </label>
+                    <label>
+                      Whole recipe min protein (g)
+                      <input
+                        inputMode="decimal"
+                        value={limits.minProtein}
+                        onChange={(e) =>
+                          setLimits({ ...limits, minProtein: e.target.value })
+                        }
+                        placeholder="Optional"
+                      />
+                    </label>
+                    <label>
+                      Whole recipe max kcal
+                      <input
+                        inputMode="decimal"
+                        value={limits.maxKcal}
+                        onChange={(e) =>
+                          setLimits({ ...limits, maxKcal: e.target.value })
+                        }
+                        placeholder="Optional"
+                      />
+                    </label>
+                  </div>
+                  <button className="primary" onClick={mix}>
+                    <Sparkles size={17} /> Find a mix at PD {fmt(pdRef, 2)}
+                  </button>
+                  <p className="small">
+                    Calculated from your foods. No AI key required. Matching
+                    density does not establish a complete meal or allergen
+                    suitability.
+                  </p>
+                  {options.length > 0 && (
+                    <div className="options">
+                      {options.map((o) => {
+                        const t = aggregate(o.items);
+                        return (
+                          <article key={o.food.id}>
+                            <div>
+                              <h3>
+                                {fmt(o.grams, 0)} g {o.food.name}
+                              </h3>
+                              <p>
+                                {fmt(t.calories, 0)} kcal · {fmt(t.protein)} g
+                                protein · {fmt(t.weight)} g whole recipe
+                              </p>
+                              {o.explanation && <p>{o.explanation}</p>}
+                            </div>
+                            <button
+                              className="subtle"
+                              onClick={() => {
+                                setState((s) => ({
+                                  ...s,
+                                  items: o.items,
+                                  portion: null,
+                                }));
+                                notify(
+                                  "Mix applied. Other ingredient quantities were preserved. Check whether the taste and portion work for you.",
+                                );
+                              }}
+                            >
+                              Use this mix
+                            </button>
+                          </article>
+                        );
+                      })}
+                      <button
+                        className="subtle"
+                        onClick={personalize}
+                        disabled={busy !== ""}
+                      >
+                        <Sparkles size={16} /> Personalize with AI
+                      </button>
+                      <p className="small">
+                        Optional: sends these candidates and your saved taste
+                        notes to the configured AI provider. AI ranks options;
+                        calculations stay deterministic.
+                      </p>
+                    </div>
+                  )}
+                </section>
+              )}
+            </div>
+            <aside>
+              {state.items.length > 0 ? (
+                <>
+                  <Mealan
+                    items={state.items}
+                    portion={state.portion}
+                    goals={state.goals}
+                    title={state.title}
+                  />
+                  <section className="panel">
+                    <h3>How much will you eat?</h3>
+                    <label className="check">
+                      <input
+                        type="checkbox"
+                        checked={state.portion === null}
+                        onChange={(e) =>
+                          setState((s) => ({
+                            ...s,
+                            portion: e.target.checked ? null : totals.weight,
+                          }))
+                        }
+                      />{" "}
+                      Whole recipe ({fmt(totals.weight)} g)
+                    </label>
+                    {state.portion !== null && (
+                      <label>
+                        Selected portion (g)
+                        <input
+                          type="number"
+                          min="1"
+                          max={totals.weight}
+                          value={state.portion}
+                          onChange={(e) =>
+                            setState((s) => ({
+                              ...s,
+                              portion: Math.max(1, Number(e.target.value) || 1),
+                            }))
+                          }
+                        />
+                      </label>
+                    )}
+                    <p className="small">
+                      {matched
+                        ? "This portion is near your daily protein density. Check its actual grams and calories against your meal needs."
+                        : "Density and portion size answer different questions. Your daily reference is not a prescribed meal size."}
+                    </p>
+                    <button className="primary wide" onClick={saveMeal}>
+                      Save recipe
+                    </button>
+                  </section>
+                </>
+              ) : (
+                <section className="panel how">
+                  <span className="eyebrow">A QUICK EXAMPLE</span>
+                  <h2>
+                    Keep the Nutella.
+                    <br />
+                    Rethink the mix.
+                  </h2>
+                  <p>
+                    A concentrated protein source can support a favourite
+                    flavour. The amount still matters.
+                  </p>
+                  <ol>
+                    <li>Confirm each ingredient's label.</li>
+                    <li>Keep the amount you enjoy.</li>
+                    <li>Calculate a feasible combination.</li>
+                    <li>Try it, then tell the Chef what worked.</li>
+                  </ol>
+                  <button
+                    className="subtle"
+                    onClick={() => {
+                      const n = candidateFood(
+                        {
+                          product_name: "Nutella — UK example",
+                          calories: 539,
+                          protein: 6.3,
+                          fats: 30.9,
+                          carbs: 57.5,
+                          fiber: null,
+                        },
+                        "PRD worked example — verify your actual label",
+                      );
+                      const y = candidateFood(
+                        {
+                          product_name:
+                            "Illustrative yogurt — NOT a real product",
+                          calories: 60,
+                          protein: 7.2,
+                          fats: 0.8,
+                          carbs: 6,
+                          fiber: 0,
+                        },
+                        "Invented PRD test data, not a product recommendation",
+                      );
+                      n.readyToEat = y.readyToEat = true;
+                      n.reviewedAt = y.reviewedAt = new Date().toISOString();
+                      const id = uid();
+                      setState((s) => ({
+                        ...s,
+                        title: "Example Nutella–Yogurt Dessert",
+                        goals: s.goals.calories
+                          ? s.goals
+                          : {
+                              calories: 2500,
+                              protein: 150,
+                              fats: 80,
+                              carbs: 280,
+                              fiber: 30,
+                            },
+                        items: [
+                          { id: uid(), food: n, grams: 50, locked: true },
+                          { id, food: y, grams: 100, locked: false },
+                        ],
+                        portion: null,
+                      }));
+                      setAdjustId(id);
+                      notify(
+                        "Illustrative example loaded. Yogurt data is invented. Replace it with real label data before eating or advising a client.",
+                      );
+                    }}
+                  >
+                    Try the worked example <ArrowRight size={16} />
+                  </button>
+                </section>
+              )}
+            </aside>
+          </div>
+        )}
+        {tab === "foods" && (
+          <>
+            <section className="panel">
+              <div className="section-heading">
+                <div>
+                  <span className="eyebrow">YOUR INGREDIENT LIBRARY</span>
+                  <h2>Start with real labels.</h2>
+                </div>
+                <button className="primary" onClick={() => blank()}>
+                  <Plus size={16} /> Add manually
+                </button>
+              </div>
+              <div className="button-row">
+                {(["label", "barcode", "group"] as ScannerMode[]).map((m) => (
+                  <button
+                    className="subtle"
+                    key={m}
+                    onClick={() => {
+                      setMode(m);
+                      setCamera(true);
+                    }}
+                  >
+                    <Camera size={16} />
+                    {m === "group"
+                      ? "Group photos"
+                      : m === "barcode"
+                        ? "Scan barcode"
+                        : "Scan label"}
                   </button>
                 ))}
               </div>
-            </div>
-
-            <div className="p-4 border-t border-neutral-800">
-              <button className="w-full py-4 rounded-2xl border border-neutral-700 text-neutral-300 font-medium hover:bg-neutral-800 transition-all text-sm">
-                Login / Sign Up
-              </button>
-            </div>
-          </motion.div>
-        </>
-      )}
-    </AnimatePresence>
-  );
-
-  const renderHome = () => (
-    <div className="flex-1 flex flex-col items-center justify-center w-full px-6 relative">
-      <button 
-        onClick={() => setState(prev => ({ ...prev, isSidebarOpen: true }))}
-        className="absolute top-6 left-6 p-3 rounded-full bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 transition-colors z-10"
-      >
-        <Menu className="w-6 h-6" />
-      </button>
-
-      <button 
-        onClick={() => setState(prev => ({ ...prev, isCartOpen: true }))}
-        className="absolute top-6 right-6 p-3 rounded-full bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 transition-colors z-10 flex items-center justify-center"
-        title="View Meal Cart"
-      >
-        <ShoppingBag className="w-6 h-6 text-neutral-300" />
-        {state.mealCart.length > 0 && (
-          <span className="absolute -top-1 -right-1 bg-[#39ff14] text-black text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(57,255,20,0.5)]">
-            {state.mealCart.length}
-          </span>
-        )}
-      </button>
-      
-      <div className="w-24 h-24 rounded-full bg-neutral-900 border border-neutral-800 flex items-center justify-center mb-8 shadow-2xl">
-        <ScanLine className="w-10 h-10 text-neutral-400" />
-      </div>
-      <h1 className="text-4xl font-semibold tracking-tight mb-3 text-center">Nutrition XP</h1>
-      <p className="text-neutral-400 text-center mb-12 max-w-[280px] leading-relaxed">
-        Advanced label parsing and macronutrient density profiling.
-      </p>
-
-      {state.error && (
-        <div className="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl text-red-400 flex items-center gap-3 max-w-sm w-full">
-          <AlertCircle className="w-5 h-5 shrink-0" />
-          <span className="text-sm font-medium">{state.error}</span>
-        </div>
-      )}
-      
-      <div className="w-full max-w-sm flex flex-col gap-4">
-        <button
-          onClick={handleScanClick}
-          className="w-full bg-neutral-50 text-neutral-950 py-5 px-6 rounded-3xl font-bold text-lg tracking-wide hover:bg-neutral-200 active:scale-[0.98] transition-all flex items-center justify-center gap-3 shadow-[0_0_40px_rgba(255,255,255,0.1)]"
-        >
-          <Camera className="w-6 h-6" />
-          Scan Food Label
-        </button>
-        
-        <button
-          onClick={() => homeFileInputRef.current?.click()}
-          className="w-full bg-transparent border border-neutral-800 text-neutral-300 py-4 px-6 rounded-3xl font-medium text-base hover:bg-neutral-900 active:scale-[0.98] transition-all flex items-center justify-center gap-2"
-        >
-          <ImageIcon className="w-5 h-5" />
-          Upload from Gallery
-        </button>
-      </div>
-
-      <input 
-        type="file" 
-        accept="image/*" 
-        ref={homeFileInputRef} 
-        onChange={handleHomeFileChange} 
-        className="hidden" 
-      />
-    </div>
-  );
-
-  const renderScanning = () => (
-    <div className="flex-1 flex flex-col items-center justify-center w-full px-6">
-      <div className="relative w-48 h-48 mb-8 rounded-3xl overflow-hidden bg-neutral-900 border border-neutral-800 shadow-2xl">
-        {state.imageUrl && (
-          <img src={state.imageUrl} alt="Scanning" className="w-full h-full object-cover opacity-30 grayscale" />
-        )}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}>
-            <RefreshCw className="w-10 h-10 text-neutral-50" />
-          </motion.div>
-        </div>
-        <motion.div 
-          className="absolute inset-0 border-t-2 border-neutral-50 opacity-50 shadow-[0_0_20px_rgba(255,255,255,0.5)]"
-          animate={{ y: ["0%", "100%", "0%"] }}
-          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-        />
-      </div>
-      <p className="text-lg font-medium text-neutral-300 animate-pulse tracking-wide">
-        {state.scannerMode === 'group' 
-          ? 'Extracting products & checking database...' 
-          : 'Parsing macronutrients...'}
-      </p>
-    </div>
-  );
-
-  const targetMissingItem = state.targetMissingItemId 
-    ? state.mealCart.find(i => i.id === state.targetMissingItemId) 
-    : null;
-
-  const renderHUD = () => {
-    if (!metrics) return null;
-    const isHighProtein = metrics.xpLevel === 'High';
-    return (
-      <div className="absolute inset-0 flex flex-col w-full h-full bg-neutral-950 overflow-hidden">
-        {state.imageUrl && (
-          <div className="absolute inset-0 z-0">
-            <img src={state.imageUrl} alt="Background" className="w-full h-full object-cover opacity-30 grayscale" />
-            <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/80 to-transparent" />
-          </div>
-        )}
-
-        <button 
-          onClick={() => setState(prev => ({ ...prev, isCartOpen: true }))}
-          className="absolute top-6 right-6 p-3 rounded-full bg-neutral-900/80 border border-neutral-700 hover:bg-neutral-800 transition-colors z-20 flex items-center justify-center backdrop-blur-md"
-          title="View Meal Cart"
-        >
-          <ShoppingBag className="w-5 h-5 text-neutral-200" />
-          {state.mealCart.length > 0 && (
-            <span className="absolute -top-1 -right-1 bg-[#39ff14] text-black text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(57,255,20,0.5)]">
-              {state.mealCart.length}
-            </span>
-          )}
-        </button>
-        
-        <div className="relative z-10 flex flex-col h-full justify-end p-6 max-w-md mx-auto w-full">
-          <div className="mb-auto mt-16 flex flex-col items-center text-center">
-            <span className="text-[10px] uppercase tracking-[0.25em] font-bold text-neutral-400 mb-4 bg-neutral-900/80 px-4 py-1.5 rounded-full border border-neutral-800 backdrop-blur-sm">
-              Live Analysis
-            </span>
-            <h2 className="text-2xl font-semibold mb-2 text-neutral-300">Protein Density (XP)</h2>
-            <div 
-              className={`text-6xl font-bold tracking-tighter mb-6 ${isHighProtein ? 'text-[#39ff14]' : 'text-neutral-50'}`}
-              style={{ textShadow: isHighProtein ? '0 0 40px rgba(57,255,20,0.5)' : 'none' }}
-            >
-              {metrics.xp.toFixed(1)} <span className="text-xl font-medium tracking-normal text-neutral-300 opacity-80">({metrics.xpLevel})</span>
-            </div>
-            <div className="px-4 py-2.5 rounded-full bg-neutral-900/80 backdrop-blur-md border border-neutral-700 text-lg tracking-widest font-mono text-neutral-200 shadow-2xl whitespace-nowrap">
-              {metrics.mealanString}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3 pb-4">
-            {targetMissingItem && (
-              <div className="p-3 bg-amber-500/15 border border-amber-500/30 rounded-2xl flex items-center gap-2 text-xs text-amber-300 backdrop-blur-md">
-                <AlertCircle className="w-4 h-4 shrink-0 text-amber-400" />
-                <span>Scanning to resolve missing data for: <strong>{targetMissingItem.product_name}</strong></span>
-              </div>
-            )}
-            <button
-              onClick={handleAddToCart}
-              className="w-full py-4 rounded-3xl bg-neutral-900/90 backdrop-blur-md border border-neutral-700 text-neutral-100 font-semibold text-base hover:bg-neutral-800 transition-all active:scale-[0.98] flex items-center justify-center gap-2 shadow-lg"
-            >
-              <ShoppingBag className="w-5 h-5 text-[#39ff14]" />
-              Add to Meal Cart (100g)
-            </button>
-            <button
-              onClick={() => setState(prev => ({ ...prev, view: 'details' }))}
-              className="w-full py-4 rounded-3xl bg-neutral-50 text-neutral-950 font-bold text-base hover:bg-neutral-200 transition-all active:scale-[0.98]"
-            >
-              View Details
-            </button>
-            <button
-              onClick={() => setState(prev => ({ ...prev, view: 'camera', scanData: null, imageUrl: null }))}
-              className="w-full py-5 rounded-3xl bg-neutral-900/80 backdrop-blur-md border border-neutral-700 text-neutral-50 font-semibold text-lg hover:bg-neutral-800 transition-all active:scale-[0.98]"
-            >
-              Retake
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <div className="min-h-screen bg-neutral-950 text-neutral-50 flex flex-col font-sans selection:bg-neutral-800 overflow-hidden relative">
-      {renderSidebar()}
-      
-      {/* Global Toast Notification */}
-      <AnimatePresence>
-        {toastMessage && (
-          <motion.div
-            initial={{ opacity: 0, y: -20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -20, scale: 0.95 }}
-            className="fixed top-6 inset-x-4 max-w-md mx-auto z-[100] bg-neutral-900/95 border border-amber-500/50 text-neutral-100 px-4 py-3 rounded-2xl shadow-2xl backdrop-blur-md flex items-center gap-3 text-xs sm:text-sm font-medium pointer-events-auto"
-          >
-            <AlertCircle className="w-5 h-5 text-amber-400 shrink-0" />
-            <span className="flex-1">{toastMessage}</span>
-            <button 
-              onClick={() => setToastMessage(null)}
-              className="p-1 text-neutral-400 hover:text-neutral-100 rounded-lg"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence mode="wait">
-        {state.view === 'home' && (
-          <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex w-full">
-            {renderHome()}
-          </motion.div>
-        )}
-        {state.view === 'camera' && (
-          <CameraView 
-            key="camera"
-            error={state.error}
-            mode={state.scannerMode || 'label'}
-            scannerMode={state.scannerMode || 'label'}
-            onModeChange={(mode) => setState(prev => ({ ...prev, scannerMode: mode, error: null }))}
-            onCapture={processImageBase64}
-            processSingleLabelOCR={processImageBase64}
-            processGroupScan={processGroupScan}
-            onBarcode={processBarcode}
-            onCancel={() => setState(prev => ({ ...prev, view: 'home', error: null }))}
-            cartCount={state.mealCart.length}
-            onOpenCart={() => setState(prev => ({ ...prev, isCartOpen: true }))}
-            targetMissingItemName={targetMissingItem?.product_name || null}
-          />
-        )}
-        {state.view === 'scanning' && (
-          <motion.div key="scanning" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex w-full">
-            {renderScanning()}
-          </motion.div>
-        )}
-        {(state.view === 'hud' || state.view === 'details') && (
-          <motion.div key="hud" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex w-full relative">
-            {renderHUD()}
-            <AnimatePresence>
-              {state.view === 'details' && state.scanData && metrics && (
-                <DetailsModal
-                  isOpen={state.view === 'details'}
-                  onClose={() => setState(prev => ({ ...prev, view: 'hud' }))}
-                  scanData={state.scanData}
-                  metrics={metrics}
-                  activeProfile={activeProfile}
-                  targetMissingItemName={targetMissingItem?.product_name || null}
-                  onUpdateBrand={(brand) => setState(prev => prev.scanData ? { ...prev, scanData: { ...prev.scanData, brand } } : prev)}
-                  onUpdateProductName={(product_name) => setState(prev => prev.scanData ? { ...prev, scanData: { ...prev.scanData, product_name } } : prev)}
-                  onSave={saveToAirtable}
-                  isSaving={state.isSaving || false}
-                  saveSuccess={state.saveSuccess || false}
-                  saveError={state.saveError || null}
-                  onAddToCart={handleAddToCart}
-                  onStartNextScan={() => setState(prev => ({ ...prev, view: 'camera', scanData: null, imageUrl: null }))}
+              <div className="barcode-entry">
+                <input
+                  aria-label="Barcode number"
+                  placeholder="Or type barcode"
+                  inputMode="numeric"
+                  value={barcode}
+                  onChange={(e) => setBarcode(e.target.value)}
                 />
-              )}
-            </AnimatePresence>
-          </motion.div>
+                <button className="subtle" onClick={() => lookup()}>
+                  <ScanBarcode size={17} /> Look up
+                </button>
+              </div>
+              <p className="small">
+                Saved on this device. Product matches and OCR always require
+                review before saving. No photo can confirm how much you will
+                eat.
+              </p>
+            </section>
+            {pending.length > 0 && (
+              <section className="panel">
+                <h3>Products identified — confirm individually</h3>
+                <p>
+                  No nutrition or quantities have been assumed. Resolve each
+                  product using its label or your saved foods. Repeated views
+                  are not extra portions.
+                </p>
+                {pending.map((p, i) => (
+                  <div className="pending" key={i}>
+                    <span>
+                      {p.brand} {p.name}
+                    </span>
+                    <button
+                      className="subtle"
+                      onClick={() => blank(p.name, p.brand)}
+                    >
+                      Enter label
+                    </button>
+                    <button
+                      className="icon"
+                      aria-label={`Dismiss ${p.name}`}
+                      onClick={() =>
+                        setPending((v) => v.filter((_, j) => j !== i))
+                      }
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                ))}
+              </section>
+            )}
+            <input
+              className="search"
+              aria-label="Search saved foods"
+              placeholder="Search your saved foods…"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <div className="food-grid">
+              {state.foods
+                .filter((f) =>
+                  (f.name + " " + f.brand)
+                    .toLowerCase()
+                    .includes(query.toLowerCase()),
+                )
+                .map((f) => (
+                  <article className="panel food" key={f.id}>
+                    <small>{f.brand || "YOUR FOOD"}</small>
+                    <h3>{f.name}</h3>
+                    <div className="food-density">
+                      <b>{fmt(density(f.protein, f.calories), 2)}</b>
+                      <span>
+                        PD<small>g protein / 100 kcal</small>
+                      </span>
+                    </div>
+                    <p>{category(density(f.protein, f.calories))}</p>
+                    <p className="small">
+                      Per 100 g: {fmt(f.calories, 0)} kcal · {fmt(f.protein)} g
+                      protein
+                    </p>
+                    <div className="button-row">
+                      <button className="primary" onClick={() => add(f)}>
+                        <Plus size={16} /> Add to meal
+                      </button>
+                      <button
+                        className="subtle"
+                        onClick={() => {
+                          setImage("");
+                          setEdit(f);
+                        }}
+                      >
+                        Review
+                      </button>
+                    </div>
+                    <details>
+                      <summary>Source & storage</summary>
+                      <p>{f.source}</p>
+                      <p>{f.notes || "No label notes."}</p>
+                      <p>
+                        Reviewed {new Date(f.reviewedAt).toLocaleDateString()}.{" "}
+                        {f.readyToEat
+                          ? "Ready for cold mixing."
+                          : "Preparation not confirmed for cold mixing."}
+                      </p>
+                      <button
+                        className="subtle"
+                        onClick={async () => {
+                          setBusy("Saving reviewed food to Airtable…");
+                          try {
+                            await api("/api/save", { food: f });
+                            notify(
+                              "Reviewed food saved to the configured Airtable base. No client targets or taste notes were sent.",
+                            );
+                          } catch (e: any) {
+                            setError(e.message);
+                          } finally {
+                            setBusy("");
+                          }
+                        }}
+                      >
+                        Save food to Airtable
+                      </button>
+                      <button
+                        className="subtle danger"
+                        onClick={() => {
+                          if (
+                            confirm(
+                              "Remove this saved food? Existing recipes retain their snapshots.",
+                            )
+                          )
+                            setState((s) => ({
+                              ...s,
+                              foods: s.foods.filter((x) => x.id !== f.id),
+                            }));
+                        }}
+                      >
+                        Remove saved food
+                      </button>
+                    </details>
+                  </article>
+                ))}
+            </div>
+            {state.foods.length === 0 && (
+              <p className="empty-text">
+                No saved foods yet. Scan a label or add one manually.
+              </p>
+            )}
+          </>
         )}
-      </AnimatePresence>
-
-      <MealCartModal
-        isOpen={!!state.isCartOpen}
-        onClose={() => setState(prev => ({ ...prev, isCartOpen: false }))}
-        items={state.mealCart}
-        onRemoveItem={handleRemoveCartItem}
-        onClearCart={handleClearCart}
-        onScanMissingItem={handleScanMissingItem}
-        onUpdateItemWeight={updateItemWeight}
-        activeProfile={activeProfile}
-        onOpenGroupScan={() => {
-          setState(prev => ({
-            ...prev,
-            isCartOpen: false,
-            view: 'camera',
-            scannerMode: 'group',
-            error: null,
-          }));
-        }}
-      />
+        {tab === "notes" && (
+          <div className="workspace">
+            <div>
+              <section className="panel">
+                <span className="eyebrow">TASTE IS PART OF THE PLAN</span>
+                <h2>What makes food work for you?</h2>
+                <label>
+                  Taste & practical preferences
+                  <textarea
+                    placeholder="E.g. creamy rather than sour; keep the chocolate flavour; small portions; quick preparation."
+                    value={state.preferences}
+                    onChange={(e) =>
+                      setState((s) => ({ ...s, preferences: e.target.value }))
+                    }
+                  />
+                </label>
+                <p className="small">
+                  Editable notes for future suggestions. The Chef does not infer
+                  allergies or change your nutrition targets.
+                </p>
+              </section>
+              <section className="panel">
+                <h2>Saved recipes</h2>
+                {!state.meals.length && (
+                  <p>
+                    Save a recipe from My meal. Saving does not log it as eaten.
+                  </p>
+                )}
+                {state.meals.map((m) => (
+                  <article className="recipe-row" key={m.id}>
+                    <div>
+                      <h3>{m.title}</h3>
+                      <p>
+                        {fmt(m.portion)} g portion ·{" "}
+                        {new Date(m.savedAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="button-row">
+                      <button
+                        className="subtle"
+                        onClick={() => {
+                          setState((s) => ({
+                            ...s,
+                            title: m.title,
+                            items: structuredClone(m.items),
+                            portion: m.portion,
+                          }));
+                          setTab("meal");
+                        }}
+                      >
+                        Open
+                      </button>
+                      <button
+                        className="subtle"
+                        onClick={() => {
+                          setFeedback({
+                            status: "prepared",
+                            taste: "",
+                            notes: "",
+                          });
+                          setReviewMeal(m);
+                        }}
+                      >
+                        Record feedback
+                      </button>
+                      <button
+                        className="icon"
+                        aria-label={`Delete recipe ${m.title}`}
+                        onClick={() => {
+                          if (
+                            confirm(
+                              "Delete this saved recipe? Existing feedback keeps its snapshot.",
+                            )
+                          )
+                            setState((s) => ({
+                              ...s,
+                              meals: s.meals.filter((x) => x.id !== m.id),
+                            }));
+                        }}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </section>
+            </div>
+            <aside>
+              <section className="panel">
+                <h2>Your feedback</h2>
+                {!state.feedback.length && (
+                  <p>
+                    After trying a recipe, record taste, portion size and
+                    whether you prepared or ate it.
+                  </p>
+                )}
+                {state.feedback.map((f) => (
+                  <article className="feedback" key={f.id}>
+                    <b>{f.meal.title}</b>
+                    <small>
+                      {f.status} · {new Date(f.createdAt).toLocaleDateString()}
+                    </small>
+                    <p>{f.taste}</p>
+                    <p>{f.notes}</p>
+                    <button
+                      className="subtle"
+                      onClick={() =>
+                        setState((s) => ({
+                          ...s,
+                          feedback: s.feedback.filter((x) => x.id !== f.id),
+                        }))
+                      }
+                    >
+                      Forget this feedback
+                    </button>
+                  </article>
+                ))}
+              </section>
+            </aside>
+          </div>
+        )}
+        <footer>
+          <p>
+            PlateMate · Mealan pilot <span>0.3</span>
+            <br />
+            <small>
+              Local data on this browser. Export before changing devices. AI
+              services: {services?.ai ? "configured" : "not connected"} ·
+              Airtable: {services?.airtable ? "configured" : "not connected"}
+            </small>
+          </p>
+          <div className="button-row">
+            <button className="subtle" onClick={exportData}>
+              <Download size={15} /> Export
+            </button>
+            <button
+              className="subtle"
+              onClick={() => importRef.current?.click()}
+            >
+              <Upload size={15} /> Import
+            </button>
+            <button className="subtle" onClick={() => setAccessOpen(true)}>
+              Server access
+            </button>
+          </div>
+          <p className="small">
+            Barcode data:{" "}
+            <a
+              href="https://world.openfoodfacts.org"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open Food Facts
+            </a>{" "}
+            · Community data; verify the package. No medical or
+            meal-completeness claims.
+          </p>
+        </footer>
+        <input
+          ref={importRef}
+          type="file"
+          accept="application/json"
+          hidden
+          onChange={async (e) => {
+            const f = e.target.files?.[0];
+            if (!f) return;
+            try {
+              if (f.size > 5_000_000) throw new Error("Backup is too large.");
+              const data = parseState(await f.text());
+              if (
+                confirm(
+                  "Replace this browser’s pilot data with this backup? Export first if needed.",
+                )
+              ) {
+                unreadableBackup = null;
+                setState(data);
+                notify("Backup imported.");
+              }
+            } catch (err: any) {
+              setError(err.message);
+            }
+            e.target.value = "";
+          }}
+        />
+      </main>
+      {camera && (
+        <div className="camera-modal">
+          <CameraView
+            scannerMode={mode}
+            onModeChange={setMode}
+            onCapture={(x) => scan(x)}
+            processGroupScan={(x) => scan(x, true)}
+            onBarcode={(x) => lookup(x)}
+            onCancel={() => setCamera(false)}
+            onOpenCart={() => {
+              setCamera(false);
+              setTab("meal");
+            }}
+            cartCount={state.items.length}
+          />
+        </div>
+      )}
+      {edit && (
+        <FoodEditor
+          key={edit.id}
+          food={edit}
+          image={image}
+          close={() => setEdit(null)}
+          save={saveFood}
+        />
+      )}{" "}
+      {goalsOpen && (
+        <GoalsEditor
+          goals={state.goals}
+          close={() => setGoalsOpen(false)}
+          save={(g) => {
+            setState((s) => ({ ...s, goals: g }));
+            setGoalsOpen(false);
+            notify("Daily reference saved. Food composition stays unchanged.");
+          }}
+        />
+      )}
+      {accessOpen && (
+        <Modal title="Pilot server access" close={() => setAccessOpen(false)}>
+          <p>
+            Use the access key provided by the person hosting this pilot. It is
+            kept for this browser session.
+          </p>
+          <label>
+            Access key
+            <input
+              type="password"
+              value={access}
+              onChange={(e) => setAccess(e.target.value)}
+            />
+          </label>
+          <button
+            className="primary"
+            onClick={() => {
+              sessionStorage.setItem("platemate-access", access);
+              setAccessOpen(false);
+              notify("Access key saved for this session. Retry your request.");
+            }}
+          >
+            Save access key
+          </button>
+        </Modal>
+      )}
+      {reviewMeal && (
+        <Modal
+          title={`Feedback: ${reviewMeal.title}`}
+          close={() => setReviewMeal(null)}
+        >
+          <label>
+            What happened?
+            <select
+              value={feedback.status}
+              onChange={(e) =>
+                setFeedback({
+                  ...feedback,
+                  status: e.target.value as Feedback["status"],
+                })
+              }
+            >
+              <option value="prepared">Prepared</option>
+              <option value="eaten">Eaten</option>
+              <option value="not-used">Not used</option>
+            </select>
+          </label>
+          <label>
+            Taste
+            <textarea
+              value={feedback.taste}
+              onChange={(e) =>
+                setFeedback({ ...feedback, taste: e.target.value })
+              }
+              placeholder="Too sour? Just right? What would you change?"
+            />
+          </label>
+          <label>
+            Portion & practical notes
+            <textarea
+              value={feedback.notes}
+              onChange={(e) =>
+                setFeedback({ ...feedback, notes: e.target.value })
+              }
+            />
+          </label>
+          <button
+            className="primary"
+            onClick={() => {
+              setState((s) => ({
+                ...s,
+                feedback: [
+                  {
+                    id: uid(),
+                    meal: structuredClone(reviewMeal),
+                    ...feedback,
+                    createdAt: new Date().toISOString(),
+                  },
+                  ...s.feedback,
+                ],
+              }));
+              setReviewMeal(null);
+              notify("Feedback saved with this recipe snapshot.");
+            }}
+          >
+            Save feedback
+          </button>
+        </Modal>
+      )}
+      {busy && (
+        <div className="busy" role="status">
+          <div className="spinner" />
+          <h3>{busy}</h3>
+          <button
+            className="subtle"
+            onClick={() => {
+              runRef.current++;
+              setBusy("");
+            }}
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
     </div>
   );
 }
