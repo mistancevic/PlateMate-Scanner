@@ -18,7 +18,7 @@ export function HomeScreen(p: AppApi) {
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
       </section>
-      <button className="pill pill-primary pill-tall" onClick={() => { setStep("in"); setTab("journey"); }}>
+      <button className="pill pill-primary pill-tall" onClick={() => { setStep(state.items.length ? "lock" : "in"); setTab("journey"); }}>
         <ChefHat size={20} /> I'm craving something
       </button>
       <button className="pill pill-tall" onClick={() => { setStep("in"); setTab("journey"); setMode("group"); setCamera(true); }}>

@@ -92,7 +92,7 @@ export function JourneyScreen(p: AppApi) {
             </div>
           ))}
         </div>
-        <Back to="in" />
+        <button className="link" onClick={() => setStep("in")}>+ Add another product</button>
         <button className="pill pill-primary pill-wide" onClick={() => {
           if (free.length !== 1) { setError(free.length === 0 ? "Unlock the one food Mealan may change." : "Leave only one food unlocked. That is the one Mealan moves."); return; }
           setAdjustId(free[0].id); setPick(0);
