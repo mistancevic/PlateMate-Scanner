@@ -20,7 +20,8 @@ import {
 import { CameraView } from "./components/CameraView";
 import { resizeImageBase64 } from "./utils/image";
 import type { ScannerMode } from "./types";
-import { fmt } from "./ui";
+import { fmt, fixed } from "./ui";
+import { Mark, APP_NAME } from "./components/Mark";
 import { MealScreen } from "./screens/MealScreen";
 import { ChefScreen } from "./screens/ChefScreen";
 import { FoodsScreen } from "./screens/FoodsScreen";
@@ -371,7 +372,11 @@ function GoalsEditor({
 }
 export default function App() {
   const [state, setState] = useState<PilotState>(load),
-    [tab, setTab] = useState<Tab>("meal"),
+    [tab, setTab] = useState<Tab>(() => {
+      const h = (typeof location !== "undefined" ? location.hash : "").replace("#", "");
+      return (["meal", "chef", "foods", "notes", "more"] as Tab[]).includes(h as Tab) ? (h as Tab) : "meal";
+    }),
+    [filter, setFilter] = useState<"all" | "high" | "mid" | "low" | "inmeal">("all"),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -708,7 +713,7 @@ export default function App() {
     api, setImage, setEdit, setGoalsOpen, setAccessOpen, setReviewMeal,
     setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
-    pdRef, matched, importRef,
+    pdRef, matched, importRef, filter, setFilter,
     mealanCard: (
       <Mealan
         items={state.items}
@@ -718,55 +723,32 @@ export default function App() {
       />
     ),
   };
-  const NAV: { id: Tab; label: string; icon: ReactNode; badge?: number }[] = [
-    { id: "meal", label: "Meal", icon: <Utensils size={19} />, badge: state.items.length || undefined },
-    { id: "chef", label: "Chef", icon: <Sparkles size={19} /> },
-    { id: "foods", label: "Foods", icon: <BookOpen size={19} /> },
-    { id: "notes", label: "Recipes", icon: <Check size={19} /> },
-    { id: "more", label: "More", icon: <SlidersHorizontal size={19} /> },
+  const NAV: { id: Tab; label: string }[] = [
+    { id: "meal", label: "Meal" },
+    { id: "chef", label: "Chef" },
+    { id: "foods", label: "Foods" },
+    { id: "notes", label: "Recipes" },
+    { id: "more", label: "More" },
   ];
   const TITLES: Record<Tab, string> = {
-    meal: state.title || "My meal",
+    meal: "Meal",
     chef: "Chef",
-    foods: "Saved foods",
-    notes: "Recipes & taste",
-    more: "Reference & data",
+    foods: "Foods",
+    notes: "Recipes",
+    more: "More",
   };
   return (
     <div className="app-shell">
       <header className="topbar">
-        <a
-          className="brand"
-          href="#"
-          onClick={(e) => {
-            e.preventDefault();
-            setTab("meal");
-          }}
-        >
-          <span className="brand-mark">
-            <Leaf size={20} />
-          </span>
-          <span className="brand-name">
-            PlateMate<small>Mealan pilot</small>
-          </span>
-        </a>
-        <button
-          className="reference-chip"
-          onClick={() => setGoalsOpen(true)}
-          aria-label="Edit daily reference"
-        >
-          <b>{fmt(state.goals.calories, 0)}</b> kcal
-          <b>{fmt(state.goals.protein)}</b> g
-          <span className="pd-tag">PD {fmt(pdRef, 2)}</span>
+        <button className="brand" onClick={() => setTab("meal")} aria-label={APP_NAME}>
+          <Mark size={30} color="var(--brand)" />
+        </button>
+        <h1>{TITLES[tab]}</h1>
+        <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
+          {fmt(state.goals.calories, 0)} kcal · {fmt(state.goals.protein)} g · PD {fixed(pdRef)}
         </button>
       </header>
       <main>
-        <div className="screen-title">
-          <h1>{TITLES[tab]}</h1>
-          {tab === "meal" && (
-            <p>Start with what you want to eat. See the portion. Find a mix that works.</p>
-          )}
-        </div>
         {error && (
           <div className="notice" role="alert">
             {error}
@@ -831,9 +813,7 @@ export default function App() {
             aria-current={tab === n.id ? "page" : undefined}
             onClick={() => setTab(n.id)}
           >
-            {n.icon}
-            <span>{n.label}</span>
-            {n.badge ? <em>{n.badge}</em> : null}
+            {n.label}
           </button>
         ))}
       </nav>

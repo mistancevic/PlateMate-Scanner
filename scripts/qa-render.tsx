@@ -1,0 +1,21 @@
+// QA render: server-render each screen with seeded state so it can be looked at without a browser.
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { freshState, candidateFood } from "../src/pilot";
+import fs from "node:fs";
+const tab = process.argv[2] || "meal";
+const s = freshState();
+s.goals = { calories: 2500, protein: 150, fats: 80, carbs: 280, fiber: 30 } as any;
+const n = candidateFood({ product_name: "Nutella", brand: "Ferrero", calories: 539, protein: 6.3, fats: 30.9, carbs: 57.5, fiber: null }, "label");
+const y = candidateFood({ product_name: "Skyr, natural", brand: "Arla", calories: 63, protein: 11, fats: 0.2, carbs: 4, fiber: 0 }, "label");
+n.reviewedAt = y.reviewedAt = new Date().toISOString(); y.readyToEat = true;
+s.foods = [n, y]; s.title = "Nutella skyr bowl";
+s.items = [{ id: "a", food: n, grams: 40, locked: true }, { id: "b", food: y, grams: 200, locked: false }];
+(globalThis as any).localStorage = { getItem: () => JSON.stringify(s), setItem: () => {}, removeItem: () => {} };
+(globalThis as any).location = { hash: "#" + tab };
+(globalThis as any).window = globalThis; (globalThis as any).sessionStorage = { getItem: () => null, setItem: () => {}, removeItem: () => {} };
+const { default: App } = await import("../src/App");
+const html = renderToStaticMarkup(React.createElement(App));
+const css = fs.readdirSync("dist/assets").filter((f) => f.endsWith(".css")).map((f) => fs.readFileSync("dist/assets/" + f, "utf8")).join("\n");
+fs.writeFileSync(`/tmp/qa-${tab}.html`, `<!doctype html><html><head><meta charset="utf-8"><style>${css}</style></head><body>${html}</body></html>`);
+console.log("wrote", tab);

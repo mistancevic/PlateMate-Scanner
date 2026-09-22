@@ -46,4 +46,6 @@ export interface AppApi {
   matched: boolean;
   mealanCard: ReactNode;
   importRef: RefObject<HTMLInputElement | null>;
+  filter: "all" | "high" | "mid" | "low" | "inmeal";
+  setFilter: (f: "all" | "high" | "mid" | "low" | "inmeal") => void;
 }
