@@ -20,6 +20,13 @@ import {
 import { CameraView } from "./components/CameraView";
 import { resizeImageBase64 } from "./utils/image";
 import type { ScannerMode } from "./types";
+import { fmt } from "./ui";
+import { MealScreen } from "./screens/MealScreen";
+import { ChefScreen } from "./screens/ChefScreen";
+import { FoodsScreen } from "./screens/FoodsScreen";
+import { RecipesScreen } from "./screens/RecipesScreen";
+import { MoreScreen } from "./screens/MoreScreen";
+import type { AppApi, Tab } from "./screens/api";
 import {
   aggregate,
   candidateFood,
@@ -47,8 +54,7 @@ import {
   validateFood,
 } from "./pilot";
 const STORE = "platemate-pilot-v1";
-const fmt = (n: number | null, d = 1) =>
-  n === null ? "?" : n.toLocaleString(undefined, { maximumFractionDigits: d });
+
 let unreadableBackup: string | null = null;
 const load = () => {
   try {
@@ -365,7 +371,7 @@ function GoalsEditor({
 }
 export default function App() {
   const [state, setState] = useState<PilotState>(load),
-    [tab, setTab] = useState<"meal" | "foods" | "notes">("meal"),
+    [tab, setTab] = useState<Tab>("meal"),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -696,6 +702,36 @@ export default function App() {
     selected.protein !== null &&
     pdRef !== null &&
     Math.abs(density(selected.protein, selected.calories)! - pdRef) <= 0.05;
+  const screenProps: AppApi = {
+    state, setState, setTab, setCamera, setMode, blank, add, updateItem,
+    saveMeal, mix, personalize, lookup, exportData, notify, setError, setBusy,
+    api, setImage, setEdit, setGoalsOpen, setAccessOpen, setReviewMeal,
+    setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
+    setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
+    pdRef, matched, importRef,
+    mealanCard: (
+      <Mealan
+        items={state.items}
+        portion={state.portion}
+        goals={state.goals}
+        title={state.title}
+      />
+    ),
+  };
+  const NAV: { id: Tab; label: string; icon: ReactNode; badge?: number }[] = [
+    { id: "meal", label: "Meal", icon: <Utensils size={19} />, badge: state.items.length || undefined },
+    { id: "chef", label: "Chef", icon: <Sparkles size={19} /> },
+    { id: "foods", label: "Foods", icon: <BookOpen size={19} /> },
+    { id: "notes", label: "Recipes", icon: <Check size={19} /> },
+    { id: "more", label: "More", icon: <SlidersHorizontal size={19} /> },
+  ];
+  const TITLES: Record<Tab, string> = {
+    meal: state.title || "My meal",
+    chef: "Chef",
+    foods: "Saved foods",
+    notes: "Recipes & taste",
+    more: "Reference & data",
+  };
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -708,36 +744,28 @@ export default function App() {
           }}
         >
           <span className="brand-mark">
-            <Leaf size={22} />
+            <Leaf size={20} />
           </span>
-          <span>
-            PlateMate<small>MEALAN PILOT</small>
+          <span className="brand-name">
+            PlateMate<small>Mealan pilot</small>
           </span>
         </a>
-        <button className="subtle" onClick={() => setGoalsOpen(true)}>
-          <SlidersHorizontal size={17} />
-          <span>Daily reference</span>
+        <button
+          className="reference-chip"
+          onClick={() => setGoalsOpen(true)}
+          aria-label="Edit daily reference"
+        >
+          <b>{fmt(state.goals.calories, 0)}</b> kcal
+          <b>{fmt(state.goals.protein)}</b> g
+          <span className="pd-tag">PD {fmt(pdRef, 2)}</span>
         </button>
       </header>
       <main>
-        <div className="intro">
-          <span className="eyebrow">
-            FOOD YOU ENJOY. A PLAN YOU CAN LIVE WITH.
-          </span>
-          <h1>Make it your meal.</h1>
-          <p>
-            Start with what you want to eat. See the portion. Find a mix that
-            works for you.
-          </p>
-        </div>
-        <div className="reference-strip">
-          <span>YOUR DAILY REFERENCE</span>
-          <b>{fmt(state.goals.calories, 0)} kcal</b>
-          <b>{fmt(state.goals.protein)} g protein</b>
-          <span className="pd-tag">PD {fmt(pdRef, 2)}</span>
-          <button onClick={() => setGoalsOpen(true)}>
-            Edit <ArrowRight size={13} />
-          </button>
+        <div className="screen-title">
+          <h1>{TITLES[tab]}</h1>
+          {tab === "meal" && (
+            <p>Start with what you want to eat. See the portion. Find a mix that works.</p>
+          )}
         </div>
         {error && (
           <div className="notice" role="alert">
@@ -763,737 +791,11 @@ export default function App() {
             </button>
           </div>
         )}
-        <nav className="tabs" aria-label="Workspace">
-          <button
-            className={tab === "meal" ? "active" : ""}
-            onClick={() => setTab("meal")}
-          >
-            <Utensils size={17} /> My meal{" "}
-            {state.items.length > 0 && <span>{state.items.length}</span>}
-          </button>
-          <button
-            className={tab === "foods" ? "active" : ""}
-            onClick={() => setTab("foods")}
-          >
-            <BookOpen size={17} /> Saved foods
-          </button>
-          <button
-            className={tab === "notes" ? "active" : ""}
-            onClick={() => setTab("notes")}
-          >
-            <Sparkles size={17} /> Recipes & taste
-          </button>
-        </nav>
-        {tab === "meal" && (
-          <div className="workspace">
-            <div className="main-column">
-              <section className="panel">
-                <div className="section-heading">
-                  <div>
-                    <span className="eyebrow">BUILD YOUR BOWL</span>
-                    <h2>Your ingredients</h2>
-                  </div>
-                  <button className="subtle" onClick={() => setTab("foods")}>
-                    <Plus size={16} /> Add food
-                  </button>
-                </div>
-                <label>
-                  Meal name
-                  <input
-                    value={state.title}
-                    onChange={(e) =>
-                      setState({ ...state, title: e.target.value })
-                    }
-                  />
-                </label>
-                {!state.items.length ? (
-                  <div className="empty">
-                    <Utensils size={34} />
-                    <h3>What are you craving?</h3>
-                    <p>
-                      Scan or enter a food, check its label, then add the amount
-                      you want.
-                    </p>
-                    <button
-                      className="primary"
-                      onClick={() => {
-                        setMode("label");
-                        setCamera(true);
-                      }}
-                    >
-                      <Camera size={17} /> Scan a label
-                    </button>
-                    <button className="subtle" onClick={() => blank()}>
-                      Enter a food manually
-                    </button>
-                  </div>
-                ) : (
-                  <div className="ingredient-list">
-                    {state.items.map((item) => (
-                      <article className="ingredient" key={item.id}>
-                        <div className="ingredient-name">
-                          <b>{item.food.name}</b>
-                          <small>
-                            {item.food.brand} · PD{" "}
-                            {fmt(
-                              density(item.food.protein, item.food.calories),
-                              2,
-                            )}
-                          </small>
-                        </div>
-                        <label className="quantity">
-                          Amount
-                          <input
-                            aria-label={`Grams of ${item.food.name}`}
-                            type="number"
-                            min="0"
-                            step="1"
-                            value={item.grams}
-                            onChange={(e) =>
-                              updateItem(item.id, {
-                                grams: Math.max(0, Number(e.target.value) || 0),
-                              })
-                            }
-                          />
-                          <span>g</span>
-                        </label>
-                        <button
-                          className={`icon ${item.locked ? "locked" : ""}`}
-                          aria-label={`${item.locked ? "Unlock" : "Lock"} ${item.food.name}`}
-                          title={
-                            item.locked
-                              ? "Amount locked"
-                              : "Available for adjustment"
-                          }
-                          onClick={() => {
-                            updateItem(item.id, { locked: !item.locked });
-                            if (item.locked) setAdjustId(item.id);
-                          }}
-                        >
-                          {item.locked ? (
-                            <LockKeyhole size={17} />
-                          ) : (
-                            <Unlock size={17} />
-                          )}
-                        </button>
-                        <button
-                          className="icon"
-                          aria-label={`Remove ${item.food.name}`}
-                          onClick={() =>
-                            setState((s) => ({
-                              ...s,
-                              items: s.items.filter((x) => x.id !== item.id),
-                              portion: null,
-                            }))
-                          }
-                        >
-                          <Trash2 size={17} />
-                        </button>
-                      </article>
-                    ))}
-                  </div>
-                )}
-                <div className="button-row">
-                  <button
-                    className="subtle"
-                    onClick={() => {
-                      setMode("label");
-                      setCamera(true);
-                    }}
-                  >
-                    <Camera size={16} /> Scan another
-                  </button>
-                  <button className="subtle" onClick={() => blank()}>
-                    <Plus size={16} /> Manual entry
-                  </button>
-                </div>
-              </section>
-              {state.items.length > 0 && (
-                <section className="panel chef">
-                  <span className="eyebrow">CHEF · KEEP THE FOOD YOU LOVE</span>
-                  <h2>Find a protein-friendly mix.</h2>
-                  <p>
-                    Lock the amounts you want to keep. Choose one ready-to-eat
-                    ingredient to adjust, or let the Chef compare your saved
-                    alternatives.
-                  </p>
-                  <label>
-                    Supporting ingredient
-                    <select
-                      aria-label="Supporting ingredient"
-                      value={adjustId}
-                      onChange={(e) => setAdjustId(e.target.value)}
-                    >
-                      <option value="">Select an unlocked ingredient</option>
-                      {state.items
-                        .filter((x) => !x.locked)
-                        .map((i) => (
-                          <option key={i.id} value={i.id}>
-                            {i.food.name}
-                          </option>
-                        ))}
-                    </select>
-                  </label>
-                  <div className="form-grid three">
-                    <label>
-                      Whole recipe max (g)
-                      <input
-                        inputMode="decimal"
-                        value={limits.maxWeight}
-                        onChange={(e) =>
-                          setLimits({ ...limits, maxWeight: e.target.value })
-                        }
-                        placeholder="Optional"
-                      />
-                    </label>
-                    <label>
-                      Whole recipe min protein (g)
-                      <input
-                        inputMode="decimal"
-                        value={limits.minProtein}
-                        onChange={(e) =>
-                          setLimits({ ...limits, minProtein: e.target.value })
-                        }
-                        placeholder="Optional"
-                      />
-                    </label>
-                    <label>
-                      Whole recipe max kcal
-                      <input
-                        inputMode="decimal"
-                        value={limits.maxKcal}
-                        onChange={(e) =>
-                          setLimits({ ...limits, maxKcal: e.target.value })
-                        }
-                        placeholder="Optional"
-                      />
-                    </label>
-                  </div>
-                  <button className="primary" onClick={mix}>
-                    <Sparkles size={17} /> Find a mix at PD {fmt(pdRef, 2)}
-                  </button>
-                  <p className="small">
-                    Calculated from your foods. No AI key required. Matching
-                    density does not establish a complete meal or allergen
-                    suitability.
-                  </p>
-                  {options.length > 0 && (
-                    <div className="options">
-                      {options.map((o) => {
-                        const t = aggregate(o.items);
-                        return (
-                          <article key={o.food.id}>
-                            <div>
-                              <h3>
-                                {fmt(o.grams, 0)} g {o.food.name}
-                              </h3>
-                              <p>
-                                {fmt(t.calories, 0)} kcal · {fmt(t.protein)} g
-                                protein · {fmt(t.weight)} g whole recipe
-                              </p>
-                              {o.explanation && <p>{o.explanation}</p>}
-                            </div>
-                            <button
-                              className="subtle"
-                              onClick={() => {
-                                setState((s) => ({
-                                  ...s,
-                                  items: o.items,
-                                  portion: null,
-                                }));
-                                notify(
-                                  "Mix applied. Other ingredient quantities were preserved. Check whether the taste and portion work for you.",
-                                );
-                              }}
-                            >
-                              Use this mix
-                            </button>
-                          </article>
-                        );
-                      })}
-                      <button
-                        className="subtle"
-                        onClick={personalize}
-                        disabled={busy !== ""}
-                      >
-                        <Sparkles size={16} /> Personalize with AI
-                      </button>
-                      <p className="small">
-                        Optional: sends these candidates and your saved taste
-                        notes to the configured AI provider. AI ranks options;
-                        calculations stay deterministic.
-                      </p>
-                    </div>
-                  )}
-                </section>
-              )}
-            </div>
-            <aside>
-              {state.items.length > 0 ? (
-                <>
-                  <Mealan
-                    items={state.items}
-                    portion={state.portion}
-                    goals={state.goals}
-                    title={state.title}
-                  />
-                  <section className="panel">
-                    <h3>How much will you eat?</h3>
-                    <label className="check">
-                      <input
-                        type="checkbox"
-                        checked={state.portion === null}
-                        onChange={(e) =>
-                          setState((s) => ({
-                            ...s,
-                            portion: e.target.checked ? null : totals.weight,
-                          }))
-                        }
-                      />{" "}
-                      Whole recipe ({fmt(totals.weight)} g)
-                    </label>
-                    {state.portion !== null && (
-                      <label>
-                        Selected portion (g)
-                        <input
-                          type="number"
-                          min="1"
-                          max={totals.weight}
-                          value={state.portion}
-                          onChange={(e) =>
-                            setState((s) => ({
-                              ...s,
-                              portion: Math.max(1, Number(e.target.value) || 1),
-                            }))
-                          }
-                        />
-                      </label>
-                    )}
-                    <p className="small">
-                      {matched
-                        ? "This portion is near your daily protein density. Check its actual grams and calories against your meal needs."
-                        : "Density and portion size answer different questions. Your daily reference is not a prescribed meal size."}
-                    </p>
-                    <button className="primary wide" onClick={saveMeal}>
-                      Save recipe
-                    </button>
-                  </section>
-                </>
-              ) : (
-                <section className="panel how">
-                  <span className="eyebrow">A QUICK EXAMPLE</span>
-                  <h2>
-                    Keep the Nutella.
-                    <br />
-                    Rethink the mix.
-                  </h2>
-                  <p>
-                    A concentrated protein source can support a favourite
-                    flavour. The amount still matters.
-                  </p>
-                  <ol>
-                    <li>Confirm each ingredient's label.</li>
-                    <li>Keep the amount you enjoy.</li>
-                    <li>Calculate a feasible combination.</li>
-                    <li>Try it, then tell the Chef what worked.</li>
-                  </ol>
-                  <button
-                    className="subtle"
-                    onClick={() => {
-                      const n = candidateFood(
-                        {
-                          product_name: "Nutella — UK example",
-                          calories: 539,
-                          protein: 6.3,
-                          fats: 30.9,
-                          carbs: 57.5,
-                          fiber: null,
-                        },
-                        "PRD worked example — verify your actual label",
-                      );
-                      const y = candidateFood(
-                        {
-                          product_name:
-                            "Illustrative yogurt — NOT a real product",
-                          calories: 60,
-                          protein: 7.2,
-                          fats: 0.8,
-                          carbs: 6,
-                          fiber: 0,
-                        },
-                        "Invented PRD test data, not a product recommendation",
-                      );
-                      n.readyToEat = y.readyToEat = true;
-                      n.reviewedAt = y.reviewedAt = new Date().toISOString();
-                      const id = uid();
-                      setState((s) => ({
-                        ...s,
-                        title: "Example Nutella–Yogurt Dessert",
-                        goals: s.goals.calories
-                          ? s.goals
-                          : {
-                              calories: 2500,
-                              protein: 150,
-                              fats: 80,
-                              carbs: 280,
-                              fiber: 30,
-                            },
-                        items: [
-                          { id: uid(), food: n, grams: 50, locked: true },
-                          { id, food: y, grams: 100, locked: false },
-                        ],
-                        portion: null,
-                      }));
-                      setAdjustId(id);
-                      notify(
-                        "Illustrative example loaded. Yogurt data is invented. Replace it with real label data before eating or advising a client.",
-                      );
-                    }}
-                  >
-                    Try the worked example <ArrowRight size={16} />
-                  </button>
-                </section>
-              )}
-            </aside>
-          </div>
-        )}
-        {tab === "foods" && (
-          <>
-            <section className="panel">
-              <div className="section-heading">
-                <div>
-                  <span className="eyebrow">YOUR INGREDIENT LIBRARY</span>
-                  <h2>Start with real labels.</h2>
-                </div>
-                <button className="primary" onClick={() => blank()}>
-                  <Plus size={16} /> Add manually
-                </button>
-              </div>
-              <div className="button-row">
-                {(["label", "barcode", "group"] as ScannerMode[]).map((m) => (
-                  <button
-                    className="subtle"
-                    key={m}
-                    onClick={() => {
-                      setMode(m);
-                      setCamera(true);
-                    }}
-                  >
-                    <Camera size={16} />
-                    {m === "group"
-                      ? "Group photos"
-                      : m === "barcode"
-                        ? "Scan barcode"
-                        : "Scan label"}
-                  </button>
-                ))}
-              </div>
-              <div className="barcode-entry">
-                <input
-                  aria-label="Barcode number"
-                  placeholder="Or type barcode"
-                  inputMode="numeric"
-                  value={barcode}
-                  onChange={(e) => setBarcode(e.target.value)}
-                />
-                <button className="subtle" onClick={() => lookup()}>
-                  <ScanBarcode size={17} /> Look up
-                </button>
-              </div>
-              <p className="small">
-                Saved on this device. Product matches and OCR always require
-                review before saving. No photo can confirm how much you will
-                eat.
-              </p>
-            </section>
-            {pending.length > 0 && (
-              <section className="panel">
-                <h3>Products identified — confirm individually</h3>
-                <p>
-                  No nutrition or quantities have been assumed. Resolve each
-                  product using its label or your saved foods. Repeated views
-                  are not extra portions.
-                </p>
-                {pending.map((p, i) => (
-                  <div className="pending" key={i}>
-                    <span>
-                      {p.brand} {p.name}
-                    </span>
-                    <button
-                      className="subtle"
-                      onClick={() => blank(p.name, p.brand)}
-                    >
-                      Enter label
-                    </button>
-                    <button
-                      className="icon"
-                      aria-label={`Dismiss ${p.name}`}
-                      onClick={() =>
-                        setPending((v) => v.filter((_, j) => j !== i))
-                      }
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                ))}
-              </section>
-            )}
-            <input
-              className="search"
-              aria-label="Search saved foods"
-              placeholder="Search your saved foods…"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-            <div className="food-grid">
-              {state.foods
-                .filter((f) =>
-                  (f.name + " " + f.brand)
-                    .toLowerCase()
-                    .includes(query.toLowerCase()),
-                )
-                .map((f) => (
-                  <article className="panel food" key={f.id}>
-                    <small>{f.brand || "YOUR FOOD"}</small>
-                    <h3>{f.name}</h3>
-                    <div className="food-density">
-                      <b>{fmt(density(f.protein, f.calories), 2)}</b>
-                      <span>
-                        PD<small>g protein / 100 kcal</small>
-                      </span>
-                    </div>
-                    <p>{category(density(f.protein, f.calories))}</p>
-                    <p className="small">
-                      Per 100 g: {fmt(f.calories, 0)} kcal · {fmt(f.protein)} g
-                      protein
-                    </p>
-                    <div className="button-row">
-                      <button className="primary" onClick={() => add(f)}>
-                        <Plus size={16} /> Add to meal
-                      </button>
-                      <button
-                        className="subtle"
-                        onClick={() => {
-                          setImage("");
-                          setEdit(f);
-                        }}
-                      >
-                        Review
-                      </button>
-                    </div>
-                    <details>
-                      <summary>Source & storage</summary>
-                      <p>{f.source}</p>
-                      <p>{f.notes || "No label notes."}</p>
-                      <p>
-                        Reviewed {new Date(f.reviewedAt).toLocaleDateString()}.{" "}
-                        {f.readyToEat
-                          ? "Ready for cold mixing."
-                          : "Preparation not confirmed for cold mixing."}
-                      </p>
-                      <button
-                        className="subtle"
-                        onClick={async () => {
-                          setBusy("Saving reviewed food to Airtable…");
-                          try {
-                            await api("/api/save", { food: f });
-                            notify(
-                              "Reviewed food saved to the configured Airtable base. No client targets or taste notes were sent.",
-                            );
-                          } catch (e: any) {
-                            setError(e.message);
-                          } finally {
-                            setBusy("");
-                          }
-                        }}
-                      >
-                        Save food to Airtable
-                      </button>
-                      <button
-                        className="subtle danger"
-                        onClick={() => {
-                          if (
-                            confirm(
-                              "Remove this saved food? Existing recipes retain their snapshots.",
-                            )
-                          )
-                            setState((s) => ({
-                              ...s,
-                              foods: s.foods.filter((x) => x.id !== f.id),
-                            }));
-                        }}
-                      >
-                        Remove saved food
-                      </button>
-                    </details>
-                  </article>
-                ))}
-            </div>
-            {state.foods.length === 0 && (
-              <p className="empty-text">
-                No saved foods yet. Scan a label or add one manually.
-              </p>
-            )}
-          </>
-        )}
-        {tab === "notes" && (
-          <div className="workspace">
-            <div>
-              <section className="panel">
-                <span className="eyebrow">TASTE IS PART OF THE PLAN</span>
-                <h2>What makes food work for you?</h2>
-                <label>
-                  Taste & practical preferences
-                  <textarea
-                    placeholder="E.g. creamy rather than sour; keep the chocolate flavour; small portions; quick preparation."
-                    value={state.preferences}
-                    onChange={(e) =>
-                      setState((s) => ({ ...s, preferences: e.target.value }))
-                    }
-                  />
-                </label>
-                <p className="small">
-                  Editable notes for future suggestions. The Chef does not infer
-                  allergies or change your nutrition targets.
-                </p>
-              </section>
-              <section className="panel">
-                <h2>Saved recipes</h2>
-                {!state.meals.length && (
-                  <p>
-                    Save a recipe from My meal. Saving does not log it as eaten.
-                  </p>
-                )}
-                {state.meals.map((m) => (
-                  <article className="recipe-row" key={m.id}>
-                    <div>
-                      <h3>{m.title}</h3>
-                      <p>
-                        {fmt(m.portion)} g portion ·{" "}
-                        {new Date(m.savedAt).toLocaleDateString()}
-                      </p>
-                    </div>
-                    <div className="button-row">
-                      <button
-                        className="subtle"
-                        onClick={() => {
-                          setState((s) => ({
-                            ...s,
-                            title: m.title,
-                            items: structuredClone(m.items),
-                            portion: m.portion,
-                          }));
-                          setTab("meal");
-                        }}
-                      >
-                        Open
-                      </button>
-                      <button
-                        className="subtle"
-                        onClick={() => {
-                          setFeedback({
-                            status: "prepared",
-                            taste: "",
-                            notes: "",
-                          });
-                          setReviewMeal(m);
-                        }}
-                      >
-                        Record feedback
-                      </button>
-                      <button
-                        className="icon"
-                        aria-label={`Delete recipe ${m.title}`}
-                        onClick={() => {
-                          if (
-                            confirm(
-                              "Delete this saved recipe? Existing feedback keeps its snapshot.",
-                            )
-                          )
-                            setState((s) => ({
-                              ...s,
-                              meals: s.meals.filter((x) => x.id !== m.id),
-                            }));
-                        }}
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </article>
-                ))}
-              </section>
-            </div>
-            <aside>
-              <section className="panel">
-                <h2>Your feedback</h2>
-                {!state.feedback.length && (
-                  <p>
-                    After trying a recipe, record taste, portion size and
-                    whether you prepared or ate it.
-                  </p>
-                )}
-                {state.feedback.map((f) => (
-                  <article className="feedback" key={f.id}>
-                    <b>{f.meal.title}</b>
-                    <small>
-                      {f.status} · {new Date(f.createdAt).toLocaleDateString()}
-                    </small>
-                    <p>{f.taste}</p>
-                    <p>{f.notes}</p>
-                    <button
-                      className="subtle"
-                      onClick={() =>
-                        setState((s) => ({
-                          ...s,
-                          feedback: s.feedback.filter((x) => x.id !== f.id),
-                        }))
-                      }
-                    >
-                      Forget this feedback
-                    </button>
-                  </article>
-                ))}
-              </section>
-            </aside>
-          </div>
-        )}
-        <footer>
-          <p>
-            PlateMate · Mealan pilot <span>0.3</span>
-            <br />
-            <small>
-              Local data on this browser. Export before changing devices. AI
-              services: {services?.ai ? "configured" : "not connected"} ·
-              Airtable: {services?.airtable ? "configured" : "not connected"}
-            </small>
-          </p>
-          <div className="button-row">
-            <button className="subtle" onClick={exportData}>
-              <Download size={15} /> Export
-            </button>
-            <button
-              className="subtle"
-              onClick={() => importRef.current?.click()}
-            >
-              <Upload size={15} /> Import
-            </button>
-            <button className="subtle" onClick={() => setAccessOpen(true)}>
-              Server access
-            </button>
-          </div>
-          <p className="small">
-            Barcode data:{" "}
-            <a
-              href="https://world.openfoodfacts.org"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Open Food Facts
-            </a>{" "}
-            · Community data; verify the package. No medical or
-            meal-completeness claims.
-          </p>
-        </footer>
+        {tab === "meal" && <MealScreen {...screenProps} />}
+        {tab === "chef" && <ChefScreen {...screenProps} />}
+        {tab === "foods" && <FoodsScreen {...screenProps} />}
+        {tab === "notes" && <RecipesScreen {...screenProps} />}
+        {tab === "more" && <MoreScreen {...screenProps} />}
         <input
           ref={importRef}
           type="file"
@@ -1521,6 +823,20 @@ export default function App() {
           }}
         />
       </main>
+      <nav className="bottom-nav" aria-label="Screens">
+        {NAV.map((n) => (
+          <button
+            key={n.id}
+            className={tab === n.id ? "active" : ""}
+            aria-current={tab === n.id ? "page" : undefined}
+            onClick={() => setTab(n.id)}
+          >
+            {n.icon}
+            <span>{n.label}</span>
+            {n.badge ? <em>{n.badge}</em> : null}
+          </button>
+        ))}
+      </nav>
       {camera && (
         <div className="camera-modal">
           <CameraView

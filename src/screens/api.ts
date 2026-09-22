@@ -1,0 +1,49 @@
+import type { Dispatch, SetStateAction, ReactNode, RefObject } from "react";
+import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
+import type { ScannerMode } from "../types";
+
+export type Tab = "meal" | "chef" | "foods" | "notes" | "more";
+
+export interface AppApi {
+  state: PilotState;
+  setState: Dispatch<SetStateAction<PilotState>>;
+  setTab: (t: Tab) => void;
+  setCamera: (v: boolean) => void;
+  setMode: (m: ScannerMode) => void;
+  blank: (name?: string, brand?: string) => void;
+  add: (f: Food) => void;
+  updateItem: (id: string, patch: Partial<Ingredient>) => void;
+  saveMeal: () => void;
+  mix: () => void;
+  personalize: () => Promise<void>;
+  lookup: (code?: string) => Promise<void>;
+  exportData: () => void;
+  notify: (s: string) => void;
+  setError: (s: string) => void;
+  setBusy: (s: string) => void;
+  api: (url: string, body?: unknown) => Promise<any>;
+  setImage: (s: string) => void;
+  setEdit: (f: Food | null) => void;
+  setGoalsOpen: (v: boolean) => void;
+  setAccessOpen: (v: boolean) => void;
+  setReviewMeal: (m: Meal | null) => void;
+  setFeedback: (f: { status: Feedback["status"]; taste: string; notes: string }) => void;
+  setAdjustId: (s: string) => void;
+  adjustId: string;
+  limits: { maxWeight: string; minProtein: string; maxKcal: string };
+  setLimits: (l: { maxWeight: string; minProtein: string; maxKcal: string }) => void;
+  options: { food: Food; items: Ingredient[]; grams: number; explanation?: string }[];
+  pending: { name: string; brand: string }[];
+  setPending: Dispatch<SetStateAction<{ name: string; brand: string }[]>>;
+  barcode: string;
+  setBarcode: (s: string) => void;
+  query: string;
+  setQuery: (s: string) => void;
+  busy: string;
+  services: { ai: boolean; airtable: boolean } | null;
+  totals: ReturnType<typeof import("../pilot").aggregate>;
+  pdRef: number | null;
+  matched: boolean;
+  mealanCard: ReactNode;
+  importRef: RefObject<HTMLInputElement | null>;
+}
