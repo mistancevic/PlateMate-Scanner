@@ -44,7 +44,7 @@ export function ChefScreen(p: AppApi) {
         <label className="field"><span>min protein g</span><input inputMode="decimal" placeholder="–" value={limits.minProtein} onChange={(e) => setLimits({ ...limits, minProtein: e.target.value })} /></label>
         <label className="field"><span>max kcal</span><input inputMode="decimal" placeholder="–" value={limits.maxKcal} onChange={(e) => setLimits({ ...limits, maxKcal: e.target.value })} /></label>
       </div>
-      <button className="pill pill-primary pill-wide" onClick={mix}>Find a mix at PD {fixed(pdRef)}</button>
+      <button className="pill pill-primary pill-wide" onClick={() => mix()}>Find a mix at PD {fixed(pdRef)}</button>
       {options.length > 0 && (
         <>
           <p className="label">{options.length} {options.length === 1 ? "mix reaches" : "mixes reach"} {fixed(pdRef)}</p>

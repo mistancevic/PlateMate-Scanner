@@ -28,7 +28,11 @@ import { ChefScreen } from "./screens/ChefScreen";
 import { FoodsScreen } from "./screens/FoodsScreen";
 import { RecipesScreen } from "./screens/RecipesScreen";
 import { MoreScreen } from "./screens/MoreScreen";
-import type { AppApi, Tab } from "./screens/api";
+import type { AppApi, Tab, Step } from "./screens/api";
+import { HomeScreen } from "./screens/HomeScreen";
+import { JourneyScreen } from "./screens/JourneyScreen";
+import { MeScreen } from "./screens/MeScreen";
+import { Home, ChefHat, CircleUser } from "lucide-react";
 import {
   aggregate,
   candidateFood,
@@ -375,10 +379,11 @@ export default function App() {
   const [state, setState] = useState<PilotState>(load),
     [tab, setTab] = useState<Tab>(() => {
       const h = (typeof location !== "undefined" ? location.hash : "").replace("#", "");
-      return (["meal", "chef", "foods", "notes", "more"] as Tab[]).includes(h as Tab) ? (h as Tab) : "meal";
+      return (["home", "journey", "meal", "chef", "foods", "notes", "more", "me"] as Tab[]).includes(h as Tab) ? (h as Tab) : "home";
     }),
     [filter, setFilter] = useState<"all" | "high" | "mid" | "low" | "inmeal">("all"),
     [coach, setCoachState] = useState<boolean>(isCoach),
+    [step, setStep] = useState<Step>("in"),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -655,6 +660,7 @@ export default function App() {
     setOptions(results.slice(0, 8));
     if (!results.length)
       setError(reason + " You can change a limit or choose another food.");
+    return results.length > 0;
   }
   async function personalize() {
     setBusy("Considering your taste preferences…");
@@ -720,6 +726,7 @@ export default function App() {
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
     pdRef, matched, importRef, filter, setFilter,
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
+    step, setStep,
     mealanCard: (
       <Mealan
         items={state.items}
@@ -729,14 +736,16 @@ export default function App() {
       />
     ),
   };
-  const NAV: { id: Tab; label: string }[] = [
-    { id: "meal", label: "Meal" },
-    { id: "chef", label: "Chef" },
-    { id: "foods", label: "Foods" },
-    ...(coach ? [{ id: "notes" as Tab, label: "Recipes" }] : []),
-    { id: "more", label: "More" },
+  const NAV: { id: Tab; label: string; icon: ReactNode }[] = [
+    { id: "home", label: "Home", icon: <Home size={20} /> },
+    { id: "journey", label: "Mealan", icon: <ChefHat size={20} /> },
+    { id: "foods", label: "Foods", icon: <BookOpen size={20} /> },
+    { id: "me", label: "Me", icon: <CircleUser size={20} /> },
   ];
   const TITLES: Record<Tab, string> = {
+    home: "",
+    journey: "Mealan",
+    me: "Me",
     meal: "Meal",
     chef: "Chef",
     foods: "Foods",
@@ -749,10 +758,10 @@ export default function App() {
         <button className="brand" onClick={() => setTab("meal")} aria-label={APP_NAME}>
           <Mark size={30} color="var(--brand)" />
         </button>
-        <h1>{TITLES[tab]}</h1>
-        <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
+        <h1>{tab === "home" ? APP_NAME : TITLES[tab]}</h1>
+        {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
           {fmt(state.goals.calories, 0)} kcal · {fmt(state.goals.protein)} g · PD {fixed(pdRef)} · set by {COACH_NAME}
-        </button>
+        </button>}
       </header>
       <main>
         {error && (
@@ -779,6 +788,9 @@ export default function App() {
             </button>
           </div>
         )}
+        {tab === "home" && <HomeScreen {...screenProps} />}
+        {tab === "journey" && <JourneyScreen {...screenProps} />}
+        {tab === "me" && <MeScreen {...screenProps} />}
         {tab === "meal" && <MealScreen {...screenProps} />}
         {tab === "chef" && <ChefScreen {...screenProps} />}
         {tab === "foods" && <FoodsScreen {...screenProps} />}
@@ -815,11 +827,12 @@ export default function App() {
         {NAV.map((n) => (
           <button
             key={n.id}
-            className={tab === n.id ? "active" : ""}
+            className={tab === n.id || (n.id === "journey" && (tab === "meal" || tab === "chef")) || (n.id === "me" && (tab === "more" || tab === "notes")) ? "active" : ""}
             aria-current={tab === n.id ? "page" : undefined}
             onClick={() => setTab(n.id)}
           >
-            {n.label}
+            {n.icon}
+            <span>{n.label}</span>
           </button>
         ))}
       </nav>

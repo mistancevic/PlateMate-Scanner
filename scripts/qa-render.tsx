@@ -3,7 +3,7 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { freshState, candidateFood } from "../src/pilot";
 import fs from "node:fs";
-const tab = process.argv[2] || "meal";
+const tab = process.argv[2] || "home";
 const s = freshState();
 s.goals = { calories: 2500, protein: 150, fats: 80, carbs: 280, fiber: 30 } as any;
 const n = candidateFood({ product_name: "Nutella", brand: "Ferrero", calories: 539, protein: 6.3, fats: 30.9, carbs: 57.5, fiber: null }, "label");

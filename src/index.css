@@ -213,3 +213,40 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
   .bottom-nav { top: 0; right: auto; width: 106px; grid-template-columns: 1fr; grid-auto-rows: min-content; align-content: center; gap: 8px; padding: 14px 12px; border-top: 0; border-right: 1px solid var(--line); }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+
+/* ---------------- Journey ---------------- */
+.hero { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; padding: 18px 0 8px; }
+.hero h2 { font-size: 26px; margin: 6px 0 0; }
+.hero p { color: var(--muted); font-size: 14px; max-width: 28ch; margin: 0; }
+.plan { background: var(--tint); color: var(--brand-text); border-radius: var(--r-card); padding: 14px 16px; margin: 12px 0; }
+.plan-top { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; margin-bottom: 8px; }
+.plan-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.plan-row > div { display: flex; flex-direction: column; }
+.plan-row b { font-size: 24px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.plan-row small { color: var(--brand-text); font-weight: 600; }
+.plan .link { margin-top: 8px; font-size: 13px; }
+.pill-tall { width: 100%; height: 56px; font-size: 16px; margin: 6px 0; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 14px 16px; margin: 12px 0; display: flex; flex-direction: column; gap: 4px; }
+.card-top { display: flex; justify-content: space-between; font-size: 12px; font-weight: 700; color: var(--muted); }
+.card .link { align-self: flex-start; margin-top: 6px; display: inline-flex; align-items: center; gap: 4px; }
+.person { flex-direction: row; align-items: center; gap: 12px; }
+.avatar { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--tint); color: var(--brand-text); font-weight: 900; font-size: 18px; }
+.person b { font-size: 16px; display: block; }
+.fb { border-top: 1px solid var(--line); padding: 8px 0 2px; } .fb b { display: block; font-size: 14px; }
+.coach-tools { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.step-head { margin: 4px 0 14px; }
+.step-head h2 { font-size: 24px; margin: 8px 0 4px; }
+.step-head p { color: var(--muted); font-size: 14px; margin: 0; }
+.step-bar { display: flex; gap: 6px; }
+.step-bar i { flex: 1; height: 5px; border-radius: 3px; background: var(--line); }
+.step-bar i.on { background: var(--brand); }
+.choices { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 14px; }
+.choices.two { grid-template-columns: repeat(2, 1fr); }
+.choice { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; height: 92px; border-radius: var(--r-card); background: var(--surface); border: 1.5px solid var(--line); color: var(--brand-text); font-size: 13px; font-weight: 700; }
+.choice.on { background: var(--tint); border-color: var(--brand); }
+.choice:hover { border-color: var(--brand); }
+.back { display: inline-flex; align-items: center; gap: 4px; margin: 8px 0 4px; }
+.center { text-align: center; display: block; margin-top: 6px; }
+.row-num { font-size: 19px; font-weight: 900; font-variant-numeric: tabular-nums; }
+.check.tiny { font-size: 12px; margin: 4px 0 0; }
+.bottom-nav button { display: flex; flex-direction: column; align-items: center; gap: 3px; height: 54px; font-size: 11px; }

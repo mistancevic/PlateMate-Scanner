@@ -2,7 +2,8 @@ import type { Dispatch, SetStateAction, ReactNode, RefObject } from "react";
 import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
 import type { ScannerMode } from "../types";
 
-export type Tab = "meal" | "chef" | "foods" | "notes" | "more";
+export type Tab = "home" | "journey" | "me" | "meal" | "chef" | "foods" | "notes" | "more";
+export type Step = "in" | "lock" | "recipe" | "after";
 
 export interface AppApi {
   state: PilotState;
@@ -14,7 +15,9 @@ export interface AppApi {
   add: (f: Food) => void;
   updateItem: (id: string, patch: Partial<Ingredient>) => void;
   saveMeal: () => void;
-  mix: () => void;
+  mix: (id?: string) => boolean;
+  step: Step;
+  setStep: (s: Step) => void;
   personalize: () => Promise<void>;
   lookup: (code?: string) => Promise<void>;
   exportData: () => void;
