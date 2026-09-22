@@ -498,14 +498,14 @@ export default function App() {
       ...s,
       items: [
         ...s.items,
-        { id: uid(), food: { ...food }, grams: 100, locked: true },
+        { id: uid(), food: { ...food }, grams: (density(food.protein, food.calories) ?? 0) < 3 ? 50 : 150, locked: true },
       ],
       portion: null,
     }));
     setStep("in");
     setTab("journey");
     notify(
-      "Added 100 g as a starting amount. Set the quantity you will actually use.",
+      "Added. Set the amount you actually have.",
     );
   }
   async function scan(raw: string | string[], group = false) {

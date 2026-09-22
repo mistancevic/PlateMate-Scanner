@@ -10,8 +10,9 @@ const STEPS = ["in", "recipe", "after"] as const;
 const band = (pd: number | null) => (pd === null || pd < 3 ? "low" : pd < 5 ? "mid" : "high");
 
 export function JourneyScreen(p: AppApi) {
-  const { state, setState, setTab, step, setStep, setCamera, setMode, blank,
+  const { state, setState, setTab, step, setStep, setCamera, setMode, blank, updateItem,
     setAdjustId, mixWith, options, pdRef, saveMeal, notify, setError, setFeedback } = p;
+  const [cap, setCap] = useState<number | null>(300);
   const [pick, setPick] = useState(0);
   const [note, setNote] = useState("");
   const [good, setGood] = useState<boolean | null>(null);
@@ -19,12 +20,12 @@ export function JourneyScreen(p: AppApi) {
   const t = aggregate(items);
   const pd = density(t.protein, t.calories);
   const n = STEPS.indexOf(step) + 1;
+  const adjustFor = (o: { items: typeof items }) => o.items.find((i) => !i.locked)?.id;
   // Mealan moves the food with the highest protein density; everything else keeps the amount you set.
   function askMealan() {
-    const kept = items.filter((i) => i.keep);
-    const pool = kept.length ? items.filter((i) => !i.keep) : items;
+    const pool = items.filter((i) => !i.locked);
     const mover = [...pool].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
-    if (!mover) { setError(`Let ${CHEF_NAME} move at least one product.`); return; }
+    if (!mover) { setError(`Everything is locked. Unlock the one product ${CHEF_NAME} may move.`); return; }
     const locked = items.map((i) => ({ ...i, locked: i.id !== mover.id, food: { ...i.food, readyToEat: true } }));
     setState((s) => ({ ...s, items: locked, foods: s.foods.map((f) => locked.some((x) => x.food.id === f.id) ? { ...f, readyToEat: true } : f) }));
     setAdjustId(mover.id); setPick(0);
@@ -57,8 +58,17 @@ export function JourneyScreen(p: AppApi) {
           <div className="rows">
             {items.map((i) => (
               <div className="row" key={i.id}>
-                <div className="row-text"><b>{i.food.name}</b><small>{i.food.brand ? `${i.food.brand} · ` : ""}{fmt(i.food.calories, 0)} kcal · {fmt(i.food.protein)} g per 100 g</small></div>
-                <span className={`pdpill pdpill-${band(density(i.food.protein, i.food.calories))}`}>{fixed(density(i.food.protein, i.food.calories))}<small>PD</small></span>
+                <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Unlock" : "Lock"} ${i.food.name}`}
+                  onClick={() => { log("lock", { locked: !i.locked }); updateItem(i.id, { locked: !i.locked }); }} />
+                <div className="row-text">
+                  <b>{i.food.name}</b>
+                  <small>PD {fixed(density(i.food.protein, i.food.calories))} · {i.locked ? "keep this amount" : `${CHEF_NAME} may move it`}</small>
+                </div>
+                <label className="grams">
+                  <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams}
+                    onChange={(e) => updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0) })} />
+                  <span>g</span>
+                </label>
                 <button className="icon" aria-label={`Remove ${i.food.name}`} onClick={() => setState((s) => ({ ...s, items: s.items.filter((x) => x.id !== i.id), portion: null }))}><Trash2 size={16} /></button>
               </div>
             ))}
@@ -69,17 +79,19 @@ export function JourneyScreen(p: AppApi) {
           <ChefHat size={18} /> Ask {CHEF_NAME}
         </button>
         {items.length < 2 && <p className="small center">Two products at least, so {CHEF_NAME} has something to move.</p>}
-        {items.length >= 2 && <p className="small center">{CHEF_NAME} keeps your amounts and moves the one with the most protein.</p>}
+        {items.length >= 2 && <p className="small center">Coral dot keeps the amount. {CHEF_NAME} moves the unlocked one with the most protein.</p>}
       </>
     );
 
   if (step === "recipe") {
     const o = options[pick % Math.max(options.length, 1)];
     if (!o) return (<><Head title={`${CHEF_NAME} found no mix`} sub="Change what is locked, or the amounts, and ask again." /><Back to="in" /></>);
-    const ot = aggregate(o.items); const opd = density(ot.protein, ot.calories);
+    const over = cap !== null && o.grams > cap;
+    const shown = over ? o.items.map((i) => (i.id === (adjustFor(o)) ? { ...i, grams: cap } : i)) : o.items;
+    const ot = aggregate(shown); const opd = density(ot.protein, ot.calories);
     return (
       <>
-        <Head title={`${CHEF_NAME}'s recipe`} sub={o.explanation || `${o.food.name} moved to ${fmt(o.grams, 0)} g. Everything you locked stayed.`} />
+        <Head title={`${CHEF_NAME}'s recipe`} sub={over ? `${o.food.name} would need ${fmt(o.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : (o.explanation || `${o.food.name} moved to ${fmt(o.grams, 0)} g. Everything you locked stayed.`)} />
         <section className="readout">
           <div className="readout-top"><span>This dessert</span><span>PD</span></div>
           <div className="readout-mid">
@@ -88,7 +100,7 @@ export function JourneyScreen(p: AppApi) {
           </div>
         </section>
         <div className="rows">
-          {o.items.map((i) => (
+          {shown.map((i) => (
             <div className="row" key={i.id}>
               <span className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} />
               <div className="row-text"><b>{i.food.name}</b><small>{i.locked ? "as you wanted it" : `what ${CHEF_NAME} changed`}</small></div>
@@ -96,19 +108,11 @@ export function JourneyScreen(p: AppApi) {
             </div>
           ))}
         </div>
-        <details className="more">
-          <summary>Change what {CHEF_NAME} may touch</summary>
-          {items.map((i) => (
-            <label className="check" key={i.id}>
-              <input type="checkbox" checked={!!i.keep} onChange={(e) => setState((s) => ({ ...s, items: s.items.map((x) => x.id === i.id ? { ...x, keep: e.target.checked } : x) }))} />
-              keep {i.food.name} at {fmt(i.grams, 0)} g
-            </label>
-          ))}
-          <button className="pill pill-wide" onClick={askMealan}>Ask again</button>
-        </details>
+
+        {over && <button className="pill pill-wide" onClick={() => setCap(null)}>Allow more than {cap} g</button>}
         <button className="pill pill-primary pill-wide" onClick={() => {
-          log("mix_applied", { grams: Math.round(o.grams) });
-          setState((s) => ({ ...s, items: o.items, portion: null, title: s.title || "DaaM" }));
+          log("mix_applied", { grams: Math.round(over ? cap! : o.grams) });
+          setState((s) => ({ ...s, items: shown, portion: null, title: s.title || "DaaM" }));
           setTimeout(() => saveMeal(), 0);
           setStep("after");
         }}>Make it</button>
