@@ -1,11 +1,11 @@
-import { ChefHat, ScanBarcode, ArrowRight } from "lucide-react";
+import { Camera, ScanBarcode, ArrowRight } from "lucide-react";
 import { aggregate, density } from "../pilot";
 import { fmt, fixed } from "../ui";
 import { Mark, APP_NAME, COACH_NAME } from "../components/Mark";
 import type { AppApi } from "./api";
 
 export function HomeScreen(p: AppApi) {
-  const { state, setTab, setStep, pdRef } = p;
+  const { state, setTab, setStep, pdRef, setCamera, setMode, clientName } = p;
   const last = state.meals[0];
   const lastT = last ? aggregate(last.items) : null;
   return (
@@ -13,7 +13,7 @@ export function HomeScreen(p: AppApi) {
       <section className="hero">
         <Mark size={72} color="var(--brand)" />
         <h2>{APP_NAME}</h2>
-        <p>Your chef for one number. Keep the food you want, stay on plan.</p>
+        <p>{clientName ? `Hi ${clientName}. ` : ""}Your chef for one number. Keep the food you want, stay on plan.</p>
       </section>
       <section className="plan">
         <div className="plan-top"><span>Your plan</span><span>set by {COACH_NAME}</span></div>
@@ -23,8 +23,8 @@ export function HomeScreen(p: AppApi) {
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
       </section>
-      <button className="pill pill-primary pill-tall" onClick={() => { setStep("in"); setTab("journey"); }}>
-        <ChefHat size={20} /> I'm craving something
+      <button className="pill pill-primary pill-tall" onClick={() => { setStep("in"); setTab("journey"); setMode("group"); setCamera(true); }}>
+        <Camera size={20} /> I'm craving something
       </button>
       <button className="pill pill-tall" onClick={() => setTab("foods")}>
         <ScanBarcode size={19} /> Just check a food

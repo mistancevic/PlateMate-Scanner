@@ -5,12 +5,19 @@ import { exportLog, clearLog, readLog } from "../log";
 import type { AppApi } from "./api";
 
 export function MeScreen(p: AppApi) {
-  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab } = p;
+  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName } = p;
   const n = readLog().length;
   return (
     <>
       <section className="card person">
-        <span className="avatar">{COACH_NAME.slice(0, 1)}</span>
+        <span className="avatar">{(clientName || "?").slice(0, 1).toUpperCase()}</span>
+        <label className="name-field">
+          <span>Your name</span>
+          <input value={clientName} placeholder="Your name" onChange={(e) => setClientName(e.target.value)} />
+        </label>
+      </section>
+      <section className="card person">
+        <span className="avatar avatar-coach">{COACH_NAME.slice(0, 1)}</span>
         <div><b>{COACH_NAME}</b><small>your coach</small></div>
       </section>
       <section className="plan">

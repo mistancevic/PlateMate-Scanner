@@ -33,3 +33,7 @@ export function exportLog() {
 const COACH = "chefmealan-coach";
 export const isCoach = () => { try { return localStorage.getItem(COACH) === "1"; } catch { return false; } };
 export const setCoach = (v: boolean) => { try { localStorage.setItem(COACH, v ? "1" : "0"); } catch {} };
+
+const CLIENT = "chefmealan-client-name";
+export const getClientName = () => { try { return localStorage.getItem(CLIENT) || ""; } catch { return ""; } };
+export const setClientName = (v: string) => { try { localStorage.setItem(CLIENT, v.trim()); } catch {} };

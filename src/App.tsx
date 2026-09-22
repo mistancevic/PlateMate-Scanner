@@ -22,7 +22,7 @@ import { resizeImageBase64 } from "./utils/image";
 import type { ScannerMode } from "./types";
 import { fmt, fixed } from "./ui";
 import { Mark, APP_NAME, COACH_NAME } from "./components/Mark";
-import { log, isCoach, setCoach } from "./log";
+import { log, isCoach, setCoach, getClientName, setClientName as storeClientName } from "./log";
 import { MealScreen } from "./screens/MealScreen";
 import { ChefScreen } from "./screens/ChefScreen";
 import { FoodsScreen } from "./screens/FoodsScreen";
@@ -384,6 +384,7 @@ export default function App() {
     [filter, setFilter] = useState<"all" | "high" | "mid" | "low" | "inmeal">("all"),
     [coach, setCoachState] = useState<boolean>(isCoach),
     [step, setStep] = useState<Step>("in"),
+    [clientName, setClientNameState] = useState<string>(getClientName),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -496,7 +497,8 @@ export default function App() {
       ],
       portion: null,
     }));
-    setTab("meal");
+    setStep("in");
+    setTab("journey");
     notify(
       "Added 100 g as a starting amount. Set the quantity you will actually use.",
     );
@@ -727,6 +729,7 @@ export default function App() {
     pdRef, matched, importRef, filter, setFilter,
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
     step, setStep,
+    clientName, setClientName: (v: string) => { storeClientName(v); setClientNameState(v); },
     mealanCard: (
       <Mealan
         items={state.items}
@@ -755,7 +758,7 @@ export default function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <button className="brand" onClick={() => setTab("meal")} aria-label={APP_NAME}>
+        <button className="brand" onClick={() => setTab("home")} aria-label={APP_NAME}>
           <Mark size={30} color="var(--brand)" />
         </button>
         <h1>{tab === "home" ? APP_NAME : TITLES[tab]}</h1>
@@ -847,7 +850,8 @@ export default function App() {
             onCancel={() => setCamera(false)}
             onOpenCart={() => {
               setCamera(false);
-              setTab("meal");
+              setStep("in");
+              setTab("journey");
             }}
             cartCount={state.items.length}
           />
