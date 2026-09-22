@@ -6,12 +6,12 @@ import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
 import type { AppApi } from "./api";
 
-const STEPS = ["in", "lock", "recipe", "after"] as const;
+const STEPS = ["in", "recipe", "after"] as const;
 const band = (pd: number | null) => (pd === null || pd < 3 ? "low" : pd < 5 ? "mid" : "high");
 
 export function JourneyScreen(p: AppApi) {
-  const { state, setState, setTab, step, setStep, setCamera, setMode, blank, updateItem,
-    setAdjustId, mix, options, pdRef, saveMeal, notify, setError, setFeedback } = p;
+  const { state, setState, setTab, step, setStep, setCamera, setMode, blank,
+    setAdjustId, mixWith, options, pdRef, saveMeal, notify, setError, setFeedback } = p;
   const [pick, setPick] = useState(0);
   const [note, setNote] = useState("");
   const [good, setGood] = useState<boolean | null>(null);
@@ -19,6 +19,18 @@ export function JourneyScreen(p: AppApi) {
   const t = aggregate(items);
   const pd = density(t.protein, t.calories);
   const n = STEPS.indexOf(step) + 1;
+  // Mealan moves the food with the highest protein density; everything else keeps the amount you set.
+  function askMealan() {
+    const kept = items.filter((i) => i.keep);
+    const pool = kept.length ? items.filter((i) => !i.keep) : items;
+    const mover = [...pool].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
+    if (!mover) { setError(`Let ${CHEF_NAME} move at least one product.`); return; }
+    const locked = items.map((i) => ({ ...i, locked: i.id !== mover.id, food: { ...i.food, readyToEat: true } }));
+    setState((s) => ({ ...s, items: locked, foods: s.foods.map((f) => locked.some((x) => x.food.id === f.id) ? { ...f, readyToEat: true } : f) }));
+    setAdjustId(mover.id); setPick(0);
+    // mix reads state from the closure, so run it after the state update lands
+    setTimeout(() => { if (mixWith(locked, mover.id)) setStep("recipe"); }, 0);
+  }
 
   const Head = ({ title, sub }: { title: string; sub?: string }) => (
     <div className="step-head">
@@ -34,7 +46,7 @@ export function JourneyScreen(p: AppApi) {
   if (step === "in")
     return (
       <>
-        <Head title="What are you craving?" sub="Get the products in. A photo of all of them, a barcode, a label, or type it." />
+        <Head title="What are you craving?" sub={`Get the products in. Then ${CHEF_NAME} works out how much of each.`} />
         <div className="choices">
           <button className="choice" onClick={() => { setMode("group"); setCamera(true); }}><Camera size={22} /><span>Photo of the products</span></button>
           <button className="choice" onClick={() => { setMode("barcode"); setCamera(true); }}><ScanBarcode size={22} /><span>Barcode</span></button>
@@ -53,61 +65,17 @@ export function JourneyScreen(p: AppApi) {
           </div>
         )}
         <button className="link" onClick={() => setTab("foods")}>Or pick from my foods</button>
-        <button className="pill pill-primary pill-wide" disabled={items.length < 2} onClick={() => setStep("lock")}>
-          That's all, next
-        </button>
-        {items.length < 2 && <p className="small center">Two products at least, so {CHEF_NAME} has something to move.</p>}
-      </>
-    );
-
-  if (step === "lock") {
-    const free = items.filter((i) => !i.locked);
-    return (
-      <>
-        <Head title="Lock what you want to keep" sub={`Tap the dot on what the craving is. ${CHEF_NAME} moves the rest.`} />
-        <section className="readout">
-          <div className="readout-top"><span>As it stands</span><span>PD</span></div>
-          <div className="readout-mid">
-            <b>{fixed(pd)}</b>
-            <div><span>{pd !== null && pdRef !== null ? (pd >= pdRef ? "on plan" : `${fixed(pdRef - pd)} under your ${fixed(pdRef)}`) : "no target set"}</span><small>{fmt(t.calories, 0)} kcal · {fmt(t.protein)} g protein</small></div>
-          </div>
-        </section>
-        <div className="rows">
-          {items.map((i) => (
-            <div className="row" key={i.id}>
-              <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Unlock" : "Lock"} ${i.food.name}`}
-                onClick={() => { log("lock", { locked: !i.locked }); updateItem(i.id, { locked: !i.locked }); }} />
-              <div className="row-text">
-                <b>{i.food.name}</b>
-                <small>{i.locked ? "kept as you set it" : `${CHEF_NAME} may change this`}</small>
-                {!i.food.readyToEat && (
-                  <label className="check tiny"><input type="checkbox" checked={false} onChange={() => setState((s) => ({ ...s, items: s.items.map((x) => x.id === i.id ? { ...x, food: { ...x.food, readyToEat: true } } : x), foods: s.foods.map((f) => f.id === i.food.id ? { ...f, readyToEat: true } : f) }))} /> ready to eat as it is</label>
-                )}
-              </div>
-              <label className="grams">
-                <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams}
-                  onChange={(e) => updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0) })} />
-                <span>g</span>
-              </label>
-            </div>
-          ))}
-        </div>
-        <button className="link" onClick={() => setStep("in")}>+ Add another product</button>
-        <button className="pill pill-primary pill-wide" onClick={() => {
-          if (free.length !== 1) { setError(free.length === 0 ? "Unlock the one food Mealan may change." : "Leave only one food unlocked. That is the one Mealan moves."); return; }
-          setAdjustId(free[0].id); setPick(0);
-          if (mix(free[0].id)) setStep("recipe");
-        }}>
+        <button className="pill pill-primary pill-wide" disabled={items.length < 2} onClick={askMealan}>
           <ChefHat size={18} /> Ask {CHEF_NAME}
         </button>
-        <p className="small center">One food stays unlocked. {CHEF_NAME} moves that one until the whole thing lands at PD {fixed(pdRef)}.</p>
+        {items.length < 2 && <p className="small center">Two products at least, so {CHEF_NAME} has something to move.</p>}
+        {items.length >= 2 && <p className="small center">{CHEF_NAME} keeps your amounts and moves the one with the most protein.</p>}
       </>
     );
-  }
 
   if (step === "recipe") {
     const o = options[pick % Math.max(options.length, 1)];
-    if (!o) return (<><Head title={`${CHEF_NAME} found no mix`} sub="Change what is locked, or the amounts, and ask again." /><Back to="lock" /></>);
+    if (!o) return (<><Head title={`${CHEF_NAME} found no mix`} sub="Change what is locked, or the amounts, and ask again." /><Back to="in" /></>);
     const ot = aggregate(o.items); const opd = density(ot.protein, ot.calories);
     return (
       <>
@@ -123,11 +91,21 @@ export function JourneyScreen(p: AppApi) {
           {o.items.map((i) => (
             <div className="row" key={i.id}>
               <span className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} />
-              <div className="row-text"><b>{i.food.name}</b><small>{i.locked ? "as you wanted it" : "what Mealan changed"}</small></div>
+              <div className="row-text"><b>{i.food.name}</b><small>{i.locked ? "as you wanted it" : `what ${CHEF_NAME} changed`}</small></div>
               <b className="row-num">{fmt(i.grams, 0)} g</b>
             </div>
           ))}
         </div>
+        <details className="more">
+          <summary>Change what {CHEF_NAME} may touch</summary>
+          {items.map((i) => (
+            <label className="check" key={i.id}>
+              <input type="checkbox" checked={!!i.keep} onChange={(e) => setState((s) => ({ ...s, items: s.items.map((x) => x.id === i.id ? { ...x, keep: e.target.checked } : x) }))} />
+              keep {i.food.name} at {fmt(i.grams, 0)} g
+            </label>
+          ))}
+          <button className="pill pill-wide" onClick={askMealan}>Ask again</button>
+        </details>
         <button className="pill pill-primary pill-wide" onClick={() => {
           log("mix_applied", { grams: Math.round(o.grams) });
           setState((s) => ({ ...s, items: o.items, portion: null, title: s.title || "DaaM" }));
@@ -135,7 +113,7 @@ export function JourneyScreen(p: AppApi) {
           setStep("after");
         }}>Make it</button>
         {options.length > 1 && <button className="pill pill-wide" onClick={() => setPick((x) => x + 1)}>Try another mix ({(pick % options.length) + 1} of {options.length})</button>}
-        <Back to="lock" />
+        <Back to="in" />
       </>
     );
   }

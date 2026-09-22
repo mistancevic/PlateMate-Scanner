@@ -35,6 +35,7 @@ export type Food = Nutrition & {
   readyToEat: boolean;
 };
 export type Ingredient = {
+  keep?: boolean;
   id: string;
   food: Food;
   grams: number;

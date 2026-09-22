@@ -3,7 +3,7 @@ import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
 import type { ScannerMode } from "../types";
 
 export type Tab = "home" | "journey" | "me" | "meal" | "chef" | "foods" | "notes" | "more";
-export type Step = "in" | "lock" | "recipe" | "after";
+export type Step = "in" | "recipe" | "after";
 
 export interface AppApi {
   state: PilotState;
@@ -16,6 +16,7 @@ export interface AppApi {
   updateItem: (id: string, patch: Partial<Ingredient>) => void;
   saveMeal: () => void;
   mix: (id?: string) => boolean;
+  mixWith: (items: Ingredient[], id: string) => boolean;
   step: Step;
   setStep: (s: Step) => void;
   personalize: () => Promise<void>;

@@ -254,3 +254,5 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .name-field { flex: 1; margin: 0; font-size: 12px; color: var(--muted); font-weight: 700; }
 .name-field input { margin-top: 4px; padding: 9px 12px; font-size: 16px; font-weight: 700; }
 .avatar-coach { background: var(--brand); color: #fff; }
+
+.toast { position: fixed; left: 14px; right: 14px; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 45; box-shadow: 0 6px 24px rgba(23,39,66,0.18); margin: 0; }

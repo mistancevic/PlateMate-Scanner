@@ -422,6 +422,11 @@ export default function App() {
   const importRef = useRef<HTMLInputElement>(null),
     runRef = useRef(0);
   useEffect(() => {
+    if (!message && !error) return;
+    const t = setTimeout(() => { setMessage(""); setError(""); }, 4000);
+    return () => clearTimeout(t);
+  }, [message, error]);
+  useEffect(() => {
     try {
       if (unreadableBackup !== null) {
         setError(
@@ -602,28 +607,25 @@ export default function App() {
     setState((s) => ({ ...s, meals: [meal, ...s.meals] }));
     notify("Recipe saved. It has not been recorded as eaten.");
   }
-  function mix() {
+  function mix(id: string = adjustId): boolean { return mixWith(state.items, id); }
+  function mixWith(itemsIn: Ingredient[], id: string): boolean {
     setError("");
     const target = density(state.goals.protein, state.goals.calories);
     if (target === null || target <= 0) {
       setError("Set daily energy and protein targets first.");
-      return;
+      return false;
     }
-    const selected = state.items.find((x) => x.id === adjustId);
+    const selected = itemsIn.find((x) => x.id === id);
     if (!selected || selected.locked) {
-      setError(
-        "Unlock one supporting ingredient, then select it here. Other quantities stay fixed.",
-      );
-      return;
+      setError("Let Mealan move one product. Everything else stays as you set it.");
+      return false;
     }
     if (
       !selected.food.readyToEat ||
-      state.items.some((x) => !x.food.readyToEat)
+      itemsIn.some((x) => !x.food.readyToEat)
     ) {
-      setError(
-        "This pilot mixes ready-to-eat foods only. Confirm each food’s preparation state in Saved foods, then add the reviewed versions to the meal.",
-      );
-      return;
+      setError("Mealan mixes foods you can eat as they are.");
+      return false;
     }
     if (
       Object.values(limits).some(
@@ -631,7 +633,7 @@ export default function App() {
       )
     ) {
       setError("Meal limits must be non-negative numbers, or blank.");
-      return;
+      return false;
     }
     const max = numberInput(limits.maxWeight),
       minP = numberInput(limits.minProtein),
@@ -643,10 +645,10 @@ export default function App() {
     ];
     const results = [];
     for (const food of foods) {
-      const candidate = state.items.map((x) =>
-          x.id === adjustId ? { ...x, food } : x,
+      const candidate = itemsIn.map((x) =>
+          x.id === id ? { ...x, food } : x,
         ),
-        s = solveIngredient(candidate, adjustId, target, max);
+        s = solveIngredient(candidate, id, target, max);
       if (s.ok === false) {
         if (food.id === selected.food.id) reason = s.reason;
         continue;
@@ -728,7 +730,7 @@ export default function App() {
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
     pdRef, matched, importRef, filter, setFilter,
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
-    step, setStep,
+    step, setStep, mixWith,
     clientName, setClientName: (v: string) => { storeClientName(v); setClientNameState(v); },
     mealanCard: (
       <Mealan
@@ -768,7 +770,7 @@ export default function App() {
       </header>
       <main>
         {error && (
-          <div className="notice" role="alert">
+          <div className="notice toast" role="alert">
             {error}
             <button
               className="icon"
@@ -780,7 +782,7 @@ export default function App() {
           </div>
         )}
         {message && (
-          <div className="success" role="status">
+          <div className="success toast" role="status">
             {message}
             <button
               className="icon"

@@ -18,7 +18,7 @@ export function HomeScreen(p: AppApi) {
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
       </section>
-      <button className="pill pill-primary pill-tall" onClick={() => { setStep(state.items.length ? "lock" : "in"); setTab("journey"); }}>
+      <button className="pill pill-primary pill-tall" onClick={() => { setStep("in"); setTab("journey"); }}>
         <ChefHat size={20} /> I'm craving something
       </button>
       <button className="pill pill-tall" onClick={() => { setStep("in"); setTab("journey"); setMode("group"); setCamera(true); }}>
@@ -32,7 +32,7 @@ export function HomeScreen(p: AppApi) {
           <div className="card-top"><span>Last time</span><span>{new Date(last.savedAt).toLocaleDateString()}</span></div>
           <b>{last.title}</b>
           <small>{last.items.map((i) => `${i.food.name} ${fmt(i.grams, 0)} g`).join(" · ")} · PD {fixed(density(lastT.protein, lastT.calories))}</small>
-          <button className="link" onClick={() => { p.setState((s) => ({ ...s, items: structuredClone(last.items), title: last.title, portion: null })); setStep("lock"); setTab("journey"); }}>
+          <button className="link" onClick={() => { p.setState((s) => ({ ...s, items: structuredClone(last.items), title: last.title, portion: null })); setStep("in"); setTab("journey"); }}>
             Make it again <ArrowRight size={14} />
           </button>
         </section>
