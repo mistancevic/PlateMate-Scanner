@@ -1,6 +1,7 @@
 import { Camera, Plus, Trash2 } from "lucide-react";
 import { portionTotals, contribution, density } from "../pilot";
 import { fmt, fixed } from "../ui";
+import { log } from "../log";
 import type { AppApi } from "./api";
 
 export function MealScreen(p: AppApi) {
@@ -57,6 +58,7 @@ export function MealScreen(p: AppApi) {
               className={`dot ${item.locked ? "dot-locked" : "dot-free"}`}
               aria-label={`${item.locked ? "Unlock" : "Lock"} ${item.food.name}`}
               onClick={() => {
+                log("lock", { locked: !item.locked });
                 updateItem(item.id, { locked: !item.locked });
                 if (item.locked) setAdjustId(item.id);
               }}

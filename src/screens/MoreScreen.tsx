@@ -1,58 +1,53 @@
-import { Camera, Plus, Utensils, LockKeyhole, Unlock, Trash2, Download, Upload, X, Sparkles, ArrowRight, ScanBarcode, SlidersHorizontal } from "lucide-react";
-import { aggregate, candidateFood, category, density, uid } from "../pilot";
-import { fmt } from "../ui";
-import type { ScannerMode } from "../types";
+import { Download, Upload, SlidersHorizontal } from "lucide-react";
+import { fmt, fixed } from "../ui";
+import { APP_NAME, COACH_NAME } from "../components/Mark";
+import { exportLog, clearLog, readLog } from "../log";
 import type { AppApi } from "./api";
 
 export function MoreScreen(p: AppApi) {
-  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef } = p;
+  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach } = p;
+  const n = readLog().length;
   return (
     <div className="more-screen">
       <section className="panel">
         <h2>Daily reference</h2>
-        <p>
-          {fmt(state.goals.calories, 0)} kcal · {fmt(state.goals.protein)} g protein · PD {fmt(pdRef, 2)}
-        </p>
-        <p className="small">
-          Set by you and your coach. This app does not prescribe targets.
-        </p>
-        <button className="primary" onClick={() => setGoalsOpen(true)}>
-          <SlidersHorizontal size={16} /> Edit reference
-        </button>
-      </section>
-      <section className="panel">
-        <h2>Your data</h2>
-        <p className="small">
-          Everything lives in this browser. Export a backup before changing devices or clearing site data.
-        </p>
-        <div className="button-row">
-          <button className="subtle" onClick={exportData}>
-            <Download size={15} /> Export backup
+        <p>{fmt(state.goals.calories, 0)} kcal · {fmt(state.goals.protein)} g protein · PD {fixed(pdRef)}</p>
+        <p className="small">Set by {COACH_NAME}.</p>
+        {coach && (
+          <button className="primary" onClick={() => setGoalsOpen(true)}>
+            <SlidersHorizontal size={16} /> Edit reference
           </button>
-          <button className="subtle" onClick={() => importRef.current?.click()}>
-            <Upload size={15} /> Import backup
-          </button>
-        </div>
+        )}
       </section>
       <section className="panel">
-        <h2>Server & services</h2>
-        <p className="small">
-          AI label reading: {services?.ai ? "configured" : "not connected"}
-          <br />
-          Airtable sync: {services?.airtable ? "configured" : "not connected"}
-        </p>
-        <button className="subtle" onClick={() => setAccessOpen(true)}>
-          Server access
-        </button>
+        <h2>Coach tools</h2>
+        <label className="check">
+          <input type="checkbox" checked={coach} onChange={(e) => setCoach(e.target.checked)} />
+          I am the coach
+        </label>
+        {coach && (
+          <>
+            <p className="small">Pilot log: {n} {n === 1 ? "event" : "events"} on this device.</p>
+            <div className="button-row">
+              <button className="subtle" onClick={exportLog}><Download size={15} /> Export pilot log</button>
+              <button className="subtle danger" onClick={() => { if (confirm("Clear the pilot log on this device?")) clearLog(); }}>Clear log</button>
+            </div>
+            <div className="button-row">
+              <button className="subtle" onClick={exportData}><Download size={15} /> Export backup</button>
+              <button className="subtle" onClick={() => importRef.current?.click()}><Upload size={15} /> Import backup</button>
+            </div>
+            <p className="small">
+              AI label reading: {services?.ai ? "on" : "off"} · Airtable: {services?.airtable ? "on" : "off"}
+            </p>
+            <button className="subtle" onClick={() => setAccessOpen(true)}>Server access</button>
+          </>
+        )}
       </section>
       <section className="panel">
-        <h2>About this pilot</h2>
+        <h2>About</h2>
         <p className="small">
-          PlateMate · Mealan pilot 0.4. Barcode data:{" "}
-          <a href="https://world.openfoodfacts.org" target="_blank" rel="noreferrer">
-            Open Food Facts
-          </a>{" "}
-          (community data; verify the package). No medical or meal-completeness claims.
+          {APP_NAME}, pilot. Barcode data from{" "}
+          <a href="https://world.openfoodfacts.org" target="_blank" rel="noreferrer">Open Food Facts</a>, check the package.
         </p>
       </section>
     </div>

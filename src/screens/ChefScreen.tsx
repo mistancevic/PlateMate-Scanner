@@ -1,6 +1,7 @@
 import { Sparkles } from "lucide-react";
 import { aggregate } from "../pilot";
 import { fmt, fixed } from "../ui";
+import { log } from "../log";
 import type { AppApi } from "./api";
 
 export function ChefScreen(p: AppApi) {
@@ -58,6 +59,7 @@ export function ChefScreen(p: AppApi) {
                     <small>{fmt(t.calories, 0)} kcal · {fmt(t.protein)} g · {fmt(t.weight, 0)} g whole{o.explanation ? ` · ${o.explanation}` : ""}</small>
                   </div>
                   <button className="pill pill-small" onClick={() => {
+                    log("mix_applied", { grams: Math.round(o.grams) });
                     setState((s) => ({ ...s, items: o.items, portion: null }));
                     notify("Mix applied.");
                     setTab("meal");

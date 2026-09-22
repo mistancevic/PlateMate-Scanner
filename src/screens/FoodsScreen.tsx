@@ -12,7 +12,7 @@ function band(pd: number | null): Band {
 export function FoodsScreen(p: AppApi) {
   const { state, setState, blank, setCamera, setMode, barcode, setBarcode, lookup,
     pending, setPending, query, setQuery, add, setImage, setEdit, api,
-    setBusy, setError, notify, setFilter, filter } = p;
+    setBusy, setError, notify, setFilter, filter, coach } = p;
   const inMeal = new Set(state.items.map((i) => i.food.id));
   const foods = state.foods.map((f) => ({ f, pd: density(f.protein, f.calories) })).map((x) => ({ ...x, b: band(x.pd) }));
   const counts = { high: foods.filter((x) => x.b === "high").length, mid: foods.filter((x) => x.b === "mid").length, low: foods.filter((x) => x.b === "low").length };
@@ -73,11 +73,11 @@ export function FoodsScreen(p: AppApi) {
               <span className="row-links">
                 <button className="link" onClick={() => add(f)}>Add to meal</button>
                 <button className="link" onClick={() => { setImage(""); setEdit(f); }}>Review</button>
-                <button className="link" onClick={async () => {
+                {coach && <button className="link" onClick={async () => {
                   setBusy("Saving to Airtable");
                   try { await api("/api/save", { food: f }); notify("Saved to Airtable."); }
                   catch (e: any) { setError(e.message); } finally { setBusy(""); }
-                }}>Airtable</button>
+                }}>Airtable</button>}
                 <button className="link link-danger" onClick={() => {
                   if (confirm("Remove this food from your library?"))
                     setState((s) => ({ ...s, foods: s.foods.filter((x) => x.id !== f.id) }));

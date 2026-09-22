@@ -21,7 +21,8 @@ import { CameraView } from "./components/CameraView";
 import { resizeImageBase64 } from "./utils/image";
 import type { ScannerMode } from "./types";
 import { fmt, fixed } from "./ui";
-import { Mark, APP_NAME } from "./components/Mark";
+import { Mark, APP_NAME, COACH_NAME } from "./components/Mark";
+import { log, isCoach, setCoach } from "./log";
 import { MealScreen } from "./screens/MealScreen";
 import { ChefScreen } from "./screens/ChefScreen";
 import { FoodsScreen } from "./screens/FoodsScreen";
@@ -377,6 +378,7 @@ export default function App() {
       return (["meal", "chef", "foods", "notes", "more"] as Tab[]).includes(h as Tab) ? (h as Tab) : "meal";
     }),
     [filter, setFilter] = useState<"all" | "high" | "mid" | "low" | "inmeal">("all"),
+    [coach, setCoachState] = useState<boolean>(isCoach),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -480,6 +482,7 @@ export default function App() {
     );
   }
   function add(food: Food) {
+    log("food_in", { way: food.barcode ? "barcode" : food.source === "label" ? "label" : food.source === "manual" ? "manual" : "saved", source: food.source });
     setState((s) => ({
       ...s,
       items: [
@@ -510,6 +513,7 @@ export default function App() {
       });
       if (run !== runRef.current) return;
       if (group) {
+        log("food_in", { way: "group" });
         setPending(
           data.entities.map((x: any) => ({
             name: x.product_name,
@@ -574,6 +578,7 @@ export default function App() {
     }));
   }
   function saveMeal() {
+    log("meal_saved", { items: state.items.length });
     const t = aggregate(state.items),
       p = state.portion ?? t.weight;
     if (!p || p > t.weight) {
@@ -714,6 +719,7 @@ export default function App() {
     setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
     pdRef, matched, importRef, filter, setFilter,
+    coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
     mealanCard: (
       <Mealan
         items={state.items}
@@ -727,7 +733,7 @@ export default function App() {
     { id: "meal", label: "Meal" },
     { id: "chef", label: "Chef" },
     { id: "foods", label: "Foods" },
-    { id: "notes", label: "Recipes" },
+    ...(coach ? [{ id: "notes" as Tab, label: "Recipes" }] : []),
     { id: "more", label: "More" },
   ];
   const TITLES: Record<Tab, string> = {
@@ -745,7 +751,7 @@ export default function App() {
         </button>
         <h1>{TITLES[tab]}</h1>
         <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
-          {fmt(state.goals.calories, 0)} kcal · {fmt(state.goals.protein)} g · PD {fixed(pdRef)}
+          {fmt(state.goals.calories, 0)} kcal · {fmt(state.goals.protein)} g · PD {fixed(pdRef)} · set by {COACH_NAME}
         </button>
       </header>
       <main>
@@ -935,6 +941,7 @@ export default function App() {
                   ...s.feedback,
                 ],
               }));
+              log("feedback", { status: feedback.status });
               setReviewMeal(null);
               notify("Feedback saved with this recipe snapshot.");
             }}
