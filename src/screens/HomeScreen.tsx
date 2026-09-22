@@ -1,11 +1,11 @@
-import { ChefHat, Camera, Plus, ArrowRight } from "lucide-react";
+import { ChefHat, Camera, BookOpen, ArrowRight } from "lucide-react";
 import { aggregate, density } from "../pilot";
 import { fmt, fixed } from "../ui";
 import { COACH_NAME } from "../components/Mark";
 import type { AppApi } from "./api";
 
 export function HomeScreen(p: AppApi) {
-  const { state, setTab, setStep, pdRef, setCamera, setMode, blank, clientName } = p;
+  const { state, setTab, setStep, pdRef, setCamera, setMode, clientName } = p;
   const last = state.meals[0];
   const lastT = last ? aggregate(last.items) : null;
   return (
@@ -21,10 +21,12 @@ export function HomeScreen(p: AppApi) {
       <button className="pill pill-primary pill-tall" onClick={() => { setStep("in"); setTab("journey"); }}>
         <ChefHat size={20} /> I'm craving something
       </button>
-      <div className="choices">
-        <button className="choice" onClick={() => { setStep("in"); setTab("journey"); setMode("group"); setCamera(true); }}><Camera size={22} /><span>Scan</span></button>
-        <button className="choice" onClick={() => { setStep("in"); setTab("journey"); blank(); }}><Plus size={22} /><span>Type it</span></button>
-      </div>
+      <button className="pill pill-tall" onClick={() => { setStep("in"); setTab("journey"); setMode("group"); setCamera(true); }}>
+        <Camera size={20} /> Scan
+      </button>
+      <button className="pill pill-tall" onClick={() => setTab("foods")}>
+        <BookOpen size={20} /> My foods
+      </button>
       {last && lastT && (
         <section className="card">
           <div className="card-top"><span>Last time</span><span>{new Date(last.savedAt).toLocaleDateString()}</span></div>
