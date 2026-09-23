@@ -75,6 +75,11 @@ export function JourneyScreen(p: AppApi) {
             ))}
           </div>
         )}
+        <button className="pill pill-primary pill-wide" disabled={items.length < 2} onClick={askMealan}>
+          <ChefHat size={18} /> Ask {CHEF_NAME}
+        </button>
+        {items.length < 2 && <p className="small center">Two products at least, so {CHEF_NAME} has something to move.</p>}
+        {items.length >= 2 && <p className="small center">Coral dot keeps the amount. {CHEF_NAME} moves the unlocked one with the most protein.</p>}
         <p className="label">My foods</p>
         <input className="search" aria-label="Search my foods" placeholder="Search my foods" value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="rows">
@@ -92,11 +97,7 @@ export function JourneyScreen(p: AppApi) {
             })}
           {state.foods.length === 0 && <small>No saved foods yet. Scan or type one above.</small>}
         </div>
-        <button className="pill pill-primary pill-wide" disabled={items.length < 2} onClick={askMealan}>
-          <ChefHat size={18} /> Ask {CHEF_NAME}
-        </button>
-        {items.length < 2 && <p className="small center">Two products at least, so {CHEF_NAME} has something to move.</p>}
-        {items.length >= 2 && <p className="small center">Coral dot keeps the amount. {CHEF_NAME} moves the unlocked one with the most protein.</p>}
+
       </>
     );
 
