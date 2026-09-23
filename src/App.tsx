@@ -499,9 +499,10 @@ export default function App() {
       });
       if (run !== runRef.current) return;
       if (group) {
+        const entities = Array.isArray(data?.entities) ? data.entities : [];
         setPending(
-          data.entities.map((x: any) => ({
-            name: x.product_name,
+          entities.map((x: any) => ({
+            name: x.product_name || "Unknown item",
             brand: x.brand || "",
           })),
         );
@@ -659,8 +660,9 @@ export default function App() {
           })),
         })),
       });
+      const suggestions = Array.isArray(data?.suggestions) ? data.suggestions : [];
       setOptions((current) =>
-        data.suggestions
+        suggestions
           .map((r: any) => {
             const o = current.find((c) => c.food.id === r.id);
             return o ? { ...o, explanation: r.reason } : null;

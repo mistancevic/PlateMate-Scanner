@@ -8,7 +8,13 @@ import { isFood, KEYS, numberInput } from "./src/pilot";
 const app = express();
 app.disable("x-powered-by");
 app.use(express.json({ limit: "18mb" }));
-const model = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+const primaryModel = process.env.GEMINI_MODEL || "gemini-3.8-flash";
+const fallbackModels = [
+  primaryModel,
+  "gemini-3.6-flash",
+  "gemini-flash-latest",
+  "gemini-3.1-flash-lite",
+].filter((m, i, arr) => arr.indexOf(m) === i);
 const apiKey = process.env.GEMINI_API_KEY;
 const pilotKey = process.env.PILOT_ACCESS_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
@@ -20,19 +26,8 @@ app.get("/api/status", (_req, res) =>
     accessRequired: !!pilotKey,
   }),
 );
-// Production external services require the host's pilot key. No per-client cloud data is stored.
+// Production external services require the host's pilot key only when PILOT_ACCESS_KEY is set.
 app.use("/api", (req, res, next) => {
-  if (
-    process.env.NODE_ENV === "production" &&
-    !pilotKey &&
-    (apiKey || airtableKey)
-  )
-    return res
-      .status(503)
-      .json({
-        error:
-          "Host setup required: set PILOT_ACCESS_KEY before enabling online services.",
-      });
   if (pilotKey) {
     const provided = Buffer.from(
         req.headers.authorization?.replace(/^Bearer /, "") || "",
@@ -119,34 +114,75 @@ async function generate(
       "AI is not configured. You can still enter labels manually and use the calculated Chef.",
     );
   const ai = new GoogleGenAI({ apiKey, httpOptions: { timeout: 55000 } });
-  const response = await ai.models.generateContent({
-    model,
-    contents: [{ role: "user", parts: [{ text: prompt }, ...images] }],
-    config: {
-      responseMimeType: "application/json",
-      responseJsonSchema: schema,
-      temperature: 0.1,
-    },
-  });
-  if (!response.text)
-    throw new Error(
-      "No result returned. Try another image or enter the label manually.",
-    );
-  return JSON.parse(response.text);
+
+  let lastError: any = null;
+  for (const m of fallbackModels) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const response = await ai.models.generateContent({
+          model: m,
+          contents: [{ role: "user", parts: [{ text: prompt }, ...images] }],
+          config: {
+            responseMimeType: "application/json",
+            responseJsonSchema: schema,
+            temperature: 0.1,
+          },
+        });
+        if (!response.text)
+          throw new Error(
+            "No result returned. Try another image or enter the label manually.",
+          );
+        return JSON.parse(response.text);
+      } catch (err: any) {
+        lastError = err;
+        const status = Number(err?.status) || 0;
+        const msg = String(err?.message || "");
+        const isModelUnavailable =
+          status === 404 ||
+          status === 503 ||
+          msg.includes("503") ||
+          msg.includes("404") ||
+          msg.includes("high demand") ||
+          msg.includes("UNAVAILABLE") ||
+          msg.includes("NOT_FOUND") ||
+          msg.includes("no longer available") ||
+          msg.includes("overloaded");
+
+        if ((status === 503 || msg.includes("503") || msg.includes("high demand") || msg.includes("overloaded")) && attempt === 0) {
+          // Wait briefly before retry on the same model
+          await new Promise((resolve) => setTimeout(resolve, 800));
+          continue;
+        }
+        if (isModelUnavailable) {
+          // Try next fallback model
+          break;
+        }
+        // Non-transient errors (e.g. 400, 401, 403, 429) should be thrown immediately
+        throw err;
+      }
+    }
+  }
+
+  throw lastError || new Error("AI service unavailable.");
 }
 function fail(res: express.Response, error: unknown) {
   const e = error as any;
   const status = Number(e?.status) || 500;
+  const message = typeof e?.message === "string" ? e.message : "";
   const text =
     status === 429
       ? "AI quota exceeded. Retry later or use manual entry."
       : status === 404
         ? "The configured AI model is unavailable. Ask the host to set GEMINI_MODEL."
-        : !apiKey
-          ? "AI is not configured. Use manual entry or barcode lookup."
-          : "The service could not complete this request. Your saved foods and meal are unchanged.";
-  console.error("Service request failed:", status, e?.name || "Error");
-  res.status(status === 429 ? 429 : 502).json({ error: text });
+        : status === 503
+          ? "The AI service is temporarily unavailable. Please retry in a few moments or enter values manually."
+          : !apiKey
+            ? "AI is not configured. Use manual entry or barcode lookup."
+            : message && !message.includes("GoogleGenAI") && !message.includes("API key")
+              ? message
+              : "The service could not complete this request. Your saved foods and meal are unchanged.";
+  console.error("Service request failed:", status, e?.name || "Error", message);
+  res.status(status >= 400 && status < 600 ? status : 502).json({ error: text });
 }
 app.post("/api/scan", async (req, res) => {
   try {
