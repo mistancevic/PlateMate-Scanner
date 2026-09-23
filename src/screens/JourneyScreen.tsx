@@ -11,7 +11,8 @@ const band = (pd: number | null) => (pd === null || pd < 3 ? "low" : pd < 5 ? "m
 
 export function JourneyScreen(p: AppApi) {
   const { state, setState, setTab, step, setStep, setCamera, setMode, blank, updateItem,
-    setAdjustId, mixWith, options, pdRef, saveMeal, notify, setError, setFeedback } = p;
+    setAdjustId, mixWith, options, pdRef, saveMeal, notify, setError, setFeedback, add } = p;
+  const [q, setQ] = useState("");
   const [cap, setCap] = useState<number | null>(300);
   const [pick, setPick] = useState(0);
   const [note, setNote] = useState("");
@@ -48,11 +49,11 @@ export function JourneyScreen(p: AppApi) {
     return (
       <>
         <Head title="What are you craving?" sub={`Get the products in. Then ${CHEF_NAME} works out how much of each.`} />
-        <div className="choices">
-          <button className="choice" onClick={() => { setMode("group"); setCamera(true); }}><Camera size={22} /><span>Photo of the products</span></button>
-          <button className="choice" onClick={() => { setMode("barcode"); setCamera(true); }}><ScanBarcode size={22} /><span>Barcode</span></button>
-          <button className="choice" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={22} /><span>Label</span></button>
-          <button className="choice" onClick={() => blank()}><Plus size={22} /><span>Type it</span></button>
+        <div className="ways">
+          <button className="pill pill-small" onClick={() => { setMode("group"); setCamera(true); }}><Camera size={15} /> Photo</button>
+          <button className="pill pill-small" onClick={() => { setMode("barcode"); setCamera(true); }}><ScanBarcode size={15} /> Barcode</button>
+          <button className="pill pill-small" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> Label</button>
+          <button className="pill pill-small" onClick={() => blank()}><Plus size={15} /> Type it</button>
         </div>
         {items.length > 0 && (
           <div className="rows">
@@ -74,7 +75,23 @@ export function JourneyScreen(p: AppApi) {
             ))}
           </div>
         )}
-        <button className="link" onClick={() => setTab("foods")}>Or pick from my foods</button>
+        <p className="label">My foods</p>
+        <input className="search" aria-label="Search my foods" placeholder="Search my foods" value={q} onChange={(e) => setQ(e.target.value)} />
+        <div className="rows">
+          {state.foods
+            .filter((f) => (f.name + " " + f.brand).toLowerCase().includes(q.toLowerCase()))
+            .slice(0, q ? 20 : 5)
+            .map((f) => {
+              const inList = items.some((i) => i.food.id === f.id);
+              return (
+                <div className="row row-food" key={f.id}>
+                  <div className="row-text"><b>{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}PD {fixed(density(f.protein, f.calories))}</small></div>
+                  <button className={`pill pill-small ${inList ? "" : "pill-primary"}`} disabled={inList} onClick={() => add(f)}>{inList ? "In" : <><Plus size={14} /> Add</>}</button>
+                </div>
+              );
+            })}
+          {state.foods.length === 0 && <small>No saved foods yet. Scan or type one above.</small>}
+        </div>
         <button className="pill pill-primary pill-wide" disabled={items.length < 2} onClick={askMealan}>
           <ChefHat size={18} /> Ask {CHEF_NAME}
         </button>

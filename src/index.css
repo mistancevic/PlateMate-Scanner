@@ -256,3 +256,7 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .avatar-coach { background: var(--brand); color: #fff; }
 
 .toast { position: fixed; left: 14px; right: 14px; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 45; box-shadow: 0 6px 24px rgba(23,39,66,0.18); margin: 0; }
+
+.ways { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.ways .pill-small { padding: 0 12px; }
+.row-food { min-height: 52px; padding: 6px 0; }
