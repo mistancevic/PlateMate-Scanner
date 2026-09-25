@@ -274,3 +274,8 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .choices.three { grid-template-columns: repeat(3, 1fr); }
 .choices.three .choice { height: 84px; font-size: 12px; }
 .armed { color: var(--low) !important; border-color: var(--low) !important; }
+.plan .button-row { margin-top: 12px; gap: 8px; }
+.plan .pill-small { background: var(--surface); }
+.button-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.coach-tools .button-row { margin-top: 2px; }
+.pill.armed { background: #fde4df; }

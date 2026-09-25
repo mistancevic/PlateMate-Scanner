@@ -1,4 +1,4 @@
-import { Download, Upload, SlidersHorizontal } from "lucide-react";
+import { Download, Upload, SlidersHorizontal, RotateCcw, Target } from "lucide-react";
 import { fmt, fixed } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
 import { exportLog, clearLog, readLog } from "../log";
@@ -8,21 +8,18 @@ import type { AppApi } from "./api";
 
 export function MeScreen(p: AppApi) {
   const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal, resetGoal } = p;
+  const n = readLog().length;
   const bandName = goal?.band ? bandOf(goal.band)?.name : null;
   const setBy = goal?.setBy === "coach" ? COACH_NAME : "you";
-  const n = readLog().length;
   return (
     <>
+      <p className="label">You</p>
       <section className="card person">
         <span className="avatar">{(clientName || "?").slice(0, 1).toUpperCase()}</span>
         <label className="name-field">
           <span>Your name</span>
           <input value={clientName} placeholder="Your name" onChange={(e) => setClientName(e.target.value)} />
         </label>
-      </section>
-      <section className="card person">
-        <span className="avatar avatar-coach">{COACH_NAME.slice(0, 1)}</span>
-        <div><b>{COACH_NAME}</b><small>your coach</small></div>
       </section>
       <section className="plan">
         <div className="plan-top"><span>Your goal{bandName ? `: ${bandName}` : ""}</span><span>set by {setBy}</span></div>
@@ -31,9 +28,11 @@ export function MeScreen(p: AppApi) {
           <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal a day</small></div>
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
-        <button className="link" onClick={openGoal}><SlidersHorizontal size={14} /> Change my goal</button>
-        <button className="link" onClick={() => setGoalsOpen(true)}>Set exact numbers</button>
-        <ConfirmButton label="Reset to default" confirmLabel="Tap again to reset the goal" onConfirm={resetGoal} />
+        <div className="button-row">
+          <button className="pill pill-small" onClick={openGoal}><Target size={14} /> Change goal</button>
+          <button className="pill pill-small" onClick={() => setGoalsOpen(true)}><SlidersHorizontal size={14} /> Exact numbers</button>
+          <ConfirmButton className="pill pill-small" label={<><RotateCcw size={14} /> Reset</>} confirmLabel="Tap again to reset" onConfirm={resetGoal} />
+        </div>
       </section>
       <section className="card">
         <div className="card-top"><span>What you told {COACH_NAME}</span><span>{state.feedback.length}</span></div>
@@ -45,20 +44,28 @@ export function MeScreen(p: AppApi) {
           </div>
         ))}
       </section>
+
+      <p className="label">Your coach</p>
+      <section className="card person">
+        <span className="avatar avatar-coach">{COACH_NAME.slice(0, 1)}</span>
+        <div><b>{COACH_NAME}</b><small>sets your target and sees how it went</small></div>
+      </section>
+
+      <p className="label">Coach area</p>
       <section className="card">
         <label className="check"><input type="checkbox" checked={coach} onChange={(e) => setCoach(e.target.checked)} /> I am the coach</label>
         {coach && (
           <div className="coach-tools">
             <small>Pilot log: {n} {n === 1 ? "event" : "events"} on this device.</small>
             <div className="button-row">
-              <button className="subtle" onClick={exportLog}><Download size={15} /> Export log</button>
-              <ConfirmButton className="subtle danger" label="Clear" confirmLabel="Tap again to clear" onConfirm={clearLog} />
+              <button className="pill pill-small" onClick={exportLog}><Download size={14} /> Export log</button>
+              <ConfirmButton className="pill pill-small" label="Clear log" confirmLabel="Tap again to clear" onConfirm={clearLog} />
             </div>
             <div className="button-row">
-              <button className="subtle" onClick={exportData}><Download size={15} /> Backup</button>
-              <button className="subtle" onClick={() => importRef.current?.click()}><Upload size={15} /> Restore</button>
-              <button className="subtle" onClick={() => setTab("notes")}>Recipes</button>
-              <button className="subtle" onClick={() => setAccessOpen(true)}>Server</button>
+              <button className="pill pill-small" onClick={exportData}><Download size={14} /> Backup</button>
+              <button className="pill pill-small" onClick={() => importRef.current?.click()}><Upload size={14} /> Restore</button>
+              <button className="pill pill-small" onClick={() => setTab("notes")}>Recipes</button>
+              <button className="pill pill-small" onClick={() => setAccessOpen(true)}>Server</button>
             </div>
             <small>AI label reading: {services?.ai ? "on" : "off"} · Airtable: {services?.airtable ? "on" : "off"}</small>
           </div>
