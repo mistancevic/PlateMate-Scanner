@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Camera, ScanBarcode, Plus, Trash2, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
 import { aggregate, density, uid } from "../pilot";
 import { fmt, fixed } from "../ui";
@@ -15,6 +15,14 @@ export function JourneyScreen(p: AppApi) {
   const { state, setState, setTab, step, setStep, setCamera, setMode, blank, updateItem,
     setAdjustId, mixWith, options, pdRef, saveMeal, notify, setError, setFeedback, add } = p;
   const [q, setQ] = useState("");
+  // When Mealan produces options, the first one becomes the recipe on screen.
+  useEffect(() => {
+    if (options.length && (step === "recipe" || step === "in")) {
+      const o = options[0]; setPick(0);
+      setState((s) => ({ ...s, items: o.items, portion: null }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [options]);
   const [cap, setCap] = useState<number | null>(300);
   const [pick, setPick] = useState(0);
   const [note, setNote] = useState("");
@@ -36,6 +44,17 @@ export function JourneyScreen(p: AppApi) {
     setAdjustId(mover.id); setPick(0);
     // mix reads state from the closure, so run it after the state update lands
     setTimeout(() => { if (mixWith(locked, mover.id)) setStep("recipe"); }, 0);
+  }
+  // Editing an amount on the recipe: that amount becomes yours, Mealan moves the highest-PD food you didn't touch.
+  function edit(id: string, grams: number) {
+    const base = items.map((i) => (i.id === id ? { ...i, grams, locked: true } : i));
+    const pool = base.filter((i) => !i.locked && i.id !== id);
+    const mover = [...pool].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
+    if (!mover) { setState((s) => ({ ...s, items: base, portion: null })); return; }
+    const withMover = base.map((i) => (i.id === mover.id ? { ...i, locked: false } : i));
+    setState((s) => ({ ...s, items: withMover, portion: null }));
+    setAdjustId(mover.id);
+    setTimeout(() => { mixWith(withMover, mover.id); }, 0);
   }
 
   const Head = ({ title, sub }: { title: string; sub?: string }) => (
@@ -72,7 +91,7 @@ export function JourneyScreen(p: AppApi) {
                 </div>
                 <label className="grams">
                   <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams}
-                    onChange={(e) => updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0) })} />
+                    onChange={(e) => updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0), locked: true })} />
                   <span>g</span>
                 </label>
                 <button className="icon" aria-label={`Remove ${i.food.name}`} onClick={() => setState((s) => ({ ...s, items: s.items.filter((x) => x.id !== i.id), portion: null }))}><Trash2 size={16} /></button>
@@ -108,39 +127,46 @@ export function JourneyScreen(p: AppApi) {
     );
 
   if (step === "recipe") {
-    const o = options[pick % Math.max(options.length, 1)];
-    if (!o) return (<><Head title={`${CHEF_NAME} found no mix`} sub="Change what is locked, or the amounts, and ask again." /><Back to="in" /></>);
-    const over = cap !== null && o.grams > cap;
-    const shown = over ? o.items.map((i) => (i.id === (adjustFor(o)) ? { ...i, grams: cap } : i)) : o.items;
+    // The recipe is the current items: Mealan's result, editable. Typing an amount makes it yours; Mealan redoes the rest.
+    const mover = items.find((i) => !i.locked);
+    const over = cap !== null && !!mover && mover.grams > cap;
+    const shown = over ? items.map((i) => (i.id === mover!.id ? { ...i, grams: cap! } : i)) : items;
     const ot = aggregate(shown); const opd = density(ot.protein, ot.calories);
+    const onPlan = opd !== null && pdRef !== null && opd >= pdRef - 0.05;
     return (
       <>
-        <Head title={`${CHEF_NAME}'s recipe`} sub={over ? `${o.food.name} would need ${fmt(o.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : (o.explanation || `${o.food.name} moved to ${fmt(o.grams, 0)} g. Everything you locked stayed.`)} />
+        <Head title={`${CHEF_NAME}'s recipe`} sub={over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : mover ? `${mover.food.name} is the one ${CHEF_NAME} moves. Change any amount and ${CHEF_NAME} redoes the rest.` : `Everything is set by you. Change one amount and ${CHEF_NAME} moves the rest.`} />
         <section className="readout">
           <div className="readout-top"><span>This dessert</span><span>PD</span></div>
           <div className="readout-mid">
             <b>{fixed(opd)}</b>
-            <div><span>{opd !== null && pdRef !== null && opd >= pdRef - 0.05 ? `on plan, target ${fixed(pdRef)}` : `target ${fixed(pdRef)}`}</span><small>{fmt(ot.calories, 0)} kcal · {fmt(ot.protein)} g protein · {fmt(ot.weight, 0)} g</small></div>
+            <div><span>{onPlan ? `on plan, target ${fixed(pdRef)}` : `target ${fixed(pdRef)}`}</span><small>{fmt(ot.calories, 0)} kcal · {fmt(ot.protein)} g protein · {fmt(ot.weight, 0)} g</small></div>
           </div>
         </section>
         <div className="rows">
           {shown.map((i) => (
             <div className="row" key={i.id}>
               <span className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} />
-              <div className="row-text"><b>{i.food.name}</b><small>{i.locked ? "as you wanted it" : `what ${CHEF_NAME} changed`}</small></div>
-              <b className="row-num">{fmt(i.grams, 0)} g</b>
+              <div className="row-text"><b>{i.food.name}</b><small>{i.locked ? "as you set it" : `what ${CHEF_NAME} moves`}</small></div>
+              <label className="grams">
+                <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams}
+                  onChange={(e) => edit(i.id, Math.max(0, Number(e.target.value) || 0))} />
+                <span>g</span>
+              </label>
             </div>
           ))}
         </div>
-
         {over && <button className="pill pill-wide" onClick={() => setCap(null)}>Allow more than {cap} g</button>}
         <button className="pill pill-primary pill-wide" onClick={() => {
-          log("mix_applied", { grams: Math.round(over ? cap! : o.grams) });
+          log("mix_applied", { grams: mover ? Math.round(over ? cap! : mover.grams) : 0 });
           setState((s) => ({ ...s, items: shown, portion: null, title: s.title || "DaaM" }));
           setTimeout(() => saveMeal(), 0);
           setStep("after");
         }}>Make it</button>
-        {options.length > 1 && <button className="pill pill-wide" onClick={() => setPick((x) => x + 1)}>Try another mix ({(pick % options.length) + 1} of {options.length})</button>}
+        {options.length > 1 && <button className="pill pill-wide" onClick={() => {
+          const next = (pick + 1) % options.length; setPick(next);
+          setState((s) => ({ ...s, items: options[next].items, portion: null }));
+        }}>Try another mix ({(pick % options.length) + 1} of {options.length})</button>}
         <Back to="in" />
       </>
     );
