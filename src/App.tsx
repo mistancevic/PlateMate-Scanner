@@ -506,7 +506,7 @@ export default function App() {
       ...s,
       items: [
         ...s.items,
-        { id: uid(), food: { ...food }, grams: (density(food.protein, food.calories) ?? 0) < 3 ? 50 : 150, locked: true },
+        { id: uid(), food: { ...food }, grams: (density(food.protein, food.calories) ?? 0) < 3 ? 50 : 150, locked: false },
       ],
       portion: null,
     }));
