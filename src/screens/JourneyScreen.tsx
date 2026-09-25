@@ -134,7 +134,7 @@ export function JourneyScreen(p: AppApi) {
                 </div>
                 {i.locked ? <b className="row-num">{fmt(i.grams, 0)} g</b> : (
                   <label className="grams">
-                    <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams}
+                    <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : i.grams}
                       onChange={(e) => updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0) })} />
                     <span>g</span>
                   </label>
@@ -198,7 +198,7 @@ export function JourneyScreen(p: AppApi) {
               <div className="row-text"><button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button><small>{i.locked ? "as you set it" : i.id === mover?.id ? `what ${CHEF_NAME} moves` : `${CHEF_NAME} may move it`}</small></div>
               {i.locked ? <b className="row-num">{fmt(i.grams, 0)} g</b> : (
                 <label className="grams">
-                  <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams}
+                  <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : i.grams}
                     onChange={(e) => edit(i.id, Math.max(0, Number(e.target.value) || 0))} />
                   <span>g</span>
                 </label>
