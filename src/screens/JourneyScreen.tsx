@@ -21,7 +21,16 @@ export function JourneyScreen(p: AppApi) {
   useEffect(() => {
     if (options.length && (step === "recipe" || step === "in")) {
       const o = options[0]; setPick(0);
-      setState((s) => ({ ...s, items: o.items.map((oi) => { const cur = s.items.find((x) => x.id === oi.id); return cur ? { ...oi, locked: cur.locked } : oi; }), portion: null }));
+      const moved = o.items.find((oi) => oi.id === o.food.id) ?? o.items.find((oi) => !oi.locked);
+      const mv = o.items.find((oi) => oi.id === (moved?.id ?? "")) ?? null;
+      const moverId = o.items.find((oi) => oi.food.id === o.food.id)?.id ?? mv?.id ?? "";
+      if (moverId && touched.has(moverId)) {
+        // you typed this one: keep your number, show Mealan's as a suggestion
+        setSuggest({ id: moverId, grams: Math.round(o.grams) });
+      } else {
+        setSuggest(null);
+        setState((s) => ({ ...s, items: o.items.map((oi) => { const cur = s.items.find((x) => x.id === oi.id); return cur ? { ...oi, locked: cur.locked } : oi; }), portion: null }));
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [options]);
@@ -31,6 +40,8 @@ export function JourneyScreen(p: AppApi) {
   const [good, setGood] = useState<"daam" | "good" | "no" | null>(null);
   const [plate, setPlate] = useState<string>("");
   const [swapId, setSwapId] = useState<string | null>(null);
+  const [touched, setTouched] = useState<Set<string>>(new Set());
+  const [suggest, setSuggest] = useState<{ id: string; grams: number } | null>(null);
   const [cardId, setCardId] = useState<string | null>(null);
   const TASTE = { daam: "DaaM good", good: "Good", no: "Not really" } as const;
   const items = state.items;
@@ -80,9 +91,16 @@ export function JourneyScreen(p: AppApi) {
   }
   // Editing an amount on the recipe: that amount becomes yours, Mealan moves the highest-PD food you didn't touch.
   function edit(id: string, grams: number) {
+    setTouched((t) => new Set(t).add(id));
     const next = items.map((i) => (i.id === id ? { ...i, grams } : i));
     setState((s) => ({ ...s, items: next, portion: null }));
-    if (moverOf(next)?.id !== id) recalc(next);
+    recalc(next);
+  }
+  function applySuggestion() {
+    if (!suggest) return;
+    setTouched((t) => { const n = new Set(t); n.delete(suggest.id); return n; });
+    setState((s) => ({ ...s, items: s.items.map((i) => (i.id === suggest.id ? { ...i, grams: suggest.grams } : i)), portion: null }));
+    setSuggest(null);
   }
   const swapPanel = swapId && (
     <div className="sheet-backdrop" onClick={() => setSwapId(null)}>
@@ -135,7 +153,9 @@ export function JourneyScreen(p: AppApi) {
                 {i.locked ? <b className="row-num">{fmt(i.grams, 0)} g</b> : (
                   <label className="grams">
                     <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : i.grams}
-                      onChange={(e) => updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0) })} />
+                      onChange={(e) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0) }); }}
+                      onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done"
+                      onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ block: "center", behavior: "smooth" }), 250)} />
                     <span>g</span>
                   </label>
                 )}
@@ -195,11 +215,16 @@ export function JourneyScreen(p: AppApi) {
             <SwipeRow key={i.id} onRemove={() => remove(i.id)} onSwap={() => setSwapId(i.id)}>
             <div className="row">
               <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Let Mealan move" : "Keep"} ${i.food.name}`} onClick={() => toggle(i.id)} />
-              <div className="row-text"><button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button><small>{i.locked ? "as you set it" : i.id === mover?.id ? `what ${CHEF_NAME} moves` : `${CHEF_NAME} may move it`}</small></div>
+              <div className="row-text"><button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button>
+                <small>{i.locked ? "as you set it" : i.id === mover?.id ? `what ${CHEF_NAME} moves` : `${CHEF_NAME} may move it`}</small>
+                {suggest?.id === i.id && suggest.grams !== i.grams && <button className="link" onClick={applySuggestion}>{CHEF_NAME} suggests {suggest.grams} g · apply</button>}
+              </div>
               {i.locked ? <b className="row-num">{fmt(i.grams, 0)} g</b> : (
                 <label className="grams">
                   <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : i.grams}
-                    onChange={(e) => edit(i.id, Math.max(0, Number(e.target.value) || 0))} />
+                    onChange={(e) => edit(i.id, Math.max(0, Number(e.target.value) || 0))}
+                    onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done"
+                    onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ block: "center", behavior: "smooth" }), 250)} />
                   <span>g</span>
                 </label>
               )}
@@ -208,7 +233,6 @@ export function JourneyScreen(p: AppApi) {
           ))}
         </div>
         {over && <button className="pill pill-wide" onClick={() => setCap(null)}>Allow more than {cap} g</button>}
-        {mover && !onPlan && <button className="pill pill-wide" onClick={() => recalc(items)}><ChefHat size={16} /> Fit it again</button>}
         <button className="pill pill-primary pill-wide" onClick={() => {
           log("mix_applied", { grams: mover ? Math.round(over ? cap! : mover.grams) : 0 });
           setState((s) => ({ ...s, items: shown, portion: null, title: s.title || "DaaM" }));
@@ -250,7 +274,7 @@ export function JourneyScreen(p: AppApi) {
         log("feedback", { status, taste });
         setFeedback({ status, taste, notes: note });
         setState((s) => ({ ...s, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, photo: plate || undefined, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
-        setGood(null); setNote(""); setPlate(""); setStep("in");
+        setGood(null); setNote(""); setPlate(""); setTouched(new Set()); setSuggest(null); setStep("in");
         notify(`Thanks. ${COACH_NAME} will see it.`);
         setTab("home");
       }}>Send to {COACH_NAME}</button>
