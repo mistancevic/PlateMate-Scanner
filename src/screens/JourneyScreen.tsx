@@ -45,6 +45,18 @@ export function JourneyScreen(p: AppApi) {
     // mix reads state from the closure, so run it after the state update lands
     setTimeout(() => { if (mixWith(locked, mover.id)) setStep("recipe"); }, 0);
   }
+  // Tapping a dot: kept becomes free to move and Mealan recalculates; free becomes kept at its current amount.
+  function toggle(id: string) {
+    const base = items.map((i) => (i.id === id ? { ...i, locked: !i.locked } : i));
+    const pool = base.filter((i) => !i.locked);
+    const mover = [...pool].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
+    if (!mover) { setState((s) => ({ ...s, items: base, portion: null })); setError(`Everything is kept. Tap a dot to let ${CHEF_NAME} move one food.`); return; }
+    // only the mover is free; the rest stays at its amount
+    const kept = base.map((i) => (pool.some((p) => p.id === i.id) && i.id !== mover.id ? { ...i, locked: true } : i));
+    setState((s) => ({ ...s, items: kept, portion: null }));
+    setAdjustId(mover.id);
+    setTimeout(() => { mixWith(kept, mover.id); }, 0);
+  }
   // Editing an amount on the recipe: that amount becomes yours, Mealan moves the highest-PD food you didn't touch.
   function edit(id: string, grams: number) {
     const base = items.map((i) => (i.id === id ? { ...i, grams, locked: true } : i));
@@ -146,7 +158,7 @@ export function JourneyScreen(p: AppApi) {
         <div className="rows">
           {shown.map((i) => (
             <div className="row" key={i.id}>
-              <span className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} />
+              <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Let Mealan move" : "Keep"} ${i.food.name}`} onClick={() => toggle(i.id)} />
               <div className="row-text"><b>{i.food.name}</b><small>{i.locked ? "as you set it" : `what ${CHEF_NAME} moves`}</small></div>
               <label className="grams">
                 <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams}
