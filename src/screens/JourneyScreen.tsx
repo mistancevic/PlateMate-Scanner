@@ -5,6 +5,7 @@ import { fmt, fixed } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
 import { iconFor } from "../icons";
+import { SwipeRow } from "../components/SwipeRow";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
 
@@ -28,6 +29,7 @@ export function JourneyScreen(p: AppApi) {
   const [note, setNote] = useState("");
   const [good, setGood] = useState<"daam" | "good" | "no" | null>(null);
   const [plate, setPlate] = useState<string>("");
+  const [swapId, setSwapId] = useState<string | null>(null);
   const TASTE = { daam: "DaaM good", good: "Good", no: "Not really" } as const;
   const items = state.items;
   const t = aggregate(items);
@@ -57,6 +59,21 @@ export function JourneyScreen(p: AppApi) {
     setAdjustId(mover.id);
     setTimeout(() => { mixWith(kept, mover.id); }, 0);
   }
+  function remove(id: string) {
+    const rest = items.filter((i) => i.id !== id);
+    setState((s) => ({ ...s, items: rest, portion: null }));
+    if (step === "recipe") {
+      const mover = rest.find((i) => !i.locked) ?? [...rest].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
+      if (mover && rest.length >= 2) { const kept = rest.map((i) => (i.id === mover.id ? { ...i, locked: false } : i)); setState((s) => ({ ...s, items: kept })); setAdjustId(mover.id); setTimeout(() => { mixWith(kept, mover.id); }, 0); }
+      else setStep("in");
+    }
+  }
+  function swap(id: string, food: typeof state.foods[number]) {
+    const next = items.map((i) => (i.id === id ? { ...i, food: { ...food, readyToEat: true } } : i));
+    setState((s) => ({ ...s, items: next, portion: null }));
+    setSwapId(null);
+    if (step === "recipe") { const mover = next.find((i) => !i.locked); if (mover) { setAdjustId(mover.id); setTimeout(() => { mixWith(next, mover.id); }, 0); } }
+  }
   // Editing an amount on the recipe: that amount becomes yours, Mealan moves the highest-PD food you didn't touch.
   function edit(id: string, grams: number) {
     const base = items.map((i) => (i.id === id ? { ...i, grams, locked: true } : i));
@@ -69,6 +86,21 @@ export function JourneyScreen(p: AppApi) {
     setTimeout(() => { mixWith(withMover, mover.id); }, 0);
   }
 
+  const swapPanel = swapId && (
+    <div className="sheet-backdrop" onClick={() => setSwapId(null)}>
+      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="card-top"><span>Swap {items.find((i) => i.id === swapId)?.food.name} for</span><button className="link" onClick={() => setSwapId(null)}>Cancel</button></div>
+        <div className="rows">
+          {state.foods.filter((f) => !items.some((i) => i.food.id === f.id)).map((f) => (
+            <button className="row row-food row-button" key={f.id} onClick={() => swap(swapId, f)}>
+              <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
+              <div className="row-text"><b>{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}PD {fixed(density(f.protein, f.calories))}</small></div>
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
   const Head = ({ title, sub }: { title: string; sub?: string }) => (
     <div className="step-head">
       <div className="step-bar">{STEPS.map((s, i) => <i key={s} className={i < n ? "on" : ""} />)}</div>
@@ -93,7 +125,8 @@ export function JourneyScreen(p: AppApi) {
         {items.length > 0 && (
           <div className="rows">
             {items.map((i) => (
-              <div className="row" key={i.id}>
+              <SwipeRow key={i.id} onRemove={() => remove(i.id)} onSwap={() => setSwapId(i.id)}>
+              <div className="row">
                 <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Unlock" : "Lock"} ${i.food.name}`}
                   onClick={() => { log("lock", { locked: !i.locked }); updateItem(i.id, { locked: !i.locked }); }} />
                 <span className="thumb">{i.food.photo ? <img src={i.food.photo} alt="" /> : (i.food.icon || iconFor(i.food.name))}</span>
@@ -106,8 +139,9 @@ export function JourneyScreen(p: AppApi) {
                     onChange={(e) => updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0), locked: true })} />
                   <span>g</span>
                 </label>
-                <button className="icon" aria-label={`Remove ${i.food.name}`} onClick={() => setState((s) => ({ ...s, items: s.items.filter((x) => x.id !== i.id), portion: null }))}><Trash2 size={16} /></button>
+                <button className="icon" aria-label={`Remove ${i.food.name}`} onClick={() => remove(i.id)}><Trash2 size={16} /></button>
               </div>
+              </SwipeRow>
             ))}
           </div>
         )}
@@ -115,7 +149,8 @@ export function JourneyScreen(p: AppApi) {
           <ChefHat size={18} /> Ask {CHEF_NAME}
         </button>
         {items.length < 2 && <p className="small center">Two products at least, so {CHEF_NAME} has something to move.</p>}
-        {items.length >= 2 && <p className="small center">Coral dot keeps the amount. {CHEF_NAME} moves the unlocked one with the most protein.</p>}
+        {items.length >= 2 && <p className="small center">Coral dot keeps the amount. {CHEF_NAME} moves the unlocked one with the most protein. Swipe a food right to remove it, left to swap it.</p>}
+        {swapPanel}
         <p className="label">My foods</p>
         <input className="search" aria-label="Search my foods" placeholder="Search my foods" value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="rows">
@@ -157,7 +192,8 @@ export function JourneyScreen(p: AppApi) {
         </section>
         <div className="rows">
           {shown.map((i) => (
-            <div className="row" key={i.id}>
+            <SwipeRow key={i.id} onRemove={() => remove(i.id)} onSwap={() => setSwapId(i.id)}>
+            <div className="row">
               <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Let Mealan move" : "Keep"} ${i.food.name}`} onClick={() => toggle(i.id)} />
               <div className="row-text"><b>{i.food.name}</b><small>{i.locked ? "as you set it" : `what ${CHEF_NAME} moves`}</small></div>
               <label className="grams">
@@ -165,7 +201,9 @@ export function JourneyScreen(p: AppApi) {
                   onChange={(e) => edit(i.id, Math.max(0, Number(e.target.value) || 0))} />
                 <span>g</span>
               </label>
+              <button className="icon" aria-label={`Remove ${i.food.name}`} onClick={() => remove(i.id)}><Trash2 size={16} /></button>
             </div>
+            </SwipeRow>
           ))}
         </div>
         {over && <button className="pill pill-wide" onClick={() => setCap(null)}>Allow more than {cap} g</button>}
@@ -180,6 +218,7 @@ export function JourneyScreen(p: AppApi) {
           setState((s) => ({ ...s, items: options[next].items, portion: null }));
         }}>Try another mix ({(pick % options.length) + 1} of {options.length})</button>}
         <Back to="in" />
+        {swapPanel}
       </>
     );
   }
