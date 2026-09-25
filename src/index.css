@@ -260,3 +260,13 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .ways { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .ways .pill-small { padding: 0 12px; }
 .row-food { min-height: 52px; padding: 6px 0; }
+
+/* ---------------- Goal ---------------- */
+.goal-screen { padding: 12px 0 24px; }
+.goal-screen h3 { font-size: 18px; margin: 12px 0 10px; }
+.bands { display: flex; flex-direction: column; gap: 8px; }
+.band-card { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-card); padding: 12px 14px; }
+.band-card:hover { border-color: var(--brand); }
+.band-card b { font-size: 16px; } .band-card small { color: var(--muted); } .band-card span { font-size: 12px; font-weight: 700; color: var(--brand-text); margin-top: 2px; }
+.own-goal { display: flex; flex-direction: column; gap: 8px; }
+.goal-line { font-size: 13px; color: var(--muted); margin: 2px 0 8px; }

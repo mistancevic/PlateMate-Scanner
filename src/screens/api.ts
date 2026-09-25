@@ -50,6 +50,9 @@ export interface AppApi {
   matched: boolean;
   mealanCard: ReactNode;
   importRef: RefObject<HTMLInputElement | null>;
+  goal: import("../goal").Goal | null;
+  openGoal: () => void;
+  fitPd: (pd: number | null) => "high" | "mid" | "low";
   clientName: string;
   setClientName: (v: string) => void;
   coach: boolean;

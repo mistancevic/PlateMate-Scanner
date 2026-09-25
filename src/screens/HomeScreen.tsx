@@ -2,16 +2,19 @@ import { ChefHat, Camera, BookOpen, ArrowRight } from "lucide-react";
 import { aggregate, density } from "../pilot";
 import { fmt, fixed } from "../ui";
 import { COACH_NAME } from "../components/Mark";
+import { bandOf } from "../goal";
 import type { AppApi } from "./api";
 
 export function HomeScreen(p: AppApi) {
-  const { state, setTab, setStep, pdRef, setCamera, setMode, clientName } = p;
+  const { state, setTab, setStep, pdRef, setCamera, setMode, clientName, goal } = p;
+  const bandName = goal?.band ? bandOf(goal.band)?.name : null;
+  const setBy = goal?.setBy === "coach" ? COACH_NAME : "you";
   const last = state.meals[0];
   const lastT = last ? aggregate(last.items) : null;
   return (
     <>
       <section className="plan">
-        <div className="plan-top"><span>{clientName ? `${clientName}'s plan` : "Your plan"}</span><span>set by {COACH_NAME}</span></div>
+        <div className="plan-top"><span>{clientName ? `${clientName}'s goal` : "Your goal"}{bandName ? `: ${bandName}` : ""}</span><span>set by {setBy}</span></div>
         <div className="plan-row">
           <div><b>{fixed(pdRef)}</b><small>PD target</small></div>
           <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal a day</small></div>

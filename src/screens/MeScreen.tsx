@@ -2,10 +2,13 @@ import { Download, Upload, SlidersHorizontal } from "lucide-react";
 import { fmt, fixed } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
 import { exportLog, clearLog, readLog } from "../log";
+import { bandOf } from "../goal";
 import type { AppApi } from "./api";
 
 export function MeScreen(p: AppApi) {
-  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName } = p;
+  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal } = p;
+  const bandName = goal?.band ? bandOf(goal.band)?.name : null;
+  const setBy = goal?.setBy === "coach" ? COACH_NAME : "you";
   const n = readLog().length;
   return (
     <>
@@ -21,13 +24,14 @@ export function MeScreen(p: AppApi) {
         <div><b>{COACH_NAME}</b><small>your coach</small></div>
       </section>
       <section className="plan">
-        <div className="plan-top"><span>Your plan</span><span>set by {COACH_NAME}</span></div>
+        <div className="plan-top"><span>Your goal{bandName ? `: ${bandName}` : ""}</span><span>set by {setBy}</span></div>
         <div className="plan-row">
           <div><b>{fixed(pdRef)}</b><small>PD target</small></div>
           <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal a day</small></div>
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
-        {coach && <button className="link" onClick={() => setGoalsOpen(true)}><SlidersHorizontal size={14} /> Edit the plan</button>}
+        <button className="link" onClick={openGoal}><SlidersHorizontal size={14} /> Change my goal</button>
+        {coach && <button className="link" onClick={() => setGoalsOpen(true)}>Edit the numbers</button>}
       </section>
       <section className="card">
         <div className="card-top"><span>What you told {COACH_NAME}</span><span>{state.feedback.length}</span></div>

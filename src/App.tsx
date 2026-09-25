@@ -30,6 +30,8 @@ import { RecipesScreen } from "./screens/RecipesScreen";
 import { MoreScreen } from "./screens/MoreScreen";
 import type { AppApi, Tab, Step } from "./screens/api";
 import { HomeScreen } from "./screens/HomeScreen";
+import { GoalScreen } from "./screens/GoalScreen";
+import { getGoal, bandOf, fit as fitPd } from "./goal";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
 import { Home, ChefHat, CircleUser } from "lucide-react";
@@ -385,6 +387,8 @@ export default function App() {
     [coach, setCoachState] = useState<boolean>(isCoach),
     [step, setStep] = useState<Step>("in"),
     [clientName, setClientNameState] = useState<string>(getClientName),
+    [goal, setGoalState] = useState(getGoal),
+    [goalOpen, setGoalOpen] = useState<boolean>(() => !getGoal()),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -732,6 +736,7 @@ export default function App() {
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
     step, setStep, mixWith,
     clientName, setClientName: (v: string) => { storeClientName(v); setClientNameState(v); },
+    goal, openGoal: () => setGoalOpen(true), fitPd: (pd: number | null) => fitPd(pd, pdRef),
     mealanCard: (
       <Mealan
         items={state.items}
@@ -757,6 +762,10 @@ export default function App() {
     notes: "Recipes",
     more: "More",
   };
+  if (goalOpen)
+    return (
+      <div className="app-shell"><main><GoalScreen {...screenProps} onDone={() => { setGoalState(getGoal()); setGoalOpen(false); }} /></main></div>
+    );
   return (
     <div className="app-shell">
       <header className="topbar">
@@ -765,7 +774,7 @@ export default function App() {
         </button>
         <h1>{tab === "home" ? APP_NAME : TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
-          {fmt(state.goals.calories, 0)} kcal · {fmt(state.goals.protein)} g · PD {fixed(pdRef)} · set by {COACH_NAME}
+          {goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · PD {fixed(pdRef)} · set by {goal?.setBy === "coach" ? COACH_NAME : "you"}
         </button>}
       </header>
       <main>

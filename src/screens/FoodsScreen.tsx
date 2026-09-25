@@ -14,7 +14,7 @@ export function FoodsScreen(p: AppApi) {
     pending, setPending, query, setQuery, add, setImage, setEdit, api,
     setBusy, setError, notify, setFilter, filter, coach } = p;
   const inMeal = new Set(state.items.map((i) => i.food.id));
-  const foods = state.foods.map((f) => ({ f, pd: density(f.protein, f.calories) })).map((x) => ({ ...x, b: band(x.pd) }));
+  const foods = state.foods.map((f) => ({ f, pd: density(f.protein, f.calories) })).map((x) => ({ ...x, b: p.fitPd(x.pd) }));
   const counts = { high: foods.filter((x) => x.b === "high").length, mid: foods.filter((x) => x.b === "mid").length, low: foods.filter((x) => x.b === "low").length };
   const shown = foods.filter(({ f, b }) =>
     (f.name + " " + f.brand).toLowerCase().includes(query.toLowerCase()) &&
@@ -59,7 +59,7 @@ export function FoodsScreen(p: AppApi) {
       )}
       <input className="search" aria-label="Search saved foods" placeholder="Search your foods" value={query} onChange={(e) => setQuery(e.target.value)} />
       <div className="chips">
-        {([["high", "High PD"], ["mid", "Mid"], ["low", "Low"], ["inmeal", "In meal"]] as const).map(([k, l]) => (
+        {([["high", "Fits my goal"], ["mid", "Close"], ["low", "Below"], ["inmeal", "In meal"]] as const).map(([k, l]) => (
           <button key={k} className={`chip chip-${k} ${filter === k ? "on" : ""}`} onClick={() => setFilter(filter === k ? "all" : k)}>{l}</button>
         ))}
       </div>
