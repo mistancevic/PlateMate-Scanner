@@ -21,7 +21,7 @@ export function JourneyScreen(p: AppApi) {
   useEffect(() => {
     if (options.length && (step === "recipe" || step === "in")) {
       const o = options[0]; setPick(0);
-      setState((s) => ({ ...s, items: o.items, portion: null }));
+      setState((s) => ({ ...s, items: o.items.map((oi) => { const cur = s.items.find((x) => x.id === oi.id); return cur ? { ...oi, locked: cur.locked } : oi; }), portion: null }));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [options]);
@@ -42,57 +42,48 @@ export function JourneyScreen(p: AppApi) {
   const adjustFor = (o: { items: typeof items }) => o.items.find((i) => !i.locked)?.id;
   // Mealan moves the food with the highest protein density; everything else keeps the amount you set.
   function askMealan() {
-    const pool = items.filter((i) => !i.locked);
-    const mover = [...pool].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
-    if (!mover) { setError(`Everything is locked. Unlock the one product ${CHEF_NAME} may move.`); return; }
-    const locked = items.map((i) => ({ ...i, locked: i.id !== mover.id, food: { ...i.food, readyToEat: true } }));
-    setState((s) => ({ ...s, items: locked, foods: s.foods.map((f) => locked.some((x) => x.food.id === f.id) ? { ...f, readyToEat: true } : f) }));
+    const ready = items.map((i) => ({ ...i, food: { ...i.food, readyToEat: true } }));
+    const mover = moverOf(ready);
+    if (!mover) { setError(`Everything is kept. Tap a dot to let ${CHEF_NAME} move one food.`); return; }
+    setState((s) => ({ ...s, items: ready, foods: s.foods.map((f) => ready.some((x) => x.food.id === f.id) ? { ...f, readyToEat: true } : f) }));
     setAdjustId(mover.id); setPick(0);
-    // mix reads state from the closure, so run it after the state update lands
-    setTimeout(() => { if (mixWith(locked, mover.id)) setStep("recipe"); }, 0);
+    const forSolver = ready.map((i) => (i.id === mover.id ? i : { ...i, locked: true }));
+    setTimeout(() => { if (mixWith(forSolver, mover.id)) setStep("recipe"); }, 0);
   }
   // Tapping a dot: kept becomes free to move and Mealan recalculates; free becomes kept at its current amount.
-  function toggle(id: string) {
-    const me = items.find((i) => i.id === id); if (!me) return;
-    let mover: typeof items[number] | undefined;
-    if (me.locked) mover = me; // you freed it: this is the one Mealan moves
-    else {
-      const others = items.filter((i) => i.id !== id);
-      mover = [...others].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
-      if (!mover) { setState((s) => ({ ...s, items: s.items.map((i) => ({ ...i, locked: true })), portion: null })); setError(`Everything is kept. Tap a dot to let ${CHEF_NAME} move one food.`); return; }
-    }
-    const kept = items.map((i) => ({ ...i, locked: i.id !== mover!.id }));
-    setState((s) => ({ ...s, items: kept, portion: null }));
+  // The mover is the free food with the most protein. Freeing a food never changes its amount by itself.
+  const moverOf = (list: typeof items) => [...list.filter((i) => !i.locked)].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
+  function recalc(list: typeof items) {
+    const mover = moverOf(list);
+    if (!mover) { setError(`Everything is kept. Tap a dot to let ${CHEF_NAME} move one food.`); return; }
     setAdjustId(mover.id);
-    setTimeout(() => { mixWith(kept, mover!.id); }, 0);
+    const forSolver = list.map((i) => (i.id === mover.id ? i : { ...i, locked: true }));
+    setTimeout(() => { mixWith(forSolver, mover.id); }, 0);
+  }
+  function toggle(id: string) {
+    const next = items.map((i) => (i.id === id ? { ...i, locked: !i.locked } : i));
+    setState((s) => ({ ...s, items: next, portion: null }));
+    if (step === "recipe") recalc(next);
   }
   function remove(id: string) {
     const rest = items.filter((i) => i.id !== id);
     setState((s) => ({ ...s, items: rest, portion: null }));
     if (step === "recipe") {
-      const mover = rest.find((i) => !i.locked) ?? [...rest].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
-      if (mover && rest.length >= 2) { const kept = rest.map((i) => ({ ...i, locked: i.id !== mover.id })); setState((s) => ({ ...s, items: kept })); setAdjustId(mover.id); setTimeout(() => { mixWith(kept, mover.id); }, 0); }
-      else setStep("in");
+      if (rest.length >= 2 && moverOf(rest)) recalc(rest); else setStep("in");
     }
   }
   function swap(id: string, food: typeof state.foods[number]) {
     const next = items.map((i) => (i.id === id ? { ...i, food: { ...food, readyToEat: true } } : i));
     setState((s) => ({ ...s, items: next, portion: null }));
     setSwapId(null);
-    if (step === "recipe") { const mover = next.find((i) => !i.locked); if (mover) { setAdjustId(mover.id); setTimeout(() => { mixWith(next, mover.id); }, 0); } }
+    if (step === "recipe") recalc(next);
   }
   // Editing an amount on the recipe: that amount becomes yours, Mealan moves the highest-PD food you didn't touch.
   function edit(id: string, grams: number) {
-    const base = items.map((i) => (i.id === id ? { ...i, grams, locked: true } : i));
-    const pool = base.filter((i) => !i.locked && i.id !== id);
-    const mover = [...pool].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
-    if (!mover) { setState((s) => ({ ...s, items: base, portion: null })); return; }
-    const withMover = base.map((i) => (i.id === mover.id ? { ...i, locked: false } : i));
-    setState((s) => ({ ...s, items: withMover, portion: null }));
-    setAdjustId(mover.id);
-    setTimeout(() => { mixWith(withMover, mover.id); }, 0);
+    const next = items.map((i) => (i.id === id ? { ...i, grams, locked: true } : i));
+    setState((s) => ({ ...s, items: next, portion: null }));
+    recalc(next);
   }
-
   const swapPanel = swapId && (
     <div className="sheet-backdrop" onClick={() => setSwapId(null)}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -182,7 +173,7 @@ export function JourneyScreen(p: AppApi) {
 
   if (step === "recipe") {
     // The recipe is the current items: Mealan's result, editable. Typing an amount makes it yours; Mealan redoes the rest.
-    const mover = items.find((i) => !i.locked);
+    const mover = moverOf(items);
     const over = cap !== null && !!mover && mover.grams > cap;
     const shown = over ? items.map((i) => (i.id === mover!.id ? { ...i, grams: cap! } : i)) : items;
     const ot = aggregate(shown); const opd = density(ot.protein, ot.calories);
@@ -202,7 +193,7 @@ export function JourneyScreen(p: AppApi) {
             <SwipeRow key={i.id} onRemove={() => remove(i.id)} onSwap={() => setSwapId(i.id)}>
             <div className="row">
               <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Let Mealan move" : "Keep"} ${i.food.name}`} onClick={() => toggle(i.id)} />
-              <div className="row-text"><button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button><small>{i.locked ? "as you set it" : `what ${CHEF_NAME} moves`}</small></div>
+              <div className="row-text"><button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button><small>{i.locked ? "as you set it" : i.id === mover?.id ? `what ${CHEF_NAME} moves` : `${CHEF_NAME} may move it`}</small></div>
               <label className="grams">
                 <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams}
                   onChange={(e) => edit(i.id, Math.max(0, Number(e.target.value) || 0))} />
