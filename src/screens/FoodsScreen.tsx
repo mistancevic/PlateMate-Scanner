@@ -4,6 +4,7 @@ import { fmt, fixed } from "../ui";
 import type { ScannerMode } from "../types";
 import type { AppApi } from "./api";
 import { ConfirmButton } from "../components/Confirm";
+import { iconFor } from "../icons";
 
 type Band = "high" | "mid" | "low";
 function band(pd: number | null): Band {
@@ -67,7 +68,7 @@ export function FoodsScreen(p: AppApi) {
       <div className="rows">
         {shown.map(({ f, pd, b }) => (
           <div className="row" key={f.id}>
-            <span className={`dot ${inMeal.has(f.id) ? "dot-locked" : "dot-none"}`} />
+            <span className="thumb">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
             <div className="row-text">
               <b>{f.name}</b>
               <small>{f.brand ? `${f.brand} · ` : ""}{fmt(f.calories, 0)} kcal · {fmt(f.protein)} g per 100 g</small>

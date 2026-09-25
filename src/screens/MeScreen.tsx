@@ -39,6 +39,7 @@ export function MeScreen(p: AppApi) {
         {state.feedback.length === 0 && <small>Nothing yet. It starts after your first DaaM.</small>}
         {state.feedback.slice(0, 5).map((f) => (
           <div className="fb" key={f.id}>
+            {f.photo && <img className="fb-photo" src={f.photo} alt="" />}
             <b>{f.taste}</b>
             <small>{f.meal.title} · {new Date(f.createdAt).toLocaleDateString()}{f.notes ? ` · ${f.notes}` : ""}</small>
           </div>

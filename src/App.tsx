@@ -18,7 +18,8 @@ import {
   Leaf,
 } from "lucide-react";
 import { CameraView } from "./components/CameraView";
-import { resizeImageBase64 } from "./utils/image";
+import { resizeImageBase64, thumbnailBase64 } from "./utils/image";
+import { iconFor } from "./icons";
 import type { ScannerMode } from "./types";
 import { fmt, fixed } from "./ui";
 import { Mark, APP_NAME, COACH_NAME } from "./components/Mark";
@@ -229,7 +230,10 @@ function FoodEditor({
     if (!reviewed)
       e.push("Confirm the label and per-100-g basis before saving.");
     setErrors(e);
-    if (!e.length) save(f);
+    if (e.length) return;
+    f.icon = f.icon || iconFor(f.name);
+    if (image && !f.photo) thumbnailBase64(image).then((t) => save({ ...f, photo: t })).catch(() => save(f));
+    else save(f);
   }
   return (
     <Modal title="Review food data" close={close}>

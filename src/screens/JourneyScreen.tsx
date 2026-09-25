@@ -4,6 +4,8 @@ import { aggregate, density, uid } from "../pilot";
 import { fmt, fixed } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
+import { iconFor } from "../icons";
+import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
 
 const STEPS = ["in", "recipe", "after"] as const;
@@ -17,6 +19,7 @@ export function JourneyScreen(p: AppApi) {
   const [pick, setPick] = useState(0);
   const [note, setNote] = useState("");
   const [good, setGood] = useState<"daam" | "good" | "no" | null>(null);
+  const [plate, setPlate] = useState<string>("");
   const TASTE = { daam: "DaaM good", good: "Good", no: "Not really" } as const;
   const items = state.items;
   const t = aggregate(items);
@@ -62,6 +65,7 @@ export function JourneyScreen(p: AppApi) {
               <div className="row" key={i.id}>
                 <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Unlock" : "Lock"} ${i.food.name}`}
                   onClick={() => { log("lock", { locked: !i.locked }); updateItem(i.id, { locked: !i.locked }); }} />
+                <span className="thumb">{i.food.photo ? <img src={i.food.photo} alt="" /> : (i.food.icon || iconFor(i.food.name))}</span>
                 <div className="row-text">
                   <b>{i.food.name}</b>
                   <small>PD {fixed(density(i.food.protein, i.food.calories))} · {i.locked ? "keep this amount" : `${CHEF_NAME} may move it`}</small>
@@ -91,6 +95,7 @@ export function JourneyScreen(p: AppApi) {
               const inList = items.some((i) => i.food.id === f.id);
               return (
                 <div className="row row-food" key={f.id}>
+                  <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
                   <div className="row-text"><b>{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}PD {fixed(density(f.protein, f.calories))}</small></div>
                   <button className={`pill pill-small ${inList ? "" : "pill-primary"}`} disabled={inList} onClick={() => add(f)}>{inList ? "In" : <><Plus size={14} /> Add</>}</button>
                 </div>
@@ -150,6 +155,13 @@ export function JourneyScreen(p: AppApi) {
         <button className={`choice ${good === "good" ? "on" : ""}`} onClick={() => setGood("good")}><ThumbsUp size={22} /><span>Good</span></button>
         <button className={`choice ${good === "no" ? "on" : ""}`} onClick={() => setGood("no")}><ThumbsDown size={24} /><span>Not really</span></button>
       </div>
+      <label className="plate-photo">
+        {plate ? <img src={plate} alt="your plate" /> : <span>Add a photo of the plate</span>}
+        <input type="file" accept="image/*" capture="environment" onChange={(e) => {
+          const file = e.target.files?.[0]; if (!file) return;
+          const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 480).then(setPlate).catch(() => {}); r.readAsDataURL(file);
+        }} />
+      </label>
       <textarea placeholder="A line for your coach, if you like" value={note} onChange={(e) => setNote(e.target.value)} />
       <button className="pill pill-primary pill-wide" disabled={good === null} onClick={() => {
         const meal = state.meals[0] ?? { id: uid(), title: state.title || "DaaM", items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString() };
@@ -157,8 +169,8 @@ export function JourneyScreen(p: AppApi) {
         const taste = TASTE[good!];
         log("feedback", { status, taste });
         setFeedback({ status, taste, notes: note });
-        setState((s) => ({ ...s, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
-        setGood(null); setNote(""); setStep("in");
+        setState((s) => ({ ...s, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, photo: plate || undefined, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
+        setGood(null); setNote(""); setPlate(""); setStep("in");
         notify(`Thanks. ${COACH_NAME} will see it.`);
         setTab("home");
       }}>Send to {COACH_NAME}</button>
