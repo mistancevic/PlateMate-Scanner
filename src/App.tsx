@@ -822,15 +822,9 @@ export default function App() {
             try {
               if (f.size > 5_000_000) throw new Error("Backup is too large.");
               const data = parseState(await f.text());
-              if (
-                confirm(
-                  "Replace this browser’s pilot data with this backup? Export first if needed.",
-                )
-              ) {
-                unreadableBackup = null;
-                setState(data);
-                notify("Backup imported.");
-              }
+              unreadableBackup = null;
+              setState(data);
+              notify("Backup imported. It replaced what was on this device.");
             } catch (err: any) {
               setError(err.message);
             }

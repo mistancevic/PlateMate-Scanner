@@ -3,6 +3,7 @@ import { fmt, fixed } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
 import { exportLog, clearLog, readLog } from "../log";
 import { bandOf } from "../goal";
+import { ConfirmButton } from "../components/Confirm";
 import type { AppApi } from "./api";
 
 export function MeScreen(p: AppApi) {
@@ -32,7 +33,7 @@ export function MeScreen(p: AppApi) {
         </div>
         <button className="link" onClick={openGoal}><SlidersHorizontal size={14} /> Change my goal</button>
         <button className="link" onClick={() => setGoalsOpen(true)}>Set exact numbers</button>
-        <button className="link link-danger" onClick={() => { if (confirm("Reset the goal to default? Your foods and meals stay.")) resetGoal(); }}>Reset to default</button>
+        <ConfirmButton label="Reset to default" confirmLabel="Tap again to reset the goal" onConfirm={resetGoal} />
       </section>
       <section className="card">
         <div className="card-top"><span>What you told {COACH_NAME}</span><span>{state.feedback.length}</span></div>
@@ -51,7 +52,7 @@ export function MeScreen(p: AppApi) {
             <small>Pilot log: {n} {n === 1 ? "event" : "events"} on this device.</small>
             <div className="button-row">
               <button className="subtle" onClick={exportLog}><Download size={15} /> Export log</button>
-              <button className="subtle danger" onClick={() => { if (confirm("Clear the pilot log on this device?")) clearLog(); }}>Clear</button>
+              <ConfirmButton className="subtle danger" label="Clear" confirmLabel="Tap again to clear" onConfirm={clearLog} />
             </div>
             <div className="button-row">
               <button className="subtle" onClick={exportData}><Download size={15} /> Backup</button>

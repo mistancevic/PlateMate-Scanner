@@ -3,6 +3,7 @@ import { aggregate, candidateFood, category, density, uid } from "../pilot";
 import { fmt } from "../ui";
 import type { ScannerMode } from "../types";
 import type { AppApi } from "./api";
+import { ConfirmButton } from "../components/Confirm";
 
 export function RecipesScreen(p: AppApi) {
   const { state, setState, setTab, setFeedback, setReviewMeal } = p;
@@ -71,23 +72,8 @@ export function RecipesScreen(p: AppApi) {
                       >
                         Record feedback
                       </button>
-                      <button
-                        className="icon"
-                        aria-label={`Delete recipe ${m.title}`}
-                        onClick={() => {
-                          if (
-                            confirm(
-                              "Delete this saved recipe? Existing feedback keeps its snapshot.",
-                            )
-                          )
-                            setState((s) => ({
-                              ...s,
-                              meals: s.meals.filter((x) => x.id !== m.id),
-                            }));
-                        }}
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      <ConfirmButton className="icon" ariaLabel={`Delete recipe ${m.title}`} label={<Trash2 size={16} />} confirmLabel="Sure?"
+                        onConfirm={() => setState((s) => ({ ...s, meals: s.meals.filter((x) => x.id !== m.id) }))} />
                     </div>
                   </article>
                 ))}

@@ -273,3 +273,4 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .band-card em { font-style: normal; font-size: 14px; font-weight: 700; color: var(--ink); margin-top: 4px; }
 .choices.three { grid-template-columns: repeat(3, 1fr); }
 .choices.three .choice { height: 84px; font-size: 12px; }
+.armed { color: var(--low) !important; border-color: var(--low) !important; }

@@ -3,6 +3,7 @@ import { fmt, fixed } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
 import { exportLog, clearLog, readLog } from "../log";
 import type { AppApi } from "./api";
+import { ConfirmButton } from "../components/Confirm";
 
 export function MoreScreen(p: AppApi) {
   const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach } = p;
@@ -30,7 +31,7 @@ export function MoreScreen(p: AppApi) {
             <p className="small">Pilot log: {n} {n === 1 ? "event" : "events"} on this device.</p>
             <div className="button-row">
               <button className="subtle" onClick={exportLog}><Download size={15} /> Export pilot log</button>
-              <button className="subtle danger" onClick={() => { if (confirm("Clear the pilot log on this device?")) clearLog(); }}>Clear log</button>
+              <ConfirmButton className="subtle danger" label="Clear log" confirmLabel="Tap again to clear" onConfirm={clearLog} />
             </div>
             <div className="button-row">
               <button className="subtle" onClick={exportData}><Download size={15} /> Export backup</button>

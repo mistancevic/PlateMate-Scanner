@@ -3,6 +3,7 @@ import { density } from "../pilot";
 import { fmt, fixed } from "../ui";
 import type { ScannerMode } from "../types";
 import type { AppApi } from "./api";
+import { ConfirmButton } from "../components/Confirm";
 
 type Band = "high" | "mid" | "low";
 function band(pd: number | null): Band {
@@ -78,10 +79,7 @@ export function FoodsScreen(p: AppApi) {
                   try { await api("/api/save", { food: f }); notify("Saved to Airtable."); }
                   catch (e: any) { setError(e.message); } finally { setBusy(""); }
                 }}>Airtable</button>}
-                <button className="link link-danger" onClick={() => {
-                  if (confirm("Remove this food from your library?"))
-                    setState((s) => ({ ...s, foods: s.foods.filter((x) => x.id !== f.id) }));
-                }}>Remove</button>
+                <ConfirmButton label="Remove" confirmLabel="Tap again to remove" onConfirm={() => setState((s) => ({ ...s, foods: s.foods.filter((x) => x.id !== f.id) }))} />
               </span>
             </div>
             <span className={`pdpill pdpill-${b}`}>{fixed(pd)}<small>PD</small></span>
