@@ -55,7 +55,7 @@ export function JourneyScreen(p: AppApi) {
   const moverOf = (list: typeof items) => [...list.filter((i) => !i.locked)].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
   function recalc(list: typeof items) {
     const mover = moverOf(list);
-    if (!mover) { setError(`Everything is kept. Tap a dot to let ${CHEF_NAME} move one food.`); return; }
+    if (!mover) return;
     setAdjustId(mover.id);
     const forSolver = list.map((i) => (i.id === mover.id ? i : { ...i, locked: true }));
     setTimeout(() => { mixWith(forSolver, mover.id); }, 0);
@@ -80,9 +80,9 @@ export function JourneyScreen(p: AppApi) {
   }
   // Editing an amount on the recipe: that amount becomes yours, Mealan moves the highest-PD food you didn't touch.
   function edit(id: string, grams: number) {
-    const next = items.map((i) => (i.id === id ? { ...i, grams, locked: true } : i));
+    const next = items.map((i) => (i.id === id ? { ...i, grams } : i));
     setState((s) => ({ ...s, items: next, portion: null }));
-    recalc(next);
+    if (moverOf(next)?.id !== id) recalc(next);
   }
   const swapPanel = swapId && (
     <div className="sheet-backdrop" onClick={() => setSwapId(null)}>
@@ -134,7 +134,7 @@ export function JourneyScreen(p: AppApi) {
                 </div>
                 <label className="grams">
                   <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams}
-                    onChange={(e) => updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0), locked: true })} />
+                    onChange={(e) => updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0) })} />
                   <span>g</span>
                 </label>
               </div>
@@ -146,7 +146,7 @@ export function JourneyScreen(p: AppApi) {
           <ChefHat size={18} /> Ask {CHEF_NAME}
         </button>
         {items.length < 2 && <p className="small center">Two products at least, so {CHEF_NAME} has something to move.</p>}
-        {items.length >= 2 && <p className="small center">Coral dot keeps the amount. {CHEF_NAME} moves the unlocked one with the most protein. Swipe a food right to remove it, left to swap it. Tap a name for its card.</p>}
+        {items.length >= 2 && <p className="small center">Coral keeps the amount, grey lets {CHEF_NAME} move it. Swipe right to remove, left to swap. Tap a name for its card.</p>}
         {swapPanel}
         {foodCard}
         <p className="label">My foods</p>
@@ -180,7 +180,7 @@ export function JourneyScreen(p: AppApi) {
     const onPlan = opd !== null && pdRef !== null && opd >= pdRef - 0.05;
     return (
       <>
-        <Head title={`${CHEF_NAME}'s recipe`} sub={over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : mover ? `${mover.food.name} is the one ${CHEF_NAME} moves. Change any amount and ${CHEF_NAME} redoes the rest.` : `Everything is set by you. Change one amount and ${CHEF_NAME} moves the rest.`} />
+        <Head title={`${CHEF_NAME}'s recipe`} sub={over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : mover ? `${CHEF_NAME} moves the ${mover.food.name}. Change any other amount and it refits.` : `Nothing moves. Tap a grey dot to let ${CHEF_NAME} move one food.`} />
         <section className="readout">
           <div className="readout-top"><span>This dessert</span><span>PD</span></div>
           <div className="readout-mid">
@@ -204,6 +204,7 @@ export function JourneyScreen(p: AppApi) {
           ))}
         </div>
         {over && <button className="pill pill-wide" onClick={() => setCap(null)}>Allow more than {cap} g</button>}
+        {mover && !onPlan && <button className="pill pill-wide" onClick={() => recalc(items)}><ChefHat size={16} /> Fit it again</button>}
         <button className="pill pill-primary pill-wide" onClick={() => {
           log("mix_applied", { grams: mover ? Math.round(over ? cap! : mover.grams) : 0 });
           setState((s) => ({ ...s, items: shown, portion: null, title: s.title || "DaaM" }));
