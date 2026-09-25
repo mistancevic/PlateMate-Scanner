@@ -6,7 +6,7 @@ import { bandOf } from "../goal";
 import type { AppApi } from "./api";
 
 export function MeScreen(p: AppApi) {
-  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal } = p;
+  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal, resetGoal } = p;
   const bandName = goal?.band ? bandOf(goal.band)?.name : null;
   const setBy = goal?.setBy === "coach" ? COACH_NAME : "you";
   const n = readLog().length;
@@ -32,6 +32,7 @@ export function MeScreen(p: AppApi) {
         </div>
         <button className="link" onClick={openGoal}><SlidersHorizontal size={14} /> Change my goal</button>
         <button className="link" onClick={() => setGoalsOpen(true)}>Set exact numbers</button>
+        <button className="link link-danger" onClick={() => { if (confirm("Reset the goal to default? Your foods and meals stay.")) resetGoal(); }}>Reset to default</button>
       </section>
       <section className="card">
         <div className="card-top"><span>What you told {COACH_NAME}</span><span>{state.feedback.length}</span></div>

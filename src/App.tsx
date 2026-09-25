@@ -31,7 +31,7 @@ import { MoreScreen } from "./screens/MoreScreen";
 import type { AppApi, Tab, Step } from "./screens/api";
 import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
-import { getGoal, bandOf, fit as fitPd } from "./goal";
+import { getGoal, clearGoal, bandOf, fit as fitPd } from "./goal";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
 import { Home, ChefHat, CircleUser } from "lucide-react";
@@ -737,6 +737,7 @@ export default function App() {
     step, setStep, mixWith,
     clientName, setClientName: (v: string) => { storeClientName(v); setClientNameState(v); },
     goal, openGoal: () => setGoalOpen(true), fitPd: (pd: number | null) => fitPd(pd, pdRef),
+    resetGoal: () => { clearGoal(); setState((s) => ({ ...s, goals: { ...s.goals, calories: null, protein: null } })); setGoalState(null); setGoalOpen(true); },
     mealanCard: (
       <Mealan
         items={state.items}

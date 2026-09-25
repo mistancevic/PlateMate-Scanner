@@ -13,6 +13,7 @@ const KEY = "chefmealan-goal";
 export type Goal = { band?: string; setBy: "you" | "coach"; setAt: string };
 export const getGoal = (): Goal | null => { try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch { return null; } };
 export const saveGoal = (g: Goal) => { try { localStorage.setItem(KEY, JSON.stringify(g)); } catch {} };
+export const clearGoal = () => { try { localStorage.removeItem(KEY); } catch {} };
 export const bandOf = (id?: string) => BANDS.find((b) => b.id === id);
 // The middle of the band's range as the working numbers; exact numbers can be set on Me later.
 export const goalsForBand = (b: Band) => ({ calories: mid(b.kcal), protein: mid(b.protein) });
