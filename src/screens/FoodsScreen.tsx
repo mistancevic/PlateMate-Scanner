@@ -5,6 +5,8 @@ import type { ScannerMode } from "../types";
 import type { AppApi } from "./api";
 import { ConfirmButton } from "../components/Confirm";
 import { iconFor } from "../icons";
+import { FoodCard } from "../components/FoodCard";
+import { useState } from "react";
 
 type Band = "high" | "mid" | "low";
 function band(pd: number | null): Band {
@@ -14,8 +16,10 @@ function band(pd: number | null): Band {
 export function FoodsScreen(p: AppApi) {
   const { state, setState, blank, setCamera, setMode, barcode, setBarcode, lookup,
     pending, setPending, query, setQuery, add, setImage, setEdit, api,
-    setBusy, setError, notify, setFilter, filter, coach } = p;
+    setBusy, setError, notify, setFilter, filter, coach, pdRef } = p;
   const inMeal = new Set(state.items.map((i) => i.food.id));
+  const [cardId, setCardId] = useState<string | null>(null);
+  const cardFood = state.foods.find((x) => x.id === cardId);
   const foods = state.foods.map((f) => ({ f, pd: density(f.protein, f.calories) })).map((x) => ({ ...x, b: p.fitPd(x.pd) }));
   const counts = { high: foods.filter((x) => x.b === "high").length, mid: foods.filter((x) => x.b === "mid").length, low: foods.filter((x) => x.b === "low").length };
   const shown = foods.filter(({ f, b }) =>
@@ -70,7 +74,7 @@ export function FoodsScreen(p: AppApi) {
           <div className="row" key={f.id}>
             <span className="thumb">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
             <div className="row-text">
-              <b>{f.name}</b>
+              <button className="name-link" onClick={() => setCardId(f.id)}>{f.name}</button>
               <small>{f.brand ? `${f.brand} · ` : ""}{fmt(f.calories, 0)} kcal · {fmt(f.protein)} g per 100 g</small>
               <span className="row-links">
                 <button className="link" onClick={() => add(f)}>Add to meal</button>
@@ -88,6 +92,7 @@ export function FoodsScreen(p: AppApi) {
         ))}
       </div>
       {state.foods.length === 0 && <div className="strip">No foods yet. Scan a label or add one by hand.</div>}
+      {cardFood && <FoodCard food={cardFood} target={pdRef} fit={p.fitPd(density(cardFood.protein, cardFood.calories))} close={() => setCardId(null)} review={() => { setImage(""); setEdit(cardFood); }} />}
     </>
   );
 }

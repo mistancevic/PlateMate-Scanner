@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { Camera, ScanBarcode, Plus, Trash2, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Camera, ScanBarcode, Plus, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
 import { aggregate, density, uid } from "../pilot";
 import { fmt, fixed } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
 import { iconFor } from "../icons";
 import { SwipeRow } from "../components/SwipeRow";
+import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
 
@@ -30,11 +31,14 @@ export function JourneyScreen(p: AppApi) {
   const [good, setGood] = useState<"daam" | "good" | "no" | null>(null);
   const [plate, setPlate] = useState<string>("");
   const [swapId, setSwapId] = useState<string | null>(null);
+  const [cardId, setCardId] = useState<string | null>(null);
   const TASTE = { daam: "DaaM good", good: "Good", no: "Not really" } as const;
   const items = state.items;
   const t = aggregate(items);
   const pd = density(t.protein, t.calories);
   const n = STEPS.indexOf(step) + 1;
+  const cardItem = items.find((i) => i.id === cardId);
+  const foodCard = cardItem && <FoodCard food={cardItem.food} target={pdRef} fit={p.fitPd(density(cardItem.food.protein, cardItem.food.calories))} close={() => setCardId(null)} />;
   const adjustFor = (o: { items: typeof items }) => o.items.find((i) => !i.locked)?.id;
   // Mealan moves the food with the highest protein density; everything else keeps the amount you set.
   function askMealan() {
@@ -131,7 +135,7 @@ export function JourneyScreen(p: AppApi) {
                   onClick={() => { log("lock", { locked: !i.locked }); updateItem(i.id, { locked: !i.locked }); }} />
                 <span className="thumb">{i.food.photo ? <img src={i.food.photo} alt="" /> : (i.food.icon || iconFor(i.food.name))}</span>
                 <div className="row-text">
-                  <b>{i.food.name}</b>
+                  <button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button>
                   <small>PD {fixed(density(i.food.protein, i.food.calories))} · {i.locked ? "keep this amount" : `${CHEF_NAME} may move it`}</small>
                 </div>
                 <label className="grams">
@@ -139,7 +143,6 @@ export function JourneyScreen(p: AppApi) {
                     onChange={(e) => updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0), locked: true })} />
                   <span>g</span>
                 </label>
-                <button className="icon" aria-label={`Remove ${i.food.name}`} onClick={() => remove(i.id)}><Trash2 size={16} /></button>
               </div>
               </SwipeRow>
             ))}
@@ -149,8 +152,9 @@ export function JourneyScreen(p: AppApi) {
           <ChefHat size={18} /> Ask {CHEF_NAME}
         </button>
         {items.length < 2 && <p className="small center">Two products at least, so {CHEF_NAME} has something to move.</p>}
-        {items.length >= 2 && <p className="small center">Coral dot keeps the amount. {CHEF_NAME} moves the unlocked one with the most protein. Swipe a food right to remove it, left to swap it.</p>}
+        {items.length >= 2 && <p className="small center">Coral dot keeps the amount. {CHEF_NAME} moves the unlocked one with the most protein. Swipe a food right to remove it, left to swap it. Tap a name for its card.</p>}
         {swapPanel}
+        {foodCard}
         <p className="label">My foods</p>
         <input className="search" aria-label="Search my foods" placeholder="Search my foods" value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="rows">
@@ -195,13 +199,12 @@ export function JourneyScreen(p: AppApi) {
             <SwipeRow key={i.id} onRemove={() => remove(i.id)} onSwap={() => setSwapId(i.id)}>
             <div className="row">
               <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Let Mealan move" : "Keep"} ${i.food.name}`} onClick={() => toggle(i.id)} />
-              <div className="row-text"><b>{i.food.name}</b><small>{i.locked ? "as you set it" : `what ${CHEF_NAME} moves`}</small></div>
+              <div className="row-text"><button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button><small>{i.locked ? "as you set it" : `what ${CHEF_NAME} moves`}</small></div>
               <label className="grams">
                 <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams}
                   onChange={(e) => edit(i.id, Math.max(0, Number(e.target.value) || 0))} />
                 <span>g</span>
               </label>
-              <button className="icon" aria-label={`Remove ${i.food.name}`} onClick={() => remove(i.id)}><Trash2 size={16} /></button>
             </div>
             </SwipeRow>
           ))}
@@ -219,6 +222,7 @@ export function JourneyScreen(p: AppApi) {
         }}>Try another mix ({(pick % options.length) + 1} of {options.length})</button>}
         <Back to="in" />
         {swapPanel}
+        {foodCard}
       </>
     );
   }

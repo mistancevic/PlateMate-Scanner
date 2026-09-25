@@ -298,3 +298,8 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .sheet-backdrop { position: fixed; inset: 0; z-index: 55; background: rgba(23,39,66,0.45); display: flex; align-items: flex-end; }
 .sheet { width: 100%; max-height: 70dvh; overflow: auto; background: var(--surface); border-radius: 22px 22px 0 0; padding: 16px 18px calc(16px + env(safe-area-inset-bottom, 0px)); }
 .row-button { width: 100%; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); }
+
+.name-link { font-size: 16px; font-weight: 700; color: var(--ink); padding: 0; text-align: left; text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; }
+.foodcard-head { display: flex; align-items: center; gap: 12px; margin: 8px 0 12px; } .foodcard-head b { display: block; font-size: 17px; }
+.nut-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 4px 0 10px; }
+.nut-grid > div { background: var(--base); border-radius: 12px; padding: 8px 6px; text-align: center; } .nut-grid b { display: block; font-size: 15px; } .nut-grid small { font-size: 11px; }
