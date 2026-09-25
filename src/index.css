@@ -270,3 +270,6 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .band-card b { font-size: 16px; } .band-card small { color: var(--muted); } .band-card span { font-size: 12px; font-weight: 700; color: var(--brand-text); margin-top: 2px; }
 .own-goal { display: flex; flex-direction: column; gap: 8px; }
 .goal-line { font-size: 13px; color: var(--muted); margin: 2px 0 8px; }
+.band-card em { font-style: normal; font-size: 14px; font-weight: 700; color: var(--ink); margin-top: 4px; }
+.choices.three { grid-template-columns: repeat(3, 1fr); }
+.choices.three .choice { height: 84px; font-size: 12px; }

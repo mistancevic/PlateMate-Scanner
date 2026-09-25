@@ -31,7 +31,7 @@ export function MeScreen(p: AppApi) {
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
         <button className="link" onClick={openGoal}><SlidersHorizontal size={14} /> Change my goal</button>
-        {coach && <button className="link" onClick={() => setGoalsOpen(true)}>Edit the numbers</button>}
+        <button className="link" onClick={() => setGoalsOpen(true)}>Set exact numbers</button>
       </section>
       <section className="card">
         <div className="card-top"><span>What you told {COACH_NAME}</span><span>{state.feedback.length}</span></div>

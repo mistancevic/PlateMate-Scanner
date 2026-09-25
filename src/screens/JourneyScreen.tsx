@@ -16,7 +16,8 @@ export function JourneyScreen(p: AppApi) {
   const [cap, setCap] = useState<number | null>(300);
   const [pick, setPick] = useState(0);
   const [note, setNote] = useState("");
-  const [good, setGood] = useState<boolean | null>(null);
+  const [good, setGood] = useState<"daam" | "good" | "no" | null>(null);
+  const TASTE = { daam: "DaaM good", good: "Good", no: "Not really" } as const;
   const items = state.items;
   const t = aggregate(items);
   const pd = density(t.protein, t.calories);
@@ -144,17 +145,19 @@ export function JourneyScreen(p: AppApi) {
   return (
     <>
       <Head title="How was it?" sub={`One tap. ${COACH_NAME} sees it.`} />
-      <div className="choices two">
-        <button className={`choice ${good === true ? "on" : ""}`} onClick={() => setGood(true)}><ThumbsUp size={24} /><span>DaaM good</span></button>
-        <button className={`choice ${good === false ? "on" : ""}`} onClick={() => setGood(false)}><ThumbsDown size={24} /><span>Not really</span></button>
+      <div className="choices three">
+        <button className={`choice ${good === "daam" ? "on" : ""}`} onClick={() => setGood("daam")}><ThumbsUp size={24} /><span>DaaM good</span></button>
+        <button className={`choice ${good === "good" ? "on" : ""}`} onClick={() => setGood("good")}><ThumbsUp size={22} /><span>Good</span></button>
+        <button className={`choice ${good === "no" ? "on" : ""}`} onClick={() => setGood("no")}><ThumbsDown size={24} /><span>Not really</span></button>
       </div>
       <textarea placeholder="A line for your coach, if you like" value={note} onChange={(e) => setNote(e.target.value)} />
       <button className="pill pill-primary pill-wide" disabled={good === null} onClick={() => {
         const meal = state.meals[0] ?? { id: uid(), title: state.title || "DaaM", items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString() };
-        const status = good ? "eaten" : "not-used";
-        log("feedback", { status });
-        setFeedback({ status, taste: good ? "DaaM good" : "Not really", notes: note });
-        setState((s) => ({ ...s, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste: good ? "DaaM good" : "Not really", notes: note, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
+        const status = good === "no" ? "not-used" : "eaten";
+        const taste = TASTE[good!];
+        log("feedback", { status, taste });
+        setFeedback({ status, taste, notes: note });
+        setState((s) => ({ ...s, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
         setGood(null); setNote(""); setStep("in");
         notify(`Thanks. ${COACH_NAME} will see it.`);
         setTab("home");

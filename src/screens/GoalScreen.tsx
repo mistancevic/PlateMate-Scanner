@@ -24,7 +24,9 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
               saveGoal({ band: b.id, setBy: coach ? "coach" : "you", setAt: new Date().toISOString() });
               onDone();
             }}>
-              <b>{b.name}</b><small>{b.who}</small><span>{b.range}</span>
+              <b>{b.name}</b><small>{b.who}</small>
+              <em>{b.kcal[0].toLocaleString()} to {b.kcal[1].toLocaleString()} kcal · {b.protein[0]} to {b.protein[1]} g protein</em>
+              <span>{b.range}</span>
             </button>
           ))}
           <button className="link" onClick={() => setOwn(true)}>I know my calories and protein</button>
