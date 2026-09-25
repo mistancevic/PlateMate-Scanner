@@ -44,7 +44,7 @@ export function JourneyScreen(p: AppApi) {
   function askMealan() {
     const ready = items.map((i) => ({ ...i, food: { ...i.food, readyToEat: true } }));
     const mover = moverOf(ready);
-    if (!mover) { setError(`Everything is kept. Tap a dot to let ${CHEF_NAME} move one food.`); return; }
+    if (!mover) { setState((s) => ({ ...s, items: ready, portion: null })); setStep("recipe"); return; } // everything fixed: show where it lands
     setState((s) => ({ ...s, items: ready, foods: s.foods.map((f) => ready.some((x) => x.food.id === f.id) ? { ...f, readyToEat: true } : f) }));
     setAdjustId(mover.id); setPick(0);
     const forSolver = ready.map((i) => (i.id === mover.id ? i : { ...i, locked: true }));
@@ -182,7 +182,7 @@ export function JourneyScreen(p: AppApi) {
     const onPlan = opd !== null && pdRef !== null && opd >= pdRef - 0.05;
     return (
       <>
-        <Head title={`${CHEF_NAME}'s recipe`} sub={over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : mover ? `${CHEF_NAME} moves the ${mover.food.name}. Change any other amount and it refits.` : `Nothing moves. Tap a grey dot to let ${CHEF_NAME} move one food.`} />
+        <Head title={mover ? `${CHEF_NAME}'s recipe` : "As you set it"} sub={over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : mover ? `${CHEF_NAME} moves the ${mover.food.name}. Change any other amount and it refits.` : `Nothing moved. This is where your amounts land. Tap a grey dot if you want ${CHEF_NAME} to fit one food.`} />
         <section className="readout">
           <div className="readout-top"><span>This dessert</span><span>PD</span></div>
           <div className="readout-mid">
