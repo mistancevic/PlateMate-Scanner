@@ -222,7 +222,11 @@ export function JourneyScreen(p: AppApi) {
               <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Let Mealan move" : "Keep"} ${i.food.name}`} onClick={() => toggle(i.id)} />
               <div className="row-text"><button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button>
                 <small>{i.locked ? "as you set it" : i.id === mover?.id ? `what ${CHEF_NAME} moves` : `${CHEF_NAME} may move it`}</small>
-                {suggest?.id === i.id && suggest.grams !== i.grams && <button className="link" onClick={applySuggestion}>{CHEF_NAME} suggests {suggest.grams} g · apply</button>}
+                {suggest?.id === i.id && suggest.grams !== i.grams && (
+                  <button className="link suggest" onClick={applySuggestion}>
+                    {CHEF_NAME} suggests {suggest.grams} g: that brings the plate from PD {fixed(opd)} to your {fixed(pdRef)} · apply
+                  </button>
+                )}
               </div>
               {i.locked ? <b className="row-num">{fmt(i.grams, 0)} g</b> : (
                 <label className="grams">

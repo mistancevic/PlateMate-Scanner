@@ -303,3 +303,4 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .foodcard-head { display: flex; align-items: center; gap: 12px; margin: 8px 0 12px; } .foodcard-head b { display: block; font-size: 17px; }
 .nut-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 4px 0 10px; }
 .nut-grid > div { background: var(--base); border-radius: 12px; padding: 8px 6px; text-align: center; } .nut-grid b { display: block; font-size: 15px; } .nut-grid small { font-size: 11px; }
+.suggest { white-space: normal; line-height: 1.35; margin-top: 4px; }
