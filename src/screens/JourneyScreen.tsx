@@ -53,22 +53,25 @@ export function JourneyScreen(p: AppApi) {
   }
   // Tapping a dot: kept becomes free to move and Mealan recalculates; free becomes kept at its current amount.
   function toggle(id: string) {
-    const base = items.map((i) => (i.id === id ? { ...i, locked: !i.locked } : i));
-    const pool = base.filter((i) => !i.locked);
-    const mover = [...pool].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
-    if (!mover) { setState((s) => ({ ...s, items: base, portion: null })); setError(`Everything is kept. Tap a dot to let ${CHEF_NAME} move one food.`); return; }
-    // only the mover is free; the rest stays at its amount
-    const kept = base.map((i) => (pool.some((p) => p.id === i.id) && i.id !== mover.id ? { ...i, locked: true } : i));
+    const me = items.find((i) => i.id === id); if (!me) return;
+    let mover: typeof items[number] | undefined;
+    if (me.locked) mover = me; // you freed it: this is the one Mealan moves
+    else {
+      const others = items.filter((i) => i.id !== id);
+      mover = [...others].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
+      if (!mover) { setState((s) => ({ ...s, items: s.items.map((i) => ({ ...i, locked: true })), portion: null })); setError(`Everything is kept. Tap a dot to let ${CHEF_NAME} move one food.`); return; }
+    }
+    const kept = items.map((i) => ({ ...i, locked: i.id !== mover!.id }));
     setState((s) => ({ ...s, items: kept, portion: null }));
     setAdjustId(mover.id);
-    setTimeout(() => { mixWith(kept, mover.id); }, 0);
+    setTimeout(() => { mixWith(kept, mover!.id); }, 0);
   }
   function remove(id: string) {
     const rest = items.filter((i) => i.id !== id);
     setState((s) => ({ ...s, items: rest, portion: null }));
     if (step === "recipe") {
       const mover = rest.find((i) => !i.locked) ?? [...rest].sort((a, b) => (density(b.food.protein, b.food.calories) ?? -1) - (density(a.food.protein, a.food.calories) ?? -1))[0];
-      if (mover && rest.length >= 2) { const kept = rest.map((i) => (i.id === mover.id ? { ...i, locked: false } : i)); setState((s) => ({ ...s, items: kept })); setAdjustId(mover.id); setTimeout(() => { mixWith(kept, mover.id); }, 0); }
+      if (mover && rest.length >= 2) { const kept = rest.map((i) => ({ ...i, locked: i.id !== mover.id })); setState((s) => ({ ...s, items: kept })); setAdjustId(mover.id); setTimeout(() => { mixWith(kept, mover.id); }, 0); }
       else setStep("in");
     }
   }
