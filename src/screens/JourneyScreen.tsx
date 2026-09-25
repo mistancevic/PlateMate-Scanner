@@ -74,7 +74,12 @@ export function JourneyScreen(p: AppApi) {
   function toggle(id: string) {
     const next = items.map((i) => (i.id === id ? { ...i, locked: !i.locked } : i));
     setState((s) => ({ ...s, items: next, portion: null }));
-    if (step === "recipe") recalc(next);
+    if (step !== "recipe") return;
+    // a dot never changes a number: whoever becomes the mover gets a suggestion, not a move
+    const mover = moverOf(next);
+    if (mover) setTouched((t) => new Set(t).add(mover.id));
+    setSuggest(null);
+    recalc(next);
   }
   function remove(id: string) {
     const rest = items.filter((i) => i.id !== id);
