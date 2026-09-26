@@ -27,7 +27,7 @@
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--base); }
 h1, h2, h3, p { margin-top: 0; }
-h1 { font-size: 20px; font-weight: 900; margin: 0; }
+h1 { font-size: 20px; font-weight: 900; margin: 0; white-space: nowrap; }
 h2 { font-size: 18px; font-weight: 900; margin-bottom: 8px; }
 h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
 p { line-height: 1.5; }
@@ -66,7 +66,7 @@ main { flex: 1; width: 100%; max-width: 640px; margin: 0 auto; padding: 8px 18px
   background: color-mix(in srgb, var(--base) 90%, transparent); backdrop-filter: blur(10px);
 }
 .brand { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; }
-.ref { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--muted); padding: 6px 0; white-space: nowrap; }
+.ref { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--muted); padding: 6px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .ref:hover { color: var(--brand-text); }
 
 /* ---------------- Readout ---------------- */

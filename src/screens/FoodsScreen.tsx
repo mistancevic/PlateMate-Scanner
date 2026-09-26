@@ -46,7 +46,7 @@ export function FoodsScreen(p: AppApi) {
       <div className="scan-modes">
         {(["barcode", "group"] as ScannerMode[]).map((m) => (
           <button key={m} className="pill pill-small" onClick={() => { setMode(m); setCamera(true); }}>
-            {m === "group" ? <><Camera size={14} /> Photo of several products</> : <><ScanBarcode size={14} /> Scan a barcode</>}
+            {m === "group" ? <><Camera size={14} /> Several products</> : <><ScanBarcode size={14} /> Barcode</>}
           </button>
         ))}
         <input aria-label="Barcode number" placeholder="or type a barcode" inputMode="numeric" value={barcode}

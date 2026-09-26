@@ -800,11 +800,9 @@ export default function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        {tab !== "home" && (
-          <button className="brand" onClick={() => setTab("journey")} aria-label={APP_NAME}>
-            <Mark size={30} color="var(--brand)" />
-          </button>
-        )}
+        <button className="brand" onClick={() => setTab("journey")} aria-label={APP_NAME}>
+          <Mark size={30} color="var(--brand)" />
+        </button>
         <h1>{TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
           {goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · PD {fixed(pdRef)} · set by {goal?.setBy === "coach" ? COACH_NAME : "you"}
