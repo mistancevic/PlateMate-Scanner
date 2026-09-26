@@ -6,11 +6,12 @@ import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
 import { iconFor } from "../icons";
 import { SwipeRow } from "../components/SwipeRow";
+import { methodsFor } from "../methods";
 import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
 
-const STEPS = ["in", "recipe", "after"] as const;
+const STEPS = ["in", "recipe", "make", "after"] as const;
 const band = (pd: number | null) => (pd === null || pd < 3 ? "low" : pd < 5 ? "mid" : "high");
 
 export function JourneyScreen(p: AppApi) {
@@ -39,6 +40,7 @@ export function JourneyScreen(p: AppApi) {
   const [note, setNote] = useState("");
   const [good, setGood] = useState<"daam" | "good" | "no" | null>(null);
   const [plate, setPlate] = useState<string>("");
+  const [method, setMethod] = useState<string | null>(null);
   const [swapId, setSwapId] = useState<string | null>(null);
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const [suggest, setSuggest] = useState<{ id: string; grams: number } | null>(null);
@@ -281,8 +283,8 @@ export function JourneyScreen(p: AppApi) {
         <button className="pill pill-primary pill-wide" onClick={() => {
           log("mix_applied", { grams: mover ? Math.round(over ? cap! : mover.grams) : 0 });
           setState((s) => ({ ...s, items: shown, portion: null, title: s.title || "DaaM" }));
-          setTimeout(() => saveMeal(), 0);
-          setStep("after");
+          setMethod(null);
+          setStep("make");
         }}>Make it</button>
         {options.length > 1 && <button className="pill pill-wide" onClick={() => {
           const next = (pick + 1) % options.length; setPick(next);
@@ -291,6 +293,32 @@ export function JourneyScreen(p: AppApi) {
         <Back to="in" />
         {swapPanel}
         {foodCard}
+      </>
+    );
+  }
+
+  if (step === "make") {
+    const ways = methodsFor(items);
+    return (
+      <>
+        <Head title="How do you want to eat it?" sub={`Same amounts, three ways. Pick the one you feel like.`} />
+        <div className="ways">
+          {ways.map((w) => (
+            <button key={w.id} className={`way ${method === w.id ? "on" : ""}`} onClick={() => setMethod(w.id)}>
+              <b>{w.name}</b>
+              <small>{w.why}</small>
+              <ol>{w.steps.map((s, i) => <li key={i}>{s}</li>)}</ol>
+            </button>
+          ))}
+        </div>
+        <button className="pill pill-primary pill-wide" disabled={!method} onClick={() => {
+          const w = ways.find((x) => x.id === method);
+          log("method_chosen", { method });
+          setState((s) => ({ ...s, title: w ? `${s.title || "DaaM"}, ${w.name.toLowerCase()}` : s.title }));
+          setTimeout(() => saveMeal(), 0);
+          setStep("after");
+        }}>I'm making it this way</button>
+        <Back to="recipe" />
       </>
     );
   }

@@ -317,3 +317,9 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 
 .readout-fit-high { background: var(--high); } .readout-fit-mid { background: var(--mid); } .readout-fit-low { background: var(--low); }
 .readout-note { margin: 12px 0 0; font-size: 13px; font-weight: 700; line-height: 1.4; color: #fff; }
+
+.ways { display: flex; flex-direction: column; gap: 10px; margin: 4px 0 14px; }
+.way { display: block; text-align: left; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-card); padding: 14px 16px; }
+.way.on { border-color: var(--brand); background: var(--tint); }
+.way b { display: block; font-size: 16px; } .way small { display: block; color: var(--muted); margin: 2px 0 8px; }
+.way ol { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.45; color: var(--ink); } .way li + li { margin-top: 3px; }

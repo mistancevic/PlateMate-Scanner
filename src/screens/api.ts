@@ -3,7 +3,7 @@ import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
 import type { ScannerMode } from "../types";
 
 export type Tab = "home" | "journey" | "me" | "meal" | "chef" | "foods" | "notes" | "more";
-export type Step = "in" | "recipe" | "after";
+export type Step = "in" | "recipe" | "make" | "after";
 
 export interface AppApi {
   state: PilotState;

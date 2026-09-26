@@ -5,6 +5,7 @@ export type LogEvent =
   | "lock"           // data.locked
   | "mix"            // Chef asked for a mix
   | "mix_applied"
+  | "method_chosen"  // data.method = mixed | topped | base-first
   | "meal_saved"
   | "feedback";      // data.status
 const KEY = "chefmealan-log";
