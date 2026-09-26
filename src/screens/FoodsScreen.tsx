@@ -40,6 +40,7 @@ export function FoodsScreen(p: AppApi) {
         <div className="band-actions">
           <button className="pill pill-primary pill-small" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={14} /> Scan</button>
           <button className="pill pill-small" onClick={() => blank()}><Plus size={14} /> Add</button>
+          <button className="pill pill-small" onClick={p.addStarter}>Starter foods</button>
         </div>
       </section>
       <div className="scan-modes">

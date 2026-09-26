@@ -17,7 +17,7 @@ export function FoodCard({ food, target, fit, close, review }: { food: Food; tar
           <span className="thumb">{food.photo ? <img src={food.photo} alt="" /> : (food.icon || iconFor(food.name))}</span>
           <div><b>{food.name}</b><small>{food.brand || "no brand"}{food.barcode ? ` · ${food.barcode}` : ""}</small></div>
         </div>
-        <section className="readout">
+        <section className={`readout readout-${fit}`}>
           <div className="readout-top"><span>Protein density</span><span>PD</span></div>
           <div className="readout-mid">
             <b>{fixed(pd)}</b>
