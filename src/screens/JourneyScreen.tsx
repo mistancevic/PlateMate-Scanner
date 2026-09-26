@@ -93,11 +93,12 @@ export function JourneyScreen(p: AppApi) {
       if (rest.length >= 2 && moverOf(rest)) recalc(rest); else setStep("in");
     }
   }
-  function swap(id: string, food: typeof state.foods[number]) {
-    const next = items.map((i) => (i.id === id ? { ...i, food: { ...food, readyToEat: true } } : i));
+  function swap(id: string, food: typeof state.foods[number], grams?: number | null) {
+    // the swapped-in food arrives at the grams the list promised, kept, so nothing else needs to move
+    const next = items.map((i) => (i.id === id ? { ...i, food: { ...food, readyToEat: true }, grams: grams ?? i.grams, locked: grams != null ? true : i.locked } : i));
     setState((s) => ({ ...s, items: next, portion: null }));
     setSwapId(null);
-    if (step === "recipe") recalc(next);
+    if (step === "recipe" && grams == null) recalc(next);
   }
   // Editing an amount on the recipe: that amount becomes yours, Mealan moves the highest-PD food you didn't touch.
   function edit(id: string, grams: number) {
@@ -130,7 +131,7 @@ export function JourneyScreen(p: AppApi) {
         <p className="small">Sorted by how well each one brings the plate to your {fixed(pdRef)}, with the rest kept as it is.</p>
         <div className="rows">
           {swapCandidates.map(({ f, grams, fits }) => (
-            <button className="row row-food row-button" key={f.id} onClick={() => swap(swapId, f)}>
+            <button className="row row-food row-button" key={f.id} onClick={() => swap(swapId, f, grams)}>
               <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
               <div className="row-text"><b>{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}PD {fixed(density(f.protein, f.calories))}</small></div>
               <span className={`pdpill pdpill-${fits ? "high" : grams !== null ? "mid" : "low"}`}>{grams !== null ? `${grams} g` : "no"}</span>
