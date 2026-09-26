@@ -1,4 +1,4 @@
-import { Camera, Plus, X } from "lucide-react";
+import { Camera, Plus, X, ScanBarcode } from "lucide-react";
 import { density } from "../pilot";
 import { fmt, fixed } from "../ui";
 import type { ScannerMode } from "../types";
@@ -45,8 +45,8 @@ export function FoodsScreen(p: AppApi) {
       </section>
       <div className="scan-modes">
         {(["barcode", "group"] as ScannerMode[]).map((m) => (
-          <button key={m} className="link" onClick={() => { setMode(m); setCamera(true); }}>
-            {m === "group" ? "Photo of several products" : "Scan a barcode"}
+          <button key={m} className="pill pill-small" onClick={() => { setMode(m); setCamera(true); }}>
+            {m === "group" ? <><Camera size={14} /> Photo of several products</> : <><ScanBarcode size={14} /> Scan a barcode</>}
           </button>
         ))}
         <input aria-label="Barcode number" placeholder="or type a barcode" inputMode="numeric" value={barcode}

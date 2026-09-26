@@ -778,14 +778,14 @@ export default function App() {
     ),
   };
   const NAV: { id: Tab; label: string; icon: ReactNode }[] = [
-    { id: "home", label: "Home", icon: <Home size={20} /> },
+    { id: "home", label: "Today", icon: <Home size={20} /> },
     { id: "journey", label: "Mealan", icon: <Mark size={22} color="currentColor" /> },
     { id: "foods", label: "Foods", icon: <BookOpen size={20} /> },
     { id: "me", label: "Me", icon: <CircleUser size={20} /> },
   ];
   const TITLES: Record<Tab, string> = {
-    home: "",
-    journey: "Mealan",
+    home: "Today",
+    journey: APP_NAME,
     me: "Me",
     meal: "Meal",
     chef: "Chef",
@@ -800,10 +800,12 @@ export default function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <button className="brand" onClick={() => setTab("home")} aria-label={APP_NAME}>
-          <Mark size={30} color="var(--brand)" />
-        </button>
-        <h1>{tab === "home" ? APP_NAME : TITLES[tab]}</h1>
+        {tab !== "home" && (
+          <button className="brand" onClick={() => setTab("journey")} aria-label={APP_NAME}>
+            <Mark size={30} color="var(--brand)" />
+          </button>
+        )}
+        <h1>{TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
           {goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · PD {fixed(pdRef)} · set by {goal?.setBy === "coach" ? COACH_NAME : "you"}
         </button>}
