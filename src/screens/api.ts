@@ -52,6 +52,8 @@ export interface AppApi {
   importRef: RefObject<HTMLInputElement | null>;
   goal: import("../goal").Goal | null;
   openGoal: () => void;
+  addStarter: () => void;
+  importAirtable: () => Promise<void>;
   resetGoal: () => void;
   fitPd: (pd: number | null) => "high" | "mid" | "low";
   clientName: string;

@@ -91,7 +91,9 @@ export function FoodsScreen(p: AppApi) {
           </div>
         ))}
       </div>
-      {state.foods.length === 0 && <div className="strip">No foods yet. Scan a label or add one by hand.</div>}
+      {state.foods.length === 0 && (
+        <div className="strip">No foods yet. Scan a label, add one by hand, or <button className="link" onClick={p.addStarter}>add twenty starter foods</button>.</div>
+      )}
       {cardFood && <FoodCard food={cardFood} target={pdRef} fit={p.fitPd(density(cardFood.protein, cardFood.calories))} close={() => setCardId(null)} review={() => { setImage(""); setEdit(cardFood); }} />}
     </>
   );

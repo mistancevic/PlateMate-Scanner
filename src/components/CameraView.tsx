@@ -48,6 +48,7 @@ export function CameraView({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const [typedCode, setTypedCode] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [stagedGroupImages, setStagedGroupImages] = useState<string[]>([]);
 
@@ -174,7 +175,7 @@ export function CameraView({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="absolute inset-0 z-50 bg-black flex flex-col overflow-hidden"
+      className="camera-ui absolute inset-0 z-50 bg-black flex flex-col overflow-hidden"
     >
       {/* Header */}
       <div className="absolute top-0 inset-x-0 p-4 sm:p-6 z-30 flex justify-between items-center gap-2">
@@ -394,7 +395,13 @@ export function CameraView({
         </div>
       )}
       {/* Controls */}
-      <div className="absolute bottom-0 inset-x-0 p-8 z-30 flex items-center justify-center bg-gradient-to-t from-black via-black/60 to-transparent pt-20">
+      <div className="absolute bottom-0 inset-x-0 p-8 z-30 flex flex-col items-center justify-center gap-4 bg-gradient-to-t from-black via-black/60 to-transparent pt-20">
+        {scannerMode === "barcode" && (
+          <form className="typed-barcode" onSubmit={(e) => { e.preventDefault(); const v = typedCode.trim(); if (/^\d{8,14}$/.test(v)) { onBarcode(v); setTypedCode(""); } }}>
+            <input value={typedCode} onChange={(e) => setTypedCode(e.target.value)} inputMode="numeric" placeholder="or type the barcode" aria-label="Type the barcode" enterKeyHint="go" />
+            <button type="submit" disabled={!/^\d{8,14}$/.test(typedCode.trim())}>Look up</button>
+          </form>
+        )}
         {!cameraError && (
           <div className="relative flex items-center justify-center w-full max-w-sm">
             {/* Gallery Button */}

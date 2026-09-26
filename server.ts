@@ -436,6 +436,36 @@ app.post("/api/save", async (req, res) => {
       });
   }
 });
+// Foods saved to Airtable, mapped back to the app's shape. Coach-side import.
+app.get("/api/foods", async (_req, res) => {
+  try {
+    if (!baseId || !airtableKey)
+      return res.status(503).json({ error: "Airtable is not configured." });
+    const headers = { Authorization: `Bearer ${airtableKey}` };
+    const base = `https://api.airtable.com/v0/${encodeURIComponent(baseId)}/Scans`;
+    const out: any[] = [];
+    let offset: string | undefined;
+    for (let i = 0; i < 10; i++) {
+      const url = `${base}?pageSize=100${offset ? `&offset=${encodeURIComponent(offset)}` : ""}`;
+      const r = await fetch(url, { headers, signal: AbortSignal.timeout(12000) });
+      if (!r.ok) throw new Error("Airtable unavailable");
+      const data = await r.json();
+      for (const rec of data.records ?? []) {
+        const f = rec.fields ?? {};
+        if (!f["Product Name"]) continue;
+        out.push({
+          product_name: f["Product Name"], brand: f.Brand ?? "", barcode: f.Barcode ? String(f.Barcode) : undefined,
+          calories: f.Calories ?? null, protein: f.Protein ?? null, fats: f.Fats ?? null, carbs: f.Carbs ?? null, fiber: f.Fiber ?? null,
+        });
+      }
+      offset = data.offset;
+      if (!offset) break;
+    }
+    res.json({ foods: out });
+  } catch {
+    res.status(502).json({ error: "Could not read from Airtable." });
+  }
+});
 app.use("/api", (_req, res) =>
   res.status(404).json({ error: "Unknown API route." }),
 );

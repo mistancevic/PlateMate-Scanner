@@ -7,7 +7,7 @@ import { ConfirmButton } from "../components/Confirm";
 import type { AppApi } from "./api";
 
 export function MeScreen(p: AppApi) {
-  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal, resetGoal } = p;
+  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal, resetGoal, addStarter, importAirtable } = p;
   const n = readLog().length;
   const bandName = goal?.band ? bandOf(goal.band)?.name : null;
   const setBy = goal?.setBy === "coach" ? COACH_NAME : "you";
@@ -61,6 +61,10 @@ export function MeScreen(p: AppApi) {
             <div className="button-row">
               <button className="pill pill-small" onClick={exportLog}><Download size={14} /> Export log</button>
               <ConfirmButton className="pill pill-small" label="Clear log" confirmLabel="Tap again to clear" onConfirm={clearLog} />
+            </div>
+            <div className="button-row">
+              <button className="pill pill-small" onClick={addStarter}>Add starter foods</button>
+              <button className="pill pill-small" onClick={importAirtable} disabled={!services?.airtable}>Import from Airtable</button>
             </div>
             <div className="button-row">
               <button className="pill pill-small" onClick={exportData}><Download size={14} /> Backup</button>

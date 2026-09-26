@@ -304,3 +304,13 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .nut-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 4px 0 10px; }
 .nut-grid > div { background: var(--base); border-radius: 12px; padding: 8px 6px; text-align: center; } .nut-grid b { display: block; font-size: 15px; } .nut-grid small { font-size: 11px; }
 .suggest { white-space: normal; line-height: 1.35; margin-top: 4px; }
+
+/* Camera: the app's base button colour must not bleed into the dark camera UI */
+.camera-ui button { color: #fff; }
+.camera-ui button.bg-white { color: #000; }
+.camera-ui .text-black { color: #000 !important; }
+.typed-barcode { display: flex; gap: 8px; width: 100%; max-width: 24rem; }
+.typed-barcode input { flex: 1; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #fff; border-radius: 999px; padding: 10px 14px; font-size: 15px; }
+.typed-barcode input::placeholder { color: rgba(255,255,255,0.6); }
+.typed-barcode button { background: #fff; color: #000; border-radius: 999px; padding: 0 16px; font-weight: 800; font-size: 13px; }
+.typed-barcode button:disabled { opacity: 0.4; }

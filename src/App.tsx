@@ -33,6 +33,7 @@ import type { AppApi, Tab, Step } from "./screens/api";
 import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
 import { getGoal, clearGoal, bandOf, fit as fitPd } from "./goal";
+import { STARTER_FOODS } from "./starter";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
 import { Home, ChefHat, CircleUser } from "lucide-react";
@@ -743,6 +744,29 @@ export default function App() {
     step, setStep, mixWith,
     clientName, setClientName: (v: string) => { storeClientName(v); setClientNameState(v); },
     goal, openGoal: () => setGoalOpen(true), fitPd: (pd: number | null) => fitPd(pd, pdRef),
+    addStarter: () => {
+      setState((s) => {
+        const have = new Set(s.foods.map((f) => (f.name + "|" + f.brand).toLowerCase()));
+        const add = STARTER_FOODS.filter((f) => !have.has((f.name + "|" + f.brand).toLowerCase())).map((f) => ({ ...f, id: uid(), reviewedAt: new Date().toISOString() }));
+        notify(add.length ? `${add.length} starter foods added.` : "Starter foods are already in your library.");
+        return { ...s, foods: [...s.foods, ...add] };
+      });
+    },
+    importAirtable: async () => {
+      setBusy("Reading Airtable");
+      try {
+        const data = await api("/api/foods");
+        const rows: any[] = data.foods ?? [];
+        setState((s) => {
+          const key = (n: string, b: string, bc?: string) => bc ? `bc:${bc}` : (n + "|" + b).toLowerCase();
+          const have = new Set(s.foods.map((f) => key(f.name, f.brand, f.barcode)));
+          const add = rows.map((r) => candidateFood(r, "airtable")).map((f) => ({ ...f, reviewedAt: new Date().toISOString(), readyToEat: true, icon: iconFor(f.name) }))
+            .filter((f) => !validateFood(f).length && !have.has(key(f.name, f.brand, f.barcode)));
+          notify(add.length ? `${add.length} foods imported from Airtable.` : "Nothing new in Airtable.");
+          return { ...s, foods: [...s.foods, ...add] };
+        });
+      } catch (e: any) { setError(e.message); } finally { setBusy(""); }
+    },
     resetGoal: () => { clearGoal(); setState((s) => ({ ...s, goals: { ...s.goals, calories: null, protein: null } })); setGoalState(null); setGoalOpen(true); },
     mealanCard: (
       <Mealan
