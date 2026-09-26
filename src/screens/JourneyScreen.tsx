@@ -93,12 +93,12 @@ export function JourneyScreen(p: AppApi) {
       if (rest.length >= 2 && moverOf(rest)) recalc(rest); else setStep("in");
     }
   }
-  function swap(id: string, food: typeof state.foods[number], grams?: number | null) {
-    // the swapped-in food arrives at the grams the list promised, kept, so nothing else needs to move
-    const next = items.map((i) => (i.id === id ? { ...i, food: { ...food, readyToEat: true }, grams: grams ?? i.grams, locked: grams != null ? true : i.locked } : i));
+  function swap(id: string, food: typeof state.foods[number], grams?: number | null, keep = false) {
+    // a food that works arrives kept at the grams the list promised; one that doesn't arrives at the cap, grey, and the plate says how far that gets you
+    const next = items.map((i) => (i.id === id ? { ...i, food: { ...food, readyToEat: true }, grams: grams ?? i.grams, locked: keep } : i));
     setState((s) => ({ ...s, items: next, portion: null }));
     setSwapId(null);
-    if (step === "recipe" && grams == null) recalc(next);
+    if (step === "recipe" && !keep) { setTouched((t) => new Set(t).add(id)); recalc(next); }
   }
   // Editing an amount on the recipe: that amount becomes yours, Mealan moves the highest-PD food you didn't touch.
   function edit(id: string, grams: number) {
@@ -131,7 +131,7 @@ export function JourneyScreen(p: AppApi) {
         <p className="small">Sorted by how well each one brings the plate to your {fixed(pdRef)}, with the rest kept as it is.</p>
         <div className="rows">
           {swapCandidates.map(({ f, grams, fits }) => (
-            <button className="row row-food row-button" key={f.id} onClick={() => swap(swapId, f, grams)}>
+            <button className="row row-food row-button" key={f.id} onClick={() => swap(swapId, f, fits ? grams : grams !== null ? Math.min(grams, cap ?? 300) : null, fits)}>
               <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
               <div className="row-text"><b>{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}PD {fixed(density(f.protein, f.calories))}</small></div>
               <span className={`pdpill pdpill-${fits ? "high" : grams !== null ? "mid" : "low"}`}>{grams !== null ? `${grams} g` : "no"}</span>
@@ -232,16 +232,24 @@ export function JourneyScreen(p: AppApi) {
     const over = cap !== null && !!mover && mover.grams > cap;
     const shown = over ? items.map((i) => (i.id === mover!.id ? { ...i, grams: cap! } : i)) : items;
     const ot = aggregate(shown); const opd = density(ot.protein, ot.calories);
-    const onPlan = opd !== null && pdRef !== null && opd >= pdRef - 0.05;
+    const dayKcal = state.goals.calories ?? null;
+    const share = dayKcal ? Math.round(((ot.calories ?? 0) / dayKcal) * 100) : null;
+    const tooBig = shown.filter((i) => i.grams > (cap ?? 300));
+    const unreal = tooBig.length > 0 || (share !== null && share > 50);
+    const onPlan = !unreal && opd !== null && pdRef !== null && opd >= pdRef - 0.05;
+    const unrealText = tooBig.length
+      ? `${fmt(tooBig[0].grams, 0)} g of ${tooBig[0].food.name} is not a portion. This food can't get you there at a normal amount; swap it or lower the others.`
+      : `This plate is ${share} % of your day. Fit for a meal, not a dessert.`;
     return (
       <>
         <Head title={mover ? `${CHEF_NAME}'s recipe` : "As you set it"} sub={over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : mover ? `${CHEF_NAME} moves the ${mover.food.name}. Change any other amount and it refits.` : `Nothing moved. This is where your amounts land. Tap a grey dot if you want ${CHEF_NAME} to fit one food.`} />
-        <section className="readout">
-          <div className="readout-top"><span>This dessert</span><span>PD</span></div>
+        <section className={`readout ${unreal ? "readout-fit-mid" : ""}`}>
+          <div className="readout-top"><span>This plate</span><span>PD</span></div>
           <div className="readout-mid">
             <b>{fixed(opd)}</b>
-            <div><span>{onPlan ? `on plan, target ${fixed(pdRef)}` : `target ${fixed(pdRef)}`}</span><small>{fmt(ot.calories, 0)} kcal · {fmt(ot.protein)} g protein · {fmt(ot.weight, 0)} g</small></div>
+            <div><span>{unreal ? "not realistic" : onPlan ? `on plan, target ${fixed(pdRef)}` : `target ${fixed(pdRef)}`}</span><small>{fmt(ot.calories, 0)} kcal{share !== null ? `, ${share} % of your day` : ""} · {fmt(ot.protein)} g protein · {fmt(ot.weight, 0)} g</small></div>
           </div>
+          {unreal && <p className="readout-note">{unrealText}</p>}
         </section>
         <div className="rows">
           {shown.map((i) => (

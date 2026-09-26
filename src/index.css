@@ -316,3 +316,4 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .typed-barcode button:disabled { opacity: 0.4; }
 
 .readout-fit-high { background: var(--high); } .readout-fit-mid { background: var(--mid); } .readout-fit-low { background: var(--low); }
+.readout-note { margin: 12px 0 0; font-size: 13px; font-weight: 700; line-height: 1.4; color: #fff; }
