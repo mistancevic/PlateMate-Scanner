@@ -323,3 +323,15 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .way.on { border-color: var(--brand); background: var(--tint); }
 .way b { display: block; font-size: 16px; } .way small { display: block; color: var(--muted); margin: 2px 0 8px; }
 .way ol { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.45; color: var(--ink); } .way li + li { margin-top: 3px; }
+
+.chat { display: flex; flex-direction: column; gap: 10px; margin: 8px 0 12px; }
+.bubble { max-width: 92%; border-radius: 18px; padding: 12px 14px; font-size: 15px; line-height: 1.45; }
+.bubble.you { align-self: flex-end; background: var(--brand); color: #fff; border-bottom-right-radius: 6px; }
+.bubble.mealan { align-self: flex-start; background: var(--surface); border: 1px solid var(--line); border-bottom-left-radius: 6px; }
+.bubble p { margin: 0; } .bubble img { width: 100%; border-radius: 12px; margin-bottom: 8px; display: block; }
+.picks { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.picks small { display: block; color: var(--muted); font-size: 12px; }
+.picks-total { font-weight: 800; color: var(--brand-text); margin-top: 2px; }
+.chat-input { display: flex; align-items: center; gap: 6px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 999px; padding: 4px 6px; }
+.chat-input input { flex: 1; border: 0; background: none; font: inherit; font-size: 15px; padding: 10px 6px; min-width: 0; }
+.chat-input .icon { width: 40px; height: 40px; }

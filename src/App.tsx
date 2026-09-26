@@ -32,6 +32,7 @@ import { MoreScreen } from "./screens/MoreScreen";
 import type { AppApi, Tab, Step } from "./screens/api";
 import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
+import { OutScreen } from "./screens/OutScreen";
 import { getGoal, clearGoal, bandOf, fit as fitPd } from "./goal";
 import { STARTER_FOODS } from "./starter";
 import { JourneyScreen } from "./screens/JourneyScreen";
@@ -394,6 +395,7 @@ export default function App() {
     [clientName, setClientNameState] = useState<string>(getClientName),
     [goal, setGoalState] = useState(getGoal),
     [goalOpen, setGoalOpen] = useState<boolean>(() => !getGoal()),
+    [outOpen, setOutOpen] = useState(false),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -767,6 +769,7 @@ export default function App() {
         });
       } catch (e: any) { setError(e.message); } finally { setBusy(""); }
     },
+    openOut: () => setOutOpen(true),
     resetGoal: () => { clearGoal(); setState((s) => ({ ...s, goals: { ...s.goals, calories: null, protein: null } })); setGoalState(null); setGoalOpen(true); },
     mealanCard: (
       <Mealan
@@ -834,7 +837,7 @@ export default function App() {
           </div>
         )}
         {tab === "home" && <HomeScreen {...screenProps} />}
-        {tab === "journey" && <JourneyScreen {...screenProps} />}
+        {tab === "journey" && (outOpen ? <OutScreen {...screenProps} close={() => setOutOpen(false)} /> : <JourneyScreen {...screenProps} />)}
         {tab === "me" && <MeScreen {...screenProps} />}
         {tab === "meal" && <MealScreen {...screenProps} />}
         {tab === "chef" && <ChefScreen {...screenProps} />}

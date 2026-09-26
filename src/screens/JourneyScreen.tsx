@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Camera, ScanBarcode, Plus, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Camera, ScanBarcode, Plus, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown, MapPin } from "lucide-react";
 import { aggregate, density, uid, solveIngredient } from "../pilot";
 import { fmt, fixed } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
