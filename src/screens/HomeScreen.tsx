@@ -1,4 +1,4 @@
-import { ChefHat, Camera, BookOpen, ArrowRight, MapPin } from "lucide-react";
+import { ChefHat, Camera, BookOpen, ArrowRight, MessageCircle } from "lucide-react";
 import { aggregate, density } from "../pilot";
 import { fmt, fixed } from "../ui";
 import { COACH_NAME } from "../components/Mark";
@@ -28,7 +28,7 @@ export function HomeScreen(p: AppApi) {
         <Camera size={20} /> Scan
       </button>
       <button className="pill pill-tall" onClick={() => { setTab("journey"); p.openOut(); }}>
-        <MapPin size={20} /> I'm out
+        <MessageCircle size={20} /> Chat with Mealan
       </button>
       <button className="pill pill-tall" onClick={() => setTab("foods")}>
         <BookOpen size={20} /> My foods

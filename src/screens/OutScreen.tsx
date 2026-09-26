@@ -31,7 +31,12 @@ export function OutScreen(p: AppApi & { close: () => void }) {
     setBusy(`${CHEF_NAME} is looking`);
     try {
       const res = await fetch("/api/out", { method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: msg, image: photo || undefined, target: { pd: pdRef, mealKcal: state.goals.calories ? Math.round(state.goals.calories * 0.35) : null }, history }) });
+        body: JSON.stringify({
+          text: msg, image: photo || undefined, history,
+          target: { pd: pdRef, mealKcal: state.goals.calories ? Math.round(state.goals.calories * 0.35) : null },
+          plate: state.items.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein })),
+          library: state.foods.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })),
+        }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Mealan could not answer.");
       const recs: Rec[] = data.recognised ?? [];
@@ -59,20 +64,20 @@ export function OutScreen(p: AppApi & { close: () => void }) {
 
   function keep(t: Turn) {
     if (!t.picks?.length) return;
-    const meal = { id: uid(), title: `Out: ${t.picks.map((i) => i.food.name).join(", ")}`, items: t.picks, portion: t.picks.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
-    setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "eaten" as const, taste: "Out", notes: turns.filter((x) => x.role === "you").map((x) => x.text).join(" / ").slice(0, 300), createdAt: new Date().toISOString() }, ...s.feedback] }));
-    log("feedback", { status: "eaten", taste: "Out" });
+    const meal = { id: uid(), title: `With Mealan: ${t.picks.map((i) => i.food.name).join(", ")}`, items: t.picks, portion: t.picks.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
+    setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "eaten" as const, taste: "Chat", notes: turns.filter((x) => x.role === "you").map((x) => x.text).join(" / ").slice(0, 300), createdAt: new Date().toISOString() }, ...s.feedback] }));
+    log("feedback", { status: "eaten", taste: "Chat" });
     close();
   }
 
   return (
     <>
       <div className="head">
-        <h2>I'm out</h2>
-        <p>Tell {CHEF_NAME} where you are and show what's on offer. The values are estimates; the amounts come from your target.</p>
+        <h2>Chat with {CHEF_NAME}</h2>
+        <p>Out, missing something, or after an idea. Say where you are or what you have, add a photo if it helps. Estimates are marked; the amounts come from your target.</p>
       </div>
       <div className="chat">
-        {turns.length === 0 && <div className="strip">Try: "Hotel breakfast buffet" with a photo, or "Team dinner, Italian, I want the tiramisu".</div>}
+        {turns.length === 0 && <div className="strip">Try: "No skyr at home, what else goes with the Nutella?", "Hotel breakfast buffet" with a photo, or "Italian tonight, I want the tiramisu".</div>}
         {turns.map((t, i) => (
           <div key={i} className={`bubble ${t.role}`}>
             {t.photo && <img src={t.photo} alt="" />}
@@ -90,7 +95,7 @@ export function OutScreen(p: AppApi & { close: () => void }) {
       {photo && <div className="strip">Photo attached. <button className="link" onClick={() => setPhoto("")}>Remove</button></div>}
       <div className="chat-input">
         <button className="icon" aria-label="Add a photo" onClick={() => fileRef.current?.click()}><Camera size={20} /></button>
-        <input value={text} placeholder="Where are you, what's on offer?" onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} enterKeyHint="send" />
+        <input value={text} placeholder="Where are you, or what do you have?" onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} enterKeyHint="send" />
         <button className="icon" aria-label="Send" onClick={ask}><Send size={20} /></button>
         <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => {
           const f = e.target.files?.[0]; if (!f) return;

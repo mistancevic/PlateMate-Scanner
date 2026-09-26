@@ -6,7 +6,7 @@ export type LogEvent =
   | "mix"            // Chef asked for a mix
   | "mix_applied"
   | "method_chosen"  // data.method = mixed | topped | base-first
-  | "out"            // away from the kitchen; data.picks, data.pd
+  | "out"            // chat with Mealan; data.picks, data.pd
   | "meal_saved"
   | "feedback";      // data.status
 const KEY = "chefmealan-log";
