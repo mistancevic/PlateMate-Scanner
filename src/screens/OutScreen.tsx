@@ -62,6 +62,16 @@ export function OutScreen(p: AppApi & { close: () => void }) {
     } catch (e: any) { setError(e.message); } finally { setBusy(""); }
   }
 
+  function toPlate(t: Turn) {
+    if (!t.picks?.length) return;
+    const items = t.picks.map((i) => {
+      const lib = state.foods.find((f) => f.name.toLowerCase() === i.food.name.toLowerCase());
+      return { id: uid(), food: lib ?? i.food, grams: i.grams, locked: false };
+    });
+    setState((s) => ({ ...s, items, portion: null }));
+    p.setStep("in");
+    close();
+  }
   function keep(t: Turn) {
     if (!t.picks?.length) return;
     const meal = { id: uid(), title: `With Mealan: ${t.picks.map((i) => i.food.name).join(", ")}`, items: t.picks, portion: t.picks.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
@@ -86,7 +96,10 @@ export function OutScreen(p: AppApi & { close: () => void }) {
               <div className="picks">
                 {t.picks.map((i) => <div key={i.id}><b>{fmt(i.grams, 0)} g</b> {i.food.name} <small>~{fmt(i.food.calories, 0)} kcal · {fmt(i.food.protein)} g protein per 100 g</small></div>)}
                 <div className="picks-total">PD {fixed(t.pd ?? null)}{pdRef !== null ? ` · target ${fixed(pdRef)}` : ""} · {fmt(t.kcal ?? null, 0)} kcal</div>
-                <button className="pill pill-small" onClick={() => keep(t)}>This is what I had</button>
+                <div className="button-row">
+                  <button className="pill pill-small pill-primary" onClick={() => toPlate(t)}>Work on it with {CHEF_NAME}</button>
+                  <button className="pill pill-small" onClick={() => keep(t)}>This is what I had</button>
+                </div>
               </div>
             )}
           </div>
@@ -99,7 +112,7 @@ export function OutScreen(p: AppApi & { close: () => void }) {
         <button className="icon" aria-label="Send" onClick={ask}><Send size={20} /></button>
         <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => {
           const f = e.target.files?.[0]; if (!f) return;
-          const r = new FileReader(); r.onload = () => resizeImageBase64(String(r.result), 1400, 1400).then(setPhoto).catch(() => {}); r.readAsDataURL(f); e.target.value = "";
+          const r = new FileReader(); r.onload = () => resizeImageBase64(String(r.result), 1024, 1024).then(setPhoto).catch(() => {}); r.readAsDataURL(f); e.target.value = "";
         }} />
       </div>
       <button className="link back" onClick={close}><ArrowLeft size={14} /> Back</button>
