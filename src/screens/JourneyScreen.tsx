@@ -302,7 +302,7 @@ export function JourneyScreen(p: AppApi) {
     return (
       <>
         <Head title="How do you want to eat it?" sub={`Same amounts, three ways. Pick the one you feel like.`} />
-        <div className="ways">
+        <div className="how">
           {ways.map((w) => (
             <button key={w.id} className={`way ${method === w.id ? "on" : ""}`} onClick={() => setMethod(w.id)}>
               <b>{w.name}</b>
