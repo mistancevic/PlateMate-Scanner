@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Camera, ScanBarcode, Plus, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
-import { aggregate, density, uid } from "../pilot";
+import { aggregate, density, uid, solveIngredient } from "../pilot";
 import { fmt, fixed } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
@@ -112,15 +112,28 @@ export function JourneyScreen(p: AppApi) {
     setState((s) => ({ ...s, items: s.items.map((i) => (i.id === suggest.id ? { ...i, grams: suggest.grams } : i)), portion: null }));
     setSuggest(null);
   }
+  const swapCandidates = (() => {
+    if (!swapId || pdRef === null) return [];
+    const slot = items.find((i) => i.id === swapId); if (!slot) return [];
+    return state.foods.filter((f) => !items.some((i) => i.food.id === f.id)).map((f) => {
+      const trial = items.map((i) => (i.id === swapId ? { ...i, food: { ...f, readyToEat: true }, locked: false } : { ...i, locked: true }));
+      const r = solveIngredient(trial, swapId, pdRef, null);
+      const grams = r.ok ? r.grams : null;
+      const fits = grams !== null && grams <= (cap ?? Infinity);
+      return { f, grams, fits };
+    }).sort((a, b) => (a.fits === b.fits ? (a.grams ?? 1e9) - (b.grams ?? 1e9) : a.fits ? -1 : 1));
+  })();
   const swapPanel = swapId && (
     <div className="sheet-backdrop" onClick={() => setSwapId(null)}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="card-top"><span>Swap {items.find((i) => i.id === swapId)?.food.name} for</span><button className="link" onClick={() => setSwapId(null)}>Cancel</button></div>
+        <p className="small">Sorted by how well each one brings the plate to your {fixed(pdRef)}, with the rest kept as it is.</p>
         <div className="rows">
-          {state.foods.filter((f) => !items.some((i) => i.food.id === f.id)).map((f) => (
+          {swapCandidates.map(({ f, grams, fits }) => (
             <button className="row row-food row-button" key={f.id} onClick={() => swap(swapId, f)}>
               <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
               <div className="row-text"><b>{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}PD {fixed(density(f.protein, f.calories))}</small></div>
+              <span className={`pdpill pdpill-${fits ? "high" : grams !== null ? "mid" : "low"}`}>{grams !== null ? `${grams} g` : "no"}</span>
             </button>
           ))}
         </div>
