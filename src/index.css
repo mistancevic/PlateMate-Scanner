@@ -33,7 +33,9 @@ h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
 p { line-height: 1.5; }
 small, .small { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
 .label { font-size: 13px; font-weight: 700; margin: 18px 0 6px; }
-button:not(.camera-ui *) { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; transition: background 0.15s, opacity 0.15s; }
+@layer base {
+  button { font: inherit; color: inherit; cursor: pointer; border: 0; background: none; transition: background 0.15s, opacity 0.15s; }
+}
 button:disabled { opacity: 0.45; cursor: default; }
 button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--tint); outline-offset: 2px; }
 input, select, textarea {
@@ -306,7 +308,6 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .suggest { white-space: normal; line-height: 1.35; margin-top: 4px; }
 
 /* Camera: the app's base button colour must not bleed into the dark camera UI */
-.camera-ui button { font: inherit; cursor: pointer; }
 .typed-barcode { display: flex; gap: 8px; width: 100%; max-width: 24rem; }
 .typed-barcode input { flex: 1; background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25); color: #fff; border-radius: 999px; padding: 10px 14px; font-size: 15px; }
 .typed-barcode input::placeholder { color: rgba(255,255,255,0.6); }
