@@ -314,4 +314,4 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .typed-barcode button { background: #fff; color: #000; border-radius: 999px; padding: 0 16px; font-weight: 800; font-size: 13px; }
 .typed-barcode button:disabled { opacity: 0.4; }
 
-.readout-high { background: var(--high); } .readout-mid { background: var(--mid); } .readout-low { background: var(--low); }
+.readout-fit-high { background: var(--high); } .readout-fit-mid { background: var(--mid); } .readout-fit-low { background: var(--low); }
