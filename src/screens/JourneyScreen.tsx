@@ -53,7 +53,12 @@ export function JourneyScreen(p: AppApi) {
   const adjustFor = (o: { items: typeof items }) => o.items.find((i) => !i.locked)?.id;
   // Mealan moves the food with the highest protein density; everything else keeps the amount you set.
   function askMealan() {
-    const ready = items.map((i) => ({ ...i, food: { ...i.food, readyToEat: true } }));
+    let ready = items.map((i) => ({ ...i, food: { ...i.food, readyToEat: true } }));
+    if (ready.length === 1) {
+      const partner = [...state.foods].filter((f) => f.id !== ready[0].food.id).sort((a, b) => (density(b.protein, b.calories) ?? -1) - (density(a.protein, a.calories) ?? -1))[0];
+      if (!partner) { setError("Add a food to your library first, so Mealan has partners to choose from."); return; }
+      ready = [{ ...ready[0], locked: true }, { id: uid(), food: { ...partner, readyToEat: true }, grams: 100, locked: false }];
+    }
     const mover = moverOf(ready);
     if (!mover) { setState((s) => ({ ...s, items: ready, portion: null })); setStep("recipe"); return; } // everything fixed: show where it lands
     setState((s) => ({ ...s, items: ready, foods: s.foods.map((f) => ready.some((x) => x.food.id === f.id) ? { ...f, readyToEat: true } : f) }));
@@ -137,6 +142,15 @@ export function JourneyScreen(p: AppApi) {
     return (
       <>
         <Head title="What are you craving?" sub={`Get the products in. Then ${CHEF_NAME} works out how much of each.`} />
+        {items.length > 0 && (
+          <section className={`readout readout-fit-${p.fitPd(pd)}`}>
+            <div className="readout-top"><span>As it stands</span><span>PD</span></div>
+            <div className="readout-mid">
+              <b>{fixed(pd)}</b>
+              <div><span>{pd !== null && pdRef !== null ? (pd >= pdRef ? "fits your plan" : `${fixed(pdRef - pd)} under your ${fixed(pdRef)}`) : "no target set"}</span><small>{fmt(t.calories, 0)} kcal · {fmt(t.protein)} g protein · {fmt(t.weight, 0)} g</small></div>
+            </div>
+          </section>
+        )}
         <div className="ways">
           <button className="pill pill-small" onClick={() => { setMode("group"); setCamera(true); }}><Camera size={15} /> Photo</button>
           <button className="pill pill-small" onClick={() => { setMode("barcode"); setCamera(true); }}><ScanBarcode size={15} /> Barcode</button>
@@ -169,10 +183,10 @@ export function JourneyScreen(p: AppApi) {
             ))}
           </div>
         )}
-        <button className="pill pill-primary pill-wide" disabled={items.length < 2} onClick={askMealan}>
+        <button className="pill pill-primary pill-wide" disabled={items.length < 1} onClick={askMealan}>
           <ChefHat size={18} /> Ask {CHEF_NAME}
         </button>
-        {items.length < 2 && <p className="small center">Two products at least, so {CHEF_NAME} has something to move.</p>}
+        {items.length === 1 && <p className="small center">One product: {CHEF_NAME} looks through your foods for a partner that brings it to your plan.</p>}
         {items.length >= 2 && <p className="small center">Grey is yours to type and {CHEF_NAME}'s to move. Coral is fixed. Swipe right to remove, left to swap. Tap a name for its card.</p>}
         {swapPanel}
         {foodCard}
