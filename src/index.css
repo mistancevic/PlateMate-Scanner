@@ -65,7 +65,7 @@ main { flex: 1; width: 100%; max-width: 640px; margin: 0 auto; padding: 8px 18px
   padding: calc(14px + env(safe-area-inset-top, 0px)) 18px 10px;
   background: color-mix(in srgb, var(--base) 90%, transparent); backdrop-filter: blur(10px);
 }
-.brand { display: grid; place-items: center; width: 34px; height: 34px; padding: 0; }
+.brand { display: grid; place-items: center; height: 34px; padding: 0 2px; }
 .ref { margin-left: auto; font-size: 12px; font-weight: 600; color: var(--muted); padding: 6px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .ref:hover { color: var(--brand-text); }
 

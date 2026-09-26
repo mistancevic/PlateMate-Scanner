@@ -801,7 +801,7 @@ export default function App() {
     <div className="app-shell">
       <header className="topbar">
         <button className="brand" onClick={() => setTab("journey")} aria-label={APP_NAME}>
-          <Mark size={30} color="var(--brand)" />
+          <Mark size={28} color="var(--brand)" />
         </button>
         <h1>{TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
