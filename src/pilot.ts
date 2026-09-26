@@ -33,8 +33,11 @@ export type Food = Nutrition & {
   notes: string;
   reviewedAt: string;
   readyToEat: boolean;
+  photo?: string;
+  icon?: string;
 };
 export type Ingredient = {
+  keep?: boolean;
   id: string;
   food: Food;
   grams: number;
@@ -55,6 +58,7 @@ export type Feedback = {
   taste: string;
   notes: string;
   createdAt: string;
+  photo?: string;
 };
 export type PilotState = {
   version: 1;
