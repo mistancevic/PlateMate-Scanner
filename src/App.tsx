@@ -36,7 +36,7 @@ import { getGoal, clearGoal, bandOf, fit as fitPd } from "./goal";
 import { STARTER_FOODS } from "./starter";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
-import { Home, ChefHat, CircleUser } from "lucide-react";
+import { Home, CircleUser } from "lucide-react";
 import {
   aggregate,
   candidateFood,
@@ -779,7 +779,7 @@ export default function App() {
   };
   const NAV: { id: Tab; label: string; icon: ReactNode }[] = [
     { id: "home", label: "Home", icon: <Home size={20} /> },
-    { id: "journey", label: "Mealan", icon: <ChefHat size={20} /> },
+    { id: "journey", label: "Mealan", icon: <Mark size={22} color="currentColor" /> },
     { id: "foods", label: "Foods", icon: <BookOpen size={20} /> },
     { id: "me", label: "Me", icon: <CircleUser size={20} /> },
   ];
