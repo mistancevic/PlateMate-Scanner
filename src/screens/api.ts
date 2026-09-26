@@ -53,6 +53,10 @@ export interface AppApi {
   goal: import("../goal").Goal | null;
   openGoal: () => void;
   openOut: () => void;
+  user: import("../cloud").CloudUser | null;
+  cloudEnabled: boolean;
+  signOut: () => Promise<void>;
+  deleteAccount: () => Promise<void>;
   addStarter: () => void;
   importAirtable: () => Promise<void>;
   resetGoal: () => void;

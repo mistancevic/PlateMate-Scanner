@@ -33,6 +33,8 @@ import type { AppApi, Tab, Step } from "./screens/api";
 import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen } from "./screens/OutScreen";
+import { SignInScreen } from "./screens/SignInScreen";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, type CloudUser } from "./cloud";
 import { getGoal, clearGoal, bandOf, fit as fitPd } from "./goal";
 import { STARTER_FOODS } from "./starter";
 import { JourneyScreen } from "./screens/JourneyScreen";
@@ -396,6 +398,10 @@ export default function App() {
     [goal, setGoalState] = useState(getGoal),
     [goalOpen, setGoalOpen] = useState<boolean>(() => !getGoal()),
     [outOpen, setOutOpen] = useState(false),
+    [user, setUser] = useState<CloudUser | null>(null),
+    [authReady, setAuthReady] = useState(!cloudEnabled),
+    [localOnly, setLocalOnly] = useState<boolean>(() => localStorage.getItem("chefmealan-local-only") === "1"),
+    cloudLoaded = useRef(false),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -455,6 +461,29 @@ export default function App() {
   useEffect(() => {
     setOptions([]);
   }, [state.items, state.goals, limits]);
+  useEffect(() => watchUser((u) => { setUser(u); setAuthReady(true); if (!u) cloudLoaded.current = false; }), []);
+  useEffect(() => {
+    if (!user || cloudLoaded.current) return;
+    (async () => {
+      try {
+        const remote = await loadCloud(user.uid);
+        if (remote) {
+          try { setState(parseState(JSON.stringify(remote.state))); } catch { /* keep local if the cloud copy is unreadable */ }
+          if (remote.goal) { try { localStorage.setItem("chefmealan-goal", JSON.stringify(remote.goal)); } catch {} setGoalState(getGoal()); setGoalOpen(!remote.goal); }
+          if (remote.clientName) { storeClientName(remote.clientName); setClientNameState(remote.clientName); }
+        } else {
+          await saveCloud(user.uid, { state, goal: getGoal(), clientName, updatedAt: new Date().toISOString() });
+        }
+      } catch (e: any) { setError("Could not reach your account. Working on this phone for now."); }
+      cloudLoaded.current = true;
+    })();
+  }, [user]);
+  // every change goes to the account, a second after it settles
+  useEffect(() => {
+    if (!user || !cloudLoaded.current) return;
+    const t = setTimeout(() => { saveCloud(user.uid, { state, goal: getGoal(), clientName, updatedAt: new Date().toISOString() }).catch(() => {}); }, 1000);
+    return () => clearTimeout(t);
+  }, [state, goal, clientName, user]);
   async function api(url: string, body?: unknown) {
     const res = await fetch(url, {
       method: body === undefined ? "GET" : "POST",
@@ -770,6 +799,9 @@ export default function App() {
       } catch (e: any) { setError(e.message); } finally { setBusy(""); }
     },
     openOut: () => setOutOpen(true),
+    user, cloudEnabled,
+    signOut: async () => { await signOutCloud(); cloudLoaded.current = false; },
+    deleteAccount: async () => { try { await deleteAccount(); localStorage.clear(); location.reload(); } catch (e: any) { setError(e.message || "Could not delete the account. Sign in again and retry."); } },
     resetGoal: () => { clearGoal(); setState((s) => ({ ...s, goals: { ...s.goals, calories: null, protein: null } })); setGoalState(null); setGoalOpen(true); },
     mealanCard: (
       <Mealan
@@ -796,6 +828,11 @@ export default function App() {
     notes: "Recipes",
     more: "More",
   };
+  if (!authReady) return <div className="app-shell"><main /></div>;
+  if (cloudEnabled && !user && !localOnly)
+    return (
+      <div className="app-shell"><main><SignInScreen onLocal={() => { localStorage.setItem("chefmealan-local-only", "1"); setLocalOnly(true); }} /></main></div>
+    );
   if (goalOpen)
     return (
       <div className="app-shell"><main><GoalScreen {...screenProps} onDone={() => { setGoalState(getGoal()); setGoalOpen(false); }} /></main></div>
