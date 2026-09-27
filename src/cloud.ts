@@ -13,7 +13,9 @@ export const cloudEnabled = Boolean(cfg.apiKey && cfg.projectId && cfg.appId && 
 let app: FirebaseApp | null = null;
 const getApp = () => (app ??= initializeApp(cfg));
 const auth = () => getAuth(getApp());
-const db = () => getFirestore(getApp());
+// A project can hold several Firestore databases; the client reaches "(default)" unless told which one.
+const dbId = import.meta.env.VITE_FIREBASE_DB_ID as string | undefined;
+const db = () => (dbId && dbId !== "(default)" ? getFirestore(getApp(), dbId) : getFirestore(getApp()));
 
 export type CloudUser = { uid: string; name: string; email: string; photo: string };
 const asUser = (u: User): CloudUser => ({ uid: u.uid, name: u.displayName ?? "", email: u.email ?? "", photo: u.photoURL ?? "" });
