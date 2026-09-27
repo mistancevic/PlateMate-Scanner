@@ -68,8 +68,8 @@ export function MeScreen(p: AppApi) {
           </div>
         </>
       )}
-      <p className="label">Your coach</p>
-      {cloudEnabled && user ? (
+      {!isCoach && <p className="label">Your coach</p>}
+      {isCoach ? null : cloudEnabled && user ? (
         profile.coachId ? (
           <section className="card person">
             <span className="avatar avatar-coach">{coachName.slice(0, 1)}</span>

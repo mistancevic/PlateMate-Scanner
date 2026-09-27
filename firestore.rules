@@ -1,16 +1,22 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Each person reads and writes their own document. A coach may read and update the documents of clients who joined with the coach's code.
+    // Each person reads and writes their own document. A coach may read and update the documents of clients
+    // who joined with the coach's code. Every lookup is guarded, so a document that does not exist yet never trips a rule.
     match /users/{uid} {
-      allow read: if request.auth != null && (request.auth.uid == uid || resource.data.coachId == request.auth.uid);
-      allow create, delete: if request.auth != null && request.auth.uid == uid;
-      allow update: if request.auth != null && (
-        (request.auth.uid == uid && request.resource.data.role == resource.data.role) ||
-        (resource.data.coachId == request.auth.uid && request.resource.data.role == resource.data.role && request.resource.data.coachId == resource.data.coachId)
-      );
+      function signedIn() { return request.auth != null; }
+      function isOwner() { return signedIn() && request.auth.uid == uid; }
+      function existing() { return resource != null && resource.data != null; }
+      function isCoachOf() { return signedIn() && existing() && resource.data.get('coachId', '') == request.auth.uid; }
+      function roleKept() { return request.resource.data.get('role', '') == (existing() ? resource.data.get('role', '') : ''); }
+      function coachKept() { return request.resource.data.get('coachId', '') == (existing() ? resource.data.get('coachId', '') : ''); }
+      allow get: if isOwner() || isCoachOf();
+      allow list: if isOwner() || isCoachOf();
+      allow create: if isOwner() && request.resource.data.get('role', '') == '';
+      allow delete: if isOwner();
+      allow update: if (isOwner() && roleKept()) || (isCoachOf() && roleKept() && coachKept());
     }
-    // A coach's code is readable by any signed-in person, writable only by that coach.
+    // A coach's code: readable by any signed-in person, writable only by that coach.
     match /coaches/{code} {
       allow read: if request.auth != null;
       allow write: if request.auth != null && request.resource.data.uid == request.auth.uid;
