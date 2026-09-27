@@ -4,13 +4,18 @@ import { APP_NAME, COACH_NAME } from "../components/Mark";
 import { exportLog, clearLog, readLog } from "../log";
 import { bandOf } from "../goal";
 import { ConfirmButton } from "../components/Confirm";
+import { CoachArea } from "./CoachScreen";
+import { useState } from "react";
 import type { AppApi } from "./api";
 
 export function MeScreen(p: AppApi) {
-  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal, resetGoal, addStarter, importAirtable, user, cloudEnabled, cloudStatus, signOut, deleteAccount } = p;
+  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal, resetGoal, addStarter, importAirtable, user, cloudEnabled, cloudStatus, signOut, deleteAccount, profile, joinCoach, leaveCoach } = p;
+  const [code, setCode] = useState("");
+  const coachName = profile.coachName || COACH_NAME;
+  const isCoach = profile.role === "coach";
   const n = readLog().length;
   const bandName = goal?.band ? bandOf(goal.band)?.name : null;
-  const setBy = goal?.setBy === "coach" ? COACH_NAME : "you";
+  const setBy = goal?.setBy === "coach" ? (goal.coachName || coachName) : "you";
   return (
     <>
       <p className="label">You</p>
@@ -35,7 +40,7 @@ export function MeScreen(p: AppApi) {
         </div>
       </section>
       <section className="card">
-        <div className="card-top"><span>What you told {COACH_NAME}</span><span>{state.feedback.length}</span></div>
+        <div className="card-top"><span>What you told {coachName}</span><span>{state.feedback.length}</span></div>
         {state.feedback.length === 0 && <small>Nothing yet. It starts after your first DaaM.</small>}
         {state.feedback.slice(0, 5).map((f) => (
           <div className="fb" key={f.id}>
@@ -64,15 +69,39 @@ export function MeScreen(p: AppApi) {
         </>
       )}
       <p className="label">Your coach</p>
-      <section className="card person">
-        <span className="avatar avatar-coach">{COACH_NAME.slice(0, 1)}</span>
-        <div><b>{COACH_NAME}</b><small>sets your target and sees how it went</small></div>
-      </section>
+      {cloudEnabled && user ? (
+        profile.coachId ? (
+          <section className="card person">
+            <span className="avatar avatar-coach">{coachName.slice(0, 1)}</span>
+            <div><b>{coachName}</b><small>sets your target and sees how it went</small></div>
+            <ConfirmButton className="link link-danger" label="Leave" confirmLabel="Tap again to leave" onConfirm={leaveCoach} />
+          </section>
+        ) : (
+          <section className="card">
+            <small>Got a code from your coach? Enter it once. From then on your coach sees your cards and can set your goal.</small>
+            <div className="button-row" style={{ marginTop: 8 }}>
+              <input className="code-input" value={code} placeholder="Coach code" onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={8} />
+              <button className="pill pill-small pill-primary" disabled={code.trim().length < 4} onClick={() => joinCoach(code)}>Join</button>
+            </div>
+          </section>
+        )
+      ) : (
+        <section className="card person">
+          <span className="avatar avatar-coach">{COACH_NAME.slice(0, 1)}</span>
+          <div><b>{COACH_NAME}</b><small>sets your target and sees how it went</small></div>
+        </section>
+      )}
 
-      <p className="label">Coach area</p>
-      <section className="card">
-        <label className="check"><input type="checkbox" checked={coach} onChange={(e) => setCoach(e.target.checked)} /> I am the coach</label>
-        {coach && (
+      {cloudEnabled && user && isCoach && (
+        <>
+          <p className="label">Coach area</p>
+          <CoachArea {...p} />
+        </>
+      )}
+      {(!cloudEnabled || isCoach) && <p className="label">{cloudEnabled ? "Tools" : "Coach area"}</p>}
+      {(!cloudEnabled || isCoach) && <section className="card">
+        {!cloudEnabled && <label className="check"><input type="checkbox" checked={coach} onChange={(e) => setCoach(e.target.checked)} /> I am the coach</label>}
+        {(coach || isCoach) && (
           <div className="coach-tools">
             <small>Pilot log: {n} {n === 1 ? "event" : "events"} on this device.</small>
             <div className="button-row">
@@ -92,7 +121,7 @@ export function MeScreen(p: AppApi) {
             <small>AI label reading: {services?.ai ? "on" : "off"} · Airtable: {services?.airtable ? "on" : "off"}</small>
           </div>
         )}
-      </section>
+      </section>}
       <p className="small center">{APP_NAME}, pilot. Barcode data from Open Food Facts, check the package.</p>
     </>
   );

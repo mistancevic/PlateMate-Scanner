@@ -56,6 +56,9 @@ export interface AppApi {
   user: import("../cloud").CloudUser | null;
   cloudEnabled: boolean;
   cloudStatus: { ok: boolean; text: string; at?: string };
+  profile: { role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string };
+  joinCoach: (code: string) => Promise<void>;
+  leaveCoach: () => Promise<void>;
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<void>;
   addStarter: () => void;

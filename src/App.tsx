@@ -34,7 +34,7 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen } from "./screens/OutScreen";
 import { SignInScreen } from "./screens/SignInScreen";
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, type CloudUser } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, type CloudUser } from "./cloud";
 import { getGoal, clearGoal, bandOf, fit as fitPd } from "./goal";
 import { STARTER_FOODS } from "./starter";
 import { JourneyScreen } from "./screens/JourneyScreen";
@@ -403,6 +403,7 @@ export default function App() {
     [localOnly, setLocalOnly] = useState<boolean>(() => localStorage.getItem("chefmealan-local-only") === "1"),
     cloudLoaded = useRef(false),
     [cloudStatus, setCloudStatus] = useState<{ ok: boolean; text: string; at?: string }>({ ok: true, text: "" }),
+    [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string }>({}),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -468,6 +469,7 @@ export default function App() {
     (async () => {
       try {
         const remote = await loadCloud(user.uid);
+        if (remote) setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachSetAt: remote.coachSetAt });
         if (remote && !(isEmptyState(remote.state) && !isEmptyState(state))) {
           // a real account copy replaces the phone; photos are merged back from the phone by id
           try {
@@ -493,6 +495,28 @@ export default function App() {
       cloudLoaded.current = true;
     })();
   }, [user]);
+  // when the app comes back to the front, pick up a goal the coach set meanwhile
+  useEffect(() => {
+    if (!user) return;
+    const onShow = async () => {
+      if (document.visibilityState !== "visible") return;
+      try {
+        const remote = await loadCloud(user.uid);
+        if (!remote) return;
+        setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachSetAt: remote.coachSetAt });
+        if (remote.coachSetAt && remote.coachSetAt !== profile.coachSetAt && remote.goal) {
+          try { localStorage.setItem("chefmealan-goal", JSON.stringify(remote.goal)); } catch {}
+          setGoalState(getGoal());
+          const g = (remote.state as any)?.goals;
+          if (g) setState((s) => ({ ...s, goals: { ...s.goals, calories: g.calories ?? s.goals.calories, protein: g.protein ?? s.goals.protein } }));
+          notify(`${remote.coachName || "Your coach"} set your goal.`);
+        }
+      } catch { /* offline, ignore */ }
+    };
+    document.addEventListener("visibilitychange", onShow);
+    return () => document.removeEventListener("visibilitychange", onShow);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, profile.coachSetAt]);
   // every change goes to the account, a second after it settles
   useEffect(() => {
     if (!user || !cloudLoaded.current) return;
@@ -818,7 +842,9 @@ export default function App() {
       } catch (e: any) { setError(e.message); } finally { setBusy(""); }
     },
     openOut: () => setOutOpen(true),
-    user, cloudEnabled, cloudStatus,
+    user, cloudEnabled, cloudStatus, profile,
+    joinCoach: async (code: string) => { if (!user) return; try { const r = await joinCoach(user.uid, code); setProfile((p) => ({ ...p, ...r })); notify(`You're with ${r.coachName} now.`); } catch (e: any) { setError(e.message); } },
+    leaveCoach: async () => { if (!user) return; try { await leaveCoach(user.uid); setProfile((p) => ({ ...p, coachId: undefined, coachName: undefined })); } catch (e: any) { setError(e.message); } },
     signOut: async () => { await signOutCloud(); cloudLoaded.current = false; },
     deleteAccount: async () => { try { await deleteAccount(); localStorage.clear(); location.reload(); } catch (e: any) { setError(e.message || "Could not delete the account. Sign in again and retry."); } },
     resetGoal: () => { clearGoal(); setState((s) => ({ ...s, goals: { ...s.goals, calories: null, protein: null } })); setGoalState(null); setGoalOpen(true); },
@@ -864,7 +890,7 @@ export default function App() {
         </button>
         <h1>{TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
-          {goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · PD {fixed(pdRef)} · set by {goal?.setBy === "coach" ? COACH_NAME : "you"}
+          {goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · PD {fixed(pdRef)} · set by {goal?.setBy === "coach" ? (goal.coachName || profile.coachName || COACH_NAME) : "you"}
         </button>}
       </header>
       <main>

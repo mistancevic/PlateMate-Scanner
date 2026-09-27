@@ -8,7 +8,7 @@ import type { AppApi } from "./api";
 export function HomeScreen(p: AppApi) {
   const { state, setTab, setStep, pdRef, setCamera, setMode, clientName, goal } = p;
   const bandName = goal?.band ? bandOf(goal.band)?.name : null;
-  const setBy = goal?.setBy === "coach" ? COACH_NAME : "you";
+  const setBy = goal?.setBy === "coach" ? (goal.coachName || p.profile.coachName || COACH_NAME) : "you";
   const last = state.meals[0];
   const lastT = last ? aggregate(last.items) : null;
   return (

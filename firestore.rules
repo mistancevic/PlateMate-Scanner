@@ -1,9 +1,19 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Each person reads and writes only their own document.
+    // Each person reads and writes their own document. A coach may read and update the documents of clients who joined with the coach's code.
     match /users/{uid} {
-      allow read, write: if request.auth != null && request.auth.uid == uid;
+      allow read: if request.auth != null && (request.auth.uid == uid || resource.data.coachId == request.auth.uid);
+      allow create, delete: if request.auth != null && request.auth.uid == uid;
+      allow update: if request.auth != null && (
+        (request.auth.uid == uid && request.resource.data.role == resource.data.role) ||
+        (resource.data.coachId == request.auth.uid && request.resource.data.role == resource.data.role && request.resource.data.coachId == resource.data.coachId)
+      );
+    }
+    // A coach's code is readable by any signed-in person, writable only by that coach.
+    match /coaches/{code} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.resource.data.uid == request.auth.uid;
     }
   }
 }

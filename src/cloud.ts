@@ -1,7 +1,7 @@
 // Sign in with Google and keep each person's data under their own account. Off entirely when not configured.
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, type User } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
 
 const cfg = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -34,14 +34,50 @@ export async function signIn() {
 }
 export const signOutCloud = () => signOut(auth());
 
-// One document per person: the pilot state plus goal and name. Small enough for now; foods with photos may need their own collection later.
-export type CloudDoc = { state: unknown; goal: unknown; clientName: string; updatedAt: string };
+// One document per person: the pilot state plus goal and name, and who coaches them.
+// role is set by hand in the Firebase console ("coach"); nobody can sign up as a coach.
+export type CloudDoc = { state: unknown; goal: unknown; clientName: string; updatedAt: string; role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string };
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const snap = await getDoc(doc(db(), "users", uid));
   return snap.exists() ? (snap.data() as CloudDoc) : null;
 }
 export async function saveCloud(uid: string, data: CloudDoc) {
-  await setDoc(doc(db(), "users", uid), data);
+  // merge, so fields the coach or the console own (role, coach link, coachSetAt) are never wiped by the client's save
+  await setDoc(doc(db(), "users", uid), data, { merge: true });
+}
+// ---- coach and clients ----
+// A short code from the coach's uid; the coach publishes it once under coaches/{code}.
+export const codeFor = (uid: string) => { let h = 0; for (const ch of uid) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return h.toString(36).toUpperCase().padStart(6, "0").slice(-6); };
+export async function publishCoachCode(uid: string, name: string) {
+  const code = codeFor(uid);
+  await setDoc(doc(db(), "coaches", code), { uid, name, updatedAt: new Date().toISOString() });
+  return code;
+}
+export async function joinCoach(uid: string, code: string) {
+  const snap = await getDoc(doc(db(), "coaches", code.trim().toUpperCase()));
+  if (!snap.exists()) throw new Error("No coach with that code.");
+  const { uid: coachId, name } = snap.data() as { uid: string; name: string };
+  await updateDoc(doc(db(), "users", uid), { coachId, coachName: name || "your coach" });
+  return { coachId, coachName: name || "your coach" };
+}
+export async function leaveCoach(uid: string) {
+  await updateDoc(doc(db(), "users", uid), { coachId: null, coachName: null });
+}
+export type ClientRow = { uid: string; name: string; goal: any; feedback: any[]; foods: number; updatedAt: string };
+export async function listClients(coachUid: string): Promise<ClientRow[]> {
+  const q = query(collection(db(), "users"), where("coachId", "==", coachUid));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => {
+    const x = d.data() as any;
+    return { uid: d.id, name: x.clientName || "unnamed", goal: x.goal ?? null, feedback: x.state?.feedback ?? [], foods: x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "" };
+  }).sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1));
+}
+export async function setClientGoal(clientUid: string, goal: any, goals: { calories: number; protein: number }, coachName: string) {
+  await updateDoc(doc(db(), "users", clientUid), {
+    goal: { ...goal, setBy: "coach", coachName, setAt: new Date().toISOString() },
+    "state.goals.calories": goals.calories, "state.goals.protein": goals.protein,
+    coachSetAt: new Date().toISOString(),
+  });
 }
 // Plain words for the two failures people will actually hit.
 export function explainCloudError(e: any): string {

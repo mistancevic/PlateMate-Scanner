@@ -10,7 +10,7 @@ export const BANDS: Band[] = [
 ];
 const mid = (r: [number, number]) => Math.round((r[0] + r[1]) / 2);
 const KEY = "chefmealan-goal";
-export type Goal = { band?: string; setBy: "you" | "coach"; setAt: string };
+export type Goal = { band?: string; setBy: "you" | "coach"; setAt: string; coachName?: string };
 export const getGoal = (): Goal | null => { try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch { return null; } };
 export const saveGoal = (g: Goal) => { try { localStorage.setItem(KEY, JSON.stringify(g)); } catch {} };
 export const clearGoal = () => { try { localStorage.removeItem(KEY); } catch {} };
