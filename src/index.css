@@ -336,3 +336,4 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .chat-input input { flex: 1; border: 0; background: none; font: inherit; font-size: 15px; padding: 10px 6px; min-width: 0; }
 .chat-input .icon { width: 40px; height: 40px; }
 .avatar-img { object-fit: cover; }
+.sync { margin: 6px 2px 2px; color: var(--muted); } .sync-bad { color: var(--low); font-weight: 700; }

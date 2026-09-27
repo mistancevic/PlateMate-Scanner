@@ -7,7 +7,7 @@ import { ConfirmButton } from "../components/Confirm";
 import type { AppApi } from "./api";
 
 export function MeScreen(p: AppApi) {
-  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal, resetGoal, addStarter, importAirtable, user, cloudEnabled, signOut, deleteAccount } = p;
+  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal, resetGoal, addStarter, importAirtable, user, cloudEnabled, cloudStatus, signOut, deleteAccount } = p;
   const n = readLog().length;
   const bandName = goal?.band ? bandOf(goal.band)?.name : null;
   const setBy = goal?.setBy === "coach" ? COACH_NAME : "you";
@@ -53,6 +53,9 @@ export function MeScreen(p: AppApi) {
             {user?.photo ? <img className="avatar avatar-img" src={user.photo} alt="" /> : <span className="avatar">{(user?.name || "?").slice(0, 1)}</span>}
             <div><b>{user ? user.name || user.email : "This phone only"}</b><small>{user ? user.email : "no account, data stays here"}</small></div>
           </section>
+          {user && cloudStatus.text && (
+            <p className={`small sync ${cloudStatus.ok ? "" : "sync-bad"}`}>{cloudStatus.text}{cloudStatus.at ? `, ${new Date(cloudStatus.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}. Photos stay on this phone for now.</p>
+          )}
           <div className="button-row">
             {user && <button className="pill pill-small" onClick={signOut}>Sign out</button>}
             {user && <ConfirmButton className="pill pill-small" label="Delete my account and data" confirmLabel="Tap again to delete everything" onConfirm={deleteAccount} />}

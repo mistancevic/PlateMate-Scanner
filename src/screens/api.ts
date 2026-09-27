@@ -55,6 +55,7 @@ export interface AppApi {
   openOut: () => void;
   user: import("../cloud").CloudUser | null;
   cloudEnabled: boolean;
+  cloudStatus: { ok: boolean; text: string; at?: string };
   signOut: () => Promise<void>;
   deleteAccount: () => Promise<void>;
   addStarter: () => void;
