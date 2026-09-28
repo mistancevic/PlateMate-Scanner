@@ -115,7 +115,7 @@ async function generate(
       "AI is not configured. You can still enter labels manually and use the calculated Chef.",
     );
   const ai = new GoogleGenAI({ apiKey, httpOptions: { timeout: opts.fast ? 25000 : 55000 } });
-  const models = opts.fast ? [primaryModel, "gemini-flash-latest", "gemini-3.6-flash"].filter((m, i, a) => a.indexOf(m) === i) : fallbackModels;
+  const models = opts.fast ? [primaryModel, "gemini-flash-latest", "gemini-3.6-flash", "gemini-3.1-flash-lite"].filter((m, i, a) => a.indexOf(m) === i) : fallbackModels;
   const attempts = opts.fast ? 1 : 2;
 
   let lastError: any = null;
