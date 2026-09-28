@@ -6,6 +6,7 @@ import { bandOf } from "../goal";
 import { ConfirmButton } from "../components/Confirm";
 import { CoachArea } from "./CoachScreen";
 import { MOMENTS, RHYTHMS, REGIONS } from "../moments";
+import { SendSheet } from "./CoachScreen";
 import { useState } from "react";
 import type { AppApi } from "./api";
 
@@ -13,6 +14,7 @@ export function MeScreen(p: AppApi) {
   const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal, resetGoal, addStarter, importAirtable, user, cloudEnabled, cloudStatus, signOut, deleteAccount, profile, joinCoach, leaveCoach, notify } = p;
   const [code, setCode] = useState("");
   const [shareFor, setShareFor] = useState<string | null>(null);
+  const [sendCard, setSendCard] = useState<any>(null);
   const [nameDraft, setNameDraft] = useState(clientName);
   const coachName = profile.coachName || COACH_NAME;
   const isCoach = profile.role === "coach";
@@ -80,8 +82,10 @@ export function MeScreen(p: AppApi) {
                     <button className="link" onClick={() => setShareFor(null)}>Cancel</button>
                   </div>
                 : <button className="link" onClick={() => setShareFor(f.id)}>Share with {coachName}</button>)}
+            {isCoach && <button className="link" onClick={() => setSendCard(f)}>Send to a client</button>}
           </div>
         ))}
+        {sendCard && <SendSheet card={sendCard} close={() => setSendCard(null)} {...p} />}
       </section>
 
       {cloudEnabled && (

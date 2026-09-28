@@ -47,15 +47,12 @@ export function CoachArea(p: AppApi) {
           <small className="client-last">{last(r) ? `${last(r).taste}: ${last(r).meal?.title ?? ""} · ${new Date(last(r).createdAt).toLocaleDateString()}${last(r).notes ? ` · ${last(r).notes}` : ""}` : "no meals yet"} · active {r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : "never"}</small>
         </button>
       ))}
-      {open && <ClientSheet row={open} coachName={coachName} coachUid={user?.uid ?? ""} meals={p.state.meals} close={() => setOpen(null)} onSaved={refresh} setError={setError} notify={notify} />}
+      {open && <ClientSheet row={open} coachName={coachName} close={() => setOpen(null)} onSaved={refresh} setError={setError} notify={notify} />}
     </>
   );
 }
 
-function ClientSheet({ row, coachName, coachUid, meals, close, onSaved, setError, notify }: { row: ClientRow; coachName: string; coachUid: string; meals: any[]; close: () => void; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void }) {
-  const [sending, setSending] = useState(false);
-  const [pick, setPick] = useState<string>("");
-  const [note, setNote] = useState("");
+function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row: ClientRow; coachName: string; close: () => void; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void }) {
   const [band, setBand] = useState<string>(row.goal?.band ?? "");
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -89,27 +86,6 @@ function ClientSheet({ row, coachName, coachUid, meals, close, onSaved, setError
             }}>Set this goal</button>
           </>
         )}
-        <div className="button-row" style={{ margin: "4px 0 10px" }}>
-          <button className="pill pill-small" onClick={() => setSending((v) => !v)}>{sending ? "Cancel" : "Send a recipe"}</button>
-        </div>
-        {sending && (
-          <section className="card">
-            {meals.length === 0 && <small>No saved recipes yet. Make one and save it, then send it.</small>}
-            <div className="rows">
-              {meals.slice(0, 20).map((m: any) => (
-                <button key={m.id} className={`row row-food row-button ${pick === m.id ? "on" : ""}`} onClick={() => setPick(m.id)}>
-                  <div className="row-text"><b>{m.title}</b><small>{(m.items ?? []).map((i: any) => `${Math.round(i.grams)} g ${i.food.name}`).join(" · ")}</small></div>
-                </button>
-              ))}
-            </div>
-            <textarea placeholder="A line to go with it, if you like" value={note} onChange={(e) => setNote(e.target.value)} />
-            <button className="pill pill-primary pill-wide" disabled={!pick} onClick={async () => {
-              const m = meals.find((x: any) => x.id === pick); if (!m) return;
-              try { await sendRecipe(row.uid, { id: uid(), from: coachUid, note: note.trim(), meal: structuredClone(m), sentAt: new Date().toISOString() }); notify(`Sent to ${row.name}.`); setSending(false); setPick(""); setNote(""); }
-              catch (e: any) { setError(e.message || "Could not send."); }
-            }}>Send</button>
-          </section>
-        )}
         <p className="label">Shared with you ({row.feedback.length})</p>
         {row.feedback.length === 0 && <small>Nothing yet.</small>}
         {row.feedback.slice(0, 30).map((f: any) => {
@@ -133,6 +109,42 @@ function ClientSheet({ row, coachName, coachUid, meals, close, onSaved, setError
             </section>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+// Send one of my own cards, as a recipe, to one or more clients.
+export function SendSheet(p: AppApi & { card: any; close: () => void }) {
+  const { card, close, user, setError, notify } = p;
+  const [rows, setRows] = useState<ClientRow[]>([]);
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [note, setNote] = useState("");
+  const [busy, setBusy] = useState(false);
+  useEffect(() => { if (user) listClients(user.uid).then(setRows).catch(() => {}); }, [user?.uid]);
+  const items: any[] = card.meal?.items ?? [];
+  return (
+    <div className="sheet-backdrop" onClick={close}>
+      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="card-top"><span>Send "{card.meal?.title}"</span><button className="link" onClick={close}>Cancel</button></div>
+        <small>{items.map((i) => `${Math.round(i.grams)} g ${i.food.name}`).join(" · ")}</small>
+        <p className="label">To</p>
+        <div className="moments">
+          {rows.map((r) => (
+            <button key={r.uid} className={`pill pill-small ${picked.has(r.uid) ? "pill-primary" : ""}`} onClick={() => setPicked((s) => { const n = new Set(s); n.has(r.uid) ? n.delete(r.uid) : n.add(r.uid); return n; })}>{r.name}</button>
+          ))}
+          {rows.length === 0 && <small>No clients yet.</small>}
+        </div>
+        <textarea placeholder="A line to go with it, if you like" value={note} onChange={(e) => setNote(e.target.value)} />
+        <button className="pill pill-primary pill-wide" disabled={!picked.size || busy} onClick={async () => {
+          if (!user) return;
+          setBusy(true);
+          try {
+            for (const cu of picked) await sendRecipe(cu, { id: uid(), from: user.uid, note: note.trim(), meal: structuredClone(card.meal), sentAt: new Date().toISOString() });
+            notify(`Sent to ${picked.size === 1 ? rows.find((r) => r.uid === [...picked][0])?.name : `${picked.size} clients`}.`); close();
+          } catch (e: any) { setError(e.message || "Could not send."); }
+          finally { setBusy(false); }
+        }}>Send</button>
       </div>
     </div>
   );
