@@ -5,6 +5,7 @@ import { exportLog, clearLog, readLog } from "../log";
 import { bandOf } from "../goal";
 import { ConfirmButton } from "../components/Confirm";
 import { CoachArea } from "./CoachScreen";
+import { MOMENTS } from "../moments";
 import { useState } from "react";
 import type { AppApi } from "./api";
 
@@ -46,13 +47,21 @@ export function MeScreen(p: AppApi) {
         </div>
       </section>
       <section className="card">
+        <div className="card-top"><span>My usual moments</span><small>show first when you cook</small></div>
+        <div className="moments">
+          {MOMENTS.filter((m) => m.id !== "regular").map((m) => (
+            <button key={m.id} className={`pill pill-small ${p.usual.includes(m.id) ? "pill-primary" : ""}`} onClick={() => p.setUsual(p.usual.includes(m.id) ? p.usual.filter((x) => x !== m.id) : [...p.usual, m.id])}>{m.name}</button>
+          ))}
+        </div>
+      </section>
+      <section className="card">
         <div className="card-top"><span>Your meals</span><span>{state.feedback.length}</span></div>
         {state.feedback.length === 0 && <small>Nothing yet. It starts after your first DaaM.</small>}
         {state.feedback.slice(0, 8).map((f) => (
           <div className="fb" key={f.id}>
             {f.photo && <img className="fb-photo" src={f.photo} alt="" />}
             <b>{f.taste}</b>
-            <small>{f.meal.title} · {new Date(f.createdAt).toLocaleDateString()}{f.notes ? ` · ${f.notes}` : ""}</small>
+            <small>{f.meal.title}{f.moment && f.moment !== "regular" ? ` · ${MOMENTS.find((m) => m.id === f.moment)?.name}` : ""} · {new Date(f.createdAt).toLocaleDateString()}{f.notes ? ` · ${f.notes}` : ""}</small>
             {profile.coachId && (f.shared
               ? <small className="shared-tag">Shared: {({ look: "look at this", ok: "was this OK?", help: "help me next time" } as const)[f.shared.reason]}</small>
               : shareFor === f.id

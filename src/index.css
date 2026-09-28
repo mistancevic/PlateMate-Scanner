@@ -357,3 +357,7 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .shared-tag { display: block; color: var(--brand-text); font-weight: 700; margin-top: 4px; }
 .reason-tag { font-weight: 600; color: var(--brand-text); font-size: 13px; }
 .name-row { display: flex; gap: 8px; align-items: center; } .name-row input { flex: 1; min-width: 0; }
+
+.moments { display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 6px; }
+.pill-unplanned { border-style: dashed; }
+.moment-hint { margin: 0 0 10px; }

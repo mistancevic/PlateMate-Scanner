@@ -7,6 +7,7 @@ import { log } from "../log";
 import { iconFor } from "../icons";
 import { SwipeRow } from "../components/SwipeRow";
 import { methodsFor } from "../methods";
+import { MOMENTS, momentOf } from "../moments";
 import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
@@ -160,6 +161,13 @@ export function JourneyScreen(p: AppApi) {
     return (
       <>
         <Head title="What are you craving?" sub={`Get the products in. Then ${CHEF_NAME} works out how much of each.`} />
+        <p className="label">When is this for?</p>
+        <div className="moments">
+          {[...MOMENTS].sort((x, y) => (p.usual.includes(y.id) ? 1 : 0) - (p.usual.includes(x.id) ? 1 : 0) || (x.id === "regular" ? -1 : y.id === "regular" ? 1 : 0)).map((m) => (
+            <button key={m.id} className={`pill pill-small ${p.moment === m.id ? "pill-primary" : ""} ${m.planned ? "" : "pill-unplanned"}`} onClick={() => p.setMoment(m.id)}>{m.name}</button>
+          ))}
+        </div>
+        <p className="small moment-hint">{momentOf(p.moment).hint}{p.moment !== "regular" && pdRef !== null ? ` Target for this plate: PD ${fixed(pdRef)}.` : ""}</p>
         {items.length > 0 && (
           <section className={`readout readout-fit-${p.fitPd(pd)}`}>
             <div className="readout-top"><span>As it stands</span><span>PD</span></div>
@@ -239,14 +247,18 @@ export function JourneyScreen(p: AppApi) {
     const dayKcal = state.goals.calories ?? null;
     const share = dayKcal ? Math.round(((ot.calories ?? 0) / dayKcal) * 100) : null;
     const tooBig = shown.filter((i) => i.grams > (cap ?? 300));
-    const unreal = tooBig.length > 0 || (share !== null && share > 50);
+    const meetingBig = p.moment === "meeting" && share !== null && share > 30;
+    const unplanned = !momentOf(p.moment).planned;
+    const unreal = !unplanned && (tooBig.length > 0 || (share !== null && share > 50) || meetingBig);
     const onPlan = !unreal && opd !== null && pdRef !== null && opd >= pdRef - 0.05;
     const unrealText = tooBig.length
       ? `${fmt(tooBig[0].grams, 0)} g of ${tooBig[0].food.name} is not a portion. This food can't get you there at a normal amount; swap it or lower the others.`
-      : `This plate is ${share} % of your day. Fit for a meal, not a dessert.`;
+      : meetingBig
+        ? `This plate is ${share} % of your day. On a meeting day keep it under a third, so the afternoon stays sharp.`
+        : `This plate is ${share} % of your day. Fit for a meal, not a dessert.`;
     return (
       <>
-        <Head title={mover ? `${CHEF_NAME}'s recipe` : "As you set it"} sub={over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : mover ? `${CHEF_NAME} moves the ${mover.food.name}. Change any other amount and it refits.` : `Nothing moved. This is where your amounts land. Tap a grey dot if you want ${CHEF_NAME} to fit one food.`} />
+        <Head title={mover ? `${CHEF_NAME}'s recipe` : "As you set it"} sub={unplanned ? `${momentOf(p.moment).name}. Enjoy it, keep it small. Your next meal leans protein and you're back.` : over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : mover ? `${CHEF_NAME} moves the ${mover.food.name}. Change any other amount and it refits.` : `Nothing moved. This is where your amounts land. Tap a grey dot if you want ${CHEF_NAME} to fit one food.`} />
         <section className={`readout ${unreal ? "readout-fit-mid" : ""}`}>
           <div className="readout-top"><span>This plate</span><span>PD</span></div>
           <div className="readout-mid">
@@ -356,7 +368,7 @@ export function JourneyScreen(p: AppApi) {
         log("feedback", { status, taste, shared: sharing ? shareWhy : null });
         setFeedback({ status, taste, notes: note });
         const shared = sharing && shareWhy ? { reason: shareWhy, at: new Date().toISOString() } : undefined;
-        setState((s) => ({ ...s, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, photo: plate || undefined, shared, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
+        setState((s) => ({ ...s, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, photo: plate || undefined, shared, moment: p.moment, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
         setGood(null); setNote(""); setPlate(""); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); setStep("in");
       }}>{sharing ? `Save and share with ${p.profile.coachName || "your coach"}` : "Save"}</button>
       {p.profile.coachId && !sharing && <button className="pill pill-wide" onClick={() => setSharing(true)}>Share with {p.profile.coachName || "your coach"}</button>}

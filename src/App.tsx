@@ -37,6 +37,7 @@ import { SignInScreen } from "./screens/SignInScreen";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, type CloudUser } from "./cloud";
 import { getGoal, clearGoal, bandOf, goalsForBand, fit as fitPd } from "./goal";
 import { STARTER_FOODS } from "./starter";
+import { momentTarget, getUsual, setUsual, type MomentId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
 import { Home, CircleUser } from "lucide-react";
@@ -404,6 +405,8 @@ export default function App() {
     cloudLoaded = useRef(false),
     [cloudStatus, setCloudStatus] = useState<{ ok: boolean; text: string; at?: string }>({ ok: true, text: "" }),
     [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string }>({}),
+    [moment, setMomentState] = useState<MomentId>("regular"),
+    [usual, setUsualState] = useState<MomentId[]>(getUsual),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -726,7 +729,7 @@ export default function App() {
   function mix(id: string = adjustId): boolean { return mixWith(state.items, id); }
   function mixWith(itemsIn: Ingredient[], id: string): boolean {
     setError("");
-    const target = density(state.goals.protein, state.goals.calories);
+    const target = momentTarget(moment, density(state.goals.protein, state.goals.calories));
     if (target === null || target <= 0) {
       setError("Set daily energy and protein targets first.");
       return false;
@@ -832,7 +835,8 @@ export default function App() {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   const totals = aggregate(state.items),
-    pdRef = density(state.goals.protein, state.goals.calories);
+    dayPd = density(state.goals.protein, state.goals.calories),
+    pdRef = momentTarget(moment, dayPd);
   const selected = portionTotals(state.items, state.portion);
   const matched =
     selected.calories !== null &&
@@ -845,7 +849,8 @@ export default function App() {
     api, setImage, setEdit, setGoalsOpen, setAccessOpen, setReviewMeal,
     setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
-    pdRef, matched, importRef, filter, setFilter,
+    pdRef, dayPd, moment, setMoment: (m: MomentId) => setMomentState(m), usual, setUsual: (ids: MomentId[]) => { setUsual(ids); setUsualState(ids); },
+    matched, importRef, filter, setFilter,
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
     step, setStep, mixWith,
     clientName, setClientName: (v: string) => { storeClientName(v); setClientNameState(v); },
@@ -926,7 +931,7 @@ export default function App() {
         </button>
         <h1>{TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
-          {goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · PD {fixed(pdRef)} · set by {goal?.setBy === "coach" ? (goal.coachName || profile.coachName || COACH_NAME) : "you"}
+          {goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · PD {fixed(dayPd)} · set by {goal?.setBy === "coach" ? (goal.coachName || profile.coachName || COACH_NAME) : "you"}
         </button>}
       </header>
       <main>

@@ -47,6 +47,11 @@ export interface AppApi {
   services: { ai: boolean; airtable: boolean } | null;
   totals: ReturnType<typeof import("../pilot").aggregate>;
   pdRef: number | null;
+  dayPd: number | null;
+  moment: import("../moments").MomentId;
+  setMoment: (m: import("../moments").MomentId) => void;
+  usual: import("../moments").MomentId[];
+  setUsual: (ids: import("../moments").MomentId[]) => void;
   matched: boolean;
   mealanCard: ReactNode;
   importRef: RefObject<HTMLInputElement | null>;

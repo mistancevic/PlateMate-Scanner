@@ -4,6 +4,7 @@ import { listClients, setClientGoal, publishCoachCode, loadPhotos, type ClientRo
 import { BANDS, bandOf, goalsForBand } from "../goal";
 import { fixed } from "../ui";
 import { density } from "../pilot";
+import { MOMENTS } from "../moments";
 import type { AppApi } from "./api";
 
 // The coach's area on Me: the code to share, the client list, and a client's cards with a goal to set.
@@ -94,7 +95,7 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row
               <div className="client-card-top">
                 <div>
                   <b>{f.taste}{f.shared?.reason ? <span className="reason-tag"> · {({ look: "look at this", ok: "was this OK?", help: "help me next time" } as any)[f.shared.reason]}</span> : null}</b>
-                  <small>{new Date(f.createdAt).toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" })}</small>
+                  <small>{f.moment && f.moment !== "regular" ? `${MOMENTS.find((m) => m.id === f.moment)?.name} · ` : ""}{new Date(f.createdAt).toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" })}</small>
                 </div>
                 {photo && <img className="client-photo" src={photo} alt="" />}
               </div>
