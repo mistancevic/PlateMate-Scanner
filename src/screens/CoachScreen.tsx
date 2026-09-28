@@ -40,7 +40,7 @@ export function CoachArea(p: AppApi) {
         <button className="card client-row" key={r.uid} onClick={() => setOpen(r)}>
           <div className="client-head">
             <span className="avatar">{r.name.slice(0, 1).toUpperCase()}</span>
-            <div><b>{r.name}</b><small>{r.goal?.band ? bandOf(r.goal.band)?.name : "no goal yet"} · {r.foods} foods · {daam(r)} DaaM good</small></div>
+            <div><b>{r.name}</b><small>{r.goal?.band ? bandOf(r.goal.band)?.name : "no goal yet"} · {r.foods} foods · {r.feedback.length} shared · {daam(r)} DaaM good</small></div>
           </div>
           <small className="client-last">{last(r) ? `${last(r).taste}: ${last(r).meal?.title ?? ""} · ${new Date(last(r).createdAt).toLocaleDateString()}${last(r).notes ? ` · ${last(r).notes}` : ""}` : "no meals yet"} · active {r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : "never"}</small>
         </button>
@@ -84,7 +84,7 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row
             }}>Set this goal</button>
           </>
         )}
-        <p className="label">What they told you ({row.feedback.length})</p>
+        <p className="label">Shared with you ({row.feedback.length})</p>
         {row.feedback.length === 0 && <small>Nothing yet.</small>}
         {row.feedback.slice(0, 30).map((f: any) => {
           const items: any[] = f.meal?.items ?? [];
@@ -93,7 +93,7 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row
             <section className="card client-card" key={f.id}>
               <div className="client-card-top">
                 <div>
-                  <b>{f.taste}</b>
+                  <b>{f.taste}{f.shared?.reason ? <span className="reason-tag"> · {({ look: "look at this", ok: "was this OK?", help: "help me next time" } as any)[f.shared.reason]}</span> : null}</b>
                   <small>{new Date(f.createdAt).toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" })}</small>
                 </div>
                 {photo && <img className="client-photo" src={photo} alt="" />}

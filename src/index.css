@@ -353,3 +353,6 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .client-photo { width: 72px; height: 72px; border-radius: 12px; object-fit: cover; flex: none; }
 .client-plate { margin-top: 8px; } .client-plate b { display: block; font-size: 14px; } .client-plate small { display: block; color: var(--muted); margin-top: 2px; }
 .client-note { margin: 8px 0 0; font-size: 14px; color: var(--ink); }
+.reasons { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 10px; }
+.shared-tag { display: block; color: var(--brand-text); font-weight: 700; margin-top: 4px; }
+.reason-tag { font-weight: 600; color: var(--brand-text); font-size: 13px; }

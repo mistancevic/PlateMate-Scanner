@@ -53,6 +53,7 @@ export interface AppApi {
   goal: import("../goal").Goal | null;
   openGoal: () => void;
   openOut: () => void;
+  shareCard: (id: string, reason: "look" | "ok" | "help") => void;
   user: import("../cloud").CloudUser | null;
   cloudEnabled: boolean;
   cloudStatus: { ok: boolean; text: string; at?: string };

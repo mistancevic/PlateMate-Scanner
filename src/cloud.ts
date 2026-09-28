@@ -67,10 +67,13 @@ export type ClientRow = { uid: string; name: string; goal: any; feedback: any[];
 export async function listClients(coachUid: string): Promise<ClientRow[]> {
   const q = query(collection(db(), "users"), where("coachId", "==", coachUid));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => {
+  const rows = await Promise.all(snap.docs.map(async (d) => {
     const x = d.data() as any;
-    return { uid: d.id, name: x.clientName || "unnamed", goal: x.goal ?? null, feedback: x.state?.feedback ?? [], foods: x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "" };
-  }).sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1));
+    let feedback: any[] = [];
+    try { feedback = await loadSharedCards(d.id); } catch { /* none shared or not allowed */ }
+    return { uid: d.id, name: x.clientName || "unnamed", goal: x.goal ?? null, feedback, foods: x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "" };
+  }));
+  return rows.sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1));
 }
 export async function setClientGoal(clientUid: string, goal: any, goals: { calories: number; protein: number }, coachName: string) {
   await updateDoc(doc(db(), "users", clientUid), {
@@ -94,9 +97,34 @@ export function stripPhotos<T>(state: T): T {
   (s.foods ?? []).forEach(strip);
   (s.items ?? []).forEach((i: any) => strip(i.food));
   (s.meals ?? []).forEach((m: any) => (m.items ?? []).forEach((i: any) => strip(i.food)));
-  (s.feedback ?? []).forEach((fb: any) => { delete fb.photo; (fb.meal?.items ?? []).forEach((i: any) => strip(i.food)); });
+  s.feedback = []; // cards live as their own documents, see saveCards
   return s;
 }
+// ---- cards ----
+// Each meal card is its own document under users/{uid}/cards. Private by default; the coach may read only shared ones.
+export async function saveCards(uid: string, cards: any[]) {
+  for (let i = 0; i < cards.length; i += 20) {
+    const b = writeBatch(db());
+    for (const fb of cards.slice(i, i + 20)) {
+      const copy = structuredClone(fb); delete copy.photo;
+      (copy.meal?.items ?? []).forEach((it: any) => { if (it.food) delete it.food.photo; });
+      b.set(doc(db(), "users", uid, "cards", fb.id), { ...copy, shared: fb.shared ? true : false, reason: fb.shared?.reason ?? null, sharedAt: fb.shared?.at ?? null });
+    }
+    await b.commit();
+  }
+}
+export async function loadCards(uid: string): Promise<any[]> {
+  const snap = await getDocs(collection(db(), "users", uid, "cards"));
+  return snap.docs.map((d) => { const x = d.data() as any; const { shared, reason, sharedAt, ...rest } = x; return { ...rest, shared: shared ? { reason, at: sharedAt } : undefined }; })
+    .sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
+}
+export async function loadSharedCards(clientUid: string): Promise<any[]> {
+  const q = query(collection(db(), "users", clientUid, "cards"), where("shared", "==", true));
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => { const x = d.data() as any; const { shared, reason, sharedAt, ...rest } = x; return { ...rest, shared: { reason, at: sharedAt } }; })
+    .sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
+}
+export async function deleteCard(uid: string, id: string) { await deleteDoc(doc(db(), "users", uid, "cards", id)); }
 export const isEmptyState = (st: any) => !st || ((st.foods?.length ?? 0) === 0 && (st.feedback?.length ?? 0) === 0 && (st.meals?.length ?? 0) === 0);
 export async function deleteAccount() {
   const u = auth().currentUser; if (!u) return;

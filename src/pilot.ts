@@ -59,6 +59,7 @@ export type Feedback = {
   notes: string;
   createdAt: string;
   photo?: string;
+  shared?: { reason: "look" | "ok" | "help"; at: string };
 };
 export type PilotState = {
   version: 1;

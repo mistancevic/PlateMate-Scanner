@@ -11,6 +11,7 @@ import type { AppApi } from "./api";
 export function MeScreen(p: AppApi) {
   const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal, resetGoal, addStarter, importAirtable, user, cloudEnabled, cloudStatus, signOut, deleteAccount, profile, joinCoach, leaveCoach } = p;
   const [code, setCode] = useState("");
+  const [shareFor, setShareFor] = useState<string | null>(null);
   const coachName = profile.coachName || COACH_NAME;
   const isCoach = profile.role === "coach";
   const n = readLog().length;
@@ -40,13 +41,23 @@ export function MeScreen(p: AppApi) {
         </div>
       </section>
       <section className="card">
-        <div className="card-top"><span>What you told {coachName}</span><span>{state.feedback.length}</span></div>
+        <div className="card-top"><span>Your meals</span><span>{state.feedback.length}</span></div>
         {state.feedback.length === 0 && <small>Nothing yet. It starts after your first DaaM.</small>}
-        {state.feedback.slice(0, 5).map((f) => (
+        {state.feedback.slice(0, 8).map((f) => (
           <div className="fb" key={f.id}>
             {f.photo && <img className="fb-photo" src={f.photo} alt="" />}
             <b>{f.taste}</b>
             <small>{f.meal.title} · {new Date(f.createdAt).toLocaleDateString()}{f.notes ? ` · ${f.notes}` : ""}</small>
+            {profile.coachId && (f.shared
+              ? <small className="shared-tag">Shared: {({ look: "look at this", ok: "was this OK?", help: "help me next time" } as const)[f.shared.reason]}</small>
+              : shareFor === f.id
+                ? <div className="reasons">
+                    {([["look", "Look at this"], ["ok", "Was this OK?"], ["help", "Help me next time"]] as const).map(([k, l]) => (
+                      <button key={k} className="pill pill-small" onClick={() => { p.shareCard(f.id, k); setShareFor(null); }}>{l}</button>
+                    ))}
+                    <button className="link" onClick={() => setShareFor(null)}>Cancel</button>
+                  </div>
+                : <button className="link" onClick={() => setShareFor(f.id)}>Share with {coachName}</button>)}
           </div>
         ))}
       </section>

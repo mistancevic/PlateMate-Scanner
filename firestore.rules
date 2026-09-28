@@ -15,9 +15,15 @@ service cloud.firestore {
       allow create: if isOwner() && request.resource.data.get('role', '') == '';
       allow delete: if isOwner();
       allow update: if (isOwner() && roleKept()) || (isCoachOf() && roleKept() && coachKept());
+      function coachOfParent() { return request.auth != null && get(/databases/$(database)/documents/users/$(uid)).data.get('coachId', '') == request.auth.uid; }
       // Photos: the owner reads and writes; the coach of that person reads.
       match /photos/{pid} {
-        allow read: if request.auth != null && (request.auth.uid == uid || get(/databases/$(database)/documents/users/$(uid)).data.get('coachId', '') == request.auth.uid);
+        allow read: if request.auth != null && (request.auth.uid == uid || coachOfParent());
+        allow write: if request.auth != null && request.auth.uid == uid;
+      }
+      // Cards: private by default. The owner reads and writes; the coach reads only cards marked shared.
+      match /cards/{cid} {
+        allow read: if request.auth != null && (request.auth.uid == uid || (coachOfParent() && resource.data.get('shared', false) == true));
         allow write: if request.auth != null && request.auth.uid == uid;
       }
     }

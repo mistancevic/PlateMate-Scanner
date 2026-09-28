@@ -34,7 +34,7 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen } from "./screens/OutScreen";
 import { SignInScreen } from "./screens/SignInScreen";
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, type CloudUser } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, type CloudUser } from "./cloud";
 import { getGoal, clearGoal, bandOf, goalsForBand, fit as fitPd } from "./goal";
 import { STARTER_FOODS } from "./starter";
 import { JourneyScreen } from "./screens/JourneyScreen";
@@ -478,8 +478,12 @@ export default function App() {
             const localFb = new Map(state.feedback.map((f) => [f.id, f.photo]));
             let cloudPhotos = new Map<string, string>();
             try { cloudPhotos = await loadPhotos(user.uid); } catch { /* photos are optional */ }
+            let cards: any[] = [];
+            try { cards = await loadCards(user.uid); } catch { /* none yet */ }
+            const byId = new Map<string, any>();
+            for (const fb of [...cards, ...incoming.feedback, ...state.feedback]) if (!byId.has(fb.id)) byId.set(fb.id, fb);
             incoming.foods = incoming.foods.map((f) => ({ ...f, photo: f.photo ?? localPhoto.get(f.id) ?? cloudPhotos.get(`food:${f.id}`) }));
-            incoming.feedback = incoming.feedback.map((f) => ({ ...f, photo: f.photo ?? localFb.get(f.id) ?? cloudPhotos.get(`fb:${f.id}`) }));
+            incoming.feedback = [...byId.values()].sort((x, y) => (y.createdAt > x.createdAt ? 1 : -1)).map((f) => ({ ...f, photo: f.photo ?? localFb.get(f.id) ?? cloudPhotos.get(`fb:${f.id}`) }));
             setState(incoming);
           } catch { /* keep local if the cloud copy is unreadable */ }
           if (remote.goal) { try { localStorage.setItem("chefmealan-goal", JSON.stringify(remote.goal)); } catch {} setGoalState(getGoal()); setGoalOpen(!remote.goal); }
@@ -535,6 +539,7 @@ export default function App() {
       saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, updatedAt: new Date().toISOString() })
         .then(async () => {
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
+          try { if (state.feedback.length) await saveCards(user.uid, state.feedback); } catch (e) { setCloudStatus({ ok: true, text: `Saved. Cards: ${explainCloudError(e)}`, at: new Date().toISOString() }); }
           // photos not yet in the account go up now, once
           let done = new Set<string>();
           try { done = new Set(JSON.parse(localStorage.getItem(`chefmealan-photos-up-${user.uid}`) || "[]")); } catch {}
@@ -869,6 +874,10 @@ export default function App() {
       } catch (e: any) { setError(e.message); } finally { setBusy(""); }
     },
     openOut: () => setOutOpen(true),
+    shareCard: (id: string, reason: "look" | "ok" | "help") => {
+      setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, shared: { reason, at: new Date().toISOString() } } : f)) }));
+      notify(`Shared with ${profile.coachName || "your coach"}.`);
+    },
     user, cloudEnabled, cloudStatus, profile,
     joinCoach: async (code: string) => { if (!user) return; try { const r = await joinCoach(user.uid, code); setProfile((p) => ({ ...p, ...r })); notify(`You're with ${r.coachName} now.`); } catch (e: any) { setError(e.message); } },
     leaveCoach: async () => { if (!user) return; try { await leaveCoach(user.uid); setProfile((p) => ({ ...p, coachId: undefined, coachName: undefined })); } catch (e: any) { setError(e.message); } },

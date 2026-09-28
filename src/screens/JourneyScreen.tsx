@@ -41,6 +41,8 @@ export function JourneyScreen(p: AppApi) {
   const [good, setGood] = useState<"daam" | "good" | "no" | null>(null);
   const [plate, setPlate] = useState<string>("");
   const [method, setMethod] = useState<string | null>(null);
+  const [shareWhy, setShareWhy] = useState<"look" | "ok" | "help" | null>(null);
+  const [sharing, setSharing] = useState(false);
   const [swapId, setSwapId] = useState<string | null>(null);
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const [suggest, setSuggest] = useState<{ id: string; grams: number } | null>(null);
@@ -326,7 +328,7 @@ export function JourneyScreen(p: AppApi) {
   // after
   return (
     <>
-      <Head title="How was it?" sub={`One tap. ${COACH_NAME} sees it.`} />
+      <Head title="How was it?" sub="One tap. It stays yours unless you share it." />
       <div className="choices three">
         <button className={`choice ${good === "daam" ? "on" : ""}`} onClick={() => setGood("daam")}><ThumbsUp size={24} /><span>DaaM good</span></button>
         <button className={`choice ${good === "good" ? "on" : ""}`} onClick={() => setGood("good")}><ThumbsUp size={22} /><span>Good</span></button>
@@ -340,17 +342,25 @@ export function JourneyScreen(p: AppApi) {
         }} />
       </label>
       <textarea placeholder="A line for your coach, if you like" value={note} onChange={(e) => setNote(e.target.value)} />
-      <button className="pill pill-primary pill-wide" disabled={good === null} onClick={() => {
+      {sharing && p.profile.coachId && (
+        <div className="reasons">
+          {([["look", "Look at this"], ["ok", "Was this OK?"], ["help", "Help me next time"]] as const).map(([k, l]) => (
+            <button key={k} className={`pill pill-small ${shareWhy === k ? "pill-primary" : ""}`} onClick={() => setShareWhy(k)}>{l}</button>
+          ))}
+        </div>
+      )}
+      <button className="pill pill-primary pill-wide" disabled={good === null || (sharing && !shareWhy)} onClick={() => {
         const meal = state.meals[0] ?? { id: uid(), title: state.title || "DaaM", items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString() };
         const status = good === "no" ? "not-used" : "eaten";
         const taste = TASTE[good!];
-        log("feedback", { status, taste });
+        log("feedback", { status, taste, shared: sharing ? shareWhy : null });
         setFeedback({ status, taste, notes: note });
-        setState((s) => ({ ...s, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, photo: plate || undefined, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
-        setGood(null); setNote(""); setPlate(""); setTouched(new Set()); setSuggest(null); setStep("in");
-        notify(`Thanks. ${COACH_NAME} will see it.`);
-        setTab("home");
-      }}>Send to {COACH_NAME}</button>
+        const shared = sharing && shareWhy ? { reason: shareWhy, at: new Date().toISOString() } : undefined;
+        setState((s) => ({ ...s, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, photo: plate || undefined, shared, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
+        setGood(null); setNote(""); setPlate(""); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); setStep("in");
+      }}>{sharing ? `Save and share with ${p.profile.coachName || "your coach"}` : "Save"}</button>
+      {p.profile.coachId && !sharing && <button className="pill pill-wide" onClick={() => setSharing(true)}>Share with {p.profile.coachName || "your coach"}</button>}
+      {sharing && <button className="link" onClick={() => { setSharing(false); setShareWhy(null); }}>Keep it private</button>}
       <Back to="recipe" />
     </>
   );
