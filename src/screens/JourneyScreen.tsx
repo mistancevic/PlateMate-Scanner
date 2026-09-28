@@ -7,7 +7,7 @@ import { log } from "../log";
 import { iconFor } from "../icons";
 import { SwipeRow } from "../components/SwipeRow";
 import { methodsFor } from "../methods";
-import { momentOf, orderMoments } from "../moments";
+import { momentOf, orderMoments, REGIONS } from "../moments";
 import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
@@ -168,6 +168,17 @@ export function JourneyScreen(p: AppApi) {
           ))}
         </div>
         <p className="small moment-hint">{momentOf(p.moment).hint}{p.moment !== "regular" && pdRef !== null ? ` Target for this plate: PD ${fixed(pdRef)}.` : ""}</p>
+        {p.moment === "travel" && (
+          <>
+            <p className="label">Where to?</p>
+            <div className="moments">
+              {REGIONS.filter((r) => r.id !== p.region).map((r) => (
+                <button key={r.id} className={`pill pill-small ${p.travelTo === r.id ? "pill-primary" : ""}`} onClick={() => p.setTravelTo(p.travelTo === r.id ? null : r.id)}>{r.name}</button>
+              ))}
+            </div>
+            <p className="small moment-hint">{p.travelTo ? `${CHEF_NAME} plans with what's sold in ${REGIONS.find((r) => r.id === p.travelTo)?.name}. Use the chat to shop and cook there.` : "Pick the place and Mealan plans with its shelves."}</p>
+          </>
+        )}
         {items.length > 0 && (
           <section className={`readout readout-fit-${p.fitPd(pd)}`}>
             <div className="readout-top"><span>As it stands</span><span>PD</span></div>

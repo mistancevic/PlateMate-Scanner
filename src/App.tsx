@@ -37,7 +37,7 @@ import { SignInScreen } from "./screens/SignInScreen";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, type CloudUser } from "./cloud";
 import { getGoal, clearGoal, bandOf, goalsForBand, fit as fitPd } from "./goal";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
-import { momentTarget, getUsual, setUsual, getRegion, setRegion, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
+import { momentTarget, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
 import { Home, CircleUser } from "lucide-react";
@@ -408,6 +408,7 @@ export default function App() {
     [moment, setMomentState] = useState<MomentId>("regular"),
     [usual, setUsualState] = useState<RhythmId[]>(getUsual),
     [region, setRegionState] = useState<RegionId | null>(getRegion),
+    [travelTo, setTravelToState] = useState<RegionId | null>(getTravelTo),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -852,6 +853,7 @@ export default function App() {
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
     pdRef, dayPd, moment, setMoment: (m: MomentId) => setMomentState(m), usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
+    travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     matched, importRef, filter, setFilter,
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
     step, setStep, mixWith,

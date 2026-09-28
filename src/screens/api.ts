@@ -54,6 +54,8 @@ export interface AppApi {
   setUsual: (ids: import("../moments").RhythmId[]) => void;
   region: import("../moments").RegionId | null;
   setRegion: (r: import("../moments").RegionId) => void;
+  travelTo: import("../moments").RegionId | null;
+  setTravelTo: (r: import("../moments").RegionId | null) => void;
   matched: boolean;
   mealanCard: ReactNode;
   importRef: RefObject<HTMLInputElement | null>;
