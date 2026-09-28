@@ -15,6 +15,11 @@ service cloud.firestore {
       allow create: if isOwner() && request.resource.data.get('role', '') == '';
       allow delete: if isOwner();
       allow update: if (isOwner() && roleKept()) || (isCoachOf() && roleKept() && coachKept());
+      // Photos: the owner reads and writes; the coach of that person reads.
+      match /photos/{pid} {
+        allow read: if request.auth != null && (request.auth.uid == uid || get(/databases/$(database)/documents/users/$(uid)).data.get('coachId', '') == request.auth.uid);
+        allow write: if request.auth != null && request.auth.uid == uid;
+      }
     }
     // A coach's code: readable by any signed-in person, writable only by that coach.
     match /coaches/{code} {

@@ -59,7 +59,7 @@ export function MeScreen(p: AppApi) {
             <div><b>{user ? user.name || user.email : "This phone only"}</b><small>{user ? user.email : "no account, data stays here"}</small></div>
           </section>
           {user && cloudStatus.text && (
-            <p className={`small sync ${cloudStatus.ok ? "" : "sync-bad"}`}>{cloudStatus.text}{cloudStatus.at ? `, ${new Date(cloudStatus.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}. Photos stay on this phone for now.</p>
+            <p className={`small sync ${cloudStatus.ok ? "" : "sync-bad"}`}>{cloudStatus.text}{cloudStatus.at ? `, ${new Date(cloudStatus.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}.</p>
           )}
           <div className="button-row">
             {user && <button className="pill pill-small" onClick={signOut}>Sign out</button>}

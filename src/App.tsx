@@ -34,7 +34,7 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen } from "./screens/OutScreen";
 import { SignInScreen } from "./screens/SignInScreen";
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, type CloudUser } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, type CloudUser } from "./cloud";
 import { getGoal, clearGoal, bandOf, goalsForBand, fit as fitPd } from "./goal";
 import { STARTER_FOODS } from "./starter";
 import { JourneyScreen } from "./screens/JourneyScreen";
@@ -476,8 +476,10 @@ export default function App() {
             const incoming = parseState(JSON.stringify(remote.state));
             const localPhoto = new Map(state.foods.map((f) => [f.id, f.photo]));
             const localFb = new Map(state.feedback.map((f) => [f.id, f.photo]));
-            incoming.foods = incoming.foods.map((f) => ({ ...f, photo: f.photo ?? localPhoto.get(f.id) }));
-            incoming.feedback = incoming.feedback.map((f) => ({ ...f, photo: f.photo ?? localFb.get(f.id) }));
+            let cloudPhotos = new Map<string, string>();
+            try { cloudPhotos = await loadPhotos(user.uid); } catch { /* photos are optional */ }
+            incoming.foods = incoming.foods.map((f) => ({ ...f, photo: f.photo ?? localPhoto.get(f.id) ?? cloudPhotos.get(`food:${f.id}`) }));
+            incoming.feedback = incoming.feedback.map((f) => ({ ...f, photo: f.photo ?? localFb.get(f.id) ?? cloudPhotos.get(`fb:${f.id}`) }));
             setState(incoming);
           } catch { /* keep local if the cloud copy is unreadable */ }
           if (remote.goal) { try { localStorage.setItem("chefmealan-goal", JSON.stringify(remote.goal)); } catch {} setGoalState(getGoal()); setGoalOpen(!remote.goal); }
@@ -531,7 +533,23 @@ export default function App() {
     if (!user || !cloudLoaded.current) return;
     const t = setTimeout(() => {
       saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, updatedAt: new Date().toISOString() })
-        .then(() => setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() }))
+        .then(async () => {
+          setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
+          // photos not yet in the account go up now, once
+          let done = new Set<string>();
+          try { done = new Set(JSON.parse(localStorage.getItem(`chefmealan-photos-up-${user.uid}`) || "[]")); } catch {}
+          const pending = [
+            ...state.foods.filter((f) => f.photo && f.photo.startsWith("data:")).map((f) => ({ key: `food:${f.id}`, data: f.photo! })),
+            ...state.feedback.filter((f) => f.photo && f.photo.startsWith("data:")).map((f) => ({ key: `fb:${f.id}`, data: f.photo! })),
+          ].filter((p) => !done.has(p.key));
+          if (!pending.length) return;
+          try {
+            await savePhotos(user.uid, pending);
+            pending.forEach((p) => done.add(p.key));
+            try { localStorage.setItem(`chefmealan-photos-up-${user.uid}`, JSON.stringify([...done])); } catch {}
+            setCloudStatus({ ok: true, text: `Saved to your account, with ${pending.length} photo${pending.length === 1 ? "" : "s"}`, at: new Date().toISOString() });
+          } catch (e) { setCloudStatus({ ok: true, text: `Saved to your account. Photos: ${explainCloudError(e)}`, at: new Date().toISOString() }); }
+        })
         .catch((e) => setCloudStatus({ ok: false, text: `Not saved: ${explainCloudError(e)}` }));
     }, 1000);
     return () => clearTimeout(t);

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { RefreshCw, Copy, Target } from "lucide-react";
-import { listClients, setClientGoal, publishCoachCode, type ClientRow } from "../cloud";
+import { listClients, setClientGoal, publishCoachCode, loadPhotos, type ClientRow } from "../cloud";
 import { BANDS, bandOf, goalsForBand } from "../goal";
 import { fixed } from "../ui";
 import { density } from "../pilot";
@@ -53,6 +53,8 @@ export function CoachArea(p: AppApi) {
 function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row: ClientRow; coachName: string; close: () => void; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void }) {
   const [band, setBand] = useState<string>(row.goal?.band ?? "");
   const [saving, setSaving] = useState(false);
+  const [photos, setPhotos] = useState<Map<string, string>>(new Map());
+  useEffect(() => { loadPhotos(row.uid).then(setPhotos).catch(() => {}); }, [row.uid]);
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -76,6 +78,7 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row
         {row.feedback.length === 0 && <small>Nothing yet.</small>}
         {row.feedback.slice(0, 20).map((f: any) => (
           <div className="fb" key={f.id}>
+            {photos.get(`fb:${f.id}`) && <img className="fb-photo" src={photos.get(`fb:${f.id}`)} alt="" />}
             <b>{f.taste}</b>
             <small>{f.meal?.title} · {new Date(f.createdAt).toLocaleDateString()}{f.notes ? ` · ${f.notes}` : ""}{f.meal?.items?.length ? ` · PD ${fixed(density(f.meal.items.reduce((n: number, i: any) => n + (i.food.protein ?? 0) * i.grams / 100, 0), f.meal.items.reduce((n: number, i: any) => n + (i.food.calories ?? 0) * i.grams / 100, 0)))}` : ""}</small>
           </div>

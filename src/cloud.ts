@@ -1,7 +1,7 @@
 // Sign in with Google and keep each person's data under their own account. Off entirely when not configured.
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, type User } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { getFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch } from "firebase/firestore";
 
 const cfg = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -102,4 +102,19 @@ export async function deleteAccount() {
   const u = auth().currentUser; if (!u) return;
   await deleteDoc(doc(db(), "users", u.uid)).catch(() => {});
   await deleteUser(u);
+}
+
+// ---- photos ----
+// Small pictures (label thumbnails, plate photos) live one per document under users/{uid}/photos, so the main document stays small
+// and a second device, or the coach, can fetch them. Keys: food:<foodId>, fb:<feedbackId>.
+export async function savePhotos(uid: string, photos: { key: string; data: string }[]) {
+  for (let i = 0; i < photos.length; i += 20) {
+    const b = writeBatch(db());
+    for (const p of photos.slice(i, i + 20)) b.set(doc(db(), "users", uid, "photos", p.key), { data: p.data, updatedAt: new Date().toISOString() });
+    await b.commit();
+  }
+}
+export async function loadPhotos(uid: string): Promise<Map<string, string>> {
+  const snap = await getDocs(collection(db(), "users", uid, "photos"));
+  return new Map(snap.docs.map((d) => [d.id, (d.data() as any).data as string]));
 }
