@@ -36,8 +36,8 @@ import { OutScreen } from "./screens/OutScreen";
 import { SignInScreen } from "./screens/SignInScreen";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, type CloudUser } from "./cloud";
 import { getGoal, clearGoal, bandOf, goalsForBand, fit as fitPd } from "./goal";
-import { STARTER_FOODS } from "./starter";
-import { momentTarget, getUsual, setUsual, type MomentId, type RhythmId } from "./moments";
+import { STARTER_FOODS, STARTER_REGION } from "./starter";
+import { momentTarget, getUsual, setUsual, getRegion, setRegion, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
 import { Home, CircleUser } from "lucide-react";
@@ -407,6 +407,7 @@ export default function App() {
     [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string }>({}),
     [moment, setMomentState] = useState<MomentId>("regular"),
     [usual, setUsualState] = useState<RhythmId[]>(getUsual),
+    [region, setRegionState] = useState<RegionId | null>(getRegion),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -850,6 +851,7 @@ export default function App() {
     setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
     pdRef, dayPd, moment, setMoment: (m: MomentId) => setMomentState(m), usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
+    region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     matched, importRef, filter, setFilter,
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
     step, setStep, mixWith,
@@ -858,7 +860,10 @@ export default function App() {
     addStarter: () => {
       setState((s) => {
         const have = new Set(s.foods.map((f) => (f.name + "|" + f.brand).toLowerCase()));
-        const add = STARTER_FOODS.filter((f) => !have.has((f.name + "|" + f.brand).toLowerCase())).map((f) => ({ ...f, id: uid(), reviewedAt: new Date().toISOString() }));
+        const tags = new Set(REGIONS.find((r) => r.id === (region ?? "elsewhere"))?.tags ?? ["*"]);
+        const add = STARTER_FOODS
+          .filter((f) => (STARTER_REGION[f.id] ?? ["*"]).some((t) => tags.has(t)))
+          .filter((f) => !have.has((f.name + "|" + f.brand).toLowerCase())).map((f) => ({ ...f, id: uid(), reviewedAt: new Date().toISOString() }));
         notify(add.length ? `${add.length} starter foods added.` : "Starter foods are already in your library.");
         return { ...s, foods: [...s.foods, ...add] };
       });

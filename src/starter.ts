@@ -1,5 +1,6 @@
 // Twenty starter foods with drawn pictures, for an empty library. Values are label-style per 100 g; generic ones say check your package.
 import type { Food } from "./pilot";
+export const STARTER_REGION: Record<string, string[]> = { "f-nutella": ["de"], "f-skyr": ["de"], "f-keks": ["de"] };
 export const STARTER_FOODS: Food[] = [
  {
   "id": "f-nutella",

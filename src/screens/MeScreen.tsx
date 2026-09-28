@@ -5,7 +5,7 @@ import { exportLog, clearLog, readLog } from "../log";
 import { bandOf } from "../goal";
 import { ConfirmButton } from "../components/Confirm";
 import { CoachArea } from "./CoachScreen";
-import { MOMENTS, RHYTHMS } from "../moments";
+import { MOMENTS, RHYTHMS, REGIONS } from "../moments";
 import { useState } from "react";
 import type { AppApi } from "./api";
 
@@ -44,6 +44,14 @@ export function MeScreen(p: AppApi) {
           <button className="pill pill-small" onClick={openGoal}><Target size={14} /> Change goal</button>
           <button className="pill pill-small" onClick={() => setGoalsOpen(true)}><SlidersHorizontal size={14} /> Exact numbers</button>
           <ConfirmButton className="pill pill-small" label={<><RotateCcw size={14} /> Reset</>} confirmLabel="Tap again to reset" onConfirm={resetGoal} />
+        </div>
+      </section>
+      <section className="card">
+        <div className="card-top"><span>Where do you shop?</span><small>decides your starter foods</small></div>
+        <div className="moments">
+          {REGIONS.map((r) => (
+            <button key={r.id} className={`pill pill-small ${p.region === r.id ? "pill-primary" : ""}`} onClick={() => p.setRegion(r.id)}>{r.name}</button>
+          ))}
         </div>
       </section>
       <section className="card">
