@@ -22,7 +22,7 @@ export function CoachArea(p: AppApi) {
     catch (e: any) { setError(e.message || "Could not load clients."); }
     finally { setBusy(false); }
   }
-  useEffect(() => { refresh(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
+  useEffect(() => { refresh(); p.markSharedSeen(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
   const daam = (r: ClientRow) => r.feedback.filter((f) => f.taste === "DaaM good").length;
   const last = (r: ClientRow) => r.feedback[0];
   return (

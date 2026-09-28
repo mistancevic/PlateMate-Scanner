@@ -34,7 +34,7 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen } from "./screens/OutScreen";
 import { SignInScreen } from "./screens/SignInScreen";
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, type CloudUser } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, type CloudUser } from "./cloud";
 import { getGoal, clearGoal, bandOf, goalsForBand, fit as fitPd } from "./goal";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { momentTarget, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
@@ -409,6 +409,7 @@ export default function App() {
     [usual, setUsualState] = useState<RhythmId[]>(getUsual),
     [region, setRegionState] = useState<RegionId | null>(getRegion),
     [travelTo, setTravelToState] = useState<RegionId | null>(getTravelTo),
+    [newShared, setNewShared] = useState(0),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -506,6 +507,23 @@ export default function App() {
       cloudLoaded.current = true;
     })();
   }, [user]);
+  // coach: how many cards were shared since I last looked
+  const countNewShared = async () => {
+    if (!user || profile.role !== "coach") return;
+    try {
+      const since = localStorage.getItem(`chefmealan-coach-seen-${user.uid}`) || "";
+      const rows = await listClients(user.uid);
+      const n = rows.reduce((acc, r) => acc + r.feedback.filter((f: any) => (f.shared?.at || f.createdAt) > since).length, 0);
+      setNewShared(n);
+    } catch { /* offline */ }
+  };
+  useEffect(() => { countNewShared(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid, profile.role]);
+  useEffect(() => {
+    const onShow = () => { if (document.visibilityState === "visible") countNewShared(); };
+    document.addEventListener("visibilitychange", onShow);
+    return () => document.removeEventListener("visibilitychange", onShow);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.uid, profile.role]);
   // when the app comes back to the front, pick up a goal the coach set meanwhile
   useEffect(() => {
     if (!user) return;
@@ -854,6 +872,7 @@ export default function App() {
     pdRef, dayPd, moment, setMoment: (m: MomentId) => setMomentState(m), usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
+    newShared, markSharedSeen: () => { if (user) { try { localStorage.setItem(`chefmealan-coach-seen-${user.uid}`, new Date().toISOString()); } catch {} } setNewShared(0); },
     matched, importRef, filter, setFilter,
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
     step, setStep, mixWith,
@@ -909,7 +928,7 @@ export default function App() {
     { id: "home", label: "Today", icon: <Home size={20} /> },
     { id: "journey", label: "Mealan", icon: <Mark size={22} color="currentColor" /> },
     { id: "foods", label: "Foods", icon: <BookOpen size={20} /> },
-    { id: "me", label: "Me", icon: <CircleUser size={20} /> },
+    { id: "me", label: "Me", icon: <span className="nav-icon">{<CircleUser size={20} />}{newShared > 0 && <span className="badge">{newShared}</span>}</span> },
   ];
   const TITLES: Record<Tab, string> = {
     home: "Today",

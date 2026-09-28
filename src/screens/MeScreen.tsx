@@ -127,7 +127,7 @@ export function MeScreen(p: AppApi) {
 
       {cloudEnabled && user && isCoach && (
         <>
-          <p className="label">Coach area</p>
+          <p className="label">Coach area{p.newShared > 0 ? ` · ${p.newShared} new` : ""}</p>
           <CoachArea {...p} />
         </>
       )}

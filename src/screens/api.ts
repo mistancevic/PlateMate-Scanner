@@ -55,6 +55,8 @@ export interface AppApi {
   region: import("../moments").RegionId | null;
   setRegion: (r: import("../moments").RegionId) => void;
   travelTo: import("../moments").RegionId | null;
+  newShared: number;
+  markSharedSeen: () => void;
   setTravelTo: (r: import("../moments").RegionId | null) => void;
   matched: boolean;
   mealanCard: ReactNode;
