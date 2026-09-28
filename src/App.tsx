@@ -35,7 +35,7 @@ import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen } from "./screens/OutScreen";
 import { SignInScreen } from "./screens/SignInScreen";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, type CloudUser } from "./cloud";
-import { getGoal, clearGoal, bandOf, fit as fitPd } from "./goal";
+import { getGoal, clearGoal, bandOf, goalsForBand, fit as fitPd } from "./goal";
 import { STARTER_FOODS } from "./starter";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
@@ -517,6 +517,15 @@ export default function App() {
     return () => document.removeEventListener("visibilitychange", onShow);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, profile.coachSetAt]);
+  // a goal band with missing numbers heals itself from the band
+  useEffect(() => {
+    const b = goal?.band ? bandOf(goal.band) : null;
+    if (b && (state.goals.calories == null || state.goals.protein == null)) {
+      const g = goalsForBand(b);
+      setState((s) => ({ ...s, goals: { ...s.goals, calories: s.goals.calories ?? g.calories, protein: s.goals.protein ?? g.protein } }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [goal, state.goals.calories, state.goals.protein]);
   // every change goes to the account, a second after it settles
   useEffect(() => {
     if (!user || !cloudLoaded.current) return;
