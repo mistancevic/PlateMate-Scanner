@@ -107,10 +107,14 @@ const groupSchema = {
 // Ask two models at once and take the first that answers; fall back to the slower chain only if both fail.
 async function generateRace(prompt: string, schema: any, images: { inlineData: { data: string; mimeType: string } }[] = []) {
   const one = (model: string) => generate(prompt, schema, images, { fast: true, only: model });
+  const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
   try {
     return await Promise.any([one(primaryModel), one("gemini-3.1-flash-lite")]);
   } catch {
-    return generate(prompt, schema, images, { fast: true });
+    // a short breath, then once more in parallel: real spikes clear in seconds
+    await pause(2500);
+    try { return await Promise.any([one(primaryModel), one("gemini-3.1-flash-lite"), one("gemini-flash-latest")]); }
+    catch { return generate(prompt, schema, images, { fast: true }); }
   }
 }
 async function generate(
