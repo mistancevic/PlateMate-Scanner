@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Camera, Send, ArrowLeft } from "lucide-react";
 import { aggregate, density, solveIngredient, uid, type Ingredient, type Food } from "../pilot";
 import { fmt, fixed } from "../ui";
@@ -16,19 +16,22 @@ const asFood = (r: Rec): Food => ({
 });
 
 export function OutScreen(p: AppApi & { close: () => void }) {
-  const { pdRef, setState, setBusy, setError, close, state } = p;
+  const { pdRef, setState, setError, close, state } = p;
   const [text, setText] = useState("");
   const [photo, setPhoto] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
-  const history = turns.map((t) => ({ role: t.role === "you" ? "user" : "assistant", content: t.text }));
+  const endRef = useRef<HTMLDivElement>(null);
+  const [thinking, setThinking] = useState(false);
+  useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }); }, [turns, thinking]);
+  const history = turns.slice(-6).map((t) => ({ role: t.role === "you" ? "user" : "assistant", content: t.text }));
 
   async function ask() {
     const msg = text.trim();
     if (!msg && !photo) return;
     const mine: Turn = { role: "you", text: msg || "(photo)", photo: photo || undefined };
     setTurns((t) => [...t, mine]); setText(""); setPhoto("");
-    setBusy(`${CHEF_NAME} is looking`);
+    setThinking(true);
     try {
       const res = await fetch("/api/out", { method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -36,7 +39,7 @@ export function OutScreen(p: AppApi & { close: () => void }) {
           target: { pd: pdRef, mealKcal: state.goals.calories ? Math.round(state.goals.calories * 0.35) : null },
           plate: state.items.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein })),
           rhythm: p.usual, moment: p.moment, region: p.region, travelTo: p.moment === "travel" ? p.travelTo : null,
-          library: state.foods.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })),
+          library: state.foods.slice(0, 24).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })),
         }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Mealan could not answer.");
@@ -60,7 +63,7 @@ export function OutScreen(p: AppApi & { close: () => void }) {
       const reply: Turn = { role: "mealan", text: (data.reply || "") + fitNote, picks, pd, kcal };
       setTurns((t) => [...t, reply]);
       log("out", { picks: picks.length, pd });
-    } catch (e: any) { setError(e.message); } finally { setBusy(""); }
+    } catch (e: any) { setError(e.message); } finally { setThinking(false); }
   }
 
   function toPlate(t: Turn) {
@@ -82,7 +85,7 @@ export function OutScreen(p: AppApi & { close: () => void }) {
   }
 
   return (
-    <>
+    <div className="chat-screen">
       <div className="head">
         <h2>Chat with {CHEF_NAME}</h2>
         <p>Out, missing something, or after an idea. Say where you are or what you have, add a photo if it helps. Estimates are marked; the amounts come from your target.</p>
@@ -105,7 +108,10 @@ export function OutScreen(p: AppApi & { close: () => void }) {
             )}
           </div>
         ))}
+        {thinking && <div className="bubble mealan thinking"><span /><span /><span /></div>}
+        <div ref={endRef} />
       </div>
+      <div className="chat-bottom">
       {photo && <div className="strip">Photo attached. <button className="link" onClick={() => setPhoto("")}>Remove</button></div>}
       <div className="chat-input">
         <button className="icon" aria-label="Add a photo" onClick={() => fileRef.current?.click()}><Camera size={20} /></button>
@@ -117,6 +123,7 @@ export function OutScreen(p: AppApi & { close: () => void }) {
         }} />
       </div>
       <button className="link back" onClick={close}><ArrowLeft size={14} /> Back</button>
-    </>
+      </div>
+    </div>
   );
 }
