@@ -21,6 +21,18 @@ export function HomeScreen(p: AppApi) {
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
       </section>
+      {p.inbox.map((it) => (
+        <section className="card inbox" key={it.id}>
+          <div className="card-top"><span>{p.profile.coachName || "Your coach"} sent you a recipe</span><button className="link" onClick={() => p.dismissRecipe(it)}>Dismiss</button></div>
+          <b>{it.meal?.title || "Recipe"}</b>
+          <small>{(it.meal?.items ?? []).map((i: any) => `${Math.round(i.grams)} g ${i.food?.name}`).join(" · ")}</small>
+          {it.note && <p className="client-note">“{it.note}”</p>}
+          <div className="button-row" style={{ marginTop: 10 }}>
+            <button className="pill pill-small pill-primary" onClick={() => p.takeRecipe(it, "make")}>Make it</button>
+            <button className="pill pill-small" onClick={() => p.takeRecipe(it, "keep")}>Keep it</button>
+          </div>
+        </section>
+      ))}
       {p.profile.role === "coach" && p.newShared > 0 && (
         <button className="strip strip-button" onClick={() => setTab("me")}>{p.newShared} new {p.newShared === 1 ? "card" : "cards"} shared with you. Open the Coach area.</button>
       )}

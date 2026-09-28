@@ -146,3 +146,16 @@ export async function loadPhotos(uid: string): Promise<Map<string, string>> {
   const snap = await getDocs(collection(db(), "users", uid, "photos"));
   return new Map(snap.docs.map((d) => [d.id, (d.data() as any).data as string]));
 }
+
+// ---- inbox: recipes a coach sends to a client ----
+export type InboxItem = { id: string; from: string; note: string; meal: any; sentAt: string };
+export async function sendRecipe(clientUid: string, item: InboxItem) {
+  const copy = structuredClone(item);
+  (copy.meal?.items ?? []).forEach((it: any) => { if (it.food) delete it.food.photo; });
+  await setDoc(doc(db(), "users", clientUid, "inbox", item.id), copy);
+}
+export async function loadInbox(uid: string): Promise<InboxItem[]> {
+  const snap = await getDocs(collection(db(), "users", uid, "inbox"));
+  return snap.docs.map((d) => d.data() as InboxItem).sort((a, b) => (b.sentAt > a.sentAt ? 1 : -1));
+}
+export async function clearInboxItem(uid: string, id: string) { await deleteDoc(doc(db(), "users", uid, "inbox", id)); }

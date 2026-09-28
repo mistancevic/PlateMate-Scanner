@@ -55,6 +55,9 @@ export interface AppApi {
   region: import("../moments").RegionId | null;
   setRegion: (r: import("../moments").RegionId) => void;
   travelTo: import("../moments").RegionId | null;
+  inbox: import("../cloud").InboxItem[];
+  takeRecipe: (item: import("../cloud").InboxItem, how: "make" | "keep") => Promise<void>;
+  dismissRecipe: (item: import("../cloud").InboxItem) => Promise<void>;
   newShared: number;
   markSharedSeen: () => void;
   setTravelTo: (r: import("../moments").RegionId | null) => void;

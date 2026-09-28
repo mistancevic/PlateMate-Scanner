@@ -34,7 +34,7 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen } from "./screens/OutScreen";
 import { SignInScreen } from "./screens/SignInScreen";
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, type CloudUser } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, bandOf, goalsForBand, fit as fitPd } from "./goal";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { momentTarget, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
@@ -410,6 +410,7 @@ export default function App() {
     [region, setRegionState] = useState<RegionId | null>(getRegion),
     [travelTo, setTravelToState] = useState<RegionId | null>(getTravelTo),
     [newShared, setNewShared] = useState(0),
+    [inbox, setInbox] = useState<InboxItem[]>([]),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -507,6 +508,15 @@ export default function App() {
       cloudLoaded.current = true;
     })();
   }, [user]);
+  // client: recipes the coach sent
+  const fetchInbox = async () => { if (!user) return; try { setInbox(await loadInbox(user.uid)); } catch { /* offline */ } };
+  useEffect(() => { fetchInbox(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
+  useEffect(() => {
+    const onShow = () => { if (document.visibilityState === "visible") fetchInbox(); };
+    document.addEventListener("visibilitychange", onShow);
+    return () => document.removeEventListener("visibilitychange", onShow);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.uid]);
   // coach: how many cards were shared since I last looked
   const countNewShared = async () => {
     if (!user || profile.role !== "coach") return;
@@ -872,6 +882,23 @@ export default function App() {
     pdRef, dayPd, moment, setMoment: (m: MomentId) => setMomentState(m), usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
+    inbox,
+    takeRecipe: async (item: InboxItem, how: "make" | "keep") => {
+      // foods she doesn't have come along; then the recipe goes to the plate or to her recipes
+      setState((s) => {
+        const have = new Set(s.foods.map((f) => (f.name + "|" + f.brand).toLowerCase()));
+        const newFoods = (item.meal.items as Ingredient[]).map((i) => i.food).filter((f) => !have.has((f.name + "|" + f.brand).toLowerCase())).map((f) => ({ ...f, id: uid(), icon: f.icon || iconFor(f.name), reviewedAt: new Date().toISOString() }));
+        const foods = [...s.foods, ...newFoods];
+        const items = (item.meal.items as Ingredient[]).map((i) => { const lib = foods.find((f) => (f.name + "|" + f.brand).toLowerCase() === (i.food.name + "|" + i.food.brand).toLowerCase()); return { id: uid(), food: lib ?? i.food, grams: i.grams, locked: true }; });
+        const meal = { id: uid(), title: item.meal.title || "From your coach", items, portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
+        return how === "make" ? { ...s, foods, items, portion: null, title: meal.title } : { ...s, foods, meals: [meal, ...s.meals] };
+      });
+      if (how === "make") { setStep("recipe"); setTab("journey"); }
+      notify(how === "make" ? "On your plate. Ask Mealan if you want it fitted to you." : "Kept in your recipes.");
+      if (user) { try { await clearInboxItem(user.uid, item.id); } catch {} }
+      setInbox((x) => x.filter((i) => i.id !== item.id));
+    },
+    dismissRecipe: async (item: InboxItem) => { if (user) { try { await clearInboxItem(user.uid, item.id); } catch {} } setInbox((x) => x.filter((i) => i.id !== item.id)); },
     newShared, markSharedSeen: () => { if (user) { try { localStorage.setItem(`chefmealan-coach-seen-${user.uid}`, new Date().toISOString()); } catch {} } setNewShared(0); },
     matched, importRef, filter, setFilter,
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },

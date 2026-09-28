@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { RefreshCw, Copy, Target } from "lucide-react";
-import { listClients, setClientGoal, publishCoachCode, loadPhotos, type ClientRow } from "../cloud";
+import { listClients, setClientGoal, publishCoachCode, loadPhotos, sendRecipe, type ClientRow } from "../cloud";
+import { uid } from "../pilot";
 import { BANDS, bandOf, goalsForBand } from "../goal";
 import { fixed } from "../ui";
 import { density } from "../pilot";
@@ -46,12 +47,15 @@ export function CoachArea(p: AppApi) {
           <small className="client-last">{last(r) ? `${last(r).taste}: ${last(r).meal?.title ?? ""} · ${new Date(last(r).createdAt).toLocaleDateString()}${last(r).notes ? ` · ${last(r).notes}` : ""}` : "no meals yet"} · active {r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : "never"}</small>
         </button>
       ))}
-      {open && <ClientSheet row={open} coachName={coachName} close={() => setOpen(null)} onSaved={refresh} setError={setError} notify={notify} />}
+      {open && <ClientSheet row={open} coachName={coachName} coachUid={user?.uid ?? ""} meals={p.state.meals} close={() => setOpen(null)} onSaved={refresh} setError={setError} notify={notify} />}
     </>
   );
 }
 
-function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row: ClientRow; coachName: string; close: () => void; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void }) {
+function ClientSheet({ row, coachName, coachUid, meals, close, onSaved, setError, notify }: { row: ClientRow; coachName: string; coachUid: string; meals: any[]; close: () => void; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void }) {
+  const [sending, setSending] = useState(false);
+  const [pick, setPick] = useState<string>("");
+  const [note, setNote] = useState("");
   const [band, setBand] = useState<string>(row.goal?.band ?? "");
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -84,6 +88,27 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row
               finally { setSaving(false); }
             }}>Set this goal</button>
           </>
+        )}
+        <div className="button-row" style={{ margin: "4px 0 10px" }}>
+          <button className="pill pill-small" onClick={() => setSending((v) => !v)}>{sending ? "Cancel" : "Send a recipe"}</button>
+        </div>
+        {sending && (
+          <section className="card">
+            {meals.length === 0 && <small>No saved recipes yet. Make one and save it, then send it.</small>}
+            <div className="rows">
+              {meals.slice(0, 20).map((m: any) => (
+                <button key={m.id} className={`row row-food row-button ${pick === m.id ? "on" : ""}`} onClick={() => setPick(m.id)}>
+                  <div className="row-text"><b>{m.title}</b><small>{(m.items ?? []).map((i: any) => `${Math.round(i.grams)} g ${i.food.name}`).join(" · ")}</small></div>
+                </button>
+              ))}
+            </div>
+            <textarea placeholder="A line to go with it, if you like" value={note} onChange={(e) => setNote(e.target.value)} />
+            <button className="pill pill-primary pill-wide" disabled={!pick} onClick={async () => {
+              const m = meals.find((x: any) => x.id === pick); if (!m) return;
+              try { await sendRecipe(row.uid, { id: uid(), from: coachUid, note: note.trim(), meal: structuredClone(m), sentAt: new Date().toISOString() }); notify(`Sent to ${row.name}.`); setSending(false); setPick(""); setNote(""); }
+              catch (e: any) { setError(e.message || "Could not send."); }
+            }}>Send</button>
+          </section>
         )}
         <p className="label">Shared with you ({row.feedback.length})</p>
         {row.feedback.length === 0 && <small>Nothing yet.</small>}
