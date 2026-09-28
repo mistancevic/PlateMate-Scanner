@@ -52,37 +52,61 @@ export function CoachArea(p: AppApi) {
 
 function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row: ClientRow; coachName: string; close: () => void; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void }) {
   const [band, setBand] = useState<string>(row.goal?.band ?? "");
+  const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [photos, setPhotos] = useState<Map<string, string>>(new Map());
   useEffect(() => { loadPhotos(row.uid).then(setPhotos).catch(() => {}); }, [row.uid]);
+  const pdOf = (items: any[]) => density(items.reduce((n, i) => n + (i.food.protein ?? 0) * i.grams / 100, 0), items.reduce((n, i) => n + (i.food.calories ?? 0) * i.grams / 100, 0));
+  const kcalOf = (items: any[]) => Math.round(items.reduce((n, i) => n + (i.food.calories ?? 0) * i.grams / 100, 0));
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="card-top"><span>{row.name}</span><button className="link" onClick={close}>Close</button></div>
-        <p className="small">Goal: {row.goal?.band ? bandOf(row.goal.band)?.name : "not set"}{row.goal?.setBy === "coach" ? " (set by you)" : ""}</p>
-        <div className="bands compact">
-          {BANDS.map((b) => (
-            <button key={b.id} className={`band-card ${band === b.id ? "on" : ""}`} onClick={() => setBand(b.id)}>
-              <b>{b.name}</b><span>{b.range} · {b.kcal[0]}–{b.kcal[1]} kcal · {b.protein[0]}–{b.protein[1]} g</span>
-            </button>
-          ))}
+        <div className="client-goal">
+          <div><b>{row.goal?.band ? bandOf(row.goal.band)?.name : "No goal yet"}</b><small>{row.goal?.band ? bandOf(row.goal.band)?.range : ""}{row.goal?.setBy === "coach" ? " · set by you" : row.goal ? " · set by them" : ""}</small></div>
+          <button className="pill pill-small" onClick={() => setEditing((v) => !v)}><Target size={14} /> {editing ? "Cancel" : "Change goal"}</button>
         </div>
-        <button className="pill pill-primary pill-wide" disabled={!band || saving} onClick={async () => {
-          const b = bandOf(band); if (!b) return;
-          setSaving(true);
-          try { await setClientGoal(row.uid, { band }, goalsForBand(b), coachName); notify(`${row.name}'s goal set to ${b.name}.`); onSaved(); close(); }
-          catch (e: any) { setError(e.message || "Could not set the goal."); }
-          finally { setSaving(false); }
-        }}><Target size={16} /> Set this goal</button>
-        <p className="label">What they told you</p>
+        {editing && (
+          <>
+            <div className="bands compact">
+              {BANDS.map((b) => (
+                <button key={b.id} className={`band-card ${band === b.id ? "on" : ""}`} onClick={() => setBand(b.id)}>
+                  <b>{b.name}</b><span>{b.range} · {b.kcal[0]}–{b.kcal[1]} kcal · {b.protein[0]}–{b.protein[1]} g</span>
+                </button>
+              ))}
+            </div>
+            <button className="pill pill-primary pill-wide" disabled={!band || saving} onClick={async () => {
+              const b = bandOf(band); if (!b) return;
+              setSaving(true);
+              try { await setClientGoal(row.uid, { band }, goalsForBand(b), coachName); notify(`${row.name}'s goal set to ${b.name}.`); setEditing(false); onSaved(); }
+              catch (e: any) { setError(e.message || "Could not set the goal."); }
+              finally { setSaving(false); }
+            }}>Set this goal</button>
+          </>
+        )}
+        <p className="label">What they told you ({row.feedback.length})</p>
         {row.feedback.length === 0 && <small>Nothing yet.</small>}
-        {row.feedback.slice(0, 20).map((f: any) => (
-          <div className="fb" key={f.id}>
-            {photos.get(`fb:${f.id}`) && <img className="fb-photo" src={photos.get(`fb:${f.id}`)} alt="" />}
-            <b>{f.taste}</b>
-            <small>{f.meal?.title} · {new Date(f.createdAt).toLocaleDateString()}{f.notes ? ` · ${f.notes}` : ""}{f.meal?.items?.length ? ` · PD ${fixed(density(f.meal.items.reduce((n: number, i: any) => n + (i.food.protein ?? 0) * i.grams / 100, 0), f.meal.items.reduce((n: number, i: any) => n + (i.food.calories ?? 0) * i.grams / 100, 0)))}` : ""}</small>
-          </div>
-        ))}
+        {row.feedback.slice(0, 30).map((f: any) => {
+          const items: any[] = f.meal?.items ?? [];
+          const photo = photos.get(`fb:${f.id}`);
+          return (
+            <section className="card client-card" key={f.id}>
+              <div className="client-card-top">
+                <div>
+                  <b>{f.taste}</b>
+                  <small>{new Date(f.createdAt).toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" })}</small>
+                </div>
+                {photo && <img className="client-photo" src={photo} alt="" />}
+              </div>
+              <div className="client-plate">
+                <b>{f.meal?.title || "Meal"}</b>
+                {items.length > 0 && <small>{items.map((i) => `${Math.round(i.grams)} g ${i.food.name}`).join(" · ")}</small>}
+                {items.length > 0 && <small>PD {fixed(pdOf(items))} · {kcalOf(items)} kcal</small>}
+              </div>
+              {f.notes && <p className="client-note">“{f.notes}”</p>}
+            </section>
+          );
+        })}
       </div>
     </div>
   );
