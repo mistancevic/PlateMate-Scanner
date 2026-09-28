@@ -9,9 +9,10 @@ import { useState } from "react";
 import type { AppApi } from "./api";
 
 export function MeScreen(p: AppApi) {
-  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal, resetGoal, addStarter, importAirtable, user, cloudEnabled, cloudStatus, signOut, deleteAccount, profile, joinCoach, leaveCoach } = p;
+  const { state, services, exportData, importRef, setAccessOpen, setGoalsOpen, pdRef, coach, setCoach, setTab, clientName, setClientName, goal, openGoal, resetGoal, addStarter, importAirtable, user, cloudEnabled, cloudStatus, signOut, deleteAccount, profile, joinCoach, leaveCoach, notify } = p;
   const [code, setCode] = useState("");
   const [shareFor, setShareFor] = useState<string | null>(null);
+  const [nameDraft, setNameDraft] = useState(clientName);
   const coachName = profile.coachName || COACH_NAME;
   const isCoach = profile.role === "coach";
   const n = readLog().length;
@@ -24,7 +25,11 @@ export function MeScreen(p: AppApi) {
         <span className="avatar">{(clientName || "?").slice(0, 1).toUpperCase()}</span>
         <label className="name-field">
           <span>Your name</span>
-          <input value={clientName} placeholder="Your name" onChange={(e) => setClientName(e.target.value)} />
+          <div className="name-row">
+            <input value={nameDraft} placeholder="Your name" onChange={(e) => setNameDraft(e.target.value)} enterKeyHint="done"
+              onKeyDown={(e) => { if (e.key === "Enter") { setClientName(nameDraft.trim()); (e.target as HTMLInputElement).blur(); } }} />
+            <button className="pill pill-small pill-primary" disabled={nameDraft.trim() === clientName} onClick={() => { setClientName(nameDraft.trim()); notify("Name saved."); }}>Save</button>
+          </div>
         </label>
       </section>
       <section className="plan">
