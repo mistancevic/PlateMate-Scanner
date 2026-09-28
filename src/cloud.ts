@@ -1,7 +1,7 @@
 // Sign in with Google and keep each person's data under their own account. Off entirely when not configured.
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, type User } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch } from "firebase/firestore";
+import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, type Firestore } from "firebase/firestore";
 
 const cfg = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -15,7 +15,17 @@ const getApp = () => (app ??= initializeApp(cfg));
 const auth = () => getAuth(getApp());
 // A project can hold several Firestore databases; the client reaches "(default)" unless told which one.
 const dbId = import.meta.env.VITE_FIREBASE_DB_ID as string | undefined;
-const db = () => (dbId && dbId !== "(default)" ? getFirestore(getApp(), dbId) : getFirestore(getApp()));
+// Fields a label read leaves as undefined must not break a save: the client drops them on the way out.
+let dbInstance: Firestore | null = null;
+const db = () => {
+  if (dbInstance) return dbInstance;
+  try {
+    dbInstance = dbId && dbId !== "(default)" ? initializeFirestore(getApp(), { ignoreUndefinedProperties: true }, dbId) : initializeFirestore(getApp(), { ignoreUndefinedProperties: true });
+  } catch {
+    dbInstance = dbId && dbId !== "(default)" ? getFirestore(getApp(), dbId) : getFirestore(getApp());
+  }
+  return dbInstance;
+};
 
 export type CloudUser = { uid: string; name: string; email: string; photo: string };
 const asUser = (u: User): CloudUser => ({ uid: u.uid, name: u.displayName ?? "", email: u.email ?? "", photo: u.photoURL ?? "" });

@@ -234,7 +234,7 @@ export function JourneyScreen(p: AppApi) {
         <div className="rows">
           {state.foods
             .filter((f) => (f.name + " " + f.brand).toLowerCase().includes(q.toLowerCase()))
-            .slice(0, q ? 20 : 5)
+            .slice(0, 60)
             .map((f) => {
               const inList = items.some((i) => i.food.id === f.id);
               return (
