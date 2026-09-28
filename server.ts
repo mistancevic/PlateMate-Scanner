@@ -115,7 +115,7 @@ async function generate(
       "AI is not configured. You can still enter labels manually and use the calculated Chef.",
     );
   const ai = new GoogleGenAI({ apiKey, httpOptions: { timeout: opts.fast ? 25000 : 55000 } });
-  const models = opts.fast ? ["gemini-3.6-flash", "gemini-flash-latest", primaryModel].filter((m, i, a) => a.indexOf(m) === i) : fallbackModels;
+  const models = opts.fast ? [primaryModel, "gemini-flash-latest", "gemini-3.6-flash"].filter((m, i, a) => a.indexOf(m) === i) : fallbackModels;
   const attempts = opts.fast ? 1 : 2;
 
   let lastError: any = null;
@@ -137,6 +137,8 @@ async function generate(
           );
         return JSON.parse(response.text);
       } catch (err: any) {
+        try { err.model = m; } catch { /* read-only error */ }
+        console.warn(`[ai] ${m} attempt ${attempt + 1}: ${Number(err?.status) || "?"} ${String(err?.message || "").slice(0, 160)}`);
         lastError = err;
         const status = Number(err?.status) || 0;
         const msg = String(err?.message || "");
@@ -178,7 +180,7 @@ function fail(res: express.Response, error: unknown) {
       : status === 404
         ? "The configured AI model is unavailable. Ask the host to set GEMINI_MODEL."
         : status === 503
-          ? "The AI service is temporarily unavailable. Please retry in a few moments or enter values manually."
+          ? `The AI service is temporarily unavailable (${e?.model ?? "model"}: ${(message || "503").slice(0, 120)}). Retry in a moment.`
           : !apiKey
             ? "AI is not configured. Use manual entry or barcode lookup."
             : message && !message.includes("GoogleGenAI") && !message.includes("API key")
