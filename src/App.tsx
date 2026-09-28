@@ -37,7 +37,7 @@ import { SignInScreen } from "./screens/SignInScreen";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, type CloudUser } from "./cloud";
 import { getGoal, clearGoal, bandOf, goalsForBand, fit as fitPd } from "./goal";
 import { STARTER_FOODS } from "./starter";
-import { momentTarget, getUsual, setUsual, type MomentId } from "./moments";
+import { momentTarget, getUsual, setUsual, type MomentId, type RhythmId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
 import { Home, CircleUser } from "lucide-react";
@@ -406,7 +406,7 @@ export default function App() {
     [cloudStatus, setCloudStatus] = useState<{ ok: boolean; text: string; at?: string }>({ ok: true, text: "" }),
     [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string }>({}),
     [moment, setMomentState] = useState<MomentId>("regular"),
-    [usual, setUsualState] = useState<MomentId[]>(getUsual),
+    [usual, setUsualState] = useState<RhythmId[]>(getUsual),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -849,7 +849,7 @@ export default function App() {
     api, setImage, setEdit, setGoalsOpen, setAccessOpen, setReviewMeal,
     setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
-    pdRef, dayPd, moment, setMoment: (m: MomentId) => setMomentState(m), usual, setUsual: (ids: MomentId[]) => { setUsual(ids); setUsualState(ids); },
+    pdRef, dayPd, moment, setMoment: (m: MomentId) => setMomentState(m), usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
     matched, importRef, filter, setFilter,
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
     step, setStep, mixWith,

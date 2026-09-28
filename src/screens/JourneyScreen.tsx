@@ -7,7 +7,7 @@ import { log } from "../log";
 import { iconFor } from "../icons";
 import { SwipeRow } from "../components/SwipeRow";
 import { methodsFor } from "../methods";
-import { MOMENTS, momentOf } from "../moments";
+import { momentOf, orderMoments } from "../moments";
 import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
@@ -163,7 +163,7 @@ export function JourneyScreen(p: AppApi) {
         <Head title="What are you craving?" sub={`Get the products in. Then ${CHEF_NAME} works out how much of each.`} />
         <p className="label">When is this for?</p>
         <div className="moments">
-          {[...MOMENTS].sort((x, y) => (p.usual.includes(y.id) ? 1 : 0) - (p.usual.includes(x.id) ? 1 : 0) || (x.id === "regular" ? -1 : y.id === "regular" ? 1 : 0)).map((m) => (
+          {orderMoments(p.usual).map((m) => (
             <button key={m.id} className={`pill pill-small ${p.moment === m.id ? "pill-primary" : ""} ${m.planned ? "" : "pill-unplanned"}`} onClick={() => p.setMoment(m.id)}>{m.name}</button>
           ))}
         </div>

@@ -50,8 +50,8 @@ export interface AppApi {
   dayPd: number | null;
   moment: import("../moments").MomentId;
   setMoment: (m: import("../moments").MomentId) => void;
-  usual: import("../moments").MomentId[];
-  setUsual: (ids: import("../moments").MomentId[]) => void;
+  usual: import("../moments").RhythmId[];
+  setUsual: (ids: import("../moments").RhythmId[]) => void;
   matched: boolean;
   mealanCard: ReactNode;
   importRef: RefObject<HTMLInputElement | null>;

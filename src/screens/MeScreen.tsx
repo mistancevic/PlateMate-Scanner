@@ -5,7 +5,7 @@ import { exportLog, clearLog, readLog } from "../log";
 import { bandOf } from "../goal";
 import { ConfirmButton } from "../components/Confirm";
 import { CoachArea } from "./CoachScreen";
-import { MOMENTS } from "../moments";
+import { MOMENTS, RHYTHMS } from "../moments";
 import { useState } from "react";
 import type { AppApi } from "./api";
 
@@ -47,10 +47,10 @@ export function MeScreen(p: AppApi) {
         </div>
       </section>
       <section className="card">
-        <div className="card-top"><span>My usual moments</span><small>show first when you cook</small></div>
+        <div className="card-top"><span>My week</span><small>decides which moments come first</small></div>
         <div className="moments">
-          {MOMENTS.filter((m) => m.id !== "regular").map((m) => (
-            <button key={m.id} className={`pill pill-small ${p.usual.includes(m.id) ? "pill-primary" : ""}`} onClick={() => p.setUsual(p.usual.includes(m.id) ? p.usual.filter((x) => x !== m.id) : [...p.usual, m.id])}>{m.name}</button>
+          {RHYTHMS.map((r) => (
+            <button key={r.id} className={`pill pill-small ${p.usual.includes(r.id) ? "pill-primary" : ""}`} onClick={() => p.setUsual(p.usual.includes(r.id) ? p.usual.filter((x) => x !== r.id) : [...p.usual, r.id])}>{r.name}</button>
           ))}
         </div>
       </section>
