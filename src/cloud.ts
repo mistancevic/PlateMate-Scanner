@@ -46,7 +46,7 @@ export const signOutCloud = () => signOut(auth());
 
 // One document per person: the pilot state plus goal and name, and who coaches them.
 // role is set by hand in the Firebase console ("coach"); nobody can sign up as a coach.
-export type CloudDoc = { state: unknown; goal: unknown; clientName: string; updatedAt: string; role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string };
+export type CloudDoc = { state: unknown; goal: unknown; clientName: string; updatedAt: string; personal?: unknown; role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string };
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const snap = await getDoc(doc(db(), "users", uid));
   return snap.exists() ? (snap.data() as CloudDoc) : null;

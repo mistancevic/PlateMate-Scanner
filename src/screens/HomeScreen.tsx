@@ -34,7 +34,7 @@ export function HomeScreen(p: AppApi) {
         </section>
       ))}
       {p.profile.role === "coach" && p.newShared > 0 && (
-        <button className="strip strip-button" onClick={() => setTab("me")}>{p.newShared} new {p.newShared === 1 ? "card" : "cards"} shared with you. Open the Coach area.</button>
+        <button className="strip strip-button" onClick={() => setTab("clients")}>{p.newShared} new {p.newShared === 1 ? "card" : "cards"} shared with you. Open Clients.</button>
       )}
       <button className="pill pill-primary pill-tall" onClick={() => { setStep("in"); setTab("journey"); }}>
         <ChefHat size={20} /> I'm craving something

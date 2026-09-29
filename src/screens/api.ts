@@ -2,7 +2,8 @@ import type { Dispatch, SetStateAction, ReactNode, RefObject } from "react";
 import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
 import type { ScannerMode } from "../types";
 
-export type Tab = "home" | "journey" | "me" | "meal" | "chef" | "foods" | "notes" | "more";
+export type Tab = "home" | "journey" | "me" | "clients" | "meal" | "chef" | "foods" | "notes" | "more";
+export type MenuSection = "list" | "profile" | "goal" | "week" | "shop" | "coach" | "account" | "support" | "about";
 export type Step = "in" | "recipe" | "make" | "after";
 
 export interface AppApi {
@@ -58,6 +59,10 @@ export interface AppApi {
   inbox: import("../cloud").InboxItem[];
   takeRecipe: (item: import("../cloud").InboxItem, how: "make" | "keep") => Promise<void>;
   dismissRecipe: (item: import("../cloud").InboxItem) => Promise<void>;
+  personal: import("../personal").Personal;
+  setPersonal: (p: import("../personal").Personal) => void;
+  applyNumbers: (bandId: string, kcal: number, protein: number) => void;
+  openMenu: (s?: MenuSection) => void;
   newShared: number;
   markSharedSeen: () => void;
   setTravelTo: (r: import("../moments").RegionId | null) => void;

@@ -29,18 +29,21 @@ import { ChefScreen } from "./screens/ChefScreen";
 import { FoodsScreen } from "./screens/FoodsScreen";
 import { RecipesScreen } from "./screens/RecipesScreen";
 import { MoreScreen } from "./screens/MoreScreen";
-import type { AppApi, Tab, Step } from "./screens/api";
+import type { AppApi, Tab, Step, MenuSection } from "./screens/api";
 import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen } from "./screens/OutScreen";
 import { SignInScreen } from "./screens/SignInScreen";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
-import { getGoal, clearGoal, bandOf, goalsForBand, fit as fitPd } from "./goal";
+import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd } from "./goal";
+import { getPersonal, setPersonal as storePersonal, type Personal } from "./personal";
+import { MenuScreen } from "./screens/MenuScreen";
+import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { momentTarget, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
-import { Home, CircleUser } from "lucide-react";
+import { Home, CircleUser, Menu, Users } from "lucide-react";
 import {
   aggregate,
   candidateFood,
@@ -411,6 +414,8 @@ export default function App() {
     [travelTo, setTravelToState] = useState<RegionId | null>(getTravelTo),
     [newShared, setNewShared] = useState(0),
     [inbox, setInbox] = useState<InboxItem[]>([]),
+    [personal, setPersonalState] = useState<Personal>(getPersonal),
+    [menuSection, setMenuSection] = useState<MenuSection | null>(null),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -495,9 +500,10 @@ export default function App() {
           } catch { /* keep local if the cloud copy is unreadable */ }
           if (remote.goal) { try { localStorage.setItem("chefmealan-goal", JSON.stringify(remote.goal)); } catch {} setGoalState(getGoal()); setGoalOpen(!remote.goal); }
           if (remote.clientName) { storeClientName(remote.clientName); setClientNameState(remote.clientName); }
+          if (remote.personal && typeof remote.personal === "object") { storePersonal(remote.personal as Personal); setPersonalState(remote.personal as Personal); }
           setCloudStatus({ ok: true, text: "Loaded from your account", at: new Date().toISOString() });
         } else {
-          await saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, updatedAt: new Date().toISOString() });
+          await saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), updatedAt: new Date().toISOString() });
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
         }
       } catch (e: any) {
@@ -569,7 +575,7 @@ export default function App() {
   useEffect(() => {
     if (!user || !cloudLoaded.current) return;
     const t = setTimeout(() => {
-      saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, updatedAt: new Date().toISOString() })
+      saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), updatedAt: new Date().toISOString() })
         .then(async () => {
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
           try { if (state.feedback.length) await saveCards(user.uid, state.feedback); } catch (e) { setCloudStatus({ ok: true, text: `Saved. Cards: ${explainCloudError(e)}`, at: new Date().toISOString() }); }
@@ -591,7 +597,7 @@ export default function App() {
         .catch((e) => setCloudStatus({ ok: false, text: `Not saved: ${explainCloudError(e)}` }));
     }, 1000);
     return () => clearTimeout(t);
-  }, [state, goal, clientName, user]);
+  }, [state, goal, clientName, personal, user]);
   async function api(url: string, body?: unknown) {
     const res = await fetch(url, {
       method: body === undefined ? "GET" : "POST",
@@ -882,6 +888,13 @@ export default function App() {
     pdRef, dayPd, moment, setMoment: (m: MomentId) => setMomentState(m), usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
+    personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },
+    applyNumbers: (bandId: string, kcal: number, protein: number) => {
+      saveGoal({ band: bandId, setBy: "you", setAt: new Date().toISOString() });
+      setGoalState(getGoal());
+      setState((s) => ({ ...s, goals: { ...s.goals, calories: kcal, protein } }));
+    },
+    openMenu: (s?: MenuSection) => setMenuSection(s ?? "list"),
     inbox,
     takeRecipe: async (item: InboxItem, how: "make" | "keep") => {
       // foods she doesn't have come along; then the recipe goes to the plate or to her recipes
@@ -955,12 +968,14 @@ export default function App() {
     { id: "home", label: "Today", icon: <Home size={20} /> },
     { id: "journey", label: "Mealan", icon: <Mark size={22} color="currentColor" /> },
     { id: "foods", label: "Foods", icon: <BookOpen size={20} /> },
-    { id: "me", label: "Me", icon: <span className="nav-icon">{<CircleUser size={20} />}{newShared > 0 && <span className="badge">{newShared}</span>}</span> },
+    { id: "me", label: "Me", icon: <CircleUser size={20} /> },
+    ...(profile.role === "coach" ? [{ id: "clients" as Tab, label: "Clients", icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }] : []),
   ];
   const TITLES: Record<Tab, string> = {
     home: "Today",
     journey: APP_NAME,
     me: "Me",
+    clients: "Clients",
     meal: "Meal",
     chef: "Chef",
     foods: "Foods",
@@ -986,6 +1001,7 @@ export default function App() {
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
           {goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · PD {fixed(dayPd)} · set by {goal?.setBy === "coach" ? (goal.coachName || profile.coachName || COACH_NAME) : "you"}
         </button>}
+        <button className="icon menu-button" aria-label="Settings" onClick={() => setMenuSection(menuSection ? null : "list")}><Menu size={22} /></button>
       </header>
       <main>
         {error && (
@@ -1012,14 +1028,16 @@ export default function App() {
             </button>
           </div>
         )}
-        {tab === "home" && <HomeScreen {...screenProps} />}
-        {tab === "journey" && (outOpen ? <OutScreen {...screenProps} close={() => setOutOpen(false)} /> : <JourneyScreen {...screenProps} />)}
-        {tab === "me" && <MeScreen {...screenProps} />}
-        {tab === "meal" && <MealScreen {...screenProps} />}
-        {tab === "chef" && <ChefScreen {...screenProps} />}
-        {tab === "foods" && <FoodsScreen {...screenProps} />}
-        {tab === "notes" && <RecipesScreen {...screenProps} />}
-        {tab === "more" && <MoreScreen {...screenProps} />}
+        {menuSection && <MenuScreen {...screenProps} section={menuSection} setSection={setMenuSection} close={() => setMenuSection(null)} />}
+        {!menuSection && tab === "home" && <HomeScreen {...screenProps} />}
+        {!menuSection && tab === "journey" && (outOpen ? <OutScreen {...screenProps} close={() => setOutOpen(false)} /> : <JourneyScreen {...screenProps} />)}
+        {!menuSection && tab === "me" && <MeScreen {...screenProps} />}
+        {!menuSection && tab === "clients" && <ClientsScreen {...screenProps} />}
+        {!menuSection && tab === "meal" && <MealScreen {...screenProps} />}
+        {!menuSection && tab === "chef" && <ChefScreen {...screenProps} />}
+        {!menuSection && tab === "foods" && <FoodsScreen {...screenProps} />}
+        {!menuSection && tab === "notes" && <RecipesScreen {...screenProps} />}
+        {!menuSection && tab === "more" && <MoreScreen {...screenProps} />}
         <input
           ref={importRef}
           type="file"
@@ -1047,7 +1065,7 @@ export default function App() {
             key={n.id}
             className={tab === n.id || (n.id === "journey" && (tab === "meal" || tab === "chef")) || (n.id === "me" && (tab === "more" || tab === "notes")) ? "active" : ""}
             aria-current={tab === n.id ? "page" : undefined}
-            onClick={() => setTab(n.id)}
+            onClick={() => { setMenuSection(null); setTab(n.id); }}
           >
             {n.icon}
             <span>{n.label}</span>
