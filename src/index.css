@@ -395,3 +395,10 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 a.pill { text-decoration: none; display: inline-flex; align-items: center; }
 /* the menu button always sits at the right edge: after the reference line, or pushed right when there is none (Today) */
 .topbar h1 + .menu-button { margin-left: auto; }
+
+.source-line { margin: 10px 0 0; font-size: 13px; font-weight: 700; color: var(--brand-text); }
+.history-row { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.history-row:last-child { border-bottom: 0; }
+.history-row b { display: block; font-size: 15px; } .history-row small { color: var(--muted); }
+.history-num { text-align: right; flex: none; }
+.formula-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 10px; } .formula-row small { color: var(--muted); margin-right: 4px; }

@@ -3,10 +3,10 @@ import { ChevronRight, ArrowLeft, Download, Upload, SlidersHorizontal, RotateCcw
 import { fmt, fixed } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
 import { exportLog, clearLog, readLog } from "../log";
-import { BANDS, bandOf } from "../goal";
+import { BANDS, bandOf, SOURCE_LABEL, type GoalEntry } from "../goal";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
-import { ACTIVITIES, calculate, canCalculate, suggestBand, type Personal } from "../personal";
+import { ACTIVITIES, calculate, canCalculate, suggestBand, formulaFor, type Personal } from "../personal";
 import type { AppApi, MenuSection } from "./api";
 
 const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
@@ -72,6 +72,7 @@ function ProfilePanel(p: AppApi) {
           <label className="field"><span>Height, cm</span><input inputMode="numeric" value={d.heightCm ?? ""} placeholder="175" onChange={(e) => setD({ ...d, heightCm: num(e.target.value) })} /></label>
           <label className="field"><span>Weight, kg</span><input inputMode="decimal" value={d.weightKg ?? ""} placeholder="75" onChange={(e) => setD({ ...d, weightKg: num(e.target.value) })} /></label>
         </div>
+        <label className="field"><span>Body fat %, if you know it</span><input inputMode="decimal" value={d.bodyFatPct ?? ""} placeholder="from a scale or a scan" onChange={(e) => setD({ ...d, bodyFatPct: num(e.target.value) })} /></label>
         <div className="field"><span>Activity</span>
           <div className="activity-list">
             {ACTIVITIES.map((a) => (
@@ -93,7 +94,7 @@ function GoalPanel(p: AppApi) {
   const bandName = goal?.band ? bandOf(goal.band)?.name : null;
   const setBy = goal?.setBy === "coach" ? (goal.coachName || p.profile.coachName || COACH_NAME) : "you";
   const [band, setBand] = useState<string>(suggestBand(p.personal, goal?.band).id);
-  const result = calculate(p.personal, band);
+  const result = calculate(p.personal, band, p.formula);
   return (
     <>
       <section className="plan">
@@ -103,6 +104,7 @@ function GoalPanel(p: AppApi) {
           <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal a day</small></div>
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
+        <p className="source-line">{goal?.source ? SOURCE_LABEL[goal.source] : goal?.setBy === "coach" ? SOURCE_LABEL.coach : "Quick goal"}{goal?.method ? `: ${goal.method}` : ""}{goal?.source === "profile" ? ". Follows your profile." : ""}</p>
         <div className="button-row">
           <button className="pill pill-small" onClick={openGoal}><Target size={14} /> Quick goal</button>
           <button className="pill pill-small" onClick={() => setGoalsOpen(true)}><SlidersHorizontal size={14} /> Exact numbers</button>
@@ -128,13 +130,32 @@ function GoalPanel(p: AppApi) {
                 <div><b>{fmt(result.kcal, 0)}</b><small>kcal a day</small></div>
                 <div><b>{result.protein}</b><small>g protein</small></div>
               </div>
+              <small>{result.method}{p.formula ? " (chosen by your coach)" : formulaFor(p.personal) === "katch" ? " (from your body fat)" : ""}.</small>
               {result.note && <small>{result.note}</small>}
-              <button className="pill pill-primary pill-wide" onClick={() => { p.applyNumbers(band, result.kcal, result.protein); p.notify("Your goal is set."); }}>Use these numbers</button>
+              <button className="pill pill-primary pill-wide" onClick={() => { p.applyNumbers(band, result.kcal, result.protein, result.method); p.notify("Your goal is set. It follows your profile from now on."); }}>Use these numbers</button>
             </div>
           )}
           {pdRef === null && null}
         </section>
       )}
+      <GoalHistory log={p.goalLog} />
+    </>
+  );
+}
+
+export function GoalHistory({ log }: { log: GoalEntry[] }) {
+  if (!log.length) return null;
+  return (
+    <>
+      <p className="label">History</p>
+      <section className="card history">
+        {[...log].reverse().slice(0, 20).map((e) => (
+          <div className="history-row" key={e.at}>
+            <div><b>{e.band ? bandOf(e.band)?.name : "Custom"}</b><small>{new Date(e.at).toLocaleDateString([], { day: "numeric", month: "short", year: "numeric" })} · {SOURCE_LABEL[e.source]}{e.weightKg ? ` · ${e.weightKg} kg` : ""}</small></div>
+            <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString() : "?"}</b><small>kcal · {e.protein ?? "?"} g{e.kcal && e.protein ? ` · PD ${(e.protein / (e.kcal / 100)).toFixed(1)}` : ""}</small></div>
+          </div>
+        ))}
+      </section>
     </>
   );
 }

@@ -2,7 +2,8 @@
 import { BANDS, type Band } from "./goal";
 export type Sex = "female" | "male";
 export type Activity = "sedentary" | "light" | "moderate" | "very" | "athlete";
-export type Personal = { sex?: Sex; birthYear?: number; heightCm?: number; weightKg?: number; activity?: Activity };
+export type Formula = "mifflin" | "katch";
+export type Personal = { sex?: Sex; birthYear?: number; heightCm?: number; weightKg?: number; activity?: Activity; bodyFatPct?: number };
 export const ACTIVITIES: { id: Activity; name: string; hint: string; factor: number }[] = [
   { id: "sedentary", name: "Mostly sitting",   hint: "desk job, little movement",          factor: 1.3 },
   { id: "light",     name: "Lightly active",   hint: "walking, 1 to 2 sessions a week",    factor: 1.45 },
@@ -25,13 +26,17 @@ export function suggestBand(p: Personal, current?: string): Band {
   if (age !== null && age >= 60) return BANDS.find((b) => b.id === "longevity")!;
   return BANDS.find((b) => b.id === "maintain")!;
 }
-export function calculate(p: Personal, bandId: string): { kcal: number; protein: number; note: string } | null {
+// Mifflin–St Jeor by default; Katch–McArdle when a body fat figure exists, unless the coach pinned a formula.
+export function formulaFor(p: Personal, pinned?: Formula | null): Formula { return pinned ?? (p.bodyFatPct ? "katch" : "mifflin"); }
+export function calculate(p: Personal, bandId: string, pinned?: Formula | null): { kcal: number; protein: number; note: string; method: string } | null {
   if (!canCalculate(p)) return null;
   const age = ageOf(p)!;
   const w = p.weightKg!, h = p.heightCm!;
   const sexTerm = p.sex === "male" ? 5 : p.sex === "female" ? -161 : -78;
-  const bmr = 10 * w + 6.25 * h - 5 * age + sexTerm;
-  const factor = ACTIVITIES.find((a) => a.id === p.activity)!.factor;
+  const f = formulaFor(p, pinned) === "katch" && p.bodyFatPct ? "katch" : "mifflin";
+  const bmr = f === "katch" ? 370 + 21.6 * w * (1 - p.bodyFatPct! / 100) : 10 * w + 6.25 * h - 5 * age + sexTerm;
+  const act = ACTIVITIES.find((a) => a.id === p.activity)!;
+  const factor = act.factor;
   let adj = ADJ[bandId] ?? 0;
   let note = "";
   if (age < 18 && adj < 0) { adj = 0; note = "Under 18: no deficit, energy stays at maintenance."; }
@@ -40,5 +45,7 @@ export function calculate(p: Personal, bandId: string): { kcal: number; protein:
   const refWeight = bmi > 25 ? 25 * hm * hm : w;
   const protein = Math.round(((PROTEIN_PER_KG[bandId] ?? 1.4) * refWeight) / 5) * 5;
   if (!note && bmi > 25) note = "Protein counted on a reference weight, not the current one.";
-  return { kcal, protein, note };
+  const pct = Math.round(adj * 100);
+  const method = `${f === "katch" ? "Katch–McArdle" : "Mifflin–St Jeor"}, ${act.name.toLowerCase()} ×${factor}${pct ? `, ${pct > 0 ? "+" : ""}${pct} %` : ""}`;
+  return { kcal, protein, note, method };
 }

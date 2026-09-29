@@ -46,7 +46,7 @@ export const signOutCloud = () => signOut(auth());
 
 // One document per person: the pilot state plus goal and name, and who coaches them.
 // role is set by hand in the Firebase console ("coach"); nobody can sign up as a coach.
-export type CloudDoc = { state: unknown; goal: unknown; clientName: string; updatedAt: string; personal?: unknown; role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string };
+export type CloudDoc = { state: unknown; goal: unknown; clientName: string; updatedAt: string; personal?: unknown; goalLog?: unknown[]; formula?: "mifflin" | "katch" | null; role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string };
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const snap = await getDoc(doc(db(), "users", uid));
   return snap.exists() ? (snap.data() as CloudDoc) : null;
@@ -73,7 +73,8 @@ export async function joinCoach(uid: string, code: string) {
 export async function leaveCoach(uid: string) {
   await updateDoc(doc(db(), "users", uid), { coachId: null, coachName: null });
 }
-export type ClientRow = { uid: string; name: string; goal: any; feedback: any[]; foods: number; updatedAt: string };
+export type ClientRow = { uid: string; name: string; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: "mifflin" | "katch" | null };
+export async function pinFormula(clientUid: string, formula: "mifflin" | "katch" | null) { await updateDoc(doc(db(), "users", clientUid), { formula }); }
 export async function listClients(coachUid: string): Promise<ClientRow[]> {
   const q = query(collection(db(), "users"), where("coachId", "==", coachUid));
   const snap = await getDocs(q);
@@ -81,13 +82,13 @@ export async function listClients(coachUid: string): Promise<ClientRow[]> {
     const x = d.data() as any;
     let feedback: any[] = [];
     try { feedback = await loadSharedCards(d.id); } catch { /* none shared or not allowed */ }
-    return { uid: d.id, name: x.clientName || "unnamed", goal: x.goal ?? null, feedback, foods: x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "" };
+    return { uid: d.id, name: x.clientName || "unnamed", goal: x.goal ?? null, feedback, foods: x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null };
   }));
   return rows.sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1));
 }
 export async function setClientGoal(clientUid: string, goal: any, goals: { calories: number; protein: number }, coachName: string) {
   await updateDoc(doc(db(), "users", clientUid), {
-    goal: { ...goal, setBy: "coach", coachName, setAt: new Date().toISOString() },
+    goal: { ...goal, setBy: "coach", coachName, setAt: new Date().toISOString(), source: "coach" },
     "state.goals.calories": goals.calories, "state.goals.protein": goals.protein,
     coachSetAt: new Date().toISOString(),
   });

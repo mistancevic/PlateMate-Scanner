@@ -61,7 +61,9 @@ export interface AppApi {
   dismissRecipe: (item: import("../cloud").InboxItem) => Promise<void>;
   personal: import("../personal").Personal;
   setPersonal: (p: import("../personal").Personal) => void;
-  applyNumbers: (bandId: string, kcal: number, protein: number) => void;
+  applyNumbers: (bandId: string, kcal: number, protein: number, method?: string) => void;
+  goalLog: import("../goal").GoalEntry[];
+  formula: import("../personal").Formula | null;
   openMenu: (s?: MenuSection) => void;
   newShared: number;
   markSharedSeen: () => void;
@@ -76,7 +78,7 @@ export interface AppApi {
   user: import("../cloud").CloudUser | null;
   cloudEnabled: boolean;
   cloudStatus: { ok: boolean; text: string; at?: string };
-  profile: { role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string };
+  profile: { role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string; formula?: "mifflin" | "katch" | null };
   joinCoach: (code: string) => Promise<void>;
   leaveCoach: () => Promise<void>;
   signOut: () => Promise<void>;

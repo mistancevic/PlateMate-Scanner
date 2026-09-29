@@ -10,7 +10,14 @@ export const BANDS: Band[] = [
 ];
 const mid = (r: [number, number]) => Math.round((r[0] + r[1]) / 2);
 const KEY = "chefmealan-goal";
-export type Goal = { band?: string; setBy: "you" | "coach"; setAt: string; coachName?: string };
+export type GoalSource = "quick" | "profile" | "exact" | "coach";
+export type Goal = { band?: string; setBy: "you" | "coach"; setAt: string; coachName?: string; source?: GoalSource; method?: string };
+// Every change of the daily target, oldest first. Small, synced with the account.
+export type GoalEntry = { at: string; band?: string; kcal: number | null; protein: number | null; source: GoalSource; method?: string; weightKg?: number };
+const LKEY = "chefmealan-goal-log";
+export const getGoalLog = (): GoalEntry[] => { try { return JSON.parse(localStorage.getItem(LKEY) || "[]"); } catch { return []; } };
+export const setGoalLog = (l: GoalEntry[]) => { try { localStorage.setItem(LKEY, JSON.stringify(l.slice(-60))); } catch {} };
+export const SOURCE_LABEL: Record<GoalSource, string> = { quick: "Quick goal", profile: "From your profile", exact: "Exact numbers", coach: "Set by your coach" };
 export const getGoal = (): Goal | null => { try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch { return null; } };
 export const saveGoal = (g: Goal) => { try { localStorage.setItem(KEY, JSON.stringify(g)); } catch {} };
 export const clearGoal = () => { try { localStorage.removeItem(KEY); } catch {} };

@@ -35,8 +35,8 @@ import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen } from "./screens/OutScreen";
 import { SignInScreen } from "./screens/SignInScreen";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
-import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd } from "./goal";
-import { getPersonal, setPersonal as storePersonal, type Personal } from "./personal";
+import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
+import { getPersonal, setPersonal as storePersonal, calculate, type Personal } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
@@ -407,7 +407,9 @@ export default function App() {
     [localOnly, setLocalOnly] = useState<boolean>(() => localStorage.getItem("chefmealan-local-only") === "1"),
     cloudLoaded = useRef(false),
     [cloudStatus, setCloudStatus] = useState<{ ok: boolean; text: string; at?: string }>({ ok: true, text: "" }),
-    [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string }>({}),
+    [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string; formula?: "mifflin" | "katch" | null }>({}),
+    [goalLog, setGoalLogState] = useState<GoalEntry[]>(getGoalLog),
+    nextSource = useRef<GoalSource | null>(null),
     [moment, setMomentState] = useState<MomentId>("regular"),
     [usual, setUsualState] = useState<RhythmId[]>(getUsual),
     [region, setRegionState] = useState<RegionId | null>(getRegion),
@@ -481,7 +483,8 @@ export default function App() {
     (async () => {
       try {
         const remote = await loadCloud(user.uid);
-        if (remote) setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachSetAt: remote.coachSetAt });
+        if (remote) setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
+        if (remote && Array.isArray(remote.goalLog)) { const merged = [...new Map([...(remote.goalLog as GoalEntry[]), ...getGoalLog()].map((e) => [e.at, e])).values()].sort((x, y) => (x.at > y.at ? 1 : -1)); setGoalLog(merged); setGoalLogState(merged); }
         if (remote && !(isEmptyState(remote.state) && !isEmptyState(state))) {
           // a real account copy replaces the phone; photos are merged back from the phone by id
           try {
@@ -503,7 +506,7 @@ export default function App() {
           if (remote.personal && typeof remote.personal === "object") { storePersonal(remote.personal as Personal); setPersonalState(remote.personal as Personal); }
           setCloudStatus({ ok: true, text: "Loaded from your account", at: new Date().toISOString() });
         } else {
-          await saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), updatedAt: new Date().toISOString() });
+          await saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), updatedAt: new Date().toISOString() });
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
         }
       } catch (e: any) {
@@ -548,7 +551,7 @@ export default function App() {
       try {
         const remote = await loadCloud(user.uid);
         if (!remote) return;
-        setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachSetAt: remote.coachSetAt });
+        setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
         if (remote.coachSetAt && remote.coachSetAt !== profile.coachSetAt && remote.goal) {
           try { localStorage.setItem("chefmealan-goal", JSON.stringify(remote.goal)); } catch {}
           setGoalState(getGoal());
@@ -562,6 +565,33 @@ export default function App() {
     return () => document.removeEventListener("visibilitychange", onShow);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, profile.coachSetAt]);
+  // every change of the daily target lands in the goal log, a moment after it settles
+  useEffect(() => {
+    const kcal = state.goals.calories ?? null, protein = state.goals.protein ?? null;
+    if (kcal === null && protein === null) return;
+    const t = setTimeout(() => {
+      const log = getGoalLog();
+      const last = log[log.length - 1];
+      const source: GoalSource = nextSource.current ?? goal?.source ?? (goal?.setBy === "coach" ? "coach" : "exact");
+      if (last && last.kcal === kcal && last.protein === protein && last.band === goal?.band && last.source === source) return;
+      const entry: GoalEntry = { at: new Date().toISOString(), band: goal?.band, kcal, protein, source, method: goal?.method, weightKg: personal.weightKg };
+      const next = [...log, entry];
+      setGoalLog(next); setGoalLogState(next); nextSource.current = null;
+    }, 1500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.goals.calories, state.goals.protein, goal?.band, goal?.source]);
+  // numbers calculated from the profile follow the profile
+  useEffect(() => {
+    if (goal?.source !== "profile" || !goal.band) return;
+    const r = calculate(personal, goal.band, profile.formula ?? null);
+    if (!r || (r.kcal === state.goals.calories && r.protein === state.goals.protein)) return;
+    nextSource.current = "profile";
+    saveGoal({ ...goal, method: r.method, setAt: new Date().toISOString() }); setGoalState(getGoal());
+    setState((s) => ({ ...s, goals: { ...s.goals, calories: r.kcal, protein: r.protein } }));
+    notify(`Your numbers moved with your profile: ${r.kcal.toLocaleString()} kcal, ${r.protein} g protein.`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [personal, profile.formula]);
   // a goal band with missing numbers heals itself from the band
   useEffect(() => {
     const b = goal?.band ? bandOf(goal.band) : null;
@@ -575,7 +605,7 @@ export default function App() {
   useEffect(() => {
     if (!user || !cloudLoaded.current) return;
     const t = setTimeout(() => {
-      saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), updatedAt: new Date().toISOString() })
+      saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), updatedAt: new Date().toISOString() })
         .then(async () => {
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
           try { if (state.feedback.length) await saveCards(user.uid, state.feedback); } catch (e) { setCloudStatus({ ok: true, text: `Saved. Cards: ${explainCloudError(e)}`, at: new Date().toISOString() }); }
@@ -597,7 +627,7 @@ export default function App() {
         .catch((e) => setCloudStatus({ ok: false, text: `Not saved: ${explainCloudError(e)}` }));
     }, 1000);
     return () => clearTimeout(t);
-  }, [state, goal, clientName, personal, user]);
+  }, [state, goal, clientName, personal, goalLog, user]);
   async function api(url: string, body?: unknown) {
     const res = await fetch(url, {
       method: body === undefined ? "GET" : "POST",
@@ -889,8 +919,10 @@ export default function App() {
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },
-    applyNumbers: (bandId: string, kcal: number, protein: number) => {
-      saveGoal({ band: bandId, setBy: "you", setAt: new Date().toISOString() });
+    goalLog, formula: profile.formula ?? null,
+    applyNumbers: (bandId: string, kcal: number, protein: number, method?: string) => {
+      nextSource.current = "profile";
+      saveGoal({ band: bandId, setBy: "you", setAt: new Date().toISOString(), source: "profile", method });
       setGoalState(getGoal());
       setState((s) => ({ ...s, goals: { ...s.goals, calories: kcal, protein } }));
     },
@@ -1104,6 +1136,8 @@ export default function App() {
           goals={state.goals}
           close={() => setGoalsOpen(false)}
           save={(g) => {
+            nextSource.current = "exact";
+            { const cur = getGoal(); if (cur) { saveGoal({ ...cur, source: "exact", method: undefined, setAt: new Date().toISOString() }); setGoalState(getGoal()); } }
             setState((s) => ({ ...s, goals: g }));
             setGoalsOpen(false);
             notify("Daily reference saved. Food composition stays unchanged.");

@@ -21,7 +21,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
             <button key={b.id} className="band-card" onClick={() => {
               const g = goalsForBand(b);
               setState((s) => ({ ...s, goals: { ...s.goals, calories: g.calories, protein: g.protein } }));
-              saveGoal({ band: b.id, setBy: coach ? "coach" : "you", setAt: new Date().toISOString() });
+              saveGoal({ band: b.id, setBy: coach ? "coach" : "you", setAt: new Date().toISOString(), source: "quick" });
               onDone();
             }}>
               <b>{b.name}</b><small>{b.who}</small>
@@ -39,7 +39,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
           <p className="small">That is PD {fixed(ownPd)}, protein per 100 kcal.</p>
           <button className="pill pill-primary pill-wide" disabled={!ownPd} onClick={() => {
             setState((s) => ({ ...s, goals: { ...s.goals, calories: Number(kcal), protein: Number(protein) } }));
-            saveGoal({ setBy: coach ? "coach" : "you", setAt: new Date().toISOString() });
+            saveGoal({ setBy: coach ? "coach" : "you", setAt: new Date().toISOString(), source: "exact" });
             onDone();
           }}>Set my goal</button>
           <button className="link" onClick={() => setOwn(false)}>Back to the goals</button>

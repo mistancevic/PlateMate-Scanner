@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { RefreshCw, Copy, Target } from "lucide-react";
-import { listClients, setClientGoal, publishCoachCode, loadPhotos, sendRecipe, type ClientRow } from "../cloud";
+import { listClients, setClientGoal, publishCoachCode, loadPhotos, sendRecipe, pinFormula, type ClientRow } from "../cloud";
+import { GoalHistory } from "./MenuScreen";
 import { uid } from "../pilot";
 import { BANDS, bandOf, goalsForBand } from "../goal";
 import { fixed } from "../ui";
@@ -55,6 +56,7 @@ export function CoachArea(p: AppApi) {
 function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row: ClientRow; coachName: string; close: () => void; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void }) {
   const [band, setBand] = useState<string>(row.goal?.band ?? "");
   const [editing, setEditing] = useState(false);
+  const [formula, setFormula] = useState<"mifflin" | "katch" | null>(row.formula ?? null);
   const [saving, setSaving] = useState(false);
   const [photos, setPhotos] = useState<Map<string, string>>(new Map());
   useEffect(() => { loadPhotos(row.uid).then(setPhotos).catch(() => {}); }, [row.uid]);
@@ -67,6 +69,12 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row
         <div className="client-goal">
           <div><b>{row.goal?.band ? bandOf(row.goal.band)?.name : "No goal yet"}</b><small>{row.goal?.band ? bandOf(row.goal.band)?.range : ""}{row.goal?.setBy === "coach" ? " · set by you" : row.goal ? " · set by them" : ""}</small></div>
           <button className="pill pill-small" onClick={() => setEditing((v) => !v)}><Target size={14} /> {editing ? "Cancel" : "Change goal"}</button>
+        </div>
+        <div className="formula-row">
+          <small>Formula</small>
+          {([[null, "Automatic"], ["mifflin", "Mifflin–St Jeor"], ["katch", "Katch–McArdle"]] as const).map(([k, l]) => (
+            <button key={l} className={`pill pill-small ${(formula ?? null) === k ? "pill-primary" : ""}`} onClick={async () => { try { await pinFormula(row.uid, k); setFormula(k); notify(`${row.name}: ${l.toLowerCase()}.`); } catch (e: any) { setError(e.message || "Could not set the formula."); } }}>{l}</button>
+          ))}
         </div>
         {editing && (
           <>
@@ -86,6 +94,7 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row
             }}>Set this goal</button>
           </>
         )}
+        <GoalHistory log={row.goalLog ?? []} />
         <p className="label">Shared with you ({row.feedback.length})</p>
         {row.feedback.length === 0 && <small>Nothing yet.</small>}
         {row.feedback.slice(0, 30).map((f: any) => {
