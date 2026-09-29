@@ -406,3 +406,8 @@ a.pill { text-decoration: none; display: inline-flex; align-items: center; }
 .explain p { margin: 0 0 8px; font-size: 14px; line-height: 1.45; } .explain small { color: var(--muted); }
 .day-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; } .day-row small { margin-right: 4px; font-weight: 700; }
 .menu-row-text { flex: 1; display: flex; flex-direction: column; } .menu-row-text small { color: var(--muted); font-weight: 400; }
+.helper { max-height: 85dvh; overflow-y: auto; }
+.suggestion { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.suggestion b { display: block; font-size: 15px; } .suggestion small { color: var(--muted); }
+.helper-reply { margin: 10px 0 4px; font-size: 15px; line-height: 1.45; }
+.ask-plate { margin-top: 8px; }

@@ -1,0 +1,185 @@
+{
+ "note": "Fill coach_top3 with up to three food ids you would pick; the check then scores your pick in the ranking.",
+ "cases": [
+  {
+   "id": "g01",
+   "plate": [
+    {
+     "food": "f-nutella",
+     "grams": 20
+    },
+    {
+     "food": "f-skyr",
+     "grams": 150
+    }
+   ],
+   "missing": "f-skyr",
+   "target": 5.7,
+   "coach_top3": []
+  },
+  {
+   "id": "g02",
+   "plate": [
+    {
+     "food": "f-oats",
+     "grams": 50
+    },
+    {
+     "food": "f-milk",
+     "grams": 200
+    },
+    {
+     "food": "f-banana",
+     "grams": 80
+    }
+   ],
+   "missing": "f-milk",
+   "target": 4.0,
+   "coach_top3": []
+  },
+  {
+   "id": "g03",
+   "plate": [
+    {
+     "food": "f-keks",
+     "grams": 30
+    },
+    {
+     "food": "f-greek",
+     "grams": 170
+    }
+   ],
+   "missing": "f-greek",
+   "target": 5.5,
+   "coach_top3": []
+  },
+  {
+   "id": "g04",
+   "plate": [
+    {
+     "food": "f-icecream",
+     "grams": 80
+    },
+    {
+     "food": "f-quark",
+     "grams": 150
+    }
+   ],
+   "missing": "f-quark",
+   "target": 6.0,
+   "coach_top3": []
+  },
+  {
+   "id": "g05",
+   "plate": [
+    {
+     "food": "f-pb",
+     "grams": 20
+    },
+    {
+     "food": "f-bread",
+     "grams": 60
+    },
+    {
+     "food": "f-cottage",
+     "grams": 100
+    }
+   ],
+   "missing": "f-cottage",
+   "target": 5.0,
+   "coach_top3": []
+  },
+  {
+   "id": "g06",
+   "plate": [
+    {
+     "food": "f-rice",
+     "grams": 150
+    },
+    {
+     "food": "f-chicken",
+     "grams": 120
+    }
+   ],
+   "missing": "f-chicken",
+   "target": 6.5,
+   "coach_top3": []
+  },
+  {
+   "id": "g07",
+   "plate": [
+    {
+     "food": "f-apple",
+     "grams": 150
+    },
+    {
+     "food": "f-almonds",
+     "grams": 15
+    },
+    {
+     "food": "f-greek",
+     "grams": 150
+    }
+   ],
+   "missing": "f-greek",
+   "target": 5.0,
+   "coach_top3": []
+  },
+  {
+   "id": "g08",
+   "plate": [
+    {
+     "food": "f-honey",
+     "grams": 15
+    },
+    {
+     "food": "f-skyr",
+     "grams": 200
+    },
+    {
+     "food": "f-oats",
+     "grams": 30
+    }
+   ],
+   "missing": "f-skyr",
+   "target": 6.5,
+   "coach_top3": []
+  },
+  {
+   "id": "g09",
+   "plate": [
+    {
+     "food": "f-bread",
+     "grams": 80
+    },
+    {
+     "food": "f-egg",
+     "grams": 120
+    }
+   ],
+   "missing": "f-egg",
+   "target": 5.5,
+   "coach_top3": []
+  },
+  {
+   "id": "g10",
+   "plate": [
+    {
+     "food": "f-banana",
+     "grams": 100
+    },
+    {
+     "food": "f-whey",
+     "grams": 30
+    },
+    {
+     "food": "f-milk",
+     "grams": 250
+    }
+   ],
+   "missing": "f-whey",
+   "target": 7.0,
+   "coach_top3": []
+  }
+ ]
+}

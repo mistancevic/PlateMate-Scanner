@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Camera, ScanBarcode, Plus, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Camera, ScanBarcode, Plus, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown, MessageCircleQuestion } from "lucide-react";
 import { aggregate, density, uid, solveIngredient } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
@@ -7,6 +7,8 @@ import { log } from "../log";
 import { iconFor } from "../icons";
 import { SwipeRow } from "../components/SwipeRow";
 import { methodsFor } from "../methods";
+import { rankSwaps } from "../swaps";
+import { PlateHelper } from "../components/PlateHelper";
 import { momentOf, orderMoments, REGIONS } from "../moments";
 import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
@@ -45,6 +47,7 @@ export function JourneyScreen(p: AppApi) {
   const [title, setTitle] = useState("");
   const autoTitle = (its: typeof items) => { const n = its.map((i) => i.food.name.split(",")[0].trim()); return n.length <= 1 ? n[0] ?? "Meal" : `${n.slice(0, -1).join(", ")} & ${n[n.length - 1]}`; };
   const [shareWhy, setShareWhy] = useState<"look" | "ok" | "help" | null>(null);
+  const [helper, setHelper] = useState<{ missing: string | null } | null>(null);
   const [sharing, setSharing] = useState(false);
   const [swapId, setSwapId] = useState<string | null>(null);
   const [touched, setTouched] = useState<Set<string>>(new Set());
@@ -56,7 +59,12 @@ export function JourneyScreen(p: AppApi) {
   const pd = density(t.protein, t.calories);
   const n = STEPS.indexOf(step) + 1;
   const cardItem = items.find((i) => i.id === cardId);
-  const foodCard = cardItem && <FoodCard food={cardItem.food} target={pdRef} fit={p.fitPd(density(cardItem.food.protein, cardItem.food.calories))} close={() => setCardId(null)} />;
+  const foodCard = cardItem && <FoodCard food={cardItem.food} target={pdRef} fit={p.fitPd(density(cardItem.food.protein, cardItem.food.calories))} close={() => setCardId(null)} dontHave={() => { setHelper({ missing: cardItem.id }); setCardId(null); }} />;
+  const helperSheet = helper && (
+    <PlateHelper items={items} library={state.foods} pdRef={pdRef} cap={cap ?? null} missing={helper.missing ? items.find((i) => i.id === helper.missing) ?? null : null}
+      setError={setError} close={() => setHelper(null)}
+      apply={(next, note) => { setState((s) => ({ ...s, items: next, portion: null })); setHelper(null); p.notify(note); if (step === "recipe") recalc(next); }} />
+  );
   const adjustFor = (o: { items: typeof items }) => o.items.find((i) => !i.locked)?.id;
   // Mealan moves the food with the highest protein density; everything else keeps the amount you set.
   function askMealan() {
@@ -120,17 +128,7 @@ export function JourneyScreen(p: AppApi) {
     setState((s) => ({ ...s, items: s.items.map((i) => (i.id === suggest.id ? { ...i, grams: suggest.grams } : i)), portion: null }));
     setSuggest(null);
   }
-  const swapCandidates = (() => {
-    if (!swapId || pdRef === null) return [];
-    const slot = items.find((i) => i.id === swapId); if (!slot) return [];
-    return state.foods.filter((f) => !items.some((i) => i.food.id === f.id)).map((f) => {
-      const trial = items.map((i) => (i.id === swapId ? { ...i, food: { ...f, readyToEat: true }, locked: false } : { ...i, locked: true }));
-      const r = solveIngredient(trial, swapId, pdRef, null);
-      const grams = r.ok ? r.grams : null;
-      const fits = grams !== null && grams <= (cap ?? Infinity);
-      return { f, grams, fits };
-    }).sort((a, b) => (a.fits === b.fits ? (a.grams ?? 1e9) - (b.grams ?? 1e9) : a.fits ? -1 : 1));
-  })();
+  const swapCandidates = !swapId || pdRef === null ? [] : rankSwaps(items, swapId, state.foods, pdRef, cap ?? null);
   const swapPanel = swapId && (
     <div className="sheet-backdrop" onClick={() => setSwapId(null)}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -227,8 +225,10 @@ export function JourneyScreen(p: AppApi) {
         </button>
         {items.length === 1 && <p className="small center">One product: {CHEF_NAME} looks through your foods for a partner that brings it to your plan.</p>}
         {items.length >= 2 && <p className="small center">Grey is yours to type and {CHEF_NAME}'s to move. Coral is fixed. Swipe right to remove, left to swap. Tap a name for its card.</p>}
+        {items.length > 0 && <button className="pill pill-wide ask-plate" onClick={() => setHelper({ missing: null })}><MessageCircleQuestion size={16} /> Ask about this plate</button>}
         {swapPanel}
         {foodCard}
+        {helperSheet}
         <p className="label">My foods</p>
         <input className="search" aria-label="Search my foods" placeholder="Search my foods" value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="rows">
@@ -317,9 +317,11 @@ export function JourneyScreen(p: AppApi) {
           const next = (pick + 1) % options.length; setPick(next);
           setState((s) => ({ ...s, items: options[next].items, portion: null }));
         }}>Try another mix ({(pick % options.length) + 1} of {options.length})</button>}
+        <button className="pill pill-wide ask-plate" onClick={() => setHelper({ missing: null })}><MessageCircleQuestion size={16} /> Ask about this plate</button>
         <Back to="in" />
         {swapPanel}
         {foodCard}
+        {helperSheet}
       </>
     );
   }

@@ -5,7 +5,7 @@ import { iconFor } from "../icons";
 const role = (pd: number | null) =>
   pd === null ? "unknown" : pd < 3 ? "flavour, fat or carbs: the reason you want it" : pd < 5 ? "mixed: look at the amount and the rest of the plate" : pd < 10 ? "helps the protein along" : "a protein base to build on";
 
-export function FoodCard({ food, target, fit, close, review }: { food: Food; target: number | null; fit: "high" | "mid" | "low"; close: () => void; review?: () => void }) {
+export function FoodCard({ food, target, fit, close, review, dontHave }: { food: Food; target: number | null; fit: "high" | "mid" | "low"; close: () => void; review?: () => void; dontHave?: () => void }) {
   const pd = density(food.protein, food.calories);
   const share = pd === null ? null : Math.round(pd * 4);
   const fitText = fit === "high" ? "fits your goal" : fit === "mid" ? "close to your goal" : "below your goal";
@@ -33,6 +33,7 @@ export function FoodCard({ food, target, fit, close, review }: { food: Food; tar
         </div>
         <p className="small">Role in a recipe: {role(pd)}.</p>
         <p className="small">{food.readyToEat ? "Ready to eat as it is." : "Needs preparation before eating."} Values from the {food.source === "label" ? "label" : food.source}, check your package.</p>
+        {dontHave && <button className="pill pill-wide pill-primary" onClick={dontHave}>Don't have it? Find something instead</button>}
         {review && <button className="pill pill-wide" onClick={() => { close(); review(); }}>Review the label</button>}
       </div>
     </div>
