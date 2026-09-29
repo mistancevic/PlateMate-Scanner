@@ -139,6 +139,14 @@ function GoalPanel(p: AppApi) {
           {pdRef === null && null}
         </section>
       )}
+      <p className="label">How your numbers work</p>
+      <section className="card explain">
+        <p><b>At rest.</b> What your body burns doing nothing: Mifflin–St Jeor from sex, age, height and weight, or Katch–McArdle from your lean mass when you know your body fat.</p>
+        <p><b>Your day.</b> That times how much you move: 1.2 for a day on the sofa, 1.375 light, 1.55 active, 1.725 very active, 1.9 training twice. A lazy Sunday and a training day can be 1,000 kcal apart.</p>
+        <p><b>Your goal.</b> Minus 20 % to lose fat, minus 10 % for recomposition, plus 10 % to build.</p>
+        <p><b>Protein.</b> Per kg of your weight: 1.2 to 1.6 g for adults, 1.6 to 2.2 g if you train, build or cut. It stays the same on rest days; the energy moves.</p>
+        <small>Sources: Mifflin et al. 1990; Katch and McArdle; standard activity multipliers; US Dietary Guidelines 2025–2030; ISSN position stand 2017; Morton et al. 2018.</small>
+      </section>
       <GoalHistory log={p.goalLog} />
     </>
   );
