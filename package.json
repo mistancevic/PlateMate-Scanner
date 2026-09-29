@@ -10,7 +10,8 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "test": "node --import tsx --test src/*.test.ts",
-    "test:ui": "npm run build && node scripts/ui-smoke.cjs"
+    "test:ui": "npm run build && node scripts/ui-smoke.cjs",
+    "test:flows": "npm run build && node tests/flows/meal-from-empty-plate.cjs && node tests/flows/chat-then-craving.cjs"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

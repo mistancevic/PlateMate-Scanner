@@ -195,6 +195,7 @@ export function JourneyScreen(p: AppApi) {
           <button className="pill pill-small" onClick={() => { setMode("barcode"); setCamera(true); }}><ScanBarcode size={15} /> Barcode</button>
           <button className="pill pill-small" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> Label</button>
           <button className="pill pill-small" onClick={() => blank()}><Plus size={15} /> Type it</button>
+          <button className="pill pill-small" onClick={p.openOut}><MessageCircle size={15} /> Chat</button>
         </div>
         {items.length > 0 && (
           <div className="rows">

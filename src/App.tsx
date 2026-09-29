@@ -528,6 +528,8 @@ export default function App() {
     return () => document.removeEventListener("visibilitychange", onShow);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid]);
+  // the chat is a mode of the Mealan tab: leaving the tab closes it, so the next visit starts on the plate
+  useEffect(() => { if (tab !== "journey") setOutOpen(false); }, [tab]);
   // coach: how many cards were shared since I last looked
   const countNewShared = async () => {
     if (!user || profile.role !== "coach") return;
@@ -987,6 +989,7 @@ export default function App() {
       } catch (e: any) { setError(e.message); } finally { setBusy(""); }
     },
     openOut: () => setOutOpen(true),
+    closeOut: () => setOutOpen(false),
     shareCard: (id: string, reason: "look" | "ok" | "help") => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, shared: { reason, at: new Date().toISOString() } } : f)) }));
       notify(`Shared with ${profile.coachName || "your coach"}.`);
