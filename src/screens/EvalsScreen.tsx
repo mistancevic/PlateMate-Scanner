@@ -1,0 +1,150 @@
+import { useMemo, useState } from "react";
+import { Play, Check, X, Download, RotateCcw } from "lucide-react";
+import questionsRaw from "../../evals/plate-questions.jsonl?raw";
+import goldenRaw from "../../evals/swap-golden.json?raw";
+import libraryRaw from "../../evals/library.json?raw";
+import { rankSwaps, sameFood } from "../swaps";
+import { uid, type Food, type Ingredient } from "../pilot";
+import type { AppApi } from "./api";
+
+// The evals page: every scenario, run it, see the output and the checks, label it, compare with the judge.
+type Q = { id: string; dimensions: Record<string, string>; plate: { food: string; grams: number }[]; question: string; missing: string | null; expect: { min_suggestions: number; must_not_suggest: string[]; forbidden_phrases: string[] } };
+type G = { id: string; plate: { food: string; grams: number }[]; missing: string; target: number; coach_top3: string[] };
+type Result = { at: string; ms?: number; output: any; checks: Record<string, boolean>; judge?: { score: number; reason: string }; label?: "pass" | "fail"; reason?: string };
+const LIB: Food[] = JSON.parse(libraryRaw).foods;
+const QUESTIONS: Q[] = questionsRaw.trim().split("\n").map((l: string) => JSON.parse(l));
+const GOLDEN: G[] = JSON.parse(goldenRaw).cases;
+const food = (id: string) => LIB.find((f) => f.id === id)!;
+const KEY = "chefmealan-evals";
+const load = (): Record<string, Result> => { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; } };
+const TYPES = ["all", "code", "missing", "goes-with", "better-match", "texture", "cheaper", "constraint", "adversarial"];
+
+function runCode(g: G): Result {
+  const items: Ingredient[] = g.plate.map((p) => ({ id: uid(), food: { ...food(p.food), readyToEat: true }, grams: p.grams, locked: true }));
+  const slot = items.find((i) => i.food.id === g.missing)!;
+  const t0 = performance.now();
+  const ranked = rankSwaps(items, slot.id, LIB, g.target, 300, slot.food.name);
+  const top3 = ranked.slice(0, 3);
+  const checks: Record<string, boolean> = {
+    "top pick reaches the target": !!ranked[0]?.fits,
+    "never the missing food": ranked.every((r) => !sameFood(r.f.name, slot.food.name)),
+  };
+  if (g.coach_top3.length) checks["coach pick in top 3"] = g.coach_top3.some((id) => top3.some((r) => r.f.id === id));
+  return { at: new Date().toISOString(), ms: Math.round(performance.now() - t0), output: { swaps: top3.map((r) => ({ food: r.f.name, grams: r.grams, fits: r.fits })) }, checks };
+}
+async function runModel(q: Q): Promise<Result> {
+  const plate = q.plate.map((p) => { const f = food(p.food); return { name: f.name, grams: p.grams, calories: f.calories, protein: f.protein }; });
+  const t0 = performance.now();
+  const res = await fetch("/api/plate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q.question, missing: q.missing, plate, library: LIB.map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), target: { pd: 5.5 } }) });
+  const data = await res.json(); const ms = Math.round(performance.now() - t0);
+  if (!res.ok) return { at: new Date().toISOString(), ms, output: { error: data.error }, checks: { "answered": false } };
+  const sugs: any[] = data.suggestions ?? [];
+  const text = `${data.reply ?? ""} ${sugs.map((s) => `${s.food} ${s.why}`).join(" ")}`.toLowerCase();
+  const checks = {
+    "right shape": sugs.length >= q.expect.min_suggestions && sugs.length <= 3,
+    "grounded": sugs.every((s) => s.known || (s.calories !== null && s.protein !== null)),
+    "never the missing food": q.expect.must_not_suggest.every((m) => !sugs.some((s) => s.food.toLowerCase().includes(m.toLowerCase().split(/[\s,(]+/)[0]))),
+    "no forbidden phrase": q.expect.forbidden_phrases.every((w) => !text.includes(w.toLowerCase())),
+    "under 5 seconds": ms < 5000,
+  };
+  let judge: Result["judge"];
+  try { const j = await fetch("/api/judge", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question: q.question, plate, answer: data }) }); if (j.ok) judge = await j.json(); } catch { /* optional */ }
+  return { at: new Date().toISOString(), ms, output: data, checks, judge };
+}
+
+export function EvalsScreen(p: AppApi) {
+  const [results, setResults] = useState<Record<string, Result>>(load);
+  const [type, setType] = useState("all");
+  const [open, setOpen] = useState<string | null>(null);
+  const [running, setRunning] = useState<string | null>(null);
+  const save = (r: Record<string, Result>) => { setResults(r); try { localStorage.setItem(KEY, JSON.stringify(r)); } catch {} };
+  const put = (id: string, r: Partial<Result>) => save({ ...load(), [id]: { ...(load()[id] ?? {}), ...r } as Result });
+
+  const cases = useMemo(() => [
+    ...GOLDEN.map((g) => ({ id: g.id, kind: "code" as const, title: `${g.plate.map((x) => food(x.food).name.split(",")[0]).join(" + ")}, without ${food(g.missing).name.split(",")[0]}`, tags: ["code", "swap ranking", `target ${g.target}`], g })),
+    ...QUESTIONS.map((q) => ({ id: q.id, kind: "model" as const, title: q.question, tags: [q.dimensions.question, q.dimensions.identity, q.dimensions.goal, q.dimensions.situation, q.dimensions.place], q })),
+  ], []);
+  const shown = cases.filter((c) => type === "all" || (type === "code" ? c.kind === "code" : c.kind === "model" && c.q.dimensions.question === type));
+
+  async function run(c: (typeof cases)[number]) {
+    setRunning(c.id);
+    try { const r = c.kind === "code" ? runCode(c.g) : await runModel(c.q); const prev = load()[c.id]; put(c.id, { ...r, label: prev?.label, reason: prev?.reason }); }
+    catch (e: any) { p.setError(e.message); } finally { setRunning(null); }
+  }
+  async function runAll() { for (const c of shown) { await run(c); } }
+  const passChecks = (r?: Result) => r && Object.values(r.checks).every(Boolean);
+
+  const ran = cases.filter((c) => results[c.id]);
+  const checksOk = ran.filter((c) => passChecks(results[c.id])).length;
+  const judged = ran.map((c) => results[c.id].judge?.score).filter(Boolean) as number[];
+  const labelled = ran.filter((c) => results[c.id].label);
+  const agree = labelled.filter((c) => results[c.id].judge && (results[c.id].judge!.score >= 4) === (results[c.id].label === "pass")).length;
+  const labelledWithJudge = labelled.filter((c) => results[c.id].judge).length;
+  const times = ran.map((c) => results[c.id].ms ?? 0).filter((t) => t > 50).sort((a, b) => a - b);
+
+  function exportCsv() {
+    const rows = [["id", "kind", "title", "checks_pass", "failed_checks", "ms", "judge", "judge_reason", "your_label", "your_reason", "output"].join(",")];
+    const esc = (s: unknown) => `"${String(s ?? "").replace(/"/g, '""')}"`;
+    for (const c of cases) { const r = results[c.id]; if (!r) continue; rows.push([c.id, c.kind, esc(c.title), passChecks(r), esc(Object.entries(r.checks).filter(([, v]) => !v).map(([k]) => k).join("; ")), r.ms ?? "", r.judge?.score ?? "", esc(r.judge?.reason), r.label ?? "", esc(r.reason), esc(JSON.stringify(r.output))].join(",")); }
+    const url = URL.createObjectURL(new Blob([rows.join("\n")], { type: "text/csv" }));
+    const a = document.createElement("a"); a.href = url; a.download = `chef-mealan-evals-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  return (
+    <>
+      <section className="card eval-summary">
+        <div><b>{ran.length}/{cases.length}</b><small>run</small></div>
+        <div><b>{checksOk}/{ran.length || 0}</b><small>checks pass</small></div>
+        <div><b>{judged.length ? (judged.reduce((a, b) => a + b, 0) / judged.length).toFixed(1) : "–"}</b><small>judge avg</small></div>
+        <div><b>{labelledWithJudge ? `${agree}/${labelledWithJudge}` : "–"}</b><small>you and judge agree</small></div>
+        <div><b>{times.length ? `${(times[Math.floor(times.length / 2)] / 1000).toFixed(1)} s` : "–"}</b><small>median time</small></div>
+      </section>
+      <div className="moments">{TYPES.map((t) => <button key={t} className={`pill pill-small ${type === t ? "pill-primary" : ""}`} onClick={() => setType(t)}>{t}</button>)}</div>
+      <div className="button-row" style={{ margin: "8px 0 12px" }}>
+        <button className="pill pill-small pill-primary" disabled={!!running} onClick={runAll}><Play size={14} /> Run {shown.length}</button>
+        <button className="pill pill-small" onClick={exportCsv}><Download size={14} /> Export</button>
+        <button className="pill pill-small" onClick={() => save({})}><RotateCcw size={14} /> Clear</button>
+      </div>
+      {shown.map((c) => {
+        const r = results[c.id]; const isOpen = open === c.id;
+        const status = !r ? "not run" : passChecks(r) ? "checks pass" : "check failed";
+        return (
+          <section key={c.id} className={`card eval-case ${!r ? "" : passChecks(r) ? "eval-ok" : "eval-bad"}`}>
+            <button className="eval-head" onClick={() => setOpen(isOpen ? null : c.id)}>
+              <div><b>{c.id} · {c.title}</b><small>{c.tags.filter(Boolean).join(" · ")}</small></div>
+              <span className="eval-status">{running === c.id ? "running…" : status}{r?.judge ? ` · judge ${r.judge.score}` : ""}{r?.label ? ` · you: ${r.label}` : ""}</span>
+            </button>
+            {isOpen && (
+              <div className="eval-body">
+                <small>Plate: {(c.kind === "code" ? c.g.plate : c.q.plate).map((x) => `${x.grams} g ${food(x.food).name}`).join(" · ")}</small>
+                <div className="button-row" style={{ margin: "8px 0" }}><button className="pill pill-small" disabled={!!running} onClick={() => run(c)}><Play size={14} /> Run</button></div>
+                {r && (
+                  <>
+                    <p className="label">Output{r.ms !== undefined ? `, ${r.ms} ms` : ""}</p>
+                    {c.kind === "code" ? (
+                      <ol className="eval-list">{r.output.swaps.map((s: any, k: number) => <li key={k}>{s.food}, {s.grams ?? "–"} g{s.fits ? "" : " (doesn't reach the target)"}</li>)}</ol>
+                    ) : r.output.error ? <p className="small">{r.output.error}</p> : (
+                      <>
+                        <p className="helper-reply">{r.output.reply}</p>
+                        <ol className="eval-list">{(r.output.suggestions ?? []).map((s: any, k: number) => <li key={k}><b>{s.action}</b> {s.replaces ? `${s.replaces} → ` : ""}{s.food}{s.grams ? `, ${s.grams} g` : ""}: {s.why}{s.known ? "" : " (estimate)"}</li>)}</ol>
+                      </>
+                    )}
+                    <p className="label">Checks</p>
+                    <ul className="eval-checks">{Object.entries(r.checks).map(([k, v]) => <li key={k} className={v ? "ok" : "bad"}>{v ? "✓" : "✗"} {k}</li>)}</ul>
+                    {r.judge && <p className="small">Judge: {r.judge.score}/5. {r.judge.reason}</p>}
+                    <p className="label">Your label</p>
+                    <div className="button-row">
+                      <button className={`pill pill-small ${r.label === "pass" ? "pill-primary" : ""}`} onClick={() => put(c.id, { label: "pass" })}><Check size={14} /> Pass</button>
+                      <button className={`pill pill-small ${r.label === "fail" ? "pill-primary" : ""}`} onClick={() => put(c.id, { label: "fail" })}><X size={14} /> Fail</button>
+                    </div>
+                    <input className="search" placeholder="Why, in a few words" value={r.reason ?? ""} onChange={(e) => put(c.id, { reason: e.target.value })} />
+                  </>
+                )}
+              </div>
+            )}
+          </section>
+        );
+      })}
+    </>
+  );
+}

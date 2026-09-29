@@ -18,6 +18,8 @@ The method is the one from the Product Faculty AI Build Labs, applied per carrie
 | Code | `swap-golden.json` | `npm run eval:code` | 10/10 feasible, never the missing food; coach pick in top 3 for 8/10 |
 | Model | `plate-questions.jsonl` | `npm run eval:model` (server running, key set) | grounded 100 %, shape 100 %, forbidden 0, relevance ≥ 4, p50 < 5 s |
 | Human vs judge | `results/*.csv` | `npm run eval:align` | agreement ≥ 8 of 10 |
+
+The same scenarios run on a page in the app: Menu, Evals (coach accounts). Run one or all, see the output and the checks, the judge's score and reason, mark pass or fail with a reason, export as CSV. The summary shows run, checks passed, judge average, how often you and the judge agree, and the median time.
 | Behaviour | `tests/flows/*.cjs` | `npm run test:flows` | every step as expected |
 
 Outcome measures (acceptance, completion, DaaM good after a swap, repeat questions) come from the pilot log, read per

@@ -411,3 +411,12 @@ a.pill { text-decoration: none; display: inline-flex; align-items: center; }
 .suggestion b { display: block; font-size: 15px; } .suggestion small { color: var(--muted); }
 .helper-reply { margin: 10px 0 4px; font-size: 15px; line-height: 1.45; }
 .ask-plate { margin-top: 8px; }
+
+.eval-summary { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; text-align: center; }
+.eval-summary b { display: block; font-size: 17px; } .eval-summary small { color: var(--muted); font-size: 11px; line-height: 1.2; display: block; }
+.eval-case { padding: 12px 14px; } .eval-ok { border-left: 4px solid var(--high); } .eval-bad { border-left: 4px solid var(--low); }
+.eval-head { display: flex; justify-content: space-between; gap: 10px; width: 100%; text-align: left; }
+.eval-head b { display: block; font-size: 14px; } .eval-head small { color: var(--muted); }
+.eval-status { font-size: 12px; font-weight: 700; color: var(--brand-text); flex: none; text-align: right; max-width: 40%; }
+.eval-body { margin-top: 10px; } .eval-list { margin: 4px 0; padding-left: 18px; font-size: 14px; line-height: 1.45; }
+.eval-checks { list-style: none; margin: 4px 0; padding: 0; font-size: 14px; } .eval-checks .ok { color: var(--high); } .eval-checks .bad { color: var(--low); font-weight: 700; }

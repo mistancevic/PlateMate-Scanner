@@ -3,7 +3,7 @@ import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
 import type { ScannerMode } from "../types";
 
 export type Tab = "home" | "journey" | "chat" | "me" | "clients" | "meal" | "chef" | "foods" | "notes" | "more";
-export type MenuSection = "list" | "profile" | "goal" | "week" | "shop" | "coach" | "account" | "support" | "about";
+export type MenuSection = "list" | "profile" | "goal" | "week" | "shop" | "coach" | "account" | "support" | "about" | "evals";
 export type Step = "in" | "recipe" | "make" | "after";
 
 export interface AppApi {

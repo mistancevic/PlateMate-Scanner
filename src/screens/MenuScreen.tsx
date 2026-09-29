@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { ChevronRight, ArrowLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator } from "lucide-react";
+import { FlaskConical, ChevronRight, ArrowLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator } from "lucide-react";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
 import { exportLog, clearLog, readLog, log } from "../log";
@@ -8,6 +8,7 @@ import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
 import { ACTIVITIES, calculate, canCalculate, suggestBand, formulaFor, type Personal } from "../personal";
 import type { AppApi, MenuSection } from "./api";
+import { EvalsScreen } from "./EvalsScreen";
 
 const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "profile", name: "Profile", icon: <User size={20} /> },
@@ -18,6 +19,7 @@ const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "account", name: "Account", icon: <KeyRound size={20} /> },
   { id: "support", name: "Support", icon: <LifeBuoy size={20} /> },
   { id: "about", name: "About", icon: <Info size={20} /> },
+  { id: "evals", name: "Evals", icon: <FlaskConical size={20} /> },
 ];
 
 export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: MenuSection) => void; close: () => void; from: MenuSection | null }) {
@@ -27,7 +29,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       <>
         <div className="menu-head"><h2>Settings</h2><button className="link" onClick={close}>Close</button></div>
         <div className="menu-list">
-          {ITEMS.map((it) => (
+          {ITEMS.filter((it) => it.id !== "evals" || p.profile.role === "coach" || !p.cloudEnabled).map((it) => (
             <button key={it.id} className="menu-row" onClick={() => setSection(it.id)}>
               <span className="menu-icon">{it.icon}</span><b>{it.name}</b><ChevronRight size={18} />
             </button>
@@ -48,6 +50,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       {section === "account" && <AccountPanel {...p} />}
       {section === "support" && <SupportPanel {...p} />}
       {section === "about" && <AboutPanel />}
+      {section === "evals" && <EvalsScreen {...p} />}
     </>
   );
 }
