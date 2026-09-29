@@ -419,6 +419,7 @@ export default function App() {
     [personal, setPersonalState] = useState<Personal>(getPersonal),
     [dayType, setDayTypeState] = useState<DayType>(getDayType),
     [menuSection, setMenuSection] = useState<MenuSection | null>(null),
+    [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -935,7 +936,7 @@ export default function App() {
       setGoalState(getGoal());
       setState((s) => ({ ...s, goals: { ...s.goals, calories: kcal, protein } }));
     },
-    openMenu: (s?: MenuSection) => setMenuSection(s ?? "list"),
+    openMenu: (s?: MenuSection, from?: MenuSection) => { setMenuFrom(from ?? null); setMenuSection(s ?? "list"); },
     inbox,
     takeRecipe: async (item: InboxItem, how: "make" | "keep") => {
       // foods she doesn't have come along; then the recipe goes to the plate or to her recipes
@@ -1069,7 +1070,7 @@ export default function App() {
             </button>
           </div>
         )}
-        {menuSection && <MenuScreen {...screenProps} section={menuSection} setSection={setMenuSection} close={() => setMenuSection(null)} />}
+        {menuSection && <MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s) => { setMenuFrom(null); setMenuSection(s); }} close={() => { setMenuFrom(null); setMenuSection(null); }} />}
         {!menuSection && tab === "home" && <HomeScreen {...screenProps} />}
         {!menuSection && tab === "journey" && (outOpen ? <OutScreen {...screenProps} close={() => setOutOpen(false)} /> : <JourneyScreen {...screenProps} />)}
         {!menuSection && tab === "me" && <MeScreen {...screenProps} />}

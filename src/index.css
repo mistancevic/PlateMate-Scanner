@@ -405,3 +405,4 @@ a.pill { text-decoration: none; display: inline-flex; align-items: center; }
 .math { margin: 0; font-size: 13px; line-height: 1.45; color: var(--ink); background: var(--base); border-radius: 12px; padding: 10px 12px; }
 .explain p { margin: 0 0 8px; font-size: 14px; line-height: 1.45; } .explain small { color: var(--muted); }
 .day-row { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 12px; } .day-row small { margin-right: 4px; font-weight: 700; }
+.menu-row-text { flex: 1; display: flex; flex-direction: column; } .menu-row-text small { color: var(--muted); font-weight: 400; }

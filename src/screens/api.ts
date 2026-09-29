@@ -67,7 +67,7 @@ export interface AppApi {
   dayType: import("../personal").DayType;
   setDayType: (d: import("../personal").DayType) => void;
   formula: import("../personal").Formula | null;
-  openMenu: (s?: MenuSection) => void;
+  openMenu: (s?: MenuSection, from?: MenuSection) => void;
   newShared: number;
   markSharedSeen: () => void;
   setTravelTo: (r: import("../moments").RegionId | null) => void;

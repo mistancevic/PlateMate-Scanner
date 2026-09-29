@@ -20,8 +20,8 @@ const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "about", name: "About", icon: <Info size={20} /> },
 ];
 
-export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: MenuSection) => void; close: () => void }) {
-  const { section, setSection, close } = p;
+export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: MenuSection) => void; close: () => void; from: MenuSection | null }) {
+  const { section, setSection, close, from } = p;
   if (section === "list")
     return (
       <>
@@ -38,7 +38,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
   const title = ITEMS.find((i) => i.id === section)?.name ?? "";
   return (
     <>
-      <div className="menu-head"><button className="link" onClick={() => setSection("list")}><ArrowLeft size={16} /> Settings</button><button className="link" onClick={close}>Close</button></div>
+      <div className="menu-head"><button className="link" onClick={() => setSection(from ?? "list")}><ArrowLeft size={16} /> {from ? ITEMS.find((i) => i.id === from)?.name : "Settings"}</button><button className="link" onClick={close}>Close</button></div>
       <h2 className="menu-title">{title}</h2>
       {section === "profile" && <ProfilePanel {...p} />}
       {section === "goal" && <GoalPanel {...p} />}
@@ -91,7 +91,13 @@ function ProfilePanel(p: AppApi) {
         </div>
         <button className="pill pill-primary pill-wide" disabled={!dirty} onClick={() => { p.setClientName(name.trim()); p.setPersonal(d); if (d.pdUnit !== p.personal.pdUnit) log("pd_unit", { unit: d.pdUnit ?? "pd" }); p.notify("Profile saved."); }}>Save</button>
       </section>
-      <button className="pill pill-wide" onClick={() => p.openMenu("goal")}>{canCalculate(d) ? <><Calculator size={16} /> Calculate my numbers</> : <><Target size={16} /> Go to Goal</>}</button>
+      <div className="menu-list" style={{ marginTop: 12 }}>
+        <button className="menu-row" onClick={() => { if (dirty) { p.setClientName(name.trim()); p.setPersonal(d); p.notify("Profile saved."); } p.openMenu("goal", "profile"); }}>
+          <span className="menu-icon"><Calculator size={20} /></span>
+          <span className="menu-row-text"><b>{dirty ? "Save and go to Goal" : "Goal"}</b><small>{canCalculate(d) ? "Calculate your daily numbers from this profile" : "Your goal and daily numbers"}</small></span>
+          <ChevronRight size={18} />
+        </button>
+      </div>
     </>
   );
 }
@@ -130,8 +136,14 @@ function GoalPanel(p: AppApi) {
       {!canCalculate(p.personal) ? (
         <section className="card">
           <small>Add your birth year, height, weight and activity in Profile, and Mealan calculates your daily calories and protein for the goal you pick.</small>
-          <div className="button-row" style={{ marginTop: 8 }}><button className="pill pill-small pill-primary" onClick={() => p.openMenu("profile")}>Open Profile</button></div>
         </section>
+        <div className="menu-list" style={{ marginTop: 8 }}>
+          <button className="menu-row" onClick={() => p.openMenu("profile", "goal")}>
+            <span className="menu-icon"><User size={20} /></span>
+            <span className="menu-row-text"><b>Profile</b><small>Add what the calculation needs</small></span>
+            <ChevronRight size={18} />
+          </button>
+        </div>
       ) : (
         <section className="card">
           <small>Pick what you're after. The numbers come from your profile.</small>
