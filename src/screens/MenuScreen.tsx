@@ -128,8 +128,9 @@ function GoalPanel(p: AppApi) {
               <div className="plan-row">
                 <div><b>{fixed(result.protein / (result.kcal / 100))}</b><small>PD</small></div>
                 <div><b>{fmt(result.kcal, 0)}</b><small>kcal a day</small></div>
-                <div><b>{result.protein}</b><small>g protein</small></div>
+                <div><b>{result.protein}</b><small>g protein, {result.proteinMin}–{result.proteinMax}</small></div>
               </div>
+              <p className="math">{result.math}</p>
               <small>{result.method}{p.formula ? " (chosen by your coach)" : formulaFor(p.personal) === "katch" ? " (from your body fat)" : ""}.</small>
               {result.note && <small>{result.note}</small>}
               <button className="pill pill-primary pill-wide" onClick={() => { p.applyNumbers(band, result.kcal, result.protein, result.method); p.notify("Your goal is set. It follows your profile from now on."); }}>Use these numbers</button>
