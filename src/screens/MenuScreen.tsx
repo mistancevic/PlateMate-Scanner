@@ -134,6 +134,7 @@ function GoalPanel(p: AppApi) {
       </section>
       <p className="label">Calculate my numbers</p>
       {!canCalculate(p.personal) ? (
+        <>
         <section className="card">
           <small>Add your birth year, height, weight and activity in Profile, and Mealan calculates your daily calories and protein for the goal you pick.</small>
         </section>
@@ -144,6 +145,7 @@ function GoalPanel(p: AppApi) {
             <ChevronRight size={18} />
           </button>
         </div>
+        </>
       ) : (
         <section className="card">
           <small>Pick what you're after. The numbers come from your profile.</small>
