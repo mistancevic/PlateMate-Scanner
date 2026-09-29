@@ -328,7 +328,7 @@ export function JourneyScreen(p: AppApi) {
     const ways = methodsFor(items);
     return (
       <>
-        <Head title="How do you want to eat it?" sub={`Same amounts, three ways. Pick the one you feel like.`} />
+        <Head title="How do you want to eat it?" sub={ways.length ? `Same amounts, ${ways.length === 1 ? "one way" : `${ways.length} ways`}. Pick the one you feel like.` : "One food, nothing to combine. Enjoy it as it is."} />
         <div className="how">
           {ways.map((w) => (
             <button key={w.id} className={`way ${method === w.id ? "on" : ""}`} onClick={() => setMethod(w.id)}>
@@ -338,12 +338,12 @@ export function JourneyScreen(p: AppApi) {
             </button>
           ))}
         </div>
-        <button className="pill pill-primary pill-wide" disabled={!method} onClick={() => {
+        <button className="pill pill-primary pill-wide" disabled={ways.length > 0 && !method} onClick={() => {
           const w = ways.find((x) => x.id === method);
           log("method_chosen", { method });
           setState((s) => ({ ...s, title: w ? w.name : s.title }));
           setStep("after");
-        }}>I'm making it this way</button>
+        }}>{ways.length ? "I'm making it this way" : "Continue"}</button>
         <Back to="recipe" />
       </>
     );
