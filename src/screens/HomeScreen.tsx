@@ -43,13 +43,13 @@ export function HomeScreen(p: AppApi) {
       {p.profile.role === "coach" && p.newShared > 0 && (
         <button className="strip strip-button" onClick={() => setTab("clients")}>{p.newShared} new {p.newShared === 1 ? "card" : "cards"} shared with you. Open Clients.</button>
       )}
-      <button className="pill pill-primary pill-tall" onClick={() => { p.closeOut(); setStep("in"); setTab("journey"); }}>
+      <button className="pill pill-primary pill-tall" onClick={() => { setStep("in"); setTab("journey"); }}>
         <ChefHat size={20} /> I'm craving something
       </button>
       <button className="pill pill-tall" onClick={() => { setStep("in"); setTab("journey"); setMode("group"); setCamera(true); }}>
         <Camera size={20} /> Scan
       </button>
-      <button className="pill pill-tall" onClick={() => { setTab("journey"); p.openOut(); }}>
+      <button className="pill pill-tall" onClick={() => setTab("chat")}>
         <MessageCircle size={20} /> Chat with Mealan
       </button>
       <button className="pill pill-tall" onClick={() => setTab("foods")}>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Camera, Send, ArrowLeft } from "lucide-react";
+import { Camera, Send } from "lucide-react";
 import { aggregate, density, solveIngredient, uid, type Ingredient, type Food } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME } from "../components/Mark";
@@ -15,8 +15,8 @@ const asFood = (r: Rec): Food => ({
   reviewedAt: new Date().toISOString(), readyToEat: true, calories: r.calories, protein: r.protein, fats: r.fats, carbs: r.carbs, fiber: null,
 });
 
-export function OutScreen(p: AppApi & { close: () => void }) {
-  const { pdRef, setState, setError, close, state } = p;
+export function OutScreen(p: AppApi & { toPlate: () => void }) {
+  const { pdRef, setState, setError, state } = p;
   const [text, setText] = useState("");
   const [photo, setPhoto] = useState("");
   const [turns, setTurns] = useState<Turn[]>([]);
@@ -73,15 +73,14 @@ export function OutScreen(p: AppApi & { close: () => void }) {
       return { id: uid(), food: lib ?? i.food, grams: i.grams, locked: false };
     });
     setState((s) => ({ ...s, items, portion: null }));
-    p.setStep("in");
-    close();
+    p.toPlate();
   }
   function keep(t: Turn) {
     if (!t.picks?.length) return;
     const meal = { id: uid(), title: `With Mealan: ${t.picks.map((i) => i.food.name).join(", ")}`, items: t.picks, portion: t.picks.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
     setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "eaten" as const, taste: "Chat", notes: turns.filter((x) => x.role === "you").map((x) => x.text).join(" / ").slice(0, 300), createdAt: new Date().toISOString() }, ...s.feedback] }));
     log("feedback", { status: "eaten", taste: "Chat" });
-    close();
+    p.notify("Saved to your meals.");
   }
 
   return (
@@ -122,7 +121,6 @@ export function OutScreen(p: AppApi & { close: () => void }) {
           const r = new FileReader(); r.onload = () => resizeImageBase64(String(r.result), 1024, 1024).then(setPhoto).catch(() => {}); r.readAsDataURL(f); e.target.value = "";
         }} />
       </div>
-      <button className="link back" onClick={close}><ArrowLeft size={14} /> Back</button>
       </div>
     </div>
   );

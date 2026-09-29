@@ -43,7 +43,7 @@ import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { momentTarget, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
-import { Home, CircleUser, Menu, Users } from "lucide-react";
+import { Home, CircleUser, Menu, Users, MessageCircle } from "lucide-react";
 import {
   aggregate,
   candidateFood,
@@ -401,7 +401,6 @@ export default function App() {
     [clientName, setClientNameState] = useState<string>(getClientName),
     [goal, setGoalState] = useState(getGoal),
     [goalOpen, setGoalOpen] = useState<boolean>(() => !getGoal()),
-    [outOpen, setOutOpen] = useState(false),
     [user, setUser] = useState<CloudUser | null>(null),
     [authReady, setAuthReady] = useState(!cloudEnabled),
     [localOnly, setLocalOnly] = useState<boolean>(() => localStorage.getItem("chefmealan-local-only") === "1"),
@@ -528,8 +527,6 @@ export default function App() {
     return () => document.removeEventListener("visibilitychange", onShow);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid]);
-  // the chat is a mode of the Mealan tab: leaving the tab closes it, so the next visit starts on the plate
-  useEffect(() => { if (tab !== "journey") setOutOpen(false); }, [tab]);
   // coach: how many cards were shared since I last looked
   const countNewShared = async () => {
     if (!user || profile.role !== "coach") return;
@@ -988,8 +985,8 @@ export default function App() {
         });
       } catch (e: any) { setError(e.message); } finally { setBusy(""); }
     },
-    openOut: () => setOutOpen(true),
-    closeOut: () => setOutOpen(false),
+    openOut: () => setTab("chat"),
+    closeOut: () => {},
     shareCard: (id: string, reason: "look" | "ok" | "help") => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, shared: { reason, at: new Date().toISOString() } } : f)) }));
       notify(`Shared with ${profile.coachName || "your coach"}.`);
@@ -1012,6 +1009,7 @@ export default function App() {
   const NAV: { id: Tab; label: string; icon: ReactNode }[] = [
     { id: "home", label: "Today", icon: <Home size={20} /> },
     { id: "journey", label: "Mealan", icon: <Mark size={22} color="currentColor" /> },
+    { id: "chat", label: "Chat", icon: <MessageCircle size={20} /> },
     { id: "foods", label: "Foods", icon: <BookOpen size={20} /> },
     { id: "me", label: "Me", icon: <CircleUser size={20} /> },
     ...(profile.role === "coach" ? [{ id: "clients" as Tab, label: "Clients", icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }] : []),
@@ -1020,6 +1018,7 @@ export default function App() {
     home: "Today",
     journey: APP_NAME,
     me: "Me",
+    chat: "Chat",
     clients: "Clients",
     meal: "Meal",
     chef: "Chef",
@@ -1075,7 +1074,8 @@ export default function App() {
         )}
         {menuSection && <MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s) => { setMenuFrom(null); setMenuSection(s); }} close={() => { setMenuFrom(null); setMenuSection(null); }} />}
         {!menuSection && tab === "home" && <HomeScreen {...screenProps} />}
-        {!menuSection && tab === "journey" && (outOpen ? <OutScreen {...screenProps} close={() => setOutOpen(false)} /> : <JourneyScreen {...screenProps} />)}
+        {!menuSection && tab === "journey" && <JourneyScreen {...screenProps} />}
+        {!menuSection && tab === "chat" && <OutScreen {...screenProps} toPlate={() => { setStep("in"); setTab("journey"); }} />}
         {!menuSection && tab === "me" && <MeScreen {...screenProps} />}
         {!menuSection && tab === "clients" && <ClientsScreen {...screenProps} />}
         {!menuSection && tab === "meal" && <MealScreen {...screenProps} />}
