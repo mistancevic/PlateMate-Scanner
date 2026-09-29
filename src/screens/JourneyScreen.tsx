@@ -257,7 +257,7 @@ export function JourneyScreen(p: AppApi) {
     const over = cap !== null && !!mover && mover.grams > cap;
     const shown = over ? items.map((i) => (i.id === mover!.id ? { ...i, grams: cap! } : i)) : items;
     const ot = aggregate(shown); const opd = density(ot.protein, ot.calories);
-    const dayKcal = state.goals.calories ?? null;
+    const dayKcal = p.todayKcal ?? state.goals.calories ?? null;
     const share = dayKcal ? Math.round(((ot.calories ?? 0) / dayKcal) * 100) : null;
     const tooBig = shown.filter((i) => i.grams > (cap ?? 300));
     const meetingBig = p.moment === "meeting" && share !== null && share > 30;
@@ -382,7 +382,7 @@ export function JourneyScreen(p: AppApi) {
         log("feedback", { status, taste, shared: sharing ? shareWhy : null });
         setFeedback({ status, taste, notes: note });
         const shared = sharing && shareWhy ? { reason: shareWhy, at: new Date().toISOString() } : undefined;
-        setState((s) => ({ ...s, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, photo: plate || undefined, shared, moment: p.moment, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
+        setState((s) => ({ ...s, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, photo: plate || undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
         setGood(null); setNote(""); setTitle(""); setPlate(""); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); setStep("in");
       }}>{sharing ? `Save and share with ${p.profile.coachName || "your coach"}` : "Save"}</button>
       {p.profile.coachId && !sharing && <button className="pill pill-wide" onClick={() => setSharing(true)}>Share with {p.profile.coachName || "your coach"}</button>}

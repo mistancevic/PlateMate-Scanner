@@ -3,6 +3,7 @@ import { aggregate, density } from "../pilot";
 import { fmt, fixed } from "../ui";
 import { COACH_NAME } from "../components/Mark";
 import { bandOf } from "../goal";
+import { DAY_TYPES } from "../personal";
 import type { AppApi } from "./api";
 
 export function HomeScreen(p: AppApi) {
@@ -17,9 +18,15 @@ export function HomeScreen(p: AppApi) {
         <div className="plan-top"><span>{clientName ? `${clientName}'s goal` : "Your goal"}{bandName ? `: ${bandName}` : ""}</span><span>set by {setBy}</span></div>
         <div className="plan-row">
           <div><b>{fixed(pdRef)}</b><small>PD target</small></div>
-          <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal a day</small></div>
+          <div><b>{fmt(p.todayKcal ?? state.goals.calories, 0)}</b><small>{p.personal.dayMode === "follow" ? "kcal today" : "kcal a day"}</small></div>
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
+        {p.personal.dayMode === "follow" && (
+          <div className="day-row">
+            <small>Today is</small>
+            {DAY_TYPES.map((d) => <button key={d.id} className={`pill pill-small ${p.dayType === d.id ? "pill-primary" : ""}`} onClick={() => p.setDayType(d.id)}>{d.name}</button>)}
+          </div>
+        )}
       </section>
       {p.inbox.map((it) => (
         <section className="card inbox" key={it.id}>

@@ -63,6 +63,9 @@ export interface AppApi {
   setPersonal: (p: import("../personal").Personal) => void;
   applyNumbers: (bandId: string, kcal: number, protein: number, method?: string) => void;
   goalLog: import("../goal").GoalEntry[];
+  todayKcal: number | null;
+  dayType: import("../personal").DayType;
+  setDayType: (d: import("../personal").DayType) => void;
   formula: import("../personal").Formula | null;
   openMenu: (s?: MenuSection) => void;
   newShared: number;

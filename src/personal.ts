@@ -3,7 +3,21 @@ import { BANDS, type Band } from "./goal";
 export type Sex = "female" | "male";
 export type Activity = "sedentary" | "light" | "moderate" | "very" | "athlete";
 export type Formula = "mifflin" | "katch";
-export type Personal = { sex?: Sex; birthYear?: number; heightCm?: number; weightKg?: number; activity?: Activity; bodyFatPct?: number };
+export type DayMode = "same" | "follow";
+export type DayType = "rest" | "normal" | "training" | "very";
+export type Personal = { sex?: Sex; birthYear?: number; heightCm?: number; weightKg?: number; activity?: Activity; bodyFatPct?: number; dayMode?: DayMode };
+export const DAY_TYPES: { id: DayType; name: string }[] = [
+  { id: "rest", name: "Rest day" }, { id: "normal", name: "Normal day" }, { id: "training", name: "Training day" }, { id: "very", name: "Very active day" },
+];
+// The goal's calories are the average day. A given day moves them by its multiplier against the usual one; protein stays.
+export function dayFactor(day: DayType, p: Personal): { base: number; today: number } {
+  const base = ACTIVITIES.find((a) => a.id === p.activity)?.factor ?? 1.55;
+  const today = day === "rest" ? 1.2 : day === "training" ? Math.min(1.9, base + 0.175) : day === "very" ? Math.min(1.9, base + 0.35) : base;
+  return { base, today };
+}
+const dayKey = () => `chefmealan-day-${new Date().toISOString().slice(0, 10)}`;
+export const getDayType = (): DayType => { try { return (localStorage.getItem(dayKey()) as DayType) || "normal"; } catch { return "normal"; } };
+export const setDayType = (d: DayType) => { try { localStorage.setItem(dayKey(), d); } catch {} };
 export const ACTIVITIES: { id: Activity; name: string; hint: string; factor: number }[] = [
   { id: "sedentary", name: "Mostly sitting",   hint: "desk job, little movement",             factor: 1.2 },
   { id: "light",     name: "Lightly active",   hint: "walking, 1 to 3 sessions a week",       factor: 1.375 },

@@ -36,7 +36,7 @@ import { OutScreen } from "./screens/OutScreen";
 import { SignInScreen } from "./screens/SignInScreen";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
-import { getPersonal, setPersonal as storePersonal, calculate, type Personal } from "./personal";
+import { getPersonal, setPersonal as storePersonal, calculate, dayFactor, getDayType, setDayType as storeDayType, type Personal, type DayType } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
@@ -417,6 +417,7 @@ export default function App() {
     [newShared, setNewShared] = useState(0),
     [inbox, setInbox] = useState<InboxItem[]>([]),
     [personal, setPersonalState] = useState<Personal>(getPersonal),
+    [dayType, setDayTypeState] = useState<DayType>(getDayType),
     [menuSection, setMenuSection] = useState<MenuSection | null>(null),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
@@ -792,10 +793,16 @@ export default function App() {
     setState((s) => ({ ...s, meals: [meal, ...s.meals] }));
     notify("Recipe saved. It has not been recorded as eaten.");
   }
+  function todayKcalOf(): number | null {
+    const k = state.goals.calories ?? null;
+    if (k === null || personal.dayMode !== "follow") return k;
+    const { base, today } = dayFactor(dayType, personal);
+    return Math.round((k * today) / base / 50) * 50;
+  }
   function mix(id: string = adjustId): boolean { return mixWith(state.items, id); }
   function mixWith(itemsIn: Ingredient[], id: string): boolean {
     setError("");
-    const target = momentTarget(moment, density(state.goals.protein, state.goals.calories));
+    const target = momentTarget(moment, density(state.goals.protein, todayKcalOf()));
     if (target === null || target <= 0) {
       setError("Set daily energy and protein targets first.");
       return false;
@@ -901,7 +908,8 @@ export default function App() {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   const totals = aggregate(state.items),
-    dayPd = density(state.goals.protein, state.goals.calories),
+    todayKcal = todayKcalOf(),
+    dayPd = density(state.goals.protein, todayKcal),
     pdRef = momentTarget(moment, dayPd);
   const selected = portionTotals(state.items, state.portion);
   const matched =
@@ -919,7 +927,7 @@ export default function App() {
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },
-    goalLog, formula: profile.formula ?? null,
+    goalLog, formula: profile.formula ?? null, todayKcal, dayType, setDayType: (d: DayType) => { storeDayType(d); setDayTypeState(d); },
     applyNumbers: (bandId: string, kcal: number, protein: number, method?: string) => {
       nextSource.current = "profile";
       saveGoal({ band: bandId, setBy: "you", setAt: new Date().toISOString(), source: "profile", method });

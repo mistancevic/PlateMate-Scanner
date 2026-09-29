@@ -111,6 +111,14 @@ function GoalPanel(p: AppApi) {
           <ConfirmButton className="pill pill-small" label={<><RotateCcw size={14} /> Reset</>} confirmLabel="Tap again to reset" onConfirm={resetGoal} />
         </div>
       </section>
+      <p className="label">Your days</p>
+      <section className="card">
+        <div className="moments">
+          <button className={`pill pill-small ${p.personal.dayMode !== "follow" ? "pill-primary" : ""}`} onClick={() => p.setPersonal({ ...p.personal, dayMode: "same" })}>Every day the same</button>
+          <button className={`pill pill-small ${p.personal.dayMode === "follow" ? "pill-primary" : ""}`} onClick={() => p.setPersonal({ ...p.personal, dayMode: "follow" })}>Follow my day</button>
+        </div>
+        <small>{p.personal.dayMode === "follow" ? "On Today you say what kind of day it is: rest, normal, training or very active. Calories move with the day; protein stays." : "One number for every day. Some days you'll use more, some less; over the week it evens out."}</small>
+      </section>
       <p className="label">Calculate my numbers</p>
       {!canCalculate(p.personal) ? (
         <section className="card">

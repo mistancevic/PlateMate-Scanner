@@ -61,6 +61,7 @@ export type Feedback = {
   photo?: string;
   shared?: { reason: "look" | "ok" | "help"; at: string };
   moment?: string;
+  dayType?: string;
 };
 export type PilotState = {
   version: 1;
