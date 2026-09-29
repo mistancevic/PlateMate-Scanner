@@ -393,3 +393,5 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .activity b { display: block; font-size: 15px; } .activity small { color: var(--muted); }
 .proposal { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
 a.pill { text-decoration: none; display: inline-flex; align-items: center; }
+/* the menu button always sits at the right edge: after the reference line, or pushed right when there is none (Today) */
+.topbar h1 + .menu-button { margin-left: auto; }
