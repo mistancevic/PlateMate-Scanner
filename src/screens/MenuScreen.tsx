@@ -1,8 +1,8 @@
 import { useState, type ReactNode } from "react";
 import { ChevronRight, ArrowLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator } from "lucide-react";
-import { fmt, fixed } from "../ui";
+import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
-import { exportLog, clearLog, readLog } from "../log";
+import { exportLog, clearLog, readLog, log } from "../log";
 import { BANDS, bandOf, SOURCE_LABEL, type GoalEntry } from "../goal";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
@@ -82,9 +82,16 @@ function ProfilePanel(p: AppApi) {
             ))}
           </div>
         </div>
-        <button className="pill pill-primary pill-wide" disabled={!dirty} onClick={() => { p.setClientName(name.trim()); p.setPersonal(d); p.notify("Profile saved."); }}>Save</button>
+        <div className="field"><span>Show protein density as</span>
+          <div className="moments">
+            <button className={`pill pill-small ${(d.pdUnit ?? "pd") === "pd" ? "pill-primary" : ""}`} onClick={() => setD({ ...d, pdUnit: "pd" })}>PD, grams per 100 kcal</button>
+            <button className={`pill pill-small ${d.pdUnit === "pct" ? "pill-primary" : ""}`} onClick={() => setD({ ...d, pdUnit: "pct" })}>% of energy from protein</button>
+          </div>
+          <small>Same thing, two ways to read it: PD 5 is 20 % of the energy from protein.</small>
+        </div>
+        <button className="pill pill-primary pill-wide" disabled={!dirty} onClick={() => { p.setClientName(name.trim()); p.setPersonal(d); if (d.pdUnit !== p.personal.pdUnit) log("pd_unit", { unit: d.pdUnit ?? "pd" }); p.notify("Profile saved."); }}>Save</button>
       </section>
-      {canCalculate(d) && <button className="pill pill-wide" onClick={() => p.openMenu("goal")}><Calculator size={16} /> Calculate my numbers</button>}
+      <button className="pill pill-wide" onClick={() => p.openMenu("goal")}>{canCalculate(d) ? <><Calculator size={16} /> Calculate my numbers</> : <><Target size={16} /> Go to Goal</>}</button>
     </>
   );
 }
@@ -100,7 +107,7 @@ function GoalPanel(p: AppApi) {
       <section className="plan">
         <div className="plan-top"><span>Your goal{bandName ? `: ${bandName}` : ""}</span><span>set by {setBy}</span></div>
         <div className="plan-row">
-          <div><b>{fixed(p.dayPd)}</b><small>PD target</small></div>
+          <div><b>{pdVal(p.dayPd)}</b><small>{pdTag()} target</small></div>
           <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal a day</small></div>
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
@@ -134,7 +141,7 @@ function GoalPanel(p: AppApi) {
           {result && (
             <div className="proposal">
               <div className="plan-row">
-                <div><b>{fixed(result.protein / (result.kcal / 100))}</b><small>PD</small></div>
+                <div><b>{pdVal(result.protein / (result.kcal / 100))}</b><small>{pdTag()}</small></div>
                 <div><b>{fmt(result.kcal, 0)}</b><small>kcal a day</small></div>
                 <div><b>{result.protein}</b><small>g protein, {result.proteinMin}–{result.proteinMax}</small></div>
               </div>
@@ -169,7 +176,7 @@ export function GoalHistory({ log }: { log: GoalEntry[] }) {
         {[...log].reverse().slice(0, 20).map((e) => (
           <div className="history-row" key={e.at}>
             <div><b>{e.band ? bandOf(e.band)?.name : "Custom"}</b><small>{new Date(e.at).toLocaleDateString([], { day: "numeric", month: "short", year: "numeric" })} · {SOURCE_LABEL[e.source]}{e.weightKg ? ` · ${e.weightKg} kg` : ""}</small></div>
-            <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString() : "?"}</b><small>kcal · {e.protein ?? "?"} g{e.kcal && e.protein ? ` · PD ${(e.protein / (e.kcal / 100)).toFixed(1)}` : ""}</small></div>
+            <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString() : "?"}</b><small>kcal · {e.protein ?? "?"} g{e.kcal && e.protein ? ` · ${pdText(e.protein / (e.kcal / 100))}` : ""}</small></div>
           </div>
         ))}
       </section>

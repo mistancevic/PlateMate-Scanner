@@ -1,5 +1,5 @@
 import { Settings } from "lucide-react";
-import { fmt } from "../ui";
+import { fmt, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
 import { bandOf } from "../goal";
 import { MOMENTS } from "../moments";
@@ -21,7 +21,7 @@ export function MeScreen(p: AppApi) {
       <section className="plan">
         <div className="plan-top"><span>{clientName ? `${clientName}'s goal` : "Your goal"}{bandName ? `: ${bandName}` : ""}</span><span>set by {setBy}</span></div>
         <div className="plan-row">
-          <div><b>{p.dayPd !== null ? p.dayPd.toFixed(1) : "?"}</b><small>PD target</small></div>
+          <div><b>{pdVal(p.dayPd)}</b><small>{pdTag()} target</small></div>
           <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal a day</small></div>
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>

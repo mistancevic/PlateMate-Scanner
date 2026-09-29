@@ -7,6 +7,7 @@ export type LogEvent =
   | "mix_applied"
   | "method_chosen"  // data.method = mixed | topped | base-first
   | "out"            // chat with Mealan; data.picks, data.pd
+  | "pd_unit"        // data.unit = pd | pct
   | "meal_saved"
   | "feedback";      // data.status
 const KEY = "chefmealan-log";

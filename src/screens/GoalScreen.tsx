@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { BANDS, saveGoal, goalsForBand } from "../goal";
 import { density } from "../pilot";
-import { fixed } from "../ui";
+import { fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { Mark, APP_NAME } from "../components/Mark";
 import type { AppApi } from "./api";
 
@@ -26,7 +26,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
             }}>
               <b>{b.name}</b><small>{b.who}</small>
               <em>{b.kcal[0].toLocaleString()} to {b.kcal[1].toLocaleString()} kcal · {b.protein[0]} to {b.protein[1]} g protein</em>
-              <span>{b.range}</span>
+              <span>{pdRange(b.range)}</span>
             </button>
           ))}
           <button className="link" onClick={() => setOwn(true)}>I know my calories and protein</button>
@@ -36,7 +36,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
         <div className="own-goal">
           <label className="field"><span>calories a day</span><input inputMode="numeric" value={kcal} onChange={(e) => setKcal(e.target.value)} placeholder="2200" /></label>
           <label className="field"><span>protein a day, g</span><input inputMode="numeric" value={protein} onChange={(e) => setProtein(e.target.value)} placeholder="140" /></label>
-          <p className="small">That is PD {fixed(ownPd)}, protein per 100 kcal.</p>
+          <p className="small">That is {pdText(ownPd)}.</p>
           <button className="pill pill-primary pill-wide" disabled={!ownPd} onClick={() => {
             setState((s) => ({ ...s, goals: { ...s.goals, calories: Number(kcal), protein: Number(protein) } }));
             saveGoal({ setBy: coach ? "coach" : "you", setAt: new Date().toISOString(), source: "exact" });

@@ -1,5 +1,5 @@
 import { density, type Food } from "../pilot";
-import { fmt, fixed } from "../ui";
+import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { iconFor } from "../icons";
 
 const role = (pd: number | null) =>
@@ -18,9 +18,9 @@ export function FoodCard({ food, target, fit, close, review }: { food: Food; tar
           <div><b>{food.name}</b><small>{food.brand || "no brand"}{food.barcode ? ` · ${food.barcode}` : ""}</small></div>
         </div>
         <section className={`readout readout-fit-${fit}`}>
-          <div className="readout-top"><span>Protein density</span><span>PD</span></div>
+          <div className="readout-top"><span>Protein density</span><span>{pdTag()}</span></div>
           <div className="readout-mid">
-            <b>{fixed(pd)}</b>
+            <b>{pdVal(pd)}</b>
             <div><span>{fitText}{target !== null ? `, target ${fixed(target)}` : ""}</span><small>{share !== null ? `${share} % of its energy is protein` : "no protein value"}</small></div>
           </div>
         </section>

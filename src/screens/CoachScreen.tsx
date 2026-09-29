@@ -4,7 +4,7 @@ import { listClients, setClientGoal, publishCoachCode, loadPhotos, sendRecipe, p
 import { GoalHistory } from "./MenuScreen";
 import { uid } from "../pilot";
 import { BANDS, bandOf, goalsForBand } from "../goal";
-import { fixed } from "../ui";
+import { fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { density } from "../pilot";
 import { MOMENTS } from "../moments";
 import type { AppApi } from "./api";
@@ -43,7 +43,7 @@ export function CoachArea(p: AppApi) {
         <button className="card client-row" key={r.uid} onClick={() => setOpen(r)}>
           <div className="client-head">
             <span className="avatar">{r.name.slice(0, 1).toUpperCase()}</span>
-            <div><b>{r.name}</b><small>{r.goal?.band ? bandOf(r.goal.band)?.name : "no goal yet"} · {r.foods} foods · {r.feedback.length} shared · {daam(r)} DaaM good</small></div>
+            <div><b>{r.name}</b><small>{r.goal?.band ? bandOf(r.goal.band)?.name : "no goal yet"} · {r.foods} foods · {r.feedback.length} shared · {daam(r)} DaaM good · reads {r.pdUnit === "pct" ? "% protein" : "PD"}</small></div>
           </div>
           <small className="client-last">{last(r) ? `${last(r).taste}: ${last(r).meal?.title ?? ""} · ${new Date(last(r).createdAt).toLocaleDateString()}${last(r).notes ? ` · ${last(r).notes}` : ""}` : "no meals yet"} · active {r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : "never"}</small>
         </button>
@@ -67,7 +67,7 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="card-top"><span>{row.name}</span><button className="link" onClick={close}>Close</button></div>
         <div className="client-goal">
-          <div><b>{row.goal?.band ? bandOf(row.goal.band)?.name : "No goal yet"}</b><small>{row.goal?.band ? bandOf(row.goal.band)?.range : ""}{row.goal?.setBy === "coach" ? " · set by you" : row.goal ? " · set by them" : ""}</small></div>
+          <div><b>{row.goal?.band ? bandOf(row.goal.band)?.name : "No goal yet"}</b><small>{row.goal?.band ? pdRange(bandOf(row.goal.band)?.range ?? "") : ""}{row.goal?.setBy === "coach" ? " · set by you" : row.goal ? " · set by them" : ""}</small></div>
           <button className="pill pill-small" onClick={() => setEditing((v) => !v)}><Target size={14} /> {editing ? "Cancel" : "Change goal"}</button>
         </div>
         <div className="formula-row">
@@ -81,7 +81,7 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row
             <div className="bands compact">
               {BANDS.map((b) => (
                 <button key={b.id} className={`band-card ${band === b.id ? "on" : ""}`} onClick={() => setBand(b.id)}>
-                  <b>{b.name}</b><span>{b.range} · {b.kcal[0]}–{b.kcal[1]} kcal · {b.protein[0]}–{b.protein[1]} g</span>
+                  <b>{b.name}</b><span>{pdRange(b.range)} · {b.kcal[0]}–{b.kcal[1]} kcal · {b.protein[0]}–{b.protein[1]} g</span>
                 </button>
               ))}
             </div>
@@ -112,7 +112,7 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row
               <div className="client-plate">
                 <b>{f.meal?.title || "Meal"}</b>
                 {items.length > 0 && <small>{items.map((i) => `${Math.round(i.grams)} g ${i.food.name}`).join(" · ")}</small>}
-                {items.length > 0 && <small>PD {fixed(pdOf(items))} · {kcalOf(items)} kcal</small>}
+                {items.length > 0 && <small>{pdText(pdOf(items))} · {kcalOf(items)} kcal</small>}
               </div>
               {f.notes && <p className="client-note">“{f.notes}”</p>}
             </section>

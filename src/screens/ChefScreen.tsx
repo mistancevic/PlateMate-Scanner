@@ -1,6 +1,6 @@
 import { Sparkles } from "lucide-react";
 import { aggregate } from "../pilot";
-import { fmt, fixed } from "../ui";
+import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { log } from "../log";
 import type { AppApi } from "./api";
 
@@ -14,7 +14,7 @@ export function ChefScreen(p: AppApi) {
     return (
       <>
         <section className="readout readout-empty">
-          <div className="readout-mid"><b>{fixed(pdRef)}</b><div><span>your target</span><small>g protein per 100 kcal</small></div></div>
+          <div className="readout-mid"><b>{pdVal(pdRef)}</b><div><span>your target</span><small>g protein per 100 kcal</small></div></div>
         </section>
         <div className="strip">The Chef needs a meal first. Add foods, lock what you want to keep, then come back.</div>
         <button className="pill pill-primary pill-wide" onClick={() => setTab("meal")}>Go to Meal</button>
@@ -23,9 +23,9 @@ export function ChefScreen(p: AppApi) {
   return (
     <>
       <section className="readout">
-        <div className="readout-top"><span>Target</span><span>PD</span></div>
+        <div className="readout-top"><span>Target</span><span>{pdTag()}</span></div>
         <div className="readout-mid">
-          <b>{fixed(pdRef)}</b>
+          <b>{pdVal(pdRef)}</b>
           <div>
             <span>fixed: {lockedItems.length ? lockedItems.map((i) => `${i.food.name} ${fmt(i.grams, 0)} g`).join(", ") : "nothing yet"}</span>
             <small>adjusting: {adjusting ? adjusting.food.name : "pick below"}</small>
@@ -44,7 +44,7 @@ export function ChefScreen(p: AppApi) {
         <label className="field"><span>min protein g</span><input inputMode="decimal" placeholder="–" value={limits.minProtein} onChange={(e) => setLimits({ ...limits, minProtein: e.target.value })} /></label>
         <label className="field"><span>max kcal</span><input inputMode="decimal" placeholder="–" value={limits.maxKcal} onChange={(e) => setLimits({ ...limits, maxKcal: e.target.value })} /></label>
       </div>
-      <button className="pill pill-primary pill-wide" onClick={() => mix()}>Find a mix at PD {fixed(pdRef)}</button>
+      <button className="pill pill-primary pill-wide" onClick={() => mix()}>Find a mix at {pdText(pdRef)}</button>
       {options.length > 0 && (
         <>
           <p className="label">{options.length} {options.length === 1 ? "mix reaches" : "mixes reach"} {fixed(pdRef)}</p>

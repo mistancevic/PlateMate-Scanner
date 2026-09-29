@@ -1,6 +1,6 @@
 import { Camera, Plus, Trash2 } from "lucide-react";
 import { portionTotals, contribution, density } from "../pilot";
-import { fmt, fixed } from "../ui";
+import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { log } from "../log";
 import type { AppApi } from "./api";
 
@@ -22,9 +22,9 @@ export function MealScreen(p: AppApi) {
       />
       {has ? (
         <section className="readout">
-          <div className="readout-top"><span>This meal</span><span>PD</span></div>
+          <div className="readout-top"><span>This meal</span><span>{pdTag()}</span></div>
           <div className="readout-mid">
-            <b>{fixed(pd)}</b>
+            <b>{pdVal(pd)}</b>
             <div>
               <span>
                 {delta === null ? "set a daily reference" : delta >= 0

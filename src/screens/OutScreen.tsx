@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Camera, Send, ArrowLeft } from "lucide-react";
 import { aggregate, density, solveIngredient, uid, type Ingredient, type Food } from "../pilot";
-import { fmt, fixed } from "../ui";
+import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME } from "../components/Mark";
 import { resizeImageBase64 } from "../utils/image";
 import { log } from "../log";
@@ -99,7 +99,7 @@ export function OutScreen(p: AppApi & { close: () => void }) {
             {t.picks && t.picks.length > 0 && (
               <div className="picks">
                 {t.picks.map((i) => <div key={i.id}><b>{fmt(i.grams, 0)} g</b> {i.food.name} <small>~{fmt(i.food.calories, 0)} kcal · {fmt(i.food.protein)} g protein per 100 g</small></div>)}
-                <div className="picks-total">PD {fixed(t.pd ?? null)}{pdRef !== null ? ` · target ${fixed(pdRef)}` : ""} · {fmt(t.kcal ?? null, 0)} kcal</div>
+                <div className="picks-total">{pdText(t.pd ?? null)}{pdRef !== null ? ` · target ${pdVal(pdRef)}` : ""} · {fmt(t.kcal ?? null, 0)} kcal</div>
                 <div className="button-row">
                   <button className="pill pill-small pill-primary" onClick={() => toPlate(t)}>Work on it with {CHEF_NAME}</button>
                   <button className="pill pill-small" onClick={() => keep(t)}>This is what I had</button>

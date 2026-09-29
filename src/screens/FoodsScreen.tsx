@@ -1,6 +1,6 @@
 import { Camera, Plus, X, ScanBarcode } from "lucide-react";
 import { density } from "../pilot";
-import { fmt, fixed } from "../ui";
+import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import type { ScannerMode } from "../types";
 import type { AppApi } from "./api";
 import { ConfirmButton } from "../components/Confirm";
@@ -88,7 +88,7 @@ export function FoodsScreen(p: AppApi) {
                 <ConfirmButton label="Remove" confirmLabel="Tap again to remove" onConfirm={() => setState((s) => ({ ...s, foods: s.foods.filter((x) => x.id !== f.id) }))} />
               </span>
             </div>
-            <span className={`pdpill pdpill-${b}`}>{fixed(pd)}<small>PD</small></span>
+            <span className={`pdpill pdpill-${b}`}>{pdVal(pd)}<small>{pdTag()}</small></span>
           </div>
         ))}
       </div>

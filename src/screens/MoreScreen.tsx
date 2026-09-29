@@ -1,5 +1,5 @@
 import { Download, Upload, SlidersHorizontal } from "lucide-react";
-import { fmt, fixed } from "../ui";
+import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
 import { exportLog, clearLog, readLog } from "../log";
 import type { AppApi } from "./api";
@@ -12,7 +12,7 @@ export function MoreScreen(p: AppApi) {
     <div className="more-screen">
       <section className="panel">
         <h2>Daily reference</h2>
-        <p>{fmt(state.goals.calories, 0)} kcal · {fmt(state.goals.protein)} g protein · PD {fixed(pdRef)}</p>
+        <p>{fmt(state.goals.calories, 0)} kcal · {fmt(state.goals.protein)} g protein · {pdText(pdRef)}</p>
         <p className="small">Set by {COACH_NAME}.</p>
         {coach && (
           <button className="primary" onClick={() => setGoalsOpen(true)}>

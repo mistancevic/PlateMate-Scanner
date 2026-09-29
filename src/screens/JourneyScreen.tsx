@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Camera, ScanBarcode, Plus, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown, MessageCircle } from "lucide-react";
 import { aggregate, density, uid, solveIngredient } from "../pilot";
-import { fmt, fixed } from "../ui";
+import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
 import { iconFor } from "../icons";
@@ -135,12 +135,12 @@ export function JourneyScreen(p: AppApi) {
     <div className="sheet-backdrop" onClick={() => setSwapId(null)}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="card-top"><span>Swap {items.find((i) => i.id === swapId)?.food.name} for</span><button className="link" onClick={() => setSwapId(null)}>Cancel</button></div>
-        <p className="small">Sorted by how well each one brings the plate to your {fixed(pdRef)}, with the rest kept as it is.</p>
+        <p className="small">Sorted by how well each one brings the plate to your {pdVal(pdRef)}, with the rest kept as it is.</p>
         <div className="rows">
           {swapCandidates.map(({ f, grams, fits }) => (
             <button className="row row-food row-button" key={f.id} onClick={() => swap(swapId, f, fits ? grams : grams !== null ? Math.min(grams, cap ?? 300) : null, fits)}>
               <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
-              <div className="row-text"><b>{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}PD {fixed(density(f.protein, f.calories))}</small></div>
+              <div className="row-text"><b>{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}{pdText(density(f.protein, f.calories))}</small></div>
               <span className={`pdpill pdpill-${fits ? "high" : grams !== null ? "mid" : "low"}`}>{grams !== null ? `${grams} g` : "no"}</span>
             </button>
           ))}
@@ -169,7 +169,7 @@ export function JourneyScreen(p: AppApi) {
             <button key={m.id} className={`pill pill-small ${p.moment === m.id ? "pill-primary" : ""} ${m.planned ? "" : "pill-unplanned"}`} onClick={() => p.setMoment(m.id)}>{m.name}</button>
           ))}
         </div>
-        <p className="small moment-hint">{momentOf(p.moment).hint}{p.moment !== "regular" && pdRef !== null ? ` Target for this plate: PD ${fixed(pdRef)}.` : ""}</p>
+        <p className="small moment-hint">{momentOf(p.moment).hint}{p.moment !== "regular" && pdRef !== null ? ` Target for this plate: ${pdText(pdRef)}.` : ""}</p>
         {p.moment === "travel" && (
           <>
             <p className="label">Where to?</p>
@@ -183,9 +183,9 @@ export function JourneyScreen(p: AppApi) {
         )}
         {items.length > 0 && (
           <section className={`readout readout-fit-${p.fitPd(pd)}`}>
-            <div className="readout-top"><span>As it stands</span><span>PD</span></div>
+            <div className="readout-top"><span>As it stands</span><span>{pdTag()}</span></div>
             <div className="readout-mid">
-              <b>{fixed(pd)}</b>
+              <b>{pdVal(pd)}</b>
               <div><span>{pd !== null && pdRef !== null ? (pd >= pdRef ? "fits your plan" : `${fixed(pdRef - pd)} under your ${fixed(pdRef)}`) : "no target set"}</span><small>{fmt(t.calories, 0)} kcal · {fmt(t.protein)} g protein · {fmt(t.weight, 0)} g</small></div>
             </div>
           </section>
@@ -206,7 +206,7 @@ export function JourneyScreen(p: AppApi) {
                 <span className="thumb">{i.food.photo ? <img src={i.food.photo} alt="" /> : (i.food.icon || iconFor(i.food.name))}</span>
                 <div className="row-text">
                   <button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button>
-                  <small>PD {fixed(density(i.food.protein, i.food.calories))} · {i.locked ? "keep this amount" : `${CHEF_NAME} may move it`}</small>
+                  <small>{pdText(density(i.food.protein, i.food.calories))} · {i.locked ? "keep this amount" : `${CHEF_NAME} may move it`}</small>
                 </div>
                 {i.locked ? <b className="row-num">{fmt(i.grams, 0)} g</b> : (
                   <label className="grams">
@@ -240,7 +240,7 @@ export function JourneyScreen(p: AppApi) {
               return (
                 <div className="row row-food" key={f.id}>
                   <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
-                  <div className="row-text"><b>{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}PD {fixed(density(f.protein, f.calories))}</small></div>
+                  <div className="row-text"><b>{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}{pdText(density(f.protein, f.calories))}</small></div>
                   <button className={`pill pill-small ${inList ? "" : "pill-primary"}`} disabled={inList} onClick={() => add(f)}>{inList ? "In" : <><Plus size={14} /> Add</>}</button>
                 </div>
               );
@@ -273,10 +273,10 @@ export function JourneyScreen(p: AppApi) {
       <>
         <Head title={mover ? `${CHEF_NAME}'s recipe` : "As you set it"} sub={unplanned ? `${momentOf(p.moment).name}. Enjoy it, keep it small. Your next meal leans protein and you're back.` : over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : mover ? `${CHEF_NAME} moves the ${mover.food.name}. Change any other amount and it refits.` : `Nothing moved. This is where your amounts land. Tap a grey dot if you want ${CHEF_NAME} to fit one food.`} />
         <section className={`readout ${unreal ? "readout-fit-mid" : ""}`}>
-          <div className="readout-top"><span>This plate</span><span>PD</span></div>
+          <div className="readout-top"><span>This plate</span><span>{pdTag()}</span></div>
           <div className="readout-mid">
-            <b>{fixed(opd)}</b>
-            <div><span>{unreal ? "not realistic" : onPlan ? `on plan, target ${fixed(pdRef)}` : `target ${fixed(pdRef)}`}</span><small>{fmt(ot.calories, 0)} kcal{share !== null ? `, ${share} % of your day` : ""} · {fmt(ot.protein)} g protein · {fmt(ot.weight, 0)} g</small></div>
+            <b>{pdVal(opd)}</b>
+            <div><span>{unreal ? "not realistic" : onPlan ? `on plan, target ${pdVal(pdRef)}` : `target ${fixed(pdRef)}`}</span><small>{fmt(ot.calories, 0)} kcal{share !== null ? `, ${share} % of your day` : ""} · {fmt(ot.protein)} g protein · {fmt(ot.weight, 0)} g</small></div>
           </div>
           {unreal && <p className="readout-note">{unrealText}</p>}
         </section>
@@ -289,7 +289,7 @@ export function JourneyScreen(p: AppApi) {
                 <small>{i.locked ? "as you set it" : i.id === mover?.id ? `what ${CHEF_NAME} moves` : `${CHEF_NAME} may move it`}</small>
                 {suggest?.id === i.id && suggest.grams !== i.grams && (
                   <button className="link suggest" onClick={applySuggestion}>
-                    {CHEF_NAME} suggests {suggest.grams} g: that brings the plate from PD {fixed(opd)} to your {fixed(pdRef)} · apply
+                    {CHEF_NAME} suggests {suggest.grams} g: that brings the plate from {pdText(opd)} to your {pdVal(pdRef)} · apply
                   </button>
                 )}
               </div>

@@ -1,6 +1,6 @@
 import { ChefHat, Camera, BookOpen, ArrowRight, MessageCircle } from "lucide-react";
 import { aggregate, density } from "../pilot";
-import { fmt, fixed } from "../ui";
+import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
 import { bandOf } from "../goal";
 import { DAY_TYPES } from "../personal";
@@ -17,7 +17,7 @@ export function HomeScreen(p: AppApi) {
       <section className="plan">
         <div className="plan-top"><span>{clientName ? `${clientName}'s goal` : "Your goal"}{bandName ? `: ${bandName}` : ""}</span><span>set by {setBy}</span></div>
         <div className="plan-row">
-          <div><b>{fixed(pdRef)}</b><small>PD target</small></div>
+          <div><b>{pdVal(pdRef)}</b><small>{pdTag()} target</small></div>
           <div><b>{fmt(p.todayKcal ?? state.goals.calories, 0)}</b><small>{p.personal.dayMode === "follow" ? "kcal today" : "kcal a day"}</small></div>
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
@@ -59,7 +59,7 @@ export function HomeScreen(p: AppApi) {
         <section className="card">
           <div className="card-top"><span>Last time</span><span>{new Date(last.savedAt).toLocaleDateString()}</span></div>
           <b>{last.title}</b>
-          <small>{last.items.map((i) => `${i.food.name} ${fmt(i.grams, 0)} g`).join(" · ")} · PD {fixed(density(lastT.protein, lastT.calories))}</small>
+          <small>{last.items.map((i) => `${i.food.name} ${fmt(i.grams, 0)} g`).join(" · ")} · {pdText(density(lastT.protein, lastT.calories))}</small>
           <button className="link" onClick={() => { p.setState((s) => ({ ...s, items: structuredClone(last.items), title: last.title, portion: null })); setStep("in"); setTab("journey"); }}>
             Make it again <ArrowRight size={14} />
           </button>

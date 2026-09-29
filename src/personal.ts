@@ -5,7 +5,7 @@ export type Activity = "sedentary" | "light" | "moderate" | "very" | "athlete";
 export type Formula = "mifflin" | "katch";
 export type DayMode = "same" | "follow";
 export type DayType = "rest" | "normal" | "training" | "very";
-export type Personal = { sex?: Sex; birthYear?: number; heightCm?: number; weightKg?: number; activity?: Activity; bodyFatPct?: number; dayMode?: DayMode };
+export type Personal = { sex?: Sex; birthYear?: number; heightCm?: number; weightKg?: number; activity?: Activity; bodyFatPct?: number; dayMode?: DayMode; pdUnit?: "pd" | "pct" };
 export const DAY_TYPES: { id: DayType; name: string }[] = [
   { id: "rest", name: "Rest day" }, { id: "normal", name: "Normal day" }, { id: "training", name: "Training day" }, { id: "very", name: "Very active day" },
 ];

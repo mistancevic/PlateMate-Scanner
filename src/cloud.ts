@@ -73,7 +73,7 @@ export async function joinCoach(uid: string, code: string) {
 export async function leaveCoach(uid: string) {
   await updateDoc(doc(db(), "users", uid), { coachId: null, coachName: null });
 }
-export type ClientRow = { uid: string; name: string; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: "mifflin" | "katch" | null };
+export type ClientRow = { uid: string; name: string; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: "mifflin" | "katch" | null; pdUnit: "pd" | "pct" };
 export async function pinFormula(clientUid: string, formula: "mifflin" | "katch" | null) { await updateDoc(doc(db(), "users", clientUid), { formula }); }
 export async function listClients(coachUid: string): Promise<ClientRow[]> {
   const q = query(collection(db(), "users"), where("coachId", "==", coachUid));
@@ -82,7 +82,7 @@ export async function listClients(coachUid: string): Promise<ClientRow[]> {
     const x = d.data() as any;
     let feedback: any[] = [];
     try { feedback = await loadSharedCards(d.id); } catch { /* none shared or not allowed */ }
-    return { uid: d.id, name: x.clientName || "unnamed", goal: x.goal ?? null, feedback, foods: x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null };
+    return { uid: d.id, name: x.clientName || "unnamed", goal: x.goal ?? null, feedback, foods: x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: x.personal?.pdUnit ?? "pd" };
   }));
   return rows.sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1));
 }

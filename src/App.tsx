@@ -21,7 +21,7 @@ import { CameraView } from "./components/CameraView";
 import { resizeImageBase64, thumbnailBase64 } from "./utils/image";
 import { iconFor } from "./icons";
 import type { ScannerMode } from "./types";
-import { fmt, fixed } from "./ui";
+import { fmt, fixed, pdText, pdVal, pdTag, pdRange, setPdUnit } from "./ui";
 import { Mark, APP_NAME, COACH_NAME } from "./components/Mark";
 import { log, isCoach, setCoach, getClientName, setClientName as storeClientName } from "./log";
 import { MealScreen } from "./screens/MealScreen";
@@ -907,6 +907,7 @@ export default function App() {
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
+  setPdUnit(personal.pdUnit);
   const totals = aggregate(state.items),
     todayKcal = todayKcalOf(),
     dayPd = density(state.goals.protein, todayKcal),
@@ -1039,7 +1040,7 @@ export default function App() {
         </button>
         <h1>{TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
-          {goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · PD {fixed(dayPd)} · set by {goal?.setBy === "coach" ? (goal.coachName || profile.coachName || COACH_NAME) : "you"}
+          {goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · {pdText(dayPd)} · set by {goal?.setBy === "coach" ? (goal.coachName || profile.coachName || COACH_NAME) : "you"}
         </button>}
         <button className="icon menu-button" aria-label="Settings" onClick={() => setMenuSection(menuSection ? null : "list")}><Menu size={22} /></button>
       </header>
