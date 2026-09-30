@@ -8,9 +8,9 @@ import { log } from "../log";
 type Suggestion = { action: "add" | "swap" | "amount"; food: string; replaces: string | null; grams: number | null; calories: number | null; protein: number | null; why: string; known: boolean };
 
 // Help inside the plate: ask about it, get up to three actions, tap one. Closing leaves the plate as it was, plus what you tapped.
-export function PlateHelper({ items, library, pdRef, cap, missing, apply, close, setError, openTalk }: {
+export function PlateHelper({ items, library, pdRef, cap, missing, apply, close, setError, openTalk, record }: {
   items: Ingredient[]; library: Food[]; pdRef: number | null; cap: number | null; missing?: Ingredient | null;
-  apply: (next: Ingredient[], note: string) => void; close: () => void; setError: (m: string) => void; openTalk?: () => void;
+  apply: (next: Ingredient[], note: string) => void; close: () => void; setError: (m: string) => void; openTalk?: () => void; record?: (q: string, reply: string, plate: string[]) => void;
 }) {
   const [q, setQ] = useState(missing ? `I don't have ${missing.food.name}. What instead?` : "");
   const [busy, setBusy] = useState(false);
@@ -50,8 +50,9 @@ export function PlateHelper({ items, library, pdRef, cap, missing, apply, close,
     log("plate_question", { q, plate: items.map((i) => i.food.name), applied: "swap", food: f.name, from: "code" });
     apply(next, `${f.name} in`);
   }
-  async function ask() {
-    const question = q.trim(); if (!question) return;
+  async function ask(given?: string) {
+    const question = (typeof given === "string" ? given : q).trim(); if (!question) return;
+    if (typeof given === "string") setQ(given);
     setBusy(true); setReply(""); setSugs([]);
     try {
       const res = await fetch("/api/plate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
@@ -63,6 +64,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, apply, close,
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Mealan could not answer.");
       setReply(data.reply || ""); setSugs(data.suggestions ?? []);
+      record?.(question, data.reply || "", items.map((i) => i.food.name));
       if (!(data.suggestions ?? []).length) setReply((r) => r || "Couldn't work this one out. Try asking it another way.");
       log("plate_question", { q: question, plate: items.map((i) => i.food.name), n: (data.suggestions ?? []).length, ms: data.ms });
     } catch (e: any) { setError(e.message); } finally { setBusy(false); }
@@ -84,9 +86,16 @@ export function PlateHelper({ items, library, pdRef, cap, missing, apply, close,
             ))}
           </>
         )}
+        {!missing && (
+          <div className="moments chips-start">
+            {["What goes with this?", "Better match for my target?", "Make it crunchier", "Less sweet", "Cheaper option"].map((c) => (
+              <button key={c} className="pill pill-small" onClick={() => ask(c)}>{c}</button>
+            ))}
+          </div>
+        )}
         <div className="chat-input">
           <input value={q} placeholder="What goes with this? What instead of…?" onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} enterKeyHint="send" />
-          <button className="icon" aria-label="Ask" onClick={ask} disabled={busy}><Send size={20} /></button>
+          <button className="icon" aria-label="Ask" onClick={() => ask()} disabled={busy}><Send size={20} /></button>
         </div>
         {busy && <div className="bubble mealan thinking"><span /><span /><span /></div>}
         {reply && <p className="helper-reply">{reply}</p>}

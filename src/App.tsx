@@ -951,7 +951,7 @@ export default function App() {
         return how === "make" ? { ...s, foods, items, portion: null, title: meal.title } : { ...s, foods, meals: [meal, ...s.meals] };
       });
       if (how === "make") { setStep("recipe"); setTab("journey"); }
-      notify(how === "make" ? "On your plate. Fit it to me sets the amounts." : "Kept in your recipes.");
+      notify(how === "make" ? "On your plate. Fit to my target sets the amounts." : "Kept in your recipes.");
       if (user) { try { await clearInboxItem(user.uid, item.id); } catch {} }
       setInbox((x) => x.filter((i) => i.id !== item.id));
     },
@@ -991,6 +991,7 @@ export default function App() {
     openOut: () => setTalkOpen(true),
     closeOut: () => setTalkOpen(false),
     mealanAsk, mealanAsked: () => setMealanAsk(0),
+    recordTalk: (q: string, reply: string, plate: string[]) => setTalkTurns((t) => [...t, { role: "you", text: q, plate }, { role: "mealan", text: reply }]),
     shareCard: (id: string, reason: "look" | "ok" | "help") => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, shared: { reason, at: new Date().toISOString() } } : f)) }));
       notify(`Shared with ${profile.coachName || "your coach"}.`);

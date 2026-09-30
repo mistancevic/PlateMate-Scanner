@@ -8,7 +8,7 @@ import { log } from "../log";
 import type { AppApi } from "./api";
 
 type Rec = { name: string; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; typical_grams: number; confidence: string };
-export type Turn = { role: "you" | "mealan"; text: string; picks?: Ingredient[]; pd?: number | null; kcal?: number | null; photo?: string };
+export type Turn = { role: "you" | "mealan"; text: string; picks?: Ingredient[]; pd?: number | null; kcal?: number | null; photo?: string; plate?: string[] };
 
 const asFood = (r: Rec): Food => ({
   id: uid(), name: r.name, brand: "estimate", basis: "100g", source: "estimate", notes: `${r.confidence} confidence`,
@@ -26,8 +26,8 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }); }, [turns, thinking]);
   const history = turns.slice(-6).map((t) => ({ role: t.role === "you" ? "user" : "assistant", content: t.text }));
 
-  async function ask() {
-    const msg = text.trim();
+  async function ask(given?: string) {
+    const msg = (typeof given === "string" ? given : text).trim();
     if (!msg && !photo) return;
     const mine: Turn = { role: "you", text: msg || "(photo)", photo: photo || undefined };
     setTurns((t) => [...t, mine]); setText(""); setPhoto("");
@@ -90,10 +90,17 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
         <p>Out, missing something, or after an idea. Say where you are or what you have, add a photo if it helps. Estimates are marked; the amounts come from your target.</p>
       </div>
       <div className="chat">
-        {turns.length === 0 && <div className="strip">Try: "No skyr at home, what else goes with the Nutella?", "Hotel breakfast buffet" with a photo, or "Italian tonight, I want the tiramisu".</div>}
+        {turns.length === 0 && (
+          <div className="moments chips-start">
+            {["No idea, inspire me", "I'm out, what do I take?", "Hotel breakfast buffet", "Plan food for a trip", "Italian tonight, I want dessert"].map((c) => (
+              <button key={c} className="pill pill-small" onClick={() => ask(c)}>{c}</button>
+            ))}
+          </div>
+        )}
         {turns.map((t, i) => (
           <div key={i} className={`bubble ${t.role}`}>
             {t.photo && <img src={t.photo} alt="" />}
+            {t.plate && <span className="plate-chip">Plate: {t.plate.join(" · ")}</span>}
             <p>{t.text}</p>
             {t.picks && t.picks.length > 0 && (
               <div className="picks">
@@ -115,7 +122,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
       <div className="chat-input">
         <button className="icon" aria-label="Add a photo" onClick={() => fileRef.current?.click()}><Camera size={20} /></button>
         <input value={text} placeholder="Where are you, or what do you have?" onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} enterKeyHint="send" />
-        <button className="icon" aria-label="Send" onClick={ask}><Send size={20} /></button>
+        <button className="icon" aria-label="Send" onClick={() => ask()}><Send size={20} /></button>
         <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => {
           const f = e.target.files?.[0]; if (!f) return;
           const r = new FileReader(); r.onload = () => resizeImageBase64(String(r.result), 1024, 1024).then(setPhoto).catch(() => {}); r.readAsDataURL(f); e.target.value = "";

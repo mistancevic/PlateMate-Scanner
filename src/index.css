@@ -428,3 +428,6 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 
 .talk-overlay { display: block; }
 .chat-fab { padding: 0; }
+.plate-chip { display: inline-block; font-size: 12px; font-weight: 700; background: rgba(255,255,255,0.22); border-radius: 999px; padding: 2px 8px; margin-bottom: 6px; }
+.bubble.mealan .plate-chip { background: var(--tint); color: var(--brand-text); }
+.chips-start { margin: 6px 0 10px; }

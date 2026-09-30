@@ -63,7 +63,7 @@ export function JourneyScreen(p: AppApi) {
   const foodCard = cardItem && <FoodCard food={cardItem.food} target={pdRef} fit={p.fitPd(density(cardItem.food.protein, cardItem.food.calories))} close={() => setCardId(null)} dontHave={() => { setHelper({ missing: cardItem.id }); setCardId(null); }} />;
   const helperSheet = helper && (
     <PlateHelper items={items} library={state.foods} pdRef={pdRef} cap={cap ?? null} missing={helper.missing ? items.find((i) => i.id === helper.missing) ?? null : null}
-      setError={setError} close={() => setHelper(null)} openTalk={() => { setHelper(null); p.openOut(); }}
+      setError={setError} close={() => setHelper(null)} openTalk={() => { setHelper(null); p.openOut(); }} record={p.recordTalk}
       apply={(next, note) => { setState((s) => ({ ...s, items: next, portion: null })); setHelper(null); p.notify(note); if (step === "recipe") recalc(next); }} />
   );
   const adjustFor = (o: { items: typeof items }) => o.items.find((i) => !i.locked)?.id;
@@ -222,7 +222,7 @@ export function JourneyScreen(p: AppApi) {
           </div>
         )}
         <button className="pill pill-primary pill-wide" disabled={items.length < 1} onClick={askMealan}>
-          <ChefHat size={18} /> Fit it to me
+          <ChefHat size={18} /> Fit to my target
         </button>
         {items.length === 1 && <p className="small center">One product: {CHEF_NAME} looks through your foods for a partner that brings it to your plan.</p>}
         {items.length >= 2 && <p className="small center">Code, not a conversation: the amounts, at once. Questions go to {CHEF_NAME}, the button bottom right.</p>}

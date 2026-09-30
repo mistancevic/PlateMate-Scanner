@@ -80,6 +80,7 @@ export interface AppApi {
   closeOut: () => void;
   mealanAsk: number;
   mealanAsked: () => void;
+  recordTalk: (q: string, reply: string, plate: string[]) => void;
   shareCard: (id: string, reason: "look" | "ok" | "help") => void;
   user: import("../cloud").CloudUser | null;
   cloudEnabled: boolean;
