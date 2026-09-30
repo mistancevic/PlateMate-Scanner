@@ -6,6 +6,30 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import { isFood, KEYS, numberInput } from "./src/pilot";
 const app = express();
+// Who is asking: a Firebase ID token from the signed-in app. On when the server knows its Firebase project.
+import { initializeApp as initAdmin, getApps as adminApps } from "firebase-admin/app";
+import { getAuth as adminAuth } from "firebase-admin/auth";
+const FB_PROJECT = process.env.FIREBASE_PROJECT_ID || "";
+if (FB_PROJECT && !adminApps().length) initAdmin({ projectId: FB_PROJECT });
+const HOURLY_LIMIT = Number(process.env.AI_HOURLY_LIMIT || 120);
+const usage = new Map<string, { hour: number; n: number }>();
+async function requireUser(req: express.Request, res: express.Response, next: express.NextFunction) {
+  if (!FB_PROJECT) return next(); // preview and local development run without accounts
+  const token = String(req.headers.authorization || "").replace(/^Bearer /, "");
+  if (!token) return res.status(401).json({ error: "Please sign in to use Mealan." });
+  try {
+    const user = await adminAuth().verifyIdToken(token);
+    const hour = Math.floor(Date.now() / 3_600_000);
+    const u = usage.get(user.uid);
+    const n = u && u.hour === hour ? u.n + 1 : 1;
+    usage.set(user.uid, { hour, n });
+    if (n > HOURLY_LIMIT) return res.status(429).json({ error: "That's a lot of questions for one hour. Mealan needs a short break; try again in a few minutes." });
+    (req as any).uid = user.uid;
+    next();
+  } catch {
+    res.status(401).json({ error: "Your sign-in expired. Close and reopen the app." });
+  }
+}
 app.disable("x-powered-by");
 app.use(express.json({ limit: "18mb" }));
 const primaryModel = process.env.GEMINI_MODEL || "gemini-3.8-flash";
@@ -204,7 +228,7 @@ function fail(res: express.Response, error: unknown) {
   console.error("Service request failed:", status, e?.name || "Error", message);
   res.status(status >= 400 && status < 600 ? status : 502).json({ error: text });
 }
-app.post("/api/scan", async (req, res) => {
+app.post("/api/scan", requireUser, async (req, res) => {
   try {
     const raw = req.body?.images;
     if (!Array.isArray(raw) || raw.length < 1 || raw.length > 6)
@@ -274,7 +298,7 @@ app.post("/api/scan", async (req, res) => {
     fail(res, error);
   }
 });
-app.get("/api/product/:barcode", async (req, res) => {
+app.get("/api/product/:barcode", requireUser, async (req, res) => {
   try {
     const barcode = String(req.params.barcode);
     if (!/^\d{8,14}$/.test(barcode))
@@ -329,7 +353,7 @@ app.get("/api/product/:barcode", async (req, res) => {
       });
   }
 });
-app.post("/api/chef", async (req, res) => {
+app.post("/api/chef", requireUser, async (req, res) => {
   try {
     const { candidates, preferences, feedback } = req.body;
     if (
@@ -398,7 +422,7 @@ app.post("/api/chef", async (req, res) => {
 });
 const escapeFormula = (s: string) =>
   s.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-app.post("/api/save", async (req, res) => {
+app.post("/api/save", requireUser, async (req, res) => {
   try {
     if (!baseId || !airtableKey)
       return res
@@ -470,7 +494,7 @@ const outSchema = {
   },
   required: ["recognised", "picks", "skip", "reply"],
 };
-app.post("/api/out", async (req, res) => {
+app.post("/api/out", requireUser, async (req, res) => {
   try {
     const { text, image, target, history } = req.body ?? {};
     if (typeof text !== "string" || text.length > 1000) return res.status(400).json({ error: "Say where you are and what's on offer." });
@@ -518,7 +542,7 @@ const plateSchema = {
   },
   required: ["reply", "suggestions"],
 };
-app.post("/api/plate", async (req, res) => {
+app.post("/api/plate", requireUser, async (req, res) => {
   const started = Date.now();
   try {
     const { question, plate, library, target, missing } = req.body ?? {};
@@ -544,7 +568,7 @@ app.post("/api/plate", async (req, res) => {
 
 
 // The judge for the evals page: a second model grades one answer against its question and plate.
-app.post("/api/judge", async (req, res) => {
+app.post("/api/judge", requireUser, async (req, res) => {
   try {
     const { question, plate, answer } = req.body ?? {};
     if (typeof question !== "string" || question.length > 500) return res.status(400).json({ error: "Invalid case." });
@@ -558,7 +582,7 @@ app.post("/api/judge", async (req, res) => {
 });
 
 // Foods saved to Airtable, mapped back to the app's shape. Coach-side import.
-app.get("/api/foods", async (_req, res) => {
+app.get("/api/foods", requireUser, async (_req, res) => {
   try {
     if (!baseId || !airtableKey)
       return res.status(503).json({ error: "Airtable is not configured." });

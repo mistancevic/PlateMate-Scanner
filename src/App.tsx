@@ -1030,7 +1030,7 @@ export default function App() {
     more: "More",
   };
   if (!authReady) return <div className="app-shell"><main /></div>;
-  if (cloudEnabled && !user && !localOnly)
+  if (cloudEnabled && !user)
     return (
       <div className="app-shell"><main><SignInScreen onLocal={() => { localStorage.setItem("chefmealan-local-only", "1"); setLocalOnly(true); }} /></main></div>
     );

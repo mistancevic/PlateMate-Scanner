@@ -13,7 +13,6 @@ export function SignInScreen({ onLocal }: { onLocal: () => void }) {
       </button>
       {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
       <p className="small center">What's stored: your goal, your foods, your meals and what you told your coach. In the EU, under your account only. Delete it any time from Me.</p>
-      <button className="link" onClick={onLocal}>Use on this phone only, without an account</button>
     </div>
   );
 }

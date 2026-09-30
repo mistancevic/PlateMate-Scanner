@@ -170,3 +170,24 @@ export async function loadInbox(uid: string): Promise<InboxItem[]> {
   return snap.docs.map((d) => d.data() as InboxItem).sort((a, b) => (b.sentAt > a.sentAt ? 1 : -1));
 }
 export async function clearInboxItem(uid: string, id: string) { await deleteDoc(doc(db(), "users", uid, "inbox", id)); }
+
+// Every call to our own server carries the signed-in person's token; the server refuses AI calls without one.
+let fetchPatched = false;
+export function installAuthFetch() {
+  if (!cloudEnabled || fetchPatched || typeof window === "undefined") return;
+  fetchPatched = true;
+  const plain = window.fetch.bind(window);
+  window.fetch = async (input: RequestInfo | URL, init: RequestInit = {}) => {
+    const url = typeof input === "string" ? input : input instanceof URL ? input.pathname : input.url;
+    const own = url.startsWith("/api/") || url.startsWith(`${location.origin}/api/`);
+    const u = own ? auth().currentUser : null;
+    if (u) {
+      const token = await u.getIdToken();
+      const headers = new Headers(init.headers || (input instanceof Request ? input.headers : undefined));
+      headers.set("Authorization", `Bearer ${token}`);
+      return plain(input, { ...init, headers });
+    }
+    return plain(input, init);
+  };
+}
+installAuthFetch();
