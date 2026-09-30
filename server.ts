@@ -778,8 +778,14 @@ async function start() {
     app.use(vite.middlewares);
   } else {
     const dist = path.join(process.cwd(), "dist");
-    app.use(express.static(dist));
-    app.get("*", (_req, res) => res.sendFile(path.join(dist, "index.html")));
+    // the page itself is never cached, so a release reaches every phone on its next open; versioned files are cached for a year
+    app.use(express.static(dist, {
+      setHeaders: (res, file) => {
+        if (file.endsWith(".html")) res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        else if (file.includes(`${path.sep}assets${path.sep}`)) res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      },
+    }));
+    app.get("*", (_req, res) => { res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); res.sendFile(path.join(dist, "index.html")); });
   }
   app.listen(Number(process.env.PORT) || 3000, "0.0.0.0", () =>
     console.log(`PlateMate pilot ready on port ${process.env.PORT || 3000}`),
