@@ -37,6 +37,7 @@ export function CoachArea(p: AppApi) {
         </div>
         <small>A client enters it once on Me, under Your coach. From then on you see their cards and can set their goal.</small>
       </section>
+      <AccessRequests {...p} />
       <p className="label">Clients ({rows.length})</p>
       {rows.length === 0 && <div className="strip">No clients yet. Share the code.</div>}
       {rows.map((r) => (
@@ -156,5 +157,27 @@ export function SendSheet(p: AppApi & { card: any; close: () => void }) {
         }}>Send</button>
       </div>
     </div>
+  );
+}
+
+// People who asked for a code on the landing page.
+export function AccessRequests(p: AppApi) {
+  const [list, setList] = useState<any[] | null>(null);
+  const load = () => fetch("/api/access-requests").then((r) => r.json()).then((d) => setList(d.requests ?? [])).catch(() => setList([]));
+  useEffect(() => { load(); }, []);
+  if (!list || list.length === 0) return null;
+  const open = list.filter((r) => r.status !== "handled");
+  return (
+    <>
+      <p className="label">Access requests ({open.length} new)</p>
+      {list.slice(0, 20).map((r) => (
+        <section className={`card request ${r.status === "handled" ? "handled" : ""}`} key={r.id}>
+          <div className="card-top"><span>{r.name}{r.coach ? " · coach" : ""}</span><small>{new Date(r.createdAt).toLocaleDateString()}</small></div>
+          <a href={`mailto:${r.email}?subject=Your%20Chef%20Mealan%20code`}>{r.email}</a>
+          {r.note && <p className="client-note">“{r.note}”</p>}
+          {r.status !== "handled" && <button className="link" onClick={async () => { await fetch(`/api/access-requests/${r.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "handled" }) }); p.notify("Marked as handled."); load(); }}>Mark as handled</button>}
+        </section>
+      ))}
+    </>
   );
 }

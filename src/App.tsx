@@ -33,7 +33,8 @@ import type { AppApi, Tab, Step, MenuSection } from "./screens/api";
 import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen, type Turn } from "./screens/OutScreen";
-import { SignInScreen } from "./screens/SignInScreen";
+import { LandingScreen } from "./screens/LandingScreen";
+import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { getPersonal, setPersonal as storePersonal, calculate, dayFactor, getDayType, setDayType as storeDayType, type Personal, type DayType } from "./personal";
@@ -420,6 +421,7 @@ export default function App() {
     [menuSection, setMenuSection] = useState<MenuSection | null>(null),
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
     [talkOpen, setTalkOpen] = useState(false),
+    [profileReady, setProfileReady] = useState(false),
     [talkTurns, setTalkTurns] = useState<Turn[]>([]),
     [mealanAsk, setMealanAsk] = useState(0),
     [camera, setCamera] = useState(false),
@@ -481,7 +483,7 @@ export default function App() {
   useEffect(() => {
     setOptions([]);
   }, [state.items, state.goals, limits]);
-  useEffect(() => watchUser((u) => { setUser(u); setAuthReady(true); if (!u) cloudLoaded.current = false; }), []);
+  useEffect(() => watchUser((u) => { setUser(u); setAuthReady(true); if (!u) { cloudLoaded.current = false; setProfileReady(false); } }), []);
   useEffect(() => {
     if (!user || cloudLoaded.current) return;
     (async () => {
@@ -519,6 +521,7 @@ export default function App() {
         setError(`Could not reach your account: ${why}. Working on this phone for now.`);
       }
       cloudLoaded.current = true;
+      setProfileReady(true);
     })();
   }, [user]);
   // client: recipes the coach sent
@@ -1030,10 +1033,10 @@ export default function App() {
     more: "More",
   };
   if (!authReady) return <div className="app-shell"><main /></div>;
-  if (cloudEnabled && !user)
-    return (
-      <div className="app-shell"><main><SignInScreen onLocal={() => { localStorage.setItem("chefmealan-local-only", "1"); setLocalOnly(true); }} /></main></div>
-    );
+  if (cloudEnabled && !user) return <LandingScreen />;
+  if (cloudEnabled && user && !profileReady) return <div className="app-shell"><main /></div>;
+  if (cloudEnabled && user && profile.role !== "coach" && !profile.coachId)
+    return <div className="app-shell"><main><PilotGate {...screenProps} /></main></div>;
   if (goalOpen)
     return (
       <div className="app-shell"><main><GoalScreen {...screenProps} onDone={() => { setGoalState(getGoal()); setGoalOpen(false); }} /></main></div>

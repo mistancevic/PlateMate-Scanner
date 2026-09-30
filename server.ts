@@ -9,10 +9,39 @@ const app = express();
 // Who is asking: a Firebase ID token from the signed-in app. On when the server knows its Firebase project.
 import { initializeApp as initAdmin, getApps as adminApps } from "firebase-admin/app";
 import { getAuth as adminAuth } from "firebase-admin/auth";
+import { getFirestore as adminDb, FieldValue } from "firebase-admin/firestore";
+import { createHash } from "node:crypto";
 const FB_PROJECT = process.env.FIREBASE_PROJECT_ID || "";
 if (FB_PROJECT && !adminApps().length) initAdmin({ projectId: FB_PROJECT });
 const HOURLY_LIMIT = Number(process.env.AI_HOURLY_LIMIT || 120);
 const usage = new Map<string, { hour: number; n: number }>();
+const FB_DB = process.env.FIRESTORE_DB_ID || "(default)";
+const db = () => (FB_DB === "(default)" ? adminDb() : adminDb(FB_DB));
+// Membership, cached briefly: only a positive answer is cached, so a new member is let in at once.
+const members = new Map<string, { role: string; at: number }>();
+async function membership(uid: string): Promise<{ member: boolean; role: string }> {
+  const hit = members.get(uid);
+  if (hit && Date.now() - hit.at < 5 * 60_000) return { member: true, role: hit.role };
+  const snap = await db().collection("users").doc(uid).get();
+  const x = snap.exists ? (snap.data() as any) : {};
+  const role = x.role === "coach" ? "coach" : "client";
+  const member = role === "coach" || Boolean(x.coachId);
+  if (member) members.set(uid, { role, at: Date.now() });
+  return { member, role };
+}
+async function requireMember(req: express.Request, res: express.Response, next: express.NextFunction) {
+  if (!FB_PROJECT) return next();
+  try {
+    const m = await membership((req as any).uid);
+    if (!m.member) return res.status(403).json({ error: "Chef Mealan is in a closed pilot. Join with your coach's code to use Mealan." });
+    (req as any).role = m.role; next();
+  } catch (e) { fail(res, e); }
+}
+function requireCoach(req: express.Request, res: express.Response, next: express.NextFunction) {
+  if (!FB_PROJECT) return next();
+  if ((req as any).role !== "coach") return res.status(403).json({ error: "For coach accounts only." });
+  next();
+}
 async function requireUser(req: express.Request, res: express.Response, next: express.NextFunction) {
   if (!FB_PROJECT) return next(); // preview and local development run without accounts
   const token = String(req.headers.authorization || "").replace(/^Bearer /, "");
@@ -32,6 +61,7 @@ async function requireUser(req: express.Request, res: express.Response, next: ex
 }
 app.disable("x-powered-by");
 app.use(express.json({ limit: "18mb" }));
+app.set("trust proxy", true);
 const primaryModel = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 const fallbackModels = [
   primaryModel,
@@ -228,7 +258,7 @@ function fail(res: express.Response, error: unknown) {
   console.error("Service request failed:", status, e?.name || "Error", message);
   res.status(status >= 400 && status < 600 ? status : 502).json({ error: text });
 }
-app.post("/api/scan", requireUser, async (req, res) => {
+app.post("/api/scan", requireUser, requireMember, async (req, res) => {
   try {
     const raw = req.body?.images;
     if (!Array.isArray(raw) || raw.length < 1 || raw.length > 6)
@@ -298,7 +328,7 @@ app.post("/api/scan", requireUser, async (req, res) => {
     fail(res, error);
   }
 });
-app.get("/api/product/:barcode", requireUser, async (req, res) => {
+app.get("/api/product/:barcode", requireUser, requireMember, async (req, res) => {
   try {
     const barcode = String(req.params.barcode);
     if (!/^\d{8,14}$/.test(barcode))
@@ -353,7 +383,7 @@ app.get("/api/product/:barcode", requireUser, async (req, res) => {
       });
   }
 });
-app.post("/api/chef", requireUser, async (req, res) => {
+app.post("/api/chef", requireUser, requireMember, async (req, res) => {
   try {
     const { candidates, preferences, feedback } = req.body;
     if (
@@ -422,7 +452,7 @@ app.post("/api/chef", requireUser, async (req, res) => {
 });
 const escapeFormula = (s: string) =>
   s.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-app.post("/api/save", requireUser, async (req, res) => {
+app.post("/api/save", requireUser, requireMember, async (req, res) => {
   try {
     if (!baseId || !airtableKey)
       return res
@@ -494,7 +524,7 @@ const outSchema = {
   },
   required: ["recognised", "picks", "skip", "reply"],
 };
-app.post("/api/out", requireUser, async (req, res) => {
+app.post("/api/out", requireUser, requireMember, async (req, res) => {
   try {
     const { text, image, target, history } = req.body ?? {};
     if (typeof text !== "string" || text.length > 1000) return res.status(400).json({ error: "Say where you are and what's on offer." });
@@ -542,7 +572,7 @@ const plateSchema = {
   },
   required: ["reply", "suggestions"],
 };
-app.post("/api/plate", requireUser, async (req, res) => {
+app.post("/api/plate", requireUser, requireMember, async (req, res) => {
   const started = Date.now();
   try {
     const { question, plate, library, target, missing } = req.body ?? {};
@@ -568,7 +598,7 @@ app.post("/api/plate", requireUser, async (req, res) => {
 
 
 // The judge for the evals page: a second model grades one answer against its question and plate.
-app.post("/api/judge", requireUser, async (req, res) => {
+app.post("/api/judge", requireUser, requireMember, requireCoach, async (req, res) => {
   try {
     const { question, plate, answer } = req.body ?? {};
     if (typeof question !== "string" || question.length > 500) return res.status(400).json({ error: "Invalid case." });
@@ -581,8 +611,53 @@ app.post("/api/judge", requireUser, async (req, res) => {
   }
 });
 
+
+// Requests for access from the landing page. Public, so guarded: a hidden trap field, a minimum time on the page,
+// limits per address and per day, strict sizes. Written by the server only; browsers can't write this collection.
+const perIp = new Map<string, number[]>();
+let perDay = { day: "", n: 0 };
+app.post("/api/access-request", async (req, res) => {
+  const b = req.body ?? {};
+  const ok = () => res.json({ ok: true }); // bots get the same answer as people, and nothing is stored
+  if (typeof b.website === "string" && b.website.trim()) return ok();
+  const elapsed = Number(b.elapsed);
+  if (!Number.isFinite(elapsed) || elapsed < 4000 || elapsed > 3 * 3_600_000) return ok();
+  const name = String(b.name ?? "").trim(), email = String(b.email ?? "").trim(), note = String(b.note ?? "").trim();
+  if (!name || name.length > 80 || !/^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i.test(email) || note.length > 600) return res.status(400).json({ error: "Please check your name and email." });
+  if (/https?:\/\//i.test(name) || (note.match(/https?:\/\//gi) ?? []).length > 1) return ok();
+  const ip = String(req.ip || "unknown");
+  const now = Date.now();
+  const times = (perIp.get(ip) ?? []).filter((t) => now - t < 3_600_000);
+  if (times.length >= 3) return res.status(429).json({ error: "Thanks, we already have your request." });
+  const day = new Date().toISOString().slice(0, 10);
+  if (perDay.day !== day) perDay = { day, n: 0 };
+  if (perDay.n >= 50) return res.status(429).json({ error: "Lots of requests today. Please write to hello@chefmealan.com." });
+  perIp.set(ip, [...times, now]); perDay.n++;
+  if (!FB_PROJECT) return ok();
+  try {
+    await db().collection("accessRequests").add({
+      name, email, note, coach: Boolean(b.coach), status: "new", createdAt: new Date().toISOString(),
+      ipHash: createHash("sha256").update(ip + day).digest("hex").slice(0, 16), ua: String(req.headers["user-agent"] || "").slice(0, 160),
+    });
+    ok();
+  } catch (e) { fail(res, e); }
+});
+app.get("/api/access-requests", requireUser, requireMember, requireCoach, async (_req, res) => {
+  try {
+    const snap = await db().collection("accessRequests").orderBy("createdAt", "desc").limit(50).get();
+    res.json({ requests: snap.docs.map((d) => ({ id: d.id, ...(d.data() as any), ipHash: undefined, ua: undefined })) });
+  } catch (e) { fail(res, e); }
+});
+app.post("/api/access-requests/:id", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    const status = req.body?.status === "handled" ? "handled" : "new";
+    await db().collection("accessRequests").doc(String(req.params.id).slice(0, 80)).update({ status, handledAt: FieldValue.serverTimestamp() });
+    res.json({ ok: true });
+  } catch (e) { fail(res, e); }
+});
+
 // Foods saved to Airtable, mapped back to the app's shape. Coach-side import.
-app.get("/api/foods", requireUser, async (_req, res) => {
+app.get("/api/foods", requireUser, requireMember, requireCoach, async (_req, res) => {
   try {
     if (!baseId || !airtableKey)
       return res.status(503).json({ error: "Airtable is not configured." });

@@ -12,7 +12,7 @@ read -rsp "Paste the Airtable API key (Enter to skip): " AK; echo
 if [ -n "$AK" ]; then printf %s "$AK" | (gcloud secrets create airtable-key --data-file=- 2>/dev/null || gcloud secrets versions add airtable-key --data-file=-); fi
 PN=$(gcloud projects describe "$PROJECT" --format='value(projectNumber)')
 # newer projects build as the Compute Engine account, which needs rights to push images and write logs
-for r in roles/artifactregistry.writer roles/logging.logWriter roles/storage.objectViewer; do
+for r in roles/artifactregistry.writer roles/logging.logWriter roles/storage.objectViewer roles/datastore.user; do
   gcloud projects add-iam-policy-binding "$PROJECT" --member "serviceAccount:$PN-compute@developer.gserviceaccount.com" --role "$r" --condition=None >/dev/null
 done
 for s in gemini-key airtable-key; do
