@@ -32,7 +32,7 @@ import { MoreScreen } from "./screens/MoreScreen";
 import type { AppApi, Tab, Step, MenuSection } from "./screens/api";
 import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
-import { OutScreen } from "./screens/OutScreen";
+import { OutScreen, type Turn } from "./screens/OutScreen";
 import { SignInScreen } from "./screens/SignInScreen";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
@@ -43,7 +43,7 @@ import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { momentTarget, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
-import { Home, CircleUser, Menu, Users, MessageCircle } from "lucide-react";
+import { Home, CircleUser, Menu, Users } from "lucide-react";
 import {
   aggregate,
   candidateFood,
@@ -419,6 +419,9 @@ export default function App() {
     [dayType, setDayTypeState] = useState<DayType>(getDayType),
     [menuSection, setMenuSection] = useState<MenuSection | null>(null),
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
+    [talkOpen, setTalkOpen] = useState(false),
+    [talkTurns, setTalkTurns] = useState<Turn[]>([]),
+    [mealanAsk, setMealanAsk] = useState(0),
     [camera, setCamera] = useState(false),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
@@ -948,7 +951,7 @@ export default function App() {
         return how === "make" ? { ...s, foods, items, portion: null, title: meal.title } : { ...s, foods, meals: [meal, ...s.meals] };
       });
       if (how === "make") { setStep("recipe"); setTab("journey"); }
-      notify(how === "make" ? "On your plate. Ask Mealan if you want it fitted to you." : "Kept in your recipes.");
+      notify(how === "make" ? "On your plate. Fit it to me sets the amounts." : "Kept in your recipes.");
       if (user) { try { await clearInboxItem(user.uid, item.id); } catch {} }
       setInbox((x) => x.filter((i) => i.id !== item.id));
     },
@@ -985,8 +988,9 @@ export default function App() {
         });
       } catch (e: any) { setError(e.message); } finally { setBusy(""); }
     },
-    openOut: () => setTab("chat"),
-    closeOut: () => {},
+    openOut: () => setTalkOpen(true),
+    closeOut: () => setTalkOpen(false),
+    mealanAsk, mealanAsked: () => setMealanAsk(0),
     shareCard: (id: string, reason: "look" | "ok" | "help") => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, shared: { reason, at: new Date().toISOString() } } : f)) }));
       notify(`Shared with ${profile.coachName || "your coach"}.`);
@@ -1008,16 +1012,15 @@ export default function App() {
   };
   const NAV: { id: Tab; label: string; icon: ReactNode }[] = [
     { id: "home", label: "Today", icon: <Home size={20} /> },
-    { id: "journey", label: "Mealan", icon: <Mark size={22} color="currentColor" /> },
+    { id: "journey", label: "Plate", icon: <Utensils size={20} /> },
     { id: "foods", label: "Foods", icon: <BookOpen size={20} /> },
     { id: "me", label: "Me", icon: <CircleUser size={20} /> },
     ...(profile.role === "coach" ? [{ id: "clients" as Tab, label: "Clients", icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }] : []),
   ];
   const TITLES: Record<Tab, string> = {
     home: "Today",
-    journey: APP_NAME,
+    journey: "Plate",
     me: "Me",
-    chat: "Chat",
     clients: "Clients",
     meal: "Meal",
     chef: "Chef",
@@ -1072,17 +1075,23 @@ export default function App() {
           </div>
         )}
         {menuSection && <MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s) => { setMenuFrom(null); setMenuSection(s); }} close={() => { setMenuFrom(null); setMenuSection(null); }} />}
-        {!menuSection && tab === "home" && <HomeScreen {...screenProps} />}
-        {!menuSection && tab === "journey" && <JourneyScreen {...screenProps} />}
-        {!menuSection && tab === "chat" && <OutScreen {...screenProps} toPlate={() => { setStep("in"); setTab("journey"); }} />}
-        {(tab !== "chat" || menuSection) && <button className="chat-fab" aria-label="Chat with Mealan" onClick={() => { setMenuSection(null); setTab("chat"); }}><MessageCircle size={26} /></button>}
-        {!menuSection && tab === "me" && <MeScreen {...screenProps} />}
-        {!menuSection && tab === "clients" && <ClientsScreen {...screenProps} />}
-        {!menuSection && tab === "meal" && <MealScreen {...screenProps} />}
-        {!menuSection && tab === "chef" && <ChefScreen {...screenProps} />}
-        {!menuSection && tab === "foods" && <FoodsScreen {...screenProps} />}
-        {!menuSection && tab === "notes" && <RecipesScreen {...screenProps} />}
-        {!menuSection && tab === "more" && <MoreScreen {...screenProps} />}
+        {!menuSection && !talkOpen && tab === "home" && <HomeScreen {...screenProps} />}
+        {!menuSection && !talkOpen && tab === "journey" && <JourneyScreen {...screenProps} />}
+        {talkOpen && !menuSection && <div className="talk-overlay"><OutScreen {...screenProps} turns={talkTurns} setTurns={(f) => setTalkTurns(f)} close={() => setTalkOpen(false)} toPlate={() => { setTalkOpen(false); setMenuSection(null); setStep("in"); setTab("journey"); }} /></div>}
+        {!talkOpen && (
+          <button className="chat-fab" aria-label="Mealan" onClick={() => {
+            // one door: on a plate with food it answers about the plate; anywhere else it's the conversation
+            if (!menuSection && tab === "journey" && (step === "in" || step === "recipe") && state.items.length > 0) setMealanAsk((n) => n + 1);
+            else setTalkOpen(true);
+          }}><Mark size={30} color="#fff" /></button>
+        )}
+        {!menuSection && !talkOpen && tab === "me" && <MeScreen {...screenProps} />}
+        {!menuSection && !talkOpen && tab === "clients" && <ClientsScreen {...screenProps} />}
+        {!menuSection && !talkOpen && tab === "meal" && <MealScreen {...screenProps} />}
+        {!menuSection && !talkOpen && tab === "chef" && <ChefScreen {...screenProps} />}
+        {!menuSection && !talkOpen && tab === "foods" && <FoodsScreen {...screenProps} />}
+        {!menuSection && !talkOpen && tab === "notes" && <RecipesScreen {...screenProps} />}
+        {!menuSection && !talkOpen && tab === "more" && <MoreScreen {...screenProps} />}
         <input
           ref={importRef}
           type="file"
@@ -1110,7 +1119,7 @@ export default function App() {
             key={n.id}
             className={tab === n.id || (n.id === "journey" && (tab === "meal" || tab === "chef")) || (n.id === "me" && (tab === "more" || tab === "notes")) ? "active" : ""}
             aria-current={tab === n.id ? "page" : undefined}
-            onClick={() => { setMenuSection(null); setTab(n.id); }}
+            onClick={() => { setMenuSection(null); setTalkOpen(false); setTab(n.id); }}
           >
             {n.icon}
             <span>{n.label}</span>

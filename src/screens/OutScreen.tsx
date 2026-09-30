@@ -8,18 +8,18 @@ import { log } from "../log";
 import type { AppApi } from "./api";
 
 type Rec = { name: string; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; typical_grams: number; confidence: string };
-type Turn = { role: "you" | "mealan"; text: string; picks?: Ingredient[]; pd?: number | null; kcal?: number | null; photo?: string };
+export type Turn = { role: "you" | "mealan"; text: string; picks?: Ingredient[]; pd?: number | null; kcal?: number | null; photo?: string };
 
 const asFood = (r: Rec): Food => ({
   id: uid(), name: r.name, brand: "estimate", basis: "100g", source: "estimate", notes: `${r.confidence} confidence`,
   reviewedAt: new Date().toISOString(), readyToEat: true, calories: r.calories, protein: r.protein, fats: r.fats, carbs: r.carbs, fiber: null,
 });
 
-export function OutScreen(p: AppApi & { toPlate: () => void }) {
+export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; turns: Turn[]; setTurns: (f: (t: Turn[]) => Turn[]) => void }) {
   const { pdRef, setState, setError, state } = p;
   const [text, setText] = useState("");
   const [photo, setPhoto] = useState("");
-  const [turns, setTurns] = useState<Turn[]>([]);
+  const { turns, setTurns, close } = p;
   const fileRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const [thinking, setThinking] = useState(false);
@@ -86,7 +86,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void }) {
   return (
     <div className="chat-screen">
       <div className="head">
-        <h2>Chat with {CHEF_NAME}</h2>
+        <div className="menu-head"><h2>{CHEF_NAME}</h2><button className="link" onClick={close}>Close</button></div>
         <p>Out, missing something, or after an idea. Say where you are or what you have, add a photo if it helps. Estimates are marked; the amounts come from your target.</p>
       </div>
       <div className="chat">

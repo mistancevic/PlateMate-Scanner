@@ -425,3 +425,6 @@ a.pill { text-decoration: none; display: inline-flex; align-items: center; }
 .chat-fab:active { transform: scale(0.96); }
 main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 @media (min-width: 900px) { main { padding-bottom: 96px; } }
+
+.talk-overlay { display: block; }
+.chat-fab { padding: 0; }

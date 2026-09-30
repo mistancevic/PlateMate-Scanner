@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Camera, ScanBarcode, Plus, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown, MessageCircleQuestion } from "lucide-react";
+import { Camera, ScanBarcode, Plus, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
 import { aggregate, density, uid, solveIngredient } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
@@ -48,6 +48,7 @@ export function JourneyScreen(p: AppApi) {
   const autoTitle = (its: typeof items) => { const n = its.map((i) => i.food.name.split(",")[0].trim()); return n.length <= 1 ? n[0] ?? "Meal" : `${n.slice(0, -1).join(", ")} & ${n[n.length - 1]}`; };
   const [shareWhy, setShareWhy] = useState<"look" | "ok" | "help" | null>(null);
   const [helper, setHelper] = useState<{ missing: string | null } | null>(null);
+  useEffect(() => { if (p.mealanAsk && items.length > 0) { setHelper({ missing: null }); p.mealanAsked(); } /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [p.mealanAsk]);
   const [sharing, setSharing] = useState(false);
   const [swapId, setSwapId] = useState<string | null>(null);
   const [touched, setTouched] = useState<Set<string>>(new Set());
@@ -62,7 +63,7 @@ export function JourneyScreen(p: AppApi) {
   const foodCard = cardItem && <FoodCard food={cardItem.food} target={pdRef} fit={p.fitPd(density(cardItem.food.protein, cardItem.food.calories))} close={() => setCardId(null)} dontHave={() => { setHelper({ missing: cardItem.id }); setCardId(null); }} />;
   const helperSheet = helper && (
     <PlateHelper items={items} library={state.foods} pdRef={pdRef} cap={cap ?? null} missing={helper.missing ? items.find((i) => i.id === helper.missing) ?? null : null}
-      setError={setError} close={() => setHelper(null)}
+      setError={setError} close={() => setHelper(null)} openTalk={() => { setHelper(null); p.openOut(); }}
       apply={(next, note) => { setState((s) => ({ ...s, items: next, portion: null })); setHelper(null); p.notify(note); if (step === "recipe") recalc(next); }} />
   );
   const adjustFor = (o: { items: typeof items }) => o.items.find((i) => !i.locked)?.id;
@@ -221,11 +222,11 @@ export function JourneyScreen(p: AppApi) {
           </div>
         )}
         <button className="pill pill-primary pill-wide" disabled={items.length < 1} onClick={askMealan}>
-          <ChefHat size={18} /> Ask {CHEF_NAME}
+          <ChefHat size={18} /> Fit it to me
         </button>
         {items.length === 1 && <p className="small center">One product: {CHEF_NAME} looks through your foods for a partner that brings it to your plan.</p>}
+        {items.length >= 2 && <p className="small center">Code, not a conversation: the amounts, at once. Questions go to {CHEF_NAME}, the button bottom right.</p>}
         {items.length >= 2 && <p className="small center">Grey is yours to type and {CHEF_NAME}'s to move. Coral is fixed. Swipe right to remove, left to swap. Tap a name for its card.</p>}
-        {items.length > 0 && <button className="pill pill-wide ask-plate" onClick={() => setHelper({ missing: null })}><MessageCircleQuestion size={16} /> Ask about this plate</button>}
         {swapPanel}
         {foodCard}
         {helperSheet}
@@ -317,7 +318,6 @@ export function JourneyScreen(p: AppApi) {
           const next = (pick + 1) % options.length; setPick(next);
           setState((s) => ({ ...s, items: options[next].items, portion: null }));
         }}>Try another mix ({(pick % options.length) + 1} of {options.length})</button>}
-        <button className="pill pill-wide ask-plate" onClick={() => setHelper({ missing: null })}><MessageCircleQuestion size={16} /> Ask about this plate</button>
         <Back to="in" />
         {swapPanel}
         {foodCard}

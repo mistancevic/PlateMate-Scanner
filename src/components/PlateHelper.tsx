@@ -8,9 +8,9 @@ import { log } from "../log";
 type Suggestion = { action: "add" | "swap" | "amount"; food: string; replaces: string | null; grams: number | null; calories: number | null; protein: number | null; why: string; known: boolean };
 
 // Help inside the plate: ask about it, get up to three actions, tap one. Closing leaves the plate as it was, plus what you tapped.
-export function PlateHelper({ items, library, pdRef, cap, missing, apply, close, setError }: {
+export function PlateHelper({ items, library, pdRef, cap, missing, apply, close, setError, openTalk }: {
   items: Ingredient[]; library: Food[]; pdRef: number | null; cap: number | null; missing?: Ingredient | null;
-  apply: (next: Ingredient[], note: string) => void; close: () => void; setError: (m: string) => void;
+  apply: (next: Ingredient[], note: string) => void; close: () => void; setError: (m: string) => void; openTalk?: () => void;
 }) {
   const [q, setQ] = useState(missing ? `I don't have ${missing.food.name}. What instead?` : "");
   const [busy, setBusy] = useState(false);
@@ -72,7 +72,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, apply, close,
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet helper" onClick={(e) => e.stopPropagation()}>
-        <div className="card-top"><span>{missing ? `Instead of ${missing.food.name}` : "Ask about this plate"}</span><button className="link" onClick={close}>Close</button></div>
+        <div className="card-top"><span>{missing ? `Mealan, instead of ${missing.food.name}` : "Mealan, about this plate"}</span><button className="link" onClick={close}>Close</button></div>
         {codeSwaps.length > 0 && (
           <>
             <p className="label">From your foods</p>
@@ -90,6 +90,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, apply, close,
         </div>
         {busy && <div className="bubble mealan thinking"><span /><span /><span /></div>}
         {reply && <p className="helper-reply">{reply}</p>}
+        {openTalk && <button className="link" onClick={openTalk}>Something else? Talk to Mealan</button>}
         {sugs.map((s, k) => (
           <div className="suggestion" key={k}>
             <div>

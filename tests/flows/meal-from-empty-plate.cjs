@@ -30,7 +30,7 @@ seed.items = [];
   await shot("1-plate");
   console.log("items in state:", await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.length));
   await step("moment afterwork", () => click(/Afterwork event/i));
-  await step("ask", () => click(/Ask Mealan/i));
+  await step("ask", () => click(/Fit it to me/i));
   await shot("2-recipe");
   console.log("recipe h2:", await page.locator("h2").first().textContent());
   await step("make it", () => click(/^Make it$/i));
