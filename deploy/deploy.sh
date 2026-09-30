@@ -12,3 +12,4 @@ gcloud run deploy "$SERVICE" --project "$PROJECT" --region "$REGION" --image "$I
   --allow-unauthenticated --memory 512Mi --max-instances 3 \
   --set-secrets "$SECRETS" --set-env-vars "AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID:-},FIREBASE_PROJECT_ID=$FB_PROJECT_ID,FIRESTORE_DB_ID=$FB_DB_ID"
 echo "Live: $(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(status.url)')  (commit $TAG)"
+"$(dirname "$0")/rules.sh" || echo "Rules not published: check the message above, or paste firestore.rules in the Firebase console."

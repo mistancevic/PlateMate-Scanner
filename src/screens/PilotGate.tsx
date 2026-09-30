@@ -8,9 +8,10 @@ export function PilotGate(p: AppApi) {
   const [code, setCode] = useState("");
   return (
     <div className="goal-screen">
-      <div className="hero"><Mark size={52} color="var(--brand)" /><h2>Almost there{p.user?.name ? `, ${p.user.name.split(" ")[0]}` : ""}</h2><p>{APP_NAME} is a closed pilot. You join with a code from your coach.</p></div>
+      <div className="hero"><Mark size={52} color="var(--brand)" /><h2>Almost there{p.user?.name ? `, ${p.user.name.split(" ")[0]}` : ""}</h2><p>{APP_NAME} is a closed pilot. You join with the personal code from your invite.</p></div>
       <section className="card">
         <b>I have a code</b>
+        <p className="small">It works with the email it was sent to. You're signed in as {p.user?.email}.</p>
         <div className="button-row" style={{ marginTop: 8 }}>
           <input className="code-input" value={code} placeholder="Coach code" onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={8} />
           <button className="pill pill-small pill-primary" disabled={code.trim().length < 4} onClick={() => p.joinCoach(code)}>Join</button>

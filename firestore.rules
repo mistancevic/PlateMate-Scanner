@@ -12,9 +12,11 @@ service cloud.firestore {
       function coachKept() { return request.resource.data.get('coachId', '') == (existing() ? resource.data.get('coachId', '') : ''); }
       allow get: if isOwner() || isCoachOf();
       allow list: if isOwner() || isCoachOf();
-      allow create: if isOwner() && request.resource.data.get('role', '') == '';
+      // a person may keep or remove their coach link, never set one: joining goes through the server with a personal invite
+      function coachLinkOk() { return coachKept() || request.resource.data.get('coachId', null) == null || request.resource.data.get('coachId', '') == ''; }
+      allow create: if isOwner() && request.resource.data.get('role', '') == '' && request.resource.data.get('coachId', '') == '';
       allow delete: if isOwner();
-      allow update: if (isOwner() && roleKept()) || (isCoachOf() && roleKept() && coachKept());
+      allow update: if (isOwner() && roleKept() && coachLinkOk()) || (isCoachOf() && roleKept() && coachKept());
       function coachOfParent() { return request.auth != null && get(/databases/$(database)/documents/users/$(uid)).data.get('coachId', '') == request.auth.uid; }
       // Photos: the owner reads and writes; the coach of that person reads.
       match /photos/{pid} {
@@ -32,10 +34,8 @@ service cloud.firestore {
         allow write: if request.auth != null && request.auth.uid == uid;
       }
     }
-    // A coach's code: readable by any signed-in person, writable only by that coach.
-    match /coaches/{code} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.resource.data.uid == request.auth.uid;
-    }
+    // Invites and access requests are written and read by the server only.
+    match /invites/{code} { allow read, write: if false; }
+    match /accessRequests/{id} { allow read, write: if false; }
   }
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { RefreshCw, Copy, Target } from "lucide-react";
-import { listClients, setClientGoal, publishCoachCode, loadPhotos, sendRecipe, pinFormula, type ClientRow } from "../cloud";
+import { RefreshCw, Copy, Target, Send, UserPlus } from "lucide-react";
+import { listClients, setClientGoal, loadPhotos, sendRecipe, pinFormula, type ClientRow } from "../cloud";
 import { GoalHistory } from "./MenuScreen";
 import { uid } from "../pilot";
 import { BANDS, bandOf, goalsForBand } from "../goal";
@@ -12,7 +12,6 @@ import type { AppApi } from "./api";
 // The coach's area on Me: the code to share, the client list, and a client's cards with a goal to set.
 export function CoachArea(p: AppApi) {
   const { user, setError, notify } = p;
-  const [code, setCode] = useState<string>("");
   const [rows, setRows] = useState<ClientRow[]>([]);
   const [open, setOpen] = useState<ClientRow | null>(null);
   const [busy, setBusy] = useState(false);
@@ -20,7 +19,7 @@ export function CoachArea(p: AppApi) {
   async function refresh() {
     if (!user) return;
     setBusy(true);
-    try { setCode(await publishCoachCode(user.uid, coachName)); setRows(await listClients(user.uid)); }
+    try { setRows(await listClients(user.uid)); }
     catch (e: any) { setError(e.message || "Could not load clients."); }
     finally { setBusy(false); }
   }
@@ -29,14 +28,7 @@ export function CoachArea(p: AppApi) {
   const last = (r: ClientRow) => r.feedback[0];
   return (
     <>
-      <section className="card">
-        <div className="card-top"><span>Your coach code</span><button className="icon" aria-label="Refresh" onClick={refresh}><RefreshCw size={16} className={busy ? "spin" : ""} /></button></div>
-        <div className="code-row">
-          <b className="code">{code || "…"}</b>
-          <button className="pill pill-small" onClick={() => { navigator.clipboard?.writeText(code); notify("Code copied."); }}><Copy size={14} /> Copy</button>
-        </div>
-        <small>A client enters it once on Me, under Your coach. From then on you see their cards and can set their goal.</small>
-      </section>
+      <Invites {...p} />
       <AccessRequests {...p} />
       <p className="label">Clients ({rows.length})</p>
       {rows.length === 0 && <div className="strip">No clients yet. Share the code.</div>}
@@ -175,9 +167,71 @@ export function AccessRequests(p: AppApi) {
           <div className="card-top"><span>{r.name}{r.coach ? " · coach" : ""}</span><small>{new Date(r.createdAt).toLocaleDateString()}</small></div>
           <a href={`mailto:${r.email}?subject=Your%20Chef%20Mealan%20code`}>{r.email}</a>
           {r.note && <p className="client-note">“{r.note}”</p>}
-          {r.status !== "handled" && <button className="link" onClick={async () => { await fetch(`/api/access-requests/${r.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "handled" }) }); p.notify("Marked as handled."); load(); }}>Mark as handled</button>}
+          {r.status !== "handled" && (
+            <div className="button-row" style={{ marginTop: 6 }}>
+              <button className="pill pill-small pill-primary" onClick={async () => {
+                const res = await fetch("/api/invites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: r.name, email: r.email }) });
+                const d = await res.json(); if (!res.ok) { p.setError(d.error || "Couldn't create the invite."); return; }
+                await fetch(`/api/access-requests/${r.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "handled" }) });
+                location.href = inviteMail(d); load();
+              }}><Send size={14} /> Invite</button>
+              <button className="link" onClick={async () => { await fetch(`/api/access-requests/${r.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "handled" }) }); p.notify("Marked as handled."); load(); }}>Mark as handled</button>
+            </div>
+          )}
         </section>
       ))}
+    </>
+  );
+}
+
+// Personal invites: one code for one email, used once, valid 30 days.
+const inviteMail = (i: { email: string; name: string; code: string; coachName: string }) =>
+  `mailto:${i.email}?subject=${encodeURIComponent("Your Chef Mealan invite")}&body=${encodeURIComponent(`Hi ${i.name || ""},\n\nyour personal code for Chef Mealan: ${i.code}\n\n1. Open https://chefmealan.com\n2. Sign in with Google using this email address: ${i.email}\n3. Enter the code.\n\nThe code works once, with this email only, for 30 days.\n\n${i.coachName}`)}`;
+export function Invites(p: AppApi) {
+  const [name, setName] = useState(""); const [email, setEmail] = useState("");
+  const [list, setList] = useState<any[]>([]); const [made, setMade] = useState<any>(null); const [busy, setBusy] = useState(false);
+  const load = () => fetch("/api/invites").then((r) => r.json()).then((d) => setList(d.invites ?? [])).catch(() => {});
+  useEffect(() => { load(); }, []);
+  const create = async (n: string, e: string) => {
+    setBusy(true);
+    try { const r = await fetch("/api/invites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: n, email: e }) }); const d = await r.json(); if (!r.ok) throw new Error(d.error); setMade(d); setName(""); setEmail(""); load(); return d; }
+    catch (err: any) { p.setError(err.message || "Couldn't create the invite."); return null; } finally { setBusy(false); }
+  };
+  return (
+    <>
+      <section className="card">
+        <div className="card-top"><span><UserPlus size={15} /> Invite a client</span><button className="icon" aria-label="Refresh" onClick={load}><RefreshCw size={16} /></button></div>
+        <small>A personal code: one email, used once, valid 30 days.</small>
+        <div className="l-form" style={{ marginTop: 8 }}>
+          <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} />
+          <input placeholder="Email they sign in with" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <button className="pill pill-primary" disabled={busy || !email.includes("@")} onClick={() => create(name, email)}>Create invite</button>
+        </div>
+        {made && (
+          <div className="invite-made">
+            <b className="code">{made.code}</b><small>for {made.email}</small>
+            <div className="button-row">
+              <a className="pill pill-small pill-primary" href={inviteMail(made)}><Send size={14} /> Send by email</a>
+              <button className="pill pill-small" onClick={() => { navigator.clipboard?.writeText(made.code); p.notify("Code copied."); }}><Copy size={14} /> Copy</button>
+            </div>
+          </div>
+        )}
+      </section>
+      {list.length > 0 && (
+        <>
+          <p className="label">Invites</p>
+          <section className="card">
+            {list.slice(0, 20).map((i) => (
+              <div className="history-row" key={i.code}>
+                <div><b>{i.name || i.email}</b><small>{i.email} · {i.code}</small></div>
+                <div className="history-num"><b className={`inv-${i.status}`}>{i.status}</b>
+                  {i.status === "open" && <small><a href={inviteMail(i)}>resend</a> · <button className="link" onClick={async () => { await fetch(`/api/invites/${i.code}/revoke`, { method: "POST" }); load(); }}>revoke</button></small>}
+                </div>
+              </div>
+            ))}
+          </section>
+        </>
+      )}
     </>
   );
 }

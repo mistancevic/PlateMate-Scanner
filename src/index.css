@@ -472,3 +472,4 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .l-hero > * { min-width: 0; }
 .l-hero h1 { max-width: 13ch; white-space: normal; }
 .l-chef { -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 14%); mask-image: linear-gradient(to top, transparent 0%, #000 14%); }
+.invite-made { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; } .inv-open { color: var(--brand-text); } .inv-used { color: var(--high); } .inv-expired, .inv-revoked { color: var(--muted); }

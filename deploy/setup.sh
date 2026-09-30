@@ -3,7 +3,7 @@
 set -euo pipefail
 cd "$(dirname "$0")"; source ./deploy.env
 gcloud config set project "$PROJECT"
-gcloud services enable run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com secretmanager.googleapis.com generativelanguage.googleapis.com
+gcloud services enable firebaserules.googleapis.com run.googleapis.com cloudbuild.googleapis.com artifactregistry.googleapis.com secretmanager.googleapis.com generativelanguage.googleapis.com
 gcloud artifacts repositories describe chefmealan --location "$REGION" >/dev/null 2>&1 || \
   gcloud artifacts repositories create chefmealan --repository-format docker --location "$REGION"
 read -rsp "Paste the Gemini API key (from aistudio.google.com/apikey, project $PROJECT): " GK; echo

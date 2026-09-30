@@ -63,12 +63,12 @@ export async function publishCoachCode(uid: string, name: string) {
   await setDoc(doc(db(), "coaches", code), { uid, name, updatedAt: new Date().toISOString() });
   return code;
 }
-export async function joinCoach(uid: string, code: string) {
-  const snap = await getDoc(doc(db(), "coaches", code.trim().toUpperCase()));
-  if (!snap.exists()) throw new Error("No coach with that code.");
-  const { uid: coachId, name } = snap.data() as { uid: string; name: string };
-  await updateDoc(doc(db(), "users", uid), { coachId, coachName: name || "your coach" });
-  return { coachId, coachName: name || "your coach" };
+export async function joinCoach(_uid: string, code: string) {
+  // the server checks the invite: right code, right email, not used, not expired
+  const r = await fetch("/api/join", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code }) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || "Couldn't join with that code.");
+  return { coachId: d.coachId as string, coachName: (d.coachName as string) || "your coach" };
 }
 export async function leaveCoach(uid: string) {
   await updateDoc(doc(db(), "users", uid), { coachId: null, coachName: null });

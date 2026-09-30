@@ -54,6 +54,7 @@ async function requireUser(req: express.Request, res: express.Response, next: ex
     usage.set(user.uid, { hour, n });
     if (n > HOURLY_LIMIT) return res.status(429).json({ error: "That's a lot of questions for one hour. Mealan needs a short break; try again in a few minutes." });
     (req as any).uid = user.uid;
+    (req as any).email = user.email_verified ? String(user.email || "").toLowerCase() : "";
     next();
   } catch {
     res.status(401).json({ error: "Your sign-in expired. Close and reopen the app." });
@@ -653,6 +654,69 @@ app.post("/api/access-requests/:id", requireUser, requireMember, requireCoach, a
     const status = req.body?.status === "handled" ? "handled" : "new";
     await db().collection("accessRequests").doc(String(req.params.id).slice(0, 80)).update({ status, handledAt: FieldValue.serverTimestamp() });
     res.json({ ok: true });
+  } catch (e) { fail(res, e); }
+});
+
+
+// Personal invites: one code, one email, one use, 30 days. Only the server connects a person to a coach.
+const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const newCode = () => Array.from(createHash("sha256").update(String(Math.random()) + Date.now() + process.hrtime.bigint()).digest()).slice(0, 8).map((b) => ALPHABET[b % ALPHABET.length]).join("");
+const joinTries = new Map<string, number[]>();
+app.post("/api/invites", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    const email = String(req.body?.email ?? "").trim().toLowerCase(), name = String(req.body?.name ?? "").trim().slice(0, 80);
+    if (!/^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i.test(email)) return res.status(400).json({ error: "Check the email." });
+    const me = await db().collection("users").doc((req as any).uid).get();
+    const coachName = String(me.data()?.clientName || "").split(" ")[0] || "your coach";
+    let code = newCode();
+    for (let i = 0; i < 5 && (await db().collection("invites").doc(code).get()).exists; i++) code = newCode();
+    const now = Date.now();
+    await db().collection("invites").doc(code).set({ code, email, name, coachId: (req as any).uid, coachName, status: "open", createdAt: new Date(now).toISOString(), expiresAt: new Date(now + 30 * 86_400_000).toISOString() });
+    res.json({ code, email, name, coachName });
+  } catch (e) { fail(res, e); }
+});
+app.get("/api/invites", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    const snap = await db().collection("invites").where("coachId", "==", (req as any).uid).get();
+    const now = new Date().toISOString();
+    const invites = snap.docs.map((d) => d.data() as any).map((x) => ({ ...x, status: x.status === "open" && x.expiresAt < now ? "expired" : x.status })).sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1)).slice(0, 60);
+    res.json({ invites });
+  } catch (e) { fail(res, e); }
+});
+app.post("/api/invites/:code/revoke", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    const ref = db().collection("invites").doc(String(req.params.code).toUpperCase().slice(0, 12));
+    const snap = await ref.get();
+    if (!snap.exists || snap.data()?.coachId !== (req as any).uid) return res.status(404).json({ error: "No such invite." });
+    if (snap.data()?.status === "open") await ref.update({ status: "revoked" });
+    res.json({ ok: true });
+  } catch (e) { fail(res, e); }
+});
+app.post("/api/join", requireUser, async (req, res) => {
+  const uid = (req as any).uid, email = (req as any).email;
+  const now = Date.now();
+  const tries = (joinTries.get(uid) ?? []).filter((t) => now - t < 3_600_000);
+  if (tries.length >= 8) return res.status(429).json({ error: "Too many tries. Wait an hour, or ask your coach for a new invite." });
+  joinTries.set(uid, [...tries, now]);
+  if (!FB_PROJECT) return res.status(400).json({ error: "Invites work on the live app only." });
+  try {
+    const code = String(req.body?.code ?? "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
+    const ref = db().collection("invites").doc(code);
+    const result = await db().runTransaction(async (t) => {
+      const snap = await t.get(ref);
+      if (!snap.exists) return { error: "That code doesn't exist. Check it, or ask your coach for a new one." };
+      const inv = snap.data() as any;
+      if (inv.status === "used") return { error: "That code has been used already. Ask your coach for a new one." };
+      if (inv.status === "revoked") return { error: "That code was withdrawn. Ask your coach for a new one." };
+      if (inv.expiresAt < new Date().toISOString()) return { error: "That code has expired. Ask your coach for a new one." };
+      if (!email || email !== inv.email) return { error: `This code was sent to another email. You're signed in as ${email || "an account without a confirmed email"}.` };
+      t.update(ref, { status: "used", usedBy: uid, usedAt: new Date().toISOString() });
+      t.set(db().collection("users").doc(uid), { coachId: inv.coachId, coachName: inv.coachName, clientName: inv.name || null, joinedAt: new Date().toISOString() }, { merge: true });
+      return { coachId: inv.coachId, coachName: inv.coachName };
+    });
+    if ("error" in result) return res.status(400).json(result);
+    joinTries.delete(uid);
+    res.json(result);
   } catch (e) { fail(res, e); }
 });
 

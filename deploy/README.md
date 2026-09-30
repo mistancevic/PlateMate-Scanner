@@ -19,4 +19,4 @@ Data stays in Firestore, europe-west3 (Frankfurt). Address: chefmealan.com.
 
 ## Every release
    cd PlateMate-Scanner && git pull && ./deploy/deploy.sh
-Rules changed? Also: firebase deploy --only firestore:rules --project project-fb3c5fab-00d1-4d11-ac7
+Rules are published by the same command (deploy/rules.sh), so they always match the code.

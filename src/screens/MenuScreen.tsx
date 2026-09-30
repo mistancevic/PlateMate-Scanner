@@ -241,7 +241,7 @@ function CoachPanel(p: AppApi) {
     </section>
   ) : (
     <section className="card">
-      <small>Got a code from your coach? Enter it once. From then on your coach sees what you share and can set your goal.</small>
+      <small>Got an invite from your coach? Enter its code. It works with the email it was sent to.</small>
       <div className="button-row" style={{ marginTop: 8 }}>
         <input className="code-input" value={code} placeholder="Coach code" onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={8} />
         <button className="pill pill-small pill-primary" disabled={code.trim().length < 4} onClick={() => joinCoach(code)}>Join</button>
