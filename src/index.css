@@ -420,3 +420,8 @@ a.pill { text-decoration: none; display: inline-flex; align-items: center; }
 .eval-status { font-size: 12px; font-weight: 700; color: var(--brand-text); flex: none; text-align: right; max-width: 40%; }
 .eval-body { margin-top: 10px; } .eval-list { margin: 4px 0; padding-left: 18px; font-size: 14px; line-height: 1.45; }
 .eval-checks { list-style: none; margin: 4px 0; padding: 0; font-size: 14px; } .eval-checks .ok { color: var(--high); } .eval-checks .bad { color: var(--low); font-weight: 700; }
+
+.chat-fab { position: fixed; right: max(16px, calc((100vw - 640px) / 2 + 16px)); bottom: calc(78px + env(safe-area-inset-bottom, 0px)); width: 56px; height: 56px; border-radius: 50%; background: var(--brand); color: #fff; display: grid; place-items: center; box-shadow: 0 6px 18px rgba(20, 60, 140, 0.28); z-index: 30; }
+.chat-fab:active { transform: scale(0.96); }
+main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
+@media (min-width: 900px) { main { padding-bottom: 96px; } }

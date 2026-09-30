@@ -1009,7 +1009,6 @@ export default function App() {
   const NAV: { id: Tab; label: string; icon: ReactNode }[] = [
     { id: "home", label: "Today", icon: <Home size={20} /> },
     { id: "journey", label: "Mealan", icon: <Mark size={22} color="currentColor" /> },
-    { id: "chat", label: "Chat", icon: <MessageCircle size={20} /> },
     { id: "foods", label: "Foods", icon: <BookOpen size={20} /> },
     { id: "me", label: "Me", icon: <CircleUser size={20} /> },
     ...(profile.role === "coach" ? [{ id: "clients" as Tab, label: "Clients", icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }] : []),
@@ -1076,6 +1075,7 @@ export default function App() {
         {!menuSection && tab === "home" && <HomeScreen {...screenProps} />}
         {!menuSection && tab === "journey" && <JourneyScreen {...screenProps} />}
         {!menuSection && tab === "chat" && <OutScreen {...screenProps} toPlate={() => { setStep("in"); setTab("journey"); }} />}
+        {(tab !== "chat" || menuSection) && <button className="chat-fab" aria-label="Chat with Mealan" onClick={() => { setMenuSection(null); setTab("chat"); }}><MessageCircle size={26} /></button>}
         {!menuSection && tab === "me" && <MeScreen {...screenProps} />}
         {!menuSection && tab === "clients" && <ClientsScreen {...screenProps} />}
         {!menuSection && tab === "meal" && <MealScreen {...screenProps} />}

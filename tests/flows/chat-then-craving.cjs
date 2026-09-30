@@ -18,9 +18,12 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   const expect = (label, got, want) => { const ok = got === want; console.log(ok ? "ok  " : "FAIL", label, "->", got); if (!ok) process.exitCode = 1; };
   await click(/Chat with Mealan/i); expect("Today, Chat with Mealan", await h2(), "Chat with Mealan");
   await nav("Today"); await click(/I'm craving something/i); expect("Today, I'm craving something", await h2(), "What are you craving?");
-  await nav("Chat"); expect("Chat tab", await h2(), "Chat with Mealan");
+  await page.locator(".chat-fab").click(); await page.waitForTimeout(300); expect("floating chat button", await h2(), "Chat with Mealan");
+  expect("no chat button while in the chat", String(await page.locator(".chat-fab").count()), "0");
   await nav("Mealan"); expect("Mealan tab after chat", await h2(), "What are you craving?");
   expect("no Chat button on the plate", String(await page.locator("main").getByRole("button", { name: /^Chat$/ }).count()), "0");
+  expect("chat button floats over the plate", String(await page.locator(".chat-fab").count()), "1");
+  expect("bottom bar has four tabs", String(await page.locator("nav button").count()), "4");
   if (errs.length) { console.log("page errors:", errs); process.exitCode = 1; }
   await b.close(); server.kill();
 })();
