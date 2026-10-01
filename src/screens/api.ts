@@ -64,6 +64,9 @@ export interface AppApi {
   applyNumbers: (bandId: string, kcal: number, protein: number, method?: string) => void;
   goalLog: import("../goal").GoalEntry[];
   addFoodPhoto: (foodId: string, dataUrl: string) => Promise<void>;
+  openFoodId: string | null;
+  clearOpenFood: () => void;
+  mergeInLibrary: (keepId: string, otherId: string, name: string) => void;
   todayKcal: number | null;
   dayType: import("../personal").DayType;
   setDayType: (d: import("../personal").DayType) => void;

@@ -1,0 +1,24 @@
+const { chromium } = require("playwright");
+const { spawn } = require("node:child_process");
+const fs = require("node:fs");
+const seed = JSON.parse(fs.readFileSync(require("node:path").resolve(__dirname, "seed.json"), "utf8"));
+seed.foods = [{ id: "fb", name: "Protein Flips Salt & Vinegar", brand: "ahead", barcode: "4260345270123", basis: "100g", source: "label", notes: "", reviewedAt: "2026-10-01", readyToEat: true, calories: 404, protein: 23, fats: 8.4, carbs: 56, fiber: 5.2 }, ...seed.foods];
+(async () => {
+  const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: require("node:path").resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT: "3187" }, stdio: ["ignore", "pipe", "pipe"] });
+  await new Promise((r) => setTimeout(r, 2500));
+  const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
+  const page = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 });
+  await page.addInitScript((s) => { if (!localStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); localStorage.setItem("seeded", "1"); } }, seed);
+  await page.goto("http://127.0.0.1:3187/"); await page.waitForTimeout(800);
+  await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /^\+?\s*Add$/ }).first().click(); await page.waitForTimeout(400);
+  const fill = async (label, v) => { await page.getByLabel(label, { exact: false }).first().fill(v); };
+  await fill("Product name", "PROTEIN FLIPS salt vinegar flavour"); await fill("Energy", "404"); await fill("Protein", "23"); await fill("Fat", "8.4"); await fill("Carbohydrate", "56");
+  await page.waitForTimeout(300);
+  console.log("banner:", await page.locator(".match b").textContent().catch(() => "none"), "|", await page.locator(".match small").first().textContent().catch(() => ""));
+  await page.getByLabel(/I checked the values/).check();
+  await page.getByRole("button", { name: /Confirm & save food/ }).click(); await page.waitForTimeout(600);
+  const foods = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.filter((f) => /flips/i.test(f.name)));
+  console.log("flips in library:", foods.length, foods.map((f) => f.name));
+  await b.close(); server.kill();
+})();

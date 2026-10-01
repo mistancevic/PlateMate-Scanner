@@ -1,0 +1,13 @@
+import test from "node:test";
+import assert from "node:assert/strict";
+import { findMatch, mergeFoods, duplicatePairs, nameSimilarity } from "./dedupe";
+const base = { basis: "100g", source: "label", notes: "", reviewedAt: "", readyToEat: true, fiber: 5.2 } as any;
+const flipsA = { ...base, id: "a", name: "Protein Flips Salt & Vinegar Flavour", brand: "", calories: 404, protein: 23, fats: 8.4, carbs: 56 };
+const flipsB = { ...base, id: "b", name: "PROTEIN FLIPS Salt Vinegar", brand: "ahead", barcode: "4260123456789", calories: 404, protein: 23, fats: 8.4, carbs: 56 };
+const skyr = { ...base, id: "c", name: "Skyr, natural", brand: "Arla", calories: 63, protein: 11, fats: 0.2, carbs: 4 };
+test("same values and a similar name is the same product", () => { assert.equal(findMatch(flipsB, [flipsA, skyr])?.food.id, "a"); });
+test("same barcode is certain", () => { assert.equal(findMatch({ ...skyr, id: "z", barcode: "4260123456789", name: "x" }, [flipsB])?.reason, "barcode"); });
+test("different products don't match", () => { assert.equal(findMatch(skyr, [flipsA, flipsB]), null); });
+test("names vary, words count", () => { assert.ok(nameSimilarity("protein flips salt vinegar flavour", "PROTEIN FLIPS Salt & Vinegar") >= 0.75); });
+test("merge keeps the chosen name, fills brand and barcode", () => { const m = mergeFoods(flipsA, flipsB, flipsB.name); assert.equal(m.id, "a"); assert.equal(m.brand, "ahead"); assert.equal(m.barcode, "4260123456789"); assert.equal(m.name, flipsB.name); });
+test("existing duplicates are found as a pair", () => { assert.equal(duplicatePairs([flipsA, skyr, flipsB]).length, 1); });

@@ -1,12 +1,13 @@
 import { Camera, Plus, X, ScanBarcode } from "lucide-react";
 import { density, candidateFood } from "../pilot";
+import { duplicatePairs } from "../dedupe";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import type { ScannerMode } from "../types";
 import type { AppApi } from "./api";
 import { ConfirmButton } from "../components/Confirm";
 import { iconFor } from "../icons";
 import { FoodCard } from "../components/FoodCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Band = "high" | "mid" | "low";
 function band(pd: number | null): Band {
@@ -19,6 +20,12 @@ export function FoodsScreen(p: AppApi) {
     setBusy, setError, notify, setFilter, filter, coach, pdRef } = p;
   const inMeal = new Set(state.items.map((i) => i.food.id));
   const [cardId, setCardId] = useState<string | null>(null);
+  // a barcode that's already in the library opens its card here
+  useEffect(() => { if (p.openFoodId) { setCardId(p.openFoodId); p.clearOpenFood(); } /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [p.openFoodId]);
+  const [dupOpen, setDupOpen] = useState(false);
+  const [notSame, setNotSame] = useState<string[]>(() => { try { return JSON.parse(localStorage.getItem("chefmealan-not-same") || "[]"); } catch { return []; } });
+  const pairKey = (a: string, b: string) => [a, b].sort().join("|");
+  const pairs = duplicatePairs(state.foods).filter(([a, b]) => !notSame.includes(pairKey(a.id, b.id)));
   const cardFood = state.foods.find((x) => x.id === cardId);
   const foods = state.foods.map((f) => ({ f, pd: density(f.protein, f.calories) })).map((x) => ({ ...x, b: p.fitPd(x.pd) }));
   const counts = { high: foods.filter((x) => x.b === "high").length, mid: foods.filter((x) => x.b === "mid").length, low: foods.filter((x) => x.b === "low").length };
@@ -52,6 +59,10 @@ export function FoodsScreen(p: AppApi) {
         <input aria-label="Barcode number" placeholder="or type a barcode" inputMode="numeric" value={barcode}
           onChange={(e) => setBarcode(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") lookup(); }} />
       </div>
+      {pairs.length > 0 && (
+        <button className="strip strip-button" onClick={() => setDupOpen(true)}>{pairs.length} possible {pairs.length === 1 ? "duplicate" : "duplicates"} in your foods. Check and merge.</button>
+      )}
+      {dupOpen && <DuplicatesSheet pairs={pairs} close={() => setDupOpen(false)} merge={p.mergeInLibrary} notSame={(a, b) => { const k = [...notSame, pairKey(a, b)]; setNotSame(k); try { localStorage.setItem("chefmealan-not-same", JSON.stringify(k)); } catch {} }} />}
       {pending.length > 0 && (
         <section className="pending">
           <p className="label">Products seen. Review or enter each one.</p>
@@ -99,5 +110,38 @@ export function FoodsScreen(p: AppApi) {
       )}
       {cardFood && <FoodCard food={p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood} addPhoto={(d) => p.addFoodPhoto(cardFood.id, d)} target={pdRef} fit={p.fitPd(density(cardFood.protein, cardFood.calories))} close={() => setCardId(null)} review={() => { setImage(""); setEdit(cardFood); }} />}
     </>
+  );
+}
+
+// Each likely pair side by side: pick the name to keep, merge; or say they're not the same.
+function DuplicatesSheet({ pairs, close, merge, notSame }: { pairs: [any, any][]; close: () => void; merge: (keepId: string, otherId: string, name: string) => void; notSame: (a: string, b: string) => void }) {
+  const [names, setNames] = useState<Record<number, 0 | 1>>({});
+  if (!pairs.length) return null;
+  return (
+    <div className="sheet-backdrop" onClick={close}>
+      <div className="sheet" onClick={(e) => e.stopPropagation()}>
+        <div className="card-top"><span>Possible duplicates</span><button className="link" onClick={close}>Close</button></div>
+        <p className="small">Same barcode, or the same values per 100 g with a similar name. Pick the name to keep; the photos of both stay.</p>
+        {pairs.map(([a, b], i) => {
+          const keep = names[i] ?? (a.barcode && !b.barcode ? 0 : b.barcode && !a.barcode ? 1 : 0);
+          const pair = [a, b];
+          return (
+            <section className="card dup" key={a.id + b.id}>
+              {pair.map((x, k) => (
+                <button key={x.id} className={`dup-row ${keep === k ? "on" : ""}`} onClick={() => setNames({ ...names, [i]: k as 0 | 1 })}>
+                  <span className="thumb thumb-sm">{x.photo ? <img src={x.photo} alt="" /> : "🍽️"}</span>
+                  <span className="dup-text"><b>{x.name}</b><small>{x.brand || "no brand"}{x.barcode ? ` · ${x.barcode}` : ""} · {Math.round(x.calories ?? 0)} kcal · {x.protein ?? "?"} g protein</small></span>
+                  <span className="dup-pick">{keep === k ? "Keep this name" : ""}</span>
+                </button>
+              ))}
+              <div className="button-row" style={{ marginTop: 8 }}>
+                <button className="pill pill-small pill-primary" onClick={() => { const k = pair[keep], o = pair[1 - keep]; merge(k.id, o.id, k.name); }}>Merge</button>
+                <button className="link" onClick={() => notSame(a.id, b.id)}>Not the same</button>
+              </div>
+            </section>
+          );
+        })}
+      </div>
+    </div>
   );
 }

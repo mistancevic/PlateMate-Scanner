@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { CameraView } from "./components/CameraView";
 import { resizeImageBase64, thumbnailBase64 } from "./utils/image";
+import { findMatch, mergeFoods, repoint } from "./dedupe";
 import { iconFor } from "./icons";
 import type { ScannerMode } from "./types";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange, setPdUnit } from "./ui";
@@ -198,16 +199,19 @@ function FoodEditor({
   food,
   image,
   images,
+  library,
   close,
   save,
 }: {
   food: Food;
   image?: string;
   images?: string[];
+  library?: Food[];
   close: () => void;
   save: (f: Food) => void;
 }) {
   const [mainIdx, setMainIdx] = useState(0);
+  const [choice, setChoice] = useState<"update" | "both">("update");
   const [name, setName] = useState(food.name),
     [brand, setBrand] = useState(food.brand),
     [notes, setNotes] = useState(food.notes),
@@ -220,6 +224,10 @@ function FoodEditor({
       string
     >,
   );
+  // the same product, recognised from what's on screen now
+  const liveMatch = !(library ?? []).some((x) => x.id === food.id)
+    ? findMatch({ ...food, name, brand, ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])) } as Food, library ?? [])
+    : null;
   function submit() {
     const f = {
       ...food,
@@ -244,13 +252,16 @@ function FoodEditor({
     setErrors(e);
     if (e.length) return;
     f.icon = f.icon || iconFor(f.name);
+    const isNew = !(library ?? []).some((x) => x.id === f.id);
+    const match = isNew ? findMatch(f, library ?? []) : null;
+    const finish = (g: Food) => save(match && choice === "update" ? { ...mergeFoods(match.food, g), reviewedAt: g.reviewedAt } : g);
     const raw = (images && images.length ? images : image ? [image] : []);
     const all = raw.length > 1 ? [raw[mainIdx] ?? raw[0], ...raw.filter((_, i) => i !== mainIdx)] : raw;
     if (all.length && !f.photo)
       Promise.all([thumbnailBase64(all[0]).catch(() => ""), ...all.map((x) => resizeImageBase64(x, 900, 900).catch(() => ""))])
-        .then(([thumb, ...big]) => { const ok = big.filter(Boolean); save({ ...f, photo: thumb || undefined, photos: ok.length ? ok : undefined }); })
-        .catch(() => save(f));
-    else save(f);
+        .then(([thumb, ...big]) => { const ok = big.filter(Boolean); finish({ ...f, photo: thumb || undefined, photos: ok.length ? ok : undefined }); })
+        .catch(() => finish(f));
+    else finish(f);
   }
   return (
     <Modal title="Review food data" close={close}>
@@ -267,6 +278,18 @@ function FoodEditor({
         <img className="label-preview" src={image} alt="Captured nutrition label" />
       ) : null}
       {images && images.length > 1 && <p className="small center">{images.length} photos · swipe to see each</p>}
+      {liveMatch && (
+        <section className="match">
+          <b>Looks like a food you already have</b>
+          <small>{liveMatch.food.name}{liveMatch.food.brand ? `, ${liveMatch.food.brand}` : ""} · {liveMatch.reason === "barcode" ? "same barcode" : "same values per 100 g"}</small>
+          <div className="moments" style={{ marginTop: 8 }}>
+            <button className={`pill pill-small ${choice === "update" ? "pill-primary" : ""}`} onClick={() => setChoice("update")}>Update that one</button>
+            <button className={`pill pill-small ${choice === "both" ? "pill-primary" : ""}`} onClick={() => setChoice("both")}>Keep both</button>
+            <button className="pill pill-small" onClick={close}>Cancel</button>
+          </div>
+          {choice === "update" && <small>It keeps its name. Missing values, brand or barcode are filled in, and these photos join its gallery.</small>}
+        </section>
+      )}
       <p className="small">
         Source: {food.source}. Check the actual package. All values below must
         be <strong>per 100 g</strong>, with carbohydrate excluding fibre.
@@ -446,6 +469,7 @@ export default function App() {
     [edit, setEdit] = useState<Food | null>(null),
     [image, setImage] = useState(""),
     [imageSet, setImageSet] = useState<string[]>([]),
+    [openFoodId, setOpenFoodId] = useState<string | null>(null),
     [goalsOpen, setGoalsOpen] = useState(false),
     [pending, setPending] = useState<{ name: string; brand: string; values?: any }[]>([]),
     [barcode, setBarcode] = useState(""),
@@ -682,12 +706,15 @@ export default function App() {
     setEdit(candidateFood({ product_name: name, brand }, "Manual entry"));
   }
   function saveFood(f: Food) {
+    const existed = state.foods.some((x) => x.id === f.id);
     setState((s) => ({
       ...s,
       foods: s.foods.some((x) => x.id === f.id)
         ? s.foods.map((x) => (x.id === f.id ? f : x))
         : [f, ...s.foods],
+      items: repoint(s.items, f.id, f),
     }));
+    if (existed && f.reviewedAt) { setEdit(null); setImageSet([]); notify(`Updated ${f.name}.`); return; }
     setEdit(null);
     setPending((p) =>
       p.filter((x) => x.name !== f.name || x.brand !== f.brand),
@@ -776,8 +803,9 @@ export default function App() {
     try {
       const local = state.foods.find((f) => f.barcode === code.trim());
       if (local) {
-        setEdit({ ...local });
-        notify("Found your saved food. Check the package is still the same.");
+        setOpenFoodId(local.id);
+        setTab("foods");
+        notify("Already in your foods.");
       } else {
         const d = await api(`/api/product/${code.trim()}`);
         if (run !== runRef.current) return;
@@ -955,6 +983,16 @@ export default function App() {
       const [thumb, big] = await Promise.all([thumbnailBase64(dataUrl).catch(() => ""), resizeImageBase64(dataUrl, 900, 900).catch(() => "")]);
       setState((s) => ({ ...s, foods: s.foods.map((f) => f.id !== foodId ? f : { ...f, photo: f.photo || thumb || undefined, photos: [...(f.photos ?? (f.photo ? [f.photo] : [])), big].filter(Boolean).slice(0, 6) }) }));
       notify("Photo added.");
+    },
+    openFoodId, clearOpenFood: () => setOpenFoodId(null),
+    mergeInLibrary: (keepId: string, otherId: string, name: string) => {
+      setState((s) => {
+        const keep = s.foods.find((x) => x.id === keepId), other = s.foods.find((x) => x.id === otherId);
+        if (!keep || !other) return s;
+        const merged = mergeFoods(keep, other, name);
+        return { ...s, foods: s.foods.filter((x) => x.id !== otherId).map((x) => (x.id === keepId ? merged : x)), items: repoint(repoint(s.items, otherId, merged), keepId, merged) };
+      });
+      notify("Merged into one food.");
     },
     goalLog, formula: profile.formula ?? null, todayKcal, dayType, setDayType: (d: DayType) => { storeDayType(d); setDayTypeState(d); },
     applyNumbers: (bandId: string, kcal: number, protein: number, method?: string) => {
@@ -1176,6 +1214,7 @@ export default function App() {
           food={edit}
           image={image}
           images={imageSet}
+          library={state.foods}
           close={() => { setEdit(null); setImageSet([]); }}
           save={saveFood}
         />
