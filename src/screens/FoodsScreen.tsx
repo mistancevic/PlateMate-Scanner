@@ -1,5 +1,5 @@
 import { Camera, Plus, X, ScanBarcode } from "lucide-react";
-import { density } from "../pilot";
+import { density, candidateFood } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import type { ScannerMode } from "../types";
 import type { AppApi } from "./api";
@@ -54,11 +54,13 @@ export function FoodsScreen(p: AppApi) {
       </div>
       {pending.length > 0 && (
         <section className="pending">
-          <p className="label">Products seen. Enter each label to add it.</p>
+          <p className="label">Products seen. Review or enter each one.</p>
           {pending.map((q, i) => (
             <div className="row" key={i}>
-              <div className="row-text"><b>{q.name}</b><small>{q.brand}</small></div>
-              <button className="pill pill-small" onClick={() => blank(q.name, q.brand)}>Enter label</button>
+              <div className="row-text"><b>{q.name}</b><small>{q.brand}{q.values ? " · values read from the label" : ""}</small></div>
+              {q.values
+                ? <button className="pill pill-small pill-primary" onClick={() => { setEdit(candidateFood(q.values, "Photos · review required")); setPending((v: any[]) => v.filter((_, j) => j !== i)); }}>Review</button>
+                : <button className="pill pill-small" onClick={() => blank(q.name, q.brand)}>Enter label</button>}
               <button className="icon" aria-label={`Dismiss ${q.name}`} onClick={() => setPending((v) => v.filter((_, j) => j !== i))}><X size={16} /></button>
             </div>
           ))}

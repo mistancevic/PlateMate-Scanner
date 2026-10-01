@@ -432,7 +432,7 @@ export default function App() {
     [edit, setEdit] = useState<Food | null>(null),
     [image, setImage] = useState(""),
     [goalsOpen, setGoalsOpen] = useState(false),
-    [pending, setPending] = useState<{ name: string; brand: string }[]>([]),
+    [pending, setPending] = useState<{ name: string; brand: string; values?: any }[]>([]),
     [barcode, setBarcode] = useState(""),
     [query, setQuery] = useState(""),
     [accessOpen, setAccessOpen] = useState(false),
@@ -710,17 +710,17 @@ export default function App() {
       if (run !== runRef.current) return;
       if (group) {
         const entities = Array.isArray(data?.entities) ? data.entities : [];
-        log("food_in", { way: "group" });
-        setPending(
-          entities.map((x: any) => ({
-            name: x.product_name || "Unknown item",
-            brand: x.brand || "",
-          })),
-        );
-        setTab("foods");
-        notify(
-          "Review each identified product. Photos do not establish nutrients or quantities.",
-        );
+        log("food_in", { way: "group", products: entities.length });
+        const read = (x: any) => x && x.calories !== null && x.protein !== null;
+        if (entities.length === 1 && read(entities[0])) {
+          // one product from several sides, its table read: straight to review, like a single label
+          setImage(images[0]);
+          setEdit(candidateFood(entities[0], "Photos · review required"));
+        } else {
+          setPending(entities.map((x: any) => ({ name: x.product_name || "Unknown item", brand: x.brand || "", values: read(x) ? x : undefined })));
+          setTab("foods");
+          notify(entities.some(read) ? "Products found. Review the ones with values read, enter the others." : "Products found. Enter each label, or photograph its nutrition table.");
+        }
       } else {
         if (!data.success)
           throw new Error(

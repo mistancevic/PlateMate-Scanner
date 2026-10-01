@@ -38,7 +38,7 @@ export interface AppApi {
   limits: { maxWeight: string; minProtein: string; maxKcal: string };
   setLimits: (l: { maxWeight: string; minProtein: string; maxKcal: string }) => void;
   options: { food: Food; items: Ingredient[]; grams: number; explanation?: string }[];
-  pending: { name: string; brand: string }[];
+  pending: { name: string; brand: string; values?: any }[];
   setPending: Dispatch<SetStateAction<{ name: string; brand: string }[]>>;
   barcode: string;
   setBarcode: (s: string) => void;

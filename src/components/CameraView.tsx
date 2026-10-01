@@ -51,15 +51,20 @@ export function CameraView({
   const [typedCode, setTypedCode] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [stagedGroupImages, setStagedGroupImages] = useState<string[]>([]);
+  const frameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let mounted = true;
     const initCamera = async () => {
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: { ideal: "environment" } },
+          // ask for a sharp picture; phones otherwise often hand over a small one
+          video: { facingMode: { ideal: "environment" }, width: { ideal: 2560 }, height: { ideal: 1440 } },
           audio: false,
         });
+        // keep refocusing as the label comes closer, where the phone supports it
+        const track = stream.getVideoTracks()[0];
+        try { await track.applyConstraints({ advanced: [{ focusMode: "continuous" } as any] }); } catch { /* not supported: fine */ }
         if (!mounted) {
           stream.getTracks().forEach((t) => t.stop());
           return;
@@ -94,12 +99,24 @@ export function CameraView({
     const video = videoRef.current;
     const canvas = canvasRef.current;
     if (video.videoWidth === 0 || video.videoHeight === 0) return null;
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
     const ctx = canvas.getContext("2d");
     if (!ctx) return null;
-    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    return canvas.toDataURL("image/jpeg", 0.8);
+    const vw = video.videoWidth, vh = video.videoHeight;
+    let sx = 0, sy = 0, sw = vw, sh = vh;
+    const frame = frameRef.current;
+    if (scannerMode !== "barcode" && frame) {
+      // the video fills the screen with object-cover: map the frame on screen back to the video's own pixels
+      const box = video.getBoundingClientRect(), f = frame.getBoundingClientRect();
+      const scale = Math.max(box.width / vw, box.height / vh);
+      const offX = (vw * scale - box.width) / 2, offY = (vh * scale - box.height) / 2;
+      const m = 0.06; // a small margin, so an edge of the label isn't lost
+      const fx = f.left - box.left - f.width * m, fy = f.top - box.top - f.height * m;
+      sx = Math.max(0, (fx + offX) / scale); sy = Math.max(0, (fy + offY) / scale);
+      sw = Math.min(vw - sx, (f.width * (1 + 2 * m)) / scale); sh = Math.min(vh - sy, (f.height * (1 + 2 * m)) / scale);
+    }
+    canvas.width = Math.round(sw); canvas.height = Math.round(sh);
+    ctx.drawImage(video, sx, sy, sw, sh, 0, 0, canvas.width, canvas.height);
+    return canvas.toDataURL("image/jpeg", 0.88);
   };
 
   const processSingleLabelOCR = async (image: string) => {
@@ -301,6 +318,7 @@ export function CameraView({
             </AnimatePresence>
 
             <div
+              ref={frameRef}
               className={`relative overflow-hidden transition-all duration-300 ${
                 scannerMode === "group"
                   ? "w-[90%] max-w-md aspect-[4/3] border-2 rounded-3xl shadow-[0_0_0_9999px_rgba(0,0,0,0.7)]"
