@@ -251,31 +251,6 @@ export function CameraView({
         </div>
       )}
 
-      {/* Multi-Angle Staging Floating Action Bar for Group Scan */}
-      {scannerMode === "group" && stagedGroupImages.length > 0 && (
-        <div className="absolute top-20 inset-x-4 z-40 flex items-center justify-center gap-3">
-          <button
-            onClick={() => {
-              const imagesToProcess = [...stagedGroupImages];
-              setStagedGroupImages([]);
-              processGroupScan(imagesToProcess);
-            }}
-            className="px-5 py-2.5 rounded-full bg-[#39ff14] text-black font-extrabold text-xs sm:text-sm tracking-wide shadow-[0_0_20px_rgba(57,255,20,0.4)] hover:brightness-110 active:scale-95 transition-all flex items-center gap-2"
-          >
-            <span>
-              Analyze {stagedGroupImages.length}{" "}
-              {stagedGroupImages.length === 1 ? "Photo" : "Photos"}
-            </span>
-          </button>
-          <button
-            onClick={() => setStagedGroupImages([])}
-            className="px-4 py-2.5 rounded-full bg-neutral-900/90 hover:bg-neutral-800 text-neutral-300 font-semibold text-xs sm:text-sm border border-neutral-700 backdrop-blur-md active:scale-95 transition-all"
-          >
-            Clear
-          </button>
-        </div>
-      )}
-
       {!cameraError ? (
         <>
           <div
@@ -306,7 +281,7 @@ export function CameraView({
                   ? "ALIGN BARCODE INSIDE THE FRAME"
                   : scannerMode === "group"
                     ? stagedGroupImages.length > 0
-                      ? `${stagedGroupImages.length} PHOTO(S) STAGED - SNAP MORE OR ANALYZE`
+                      ? `${stagedGroupImages.length} ${stagedGroupImages.length === 1 ? "PHOTO" : "PHOTOS"} READY · ADD MORE OR TAP ANALYZE`
                       : "FRAME MULTIPLE FOOD ITEMS"
                     : "ALIGN LABEL INSIDE THE FRAME"}
               </div>
@@ -413,6 +388,16 @@ export function CameraView({
               <ImageIcon className="w-6 h-6" />
             </button>
 
+            {/* Finish: right of the shutter, where the thumb is; the only green on the screen */}
+            {scannerMode === "group" && stagedGroupImages.length > 0 && (
+              <button
+                onClick={() => { const imagesToProcess = [...stagedGroupImages]; setStagedGroupImages([]); processGroupScan(imagesToProcess); }}
+                className="absolute right-2 px-4 h-12 rounded-full bg-[#39ff14] text-black font-extrabold text-sm shadow-[0_0_18px_rgba(57,255,20,0.35)] active:scale-95 transition-all"
+                aria-label={`Analyze ${stagedGroupImages.length} photo${stagedGroupImages.length === 1 ? "" : "s"}`}
+              >
+                Analyze {stagedGroupImages.length}
+              </button>
+            )}
             {/* Shutter Button */}
             <button
               id="camera-shutter-button"
@@ -423,16 +408,8 @@ export function CameraView({
               }
             >
               <div
-                className={`w-[3.25rem] h-[3.25rem] rounded-full transition-colors relative flex items-center justify-center ${
-                  scannerMode === "group" ? "bg-[#39ff14]" : "bg-white"
-                }`}
-              >
-                {scannerMode === "group" && stagedGroupImages.length > 0 && (
-                  <span className="text-[11px] font-black text-black">
-                    +{stagedGroupImages.length}
-                  </span>
-                )}
-              </div>
+                className="w-[3.25rem] h-[3.25rem] rounded-full bg-white transition-colors relative flex items-center justify-center"
+              />
             </button>
           </div>
         )}

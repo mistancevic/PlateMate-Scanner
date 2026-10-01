@@ -230,7 +230,9 @@ function fail(res: express.Response, error: unknown) {
   const status = Number(e?.status) || 500;
   const message = typeof e?.message === "string" ? e.message : "";
   const text =
-    status === 429
+    (status === 401 || status === 403) && /generativelanguage|API key|UNAUTHENTICATED|PERMISSION_DENIED/i.test(message)
+      ? "The AI key on the server isn't working. The host needs to check the Gemini key."
+      :     status === 429
       ? "AI quota exceeded. Retry later or use manual entry."
       : status === 404
         ? "The configured AI model is unavailable. Ask the host to set GEMINI_MODEL."
