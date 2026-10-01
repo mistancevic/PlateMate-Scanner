@@ -474,3 +474,11 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .l-chef { -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 14%); mask-image: linear-gradient(to top, transparent 0%, #000 14%); }
 .invite-made { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; } .inv-open { color: var(--brand-text); } .inv-used { color: var(--high); } .inv-expired, .inv-revoked { color: var(--muted); }
 .auto-switch { font: inherit; font-size: 13px; font-weight: 800; color: #fff; background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.25); border-radius: 999px; padding: 7px 14px; margin: 0; } .auto-note { font-weight: 700; }
+.label-previews { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; margin-bottom: 4px; } .label-previews .label-preview { flex: 0 0 86%; scroll-snap-align: center; }
+
+.group-frame { position: absolute; inset: 12% 6% 24% 6%; }
+.group-frame .corner { position: absolute; width: 34px; height: 34px; border-color: rgba(255,255,255,.85); border-style: solid; border-width: 0; }
+.group-frame .tl { top: 0; left: 0; border-top-width: 3px; border-left-width: 3px; border-top-left-radius: 14px; }
+.group-frame .tr { top: 0; right: 0; border-top-width: 3px; border-right-width: 3px; border-top-right-radius: 14px; }
+.group-frame .bl { bottom: 0; left: 0; border-bottom-width: 3px; border-left-width: 3px; border-bottom-left-radius: 14px; }
+.group-frame .br { bottom: 0; right: 0; border-bottom-width: 3px; border-right-width: 3px; border-bottom-right-radius: 14px; }

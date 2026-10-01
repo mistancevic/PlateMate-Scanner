@@ -104,12 +104,14 @@ export function CameraView({
     const vw = video.videoWidth, vh = video.videoHeight;
     let sx = 0, sy = 0, sw = vw, sh = vh;
     const frame = frameRef.current;
-    if (scannerMode !== "barcode" && frame) {
-      // the video fills the screen with object-cover: map the frame on screen back to the video's own pixels
-      const box = video.getBoundingClientRect(), f = frame.getBoundingClientRect();
+    if (scannerMode !== "barcode") {
+      // the video fills the screen with object-cover: map what's on screen back to the video's own pixels.
+      // Label: the narrow frame plus a small margin. Group: everything visible on the screen.
+      const box = video.getBoundingClientRect();
+      const f = scannerMode === "label" && frame ? frame.getBoundingClientRect() : box;
+      const m = scannerMode === "label" ? 0.06 : 0;
       const scale = Math.max(box.width / vw, box.height / vh);
       const offX = (vw * scale - box.width) / 2, offY = (vh * scale - box.height) / 2;
-      const m = 0.06; // a small margin, so an edge of the label isn't lost
       const fx = f.left - box.left - f.width * m, fy = f.top - box.top - f.height * m;
       sx = Math.max(0, (fx + offX) / scale); sy = Math.max(0, (fy + offY) / scale);
       sw = Math.min(vw - sx, (f.width * (1 + 2 * m)) / scale); sh = Math.min(vh - sy, (f.height * (1 + 2 * m)) / scale);
@@ -358,8 +360,8 @@ export function CameraView({
                   : scannerMode === "group"
                     ? stagedGroupImages.length > 0
                       ? `${stagedGroupImages.length} ${stagedGroupImages.length === 1 ? "PHOTO" : "PHOTOS"} READY · ADD MORE OR TAP ANALYZE`
-                      : "FRAME MULTIPLE FOOD ITEMS"
-                    : "ALIGN LABEL INSIDE THE FRAME"}
+                      : "WHOLE PRODUCT · ONE SIDE PER PHOTO"
+                    : "THE NUTRITION TABLE INSIDE THE FRAME"}
               </div>
             )}
 
@@ -380,9 +382,9 @@ export function CameraView({
               ref={frameRef}
               className={`relative overflow-hidden transition-all duration-300 ${
                 scannerMode === "group"
-                  ? "w-[90%] max-w-md aspect-[4/3] border-2 rounded-3xl shadow-[0_0_0_9999px_rgba(0,0,0,0.7)]"
-                  : "w-[85%] max-w-sm aspect-[3/4] border-2 rounded-3xl shadow-[0_0_0_9999px_rgba(0,0,0,0.7)]"
-              } ${error ? "border-red-500/80" : "border-white/40"}`}
+                  ? "group-frame"
+                  : `w-[85%] max-w-sm aspect-[3/4] border-2 rounded-3xl shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] ${error ? "border-red-500/80" : "border-white/40"}`
+              }`}
             >
               {scannerMode === "barcode" && (
                 <motion.div
@@ -396,7 +398,9 @@ export function CameraView({
                 />
               )}
               {scannerMode === "group" && (
-                <div className="absolute inset-0 border border-dashed border-white/20 rounded-3xl m-2 pointer-events-none" />
+                <>
+                  <span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" />
+                </>
               )}
             </div>
           </div>

@@ -34,6 +34,7 @@ export type Food = Nutrition & {
   reviewedAt: string;
   readyToEat: boolean;
   photo?: string;
+  photos?: string[];
   icon?: string;
 };
 export type Ingredient = {
@@ -343,7 +344,7 @@ export function candidateFood(input: any, source: string): Food {
   return {
     id: uid(),
     name: typeof input.product_name === "string" ? input.product_name : "",
-    brand: typeof input.brand === "string" ? input.brand : "",
+    brand: typeof input.brand === "string" && !/^\s*(unknown|n\/?a|none|-)?\s*$/i.test(input.brand) ? input.brand : "",
     barcode: typeof input.barcode === "string" ? input.barcode : undefined,
     basis: "100g",
     source,

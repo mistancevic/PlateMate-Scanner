@@ -197,11 +197,13 @@ function Mealan({
 function FoodEditor({
   food,
   image,
+  images,
   close,
   save,
 }: {
   food: Food;
   image?: string;
+  images?: string[];
   close: () => void;
   save: (f: Food) => void;
 }) {
@@ -241,18 +243,23 @@ function FoodEditor({
     setErrors(e);
     if (e.length) return;
     f.icon = f.icon || iconFor(f.name);
-    if (image && !f.photo) thumbnailBase64(image).then((t) => save({ ...f, photo: t })).catch(() => save(f));
+    const all = (images && images.length ? images : image ? [image] : []);
+    if (all.length && !f.photo)
+      Promise.all(all.map((x) => thumbnailBase64(x).catch(() => "")))
+        .then((t) => { const ok = t.filter(Boolean); save({ ...f, photo: ok[0] || undefined, photos: ok.length > 1 ? ok.slice(1) : undefined }); })
+        .catch(() => save(f));
     else save(f);
   }
   return (
     <Modal title="Review food data" close={close}>
-      {image && (
-        <img
-          className="label-preview"
-          src={image}
-          alt="Captured nutrition label"
-        />
-      )}
+      {images && images.length > 1 ? (
+        <div className="label-previews" aria-label="Your photos of this product">
+          {images.map((src, i) => <img key={i} className="label-preview" src={src} alt={`Photo ${i + 1} of ${images.length}`} />)}
+        </div>
+      ) : image ? (
+        <img className="label-preview" src={image} alt="Captured nutrition label" />
+      ) : null}
+      {images && images.length > 1 && <p className="small center">{images.length} photos · swipe to see each</p>}
       <p className="small">
         Source: {food.source}. Check the actual package. All values below must
         be <strong>per 100 g</strong>, with carbohydrate excluding fibre.
@@ -431,6 +438,7 @@ export default function App() {
     [error, setError] = useState(""),
     [edit, setEdit] = useState<Food | null>(null),
     [image, setImage] = useState(""),
+    [imageSet, setImageSet] = useState<string[]>([]),
     [goalsOpen, setGoalsOpen] = useState(false),
     [pending, setPending] = useState<{ name: string; brand: string; values?: any }[]>([]),
     [barcode, setBarcode] = useState(""),
@@ -503,7 +511,11 @@ export default function App() {
             try { cards = await loadCards(user.uid); } catch { /* none yet */ }
             const byId = new Map<string, any>();
             for (const fb of [...cards, ...incoming.feedback, ...state.feedback]) if (!byId.has(fb.id)) byId.set(fb.id, fb);
-            incoming.foods = incoming.foods.map((f) => ({ ...f, photo: f.photo ?? localPhoto.get(f.id) ?? cloudPhotos.get(`food:${f.id}`) }));
+            const localMore = new Map(state.foods.map((f) => [f.id, f.photos]));
+            incoming.foods = incoming.foods.map((f) => {
+              const more = [1, 2, 3, 4, 5].map((n) => cloudPhotos.get(`food:${f.id}:${n}`)).filter(Boolean) as string[];
+              return { ...f, photo: f.photo ?? localPhoto.get(f.id) ?? cloudPhotos.get(`food:${f.id}`), photos: f.photos ?? localMore.get(f.id) ?? (more.length ? more : undefined) };
+            });
             incoming.feedback = [...byId.values()].sort((x, y) => (y.createdAt > x.createdAt ? 1 : -1)).map((f) => ({ ...f, photo: f.photo ?? localFb.get(f.id) ?? cloudPhotos.get(`fb:${f.id}`) }));
             setState(incoming);
           } catch { /* keep local if the cloud copy is unreadable */ }
@@ -621,6 +633,7 @@ export default function App() {
           try { done = new Set(JSON.parse(localStorage.getItem(`chefmealan-photos-up-${user.uid}`) || "[]")); } catch {}
           const pending = [
             ...state.foods.filter((f) => f.photo && f.photo.startsWith("data:")).map((f) => ({ key: `food:${f.id}`, data: f.photo! })),
+            ...state.foods.flatMap((f) => (f.photos ?? []).filter((x) => x.startsWith("data:")).map((x, n) => ({ key: `food:${f.id}:${n + 1}`, data: x }))),
             ...state.feedback.filter((f) => f.photo && f.photo.startsWith("data:")).map((f) => ({ key: `fb:${f.id}`, data: f.photo! })),
           ].filter((p) => !done.has(p.key));
           if (!pending.length) return;
@@ -715,6 +728,7 @@ export default function App() {
         if (entities.length === 1 && read(entities[0])) {
           // one product from several sides, its table read: straight to review, like a single label
           setImage(images[0]);
+          setImageSet(images);
           setEdit(candidateFood(entities[0], "Photos · review required"));
         } else {
           setPending(entities.map((x: any) => ({ name: x.product_name || "Unknown item", brand: x.brand || "", values: read(x) ? x : undefined })));
@@ -728,6 +742,7 @@ export default function App() {
               "Label could not be read. Try another photo or enter it manually.",
           );
         setImage(images[0]);
+        setImageSet(images);
         setEdit(candidateFood(data, "Label photo · review required"));
       }
     } catch (e: any) {
@@ -1146,7 +1161,8 @@ export default function App() {
           key={edit.id}
           food={edit}
           image={image}
-          close={() => setEdit(null)}
+          images={imageSet}
+          close={() => { setEdit(null); setImageSet([]); }}
           save={saveFood}
         />
       )}{" "}
