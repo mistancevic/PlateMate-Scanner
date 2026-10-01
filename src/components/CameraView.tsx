@@ -205,7 +205,7 @@ export function CameraView({
   const handleShutterClick = async () => {
     if (busyRef.current) return;
     busyRef.current = true;
-    window.setTimeout(() => { busyRef.current = false; }, 900);
+    window.setTimeout(() => { busyRef.current = false; }, 450);
     const image = captureImageFromVideo();
     if (!image) return;
     if (scannerMode === "group") {
