@@ -207,6 +207,7 @@ function FoodEditor({
   close: () => void;
   save: (f: Food) => void;
 }) {
+  const [mainIdx, setMainIdx] = useState(0);
   const [name, setName] = useState(food.name),
     [brand, setBrand] = useState(food.brand),
     [notes, setNotes] = useState(food.notes),
@@ -243,10 +244,11 @@ function FoodEditor({
     setErrors(e);
     if (e.length) return;
     f.icon = f.icon || iconFor(f.name);
-    const all = (images && images.length ? images : image ? [image] : []);
+    const raw = (images && images.length ? images : image ? [image] : []);
+    const all = raw.length > 1 ? [raw[mainIdx] ?? raw[0], ...raw.filter((_, i) => i !== mainIdx)] : raw;
     if (all.length && !f.photo)
-      Promise.all(all.map((x) => thumbnailBase64(x).catch(() => "")))
-        .then((t) => { const ok = t.filter(Boolean); save({ ...f, photo: ok[0] || undefined, photos: ok.length > 1 ? ok.slice(1) : undefined }); })
+      Promise.all([thumbnailBase64(all[0]).catch(() => ""), ...all.map((x) => resizeImageBase64(x, 900, 900).catch(() => ""))])
+        .then(([thumb, ...big]) => { const ok = big.filter(Boolean); save({ ...f, photo: thumb || undefined, photos: ok.length ? ok : undefined }); })
         .catch(() => save(f));
     else save(f);
   }
@@ -254,7 +256,12 @@ function FoodEditor({
     <Modal title="Review food data" close={close}>
       {images && images.length > 1 ? (
         <div className="label-previews" aria-label="Your photos of this product">
-          {images.map((src, i) => <img key={i} className="label-preview" src={src} alt={`Photo ${i + 1} of ${images.length}`} />)}
+          {images.map((src, i) => (
+            <div className="preview-wrap" key={i}>
+              <img className="label-preview" src={src} alt={`Photo ${i + 1} of ${images.length}`} />
+              <button className={`star ${mainIdx === i ? "on" : ""}`} aria-label={mainIdx === i ? "Main photo" : "Make this the main photo"} onClick={() => setMainIdx(i)}>{mainIdx === i ? "★ Main photo" : "☆ Make main"}</button>
+            </div>
+          ))}
         </div>
       ) : image ? (
         <img className="label-preview" src={image} alt="Captured nutrition label" />
@@ -727,8 +734,10 @@ export default function App() {
         const read = (x: any) => x && x.calories !== null && x.protein !== null;
         if (entities.length === 1 && read(entities[0])) {
           // one product from several sides, its table read: straight to review, like a single label
-          setImage(images[0]);
-          setImageSet(images);
+          const front = Number(entities[0].front_image) - 1;
+          const ordered = front > 0 && front < images.length ? [images[front], ...images.filter((_, i) => i !== front)] : images;
+          setImage(ordered[0]);
+          setImageSet(ordered);
           setEdit(candidateFood(entities[0], "Photos · review required"));
         } else {
           setPending(entities.map((x: any) => ({ name: x.product_name || "Unknown item", brand: x.brand || "", values: read(x) ? x : undefined })));
@@ -942,6 +951,11 @@ export default function App() {
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },
+    addFoodPhoto: async (foodId: string, dataUrl: string) => {
+      const [thumb, big] = await Promise.all([thumbnailBase64(dataUrl).catch(() => ""), resizeImageBase64(dataUrl, 900, 900).catch(() => "")]);
+      setState((s) => ({ ...s, foods: s.foods.map((f) => f.id !== foodId ? f : { ...f, photo: f.photo || thumb || undefined, photos: [...(f.photos ?? (f.photo ? [f.photo] : [])), big].filter(Boolean).slice(0, 6) }) }));
+      notify("Photo added.");
+    },
     goalLog, formula: profile.formula ?? null, todayKcal, dayType, setDayType: (d: DayType) => { storeDayType(d); setDayTypeState(d); },
     applyNumbers: (bandId: string, kcal: number, protein: number, method?: string) => {
       nextSource.current = "profile";
