@@ -638,20 +638,13 @@ export default function App() {
   async function api(url: string, body?: unknown) {
     const res = await fetch(url, {
       method: body === undefined ? "GET" : "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(access ? { Authorization: `Bearer ${access}` } : {}),
-      },
+      headers: { "Content-Type": "application/json" },
       ...(body !== undefined ? { body: JSON.stringify(body) } : {}),
       signal: AbortSignal.timeout(65000),
     });
     const data = await res
       .json()
       .catch(() => ({ error: "The server returned an unreadable response." }));
-    if (res.status === 401) {
-      setAccessOpen(true);
-      throw new Error("Enter your pilot access key, then retry.");
-    }
     if (!res.ok) throw new Error(data.error || "Request failed.");
     return data;
   }

@@ -56,8 +56,9 @@ async function requireUser(req: express.Request, res: express.Response, next: ex
     (req as any).uid = user.uid;
     (req as any).email = user.email_verified ? String(user.email || "").toLowerCase() : "";
     next();
-  } catch {
-    res.status(401).json({ error: "Your sign-in expired. Close and reopen the app." });
+  } catch (e: any) {
+    console.warn(`[auth] token refused: ${e?.code || ""} ${String(e?.message || "").slice(0, 160)}`);
+    res.status(401).json({ error: "Your sign-in needs a refresh. Close and reopen the app, then try again.", code: e?.code || "auth" });
   }
 }
 app.disable("x-powered-by");
@@ -73,31 +74,15 @@ const fallbackModels = [
 const apiKey = process.env.GEMINI_API_KEY;
 // Mealan's voice: the same six rules in every prompt, so the chef sounds like one person wherever it speaks.
 const VOICE = `Voice: at most two short sentences before any list. Second person, plain words, no jargon. When a value is an estimate, say so. Never scold, never moralise; going off plan is not a failure. No health, medical or weight-loss claims. Never state grams for something the app fits; the app's solver sets amounts.`;
-const pilotKey = process.env.PILOT_ACCESS_KEY;
 const baseId = process.env.AIRTABLE_BASE_ID;
 const airtableKey = process.env.AIRTABLE_API_KEY;
 app.get("/api/status", (_req, res) =>
   res.json({
     ai: !!apiKey,
     airtable: !!(baseId && airtableKey),
-    accessRequired: !!pilotKey,
+    accessRequired: false,
   }),
 );
-// Production external services require the host's pilot key only when PILOT_ACCESS_KEY is set.
-app.use("/api", (req, res, next) => {
-  if (pilotKey) {
-    const provided = Buffer.from(
-        req.headers.authorization?.replace(/^Bearer /, "") || "",
-      ),
-      expected = Buffer.from(pilotKey);
-    if (
-      provided.length !== expected.length ||
-      !timingSafeEqual(provided, expected)
-    )
-      return res.status(401).json({ error: "Pilot access key required." });
-  }
-  next();
-});
 const requests = new Map<string, { count: number; until: number }>();
 app.use("/api", (req, res, next) => {
   const now = Date.now();

@@ -182,10 +182,14 @@ export function installAuthFetch() {
     const own = url.startsWith("/api/") || url.startsWith(`${location.origin}/api/`);
     const u = own ? auth().currentUser : null;
     if (u) {
-      const token = await u.getIdToken();
-      const headers = new Headers(init.headers || (input instanceof Request ? input.headers : undefined));
-      headers.set("Authorization", `Bearer ${token}`);
-      return plain(input, { ...init, headers });
+      const send = async (fresh: boolean) => {
+        const headers = new Headers(init.headers || (input instanceof Request ? input.headers : undefined));
+        headers.set("Authorization", `Bearer ${await u.getIdToken(fresh)}`);
+        return plain(input, { ...init, headers });
+      };
+      const res = await send(false);
+      // a stale token gets one fresh retry, silently
+      return res.status === 401 ? send(true) : res;
     }
     return plain(input, init);
   };

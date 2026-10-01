@@ -299,7 +299,6 @@ function SupportPanel(p: AppApi) {
                   <button className="pill pill-small" onClick={exportData}><Download size={14} /> Backup</button>
                   <button className="pill pill-small" onClick={() => importRef.current?.click()}><Upload size={14} /> Restore</button>
                   <button className="pill pill-small" onClick={() => setTab("notes")}>Recipes</button>
-                  <button className="pill pill-small" onClick={() => setAccessOpen(true)}>Server</button>
                 </div>
                 <small>AI label reading: {services?.ai ? "on" : "off"} · Airtable: {services?.airtable ? "on" : "off"}</small>
               </div>

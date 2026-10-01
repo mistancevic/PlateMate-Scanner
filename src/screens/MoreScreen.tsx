@@ -40,7 +40,7 @@ export function MoreScreen(p: AppApi) {
             <p className="small">
               AI label reading: {services?.ai ? "on" : "off"} · Airtable: {services?.airtable ? "on" : "off"}
             </p>
-            <button className="subtle" onClick={() => setAccessOpen(true)}>Server access</button>
+            
           </>
         )}
       </section>
