@@ -473,3 +473,4 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .l-hero h1 { max-width: 13ch; white-space: normal; }
 .l-chef { -webkit-mask-image: linear-gradient(to top, transparent 0%, #000 14%); mask-image: linear-gradient(to top, transparent 0%, #000 14%); }
 .invite-made { margin-top: 12px; display: flex; flex-direction: column; gap: 6px; } .inv-open { color: var(--brand-text); } .inv-used { color: var(--high); } .inv-expired, .inv-revoked { color: var(--muted); }
+.auto-switch { font: inherit; font-size: 13px; font-weight: 800; color: #fff; background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.25); border-radius: 999px; padding: 7px 14px; margin: 0; } .auto-note { font-weight: 700; }

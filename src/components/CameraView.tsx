@@ -144,7 +144,66 @@ export function CameraView({
     }
   };
 
+  // Auto shot: take the photo when the picture has been steady for about a second. Remembered across visits.
+  const [auto, setAuto] = useState<boolean>(() => { try { return localStorage.getItem("chefmealan-camera-auto") !== "manual"; } catch { return true; } });
+  const [steady, setSteady] = useState(0); // 0..1, fills the ring
+  const busyRef = useRef(false);
+  const setAutoMode = (on: boolean) => { setAuto(on); try { localStorage.setItem("chefmealan-camera-auto", on ? "auto" : "manual"); } catch {} };
+  useEffect(() => {
+    if (!auto || scannerMode === "barcode" || cameraError) { setSteady(0); return; }
+    const small = document.createElement("canvas"); small.width = 48; small.height = 48;
+    const sctx = small.getContext("2d", { willReadFrequently: true });
+    let prev: Uint8ClampedArray | null = null, still = 0, armed = true, last = performance.now();
+    const id = window.setInterval(() => {
+      const v = videoRef.current; if (!v || !sctx || v.videoWidth === 0 || busyRef.current) return;
+      sctx.drawImage(v, 0, 0, 48, 48);
+      const px = sctx.getImageData(0, 0, 48, 48).data;
+      const now = performance.now(), dt = now - last; last = now;
+      if (prev) {
+        let diff = 0;
+        for (let i = 0; i < px.length; i += 4) diff += Math.abs(px[i] - prev[i]) + Math.abs(px[i + 1] - prev[i + 1]) + Math.abs(px[i + 2] - prev[i + 2]);
+        diff /= (px.length / 4) * 3;
+        if (diff > 14) armed = true; // moved on to the next side or product
+        still = diff < 5 && armed ? still + dt : 0;
+        setSteady(Math.min(1, still / 1000));
+        if (still >= 1000) { still = 0; armed = scannerMode !== "group"; setSteady(0); void handleShutterClick(); }
+      }
+      prev = px;
+    }, 120);
+    return () => window.clearInterval(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [auto, scannerMode, cameraError]);
+
+  // Barcode: read live from the camera, a few times a second; the phone's own detector where it has one.
+  useEffect(() => {
+    if (scannerMode !== "barcode" || cameraError) return;
+    const Detector = (window as any).BarcodeDetector;
+    const native = Detector ? new Detector({ formats: ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"] }) : null;
+    const reader = native ? null : new BrowserMultiFormatReader();
+    const grab = document.createElement("canvas");
+    let done = false, working = false;
+    const id = window.setInterval(async () => {
+      const v = videoRef.current; if (done || working || !v || v.videoWidth === 0) return;
+      working = true;
+      try {
+        let code = "";
+        if (native) { const r = await native.detect(v); code = r?.[0]?.rawValue ?? ""; }
+        else {
+          const w = Math.min(1280, v.videoWidth); grab.width = w; grab.height = Math.round((v.videoHeight / v.videoWidth) * w);
+          grab.getContext("2d")?.drawImage(v, 0, 0, grab.width, grab.height);
+          try { code = (await reader!.decodeFromImageUrl(grab.toDataURL("image/jpeg", 0.85))).getText(); } catch { code = ""; }
+        }
+        if (/^\d{8,14}$/.test(code)) { done = true; try { navigator.vibrate?.(60); } catch {} onBarcode(code); }
+      } catch { /* keep looking */ } finally { working = false; }
+    }, native ? 250 : 450);
+    return () => { done = true; window.clearInterval(id); reader?.reset(); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [scannerMode, cameraError]);
+
   const handleShutterClick = async () => {
+    if (busyRef.current) return;
+    busyRef.current = true;
+    window.setTimeout(() => { busyRef.current = false; }, 900);
     const image = captureImageFromVideo();
     if (!image) return;
     if (scannerMode === "group") {
@@ -295,7 +354,7 @@ export function CameraView({
             ) : (
               <div className="absolute top-[16%] text-white text-[11px] font-bold tracking-[0.2em] bg-black/60 px-5 py-2.5 rounded-full backdrop-blur-md border border-white/10">
                 {scannerMode === "barcode"
-                  ? "ALIGN BARCODE INSIDE THE FRAME"
+                  ? "HOLD THE BARCODE INSIDE THE FRAME"
                   : scannerMode === "group"
                     ? stagedGroupImages.length > 0
                       ? `${stagedGroupImages.length} ${stagedGroupImages.length === 1 ? "PHOTO" : "PHOTOS"} READY · ADD MORE OR TAP ANALYZE`
@@ -360,7 +419,7 @@ export function CameraView({
 
       {scannerMode === "group" && stagedGroupImages.length > 0 && (
         <div
-          className="absolute bottom-32 left-3 right-3 z-40 flex justify-center gap-2"
+          className="absolute bottom-[196px] left-3 right-3 z-40 flex justify-center gap-2"
           aria-label="Staged photos"
         >
           {stagedGroupImages.map((src, i) => (
@@ -395,6 +454,12 @@ export function CameraView({
             <button type="submit" disabled={!/^\d{8,14}$/.test(typedCode.trim())}>Look up</button>
           </form>
         )}
+        {!cameraError && scannerMode !== "barcode" && (
+          <button className="auto-switch" onClick={() => setAutoMode(!auto)} aria-pressed={auto}>
+            {auto ? "Auto shot: hold still" : "Manual shot: tap to take"}
+          </button>
+        )}
+        {!cameraError && scannerMode === "barcode" && <p className="auto-switch auto-note">Reads by itself. Hold the code inside the frame.</p>}
         {!cameraError && (
           <div className="relative flex items-center justify-center w-full max-w-sm">
             {/* Gallery Button */}
@@ -420,7 +485,7 @@ export function CameraView({
             <button
               id="camera-shutter-button"
               onClick={handleShutterClick}
-              className="w-20 h-20 rounded-full border-[5px] border-white/80 flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(0,0,0,0.5)]"
+              className="relative w-20 h-20 rounded-full border-[5px] border-white/80 flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(0,0,0,0.5)]"
               title={
                 scannerMode === "group" ? "Snap Angle for Group" : "Capture"
               }
@@ -428,6 +493,11 @@ export function CameraView({
               <div
                 className="w-[3.25rem] h-[3.25rem] rounded-full bg-white transition-colors relative flex items-center justify-center"
               />
+              {auto && scannerMode !== "barcode" && (
+                <svg className="absolute inset-0 w-20 h-20 -rotate-90 pointer-events-none" viewBox="0 0 80 80" aria-hidden="true">
+                  <circle cx="40" cy="40" r="37" fill="none" stroke="#39ff14" strokeWidth="5" strokeLinecap="round" strokeDasharray={2 * Math.PI * 37} strokeDashoffset={(1 - steady) * 2 * Math.PI * 37} style={{ transition: "stroke-dashoffset 120ms linear" }} />
+                </svg>
+              )}
             </button>
           </div>
         )}
