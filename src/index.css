@@ -482,3 +482,5 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .group-frame .tr { top: 0; right: 0; border-top-width: 3px; border-right-width: 3px; border-top-right-radius: 14px; }
 .group-frame .bl { bottom: 0; left: 0; border-bottom-width: 3px; border-left-width: 3px; border-bottom-left-radius: 14px; }
 .group-frame .br { bottom: 0; right: 0; border-bottom-width: 3px; border-right-width: 3px; border-bottom-right-radius: 14px; }
+/* the selected day stays readable inside the goal card */
+.plan .day-row .pill.pill-primary { background: var(--brand); color: #fff; border-color: var(--brand); }
