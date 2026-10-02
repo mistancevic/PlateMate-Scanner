@@ -214,7 +214,7 @@ export function JourneyScreen(p: AppApi) {
           </section>
         )}
         <div className="ways">
-          <button className="pill pill-small" onClick={() => setCamera(true)}><Camera size={15} /> Scan</button>
+          <button className="pill pill-small" onClick={() => { setMode("group"); setCamera(true); }}><Camera size={15} /> Scan</button>
           <button className="pill pill-small" onClick={() => blank()}><Plus size={15} /> Type it</button>
           {items.length > 0 && <ConfirmButton className="pill pill-small ways-empty" label={<><Trash2 size={15} /> Empty plate</>} confirmLabel="Tap again to empty" onConfirm={emptyPlate} />}
         </div>
