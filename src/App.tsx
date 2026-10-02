@@ -544,7 +544,8 @@ export default function App() {
             for (const fb of [...cards, ...incoming.feedback, ...state.feedback]) if (!byId.has(fb.id)) byId.set(fb.id, fb);
             const localMore = new Map(state.foods.map((f) => [f.id, f.photos]));
             incoming.foods = incoming.foods.map((f) => {
-              const more = [1, 2, 3, 4, 5].map((n) => cloudPhotos.get(`food:${f.id}:${n}`)).filter(Boolean) as string[];
+              const count = typeof (f as any).photoCount === "number" ? (f as any).photoCount : 6;
+              const more = [1, 2, 3, 4, 5, 6].slice(0, count).map((n) => cloudPhotos.get(`food:${f.id}:${n}`)).filter(Boolean) as string[];
               return { ...f, photo: f.photo ?? localPhoto.get(f.id) ?? cloudPhotos.get(`food:${f.id}`), photos: f.photos ?? localMore.get(f.id) ?? (more.length ? more : undefined) };
             });
             incoming.feedback = [...byId.values()].sort((x, y) => (y.createdAt > x.createdAt ? 1 : -1)).map((f) => ({ ...f, photo: f.photo ?? localFb.get(f.id) ?? cloudPhotos.get(`fb:${f.id}`) }));
@@ -847,6 +848,14 @@ export default function App() {
     setState((s) => ({ ...s, meals: [meal, ...s.meals] }));
     notify("Recipe saved. It has not been recorded as eaten.");
   }
+  function forgetUploaded(foodId: string) {
+    if (!user) return;
+    try {
+      const k = `chefmealan-photos-up-${user.uid}`;
+      const done: string[] = JSON.parse(localStorage.getItem(k) || "[]");
+      localStorage.setItem(k, JSON.stringify(done.filter((x) => !x.startsWith(`food:${foodId}`))));
+    } catch { /* fine */ }
+  }
   function todayKcalOf(): number | null {
     const k = state.goals.calories ?? null;
     if (k === null || personal.dayMode !== "follow") return k;
@@ -983,12 +992,14 @@ export default function App() {
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },
     addFoodPhoto: async (foodId: string, dataUrl: string) => {
+      forgetUploaded(foodId);
       const [thumb, big] = await Promise.all([thumbnailBase64(dataUrl).catch(() => ""), resizeImageBase64(dataUrl, 900, 900).catch(() => "")]);
       setState((s) => ({ ...s, foods: s.foods.map((f) => f.id !== foodId ? f : { ...f, photo: f.photo || thumb || undefined, photos: [...(f.photos ?? (f.photo ? [f.photo] : [])), big].filter(Boolean).slice(0, 6) }) }));
       notify("Photo added.");
     },
     openFoodId, clearOpenFood: () => setOpenFoodId(null),
     removeFoodPhoto: (foodId: string, index: number) => {
+      forgetUploaded(foodId);
       setState((s) => ({ ...s, foods: s.foods.map((f) => {
         if (f.id !== foodId) return f;
         const gallery = f.photos?.length ? f.photos : f.photo ? [f.photo] : [];

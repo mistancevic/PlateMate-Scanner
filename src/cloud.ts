@@ -104,7 +104,7 @@ export function explainCloudError(e: any): string {
 // Photos stay on the phone for now; everything else goes to the account. Keeps the document small.
 export function stripPhotos<T>(state: T): T {
   const s: any = structuredClone(state);
-  const strip = (f: any) => { if (f && typeof f === "object") { delete f.photo; delete f.photos; } return f; };
+  const strip = (f: any) => { if (f && typeof f === "object") { if (Array.isArray(f.photos)) f.photoCount = f.photos.length; else if (f.photo) f.photoCount = 0; delete f.photo; delete f.photos; } return f; };
   (s.foods ?? []).forEach(strip);
   (s.items ?? []).forEach((i: any) => strip(i.food));
   (s.meals ?? []).forEach((m: any) => (m.items ?? []).forEach((i: any) => strip(i.food)));
