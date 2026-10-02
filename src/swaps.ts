@@ -9,9 +9,9 @@ export type Role = "dairy" | "savoury" | "grain" | "sweet" | "fruit" | "nut" | "
 const ROLES: [Role, RegExp][] = [
   ["supplement", /whey|protein ?powder|casein|proteinpulver/i],
   ["dairy", /skyr|quark|yog|joghurt|cottage|hüttenk|milk|milch|kefir|frischk|ricotta|cream cheese/i],
-  ["savoury", /chicken|hähnchen|huhn|salmon|lachs|fish|fisch|tuna|thunfisch|beef|rind|pork|schwein|turkey|pute|\begg|\beier?\b|tofu|ham\b|schinken|steak/i],
-  ["grain", /oat|hafer|rice|reis|bread|brot|pasta|nudel|müsli|muesli|granola|toast|cracker|knäcke/i],
-  ["sweet", /nutella|honey|honig|ice ?cream|\beis\b|keks|biscuit|cookie|chocolate|schoko|jam|marmelade|sugar|zucker|syrup|sirup/i],
+  ["savoury", /chicken|hähnchen|huhn|salmon|lachs|fish|fisch|tuna|thunfisch|beef|rind|pork|schwein|turkey|pute|\begg|\beier?\b|tofu|soja|\bsoy|tempeh|seitan|quorn|ham\b|schinken|steak/i],
+  ["grain", /oat|hafer|rice|reis|bread|brot|pasta|nudel|noodle|ramen|spaghetti|penne|potato|kartoffel|quinoa|couscous|bulgur|müsli|muesli|granola|toast|cracker|knäcke/i],
+  ["sweet", /nutella|honey|honig|ice ?cream|\beis\b|keks|biscuit|cookie|chocolate|schoko|kakao|cocoa|cacao|dattel|\bdates?\b|\bballs?\b|jam|marmelade|sugar|zucker|syrup|sirup/i],
   ["fruit", /banana|banane|apple|apfel|berr|beere|fruit|frucht|mango|orange|pear|birne|grape|traube/i],
   ["nut", /almond|mandel|\bnut|nuss|peanut|erdnuss|cashew|walnut|pistach/i],
 ];

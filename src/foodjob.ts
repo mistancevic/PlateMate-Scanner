@@ -7,7 +7,8 @@ const SPREAD = /nutella|spread|aufstrich|creme|crème|butter|peanut ?butter|erdn
 const DRINK = /drink|juice|saft|milk\b|milch\b|cola|soda|tea\b|tee\b|coffee|kaffee|smoothie|shake|wasser|water|bier|beer|wein|wine/i;
 export function jobOf(f: Food): { job: Job; note: string; taste: "sweet" | "savoury" | null; mine: boolean } {
   const role = roleOf(f.name);
-  const taste = role === "sweet" || role === "fruit" ? "sweet" : role === "savoury" ? "savoury" : null;
+  const sugarsLine = f.table?.find((r) => r.key === "sugars")?.amount ?? null;
+  const taste = role === "sweet" || role === "fruit" ? "sweet" : role === "savoury" ? "savoury" : sugarsLine !== null && sugarsLine >= 25 ? "sweet" : null;
   if (f.job && (JOBS as readonly string[]).includes(f.job)) return { job: f.job as Job, note: SPREAD.test(f.name) ? "spread" : "", taste, mine: true };
   const kcal = f.calories ?? 0, pd = density(f.protein, f.calories) ?? 0;
   const fat = kcal ? ((f.fats ?? 0) * 9) / kcal : 0, carb = kcal ? ((f.carbs ?? 0) * 4) / kcal : 0;

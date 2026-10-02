@@ -40,22 +40,17 @@ const fatShare = (f: Food) => (f.calories ? ((f.fats ?? 0) * 9) / f.calories : 0
 const sameName = (a: Food, b: Food) => a.id === b.id || a.name.trim().toLowerCase() === b.name.trim().toLowerCase();
 
 function kindOf(scanned: Food, partners: Food[], kcal: number, snackMoment: boolean): MixKind {
-  const all = [scanned, ...partners], jobs = all.map((f) => jobOf(f).job);
-  const sweet = all.some((f) => jobOf(f).taste === "sweet" || jobOf(f).job === "Flavour food");
-  if (sweet && jobs.includes("Protein base")) return "DaaM dessert";
+  const all = [scanned, ...partners], jobs = all.map((f) => jobOf(f).job), cats = all.map(catOf);
+  const sweet = cats.some((c) => c === "sweet" || c === "spread" || c === "fruit");
+  const dairy = cats.some((c) => c === "dairy" || c === "cottage" || c === "supplement");
+  if (sweet && dairy) return "DaaM dessert";
   if (kcal <= SNACK_KCAL || snackMoment) return "snack";
   const side = jobs.some((j) => j === "Carb base" || j === "Fat source" || j === "Mixed");
   return jobs.includes("Protein base") && side ? "meal" : "snack";
 }
 // A portion to start from. The job's typical portion, except a supplement, which is a scoop, not a plate.
 const portionOf = (f: Food) => (roleOf(f.name) === "supplement" ? 30 : PORTION[jobOf(f).job]);
-// Which neutral grain goes with what: oats and bread with sweet, rice and pasta with savoury. A nudge in the order, nothing more.
-const grainFit = (scanned: Food, p: Food) => {
-  if (roleOf(p.name) !== "grain") return 0;
-  const sweet = jobOf(scanned).taste === "sweet" || jobOf(scanned).job === "Flavour food";
-  const breakfast = /oat|hafer|müsli|muesli|granola|bread|brot|toast/i.test(p.name);
-  return sweet === breakfast ? -1 : 1;
-};
+
 
 // One mix: the scanned food at its portion, the partners at theirs. Under target the first partner is solved up to the
 // target. Over target nothing is solved: a protein base stays a protein base, the partners make it a meal at their
@@ -79,8 +74,53 @@ function build(scanned: Food, partners: Food[], target: number, cap: number | nu
   return { partners, items: result, pd, kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0) };
 }
 
-// Sweet goes with sweet or neutral, savoury with savoury or neutral. A partner that clashes is out.
-const clash = (scanned: Food, p: Food) => { const a = jobOf(scanned).taste, b = jobOf(p).taste; return a !== null && b !== null && a !== b; };
+// ---- Culinary rules, version 1 (3 October 2026). Code, not the model. What a cook takes for granted; cuisines, heat and allergies wait for the session.
+export type Cat = "sweet" | "fruit" | "spread" | "dairy" | "cottage" | "supplement" | "meat" | "bgrain" | "mgrain" | "nut" | "veg" | "fat" | "drink" | "other";
+const SPREAD = /nutella|spread|aufstrich|creme|crème|peanut ?butter|erdnussmus|nussmus|honig|honey|jam|marmelade|konfit/i;
+const BREAKFAST = /oat|hafer|müsli|muesli|granola|bread|brot|toast|knäcke|cracker/i;
+const MILK = /milk|milch|kefir|buttermilk/i;
+export function catOf(f: Food): Cat {
+  const { job, taste } = jobOf(f), role = roleOf(f.name), n = f.name;
+  if (job === "Drink" && !MILK.test(n)) return "drink";
+  if (role === "supplement") return "supplement";
+  if (SPREAD.test(n)) return "spread";
+  if (/cottage|hüttenk|ricotta/i.test(n)) return "cottage";
+  if (role === "dairy" || MILK.test(n)) return "dairy";
+  if (role === "savoury") return "meat";
+  if (role === "grain") return BREAKFAST.test(n) ? "bgrain" : "mgrain";
+  if (role === "sweet") return "sweet";
+  if (role === "fruit") return "fruit";
+  if (role === "nut") return "nut";
+  if (job === "Fat source") return "fat";
+  if (job === "Volume food") return "veg";
+  if (taste === "sweet") return "sweet";
+  return "other";
+}
+// Who goes with whom. Sweet with dairy, savoury with meal grains, dairy both ways, cottage cheese also savoury, whey a dessert ingredient, drinks never.
+const GOES: Record<Cat, Cat[]> = {
+  sweet:      ["dairy", "cottage", "supplement", "bgrain", "fruit", "nut", "spread", "sweet"],
+  fruit:      ["dairy", "cottage", "supplement", "bgrain", "nut", "sweet", "spread", "fruit"],
+  spread:     ["dairy", "cottage", "supplement", "bgrain", "sweet", "fruit", "nut"],
+  dairy:      ["sweet", "fruit", "spread", "bgrain", "nut", "supplement", "dairy", "cottage"],
+  cottage:    ["sweet", "fruit", "spread", "bgrain", "nut", "supplement", "dairy", "cottage", "meat", "mgrain", "veg", "other"],
+  supplement: ["dairy", "cottage", "bgrain", "fruit", "sweet", "nut", "spread"],
+  meat:       ["mgrain", "veg", "cottage", "fat", "meat", "other"],
+  bgrain:     ["dairy", "cottage", "supplement", "sweet", "fruit", "spread", "nut"],
+  mgrain:     ["meat", "cottage", "veg", "fat", "other", "mgrain"],
+  nut:        ["sweet", "fruit", "dairy", "cottage", "supplement", "bgrain", "spread"],
+  veg:        ["meat", "mgrain", "cottage", "fat", "other"],
+  fat:        ["meat", "mgrain", "veg", "other"],
+  other:      ["meat", "mgrain", "veg", "fat", "cottage", "other"],
+  drink:      [],
+};
+export const goesWith = (a: Food, b: Food) => GOES[catOf(a)].includes(catOf(b)) && GOES[catOf(b)].includes(catOf(a));
+// A spread needs a carrier: bread, oats or dairy. Fruit alone is not a carrier.
+const spreadWithoutCarrier = (all: Food[]) => all.some((f) => catOf(f) === "spread") && !all.some((f) => ["bgrain", "dairy", "cottage", "supplement"].includes(catOf(f)));
+// Every food on the plate must go with every other, and a spread must have its carrier.
+export function plateOk(all: Food[]): boolean {
+  for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) if (!goesWith(all[i], all[j])) return false;
+  return !spreadWithoutCarrier(all);
+}
 
 // Candidates for a role, best first: a real portion for the role, library before starter set, favourites first.
 function candidates(role: Job, scanned: Food, library: Food[], starter: Food[], ask: Ask, moment: MomentId): Food[] {
@@ -91,8 +131,9 @@ function candidates(role: Job, scanned: Food, library: Food[], starter: Food[], 
     .filter((f) => !ask.lowFat || fatShare(f) < 0.3)
     .filter((f) => moment !== "before" || playbookFor(f).beforeTraining.ok)
     .filter((f) => moment !== "after" || playbookFor(f).afterTraining.ok)
-    .filter((f) => !clash(scanned, f))
-    .sort((a, b) => Number(Boolean(b.favorite)) - Number(Boolean(a.favorite)) || Number(library.includes(b)) - Number(library.includes(a)) || grainFit(scanned, a) - grainFit(scanned, b));
+    .filter((f) => catOf(f) !== "drink")
+    .filter((f) => goesWith(scanned, f))
+    .sort((a, b) => Number(Boolean(b.favorite)) - Number(Boolean(a.favorite)) || Number(library.includes(b)) - Number(library.includes(a)));
 }
 
 // The tip for a scanned food, this moment and this plate's target. kcalCap is the moment's share of the day, if known.
@@ -107,6 +148,7 @@ export function mixTip(food: Food, moment: MomentId, target: number | null, libr
   const mixes: Mix[] = [];
   const push = (partners: Food[]) => {
     if (mixes.length >= ask.partners || mixes.some((m) => m.partners.length === partners.length && m.partners.every((p, i) => sameName(p, partners[i])))) return;
+    if (!plateOk([food, ...partners])) return;
     const b = build(food, partners, target, cap, c);
     if (!b) return;
     mixes.push({ ...b, id: uid(), kind: kindOf(food, partners, b.kcal, ask.snack), cooking: partners.some((p) => !p.readyToEat) || !food.readyToEat, fromStarter: partners.filter((p) => !library.includes(p)).map((p) => p.name) });
@@ -114,11 +156,12 @@ export function mixTip(food: Food, moment: MomentId, target: number | null, libr
   // the first mix is one partner; then, where the moment allows, the same partner with a second and a third role on the plate
   for (const f of firsts) { push([f]); if (mixes.length) break; }
   if (mixes.length && roles.length > 1) {
-    const second = candidates(roles[1], food, library, starter, ask, moment)[0];
+    const first = mixes[0].partners[0];
+    const second = candidates(roles[1], food, library, starter, ask, moment).find((f) => plateOk([food, first, f]));
     if (second) {
-      push([mixes[0].partners[0], second]);
-      const third = roles[2] ? candidates(roles[2], food, library, starter, ask, moment)[0] : null;
-      if (third && mixes.length === 2) push([mixes[0].partners[0], second, third]);
+      push([first, second]);
+      const third = roles[2] ? candidates(roles[2], food, library, starter, ask, moment).find((f) => plateOk([food, first, second, f])) : null;
+      if (third && mixes.length === 2) push([first, second, third]);
     }
   }
   // fill the remaining slots with other single partners, so the person sees an alternative
