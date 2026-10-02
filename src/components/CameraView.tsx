@@ -18,7 +18,8 @@ interface CameraViewProps {
   mode?: ScannerMode;
   scannerMode?: ScannerMode;
   onModeChange: (mode: ScannerMode) => void;
-  onCapture: (base64: string) => void;
+  onCapture: (images: string[]) => void;
+  onBarcodeWithPhotos: (code: string, images: string[]) => void;
   processSingleLabelOCR?: (base64: string) => void;
   processGroupScan: (images: string[] | string) => void;
   onBarcode: (barcode: string) => void;
@@ -34,6 +35,7 @@ export function CameraView({
   scannerMode: propScannerMode,
   onModeChange,
   onCapture,
+  onBarcodeWithPhotos,
   processSingleLabelOCR: propProcessSingleLabelOCR,
   processGroupScan,
   onBarcode,
@@ -51,6 +53,9 @@ export function CameraView({
   const [typedCode, setTypedCode] = useState("");
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [stagedGroupImages, setStagedGroupImages] = useState<string[]>([]);
+  // Barcode: the code read, kept while the person adds the pack's photos; the camera stays open
+  const [codeRead, setCodeRead] = useState<string | null>(null);
+  const staged = stagedGroupImages;
   const frameRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -125,8 +130,17 @@ export function CameraView({
     if (propProcessSingleLabelOCR) {
       await propProcessSingleLabelOCR(image);
     } else {
-      await onCapture(image);
+      await onCapture([image]);
     }
+  };
+  // Every shot stages, in every mode. Up to six. Nothing is sent until Analyze.
+  const stage = (image: string) => setStagedGroupImages((prev) => (prev.length < 6 ? [...prev, image] : prev));
+  // Analyze: the staged photos leave as one scan, read the way the mode says
+  const analyze = () => {
+    const images = [...stagedGroupImages]; setStagedGroupImages([]);
+    if (scannerMode === "group") processGroupScan(images);
+    else if (scannerMode === "barcode" && codeRead) { const c = codeRead; setCodeRead(null); onBarcodeWithPhotos(c, images); }
+    else onCapture(images);
   };
 
   const processBarcodeFallback = async (image?: string | null) => {
@@ -135,7 +149,7 @@ export function CameraView({
     try {
       // Decode the supplied capture/upload, not a stale or empty canvas.
       const result = await reader.decodeFromImageUrl(image);
-      onBarcode(result.getText());
+      setCodeRead(result.getText());
     } catch {
       setToastMessage(
         "No barcode found. Try a sharper photo, or enter the number in Saved foods.",
@@ -152,7 +166,7 @@ export function CameraView({
   const busyRef = useRef(false);
   const setAutoMode = (on: boolean) => { setAuto(on); try { localStorage.setItem("chefmealan-camera-auto", on ? "auto" : "manual"); } catch {} };
   useEffect(() => {
-    if (!auto || scannerMode === "barcode" || cameraError) { setSteady(0); return; }
+    if (!auto || (scannerMode === "barcode" && !codeRead) || cameraError) { setSteady(0); return; }
     const small = document.createElement("canvas"); small.width = 48; small.height = 48;
     const sctx = small.getContext("2d", { willReadFrequently: true });
     let prev: Uint8ClampedArray | null = null, still = 0, armed = true, last = performance.now();
@@ -168,13 +182,13 @@ export function CameraView({
         if (diff > 14) armed = true; // moved on to the next side or product
         still = diff < 5 && armed ? still + dt : 0;
         setSteady(Math.min(1, still / 1000));
-        if (still >= 1000) { still = 0; armed = scannerMode !== "group"; setSteady(0); void handleShutterClick(); }
+        if (still >= 1000) { still = 0; armed = false; setSteady(0); void handleShutterClick(); }
       }
       prev = px;
     }, 120);
     return () => window.clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [auto, scannerMode, cameraError]);
+  }, [auto, scannerMode, cameraError, codeRead]);
 
   // Barcode: read live from the camera, a few times a second; the phone's own detector where it has one.
   useEffect(() => {
@@ -195,12 +209,12 @@ export function CameraView({
           grab.getContext("2d")?.drawImage(v, 0, 0, grab.width, grab.height);
           try { code = (await reader!.decodeFromImageUrl(grab.toDataURL("image/jpeg", 0.85))).getText(); } catch { code = ""; }
         }
-        if (/^\d{8,14}$/.test(code)) { done = true; try { navigator.vibrate?.(60); } catch {} onBarcode(code); }
+        if (/^\d{8,14}$/.test(code)) { done = true; try { navigator.vibrate?.(60); } catch {} setCodeRead(code); }
       } catch { /* keep looking */ } finally { working = false; }
     }, native ? 250 : 450);
     return () => { done = true; window.clearInterval(id); reader?.reset(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scannerMode, cameraError]);
+  }, [scannerMode, cameraError, codeRead]);
 
   const handleShutterClick = async () => {
     if (busyRef.current) return;
@@ -208,17 +222,8 @@ export function CameraView({
     window.setTimeout(() => { busyRef.current = false; }, 450);
     const image = captureImageFromVideo();
     if (!image) return;
-    if (scannerMode === "group") {
-      setStagedGroupImages((prev) =>
-        prev.length < 6 ? [...prev, image] : prev,
-      );
-      return;
-    } else if (scannerMode === "barcode") {
-      await processBarcodeFallback(image);
-      return;
-    } else {
-      await processSingleLabelOCR(image);
-    }
+    if (scannerMode === "barcode" && !codeRead) { await processBarcodeFallback(image); return; }
+    stage(image);
   };
 
   const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
@@ -233,17 +238,8 @@ export function CameraView({
     reader.onload = async () => {
       const image = reader.result as string;
       if (!image) return;
-      if (scannerMode === "group") {
-        setStagedGroupImages((prev) =>
-          prev.length < 6 ? [...prev, image] : prev,
-        );
-        return;
-      } else if (scannerMode === "barcode") {
-        await processBarcodeFallback(image);
-        return;
-      } else {
-        await processSingleLabelOCR(image);
-      }
+      if (scannerMode === "barcode" && !codeRead) { await processBarcodeFallback(image); return; }
+      stage(image);
     };
     reader.readAsDataURL(file);
   };
@@ -279,7 +275,7 @@ export function CameraView({
             BARCODE
           </button>
           <button
-            onClick={() => onModeChange("label")}
+            onClick={() => { setCodeRead(null); onModeChange("label"); }}
             className={`px-2.5 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold tracking-wide transition-all flex items-center gap-1.5 ${
               scannerMode === "label"
                 ? "bg-white text-black shadow-sm"
@@ -290,7 +286,7 @@ export function CameraView({
             LABEL
           </button>
           <button
-            onClick={() => onModeChange("group")}
+            onClick={() => { setCodeRead(null); onModeChange("group"); }}
             className={`px-2.5 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold tracking-wide transition-all flex items-center gap-1.5 ${
               scannerMode === "group"
                 ? "bg-white text-black shadow-sm"
@@ -355,13 +351,13 @@ export function CameraView({
               </div>
             ) : (
               <div className="absolute top-[16%] text-white text-[11px] font-bold tracking-[0.2em] bg-black/60 px-5 py-2.5 rounded-full backdrop-blur-md border border-white/10">
-                {scannerMode === "barcode"
-                  ? "HOLD THE BARCODE INSIDE THE FRAME"
-                  : scannerMode === "group"
-                    ? stagedGroupImages.length > 0
-                      ? `${stagedGroupImages.length} ${stagedGroupImages.length === 1 ? "PHOTO" : "PHOTOS"} READY · ADD MORE OR TAP ANALYZE`
-                      : "WHOLE PRODUCT · ONE SIDE PER PHOTO"
-                    : "THE NUTRITION TABLE INSIDE THE FRAME"}
+                {staged.length > 0
+                  ? `${staged.length} ${staged.length === 1 ? "PHOTO" : "PHOTOS"} READY · ADD MORE OR TAP ANALYZE`
+                  : scannerMode === "barcode"
+                    ? codeRead ? `CODE READ · ADD THE PACK'S FRONT AND BACK` : "HOLD THE BARCODE INSIDE THE FRAME"
+                    : scannerMode === "group"
+                      ? "WHOLE PRODUCT · ONE SIDE PER PHOTO"
+                      : "THE NUTRITION TABLE · ONE SIDE PER PHOTO"}
               </div>
             )}
 
@@ -421,7 +417,7 @@ export function CameraView({
         </div>
       )}
 
-      {scannerMode === "group" && stagedGroupImages.length > 0 && (
+      {stagedGroupImages.length > 0 && (
         <div
           className="absolute bottom-[196px] left-3 right-3 z-40 flex justify-center gap-2"
           aria-label="Staged photos"
@@ -452,18 +448,24 @@ export function CameraView({
       )}
       {/* Controls */}
       <div className="absolute bottom-0 inset-x-0 p-8 z-30 flex flex-col items-center justify-center gap-4 bg-gradient-to-t from-black via-black/60 to-transparent pt-20">
-        {scannerMode === "barcode" && (
-          <form className="typed-barcode" onSubmit={(e) => { e.preventDefault(); const v = typedCode.trim(); if (/^\d{8,14}$/.test(v)) { onBarcode(v); setTypedCode(""); } }}>
+        {scannerMode === "barcode" && codeRead && (
+          <div className="typed-barcode code-read">
+            <span>Code read: {codeRead}</span>
+            <button type="button" onClick={() => { const c = codeRead; setCodeRead(null); setStagedGroupImages([]); onBarcode(c); }}>Use the code only</button>
+          </div>
+        )}
+        {scannerMode === "barcode" && !codeRead && (
+          <form className="typed-barcode" onSubmit={(e) => { e.preventDefault(); const v = typedCode.trim(); if (/^\d{8,14}$/.test(v)) { setCodeRead(v); setTypedCode(""); } }}>
             <input value={typedCode} onChange={(e) => setTypedCode(e.target.value)} inputMode="numeric" placeholder="or type the barcode" aria-label="Type the barcode" enterKeyHint="go" />
             <button type="submit" disabled={!/^\d{8,14}$/.test(typedCode.trim())}>Look up</button>
           </form>
         )}
-        {!cameraError && scannerMode !== "barcode" && (
+        {!cameraError && (scannerMode !== "barcode" || codeRead) && (
           <button className="auto-switch" onClick={() => setAutoMode(!auto)} aria-pressed={auto}>
             {auto ? "Auto shot: hold still" : "Manual shot: tap to take"}
           </button>
         )}
-        {!cameraError && scannerMode === "barcode" && <p className="auto-switch auto-note">Reads by itself. Hold the code inside the frame.</p>}
+        {!cameraError && scannerMode === "barcode" && !codeRead && <p className="auto-switch auto-note">Reads by itself. Hold the code inside the frame.</p>}
         {!cameraError && (
           <div className="relative flex items-center justify-center w-full max-w-sm">
             {/* Gallery Button */}
@@ -476,9 +478,9 @@ export function CameraView({
             </button>
 
             {/* Finish: right of the shutter, where the thumb is; the only green on the screen */}
-            {scannerMode === "group" && stagedGroupImages.length > 0 && (
+            {stagedGroupImages.length > 0 && (
               <button
-                onClick={() => { const imagesToProcess = [...stagedGroupImages]; setStagedGroupImages([]); processGroupScan(imagesToProcess); }}
+                onClick={analyze}
                 className="absolute right-2 px-4 h-12 rounded-full bg-[#39ff14] text-black font-extrabold text-sm shadow-[0_0_18px_rgba(57,255,20,0.35)] active:scale-95 transition-all"
                 aria-label={`Analyze ${stagedGroupImages.length} photo${stagedGroupImages.length === 1 ? "" : "s"}`}
               >
@@ -497,7 +499,7 @@ export function CameraView({
               <div
                 className="w-[3.25rem] h-[3.25rem] rounded-full bg-white transition-colors relative flex items-center justify-center"
               />
-              {auto && scannerMode !== "barcode" && (
+              {auto && (scannerMode !== "barcode" || codeRead) && (
                 <svg className="absolute inset-0 w-20 h-20 -rotate-90 pointer-events-none" viewBox="0 0 80 80" aria-hidden="true">
                   <circle cx="40" cy="40" r="37" fill="none" stroke="#39ff14" strokeWidth="5" strokeLinecap="round" strokeDasharray={2 * Math.PI * 37} strokeDashoffset={(1 - steady) * 2 * Math.PI * 37} style={{ transition: "stroke-dashoffset 120ms linear" }} />
                 </svg>

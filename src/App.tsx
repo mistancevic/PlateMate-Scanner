@@ -818,7 +818,7 @@ export default function App() {
       "Added. Set the amount you actually have.",
     );
   }
-  async function scan(raw: string | string[], group = false) {
+  async function scan(raw: string | string[], group = false, barcode?: string) {
     const run = ++runRef.current;
     setBusy(group ? "Identifying products…" : "Reading label…");
     setError("");
@@ -832,6 +832,7 @@ export default function App() {
       const data = await api("/api/scan", {
         images,
         mode: group ? "group" : "label",
+        ...(barcode ? { barcode } : {}),
       });
       if (run !== runRef.current) return;
       if (group) {
@@ -858,7 +859,7 @@ export default function App() {
           );
         setImage(images[0]);
         setImageSet(images);
-        setEdit(candidateFood(data, "Label photo · review required"));
+        setEdit(candidateFood(barcode ? { ...data, barcode } : data, barcode ? "Barcode and photos · review required" : "Label photo · review required"));
       }
     } catch (e: any) {
       if (run === runRef.current)
@@ -898,6 +899,37 @@ export default function App() {
     } finally {
       if (run === runRef.current) setBusy("");
     }
+  }
+  // A barcode plus the pack's photos: the database answers by code, the photos fill what it lacks (name, front, table lines).
+  // No database row: the photos are read as a label scan and the code travels with the food.
+  async function lookupWithPhotos(code: string, images: string[]) {
+    const c = code.trim();
+    const local = state.foods.find((f) => f.barcode === c);
+    if (local) { setCamera(false); setOpenFoodId(local.id); setTab("foods"); notify("Already in your foods."); return; }
+    const run = ++runRef.current;
+    setBusy("Looking up product…"); setError(""); setCamera(false);
+    let db: any = null;
+    try { db = await api(`/api/product/${c}`); } catch { db = null; }
+    if (run !== runRef.current) return;
+    if (!db) { setBusy(""); await scan(images, false, c); return; }
+    const missing = !db.product_name || db.calories === null || db.calories === undefined || db.protein === null || db.protein === undefined;
+    let read: any = null;
+    if (missing && images.length) {
+      try {
+        const resized = await Promise.all(images.slice(0, 6).map((x) => resizeImageBase64(x, 1800, 1800)));
+        const d = await api("/api/scan", { images: resized, mode: "label", barcode: c });
+        if (d?.success) read = d;
+      } catch { read = null; }
+      if (run !== runRef.current) return;
+    }
+    const merged = { ...db };
+    if (read) for (const k of ["product_name", "brand", "calories", "protein", "fats", "carbs", "fiber", "table", "notes"]) if (merged[k] === null || merged[k] === undefined || merged[k] === "") merged[k] = read[k];
+    try {
+      const resized = await Promise.all(images.slice(0, 6).map((x) => resizeImageBase64(x, 1800, 1800)));
+      setImage(resized[0] ?? ""); setImageSet(resized);
+    } catch { setImage(""); setImageSet([]); }
+    setEdit(candidateFood({ ...merged, barcode: c }, db.source || "Product database and photos · review required"));
+    setBusy("");
   }
   function updateItem(id: string, patch: Partial<Ingredient>) {
     setState((s) => ({
@@ -1366,6 +1398,7 @@ export default function App() {
             onCapture={(x) => scan(x)}
             processGroupScan={(x) => scan(x, true)}
             onBarcode={(x) => lookup(x)}
+            onBarcodeWithPhotos={(c, x) => lookupWithPhotos(c, x)}
             onCancel={() => setCamera(false)}
             onOpenCart={() => {
               setCamera(false);
