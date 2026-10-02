@@ -20,6 +20,7 @@ import {
 import { CameraView } from "./components/CameraView";
 import { resizeImageBase64, thumbnailBase64 } from "./utils/image";
 import { findMatch, mergeFoods, repoint } from "./dedupe";
+import { KNOWN, knownOf, displayRows, sortEuropean, type LabelRow, type Unit } from "./labeltable";
 import { iconFor } from "./icons";
 import type { ScannerMode } from "./types";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange, setPdUnit } from "./ui";
@@ -224,6 +225,13 @@ function FoodEditor({
       string
     >,
   );
+  const [rows, setRows] = useState<LabelRow[]>(() => displayRows(food));
+  const [adding, setAdding] = useState(false);
+  const [addKey, setAddKey] = useState("saturates");
+  const [addName, setAddName] = useState("");
+  const [addAmount, setAddAmount] = useState("");
+  const [addUnit, setAddUnit] = useState<Unit>("g");
+  useEffect(() => { const k = knownOf(addKey); if (k) setAddUnit(k.unit); }, [addKey]);
   // the same product, recognised from what's on screen now
   const liveMatch = !(library ?? []).some((x) => x.id === food.id)
     ? findMatch({ ...food, name, brand, ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])) } as Food, library ?? [])
@@ -237,6 +245,7 @@ function FoodEditor({
       readyToEat: ready,
       reviewedAt: new Date().toISOString(),
       ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])),
+      table: rows.map((r) => { const core = knownOf(r.key)?.core; return core ? { ...r, amount: numberInput(values[core]) } : r; }),
     } as Food;
     const e = validateFood(f);
     if (
@@ -302,21 +311,43 @@ function FoodEditor({
         Brand
         <input value={brand} onChange={(e) => setBrand(e.target.value)} />
       </label>
-      <div className="form-grid">
-        {KEYS.map((k) => (
-          <label key={k}>
-            {LABELS[k]} ({k === "calories" ? "kcal" : "g"})
-            <input
-              inputMode="decimal"
-              value={values[k]}
-              placeholder="Unknown"
-              onChange={(e) =>
-                setValues((v) => ({ ...v, [k]: e.target.value }))
-              }
-            />
-          </label>
-        ))}
+      <p className="label">Nutrition table, per 100 g, as on the pack</p>
+      <div className="label-table">
+        {rows.map((r, i) => {
+          const core = knownOf(r.key)?.core;
+          return (
+            <div className={`lt-row ${r.sub ? "sub" : ""}`} key={r.key + i}>
+              <span className="lt-name">{r.name}{r.source === "you" && <em> · added by you</em>}{r.source === "database" && <em> · database</em>}</span>
+              <input inputMode="decimal" aria-label={r.name} value={core ? values[core] : r.amount ?? ""} placeholder="–"
+                onChange={(e) => core ? setValues((v) => ({ ...v, [core]: e.target.value })) : setRows((rs) => rs.map((x, j) => j === i ? { ...x, amount: numberInput(e.target.value) } : x))} />
+              <span className="lt-unit">{r.unit}</span>
+              {!core ? <button className="lt-x" aria-label={`Remove ${r.name}`} onClick={() => setRows((rs) => rs.filter((_, j) => j !== i))}>×</button> : <span className="lt-x" />}
+            </div>
+          );
+        })}
       </div>
+      {adding ? (
+        <div className="lt-add">
+          <select value={addKey} onChange={(e) => setAddKey(e.target.value)} aria-label="Which line">
+            {KNOWN.filter((k) => !k.core && !rows.some((r) => r.key === k.key)).map((k) => <option key={k.key} value={k.key}>{k.name}</option>)}
+            <option value="other">Other…</option>
+          </select>
+          {addKey === "other" && <input placeholder="Name, as printed" value={addName} onChange={(e) => setAddName(e.target.value)} />}
+          <div className="lt-add-row">
+            <input inputMode="decimal" placeholder="Amount" value={addAmount} onChange={(e) => setAddAmount(e.target.value)} />
+            <select value={addUnit} onChange={(e) => setAddUnit(e.target.value as Unit)} aria-label="Unit">{["g", "mg", "µg", "kcal", "kJ", "%"].map((u) => <option key={u}>{u}</option>)}</select>
+            <button className="pill pill-small pill-primary" disabled={addKey === "other" && !addName.trim()} onClick={() => {
+              const k = knownOf(addKey);
+              const row: LabelRow = { key: k ? k.key : "other:" + addName.trim().toLowerCase(), name: k ? k.name : addName.trim(), amount: numberInput(addAmount), unit: addUnit, sub: k?.sub ?? false, source: "you" };
+              setRows((rs) => sortEuropean([...rs, row]).sort((x, y) => { const ix = rs.indexOf(x), iy = rs.indexOf(y); return ix >= 0 && iy >= 0 ? ix - iy : 0; }));
+              setAdding(false); setAddName(""); setAddAmount("");
+            }}>Add</button>
+            <button className="link" onClick={() => setAdding(false)}>Cancel</button>
+          </div>
+        </div>
+      ) : (
+        <button className="link" onClick={() => { const first = KNOWN.find((k) => !k.core && !rows.some((r) => r.key === k.key)); setAddKey(first?.key ?? "other"); setAddUnit(first?.unit ?? "g"); setAdding(true); }}>+ Add a line, from the pack or the maker's website</button>
+      )}
       <label>
         Label notes / preparation state
         <textarea

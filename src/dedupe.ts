@@ -36,6 +36,13 @@ export function mergeFoods(keep: Food, other: Food, name?: string): Food {
     calories: pick("calories"), protein: pick("protein"), fats: pick("fats"), carbs: pick("carbs"), fiber: pick("fiber"),
     notes: [keep.notes, other.notes].filter(Boolean).join(" · ").slice(0, 500),
     photo: keep.photo || other.photo, photos: photos.length ? photos : undefined,
+    // the fuller table wins; lines only the other one has are added
+    table: (() => {
+      const a = keep.table ?? [], b = other.table ?? [];
+      const base = a.length >= b.length ? a : b, rest = a.length >= b.length ? b : a;
+      const merged = [...base, ...rest.filter((r) => !base.some((x) => x.key === r.key))];
+      return merged.length ? merged : undefined;
+    })(),
   };
 }
 // a plate that used the merged-away food now points at the kept one

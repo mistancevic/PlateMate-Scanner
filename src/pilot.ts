@@ -1,3 +1,4 @@
+import { rowsFromRaw } from "./labeltable";
 /** Versioned pilot contract: numbers are unrounded; null means unknown. */
 export type Nutrient = "calories" | "protein" | "fats" | "carbs" | "fiber";
 // the order printed on European labels, so checking against the pack goes line by line
@@ -36,6 +37,7 @@ export type Food = Nutrition & {
   readyToEat: boolean;
   photo?: string;
   photos?: string[];
+  table?: import("./labeltable").LabelRow[];
   icon?: string;
 };
 export type Ingredient = {
@@ -353,5 +355,6 @@ export function candidateFood(input: any, source: string): Food {
     reviewedAt: "",
     readyToEat: false,
     ...Object.fromEntries(KEYS.map((k) => [k, numberInput(input[k])])),
+    table: Array.isArray(input.table) && input.table.length ? rowsFromRaw(input.table, /Open Food Facts/i.test(source) ? "database" : "label") : undefined,
   } as Food;
 }

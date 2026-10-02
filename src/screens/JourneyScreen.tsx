@@ -1,3 +1,4 @@
+import { lineTotal } from "../labeltable";
 import { useState, useEffect } from "react";
 import { Camera, ScanBarcode, Plus, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
 import { aggregate, density, uid, solveIngredient } from "../pilot";
@@ -5,6 +6,7 @@ import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
 import { iconFor } from "../icons";
+import { lineTotal } from "../labeltable";
 import { SwipeRow } from "../components/SwipeRow";
 import { methodsFor } from "../methods";
 import { rankSwaps } from "../swaps";
@@ -17,6 +19,12 @@ import type { AppApi } from "./api";
 const STEPS = ["in", "recipe", "make", "after"] as const;
 const band = (pd: number | null) => (pd === null || pd < 3 ? "low" : pd < 5 ? "mid" : "high");
 
+// sugars, saturates and salt on the plate, from the foods whose tables have them; for information only
+function extras(items: { food: any; grams: number }[]) {
+  const parts = ([["sugars", "sugars"], ["saturates", "saturates"], ["salt", "salt"]] as const)
+    .map(([key, word]) => { const v = lineTotal(items, key); return v === null ? null : `${fmt(v)} g ${word}`; }).filter(Boolean);
+  return parts.length ? <small className="readout-extra">{parts.join(" · ")}{items.some((i) => !i.food.table?.length) ? " · from foods with a full table" : ""}</small> : null;
+}
 export function JourneyScreen(p: AppApi) {
   const { state, setState, setTab, step, setStep, setCamera, setMode, blank, updateItem,
     setAdjustId, mixWith, options, pdRef, saveMeal, notify, setError, setFeedback, add } = p;
@@ -187,6 +195,7 @@ export function JourneyScreen(p: AppApi) {
               <b>{pdVal(pd)}</b>
               <div><span>{pd !== null && pdRef !== null ? (pd >= pdRef ? "fits your plan" : `${fixed(pdRef - pd)} under your ${fixed(pdRef)}`) : "no target set"}</span><small>{fmt(t.calories, 0)} kcal · {fmt(t.protein)} g protein · {fmt(t.weight, 0)} g</small></div>
             </div>
+            {extras(items)}
           </section>
         )}
         <div className="ways">
@@ -280,6 +289,13 @@ export function JourneyScreen(p: AppApi) {
             <div><span>{unreal ? "not realistic" : onPlan ? `on plan, target ${pdVal(pdRef)}` : `target ${fixed(pdRef)}`}</span><small>{fmt(ot.calories, 0)} kcal{share !== null ? `, ${share} % of your day` : ""} · {fmt(ot.protein)} g protein · {fmt(ot.weight, 0)} g</small></div>
           </div>
           {unreal && <p className="readout-note">{unrealText}</p>}
+          {(() => {
+            // for information: totals of lines the labels print, only for the foods that have them
+            const items = shown.map((x) => ({ food: x.food, grams: x.grams }));
+            const parts = ([["sugars", "sugars"], ["saturates", "saturates"], ["salt", "salt"]] as const)
+              .map(([k, word]) => { const t = lineTotal(items, k); return t === null ? null : `${fmt(t, 1)} g ${word}`; }).filter(Boolean);
+            return parts.length ? <p className="readout-info">{parts.join(" · ")}, from the labels that print them</p> : null;
+          })()}
         </section>
         <div className="rows">
           {shown.map((i) => (
