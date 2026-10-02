@@ -44,7 +44,7 @@ function kindOf(scanned: Food, partners: Food[], kcal: number, snackMoment: bool
   const sweet = all.some((f) => jobOf(f).taste === "sweet" || jobOf(f).job === "Flavour food");
   if (sweet && jobs.includes("Protein base")) return "DaaM dessert";
   if (kcal <= SNACK_KCAL || snackMoment) return "snack";
-  const side = jobs.some((j) => j === "Carb base" || j === "Fat source");
+  const side = jobs.some((j) => j === "Carb base" || j === "Fat source" || j === "Mixed");
   return jobs.includes("Protein base") && side ? "meal" : "snack";
 }
 // A portion to start from. The job's typical portion, except a supplement, which is a scoop, not a plate.

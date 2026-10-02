@@ -205,6 +205,9 @@ function FoodEditor({
   library,
   close,
   save,
+  mixFor,
+  onMix,
+  momentName,
 }: {
   food: Food;
   image?: string;
@@ -212,6 +215,9 @@ function FoodEditor({
   library?: Food[];
   close: () => void;
   save: (f: Food) => void;
+  mixFor?: (f: Food) => MixTip;
+  onMix?: (f: Food, m: Mix) => void;
+  momentName?: string;
 }) {
   const [mainIdx, setMainIdx] = useState(0);
   const [choice, setChoice] = useState<"update" | "both">("update");
@@ -238,6 +244,16 @@ function FoodEditor({
   const liveMatch = !(library ?? []).some((x) => x.id === food.id)
     ? findMatch({ ...food, name, brand, ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])) } as Food, library ?? [])
     : null;
+  // the draft as a food, for the mix tip while the sheet is still open
+  const draft = (): Food => ({ ...food, name: name.trim() || food.name, brand: brand.trim(), readyToEat: ready, ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])) } as Food);
+  const pendingMix = useRef<Mix | null>(null);
+  // the mix tip shown on the review sheet is logged once per food
+  const loggedTip = useRef<string | null>(null);
+  function noteTip(tip: MixTip, d: Food) {
+    if (loggedTip.current === food.id || tip.case === "fits" || tip.case === "unknown") return;
+    loggedTip.current = food.id;
+    log("mix_tip", { food: d.name, where: "review", moment: momentName, case: tip.case, offered: tip.mixes.map((m) => ({ partners: m.partners.map((x) => x.name), kind: m.kind, pd: Math.round(m.pd * 10) / 10, kcal: m.kcal })) });
+  }
   function submit() {
     const f = {
       ...food,
@@ -265,7 +281,12 @@ function FoodEditor({
     f.icon = f.icon || iconFor(f.name);
     const isNew = !(library ?? []).some((x) => x.id === f.id);
     const match = isNew ? findMatch(f, library ?? []) : null;
-    const finish = (g: Food) => save(match && choice === "update" ? { ...mergeFoods(match.food, g), reviewedAt: g.reviewedAt } : g);
+    const finish = (g: Food) => {
+      const saved = match && choice === "update" ? { ...mergeFoods(match.food, g), reviewedAt: g.reviewedAt } : g;
+      save(saved);
+      const m = pendingMix.current; pendingMix.current = null;
+      if (m && onMix) onMix(saved, m);
+    };
     const raw = (images && images.length ? images : image ? [image] : []);
     const all = raw.length > 1 ? [raw[mainIdx] ?? raw[0], ...raw.filter((_, i) => i !== mainIdx)] : raw;
     if (all.length && !f.photo)
@@ -386,6 +407,27 @@ function FoodEditor({
       <button className="primary wide" onClick={submit}>
         <Check size={17} /> Confirm & save food
       </button>
+      {mixFor && onMix && (() => {
+        const d = draft();
+        if (d.calories === null || d.protein === null) return null;
+        const tip = mixFor(d);
+        noteTip(tip, d);
+        if (tip.case === "fits") return <p className="small center mix-fits">Fits your plate as it stands.</p>;
+        if (tip.case === "unknown") return null;
+        return (
+          <section className="mix-tip">
+            <div className="mix-head"><span className="pro-badge">Mix it</span><small>{momentName}: {tip.why}</small></div>
+            {tip.mixes.length === 0 && <p className="muted">Nothing in your foods or the starter set gets there with this one.</p>}
+            {tip.mixes.map((m) => (
+              <button key={m.id} className="mix-chip" onClick={() => { pendingMix.current = m; submit(); }}>
+                <b>{mixLabel(m)}</b>
+                <small>{pdText(m.pd)} · {m.kcal} kcal · {m.kind}{m.cooking ? " · cooking" : ""}{m.fromStarter.length ? " · from the starter set" : ""}</small>
+              </button>
+            ))}
+            <p className="small">A tap saves the food and puts the mix on the plate.</p>
+          </section>
+        );
+      })()}
     </Modal>
   );
 }
@@ -496,7 +538,7 @@ export default function App() {
     [mealanAsk, setMealanAsk] = useState(0),
     [mixQuestion, setMixQuestion] = useState<string | null>(null),
     [camera, setCamera] = useState(false),
-    [mode, setModeState] = useState<ScannerMode>(() => { try { return (localStorage.getItem("chefmealan-scan-mode") as ScannerMode) || "group"; } catch { return "group"; } }),
+    [mode, setMode] = useState<ScannerMode>("group"),
     [busy, setBusy] = useState(""),
     [message, setMessage] = useState(""),
     [error, setError] = useState(""),
@@ -890,8 +932,6 @@ export default function App() {
       localStorage.setItem(k, JSON.stringify(done.filter((x) => !x.startsWith(`food:${foodId}`))));
     } catch { /* fine */ }
   }
-  // Scan opens the camera in the mode last used; the first time it is the group photo.
-  function setMode(m: ScannerMode) { setModeState(m); try { localStorage.setItem("chefmealan-scan-mode", m); } catch {} }
   function todayKcalOf(): number | null {
     const k = state.goals.calories ?? null;
     if (k === null || personal.dayMode !== "follow") return k;
@@ -1345,6 +1385,9 @@ export default function App() {
           library={state.foods}
           close={() => { setEdit(null); setImageSet([]); }}
           save={saveFood}
+          mixFor={screenProps.mixFor}
+          onMix={screenProps.takeMix}
+          momentName={momentOf(moment).name}
         />
       )}{" "}
       {goalsOpen && (

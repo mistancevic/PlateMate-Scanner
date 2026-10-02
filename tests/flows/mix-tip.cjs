@@ -58,6 +58,26 @@ seed.items = [];
   ok(/I scanned Nutella for before training/.test(q) && /You suggested with/.test(q), "the helper carries the tip: " + q.slice(0, 60));
   const asked = await logOf("mix_ask");
   ok(asked.length === 1, "the ask is logged");
+  await page.locator(".sheet-backdrop, .modal-backdrop").first().click({ position: { x: 5, y: 5 } }).catch(() => {}); await page.waitForTimeout(300);
+
+  // the review sheet is the scan result: Type it a biscuit, Mix it shows before saving; a chip saves it and makes the plate
+  await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Regular meal" }).click(); await page.waitForTimeout(200);
+  await page.getByRole("button", { name: /Empty plate/ }).click().catch(() => {}); await page.getByRole("button", { name: /Tap again to empty/ }).click().catch(() => {}); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /^Type it$/ }).click(); await page.waitForTimeout(400);
+  const sheet = page.locator(".modal").last();
+  await sheet.locator("input").first().fill("Shop biscuit");
+  const rowNames = await sheet.locator(".lt-row .lt-name").allTextContents();
+  const fillRow = async (re, v) => { const i = rowNames.findIndex((n) => re.test(n)); await sheet.locator(".lt-row input").nth(i).fill(v); };
+  await fillRow(/Energ/i, "470"); await fillRow(/^Fat|Fett/i, "14"); await fillRow(/Carb|Kohlen/i, "74"); await fillRow(/Protein|Eiwei/i, "7.6"); await page.waitForTimeout(300);
+  ok(await sheet.locator(".mix-tip").count() === 1, "the review sheet shows Mix it before the food is saved");
+  const reviewChips = await sheet.locator(".mix-chip").allTextContents();
+  ok(reviewChips.length >= 1 && /with /.test(reviewChips[0]), "a partner is offered on the review sheet: " + reviewChips[0].slice(0, 30));
+  await sheet.getByText(/I checked the values/).click(); await page.waitForTimeout(100);
+  await sheet.locator(".mix-chip").first().click(); await page.waitForTimeout(800);
+  const st2 = await state();
+  ok(st2.foods.some((f) => f.name === "Shop biscuit"), "the chip saved the food");
+  ok(st2.items.length >= 2 && st2.items[0].food.name === "Shop biscuit", "and put the mix on the plate: " + st2.items.map((i) => i.food.name).join(" + "));
   await page.screenshot({ path: "/tmp/mix-tip.png", fullPage: true });
   console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
   await b.close(); server.kill(); process.exitCode = fail ? 1 : 0;
