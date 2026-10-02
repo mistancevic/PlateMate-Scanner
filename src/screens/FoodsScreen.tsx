@@ -88,10 +88,11 @@ export function FoodsScreen(p: AppApi) {
           <div className="row" key={f.id}>
             <span className="thumb">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
             <div className="row-text">
-              <button className="name-link" onClick={() => setCardId(f.id)}>{f.name}</button>
+              <button className="name-link" onClick={() => setCardId(f.id)}>{f.favorite && <span className="fav-mark">★ </span>}{f.name}</button>
               <small>{f.brand ? `${f.brand} · ` : ""}{fmt(f.calories, 0)} kcal · {fmt(f.protein)} g per 100 g</small>
               <span className="row-links">
                 <button className="link" onClick={() => add(f)}>Add to meal</button>
+                <button className="link" onClick={() => p.toggleFavorite(f.id)}>{f.favorite ? "★ Favourite" : "☆ Favourite"}</button>
                 <button className="link" onClick={() => { setImage(""); setEdit(f); }}>Review</button>
                 {coach && <button className="link" onClick={async () => {
                   setBusy("Saving to Airtable");
@@ -108,7 +109,7 @@ export function FoodsScreen(p: AppApi) {
       {state.foods.length === 0 && (
         <div className="strip">No foods yet. Scan a label, add one by hand, or <button className="link" onClick={p.addStarter}>add twenty starter foods</button>.</div>
       )}
-      {cardFood && <FoodCard food={p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood} addPhoto={(d) => p.addFoodPhoto(cardFood.id, d)} removePhoto={(i) => p.removeFoodPhoto(cardFood.id, i)} target={pdRef} fit={p.fitPd(density(cardFood.protein, cardFood.calories))} close={() => setCardId(null)} review={() => { setImage(""); setEdit(cardFood); }} />}
+      {cardFood && <FoodCard food={p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood} addPhoto={(d) => p.addFoodPhoto(cardFood.id, d)} removePhoto={(i) => p.removeFoodPhoto(cardFood.id, i)} toggleFavorite={() => p.toggleFavorite(cardFood.id)} target={pdRef} fit={p.fitPd(density(cardFood.protein, cardFood.calories))} close={() => setCardId(null)} review={() => { setImage(""); setEdit(cardFood); }} />}
     </>
   );
 }

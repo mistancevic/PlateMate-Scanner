@@ -518,3 +518,9 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .label-table-read .lt-row { grid-template-columns: 1fr auto 34px; padding: 8px 12px; } .lt-val { font-size: 15px; text-align: right; }
 .readout-extra { display: block; margin-top: 8px; opacity: .9; font-size: 12px; font-weight: 700; }
 .lt-add-row select { width: 90px; } .lt-add-row input { width: 120px; }
+
+.fav { margin-left: auto; flex: none; border: 0; background: none; font-size: 26px; line-height: 1; color: var(--muted); padding: 4px 2px; }
+.fav.on { color: #f5b400; }
+.fav-mark { color: #f5b400; }
+.all-foods { display: block; margin: 10px auto 0; }
+.foodcard-head { align-items: center; }

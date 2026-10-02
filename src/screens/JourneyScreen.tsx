@@ -5,6 +5,7 @@ import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
 import { iconFor } from "../icons";
+import { quickPicks } from "../quick";
 import { lineTotal } from "../labeltable";
 import { SwipeRow } from "../components/SwipeRow";
 import { methodsFor } from "../methods";
@@ -67,7 +68,7 @@ export function JourneyScreen(p: AppApi) {
   const pd = density(t.protein, t.calories);
   const n = STEPS.indexOf(step) + 1;
   const cardItem = items.find((i) => i.id === cardId);
-  const foodCard = cardItem && <FoodCard food={state.foods.find((x) => x.id === cardItem.food.id) ?? cardItem.food} addPhoto={(d) => p.addFoodPhoto(cardItem.food.id, d)} removePhoto={(i) => p.removeFoodPhoto(cardItem.food.id, i)} target={pdRef} fit={p.fitPd(density(cardItem.food.protein, cardItem.food.calories))} close={() => setCardId(null)} dontHave={() => { setHelper({ missing: cardItem.id }); setCardId(null); }} />;
+  const foodCard = cardItem && <FoodCard food={state.foods.find((x) => x.id === cardItem.food.id) ?? cardItem.food} addPhoto={(d) => p.addFoodPhoto(cardItem.food.id, d)} toggleFavorite={() => p.toggleFavorite(cardItem.food.id)} removePhoto={(i) => p.removeFoodPhoto(cardItem.food.id, i)} target={pdRef} fit={p.fitPd(density(cardItem.food.protein, cardItem.food.calories))} close={() => setCardId(null)} dontHave={() => { setHelper({ missing: cardItem.id }); setCardId(null); }} />;
   const helperSheet = helper && (
     <PlateHelper items={items} library={state.foods} pdRef={pdRef} cap={cap ?? null} missing={helper.missing ? items.find((i) => i.id === helper.missing) ?? null : null}
       setError={setError} close={() => setHelper(null)} openTalk={() => { setHelper(null); p.openOut(); }} record={p.recordTalk}
@@ -136,6 +137,7 @@ export function JourneyScreen(p: AppApi) {
     setState((s) => ({ ...s, items: s.items.map((i) => (i.id === suggest.id ? { ...i, grams: suggest.grams } : i)), portion: null }));
     setSuggest(null);
   }
+  const quick = quickPicks(state.foods, state.feedback);
   const swapCandidates = !swapId || pdRef === null ? [] : rankSwaps(items, swapId, state.foods, pdRef, cap ?? null);
   const swapPanel = swapId && (
     <div className="sheet-backdrop" onClick={() => setSwapId(null)}>
@@ -238,24 +240,28 @@ export function JourneyScreen(p: AppApi) {
         {swapPanel}
         {foodCard}
         {helperSheet}
-        <p className="label">My foods</p>
-        <input className="search" aria-label="Search my foods" placeholder="Search my foods" value={q} onChange={(e) => setQ(e.target.value)} />
+        <p className="label">{q.trim() ? "From all your foods" : "Quick picks"}</p>
+        <input className="search" aria-label="Search all my foods" placeholder="Search all my foods" value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="rows">
-          {state.foods
-            .filter((f) => (f.name + " " + f.brand).toLowerCase().includes(q.toLowerCase()))
-            .slice(0, 60)
-            .map((f) => {
+          {(q.trim()
+            ? state.foods.filter((f) => (f.name + " " + f.brand).toLowerCase().includes(q.toLowerCase())).slice(0, 60)
+            : quick.picks
+          ).map((f) => {
               const inList = items.some((i) => i.food.id === f.id);
+              const why = q.trim() ? null : quick.why.get(f.id);
               return (
                 <div className="row row-food" key={f.id}>
                   <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
-                  <div className="row-text"><b>{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}{pdText(density(f.protein, f.calories))}</small></div>
+                  <div className="row-text"><b>{f.favorite && <span className="fav-mark" aria-label="Favourite">★ </span>}{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}{pdText(density(f.protein, f.calories))}{why === "often" ? " · often" : ""}</small></div>
                   <button className={`pill pill-small ${inList ? "" : "pill-primary"}`} disabled={inList} onClick={() => add(f)}>{inList ? "In" : <><Plus size={14} /> Add</>}</button>
                 </div>
               );
             })}
           {state.foods.length === 0 && <small>No saved foods yet. Scan or type one above.</small>}
         </div>
+        {!q.trim() && state.foods.length > quick.picks.length && (
+          <button className="link all-foods" onClick={() => setTab("foods")}>All {state.foods.length} foods →</button>
+        )}
 
       </>
     );

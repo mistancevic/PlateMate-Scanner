@@ -1029,6 +1029,11 @@ export default function App() {
       notify("Photo added.");
     },
     openFoodId, clearOpenFood: () => setOpenFoodId(null),
+    toggleFavorite: (foodId: string) => {
+      const f = state.foods.find((x) => x.id === foodId);
+      setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, favorite: !x.favorite } : x)) }));
+      notify(f?.favorite ? "Removed from favourites." : "Added to favourites: it shows first on the plate.");
+    },
     removeFoodPhoto: (foodId: string, index: number) => {
       forgetUploaded(foodId);
       setState((s) => ({ ...s, foods: s.foods.map((f) => {
