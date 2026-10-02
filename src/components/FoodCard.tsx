@@ -7,7 +7,7 @@ import { iconFor } from "../icons";
 const role = (pd: number | null) =>
   pd === null ? "unknown" : pd < 3 ? "flavour, fat or carbs: the reason you want it" : pd < 5 ? "mixed: look at the amount and the rest of the plate" : pd < 10 ? "helps the protein along" : "a protein base to build on";
 
-export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto }: { food: Food; target: number | null; fit: "high" | "mid" | "low"; close: () => void; review?: () => void; dontHave?: () => void; addPhoto?: (dataUrl: string) => void }) {
+export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto, removePhoto }: { food: Food; target: number | null; fit: "high" | "mid" | "low"; close: () => void; review?: () => void; dontHave?: () => void; addPhoto?: (dataUrl: string) => void; removePhoto?: (index: number) => void }) {
   const [view, setView] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const gallery = food.photos?.length ? food.photos : food.photo ? [food.photo] : [];
@@ -57,6 +57,9 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto 
         <div className="photo-view" onClick={(e) => { e.stopPropagation(); setView(null); }}>
           <img src={view} alt="" />
           <span>Tap to close</span>
+          {removePhoto && (
+            <button className="pill pill-small photo-remove" onClick={(e) => { e.stopPropagation(); const i = gallery.indexOf(view); if (i >= 0) removePhoto(i); setView(null); }}>Remove this photo</button>
+          )}
         </div>
       )}
     </div>

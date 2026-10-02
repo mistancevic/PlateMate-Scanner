@@ -988,6 +988,16 @@ export default function App() {
       notify("Photo added.");
     },
     openFoodId, clearOpenFood: () => setOpenFoodId(null),
+    removeFoodPhoto: (foodId: string, index: number) => {
+      setState((s) => ({ ...s, foods: s.foods.map((f) => {
+        if (f.id !== foodId) return f;
+        const gallery = f.photos?.length ? f.photos : f.photo ? [f.photo] : [];
+        const rest = gallery.filter((_, i) => i !== index);
+        // the picture follows the first remaining photo, or goes back to the icon
+        return { ...f, photos: rest.length ? rest : undefined, photo: index === 0 || !rest.length ? (rest[0] || undefined) : f.photo };
+      }) }));
+      notify("Photo removed.");
+    },
     mergeInLibrary: (keepId: string, otherId: string, name: string) => {
       setState((s) => {
         const keep = s.foods.find((x) => x.id === keepId), other = s.foods.find((x) => x.id === otherId);

@@ -503,3 +503,4 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .dup-row.on { border-color: var(--brand); background: var(--tint); }
 .dup-text { flex: 1; min-width: 0; } .dup-text b { display: block; font-size: 14px; } .dup-text small { color: var(--muted); font-size: 12px; }
 .dup-pick { font-size: 12px; font-weight: 800; color: var(--brand-text); flex: none; }
+.photo-remove { background: rgba(255,255,255,.12) !important; color: #fff !important; border-color: rgba(255,255,255,.3) !important; }

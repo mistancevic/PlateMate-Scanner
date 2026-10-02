@@ -18,8 +18,10 @@ const seed = JSON.parse(fs.readFileSync(require("node:path").resolve(__dirname, 
   const n = await page.locator(".g-thumb").count(); console.log(n === 3 ? "ok   the picture plus two added photos" : "FAIL gallery has " + n); if (n !== 3) process.exitCode = 1;
   await page.locator(".g-thumb").first().click(); await page.waitForTimeout(300);
   console.log("full view open:", await page.locator(".photo-view").count());
+  await page.getByRole("button", { name: "Remove this photo" }).click(); await page.waitForTimeout(400);
+  const left = await page.locator(".g-thumb").count();
+  console.log(left === 2 ? "ok   a photo can be removed" : "FAIL remove left " + left); if (left !== 2) process.exitCode = 1;
   
-  await page.locator(".photo-view").click(); await page.waitForTimeout(200);
   
   console.log(errs.length ? "errors: " + errs : "no page errors");
   await b.close(); server.kill();
