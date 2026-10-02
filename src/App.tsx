@@ -1039,10 +1039,10 @@ export default function App() {
         .reduce((s, f) => s + f.meal.items.reduce((t, i) => t + ((i.food.calories ?? 0) * i.grams) / 100, 0), 0);
     })(),
     dayName: personal.dayMode === "follow" ? ({ rest: "Rest day", normal: "Normal day", training: "Training day", active: "Very active day" } as Record<string, string>)[dayType] ?? "Today" : "Today",
-    tipGoalKey: `${goal?.band ?? "none"}|${pdRef ?? "none"}`,
+    tipGoalKey: `${goal?.band ?? "none"}|${pdRef ?? "none"}|pb1`,
     requestTip: async (foodId: string) => {
       const f = state.foods.find((x) => x.id === foodId); if (!f) return;
-      const key = `${goal?.band ?? "none"}|${pdRef ?? "none"}`;
+      const key = `${goal?.band ?? "none"}|${pdRef ?? "none"}|pb1`;
       const { jobOf } = await import("./foodjob");
       const band = bandOf(goal?.band);
       const res = await api("/api/tip", {

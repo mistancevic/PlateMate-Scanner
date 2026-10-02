@@ -179,6 +179,15 @@ function GoalPanel(p: AppApi) {
         <p><b>Protein.</b> Per kg of your weight: 1.2 to 1.6 g for adults, 1.6 to 2.2 g if you train, build or cut. It stays the same on rest days; the energy moves.</p>
         <small>Sources: Mifflin et al. 1990; Katch and McArdle; standard activity multipliers; US Dietary Guidelines 2025–2030; ISSN position stand 2017; Morton et al. 2018.</small>
       </section>
+      <p className="label">How Mealan judges a food</p>
+      <section className="card explain">
+        <p><b>Before decides after.</b> Code works out what a food suits before Mealan writes a word, and Mealan has to follow it. A tip that breaks a rule is sent back; if it breaks again, the rule writes the tip itself.</p>
+        <p><b>Before training.</b> Only foods with at most 10 g fat and 6 g fibre per 100 g: they digest fast enough not to sit in the stomach while you lift.</p>
+        <p><b>After training.</b> A protein base, with or without carbs next to it.</p>
+        <p><b>Flavour foods and fat sources.</b> A small part of a plate a protein base carries. Never on their own, never "for energy".</p>
+        <p><b>Caveats.</b> Only from fixed values per 100 g: fat above 17.5 g, saturates above 5 g, sugars above 22.5 g, salt above 1.5 g. Said as a fact, never as a judgement.</p>
+        <small>Sources: UK Food Standards Agency front-of-pack values; ISSN position stand on nutrient timing, 2017.</small>
+      </section>
       <GoalHistory log={p.goalLog} />
     </>
   );

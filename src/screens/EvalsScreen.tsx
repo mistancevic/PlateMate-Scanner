@@ -5,6 +5,7 @@ import goldenRaw from "../../evals/swap-golden.json?raw";
 import libraryRaw from "../../evals/library.json?raw";
 import tipRaw from "../../evals/tip-cases.json?raw";
 import { jobOf } from "../foodjob";
+import { playbookFor, tipBreaks } from "../playbook";
 import { density } from "../pilot";
 import { rankSwaps, sameFood } from "../swaps";
 import { uid, type Food, type Ingredient } from "../pilot";
@@ -73,6 +74,8 @@ async function runTip(t: T): Promise<Result> {
     "no grams or portions": !/\b\d+\s?(g|grams?|gram)\b/i.test(tip),
     "numbers only from the data": numbers.every((n) => allowed.has(n) || allowed.has(String(Number(n)))),
     "foods named are in the library": (data.pairs ?? []).every((n: string) => LIB.some((x) => x.name === n)),
+    "follows the playbook": tipBreaks(tip, playbookFor(f)).length === 0,
+    "written by Mealan, not the fallback": data.by !== "playbook",
     "under 8 seconds": ms < 8000,
   };
   return { at: new Date().toISOString(), ms, output: data, checks };

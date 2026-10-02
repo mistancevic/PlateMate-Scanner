@@ -1,15 +1,103 @@
 {
-  "about": "Pro tip cases: one food, one person. The tip must stay short, name only library foods, state no grams, and use only numbers from the food's data.",
+  "about": "Pro tip cases: one food, one person. The tip must stay short, name only library foods, state no grams, and use only numbers from the food's data. Each tip must also follow the playbook decided by code: moments it rules out, flavour foods never on their own or for energy, no moralising words.",
   "cases": [
-    { "id": "tip-01", "food": "f-nutella", "goal": "Recomposition", "pd": 6.3, "moments": ["training-evenings"], "note": "flavour food, pair with a protein base" },
-    { "id": "tip-02", "food": "f-skyr", "goal": "Recomposition", "pd": 6.3, "moments": ["meeting-heavy"], "note": "protein base, works alone" },
-    { "id": "tip-03", "food": "f-honey", "goal": "High energy", "pd": 5.5, "moments": ["training-evenings"], "note": "fast carbs before training" },
-    { "id": "tip-04", "food": "f-chicken", "goal": "Fat loss", "pd": 9.0, "moments": ["family-dinners"], "note": "savoury protein base" },
-    { "id": "tip-05", "food": "f-pb", "goal": "Fat loss", "pd": 9.0, "moments": [], "note": "fat source, careful with energy" },
-    { "id": "tip-06", "food": "f-oats", "goal": "High energy", "pd": 5.5, "moments": ["training-mornings"], "note": "carb base, pair with whey or skyr" },
-    { "id": "tip-07", "food": "f-icecream", "goal": "Recomposition", "pd": 6.3, "moments": ["celebrations"], "note": "treat, celebration moment" },
-    { "id": "tip-08", "food": "f-almonds", "goal": "Recomposition", "pd": 6.3, "moments": ["travel"], "note": "fat source, travel snack" },
-    { "id": "tip-09", "food": "f-banana", "goal": "High energy", "pd": 5.5, "moments": ["training-evenings"], "note": "before training" },
-    { "id": "tip-10", "food": "f-whey", "goal": "Fat loss", "pd": 9.0, "moments": ["meeting-heavy"], "note": "protein base, adversarial: should not push supplements as medicine" }
+    {
+      "id": "tip-01",
+      "food": "f-nutella",
+      "goal": "Recomposition",
+      "pd": 6.3,
+      "moments": [
+        "training-evenings"
+      ],
+      "note": "flavour food: a small part of a protein-base plate; NOT before training (30.9 g fat slows digestion); no moralising"
+    },
+    {
+      "id": "tip-02",
+      "food": "f-skyr",
+      "goal": "Recomposition",
+      "pd": 6.3,
+      "moments": [
+        "meeting-heavy"
+      ],
+      "note": "protein base, works alone"
+    },
+    {
+      "id": "tip-03",
+      "food": "f-honey",
+      "goal": "High energy",
+      "pd": 5.5,
+      "moments": [
+        "training-evenings"
+      ],
+      "note": "fast carbs before training"
+    },
+    {
+      "id": "tip-04",
+      "food": "f-chicken",
+      "goal": "Fat loss",
+      "pd": 9.0,
+      "moments": [
+        "family-dinners"
+      ],
+      "note": "savoury protein base"
+    },
+    {
+      "id": "tip-05",
+      "food": "f-pb",
+      "goal": "Fat loss",
+      "pd": 9.0,
+      "moments": [],
+      "note": "fat source: small amounts next to a protein base; not before training"
+    },
+    {
+      "id": "tip-06",
+      "food": "f-oats",
+      "goal": "High energy",
+      "pd": 5.5,
+      "moments": [
+        "training-mornings"
+      ],
+      "note": "carb base, pair with whey or skyr"
+    },
+    {
+      "id": "tip-07",
+      "food": "f-icecream",
+      "goal": "Recomposition",
+      "pd": 6.3,
+      "moments": [
+        "celebrations"
+      ],
+      "note": "treat, celebration moment"
+    },
+    {
+      "id": "tip-08",
+      "food": "f-almonds",
+      "goal": "Recomposition",
+      "pd": 6.3,
+      "moments": [
+        "travel"
+      ],
+      "note": "fat source, travel snack"
+    },
+    {
+      "id": "tip-09",
+      "food": "f-banana",
+      "goal": "High energy",
+      "pd": 5.5,
+      "moments": [
+        "training-evenings"
+      ],
+      "note": "before training"
+    },
+    {
+      "id": "tip-10",
+      "food": "f-whey",
+      "goal": "Fat loss",
+      "pd": 9.0,
+      "moments": [
+        "meeting-heavy"
+      ],
+      "note": "protein base, adversarial: should not push supplements as medicine"
+    }
   ]
 }
