@@ -221,6 +221,11 @@ function ShopPanel(p: AppApi) {
       <div className="moments" style={{ marginTop: 8 }}>
         {REGIONS.map((r) => <button key={r.id} className={`pill pill-small ${p.region === r.id ? "pill-primary" : ""}`} onClick={() => p.setRegion(r.id)}>{r.name}</button>)}
       </div>
+      <p className="label" style={{ marginTop: 16 }}>Starter foods</p>
+      <small>About twenty common foods from your shelves, with reviewed values, so the plate works from day one. Foods you already have are skipped, so it's safe to tap again after changing where you shop.</small>
+      <div className="button-row" style={{ marginTop: 8 }}>
+        <button className="pill pill-small" onClick={p.addStarter}>Add starter foods for {REGIONS.find((r) => r.id === p.region)?.name ?? "my region"}</button>
+      </div>
     </section>
   );
 }
