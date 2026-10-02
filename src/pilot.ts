@@ -8,7 +8,7 @@ export const KEYS: Nutrient[] = [
   "fiber",
   "protein",
 ];
-export const MACROS = ["protein", "fats", "carbs", "fiber"] as const;
+export const MACROS = ["fats", "carbs", "fiber", "protein"] as const; // label order, wherever all of them are shown
 export const LABELS = {
   calories: "Energy",
   protein: "Protein",

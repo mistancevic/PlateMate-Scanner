@@ -9,6 +9,7 @@ steps:
       - --build-arg=VITE_FIREBASE_PROJECT_ID=${_FB_PROJECT_ID}
       - --build-arg=VITE_FIREBASE_APP_ID=${_FB_APP_ID}
       - --build-arg=VITE_FIREBASE_DB_ID=${_FB_DB_ID}
+      - --build-arg=VITE_COMMIT=${_COMMIT}
       - .
 images:
   - ${_IMAGE}

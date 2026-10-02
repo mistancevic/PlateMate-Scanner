@@ -317,6 +317,7 @@ function AboutPanel() {
       <p className="small">Mealan fits the food you want to the goal you have. The numbers come from code; the model reads labels, menus and shelves; you and your coach decide.</p>
       <p className="small">Pilot. Barcode data from Open Food Facts; label values are estimates, check the package. Your data sits in the EU, under your account.</p>
       <p className="small">hello@chefmealan.com</p>
+      <p className="small">Version {(import.meta.env.VITE_COMMIT as string | undefined) || "preview"}</p>
     </section>
   );
 }
