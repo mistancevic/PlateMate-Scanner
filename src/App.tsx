@@ -199,7 +199,8 @@ function Mealan({
     </section>
   );
 }
-function FoodEditor({
+// The label check: the model read it, the person checks it against the pack, then saves. Named after the person's job.
+function LabelCheck({
   food,
   image,
   images,
@@ -314,7 +315,7 @@ function FoodEditor({
     else finish(f);
   }
   return (
-    <Modal title="Review food data" close={close}>
+    <Modal title="Check the label" close={close}>
       {images && images.length > 1 ? (
         <div className="label-previews" aria-label="Your photos of this product">
           {images.map((src, i) => (
@@ -1457,7 +1458,7 @@ export default function App() {
         </div>
       )}
       {edit && (
-        <FoodEditor
+        <LabelCheck
           key={edit.id}
           food={edit}
           image={image}
