@@ -9,6 +9,9 @@ export type LogEvent =
   | "out"            // chat with Mealan; data.picks, data.pd
   | "pd_unit"        // data.unit = pd | pct
   | "plate_question" // a question at the plate; data.q, data.plate, data.n or data.applied
+  | "mix_tip"        // a mix tip shown on a food card; data.food, data.moment, data.case, data.offered
+  | "mix_taken"      // a mix chip tapped; data.food, data.moment, data.partners, data.kind, data.pd, data.kcal
+  | "mix_ask"        // "Not quite? Tell Mealan" from a mix tip
   | "meal_saved"
   | "feedback";      // data.status
 const KEY = "chefmealan-log";

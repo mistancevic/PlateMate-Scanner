@@ -43,7 +43,9 @@ import { getPersonal, setPersonal as storePersonal, calculate, dayFactor, getDay
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
-import { momentTarget, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
+import { mixTip, mixLabel, type Mix, type MixTip } from "./mixtip";
+import { jobOf, PORTION } from "./foodjob";
+import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
 import { Home, CircleUser, Menu, Users } from "lucide-react";
@@ -492,6 +494,7 @@ export default function App() {
     [profileReady, setProfileReady] = useState(false),
     [talkTurns, setTalkTurns] = useState<Turn[]>([]),
     [mealanAsk, setMealanAsk] = useState(0),
+    [mixQuestion, setMixQuestion] = useState<string | null>(null),
     [camera, setCamera] = useState(false),
     [mode, setModeState] = useState<ScannerMode>(() => { try { return (localStorage.getItem("chefmealan-scan-mode") as ScannerMode) || "group"; } catch { return "group"; } }),
     [busy, setBusy] = useState(""),
@@ -1151,6 +1154,34 @@ export default function App() {
     openOut: () => setTalkOpen(true),
     closeOut: () => setTalkOpen(false),
     mealanAsk, mealanAsked: () => setMealanAsk(0),
+    mixFor: (food: Food) => {
+      const tags = new Set(REGIONS.find((r) => r.id === (region ?? "elsewhere"))?.tags ?? ["*"]);
+      const starter = STARTER_FOODS.filter((f) => (STARTER_REGION[f.id] ?? ["*"]).some((t) => tags.has(t)));
+      const share = todayKcal === null ? null : Math.round(todayKcal * momentKcalShare(moment));
+      return mixTip(food, moment, pdRef, state.foods, starter, share);
+    },
+    takeMix: (food: Food, mix: Mix) => {
+      // the partners enter the library if they came from the starter set; the plate becomes the mix, amounts as solved
+      log("mix_taken", { food: food.name, moment, partners: mix.partners.map((p) => p.name), kind: mix.kind, pd: Math.round(mix.pd * 10) / 10, kcal: mix.kcal, fromStarter: mix.fromStarter });
+      setState((s) => {
+        const have = new Set(s.foods.map((f) => f.name.trim().toLowerCase()));
+        const added = mix.partners.filter((p) => !have.has(p.name.trim().toLowerCase())).map((p) => ({ ...p, id: uid(), reviewedAt: new Date().toISOString() }));
+        const foods = [...s.foods, ...added];
+        const byName = (n: string) => foods.find((f) => f.name.trim().toLowerCase() === n.trim().toLowerCase());
+        const items = mix.items.map((i) => ({ ...i, food: byName(i.food.name) ?? i.food }));
+        return { ...s, foods, items, portion: null };
+      });
+      setStep("in"); setTab("journey");
+      notify(`${mixLabel(mix)}: ${mix.kind}, ${mix.kcal} kcal. Amounts set by the solver.`);
+    },
+    askAboutMix: (food: Food, tip: MixTip) => {
+      log("mix_ask", { food: food.name, moment, case: tip.case, offered: tip.mixes.map(mixLabel) });
+      const offered = tip.mixes.length ? ` You suggested ${tip.mixes.map(mixLabel).join("; ")}.` : "";
+      setMixQuestion(`I scanned ${food.name} for ${momentOf(moment).name.toLowerCase()}.${offered} What I'd change: `);
+      setState((s) => (s.items.some((i) => i.food.id === food.id) ? s : { ...s, items: [...s.items, { id: uid(), food, grams: PORTION[jobOf(food).job], locked: true } as Ingredient], portion: null }));
+      setStep("in"); setTab("journey");
+    },
+    mixQuestion, mixQuestionTaken: () => setMixQuestion(null),
     recordTalk: (q: string, reply: string, plate: string[]) => setTalkTurns((t) => [...t, { role: "you", text: q, plate }, { role: "mealan", text: reply }]),
     shareCard: (id: string, reason: "look" | "ok" | "help") => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, shared: { reason, at: new Date().toISOString() } } : f)) }));

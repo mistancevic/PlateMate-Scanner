@@ -8,11 +8,11 @@ import { log } from "../log";
 type Suggestion = { action: "add" | "swap" | "amount"; food: string; replaces: string | null; grams: number | null; calories: number | null; protein: number | null; why: string; known: boolean };
 
 // Help inside the plate: ask about it, get up to three actions, tap one. Closing leaves the plate as it was, plus what you tapped.
-export function PlateHelper({ items, library, pdRef, cap, missing, apply, close, setError, openTalk, record }: {
-  items: Ingredient[]; library: Food[]; pdRef: number | null; cap: number | null; missing?: Ingredient | null;
+export function PlateHelper({ items, library, pdRef, cap, missing, prefill, apply, close, setError, openTalk, record }: {
+  items: Ingredient[]; library: Food[]; pdRef: number | null; cap: number | null; missing?: Ingredient | null; prefill?: string;
   apply: (next: Ingredient[], note: string) => void; close: () => void; setError: (m: string) => void; openTalk?: () => void; record?: (q: string, reply: string, plate: string[]) => void;
 }) {
-  const [q, setQ] = useState(missing ? `I don't have ${missing.food.name}. What instead?` : "");
+  const [q, setQ] = useState(prefill ?? (missing ? `I don't have ${missing.food.name}. What instead?` : ""));
   const [busy, setBusy] = useState(false);
   const [reply, setReply] = useState("");
   const [sugs, setSugs] = useState<Suggestion[]>([]);

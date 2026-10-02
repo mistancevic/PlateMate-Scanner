@@ -94,6 +94,12 @@ export interface AppApi {
   closeOut: () => void;
   mealanAsk: number;
   mealanAsked: () => void;
+  // the mix tip on a food card: code decides, the plate takes it, the helper hears what was wrong
+  mixFor: (food: import("../pilot").Food) => import("../mixtip").MixTip;
+  takeMix: (food: import("../pilot").Food, mix: import("../mixtip").Mix) => void;
+  askAboutMix: (food: import("../pilot").Food, tip: import("../mixtip").MixTip) => void;
+  mixQuestion: string | null;
+  mixQuestionTaken: () => void;
   recordTalk: (q: string, reply: string, plate: string[]) => void;
   shareCard: (id: string, reason: "look" | "ok" | "help") => void;
   user: import("../cloud").CloudUser | null;

@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
-import { Camera } from "lucide-react";
+import { Camera, MessageCircle } from "lucide-react";
+import { mixLabel, type Mix, type MixTip } from "../mixtip";
+import { log } from "../log";
 import { density, type Food } from "../pilot";
 import { displayRows } from "../labeltable";
 import { useEffect } from "react";
@@ -7,7 +9,7 @@ import { JOBS, jobOf, plainLine, todayLine } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { iconFor } from "../icons";
 
-export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto, removePhoto, toggleFavorite, insight }: { food: Food; target: number | null; fit: "high" | "mid" | "low"; close: () => void; review?: () => void; dontHave?: () => void; addPhoto?: (dataUrl: string) => void; removePhoto?: (index: number) => void; toggleFavorite?: () => void; insight?: { dayKcal: number | null; eaten: number; dayName: string; goalKey: string; requestTip: () => Promise<void>; setJob: (job: string | null) => void } }) {
+export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto, removePhoto, toggleFavorite, insight, mix }: { food: Food; target: number | null; fit: "high" | "mid" | "low"; close: () => void; review?: () => void; dontHave?: () => void; mix?: { tip: MixTip; momentName: string; take: (m: Mix) => void; ask: () => void }; addPhoto?: (dataUrl: string) => void; removePhoto?: (index: number) => void; toggleFavorite?: () => void; insight?: { dayKcal: number | null; eaten: number; dayName: string; goalKey: string; requestTip: () => Promise<void>; setJob: (job: string | null) => void } }) {
   const job = jobOf(food);
   const [picking, setPicking] = useState(false);
   const [tipState, setTipState] = useState<"idle" | "busy" | "failed">("idle");
@@ -19,6 +21,12 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
     insight.requestTip().then(() => setTipState("idle")).catch(() => setTipState("failed"));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [food.id, tipFresh]);
+  // the mix tip shown is logged once per card, on whichever screen the card opened
+  useEffect(() => {
+    if (!mix || mix.tip.case === "fits" || mix.tip.case === "unknown") return;
+    log("mix_tip", { food: food.name, moment: mix.momentName, case: mix.tip.case, offered: mix.tip.mixes.map((m) => ({ partners: m.partners.map((x) => x.name), kind: m.kind, pd: Math.round(m.pd * 10) / 10, kcal: m.kcal })) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [food.id, mix?.momentName]);
   const [view, setView] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const gallery = food.photos?.length ? food.photos : food.photo ? [food.photo] : [];
@@ -64,6 +72,19 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
           </div>
         </section>
         <p className="insight">{plainLine(food, target)}</p>
+        {mix && mix.tip.case !== "fits" && mix.tip.case !== "unknown" && (
+          <section className="mix-tip">
+            <div className="mix-head"><span className="pro-badge">Mix it</span><small>{mix.momentName}: {mix.tip.why}</small></div>
+            {mix.tip.mixes.length === 0 && <p className="muted">Nothing in your foods or the starter set gets there with this one.</p>}
+            {mix.tip.mixes.map((m) => (
+              <button key={m.id} className="mix-chip" onClick={() => mix.take(m)}>
+                <b>{mixLabel(m)}</b>
+                <small>{pdText(m.pd)} · {m.kcal} kcal · {m.kind}{m.cooking ? " · cooking" : ""}{m.fromStarter.length ? " · from the starter set" : ""}</small>
+              </button>
+            ))}
+            <button className="link" onClick={mix.ask}><MessageCircle size={14} /> Not quite? Tell Mealan</button>
+          </section>
+        )}
         {insight && (() => { const t = todayLine(food, insight.dayKcal, insight.eaten, insight.dayName); return t ? <p className="insight insight-today">{t}</p> : null; })()}
         {insight && (
           <section className="pro-tip">
