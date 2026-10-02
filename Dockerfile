@@ -1,6 +1,8 @@
 # Chef Mealan, production image: build the app and the server, run the server.
 FROM node:22-slim AS build
 WORKDIR /app
+# quiet npm in the build log: no "new version available" notice, no audit or funding lines; the installed packages are pinned by the lockfile
+ENV NPM_CONFIG_UPDATE_NOTIFIER=false NPM_CONFIG_FUND=false NPM_CONFIG_AUDIT=false
 COPY package*.json ./
 RUN npm ci
 COPY . .
