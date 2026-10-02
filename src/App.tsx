@@ -44,7 +44,8 @@ import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, type Mix, type MixTip } from "./mixtip";
-import { jobOf, PORTION } from "./foodjob";
+import { jobOf, PORTION, todayLine } from "./foodjob";
+import { playbookFor } from "./playbook";
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
@@ -209,6 +210,8 @@ function FoodEditor({
   onMix,
   onAsk,
   momentName,
+  target,
+  day,
 }: {
   food: Food;
   image?: string;
@@ -220,6 +223,8 @@ function FoodEditor({
   onMix?: (f: Food, m: Mix) => void;
   onAsk?: (f: Food, tip: MixTip) => void;
   momentName?: string;
+  target?: number | null;
+  day?: { kcal: number | null; eaten: number; name: string };
 }) {
   const [mainIdx, setMainIdx] = useState(0);
   const [choice, setChoice] = useState<"update" | "both">("update");
@@ -250,13 +255,22 @@ function FoodEditor({
   // readyToEat is true for the tip: the box starts unticked because it is unconfirmed, not because the food needs cooking
   const draft = (): Food => ({ ...food, name: name.trim() || food.name, brand: brand.trim(), readyToEat: true, ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])) } as Food);
   const pendingMix = useRef<Mix | null>(null);
-  const pendingAsk = useRef<MixTip | null>(null);
+  const [askError, setAskError] = useState("");
   // the mix tip shown on the review sheet is logged once per food
   const loggedTip = useRef<string | null>(null);
   function noteTip(tip: MixTip, d: Food) {
     if (loggedTip.current === food.id || tip.case === "fits" || tip.case === "unknown") return;
     loggedTip.current = food.id;
     log("mix_tip", { food: d.name, where: "review", moment: momentName, case: tip.case, offered: tip.mixes.map((m) => ({ partners: m.partners.map((x) => x.name), kind: m.kind, pd: Math.round(m.pd * 10) / 10, kcal: m.kcal })) });
+  }
+  // Tell Mealan from the sheet: the food goes in with what is typed (name, energy, protein), unreviewed, so the conversation can start now
+  function askNow(tip: MixTip) {
+    const f = { ...draft(), readyToEat: ready, notes, icon: food.icon || iconFor(name.trim() || food.name) } as Food;
+    const e = validateFood(f);
+    setAskError(e[0] ?? "");
+    if (e.length || !onAsk) return;
+    save(f);
+    onAsk(f, tip);
   }
   function submit() {
     const f = {
@@ -290,8 +304,6 @@ function FoodEditor({
       save(saved);
       const m = pendingMix.current; pendingMix.current = null;
       if (m && onMix) onMix(saved, m);
-      const a = pendingAsk.current; pendingAsk.current = null;
-      if (a && onAsk) onAsk(saved, a);
     };
     const raw = (images && images.length ? images : image ? [image] : []);
     const all = raw.length > 1 ? [raw[mainIdx] ?? raw[0], ...raw.filter((_, i) => i !== mainIdx)] : raw;
@@ -355,6 +367,27 @@ function FoodEditor({
           );
         })}
       </div>
+      {(() => {
+        const d = draft();
+        if (d.calories === null || d.protein === null) return null;
+        const pb = playbookFor(d), pd = density(d.protein, d.calories);
+        const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
+        // on its own: the playbook's word, and the number against this plate's target; under the target is never green
+        const under = target != null && pd !== null && pd < target;
+        const ownText = !pb.alone.ok ? cap(pb.alone.reason) : under ? `Under your ${fixed(target!)}: pair it with a protein base to get there` : target != null ? `On your ${fixed(target)}. ${cap(pb.alone.reason)}` : cap(pb.alone.reason);
+        const ownClass = !pb.alone.ok ? "no" : under ? "mid" : "ok";
+        const t = day ? todayLine(d, day.kcal, day.eaten, day.name) : null;
+        return (
+          <section className="fit-lines" aria-label="How it fits">
+            <p className="label">How it fits</p>
+            <p className={`fit-line ${ownClass}`}><b>On its own:</b> {ownText}.</p>
+            <p className={`fit-line ${pb.beforeTraining.ok ? "ok" : "no"}`}><b>Before training:</b> {cap(pb.beforeTraining.reason)}.</p>
+            <p className={`fit-line ${pb.afterTraining.ok ? "ok" : "no"}`}><b>After training:</b> {cap(pb.afterTraining.reason)}.</p>
+            {pb.caveats.length > 0 && <p className="fit-line no"><b>Label:</b> {cap(pb.caveats.join(", "))}.</p>}
+            {t && <p className="fit-line today">{t}</p>}
+          </section>
+        );
+      })()}
       {adding ? (
         <div className="lt-add">
           <select value={addKey} onChange={(e) => setAddKey(e.target.value)} aria-label="Which line">
@@ -431,7 +464,8 @@ function FoodEditor({
               </button>
             ))}
             <p className="small">A tap saves the food and puts the mix on the plate.</p>
-            {onAsk && <button className="link" onClick={() => { pendingAsk.current = tip; submit(); }}><MessageCircle size={14} /> Not quite? Tell Mealan</button>}
+            {onAsk && <button className="link" onClick={() => askNow(tip)}><MessageCircle size={14} /> Not quite? Tell Mealan</button>}
+            {askError && <p className="notice">{askError}</p>}
           </section>
         );
       })()}
@@ -1434,6 +1468,8 @@ export default function App() {
           mixFor={screenProps.mixFor}
           onMix={screenProps.takeMix}
           onAsk={screenProps.askAboutMix}
+          target={pdRef}
+          day={{ kcal: todayKcal, eaten: screenProps.eatenTodayKcal, name: screenProps.dayName }}
           momentName={momentOf(moment).name}
         />
       )}{" "}

@@ -542,6 +542,9 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .mix-chip:hover { border-color: var(--brand); }
 .mix-chip b { font-size: 14px; font-weight: 800; color: var(--brand-text); } .mix-chip small { color: var(--muted); font-weight: 600; }
 .mix-tip .link { align-self: flex-start; display: inline-flex; align-items: center; gap: 4px; }
+.fit-lines { margin: 4px 0 10px; } .fit-line { font-size: 13px; line-height: 1.45; margin: 0 0 4px; padding-left: 14px; position: relative; color: var(--ink); }
+.fit-line::before { content: ""; position: absolute; left: 0; top: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--mid); }
+.fit-line.ok::before { background: var(--high); } .fit-line.no::before { background: var(--low); } .fit-line.today::before { background: var(--brand); }
 .plan-source { display: inline-flex; align-items: center; gap: 2px; padding: 0; color: var(--brand-text); font-size: 12px; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
 .day-line { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1.5px solid #b9cdf1; }
 .day-line > div { display: flex; flex-direction: column; gap: 2px; }

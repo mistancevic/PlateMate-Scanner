@@ -86,7 +86,10 @@ seed.items = [];
   const names2 = await sheet2.locator(".lt-row .lt-name").allTextContents();
   const fill2 = async (re, v) => { const i = names2.findIndex((n) => re.test(n)); await sheet2.locator(".lt-row input").nth(i).fill(v); };
   await fill2(/Energ/i, "500"); await fill2(/^Fat|Fett/i, "25"); await fill2(/Carb|Kohlen/i, "60"); await fill2(/Protein|Eiwei/i, "6"); await page.waitForTimeout(200);
-  await sheet2.getByText(/I checked the values/).click(); await page.waitForTimeout(100);
+  const fit = await sheet2.locator(".fit-line").allTextContents();
+  ok(fit.length >= 3 && /On its own/.test(fit[0]) && /Before training/.test(fit[1]) && /After training/.test(fit[2]), "the sheet says how it fits: on its own, before and after training");
+  ok(/Under your/.test(fit[0]) && !/fit-line ok/.test(await sheet2.locator(".fit-line").first().getAttribute("class")), "on its own: under the target, said plainly and never green");
+  // Tell Mealan needs no reviewed tick: name, energy and protein are enough
   await sheet2.getByRole("button", { name: /Not quite/ }).click(); await page.waitForTimeout(800);
   const q2 = await page.locator("input[placeholder^=\"What goes with\"]").first().inputValue().catch(() => "");
   ok(/I scanned Shop wafer/.test(q2), "Tell Mealan on the sheet saves the food and opens the helper with the tip: " + q2.slice(0, 40));
