@@ -1,4 +1,3 @@
-import { lineTotal } from "../labeltable";
 import { useState, useEffect } from "react";
 import { Camera, ScanBarcode, Plus, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
 import { aggregate, density, uid, solveIngredient } from "../pilot";
@@ -289,13 +288,7 @@ export function JourneyScreen(p: AppApi) {
             <div><span>{unreal ? "not realistic" : onPlan ? `on plan, target ${pdVal(pdRef)}` : `target ${fixed(pdRef)}`}</span><small>{fmt(ot.calories, 0)} kcal{share !== null ? `, ${share} % of your day` : ""} · {fmt(ot.protein)} g protein · {fmt(ot.weight, 0)} g</small></div>
           </div>
           {unreal && <p className="readout-note">{unrealText}</p>}
-          {(() => {
-            // for information: totals of lines the labels print, only for the foods that have them
-            const items = shown.map((x) => ({ food: x.food, grams: x.grams }));
-            const parts = ([["sugars", "sugars"], ["saturates", "saturates"], ["salt", "salt"]] as const)
-              .map(([k, word]) => { const t = lineTotal(items, k); return t === null ? null : `${fmt(t, 1)} g ${word}`; }).filter(Boolean);
-            return parts.length ? <p className="readout-info">{parts.join(" · ")}, from the labels that print them</p> : null;
-          })()}
+          {extras(shown.map((x) => ({ food: x.food, grams: x.grams })))}
         </section>
         <div className="rows">
           {shown.map((i) => (

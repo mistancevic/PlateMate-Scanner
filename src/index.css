@@ -518,5 +518,3 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .label-table-read .lt-row { grid-template-columns: 1fr auto 34px; padding: 8px 12px; } .lt-val { font-size: 15px; text-align: right; }
 .readout-extra { display: block; margin-top: 8px; opacity: .9; font-size: 12px; font-weight: 700; }
 .lt-add-row select { width: 90px; } .lt-add-row input { width: 120px; }
-.card-table { margin-bottom: 12px; } .lt-view { grid-template-columns: 1fr auto; padding: 8px 12px; } .lt-val { font-size: 15px; }
-.readout-info { margin: 8px 0 0; font-size: 12px; font-weight: 700; opacity: .85; }
