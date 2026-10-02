@@ -1,11 +1,12 @@
 /** Versioned pilot contract: numbers are unrounded; null means unknown. */
 export type Nutrient = "calories" | "protein" | "fats" | "carbs" | "fiber";
+// the order printed on European labels, so checking against the pack goes line by line
 export const KEYS: Nutrient[] = [
   "calories",
-  "protein",
   "fats",
   "carbs",
   "fiber",
+  "protein",
 ];
 export const MACROS = ["protein", "fats", "carbs", "fiber"] as const;
 export const LABELS = {

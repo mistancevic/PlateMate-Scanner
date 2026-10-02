@@ -43,10 +43,10 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto 
         </section>
         <div className="nut-grid">
           <div><b>{fmt(food.calories, 0)}</b><small>kcal</small></div>
-          <div><b>{fmt(food.protein)}</b><small>g protein</small></div>
           <div><b>{fmt(food.fats)}</b><small>g fat</small></div>
           <div><b>{fmt(food.carbs)}</b><small>g carbs</small></div>
           <div><b>{fmt(food.fiber)}</b><small>g fibre</small></div>
+          <div><b>{fmt(food.protein)}</b><small>g protein</small></div>
         </div>
         <p className="small">Role in a recipe: {role(pd)}.</p>
         <p className="small">{food.readyToEat ? "Ready to eat as it is." : "Needs preparation before eating."} Values from the {food.source === "label" ? "label" : food.source}, check your package.</p>

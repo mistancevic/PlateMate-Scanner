@@ -703,10 +703,12 @@ export default function App() {
   };
   function blank(name = "", brand = "") {
     setImage("");
+    setImageSet([]);
     setEdit(candidateFood({ product_name: name, brand }, "Manual entry"));
   }
   function saveFood(f: Food) {
     const existed = state.foods.some((x) => x.id === f.id);
+    setImage(""); setImageSet([]);
     setState((s) => ({
       ...s,
       foods: s.foods.some((x) => x.id === f.id)
@@ -800,6 +802,7 @@ export default function App() {
     setCamera(false);
     setError("");
     setImage("");
+    setImageSet([]);
     try {
       const local = state.foods.find((f) => f.barcode === code.trim());
       if (local) {
