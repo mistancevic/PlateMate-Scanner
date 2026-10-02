@@ -4,14 +4,17 @@ import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
 import { bandOf } from "../goal";
 import { DAY_TYPES } from "../personal";
+import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
+import { Dumbbell, Check, X } from "lucide-react";
 import type { AppApi } from "./api";
 
 export function HomeScreen(p: AppApi) {
   const { state, setTab, setStep, pdRef, setCamera, setMode, clientName, goal } = p;
   const bandName = goal?.band ? bandOf(goal.band)?.name : null;
   const setBy = goal?.setBy === "coach" ? (goal.coachName || p.profile.coachName || COACH_NAME) : "you";
-  const last = state.meals[0];
-  const lastT = last ? aggregate(last.items) : null;
+  const today = dayLog(state.feedback, new Date());
+  const past = [1, 2].map((n) => dayLog(state.feedback, daysAgo(n)));
+  const trained = p.dayType === "training" || p.dayType === "very";
   return (
     <>
       <section className="plan">
@@ -26,6 +29,9 @@ export function HomeScreen(p: AppApi) {
             <small>Today is</small>
             {DAY_TYPES.map((d) => <button key={d.id} className={`pill pill-small ${p.dayType === d.id ? "pill-primary" : ""}`} onClick={() => p.setDayType(d.id)}>{d.name}</button>)}
           </div>
+        )}
+        {p.personal.dayMode === "follow" && (
+          <button className={`pill pill-small trained ${trained ? "pill-primary" : ""}`} onClick={p.trainedToday} aria-pressed={trained}><Dumbbell size={14} /> {trained ? "Trained today" : "Trained today?"}</button>
         )}
       </section>
       {p.inbox.map((it) => (
@@ -52,16 +58,39 @@ export function HomeScreen(p: AppApi) {
       <button className="pill pill-tall" onClick={() => setTab("foods")}>
         <BookOpen size={20} /> My foods
       </button>
-      {last && lastT && (
-        <section className="card">
-          <div className="card-top"><span>Last time</span><span>{new Date(last.savedAt).toLocaleDateString()}</span></div>
-          <b>{last.title}</b>
-          <small>{last.items.map((i) => `${i.food.name} ${fmt(i.grams, 0)} g`).join(" · ")} · {pdText(density(lastT.protein, lastT.calories))}</small>
-          <button className="link" onClick={() => { p.setState((s) => ({ ...s, items: structuredClone(last.items), title: last.title, portion: null })); setStep("in"); setTab("journey"); }}>
-            Make it again <ArrowRight size={14} />
-          </button>
+      <p className="label">Logged so far</p>
+      <p className="small logged-line">{loggedLine(today, true)} What went through Mealan, nothing more.</p>
+      {today.logged.map((f) => (
+        <section className="card log-card" key={f.id}>
+          <div className="card-top"><span>{f.meal.title}</span><small>{new Date(f.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small></div>
+          <small>{f.meal.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}</small>
+          {(() => { const a = aggregate(f.meal.items); return <small className="log-nums">{fmt(a.calories, 0)} kcal · {fmt(a.protein, 0)} g protein · {pdText(density(a.protein, a.calories))}</small>; })()}
         </section>
+      ))}
+      {today.prepared.length > 0 && (
+        <>
+          <p className="label">Prepared for later</p>
+          {today.prepared.map((f) => (
+            <section className="card log-card" key={f.id}>
+              <div className="card-top"><span>{f.meal.title}</span></div>
+              <small>{f.meal.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}</small>
+              <div className="button-row" style={{ marginTop: 8 }}>
+                <button className="pill pill-small pill-primary" onClick={() => p.settleCard(f.id, "eaten")}><Check size={14} /> I ate it</button>
+                <button className="pill pill-small" onClick={() => p.settleCard(f.id, "not-used")}><X size={14} /> Not today</button>
+              </div>
+            </section>
+          ))}
+        </>
       )}
+      <p className="label">The last days</p>
+      <section className="card days">
+        {past.map((d) => (
+          <div className="history-row" key={d.day.toISOString()}>
+            <div><b>{dayLabel(d.day)}</b><small>{d.dayType ? DAY_TYPES.find((x) => x.id === d.dayType)?.name ?? d.dayType : "day type not set"}</small></div>
+            <div className="history-num"><small>{loggedLine(d, false)}</small></div>
+          </div>
+        ))}
+      </section>
     </>
   );
 }

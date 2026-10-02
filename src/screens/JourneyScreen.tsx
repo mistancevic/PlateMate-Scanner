@@ -329,6 +329,10 @@ export function JourneyScreen(p: AppApi) {
           setMethod(null);
           setStep("make");
         }}>Make it</button>
+        <button className="pill pill-wide" onClick={() => {
+          p.keepForLater({ id: uid(), title: p.state.title || autoTitle(shown), items: structuredClone(shown), portion: shown.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
+          setStep("in");
+        }}>Keep for later today</button>
         {options.length > 1 && <button className="pill pill-wide" onClick={() => {
           const next = (pick + 1) % options.length; setPick(next);
           setState((s) => ({ ...s, items: options[next].items, portion: null }));

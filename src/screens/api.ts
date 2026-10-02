@@ -67,6 +67,9 @@ export interface AppApi {
   openFoodId: string | null;
   clearOpenFood: () => void;
   toggleFavorite: (foodId: string) => void;
+  keepForLater: (meal: import("../pilot").Meal) => void;
+  settleCard: (id: string, how: "eaten" | "not-used") => void;
+  trainedToday: () => void;
   setFoodJob: (foodId: string, job: string | null) => void;
   eatenTodayKcal: number;
   dayName: string;

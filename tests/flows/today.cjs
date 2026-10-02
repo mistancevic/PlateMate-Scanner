@@ -1,0 +1,31 @@
+// Today: the plan, what was logged, a card kept for later, the last days.
+const { chromium } = require("playwright");
+const { spawn } = require("node:child_process");
+const path = require("node:path"), fs = require("node:fs");
+const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "utf8"));
+const skyr = seed.foods.find((f) => /skyr/i.test(f.name));
+const card = (status, daysAgo, title) => ({ id: "c" + status + daysAgo, meal: { id: "m", title, items: [{ id: "i", food: skyr, grams: 300, locked: true }], portion: 300, savedAt: "" }, status, taste: "Good", notes: "", createdAt: new Date(Date.now() - daysAgo * 86_400_000).toISOString(), dayType: daysAgo === 1 ? "training" : undefined });
+seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening skyr"), card("eaten", 1, "Yesterday's bowl"), card("eaten", 1, "Second bowl")];
+(async () => {
+  const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT: "3193" }, stdio: ["ignore", "pipe", "pipe"] });
+  await new Promise((r) => setTimeout(r, 2500));
+  const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
+  const page = await b.newPage({ viewport: { width: 390, height: 1500 }, deviceScaleFactor: 2 });
+  const errs = []; page.on("pageerror", (e) => errs.push(e.message));
+  let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
+  await page.addInitScript((s) => { if (!localStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "follow" })); localStorage.setItem("seeded", "1"); } }, seed);
+  await page.goto("http://127.0.0.1:3193/"); await page.waitForTimeout(900);
+  const line = await page.locator(".logged-line").textContent();
+  ok(/1 meal logged, 189 kcal and 33 g protein so far/.test(line), "logged line is information: " + line.trim());
+  ok(await page.getByText("Prepared for later").count() === 1, "a prepared card waits");
+  await page.getByRole("button", { name: /I ate it/ }).click(); await page.waitForTimeout(300);
+  ok(/2 meals logged, 378 kcal/.test(await page.locator(".logged-line").textContent()), "I ate it moves it into the log");
+  const rows = await page.locator(".days .history-row").allTextContents();
+  ok(rows.length === 2 && /Yesterday/.test(rows[0]) && /Training day/.test(rows[0]) && /2 meals logged/.test(rows[0]), "yesterday: training day, 2 meals logged");
+  ok(/Nothing logged/.test(rows[1]), "two days ago: nothing logged, said plainly");
+  await page.getByRole("button", { name: /Trained today/ }).click(); await page.waitForTimeout(300);
+  ok(await page.locator(".day-row .pill-primary").textContent() === "Training day", "Trained today sets the day type");
+  await page.screenshot({ path: "/tmp/today.png", fullPage: true });
+  console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
+  await b.close(); server.kill(); process.exitCode = fail ? 1 : 0;
+})();

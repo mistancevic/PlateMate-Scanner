@@ -1053,6 +1053,16 @@ export default function App() {
       });
       setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, tip: { text: res.tip, pairs: res.pairs ?? [], goalKey: key, at: new Date().toISOString() } } : x)) }));
     },
+    keepForLater: (meal: Meal) => {
+      // a prepared card: it shows on Today until it's eaten or dropped
+      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "prepared" as const, taste: "", notes: "", createdAt: new Date().toISOString(), dayType: personal.dayMode === "follow" ? dayType : undefined } as any, ...s.feedback] }));
+      notify("Kept for later. It's on Today.");
+    },
+    settleCard: (id: string, how: "eaten" | "not-used") => {
+      setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, status: how, createdAt: how === "eaten" ? new Date().toISOString() : f.createdAt, taste: how === "eaten" ? f.taste || "Good" : f.taste } : f)) }));
+      notify(how === "eaten" ? "Logged." : "Dropped for today.");
+    },
+    trainedToday: () => { const d: DayType = dayType === "training" || dayType === "very" ? "normal" : "training"; storeDayType(d); setDayTypeState(d); notify(d === "training" ? "Training day. Your calories follow." : "Back to a normal day."); },
     toggleFavorite: (foodId: string) => {
       const f = state.foods.find((x) => x.id === foodId);
       setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, favorite: !x.favorite } : x)) }));
@@ -1095,7 +1105,9 @@ export default function App() {
         const foods = [...s.foods, ...newFoods];
         const items = (item.meal.items as Ingredient[]).map((i) => { const lib = foods.find((f) => (f.name + "|" + f.brand).toLowerCase() === (i.food.name + "|" + i.food.brand).toLowerCase()); return { id: uid(), food: lib ?? i.food, grams: i.grams, locked: true }; });
         const meal = { id: uid(), title: item.meal.title || "From your coach", items, portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
-        return how === "make" ? { ...s, foods, items, portion: null, title: meal.title } : { ...s, foods, meals: [meal, ...s.meals] };
+        return how === "make"
+          ? { ...s, foods, items, portion: null, title: meal.title }
+          : { ...s, foods, meals: [meal, ...s.meals], feedback: [{ id: uid(), meal, status: "prepared" as const, taste: "", notes: "", createdAt: new Date().toISOString() } as any, ...s.feedback] };
       });
       if (how === "make") { setStep("recipe"); setTab("journey"); }
       notify(how === "make" ? "On your plate. Fit to my target sets the amounts." : "Kept in your recipes.");

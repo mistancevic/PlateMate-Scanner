@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { RefreshCw, Copy, Target, Send, UserPlus } from "lucide-react";
+import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
+import { DAY_TYPES } from "../personal";
 import { listClients, setClientGoal, loadPhotos, sendRecipe, pinFormula, type ClientRow } from "../cloud";
 import { GoalHistory } from "./MenuScreen";
 import { uid } from "../pilot";
@@ -88,6 +90,15 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row
           </>
         )}
         <GoalHistory log={row.goalLog ?? []} />
+        <p className="label">The last days, from shared cards</p>
+        <section className="card days">
+          {[0, 1, 2].map((n) => { const d = dayLog(row.feedback as any, daysAgo(n)); return (
+            <div className="history-row" key={n}>
+              <div><b>{dayLabel(d.day)}</b><small>{d.dayType ? DAY_TYPES.find((x) => x.id === d.dayType)?.name ?? d.dayType : "day type unknown"}</small></div>
+              <div className="history-num"><small>{loggedLine(d, n === 0).replace("logged", "shared")}</small></div>
+            </div>
+          ); })}
+        </section>
         <p className="label">Shared with you ({row.feedback.length})</p>
         {row.feedback.length === 0 && <small>Nothing yet.</small>}
         {row.feedback.slice(0, 30).map((f: any) => {
