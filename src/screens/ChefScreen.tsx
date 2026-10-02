@@ -56,7 +56,7 @@ export function ChefScreen(p: AppApi) {
                   <b className="row-lead">{fmt(o.grams, 0)} g</b>
                   <div className="row-text">
                     <b>{o.food.name}</b>
-                    <small>{fmt(t.calories, 0)} kcal · {fmt(t.protein)} g · {fmt(t.weight, 0)} g whole{o.explanation ? ` · ${o.explanation}` : ""}</small>
+                    <small>{fmt(t.calories, 0)} kcal · {fmt(t.protein)} g · {fmt(t.weight, 0)} g whole{o.explanation ? ` · ${o.explanation}` : ""}</small>
                   </div>
                   <button className="pill pill-small" onClick={() => {
                     log("mix_applied", { grams: Math.round(o.grams) });

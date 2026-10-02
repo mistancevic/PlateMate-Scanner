@@ -65,7 +65,7 @@ export function MealScreen(p: AppApi) {
             />
             <div className="row-text">
               <b>{item.food.name}</b>
-              <small>{item.food.brand ? `${item.food.brand} · ` : ""}{fmt(item.food.calories, 0)} kcal · {fmt(item.food.protein)} g per 100 g</small>
+              <small>{item.food.brand ? `${item.food.brand} · ` : ""}{fmt(item.food.calories, 0)} kcal · {fmt(item.food.protein)} g per 100 g</small>
             </div>
             <label className="grams">
               <input

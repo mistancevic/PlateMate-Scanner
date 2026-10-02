@@ -192,7 +192,7 @@ export function JourneyScreen(p: AppApi) {
             <div className="readout-top"><span>As it stands</span><span>{pdTag()}</span></div>
             <div className="readout-mid">
               <b>{pdVal(pd)}</b>
-              <div><span>{pd !== null && pdRef !== null ? (pd >= pdRef ? "fits your plan" : `${fixed(pdRef - pd)} under your ${fixed(pdRef)}`) : "no target set"}</span><small>{fmt(t.calories, 0)} kcal · {fmt(t.protein)} g protein · {fmt(t.weight, 0)} g</small></div>
+              <div><span>{pd !== null && pdRef !== null ? (pd >= pdRef ? "fits your plan" : `${fixed(pdRef - pd)} under your ${fixed(pdRef)}`) : "no target set"}</span><small>{fmt(t.calories, 0)} kcal · {fmt(t.protein)} g protein · {fmt(t.weight, 0)} g</small></div>
             </div>
             {extras(items)}
           </section>
@@ -285,7 +285,7 @@ export function JourneyScreen(p: AppApi) {
           <div className="readout-top"><span>This plate</span><span>{pdTag()}</span></div>
           <div className="readout-mid">
             <b>{pdVal(opd)}</b>
-            <div><span>{unreal ? "not realistic" : onPlan ? `on plan, target ${pdVal(pdRef)}` : `target ${fixed(pdRef)}`}</span><small>{fmt(ot.calories, 0)} kcal{share !== null ? `, ${share} % of your day` : ""} · {fmt(ot.protein)} g protein · {fmt(ot.weight, 0)} g</small></div>
+            <div><span>{unreal ? "not realistic" : onPlan ? `on plan, target ${pdVal(pdRef)}` : `target ${fixed(pdRef)}`}</span><small>{fmt(ot.calories, 0)} kcal{share !== null ? `, ${share} % of your day` : ""} · {fmt(ot.protein)} g protein · {fmt(ot.weight, 0)} g</small></div>
           </div>
           {unreal && <p className="readout-note">{unrealText}</p>}
           {extras(shown.map((x) => ({ food: x.food, grams: x.grams })))}
