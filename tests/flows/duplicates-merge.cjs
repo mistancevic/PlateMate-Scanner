@@ -23,7 +23,8 @@ seed.foods = [flip("fa", "Protein Flips Salt & Vinegar Flavour", "", undefined),
   // the barcode now opens the existing card
   await page.locator(".sheet-backdrop").first().click({ position: { x: 5, y: 5 } }).catch(() => {}); await page.waitForTimeout(200);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: /^Barcode$/ }).first().click(); await page.waitForTimeout(1500);
+  await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(1500);
+  await page.getByRole("button", { name: /BARCODE/ }).click(); await page.waitForTimeout(300);
   await page.locator('input[aria-label^="Type t"]').fill("4260345270123"); await page.keyboard.press("Enter"); await page.waitForTimeout(800);
   console.log("card opened for:", await page.locator(".foodcard-head b").textContent().catch(() => "no card"));
   console.log(errs.length ? "errors: " + errs : "no page errors");

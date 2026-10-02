@@ -12,7 +12,7 @@ const seed = JSON.parse(fs.readFileSync(require("node:path").resolve(__dirname, 
   await page.addInitScript((s) => { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); }, seed);
   await page.goto("http://127.0.0.1:3182/"); await page.waitForTimeout(800);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(400);
-  await page.getByRole("button", { name: /^Photo$/ }).first().click(); await page.waitForTimeout(1500);
+  await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(1500);
   console.log("switch:", await page.locator(".auto-switch").first().textContent());
   // freeze the picture to simulate holding still: pause the video
   await page.evaluate(() => document.querySelector("video").pause());

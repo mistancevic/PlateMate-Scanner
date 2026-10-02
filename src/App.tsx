@@ -493,7 +493,7 @@ export default function App() {
     [talkTurns, setTalkTurns] = useState<Turn[]>([]),
     [mealanAsk, setMealanAsk] = useState(0),
     [camera, setCamera] = useState(false),
-    [mode, setMode] = useState<ScannerMode>("label"),
+    [mode, setModeState] = useState<ScannerMode>(() => { try { return (localStorage.getItem("chefmealan-scan-mode") as ScannerMode) || "group"; } catch { return "group"; } }),
     [busy, setBusy] = useState(""),
     [message, setMessage] = useState(""),
     [error, setError] = useState(""),
@@ -887,6 +887,8 @@ export default function App() {
       localStorage.setItem(k, JSON.stringify(done.filter((x) => !x.startsWith(`food:${foodId}`))));
     } catch { /* fine */ }
   }
+  // Scan opens the camera in the mode last used; the first time it is the group photo.
+  function setMode(m: ScannerMode) { setModeState(m); try { localStorage.setItem("chefmealan-scan-mode", m); } catch {} }
   function todayKcalOf(): number | null {
     const k = state.goals.calories ?? null;
     if (k === null || personal.dayMode !== "follow") return k;

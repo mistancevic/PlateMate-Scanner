@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { Camera, ScanBarcode, Plus, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Camera, Plus, Trash2, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
+import { ConfirmButton } from "../components/Confirm";
 import { aggregate, density, uid, solveIngredient } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
@@ -110,6 +111,11 @@ export function JourneyScreen(p: AppApi) {
     setSuggest(null);
     recalc(next);
   }
+  // Start again from nothing: the plate's foods go, the library stays.
+  function emptyPlate() {
+    setState((s) => ({ ...s, items: [], portion: null }));
+    setStep("in");
+  }
   function remove(id: string) {
     const rest = items.filter((i) => i.id !== id);
     setState((s) => ({ ...s, items: rest, portion: null }));
@@ -170,7 +176,7 @@ export function JourneyScreen(p: AppApi) {
   if (step === "in")
     return (
       <>
-        <Head title="What are you craving?" sub={`Get the products in. Then ${CHEF_NAME} works out how much of each.`} />
+        <Head title="What are you craving?" sub={`Products in, ${CHEF_NAME} does the amounts.`} />
         <p className="label">When is this for?</p>
         <div className="moments">
           {orderMoments(p.usual).map((m) => (
@@ -200,10 +206,9 @@ export function JourneyScreen(p: AppApi) {
           </section>
         )}
         <div className="ways">
-          <button className="pill pill-small" onClick={() => { setMode("group"); setCamera(true); }}><Camera size={15} /> Photo</button>
-          <button className="pill pill-small" onClick={() => { setMode("barcode"); setCamera(true); }}><ScanBarcode size={15} /> Barcode</button>
-          <button className="pill pill-small" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> Label</button>
+          <button className="pill pill-small" onClick={() => setCamera(true)}><Camera size={15} /> Scan</button>
           <button className="pill pill-small" onClick={() => blank()}><Plus size={15} /> Type it</button>
+          {items.length > 0 && <ConfirmButton className="pill pill-small ways-empty" label={<><Trash2 size={15} /> Empty plate</>} confirmLabel="Tap again to empty" onConfirm={emptyPlate} />}
         </div>
         {items.length > 0 && (
           <div className="rows">

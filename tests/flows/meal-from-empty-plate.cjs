@@ -29,6 +29,19 @@ seed.items = [];
   await step("add second food", async () => { await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300); });
   await shot("1-plate");
   console.log("items in state:", await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.length));
+  await step("one line in, two ways in", async () => {
+    const sub = page.locator(".step-head p, .step-head small").first();
+    const box = await sub.boundingBox(); if (!box || box.height > 24) throw new Error("the sub line wraps: " + (box && box.height));
+    const ways = await page.locator(".ways .pill").allTextContents(); if (ways.length !== 3 || !/Scan/.test(ways[0]) || !/Type it/.test(ways[1]) || !/Empty plate/.test(ways[2])) throw new Error("ways: " + ways.join(" | "));
+    const tops = await page.locator(".ways .pill").evaluateAll((es) => es.map((e) => Math.round(e.getBoundingClientRect().top))); if (new Set(tops).size !== 1) throw new Error("ways on more than one row: " + tops.join(","));
+  });
+  await step("empty plate asks twice, then empties", async () => {
+    await click(/Empty plate/i); await click(/Tap again to empty/i);
+    const n = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.length); if (n !== 0) throw new Error("items left: " + n);
+    if (await page.getByRole("button", { name: /Empty plate/ }).count() !== 0) throw new Error("Empty plate still shown on an empty plate");
+  });
+  await step("add first food again", async () => { await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300); });
+  await step("add second food again", async () => { await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300); });
   await step("moment afterwork", () => click(/Afterwork event/i));
   await step("ask", () => click(/Fit to my target/i));
   await shot("2-recipe");

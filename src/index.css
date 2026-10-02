@@ -262,6 +262,7 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 
 .ways { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .ways .pill-small { padding: 0 12px; }
+.ways .ways-empty { margin-left: auto; color: var(--low); }
 .row-food { min-height: 52px; padding: 6px 0; }
 
 /* ---------------- Goal ---------------- */
