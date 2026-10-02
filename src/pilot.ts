@@ -39,6 +39,8 @@ export type Food = Nutrition & {
   photos?: string[];
   table?: import("./labeltable").LabelRow[];
   favorite?: boolean;
+  job?: string;
+  tip?: { text: string; pairs: string[]; goalKey: string; at: string };
   icon?: string;
 };
 export type Ingredient = {

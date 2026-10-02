@@ -1,6 +1,7 @@
 import { Camera, Plus, X, ScanBarcode } from "lucide-react";
 import { density, candidateFood } from "../pilot";
 import { duplicatePairs } from "../dedupe";
+import { jobOf } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import type { ScannerMode } from "../types";
 import type { AppApi } from "./api";
@@ -88,7 +89,7 @@ export function FoodsScreen(p: AppApi) {
             <span className="thumb">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
             <div className="row-text">
               <button className="name-link" onClick={() => setCardId(f.id)}>{f.favorite && <span className="fav-mark">★ </span>}{f.name}</button>
-              <small>{f.brand ? `${f.brand} · ` : ""}{fmt(f.calories, 0)} kcal · {fmt(f.protein)} g per 100 g</small>
+              <small>{jobOf(f).job} · {f.brand ? `${f.brand} · ` : ""}{fmt(f.calories, 0)} kcal · {fmt(f.protein)} g per 100 g</small>
               <span className="row-links">
                 <button className="link" onClick={() => add(f)}>Add to meal</button>
                 <button className="link" onClick={() => p.toggleFavorite(f.id)}>{f.favorite ? "★ Favourite" : "☆ Favourite"}</button>
@@ -108,7 +109,7 @@ export function FoodsScreen(p: AppApi) {
       {state.foods.length === 0 && (
         <div className="strip">No foods yet. Scan a label, add one by hand, or <button className="link" onClick={p.addStarter}>add twenty starter foods</button>.</div>
       )}
-      {cardFood && <FoodCard food={p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood} addPhoto={(d) => p.addFoodPhoto(cardFood.id, d)} removePhoto={(i) => p.removeFoodPhoto(cardFood.id, i)} toggleFavorite={() => p.toggleFavorite(cardFood.id)} target={pdRef} fit={p.fitPd(density(cardFood.protein, cardFood.calories))} close={() => setCardId(null)} review={() => { setImage(""); setEdit(cardFood); }} />}
+      {cardFood && <FoodCard food={p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood} addPhoto={(d) => p.addFoodPhoto(cardFood.id, d)} removePhoto={(i) => p.removeFoodPhoto(cardFood.id, i)} toggleFavorite={() => p.toggleFavorite(cardFood.id)} insight={{ dayKcal: p.todayKcal, eaten: p.eatenTodayKcal, dayName: p.dayName, goalKey: p.tipGoalKey, requestTip: () => p.requestTip(cardFood.id), setJob: (j) => p.setFoodJob(cardFood.id, j) }} target={pdRef} fit={p.fitPd(density(cardFood.protein, cardFood.calories))} close={() => setCardId(null)} review={() => { setImage(""); setEdit(cardFood); }} />}
     </>
   );
 }

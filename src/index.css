@@ -524,3 +524,11 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .fav-mark { color: #f5b400; }
 .all-foods { display: block; margin: 10px auto 0; }
 .foodcard-head { align-items: center; }
+
+.job-row { display: flex; align-items: center; gap: 8px; margin: -4px 0 12px; } .job-row small { color: var(--muted); font-size: 12px; }
+.job-chip { font: inherit; font-size: 13px; font-weight: 800; color: var(--brand-text); background: var(--tint); border: 0; border-radius: 999px; padding: 6px 12px; }
+.job-pick { margin: -4px 0 12px; }
+.insight { font-size: 14px; line-height: 1.45; margin: 4px 0 8px; } .insight-today { font-weight: 800; }
+.pro-tip { position: relative; background: linear-gradient(135deg, #fff7e0, #ffeec2); border: 1px solid #f5d27a; border-radius: var(--r-card); padding: 14px 14px 12px; margin: 10px 0 14px; color: #3a2a00; }
+.pro-tip p { margin: 6px 0 0; font-size: 14px; line-height: 1.45; } .pro-tip .muted { color: #8a6d1f; }
+.pro-badge { display: inline-block; font-size: 11px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; background: #f5b400; color: #2b1d00; border-radius: 999px; padding: 3px 9px; }

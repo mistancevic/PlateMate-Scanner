@@ -1029,6 +1029,30 @@ export default function App() {
       notify("Photo added.");
     },
     openFoodId, clearOpenFood: () => setOpenFoodId(null),
+    setFoodJob: (foodId: string, job: string | null) => {
+      setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, job: job || undefined } : x)) }));
+      notify(job ? `Labelled ${job.toLowerCase()}.` : "Back to Mealan's label.");
+    },
+    eatenTodayKcal: (() => {
+      const today = new Date().toDateString();
+      return state.feedback.filter((f) => f.status !== "not-used" && new Date(f.createdAt).toDateString() === today)
+        .reduce((s, f) => s + f.meal.items.reduce((t, i) => t + ((i.food.calories ?? 0) * i.grams) / 100, 0), 0);
+    })(),
+    dayName: personal.dayMode === "follow" ? ({ rest: "Rest day", normal: "Normal day", training: "Training day", active: "Very active day" } as Record<string, string>)[dayType] ?? "Today" : "Today",
+    tipGoalKey: `${goal?.band ?? "none"}|${pdRef ?? "none"}`,
+    requestTip: async (foodId: string) => {
+      const f = state.foods.find((x) => x.id === foodId); if (!f) return;
+      const key = `${goal?.band ?? "none"}|${pdRef ?? "none"}`;
+      const { jobOf } = await import("./foodjob");
+      const band = bandOf(goal?.band);
+      const res = await api("/api/tip", {
+        food: f, job: jobOf(f).job,
+        goal: { name: band?.name ?? "no goal set", pdTarget: pdRef, kcalToday: todayKcalOf(), dayType: personal.dayMode === "follow" ? dayType : "same every day" },
+        moments: getUsual(), region,
+        library: state.foods.filter((x) => x.id !== f.id).map((x) => ({ name: x.name, job: jobOf(x).job, pd: density(x.protein, x.calories) })),
+      });
+      setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, tip: { text: res.tip, pairs: res.pairs ?? [], goalKey: key, at: new Date().toISOString() } } : x)) }));
+    },
     toggleFavorite: (foodId: string) => {
       const f = state.foods.find((x) => x.id === foodId);
       setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, favorite: !x.favorite } : x)) }));

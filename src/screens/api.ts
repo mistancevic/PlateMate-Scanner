@@ -67,6 +67,11 @@ export interface AppApi {
   openFoodId: string | null;
   clearOpenFood: () => void;
   toggleFavorite: (foodId: string) => void;
+  setFoodJob: (foodId: string, job: string | null) => void;
+  eatenTodayKcal: number;
+  dayName: string;
+  tipGoalKey: string;
+  requestTip: (foodId: string) => Promise<void>;
   removeFoodPhoto: (foodId: string, index: number) => void;
   mergeInLibrary: (keepId: string, otherId: string, name: string) => void;
   todayKcal: number | null;

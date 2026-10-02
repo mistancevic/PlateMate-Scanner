@@ -2,13 +2,23 @@ import { useRef, useState } from "react";
 import { Camera } from "lucide-react";
 import { density, type Food } from "../pilot";
 import { displayRows } from "../labeltable";
+import { useEffect } from "react";
+import { JOBS, jobOf, plainLine, todayLine } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { iconFor } from "../icons";
 
-const role = (pd: number | null) =>
-  pd === null ? "unknown" : pd < 3 ? "flavour, fat or carbs: the reason you want it" : pd < 5 ? "mixed: look at the amount and the rest of the plate" : pd < 10 ? "helps the protein along" : "a protein base to build on";
-
-export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto, removePhoto, toggleFavorite }: { food: Food; target: number | null; fit: "high" | "mid" | "low"; close: () => void; review?: () => void; dontHave?: () => void; addPhoto?: (dataUrl: string) => void; removePhoto?: (index: number) => void; toggleFavorite?: () => void }) {
+export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto, removePhoto, toggleFavorite, insight }: { food: Food; target: number | null; fit: "high" | "mid" | "low"; close: () => void; review?: () => void; dontHave?: () => void; addPhoto?: (dataUrl: string) => void; removePhoto?: (index: number) => void; toggleFavorite?: () => void; insight?: { dayKcal: number | null; eaten: number; dayName: string; goalKey: string; requestTip: () => Promise<void>; setJob: (job: string | null) => void } }) {
+  const job = jobOf(food);
+  const [picking, setPicking] = useState(false);
+  const [tipState, setTipState] = useState<"idle" | "busy" | "failed">("idle");
+  const tipFresh = food.tip && insight && food.tip.goalKey === insight.goalKey;
+  // a Pro tip is written once per goal: ask only when there's none for this goal yet
+  useEffect(() => {
+    if (!insight || tipFresh || tipState !== "idle" || food.calories == null) return;
+    setTipState("busy");
+    insight.requestTip().then(() => setTipState("idle")).catch(() => setTipState("failed"));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [food.id, tipFresh]);
   const [view, setView] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const gallery = food.photos?.length ? food.photos : food.photo ? [food.photo] : [];
@@ -36,6 +46,16 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
             }} />
           </div>
         )}
+        <div className="job-row">
+          <button className="job-chip" onClick={() => insight && setPicking(!picking)} aria-label="What this food is">{job.job}{job.note ? ` · ${job.note}` : ""}{job.taste && job.job !== "Flavour food" ? ` · ${job.taste}` : ""}</button>
+          {job.mine && <small>your label</small>}
+        </div>
+        {picking && insight && (
+          <div className="moments job-pick">
+            {JOBS.map((j) => <button key={j} className={`pill pill-small ${job.job === j ? "pill-primary" : ""}`} onClick={() => { insight.setJob(j); setPicking(false); }}>{j}</button>)}
+            {job.mine && <button className="link" onClick={() => { insight.setJob(null); setPicking(false); }}>Use Mealan's label</button>}
+          </div>
+        )}
         <section className={`readout readout-fit-${fit}`}>
           <div className="readout-top"><span>Protein density</span><span>{pdTag()}</span></div>
           <div className="readout-mid">
@@ -43,6 +63,14 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
             <div><span>{fitText}{target !== null ? `, target ${fixed(target)}` : ""}</span><small>{share !== null ? `${share} % of its energy is protein` : "no protein value"}</small></div>
           </div>
         </section>
+        <p className="insight">{plainLine(food, target)}</p>
+        {insight && (() => { const t = todayLine(food, insight.dayKcal, insight.eaten, insight.dayName); return t ? <p className="insight insight-today">{t}</p> : null; })()}
+        {insight && (
+          <section className="pro-tip">
+            <span className="pro-badge">Pro tip</span>
+            {tipFresh ? <p>{food.tip!.text}</p> : tipState === "busy" ? <p className="muted">Mealan is writing a tip for your goal…</p> : tipState === "failed" ? <p className="muted">No tip just now. <button className="link" onClick={() => { setTipState("busy"); insight.requestTip().then(() => setTipState("idle")).catch(() => setTipState("failed")); }}>Try again</button></p> : null}
+          </section>
+        )}
         <div className="label-table label-table-read" aria-label="Nutrition table per 100 g">
           {displayRows(food).map((r, i) => (
             <div className={`lt-row ${r.sub ? "sub" : ""}`} key={r.key + i}>
@@ -52,7 +80,6 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
             </div>
           ))}
         </div>
-        <p className="small">Role in a recipe: {role(pd)}.</p>
         <p className="small">{food.readyToEat ? "Ready to eat as it is." : "Needs preparation before eating."} Values from the {food.source === "label" ? "label" : food.source}, check your package.</p>
         {dontHave && <button className="pill pill-wide pill-primary" onClick={dontHave}>Don't have it? Find something instead</button>}
         {review && <button className="pill pill-wide" onClick={() => { close(); review(); }}>Review the label</button>}

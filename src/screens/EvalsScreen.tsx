@@ -3,6 +3,9 @@ import { Play, Check, X, Download, RotateCcw } from "lucide-react";
 import questionsRaw from "../../evals/plate-questions.jsonl?raw";
 import goldenRaw from "../../evals/swap-golden.json?raw";
 import libraryRaw from "../../evals/library.json?raw";
+import tipRaw from "../../evals/tip-cases.json?raw";
+import { jobOf } from "../foodjob";
+import { density } from "../pilot";
 import { rankSwaps, sameFood } from "../swaps";
 import { uid, type Food, type Ingredient } from "../pilot";
 import type { AppApi } from "./api";
@@ -14,10 +17,12 @@ type Result = { at: string; ms?: number; output: any; checks: Record<string, boo
 const LIB: Food[] = JSON.parse(libraryRaw).foods;
 const QUESTIONS: Q[] = questionsRaw.trim().split("\n").map((l: string) => JSON.parse(l));
 const GOLDEN: G[] = JSON.parse(goldenRaw).cases;
+type T = { id: string; food: string; goal: string; pd: number; moments: string[]; note: string };
+const TIPS: T[] = JSON.parse(tipRaw).cases;
 const food = (id: string) => LIB.find((f) => f.id === id)!;
 const KEY = "chefmealan-evals";
 const load = (): Record<string, Result> => { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; } };
-const TYPES = ["all", "code", "missing", "goes-with", "better-match", "texture", "cheaper", "constraint", "adversarial"];
+const TYPES = ["all", "code", "tip", "missing", "goes-with", "better-match", "texture", "cheaper", "constraint", "adversarial"];
 
 function runCode(g: G): Result {
   const items: Ingredient[] = g.plate.map((p) => ({ id: uid(), food: { ...food(p.food), readyToEat: true }, grams: p.grams, locked: true }));
@@ -52,6 +57,27 @@ async function runModel(q: Q): Promise<Result> {
   return { at: new Date().toISOString(), ms, output: data, checks, judge };
 }
 
+// A Pro tip: short, only library foods, no grams, only numbers from the data.
+async function runTip(t: T): Promise<Result> {
+  const f = food(t.food);
+  const library = LIB.filter((x) => x.id !== f.id).map((x) => ({ name: x.name, job: jobOf(x).job, pd: density(x.protein, x.calories) }));
+  const t0 = performance.now();
+  const res = await fetch("/api/tip", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ food: f, job: jobOf(f).job, goal: { name: t.goal, pdTarget: t.pd }, moments: t.moments, region: "munich", library }) });
+  const data = await res.json(); const ms = Math.round(performance.now() - t0);
+  if (!res.ok) return { at: new Date().toISOString(), ms, output: { error: data.error }, checks: { answered: false } };
+  const tip: string = data.tip ?? "";
+  const allowed = new Set([f.calories, f.protein, f.fats, f.carbs, f.fiber].filter((x) => x != null).map((x) => String(x)));
+  const numbers = (tip.match(/\d+(?:[.,]\d+)?/g) ?? []).map((n) => n.replace(",", "."));
+  const checks = {
+    "at most two sentences": (tip.match(/[.!?](\s|$)/g) ?? []).length <= 2,
+    "no grams or portions": !/\b\d+\s?(g|grams?|gram)\b/i.test(tip),
+    "numbers only from the data": numbers.every((n) => allowed.has(n) || allowed.has(String(Number(n)))),
+    "foods named are in the library": (data.pairs ?? []).every((n: string) => LIB.some((x) => x.name === n)),
+    "under 8 seconds": ms < 8000,
+  };
+  return { at: new Date().toISOString(), ms, output: data, checks };
+}
+
 export function EvalsScreen(p: AppApi) {
   const [results, setResults] = useState<Record<string, Result>>(load);
   const [type, setType] = useState("all");
@@ -62,13 +88,14 @@ export function EvalsScreen(p: AppApi) {
 
   const cases = useMemo(() => [
     ...GOLDEN.map((g) => ({ id: g.id, kind: "code" as const, title: `${g.plate.map((x) => food(x.food).name.split(",")[0]).join(" + ")}, without ${food(g.missing).name.split(",")[0]}`, tags: ["code", "swap ranking", `target ${g.target}`], g })),
+    ...TIPS.map((t) => ({ id: t.id, kind: "tip" as const, title: `Pro tip: ${food(t.food).name}, ${t.goal}${t.moments.length ? ", " + t.moments.join(", ") : ""}`, tags: ["tip", t.goal, ...t.moments], t })),
     ...QUESTIONS.map((q) => ({ id: q.id, kind: "model" as const, title: q.question, tags: [q.dimensions.question, q.dimensions.identity, q.dimensions.goal, q.dimensions.situation, q.dimensions.place], q })),
   ], []);
-  const shown = cases.filter((c) => type === "all" || (type === "code" ? c.kind === "code" : c.kind === "model" && c.q.dimensions.question === type));
+  const shown = cases.filter((c: any) => type === "all" || (type === "code" ? c.kind === "code" : type === "tip" ? c.kind === "tip" : c.kind === "model" && c.q.dimensions.question === type));
 
   async function run(c: (typeof cases)[number]) {
     setRunning(c.id);
-    try { const r = c.kind === "code" ? runCode(c.g) : await runModel(c.q); const prev = load()[c.id]; put(c.id, { ...r, label: prev?.label, reason: prev?.reason }); }
+    try { const r = c.kind === "code" ? runCode((c as any).g) : c.kind === "tip" ? await runTip((c as any).t) : await runModel((c as any).q); const prev = load()[c.id]; put(c.id, { ...r, label: prev?.label, reason: prev?.reason }); }
     catch (e: any) { p.setError(e.message); } finally { setRunning(null); }
   }
   async function runAll() { for (const c of shown) { await run(c); } }
@@ -116,7 +143,7 @@ export function EvalsScreen(p: AppApi) {
             </button>
             {isOpen && (
               <div className="eval-body">
-                <small>Plate: {(c.kind === "code" ? c.g.plate : c.q.plate).map((x) => `${x.grams} g ${food(x.food).name}`).join(" · ")}</small>
+                {c.kind === "tip" ? <small>Expect: {(c as any).t.note}</small> : <small>Plate: {(c.kind === "code" ? (c as any).g.plate : (c as any).q.plate).map((x: any) => `${x.grams} g ${food(x.food).name}`).join(" · ")}</small>}
                 <div className="button-row" style={{ margin: "8px 0" }}><button className="pill pill-small" disabled={!!running} onClick={() => run(c)}><Play size={14} /> Run</button></div>
                 {r && (
                   <>
