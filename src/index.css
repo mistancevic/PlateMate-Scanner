@@ -533,7 +533,14 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .pro-tip p { margin: 6px 0 0; font-size: 14px; line-height: 1.45; } .pro-tip .muted { color: #8a6d1f; }
 .pro-badge { display: inline-block; font-size: 11px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; background: #f5b400; color: #2b1d00; border-radius: 999px; padding: 3px 9px; }
 
-.trained { margin-top: 10px; } .trained svg { vertical-align: -2px; }
+.plan-source { display: inline-flex; align-items: center; gap: 2px; padding: 0; color: var(--brand-text); font-size: 12px; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.day-line { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1.5px solid #b9cdf1; }
+.day-line > div { display: flex; flex-direction: column; gap: 2px; }
+.day-line b { font-size: 14px; font-weight: 800; color: var(--ink); }
+.day-line small { color: #4a5f85; font-weight: 600; }
+.day-line .day-state { display: inline-flex; align-items: center; gap: 6px; color: var(--brand-text); font-size: 13px; font-weight: 700; }
+.plan .day-row { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 10px; }
+.plan .day-row .pill-small { height: 44px; border-radius: 22px; font-size: 14px; }
 .logged-line { margin: -6px 0 10px; }
 .log-card small { display: block; } .log-nums { color: var(--brand-text); font-weight: 700; margin-top: 4px; }
 .days .history-row { align-items: center; } .days .history-num small { text-align: right; display: block; max-width: 180px; }

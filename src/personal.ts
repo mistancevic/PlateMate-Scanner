@@ -7,7 +7,7 @@ export type DayMode = "same" | "follow";
 export type DayType = "rest" | "normal" | "training" | "very";
 export type Personal = { sex?: Sex; birthYear?: number; heightCm?: number; weightKg?: number; activity?: Activity; bodyFatPct?: number; dayMode?: DayMode; pdUnit?: "pd" | "pct" };
 export const DAY_TYPES: { id: DayType; name: string }[] = [
-  { id: "rest", name: "Rest day" }, { id: "normal", name: "Normal day" }, { id: "training", name: "Training day" }, { id: "very", name: "Very active day" },
+  { id: "rest", name: "Rest day" }, { id: "normal", name: "Usual day" }, { id: "training", name: "Training day" }, { id: "very", name: "Very active day" },
 ];
 // The goal's calories are the average day. A given day moves them by its multiplier against the usual one; protein stays.
 export function dayFactor(day: DayType, p: Personal): { base: number; today: number } {
@@ -16,8 +16,24 @@ export function dayFactor(day: DayType, p: Personal): { base: number; today: num
   return { base, today };
 }
 const dayKey = () => `chefmealan-day-${new Date().toISOString().slice(0, 10)}`;
-export const getDayType = (): DayType => { try { return (localStorage.getItem(dayKey()) as DayType) || "normal"; } catch { return "normal"; } };
+// The day has one source, in this order: a plan says it, else the person tapped it, else the usual day is assumed.
+// The key is dated, so every new day starts unset. Changing today never touches a plan.
+export type DaySource = "plan" | "you" | "assumed";
+export type Day = { type: DayType; source: DaySource };
+// Plans are not built yet; when they are, this returns the planned day type for the date, or null.
+export const plannedDayFor = (_date: Date): DayType | null => null;
+export function getDay(): Day {
+  const planned = plannedDayFor(new Date());
+  if (planned) return { type: planned, source: "plan" };
+  try { const tapped = localStorage.getItem(dayKey()) as DayType | null; if (tapped) return { type: tapped, source: "you" }; } catch {}
+  return { type: "normal", source: "assumed" };
+}
+export const getDayType = (): DayType => getDay().type;
 export const setDayType = (d: DayType) => { try { localStorage.setItem(dayKey(), d); } catch {} };
+export const dayLine = (d: Day): string => {
+  const name = DAY_TYPES.find((x) => x.id === d.type)?.name ?? d.type;
+  return d.source === "plan" ? `${name}, as planned` : d.source === "you" ? `${name}, set by you` : name;
+};
 export const ACTIVITIES: { id: Activity; name: string; hint: string; factor: number }[] = [
   { id: "sedentary", name: "Mostly sitting",   hint: "desk job, little movement",             factor: 1.2 },
   { id: "light",     name: "Lightly active",   hint: "walking, 1 to 3 sessions a week",       factor: 1.375 },

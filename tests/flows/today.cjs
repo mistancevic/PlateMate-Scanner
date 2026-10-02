@@ -23,8 +23,25 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   const rows = await page.locator(".days .history-row").allTextContents();
   ok(rows.length === 2 && /Yesterday/.test(rows[0]) && /Training day/.test(rows[0]) && /2 meals logged/.test(rows[0]), "yesterday: training day, 2 meals logged");
   ok(/Nothing logged/.test(rows[1]), "two days ago: nothing logged, said plainly");
-  await page.getByRole("button", { name: /Trained today/ }).click(); await page.waitForTimeout(300);
-  ok(await page.locator(".day-row .pill-primary").textContent() === "Training day", "Trained today sets the day type");
+  // the day: assumed until set, then one line with Change
+  ok(/kcal, usual day/.test(await page.locator(".plan-row").textContent()), "until the day is set, the calories say usual day");
+  ok(await page.locator(".plan .day-row .pill").count() === 4, "the four day pills show while the day is assumed");
+  const assumedKcal = (await page.locator(".plan-row b").nth(1).textContent()).trim();
+  await page.getByRole("button", { name: "Training day" }).click(); await page.waitForTimeout(300);
+  ok(await page.locator(".plan .day-row").count() === 0, "tapping a day collapses the pills");
+  ok(/Training day, set by you/.test(await page.locator(".day-state").textContent()), "the line names the day and its source");
+  ok(/kcal today/.test(await page.locator(".plan-row").textContent()) && (await page.locator(".plan-row b").nth(1).textContent()).trim() !== assumedKcal, "calories follow the day");
+  ok(await page.getByRole("button", { name: /Trained today/ }).count() === 0, "Trained today is gone: it is the Training day pill");
+  await page.getByRole("button", { name: "Change" }).click(); await page.waitForTimeout(200);
+  ok(await page.locator(".plan .day-row .pill-primary").textContent() === "Training day", "Change reopens the pills with today marked");
+  await page.getByRole("button", { name: "Rest day" }).click(); await page.waitForTimeout(300);
+  ok(/Rest day, set by you/.test(await page.locator(".day-state").textContent()), "picking another day collapses again");
+  ok(/set by you/.test(await page.locator(".plan-source").textContent()), "the goal source is a link");
+  await page.locator(".plan-source").click(); await page.waitForTimeout(300);
+  ok(await page.getByText("Every day the same").count() >= 1, "set by you opens Menu, Goal");
+  await page.goto("http://127.0.0.1:3193/"); await page.waitForTimeout(600);
+  const actions = await page.locator("main").evaluate((m) => Array.from(m.querySelectorAll(".pill-tall, .inbox")).map((e) => e.className.includes("inbox") ? "inbox" : "action"));
+  ok(actions.slice(0, 3).every((x) => x === "action"), "the three actions sit directly under the plan");
   await page.screenshot({ path: "/tmp/today.png", fullPage: true });
   console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
   await b.close(); server.kill(); process.exitCode = fail ? 1 : 0;

@@ -39,7 +39,7 @@ import { LandingScreen } from "./screens/LandingScreen";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
-import { getPersonal, setPersonal as storePersonal, calculate, dayFactor, getDayType, setDayType as storeDayType, type Personal, type DayType } from "./personal";
+import { getPersonal, setPersonal as storePersonal, calculate, dayFactor, getDay, setDayType as storeDayType, DAY_TYPES, type Personal, type DayType, type Day } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
@@ -485,7 +485,7 @@ export default function App() {
     [newShared, setNewShared] = useState(0),
     [inbox, setInbox] = useState<InboxItem[]>([]),
     [personal, setPersonalState] = useState<Personal>(getPersonal),
-    [dayType, setDayTypeState] = useState<DayType>(getDayType),
+    [day, setDayState] = useState<Day>(getDay),
     [menuSection, setMenuSection] = useState<MenuSection | null>(null),
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
     [talkOpen, setTalkOpen] = useState(false),
@@ -890,7 +890,7 @@ export default function App() {
   function todayKcalOf(): number | null {
     const k = state.goals.calories ?? null;
     if (k === null || personal.dayMode !== "follow") return k;
-    const { base, today } = dayFactor(dayType, personal);
+    const { base, today } = dayFactor(day.type, personal);
     return Math.round((k * today) / base / 50) * 50;
   }
   function mix(id: string = adjustId): boolean { return mixWith(state.items, id); }
@@ -1038,7 +1038,7 @@ export default function App() {
       return state.feedback.filter((f) => f.status !== "not-used" && new Date(f.createdAt).toDateString() === today)
         .reduce((s, f) => s + f.meal.items.reduce((t, i) => t + ((i.food.calories ?? 0) * i.grams) / 100, 0), 0);
     })(),
-    dayName: personal.dayMode === "follow" ? ({ rest: "Rest day", normal: "Normal day", training: "Training day", active: "Very active day" } as Record<string, string>)[dayType] ?? "Today" : "Today",
+    dayName: personal.dayMode === "follow" ? DAY_TYPES.find((d) => d.id === day.type)?.name ?? "Today" : "Today",
     tipGoalKey: `${goal?.band ?? "none"}|${pdRef ?? "none"}|pb1`,
     requestTip: async (foodId: string) => {
       const f = state.foods.find((x) => x.id === foodId); if (!f) return;
@@ -1047,7 +1047,7 @@ export default function App() {
       const band = bandOf(goal?.band);
       const res = await api("/api/tip", {
         food: f, job: jobOf(f).job,
-        goal: { name: band?.name ?? "no goal set", pdTarget: pdRef, kcalToday: todayKcalOf(), dayType: personal.dayMode === "follow" ? dayType : "same every day" },
+        goal: { name: band?.name ?? "no goal set", pdTarget: pdRef, kcalToday: todayKcalOf(), dayType: personal.dayMode === "follow" ? day.type : "same every day" },
         moments: getUsual(), region,
         library: state.foods.filter((x) => x.id !== f.id).map((x) => ({ name: x.name, job: jobOf(x).job, pd: density(x.protein, x.calories) })),
       });
@@ -1055,14 +1055,13 @@ export default function App() {
     },
     keepForLater: (meal: Meal) => {
       // a prepared card: it shows on Today until it's eaten or dropped
-      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "prepared" as const, taste: "", notes: "", createdAt: new Date().toISOString(), dayType: personal.dayMode === "follow" ? dayType : undefined } as any, ...s.feedback] }));
+      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "prepared" as const, taste: "", notes: "", createdAt: new Date().toISOString(), dayType: personal.dayMode === "follow" ? day.type : undefined } as any, ...s.feedback] }));
       notify("Kept for later. It's on Today.");
     },
     settleCard: (id: string, how: "eaten" | "not-used") => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, status: how, createdAt: how === "eaten" ? new Date().toISOString() : f.createdAt, taste: how === "eaten" ? f.taste || "Good" : f.taste } : f)) }));
       notify(how === "eaten" ? "Logged." : "Dropped for today.");
     },
-    trainedToday: () => { const d: DayType = dayType === "training" || dayType === "very" ? "normal" : "training"; storeDayType(d); setDayTypeState(d); notify(d === "training" ? "Training day. Your calories follow." : "Back to a normal day."); },
     toggleFavorite: (foodId: string) => {
       const f = state.foods.find((x) => x.id === foodId);
       setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, favorite: !x.favorite } : x)) }));
@@ -1088,7 +1087,7 @@ export default function App() {
       });
       notify("Merged into one food.");
     },
-    goalLog, formula: profile.formula ?? null, todayKcal, dayType, setDayType: (d: DayType) => { storeDayType(d); setDayTypeState(d); },
+    goalLog, formula: profile.formula ?? null, todayKcal, dayType: day.type, day, setDayType: (d: DayType) => { storeDayType(d); setDayState(getDay()); },
     applyNumbers: (bandId: string, kcal: number, protein: number, method?: string) => {
       nextSource.current = "profile";
       saveGoal({ band: bandId, setBy: "you", setAt: new Date().toISOString(), source: "profile", method });

@@ -69,7 +69,6 @@ export interface AppApi {
   toggleFavorite: (foodId: string) => void;
   keepForLater: (meal: import("../pilot").Meal) => void;
   settleCard: (id: string, how: "eaten" | "not-used") => void;
-  trainedToday: () => void;
   setFoodJob: (foodId: string, job: string | null) => void;
   eatenTodayKcal: number;
   dayName: string;
@@ -79,6 +78,7 @@ export interface AppApi {
   mergeInLibrary: (keepId: string, otherId: string, name: string) => void;
   todayKcal: number | null;
   dayType: import("../personal").DayType;
+  day: import("../personal").Day;
   setDayType: (d: import("../personal").DayType) => void;
   formula: import("../personal").Formula | null;
   openMenu: (s?: MenuSection, from?: MenuSection) => void;
