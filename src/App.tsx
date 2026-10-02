@@ -48,7 +48,7 @@ import { jobOf, PORTION } from "./foodjob";
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
-import { Home, CircleUser, Menu, Users } from "lucide-react";
+import { Home, CircleUser, Menu, Users, MessageCircle } from "lucide-react";
 import {
   aggregate,
   candidateFood,
@@ -207,6 +207,7 @@ function FoodEditor({
   save,
   mixFor,
   onMix,
+  onAsk,
   momentName,
 }: {
   food: Food;
@@ -217,6 +218,7 @@ function FoodEditor({
   save: (f: Food) => void;
   mixFor?: (f: Food) => MixTip;
   onMix?: (f: Food, m: Mix) => void;
+  onAsk?: (f: Food, tip: MixTip) => void;
   momentName?: string;
 }) {
   const [mainIdx, setMainIdx] = useState(0);
@@ -245,8 +247,10 @@ function FoodEditor({
     ? findMatch({ ...food, name, brand, ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])) } as Food, library ?? [])
     : null;
   // the draft as a food, for the mix tip while the sheet is still open
-  const draft = (): Food => ({ ...food, name: name.trim() || food.name, brand: brand.trim(), readyToEat: ready, ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])) } as Food);
+  // readyToEat is true for the tip: the box starts unticked because it is unconfirmed, not because the food needs cooking
+  const draft = (): Food => ({ ...food, name: name.trim() || food.name, brand: brand.trim(), readyToEat: true, ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])) } as Food);
   const pendingMix = useRef<Mix | null>(null);
+  const pendingAsk = useRef<MixTip | null>(null);
   // the mix tip shown on the review sheet is logged once per food
   const loggedTip = useRef<string | null>(null);
   function noteTip(tip: MixTip, d: Food) {
@@ -286,6 +290,8 @@ function FoodEditor({
       save(saved);
       const m = pendingMix.current; pendingMix.current = null;
       if (m && onMix) onMix(saved, m);
+      const a = pendingAsk.current; pendingAsk.current = null;
+      if (a && onAsk) onAsk(saved, a);
     };
     const raw = (images && images.length ? images : image ? [image] : []);
     const all = raw.length > 1 ? [raw[mainIdx] ?? raw[0], ...raw.filter((_, i) => i !== mainIdx)] : raw;
@@ -425,6 +431,7 @@ function FoodEditor({
               </button>
             ))}
             <p className="small">A tap saves the food and puts the mix on the plate.</p>
+            {onAsk && <button className="link" onClick={() => { pendingAsk.current = tip; submit(); }}><MessageCircle size={14} /> Not quite? Tell Mealan</button>}
           </section>
         );
       })()}
@@ -818,6 +825,8 @@ export default function App() {
       "Added. Set the amount you actually have.",
     );
   }
+  // the photo that shows the front goes first: it becomes the main photo and the card's picture
+  const frontFirst = (images: string[], front: number) => { const i = Number(front) - 1; return i > 0 && i < images.length ? [images[i], ...images.filter((_, j) => j !== i)] : images; };
   async function scan(raw: string | string[], group = false, barcode?: string) {
     const run = ++runRef.current;
     setBusy(group ? "Identifying products…" : "Reading label…");
@@ -840,12 +849,17 @@ export default function App() {
         log("food_in", { way: "group", products: entities.length });
         const read = (x: any) => x && x.calories !== null && x.protein !== null;
         if (entities.length === 1 && read(entities[0])) {
-          // one product from several sides, its table read: straight to review, like a single label
-          const front = Number(entities[0].front_image) - 1;
-          const ordered = front > 0 && front < images.length ? [images[front], ...images.filter((_, i) => i !== front)] : images;
+          // one product from several sides: read it again as a label, which transcribes every printed line; the group read keeps name, brand and the front
+          let one = entities[0];
+          try {
+            const lab = await api("/api/scan", { images, mode: "label" });
+            if (run !== runRef.current) return;
+            if (lab?.success && (lab.table?.length ?? 0) > (one.table?.length ?? 0)) one = { ...one, table: lab.table, calories: one.calories ?? lab.calories, protein: one.protein ?? lab.protein, fats: one.fats ?? lab.fats, carbs: one.carbs ?? lab.carbs, fiber: one.fiber ?? lab.fiber, front_image: one.front_image || lab.front_image };
+          } catch { /* the group read stands */ }
+          const ordered = frontFirst(images, one.front_image);
           setImage(ordered[0]);
           setImageSet(ordered);
-          setEdit(candidateFood(entities[0], "Photos · review required"));
+          setEdit(candidateFood(one, "Photos · review required"));
         } else {
           setPending(entities.map((x: any) => ({ name: x.product_name || "Unknown item", brand: x.brand || "", values: read(x) ? x : undefined })));
           setTab("foods");
@@ -857,8 +871,9 @@ export default function App() {
             data.error_reason ||
               "Label could not be read. Try another photo or enter it manually.",
           );
-        setImage(images[0]);
-        setImageSet(images);
+        const ordered = frontFirst(images, data.front_image);
+        setImage(ordered[0]);
+        setImageSet(ordered);
         setEdit(candidateFood(barcode ? { ...data, barcode } : data, barcode ? "Barcode and photos · review required" : "Label photo · review required"));
       }
     } catch (e: any) {
@@ -912,22 +927,20 @@ export default function App() {
     try { db = await api(`/api/product/${c}`); } catch { db = null; }
     if (run !== runRef.current) return;
     if (!db) { setBusy(""); await scan(images, false, c); return; }
-    const missing = !db.product_name || db.calories === null || db.calories === undefined || db.protein === null || db.protein === undefined;
-    let read: any = null;
-    if (missing && images.length) {
-      try {
-        const resized = await Promise.all(images.slice(0, 6).map((x) => resizeImageBase64(x, 1800, 1800)));
-        const d = await api("/api/scan", { images: resized, mode: "label", barcode: c });
-        if (d?.success) read = d;
-      } catch { read = null; }
+    let read: any = null, resized: string[] = [];
+    try { resized = await Promise.all(images.slice(0, 6).map((x) => resizeImageBase64(x, 1800, 1800))); } catch { resized = []; }
+    if (resized.length) {
+      try { const d = await api("/api/scan", { images: resized, mode: "label", barcode: c }); if (d?.success) read = d; } catch { read = null; }
       if (run !== runRef.current) return;
     }
     const merged = { ...db };
-    if (read) for (const k of ["product_name", "brand", "calories", "protein", "fats", "carbs", "fiber", "table", "notes"]) if (merged[k] === null || merged[k] === undefined || merged[k] === "") merged[k] = read[k];
-    try {
-      const resized = await Promise.all(images.slice(0, 6).map((x) => resizeImageBase64(x, 1800, 1800)));
-      setImage(resized[0] ?? ""); setImageSet(resized);
-    } catch { setImage(""); setImageSet([]); }
+    if (read) {
+      for (const k of ["product_name", "brand", "calories", "protein", "fats", "carbs", "fiber", "notes"]) if (merged[k] === null || merged[k] === undefined || merged[k] === "") merged[k] = read[k];
+      // the pack's printed lines win over the database's where the database has fewer
+      if ((read.table?.length ?? 0) > (merged.table?.length ?? 0)) merged.table = read.table;
+    }
+    const ordered = frontFirst(resized, read?.front_image ?? 0);
+    setImage(ordered[0] ?? ""); setImageSet(ordered);
     setEdit(candidateFood({ ...merged, barcode: c }, db.source || "Product database and photos · review required"));
     setBusy("");
   }
@@ -1420,6 +1433,7 @@ export default function App() {
           save={saveFood}
           mixFor={screenProps.mixFor}
           onMix={screenProps.takeMix}
+          onAsk={screenProps.askAboutMix}
           momentName={momentOf(moment).name}
         />
       )}{" "}

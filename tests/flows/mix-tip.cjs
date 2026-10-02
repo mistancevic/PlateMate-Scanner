@@ -54,7 +54,7 @@ seed.items = [];
 
   // Not quite? Tell Mealan: the helper opens with the tip as the start of the question
   await page.getByRole("button", { name: /Not quite/ }).click(); await page.waitForTimeout(500);
-  const q = await page.locator(".helper textarea, .helper input, textarea").first().inputValue().catch(() => "");
+  const q = await page.locator("input[placeholder^=\"What goes with\"]").first().inputValue().catch(() => "");
   ok(/I scanned Nutella for before training/.test(q) && /You suggested with/.test(q), "the helper carries the tip: " + q.slice(0, 60));
   const asked = await logOf("mix_ask");
   ok(asked.length === 1, "the ask is logged");
@@ -78,6 +78,19 @@ seed.items = [];
   const st2 = await state();
   ok(st2.foods.some((f) => f.name === "Shop biscuit"), "the chip saved the food");
   ok(st2.items.length >= 2 && st2.items[0].food.name === "Shop biscuit", "and put the mix on the plate: " + st2.items.map((i) => i.food.name).join(" + "));
+  ok(!/cooking/.test(reviewChips[0]), "the review sheet does not call a mix cooking because the ready box is still unticked");
+  // Tell Mealan from the review sheet: saves, then opens the helper with the tip
+  await page.getByRole("button", { name: /^Type it$/ }).click(); await page.waitForTimeout(400);
+  const sheet2 = page.locator(".modal").last();
+  await sheet2.locator("input").first().fill("Shop wafer");
+  const names2 = await sheet2.locator(".lt-row .lt-name").allTextContents();
+  const fill2 = async (re, v) => { const i = names2.findIndex((n) => re.test(n)); await sheet2.locator(".lt-row input").nth(i).fill(v); };
+  await fill2(/Energ/i, "500"); await fill2(/^Fat|Fett/i, "25"); await fill2(/Carb|Kohlen/i, "60"); await fill2(/Protein|Eiwei/i, "6"); await page.waitForTimeout(200);
+  await sheet2.getByText(/I checked the values/).click(); await page.waitForTimeout(100);
+  await sheet2.getByRole("button", { name: /Not quite/ }).click(); await page.waitForTimeout(800);
+  const q2 = await page.locator("input[placeholder^=\"What goes with\"]").first().inputValue().catch(() => "");
+  ok(/I scanned Shop wafer/.test(q2), "Tell Mealan on the sheet saves the food and opens the helper with the tip: " + q2.slice(0, 40));
+  ok((await state()).foods.some((f) => f.name === "Shop wafer"), "the wafer was saved on the way");
   await page.screenshot({ path: "/tmp/mix-tip.png", fullPage: true });
   console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
   await b.close(); server.kill(); process.exitCode = fail ? 1 : 0;
