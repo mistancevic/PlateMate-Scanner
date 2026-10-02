@@ -12,6 +12,9 @@ const seed = JSON.parse(fs.readFileSync(require("node:path").resolve(__dirname, 
   await page.goto("http://127.0.0.1:3180/"); await page.waitForTimeout(800);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2500);
+  // JOURNEY INVARIANT: Scan on the plate opens the group camera, several sides of one product in one go. Never rewrite this line to fit a change.
+  const groupOn = await page.getByRole("button", { name: /GROUP/ }).evaluate((b) => b.className.includes("bg-white"));
+  console.log(groupOn ? "ok   Scan opens the group camera" : "FAIL Scan did not open the group camera"); if (!groupOn) process.exitCode = 1;
   await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(500);
   await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(500);
   
