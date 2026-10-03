@@ -37,9 +37,9 @@ import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen, type Turn } from "./screens/OutScreen";
 import { LandingScreen } from "./screens/LandingScreen";
 import { PilotGate } from "./screens/PilotGate";
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, confirmClientAi, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
-import { getPersonal, setPersonal as storePersonal, calculate, dayFactor, getDay, setDayType as storeDayType, DAY_TYPES, type Personal, type DayType, type Day } from "./personal";
+import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, dayFactor, getDay, setDayType as storeDayType, DAY_TYPES, type Personal, type DayType, type Day } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
@@ -47,6 +47,7 @@ import { mixTip, mixLabel, catOf, plateOk, type Mix, type MixTip } from "./mixti
 import { jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
 import { fitnessFor, SOURCES, dayName } from "./fitness";
+import { getSafety, setSafety as storeSafety, aiState, addFlag, goalSignals, allergyHits, FIXED, EMPTY_SAFETY, type Safety, type SituationId } from "./safety";
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
@@ -219,6 +220,7 @@ function LabelCheck({
   momentName,
   target,
   day,
+  allergies,
 }: {
   food: Food;
   image?: string;
@@ -232,6 +234,7 @@ function LabelCheck({
   momentName?: string;
   target?: number | null;
   day?: { kcal: number | null; eaten: number; name: string; type: DayType; weightKg: number | null };
+  allergies?: string[];
 }) {
   const [mainIdx, setMainIdx] = useState(0);
   const [choice, setChoice] = useState<"update" | "both">("update");
@@ -410,6 +413,7 @@ function LabelCheck({
             <p className={`fit-line ${fit.before.fits ? "ok" : pb.beforeTraining.ok ? "mid" : "no"}`} title={SOURCES.preCarb}><b>Before training:</b> {cap(beforeText)}.</p>
             <p className={`fit-line ${fit.after.fits ? "ok" : "no"}`} title={SOURCES.proteinDose}><b>After training:</b> {cap(afterText)}.</p>
             {pb.caveats.length > 0 && <p className="fit-line no"><b>Label:</b> {cap(pb.caveats.join(", "))}.</p>}
+            {allergies && allergyHits(d, allergies).length > 0 && <p className="fit-line no"><b>Contains what you avoid:</b> {allergyHits(d, allergies).join(", ")}. Never suggested; shown so you can see it.</p>}
             {t && <p className="fit-line today">{t}</p>}
           </section>
         );
@@ -596,6 +600,8 @@ export default function App() {
     [newShared, setNewShared] = useState(0),
     [inbox, setInbox] = useState<InboxItem[]>([]),
     [personal, setPersonalState] = useState<Personal>(getPersonal),
+    [safety, setSafetyState] = useState<Safety>(getSafety),
+    [deleteSteps, setDeleteSteps] = useState(""),
     [day, setDayState] = useState<Day>(getDay),
     [menuSection, setMenuSection] = useState<MenuSection | null>(null),
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
@@ -697,9 +703,14 @@ export default function App() {
           if (remote.goal) { try { localStorage.setItem("chefmealan-goal", JSON.stringify(remote.goal)); } catch {} setGoalState(getGoal()); setGoalOpen(!remote.goal); }
           if (remote.clientName) { storeClientName(remote.clientName); setClientNameState(remote.clientName); }
           if (remote.personal && typeof remote.personal === "object") { storePersonal(remote.personal as Personal); setPersonalState(remote.personal as Personal); }
+          {
+            const base = remote.safety && typeof remote.safety === "object" ? { ...EMPTY_SAFETY, ...(remote.safety as Safety) } : getSafety();
+            const merged: Safety = { ...base, aiConfirmedAt: remote.aiConfirmedAt ?? undefined, aiConfirmedBy: remote.aiConfirmedBy ?? undefined };
+            storeSafety(merged); setSafetyState(merged);
+          }
           setCloudStatus({ ok: true, text: "Loaded from your account", at: new Date().toISOString() });
         } else {
-          await saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), updatedAt: new Date().toISOString() });
+          await saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), updatedAt: new Date().toISOString() });
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
         }
       } catch (e: any) {
@@ -799,7 +810,7 @@ export default function App() {
   useEffect(() => {
     if (!user || !cloudLoaded.current) return;
     const t = setTimeout(() => {
-      saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), updatedAt: new Date().toISOString() })
+      saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), updatedAt: new Date().toISOString() })
         .then(async () => {
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
           try { if (state.feedback.length) await saveCards(user.uid, state.feedback); } catch (e) { setCloudStatus({ ok: true, text: `Saved. Cards: ${explainCloudError(e)}`, at: new Date().toISOString() }); }
@@ -1164,6 +1175,17 @@ export default function App() {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   setPdUnit(personal.pdUnit);
+  const ai = aiState(safety, personal.birthYear, Boolean(profile.coachId) || profile.role === "coach");
+  const updateSafety = (fn: (s: Safety) => Safety) => { const next = fn(getSafety()); storeSafety(next); setSafetyState(next); };
+  // code signal: a custom goal under the body's resting burn, or a loss faster than 1 percent a week, raises a flag
+  useEffect(() => {
+    if (!goal || goal.source !== "exact" || state.goals.calories === null || !canCalculate(personal)) return;
+    const c = calculate(personal, goal.band ?? "recomp", profile.formula ?? null);
+    if (!c) return;
+    const sig = goalSignals(true, state.goals.calories, c.bmr, c.tdee, personal.weightKg ?? null);
+    if (sig.flag) { updateSafety((x) => addFlag(x, "eating", "code")); log("safety_flag", { situation: "eating", source: "code", reasons: sig.reasons }); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [goal?.setAt, state.goals.calories]);
   const totals = aggregate(state.items),
     todayKcal = todayKcalOf(),
     dayPd = density(state.goals.protein, todayKcal),
@@ -1203,6 +1225,7 @@ export default function App() {
     dayName: personal.dayMode === "follow" ? DAY_TYPES.find((d) => d.id === day.type)?.name ?? "Today" : "Today",
     tipGoalKey: `${goal?.band ?? "none"}|${pdRef ?? "none"}|pb1`,
     requestTip: async (foodId: string) => {
+      if (!ai.on) { notify(ai.why || FIXED.off); return; }
       const f = state.foods.find((x) => x.id === foodId); if (!f) return;
       const key = `${goal?.band ?? "none"}|${pdRef ?? "none"}|pb1`;
       const { jobOf } = await import("./foodjob");
@@ -1315,7 +1338,7 @@ export default function App() {
       const tags = new Set(REGIONS.find((r) => r.id === (region ?? "elsewhere"))?.tags ?? ["*"]);
       const starter = STARTER_FOODS.filter((f) => (STARTER_REGION[f.id] ?? ["*"]).some((t) => tags.has(t)));
       const share = todayKcal === null ? null : Math.round(todayKcal * momentKcalShare(moment));
-      return mixTip(food, moment, pdRef, state.foods, starter, share, { weightKg: personal.weightKg ?? null, dayType: day.type });
+      return mixTip(food, moment, pdRef, state.foods, starter, share, { weightKg: personal.weightKg ?? null, dayType: day.type, allergies: safety.allergies });
     },
     takeMix: (food: Food, mix: Mix) => {
       // the partners enter the library if they came from the starter set; the plate becomes the mix, amounts as solved
@@ -1348,7 +1371,26 @@ export default function App() {
     joinCoach: async (code: string) => { if (!user) return; try { const r = await joinCoach(user.uid, code); setProfile((p) => ({ ...p, ...r })); notify(`You're with ${r.coachName} now.`); } catch (e: any) { setError(e.message); } },
     leaveCoach: async () => { if (!user) return; try { await leaveCoach(user.uid); setProfile((p) => ({ ...p, coachId: undefined, coachName: undefined })); } catch (e: any) { setError(e.message); } },
     signOut: async () => { await signOutCloud(); cloudLoaded.current = false; },
-    deleteAccount: async () => { try { await deleteAccount(); localStorage.clear(); location.reload(); } catch (e: any) { setError(e.message || "Could not delete the account. Sign in again and retry."); } },
+    safety, ai,
+    declareSafety: (patch) => { updateSafety((x) => { const next = { ...x, ...patch }; const now = new Date().toISOString(); for (const sid of next.situations) if (!x.situations.includes(sid)) next.flags = [...next.flags, { situation: sid, at: now, source: "door" as const }]; return next; }); },
+    flagFromModel: (situation) => { updateSafety((x) => addFlag(x, situation, "model")); log("safety_flag", { situation, source: "model" }); },
+    exportMyData: async () => {
+      // everything: the profile, the goal and its history, the foods with their photos, the cards, the recipes, and what the account holds
+      let cloud: any = null;
+      if (user) { try { cloud = await exportAccount(user.uid); } catch (e: any) { cloud = { error: explainCloudError(e) }; } }
+      const data = { exportedAt: new Date().toISOString(), name: clientName, personal: getPersonal(), safety: getSafety(), goal: getGoal(), goalLog: getGoalLog(), foods: state.foods, cards: state.feedback, items: state.items, recipes: inbox, account: cloud };
+      const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
+      const a = document.createElement("a"); a.href = url; a.download = `chef-mealan-my-data-${new Date().toISOString().slice(0, 10)}.json`; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      log("data_export", {});
+    },
+    deleteSteps,
+    confirmClientAi: async (clientUid: string, on: boolean) => {
+      if (!user) return;
+      if (on) await confirmClientAi(clientUid, user.uid); else await clearClientAi(clientUid);
+      notify(on ? "Mealan's chat is on for this client." : "Mealan's chat is off for this client.");
+    },
+    deleteAccount: async () => { try { await deleteAccount(setDeleteSteps); localStorage.clear(); location.reload(); } catch (e: any) { setError(e.message || "Could not delete the account. Sign in again and retry."); } },
     resetGoal: () => { clearGoal(); setState((s) => ({ ...s, goals: { ...s.goals, calories: null, protein: null } })); setGoalState(null); setGoalOpen(true); },
     mealanCard: (
       <Mealan
@@ -1382,6 +1424,17 @@ export default function App() {
   if (cloudEnabled && user && !profileReady) return <div className="app-shell"><main /></div>;
   if (cloudEnabled && user && profile.role !== "coach" && !profile.coachId)
     return <div className="app-shell"><main><PilotGate {...screenProps} /></main></div>;
+  if (ai.blocked)
+    return (
+      <div className="app-shell"><main>
+        <section className="card" style={{ margin: 18 }}>
+          <b>Chef Mealan is not for people under 13.</b>
+          <p className="small">The birth year on the profile says under 13. If that's a typo, fix it on the profile; if not, the account closes here. Nothing else is stored.</p>
+          <div className="button-row"><button className="pill pill-small" onClick={() => screenProps.openMenu("profile")}>Profile</button><button className="pill pill-small" onClick={screenProps.signOut}>Sign out</button></div>
+        </section>
+        {menuSection && <MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s) => { setMenuFrom(null); setMenuSection(s); }} close={() => { setMenuFrom(null); setMenuSection(null); }} />}
+      </main></div>
+    );
   if (goalOpen)
     return (
       <div className="app-shell"><main><GoalScreen {...screenProps} onDone={() => { setGoalState(getGoal()); setGoalOpen(false); }} /></main></div>
@@ -1508,6 +1561,7 @@ export default function App() {
           onAsk={screenProps.askAboutMix}
           target={pdRef}
           day={{ kcal: todayKcal, eaten: screenProps.eatenTodayKcal, name: screenProps.dayName, type: day.type, weightKg: personal.weightKg ?? null }}
+          allergies={safety.allergies}
           momentName={momentOf(moment).name}
         />
       )}{" "}

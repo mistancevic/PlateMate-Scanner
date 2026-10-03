@@ -64,6 +64,7 @@ export function LandingScreen() {
         <div className="l-lock"><Lock size={20} /></div>
         <h2>Chef Mealan works through coaches</h2>
         <p>It's a closed pilot. You join with a code from your coach. No coach yet, or you are one? Leave your details and Milan gets back to you.</p>
+        <p className="small">For people with a goal who decide their own food. Not for anyone under 13, and not a replacement for a doctor: with a medical condition that decides your food, pregnancy, diabetes or a difficult relationship with eating, Mealan steps back and names who to talk to. Under 18 you join with a parent or a coach.</p>
         <RequestForm />
       </section>
 

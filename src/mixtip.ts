@@ -8,6 +8,7 @@ import { playbookFor } from "./playbook";
 import type { MomentId } from "./moments";
 import type { DayType } from "./personal";
 import { preTraining, proteinFloor } from "./fitness";
+import { blockedByAllergy } from "./safety";
 
 export type MixCase = "fits" | "under" | "over" | "unknown";
 export type MixKind = "DaaM dessert" | "meal" | "snack";
@@ -132,8 +133,9 @@ export function plateOk(all: Food[]): boolean {
 }
 
 // Candidates for a role, best first: a real portion for the role, library before starter set, favourites first.
-function candidates(role: Job, scanned: Food, library: Food[], starter: Food[], ask: Ask, moment: MomentId): Food[] {
-  const pool = [...library, ...starter.filter((s) => !library.some((l) => sameName(l, s)))].filter((f) => !sameName(f, scanned));
+function candidates(role: Job, scanned: Food, library: Food[], starter: Food[], ask: Ask, moment: MomentId, allergies: string[] = []): Food[] {
+  // a declared allergy or intolerance: the food is never a partner, whatever else says
+  const pool = [...library, ...starter.filter((s) => !library.some((l) => sameName(l, s)))].filter((f) => !sameName(f, scanned)).filter((f) => !blockedByAllergy(f, allergies));
   return pool
     .filter((f) => jobOf(f).job === role && f.calories !== null && f.protein !== null)
     .filter((f) => ask.cooking || f.readyToEat)
@@ -146,7 +148,7 @@ function candidates(role: Job, scanned: Food, library: Food[], starter: Food[], 
 }
 
 // The tip for a scanned food, this moment and this plate's target. kcalCap is the moment's share of the day, if known.
-export type MixOpts = { weightKg?: number | null; dayType?: DayType };
+export type MixOpts = { weightKg?: number | null; dayType?: DayType; allergies?: string[] };
 export function mixTip(food: Food, moment: MomentId, target: number | null, library: Food[], starter: Food[], kcalCap: number | null, opts: MixOpts = {}): MixTip {
   // fitness rule: before training the job is energy; a carb food the playbook clears fits as it is, whatever its PD
   if (moment === "before") {
@@ -159,7 +161,7 @@ export function mixTip(food: Food, moment: MomentId, target: number | null, libr
   const ask = ASKS[moment] ?? ASKS.regular;
   const roles = c === "under" ? ask.under : ask.over;
   const cap = ask.snack ? Math.min(SNACK_KCAL, kcalCap ?? SNACK_KCAL) : kcalCap;
-  const firsts = candidates(roles[0], food, library, starter, ask, moment);
+  const firsts = candidates(roles[0], food, library, starter, ask, moment, opts.allergies ?? []);
   const mixes: Mix[] = [];
   const floor = moment === "after" ? proteinFloor(opts.weightKg) : null;
   const push = (partners: Food[]) => {
@@ -185,10 +187,10 @@ export function mixTip(food: Food, moment: MomentId, target: number | null, libr
   for (const f of firsts) { push([f]); if (mixes.length) break; }
   if (mixes.length && roles.length > 1) {
     const first = mixes[0].partners[0];
-    const second = candidates(roles[1], food, library, starter, ask, moment).find((f) => plateOk([food, first, f]));
+    const second = candidates(roles[1], food, library, starter, ask, moment, opts.allergies ?? []).find((f) => plateOk([food, first, f]));
     if (second) {
       push([first, second]);
-      const third = roles[2] ? candidates(roles[2], food, library, starter, ask, moment).find((f) => plateOk([food, first, second, f])) : null;
+      const third = roles[2] ? candidates(roles[2], food, library, starter, ask, moment, opts.allergies ?? []).find((f) => plateOk([food, first, second, f])) : null;
       if (third && mixes.length === 2) push([first, second, third]);
     }
   }

@@ -8,6 +8,7 @@ import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
 import { ACTIVITIES, calculate, canCalculate, suggestBand, formulaFor, type Personal } from "../personal";
 import type { AppApi, MenuSection } from "./api";
+import { SITUATIONS, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
 
 const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
@@ -60,10 +61,39 @@ function ProfilePanel(p: AppApi) {
   const [d, setD] = useState<Personal>(p.personal);
   const num = (v: string) => (v.trim() === "" ? undefined : Number(v.replace(",", ".")) || undefined);
   const dirty = name.trim() !== p.clientName || JSON.stringify(d) !== JSON.stringify(p.personal);
+  const consented = Boolean(p.safety.consentBodyAt);
+  // the door: situations Mealan steps back from, and what to keep off every suggestion
+  const [sits, setSits] = useState<SituationId[]>(p.safety.situations);
+  const [allergyText, setAllergyText] = useState(p.safety.allergies.join(", "));
+  const doorDirty = JSON.stringify(sits) !== JSON.stringify(p.safety.situations) || allergyText.trim() !== p.safety.allergies.join(", ");
+  const saveDoor = () => {
+    const allergies = allergyText.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean);
+    const next = allergies.length && !sits.includes("allergies") ? [...sits, "allergies" as SituationId] : sits;
+    p.declareSafety({ situations: next, allergies, declaredAt: new Date().toISOString() });
+    setSits(next);
+    p.notify("Noted. Mealan keeps to it.");
+  };
   return (
     <>
       <p className="small">Optional. Used only to calculate your numbers. Stored on this phone and in your account, nowhere else.</p>
-      <section className="card form">
+      {!consented && (
+        <section className="card consent" aria-label="Before your numbers">
+          <b>Before your numbers</b>
+          <p className="small">To calculate your day, Mealan asks about your body: sex, birth year, height, weight, body fat if you know it. Here is what happens with it.</p>
+          <ul className="small">
+            <li><b>Kept:</b> only those values, and the numbers they give.</li>
+            <li><b>Where:</b> on this phone, and in your account in Frankfurt, EU. Nowhere else; never sold, never shared beyond your coach.</li>
+            <li><b>How long:</b> while the account exists.</li>
+            <li><b>Yours:</b> export it or delete it, with everything else, from Menu, Account.</li>
+          </ul>
+          <p className="small">Nothing about your body is stored until you agree. Under 16, a parent agrees.</p>
+          <div className="button-row">
+            <button className="pill pill-small pill-primary" onClick={() => p.declareSafety({ consentBodyAt: new Date().toISOString(), consentBy: "self" })}>I agree</button>
+            <button className="pill pill-small" onClick={() => p.declareSafety({ consentBodyAt: new Date().toISOString(), consentBy: "parent" })}>A parent agrees for me</button>
+          </div>
+        </section>
+      )}
+      <section className={`card form ${consented ? "" : "shut"}`} aria-disabled={!consented}>
         <label className="field"><span>Name</span><input value={name} placeholder="Your name" onChange={(e) => setName(e.target.value)} /></label>
         <div className="field"><span>Sex</span>
           <div className="moments">
@@ -92,7 +122,27 @@ function ProfilePanel(p: AppApi) {
           </div>
           <small>Same thing, two ways to read it: PD 5 is 20 % of the energy from protein.</small>
         </div>
-        <button className="pill pill-primary pill-wide" disabled={!dirty} onClick={() => { p.setClientName(name.trim()); p.setPersonal(d); if (d.pdUnit !== p.personal.pdUnit) log("pd_unit", { unit: d.pdUnit ?? "pd" }); p.notify("Profile saved."); }}>Save</button>
+        <button className="pill pill-primary pill-wide" disabled={!dirty || !consented} onClick={() => { p.setClientName(name.trim()); p.setPersonal(d); if (d.pdUnit !== p.personal.pdUnit) log("pd_unit", { unit: d.pdUnit ?? "pd" }); p.notify("Profile saved."); }}>Save</button>
+      </section>
+      <section className="card form door" aria-label="Is any of this true for you">
+        <b>Is any of this true for you?</b>
+        <p className="small">Mealan is a chef. For these, it steps back, names who to talk to, and keeps the plate working. Your coach sees that you ticked one and when, never your words.</p>
+        {SITUATIONS.map((x) => (
+          <label className="check" key={x.id}>
+            <input type="checkbox" checked={sits.includes(x.id)} onChange={(e) => setSits(e.target.checked ? [...sits, x.id] : sits.filter((y) => y !== x.id))} />
+            <span><b>{x.label}</b>{x.detail ? <small> {x.detail}</small> : null}</span>
+          </label>
+        ))}
+        <label className="field"><span>Allergies and intolerances, which ones</span><input value={allergyText} placeholder="milk, peanuts, gluten" onChange={(e) => setAllergyText(e.target.value)} /></label>
+        <small className="muted">Nothing containing these is ever suggested. Mealan checks the name and the label lines of every food.</small>
+        {p.ai.needsParent && <small className="muted">Under 16: a parent agrees on the profile, and your coach confirms before Mealan's chat is on.</small>}
+        <button className="pill pill-primary pill-wide" disabled={!doorDirty} onClick={saveDoor}>Save</button>
+        {p.safety.situations.length > 0 && (
+          <div className="fixed-lines">
+            {p.safety.situations.map((id) => <p className="small" key={id}><b>{SITUATIONS.find((x) => x.id === id)?.label}:</b> {FIXED[id]}</p>)}
+          </div>
+        )}
+        {!p.ai.on && <p className="small notice">{p.ai.why}</p>}
       </section>
       <div className="menu-list" style={{ marginTop: 12 }}>
         <button className="menu-row" onClick={() => { if (dirty) { p.setClientName(name.trim()); p.setPersonal(d); p.notify("Profile saved."); } p.openMenu("goal", "profile"); }}>
@@ -266,7 +316,17 @@ function CoachPanel(p: AppApi) {
 
 function AccountPanel(p: AppApi) {
   const { cloudEnabled, user, cloudStatus, signOut, deleteAccount } = p;
-  if (!cloudEnabled) return <section className="card"><small>This phone only. Your data stays here.</small></section>;
+  // the export is the person's whatever the sign-in: on this phone only, the file holds what the phone holds
+  if (!cloudEnabled) return (
+    <>
+      <section className="card"><small>This phone only. Your data stays here.</small></section>
+      <section className="card">
+        <b>Your data</b>
+        <p className="small">Everything Mealan holds about you on this phone: profile, goal and its history, foods with photos, cards. One file, yours.</p>
+        <div className="button-row"><button className="pill pill-small" onClick={p.exportMyData}><Download size={14} /> Export my data</button></div>
+      </section>
+    </>
+  );
   return (
     <>
       <section className="card person">
@@ -274,9 +334,17 @@ function AccountPanel(p: AppApi) {
         <div><b>{user ? user.name || user.email : "This phone only"}</b><small>{user ? user.email : "no account, data stays here"}</small></div>
       </section>
       {user && cloudStatus.text && <p className={`small sync ${cloudStatus.ok ? "" : "sync-bad"}`}>{cloudStatus.text}{cloudStatus.at ? `, ${new Date(cloudStatus.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}.</p>}
+      <section className="card">
+        <b>Your data</b>
+        <p className="small">Everything Mealan holds about you: profile, goal and its history, foods with photos, cards, recipes from your coach, and what the account stores. One file, yours.</p>
+        <div className="button-row">
+          <button className="pill pill-small" onClick={p.exportMyData}><Download size={14} /> Export my data</button>
+        </div>
+        {user && <p className="small">Delete removes all of it, photos, cards and recipes included, and the sign-in. Not undoable.{p.deleteSteps ? ` ${p.deleteSteps}…` : ""}</p>}
+      </section>
       <div className="button-row">
         {user && <button className="pill pill-small" onClick={signOut}>Sign out</button>}
-        {user && <ConfirmButton className="pill pill-small" label="Delete my account and data" confirmLabel="Tap again to delete everything" onConfirm={deleteAccount} />}
+        {user && <ConfirmButton className="pill pill-small danger" label="Delete my account" confirmLabel="Tap again to delete everything" onConfirm={deleteAccount} />}
         {!user && <button className="pill pill-small" onClick={() => { localStorage.removeItem("chefmealan-local-only"); location.reload(); }}>Sign in</button>}
       </div>
     </>

@@ -79,7 +79,7 @@ export function JourneyScreen(p: AppApi) {
   const cardItem = items.find((i) => i.id === cardId);
   const foodCard = cardItem && <FoodCard food={state.foods.find((x) => x.id === cardItem.food.id) ?? cardItem.food} addPhoto={(d) => p.addFoodPhoto(cardItem.food.id, d)} toggleFavorite={() => p.toggleFavorite(cardItem.food.id)} insight={{ dayKcal: p.todayKcal, eaten: p.eatenTodayKcal, dayName: p.dayName, goalKey: p.tipGoalKey, requestTip: () => p.requestTip(cardItem.food.id), setJob: (j) => p.setFoodJob(cardItem.food.id, j) }} removePhoto={(i) => p.removeFoodPhoto(cardItem.food.id, i)} target={pdRef} fit={p.fitPd(density(cardItem.food.protein, cardItem.food.calories))} close={() => setCardId(null)} dontHave={() => { setHelper({ missing: cardItem.id }); setCardId(null); }} mix={mixProps(state.foods.find((x) => x.id === cardItem.food.id) ?? cardItem.food)} />;
   const helperSheet = helper && (
-    <PlateHelper items={items} library={state.foods} pdRef={pdRef} cap={cap ?? null} missing={helper.missing ? items.find((i) => i.id === helper.missing) ?? null : null} prefill={helper.prefill}
+    <PlateHelper safety={p.safety} ai={p.ai} onFlag={p.flagFromModel} items={items} library={state.foods} pdRef={pdRef} cap={cap ?? null} missing={helper.missing ? items.find((i) => i.id === helper.missing) ?? null : null} prefill={helper.prefill}
       setError={setError} close={() => setHelper(null)} openTalk={() => { setHelper(null); p.openOut(); }} record={p.recordTalk}
       apply={(next, note) => { setState((s) => ({ ...s, items: next, portion: null })); p.notify(note); if (step === "recipe") recalc(next); }} />
   );

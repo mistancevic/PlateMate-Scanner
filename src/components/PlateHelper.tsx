@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Send, Replace, Plus, Scale, Check } from "lucide-react";
+import { SafetyNote } from "./SafetyNote";
+import { FIXED, takeModelFlag, allergyHits, type Safety, type AiState, type SituationId } from "../safety";
 import { density, solveIngredient, uid, type Food, type Ingredient } from "../pilot";
 import { rankSwaps, sameFood } from "../swaps";
 import { fmt, pdText } from "../ui";
@@ -8,9 +10,10 @@ import { log } from "../log";
 type Suggestion = { action: "add" | "swap" | "amount"; food: string; replaces: string | null; grams: number | null; calories: number | null; protein: number | null; why: string; known: boolean };
 
 // Help inside the plate: ask about it, get up to three actions, tap one. Closing leaves the plate as it was, plus what you tapped.
-export function PlateHelper({ items, library, pdRef, cap, missing, prefill, apply, close, setError, openTalk, record }: {
+export function PlateHelper({ items, library, pdRef, cap, missing, prefill, apply, close, setError, openTalk, record, safety, ai, onFlag }: {
   items: Ingredient[]; library: Food[]; pdRef: number | null; cap: number | null; missing?: Ingredient | null; prefill?: string;
   apply: (next: Ingredient[], note: string) => void; close: () => void; setError: (m: string) => void; openTalk?: () => void; record?: (q: string, reply: string, plate: string[]) => void;
+  safety: Safety; ai: AiState; onFlag: (s: SituationId) => void;
 }) {
   const [q, setQ] = useState(prefill ?? (missing ? `I don't have ${missing.food.name}. What instead?` : ""));
   // suggestions taken in this conversation: the helper stays open, so a second one can be added
@@ -54,6 +57,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
   }
   async function ask(given?: string) {
     const question = (typeof given === "string" ? given : q).trim(); if (!question) return;
+    if (!ai.on) { setReply(ai.why || FIXED.off); return; }
     if (typeof given === "string") setQ(given);
     setBusy(true); setReply(""); setSugs([]); setTaken(new Set());
     try {
@@ -65,7 +69,10 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
       }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Mealan could not answer.");
-      setReply(data.reply || ""); setSugs(data.suggestions ?? []);
+      const taken = takeModelFlag(data.reply || ""); if (taken.flag) onFlag(taken.flag);
+      // a declared allergy: a suggestion that trips it never shows, whatever the model said
+      const safe = (data.suggestions ?? []).filter((x: any) => !allergyHits({ name: String(x.food ?? ""), brand: "", notes: String(x.why ?? ""), table: [] } as any, safety.allergies).length);
+      setReply(taken.text); setSugs(safe);
       record?.(question, data.reply || "", items.map((i) => i.food.name));
       if (!(data.suggestions ?? []).length) setReply((r) => r || "Couldn't work this one out. Try asking it another way.");
       log("plate_question", { q: question, plate: items.map((i) => i.food.name), n: (data.suggestions ?? []).length, ms: data.ms });
@@ -77,6 +84,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet helper" onClick={(e) => e.stopPropagation()}>
         <div className="card-top"><span>{missing ? `Mealan, instead of ${missing.food.name}` : "Mealan, about this plate"}</span><button className="link" onClick={close}>Close</button></div>
+        <SafetyNote safety={safety} ai={ai} />
         {codeSwaps.length > 0 && (
           <>
             <p className="label">From your foods</p>

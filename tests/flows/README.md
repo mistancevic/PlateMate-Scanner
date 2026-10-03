@@ -10,6 +10,7 @@ Two kinds of checks live here, and the difference is the rule.
 - A missing food: the plate helper offers swaps from the library, never the missing food. (`dont-have-it.cjs`)
 - A barcode scanned twice opens the existing food, never a duplicate. (`duplicates-merge.cjs`)
 - Today: the day set once, read all day; the actions directly under the plan. (`today.cjs`)
+- Safe for people who need more than a chef: consent before the body fields; the door asks the six situations; a declared situation is flagged with its source and date and the person is told; the chat is off until the coach confirms and a question gets the fixed line, never the model; a declared allergy blocks every suggestion and the label check says what a pack contains; export holds everything. (`safety.cjs`)
 
 **The happy paths.** The eight paths a person takes to get a job done, with the outcome they perceive and where a safety rule sits, are in the Worth Building doc, tab "Happy paths". `npm run qa:paths` runs the walkthroughs that guard each path and prints one line per path; P1, P7 and P8 have no guard in the sandbox and are checked on the phone.
 

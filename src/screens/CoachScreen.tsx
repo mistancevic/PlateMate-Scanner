@@ -3,6 +3,7 @@ import { RefreshCw, Copy, Target, Send, UserPlus } from "lucide-react";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { DAY_TYPES } from "../personal";
 import { listClients, setClientGoal, loadPhotos, sendRecipe, pinFormula, type ClientRow } from "../cloud";
+import { ageBand, isMinor, SITUATIONS } from "../safety";
 import { GoalHistory } from "./MenuScreen";
 import { uid } from "../pilot";
 import { BANDS, bandOf, goalsForBand } from "../goal";
@@ -43,12 +44,12 @@ export function CoachArea(p: AppApi) {
           <small className="client-last">{last(r) ? `${last(r).taste}: ${last(r).meal?.title ?? ""} · ${new Date(last(r).createdAt).toLocaleDateString()}${last(r).notes ? ` · ${last(r).notes}` : ""}` : "no meals yet"} · active {r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : "never"}</small>
         </button>
       ))}
-      {open && <ClientSheet row={open} coachName={coachName} close={() => setOpen(null)} onSaved={refresh} setError={setError} notify={notify} />}
+      {open && <ClientSheet row={open} coachName={coachName} close={() => setOpen(null)} onSaved={refresh} setError={setError} notify={notify} confirmAi={p.confirmClientAi} />}
     </>
   );
 }
 
-function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row: ClientRow; coachName: string; close: () => void; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void }) {
+function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirmAi }: { row: ClientRow; coachName: string; close: () => void; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void; confirmAi?: (uid: string, on: boolean) => Promise<void> }) {
   const [band, setBand] = useState<string>(row.goal?.band ?? "");
   const [editing, setEditing] = useState(false);
   const [formula, setFormula] = useState<"mifflin" | "katch" | null>(row.formula ?? null);
@@ -61,6 +62,28 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify }: { row
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="card-top"><span>{row.name}</span><button className="link" onClick={close}>Close</button></div>
+        {(() => {
+          // safety: situation and date only, never the person's words; the coach confirms Mealan's chat for a minor or a flagged account
+          const band = ageBand(row.birthYear);
+          const minor = isMinor(band);
+          const flagged = row.flags.some((f) => f.situation === "eating");
+          const needs = minor || flagged;
+          if (!needs && row.flags.length === 0) return null;
+          return (
+            <section className="card safety-sheet">
+              <b>Safety</b>
+              {row.flags.length > 0 && <ul className="small">{row.flags.map((f, i) => <li key={i}>{SITUATIONS.find((x) => x.id === f.situation)?.label ?? f.situation} · {f.at}</li>)}</ul>}
+              {minor && <p className="small">Under 18{band === "young" ? ", under 16: a parent has to agree on the profile" : ""}{row.consentBy ? ` · consent recorded by ${row.consentBy}` : " · no consent recorded yet"}. The numbers never go under maintenance.</p>}
+              {needs && confirmAi && (
+                <div className="button-row">
+                  {row.aiConfirmedAt
+                    ? <button className="pill pill-small" onClick={() => confirmAi(row.uid, false).then(onSaved).catch((e) => setError(e.message))}>Mealan's chat is on · switch off</button>
+                    : <button className="pill pill-small pill-primary" disabled={band === "young" && row.consentBy !== "parent"} onClick={() => confirmAi(row.uid, true).then(onSaved).catch((e) => setError(e.message))}>Confirm Mealan's chat</button>}
+                </div>
+              )}
+            </section>
+          );
+        })()}
         <div className="client-goal">
           <div><b>{row.goal?.band ? bandOf(row.goal.band)?.name : "No goal yet"}</b><small>{row.goal?.band ? pdRange(bandOf(row.goal.band)?.range ?? "") : ""}{row.goal?.setBy === "coach" ? " · set by you" : row.goal ? " · set by them" : ""}</small></div>
           <button className="pill pill-small" onClick={() => setEditing((v) => !v)}><Target size={14} /> {editing ? "Cancel" : "Change goal"}</button>

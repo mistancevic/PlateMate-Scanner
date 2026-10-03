@@ -60,7 +60,7 @@ export function suggestBand(p: Personal, current?: string): Band {
 }
 // Mifflin–St Jeor by default; Katch–McArdle when a body fat figure exists, unless the coach pinned a formula.
 export function formulaFor(p: Personal, pinned?: Formula | null): Formula { return pinned ?? (p.bodyFatPct ? "katch" : "mifflin"); }
-export type Calc = { kcal: number; protein: number; proteinMin: number; proteinMax: number; note: string; method: string; math: string };
+export type Calc = { kcal: number; protein: number; proteinMin: number; proteinMax: number; note: string; method: string; math: string; bmr: number; tdee: number };
 export function calculate(p: Personal, bandId: string, pinned?: Formula | null): Calc | null {
   if (!canCalculate(p)) return null;
   const age = ageOf(p)!;
@@ -94,5 +94,5 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   const method = `${f === "katch" ? "Katch–McArdle" : "Mifflin–St Jeor"}, ${act.name.toLowerCase()} ×${act.factor}${pct ? `, ${pct > 0 ? "+" : ""}${pct} %` : ""}`;
   const fmtK = (x: number) => (Number.isInteger(x) ? `${x}.0` : `${x}`);
   const math = `Energy: ${Math.round(bmr).toLocaleString()} at rest × ${act.factor} = ${Math.round(tdee).toLocaleString()}${pct ? `, ${pct > 0 ? "+" : "−"}${Math.abs(pct)} % = ${kcal.toLocaleString()}` : ` ≈ ${kcal.toLocaleString()}`} kcal. Protein: ${fmtK(lo)}–${fmtK(hi)} g per kg × ${refWhy} = ${proteinMin}–${proteinMax} g, target ${protein} g.`;
-  return { kcal, protein, proteinMin, proteinMax, note: notes.join(" "), method, math };
+  return { kcal, protein, proteinMin, proteinMax, note: notes.join(" "), method, math, bmr: Math.round(bmr), tdee: Math.round(tdee) };
 }

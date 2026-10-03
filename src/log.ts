@@ -12,6 +12,8 @@ export type LogEvent =
   | "mix_tip"        // a mix tip shown on a food card; data.food, data.moment, data.case, data.offered
   | "mix_taken"      // a mix chip tapped; data.food, data.moment, data.partners, data.kind, data.pd, data.kcal
   | "mix_ask"        // "Not quite? Tell Mealan" from a mix tip
+  | "safety_flag"    // a situation flagged: data.situation, data.source (door, code, model)
+  | "data_export"    // the person exported their data
   | "meal_saved"
   | "feedback";      // data.status
 const KEY = "chefmealan-log";

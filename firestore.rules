@@ -14,9 +14,11 @@ service cloud.firestore {
       allow list: if isOwner() || isCoachOf();
       // a person may keep or remove their coach link, never set one: joining goes through the server with a personal invite
       function coachLinkOk() { return coachKept() || request.resource.data.get('coachId', null) == null || request.resource.data.get('coachId', '') == ''; }
-      allow create: if isOwner() && request.resource.data.get('role', '') == '' && request.resource.data.get('coachId', '') == '';
+      // the coach's confirmation of Mealan's chat is the coach's to write, never the person's own
+      function aiKept() { return request.resource.data.get('aiConfirmedAt', null) == (existing() ? resource.data.get('aiConfirmedAt', null) : null) && request.resource.data.get('aiConfirmedBy', null) == (existing() ? resource.data.get('aiConfirmedBy', null) : null); }
+      allow create: if isOwner() && request.resource.data.get('role', '') == '' && request.resource.data.get('coachId', '') == '' && request.resource.data.get('aiConfirmedAt', null) == null;
       allow delete: if isOwner();
-      allow update: if (isOwner() && roleKept() && coachLinkOk()) || (isCoachOf() && roleKept() && coachKept());
+      allow update: if (isOwner() && roleKept() && coachLinkOk() && aiKept()) || (isCoachOf() && roleKept() && coachKept());
       function coachOfParent() { return request.auth != null && get(/databases/$(database)/documents/users/$(uid)).data.get('coachId', '') == request.auth.uid; }
       // Photos: the owner reads and writes; the coach of that person reads.
       match /photos/{pid} {

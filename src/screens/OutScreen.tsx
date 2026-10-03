@@ -6,6 +6,8 @@ import { CHEF_NAME } from "../components/Mark";
 import { resizeImageBase64 } from "../utils/image";
 import { log } from "../log";
 import type { AppApi } from "./api";
+import { SafetyNote } from "../components/SafetyNote";
+import { FIXED, takeModelFlag } from "../safety";
 
 type Rec = { name: string; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; typical_grams: number; confidence: string };
 export type Turn = { role: "you" | "mealan"; text: string; picks?: Ingredient[]; pd?: number | null; kcal?: number | null; photo?: string; plate?: string[] };
@@ -29,6 +31,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   async function ask(given?: string) {
     const msg = (typeof given === "string" ? given : text).trim();
     if (!msg && !photo) return;
+    if (!p.ai.on) { setTurns((t) => [...t, { role: "you", text: msg || "(photo)" }, { role: "mealan", text: p.ai.why || FIXED.off }]); setText(""); setPhoto(""); return; }
     const mine: Turn = { role: "you", text: msg || "(photo)", photo: photo || undefined };
     setTurns((t) => [...t, mine]); setText(""); setPhoto("");
     setThinking(true);
@@ -60,7 +63,8 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
         else fitNote = ` Even with more ${lever.food.name} this stays under your target; it's a treat, not a fit.`;
       }
       const kcal = aggregate(picks).calories;
-      const reply: Turn = { role: "mealan", text: (data.reply || "") + fitNote, picks, pd, kcal };
+      const taken = takeModelFlag(data.reply || ""); if (taken.flag) p.flagFromModel(taken.flag);
+      const reply: Turn = { role: "mealan", text: taken.text + fitNote, picks, pd, kcal };
       setTurns((t) => [...t, reply]);
       log("out", { picks: picks.length, pd });
     } catch (e: any) { setError(e.message); } finally { setThinking(false); }
@@ -88,6 +92,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
       <div className="head">
         <div className="menu-head"><h2>{CHEF_NAME}</h2><button className="link" onClick={close}>Close</button></div>
         <p>Out, missing something, or after an idea. Say where you are or what you have, add a photo if it helps. Estimates are marked; the amounts come from your target.</p>
+        <SafetyNote safety={p.safety} ai={p.ai} />
       </div>
       <div className="chat">
         {turns.length === 0 && (

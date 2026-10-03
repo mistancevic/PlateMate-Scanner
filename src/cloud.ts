@@ -46,7 +46,7 @@ export const signOutCloud = () => signOut(auth());
 
 // One document per person: the pilot state plus goal and name, and who coaches them.
 // role is set by hand in the Firebase console ("coach"); nobody can sign up as a coach.
-export type CloudDoc = { state: unknown; goal: unknown; clientName: string; updatedAt: string; personal?: unknown; goalLog?: unknown[]; formula?: "mifflin" | "katch" | null; role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string };
+export type CloudDoc = { state: unknown; goal: unknown; clientName: string; updatedAt: string; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: "mifflin" | "katch" | null; role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string };
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const snap = await getDoc(doc(db(), "users", uid));
   return snap.exists() ? (snap.data() as CloudDoc) : null;
@@ -73,7 +73,7 @@ export async function joinCoach(_uid: string, code: string) {
 export async function leaveCoach(uid: string) {
   await updateDoc(doc(db(), "users", uid), { coachId: null, coachName: null });
 }
-export type ClientRow = { uid: string; name: string; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: "mifflin" | "katch" | null; pdUnit: "pd" | "pct" };
+export type ClientRow = { uid: string; name: string; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: "mifflin" | "katch" | null; pdUnit: "pd" | "pct"; flags: { situation: string; at: string }[]; birthYear: number | null; aiConfirmedAt: string | null; consentBy: string | null };
 export async function pinFormula(clientUid: string, formula: "mifflin" | "katch" | null) { await updateDoc(doc(db(), "users", clientUid), { formula }); }
 export async function listClients(coachUid: string): Promise<ClientRow[]> {
   const q = query(collection(db(), "users"), where("coachId", "==", coachUid));
@@ -82,7 +82,9 @@ export async function listClients(coachUid: string): Promise<ClientRow[]> {
     const x = d.data() as any;
     let feedback: any[] = [];
     try { feedback = await loadSharedCards(d.id); } catch { /* none shared or not allowed */ }
-    return { uid: d.id, name: x.clientName || "unnamed", goal: x.goal ?? null, feedback, foods: x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: x.personal?.pdUnit ?? "pd" };
+    // the coach sees situation and date only, never the person's words
+    const flags = Array.isArray(x.safety?.flags) ? x.safety.flags.map((f: any) => ({ situation: String(f.situation), at: String(f.at ?? "").slice(0, 10) })) : [];
+    return { uid: d.id, name: x.clientName || "unnamed", goal: x.goal ?? null, feedback, foods: x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: x.personal?.pdUnit ?? "pd", flags, birthYear: x.personal?.birthYear ?? null, aiConfirmedAt: x.aiConfirmedAt ?? null, consentBy: x.safety?.consentBy ?? null };
   }));
   return rows.sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1));
 }
@@ -137,10 +139,30 @@ export async function loadSharedCards(clientUid: string): Promise<any[]> {
 }
 export async function deleteCard(uid: string, id: string) { await deleteDoc(doc(db(), "users", uid, "cards", id)); }
 export const isEmptyState = (st: any) => !st || ((st.foods?.length ?? 0) === 0 && (st.feedback?.length ?? 0) === 0 && (st.meals?.length ?? 0) === 0);
-export async function deleteAccount() {
+// Delete everything: the photos, the cards and the recipes under the account, then the account document, then the sign-in.
+// Each step reports; a step that fails stops the rest so nothing is half gone with the sign-in already removed.
+export async function deleteAccount(onStep?: (s: string) => void) {
   const u = auth().currentUser; if (!u) return;
-  await deleteDoc(doc(db(), "users", u.uid)).catch(() => {});
+  for (const sub of ["photos", "cards", "inbox"]) {
+    onStep?.(`Removing ${sub}`);
+    const snap = await getDocs(collection(db(), "users", u.uid, sub));
+    let batch = writeBatch(db()), n = 0;
+    for (const d of snap.docs) { batch.delete(d.ref); if (++n % 400 === 0) { await batch.commit(); batch = writeBatch(db()); } }
+    await batch.commit();
+  }
+  onStep?.("Removing the account record");
+  await deleteDoc(doc(db(), "users", u.uid));
+  onStep?.("Removing the sign-in");
   await deleteUser(u);
+}
+// The coach confirms Mealan's chat for a client: two fields on the client's document, situation flags stay the client's
+export async function confirmClientAi(clientUid: string, coachUid: string) { await updateDoc(doc(db(), "users", clientUid), { aiConfirmedAt: new Date().toISOString(), aiConfirmedBy: coachUid }); }
+export async function clearClientAi(clientUid: string) { await updateDoc(doc(db(), "users", clientUid), { aiConfirmedAt: null, aiConfirmedBy: null }); }
+// Everything under the account, for export: the record, the photos, the cards, the recipes
+export async function exportAccount(uid: string) {
+  const main = await loadCloud(uid);
+  const read = async (sub: string) => (await getDocs(collection(db(), "users", uid, sub))).docs.map((d) => ({ id: d.id, ...d.data() }));
+  return { account: main, photos: await read("photos"), cards: await read("cards"), inbox: await read("inbox") };
 }
 
 // ---- photos ----
