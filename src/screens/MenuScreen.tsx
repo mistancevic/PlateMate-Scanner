@@ -145,13 +145,13 @@ function ProfilePanel(p: AppApi) {
             <span><b>{x.label}</b>{x.detail ? <small> {x.detail}</small> : null}</span>
           </label>
         ))}
+        <label className="field"><span>Allergies and intolerances, which ones</span><input value={allergyText} placeholder="milk, peanuts, gluten" onChange={(e) => { setAllergyText(e.target.value); if (e.target.value.trim()) setNone(false); }} onBlur={() => commit(sits, none, allergyText)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /></label>
+        <small className="muted">Nothing containing these is ever suggested. Mealan checks the name and the label lines of every food.</small>
+        {p.ai.needsParent && <small className="muted">Under 16: a parent agrees on the profile, and your coach confirms before Mealan's chat is on.</small>}
         <label className="check none">
           <input type="checkbox" checked={none} onChange={(e) => tickNone(e.target.checked)} />
           <span><b>None of these applies to me</b><small> an unanswered question is not a no; Mealan asks again once a year</small></span>
         </label>
-        <label className="field"><span>Allergies and intolerances, which ones</span><input value={allergyText} placeholder="milk, peanuts, gluten" onChange={(e) => { setAllergyText(e.target.value); if (e.target.value.trim()) setNone(false); }} onBlur={() => commit(sits, none, allergyText)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /></label>
-        <small className="muted">Nothing containing these is ever suggested. Mealan checks the name and the label lines of every food.</small>
-        {p.ai.needsParent && <small className="muted">Under 16: a parent agrees on the profile, and your coach confirms before Mealan's chat is on.</small>}
         <p className={`small ${answered ? "muted" : "notice"}`}>{answered ? `Answered${p.safety.declaredAt ? " on " + fmtDay(p.safety.declaredAt) : ""}. A tick saves by itself; change it any time.` : "Tick one, or none. A tick saves by itself."}</p>
         {p.safety.situations.length > 0 && (
           <div className="fixed-lines">

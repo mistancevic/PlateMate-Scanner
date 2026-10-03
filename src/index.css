@@ -560,6 +560,8 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .safety-note.off { background: #fff4e5; } .safety-note p { margin: 4px 0 0; } .safety-note small { color: var(--brand-text); font-weight: 700; }
 .safety-sheet ul { margin: 6px 0; padding-left: 18px; }
 .pill.danger { color: var(--low); }
+.door .check.none { margin-top: 12px; padding: 12px; background: var(--tint); border-radius: 14px; border-bottom: 0; }
+.check.none b { color: var(--brand-text); }
 .consent-line { padding: 8px 12px; background: var(--tint); border-radius: 12px; }
 .door-log { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); }
 .plan-source { display: inline-flex; align-items: center; gap: 2px; padding: 0; color: var(--brand-text); font-size: 12px; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }

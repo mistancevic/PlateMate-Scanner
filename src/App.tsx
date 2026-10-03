@@ -704,7 +704,11 @@ export default function App() {
           if (remote.clientName) { storeClientName(remote.clientName); setClientNameState(remote.clientName); }
           if (remote.personal && typeof remote.personal === "object") { storePersonal(remote.personal as Personal); setPersonalState(remote.personal as Personal); }
           {
-            const base = remote.safety && typeof remote.safety === "object" ? { ...EMPTY_SAFETY, ...(remote.safety as Safety) } : getSafety();
+            // the newer answer wins: a door answered on this phone after the account's last save is not overwritten by the account's older copy
+            const local = getSafety();
+            const remoteS = remote.safety && typeof remote.safety === "object" ? { ...EMPTY_SAFETY, ...(remote.safety as Safety) } : null;
+            const newer = (a?: string, b?: string) => (a ?? "") > (b ?? "");
+            const base: Safety = !remoteS ? local : newer(local.declaredAt, remoteS.declaredAt) || newer(local.consentBodyAt, remoteS.consentBodyAt) ? { ...remoteS, ...local, flags: [...remoteS.flags, ...local.flags.filter((f) => !remoteS.flags.some((g) => g.situation === f.situation && g.at === f.at))] } : remoteS;
             const merged: Safety = { ...base, aiConfirmedAt: remote.aiConfirmedAt ?? undefined, aiConfirmedBy: remote.aiConfirmedBy ?? undefined };
             storeSafety(merged); setSafetyState(merged);
           }
@@ -833,7 +837,7 @@ export default function App() {
         .catch((e) => setCloudStatus({ ok: false, text: `Not saved: ${explainCloudError(e)}` }));
     }, 1000);
     return () => clearTimeout(t);
-  }, [state, goal, clientName, personal, goalLog, user]);
+  }, [state, goal, clientName, personal, goalLog, safety, user]);
   async function api(url: string, body?: unknown) {
     const res = await fetch(url, {
       method: body === undefined ? "GET" : "POST",
