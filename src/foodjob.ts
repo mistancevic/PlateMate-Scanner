@@ -45,10 +45,13 @@ export function plainLine(f: Food, target: number | null): string {
 export function todayLine(f: Food, dayKcal: number | null, eatenKcal: number, dayName: string): string | null {
   if (dayKcal == null || f.calories == null) return null;
   const { job } = jobOf(f);
-  const portionKcal = Math.round((f.calories * PORTION[job]) / 100);
+  // a counted food's portion is one serving; the line says so in the pack's own word
+  const grams = f.serving ? f.serving.grams : PORTION[job];
+  const portion = f.serving ? `1 ${f.serving.name} (${f.serving.grams} g)` : `A ${PORTION[job]} g portion`;
+  const portionKcal = Math.round((f.calories * grams) / 100);
   const left = Math.round(dayKcal - eatenKcal);
   const so = eatenKcal > 0 ? `${Math.round(eatenKcal).toLocaleString("en")} of ${Math.round(dayKcal).toLocaleString("en")} kcal so far in Mealan` : `${Math.round(dayKcal).toLocaleString("en")} kcal planned, nothing in Mealan yet`;
   if (left <= 0) return `${dayName}: ${so}. Not today.`;
-  if (portionKcal > left) return `${dayName}: ${so}. A ${PORTION[job]} g portion is more than the ${left} kcal left.`;
-  return `${dayName}: ${so}. A ${PORTION[job]} g portion fits.`;
+  if (portionKcal > left) return `${dayName}: ${so}. ${portion} is more than the ${left} kcal left.`;
+  return `${dayName}: ${so}. ${portion} fits.`;
 }

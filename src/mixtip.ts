@@ -1,7 +1,7 @@
 // The mix tip: a scanned food that doesn't fit the plate on its own, and what to mix it with.
 // Pure code. The case comes from the number, the partners from the moment and the roles, the amounts from the solver.
 // The model never picks a partner; it may only word the Pro tip below.
-import { aggregate, density, solveIngredient, uid, type Food, type Ingredient } from "./pilot";
+import { aggregate, density, solveIngredient, snapToServing, uid, type Food, type Ingredient } from "./pilot";
 import { jobOf, PORTION, minPortionOf, type Job } from "./foodjob";
 import { roleOf } from "./swaps";
 import { playbookFor } from "./playbook";
@@ -51,7 +51,7 @@ function kindOf(scanned: Food, partners: Food[], kcal: number, snackMoment: bool
   return jobs.includes("Protein base") && side ? "meal" : "snack";
 }
 // A portion to start from. The job's typical portion, except a supplement, which is a scoop, not a plate.
-const portionOf = (f: Food) => (roleOf(f.name) === "supplement" ? 30 : PORTION[jobOf(f).job]);
+const portionOf = (f: Food) => (f.serving ? f.serving.grams : roleOf(f.name) === "supplement" ? 30 : PORTION[jobOf(f).job]);
 
 
 // One mix: the scanned food at its portion, the partners at theirs. Under target the first partner is solved up to the
@@ -172,8 +172,9 @@ export function mixTip(food: Food, moment: MomentId, target: number | null, libr
       const base = b.items.find((i) => jobOf(i.food).job === "Protein base" && (i.food.protein ?? 0) > 0);
       if (!base) return;
       const need = floor - b.protein, extra = Math.ceil((need / (base.food.protein as number)) * 100 / 5) * 5;
-      if (base.grams + extra > 400) return;
-      const items = b.items.map((i) => (i.id === base.id ? { ...i, grams: i.grams + extra } : i));
+      const grown = snapToServing(base.food, base.grams + extra);
+      if (grown > 400) return;
+      const items = b.items.map((i) => (i.id === base.id ? { ...i, grams: grown } : i));
       const t = aggregate(items), pd = density(t.protein, t.calories);
       if (pd === null || (cap !== null && (t.calories ?? 0) > cap)) return;
       b = { ...b, items, pd, kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0) };
@@ -197,4 +198,4 @@ export function mixTip(food: Food, moment: MomentId, target: number | null, libr
   return { case: c, mixes, why };
 }
 
-export const mixLabel = (m: Mix) => `with ${m.partners.map((p) => p.name).join(" + ")}`;
+export const mixLabel = (m: Mix) => { const first = m.items[0]; const n = first?.food.serving ? `${Math.round(first.grams / first.food.serving.grams)} ${first.food.serving.name}${Math.round(first.grams / first.food.serving.grams) === 1 ? "" : "s"} ` : ""; return `${n}with ${m.partners.map((p) => p.name).join(" + ")}`; };

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Camera, Plus, Trash2, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
 import { ConfirmButton } from "../components/Confirm";
 import type { Mix } from "../mixtip";
-import { aggregate, density, uid, solveIngredient } from "../pilot";
+import { aggregate, density, uid, solveIngredient, servingLabel } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
@@ -230,13 +230,13 @@ export function JourneyScreen(p: AppApi) {
                   <button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button>
                   <small>{pdText(density(i.food.protein, i.food.calories))} · {i.locked ? "keep this amount" : `${CHEF_NAME} may move it`}</small>
                 </div>
-                {i.locked ? <b className="row-num">{fmt(i.grams, 0)} g</b> : (
+                {i.locked ? <b className="row-num">{fmt(i.grams, 0)} g{servingLabel(i.food, i.grams) ? <small> = {servingLabel(i.food, i.grams)}</small> : null}</b> : (
                   <label className="grams">
                     <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : i.grams}
                       onChange={(e) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0) }); }}
                       onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done"
                       onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ block: "center", behavior: "smooth" }), 250)} />
-                    <span>g</span>
+                    <span>g{servingLabel(i.food, i.grams) ? ` = ${servingLabel(i.food, i.grams)}` : ""}</span>
                   </label>
                 )}
               </div>

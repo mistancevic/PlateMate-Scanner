@@ -105,3 +105,22 @@ test("a less-than in the notes fills a blank field with the printed bound", asyn
   assert.equal(b.carbs, undefined);
   assert.deepEqual(lessThanFromNotes("as sold; contains milk"), {});
 });
+
+test("a counted food: what Mealan moves snaps to whole servings, never under one", async () => {
+  const { servingsFor, snapToServing, servingLabel, solveIngredient, servingOf } = await import("./pilot");
+  const bar = { id: "bar", name: "Protein bar", brand: "", basis: "100g", source: "test", notes: "", reviewedAt: "", readyToEat: true, calories: 363, protein: 50, fats: 10, carbs: 27, fiber: null, serving: { grams: 45, name: "bar" } } as any;
+  assert.equal(servingsFor(bar, 60), 2);
+  assert.equal(servingsFor(bar, 45), 1);
+  assert.equal(servingsFor(bar, 10), 1);
+  assert.equal(snapToServing(bar, 60), 90);
+  assert.equal(servingLabel(bar, 90), "2 bars");
+  assert.equal(servingLabel(bar, 45), "1 bar");
+  assert.equal(servingOf({ grams: 45, name: "bar" })?.grams, 45);
+  assert.equal(servingOf({ grams: 2, name: "bar" }), undefined);
+  // the solver: a bar moved next to 150 g skyr lands on whole bars
+  const skyr = { ...bar, id: "skyr", name: "Skyr", calories: 63, protein: 11, serving: undefined };
+  const r = solveIngredient([{ id: "a", food: skyr, grams: 150, locked: true }, { id: "b", food: bar, grams: 45, locked: false }], "b", 15, null) as any;
+  assert.equal(r.ok, true);
+  assert.equal(r.grams % 45, 0, `whole bars: ${r.grams} g`);
+  assert.ok(r.grams >= 45);
+});

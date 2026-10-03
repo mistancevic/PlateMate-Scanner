@@ -50,6 +50,8 @@ export type Food = Nutrition & {
   name: string;
   brand: string;
   barcode?: string;
+  // a counted food: the pack prints a serving (1 bar 45 g, 1 piece 30 g); what Mealan moves then snaps to whole servings
+  serving?: { grams: number; name: string };
   basis: "100g";
   source: string;
   notes: string;
@@ -235,7 +237,9 @@ export function solveIngredient(
       reason:
         "No non-negative amount of this ingredient meets the reference. Try a different supporting food.",
     };
-  const grams = Math.round(exactGrams);
+  // a counted food lands on whole servings: more of it when it lifts the plate, fewer when it lowers it, never under one
+  const lifts = (f.protein! / f.calories!) * 100 >= target;
+  const grams = f.serving ? (lifts ? snapToServing(f, exactGrams) : Math.max(1, Math.floor(exactGrams / f.serving.grams + 1e-9)) * f.serving.grams) : Math.round(exactGrams);
   if (
     maxWeight !== null &&
     (t.weight + exactGrams > maxWeight + 1e-8 || t.weight + grams > maxWeight)
@@ -247,7 +251,9 @@ export function solveIngredient(
   const result = items.map((x) => (x.id === id ? { ...x, grams } : x)),
     total = aggregate(result),
     actualPD = density(total.protein, total.calories);
-  if (actualPD === null || Math.abs(actualPD - target) > 0.05)
+  // a counted food lands on whole servings, so it may overshoot the target; a food in grams must land within 0.05
+  const overshootOk = Boolean(f.serving) && actualPD !== null && actualPD >= target;
+  if (actualPD === null || (Math.abs(actualPD - target) > 0.05 && !overshootOk))
     return {
       ok: false,
       reason:
@@ -366,12 +372,24 @@ export function parseState(raw: string): PilotState {
     );
   return v;
 }
+// A serving as the label read returns it: grams between 5 and 500 and a short unit name, or nothing
+export function servingOf(x: any): { grams: number; name: string } | undefined {
+  if (!x || typeof x !== "object") return undefined;
+  const grams = Number(x.grams), name = typeof x.name === "string" ? x.name.trim().slice(0, 20) : "";
+  if (!Number.isFinite(grams) || grams < 5 || grams > 500) return undefined;
+  return { grams: Math.round(grams), name: name || "serving" };
+}
+// Whole servings of a counted food that reach at least the grams asked for, never under one
+export const servingsFor = (f: Food, grams: number) => (f.serving ? Math.max(1, Math.ceil(grams / f.serving.grams - 1e-9)) : null);
+export const snapToServing = (f: Food, grams: number) => (f.serving ? servingsFor(f, grams)! * f.serving.grams : grams);
+export const servingLabel = (f: Food, grams: number) => { if (!f.serving) return null; const n = Math.round((grams / f.serving.grams) * 10) / 10; const whole = Number.isInteger(n); return `${whole ? n : n.toFixed(1)} ${f.serving.name}${n === 1 ? "" : "s"}`; };
 export function candidateFood(input: any, source: string): Food {
   return {
     id: uid(),
     name: typeof input.product_name === "string" ? input.product_name : "",
     brand: typeof input.brand === "string" && !/^\s*(unknown|n\/?a|none|-)?\s*$/i.test(input.brand) ? input.brand : "",
     barcode: typeof input.barcode === "string" ? input.barcode : undefined,
+    serving: servingOf(input.serving),
     basis: "100g",
     source,
     notes: typeof input.notes === "string" ? input.notes : "",

@@ -46,7 +46,7 @@ import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, type Mix, type MixTip } from "./mixtip";
 import { jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
-import { fitnessFor, SOURCES } from "./fitness";
+import { fitnessFor, SOURCES, dayName } from "./fitness";
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
@@ -69,6 +69,10 @@ import {
   MACROS,
   Meal,
   numberInput,
+  servingOf,
+  servingsFor,
+  snapToServing,
+
   lessThanFromNotes,
   parseState,
   PilotState,
@@ -231,7 +235,9 @@ function LabelCheck({
 }) {
   const [mainIdx, setMainIdx] = useState(0);
   const [choice, setChoice] = useState<"update" | "both">("update");
-  const [name, setName] = useState(food.name),
+  const [servingGrams, setServingGrams] = useState(food.serving ? String(food.serving.grams) : ""),
+    [servingName, setServingName] = useState(food.serving?.name ?? ""),
+    [name, setName] = useState(food.name),
     [brand, setBrand] = useState(food.brand),
     [notes, setNotes] = useState(food.notes),
     [ready, setReady] = useState(food.readyToEat),
@@ -255,7 +261,8 @@ function LabelCheck({
     : null;
   // the draft as a food, for the mix tip while the sheet is still open
   // readyToEat is true for the tip: the box starts unticked because it is unconfirmed, not because the food needs cooking
-  const draft = (): Food => ({ ...food, name: name.trim() || food.name, brand: brand.trim(), readyToEat: true, ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])) } as Food);
+  const servingNow = () => servingOf({ grams: numberInput(servingGrams), name: servingName.trim() || "serving" });
+  const draft = (): Food => ({ ...food, name: name.trim() || food.name, brand: brand.trim(), readyToEat: true, serving: servingNow(), ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])) } as Food);
   const pendingMix = useRef<Mix | null>(null);
   const [askError, setAskError] = useState("");
   // the mix tip shown on the review sheet is logged once per food
@@ -279,6 +286,7 @@ function LabelCheck({
       ...food,
       name: name.trim(),
       brand: brand.trim(),
+      serving: servingNow(),
       notes,
       readyToEat: ready,
       reviewedAt: new Date().toISOString(),
@@ -354,6 +362,16 @@ function LabelCheck({
         Brand
         <input value={brand} onChange={(e) => setBrand(e.target.value)} />
       </label>
+      <div className="serving-field">
+        <span className="label">Serving, if the pack prints one</span>
+        <div className="serving-row">
+          <span>1</span>
+          <input aria-label="Serving name" placeholder="bar, piece, pot" value={servingName} onChange={(e) => setServingName(e.target.value)} />
+          <input aria-label="Serving grams" type="number" inputMode="decimal" min="0" placeholder="45" value={servingGrams} onChange={(e) => setServingGrams(e.target.value)} />
+          <span>g</span>
+        </div>
+        <small className="muted">A counted food: what Mealan moves then comes in whole servings, 1 bar, 2 bars, never 1.3.</small>
+      </div>
       <p className="label">Nutrition table, per 100 g, as on the pack</p>
       <div className="label-table">
         {rows.map((r, i) => {
@@ -380,12 +398,17 @@ function LabelCheck({
         const ownText = !pb.alone.ok ? cap(pb.alone.reason) : under ? `Under your ${fixed(target!)}: pair it with a protein base to get there` : target != null ? `On your ${fixed(target)}. ${cap(pb.alone.reason)}` : cap(pb.alone.reason);
         const ownClass = !pb.alone.ok ? "no" : under ? "mid" : "ok";
         const t = day ? todayLine(d, day.kcal, day.eaten, day.name) : null;
+        const sv = d.serving;
+        const count = (grams: number) => (sv ? `${servingsFor(d, grams)} ${sv.name}${servingsFor(d, grams) === 1 ? "" : "s"}, ${snapToServing(d, grams)} g` : `about ${grams} g`);
+        const beforeText = fit.before.fits && fit.before.grams !== null ? `fast energy, nothing to add: ${count(fit.before.grams)} gives about ${Math.round((snapToServing(d, fit.before.grams) * (d.carbs ?? 0)) / 100)} g carbs for a ${dayName(day?.type ?? "normal")}` : fit.before.reason;
+        const afterText = fit.after.fits && fit.after.grams !== null ? `suits after training: ${count(fit.after.grams)} gives about ${Math.round((snapToServing(d, fit.after.grams) * (d.protein ?? 0)) / 100)} g protein, your ${fit.after.floor} g` : fit.after.reason;
         return (
           <section className="fit-lines" aria-label="How it fits">
             <p className="label">How it fits</p>
+            <p className="fit-pd"><b>{pdText(pd)}</b><small>{fmt(d.protein)} g protein per {fmt(d.calories, 0)} kcal{sv ? ` · 1 ${sv.name} is ${sv.grams} g, ${Math.round((sv.grams * (d.calories ?? 0)) / 100)} kcal and ${Math.round((sv.grams * (d.protein ?? 0)) / 100 * 10) / 10} g protein` : ""}</small></p>
             <p className={`fit-line ${ownClass}`}><b>On its own:</b> {ownText}.</p>
-            <p className={`fit-line ${fit.before.fits ? "ok" : pb.beforeTraining.ok ? "mid" : "no"}`} title={SOURCES.preCarb}><b>Before training:</b> {cap(fit.before.reason)}.</p>
-            <p className={`fit-line ${fit.after.fits ? "ok" : "no"}`} title={SOURCES.proteinDose}><b>After training:</b> {cap(fit.after.reason)}.</p>
+            <p className={`fit-line ${fit.before.fits ? "ok" : pb.beforeTraining.ok ? "mid" : "no"}`} title={SOURCES.preCarb}><b>Before training:</b> {cap(beforeText)}.</p>
+            <p className={`fit-line ${fit.after.fits ? "ok" : "no"}`} title={SOURCES.proteinDose}><b>After training:</b> {cap(afterText)}.</p>
             {pb.caveats.length > 0 && <p className="fit-line no"><b>Label:</b> {cap(pb.caveats.join(", "))}.</p>}
             {t && <p className="fit-line today">{t}</p>}
           </section>
