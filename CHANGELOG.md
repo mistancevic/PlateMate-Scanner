@@ -4,6 +4,7 @@ One version per release since 2 October 2026. The number is in Menu, About, next
 
 ## 0.1.x, the pilot builds
 
+- **v0.1.25** · 2026-10-04 · the door saves on the tick: no Save button, a tick or an allergy typed is the answer, the line under it says when it was answered.
 - **v0.1.24** · 2026-10-03 · version numbers: the app shows its version next to the commit, every release is tagged, this log is kept.
 - **v0.1.23** · 2026-10-03 · `3502871` · The door is a gate: None of these applies to me, Save shut until answered, the chat waits for the answer, asked again yearly.
 - **v0.1.22** · 2026-10-03 · `02cfae6` · Consent visible with its date; the door says Mealan is an AI chef that can be wrong; pregnancy not asked of a man; dated history of declarations; Settings chain Profile, Goal, My week, Where I shop, Coach.

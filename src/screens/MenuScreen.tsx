@@ -68,18 +68,20 @@ function ProfilePanel(p: AppApi) {
   const [sits, setSits] = useState<SituationId[]>(p.safety.situations);
   const [none, setNone] = useState<boolean>(Boolean(p.safety.none));
   const [allergyText, setAllergyText] = useState(p.safety.allergies.join(", "));
-  const doorDirty = JSON.stringify(sits) !== JSON.stringify(p.safety.situations) || allergyText.trim() !== p.safety.allergies.join(", ") || none !== Boolean(p.safety.none) || !p.safety.declaredAt;
-  const answered = none || sits.length > 0 || allergyText.trim().length > 0;
-  const tick = (id: SituationId, on: boolean) => { setSits(on ? [...sits, id] : sits.filter((y) => y !== id)); if (on) setNone(false); };
-  const tickNone = (on: boolean) => { setNone(on); if (on) { setSits([]); setAllergyText(""); } };
-  const saveDoor = () => {
-    const allergies = allergyText.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean);
-    const next = allergies.length && !sits.includes("allergies") ? [...sits, "allergies" as SituationId] : sits;
-    const isNone = none && next.length === 0;
-    p.declareSafety({ situations: next, allergies, none: isNone, declaredAt: new Date().toISOString() }, true);
-    setSits(next);
+  // a tick is the answer: it saves the moment it is made, no Save button to find below the fold
+  const commit = (nextSits: SituationId[], nextNone: boolean, text: string) => {
+    const allergies = text.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean);
+    const withAllergies = allergies.length && !nextSits.includes("allergies") ? [...nextSits, "allergies" as SituationId] : nextSits.filter((x) => x !== "allergies" || allergies.length);
+    const isNone = nextNone && withAllergies.length === 0;
+    const answered = isNone || withAllergies.length > 0;
+    setSits(withAllergies); setNone(isNone);
+    if (!answered) { p.declareSafety({ situations: [], allergies: [], none: false, declaredAt: undefined }, false); return; }
+    p.declareSafety({ situations: withAllergies, allergies, none: isNone, declaredAt: new Date().toISOString() }, true);
     p.notify(isNone ? "Noted: none applies. Mealan cooks." : "Noted. Mealan keeps to it.");
   };
+  const tick = (id: SituationId, on: boolean) => commit(on ? [...sits, id] : sits.filter((y) => y !== id), on ? false : none, id === "allergies" && !on ? "" : allergyText);
+  const tickNone = (on: boolean) => { if (on) setAllergyText(""); commit(on ? [] : sits, on, on ? "" : allergyText); };
+  const answered = none || sits.length > 0;
   return (
     <>
       <p className="small">Optional. Used only to calculate your numbers. Stored on this phone and in your account, nowhere else.</p>
@@ -147,10 +149,10 @@ function ProfilePanel(p: AppApi) {
           <input type="checkbox" checked={none} onChange={(e) => tickNone(e.target.checked)} />
           <span><b>None of these applies to me</b><small> an unanswered question is not a no; Mealan asks again once a year</small></span>
         </label>
-        <label className="field"><span>Allergies and intolerances, which ones</span><input value={allergyText} placeholder="milk, peanuts, gluten" onChange={(e) => { setAllergyText(e.target.value); if (e.target.value.trim()) setNone(false); }} /></label>
+        <label className="field"><span>Allergies and intolerances, which ones</span><input value={allergyText} placeholder="milk, peanuts, gluten" onChange={(e) => { setAllergyText(e.target.value); if (e.target.value.trim()) setNone(false); }} onBlur={() => commit(sits, none, allergyText)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /></label>
         <small className="muted">Nothing containing these is ever suggested. Mealan checks the name and the label lines of every food.</small>
         {p.ai.needsParent && <small className="muted">Under 16: a parent agrees on the profile, and your coach confirms before Mealan's chat is on.</small>}
-        <button className="pill pill-primary pill-wide" disabled={!doorDirty || !answered} onClick={saveDoor}>{answered ? "Save" : "Tick one, or none"}</button>
+        <p className={`small ${answered ? "muted" : "notice"}`}>{answered ? `Answered${p.safety.declaredAt ? " on " + fmtDay(p.safety.declaredAt) : ""}. A tick saves by itself; change it any time.` : "Tick one, or none. A tick saves by itself."}</p>
         {p.safety.situations.length > 0 && (
           <div className="fixed-lines">
             {p.safety.situations.map((id) => <p className="small" key={id}><b>{SITUATIONS.find((x) => x.id === id)?.label}:</b> {FIXED[id]}</p>)}
