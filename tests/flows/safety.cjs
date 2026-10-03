@@ -27,7 +27,16 @@ seed.items = [];
   ok(await page.locator(".form.shut").count() === 0 && (await safety()).consentBodyAt, "I agree opens the fields and records consent");
 
   // the door: a situation ticked, an allergy declared
+  // JOURNEY INVARIANT: an unanswered door is not a no. Before anything is ticked the chat is off and Save is shut; "None of these" is an answer.
+  ok(/Tick one, or none/.test(await page.locator(".door").getByRole("button", { name: /Tick one|Save/ }).textContent()), "the door's Save is shut until something is ticked");
+  ok(/Answer the question/.test(await page.locator(".door .notice").textContent()), "the chat waits for the door's answer");
+  await page.getByText("None of these applies to me").click(); await page.waitForTimeout(100);
+  await page.locator(".door").getByRole("button", { name: /^Save$/ }).click(); await page.waitForTimeout(400);
+  const s0 = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-safety")));
+  ok(s0.none === true && s0.declaredAt && s0.situations.length === 0, "none applies is recorded with its date");
+  ok(/none applies/.test(await page.locator(".door-log").textContent()), "and it shows in the history");
   await page.getByText("A difficult relationship with eating").click(); await page.waitForTimeout(100);
+  ok((await page.evaluate(() => document.querySelector(".door .check.none input").checked)) === false, "ticking a situation clears none");
   await page.getByPlaceholder("milk, peanuts, gluten").fill("milk");
   await page.locator(".door").getByRole("button", { name: /^Save$/ }).click(); await page.waitForTimeout(400);
   const s1 = await safety();

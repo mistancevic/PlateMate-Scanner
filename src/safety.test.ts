@@ -6,9 +6,10 @@ import { STARTER_FOODS } from "./starter";
 
 const Y = new Date("2026-10-04");
 const byName = (n: string) => STARTER_FOODS.find((f) => f.name === n)!;
-const S = (x: Partial<Safety> = {}): Safety => ({ ...EMPTY_SAFETY, ...x });
+// every case has been through the door: it was answered on the day, with none ticked unless a situation is given
+const S = (x: Partial<Safety> = {}): Safety => ({ ...EMPTY_SAFETY, declaredAt: "2026-10-04T09:30:00Z", none: !(x.situations && x.situations.length), ...x });
 
-test("case 1: an adult with nothing declared, the chat is on", () => {
+test("case 1: an adult who answered none, the chat is on", () => {
   assert.equal(aiState(S(), 1981, true, Y).on, true);
   assert.equal(aiState(S(), null, false, Y).on, true, "no birth year on the profile is not a minor");
 });
@@ -102,4 +103,20 @@ test("the door keeps a dated history, only when something changed; pregnancy is 
   assert.equal(s.declarations!.length, 2);
   assert.deepEqual(s.declarations![1].situations, ["eating"]);
   assert.equal(SITUATION_FOR.pregnancy, "female");
+});
+
+test("an unanswered door is not a no: the chat waits; none applies is an answer, and it ages out after a year", async () => {
+  const { aiState, doorAnswered, EMPTY_SAFETY } = await import("./safety");
+  const now = new Date("2026-10-04T10:00:00Z");
+  const fresh = { ...EMPTY_SAFETY, consentBodyAt: "2026-10-04T09:00:00Z", consentBy: "self" as const };
+  assert.equal(doorAnswered(fresh, now), false);
+  assert.equal(aiState(fresh, 1981, true, now).on, false);
+  assert.ok(/Answer the question/.test(aiState(fresh, 1981, true, now).why));
+  const none = { ...fresh, none: true, declaredAt: "2026-10-04T09:30:00Z" };
+  assert.equal(doorAnswered(none, now), true);
+  assert.equal(aiState(none, 1981, true, now).on, true);
+  const old = { ...none, declaredAt: "2025-09-01T09:30:00Z" };
+  assert.equal(doorAnswered(old, now), false, "asked again after a year");
+  const ticked = { ...fresh, situations: ["diabetes" as const], declaredAt: "2026-10-04T09:30:00Z" };
+  assert.equal(aiState(ticked, 1981, true, now).on, true, "a situation that only changes the answer leaves the chat on");
 });

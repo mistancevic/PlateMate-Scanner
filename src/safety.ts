@@ -12,7 +12,8 @@ export type Safety = {
   flags: Flag[];                   // every flag, with its source and date; the coach sees situation and date only
   allergies: string[];             // declared on the profile; a flagged food is never suggested
   declaredAt?: string;             // when the door screen was last answered
-  declarations?: { at: string; situations: SituationId[]; allergies: string[] }[]; // every save of the door, dated, visible to the person
+  none?: boolean;                  // "none of these applies to me", ticked on purpose; an unanswered door is not a no
+  declarations?: { at: string; situations: SituationId[]; allergies: string[]; none?: boolean }[]; // every save of the door, dated, visible to the person
   aiConfirmedAt?: string;          // written by the coach: the AI parts may be on for this account
   aiConfirmedBy?: string;
 };
@@ -38,10 +39,18 @@ export const isMinor = (b: AgeBand) => b === "teen" || b === "young" || b === "c
 // ---- the AI switch. Off until a coach confirms for: signs of disordered eating, and every minor.
 // A minor also needs the right consent recorded: under 16 a parent's. Under 13 there is no account.
 export type AiState = { on: boolean; why: string; needsParent: boolean; blocked: boolean };
+// The door is answered when something was ticked, a situation or none, within the last year
+export const DOOR_VALID_DAYS = 365;
+export function doorAnswered(safety: Safety, now = new Date()): boolean {
+  if (!safety.declaredAt) return false;
+  if (!(safety.none || safety.situations.length > 0)) return false;
+  return now.getTime() - new Date(safety.declaredAt).getTime() < DOOR_VALID_DAYS * 86_400_000;
+}
 export function aiState(safety: Safety, birthYear: number | undefined | null, hasCoach: boolean, now = new Date()): AiState {
   const band = ageBand(birthYear, now);
   if (band === "child") return { on: false, why: "Chef Mealan is not for people under 13.", needsParent: false, blocked: true };
   const confirmed = Boolean(safety.aiConfirmedAt);
+  if (!doorAnswered(safety, now)) return { on: false, why: "Answer the question on your profile first: is any of this true for you? One tap if none applies. Mealan's chat waits for that answer, and asks again once a year.", needsParent: band === "young", blocked: false };
   if (isMinor(band)) {
     const needsParent = band === "young";
     const consentOk = Boolean(safety.consentBodyAt) && (!needsParent || safety.consentBy === "parent");
@@ -134,11 +143,11 @@ export const getSafety = (): Safety => { try { const x = JSON.parse(localStorage
 export const setSafety = (s: Safety) => { try { localStorage.setItem(SKEY, JSON.stringify(s)); } catch {} };
 // the model may end a reply with "FLAG: <situation>"; the client takes it and never shows it
 // the door's history: a save is recorded only when it changes something; the person reads it under the door
-export function recordDeclaration(s: Safety, situations: SituationId[], allergies: string[], now = new Date()): Safety {
+export function recordDeclaration(s: Safety, situations: SituationId[], allergies: string[], now = new Date(), none = false): Safety {
   const last = s.declarations?.[s.declarations.length - 1];
-  const same = last && JSON.stringify([...last.situations].sort()) === JSON.stringify([...situations].sort()) && JSON.stringify(last.allergies) === JSON.stringify(allergies);
+  const same = last && JSON.stringify([...last.situations].sort()) === JSON.stringify([...situations].sort()) && JSON.stringify(last.allergies) === JSON.stringify(allergies) && Boolean(last.none) === none;
   if (same) return s;
-  return { ...s, declarations: [...(s.declarations ?? []), { at: now.toISOString(), situations: [...situations], allergies: [...allergies] }].slice(-50) };
+  return { ...s, declarations: [...(s.declarations ?? []), { at: now.toISOString(), situations: [...situations], allergies: [...allergies], none }].slice(-50) };
 }
 export const SITUATION_FOR: Record<SituationId, "all" | "female"> = { eating: "all", pregnancy: "female", diabetes: "all", allergies: "all", medication: "all" };
 export function takeModelFlag(text: string): { text: string; flag: SituationId | null } {

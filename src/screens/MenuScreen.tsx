@@ -66,14 +66,19 @@ function ProfilePanel(p: AppApi) {
   const consented = Boolean(p.safety.consentBodyAt);
   // the door: situations Mealan steps back from, and what to keep off every suggestion
   const [sits, setSits] = useState<SituationId[]>(p.safety.situations);
+  const [none, setNone] = useState<boolean>(Boolean(p.safety.none));
   const [allergyText, setAllergyText] = useState(p.safety.allergies.join(", "));
-  const doorDirty = JSON.stringify(sits) !== JSON.stringify(p.safety.situations) || allergyText.trim() !== p.safety.allergies.join(", ");
+  const doorDirty = JSON.stringify(sits) !== JSON.stringify(p.safety.situations) || allergyText.trim() !== p.safety.allergies.join(", ") || none !== Boolean(p.safety.none) || !p.safety.declaredAt;
+  const answered = none || sits.length > 0 || allergyText.trim().length > 0;
+  const tick = (id: SituationId, on: boolean) => { setSits(on ? [...sits, id] : sits.filter((y) => y !== id)); if (on) setNone(false); };
+  const tickNone = (on: boolean) => { setNone(on); if (on) { setSits([]); setAllergyText(""); } };
   const saveDoor = () => {
     const allergies = allergyText.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean);
     const next = allergies.length && !sits.includes("allergies") ? [...sits, "allergies" as SituationId] : sits;
-    p.declareSafety({ situations: next, allergies, declaredAt: new Date().toISOString() }, true);
+    const isNone = none && next.length === 0;
+    p.declareSafety({ situations: next, allergies, none: isNone, declaredAt: new Date().toISOString() }, true);
     setSits(next);
-    p.notify("Noted. Mealan keeps to it.");
+    p.notify(isNone ? "Noted: none applies. Mealan cooks." : "Noted. Mealan keeps to it.");
   };
   return (
     <>
@@ -134,14 +139,18 @@ function ProfilePanel(p: AppApi) {
         <p className="small">Mealan is an AI chef. It reads labels and suggests plates, and it can be wrong: check a number against the pack, and check anything about your health with a professional. For the situations below it steps back, names who to talk to, and keeps the plate working. Your coach sees that you ticked one and when, never your words.</p>
         {SITUATIONS.filter((x) => SITUATION_FOR[x.id] === "all" || d.sex !== "male").map((x) => (
           <label className="check" key={x.id}>
-            <input type="checkbox" checked={sits.includes(x.id)} onChange={(e) => setSits(e.target.checked ? [...sits, x.id] : sits.filter((y) => y !== x.id))} />
+            <input type="checkbox" checked={sits.includes(x.id)} onChange={(e) => tick(x.id, e.target.checked)} />
             <span><b>{x.label}</b>{x.detail ? <small> {x.detail}</small> : null}</span>
           </label>
         ))}
-        <label className="field"><span>Allergies and intolerances, which ones</span><input value={allergyText} placeholder="milk, peanuts, gluten" onChange={(e) => setAllergyText(e.target.value)} /></label>
+        <label className="check none">
+          <input type="checkbox" checked={none} onChange={(e) => tickNone(e.target.checked)} />
+          <span><b>None of these applies to me</b><small> an unanswered question is not a no; Mealan asks again once a year</small></span>
+        </label>
+        <label className="field"><span>Allergies and intolerances, which ones</span><input value={allergyText} placeholder="milk, peanuts, gluten" onChange={(e) => { setAllergyText(e.target.value); if (e.target.value.trim()) setNone(false); }} /></label>
         <small className="muted">Nothing containing these is ever suggested. Mealan checks the name and the label lines of every food.</small>
         {p.ai.needsParent && <small className="muted">Under 16: a parent agrees on the profile, and your coach confirms before Mealan's chat is on.</small>}
-        <button className="pill pill-primary pill-wide" disabled={!doorDirty} onClick={saveDoor}>Save</button>
+        <button className="pill pill-primary pill-wide" disabled={!doorDirty || !answered} onClick={saveDoor}>{answered ? "Save" : "Tick one, or none"}</button>
         {p.safety.situations.length > 0 && (
           <div className="fixed-lines">
             {p.safety.situations.map((id) => <p className="small" key={id}><b>{SITUATIONS.find((x) => x.id === id)?.label}:</b> {FIXED[id]}</p>)}
@@ -153,7 +162,7 @@ function ProfilePanel(p: AppApi) {
             <small className="muted">What you declared, and when it changed</small>
             {[...(p.safety.declarations ?? [])].reverse().map((dcl, i) => (
               <p className="small" key={dcl.at}>
-                <b>{fmtDay(dcl.at)}{i === 0 ? ", current" : ""}:</b> {dcl.situations.length ? dcl.situations.map((id) => SITUATIONS.find((x) => x.id === id)?.label ?? id).join("; ") : "nothing ticked"}{dcl.allergies.length ? `. Avoids: ${dcl.allergies.join(", ")}` : ""}
+                <b>{fmtDay(dcl.at)}{i === 0 ? ", current" : ""}:</b> {dcl.situations.length ? dcl.situations.map((id) => SITUATIONS.find((x) => x.id === id)?.label ?? id).join("; ") : dcl.none ? "none applies" : "nothing ticked"}{dcl.allergies.length ? `. Avoids: ${dcl.allergies.join(", ")}` : ""}
               </p>
             ))}
           </div>
