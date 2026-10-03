@@ -1,5 +1,34 @@
 # Change log
 
+One version per release since 2 October 2026. The number is in Menu, About, next to the commit; every release is a git tag `vX.Y.Z`; the full story of each is in the commit message (`git log`).
+
+## 0.1.x, the pilot builds
+
+- **v0.1.24** · 2026-10-03 · version numbers: the app shows its version next to the commit, every release is tagged, this log is kept.
+- **v0.1.23** · 2026-10-03 · `3502871` · The door is a gate: None of these applies to me, Save shut until answered, the chat waits for the answer, asked again yearly.
+- **v0.1.22** · 2026-10-03 · `02cfae6` · Consent visible with its date; the door says Mealan is an AI chef that can be wrong; pregnancy not asked of a man; dated history of declarations; Settings chain Profile, Goal, My week, Where I shop, Coach.
+- **v0.1.21** · 2026-10-03 · `25facd7` · S2 + S5: consent before body data, the door with five situations and allergies, the AI switch for disordered eating and minors with coach confirmation, fixed responses, code signals, allergy filtering, coach flag, export and full delete, landing line.
+- **v0.1.20** · 2026-10-03 · `c5ffc9b` · QA pass on request: npm run qa:paths, one verdict per happy path.
+- **v0.1.19** · 2026-10-03 · `96215b4` · Servings: counted foods, whole bars, PD as its own line on the label check.
+- **v0.1.18** · 2026-10-03 · `4843d01` · Release script sets the account and project itself.
+- **v0.1.17** · 2026-10-03 · `4291ede` · Scan opens the single-product camera; Several products is the explicit choice.
+- **v0.1.16** · 2026-10-03 · `a36d18e` · Fit to my target keeps the person's foods; ideas from the Out chat are a different plate.
+- **v0.1.15** · 2026-10-03 · `95db8d4` · Fitness rules v1 with sources: pre-training carbs by the day's load, post-training protein floor.
+- **v0.1.14** · 2026-10-03 · `81120e1` · Less-than label values fill the field with the printed bound.
+- **v0.1.13** · 2026-10-03 · `910a71d` · Sauce category; what Mealan moves is a real portion; helper stays open after Add; white text on the cards.
+- **v0.1.12** · 2026-10-02 · `698d6af` · Quiet build log.
+- **v0.1.11** · 2026-10-02 · `6d4da0e` · Label check and Food card named by the job.
+- **v0.1.10** · 2026-10-02 · `08cd3cb` · Culinary rules v1 in code: sweet with dairy, savoury with meal grains, dairy both ways, spreads need a carrier, whey a dessert ingredient, drinks never.
+- **v0.1.9** · 2026-10-02 · `e4a1979` · How it fits on the label check; Tell Mealan without the reviewed tick.
+- **v0.1.8** · 2026-10-02 · `1104366` · Front photo first in every scan; every printed line for one product; Tell Mealan on the label check.
+- **v0.1.7** · 2026-10-02 · `4352925` · Several photos in every mode; barcode stays open for the pack's photos.
+- **v0.1.6** · 2026-10-02 · `63ccc57` · Scan sets the camera mode itself, never the last one used.
+- **v0.1.5** · 2026-10-02 · `87f3192` · QA rule: journey invariants never rewritten to fit a change.
+- **v0.1.4** · 2026-10-02 · `02c81d0` · Mix it on the label check; Scan always the several-photos camera.
+- **v0.1.3** · 2026-10-02 · `a1aa280` · Mix it: up to three mixes that follow the moment, one tap to the plate, Not quite? Tell Mealan, everything logged.
+- **v0.1.2** · 2026-10-02 · `caf767a` · Plate first step: Products in, Mealan does the amounts; Scan, Type it, Empty plate.
+- **v0.1.1** · 2026-10-02 · `bc677be` · Today card: the day set once, read all day; goal source as a link; Usual day.
+
 ## 0.3.0 — Mealan client pilot
 
 Scope: update the existing scanner into a bounded, testable food-to-meal workflow. No business-model documents or published PRD were changed. This branch is not a production rollout or a claim that every PRD feature is complete.
