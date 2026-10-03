@@ -64,7 +64,7 @@ export function HomeScreen(p: AppApi) {
       <button className="pill pill-primary pill-tall" onClick={() => { setStep("in"); setTab("journey"); }}>
         <ChefHat size={20} /> I'm craving something
       </button>
-      <button className="pill pill-tall" onClick={() => { setStep("in"); setTab("journey"); setMode("group"); setCamera(true); }}>
+      <button className="pill pill-tall" onClick={() => { setStep("in"); setTab("journey"); setMode("label"); setCamera(true); }}>
         <Camera size={20} /> Scan
       </button>
       <button className="pill pill-tall" onClick={() => setTab("foods")}>

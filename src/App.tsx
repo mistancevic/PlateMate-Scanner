@@ -582,7 +582,7 @@ export default function App() {
     [mealanAsk, setMealanAsk] = useState(0),
     [mixQuestion, setMixQuestion] = useState<string | null>(null),
     [camera, setCamera] = useState(false),
-    [mode, setMode] = useState<ScannerMode>("group"),
+    [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
     [message, setMessage] = useState(""),
     [error, setError] = useState(""),
