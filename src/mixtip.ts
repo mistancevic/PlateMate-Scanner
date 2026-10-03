@@ -6,6 +6,8 @@ import { jobOf, PORTION, minPortionOf, type Job } from "./foodjob";
 import { roleOf } from "./swaps";
 import { playbookFor } from "./playbook";
 import type { MomentId } from "./moments";
+import type { DayType } from "./personal";
+import { preTraining, proteinFloor } from "./fitness";
 
 export type MixCase = "fits" | "under" | "over" | "unknown";
 export type MixKind = "DaaM dessert" | "meal" | "snack";
@@ -144,7 +146,13 @@ function candidates(role: Job, scanned: Food, library: Food[], starter: Food[], 
 }
 
 // The tip for a scanned food, this moment and this plate's target. kcalCap is the moment's share of the day, if known.
-export function mixTip(food: Food, moment: MomentId, target: number | null, library: Food[], starter: Food[], kcalCap: number | null): MixTip {
+export type MixOpts = { weightKg?: number | null; dayType?: DayType };
+export function mixTip(food: Food, moment: MomentId, target: number | null, library: Food[], starter: Food[], kcalCap: number | null, opts: MixOpts = {}): MixTip {
+  // fitness rule: before training the job is energy; a carb food the playbook clears fits as it is, whatever its PD
+  if (moment === "before") {
+    const pre = preTraining(food, playbookFor(food), opts.weightKg, opts.dayType ?? "normal");
+    if (pre.fits) return { case: "fits", mixes: [], why: pre.reason };
+  }
   const c = mixCase(food, target);
   if (c === "fits") return { case: c, mixes: [], why: "fits this plate as it stands" };
   if (c === "unknown" || target === null) return { case: c, mixes: [], why: "no target or no protein value" };
@@ -153,11 +161,23 @@ export function mixTip(food: Food, moment: MomentId, target: number | null, libr
   const cap = ask.snack ? Math.min(SNACK_KCAL, kcalCap ?? SNACK_KCAL) : kcalCap;
   const firsts = candidates(roles[0], food, library, starter, ask, moment);
   const mixes: Mix[] = [];
+  const floor = moment === "after" ? proteinFloor(opts.weightKg) : null;
   const push = (partners: Food[]) => {
     if (mixes.length >= ask.partners || mixes.some((m) => m.partners.length === partners.length && m.partners.every((p, i) => sameName(p, partners[i])))) return;
     if (!plateOk([food, ...partners])) return;
-    const b = build(food, partners, target, cap, c);
+    let b = build(food, partners, target, cap, c);
     if (!b) return;
+    // fitness rule: after training the plate reaches the protein floor; the protein base grows to get there, within a real portion
+    if (floor !== null && b.protein < floor) {
+      const base = b.items.find((i) => jobOf(i.food).job === "Protein base" && (i.food.protein ?? 0) > 0);
+      if (!base) return;
+      const need = floor - b.protein, extra = Math.ceil((need / (base.food.protein as number)) * 100 / 5) * 5;
+      if (base.grams + extra > 400) return;
+      const items = b.items.map((i) => (i.id === base.id ? { ...i, grams: i.grams + extra } : i));
+      const t = aggregate(items), pd = density(t.protein, t.calories);
+      if (pd === null || (cap !== null && (t.calories ?? 0) > cap)) return;
+      b = { ...b, items, pd, kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0) };
+    }
     mixes.push({ ...b, id: uid(), kind: kindOf(food, partners, b.kcal, ask.snack), cooking: partners.some((p) => !p.readyToEat) || !food.readyToEat, fromStarter: partners.filter((p) => !library.includes(p)).map((p) => p.name) });
   };
   // the first mix is one partner; then, where the moment allows, the same partner with a second and a third role on the plate

@@ -46,6 +46,7 @@ import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, type Mix, type MixTip } from "./mixtip";
 import { jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
+import { fitnessFor, SOURCES } from "./fitness";
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
@@ -226,7 +227,7 @@ function LabelCheck({
   onAsk?: (f: Food, tip: MixTip) => void;
   momentName?: string;
   target?: number | null;
-  day?: { kcal: number | null; eaten: number; name: string };
+  day?: { kcal: number | null; eaten: number; name: string; type: DayType; weightKg: number | null };
 }) {
   const [mainIdx, setMainIdx] = useState(0);
   const [choice, setChoice] = useState<"update" | "both">("update");
@@ -372,6 +373,7 @@ function LabelCheck({
         const d = draft();
         if (d.calories === null || d.protein === null) return null;
         const pb = playbookFor(d), pd = density(d.protein, d.calories);
+        const fit = fitnessFor(d, day?.weightKg ?? null, day?.type ?? "normal");
         const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1);
         // on its own: the playbook's word, and the number against this plate's target; under the target is never green
         const under = target != null && pd !== null && pd < target;
@@ -382,8 +384,8 @@ function LabelCheck({
           <section className="fit-lines" aria-label="How it fits">
             <p className="label">How it fits</p>
             <p className={`fit-line ${ownClass}`}><b>On its own:</b> {ownText}.</p>
-            <p className={`fit-line ${pb.beforeTraining.ok ? "ok" : "no"}`}><b>Before training:</b> {cap(pb.beforeTraining.reason)}.</p>
-            <p className={`fit-line ${pb.afterTraining.ok ? "ok" : "no"}`}><b>After training:</b> {cap(pb.afterTraining.reason)}.</p>
+            <p className={`fit-line ${fit.before.fits ? "ok" : pb.beforeTraining.ok ? "mid" : "no"}`} title={SOURCES.preCarb}><b>Before training:</b> {cap(fit.before.reason)}.</p>
+            <p className={`fit-line ${fit.after.fits ? "ok" : "no"}`} title={SOURCES.proteinDose}><b>After training:</b> {cap(fit.after.reason)}.</p>
             {pb.caveats.length > 0 && <p className="fit-line no"><b>Label:</b> {cap(pb.caveats.join(", "))}.</p>}
             {t && <p className="fit-line today">{t}</p>}
           </section>
@@ -1283,7 +1285,7 @@ export default function App() {
       const tags = new Set(REGIONS.find((r) => r.id === (region ?? "elsewhere"))?.tags ?? ["*"]);
       const starter = STARTER_FOODS.filter((f) => (STARTER_REGION[f.id] ?? ["*"]).some((t) => tags.has(t)));
       const share = todayKcal === null ? null : Math.round(todayKcal * momentKcalShare(moment));
-      return mixTip(food, moment, pdRef, state.foods, starter, share);
+      return mixTip(food, moment, pdRef, state.foods, starter, share, { weightKg: personal.weightKg ?? null, dayType: day.type });
     },
     takeMix: (food: Food, mix: Mix) => {
       // the partners enter the library if they came from the starter set; the plate becomes the mix, amounts as solved
@@ -1475,7 +1477,7 @@ export default function App() {
           onMix={screenProps.takeMix}
           onAsk={screenProps.askAboutMix}
           target={pdRef}
-          day={{ kcal: todayKcal, eaten: screenProps.eatenTodayKcal, name: screenProps.dayName }}
+          day={{ kcal: todayKcal, eaten: screenProps.eatenTodayKcal, name: screenProps.dayName, type: day.type, weightKg: personal.weightKg ?? null }}
           momentName={momentOf(moment).name}
         />
       )}{" "}
