@@ -4,6 +4,7 @@ One version per release since 2 October 2026. The number is in Menu, About, next
 
 ## 0.1.x, the pilot builds
 
+- **v0.1.27** · 2026-10-04 · allergies under the tick, the fourteen EU allergens as chips plus a free line; the public legal pages, Impressum, Privacy notice, Disclaimer and Who's behind it, at their own addresses, linked from the landing page, About and the consent card; Milan's lines in brackets.
 - **v0.1.26** · 2026-10-04 · the door's answer reaches the account (the cloud save had not been watching the safety record, so the account's older copy could overwrite a fresh answer on the next open); the newer answer wins on load; None of these sits below the allergies, set apart on a tint.
 - **v0.1.25** · 2026-10-04 · the door saves on the tick: no Save button, a tick or an allergy typed is the answer, the line under it says when it was answered.
 - **v0.1.24** · 2026-10-03 · version numbers: the app shows its version next to the commit, every release is tagged, this log is kept.

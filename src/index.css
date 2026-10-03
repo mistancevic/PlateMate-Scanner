@@ -562,6 +562,10 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .pill.danger { color: var(--low); }
 .door .check.none { margin-top: 12px; padding: 12px; background: var(--tint); border-radius: 14px; border-bottom: 0; }
 .check.none b { color: var(--brand-text); }
+.allergy-pick { margin: 4px 0 10px 30px; display: flex; flex-direction: column; gap: 8px; } .allergy-pick .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.legal { max-width: 720px; margin: 0 auto; padding: 0 18px 40px; color: var(--ink); } .legal article { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 18px 20px; margin-top: 12px; line-height: 1.5; }
+.legal h1 { font-size: 24px; margin: 0 0 6px; } .legal h2 { font-size: 16px; margin: 18px 0 6px; } .legal ul { padding-left: 18px; } .legal li { margin: 6px 0; }
+.legal-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; } .legal-nav a { padding: 8px 12px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); text-decoration: none; font-weight: 700; font-size: 13px; } .legal-nav a.on { background: var(--brand); color: #fff; border-color: var(--brand); }
 .consent-line { padding: 8px 12px; background: var(--tint); border-radius: 12px; }
 .door-log { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--line); }
 .plan-source { display: inline-flex; align-items: center; gap: 2px; padding: 0; color: var(--brand-text); font-size: 12px; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }

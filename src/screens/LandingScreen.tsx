@@ -69,7 +69,7 @@ export function LandingScreen() {
       </section>
 
       <footer className="l-foot">
-        <span>© 2026 Milan Stancevic · <a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a></span>
+        <span>© 2026 Milan Stancevic · <a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a> · <a href="/about">Who's behind it</a></span>
         <span>Your data stays in the EU, under your account. Built with <a href="https://github.com/mistancevic/worth-building" target="_blank" rel="noreferrer">Worth Building</a>.</span>
       </footer>
     </div>

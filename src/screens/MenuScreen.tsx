@@ -8,7 +8,7 @@ import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
 import { ACTIVITIES, calculate, canCalculate, suggestBand, formulaFor, type Personal } from "../personal";
 import type { AppApi, MenuSection } from "./api";
-import { SITUATIONS, SITUATION_FOR, FIXED, type SituationId } from "../safety";
+import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
 
 const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
@@ -67,11 +67,16 @@ function ProfilePanel(p: AppApi) {
   // the door: situations Mealan steps back from, and what to keep off every suggestion
   const [sits, setSits] = useState<SituationId[]>(p.safety.situations);
   const [none, setNone] = useState<boolean>(Boolean(p.safety.none));
-  const [allergyText, setAllergyText] = useState(p.safety.allergies.join(", "));
+  const keys = new Set(EU_ALLERGENS.map((a) => a.key));
+  const [chips, setChips] = useState<string[]>(p.safety.allergies.filter((a) => keys.has(a)));
+  const [freeText, setFreeText] = useState(p.safety.allergies.filter((a) => !keys.has(a)).join(", "));
+  const joined = (c: string[], t: string) => [...c, ...t.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean)].join(", ");
+  const allergyText = joined(chips, freeText);
+  const chipOn = (k: string) => chips.includes(k);
   // a tick is the answer: it saves the moment it is made, no Save button to find below the fold
   const commit = (nextSits: SituationId[], nextNone: boolean, text: string) => {
     const allergies = text.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean);
-    const withAllergies = allergies.length && !nextSits.includes("allergies") ? [...nextSits, "allergies" as SituationId] : nextSits.filter((x) => x !== "allergies" || allergies.length);
+    const withAllergies = allergies.length && !nextSits.includes("allergies") ? [...nextSits, "allergies" as SituationId] : nextSits;
     const isNone = nextNone && withAllergies.length === 0;
     const answered = isNone || withAllergies.length > 0;
     setSits(withAllergies); setNone(isNone);
@@ -79,8 +84,9 @@ function ProfilePanel(p: AppApi) {
     p.declareSafety({ situations: withAllergies, allergies, none: isNone, declaredAt: new Date().toISOString() }, true);
     p.notify(isNone ? "Noted: none applies. Mealan cooks." : "Noted. Mealan keeps to it.");
   };
-  const tick = (id: SituationId, on: boolean) => commit(on ? [...sits, id] : sits.filter((y) => y !== id), on ? false : none, id === "allergies" && !on ? "" : allergyText);
-  const tickNone = (on: boolean) => { if (on) setAllergyText(""); commit(on ? [] : sits, on, on ? "" : allergyText); };
+  const tick = (id: SituationId, on: boolean) => { if (id === "allergies" && !on) { setChips([]); setFreeText(""); } commit(on ? [...sits, id] : sits.filter((y) => y !== id), on ? false : none, id === "allergies" && !on ? "" : allergyText); };
+  const tickNone = (on: boolean) => { if (on) { setChips([]); setFreeText(""); } commit(on ? [] : sits, on, on ? "" : allergyText); };
+  const toggleChip = (k: string, on: boolean) => { const next = on ? [...chips, k] : chips.filter((x) => x !== k); setChips(next); commit(sits.includes("allergies") ? sits : [...sits, "allergies"], false, joined(next, freeText)); };
   const answered = none || sits.length > 0;
   return (
     <>
@@ -98,7 +104,7 @@ function ProfilePanel(p: AppApi) {
             <li><b>How long:</b> while the account exists.</li>
             <li><b>Yours:</b> export it or delete it, with everything else, from Menu, Account.</li>
           </ul>
-          <p className="small">Nothing about your body is stored until you agree. Under 16, a parent agrees.</p>
+          <p className="small">Nothing about your body is stored until you agree. Under 16, a parent agrees. The full <a href="/privacy">privacy notice</a>.</p>
           <div className="button-row">
             <button className="pill pill-small pill-primary" onClick={() => p.declareSafety({ consentBodyAt: new Date().toISOString(), consentBy: "self" })}>I agree</button>
             <button className="pill pill-small" onClick={() => p.declareSafety({ consentBodyAt: new Date().toISOString(), consentBy: "parent" })}>A parent agrees for me</button>
@@ -140,13 +146,23 @@ function ProfilePanel(p: AppApi) {
         <b>Is any of this true for you?</b>
         <p className="small">Mealan is an AI chef. It reads labels and suggests plates, and it can be wrong: check a number against the pack, and check anything about your health with a professional. For the situations below it steps back, names who to talk to, and keeps the plate working. Your coach sees that you ticked one and when, never your words.</p>
         {SITUATIONS.filter((x) => SITUATION_FOR[x.id] === "all" || d.sex !== "male").map((x) => (
-          <label className="check" key={x.id}>
-            <input type="checkbox" checked={sits.includes(x.id)} onChange={(e) => tick(x.id, e.target.checked)} />
-            <span><b>{x.label}</b>{x.detail ? <small> {x.detail}</small> : null}</span>
-          </label>
+          <div key={x.id}>
+            <label className="check">
+              <input type="checkbox" checked={sits.includes(x.id)} onChange={(e) => tick(x.id, e.target.checked)} />
+              <span><b>{x.label}</b>{x.detail ? <small> {x.detail}</small> : null}</span>
+            </label>
+            {x.id === "allergies" && sits.includes("allergies") && (
+              <div className="allergy-pick">
+                <small className="muted">The fourteen every pack in the EU declares. Tap what applies.</small>
+                <div className="chips">
+                  {EU_ALLERGENS.map((a) => { const on = chipOn(a.key); return <button key={a.key} className={`pill pill-small ${on ? "pill-primary" : ""}`} onClick={() => toggleChip(a.key, !on)}>{a.label}</button>; })}
+                </div>
+                <label className="field"><span>Anything else</span><input value={freeText} placeholder="e.g. kiwi, histamine" onChange={(e) => setFreeText(e.target.value)} onBlur={() => commit(sits, none, joined(chips, freeText))} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /></label>
+                <small className="muted">Nothing containing these is ever suggested. Mealan checks the name and the label lines of every food.</small>
+              </div>
+            )}
+          </div>
         ))}
-        <label className="field"><span>Allergies and intolerances, which ones</span><input value={allergyText} placeholder="milk, peanuts, gluten" onChange={(e) => { setAllergyText(e.target.value); if (e.target.value.trim()) setNone(false); }} onBlur={() => commit(sits, none, allergyText)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /></label>
-        <small className="muted">Nothing containing these is ever suggested. Mealan checks the name and the label lines of every food.</small>
         {p.ai.needsParent && <small className="muted">Under 16: a parent agrees on the profile, and your coach confirms before Mealan's chat is on.</small>}
         <label className="check none">
           <input type="checkbox" checked={none} onChange={(e) => tickNone(e.target.checked)} />
@@ -444,6 +460,7 @@ function AboutPanel() {
       <p className="small">Mealan fits the food you want to the goal you have. The numbers come from code; the model reads labels, menus and shelves; you and your coach decide.</p>
       <p className="small">Pilot. Barcode data from Open Food Facts; label values are estimates, check the package. Your data sits in the EU, under your account.</p>
       <p className="small">hello@chefmealan.com</p>
+      <p className="small"><a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy notice</a> · <a href="/disclaimer">Disclaimer</a></p>
       <p className="small">Version {(import.meta.env.VITE_VERSION as string | undefined) || "0"} · {(import.meta.env.VITE_COMMIT as string | undefined) || "preview"}</p>
     </section>
   );

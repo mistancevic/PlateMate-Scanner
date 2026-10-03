@@ -36,7 +36,10 @@ seed.items = [];
   ok(/none applies/.test(await page.locator(".door-log").textContent()), "and it shows in the history");
   await page.getByText("A difficult relationship with eating").click(); await page.waitForTimeout(100);
   ok((await page.evaluate(() => document.querySelector(".door .check.none input").checked)) === false, "ticking a situation clears none");
-  await page.getByPlaceholder("milk, peanuts, gluten").fill("milk"); await page.keyboard.press("Enter"); await page.waitForTimeout(400);
+  ok(await page.locator(".allergy-pick").count() === 0, "the allergy chips stay folded until the tick");
+  await page.getByText("Allergies or intolerances").click(); await page.waitForTimeout(300);
+  ok(await page.locator(".allergy-pick .pill").count() === 14, "the fourteen EU allergens as chips, under the tick");
+  await page.locator(".allergy-pick").getByRole("button", { name: "Milk" }).click(); await page.waitForTimeout(400);
   const s1 = await safety();
   ok(s1.situations.includes("eating") && s1.situations.includes("allergies") && s1.allergies[0] === "milk", "the door is recorded: " + s1.situations.join(","));
   ok(/You agreed to the body data on [A-Z][a-z]+ \d/.test(await page.locator(".consent-line").textContent()), "the consent is visible with its date");
@@ -91,6 +94,15 @@ seed.items = [];
   ok(await page.getByRole("button", { name: /Next: Where I shop/ }).count() === 1, "My week leads to Where I shop");
   await page.getByRole("button", { name: /Next: Where I shop/ }).click(); await page.waitForTimeout(300);
   ok(await page.getByRole("button", { name: /Next: Coach/ }).count() === 1, "Where I shop leads to Coach");
+  // the legal pages are public, at their own addresses, with a way back
+  for (const [path, head] of [["/impressum", /Impressum/], ["/privacy", /Privacy notice/], ["/disclaimer", /Disclaimer/], ["/about", /Who's behind/]]) {
+    await page.goto("http://127.0.0.1:3197" + path); await page.waitForTimeout(500);
+    ok(head.test(await page.locator(".legal h1").textContent().catch(() => "")), "a public page at " + path);
+  }
+  await page.goto("http://127.0.0.1:3197/privacy"); await page.waitForTimeout(500);
+  ok(/Art\. 9\(2\)\(a\)/.test(await page.locator(".legal").textContent()), "the privacy notice names the legal basis for health data");
+  await page.getByRole("button", { name: /Back to the app/ }).click(); await page.waitForTimeout(800);
+  ok((await page.locator(".legal").count()) === 0, "Back to the app leaves the legal pages");
   console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
   await b.close(); server.kill(); process.exitCode = fail ? 1 : 0;
 })();

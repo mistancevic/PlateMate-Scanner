@@ -23,7 +23,7 @@ export const SITUATIONS: { id: SituationId; label: string; detail: string }[] = 
   { id: "eating", label: "A difficult relationship with eating", detail: "now or in the past" },
   { id: "pregnancy", label: "Pregnant or breastfeeding", detail: "" },
   { id: "diabetes", label: "Diabetes or insulin", detail: "" },
-  { id: "allergies", label: "Allergies or intolerances", detail: "say which, below" },
+  { id: "allergies", label: "Allergies or intolerances", detail: "tick, then say which" },
   { id: "medication", label: "Medication that affects food", detail: "anticoagulants, MAO inhibitors, thyroid, anything your doctor told you about with food" },
 ];
 
@@ -87,12 +87,21 @@ const ALLERGEN_WORDS: Record<string, RegExp> = {
   soy: /soy|soja|tofu|tempeh|edamame|miso|shoyu|tamari/i,
   fish: /fish|fisch|riba|pescado|poisson|salmon|lachs|tuna|thunfisch|cod|kabeljau|trout|forelle|anchov|sardin|mackerel|makrele|hering/i,
   shellfish: /shrimp|prawn|garnele|crab|krabbe|lobster|hummer|mussel|muschel|clam|oyster|auster|scallop|squid|calamari|octopus|crustace|krebstier|mollus|weichtier/i,
+  crustaceans: /shrimp|prawn|garnele|crab|krabbe|lobster|hummer|scampi|langoustine|crustace|krebstier|rakovi|škampi/i,
+  molluscs: /mussel|muschel|clam|oyster|auster|scallop|squid|calamari|octopus|mollus|weichtier|snail|schnecke|školjke|lignje/i,
   sesame: /sesame|sesam|tahini|susam/i,
   celery: /celery|sellerie|celer/i,
   mustard: /mustard|senf|moutarde/i,
   sulphites: /sulphite|sulfite|sulfit|schwefel/i,
   lupin: /lupin|lupine/i,
 };
+// The fourteen allergens every pack in the EU must declare (Regulation 1169/2011, Annex II), as chips. The key is the matcher's family.
+export const EU_ALLERGENS: { key: string; label: string }[] = [
+  { key: "gluten", label: "Gluten" }, { key: "milk", label: "Milk" }, { key: "egg", label: "Eggs" }, { key: "peanut", label: "Peanuts" },
+  { key: "nuts", label: "Nuts" }, { key: "soy", label: "Soya" }, { key: "fish", label: "Fish" }, { key: "crustaceans", label: "Crustaceans" },
+  { key: "molluscs", label: "Molluscs" }, { key: "sesame", label: "Sesame" }, { key: "celery", label: "Celery" }, { key: "mustard", label: "Mustard" },
+  { key: "lupin", label: "Lupin" }, { key: "sulphites", label: "Sulphites" },
+];
 // A declared word matches an allergen family, or is used as a plain word of its own.
 export function allergenMatcher(declared: string): RegExp | null {
   const d = declared.trim().toLowerCase();

@@ -36,6 +36,7 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen, type Turn } from "./screens/OutScreen";
 import { LandingScreen } from "./screens/LandingScreen";
+import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, confirmClientAi, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
@@ -1424,6 +1425,8 @@ export default function App() {
     more: "More",
   };
   if (!authReady) return <div className="app-shell"><main /></div>;
+  // the legal pages are public: /impressum, /privacy, /disclaimer, /about, signed in or not
+  { const legal = legalPageFromPath(window.location.pathname); if (legal) return <LegalScreen page={legal} back={() => { window.history.replaceState(null, "", "/"); window.location.reload(); }} />; }
   if (cloudEnabled && !user) return <LandingScreen />;
   if (cloudEnabled && user && !profileReady) return <div className="app-shell"><main /></div>;
   if (cloudEnabled && user && profile.role !== "coach" && !profile.coachId)
