@@ -10,6 +10,26 @@ export const KEYS: Nutrient[] = [
   "protein",
 ];
 export const MACROS = ["fats", "carbs", "fiber", "protein"] as const; // label order, wherever all of them are shown
+// A value printed as a less-than ("Eiweiß <0,5 g") is a declared value: at most that much. The model leaves the field null
+// and keeps the printed text in the notes; the label check fills the field with the bound so the number can be calculated.
+const LESS_THAN_NAMES: Record<string, RegExp> = {
+  protein: /(eiweiß|eiweiss|protein|proteine|proteínas|proteini|belančevine)/i,
+  fats: /(fett|fat|grasas|lipides|masti)(?!säuren|acids)/i,
+  carbs: /(kohlenhydrate|carbohydrate|carbs|hidratos|glucides|ugljeni)/i,
+  fiber: /(ballaststoffe|fibre|fiber|fibra|vlakna)/i,
+  calories: /(energie|energy|kcal)/i,
+};
+export function lessThanFromNotes(notes: string): Partial<Record<string, number>> {
+  const out: Partial<Record<string, number>> = {};
+  if (!notes) return out;
+  // "Fett <0,5g", "Eiweiß < 0.5 g", "protein: <0,5 g"
+  for (const m of notes.matchAll(/([A-Za-zÀ-ž ]{3,40}?)\s*[:=]?\s*<\s*([\d]+(?:[.,]\d+)?)\s*(g|kcal)?/g)) {
+    const name = m[1].trim(), n = Number(m[2].replace(",", "."));
+    if (!Number.isFinite(n)) continue;
+    for (const [k, re] of Object.entries(LESS_THAN_NAMES)) if (re.test(name) && !(k in out)) out[k] = n;
+  }
+  return out;
+}
 export const LABELS = {
   calories: "Energy",
   protein: "Protein",

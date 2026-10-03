@@ -68,6 +68,7 @@ import {
   MACROS,
   Meal,
   numberInput,
+  lessThanFromNotes,
   parseState,
   PilotState,
   portionTotals,
@@ -235,12 +236,11 @@ function LabelCheck({
     [ready, setReady] = useState(food.readyToEat),
     [reviewed, setReviewed] = useState(false),
     [errors, setErrors] = useState<string[]>([]);
-  const [values, setValues] = useState(
-    Object.fromEntries(KEYS.map((k) => [k, inputValue(food[k])])) as Record<
-      string,
-      string
-    >,
-  );
+  const [values, setValues] = useState(() => {
+    // a blank field with a less-than in the notes gets the printed bound, so the number can be calculated; the note keeps the printed text
+    const bounds = lessThanFromNotes(food.notes ?? "");
+    return Object.fromEntries(KEYS.map((k) => [k, food[k] === null && bounds[k] !== undefined ? String(bounds[k]) : inputValue(food[k])])) as Record<string, string>;
+  });
   const [rows, setRows] = useState<LabelRow[]>(() => displayRows(food));
   const [adding, setAdding] = useState(false);
   const [addKey, setAddKey] = useState("saturates");

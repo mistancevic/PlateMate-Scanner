@@ -95,3 +95,13 @@ test("reject invalid records/imports rather than mutating data", () => {
   assert.ok(validateFood(food("bad", { calories: 200, protein: 101 })).length);
   assert.throws(() => parseState('{"version":1}'));
 });
+
+test("a less-than in the notes fills a blank field with the printed bound", async () => {
+  const { lessThanFromNotes } = await import("./pilot");
+  const b = lessThanFromNotes("Values reported as less-than: Fett <0,5g, davon gesättigte Fettsäuren <0,1g, Ballaststoffe <0,5g, Eiweiß <0,5g.");
+  assert.equal(b.protein, 0.5);
+  assert.equal(b.fats, 0.5);
+  assert.equal(b.fiber, 0.5);
+  assert.equal(b.carbs, undefined);
+  assert.deepEqual(lessThanFromNotes("as sold; contains milk"), {});
+});
