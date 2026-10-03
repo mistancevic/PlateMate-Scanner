@@ -94,6 +94,27 @@ seed.items = [];
   const q2 = await page.locator("input[placeholder^=\"What goes with\"]").first().inputValue().catch(() => "");
   ok(/I scanned Shop wafer/.test(q2), "Tell Mealan on the sheet saves the food and opens the helper with the tip: " + q2.slice(0, 40));
   ok((await state()).foods.some((f) => f.name === "Shop wafer"), "the wafer was saved on the way");
+
+  // JOURNEY INVARIANT: Fit to my target keeps the person's foods. A plate already on or above the target moves nothing and swaps nothing.
+  await page.getByRole("button", { name: /^Close$/ }).first().click().catch(() => {}); await page.waitForTimeout(300);
+  await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /Empty plate/ }).click().catch(() => {}); await page.getByRole("button", { name: /Tap again to empty/ }).click().catch(() => {}); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /^Type it$/ }).click(); await page.waitForTimeout(400);
+  const sheet3 = page.locator(".modal").last();
+  await sheet3.locator("input").first().fill("Tomato sauce, no added sugar");
+  const names3 = await sheet3.locator(".lt-row .lt-name").allTextContents();
+  const fill3 = async (re, v) => { const i = names3.findIndex((n) => re.test(n)); await sheet3.locator(".lt-row input").nth(i).fill(v); };
+  await fill3(/Energ/i, "37"); await fill3(/^Fat|Fett/i, "0.5"); await fill3(/Carb|Kohlen/i, "5.8"); await fill3(/Protein|Eiwei/i, "1.3"); await page.waitForTimeout(200);
+  await sheet3.getByText(/Ready to eat/).click(); await sheet3.getByText(/I checked the values/).click(); await page.waitForTimeout(100);
+  await sheet3.getByRole("button", { name: /Confirm & save food/ }).click(); await page.waitForTimeout(600);
+  const st3 = await state();
+  await page.evaluate((s) => { s.items = [{ id: "c1", food: s.foods.find((f) => f.name === "Chicken breast, cooked"), grams: 200, locked: false }, { id: "s1", food: s.foods.find((f) => /Tomato sauce/.test(f.name)), grams: 100, locked: false }]; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); }, st3);
+  await page.goto("http://127.0.0.1:3196/"); await page.waitForTimeout(800);
+  await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /Fit to my target/ }).click(); await page.waitForTimeout(900);
+  const after = await state();
+  ok(after.items.some((i) => i.food.name === "Chicken breast, cooked") && after.items.some((i) => /Tomato sauce/.test(i.food.name)), "the person's foods stay: " + after.items.map((i) => i.food.name).join(" + "));
+  ok(!after.items.some((i) => /Soda|Whey/.test(i.food.name)), "no swap for a food that was never asked for");
   await page.screenshot({ path: "/tmp/mix-tip.png", fullPage: true });
   console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
   await b.close(); server.kill(); process.exitCode = fail ? 1 : 0;

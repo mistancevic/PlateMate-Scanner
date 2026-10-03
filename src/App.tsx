@@ -43,7 +43,7 @@ import { getPersonal, setPersonal as storePersonal, calculate, dayFactor, getDay
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
-import { mixTip, mixLabel, type Mix, type MixTip } from "./mixtip";
+import { mixTip, mixLabel, catOf, plateOk, type Mix, type MixTip } from "./mixtip";
 import { jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
 import { fitnessFor, SOURCES } from "./fitness";
@@ -1052,9 +1052,11 @@ export default function App() {
       minP = numberInput(limits.minProtein),
       maxE = numberInput(limits.maxKcal);
     let reason = "No candidate meets the selected constraints.";
+    // the person's food first and always; a swap is only offered when it goes with the rest of the plate, and a drink never is
+    const others = itemsIn.filter((x) => x.id !== id).map((x) => x.food);
     const foods = [
       selected.food,
-      ...state.foods.filter((f) => f.id !== selected.food.id && f.readyToEat),
+      ...state.foods.filter((f) => f.id !== selected.food.id && f.readyToEat && catOf(f) !== "drink" && plateOk([...others, f])),
     ];
     const results = [];
     for (const food of foods) {
@@ -1063,7 +1065,12 @@ export default function App() {
         ),
         s = solveIngredient(candidate, id, target, max);
       if (s.ok === false) {
-        if (food.id === selected.food.id) reason = s.reason;
+        if (food.id === selected.food.id) {
+          // already on plan: the plate as it stands is on or above the target, so nothing moves and nothing is swapped
+          const as = aggregate(itemsIn), pdNow = density(as.protein, as.calories);
+          if (pdNow !== null && pdNow >= target) { results.push({ food, items: itemsIn, grams: selected.grams }); continue; }
+          reason = s.reason;
+        }
         continue;
       }
       // a real portion: if the target is met with less than the food's minimum portion, the minimum stands and the plate lands above the target
