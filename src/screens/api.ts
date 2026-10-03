@@ -113,7 +113,7 @@ export interface AppApi {
   // safety rules: the person's declarations, the AI switch, what the coach can confirm
   safety: import("../safety").Safety;
   ai: import("../safety").AiState;
-  declareSafety: (patch: Partial<import("../safety").Safety>) => void;
+  declareSafety: (patch: Partial<import("../safety").Safety>, record?: boolean) => void;
   flagFromModel: (situation: import("../safety").SituationId) => void;
   exportMyData: () => Promise<void>;
   deleteSteps: string;

@@ -92,3 +92,14 @@ test("case 10, adversarial: a model flag is taken and never shown; the coach see
   const v = coachView(s);
   assert.deepEqual(Object.keys(v[0]), ["situation", "at"]); assert.equal(v[0].at, "2026-10-04");
 });
+
+test("the door keeps a dated history, only when something changed; pregnancy is not asked of a man", async () => {
+  const { recordDeclaration, EMPTY_SAFETY, SITUATION_FOR } = await import("./safety");
+  let s = recordDeclaration({ ...EMPTY_SAFETY }, [], ["milk"], new Date("2026-10-04T10:00:00Z"));
+  s = recordDeclaration(s, [], ["milk"], new Date("2026-10-05T10:00:00Z"));
+  assert.equal(s.declarations!.length, 1, "the same answer again is not a new entry");
+  s = recordDeclaration(s, ["eating"], ["milk"], new Date("2026-10-06T10:00:00Z"));
+  assert.equal(s.declarations!.length, 2);
+  assert.deepEqual(s.declarations![1].situations, ["eating"]);
+  assert.equal(SITUATION_FOR.pregnancy, "female");
+});

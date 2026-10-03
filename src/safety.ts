@@ -12,6 +12,7 @@ export type Safety = {
   flags: Flag[];                   // every flag, with its source and date; the coach sees situation and date only
   allergies: string[];             // declared on the profile; a flagged food is never suggested
   declaredAt?: string;             // when the door screen was last answered
+  declarations?: { at: string; situations: SituationId[]; allergies: string[] }[]; // every save of the door, dated, visible to the person
   aiConfirmedAt?: string;          // written by the coach: the AI parts may be on for this account
   aiConfirmedBy?: string;
 };
@@ -132,6 +133,14 @@ const SKEY = "chefmealan-safety";
 export const getSafety = (): Safety => { try { const x = JSON.parse(localStorage.getItem(SKEY) || "null"); return x && typeof x === "object" ? { ...EMPTY_SAFETY, ...x } : { ...EMPTY_SAFETY }; } catch { return { ...EMPTY_SAFETY }; } };
 export const setSafety = (s: Safety) => { try { localStorage.setItem(SKEY, JSON.stringify(s)); } catch {} };
 // the model may end a reply with "FLAG: <situation>"; the client takes it and never shows it
+// the door's history: a save is recorded only when it changes something; the person reads it under the door
+export function recordDeclaration(s: Safety, situations: SituationId[], allergies: string[], now = new Date()): Safety {
+  const last = s.declarations?.[s.declarations.length - 1];
+  const same = last && JSON.stringify([...last.situations].sort()) === JSON.stringify([...situations].sort()) && JSON.stringify(last.allergies) === JSON.stringify(allergies);
+  if (same) return s;
+  return { ...s, declarations: [...(s.declarations ?? []), { at: now.toISOString(), situations: [...situations], allergies: [...allergies] }].slice(-50) };
+}
+export const SITUATION_FOR: Record<SituationId, "all" | "female"> = { eating: "all", pregnancy: "female", diabetes: "all", allergies: "all", medication: "all" };
 export function takeModelFlag(text: string): { text: string; flag: SituationId | null } {
   const m = text.match(/\n?\s*FLAG:\s*(eating|pregnancy|diabetes|allergies|medication)\s*\.?\s*$/i);
   if (!m) return { text, flag: null };

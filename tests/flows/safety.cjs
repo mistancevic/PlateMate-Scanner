@@ -32,6 +32,9 @@ seed.items = [];
   await page.locator(".door").getByRole("button", { name: /^Save$/ }).click(); await page.waitForTimeout(400);
   const s1 = await safety();
   ok(s1.situations.includes("eating") && s1.situations.includes("allergies") && s1.allergies[0] === "milk", "the door is recorded: " + s1.situations.join(","));
+  ok(/You agreed to the body data on [A-Z][a-z]+ \d/.test(await page.locator(".consent-line").textContent()), "the consent is visible with its date");
+  ok(/AI chef/.test(await page.locator(".door").textContent()) && /can be wrong/.test(await page.locator(".door").textContent()), "the door says Mealan is an AI chef and can be wrong");
+  ok(/current/.test(await page.locator(".door-log").textContent()) && /A difficult relationship with eating/.test(await page.locator(".door-log").textContent()), "the door keeps a dated, visible history: " + (await page.locator(".door-log p").first().textContent()).slice(0, 60));
   ok(s1.flags.some((f) => f.situation === "eating" && f.source === "door"), "the flag carries its source and date");
   ok(await page.locator(".door .notice").count() === 1 && /coach confirms/.test(await page.locator(".door .notice").textContent()), "the person is told the chat is off until the coach confirms");
 
@@ -69,6 +72,18 @@ seed.items = [];
     ok(file.personal && file.safety && Array.isArray(file.foods) && Array.isArray(file.cards) && file.goal, "the export holds profile, safety, foods, cards and goal");
     ok(file.safety.allergies[0] === "milk", "and the declarations are in it");
   } else ok(false, "no export file came");
+  // settings chain: Profile to Goal opens at the top, and each panel leads to the next (the menu is still open, on Account)
+  await page.getByRole("button", { name: /^Close$/ }).first().click().catch(() => {}); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Settings" }).click(); await page.waitForTimeout(300);
+  await page.locator(".menu-row").filter({ hasText: /^Profile/ }).first().click(); await page.waitForTimeout(400);
+  await page.evaluate(() => window.scrollTo(0, 2000)); await page.waitForTimeout(100);
+  await page.locator(".menu-row").filter({ hasText: /Goal/ }).last().click(); await page.waitForTimeout(400);
+  ok((await page.evaluate(() => window.scrollY)) < 40, "Goal opens at the top: scrollY " + (await page.evaluate(() => window.scrollY)));
+  ok(await page.getByRole("button", { name: /Next: My week/ }).count() === 1, "Goal leads to My week");
+  await page.getByRole("button", { name: /Next: My week/ }).click(); await page.waitForTimeout(300);
+  ok(await page.getByRole("button", { name: /Next: Where I shop/ }).count() === 1, "My week leads to Where I shop");
+  await page.getByRole("button", { name: /Next: Where I shop/ }).click(); await page.waitForTimeout(300);
+  ok(await page.getByRole("button", { name: /Next: Coach/ }).count() === 1, "Where I shop leads to Coach");
   console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
   await b.close(); server.kill(); process.exitCode = fail ? 1 : 0;
 })();

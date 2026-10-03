@@ -47,7 +47,7 @@ import { mixTip, mixLabel, catOf, plateOk, type Mix, type MixTip } from "./mixti
 import { jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
 import { fitnessFor, SOURCES, dayName } from "./fitness";
-import { getSafety, setSafety as storeSafety, aiState, addFlag, goalSignals, allergyHits, FIXED, EMPTY_SAFETY, type Safety, type SituationId } from "./safety";
+import { getSafety, setSafety as storeSafety, aiState, addFlag, goalSignals, allergyHits, recordDeclaration, FIXED, EMPTY_SAFETY, type Safety, type SituationId } from "./safety";
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
@@ -1372,7 +1372,7 @@ export default function App() {
     leaveCoach: async () => { if (!user) return; try { await leaveCoach(user.uid); setProfile((p) => ({ ...p, coachId: undefined, coachName: undefined })); } catch (e: any) { setError(e.message); } },
     signOut: async () => { await signOutCloud(); cloudLoaded.current = false; },
     safety, ai,
-    declareSafety: (patch) => { updateSafety((x) => { const next = { ...x, ...patch }; const now = new Date().toISOString(); for (const sid of next.situations) if (!x.situations.includes(sid)) next.flags = [...next.flags, { situation: sid, at: now, source: "door" as const }]; return next; }); },
+    declareSafety: (patch, record = false) => { updateSafety((x) => { let next = { ...x, ...patch }; const now = new Date().toISOString(); for (const sid of next.situations) if (!x.situations.includes(sid)) next.flags = [...next.flags, { situation: sid, at: now, source: "door" as const }]; if (record) next = recordDeclaration(next, next.situations, next.allergies); return next; }); },
     flagFromModel: (situation) => { updateSafety((x) => addFlag(x, situation, "model")); log("safety_flag", { situation, source: "model" }); },
     exportMyData: async () => {
       // everything: the profile, the goal and its history, the foods with their photos, the cards, the recipes, and what the account holds

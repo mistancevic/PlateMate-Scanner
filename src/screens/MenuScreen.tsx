@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState, useEffect, type ReactNode } from "react";
 import { FlaskConical, ChevronRight, ArrowLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator } from "lucide-react";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
@@ -8,7 +8,7 @@ import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
 import { ACTIVITIES, calculate, canCalculate, suggestBand, formulaFor, type Personal } from "../personal";
 import type { AppApi, MenuSection } from "./api";
-import { SITUATIONS, FIXED, type SituationId } from "../safety";
+import { SITUATIONS, SITUATION_FOR, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
 
 const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
@@ -39,6 +39,8 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       </>
     );
   const title = ITEMS.find((i) => i.id === section)?.name ?? "";
+  // a section opens at its top, whatever the scroll of the one before
+  useEffect(() => { try { window.scrollTo({ top: 0 }); document.querySelector("main")?.scrollTo?.({ top: 0 }); } catch {} }, [section]);
   return (
     <>
       <div className="menu-head"><button className="link" onClick={() => setSection(from ?? "list")}><ArrowLeft size={16} /> {from ? ITEMS.find((i) => i.id === from)?.name : "Settings"}</button><button className="link" onClick={close}>Close</button></div>
@@ -69,13 +71,16 @@ function ProfilePanel(p: AppApi) {
   const saveDoor = () => {
     const allergies = allergyText.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean);
     const next = allergies.length && !sits.includes("allergies") ? [...sits, "allergies" as SituationId] : sits;
-    p.declareSafety({ situations: next, allergies, declaredAt: new Date().toISOString() });
+    p.declareSafety({ situations: next, allergies, declaredAt: new Date().toISOString() }, true);
     setSits(next);
     p.notify("Noted. Mealan keeps to it.");
   };
   return (
     <>
       <p className="small">Optional. Used only to calculate your numbers. Stored on this phone and in your account, nowhere else.</p>
+      {consented && (
+        <p className="small consent-line">You agreed to the body data on {fmtDay(p.safety.consentBodyAt!)}{p.safety.consentBy === "parent" ? ", a parent agreeing for you" : ""}. It is in your export, and goes with everything else when you delete the account.</p>
+      )}
       {!consented && (
         <section className="card consent" aria-label="Before your numbers">
           <b>Before your numbers</b>
@@ -126,8 +131,8 @@ function ProfilePanel(p: AppApi) {
       </section>
       <section className="card form door" aria-label="Is any of this true for you">
         <b>Is any of this true for you?</b>
-        <p className="small">Mealan is a chef. For these, it steps back, names who to talk to, and keeps the plate working. Your coach sees that you ticked one and when, never your words.</p>
-        {SITUATIONS.map((x) => (
+        <p className="small">Mealan is an AI chef. It reads labels and suggests plates, and it can be wrong: check a number against the pack, and check anything about your health with a professional. For the situations below it steps back, names who to talk to, and keeps the plate working. Your coach sees that you ticked one and when, never your words.</p>
+        {SITUATIONS.filter((x) => SITUATION_FOR[x.id] === "all" || d.sex !== "male").map((x) => (
           <label className="check" key={x.id}>
             <input type="checkbox" checked={sits.includes(x.id)} onChange={(e) => setSits(e.target.checked ? [...sits, x.id] : sits.filter((y) => y !== x.id))} />
             <span><b>{x.label}</b>{x.detail ? <small> {x.detail}</small> : null}</span>
@@ -143,6 +148,16 @@ function ProfilePanel(p: AppApi) {
           </div>
         )}
         {!p.ai.on && <p className="small notice">{p.ai.why}</p>}
+        {(p.safety.declarations?.length ?? 0) > 0 && (
+          <div className="door-log">
+            <small className="muted">What you declared, and when it changed</small>
+            {[...(p.safety.declarations ?? [])].reverse().map((dcl, i) => (
+              <p className="small" key={dcl.at}>
+                <b>{fmtDay(dcl.at)}{i === 0 ? ", current" : ""}:</b> {dcl.situations.length ? dcl.situations.map((id) => SITUATIONS.find((x) => x.id === id)?.label ?? id).join("; ") : "nothing ticked"}{dcl.allergies.length ? `. Avoids: ${dcl.allergies.join(", ")}` : ""}
+              </p>
+            ))}
+          </div>
+        )}
       </section>
       <div className="menu-list" style={{ marginTop: 12 }}>
         <button className="menu-row" onClick={() => { if (dirty) { p.setClientName(name.trim()); p.setPersonal(d); p.notify("Profile saved."); } p.openMenu("goal", "profile"); }}>
@@ -155,6 +170,18 @@ function ProfilePanel(p: AppApi) {
   );
 }
 
+const fmtDay = (iso: string) => new Date(iso).toLocaleDateString([], { day: "numeric", month: "long", year: "numeric" });
+function NextLink({ p, to, from, text, hint }: { p: AppApi; to: MenuSection; from: MenuSection; text: string; hint: string }) {
+  return (
+    <div className="menu-list" style={{ marginTop: 12 }}>
+      <button className="menu-row" onClick={() => p.openMenu(to, from)}>
+        <span className="menu-icon">{ITEMS.find((i) => i.id === to)?.icon}</span>
+        <span className="menu-row-text"><b>Next: {text}</b><small>{hint}</small></span>
+        <ChevronRight size={18} />
+      </button>
+    </div>
+  );
+}
 function GoalPanel(p: AppApi) {
   const { state, goal, pdRef, openGoal, setGoalsOpen, resetGoal } = p;
   const bandName = goal?.band ? bandOf(goal.band)?.name : null;
@@ -239,6 +266,7 @@ function GoalPanel(p: AppApi) {
         <small>Sources: UK Food Standards Agency front-of-pack values; ISSN position stand on nutrient timing, 2017.</small>
       </section>
       <GoalHistory log={p.goalLog} />
+      <NextLink p={p} to="week" from="goal" text="My week" hint="Training days, desk days, where the calories move" />
     </>
   );
 }
@@ -262,6 +290,7 @@ export function GoalHistory({ log }: { log: GoalEntry[] }) {
 
 function WeekPanel(p: AppApi) {
   return (
+    <>
     <section className="card">
       <small>The shape of your week. It decides which moments come first when you cook.</small>
       <div className="moments" style={{ marginTop: 8 }}>
@@ -270,11 +299,14 @@ function WeekPanel(p: AppApi) {
         ))}
       </div>
     </section>
+      <NextLink p={p} to="shop" from="week" text="Where I shop" hint="The starter foods for your shops" />
+    </>
   );
 }
 
 function ShopPanel(p: AppApi) {
   return (
+    <>
     <section className="card">
       <small>Decides your starter foods, and tells Mealan which shelves are real.</small>
       <div className="moments" style={{ marginTop: 8 }}>
@@ -286,6 +318,8 @@ function ShopPanel(p: AppApi) {
         <button className="pill pill-small" onClick={p.addStarter}>Add starter foods for {REGIONS.find((r) => r.id === p.region)?.name ?? "my region"}</button>
       </div>
     </section>
+      <NextLink p={p} to="coach" from="shop" text="Coach" hint="Join a coach with a code, or see yours" />
+    </>
   );
 }
 
