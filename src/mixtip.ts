@@ -2,7 +2,7 @@
 // Pure code. The case comes from the number, the partners from the moment and the roles, the amounts from the solver.
 // The model never picks a partner; it may only word the Pro tip below.
 import { aggregate, density, solveIngredient, uid, type Food, type Ingredient } from "./pilot";
-import { jobOf, PORTION, type Job } from "./foodjob";
+import { jobOf, PORTION, minPortionOf, type Job } from "./foodjob";
 import { roleOf } from "./swaps";
 import { playbookFor } from "./playbook";
 import type { MomentId } from "./moments";
@@ -63,8 +63,11 @@ function build(scanned: Food, partners: Food[], target: number, cap: number | nu
   let result = items, pd: number | null;
   if (c === "under") {
     const r = solveIngredient(items, items[1].id, target, null);
-    if (!r.ok || r.grams < 10 || r.grams > CAP_GRAMS) return null;
-    result = r.items; pd = r.actualPD;
+    if (!r.ok || r.grams > CAP_GRAMS) return null;
+    // a real portion: the moved partner never goes under its minimum; the plate then lands above the target, which still fits
+    const floor = minPortionOf(partners[0]);
+    if (r.grams < floor) { result = r.items.map((x) => (x.id === items[1].id ? { ...x, grams: floor } : x)); const t = aggregate(result); pd = density(t.protein, t.calories); if (pd === null) return null; }
+    else { result = r.items; pd = r.actualPD; }
   } else {
     const t = aggregate(items); pd = density(t.protein, t.calories);
     if (pd === null || pd < target) return null;
@@ -75,7 +78,8 @@ function build(scanned: Food, partners: Food[], target: number, cap: number | nu
 }
 
 // ---- Culinary rules, version 1 (3 October 2026). Code, not the model. What a cook takes for granted; cuisines, heat and allergies wait for the session.
-export type Cat = "sweet" | "fruit" | "spread" | "dairy" | "cottage" | "supplement" | "meat" | "bgrain" | "mgrain" | "nut" | "veg" | "fat" | "drink" | "other";
+export type Cat = "sweet" | "fruit" | "spread" | "dairy" | "cottage" | "supplement" | "meat" | "bgrain" | "mgrain" | "nut" | "veg" | "fat" | "drink" | "sauce" | "other";
+const SAUCE = /sauce|sugo|passata|ketchup|pesto|dressing|salsa|mayo|senf|mustard|soße|sosse|curry paste|tomatensauce|tomato sauce/i;
 const SPREAD = /nutella|spread|aufstrich|creme|crème|peanut ?butter|erdnussmus|nussmus|honig|honey|jam|marmelade|konfit/i;
 const BREAKFAST = /oat|hafer|müsli|muesli|granola|bread|brot|toast|knäcke|cracker/i;
 const MILK = /milk|milch|kefir|buttermilk/i;
@@ -83,6 +87,7 @@ export function catOf(f: Food): Cat {
   const { job, taste } = jobOf(f), role = roleOf(f.name), n = f.name;
   if (job === "Drink" && !MILK.test(n)) return "drink";
   if (role === "supplement") return "supplement";
+  if (SAUCE.test(n)) return "sauce";
   if (SPREAD.test(n)) return "spread";
   if (/cottage|hüttenk|ricotta/i.test(n)) return "cottage";
   if (role === "dairy" || MILK.test(n)) return "dairy";
@@ -104,13 +109,15 @@ const GOES: Record<Cat, Cat[]> = {
   dairy:      ["sweet", "fruit", "spread", "bgrain", "nut", "supplement", "dairy", "cottage"],
   cottage:    ["sweet", "fruit", "spread", "bgrain", "nut", "supplement", "dairy", "cottage", "meat", "mgrain", "veg", "other"],
   supplement: ["dairy", "cottage", "bgrain", "fruit", "sweet", "nut", "spread"],
-  meat:       ["mgrain", "veg", "cottage", "fat", "meat", "other"],
+  meat:       ["mgrain", "veg", "cottage", "fat", "meat", "other", "sauce"],
   bgrain:     ["dairy", "cottage", "supplement", "sweet", "fruit", "spread", "nut"],
-  mgrain:     ["meat", "cottage", "veg", "fat", "other", "mgrain"],
+  mgrain:     ["meat", "cottage", "veg", "fat", "other", "mgrain", "sauce"],
   nut:        ["sweet", "fruit", "dairy", "cottage", "supplement", "bgrain", "spread"],
-  veg:        ["meat", "mgrain", "cottage", "fat", "other"],
-  fat:        ["meat", "mgrain", "veg", "other"],
-  other:      ["meat", "mgrain", "veg", "fat", "cottage", "other"],
+  veg:        ["meat", "mgrain", "cottage", "fat", "other", "sauce"],
+  fat:        ["meat", "mgrain", "veg", "other", "sauce"],
+  other:      ["meat", "mgrain", "veg", "fat", "cottage", "other", "sauce"],
+  // a sauce is savoury and goes on a meal: with meat, a meal grain, vegetables; never alone with dairy or sweet
+  sauce:      ["meat", "mgrain", "veg", "fat", "other"],
   drink:      [],
 };
 export const goesWith = (a: Food, b: Food) => GOES[catOf(a)].includes(catOf(b)) && GOES[catOf(b)].includes(catOf(a));

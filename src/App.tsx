@@ -44,7 +44,7 @@ import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, type Mix, type MixTip } from "./mixtip";
-import { jobOf, PORTION, todayLine } from "./foodjob";
+import { jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
@@ -1064,13 +1064,18 @@ export default function App() {
         if (food.id === selected.food.id) reason = s.reason;
         continue;
       }
-      const t = aggregate(s.items);
+      // a real portion: if the target is met with less than the food's minimum portion, the minimum stands and the plate lands above the target
+      const floor = minPortionOf(food);
+      const grams = Math.max(s.grams, floor);
+      const solved = grams === s.grams ? s.items : s.items.map((x) => (x.id === id ? { ...x, grams } : x));
+      if (max !== null && solved.reduce((a, x) => a + x.grams, 0) > max) continue;
+      const t = aggregate(solved);
       if (
         (minP !== null && (t.protein === null || t.protein < minP)) ||
         (maxE !== null && (t.calories === null || t.calories > maxE))
       )
         continue;
-      results.push({ food, items: s.items, grams: s.grams });
+      results.push({ food, items: solved, grams });
     }
     setOptions(results.slice(0, 8));
     if (!results.length)

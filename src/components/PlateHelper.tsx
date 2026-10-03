@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Send, Replace, Plus, Scale } from "lucide-react";
+import { Send, Replace, Plus, Scale, Check } from "lucide-react";
 import { density, solveIngredient, uid, type Food, type Ingredient } from "../pilot";
 import { rankSwaps, sameFood } from "../swaps";
 import { fmt, pdText } from "../ui";
@@ -13,6 +13,8 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
   apply: (next: Ingredient[], note: string) => void; close: () => void; setError: (m: string) => void; openTalk?: () => void; record?: (q: string, reply: string, plate: string[]) => void;
 }) {
   const [q, setQ] = useState(prefill ?? (missing ? `I don't have ${missing.food.name}. What instead?` : ""));
+  // suggestions taken in this conversation: the helper stays open, so a second one can be added
+  const [taken, setTaken] = useState<Set<number>>(new Set());
   const [busy, setBusy] = useState(false);
   const [reply, setReply] = useState("");
   const [sugs, setSugs] = useState<Suggestion[]>([]);
@@ -53,7 +55,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
   async function ask(given?: string) {
     const question = (typeof given === "string" ? given : q).trim(); if (!question) return;
     if (typeof given === "string") setQ(given);
-    setBusy(true); setReply(""); setSugs([]);
+    setBusy(true); setReply(""); setSugs([]); setTaken(new Set());
     try {
       const res = await fetch("/api/plate", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         question, missing: missing?.food.name,
@@ -106,11 +108,14 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
               <b>{s.action === "swap" && s.replaces ? `${s.replaces} → ${s.food}` : s.action === "amount" ? `${s.food}: ${fmt(s.grams, 0)} g` : s.food}</b>
               <small>{s.why}{!s.known && s.action !== "amount" ? " · values are an estimate" : ""}</small>
             </div>
-            <button className="pill pill-small pill-primary" onClick={() => take(s)}>
-              {s.action === "swap" ? <><Replace size={14} /> Swap</> : s.action === "add" ? <><Plus size={14} /> Add</> : <><Scale size={14} /> Set</>}
-            </button>
+            {taken.has(k)
+              ? <span className="pill pill-small taken"><Check size={14} /> On the plate</span>
+              : <button className="pill pill-small pill-primary" onClick={() => { setTaken((t) => new Set(t).add(k)); take(s); }}>
+                  {s.action === "swap" ? <><Replace size={14} /> Swap</> : s.action === "add" ? <><Plus size={14} /> Add</> : <><Scale size={14} /> Set</>}
+                </button>}
           </div>
         ))}
+        {taken.size > 0 && <button className="primary wide" onClick={close}><Check size={16} /> Done, back to the plate</button>}
       </div>
     </div>
   );

@@ -519,7 +519,8 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .lt-add select, .lt-add input { font: inherit; font-size: 15px; padding: 9px 10px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); }
 .lt-add-row { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; } .lt-add-row input { width: 110px; }
 .label-table-read .lt-row { grid-template-columns: 1fr auto 34px; padding: 8px 12px; } .lt-val { font-size: 15px; text-align: right; }
-.readout-extra { display: block; margin-top: 8px; opacity: .9; font-size: 12px; font-weight: 700; }
+.readout-extra { display: block; margin-top: 8px; opacity: .9; font-size: 12px; font-weight: 700; color: #fff; }
+.readout small, .readout p { color: #fff; }
 .lt-add-row select { width: 90px; } .lt-add-row input { width: 120px; }
 
 .fav { margin-left: auto; flex: none; border: 0; background: none; font-size: 26px; line-height: 1; color: var(--muted); padding: 4px 2px; }
@@ -545,6 +546,7 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .fit-lines { margin: 4px 0 10px; } .fit-line { font-size: 13px; line-height: 1.45; margin: 0 0 4px; padding-left: 14px; position: relative; color: var(--ink); }
 .fit-line::before { content: ""; position: absolute; left: 0; top: 7px; width: 7px; height: 7px; border-radius: 50%; background: var(--mid); }
 .fit-line.ok::before { background: var(--high); } .fit-line.no::before { background: var(--low); } .fit-line.today::before { background: var(--brand); }
+.pill.taken { background: var(--tint); border-color: var(--tint); color: var(--brand-text); display: inline-flex; align-items: center; gap: 4px; }
 .plan-source { display: inline-flex; align-items: center; gap: 2px; padding: 0; color: var(--brand-text); font-size: 12px; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
 .day-line { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1.5px solid #b9cdf1; }
 .day-line > div { display: flex; flex-direction: column; gap: 2px; }

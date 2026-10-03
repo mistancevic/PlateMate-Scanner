@@ -24,7 +24,7 @@ test("under target, regular meal: a protein base first, then a plate of up to th
   assert.equal(t.case, "under");
   assert.ok(t.mixes.length >= 2 && t.mixes.length <= 3, "two or three mixes");
   for (const m of t.mixes) {
-    assert.ok(Math.abs(m.pd - 6.3) <= 0.05, `on target: ${m.pd}`);
+    assert.ok(m.pd >= 6.3 - 0.05, `on or above target: ${m.pd}`);
     assert.equal(m.items[0].food.name, "Nutella");
     assert.ok(m.items.every((i) => i.grams >= 10 && i.grams <= 300), "real portions");
     const a = aggregate(m.items); assert.equal(m.kcal, Math.round(a.calories!));
@@ -171,4 +171,20 @@ test("rule 9: the kind, plain", () => {
   assert.equal(noodleMix.mixes[0].kind, "meal");                       // a mixed food plus a protein base is a meal
   const snack = mixTip(byName("Vanilla ice cream"), "travel", 6.3, lib, [], 900).mixes[0];
   assert.ok(snack.kcal <= SNACK_KCAL);
+});
+
+test("rule 10: a sauce goes on a meal, and what Mealan moves is a real portion", () => {
+  const sauce = mk("Kinder Tomatensauce ohne Zuckerzusatz", 37, 1.3, 0.5, 5.8);
+  assert.equal(catOf(sauce), "sauce");
+  assert.equal(goesWith(sauce, chicken), true);
+  assert.equal(goesWith(sauce, rice), true);
+  assert.equal(goesWith(sauce, skyr), false);
+  assert.equal(goesWith(sauce, nutella), false);
+  const t = mixTip(sauce, "regular", 5.5, lib, [], 1200);
+  assert.ok(t.mixes.length >= 1, "a sauce gets a mix");
+  assert.equal(catOf(t.mixes[0].partners[0]), "meat");
+  const proteinGrams = t.mixes[0].items[1].grams;
+  assert.ok(proteinGrams >= 80, `a real portion of the protein base, not a pinch: ${proteinGrams} g`);
+  assert.equal(t.mixes[0].items[1].grams, 80, "the floor stands when the target came sooner");
+  assert.ok(t.mixes[0].pd >= 5.5, "the plate lands on or above the target");
 });

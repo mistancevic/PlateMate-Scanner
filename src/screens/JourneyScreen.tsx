@@ -81,7 +81,7 @@ export function JourneyScreen(p: AppApi) {
   const helperSheet = helper && (
     <PlateHelper items={items} library={state.foods} pdRef={pdRef} cap={cap ?? null} missing={helper.missing ? items.find((i) => i.id === helper.missing) ?? null : null} prefill={helper.prefill}
       setError={setError} close={() => setHelper(null)} openTalk={() => { setHelper(null); p.openOut(); }} record={p.recordTalk}
-      apply={(next, note) => { setState((s) => ({ ...s, items: next, portion: null })); setHelper(null); p.notify(note); if (step === "recipe") recalc(next); }} />
+      apply={(next, note) => { setState((s) => ({ ...s, items: next, portion: null })); p.notify(note); if (step === "recipe") recalc(next); }} />
   );
   const adjustFor = (o: { items: typeof items }) => o.items.find((i) => !i.locked)?.id;
   // Mealan moves the food with the highest protein density; everything else keeps the amount you set.

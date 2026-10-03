@@ -26,6 +26,9 @@ export function jobOf(f: Food): { job: Job; note: string; taste: "sweet" | "savo
 }
 // A typical portion by job, for the plain line. A starting point, not advice: the solver sets real amounts.
 export const PORTION: Record<Job, number> = { "Protein base": 150, "Flavour food": 20, "Carb base": 80, "Fat source": 20, "Volume food": 150, "Drink": 250, "Mixed": 100 };
+// The least a moved food can be and still be a portion: a plate reaches the target, it never reaches it with 8 g of chicken.
+export const MIN_PORTION: Record<Job, number> = { "Protein base": 80, "Flavour food": 10, "Carb base": 50, "Fat source": 5, "Volume food": 50, "Drink": 100, "Mixed": 50 };
+export const minPortionOf = (f: Food) => (roleOf(f.name) === "supplement" ? 20 : MIN_PORTION[jobOf(f).job]);
 export function plainLine(f: Food, target: number | null): string {
   const { job } = jobOf(f);
   const pd = density(f.protein, f.calories);
