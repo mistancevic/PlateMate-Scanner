@@ -2,6 +2,12 @@
 # Every release: build the image from the current commit and put it live.
 set -euo pipefail
 cd "$(dirname "$0")"; source ./deploy.env; cd ..
+# The Cloud Shell forgets its active account when the session restarts. Pick the signed-in one before anything else.
+if [ -z "$(gcloud config get-value account 2>/dev/null)" ]; then
+  ACCOUNT=$(gcloud auth list --format='value(account)' 2>/dev/null | head -1)
+  [ -n "$ACCOUNT" ] && gcloud config set account "$ACCOUNT" --quiet >/dev/null && echo "Account set: $ACCOUNT"
+fi
+gcloud config set project "$PROJECT" --quiet >/dev/null
 TAG=$(git rev-parse --short HEAD)
 IMAGE="$REGION-docker.pkg.dev/$PROJECT/chefmealan/app:$TAG"
 gcloud builds submit --project "$PROJECT" --config deploy/cloudbuild.yaml \
