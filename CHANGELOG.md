@@ -4,6 +4,7 @@ One version per release since 2 October 2026. The number is in Menu, About, next
 
 ## 0.1.x, the pilot builds
 
+- **v0.1.29** · 2026-10-04 · the first screen works the day out: body data behind consent, the goal band, four numbers as you type (calories, protein, fat, carbs); a rough goal and own numbers are the other ways; fat 30 percent of energy by rule, carbs the rest and moving with the day; the Goal panel and the Today card carry the four; walkthrough first-goal.cjs.
 - **v0.1.28** · 2026-10-04 · the coach's confirm shows at once on the client sheet, no refresh needed.
 - **v0.1.27** · 2026-10-04 · allergies under the tick, the fourteen EU allergens as chips plus a free line; the public legal pages, Impressum, Privacy notice, Disclaimer and Who's behind it, at their own addresses, linked from the landing page, About and the consent card; Milan's lines in brackets.
 - **v0.1.27** · 2026-10-04 · allergies field opens under its tick, with the fourteen EU allergens as chips plus a free line; legal pages readable without signing in: /impressum, /privacy, /disclaimer, /about, linked from the landing page and About; lines in brackets are Milan's to fill.

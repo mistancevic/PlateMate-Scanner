@@ -4,7 +4,7 @@
 const { spawnSync } = require("node:child_process");
 const path = require("node:path");
 const PATHS = [
-  { id: "P1", name: "Getting in: landing, access, sign-in, coach code, profile with consent, goal", guards: ["safety"], note: "sign-in and the coach code are checked on the phone" },
+  { id: "P1", name: "Getting in: landing, access, sign-in, coach code, profile with consent, goal", guards: ["safety", "first-goal"], note: "sign-in and the coach code are checked on the phone" },
   { id: "P2", name: "At the shelf: Scan, label check, PD, fit, Mix it, one tap to a plate", guards: ["camera-group", "camera-every-mode", "mix-tip"] },
   { id: "P3", name: "A craving at home: moment, foods in, Fit to my target, Make it, saved", guards: ["meal-from-empty-plate", "mix-tip"] },
   { id: "P4", name: "Out, or missing something: the helper and the chat work with what I have", guards: ["dont-have-it", "chat-then-craving"] },

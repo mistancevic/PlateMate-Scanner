@@ -210,11 +210,9 @@ function NextLink({ p, to, from, text, hint }: { p: AppApi; to: MenuSection; fro
   );
 }
 function GoalPanel(p: AppApi) {
-  const { state, goal, pdRef, openGoal, setGoalsOpen, resetGoal } = p;
+  const { state, goal, openGoal, setGoalsOpen, resetGoal } = p;
   const bandName = goal?.band ? bandOf(goal.band)?.name : null;
   const setBy = goal?.setBy === "coach" ? (goal.coachName || p.profile.coachName || COACH_NAME) : "you";
-  const [band, setBand] = useState<string>(suggestBand(p.personal, goal?.band).id);
-  const result = calculate(p.personal, band, p.formula);
   return (
     <>
       <section className="plan">
@@ -224,9 +222,10 @@ function GoalPanel(p: AppApi) {
           <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal a day</small></div>
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
-        <p className="source-line">{goal?.source ? SOURCE_LABEL[goal.source] : goal?.setBy === "coach" ? SOURCE_LABEL.coach : "Quick goal"}{goal?.method ? `: ${goal.method}` : ""}{goal?.source === "profile" ? ". Follows your profile." : ""}</p>
+        {state.goals.fats != null && state.goals.carbs != null && <p className="macro-line">{fmt(state.goals.fats, 0)} g fat · {fmt(state.goals.carbs, 0)} g carbs · fat and carbs by rule, carbs move with the day</p>}
+        <p className="source-line">{goal?.source ? SOURCE_LABEL[goal.source] : goal?.setBy === "coach" ? SOURCE_LABEL.coach : "Quick goal"}{goal?.method ? `: ${goal.method}` : ""}{goal?.source === "profile" ? ". Follows your profile from here on." : ""}</p>
         <div className="button-row">
-          <button className="pill pill-small" onClick={openGoal}><Target size={14} /> Quick goal</button>
+          <button className="pill pill-small pill-primary" onClick={openGoal}><Calculator size={14} /> Work it out, or change it</button>
           <button className="pill pill-small" onClick={() => setGoalsOpen(true)}><SlidersHorizontal size={14} /> Exact numbers</button>
           <ConfirmButton className="pill pill-small" label={<><RotateCcw size={14} /> Reset</>} confirmLabel="Tap again to reset" onConfirm={resetGoal} />
         </div>
@@ -239,42 +238,6 @@ function GoalPanel(p: AppApi) {
         </div>
         <small>{p.personal.dayMode === "follow" ? "On Today you say what kind of day it is: rest, usual, training or very active. Calories move with the day; protein stays. Until you say, the usual day is assumed." : "One number for every day. Some days you'll use more, some less; over the week it evens out."}</small>
       </section>
-      <p className="label">Calculate my numbers</p>
-      {!canCalculate(p.personal) ? (
-        <>
-        <section className="card">
-          <small>Add your birth year, height, weight and activity in Profile, and Mealan calculates your daily calories and protein for the goal you pick.</small>
-        </section>
-        <div className="menu-list" style={{ marginTop: 8 }}>
-          <button className="menu-row" onClick={() => p.openMenu("profile", "goal")}>
-            <span className="menu-icon"><User size={20} /></span>
-            <span className="menu-row-text"><b>Profile</b><small>Add what the calculation needs</small></span>
-            <ChevronRight size={18} />
-          </button>
-        </div>
-        </>
-      ) : (
-        <section className="card">
-          <small>Pick what you're after. The numbers come from your profile.</small>
-          <div className="moments" style={{ marginTop: 8 }}>
-            {BANDS.map((b) => <button key={b.id} className={`pill pill-small ${band === b.id ? "pill-primary" : ""}`} onClick={() => setBand(b.id)}>{b.name}</button>)}
-          </div>
-          {result && (
-            <div className="proposal">
-              <div className="plan-row">
-                <div><b>{pdVal(result.protein / (result.kcal / 100))}</b><small>{pdTag()}</small></div>
-                <div><b>{fmt(result.kcal, 0)}</b><small>kcal a day</small></div>
-                <div><b>{result.protein}</b><small>g protein, {result.proteinMin}–{result.proteinMax}</small></div>
-              </div>
-              <p className="math">{result.math}</p>
-              <small>{result.method}{p.formula ? " (chosen by your coach)" : formulaFor(p.personal) === "katch" ? " (from your body fat)" : ""}.</small>
-              {result.note && <small>{result.note}</small>}
-              <button className="pill pill-primary pill-wide" onClick={() => { p.applyNumbers(band, result.kcal, result.protein, result.method); p.notify("Your goal is set. It follows your profile from now on."); }}>Use these numbers</button>
-            </div>
-          )}
-          {pdRef === null && null}
-        </section>
-      )}
       <p className="label">How your numbers work</p>
       <section className="card explain">
         <p><b>At rest.</b> What your body burns doing nothing: Mifflin–St Jeor from sex, age, height and weight, or Katch–McArdle from your lean mass when you know your body fat.</p>

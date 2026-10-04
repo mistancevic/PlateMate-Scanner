@@ -1,3 +1,4 @@
+import { macroSplit } from "./personal";
 // The goal a person sets once. A band from the goal bands (G1 to G6), or their own calories and protein.
 export type Band = { id: string; name: string; range: string; kcal: [number, number]; protein: [number, number]; who: string };
 export const BANDS: Band[] = [
@@ -23,7 +24,7 @@ export const saveGoal = (g: Goal) => { try { localStorage.setItem(KEY, JSON.stri
 export const clearGoal = () => { try { localStorage.removeItem(KEY); } catch {} };
 export const bandOf = (id?: string) => BANDS.find((b) => b.id === id);
 // The middle of the band's range as the working numbers; exact numbers can be set on Me later.
-export const goalsForBand = (b: Band) => ({ calories: mid(b.kcal), protein: mid(b.protein) });
+export const goalsForBand = (b: Band) => { const calories = mid(b.kcal), protein = mid(b.protein); return { calories, protein, ...macroSplit(calories, protein) }; };
 // How a food's PD sits against the target: fits, close, or below.
 export const fit = (pd: number | null, target: number | null): "high" | "mid" | "low" =>
   pd === null || target === null ? "mid" : pd >= target ? "high" : pd >= target - 2 ? "mid" : "low";

@@ -45,6 +45,7 @@ export function HomeScreen(p: AppApi) {
           <div><b>{fmt(p.todayKcal ?? state.goals.calories, 0)}</b><small>{!follow ? "kcal a day" : p.day.source === "assumed" ? "kcal, usual day" : "kcal today"}</small></div>
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
+        {p.todayMacros && <p className="macro-line">{p.todayMacros.fats} g fat · {p.todayMacros.carbs} g carbs</p>}
         <div className="day-line">
           <div>
             <b>{dateLine}</b>

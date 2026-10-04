@@ -61,3 +61,14 @@ test("after training, Mix it: the plate reaches the protein floor", () => {
   assert.ok(t.mixes.length >= 1);
   for (const m of t.mixes) assert.ok(m.protein >= 29, `${m.partners.map((p) => p.name).join("+")}: ${m.protein} g protein`);
 });
+
+test("fat and carbs by rule: fat 30 percent of energy, carbs the rest; the day's extra calories go to carbs", async () => {
+  const { macroSplit, calculate } = await import("./personal");
+  const a = macroSplit(2400, 160);
+  assert.equal(a.fats, 80);                 // 2400 * 0.30 / 9
+  assert.equal(a.carbs, 260);               // (2400 - 640 - 720) / 4
+  const b = macroSplit(2800, 160, a.fats);  // a training day: same protein, same fat, carbs take the difference
+  assert.equal(b.fats, 80); assert.equal(b.carbs, 360);
+  const r = calculate({ sex: "male", birthYear: 1981, heightCm: 182, weightKg: 95, activity: "moderate" } as any, "recomp", null)!;
+  assert.ok(r.fats > 0 && r.carbs > 0 && Math.abs(r.protein * 4 + r.fats * 9 + r.carbs * 4 - r.kcal) <= 8, "the four add up to the day");
+});

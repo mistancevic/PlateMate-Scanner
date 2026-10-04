@@ -62,6 +62,7 @@ export interface AppApi {
   personal: import("../personal").Personal;
   setPersonal: (p: import("../personal").Personal) => void;
   applyNumbers: (bandId: string, kcal: number, protein: number, method?: string) => void;
+  todayMacros: { kcal: number; protein: number; fats: number; carbs: number } | null;
   goalLog: import("../goal").GoalEntry[];
   addFoodPhoto: (foodId: string, dataUrl: string) => Promise<void>;
   openFoodId: string | null;

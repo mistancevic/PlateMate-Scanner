@@ -40,7 +40,7 @@ import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, confirmClientAi, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
-import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, dayFactor, getDay, setDayType as storeDayType, DAY_TYPES, type Personal, type DayType, type Day } from "./personal";
+import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, dayFactor, getDay, setDayType as storeDayType, DAY_TYPES, macroSplit, type Personal, type DayType, type Day } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
@@ -1282,8 +1282,15 @@ export default function App() {
       nextSource.current = "profile";
       saveGoal({ band: bandId, setBy: "you", setAt: new Date().toISOString(), source: "profile", method });
       setGoalState(getGoal());
-      setState((s) => ({ ...s, goals: { ...s.goals, calories: kcal, protein } }));
+      setState((s) => ({ ...s, goals: { ...s.goals, calories: kcal, protein, ...macroSplit(kcal, protein) } }));
     },
+    // today's four: protein and fat stay, the carbs take the day's difference
+    todayMacros: (() => {
+      const kcal = todayKcalOf() ?? state.goals.calories, protein = state.goals.protein;
+      if (kcal === null || protein === null) return null;
+      const fats = state.goals.fats ?? macroSplit(kcal, protein).fats;
+      return { kcal, protein, fats, carbs: macroSplit(kcal, protein, fats).carbs };
+    })(),
     openMenu: (s?: MenuSection, from?: MenuSection) => { setMenuFrom(from ?? null); setMenuSection(s ?? "list"); },
     inbox,
     takeRecipe: async (item: InboxItem, how: "make" | "keep") => {
