@@ -4,6 +4,7 @@ One version per release since 2 October 2026. The number is in Menu, About, next
 
 ## 0.1.x, the pilot builds
 
+- **v0.1.32** · 2026-10-05 · Saved recipes reachable: a row at the top of Settings for everyone, and a button on Today once there is one; before, only the coach tools linked to it.
 - **v0.1.31** · 2026-10-05 · the white button: a primary pill inside the plan card was painted white by a card rule, so "Work it out, or change it" had white text on white; fixed for every primary pill in a plan card; the duplicate "Your days" block on the goal screen removed; "A rough goal" only offered when there is no body data, and it says it never follows your weight; the source line names the way in plain words.
 - **v0.1.30** · 2026-10-04 · from Davorka's call: Delete my account asks for a fresh sign-in when Firebase requires one and wipes the phone once the data is gone; the Coach card shows who the coach is (name, email, photo, since when) and what they see and never see; the first screen asks every day the same or follow my day; buttons keep their colours on browsers without @layer; access requests one line per person.
 - **v0.1.30** · 2026-10-04 · Delete my account runs on the server with admin rights: record, photos, cards, recipes, access requests and invites by email, then the sign-in, no second sign-in; the phone wipes its copy so nothing comes back; the day mode (every day the same, follow my day) on every way of the goal screen; "Your day is set. This is Today." after setting; the coach named and tappable on the Today card.

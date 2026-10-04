@@ -1,5 +1,5 @@
 import { useState, useEffect, type ReactNode } from "react";
-import { FlaskConical, ChevronRight, ArrowLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator } from "lucide-react";
+import { FlaskConical, ChevronRight, BookOpen, ArrowLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator } from "lucide-react";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
 import { exportLog, clearLog, readLog, log } from "../log";
@@ -30,6 +30,9 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       <>
         <div className="menu-head"><h2>Settings</h2><button className="link" onClick={close}>Close</button></div>
         <div className="menu-list">
+          <button className="menu-row" onClick={() => { p.setTab("notes"); close(); }}>
+            <span className="menu-icon"><BookOpen size={20} /></span><span className="menu-row-text"><b>Saved recipes</b><small>{p.state.meals.length ? `${p.state.meals.length} you made and rated` : "What you make and rate lands here"}</small></span><ChevronRight size={18} />
+          </button>
           {ITEMS.filter((it) => it.id !== "evals" || p.profile.role === "coach" || !p.cloudEnabled).map((it) => (
             <button key={it.id} className="menu-row" onClick={() => setSection(it.id)}>
               <span className="menu-icon">{it.icon}</span><b>{it.name}</b><ChevronRight size={18} />

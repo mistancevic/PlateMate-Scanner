@@ -72,6 +72,11 @@ export function HomeScreen(p: AppApi) {
       <button className="pill pill-tall" onClick={() => setTab("foods")}>
         <BookOpen size={20} /> My foods
       </button>
+      {state.meals.length > 0 && (
+        <button className="pill pill-tall" onClick={() => setTab("notes")}>
+          <BookOpen size={20} /> Saved recipes ({state.meals.length})
+        </button>
+      )}
       {inbox}
       <p className="label">Logged so far</p>
       <p className="small logged-line">{loggedLine(today, true)} What went through Mealan, nothing more.</p>
