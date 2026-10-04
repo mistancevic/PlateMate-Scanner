@@ -22,7 +22,7 @@ export function CoachArea(p: AppApi) {
   async function refresh() {
     if (!user) return;
     setBusy(true);
-    try { setRows(await listClients(user.uid)); }
+    try { const next = await listClients(user.uid); setRows(next); setOpen((o) => (o ? next.find((r) => r.uid === o.uid) ?? o : o)); }
     catch (e: any) { setError(e.message || "Could not load clients."); }
     finally { setBusy(false); }
   }

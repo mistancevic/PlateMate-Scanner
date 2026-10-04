@@ -4,6 +4,7 @@ One version per release since 2 October 2026. The number is in Menu, About, next
 
 ## 0.1.x, the pilot builds
 
+- **v0.1.28** · 2026-10-04 · the coach's confirm shows at once on the client sheet, no refresh needed.
 - **v0.1.27** · 2026-10-04 · allergies under the tick, the fourteen EU allergens as chips plus a free line; the public legal pages, Impressum, Privacy notice, Disclaimer and Who's behind it, at their own addresses, linked from the landing page, About and the consent card; Milan's lines in brackets.
 - **v0.1.27** · 2026-10-04 · allergies field opens under its tick, with the fourteen EU allergens as chips plus a free line; legal pages readable without signing in: /impressum, /privacy, /disclaimer, /about, linked from the landing page and About; lines in brackets are Milan's to fill.
 - **v0.1.26** · 2026-10-04 · the door's answer reaches the account (the cloud save had not been watching the safety record, so the account's older copy could overwrite a fresh answer on the next open); the newer answer wins on load; None of these sits below the allergies, set apart on a tint.
