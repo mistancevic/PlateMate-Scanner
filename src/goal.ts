@@ -18,7 +18,7 @@ export type GoalEntry = { at: string; band?: string; kcal: number | null; protei
 const LKEY = "chefmealan-goal-log";
 export const getGoalLog = (): GoalEntry[] => { try { return JSON.parse(localStorage.getItem(LKEY) || "[]"); } catch { return []; } };
 export const setGoalLog = (l: GoalEntry[]) => { try { localStorage.setItem(LKEY, JSON.stringify(l.slice(-60))); } catch {} };
-export const SOURCE_LABEL: Record<GoalSource, string> = { quick: "Quick goal", profile: "From your profile", exact: "Exact numbers", coach: "Set by your coach" };
+export const SOURCE_LABEL: Record<GoalSource, string> = { quick: "A rough goal, the band's middle", profile: "Worked out from your profile", exact: "Your own numbers", coach: "Set by your coach" };
 export const getGoal = (): Goal | null => { try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch { return null; } };
 export const saveGoal = (g: Goal) => { try { localStorage.setItem(KEY, JSON.stringify(g)); } catch {} };
 export const clearGoal = () => { try { localStorage.removeItem(KEY); } catch {} };

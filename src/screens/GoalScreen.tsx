@@ -28,15 +28,6 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
   const by = coach ? "coach" : "you";
   const setPersonalNow = (next: Personal) => { setD(next); p.setPersonal(next); };
 
-  const DayMode = () => (
-    <div className="card" style={{ marginTop: 10 }}>
-      <div className="moments">
-        <button className={`pill pill-small ${p.personal.dayMode !== "follow" ? "pill-primary" : ""}`} onClick={() => p.setPersonal({ ...p.personal, dayMode: "same" })}>Every day the same</button>
-        <button className={`pill pill-small ${p.personal.dayMode === "follow" ? "pill-primary" : ""}`} onClick={() => p.setPersonal({ ...p.personal, dayMode: "follow" })}>Follow my day</button>
-      </div>
-      <small>{p.personal.dayMode === "follow" ? "Each day on Today you say what kind of day it is; calories and carbs move, protein and fat stay." : "One number for every day; over the week it evens out. Change it any time in Settings, Goal."}</small>
-    </div>
-  );
   const dayMode = p.personal.dayMode === "follow" ? "follow" : "same";
   const setDayMode = (m: "same" | "follow") => p.setPersonal({ ...p.personal, dayMode: m });
   const Days = () => (
@@ -65,7 +56,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
       <div className="hero"><Mark size={56} color="var(--brand)" /><h2>{APP_NAME}</h2><p>Your day in four numbers. Every plate is measured against them.</p></div>
       <div className="ways three">
         <button className={`pill pill-small ${way === "calc" ? "pill-primary" : ""}`} onClick={() => setWay("calc")}>Work it out for me</button>
-        <button className={`pill pill-small ${way === "rough" ? "pill-primary" : ""}`} onClick={() => setWay("rough")}>A rough goal</button>
+        {!canCalculate(d) && <button className={`pill pill-small ${way === "rough" ? "pill-primary" : ""}`} onClick={() => setWay("rough")}>A rough goal</button>}
         <button className={`pill pill-small ${way === "own" ? "pill-primary" : ""}`} onClick={() => setWay("own")}>My own numbers</button>
       </div>
 
@@ -113,7 +104,6 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
               <p className="math">{result.math}</p>
               <small>{result.method}. {MACRO_SOURCE}</small>
               {result.note && <small>{result.note}</small>}
-              <DayMode />
               <button className="pill pill-primary pill-wide" onClick={() => { p.applyNumbers(band, result.kcal, result.protein, result.method); onDone(); }}>Set my day</button>
             </section>
           ) : (
@@ -124,7 +114,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
 
       {way === "rough" && (
         <div className="bands">
-          <p className="small muted">The middle of each range. Rough; work it out for exact.</p>
+          <p className="small muted">The middle of each range, the same for everyone, and it never follows your weight. Rough; work it out for exact, and it follows your profile from then on.</p>
           <Days />
           {BANDS.map((b) => (
             <button key={b.id} className="band-card" onClick={() => {
@@ -154,7 +144,6 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
           </div>
           <p className="small">That is {pdText(ownPd)}{ownFats !== null && ownCarbs !== null ? `, ${ownFats} g fat and ${ownCarbs} g carbs` : ""}.</p>
           <Days />
-          <DayMode />
           <button className="pill pill-primary pill-wide" disabled={!ownPd} onClick={() => {
             setState((s) => ({ ...s, goals: { ...s.goals, calories: ownKcal, protein: ownProtein, fats: ownFats, carbs: ownCarbs } }));
             saveGoal({ setBy: by, setAt: new Date().toISOString(), source: "exact" });
