@@ -38,7 +38,7 @@ import { OutScreen, type Turn } from "./screens/OutScreen";
 import { LandingScreen } from "./screens/LandingScreen";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, deleteAccount, confirmClientAi, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, dayFactor, getDay, setDayType as storeDayType, DAY_TYPES, macroSplit, type Personal, type DayType, type Day } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
@@ -1405,8 +1405,14 @@ export default function App() {
     deleteAccount: async () => {
       let dataGone = false;
       try {
-        await deleteAccount((step) => { if (/Removing the sign-in|Sign in once more/.test(step)) dataGone = true; setDeleteSteps(step); });
-        localStorage.clear(); location.reload();
+        setDeleteSteps("Removing the record, photos, cards, recipes and the sign-in");
+        const r = await api("/api/account/delete", {});
+        dataGone = true;
+        setDeleteSteps((r?.steps ?? []).join("; ") || "Removed");
+        // the phone's copy goes too, or it would come back on the next sign-in
+        localStorage.clear(); sessionStorage.clear();
+        try { await signOutCloud(); } catch {}
+        location.reload();
       } catch (e: any) {
         if (dataGone) {
           // the record, photos, cards and recipes are gone; only the sign-in itself is left

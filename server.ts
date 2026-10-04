@@ -358,6 +358,31 @@ app.post("/api/scan", requireUser, requireMember, async (req, res) => {
     fail(res, error);
   }
 });
+// Delete my account, the whole of it, with admin rights: the record and everything under it (photos, cards, recipes),
+// the person's access requests and invites by email, then the sign-in. No second sign-in needed, which the client-side
+// delete could not promise on a phone. The client wipes its own storage after, so nothing comes back on the next sign-in.
+app.post("/api/account/delete", requireUser, async (req, res) => {
+  const uid = (req as any).uid as string | undefined;
+  if (!uid) return res.status(401).json({ error: "Please sign in." });
+  const steps: string[] = [];
+  try {
+    const d = db();
+    await d.recursiveDelete(d.collection("users").doc(uid)); steps.push("record, photos, cards and recipes removed");
+    let email = String((req as any).email || "");
+    if (!email) { try { email = String((await adminAuth().getUser(uid)).email || "").toLowerCase(); } catch { /* no email, nothing to clean by it */ } }
+    if (email) {
+      for (const col of ["accessRequests", "invites"]) {
+        const snap = await d.collection(col).where("email", "==", email).get();
+        const batch = d.batch(); snap.docs.forEach((x) => batch.delete(x.ref)); if (snap.size) await batch.commit();
+        if (snap.size) steps.push(`${snap.size} ${col === "invites" ? "invite" : "access request"}${snap.size === 1 ? "" : "s"} removed`);
+      }
+    }
+    await adminAuth().deleteUser(uid); steps.push("sign-in removed");
+    return res.json({ ok: true, steps });
+  } catch (error) {
+    return res.status(500).json({ error: `Could not finish the deletion: ${(error as Error).message}`, steps });
+  }
+});
 app.get("/api/product/:barcode", requireUser, requireMember, async (req, res) => {
   try {
     const barcode = String(req.params.barcode);

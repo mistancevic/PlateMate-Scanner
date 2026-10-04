@@ -46,6 +46,7 @@ export function HomeScreen(p: AppApi) {
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
         {p.todayMacros && <p className="macro-line">{p.todayMacros.fats} g fat · {p.todayMacros.carbs} g carbs</p>}
+        {p.profile.coachId && !byCoach && <button className="plan-source coach-line" onClick={() => p.openMenu("coach")} aria-label="Open your coach">Your coach: {p.profile.coachName || COACH_NAME} <ChevronRight size={12} /></button>}
         <div className="day-line">
           <div>
             <b>{dateLine}</b>
