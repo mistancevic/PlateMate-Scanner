@@ -322,11 +322,31 @@ function CoachPanel(p: AppApi) {
   if (!cloudEnabled || !user)
     return <section className="card person"><span className="avatar avatar-coach">{COACH_NAME.slice(0, 1)}</span><div><b>{COACH_NAME}</b><small>sets your target and sees how it went</small></div></section>;
   return profile.coachId ? (
-    <section className="card person">
-      <span className="avatar avatar-coach">{coachName.slice(0, 1)}</span>
-      <div><b>{coachName}</b><small>sets your target and sees how it went</small></div>
-      <ConfirmButton className="link link-danger" label="Leave" confirmLabel="Tap again to leave" onConfirm={leaveCoach} />
-    </section>
+    <>
+      <section className="card person">
+        {profile.coachPhoto ? <img className="avatar avatar-coach" src={profile.coachPhoto} alt="" referrerPolicy="no-referrer" /> : <span className="avatar avatar-coach">{coachName.slice(0, 1)}</span>}
+        <div>
+          <b>{coachName}</b>
+          {profile.coachEmail && <small><a href={`mailto:${profile.coachEmail}`}>{profile.coachEmail}</a></small>}
+          <small>Your coach{profile.joinedAt ? ` since ${fmtDay(profile.joinedAt)}` : ""}.</small>
+        </div>
+      </section>
+      <section className="card">
+        <b>What your coach sees</b>
+        <ul className="small">
+          <li>Your goal and today's numbers, and may set them for you.</li>
+          <li>The cards you share, with the reason and the photo, and the days they add up to.</li>
+          <li>Which situations you ticked on your profile and when. Never your words.</li>
+          <li>Recipes they send you land on Today.</li>
+        </ul>
+        <b>What your coach never sees</b>
+        <ul className="small">
+          <li>Cards you keep private, your library, your photos, your chats with Mealan.</li>
+          <li>Your body data. Only the numbers it gives.</li>
+        </ul>
+        <ConfirmButton className="link link-danger" label="Leave this coach" confirmLabel="Tap again to leave" onConfirm={leaveCoach} />
+      </section>
+    </>
   ) : (
     <section className="card">
       <small>Got an invite from your coach? Enter its code. It works with the email it was sent to.</small>

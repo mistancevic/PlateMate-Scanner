@@ -1,6 +1,6 @@
 // Sign in with Google and keep each person's data under their own account. Off entirely when not configured.
 import { initializeApp, type FirebaseApp } from "firebase/app";
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, type User } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, reauthenticateWithPopup, type User } from "firebase/auth";
 import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, type Firestore } from "firebase/firestore";
 
 const cfg = {
@@ -46,7 +46,7 @@ export const signOutCloud = () => signOut(auth());
 
 // One document per person: the pilot state plus goal and name, and who coaches them.
 // role is set by hand in the Firebase console ("coach"); nobody can sign up as a coach.
-export type CloudDoc = { state: unknown; goal: unknown; clientName: string; updatedAt: string; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: "mifflin" | "katch" | null; role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string };
+export type CloudDoc = { state: unknown; goal: unknown; clientName: string; updatedAt: string; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: "mifflin" | "katch" | null; role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string | null; coachPhoto?: string | null; joinedAt?: string | null; coachSetAt?: string };
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const snap = await getDoc(doc(db(), "users", uid));
   return snap.exists() ? (snap.data() as CloudDoc) : null;
@@ -68,10 +68,10 @@ export async function joinCoach(_uid: string, code: string) {
   const r = await fetch("/api/join", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code }) });
   const d = await r.json().catch(() => ({}));
   if (!r.ok) throw new Error(d.error || "Couldn't join with that code.");
-  return { coachId: d.coachId as string, coachName: (d.coachName as string) || "your coach" };
+  return { coachId: d.coachId as string, coachName: (d.coachName as string) || "your coach", coachEmail: (d.coachEmail as string | null) ?? undefined, coachPhoto: (d.coachPhoto as string | null) ?? undefined, joinedAt: (d.joinedAt as string) ?? undefined };
 }
 export async function leaveCoach(uid: string) {
-  await updateDoc(doc(db(), "users", uid), { coachId: null, coachName: null });
+  await updateDoc(doc(db(), "users", uid), { coachId: null, coachName: null, coachEmail: null, coachPhoto: null, joinedAt: null });
 }
 export type ClientRow = { uid: string; name: string; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: "mifflin" | "katch" | null; pdUnit: "pd" | "pct"; flags: { situation: string; at: string }[]; birthYear: number | null; aiConfirmedAt: string | null; consentBy: string | null };
 export async function pinFormula(clientUid: string, formula: "mifflin" | "katch" | null) { await updateDoc(doc(db(), "users", clientUid), { formula }); }
@@ -153,7 +153,14 @@ export async function deleteAccount(onStep?: (s: string) => void) {
   onStep?.("Removing the account record");
   await deleteDoc(doc(db(), "users", u.uid));
   onStep?.("Removing the sign-in");
-  await deleteUser(u);
+  try { await deleteUser(u); }
+  catch (e: any) {
+    // Firebase wants a fresh sign-in before it removes the sign-in itself: ask for one, then try again
+    if (e?.code !== "auth/requires-recent-login") throw e;
+    onStep?.("Sign in once more to finish");
+    await reauthenticateWithPopup(u, new GoogleAuthProvider());
+    await deleteUser(u);
+  }
 }
 // The coach confirms Mealan's chat for a client: two fields on the client's document, situation flags stay the client's
 export async function confirmClientAi(clientUid: string, coachUid: string) { await updateDoc(doc(db(), "users", clientUid), { aiConfirmedAt: new Date().toISOString(), aiConfirmedBy: coachUid }); }

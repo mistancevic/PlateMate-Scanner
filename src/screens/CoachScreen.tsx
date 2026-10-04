@@ -192,13 +192,17 @@ export function AccessRequests(p: AppApi) {
   const load = () => fetch("/api/access-requests").then((r) => r.json()).then((d) => setList(d.requests ?? [])).catch(() => setList([]));
   useEffect(() => { load(); }, []);
   if (!list || list.length === 0) return null;
-  const open = list.filter((r) => r.status !== "handled");
+  // one line per person: the latest request for an email, with how many came before it
+  const byEmail = new Map<string, any>();
+  for (const r of list) { const k = String(r.email || "").toLowerCase(); const prev = byEmail.get(k); if (!prev) byEmail.set(k, { ...r, count: 1 }); else { prev.count += 1; if ((r.createdAt ?? "") > (prev.createdAt ?? "")) byEmail.set(k, { ...r, count: prev.count }); } }
+  const people = [...byEmail.values()].sort((a, b) => (b.createdAt ?? "").localeCompare(a.createdAt ?? ""));
+  const open = people.filter((r) => r.status !== "handled");
   return (
     <>
       <p className="label">Access requests ({open.length} new)</p>
-      {list.slice(0, 20).map((r) => (
+      {people.slice(0, 20).map((r) => (
         <section className={`card request ${r.status === "handled" ? "handled" : ""}`} key={r.id}>
-          <div className="card-top"><span>{r.name}{r.coach ? " · coach" : ""}</span><small>{new Date(r.createdAt).toLocaleDateString()}</small></div>
+          <div className="card-top"><span>{r.name}{r.coach ? " · coach" : ""}{r.count > 1 ? ` · ${r.count} requests` : ""}</span><small>{new Date(r.createdAt).toLocaleDateString()}</small></div>
           <a href={`mailto:${r.email}?subject=Your%20Chef%20Mealan%20code`}>{r.email}</a>
           {r.note && <p className="client-note">“{r.note}”</p>}
           {r.status !== "handled" && (

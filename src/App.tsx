@@ -591,7 +591,7 @@ export default function App() {
     [localOnly, setLocalOnly] = useState<boolean>(() => localStorage.getItem("chefmealan-local-only") === "1"),
     cloudLoaded = useRef(false),
     [cloudStatus, setCloudStatus] = useState<{ ok: boolean; text: string; at?: string }>({ ok: true, text: "" }),
-    [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachSetAt?: string; formula?: "mifflin" | "katch" | null }>({}),
+    [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string; coachPhoto?: string; joinedAt?: string; coachSetAt?: string; formula?: "mifflin" | "katch" | null }>({}),
     [goalLog, setGoalLogState] = useState<GoalEntry[]>(getGoalLog),
     nextSource = useRef<GoalSource | null>(null),
     [moment, setMomentState] = useState<MomentId>("regular"),
@@ -678,7 +678,7 @@ export default function App() {
     (async () => {
       try {
         const remote = await loadCloud(user.uid);
-        if (remote) setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
+        if (remote) setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
         if (remote && Array.isArray(remote.goalLog)) { const merged = [...new Map([...(remote.goalLog as GoalEntry[]), ...getGoalLog()].map((e) => [e.at, e])).values()].sort((x, y) => (x.at > y.at ? 1 : -1)); setGoalLog(merged); setGoalLogState(merged); }
         if (remote && !(isEmptyState(remote.state) && !isEmptyState(state))) {
           // a real account copy replaces the phone; photos are merged back from the phone by id
@@ -761,7 +761,7 @@ export default function App() {
       try {
         const remote = await loadCloud(user.uid);
         if (!remote) return;
-        setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
+        setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
         if (remote.coachSetAt && remote.coachSetAt !== profile.coachSetAt && remote.goal) {
           try { localStorage.setItem("chefmealan-goal", JSON.stringify(remote.goal)); } catch {}
           setGoalState(getGoal());
@@ -1381,7 +1381,7 @@ export default function App() {
     },
     user, cloudEnabled, cloudStatus, profile,
     joinCoach: async (code: string) => { if (!user) return; try { const r = await joinCoach(user.uid, code); setProfile((p) => ({ ...p, ...r })); notify(`You're with ${r.coachName} now.`); } catch (e: any) { setError(e.message); } },
-    leaveCoach: async () => { if (!user) return; try { await leaveCoach(user.uid); setProfile((p) => ({ ...p, coachId: undefined, coachName: undefined })); } catch (e: any) { setError(e.message); } },
+    leaveCoach: async () => { if (!user) return; try { await leaveCoach(user.uid); setProfile((p) => ({ ...p, coachId: undefined, coachName: undefined, coachEmail: undefined, coachPhoto: undefined, joinedAt: undefined })); } catch (e: any) { setError(e.message); } },
     signOut: async () => { await signOutCloud(); cloudLoaded.current = false; },
     safety, ai,
     declareSafety: (patch, record = false) => { updateSafety((x) => { let next = { ...x, ...patch }; const now = new Date().toISOString(); for (const sid of next.situations) if (!x.situations.includes(sid)) next.flags = [...next.flags, { situation: sid, at: now, source: "door" as const }]; if (record) next = recordDeclaration(next, next.situations, next.allergies, new Date(), Boolean(next.none)); return next; }); },
@@ -1402,7 +1402,21 @@ export default function App() {
       if (on) await confirmClientAi(clientUid, user.uid); else await clearClientAi(clientUid);
       notify(on ? "Mealan's chat is on for this client." : "Mealan's chat is off for this client.");
     },
-    deleteAccount: async () => { try { await deleteAccount(setDeleteSteps); localStorage.clear(); location.reload(); } catch (e: any) { setError(e.message || "Could not delete the account. Sign in again and retry."); } },
+    deleteAccount: async () => {
+      let dataGone = false;
+      try {
+        await deleteAccount((step) => { if (/Removing the sign-in|Sign in once more/.test(step)) dataGone = true; setDeleteSteps(step); });
+        localStorage.clear(); location.reload();
+      } catch (e: any) {
+        if (dataGone) {
+          // the record, photos, cards and recipes are gone; only the sign-in itself is left
+          localStorage.clear();
+          setError("Your data is deleted. The sign-in itself could not be removed just now: sign in again and tap Delete my account once more, and it goes too.");
+          try { await signOutCloud(); } catch {}
+          setTimeout(() => location.reload(), 4000);
+        } else setError(e.message || "Could not delete the account. Sign in again and retry.");
+      }
+    },
     resetGoal: () => { clearGoal(); setState((s) => ({ ...s, goals: { ...s.goals, calories: null, protein: null } })); setGoalState(null); setGoalOpen(true); },
     mealanCard: (
       <Mealan

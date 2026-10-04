@@ -757,7 +757,12 @@ app.post("/api/join", requireUser, async (req, res) => {
     });
     if ("error" in result) return res.status(400).json(result);
     joinTries.delete(uid);
-    res.json(result);
+    // the coach's name, email and photo, so the client knows who they joined; from the coach's sign-in, nothing else
+    let coachEmail: string | null = null, coachPhoto: string | null = null;
+    try { const c = await adminAuth().getUser(result.coachId); coachEmail = c.email ?? null; coachPhoto = c.photoURL ?? null; } catch { /* the name alone, then */ }
+    const joinedAt = new Date().toISOString();
+    try { await db().collection("users").doc(uid).set({ coachEmail, coachPhoto, joinedAt }, { merge: true }); } catch { /* the join stands */ }
+    res.json({ ...result, coachEmail, coachPhoto, joinedAt });
   } catch (e) { fail(res, e); }
 });
 

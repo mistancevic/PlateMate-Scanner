@@ -28,6 +28,15 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
   const by = coach ? "coach" : "you";
   const setPersonalNow = (next: Personal) => { setD(next); p.setPersonal(next); };
 
+  const DayMode = () => (
+    <div className="card" style={{ marginTop: 10 }}>
+      <div className="moments">
+        <button className={`pill pill-small ${p.personal.dayMode !== "follow" ? "pill-primary" : ""}`} onClick={() => p.setPersonal({ ...p.personal, dayMode: "same" })}>Every day the same</button>
+        <button className={`pill pill-small ${p.personal.dayMode === "follow" ? "pill-primary" : ""}`} onClick={() => p.setPersonal({ ...p.personal, dayMode: "follow" })}>Follow my day</button>
+      </div>
+      <small>{p.personal.dayMode === "follow" ? "Each day on Today you say what kind of day it is; calories and carbs move, protein and fat stay." : "One number for every day; over the week it evens out. Change it any time in Settings, Goal."}</small>
+    </div>
+  );
   const Four = ({ kcal, protein, fats, carbs }: { kcal: number; protein: number; fats: number; carbs: number }) => (
     <div className="four" aria-label="Your day">
       <div><b>{pdVal(density(protein, kcal))}</b><small>{pdTag()}</small></div>
@@ -91,6 +100,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
               <p className="math">{result.math}</p>
               <small>{result.method}. {MACRO_SOURCE}</small>
               {result.note && <small>{result.note}</small>}
+              <DayMode />
               <button className="pill pill-primary pill-wide" onClick={() => { p.applyNumbers(band, result.kcal, result.protein, result.method); onDone(); }}>Set my day</button>
             </section>
           ) : (
@@ -129,6 +139,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
             <label className="field"><span>carbs, g</span><input inputMode="numeric" value={own.carbs} onChange={(e) => setOwn({ ...own, carbs: e.target.value })} placeholder={ownCarbs !== null ? String(ownCarbs) : "the rest"} /></label>
           </div>
           <p className="small">That is {pdText(ownPd)}{ownFats !== null && ownCarbs !== null ? `, ${ownFats} g fat and ${ownCarbs} g carbs` : ""}.</p>
+          <DayMode />
           <button className="pill pill-primary pill-wide" disabled={!ownPd} onClick={() => {
             setState((s) => ({ ...s, goals: { ...s.goals, calories: ownKcal, protein: ownProtein, fats: ownFats, carbs: ownCarbs } }));
             saveGoal({ setBy: by, setAt: new Date().toISOString(), source: "exact" });
