@@ -14,7 +14,7 @@ export interface AppApi {
   setFoodsView: (v: "foods" | "recipes") => void;
   setCamera: (v: boolean) => void;
   setMode: (m: ScannerMode) => void;
-  blank: (name?: string, brand?: string, from?: string) => void;
+  blank: (name?: string, brand?: string, from?: string, barcode?: string) => void;
   setEditFrom: (from: string) => void;
   add: (f: Food) => void;
   updateItem: (id: string, patch: Partial<Ingredient>) => void;

@@ -18,7 +18,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(400);
   ok(/Find a food/.test(await page.locator(".find-head").textContent()) && /in your foods/.test(await page.locator(".find-head").textContent()), "Find a food on top, with the count");
   const ways = await page.locator(".add-strip .ways .pill").allTextContents();
-  ok(ways.length === 3 && /Type/.test(ways[0]) && /Barcode/.test(ways[1]) && /Scan/.test(ways[2]), "Add a food: one row, Type, Barcode, Scan: " + ways.join(" | "));
+  ok(ways.length === 2 && /Type/.test(ways[0]) && /Scan/.test(ways[1]), "Add a food: one row, Type, Scan: " + ways.join(" | "));
   ok(await page.getByRole("button", { name: /Several products|^Add$/ }).count() === 0 && await page.getByPlaceholder("or type a barcode").count() === 0, "the old chips and the loose barcode field are gone");
   // find: letters match my foods only, and never add
   await page.getByLabel("Find a food").fill("skyr"); await page.waitForTimeout(300);
@@ -34,12 +34,13 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(/From your search: tikvice/.test(await sheet.locator(".sheet-line").textContent()), "the search text rides along");
   ok((await sheet.locator("input").first().inputValue()) === "tikvice" && await sheet.locator(".ref-row").count() >= 1, "the name is filled and the food without a label is suggested");
   await sheet.getByRole("button", { name: "Close dialog" }).click(); await page.waitForTimeout(200);
-  // digits: the search finds a saved barcode, the Barcode sheet carries the number
+  // digits: Type carries the number into its barcode field, and Look up asks the database from there
   await page.getByLabel("Find a food").fill("4311501670408"); await page.waitForTimeout(300);
-  ok(/Barcode keeps the number/.test(await page.locator(".not-found").textContent().catch(() => "")), "digits not in my foods: Barcode keeps the number");
-  await page.locator(".add-strip").getByRole("button", { name: /^Barcode/ }).click(); await page.waitForTimeout(300);
-  ok((await page.locator(".modal h2").last().textContent()) === "Barcode" && (await page.getByLabel("Barcode number").inputValue()) === "4311501670408", "the Barcode sheet is titled Barcode and holds the number");
-  await page.getByRole("button", { name: /^Look up$/ }).click(); await page.waitForTimeout(800);
+  ok(/Type keeps the number/.test(await page.locator(".not-found").textContent().catch(() => "")), "digits not in my foods: Type keeps the number");
+  await page.locator(".add-strip").getByRole("button", { name: /^Type/ }).click(); await page.waitForTimeout(300);
+  const sheetB = page.locator(".modal").last();
+  ok((await sheetB.locator("h2").textContent()) === "Type" && (await sheetB.locator(".barcode-row input").inputValue()) === "4311501670408", "the Type sheet holds the number in its barcode field");
+  await sheetB.getByRole("button", { name: /^Look up$/ }).click(); await page.waitForTimeout(800);
   ok(lookups.length === 1 && /4311501670408/.test(lookups[0]), "Look up asks the database");
   // the camera header says Scan under Add a food
   await page.getByRole("button", { name: "Close dialog" }).click().catch(() => {}); await page.waitForTimeout(200);

@@ -227,6 +227,7 @@ function LabelCheck({
   region,
   addTo,
   fromSearch,
+  onLookup,
 }: {
   food: Food;
   image?: string;
@@ -244,6 +245,7 @@ function LabelCheck({
   region?: string | null;
   addTo?: "plate" | "foods";
   fromSearch?: string;
+  onLookup?: (code: string) => void;
 }) {
   const [mainIdx, setMainIdx] = useState(0);
   const [choice, setChoice] = useState<"update" | "both">("update");
@@ -286,6 +288,7 @@ function LabelCheck({
     return { eyebrow: where, title: "Type", line: "Name the food, fill the values as on the pack, save." };
   })();
   const [refOpen, setRefOpen] = useState(() => Boolean(food.name) && /manual/i.test(food.source || ""));
+  const [code, setCode] = useState(food.barcode ?? "");
   const [refPicked, setRefPicked] = useState<string | null>(null);
   // the mix tip shown on the review sheet is logged once per food
   const loggedTip = useRef<string | null>(null);
@@ -307,6 +310,7 @@ function LabelCheck({
     const f = {
       ...food,
       ...(refPicked ? { source: "Reference table" } : {}),
+      ...(/^\d{8,14}$/.test(code.trim()) ? { barcode: code.trim() } : {}),
       name: name.trim(),
       brand: brand.trim(),
       serving: servingNow(),
@@ -402,6 +406,16 @@ function LabelCheck({
         Brand
         <input value={brand} onChange={(e) => setBrand(e.target.value)} />
       </label>
+      {kind.title === "Type" && onLookup && (
+        <label className="barcode-field">
+          Barcode number, if the pack has one
+          <div className="barcode-row">
+            <input inputMode="numeric" placeholder="8 to 14 digits, under the bars" value={code} onChange={(e) => setCode(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && /^\d{8,14}$/.test(code.trim())) onLookup(code.trim()); }} />
+            <button type="button" className="pill pill-small" disabled={!/^\d{8,14}$/.test(code.trim())} onClick={() => onLookup(code.trim())}>Look up</button>
+          </div>
+          <small className="muted">Look up fills the table from the product database when the pack is known. Or fill it in below.</small>
+        </label>
+      )}
       <div className="serving-field">
         <span className="label">Serving, if the pack prints one</span>
         <div className="serving-row">
@@ -899,11 +913,11 @@ export default function App() {
     setMessage(s);
     setError("");
   };
-  function blank(name = "", brand = "", from = "") {
+  function blank(name = "", brand = "", from = "", barcode = "") {
     setImage("");
     setImageSet([]);
     setEditFrom(from);
-    setEdit(candidateFood({ product_name: name, brand }, "Manual entry"));
+    setEdit(candidateFood({ product_name: name, brand, ...(barcode ? { barcode } : {}) }, "Manual entry"));
   }
   function saveFood(f: Food) {
     const existed = state.foods.some((x) => x.id === f.id);
@@ -1640,6 +1654,7 @@ export default function App() {
           region={region}
           addTo={tab === "journey" ? "plate" : "foods"}
           fromSearch={editFrom}
+          onLookup={(c) => { setBarcode(c); setEdit(null); lookup(c); }}
           momentName={momentOf(moment).name}
         />
       )}{" "}

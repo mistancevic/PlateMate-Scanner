@@ -597,6 +597,7 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .add-strip { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; background: var(--tint); border-radius: 20px; margin-bottom: 12px; } .add-strip > b { font-size: 14px; font-weight: 800; color: var(--brand-text); } .add-strip .ways { display: flex; gap: 8px; } .add-strip .ways .pill { flex: 1; justify-content: center; }
 .not-found { margin: -4px 0 10px; } .sheet-line { margin: -6px 0 10px; }
 .modal-titles { display: flex; flex-direction: column; gap: 2px; } .eyebrow-line { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--brand-text); }
+.barcode-field { display: flex; flex-direction: column; gap: 6px; }
 .barcode-row { display: flex; gap: 8px; } .barcode-row input { flex: 1; height: 46px; border-radius: 14px; border: 1.5px solid var(--line); padding: 0 14px; font: inherit; font-size: 16px; }
 .plan-source { display: inline-flex; align-items: center; gap: 2px; padding: 0; color: var(--brand-text); font-size: 12px; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
 .day-line { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1.5px solid #b9cdf1; }

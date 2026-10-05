@@ -1,4 +1,4 @@
-import { Camera, X, ScanBarcode, Pencil } from "lucide-react";
+import { Camera, X, Pencil } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
 
 import { duplicatePairs } from "../dedupe";
@@ -25,7 +25,6 @@ export function FoodsScreen(p: AppApi) {
     setBusy, setError, notify, setFilter, filter, coach, pdRef } = p;
   const inMeal = new Set(state.items.map((i) => i.food.id));
   const [cardId, setCardId] = useState<string | null>(null);
-  const [barcodeOpen, setBarcodeOpen] = useState(false);
   const isDigits = /^\d{8,14}$/.test(query.trim());
   // a barcode that's already in the library opens its card here
   useEffect(() => { if (p.openFoodId) { setCardId(p.openFoodId); p.clearOpenFood(); } /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [p.openFoodId]);
@@ -54,26 +53,12 @@ export function FoodsScreen(p: AppApi) {
       <section className="add-strip" aria-label="Add a food">
         <b>Add a food</b>
         <div className="ways">
-          <button className="pill pill-small" onClick={() => blank(isDigits ? "" : query.trim(), "", query.trim())}><Pencil size={15} /> Type</button>
-          <button className="pill pill-small" onClick={() => { setBarcode(isDigits ? query.trim() : ""); setBarcodeOpen(true); }}><ScanBarcode size={15} /> Barcode</button>
+          <button className="pill pill-small" onClick={() => blank(isDigits ? "" : query.trim(), "", query.trim(), isDigits ? query.trim() : "")}><Pencil size={15} /> Type</button>
           <button className="pill pill-small pill-primary" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> Scan</button>
         </div>
       </section>
       {query.trim().length >= 2 && shown.length === 0 && (
-        <p className="small muted not-found"><b>Not in your foods.</b> Add it above, and it is here next time. {isDigits ? "Barcode keeps the number." : `Type keeps "${query.trim()}".`}</p>
-      )}
-      {barcodeOpen && (
-        <div className="modal-backdrop">
-          <section className="modal" role="dialog" aria-modal="true" aria-label="Add a food: Barcode">
-            <header><div className="modal-titles"><small className="eyebrow-line">Add a food</small><h2>Barcode</h2></div><button className="icon" aria-label="Close dialog" onClick={() => setBarcodeOpen(false)}><X size={20} /></button></header>
-            <p className="small muted sheet-line">The number under the bars, then Look up.{isDigits ? <> From your search: <b>{query.trim()}</b>.</> : null}</p>
-            <div className="barcode-row">
-              <input aria-label="Barcode number" placeholder="8 to 14 digits" inputMode="numeric" autoFocus value={barcode} onChange={(e) => setBarcode(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { setBarcodeOpen(false); lookup(); } }} />
-              <button className="pill pill-primary pill-small" disabled={!/^\d{8,14}$/.test(barcode.trim())} onClick={() => { setBarcodeOpen(false); lookup(); }}>Look up</button>
-            </div>
-            <p className="small muted">A hit fills the sheet in, titled Barcode, for you to check and save. A number already in your foods opens that food.</p>
-          </section>
-        </div>
+        <p className="small muted not-found"><b>Not in your foods.</b> Add it above, and it is here next time. Type keeps {isDigits ? "the number" : `"${query.trim()}"`}.</p>
       )}
       {pairs.length > 0 && (
         <button className="strip strip-button" onClick={() => setDupOpen(true)}>{pairs.length} possible {pairs.length === 1 ? "duplicate" : "duplicates"} in your foods. Check and merge.</button>

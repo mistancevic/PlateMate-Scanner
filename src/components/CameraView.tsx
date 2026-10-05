@@ -254,11 +254,10 @@ export function CameraView({
       className="camera-ui absolute inset-0 z-50 bg-black flex flex-col overflow-hidden"
     >
       {/* Header */}
+      <div className="absolute top-[72px] sm:top-[84px] inset-x-0 z-30 flex justify-center pointer-events-none" aria-label={`${addTo === "plate" ? "Add to plate" : "Add a food"}: Scan`}>
+        <span className="px-3 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-[11px] font-extrabold tracking-widest uppercase text-blue-200">{addTo === "plate" ? "Add to plate" : "Add a food"} · <span className="text-white">Scan</span></span>
+      </div>
       <div className="absolute top-0 inset-x-0 p-4 sm:p-6 z-30 flex justify-between items-center gap-2">
-        <div className="flex flex-col leading-tight shrink-0 mr-1" aria-label={`${addTo === "plate" ? "Add to plate" : "Add a food"}: Scan`}>
-          <span className="text-[10px] font-extrabold tracking-widest uppercase text-blue-200">{addTo === "plate" ? "Add to plate" : "Add a food"}</span>
-          <span className="text-base font-black text-white">Scan</span>
-        </div>
         <button
           onClick={onCancel}
           aria-label="Close camera"
