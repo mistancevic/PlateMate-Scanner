@@ -1,6 +1,6 @@
 import { Camera, Plus, X, ScanBarcode } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
-import { findReference, referenceFood, localName, REFERENCE, GROUPS, groupOf, type RefFood } from "../reference";
+import { findReference, referenceFood, localName, REFERENCE, GROUPS, groupOf } from "../reference";
 import { duplicatePairs } from "../dedupe";
 import { jobOf } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
@@ -25,6 +25,7 @@ export function FoodsScreen(p: AppApi) {
     setBusy, setError, notify, setFilter, filter, coach, pdRef } = p;
   const inMeal = new Set(state.items.map((i) => i.food.id));
   const [cardId, setCardId] = useState<string | null>(null);
+  const [browseNoLabel, setBrowseNoLabel] = useState(false);
   // a barcode that's already in the library opens its card here
   useEffect(() => { if (p.openFoodId) { setCardId(p.openFoodId); p.clearOpenFood(); } /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [p.openFoodId]);
   const [dupOpen, setDupOpen] = useState(false);
@@ -42,10 +43,8 @@ export function FoodsScreen(p: AppApi) {
       <div className="segments" role="tablist" aria-label="Foods">
         <button role="tab" aria-selected={p.foodsView === "foods"} className={`seg ${p.foodsView === "foods" ? "on" : ""}`} onClick={() => p.setFoodsView("foods")}>My foods</button>
         <button role="tab" aria-selected={p.foodsView === "recipes"} className={`seg ${p.foodsView === "recipes" ? "on" : ""}`} onClick={() => p.setFoodsView("recipes")}>My recipes{state.meals.length ? ` (${state.meals.length})` : ""}</button>
-        <button role="tab" aria-selected={p.foodsView === "basics"} className={`seg ${p.foodsView === "basics" ? "on" : ""}`} onClick={() => p.setFoodsView("basics")}>Basic foods</button>
       </div>
       {p.foodsView === "recipes" && <RecipesScreen {...p} />}
-      {p.foodsView === "basics" && <BasicFoods p={p} />}
       {p.foodsView === "foods" && <>
       <section className="band">
         <div>
@@ -89,19 +88,41 @@ export function FoodsScreen(p: AppApi) {
           ))}
         </section>
       )}
-      <input className="search" aria-label="Search saved foods" placeholder="Search your foods, or a basic food: tikvice, egg, Apfel" value={query} onChange={(e) => setQuery(e.target.value)} />
-      {query.trim().length >= 2 && (() => {
+      {!browseNoLabel && query.trim().length < 2 && <p className="small muted nolabel-hint">Vegetables, fruit, eggs, meat, bread: <button className="link" onClick={() => setBrowseNoLabel(true)}>the foods without a label</button>, named for where you shop.</p>}
+      {browseNoLabel && query.trim().length < 2 && <p className="small muted nolabel-hint"><button className="link" onClick={() => setBrowseNoLabel(false)}>Hide the foods without a label</button></p>}
+      <input className="search" aria-label="Search saved foods" placeholder="Search your foods, or a food without a label: tikvice, egg, Apfel" value={query} onChange={(e) => setQuery(e.target.value)} />
+      {(query.trim().length >= 2 || browseNoLabel) && (() => {
         const have = new Set(state.foods.map((f) => f.name.trim().toLowerCase()));
-        const refs = findReference(query).filter((r) => !have.has(localName(r, p.region).toLowerCase()));
+        const refs = (query.trim().length >= 2 ? findReference(query, 20) : REFERENCE).filter((r) => !have.has(localName(r, p.region).toLowerCase()));
         if (!refs.length) return null;
+        const groups = browseNoLabel && query.trim().length < 2 ? GROUPS : [null];
         return (
-          <div className="ref-suggest" aria-label="From the reference table">
-            <small className="muted">Not in your foods yet. From the reference table, per 100 g, one tap to add:</small>
-            {refs.map((r) => (
-              <button key={r.id} type="button" className="ref-row" onClick={() => { p.saveFood(referenceFood(r, p.region, uid)); p.notify(`${localName(r, p.region)} added from the reference table.`); }}>
-                <b>{localName(r, p.region)}</b><small>{[r.en, r.sr, r.de].filter((x) => x !== localName(r, p.region)).slice(0, 2).join(" · ")} · {r.kcal} kcal · {r.protein} g protein</small>
-              </button>
-            ))}
+          <div className="nolabel" aria-label="Foods without a label">
+            <small className="muted">{query.trim().length >= 2 ? "Without a label, not in your foods yet. Reference values per 100 g." : "Foods without a label, reference values per 100 g, named for where you shop."}</small>
+            {groups.map((g) => {
+              const rows = g ? refs.filter((r) => groupOf(r.id) === g) : refs;
+              if (!rows.length) return null;
+              return (
+                <div key={g ?? "all"}>
+                  {g && <p className="label">{g}</p>}
+                  {rows.map((r) => {
+                    const take = () => { const f = referenceFood(r, p.region, uid); p.saveFood(f); return f; };
+                    return (
+                      <div className="row nolabel-row" key={r.id}><span className="thumb">{iconFor(localName(r, p.region))}</span>
+                        <div className="row-text">
+                          <b className="name-plain">{localName(r, p.region)} <span className="tag">no label</span></b>
+                          <small>{[r.en, r.sr, r.de].filter((x) => x !== localName(r, p.region)).slice(0, 2).join(" · ")} · {r.kcal} kcal · {r.protein} g per 100 g{r.ready ? "" : " · needs cooking"}</small>
+                          <span className="row-links">
+                            <button className="link" onClick={() => { add(take()); p.notify(`${localName(r, p.region)} on the plate, and in your foods.`); }}>Add to meal</button>
+                            <button className="link" onClick={() => { take(); p.notify(`${localName(r, p.region)} in your foods.`); }}>Save</button>
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })}
           </div>
         );
       })()}
@@ -134,7 +155,7 @@ export function FoodsScreen(p: AppApi) {
         ))}
       </div>
       {state.foods.length === 0 && (
-        <div className="strip">No foods yet. Scan a label, add one by hand, or <button className="link" onClick={p.addStarter}>add twenty starter foods</button>.</div>
+        <div className="strip">No foods yet. Scan a label, type a name, <button className="link" onClick={() => setBrowseNoLabel(true)}>add from the foods without a label</button>, or <button className="link" onClick={p.addStarter}>add twenty starter foods</button>.</div>
       )}
       </>}
       {cardFood && <FoodCard food={p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood} addPhoto={(d) => p.addFoodPhoto(cardFood.id, d)} removePhoto={(i) => p.removeFoodPhoto(cardFood.id, i)} toggleFavorite={() => p.toggleFavorite(cardFood.id)} insight={{ dayKcal: p.todayKcal, eaten: p.eatenTodayKcal, dayName: p.dayName, goalKey: p.tipGoalKey, requestTip: () => p.requestTip(cardFood.id), setJob: (j) => p.setFoodJob(cardFood.id, j) }} target={pdRef} fit={p.fitPd(density(cardFood.protein, cardFood.calories))} close={() => setCardId(null)} review={() => { setImage(""); setEdit(cardFood); }} mix={(() => { const f = p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood; const tip = p.mixFor(f); return { tip, momentName: momentOf(p.moment).name, take: (m: Mix) => { setCardId(null); p.takeMix(f, m); }, ask: () => { setCardId(null); p.askAboutMix(f, tip); } }; })()} />}
@@ -175,36 +196,3 @@ function DuplicatesSheet({ pairs, close, merge, notSame }: { pairs: [any, any][]
   );
 }
 
-
-// Basic foods: the reference table, grouped, in the local name, one tap to add. Vegetables, fruit, eggs, meat and fish
-// carry no label and no barcode; this is where they come from. What is already in the library is marked.
-function BasicFoods({ p }: { p: AppApi }) {
-  const [q, setQ] = useState("");
-  const have = new Set(p.state.foods.map((f) => f.name.trim().toLowerCase()));
-  const name = (r: RefFood) => localName(r, p.region);
-  const shown = q.trim().length >= 2 ? findReference(q, 40) : REFERENCE;
-  return (
-    <div className="basics">
-      <p className="small muted">{REFERENCE.length} basic foods with no label to scan, values per 100 g from a reference table, the source on each. Named for where you shop. One tap puts one in your foods.</p>
-      <input className="search" aria-label="Search basic foods" placeholder="tikvice, egg, Apfel" value={q} onChange={(e) => setQ(e.target.value)} />
-      {GROUPS.map((g) => {
-        const rows = shown.filter((r) => groupOf(r.id) === g);
-        if (!rows.length) return null;
-        return (
-          <section key={g} className="basics-group">
-            <p className="label">{g}</p>
-            {rows.map((r) => {
-              const inLib = have.has(name(r).toLowerCase());
-              return (
-                <div key={r.id} className="basics-row">
-                  <div><b>{name(r)}</b><small>{[r.en, r.sr, r.de].filter((x) => x !== name(r)).slice(0, 2).join(" · ")} · {r.kcal} kcal · {r.protein} g protein · {r.fats} g fat · {Math.max(0, Math.round((r.carbsTotal - r.fiber) * 10) / 10)} g carbs{r.ready ? "" : " · needs cooking"}</small></div>
-                  {inLib ? <span className="pill pill-small taken">In your foods</span> : <button className="pill pill-small pill-primary" onClick={() => { p.saveFood(referenceFood(r, p.region, uid)); p.notify(`${name(r)} added.`); }}>Add</button>}
-                </div>
-              );
-            })}
-          </section>
-        );
-      })}
-    </div>
-  );
-}
