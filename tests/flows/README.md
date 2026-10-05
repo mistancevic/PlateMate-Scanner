@@ -14,6 +14,8 @@ Two kinds of checks live here, and the difference is the rule.
 
 **The happy paths.** The eight paths a person takes to get a job done, with the outcome they perceive and where a safety rule sits, are in the Worth Building doc, tab "Happy paths". `npm run qa:paths` runs the walkthroughs that guard each path and prints one line per path; P1, P7 and P8 have no guard in the sandbox and are checked on the phone.
 
+**The four places (5 October 2026).** Today holds the day, Plate the craving with its steps, Foods my foods and my recipes, Me the person: Profile with the door, Goal, My days, Where I shop, My coach, Account. The hamburger is housekeeping only. A walkthrough reaches Profile or Account through Me, Evals through the Menu. Nothing lights a tab it is not under.
+
 **Control checks.** Where a button is, what a label says. These follow the story that changes them.
 
 The rule that was missing on 2 October 2026, and is now the rule: a walkthrough is only edited when the story names it. Changing `Photo` to `Scan` in three walkthroughs because the chip was renamed is editing the test to match the change. The journey behind it, several photos of one product from the plate, had no line of its own, so nothing failed when Scan started opening the wrong camera. The line is there now.

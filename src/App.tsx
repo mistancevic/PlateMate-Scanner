@@ -30,7 +30,6 @@ import { MealScreen } from "./screens/MealScreen";
 import { ChefScreen } from "./screens/ChefScreen";
 import { FoodsScreen } from "./screens/FoodsScreen";
 import { RecipesScreen } from "./screens/RecipesScreen";
-import { MoreScreen } from "./screens/MoreScreen";
 import type { AppApi, Tab, Step, MenuSection } from "./screens/api";
 import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
@@ -578,7 +577,7 @@ export default function App() {
   const [state, setState] = useState<PilotState>(load),
     [tab, setTab] = useState<Tab>(() => {
       const h = (typeof location !== "undefined" ? location.hash : "").replace("#", "");
-      return (["home", "journey", "meal", "chef", "foods", "notes", "more", "me"] as Tab[]).includes(h as Tab) ? (h as Tab) : "home";
+      return (["home", "journey", "meal", "chef", "foods", "me"] as Tab[]).includes(h as Tab) ? (h as Tab) : "home";
     }),
     [filter, setFilter] = useState<"all" | "high" | "mid" | "low" | "inmeal">("all"),
     [coach, setCoachState] = useState<boolean>(isCoach),
@@ -605,6 +604,7 @@ export default function App() {
     [deleteSteps, setDeleteSteps] = useState(""),
     [day, setDayState] = useState<Day>(getDay),
     [menuSection, setMenuSection] = useState<MenuSection | null>(null),
+    [foodsView, setFoodsView] = useState<"foods" | "recipes">("foods"),
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
     [talkOpen, setTalkOpen] = useState(false),
     [profileReady, setProfileReady] = useState(false),
@@ -1292,6 +1292,7 @@ export default function App() {
       return { kcal, protein, fats, carbs: macroSplit(kcal, protein, fats).carbs };
     })(),
     openMenu: (s?: MenuSection, from?: MenuSection) => { setMenuFrom(from ?? null); setMenuSection(s ?? "list"); },
+    foodsView, setFoodsView,
     inbox,
     takeRecipe: async (item: InboxItem, how: "make" | "keep") => {
       // foods she doesn't have come along; then the recipe goes to the plate or to her recipes
@@ -1483,7 +1484,7 @@ export default function App() {
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
           {goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · {pdText(dayPd)} · set by {goal?.setBy === "coach" ? (goal.coachName || profile.coachName || COACH_NAME) : "you"}
         </button>}
-        <button className="icon menu-button" aria-label="Settings" onClick={() => setMenuSection(menuSection ? null : "list")}><Menu size={22} /></button>
+        <button className="icon menu-button" aria-label="Menu" onClick={() => setMenuSection(menuSection ? null : "list")}><Menu size={22} /></button>
       </header>
       <main>
         {error && (
@@ -1526,8 +1527,6 @@ export default function App() {
         {!menuSection && !talkOpen && tab === "meal" && <MealScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "chef" && <ChefScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "foods" && <FoodsScreen {...screenProps} />}
-        {!menuSection && !talkOpen && tab === "notes" && <RecipesScreen {...screenProps} />}
-        {!menuSection && !talkOpen && tab === "more" && <MoreScreen {...screenProps} />}
         <input
           ref={importRef}
           type="file"
@@ -1553,7 +1552,7 @@ export default function App() {
         {NAV.map((n) => (
           <button
             key={n.id}
-            className={tab === n.id || (n.id === "journey" && (tab === "meal" || tab === "chef")) || (n.id === "me" && (tab === "more" || tab === "notes")) ? "active" : ""}
+            className={tab === n.id || (n.id === "journey" && (tab === "meal" || tab === "chef")) ? "active" : ""}
             aria-current={tab === n.id ? "page" : undefined}
             onClick={() => { setMenuSection(null); setTalkOpen(false); setTab(n.id); }}
           >

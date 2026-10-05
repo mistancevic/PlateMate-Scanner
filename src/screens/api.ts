@@ -10,6 +10,8 @@ export interface AppApi {
   state: PilotState;
   setState: Dispatch<SetStateAction<PilotState>>;
   setTab: (t: Tab) => void;
+  foodsView: "foods" | "recipes";
+  setFoodsView: (v: "foods" | "recipes") => void;
   setCamera: (v: boolean) => void;
   setMode: (m: ScannerMode) => void;
   blank: (name?: string, brand?: string) => void;

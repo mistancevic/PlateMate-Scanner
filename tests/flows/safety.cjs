@@ -19,8 +19,8 @@ seed.items = [];
   const safety = () => page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-safety") || "null"));
 
   // consent before body data
-  await page.getByRole("button", { name: "Settings" }).click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: /Profile/ }).first().click(); await page.waitForTimeout(400);
+  await page.locator("nav button").filter({ hasText: "Me" }).click(); await page.waitForTimeout(300);
+  await page.locator(".me-rows .menu-row").filter({ hasText: /^Profile/ }).first().click(); await page.waitForTimeout(400);
   ok(await page.getByText("Before your numbers").count() === 1, "the consent screen comes before the body fields");
   ok(await page.locator(".form.shut").count() === 1, "the body fields are shut until consent");
   await page.getByRole("button", { name: /^I agree$/ }).click(); await page.waitForTimeout(300);
@@ -74,8 +74,8 @@ seed.items = [];
   await page.getByRole("button", { name: "Close dialog" }).first().click(); await page.waitForTimeout(300);
 
   // export: one file with everything
-  await page.getByRole("button", { name: "Settings" }).click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: /Account/ }).first().click(); await page.waitForTimeout(400);
+  await page.locator("nav button").filter({ hasText: "Me" }).click(); await page.waitForTimeout(300);
+  await page.locator(".me-rows .menu-row").filter({ hasText: /^Account/ }).first().click(); await page.waitForTimeout(400);
   const [dl] = await Promise.all([page.waitForEvent("download", { timeout: 5000 }).catch(() => null), page.getByRole("button", { name: /Export my data/ }).click()]);
   if (dl) {
     const file = JSON.parse(fs.readFileSync(await dl.path(), "utf8"));
@@ -84,8 +84,8 @@ seed.items = [];
   } else ok(false, "no export file came");
   // settings chain: Profile to Goal opens at the top, and each panel leads to the next (the menu is still open, on Account)
   await page.getByRole("button", { name: /^Close$/ }).first().click().catch(() => {}); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: "Settings" }).click(); await page.waitForTimeout(300);
-  await page.locator(".menu-row").filter({ hasText: /^Profile/ }).first().click(); await page.waitForTimeout(400);
+  await page.locator("nav button").filter({ hasText: "Me" }).click(); await page.waitForTimeout(300);
+  await page.locator(".me-rows .menu-row").filter({ hasText: /^Profile/ }).first().click(); await page.waitForTimeout(400);
   await page.evaluate(() => window.scrollTo(0, 2000)); await page.waitForTimeout(100);
   await page.locator(".menu-row").filter({ hasText: /Goal/ }).last().click(); await page.waitForTimeout(400);
   ok((await page.evaluate(() => window.scrollY)) < 40, "Goal opens at the top: scrollY " + (await page.evaluate(() => window.scrollY)));

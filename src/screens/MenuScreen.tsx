@@ -11,6 +11,8 @@ import type { AppApi, MenuSection } from "./api";
 import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
 
+// the sections that belong to the person: they live under Me, and back from them goes to Me
+const ME_SECTIONS: MenuSection[] = ["profile", "goal", "week", "shop", "coach", "account"];
 const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "profile", name: "Profile", icon: <User size={20} /> },
   { id: "goal", name: "Goal", icon: <Target size={20} /> },
@@ -28,17 +30,17 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
   if (section === "list")
     return (
       <>
-        <div className="menu-head"><h2>Settings</h2><button className="link" onClick={close}>Close</button></div>
+        <div className="menu-head"><h2>Menu</h2><button className="link" onClick={close}>Close</button></div>
+        <p className="small muted">Who you are and how you're set up is under Me. This is housekeeping.</p>
         <div className="menu-list">
-          <button className="menu-row" onClick={() => { p.setTab("notes"); close(); }}>
-            <span className="menu-icon"><BookOpen size={20} /></span><span className="menu-row-text"><b>Saved recipes</b><small>{p.state.meals.length ? `${p.state.meals.length} you made and rated` : "What you make and rate lands here"}</small></span><ChevronRight size={18} />
-          </button>
-          {ITEMS.filter((it) => it.id !== "evals" || p.profile.role === "coach" || !p.cloudEnabled).map((it) => (
+          {[{ id: "support" as MenuSection, name: "Support", icon: <LifeBuoy size={20} /> }, { id: "about" as MenuSection, name: "About", icon: <Info size={20} /> }, ...(p.profile.role === "coach" || !p.cloudEnabled ? [{ id: "evals" as MenuSection, name: "Evals", icon: <FlaskConical size={20} /> }] : [])].map((it) => (
             <button key={it.id} className="menu-row" onClick={() => setSection(it.id)}>
               <span className="menu-icon">{it.icon}</span><b>{it.name}</b><ChevronRight size={18} />
             </button>
           ))}
         </div>
+        <p className="small"><a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy notice</a> · <a href="/disclaimer">Disclaimer</a></p>
+        {p.user && <div className="button-row" style={{ marginTop: 12 }}><button className="pill pill-small" onClick={p.signOut}>Sign out</button></div>}
       </>
     );
   const title = ITEMS.find((i) => i.id === section)?.name ?? "";
@@ -46,7 +48,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
   useEffect(() => { try { window.scrollTo({ top: 0 }); document.querySelector("main")?.scrollTo?.({ top: 0 }); } catch {} }, [section]);
   return (
     <>
-      <div className="menu-head"><button className="link" onClick={() => setSection(from ?? "list")}><ArrowLeft size={16} /> {from ? ITEMS.find((i) => i.id === from)?.name : "Settings"}</button><button className="link" onClick={close}>Close</button></div>
+      <div className="menu-head"><button className="link" onClick={() => ((from as string) === "me" || ME_SECTIONS.includes(section) && !from ? close() : setSection(from ?? "list"))}><ArrowLeft size={16} /> {(from as string) === "me" ? "Me" : from ? ITEMS.find((i) => i.id === from)?.name : ME_SECTIONS.includes(section) ? "Me" : "Menu"}</button><button className="link" onClick={close}>Close</button></div>
       <h2 className="menu-title">{title}</h2>
       {section === "profile" && <ProfilePanel {...p} />}
       {section === "goal" && <GoalPanel {...p} />}
@@ -427,7 +429,7 @@ function SupportPanel(p: AppApi) {
                 <div className="button-row">
                   <button className="pill pill-small" onClick={exportData}><Download size={14} /> Backup</button>
                   <button className="pill pill-small" onClick={() => importRef.current?.click()}><Upload size={14} /> Restore</button>
-                  <button className="pill pill-small" onClick={() => setTab("notes")}>Recipes</button>
+                  <button className="pill pill-small" onClick={() => { p.setFoodsView("recipes"); setTab("foods"); }}>Recipes</button>
                 </div>
                 <small>AI label reading: {services?.ai ? "on" : "off"} · Airtable: {services?.airtable ? "on" : "off"}</small>
               </div>

@@ -13,7 +13,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.addInitScript((s) => { if (!localStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: new Date().toISOString(), source: "quick" })); localStorage.setItem("seeded", "1"); } }, seed);
   await page.goto("http://127.0.0.1:3124/"); await page.waitForTimeout(700);
   const expect = (label, ok, got) => { console.log(ok ? "ok  " : "FAIL", label, got !== undefined ? "-> " + JSON.stringify(got) : ""); if (!ok) process.exitCode = 1; };
-  await page.getByRole("button", { name: "Settings" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Menu" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /Evals/ }).click(); await page.waitForTimeout(300);
   expect("50 scenarios listed, ten of them Pro tips", (await page.locator(".eval-case").count()) === 50, await page.locator(".eval-case").count());
   await page.getByRole("button", { name: /^code$/ }).click(); await page.waitForTimeout(200);

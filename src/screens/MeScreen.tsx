@@ -4,10 +4,22 @@ import { COACH_NAME } from "../components/Mark";
 import { bandOf } from "../goal";
 import { MOMENTS } from "../moments";
 import { SendSheet } from "./CoachScreen";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
+import { ChevronRight, User, Target, CalendarDays, ShoppingBasket, Users, KeyRound } from "lucide-react";
+import type { MenuSection } from "./api";
 import type { AppApi } from "./api";
 
 // Me: the person's own page. Their goal at a glance and their meals. Settings live in the menu.
+
+// Me is the person's place: who I am and how I'm set up. Each row opens its panel; back comes here.
+const ME_ROWS: { id: MenuSection; name: string; icon: ReactNode; hint: (p: AppApi) => string }[] = [
+  { id: "profile", name: "Profile", icon: <User size={18} />, hint: (p) => (p.safety.declaredAt ? "Body data and the door, answered" : "Body data and the door") },
+  { id: "goal", name: "Goal", icon: <Target size={18} />, hint: (p) => (p.state.goals.calories ? `${Math.round(p.state.goals.calories).toLocaleString("en")} kcal · ${p.state.goals.protein ?? "?"} g protein` : "Work it out, or set it") },
+  { id: "week", name: "My days", icon: <CalendarDays size={18} />, hint: (p) => (p.personal.dayMode === "follow" ? "Follow my day" : "Every day the same") },
+  { id: "shop", name: "Where I shop", icon: <ShoppingBasket size={18} />, hint: () => "The starter foods for your shops" },
+  { id: "coach", name: "My coach", icon: <Users size={18} />, hint: (p) => (p.profile.coachId ? `${p.profile.coachName || "Your coach"} sees what you share` : "Join with a code") },
+  { id: "account", name: "Account", icon: <KeyRound size={18} />, hint: () => "Export my data, delete my account" },
+];
 export function MeScreen(p: AppApi) {
   const { state, goal, profile, clientName } = p;
   const [shareFor, setShareFor] = useState<string | null>(null);
@@ -27,6 +39,13 @@ export function MeScreen(p: AppApi) {
         </div>
         <div className="button-row"><button className="pill pill-small" onClick={() => p.openMenu("goal")}><Settings size={14} /> Goal and profile</button></div>
       </section>
+      <div className="menu-list me-rows">
+        {ME_ROWS.map((r) => (
+          <button key={r.id} className="menu-row" onClick={() => p.openMenu(r.id, "me" as any)}>
+            <span className="menu-icon">{r.icon}</span><span className="menu-row-text"><b>{r.name}</b><small>{r.hint(p)}</small></span><ChevronRight size={18} />
+          </button>
+        ))}
+      </div>
       <section className="card">
         <div className="card-top"><span>Your meals</span><span>{state.feedback.length}</span></div>
         {state.feedback.length === 0 && <small>Nothing yet. It starts after your first DaaM.</small>}
