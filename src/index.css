@@ -521,7 +521,12 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .dup-row.on { border-color: var(--brand); background: var(--tint); }
 .dup-text { flex: 1; min-width: 0; } .dup-text b { display: block; font-size: 14px; } .dup-text small { color: var(--muted); font-size: 12px; }
 .dup-pick { font-size: 12px; font-weight: 800; color: var(--brand-text); flex: none; }
-.photo-remove { background: rgba(255,255,255,.12) !important; color: #fff !important; border-color: rgba(255,255,255,.3) !important; }
+.photo-top { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 0; }
+.photo-close { width: 44px; height: 44px; border-radius: 22px; border: 0; background: rgba(255,255,255,.14); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
+.photo-remove { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 17px; border: 1px solid rgba(255,255,255,.25); background: transparent; color: #c9d6ee; font: inherit; font-size: 13px; font-weight: 700; }
+.photo-remove.armed { background: var(--low); border-color: var(--low); color: #fff; }
+.undo-note { position: fixed; left: 16px; right: 16px; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 90; display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-radius: 16px; background: #172742; color: #fff; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+.undo-note .link { color: #8fb6ff; font-weight: 900; }
 
 .label-table { border: 1.5px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--surface); margin-bottom: 8px; }
 .lt-row { display: grid; grid-template-columns: 1fr 86px 34px 26px; align-items: center; gap: 6px; padding: 6px 10px; border-bottom: 1px solid var(--line); }

@@ -18,9 +18,20 @@ const seed = JSON.parse(fs.readFileSync(require("node:path").resolve(__dirname, 
   const n = await page.locator(".g-thumb").count(); console.log(n === 3 ? "ok   the picture plus two added photos" : "FAIL gallery has " + n); if (n !== 3) process.exitCode = 1;
   await page.locator(".g-thumb").first().click(); await page.waitForTimeout(300);
   console.log("full view open:", await page.locator(".photo-view").count());
-  await page.getByRole("button", { name: "Remove this photo" }).click(); await page.waitForTimeout(400);
-  const left = await page.locator(".g-thumb").count();
-  console.log(left === 2 ? "ok   a photo can be removed" : "FAIL remove left " + left); if (left !== 2) process.exitCode = 1;
+  // JOURNEY INVARIANT (Milan, 5 October 2026): one tap never removes a photo. Remove sits top left, away from closing;
+  // the first tap arms it, the second removes, and Undo brings it back for eight seconds.
+  const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) process.exitCode = 1; };
+  ok(await page.getByRole("button", { name: "Close the photo" }).count() === 1, "close is its own button, top right");
+  await page.locator(".photo-remove").click(); await page.waitForTimeout(200);
+  ok(await page.locator(".photo-view").count() === 1 && /Tap again to remove/.test(await page.locator(".photo-remove").textContent()), "one tap only arms Remove; the photo stays");
+  await page.locator(".photo-remove").click(); await page.waitForTimeout(300);
+  ok((await page.locator(".g-thumb").count()) === 2 && /Photo removed/.test(await page.locator(".undo-note").textContent()), "the second tap hides it, with Undo");
+  await page.locator(".undo-note").getByRole("button", { name: "Undo" }).click(); await page.waitForTimeout(300);
+  ok((await page.locator(".g-thumb").count()) === 3, "Undo brings it back");
+  await page.locator(".g-thumb").first().click(); await page.waitForTimeout(300);
+  await page.locator(".photo-remove").click(); await page.locator(".photo-remove").click(); await page.waitForTimeout(8600);
+  const stored = await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.find((x) => /Skyr/.test(x.name)); return f ? (f.photos ?? [f.photo]).length : 0; });
+  ok((await page.locator(".g-thumb").count()) === 2 && stored === 2, "after the note goes, the photo is removed for real: " + (await page.locator(".g-thumb").count()) + " shown, " + stored + " stored");
   
   
   console.log(errs.length ? "errors: " + errs : "no page errors");

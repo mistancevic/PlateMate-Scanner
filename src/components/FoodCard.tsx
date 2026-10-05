@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Camera, MessageCircle } from "lucide-react";
+import { Camera, MessageCircle, Trash2, X } from "lucide-react";
 import { mixLabel, type Mix, type MixTip } from "../mixtip";
 import { log } from "../log";
 import { density, type Food } from "../pilot";
@@ -29,7 +29,17 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
   }, [food.id, mix?.momentName]);
   const [view, setView] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
-  const gallery = food.photos?.length ? food.photos : food.photo ? [food.photo] : [];
+  const all = food.photos?.length ? food.photos : food.photo ? [food.photo] : [];
+  // Removing a photo: a second tap arms it, and it is only really removed when the Undo note goes, eight seconds later,
+  // or when the card closes. Until then the photo is just hidden.
+  const [armed, setArmed] = useState(false);
+  const [pending, setPending] = useState<string | null>(null);
+  const commitRef = useRef<() => void>(() => {});
+  commitRef.current = () => { if (pending && removePhoto) { const i = all.indexOf(pending); if (i >= 0) removePhoto(i); } };
+  useEffect(() => { if (!pending) return; const t = setTimeout(() => { commitRef.current(); setPending(null); }, 8000); return () => clearTimeout(t); }, [pending]);
+  useEffect(() => () => commitRef.current(), []);
+  useEffect(() => { if (!armed) return; const t = setTimeout(() => setArmed(false), 3000); return () => clearTimeout(t); }, [armed]);
+  const gallery = all.filter((x) => x !== pending);
   const pd = density(food.protein, food.calories);
   const share = pd === null ? null : Math.round(pd * 4);
   const fitText = fit === "top" ? "high+ protein for your goal" : fit === "high" ? "high protein for your goal" : fit === "plan" ? "on plan" : fit === "close" ? "a bit under your goal" : "far under your goal";
@@ -106,12 +116,23 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         {review && <button className="pill pill-wide" onClick={() => { close(); review(); }}>Review the label</button>}
       </div>
       {view && (
-        <div className="photo-view" onClick={(e) => { e.stopPropagation(); setView(null); }}>
-          <img src={view} alt="" />
-          <span>Tap to close</span>
-          {removePhoto && (
-            <button className="pill pill-small photo-remove" onClick={(e) => { e.stopPropagation(); const i = gallery.indexOf(view); if (i >= 0) removePhoto(i); setView(null); }}>Remove this photo</button>
-          )}
+        <div className="photo-view" role="dialog" aria-label="Photo">
+          <div className="photo-top">
+            {removePhoto ? (
+              <button className={`photo-remove ${armed ? "armed" : ""}`} onClick={(e) => { e.stopPropagation(); if (!armed) { setArmed(true); return; } if (pending) commitRef.current(); setPending(view); setArmed(false); setView(null); }}>
+                <Trash2 size={15} /> {armed ? "Tap again to remove" : "Remove"}
+              </button>
+            ) : <span />}
+            <button className="photo-close" aria-label="Close the photo" onClick={(e) => { e.stopPropagation(); setArmed(false); setView(null); }}><X size={22} /></button>
+          </div>
+          <img src={view} alt="" onClick={(e) => { e.stopPropagation(); setArmed(false); setView(null); }} />
+          <span>Tap the photo to close</span>
+        </div>
+      )}
+      {pending && (
+        <div className="undo-note" role="status">
+          <span>Photo removed.</span>
+          <button className="link" onClick={(e) => { e.stopPropagation(); setPending(null); }}>Undo</button>
         </div>
       )}
     </div>
