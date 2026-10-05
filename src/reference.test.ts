@@ -44,3 +44,11 @@ test("a reference food is a valid library food, and a stored state with one is r
   const broken = JSON.parse(JSON.stringify(st)); delete broken.foods[0].basis;
   assert.equal(parseState(JSON.stringify(broken)).foods[0].basis, "100g");
 });
+
+test("a food saved under its Munich name carries its other names, so Kupus finds Weißkohl", () => {
+  const r = REFERENCE.find((x) => x.id === "cabbage")!;
+  const f = referenceFood(r, "munich", () => "f2");
+  assert.equal(f.name, "Weißkohl, roh");
+  assert.ok(f.aliases!.includes("Kupus") && f.aliases!.includes("Купус") && f.aliases!.includes("Cabbage, raw"));
+  assert.ok(/Also: .*Kupus/.test(f.notes), "older saves keep the names in the notes too");
+});

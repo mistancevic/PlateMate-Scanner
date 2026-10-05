@@ -186,7 +186,7 @@ export function localName(r: RefFood, region: string | null | undefined): string
 export function referenceFood(r: RefFood, region: string | null | undefined, uid: () => string): Food {
   const name = localName(r, region);
   return {
-    id: uid(), name, brand: "", basis: "100g", calories: r.kcal, protein: r.protein, fats: r.fats, carbs: Math.max(0, Math.round((r.carbsTotal - r.fiber) * 10) / 10), fiber: r.fiber,
+    id: uid(), name, brand: "", basis: "100g", aliases: [r.en, r.de, r.sr, r.cyr].filter((x) => x !== name), calories: r.kcal, protein: r.protein, fats: r.fats, carbs: Math.max(0, Math.round((r.carbsTotal - r.fiber) * 10) / 10), fiber: r.fiber,
     readyToEat: r.ready, notes: `Reference table: ${r.source}. Per 100 g${/raw|sirov|roh|sveže/i.test(name) ? ", raw" : ""}. Carbohydrate without fibre. Also: ${[r.en, r.de, r.sr, r.cyr].filter((x) => x !== name).join(" · ")}.`,
     source: "Reference table", reviewedAt: new Date().toISOString(),
   } as Food;

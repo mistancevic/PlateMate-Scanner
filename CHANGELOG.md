@@ -4,6 +4,7 @@ One version per release since 2 October 2026. The number is in Menu, About, next
 
 ## 0.1.x, the pilot builds
 
+- **v0.1.44** · 2026-10-05 · Find reads a food's other names: a food without a label saved under the shop's name (Weißkohl in Munich) is found as Kupus, Купус or Cabbage, including ones saved before today, by their notes; Without a label no longer offers a food already in my foods under another name; a chip that hides search matches says "1 more in your foods under On plan · Show all".
 - **v0.1.43** · 2026-10-05 · the line under the chips is one line in every case: "Tap a chip to see its PD range." idle, and "Low−: PD under 3.2 · your target 5.3" on a tap; no pairing advice, that is Mix it's job.
 - **v0.1.42** · 2026-10-05 · the chips on one axis: Low−, Low, On plan, High, High+; a line under them, always there so nothing jumps, says "Tap a chip to filter, and to see what it means for your target", and on a tap the band's range for this target and what it pairs with; no text selection on a chip.
 - **v0.1.41** · 2026-10-05 · five PD bands, every edge a multiple of the target: Below under 0.6 T (red), Close 0.6 to 0.9 T (orange), On plan 0.9 to 1.5 T (blue), High 1.5 to 2.5 T (green), High+ from 2.5 T (deep green); the Foods chips, the PD badges, the plate readout and the food card use them; In meal removed; the five chips fit one row.

@@ -37,6 +37,18 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.getByLabel("Find a food").fill("tikvice"); await page.waitForTimeout(900);
   await page.getByLabel("Without a label").getByRole("button", { name: /Add to my foods/ }).first().click(); await page.waitForTimeout(400);
   ok((await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.some((f) => /Tikvice/.test(f.name)))), "Add to my foods puts a food without a label in my foods");
+  // a food without a label saved under the shop's name is found by any of its names, and a chip never hides it in silence
+  await page.evaluate(() => localStorage.setItem("chefmealan-region", "munich"));
+  await page.getByLabel("Find a food").fill("kupus"); await page.waitForTimeout(900);
+  await page.getByLabel("Without a label").locator(".row").filter({ hasText: "Weißkohl" }).getByRole("button", { name: /Add to my foods/ }).click().catch(async () => {
+    await page.getByLabel("Without a label").getByRole("button", { name: /Add to my foods/ }).first().click(); });
+  await page.waitForTimeout(400);
+  await page.getByLabel("Find a food").fill(""); await page.getByLabel("Find a food").fill("Kupus"); await page.waitForTimeout(900);
+  ok((await page.locator(".rows .row").filter({ hasText: /Weißkohl|Kupus|Kiseli/ }).count()) >= 1, "a food saved under its Munich name is found by its Serbian one: " + (await page.locator(".rows .row b").allTextContents()).join(", "));
+  await page.locator(".chip-below").click(); await page.waitForTimeout(200);
+  ok(/more in your foods under/.test(await page.locator(".hidden-by-chip").textContent().catch(() => "")), "a chip that hides the match says so, with Show all");
+  await page.locator(".hidden-by-chip").getByRole("button", { name: "Show all" }).click(); await page.waitForTimeout(200);
+  ok((await page.locator(".rows .row").count()) >= 1, "Show all brings the match back");
   // a database product opens the sheet titled by the button
   await page.getByLabel("Find a food").fill("skyr"); await page.waitForTimeout(900);
   await page.getByLabel("In the product database").getByRole("button", { name: /Add to my foods/ }).first().click(); await page.waitForTimeout(800);

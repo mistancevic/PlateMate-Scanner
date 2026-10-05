@@ -42,15 +42,19 @@ export function FoodsScreen(p: AppApi) {
   const q = query.trim();
   const qf = fold(q);
   const isCode = /^\d{8,14}$/.test(q);
-  const nameHit = (f: { name: string; brand: string; barcode?: string }) => {
+  // a food's other names count: the aliases a food without a label carries, or, for one saved before aliases, the "Also:" line of its notes
+  const otherNames = (f: { aliases?: string[]; notes?: string }) => (f.aliases?.length ? f.aliases.join(" ") : (/Also: ([^\n]*)/.exec(f.notes ?? "")?.[1] ?? "").replace(/·/g, " "));
+  const nameHit = (f: { name: string; brand: string; barcode?: string; aliases?: string[]; notes?: string }) => {
     if (!q) return true;
     if (isCode) return (f.barcode ?? "") === q;
-    const hay = fold(`${f.name} ${f.brand}`);
+    const hay = fold(`${f.name} ${f.brand} ${otherNames(f)}`);
     return q.length < 3 ? hay.split(/[\s,()/-]+/).some((w) => w.startsWith(qf)) : hay.includes(qf);
   };
   const shown = foods.filter(({ f, b }) => nameHit(f) && (filter === "all" || b === filter));
-  const have = new Set(state.foods.map((f) => f.name.trim().toLowerCase()));
-  const noLabel = !isCode && q.length >= 2 ? findReference(q, 6, q.length < 3).filter((r) => !have.has(localName(r, p.region).toLowerCase())) : [];
+  // a chip must never hide a match in silence: say how many, and where
+  const hiddenByChip = q && filter !== "all" ? foods.filter(({ f, b }) => nameHit(f) && b !== filter) : [];
+  const have = new Set(state.foods.flatMap((f) => [f.name, ...(f.aliases ?? []), ...((/Also: ([^\n]*)/.exec(f.notes ?? "")?.[1] ?? "").split("·"))]).map((x) => x.trim().replace(/\.$/, "").toLowerCase()).filter(Boolean));
+  const noLabel = !isCode && q.length >= 2 ? findReference(q, 6, q.length < 3).filter((r) => ![r.en, r.de, r.sr, r.cyr].some((n) => have.has(n.toLowerCase()))) : [];
   const [db, setDb] = useState<{ q: string; products: DbProduct[]; busy: boolean }>({ q: "", products: [], busy: false });
   useEffect(() => {
     const wantsDb = isCode ? !state.foods.some((f) => f.barcode === q) : q.length >= 3;
@@ -112,6 +116,7 @@ export function FoodsScreen(p: AppApi) {
         ))}
       </div>
       <p className="band-line" aria-live="polite">{filter === "all" ? BAND_LINE_IDLE : bandHint(filter, p.pdRef)}</p>
+      {hiddenByChip.length > 0 && <p className="small hidden-by-chip">{hiddenByChip.length} more in your foods under {[...new Set(hiddenByChip.map((x) => BAND_LABEL[x.b]))].join(", ")}. <button className="link" onClick={() => setFilter("all")}>Show all</button></p>}
       {q.length >= 1 && shown.length > 0 && (noLabel.length > 0 || dbRows.length > 0) && <p className="label group-label">In your foods</p>}
       <div className="rows">
         {shown.map(({ f, pd, b }) => (
