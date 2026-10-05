@@ -44,6 +44,7 @@ import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, type Mix, type MixTip } from "./mixtip";
+import { findReference, referenceFood, localName } from "./reference";
 import { jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
 import { fitnessFor, SOURCES, dayName } from "./fitness";
@@ -221,6 +222,7 @@ function LabelCheck({
   target,
   day,
   allergies,
+  region,
 }: {
   food: Food;
   image?: string;
@@ -235,6 +237,7 @@ function LabelCheck({
   target?: number | null;
   day?: { kcal: number | null; eaten: number; name: string; type: DayType; weightKg: number | null };
   allergies?: string[];
+  region?: string | null;
 }) {
   const [mainIdx, setMainIdx] = useState(0);
   const [choice, setChoice] = useState<"update" | "both">("update");
@@ -268,6 +271,8 @@ function LabelCheck({
   const draft = (): Food => ({ ...food, name: name.trim() || food.name, brand: brand.trim(), readyToEat: true, serving: servingNow(), ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])) } as Food);
   const pendingMix = useRef<Mix | null>(null);
   const [askError, setAskError] = useState("");
+  const [refOpen, setRefOpen] = useState(false);
+  const [refPicked, setRefPicked] = useState<string | null>(null);
   // the mix tip shown on the review sheet is logged once per food
   const loggedTip = useRef<string | null>(null);
   function noteTip(tip: MixTip, d: Food) {
@@ -287,6 +292,7 @@ function LabelCheck({
   function submit() {
     const f = {
       ...food,
+      ...(refPicked ? { source: "Reference table" } : {}),
       name: name.trim(),
       brand: brand.trim(),
       serving: servingNow(),
@@ -359,8 +365,24 @@ function LabelCheck({
       </p>
       <label>
         Product name
-        <input value={name} onChange={(e) => setName(e.target.value)} />
+        <input value={name} onChange={(e) => { setName(e.target.value); setRefOpen(true); }} onFocus={() => setRefOpen(true)} autoComplete="off" />
       </label>
+      {refOpen && food.source !== "Reference table" && !food.barcode && findReference(name).length > 0 && (
+        <div className="ref-suggest" role="listbox" aria-label="From the reference table">
+          <small className="muted">No label needed. From the reference table, per 100 g:</small>
+          {findReference(name).map((r) => (
+            <button key={r.id} type="button" role="option" className="ref-row" onClick={() => {
+              const rf = referenceFood(r, region, () => food.id);
+              setName(rf.name); setBrand(""); setNotes(rf.notes ?? ""); setReady(rf.readyToEat);
+              setValues(Object.fromEntries(KEYS.map((k) => [k, inputValue((rf as any)[k])])) as Record<string, string>);
+              setRows(displayRows(rf)); setRefPicked(r.id); setRefOpen(false);
+            }}>
+              <b>{localName(r, region)}</b><small>{[r.en, r.sr, r.de].filter((x) => x !== localName(r, region)).slice(0, 2).join(" · ")} · {r.kcal} kcal · {r.protein} g protein</small>
+            </button>
+          ))}
+        </div>
+      )}
+      {refPicked && <p className="small muted">Values from the reference table. Check the tick below and save.</p>}
       <label>
         Brand
         <input value={brand} onChange={(e) => setBrand(e.target.value)} />
@@ -1202,7 +1224,7 @@ export default function App() {
     pdRef !== null &&
     Math.abs(density(selected.protein, selected.calories)! - pdRef) <= 0.05;
   const screenProps: AppApi = {
-    state, setState, setTab, setCamera, setMode, blank, add, updateItem,
+    state, setState, setCamera, setMode, blank, add, updateItem,
     saveMeal, mix, personalize, lookup, exportData, notify, setError, setBusy,
     api, setImage, setEdit, setGoalsOpen, setAccessOpen, setReviewMeal,
     setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
@@ -1292,7 +1314,9 @@ export default function App() {
       return { kcal, protein, fats, carbs: macroSplit(kcal, protein, fats).carbs };
     })(),
     openMenu: (s?: MenuSection, from?: MenuSection) => { setMenuFrom(from ?? null); setMenuSection(s ?? "list"); },
-    foodsView, setFoodsView,
+    foodsView, setFoodsView, saveFood,
+    // a link that changes the tab leaves any open panel or chat behind, or it would land under them and look dead
+    setTab: (t: Tab) => { setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab(t); },
     inbox,
     takeRecipe: async (item: InboxItem, how: "make" | "keep") => {
       // foods she doesn't have come along; then the recipe goes to the plate or to her recipes
@@ -1595,6 +1619,7 @@ export default function App() {
           target={pdRef}
           day={{ kcal: todayKcal, eaten: screenProps.eatenTodayKcal, name: screenProps.dayName, type: day.type, weightKg: personal.weightKg ?? null }}
           allergies={safety.allergies}
+          region={region}
           momentName={momentOf(moment).name}
         />
       )}{" "}

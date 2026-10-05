@@ -67,6 +67,7 @@ export interface AppApi {
   todayMacros: { kcal: number; protein: number; fats: number; carbs: number } | null;
   goalLog: import("../goal").GoalEntry[];
   addFoodPhoto: (foodId: string, dataUrl: string) => Promise<void>;
+  saveFood: (f: import("../pilot").Food) => void;
   openFoodId: string | null;
   clearOpenFood: () => void;
   toggleFavorite: (foodId: string) => void;

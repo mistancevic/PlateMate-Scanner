@@ -1,5 +1,6 @@
 import { Camera, Plus, X, ScanBarcode } from "lucide-react";
-import { density, candidateFood } from "../pilot";
+import { density, candidateFood, uid } from "../pilot";
+import { findReference, referenceFood, localName } from "../reference";
 import { duplicatePairs } from "../dedupe";
 import { jobOf } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
@@ -86,7 +87,22 @@ export function FoodsScreen(p: AppApi) {
           ))}
         </section>
       )}
-      <input className="search" aria-label="Search saved foods" placeholder="Search your foods" value={query} onChange={(e) => setQuery(e.target.value)} />
+      <input className="search" aria-label="Search saved foods" placeholder="Search your foods, or a basic food: tikvice, egg, Apfel" value={query} onChange={(e) => setQuery(e.target.value)} />
+      {query.trim().length >= 2 && (() => {
+        const have = new Set(state.foods.map((f) => f.name.trim().toLowerCase()));
+        const refs = findReference(query).filter((r) => !have.has(localName(r, p.region).toLowerCase()));
+        if (!refs.length) return null;
+        return (
+          <div className="ref-suggest" aria-label="From the reference table">
+            <small className="muted">Not in your foods yet. From the reference table, per 100 g, one tap to add:</small>
+            {refs.map((r) => (
+              <button key={r.id} type="button" className="ref-row" onClick={() => { p.saveFood(referenceFood(r, p.region, uid)); p.notify(`${localName(r, p.region)} added from the reference table.`); }}>
+                <b>{localName(r, p.region)}</b><small>{[r.en, r.sr, r.de].filter((x) => x !== localName(r, p.region)).slice(0, 2).join(" · ")} · {r.kcal} kcal · {r.protein} g protein</small>
+              </button>
+            ))}
+          </div>
+        );
+      })()}
       <div className="chips">
         {([["high", "Fits my goal"], ["mid", "Close"], ["low", "Below"], ["inmeal", "In meal"]] as const).map(([k, l]) => (
           <button key={k} className={`chip chip-${k} ${filter === k ? "on" : ""}`} onClick={() => setFilter(filter === k ? "all" : k)}>{l}</button>
