@@ -1571,7 +1571,7 @@ export default function App() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <button className="brand" onClick={() => setTab("journey")} aria-label={APP_NAME}>
+        <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setTab("home"); }} aria-label={`${APP_NAME}, Today`}>
           <Mark size={28} color="var(--brand)" />
         </button>
         <h1>{TITLES[tab]}</h1>
