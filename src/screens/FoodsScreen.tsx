@@ -1,4 +1,4 @@
-import { Camera, X, Pencil } from "lucide-react";
+import { Camera, X, Pencil, Plus } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
 import { findReference, referenceFood, localName } from "../reference";
 import { BAND_LABEL, BAND_LINE_IDLE, bandHint } from "../goal";
@@ -28,6 +28,7 @@ export function FoodsScreen(p: AppApi) {
     setBusy, setError, notify, setFilter, filter, coach, pdRef } = p;
   const [cardId, setCardId] = useState<string | null>(null);
   const isDigits = /^\d{8,14}$/.test(query.trim());
+  const [addOpen, setAddOpen] = useState(false);
   // a barcode that's already in the library opens its card here
   useEffect(() => { if (p.openFoodId) { setCardId(p.openFoodId); p.clearOpenFood(); } /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [p.openFoodId]);
   const [dupOpen, setDupOpen] = useState(false);
@@ -79,18 +80,22 @@ export function FoodsScreen(p: AppApi) {
       {p.foodsView === "recipes" && <RecipesScreen {...p} />}
       {p.foodsView === "foods" && <>
       <section className="find">
-        <div className="find-head"><b>Find a food</b><small>{state.foods.length} in your foods</small></div>
+        <div className="find-head">
+          <div className="find-title"><b>Find a food</b><small>{state.foods.length} in your foods</small></div>
+          <button className={`pill pill-small add-toggle ${addOpen ? "pill-primary" : ""}`} aria-expanded={addOpen} aria-label="Add a food" onClick={() => setAddOpen(!addOpen)}><Plus size={15} /> Add</button>
+        </div>
+        {addOpen && (
+          <div className="add-strip" aria-label="Add a food: Type or Scan">
+            <div className="ways">
+              <button className="pill pill-small" onClick={() => { setAddOpen(false); blank(isDigits ? "" : query.trim(), "", query.trim(), isDigits ? query.trim() : ""); }}><Pencil size={15} /> Type</button>
+              <button className="pill pill-small pill-primary" onClick={() => { setAddOpen(false); setMode("label"); setCamera(true); }}><Camera size={15} /> Scan</button>
+            </div>
+          </div>
+        )}
         <input className="search" aria-label="Find a food" placeholder="A name, or a barcode you saved" value={query} onChange={(e) => setQuery(e.target.value)} />
       </section>
-      <section className="add-strip" aria-label="Add a food">
-        <b>Add a food</b>
-        <div className="ways">
-          <button className="pill pill-small" onClick={() => blank(isDigits ? "" : query.trim(), "", query.trim(), isDigits ? query.trim() : "")}><Pencil size={15} /> Type</button>
-          <button className="pill pill-small pill-primary" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> Scan</button>
-        </div>
-      </section>
       {nothing && q.length >= 2 && (
-        <p className="small muted not-found"><b>Not found</b> in your foods, the foods without a label or the product database. Type or Scan above; Type keeps {isDigits ? "the number" : `"${q}"`}.</p>
+        <p className="small muted not-found"><b>Not found</b> in your foods, the foods without a label or the product database. Tap Add above; Type keeps {isDigits ? "the number" : `"${q}"`}.</p>
       )}
       {pairs.length > 0 && (
         <button className="strip strip-button" onClick={() => setDupOpen(true)}>{pairs.length} possible {pairs.length === 1 ? "duplicate" : "duplicates"} in your foods. Check and merge.</button>

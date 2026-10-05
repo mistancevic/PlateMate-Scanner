@@ -139,13 +139,14 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .scan-modes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 4px 0 12px; }
 .scan-modes input { width: auto; flex: 1; min-width: 150px; padding: 9px 12px; font-size: 13px; }
 .search { margin: 4px 0 12px; font-size: 15px; }
-.chips { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; margin-bottom: 6px; scrollbar-width: none; } .chips::-webkit-scrollbar { display: none; }
+.chips { display: flex; gap: 8px; flex-wrap: nowrap; overflow-x: auto; padding: 5px; margin: 0 -5px 2px; scrollbar-width: none; } .chips::-webkit-scrollbar { display: none; }
 .chip { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; flex: 1 1 auto; height: 34px; padding: 0 9px; white-space: nowrap; border-radius: 17px; font-size: 13px; font-weight: 700; color: #fff; border: 1.5px solid transparent; }
 /* a phone keeps :hover on the last chip tapped, so the state is carried by .on alone: no filter, every chip full;
    a filter on, the chosen chip full with a ring, the rest faded */
 .chip { opacity: 1; }
 .chips.filtering .chip { opacity: 0.4; }
-.chips.filtering .chip.on { opacity: 1; box-shadow: 0 0 0 2px var(--bg, #eef3fc), 0 0 0 4px var(--ink); }
+.chips.filtering .chip.on { opacity: 1; box-shadow: 0 0 0 2px #fff, 0 0 0 4px var(--c); }
+.chip-below { --c: var(--low); } .chip-close { --c: var(--mid); } .chip-plan { --c: var(--plan); } .chip-high { --c: var(--high); } .chip-top { --c: var(--top); }
 @media (hover: hover) { .chips:not(.filtering) .chip:hover { filter: brightness(0.95); } }
 .chip-below { background: var(--low); } .chip-close { background: var(--mid); } .chip-plan { background: var(--plan); } .chip-high { background: var(--high); } .chip-top { background: var(--top); }
 .chip-high, .chip-mid, .chip-low { } .chip-mid { background: var(--mid); } .chip-low { background: var(--low); }
@@ -603,8 +604,8 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .basics-group { margin: 12px 0; } .basics-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
 .basics-row b { display: block; font-size: 14px; font-weight: 800; } .basics-row small { color: var(--muted); font-weight: 600; font-size: 12px; }
 .basics-row .pill { flex: 0 0 auto; }
-.find { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; } .find-head { display: flex; justify-content: space-between; align-items: baseline; } .find-head b { font-size: 16px; font-weight: 900; } .find-head small { color: var(--muted); font-weight: 700; }
-.add-strip { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; background: var(--tint); border-radius: 20px; margin-bottom: 12px; } .add-strip > b { font-size: 14px; font-weight: 800; color: var(--brand-text); } .add-strip .ways { display: flex; gap: 8px; } .add-strip .ways .pill { flex: 1; justify-content: center; }
+.find { display: flex; flex-direction: column; gap: 8px; margin-bottom: 10px; } .find-head { display: flex; justify-content: space-between; align-items: center; } .find-title { display: flex; flex-direction: column; } .find-title b { font-size: 17px; font-weight: 900; } .find-title small { color: var(--muted); font-weight: 700; font-size: 12.5px; } .add-toggle { height: 36px; }
+.add-strip { display: flex; flex-direction: column; gap: 8px; padding: 10px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 18px; box-shadow: 0 8px 24px rgba(23,39,66,.10); } .add-strip .ways { display: flex; gap: 8px; margin: 0; } .add-strip .ways .pill { flex: 1; justify-content: center; }
 .not-found { margin: -4px 0 10px; } .sheet-line { margin: -6px 0 10px; }
 .modal-titles { display: flex; flex-direction: column; gap: 2px; } .eyebrow-line { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--brand-text); }
 .barcode-field { display: flex; flex-direction: column; gap: 6px; }

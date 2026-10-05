@@ -4,6 +4,7 @@ One version per release since 2 October 2026. The number is in Menu, About, next
 
 ## 0.1.x, the pilot builds
 
+- **v0.1.46** · 2026-10-05 · Add moves to the top right of Find a food; tapping it opens Type and Scan under the header, the Find box stays as it was; the tinted Add strip is gone. A selected chip has a white ring and a ring in its own colour, with room so it is never cut.
 - **v0.1.45** · 2026-10-05 · chips show their state on a phone: none on, all full colour; one on, that one full with a ring and the rest faded; tapping it again brings all back. The phone's sticky hover no longer keeps a chip lit.
 - **v0.1.44** · 2026-10-05 · Find reads a food's other names: a food without a label saved under the shop's name (Weißkohl in Munich) is found as Kupus, Купус or Cabbage, including ones saved before today, by their notes; Without a label no longer offers a food already in my foods under another name; a chip that hides search matches says "1 more in your foods under On plan · Show all".
 - **v0.1.43** · 2026-10-05 · the line under the chips is one line in every case: "Tap a chip to see its PD range." idle, and "Low−: PD under 3.2 · your target 5.3" on a tap; no pairing advice, that is Mix it's job.

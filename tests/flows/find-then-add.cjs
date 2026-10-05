@@ -18,7 +18,10 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.goto("http://127.0.0.1:3188/"); await page.waitForTimeout(900);
   await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(400);
   ok(/Find a food/.test(await page.locator(".find-head").textContent()) && /in your foods/.test(await page.locator(".find-head").textContent()), "Find a food on top, with the count");
+  ok(await page.locator(".add-strip").count() === 0 && /Add/.test(await page.locator(".find-head .add-toggle").textContent()), "Add sits in the header, closed");
+  await page.getByRole("button", { name: "Add a food", exact: true }).click(); await page.waitForTimeout(150);
   const ways = await page.locator(".add-strip .ways .pill").allTextContents();
+  await page.getByRole("button", { name: "Add a food", exact: true }).click(); await page.waitForTimeout(150);
   ok(ways.length === 2 && /Type/.test(ways[0]) && /Scan/.test(ways[1]), "Add a food: one row, Type, Scan: " + ways.join(" | "));
   ok(await page.getByRole("button", { name: /Several products|^Add$/ }).count() === 0 && await page.getByPlaceholder("or type a barcode").count() === 0, "the old chips and the loose barcode field are gone");
   // find, by what was typed: one letter, my foods by word start, nothing else, no database call
@@ -56,10 +59,10 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   // nothing anywhere: says so, and names what Type keeps
   await page.getByRole("button", { name: "Close dialog" }).click().catch(() => {});
   await page.getByLabel("Find a food").fill("zzqx"); await page.waitForTimeout(900);
-  ok(/Not found/.test(await page.locator(".not-found").textContent()) && /Type keeps "zzqx"/.test(await page.locator(".not-found").textContent()), "nothing anywhere says so, and names what Type keeps");
+  ok(/Not found/.test(await page.locator(".not-found").textContent()) && /Tap Add above; Type keeps "zzqx"/.test(await page.locator(".not-found").textContent()), "nothing anywhere says so, and names what Type keeps");
   await page.getByLabel("Find a food").fill("tikvice"); await page.waitForTimeout(300);
   // add: Type carries the search, the sheet is titled Type under Add a food, and a food without a label is suggested
-  await page.locator(".add-strip").getByRole("button", { name: /^Type/ }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: "Add a food", exact: true }).click(); await page.waitForTimeout(150); await page.locator(".add-strip").getByRole("button", { name: /^Type/ }).click(); await page.waitForTimeout(400);
   const sheet = page.locator(".modal").last();
   ok(/Add a food/.test(await sheet.locator(".eyebrow-line").textContent()) && (await sheet.locator("h2").textContent()) === "Type", "the sheet is titled Type, under Add a food");
   ok(/From your search: tikvice/.test(await sheet.locator(".sheet-line").textContent()), "the search text rides along");
@@ -69,14 +72,14 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.getByLabel("Find a food").fill("4311501670408"); await page.waitForTimeout(300);
   await page.waitForTimeout(700);
   ok(/Type keeps the number/.test(await page.locator(".not-found").textContent().catch(() => "")), "digits found nowhere: Type keeps the number");
-  await page.locator(".add-strip").getByRole("button", { name: /^Type/ }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Add a food", exact: true }).click(); await page.waitForTimeout(150); await page.locator(".add-strip").getByRole("button", { name: /^Type/ }).click(); await page.waitForTimeout(300);
   const sheetB = page.locator(".modal").last();
   ok((await sheetB.locator("h2").textContent()) === "Type" && (await sheetB.locator(".barcode-row input").inputValue()) === "4311501670408", "the Type sheet holds the number in its barcode field");
   await sheetB.getByRole("button", { name: /^Look up$/ }).click(); await page.waitForTimeout(800);
   ok(lookups.some((u) => /4311501670408/.test(u)), "Look up asks the database");
   // the camera header says Scan under Add a food
   await page.getByRole("button", { name: "Close dialog" }).click().catch(() => {}); await page.waitForTimeout(200);
-  await page.locator(".add-strip").getByRole("button", { name: /^Scan/ }).click(); await page.waitForTimeout(1500);
+  await page.getByRole("button", { name: "Add a food", exact: true }).click(); await page.waitForTimeout(150); await page.locator(".add-strip").getByRole("button", { name: /^Scan/ }).click(); await page.waitForTimeout(1500);
   ok(await page.getByLabel("Add a food: Scan").count() === 1, "the camera header reads Add a food, Scan");
   console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
   await b.close(); server.kill(); process.exitCode = fail ? 1 : 0;
