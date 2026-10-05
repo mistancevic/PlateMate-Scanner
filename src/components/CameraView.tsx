@@ -21,6 +21,7 @@ interface CameraViewProps {
   onCapture: (images: string[]) => void;
   onBarcodeWithPhotos: (code: string, images: string[]) => void;
   addTo?: "plate" | "foods";
+  knownCodes?: string[];
   processSingleLabelOCR?: (base64: string) => void;
   processGroupScan: (images: string[] | string) => void;
   onBarcode: (barcode: string) => void;
@@ -38,6 +39,7 @@ export function CameraView({
   onCapture,
   onBarcodeWithPhotos,
   addTo,
+  knownCodes,
   processSingleLabelOCR: propProcessSingleLabelOCR,
   processGroupScan,
   onBarcode,
@@ -57,6 +59,8 @@ export function CameraView({
   const [stagedGroupImages, setStagedGroupImages] = useState<string[]>([]);
   // Barcode: the code read, kept while the person adds the pack's photos; the camera stays open
   const [codeRead, setCodeRead] = useState<string | null>(null);
+  // a code already in the person's foods needs no pack photos: it opens that food at once (journey: a barcode twice)
+  useEffect(() => { if (codeRead && knownCodes?.includes(codeRead)) { const c = codeRead; setCodeRead(null); setStagedGroupImages([]); onBarcode(c); } /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [codeRead]);
   const staged = stagedGroupImages;
   const frameRef = useRef<HTMLDivElement>(null);
 

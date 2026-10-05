@@ -228,6 +228,7 @@ function LabelCheck({
   addTo,
   fromSearch,
   onLookup,
+  titleAs,
 }: {
   food: Food;
   image?: string;
@@ -246,6 +247,7 @@ function LabelCheck({
   addTo?: "plate" | "foods";
   fromSearch?: string;
   onLookup?: (code: string) => void;
+  titleAs?: string;
 }) {
   const [mainIdx, setMainIdx] = useState(0);
   const [choice, setChoice] = useState<"update" | "both">("update");
@@ -283,6 +285,7 @@ function LabelCheck({
   const kind = (() => {
     const src = food.source || "";
     const where = addTo === "plate" ? "Add to plate" : "Add a food";
+    if (titleAs) return { eyebrow: "Find a food", title: titleAs, line: "Check what the database says against the pack, then save." };
     if (/barcode|product database|open food facts/i.test(src)) return { eyebrow: where, title: "Barcode", line: "Check what the database says against the pack, then save." };
     if (/photo|label/i.test(src)) return { eyebrow: where, title: "Scan", line: "Check what was read against the pack, then save." };
     return { eyebrow: where, title: "Type", line: "Name the food, fill the values as on the pack, save." };
@@ -657,6 +660,7 @@ export default function App() {
     [menuSection, setMenuSection] = useState<MenuSection | null>(null),
     [foodsView, setFoodsView] = useState<"foods" | "recipes">("foods"),
     [editFrom, setEditFrom] = useState<string>(""),
+    [editTitle, setEditTitle] = useState<string>(""),
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
     [talkOpen, setTalkOpen] = useState(false),
     [profileReady, setProfileReady] = useState(false),
@@ -914,6 +918,7 @@ export default function App() {
     setError("");
   };
   function blank(name = "", brand = "", from = "", barcode = "") {
+    setEditTitle("");
     setImage("");
     setImageSet([]);
     setEditFrom(from);
@@ -1039,7 +1044,7 @@ export default function App() {
         );
       }
     } catch (e: any) {
-      if (run === runRef.current) setError(e.message);
+      if (run === runRef.current) { setError(e.message); setEditTitle(""); }
     } finally {
       if (run === runRef.current) setBusy("");
     }
@@ -1346,6 +1351,10 @@ export default function App() {
     })(),
     openMenu: (s?: MenuSection, from?: MenuSection) => { setMenuFrom(from ?? null); setMenuSection(s ?? "list"); },
     foodsView, setFoodsView, saveFood, setEditFrom,
+    // a product picked from the search opens the sheet titled by the button that picked it
+    addFromDatabase: (code: string) => { setEditTitle("Add to my foods"); lookup(code); },
+    searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (region ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
+    peekBarcode: async (code: string) => { try { const d = await api(`/api/product/${code}`); return d?.product_name ? { code, name: d.product_name, brand: d.brand || "", quantity: "", kcal: d.calories, protein: d.protein } : null; } catch { return null; } },
     // a link that changes the tab leaves any open panel or chat behind, or it would land under them and look dead
     setTab: (t: Tab) => { setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab(t); },
     inbox,
@@ -1626,6 +1635,7 @@ export default function App() {
             onBarcode={(x) => lookup(x)}
             onBarcodeWithPhotos={(c, x) => lookupWithPhotos(c, x)}
             addTo={tab === "journey" ? "plate" : "foods"}
+            knownCodes={state.foods.map((f) => f.barcode).filter((x): x is string => Boolean(x))}
             onCancel={() => setCamera(false)}
             onOpenCart={() => {
               setCamera(false);
@@ -1643,7 +1653,7 @@ export default function App() {
           image={image}
           images={imageSet}
           library={state.foods}
-          close={() => { setEdit(null); setImageSet([]); setEditFrom(""); }}
+          close={() => { setEdit(null); setImageSet([]); setEditFrom(""); setEditTitle(""); }}
           save={saveFood}
           mixFor={screenProps.mixFor}
           onMix={screenProps.takeMix}
@@ -1655,6 +1665,7 @@ export default function App() {
           addTo={tab === "journey" ? "plate" : "foods"}
           fromSearch={editFrom}
           onLookup={(c) => { setBarcode(c); setEdit(null); lookup(c); }}
+          titleAs={editTitle || undefined}
           momentName={momentOf(moment).name}
         />
       )}{" "}

@@ -383,6 +383,28 @@ app.post("/api/account/delete", requireUser, async (req, res) => {
     return res.status(500).json({ error: `Could not finish the deletion: ${(error as Error).message}`, steps });
   }
 });
+// Search the product database by name: top five with values per 100 g, for the country where the person shops.
+// Open Food Facts' country sites filter to products sold there; per-volume records and records without energy or protein are skipped.
+const OFF_COUNTRY: Record<string, string> = { rs: "rs", de: "de", at: "at", ch: "ch", hr: "hr", ba: "ba", si: "si", hu: "hu", it: "it", fr: "fr", es: "es", gb: "uk", us: "us" };
+app.get("/api/search", requireUser, requireMember, async (req, res) => {
+  const q = String(req.query.q ?? "").trim();
+  const cc = OFF_COUNTRY[String(req.query.cc ?? "").toLowerCase()] ?? "world";
+  if (q.length < 3 || q.length > 60) return res.json({ products: [] });
+  try {
+    const url = `https://${cc}.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=15&fields=code,product_name,brands,quantity,nutriments,nutrition_data_per`;
+    const r = await fetch(url, { headers: { "User-Agent": "PlateMatePilot/0.3 (https://github.com/mistancevic/PlateMate-Scanner)" }, signal: AbortSignal.timeout(8000) });
+    if (!r.ok) return res.json({ products: [], error: "Product database unavailable." });
+    const d = await r.json();
+    const products = (Array.isArray(d.products) ? d.products : [])
+      .filter((p: any) => /^\d{8,14}$/.test(String(p.code ?? "")) && p.product_name && !/\bml\b/i.test(p.nutrition_data_per || ""))
+      .map((p: any) => ({ code: String(p.code), name: String(p.product_name).trim(), brand: String(p.brands || "").split(",")[0].trim(), quantity: String(p.quantity || "").trim(), kcal: numberInput(p.nutriments?.["energy-kcal_100g"]), protein: numberInput(p.nutriments?.proteins_100g) }))
+      .filter((p: any) => p.kcal !== null && p.protein !== null)
+      .slice(0, 5);
+    return res.json({ products });
+  } catch {
+    return res.json({ products: [], error: "Product database did not answer in time." });
+  }
+});
 app.get("/api/product/:barcode", requireUser, requireMember, async (req, res) => {
   try {
     const barcode = String(req.params.barcode);

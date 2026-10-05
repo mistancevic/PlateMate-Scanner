@@ -158,7 +158,7 @@ export const REFERENCE: RefFood[] = R.map(([id, en, de, sr, cyr, kcal, protein, 
 
 const fold = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/ć/g, "c").replace(/č/g, "c").replace(/š/g, "s").replace(/ž/g, "z");
 // find by any name: a word start beats a substring; two characters minimum
-export function findReference(query: string, limit = 6): RefFood[] {
+export function findReference(query: string, limit = 6, wordStartOnly = false): RefFood[] {
   const q = fold(query.trim());
   if (q.length < 2) return [];
   const score = (r: RefFood) => {
@@ -168,7 +168,7 @@ export function findReference(query: string, limit = 6): RefFood[] {
       if (n === q) best = Math.max(best, 100);
       else if (n.startsWith(q)) best = Math.max(best, 80);
       else if (n.split(/[\s,()]+/).some((w) => w.startsWith(q))) best = Math.max(best, 60);
-      else if (n.includes(q)) best = Math.max(best, 30);
+      else if (!wordStartOnly && n.includes(q)) best = Math.max(best, 30);
     }
     return best;
   };

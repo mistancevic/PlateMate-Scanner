@@ -13,6 +13,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   const errs = []; page.on("pageerror", (e) => errs.push(e.message));
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
   const lookups = []; await page.route("**/api/product/**", (route) => { lookups.push(route.request().url()); route.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ error: "not in the database" }) }); });
+  const searches = []; await page.route("**/api/search**", (route) => { searches.push(route.request().url()); const u = new URL(route.request().url()); const q = u.searchParams.get("q"); route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ products: /skyr/i.test(q) ? [{ code: "4008452021131", name: "Skyr Natur", brand: "Milbona", quantity: "500 g", kcal: 63, protein: 11 }, { code: "5000000000001", name: "Skyr Vanilla", brand: "Arla", quantity: "450 g", kcal: 78, protein: 9.3 }] : [] }) }); });
   await page.addInitScript((s) => { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); localStorage.setItem("chefmealan-region", "belgrade"); }, seed);
   await page.goto("http://127.0.0.1:3188/"); await page.waitForTimeout(900);
   await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(400);
@@ -20,13 +21,31 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   const ways = await page.locator(".add-strip .ways .pill").allTextContents();
   ok(ways.length === 2 && /Type/.test(ways[0]) && /Scan/.test(ways[1]), "Add a food: one row, Type, Scan: " + ways.join(" | "));
   ok(await page.getByRole("button", { name: /Several products|^Add$/ }).count() === 0 && await page.getByPlaceholder("or type a barcode").count() === 0, "the old chips and the loose barcode field are gone");
-  // find: letters match my foods only, and never add
-  await page.getByLabel("Find a food").fill("skyr"); await page.waitForTimeout(300);
-  ok((await page.locator(".rows .row").count()) >= 1 && (await page.locator(".nolabel-row").count()) === 0, "letters find my foods, nothing from outside");
+  // find, by what was typed: one letter, my foods by word start, nothing else, no database call
   const before = (await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.length));
+  await page.getByLabel("Find a food").fill("s"); await page.waitForTimeout(700);
+  ok((await page.locator(".rows .row").count()) >= 1 && (await page.locator(".outside").count()) === 0 && searches.length === 0, "one letter: my foods by word start, nothing from outside");
+  // two letters: plus foods without a label, still no database
+  await page.getByLabel("Find a food").fill("ti"); await page.waitForTimeout(700);
+  ok(await page.getByLabel("Without a label").count() === 1 && searches.length === 0, "two letters: foods without a label join, no database yet");
+  // three letters: my foods, foods without a label, and the database, in three labelled groups
+  await page.getByLabel("Find a food").fill("skyr"); await page.waitForTimeout(900);
+  ok((await page.locator(".rows .row").count()) >= 1 && /In your foods/.test(await page.locator("main").textContent()), "three letters: my foods first, labelled");
+  ok(searches.length === 1 && await page.getByLabel("In the product database").locator(".row").count() === 2, "and the database, up to five, labelled");
+  ok((await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.length)) === before, "finding added nothing by itself");
+  // a food without a label goes straight in
+  await page.getByLabel("Find a food").fill("tikvice"); await page.waitForTimeout(900);
+  await page.getByLabel("Without a label").getByRole("button", { name: /Add to my foods/ }).first().click(); await page.waitForTimeout(400);
+  ok((await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.some((f) => /Tikvice/.test(f.name)))), "Add to my foods puts a food without a label in my foods");
+  // a database product opens the sheet titled by the button
+  await page.getByLabel("Find a food").fill("skyr"); await page.waitForTimeout(900);
+  await page.getByLabel("In the product database").getByRole("button", { name: /Add to my foods/ }).first().click(); await page.waitForTimeout(800);
+  ok(lookups.some((u) => /4008452021131/.test(u)), "a database product is fetched by its barcode");
+  // nothing anywhere: says so, and names what Type keeps
+  await page.getByRole("button", { name: "Close dialog" }).click().catch(() => {});
+  await page.getByLabel("Find a food").fill("zzqx"); await page.waitForTimeout(900);
+  ok(/Not found/.test(await page.locator(".not-found").textContent()) && /Type keeps "zzqx"/.test(await page.locator(".not-found").textContent()), "nothing anywhere says so, and names what Type keeps");
   await page.getByLabel("Find a food").fill("tikvice"); await page.waitForTimeout(300);
-  ok(await page.locator(".rows .row").count() === 0 && /Not in your foods/.test(await page.locator(".not-found").textContent()) && /Type keeps "tikvice"/.test(await page.locator(".not-found").textContent()), "nothing found says so, and names what Type keeps");
-  ok((await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.length)) === before, "finding added nothing");
   // add: Type carries the search, the sheet is titled Type under Add a food, and a food without a label is suggested
   await page.locator(".add-strip").getByRole("button", { name: /^Type/ }).click(); await page.waitForTimeout(400);
   const sheet = page.locator(".modal").last();
@@ -36,12 +55,13 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await sheet.getByRole("button", { name: "Close dialog" }).click(); await page.waitForTimeout(200);
   // digits: Type carries the number into its barcode field, and Look up asks the database from there
   await page.getByLabel("Find a food").fill("4311501670408"); await page.waitForTimeout(300);
-  ok(/Type keeps the number/.test(await page.locator(".not-found").textContent().catch(() => "")), "digits not in my foods: Type keeps the number");
+  await page.waitForTimeout(700);
+  ok(/Type keeps the number/.test(await page.locator(".not-found").textContent().catch(() => "")), "digits found nowhere: Type keeps the number");
   await page.locator(".add-strip").getByRole("button", { name: /^Type/ }).click(); await page.waitForTimeout(300);
   const sheetB = page.locator(".modal").last();
   ok((await sheetB.locator("h2").textContent()) === "Type" && (await sheetB.locator(".barcode-row input").inputValue()) === "4311501670408", "the Type sheet holds the number in its barcode field");
   await sheetB.getByRole("button", { name: /^Look up$/ }).click(); await page.waitForTimeout(800);
-  ok(lookups.length === 1 && /4311501670408/.test(lookups[0]), "Look up asks the database");
+  ok(lookups.some((u) => /4311501670408/.test(u)), "Look up asks the database");
   // the camera header says Scan under Add a food
   await page.getByRole("button", { name: "Close dialog" }).click().catch(() => {}); await page.waitForTimeout(200);
   await page.locator(".add-strip").getByRole("button", { name: /^Scan/ }).click(); await page.waitForTimeout(1500);

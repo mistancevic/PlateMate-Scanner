@@ -1,11 +1,12 @@
 import { Camera, X, Pencil } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
+import { findReference, referenceFood, localName } from "../reference";
 
 import { duplicatePairs } from "../dedupe";
 import { jobOf } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import type { ScannerMode } from "../types";
-import type { AppApi } from "./api";
+import type { AppApi, DbProduct } from "./api";
 import { ConfirmButton } from "../components/Confirm";
 import { iconFor } from "../icons";
 import { FoodCard } from "../components/FoodCard";
@@ -13,6 +14,7 @@ import { RecipesScreen } from "./RecipesScreen";
 import { momentOf } from "../moments";
 import type { Mix } from "../mixtip";
 import { useEffect, useState } from "react";
+const fold = (x: string) => x.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d");
 
 type Band = "high" | "mid" | "low";
 function band(pd: number | null): Band {
@@ -35,9 +37,36 @@ export function FoodsScreen(p: AppApi) {
   const cardFood = state.foods.find((x) => x.id === cardId);
   const foods = state.foods.map((f) => ({ f, pd: density(f.protein, f.calories) })).map((x) => ({ ...x, b: p.fitPd(x.pd) }));
   const counts = { high: foods.filter((x) => x.b === "high").length, mid: foods.filter((x) => x.b === "mid").length, low: foods.filter((x) => x.b === "low").length };
-  const shown = foods.filter(({ f, b }) =>
-    (f.name + " " + f.brand + " " + (f.barcode ?? "")).toLowerCase().includes(query.trim().toLowerCase()) &&
-    (filter === "all" || (filter === "inmeal" ? inMeal.has(f.id) : b === filter)));
+  // What the box lists, by what was typed: one or two letters match the start of a word, three or more any part of the name,
+  // eight to fourteen digits a saved barcode. Your foods first; then foods without a label (two letters on); then the product
+  // database (three letters on, or a barcode not in your foods).
+  const q = query.trim();
+  const qf = fold(q);
+  const isCode = /^\d{8,14}$/.test(q);
+  const nameHit = (f: { name: string; brand: string; barcode?: string }) => {
+    if (!q) return true;
+    if (isCode) return (f.barcode ?? "") === q;
+    const hay = fold(`${f.name} ${f.brand}`);
+    return q.length < 3 ? hay.split(/[\s,()/-]+/).some((w) => w.startsWith(qf)) : hay.includes(qf);
+  };
+  const shown = foods.filter(({ f, b }) => nameHit(f) && (filter === "all" || (filter === "inmeal" ? inMeal.has(f.id) : b === filter)));
+  const have = new Set(state.foods.map((f) => f.name.trim().toLowerCase()));
+  const noLabel = !isCode && q.length >= 2 ? findReference(q, 6, q.length < 3).filter((r) => !have.has(localName(r, p.region).toLowerCase())) : [];
+  const [db, setDb] = useState<{ q: string; products: DbProduct[]; busy: boolean }>({ q: "", products: [], busy: false });
+  useEffect(() => {
+    const wantsDb = isCode ? !state.foods.some((f) => f.barcode === q) : q.length >= 3;
+    if (!wantsDb) { setDb({ q: "", products: [], busy: false }); return; }
+    setDb((d) => ({ ...d, busy: true }));
+    const t = setTimeout(async () => {
+      const products = isCode ? [await p.peekBarcode(q)].filter(Boolean) as DbProduct[] : await p.searchDatabase(q);
+      const saved = new Set(state.foods.map((f) => f.barcode).filter(Boolean));
+      setDb({ q, products: products.filter((x) => !saved.has(x.code)), busy: false });
+    }, 500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q]);
+  const dbRows = db.q === q ? db.products : [];
+  const nothing = q.length >= 1 && shown.length === 0 && noLabel.length === 0 && dbRows.length === 0 && !db.busy;
   return (
     <>
       <div className="segments" role="tablist" aria-label="Foods">
@@ -57,8 +86,8 @@ export function FoodsScreen(p: AppApi) {
           <button className="pill pill-small pill-primary" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> Scan</button>
         </div>
       </section>
-      {query.trim().length >= 2 && shown.length === 0 && (
-        <p className="small muted not-found"><b>Not in your foods.</b> Add it above, and it is here next time. Type keeps {isDigits ? "the number" : `"${query.trim()}"`}.</p>
+      {nothing && q.length >= 2 && (
+        <p className="small muted not-found"><b>Not found</b> in your foods, the foods without a label or the product database. Type or Scan above; Type keeps {isDigits ? "the number" : `"${q}"`}.</p>
       )}
       {pairs.length > 0 && (
         <button className="strip strip-button" onClick={() => setDupOpen(true)}>{pairs.length} possible {pairs.length === 1 ? "duplicate" : "duplicates"} in your foods. Check and merge.</button>
@@ -83,6 +112,7 @@ export function FoodsScreen(p: AppApi) {
           <button key={k} className={`chip chip-${k} ${filter === k ? "on" : ""}`} onClick={() => setFilter(filter === k ? "all" : k)}>{l}</button>
         ))}
       </div>
+      {q.length >= 1 && shown.length > 0 && (noLabel.length > 0 || dbRows.length > 0) && <p className="label group-label">In your foods</p>}
       <div className="rows">
         {shown.map(({ f, pd, b }) => (
           <div className="row" key={f.id}>
@@ -106,6 +136,36 @@ export function FoodsScreen(p: AppApi) {
           </div>
         ))}
       </div>
+      {noLabel.length > 0 && (
+        <section className="outside" aria-label="Without a label">
+          <p className="label group-label">Without a label <small>reference values per 100 g</small></p>
+          {noLabel.map((r) => (
+            <div className="row outside-row" key={r.id}>
+              <span className="thumb">{iconFor(localName(r, p.region))}</span>
+              <div className="row-text">
+                <b className="name-plain">{localName(r, p.region)}</b>
+                <small>{[r.en, r.sr, r.de].filter((x) => x !== localName(r, p.region)).slice(0, 2).join(" · ")} · {r.kcal} kcal · {r.protein} g protein{r.ready ? "" : " · needs cooking"}</small>
+              </div>
+              <button className="pill pill-small pill-primary" onClick={() => { p.saveFood(referenceFood(r, p.region, uid)); p.notify(`${localName(r, p.region)} is in your foods.`); }}>Add to my foods</button>
+            </div>
+          ))}
+        </section>
+      )}
+      {(dbRows.length > 0 || (db.busy && (isCode || q.length >= 3))) && (
+        <section className="outside" aria-label="In the product database">
+          <p className="label group-label">In the product database {db.busy && <small>looking…</small>}</p>
+          {dbRows.map((x) => (
+            <div className="row outside-row" key={x.code}>
+              <span className="thumb">{iconFor(x.name)}</span>
+              <div className="row-text">
+                <b className="name-plain">{x.name}</b>
+                <small>{[x.brand, x.quantity].filter(Boolean).join(" · ")}{x.kcal !== null ? ` · ${Math.round(x.kcal)} kcal` : ""}{x.protein !== null ? ` · ${x.protein} g protein` : ""} per 100 g</small>
+              </div>
+              <button className="pill pill-small pill-primary" onClick={() => p.addFromDatabase(x.code)}>Add to my foods</button>
+            </div>
+          ))}
+        </section>
+      )}
       {state.foods.length === 0 && (
         <div className="strip">No foods yet. Scan, type a name, or <button className="link" onClick={p.addStarter}>add twenty starter foods</button>.</div>
       )}
