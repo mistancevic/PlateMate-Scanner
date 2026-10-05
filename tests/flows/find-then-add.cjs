@@ -36,6 +36,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok((await page.locator(".rows .row").count()) >= 1 && /In your foods/.test(await page.locator("main").textContent()), "three letters: my foods first, labelled");
   ok(searches.length === 1 && await page.getByLabel("In the product database").locator(".row").count() === 2, "and the database, up to five, labelled");
   ok((await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.length)) === before, "finding added nothing by itself");
+  ok(/Can't find what you want\?/.test(await page.locator(".end-add").textContent()), "with results, the end card asks in plain words");
   // a food without a label goes straight in
   await page.getByLabel("Find a food").fill("tikvice"); await page.waitForTimeout(900);
   await page.getByLabel("Without a label").getByRole("button", { name: /Add to my foods/ }).first().click(); await page.waitForTimeout(400);
@@ -52,6 +53,12 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(/more in your foods under/.test(await page.locator(".hidden-by-chip").textContent().catch(() => "")), "a chip that hides the match says so, with Show all");
   await page.locator(".hidden-by-chip").getByRole("button", { name: "Show all" }).click(); await page.waitForTimeout(200);
   ok((await page.locator(".rows .row").count()) >= 1, "Show all brings the match back");
+  // Add all on the Without a label group puts every row in my foods at once
+  await page.getByLabel("Find a food").fill("pa"); await page.waitForTimeout(700);
+  const nRows = await page.getByLabel("Without a label").locator(".row").count();
+  const beforeAll = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.length);
+  await page.getByLabel("Without a label").getByRole("button", { name: "Add all" }).click(); await page.waitForTimeout(400);
+  ok(nRows > 1 && (await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.length)) === beforeAll + nRows, "Add all adds every food without a label in the group: " + nRows);
   // a database product opens the sheet titled by the button
   await page.getByLabel("Find a food").fill("skyr"); await page.waitForTimeout(900);
   await page.getByLabel("In the product database").getByRole("button", { name: /Add to my foods/ }).first().click(); await page.waitForTimeout(800);
@@ -59,7 +66,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   // nothing anywhere: says so, and names what Type keeps
   await page.getByRole("button", { name: "Close dialog" }).click().catch(() => {});
   await page.getByLabel("Find a food").fill("zzqx"); await page.waitForTimeout(900);
-  ok(/Not found/.test(await page.locator(".not-found").textContent()) && /Tap Add above; Type keeps "zzqx"/.test(await page.locator(".not-found").textContent()), "nothing anywhere says so, and names what Type keeps");
+  ok(/Nothing found for "zzqx"/.test(await page.locator(".end-add").textContent()) && /"zzqx" comes with you/.test(await page.locator(".end-add").textContent()), "nothing anywhere: the end card says so, in plain words");
   await page.getByLabel("Find a food").fill("tikvice"); await page.waitForTimeout(300);
   // add: Type carries the search, the sheet is titled Type under Add a food, and a food without a label is suggested
   await page.getByRole("button", { name: "Add a food", exact: true }).click(); await page.waitForTimeout(150); await page.locator(".add-strip").getByRole("button", { name: /^Type/ }).click(); await page.waitForTimeout(400);
@@ -71,7 +78,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   // digits: Type carries the number into its barcode field, and Look up asks the database from there
   await page.getByLabel("Find a food").fill("4311501670408"); await page.waitForTimeout(300);
   await page.waitForTimeout(700);
-  ok(/Type keeps the number/.test(await page.locator(".not-found").textContent().catch(() => "")), "digits found nowhere: Type keeps the number");
+  ok(/the number comes with you/.test(await page.locator(".end-add").textContent().catch(() => "")), "digits found nowhere: the number comes with you");
   await page.getByRole("button", { name: "Add a food", exact: true }).click(); await page.waitForTimeout(150); await page.locator(".add-strip").getByRole("button", { name: /^Type/ }).click(); await page.waitForTimeout(300);
   const sheetB = page.locator(".modal").last();
   ok((await sheetB.locator("h2").textContent()) === "Type" && (await sheetB.locator(".barcode-row input").inputValue()) === "4311501670408", "the Type sheet holds the number in its barcode field");

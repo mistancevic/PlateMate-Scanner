@@ -94,9 +94,6 @@ export function FoodsScreen(p: AppApi) {
         )}
         <input className="search" aria-label="Find a food" placeholder="A name, or a barcode you saved" value={query} onChange={(e) => setQuery(e.target.value)} />
       </section>
-      {nothing && q.length >= 2 && (
-        <p className="small muted not-found"><b>Not found</b> in your foods, the foods without a label or the product database. Tap Add above; Type keeps {isDigits ? "the number" : `"${q}"`}.</p>
-      )}
       {pairs.length > 0 && (
         <button className="strip strip-button" onClick={() => setDupOpen(true)}>{pairs.length} possible {pairs.length === 1 ? "duplicate" : "duplicates"} in your foods. Check and merge.</button>
       )}
@@ -148,13 +145,13 @@ export function FoodsScreen(p: AppApi) {
       </div>
       {noLabel.length > 0 && (
         <section className="outside" aria-label="Without a label">
-          <p className="label group-label">Without a label <small>reference values per 100 g</small></p>
+          <div className="group-head"><p className="label group-label">Without a label <small>per 100 g</small></p>{noLabel.length > 1 && <button className="pill pill-small" onClick={() => { noLabel.forEach((r) => p.saveFood(referenceFood(r, p.region, uid))); p.notify(`${noLabel.length} foods added to your foods.`); }}>Add all</button>}</div>
           {noLabel.map((r) => (
             <div className="row outside-row" key={r.id}>
               <span className="thumb">{iconFor(localName(r, p.region))}</span>
               <div className="row-text">
                 <b className="name-plain">{localName(r, p.region)}</b>
-                <small>{[r.en, r.sr, r.de].filter((x) => x !== localName(r, p.region)).slice(0, 2).join(" · ")} · {r.kcal} kcal · {r.protein} g protein{r.ready ? "" : " · needs cooking"}</small>
+                <small>{[...new Set([r.en, r.sr, r.de])].filter((x) => x !== localName(r, p.region)).slice(0, 2).join(" · ")} · {r.kcal} kcal · {r.protein} g protein{r.ready ? "" : " · needs cooking"}</small>
               </div>
               <button className="pill pill-small pill-primary" onClick={() => { p.saveFood(referenceFood(r, p.region, uid)); p.notify(`${localName(r, p.region)} is in your foods.`); }}>Add to my foods</button>
             </div>
@@ -174,6 +171,16 @@ export function FoodsScreen(p: AppApi) {
               <button className="pill pill-small pill-primary" onClick={() => p.addFromDatabase(x.code)}>Add to my foods</button>
             </div>
           ))}
+        </section>
+      )}
+      {q.length >= 2 && !db.busy && (
+        <section className="end-add" aria-label="Add it yourself">
+          <b>{nothing ? `Nothing found for "${q}".` : "Can't find what you want?"}</b>
+          <span>Add it yourself{isDigits ? ", the number comes with you." : `, "${q}" comes with you.`}</span>
+          <div className="ways">
+            <button className="pill pill-small" onClick={() => blank(isDigits ? "" : q, "", q, isDigits ? q : "")}><Pencil size={15} /> Type</button>
+            <button className="pill pill-small pill-primary" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> Scan</button>
+          </div>
         </section>
       )}
       {state.foods.length === 0 && (

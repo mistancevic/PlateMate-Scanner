@@ -610,6 +610,10 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .modal-titles { display: flex; flex-direction: column; gap: 2px; } .eyebrow-line { font-size: 11px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--brand-text); }
 .barcode-field { display: flex; flex-direction: column; gap: 6px; }
 .barcode-row { display: flex; gap: 8px; } .barcode-row input { flex: 1; height: 46px; border-radius: 14px; border: 1.5px solid var(--line); padding: 0 14px; font: inherit; font-size: 16px; }
+.group-head { display: flex; justify-content: space-between; align-items: center; } .group-head .pill { height: 32px; }
+.end-add { display: flex; flex-direction: column; gap: 6px; margin: 16px 0 8px; padding: 14px 16px; background: var(--tint); border: 1.5px solid var(--brand); border-radius: 18px; }
+.end-add b { font-size: 16px; font-weight: 900; color: var(--ink); } .end-add span { font-size: 13.5px; color: var(--brand-text); font-weight: 700; }
+.end-add .ways { display: flex; gap: 8px; margin: 4px 0 0; } .end-add .ways .pill { flex: 1; justify-content: center; height: 42px; }
 .group-label { margin: 12px 0 4px; } .group-label small { font-weight: 600; color: var(--muted); margin-left: 6px; }
 .outside-row { align-items: center; } .outside-row .row-text { min-width: 0; flex: 1; } .outside-row .row-text small { white-space: normal; overflow: visible; text-overflow: clip; display: block; } .outside-row .pill { padding: 0 12px; font-size: 13px; } .outside-row .row-text { min-width: 0; flex: 1; } .outside-row .row-text small { white-space: normal; overflow: visible; text-overflow: clip; display: block; } .outside-row .pill { flex: 0 0 auto; margin-left: 8px; padding: 0 12px; font-size: 13px; }
 .hidden-by-chip { margin: 0 2px 6px; color: var(--brand-text); font-weight: 700; }
