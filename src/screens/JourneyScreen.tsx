@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Camera, Plus, Trash2, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
+import { Camera, Pencil, Plus, Trash2, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown } from "lucide-react";
 import { ConfirmButton } from "../components/Confirm";
 import type { Mix } from "../mixtip";
 import { aggregate, density, uid, solveIngredient, servingLabel } from "../pilot";
@@ -215,7 +215,7 @@ export function JourneyScreen(p: AppApi) {
         )}
         <div className="ways">
           <button className="pill pill-small" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> Scan</button>
-          <button className="pill pill-small" onClick={() => blank()}><Plus size={15} /> Type it</button>
+          <button className="pill pill-small" onClick={() => blank()}><Pencil size={15} /> Type</button>
           {items.length > 0 && <ConfirmButton className="pill pill-small ways-empty" label={<><Trash2 size={15} /> Empty plate</>} confirmLabel="Tap again to empty" onConfirm={emptyPlate} />}
         </div>
         {items.length > 0 && (

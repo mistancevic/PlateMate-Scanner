@@ -103,10 +103,12 @@ const load = () => {
 };
 const inputValue = (x: number | null) => (x === null ? "" : String(x));
 function Modal({
+  eyebrow,
   title,
   close,
   children,
 }: {
+  eyebrow?: string;
   title: string;
   close: () => void;
   children: ReactNode;
@@ -117,10 +119,10 @@ function Modal({
         className="modal"
         role="dialog"
         aria-modal="true"
-        aria-label={title}
+        aria-label={eyebrow ? `${eyebrow}: ${title}` : title}
       >
         <header>
-          <h2>{title}</h2>
+          <div className="modal-titles">{eyebrow && <small className="eyebrow-line">{eyebrow}</small>}<h2>{title}</h2></div>
           <button className="icon" aria-label="Close dialog" onClick={close}>
             <X size={20} />
           </button>
@@ -223,6 +225,8 @@ function LabelCheck({
   day,
   allergies,
   region,
+  addTo,
+  fromSearch,
 }: {
   food: Food;
   image?: string;
@@ -238,6 +242,8 @@ function LabelCheck({
   day?: { kcal: number | null; eaten: number; name: string; type: DayType; weightKg: number | null };
   allergies?: string[];
   region?: string | null;
+  addTo?: "plate" | "foods";
+  fromSearch?: string;
 }) {
   const [mainIdx, setMainIdx] = useState(0);
   const [choice, setChoice] = useState<"update" | "both">("update");
@@ -271,7 +277,15 @@ function LabelCheck({
   const draft = (): Food => ({ ...food, name: name.trim() || food.name, brand: brand.trim(), readyToEat: true, serving: servingNow(), ...Object.fromEntries(KEYS.map((k) => [k, numberInput(values[k])])) } as Food);
   const pendingMix = useRef<Mix | null>(null);
   const [askError, setAskError] = useState("");
-  const [refOpen, setRefOpen] = useState(false);
+  // the title is the word the person tapped: Type, Barcode, Scan; the small line above says where the food goes
+  const kind = (() => {
+    const src = food.source || "";
+    const where = addTo === "plate" ? "Add to plate" : "Add a food";
+    if (/barcode|product database|open food facts/i.test(src)) return { eyebrow: where, title: "Barcode", line: "Check what the database says against the pack, then save." };
+    if (/photo|label/i.test(src)) return { eyebrow: where, title: "Scan", line: "Check what was read against the pack, then save." };
+    return { eyebrow: where, title: "Type", line: "Name the food, fill the values as on the pack, save." };
+  })();
+  const [refOpen, setRefOpen] = useState(() => Boolean(food.name) && /manual/i.test(food.source || ""));
   const [refPicked, setRefPicked] = useState<string | null>(null);
   // the mix tip shown on the review sheet is logged once per food
   const loggedTip = useRef<string | null>(null);
@@ -333,7 +347,8 @@ function LabelCheck({
     else finish(f);
   }
   return (
-    <Modal title="Check the label" close={close}>
+    <Modal title={kind.title} close={close} eyebrow={kind.eyebrow}>
+      <p className="small muted sheet-line">{kind.line}{fromSearch ? <> From your search: <b>{fromSearch}</b>.</> : null}</p>
       {images && images.length > 1 ? (
         <div className="label-previews" aria-label="Your photos of this product">
           {images.map((src, i) => (
@@ -627,6 +642,7 @@ export default function App() {
     [day, setDayState] = useState<Day>(getDay),
     [menuSection, setMenuSection] = useState<MenuSection | null>(null),
     [foodsView, setFoodsView] = useState<"foods" | "recipes">("foods"),
+    [editFrom, setEditFrom] = useState<string>(""),
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
     [talkOpen, setTalkOpen] = useState(false),
     [profileReady, setProfileReady] = useState(false),
@@ -883,9 +899,10 @@ export default function App() {
     setMessage(s);
     setError("");
   };
-  function blank(name = "", brand = "") {
+  function blank(name = "", brand = "", from = "") {
     setImage("");
     setImageSet([]);
+    setEditFrom(from);
     setEdit(candidateFood({ product_name: name, brand }, "Manual entry"));
   }
   function saveFood(f: Food) {
@@ -1314,7 +1331,7 @@ export default function App() {
       return { kcal, protein, fats, carbs: macroSplit(kcal, protein, fats).carbs };
     })(),
     openMenu: (s?: MenuSection, from?: MenuSection) => { setMenuFrom(from ?? null); setMenuSection(s ?? "list"); },
-    foodsView, setFoodsView, saveFood,
+    foodsView, setFoodsView, saveFood, setEditFrom,
     // a link that changes the tab leaves any open panel or chat behind, or it would land under them and look dead
     setTab: (t: Tab) => { setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab(t); },
     inbox,
@@ -1594,6 +1611,7 @@ export default function App() {
             processGroupScan={(x) => scan(x, true)}
             onBarcode={(x) => lookup(x)}
             onBarcodeWithPhotos={(c, x) => lookupWithPhotos(c, x)}
+            addTo={tab === "journey" ? "plate" : "foods"}
             onCancel={() => setCamera(false)}
             onOpenCart={() => {
               setCamera(false);
@@ -1611,7 +1629,7 @@ export default function App() {
           image={image}
           images={imageSet}
           library={state.foods}
-          close={() => { setEdit(null); setImageSet([]); }}
+          close={() => { setEdit(null); setImageSet([]); setEditFrom(""); }}
           save={saveFood}
           mixFor={screenProps.mixFor}
           onMix={screenProps.takeMix}
@@ -1620,6 +1638,8 @@ export default function App() {
           day={{ kcal: todayKcal, eaten: screenProps.eatenTodayKcal, name: screenProps.dayName, type: day.type, weightKg: personal.weightKg ?? null }}
           allergies={safety.allergies}
           region={region}
+          addTo={tab === "journey" ? "plate" : "foods"}
+          fromSearch={editFrom}
           momentName={momentOf(moment).name}
         />
       )}{" "}

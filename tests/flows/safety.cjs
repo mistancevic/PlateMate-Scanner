@@ -64,7 +64,7 @@ seed.items = [];
   ok(chips.every((c) => !/Skyr|Quark|yogurt|Cottage|Whey|Milk/i.test(c)), "no dairy partner for someone avoiding milk: " + (chips.length ? chips.join(" | ").slice(0, 60) : "no mix offered"));
   await page.locator(".sheet-backdrop").first().click({ position: { x: 5, y: 5 } }).catch(() => {}); await page.waitForTimeout(200);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: /^Type it$/ }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: /^Type$/ }).click(); await page.waitForTimeout(400);
   const sheet = page.locator(".modal").last();
   await sheet.locator("input").first().fill("Molke Drink");
   const names = await sheet.locator(".lt-row .lt-name").allTextContents();

@@ -11,7 +11,7 @@ seed.foods = [{ id: "fb", name: "Protein Flips Salt & Vinegar", brand: "ahead", 
   await page.addInitScript((s) => { if (!localStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); localStorage.setItem("seeded", "1"); } }, seed);
   await page.goto("http://127.0.0.1:3187/"); await page.waitForTimeout(800);
   await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: /^\+?\s*Add$/ }).first().click(); await page.waitForTimeout(400);
+  await page.locator(".add-strip").getByRole("button", { name: /^Type/ }).click(); await page.waitForTimeout(400);
   const fill = async (label, v) => { await page.getByLabel(label, { exact: false }).first().fill(v); };
   await fill("Product name", "PROTEIN FLIPS salt vinegar flavour"); await fill("Energy", "404"); await fill("Protein", "23"); await fill("Fat", "8.4"); await fill("Carbohydrate", "56");
   await page.waitForTimeout(300);

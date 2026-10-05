@@ -20,6 +20,7 @@ interface CameraViewProps {
   onModeChange: (mode: ScannerMode) => void;
   onCapture: (images: string[]) => void;
   onBarcodeWithPhotos: (code: string, images: string[]) => void;
+  addTo?: "plate" | "foods";
   processSingleLabelOCR?: (base64: string) => void;
   processGroupScan: (images: string[] | string) => void;
   onBarcode: (barcode: string) => void;
@@ -36,6 +37,7 @@ export function CameraView({
   onModeChange,
   onCapture,
   onBarcodeWithPhotos,
+  addTo,
   processSingleLabelOCR: propProcessSingleLabelOCR,
   processGroupScan,
   onBarcode,
@@ -253,6 +255,10 @@ export function CameraView({
     >
       {/* Header */}
       <div className="absolute top-0 inset-x-0 p-4 sm:p-6 z-30 flex justify-between items-center gap-2">
+        <div className="flex flex-col leading-tight shrink-0 mr-1" aria-label={`${addTo === "plate" ? "Add to plate" : "Add a food"}: Scan`}>
+          <span className="text-[10px] font-extrabold tracking-widest uppercase text-blue-200">{addTo === "plate" ? "Add to plate" : "Add a food"}</span>
+          <span className="text-base font-black text-white">Scan</span>
+        </div>
         <button
           onClick={onCancel}
           aria-label="Close camera"
