@@ -110,7 +110,7 @@ export function FoodsScreen(p: AppApi) {
           ))}
         </section>
       )}
-      <div className="chips">
+      <div className={`chips ${filter !== "all" ? "filtering" : ""}`}>
         {(["below", "close", "plan", "high", "top"] as const).map((k) => (
           <button key={k} className={`chip chip-${k} ${filter === k ? "on" : ""}`} aria-pressed={filter === k} onClick={() => setFilter(filter === k ? "all" : k)}>{BAND_LABEL[k]}</button>
         ))}
