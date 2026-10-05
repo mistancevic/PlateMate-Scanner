@@ -41,11 +41,9 @@ export const bandRange = (b: PdBand, t: number) => {
   return b === "below" ? `under ${f(t * 0.6)}` : b === "close" ? `${f(t * 0.6)} to ${f(t * 0.9)}` : b === "plan" ? `${f(t * 0.9)} to ${f(t * 1.5)}` : b === "high" ? `${f(t * 1.5)} to ${f(t * 2.5)}` : `${f(t * 2.5)} and up`;
 };
 
-// The line under the chips: what a band means for this target, and what it pairs with. One line, always there.
-export const BAND_LINE_IDLE = "Tap a chip to filter, and to see what it means for your target.";
+// The line under the chips: one line, the band's range for this target. Pairing is Mix it's job, not the chip's.
+export const BAND_LINE_IDLE = "Tap a chip to see its PD range.";
 export function bandHint(b: PdBand, t: number | null): string {
   if (!t) return BAND_LINE_IDLE;
-  const r = bandRange(b, t);
-  const what = { below: "Pair with a High+ food to reach your plan.", close: "Any High food lifts it.", plan: "Fine alone.", high: "Lifts a Low food.", top: "Lifts even a Low− food." }[b];
-  return `${BAND_LABEL[b]}: PD ${r} for your ${t.toFixed(1)}. ${what}`;
+  return `${BAND_LABEL[b]}: PD ${bandRange(b, t)} · your target ${t.toFixed(1)}`;
 }
