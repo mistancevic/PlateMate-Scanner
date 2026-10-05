@@ -32,3 +32,15 @@ test("a reference food becomes a library food in the local name, carbohydrate wi
   assert.equal(localName(r, "munich"), "Zucchini, roh");
   assert.equal(localName(r, null), "Courgette (zucchini), raw");
 });
+
+test("a reference food is a valid library food, and a stored state with one is readable", async () => {
+  const { isFood, parseState, freshState } = await import("./pilot");
+  const r = REFERENCE.find((x) => x.id === "courgette")!;
+  const f = referenceFood(r, "belgrade", () => "f1");
+  assert.equal(isFood(f), true, "basis, source, notes, reviewedAt, readyToEat all present");
+  const st = { ...freshState(), foods: [f] };
+  assert.equal(parseState(JSON.stringify(st)).foods.length, 1);
+  // the state a phone wrote with v0.1.34, the food without its basis: repaired on read, never unreadable
+  const broken = JSON.parse(JSON.stringify(st)); delete broken.foods[0].basis;
+  assert.equal(parseState(JSON.stringify(broken)).foods[0].basis, "100g");
+});

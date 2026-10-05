@@ -329,8 +329,20 @@ function isMeal(m: any): m is Meal {
     m.portion <= aggregate(m.items).weight
   );
 }
+// Known gaps from older builds are filled before the state is judged. A food without a basis was written by v0.1.34
+// (the reference table); it is per 100 g by construction. One missing field must never make a person's whole record unreadable.
+export function repairState(v: any): any {
+  if (!v || typeof v !== "object") return v;
+  const fixFood = (f: any) => { if (f && typeof f === "object" && f.basis === undefined) f.basis = "100g"; if (f && typeof f.source !== "string") f.source = f?.source ?? "Manual entry"; return f; };
+  const fixItems = (items: any) => { if (Array.isArray(items)) for (const i of items) if (i && i.food) fixFood(i.food); };
+  if (Array.isArray(v.foods)) v.foods.forEach(fixFood);
+  fixItems(v.items);
+  if (Array.isArray(v.meals)) for (const m of v.meals) fixItems(m?.items);
+  if (Array.isArray(v.feedback)) for (const f of v.feedback) fixItems(f?.meal?.items);
+  return v;
+}
 export function parseState(raw: string): PilotState {
-  const v = JSON.parse(raw);
+  const v = repairState(JSON.parse(raw));
   if (
     v?.version !== 1 ||
     !v.goals ||
