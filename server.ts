@@ -913,6 +913,9 @@ async function start() {
         else if (file.includes(`${path.sep}assets${path.sep}`)) res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
       },
     }));
+    // a versioned file this server does not have (a page from the next release asking during a deploy) is a plain 404,
+    // never the page itself, which the browser cannot run as code and which left a blank screen
+    app.get("/assets/*", (_req, res) => { res.setHeader("Cache-Control", "no-store"); res.status(404).type("text/plain").send("Not found"); });
     app.get("*", (_req, res) => { res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); res.sendFile(path.join(dist, "index.html")); });
   }
   app.listen(Number(process.env.PORT) || 3000, "0.0.0.0", () =>

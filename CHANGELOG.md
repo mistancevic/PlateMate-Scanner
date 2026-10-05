@@ -4,6 +4,7 @@ One version per release since 2 October 2026. The number is in Menu, About, next
 
 ## 0.1.x, the pilot builds
 
+- **v0.1.52** · 2026-10-05 · no blank screen during a deploy: a code file the server does not have is a 404, never the page sent again; and if the app's code does not start, the page says "Chef Mealan is updating", reloads once by itself, then offers a Reload button. Fonts from outside do not count.
 - **v0.1.51** · 2026-10-05 · one tap never removes a photo: close is a button top right and a tap on the photo; Remove sits top left, the first tap arms it ("Tap again to remove", red, three seconds), the second hides the photo with "Photo removed. Undo" for eight seconds; only then, or when the card closes, is it removed for real.
 - **v0.1.50** · 2026-10-05 · the logo opens Today, closing any open panel or chat on the way.
 - **v0.1.49** · 2026-10-05 · never a white screen: if the app fails to draw, it says so, shows the version and the error, and offers Try again, Save this phone's copy as a file, and Open from the account copy (the phone's copy set aside, not deleted).

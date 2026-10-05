@@ -23,6 +23,30 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // If the app's code does not start (a deploy in progress, a file that did not load), say so instead of a blank page.
+      // One automatic reload first; after that a button. Plain HTML, no app code needed.
+      (function () {
+        var shown = false;
+        function fallback(reason) {
+          var root = document.getElementById("root");
+          if (shown || !root || root.childElementCount) return;
+          var tried = sessionStorage.getItem("cm-reloaded");
+          if (!tried) { sessionStorage.setItem("cm-reloaded", "1"); setTimeout(function () { location.reload(); }, 1500); }
+          shown = true;
+          root.innerHTML = '<div style="padding:32px 24px;font-family:Nunito,system-ui,sans-serif;color:#172742">' +
+            '<h2 style="margin:0 0 8px">Chef Mealan is updating</h2>' +
+            '<p style="margin:0 0 16px;color:#5b6b8a">' + (tried ? "It did not start. Your data is safe on this phone and in your account." : "One moment, reloading.") + '</p>' +
+            '<button onclick="sessionStorage.removeItem(\'cm-reloaded\');location.reload()" style="height:46px;padding:0 22px;border-radius:23px;border:0;background:#2e7be8;color:#fff;font:inherit;font-weight:800;font-size:15px">Reload</button>' +
+            '<p style="margin:16px 0 0;font-size:12px;color:#8a98b3">' + reason + '</p></div>';
+        }
+        // only the app's own files count; a font from Google that does not load is not a reason to stop
+        window.addEventListener("error", function (e) { var t = e.target, u = t && (t.src || t.href); if (u && (t.tagName === "SCRIPT" || t.tagName === "LINK") && u.indexOf(location.origin + "/assets/") === 0) fallback("A file did not load: " + u.replace(location.origin, "")); }, true);
+        window.addEventListener("vite:preloadError", function () { fallback("A file did not load."); });
+        setTimeout(function () { fallback("The app did not start in time."); }, 8000);
+        window.addEventListener("load", function () { setTimeout(function () { var r = document.getElementById("root"); if (r && r.childElementCount) sessionStorage.removeItem("cm-reloaded"); }, 3000); });
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
