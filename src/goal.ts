@@ -25,6 +25,18 @@ export const clearGoal = () => { try { localStorage.removeItem(KEY); } catch {} 
 export const bandOf = (id?: string) => BANDS.find((b) => b.id === id);
 // The middle of the band's range as the working numbers; exact numbers can be set on Me later.
 export const goalsForBand = (b: Band) => { const calories = mid(b.kcal), protein = mid(b.protein); return { calories, protein, ...macroSplit(calories, protein) }; };
-// How a food's PD sits against the target: fits, close, or below.
-export const fit = (pd: number | null, target: number | null): "high" | "mid" | "low" =>
-  pd === null || target === null ? "mid" : pd >= target ? "high" : pd >= target - 2 ? "mid" : "low";
+// How a food's PD sits against the target, five bands, every edge a multiple of the target so they move with the goal:
+// below under 0.6 T, close 0.6 to 0.9 T, on plan 0.9 to 1.5 T, high 1.5 to 2.5 T, high+ from 2.5 T. A bit under counts as on plan.
+export type PdBand = "below" | "close" | "plan" | "high" | "top";
+export const BAND_EDGES = { close: 0.6, plan: 0.9, high: 1.5, top: 2.5 } as const;
+export const BAND_LABEL: Record<PdBand, string> = { below: "Below", close: "Close", plan: "On plan", high: "High", top: "High+" };
+export const fit = (pd: number | null, target: number | null): PdBand => {
+  if (pd === null || target === null || target <= 0) return "plan";
+  const r = pd / target;
+  return r < BAND_EDGES.close ? "below" : r < BAND_EDGES.plan ? "close" : r < BAND_EDGES.high ? "plan" : r < BAND_EDGES.top ? "high" : "top";
+};
+// the range a band covers for a target, for the chip's title
+export const bandRange = (b: PdBand, t: number) => {
+  const f = (x: number) => (Math.round(x * 10) / 10).toFixed(1);
+  return b === "below" ? `under ${f(t * 0.6)}` : b === "close" ? `${f(t * 0.6)} to ${f(t * 0.9)}` : b === "plan" ? `${f(t * 0.9)} to ${f(t * 1.5)}` : b === "high" ? `${f(t * 1.5)} to ${f(t * 2.5)}` : `${f(t * 2.5)} and up`;
+};

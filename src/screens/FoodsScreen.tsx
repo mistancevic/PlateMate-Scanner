@@ -1,6 +1,7 @@
 import { Camera, X, Pencil } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
 import { findReference, referenceFood, localName } from "../reference";
+import { BAND_LABEL, bandRange } from "../goal";
 
 import { duplicatePairs } from "../dedupe";
 import { jobOf } from "../foodjob";
@@ -25,7 +26,6 @@ export function FoodsScreen(p: AppApi) {
   const { state, setState, blank, setCamera, setMode, barcode, setBarcode, lookup,
     pending, setPending, query, setQuery, add, setImage, setEdit, api,
     setBusy, setError, notify, setFilter, filter, coach, pdRef } = p;
-  const inMeal = new Set(state.items.map((i) => i.food.id));
   const [cardId, setCardId] = useState<string | null>(null);
   const isDigits = /^\d{8,14}$/.test(query.trim());
   // a barcode that's already in the library opens its card here
@@ -36,7 +36,6 @@ export function FoodsScreen(p: AppApi) {
   const pairs = duplicatePairs(state.foods).filter(([a, b]) => !notSame.includes(pairKey(a.id, b.id)));
   const cardFood = state.foods.find((x) => x.id === cardId);
   const foods = state.foods.map((f) => ({ f, pd: density(f.protein, f.calories) })).map((x) => ({ ...x, b: p.fitPd(x.pd) }));
-  const counts = { high: foods.filter((x) => x.b === "high").length, mid: foods.filter((x) => x.b === "mid").length, low: foods.filter((x) => x.b === "low").length };
   // What the box lists, by what was typed: one or two letters match the start of a word, three or more any part of the name,
   // eight to fourteen digits a saved barcode. Your foods first; then foods without a label (two letters on); then the product
   // database (three letters on, or a barcode not in your foods).
@@ -49,7 +48,7 @@ export function FoodsScreen(p: AppApi) {
     const hay = fold(`${f.name} ${f.brand}`);
     return q.length < 3 ? hay.split(/[\s,()/-]+/).some((w) => w.startsWith(qf)) : hay.includes(qf);
   };
-  const shown = foods.filter(({ f, b }) => nameHit(f) && (filter === "all" || (filter === "inmeal" ? inMeal.has(f.id) : b === filter)));
+  const shown = foods.filter(({ f, b }) => nameHit(f) && (filter === "all" || b === filter));
   const have = new Set(state.foods.map((f) => f.name.trim().toLowerCase()));
   const noLabel = !isCode && q.length >= 2 ? findReference(q, 6, q.length < 3).filter((r) => !have.has(localName(r, p.region).toLowerCase())) : [];
   const [db, setDb] = useState<{ q: string; products: DbProduct[]; busy: boolean }>({ q: "", products: [], busy: false });
@@ -108,8 +107,8 @@ export function FoodsScreen(p: AppApi) {
         </section>
       )}
       <div className="chips">
-        {([["high", "Fits my goal"], ["mid", "Close"], ["low", "Below"], ["inmeal", "In meal"]] as const).map(([k, l]) => (
-          <button key={k} className={`chip chip-${k} ${filter === k ? "on" : ""}`} onClick={() => setFilter(filter === k ? "all" : k)}>{l}</button>
+        {(["below", "close", "plan", "high", "top"] as const).map((k) => (
+          <button key={k} title={p.pdRef ? `PD ${bandRange(k, p.pdRef)}` : undefined} className={`chip chip-${k} ${filter === k ? "on" : ""}`} onClick={() => setFilter(filter === k ? "all" : k)}>{BAND_LABEL[k]}</button>
         ))}
       </div>
       {q.length >= 1 && shown.length > 0 && (noLabel.length > 0 || dbRows.length > 0) && <p className="label group-label">In your foods</p>}

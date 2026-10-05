@@ -633,7 +633,7 @@ export default function App() {
       const h = (typeof location !== "undefined" ? location.hash : "").replace("#", "");
       return (["home", "journey", "meal", "chef", "foods", "me"] as Tab[]).includes(h as Tab) ? (h as Tab) : "home";
     }),
-    [filter, setFilter] = useState<"all" | "high" | "mid" | "low" | "inmeal">("all"),
+    [filter, setFilter] = useState<"all" | import("./goal").PdBand>("all"),
     [coach, setCoachState] = useState<boolean>(isCoach),
     [step, setStep] = useState<Step>("in"),
     [clientName, setClientNameState] = useState<string>(getClientName),

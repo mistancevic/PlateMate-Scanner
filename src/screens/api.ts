@@ -129,13 +129,13 @@ export interface AppApi {
   addStarter: () => void;
   importAirtable: () => Promise<void>;
   resetGoal: () => void;
-  fitPd: (pd: number | null) => "high" | "mid" | "low";
+  fitPd: (pd: number | null) => import("../goal").PdBand;
   clientName: string;
   setClientName: (v: string) => void;
   coach: boolean;
   setCoach: (v: boolean) => void;
-  filter: "all" | "high" | "mid" | "low" | "inmeal";
-  setFilter: (f: "all" | "high" | "mid" | "low" | "inmeal") => void;
+  filter: "all" | import("../goal").PdBand;
+  setFilter: (f: "all" | import("../goal").PdBand) => void;
 }
 
 export type DbProduct = { code: string; name: string; brand: string; quantity: string; kcal: number | null; protein: number | null };

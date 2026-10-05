@@ -13,6 +13,8 @@
   --high: #35cf9e;
   --mid: #f6b94a;
   --low: #f0705c;
+  --plan: #2e7be8;
+  --top: #13916a;
   --font: "Nunito", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --r-panel: 22px;
   --r-card: 20px;
@@ -137,15 +139,17 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .scan-modes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 4px 0 12px; }
 .scan-modes input { width: auto; flex: 1; min-width: 150px; padding: 9px 12px; font-size: 13px; }
 .search { margin: 4px 0 12px; font-size: 15px; }
-.chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
-.chip { height: 34px; padding: 0 14px; border-radius: 17px; font-size: 13px; font-weight: 700; color: #fff; border: 1.5px solid transparent; opacity: 0.55; }
+.chips { display: flex; gap: 6px; flex-wrap: nowrap; overflow-x: auto; margin-bottom: 6px; scrollbar-width: none; } .chips::-webkit-scrollbar { display: none; }
+.chip { flex: 1 1 auto; height: 34px; padding: 0 9px; white-space: nowrap; border-radius: 17px; font-size: 13px; font-weight: 700; color: #fff; border: 1.5px solid transparent; opacity: 0.55; }
 .chip.on, .chip:hover { opacity: 1; }
-.chip-high { background: var(--high); } .chip-mid { background: var(--mid); } .chip-low { background: var(--low); }
+.chip-below { background: var(--low); } .chip-close { background: var(--mid); } .chip-plan { background: var(--plan); } .chip-high { background: var(--high); } .chip-top { background: var(--top); }
+.chip-high, .chip-mid, .chip-low { } .chip-mid { background: var(--mid); } .chip-low { background: var(--low); }
 .chip-inmeal { background: var(--surface); color: var(--brand-text); border-color: var(--line); opacity: 1; }
 .chip-inmeal.on { border-color: var(--brand); background: var(--tint); }
 .pdpill { display: inline-flex; align-items: baseline; gap: 3px; height: 36px; padding: 0 12px; border-radius: 18px; color: #fff; font-size: 17px; font-weight: 900; line-height: 36px; font-variant-numeric: tabular-nums; }
 .pdpill small { color: #fff; opacity: 0.9; font-size: 11px; font-weight: 700; }
 .pdpill-high { background: var(--high); } .pdpill-mid { background: var(--mid); } .pdpill-low { background: var(--low); }
+.pdpill-below { background: var(--low); } .pdpill-close { background: var(--mid); } .pdpill-plan { background: var(--plan); } .pdpill-top { background: var(--top); }
 .portion { margin: 6px 0 4px; }
 .pending { margin-bottom: 8px; }
 .more { border-top: 1px solid var(--line); margin-top: 10px; padding-top: 10px; }
@@ -323,6 +327,7 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .typed-barcode button:disabled { opacity: 0.4; }
 
 .readout-fit-high { background: var(--high); } .readout-fit-mid { background: var(--mid); } .readout-fit-low { background: var(--low); }
+.readout-fit-below { background: var(--low); } .readout-fit-close { background: var(--mid); } .readout-fit-plan { background: var(--plan); } .readout-fit-top { background: var(--top); }
 .readout-note { margin: 12px 0 0; font-size: 13px; font-weight: 700; line-height: 1.4; color: #fff; }
 
 .how { display: flex; flex-direction: column; gap: 10px; margin: 4px 0 14px; }

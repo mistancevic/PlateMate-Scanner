@@ -9,7 +9,7 @@ import { JOBS, jobOf, plainLine, todayLine } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { iconFor } from "../icons";
 
-export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto, removePhoto, toggleFavorite, insight, mix }: { food: Food; target: number | null; fit: "high" | "mid" | "low"; close: () => void; review?: () => void; dontHave?: () => void; mix?: { tip: MixTip; momentName: string; take: (m: Mix) => void; ask: () => void }; addPhoto?: (dataUrl: string) => void; removePhoto?: (index: number) => void; toggleFavorite?: () => void; insight?: { dayKcal: number | null; eaten: number; dayName: string; goalKey: string; requestTip: () => Promise<void>; setJob: (job: string | null) => void } }) {
+export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto, removePhoto, toggleFavorite, insight, mix }: { food: Food; target: number | null; fit: import("../goal").PdBand; close: () => void; review?: () => void; dontHave?: () => void; mix?: { tip: MixTip; momentName: string; take: (m: Mix) => void; ask: () => void }; addPhoto?: (dataUrl: string) => void; removePhoto?: (index: number) => void; toggleFavorite?: () => void; insight?: { dayKcal: number | null; eaten: number; dayName: string; goalKey: string; requestTip: () => Promise<void>; setJob: (job: string | null) => void } }) {
   const job = jobOf(food);
   const [picking, setPicking] = useState(false);
   const [tipState, setTipState] = useState<"idle" | "busy" | "failed">("idle");
@@ -32,7 +32,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
   const gallery = food.photos?.length ? food.photos : food.photo ? [food.photo] : [];
   const pd = density(food.protein, food.calories);
   const share = pd === null ? null : Math.round(pd * 4);
-  const fitText = fit === "high" ? "fits your goal" : fit === "mid" ? "close to your goal" : "below your goal";
+  const fitText = fit === "top" ? "high+ protein for your goal" : fit === "high" ? "high protein for your goal" : fit === "plan" ? "on plan" : fit === "close" ? "close to your goal" : "below your goal";
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
