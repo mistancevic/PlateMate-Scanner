@@ -626,7 +626,7 @@ export default function App() {
     [deleteSteps, setDeleteSteps] = useState(""),
     [day, setDayState] = useState<Day>(getDay),
     [menuSection, setMenuSection] = useState<MenuSection | null>(null),
-    [foodsView, setFoodsView] = useState<"foods" | "recipes">("foods"),
+    [foodsView, setFoodsView] = useState<"foods" | "recipes" | "basics">("foods"),
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
     [talkOpen, setTalkOpen] = useState(false),
     [profileReady, setProfileReady] = useState(false),

@@ -1,6 +1,6 @@
 import { Camera, Plus, X, ScanBarcode } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
-import { findReference, referenceFood, localName } from "../reference";
+import { findReference, referenceFood, localName, REFERENCE, GROUPS, groupOf, type RefFood } from "../reference";
 import { duplicatePairs } from "../dedupe";
 import { jobOf } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
@@ -42,8 +42,10 @@ export function FoodsScreen(p: AppApi) {
       <div className="segments" role="tablist" aria-label="Foods">
         <button role="tab" aria-selected={p.foodsView === "foods"} className={`seg ${p.foodsView === "foods" ? "on" : ""}`} onClick={() => p.setFoodsView("foods")}>My foods</button>
         <button role="tab" aria-selected={p.foodsView === "recipes"} className={`seg ${p.foodsView === "recipes" ? "on" : ""}`} onClick={() => p.setFoodsView("recipes")}>My recipes{state.meals.length ? ` (${state.meals.length})` : ""}</button>
+        <button role="tab" aria-selected={p.foodsView === "basics"} className={`seg ${p.foodsView === "basics" ? "on" : ""}`} onClick={() => p.setFoodsView("basics")}>Basic foods</button>
       </div>
       {p.foodsView === "recipes" && <RecipesScreen {...p} />}
+      {p.foodsView === "basics" && <BasicFoods p={p} />}
       {p.foodsView === "foods" && <>
       <section className="band">
         <div>
@@ -169,6 +171,40 @@ function DuplicatesSheet({ pairs, close, merge, notSame }: { pairs: [any, any][]
           );
         })}
       </div>
+    </div>
+  );
+}
+
+
+// Basic foods: the reference table, grouped, in the local name, one tap to add. Vegetables, fruit, eggs, meat and fish
+// carry no label and no barcode; this is where they come from. What is already in the library is marked.
+function BasicFoods({ p }: { p: AppApi }) {
+  const [q, setQ] = useState("");
+  const have = new Set(p.state.foods.map((f) => f.name.trim().toLowerCase()));
+  const name = (r: RefFood) => localName(r, p.region);
+  const shown = q.trim().length >= 2 ? findReference(q, 40) : REFERENCE;
+  return (
+    <div className="basics">
+      <p className="small muted">{REFERENCE.length} basic foods with no label to scan, values per 100 g from a reference table, the source on each. Named for where you shop. One tap puts one in your foods.</p>
+      <input className="search" aria-label="Search basic foods" placeholder="tikvice, egg, Apfel" value={q} onChange={(e) => setQ(e.target.value)} />
+      {GROUPS.map((g) => {
+        const rows = shown.filter((r) => groupOf(r.id) === g);
+        if (!rows.length) return null;
+        return (
+          <section key={g} className="basics-group">
+            <p className="label">{g}</p>
+            {rows.map((r) => {
+              const inLib = have.has(name(r).toLowerCase());
+              return (
+                <div key={r.id} className="basics-row">
+                  <div><b>{name(r)}</b><small>{[r.en, r.sr, r.de].filter((x) => x !== name(r)).slice(0, 2).join(" · ")} · {r.kcal} kcal · {r.protein} g protein · {r.fats} g fat · {Math.max(0, Math.round((r.carbsTotal - r.fiber) * 10) / 10)} g carbs{r.ready ? "" : " · needs cooking"}</small></div>
+                  {inLib ? <span className="pill pill-small taken">In your foods</span> : <button className="pill pill-small pill-primary" onClick={() => { p.saveFood(referenceFood(r, p.region, uid)); p.notify(`${name(r)} added.`); }}>Add</button>}
+                </div>
+              );
+            })}
+          </section>
+        );
+      })}
     </div>
   );
 }

@@ -146,6 +146,14 @@ const R: [string, string, string, string, string, number, number, number, number
   ["ajvar", "Ajvar", "Ajvar", "Ajvar", "Ајвар", 80, 1.5, 5.0, 8.0, 2.0, true, T],
   ["tomato-passata", "Tomato passata", "Passierte Tomaten", "Pasirani paradajz", "Пасирани парадајз", 38, 1.6, 0.2, 7.0, 1.5, true, T],
 ];
+// the groups, by the first id of each: the table is written in this order
+const GROUP_STARTS: [string, string][] = [["courgette", "Vegetables"], ["apple", "Fruit"], ["egg", "Eggs, meat and fish"], ["milk-whole", "Dairy"], ["rice-white-cooked", "Grains, bread and legumes"], ["almonds", "Nuts, seeds and oils"], ["sugar", "Basics"]];
+export function groupOf(id: string): string {
+  let g = GROUP_STARTS[0][1];
+  for (const r of R) { const hit = GROUP_STARTS.find((x) => x[0] === r[0]); if (hit) g = hit[1]; if (r[0] === id) return g; }
+  return g;
+}
+export const GROUPS = GROUP_STARTS.map((x) => x[1]);
 export const REFERENCE: RefFood[] = R.map(([id, en, de, sr, cyr, kcal, protein, fats, carbsTotal, fiber, ready, source]) => ({ id, en, de, sr, cyr, kcal, protein, fats, carbsTotal, fiber, ready, source: source ?? U }));
 
 const fold = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/ć/g, "c").replace(/č/g, "c").replace(/š/g, "s").replace(/ž/g, "z");

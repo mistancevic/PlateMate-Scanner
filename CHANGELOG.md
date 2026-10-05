@@ -4,6 +4,7 @@ One version per release since 2 October 2026. The number is in Menu, About, next
 
 ## 0.1.x, the pilot builds
 
+- **v0.1.35** · 2026-10-05 · Basic foods: the reference table as the third part of Foods, grouped (vegetables, fruit, eggs meat and fish, dairy, grains bread and legumes, nuts seeds and oils, basics), searchable, local names, one tap to add, what is already in the library marked.
 - **v0.1.34** · 2026-10-05 · the reference table: 125 basic foods with no label or barcode (vegetables, fruit, eggs, meat, fish, dairy, grains, legumes, nuts, oils, basics), values per 100 g from USDA FoodData Central, names in English, German and Serbian in both scripts; "tikvice" finds the courgette from the Foods search (one tap to add) and from the name field on the label check (values fill in); the local name follows where the person shops; a link inside a panel that changes the tab now closes the panel first.
 - **v0.1.33** · 2026-10-05 · tabs sorted: four places, every screen under one. Me holds the person (Profile with the door, Goal, My days, Where I shop, My coach, Account, shared cards); Foods holds my foods and my recipes as two parts; Plate keeps its steps; Today keeps the day. The hamburger is housekeeping only: Support, About, Evals for coaches, the legal pages, sign out. More and its leftovers removed; nothing lights a tab it is not under.
 - **v0.1.32** · 2026-10-05 · Saved recipes reachable: a row at the top of Settings for everyone, and a button on Today once there is one; before, only the coach tools linked to it.
