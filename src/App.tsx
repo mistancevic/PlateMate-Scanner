@@ -87,6 +87,10 @@ import {
 const STORE = "platemate-pilot-v1";
 
 let unreadableBackup: string | null = null;
+// when the phone's copy last changed by a person's hand, and which foods left the library (merged away, removed)
+const STATE_AT = "chefmealan-state-at", GONE = "chefmealan-gone-foods";
+const getGone = (): string[] => { try { const v = JSON.parse(localStorage.getItem(GONE) || "[]"); return Array.isArray(v) ? v : []; } catch { return []; } };
+const setGone = (ids: string[]) => { try { localStorage.setItem(GONE, JSON.stringify([...new Set(ids)].slice(-500))); } catch {} };
 const load = () => {
   try {
     const raw = localStorage.getItem(STORE);
@@ -704,7 +708,9 @@ export default function App() {
       airtable: boolean;
     } | null>(null);
   const importRef = useRef<HTMLInputElement>(null),
-    runRef = useRef(0);
+    runRef = useRef(0),
+    fromCloud = useRef(false),
+    prevFoodIds = useRef<string[]>(state.foods.map((f) => f.id));
   useEffect(() => {
     if (!message && !error) return;
     const t = setTimeout(() => { setMessage(""); setError(""); }, 4000);
@@ -719,6 +725,17 @@ export default function App() {
         return;
       }
       localStorage.setItem(STORE, JSON.stringify(state));
+      // a change made here, not one that came down from the account: stamp it, and remember any food that left the library
+      // (merged away or removed), so an older copy can never bring it back
+      if (fromCloud.current) { fromCloud.current = false; }
+      else {
+        // only a change made after the account was read counts as newer; start-up effects on a stale phone must never win
+        if (cloudLoaded.current) localStorage.setItem(STATE_AT, new Date().toISOString());
+        const now = new Set(state.foods.map((f) => f.id));
+        const left = prevFoodIds.current.filter((id) => !now.has(id));
+        if (left.length) setGone([...getGone(), ...left]);
+      }
+      prevFoodIds.current = state.foods.map((f) => f.id);
     } catch {
       setError(
         "This browser could not save your changes. Export a backup before leaving.",
@@ -736,10 +753,22 @@ export default function App() {
         const remote = await loadCloud(user.uid);
         if (remote) setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
         if (remote && Array.isArray(remote.goalLog)) { const merged = [...new Map([...(remote.goalLog as GoalEntry[]), ...getGoalLog()].map((e) => [e.at, e])).values()].sort((x, y) => (x.at > y.at ? 1 : -1)); setGoalLog(merged); setGoalLogState(merged); }
-        if (remote && !(isEmptyState(remote.state) && !isEmptyState(state))) {
+        // foods that left the library on any device stay gone
+        const gone = new Set([...getGone(), ...(Array.isArray(remote?.goneFoods) ? (remote!.goneFoods as string[]) : [])]);
+        setGone([...gone]);
+        // the newer copy wins: a change made on this phone after the account's last save is kept and sent up, not overwritten
+        const localAt = localStorage.getItem(STATE_AT) ?? "";
+        const phoneIsNewer = Boolean(remote) && !isEmptyState(state) && localAt > String(remote!.updatedAt ?? "");
+        if (phoneIsNewer) {
+          const kept = { ...state, foods: state.foods.filter((f) => !gone.has(f.id)) };
+          if (kept.foods.length !== state.foods.length) setState(kept);
+          await saveCloud(user.uid, { state: stripPhotos(kept), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], updatedAt: new Date().toISOString() });
+          setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() });
+        } else if (remote && !(isEmptyState(remote.state) && !isEmptyState(state))) {
           // a real account copy replaces the phone; photos are merged back from the phone by id
           try {
             const incoming = parseState(JSON.stringify(remote.state));
+            incoming.foods = incoming.foods.filter((f) => !gone.has(f.id));
             const localPhoto = new Map(state.foods.map((f) => [f.id, f.photo]));
             const localFb = new Map(state.feedback.map((f) => [f.id, f.photo]));
             let cloudPhotos = new Map<string, string>();
@@ -755,6 +784,7 @@ export default function App() {
               return { ...f, photo: f.photo ?? localPhoto.get(f.id) ?? cloudPhotos.get(`food:${f.id}`), photos: f.photos ?? localMore.get(f.id) ?? (more.length ? more : undefined) };
             });
             incoming.feedback = [...byId.values()].sort((x, y) => (y.createdAt > x.createdAt ? 1 : -1)).map((f) => ({ ...f, photo: f.photo ?? localFb.get(f.id) ?? cloudPhotos.get(`fb:${f.id}`) }));
+            fromCloud.current = true;
             setState(incoming);
           } catch { /* keep local if the cloud copy is unreadable */ }
           if (remote.goal) { try { localStorage.setItem("chefmealan-goal", JSON.stringify(remote.goal)); } catch {} setGoalState(getGoal()); setGoalOpen(!remote.goal); }
@@ -771,7 +801,7 @@ export default function App() {
           }
           setCloudStatus({ ok: true, text: "Loaded from your account", at: new Date().toISOString() });
         } else {
-          await saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), updatedAt: new Date().toISOString() });
+          await saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), updatedAt: new Date().toISOString() });
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
         }
       } catch (e: any) {
@@ -871,7 +901,7 @@ export default function App() {
   useEffect(() => {
     if (!user || !cloudLoaded.current) return;
     const t = setTimeout(() => {
-      saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), updatedAt: new Date().toISOString() })
+      saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), updatedAt: new Date().toISOString() })
         .then(async () => {
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
           try { if (state.feedback.length) await saveCards(user.uid, state.feedback); } catch (e) { setCloudStatus({ ok: true, text: `Saved. Cards: ${explainCloudError(e)}`, at: new Date().toISOString() }); }
