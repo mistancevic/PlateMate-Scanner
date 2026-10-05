@@ -4,6 +4,7 @@ One version per release since 2 October 2026. The number is in Menu, About, next
 
 ## 0.1.x, the pilot builds
 
+- **v0.1.49** · 2026-10-05 · never a white screen: if the app fails to draw, it says so, shows the version and the error, and offers Try again, Save this phone's copy as a file, and Open from the account copy (the phone's copy set aside, not deleted).
 - **v0.1.48** · 2026-10-05 · the end of a search: a card in plain words, "Can't find what you want? Add it yourself, \"kupus\" comes with you." with Type and Scan, or "Nothing found for ..." when nothing was; Add all on the Without a label group; a name is not repeated on a row.
 - **v0.1.47** · 2026-10-05 · merged or removed foods stay gone: every food that leaves the library is remembered on the phone and in the account and filtered out of any copy that still has it; on opening, the newer copy wins, so a change made on this phone after the account's last save is kept and sent up instead of being overwritten.
 - **v0.1.46** · 2026-10-05 · Add moves to the top right of Find a food; tapping it opens Type and Scan under the header, the Find box stays as it was; the tinted Add strip is gone. A selected chip has a white ring and a ring in its own colour, with room so it is never cut.
