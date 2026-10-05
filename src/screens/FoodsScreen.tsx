@@ -1,7 +1,7 @@
 import { Camera, X, Pencil } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
 import { findReference, referenceFood, localName } from "../reference";
-import { BAND_LABEL, bandRange } from "../goal";
+import { BAND_LABEL, BAND_LINE_IDLE, bandHint } from "../goal";
 
 import { duplicatePairs } from "../dedupe";
 import { jobOf } from "../foodjob";
@@ -108,9 +108,10 @@ export function FoodsScreen(p: AppApi) {
       )}
       <div className="chips">
         {(["below", "close", "plan", "high", "top"] as const).map((k) => (
-          <button key={k} title={p.pdRef ? `PD ${bandRange(k, p.pdRef)}` : undefined} className={`chip chip-${k} ${filter === k ? "on" : ""}`} onClick={() => setFilter(filter === k ? "all" : k)}>{BAND_LABEL[k]}</button>
+          <button key={k} className={`chip chip-${k} ${filter === k ? "on" : ""}`} aria-pressed={filter === k} onClick={() => setFilter(filter === k ? "all" : k)}>{BAND_LABEL[k]}</button>
         ))}
       </div>
+      <p className="band-line" aria-live="polite">{filter === "all" ? BAND_LINE_IDLE : bandHint(filter, p.pdRef)}</p>
       {q.length >= 1 && shown.length > 0 && (noLabel.length > 0 || dbRows.length > 0) && <p className="label group-label">In your foods</p>}
       <div className="rows">
         {shown.map(({ f, pd, b }) => (

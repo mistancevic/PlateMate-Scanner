@@ -29,7 +29,7 @@ export const goalsForBand = (b: Band) => { const calories = mid(b.kcal), protein
 // below under 0.6 T, close 0.6 to 0.9 T, on plan 0.9 to 1.5 T, high 1.5 to 2.5 T, high+ from 2.5 T. A bit under counts as on plan.
 export type PdBand = "below" | "close" | "plan" | "high" | "top";
 export const BAND_EDGES = { close: 0.6, plan: 0.9, high: 1.5, top: 2.5 } as const;
-export const BAND_LABEL: Record<PdBand, string> = { below: "Below", close: "Close", plan: "On plan", high: "High", top: "High+" };
+export const BAND_LABEL: Record<PdBand, string> = { below: "Low−", close: "Low", plan: "On plan", high: "High", top: "High+" };
 export const fit = (pd: number | null, target: number | null): PdBand => {
   if (pd === null || target === null || target <= 0) return "plan";
   const r = pd / target;
@@ -40,3 +40,12 @@ export const bandRange = (b: PdBand, t: number) => {
   const f = (x: number) => (Math.round(x * 10) / 10).toFixed(1);
   return b === "below" ? `under ${f(t * 0.6)}` : b === "close" ? `${f(t * 0.6)} to ${f(t * 0.9)}` : b === "plan" ? `${f(t * 0.9)} to ${f(t * 1.5)}` : b === "high" ? `${f(t * 1.5)} to ${f(t * 2.5)}` : `${f(t * 2.5)} and up`;
 };
+
+// The line under the chips: what a band means for this target, and what it pairs with. One line, always there.
+export const BAND_LINE_IDLE = "Tap a chip to filter, and to see what it means for your target.";
+export function bandHint(b: PdBand, t: number | null): string {
+  if (!t) return BAND_LINE_IDLE;
+  const r = bandRange(b, t);
+  const what = { below: "Pair with a High+ food to reach your plan.", close: "Any High food lifts it.", plan: "Fine alone.", high: "Lifts a Low food.", top: "Lifts even a Low− food." }[b];
+  return `${BAND_LABEL[b]}: PD ${r} for your ${t.toFixed(1)}. ${what}`;
+}

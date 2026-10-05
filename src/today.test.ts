@@ -29,3 +29,11 @@ test("five bands, every edge a multiple of the target: a bit under is on plan", 
   assert.equal(fit(12.0, 3.5), "top");   // 3.4 T on a high-energy target
   assert.equal(bandRange("plan", T), "5.0 to 8.3");
 });
+
+test("the line under the chips says the range and the partner, for the current target", async () => {
+  const { bandHint, BAND_LABEL, BAND_LINE_IDLE } = await import("./goal");
+  assert.equal(BAND_LABEL.below, "Low\u2212"); assert.equal(BAND_LABEL.close, "Low");
+  assert.equal(bandHint("below", 5.5), "Low\u2212: PD under 3.3 for your 5.5. Pair with a High+ food to reach your plan.");
+  assert.equal(bandHint("plan", 5.5), "On plan: PD 5.0 to 8.3 for your 5.5. Fine alone.");
+  assert.equal(bandHint("plan", null), BAND_LINE_IDLE);
+});

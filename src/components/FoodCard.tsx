@@ -32,7 +32,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
   const gallery = food.photos?.length ? food.photos : food.photo ? [food.photo] : [];
   const pd = density(food.protein, food.calories);
   const share = pd === null ? null : Math.round(pd * 4);
-  const fitText = fit === "top" ? "high+ protein for your goal" : fit === "high" ? "high protein for your goal" : fit === "plan" ? "on plan" : fit === "close" ? "close to your goal" : "below your goal";
+  const fitText = fit === "top" ? "high+ protein for your goal" : fit === "high" ? "high protein for your goal" : fit === "plan" ? "on plan" : fit === "close" ? "a bit under your goal" : "far under your goal";
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
