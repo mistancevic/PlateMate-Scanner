@@ -18,7 +18,9 @@ service cloud.firestore {
       function aiKept() { return request.resource.data.get('aiConfirmedAt', null) == (existing() ? resource.data.get('aiConfirmedAt', null) : null) && request.resource.data.get('aiConfirmedBy', null) == (existing() ? resource.data.get('aiConfirmedBy', null) : null); }
       allow create: if isOwner() && request.resource.data.get('role', '') == '' && request.resource.data.get('coachId', '') == '' && request.resource.data.get('aiConfirmedAt', null) == null;
       allow delete: if isOwner();
-      allow update: if (isOwner() && roleKept() && coachLinkOk() && aiKept()) || (isCoachOf() && roleKept() && coachKept());
+      // the coach's answer on the person's own numbers: the person may ask (waiting) or close, never approve or ask themselves to change
+      function reviewOk() { return request.resource.data.get('numbersReview', null) == (existing() ? resource.data.get('numbersReview', null) : null) || request.resource.data.numbersReview.status in ['waiting', 'closed']; }
+      allow update: if (isOwner() && roleKept() && coachLinkOk() && aiKept() && reviewOk()) || (isCoachOf() && roleKept() && coachKept());
       function coachOfParent() { return request.auth != null && get(/databases/$(database)/documents/users/$(uid)).data.get('coachId', '') == request.auth.uid; }
       // Photos: the owner reads and writes; the coach of that person reads.
       match /photos/{pid} {

@@ -12,6 +12,8 @@ export type OwnDay = { kcal?: number; protein?: number; fats?: number; carbs?: n
 export type Personal = {
   sex?: Sex; birthYear?: number; heightCm?: number; weightKg?: number; bodyFatPct?: number; pdUnit?: "pd" | "pct";
   life?: Life; week?: Week; easyMin?: number; hardMin?: number;
+  // Target analysis answers: a finding kept on purpose, with the value it was kept at, so a changed number asks again
+  kept?: Record<string, { at: string; sig: string }>;
   dayMode?: DayMode | "follow"; ownDays?: Partial<Record<DayType, OwnDay>>;
   activity?: Activity; dayKcal?: unknown;
 };
@@ -70,7 +72,7 @@ export const canCalculate = (p: Personal) => Boolean(p.birthYear && p.heightCm &
 // Energy per day: resting burn (Mifflin–St Jeor, or Katch–McArdle with body fat) × life, plus that day's training, then the goal.
 // Protein follows whether you train, not the goal: 1.6 to 2.2 g per kg with two or more sessions a week (ISSN 2017; Morton et al. 2018),
 // else 1.2 to 1.6 (US Dietary Guidelines 2025–2030). Fat 30 % of the average day, 25 % for Performance (more carbs); carbs the rest.
-const ADJ: Record<string, number> = { fatloss: -0.2, recomp: -0.1, maintain: 0, gain: 0.1, performance: 0.05 };
+export const ADJ: Record<string, number> = { fatloss: -0.2, recomp: -0.1, maintain: 0, gain: 0.1, performance: 0.05 };
 const FAT_OF: Record<string, number> = { performance: 0.25 };
 export function suggestBand(p: Personal, current?: string): Band {
   if (current) { const b = BANDS.find((x) => x.id === current); if (b) return b; }

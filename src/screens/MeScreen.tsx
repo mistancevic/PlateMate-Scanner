@@ -17,7 +17,7 @@ const ME_ROWS: { id: MenuSection; name: string; icon: ReactNode; hint: (p: AppAp
   { id: "goal", name: "Goal", icon: <Target size={18} />, hint: (p) => (p.state.goals.calories ? `${Math.round(p.state.goals.calories).toLocaleString("en")} kcal · ${p.state.goals.protein ?? "?"} g protein` : "Work it out, or set it") },
   { id: "week", name: "My days", icon: <CalendarDays size={18} />, hint: (p) => (p.personal.dayMode === "follow" ? "Follow my day" : "Every day the same") },
   { id: "shop", name: "Where I shop", icon: <ShoppingBasket size={18} />, hint: () => "The starter foods for your shops" },
-  { id: "coach", name: "My coach", icon: <Users size={18} />, hint: (p) => (p.profile.coachId ? `${p.profile.coachName || "Your coach"} sees what you share` : "Join with a code") },
+  { id: "coach", name: "My coach", icon: <Users size={18} />, hint: (p) => (p.profile.coachId ? `${p.coachLabel} sees what you share` : "Join with a code") },
   { id: "account", name: "Account", icon: <KeyRound size={18} />, hint: () => "Export my data, delete my account" },
 ];
 export function MeScreen(p: AppApi) {

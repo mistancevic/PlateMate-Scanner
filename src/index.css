@@ -640,8 +640,32 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .dt-input { justify-self: end; height: 34px; border-radius: 10px; border: 1.5px solid var(--line); padding: 0 8px; text-align: right; font: inherit; font-size: 15px; font-weight: 800; color: var(--ink); }
 .dt-src { display: flex; gap: 10px; align-items: center; min-height: 20px; } .dt-src small { font-size: 11.5px; color: var(--brand-text); font-weight: 700; } .dt-src .link { font-size: 12px; font-weight: 800; }
 .dt-how { background: var(--tint); border-radius: 12px; padding: 8px 10px; margin: 4px 0; } .dt-how p { margin: 2px 0; font-size: 12.5px; } .dt-how .dt-sum { font-weight: 900; }
+.day-blocks { background: var(--surface); border: 1.5px solid var(--line); border-radius: 18px; padding: 4px 12px 12px; display: flex; flex-direction: column; }
+.dt-block { padding: 10px 0; border-bottom: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.dt-block.edge { border-left: 4px solid #e0a33a; padding-left: 8px; margin-left: -12px; }
+.dt-block-head { display: flex; justify-content: space-between; align-items: baseline; } .dt-block-head b { font-size: 14px; } .dt-block-head small { font-size: 11.5px; color: var(--muted); font-weight: 600; }
+.dt-fields { display: grid; grid-template-columns: 1.25fr 1fr 1fr 1fr; gap: 6px; }
+.dt-field { display: flex; flex-direction: column; gap: 3px; min-width: 0; } .dt-field small { font-size: 10.5px; color: var(--muted); font-weight: 700; text-align: right; }
+.dt-fields .dt-input { width: 100%; box-sizing: border-box; height: 38px; text-align: right; font-weight: 800; font-size: 15px; }
+.dt-input::placeholder { color: #9aa8c2; font-weight: 800; } .dt-input.warn { border-color: #e0a33a; }
+.dt-src small.warn { color: #a35a00; font-weight: 800; }
+.dt-week { padding-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+.finding { background: #fff3df; border: 1.5px solid #f0c27a; border-radius: 14px; padding: 10px 12px; display: flex; flex-direction: column; gap: 5px; }
+.finding b { font-size: 13.5px; } .finding span { font-size: 12.5px; font-weight: 600; } .finding small { font-size: 10.5px; color: var(--muted); font-weight: 600; }
+.finding-acts { display: flex; gap: 8px; } .finding-acts .pill { height: 32px; }
+.finding-kept { margin: 0; font-size: 12px; font-weight: 700; color: var(--brand-text); }
+.in-range { margin: 0; background: #e3f6ee; color: #0f6b4a; border-radius: 12px; padding: 8px 10px; font-size: 12px; font-weight: 700; }
 .dt-avg { margin: 8px 0 2px; font-size: 12.5px; font-weight: 800; }
 .plan-who { color: var(--brand-text); font-weight: 600; }
+.goal-head { gap: 4px; } .goal-head .goal-src { height: 26px; padding: 0 10px; border-radius: 13px; background: var(--surface); font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; }
+.goal-name { font-size: 32px; font-weight: 900; color: var(--brand-text); line-height: 1.1; } .goal-who { font-size: 15px; font-weight: 700; color: var(--brand-text); }
+.review-state { margin-top: 6px; padding: 8px 10px; border-radius: 12px; font-size: 13px; font-weight: 800; } .review-state.waiting, .review-state.change { background: #fff3df; color: #a35a00; } .review-state.approved { background: #e3f6ee; color: #0f6b4a; }
+.coach-note { margin: 12px 0; background: var(--surface); border: 1.5px solid var(--line); border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; } .coach-note small { color: var(--muted); font-weight: 700; } .coach-note b { font-size: 14px; }
+.analysis-row { margin-top: 12px; border: 1.5px solid var(--line); border-radius: 16px; background: var(--surface); }
+.approve-head { display: flex; justify-content: space-between; align-items: center; } .approve-count { height: 26px; padding: 0 10px; border-radius: 13px; background: #fff3df; color: #a35a00; font-size: 12px; font-weight: 800; display: inline-flex; align-items: center; }
+.review-card { border-color: #f0c27a; display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; } .review-card textarea { width: 100%; box-sizing: border-box; border-radius: 12px; border: 1.5px solid var(--line); padding: 8px 10px; font: inherit; font-size: 14px; }
+.review-reply { margin: 0; font-size: 13px; font-weight: 700; }
+.review-ask { background: #fff3df !important; color: #a35a00 !important; font-weight: 800; margin-top: 8px; }
 .plan-source { display: inline-flex; align-items: center; gap: 2px; padding: 0; color: var(--brand-text); font-size: 12px; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
 .day-line { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1.5px solid #b9cdf1; }
 .day-line > div { display: flex; flex-direction: column; gap: 2px; }

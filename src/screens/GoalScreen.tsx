@@ -4,7 +4,8 @@ import { density } from "../pilot";
 import { pdText, pdVal, pdTag } from "../ui";
 import { Mark, APP_NAME } from "../components/Mark";
 import { LIFE, DAY_TYPES, calculate, canCalculate, macroSplit, suggestBand, dayModeOf, ownDayNumbers, weekOf, lifeOf, type Personal, type DayType, type DayMode, type Week } from "../personal";
-import { DayTable } from "../components/DayTable";
+import { DayTable, FindingList } from "../components/DayTable";
+import { analyse, isOpen as openAt, type Finding } from "../analysis";
 import type { AppApi } from "./api";
 
 // Your goal, as approved on 6 October 2026. Two ways in: Calculate for me, or My own numbers. Five goals. Life is set
@@ -35,7 +36,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const ownCarbs = own.carbs.trim() === "" ? (ownKcal && ownProtein && ownFats !== null ? macroSplit(ownKcal, ownProtein, ownFats).carbs : null) : Number(own.carbs);
   // own numbers, each day its own
   const o = ownDayNumbers(d, band, p.formula);
-  const setOwnDay = (day: DayType, patch: { kcal?: number; protein?: number }) => {
+  const setOwnDay = (day: DayType, patch: { kcal?: number; protein?: number; fats?: number; carbs?: number }) => {
     const prev = d.ownDays?.[day] ?? {};
     const next = { ...prev, ...patch };
     (Object.keys(next) as (keyof typeof next)[]).forEach((k) => next[k] === undefined && delete next[k]);
@@ -44,6 +45,25 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const emptyRows = Object.fromEntries(DAY_TYPES.map((x) => [x.id, { kcal: 0, protein: 0, fats: 0, carbs: 0, how: ["Type the calories for this day, or fill your profile to calculate it."], source: "average" as const }])) as Record<DayType, { kcal: number; protein: number; fats: number; carbs: number; how: string[]; source: "average" }>;
   const ownRows = o ? o.days : c ? Object.fromEntries(DAY_TYPES.map((x) => [x.id, { ...c.days[x.id], source: "calculated" as const }])) as Record<DayType, typeof c.days.passive & { source: "calculated" }> : emptyRows;
   const ownAvg = o ? o.avg : c ? { kcal: c.kcal, protein: c.protein } : { kcal: 0, protein: 0 };
+  // Target analysis: against what this body burns at maintenance, when there is body data to tell
+  const burn = canCalculate(d) ? calculate(d, "maintain", p.formula)?.kcal ?? null : null;
+  const sameRow = ownKcal && ownProtein ? { kcal: ownKcal, protein: ownProtein, fats: ownFats ?? 0, carbs: ownCarbs ?? 0, how: [] as string[] } : null;
+  const analysisEach = o ? analyse({ days: o.days, avg: o.avg, bandId: band, personal: d, burn }) : null;
+  const analysisSame = sameRow ? analyse({ days: Object.fromEntries(DAY_TYPES.map((x) => [x.id, sameRow])) as Record<DayType, typeof sameRow>, avg: sameRow, bandId: band, personal: d, burn }) : null;
+  // a day finding means nothing when every day is the same: those read as the week's
+  if (analysisSame) analysisSame.findings = analysisSame.findings.filter((f) => !f.id.startsWith("shape")).map((f) => ({ ...f, day: null }));
+  const isOpen = (f: Finding) => openAt(f, d);
+  const keep = (f: Finding) => setPersonalNow({ ...d, kept: { ...(d.kept ?? {}), [f.id]: { at: new Date().toISOString(), sig: f.sig } } });
+  const saveLabel = (a: ReturnType<typeof analyse> | null) => { const n = a ? a.findings.filter(isOpen).length : 0; return n ? `Save, ${n} kept as ${n === 1 ? "it is" : "they are"}` : "Set my day"; };
+  // on save: open findings count as kept on purpose; what is kept goes to the coach; nothing kept closes a request
+  const settle = (a: ReturnType<typeof analyse> | null, summary: string) => {
+    const now = new Date().toISOString();
+    const kept = { ...(d.kept ?? {}) };
+    (a?.findings ?? []).forEach((f) => { if (isOpen(f)) kept[f.id] = { at: now, sig: f.sig }; });
+    setPersonalNow({ ...d, kept });
+    const list = (a?.findings ?? []).map((f) => ({ id: f.id, title: f.title, body: f.body, source: f.source, day: f.day }));
+    if (!coach) void p.sendReview(list, summary);
+  };
 
   const Four = ({ kcal, protein, fats, carbs }: { kcal: number; protein: number; fats: number; carbs: number }) => (
     <div className="four" aria-label="Your day">
@@ -157,30 +177,35 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           {mode === "same" ? (
             <>
               <div className="field-row">
-                <label className="field"><span>kcal a day</span><input inputMode="numeric" value={own.kcal} onChange={(e) => setOwn({ ...own, kcal: e.target.value })} placeholder="2200" /></label>
-                <label className="field"><span>protein, g</span><input inputMode="numeric" value={own.protein} onChange={(e) => setOwn({ ...own, protein: e.target.value })} placeholder="140" /></label>
+                <label className="field"><span>kcal a day</span><input id="own-kcal" inputMode="numeric" value={own.kcal} onChange={(e) => setOwn({ ...own, kcal: e.target.value })} placeholder="2200" /></label>
+                <label className="field"><span>protein, g</span><input id="own-protein" inputMode="numeric" value={own.protein} onChange={(e) => setOwn({ ...own, protein: e.target.value })} placeholder="140" /></label>
               </div>
               <div className="field-row">
-                <label className="field"><span>fat, g</span><input inputMode="numeric" value={own.fats} onChange={(e) => setOwn({ ...own, fats: e.target.value })} placeholder={ownFats !== null ? String(ownFats) : "fills in"} /></label>
-                <label className="field"><span>carbs, g</span><input inputMode="numeric" value={own.carbs} onChange={(e) => setOwn({ ...own, carbs: e.target.value })} placeholder={ownCarbs !== null ? String(ownCarbs) : "the rest"} /></label>
+                <label className="field"><span>fat, g</span><input id="own-fats" inputMode="numeric" value={own.fats} onChange={(e) => setOwn({ ...own, fats: e.target.value })} placeholder={ownFats !== null ? String(ownFats) : "fills in"} /></label>
+                <label className="field"><span>carbs, g</span><input id="own-carbs" inputMode="numeric" value={own.carbs} onChange={(e) => setOwn({ ...own, carbs: e.target.value })} placeholder={ownCarbs !== null ? String(ownCarbs) : "the rest"} /></label>
               </div>
               <p className="small">One number for every day. That is {pdText(density(ownProtein, ownKcal))}{ownFats !== null && ownCarbs !== null ? `, ${ownFats} g fat and ${ownCarbs} g carbs` : ""}.</p>
+              {analysisSame && <FindingList analysis={analysisSame} open={isOpen} keep={keep} />}
               <button className="pill pill-primary pill-wide" disabled={!density(ownProtein, ownKcal)} onClick={() => {
                 setState((s) => ({ ...s, goals: { ...s.goals, calories: ownKcal, protein: ownProtein, fats: ownFats, carbs: ownCarbs } }));
                 saveGoal({ band, setBy: by, setAt: new Date().toISOString(), source: "exact" });
+                settle(analysisSame, `${goalNow.name} · every day the same · ${ownKcal?.toLocaleString("en")} kcal`);
                 done();
-              }}>Set my day</button>
+              }}>{saveLabel(analysisSame)}</button>
+              {p.profile.coachId && !coach && <p className="small muted">Anything kept on purpose goes to {p.coachLabel} to approve.</p>}
             </>
           ) : (
             <>
-              <DayTable rows={ownRows} avg={ownAvg} week={weekOf(d)} own={d.ownDays ?? {}} setOwn={setOwnDay} />
-              <p className="small muted">Type calories and protein for each day. Fat and carbs fill in, fat 30 % of the average day, carbs the rest. A day left empty is calculated from your profile and says so.</p>
+              <DayTable rows={ownRows} avg={ownAvg} week={weekOf(d)} own={d.ownDays ?? {}} setOwn={setOwnDay} analysis={analysisEach ?? undefined} open={isOpen} keep={keep} />
+              <p className="small muted">Type any of the four. A blank one fills in and says so. Protein and carbs count 4 kcal a gram, fat 9. Chef Mealan checks a day when you leave its fields.</p>
               <button className="pill pill-primary pill-wide" disabled={!o} onClick={() => {
                 const a = o!.avg;
                 setState((s) => ({ ...s, goals: { ...s.goals, calories: a.kcal, protein: a.protein, fats: a.fats, carbs: a.carbs } }));
                 saveGoal({ band, setBy: by, setAt: new Date().toISOString(), source: "exact" });
+                settle(analysisEach, `${goalNow.name} · each day its own · week average ${a.kcal.toLocaleString("en")} kcal`);
                 done();
-              }}>Set my day</button>
+              }}>{saveLabel(analysisEach)}</button>
+              {p.profile.coachId && !coach && <p className="small muted">Anything kept on purpose goes to {p.coachLabel} to approve.</p>}
             </>
           )}
         </div>

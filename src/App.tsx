@@ -37,7 +37,7 @@ import { OutScreen, type Turn } from "./screens/OutScreen";
 import { LandingScreen } from "./screens/LandingScreen";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, setDayType as storeDayType, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, type Personal, type DayType, type Day } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
@@ -87,6 +87,9 @@ import {
 const STORE = "platemate-pilot-v1";
 
 let unreadableBackup: string | null = null;
+// names say who is who: Coach Milan, Chef Mealan, Client Mia
+const firstName = (n?: string | null) => (n ?? "").trim().split(/\s+/)[0] || "";
+const coachLabel = (n?: string | null) => (firstName(n) ? `Coach ${firstName(n)}` : "Your coach");
 // when the phone's copy last changed by a person's hand, and which foods left the library (merged away, removed)
 const STATE_AT = "chefmealan-state-at", GONE = "chefmealan-gone-foods";
 const getGone = (): string[] => { try { const v = JSON.parse(localStorage.getItem(GONE) || "[]"); return Array.isArray(v) ? v : []; } catch { return []; } };
@@ -665,6 +668,7 @@ export default function App() {
     [foodsView, setFoodsView] = useState<"foods" | "recipes">("foods"),
     [editFrom, setEditFrom] = useState<string>(""),
     [editTitle, setEditTitle] = useState<string>(""),
+    [review, setReview] = useState<NumbersReview | null>(null),
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
     [talkOpen, setTalkOpen] = useState(false),
     [profileReady, setProfileReady] = useState(false),
@@ -751,6 +755,7 @@ export default function App() {
     (async () => {
       try {
         const remote = await loadCloud(user.uid);
+        if (remote) setReview(((remote as any).numbersReview as NumbersReview | undefined) ?? null);
         if (remote) setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
         if (remote && Array.isArray(remote.goalLog)) { const merged = [...new Map([...(remote.goalLog as GoalEntry[]), ...getGoalLog()].map((e) => [e.at, e])).values()].sort((x, y) => (x.at > y.at ? 1 : -1)); setGoalLog(merged); setGoalLogState(merged); }
         // foods that left the library on any device stay gone
@@ -1500,6 +1505,19 @@ export default function App() {
       log("data_export", {});
     },
     deleteSteps,
+    review,
+    coachLabel: coachLabel(profile.coachName),
+    // what was kept on purpose goes to Coach Milan; with nothing kept, an open request closes
+    sendReview: async (kept: ReviewFinding[], summary: string, reply?: string) => {
+      if (!user || !profile.coachId) return;
+      try {
+        if (kept.length || reply) { await askReview(user.uid, kept, summary, reply); setReview({ status: "waiting", kept, summary, reply, at: new Date().toISOString() }); }
+        else if (review && review.status !== "closed") { await closeReview(user.uid); setReview({ status: "closed", at: new Date().toISOString() }); }
+      } catch (e: any) { setError(explainCloudError(e)); }
+    },
+    answerClientReview: async (clientUid: string, status: "approved" | "change", note: string, prev: NumbersReview) => {
+      try { await answerReview(clientUid, status, note, coachLabel(user?.name), prev); notify(status === "approved" ? "Approved." : "Sent with your note."); } catch (e: any) { setError(explainCloudError(e)); }
+    },
     confirmClientAi: async (clientUid: string, on: boolean) => {
       if (!user) return;
       if (on) await confirmClientAi(clientUid, user.uid); else await clearClientAi(clientUid);
@@ -1584,7 +1602,7 @@ export default function App() {
         </button>
         <h1>{TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
-          {goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · {pdText(dayPd)} · set by {goal?.setBy === "coach" ? (goal.coachName || profile.coachName || COACH_NAME) : "you"}
+          {menuSection === "goal" ? pdText(dayPd) : <>{goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · {pdText(dayPd)} · set by {goal?.setBy === "coach" ? coachLabel(goal.coachName || profile.coachName || COACH_NAME) : "you"}</>}
         </button>}
         <button className="icon menu-button" aria-label="Menu" onClick={() => setMenuSection(menuSection ? null : "list")}><Menu size={22} /></button>
       </header>

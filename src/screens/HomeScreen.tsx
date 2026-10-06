@@ -13,7 +13,7 @@ export function HomeScreen(p: AppApi) {
   const { state, setTab, setStep, pdRef, setCamera, setMode, clientName, goal } = p;
   const bandName = goal?.band ? bandOf(goal.band)?.name : null;
   const byCoach = goal?.setBy === "coach";
-  const setBy = byCoach ? `coach ${goal?.coachName || p.profile.coachName || COACH_NAME}` : "you";
+  const setBy = byCoach ? `Coach ${(goal?.coachName || p.profile.coachName || COACH_NAME).split(" ")[0]}` : "you";
   const today = dayLog(state.feedback, new Date());
   const past = [1, 2].map((n) => dayLog(state.feedback, daysAgo(n)));
   const follow = dayModeOf(p.personal) === "each";
@@ -23,7 +23,7 @@ export function HomeScreen(p: AppApi) {
   const dateLine = new Date().toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
   const inbox = p.inbox.map((it) => (
     <section className="card inbox" key={it.id}>
-      <div className="card-top"><span>{p.profile.coachName || "Your coach"} sent you a recipe</span><button className="link" onClick={() => p.dismissRecipe(it)}>Dismiss</button></div>
+      <div className="card-top"><span>{p.coachLabel} sent you a recipe</span><button className="link" onClick={() => p.dismissRecipe(it)}>Dismiss</button></div>
       <b>{it.meal?.title || "Recipe"}</b>
       <small>{(it.meal?.items ?? []).map((i: any) => `${Math.round(i.grams)} g ${i.food?.name}`).join(" · ")}</small>
       {it.note && <p className="client-note">“{it.note}”</p>}
@@ -47,7 +47,8 @@ export function HomeScreen(p: AppApi) {
         </div>
         {!p.goal && <button className="strip strip-button" onClick={p.openGoal}>Set your goal: your day in four numbers, every plate measured against them.</button>}
         {p.todayMacros && <p className="macro-line">{p.todayMacros.fats} g fat · {p.todayMacros.carbs} g carbs</p>}
-        {p.profile.coachId && !byCoach && <button className="plan-source coach-line" onClick={() => p.openMenu("coach")} aria-label="Open your coach">Your coach: {p.profile.coachName || COACH_NAME} <ChevronRight size={12} /></button>}
+        {p.review?.status === "change" && <button className="strip strip-button review-ask" onClick={() => p.openMenu("goal")}>{p.review.by || p.coachLabel} asks you to change {p.review.kept?.length === 1 ? "one number" : "your numbers"} ›</button>}
+        {p.profile.coachId && !byCoach && <button className="plan-source coach-line" onClick={() => p.openMenu("coach")} aria-label="Open your coach">{p.coachLabel} <ChevronRight size={12} /></button>}
         <div className="day-line">
           <div>
             <b>{dateLine}</b>

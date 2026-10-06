@@ -73,7 +73,7 @@ export async function joinCoach(_uid: string, code: string) {
 export async function leaveCoach(uid: string) {
   await updateDoc(doc(db(), "users", uid), { coachId: null, coachName: null, coachEmail: null, coachPhoto: null, joinedAt: null });
 }
-export type ClientRow = { uid: string; name: string; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: "mifflin" | "katch" | null; pdUnit: "pd" | "pct"; flags: { situation: string; at: string }[]; birthYear: number | null; aiConfirmedAt: string | null; consentBy: string | null };
+export type ClientRow = { uid: string; name: string; review: NumbersReview | null; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: "mifflin" | "katch" | null; pdUnit: "pd" | "pct"; flags: { situation: string; at: string }[]; birthYear: number | null; aiConfirmedAt: string | null; consentBy: string | null };
 export async function pinFormula(clientUid: string, formula: "mifflin" | "katch" | null) { await updateDoc(doc(db(), "users", clientUid), { formula }); }
 export async function listClients(coachUid: string): Promise<ClientRow[]> {
   const q = query(collection(db(), "users"), where("coachId", "==", coachUid));
@@ -84,9 +84,19 @@ export async function listClients(coachUid: string): Promise<ClientRow[]> {
     try { feedback = await loadSharedCards(d.id); } catch { /* none shared or not allowed */ }
     // the coach sees situation and date only, never the person's words
     const flags = Array.isArray(x.safety?.flags) ? x.safety.flags.map((f: any) => ({ situation: String(f.situation), at: String(f.at ?? "").slice(0, 10) })) : [];
-    return { uid: d.id, name: x.clientName || "unnamed", goal: x.goal ?? null, feedback, foods: x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: x.personal?.pdUnit ?? "pd", flags, birthYear: x.personal?.birthYear ?? null, aiConfirmedAt: x.aiConfirmedAt ?? null, consentBy: x.safety?.consentBy ?? null };
+    return { uid: d.id, name: x.clientName || "unnamed", review: x.numbersReview ?? null, goal: x.goal ?? null, feedback, foods: x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: x.personal?.pdUnit ?? "pd", flags, birthYear: x.personal?.birthYear ?? null, aiConfirmedAt: x.aiConfirmedAt ?? null, consentBy: x.safety?.consentBy ?? null };
   }));
   return rows.sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1));
+}
+// Target analysis and Coach Milan: what the person kept on purpose goes to the coach to approve or ask to change.
+export type ReviewFinding = { id: string; title: string; body: string; source: string; day: string | null };
+export type NumbersReview = { status: "waiting" | "approved" | "change" | "closed"; kept?: ReviewFinding[]; summary?: string; note?: string; reply?: string; at: string; by?: string };
+export async function askReview(uid: string, kept: ReviewFinding[], summary: string, reply?: string) {
+  await setDoc(doc(db(), "users", uid), { numbersReview: { status: "waiting", kept, summary, ...(reply ? { reply } : {}), at: new Date().toISOString() } }, { merge: true });
+}
+export async function closeReview(uid: string) { await setDoc(doc(db(), "users", uid), { numbersReview: { status: "closed", at: new Date().toISOString() } }, { merge: true }); }
+export async function answerReview(clientUid: string, status: "approved" | "change", note: string, coachName: string, prev: NumbersReview) {
+  await updateDoc(doc(db(), "users", clientUid), { numbersReview: { ...prev, status, note: note.trim() || null, by: coachName, at: new Date().toISOString() } });
 }
 export async function setClientGoal(clientUid: string, goal: any, goals: { calories: number; protein: number }, coachName: string) {
   await updateDoc(doc(db(), "users", clientUid), {

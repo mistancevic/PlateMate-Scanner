@@ -8,6 +8,7 @@ import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
 import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, type Personal, type DayType } from "../personal";
 import { DayTable } from "../components/DayTable";
+import { analyse, isOpen as openAt } from "../analysis";
 import type { AppApi, MenuSection } from "./api";
 import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
@@ -219,16 +220,22 @@ function NextLink({ p, to, from, text, hint }: { p: AppApi; to: MenuSection; fro
 function GoalPanel(p: AppApi) {
   const { state, goal, openGoal, resetGoal } = p;
   const band = goal?.band ? bandOf(goal.band) : null;
-  const setBy = goal?.setBy === "coach" ? (goal.coachName || p.profile.coachName || COACH_NAME) : "you";
+  const setBy = goal?.setBy === "coach" ? `Coach ${(goal.coachName || p.profile.coachName || COACH_NAME).split(" ")[0]}` : "you";
   const mode = dayModeOf(p.personal);
   const ownWay = goal?.source === "exact" || goal?.source === "coach";
   const c = calculate(p.personal, band?.id ?? "maintain", p.formula);
   const o = ownWay ? ownDayNumbers(p.personal, band?.id ?? "maintain", p.formula) : null;
   return (
     <>
-      <section className="plan">
-        <div className="plan-top"><span>{band ? band.name : "Your goal"}</span><span>{ownWay ? (goal?.setBy === "coach" ? `set by ${setBy}` : "your own numbers") : "calculated for you"}</span></div>
-        {band && <small className="plan-who">{band.who}</small>}
+      <section className="plan goal-head">
+        <div className="plan-top"><small className="eyebrow-line">Your goal</small><span className="goal-src">{ownWay ? (goal?.setBy === "coach" ? `set by ${setBy}` : "your own numbers") : "calculated for you"}</span></div>
+        <b className="goal-name">{band ? band.name : "Not set yet"}</b>
+        {band && <span className="goal-who">{band.who}</span>}
+        {p.review && p.review.status !== "closed" && ownWay && (
+          <span className={`review-state ${p.review.status}`}>
+            {p.review.status === "waiting" ? `Waiting for ${p.coachLabel}: ${p.review.kept?.length ?? 0} kept on purpose` : p.review.status === "approved" ? `Approved by ${p.review.by || p.coachLabel}, ${new Date(p.review.at).toLocaleDateString("en", { day: "numeric", month: "long" })}` : `${p.review.by || p.coachLabel} asks you to change ${p.review.kept?.length === 1 ? "one number" : "your numbers"}`}
+          </span>
+        )}
         {mode === "same" || (!c && !o) ? (
           <>
             <div className="plan-row">
@@ -240,12 +247,35 @@ function GoalPanel(p: AppApi) {
           </>
         ) : null}
       </section>
+      {p.review?.status === "change" && ownWay && (
+        <section className="coach-note">
+          <small>{p.review.by || p.coachLabel}, {new Date(p.review.at).toLocaleDateString("en", { day: "numeric", month: "long" })}</small>
+          <b>{p.review.note || "Please look at your numbers again."}</b>
+          {p.review.kept?.length ? <small>About: {p.review.kept.map((k) => k.title.toLowerCase()).join("; ")}</small> : null}
+          <div className="button-row">
+            <button className="pill pill-small pill-primary" onClick={openGoal}>Change my numbers</button>
+            <button className="pill pill-small" onClick={() => { const r = window.prompt(`Reply to ${p.review?.by || p.coachLabel}`); if (r && r.trim()) void p.sendReview(p.review?.kept ?? [], p.review?.summary ?? "", r.trim()); }}>Reply to {p.review.by || p.coachLabel}</button>
+          </div>
+        </section>
+      )}
       {mode === "each" && (o || c) && (
         <>
           <p className="label">Your days, each its own</p>
           {o ? <DayTable rows={o.days} avg={o.avg} week={weekOf(p.personal)} /> : <DayTable rows={c!.days} avg={{ kcal: c!.kcal, protein: c!.protein }} week={c!.week} />}
         </>
       )}
+      {ownWay && (() => {
+        const burn = canCalculate(p.personal) ? calculate(p.personal, "maintain", p.formula)?.kcal ?? null : null;
+        const src = o ?? (state.goals.calories && state.goals.protein ? { days: Object.fromEntries(DAY_TYPES.map((x) => [x.id, { kcal: state.goals.calories!, protein: state.goals.protein!, fats: state.goals.fats ?? 0, carbs: state.goals.carbs ?? 0, how: [] }])) as any, avg: { kcal: state.goals.calories!, protein: state.goals.protein!, fats: state.goals.fats ?? 0 } } : null);
+        if (!src) return null;
+        const a = analyse({ days: src.days, avg: src.avg, bandId: band?.id ?? "maintain", personal: p.personal, burn });
+        const kept = a.findings.filter((f) => !openAt(f, p.personal)).length, open = a.findings.length - kept;
+        return (
+          <button className="menu-row analysis-row" onClick={openGoal}>
+            <span className="menu-row-text"><b>Target analysis</b><small>{a.findings.length ? `${a.findings.length} finding${a.findings.length === 1 ? "" : "s"}${kept ? `, ${kept} kept on purpose` : ""}${open ? `, ${open} open` : ""}` : "Everything in range"}</small></span><ChevronRight size={18} />
+          </button>
+        );
+      })()}
       <div className="button-row" style={{ marginTop: 12 }}>
         <button className="pill pill-small pill-primary" onClick={openGoal}><Calculator size={14} /> Change the goal</button>
         <ConfirmButton className="pill pill-small" label={<><RotateCcw size={14} /> Reset</>} confirmLabel="Tap again to reset" onConfirm={resetGoal} />

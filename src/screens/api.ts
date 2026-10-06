@@ -16,6 +16,10 @@ export interface AppApi {
   setMode: (m: ScannerMode) => void;
   blank: (name?: string, brand?: string, from?: string, barcode?: string) => void;
   setEditFrom: (from: string) => void;
+  review: import("../cloud").NumbersReview | null;
+  coachLabel: string;
+  sendReview: (kept: import("../cloud").ReviewFinding[], summary: string, reply?: string) => Promise<void>;
+  answerClientReview: (clientUid: string, status: "approved" | "change", note: string, prev: import("../cloud").NumbersReview) => Promise<void>;
   addFromDatabase: (code: string) => void;
   searchDatabase: (q: string) => Promise<DbProduct[]>;
   peekBarcode: (code: string) => Promise<DbProduct | null>;

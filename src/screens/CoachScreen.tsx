@@ -31,6 +31,16 @@ export function CoachArea(p: AppApi) {
   const last = (r: ClientRow) => r.feedback[0];
   return (
     <>
+      {(() => {
+        const waiting = rows.filter((r) => r.review?.status === "waiting");
+        if (!waiting.length) return null;
+        return (
+          <>
+            <div className="approve-head"><p className="label">To approve</p><span className="approve-count">{waiting.length} to approve</span></div>
+            {waiting.map((r) => <ReviewCard key={r.uid} row={r} answer={async (status, note) => { await p.answerClientReview(r.uid, status, note, r.review!); await refresh(); }} open={() => setOpen(r)} />)}
+          </>
+        );
+      })()}
       <Invites {...p} />
       <AccessRequests {...p} />
       <p className="label">Clients ({rows.length})</p>
@@ -39,7 +49,7 @@ export function CoachArea(p: AppApi) {
         <button className="card client-row" key={r.uid} onClick={() => setOpen(r)}>
           <div className="client-head">
             <span className="avatar">{r.name.slice(0, 1).toUpperCase()}</span>
-            <div><b>{r.name}</b><small>{r.goal?.band ? bandOf(r.goal.band)?.name : "no goal yet"} · {r.foods} foods · {r.feedback.length} shared · {daam(r)} DaaM good · reads {r.pdUnit === "pct" ? "% protein" : "PD"}</small></div>
+            <div><b>Client {r.name.split(" ")[0]}</b><small>{r.goal?.band ? bandOf(r.goal.band)?.name : "no goal yet"} · {r.foods} foods · {r.feedback.length} shared · {daam(r)} DaaM good · reads {r.pdUnit === "pct" ? "% protein" : "PD"}</small></div>
           </div>
           <small className="client-last">{last(r) ? `${last(r).taste}: ${last(r).meal?.title ?? ""} · ${new Date(last(r).createdAt).toLocaleDateString()}${last(r).notes ? ` · ${last(r).notes}` : ""}` : "no meals yet"} · active {r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : "never"}</small>
         </button>
@@ -271,5 +281,28 @@ export function Invites(p: AppApi) {
         </>
       )}
     </>
+  );
+}
+
+
+// What a client kept on purpose, as Coach Milan sees it: the same findings, the client's choice, a note, Approve or Ask to change.
+function ReviewCard({ row, answer, open }: { row: ClientRow; answer: (status: "approved" | "change", note: string) => Promise<void>; open: () => void }) {
+  const [note, setNote] = useState("");
+  const r = row.review!, first = row.name.split(" ")[0];
+  return (
+    <section className="card review-card">
+      <b>Client {first} set new numbers</b>
+      <small className="muted">{r.summary ?? ""}{r.summary ? " · " : ""}{new Date(r.at).toLocaleDateString("en", { day: "numeric", month: "long" })}</small>
+      {r.reply && <p className="review-reply">Client {first} replied: {r.reply}</p>}
+      {(r.kept ?? []).map((k) => (
+        <div className="finding" key={k.id}><b>Kept on purpose: {k.title.toLowerCase()}</b><span>{k.body}</span><small>{k.source}</small></div>
+      ))}
+      <label className="field"><span>A note to Client {first}, if you ask for a change</span><textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Add 60 g of carbs on hard days, rice or oats after training." /></label>
+      <div className="button-row">
+        <button className="pill pill-small" onClick={() => answer("change", note)}>Ask to change</button>
+        <button className="pill pill-small pill-primary" onClick={() => answer("approved", note)}>Approve</button>
+      </div>
+      <button className="link" onClick={open}>Open Client {first}'s numbers ›</button>
+    </section>
   );
 }

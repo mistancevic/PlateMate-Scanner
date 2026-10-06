@@ -54,7 +54,7 @@ const path = require("node:path");
   await page.getByRole("button", { name: /Change the goal/ }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: "My own numbers" }).click(); await page.waitForTimeout(200);
   await page.getByLabel("Rest, passive, kcal").fill("1700"); await page.getByLabel("Rest, passive, kcal").press("Enter"); await page.waitForTimeout(200);
-  ok(/Set by you/.test(await page.locator(".dt-row").first().textContent()) && /Calculated, nothing typed/.test(await page.locator(".dt-row").nth(1).textContent()), "own numbers: a typed day says set by you, an empty one calculated");
+  ok(/Set by you|Filled:/.test(await page.locator(".dt-block").first().textContent()) && /Calculated, nothing typed/.test(await page.locator(".dt-block").nth(1).textContent()), "own numbers: a typed day says set by you, an empty one calculated");
   console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
   await b.close(); server.kill(); process.exitCode = fail ? 1 : 0;
 })();
