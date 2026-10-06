@@ -136,6 +136,7 @@ export interface AppApi {
   importAirtable: () => Promise<void>;
   resetGoal: () => void;
   fitPd: (pd: number | null) => import("../goal").PdBand;
+  fitDay: (pd: number | null) => import("../goal").PdBand;
   clientName: string;
   setClientName: (v: string) => void;
   coach: boolean;

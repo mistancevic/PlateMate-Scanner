@@ -49,6 +49,17 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   ok(/your goal · set by you/i.test(await page.locator(".plan-goal small").first().textContent()), "a small line says whose goal and who set it");
   await page.getByRole("button", { name: "Open your goal" }).click(); await page.waitForTimeout(300);
   ok(await page.getByRole("button", { name: /Change the goal/ }).count() >= 1, "the goal's name opens Me, Goal");
+  // JOURNEY INVARIANT (Milan, 7 October 2026, from a Today card that showed PD 3.0 for a 190 g, 3,200 kcal day):
+  // a moment picked on the Plate changes the plate's target only; Today and Foods keep the day's target.
+  await page.goto("http://127.0.0.1:3193/"); await page.waitForTimeout(600);
+  const dayPd = (await page.locator(".plan-row b").first().textContent()).trim();
+  const nums = (await page.locator(".plan-row b").allTextContents()).map((x) => Number(x.replace(/,/g, "")));
+  ok(Math.abs(nums[0] - Math.round((nums[2] / nums[1]) * 1000) / 10) <= 0.1, `the day's PD is protein over calories: ${nums[2]} g in ${nums[1]} kcal is ${nums[0]}`);
+  await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /^Before training$/ }).first().click().catch(() => {}); await page.waitForTimeout(200);
+  const plateHint = await page.locator(".moment-hint").textContent().catch(() => "");
+  await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(300);
+  ok(/Target for this plate: PD 3/.test(plateHint) && (await page.locator(".plan-row b").first().textContent()).trim() === dayPd, `Before training sets the plate to PD 3; Today still shows the day's ${dayPd}`);
   await page.goto("http://127.0.0.1:3193/"); await page.waitForTimeout(600);
   const actions = await page.locator("main").evaluate((m) => Array.from(m.querySelectorAll(".pill-tall, .inbox")).map((e) => e.className.includes("inbox") ? "inbox" : "action"));
   ok(actions.slice(0, 3).every((x) => x === "action"), "the three actions sit directly under the plan");

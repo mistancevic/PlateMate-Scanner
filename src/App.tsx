@@ -1433,6 +1433,8 @@ export default function App() {
     step, setStep, mixWith,
     clientName, setClientName: (v: string) => { storeClientName(v); setClientNameState(v); },
     goal, openGoal: () => setGoalOpen(true), fitPd: (pd: number | null) => fitPd(pd, pdRef),
+    // Foods measure every food against the day's target, not the plate's moment (a snack before training aims at PD 3)
+    fitDay: (pd: number | null) => fitPd(pd, dayPd),
     addStarter: () => {
       setState((s) => {
         const have = new Set(s.foods.map((f) => (f.name + "|" + f.brand).toLowerCase()));
