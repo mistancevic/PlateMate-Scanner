@@ -35,6 +35,7 @@ import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen, type Turn } from "./screens/OutScreen";
 import { LandingScreen } from "./screens/LandingScreen";
+import { Starting } from "./components/Starting";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
@@ -88,6 +89,8 @@ import {
 const STORE = "platemate-pilot-v1";
 
 let unreadableBackup: string | null = null;
+// a request that does not answer in time ends with "timeout" instead of waiting forever
+const withTimeout = <T,>(p: Promise<T>, ms: number) => new Promise<T>((res, rej) => { const t = setTimeout(() => rej(new Error("timeout")), ms); p.then((v) => { clearTimeout(t); res(v); }, (e) => { clearTimeout(t); rej(e); }); });
 // names say who is who: Coach Milan, Chef Mealan, Client Mia
 const firstName = (n?: string | null) => (n ?? "").trim().split(/\s+/)[0] || "";
 const coachLabel = (n?: string | null) => (firstName(n) ? `Coach ${firstName(n)}` : "Your coach");
@@ -673,6 +676,7 @@ export default function App() {
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
     [talkOpen, setTalkOpen] = useState(false),
     [profileReady, setProfileReady] = useState(false),
+    [loadTry, setLoadTry] = useState(0),
     [talkTurns, setTalkTurns] = useState<Turn[]>([]),
     [mealanAsk, setMealanAsk] = useState(0),
     [mixQuestion, setMixQuestion] = useState<string | null>(null),
@@ -715,6 +719,8 @@ export default function App() {
   const importRef = useRef<HTMLInputElement>(null),
     runRef = useRef(0),
     fromCloud = useRef(false),
+    // opened with the phone's copy while the account was still loading (slow network): edits made then count as newer
+    localMode = useRef(false),
     prevFoodIds = useRef<string[]>(state.foods.map((f) => f.id));
   // today's day follows the Weekly plan: when the plan changes, here or from the account, today is read again
   useEffect(() => { setDayState(getDay(personal)); }, [personal]);
@@ -737,7 +743,7 @@ export default function App() {
       if (fromCloud.current) { fromCloud.current = false; }
       else {
         // only a change made after the account was read counts as newer; start-up effects on a stale phone must never win
-        if (cloudLoaded.current) localStorage.setItem(STATE_AT, new Date().toISOString());
+        if (cloudLoaded.current || localMode.current) localStorage.setItem(STATE_AT, new Date().toISOString());
         const now = new Set(state.foods.map((f) => f.id));
         const left = prevFoodIds.current.filter((id) => !now.has(id));
         if (left.length) setGone([...getGone(), ...left]);
@@ -755,9 +761,11 @@ export default function App() {
   useEffect(() => watchUser((u) => { setUser(u); setAuthReady(true); if (!u) { cloudLoaded.current = false; setProfileReady(false); } }), []);
   useEffect(() => {
     if (!user || cloudLoaded.current) return;
+    let stale = false;
     (async () => {
       try {
-        const remote = await loadCloud(user.uid);
+        const remote = await withTimeout(loadCloud(user.uid), 20000);
+        if (stale) return;
         if (remote) setReview(((remote as any).numbersReview as NumbersReview | undefined) ?? null);
         if (remote) setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
         if (remote && Array.isArray(remote.goalLog)) { const merged = [...new Map([...(remote.goalLog as GoalEntry[]), ...getGoalLog()].map((e) => [e.at, e])).values()].sort((x, y) => (x.at > y.at ? 1 : -1)); setGoalLog(merged); setGoalLogState(merged); }
@@ -779,19 +787,13 @@ export default function App() {
             incoming.foods = incoming.foods.filter((f) => !gone.has(f.id));
             const localPhoto = new Map(state.foods.map((f) => [f.id, f.photo]));
             const localFb = new Map(state.feedback.map((f) => [f.id, f.photo]));
-            let cloudPhotos = new Map<string, string>();
-            try { cloudPhotos = await loadPhotos(user.uid); } catch { /* photos are optional */ }
-            let cards: any[] = [];
-            try { cards = await loadCards(user.uid); } catch { /* none yet */ }
-            const byId = new Map<string, any>();
-            for (const fb of [...cards, ...incoming.feedback, ...state.feedback]) if (!byId.has(fb.id)) byId.set(fb.id, fb);
+            // the app opens on the phone's photos; the account's photos and plate cards follow in the background (they can be large)
             const localMore = new Map(state.foods.map((f) => [f.id, f.photos]));
-            incoming.foods = incoming.foods.map((f) => {
-              const count = typeof (f as any).photoCount === "number" ? (f as any).photoCount : 6;
-              const more = [1, 2, 3, 4, 5, 6].slice(0, count).map((n) => cloudPhotos.get(`food:${f.id}:${n}`)).filter(Boolean) as string[];
-              return { ...f, photo: f.photo ?? localPhoto.get(f.id) ?? cloudPhotos.get(`food:${f.id}`), photos: f.photos ?? localMore.get(f.id) ?? (more.length ? more : undefined) };
-            });
-            incoming.feedback = [...byId.values()].sort((x, y) => (y.createdAt > x.createdAt ? 1 : -1)).map((f) => ({ ...f, photo: f.photo ?? localFb.get(f.id) ?? cloudPhotos.get(`fb:${f.id}`) }));
+            incoming.foods = incoming.foods.map((f) => ({ ...f, photo: f.photo ?? localPhoto.get(f.id), photos: f.photos ?? localMore.get(f.id) }));
+            const byId = new Map<string, any>();
+            for (const fb of [...incoming.feedback, ...state.feedback]) if (!byId.has(fb.id)) byId.set(fb.id, fb);
+            incoming.feedback = [...byId.values()].sort((x, y) => (y.createdAt > x.createdAt ? 1 : -1)).map((f) => ({ ...f, photo: f.photo ?? localFb.get(f.id) }));
+            void fillFromAccount(user.uid);
             fromCloud.current = true;
             setState(incoming);
           } catch { /* keep local if the cloud copy is unreadable */ }
@@ -813,14 +815,46 @@ export default function App() {
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
         }
       } catch (e: any) {
-        const why = explainCloudError(e);
-        setCloudStatus({ ok: false, text: `Not saved: ${why}` });
-        setError(`Could not reach your account: ${why}. Working on this phone for now.`);
+        if (stale) return;
+        const why = e?.message === "timeout" ? "the connection is too slow right now" : explainCloudError(e);
+        setCloudStatus({ ok: false, text: `Not connected: ${why}` });
+        // never send this phone's copy over the account before the account was read: open on the phone's copy,
+        // keep what is changed here, and try the account again in half a minute
+        localMode.current = true;
+        setError(`Could not reach your account: ${why}. Working on this phone for now; Chef Mealan keeps trying.`);
+        setProfileReady(true);
+        setTimeout(() => setLoadTry((n) => n + 1), 30000);
+        return;
       }
       cloudLoaded.current = true;
       setProfileReady(true);
     })();
-  }, [user]);
+    return () => { stale = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, loadTry]);
+  // the account's photos and plate cards, after the app is open: merged in by id, never replacing what the phone has
+  async function fillFromAccount(uid: string) {
+    try {
+      const photos = await loadPhotos(uid);
+      setState((st) => ({
+        ...st,
+        foods: st.foods.map((f) => {
+          const count = typeof (f as any).photoCount === "number" ? (f as any).photoCount : 6;
+          const more = [1, 2, 3, 4, 5, 6].slice(0, count).map((n) => photos.get(`food:${f.id}:${n}`)).filter(Boolean) as string[];
+          return { ...f, photo: f.photo ?? photos.get(`food:${f.id}`), photos: f.photos ?? (more.length ? more : undefined) };
+        }),
+        feedback: st.feedback.map((fb) => ({ ...fb, photo: fb.photo ?? photos.get(`fb:${fb.id}`) })),
+      }));
+    } catch { /* photos are optional */ }
+    try {
+      const cards = await loadCards(uid);
+      if (cards.length) setState((st) => {
+        const have = new Set(st.feedback.map((f) => f.id));
+        const add = cards.filter((c) => !have.has(c.id));
+        return add.length ? { ...st, feedback: [...st.feedback, ...add].sort((x, y) => (y.createdAt > x.createdAt ? 1 : -1)) } : st;
+      });
+    } catch { /* none yet */ }
+  }
   // client: recipes the coach sent
   const fetchInbox = async () => { if (!user) return; try { setInbox(await loadInbox(user.uid)); } catch { /* offline */ } };
   useEffect(() => { fetchInbox(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
@@ -1582,11 +1616,11 @@ export default function App() {
     notes: "Recipes",
     more: "More",
   };
-  if (!authReady) return <div className="app-shell"><main /></div>;
+  if (!authReady) return <Starting onLocal={null} />;
   // the legal pages are public: /impressum, /privacy, /disclaimer, /about, signed in or not
   { const legal = legalPageFromPath(window.location.pathname); if (legal) return <LegalScreen page={legal} back={() => { window.history.replaceState(null, "", "/"); window.location.reload(); }} />; }
   if (cloudEnabled && !user) return <LandingScreen />;
-  if (cloudEnabled && user && !profileReady) return <div className="app-shell"><main /></div>;
+  if (cloudEnabled && user && !profileReady) return <Starting onLocal={() => { localMode.current = true; setProfileReady(true); }} />;
   if (cloudEnabled && user && profile.role !== "coach" && !profile.coachId)
     return <div className="app-shell"><main><PilotGate {...screenProps} /></main></div>;
   if (ai.blocked)

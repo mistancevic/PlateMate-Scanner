@@ -4,6 +4,7 @@ One version per release since 2 October 2026. The number is in Menu, About, next
 
 ## 0.1.x, the pilot builds
 
+- **v0.1.65** · 2026-10-07 · never an empty screen while opening: the logo and "Opening your account…"; after 10 seconds, Try again or Open with what's on this phone; photos and plate cards load after the app opens; the account load has a 20-second limit, then the app opens on the phone's copy, keeps what is changed there, and tries the account again every half minute.
 - **v0.1.64** · 2026-10-07 · Today shows the day's PD target, not the plate's: a moment picked on the Plate (Before training aims at PD 3) changed the Today card and the Foods chips too; now only the Plate follows the moment.
 - **v0.1.63** · 2026-10-06 · the link preview when chefmealan.com is shared, as approved on the canvas (board P1): the home page headline, a plain description, Coach Milan's photo instead of an old app screen, no brand names, Closed pilot.
 - **v0.1.62** · 2026-10-06 · goals and protein explained (canvas boards G1, G2): the five goals as cards that say what happens to your weight and food, Recomposition first; protein in the middle of the range, at the top when losing fat, eating mostly plants or over 60, with the reason shown and a card that explains the range, the portion per meal and protein quality. Home page Try it for Recomposition only, You crave, butter biscuits and a croissant, the total weight on the plate, a smaller amount suggested for a very big bowl, no photo of the plate.
