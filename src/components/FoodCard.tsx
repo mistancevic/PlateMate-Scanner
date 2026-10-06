@@ -70,7 +70,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         </div>
         {picking && insight && (
           <div className="moments job-pick">
-            {JOBS.map((j) => <button key={j} className={`pill pill-small ${job.job === j ? "pill-primary" : ""}`} onClick={() => { insight.setJob(j); setPicking(false); }}>{j}</button>)}
+            {JOBS.map((j) => <button key={j} className={`choice ${job.job === j ? "on" : ""}`} onClick={() => { insight.setJob(j); setPicking(false); }}>{j}</button>)}
             {job.mine && <button className="link" onClick={() => { insight.setJob(null); setPicking(false); }}>Use Mealan's label</button>}
           </div>
         )}

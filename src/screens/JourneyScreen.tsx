@@ -188,7 +188,7 @@ export function JourneyScreen(p: AppApi) {
         <p className="label">When is this for?</p>
         <div className="moments">
           {orderMoments(p.usual).map((m) => (
-            <button key={m.id} className={`pill pill-small ${p.moment === m.id ? "pill-primary" : ""} ${m.planned ? "" : "pill-unplanned"}`} onClick={() => p.setMoment(m.id)}>{m.name}</button>
+            <button key={m.id} className={`choice ${p.moment === m.id ? "on" : ""} ${m.planned ? "" : "pill-unplanned"}`} onClick={() => p.setMoment(m.id)}>{m.name}</button>
           ))}
         </div>
         <p className="small moment-hint">{momentOf(p.moment).hint}{p.moment !== "regular" && pdRef !== null ? ` Target for this plate: ${pdText(pdRef)}.` : ""}</p>
@@ -197,7 +197,7 @@ export function JourneyScreen(p: AppApi) {
             <p className="label">Where to?</p>
             <div className="moments">
               {REGIONS.filter((r) => r.id !== p.region).map((r) => (
-                <button key={r.id} className={`pill pill-small ${p.travelTo === r.id ? "pill-primary" : ""}`} onClick={() => p.setTravelTo(p.travelTo === r.id ? null : r.id)}>{r.name}</button>
+                <button key={r.id} className={`choice ${p.travelTo === r.id ? "on" : ""}`} onClick={() => p.setTravelTo(p.travelTo === r.id ? null : r.id)}>{r.name}</button>
               ))}
             </div>
             <p className="small moment-hint">{p.travelTo ? `${CHEF_NAME} plans with what's sold in ${REGIONS.find((r) => r.id === p.travelTo)?.name}. Use the chat to shop and cook there.` : "Pick the place and Mealan plans with its shelves."}</p>
@@ -404,7 +404,7 @@ export function JourneyScreen(p: AppApi) {
       {sharing && p.profile.coachId && (
         <div className="reasons">
           {([["look", "Look at this"], ["ok", "Was this OK?"], ["help", "Help me next time"]] as const).map(([k, l]) => (
-            <button key={k} className={`pill pill-small ${shareWhy === k ? "pill-primary" : ""}`} onClick={() => setShareWhy(k)}>{l}</button>
+            <button key={k} className={`choice ${shareWhy === k ? "on" : ""}`} onClick={() => setShareWhy(k)}>{l}</button>
           ))}
         </div>
       )}

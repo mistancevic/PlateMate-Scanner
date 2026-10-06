@@ -129,7 +129,7 @@ export function EvalsScreen(p: AppApi) {
         <div><b>{labelledWithJudge ? `${agree}/${labelledWithJudge}` : "–"}</b><small>you and judge agree</small></div>
         <div><b>{times.length ? `${(times[Math.floor(times.length / 2)] / 1000).toFixed(1)} s` : "–"}</b><small>median time</small></div>
       </section>
-      <div className="moments">{TYPES.map((t) => <button key={t} className={`pill pill-small ${type === t ? "pill-primary" : ""}`} onClick={() => setType(t)}>{t}</button>)}</div>
+      <div className="moments">{TYPES.map((t) => <button key={t} className={`choice ${type === t ? "on" : ""}`} onClick={() => setType(t)}>{t}</button>)}</div>
       <div className="button-row" style={{ margin: "8px 0 12px" }}>
         <button className="pill pill-small pill-primary" disabled={!!running} onClick={runAll}><Play size={14} /> Run {shown.length}</button>
         <button className="pill pill-small" onClick={exportCsv}><Download size={14} /> Export</button>
@@ -164,8 +164,8 @@ export function EvalsScreen(p: AppApi) {
                     {r.judge && <p className="small">Judge: {r.judge.score}/5. {r.judge.reason}</p>}
                     <p className="label">Your label</p>
                     <div className="button-row">
-                      <button className={`pill pill-small ${r.label === "pass" ? "pill-primary" : ""}`} onClick={() => put(c.id, { label: "pass" })}><Check size={14} /> Pass</button>
-                      <button className={`pill pill-small ${r.label === "fail" ? "pill-primary" : ""}`} onClick={() => put(c.id, { label: "fail" })}><X size={14} /> Fail</button>
+                      <button className={`choice ${r.label === "pass" ? "on" : ""}`} onClick={() => put(c.id, { label: "pass" })}><Check size={14} /> Pass</button>
+                      <button className={`choice ${r.label === "fail" ? "on" : ""}`} onClick={() => put(c.id, { label: "fail" })}><X size={14} /> Fail</button>
                     </div>
                     <input className="search" placeholder="Why, in a few words" value={r.reason ?? ""} onChange={(e) => put(c.id, { reason: e.target.value })} />
                   </>

@@ -101,7 +101,7 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirm
         <div className="formula-row">
           <small>Formula</small>
           {([[null, "Automatic"], ["mifflin", "Mifflin–St Jeor"], ["katch", "Katch–McArdle"]] as const).map(([k, l]) => (
-            <button key={l} className={`pill pill-small ${(formula ?? null) === k ? "pill-primary" : ""}`} onClick={async () => { try { await pinFormula(row.uid, k); setFormula(k); notify(`${row.name}: ${l.toLowerCase()}.`); } catch (e: any) { setError(e.message || "Could not set the formula."); } }}>{l}</button>
+            <button key={l} className={`choice ${(formula ?? null) === k ? "on" : ""}`} onClick={async () => { try { await pinFormula(row.uid, k); setFormula(k); notify(`${row.name}: ${l.toLowerCase()}.`); } catch (e: any) { setError(e.message || "Could not set the formula."); } }}>{l}</button>
           ))}
         </div>
         {editing && (
@@ -177,7 +177,7 @@ export function SendSheet(p: AppApi & { card: any; close: () => void }) {
         <p className="label">To</p>
         <div className="moments">
           {rows.map((r) => (
-            <button key={r.uid} className={`pill pill-small ${picked.has(r.uid) ? "pill-primary" : ""}`} onClick={() => setPicked((s) => { const n = new Set(s); n.has(r.uid) ? n.delete(r.uid) : n.add(r.uid); return n; })}>{r.name}</button>
+            <button key={r.uid} className={`choice ${picked.has(r.uid) ? "on" : ""}`} onClick={() => setPicked((s) => { const n = new Set(s); n.has(r.uid) ? n.delete(r.uid) : n.add(r.uid); return n; })}>{r.name}</button>
           ))}
           {rows.length === 0 && <small>No clients yet.</small>}
         </div>

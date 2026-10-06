@@ -720,3 +720,20 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .today-plan { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #b9cdf1; }
 .today-plan .today-what { color: var(--brand-text); font-weight: 700; } .today-plan small { color: var(--muted); font-weight: 600; }
 .today-plan .pill-wide { margin-top: 4px; }
+
+/* Choices and actions, as approved on 6 October 2026 (canvas board B1).
+   A choice is something you pick: small, light, pill-shaped; the picked one turns pale blue and gets a tick.
+   An action is something that happens: solid blue, squarer corners; the main one is wide and sits at the bottom under a line,
+   with Cancel as plain text under it. */
+.choice { display: inline-flex; align-items: center; gap: 4px; height: 34px; padding: 0 12px; border-radius: 17px; background: var(--surface); border: 1.5px solid var(--line); color: var(--ink); font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.choice.on { background: #cfe0fb; border-color: var(--brand); color: #123a7a; font-weight: 800; }
+.choice.on::before { content: "✓"; font-weight: 900; }
+.choice:disabled { opacity: .5; cursor: default; }
+.opt.on { background: #cfe0fb; border-color: var(--brand); color: #123a7a; } .opt.on small { color: #2a4c86; }
+.opt.on b::before { content: "✓ "; font-weight: 900; }
+.pill { border-radius: 14px; } .pill-small { border-radius: 12px; }
+.actions { display: flex; flex-direction: column; align-items: stretch; gap: 10px; margin-top: 6px; padding-top: 14px; border-top: 1px solid #b9cdf1; }
+.action-main { width: 100%; height: 50px; justify-content: center; font-size: 16px; box-shadow: 0 4px 10px rgba(46,123,232,.25); }
+.action-cancel { align-self: center; font-weight: 800; }
+/* a choice keeps its tick on the same line, whatever card it sits in */
+button.choice, .plan button.choice, .today-plan button.choice { display: inline-flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: center; height: 34px; min-height: 0; line-height: 1; }

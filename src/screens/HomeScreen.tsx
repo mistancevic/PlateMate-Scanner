@@ -74,9 +74,9 @@ export function HomeScreen(p: AppApi) {
           <div className="today-plan">
             <b>{dateLine}, today only</b>
             <DayEditor minor={minor} value={draft} onChange={setDraft} />
-            <div className="button-row">
-              <button className="pill pill-small" onClick={() => setChanging(false)}>Cancel</button>
-              <button className="pill pill-small pill-primary" onClick={() => { p.setTodayPlan(draft); setChanging(false); }}>Save for today</button>
+            <div className="actions">
+              <button className="pill pill-primary action-main" onClick={() => { p.setTodayPlan(draft); setChanging(false); }}>Save for today</button>
+              <button className="link action-cancel" onClick={() => setChanging(false)}>Cancel</button>
             </div>
           </div>
         )}
@@ -85,7 +85,7 @@ export function HomeScreen(p: AppApi) {
             <b>{dateLine}</b>
             <small>What kind of day is it?</small>
             <div className="day-row">
-              {DAY_TYPES.map((d) => <button key={d.id} className={`pill pill-small ${p.day.type === d.id ? "pill-primary" : ""}`} onClick={() => p.setDayType(d.id)}>{d.name}</button>)}
+              {DAY_TYPES.map((d) => <button key={d.id} className={`choice ${p.day.type === d.id ? "on" : ""}`} onClick={() => p.setDayType(d.id)}>{d.name}</button>)}
             </div>
             <button className="link" onClick={() => p.openMenu("week")}>Set your Weekly plan, and Chef Mealan won't need to ask ›</button>
           </div>

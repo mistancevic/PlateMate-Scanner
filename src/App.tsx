@@ -382,8 +382,8 @@ function LabelCheck({
           <b>Looks like a food you already have</b>
           <small>{liveMatch.food.name}{liveMatch.food.brand ? `, ${liveMatch.food.brand}` : ""} · {liveMatch.reason === "barcode" ? "same barcode" : "same values per 100 g"}</small>
           <div className="moments" style={{ marginTop: 8 }}>
-            <button className={`pill pill-small ${choice === "update" ? "pill-primary" : ""}`} onClick={() => setChoice("update")}>Update that one</button>
-            <button className={`pill pill-small ${choice === "both" ? "pill-primary" : ""}`} onClick={() => setChoice("both")}>Keep both</button>
+            <button className={`choice ${choice === "update" ? "on" : ""}`} onClick={() => setChoice("update")}>Update that one</button>
+            <button className={`choice ${choice === "both" ? "on" : ""}`} onClick={() => setChoice("both")}>Keep both</button>
             <button className="pill pill-small" onClick={close}>Cancel</button>
           </div>
           {choice === "update" && <small>It keeps its name. Missing values, brand or barcode are filled in, and these photos join its gallery.</small>}

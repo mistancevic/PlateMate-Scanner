@@ -12,7 +12,7 @@ export function DayEditor({ value, onChange, workHint, minor = false }: { value:
   const kinds = (minor ? KID_KINDS : ADULT_KINDS).map((id) => KINDS.find((k) => k.id === id)!);
   const whens = minor ? WHENS_KID : WHENS, minutes = minor ? MINUTES_KID : MINUTES;
   const Chip = ({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) => (
-    <button type="button" className={`pill pill-small ${on ? "pill-primary" : ""}`} aria-pressed={on} onClick={onClick}>{children}</button>
+    <button type="button" className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={onClick}>{children}</button>
   );
   return (
     <div className="day-editor">

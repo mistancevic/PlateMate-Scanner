@@ -26,11 +26,11 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   // JOURNEY (approved design, 6 October 2026): without a Weekly plan Today asks, with Rest, Light, Moderate, Hard and a link
   // to the plan; with a plan Today reads it, and Change today's plan changes this date only.
   ok(/kcal, week's average/.test(await page.locator(".plan-row").textContent()), "until the day is known, the calories are the week's average");
-  ok(await page.locator(".plan .day-row .pill").count() === 4 && /What kind of day is it/.test(await page.locator(".plan").textContent()), "without a Weekly plan, Today asks with four pills");
+  ok(await page.locator(".plan .day-row .choice").count() === 4 && /What kind of day is it/.test(await page.locator(".plan").textContent()), "without a Weekly plan, Today asks with four choices");
   ok(await page.getByRole("button", { name: /Set your Weekly plan/ }).count() === 1, "and links to the Weekly plan");
   const assumedKcal = (await page.locator(".plan-row b").nth(1).textContent()).trim();
   await page.getByRole("button", { name: "Hard", exact: true }).click(); await page.waitForTimeout(300);
-  ok(await page.locator(".plan .day-row .pill-primary").textContent() === "Hard", "the picked day is marked");
+  ok(await page.locator(".plan .day-row .choice.on").textContent() === "Hard", "the picked day is marked");
   ok(/kcal today/.test(await page.locator(".plan-row").textContent()) && (await page.locator(".plan-row b").nth(1).textContent()).trim() !== assumedKcal, "calories follow the day");
   // with a Weekly plan (and the day picked above cleared, as a fresh week would be): today's line, the explanation inside the card, the button under it
   await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-personal") || "{}"); const d = { work: true, kind: "strength", intensity: "hard", when: "evening", minutes: 60 }; p.plan = [d, d, d, d, d, d, d]; delete p.dated; Object.keys(localStorage).filter((k) => k.startsWith("chefmealan-today-")).forEach((k) => localStorage.removeItem(k)); localStorage.setItem("chefmealan-personal", JSON.stringify(p)); Object.keys(localStorage).filter((k) => k.startsWith("chefmealan-today-")).forEach((k) => localStorage.removeItem(k)); });

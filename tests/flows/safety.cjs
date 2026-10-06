@@ -38,7 +38,7 @@ seed.items = [];
   ok((await page.evaluate(() => document.querySelector(".door .check.none input").checked)) === false, "ticking a situation clears none");
   ok(await page.locator(".allergy-pick").count() === 0, "the allergy chips stay folded until the tick");
   await page.getByText("Allergies or intolerances").click(); await page.waitForTimeout(300);
-  ok(await page.locator(".allergy-pick .pill").count() === 14, "the fourteen EU allergens as chips, under the tick");
+  ok(await page.locator(".allergy-pick .choice").count() === 14, "the fourteen EU allergens as chips, under the tick");
   await page.locator(".allergy-pick").getByRole("button", { name: "Milk" }).click(); await page.waitForTimeout(400);
   const s1 = await safety();
   ok(s1.situations.includes("eating") && s1.situations.includes("allergies") && s1.allergies[0] === "milk", "the door is recorded: " + s1.situations.join(","));

@@ -128,7 +128,7 @@ function ProfilePanel(p: AppApi) {
         <label className="field"><span>Name</span><input value={name} placeholder="Your name" onChange={(e) => setName(e.target.value)} /></label>
         <div className="field"><span>Sex</span>
           <div className="moments">
-            {(["female", "male"] as const).map((s) => <button key={s} className={`pill pill-small ${d.sex === s ? "pill-primary" : ""}`} onClick={() => setD({ ...d, sex: d.sex === s ? undefined : s })}>{s === "female" ? "Female" : "Male"}</button>)}
+            {(["female", "male"] as const).map((s) => <button key={s} className={`choice ${d.sex === s ? "on" : ""}`} onClick={() => setD({ ...d, sex: d.sex === s ? undefined : s })}>{s === "female" ? "Female" : "Male"}</button>)}
           </div>
         </div>
         <div className="field-row">
@@ -149,8 +149,8 @@ function ProfilePanel(p: AppApi) {
         </div>
         <div className="field"><span>Show protein density as</span>
           <div className="moments">
-            <button className={`pill pill-small ${(d.pdUnit ?? "pd") === "pd" ? "pill-primary" : ""}`} onClick={() => setD({ ...d, pdUnit: "pd" })}>PD, grams per 100 kcal</button>
-            <button className={`pill pill-small ${d.pdUnit === "pct" ? "pill-primary" : ""}`} onClick={() => setD({ ...d, pdUnit: "pct" })}>% of energy from protein</button>
+            <button className={`choice ${(d.pdUnit ?? "pd") === "pd" ? "on" : ""}`} onClick={() => setD({ ...d, pdUnit: "pd" })}>PD, grams per 100 kcal</button>
+            <button className={`choice ${d.pdUnit === "pct" ? "on" : ""}`} onClick={() => setD({ ...d, pdUnit: "pct" })}>% of energy from protein</button>
           </div>
           <small>Same thing, two ways to read it: PD 5 is 20 % of the energy from protein.</small>
         </div>
@@ -169,7 +169,7 @@ function ProfilePanel(p: AppApi) {
               <div className="allergy-pick">
                 <small className="muted">The fourteen every pack in the EU declares. Tap what applies.</small>
                 <div className="chips">
-                  {EU_ALLERGENS.map((a) => { const on = chipOn(a.key); return <button key={a.key} className={`pill pill-small ${on ? "pill-primary" : ""}`} onClick={() => toggleChip(a.key, !on)}>{a.label}</button>; })}
+                  {EU_ALLERGENS.map((a) => { const on = chipOn(a.key); return <button key={a.key} className={`choice ${on ? "on" : ""}`} onClick={() => toggleChip(a.key, !on)}>{a.label}</button>; })}
                 </div>
                 <label className="field"><span>Anything else</span><input value={freeText} placeholder="e.g. kiwi, histamine" onChange={(e) => setFreeText(e.target.value)} onBlur={() => commit(sits, none, joined(chips, freeText))} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /></label>
                 <small className="muted">Nothing containing these is ever suggested. Mealan checks the name and the label lines of every food.</small>
@@ -331,7 +331,7 @@ function Setting({ name, hint, children }: { name: string; hint?: string; childr
 }
 function Chips<T extends string | number>({ items, on, pick, multi }: { items: { id: T; name: string }[]; on: T | T[] | undefined; pick: (v: T) => void; multi?: boolean }) {
   const isOn = (v: T) => (multi ? ((on as T[] | undefined) ?? []).includes(v) : on === v);
-  return <div className="chip-row">{items.map((x) => <button type="button" key={String(x.id)} className={`pill pill-small ${isOn(x.id) ? "pill-primary" : ""}`} aria-pressed={isOn(x.id)} onClick={() => pick(x.id)}>{x.name}</button>)}</div>;
+  return <div className="chip-row">{items.map((x) => <button type="button" key={String(x.id)} className={`choice ${isOn(x.id) ? "on" : ""}`} aria-pressed={isOn(x.id)} onClick={() => pick(x.id)}>{x.name}</button>)}</div>;
 }
 function Options<T extends string>({ items, on, pick }: { items: { id: T; name: string; hint: string }[]; on: T | undefined; pick: (v: T) => void }) {
   return <div className="opt-grid">{items.map((x) => <button type="button" key={x.id} className={`opt ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} onClick={() => pick(x.id)}><b>{x.name}</b><small>{x.hint}</small></button>)}</div>;
@@ -501,10 +501,10 @@ function PlanPanel(p: AppApi) {
           ) : (
             <div className="setting">
               <small className="setting-name">Copy {WEEKDAY_NAMES[sel]} to</small>
-              <div className="chip-row">{WEEKDAYS.map((w, i) => i === sel ? null : <button type="button" key={w} className={`pill pill-small ${copying.includes(i) ? "pill-primary" : ""}`} aria-pressed={copying.includes(i)} onClick={() => setCopying(copying.includes(i) ? copying.filter((x) => x !== i) : [...copying, i])}>{w}</button>)}</div>
-              <div className="button-row">
-                <button type="button" className="pill pill-small" onClick={() => setCopying(null)}>Cancel</button>
-                <button type="button" className="pill pill-small pill-primary" disabled={!copying.length} onClick={() => { save(plan.map((x, n) => (copying.includes(n) ? { ...plan[sel], work: x.work, pe: x.work ? plan[sel].pe : false } : x))); setCopying(null); }}>Copy to {copying.length} {copying.length === 1 ? "day" : "days"}</button>
+              <div className="chip-row">{WEEKDAYS.map((w, i) => i === sel ? null : <button type="button" key={w} className={`choice ${copying.includes(i) ? "on" : ""}`} aria-pressed={copying.includes(i)} onClick={() => setCopying(copying.includes(i) ? copying.filter((x) => x !== i) : [...copying, i])}>{w}</button>)}</div>
+              <div className="actions">
+                <button type="button" className="pill pill-primary action-main" disabled={!copying.length} onClick={() => { save(plan.map((x, n) => (copying.includes(n) ? { ...plan[sel], work: x.work, pe: x.work ? plan[sel].pe : false } : x))); setCopying(null); }}>Copy to {copying.length} {copying.length === 1 ? "day" : "days"}</button>
+                <button type="button" className="link action-cancel" onClick={() => setCopying(null)}>Cancel</button>
               </div>
               <small className="setting-hint">Copies the activity; each day keeps its {minor ? "school day or no school" : "work day or off"}.</small>
             </div>
@@ -522,7 +522,7 @@ function ShopPanel(p: AppApi) {
     <section className="card">
       <small>Decides your starter foods, and tells Mealan which shelves are real.</small>
       <div className="moments" style={{ marginTop: 8 }}>
-        {REGIONS.map((r) => <button key={r.id} className={`pill pill-small ${p.region === r.id ? "pill-primary" : ""}`} onClick={() => p.setRegion(r.id)}>{r.name}</button>)}
+        {REGIONS.map((r) => <button key={r.id} className={`choice ${p.region === r.id ? "on" : ""}`} onClick={() => p.setRegion(r.id)}>{r.name}</button>)}
       </div>
       <p className="label" style={{ marginTop: 16 }}>Starter foods</p>
       <small>About twenty common foods from your shelves, with reviewed values, so the plate works from day one. Foods you already have are skipped, so it's safe to tap again after changing where you shop.</small>

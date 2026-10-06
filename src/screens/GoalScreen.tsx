@@ -78,8 +78,8 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
     <div className="days-choice">
       <b className="section-title">Your days</b>
       <div className="two-way">
-        <button className={`pill pill-small ${mode === "same" ? "pill-primary" : ""}`} onClick={() => setMode("same")}>Every day the same</button>
-        <button className={`pill pill-small ${mode === "each" ? "pill-primary" : ""}`} onClick={() => setMode("each")}>Each day its own</button>
+        <button className={`choice ${mode === "same" ? "on" : ""}`} onClick={() => setMode("same")}>Every day the same</button>
+        <button className={`choice ${mode === "each" ? "on" : ""}`} onClick={() => setMode("each")}>Each day its own</button>
       </div>
     </div>
   );
@@ -107,8 +107,8 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
       </div>
       <div className="hero"><Mark size={52} color="var(--brand)" /><h2>{APP_NAME}</h2><p>Your day in four numbers. Every plate is measured against them.</p></div>
       <div className="ways">
-        <button className={`pill pill-small ${way === "calc" ? "pill-primary" : ""}`} onClick={() => setWay("calc")}>Calculate for me</button>
-        <button className={`pill pill-small ${way === "own" ? "pill-primary" : ""}`} onClick={() => setWay("own")}>My own numbers</button>
+        <button className={`choice ${way === "calc" ? "on" : ""}`} onClick={() => setWay("calc")}>Calculate for me</button>
+        <button className={`choice ${way === "own" ? "on" : ""}`} onClick={() => setWay("own")}>My own numbers</button>
       </div>
 
       {way === "calc" && (
@@ -131,7 +131,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           ) : (
             <section className={`card form ${consented ? "" : "shut"}`} aria-disabled={!consented}>
               <div className="field"><span>Sex</span>
-                <div className="moments">{(["female", "male"] as const).map((s) => <button key={s} className={`pill pill-small ${d.sex === s ? "pill-primary" : ""}`} onClick={() => setPersonalNow({ ...d, sex: d.sex === s ? undefined : s })}>{s === "female" ? "Female" : "Male"}</button>)}</div>
+                <div className="moments">{(["female", "male"] as const).map((s) => <button key={s} className={`choice ${d.sex === s ? "on" : ""}`} onClick={() => setPersonalNow({ ...d, sex: d.sex === s ? undefined : s })}>{s === "female" ? "Female" : "Male"}</button>)}</div>
               </div>
               <div className="field-row">
                 <label className="field"><span>Birth year</span><input inputMode="numeric" value={d.birthYear ?? ""} placeholder="1985" onChange={(e) => setD({ ...d, birthYear: num(e.target.value) })} onBlur={() => p.setPersonal(d)} /></label>
@@ -151,7 +151,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
             </section>
           )}
           <b className="section-title">What are you after?</b>
-          <div className="moments">{BANDS.map((b) => <button key={b.id} className={`pill pill-small ${band === b.id ? "pill-primary" : ""}`} onClick={() => setBand(b.id)}>{b.name}</button>)}</div>
+          <div className="moments">{BANDS.map((b) => <button key={b.id} className={`choice ${band === b.id ? "on" : ""}`} onClick={() => setBand(b.id)}>{b.name}</button>)}</div>
           <p className="small muted">{goalNow.name}: {goalNow.who}.{c ? ` ${c.proteinMin === c.proteinMax ? "" : `Protein ${c.proteinMin} to ${c.proteinMax} g a day.`}` : ""}</p>
           {c ? (
             <>
