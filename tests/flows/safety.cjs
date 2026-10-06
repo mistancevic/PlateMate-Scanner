@@ -89,9 +89,11 @@ seed.items = [];
   await page.evaluate(() => window.scrollTo(0, 2000)); await page.waitForTimeout(100);
   await page.locator(".menu-row").filter({ hasText: /Goal/ }).last().click(); await page.waitForTimeout(400);
   ok((await page.evaluate(() => window.scrollY)) < 40, "Goal opens at the top: scrollY " + (await page.evaluate(() => window.scrollY)));
-  ok(await page.getByRole("button", { name: /Next: My week/ }).count() === 1, "Goal leads to My week");
-  await page.getByRole("button", { name: /Next: My week/ }).click(); await page.waitForTimeout(300);
-  ok(await page.getByRole("button", { name: /Next: Where I shop/ }).count() === 1, "My week leads to Where I shop");
+  ok(await page.getByRole("button", { name: /Next: Lifestyle/ }).count() === 1, "Goal leads to Lifestyle");
+  await page.getByRole("button", { name: /Next: Lifestyle/ }).click(); await page.waitForTimeout(300);
+  ok(await page.getByRole("button", { name: /Next: Weekly plan/ }).count() === 1, "Lifestyle leads to the Weekly plan");
+  await page.getByRole("button", { name: /Next: Weekly plan/ }).click(); await page.waitForTimeout(300);
+  ok(await page.getByRole("button", { name: /Next: Where I shop/ }).count() === 1, "the Weekly plan leads to Where I shop");
   await page.getByRole("button", { name: /Next: Where I shop/ }).click(); await page.waitForTimeout(300);
   ok(await page.getByRole("button", { name: /Next: Coach/ }).count() === 1, "Where I shop leads to Coach");
   // the legal pages are public, at their own addresses, with a way back

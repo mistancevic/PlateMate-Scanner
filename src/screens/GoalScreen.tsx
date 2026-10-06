@@ -159,7 +159,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               {mode === "same" ? (
                 <section className="card proposal"><Four kcal={c.kcal} protein={c.protein} fats={c.fats} carbs={c.carbs} /><p className="math">{c.math}</p><small>{c.method}.</small></section>
               ) : (
-                <DayTable rows={c.days} avg={{ kcal: c.kcal, protein: c.protein }} week={c.week} />
+                <DayTable rows={c.days} avg={{ kcal: c.kcal, protein: c.protein }} week={c.week} weekdays={c.weekdays} />
               )}
               {c.note && <small className="notice">{c.note}</small>}
               <button className="pill pill-primary pill-wide" onClick={() => { p.applyNumbers(band, c.kcal, c.protein, c.method, c.fats, c.carbs); done(); }}>Set my day</button>

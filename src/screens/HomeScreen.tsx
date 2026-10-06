@@ -4,7 +4,9 @@ import { aggregate, density } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
 import { bandOf } from "../goal";
-import { DAY_TYPES, dayLine, dayModeOf, dayNameAny } from "../personal";
+import { DAY_TYPES, dayModeOf, dayNameAny, hasPlan } from "../personal";
+import { planLine, loadOf, LOAD_DAY, type PlanDay } from "../plan";
+import { DayEditor } from "../components/DayEditor";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { X } from "lucide-react";
 import type { AppApi } from "./api";
@@ -19,7 +21,9 @@ export function HomeScreen(p: AppApi) {
   const follow = dayModeOf(p.personal) === "each";
   // The day pills show while the day is still assumed, and again after Change, until a pill is tapped.
   const [changing, setChanging] = useState(false);
-  const pillsOpen = follow && (p.day.source === "assumed" || changing);
+  const [draft, setDraft] = useState<PlanDay | null>(null);
+  // with a Weekly plan Today reads it; without one, Today asks what kind of day it is
+  const planned = hasPlan(p.personal);
   const dateLine = new Date().toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
   const inbox = p.inbox.map((it) => (
     <section className="card inbox" key={it.id}>
@@ -37,11 +41,11 @@ export function HomeScreen(p: AppApi) {
     <>
       <section className="plan">
         <div className="plan-top">
-          <span>{clientName ? `${clientName}'s goal` : "Your goal"}{bandName ? `: ${bandName}` : ""}</span>
+          <span>{byCoach ? `${setBy}'s goal` : "Your goal"}{bandName ? `: ${bandName}` : ""}</span>
           <button className="plan-source" onClick={() => p.openMenu(byCoach ? "coach" : "goal")} aria-label={byCoach ? "Open your coach" : "Open your goal"}>set by {setBy} <ChevronRight size={12} /></button>
         </div>
         <div className="plan-row">
-          <div><b>{pdVal(pdRef)}</b><small>{pdTag()} target</small></div>
+          <div><b>{pdVal(pdRef)}</b><small>{pdTag()} target{follow && p.day.source !== "assumed" ? " today" : ""}</small></div>
           <div><b>{fmt(p.todayKcal ?? state.goals.calories, 0)}</b><small>{!follow ? "kcal a day" : p.day.source === "assumed" ? "kcal, week's average" : "kcal today"}</small></div>
           <div><b>{fmt(p.todayMacros?.protein ?? state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
@@ -49,16 +53,39 @@ export function HomeScreen(p: AppApi) {
         {p.todayMacros && <p className="macro-line">{p.todayMacros.fats} g fat · {p.todayMacros.carbs} g carbs</p>}
         {p.review?.status === "change" && <button className="strip strip-button review-ask" onClick={() => p.openMenu("goal")}>{p.review.by || p.coachLabel} asks you to change {p.review.kept?.length === 1 ? "one number" : "your numbers"} ›</button>}
         {p.profile.coachId && !byCoach && <button className="plan-source coach-line" onClick={() => p.openMenu("coach")} aria-label="Open your coach">{p.coachLabel} <ChevronRight size={12} /></button>}
-        <div className="day-line">
-          <div>
+        {follow && planned && p.day.plan && !changing && (
+          <div className="today-plan">
             <b>{dateLine}</b>
-            {pillsOpen ? <small>What kind of day is it?</small> : <small className="day-state"><Check size={14} /> {follow ? dayLine(p.day) : "Every day the same"}</small>}
+            <span className="today-what">{planLine(p.day.plan)}. {LOAD_DAY[loadOf(p.day.plan)]}</span>
+            <small>{p.day.source === "today" ? "Changed for today only. Your Weekly plan stays the same." : "Today's part of your Weekly plan. If your day goes differently, change today's plan; the numbers follow, and your Weekly plan stays the same."}</small>
+            <button className="pill pill-wide" onClick={() => { setDraft(p.day.plan!); setChanging(true); }}>Change today's plan</button>
+            {p.day.source === "today" && <button className="link" onClick={() => p.setTodayPlan(null)}>Back to the Weekly plan</button>}
           </div>
-          {!pillsOpen && <button className="pill pill-small" onClick={() => (follow ? setChanging(true) : p.openMenu("goal"))}>Change</button>}
-        </div>
-        {pillsOpen && (
-          <div className="day-row">
-            {DAY_TYPES.map((d) => <button key={d.id} className={`pill pill-small ${p.day.source !== "assumed" && p.day.type === d.id ? "pill-primary" : ""}`} onClick={() => { p.setDayType(d.id); setChanging(false); }}>{d.name}</button>)}
+        )}
+        {follow && changing && draft && (
+          <div className="today-plan">
+            <b>{dateLine}, today only</b>
+            <DayEditor value={draft} onChange={setDraft} />
+            <div className="button-row">
+              <button className="pill pill-small" onClick={() => setChanging(false)}>Cancel</button>
+              <button className="pill pill-small pill-primary" onClick={() => { p.setTodayPlan(draft); setChanging(false); }}>Save for today</button>
+            </div>
+          </div>
+        )}
+        {follow && !planned && (
+          <div className="today-plan">
+            <b>{dateLine}</b>
+            <small>What kind of day is it?</small>
+            <div className="day-row">
+              {DAY_TYPES.map((d) => <button key={d.id} className={`pill pill-small ${p.day.type === d.id ? "pill-primary" : ""}`} onClick={() => p.setDayType(d.id)}>{d.name}</button>)}
+            </div>
+            <button className="link" onClick={() => p.openMenu("week")}>Set your Weekly plan, and Chef Mealan won't need to ask ›</button>
+          </div>
+        )}
+        {!follow && (
+          <div className="today-plan">
+            <b>{dateLine}</b>
+            <small>Every day the same, one set of numbers. <button className="link" onClick={() => p.openMenu("goal")}>Change in Goal ›</button></small>
           </div>
         )}
       </section>

@@ -21,21 +21,30 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   await page.getByRole("button", { name: /I ate it/ }).click(); await page.waitForTimeout(300);
   ok(/2 meals logged, 378 kcal/.test(await page.locator(".logged-line").textContent()), "I ate it moves it into the log");
   const rows = await page.locator(".days .history-row").allTextContents();
-  ok(rows.length === 2 && /Yesterday/.test(rows[0]) && /Training, easy/.test(rows[0]) && /2 meals logged/.test(rows[0]), "yesterday: a training day, 2 meals logged");
+  ok(rows.length === 2 && /Yesterday/.test(rows[0]) && /Moderate/.test(rows[0]) && /2 meals logged/.test(rows[0]), "yesterday: a training day, 2 meals logged");
   ok(/Nothing logged/.test(rows[1]), "two days ago: nothing logged, said plainly");
-  // the day: assumed until set, then one line with Change
-  ok(/kcal, week's average/.test(await page.locator(".plan-row").textContent()), "until the day is set, the calories are the week's average");
-  ok(await page.locator(".plan .day-row .pill").count() === 4, "the four day pills show while the day is assumed");
+  // JOURNEY (approved design, 6 October 2026): without a Weekly plan Today asks, with Rest, Light, Moderate, Hard and a link
+  // to the plan; with a plan Today reads it, and Change today's plan changes this date only.
+  ok(/kcal, week's average/.test(await page.locator(".plan-row").textContent()), "until the day is known, the calories are the week's average");
+  ok(await page.locator(".plan .day-row .pill").count() === 4 && /What kind of day is it/.test(await page.locator(".plan").textContent()), "without a Weekly plan, Today asks with four pills");
+  ok(await page.getByRole("button", { name: /Set your Weekly plan/ }).count() === 1, "and links to the Weekly plan");
   const assumedKcal = (await page.locator(".plan-row b").nth(1).textContent()).trim();
-  await page.getByRole("button", { name: "Training, hard" }).click(); await page.waitForTimeout(300);
-  ok(await page.locator(".plan .day-row").count() === 0, "tapping a day collapses the pills");
-  ok(/Training, hard, set by you/.test(await page.locator(".day-state").textContent()), "the line names the day and its source");
+  await page.getByRole("button", { name: "Hard", exact: true }).click(); await page.waitForTimeout(300);
+  ok(await page.locator(".plan .day-row .pill-primary").textContent() === "Hard", "the picked day is marked");
   ok(/kcal today/.test(await page.locator(".plan-row").textContent()) && (await page.locator(".plan-row b").nth(1).textContent()).trim() !== assumedKcal, "calories follow the day");
-  ok(await page.getByRole("button", { name: /Trained today/ }).count() === 0, "Trained today is gone: it is the training day pills");
-  await page.getByRole("button", { name: "Change" }).click(); await page.waitForTimeout(200);
-  ok(await page.locator(".plan .day-row .pill-primary").textContent() === "Training, hard", "Change reopens the pills with today marked");
-  await page.getByRole("button", { name: "Rest, passive" }).click(); await page.waitForTimeout(300);
-  ok(/Rest, passive, set by you/.test(await page.locator(".day-state").textContent()), "picking another day collapses again");
+  // with a Weekly plan: today's line, the explanation inside the card, the button under it
+  await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-personal") || "{}"); const d = { work: true, kind: "strength", intensity: "hard", when: "evening", minutes: 60 }; p.plan = [d, d, d, d, d, d, d]; localStorage.setItem("chefmealan-personal", JSON.stringify(p)); Object.keys(localStorage).filter((k) => k.startsWith("chefmealan-today-")).forEach((k) => localStorage.removeItem(k)); });
+  await page.reload(); await page.waitForTimeout(900);
+  const card = await page.locator(".today-plan").first().textContent();
+  ok(/Strength, hard, in the evening\. A hard day\./.test(card) && /Today's part of your Weekly plan/.test(card), "Today reads the plan and says where it comes from: " + card.slice(0, 80));
+  await page.getByRole("button", { name: "Change today's plan" }).click(); await page.waitForTimeout(200);
+  await page.locator(".today-plan").getByRole("button", { name: "Rest", exact: true }).click();
+  await page.getByRole("button", { name: "Save for today" }).click(); await page.waitForTimeout(300);
+  ok(/Rest\. A rest day\./.test(await page.locator(".today-plan").first().textContent()) && /Changed for today only/.test(await page.locator(".today-plan").first().textContent()), "a change is for today only and says so");
+  const plan = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")).plan[0].kind);
+  ok(plan === "strength", "the Weekly plan stays the same");
+  await page.getByRole("button", { name: "Back to the Weekly plan" }).click(); await page.waitForTimeout(300);
+  ok(/A hard day/.test(await page.locator(".today-plan").first().textContent()), "back to the Weekly plan");
   ok(/set by you/.test(await page.locator(".plan-source").textContent()), "the goal source is a link");
   await page.locator(".plan-source").click(); await page.waitForTimeout(300);
   ok(await page.getByRole("button", { name: /Change the goal/ }).count() >= 1, "set by you opens Me, Goal");

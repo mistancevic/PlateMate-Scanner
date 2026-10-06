@@ -39,6 +39,7 @@ import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
+import { setTodayChange, type PlanDay } from "./plan";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, setDayType as storeDayType, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, type Personal, type DayType, type Day } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
@@ -663,7 +664,7 @@ export default function App() {
     [personal, setPersonalState] = useState<Personal>(getPersonal),
     [safety, setSafetyState] = useState<Safety>(getSafety),
     [deleteSteps, setDeleteSteps] = useState(""),
-    [day, setDayState] = useState<Day>(getDay),
+    [day, setDayState] = useState<Day>(() => getDay()),
     [menuSection, setMenuSection] = useState<MenuSection | null>(null),
     [foodsView, setFoodsView] = useState<"foods" | "recipes">("foods"),
     [editFrom, setEditFrom] = useState<string>(""),
@@ -715,6 +716,8 @@ export default function App() {
     runRef = useRef(0),
     fromCloud = useRef(false),
     prevFoodIds = useRef<string[]>(state.foods.map((f) => f.id));
+  // today's day follows the Weekly plan: when the plan changes, here or from the account, today is read again
+  useEffect(() => { setDayState(getDay(personal)); }, [personal]);
   useEffect(() => {
     if (!message && !error) return;
     const t = setTimeout(() => { setMessage(""); setError(""); }, 4000);
@@ -1155,6 +1158,7 @@ export default function App() {
     const avg = { kcal: g.calories, protein: g.protein, fats, carbs: g.carbs ?? macroSplit(g.calories, g.protein, fats).carbs };
     if (dayModeOf(personal) !== "each" || !day.type) return avg;
     const bandId = goal?.band ?? "maintain";
+    // own numbers: the row of today's load; calculated: today's planned day itself, its activity, intensity and minutes
     if (goal?.source === "exact" || goal?.source === "coach") {
       const o = ownDayNumbers(personal, bandId, profile.formula ?? null);
       if (!o) return avg;
@@ -1162,7 +1166,7 @@ export default function App() {
     }
     const c = calculate(personal, bandId, profile.formula ?? null);
     if (!c) return avg;
-    const d = c.days[day.type]; return { kcal: d.kcal, protein: d.protein, fats: d.fats, carbs: d.carbs };
+    const d = day.plan ? c.numbersOf(day.plan) : c.days[day.type]; return { kcal: d.kcal, protein: d.protein, fats: d.fats, carbs: d.carbs };
   }
   function todayKcalOf(): number | null { return todayNumbers()?.kcal ?? state.goals.calories ?? null; }
   function mix(id: string = adjustId): boolean { return mixWith(state.items, id); }
@@ -1299,7 +1303,7 @@ export default function App() {
   }, [goal?.setAt, state.goals.calories]);
   const totals = aggregate(state.items),
     todayKcal = todayKcalOf(),
-    dayPd = density(state.goals.protein, todayKcal),
+    dayPd = density(todayNumbers()?.protein ?? state.goals.protein, todayKcal),
     pdRef = momentTarget(moment, dayPd);
   const selected = portionTotals(state.items, state.portion);
   const matched =
@@ -1383,7 +1387,9 @@ export default function App() {
       });
       notify("Merged into one food.");
     },
-    goalLog, formula: profile.formula ?? null, todayKcal, dayType: day.type, day, setDayType: (d: DayType | null) => { storeDayType(d); setDayState(getDay()); },
+    goalLog, formula: profile.formula ?? null, todayKcal, dayType: day.type, day, setDayType: (d: DayType | null) => { storeDayType(d); setDayState(getDay(personal)); },
+    // today's plan, for this date only; the Weekly plan stays
+    setTodayPlan: (d: PlanDay | null) => { setTodayChange(d); setDayState(getDay(personal)); },
     applyNumbers: (bandId: string, kcal: number, protein: number, method?: string, fatsIn?: number, carbsIn?: number) => {
       nextSource.current = "profile";
       saveGoal({ band: bandId, setBy: "you", setAt: new Date().toISOString(), source: "profile", method });

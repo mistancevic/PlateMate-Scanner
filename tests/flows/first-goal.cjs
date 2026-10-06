@@ -31,7 +31,7 @@ const path = require("node:path");
   // each day its own: the table
   await page.getByRole("button", { name: "Each day its own" }).click(); await page.waitForTimeout(200);
   const rows = await page.locator(".day-table .dt-row").count();
-  ok(rows === 4 && /Rest, passive/.test(await page.locator(".day-table").textContent()) && /Training, hard/.test(await page.locator(".day-table").textContent()), "four days, all about training");
+  ok(rows === 4 && /Rest/.test(await page.locator(".day-table").textContent()) && /Hard/.test(await page.locator(".day-table").textContent()), "four days by how hard they are: Rest, Light, Moderate, Hard");
   ok(/Your week averages/.test(await page.locator(".dt-avg").textContent()), "the week's average under the table");
   await page.locator(".dt-row").last().getByRole("button", { name: /How/ }).click(); await page.waitForTimeout(150);
   ok(/METs/.test(await page.locator(".dt-how").textContent()) && /Mifflin/.test(await page.locator(".dt-how").textContent()), "How shows the arithmetic and the sources");
@@ -40,7 +40,7 @@ const path = require("node:path");
   ok(g.calories > 0 && g.protein > 0 && g.fats > 0 && g.carbs > 0, "the average is saved with all four: " + JSON.stringify(g));
   // Today: pick the day, the numbers follow it
   const avgK = await page.locator(".plan-row div").nth(1).locator("b").textContent();
-  await page.getByRole("button", { name: "Training, hard" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Hard", exact: true }).click(); await page.waitForTimeout(300);
   const hardK = await page.locator(".plan-row div").nth(1).locator("b").textContent();
   ok(Number(hardK.replace(/,/g, "")) > Number(avgK.replace(/,/g, "")), `a hard training day raises today's calories: ${avgK} to ${hardK}`);
   // from Me, Goal: the same screen comes with a way back
@@ -53,7 +53,7 @@ const path = require("node:path");
   // my own numbers, each day its own
   await page.getByRole("button", { name: /Change the goal/ }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: "My own numbers" }).click(); await page.waitForTimeout(200);
-  await page.getByLabel("Rest, passive, kcal").fill("1700"); await page.getByLabel("Rest, passive, kcal").press("Enter"); await page.waitForTimeout(200);
+  await page.getByLabel("Rest, kcal").fill("1700"); await page.getByLabel("Rest, kcal").press("Enter"); await page.waitForTimeout(200);
   ok(/Set by you|Filled:/.test(await page.locator(".dt-block").first().textContent()) && /Calculated, nothing typed/.test(await page.locator(".dt-block").nth(1).textContent()), "own numbers: a typed day says set by you, an empty one calculated");
   console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
   await b.close(); server.kill(); process.exitCode = fail ? 1 : 0;

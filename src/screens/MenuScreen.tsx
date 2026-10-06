@@ -1,12 +1,14 @@
 import { useState, useEffect, type ReactNode } from "react";
-import { FlaskConical, ChevronRight, BookOpen, ArrowLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator } from "lucide-react";
+import { FlaskConical, ChevronRight, BookOpen, ArrowLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator, Coffee } from "lucide-react";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
 import { exportLog, clearLog, readLog, log } from "../log";
 import { BANDS, bandOf, SOURCE_LABEL, type GoalEntry } from "../goal";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
-import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, type Personal, type DayType } from "../personal";
+import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, planOf, lifestyleOf, ageOf, type Personal, type DayType } from "../personal";
+import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, weekdayIndex, usualFrom, type Plan, type PlanDay, type Lifestyle } from "../plan";
+import { DayEditor } from "../components/DayEditor";
 import { DayTable } from "../components/DayTable";
 import { analyse, isOpen as openAt } from "../analysis";
 import type { AppApi, MenuSection } from "./api";
@@ -14,11 +16,12 @@ import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from
 import { EvalsScreen } from "./EvalsScreen";
 
 // the sections that belong to the person: they live under Me, and back from them goes to Me
-const ME_SECTIONS: MenuSection[] = ["profile", "goal", "week", "shop", "coach", "account"];
+const ME_SECTIONS: MenuSection[] = ["profile", "goal", "life", "week", "shop", "coach", "account"];
 const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "profile", name: "Profile", icon: <User size={20} /> },
   { id: "goal", name: "Goal", icon: <Target size={20} /> },
-  { id: "week", name: "My week", icon: <CalendarDays size={20} /> },
+  { id: "life", name: "Lifestyle", icon: <Coffee size={20} /> },
+  { id: "week", name: "Weekly plan", icon: <CalendarDays size={20} /> },
   { id: "shop", name: "Where I shop", icon: <ShoppingBasket size={20} /> },
   { id: "coach", name: "Coach", icon: <Users size={20} /> },
   { id: "account", name: "Account", icon: <KeyRound size={20} /> },
@@ -54,7 +57,8 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       <h2 className="menu-title">{title}</h2>
       {section === "profile" && <ProfilePanel {...p} />}
       {section === "goal" && <GoalPanel {...p} />}
-      {section === "week" && <WeekPanel {...p} />}
+      {section === "life" && <LifestylePanel {...p} />}
+      {section === "week" && <PlanPanel {...p} />}
       {section === "shop" && <ShopPanel {...p} />}
       {section === "coach" && <CoachPanel {...p} />}
       {section === "account" && <AccountPanel {...p} />}
@@ -139,7 +143,7 @@ function ProfilePanel(p: AppApi) {
               </button>
             ))}
           </div>
-          <small className="muted">Your training week is under My week.</small>
+          <small className="muted">What each day holds is in your Weekly plan.</small>
         </div>
         <div className="field"><span>Show protein density as</span>
           <div className="moments">
@@ -261,7 +265,7 @@ function GoalPanel(p: AppApi) {
       {mode === "each" && (o || c) && (
         <>
           <p className="label">Your days, each its own</p>
-          {o ? <DayTable rows={o.days} avg={o.avg} week={weekOf(p.personal)} /> : <DayTable rows={c!.days} avg={{ kcal: c!.kcal, protein: c!.protein }} week={c!.week} />}
+          {o ? <DayTable rows={o.days} avg={o.avg} week={weekOf(p.personal)} /> : <DayTable rows={c!.days} avg={{ kcal: c!.kcal, protein: c!.protein }} week={c!.week} weekdays={c!.weekdays} />}
         </>
       )}
       {ownWay && (() => {
@@ -290,7 +294,7 @@ function GoalPanel(p: AppApi) {
         <small>Sources: Mifflin et al. 1990; Katch and McArdle; FAO/WHO/UNU 2004 activity levels; Compendium of Physical Activities 2024; US Dietary Guidelines 2025–2030; ISSN position stand 2017; Morton et al. 2018.</small>
       </section>
       <GoalHistory log={p.goalLog} />
-      <NextLink p={p} to="week" from="goal" text="My week" hint="Your life, your training week, session lengths" />
+      <NextLink p={p} to="life" from="goal" text="Lifestyle" hint="Nutrition, work and recovery, set once" />
     </>
   );
 }
@@ -312,42 +316,118 @@ export function GoalHistory({ log }: { log: GoalEntry[] }) {
   );
 }
 
-function WeekPanel(p: AppApi) {
-  const d = p.personal, week = weekOf(d);
-  const total = DAY_TYPES.reduce((a, x) => a + (week[x.id] || 0), 0);
-  const set = (k: DayType, v: number) => p.setPersonal({ ...d, week: { ...week, [k]: Math.max(0, Math.min(7, v)) } });
-  const num = (v: string) => (v.trim() === "" ? undefined : Math.max(10, Math.min(240, Number(v))));
+function Seg({ title, why, children }: { title: string; why: string; children: ReactNode }) {
   return (
     <>
-    <p className="label">Your life, without training</p>
-    <section className="card">
-      <div className="activity-list">{LIFE.map((l) => <button key={l.id} className={`activity ${lifeOf(d) === l.id ? "on" : ""}`} onClick={() => p.setPersonal({ ...d, life: l.id })}><b>{l.name}</b><small>{l.hint}</small></button>)}</div>
-    </section>
-    <p className="label">Your training week</p>
-    <section className="card">
-      <div className="week-steps">
-        {DAY_TYPES.map((x) => (
-          <div className="week-step" key={x.id}>
-            <span><b>{x.name}</b><small>{x.hint}</small></span>
-            <span className="stepper"><button type="button" aria-label={`Fewer ${x.name}`} onClick={() => set(x.id, (week[x.id] || 0) - 1)}>−</button><b>{week[x.id] || 0}</b><button type="button" aria-label={`More ${x.name}`} disabled={total >= 7} onClick={() => set(x.id, (week[x.id] || 0) + 1)}>+</button></span>
+      <div className="seg-head"><b>{title}</b><small>{why}</small></div>
+      <section className="card seg">{children}</section>
+    </>
+  );
+}
+function Setting({ name, hint, children }: { name: string; hint?: string; children: ReactNode }) {
+  return <div className="setting"><small className="setting-name">{name}</small>{children}{hint && <small className="setting-hint">{hint}</small>}</div>;
+}
+function Chips<T extends string | number>({ items, on, pick, multi }: { items: { id: T; name: string }[]; on: T | T[] | undefined; pick: (v: T) => void; multi?: boolean }) {
+  const isOn = (v: T) => (multi ? ((on as T[] | undefined) ?? []).includes(v) : on === v);
+  return <div className="chip-row">{items.map((x) => <button type="button" key={String(x.id)} className={`pill pill-small ${isOn(x.id) ? "pill-primary" : ""}`} aria-pressed={isOn(x.id)} onClick={() => pick(x.id)}>{x.name}</button>)}</div>;
+}
+function Options<T extends string>({ items, on, pick }: { items: { id: T; name: string; hint: string }[]; on: T | undefined; pick: (v: T) => void }) {
+  return <div className="opt-grid">{items.map((x) => <button type="button" key={x.id} className={`opt ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} onClick={() => pick(x.id)}><b>{x.name}</b><small>{x.hint}</small></button>)}</div>;
+}
+
+// Lifestyle, as approved on 6 October 2026: how life runs most weeks, set once. Nutrition first, then Work, then Recovery.
+function LifestylePanel(p: AppApi) {
+  const l = lifestyleOf(p.personal);
+  const save = (patch: Partial<Lifestyle>) => {
+    const next = { ...l, ...patch };
+    p.setPersonal({ ...p.personal, lifestyle: next });
+    p.setUsual(usualFrom(next, planOf(p.personal)));
+  };
+  const age = ageOf(p.personal);
+  const toggle = (v: string) => save({ where: (l.where ?? []).includes(v) ? (l.where ?? []).filter((x) => x !== v) : [...(l.where ?? []), v] });
+  const asItems = (xs: string[]) => xs.map((x) => ({ id: x, name: x }));
+  return (
+    <>
+      <p className="small muted page-why">How your life runs most weeks. Set it once; change it when life changes.</p>
+      <Seg title="Nutrition" why="How you usually eat and drink. Chef Mealan plans and suggests from here first.">
+        <Setting name="Where you eat" hint="Any that apply."><Chips items={asItems(WHERE)} on={l.where} pick={toggle} multi /></Setting>
+        <Setting name="Meals a day"><Chips items={[2, 3, 4, 5].map((n) => ({ id: n, name: n === 5 ? "5 or more" : String(n) }))} on={l.meals} pick={(n) => save({ meals: n })} /></Setting>
+        <Setting name="Eating window" hint="For people who eat within set hours.">
+          <Chips items={[{ id: "none", name: "None" }, { id: "set", name: "Set my window" }]} on={l.window ? "set" : "none"} pick={(v) => save({ window: v === "set" ? (l.window ?? { from: "10:00", to: "18:00" }) : null })} />
+          {l.window && (
+            <div className="field-row">
+              <label className="field"><span>From</span><input type="time" value={l.window.from} onChange={(e) => save({ window: { ...l.window!, from: e.target.value } })} /></label>
+              <label className="field"><span>To</span><input type="time" value={l.window.to} onChange={(e) => save({ window: { ...l.window!, to: e.target.value } })} /></label>
+            </div>
+          )}
+        </Setting>
+        <Setting name="How you eat"><Chips items={asItems(DIETS)} on={l.diet ?? "Everything"} pick={(v) => save({ diet: v })} /></Setting>
+        {age !== null && age >= ALCOHOL_AGE && (
+          <Setting name="Alcohol" hint="Alcohol counts as energy, 7 kcal a gram, and slows recovery. Chef Mealan will leave room for it on those days instead of pretending it isn't there.">
+            <Chips items={asItems(ALCOHOL)} on={l.alcohol} pick={(v) => save({ alcohol: v })} />
+          </Setting>
+        )}
+      </Seg>
+      <small className="muted page-why">Allergies stay in Profile, with the safety questions.</small>
+      <Seg title="Work" why="How much your job moves you on an ordinary day, before any activity.">
+        <Setting name="Working hours" hint={l.hours === "fixed" ? "Fixed hours make Monday to Friday work days in your Weekly plan; you can change any day there." : undefined}>
+          <Options items={HOURS} on={l.hours} pick={(v) => save({ hours: v })} />
+          {l.hours === "fixed" && <Chips items={SLOTS} on={l.slot} pick={(v) => save({ slot: v })} />}
+        </Setting>
+        <Setting name="At work you are"><Options items={MOVES} on={l.move ?? "sitting"} pick={(v) => save({ move: v })} /></Setting>
+        <Setting name="Work travel"><Chips items={[{ id: "none", name: "None" }, { id: "sometimes", name: "Occasionally" }, { id: "often", name: "A lot" }]} on={l.travel} pick={(v) => save({ travel: v as Lifestyle["travel"] })} /></Setting>
+      </Seg>
+      <Seg title="Recovery" why="Sleep is where training turns into progress; it also decides when late meals make sense.">
+        <Setting name="Bedtime"><Chips items={[{ id: "early", name: "Before 22" }, { id: "mid", name: "22 to midnight" }, { id: "late", name: "After midnight" }, { id: "varies", name: "Varies with shifts" }]} on={l.bed} pick={(v) => save({ bed: v as Lifestyle["bed"] })} /></Setting>
+        <Setting name="Wake-up"><Chips items={[{ id: "early", name: "Before 6" }, { id: "mid", name: "6 to 8" }, { id: "late", name: "After 8" }, { id: "varies", name: "Varies with shifts" }]} on={l.wake} pick={(v) => save({ wake: v as Lifestyle["wake"] })} /></Setting>
+      </Seg>
+      <NextLink p={p} to="week" from="life" text="Weekly plan" hint="What each day of your usual week holds" />
+    </>
+  );
+}
+
+// Weekly plan, as approved on 6 October 2026: the usual week as an agenda, then the picked day's settings.
+function PlanPanel(p: AppApi) {
+  const plan = planOf(p.personal) ?? planFromCounts({ passive: 2, active: 2, easy: 2, hard: 1 });
+  const [sel, setSel] = useState(weekdayIndex(new Date()));
+  const [copying, setCopying] = useState<number[] | null>(null);
+  const l = lifestyleOf(p.personal);
+  const save = (next: Plan) => { p.setPersonal({ ...p.personal, plan: next }); p.setUsual(usualFrom(l, next)); };
+  const setDay = (i: number, d: PlanDay) => save(plan.map((x, n) => (n === i ? d : x)));
+  const c = p.goal ? calculate(p.personal, p.goal.band ?? "maintain", p.profile.formula ?? null) : null;
+  const counts = countsOf(plan);
+  return (
+    <>
+      <p className="small muted page-why">What each day of your usual week holds. Today follows it; you can change a single date there.</p>
+      <section className="week-card" aria-label="Your week">
+        <div className="week-card-head"><b>Your week</b>{c && <small>avg {c.kcal.toLocaleString("en")} kcal</small>}</div>
+        {plan.map((d, i) => (
+          <button type="button" key={i} className={`agenda-row ${sel === i ? "on" : ""}`} aria-pressed={sel === i} onClick={() => { setSel(i); setCopying(null); }}>
+            <span className={`load-bar load-${loadOf(d)}`} />
+            <b>{WEEKDAYS[i]}</b>
+            <span className="agenda-what">{planShort(d)}</span>
+            <small className={d.work ? "work" : ""}>{d.work ? "Work" : "Off"}</small>
+          </button>
+        ))}
+        <div className="load-key">{(["hard", "easy", "active", "passive"] as DayType[]).map((t) => <span key={t}><i className={`load-${t}`} />{LOAD_NAME[t]} {counts[t]}</span>)}</div>
+        <small className="week-card-foot">The bar is how hard the day is; the words say what you do. Tap a day to set it.</small>
+      </section>
+      <Seg title={WEEKDAY_NAMES[sel]} why="One day, one activity. The week above follows.">
+        <DayEditor value={plan[sel]} onChange={(d) => setDay(sel, d)} workHint={l.hours === "fixed" ? `From Lifestyle: fixed hours${l.slot ? `, ${SLOTS.find((s) => s.id === l.slot)!.name}` : ""}.` : undefined} />
+        {copying === null ? (
+          <button type="button" className="pill pill-wide" onClick={() => setCopying([])}>Copy {WEEKDAY_NAMES[sel]} to other days</button>
+        ) : (
+          <div className="setting">
+            <small className="setting-name">Copy {WEEKDAY_NAMES[sel]} to</small>
+            <div className="chip-row">{WEEKDAYS.map((w, i) => i === sel ? null : <button type="button" key={w} className={`pill pill-small ${copying.includes(i) ? "pill-primary" : ""}`} aria-pressed={copying.includes(i)} onClick={() => setCopying(copying.includes(i) ? copying.filter((x) => x !== i) : [...copying, i])}>{w}</button>)}</div>
+            <div className="button-row">
+              <button type="button" className="pill pill-small" onClick={() => setCopying(null)}>Cancel</button>
+              <button type="button" className="pill pill-small pill-primary" disabled={!copying.length} onClick={() => { save(plan.map((x, n) => (copying.includes(n) ? { ...plan[sel], work: x.work } : x))); setCopying(null); }}>Copy to {copying.length} {copying.length === 1 ? "day" : "days"}</button>
+            </div>
+            <small className="setting-hint">Copies the activity; each day keeps its work day or off.</small>
           </div>
-        ))}
-        <small className={total === 7 ? "muted" : "notice"}>{total} of 7 days. The week's average is the goal on days you don't pick.</small>
-      </div>
-      <div className="field-row" style={{ marginTop: 10 }}>
-        <label className="field"><span>Easy session, min</span><input inputMode="numeric" defaultValue={d.easyMin ?? ""} placeholder="60" onBlur={(e) => p.setPersonal({ ...d, easyMin: num(e.target.value) })} /></label>
-        <label className="field"><span>Hard session, min</span><input inputMode="numeric" defaultValue={d.hardMin ?? ""} placeholder="75" onBlur={(e) => p.setPersonal({ ...d, hardMin: num(e.target.value) })} /></label>
-      </div>
-    </section>
-    <p className="label">The shape of your week</p>
-    <section className="card">
-      <small>It decides which moments come first when you cook.</small>
-      <div className="moments" style={{ marginTop: 8 }}>
-        {RHYTHMS.map((r) => (
-          <button key={r.id} className={`pill pill-small ${p.usual.includes(r.id) ? "pill-primary" : ""}`} onClick={() => p.setUsual(p.usual.includes(r.id) ? p.usual.filter((x) => x !== r.id) : [...p.usual, r.id])}>{r.name}</button>
-        ))}
-      </div>
-    </section>
+        )}
+      </Seg>
       <NextLink p={p} to="shop" from="week" text="Where I shop" hint="The starter foods for your shops" />
     </>
   );

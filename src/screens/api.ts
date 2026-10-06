@@ -3,7 +3,7 @@ import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
 import type { ScannerMode } from "../types";
 
 export type Tab = "home" | "journey" | "me" | "clients" | "meal" | "chef" | "foods" | "notes" | "more";
-export type MenuSection = "list" | "profile" | "goal" | "week" | "shop" | "coach" | "account" | "support" | "about" | "evals";
+export type MenuSection = "list" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "account" | "support" | "about" | "evals";
 export type Step = "in" | "recipe" | "make" | "after";
 
 export interface AppApi {
@@ -91,6 +91,7 @@ export interface AppApi {
   todayKcal: number | null;
   dayType: import("../personal").DayType;
   day: import("../personal").Day;
+  setTodayPlan: (d: import("../plan").PlanDay | null) => void;
   setDayType: (d: import("../personal").DayType) => void;
   formula: import("../personal").Formula | null;
   openMenu: (s?: MenuSection, from?: MenuSection) => void;

@@ -1,4 +1,4 @@
-import { Settings } from "lucide-react";
+import { Settings , Coffee } from "lucide-react";
 import { fmt, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
 import { bandOf } from "../goal";
@@ -7,6 +7,8 @@ import { SendSheet } from "./CoachScreen";
 import { useState, type ReactNode } from "react";
 import { ChevronRight, User, Target, CalendarDays, ShoppingBasket, Users, KeyRound } from "lucide-react";
 import type { MenuSection } from "./api";
+import { lifestyleOf, planOf } from "../personal";
+import { HOURS, SLOTS, countsOf } from "../plan";
 import type { AppApi } from "./api";
 
 // Me: the person's own page. Their goal at a glance and their meals. Settings live in the menu.
@@ -15,11 +17,25 @@ import type { AppApi } from "./api";
 const ME_ROWS: { id: MenuSection; name: string; icon: ReactNode; hint: (p: AppApi) => string }[] = [
   { id: "profile", name: "Profile", icon: <User size={18} />, hint: (p) => (p.safety.declaredAt ? "Body data and the door, answered" : "Body data and the door") },
   { id: "goal", name: "Goal", icon: <Target size={18} />, hint: (p) => (p.state.goals.calories ? `${Math.round(p.state.goals.calories).toLocaleString("en")} kcal · ${p.state.goals.protein ?? "?"} g protein` : "Work it out, or set it") },
-  { id: "week", name: "My days", icon: <CalendarDays size={18} />, hint: (p) => (p.personal.dayMode === "follow" ? "Follow my day" : "Every day the same") },
+  { id: "life", name: "Lifestyle", icon: <Coffee size={18} />, hint: (p) => lifeHint(p) },
+  { id: "week", name: "Weekly plan", icon: <CalendarDays size={18} />, hint: (p) => planHint(p) },
   { id: "shop", name: "Where I shop", icon: <ShoppingBasket size={18} />, hint: () => "The starter foods for your shops" },
   { id: "coach", name: "My coach", icon: <Users size={18} />, hint: (p) => (p.profile.coachId ? `${p.coachLabel} sees what you share` : "Join with a code") },
   { id: "account", name: "Account", icon: <KeyRound size={18} />, hint: () => "Export my data, delete my account" },
 ];
+// the two speeds: Lifestyle changes when life does, the Weekly plan when the activity does
+function lifeHint(p: AppApi): string {
+  if (!p.personal.lifestyle) return "Nutrition, work and recovery, set once";
+  const l = lifestyleOf(p.personal);
+  const parts = [HOURS.find((h) => h.id === l.hours)?.name ?? "", l.hours === "fixed" && l.slot ? SLOTS.find((s) => s.id === l.slot)!.name : "", l.where?.length ? l.where[0].toLowerCase() : ""].filter(Boolean);
+  return parts.join(" · ") || "Nutrition, work and recovery, set once";
+}
+function planHint(p: AppApi): string {
+  const plan = planOf(p.personal);
+  if (!plan) return "What each day of your usual week holds";
+  const c = countsOf(plan);
+  return [c.hard ? `${c.hard} hard` : "", c.easy ? `${c.easy} moderate` : "", c.active ? `${c.active} light` : "", c.passive ? `${c.passive} rest` : ""].filter(Boolean).join(", ");
+}
 export function MeScreen(p: AppApi) {
   const { state, goal, profile, clientName } = p;
   const [shareFor, setShareFor] = useState<string | null>(null);

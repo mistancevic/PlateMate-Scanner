@@ -1,5 +1,6 @@
 // Who the person is, for calculating their numbers. Every field optional; stored on the phone and in their account only.
 import { BANDS, type Band } from "./goal";
+import { isPlan, planFromCounts, countsOf, metOf, minutesOf, lifestyleFromOld, baseFactor, moveOf, WEEKDAY_NAMES, planLine, loadOf, weekdayIndex, getTodayChange, setTodayChange, dayOfLoad, type Plan, type PlanDay, type Lifestyle } from "./plan";
 export type Sex = "female" | "male";
 export type Activity = "sedentary" | "light" | "moderate" | "very" | "athlete"; // before 6 October 2026; read only to move old profiles over
 export type Formula = "mifflin" | "katch";
@@ -16,6 +17,8 @@ export type Personal = {
   kept?: Record<string, { at: string; sig: string }>;
   dayMode?: DayMode | "follow"; ownDays?: Partial<Record<DayType, OwnDay>>;
   activity?: Activity; dayKcal?: unknown;
+  // from 6 October 2026: the usual week, Monday first, and the lifestyle set once
+  plan?: Plan; lifestyle?: Lifestyle;
 };
 // Life without planned training, as a multiple of resting burn. Physical activity levels after FAO/WHO/UNU 2004,
 // taken at the low end of each band because planned training is counted separately, per day.
@@ -27,11 +30,13 @@ export const LIFE: { id: Life; name: string; hint: string; factor: number }[] = 
 ];
 // The four days, all about training. METs from the Compendium of Physical Activities (2024): a walk or mobility about 3.5,
 // a session you could talk through about 5, a hard or heavy session about 8. Only the part above rest is added.
+// The four loads a day can have. The Weekly plan says what each day holds; its load decides which row of own numbers applies.
+// The METs and minutes here are only for someone with no Weekly plan yet: a walk about 3.5, most training about 5, hard about 8.
 export const DAY_TYPES: { id: DayType; name: string; hint: string; met: number; minutes: (p: Personal) => number }[] = [
-  { id: "passive", name: "Rest, passive",  hint: "nothing planned",       met: 1,   minutes: () => 0 },
-  { id: "active",  name: "Rest, active",   hint: "walk, mobility",        met: 3.5, minutes: () => 45 },
-  { id: "easy",    name: "Training, easy", hint: "one session",           met: 5,   minutes: (p) => p.easyMin ?? 60 },
-  { id: "hard",    name: "Training, hard", hint: "heavy, long or two",    met: 8,   minutes: (p) => p.hardMin ?? 75 },
+  { id: "passive", name: "Rest",     hint: "no activity",                 met: 1,   minutes: () => 0 },
+  { id: "active",  name: "Light",    hint: "walk, yoga, mobility",        met: 3.5, minutes: () => 45 },
+  { id: "easy",    name: "Moderate", hint: "most training",               met: 5,   minutes: (p) => p.easyMin ?? 60 },
+  { id: "hard",    name: "Hard",     hint: "you couldn't talk through it", met: 8,   minutes: (p) => p.hardMin ?? 75 },
 ];
 export const dayModeOf = (p: Personal): DayMode => (p.dayMode === "each" || p.dayMode === "follow" ? "each" : "same");
 // an old profile: its one activity is split into a life and a week the first time it is read
@@ -40,29 +45,40 @@ const OLD_WEEK: Record<Activity, Week> = {
   moderate: { passive: 2, active: 1, easy: 2, hard: 2 }, very: { passive: 1, active: 1, easy: 3, hard: 2 }, athlete: { passive: 0, active: 1, easy: 3, hard: 3 },
 };
 export const lifeOf = (p: Personal): Life => p.life ?? "desk";
-export const weekOf = (p: Personal): Week => p.week ?? OLD_WEEK[p.activity ?? "moderate"] ?? OLD_WEEK.moderate;
+const oldWeekOf = (p: Personal): Week => p.week ?? OLD_WEEK[p.activity ?? "moderate"] ?? OLD_WEEK.moderate;
+// The Weekly plan: the one set on the Weekly plan page; else, for someone who had the old My week, a starting plan from it;
+// else none yet, and Today asks what kind of day it is.
+export const hasPlan = (p: Personal) => isPlan(p.plan) || !!p.week || !!p.activity;
+export const planOf = (p: Personal): Plan | null => (isPlan(p.plan) ? p.plan : (p.week || p.activity) ? planFromCounts(oldWeekOf(p), p.easyMin, p.hardMin) : null);
+export const lifestyleOf = (p: Personal): Lifestyle => p.lifestyle ?? lifestyleFromOld(p.life);
+// how many days of each load the week holds: from the plan, else the old counts
+export const weekOf = (p: Personal): Week => { const pl = planOf(p); return pl ? countsOf(pl) : oldWeekOf(p); };
+// someone trains when two or more days a week are moderate or hard
 export const trainsOf = (p: Personal): boolean => { const w = weekOf(p); return w.easy + w.hard >= 2; };
 const dayKey = () => `chefmealan-day-${new Date().toISOString().slice(0, 10)}`;
 // The day has one source, in this order: a plan says it, else the person tapped it, else nothing: the week's average counts.
 // The key is dated, so every new day starts unset. Changing today never touches a plan.
-export type DaySource = "plan" | "you" | "assumed";
-export type Day = { type: DayType | null; source: DaySource };
-// Plans are not built yet; when they are, this returns the planned day type for the date, or null.
-export const plannedDayFor = (_date: Date): DayType | null => null;
 const isDayType = (x: unknown): x is DayType => x === "passive" || x === "active" || x === "easy" || x === "hard";
-export function getDay(): Day {
-  const planned = plannedDayFor(new Date());
-  if (planned) return { type: planned, source: "plan" };
-  try { const tapped = localStorage.getItem(dayKey()); if (isDayType(tapped)) return { type: tapped, source: "you" }; } catch {}
-  return { type: null, source: "assumed" };
+export type DaySource = "today" | "plan" | "you" | "assumed";
+export type Day = { type: DayType | null; source: DaySource; plan?: PlanDay | null };
+// Today's day, in this order: a change for this date only; else the Weekly plan for this weekday; else an old tapped day;
+// else nothing, and the week's average counts until the person says.
+export function getDay(p: Personal = getPersonal(), date = new Date()): Day {
+  const change = getTodayChange(date);
+  if (change) return { type: loadOf(change), source: "today", plan: change };
+  const pl = planOf(p);
+  if (pl) { const d = pl[weekdayIndex(date)]; return { type: loadOf(d), source: "plan", plan: d }; }
+  try { const tapped = localStorage.getItem(dayKey()); if (isDayType(tapped)) return { type: tapped, source: "you", plan: dayOfLoad(tapped) }; } catch {}
+  return { type: null, source: "assumed", plan: null };
 }
 export const getDayType = (): DayType | null => getDay().type;
-export const setDayType = (d: DayType | null) => { try { if (d) localStorage.setItem(dayKey(), d); else localStorage.removeItem(dayKey()); } catch {} };
+// a load picked on Today by someone with no Weekly plan: kept for this date only
+export const setDayType = (d: DayType | null) => setTodayChange(d ? dayOfLoad(d) : null);
 export const dayName = (t: DayType | null) => (t ? DAY_TYPES.find((x) => x.id === t)!.name : "Average day");
 // a day stored before 6 October 2026 keeps a readable name in the last days
-const OLD_DAY_NAME: Record<string, string> = { rest: "Rest, passive", normal: "Average day", training: "Training, easy", very: "Training, hard" };
+const OLD_DAY_NAME: Record<string, string> = { rest: "Rest", normal: "Average day", training: "Moderate", very: "Hard" };
 export const dayNameAny = (x: string | null | undefined) => (!x ? "" : DAY_TYPES.find((d) => d.id === x)?.name ?? OLD_DAY_NAME[x] ?? x);
-export const dayLine = (d: Day): string => d.source === "plan" ? `${dayName(d.type)}, as planned` : d.source === "you" ? `${dayName(d.type)}, set by you` : "Your week's average, until you pick the day";
+export const dayLine = (d: Day): string => d.source === "plan" ? `${dayName(d.type)}, as planned` : d.source === "today" || d.source === "you" ? `${dayName(d.type)}, changed for today` : "Your week's average, until you pick the day";
 const KEY = "chefmealan-personal";
 export const getPersonal = (): Personal => { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; } };
 export const setPersonal = (p: Personal) => { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch {} };
@@ -92,7 +108,7 @@ export function macroSplit(kcal: number, protein: number, fatsFixed?: number | n
   return { fats, carbs };
 }
 export type DayNumbers = { kcal: number; protein: number; fats: number; carbs: number; how: string[] };
-export type Calc = { kcal: number; protein: number; fats: number; carbs: number; proteinMin: number; proteinMax: number; note: string; method: string; math: string; bmr: number; tdee: number; days: Record<DayType, DayNumbers>; week: Week };
+export type Calc = { kcal: number; protein: number; fats: number; carbs: number; proteinMin: number; proteinMax: number; note: string; method: string; math: string; bmr: number; tdee: number; days: Record<DayType, DayNumbers>; week: Week; weekdays: ({ name: string; day: PlanDay } & DayNumbers)[] | null; numbersOf: (d: PlanDay) => DayNumbers };
 const r50 = (x: number) => Math.round(x / 50) * 50;
 export function calculate(p: Personal, bandId: string, pinned?: Formula | null): Calc | null {
   if (!canCalculate(p)) return null;
@@ -102,7 +118,8 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   const f = formulaFor(p, pinned) === "katch" && p.bodyFatPct ? "katch" : "mifflin";
   const lean = p.bodyFatPct ? w * (1 - p.bodyFatPct / 100) : null;
   const bmr = f === "katch" && lean ? 370 + 21.6 * lean : 10 * w + 6.25 * h - 5 * age + sexTerm;
-  const life = LIFE.find((l) => l.id === lifeOf(p))!;
+  const ls = lifestyleOf(p), move = moveOf(ls);
+  const life = { factor: move.factor, name: `${move.name.toLowerCase()} at work` };
   let adj = ADJ[bandId] ?? 0;
   const notes: string[] = [];
   if (age < 18 && adj < 0) { adj = 0; notes.push("Under 18: no deficit, energy stays at maintenance."); }
@@ -129,21 +146,41 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
     kcalOf[d.id] = r50((base + extra) * (1 + adj));
     how[d.id] = [
       `${Math.round(bmr).toLocaleString("en")} at rest (${f === "katch" ? "Katch–McArdle, from lean mass" : "Mifflin–St Jeor: sex, age, height, weight"})`,
-      `× ${life.factor} for ${life.name.toLowerCase()} = ${Math.round(base).toLocaleString("en")}`,
+      `× ${life.factor} for ${life.name} = ${Math.round(base).toLocaleString("en")}`,
       extra ? `+ ${Math.round(extra)} for ${min} min ${d.id === "active" ? "walking or mobility" : d.id === "easy" ? "easy training" : "hard training"} (${d.met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest)` : "+ 0, no training",
       `${pct === 0 ? "± 0" : pct > 0 ? `+ ${pct}` : `− ${Math.abs(pct)}`} % for ${goalName}`,
       `= ${kcalOf[d.id].toLocaleString("en")} kcal`,
     ];
   }
+  // a planned day: resting burn × the day's baseline (work day or off), plus its activity, then the goal
+  const plan = planOf(p);
+  const pctLine = `${pct === 0 ? "± 0" : pct > 0 ? `+ ${pct}` : `− ${Math.abs(pct)}`} % for ${goalName}`;
+  const restLine = `${Math.round(bmr).toLocaleString("en")} at rest (${f === "katch" ? "Katch–McArdle, from lean mass" : "Mifflin–St Jeor: sex, age, height, weight"})`;
+  const dayKcalHow = (d: PlanDay): { kcal: number; how: string[] } => {
+    const fac = baseFactor(ls, d.work), b = bmr * fac;
+    const min = minutesOf(d), met = metOf(d);
+    const extra = met > 1 ? (met - 1) * w * (min / 60) : 0;
+    const kcal = r50((b + extra) * (1 + adj));
+    return { kcal, how: [
+      restLine,
+      `× ${fac} for ${d.work ? life.name : "a day off"} = ${Math.round(b).toLocaleString("en")}`,
+      extra ? `+ ${Math.round(extra)} for ${min} min ${planLine(d).toLowerCase().replace(/, (in|during|late).*$/, "")} (${met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest; Compendium 2024)` : "+ 0, no activity",
+      pctLine,
+      `= ${kcal.toLocaleString("en")} kcal`,
+    ] };
+  };
+  const weekdayKcal = plan ? plan.map(dayKcalHow) : null;
   const nDays = DAY_TYPES.reduce((a, d) => a + (week[d.id] || 0), 0) || 1;
-  const avg = r50(DAY_TYPES.reduce((a, d) => a + kcalOf[d.id] * (week[d.id] || 0), 0) / nDays);
+  const avg = weekdayKcal ? r50(weekdayKcal.reduce((a, x) => a + x.kcal, 0) / 7) : r50(DAY_TYPES.reduce((a, d) => a + kcalOf[d.id] * (week[d.id] || 0), 0) / nDays);
   const fats = Math.round((avg * (FAT_OF[bandId] ?? FAT_SHARE)) / 9);
   const carbsOf = (k: number) => Math.max(0, Math.round((k - protein * 4 - fats * 9) / 4));
   const days = {} as Record<DayType, DayNumbers>;
   for (const d of DAY_TYPES) days[d.id] = { kcal: kcalOf[d.id], protein, fats, carbs: carbsOf(kcalOf[d.id]), how: how[d.id] };
-  const method = `${f === "katch" ? "Katch–McArdle" : "Mifflin–St Jeor"}, ${life.name.toLowerCase()} ×${life.factor}, training per day from the Compendium of Physical Activities${pct ? `, ${pct > 0 ? "+" : ""}${pct} %` : ""}`;
+  const numbersOf = (d: PlanDay): DayNumbers => { const x = dayKcalHow(d); return { kcal: x.kcal, protein, fats, carbs: carbsOf(x.kcal), how: x.how }; };
+  const weekdays = plan ? plan.map((d, i) => ({ name: WEEKDAY_NAMES[i], day: d, ...numbersOf(d) })) : null;
+  const method = `${f === "katch" ? "Katch–McArdle" : "Mifflin–St Jeor"}, ${life.name} ×${life.factor}, activity per day from the Compendium of Physical Activities${pct ? `, ${pct > 0 ? "+" : ""}${pct} %` : ""}`;
   const math = `Average over your week: ${avg.toLocaleString("en")} kcal. Protein ${lo}–${hi} g per kg${trains ? ", because you train" : ""} × ${Math.round(ref)} kg = ${proteinMin}–${proteinMax} g, target ${protein} g.`;
-  return { kcal: avg, protein, fats, carbs: carbsOf(avg), proteinMin, proteinMax, note: notes.join(" "), method, math, bmr: Math.round(bmr), tdee: Math.round(base), days, week };
+  return { kcal: avg, protein, fats, carbs: carbsOf(avg), proteinMin, proteinMax, note: notes.join(" "), method, math, bmr: Math.round(bmr), tdee: Math.round(base), days, week, weekdays, numbersOf };
 }
 // Own numbers, day by day: a typed row wins; an empty row is calculated when the profile allows, else it takes the average
 // of the typed ones. Fat stays one number for every day unless typed; carbs carry the difference.

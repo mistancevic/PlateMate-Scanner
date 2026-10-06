@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { DAY_TYPES, type DayNumbers, type DayType, type OwnDay, type Week } from "../personal";
 import { density } from "../pilot";
 import { addsUp, type Analysis, type Finding } from "../analysis";
+import { loadOf, planShort, type PlanDay } from "../plan";
 
 // The four days, the same wherever they appear. Read-only: one table, kcal, protein, fat, carbs, How under each
 // calculated row. Own numbers: each day a block with four fields; what was filled says so; a row that does not add up
@@ -10,8 +11,10 @@ type Row = DayNumbers & { source?: "you" | "calculated" | "average" };
 type Field = "kcal" | "protein" | "fats" | "carbs";
 const LABEL: Record<Field, string> = { kcal: "kcal", protein: "protein g", fats: "fat g", carbs: "carbs g" };
 
-export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep }: {
+export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, weekdays }: {
   rows: Record<DayType, Row>;
+  // calculated from a Weekly plan: the seven days themselves, each with its own activity and numbers
+  weekdays?: ({ name: string; day: PlanDay } & DayNumbers)[] | null;
   avg: { kcal: number; protein: number };
   week: Week;
   own?: Partial<Record<DayType, OwnDay>>;
@@ -20,14 +23,36 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep }:
   open?: (f: Finding) => boolean; // a finding not yet kept on purpose at this value
   keep?: (f: Finding) => void;
 }) {
-  const [how, setHow] = useState<DayType | null>(null);
+  const [how, setHow] = useState<string | null>(null);
   const [draft, setDraft] = useState<Record<string, string>>({});
   const refs = useRef<Record<string, HTMLInputElement | null>>({});
   const mix = DAY_TYPES.filter((d) => week[d.id]).map((d) => `${week[d.id]} ${d.name.toLowerCase().replace("training, ", "").replace("rest, ", "")}`).join(", ");
   const avgLine = <p className="dt-avg">Your week averages {avg.kcal.toLocaleString("en")} kcal · PD {(density(avg.protein, avg.kcal) ?? 0).toFixed(1)}{mix ? ` · ${mix}` : ""}</p>;
-  const howBlock = (d: DayType, r: Row) => how === d && <div className="dt-how">{r.how.map((l, i) => <p key={i} className={i === r.how.length - 1 ? "dt-sum" : ""}>{l}</p>)}</div>;
-  const howLink = (d: DayType) => <button type="button" className="link" aria-expanded={how === d} onClick={() => setHow(how === d ? null : d)}>{how === d ? "Hide" : "How ›"}</button>;
+  const howBlock = (d: string, r: Row) => how === d && <div className="dt-how">{r.how.map((l, i) => <p key={i} className={i === r.how.length - 1 ? "dt-sum" : ""}>{l}</p>)}</div>;
+  const howLink = (d: string) => <button type="button" className="link" aria-expanded={how === d} onClick={() => setHow(how === d ? null : d)}>{how === d ? "Hide" : "How ›"}</button>;
 
+  if (!setOwn && weekdays) {
+    return (
+      <div className="day-table" aria-label="Your days">
+        <div className="dt-head"><span>Day</span><span>kcal</span><span>protein</span><span>fat</span><span>carbs</span></div>
+        {weekdays.map((w) => (
+          <div className="dt-row" key={w.name}>
+            <div className="dt-cells">
+              <span className="dt-day"><b><i className={`load-dot load-${loadOf(w.day)}`} />{w.name}</b><small>{planShort(w.day)}</small></span>
+              <b className="dt-num">{w.kcal.toLocaleString("en")}</b>
+              <span className="dt-num">{w.protein}</span>
+              <span className="dt-num muted">{w.fats}</span>
+              <span className="dt-num muted">{w.carbs}</span>
+            </div>
+            <div className="dt-src">{howLink(w.name)}</div>
+            {howBlock(w.name, w)}
+          </div>
+        ))}
+        {avgLine}
+        <small className="muted">Protein and fat stay the same every day; carbs carry the difference. The days come from your Weekly plan. Sources: Mifflin et al. 1990; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004.</small>
+      </div>
+    );
+  }
   if (!setOwn) {
     return (
       <div className="day-table" aria-label="Your days">

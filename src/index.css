@@ -677,3 +677,30 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .logged-line { margin: -6px 0 10px; }
 .log-card small { display: block; } .log-nums { color: var(--brand-text); font-weight: 700; margin-top: 4px; }
 .days .history-row { align-items: center; } .days .history-num small { text-align: right; display: block; max-width: 180px; }
+
+/* Lifestyle and Weekly plan, 6 October 2026: one template per segment, title, one line why, the settings in one card */
+.page-why { margin: 0 2px 10px; }
+.seg-head { display: flex; flex-direction: column; gap: 2px; margin: 14px 2px 6px; } .seg-head b { font-size: 17px; font-weight: 900; } .seg-head small { color: var(--muted); font-weight: 600; }
+.card.seg { display: flex; flex-direction: column; gap: 14px; }
+.setting { display: flex; flex-direction: column; gap: 6px; } .setting-name { font-weight: 800; color: var(--ink); } .setting-hint { color: var(--muted); font-weight: 600; font-size: 12px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.opt { text-align: left; border-radius: 14px; padding: 8px 10px; background: var(--surface); border: 1.5px solid var(--line); display: flex; flex-direction: column; gap: 1px; font: inherit; color: var(--brand-text); }
+.opt b { font-size: 13.5px; } .opt small { font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.opt.on { background: var(--brand); border-color: var(--brand); color: #fff; } .opt.on small { color: #dbe8ff; }
+.day-editor { display: flex; flex-direction: column; gap: 14px; }
+/* the week as an agenda: a bar for how hard the day is, the words for what you do */
+.week-card { background: var(--tint); border-radius: 20px; padding: 12px; display: flex; flex-direction: column; gap: 6px; }
+.week-card-head { display: flex; justify-content: space-between; align-items: baseline; color: var(--brand-text); } .week-card-head b { font-size: 15px; } .week-card-head small { font-weight: 800; }
+.week-card-foot { color: var(--brand-text); font-weight: 700; font-size: 11.5px; }
+.agenda-row { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 0 10px 0 0; height: 44px; overflow: hidden; font: inherit; color: var(--ink); text-align: left; }
+.agenda-row.on { border: 2px solid var(--brand); background: #eef4ff; }
+.agenda-row b { width: 34px; font-size: 13px; } .agenda-what { flex: 1; font-size: 13px; font-weight: 700; } .agenda-row small { font-size: 11.5px; font-weight: 800; color: var(--muted); } .agenda-row small.work { color: var(--brand-text); }
+.load-bar { width: 6px; align-self: stretch; }
+.load-key { display: flex; flex-wrap: wrap; gap: 10px; font-size: 11px; font-weight: 700; color: var(--brand-text); } .load-key span { display: inline-flex; align-items: center; gap: 4px; } .load-key i { width: 12px; height: 6px; border-radius: 3px; display: inline-block; }
+.load-dot { width: 8px; height: 8px; border-radius: 4px; display: inline-block; margin-right: 6px; vertical-align: middle; }
+.load-hard { background: #13916a; } .load-easy { background: #35cf9e; } .load-active { background: #f6b94a; } .load-passive { background: #c9d3e6; }
+/* Today: today's plan inside the card, the button under the text */
+.today-plan { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #b9cdf1; }
+.today-plan .today-what { color: var(--brand-text); font-weight: 700; } .today-plan small { color: var(--muted); font-weight: 600; }
+.today-plan .pill-wide { margin-top: 4px; }
