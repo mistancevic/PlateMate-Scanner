@@ -725,7 +725,7 @@ app.post("/api/access-request", async (req, res) => {
   if (!FB_PROJECT) return ok();
   try {
     await db().collection("accessRequests").add({
-      name, email, note, coach: Boolean(b.coach), status: "new", createdAt: new Date().toISOString(),
+      name, email, note, coach: Boolean(b.coach), who: ["client", "coach", "self"].includes(b.who) ? b.who : "", status: "new", createdAt: new Date().toISOString(),
       ipHash: createHash("sha256").update(ip + day).digest("hex").slice(0, 16), ua: String(req.headers["user-agent"] || "").slice(0, 160),
     });
     ok();

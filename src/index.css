@@ -742,3 +742,34 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .goal-head .goal-name, .goal-head .goal-who { display: block; }
 /* the back link: the arrow beside the word, not above it */
 .menu-head .link { display: inline-flex; flex-direction: row; align-items: center; gap: 6px; white-space: nowrap; }
+/* chefmealan.com, as approved on 6 October 2026 (canvas boards H1 to H3) */
+.l-signin { font-weight: 800; }
+.l-hero-art { height: auto; margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.l-hero-art .l-chef { position: static; height: auto; width: 220px; max-width: 70%; border-radius: 26px; -webkit-mask-image: none; mask-image: none; filter: none; box-shadow: 0 12px 30px rgba(23,39,66,.15); }
+.l-hero-art figcaption { font-size: 13px; color: var(--muted); font-weight: 700; }
+.l-eyebrow { display: block; font-size: 12px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; color: var(--brand-text); margin-bottom: 6px; }
+.l-steps, .l-week, .l-try, .l-coach, .l-built, .l-who, .l-request { padding: 26px 0; border-top: 1px solid var(--line); }
+.landing p { line-height: 1.55; }
+.l-split { display: grid; grid-template-columns: 1fr; gap: 22px; align-items: center; }
+@media (min-width: 760px) { .l-split { grid-template-columns: 1.2fr 1fr; } .l-hero { grid-template-columns: 1.3fr 1fr; } }
+.l-numbered { list-style: none; counter-reset: step; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 16px; }
+.l-numbered li { counter-increment: step; display: grid; grid-template-columns: 34px 1fr; column-gap: 12px; }
+.l-numbered li::before { content: counter(step); grid-row: span 2; width: 34px; height: 34px; border-radius: 17px; background: var(--tint); color: var(--brand-text); font-weight: 900; display: flex; align-items: center; justify-content: center; }
+.l-numbered b { font-size: 16px; } .l-numbered p { margin: 3px 0 0; color: var(--muted); font-weight: 600; }
+.l-phone-draw { justify-self: center; width: 250px; border-radius: 30px; border: 8px solid #172742; background: var(--bg, #eef3fc); padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 20px 40px rgba(23,39,66,.18); }
+.l-ph-title { font-size: 15px; }
+.l-ph-card { background: var(--tint); border-radius: 14px; padding: 10px; display: flex; flex-direction: column; gap: 6px; color: var(--brand-text); }
+.l-ph-card > small { font-size: 8.5px; font-weight: 900; letter-spacing: .05em; }
+.l-ph-goal { font-size: 18px; }
+.l-ph-nums { display: grid; grid-template-columns: repeat(3, 1fr); } .l-ph-nums span { display: flex; flex-direction: column; } .l-ph-nums b { font-size: 16px; } .l-ph-nums small { font-size: 8px; font-weight: 700; }
+.l-ph-day { font-size: 9.5px; font-weight: 800; }
+.l-ph-btn { height: 32px; border-radius: 10px; background: #fff; border: 1px solid var(--line); color: var(--brand-text); font-size: 11px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+.l-ph-btn.primary { background: var(--brand); border-color: var(--brand); color: #fff; }
+.l-ph-row { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid var(--line); border-radius: 9px; min-height: 30px; overflow: hidden; }
+.l-ph-row > span { width: 5px; align-self: stretch; } .l-ph-row b { width: 30px; font-size: 10px; } .l-ph-row small { font-size: 10px; font-weight: 700; }
+.l-try-box { background: var(--tint); border-radius: 20px; padding: 14px; display: flex; flex-direction: column; gap: 12px; }
+.l-try-result { background: #fff; border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 4px; }
+.l-try-result b { font-size: 22px; font-weight: 900; color: var(--brand-text); } .l-try-result span { font-weight: 700; } .l-try-result small { color: var(--muted); font-weight: 600; font-size: 13px; }
+.l-pd { background: #fff; border: 1.5px solid var(--line); border-radius: 16px; padding: 12px 14px; } .l-pd b { font-size: 15px; } .l-pd p { margin: 4px 0 0; color: var(--muted); font-weight: 600; }
+.l-request .l-form { max-width: 520px; }
+.l-foot { display: flex; flex-direction: column; gap: 6px; }

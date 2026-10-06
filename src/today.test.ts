@@ -74,3 +74,9 @@ test("old profiles and goals move over", async () => {
   assert.equal(bandOf("longevity")!.id, "maintain"); assert.equal(bandOf("energy")!.id, "performance");
   assert.deepEqual(BANDS.map((b) => b.name), ["Lose fat", "Recomposition", "Maintain", "Build muscle", "Performance"]);
 });
+
+test("the home page's Try it uses the app's lift: 40 g chocolate spread needs 125 g skyr for PD 5.5", async () => {
+  const { lift, WANTS, HAVES } = await import("./landing");
+  const r = lift(WANTS[0], HAVES[0], 5.5);
+  assert.equal(r.grams, 125); assert.equal(r.kcal, 294); assert.equal(Math.round(r.protein), 16); assert.equal(r.pd, 5.5);
+});

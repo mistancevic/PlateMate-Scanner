@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
-import { ChefHat, ScanLine, Scale, MessageCircle, Lock, Check } from "lucide-react";
+import { Check } from "lucide-react";
+import { WANTS, HAVES, GOALS, lift } from "../landing";
 import { Mark, APP_NAME } from "../components/Mark";
 import { signIn } from "../cloud";
 
@@ -9,70 +10,144 @@ export function LandingScreen() {
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   const go = async () => { setBusy(true); setErr(""); try { await signIn(); } catch (e: any) { setErr(e.message || "Sign-in failed."); } finally { setBusy(false); } };
+  const toForm = () => formRef.current?.scrollIntoView({ behavior: "smooth" });
   return (
     <div className="landing">
       <header className="l-top">
         <div className="l-brand"><Mark size={30} color="var(--brand)" /><b>{APP_NAME}</b></div>
-        <button className="pill pill-small" disabled={busy} onClick={go}>I have a code · Sign in</button>
+        <button className="link l-signin" disabled={busy} onClick={go}>Sign in</button>
       </header>
 
       <section className="l-hero">
         <div className="l-hero-text">
-          <span className="l-kicker">Closed pilot · Munich and Belgrade</span>
-          <h1>An AI chef that fits your <em>craving</em> to your plan.</h1>
-          <p>You want Nutella. You have skyr and biscuits. Mealan works out how much of each, in grams, so the plate fits your goal. No log, no guilt, right when you decide.</p>
+          <span className="l-kicker">Closed pilot</span>
+          <h1>Eat what you crave. Chef Mealan tells you how much.</h1>
+          <p>Say you want chocolate spread, and you have skyr at home. Chef Mealan tells you how many grams of each to eat, so the plate fits your goal. You don't need a food diary, and you don't need to feel guilty.</p>
           <div className="l-cta">
-            <button className="pill pill-primary" onClick={() => formRef.current?.scrollIntoView({ behavior: "smooth" })}>Request access</button>
-            <button className="pill" disabled={busy} onClick={go}>I have a code</button>
+            <button className="pill pill-primary" disabled={busy} onClick={go}>I have a code</button>
+            <button className="pill" onClick={toForm}>Ask for an invite</button>
           </div>
           {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
         </div>
-        <div className="l-hero-art">
-          <img className="l-chef" src="/landing/chef.webp" alt="Milan, the coach behind Chef Mealan, in a chef's hat" />
-          <div className="l-phone"><img src="/landing/plate.webp" alt="A plate fitted to a target: Nutella 40 g, biscuits 30 g, skyr 252 g" /></div>
-        </div>
+        <figure className="l-hero-art">
+          <img className="l-chef" src="/landing/chef.webp" alt="Coach Milan, the person behind Chef Mealan, in a chef's hat" />
+          <figcaption>Coach Milan, the person behind Chef Mealan</figcaption>
+        </figure>
       </section>
 
       <section className="l-steps">
-        <h2>How it works</h2>
-        <div className="l-grid">
-          <div className="l-step"><ScanLine size={26} /><b>Put in what you crave</b><p>A photo, a barcode, a label or just the name. Your own foods stay in your library.</p></div>
-          <div className="l-step"><Scale size={26} /><b>Fit to my target</b><p>Mealan sets the amounts so the plate lands on your target. Arithmetic, not guesswork.</p></div>
-          <div className="l-step"><MessageCircle size={26} /><b>Ask the chef</b><p>No milk at home, a hotel buffet, a birthday cake at work. Mealan answers with what to take and how much.</p></div>
-          <div className="l-step"><ChefHat size={26} /><b>Eat it, rate it</b><p>DaaM good, good, or not really. It stays yours unless you share it with your coach.</p></div>
+        <span className="l-eyebrow">How it works</span>
+        <h2>Three steps, while you decide what to eat</h2>
+        <div className="l-split">
+          <ol className="l-numbered">
+            <li><b>Tell Chef Mealan what you want to eat</b><p>Take a photo of the plate or the label, scan the barcode, or type the name. The foods you add stay in your list for next time.</p></li>
+            <li><b>Chef Mealan fits the plate to your day</b><p>Chef Mealan knows whether today is a training day or a rest day, and works out the grams so the plate matches your numbers for the day. A calculator does the math, so nothing is guessed.</p></li>
+            <li><b>Eat, then say how the plate was</b><p>One tap: great, good, or not really. Only you see your answers, unless you share them with your coach.</p></li>
+          </ol>
+          <PhoneToday />
         </div>
       </section>
 
-      <section className="l-moments">
-        <h2>For the moment you're in</h2>
-        <div className="moments">
-          {["Before training", "After training", "Meeting day", "Travel", "Celebration at work", "Afterwork event"].map((m) => <span key={m} className="pill pill-small l-chip">{m}</span>)}
+      <section className="l-week">
+        <span className="l-eyebrow">Your week</span>
+        <h2>Plan your usual week once</h2>
+        <div className="l-split">
+          <p>Tell Chef Mealan what a normal week looks like: the days you train, what you do, and at what time. On training days you get more food, and on rest days less, without counting anything yourself. If one day turns out different, you change only that day.</p>
+          <PhoneWeek />
         </div>
-        <p>A rest day and a training day need different plates. Pick the moment, and Mealan fits the plate to it.</p>
+      </section>
+
+      <TryIt />
+
+      <section className="l-coach">
+        <span className="l-eyebrow">With your coach</span>
+        <h2>Your coach sees the same numbers as you</h2>
+        <p>You set your goal together with your coach. If one of your numbers looks wrong, for example too little food on a training day, Chef Mealan shows a note to you and to your coach. Your coach can then approve the number or suggest a change.</p>
       </section>
 
       <section className="l-built">
-        <h2>Built the honest way</h2>
+        <span className="l-eyebrow">How the numbers work</span>
+        <h2>Numbers you can check</h2>
         <div className="l-grid l-grid-3">
-          <div><b>You decide</b><p>Nothing moves a number you typed. Your coach sets the goal with you.</p></div>
-          <div><b>Code does the math</b><p>Published formulas and a solver. Every step shown, every number checkable.</p></div>
-          <div><b>The model reads</b><p>Labels, menus and shelves. Estimates are always marked as estimates.</p></div>
+          <div><b>A calculator does the math</b><p>Your daily numbers and the grams on each plate come from published formulas. You can open any number and see how Chef Mealan got to it.</p></div>
+          <div><b>AI reads, a calculator decides</b><p>Chef Mealan uses AI to read labels, menus and shop shelves, and to answer you in the chat. The numbers themselves come from a calculator, not from the AI. When the AI has to guess a number from a photo, the app marks that number as an estimate.</p></div>
+          <div><b>Your data stays in the EU</b><p>Your data is stored in Frankfurt, in your account. You can download all of it, or delete all of it, at any time.</p></div>
         </div>
       </section>
 
+      <section className="l-who">
+        <span className="l-eyebrow">Who it's for</span>
+        <h2>For people with a goal who choose their own food</h2>
+        <p>Chef Mealan is for adults, and for teenagers from 13 who join with a parent or a coach. Teenagers get a version built around school. Chef Mealan is not a doctor. If a medical condition decides what you eat, if you're pregnant or have diabetes, or if eating is difficult for you, Chef Mealan doesn't give advice, and tells you who to talk to instead.</p>
+      </section>
+
       <section className="l-request" ref={formRef}>
-        <div className="l-lock"><Lock size={20} /></div>
-        <h2>Chef Mealan works through coaches</h2>
-        <p>It's a closed pilot. You join with a code from your coach. No coach yet, or you are one? Leave your details and Milan gets back to you.</p>
-        <p className="small">For people with a goal who decide their own food. Not for anyone under 13, and not a replacement for a doctor: with a medical condition that decides your food, pregnancy, diabetes or a difficult relationship with eating, Mealan steps back and names who to talk to. Under 18 you join with a parent or a coach.</p>
+        <h2>Ask for an invite</h2>
+        <p>Chef Mealan is a closed pilot. Most people join with a code from their coach. If you don't have a code, leave your name and email, and Coach Milan will get back to you.</p>
         <RequestForm />
       </section>
 
       <footer className="l-foot">
-        <span>© 2026 Milan Stancevic · <a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a> · <a href="/about">Who's behind it</a></span>
-        <span>Your data stays in the EU, under your account. Built with <a href="https://github.com/mistancevic/worth-building" target="_blank" rel="noreferrer">Worth Building</a>.</span>
+        <span><a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a></span>
+        <span><a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a> · © 2026 Milan Stancevic</span>
       </footer>
     </div>
+  );
+}
+
+// The phones are drawings of the screens, not screenshots, so they stay right when the app's text changes.
+function PhoneToday() {
+  return (
+    <div className="l-phone-draw" aria-label="Drawing of the Today screen">
+      <b className="l-ph-title">Today</b>
+      <div className="l-ph-card">
+        <small>YOUR GOAL · SET BY COACH MILAN</small>
+        <b className="l-ph-goal">Maintain ›</b>
+        <div className="l-ph-nums"><span><b>6.2</b><small>PD target</small></span><span><b>2,900</b><small>kcal today</small></span><span><b>180</b><small>g protein</small></span></div>
+        <small className="l-ph-day">Monday: strength, hard, in the evening.</small>
+      </div>
+      <span className="l-ph-btn primary">I'm craving something</span>
+      <span className="l-ph-btn">Scan</span>
+    </div>
+  );
+}
+function PhoneWeek() {
+  const rows: [string, string, string][] = [["Mon", "Strength, hard · evening", "var(--top)"], ["Tue", "Rest", "#c9d3e6"], ["Wed", "Cardio, moderate · morning", "var(--high)"], ["Thu", "Yoga, easy · evening", "var(--mid)"], ["Fri", "Strength, moderate · morning", "var(--high)"], ["Sat", "Walk, easy · during the day", "var(--mid)"], ["Sun", "Rest", "#c9d3e6"]];
+  return (
+    <div className="l-phone-draw" aria-label="Drawing of the Weekly plan">
+      <b className="l-ph-title">Weekly plan</b>
+      {rows.map(([d, t, c]) => <div key={d} className="l-ph-row"><span style={{ background: c }} /><b>{d}</b><small>{t}</small></div>)}
+    </div>
+  );
+}
+// Try it: the app's own lift for a few fixed foods; nothing is saved
+function TryIt() {
+  const [want, setWant] = useState(WANTS[0].id), [have, setHave] = useState(HAVES[0].id), [goal, setGoal] = useState("maintain");
+  const w = WANTS.find((x) => x.id === want)!, h = HAVES.find((x) => x.id === have)!, g = GOALS.find((x) => x.id === goal)!;
+  const r = lift(w, h, g.pd);
+  const Pick = ({ items, on, set }: { items: { id: string; name: string; grams?: number }[]; on: string; set: (v: string) => void }) => (
+    <div className="chip-row">{items.map((x) => <button key={x.id} type="button" className={`choice ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} onClick={() => set(x.id)}>{x.name}{x.grams ? `, ${x.grams} g` : ""}</button>)}</div>
+  );
+  return (
+    <section className="l-try">
+      <span className="l-eyebrow">Try it</span>
+      <h2>You want {w.grams} g of {w.name.toLowerCase()}. How much {h.name.toLowerCase()} makes the plate fit?</h2>
+      <p>This part of the page uses the same math as the app. Nothing you pick here is saved.</p>
+      <div className="l-try-box">
+        <div className="setting"><small className="setting-name">You want</small><Pick items={WANTS} on={want} set={setWant} /></div>
+        <div className="setting"><small className="setting-name">You have at home</small><Pick items={HAVES} on={have} set={setHave} /></div>
+        <div className="setting"><small className="setting-name">Your goal</small><Pick items={GOALS} on={goal} set={setGoal} /></div>
+        <div className="l-try-result" aria-live="polite">
+          <b>Add {r.grams} g of {h.name.toLowerCase()}</b>
+          <span>Together that's {r.kcal} kcal and {Math.round(r.protein)} g of protein, a PD of {r.pd}. That fits a typical {g.name} goal.</span>
+          <small>On its own, {w.name.toLowerCase()} has very little protein. The {h.name.toLowerCase()} adds the protein, so the whole plate fits.</small>
+        </div>
+        <div className="l-pd">
+          <b>What is PD?</b>
+          <p>PD stands for protein density: how many grams of protein a food or a plate gives you for every 100 kcal. The higher the PD, the more protein you get for the same calories. Chef Mealan gives you a PD target for each day, and fits every plate to it.</p>
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -81,29 +156,31 @@ export function RequestForm({ email: presetEmail, name: presetName }: { email?: 
   const [name, setName] = useState(presetName ?? "");
   const [email, setEmail] = useState(presetEmail ?? "");
   const [note, setNote] = useState("");
-  const [coach, setCoach] = useState(false);
+  const [who, setWho] = useState<"client" | "coach" | "self" | "">("");
   const [trap, setTrap] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
   const [err, setErr] = useState("");
   async function send() {
     setErr(""); setState("sending");
     try {
-      const r = await fetch("/api/access-request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, note, coach, website: trap, elapsed: Date.now() - started.current }) });
+      const r = await fetch("/api/access-request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, note, who, coach: who === "coach", website: trap, elapsed: Date.now() - started.current }) });
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d.error || "Couldn't send. Please write to hello@chefmealan.com.");
       setState("sent");
     } catch (e: any) { setErr(e.message); setState("idle"); }
   }
-  if (state === "sent") return <div className="l-sent"><Check size={22} /> Thanks, {name.split(" ")[0] || "you're on the list"}. Milan will get back to you at {email}.</div>;
+  if (state === "sent") return <div className="l-sent"><Check size={22} /> Thanks, {name.split(" ")[0] || "you're on the list"}. Coach Milan will get back to you at {email}.</div>;
   return (
     <div className="l-form">
       <input placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} autoComplete="name" />
       <input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} autoComplete="email" />
       <textarea placeholder="What are you after? (optional)" value={note} onChange={(e) => setNote(e.target.value)} maxLength={600} />
-      <label className="check"><input type="checkbox" checked={coach} onChange={(e) => setCoach(e.target.checked)} /> I'm a coach and want to use it with clients</label>
+      <div className="setting"><small className="setting-name">Which fits you?</small>
+        <div className="chip-row">{([["client", "I have a coach"], ["coach", "I am a coach"], ["self", "I train on my own"]] as const).map(([k, l]) => <button key={k} type="button" className={`choice ${who === k ? "on" : ""}`} aria-pressed={who === k} onClick={() => setWho(k)}>{l}</button>)}</div>
+      </div>
       {/* only bots fill this */}
       <input className="l-trap" tabIndex={-1} autoComplete="off" aria-hidden="true" value={trap} onChange={(e) => setTrap(e.target.value)} name="website" />
-      <button className="pill pill-primary pill-wide" disabled={state === "sending" || !name.trim() || !email.includes("@")} onClick={send}>{state === "sending" ? "Sending…" : "Request access"}</button>
+      <button className="pill pill-primary pill-wide" disabled={state === "sending" || !name.trim() || !email.includes("@")} onClick={send}>{state === "sending" ? "Sending…" : "Send"}</button>
       {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
     </div>
   );
