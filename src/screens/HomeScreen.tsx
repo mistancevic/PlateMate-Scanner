@@ -4,8 +4,8 @@ import { aggregate, density } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
 import { bandOf } from "../goal";
-import { DAY_TYPES, dayModeOf, dayNameAny, hasPlan } from "../personal";
-import { planLine, loadOf, LOAD_DAY, type PlanDay } from "../plan";
+import { DAY_TYPES, dayModeOf, dayNameAny, hasPlan, isMinor } from "../personal";
+import { planLine, schoolLine, loadOf, LOAD_DAY, type PlanDay } from "../plan";
 import { DayEditor } from "../components/DayEditor";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { X } from "lucide-react";
@@ -37,12 +37,14 @@ export function HomeScreen(p: AppApi) {
       </div>
     </section>
   ));
+  const minor = isMinor(p.personal);
   return (
     <>
       <section className="plan">
-        <div className="plan-top">
-          <span>{byCoach ? `${setBy}'s goal` : "Your goal"}{bandName ? `: ${bandName}` : ""}</span>
-          <button className="plan-source" onClick={() => p.openMenu(byCoach ? "coach" : "goal")} aria-label={byCoach ? "Open your coach" : "Open your goal"}>set by {setBy} <ChevronRight size={12} /></button>
+        {/* the goal is the headline and the way in; whose and who set it is one small line above it */}
+        <div className="plan-goal">
+          <small>Your goal · set by {byCoach ? setBy : "you"}</small>
+          <button className="plan-goal-name" onClick={() => p.openMenu("goal")} aria-label="Open your goal">{bandName || "Your goal"} <ChevronRight size={22} /></button>
         </div>
         <div className="plan-row">
           <div><b>{pdVal(pdRef)}</b><small>{pdTag()} target{follow && p.day.source !== "assumed" ? " today" : ""}</small></div>
@@ -50,13 +52,19 @@ export function HomeScreen(p: AppApi) {
           <div><b>{fmt(p.todayMacros?.protein ?? state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
         {!p.goal && <button className="strip strip-button" onClick={p.openGoal}>Set your goal: your day in four numbers, every plate measured against them.</button>}
-        {p.todayMacros && <p className="macro-line">{p.todayMacros.fats} g fat · {p.todayMacros.carbs} g carbs</p>}
+        {p.todayMacros && (
+          <div className="plan-macros">
+            <div><b>{p.todayMacros.fats}</b><small>g fat</small></div>
+            <div><b>{p.todayMacros.carbs}</b><small>g carbs</small></div>
+            <div />
+          </div>
+        )}
         {p.review?.status === "change" && <button className="strip strip-button review-ask" onClick={() => p.openMenu("goal")}>{p.review.by || p.coachLabel} asks you to change {p.review.kept?.length === 1 ? "one number" : "your numbers"} ›</button>}
         {p.profile.coachId && !byCoach && <button className="plan-source coach-line" onClick={() => p.openMenu("coach")} aria-label="Open your coach">{p.coachLabel} <ChevronRight size={12} /></button>}
         {follow && planned && p.day.plan && !changing && (
           <div className="today-plan">
             <b>{dateLine}</b>
-            <span className="today-what">{planLine(p.day.plan)}. {LOAD_DAY[loadOf(p.day.plan)]}</span>
+            <span className="today-what">{minor ? schoolLine(p.day.plan) : planLine(p.day.plan)}. {LOAD_DAY[loadOf(p.day.plan)]}</span>
             <small>{p.day.source === "today" ? "Changed for today only. Your Weekly plan stays the same." : "Today's part of your Weekly plan. If your day goes differently, change today's plan; the numbers follow, and your Weekly plan stays the same."}</small>
             <button className="pill pill-wide" onClick={() => { setDraft(p.day.plan!); setChanging(true); }}>Change today's plan</button>
             {p.day.source === "today" && <button className="link" onClick={() => p.setTodayPlan(null)}>Back to the Weekly plan</button>}
@@ -65,7 +73,7 @@ export function HomeScreen(p: AppApi) {
         {follow && changing && draft && (
           <div className="today-plan">
             <b>{dateLine}, today only</b>
-            <DayEditor value={draft} onChange={setDraft} />
+            <DayEditor minor={minor} value={draft} onChange={setDraft} />
             <div className="button-row">
               <button className="pill pill-small" onClick={() => setChanging(false)}>Cancel</button>
               <button className="pill pill-small pill-primary" onClick={() => { p.setTodayPlan(draft); setChanging(false); }}>Save for today</button>

@@ -39,8 +39,8 @@ import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
-import { setTodayChange, type PlanDay } from "./plan";
-import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, setDayType as storeDayType, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, type Personal, type DayType, type Day } from "./personal";
+import { setTodayChange, dayOfLoad, type PlanDay } from "./plan";
+import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, type Personal, type DayType, type Day } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
@@ -1387,9 +1387,11 @@ export default function App() {
       });
       notify("Merged into one food.");
     },
-    goalLog, formula: profile.formula ?? null, todayKcal, dayType: day.type, day, setDayType: (d: DayType | null) => { storeDayType(d); setDayState(getDay(personal)); },
+    goalLog, formula: profile.formula ?? null, todayKcal, dayType: day.type, day, setDayType: (d: DayType | null) => { const next = withDated(personal, new Date(), d ? dayOfLoad(d) : null); storePersonal(next); setPersonalState(next); setDayState(getDay(next)); },
     // today's plan, for this date only; the Weekly plan stays
-    setTodayPlan: (d: PlanDay | null) => { setTodayChange(d); setDayState(getDay(personal)); },
+    setTodayPlan: (d: PlanDay | null) => { setTodayChange(null); const next = withDated(personal, new Date(), d); storePersonal(next); setPersonalState(next); setDayState(getDay(next)); },
+    // a change for any date, from the Weekly plan's dated weeks; null puts the date back on the usual week
+    setDated: (date: Date, d: PlanDay | null) => { const next = withDated(personal, date, d); storePersonal(next); setPersonalState(next); setDayState(getDay(next)); },
     applyNumbers: (bandId: string, kcal: number, protein: number, method?: string, fatsIn?: number, carbsIn?: number) => {
       nextSource.current = "profile";
       saveGoal({ band: bandId, setBy: "you", setAt: new Date().toISOString(), source: "profile", method });

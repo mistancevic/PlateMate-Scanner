@@ -6,14 +6,16 @@ import { exportLog, clearLog, readLog, log } from "../log";
 import { BANDS, bandOf, SOURCE_LABEL, type GoalEntry } from "../goal";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
-import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, planOf, lifestyleOf, ageOf, type Personal, type DayType } from "../personal";
-import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, weekdayIndex, usualFrom, type Plan, type PlanDay, type Lifestyle } from "../plan";
+import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, planOf, lifestyleOf, ageOf, isMinor, dayFor, type Personal, type DayType } from "../personal";
+import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, type Plan, type PlanDay, type Lifestyle } from "../plan";
 import { DayEditor } from "../components/DayEditor";
 import { DayTable } from "../components/DayTable";
 import { analyse, isOpen as openAt } from "../analysis";
 import type { AppApi, MenuSection } from "./api";
 import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
+import { dayLog } from "../today";
+import { aggregate, uid } from "../pilot";
 
 // the sections that belong to the person: they live under Me, and back from them goes to Me
 const ME_SECTIONS: MenuSection[] = ["profile", "goal", "life", "week", "shop", "coach", "account"];
@@ -344,23 +346,27 @@ function LifestylePanel(p: AppApi) {
     p.setUsual(usualFrom(next, planOf(p.personal)));
   };
   const age = ageOf(p.personal);
+  // under 18: school instead of work, no eating window, no alcohol question; the age comes from the profile
+  const minor = isMinor(p.personal);
   const toggle = (v: string) => save({ where: (l.where ?? []).includes(v) ? (l.where ?? []).filter((x) => x !== v) : [...(l.where ?? []), v] });
   const asItems = (xs: string[]) => xs.map((x) => ({ id: x, name: x }));
   return (
     <>
-      <p className="small muted page-why">How your life runs most weeks. Set it once; change it when life changes.</p>
-      <Seg title="Nutrition" why="How you usually eat and drink. Chef Mealan plans and suggests from here first.">
-        <Setting name="Where you eat" hint="Any that apply."><Chips items={asItems(WHERE)} on={l.where} pick={toggle} multi /></Setting>
-        <Setting name="Meals a day"><Chips items={[2, 3, 4, 5].map((n) => ({ id: n, name: n === 5 ? "5 or more" : String(n) }))} on={l.meals} pick={(n) => save({ meals: n })} /></Setting>
-        <Setting name="Eating window" hint="For people who eat within set hours.">
-          <Chips items={[{ id: "none", name: "None" }, { id: "set", name: "Set my window" }]} on={l.window ? "set" : "none"} pick={(v) => save({ window: v === "set" ? (l.window ?? { from: "10:00", to: "18:00" }) : null })} />
-          {l.window && (
-            <div className="field-row">
-              <label className="field"><span>From</span><input type="time" value={l.window.from} onChange={(e) => save({ window: { ...l.window!, from: e.target.value } })} /></label>
-              <label className="field"><span>To</span><input type="time" value={l.window.to} onChange={(e) => save({ window: { ...l.window!, to: e.target.value } })} /></label>
-            </div>
-          )}
-        </Setting>
+      <p className="small muted page-why">{minor ? "How your life runs in a normal school week. Set it once, and change it when something changes, like a new school year." : "How your life runs most weeks. Set it once; change it when life changes."}</p>
+      <Seg title="Nutrition" why={minor ? "How you usually eat. Chef Mealan suggests from here first." : "How you usually eat and drink. Chef Mealan plans and suggests from here first."}>
+        <Setting name="Where you eat" hint="Pick all that apply."><Chips items={asItems(minor ? WHERE_KID : WHERE)} on={l.where} pick={toggle} multi /></Setting>
+        <Setting name="Meals a day" hint={minor ? "Snacks count as a meal here." : undefined}><Chips items={[2, 3, 4, 5].map((n) => ({ id: n, name: n === 5 ? "5 or more" : String(n) }))} on={l.meals} pick={(n) => save({ meals: n })} /></Setting>
+        {!minor && (
+          <Setting name="Eating window" hint="For people who eat within set hours.">
+            <Chips items={[{ id: "none", name: "None" }, { id: "set", name: "Set my window" }]} on={l.window ? "set" : "none"} pick={(v) => save({ window: v === "set" ? (l.window ?? { from: "10:00", to: "18:00" }) : null })} />
+            {l.window && (
+              <div className="field-row">
+                <label className="field"><span>From</span><input type="time" value={l.window.from} onChange={(e) => save({ window: { ...l.window!, from: e.target.value } })} /></label>
+                <label className="field"><span>To</span><input type="time" value={l.window.to} onChange={(e) => save({ window: { ...l.window!, to: e.target.value } })} /></label>
+              </div>
+            )}
+          </Setting>
+        )}
         <Setting name="How you eat"><Chips items={asItems(DIETS)} on={l.diet ?? "Everything"} pick={(v) => save({ diet: v })} /></Setting>
         {age !== null && age >= ALCOHOL_AGE && (
           <Setting name="Alcohol" hint="Alcohol counts as energy, 7 kcal a gram, and slows recovery. Chef Mealan will leave room for it on those days instead of pretending it isn't there.">
@@ -369,19 +375,27 @@ function LifestylePanel(p: AppApi) {
         )}
       </Seg>
       <small className="muted page-why">Allergies stay in Profile, with the safety questions.</small>
-      <Seg title="Work" why="How much your job moves you on an ordinary day, before any activity.">
-        <Setting name="Working hours" hint={l.hours === "fixed" ? "Fixed hours make Monday to Friday work days in your Weekly plan; you can change any day there." : undefined}>
-          <Options items={HOURS} on={l.hours} pick={(v) => save({ hours: v })} />
-          {l.hours === "fixed" && <Chips items={SLOTS} on={l.slot} pick={(v) => save({ slot: v })} />}
-        </Setting>
-        <Setting name="At work you are"><Options items={MOVES} on={l.move ?? "sitting"} pick={(v) => save({ move: v })} /></Setting>
-        <Setting name="Work travel"><Chips items={[{ id: "none", name: "None" }, { id: "sometimes", name: "Occasionally" }, { id: "often", name: "A lot" }]} on={l.travel} pick={(v) => save({ travel: v as Lifestyle["travel"] })} /></Setting>
+      {minor ? (
+        <Seg title="School" why="How much school moves you on a normal day, before any sport.">
+          <Setting name="School hours"><Options items={SCHOOL_HOURS} on={l.school} pick={(v) => save({ school: v })} /></Setting>
+          <Setting name="How you get to school" hint="Walking or cycling there and back counts as light activity on every school day."><Chips items={COMMUTES} on={l.commute} pick={(v) => save({ commute: v })} /></Setting>
+          <Setting name="Sport at school" hint="You pick the days in your Weekly plan."><Chips items={PE_WEEK} on={l.peWeek} pick={(v) => save({ peWeek: v })} /></Setting>
+        </Seg>
+      ) : (
+        <Seg title="Work" why="How much your job moves you on an ordinary day, before any activity.">
+          <Setting name="Working hours" hint={l.hours === "fixed" ? "Fixed hours make Monday to Friday work days in your Weekly plan; you can change any day there." : undefined}>
+            <Options items={HOURS} on={l.hours} pick={(v) => save({ hours: v })} />
+            {l.hours === "fixed" && <Chips items={SLOTS} on={l.slot} pick={(v) => save({ slot: v })} />}
+          </Setting>
+          <Setting name="At work you are"><Options items={MOVES} on={l.move ?? "sitting"} pick={(v) => save({ move: v })} /></Setting>
+          <Setting name="Work travel"><Chips items={[{ id: "none", name: "None" }, { id: "sometimes", name: "Occasionally" }, { id: "often", name: "A lot" }]} on={l.travel} pick={(v) => save({ travel: v as Lifestyle["travel"] })} /></Setting>
+        </Seg>
+      )}
+      <Seg title="Recovery" why={minor ? "Sleep is when your body grows and turns sport into progress. Most teenagers need 8 to 10 hours." : "Sleep is where training turns into progress; it also decides when late meals make sense."}>
+        <Setting name="Bedtime"><Chips items={[{ id: "early", name: "Before 22" }, { id: "mid", name: "22 to midnight" }, { id: "late", name: "After midnight" }, ...(minor ? [] : [{ id: "varies", name: "Varies with shifts" }])]} on={l.bed} pick={(v) => save({ bed: v as Lifestyle["bed"] })} /></Setting>
+        <Setting name="Wake-up"><Chips items={minor ? [{ id: "early", name: "Before 6" }, { id: "mid", name: "6 to 7" }, { id: "late", name: "After 7" }] : [{ id: "early", name: "Before 6" }, { id: "mid", name: "6 to 8" }, { id: "late", name: "After 8" }, { id: "varies", name: "Varies with shifts" }]} on={l.wake} pick={(v) => save({ wake: v as Lifestyle["wake"] })} /></Setting>
       </Seg>
-      <Seg title="Recovery" why="Sleep is where training turns into progress; it also decides when late meals make sense.">
-        <Setting name="Bedtime"><Chips items={[{ id: "early", name: "Before 22" }, { id: "mid", name: "22 to midnight" }, { id: "late", name: "After midnight" }, { id: "varies", name: "Varies with shifts" }]} on={l.bed} pick={(v) => save({ bed: v as Lifestyle["bed"] })} /></Setting>
-        <Setting name="Wake-up"><Chips items={[{ id: "early", name: "Before 6" }, { id: "mid", name: "6 to 8" }, { id: "late", name: "After 8" }, { id: "varies", name: "Varies with shifts" }]} on={l.wake} pick={(v) => save({ wake: v as Lifestyle["wake"] })} /></Setting>
-      </Seg>
-      <NextLink p={p} to="week" from="life" text="Weekly plan" hint="What each day of your usual week holds" />
+      <NextLink p={p} to="week" from="life" text="Weekly plan" hint={minor ? "What each day of your school week holds" : "What each day of your usual week holds"} />
     </>
   );
 }
@@ -389,45 +403,114 @@ function LifestylePanel(p: AppApi) {
 // Weekly plan, as approved on 6 October 2026: the usual week as an agenda, then the picked day's settings.
 function PlanPanel(p: AppApi) {
   const plan = planOf(p.personal) ?? planFromCounts({ passive: 2, active: 2, easy: 2, hard: 1 });
-  const [sel, setSel] = useState(weekdayIndex(new Date()));
+  const minor = isMinor(p.personal);
+  const [tab, setTab] = useState<"date" | "usual">("date");
+  const [offset, setOffset] = useState(0);
+  const todayD = new Date(); todayD.setHours(0, 0, 0, 0);
+  const [sel, setSel] = useState(weekdayIndex(todayD));
   const [copying, setCopying] = useState<number[] | null>(null);
+  const [editPast, setEditPast] = useState(false);
   const l = lifestyleOf(p.personal);
   const save = (next: Plan) => { p.setPersonal({ ...p.personal, plan: next }); p.setUsual(usualFrom(l, next)); };
   const setDay = (i: number, d: PlanDay) => save(plan.map((x, n) => (n === i ? d : x)));
   const c = p.goal ? calculate(p.personal, p.goal.band ?? "maintain", p.profile.formula ?? null) : null;
-  const counts = countsOf(plan);
+  const dayWord = (d: PlanDay) => (minor ? (d.work ? "School" : "No school") : d.work ? "Work" : "Off");
+  const workHint = minor ? "Monday to Friday start as school days. Mark a holiday as no school." : l.hours === "fixed" ? `From Lifestyle: fixed hours${l.slot ? `, ${SLOTS.find((s) => s.id === l.slot)!.name}` : ""}.` : undefined;
+  // the dated week: Monday of this week, moved by the arrows
+  const base = isoWeek(todayD).monday;
+  const monday = new Date(base); monday.setDate(base.getDate() + offset * 7);
+  const wk = isoWeek(monday);
+  const dates = datesOfWeek(monday);
+  const days = dates.map((d) => dayFor({ ...p.personal, plan }, d)!);
+  const span = (() => { const a = dates[0], z = dates[6]; const m = (d: Date) => d.toLocaleDateString("en-GB", { month: "long" }); return a.getMonth() === z.getMonth() ? `${a.getDate()} to ${z.getDate()} ${m(z)} ${z.getFullYear()}` : `${a.getDate()} ${m(a)} to ${z.getDate()} ${m(z)} ${z.getFullYear()}`; })();
+  const shown = tab === "date" ? days.map((x) => x.day) : plan;
+  const counts = countsOf(shown);
+  const avg = c ? Math.round(shown.reduce((t, d) => t + c.numbersOf(d).kcal, 0) / 7 / 50) * 50 : null;
+  const selDate = dates[sel], isPast = tab === "date" && selDate < todayD;
+  const log = isPast ? dayLog(p.state.feedback, selDate) : null;
+  const target = isPast && c ? c.numbersOf(days[sel].day) : null;
+  const longDate = (d: Date) => `${WEEKDAY_NAMES[weekdayIndex(d)]}, ${d.getDate()} ${d.toLocaleDateString("en-GB", { month: "long" })}`;
   return (
     <>
-      <p className="small muted page-why">What each day of your usual week holds. Today follows it; you can change a single date there.</p>
+      <p className="small muted page-why">What each day holds. Your usual week repeats by itself; change any date when that week is different.</p>
+      <div className="seg-tabs" role="tablist">
+        <button type="button" role="tab" aria-selected={tab === "date"} className={tab === "date" ? "on" : ""} onClick={() => { setTab("date"); setSel(offset === 0 ? weekdayIndex(todayD) : 0); }}>By date</button>
+        <button type="button" role="tab" aria-selected={tab === "usual"} className={tab === "usual" ? "on" : ""} onClick={() => { setTab("usual"); setCopying(null); }}>Usual week</button>
+      </div>
       <section className="week-card" aria-label="Your week">
-        <div className="week-card-head"><b>Your week</b>{c && <small>avg {c.kcal.toLocaleString("en")} kcal</small>}</div>
-        {plan.map((d, i) => (
-          <button type="button" key={i} className={`agenda-row ${sel === i ? "on" : ""}`} aria-pressed={sel === i} onClick={() => { setSel(i); setCopying(null); }}>
-            <span className={`load-bar load-${loadOf(d)}`} />
-            <b>{WEEKDAYS[i]}</b>
-            <span className="agenda-what">{planShort(d)}</span>
-            <small className={d.work ? "work" : ""}>{d.work ? "Work" : "Off"}</small>
-          </button>
-        ))}
-        <div className="load-key">{(["hard", "easy", "active", "passive"] as DayType[]).map((t) => <span key={t}><i className={`load-${t}`} />{LOAD_NAME[t]} {counts[t]}</span>)}</div>
-        <small className="week-card-foot">The bar is how hard the day is; the words say what you do. Tap a day to set it.</small>
-      </section>
-      <Seg title={WEEKDAY_NAMES[sel]} why="One day, one activity. The week above follows.">
-        <DayEditor value={plan[sel]} onChange={(d) => setDay(sel, d)} workHint={l.hours === "fixed" ? `From Lifestyle: fixed hours${l.slot ? `, ${SLOTS.find((s) => s.id === l.slot)!.name}` : ""}.` : undefined} />
-        {copying === null ? (
-          <button type="button" className="pill pill-wide" onClick={() => setCopying([])}>Copy {WEEKDAY_NAMES[sel]} to other days</button>
-        ) : (
-          <div className="setting">
-            <small className="setting-name">Copy {WEEKDAY_NAMES[sel]} to</small>
-            <div className="chip-row">{WEEKDAYS.map((w, i) => i === sel ? null : <button type="button" key={w} className={`pill pill-small ${copying.includes(i) ? "pill-primary" : ""}`} aria-pressed={copying.includes(i)} onClick={() => setCopying(copying.includes(i) ? copying.filter((x) => x !== i) : [...copying, i])}>{w}</button>)}</div>
-            <div className="button-row">
-              <button type="button" className="pill pill-small" onClick={() => setCopying(null)}>Cancel</button>
-              <button type="button" className="pill pill-small pill-primary" disabled={!copying.length} onClick={() => { save(plan.map((x, n) => (copying.includes(n) ? { ...plan[sel], work: x.work } : x))); setCopying(null); }}>Copy to {copying.length} {copying.length === 1 ? "day" : "days"}</button>
-            </div>
-            <small className="setting-hint">Copies the activity; each day keeps its work day or off.</small>
+        {tab === "date" ? (
+          <div className="week-nav">
+            <button type="button" className="round" aria-label="Week before" onClick={() => { setOffset(offset - 1); setSel(0); setEditPast(false); }}>‹</button>
+            <span><b>Week {wk.week}</b><small>{span}{offset === 0 ? " · this week" : ""}</small></span>
+            <button type="button" className="round" aria-label="Week after" onClick={() => { setOffset(offset + 1); setSel(0); setEditPast(false); }}>›</button>
           </div>
+        ) : (
+          <div className="week-card-head"><b>Your usual week</b>{avg !== null && <small>average {avg.toLocaleString("en")} kcal</small>}</div>
         )}
-      </Seg>
+        {shown.map((d, i) => {
+          const isToday = tab === "date" && dates[i].getTime() === todayD.getTime();
+          const sub = tab === "date" ? (isToday ? "Today" : days[i].changed ? "Changed for this date" : "") : "";
+          return (
+            <button type="button" key={i} className={`agenda-row ${sel === i ? "on" : ""}`} aria-pressed={sel === i} onClick={() => { setSel(i); setCopying(null); setEditPast(false); }}>
+              <span className={`load-bar load-${loadOf(d)}`} />
+              <b>{WEEKDAYS[i]}{tab === "date" ? ` ${dates[i].getDate()}` : ""}</b>
+              <span className="agenda-what">{planShort(d)}{sub && <small className="agenda-sub">{sub}</small>}</span>
+              <small className={d.work ? "work" : ""}>{dayWord(d)}</small>
+            </button>
+          );
+        })}
+        <div className="load-key">{(["hard", "easy", "active", "passive"] as DayType[]).filter((t) => counts[t]).map((t) => <span key={t}><i className={`load-${t}`} />{LOAD_NAME[t]} {counts[t]}</span>)}</div>
+        <small className="week-card-foot">{tab === "date" && avg !== null ? `Average ${avg.toLocaleString("en")} kcal this week. ` : ""}The bar shows how hard the day is{minor ? ", sport at school and after school together" : ""}. Tap a day to {tab === "date" ? "change it for that date" : "set it"}.</small>
+      </section>
+      {tab === "date" ? (
+        isPast && !editPast ? (
+          <Seg title={longDate(selDate)} why={`${planLine(days[sel].day)}. ${LOAD_DAY[loadOf(days[sel].day)]}`}>
+            {log && log.logged.length ? (
+              <>
+                <div className="past-nums">
+                  <span><b>{Math.round(log.kcal).toLocaleString("en")}</b><small>{target ? `of ${target.kcal.toLocaleString("en")} kcal` : "kcal"}</small></span>
+                  <span><b>{Math.round(log.protein)}</b><small>{target ? `of ${target.protein} g protein` : "g protein"}</small></span>
+                  <span><b>{log.kcal ? (Math.round((log.protein / log.kcal) * 1000) / 10).toFixed(1) : "–"}</b><small>PD that day</small></span>
+                </div>
+                <small className="setting-name">What you ate</small>
+                {log.logged.map((f) => {
+                  const a = aggregate(f.meal.items);
+                  return (
+                    <div className="past-plate" key={f.id}>
+                      <span><b>{f.meal.title}</b><small>{new Date(f.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · {Math.round(a.calories ?? 0)} kcal · {Math.round(a.protein ?? 0)} g protein</small></span>
+                      <button type="button" className="pill pill-small" onClick={() => { p.setState((s) => ({ ...s, items: f.meal.items.map((it) => ({ ...it, id: uid() })) })); p.setTab("journey"); }}>Cook again</button>
+                    </div>
+                  );
+                })}
+              </>
+            ) : <small className="setting-hint">Nothing was logged on this day.</small>}
+            <button type="button" className="pill pill-wide" onClick={() => setEditPast(true)}>Change what was planned</button>
+            <small className="setting-hint">Search and filters by date come later. For now you browse back week by week.</small>
+          </Seg>
+        ) : (
+          <Seg title={longDate(selDate)} why={`This date only. To change every ${WEEKDAY_NAMES[sel]}, use Usual week above.`}>
+            <DayEditor minor={minor} value={days[sel].day} onChange={(d) => p.setDated(selDate, d)} workHint={workHint} />
+            {days[sel].changed && <button type="button" className="pill pill-wide" onClick={() => p.setDated(selDate, null)}>Back to the usual {WEEKDAY_NAMES[sel]}</button>}
+          </Seg>
+        )
+      ) : (
+        <Seg title={WEEKDAY_NAMES[sel]} why={`Every ${WEEKDAY_NAMES[sel]}, unless you change a date. The week above follows.`}>
+          <DayEditor minor={minor} value={plan[sel]} onChange={(d) => setDay(sel, d)} workHint={workHint} />
+          {copying === null ? (
+            <button type="button" className="pill pill-wide" onClick={() => setCopying([])}>Copy {WEEKDAY_NAMES[sel]} to other days</button>
+          ) : (
+            <div className="setting">
+              <small className="setting-name">Copy {WEEKDAY_NAMES[sel]} to</small>
+              <div className="chip-row">{WEEKDAYS.map((w, i) => i === sel ? null : <button type="button" key={w} className={`pill pill-small ${copying.includes(i) ? "pill-primary" : ""}`} aria-pressed={copying.includes(i)} onClick={() => setCopying(copying.includes(i) ? copying.filter((x) => x !== i) : [...copying, i])}>{w}</button>)}</div>
+              <div className="button-row">
+                <button type="button" className="pill pill-small" onClick={() => setCopying(null)}>Cancel</button>
+                <button type="button" className="pill pill-small pill-primary" disabled={!copying.length} onClick={() => { save(plan.map((x, n) => (copying.includes(n) ? { ...plan[sel], work: x.work, pe: x.work ? plan[sel].pe : false } : x))); setCopying(null); }}>Copy to {copying.length} {copying.length === 1 ? "day" : "days"}</button>
+              </div>
+              <small className="setting-hint">Copies the activity; each day keeps its {minor ? "school day or no school" : "work day or off"}.</small>
+            </div>
+          )}
+        </Seg>
+      )}
       <NextLink p={p} to="shop" from="week" text="Where I shop" hint="The starter foods for your shops" />
     </>
   );

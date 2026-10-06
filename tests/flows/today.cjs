@@ -32,8 +32,8 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   await page.getByRole("button", { name: "Hard", exact: true }).click(); await page.waitForTimeout(300);
   ok(await page.locator(".plan .day-row .pill-primary").textContent() === "Hard", "the picked day is marked");
   ok(/kcal today/.test(await page.locator(".plan-row").textContent()) && (await page.locator(".plan-row b").nth(1).textContent()).trim() !== assumedKcal, "calories follow the day");
-  // with a Weekly plan: today's line, the explanation inside the card, the button under it
-  await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-personal") || "{}"); const d = { work: true, kind: "strength", intensity: "hard", when: "evening", minutes: 60 }; p.plan = [d, d, d, d, d, d, d]; localStorage.setItem("chefmealan-personal", JSON.stringify(p)); Object.keys(localStorage).filter((k) => k.startsWith("chefmealan-today-")).forEach((k) => localStorage.removeItem(k)); });
+  // with a Weekly plan (and the day picked above cleared, as a fresh week would be): today's line, the explanation inside the card, the button under it
+  await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-personal") || "{}"); const d = { work: true, kind: "strength", intensity: "hard", when: "evening", minutes: 60 }; p.plan = [d, d, d, d, d, d, d]; delete p.dated; Object.keys(localStorage).filter((k) => k.startsWith("chefmealan-today-")).forEach((k) => localStorage.removeItem(k)); localStorage.setItem("chefmealan-personal", JSON.stringify(p)); Object.keys(localStorage).filter((k) => k.startsWith("chefmealan-today-")).forEach((k) => localStorage.removeItem(k)); });
   await page.reload(); await page.waitForTimeout(900);
   const card = await page.locator(".today-plan").first().textContent();
   ok(/Strength, hard, in the evening\. A hard day\./.test(card) && /Today's part of your Weekly plan/.test(card), "Today reads the plan and says where it comes from: " + card.slice(0, 80));
@@ -45,9 +45,10 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   ok(plan === "strength", "the Weekly plan stays the same");
   await page.getByRole("button", { name: "Back to the Weekly plan" }).click(); await page.waitForTimeout(300);
   ok(/A hard day/.test(await page.locator(".today-plan").first().textContent()), "back to the Weekly plan");
-  ok(/set by you/.test(await page.locator(".plan-source").textContent()), "the goal source is a link");
-  await page.locator(".plan-source").click(); await page.waitForTimeout(300);
-  ok(await page.getByRole("button", { name: /Change the goal/ }).count() >= 1, "set by you opens Me, Goal");
+  // approved on the canvas, 6 October 2026: the goal itself is the link, large; who set it is one small line above it
+  ok(/your goal · set by you/i.test(await page.locator(".plan-goal small").first().textContent()), "a small line says whose goal and who set it");
+  await page.getByRole("button", { name: "Open your goal" }).click(); await page.waitForTimeout(300);
+  ok(await page.getByRole("button", { name: /Change the goal/ }).count() >= 1, "the goal's name opens Me, Goal");
   await page.goto("http://127.0.0.1:3193/"); await page.waitForTimeout(600);
   const actions = await page.locator("main").evaluate((m) => Array.from(m.querySelectorAll(".pill-tall, .inbox")).map((e) => e.className.includes("inbox") ? "inbox" : "action"));
   ok(actions.slice(0, 3).every((x) => x === "action"), "the three actions sit directly under the plan");

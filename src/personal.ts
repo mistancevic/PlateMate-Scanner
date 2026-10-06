@@ -1,6 +1,6 @@
 // Who the person is, for calculating their numbers. Every field optional; stored on the phone and in their account only.
 import { BANDS, type Band } from "./goal";
-import { isPlan, planFromCounts, countsOf, metOf, minutesOf, lifestyleFromOld, baseFactor, moveOf, WEEKDAY_NAMES, planLine, loadOf, weekdayIndex, getTodayChange, setTodayChange, dayOfLoad, type Plan, type PlanDay, type Lifestyle } from "./plan";
+import { ymd, isPlanDay, PE, COMMUTE, isPlan, planFromCounts, countsOf, metOf, minutesOf, lifestyleFromOld, baseFactor, moveOf, WEEKDAY_NAMES, planLine, planShort, loadOf, weekdayIndex, getTodayChange, setTodayChange, dayOfLoad, type Plan, type PlanDay, type Lifestyle } from "./plan";
 export type Sex = "female" | "male";
 export type Activity = "sedentary" | "light" | "moderate" | "very" | "athlete"; // before 6 October 2026; read only to move old profiles over
 export type Formula = "mifflin" | "katch";
@@ -19,6 +19,8 @@ export type Personal = {
   activity?: Activity; dayKcal?: unknown;
   // from 6 October 2026: the usual week, Monday first, and the lifestyle set once
   plan?: Plan; lifestyle?: Lifestyle;
+  // from 7 October 2026: a change for one date, by local date (YYYY-MM-DD); it never touches the usual week
+  dated?: Record<string, PlanDay>;
 };
 // Life without planned training, as a multiple of resting burn. Physical activity levels after FAO/WHO/UNU 2004,
 // taken at the low end of each band because planned training is counted separately, per day.
@@ -63,8 +65,25 @@ export type DaySource = "today" | "plan" | "you" | "assumed";
 export type Day = { type: DayType | null; source: DaySource; plan?: PlanDay | null };
 // Today's day, in this order: a change for this date only; else the Weekly plan for this weekday; else an old tapped day;
 // else nothing, and the week's average counts until the person says.
+// The day for any date: its own change if it has one, else the usual week's weekday. Null when there is no plan yet.
+export function dayFor(p: Personal, date: Date): { day: PlanDay; changed: boolean } | null {
+  const own = p.dated?.[ymd(date)];
+  if (own && isPlanDay(own)) return { day: own, changed: true };
+  const pl = planOf(p);
+  return pl ? { day: pl[weekdayIndex(date)], changed: false } : null;
+}
+// a change for one date, kept in the settings; null removes it, so the date follows the usual week again
+export function withDated(p: Personal, date: Date, day: PlanDay | null): Personal {
+  const dated = { ...(p.dated ?? {}) };
+  if (day) dated[ymd(date)] = day; else delete dated[ymd(date)];
+  // keep a year and a half of changes at most
+  const keys = Object.keys(dated).sort(); while (keys.length > 550) delete dated[keys.shift()!];
+  return { ...p, dated };
+}
+export const isMinor = (p: Personal) => { const a = ageOf(p); return a !== null && a < 18; };
 export function getDay(p: Personal = getPersonal(), date = new Date()): Day {
-  const change = getTodayChange(date);
+  const own = p.dated?.[ymd(date)];
+  const change = own && isPlanDay(own) ? own : getTodayChange(date);
   if (change) return { type: loadOf(change), source: "today", plan: change };
   const pl = planOf(p);
   if (pl) { const d = pl[weekdayIndex(date)]; return { type: loadOf(d), source: "plan", plan: d }; }
@@ -117,9 +136,12 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   const sexTerm = p.sex === "male" ? 5 : p.sex === "female" ? -161 : -78;
   const f = formulaFor(p, pinned) === "katch" && p.bodyFatPct ? "katch" : "mifflin";
   const lean = p.bodyFatPct ? w * (1 - p.bodyFatPct / 100) : null;
-  const bmr = f === "katch" && lean ? 370 + 21.6 * lean : 10 * w + 6.25 * h - 5 * age + sexTerm;
+  // Under 18: the Schofield equations for 10 to 18 years (FAO/WHO/UNU), made for children and teenagers; the adult formulas are not.
+  const minor = age < 18;
+  const schofield = p.sex === "male" ? 17.686 * w + 658.2 : p.sex === "female" ? 13.384 * w + 692.6 : (17.686 * w + 658.2 + 13.384 * w + 692.6) / 2;
+  const bmr = minor ? schofield : f === "katch" && lean ? 370 + 21.6 * lean : 10 * w + 6.25 * h - 5 * age + sexTerm;
   const ls = lifestyleOf(p), move = moveOf(ls);
-  const life = { factor: move.factor, name: `${move.name.toLowerCase()} at work` };
+  const life = minor ? { factor: 1.3, name: "a school day, mostly sitting" } : { factor: move.factor, name: `${move.name.toLowerCase()} at work` };
   let adj = ADJ[bandId] ?? 0;
   const notes: string[] = [];
   if (age < 18 && adj < 0) { adj = 0; notes.push("Under 18: no deficit, energy stays at maintenance."); }
@@ -155,16 +177,24 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   // a planned day: resting burn × the day's baseline (work day or off), plus its activity, then the goal
   const plan = planOf(p);
   const pctLine = `${pct === 0 ? "± 0" : pct > 0 ? `+ ${pct}` : `− ${Math.abs(pct)}`} % for ${goalName}`;
-  const restLine = `${Math.round(bmr).toLocaleString("en")} at rest (${f === "katch" ? "Katch–McArdle, from lean mass" : "Mifflin–St Jeor: sex, age, height, weight"})`;
+  const restLine = `${Math.round(bmr).toLocaleString("en")} at rest (${minor ? "Schofield, for 10 to 18 years: sex and weight" : f === "katch" ? "Katch–McArdle, from lean mass" : "Mifflin–St Jeor: sex, age, height, weight"})`;
+  const part = (met: number, min: number) => (met - 1) * w * (min / 60);
   const dayKcalHow = (d: PlanDay): { kcal: number; how: string[] } => {
-    const fac = baseFactor(ls, d.work), b = bmr * fac;
+    const fac = minor ? 1.3 : baseFactor(ls, d.work), b = bmr * fac;
     const min = minutesOf(d), met = metOf(d);
-    const extra = met > 1 ? (met - 1) * w * (min / 60) : 0;
-    const kcal = r50((b + extra) * (1 + adj));
+    const extra = met > 1 ? part(met, min) : 0;
+    // a school kid's day can also hold sport at school and the way to school and back
+    const pe = minor && d.work && d.pe ? part(PE.met, PE.minutes) : 0;
+    const way = minor && d.work ? COMMUTE[ls.commute ?? ""] : undefined;
+    const commute = way ? part(way.met, way.minutes) : 0;
+    const kcal = r50((b + extra + pe + commute) * (1 + adj));
+    const what = d.kind === "club" || d.kind === "match" ? planShort({ ...d, pe: false, when: undefined }).toLowerCase() : planLine({ ...d, pe: false }).toLowerCase().replace(/, (in|during|late|right).*$/, "");
     return { kcal, how: [
       restLine,
-      `× ${fac} for ${d.work ? life.name : "a day off"} = ${Math.round(b).toLocaleString("en")}`,
-      extra ? `+ ${Math.round(extra)} for ${min} min ${planLine(d).toLowerCase().replace(/, (in|during|late).*$/, "")} (${met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest; Compendium 2024)` : "+ 0, no activity",
+      `× ${fac} for ${minor ? (d.work ? "a school day, mostly sitting" : "a day without school") : d.work ? life.name : "a day off"} = ${Math.round(b).toLocaleString("en")}`,
+      ...(commute ? [`+ ${Math.round(commute)} for ${way!.name} (${way!.met} METs, ${way!.minutes} min)`] : []),
+      ...(pe ? [`+ ${Math.round(pe)} for sport at school (${PE.met} METs, ${PE.minutes} min)`] : []),
+      extra ? `+ ${Math.round(extra)} for ${min} min ${what} (${met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest; Compendium 2024)` : pe || commute ? "+ 0 after school" : "+ 0, no activity",
       pctLine,
       `= ${kcal.toLocaleString("en")} kcal`,
     ] };
@@ -178,7 +208,7 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   for (const d of DAY_TYPES) days[d.id] = { kcal: kcalOf[d.id], protein, fats, carbs: carbsOf(kcalOf[d.id]), how: how[d.id] };
   const numbersOf = (d: PlanDay): DayNumbers => { const x = dayKcalHow(d); return { kcal: x.kcal, protein, fats, carbs: carbsOf(x.kcal), how: x.how }; };
   const weekdays = plan ? plan.map((d, i) => ({ name: WEEKDAY_NAMES[i], day: d, ...numbersOf(d) })) : null;
-  const method = `${f === "katch" ? "Katch–McArdle" : "Mifflin–St Jeor"}, ${life.name} ×${life.factor}, activity per day from the Compendium of Physical Activities${pct ? `, ${pct > 0 ? "+" : ""}${pct} %` : ""}`;
+  const method = `${minor ? "Schofield (10 to 18 years)" : f === "katch" ? "Katch–McArdle" : "Mifflin–St Jeor"}, ${life.name} ×${life.factor}, activity per day from the Compendium of Physical Activities${pct ? `, ${pct > 0 ? "+" : ""}${pct} %` : ""}`;
   const math = `Average over your week: ${avg.toLocaleString("en")} kcal. Protein ${lo}–${hi} g per kg${trains ? ", because you train" : ""} × ${Math.round(ref)} kg = ${proteinMin}–${proteinMax} g, target ${protein} g.`;
   return { kcal: avg, protein, fats, carbs: carbsOf(avg), proteinMin, proteinMax, note: notes.join(" "), method, math, bmr: Math.round(bmr), tdee: Math.round(base), days, week, weekdays, numbersOf };
 }

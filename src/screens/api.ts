@@ -92,6 +92,7 @@ export interface AppApi {
   dayType: import("../personal").DayType;
   day: import("../personal").Day;
   setTodayPlan: (d: import("../plan").PlanDay | null) => void;
+  setDated: (date: Date, d: import("../plan").PlanDay | null) => void;
   setDayType: (d: import("../personal").DayType) => void;
   formula: import("../personal").Formula | null;
   openMenu: (s?: MenuSection, from?: MenuSection) => void;

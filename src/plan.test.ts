@@ -35,3 +35,42 @@ test("the old My week counts become a starting plan, work Monday to Friday", () 
   assert.deepEqual(countsOf(p), { passive: 2, active: 1, easy: 2, hard: 2 });
   assert.deepEqual(p.map((d) => d.work), [true, true, true, true, true, false, false]);
 });
+
+test("ISO weeks: 5 to 11 October 2026 is week 41; 22 to 28 June is week 26; 27 July is week 31", async () => {
+  const { isoWeek, datesOfWeek } = await import("./plan");
+  assert.equal(isoWeek(new Date(2026, 9, 6)).week, 41);
+  assert.equal(isoWeek(new Date(2026, 5, 24)).week, 26);
+  assert.equal(isoWeek(new Date(2026, 6, 27)).week, 31);
+  const days = datesOfWeek(isoWeek(new Date(2026, 9, 6)).monday);
+  assert.equal(days[0].getDate(), 5); assert.equal(days[6].getDate(), 11);
+});
+
+test("a change for one date never touches the usual week, and can be taken back", async () => {
+  const { withDated, dayFor } = await import("./personal");
+  const plan = Array.from({ length: 7 }, (_, i) => ({ work: i < 5, kind: "rest" as const }));
+  const p0: any = { plan };
+  const sat = new Date(2026, 9, 17);
+  const p1 = withDated(p0, sat, { work: false, kind: "match", sport: "football", intensity: "hard" });
+  assert.equal(dayFor(p1, sat)!.day.kind, "match"); assert.equal(dayFor(p1, sat)!.changed, true);
+  assert.equal(dayFor(p1, new Date(2026, 9, 24))!.day.kind, "rest", "the next Saturday follows the usual week");
+  assert.equal(p1.plan, plan, "the usual week is the same object");
+  const p2 = withDated(p1, sat, null);
+  assert.equal(dayFor(p2, sat)!.changed, false);
+});
+
+test("under 18: Schofield, the way to school, sport at school and a football training add up", async () => {
+  const { calculate } = await import("./personal");
+  const year = new Date().getFullYear();
+  const p: any = { sex: "female", birthYear: year - 17, heightCm: 168, weightKg: 60, lifestyle: { commute: "bike" },
+    plan: Array.from({ length: 7 }, (_, i) => ({ work: i < 5, kind: "rest" })) };
+  const c = calculate(p, "maintain")!;
+  // Schofield for girls 10 to 18: 13.384 x 60 + 692.6 = 1,495.6
+  assert.equal(c.bmr, 1496);
+  const day = { work: true, kind: "club", sport: "football", intensity: "hard", when: "lateafternoon", minutes: 90, pe: true } as const;
+  const n = c.numbersOf(day as any);
+  // 1,495.6 x 1.3 = 1,944; + bike 30 min (3 x 60 x 0.5 = 90); + sport at school 45 min (3 x 60 x 0.75 = 135); + football hard 90 min (8.5 x 60 x 1.5 = 765)
+  assert.equal(n.kcal, 2950);
+  assert.ok(n.how.some((x) => /Schofield/.test(x)) && n.how.some((x) => /sport at school/.test(x)) && n.how.some((x) => /cycling to school/.test(x)), n.how.join(" | "));
+  // a calorie cut is never applied under 18
+  assert.equal(calculate(p, "fatloss")!.numbersOf(day as any).kcal, 2950);
+});
