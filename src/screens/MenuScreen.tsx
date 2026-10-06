@@ -7,6 +7,7 @@ import { BANDS, bandOf, SOURCE_LABEL, type GoalEntry } from "../goal";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
 import { ACTIVITIES, calculate, canCalculate, suggestBand, formulaFor, type Personal } from "../personal";
+import { DayTargets } from "../components/DayTargets";
 import type { AppApi, MenuSection } from "./api";
 import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
@@ -243,6 +244,9 @@ function GoalPanel(p: AppApi) {
         </div>
         <small>{p.personal.dayMode === "follow" ? "On Today you say what kind of day it is: rest, usual, training or very active. Calories move with the day; protein stays. Until you say, the usual day is assumed." : "One number for every day. Some days you'll use more, some less; over the week it evens out."}</small>
       </section>
+      {p.personal.dayMode === "follow" && (
+        <section className="card"><DayTargets avgKcal={state.goals.calories ?? null} personal={p.personal} setPersonal={p.setPersonal} /></section>
+      )}
       <p className="label">How your numbers work</p>
       <section className="card explain">
         <p><b>At rest.</b> What your body burns doing nothing: Mifflin–St Jeor from sex, age, height and weight, or Katch–McArdle from your lean mass when you know your body fat.</p>

@@ -38,3 +38,16 @@ test("the line under the chips says the range and the partner, for the current t
   assert.equal(bandHint("top", 5.3), "High+: PD 13.3 and up \u00b7 your target 5.3");
   assert.equal(bandHint("plan", null), BAND_LINE_IDLE);
 });
+
+test("four day targets: usual is the goal, the others by rule unless set by hand", async () => {
+  const { dayTargets } = await import("./personal");
+  const p: any = { activity: "moderate", dayMode: "follow" };
+  const t = dayTargets(2600, p);
+  assert.equal(t.normal.kcal, 2600);
+  assert.ok(t.rest.kcal < 2600 && t.training.kcal > 2600 && t.very.kcal > t.training.kcal);
+  assert.equal(t.rest.own, false);
+  const mine = dayTargets(2600, { ...p, dayKcal: { rest: 2100, very: 3400 } });
+  assert.equal(mine.rest.kcal, 2100); assert.equal(mine.rest.own, true);
+  assert.equal(mine.very.kcal, 3400); assert.equal(mine.training.own, false);
+  assert.equal(dayTargets(2600, { ...p, dayKcal: { normal: 9999 } as any }).normal.kcal, 2600, "the usual day is always the goal");
+});

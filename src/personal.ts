@@ -5,7 +5,7 @@ export type Activity = "sedentary" | "light" | "moderate" | "very" | "athlete";
 export type Formula = "mifflin" | "katch";
 export type DayMode = "same" | "follow";
 export type DayType = "rest" | "normal" | "training" | "very";
-export type Personal = { sex?: Sex; birthYear?: number; heightCm?: number; weightKg?: number; activity?: Activity; bodyFatPct?: number; dayMode?: DayMode; pdUnit?: "pd" | "pct" };
+export type Personal = { sex?: Sex; birthYear?: number; heightCm?: number; weightKg?: number; activity?: Activity; bodyFatPct?: number; dayMode?: DayMode; pdUnit?: "pd" | "pct"; dayKcal?: Partial<Record<DayType, number>> };
 export const DAY_TYPES: { id: DayType; name: string }[] = [
   { id: "rest", name: "Rest day" }, { id: "normal", name: "Usual day" }, { id: "training", name: "Training day" }, { id: "very", name: "Very active day" },
 ];
@@ -14,6 +14,17 @@ export function dayFactor(day: DayType, p: Personal): { base: number; today: num
   const base = ACTIVITIES.find((a) => a.id === p.activity)?.factor ?? 1.55;
   const today = day === "rest" ? 1.2 : day === "training" ? Math.min(1.9, base + 0.175) : day === "very" ? Math.min(1.9, base + 0.35) : base;
   return { base, today };
+}
+// The four day targets: the usual day is the goal's own calories; rest, training and very active follow the rule above
+// unless the person set their own number for that day, which then wins. Protein and fat stay; carbs take the difference.
+export function dayTargets(avgKcal: number, p: Personal): Record<DayType, { kcal: number; own: boolean }> {
+  const out = {} as Record<DayType, { kcal: number; own: boolean }>;
+  for (const d of DAY_TYPES.map((x) => x.id)) {
+    const set = d === "normal" ? undefined : p.dayKcal?.[d];
+    const { base, today } = dayFactor(d, p);
+    out[d] = set && set > 0 ? { kcal: Math.round(set), own: true } : { kcal: d === "normal" ? Math.round(avgKcal) : Math.round((avgKcal * today) / base / 50) * 50, own: false };
+  }
+  return out;
 }
 const dayKey = () => `chefmealan-day-${new Date().toISOString().slice(0, 10)}`;
 // The day has one source, in this order: a plan says it, else the person tapped it, else the usual day is assumed.

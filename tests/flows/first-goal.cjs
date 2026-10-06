@@ -23,7 +23,14 @@ const path = require("node:path");
   const four = await page.locator(".four").textContent();
   ok(/g protein/.test(four) && /g fat/.test(four) && /g carbs/.test(four), "four numbers appear as you type: " + four.replace(/\s+/g, " ").slice(0, 60));
   ok(/Under 18/.test(await page.locator(".proposal").textContent()), "a 17-year-old picking Lose fat gets no deficit, and is told");
+  // follow my day: the four days show, the usual is the goal, and a rest day can be set by hand
+  await page.getByRole("button", { name: /^Follow my day$/ }).click(); await page.waitForTimeout(200);
+  ok(await page.locator(".day-targets .day-target").count() === 4, "Follow my day shows the four days");
+  await page.getByLabel("Rest day, kcal").fill("1500"); await page.getByLabel("Rest day, kcal").press("Enter"); await page.waitForTimeout(200);
+  ok(/set by you/.test(await page.locator(".day-target").first().textContent()), "a rest day set by hand says so");
   await page.getByRole("button", { name: /Set my day/ }).click(); await page.waitForTimeout(600);
+  const pers = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")));
+  ok(pers.dayMode === "follow" && pers.dayKcal && pers.dayKcal.rest === 1500, "the day targets are saved: " + JSON.stringify(pers.dayKcal));
   const g = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).goals);
   ok(g.calories > 0 && g.protein > 0 && g.fats > 0 && g.carbs > 0, "the day is saved with all four: " + JSON.stringify(g));
   ok(/g fat · \d+ g carbs/.test(await page.locator(".macro-line").first().textContent()), "the Today card carries fat and carbs");

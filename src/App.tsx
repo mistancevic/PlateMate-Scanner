@@ -39,7 +39,7 @@ import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
-import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, dayFactor, getDay, setDayType as storeDayType, DAY_TYPES, macroSplit, type Personal, type DayType, type Day } from "./personal";
+import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, dayFactor, getDay, setDayType as storeDayType, DAY_TYPES, macroSplit, dayTargets, type Personal, type DayType, type Day } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
@@ -1144,8 +1144,7 @@ export default function App() {
   function todayKcalOf(): number | null {
     const k = state.goals.calories ?? null;
     if (k === null || personal.dayMode !== "follow") return k;
-    const { base, today } = dayFactor(day.type, personal);
-    return Math.round((k * today) / base / 50) * 50;
+    return dayTargets(k, personal)[day.type].kcal;
   }
   function mix(id: string = adjustId): boolean { return mixWith(state.items, id); }
   function mixWith(itemsIn: Ingredient[], id: string): boolean {

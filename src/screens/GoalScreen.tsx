@@ -5,6 +5,7 @@ import { pdText, pdVal, pdTag, pdRange } from "../ui";
 import { Mark, APP_NAME } from "../components/Mark";
 import { ACTIVITIES, calculate, canCalculate, macroSplit, suggestBand, MACRO_SOURCE, type Personal } from "../personal";
 import type { AppApi } from "./api";
+import { DayTargets } from "../components/DayTargets";
 
 // The first screen after sign-in, and the Goal screen's heart: one place, three ways in, the calculated one first.
 // 1. Work it out for me: body data here, consent first, the band underneath, four numbers as you type.
@@ -30,7 +31,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
 
   const dayMode = p.personal.dayMode === "follow" ? "follow" : "same";
   const setDayMode = (m: "same" | "follow") => p.setPersonal({ ...p.personal, dayMode: m });
-  const Days = () => (
+  const Days = ({ avg }: { avg: number | null }) => (
     <div className="days-choice">
       <span className="small">Your days</span>
       <div className="moments">
@@ -38,6 +39,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
         <button className={`pill pill-small ${dayMode === "follow" ? "pill-primary" : ""}`} onClick={() => setDayMode("follow")}>Follow my day</button>
       </div>
       <small className="muted">{dayMode === "follow" ? "On Today you say what kind of day it is; calories and carbs move with it, protein and fat stay." : "One number for every day; over the week it evens out."}</small>
+      {dayMode === "follow" && <DayTargets avgKcal={avg} personal={p.personal} setPersonal={p.setPersonal} />}
     </div>
   );
   const done = () => { p.notify("Your day is set. This is Today."); onDone(); };
@@ -104,7 +106,8 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
               <p className="math">{result.math}</p>
               <small>{result.method}. {MACRO_SOURCE}</small>
               {result.note && <small>{result.note}</small>}
-              <button className="pill pill-primary pill-wide" onClick={() => { p.applyNumbers(band, result.kcal, result.protein, result.method); onDone(); }}>Set my day</button>
+              <Days avg={result.kcal} />
+              <button className="pill pill-primary pill-wide" onClick={() => { p.applyNumbers(band, result.kcal, result.protein, result.method); done(); }}>Set my day</button>
             </section>
           ) : (
             <p className="small muted">{consented ? "Sex, birth year, height, weight and activity, and the four numbers appear here." : "Agree above, then fill in your body data."}</p>
@@ -115,7 +118,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
       {way === "rough" && (
         <div className="bands">
           <p className="small muted">The middle of each range, the same for everyone, and it never follows your weight. Rough; work it out for exact, and it follows your profile from then on.</p>
-          <Days />
+          <Days avg={null} />
           {BANDS.map((b) => (
             <button key={b.id} className="band-card" onClick={() => {
               const g = goalsForBand(b);
@@ -143,7 +146,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void }) {
             <label className="field"><span>carbs, g</span><input inputMode="numeric" value={own.carbs} onChange={(e) => setOwn({ ...own, carbs: e.target.value })} placeholder={ownCarbs !== null ? String(ownCarbs) : "the rest"} /></label>
           </div>
           <p className="small">That is {pdText(ownPd)}{ownFats !== null && ownCarbs !== null ? `, ${ownFats} g fat and ${ownCarbs} g carbs` : ""}.</p>
-          <Days />
+          <Days avg={ownKcal} />
           <button className="pill pill-primary pill-wide" disabled={!ownPd} onClick={() => {
             setState((s) => ({ ...s, goals: { ...s.goals, calories: ownKcal, protein: ownProtein, fats: ownFats, carbs: ownCarbs } }));
             saveGoal({ setBy: by, setAt: new Date().toISOString(), source: "exact" });
