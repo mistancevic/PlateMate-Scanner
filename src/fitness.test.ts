@@ -13,37 +13,37 @@ test("the numbers follow the sources and stay inside their ranges", () => {
   assert.equal(proteinFloor(55), 20);      // never under 20
   assert.equal(proteinFloor(150), 40);     // never over 40
   assert.equal(proteinFloor(null), 30);    // no weight on the profile
-  assert.equal(preCarbGrams(95, "normal"), 48);
-  assert.equal(preCarbGrams(95, "training"), 95);
-  assert.equal(preCarbGrams(95, "very"), 120); // capped
-  assert.equal(preCarbGrams(null, "training"), 60);
+  assert.equal(preCarbGrams(95, "passive"), 48);
+  assert.equal(preCarbGrams(95, "easy"), 95);
+  assert.equal(preCarbGrams(95, "hard"), 120); // capped
+  assert.equal(preCarbGrams(null, "easy"), 60);
   assert.ok(/ISSN/.test(SOURCES.proteinDose) && /2016/.test(SOURCES.preCarb));
 });
 
 test("before training: honey and a banana fit as they are; oats wait for the fibre rule; Nutella does not; chicken is not the energy", () => {
   for (const f of [honey, banana]) {
-    const r = preTraining(f, playbookFor(f), 95, "training");
+    const r = preTraining(f, playbookFor(f), 95, "easy");
     assert.equal(r.fits, true, `${f.name} fits before training`);
     assert.ok(r.grams! > 0 && /nothing to add/.test(r.reason), `${f.name}: ${r.reason}`);
   }
-  assert.equal(preTraining(nutella, playbookFor(nutella), 95, "training").fits, false, "Nutella: 31 g fat");
-  assert.equal(preTraining(oats, playbookFor(oats), 95, "training").fits, false, "oats: 10 g fibre, the playbook's before-training rule stands");
-  const c = preTraining(chicken, playbookFor(chicken), 95, "training");
+  assert.equal(preTraining(nutella, playbookFor(nutella), 95, "easy").fits, false, "Nutella: 31 g fat");
+  assert.equal(preTraining(oats, playbookFor(oats), 95, "easy").fits, false, "oats: 10 g fibre, the playbook's before-training rule stands");
+  const c = preTraining(chicken, playbookFor(chicken), 95, "easy");
   assert.equal(c.fits, false); assert.ok(/carb food/.test(c.reason));
   assert.equal(isCarbFood(honey), true); assert.equal(isCarbFood(skyr), false);
 });
 
 test("before training: the portion follows the day's load", () => {
-  const usual = preTraining(honey, playbookFor(honey), 95, "normal").grams!;
-  const training = preTraining(honey, playbookFor(honey), 95, "training").grams!;
-  const very = preTraining(honey, playbookFor(honey), 95, "very").grams!;
+  const usual = preTraining(honey, playbookFor(honey), 95, "passive").grams!;
+  const training = preTraining(honey, playbookFor(honey), 95, "easy").grams!;
+  const very = preTraining(honey, playbookFor(honey), 95, "hard").grams!;
   assert.ok(usual < training && training < very, `${usual} < ${training} < ${very}`);
 });
 
 test("before training, Mix it: honey fits on its own, no mix offered; Nutella still gets a dairy partner", () => {
-  const h = mixTip(honey, "before", 3, [], STARTER_FOODS, 300, { weightKg: 95, dayType: "training" });
+  const h = mixTip(honey, "before", 3, [], STARTER_FOODS, 300, { weightKg: 95, dayType: "easy" });
   assert.equal(h.case, "fits"); assert.equal(h.mixes.length, 0); assert.ok(/nothing to add/.test(h.why));
-  const n = mixTip(nutella, "before", 3, [], STARTER_FOODS, 300, { weightKg: 95, dayType: "training" });
+  const n = mixTip(nutella, "before", 3, [], STARTER_FOODS, 300, { weightKg: 95, dayType: "easy" });
   assert.ok(n.mixes.length >= 1);
 });
 
@@ -57,7 +57,7 @@ test("after training: a protein base says the grams that reach the floor; a carb
 });
 
 test("after training, Mix it: the plate reaches the protein floor", () => {
-  const t = mixTip(nutella, "after", 6.3, [], STARTER_FOODS, 1200, { weightKg: 95, dayType: "training" });
+  const t = mixTip(nutella, "after", 6.3, [], STARTER_FOODS, 1200, { weightKg: 95, dayType: "easy" });
   assert.ok(t.mixes.length >= 1);
   for (const m of t.mixes) assert.ok(m.protein >= 29, `${m.partners.map((p) => p.name).join("+")}: ${m.protein} g protein`);
 });

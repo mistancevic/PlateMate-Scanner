@@ -67,7 +67,7 @@ export interface AppApi {
   dismissRecipe: (item: import("../cloud").InboxItem) => Promise<void>;
   personal: import("../personal").Personal;
   setPersonal: (p: import("../personal").Personal) => void;
-  applyNumbers: (bandId: string, kcal: number, protein: number, method?: string) => void;
+  applyNumbers: (bandId: string, kcal: number, protein: number, method?: string, fats?: number, carbs?: number) => void;
   todayMacros: { kcal: number; protein: number; fats: number; carbs: number } | null;
   goalLog: import("../goal").GoalEntry[];
   addFoodPhoto: (foodId: string, dataUrl: string) => Promise<void>;

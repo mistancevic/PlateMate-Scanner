@@ -152,7 +152,7 @@ export type MixOpts = { weightKg?: number | null; dayType?: DayType; allergies?:
 export function mixTip(food: Food, moment: MomentId, target: number | null, library: Food[], starter: Food[], kcalCap: number | null, opts: MixOpts = {}): MixTip {
   // fitness rule: before training the job is energy; a carb food the playbook clears fits as it is, whatever its PD
   if (moment === "before") {
-    const pre = preTraining(food, playbookFor(food), opts.weightKg, opts.dayType ?? "normal");
+    const pre = preTraining(food, playbookFor(food), opts.weightKg, opts.dayType ?? "passive");
     if (pre.fits) return { case: "fits", mixes: [], why: pre.reason };
   }
   const c = mixCase(food, target);

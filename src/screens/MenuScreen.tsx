@@ -6,8 +6,8 @@ import { exportLog, clearLog, readLog, log } from "../log";
 import { BANDS, bandOf, SOURCE_LABEL, type GoalEntry } from "../goal";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
-import { ACTIVITIES, calculate, canCalculate, suggestBand, formulaFor, type Personal } from "../personal";
-import { DayTargets } from "../components/DayTargets";
+import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, type Personal, type DayType } from "../personal";
+import { DayTable } from "../components/DayTable";
 import type { AppApi, MenuSection } from "./api";
 import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
@@ -130,14 +130,15 @@ function ProfilePanel(p: AppApi) {
           <label className="field"><span>Weight, kg</span><input inputMode="decimal" value={d.weightKg ?? ""} placeholder="75" onChange={(e) => setD({ ...d, weightKg: num(e.target.value) })} /></label>
         </div>
         <label className="field"><span>Body fat %, if you know it</span><input inputMode="decimal" value={d.bodyFatPct ?? ""} placeholder="from a scale or a scan" onChange={(e) => setD({ ...d, bodyFatPct: num(e.target.value) })} /></label>
-        <div className="field"><span>Activity</span>
+        <div className="field"><span>Your life, without training</span>
           <div className="activity-list">
-            {ACTIVITIES.map((a) => (
-              <button key={a.id} className={`activity ${d.activity === a.id ? "on" : ""}`} onClick={() => setD({ ...d, activity: d.activity === a.id ? undefined : a.id })}>
-                <b>{a.name}</b><small>{a.hint}</small>
+            {LIFE.map((l) => (
+              <button key={l.id} className={`activity ${lifeOf(d) === l.id ? "on" : ""}`} onClick={() => setD({ ...d, life: l.id })}>
+                <b>{l.name}</b><small>{l.hint}</small>
               </button>
             ))}
           </div>
+          <small className="muted">Your training week is under My week.</small>
         </div>
         <div className="field"><span>Show protein density as</span>
           <div className="moments">
@@ -216,56 +217,50 @@ function NextLink({ p, to, from, text, hint }: { p: AppApi; to: MenuSection; fro
   );
 }
 function GoalPanel(p: AppApi) {
-  const { state, goal, openGoal, setGoalsOpen, resetGoal } = p;
-  const bandName = goal?.band ? bandOf(goal.band)?.name : null;
+  const { state, goal, openGoal, resetGoal } = p;
+  const band = goal?.band ? bandOf(goal.band) : null;
   const setBy = goal?.setBy === "coach" ? (goal.coachName || p.profile.coachName || COACH_NAME) : "you";
+  const mode = dayModeOf(p.personal);
+  const ownWay = goal?.source === "exact" || goal?.source === "coach";
+  const c = calculate(p.personal, band?.id ?? "maintain", p.formula);
+  const o = ownWay ? ownDayNumbers(p.personal, band?.id ?? "maintain", p.formula) : null;
   return (
     <>
       <section className="plan">
-        <div className="plan-top"><span>Your goal{bandName ? `: ${bandName}` : ""}</span><span>set by {setBy}</span></div>
-        <div className="plan-row">
-          <div><b>{pdVal(p.dayPd)}</b><small>{pdTag()} target</small></div>
-          <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal a day</small></div>
-          <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
-        </div>
-        {state.goals.fats != null && state.goals.carbs != null && <p className="macro-line">{fmt(state.goals.fats, 0)} g fat · {fmt(state.goals.carbs, 0)} g carbs · fat and carbs by rule, carbs move with the day</p>}
-        <p className="source-line">{goal?.source ? SOURCE_LABEL[goal.source] : goal?.setBy === "coach" ? SOURCE_LABEL.coach : "Quick goal"}{goal?.method ? `: ${goal.method}` : ""}{goal?.source === "profile" ? ". Follows your profile from here on." : ""}</p>
-        <div className="button-row">
-          <button className="pill pill-small pill-primary" onClick={openGoal}><Calculator size={14} /> Work it out, or change it</button>
-          <button className="pill pill-small" onClick={() => setGoalsOpen(true)}><SlidersHorizontal size={14} /> Exact numbers</button>
-          <ConfirmButton className="pill pill-small" label={<><RotateCcw size={14} /> Reset</>} confirmLabel="Tap again to reset" onConfirm={resetGoal} />
-        </div>
+        <div className="plan-top"><span>{band ? band.name : "Your goal"}</span><span>{ownWay ? (goal?.setBy === "coach" ? `set by ${setBy}` : "your own numbers") : "calculated for you"}</span></div>
+        {band && <small className="plan-who">{band.who}</small>}
+        {mode === "same" || (!c && !o) ? (
+          <>
+            <div className="plan-row">
+              <div><b>{pdVal(p.dayPd)}</b><small>{pdTag()} target</small></div>
+              <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal a day</small></div>
+              <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
+            </div>
+            {state.goals.fats != null && state.goals.carbs != null && <p className="macro-line">{fmt(state.goals.fats, 0)} g fat · {fmt(state.goals.carbs, 0)} g carbs · every day the same</p>}
+          </>
+        ) : null}
       </section>
-      <p className="label">Your days</p>
-      <section className="card">
-        <div className="moments">
-          <button className={`pill pill-small ${p.personal.dayMode !== "follow" ? "pill-primary" : ""}`} onClick={() => p.setPersonal({ ...p.personal, dayMode: "same" })}>Every day the same</button>
-          <button className={`pill pill-small ${p.personal.dayMode === "follow" ? "pill-primary" : ""}`} onClick={() => p.setPersonal({ ...p.personal, dayMode: "follow" })}>Follow my day</button>
-        </div>
-        <small>{p.personal.dayMode === "follow" ? "On Today you say what kind of day it is: rest, usual, training or very active. Calories move with the day; protein stays. Until you say, the usual day is assumed." : "One number for every day. Some days you'll use more, some less; over the week it evens out."}</small>
-      </section>
-      {p.personal.dayMode === "follow" && (
-        <section className="card"><DayTargets avgKcal={state.goals.calories ?? null} personal={p.personal} setPersonal={p.setPersonal} /></section>
+      {mode === "each" && (o || c) && (
+        <>
+          <p className="label">Your days, each its own</p>
+          {o ? <DayTable rows={o.days} avg={o.avg} week={weekOf(p.personal)} /> : <DayTable rows={c!.days} avg={{ kcal: c!.kcal, protein: c!.protein }} week={c!.week} />}
+        </>
       )}
+      <div className="button-row" style={{ marginTop: 12 }}>
+        <button className="pill pill-small pill-primary" onClick={openGoal}><Calculator size={14} /> Change the goal</button>
+        <ConfirmButton className="pill pill-small" label={<><RotateCcw size={14} /> Reset</>} confirmLabel="Tap again to reset" onConfirm={resetGoal} />
+      </div>
       <p className="label">How your numbers work</p>
       <section className="card explain">
         <p><b>At rest.</b> What your body burns doing nothing: Mifflin–St Jeor from sex, age, height and weight, or Katch–McArdle from your lean mass when you know your body fat.</p>
-        <p><b>Your day.</b> That times how much you move: 1.2 for a day on the sofa, 1.375 light, 1.55 active, 1.725 very active, 1.9 training twice. A lazy Sunday and a training day can be 1,000 kcal apart.</p>
-        <p><b>Your goal.</b> Minus 20 % to lose fat, minus 10 % for recomposition, plus 10 % to build.</p>
-        <p><b>Protein.</b> Per kg of your weight: 1.2 to 1.6 g for adults, 1.6 to 2.2 g if you train, build or cut. It stays the same on rest days; the energy moves.</p>
-        <small>Sources: Mifflin et al. 1990; Katch and McArdle; standard activity multipliers; US Dietary Guidelines 2025–2030; ISSN position stand 2017; Morton et al. 2018.</small>
-      </section>
-      <p className="label">How Mealan judges a food</p>
-      <section className="card explain">
-        <p><b>Before decides after.</b> Code works out what a food suits before Mealan writes a word, and Mealan has to follow it. A tip that breaks a rule is sent back; if it breaks again, the rule writes the tip itself.</p>
-        <p><b>Before training.</b> Only foods with at most 10 g fat and 6 g fibre per 100 g: they digest fast enough not to sit in the stomach while you lift.</p>
-        <p><b>After training.</b> A protein base, with or without carbs next to it.</p>
-        <p><b>Flavour foods and fat sources.</b> A small part of a plate a protein base carries. Never on their own, never "for energy".</p>
-        <p><b>Caveats.</b> Only from fixed values per 100 g: fat above 17.5 g, saturates above 5 g, sugars above 22.5 g, salt above 1.5 g. Said as a fact, never as a judgement.</p>
-        <small>Sources: UK Food Standards Agency front-of-pack values; ISSN position stand on nutrient timing, 2017.</small>
+        <p><b>Your life.</b> That times how your day goes without training: 1.3 at a desk, 1.4 on shifts, 1.55 on your feet, 1.75 in physical work.</p>
+        <p><b>Your training.</b> Each day adds what its training costs: a walk 3.5 METs, an easy session 5, a hard one 8, times your weight and the minutes, less what you burn at rest anyway.</p>
+        <p><b>Your goal.</b> Minus 20 % to lose fat, minus 10 % for recomposition, plus 10 % to build muscle, plus 5 % for performance.</p>
+        <p><b>Protein.</b> 1.6 to 2.2 g per kg if you train twice a week or more, else 1.2 to 1.6. The same every day; the energy moves with the training.</p>
+        <small>Sources: Mifflin et al. 1990; Katch and McArdle; FAO/WHO/UNU 2004 activity levels; Compendium of Physical Activities 2024; US Dietary Guidelines 2025–2030; ISSN position stand 2017; Morton et al. 2018.</small>
       </section>
       <GoalHistory log={p.goalLog} />
-      <NextLink p={p} to="week" from="goal" text="My week" hint="Training days, desk days, where the calories move" />
+      <NextLink p={p} to="week" from="goal" text="My week" hint="Your life, your training week, session lengths" />
     </>
   );
 }
@@ -288,10 +283,35 @@ export function GoalHistory({ log }: { log: GoalEntry[] }) {
 }
 
 function WeekPanel(p: AppApi) {
+  const d = p.personal, week = weekOf(d);
+  const total = DAY_TYPES.reduce((a, x) => a + (week[x.id] || 0), 0);
+  const set = (k: DayType, v: number) => p.setPersonal({ ...d, week: { ...week, [k]: Math.max(0, Math.min(7, v)) } });
+  const num = (v: string) => (v.trim() === "" ? undefined : Math.max(10, Math.min(240, Number(v))));
   return (
     <>
+    <p className="label">Your life, without training</p>
     <section className="card">
-      <small>The shape of your week. It decides which moments come first when you cook.</small>
+      <div className="activity-list">{LIFE.map((l) => <button key={l.id} className={`activity ${lifeOf(d) === l.id ? "on" : ""}`} onClick={() => p.setPersonal({ ...d, life: l.id })}><b>{l.name}</b><small>{l.hint}</small></button>)}</div>
+    </section>
+    <p className="label">Your training week</p>
+    <section className="card">
+      <div className="week-steps">
+        {DAY_TYPES.map((x) => (
+          <div className="week-step" key={x.id}>
+            <span><b>{x.name}</b><small>{x.hint}</small></span>
+            <span className="stepper"><button type="button" aria-label={`Fewer ${x.name}`} onClick={() => set(x.id, (week[x.id] || 0) - 1)}>−</button><b>{week[x.id] || 0}</b><button type="button" aria-label={`More ${x.name}`} disabled={total >= 7} onClick={() => set(x.id, (week[x.id] || 0) + 1)}>+</button></span>
+          </div>
+        ))}
+        <small className={total === 7 ? "muted" : "notice"}>{total} of 7 days. The week's average is the goal on days you don't pick.</small>
+      </div>
+      <div className="field-row" style={{ marginTop: 10 }}>
+        <label className="field"><span>Easy session, min</span><input inputMode="numeric" defaultValue={d.easyMin ?? ""} placeholder="60" onBlur={(e) => p.setPersonal({ ...d, easyMin: num(e.target.value) })} /></label>
+        <label className="field"><span>Hard session, min</span><input inputMode="numeric" defaultValue={d.hardMin ?? ""} placeholder="75" onBlur={(e) => p.setPersonal({ ...d, hardMin: num(e.target.value) })} /></label>
+      </div>
+    </section>
+    <p className="label">The shape of your week</p>
+    <section className="card">
+      <small>It decides which moments come first when you cook.</small>
       <div className="moments" style={{ marginTop: 8 }}>
         {RHYTHMS.map((r) => (
           <button key={r.id} className={`pill pill-small ${p.usual.includes(r.id) ? "pill-primary" : ""}`} onClick={() => p.setUsual(p.usual.includes(r.id) ? p.usual.filter((x) => x !== r.id) : [...p.usual, r.id])}>{r.name}</button>

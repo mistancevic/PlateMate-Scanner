@@ -16,8 +16,8 @@ export function proteinFloor(weightKg: number | null | undefined): number {
 }
 
 // Before training: the carbohydrate the session asks for, scaled by the day's load. The low end of the position's range for a snack close to the session.
-export const PRE_CARB_PER_KG: Record<DayType, number> = { rest: 0.5, normal: 0.5, training: 1, very: 1.5 };
-const PRE_CARB_DEFAULT: Record<DayType, number> = { rest: 40, normal: 40, training: 60, very: 90 };
+export const PRE_CARB_PER_KG: Record<DayType, number> = { passive: 0.5, active: 0.5, easy: 1, hard: 1.5 };
+const PRE_CARB_DEFAULT: Record<DayType, number> = { passive: 40, active: 40, easy: 60, hard: 90 };
 export function preCarbGrams(weightKg: number | null | undefined, dayType: DayType): number {
   if (!weightKg || weightKg <= 0) return PRE_CARB_DEFAULT[dayType];
   return Math.round(Math.min(120, Math.max(20, PRE_CARB_PER_KG[dayType] * weightKg)));
@@ -49,7 +49,7 @@ export function afterTraining(f: Food, pb: Playbook, weightKg: number | null | u
   return { fits: true, grams: null, floor, reason: `${pb.afterTraining.reason}; the plate wants ${floor} g protein` };
 }
 
-export const dayName = (d: DayType) => ({ rest: "rest day", normal: "usual day", training: "training day", very: "very active day" } as Record<DayType, string>)[d];
+export const dayName = (d: DayType) => ({ passive: "rest day", active: "active rest day", easy: "training day", hard: "hard training day" } as Record<DayType, string>)[d];
 
 export function fitnessFor(f: Food, weightKg: number | null | undefined, dayType: DayType) {
   const pb = playbookFor(f);

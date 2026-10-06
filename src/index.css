@@ -625,6 +625,23 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .band-line { height: 18px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; margin: 2px 2px 8px; font-size: 12.5px; line-height: 18px; color: var(--muted); font-weight: 600; }
 .day-targets { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; } .day-target { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-weight: 700; } .day-target small { color: var(--muted); font-weight: 600; }
 .day-input { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-weight: 700; } .day-input input { width: 92px; height: 40px; border-radius: 12px; border: 1.5px solid var(--line); padding: 0 10px; text-align: right; font: inherit; font-size: 16px; color: var(--ink); }
+.goal-top { display: flex; justify-content: space-between; align-items: center; min-height: 32px; } .goal-top .link { font-weight: 800; }
+.goal-screen .ways { display: flex; gap: 8px; margin: 10px 0 14px; } .goal-screen .ways .pill { flex: 1; justify-content: center; }
+.section-title { display: block; font-size: 15px; font-weight: 900; margin: 14px 0 6px; }
+.two-way { display: flex; gap: 8px; } .two-way .pill { flex: 1; justify-content: center; }
+.you-card { display: flex; justify-content: space-between; align-items: center; } .you-card span { display: flex; flex-direction: column; } .you-card small { color: var(--muted); font-weight: 600; }
+.week-steps { display: flex; flex-direction: column; gap: 6px; } .week-step { display: flex; justify-content: space-between; align-items: center; } .week-step span:first-child { display: flex; flex-direction: column; } .week-step small { color: var(--muted); font-weight: 600; }
+.stepper { display: inline-flex; align-items: center; gap: 10px; } .stepper button { width: 36px; height: 36px; border-radius: 18px; border: 1.5px solid var(--line); background: var(--surface); color: var(--brand-text); font-size: 18px; font-weight: 800; } .stepper button:disabled { opacity: .4; } .stepper b { min-width: 14px; text-align: center; }
+.day-table { background: var(--surface); border: 1.5px solid var(--line); border-radius: 18px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; margin: 10px 0; }
+.dt-head, .dt-cells { display: grid; grid-template-columns: 1.7fr 1fr .8fr .6fr .7fr; gap: 6px; align-items: center; }
+.dt-head { font-size: 11.5px; font-weight: 800; color: var(--muted); padding-bottom: 6px; border-bottom: 1px solid var(--line); } .dt-head span:not(:first-child) { text-align: right; }
+.dt-row { padding: 8px 0 4px; border-bottom: 1px solid var(--line); } .dt-day { display: flex; flex-direction: column; } .dt-day b { font-size: 13.5px; } .dt-day small { font-size: 11px; color: var(--muted); font-weight: 600; }
+.dt-num { text-align: right; font-weight: 800; } .dt-num.muted { color: var(--muted); font-weight: 700; }
+.dt-input { justify-self: end; height: 34px; border-radius: 10px; border: 1.5px solid var(--line); padding: 0 8px; text-align: right; font: inherit; font-size: 15px; font-weight: 800; color: var(--ink); }
+.dt-src { display: flex; gap: 10px; align-items: center; min-height: 20px; } .dt-src small { font-size: 11.5px; color: var(--brand-text); font-weight: 700; } .dt-src .link { font-size: 12px; font-weight: 800; }
+.dt-how { background: var(--tint); border-radius: 12px; padding: 8px 10px; margin: 4px 0; } .dt-how p { margin: 2px 0; font-size: 12.5px; } .dt-how .dt-sum { font-weight: 900; }
+.dt-avg { margin: 8px 0 2px; font-size: 12.5px; font-weight: 800; }
+.plan-who { color: var(--brand-text); font-weight: 600; }
 .plan-source { display: inline-flex; align-items: center; gap: 2px; padding: 0; color: var(--brand-text); font-size: 12px; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
 .day-line { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1.5px solid #b9cdf1; }
 .day-line > div { display: flex; flex-direction: column; gap: 2px; }

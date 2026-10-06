@@ -1,14 +1,16 @@
 import { macroSplit } from "./personal";
 // The goal a person sets once. A band from the goal bands (G1 to G6), or their own calories and protein.
 export type Band = { id: string; name: string; range: string; kcal: [number, number]; protein: [number, number]; who: string };
+// Five goals, locked 6 October 2026: each says what your weight does; protein follows whether you train, not the goal.
 export const BANDS: Band[] = [
-  { id: "fatloss",   name: "Lose fat",      range: "PD 6.5 to 9",   kcal: [1500, 2000], protein: [110, 160], who: "keep the muscle, lose the rest" },
-  { id: "recomp",    name: "Recomposition", range: "PD 5.5 to 7",   kcal: [2000, 2600], protein: [115, 175], who: "build muscle, less fat, training regularly" },
-  { id: "longevity", name: "Stay strong",   range: "PD 5 to 6.5",   kcal: [1600, 2000], protein: [85, 120],  who: "keep muscle and function for the long run" },
-  { id: "maintain",  name: "Maintain",      range: "PD 4 to 5.5",   kcal: [1900, 2500], protein: [80, 130],  who: "keep where you are, feel good" },
-  { id: "gain",      name: "Build muscle",  range: "PD 3.5 to 4.5", kcal: [2800, 3400], protein: [120, 150], who: "eating in a surplus, lifting heavy" },
-  { id: "energy",    name: "High energy",   range: "PD 2.5 to 4",   kcal: [3000, 3600], protein: [100, 130], who: "endurance, hard training days, growing athletes" },
+  { id: "fatloss",     name: "Lose fat",      range: "PD 6.5 to 9",   kcal: [1500, 2000], protein: [110, 160], who: "weight down, strength kept" },
+  { id: "recomp",      name: "Recomposition", range: "PD 5.5 to 7",   kcal: [2000, 2600], protein: [115, 175], who: "weight steady, more muscle, less fat" },
+  { id: "maintain",    name: "Maintain",      range: "PD 4 to 5.5",   kcal: [1900, 2500], protein: [80, 130],  who: "weight steady, strength steady" },
+  { id: "gain",        name: "Build muscle",  range: "PD 3.5 to 4.5", kcal: [2800, 3400], protein: [120, 150], who: "weight up" },
+  { id: "performance", name: "Performance",   range: "PD 2.5 to 4",   kcal: [3000, 3600], protein: [100, 130], who: "heavy training volume or endurance: more calories, more carbs" },
 ];
+// goals that were folded in: Stay strong is Maintain, High energy is Performance
+export const BAND_MOVED: Record<string, string> = { longevity: "maintain", energy: "performance" };
 const mid = (r: [number, number]) => Math.round((r[0] + r[1]) / 2);
 const KEY = "chefmealan-goal";
 export type GoalSource = "quick" | "profile" | "exact" | "coach";
@@ -19,10 +21,17 @@ const LKEY = "chefmealan-goal-log";
 export const getGoalLog = (): GoalEntry[] => { try { return JSON.parse(localStorage.getItem(LKEY) || "[]"); } catch { return []; } };
 export const setGoalLog = (l: GoalEntry[]) => { try { localStorage.setItem(LKEY, JSON.stringify(l.slice(-60))); } catch {} };
 export const SOURCE_LABEL: Record<GoalSource, string> = { quick: "A rough goal, the band's middle", profile: "Worked out from your profile", exact: "Your own numbers", coach: "Set by your coach" };
-export const getGoal = (): Goal | null => { try { const r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch { return null; } };
+export const getGoal = (): Goal | null => {
+  try {
+    const r = localStorage.getItem(KEY); if (!r) return null;
+    const g = JSON.parse(r) as Goal;
+    if (g.band && BAND_MOVED[g.band]) { g.band = BAND_MOVED[g.band]; localStorage.setItem(KEY, JSON.stringify(g)); }
+    return g;
+  } catch { return null; }
+};
 export const saveGoal = (g: Goal) => { try { localStorage.setItem(KEY, JSON.stringify(g)); } catch {} };
 export const clearGoal = () => { try { localStorage.removeItem(KEY); } catch {} };
-export const bandOf = (id?: string) => BANDS.find((b) => b.id === id);
+export const bandOf = (id?: string) => BANDS.find((b) => b.id === (id && BAND_MOVED[id] ? BAND_MOVED[id] : id));
 // The middle of the band's range as the working numbers; exact numbers can be set on Me later.
 export const goalsForBand = (b: Band) => { const calories = mid(b.kcal), protein = mid(b.protein); return { calories, protein, ...macroSplit(calories, protein) }; };
 // How a food's PD sits against the target, five bands, every edge a multiple of the target so they move with the goal:

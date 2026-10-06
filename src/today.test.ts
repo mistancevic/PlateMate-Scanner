@@ -39,15 +39,36 @@ test("the line under the chips says the range and the partner, for the current t
   assert.equal(bandHint("plan", null), BAND_LINE_IDLE);
 });
 
-test("four day targets: usual is the goal, the others by rule unless set by hand", async () => {
-  const { dayTargets } = await import("./personal");
-  const p: any = { activity: "moderate", dayMode: "follow" };
-  const t = dayTargets(2600, p);
-  assert.equal(t.normal.kcal, 2600);
-  assert.ok(t.rest.kcal < 2600 && t.training.kcal > 2600 && t.very.kcal > t.training.kcal);
-  assert.equal(t.rest.own, false);
-  const mine = dayTargets(2600, { ...p, dayKcal: { rest: 2100, very: 3400 } });
-  assert.equal(mine.rest.kcal, 2100); assert.equal(mine.rest.own, true);
-  assert.equal(mine.very.kcal, 3400); assert.equal(mine.training.own, false);
-  assert.equal(dayTargets(2600, { ...p, dayKcal: { normal: 9999 } as any }).normal.kcal, 2600, "the usual day is always the goal");
+test("each day its own: life once, training per day, the average over the week", async () => {
+  const { calculate, ownDayNumbers } = await import("./personal");
+  const me: any = { sex: "male", birthYear: new Date().getFullYear() - 45, heightCm: 182, weightKg: 95, life: "desk", week: { passive: 2, active: 1, easy: 2, hard: 2 } };
+  const c = calculate(me, "maintain", null)!;
+  assert.equal(c.days.passive.kcal, 2450);   // 1,868 at rest × 1.3 for a desk
+  assert.equal(c.days.active.kcal, 2600);    // + a 45-minute walk at 3.5 METs
+  assert.equal(c.days.easy.kcal, 2800);      // + 60 minutes at 5 METs
+  assert.equal(c.days.hard.kcal, 3250);      // + 75 minutes at 8 METs
+  assert.equal(c.kcal, 2800, "the week's average");
+  assert.equal(c.protein, 180, "1.6 to 2.2 g per kg because he trains");
+  assert.ok(c.days.hard.carbs > c.days.passive.carbs && c.days.hard.fats === c.days.passive.fats && c.days.hard.protein === c.days.passive.protein, "carbs carry the difference");
+  assert.ok(c.days.hard.how.some((l) => /8 METs/.test(l)) && /Mifflin/.test(c.days.hard.how[0]), "each day says how");
+  const notTraining = calculate({ ...me, week: { passive: 5, active: 2, easy: 0, hard: 0 } }, "maintain", null)!;
+  assert.equal(notTraining.protein, 135, "1.2 to 1.6 g per kg without training");
+  // the goals differ: performance more calories and a lower fat share, build muscle more calories, maintain neither
+  const perf = calculate(me, "performance", null)!, gain = calculate(me, "gain", null)!;
+  assert.ok(perf.kcal > c.kcal && gain.kcal > perf.kcal && perf.fats / perf.kcal < c.fats / c.kcal);
+  // own numbers, each day its own: typed rows win, an empty one is calculated
+  const own = ownDayNumbers({ ...me, ownDays: { passive: { kcal: 2300, protein: 170 }, hard: { kcal: 3400, protein: 190 } } }, "maintain", null)!;
+  assert.equal(own.days.passive.kcal, 2300); assert.equal(own.days.passive.source, "you");
+  assert.equal(own.days.easy.source, "calculated"); assert.equal(own.days.easy.kcal, 2800);
+  assert.equal(ownDayNumbers({ ...me, ownDays: {} }, "maintain", null), null, "nothing typed, nothing to save");
+});
+
+test("old profiles and goals move over", async () => {
+  const { weekOf, lifeOf, dayModeOf } = await import("./personal");
+  const { bandOf, BANDS } = await import("./goal");
+  assert.deepEqual(weekOf({ activity: "moderate" } as any), { passive: 2, active: 1, easy: 2, hard: 2 });
+  assert.equal(lifeOf({} as any), "desk");
+  assert.equal(dayModeOf({ dayMode: "follow" } as any), "each");
+  assert.equal(bandOf("longevity")!.id, "maintain"); assert.equal(bandOf("energy")!.id, "performance");
+  assert.deepEqual(BANDS.map((b) => b.name), ["Lose fat", "Recomposition", "Maintain", "Build muscle", "Performance"]);
 });

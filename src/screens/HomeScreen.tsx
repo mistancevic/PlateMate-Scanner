@@ -4,7 +4,7 @@ import { aggregate, density } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
 import { bandOf } from "../goal";
-import { DAY_TYPES, dayLine } from "../personal";
+import { DAY_TYPES, dayLine, dayModeOf, dayNameAny } from "../personal";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { X } from "lucide-react";
 import type { AppApi } from "./api";
@@ -16,7 +16,7 @@ export function HomeScreen(p: AppApi) {
   const setBy = byCoach ? `coach ${goal?.coachName || p.profile.coachName || COACH_NAME}` : "you";
   const today = dayLog(state.feedback, new Date());
   const past = [1, 2].map((n) => dayLog(state.feedback, daysAgo(n)));
-  const follow = p.personal.dayMode === "follow";
+  const follow = dayModeOf(p.personal) === "each";
   // The day pills show while the day is still assumed, and again after Change, until a pill is tapped.
   const [changing, setChanging] = useState(false);
   const pillsOpen = follow && (p.day.source === "assumed" || changing);
@@ -42,15 +42,16 @@ export function HomeScreen(p: AppApi) {
         </div>
         <div className="plan-row">
           <div><b>{pdVal(pdRef)}</b><small>{pdTag()} target</small></div>
-          <div><b>{fmt(p.todayKcal ?? state.goals.calories, 0)}</b><small>{!follow ? "kcal a day" : p.day.source === "assumed" ? "kcal, usual day" : "kcal today"}</small></div>
-          <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
+          <div><b>{fmt(p.todayKcal ?? state.goals.calories, 0)}</b><small>{!follow ? "kcal a day" : p.day.source === "assumed" ? "kcal, week's average" : "kcal today"}</small></div>
+          <div><b>{fmt(p.todayMacros?.protein ?? state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
+        {!p.goal && <button className="strip strip-button" onClick={p.openGoal}>Set your goal: your day in four numbers, every plate measured against them.</button>}
         {p.todayMacros && <p className="macro-line">{p.todayMacros.fats} g fat · {p.todayMacros.carbs} g carbs</p>}
         {p.profile.coachId && !byCoach && <button className="plan-source coach-line" onClick={() => p.openMenu("coach")} aria-label="Open your coach">Your coach: {p.profile.coachName || COACH_NAME} <ChevronRight size={12} /></button>}
         <div className="day-line">
           <div>
             <b>{dateLine}</b>
-            {pillsOpen ? <small>What kind of day?</small> : <small className="day-state"><Check size={14} /> {follow ? dayLine(p.day) : "Every day the same"}</small>}
+            {pillsOpen ? <small>What kind of day is it?</small> : <small className="day-state"><Check size={14} /> {follow ? dayLine(p.day) : "Every day the same"}</small>}
           </div>
           {!pillsOpen && <button className="pill pill-small" onClick={() => (follow ? setChanging(true) : p.openMenu("goal"))}>Change</button>}
         </div>
@@ -106,7 +107,7 @@ export function HomeScreen(p: AppApi) {
       <section className="card days">
         {past.map((d) => (
           <div className="history-row" key={d.day.toISOString()}>
-            <div><b>{dayLabel(d.day)}</b><small>{d.dayType ? DAY_TYPES.find((x) => x.id === d.dayType)?.name ?? d.dayType : "day type not set"}</small></div>
+            <div><b>{dayLabel(d.day)}</b><small>{d.dayType ? dayNameAny(d.dayType) : "day type not set"}</small></div>
             <div className="history-num"><small>{loggedLine(d, false)}</small></div>
           </div>
         ))}
