@@ -18,7 +18,7 @@ test("own numbers 11 % over the burn on Maintain look like building; low carbs o
   const burn = calculate(me, "maintain", null)!.kcal;
   const a = analyse({ days: o.days, avg: o.avg, bandId: "maintain", personal: p, burn });
   const energy = a.findings.find((f) => f.id === "energy")!;
-  assert.ok(energy && /building more than maintain/.test(energy.title), energy?.title);
+  assert.ok(energy && /more like building than maintain/.test(energy.title), energy?.title);
   const carbs = a.findings.find((f) => f.id === "carbs-easy")!;
   assert.equal(carbs.day, "easy"); assert.ok(/4\.2 g per kg/.test(carbs.body), carbs.body);
   assert.equal(addsUp({ kcal: 3200, protein: 190, fats: 90, carbs: 400 }), 3170);

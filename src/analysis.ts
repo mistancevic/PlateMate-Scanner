@@ -25,9 +25,10 @@ export function analyse(args: {
     const want = ADJ[bandId] ?? 0, got = avg.kcal / burn - 1, off = got - want;
     if (Math.abs(off) > 0.05) {
       const under = off < 0;
-      const looks = under ? (want <= -0.1 ? "a deeper cut than" : "losing fat more than") : (want >= 0.1 ? "a bigger surplus than" : "building more than");
+      // plain English: "This looks more like building than maintaining"
+      const looks = under ? (want <= -0.1 ? "a deeper cut" : "fat loss") : (want >= 0.1 ? "a bigger surplus" : "building");
       const goalAs: Record<string, string> = { fatloss: "losing fat", recomp: "recomposition", maintain: "maintaining", gain: "building muscle", performance: "performance" };
-      out.push({ id: "energy", day: null, field: "kcal", title: `This looks like ${looks} ${goalAs[bandId] ?? goal.toLowerCase()}`,
+      out.push({ id: "energy", day: null, field: "kcal", title: `This looks more like ${looks} than ${goalAs[bandId] ?? goal.toLowerCase()}`,
         body: `Your average is ${avg.kcal.toLocaleString("en")}; what you burn, calculated, is ${burn.toLocaleString("en")}: ${Math.abs(pct(got))} % ${got < 0 ? "under" : "over"}. ${goal} expects ${want === 0 ? "within 5 %" : `about ${Math.abs(pct(want))} % ${want < 0 ? "under" : "over"}, give or take 5`}.`,
         source: "Mifflin–St Jeor; Compendium of Physical Activities 2024; your My week", sig: `energy:${Math.round(got * 100)}` });
     } else ok.push("energy fits the goal");

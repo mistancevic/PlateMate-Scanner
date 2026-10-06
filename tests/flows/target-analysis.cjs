@@ -28,7 +28,7 @@ const path = require("node:path");
   ok(/These come to 3,170, not 3,200: 30 kcal apart/.test(await block("Training, easy").textContent()), "a row that does not add up says what it comes to");
   ok(/Calculated, nothing typed/.test(await block("Training, hard").textContent()), "an empty day is calculated and says so");
   ok((await block("Training, easy").locator(".finding").count()) === 1 && /Carbs are low for a training day/.test(await block("Training, easy").locator(".finding").textContent()), "the carbs finding sits under its day");
-  ok(/building more than maintain/.test(await page.locator(".dt-week .finding").first().textContent()), "the energy finding sits under the week's line");
+  ok(/more like building than maintain/.test(await page.locator(".dt-week .finding").first().textContent()), "the energy finding sits under the week's line");
   const save = page.getByRole("button", { name: /Save, \d kept as|Set my day/ });
   ok(/Save, 2 kept as they are/.test(await save.textContent()), "Save says how many are kept: " + (await save.textContent()));
   await block("Training, easy").getByRole("button", { name: "Keep, on purpose" }).click(); await page.waitForTimeout(200);
