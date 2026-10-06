@@ -737,3 +737,8 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .action-cancel { align-self: center; font-weight: 800; }
 /* a choice keeps its tick on the same line, whatever card it sits in */
 button.choice, .plan button.choice, .today-plan button.choice { display: inline-flex; flex-direction: row; flex-wrap: nowrap; align-items: center; justify-content: center; height: 34px; min-height: 0; line-height: 1; }
+/* the goal's name on its own line, its description under it (it ran on in one line, 6 October 2026) */
+.goal-head { display: flex; flex-direction: column; align-items: stretch; }
+.goal-head .goal-name, .goal-head .goal-who { display: block; }
+/* the back link: the arrow beside the word, not above it */
+.menu-head .link { display: inline-flex; flex-direction: row; align-items: center; gap: 6px; white-space: nowrap; }
