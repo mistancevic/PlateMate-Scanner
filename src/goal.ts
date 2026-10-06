@@ -1,13 +1,18 @@
 import { macroSplit } from "./personal";
 // The goal a person sets once. A band from the goal bands (G1 to G6), or their own calories and protein.
-export type Band = { id: string; name: string; range: string; kcal: [number, number]; protein: [number, number]; who: string };
-// Five goals, locked 6 October 2026: each says what your weight does; protein follows whether you train, not the goal.
+export type Band = { id: string; name: string; range: string; kcal: [number, number]; protein: [number, number]; who: string; points: string[]; popular?: boolean };
+// Five goals, locked 6 October 2026; explained as approved on the canvas (board G1). Recomposition first: what most people want.
 export const BANDS: Band[] = [
-  { id: "fatloss",     name: "Lose fat",      range: "PD 6.5 to 9",   kcal: [1500, 2000], protein: [110, 160], who: "weight down, strength kept" },
-  { id: "recomp",      name: "Recomposition", range: "PD 5.5 to 7",   kcal: [2000, 2600], protein: [115, 175], who: "weight steady, more muscle, less fat" },
-  { id: "maintain",    name: "Maintain",      range: "PD 4 to 5.5",   kcal: [1900, 2500], protein: [80, 130],  who: "weight steady, strength steady" },
-  { id: "gain",        name: "Build muscle",  range: "PD 3.5 to 4.5", kcal: [2800, 3400], protein: [120, 150], who: "weight up" },
-  { id: "performance", name: "Performance",   range: "PD 2.5 to 4",   kcal: [3000, 3600], protein: [100, 130], who: "heavy training volume or endurance: more calories, more carbs" },
+  { id: "recomp",      name: "Recomposition", range: "PD 5.5 to 7",   kcal: [2000, 2600], protein: [115, 175], who: "lose fat and build muscle at the same time", popular: true,
+    points: ["Lose fat and build muscle at the same time.", "Your weight stays about the same; your shape changes.", "A little less food than you burn, about 10 % less.", "Works with regular strength training, at least twice a week."] },
+  { id: "fatloss",     name: "Lose fat",      range: "PD 6.5 to 9",   kcal: [1500, 2000], protein: [110, 160], who: "your weight goes down",
+    points: ["Your weight goes down, about 0.5 to 1 % a week.", "Less food than you burn, about 20 % less.", "Protein at the top of your range, to keep your muscle."] },
+  { id: "maintain",    name: "Maintain",      range: "PD 4 to 5.5",   kcal: [1900, 2500], protein: [80, 130],  who: "your weight and your strength stay where they are",
+    points: ["Your weight and your strength stay where they are.", "As much food as you burn."] },
+  { id: "gain",        name: "Build muscle",  range: "PD 3.5 to 4.5", kcal: [2800, 3400], protein: [120, 150], who: "your weight goes up slowly, mostly as muscle",
+    points: ["Your weight goes up slowly, about 0.25 to 0.5 % a week.", "With training, most of the gain is muscle and some is fat.", "A little more food than you burn, about 10 % more, mostly as carbs for training."] },
+  { id: "performance", name: "Performance",   range: "PD 2.5 to 4",   kcal: [3000, 3600], protein: [100, 130], who: "enough food for heavy training or endurance sport",
+    points: ["For heavy training or endurance sport.", "Enough food to train well and recover, with more of it from carbs."] },
 ];
 // goals that were folded in: Stay strong is Maintain, High energy is Performance
 export const BAND_MOVED: Record<string, string> = { longevity: "maintain", energy: "performance" };

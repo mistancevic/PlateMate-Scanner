@@ -773,3 +773,23 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .l-pd { background: #fff; border: 1.5px solid var(--line); border-radius: 16px; padding: 12px 14px; } .l-pd b { font-size: 15px; } .l-pd p { margin: 4px 0 0; color: var(--muted); font-weight: 600; }
 .l-request .l-form { max-width: 520px; }
 .l-foot { display: flex; flex-direction: column; gap: 6px; }
+
+/* Goal cards and the protein card, as approved on 6 October 2026 (canvas boards G1, G2) */
+.goal-cards { display: flex; flex-direction: column; gap: 8px; margin: 6px 0 4px; }
+.goal-pick { text-align: left; font: inherit; color: var(--ink); background: var(--surface); border: 1.5px solid var(--line); border-radius: 16px; padding: 12px 14px; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
+.goal-pick.on { background: #cfe0fb; border-color: var(--brand); color: #123a7a; }
+.goal-pick-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.goal-pick-head b { font-size: 16px; } .goal-pick.on .goal-pick-head b::before { content: "✓ "; }
+.goal-pick-head small { flex: 0 0 auto; height: 22px; padding: 0 8px; border-radius: 11px; background: var(--tint); color: var(--brand-text); font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; }
+.goal-pick.on .goal-pick-head small { background: #fff; }
+.goal-pick ul { margin: 0; padding-left: 18px; font-size: 13px; color: var(--muted); font-weight: 600; line-height: 1.4; } .goal-pick.on ul { color: #2a4c86; }
+.protein-card { display: flex; flex-direction: column; gap: 8px; }
+.protein-top { display: flex; align-items: baseline; gap: 8px; color: var(--brand-text); } .protein-top b { font-size: 30px; font-weight: 900; } .protein-top span { font-weight: 800; }
+.protein-bar { position: relative; height: 12px; border-radius: 6px; background: linear-gradient(90deg, #cfe0fb, var(--brand)); margin-top: 4px; }
+.protein-mark { position: absolute; top: -5px; width: 4px; height: 22px; margin-left: -2px; border-radius: 2px; background: var(--ink); }
+.protein-ends { display: flex; justify-content: space-between; font-size: 12.5px; font-weight: 800; color: var(--brand-text); }
+.protein-line { margin: 0; font-size: 13.5px; font-weight: 600; line-height: 1.45; }
+.protein-why { margin: 0; padding-left: 18px; font-size: 13.5px; font-weight: 600; line-height: 1.45; }
+.protein-more { display: flex; flex-direction: column; gap: 4px; } .protein-more b { font-size: 14.5px; margin-top: 6px; }
+.protein-more p { margin: 0; font-size: 13.5px; color: var(--muted); font-weight: 600; line-height: 1.45; } .protein-more small { margin-top: 6px; color: var(--muted); font-size: 11.5px; }
+.goal-pick ul, .protein-why { list-style: disc; } .goal-pick li, .protein-why li { display: list-item; margin: 2px 0; }

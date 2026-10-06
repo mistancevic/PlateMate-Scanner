@@ -7,6 +7,7 @@ import { LIFE, DAY_TYPES, calculate, canCalculate, macroSplit, suggestBand, dayM
 import { DayTable, FindingList } from "../components/DayTable";
 import { analyse, isOpen as openAt, type Finding } from "../analysis";
 import type { AppApi } from "./api";
+import { ProteinCard } from "../components/ProteinCard";
 
 // Your goal, as approved on 6 October 2026. Two ways in: Calculate for me, or My own numbers. Five goals. Life is set
 // once; training is chosen per day. Every day the same, or each day its own, with the four days as one table.
@@ -151,8 +152,15 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
             </section>
           )}
           <b className="section-title">What are you after?</b>
-          <div className="moments">{BANDS.map((b) => <button key={b.id} className={`choice ${band === b.id ? "on" : ""}`} onClick={() => setBand(b.id)}>{b.name}</button>)}</div>
-          <p className="small muted">{goalNow.name}: {goalNow.who}.{c ? ` ${c.proteinMin === c.proteinMax ? "" : `Protein ${c.proteinMin} to ${c.proteinMax} g a day.`}` : ""}</p>
+          <p className="small muted">Each goal says what happens to your weight, how much you eat, and what you need to do. You can change it at any time.</p>
+          <div className="goal-cards">{BANDS.map((b) => (
+            <button key={b.id} type="button" className={`goal-pick ${band === b.id ? "on" : ""}`} aria-pressed={band === b.id} onClick={() => setBand(b.id)}>
+              <span className="goal-pick-head"><b>{b.name}</b>{b.popular && <small>Most people pick this</small>}</span>
+              <ul>{b.points.map((x) => <li key={x}>{x}</li>)}</ul>
+            </button>
+          ))}</div>
+          {d.birthYear && new Date().getFullYear() - d.birthYear < 18 && (band === "fatloss" || band === "recomp") && <p className="small muted">You're under 18, so Chef Mealan doesn't cut your food below what your body burns. Growing comes first.</p>}
+          {c && <ProteinCard c={c} />}
           {c ? (
             <>
               <Days />

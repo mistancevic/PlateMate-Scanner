@@ -19,14 +19,16 @@ const path = require("node:path");
   await page.getByText(/Set your goal/).click(); await page.waitForTimeout(400);
   // Calculate for me
   ok(await page.getByRole("button", { name: "Calculate for me" }).count() === 1 && await page.getByText("Work it out for me").count() === 0, "Calculate for me, not Work it out");
-  const goals = await page.locator(".calc-way .moments").last().locator("button").allTextContents();
-  ok(goals.join("|") === "Lose fat|Recomposition|Maintain|Build muscle|Performance", "the five goals: " + goals.join(", "));
+  // the five goals as cards, Recomposition first (approved 6 October 2026, canvas board G1); each explains itself
+  const goals = await page.locator(".calc-way .goal-pick .goal-pick-head b").allTextContents();
+  ok(goals.join("|") === "Recomposition|Lose fat|Maintain|Build muscle|Performance", "the five goals: " + goals.join(", "));
+  ok((await page.locator(".calc-way .goal-pick").first().locator("li").count()) >= 3, "each goal says what happens to your weight and food");
   await page.getByRole("button", { name: /^I agree$/ }).click(); await page.waitForTimeout(200);
   await page.getByRole("button", { name: /^Female$/ }).click();
   const inputs = page.locator(".calc-way input");
   await inputs.nth(0).fill("2009"); await inputs.nth(1).fill("168"); await inputs.nth(2).fill("58"); await inputs.nth(2).blur();
   await page.getByRole("button", { name: /9 to 5 at a desk/ }).click();
-  await page.getByRole("button", { name: /^Lose fat$/ }).click(); await page.waitForTimeout(200);
+  await page.getByRole("button", { name: /^Lose fat/ }).click(); await page.waitForTimeout(200);
   ok(/Under 18/.test(await page.locator(".calc-way").textContent()), "a 17-year-old picking Lose fat gets no deficit, and is told");
   // each day its own: the table
   await page.getByRole("button", { name: "Each day its own" }).click(); await page.waitForTimeout(200);

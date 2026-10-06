@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Check } from "lucide-react";
-import { WANTS, HAVES, GOALS, lift } from "../landing";
+import { WANTS, HAVES, DEMO_GOAL, BIG_BOWL, lift, smaller } from "../landing";
 import { Mark, APP_NAME } from "../components/Mark";
 import { signIn } from "../cloud";
 
@@ -40,7 +40,7 @@ export function LandingScreen() {
         <h2>Three steps, while you decide what to eat</h2>
         <div className="l-split">
           <ol className="l-numbered">
-            <li><b>Tell Chef Mealan what you want to eat</b><p>Take a photo of the plate or the label, scan the barcode, or type the name. The foods you add stay in your list for next time.</p></li>
+            <li><b>Tell Chef Mealan what you want to eat</b><p>Scan the barcode, take a photo of the label, or type the name. The foods you add stay in your list for next time.</p></li>
             <li><b>Chef Mealan fits the plate to your day</b><p>Chef Mealan knows whether today is a training day or a rest day, and works out the grams so the plate matches your numbers for the day. A calculator does the math, so nothing is guessed.</p></li>
             <li><b>Eat, then say how the plate was</b><p>One tap: great, good, or not really. Only you see your answers, unless you share them with your coach.</p></li>
           </ol>
@@ -120,27 +120,29 @@ function PhoneWeek() {
     </div>
   );
 }
-// Try it: the app's own lift for a few fixed foods; nothing is saved
+// Try it: the app's own lift for a few fixed foods, for Recomposition only; nothing is saved
 function TryIt() {
-  const [want, setWant] = useState(WANTS[0].id), [have, setHave] = useState(HAVES[0].id), [goal, setGoal] = useState("maintain");
-  const w = WANTS.find((x) => x.id === want)!, h = HAVES.find((x) => x.id === have)!, g = GOALS.find((x) => x.id === goal)!;
-  const r = lift(w, h, g.pd);
+  const [want, setWant] = useState(WANTS[0].id), [have, setHave] = useState(HAVES[0].id);
+  const w = WANTS.find((x) => x.id === want)!, h = HAVES.find((x) => x.id === have)!;
+  const r = lift(w, h, DEMO_GOAL.pd);
+  const big = r.grams > BIG_BOWL ? smaller(w, h, DEMO_GOAL.pd) : null;
+  const wn = w.name.toLowerCase(), hn = h.name.toLowerCase();
   const Pick = ({ items, on, set }: { items: { id: string; name: string; grams?: number }[]; on: string; set: (v: string) => void }) => (
     <div className="chip-row">{items.map((x) => <button key={x.id} type="button" className={`choice ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} onClick={() => set(x.id)}>{x.name}{x.grams ? `, ${x.grams} g` : ""}</button>)}</div>
   );
   return (
     <section className="l-try">
       <span className="l-eyebrow">Try it</span>
-      <h2>You want {w.grams} g of {w.name.toLowerCase()}. How much {h.name.toLowerCase()} makes the plate fit?</h2>
-      <p>This part of the page uses the same math as the app. Nothing you pick here is saved.</p>
+      <h2>You crave {w.amount}. How much {hn} makes the plate fit?</h2>
+      <p>The answer is worked out for Recomposition, the goal most people pick: lose fat and build muscle at the same time. The page uses the same math as the app, and nothing you pick here is saved.</p>
       <div className="l-try-box">
-        <div className="setting"><small className="setting-name">You want</small><Pick items={WANTS} on={want} set={setWant} /></div>
+        <div className="setting"><small className="setting-name">You crave</small><Pick items={WANTS} on={want} set={setWant} /></div>
         <div className="setting"><small className="setting-name">You have at home</small><Pick items={HAVES} on={have} set={setHave} /></div>
-        <div className="setting"><small className="setting-name">Your goal</small><Pick items={GOALS} on={goal} set={setGoal} /></div>
         <div className="l-try-result" aria-live="polite">
-          <b>Add {r.grams} g of {h.name.toLowerCase()}</b>
-          <span>Together that's {r.kcal} kcal and {Math.round(r.protein)} g of protein, a PD of {r.pd}. That fits a typical {g.name} goal.</span>
-          <small>On its own, {w.name.toLowerCase()} has very little protein. The {h.name.toLowerCase()} adds the protein, so the whole plate fits.</small>
+          <b>Add {r.grams} g of {hn}</b>
+          <span>That's {r.total} g on the plate in all: {w.amount} and {r.grams} g of {hn}. Together it's {r.kcal} kcal and {Math.round(r.protein)} g of protein, a PD of {r.pd}, a typical target for Recomposition.</span>
+          {big ? <small>That's a very big bowl. With {big.grams} g of {wn} instead, {big.partner} g of {hn} is enough, {big.grams + big.partner} g in all.</small>
+               : <small>On its own, {w.alone} very little protein. The {hn} adds the protein, so the whole plate fits.</small>}
         </div>
         <div className="l-pd">
           <b>What is PD?</b>

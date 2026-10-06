@@ -72,11 +72,29 @@ test("old profiles and goals move over", async () => {
   assert.equal(lifeOf({} as any), "desk");
   assert.equal(dayModeOf({ dayMode: "follow" } as any), "each");
   assert.equal(bandOf("longevity")!.id, "maintain"); assert.equal(bandOf("energy")!.id, "performance");
-  assert.deepEqual(BANDS.map((b) => b.name), ["Lose fat", "Recomposition", "Maintain", "Build muscle", "Performance"]);
+  assert.deepEqual(BANDS.map((b) => b.name), ["Recomposition", "Lose fat", "Maintain", "Build muscle", "Performance"]); // Recomposition first, as approved on board G1
 });
 
 test("the home page's Try it uses the app's lift: 40 g chocolate spread needs 125 g skyr for PD 5.5", async () => {
   const { lift, WANTS, HAVES } = await import("./landing");
   const r = lift(WANTS[0], HAVES[0], 5.5);
   assert.equal(r.grams, 125); assert.equal(r.kcal, 294); assert.equal(Math.round(r.protein), 16); assert.equal(r.pd, 5.5);
+});
+
+test("the home page works for Recomposition at PD 6.5 and says how much is on the plate in all", async () => {
+  const { lift, smaller, WANTS, HAVES, DEMO_GOAL, BIG_BOWL } = await import("./landing");
+  const r = lift(WANTS[0], HAVES[0], DEMO_GOAL.pd);
+  assert.equal(r.grams, 165); assert.equal(r.total, 205); assert.equal(r.kcal, 320); assert.equal(Math.round(r.protein), 21); assert.equal(r.pd, 6.5);
+  for (const w of WANTS) for (const h of HAVES) { const x = lift(w, h, DEMO_GOAL.pd); assert.ok(x.grams > 0 && x.grams <= BIG_BOWL, `${w.id}+${h.id}: ${x.grams} g`); }
+  const s = smaller({ ...WANTS[0], grams: 80 }, HAVES[1], DEMO_GOAL.pd);
+  assert.ok(s && s.partner <= BIG_BOWL && s.grams < 80);
+});
+test("protein: the middle of the range, the top when losing fat, eating mostly plants or over 60", async () => {
+  const { calculate } = await import("./personal");
+  const base: any = { sex: "male", birthYear: 1981, heightCm: 182, weightKg: 95, plan: [{ work: true, kind: "strength", intensity: "hard", minutes: 60 }, { work: true, kind: "strength", intensity: "moderate", minutes: 60 }, { work: true, kind: "rest" }, { work: true, kind: "rest" }, { work: true, kind: "rest" }, { work: false, kind: "rest" }, { work: false, kind: "rest" }] };
+  const mid = calculate(base, "recomp")!;
+  assert.equal(mid.protein, 180); assert.equal(mid.proteinWhy.length, 0); assert.equal(mid.perMeal, 40);
+  const cut = calculate(base, "fatloss")!; assert.equal(cut.protein, 210); assert.equal(cut.proteinWhy.length, 1);
+  const veg = calculate({ ...base, lifestyle: { diet: "Vegan" } }, "maintain")!; assert.equal(veg.protein, 210);
+  const old = calculate({ ...base, birthYear: 1960 }, "maintain")!; assert.equal(old.protein, 210);
 });

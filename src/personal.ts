@@ -127,7 +127,7 @@ export function macroSplit(kcal: number, protein: number, fatsFixed?: number | n
   return { fats, carbs };
 }
 export type DayNumbers = { kcal: number; protein: number; fats: number; carbs: number; how: string[] };
-export type Calc = { kcal: number; protein: number; fats: number; carbs: number; proteinMin: number; proteinMax: number; note: string; method: string; math: string; bmr: number; tdee: number; days: Record<DayType, DayNumbers>; week: Week; weekdays: ({ name: string; day: PlanDay } & DayNumbers)[] | null; numbersOf: (d: PlanDay) => DayNumbers };
+export type Calc = { kcal: number; protein: number; fats: number; carbs: number; proteinMin: number; proteinMax: number; proteinLo: number; proteinHi: number; proteinPerKg: number; proteinWhy: string[]; perMeal: number; trains: boolean; note: string; method: string; math: string; bmr: number; tdee: number; days: Record<DayType, DayNumbers>; week: Week; weekdays: ({ name: string; day: PlanDay } & DayNumbers)[] | null; numbersOf: (d: PlanDay) => DayNumbers };
 const r50 = (x: number) => Math.round(x / 50) * 50;
 export function calculate(p: Personal, bandId: string, pinned?: Formula | null): Calc | null {
   if (!canCalculate(p)) return null;
@@ -158,7 +158,16 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   const trains = trainsOf(p);
   const [lo, hi] = trains ? [1.6, 2.2] : [1.2, 1.6];
   const proteinMin = Math.round((lo * ref) / 5) * 5, proteinMax = Math.round((hi * ref) / 5) * 5;
-  const protein = Math.round(((lo + hi) / 2 * ref) / 5) * 5;
+  // Where in the range (approved 6 October 2026, canvas board G2): the middle, unless losing fat (Helms et al. 2014),
+  // eating mostly plant protein (used a little less well), or being over 60 (PROT-AGE 2013) moves it to the top.
+  const diet = (lifestyleOf(p).diet ?? "").toLowerCase();
+  const proteinWhy: string[] = [];
+  if (bandId === "fatloss" && !minor) proteinWhy.push("You're losing fat: eating less than you burn, more protein helps you keep your muscle.");
+  if (diet === "vegan" || diet === "vegetarian") proteinWhy.push("You eat mostly plant protein, which the body uses a little less well.");
+  if (age >= 60) proteinWhy.push("You're over 60: muscles respond less to protein with age.");
+  const perKg = proteinWhy.length ? hi : (lo + hi) / 2;
+  const protein = Math.round((perKg * ref) / 5) * 5;
+  const perMeal = Math.round((0.4 * ref) / 5) * 5;
   const week = weekOf(p);
   const kcalOf = {} as Record<DayType, number>;
   const how = {} as Record<DayType, string[]>;
@@ -210,7 +219,7 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   const weekdays = plan ? plan.map((d, i) => ({ name: WEEKDAY_NAMES[i], day: d, ...numbersOf(d) })) : null;
   const method = `${minor ? "Schofield (10 to 18 years)" : f === "katch" ? "Katch–McArdle" : "Mifflin–St Jeor"}, ${life.name} ×${life.factor}, activity per day from the Compendium of Physical Activities${pct ? `, ${pct > 0 ? "+" : ""}${pct} %` : ""}`;
   const math = `Average over your week: ${avg.toLocaleString("en")} kcal. Protein ${lo}–${hi} g per kg${trains ? ", because you train" : ""} × ${Math.round(ref)} kg = ${proteinMin}–${proteinMax} g, target ${protein} g.`;
-  return { kcal: avg, protein, fats, carbs: carbsOf(avg), proteinMin, proteinMax, note: notes.join(" "), method, math, bmr: Math.round(bmr), tdee: Math.round(base), days, week, weekdays, numbersOf };
+  return { kcal: avg, protein, fats, carbs: carbsOf(avg), proteinMin, proteinMax, proteinLo: lo, proteinHi: hi, proteinPerKg: perKg, proteinWhy, perMeal, trains, note: notes.join(" "), method, math, bmr: Math.round(bmr), tdee: Math.round(base), days, week, weekdays, numbersOf };
 }
 // Own numbers, day by day: a typed row wins; an empty row is calculated when the profile allows, else it takes the average
 // of the typed ones. Fat stays one number for every day unless typed; carbs carry the difference.

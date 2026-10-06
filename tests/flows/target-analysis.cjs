@@ -17,7 +17,7 @@ const path = require("node:path");
   });
   await page.goto("http://127.0.0.1:3184/"); await page.waitForTimeout(900);
   await page.getByRole("button", { name: /^My own numbers$/ }).click(); await page.waitForTimeout(200);
-  await page.getByRole("button", { name: /^Maintain$/ }).click().catch(() => {}); await page.waitForTimeout(150);
+  await page.getByRole("button", { name: /^Maintain/ }).click().catch(() => {}); await page.waitForTimeout(150);
   const put = async (label, v) => { const f = page.getByLabel(label, { exact: true }); await f.fill(v); await f.press("Enter"); await page.waitForTimeout(120); };
   await put("Rest, kcal", "2900"); await put("Rest, protein in grams", "185"); await put("Rest, fat in grams", "108"); await put("Rest, carbs in grams", "297");
   await put("Light, kcal", "3100"); await put("Light, protein in grams", "190");
