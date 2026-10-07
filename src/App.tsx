@@ -38,10 +38,11 @@ import { LandingScreen } from "./screens/LandingScreen";
 import { Starting } from "./components/Starting";
 import { Welcome, AdultOnly } from "./components/Welcome";
 import { openStats } from "./openStats";
+import { merge as mergeRecords, changes as recordChanges, type Known } from "./records";
 import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear } from "./photos";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalLabel, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { setTodayChange, dayOfLoad, type PlanDay } from "./plan";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, type Personal, type DayType, type Day } from "./personal";
@@ -99,6 +100,10 @@ const firstName = (n?: string | null) => (n ?? "").trim().split(/\s+/)[0] || "";
 const coachLabel = (n?: string | null) => (firstName(n) ? `Coach ${firstName(n)}` : "Your coach");
 // when the phone's copy last changed by a person's hand, and which foods left the library (merged away, removed)
 const STATE_AT = "chefmealan-state-at", GONE = "chefmealan-gone-foods";
+// Storage release 2: what this phone last sent or took, per record (see records.ts)
+const recKey = (uid: string) => `chefmealan-records-${uid}`;
+const loadKnown = (uid: string): Known => { try { const v = JSON.parse(localStorage.getItem(recKey(uid)) || "{}"); return v && typeof v === "object" ? v : {}; } catch { return {}; } };
+const saveKnown = (uid: string, k: Known) => { try { localStorage.setItem(recKey(uid), JSON.stringify(k)); } catch {} };
 const getGone = (): string[] => { try { const v = JSON.parse(localStorage.getItem(GONE) || "[]"); return Array.isArray(v) ? v : []; } catch { return []; } };
 const setGone = (ids: string[]) => { try { localStorage.setItem(GONE, JSON.stringify([...new Set(ids)].slice(-500))); } catch {} };
 const load = () => {
@@ -731,6 +736,47 @@ export default function App() {
   // The phone keeps photos in its own photo store; the saved data carries none once they are safely there.
   // The account keeps them as image files. Keys: food:<id>, food:<id>:<n>, fb:<cardId>.
   const stateRef = useRef(state); stateRef.current = state;
+  // The big block in the account: foods, recipes and the plate, as before. Since storage release 2 the foods and recipes
+  // also live as records; the block keeps them 30 days after the move, so a rollback loses nothing, then holds only the
+  // plate and settings ("recordsOnly"). The coach reads the number of foods from foodsCount.
+  const blockOf = (st: PilotState) => {
+    const moved = remoteMeta.current.recordsMovedAt;
+    const slim = Boolean(moved && Date.now() - Date.parse(moved) > 30 * 86_400_000);
+    const b = stripPhotos(st);
+    return { state: slim ? { ...b, foods: [], meals: [] } : b, recordsOnly: slim, foodsCount: st.foods.length };
+  };
+  // Storage release 2: read the account's records, take the newest of each, then send what changed here.
+  const recRef = useRef({ uid: "", known: {} as Known, pulled: false, running: false, again: false, againPull: false });
+  const syncRecords = async (pull: boolean) => {
+    const r = recRef.current, uid = r.uid;
+    if (!uid || !cloudEnabled) return;
+    if (r.running) { r.again = true; r.againPull = r.againPull || pull; return; }
+    r.running = true;
+    try {
+      let cur = stateRef.current;
+      if (pull) {
+        const remote = await loadRecords(uid);
+        if (recRef.current.uid !== uid) return;
+        const m = mergeRecords(stateRef.current, remote, r.known, localStorage.getItem(STATE_AT) || new Date().toISOString());
+        r.known = m.known;
+        if (m.changed) {
+          cur = m.state; fromCloud.current = true; setState(m.state);
+          // photos of foods that came from the account come from the photo store
+          void photoRef.current.busy.then(() => storeAll()).then(mergePhotos).catch(() => {});
+        }
+        r.pulled = true;
+      }
+      const c = recordChanges(cur, r.known, new Date().toISOString(), r.pulled);
+      if (c.ups.length || c.dels.length) await saveRecords(uid, c.ups, c.dels);
+      r.known = c.next; saveKnown(uid, r.known);
+      if (r.pulled && !remoteMeta.current.recordsMovedAt) { await markRecordsMoved(uid); remoteMeta.current = { ...remoteMeta.current, recordsMovedAt: new Date().toISOString() }; }
+    } catch (e) {
+      setCloudStatus({ ok: true, text: `Saved. Records: ${explainCloudError(e)}`, at: new Date().toISOString() });
+    } finally {
+      r.running = false;
+      if (r.again) { const p = r.againPull; r.again = false; r.againPull = false; void syncRecords(p); }
+    }
+  };
   const photoRef = useRef({ ok: false, ready: false, known: new Map<string, string>(), stored: new Set<string>(), busy: Promise.resolve() as Promise<unknown> });
   const filesRef = useRef({ uid: "", ready: false, running: false, again: false, up: new Map<string, string>() });
   const [, setPhotoCountState] = useState(0);
@@ -841,7 +887,7 @@ export default function App() {
   useEffect(() => {
     setOptions([]);
   }, [state.items, state.goals, limits]);
-  useEffect(() => watchUser((u) => { setUser(u); setAuthReady(true); if (!u) { cloudLoaded.current = false; setProfileReady(false); filesRef.current.uid = ""; filesRef.current.ready = false; setFilesFor(""); } }), []);
+  useEffect(() => watchUser((u) => { setUser(u); setAuthReady(true); if (!u) { cloudLoaded.current = false; recRef.current.uid = ""; setProfileReady(false); filesRef.current.uid = ""; filesRef.current.ready = false; setFilesFor(""); } }), []);
   useEffect(() => {
     if (!user || cloudLoaded.current) return;
     let stale = false;
@@ -850,7 +896,7 @@ export default function App() {
         const remote = await withTimeout(loadCloud(user.uid), 20000);
         if (stale) return;
         if (remote) setReview(((remote as any).numbersReview as NumbersReview | undefined) ?? null);
-        remoteMeta.current = { photosMovedAt: remote?.photosMovedAt, photosOldGoneAt: remote?.photosOldGoneAt };
+        remoteMeta.current = { photosMovedAt: remote?.photosMovedAt, photosOldGoneAt: remote?.photosOldGoneAt, recordsMovedAt: remote?.recordsMovedAt };
         if (remote) setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
         if (remote && Array.isArray(remote.goalLog)) { const merged = [...new Map([...(remote.goalLog as GoalEntry[]), ...getGoalLog()].map((e) => [e.at, e])).values()].sort((x, y) => (x.at > y.at ? 1 : -1)); setGoalLog(merged); setGoalLogState(merged); }
         // foods that left the library on any device stay gone
@@ -862,12 +908,13 @@ export default function App() {
         if (phoneIsNewer) {
           const kept = { ...state, foods: state.foods.filter((f) => !gone.has(f.id)) };
           if (kept.foods.length !== state.foods.length) setState(kept);
-          await saveCloud(user.uid, { state: stripPhotos(kept), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], updatedAt: new Date().toISOString() });
+          await saveCloud(user.uid, { ...blockOf(kept), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], updatedAt: new Date().toISOString() });
           setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() });
         } else if (remote && !(isEmptyState(remote.state) && !isEmptyState(state))) {
           // a real account copy replaces the phone; photos are merged back from the phone by id
           try {
             const incoming = parseState(JSON.stringify(remote.state));
+            if (remote.recordsOnly) { incoming.foods = state.foods; incoming.meals = state.meals; }
             incoming.foods = incoming.foods.filter((f) => !gone.has(f.id));
             const localPhoto = new Map(state.foods.map((f) => [f.id, f.photo]));
             const localFb = new Map(state.feedback.map((f) => [f.id, f.photo]));
@@ -898,7 +945,7 @@ export default function App() {
           }
           setCloudStatus({ ok: true, text: "Loaded from your account", at: new Date().toISOString() });
         } else {
-          await saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), updatedAt: new Date().toISOString() });
+          await saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), updatedAt: new Date().toISOString() });
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
         }
       } catch (e: any) {
@@ -916,6 +963,8 @@ export default function App() {
       cloudLoaded.current = true;
       setProfileReady(true);
       setFilesFor(user.uid);
+      recRef.current = { uid: user.uid, known: loadKnown(user.uid), pulled: false, running: false, again: false, againPull: false };
+      void syncRecords(true);
     })();
     return () => { stale = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -933,7 +982,7 @@ export default function App() {
   }
   // the account's photo files, once the account is read: the first time, the photos move out of the database into files
   // (the old copies stay 30 days); after that, photos missing on this phone come down, previews first
-  const remoteMeta = useRef<{ photosMovedAt?: string; photosOldGoneAt?: string }>({});
+  const remoteMeta = useRef<{ photosMovedAt?: string; photosOldGoneAt?: string; recordsMovedAt?: string }>({});
   const [filesFor, setFilesFor] = useState("");
   useEffect(() => {
     if (!filesFor || !cloudEnabled) return;
@@ -999,6 +1048,13 @@ export default function App() {
     return () => document.removeEventListener("visibilitychange", onShow);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid, profile.role]);
+  // when the app comes back to the front, pick up what another phone changed meanwhile (storage release 2)
+  useEffect(() => {
+    const onShow = () => { if (document.visibilityState === "visible" && cloudLoaded.current) void syncRecords(true); };
+    document.addEventListener("visibilitychange", onShow);
+    return () => document.removeEventListener("visibilitychange", onShow);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // when the app comes back to the front, pick up a goal the coach set meanwhile
   useEffect(() => {
     if (!user) return;
@@ -1061,10 +1117,11 @@ export default function App() {
   useEffect(() => {
     if (!user || !cloudLoaded.current) return;
     const t = setTimeout(() => {
-      saveCloud(user.uid, { state: stripPhotos(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), updatedAt: new Date().toISOString() })
+      saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), updatedAt: new Date().toISOString() })
         .then(async () => {
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
-          try { if (state.feedback.length) await saveCards(user.uid, state.feedback); } catch (e) { setCloudStatus({ ok: true, text: `Saved. Cards: ${explainCloudError(e)}`, at: new Date().toISOString() }); }
+          // foods, recipes and cards: only the records that changed (storage release 2)
+          void syncRecords(false);
           // photos go up as files, by the photo sync: see syncFiles
           void syncFiles();
         })

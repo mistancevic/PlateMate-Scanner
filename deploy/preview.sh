@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Step 1 of a careful release: build the current commit and put it on its own preview link. Nobody else gets it:
+# Step 1 of a careful release: build the current commit and put it on its own preview link (rules included). Nobody else gets the app:
 # chefmealan.com keeps serving what it served. Check the preview on your phone, then run ./deploy/promote.sh.
 # The preview uses the real accounts and data, so sign in as yourself.
 set -euo pipefail
@@ -25,5 +25,7 @@ if [ -n "$HOST" ]; then
     if [ -n "$BODY" ]; then curl -sf "${H[@]}" -X PATCH "$CFG?updateMask=authorizedDomains" -d "$BODY" >/dev/null && echo "Sign-in allowed on the preview address." || echo "$ASK"; fi
   fi
 fi
+# Rules go out with the preview too: new records need their rules, and rules only ever add what newer code needs
+"$(dirname "$0")/rules.sh" || echo "Rules not published: check the message above."
 echo "Preview: $URL  (commit $TAG, version $VERSION)"
 echo "chefmealan.com still serves $(commit_of "$(live_revision)"). When the preview looks right: ./deploy/promote.sh"

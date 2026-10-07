@@ -51,7 +51,7 @@ export const signOutCloud = () => signOut(auth());
 
 // One document per person: the pilot state plus goal and name, and who coaches them.
 // role is set by hand in the Firebase console ("coach"); nobody can sign up as a coach.
-export type CloudDoc = { photosMovedAt?: string; photosOldGoneAt?: string; state: unknown; goal: unknown; clientName: string; updatedAt: string; goneFoods?: string[]; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: "mifflin" | "katch" | null; role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string | null; coachPhoto?: string | null; joinedAt?: string | null; coachSetAt?: string };
+export type CloudDoc = { photosMovedAt?: string; photosOldGoneAt?: string; recordsMovedAt?: string; recordsOnly?: boolean; foodsCount?: number; state: unknown; goal: unknown; clientName: string; updatedAt: string; goneFoods?: string[]; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: "mifflin" | "katch" | null; role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string | null; coachPhoto?: string | null; joinedAt?: string | null; coachSetAt?: string };
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const snap = await getDoc(doc(db(), "users", uid));
   return snap.exists() ? (snap.data() as CloudDoc) : null;
@@ -95,7 +95,7 @@ export async function listClients(coachUid: string): Promise<ClientRow[]> {
     try { feedback = await loadSharedCards(d.id); } catch { /* none shared or not allowed */ }
     // the coach sees situation and date only, never the person's words
     const flags = Array.isArray(x.safety?.flags) ? x.safety.flags.map((f: any) => ({ situation: String(f.situation), at: String(f.at ?? "").slice(0, 10) })) : [];
-    return { uid: d.id, name: x.clientName || "unnamed", review: x.numbersReview ?? null, goal: x.goal ?? null, feedback, foods: x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: x.personal?.pdUnit ?? "pd", flags, birthYear: x.personal?.birthYear ?? null, aiConfirmedAt: x.aiConfirmedAt ?? null, consentBy: x.safety?.consentBy ?? null, weightKg: x.personal?.weightKg, trainingAge: x.personal?.trainingAge, weighIns: Array.isArray(x.personal?.weighIns) ? x.personal.weighIns : [] };
+    return { uid: d.id, name: x.clientName || "unnamed", review: x.numbersReview ?? null, goal: x.goal ?? null, feedback, foods: typeof x.foodsCount === "number" ? x.foodsCount : x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: x.personal?.pdUnit ?? "pd", flags, birthYear: x.personal?.birthYear ?? null, aiConfirmedAt: x.aiConfirmedAt ?? null, consentBy: x.safety?.consentBy ?? null, weightKg: x.personal?.weightKg, trainingAge: x.personal?.trainingAge, weighIns: Array.isArray(x.personal?.weighIns) ? x.personal.weighIns : [] };
   }));
   return rows.sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1));
 }
@@ -134,6 +134,40 @@ export function stripPhotos<T>(state: T): T {
   s.feedback = []; // cards live as their own documents, see saveCards
   return s;
 }
+// ---- records (storage release 2, 7 October 2026) ----
+// Each food and recipe is its own document under users/{uid}/foods and users/{uid}/recipes: { data, at } or, once
+// deleted, { data: null, at, deletedAt }. Cards keep their own shape under users/{uid}/cards, with "at" and "deletedAt"
+// added, so the coach's reading of shared cards is unchanged. Only the owner reads foods and recipes.
+const cardOf = (x: any) => { const { shared, reason, sharedAt, at: _at, deletedAt: _d, ...rest } = x; return { ...rest, shared: shared ? { reason, at: sharedAt } : undefined }; };
+export async function loadRecords(uid: string): Promise<import("./records").Remote> {
+  const read = async (sub: string) => (await getDocs(collection(db(), "users", uid, sub))).docs.map((d) => ({ id: d.id, x: d.data() as any }));
+  const [foods, recipes, cards] = await Promise.all([read("foods"), read("recipes"), read("cards")]);
+  const plain = (r: { id: string; x: any }) => ({ id: r.id, data: r.x.deletedAt ? null : r.x.data ?? null, at: String(r.x.at ?? ""), deletedAt: r.x.deletedAt ?? null });
+  return {
+    foods: foods.map(plain), recipes: recipes.map(plain),
+    cards: cards.map((r) => ({ id: r.id, data: r.x.deletedAt ? null : cardOf(r.x), at: String(r.x.at ?? r.x.createdAt ?? ""), deletedAt: r.x.deletedAt ?? null })),
+  };
+}
+export async function saveRecords(uid: string, ups: import("./records").Up[], dels: import("./records").Del[]) {
+  notPaused();
+  const all = [...ups.map((u) => ({ u })), ...dels.map((d) => ({ d }))];
+  for (let i = 0; i < all.length; i += 400) {
+    const b = writeBatch(db());
+    for (const w of all.slice(i, i + 400)) {
+      if ("u" in w && w.u) {
+        const { kind, id, data, at } = w.u;
+        if (kind === "cards") b.set(doc(db(), "users", uid, "cards", id), { ...data, shared: data.shared ? true : false, reason: data.shared?.reason ?? null, sharedAt: data.shared?.at ?? null, at, deletedAt: null });
+        else b.set(doc(db(), "users", uid, kind, id), { data, at });
+      } else if ("d" in w && w.d) {
+        const { kind, id, at } = w.d;
+        b.set(doc(db(), "users", uid, kind, id), kind === "cards" ? { deletedAt: at, at, shared: false } : { data: null, at, deletedAt: at });
+      }
+    }
+    await b.commit();
+  }
+}
+export async function markRecordsMoved(uid: string) { notPaused(); await setDoc(doc(db(), "users", uid), { recordsMovedAt: new Date().toISOString() }, { merge: true }); }
+
 // ---- cards ----
 // Each meal card is its own document under users/{uid}/cards. Private by default; the coach may read only shared ones.
 export async function saveCards(uid: string, cards: any[]) {
@@ -150,13 +184,13 @@ export async function saveCards(uid: string, cards: any[]) {
 }
 export async function loadCards(uid: string): Promise<any[]> {
   const snap = await getDocs(collection(db(), "users", uid, "cards"));
-  return snap.docs.map((d) => { const x = d.data() as any; const { shared, reason, sharedAt, ...rest } = x; return { ...rest, shared: shared ? { reason, at: sharedAt } : undefined }; })
+  return snap.docs.filter((d) => !(d.data() as any).deletedAt).map((d) => cardOf(d.data()))
     .sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
 }
 export async function loadSharedCards(clientUid: string): Promise<any[]> {
   const q = query(collection(db(), "users", clientUid, "cards"), where("shared", "==", true));
   const snap = await getDocs(q);
-  return snap.docs.map((d) => { const x = d.data() as any; const { shared, reason, sharedAt, ...rest } = x; return { ...rest, shared: { reason, at: sharedAt } }; })
+  return snap.docs.filter((d) => !(d.data() as any).deletedAt).map((d) => cardOf(d.data()))
     .sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
 }
 export async function deleteCard(uid: string, id: string) { await deleteDoc(doc(db(), "users", uid, "cards", id)); }
@@ -191,7 +225,7 @@ export async function clearClientAi(clientUid: string) { await updateDoc(doc(db(
 export async function exportAccount(uid: string) {
   const main = await loadCloud(uid);
   const read = async (sub: string) => (await getDocs(collection(db(), "users", uid, sub))).docs.map((d) => ({ id: d.id, ...d.data() }));
-  return { account: main, photos: await read("photos"), cards: await read("cards"), inbox: await read("inbox") };
+  return { account: main, foods: await read("foods"), recipes: await read("recipes"), photos: await read("photos"), cards: await read("cards"), inbox: await read("inbox") };
 }
 
 // ---- photos as files (storage release 1) ----

@@ -32,6 +32,13 @@ service cloud.firestore {
         allow create: if coachOfParent() && request.resource.data.from == request.auth.uid;
         allow read, delete: if request.auth != null && request.auth.uid == uid;
       }
+      // Foods and recipes, one record each (storage release 2, 7 October 2026): the owner's only. The coach sees a count.
+      match /foods/{fid} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
+      match /recipes/{rid} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
       // Cards: private by default. The owner reads and writes; the coach reads only cards marked shared.
       match /cards/{cid} {
         allow read: if request.auth != null && (request.auth.uid == uid || (coachOfParent() && resource.data.get('shared', false) == true));
