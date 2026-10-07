@@ -4,8 +4,8 @@ import { aggregate, density } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
 import { bandOf } from "../goal";
-import { DAY_TYPES, dayModeOf, dayNameAny, hasPlan, isMinor } from "../personal";
-import { planLine, schoolLine, loadOf, LOAD_DAY, type PlanDay } from "../plan";
+import { DAY_TYPES, dayModeOf, dayNameAny, hasPlan, isMinor, lifestyleOf } from "../personal";
+import { planLine, schoolLine, studyLine, loadOf, LOAD_DAY, weekdaysOf, dayKindOf, type PlanDay } from "../plan";
 import { DayEditor } from "../components/DayEditor";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { X } from "lucide-react";
@@ -38,6 +38,9 @@ export function HomeScreen(p: AppApi) {
     </section>
   ));
   const minor = isMinor(p.personal);
+  // Release B: a study day says so; the editor offers the kinds of day Lifestyle allows
+  const ls = lifestyleOf(p.personal), wkd = weekdaysOf(ls), peOn = !!ls.peWeek && ls.peWeek !== "none";
+  const todayLine = (d: PlanDay) => (minor ? schoolLine(d) : dayKindOf(d, ls) === "study" ? studyLine({ ...d, study: true }) : planLine(d));
   return (
     <>
       <section className="plan">
@@ -64,7 +67,7 @@ export function HomeScreen(p: AppApi) {
         {follow && planned && p.day.plan && !changing && (
           <div className="today-plan">
             <b>{dateLine}</b>
-            <span className="today-what">{minor ? schoolLine(p.day.plan) : planLine(p.day.plan)}. {LOAD_DAY[loadOf(p.day.plan)]}</span>
+            <span className="today-what">{todayLine(p.day.plan)}. {LOAD_DAY[loadOf(p.day.plan)]}</span>
             <small>{p.day.source === "today" ? "Changed for today only. Your Weekly plan stays the same." : "Today's part of your Weekly plan. If your day goes differently, change today's plan; the numbers follow, and your Weekly plan stays the same."}</small>
             <button className="pill pill-wide" onClick={() => { setDraft(p.day.plan!); setChanging(true); }}>Change today's plan</button>
             {p.day.source === "today" && <button className="link" onClick={() => p.setTodayPlan(null)}>Back to the Weekly plan</button>}
@@ -73,7 +76,7 @@ export function HomeScreen(p: AppApi) {
         {follow && changing && draft && (
           <div className="today-plan">
             <b>{dateLine}, today only</b>
-            <DayEditor minor={minor} value={draft} onChange={setDraft} />
+            <DayEditor minor={minor} weekdays={wkd} peOn={peOn} value={draft} onChange={setDraft} />
             <div className="actions">
               <button className="pill pill-primary action-main" onClick={() => { p.setTodayPlan(draft); setChanging(false); }}>Save for today</button>
               <button className="link action-cancel" onClick={() => setChanging(false)}>Cancel</button>

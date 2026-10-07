@@ -7,8 +7,10 @@ export type Kind = "rest" | "strength" | "cardio" | "hiit" | "mobility" | "stret
 export type Intensity = "easy" | "moderate" | "hard";
 export type When = "morning" | "day" | "evening" | "late" | "afterschool" | "lateafternoon";
 export type Sport = "football" | "basketball" | "swimming" | "handball" | "volleyball" | "tennis" | "other";
-// work: a work day for adults, a school day for anyone under 18. pe: sport at school that day. sport: for club training or a match.
-export type PlanDay = { work: boolean; kind: Kind; intensity?: Intensity; when?: When; minutes?: number; pe?: boolean; sport?: Sport };
+// work: a weekday with work or study (a school day for anyone under 18); false is a day off.
+// study: on such a day, a study day rather than a work day (Release B, for anyone who works and studies).
+// pe: sport at school, or sport in class, that day. sport: for club training or a match.
+export type PlanDay = { work: boolean; study?: boolean; kind: Kind; intensity?: Intensity; when?: When; minutes?: number; pe?: boolean; sport?: Sport };
 export type Plan = PlanDay[]; // seven days, Monday first
 
 export const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -47,10 +49,10 @@ export const SPORTS: { id: Sport; name: string; met: [number, number, number] }[
 export const sportOf = (s?: Sport) => SPORTS.find((x) => x.id === s) ?? SPORTS[0];
 // Sport at school counts as 45 minutes at about 4 METs (Compendium 2024, youth physical education).
 export const PE = { met: 4, minutes: 45 };
-// The way to school and back, on a school day: about 30 minutes in all. Walking about 3.5 METs, cycling about 4.
+// The way to school or to classes and back, on a study day: about 30 minutes in all. Walking about 3.5 METs, cycling about 4.
 export const COMMUTE: Record<string, { met: number; minutes: number; name: string }> = {
-  walk: { met: 3.5, minutes: 30, name: "walking to school and back" },
-  bike: { met: 4, minutes: 30, name: "cycling to school and back" },
+  walk: { met: 3.5, minutes: 30, name: "walking there and back" },
+  bike: { met: 4, minutes: 30, name: "cycling there and back" },
 };
 export const INTENSITIES: { id: Intensity; name: string }[] = [{ id: "easy", name: "Easy" }, { id: "moderate", name: "Moderate" }, { id: "hard", name: "Hard" }];
 export const WHENS: { id: When; name: string }[] = [{ id: "morning", name: "Morning" }, { id: "day", name: "During the day" }, { id: "evening", name: "Evening" }, { id: "late", name: "Late night" }];
@@ -72,14 +74,20 @@ export const activityName = (d: PlanDay) => d.kind === "club" ? `${sportOf(d.spo
 // "Strength, hard, in the evening"
 export function planLine(d: PlanDay): string {
   const act = d.kind === "rest" ? "" : `${activityName(d)}, ${d.intensity ?? "easy"}${d.when ? `, ${whenWords[d.when]}` : ""}`;
-  if (d.pe) return act ? `Sport at school, then ${act.charAt(0).toLowerCase() + act.slice(1)}` : "Sport at school";
+  if (d.pe) return act ? `${peName(d)}, then ${act.charAt(0).toLowerCase() + act.slice(1)}` : peName(d);
   return act || "Rest";
 }
+const peName = (d: PlanDay) => (d.study ? "Sport in class" : "Sport at school");
 // the agenda line: "Strength, hard · evening", "Sport at school, then football training, hard · late afternoon"
 export function planShort(d: PlanDay): string {
   const act = d.kind === "rest" ? "" : `${activityName(d)}, ${d.intensity ?? "easy"}${d.when ? ` · ${whenShort(d.when)}` : ""}`;
-  if (d.pe) return act ? `Sport at school, then ${act.charAt(0).toLowerCase() + act.slice(1)}` : "Sport at school";
+  if (d.pe) return act ? `${peName(d)}, then ${act.charAt(0).toLowerCase() + act.slice(1)}` : peName(d);
   return act || "Rest";
+}
+// Today's sentence on a study day (Release B): "Study day, then team sport in the evening."
+export function studyLine(d: PlanDay): string {
+  const act = d.kind === "rest" ? "" : `${activityName(d).charAt(0).toLowerCase() + activityName(d).slice(1)}${d.when ? ` ${whenWords[d.when]}` : ""}`;
+  return `Study day${d.pe ? " with sport in class" : ""}${act ? `, then ${act}` : ""}`;
 }
 // Today's sentence for a school kid: "School with sport at school, then football training in the late afternoon."
 export function schoolLine(d: PlanDay): string {
@@ -141,9 +149,12 @@ export type Slot = "9-5" | "8-4" | "7-3";
 export type Move = "sitting" | "feet" | "physical";
 export type SchoolHours = "mornings" | "full" | "alternating" | "none";
 export type Commute = "walk" | "bike" | "bus" | "car";
+// Release B (7 October 2026): what fills the weekdays. The questions after it follow the answer.
+export type Weekdays = "work" | "study" | "both" | "home";
 export type Lifestyle = {
+  weekdays?: Weekdays;
   hours?: Hours; slot?: Slot; move?: Move; travel?: "none" | "sometimes" | "often";
-  // for anyone under 18: school instead of work
+  // study (any adult; school for anyone under 18): hours, the way there, sport as part of the studies
   school?: SchoolHours; commute?: Commute; peWeek?: "1" | "2" | "3" | "none";
   bed?: "early" | "mid" | "late" | "varies"; wake?: "early" | "mid" | "late" | "varies";
   where?: string[]; meals?: number; window?: { from: string; to: string } | null; diet?: string; alcohol?: string;
@@ -161,6 +172,29 @@ export const HOURS: { id: Hours; name: string; hint: string }[] = [
   { id: "shifts", name: "Shifts", hint: "early, late, night or rotating" },
   { id: "none", name: "No fixed work", hint: "home, studies, retired" },
 ];
+// Working hours as asked since Release B: No fixed work is now At home, under Your weekdays.
+export const HOURS_SHOWN = HOURS.filter((h) => h.id !== "none");
+export const WEEKDAY_CHOICES: { id: Weekdays; name: string; hint: string }[] = [
+  { id: "work", name: "Work", hint: "a job, on site or remote work" },
+  { id: "study", name: "Study", hint: "university, school, a course" },
+  { id: "both", name: "Work and study", hint: "an apprenticeship, a job next to studies" },
+  { id: "home", name: "At home", hint: "home and family, retired, between jobs" },
+];
+// older lifestyles had No fixed work under Working hours: that is At home now
+export const weekdaysOf = (l: Lifestyle): Weekdays => l.weekdays ?? (l.hours === "none" ? "home" : "work");
+export const STUDY_HOURS: { id: SchoolHours; name: string; hint: string }[] = [
+  { id: "mornings", name: "Mornings", hint: "done around lunch" },
+  { id: "full", name: "Full day", hint: "until the afternoon" },
+  { id: "alternating", name: "Changes every week", hint: "mornings, then afternoons" },
+];
+// What a day is: work, study or off. Under 18 a weekday is a school day; At home, every day is a day at home.
+export type DayKind = "work" | "study" | "off";
+export function dayKindOf(d: PlanDay, l: Lifestyle, minor = false): DayKind {
+  if (!d.work) return "off";
+  if (minor) return "study";
+  const w = weekdaysOf(l);
+  return w === "home" ? "off" : w === "study" ? "study" : w === "work" ? "work" : d.study ? "study" : "work";
+}
 export const SLOTS: { id: Slot; name: string }[] = [{ id: "9-5", name: "9 to 5" }, { id: "8-4", name: "8 to 4" }, { id: "7-3", name: "7 to 3" }];
 export const WHERE = ["Cook at home", "Meal prep for days", "Canteen at work", "Restaurants", "Takeaway", "Family dinners"];
 export const WHERE_KID = ["At home", "School lunch", "Lunch packed from home", "Bakery or shop near school", "Takeaway", "Family dinners"];

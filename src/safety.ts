@@ -48,18 +48,18 @@ export function aiState(safety: Safety, birthYear: number | undefined | null, _h
   if (!safety.adultAt) return { on: false, why: "Confirm on the welcome screen that you're 18 or older.", blocked: false };
   const confirmed = Boolean(safety.aiConfirmedAt);
   if (!doorAnswered(safety, now)) return { on: false, why: "Answer the question on your profile first: is any of this true for you? One tap if none applies. Mealan's chat waits for that answer, and asks again once a year.", blocked: false };
-  if (safety.situations.includes("eating") && !confirmed) return { on: false, why: "Mealan's chat is off for this account until your coach confirms. The plate, the numbers and your foods keep working.", blocked: false };
+  if (safety.situations.includes("eating") && !confirmed) return { on: false, why: FIXED.off, blocked: false };
   return { on: true, why: "", blocked: false };
 }
 
-// ---- the fixed responses. Written once, reviewed by Milan, never improvised. Mealan stays a chef, names who to talk to, says what the plate still does.
+// ---- the fixed responses. Written once, approved by Milan on 7 October 2026, never improvised. Mealan stays a chef, names who to talk to, says what the plate still does.
 export const FIXED: Record<SituationId | "off", string> = {
-  eating: "I'm a chef, and this is beyond what a chef should advise on. A doctor or a therapist who works with eating is the right person, and your coach knows you told me. Here, I keep doing what I can: the foods, the plates and the amounts, with the numbers as information, never as a verdict.",
-  pregnancy: "I'm a chef, and pregnancy and breastfeeding change what a body needs in ways a chef shouldn't set. Your midwife or doctor sets the targets; bring their numbers and I fit the food to them. I won't suggest a deficit, and the plates stay as they are.",
-  diabetes: "I'm a chef, and with diabetes or insulin the timing and the carbs are your doctor's call, not mine. I show the carbs and the sugars on every plate, and I fit the food to the numbers you bring from them. I won't advise on doses or timing.",
-  allergies: "Noted. Nothing with what you listed will be suggested, and I check the name and the label lines of every food. The label check still shows what a pack contains, so you can see it yourself.",
-  medication: "I'm a chef, and some medication changes what food does. Your doctor or pharmacist says what to avoid; tell me which foods and I keep them off every suggestion. Everything else stays as it is.",
-  off: "Mealan's chat is off for this account until your coach confirms. The plate, the numbers and your foods keep working.",
+  eating: "I'm a chef, so this isn't something I should advise on. A doctor or a therapist who works with eating is the right person to talk to. Your coach can see that you told me, but not what you wrote. I'll keep helping with foods, plates and amounts. The numbers are there to inform you, never to judge you.",
+  pregnancy: "I'm a chef, and pregnancy and breastfeeding change what your body needs. Your midwife or doctor should set your targets. Bring me their numbers and I'll fit your food to them. I won't suggest eating less than you burn, and your plates stay as they are.",
+  diabetes: "I'm a chef. With diabetes or insulin, the timing and the carbs are your doctor's call. I show the carbs and sugars on every plate, and I fit your food to the numbers your doctor gives you. I won't advise on doses or timing.",
+  allergies: "Noted. I won't suggest anything that contains what you listed, and I check the name and label of every food. The label check still shows what each pack contains, so you can check it yourself too.",
+  medication: "I'm a chef, and some medication changes how food works in your body. Your doctor or pharmacist knows what to avoid. Tell me which foods, and I'll keep them out of every suggestion.",
+  off: "Mealan's chat is off for your account until your coach confirms it. Plates, numbers and your foods keep working as usual.",
 };
 export const PROFESSIONAL: Record<SituationId, string> = { eating: "a doctor or a therapist who works with eating", pregnancy: "your midwife or doctor", diabetes: "your doctor or diabetes nurse", allergies: "your doctor or an allergist", medication: "your doctor or pharmacist" };
 

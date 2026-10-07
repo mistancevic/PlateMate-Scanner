@@ -70,7 +70,34 @@ test("under 18: Schofield, the way to school, sport at school and a football tra
   const n = c.numbersOf(day as any);
   // 1,495.6 x 1.3 = 1,944; + bike 30 min (3 x 60 x 0.5 = 90); + sport at school 45 min (3 x 60 x 0.75 = 135); + football hard 90 min (8.5 x 60 x 1.5 = 765)
   assert.equal(n.kcal, 2950);
-  assert.ok(n.how.some((x) => /Schofield/.test(x)) && n.how.some((x) => /sport at school/.test(x)) && n.how.some((x) => /cycling to school/.test(x)), n.how.join(" | "));
+  assert.ok(n.how.some((x) => /Schofield/.test(x)) && n.how.some((x) => /sport at school/.test(x)) && n.how.some((x) => /cycling there and back/.test(x)), n.how.join(" | "));
   // a calorie cut is never applied under 18
   assert.equal(calculate(p, "fatloss")!.numbersOf(day as any).kcal, 2950);
+});
+
+// Release B (7 October 2026, canvas B0 to B3): work, study, or both, for any adult; At home counts every day as a day at home.
+test("an apprentice: a work day on her feet, a study day sitting with the bike ride, a day off sitting", async () => {
+  const { dayKindOf, studyLine } = await import("./plan");
+  const p: any = { sex: "female", birthYear: 2004, heightCm: 168, weightKg: 60, lifestyle: { weekdays: "both", hours: "fixed", move: "feet", commute: "bike", peWeek: "none" } };
+  const c = calculate(p, "maintain")!;
+  const bmr = 10 * 60 + 6.25 * 168 - 5 * (new Date().getFullYear() - 2004) - 161;
+  const work = c.numbersOf({ work: true, kind: "rest" }), study = c.numbersOf({ work: true, study: true, kind: "rest" }), off = c.numbersOf({ work: false, kind: "rest" });
+  assert.equal(work.kcal, Math.round((bmr * 1.55) / 50) * 50, work.how.join(" | "));
+  assert.equal(study.kcal, Math.round((bmr * 1.3 + 3 * 60 * 0.5) / 50) * 50, study.how.join(" | "));
+  assert.ok(study.how.some((x) => /a study day, mostly sitting/.test(x)) && study.how.some((x) => /cycling there and back/.test(x)), study.how.join(" | "));
+  assert.equal(off.kcal, Math.round((bmr * 1.3) / 50) * 50);
+  assert.equal(dayKindOf({ work: true, study: true, kind: "rest" }, p.lifestyle), "study");
+  assert.equal(studyLine({ work: true, study: true, kind: "team", intensity: "moderate", when: "evening" }), "Study day, then team sport in the evening");
+});
+
+test("study only: a weekday is a study day; sport in class adds 45 minutes at 4 METs; At home: every day is a day at home", async () => {
+  const { dayKindOf, weekdaysOf } = await import("./plan");
+  const s: any = { sex: "male", birthYear: 1990, heightCm: 180, weightKg: 80, lifestyle: { weekdays: "study", move: "physical", commute: "bus", peWeek: "1" } };
+  const day = calculate(s, "maintain")!.numbersOf({ work: true, kind: "rest", pe: true });
+  assert.ok(day.how.some((x) => /× 1.3 for a study day/.test(x)) && day.how.some((x) => /sport in class/.test(x)), day.how.join(" | "));
+  assert.equal(dayKindOf({ work: true, kind: "rest" }, s.lifestyle), "study", "an older plan's weekday counts as a study day");
+  const h: any = { ...s, lifestyle: { weekdays: "home", move: "physical" } };
+  assert.ok(calculate(h, "maintain")!.numbersOf({ work: true, kind: "rest" }).how.some((x) => /× 1.3 for a day at home/.test(x)));
+  assert.equal(weekdaysOf({ hours: "none" }), "home", "No fixed work from before Release B is At home");
+  assert.equal(weekdaysOf({ hours: "fixed" }), "work");
 });

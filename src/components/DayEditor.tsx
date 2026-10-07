@@ -1,9 +1,10 @@
-import { KINDS, INTENSITIES, WHENS, WHENS_KID, MINUTES, MINUTES_KID, ADULT_KINDS, KID_KINDS, SPORTS, PE, type PlanDay, type Kind } from "../plan";
+import { KINDS, INTENSITIES, WHENS, WHENS_KID, MINUTES, MINUTES_KID, ADULT_KINDS, KID_KINDS, SPORTS, PE, type PlanDay, type Kind, type Weekdays } from "../plan";
 
 // One day's settings, the same on the Weekly plan, a dated week and Change today's plan.
-// Adults: work or off, one activity, how hard, when, how long. School kids (under 18): school or no school, sport at school,
+// Adults: the kind of day as Lifestyle allows it (Release B: Work day, Study day, Day off; nothing to pick when At home),
+// sport in class on a study day when the studies have it, then one activity, how hard, when, how long. School kids (under 18): school or no school, sport at school,
 // then one activity after school; a club training or a match asks which sport. A rest day folds the last ones away.
-export function DayEditor({ value, onChange, workHint, minor = false }: { value: PlanDay; onChange: (d: PlanDay) => void; workHint?: string; minor?: boolean }) {
+export function DayEditor({ value, onChange, workHint, minor = false, weekdays = "work", peOn = false }: { value: PlanDay; onChange: (d: PlanDay) => void; workHint?: string; minor?: boolean; weekdays?: Weekdays; peOn?: boolean }) {
   const set = (patch: Partial<PlanDay>) => onChange({ ...value, ...patch });
   const pickKind = (k: Kind) => set(k === "rest"
     ? { kind: k, intensity: undefined, when: undefined, minutes: undefined, sport: undefined }
@@ -16,14 +17,36 @@ export function DayEditor({ value, onChange, workHint, minor = false }: { value:
   );
   return (
     <div className="day-editor">
-      <div className="setting">
-        <small className="setting-name">{minor ? "School" : "Work"}</small>
-        <div className="chip-row">
-          <Chip on={value.work} onClick={() => set({ work: true })}>{minor ? "School day" : "Work day"}</Chip>
-          <Chip on={!value.work} onClick={() => set({ work: false, pe: false })}>{minor ? "No school" : "Off"}</Chip>
+      {minor ? (
+        <div className="setting">
+          <small className="setting-name">School</small>
+          <div className="chip-row">
+            <Chip on={value.work} onClick={() => set({ work: true })}>School day</Chip>
+            <Chip on={!value.work} onClick={() => set({ work: false, pe: false })}>No school</Chip>
+          </div>
+          {workHint && <small className="setting-hint">{workHint}</small>}
         </div>
-        {workHint && <small className="setting-hint">{workHint}</small>}
-      </div>
+      ) : weekdays !== "home" && (
+        <div className="setting">
+          <small className="setting-name">Your day</small>
+          <div className="chip-row">
+            {weekdays !== "study" && <Chip on={value.work && (weekdays === "work" || !value.study)} onClick={() => set({ work: true, study: false, pe: false })}>Work day</Chip>}
+            {weekdays !== "work" && <Chip on={value.work && (weekdays === "study" || !!value.study)} onClick={() => set({ work: true, study: true })}>Study day</Chip>}
+            <Chip on={!value.work} onClick={() => set({ work: false, study: false, pe: false })}>Day off</Chip>
+          </div>
+          {workHint && <small className="setting-hint">{workHint}</small>}
+        </div>
+      )}
+      {!minor && peOn && value.work && (weekdays === "study" || (weekdays === "both" && value.study)) && (
+        <div className="setting">
+          <small className="setting-name">Sport in class</small>
+          <div className="chip-row">
+            <Chip on={!!value.pe} onClick={() => set({ pe: true, study: true })}>Yes</Chip>
+            <Chip on={!value.pe} onClick={() => set({ pe: false })}>No</Chip>
+          </div>
+          <small className="setting-hint">Counted as {PE.minutes} minutes of moderate activity.</small>
+        </div>
+      )}
       {minor && value.work && (
         <div className="setting">
           <small className="setting-name">Sport at school</small>

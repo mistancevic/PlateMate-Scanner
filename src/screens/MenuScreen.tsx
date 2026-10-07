@@ -7,7 +7,7 @@ import { BANDS, bandOf, SOURCE_LABEL, type GoalEntry } from "../goal";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
 import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, planOf, lifestyleOf, ageOf, isMinor, dayFor, type Personal, type DayType } from "../personal";
-import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, type Plan, type PlanDay, type Lifestyle } from "../plan";
+import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, type Plan, type PlanDay, type Lifestyle } from "../plan";
 import { DayEditor } from "../components/DayEditor";
 import { ProteinCard } from "../components/ProteinCard";
 import { DayTable } from "../components/DayTable";
@@ -348,6 +348,7 @@ function LifestylePanel(p: AppApi) {
   const age = ageOf(p.personal);
   // under 18: school instead of work, no eating window, no alcohol question; the age comes from the profile
   const minor = isMinor(p.personal);
+  const wk = weekdaysOf(l);
   const toggle = (v: string) => save({ where: (l.where ?? []).includes(v) ? (l.where ?? []).filter((x) => x !== v) : [...(l.where ?? []), v] });
   const asItems = (xs: string[]) => xs.map((x) => ({ id: x, name: x }));
   return (
@@ -382,13 +383,27 @@ function LifestylePanel(p: AppApi) {
           <Setting name="Sport at school" hint="You pick the days in your Weekly plan."><Chips items={PE_WEEK} on={l.peWeek} pick={(v) => save({ peWeek: v })} /></Setting>
         </Seg>
       ) : (
-        <Seg title="Work" why="How much your job moves you on an ordinary day, before any activity.">
-          <Setting name="Working hours" hint={l.hours === "fixed" ? "Fixed hours make Monday to Friday work days in your Weekly plan; you can change any day there." : undefined}>
-            <Options items={HOURS} on={l.hours} pick={(v) => save({ hours: v })} />
-            {l.hours === "fixed" && <Chips items={SLOTS} on={l.slot} pick={(v) => save({ slot: v })} />}
-          </Setting>
-          <Setting name="At work you are"><Options items={MOVES} on={l.move ?? "sitting"} pick={(v) => save({ move: v })} /></Setting>
-          <Setting name="Work travel"><Chips items={[{ id: "none", name: "None" }, { id: "sometimes", name: "Occasionally" }, { id: "often", name: "A lot" }]} on={l.travel} pick={(v) => save({ travel: v as Lifestyle["travel"] })} /></Setting>
+        // Release B (7 October 2026, canvas B1 and B3): what fills the weekdays first; the questions after it follow the answer
+        <Seg title="Work and study" why="How much your weekdays move you, before any training.">
+          <Setting name="Your weekdays"><Options items={WEEKDAY_CHOICES} on={wk} pick={(v) => save({ weekdays: v, ...(v !== "home" && l.hours === "none" ? { hours: undefined } : {}) })} /></Setting>
+          {(wk === "work" || wk === "both") && (
+            <>
+              <Setting name="Working hours" hint={l.hours === "fixed" ? "Fixed hours make Monday to Friday work days in your Weekly plan; you can change any day there." : undefined}>
+                <Options items={HOURS_SHOWN} on={l.hours === "none" ? undefined : l.hours} pick={(v) => save({ hours: v })} />
+                {l.hours === "fixed" && <Chips items={SLOTS} on={l.slot} pick={(v) => save({ slot: v })} />}
+              </Setting>
+              <Setting name="At work you are"><Options items={MOVES} on={l.move ?? "sitting"} pick={(v) => save({ move: v })} /></Setting>
+              <Setting name="Work travel"><Chips items={[{ id: "none", name: "None" }, { id: "sometimes", name: "Occasionally" }, { id: "often", name: "A lot" }]} on={l.travel} pick={(v) => save({ travel: v as Lifestyle["travel"] })} /></Setting>
+            </>
+          )}
+          {(wk === "study" || wk === "both") && (
+            <>
+              <Setting name="Study hours"><Options items={STUDY_HOURS} on={l.school === "none" ? undefined : l.school} pick={(v) => save({ school: v })} /></Setting>
+              <Setting name="How you get there" hint="Walking or cycling there and back counts as light activity on every study day."><Chips items={COMMUTES} on={l.commute} pick={(v) => save({ commute: v })} /></Setting>
+              <Setting name="Sport as part of your studies" hint="For courses with sport, like a sports class at school. You pick the days in your Weekly plan."><Chips items={PE_WEEK} on={l.peWeek} pick={(v) => save({ peWeek: v })} /></Setting>
+            </>
+          )}
+          {wk === "home" && <p className="small muted">Your days are spent at home. Chef Mealan counts every day as a day at home, and your training goes in the Weekly plan.</p>}
         </Seg>
       )}
       <Seg title="Recovery" why={minor ? "Sleep is when your body grows and turns sport into progress. Most teenagers need 8 to 10 hours." : "Sleep is where training turns into progress; it also decides when late meals make sense."}>
@@ -414,8 +429,10 @@ function PlanPanel(p: AppApi) {
   const save = (next: Plan) => { p.setPersonal({ ...p.personal, plan: next }); p.setUsual(usualFrom(l, next)); };
   const setDay = (i: number, d: PlanDay) => save(plan.map((x, n) => (n === i ? d : x)));
   const c = p.goal ? calculate(p.personal, p.goal.band ?? "maintain", p.profile.formula ?? null) : null;
-  const dayWord = (d: PlanDay) => (minor ? (d.work ? "School" : "No school") : d.work ? "Work" : "Off");
-  const workHint = minor ? "Monday to Friday start as school days. Mark a holiday as no school." : l.hours === "fixed" ? `From Lifestyle: fixed hours${l.slot ? `, ${SLOTS.find((s) => s.id === l.slot)!.name}` : ""}.` : undefined;
+  // Release B: the word on the right says Work, Study, or nothing on a day off; the bar keeps its colors
+  const wkd = weekdaysOf(l), peOn = !!l.peWeek && l.peWeek !== "none";
+  const dayWord = (d: PlanDay) => { if (minor) return d.work ? "School" : "No school"; const k = dayKindOf(d, l); return k === "work" ? "Work" : k === "study" ? "Study" : ""; };
+  const workHint = minor ? "Monday to Friday start as school days. Mark a holiday as no school." : wkd === "both" ? "From Lifestyle: work and study. Pick which one each day is." : wkd === "work" && l.hours === "fixed" ? `From Lifestyle: fixed hours${l.slot ? `, ${SLOTS.find((s) => s.id === l.slot)!.name}` : ""}.` : undefined;
   // the dated week: Monday of this week, moved by the arrows
   const base = isoWeek(todayD).monday;
   const monday = new Date(base); monday.setDate(base.getDate() + offset * 7);
@@ -455,7 +472,7 @@ function PlanPanel(p: AppApi) {
               <span className={`load-bar load-${loadOf(d)}`} />
               <b>{WEEKDAYS[i]}{tab === "date" ? ` ${dates[i].getDate()}` : ""}</b>
               <span className="agenda-what">{planShort(d)}{sub && <small className="agenda-sub">{sub}</small>}</span>
-              <small className={d.work ? "work" : ""}>{dayWord(d)}</small>
+              <small className={dayWord(d) ? "work" : ""}>{dayWord(d)}</small>
             </button>
           );
         })}
@@ -489,13 +506,13 @@ function PlanPanel(p: AppApi) {
           </Seg>
         ) : (
           <Seg title={longDate(selDate)} why={`This date only. To change every ${WEEKDAY_NAMES[sel]}, use Usual week above.`}>
-            <DayEditor minor={minor} value={days[sel].day} onChange={(d) => p.setDated(selDate, d)} workHint={workHint} />
+            <DayEditor minor={minor} weekdays={wkd} peOn={peOn} value={days[sel].day} onChange={(d) => p.setDated(selDate, d)} workHint={workHint} />
             {days[sel].changed && <button type="button" className="pill pill-wide" onClick={() => p.setDated(selDate, null)}>Back to the usual {WEEKDAY_NAMES[sel]}</button>}
           </Seg>
         )
       ) : (
         <Seg title={WEEKDAY_NAMES[sel]} why={`Every ${WEEKDAY_NAMES[sel]}, unless you change a date. The week above follows.`}>
-          <DayEditor minor={minor} value={plan[sel]} onChange={(d) => setDay(sel, d)} workHint={workHint} />
+          <DayEditor minor={minor} weekdays={wkd} peOn={peOn} value={plan[sel]} onChange={(d) => setDay(sel, d)} workHint={workHint} />
           {copying === null ? (
             <button type="button" className="pill pill-wide" onClick={() => setCopying([])}>Copy {WEEKDAY_NAMES[sel]} to other days</button>
           ) : (
@@ -503,10 +520,10 @@ function PlanPanel(p: AppApi) {
               <small className="setting-name">Copy {WEEKDAY_NAMES[sel]} to</small>
               <div className="chip-row">{WEEKDAYS.map((w, i) => i === sel ? null : <button type="button" key={w} className={`choice ${copying.includes(i) ? "on" : ""}`} aria-pressed={copying.includes(i)} onClick={() => setCopying(copying.includes(i) ? copying.filter((x) => x !== i) : [...copying, i])}>{w}</button>)}</div>
               <div className="actions">
-                <button type="button" className="pill pill-primary action-main" disabled={!copying.length} onClick={() => { save(plan.map((x, n) => (copying.includes(n) ? { ...plan[sel], work: x.work, pe: x.work ? plan[sel].pe : false } : x))); setCopying(null); }}>Copy to {copying.length} {copying.length === 1 ? "day" : "days"}</button>
+                <button type="button" className="pill pill-primary action-main" disabled={!copying.length} onClick={() => { save(plan.map((x, n) => (copying.includes(n) ? { ...plan[sel], work: x.work, study: x.study, pe: x.work && x.study === plan[sel].study ? plan[sel].pe : false } : x))); setCopying(null); }}>Copy to {copying.length} {copying.length === 1 ? "day" : "days"}</button>
                 <button type="button" className="link action-cancel" onClick={() => setCopying(null)}>Cancel</button>
               </div>
-              <small className="setting-hint">Copies the activity; each day keeps its {minor ? "school day or no school" : "work day or off"}.</small>
+              <small className="setting-hint">Copies the activity; each day keeps its {minor ? "school day or no school" : "work day, study day or day off"}.</small>
             </div>
           )}
         </Seg>

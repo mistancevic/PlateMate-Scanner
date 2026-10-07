@@ -1,6 +1,6 @@
 // Who the person is, for calculating their numbers. Every field optional; stored on the phone and in their account only.
 import { BANDS, type Band } from "./goal";
-import { ymd, isPlanDay, PE, COMMUTE, isPlan, planFromCounts, countsOf, metOf, minutesOf, lifestyleFromOld, baseFactor, moveOf, WEEKDAY_NAMES, planLine, planShort, loadOf, weekdayIndex, getTodayChange, setTodayChange, dayOfLoad, type Plan, type PlanDay, type Lifestyle } from "./plan";
+import { ymd, isPlanDay, PE, COMMUTE, isPlan, planFromCounts, countsOf, metOf, minutesOf, lifestyleFromOld, baseFactor, moveOf, MOVES, weekdaysOf, dayKindOf, WEEKDAY_NAMES, planLine, planShort, loadOf, weekdayIndex, getTodayChange, setTodayChange, dayOfLoad, type Plan, type PlanDay, type Lifestyle } from "./plan";
 export type Sex = "female" | "male";
 export type Activity = "sedentary" | "light" | "moderate" | "very" | "athlete"; // before 6 October 2026; read only to move old profiles over
 export type Formula = "mifflin" | "katch";
@@ -142,7 +142,9 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   const schofield = p.sex === "male" ? 17.686 * w + 658.2 : p.sex === "female" ? 13.384 * w + 692.6 : (17.686 * w + 658.2 + 13.384 * w + 692.6) / 2;
   const bmr = minor ? schofield : f === "katch" && lean ? 370 + 21.6 * lean : 10 * w + 6.25 * h - 5 * age + sexTerm;
   const ls = lifestyleOf(p), move = moveOf(ls);
-  const life = minor ? { factor: 1.3, name: "a school day, mostly sitting" } : { factor: move.factor, name: `${move.name.toLowerCase()} at work` };
+  // what fills the weekdays (Release B): work counts how you move at work; study and at home count as mostly sitting
+  const wk = weekdaysOf(ls);
+  const life = minor ? { factor: 1.3, name: "a school day, mostly sitting" } : wk === "study" ? { factor: 1.3, name: "a study day, mostly sitting" } : wk === "home" ? { factor: 1.3, name: "a day at home" } : { factor: move.factor, name: `${move.name.toLowerCase()} at work` };
   let adj = ADJ[bandId] ?? 0;
   const notes: string[] = [];
   if (age < 18 && adj < 0) { adj = 0; notes.push("Under 18: no deficit, energy stays at maintenance."); }
@@ -190,21 +192,22 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   const restLine = `${Math.round(bmr).toLocaleString("en")} at rest (${minor ? "Schofield, for 10 to 18 years: sex and weight" : f === "katch" ? "Katch–McArdle, from lean mass" : "Mifflin–St Jeor: sex, age, height, weight"})`;
   const part = (met: number, min: number) => (met - 1) * w * (min / 60);
   const dayKcalHow = (d: PlanDay): { kcal: number; how: string[] } => {
-    const fac = minor ? 1.3 : baseFactor(ls, d.work), b = bmr * fac;
+    const kind = dayKindOf(d, ls, minor);
+    const fac = kind === "work" ? baseFactor(ls, true) : MOVES[0].factor, b = bmr * fac;
     const min = minutesOf(d), met = metOf(d);
     const extra = met > 1 ? part(met, min) : 0;
-    // a school kid's day can also hold sport at school and the way to school and back
-    const pe = minor && d.work && d.pe ? part(PE.met, PE.minutes) : 0;
-    const way = minor && d.work ? COMMUTE[ls.commute ?? ""] : undefined;
+    // a study day (a school day under 18) can also hold sport in class and the way there and back
+    const pe = kind === "study" && d.pe ? part(PE.met, PE.minutes) : 0;
+    const way = kind === "study" ? COMMUTE[ls.commute ?? ""] : undefined;
     const commute = way ? part(way.met, way.minutes) : 0;
     const kcal = r50((b + extra + pe + commute) * (1 + adj));
     const what = d.kind === "club" || d.kind === "match" ? planShort({ ...d, pe: false, when: undefined }).toLowerCase() : planLine({ ...d, pe: false }).toLowerCase().replace(/, (in|during|late|right).*$/, "");
     return { kcal, how: [
       restLine,
-      `× ${fac} for ${minor ? (d.work ? "a school day, mostly sitting" : "a day without school") : d.work ? life.name : "a day off"} = ${Math.round(b).toLocaleString("en")}`,
+      `× ${fac} for ${minor ? (d.work ? "a school day, mostly sitting" : "a day without school") : kind === "work" ? `${move.name.toLowerCase()} at work` : kind === "study" ? "a study day, mostly sitting" : wk === "home" ? "a day at home" : "a day off"} = ${Math.round(b).toLocaleString("en")}`,
       ...(commute ? [`+ ${Math.round(commute)} for ${way!.name} (${way!.met} METs, ${way!.minutes} min)`] : []),
-      ...(pe ? [`+ ${Math.round(pe)} for sport at school (${PE.met} METs, ${PE.minutes} min)`] : []),
-      extra ? `+ ${Math.round(extra)} for ${min} min ${what} (${met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest; Compendium 2024)` : pe || commute ? "+ 0 after school" : "+ 0, no activity",
+      ...(pe ? [`+ ${Math.round(pe)} for ${minor ? "sport at school" : "sport in class"} (${PE.met} METs, ${PE.minutes} min)`] : []),
+      extra ? `+ ${Math.round(extra)} for ${min} min ${what} (${met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest; Compendium 2024)` : pe || commute ? (minor ? "+ 0 after school" : "+ 0 after classes") : "+ 0, no activity",
       pctLine,
       `= ${kcal.toLocaleString("en")} kcal`,
     ] };
