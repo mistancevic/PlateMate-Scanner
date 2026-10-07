@@ -895,3 +895,7 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 
 /* a food added today, on the Foods list (canvas C5) */
 .new-mark { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 8px; background: var(--brand); color: #fff; font-size: 11px; font-weight: 900; vertical-align: 2px; }
+
+/* adding photos to a food: its own part, under the photos, one button below the other (8 October 2026) */
+.photo-add { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 12px; }
+.photo-add .g-add { width: 100%; height: 48px; justify-content: center; font-size: 15px; }

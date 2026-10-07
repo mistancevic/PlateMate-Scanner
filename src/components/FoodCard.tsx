@@ -73,17 +73,18 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
           <div><b>{food.name}</b><small>{food.brand || "no brand"}{food.barcode ? ` · ${food.barcode}` : ""}</small></div>
           {toggleFavorite && <button className={`fav ${food.favorite ? "on" : ""}`} onClick={toggleFavorite} aria-pressed={!!food.favorite} aria-label={food.favorite ? "Remove from favourites" : "Add to favourites"}>{food.favorite ? "★" : "☆"}</button>}
         </div>
-        {(gallery.length > 1 || addPhoto) && (
+        {gallery.length > 1 && (
           <div className="food-gallery" aria-label="Photos of this product">
-            {gallery.length > 1 && gallery.map((src, i) => <button key={i} className="g-thumb" onClick={() => setViewAt(i)} aria-label={`Photo ${i + 1}`}><img src={src} alt="" /></button>)}
-            {/* two ways in (Milan, 8 October 2026): newer Android phones open only their photo picker for a plain file field,
-                without the camera, so the camera has its own button; on a computer there is no camera to offer */}
-            {addPhoto && gallery.length < 6 && (
-              <>
-                {hasCamera && <button className="g-add" onClick={() => camRef.current?.click()}><Camera size={16} /><span>{gallery.length ? "Take a photo" : "Take a photo of the front"}</span></button>}
-                <button className="g-add" onClick={() => fileRef.current?.click()}><ImageIcon size={16} /><span>{hasCamera ? "Choose a photo" : gallery.length ? "Add a photo" : "Add a photo of the front"}</span></button>
-              </>
-            )}
+            {gallery.map((src, i) => <button key={i} className="g-thumb" onClick={() => setViewAt(i)} aria-label={`Photo ${i + 1}`}><img src={src} alt="" /></button>)}
+          </div>
+        )}
+        {/* adding photos is its own part, under the photos, one button below the other (Milan, 8 October 2026). Two ways in:
+            newer Android phones open only their photo picker for a plain file field, without the camera, so the camera has
+            its own button; on a computer there is no camera to offer */}
+        {addPhoto && gallery.length < 6 && (
+          <div className="photo-add" aria-label="Add a photo">
+            {hasCamera && <button className="g-add" onClick={() => camRef.current?.click()}><Camera size={18} /><span>{gallery.length ? "Take a photo" : "Take a photo of the front"}</span></button>}
+            <button className="g-add" onClick={() => fileRef.current?.click()}><ImageIcon size={18} /><span>{hasCamera ? "Choose a photo" : gallery.length ? "Add a photo" : "Add a photo of the front"}</span></button>
             {[camRef, fileRef].map((ref, k) => (
               <input key={k} ref={ref} type="file" accept="image/*" hidden {...(k === 0 ? { capture: "environment" as const } : {})} onChange={(e) => {
                 const file = e.target.files?.[0]; e.target.value = ""; if (!file || !addPhoto) return;

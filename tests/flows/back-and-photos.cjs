@@ -31,7 +31,7 @@ seed.foods = seed.foods.map((f) => /Skyr/.test(f.name) ? { ...f, photos: [jpg, j
     ok(await skyr.locator(".new-mark").count() === 1, "a food added today is marked New");
     ok(await page.locator(".row-text").filter({ hasText: "Nutella" }).first().locator(".new-mark").count() === 0, "an older food is not");
     await skyr.locator(".name-link").click(); await page.waitForTimeout(400);
-    ok(await page.locator('.food-gallery input[type=file][capture]').count() === 1 && await page.locator('.food-gallery input[type=file]:not([capture])').count() === 1, "a photo can be taken with the camera, or chosen from the phone's photos");
+    ok(await page.locator('.photo-add input[type=file][capture]').count() === 1 && await page.locator('.photo-add input[type=file]:not([capture])').count() === 1, "a photo can be taken with the camera, or chosen from the phone's photos");
     await page.locator(".g-thumb").first().click(); await page.waitForTimeout(300);
     ok((await count()) === "1 of 3", "the photo says 1 of 3");
     await page.getByRole("button", { name: "Next photo" }).click(); await page.waitForTimeout(200);
