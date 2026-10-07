@@ -33,7 +33,8 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(after.some((x) => /Taurin.*added by you/.test(x)), "an extra line is marked as added by you");
   await page.getByLabel(/I checked the values/).check();
   await page.getByRole("button", { name: /Confirm & save food/ }).click(); await page.waitForTimeout(500);
-  await page.locator(".name-link, .row-text b").filter({ hasText: "Test Riegel" }).first().click(); await page.waitForTimeout(300);
+  // since 0.1.83 (Milan, 7 October 2026) a new food saved from Foods opens its own card, so there is nothing to tap here
+  ok(await page.locator(".foodcard-head b").filter({ hasText: "Test Riegel" }).count() === 1, "the new food's card opens by itself");
   const card = await page.locator(".label-table .lt-name").allTextContents();
   ok(card.length === 9, "the card shows all nine lines: " + card.join(", "));
   ok(/saturates/.test(card[2] || ""), "same order on the card");

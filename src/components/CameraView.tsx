@@ -55,6 +55,11 @@ export function CameraView({
   const streamRef = useRef<MediaStream | null>(null);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const [typedCode, setTypedCode] = useState("");
+  // typing the code by hand: the camera stops reading and the green line stands still until the field is left empty
+  // (Milan, 7 October 2026); a typed code's pack photos wait for the pack to come into view, not for a still room
+  const [typingFocus, setTypingFocus] = useState(false);
+  const typing = typingFocus || typedCode.trim() !== "";
+  const typedRef = useRef(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [stagedGroupImages, setStagedGroupImages] = useState<string[]>([]);
   // Barcode: the code read, kept while the person adds the pack's photos; the camera stays open
@@ -175,7 +180,7 @@ export function CameraView({
     if (!auto || (scannerMode === "barcode" && !codeRead) || cameraError) { setSteady(0); return; }
     const small = document.createElement("canvas"); small.width = 48; small.height = 48;
     const sctx = small.getContext("2d", { willReadFrequently: true });
-    let prev: Uint8ClampedArray | null = null, still = 0, armed = true, last = performance.now();
+    let prev: Uint8ClampedArray | null = null, still = 0, armed = !(scannerMode === "barcode" && typedRef.current), last = performance.now();
     const id = window.setInterval(() => {
       const v = videoRef.current; if (!v || !sctx || v.videoWidth === 0 || busyRef.current) return;
       sctx.drawImage(v, 0, 0, 48, 48);
@@ -198,7 +203,7 @@ export function CameraView({
 
   // Barcode: read live from the camera, a few times a second; the phone's own detector where it has one.
   useEffect(() => {
-    if (scannerMode !== "barcode" || cameraError) return;
+    if (scannerMode !== "barcode" || cameraError || typing) return;
     const Detector = (window as any).BarcodeDetector;
     const native = Detector ? new Detector({ formats: ["ean_13", "ean_8", "upc_a", "upc_e", "code_128"] }) : null;
     const reader = native ? null : new BrowserMultiFormatReader();
@@ -215,12 +220,12 @@ export function CameraView({
           grab.getContext("2d")?.drawImage(v, 0, 0, grab.width, grab.height);
           try { code = (await reader!.decodeFromImageUrl(grab.toDataURL("image/jpeg", 0.85))).getText(); } catch { code = ""; }
         }
-        if (/^\d{8,14}$/.test(code)) { done = true; try { navigator.vibrate?.(60); } catch {} setCodeRead(code); }
+        if (/^\d{8,14}$/.test(code)) { done = true; typedRef.current = false; try { navigator.vibrate?.(60); } catch {} setCodeRead(code); }
       } catch { /* keep looking */ } finally { working = false; }
     }, native ? 250 : 450);
     return () => { done = true; window.clearInterval(id); reader?.reset(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [scannerMode, cameraError, codeRead]);
+  }, [scannerMode, cameraError, codeRead, typing]);
 
   const handleShutterClick = async () => {
     if (busyRef.current) return;
@@ -363,7 +368,7 @@ export function CameraView({
                 {staged.length > 0
                   ? `${staged.length} ${staged.length === 1 ? "PHOTO" : "PHOTOS"} READY · ADD MORE OR TAP ANALYZE`
                   : scannerMode === "barcode"
-                    ? codeRead ? `CODE READ · ADD THE PACK'S FRONT AND BACK` : "HOLD THE BARCODE INSIDE THE FRAME"
+                    ? codeRead ? `CODE READ · ADD THE PACK'S FRONT AND BACK` : typing ? "PAUSED WHILE YOU TYPE THE CODE" : "HOLD THE BARCODE INSIDE THE FRAME"
                     : scannerMode === "group"
                       ? "WHOLE PRODUCT · ONE SIDE PER PHOTO"
                       : "THE NUTRITION TABLE · ONE SIDE PER PHOTO"}
@@ -391,7 +396,7 @@ export function CameraView({
                   : `w-[85%] max-w-sm aspect-[3/4] border-2 rounded-3xl shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] ${error ? "border-red-500/80" : "border-white/40"}`
               }`}
             >
-              {scannerMode === "barcode" && (
+              {scannerMode === "barcode" && !typing && (
                 <motion.div
                   className="absolute left-0 right-0 h-1 bg-green-500 shadow-[0_0_15px_3px_rgba(34,197,94,0.9)] opacity-80"
                   animate={{ top: ["0%", "98%", "0%"] }}
@@ -464,8 +469,8 @@ export function CameraView({
           </div>
         )}
         {scannerMode === "barcode" && !codeRead && (
-          <form className="typed-barcode" onSubmit={(e) => { e.preventDefault(); const v = typedCode.trim(); if (/^\d{8,14}$/.test(v)) { setCodeRead(v); setTypedCode(""); } }}>
-            <input value={typedCode} onChange={(e) => setTypedCode(e.target.value)} inputMode="numeric" placeholder="or type the barcode" aria-label="Type the barcode" enterKeyHint="go" />
+          <form className="typed-barcode" onSubmit={(e) => { e.preventDefault(); const v = typedCode.trim(); if (/^\d{8,14}$/.test(v)) { typedRef.current = true; setTypingFocus(false); setCodeRead(v); setTypedCode(""); } }}>
+            <input value={typedCode} onChange={(e) => setTypedCode(e.target.value)} onFocus={() => setTypingFocus(true)} onBlur={() => setTypingFocus(false)} inputMode="numeric" placeholder="or type the barcode" aria-label="Type the barcode" enterKeyHint="go" />
             <button type="submit" disabled={!/^\d{8,14}$/.test(typedCode.trim())}>Look up</button>
           </form>
         )}
@@ -474,7 +479,7 @@ export function CameraView({
             {auto ? "Auto shot: hold still" : "Manual shot: tap to take"}
           </button>
         )}
-        {!cameraError && scannerMode === "barcode" && !codeRead && <p className="auto-switch auto-note">Reads by itself. Hold the code inside the frame.</p>}
+        {!cameraError && scannerMode === "barcode" && !codeRead && <p className="auto-switch auto-note">{typing ? "Paused while you type. Leave the field empty to read with the camera again." : "Reads by itself. Hold the code inside the frame."}</p>}
         {!cameraError && (
           <div className="relative flex items-center justify-center w-full max-w-sm">
             {/* Gallery Button */}

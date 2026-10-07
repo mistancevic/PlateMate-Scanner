@@ -85,3 +85,63 @@ test("a copy that lost most of its foods sends no deleted notes: a wrong copy is
   assert.equal(changes(st(foods.slice(0, 2)), known, "10:05", true).dels.length, 0, "8 of 10 gone: nothing deleted");
   assert.equal(changes(st(foods.slice(0, 9)), known, "10:05", true).dels.length, 1, "one gone: one deleted note");
 });
+
+// Milan's test, 7 October 2026: a bar scanned with two photos on the phone showed on the laptop without its photos; a photo
+// added on the laptop never reached the phone. The record now says which photos the food has, and the other phone fetches them.
+import { photosWanted, withPhotos, photosOf, sig } from "./photos";
+const J = (x: string) => `data:image/jpeg;base64,${x.repeat(30)}`;
+// what fetching the files gives: the photos the first phone sent, by key
+const fetchFor = (s: any, from: any) => { const all = photosOf(from), got = new Map<string, string>(); for (const k of photosWanted(s).keys()) if (all.has(k)) got.set(k, all.get(k)!); return got; };
+
+test("photos added on one phone reach the other, whole, and nothing is sent back", () => {
+  const acc = account();
+  const phoneA = phone(acc, st([food("bar", "Protein bar", { photo: J("T"), photos: [J("A"), J("B")] })])); phoneA.sync("10:00");
+  const laptop = phone(acc, st([])); laptop.sync("10:01");
+  assert.equal(laptop.s.foods[0].photos, undefined, "the record carries no photos");
+  assert.deepEqual([...photosWanted(laptop.s).keys()].sort(), ["food:bar", "food:bar:1", "food:bar:2"]);
+  const got = fetchFor(laptop.s, phoneA.s);
+  laptop.s = withPhotos(laptop.s, got, new Set(got.keys()));
+  assert.deepEqual(laptop.s.foods[0].photos, [J("A"), J("B")]); assert.equal(laptop.s.foods[0].photo, J("T"));
+  assert.equal(laptop.sync("10:02").ups.length, 0, "the laptop sends nothing back");
+  assert.equal(photosWanted(laptop.s).size, 0);
+});
+
+test("a photo added on the laptop replaces the phone's set; the phone never sends its older set back", () => {
+  const acc = account();
+  const p = phone(acc, st([food("pam", "PAM bar", { photos: [] })])); p.sync("10:00");
+  const laptop = phone(acc, st([])); laptop.sync("10:01");
+  laptop.edit("10:02", (s) => st(s.foods.map((f: any) => ({ ...f, photo: J("t"), photos: [J("shot")] })))); laptop.sync("10:02");
+  const c = p.sync("10:03");
+  assert.equal(c.ups.length, 0, "the phone doesn't send its empty set back");
+  assert.equal(p.s.foods[0].photos, undefined, "its old set is let go, to be fetched");
+  const got = fetchFor(p.s, laptop.s);
+  p.s = withPhotos(p.s, got, new Set(got.keys()));
+  assert.deepEqual(p.s.foods[0].photos, [J("shot")]);
+  assert.equal(p.sync("10:04").ups.length, 0);
+});
+
+test("half a set is never taken: a photo still on its way leaves the food waiting", () => {
+  const acc = account();
+  const a = phone(acc, st([food("f", "Skyr", { photo: J("t"), photos: [J("1"), J("2")] })])); a.sync("10:00");
+  const b = phone(acc, st([])); b.sync("10:01");
+  const got = fetchFor(b.s, a.s); got.delete("food:f:2");
+  b.s = withPhotos(b.s, got, new Set(got.keys()));
+  assert.equal(b.s.foods[0].photos, undefined);
+  assert.equal(b.sync("10:02").ups.length, 0, "nothing sent while waiting");
+  // the phone's own store fills a set only with photos whose fingerprint matches
+  const wrong = new Map([["food:f", J("t")], ["food:f:1", J("1")], ["food:f:2", J("old")]]);
+  assert.equal(withPhotos(b.s, wrong).foods[0].photos, undefined);
+  assert.equal(sig(J("2")) === sig(J("old")), false);
+});
+
+test("a photo removed on one phone goes on the other, from its own store", () => {
+  const acc = account();
+  const a = phone(acc, st([food("f", "Skyr", { photo: J("t"), photos: [J("1"), J("2")] })])); a.sync("10:00");
+  const b = phone(acc, st([])); b.sync("10:01");
+  const all = photosOf(a.s); b.s = withPhotos(b.s, all, new Set(all.keys())); b.sync("10:01:30");
+  a.edit("10:02", (s) => st(s.foods.map((f: any) => ({ ...f, photos: [J("1")] })))); a.sync("10:02");
+  b.sync("10:03");
+  b.s = withPhotos(b.s, all); // the store still holds all three; only the matching ones are taken
+  assert.deepEqual(b.s.foods[0].photos, [J("1")]);
+  assert.equal(b.sync("10:04").ups.length, 0);
+});

@@ -39,7 +39,7 @@ import { Starting } from "./components/Starting";
 import { Welcome, AdultOnly } from "./components/Welcome";
 import { openStats } from "./openStats";
 import { merge as mergeRecords, changes as recordChanges, type Known } from "./records";
-import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear } from "./photos";
+import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted } from "./photos";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
@@ -256,7 +256,7 @@ function LabelCheck({
   images?: string[];
   library?: Food[];
   close: () => void;
-  save: (f: Food) => void;
+  save: (f: Food, opts?: { open?: boolean }) => void;
   mixFor?: (f: Food) => MixTip;
   onMix?: (f: Food, m: Mix) => void;
   onAsk?: (f: Food, tip: MixTip) => void;
@@ -362,8 +362,8 @@ function LabelCheck({
     const match = isNew ? findMatch(f, library ?? []) : null;
     const finish = (g: Food) => {
       const saved = match && choice === "update" ? { ...mergeFoods(match.food, g), reviewedAt: g.reviewedAt } : g;
-      save(saved);
       const m = pendingMix.current; pendingMix.current = null;
+      save(saved, { open: isNew && !(match && choice === "update") && !(m && onMix) && addTo !== "plate" });
       if (m && onMix) onMix(saved, m);
     };
     const raw = (images && images.length ? images : image ? [image] : []);
@@ -761,8 +761,9 @@ export default function App() {
         r.known = m.known;
         if (m.changed) {
           cur = m.state; fromCloud.current = true; setState(m.state);
-          // photos of foods that came from the account come from the photo store
-          void photoRef.current.busy.then(() => storeAll()).then(mergePhotos).catch(() => {});
+          // photos of foods that came from the account: from the photo store, and from the account's files
+          void photoRef.current.busy.then(() => storeAll()).then((m) => mergePhotos(m)).catch(() => {});
+          void pullFiles();
         }
         r.pulled = true;
       }
@@ -831,9 +832,51 @@ export default function App() {
     void syncFiles();
   };
   // photos that arrive from the store or the account: added where the state has none, never stamped as a change made here
-  const mergePhotos = (photos: Map<string, string>) => {
+  const mergePhotos = (photos: Map<string, string>, accept?: Set<string>) => {
     if (!photos.size) return;
-    setState((st) => { const next = withPhotos(st, photos); if (next !== st) fromCloud.current = true; return next; });
+    setState((st) => { const next = withPhotos(st, photos, accept); if (next !== st) fromCloud.current = true; return next; });
+  };
+  // Photos from the account: the ones a food or card names that this phone doesn't hold (added or changed on another
+  // phone), and on opening, any file the state has no photo for. Fetched a few at a time, previews first; a file that isn't
+  // there yet (the other phone is still sending it) is looked for again in 20 seconds, twice at most per photo.
+  const pullRef = useRef({ running: false, again: false, list: false, tries: new Map<string, number>(), timer: 0 });
+  const pullFiles = async (list = false) => {
+    const fr = filesRef.current, uid = fr.uid, pr = pullRef.current;
+    if (!cloudEnabled || !uid || !remoteMeta.current.photosMovedAt) return;
+    if (pr.running) { pr.again = true; pr.list = pr.list || list; return; }
+    pr.running = true;
+    let waiting = false;
+    try {
+      do {
+        const listNow = list || pr.list;
+        pr.again = false; pr.list = false; list = false;
+        await photoRef.current.busy.catch(() => {});
+        const st = stateRef.current, known = photoRef.current.known;
+        const want = photosWanted(st);
+        const need = new Map<string, string>();
+        for (const [k, s] of want) if (known.get(k) !== s) need.set(k, s);
+        if (listNow) {
+          const names = await listPhotoFiles(uid);
+          if (filesRef.current.uid !== uid) return;
+          const have = photosOf(stateRef.current);
+          for (const k of names.map(keyOf)) if (!have.has(k) && !known.has(k) && !want.has(k) && !isOrphan(k, stateRef.current)) need.set(k, "");
+        }
+        const keys = [...need.keys()].filter((k) => (pr.tries.get(k + need.get(k)) ?? 0) < 3).sort((a, b) => Number(isPreview(b)) - Number(isPreview(a)));
+        const store = want.size ? await storeAll().catch(() => new Map<string, string>()) : new Map<string, string>();
+        const got = new Map(store), accept = new Set<string>();
+        for (let i = 0; i < keys.length; i += 6) {
+          for (const k of keys.slice(i, i + 6)) {
+            const t = k + need.get(k); pr.tries.set(t, (pr.tries.get(t) ?? 0) + 1);
+            try { const d = await downloadPhoto(uid, fileOf(k)); got.set(k, d); accept.add(k); fr.up.set(k, sig(d)); } catch { waiting = true; }
+            if (filesRef.current.uid !== uid) return;
+          }
+          saveUp(); mergePhotos(got, accept);
+        }
+        if (!keys.length && got.size) mergePhotos(got, accept);
+        if ([...need.keys()].some((k) => (pr.tries.get(k + need.get(k)) ?? 0) < 3 && !got.has(k))) waiting = true;
+      } while (pr.again);
+    } catch { waiting = true; } finally { pr.running = false; }
+    if (waiting && !pr.timer) pr.timer = window.setTimeout(() => { pr.timer = 0; void pullFiles(); }, 20_000);
   };
   // on open: the photo store fills the state; on the first open after the release, the photos in the saved data move into the store
   useEffect(() => {
@@ -1004,15 +1047,7 @@ export default function App() {
           remoteMeta.current = { ...meta, photosMovedAt: new Date().toISOString() };
         } else {
           if (!meta.photosOldGoneAt && Date.now() - Date.parse(meta.photosMovedAt) > 30 * 86_400_000) await dropOldPhotoCopies(filesFor).catch(() => {});
-          const names = await listPhotoFiles(filesFor);
-          const have = photosOf(stateRef.current);
-          const missing = names.map(keyOf).filter((k) => !have.has(k) && !photoRef.current.known.has(k) && !isOrphan(k, stateRef.current))
-            .sort((a, b) => Number(isPreview(b)) - Number(isPreview(a)));
-          for (let i = 0; i < missing.length && !stale; i += 6) {
-            const got = new Map<string, string>();
-            for (const k of missing.slice(i, i + 6)) { try { const d = await downloadPhoto(filesFor, fileOf(k)); got.set(k, d); fr.up.set(k, sig(d)); } catch { /* the next open tries again */ } }
-            saveUp(); mergePhotos(got);
-          }
+          await pullFiles(true);
         }
       } catch (e) { setCloudStatus({ ok: true, text: `Loaded. Photos: ${explainCloudError(e)}`, at: new Date().toISOString() }); }
       if (stale) return;
@@ -1050,7 +1085,7 @@ export default function App() {
   }, [user?.uid, profile.role]);
   // when the app comes back to the front, pick up what another phone changed meanwhile (storage release 2)
   useEffect(() => {
-    const onShow = () => { if (document.visibilityState === "visible" && cloudLoaded.current) void syncRecords(true); };
+    const onShow = () => { if (document.visibilityState === "visible" && cloudLoaded.current) { void syncRecords(true); void pullFiles(); } };
     document.addEventListener("visibilitychange", onShow);
     return () => document.removeEventListener("visibilitychange", onShow);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1158,7 +1193,7 @@ export default function App() {
     setEditFrom(from);
     setEdit(candidateFood({ product_name: name, brand, ...(barcode ? { barcode } : {}) }, "Manual entry"));
   }
-  function saveFood(f: Food) {
+  function saveFood(f: Food, opts?: { open?: boolean }) {
     const existed = state.foods.some((x) => x.id === f.id);
     setImage(""); setImageSet([]);
     setState((s) => ({
@@ -1173,9 +1208,9 @@ export default function App() {
     setPending((p) =>
       p.filter((x) => x.name !== f.name || x.brand !== f.brand),
     );
-    notify(
-      "Saved on this device. Existing recipes keep their original food data.",
-    );
+    // journey invariant (Milan, 7 October 2026): a new food added on Foods opens its card, so you see what was saved
+    if (opts?.open) { setOpenFoodId(f.id); setTab("foods"); notify(`${f.name} is in your foods.`); return; }
+    notify(`${f.name} is in your foods.`);
   }
   function add(food: Food) {
     log("food_in", { way: food.barcode ? "barcode" : food.source === "label" ? "label" : food.source === "manual" ? "manual" : "saved", source: food.source });
@@ -1510,6 +1545,11 @@ export default function App() {
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },
     addFoodPhoto: async (foodId: string, dataUrl: string) => {
+      // photos taken on another phone that haven't arrived yet: adding now would take the place of one of them
+      const f0 = stateRef.current.foods.find((f) => f.id === foodId) as any;
+      if (f0 && !f0.photos?.length && !f0.photo && ((f0.photoSigs ?? []).some(Boolean) || (f0.photoCount ?? 0) > 0)) {
+        void pullFiles(); setError("This food's photos are still coming from your account. Try again in a moment."); return;
+      }
       const [thumb, big] = await Promise.all([thumbnailBase64(dataUrl).catch(() => ""), resizeImageBase64(dataUrl, 900, 900).catch(() => "")]);
       if (!big) { setError("This photo could not be read. Try another one."); return; }
       // a food's picture stays its first photo (journey invariant, 5 October 2026: the picture plus the added photos)

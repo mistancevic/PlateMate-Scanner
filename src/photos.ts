@@ -34,15 +34,55 @@ export function photosOf(state: any): Map<string, string> {
   return out;
 }
 
+// What a food or a card says about its photos, for the other phones: the fingerprint of the preview first, then of each
+// larger copy, "" where there is none. Only from photos that are here; undefined when they have not loaded.
+export function photoSigsOf(x: any): string[] | undefined {
+  if (!x || typeof x !== "object") return undefined;
+  if (Array.isArray(x.photos)) return [isData(x.photo) ? sig(x.photo) : "", ...x.photos.map((p: unknown) => (isData(p) ? sig(p) : ""))];
+  if (isData(x.photo)) return [sig(x.photo)];
+  return undefined;
+}
+const loaded = (f: any) => Array.isArray(f?.photos) || isData(f?.photo);
+const same = (a?: string[], b?: string[]) => Boolean(a && b && a.join() === b.join());
+
+// Photos another phone added or changed: a food from the account says which photos it has (photoSigs); where this phone
+// doesn't hold them yet, these are the keys to fetch, with the fingerprint each should have.
+export function photosWanted(state: any): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const f of state?.foods ?? []) {
+    const want: string[] | undefined = Array.isArray(f?.photoSigs) ? f.photoSigs : undefined;
+    if (!f?.id || !want || loaded(f)) continue;
+    want.forEach((s, n) => { if (s) out.set(n === 0 ? `food:${f.id}` : `food:${f.id}:${n}`, s); });
+  }
+  for (const fb of state?.feedback ?? []) {
+    const s = Array.isArray(fb?.photoSigs) ? fb.photoSigs[0] : "";
+    if (fb?.id && s && !isData(fb.photo)) out.set(`fb:${fb.id}`, s);
+  }
+  return out;
+}
+
 // Puts photos back where they belong, only where the state has none: what the state already holds is never replaced.
-// A food whose list of photos is empty on purpose ([]) stays empty.
-export function withPhotos<T>(state: T, photos: Map<string, string>): T {
+// A food whose list of photos is empty on purpose ([]) stays empty. A food that says which photos it has (photoSigs) gets
+// them only as a whole set, each one the right one: from the phone's store when its fingerprint matches, or as fetched
+// from the account (accept). Never half a set, so this phone can't send back fewer photos than the food has.
+export function withPhotos<T>(state: T, photos: Map<string, string>, accept?: Set<string>): T {
   if (!photos.size) return state;
   const s: any = state;
   let changed = false;
   const food = (f: any) => {
     if (!f || !f.id) return f;
     if (Array.isArray(f.photos) && f.photos.length === 0 && !f.photo) return f;
+    const want: string[] | undefined = Array.isArray(f.photoSigs) ? f.photoSigs : undefined;
+    if (want) {
+      if (loaded(f) || !want.some(Boolean)) return f;
+      const pick = (k: string, n: number) => { const x = photos.get(k); return x && (accept?.has(k) || sig(x) === want[n]) ? x : undefined; };
+      const thumb = want[0] ? pick(`food:${f.id}`, 0) : undefined;
+      if (want[0] && !thumb) return f;
+      const more: string[] = [];
+      for (let n = 1; n < want.length; n++) { const x = want[n] ? pick(`food:${f.id}:${n}`, n) : undefined; if (!x) return f; more.push(x); }
+      changed = true;
+      return { ...f, photo: thumb, photos: want.length > 1 ? more : undefined };
+    }
     const thumb = f.photo ?? photos.get(`food:${f.id}`);
     let more = f.photos as string[] | undefined;
     if (!more) {
@@ -59,7 +99,8 @@ export function withPhotos<T>(state: T, photos: Map<string, string>): T {
     ...s,
     foods: (s.foods ?? []).map(food),
     feedback: (s.feedback ?? []).map((fb: any) => {
-      const photo = fb.photo || photos.get(`fb:${fb.id}`);
+      const want = Array.isArray(fb.photoSigs) ? fb.photoSigs[0] : undefined, k = `fb:${fb.id}`, x = photos.get(k);
+      const photo = fb.photo || (x && (!want || accept?.has(k) || sig(x) === want) ? x : undefined);
       if (photo !== fb.photo) changed = true;
       return { ...fb, photo, meal: fb.meal ? { ...fb.meal, items: inItems(fb.meal.items) } : fb.meal };
     }),
@@ -68,6 +109,8 @@ export function withPhotos<T>(state: T, photos: Map<string, string>): T {
   };
   return changed ? next : state;
 }
+// Whether this phone's photos of a food or card are the ones the account's copy names (or the account names none)
+export const samePhotos = (local: any, remote: any) => !Array.isArray(remote?.photoSigs) || !loaded(local) || same(photoSigsOf(local), remote.photoSigs);
 
 // The saved data without the photos that are safely in the photo store. A food or a card keeps its photos in the saved
 // data until every one of them is confirmed in the store, so nothing is ever only in memory. Copies of a library food
@@ -81,11 +124,12 @@ export function withoutStored<T>(state: T, stored: Set<string>): T {
     const keys = [...(isData(f.photo) ? [`food:${f.id}`] : []), ...((f.photos ?? []) as string[]).map((_, n) => `food:${f.id}:${n + 1}`)];
     if (!keys.length || !keys.every((k) => stored.has(k))) return;
     f.photoCount = Array.isArray(f.photos) ? f.photos.length : 0;
+    if (!copy) f.photoSigs = photoSigsOf(f);
     delete f.photo; delete f.photos;
   };
   (s.foods ?? []).forEach((f: any) => food(f));
   copiesOf(s).forEach((f) => food(f, true));
-  (s.feedback ?? []).forEach((fb: any) => { if (isData(fb?.photo) && stored.has(`fb:${fb.id}`)) { delete fb.photo; fb.hasPhoto = true; } });
+  (s.feedback ?? []).forEach((fb: any) => { if (isData(fb?.photo) && stored.has(`fb:${fb.id}`)) { fb.photoSigs = [sig(fb.photo)]; delete fb.photo; fb.hasPhoto = true; } });
   return s;
 }
 

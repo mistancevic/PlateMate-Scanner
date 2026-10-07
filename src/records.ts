@@ -2,6 +2,7 @@
 // its own "changed at" time. A phone sends only the records that changed; when it reads the account it takes the newest
 // of each record, one by one, so two changes on two phones are both kept. A deleted record leaves a "deleted" note, so
 // the other phone deletes it too instead of bringing it back. Pure functions here; the account calls are in cloud.ts.
+import { photoSigsOf, samePhotos } from "./photos";
 export type Kind = "foods" | "recipes" | "cards";
 export const KINDS: Kind[] = ["foods", "recipes", "cards"];
 // what this phone last sent or took, per record: the fingerprint of its content and its "changed at"; "-" is a deleted note
@@ -20,9 +21,10 @@ const stripFood = (f: any) => { if (f && typeof f === "object") { if (Array.isAr
 export function clean(kind: Kind, x: any): any {
   const c = JSON.parse(JSON.stringify(x ?? null));
   if (!c) return c;
-  if (kind === "foods") stripFood(c);
+  // which photos it has travels with it (the photos themselves are files), so another phone fetches the right ones
+  if (kind === "foods") { const ps = photoSigsOf(c); if (ps) c.photoSigs = ps; stripFood(c); }
   if (kind === "recipes") (c.items ?? []).forEach((i: any) => stripFood(i?.food));
-  if (kind === "cards") { delete c.photo; (c.meal?.items ?? []).forEach((i: any) => stripFood(i?.food)); }
+  if (kind === "cards") { const ps = photoSigsOf({ photo: c.photo }); if (ps) c.photoSigs = ps; delete c.photo; (c.meal?.items ?? []).forEach((i: any) => stripFood(i?.food)); }
   return c;
 }
 // a short fingerprint of a record's content, enough to see that it changed
@@ -92,7 +94,9 @@ export function merge(state: any, remote: Remote, known: Known, localAt: string)
         continue;
       }
       if (r.at > localWhen) {
-        const keep = kind === "foods" ? { photo: local.photo, photos: local.photos } : kind === "cards" ? { photo: local.photo } : {};
+        // this phone's photos stay only when they are the ones the newer copy names; otherwise they are fetched again
+        const mine = samePhotos(kind === "cards" ? { photo: local.photo } : local, r.data);
+        const keep = !mine ? {} : kind === "foods" ? { photo: local.photo, photos: local.photos } : kind === "cards" ? { photo: local.photo } : {};
         list[i!] = { ...r.data, ...Object.fromEntries(Object.entries(keep).filter(([, v]) => v !== undefined)) };
         next[k] = { sig: remoteSig, at: r.at }; touched = true;
       }
