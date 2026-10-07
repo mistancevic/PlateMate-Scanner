@@ -6,6 +6,8 @@ import libraryRaw from "../../evals/library.json?raw";
 import tipRaw from "../../evals/tip-cases.json?raw";
 import numberCasesRaw from "../../evals/number-cases.json?raw";
 import numberSnapRaw from "../../evals/number-snapshot.json?raw";
+import chatGoalRaw from "../../evals/chat-goal-cases.json?raw";
+import { goalLabel } from "../goal";
 import { numbersOf, numberChecks, type NumberCase, type NumberOutput, type Snapshot } from "../numbersEval";
 import { jobOf } from "../foodjob";
 import { playbookFor, tipBreaks } from "../playbook";
@@ -26,7 +28,7 @@ const TIPS: T[] = JSON.parse(tipRaw).cases;
 const food = (id: string) => LIB.find((f) => f.id === id)!;
 const KEY = "chefmealan-evals";
 const load = (): Record<string, Result> => { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; } };
-const TYPES = ["all", "numbers", "code", "tip", "missing", "goes-with", "better-match", "texture", "cheaper", "constraint", "adversarial"];
+const TYPES = ["all", "numbers", "goal chat", "code", "tip", "missing", "goes-with", "better-match", "texture", "cheaper", "constraint", "adversarial"];
 
 // Numbers (7 October 2026): ten people from the dimensions; the app's numbers, the checks every answer must hold,
 // and the coach's label. No judge: the calculation is deterministic, so the coach's pass is the reference.
@@ -47,6 +49,31 @@ function NumbersOut({ o }: { o: NumberOutput }) {
       {o.days.length > 0 && <ol className="eval-list">{o.days.map((d) => <li key={d.name}><b>{d.name}</b> {d.kcal.toLocaleString("en")} kcal, {d.carbs} g carbs · {d.what}</li>)}</ol>}
     </>
   );
+}
+
+// Goal chat (7 October 2026): the chat's advice against About your goal. Code checks catch what a coach would never say,
+// and Milan's rule that no food is good or bad by itself; the coach labels the rest.
+type CG = { id: string; goal: string; moment: string; pd: number; text: string; look: string };
+const CHATS: CG[] = JSON.parse(chatGoalRaw).cases;
+const NEVER = ["cheat meal", "cheat day", "guilt", "bad food", "junk food", "unhealthy", "clean eating", "detox", "starve", "dirty bulk", "eat as much as you can", "skip dinner", "skip the meal", "skip a meal", "lose weight fast"];
+async function runChat(c: CG): Promise<Result> {
+  const plate: any[] = [];
+  const library = LIB.slice(0, 20).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein }));
+  const t0 = performance.now();
+  const res = await fetch("/api/out", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ text: c.text, history: [], target: { pd: c.pd, mealKcal: 800 }, plate, library, rhythm: [], moment: c.moment, region: "munich", goal: c.goal }) });
+  const data = await res.json(); const ms = Math.round(performance.now() - t0);
+  if (!res.ok) return { at: new Date().toISOString(), ms, output: { error: data.error }, checks: { answered: false } };
+  const reply: string = data.reply ?? "";
+  const all = `${reply} ${(data.picks ?? []).map((p: any) => p.name).join(" ")} ${(data.skip ?? []).join(" ")}`.toLowerCase();
+  const said = NEVER.filter((w) => all.includes(w));
+  const checks: Record<string, boolean> = {
+    "answered": reply.trim().length > 0,
+    "no food called good or bad, no guilt, no crash advice": said.length === 0,
+    "at most three sentences before any list": (reply.match(/[.!?](\s|$)/g) ?? []).length <= 3,
+    "no grams stated (the app sets amounts)": !/\b\d+\s?(g|grams?)\b/i.test(reply),
+    "under 8 seconds": ms < 8000,
+  };
+  return { at: new Date().toISOString(), ms, output: { ...data, said }, checks };
 }
 
 function runCode(g: G): Result {
@@ -115,15 +142,16 @@ export function EvalsScreen(p: AppApi) {
 
   const cases = useMemo(() => [
     ...NUMBERS.map((n) => ({ id: n.id, kind: "numbers" as const, title: n.title, tags: ["numbers", ...Object.values(n.dimensions)], n })),
+    ...CHATS.map((g) => ({ id: g.id, kind: "chat" as const, title: g.text, tags: ["goal chat", goalLabel(g.goal), g.moment], cg: g })),
     ...GOLDEN.map((g) => ({ id: g.id, kind: "code" as const, title: `${g.plate.map((x) => food(x.food).name.split(",")[0]).join(" + ")}, without ${food(g.missing).name.split(",")[0]}`, tags: ["code", "swap ranking", `target ${g.target}`], g })),
     ...TIPS.map((t) => ({ id: t.id, kind: "tip" as const, title: `Pro tip: ${food(t.food).name}, ${t.goal}${t.moments.length ? ", " + t.moments.join(", ") : ""}`, tags: ["tip", t.goal, ...t.moments], t })),
     ...QUESTIONS.map((q) => ({ id: q.id, kind: "model" as const, title: q.question, tags: [q.dimensions.question, q.dimensions.identity, q.dimensions.goal, q.dimensions.situation, q.dimensions.place], q })),
   ], []);
-  const shown = cases.filter((c: any) => type === "all" || (type === "numbers" ? c.kind === "numbers" : type === "code" ? c.kind === "code" : type === "tip" ? c.kind === "tip" : c.kind === "model" && c.q.dimensions.question === type));
+  const shown = cases.filter((c: any) => type === "all" || (type === "numbers" ? c.kind === "numbers" : type === "goal chat" ? c.kind === "chat" : type === "code" ? c.kind === "code" : type === "tip" ? c.kind === "tip" : c.kind === "model" && c.q.dimensions.question === type));
 
   async function run(c: (typeof cases)[number]) {
     setRunning(c.id);
-    try { const r = c.kind === "numbers" ? runNumbers((c as any).n) : c.kind === "code" ? runCode((c as any).g) : c.kind === "tip" ? await runTip((c as any).t) : await runModel((c as any).q); const prev = load()[c.id]; put(c.id, { ...r, label: prev?.label, reason: prev?.reason, coachKcal: prev?.coachKcal, coachProtein: prev?.coachProtein }); }
+    try { const r = c.kind === "numbers" ? runNumbers((c as any).n) : c.kind === "chat" ? await runChat((c as any).cg) : c.kind === "code" ? runCode((c as any).g) : c.kind === "tip" ? await runTip((c as any).t) : await runModel((c as any).q); const prev = load()[c.id]; put(c.id, { ...r, label: prev?.label, reason: prev?.reason, coachKcal: prev?.coachKcal, coachProtein: prev?.coachProtein }); }
     catch (e: any) { p.setError(e.message); } finally { setRunning(null); }
   }
   async function runAll() { for (const c of shown) { await run(c); } }
@@ -171,12 +199,12 @@ export function EvalsScreen(p: AppApi) {
             </button>
             {isOpen && (
               <div className="eval-body">
-                {c.kind === "numbers" ? <p className="small"><b>Look for:</b> {(c as any).n.look}</p> : c.kind === "tip" ? <small>Expect: {(c as any).t.note}</small> : <small>Plate: {(c.kind === "code" ? (c as any).g.plate : (c as any).q.plate).map((x: any) => `${x.grams} g ${food(x.food).name}`).join(" · ")}</small>}
+                {c.kind === "chat" ? <p className="small"><b>Look for:</b> {(c as any).cg.look} <span className="muted">Goal: {goalLabel((c as any).cg.goal)}. The chat reads its About your goal page.</span></p> : c.kind === "numbers" ? <p className="small"><b>Look for:</b> {(c as any).n.look}</p> : c.kind === "tip" ? <small>Expect: {(c as any).t.note}</small> : <small>Plate: {(c.kind === "code" ? (c as any).g.plate : (c as any).q.plate).map((x: any) => `${x.grams} g ${food(x.food).name}`).join(" · ")}</small>}
                 <div className="button-row" style={{ margin: "8px 0" }}><button className="pill pill-small" disabled={!!running} onClick={() => run(c)}><Play size={14} /> Run</button></div>
                 {r && (
                   <>
                     <p className="label">Output{r.ms !== undefined ? `, ${r.ms} ms` : ""}</p>
-                    {c.kind === "numbers" ? (r.output.error ? <p className="small">{r.output.error}</p> : <NumbersOut o={r.output} />) : c.kind === "code" ? (
+                    {c.kind === "chat" ? (r.output.error ? <p className="small">{r.output.error}</p> : <><p className="helper-reply">{r.output.reply}</p><ol className="eval-list">{(r.output.picks ?? []).map((x: any, k: number) => <li key={k}>{x.name}</li>)}</ol>{r.output.said?.length > 0 && <p className="small">Said: {r.output.said.join(", ")}</p>}</>) : c.kind === "numbers" ? (r.output.error ? <p className="small">{r.output.error}</p> : <NumbersOut o={r.output} />) : c.kind === "code" ? (
                       <ol className="eval-list">{r.output.swaps.map((s: any, k: number) => <li key={k}>{s.food}, {s.grams ?? "–"} g{s.fits ? "" : " (doesn't reach the target)"}</li>)}</ol>
                     ) : r.output.error ? <p className="small">{r.output.error}</p> : (
                       <>

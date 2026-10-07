@@ -16,8 +16,10 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   const expect = (label, ok, got) => { console.log(ok ? "ok  " : "FAIL", label, got !== undefined ? "-> " + JSON.stringify(got) : ""); if (!ok) process.exitCode = 1; };
   await page.getByRole("button", { name: "Menu" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /Evals/ }).click(); await page.waitForTimeout(300);
-  // ten Numbers cases joined on 7 October 2026: 60 in all
-  expect("60 scenarios listed: ten numbers, ten Pro tips", (await page.locator(".eval-case").count()) === 60, await page.locator(".eval-case").count());
+  // ten Numbers cases and eight goal chat cases joined on 7 October 2026: 68 in all
+  expect("68 scenarios listed: ten numbers, eight goal chats, ten Pro tips", (await page.locator(".eval-case").count()) === 68, await page.locator(".eval-case").count());
+  await page.getByRole("button", { name: /^goal chat$/ }).click(); await page.waitForTimeout(200);
+  expect("eight goal chat cases, each against a goal", (await page.locator(".eval-case").count()) === 8 && /Build muscle · Steady/.test(await page.locator(".eval-case").first().textContent()), await page.locator(".eval-case").count());
   // Numbers: the ten people, every check, the coach's label and own numbers
   await page.getByRole("button", { name: /^numbers$/ }).click(); await page.waitForTimeout(200);
   await page.getByRole("button", { name: /Run 10/ }).click(); await page.waitForTimeout(600);

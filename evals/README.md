@@ -25,6 +25,7 @@ the numbers is shown to the coach first, then recorded with `npm run eval:number
 |---|---|---|---|
 | Code | `swap-golden.json` | `npm run eval:code` | 10/10 feasible, never the missing food; coach pick in top 3 for 8/10 |
 | Numbers | `number-cases.json`, `number-snapshot.json` | `npm test` (every push), `npm run eval:numbers` | every check holds; numbers as recorded; a case the coach passed stays within 5 % of the coach's calories and 10 g of the coach's protein |
+| Goal chat | `chat-goal-cases.json` | Menu, Evals, goal chat (server running, key set) | answered; no food called good or bad, no guilt, no crash advice; at most three sentences; no grams; under 8 s; the coach labels whether the advice matches About your goal |
 | Model | `plate-questions.jsonl` | `npm run eval:model` (server running, key set) | grounded 100 %, shape 100 %, forbidden 0, relevance ≥ 4, p50 < 5 s |
 | Human vs judge | `results/*.csv` | `npm run eval:align` | agreement ≥ 8 of 10 |
 

@@ -184,7 +184,7 @@ export function JourneyScreen(p: AppApi) {
   if (step === "in")
     return (
       <>
-        <Head title="What are you craving?" sub={`Products in, ${CHEF_NAME} does the amounts.`} />
+        <Head title="What are you craving?" sub={`Add your foods. ${CHEF_NAME} sets the amounts.`} />
         <p className="label">When is this for?</p>
         <div className="moments">
           {orderMoments(p.usual).map((m) => (
@@ -266,7 +266,7 @@ export function JourneyScreen(p: AppApi) {
                 <div className="row row-food" key={f.id}>
                   <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
                   <div className="row-text"><b>{f.favorite && <span className="fav-mark" aria-label="Favourite">★ </span>}{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}{pdText(density(f.protein, f.calories))}{why === "often" ? " · often" : ""}</small></div>
-                  <button className={`pill pill-small ${inList ? "" : "pill-primary"}`} disabled={inList} onClick={() => add(f)}>{inList ? "In" : <><Plus size={14} /> Add</>}</button>
+                  <button className={`pill pill-small ${inList ? "" : "pill-primary"}`} disabled={inList} onClick={() => add(f)}>{inList ? "On plate" : <><Plus size={14} /> Add</>}</button>
                 </div>
               );
             })}

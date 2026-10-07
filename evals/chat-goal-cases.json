@@ -1,0 +1,69 @@
+{
+ "about": "Chat evals against About your goal (7 October 2026): the chat's advice should match the goal's page. Code checks catch the words a coach would never use; the coach labels the rest on Menu, Evals.",
+ "cases": [
+  {
+   "id": "C01",
+   "goal": "gainsteady",
+   "moment": "after-training",
+   "pd": 5.7,
+   "text": "I'm at a kebab place after training. What fits?",
+   "look": "Protein first, a normal portion with carbs around training. No bulking talk: Steady means a small surplus."
+  },
+  {
+   "id": "C02",
+   "goal": "gainsteady",
+   "moment": "regular",
+   "pd": 5.7,
+   "text": "I'm not very hungry tonight. Should I skip dinner to stay lean?",
+   "look": "Doesn't tell him to skip. Steady needs the food: a smaller plate that still brings the protein."
+  },
+  {
+   "id": "C03",
+   "goal": "fatloss",
+   "moment": "regular",
+   "pd": 7.0,
+   "text": "I'm at the bakery and I want something sweet.",
+   "look": "Something sweet that fits, sized by the app. No guilt, no 'cheat', no 'bad food'."
+  },
+  {
+   "id": "C04",
+   "goal": "fatloss",
+   "moment": "regular",
+   "pd": 7.0,
+   "text": "I had a big lunch. Should I skip dinner?",
+   "look": "No skipping or crash advice. A lighter dinner with protein, as the fat loss page says."
+  },
+  {
+   "id": "C05",
+   "goal": "gain",
+   "moment": "before-training",
+   "pd": 4.0,
+   "text": "Quick snack before the gym, I have 30 minutes.",
+   "look": "Carbs and some protein, easy to digest. Not 'eat as much as you can'."
+  },
+  {
+   "id": "C06",
+   "goal": "maintain",
+   "moment": "celebration",
+   "pd": 4.8,
+   "text": "Pizza night with friends. What do I do?",
+   "look": "Enjoys it: pizza has its place. A side or a topping that adds protein, no judgement."
+  },
+  {
+   "id": "C07",
+   "goal": "recomp",
+   "moment": "regular",
+   "pd": 6.0,
+   "text": "Canteen today has schnitzel with fries or a big salad with chicken.",
+   "look": "Compares against the target, no food called good or bad. Either can fit with the right amounts."
+  },
+  {
+   "id": "C08",
+   "goal": "performance",
+   "moment": "before-training",
+   "pd": 3.5,
+   "text": "Long run tomorrow morning. What should dinner be tonight?",
+   "look": "Carbs first, as the performance page says. Protein the same as every day."
+  }
+ ]
+}

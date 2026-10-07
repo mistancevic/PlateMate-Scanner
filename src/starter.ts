@@ -56,7 +56,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-greek",
   "name": "Greek yogurt 2%",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -73,7 +73,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-quark",
   "name": "Quark, low fat (Magerquark)",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -90,7 +90,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-cottage",
   "name": "Cottage cheese (Hüttenkäse)",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -107,7 +107,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-egg",
   "name": "Eggs",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -124,7 +124,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-chicken",
   "name": "Chicken breast, cooked",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -141,7 +141,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-salmon",
   "name": "Salmon, cooked",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -158,7 +158,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-rice",
   "name": "Rice, cooked",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -175,7 +175,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-oats",
   "name": "Oats",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -192,7 +192,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-bread",
   "name": "Wholegrain bread",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -209,7 +209,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-banana",
   "name": "Banana",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -226,7 +226,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-apple",
   "name": "Apple",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -243,7 +243,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-pb",
   "name": "Peanut butter",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -260,7 +260,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-almonds",
   "name": "Almonds",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -277,7 +277,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-honey",
   "name": "Honey",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -294,7 +294,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-whey",
   "name": "Whey protein powder",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -311,7 +311,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-milk",
   "name": "Milk 1.5%",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",
@@ -328,7 +328,7 @@ export const STARTER_FOODS: Food[] = [
  {
   "id": "f-icecream",
   "name": "Vanilla ice cream",
-  "brand": "generic, check your package",
+  "brand": "typical values, check your pack",
   "basis": "100g",
   "source": "label",
   "notes": "",

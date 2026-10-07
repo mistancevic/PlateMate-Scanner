@@ -333,9 +333,11 @@ function isMeal(m: any): m is Meal {
 }
 // Known gaps from older builds are filled before the state is judged. A food without a basis was written by v0.1.34
 // (the reference table); it is per 100 g by construction. One missing field must never make a person's whole record unreadable.
+export const TYPICAL = "typical values, check your pack";
 export function repairState(v: any): any {
   if (!v || typeof v !== "object") return v;
-  const fixFood = (f: any) => { if (f && typeof f === "object" && f.basis === undefined) f.basis = "100g"; if (f && typeof f.source !== "string") f.source = f?.source ?? "Manual entry"; return f; };
+  // plain English pass (7 October 2026): the starter foods' brand line, also in foods saved before
+  const fixFood = (f: any) => { if (f && f.brand === "generic, check your package") f.brand = TYPICAL; if (f && typeof f === "object" && f.basis === undefined) f.basis = "100g"; if (f && typeof f.source !== "string") f.source = f?.source ?? "Manual entry"; return f; };
   const fixItems = (items: any) => { if (Array.isArray(items)) for (const i of items) if (i && i.food) fixFood(i.food); };
   if (Array.isArray(v.foods)) v.foods.forEach(fixFood);
   fixItems(v.items);
