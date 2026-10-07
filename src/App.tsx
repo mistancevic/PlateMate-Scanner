@@ -1473,7 +1473,7 @@ export default function App() {
     );
     const a = document.createElement("a");
     a.href = url;
-    a.download = `platemate-pilot-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `chefmealan-backup-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }

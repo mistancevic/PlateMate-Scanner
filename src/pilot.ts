@@ -384,7 +384,7 @@ export function parseState(raw: string): PilotState {
     )
   )
     throw new Error(
-      "This is not a valid PlateMate pilot backup. Existing data has not been changed.",
+      "This isn't a Chef Mealan backup. Nothing was changed.",
     );
   return v;
 }

@@ -429,7 +429,7 @@ app.get("/api/search", requireUser, requireMember, async (req, res) => {
   if (q.length < 3 || q.length > 60) return res.json({ products: [] });
   try {
     const url = `https://${cc}.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(q)}&search_simple=1&action=process&json=1&page_size=15&fields=code,product_name,brands,quantity,nutriments,nutrition_data_per`;
-    const r = await fetch(url, { headers: { "User-Agent": "PlateMatePilot/0.3 (https://github.com/mistancevic/PlateMate-Scanner)" }, signal: AbortSignal.timeout(8000) });
+    const r = await fetch(url, { headers: { "User-Agent": "ChefMealan/1.0 (https://chefmealan.com)" }, signal: AbortSignal.timeout(8000) });
     if (!r.ok) return res.json({ products: [], error: "Product database unavailable." });
     const d = await r.json();
     const products = (Array.isArray(d.products) ? d.products : [])
@@ -452,7 +452,7 @@ app.get("/api/product/:barcode", requireUser, requireMember, async (req, res) =>
       {
         headers: {
           "User-Agent":
-            "PlateMatePilot/0.3 (https://github.com/mistancevic/PlateMate-Scanner)",
+            "ChefMealan/1.0 (https://chefmealan.com)",
         },
         signal: AbortSignal.timeout(12000),
       },
@@ -958,7 +958,7 @@ async function start() {
     app.get("*", (_req, res) => { res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); res.sendFile(path.join(dist, "index.html")); });
   }
   app.listen(Number(process.env.PORT) || 3000, "0.0.0.0", () =>
-    console.log(`PlateMate pilot ready on port ${process.env.PORT || 3000}`),
+    console.log(`Chef Mealan ready on port ${process.env.PORT || 3000}`),
   );
 }
 start();

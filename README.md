@@ -1,4 +1,4 @@
-# PlateMate · Mealan client pilot
+# Chef Mealan · client pilot
 
 A small, supervised pilot for real food labels, one person's daily reference, and enjoyable ready-to-eat meal combinations. Based on Mealan App PRD v0.2.0. This is a pilot implementation, not the entire PRD or a validated nutrition service.
 
