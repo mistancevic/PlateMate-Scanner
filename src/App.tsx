@@ -37,9 +37,11 @@ import { OutScreen, type Turn } from "./screens/OutScreen";
 import { LandingScreen } from "./screens/LandingScreen";
 import { Starting } from "./components/Starting";
 import { Welcome, AdultOnly } from "./components/Welcome";
+import { openStats } from "./openStats";
+import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear } from "./photos";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { setTodayChange, dayOfLoad, type PlanDay } from "./plan";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, type Personal, type DayType, type Day } from "./personal";
@@ -113,6 +115,8 @@ const load = () => {
     return freshState();
   }
 };
+// the main screen showed: how long the app took to open, from the page starting to load (storage release 1)
+function Opened() { useEffect(() => { if (openStats.ms === null) openStats.ms = Math.round(performance.now()); }, []); return null; }
 const inputValue = (x: number | null) => (x === null ? "" : String(x));
 function Modal({
   eyebrow,
@@ -723,6 +727,83 @@ export default function App() {
     // opened with the phone's copy while the account was still loading (slow network): edits made then count as newer
     localMode = useRef(false),
     prevFoodIds = useRef<string[]>(state.foods.map((f) => f.id));
+  // ---- photos as files (storage release 1, canvas P0 to P2) ----
+  // The phone keeps photos in its own photo store; the saved data carries none once they are safely there.
+  // The account keeps them as image files. Keys: food:<id>, food:<id>:<n>, fb:<cardId>.
+  const stateRef = useRef(state); stateRef.current = state;
+  const photoRef = useRef({ ok: false, ready: false, known: new Map<string, string>(), stored: new Set<string>(), busy: Promise.resolve() as Promise<unknown> });
+  const filesRef = useRef({ uid: "", ready: false, running: false, again: false, up: new Map<string, string>() });
+  const [, setPhotoCountState] = useState(0);
+  const setPhotoCount = (n: number) => { openStats.photos = n; setPhotoCountState(n); };
+  const writeLocal = () => {
+    const ph = photoRef.current, st = stateRef.current;
+    localStorage.setItem(STORE, JSON.stringify(ph.ok && ph.ready ? withoutStored(st, ph.stored) : st));
+  };
+  // photos the account already has, by key and fingerprint, so each one goes up once
+  const upKey = (uid: string) => `chefmealan-files-up-${uid}`;
+  const saveUp = () => { const fr = filesRef.current; try { localStorage.setItem(upKey(fr.uid), JSON.stringify(Object.fromEntries(fr.up))); } catch {} };
+  const syncFiles = async () => {
+    const fr = filesRef.current;
+    if (!cloudEnabled || !fr.uid || !fr.ready) return;
+    if (fr.running) { fr.again = true; return; }
+    fr.running = true;
+    let sent = 0;
+    try {
+      do {
+        fr.again = false;
+        const st = stateRef.current, now = photosOf(st);
+        for (const [k, v] of now) {
+          if (fr.up.get(k) === sig(v)) continue;
+          await uploadPhoto(fr.uid, fileOf(k), v); fr.up.set(k, sig(v)); saveUp(); sent++;
+        }
+        for (const k of [...fr.up.keys()]) {
+          if (now.has(k) || !isOrphan(k, st)) continue;
+          await deletePhotoFile(fr.uid, fileOf(k)); fr.up.delete(k); saveUp();
+        }
+      } while (fr.again);
+      if (sent) setCloudStatus({ ok: true, text: `Saved to your account, with ${sent} photo${sent === 1 ? "" : "s"}`, at: new Date().toISOString() });
+    } catch (e) {
+      setCloudStatus({ ok: true, text: `Saved to your account. Photos: ${explainCloudError(e)}`, at: new Date().toISOString() });
+    } finally { fr.running = false; }
+  };
+  const syncPhotoStore = () => {
+    const ph = photoRef.current;
+    if (!ph.ok || !ph.ready) return;
+    const st = stateRef.current, now = photosOf(st);
+    const put: [string, string][] = [];
+    for (const [k, v] of now) if (ph.known.get(k) !== sig(v)) { put.push([k, v]); ph.known.set(k, sig(v)); ph.stored.delete(k); }
+    const del = [...ph.known.keys()].filter((k) => !now.has(k) && isOrphan(k, st));
+    del.forEach((k) => { ph.known.delete(k); ph.stored.delete(k); });
+    if (put.length || del.length) {
+      ph.busy = ph.busy.then(async () => {
+        await storePut(put); await storeDel(del);
+        put.forEach(([k]) => ph.stored.add(k));
+        setPhotoCount(ph.known.size);
+        try { writeLocal(); } catch { /* the next save tries again */ }
+      }).catch((e) => { console.warn("photo store:", e); /* not confirmed: the photos stay in the saved data */ });
+    }
+    void syncFiles();
+  };
+  // photos that arrive from the store or the account: added where the state has none, never stamped as a change made here
+  const mergePhotos = (photos: Map<string, string>) => {
+    if (!photos.size) return;
+    setState((st) => { const next = withPhotos(st, photos); if (next !== st) fromCloud.current = true; return next; });
+  };
+  // on open: the photo store fills the state; on the first open after the release, the photos in the saved data move into the store
+  useEffect(() => {
+    (async () => {
+      const ph = photoRef.current;
+      ph.ok = await storeOk();
+      let map = new Map<string, string>();
+      if (ph.ok) { try { map = await storeAll(); } catch { /* an empty store */ } }
+      for (const [k, v] of map) { ph.known.set(k, sig(v)); ph.stored.add(k); }
+      ph.ready = true;
+      setPhotoCount(map.size);
+      if (map.size) mergePhotos(map);
+      syncPhotoStore();
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   // today's day follows the Weekly plan: when the plan changes, here or from the account, today is read again
   useEffect(() => { setDayState(getDay(personal)); }, [personal]);
   useEffect(() => {
@@ -738,7 +819,8 @@ export default function App() {
         );
         return;
       }
-      localStorage.setItem(STORE, JSON.stringify(state));
+      writeLocal();
+      syncPhotoStore();
       // a change made here, not one that came down from the account: stamp it, and remember any food that left the library
       // (merged away or removed), so an older copy can never bring it back
       if (fromCloud.current) { fromCloud.current = false; }
@@ -759,7 +841,7 @@ export default function App() {
   useEffect(() => {
     setOptions([]);
   }, [state.items, state.goals, limits]);
-  useEffect(() => watchUser((u) => { setUser(u); setAuthReady(true); if (!u) { cloudLoaded.current = false; setProfileReady(false); } }), []);
+  useEffect(() => watchUser((u) => { setUser(u); setAuthReady(true); if (!u) { cloudLoaded.current = false; setProfileReady(false); filesRef.current.uid = ""; filesRef.current.ready = false; setFilesFor(""); } }), []);
   useEffect(() => {
     if (!user || cloudLoaded.current) return;
     let stale = false;
@@ -768,6 +850,7 @@ export default function App() {
         const remote = await withTimeout(loadCloud(user.uid), 20000);
         if (stale) return;
         if (remote) setReview(((remote as any).numbersReview as NumbersReview | undefined) ?? null);
+        remoteMeta.current = { photosMovedAt: remote?.photosMovedAt, photosOldGoneAt: remote?.photosOldGoneAt };
         if (remote) setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
         if (remote && Array.isArray(remote.goalLog)) { const merged = [...new Map([...(remote.goalLog as GoalEntry[]), ...getGoalLog()].map((e) => [e.at, e])).values()].sort((x, y) => (x.at > y.at ? 1 : -1)); setGoalLog(merged); setGoalLogState(merged); }
         // foods that left the library on any device stay gone
@@ -797,6 +880,8 @@ export default function App() {
             void fillFromAccount(user.uid);
             fromCloud.current = true;
             setState(incoming);
+            // the photo store fills any photo the account copy left out
+            void photoRef.current.busy.then(() => storeAll()).then(mergePhotos).catch(() => {});
           } catch { /* keep local if the cloud copy is unreadable */ }
           if (remote.goal) { try { localStorage.setItem("chefmealan-goal", JSON.stringify(remote.goal)); } catch {} setGoalState(getGoal()); setGoalOpen(!remote.goal); }
           if (remote.clientName) { storeClientName(remote.clientName); setClientNameState(remote.clientName); }
@@ -830,24 +915,13 @@ export default function App() {
       }
       cloudLoaded.current = true;
       setProfileReady(true);
+      setFilesFor(user.uid);
     })();
     return () => { stale = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, loadTry]);
   // the account's photos and plate cards, after the app is open: merged in by id, never replacing what the phone has
   async function fillFromAccount(uid: string) {
-    try {
-      const photos = await loadPhotos(uid);
-      setState((st) => ({
-        ...st,
-        foods: st.foods.map((f) => {
-          const count = typeof (f as any).photoCount === "number" ? (f as any).photoCount : 6;
-          const more = [1, 2, 3, 4, 5, 6].slice(0, count).map((n) => photos.get(`food:${f.id}:${n}`)).filter(Boolean) as string[];
-          return { ...f, photo: f.photo ?? photos.get(`food:${f.id}`), photos: f.photos ?? (more.length ? more : undefined) };
-        }),
-        feedback: st.feedback.map((fb) => ({ ...fb, photo: fb.photo ?? photos.get(`fb:${fb.id}`) })),
-      }));
-    } catch { /* photos are optional */ }
     try {
       const cards = await loadCards(uid);
       if (cards.length) setState((st) => {
@@ -857,6 +931,48 @@ export default function App() {
       });
     } catch { /* none yet */ }
   }
+  // the account's photo files, once the account is read: the first time, the photos move out of the database into files
+  // (the old copies stay 30 days); after that, photos missing on this phone come down, previews first
+  const remoteMeta = useRef<{ photosMovedAt?: string; photosOldGoneAt?: string }>({});
+  const [filesFor, setFilesFor] = useState("");
+  useEffect(() => {
+    if (!filesFor || !cloudEnabled) return;
+    let stale = false;
+    (async () => {
+      const fr = filesRef.current;
+      fr.uid = filesFor; fr.ready = false;
+      try { fr.up = new Map(Object.entries(JSON.parse(localStorage.getItem(upKey(filesFor)) || "{}"))); } catch { fr.up = new Map(); }
+      while (!photoRef.current.ready) await new Promise((r) => setTimeout(r, 100));
+      await photoRef.current.busy.catch(() => {});
+      const meta = remoteMeta.current;
+      try {
+        if (!meta.photosMovedAt) {
+          const old = await loadPhotos(filesFor);
+          if (stale) return;
+          mergePhotos(old);
+          for (const [k, v] of old) { if (fr.up.get(k) === sig(v)) continue; await uploadPhoto(filesFor, fileOf(k), v); fr.up.set(k, sig(v)); saveUp(); }
+          await markPhotosMoved(filesFor);
+          remoteMeta.current = { ...meta, photosMovedAt: new Date().toISOString() };
+        } else {
+          if (!meta.photosOldGoneAt && Date.now() - Date.parse(meta.photosMovedAt) > 30 * 86_400_000) await dropOldPhotoCopies(filesFor).catch(() => {});
+          const names = await listPhotoFiles(filesFor);
+          const have = photosOf(stateRef.current);
+          const missing = names.map(keyOf).filter((k) => !have.has(k) && !photoRef.current.known.has(k) && !isOrphan(k, stateRef.current))
+            .sort((a, b) => Number(isPreview(b)) - Number(isPreview(a)));
+          for (let i = 0; i < missing.length && !stale; i += 6) {
+            const got = new Map<string, string>();
+            for (const k of missing.slice(i, i + 6)) { try { const d = await downloadPhoto(filesFor, fileOf(k)); got.set(k, d); fr.up.set(k, sig(d)); } catch { /* the next open tries again */ } }
+            saveUp(); mergePhotos(got);
+          }
+        }
+      } catch (e) { setCloudStatus({ ok: true, text: `Loaded. Photos: ${explainCloudError(e)}`, at: new Date().toISOString() }); }
+      if (stale) return;
+      fr.ready = true;
+      void syncFiles();
+    })();
+    return () => { stale = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filesFor]);
   // client: recipes the coach sent
   const fetchInbox = async () => { if (!user) return; try { setInbox(await loadInbox(user.uid)); } catch { /* offline */ } };
   useEffect(() => { fetchInbox(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
@@ -949,21 +1065,8 @@ export default function App() {
         .then(async () => {
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
           try { if (state.feedback.length) await saveCards(user.uid, state.feedback); } catch (e) { setCloudStatus({ ok: true, text: `Saved. Cards: ${explainCloudError(e)}`, at: new Date().toISOString() }); }
-          // photos not yet in the account go up now, once
-          let done = new Set<string>();
-          try { done = new Set(JSON.parse(localStorage.getItem(`chefmealan-photos-up-${user.uid}`) || "[]")); } catch {}
-          const pending = [
-            ...state.foods.filter((f) => f.photo && f.photo.startsWith("data:")).map((f) => ({ key: `food:${f.id}`, data: f.photo! })),
-            ...state.foods.flatMap((f) => (f.photos ?? []).filter((x) => x.startsWith("data:")).map((x, n) => ({ key: `food:${f.id}:${n + 1}`, data: x }))),
-            ...state.feedback.filter((f) => f.photo && f.photo.startsWith("data:")).map((f) => ({ key: `fb:${f.id}`, data: f.photo! })),
-          ].filter((p) => !done.has(p.key));
-          if (!pending.length) return;
-          try {
-            await savePhotos(user.uid, pending);
-            pending.forEach((p) => done.add(p.key));
-            try { localStorage.setItem(`chefmealan-photos-up-${user.uid}`, JSON.stringify([...done])); } catch {}
-            setCloudStatus({ ok: true, text: `Saved to your account, with ${pending.length} photo${pending.length === 1 ? "" : "s"}`, at: new Date().toISOString() });
-          } catch (e) { setCloudStatus({ ok: true, text: `Saved to your account. Photos: ${explainCloudError(e)}`, at: new Date().toISOString() }); }
+          // photos go up as files, by the photo sync: see syncFiles
+          void syncFiles();
         })
         .catch((e) => setCloudStatus({ ok: false, text: `Not saved: ${explainCloudError(e)}` }));
     }, 1000);
@@ -1576,14 +1679,14 @@ export default function App() {
         const r = await api("/api/account/delete", {});
         dataGone = true;
         setDeleteSteps((r?.steps ?? []).join("; ") || "Removed");
-        // the phone's copy goes too, or it would come back on the next sign-in
-        localStorage.clear(); sessionStorage.clear();
+        // the phone's copy goes too, or it would come back on the next sign-in; the photo store with it
+        localStorage.clear(); sessionStorage.clear(); await storeClear();
         try { await signOutCloud(); } catch {}
         location.reload();
       } catch (e: any) {
         if (dataGone) {
           // the record, photos, cards and recipes are gone; only the sign-in itself is left
-          localStorage.clear();
+          localStorage.clear(); await storeClear();
           setError("Your data is deleted. The sign-in itself could not be removed just now: sign in again and tap Delete my account once more, and it goes too.");
           try { await signOutCloud(); } catch {}
           setTimeout(() => location.reload(), 4000);
@@ -1645,6 +1748,7 @@ export default function App() {
     );
   return (
     <div className="app-shell">
+      <Opened />
       <header className="topbar">
         <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setTab("home"); }} aria-label={`${APP_NAME}, Today`}>
           <Mark size={28} color="var(--brand)" />

@@ -1,0 +1,13 @@
+rules_version = '2';
+// Photos as files (storage release 1, 7 October 2026): each person reads and writes only their own photos.
+// A coach never reads them here: a shared plate's photo goes through our server, which checks the coach link and the share.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /users/{uid}/photos/{file} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create, update: if request.auth != null && request.auth.uid == uid
+        && request.resource.size < 3 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+    }
+  }
+}

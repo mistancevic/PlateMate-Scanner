@@ -13,6 +13,7 @@ import { ProteinCard } from "../components/ProteinCard";
 import { DayTable } from "../components/DayTable";
 import { analyse, isOpen as openAt } from "../analysis";
 import type { AppApi, MenuSection } from "./api";
+import { openLine } from "../openStats";
 import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
 import { dayLog } from "../today";
@@ -684,6 +685,8 @@ function AboutPanel() {
       <p className="small">hello@chefmealan.com</p>
       <p className="small"><a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy notice</a> · <a href="/disclaimer">Disclaimer</a></p>
       <p className="small">Version {(import.meta.env.VITE_VERSION as string | undefined) || "0"} · {(import.meta.env.VITE_COMMIT as string | undefined) || "preview"}</p>
+      <p className="small open-line">{openLine()}</p>
+      <small className="muted">Measured on this phone, each time the app opens.</small>
     </section>
   );
 }

@@ -31,7 +31,7 @@ const seed = JSON.parse(fs.readFileSync(require("node:path").resolve(__dirname, 
   ok((await page.locator(".g-thumb").count()) === 3, "Undo brings it back");
   await page.locator(".g-thumb").first().click(); await page.waitForTimeout(300);
   await page.locator(".photo-remove").click(); await page.locator(".photo-remove").click(); await page.waitForTimeout(8600);
-  const stored = await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.find((x) => /Skyr/.test(x.name)); return f ? (f.photos ?? [f.photo]).length : 0; });
+  const stored = await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.find((x) => /Skyr/.test(x.name)); return f ? (f.photos ? f.photos.length : typeof f.photoCount === "number" ? f.photoCount : [f.photo].length) : 0; }); // since 7 October 2026 the saved data counts photos, the photo store holds them
   ok((await page.locator(".g-thumb").count()) === 2 && stored === 2, "after the note goes, the photo is removed for real: " + (await page.locator(".g-thumb").count()) + " shown, " + stored + " stored");
   
   

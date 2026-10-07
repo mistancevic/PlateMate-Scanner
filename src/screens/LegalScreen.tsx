@@ -1,18 +1,16 @@
 import { Mark, APP_NAME } from "../components/Mark";
 
 // The pages the law asks for, readable without signing in: /impressum, /privacy, /disclaimer, /about.
-// Lines in [brackets] are Milan's to fill. Not legal advice; a lawyer's half hour before anyone beyond friends joins.
+// Not legal advice; a lawyer's half hour before anyone beyond friends joins. The street address waits for an address service.
 export type LegalPage = "impressum" | "privacy" | "disclaimer" | "about";
 export const LEGAL_PATHS: Record<string, LegalPage> = { "/impressum": "impressum", "/privacy": "privacy", "/datenschutz": "privacy", "/disclaimer": "disclaimer", "/about": "about" };
 export const legalPageFromPath = (path: string): LegalPage | null => LEGAL_PATHS[path.replace(/\/+$/, "") || "/"] ?? null;
 
 const OPERATOR = {
   name: "Milan Stancevic",
-  street: "[Street and number]",
-  city: "[Postcode] München",
+  city: "80689 München",
   country: "Germany",
   email: "hello@chefmealan.com",
-  vat: "[USt-IdNr., if any, else: not subject to VAT under § 19 UStG]",
 };
 
 export function LegalScreen({ page, back }: { page: LegalPage; back: () => void }) {
@@ -33,7 +31,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
       {page === "about" && (
         <article>
           <h1>Who's behind Chef Mealan</h1>
-          <p>Chef Mealan is built and run by {OPERATOR.name}, a product manager in Munich and a certified fitness and nutrition coach. [One or two lines in Milan's words: why this exists, who it is for.]</p>
+          <p>Chef Mealan is built and run by {OPERATOR.name}, a product manager in Munich and a certified fitness and nutrition coach.</p>
           <p>It is a closed pilot: a coach gives out a code, a person joins with it, and the two of them decide together what the plate should be. Mealan is the AI chef in between: it reads labels, fits amounts to a goal, and stays a chef. The numbers come from code; the model reads labels, menus and shelves; you and your coach decide.</p>
           <p>Questions, feedback, a code: <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>.</p>
         </article>
@@ -42,10 +40,9 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
         <article>
           <h1>Impressum</h1>
           <p className="small muted">Angaben gemäß § 5 DDG (formerly § 5 TMG)</p>
-          <p>{OPERATOR.name}<br />{OPERATOR.street}<br />{OPERATOR.city}<br />{OPERATOR.country}</p>
+          <p>{OPERATOR.name}<br />{OPERATOR.city}<br />{OPERATOR.country}</p>
           <p>E-Mail: <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a></p>
-          <p>Umsatzsteuer: {OPERATOR.vat}</p>
-          <p>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV: {OPERATOR.name}, Anschrift wie oben.</p>
+          <p>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV: {OPERATOR.name}, {OPERATOR.city}.</p>
           <h2>Haftung für Inhalte</h2>
           <p>Die Inhalte dieser Seiten wurden mit größter Sorgfalt erstellt. Für die Richtigkeit, Vollständigkeit und Aktualität der Inhalte, insbesondere der von einem KI-Modell gelesenen Nährwerte, kann keine Gewähr übernommen werden. Nährwerte sind Schätzungen; maßgeblich ist die Angabe auf der Verpackung.</p>
           <h2>Streitschlichtung</h2>
@@ -55,9 +52,9 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
       {page === "privacy" && (
         <article>
           <h1>Privacy notice</h1>
-          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 7 October 2026</p>
+          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 7 October 2026 (photos as files)</p>
           <h2>1. Who is responsible</h2>
-          <p>{OPERATOR.name}, {OPERATOR.street}, {OPERATOR.city}, {OPERATOR.country}. <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>. No data protection officer is appointed; the pilot is below the thresholds that require one.</p>
+          <p>{OPERATOR.name}, {OPERATOR.city}, {OPERATOR.country}. <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>. No data protection officer is appointed; the pilot is below the thresholds that require one.</p>
           <h2>2. What Chef Mealan keeps, and why</h2>
           <ul>
             <li><b>Account.</b> Your Google sign-in (name, email, user ID), so the app knows it is you, and the date you confirmed that you're 18 or over. Legal basis: the contract, Art. 6(1)(b).</li>
@@ -69,13 +66,13 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
           </ul>
           <h2>3. Where it is, and who processes it</h2>
           <ul>
-            <li><b>Google Cloud, Frankfurt (EU).</b> The app runs on Cloud Run; your data sits in Firestore and Firebase Authentication, region europe-west1/europe-west3. Google Ireland Ltd is the processor under its Cloud data processing terms.</li>
-            <li><b>Google Gemini API.</b> When you scan a label or write to Mealan, the photo or the text is sent to Google's Gemini API to be read, and the answer comes back. Under the API terms in force for paid use, Google does not use that content to train its models. [Confirm the data location and the current terms before the pilot widens.]</li>
+            <li><b>Google Cloud, Frankfurt (EU).</b> The app runs on Cloud Run; your data sits in Firestore and Firebase Authentication, and your photos as image files in Firebase Storage, region europe-west1/europe-west3. Only you can open your photos; your coach sees a plate's photo only when you share that card. Google Ireland Ltd is the processor under its Cloud data processing terms.</li>
+            <li><b>Google Gemini API.</b> When you scan a label or write to Mealan, the photo or the text is sent to Google's Gemini API to be read, and the answer comes back. Chef Mealan uses the paid Gemini API: under its terms, Google does not use that content to train its models.</li>
             <li><b>Open Food Facts.</b> A barcode you scan is looked up there. The barcode is not personal data; nothing else is sent.</li>
             <li>No advertising, no analytics beyond the pilot log above, no sale or sharing of your data with anyone else.</li>
           </ul>
           <h2>4. How long</h2>
-          <p>While your account exists. Delete the account, from Menu, Account, and everything goes: profile, declarations, foods, cards, photos, recipes, the sign-in. Backups of the database are kept by Google for up to [30] days and then expire.</p>
+          <p>While your account exists. Delete the account, from Menu, Account, and everything goes: profile, declarations, foods, cards, photos, recipes, the sign-in. Chef Mealan keeps no separate backup copies. When the photos moved into image files in October 2026, their old copies in the database stayed for 30 days, then were removed.</p>
           <h2>5. Your rights</h2>
           <p>Access, rectification, erasure, restriction, portability and objection, Art. 15 to 21. In the app: Menu, Account, Export my data gives you everything as one file; Delete my account removes it. By email: {OPERATOR.email}. You may complain to a supervisory authority; for Bavaria that is the Bayerisches Landesamt für Datenschutzaufsicht (BayLDA), Ansbach.</p>
           <h2>6. Age</h2>

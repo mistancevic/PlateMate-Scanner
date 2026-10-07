@@ -11,9 +11,12 @@ const app = express();
 import { initializeApp as initAdmin, getApps as adminApps } from "firebase-admin/app";
 import { getAuth as adminAuth } from "firebase-admin/auth";
 import { getFirestore as adminDb, FieldValue } from "firebase-admin/firestore";
+import { getStorage as adminStorage } from "firebase-admin/storage";
 import { createHash } from "node:crypto";
 const FB_PROJECT = process.env.FIREBASE_PROJECT_ID || "";
-if (FB_PROJECT && !adminApps().length) initAdmin({ projectId: FB_PROJECT });
+// photos as files (storage release 1): the project's default bucket in Frankfurt
+const BUCKET = process.env.FIREBASE_STORAGE_BUCKET || (FB_PROJECT ? `${FB_PROJECT}.firebasestorage.app` : "");
+if (FB_PROJECT && !adminApps().length) initAdmin({ projectId: FB_PROJECT, ...(BUCKET ? { storageBucket: BUCKET } : {}) });
 const HOURLY_LIMIT = Number(process.env.AI_HOURLY_LIMIT || 120);
 const usage = new Map<string, { hour: number; n: number }>();
 const FB_DB = process.env.FIRESTORE_DB_ID || "(default)";
@@ -371,6 +374,7 @@ app.post("/api/account/delete", requireUser, async (req, res) => {
   const steps: string[] = [];
   try {
     const d = db();
+    if (BUCKET) { await adminStorage().bucket(BUCKET).deleteFiles({ prefix: `users/${uid}/` }); steps.push("photo files removed"); }
     await d.recursiveDelete(d.collection("users").doc(uid)); steps.push("record, photos, cards and recipes removed");
     let email = String((req as any).email || "");
     if (!email) { try { email = String((await adminAuth().getUser(uid)).email || "").toLowerCase(); } catch { /* no email, nothing to clean by it */ } }
@@ -386,6 +390,31 @@ app.post("/api/account/delete", requireUser, async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error: `Could not finish the deletion: ${(error as Error).message}`, steps });
   }
+});
+// A shared plate's photo for the client's coach (storage release 1). Photo files are the owner's only; the coach gets one
+// through here, after the server checks that this coach is the client's coach and that the card is shared.
+app.get("/api/client-photo/:client/:card", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    const coach = (req as any).uid as string, client = String(req.params.client), card = String(req.params.card);
+    if (!/^[\w-]{1,128}$/.test(client) || !/^[\w-]{1,128}$/.test(card)) return res.status(400).json({ error: "Not a photo." });
+    const d = db();
+    const user = await d.collection("users").doc(client).get();
+    if (!user.exists || user.get("coachId") !== coach) return res.status(403).json({ error: "Not your client." });
+    const c = await d.collection("users").doc(client).collection("cards").doc(card).get();
+    if (!c.exists || c.get("shared") !== true) return res.status(403).json({ error: "This card is not shared." });
+    res.setHeader("Cache-Control", "private, max-age=3600");
+    if (BUCKET) {
+      const f = adminStorage().bucket(BUCKET).file(`users/${client}/photos/fb~${card}.jpg`);
+      const [there] = await f.exists();
+      if (there) { const [[buf], [meta]] = await Promise.all([f.download(), f.getMetadata()]); res.type(String(meta.contentType || "image/jpeg")); return res.send(buf); }
+    }
+    // before the move: the old copy in the database
+    const old = await d.collection("users").doc(client).collection("photos").doc(`fb:${card}`).get();
+    const data = old.exists ? String(old.get("data") || "") : "";
+    const m = /^data:(image\/[\w+.-]+);base64,(.*)$/.exec(data);
+    if (!m) return res.status(404).json({ error: "No photo." });
+    res.type(m[1]); return res.send(Buffer.from(m[2], "base64"));
+  } catch (e) { return fail(res, e); }
 });
 // Search the product database by name: top five with values per 100 g, for the country where the person shops.
 // Open Food Facts' country sites filter to products sold there; per-volume records and records without energy or protein are skipped.

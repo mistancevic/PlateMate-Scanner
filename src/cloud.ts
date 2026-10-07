@@ -2,12 +2,15 @@
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, reauthenticateWithPopup, type User } from "firebase/auth";
 import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, type Firestore } from "firebase/firestore";
+import { getStorage, ref as fileRef, uploadString, getBytes, deleteObject, listAll } from "firebase/storage";
 
 const cfg = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  // photos as files (storage release 1): the project's default bucket, in Frankfurt, unless told otherwise
+  storageBucket: (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string | undefined) || (import.meta.env.VITE_FIREBASE_PROJECT_ID ? `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebasestorage.app` : undefined),
 };
 export const cloudEnabled = Boolean(cfg.apiKey && cfg.projectId && cfg.appId && cfg.authDomain);
 let app: FirebaseApp | null = null;
@@ -46,7 +49,7 @@ export const signOutCloud = () => signOut(auth());
 
 // One document per person: the pilot state plus goal and name, and who coaches them.
 // role is set by hand in the Firebase console ("coach"); nobody can sign up as a coach.
-export type CloudDoc = { state: unknown; goal: unknown; clientName: string; updatedAt: string; goneFoods?: string[]; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: "mifflin" | "katch" | null; role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string | null; coachPhoto?: string | null; joinedAt?: string | null; coachSetAt?: string };
+export type CloudDoc = { photosMovedAt?: string; photosOldGoneAt?: string; state: unknown; goal: unknown; clientName: string; updatedAt: string; goneFoods?: string[]; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: "mifflin" | "katch" | null; role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string | null; coachPhoto?: string | null; joinedAt?: string | null; coachSetAt?: string };
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const snap = await getDoc(doc(db(), "users", uid));
   return snap.exists() ? (snap.data() as CloudDoc) : null;
@@ -182,16 +185,42 @@ export async function exportAccount(uid: string) {
   return { account: main, photos: await read("photos"), cards: await read("cards"), inbox: await read("inbox") };
 }
 
-// ---- photos ----
-// Small pictures (label thumbnails, plate photos) live one per document under users/{uid}/photos, so the main document stays small
-// and a second device, or the coach, can fetch them. Keys: food:<foodId>, fb:<feedbackId>.
-export async function savePhotos(uid: string, photos: { key: string; data: string }[]) {
-  for (let i = 0; i < photos.length; i += 20) {
-    const b = writeBatch(db());
-    for (const p of photos.slice(i, i + 20)) b.set(doc(db(), "users", uid, "photos", p.key), { data: p.data, updatedAt: new Date().toISOString() });
-    await b.commit();
-  }
+// ---- photos as files (storage release 1) ----
+// Each photo is an image file under users/{uid}/photos/ in Firebase Storage. Only the owner reads and writes (storage.rules);
+// a coach sees a shared plate's photo through our server, which checks the link and the share first.
+const files = () => getStorage(getApp());
+const photoFile = (uid: string, name: string) => fileRef(files(), `users/${uid}/photos/${name}`);
+export async function uploadPhoto(uid: string, name: string, dataUrl: string) {
+  // the type comes from the photo itself (most are JPEG; the starter foods' pictures are SVG)
+  await uploadString(photoFile(uid, name), dataUrl, "data_url", { cacheControl: "private, max-age=31536000" });
 }
+export async function deletePhotoFile(uid: string, name: string) {
+  try { await deleteObject(photoFile(uid, name)); } catch (e: any) { if (e?.code !== "storage/object-not-found") throw e; }
+}
+export async function listPhotoFiles(uid: string): Promise<string[]> {
+  const r = await listAll(fileRef(files(), `users/${uid}/photos`));
+  return r.items.map((i) => i.name);
+}
+export async function downloadPhoto(uid: string, name: string): Promise<string> {
+  const bytes = await getBytes(photoFile(uid, name));
+  const head = new Uint8Array(bytes.slice(0, 64));
+  const text = new TextDecoder().decode(head).trimStart();
+  const type = text.startsWith("<svg") || text.startsWith("<?xml") ? "image/svg+xml" : head[0] === 0x89 && head[1] === 0x50 ? "image/png" : head[0] === 0x52 && head[1] === 0x49 ? "image/webp" : "image/jpeg";
+  const blob = new Blob([bytes], { type });
+  return await new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
+}
+// The photos moved out of the database once; the old copies stay 30 days as a backup, then go.
+export async function markPhotosMoved(uid: string) { await setDoc(doc(db(), "users", uid), { photosMovedAt: new Date().toISOString() }, { merge: true }); }
+export async function dropOldPhotoCopies(uid: string) {
+  const snap = await getDocs(collection(db(), "users", uid, "photos"));
+  let batch = writeBatch(db()), n = 0;
+  for (const d of snap.docs) { batch.delete(d.ref); if (++n % 400 === 0) { await batch.commit(); batch = writeBatch(db()); } }
+  await batch.commit();
+  await setDoc(doc(db(), "users", uid), { photosOldGoneAt: new Date().toISOString() }, { merge: true });
+}
+
+// ---- photos before storage release 1 ----
+// One per document under users/{uid}/photos: read once to move them into files, kept 30 days as a backup.
 export async function loadPhotos(uid: string): Promise<Map<string, string>> {
   const snap = await getDocs(collection(db(), "users", uid, "photos"));
   return new Map(snap.docs.map((d) => [d.id, (d.data() as any).data as string]));

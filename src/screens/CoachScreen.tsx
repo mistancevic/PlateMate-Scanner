@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { RefreshCw, Copy, Target, Send, UserPlus } from "lucide-react";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { dayNameAny } from "../personal";
-import { listClients, setClientGoal, loadPhotos, sendRecipe, pinFormula, type ClientRow } from "../cloud";
+import { listClients, setClientGoal, sendRecipe, pinFormula, type ClientRow } from "../cloud";
 import { SITUATIONS } from "../safety";
 import { GoalHistory } from "./MenuScreen";
 import { uid } from "../pilot";
@@ -65,7 +65,21 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirm
   const [formula, setFormula] = useState<"mifflin" | "katch" | null>(row.formula ?? null);
   const [saving, setSaving] = useState(false);
   const [photos, setPhotos] = useState<Map<string, string>>(new Map());
-  useEffect(() => { loadPhotos(row.uid).then(setPhotos).catch(() => {}); }, [row.uid]);
+  // a shared plate's photo comes through our server, which checks that the card is shared with this coach (storage release 1)
+  useEffect(() => {
+    let stale = false; const urls: string[] = [];
+    (async () => {
+      for (const f of row.feedback.slice(0, 30)) {
+        try {
+          const r = await fetch(`/api/client-photo/${encodeURIComponent(row.uid)}/${encodeURIComponent(f.id)}`);
+          if (!r.ok || stale) continue;
+          const url = URL.createObjectURL(await r.blob()); urls.push(url);
+          setPhotos((m) => new Map(m).set(`fb:${f.id}`, url));
+        } catch { /* no photo for this card */ }
+      }
+    })();
+    return () => { stale = true; urls.forEach((u) => URL.revokeObjectURL(u)); };
+  }, [row.uid, row.feedback]);
   const pdOf = (items: any[]) => density(items.reduce((n, i) => n + (i.food.protein ?? 0) * i.grams / 100, 0), items.reduce((n, i) => n + (i.food.calories ?? 0) * i.grams / 100, 0));
   const kcalOf = (items: any[]) => Math.round(items.reduce((n, i) => n + (i.food.calories ?? 0) * i.grams / 100, 0));
   return (

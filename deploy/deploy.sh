@@ -12,10 +12,15 @@ TAG=$(git rev-parse --short HEAD)
 IMAGE="$REGION-docker.pkg.dev/$PROJECT/chefmealan/app:$TAG"
 gcloud builds submit --project "$PROJECT" --config deploy/cloudbuild.yaml \
   --substitutions "_IMAGE=$IMAGE,_FB_API_KEY=$FB_API_KEY,_FB_AUTH_DOMAIN=$FB_AUTH_DOMAIN,_FB_PROJECT_ID=$FB_PROJECT_ID,_FB_APP_ID=$FB_APP_ID,_FB_DB_ID=$FB_DB_ID,_COMMIT=$TAG" .
+# Photos as files (storage release 1): the bucket lets the app read photos back, and the server may remove them when an account is deleted
+BUCKET="${STORAGE_BUCKET:-$FB_PROJECT_ID.firebasestorage.app}"
+gcloud storage buckets update "gs://$BUCKET" --cors-file=deploy/cors.json --quiet >/dev/null 2>&1 || echo "Photo storage: CORS not set (check that the bucket $BUCKET exists)"
+PN=$(gcloud projects describe "$PROJECT" --format='value(projectNumber)')
+gcloud storage buckets add-iam-policy-binding "gs://$BUCKET" --member "serviceAccount:$PN-compute@developer.gserviceaccount.com" --role roles/storage.objectAdmin --quiet >/dev/null 2>&1 || echo "Photo storage: the server's access was not set"
 SECRETS="GEMINI_API_KEY=gemini-key:latest"
 gcloud secrets describe airtable-key --project "$PROJECT" >/dev/null 2>&1 && SECRETS="$SECRETS,AIRTABLE_API_KEY=airtable-key:latest"
 gcloud run deploy "$SERVICE" --project "$PROJECT" --region "$REGION" --image "$IMAGE" \
   --allow-unauthenticated --memory 512Mi --max-instances 3 \
-  --set-secrets "$SECRETS" --set-env-vars "AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID:-},FIREBASE_PROJECT_ID=$FB_PROJECT_ID,FIRESTORE_DB_ID=$FB_DB_ID"
+  --set-secrets "$SECRETS" --set-env-vars "AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID:-},FIREBASE_PROJECT_ID=$FB_PROJECT_ID,FIRESTORE_DB_ID=$FB_DB_ID,FIREBASE_STORAGE_BUCKET=$BUCKET"
 echo "Live: $(gcloud run services describe "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(status.url)')  (commit $TAG)"
 "$(dirname "$0")/rules.sh" || echo "Rules not published: check the message above, or paste firestore.rules in the Firebase console."
