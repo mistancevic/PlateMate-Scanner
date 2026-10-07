@@ -106,7 +106,7 @@ function ProfilePanel(p: AppApi) {
     <>
       <p className="small">Optional. Used only to calculate your numbers. Stored on this phone and in your account, nowhere else.</p>
       {consented && (
-        <p className="small consent-line">You agreed to the body data on {fmtDay(p.safety.consentBodyAt!)}{p.safety.consentBy === "parent" ? ", a parent agreeing for you" : ""}. It is in your export, and goes with everything else when you delete the account.</p>
+        <p className="small consent-line">You agreed to the body data on {fmtDay(p.safety.consentBodyAt!)}. It is in your export, and goes with everything else when you delete the account.</p>
       )}
       {!consented && (
         <section className="card consent" aria-label="Before your numbers">
@@ -118,10 +118,9 @@ function ProfilePanel(p: AppApi) {
             <li><b>How long:</b> while the account exists.</li>
             <li><b>Yours:</b> export it or delete it, with everything else, from Menu, Account.</li>
           </ul>
-          <p className="small">Nothing about your body is stored until you agree. Under 16, a parent agrees. The full <a href="/privacy">privacy notice</a>.</p>
+          <p className="small">Nothing about your body is stored until you agree. The full <a href="/privacy">privacy notice</a>.</p>
           <div className="button-row">
             <button className="pill pill-small pill-primary" onClick={() => p.declareSafety({ consentBodyAt: new Date().toISOString(), consentBy: "self" })}>I agree</button>
-            <button className="pill pill-small" onClick={() => p.declareSafety({ consentBodyAt: new Date().toISOString(), consentBy: "parent" })}>A parent agrees for me</button>
           </div>
         </section>
       )}
@@ -178,7 +177,6 @@ function ProfilePanel(p: AppApi) {
             )}
           </div>
         ))}
-        {p.ai.needsParent && <small className="muted">Under 16: a parent agrees on the profile, and your coach confirms before Mealan's chat is on.</small>}
         <label className="check none">
           <input type="checkbox" checked={none} onChange={(e) => tickNone(e.target.checked)} />
           <span><b>None of these applies to me</b><small> an unanswered question is not a no; Mealan asks again once a year</small></span>

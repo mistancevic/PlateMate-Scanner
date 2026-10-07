@@ -80,6 +80,7 @@ export function withDated(p: Personal, date: Date, day: PlanDay | null): Persona
   const keys = Object.keys(dated).sort(); while (keys.length > 550) delete dated[keys.shift()!];
   return { ...p, dated };
 }
+// Since Release A (7 October 2026) accounts are 18 and over; the under-18 paths stay, switched off, for family profiles later.
 export const isMinor = (p: Personal) => { const a = ageOf(p); return a !== null && a < 18; };
 export function getDay(p: Personal = getPersonal(), date = new Date()): Day {
   const own = p.dated?.[ymd(date)];

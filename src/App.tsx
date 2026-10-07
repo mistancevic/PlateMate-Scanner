@@ -36,6 +36,7 @@ import { GoalScreen } from "./screens/GoalScreen";
 import { OutScreen, type Turn } from "./screens/OutScreen";
 import { LandingScreen } from "./screens/LandingScreen";
 import { Starting } from "./components/Starting";
+import { Welcome, AdultOnly } from "./components/Welcome";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, savePhotos, loadPhotos, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
@@ -806,7 +807,8 @@ export default function App() {
             const remoteS = remote.safety && typeof remote.safety === "object" ? { ...EMPTY_SAFETY, ...(remote.safety as Safety) } : null;
             const newer = (a?: string, b?: string) => (a ?? "") > (b ?? "");
             const base: Safety = !remoteS ? local : newer(local.declaredAt, remoteS.declaredAt) || newer(local.consentBodyAt, remoteS.consentBodyAt) ? { ...remoteS, ...local, flags: [...remoteS.flags, ...local.flags.filter((f) => !remoteS.flags.some((g) => g.situation === f.situation && g.at === f.at))] } : remoteS;
-            const merged: Safety = { ...base, aiConfirmedAt: remote.aiConfirmedAt ?? undefined, aiConfirmedBy: remote.aiConfirmedBy ?? undefined };
+            // the 18+ tap is kept once given, whichever copy has it
+            const merged: Safety = { ...base, adultAt: base.adultAt ?? local.adultAt ?? remoteS?.adultAt, aiConfirmedAt: remote.aiConfirmedAt ?? undefined, aiConfirmedBy: remote.aiConfirmedBy ?? undefined };
             storeSafety(merged); setSafetyState(merged);
           }
           setCloudStatus({ ok: true, text: "Loaded from your account", at: new Date().toISOString() });
@@ -1621,18 +1623,21 @@ export default function App() {
   { const legal = legalPageFromPath(window.location.pathname); if (legal) return <LegalScreen page={legal} back={() => { window.history.replaceState(null, "", "/"); window.location.reload(); }} />; }
   if (cloudEnabled && !user) return <LandingScreen />;
   if (cloudEnabled && user && !profileReady) return <Starting onLocal={() => { localMode.current = true; setProfileReady(true); }} />;
+  // Release A: Chef Mealan is for adults. Nothing opens, and nothing reaches the AI, before the welcome tap (canvas R1).
+  if (!safety.adultAt) {
+    const first = String((user as any)?.displayName || clientName || "").trim().split(/\s+/)[0] || "";
+    return <Welcome name={first} onConfirm={() => { updateSafety((x) => ({ ...x, adultAt: new Date().toISOString() })); log("adult_confirmed", {}); }} onSignOut={cloudEnabled && user ? screenProps.signOut : null} />;
+  }
   if (cloudEnabled && user && profile.role !== "coach" && !profile.coachId)
     return <div className="app-shell"><main><PilotGate {...screenProps} /></main></div>;
+  // a birth year under 18, at setup or later: the reason is the AI; correct the year or delete the account (canvas R2)
   if (ai.blocked)
     return (
-      <div className="app-shell"><main>
-        <section className="card" style={{ margin: 18 }}>
-          <b>Chef Mealan is not for people under 13.</b>
-          <p className="small">The birth year on the profile says under 13. If that's a typo, fix it on the profile; if not, the account closes here. Nothing else is stored.</p>
-          <div className="button-row"><button className="pill pill-small" onClick={() => screenProps.openMenu("profile")}>Profile</button><button className="pill pill-small" onClick={screenProps.signOut}>Sign out</button></div>
-        </section>
-        {menuSection && <MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s) => { setMenuFrom(null); setMenuSection(s); }} close={() => { setMenuFrom(null); setMenuSection(null); }} />}
-      </main></div>
+      <div className="app-shell">
+        {menuSection
+          ? <main><MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s) => { setMenuFrom(null); setMenuSection(s); }} close={() => { setMenuFrom(null); setMenuSection(null); }} /></main>
+          : <AdultOnly onCorrect={() => screenProps.openMenu("profile")} onDelete={cloudEnabled && user ? screenProps.deleteAccount : null} />}
+      </div>
     );
   if (goalOpen)
     return (

@@ -1,13 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { aiState, ageBand, addFlag, allergyHits, blockedByAllergy, goalSignals, takeModelFlag, coachView, EMPTY_SAFETY, FIXED, type Safety } from "./safety";
+import { aiState, underAge, addFlag, allergyHits, blockedByAllergy, goalSignals, takeModelFlag, coachView, EMPTY_SAFETY, FIXED, type Safety } from "./safety";
 import { mixTip } from "./mixtip";
 import { STARTER_FOODS } from "./starter";
 
 const Y = new Date("2026-10-04");
 const byName = (n: string) => STARTER_FOODS.find((f) => f.name === n)!;
 // every case has been through the door: it was answered on the day, with none ticked unless a situation is given
-const S = (x: Partial<Safety> = {}): Safety => ({ ...EMPTY_SAFETY, declaredAt: "2026-10-04T09:30:00Z", none: !(x.situations && x.situations.length), ...x });
+const S = (x: Partial<Safety> = {}): Safety => ({ ...EMPTY_SAFETY, adultAt: "2026-10-04T09:00:00Z", declaredAt: "2026-10-04T09:30:00Z", none: !(x.situations && x.situations.length), ...x });
 
 test("case 1: an adult who answered none, the chat is on", () => {
   assert.equal(aiState(S(), 1981, true, Y).on, true);
@@ -23,28 +23,18 @@ test("case 2: signs of disordered eating switch the chat off until a coach confi
   assert.match(FIXED.eating, /doctor or a therapist/);
 });
 
-test("case 3: 17, consents herself, coach attached, coach confirms: on; without the coach's confirmation: off", () => {
-  assert.equal(ageBand(2009, Y), "teen");
-  const s = S({ consentBodyAt: "2026-10-04T10:00:00Z", consentBy: "self" });
-  assert.equal(aiState(s, 2009, true, Y).on, false);
-  assert.equal(aiState({ ...s, aiConfirmedAt: "2026-10-04T11:00:00Z" }, 2009, true, Y).on, true);
+test("case 3: Chef Mealan is for adults: no welcome tap, no AI", () => {
+  const r = aiState(S({ adultAt: undefined }), 1981, true, Y);
+  assert.equal(r.on, false); assert.equal(r.blocked, false); assert.match(r.why, /18 or older/);
 });
 
-test("case 4: 13, a parent consents, coach attached, confirmed: on; self-consent is not enough under 16", () => {
-  assert.equal(ageBand(2013, Y), "young");
-  const self = S({ consentBodyAt: "2026-10-04T10:00:00Z", consentBy: "self", aiConfirmedAt: "2026-10-04T11:00:00Z" });
-  const r = aiState(self, 2013, true, Y);
-  assert.equal(r.on, false); assert.equal(r.needsParent, true); assert.match(r.why, /parent/);
-  const parent = { ...self, consentBy: "parent" as const };
-  assert.equal(aiState(parent, 2013, true, Y).on, true);
-});
-
-test("case 5: a minor with no coach or parent attached never gets the chat; under 13 no account", () => {
-  const s = S({ consentBodyAt: "2026-10-04T10:00:00Z", consentBy: "parent", aiConfirmedAt: "2026-10-04T11:00:00Z" });
-  assert.equal(aiState(s, 2010, false, Y).on, false);
-  assert.equal(ageBand(2015, Y), "child");
-  const c = aiState(s, 2015, true, Y);
-  assert.equal(c.blocked, true); assert.equal(c.on, false);
+test("case 4: a birth year under 18 stops everything, and says the reason is the AI; counted by year", () => {
+  assert.equal(underAge(2009, Y), true, "17 in 2026");
+  assert.equal(underAge(2008, Y), false, "turns 18 in 2026: counted as 18 all year");
+  assert.equal(underAge(null, Y), false);
+  const r = aiState(S(), 2009, true, Y);
+  assert.equal(r.on, false); assert.equal(r.blocked, true); assert.match(r.why, /AI/);
+  assert.equal(aiState(S({ aiConfirmedAt: "2026-10-04T11:00:00Z" }), 2012, true, Y).blocked, true, "no coach confirmation opens it for a minor");
 });
 
 test("case 6: pregnancy, diabetes and medication change the answer and keep the chat on", () => {
@@ -108,7 +98,7 @@ test("the door keeps a dated history, only when something changed; pregnancy is 
 test("an unanswered door is not a no: the chat waits; none applies is an answer, and it ages out after a year", async () => {
   const { aiState, doorAnswered, EMPTY_SAFETY } = await import("./safety");
   const now = new Date("2026-10-04T10:00:00Z");
-  const fresh = { ...EMPTY_SAFETY, consentBodyAt: "2026-10-04T09:00:00Z", consentBy: "self" as const };
+  const fresh = { ...EMPTY_SAFETY, adultAt: "2026-10-04T09:00:00Z", consentBodyAt: "2026-10-04T09:00:00Z", consentBy: "self" as const };
   assert.equal(doorAnswered(fresh, now), false);
   assert.equal(aiState(fresh, 1981, true, now).on, false);
   assert.ok(/Answer the question/.test(aiState(fresh, 1981, true, now).why));

@@ -78,7 +78,7 @@ export function LandingScreen() {
       <section className="l-who">
         <span className="l-eyebrow">Who it's for</span>
         <h2>For people with a goal who choose their own food</h2>
-        <p>Chef Mealan is for adults, and for teenagers from 13 who join with a parent or a coach. Teenagers get a version built around school. Chef Mealan is not a doctor. If a medical condition decides what you eat, if you're pregnant or have diabetes, or if eating is difficult for you, Chef Mealan doesn't give advice, and tells you who to talk to instead.</p>
+        <p>Chef Mealan is for adults. Chef Mealan is not a doctor. If a medical condition decides what you eat, if you're pregnant or have diabetes, or if eating is difficult for you, Chef Mealan doesn't give advice, and tells you who to talk to instead.</p>
       </section>
 
       <section className="l-request" ref={formRef}>

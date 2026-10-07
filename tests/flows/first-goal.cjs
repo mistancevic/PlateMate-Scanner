@@ -11,6 +11,7 @@ const path = require("node:path");
   const page = await b.newPage({ viewport: { width: 390, height: 844 } });
   const errs = []; page.on("pageerror", (e) => errs.push(e.message));
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
+  await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3189/"); await page.waitForTimeout(900);
   // the way out
   ok(await page.getByRole("button", { name: "Not now" }).count() === 1, "the first screen has Not now");
@@ -26,10 +27,15 @@ const path = require("node:path");
   await page.getByRole("button", { name: /^I agree$/ }).click(); await page.waitForTimeout(200);
   await page.getByRole("button", { name: /^Female$/ }).click();
   const inputs = page.locator(".calc-way input");
-  await inputs.nth(0).fill("2009"); await inputs.nth(1).fill("168"); await inputs.nth(2).fill("58"); await inputs.nth(2).blur();
+  // Release A (7 October 2026): Chef Mealan is for adults. A birth year under 18 says so; the journey goes on as an adult.
+  await inputs.nth(0).fill("2009"); await inputs.nth(0).blur(); await page.waitForTimeout(200);
+  ok(/Chef Mealan is for adults/.test(await page.locator(".calc-way").textContent()) && /\bAI\b/.test(await page.locator(".adult-line").textContent()), "a birth year under 18 is told, in place, that Chef Mealan is for adults, and why");
+  ok((await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal") || "{}").birthYear)) !== 2009, "a birth year under 18 is not saved");
+  await inputs.nth(0).fill("1998");
+  await inputs.nth(1).fill("168"); await inputs.nth(2).fill("58"); await inputs.nth(2).blur();
   await page.getByRole("button", { name: /9 to 5 at a desk/ }).click();
   await page.getByRole("button", { name: /^Lose fat/ }).click(); await page.waitForTimeout(200);
-  ok(/Under 18/.test(await page.locator(".calc-way").textContent()), "a 17-year-old picking Lose fat gets no deficit, and is told");
+  ok(!/Chef Mealan is for adults/.test(await page.locator(".calc-way").textContent()), "an adult picking Lose fat sees no age line");
   // each day its own: the table
   await page.getByRole("button", { name: "Each day its own" }).click(); await page.waitForTimeout(200);
   const rows = await page.locator(".day-table .dt-row").count();

@@ -15,6 +15,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   const lookups = []; await page.route("**/api/product/**", (route) => { lookups.push(route.request().url()); route.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ error: "not in the database" }) }); });
   const searches = []; await page.route("**/api/search**", (route) => { searches.push(route.request().url()); const u = new URL(route.request().url()); const q = u.searchParams.get("q"); route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ products: /skyr/i.test(q) ? [{ code: "4008452021131", name: "Skyr Natur", brand: "Milbona", quantity: "500 g", kcal: 63, protein: 11 }, { code: "5000000000001", name: "Skyr Vanilla", brand: "Arla", quantity: "450 g", kcal: 78, protein: 9.3 }] : [] }) }); });
   await page.addInitScript((s) => { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); localStorage.setItem("chefmealan-region", "belgrade"); }, seed);
+  await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3188/"); await page.waitForTimeout(900);
   await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(400);
   ok(/Find a food/.test(await page.locator(".find-head").textContent()) && /in your foods/.test(await page.locator(".find-head").textContent()), "Find a food on top, with the count");

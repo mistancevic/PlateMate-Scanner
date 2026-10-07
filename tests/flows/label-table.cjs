@@ -11,6 +11,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   const errs = []; page.on("pageerror", (e) => errs.push(e.message));
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
   await page.addInitScript((s) => { if (!localStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); localStorage.setItem("seeded", "1"); } }, seed);
+  await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3189/"); await page.waitForTimeout(800);
   await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: "Add a food", exact: true }).click(); await page.waitForTimeout(150); await page.locator(".add-strip").getByRole("button", { name: /^Type/ }).click(); await page.waitForTimeout(400);

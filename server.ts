@@ -5,7 +5,7 @@ import { timingSafeEqual } from "node:crypto";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import { isFood, KEYS, numberInput } from "./src/pilot";
-import { aiState, EMPTY_SAFETY, FIXED, SITUATIONS, type Safety } from "./src/safety";
+import { aiState, underAge, ADULT_ONLY, EMPTY_SAFETY, FIXED, SITUATIONS, type Safety } from "./src/safety";
 const app = express();
 // Who is asking: a Firebase ID token from the signed-in app. On when the server knows its Firebase project.
 import { initializeApp as initAdmin, getApps as adminApps } from "firebase-admin/app";
@@ -30,7 +30,8 @@ async function membership(uid: string): Promise<Member> {
   const member = role === "coach" || Boolean(x.coachId);
   const safety: Safety = { ...EMPTY_SAFETY, ...(x.safety && typeof x.safety === "object" ? x.safety : {}), aiConfirmedAt: x.aiConfirmedAt ?? undefined, aiConfirmedBy: x.aiConfirmedBy ?? undefined };
   const m: Member = { member, role, safety, birthYear: x.personal?.birthYear ?? null, hasCoach: Boolean(x.coachId) };
-  if (member) members.set(uid, { m, at: Date.now() });
+  // cached only once the account is a member and confirmed 18 or older, so the welcome tap counts at once
+  if (member && safety.adultAt && !underAge(m.birthYear)) members.set(uid, { m, at: Date.now() });
   return m;
 }
 // The AI parts answer only when the safety rules say the chat is on for this account; otherwise the fixed line, never the model.
@@ -57,6 +58,9 @@ async function requireMember(req: express.Request, res: express.Response, next: 
   try {
     const m = await membership((req as any).uid);
     if (!m.member) return res.status(403).json({ error: "Chef Mealan is in a closed pilot. Join with your coach's code to use Mealan." });
+    // Chef Mealan is for adults: nothing that reaches the AI, or the account's data, before the welcome tap; never for a birth year under 18
+    if (underAge(m.birthYear)) return res.status(403).json({ error: `${ADULT_ONLY} Your birth year means you're under 18.`, fixed: true });
+    if (!m.safety.adultAt) return res.status(403).json({ error: "Confirm on the welcome screen that you're 18 or older." });
     (req as any).role = m.role; (req as any).membership = m; next();
   } catch (e) { fail(res, e); }
 }

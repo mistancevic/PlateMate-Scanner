@@ -798,3 +798,16 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .starting > b { font-size: 22px; font-weight: 900; } .starting > p { margin: 0; color: var(--muted); font-weight: 700; }
 .starting-slow { margin-top: 18px; display: flex; flex-direction: column; align-items: stretch; gap: 10px; max-width: 320px; }
 .starting-slow p { margin: 0; font-weight: 700; } .starting-slow small { color: var(--muted); font-weight: 600; }
+
+/* Release A: the welcome with the 18+ tap, and the adults-only screen (canvas R1, R2). Same light blue as the app; nothing that looks like a warning. */
+.gate { max-width: 440px; margin: 0 auto; min-height: 100dvh; box-sizing: border-box; padding: calc(18px + env(safe-area-inset-top, 0px)) 20px calc(20px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 14px; color: var(--ink); }
+.gate .gate-brand { font-size: 15px; font-weight: 900; color: var(--brand-text); }
+.gate h1 { margin: 0; font-size: 26px; font-weight: 900; line-height: 1.2; }
+.gate p { margin: 0; font-size: 15px; line-height: 1.45; font-weight: 600; color: #3d4a63; }
+.gate .gate-lead { font-weight: 700; }
+.gate-list { list-style: none; margin: 0; padding: 14px 16px; background: var(--surface); border: 1.5px solid var(--line); border-radius: 18px; display: flex; flex-direction: column; gap: 10px; }
+.gate-list li { position: relative; padding-left: 18px; font-size: 14.5px; line-height: 1.4; font-weight: 600; color: #3d4a63; }
+.gate-list li::before { content: ""; position: absolute; left: 0; top: 7px; width: 8px; height: 8px; border-radius: 4px; background: var(--brand); }
+.gate-list b { color: var(--ink); }
+.gate-actions { margin-top: auto; }
+.adult-line { margin: 0; background: var(--tint); border-radius: 12px; padding: 10px 12px; color: var(--ink); line-height: 1.45; }

@@ -17,6 +17,7 @@ seed.items = [];
   const calls = []; await page.route("**/api/scan", (route) => { calls.push(route.request().postDataJSON()); route.fulfill({ status: 503, contentType: "application/json", body: JSON.stringify({ error: "no model in the sandbox" }) }); });
   const lookups = []; await page.route("**/api/product/**", (route) => { lookups.push(route.request().url()); route.fulfill({ status: 404, contentType: "application/json", body: JSON.stringify({ error: "not in the database" }) }); });
   await page.addInitScript((s) => { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); localStorage.setItem("chefmealan-camera-auto", "manual"); }, seed);
+  await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3199/"); await page.waitForTimeout(800);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2500);

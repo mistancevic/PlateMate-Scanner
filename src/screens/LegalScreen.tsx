@@ -55,12 +55,12 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
       {page === "privacy" && (
         <article>
           <h1>Privacy notice</h1>
-          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 4 October 2026</p>
+          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 7 October 2026</p>
           <h2>1. Who is responsible</h2>
           <p>{OPERATOR.name}, {OPERATOR.street}, {OPERATOR.city}, {OPERATOR.country}. <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>. No data protection officer is appointed; the pilot is below the thresholds that require one.</p>
           <h2>2. What Chef Mealan keeps, and why</h2>
           <ul>
-            <li><b>Account.</b> Your Google sign-in (name, email, user ID), so the app knows it is you. Legal basis: the contract, Art. 6(1)(b).</li>
+            <li><b>Account.</b> Your Google sign-in (name, email, user ID), so the app knows it is you, and the date you confirmed that you're 18 or over. Legal basis: the contract, Art. 6(1)(b).</li>
             <li><b>Body data.</b> Sex, birth year, height, weight, body fat if you give it. Used only to calculate your numbers. This is health data; it is kept only after you agree on the profile, Art. 9(2)(a), and you can withdraw by deleting it or the account.</li>
             <li><b>Your declarations.</b> What you tick under "Is any of this true for you?", allergies and intolerances, with the date, so Mealan steps back where it should. Health data, same basis, same withdrawal.</li>
             <li><b>Your foods, plates, cards and photos.</b> What you scan, build, cook and rate, and the photos you take of packs and plates. Legal basis: the contract.</li>
@@ -79,11 +79,11 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
           <h2>5. Your rights</h2>
           <p>Access, rectification, erasure, restriction, portability and objection, Art. 15 to 21. In the app: Menu, Account, Export my data gives you everything as one file; Delete my account removes it. By email: {OPERATOR.email}. You may complain to a supervisory authority; for Bavaria that is the Bayerisches Landesamt für Datenschutzaufsicht (BayLDA), Ansbach.</p>
           <h2>6. Age</h2>
-          <p>Under 16, a parent agrees to the body data and a parent or coach is attached to the account. Under 13, no account.</p>
+          <p>Chef Mealan is for people 18 and over, because the AI it uses is only allowed for adults. You confirm your age when you first sign in. If we learn that an account belongs to someone under 18, we close it and delete its data.</p>
           <h2>7. Cookies and storage</h2>
           <p>No tracking cookies. The browser keeps your sign-in session and a local copy of your data so the app works offline; both are cleared when you sign out or delete the account.</p>
           <h2>8. Automated decisions</h2>
-          <p>Mealan is an AI chef. It suggests; it does not decide anything with legal or similar effect on you. Whether Mealan's chat is on for an account follows the rules on the profile and, for minors and for one declared situation, your coach's confirmation, which a person makes.</p>
+          <p>Mealan is an AI chef. It suggests; it does not decide anything with legal or similar effect on you. Whether Mealan's chat is on for an account follows the rules on the profile and, for one declared situation, your coach's confirmation, which a person makes.</p>
         </article>
       )}
       {page === "disclaimer" && (

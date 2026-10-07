@@ -12,6 +12,7 @@ seed.items = [];
   const errs = []; page.on("pageerror", (e) => errs.push(e.message));
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
   await page.addInitScript((s) => { if (!localStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); localStorage.setItem("chefmealan-personal", JSON.stringify({ sex: "male", birthYear: 1981, heightCm: 182, weightKg: 95, activity: "moderate" })); localStorage.setItem("chefmealan-region", "munich"); localStorage.setItem("seeded", "1"); } }, seed);
+  await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3196/"); await page.waitForTimeout(900);
   const state = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   const logOf = (ev) => page.evaluate((e) => JSON.parse(localStorage.getItem("chefmealan-log") || "[]").filter((x) => x.event === e), ev);

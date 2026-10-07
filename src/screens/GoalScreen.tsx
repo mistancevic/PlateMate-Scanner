@@ -1,3 +1,4 @@
+import { underAge, ADULT_ONLY } from "../safety";
 import { useState } from "react";
 import { BANDS, saveGoal } from "../goal";
 import { density } from "../pilot";
@@ -24,9 +25,12 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const [band, setBand] = useState<string>(suggestBand(p.personal, p.goal?.band).id);
   const [own, setOwn] = useState({ kcal: state.goals.calories ? String(state.goals.calories) : "", protein: state.goals.protein ? String(state.goals.protein) : "", fats: state.goals.fats ? String(state.goals.fats) : "", carbs: state.goals.carbs ? String(state.goals.carbs) : "" });
   const mode: DayMode = dayModeOf(d);
-  const setPersonalNow = (next: Personal) => { setD(next); p.setPersonal(next); };
+  // Release A: a birth year under 18 is not saved from the goal setup; the setup says why, and the person corrects it in place
+  const under = underAge(d.birthYear);
+  const save = (next: Personal) => p.setPersonal(underAge(next.birthYear) ? { ...next, birthYear: p.personal.birthYear } : next);
+  const setPersonalNow = (next: Personal) => { setD(next); save(next); };
   const setMode = (m: DayMode) => setPersonalNow({ ...d, dayMode: m });
-  const c = calculate(d, band, p.formula);
+  const c = under ? null : calculate(d, band, p.formula);
   const by = coach ? "coach" : "you";
   const done = () => { p.notify("Your day is set. This is Today."); onDone(); };
   const goalNow = BANDS.find((b) => b.id === band)!;
@@ -47,7 +51,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const ownRows = o ? o.days : c ? Object.fromEntries(DAY_TYPES.map((x) => [x.id, { ...c.days[x.id], source: "calculated" as const }])) as Record<DayType, typeof c.days.passive & { source: "calculated" }> : emptyRows;
   const ownAvg = o ? o.avg : c ? { kcal: c.kcal, protein: c.protein } : { kcal: 0, protein: 0 };
   // Target analysis: against what this body burns at maintenance, when there is body data to tell
-  const burn = canCalculate(d) ? calculate(d, "maintain", p.formula)?.kcal ?? null : null;
+  const burn = !under && canCalculate(d) ? calculate(d, "maintain", p.formula)?.kcal ?? null : null;
   const sameRow = ownKcal && ownProtein ? { kcal: ownKcal, protein: ownProtein, fats: ownFats ?? 0, carbs: ownCarbs ?? 0, how: [] as string[] } : null;
   const analysisEach = o ? analyse({ days: o.days, avg: o.avg, bandId: band, personal: d, burn }) : null;
   const analysisSame = sameRow ? analyse({ days: Object.fromEntries(DAY_TYPES.map((x) => [x.id, sameRow])) as Record<DayType, typeof sameRow>, avg: sameRow, bandId: band, personal: d, burn }) : null;
@@ -117,10 +121,9 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           {!consented && (
             <section className="card consent" aria-label="Before your numbers">
               <b>Before your numbers</b>
-              <p className="small">To calculate your day, Mealan asks about your body: sex, birth year, height, weight, body fat if you know it. Kept only as those values and the numbers they give; on this phone and in your account in Frankfurt, EU; while the account exists; yours to export or delete. Nothing is stored until you agree. Under 16, a parent agrees. The full <a href="/privacy">privacy notice</a>.</p>
+              <p className="small">To calculate your day, Mealan asks about your body: sex, birth year, height, weight, body fat if you know it. Kept only as those values and the numbers they give; on this phone and in your account in Frankfurt, EU; while the account exists; yours to export or delete. Nothing is stored until you agree. The full <a href="/privacy">privacy notice</a>.</p>
               <div className="button-row">
                 <button className="pill pill-small pill-primary" onClick={() => p.declareSafety({ consentBodyAt: new Date().toISOString(), consentBy: "self" })}>I agree</button>
-                <button className="pill pill-small" onClick={() => p.declareSafety({ consentBodyAt: new Date().toISOString(), consentBy: "parent" })}>A parent agrees for me</button>
               </div>
             </section>
           )}
@@ -135,20 +138,21 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
                 <div className="moments">{(["female", "male"] as const).map((s) => <button key={s} className={`choice ${d.sex === s ? "on" : ""}`} onClick={() => setPersonalNow({ ...d, sex: d.sex === s ? undefined : s })}>{s === "female" ? "Female" : "Male"}</button>)}</div>
               </div>
               <div className="field-row">
-                <label className="field"><span>Birth year</span><input inputMode="numeric" value={d.birthYear ?? ""} placeholder="1985" onChange={(e) => setD({ ...d, birthYear: num(e.target.value) })} onBlur={() => p.setPersonal(d)} /></label>
-                <label className="field"><span>Height, cm</span><input inputMode="numeric" value={d.heightCm ?? ""} placeholder="175" onChange={(e) => setD({ ...d, heightCm: num(e.target.value) })} onBlur={() => p.setPersonal(d)} /></label>
-                <label className="field"><span>Weight, kg</span><input inputMode="decimal" value={d.weightKg ?? ""} placeholder="75" onChange={(e) => setD({ ...d, weightKg: num(e.target.value) })} onBlur={() => p.setPersonal(d)} /></label>
+                <label className="field"><span>Birth year</span><input inputMode="numeric" value={d.birthYear ?? ""} placeholder="1985" onChange={(e) => setD({ ...d, birthYear: num(e.target.value) })} onBlur={() => save(d)} /></label>
+                <label className="field"><span>Height, cm</span><input inputMode="numeric" value={d.heightCm ?? ""} placeholder="175" onChange={(e) => setD({ ...d, heightCm: num(e.target.value) })} onBlur={() => save(d)} /></label>
+                <label className="field"><span>Weight, kg</span><input inputMode="decimal" value={d.weightKg ?? ""} placeholder="75" onChange={(e) => setD({ ...d, weightKg: num(e.target.value) })} onBlur={() => save(d)} /></label>
               </div>
+              {under && <p className="small adult-line" role="alert"><b>Chef Mealan is for adults.</b> {ADULT_ONLY} This birth year means you're under 18, so you can't use Chef Mealan yet. If you typed it wrong, correct it here.</p>}
               <div className="field"><span>Your life, without training</span>
                 <div className="activity-list">{LIFE.map((l) => <button key={l.id} className={`activity ${lifeOf(d) === l.id ? "on" : ""}`} onClick={() => setPersonalNow({ ...d, life: l.id })}><b>{l.name}</b><small>{l.hint}</small></button>)}</div>
               </div>
               <div className="field"><span>Your training week</span><Steps week={weekOf(d)} /></div>
               <div className="field-row">
-                <label className="field"><span>Easy session, min</span><input inputMode="numeric" value={d.easyMin ?? ""} placeholder="60" onChange={(e) => setD({ ...d, easyMin: num(e.target.value) })} onBlur={() => p.setPersonal(d)} /></label>
-                <label className="field"><span>Hard session, min</span><input inputMode="numeric" value={d.hardMin ?? ""} placeholder="75" onChange={(e) => setD({ ...d, hardMin: num(e.target.value) })} onBlur={() => p.setPersonal(d)} /></label>
+                <label className="field"><span>Easy session, min</span><input inputMode="numeric" value={d.easyMin ?? ""} placeholder="60" onChange={(e) => setD({ ...d, easyMin: num(e.target.value) })} onBlur={() => save(d)} /></label>
+                <label className="field"><span>Hard session, min</span><input inputMode="numeric" value={d.hardMin ?? ""} placeholder="75" onChange={(e) => setD({ ...d, hardMin: num(e.target.value) })} onBlur={() => save(d)} /></label>
               </div>
-              <label className="field"><span>Body fat %, if you know it</span><input inputMode="decimal" value={d.bodyFatPct ?? ""} placeholder="from a scale or a scan" onChange={(e) => setD({ ...d, bodyFatPct: num(e.target.value) })} onBlur={() => p.setPersonal(d)} /></label>
-              {canCalculate(d) && <button className="pill pill-small" onClick={() => { p.setPersonal(d); setEditing(false); }}>Done</button>}
+              <label className="field"><span>Body fat %, if you know it</span><input inputMode="decimal" value={d.bodyFatPct ?? ""} placeholder="from a scale or a scan" onChange={(e) => setD({ ...d, bodyFatPct: num(e.target.value) })} onBlur={() => save(d)} /></label>
+              {canCalculate(d) && <button className="pill pill-small" onClick={() => { save(d); setEditing(false); }}>Done</button>}
             </section>
           )}
           <b className="section-title">What are you after?</b>
@@ -159,7 +163,6 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               <ul>{b.points.map((x) => <li key={x}>{x}</li>)}</ul>
             </button>
           ))}</div>
-          {d.birthYear && new Date().getFullYear() - d.birthYear < 18 && (band === "fatloss" || band === "recomp") && <p className="small muted">You're under 18, so Chef Mealan doesn't cut your food below what your body burns. Growing comes first.</p>}
           {c && <ProteinCard c={c} />}
           {c ? (
             <>

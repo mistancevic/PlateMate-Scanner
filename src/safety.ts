@@ -7,7 +7,8 @@ export type FlagSource = "door" | "code" | "model" | "coach";
 export type Flag = { situation: SituationId | "under18"; at: string; source: FlagSource };
 export type Safety = {
   consentBodyAt?: string;          // explicit consent before anything about the body is stored
-  consentBy?: "self" | "parent";   // who gave it; under 16 it has to be a parent
+  consentBy?: "self" | "parent";   // older accounts only; since Release A everyone agrees for themselves
+  adultAt?: string;                // when the person confirmed on the welcome screen that they're 18 or older
   situations: SituationId[];       // declared at the door, or flagged inside and kept
   flags: Flag[];                   // every flag, with its source and date; the coach sees situation and date only
   allergies: string[];             // declared on the profile; a flagged food is never suggested
@@ -27,18 +28,14 @@ export const SITUATIONS: { id: SituationId; label: string; detail: string }[] = 
   { id: "medication", label: "Medication that affects food", detail: "anticoagulants, MAO inhibitors, thyroid, anything your doctor told you about with food" },
 ];
 
-// ---- age bands. Germany: a person consents to a service from 16; under 16 a parent does; under 13 no account.
-export type AgeBand = "adult" | "teen" | "young" | "child" | "unknown";
-export function ageBand(birthYear: number | undefined | null, now = new Date()): AgeBand {
-  if (!birthYear || birthYear < 1900) return "unknown";
-  const age = now.getFullYear() - birthYear;
-  return age >= 18 ? "adult" : age >= 16 ? "teen" : age >= 13 ? "young" : "child";
-}
-export const isMinor = (b: AgeBand) => b === "teen" || b === "young" || b === "child";
+// ---- age. Chef Mealan is for adults, 18 and over (Release A, 7 October 2026): the AI it uses is only allowed for adults.
+// Two checks: the tap on the welcome screen (adultAt), and the birth year on the profile, counted by year.
+export const ADULT_AGE = 18;
+export const underAge = (birthYear: number | undefined | null, now = new Date()): boolean => Boolean(birthYear && birthYear > 1900 && now.getFullYear() - birthYear < ADULT_AGE);
+export const ADULT_ONLY = "Chef Mealan uses AI to read labels and photos and to chat with you, and that AI is only allowed for adults.";
 
-// ---- the AI switch. Off until a coach confirms for: signs of disordered eating, and every minor.
-// A minor also needs the right consent recorded: under 16 a parent's. Under 13 there is no account.
-export type AiState = { on: boolean; why: string; needsParent: boolean; blocked: boolean };
+// ---- the AI switch. Off until the welcome tap; off for a birth year under 18; off until a coach confirms for signs of disordered eating.
+export type AiState = { on: boolean; why: string; blocked: boolean };
 // The door is answered when something was ticked, a situation or none, within the last year
 export const DOOR_VALID_DAYS = 365;
 export function doorAnswered(safety: Safety, now = new Date()): boolean {
@@ -46,31 +43,22 @@ export function doorAnswered(safety: Safety, now = new Date()): boolean {
   if (!(safety.none || safety.situations.length > 0)) return false;
   return now.getTime() - new Date(safety.declaredAt).getTime() < DOOR_VALID_DAYS * 86_400_000;
 }
-export function aiState(safety: Safety, birthYear: number | undefined | null, hasCoach: boolean, now = new Date()): AiState {
-  const band = ageBand(birthYear, now);
-  if (band === "child") return { on: false, why: "Chef Mealan is not for people under 13.", needsParent: false, blocked: true };
+export function aiState(safety: Safety, birthYear: number | undefined | null, _hasCoach?: boolean, now = new Date()): AiState {
+  if (underAge(birthYear, now)) return { on: false, why: ADULT_ONLY, blocked: true };
+  if (!safety.adultAt) return { on: false, why: "Confirm on the welcome screen that you're 18 or older.", blocked: false };
   const confirmed = Boolean(safety.aiConfirmedAt);
-  if (!doorAnswered(safety, now)) return { on: false, why: "Answer the question on your profile first: is any of this true for you? One tap if none applies. Mealan's chat waits for that answer, and asks again once a year.", needsParent: band === "young", blocked: false };
-  if (isMinor(band)) {
-    const needsParent = band === "young";
-    const consentOk = Boolean(safety.consentBodyAt) && (!needsParent || safety.consentBy === "parent");
-    if (!hasCoach) return { on: false, why: "Under 18, Mealan's chat needs a coach or a parent attached to the account.", needsParent, blocked: false };
-    if (!consentOk) return { on: false, why: needsParent ? "Under 16, a parent has to agree before Mealan's chat is on." : "Mealan's chat is on once you have agreed to the profile and your coach has confirmed.", needsParent, blocked: false };
-    if (!confirmed) return { on: false, why: "Mealan's chat is on once your coach confirms the account.", needsParent, blocked: false };
-    return { on: true, why: "", needsParent, blocked: false };
-  }
-  if (safety.situations.includes("eating") && !confirmed) return { on: false, why: "Mealan's chat is off for this account until your coach confirms. The plate, the numbers and your foods keep working.", needsParent: false, blocked: false };
-  return { on: true, why: "", needsParent: false, blocked: false };
+  if (!doorAnswered(safety, now)) return { on: false, why: "Answer the question on your profile first: is any of this true for you? One tap if none applies. Mealan's chat waits for that answer, and asks again once a year.", blocked: false };
+  if (safety.situations.includes("eating") && !confirmed) return { on: false, why: "Mealan's chat is off for this account until your coach confirms. The plate, the numbers and your foods keep working.", blocked: false };
+  return { on: true, why: "", blocked: false };
 }
 
 // ---- the fixed responses. Written once, reviewed by Milan, never improvised. Mealan stays a chef, names who to talk to, says what the plate still does.
-export const FIXED: Record<SituationId | "under18" | "off", string> = {
+export const FIXED: Record<SituationId | "off", string> = {
   eating: "I'm a chef, and this is beyond what a chef should advise on. A doctor or a therapist who works with eating is the right person, and your coach knows you told me. Here, I keep doing what I can: the foods, the plates and the amounts, with the numbers as information, never as a verdict.",
   pregnancy: "I'm a chef, and pregnancy and breastfeeding change what a body needs in ways a chef shouldn't set. Your midwife or doctor sets the targets; bring their numbers and I fit the food to them. I won't suggest a deficit, and the plates stay as they are.",
   diabetes: "I'm a chef, and with diabetes or insulin the timing and the carbs are your doctor's call, not mine. I show the carbs and the sugars on every plate, and I fit the food to the numbers you bring from them. I won't advise on doses or timing.",
   allergies: "Noted. Nothing with what you listed will be suggested, and I check the name and the label lines of every food. The label check still shows what a pack contains, so you can see it yourself.",
   medication: "I'm a chef, and some medication changes what food does. Your doctor or pharmacist says what to avoid; tell me which foods and I keep them off every suggestion. Everything else stays as it is.",
-  under18: "Mealan's numbers never go under what a growing body needs: no deficit, no cutting. The chat is on once the account is confirmed by a coach or a parent.",
   off: "Mealan's chat is off for this account until your coach confirms. The plate, the numbers and your foods keep working.",
 };
 export const PROFESSIONAL: Record<SituationId, string> = { eating: "a doctor or a therapist who works with eating", pregnancy: "your midwife or doctor", diabetes: "your doctor or diabetes nurse", allergies: "your doctor or an allergist", medication: "your doctor or pharmacist" };

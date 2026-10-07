@@ -11,6 +11,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   const page = await b.newPage({ viewport: { width: 390, height: 844 } });
   const errs = []; page.on("pageerror", (e) => errs.push(e.message));
   await page.addInitScript((s) => { if (!localStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: new Date().toISOString(), source: "quick" })); localStorage.setItem("seeded", "1"); } }, seed);
+  await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3123/"); await page.waitForTimeout(700);
   const plate = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.map((i) => i.food.name));
   const expect = (label, ok, got) => { console.log(ok ? "ok  " : "FAIL", label, got !== undefined ? "-> " + JSON.stringify(got) : ""); if (!ok) process.exitCode = 1; };

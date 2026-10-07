@@ -15,6 +15,7 @@ const path = require("node:path");
     localStorage.setItem("chefmealan-personal", JSON.stringify({ sex: "male", birthYear: 1981, heightCm: 182, weightKg: 95, life: "desk", week: { passive: 2, active: 1, easy: 2, hard: 2 }, easyMin: 60, hardMin: 75, dayMode: "each" }));
     localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], allergies: [], flags: [], consentBodyAt: "2026-10-05T10:00:00Z", consentBy: "self", none: true, declaredAt: "2026-10-05T10:00:00Z" }));
   });
+  await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3184/"); await page.waitForTimeout(900);
   await page.getByRole("button", { name: /^My own numbers$/ }).click(); await page.waitForTimeout(200);
   await page.getByRole("button", { name: /^Maintain/ }).click().catch(() => {}); await page.waitForTimeout(150);

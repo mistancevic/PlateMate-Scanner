@@ -19,6 +19,7 @@ seed.items = [];
       localStorage.setItem("seeded", "1");
     }
   }, seed);
+  await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3121/");
   await page.waitForTimeout(800);
   const shot = async (n) => page.screenshot({ path: `/tmp/f2-${n}.png`, fullPage: true });

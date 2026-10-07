@@ -11,6 +11,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   const errs = []; page.on("pageerror", (e) => errs.push(e.message));
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
   await page.addInitScript((s) => { if (!localStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); localStorage.setItem("seeded", "1"); } }, seed);
+  await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3191/"); await page.waitForTimeout(800);
   const total = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.length);
   // make the last food a favourite, from Foods

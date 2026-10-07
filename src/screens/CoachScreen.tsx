@@ -3,7 +3,7 @@ import { RefreshCw, Copy, Target, Send, UserPlus } from "lucide-react";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { dayNameAny } from "../personal";
 import { listClients, setClientGoal, loadPhotos, sendRecipe, pinFormula, type ClientRow } from "../cloud";
-import { ageBand, isMinor, SITUATIONS } from "../safety";
+import { SITUATIONS } from "../safety";
 import { GoalHistory } from "./MenuScreen";
 import { uid } from "../pilot";
 import { BANDS, bandOf, goalsForBand } from "../goal";
@@ -73,22 +73,18 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirm
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="card-top"><span>{row.name}</span><button className="link" onClick={close}>Close</button></div>
         {(() => {
-          // safety: situation and date only, never the person's words; the coach confirms Mealan's chat for a minor or a flagged account
-          const band = ageBand(row.birthYear);
-          const minor = isMinor(band);
-          const flagged = row.flags.some((f) => f.situation === "eating");
-          const needs = minor || flagged;
+          // safety: situation and date only, never the person's words; the coach confirms Mealan's chat for a flagged account
+          const needs = row.flags.some((f) => f.situation === "eating");
           if (!needs && row.flags.length === 0) return null;
           return (
             <section className="card safety-sheet">
               <b>Safety</b>
               {row.flags.length > 0 && <ul className="small">{row.flags.map((f, i) => <li key={i}>{SITUATIONS.find((x) => x.id === f.situation)?.label ?? f.situation} · {f.at}</li>)}</ul>}
-              {minor && <p className="small">Under 18{band === "young" ? ", under 16: a parent has to agree on the profile" : ""}{row.consentBy ? ` · consent recorded by ${row.consentBy}` : " · no consent recorded yet"}. The numbers never go under maintenance.</p>}
               {needs && confirmAi && (
                 <div className="button-row">
                   {row.aiConfirmedAt
                     ? <button className="pill pill-small" onClick={() => confirmAi(row.uid, false).then(onSaved).catch((e) => setError(e.message))}>Mealan's chat is on · switch off</button>
-                    : <button className="pill pill-small pill-primary" disabled={band === "young" && row.consentBy !== "parent"} onClick={() => confirmAi(row.uid, true).then(onSaved).catch((e) => setError(e.message))}>Confirm Mealan's chat</button>}
+                    : <button className="pill pill-small pill-primary" onClick={() => confirmAi(row.uid, true).then(onSaved).catch((e) => setError(e.message))}>Confirm Mealan's chat</button>}
                 </div>
               )}
             </section>

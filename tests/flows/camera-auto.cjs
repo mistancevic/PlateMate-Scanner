@@ -10,6 +10,7 @@ const seed = JSON.parse(fs.readFileSync(require("node:path").resolve(__dirname, 
   const page = await ctx.newPage();
   const errs = []; page.on("pageerror", (e) => errs.push(e.message));
   await page.addInitScript((s) => { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); }, seed);
+  await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3182/"); await page.waitForTimeout(800);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(1500);
