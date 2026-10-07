@@ -844,3 +844,8 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
    one behind shows only at its edge, as one mark. */
 .double-thumbs { display: inline-flex; align-items: center; } .double-thumbs svg + svg { margin-left: -11px; margin-top: -5px; fill: var(--surface); }
 .choice.on .double-thumbs svg + svg { fill: #cfe0fb; }
+
+/* How was it? (7 October 2026): the three ratings are cards, icon above the label, as before v0.1.59 turned every
+   choice into a pill. The tick of a picked pill is not shown here: the card's colour says it. */
+.choices.three button.choice { flex-direction: column; justify-content: center; gap: 8px; height: 92px; border-radius: var(--r-card); white-space: normal; text-align: center; padding: 0 6px; font-size: 13px; }
+.choices.three button.choice.on::before { content: none; }
