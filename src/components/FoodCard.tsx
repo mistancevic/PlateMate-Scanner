@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Camera, ChevronLeft, ChevronRight, MessageCircle, Trash2, X } from "lucide-react";
+import { Camera, ChevronLeft, ChevronRight, Image as ImageIcon, MessageCircle, Trash2, X } from "lucide-react";
 import { mixLabel, type Mix, type MixTip } from "../mixtip";
 import { log } from "../log";
 import { density, type Food } from "../pilot";
@@ -34,6 +34,9 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
   useBack(true, close);
   useBack(viewAt !== null, () => { setViewAt(null); setArmed(false); });
   const fileRef = useRef<HTMLInputElement>(null);
+  const camRef = useRef<HTMLInputElement>(null);
+  // a phone or tablet: a touch screen, where a camera can be opened from the page
+  const hasCamera = typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches;
   const all = food.photos?.length ? food.photos : food.photo ? [food.photo] : [];
   // Removing a photo: a second tap arms it, and it is only really removed when the Undo note goes, eight seconds later,
   // or when the card closes. Until then the photo is just hidden.
@@ -73,13 +76,20 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         {(gallery.length > 1 || addPhoto) && (
           <div className="food-gallery" aria-label="Photos of this product">
             {gallery.length > 1 && gallery.map((src, i) => <button key={i} className="g-thumb" onClick={() => setViewAt(i)} aria-label={`Photo ${i + 1}`}><img src={src} alt="" /></button>)}
+            {/* two ways in (Milan, 8 October 2026): newer Android phones open only their photo picker for a plain file field,
+                without the camera, so the camera has its own button; on a computer there is no camera to offer */}
             {addPhoto && gallery.length < 6 && (
-              <button className="g-add" onClick={() => fileRef.current?.click()}><Camera size={16} /><span>{gallery.length ? "Add a photo" : "Add a photo of the front"}</span></button>
+              <>
+                {hasCamera && <button className="g-add" onClick={() => camRef.current?.click()}><Camera size={16} /><span>{gallery.length ? "Take a photo" : "Take a photo of the front"}</span></button>}
+                <button className="g-add" onClick={() => fileRef.current?.click()}><ImageIcon size={16} /><span>{hasCamera ? "Choose a photo" : gallery.length ? "Add a photo" : "Add a photo of the front"}</span></button>
+              </>
             )}
-            <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => {
-              const file = e.target.files?.[0]; e.target.value = ""; if (!file || !addPhoto) return;
-              const r = new FileReader(); r.onload = () => addPhoto(String(r.result)); r.readAsDataURL(file);
-            }} />
+            {[camRef, fileRef].map((ref, k) => (
+              <input key={k} ref={ref} type="file" accept="image/*" hidden {...(k === 0 ? { capture: "environment" as const } : {})} onChange={(e) => {
+                const file = e.target.files?.[0]; e.target.value = ""; if (!file || !addPhoto) return;
+                const r = new FileReader(); r.onload = () => addPhoto(String(r.result)); r.readAsDataURL(file);
+              }} />
+            ))}
           </div>
         )}
         <div className="job-row">

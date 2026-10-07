@@ -2,7 +2,8 @@
 // closing: the arrows, a photo below, or the arrow keys, and it says 2 of 3; tapping the photo doesn't close it. Back
 // closes only what is on top: the photo, then the card, then the tab you came from; the address follows the tab, so a
 // reload opens on the same tab. A food added today is marked New on the list. With one photo, tapping it closes it; Add a
-// photo lets you take one or choose one from the phone (Milan, 7 October 2026). Never rewrite these lines to fit a change.
+// photo lets you take one or choose one from the phone (Milan, 7 and 8 October 2026): Take a photo and Choose a photo on a
+// phone, where Android's photo picker has no camera; on a computer, one Add a photo. Never rewrite these lines to fit a change.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -30,7 +31,7 @@ seed.foods = seed.foods.map((f) => /Skyr/.test(f.name) ? { ...f, photos: [jpg, j
     ok(await skyr.locator(".new-mark").count() === 1, "a food added today is marked New");
     ok(await page.locator(".row-text").filter({ hasText: "Nutella" }).first().locator(".new-mark").count() === 0, "an older food is not");
     await skyr.locator(".name-link").click(); await page.waitForTimeout(400);
-    ok(await page.locator('.food-gallery input[type=file]').evaluate((i) => !i.hasAttribute("capture")), "Add a photo offers the camera and the phone's photos");
+    ok(await page.locator('.food-gallery input[type=file][capture]').count() === 1 && await page.locator('.food-gallery input[type=file]:not([capture])').count() === 1, "a photo can be taken with the camera, or chosen from the phone's photos");
     await page.locator(".g-thumb").first().click(); await page.waitForTimeout(300);
     ok((await count()) === "1 of 3", "the photo says 1 of 3");
     await page.getByRole("button", { name: "Next photo" }).click(); await page.waitForTimeout(200);

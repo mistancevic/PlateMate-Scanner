@@ -13,9 +13,10 @@ const seed = JSON.parse(fs.readFileSync(require("node:path").resolve(__dirname, 
   await page.goto("http://127.0.0.1:3185/"); await page.waitForTimeout(800);
   await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(400);
   await page.locator(".name-link, .row-text b").filter({ hasText: "Skyr" }).first().click(); await page.waitForTimeout(400);
-  console.log("add button:", await page.locator(".g-add").textContent());
-  await page.locator('.food-gallery input[type=file]').setInputFiles(require("node:path").resolve(__dirname, "front.jpg")); await page.waitForTimeout(900);
-  await page.locator('.food-gallery input[type=file]').setInputFiles(require("node:path").resolve(__dirname, "front.jpg")); await page.waitForTimeout(900);
+  // since 0.1.86 the card has Take a photo (phones) and Choose a photo; the photos here go in through Choose
+  console.log("add button:", await page.locator(".g-add").last().textContent());
+  await page.locator('.food-gallery input[type=file]:not([capture])').setInputFiles(require("node:path").resolve(__dirname, "front.jpg")); await page.waitForTimeout(900);
+  await page.locator('.food-gallery input[type=file]:not([capture])').setInputFiles(require("node:path").resolve(__dirname, "front.jpg")); await page.waitForTimeout(900);
   const n = await page.locator(".g-thumb").count(); console.log(n === 3 ? "ok   the picture plus two added photos" : "FAIL gallery has " + n); if (n !== 3) process.exitCode = 1;
   await page.locator(".g-thumb").first().click(); await page.waitForTimeout(300);
   console.log("full view open:", await page.locator(".photo-view").count());
