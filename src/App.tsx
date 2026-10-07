@@ -20,7 +20,7 @@ import {
 import { CameraView } from "./components/CameraView";
 import { resizeImageBase64, thumbnailBase64 } from "./utils/image";
 import { findMatch, mergeFoods, repoint } from "./dedupe";
-import { KNOWN, knownOf, displayRows, sortEuropean, type LabelRow, type Unit } from "./labeltable";
+import { KNOWN, knownOf, displayRows, sortEuropean, tidy, withPackLines, rowsFromRaw, type LabelRow, type Unit } from "./labeltable";
 import { iconFor } from "./icons";
 import type { ScannerMode } from "./types";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange, setPdUnit } from "./ui";
@@ -123,7 +123,8 @@ const load = () => {
 };
 // the main screen showed: how long the app took to open, from the page starting to load (storage release 1)
 function Opened() { useEffect(() => { if (openStats.ms === null) openStats.ms = Math.round(performance.now()); }, []); return null; }
-const inputValue = (x: number | null) => (x === null ? "" : String(x));
+// a value in a field as a label prints it: 313 kcal, 8.9 g, not 313.3333 or 8.888889 (Milan, 8 October 2026)
+const inputValue = (x: number | null, key?: string) => (x === null ? "" : String(tidy(x, key === "calories" ? "kcal" : "g") ?? x));
 function Modal({
   eyebrow,
   title,
@@ -285,9 +286,10 @@ function LabelCheck({
   const [values, setValues] = useState(() => {
     // a blank field with a less-than in the notes gets the printed bound, so the number can be calculated; the note keeps the printed text
     const bounds = lessThanFromNotes(food.notes ?? "");
-    return Object.fromEntries(KEYS.map((k) => [k, food[k] === null && bounds[k] !== undefined ? String(bounds[k]) : inputValue(food[k])])) as Record<string, string>;
+    return Object.fromEntries(KEYS.map((k) => [k, food[k] === null && bounds[k] !== undefined ? String(bounds[k]) : inputValue(food[k], k)])) as Record<string, string>;
   });
-  const [rows, setRows] = useState<LabelRow[]>(() => displayRows(food));
+  // the lines as a label prints them, once, when the review opens: typing stays exactly as typed
+  const [rows, setRows] = useState<LabelRow[]>(() => displayRows(food).map((r) => ({ ...r, amount: r.amount === null ? null : tidy(r.amount, r.unit) })));
   const [adding, setAdding] = useState(false);
   const [addKey, setAddKey] = useState("saturates");
   const [addName, setAddName] = useState("");
@@ -419,7 +421,7 @@ function LabelCheck({
             <button key={r.id} type="button" role="option" className="ref-row" onClick={() => {
               const rf = referenceFood(r, region, () => food.id);
               setName(rf.name); setBrand(""); setNotes(rf.notes ?? ""); setReady(rf.readyToEat);
-              setValues(Object.fromEntries(KEYS.map((k) => [k, inputValue((rf as any)[k])])) as Record<string, string>);
+              setValues(Object.fromEntries(KEYS.map((k) => [k, inputValue((rf as any)[k], k)])) as Record<string, string>);
               setRows(displayRows(rf)); setRefPicked(r.id); setRefOpen(false);
             }}>
               <b>{localName(r, region)}</b><small>{[r.en, r.sr, r.de].filter((x) => x !== localName(r, region)).slice(0, 2).join(" · ")} · {r.kcal} kcal · {r.protein} g protein</small>
@@ -1364,6 +1366,8 @@ export default function App() {
       for (const k of ["product_name", "brand", "calories", "protein", "fats", "carbs", "fiber", "notes"]) if (merged[k] === null || merged[k] === undefined || merged[k] === "") merged[k] = read[k];
       // the pack's printed lines win over the database's where the database has fewer
       if ((read.table?.length ?? 0) > (merged.table?.length ?? 0)) merged.table = read.table;
+      // the pack's lines the database lacks (sugar alcohols, often) are added to the database's (Milan, 8 October 2026)
+      else if (read.table?.length) merged.table = withPackLines(rowsFromRaw(merged.table ?? [], "database"), rowsFromRaw(read.table, "label"));
     }
     const ordered = frontFirst(resized, read?.front_image ?? 0);
     setImage(ordered[0] ?? ""); setImageSet(ordered);

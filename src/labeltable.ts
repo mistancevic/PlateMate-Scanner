@@ -14,7 +14,7 @@ export const KNOWN: Known[] = [
   { key: "carbohydrate", name: "Carbohydrate", sub: false, unit: "g", core: "carbs", re: /^(kohlenhydrat|carbohydrat|total carb|ugljeni hidrat|ugljikohidrat|hidratos|koolhydrat|glucides|carboidrat)/i },
   { key: "sugars", name: "of which sugars", sub: true, unit: "g", re: /(zucker|sugar|šećer|secer|azúcar|azucar|suiker|sucres|zuccher)/i },
   { key: "addedsugars", name: "of which added sugars", sub: true, unit: "g", re: /added sugar|zugesetzt/i },
-  { key: "polyols", name: "of which polyols", sub: true, unit: "g", re: /(mehrwertige alkohol|polyol|poliol|polialkohol)/i },
+  { key: "polyols", name: "of which polyols", sub: true, unit: "g", re: /(mehrwertige alkohol|polyol|poliol|polialkohol|sugar.?alcohol|zuckeralkohol|šećerni alkohol|secerni alkohol|alcoholes de az|alcools de sucre|suikeralcohol|erythrit|eritrit|maltit|xylit|sorbit)/i },
   { key: "starch", name: "of which starch", sub: true, unit: "g", re: /(stärke|starch|škrob|skrob|almidón|almidon|zetmeel|amidon|amido)/i },
   { key: "fibre", name: "Fibre", sub: false, unit: "g", core: "fiber", re: /(ballaststoff|fib(re|er)|vlakn|fibra|vezel|fibres)/i },
   { key: "protein", name: "Protein", sub: false, unit: "g", core: "protein", re: /(eiweiß|eiweiss|protein|proteín|proteina|eiwit|protéines)/i },
@@ -41,7 +41,7 @@ export function rowsFromRaw(raw: { name: string; amount: number | null; unit?: s
     const key = recognise(r.name);
     const k = knownOf(key);
     const unit = (["kcal", "kJ", "g", "mg", "µg", "%"].includes(String(r.unit)) ? r.unit : k?.unit ?? "g") as Unit;
-    return { key, name: r.name.trim().slice(0, 60), amount: typeof r.amount === "number" && Number.isFinite(r.amount) ? r.amount : null, unit, sub: r.sub ?? k?.sub ?? false, source };
+    return { key, name: r.name.trim().slice(0, 60), amount: typeof r.amount === "number" && Number.isFinite(r.amount) ? r.amount : null, unit, sub: r.sub ?? k?.sub ?? false, source: ((r as any).source as LabelRow["source"]) ?? source };
   });
 }
 // European order for a table built from known values (database, typed, or older foods)
@@ -68,4 +68,20 @@ export function lineTotal(items: { food: { table?: LabelRow[] }; grams: number }
   let sum = 0, any = false;
   for (const i of items) { const r = i.food.table?.find((x) => x.key === key && x.amount != null && (x.unit === "g")); if (r) { sum += (r.amount! * i.grams) / 100; any = true; } }
   return any ? sum : null;
+}
+
+// Values as a label prints them (Milan, 8 October 2026): a database that works per 100 g from a serving gives 313.3333
+// kcal or 8.888889 g. Energy and milligrams in whole numbers, grams to one decimal, under 1 g to two.
+export function tidy(x: number | null | undefined, unit: string = "g"): number | null {
+  if (typeof x !== "number" || !Number.isFinite(x)) return null;
+  const d = unit === "kcal" || unit === "kJ" || unit === "mg" || unit === "µg" ? 0 : Math.abs(x) < 1 ? 2 : 1;
+  const f = 10 ** d;
+  return Math.round(x * f) / f;
+}
+// A database's table plus the lines read from the pack that the database lacks (sugar alcohols, often): the database's
+// lines stay as they are, the pack's extra lines are added, in European order.
+export function withPackLines(db: LabelRow[], pack: LabelRow[]): LabelRow[] {
+  const have = new Set(db.map((r) => r.key || recognise(r.name)));
+  const extra = pack.filter((r) => { const k = r.key || recognise(r.name); return !have.has(k) && !(k === "energy" && r.unit === "kJ"); });
+  return extra.length ? sortEuropean([...db, ...extra]) : db;
 }

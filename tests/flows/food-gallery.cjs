@@ -13,7 +13,7 @@ const seed = JSON.parse(fs.readFileSync(require("node:path").resolve(__dirname, 
   await page.goto("http://127.0.0.1:3185/"); await page.waitForTimeout(800);
   await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(400);
   await page.locator(".name-link, .row-text b").filter({ hasText: "Skyr" }).first().click(); await page.waitForTimeout(400);
-  // since 0.1.86 the card has Take a photo (phones) and Choose a photo, in their own part under the photos (0.1.87); the photos here go in through Choose
+  // since 0.1.86 the card has Take a photo (phones) and Choose a photo, in their own row under the photos (0.1.88, canvas C6); the photos here go in through Choose
   console.log("add button:", await page.locator(".g-add").last().textContent());
   await page.locator('.photo-add input[type=file]:not([capture])').setInputFiles(require("node:path").resolve(__dirname, "front.jpg")); await page.waitForTimeout(900);
   await page.locator('.photo-add input[type=file]:not([capture])').setInputFiles(require("node:path").resolve(__dirname, "front.jpg")); await page.waitForTimeout(900);

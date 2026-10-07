@@ -15,6 +15,7 @@ import { getStorage as adminStorage } from "firebase-admin/storage";
 import { createHash } from "node:crypto";
 import { deleteAccount as deleteAccountSteps } from "./src/accountDelete";
 import { guideForChat } from "./src/goalGuide";
+import { tidy } from "./src/labeltable";
 const FB_PROJECT = process.env.FIREBASE_PROJECT_ID || "";
 // photos as files (storage release 1): the project's default bucket in Frankfurt
 const BUCKET = process.env.FIREBASE_STORAGE_BUCKET || (FB_PROJECT ? `${FB_PROJECT}.firebasestorage.app` : "");
@@ -434,7 +435,7 @@ app.get("/api/search", requireUser, requireMember, async (req, res) => {
     const d = await r.json();
     const products = (Array.isArray(d.products) ? d.products : [])
       .filter((p: any) => /^\d{8,14}$/.test(String(p.code ?? "")) && p.product_name && !/\bml\b/i.test(p.nutrition_data_per || ""))
-      .map((p: any) => ({ code: String(p.code), name: String(p.product_name).trim(), brand: String(p.brands || "").split(",")[0].trim(), quantity: String(p.quantity || "").trim(), kcal: numberInput(p.nutriments?.["energy-kcal_100g"]), protein: numberInput(p.nutriments?.proteins_100g) }))
+      .map((p: any) => ({ code: String(p.code), name: String(p.product_name).trim(), brand: String(p.brands || "").split(",")[0].trim(), quantity: String(p.quantity || "").trim(), kcal: tidy(numberInput(p.nutriments?.["energy-kcal_100g"]), "kcal"), protein: tidy(numberInput(p.nutriments?.proteins_100g)) }))
       .filter((p: any) => p.kcal !== null && p.protein !== null)
       .slice(0, 5);
     return res.json({ products });
@@ -480,17 +481,17 @@ app.get("/api/product/:barcode", requireUser, requireMember, async (req, res) =>
       product_name: p.product_name || "",
       brand: p.brands || "",
       barcode,
-      calories: perVolume ? null : numberInput(n["energy-kcal_100g"]),
-      protein: perVolume ? null : numberInput(n.proteins_100g),
-      fats: perVolume ? null : numberInput(n.fat_100g),
-      carbs: perVolume ? null : numberInput(n.carbohydrates_100g),
-      fiber: perVolume ? null : numberInput(n.fiber_100g),
+      calories: tidy(perVolume ? null : numberInput(n["energy-kcal_100g"]), "kcal"),
+      protein: tidy(perVolume ? null : numberInput(n.proteins_100g), "g"),
+      fats: tidy(perVolume ? null : numberInput(n.fat_100g), "g"),
+      carbs: tidy(perVolume ? null : numberInput(n.carbohydrates_100g), "g"),
+      fiber: tidy(perVolume ? null : numberInput(n.fiber_100g), "g"),
       table: perVolume ? [] : ([
         ["Energy", n["energy-kcal_100g"], "kcal", false], ["Fat", n.fat_100g, "g", false], ["of which saturates", n["saturated-fat_100g"], "g", true],
         ["of which mono-unsaturates", n["monounsaturated-fat_100g"], "g", true], ["of which polyunsaturates", n["polyunsaturated-fat_100g"], "g", true],
         ["Carbohydrate", n.carbohydrates_100g, "g", false], ["of which sugars", n.sugars_100g, "g", true], ["of which polyols", n.polyols_100g, "g", true],
         ["of which starch", n.starch_100g, "g", true], ["Fibre", n.fiber_100g, "g", false], ["Protein", n.proteins_100g, "g", false], ["Salt", n.salt_100g, "g", false],
-      ] as [string, unknown, string, boolean][]).filter(([, v, , sub]) => !sub || numberInput(v) !== null).map(([name, v, unit, sub]) => ({ name, amount: numberInput(v), unit, sub })),
+      ] as [string, unknown, string, boolean][]).filter(([, v, , sub]) => !sub || numberInput(v) !== null).map(([name, v, unit, sub]) => ({ name, amount: tidy(numberInput(v), unit), unit, sub })),
       source: `Open Food Facts · ${new Date().toISOString().slice(0, 10)}`,
       notes: `Verify product variant, actual label basis and carbohydrate convention. ${perVolume ? "Volume-based record: enter confirmed per-100-g values." : ""} Markets: ${(p.countries_tags || []).slice(0, 6).join(", ")}`,
     });
