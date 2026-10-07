@@ -14,7 +14,7 @@ export function dayLog(feedback: Feedback[], day: Date): DayLog {
 // "2 meals logged, 1,210 kcal and 84 g protein so far": a count and the numbers, nothing about targets
 export function loggedLine(log: DayLog, today: boolean): string {
   const n = log.logged.length;
-  if (n === 0) return today ? "Nothing logged yet today." : "Nothing logged.";
+  if (n === 0) return today ? "Nothing logged yet today." : "Nothing logged that day.";
   const meals = `${n} ${n === 1 ? "meal" : "meals"} logged`;
   return `${meals}, ${Math.round(log.kcal).toLocaleString("en")} kcal and ${Math.round(log.protein)} g protein${today ? " so far" : ""}.`;
 }

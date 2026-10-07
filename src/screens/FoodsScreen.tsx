@@ -126,7 +126,7 @@ export function FoodsScreen(p: AppApi) {
             <span className="thumb">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
             <div className="row-text">
               <button className="name-link" onClick={() => setCardId(f.id)}>{f.favorite && <span className="fav-mark">★ </span>}{f.name}</button>
-              <small>{jobOf(f).job} · {f.brand ? `${f.brand} · ` : ""}{fmt(f.calories, 0)} kcal · {fmt(f.protein)} g per 100 g</small>
+              <small>{jobOf(f).job}{f.brand ? ` by ${f.brand}` : ""}. Per 100 g: {fmt(f.calories, 0)} kcal and {fmt(f.protein)} g protein.</small>
               <span className="row-links">
                 <button className="link" onClick={() => add(f)}>Add to meal</button>
                 <button className="link" onClick={() => p.toggleFavorite(f.id)}>{f.favorite ? "★ Favourite" : "☆ Favourite"}</button>

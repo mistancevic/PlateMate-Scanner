@@ -48,7 +48,7 @@ export function HomeScreen(p: AppApi) {
       <section className="plan">
         {/* the goal is the headline and the way in; whose and who set it is one small line above it */}
         <div className="plan-goal">
-          <small>Your goal · set by {byCoach ? setBy : "you"}</small>
+          <small>Your goal, set by {byCoach ? setBy : "you"}</small>
           <button className="plan-goal-name" onClick={() => p.openMenu("goal")} aria-label="Open your goal">{bandName || "Your goal"} <ChevronRight size={22} /></button>
         </div>
         <div className="plan-row">
@@ -70,7 +70,7 @@ export function HomeScreen(p: AppApi) {
           <div className="today-plan">
             <b>{dateLine}</b>
             <span className="today-what">{todayLine(p.day.plan)}. {LOAD_DAY[loadOf(p.day.plan)]}</span>
-            <small>{p.day.source === "today" ? "Changed for today only. Your Weekly plan stays the same." : "Today's part of your Weekly plan. If your day goes differently, change today's plan; the numbers follow, and your Weekly plan stays the same."}</small>
+            <small>{p.day.source === "today" ? "Changed for today only. Your Weekly plan stays the same." : "This comes from your Weekly plan. If today goes differently, change today's plan. The numbers follow, and your Weekly plan stays as it is."}</small>
             <button className="pill pill-wide" onClick={() => { setDraft(p.day.plan!); setChanging(true); }}>Change today's plan</button>
             {p.day.source === "today" && <button className="link" onClick={() => p.setTodayPlan(null)}>Back to the Weekly plan</button>}
           </div>
@@ -123,7 +123,7 @@ export function HomeScreen(p: AppApi) {
       )}
       {inbox}
       <p className="label">Logged so far</p>
-      <p className="small logged-line">{loggedLine(today, true)} What went through Mealan, nothing more.</p>
+      <p className="small logged-line">{loggedLine(today, true)} This shows only the meals you made with Mealan.</p>
       {today.logged.map((f) => (
         <section className="card log-card" key={f.id}>
           <div className="card-top"><span>{f.meal.title}</span><small>{new Date(f.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small></div>
@@ -146,11 +146,11 @@ export function HomeScreen(p: AppApi) {
           ))}
         </>
       )}
-      <p className="label">The last days</p>
+      <p className="label">The last few days</p>
       <section className="card days">
         {past.map((d) => (
           <div className="history-row" key={d.day.toISOString()}>
-            <div><b>{dayLabel(d.day)}</b><small>{d.dayType ? dayNameAny(d.dayType) : "day type not set"}</small></div>
+            <div><b>{dayLabel(d.day)}</b><small>{d.dayType ? dayNameAny(d.dayType) : "No kind of day was set"}</small></div>
             <div className="history-num"><small>{loggedLine(d, false)}</small></div>
           </div>
         ))}

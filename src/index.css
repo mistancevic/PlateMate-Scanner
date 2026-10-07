@@ -839,3 +839,8 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .trend-chip { align-self: flex-start; height: 26px; padding: 0 10px; border-radius: 13px; font-size: 12.5px; font-weight: 800; display: inline-flex; align-items: center; } .trend-chip.ok { background: #e3f4e8; color: #1b7a3a; } .trend-chip.warn { background: #fff4e0; color: #8a4b00; } .trend-chip.quiet { background: var(--tint); color: var(--brand-text); }
 .trend-note { margin: 0; padding: 10px 12px; border-radius: 12px; background: #fff8ec; font-size: 13px; line-height: 1.45; color: var(--ink); }
 .weigh-list { list-style: none; margin: 0; padding: 0; } .weigh-list li { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); font-size: 13px; } .weigh-list li span { color: var(--muted); font-weight: 700; flex: 1; }
+
+/* DaaM good: two thumbs up, the top rating (7 October 2026). The front thumb is filled with the button's colour so the
+   one behind shows only at its edge, as one mark. */
+.double-thumbs { display: inline-flex; align-items: center; } .double-thumbs svg + svg { margin-left: -11px; margin-top: -5px; fill: var(--surface); }
+.choice.on .double-thumbs svg + svg { fill: #cfe0fb; }

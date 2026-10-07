@@ -2,7 +2,7 @@
 export type MomentId = "regular" | "before" | "after" | "meeting" | "travel" | "celebration" | "afterwork";
 export type Moment = { id: MomentId; name: string; planned: boolean; hint: string };
 export const MOMENTS: Moment[] = [
-  { id: "regular",     name: "Regular meal",        planned: true,  hint: "Fits your day." },
+  { id: "regular",     name: "Regular meal",        planned: true,  hint: "Aims at your day's target." },
   { id: "before",      name: "Before training",     planned: true,  hint: "Energy that's easy to take in. Keep fat and fibre low." },
   { id: "after",       name: "After training",      planned: true,  hint: "Protein first." },
   { id: "meeting",     name: "Meeting day",         planned: true,  hint: "Steady energy, no dip. Keep the plate small." },

@@ -37,7 +37,8 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-personal") || "{}"); const d = { work: true, kind: "strength", intensity: "hard", when: "evening", minutes: 60 }; p.plan = [d, d, d, d, d, d, d]; delete p.dated; Object.keys(localStorage).filter((k) => k.startsWith("chefmealan-today-")).forEach((k) => localStorage.removeItem(k)); localStorage.setItem("chefmealan-personal", JSON.stringify(p)); Object.keys(localStorage).filter((k) => k.startsWith("chefmealan-today-")).forEach((k) => localStorage.removeItem(k)); });
   await page.reload(); await page.waitForTimeout(900);
   const card = await page.locator(".today-plan").first().textContent();
-  ok(/Strength, hard, in the evening\. A hard day\./.test(card) && /Today's part of your Weekly plan/.test(card), "Today reads the plan and says where it comes from: " + card.slice(0, 80));
+  // the wording of this line changed in the plain English pass (approved 7 October 2026); it still says where the plan comes from
+  ok(/Strength, hard, in the evening\. A hard day\./.test(card) && /comes from your Weekly plan/.test(card), "Today reads the plan and says where it comes from: " + card.slice(0, 80));
   await page.getByRole("button", { name: "Change today's plan" }).click(); await page.waitForTimeout(200);
   // since 7 October 2026 (canvas board T3) the day settings call a rest day No training
   await page.locator(".today-plan").getByRole("button", { name: "No training", exact: true }).click();
@@ -48,7 +49,7 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   await page.getByRole("button", { name: "Back to the Weekly plan" }).click(); await page.waitForTimeout(300);
   ok(/A hard day/.test(await page.locator(".today-plan").first().textContent()), "back to the Weekly plan");
   // approved on the canvas, 6 October 2026: the goal itself is the link, large; who set it is one small line above it
-  ok(/your goal · set by you/i.test(await page.locator(".plan-goal small").first().textContent()), "a small line says whose goal and who set it");
+  ok(/your goal, set by you/i.test(await page.locator(".plan-goal small").first().textContent()), "a small line says whose goal and who set it");
   await page.getByRole("button", { name: "Open your goal" }).click(); await page.waitForTimeout(300);
   ok(await page.getByRole("button", { name: /Change the goal/ }).count() >= 1, "the goal's name opens Me, Goal");
   // JOURNEY INVARIANT (Milan, 7 October 2026, from a Today card that showed PD 3.0 for a 190 g, 3,200 kcal day):

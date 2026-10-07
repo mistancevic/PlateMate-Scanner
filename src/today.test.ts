@@ -11,7 +11,8 @@ test("a day sums only what was eaten and keeps prepared cards apart", () => {
 test("the line is information, never a verdict", () => {
   const today = new Date();
   assert.equal(loggedLine(dayLog([card("eaten", today, 300)], today), true), "1 meal logged, 189 kcal and 33 g protein so far.");
-  assert.equal(loggedLine(dayLog([], daysAgo(2)), false), "Nothing logged.");
+  // plain English pass, 7 October 2026: a past day says "that day"
+  assert.equal(loggedLine(dayLog([], daysAgo(2)), false), "Nothing logged that day.");
 });
 test("day labels", () => { assert.equal(dayLabel(daysAgo(0)), "Today"); assert.equal(dayLabel(daysAgo(1)), "Yesterday"); });
 test("the day type comes from the cards of that day", () => { const d = daysAgo(1); assert.equal(dayLog([card("eaten", d, 300, "training")], d).dayType, "training"); });

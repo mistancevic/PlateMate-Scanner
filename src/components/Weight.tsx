@@ -22,7 +22,7 @@ export function WeighInLine({ list, onSave, notify }: { list: WeighIn[] | undefi
   };
   if (!open) return (
     <button className="weigh-line" onClick={() => { setV(last ? String(last.kg) : ""); setOpen(true); }}>
-      <span><b>Weigh in</b><small>{last ? `last: ${last.kg.toFixed(1)} kg, ${last.date === today() ? "today" : dayName(last.date)}${avg ? ` · 7-day average ${avg.toFixed(1)} kg` : ""}` : "any morning, before breakfast"}</small></span>
+      <span><b>Weigh in</b><small>{last ? `last: ${last.kg.toFixed(1)} kg, ${last.date === today() ? "today" : dayName(last.date)}${avg ? ` · 7-day average ${avg.toFixed(1)} kg` : ""}` : "Any morning, before breakfast."}</small></span>
       <Plus size={20} />
     </button>
   );

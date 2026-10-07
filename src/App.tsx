@@ -1045,7 +1045,7 @@ export default function App() {
     nextSource.current = "profile";
     saveGoal({ ...goal, method: r.method, setAt: new Date().toISOString() }); setGoalState(getGoal());
     setState((s) => ({ ...s, goals: { ...s.goals, calories: r.kcal, protein: r.protein } }));
-    notify(`Your numbers moved with your profile: ${r.kcal.toLocaleString()} kcal, ${r.protein} g protein.`);
+    notify(`Your numbers changed with your profile. An average day is now ${r.kcal.toLocaleString("en")} kcal and ${r.protein} g protein.`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [personal, profile.formula]);
   // a goal band with missing numbers heals itself from the band
@@ -1765,7 +1765,7 @@ export default function App() {
         </button>
         <h1>{TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
-          {menuSection === "goal" ? pdText(dayPd) : <>{goal?.band ? goalLabel(goal.band) : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · {pdText(dayPd)} · set by {goal?.setBy === "coach" ? coachLabel(goal.coachName || profile.coachName || COACH_NAME) : "you"}</>}
+          {menuSection === "goal" ? pdText(dayPd) : <>{goal?.band ? goalLabel(goal.band).replace(" · ", ", ") : `${fmt(state.goals.calories, 0)} kcal, ${fmt(state.goals.protein)} g`} · {pdText(dayPd)}</>}
         </button>}
         <button className="icon menu-button" aria-label="Menu" onClick={() => setMenuSection(menuSection ? null : "list")}><Menu size={22} /></button>
       </header>

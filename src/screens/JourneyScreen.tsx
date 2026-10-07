@@ -228,7 +228,7 @@ export function JourneyScreen(p: AppApi) {
                 <span className="thumb">{i.food.photo ? <img src={i.food.photo} alt="" /> : (i.food.icon || iconFor(i.food.name))}</span>
                 <div className="row-text">
                   <button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button>
-                  <small>{pdText(density(i.food.protein, i.food.calories))} · {i.locked ? "keep this amount" : `${CHEF_NAME} may move it`}</small>
+                  <small>{pdText(density(i.food.protein, i.food.calories))} · {i.locked ? "This amount stays." : `${CHEF_NAME} can change this amount.`}</small>
                 </div>
                 {i.locked ? <b className="row-num">{fmt(i.grams, 0)} g{servingLabel(i.food, i.grams) ? <small> = {servingLabel(i.food, i.grams)}</small> : null}</b> : (
                   <label className="grams">
@@ -248,7 +248,7 @@ export function JourneyScreen(p: AppApi) {
           <ChefHat size={18} /> Fit to my target
         </button>
         {items.length === 1 && <p className="small center">One product: {CHEF_NAME} looks through your foods for a partner that brings it to your plan.</p>}
-        {items.length >= 2 && <p className="small center">Code, not a conversation: the amounts, at once. Questions go to {CHEF_NAME}, the button bottom right.</p>}
+        {items.length >= 2 && <p className="small center">This works out the amounts straight away, without the AI. To ask {CHEF_NAME} something, tap the round button at the bottom right.</p>}
         {items.length >= 2 && <p className="small center">Grey is yours to type and {CHEF_NAME}'s to move. Coral is fixed. Swipe right to remove, left to swap. Tap a name for its card.</p>}
         {swapPanel}
         {foodCard}
@@ -273,7 +273,7 @@ export function JourneyScreen(p: AppApi) {
           {state.foods.length === 0 && <small>No saved foods yet. Scan or type one above.</small>}
         </div>
         {!q.trim() && state.foods.length > quick.picks.length && (
-          <button className="link all-foods" onClick={() => setTab("foods")}>All {state.foods.length} foods →</button>
+          <button className="link all-foods" onClick={() => setTab("foods")}>See all {state.foods.length} foods</button>
         )}
 
       </>
@@ -388,7 +388,7 @@ export function JourneyScreen(p: AppApi) {
     <>
       <Head title="How was it?" sub="One tap. It stays yours unless you share it." />
       <div className="choices three">
-        <button className={`choice ${good === "daam" ? "on" : ""}`} onClick={() => setGood("daam")}><ThumbsUp size={24} /><span>DaaM good</span></button>
+        <button className={`choice ${good === "daam" ? "on" : ""}`} onClick={() => setGood("daam")}><span className="double-thumbs" aria-hidden="true"><ThumbsUp size={22} /><ThumbsUp size={22} /></span><span>DaaM good</span></button>
         <button className={`choice ${good === "good" ? "on" : ""}`} onClick={() => setGood("good")}><ThumbsUp size={22} /><span>Good</span></button>
         <button className={`choice ${good === "no" ? "on" : ""}`} onClick={() => setGood("no")}><ThumbsDown size={24} /><span>Not really</span></button>
       </div>

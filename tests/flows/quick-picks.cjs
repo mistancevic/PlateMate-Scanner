@@ -25,7 +25,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.getByLabel("Search all my foods").fill(lastName.slice(0, 5)); await page.waitForTimeout(200);
   ok(await page.getByText("From all your foods").count() === 1, "typing searches all foods");
   await page.getByLabel("Search all my foods").fill(""); await page.waitForTimeout(200);
-  await page.getByRole("button", { name: new RegExp(`All ${total} foods`) }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: new RegExp(`all ${total} foods`, "i") }).click(); await page.waitForTimeout(300);
   ok(await page.getByText(/Find a food/).count() >= 1, "All foods opens Foods");
   console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(300);
