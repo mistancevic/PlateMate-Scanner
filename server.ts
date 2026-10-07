@@ -13,6 +13,7 @@ import { getAuth as adminAuth } from "firebase-admin/auth";
 import { getFirestore as adminDb, FieldValue } from "firebase-admin/firestore";
 import { getStorage as adminStorage } from "firebase-admin/storage";
 import { createHash } from "node:crypto";
+import { deleteAccount as deleteAccountSteps } from "./src/accountDelete";
 const FB_PROJECT = process.env.FIREBASE_PROJECT_ID || "";
 // photos as files (storage release 1): the project's default bucket in Frankfurt
 const BUCKET = process.env.FIREBASE_STORAGE_BUCKET || (FB_PROJECT ? `${FB_PROJECT}.firebasestorage.app` : "");
@@ -365,31 +366,32 @@ app.post("/api/scan", requireUser, requireMember, async (req, res) => {
     fail(res, error);
   }
 });
-// Delete my account, the whole of it, with admin rights: the record and everything under it (photos, cards, recipes),
-// the person's access requests and invites by email, then the sign-in. No second sign-in needed, which the client-side
-// delete could not promise on a phone. The client wipes its own storage after, so nothing comes back on the next sign-in.
+// Delete my account, the whole of it, with admin rights, in the safe order of src/accountDelete.ts: lock the sign-in
+// first (nothing is deleted if that fails), then photo files, the record with everything under it, access requests and
+// invites by email, and the sign-in last. A data step that fails unlocks the sign-in again, so the person can finish.
+// The answer says which steps were done and which one stopped, so the phone knows whether to clear itself.
 app.post("/api/account/delete", requireUser, async (req, res) => {
   const uid = (req as any).uid as string | undefined;
   if (!uid) return res.status(401).json({ error: "Please sign in." });
-  const steps: string[] = [];
-  try {
-    const d = db();
-    if (BUCKET) { await adminStorage().bucket(BUCKET).deleteFiles({ prefix: `users/${uid}/` }); steps.push("photo files removed"); }
-    await d.recursiveDelete(d.collection("users").doc(uid)); steps.push("record, photos, cards and recipes removed");
-    let email = String((req as any).email || "");
-    if (!email) { try { email = String((await adminAuth().getUser(uid)).email || "").toLowerCase(); } catch { /* no email, nothing to clean by it */ } }
-    if (email) {
+  const d = db();
+  let email = String((req as any).email || "").toLowerCase();
+  const r = await deleteAccountSteps({
+    lock: async () => { await adminAuth().updateUser(uid, { disabled: true }); await adminAuth().revokeRefreshTokens(uid); },
+    unlock: async () => { await adminAuth().updateUser(uid, { disabled: false }); },
+    files: async () => { if (BUCKET) await adminStorage().bucket(BUCKET).deleteFiles({ prefix: `users/${uid}/` }); },
+    record: async () => { await d.recursiveDelete(d.collection("users").doc(uid)); },
+    requests: async () => {
+      if (!email) { try { email = String((await adminAuth().getUser(uid)).email || "").toLowerCase(); } catch { /* no email, nothing to clean by it */ } }
+      if (!email) return;
       for (const col of ["accessRequests", "invites"]) {
         const snap = await d.collection(col).where("email", "==", email).get();
         const batch = d.batch(); snap.docs.forEach((x) => batch.delete(x.ref)); if (snap.size) await batch.commit();
-        if (snap.size) steps.push(`${snap.size} ${col === "invites" ? "invite" : "access request"}${snap.size === 1 ? "" : "s"} removed`);
       }
-    }
-    await adminAuth().deleteUser(uid); steps.push("sign-in removed");
-    return res.json({ ok: true, steps });
-  } catch (error) {
-    return res.status(500).json({ error: `Could not finish the deletion: ${(error as Error).message}`, steps });
-  }
+    },
+    signin: async () => { await adminAuth().deleteUser(uid); },
+    log: (line) => console.error(`${line} (uid ${uid})`),
+  });
+  return res.status(r.ok ? 200 : 500).json(r);
 });
 // A shared plate's photo for the client's coach (storage release 1). Photo files are the owner's only; the coach gets one
 // through here, after the server checks that this coach is the client's coach and that the card is shared.

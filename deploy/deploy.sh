@@ -17,6 +17,8 @@ BUCKET="${STORAGE_BUCKET:-$FB_PROJECT_ID.firebasestorage.app}"
 gcloud storage buckets update "gs://$BUCKET" --cors-file=deploy/cors.json --quiet >/dev/null 2>&1 || echo "Photo storage: CORS not set (check that the bucket $BUCKET exists)"
 PN=$(gcloud projects describe "$PROJECT" --format='value(projectNumber)')
 gcloud storage buckets add-iam-policy-binding "gs://$BUCKET" --member "serviceAccount:$PN-compute@developer.gserviceaccount.com" --role roles/storage.objectAdmin --quiet >/dev/null 2>&1 || echo "Photo storage: the server's access was not set"
+# Delete my account: the server may switch off and remove a sign-in (Firebase Authentication), every deploy, so it never goes missing
+gcloud projects add-iam-policy-binding "${FB_PROJECT_ID:-$PROJECT}" --member "serviceAccount:$PN-compute@developer.gserviceaccount.com" --role roles/firebaseauth.admin --condition=None --quiet >/dev/null 2>&1 || echo "Account delete: the server's right to remove sign-ins was not set (needs an owner of ${FB_PROJECT_ID:-$PROJECT})"
 SECRETS="GEMINI_API_KEY=gemini-key:latest"
 gcloud secrets describe airtable-key --project "$PROJECT" >/dev/null 2>&1 && SECRETS="$SECRETS,AIRTABLE_API_KEY=airtable-key:latest"
 gcloud run deploy "$SERVICE" --project "$PROJECT" --region "$REGION" --image "$IMAGE" \

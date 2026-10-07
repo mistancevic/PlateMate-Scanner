@@ -15,6 +15,8 @@ PN=$(gcloud projects describe "$PROJECT" --format='value(projectNumber)')
 for r in roles/artifactregistry.writer roles/logging.logWriter roles/storage.objectViewer roles/datastore.user; do
   gcloud projects add-iam-policy-binding "$PROJECT" --member "serviceAccount:$PN-compute@developer.gserviceaccount.com" --role "$r" --condition=None >/dev/null
 done
+# Delete my account: the server switches off and removes the sign-in (Firebase Authentication)
+gcloud projects add-iam-policy-binding "${FB_PROJECT_ID:-$PROJECT}" --member "serviceAccount:$PN-compute@developer.gserviceaccount.com" --role roles/firebaseauth.admin --condition=None >/dev/null
 for s in gemini-key airtable-key; do
   gcloud secrets describe "$s" >/dev/null 2>&1 && gcloud secrets add-iam-policy-binding "$s" --member "serviceAccount:$PN-compute@developer.gserviceaccount.com" --role roles/secretmanager.secretAccessor >/dev/null
 done

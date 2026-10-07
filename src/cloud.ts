@@ -4,20 +4,22 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRe
 import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, type Firestore } from "firebase/firestore";
 import { getStorage, ref as fileRef, uploadString, getBytes, deleteObject, listAll } from "firebase/storage";
 
+// outside the browser build (the tests) there is no env: the cloud is simply off
+const env: Record<string, string | undefined> = (import.meta as any).env ?? {};
 const cfg = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey: env.VITE_FIREBASE_API_KEY,
+  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: env.VITE_FIREBASE_PROJECT_ID,
+  appId: env.VITE_FIREBASE_APP_ID,
   // photos as files (storage release 1): the project's default bucket, in Frankfurt, unless told otherwise
-  storageBucket: (import.meta.env.VITE_FIREBASE_STORAGE_BUCKET as string | undefined) || (import.meta.env.VITE_FIREBASE_PROJECT_ID ? `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.firebasestorage.app` : undefined),
+  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || (env.VITE_FIREBASE_PROJECT_ID ? `${env.VITE_FIREBASE_PROJECT_ID}.firebasestorage.app` : undefined),
 };
 export const cloudEnabled = Boolean(cfg.apiKey && cfg.projectId && cfg.appId && cfg.authDomain);
 let app: FirebaseApp | null = null;
 const getApp = () => (app ??= initializeApp(cfg));
 const auth = () => getAuth(getApp());
 // A project can hold several Firestore databases; the client reaches "(default)" unless told which one.
-const dbId = import.meta.env.VITE_FIREBASE_DB_ID as string | undefined;
+const dbId = env.VITE_FIREBASE_DB_ID;
 // Fields a label read leaves as undefined must not break a save: the client drops them on the way out.
 let dbInstance: Firestore | null = null;
 const db = () => {
@@ -54,7 +56,13 @@ export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const snap = await getDoc(doc(db(), "users", uid));
   return snap.exists() ? (snap.data() as CloudDoc) : null;
 }
+// While an account is being deleted, this phone writes nothing to it: no save, no card, no photo file. An open app could
+// otherwise put its old copy back after the record is gone (7 October 2026). A paused write fails, so nothing counts as saved.
+let paused = false;
+export const pauseAccountWrites = (on: boolean) => { paused = on; };
+const notPaused = () => { if (paused) throw new Error("Saving is paused while your account is deleted."); };
 export async function saveCloud(uid: string, data: CloudDoc) {
+  notPaused();
   // merge, so fields the coach or the console own (role, coach link, coachSetAt) are never wiped by the client's save
   await setDoc(doc(db(), "users", uid), data, { merge: true });
 }
@@ -129,6 +137,7 @@ export function stripPhotos<T>(state: T): T {
 // ---- cards ----
 // Each meal card is its own document under users/{uid}/cards. Private by default; the coach may read only shared ones.
 export async function saveCards(uid: string, cards: any[]) {
+  notPaused();
   for (let i = 0; i < cards.length; i += 20) {
     const b = writeBatch(db());
     for (const fb of cards.slice(i, i + 20)) {
@@ -191,10 +200,12 @@ export async function exportAccount(uid: string) {
 const files = () => getStorage(getApp());
 const photoFile = (uid: string, name: string) => fileRef(files(), `users/${uid}/photos/${name}`);
 export async function uploadPhoto(uid: string, name: string, dataUrl: string) {
+  notPaused();
   // the type comes from the photo itself (most are JPEG; the starter foods' pictures are SVG)
   await uploadString(photoFile(uid, name), dataUrl, "data_url", { cacheControl: "private, max-age=31536000" });
 }
 export async function deletePhotoFile(uid: string, name: string) {
+  notPaused();
   try { await deleteObject(photoFile(uid, name)); } catch (e: any) { if (e?.code !== "storage/object-not-found") throw e; }
 }
 export async function listPhotoFiles(uid: string): Promise<string[]> {
@@ -210,8 +221,9 @@ export async function downloadPhoto(uid: string, name: string): Promise<string> 
   return await new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
 }
 // The photos moved out of the database once; the old copies stay 30 days as a backup, then go.
-export async function markPhotosMoved(uid: string) { await setDoc(doc(db(), "users", uid), { photosMovedAt: new Date().toISOString() }, { merge: true }); }
+export async function markPhotosMoved(uid: string) { notPaused(); await setDoc(doc(db(), "users", uid), { photosMovedAt: new Date().toISOString() }, { merge: true }); }
 export async function dropOldPhotoCopies(uid: string) {
+  notPaused();
   const snap = await getDocs(collection(db(), "users", uid, "photos"));
   let batch = writeBatch(db()), n = 0;
   for (const d of snap.docs) { batch.delete(d.ref); if (++n % 400 === 0) { await batch.commit(); batch = writeBatch(db()); } }

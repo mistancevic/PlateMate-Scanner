@@ -41,7 +41,7 @@ import { openStats } from "./openStats";
 import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear } from "./photos";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { setTodayChange, dayOfLoad, type PlanDay } from "./plan";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, type Personal, type DayType, type Day } from "./personal";
@@ -1671,26 +1671,37 @@ export default function App() {
       if (on) await confirmClientAi(clientUid, user.uid); else await clearClientAi(clientUid);
       notify(on ? "Mealan's chat is on for this client." : "Mealan's chat is off for this client.");
     },
+    // Delete my account (7 October 2026): the server runs the steps in a safe order and says which were done. From the
+    // first tap this phone writes nothing to the account. Once the record is gone the phone is cleared and signed out,
+    // whatever happened to the last step; if nothing was deleted, the phone keeps everything and saving goes on.
     deleteAccount: async () => {
-      let dataGone = false;
+      const clearPhone = async () => { localStorage.clear(); sessionStorage.clear(); await storeClear(); try { await signOutCloud(); } catch {} };
+      pauseAccountWrites(true);
+      setDeleteSteps("Removing the photo files, the record, cards, recipes and the sign-in");
+      let r: { ok?: boolean; dataGone?: boolean; message?: string; error?: string } | null = null;
       try {
-        setDeleteSteps("Removing the record, photos, cards, recipes and the sign-in");
-        const r = await api("/api/account/delete", {});
-        dataGone = true;
-        setDeleteSteps((r?.steps ?? []).join("; ") || "Removed");
-        // the phone's copy goes too, or it would come back on the next sign-in; the photo store with it
-        localStorage.clear(); sessionStorage.clear(); await storeClear();
-        try { await signOutCloud(); } catch {}
-        location.reload();
-      } catch (e: any) {
-        if (dataGone) {
-          // the record, photos, cards and recipes are gone; only the sign-in itself is left
-          localStorage.clear(); await storeClear();
-          setError("Your data is deleted. The sign-in itself could not be removed just now: sign in again and tap Delete my account once more, and it goes too.");
-          try { await signOutCloud(); } catch {}
-          setTimeout(() => location.reload(), 4000);
-        } else setError(e.message || "Could not delete the account. Sign in again and retry.");
+        const res = await fetch("/api/account/delete", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}", signal: AbortSignal.timeout(65000) });
+        r = await res.json().catch(() => null);
+      } catch { r = null; }
+      setDeleteSteps("");
+      if (!r || (r.ok === undefined && r.dataGone === undefined)) {
+        // no answer: the delete may or may not have run; the phone's copy goes, so it can't come back, and the account decides
+        log("account_delete", { result: "unknown" });
+        await clearPhone();
+        setError(r?.error ? `${r.error} Nothing on this phone is kept; sign in again to check.` : "The delete didn't answer. Sign in again: if your data is still there, tap Delete my account again.");
+        setTimeout(() => location.reload(), 5000);
+        return;
       }
+      log("account_delete", { result: r.ok ? "done" : r.dataGone ? "data gone" : "stopped" });
+      if (r.ok) { await clearPhone(); location.reload(); return; }
+      if (r.dataGone) {
+        await clearPhone();
+        setError(r.message || "Your data is deleted.");
+        setTimeout(() => location.reload(), 6000);
+        return;
+      }
+      pauseAccountWrites(false);
+      setError(r.message || "Nothing was deleted. Try again later.");
     },
     resetGoal: () => { clearGoal(); setState((s) => ({ ...s, goals: { ...s.goals, calories: null, protein: null } })); setGoalState(null); setGoalOpen(true); },
     mealanCard: (

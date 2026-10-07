@@ -1,6 +1,7 @@
 // Pilot log: the Discovery instrument. Local only, coach pulls it from More.
 export type LogEvent =
   | "adult_confirmed" // the welcome tap: 18 or older (Release A)
+  | "account_delete" // Delete my account: done, data gone, stopped, or no answer
   | "food_in"        // a food entered the meal; data.way = manual | saved | label | barcode | group
   | "barcode_miss"   // lookup failed, client falls back
   | "lock"           // data.locked
