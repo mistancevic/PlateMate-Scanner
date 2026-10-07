@@ -25,6 +25,8 @@ if [ -n "$HOST" ]; then
     if [ -n "$BODY" ]; then curl -sf "${H[@]}" -X PATCH "$CFG?updateMask=authorizedDomains" -d "$BODY" >/dev/null && echo "Sign-in allowed on the preview address." || echo "$ASK"; fi
   fi
 fi
+# the preview's address may read photos back, or photos sent from it never come down on another device
+"$(dirname "$0")/cors.sh" || true
 # Rules go out with the preview too: new records need their rules, and rules only ever add what newer code needs
 "$(dirname "$0")/rules.sh" || echo "Rules not published: check the message above."
 echo "Preview: $URL  (commit $TAG, version $VERSION)"

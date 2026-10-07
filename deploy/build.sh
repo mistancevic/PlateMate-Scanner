@@ -17,7 +17,7 @@ gcloud builds submit --project "$PROJECT" --config deploy/cloudbuild.yaml \
   --substitutions "_IMAGE=$IMAGE,_FB_API_KEY=$FB_API_KEY,_FB_AUTH_DOMAIN=$FB_AUTH_DOMAIN,_FB_PROJECT_ID=$FB_PROJECT_ID,_FB_APP_ID=$FB_APP_ID,_FB_DB_ID=$FB_DB_ID,_COMMIT=$TAG" .
 # Photos as files (storage release 1): the bucket lets the app read photos back, and the server may remove them when an account is deleted
 BUCKET="${STORAGE_BUCKET:-$FB_PROJECT_ID.firebasestorage.app}"
-gcloud storage buckets update "gs://$BUCKET" --cors-file=deploy/cors.json --quiet >/dev/null 2>&1 || echo "Photo storage: CORS not set (check that the bucket $BUCKET exists)"
+"$(pwd)/deploy/cors.sh" | grep -v "^Photos can be read" || true
 PN=$(gcloud projects describe "$PROJECT" --format='value(projectNumber)')
 gcloud storage buckets add-iam-policy-binding "gs://$BUCKET" --member "serviceAccount:$PN-compute@developer.gserviceaccount.com" --role roles/storage.objectAdmin --quiet >/dev/null 2>&1 || echo "Photo storage: the server's access was not set"
 # Delete my account: the server may switch off and remove a sign-in (Firebase Authentication), every deploy, so it never goes missing
