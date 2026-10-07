@@ -94,7 +94,8 @@ export const metOf = (d: PlanDay) => (d.kind === "rest" ? 1 : d.kind === "club" 
 export const minutesOf = (d: PlanDay) => (d.kind === "rest" ? 0 : d.minutes ?? 60);
 // How hard the day is decides the numbers row when the person types their own: Rest, Light, Moderate, Hard.
 export const loadOf = (d: PlanDay): DayType => (d.kind === "rest" ? (d.pe ? "active" : "passive") : d.intensity === "hard" ? "hard" : d.intensity === "moderate" ? "easy" : "active");
-export const LOAD_NAME: Record<DayType, string> = { passive: "Rest", active: "Light", easy: "Moderate", hard: "Hard" };
+// plain English pass (7 October 2026): a day without training says so; "Rest" stays only as the row name in the own numbers table
+export const LOAD_NAME: Record<DayType, string> = { passive: "No training", active: "Light", easy: "Moderate", hard: "Hard" };
 export const LOAD_DAY: Record<DayType, string> = { passive: "A rest day.", active: "A light day.", easy: "A moderate day.", hard: "A hard day." };
 const whenWords: Record<When, string> = { morning: "in the morning", day: "during the day", evening: "in the evening", late: "late at night", afterschool: "right after school", lateafternoon: "in the late afternoon" };
 const whenShort = (w: When) => [...WHENS, ...WHENS_KID].find((x) => x.id === w)!.name.toLowerCase();
@@ -104,14 +105,14 @@ export const activityName = (d: PlanDay) => d.kind === "club" ? `${sportOf(d.spo
 export function planLine(d: PlanDay): string {
   const act = d.kind === "rest" ? "" : `${activityName(d)}, ${intensityWord(d.intensity)}${d.when ? `, ${whenWords[d.when]}` : ""}`;
   if (d.pe) return act ? `${peName(d)}, then ${act.charAt(0).toLowerCase() + act.slice(1)}` : peName(d);
-  return act || "Rest";
+  return act || "No training";
 }
 const peName = (d: PlanDay) => (d.study ? "Sport in class" : "Sport at school");
 // the agenda line: "Strength, hard · evening", "Sport at school, then football training, hard · late afternoon"
 export function planShort(d: PlanDay): string {
   const act = d.kind === "rest" ? "" : `${activityName(d)}, ${intensityWord(d.intensity)}${d.when ? ` · ${whenShort(d.when)}` : ""}`;
   if (d.pe) return act ? `${peName(d)}, then ${act.charAt(0).toLowerCase() + act.slice(1)}` : peName(d);
-  return act || "Rest";
+  return act || "No training";
 }
 // Today's sentence on a study day (Release B): "Study day, then team sport in the evening."
 export function studyLine(d: PlanDay): string {

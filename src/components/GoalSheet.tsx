@@ -3,10 +3,11 @@ import { goalLabel } from "../goal";
 
 // The goal sheet (canvas board K2, 7 October 2026): the same card for the person on Me › Goal and for the coach on the
 // client's page. What to eat, what weight to expect, how it's counted, what counts as progress, the next check-in.
-export function GoalSheet({ sheet }: { sheet: Sheet }) {
+// The goal's name is already right above it on both pages, so the sheet starts with who set it (7 October 2026).
+export function GoalSheet({ sheet, title = false }: { sheet: Sheet; title?: boolean }) {
   return (
     <section className="card goal-sheet" aria-label="Your goal sheet">
-      <div className="sheet-head"><b>{sheet.title}</b><small>{sheet.byLine}</small></div>
+      <div className="sheet-head">{title && <b>{sheet.title}</b>}<small>{sheet.byLine}</small></div>
       <div className="sheet-row"><small>Food</small><b>{sheet.food}</b></div>
       <div className="sheet-row"><small>Weight to expect</small><b>{sheet.weight}</b></div>
       <div className="sheet-row"><small>Counted as</small><b>{sheet.counted}</b></div>

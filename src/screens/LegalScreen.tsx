@@ -58,7 +58,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
           <h2>2. What Chef Mealan keeps, and why</h2>
           <ul>
             <li><b>Account.</b> Your Google sign-in (name, email, user ID), so the app knows it is you, and the date you confirmed that you're 18 or over. Legal basis: the contract, Art. 6(1)(b).</li>
-            <li><b>Body data.</b> Sex, birth year, height, weight, body fat if you give it, and the weigh-ins you add. Used only to calculate your numbers and show your trend to you and your coach. This is health data; it is kept only after you agree on the profile, Art. 9(2)(a), and you can withdraw by deleting it or the account.</li>
+            <li><b>Body data.</b> Female or male (the formulas differ), birth year, height, weight, body fat if you give it, and the weigh-ins you add. Used only to calculate your numbers and show your trend to you and your coach. This is health data; it is kept only after you agree on the profile, Art. 9(2)(a), and you can withdraw by deleting it or the account.</li>
             <li><b>Your declarations.</b> What you tick under "Is any of this true for you?", allergies and intolerances, with the date, so Mealan steps back where it should. Health data, same basis, same withdrawal.</li>
             <li><b>Your foods, plates, cards and photos.</b> What you scan, build, cook and rate, and the photos you take of packs and plates. Legal basis: the contract.</li>
             <li><b>The coach link.</b> Which coach you joined, what you chose to share with them, and what they sent you. Your coach sees the cards you share, the goal, and that you ticked a situation and when, never the words you typed. Legal basis: the contract.</li>

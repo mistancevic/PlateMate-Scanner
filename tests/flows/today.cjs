@@ -43,7 +43,8 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   // since 7 October 2026 (canvas board T3) the day settings call a rest day No training
   await page.locator(".today-plan").getByRole("button", { name: "No training", exact: true }).click();
   await page.getByRole("button", { name: "Save for today" }).click(); await page.waitForTimeout(300);
-  ok(/Rest\. A rest day\./.test(await page.locator(".today-plan").first().textContent()) && /Changed for today only/.test(await page.locator(".today-plan").first().textContent()), "a change is for today only and says so");
+  // plain English pass (approved 7 October 2026): a day without training says "No training today."
+  ok(/No training today\./.test(await page.locator(".today-plan").first().textContent()) && /Changed for today only/.test(await page.locator(".today-plan").first().textContent()), "a change is for today only and says so");
   const plan = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")).plan[0].kind);
   ok(plan === "strength", "the Weekly plan stays the same");
   await page.getByRole("button", { name: "Back to the Weekly plan" }).click(); await page.waitForTimeout(300);

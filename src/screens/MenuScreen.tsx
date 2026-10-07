@@ -109,17 +109,17 @@ function ProfilePanel(p: AppApi) {
   const answered = none || sits.length > 0;
   return (
     <>
-      <p className="small">Optional. Used only to calculate your numbers. Stored on this phone and in your account, nowhere else.</p>
+      <p className="small">All of this is optional. It's used only to calculate your numbers, and kept on this phone and in your account, nowhere else.</p>
       {consented && (
         <p className="small consent-line">You agreed to the body data on {fmtDay(p.safety.consentBodyAt!)}. It is in your export, and goes with everything else when you delete the account.</p>
       )}
       {!consented && (
         <section className="card consent" aria-label="Before your numbers">
           <b>Before your numbers</b>
-          <p className="small">To calculate your day, Mealan asks about your body: sex, birth year, height, weight, body fat if you know it, and later the weigh-ins you add. Here is what happens with it.</p>
+          <p className="small">To calculate your day, Mealan asks a few things about your body: female or male, your birth year, height, weight, and your body fat if you know it. Later, also the weigh-ins you add. Here is what happens with them.</p>
           <ul className="small">
             <li><b>Kept:</b> only those values, and the numbers they give.</li>
-            <li><b>Where:</b> on this phone, and in your account in Frankfurt, EU. Nowhere else; never sold, never shared beyond your coach.</li>
+            <li><b>Where:</b> on this phone and in your account. Nowhere else: never sold, and never shared beyond your coach.</li>
             <li><b>How long:</b> while the account exists.</li>
             <li><b>Yours:</b> export it or delete it, with everything else, from Menu, Account.</li>
           </ul>
@@ -131,7 +131,7 @@ function ProfilePanel(p: AppApi) {
       )}
       <section className={`card form ${consented ? "" : "shut"}`} aria-disabled={!consented}>
         <label className="field"><span>Name</span><input value={name} placeholder="Your name" onChange={(e) => setName(e.target.value)} /></label>
-        <div className="field"><span>Sex</span>
+        <div className="field"><span>Your body</span>
           <div className="moments">
             {(["female", "male"] as const).map((s) => <button key={s} className={`choice ${d.sex === s ? "on" : ""}`} onClick={() => setD({ ...d, sex: d.sex === s ? undefined : s })}>{s === "female" ? "Female" : "Male"}</button>)}
           </div>
@@ -142,7 +142,7 @@ function ProfilePanel(p: AppApi) {
           <label className="field"><span>Weight, kg</span><input inputMode="decimal" value={d.weightKg ?? ""} placeholder="75" onChange={(e) => setD({ ...d, weightKg: num(e.target.value) })} /></label>
         </div>
         <label className="field"><span>Body fat %, if you know it</span><input inputMode="decimal" value={d.bodyFatPct ?? ""} placeholder="from a scale or a scan" onChange={(e) => setD({ ...d, bodyFatPct: num(e.target.value) })} /></label>
-        <div className="field"><span>Your life, without training</span>
+        <div className="field"><span>Your work</span>
           <div className="activity-list">
             {LIFE.map((l) => (
               <button key={l.id} className={`activity ${workOf(d) === l.id ? "on" : ""}`} onClick={() => setD(withWork(d, l.id))}>
@@ -150,7 +150,7 @@ function ProfilePanel(p: AppApi) {
               </button>
             ))}
           </div>
-          <small className="muted">What each day holds is in your Weekly plan.</small>
+          <small className="muted">Your training goes in the Weekly plan.</small>
         </div>
         <div className="field"><span>Show protein density as</span>
           <div className="moments">
@@ -163,7 +163,7 @@ function ProfilePanel(p: AppApi) {
       </section>
       <section className="card form door" aria-label="Is any of this true for you">
         <b>Is any of this true for you?</b>
-        <p className="small">Mealan is an AI chef. It reads labels and suggests plates, and it can be wrong: check a number against the pack, and check anything about your health with a professional. For the situations below it steps back, names who to talk to, and keeps the plate working. Your coach sees that you ticked one and when, never your words.</p>
+        <p className="small">Mealan is an AI chef. It reads labels and suggests plates, and it can be wrong: check a number against the pack, and check anything about your health with a professional. If one of these is true for you, Mealan steps back from that topic, tells you who to talk to, and still helps with the plate. Your coach sees that you ticked one and when, never what you wrote.</p>
         {SITUATIONS.filter((x) => SITUATION_FOR[x.id] === "all" || d.sex !== "male").map((x) => (
           <div key={x.id}>
             <label className="check">
@@ -184,9 +184,9 @@ function ProfilePanel(p: AppApi) {
         ))}
         <label className="check none">
           <input type="checkbox" checked={none} onChange={(e) => tickNone(e.target.checked)} />
-          <span><b>None of these applies to me</b><small> an unanswered question is not a no; Mealan asks again once a year</small></span>
+          <span><b>None of these applies to me</b><small> If you leave it open, Mealan doesn't take it as a no. It asks again once a year.</small></span>
         </label>
-        <p className={`small ${answered ? "muted" : "notice"}`}>{answered ? `Answered${p.safety.declaredAt ? " on " + fmtDay(p.safety.declaredAt) : ""}. A tick saves by itself; change it any time.` : "Tick one, or none. A tick saves by itself."}</p>
+        <p className={`small ${answered ? "muted" : "notice"}`}>{answered ? `Answered${p.safety.declaredAt ? " on " + fmtDay(p.safety.declaredAt) : ""}. Each tick is saved straight away, and you can change it any time.` : "Tick one, or none. A tick saves by itself."}</p>
         {p.safety.situations.length > 0 && (
           <div className="fixed-lines">
             {p.safety.situations.map((id) => <p className="small" key={id}><b>{SITUATIONS.find((x) => x.id === id)?.label}:</b> {FIXED[id]}</p>)}
@@ -317,7 +317,7 @@ function GoalPanel(p: AppApi) {
         <small>Sources: Mifflin et al. 1990; Katch and McArdle; FAO/WHO/UNU 2004 activity levels; Compendium of Physical Activities 2024; US Dietary Guidelines 2025–2030; ISSN position stand 2017; Morton et al. 2018.</small>
       </section>
       <GoalHistory log={p.goalLog} />
-      <NextLink p={p} to="life" from="goal" text="Lifestyle" hint="Nutrition, work and recovery, set once" />
+      <NextLink p={p} to="life" from="goal" text="Lifestyle" hint="How you eat, work and sleep. Set once." />
     </>
   );
 }
@@ -330,8 +330,8 @@ export function GoalHistory({ log }: { log: GoalEntry[] }) {
       <section className="card history">
         {[...log].reverse().slice(0, 20).map((e) => (
           <div className="history-row" key={e.at}>
-            <div><b>{e.band ? goalLabel(e.band) : "Custom"}</b><small>{new Date(e.at).toLocaleDateString([], { day: "numeric", month: "short", year: "numeric" })} · {SOURCE_LABEL[e.source]}{e.weightKg ? ` · ${e.weightKg} kg` : ""}</small></div>
-            <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString() : "?"}</b><small>kcal · {e.protein ?? "?"} g{e.kcal && e.protein ? ` · ${pdText(e.protein / (e.kcal / 100))}` : ""}</small></div>
+            <div><b>{e.band ? goalLabel(e.band) : "Custom"}</b><small>{new Date(e.at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}{SOURCE_LABEL[e.source] ? `, ${SOURCE_LABEL[e.source].charAt(0).toLowerCase()}${SOURCE_LABEL[e.source].slice(1)}` : ""}{e.weightKg ? ` at ${e.weightKg} kg` : ""}</small></div>
+            <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString() : "?"}</b><small>kcal, {e.protein ?? "?"} g protein{e.kcal && e.protein ? `, ${pdText(e.protein / (e.kcal / 100))}` : ""}</small></div>
           </div>
         ))}
       </section>
@@ -409,7 +409,7 @@ function LifestylePanel(p: AppApi) {
           <Setting name="Your weekdays"><Options items={WEEKDAY_CHOICES} on={wk} pick={(v) => save({ weekdays: v, ...(v !== "home" && l.hours === "none" ? { hours: undefined } : {}) })} /></Setting>
           {(wk === "work" || wk === "both") && (
             <>
-              <Setting name="Working hours" hint={l.hours === "fixed" ? "Fixed hours make Monday to Friday work days in your Weekly plan; you can change any day there." : undefined}>
+              <Setting name="Working hours" hint={l.hours === "fixed" ? "With fixed hours, Monday to Friday are work days in your Weekly plan. You can change any day there." : undefined}>
                 <Options items={HOURS_SHOWN} on={l.hours === "none" ? undefined : l.hours} pick={(v) => save({ hours: v })} />
                 {l.hours === "fixed" && <Chips items={SLOTS} on={l.slot} pick={(v) => save({ slot: v })} />}
               </Setting>
@@ -427,9 +427,9 @@ function LifestylePanel(p: AppApi) {
           {wk === "home" && <p className="small muted">Your days are spent at home. Chef Mealan counts every day as a day at home, and your training goes in the Weekly plan.</p>}
         </Seg>
       )}
-      <Seg title="Recovery" why={minor ? "Sleep is when your body grows and turns sport into progress. Most teenagers need 8 to 10 hours." : "Sleep is where training turns into progress; it also decides when late meals make sense."}>
-        <Setting name="Bedtime"><Chips items={[{ id: "early", name: "Before 22" }, { id: "mid", name: "22 to midnight" }, { id: "late", name: "After midnight" }, ...(minor ? [] : [{ id: "varies", name: "Varies with shifts" }])]} on={l.bed} pick={(v) => save({ bed: v as Lifestyle["bed"] })} /></Setting>
-        <Setting name="Wake-up"><Chips items={minor ? [{ id: "early", name: "Before 6" }, { id: "mid", name: "6 to 7" }, { id: "late", name: "After 7" }] : [{ id: "early", name: "Before 6" }, { id: "mid", name: "6 to 8" }, { id: "late", name: "After 8" }, { id: "varies", name: "Varies with shifts" }]} on={l.wake} pick={(v) => save({ wake: v as Lifestyle["wake"] })} /></Setting>
+      <Seg title="Recovery" why={minor ? "Sleep is when your body grows and turns sport into progress. Most teenagers need 8 to 10 hours." : "Sleep is where training turns into progress. It also decides when a late meal makes sense."}>
+        <Setting name="Bedtime"><Chips items={[{ id: "early", name: "Before 22:00" }, { id: "mid", name: "22:00 to midnight" }, { id: "late", name: "After midnight" }, ...(minor ? [] : [{ id: "varies", name: "Varies with shifts" }])]} on={l.bed} pick={(v) => save({ bed: v as Lifestyle["bed"] })} /></Setting>
+        <Setting name="Wake-up"><Chips items={minor ? [{ id: "early", name: "Before 6" }, { id: "mid", name: "6 to 7" }, { id: "late", name: "After 7" }] : [{ id: "early", name: "Before 6:00" }, { id: "mid", name: "6:00 to 8:00" }, { id: "late", name: "After 8:00" }, { id: "varies", name: "Varies with shifts" }]} on={l.wake} pick={(v) => save({ wake: v as Lifestyle["wake"] })} /></Setting>
       </Seg>
       <NextLink p={p} to="week" from="life" text="Weekly plan" hint={minor ? "What each day of your school week holds" : "What each day of your usual week holds"} />
     </>
@@ -471,7 +471,7 @@ function PlanPanel(p: AppApi) {
   const longDate = (d: Date) => `${WEEKDAY_NAMES[weekdayIndex(d)]}, ${d.getDate()} ${d.toLocaleDateString("en-GB", { month: "long" })}`;
   return (
     <>
-      <p className="small muted page-why">What each day holds. Your usual week repeats by itself; change any date when that week is different.</p>
+      <p className="small muted page-why">What each day of your week holds. Your usual week repeats by itself. If one week is different, change those dates.</p>
       <div className="seg-tabs" role="tablist">
         <button type="button" role="tab" aria-selected={tab === "date"} className={tab === "date" ? "on" : ""} onClick={() => { setTab("date"); setSel(offset === 0 ? weekdayIndex(todayD) : 0); }}>By date</button>
         <button type="button" role="tab" aria-selected={tab === "usual"} className={tab === "usual" ? "on" : ""} onClick={() => { setTab("usual"); setCopying(null); }}>Usual week</button>
@@ -480,7 +480,7 @@ function PlanPanel(p: AppApi) {
         {tab === "date" ? (
           <div className="week-nav">
             <button type="button" className="round" aria-label="Week before" onClick={() => { setOffset(offset - 1); setSel(0); setEditPast(false); }}>‹</button>
-            <span><b>Week {wk.week}</b><small>{span}{offset === 0 ? " · this week" : ""}</small></span>
+            <span><b>Week {wk.week}</b><small>{span}{offset === 0 ? ", this week" : ""}</small></span>
             <button type="button" className="round" aria-label="Week after" onClick={() => { setOffset(offset + 1); setSel(0); setEditPast(false); }}>›</button>
           </div>
         ) : (
@@ -503,7 +503,7 @@ function PlanPanel(p: AppApi) {
       </section>
       {tab === "date" ? (
         isPast && !editPast ? (
-          <Seg title={longDate(selDate)} why={`${planLine(days[sel].day)}. ${LOAD_DAY[loadOf(days[sel].day)]}`}>
+          <Seg title={longDate(selDate)} why={days[sel].day.kind === "rest" && !days[sel].day.pe ? "No training that day." : `${planLine(days[sel].day)}. ${LOAD_DAY[loadOf(days[sel].day)]}`}>
             {log && log.logged.length ? (
               <>
                 <div className="past-nums">
@@ -559,12 +559,12 @@ function ShopPanel(p: AppApi) {
   return (
     <>
     <section className="card">
-      <small>Decides your starter foods, and tells Mealan which shelves are real.</small>
+      <small>This picks your starter foods, and tells Mealan which shops you can really buy from.</small>
       <div className="moments" style={{ marginTop: 8 }}>
         {REGIONS.map((r) => <button key={r.id} className={`choice ${p.region === r.id ? "on" : ""}`} onClick={() => p.setRegion(r.id)}>{r.name}</button>)}
       </div>
       <p className="label" style={{ marginTop: 16 }}>Starter foods</p>
-      <small>About twenty common foods from your shelves, with reviewed values, so the plate works from day one. Foods you already have are skipped, so it's safe to tap again after changing where you shop.</small>
+      <small>About twenty common foods from your shops, with checked values, so the plate works from day one. Foods you already have are skipped, so you can tap again after changing where you shop.</small>
       <div className="button-row" style={{ marginTop: 8 }}>
         <button className="pill pill-small" onClick={p.addStarter}>Add starter foods for {REGIONS.find((r) => r.id === p.region)?.name ?? "my region"}</button>
       </div>
@@ -627,7 +627,7 @@ function AccountPanel(p: AppApi) {
       <section className="card"><small>This phone only. Your data stays here.</small></section>
       <section className="card">
         <b>Your data</b>
-        <p className="small">Everything Mealan holds about you on this phone: profile, goal and its history, foods with photos, cards. One file, yours.</p>
+        <p className="small">Everything Mealan keeps about you on this phone, in one file: your profile, your goal and its history, your foods with their photos, and your cards.</p>
         <div className="button-row"><button className="pill pill-small" onClick={p.exportMyData}><Download size={14} /> Export my data</button></div>
       </section>
     </>
@@ -641,7 +641,7 @@ function AccountPanel(p: AppApi) {
       {user && cloudStatus.text && <p className={`small sync ${cloudStatus.ok ? "" : "sync-bad"}`}>{cloudStatus.text}{cloudStatus.at ? `, ${new Date(cloudStatus.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}.</p>}
       <section className="card">
         <b>Your data</b>
-        <p className="small">Everything Mealan holds about you: profile, goal and its history, foods with photos, cards, recipes from your coach, and what the account stores. One file, yours.</p>
+        <p className="small">Everything Mealan keeps about you, in one file: your profile, your goal and its history, your foods with their photos, your cards, recipes from your coach, and what your account stores.</p>
         <div className="button-row">
           <button className="pill pill-small" onClick={p.exportMyData}><Download size={14} /> Export my data</button>
         </div>

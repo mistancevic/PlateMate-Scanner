@@ -27,7 +27,9 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
   const [draft, setDraft] = useState<Record<string, string>>({});
   const refs = useRef<Record<string, HTMLInputElement | null>>({});
   const mix = DAY_TYPES.filter((d) => week[d.id]).map((d) => `${week[d.id]} ${d.name.toLowerCase().replace("training, ", "").replace("rest, ", "")}`).join(", ");
-  const avgLine = <p className="dt-avg">Your week averages {avg.kcal.toLocaleString("en")} kcal · PD {(density(avg.protein, avg.kcal) ?? 0).toFixed(1)}{mix ? ` · ${mix}` : ""}</p>;
+  // plain English (7 October 2026): "Your week averages 2,950 kcal at PD 6.1, with 4 training days and 3 without."
+  const trainingDays = 7 - (week.passive || 0);
+  const avgLine = <p className="dt-avg">Your week averages {avg.kcal.toLocaleString("en")} kcal at PD {(density(avg.protein, avg.kcal) ?? 0).toFixed(1)}{mix ? `, with ${trainingDays} training ${trainingDays === 1 ? "day" : "days"} and ${7 - trainingDays} without` : ""}.</p>;
   const howBlock = (d: string, r: Row) => how === d && <div className="dt-how">{r.how.map((l, i) => <p key={i} className={i === r.how.length - 1 ? "dt-sum" : ""}>{l}</p>)}</div>;
   const howLink = (d: string) => <button type="button" className="link" aria-expanded={how === d} onClick={() => setHow(how === d ? null : d)}>{how === d ? "Hide" : "How ›"}</button>;
 
@@ -49,7 +51,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
           </div>
         ))}
         {avgLine}
-        <small className="muted">Protein and fat stay the same every day; carbs carry the difference. The days come from your Weekly plan. Sources: Mifflin et al. 1990; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004.</small>
+        <small className="muted">Protein and fat stay the same every day. Carbs go up and down with your training. The days come from your Weekly plan. Sources: Mifflin et al. 1990; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004.</small>
       </div>
     );
   }
@@ -74,7 +76,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
           );
         })}
         {avgLine}
-        <small className="muted">Protein and fat stay the same every day; carbs carry the difference. Sources: Mifflin et al. 1990; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004.</small>
+        <small className="muted">Protein and fat stay the same every day. Carbs go up and down with your training. Sources: Mifflin et al. 1990; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004.</small>
       </div>
     );
   }

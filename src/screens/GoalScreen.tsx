@@ -138,7 +138,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           {!consented && (
             <section className="card consent" aria-label="Before your numbers">
               <b>Before your numbers</b>
-              <p className="small">To calculate your day, Mealan asks about your body: sex, birth year, height, weight, body fat if you know it, and later the weigh-ins you add. Kept only as those values and the numbers they give; on this phone and in your account in Frankfurt, EU; while the account exists; yours to export or delete. Nothing is stored until you agree. The full <a href="/privacy">privacy notice</a>.</p>
+              <p className="small">To calculate your day, Mealan asks a few things about your body: female or male, your birth year, height, weight, and your body fat if you know it. Later, also the weigh-ins you add. Mealan keeps only these and the numbers they give, on this phone and in your account, for as long as you have the account. You can export or delete them any time. Nothing is kept until you agree. More in the <a href="/privacy">privacy notice</a>.</p>
               <div className="button-row">
                 <button className="pill pill-small pill-primary" onClick={() => p.declareSafety({ consentBodyAt: new Date().toISOString(), consentBy: "self" })}>I agree</button>
               </div>
@@ -151,7 +151,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
             </section>
           ) : (
             <section className={`card form ${consented ? "" : "shut"}`} aria-disabled={!consented}>
-              <div className="field"><span>Sex</span>
+              <div className="field"><span>Your body</span>
                 <div className="moments">{(["female", "male"] as const).map((s) => <button key={s} className={`choice ${d.sex === s ? "on" : ""}`} onClick={() => setPersonalNow({ ...d, sex: d.sex === s ? undefined : s })}>{s === "female" ? "Female" : "Male"}</button>)}</div>
               </div>
               <div className="field-row">
@@ -219,7 +219,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               <button className="pill pill-primary pill-wide" onClick={() => { p.applyNumbers(band, c.kcal, c.protein, c.method, c.fats, c.carbs); done(); }}>Set my day</button>
             </>
           ) : (
-            <p className="small muted">{consented ? "Sex, birth year, height and weight, and your numbers appear here." : "Agree above, then fill in your body data."}</p>
+            <p className="small muted">{consented ? "Your body, birth year, height and weight, and your numbers appear here." : "Agree above, then fill in your body data."}</p>
           )}
         </div>
       )}

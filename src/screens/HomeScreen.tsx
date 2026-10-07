@@ -69,7 +69,7 @@ export function HomeScreen(p: AppApi) {
         {follow && planned && p.day.plan && !changing && (
           <div className="today-plan">
             <b>{dateLine}</b>
-            <span className="today-what">{todayLine(p.day.plan)}. {LOAD_DAY[loadOf(p.day.plan)]}</span>
+            <span className="today-what">{p.day.plan.kind === "rest" && !p.day.plan.pe ? "No training today." : `${todayLine(p.day.plan)}. ${LOAD_DAY[loadOf(p.day.plan)]}`}</span>
             <small>{p.day.source === "today" ? "Changed for today only. Your Weekly plan stays the same." : "This comes from your Weekly plan. If today goes differently, change today's plan. The numbers follow, and your Weekly plan stays as it is."}</small>
             <button className="pill pill-wide" onClick={() => { setDraft(p.day.plan!); setChanging(true); }}>Change today's plan</button>
             {p.day.source === "today" && <button className="link" onClick={() => p.setTodayPlan(null)}>Back to the Weekly plan</button>}

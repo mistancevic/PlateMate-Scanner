@@ -60,7 +60,7 @@ const path = require("node:path");
     await page.getByText("Weekly plan", { exact: true }).first().click(); await page.waitForTimeout(400);
     await page.getByRole("tab", { name: "Usual week" }).click(); await page.waitForTimeout(200);
     const agenda = await page.locator(".week-card").textContent();
-    const restRows = (await page.locator(".agenda-row").allTextContents()).filter((x) => /Rest/.test(x)).length;
+    const restRows = (await page.locator(".agenda-row").allTextContents()).filter((x) => /No training/.test(x)).length;
     ok(restRows === 3 && /Strength, hard/.test(agenda) && /Mobility, light/.test(agenda), "the Weekly plan holds the same week: " + restRows + " days without training; " + agenda.replace(/\s+/g, " ").slice(0, 120));
     // the day settings
     await page.locator(".agenda-row").nth(0).click(); await page.waitForTimeout(200);

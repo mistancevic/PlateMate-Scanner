@@ -25,7 +25,7 @@ const ME_ROWS: { id: MenuSection; name: string; icon: ReactNode; hint: (p: AppAp
 ];
 // the two speeds: Lifestyle changes when life does, the Weekly plan when the activity does
 function lifeHint(p: AppApi): string {
-  if (!p.personal.lifestyle) return "Nutrition, work and recovery, set once";
+  if (!p.personal.lifestyle) return "How you eat, work and sleep. Set once.";
   const l = lifestyleOf(p.personal);
   // plain English (7 October 2026): "Work, fixed hours, 9 to 5"
   const wk = weekdaysOf(l);
