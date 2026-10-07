@@ -223,7 +223,8 @@ async function generate(
           config: {
             responseMimeType: "application/json",
             responseJsonSchema: schema,
-            temperature: 0.1,
+            // no temperature, top_p, top_k or thinking budget: Google deprecated them (notice of 7 October 2026);
+            // each model uses its own defaults
           },
         });
         if (!response.text)
