@@ -1,3 +1,4 @@
+// 0.1.84: the camera's modes read Barcode, Label, Group (canvas board C2, approved by Milan 7 October 2026); only the locators changed
 // JOURNEY INVARIANT (Milan, 7 October 2026, from testing on his phone and laptop): typing a barcode by hand pauses the
 // camera: the green line stops and nothing is read until the field is left empty. A new food saved from Foods opens its
 // card, so you see what was saved and can add its photos. Never rewrite these lines to fit a change.
@@ -22,8 +23,8 @@ seed.items = [];
     await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "Add a food" }).click(); await page.waitForTimeout(300);
     await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2000);
-    await page.getByRole("button", { name: /BARCODE/ }).click(); await page.waitForTimeout(400);
-    const line = () => page.locator(".bg-green-500").count();
+    await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(400);
+    const line = () => page.locator(".cam-line").count();
     ok(await line() === 1, "the green line moves while the camera reads");
     const field = page.locator('input[aria-label="Type the barcode"]');
     await field.click(); await field.type("42603", { delay: 30 }); await page.waitForTimeout(300);

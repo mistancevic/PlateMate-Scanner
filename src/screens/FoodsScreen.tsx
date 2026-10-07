@@ -22,6 +22,8 @@ function band(pd: number | null): Band {
   return pd === null || pd < 3 ? "low" : pd < 5 ? "mid" : "high";
 }
 
+// added today, on this phone's calendar
+const isToday = (iso?: string) => { if (!iso) return false; const d = new Date(iso), n = new Date(); return d.getFullYear() === n.getFullYear() && d.getMonth() === n.getMonth() && d.getDate() === n.getDate(); };
 export function FoodsScreen(p: AppApi) {
   const { state, setState, blank, setCamera, setMode, barcode, setBarcode, lookup,
     pending, setPending, query, setQuery, add, setImage, setEdit, api,
@@ -125,7 +127,7 @@ export function FoodsScreen(p: AppApi) {
           <div className="row" key={f.id}>
             <span className="thumb">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
             <div className="row-text">
-              <button className="name-link" onClick={() => setCardId(f.id)}>{f.favorite && <span className="fav-mark">★ </span>}{f.name}</button>
+              <button className="name-link" onClick={() => setCardId(f.id)}>{f.favorite && <span className="fav-mark">★ </span>}{f.name}</button>{isToday((f as any).addedAt) && <span className="new-mark">New</span>}
               <small>{jobOf(f).job}{f.brand ? ` by ${f.brand}` : ""}. Per 100 g: {fmt(f.calories, 0)} kcal and {fmt(f.protein)} g protein.</small>
               <span className="row-links">
                 <button className="link" onClick={() => add(f)}>Add to meal</button>

@@ -92,6 +92,8 @@ const plan = [
   ok((await t.locator(".agenda-row").nth(5).locator("small").last().textContent()).trim() === "", "a day off has no word on the right");
   await t.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-personal")); const i = (new Date().getDay() + 6) % 7; p.plan[i] = { work: true, study: true, kind: "team", intensity: "moderate", when: "evening", minutes: 60 }; localStorage.setItem("chefmealan-personal", JSON.stringify(p)); });
   await t.reload(); await t.waitForTimeout(900);
+  // since 0.1.84 a reload opens on the same tab (canvas board C5, approved 7 October 2026), so Today is one tap away
+  await t.locator("nav button").filter({ hasText: "Today" }).click(); await t.waitForTimeout(300);
   ok(/Study day, then team sport in the evening\. A moderate day\./.test(await t.locator(".today-what").textContent()), "Today: Study day, then team sport in the evening. A moderate day.");
   ok(t.errs.length === 0, "no page errors (apprentice)" + (t.errs.length ? ": " + t.errs.join("; ") : ""));
   // a 17-year-old: Chef Mealan is for adults, and says why

@@ -39,6 +39,7 @@ import { Starting } from "./components/Starting";
 import { Welcome, AdultOnly } from "./components/Welcome";
 import { openStats } from "./openStats";
 import { merge as mergeRecords, changes as recordChanges, type Known } from "./records";
+import { installBack, pushTab, startTab, tabOfPath, useBack } from "./back";
 import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted } from "./photos";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
@@ -134,6 +135,7 @@ function Modal({
   close: () => void;
   children: ReactNode;
 }) {
+  useBack(true, close);
   return (
     <div className="modal-backdrop">
       <section
@@ -648,11 +650,30 @@ function GoalsEditor({
     </Modal>
   );
 }
+function MenuBack({ open, close }: { open: boolean; close: () => void }) { useBack(open, close); return null; }
+// The app's own address and Back (canvas board C5): mounted only while the app itself shows, never on the home page
+function BackKeeper({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
+  const tabRef = useRef(tab), fromBack = useRef(false), first = useRef(true);
+  tabRef.current = tab;
+  useEffect(() => {
+    installBack((t) => { const next = (t ?? "home") as Tab; if (next !== tabRef.current) { fromBack.current = true; setTab(next); } });
+    startTab(tabRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    if (first.current) { first.current = false; return; }
+    if (fromBack.current) { fromBack.current = false; return; }
+    pushTab(tab);
+  }, [tab]);
+  return null;
+}
 export default function App() {
   const [state, setState] = useState<PilotState>(load),
     [tab, setTab] = useState<Tab>(() => {
+      const tabs = ["home", "journey", "meal", "chef", "foods", "me"] as Tab[];
+      const fromPath = typeof location !== "undefined" ? tabOfPath(location.pathname, tabs) : null;
       const h = (typeof location !== "undefined" ? location.hash : "").replace("#", "");
-      return (["home", "journey", "meal", "chef", "foods", "me"] as Tab[]).includes(h as Tab) ? (h as Tab) : "home";
+      return (fromPath as Tab | null) ?? (tabs.includes(h as Tab) ? (h as Tab) : "home");
     }),
     [filter, setFilter] = useState<"all" | import("./goal").PdBand>("all"),
     [coach, setCoachState] = useState<boolean>(isCoach),
@@ -1193,8 +1214,10 @@ export default function App() {
     setEditFrom(from);
     setEdit(candidateFood({ product_name: name, brand, ...(barcode ? { barcode } : {}) }, "Manual entry"));
   }
-  function saveFood(f: Food, opts?: { open?: boolean }) {
-    const existed = state.foods.some((x) => x.id === f.id);
+  function saveFood(f0: Food, opts?: { open?: boolean }) {
+    const existed = state.foods.some((x) => x.id === f0.id);
+    // a food new to the library says when it came, so the list can mark it New for the rest of the day (canvas C5)
+    const f = existed || (f0 as any).addedAt ? f0 : ({ ...f0, addedAt: new Date().toISOString() } as Food);
     setImage(""); setImageSet([]);
     setState((s) => ({
       ...s,
@@ -1855,6 +1878,9 @@ export default function App() {
     );
   return (
     <div className="app-shell">
+      <BackKeeper tab={tab} setTab={setTab} />
+      <MenuBack open={Boolean(menuSection)} close={() => { setMenuFrom(null); setMenuSection(null); }} />
+      <MenuBack open={talkOpen && !menuSection} close={() => setTalkOpen(false)} />
       <Opened />
       <header className="topbar">
         <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setTab("home"); }} aria-label={`${APP_NAME}, Today`}>

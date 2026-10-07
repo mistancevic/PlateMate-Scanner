@@ -1,3 +1,4 @@
+// 0.1.84: the camera's modes read Barcode, Label, Group (canvas board C2, approved by Milan 7 October 2026); only the locators changed
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs");
@@ -16,12 +17,12 @@ const seed = JSON.parse(fs.readFileSync(require("node:path").resolve(__dirname, 
   // JOURNEY INVARIANT (Milan, 4 October 2026): Scan opens the single-product camera, Label, where several sides of one product stage
   // and go as one read; Several products is the explicit choice, never the default, whatever mode was used before. Never rewrite these lines to fit a change.
   const on = async (re) => page.getByRole("button", { name: re }).evaluate((b) => b.className.includes("bg-white"));
-  console.log((await on(/LABEL/)) ? "ok   Scan opens the single-product camera" : "FAIL Scan did not open the single-product camera"); if (!(await on(/LABEL/))) process.exitCode = 1;
-  await page.getByRole("button", { name: /GROUP/ }).click(); await page.waitForTimeout(300);
+  console.log((await on(/^Label$/)) ? "ok   Scan opens the single-product camera" : "FAIL Scan did not open the single-product camera"); if (!(await on(/^Label$/))) process.exitCode = 1;
+  await page.getByRole("button", { name: /^Group$/ }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /Close camera|Cancel|Close/ }).first().click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2500);
-  console.log((await on(/LABEL/)) ? "ok   Scan opens the single-product camera again after Group was used" : "FAIL Scan reopened in the last mode"); if (!(await on(/LABEL/))) process.exitCode = 1;
-  await page.getByRole("button", { name: /GROUP/ }).click(); await page.waitForTimeout(400);
+  console.log((await on(/^Label$/)) ? "ok   Scan opens the single-product camera again after Group was used" : "FAIL Scan reopened in the last mode"); if (!(await on(/^Label$/))) process.exitCode = 1;
+  await page.getByRole("button", { name: /^Group$/ }).click(); await page.waitForTimeout(400);
   await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(500);
   await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(500);
   

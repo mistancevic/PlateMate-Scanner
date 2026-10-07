@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import { Camera, MessageCircle, Trash2, X } from "lucide-react";
+import { Camera, ChevronLeft, ChevronRight, MessageCircle, Trash2, X } from "lucide-react";
 import { mixLabel, type Mix, type MixTip } from "../mixtip";
 import { log } from "../log";
 import { density, type Food } from "../pilot";
@@ -8,6 +8,7 @@ import { useEffect } from "react";
 import { JOBS, jobOf, plainLine, todayLine } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { iconFor } from "../icons";
+import { useBack } from "../back";
 
 export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto, removePhoto, toggleFavorite, insight, mix }: { food: Food; target: number | null; fit: import("../goal").PdBand; close: () => void; review?: () => void; dontHave?: () => void; mix?: { tip: MixTip; momentName: string; take: (m: Mix) => void; ask: () => void }; addPhoto?: (dataUrl: string) => void; removePhoto?: (index: number) => void; toggleFavorite?: () => void; insight?: { dayKcal: number | null; eaten: number; dayName: string; goalKey: string; requestTip: () => Promise<void>; setJob: (job: string | null) => void } }) {
   const job = jobOf(food);
@@ -27,7 +28,11 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
     log("mix_tip", { food: food.name, moment: mix.momentName, case: mix.tip.case, offered: mix.tip.mixes.map((m) => ({ partners: m.partners.map((x) => x.name), kind: m.kind, pd: Math.round(m.pd * 10) / 10, kcal: m.kcal })) });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [food.id, mix?.momentName]);
-  const [view, setView] = useState<string | null>(null);
+  // which photo is open, by its place: two copies of the same picture are still two photos
+  const [viewAt, setViewAt] = useState<number | null>(null);
+  const swipeRef = useRef<number | null>(null);
+  useBack(true, close);
+  useBack(viewAt !== null, () => { setViewAt(null); setArmed(false); });
   const fileRef = useRef<HTMLInputElement>(null);
   const all = food.photos?.length ? food.photos : food.photo ? [food.photo] : [];
   // Removing a photo: a second tap arms it, and it is only really removed when the Undo note goes, eight seconds later,
@@ -40,6 +45,19 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
   useEffect(() => () => commitRef.current(), []);
   useEffect(() => { if (!armed) return; const t = setTimeout(() => setArmed(false), 3000); return () => clearTimeout(t); }, [armed]);
   const gallery = all.filter((x) => x !== pending);
+  const view = viewAt !== null ? gallery[viewAt] ?? null : null;
+  // on a computer: the arrow keys move between photos, Escape closes the photo
+  useEffect(() => {
+    if (!view) return;
+    const onKey = (e: KeyboardEvent) => {
+      const g = gallery;
+      const at = viewAt ?? 0;
+      if (e.key === "Escape") { setViewAt(null); setArmed(false); }
+      else if (g.length > 1 && (e.key === "ArrowRight" || e.key === "ArrowLeft")) { setArmed(false); setViewAt((at + (e.key === "ArrowRight" ? 1 : -1) + g.length) % g.length); }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [view, viewAt, gallery.length, food.photos, pending]);
   const pd = density(food.protein, food.calories);
   const share = pd === null ? null : Math.round(pd * 4);
   const fitText = fit === "top" ? "high+ protein for your goal" : fit === "high" ? "high protein for your goal" : fit === "plan" ? "on plan" : fit === "close" ? "a bit under your goal" : "far under your goal";
@@ -48,13 +66,13 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="card-top"><span>Nutrition per 100 g</span><button className="link" onClick={close}>Close</button></div>
         <div className="foodcard-head">
-          <button className="thumb thumb-button" onClick={() => gallery[0] && setView(gallery[0])} aria-label="See the photo">{food.photo ? <img src={food.photo} alt="" /> : (food.icon || iconFor(food.name))}</button>
+          <button className="thumb thumb-button" onClick={() => gallery[0] && setViewAt(0)} aria-label="See the photo">{food.photo ? <img src={food.photo} alt="" /> : (food.icon || iconFor(food.name))}</button>
           <div><b>{food.name}</b><small>{food.brand || "no brand"}{food.barcode ? ` · ${food.barcode}` : ""}</small></div>
           {toggleFavorite && <button className={`fav ${food.favorite ? "on" : ""}`} onClick={toggleFavorite} aria-pressed={!!food.favorite} aria-label={food.favorite ? "Remove from favourites" : "Add to favourites"}>{food.favorite ? "★" : "☆"}</button>}
         </div>
         {(gallery.length > 1 || addPhoto) && (
           <div className="food-gallery" aria-label="Photos of this product">
-            {gallery.length > 1 && gallery.map((src, i) => <button key={i} className="g-thumb" onClick={() => setView(src)} aria-label={`Photo ${i + 1}`}><img src={src} alt="" /></button>)}
+            {gallery.length > 1 && gallery.map((src, i) => <button key={i} className="g-thumb" onClick={() => setViewAt(i)} aria-label={`Photo ${i + 1}`}><img src={src} alt="" /></button>)}
             {addPhoto && gallery.length < 6 && (
               <button className="g-add" onClick={() => fileRef.current?.click()}><Camera size={16} /><span>{gallery.length ? "Add a photo" : "Add a photo of the front"}</span></button>
             )}
@@ -115,20 +133,36 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         {dontHave && <button className="pill pill-wide pill-primary" onClick={dontHave}>Don't have it? Find something instead</button>}
         {review && <button className="pill pill-wide" onClick={() => { close(); review(); }}>Review the label</button>}
       </div>
-      {view && (
-        <div className="photo-view" role="dialog" aria-label="Photo">
-          <div className="photo-top">
-            {removePhoto ? (
-              <button className={`photo-remove ${armed ? "armed" : ""}`} onClick={(e) => { e.stopPropagation(); if (!armed) { setArmed(true); return; } if (pending) commitRef.current(); setPending(view); setArmed(false); setView(null); }}>
-                <Trash2 size={15} /> {armed ? "Tap again to remove" : "Remove"}
-              </button>
-            ) : <span />}
-            <button className="photo-close" aria-label="Close the photo" onClick={(e) => { e.stopPropagation(); setArmed(false); setView(null); }}><X size={22} /></button>
+      {view && (() => {
+        // canvas board C4 (Milan, 7 October 2026): the next photo without closing; swipe, the arrows, a photo below, or
+        // the arrow keys on a computer. Tapping the photo no longer closes it, so a swipe can't close it by accident.
+        const at = viewAt ?? 0, many = gallery.length > 1;
+        const go = (d: number) => { setArmed(false); setViewAt((at + d + gallery.length) % gallery.length); };
+        return (
+          <div className="photo-view" role="dialog" aria-label="Photo" onClick={(e) => e.stopPropagation()}
+            onTouchStart={(e) => { swipeRef.current = e.touches[0].clientX; }}
+            onTouchEnd={(e) => { const x0 = swipeRef.current; swipeRef.current = null; if (x0 === null || !many) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1); }}>
+            <div className="photo-top">
+              {removePhoto ? (
+                <button className={`photo-remove ${armed ? "armed" : ""}`} onClick={(e) => { e.stopPropagation(); if (!armed) { setArmed(true); return; } if (pending) commitRef.current(); setPending(view); setArmed(false); setViewAt(null); }}>
+                  <Trash2 size={15} /> {armed ? "Tap again to remove" : "Remove"}
+                </button>
+              ) : <span />}
+              {many && <b className="photo-count">{at + 1} of {gallery.length}</b>}
+              <button className="photo-close" aria-label="Close the photo" onClick={(e) => { e.stopPropagation(); setArmed(false); setViewAt(null); }}><X size={22} /></button>
+            </div>
+            <img src={view} alt={`Photo ${at + 1} of ${gallery.length}`} draggable={false} />
+            {many && <button className="photo-arrow prev" aria-label="Previous photo" onClick={(e) => { e.stopPropagation(); go(-1); }}><ChevronLeft size={26} /></button>}
+            {many && <button className="photo-arrow next" aria-label="Next photo" onClick={(e) => { e.stopPropagation(); go(1); }}><ChevronRight size={26} /></button>}
+            {many && (
+              <div className="photo-strip">
+                {gallery.map((src, i) => <button key={i} className={i === at ? "on" : ""} aria-label={`Show photo ${i + 1}`} aria-current={i === at} onClick={(e) => { e.stopPropagation(); setArmed(false); setViewAt(i); }}><img src={src} alt="" /></button>)}
+              </div>
+            )}
+            {many && <span>Swipe, or tap a photo below</span>}
           </div>
-          <img src={view} alt="" onClick={(e) => { e.stopPropagation(); setArmed(false); setView(null); }} />
-          <span>Tap the photo to close</span>
-        </div>
-      )}
+        );
+      })()}
       {pending && (
         <div className="undo-note" role="status">
           <span>Photo removed.</span>

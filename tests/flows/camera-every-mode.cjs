@@ -1,3 +1,4 @@
+// 0.1.84: the camera's modes read Barcode, Label, Group (canvas board C2, approved by Milan 7 October 2026); only the locators changed
 // JOURNEY INVARIANT: several photos in every mode. The mode decides how a picture is read, never how many can be taken.
 // Label: two shots stage, nothing is sent until Analyze 2. Barcode: the code is read, the camera stays open, a photo stages,
 // Analyze sends the code plus the photo; Use the code only sends the code alone. Never rewrite these lines to fit a change.
@@ -23,7 +24,7 @@ seed.items = [];
   await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2500);
 
   // Label: two shots stage, nothing sent, Analyze 2 sends both as one label scan
-  await page.getByRole("button", { name: /LABEL/ }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: /^Label$/ }).click(); await page.waitForTimeout(400);
   await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(600);
   ok(calls.length === 0, "label: the first shot is staged, not sent");
   await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(600);
@@ -34,7 +35,7 @@ seed.items = [];
 
   // Barcode: the code is read, the camera stays open, a photo stages, Analyze sends the code plus the photo
   await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2500);
-  await page.getByRole("button", { name: /BARCODE/ }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(400);
   await page.locator('input[aria-label^="Type t"]').fill("4260345270123"); await page.keyboard.press("Enter"); await page.waitForTimeout(600);
   ok(await page.locator("#camera-shutter-button").count() === 1, "barcode: the camera stays open after the code is read");
   ok(await page.getByText(/Code read/).count() === 1, "barcode: it says the code was read and asks for the pack's photos");
@@ -47,7 +48,7 @@ seed.items = [];
 
   // Barcode: Use the code only sends the code alone
   await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2500);
-  await page.getByRole("button", { name: /BARCODE/ }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(400);
   await page.locator('input[aria-label^="Type t"]').fill("4260345270123"); await page.keyboard.press("Enter"); await page.waitForTimeout(600);
   await page.getByRole("button", { name: /Use the code only/ }).click(); await page.waitForTimeout(800);
   ok(lookups.length === 2 && calls.length === 2, "barcode: Use the code only looks up without a photo");

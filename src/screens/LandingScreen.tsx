@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { tabOfPath } from "../back";
 import { Check } from "lucide-react";
 import { WANTS, HAVES, DEMO_GOAL, BIG_BOWL, lift, smaller } from "../landing";
 import { Mark, APP_NAME } from "../components/Mark";
@@ -9,6 +10,8 @@ export function LandingScreen() {
   const formRef = useRef<HTMLDivElement>(null);
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
+  // signed out on an app address (chefmealan.com/foods): the home page sits at chefmealan.com
+  useEffect(() => { if (tabOfPath(location.pathname, ["home", "journey", "meal", "chef", "foods", "me"])) history.replaceState(null, "", "/"); }, []);
   const go = async () => { setBusy(true); setErr(""); try { await signIn(); } catch (e: any) { setErr(e.message || "Sign-in failed."); } finally { setBusy(false); } };
   const toForm = () => formRef.current?.scrollIntoView({ behavior: "smooth" });
   return (

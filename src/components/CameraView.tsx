@@ -4,13 +4,11 @@ import {
   X,
   Image as ImageIcon,
   Camera,
-  ScanBarcode,
-  AlignHorizontalJustifyCenter,
-  Layers,
   ShoppingBag,
 } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import type { ScannerMode } from "../types";
+import { useBack } from "../back";
 
 interface CameraViewProps {
   key?: string;
@@ -49,6 +47,7 @@ export function CameraView({
   targetMissingItemName,
 }: CameraViewProps) {
   const scannerMode = propScannerMode || mode || "label";
+  useBack(true, onCancel);
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -262,206 +261,77 @@ export function CameraView({
       exit={{ opacity: 0 }}
       className="camera-ui absolute inset-0 z-50 bg-black flex flex-col overflow-hidden"
     >
-      {/* Header */}
-      <div className="absolute top-[72px] sm:top-[84px] inset-x-0 z-30 flex justify-center pointer-events-none" aria-label={`${addTo === "plate" ? "Add to plate" : "Add a food"}: Scan`}>
-        <span className="px-3 py-1 rounded-full bg-black/50 backdrop-blur-md border border-white/10 text-[11px] font-extrabold tracking-widest uppercase text-blue-200">{addTo === "plate" ? "Add to plate" : "Add a food"} · <span className="text-white">Scan</span></span>
-      </div>
-      <div className="absolute top-0 inset-x-0 p-4 sm:p-6 z-30 flex justify-between items-center gap-2">
-        <button
-          onClick={onCancel}
-          aria-label="Close camera"
-          className="p-3 bg-black/50 hover:bg-black/70 rounded-full backdrop-blur-md text-white transition-colors border border-white/10 shrink-0"
-        >
-          <X className="w-5 h-5 sm:w-6 sm:h-6" />
-        </button>
-
-        {/* Toggle UI: [ Barcode | Label | Group ] */}
-        <div className="flex bg-black/60 backdrop-blur-md p-1 rounded-full border border-white/15 shadow-xl">
-          <button
-            onClick={() => onModeChange("barcode")}
-            className={`px-2.5 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold tracking-wide transition-all flex items-center gap-1.5 ${
-              scannerMode === "barcode"
-                ? "bg-white text-black shadow-sm"
-                : "text-white/70 hover:text-white"
-            }`}
-          >
-            <ScanBarcode className="w-3.5 h-3.5" />
-            BARCODE
-          </button>
-          <button
-            onClick={() => { setCodeRead(null); onModeChange("label"); }}
-            className={`px-2.5 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold tracking-wide transition-all flex items-center gap-1.5 ${
-              scannerMode === "label"
-                ? "bg-white text-black shadow-sm"
-                : "text-white/70 hover:text-white"
-            }`}
-          >
-            <AlignHorizontalJustifyCenter className="w-3.5 h-3.5" />
-            LABEL
-          </button>
-          <button
-            onClick={() => { setCodeRead(null); onModeChange("group"); }}
-            className={`px-2.5 sm:px-3.5 py-1.5 rounded-full text-[11px] sm:text-xs font-bold tracking-wide transition-all flex items-center gap-1.5 ${
-              scannerMode === "group"
-                ? "bg-white text-black shadow-sm"
-                : "text-white/70 hover:text-white"
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            GROUP
+      {/* Canvas boards C2 and C3 (Milan, 7 October 2026): white words on solid dark, in sentences; the modes as one switch;
+          everything to tap in one dark panel at the bottom, so it reads on any kitchen */}
+      <div className="cam-top">
+        <div className="cam-row">
+          <button onClick={onCancel} aria-label="Close camera" className="cam-round"><X className="w-5 h-5" /></button>
+          <b className="cam-title" aria-label={`${addTo === "plate" ? "Add to plate" : "Add a food"}: Scan`}>{addTo === "plate" ? "Scan for your plate" : "Scan a food"}</b>
+          <button onClick={onOpenCart} aria-label="Your plate" className="cam-round relative">
+            <ShoppingBag className="w-5 h-5" />
+            {cartCount > 0 && <span className="cam-badge">{cartCount}</span>}
           </button>
         </div>
-
-        {/* Floating Meal Cart button */}
-        <button
-          onClick={onOpenCart}
-          className="relative p-3 bg-black/50 hover:bg-black/70 rounded-full backdrop-blur-md text-white transition-colors border border-white/10 shrink-0 shadow-lg active:scale-95"
-          title="View Meal Cart"
-        >
-          <ShoppingBag className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-          {cartCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-[#39ff14] text-black text-[10px] font-black w-5 h-5 rounded-full flex items-center justify-center shadow-[0_0_10px_rgba(57,255,20,0.6)]">
-              {cartCount}
-            </span>
+        <div className="cam-modes" role="group" aria-label="What to scan">
+          {([["barcode", "Barcode"], ["label", "Label"], ["group", "Group"]] as const).map(([m, name]) => (
+            <button key={m} aria-pressed={scannerMode === m} className={scannerMode === m ? "bg-white on" : ""} onClick={() => { if (m !== "barcode") setCodeRead(null); onModeChange(m); }}>{name}</button>
+          ))}
+        </div>
+        {error ? <span className="cam-say cam-error">{error}</span> : (
+          <span className="cam-say" role="status">
+            {scannerMode === "barcode"
+              ? codeRead ? "Now photos of the pack's front and back, or use the code only" : typing ? "Paused while you type the code" : "Hold the barcode inside the frame"
+              : scannerMode === "group" ? "The whole product, one side per photo" : "Hold the nutrition table inside the frame"}
+          </span>
+        )}
+        {targetMissingItemName && <span className="cam-say cam-missing">Scanning for: {targetMissingItemName}</span>}
+        <AnimatePresence>
+          {toastMessage && (
+            <motion.span initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="cam-say cam-toast">{toastMessage}</motion.span>
           )}
-        </button>
+        </AnimatePresence>
       </div>
-
-      {/* Target missing product indicator if user is resolving a pending cart item */}
-      {targetMissingItemName && (
-        <div className="absolute top-20 inset-x-4 z-30 flex justify-center pointer-events-none">
-          <div className="bg-amber-500/90 text-black text-xs font-bold px-4 py-2 rounded-full shadow-lg backdrop-blur-md flex items-center gap-2">
-            <span>Scanning for missing item:</span>
-            <span className="underline underline-offset-2">
-              {targetMissingItemName}
-            </span>
-          </div>
-        </div>
-      )}
 
       {!cameraError ? (
         <>
-          <div
-            className={`w-full flex items-center justify-center ${scannerMode === "barcode" ? "p-4 my-auto" : "h-full"}`}
-          >
-            <video
-              ref={videoRef as any}
-              autoPlay
-              playsInline
-              muted
-              className={
-                scannerMode === "barcode"
-                  ? "h-64 w-full object-cover rounded-xl"
-                  : "h-full w-full object-cover"
-              }
-            />
-          </div>
-
-          {/* Viewfinder Overlay Mask */}
-          <div className="absolute inset-0 pointer-events-none z-20 flex flex-col items-center justify-center">
-            {error ? (
-              <div className="absolute top-[16%] w-[85%] max-w-sm text-red-50 text-[13px] font-bold tracking-wide bg-red-600/90 px-6 py-4 rounded-3xl backdrop-blur-md border border-red-500/50 text-center shadow-2xl">
-                {error}
-              </div>
+          <video ref={videoRef as any} autoPlay playsInline muted className="absolute inset-0 h-full w-full object-cover" />
+          <div className="cam-frame-area" aria-hidden="true">
+            {scannerMode === "group" ? (
+              <div className="group-frame"><span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" /></div>
             ) : (
-              <div className="absolute top-[16%] text-white text-[11px] font-bold tracking-[0.2em] bg-black/60 px-5 py-2.5 rounded-full backdrop-blur-md border border-white/10">
-                {staged.length > 0
-                  ? `${staged.length} ${staged.length === 1 ? "PHOTO" : "PHOTOS"} READY · ADD MORE OR TAP ANALYZE`
-                  : scannerMode === "barcode"
-                    ? codeRead ? `CODE READ · ADD THE PACK'S FRONT AND BACK` : typing ? "PAUSED WHILE YOU TYPE THE CODE" : "HOLD THE BARCODE INSIDE THE FRAME"
-                    : scannerMode === "group"
-                      ? "WHOLE PRODUCT · ONE SIDE PER PHOTO"
-                      : "THE NUTRITION TABLE · ONE SIDE PER PHOTO"}
+              <div ref={frameRef} className={`cam-frame ${scannerMode === "barcode" ? "barcode" : "label"}`}>
+                <span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" />
+                {scannerMode === "barcode" && !typing && !codeRead && (
+                  <motion.div className="cam-line" animate={{ top: ["4%", "94%", "4%"] }} transition={{ repeat: Infinity, duration: 2.5, ease: "linear" }} />
+                )}
               </div>
             )}
-
-            <AnimatePresence>
-              {toastMessage && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  className="absolute top-[25%] bg-neutral-900/90 text-neutral-100 text-sm font-medium px-4 py-2 rounded-full shadow-lg border border-neutral-700/50 backdrop-blur-md"
-                >
-                  {toastMessage}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            <div
-              ref={frameRef}
-              className={`relative overflow-hidden transition-all duration-300 ${
-                scannerMode === "group"
-                  ? "group-frame"
-                  : `w-[85%] max-w-sm aspect-[3/4] border-2 rounded-3xl shadow-[0_0_0_9999px_rgba(0,0,0,0.7)] ${error ? "border-red-500/80" : "border-white/40"}`
-              }`}
-            >
-              {scannerMode === "barcode" && !typing && (
-                <motion.div
-                  className="absolute left-0 right-0 h-1 bg-green-500 shadow-[0_0_15px_3px_rgba(34,197,94,0.9)] opacity-80"
-                  animate={{ top: ["0%", "98%", "0%"] }}
-                  transition={{
-                    repeat: Infinity,
-                    duration: 2.5,
-                    ease: "linear",
-                  }}
-                />
-              )}
-              {scannerMode === "group" && (
-                <>
-                  <span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" />
-                </>
-              )}
-            </div>
           </div>
         </>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center z-20">
-          <Camera className="w-16 h-16 text-neutral-600 mb-4" />
-          <p className="text-neutral-300 font-medium mb-6 leading-relaxed max-w-[280px]">
-            {cameraError}
-          </p>
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="px-6 py-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-2xl font-semibold flex items-center gap-3 border border-neutral-700 transition-colors"
-          >
-            <ImageIcon className="w-5 h-5" />
-            Upload from Gallery
+          <Camera className="w-16 h-16 text-neutral-400 mb-4" />
+          <p className="text-white font-semibold mb-6 leading-relaxed max-w-[280px]">{cameraError}</p>
+          <button onClick={() => fileInputRef.current?.click()} className="px-6 py-4 bg-white text-[#172742] rounded-2xl font-extrabold flex items-center gap-3">
+            <ImageIcon className="w-5 h-5" /> Choose from your photos
           </button>
         </div>
       )}
 
-      {stagedGroupImages.length > 0 && (
-        <div
-          className="absolute bottom-[196px] left-3 right-3 z-40 flex justify-center gap-2"
-          aria-label="Staged photos"
-        >
-          {stagedGroupImages.map((src, i) => (
-            <button
-              key={i}
-              onClick={() =>
-                setStagedGroupImages((v) => v.filter((_, j) => j !== i))
-              }
-              aria-label={`Remove staged photo ${i + 1}`}
-              className="relative border border-white rounded-lg overflow-hidden"
-            >
-              <img
-                src={src}
-                alt={`Staged angle ${i + 1}`}
-                className="w-12 h-14 object-cover"
-              />
-              <span className="absolute right-0 top-0 bg-black text-white px-1">
-                ×
-              </span>
-            </button>
-          ))}
-          <span className="text-white text-xs self-center">
-            {stagedGroupImages.length}/6
-          </span>
-        </div>
-      )}
-      {/* Controls */}
-      <div className="absolute bottom-0 inset-x-0 p-8 z-30 flex flex-col items-center justify-center gap-4 bg-gradient-to-t from-black via-black/60 to-transparent pt-20">
+      <div className="cam-panel">
+        {stagedGroupImages.length > 0 && (
+          <div className="cam-staged">
+            <b>{stagedGroupImages.length} {stagedGroupImages.length === 1 ? "photo" : "photos"} ready</b>
+            <div className="cam-thumbs" aria-label="Staged photos">
+              {stagedGroupImages.map((src, i) => (
+                <button key={i} onClick={() => setStagedGroupImages((v) => v.filter((_, j) => j !== i))} aria-label={`Remove staged photo ${i + 1}`}>
+                  <img src={src} alt={`Staged angle ${i + 1}`} />
+                  <span aria-hidden="true"><X className="w-3 h-3" /></span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         {scannerMode === "barcode" && codeRead && (
           <div className="typed-barcode code-read">
             <span>Code read: {codeRead}</span>
@@ -469,57 +339,42 @@ export function CameraView({
           </div>
         )}
         {scannerMode === "barcode" && !codeRead && (
-          <form className="typed-barcode" onSubmit={(e) => { e.preventDefault(); const v = typedCode.trim(); if (/^\d{8,14}$/.test(v)) { typedRef.current = true; setTypingFocus(false); setCodeRead(v); setTypedCode(""); } }}>
-            <input value={typedCode} onChange={(e) => setTypedCode(e.target.value)} onFocus={() => setTypingFocus(true)} onBlur={() => setTypingFocus(false)} inputMode="numeric" placeholder="or type the barcode" aria-label="Type the barcode" enterKeyHint="go" />
-            <button type="submit" disabled={!/^\d{8,14}$/.test(typedCode.trim())}>Look up</button>
-          </form>
+          <>
+            <small className="cam-small">Or type the barcode</small>
+            <form className="typed-barcode" onSubmit={(e) => { e.preventDefault(); const v = typedCode.trim(); if (/^\d{8,14}$/.test(v)) { typedRef.current = true; setTypingFocus(false); setCodeRead(v); setTypedCode(""); } }}>
+              <input value={typedCode} onChange={(e) => setTypedCode(e.target.value)} onFocus={() => setTypingFocus(true)} onBlur={() => setTypingFocus(false)} inputMode="numeric" placeholder="Barcode numbers" aria-label="Type the barcode" enterKeyHint="go" />
+              <button type="submit" disabled={!/^\d{8,14}$/.test(typedCode.trim())}>Look up</button>
+            </form>
+            {!cameraError && typing && <small className="cam-small auto-note">Leave the field empty and the camera reads again.</small>}
+          </>
         )}
-        {!cameraError && (scannerMode !== "barcode" || codeRead) && (
-          <button className="auto-switch" onClick={() => setAutoMode(!auto)} aria-pressed={auto}>
-            {auto ? "Auto shot: hold still" : "Manual shot: tap to take"}
+        <div className="cam-controls">
+          <button onClick={() => fileInputRef.current?.click()} className="cam-gallery" aria-label="Your photos">
+            <span className="cam-round"><ImageIcon className="w-5 h-5" /></span>
+            <small>Your photos</small>
           </button>
-        )}
-        {!cameraError && scannerMode === "barcode" && !codeRead && <p className="auto-switch auto-note">{typing ? "Paused while you type. Leave the field empty to read with the camera again." : "Reads by itself. Hold the code inside the frame."}</p>}
-        {!cameraError && (
-          <div className="relative flex items-center justify-center w-full max-w-sm">
-            {/* Gallery Button */}
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="absolute left-4 p-4 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full text-white transition-colors border border-white/10"
-              title="Upload Label from Gallery"
-            >
-              <ImageIcon className="w-6 h-6" />
-            </button>
-
-            {/* Finish: right of the shutter, where the thumb is; the only green on the screen */}
-            {stagedGroupImages.length > 0 && (
-              <button
-                onClick={analyze}
-                className="absolute right-2 px-4 h-12 rounded-full bg-[#39ff14] text-black font-extrabold text-sm shadow-[0_0_18px_rgba(57,255,20,0.35)] active:scale-95 transition-all"
-                aria-label={`Analyze ${stagedGroupImages.length} photo${stagedGroupImages.length === 1 ? "" : "s"}`}
-              >
-                Analyze {stagedGroupImages.length}
-              </button>
-            )}
-            {/* Shutter Button */}
-            <button
-              id="camera-shutter-button"
-              onClick={handleShutterClick}
-              className="relative w-20 h-20 rounded-full border-[5px] border-white/80 flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-[0_0_20px_rgba(0,0,0,0.5)]"
-              title={
-                scannerMode === "group" ? "Snap Angle for Group" : "Capture"
-              }
-            >
-              <div
-                className="w-[3.25rem] h-[3.25rem] rounded-full bg-white transition-colors relative flex items-center justify-center"
-              />
+          {!cameraError ? (
+            <button id="camera-shutter-button" onClick={handleShutterClick} className="cam-shutter" title={scannerMode === "group" ? "Take a photo of one side" : "Take a photo"}>
+              <span />
               {auto && (scannerMode !== "barcode" || codeRead) && (
-                <svg className="absolute inset-0 w-20 h-20 -rotate-90 pointer-events-none" viewBox="0 0 80 80" aria-hidden="true">
-                  <circle cx="40" cy="40" r="37" fill="none" stroke="#39ff14" strokeWidth="5" strokeLinecap="round" strokeDasharray={2 * Math.PI * 37} strokeDashoffset={(1 - steady) * 2 * Math.PI * 37} style={{ transition: "stroke-dashoffset 120ms linear" }} />
+                <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 80 80" aria-hidden="true">
+                  <circle cx="40" cy="40" r="37" fill="none" stroke="#2e7be8" strokeWidth="5" strokeLinecap="round" strokeDasharray={2 * Math.PI * 37} strokeDashoffset={(1 - steady) * 2 * Math.PI * 37} style={{ transition: "stroke-dashoffset 120ms linear" }} />
                 </svg>
               )}
             </button>
-          </div>
+          ) : <span className="cam-shutter-gap" />}
+          <span className="cam-analyze-slot">
+            {stagedGroupImages.length > 0 && (
+              <button onClick={analyze} className="cam-analyze" aria-label={`Analyze ${stagedGroupImages.length} photo${stagedGroupImages.length === 1 ? "" : "s"}`}>
+                Analyze {stagedGroupImages.length}
+              </button>
+            )}
+          </span>
+        </div>
+        {!cameraError && (scannerMode !== "barcode" || codeRead) && (
+          <button className="auto-switch" onClick={() => setAutoMode(!auto)} aria-pressed={auto}>
+            {auto ? "Auto shot: hold still · tap for manual" : "Manual shot: tap to take · tap for auto"}
+          </button>
         )}
       </div>
 

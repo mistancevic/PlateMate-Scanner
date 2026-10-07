@@ -1,3 +1,4 @@
+// 0.1.84: the camera's modes read Barcode, Label, Group (canvas board C2, approved by Milan 7 October 2026); only the locators changed
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs");
@@ -25,7 +26,7 @@ seed.foods = [flip("fa", "Protein Flips Salt & Vinegar Flavour", "", undefined),
   await page.locator(".sheet-backdrop").first().click({ position: { x: 5, y: 5 } }).catch(() => {}); await page.waitForTimeout(200);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(1500);
-  await page.getByRole("button", { name: /BARCODE/ }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(300);
   await page.locator('input[aria-label^="Type t"]').fill("4260345270123"); await page.keyboard.press("Enter"); await page.waitForTimeout(800);
   await page.screenshot({ path: "/tmp/dm.png" }); console.log("card opened for:", await page.locator(".foodcard-head b").textContent().catch(() => "no card"));
   console.log(errs.length ? "errors: " + errs : "no page errors");
