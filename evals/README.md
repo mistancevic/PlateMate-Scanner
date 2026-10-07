@@ -11,11 +11,20 @@ The method is the one from the Product Faculty AI Build Labs, applied per carrie
    answers. We track how often the two agree, and trust the judge only where they do.
 5. **Failure modes.** Read the fails, name the patterns, fix the prompt or the code, add the fail as a new case, run again.
 
+## Adapted for the real app (7 October 2026)
+
+Chef Mealan is a real app with a calculator at its heart, not only a model, so the method runs per carrier. The numbers
+are deterministic: they get code checks and the coach's label, no judge model. The coach passes or fails each person on
+Menu, Evals, can type the calories and protein they'd expect, and exports the CSV; passed cases go into
+`number-cases.json` as `coach`, and from then on every push checks against them. A change to the calculation that moves
+the numbers is shown to the coach first, then recorded with `npm run eval:numbers -- --update`.
+
 ## What runs
 
 | Carrier | File | Command | Bar |
 |---|---|---|---|
 | Code | `swap-golden.json` | `npm run eval:code` | 10/10 feasible, never the missing food; coach pick in top 3 for 8/10 |
+| Numbers | `number-cases.json`, `number-snapshot.json` | `npm test` (every push), `npm run eval:numbers` | every check holds; numbers as recorded; a case the coach passed stays within 5 % of the coach's calories and 10 g of the coach's protein |
 | Model | `plate-questions.jsonl` | `npm run eval:model` (server running, key set) | grounded 100 %, shape 100 %, forbidden 0, relevance ≥ 4, p50 < 5 s |
 | Human vs judge | `results/*.csv` | `npm run eval:align` | agreement ≥ 8 of 10 |
 

@@ -1,0 +1,670 @@
+{
+ "about": "Numbers evals (7 October 2026): ten adults from the dimensions in dimensions.md. The app's numbers are recorded in number-snapshot.json; the coach labels each case on Menu, Evals. A case the coach passed keeps its numbers as a check on every push.",
+ "cases": [
+  {
+   "id": "N01",
+   "title": "Like Milan: desk job, many steps, 4 training days, building strength steadily",
+   "dimensions": {
+    "identity": "optimiser",
+    "goal": "Build muscle · Steady",
+    "work": "desk",
+    "steps": "8,000–12,000",
+    "week": "1 light, 2 moderate, 1 hard",
+    "age": "45",
+    "diet": "everything",
+    "trainingAge": "over 3 years"
+   },
+   "band": "gainsteady",
+   "look": "Small surplus over maintenance, about 5 %. Protein in the trained range. Hard day clearly above the rest days.",
+   "personal": {
+    "sex": "male",
+    "birthYear": 1981,
+    "heightCm": 182,
+    "weightKg": 96,
+    "steps": "8to12",
+    "trainingAge": "3p",
+    "dayMode": "each",
+    "lifestyle": {
+     "weekdays": "work",
+     "hours": "fixed",
+     "slot": "9-5",
+     "move": "sitting"
+    },
+    "plan": [
+     {
+      "work": true,
+      "kind": "strength",
+      "intensity": "hard",
+      "minutes": 75,
+      "when": "evening"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "strength",
+      "intensity": "moderate",
+      "minutes": 55,
+      "when": "evening"
+     },
+     {
+      "work": true,
+      "kind": "mobility",
+      "intensity": "easy",
+      "minutes": 40,
+      "when": "day"
+     },
+     {
+      "work": true,
+      "kind": "strength",
+      "intensity": "moderate",
+      "minutes": 55,
+      "when": "evening"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     }
+    ]
+   }
+  },
+  {
+   "id": "N02",
+   "title": "Desk worker, no training, few steps, losing fat",
+   "dimensions": {
+    "identity": "restarter",
+    "goal": "Lose fat",
+    "work": "desk",
+    "steps": "under 5,000",
+    "week": "no training",
+    "age": "36",
+    "diet": "everything"
+   },
+   "band": "fatloss",
+   "look": "About 20 % under maintenance but never under resting burn. Protein at the top of the untrained range (1.2–1.6 g/kg).",
+   "personal": {
+    "sex": "female",
+    "birthYear": 1990,
+    "heightCm": 165,
+    "weightKg": 78,
+    "steps": "u5",
+    "dayMode": "same",
+    "lifestyle": {
+     "weekdays": "work",
+     "hours": "fixed",
+     "slot": "9-5",
+     "move": "sitting"
+    },
+    "plan": [
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     }
+    ]
+   }
+  },
+  {
+   "id": "N03",
+   "title": "Student, cycles to university, sport in class, recomposition",
+   "dimensions": {
+    "identity": "athlete",
+    "goal": "Recomposition",
+    "work": "study, bike",
+    "steps": "8,000–12,000",
+    "week": "2 strength, 1 cardio, sport in class once",
+    "age": "22",
+    "diet": "everything"
+   },
+   "band": "recomp",
+   "look": "About 10 % under maintenance. Study days count the bike and sport in class.",
+   "personal": {
+    "sex": "male",
+    "birthYear": 2004,
+    "heightCm": 178,
+    "weightKg": 72,
+    "steps": "8to12",
+    "dayMode": "each",
+    "lifestyle": {
+     "weekdays": "study",
+     "school": "full",
+     "commute": "bike",
+     "peWeek": "1"
+    },
+    "plan": [
+     {
+      "work": true,
+      "kind": "strength",
+      "study": true,
+      "intensity": "moderate",
+      "minutes": 55,
+      "when": "evening"
+     },
+     {
+      "work": true,
+      "kind": "rest",
+      "study": true,
+      "pe": true
+     },
+     {
+      "work": true,
+      "kind": "cardio",
+      "study": true,
+      "intensity": "moderate",
+      "minutes": 40,
+      "when": "morning"
+     },
+     {
+      "work": true,
+      "kind": "strength",
+      "study": true,
+      "intensity": "moderate",
+      "minutes": 55,
+      "when": "evening"
+     },
+     {
+      "work": true,
+      "kind": "rest",
+      "study": true
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     }
+    ]
+   }
+  },
+  {
+   "id": "N04",
+   "title": "Vegan woman, desk job, 2 training days, maintaining",
+   "dimensions": {
+    "identity": "clean eater",
+    "goal": "Maintain",
+    "work": "desk",
+    "steps": "5,000–8,000",
+    "week": "2 moderate",
+    "age": "31",
+    "diet": "vegan"
+   },
+   "band": "maintain",
+   "look": "Maintenance. Protein at the top of the trained range because the protein is mostly from plants.",
+   "personal": {
+    "sex": "female",
+    "birthYear": 1995,
+    "heightCm": 168,
+    "weightKg": 60,
+    "steps": "5to8",
+    "dayMode": "each",
+    "lifestyle": {
+     "weekdays": "work",
+     "hours": "flexible",
+     "move": "sitting",
+     "diet": "Vegan"
+    },
+    "plan": [
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "yoga",
+      "intensity": "moderate",
+      "minutes": 55,
+      "when": "evening"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "strength",
+      "intensity": "moderate",
+      "minutes": 55,
+      "when": "evening"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     }
+    ]
+   }
+  },
+  {
+   "id": "N05",
+   "title": "Woman over 60, at home, walks a lot, one easy session",
+   "dimensions": {
+    "identity": "family cook",
+    "goal": "Maintain",
+    "work": "at home",
+    "steps": "12,000+",
+    "week": "1 light",
+    "age": "64",
+    "diet": "everything"
+   },
+   "band": "maintain",
+   "look": "Steps count on every day. Protein at the top of the range because she is over 60.",
+   "personal": {
+    "sex": "female",
+    "birthYear": 1962,
+    "heightCm": 163,
+    "weightKg": 66,
+    "steps": "12p",
+    "dayMode": "each",
+    "lifestyle": {
+     "weekdays": "home",
+     "hours": "none"
+    },
+    "plan": [
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "stretching",
+      "intensity": "easy",
+      "minutes": 40,
+      "when": "morning"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     }
+    ]
+   }
+  },
+  {
+   "id": "N06",
+   "title": "Shift worker on her feet, 2 training days, losing fat",
+   "dimensions": {
+    "identity": "restarter",
+    "goal": "Lose fat",
+    "work": "shifts, on her feet",
+    "steps": "8,000–12,000",
+    "week": "2 moderate",
+    "age": "38",
+    "diet": "everything"
+   },
+   "band": "fatloss",
+   "look": "Her job already covers most steps: steps add little on work days. Protein at the top for fat loss.",
+   "personal": {
+    "sex": "female",
+    "birthYear": 1988,
+    "heightCm": 170,
+    "weightKg": 82,
+    "steps": "8to12",
+    "dayMode": "each",
+    "lifestyle": {
+     "weekdays": "work",
+     "hours": "shifts",
+     "move": "feet"
+    },
+    "plan": [
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "strength",
+      "intensity": "moderate",
+      "minutes": 55,
+      "when": "evening"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "strength",
+      "intensity": "moderate",
+      "minutes": 55,
+      "when": "evening"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     }
+    ]
+   }
+  },
+  {
+   "id": "N07",
+   "title": "Builder, physical work, beginner lifter, building muscle faster",
+   "dimensions": {
+    "identity": "athlete",
+    "goal": "Build muscle · Faster",
+    "work": "physical",
+    "steps": "12,000+",
+    "week": "3 moderate",
+    "age": "29",
+    "diet": "everything",
+    "trainingAge": "under 1 year"
+   },
+   "band": "gain",
+   "look": "About 10 % over maintenance on top of a physical job. The highest numbers of the set.",
+   "personal": {
+    "sex": "male",
+    "birthYear": 1997,
+    "heightCm": 185,
+    "weightKg": 80,
+    "steps": "12p",
+    "trainingAge": "u1",
+    "dayMode": "each",
+    "lifestyle": {
+     "weekdays": "work",
+     "hours": "fixed",
+     "slot": "7-3",
+     "move": "physical"
+    },
+    "plan": [
+     {
+      "work": true,
+      "kind": "strength",
+      "intensity": "moderate",
+      "minutes": 75,
+      "when": "evening"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "strength",
+      "intensity": "moderate",
+      "minutes": 75,
+      "when": "evening"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "strength",
+      "intensity": "moderate",
+      "minutes": 75,
+      "when": "evening"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     }
+    ]
+   }
+  },
+  {
+   "id": "N08",
+   "title": "Runner, 5 days, body fat known, performance",
+   "dimensions": {
+    "identity": "athlete",
+    "goal": "Performance",
+    "work": "desk",
+    "steps": "8,000–12,000",
+    "week": "3 moderate, 2 hard runs",
+    "age": "34",
+    "diet": "everything"
+   },
+   "band": "performance",
+   "look": "Katch–McArdle from body fat. More carbs (fat 25 %). Hard days well above the rest.",
+   "personal": {
+    "sex": "female",
+    "birthYear": 1992,
+    "heightCm": 170,
+    "weightKg": 58,
+    "bodyFatPct": 20,
+    "steps": "8to12",
+    "dayMode": "each",
+    "lifestyle": {
+     "weekdays": "work",
+     "hours": "flexible",
+     "move": "sitting"
+    },
+    "plan": [
+     {
+      "work": true,
+      "kind": "cardio",
+      "intensity": "moderate",
+      "minutes": 55,
+      "when": "morning"
+     },
+     {
+      "work": true,
+      "kind": "cardio",
+      "intensity": "hard",
+      "minutes": 55,
+      "when": "evening"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "cardio",
+      "intensity": "moderate",
+      "minutes": 55,
+      "when": "morning"
+     },
+     {
+      "work": true,
+      "kind": "cardio",
+      "intensity": "hard",
+      "minutes": 55,
+      "when": "evening"
+     },
+     {
+      "work": false,
+      "kind": "cardio",
+      "intensity": "moderate",
+      "minutes": 100,
+      "when": "morning"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     }
+    ]
+   }
+  },
+  {
+   "id": "N09",
+   "title": "Parent at home, no training, some steps, losing fat",
+   "dimensions": {
+    "identity": "family cook",
+    "goal": "Lose fat",
+    "work": "at home",
+    "steps": "5,000–8,000",
+    "week": "no training",
+    "age": "41",
+    "diet": "everything"
+   },
+   "band": "fatloss",
+   "look": "Every day the same. About 20 % under maintenance, protein at the top of the untrained range.",
+   "personal": {
+    "sex": "male",
+    "birthYear": 1985,
+    "heightCm": 176,
+    "weightKg": 95,
+    "steps": "5to8",
+    "dayMode": "same",
+    "lifestyle": {
+     "weekdays": "home",
+     "hours": "none"
+    },
+    "plan": [
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     }
+    ]
+   }
+  },
+  {
+   "id": "N10",
+   "title": "Apprentice on his feet, 2 study days, team sport, recomposition",
+   "dimensions": {
+    "identity": "athlete",
+    "goal": "Recomposition",
+    "work": "work and study, on his feet, bike",
+    "steps": "8,000–12,000",
+    "week": "2 team sport",
+    "age": "21",
+    "diet": "everything"
+   },
+   "band": "recomp",
+   "look": "Work days on his feet, study days sitting with the bike. About 10 % under maintenance.",
+   "personal": {
+    "sex": "male",
+    "birthYear": 2005,
+    "heightCm": 180,
+    "weightKg": 70,
+    "steps": "8to12",
+    "dayMode": "each",
+    "lifestyle": {
+     "weekdays": "both",
+     "hours": "fixed",
+     "slot": "7-3",
+     "move": "feet",
+     "commute": "bike",
+     "peWeek": "none"
+    },
+    "plan": [
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "team",
+      "study": true,
+      "intensity": "moderate",
+      "minutes": 75,
+      "when": "evening"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": true,
+      "kind": "team",
+      "study": true,
+      "intensity": "moderate",
+      "minutes": 75,
+      "when": "evening"
+     },
+     {
+      "work": true,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     },
+     {
+      "work": false,
+      "kind": "rest"
+     }
+    ]
+   }
+  }
+ ]
+}

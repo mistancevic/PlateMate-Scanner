@@ -4,6 +4,9 @@ import questionsRaw from "../../evals/plate-questions.jsonl?raw";
 import goldenRaw from "../../evals/swap-golden.json?raw";
 import libraryRaw from "../../evals/library.json?raw";
 import tipRaw from "../../evals/tip-cases.json?raw";
+import numberCasesRaw from "../../evals/number-cases.json?raw";
+import numberSnapRaw from "../../evals/number-snapshot.json?raw";
+import { numbersOf, numberChecks, type NumberCase, type NumberOutput, type Snapshot } from "../numbersEval";
 import { jobOf } from "../foodjob";
 import { playbookFor, tipBreaks } from "../playbook";
 import { density } from "../pilot";
@@ -14,7 +17,7 @@ import type { AppApi } from "./api";
 // The evals page: every scenario, run it, see the output and the checks, label it, compare with the judge.
 type Q = { id: string; dimensions: Record<string, string>; plate: { food: string; grams: number }[]; question: string; missing: string | null; expect: { min_suggestions: number; must_not_suggest: string[]; forbidden_phrases: string[] } };
 type G = { id: string; plate: { food: string; grams: number }[]; missing: string; target: number; coach_top3: string[] };
-type Result = { at: string; ms?: number; output: any; checks: Record<string, boolean>; judge?: { score: number; reason: string }; label?: "pass" | "fail"; reason?: string };
+type Result = { at: string; ms?: number; output: any; checks: Record<string, boolean>; judge?: { score: number; reason: string }; label?: "pass" | "fail"; reason?: string; coachKcal?: number; coachProtein?: number };
 const LIB: Food[] = JSON.parse(libraryRaw).foods;
 const QUESTIONS: Q[] = questionsRaw.trim().split("\n").map((l: string) => JSON.parse(l));
 const GOLDEN: G[] = JSON.parse(goldenRaw).cases;
@@ -23,7 +26,28 @@ const TIPS: T[] = JSON.parse(tipRaw).cases;
 const food = (id: string) => LIB.find((f) => f.id === id)!;
 const KEY = "chefmealan-evals";
 const load = (): Record<string, Result> => { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; } };
-const TYPES = ["all", "code", "tip", "missing", "goes-with", "better-match", "texture", "cheaper", "constraint", "adversarial"];
+const TYPES = ["all", "numbers", "code", "tip", "missing", "goes-with", "better-match", "texture", "cheaper", "constraint", "adversarial"];
+
+// Numbers (7 October 2026): ten people from the dimensions; the app's numbers, the checks every answer must hold,
+// and the coach's label. No judge: the calculation is deterministic, so the coach's pass is the reference.
+const NUMBERS: NumberCase[] = JSON.parse(numberCasesRaw).cases;
+const NSNAP: Snapshot = JSON.parse(numberSnapRaw);
+function runNumbers(n: NumberCase): Result {
+  const t0 = performance.now();
+  const o = numbersOf(n);
+  if (!o) return { at: new Date().toISOString(), output: { error: "Could not calculate." }, checks: { calculated: false } };
+  return { at: new Date().toISOString(), ms: Math.round(performance.now() - t0), output: o, checks: numberChecks(n, o, NSNAP[n.id]) };
+}
+function NumbersOut({ o }: { o: NumberOutput }) {
+  return (
+    <>
+      <p className="small"><b>{o.kcal.toLocaleString("en")} kcal</b> on average · <b>{o.protein} g protein</b> ({o.proteinMin}–{o.proteinMax} g, {o.perKg.toFixed(1)} g per kg) · {o.fats} g fat · {o.carbs} g carbs</p>
+      <p className="small muted">Maintenance {o.maintenance.toLocaleString("en")} kcal · resting burn {o.bmr.toLocaleString("en")} · {o.method}</p>
+      {o.why.length > 0 && <ul className="small">{o.why.map((w) => <li key={w}>{w}</li>)}</ul>}
+      {o.days.length > 0 && <ol className="eval-list">{o.days.map((d) => <li key={d.name}><b>{d.name}</b> {d.kcal.toLocaleString("en")} kcal, {d.carbs} g carbs · {d.what}</li>)}</ol>}
+    </>
+  );
+}
 
 function runCode(g: G): Result {
   const items: Ingredient[] = g.plate.map((p) => ({ id: uid(), food: { ...food(p.food), readyToEat: true }, grams: p.grams, locked: true }));
@@ -90,15 +114,16 @@ export function EvalsScreen(p: AppApi) {
   const put = (id: string, r: Partial<Result>) => save({ ...load(), [id]: { ...(load()[id] ?? {}), ...r } as Result });
 
   const cases = useMemo(() => [
+    ...NUMBERS.map((n) => ({ id: n.id, kind: "numbers" as const, title: n.title, tags: ["numbers", ...Object.values(n.dimensions)], n })),
     ...GOLDEN.map((g) => ({ id: g.id, kind: "code" as const, title: `${g.plate.map((x) => food(x.food).name.split(",")[0]).join(" + ")}, without ${food(g.missing).name.split(",")[0]}`, tags: ["code", "swap ranking", `target ${g.target}`], g })),
     ...TIPS.map((t) => ({ id: t.id, kind: "tip" as const, title: `Pro tip: ${food(t.food).name}, ${t.goal}${t.moments.length ? ", " + t.moments.join(", ") : ""}`, tags: ["tip", t.goal, ...t.moments], t })),
     ...QUESTIONS.map((q) => ({ id: q.id, kind: "model" as const, title: q.question, tags: [q.dimensions.question, q.dimensions.identity, q.dimensions.goal, q.dimensions.situation, q.dimensions.place], q })),
   ], []);
-  const shown = cases.filter((c: any) => type === "all" || (type === "code" ? c.kind === "code" : type === "tip" ? c.kind === "tip" : c.kind === "model" && c.q.dimensions.question === type));
+  const shown = cases.filter((c: any) => type === "all" || (type === "numbers" ? c.kind === "numbers" : type === "code" ? c.kind === "code" : type === "tip" ? c.kind === "tip" : c.kind === "model" && c.q.dimensions.question === type));
 
   async function run(c: (typeof cases)[number]) {
     setRunning(c.id);
-    try { const r = c.kind === "code" ? runCode((c as any).g) : c.kind === "tip" ? await runTip((c as any).t) : await runModel((c as any).q); const prev = load()[c.id]; put(c.id, { ...r, label: prev?.label, reason: prev?.reason }); }
+    try { const r = c.kind === "numbers" ? runNumbers((c as any).n) : c.kind === "code" ? runCode((c as any).g) : c.kind === "tip" ? await runTip((c as any).t) : await runModel((c as any).q); const prev = load()[c.id]; put(c.id, { ...r, label: prev?.label, reason: prev?.reason, coachKcal: prev?.coachKcal, coachProtein: prev?.coachProtein }); }
     catch (e: any) { p.setError(e.message); } finally { setRunning(null); }
   }
   async function runAll() { for (const c of shown) { await run(c); } }
@@ -113,9 +138,9 @@ export function EvalsScreen(p: AppApi) {
   const times = ran.map((c) => results[c.id].ms ?? 0).filter((t) => t > 50).sort((a, b) => a - b);
 
   function exportCsv() {
-    const rows = [["id", "kind", "title", "checks_pass", "failed_checks", "ms", "judge", "judge_reason", "your_label", "your_reason", "output"].join(",")];
+    const rows = [["id", "kind", "title", "checks_pass", "failed_checks", "ms", "judge", "judge_reason", "your_label", "your_reason", "output", "your_kcal", "your_protein"].join(",")];
     const esc = (s: unknown) => `"${String(s ?? "").replace(/"/g, '""')}"`;
-    for (const c of cases) { const r = results[c.id]; if (!r) continue; rows.push([c.id, c.kind, esc(c.title), passChecks(r), esc(Object.entries(r.checks).filter(([, v]) => !v).map(([k]) => k).join("; ")), r.ms ?? "", r.judge?.score ?? "", esc(r.judge?.reason), r.label ?? "", esc(r.reason), esc(JSON.stringify(r.output))].join(",")); }
+    for (const c of cases) { const r = results[c.id]; if (!r) continue; rows.push([c.id, c.kind, esc(c.title), passChecks(r), esc(Object.entries(r.checks).filter(([, v]) => !v).map(([k]) => k).join("; ")), r.ms ?? "", r.judge?.score ?? "", esc(r.judge?.reason), r.label ?? "", esc(r.reason), esc(JSON.stringify(r.output)), r.coachKcal ?? "", r.coachProtein ?? ""].join(",")); }
     const url = URL.createObjectURL(new Blob([rows.join("\n")], { type: "text/csv" }));
     const a = document.createElement("a"); a.href = url; a.download = `chef-mealan-evals-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
@@ -146,12 +171,12 @@ export function EvalsScreen(p: AppApi) {
             </button>
             {isOpen && (
               <div className="eval-body">
-                {c.kind === "tip" ? <small>Expect: {(c as any).t.note}</small> : <small>Plate: {(c.kind === "code" ? (c as any).g.plate : (c as any).q.plate).map((x: any) => `${x.grams} g ${food(x.food).name}`).join(" · ")}</small>}
+                {c.kind === "numbers" ? <p className="small"><b>Look for:</b> {(c as any).n.look}</p> : c.kind === "tip" ? <small>Expect: {(c as any).t.note}</small> : <small>Plate: {(c.kind === "code" ? (c as any).g.plate : (c as any).q.plate).map((x: any) => `${x.grams} g ${food(x.food).name}`).join(" · ")}</small>}
                 <div className="button-row" style={{ margin: "8px 0" }}><button className="pill pill-small" disabled={!!running} onClick={() => run(c)}><Play size={14} /> Run</button></div>
                 {r && (
                   <>
                     <p className="label">Output{r.ms !== undefined ? `, ${r.ms} ms` : ""}</p>
-                    {c.kind === "code" ? (
+                    {c.kind === "numbers" ? (r.output.error ? <p className="small">{r.output.error}</p> : <NumbersOut o={r.output} />) : c.kind === "code" ? (
                       <ol className="eval-list">{r.output.swaps.map((s: any, k: number) => <li key={k}>{s.food}, {s.grams ?? "–"} g{s.fits ? "" : " (doesn't reach the target)"}</li>)}</ol>
                     ) : r.output.error ? <p className="small">{r.output.error}</p> : (
                       <>
@@ -168,6 +193,12 @@ export function EvalsScreen(p: AppApi) {
                       <button className={`choice ${r.label === "fail" ? "on" : ""}`} onClick={() => put(c.id, { label: "fail" })}><X size={14} /> Fail</button>
                     </div>
                     <input className="search" placeholder="Why, in a few words" value={r.reason ?? ""} onChange={(e) => put(c.id, { reason: e.target.value })} />
+                    {c.kind === "numbers" && (
+                      <div className="field-row eval-coach">
+                        <label className="field"><span>Your kcal</span><input inputMode="numeric" aria-label={`${c.id}, your kcal`} value={r.coachKcal ?? ""} placeholder={String(r.output.kcal ?? "")} onChange={(e) => put(c.id, { coachKcal: e.target.value ? Number(e.target.value) : undefined })} /></label>
+                        <label className="field"><span>Your protein, g</span><input inputMode="numeric" aria-label={`${c.id}, your protein`} value={r.coachProtein ?? ""} placeholder={String(r.output.protein ?? "")} onChange={(e) => put(c.id, { coachProtein: e.target.value ? Number(e.target.value) : undefined })} /></label>
+                      </div>
+                    )}
                   </>
                 )}
               </div>
