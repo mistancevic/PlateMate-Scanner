@@ -133,7 +133,7 @@ export async function saveCards(uid: string, cards: any[]) {
     const b = writeBatch(db());
     for (const fb of cards.slice(i, i + 20)) {
       const copy = structuredClone(fb); delete copy.photo;
-      (copy.meal?.items ?? []).forEach((it: any) => { if (it.food) delete it.food.photo; });
+      (copy.meal?.items ?? []).forEach((it: any) => { if (it.food) { delete it.food.photo; delete it.food.photos; } });
       b.set(doc(db(), "users", uid, "cards", fb.id), { ...copy, shared: fb.shared ? true : false, reason: fb.shared?.reason ?? null, sharedAt: fb.shared?.at ?? null });
     }
     await b.commit();
@@ -230,7 +230,7 @@ export async function loadPhotos(uid: string): Promise<Map<string, string>> {
 export type InboxItem = { id: string; from: string; note: string; meal: any; sentAt: string };
 export async function sendRecipe(clientUid: string, item: InboxItem) {
   const copy = structuredClone(item);
-  (copy.meal?.items ?? []).forEach((it: any) => { if (it.food) delete it.food.photo; });
+  (copy.meal?.items ?? []).forEach((it: any) => { if (it.food) { delete it.food.photo; delete it.food.photos; } });
   await setDoc(doc(db(), "users", clientUid, "inbox", item.id), copy);
 }
 export async function loadInbox(uid: string): Promise<InboxItem[]> {

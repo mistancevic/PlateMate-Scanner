@@ -9,7 +9,17 @@ const isData = (x: unknown): x is string => typeof x === "string" && x.startsWit
 // A cheap fingerprint: enough to see that the picture under a key changed, without comparing whole photos.
 export const sig = (data: string) => `${data.length}:${data.slice(-32)}`;
 
-// Every photo the state holds, by key. A food inside a plate or a meal counts under its own food key.
+// Copies of a food: inside the plate being built (items), saved meals, and the plates on cards (feedback[].meal.items).
+const copiesOf = (state: any): any[] => [
+  ...(state?.items ?? []).map((i: any) => i?.food),
+  ...(state?.meals ?? []).flatMap((m: any) => (m?.items ?? []).map((i: any) => i?.food)),
+  ...(state?.feedback ?? []).flatMap((fb: any) => (fb?.meal?.items ?? []).map((i: any) => i?.food)),
+].filter(Boolean);
+const libraryIds = (state: any) => new Set<string>((state?.foods ?? []).map((f: any) => f?.id).filter(Boolean));
+
+// Every photo the state holds, by key. The library is the one source for a food's photos: a copy of a library food
+// inside a plate, a meal or a card never speaks for it (a copy can be older). Only a food that left the library is
+// kept through its copies.
 export function photosOf(state: any): Map<string, string> {
   const out = new Map<string, string>();
   const food = (f: (Photoish & { id?: string }) | undefined) => {
@@ -19,17 +29,20 @@ export function photosOf(state: any): Map<string, string> {
   };
   (state?.foods ?? []).forEach(food);
   (state?.feedback ?? []).forEach((fb: any) => { if (isData(fb?.photo)) out.set(`fb:${fb.id}`, fb.photo); });
-  (state?.items ?? []).forEach((i: any) => food(i?.food));
-  (state?.meals ?? []).forEach((m: any) => (m?.items ?? []).forEach((i: any) => food(i?.food)));
+  const lib = libraryIds(state);
+  copiesOf(state).filter((f) => !lib.has(f.id)).forEach(food);
   return out;
 }
 
 // Puts photos back where they belong, only where the state has none: what the state already holds is never replaced.
+// A food whose list of photos is empty on purpose ([]) stays empty.
 export function withPhotos<T>(state: T, photos: Map<string, string>): T {
   if (!photos.size) return state;
   const s: any = state;
+  let changed = false;
   const food = (f: any) => {
     if (!f || !f.id) return f;
+    if (Array.isArray(f.photos) && f.photos.length === 0 && !f.photo) return f;
     const thumb = f.photo ?? photos.get(`food:${f.id}`);
     let more = f.photos as string[] | undefined;
     if (!more) {
@@ -37,35 +50,41 @@ export function withPhotos<T>(state: T, photos: Map<string, string>): T {
       for (let n = 1; n <= 12; n++) { const x = photos.get(`food:${f.id}:${n}`); if (!x) break; found.push(x); }
       if (found.length) more = found;
     }
-    return thumb === f.photo && more === f.photos ? f : { ...f, photo: thumb, photos: more };
+    if (thumb === f.photo && more === f.photos) return f;
+    changed = true;
+    return { ...f, photo: thumb, photos: more };
   };
-  let changed = false;
-  const food0 = food;
-  const foodC = (f: any) => { const g = food0(f); if (g !== f) changed = true; return g; };
+  const inItems = (items: any[] | undefined) => (items ?? []).map((i: any) => (i?.food ? { ...i, food: food(i.food) } : i));
   const next = {
     ...s,
-    foods: (s.foods ?? []).map(foodC),
-    feedback: (s.feedback ?? []).map((fb: any) => (fb.photo || !photos.get(`fb:${fb.id}`) ? fb : ((changed = true), { ...fb, photo: photos.get(`fb:${fb.id}`) }))),
-    items: (s.items ?? []).map((i: any) => (i?.food ? { ...i, food: foodC(i.food) } : i)),
-    meals: (s.meals ?? []).map((m: any) => ({ ...m, items: (m.items ?? []).map((i: any) => (i?.food ? { ...i, food: foodC(i.food) } : i)) })),
+    foods: (s.foods ?? []).map(food),
+    feedback: (s.feedback ?? []).map((fb: any) => {
+      const photo = fb.photo || photos.get(`fb:${fb.id}`);
+      if (photo !== fb.photo) changed = true;
+      return { ...fb, photo, meal: fb.meal ? { ...fb.meal, items: inItems(fb.meal.items) } : fb.meal };
+    }),
+    items: inItems(s.items),
+    meals: (s.meals ?? []).map((m: any) => ({ ...m, items: inItems(m.items) })),
   };
   return changed ? next : state;
 }
 
 // The saved data without the photos that are safely in the photo store. A food or a card keeps its photos in the saved
-// data until every one of them is confirmed in the store, so nothing is ever only in memory.
+// data until every one of them is confirmed in the store, so nothing is ever only in memory. Copies of a library food
+// carry no photos in the saved data at all: they come back from the library's.
 export function withoutStored<T>(state: T, stored: Set<string>): T {
   const s: any = structuredClone(state);
-  const food = (f: any) => {
+  const lib = libraryIds(s);
+  const food = (f: any, copy = false) => {
     if (!f || !f.id) return;
+    if (copy && lib.has(f.id)) { delete f.photo; delete f.photos; return; }
     const keys = [...(isData(f.photo) ? [`food:${f.id}`] : []), ...((f.photos ?? []) as string[]).map((_, n) => `food:${f.id}:${n + 1}`)];
     if (!keys.length || !keys.every((k) => stored.has(k))) return;
     f.photoCount = Array.isArray(f.photos) ? f.photos.length : 0;
     delete f.photo; delete f.photos;
   };
-  (s.foods ?? []).forEach(food);
-  (s.items ?? []).forEach((i: any) => food(i?.food));
-  (s.meals ?? []).forEach((m: any) => (m?.items ?? []).forEach((i: any) => food(i?.food)));
+  (s.foods ?? []).forEach((f: any) => food(f));
+  copiesOf(s).forEach((f) => food(f, true));
   (s.feedback ?? []).forEach((fb: any) => { if (isData(fb?.photo) && stored.has(`fb:${fb.id}`)) { delete fb.photo; fb.hasPhoto = true; } });
   return s;
 }
@@ -74,17 +93,22 @@ export function withoutStored<T>(state: T, stored: Set<string>): T {
 export const fileOf = (key: string) => `${key.replace(/:/g, "~")}.jpg`;
 export const keyOf = (file: string) => file.replace(/\.jpg$/, "").replace(/~/g, ":");
 
-// A photo that left the state is removed from the phone and the account only when what it belonged to is gone:
-// the food or the card no longer exists, or the food's list of photos got shorter. A food whose photos simply
-// have not loaded yet never loses them.
+// A photo that left the state is removed from the phone and the account only when what it belonged to is gone.
+// For a library food, the library decides: the food is gone, or its list of photos is shorter than the key's number,
+// or it has no photos left at all ([] and no preview). A food whose photos have not loaded yet never loses them.
+// A food that left the library keeps its photos while a plate, a meal or a card still shows it.
 export function isOrphan(key: string, state: any): boolean {
   const [kind, id, n] = key.split(":");
   if (kind === "fb") return !(state?.feedback ?? []).some((f: any) => f?.id === id);
-  const all = [...(state?.foods ?? []), ...(state?.items ?? []).map((i: any) => i?.food), ...(state?.meals ?? []).flatMap((m: any) => (m?.items ?? []).map((i: any) => i?.food))];
-  const mine = all.filter((f: any) => f && f.id === id);
-  if (!mine.length) return true;
+  const lib = (state?.foods ?? []).find((f: any) => f?.id === id);
+  if (lib) {
+    if (!Array.isArray(lib.photos)) return false;
+    return n ? lib.photos.length < Number(n) : lib.photos.length === 0 && !lib.photo;
+  }
+  const copies = copiesOf(state).filter((f) => f.id === id);
+  if (!copies.length) return true;
   if (!n) return false;
-  const lists = mine.filter((f: any) => Array.isArray(f.photos));
+  const lists = copies.filter((f: any) => Array.isArray(f.photos));
   return lists.length > 0 && lists.every((f: any) => f.photos.length < Number(n));
 }
 // previews first: a key without a copy number

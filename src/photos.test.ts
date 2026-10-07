@@ -49,3 +49,27 @@ test("file names round-trip, previews first, fingerprints change with the pictur
   assert.ok(isPreview("food:a") && isPreview("fb:c") && !isPreview("food:a:1"));
   assert.notEqual(sig(P(1)), sig(P(2)));
 });
+
+// The three fixes after the first deploy (7 October 2026)
+test("a plate on a card carries no photos of a library food in the saved data; they come back from the library", () => {
+  const s: any = { ...state(), feedback: [{ id: "c1", photo: P(4), meal: { items: [{ food: { id: "f1", name: "Skyr", photo: P(7), photos: [P(8)] } }] } }] };
+  const saved = withoutStored(s, new Set(["food:f1", "food:f1:1", "food:f1:2", "fb:c1"])) as any;
+  assert.equal(saved.feedback[0].meal.items[0].food.photo, undefined); assert.equal(saved.feedback[0].meal.items[0].food.photos, undefined);
+  const back = withPhotos(saved, photosOf(state())) as any;
+  assert.equal(back.feedback[0].meal.items[0].food.photo, P(1), "the library's preview, not the card's older copy");
+});
+
+test("an older copy never speaks for a library food; a food that left the library keeps its photos through its copies", () => {
+  const s: any = { foods: [{ id: "f1", name: "Skyr" }], feedback: [], meals: [], items: [{ food: { id: "f1", photo: P(7), photos: [P(8)] } }, { food: { id: "gone", photo: P(5), photos: [P(6)] } }] };
+  const m = photosOf(s);
+  assert.equal(m.has("food:f1"), false, "the library food has no photos loaded: the copy's are not taken as its own");
+  assert.equal(m.get("food:gone"), P(5));
+  assert.equal(isOrphan("food:f1:3", s), false, "photos not loaded yet: nothing is removed, whatever an older copy holds");
+  assert.equal(isOrphan("food:gone:1", s), false);
+});
+
+test("removing every photo removes the files too; an empty list stays empty", () => {
+  const s: any = { foods: [{ id: "f1", name: "Skyr", photos: [] }], feedback: [], items: [], meals: [] };
+  assert.equal(isOrphan("food:f1", s), true); assert.equal(isOrphan("food:f1:1", s), true);
+  assert.equal((withPhotos(s, new Map([["food:f1:1", P(2)]])) as any).foods[0].photos.length, 0);
+});

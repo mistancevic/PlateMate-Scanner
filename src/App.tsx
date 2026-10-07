@@ -1280,14 +1280,6 @@ export default function App() {
     setState((s) => ({ ...s, meals: [meal, ...s.meals] }));
     notify("Recipe saved. It has not been recorded as eaten.");
   }
-  function forgetUploaded(foodId: string) {
-    if (!user) return;
-    try {
-      const k = `chefmealan-photos-up-${user.uid}`;
-      const done: string[] = JSON.parse(localStorage.getItem(k) || "[]");
-      localStorage.setItem(k, JSON.stringify(done.filter((x) => !x.startsWith(`food:${foodId}`))));
-    } catch { /* fine */ }
-  }
   // Today's four numbers: the week's average, unless each day has its own and today's day is picked; then that day's row,
   // calculated from the profile, or the coach's or the person's own numbers for that day.
   function todayNumbers(): { kcal: number; protein: number; fats: number; carbs: number } | null {
@@ -1461,9 +1453,14 @@ export default function App() {
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },
     addFoodPhoto: async (foodId: string, dataUrl: string) => {
-      forgetUploaded(foodId);
       const [thumb, big] = await Promise.all([thumbnailBase64(dataUrl).catch(() => ""), resizeImageBase64(dataUrl, 900, 900).catch(() => "")]);
-      setState((s) => ({ ...s, foods: s.foods.map((f) => f.id !== foodId ? f : { ...f, photo: f.photo || thumb || undefined, photos: [...(f.photos ?? (f.photo ? [f.photo] : [])), big].filter(Boolean).slice(0, 6) }) }));
+      if (!big) { setError("This photo could not be read. Try another one."); return; }
+      // a food's picture stays its first photo (journey invariant, 5 October 2026: the picture plus the added photos)
+      setState((s) => ({ ...s, foods: s.foods.map((f) => {
+        if (f.id !== foodId) return f;
+        const had = (f.photos?.length ? f.photos : f.photo ? [f.photo] : []).filter(Boolean);
+        return { ...f, photo: f.photo || thumb || undefined, photos: [...had, big].slice(0, 6) };
+      }) }));
       notify("Photo added.");
     },
     openFoodId, clearOpenFood: () => setOpenFoodId(null),
@@ -1507,14 +1504,16 @@ export default function App() {
       notify(f?.favorite ? "Removed from favourites." : "Added to favourites: it shows first on the plate.");
     },
     removeFoodPhoto: (foodId: string, index: number) => {
-      forgetUploaded(foodId);
-      setState((s) => ({ ...s, foods: s.foods.map((f) => {
-        if (f.id !== foodId) return f;
-        const gallery = f.photos?.length ? f.photos : f.photo ? [f.photo] : [];
-        const rest = gallery.filter((_, i) => i !== index);
-        // the picture follows the first remaining photo, or goes back to the icon
-        return { ...f, photos: rest.length ? rest : undefined, photo: index === 0 || !rest.length ? (rest[0] || undefined) : f.photo };
-      }) }));
+      const f0 = state.foods.find((f) => f.id === foodId);
+      const gallery = f0?.photos?.length ? f0.photos : f0?.photo ? [f0.photo] : [];
+      const rest = gallery.filter((_, i) => i !== index);
+      // the preview follows the first remaining photo (made small again), or goes back to the icon; an empty list stays
+      // empty on purpose ([]), so its old photos leave the phone and the account too
+      setState((s) => ({ ...s, foods: s.foods.map((f) => (f.id !== foodId ? f : { ...f, photos: rest, photo: index === 0 || !rest.length ? (rest[0] || undefined) : f.photo })) }));
+      if (index === 0 && rest[0]) {
+        const first = rest[0];
+        thumbnailBase64(first).then((t) => { if (t) setState((s) => ({ ...s, foods: s.foods.map((f) => (f.id === foodId && f.photos?.[0] === first ? { ...f, photo: t } : f)) })); }).catch(() => {});
+      }
       notify("Photo removed.");
     },
     mergeInLibrary: (keepId: string, otherId: string, name: string) => {
