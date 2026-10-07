@@ -1,7 +1,8 @@
 // 0.1.84: the camera's modes read Barcode, Label, Group (canvas board C2, approved by Milan 7 October 2026); only the locators changed
 // JOURNEY INVARIANT (Milan, 7 October 2026, from testing on his phone and laptop): typing a barcode by hand pauses the
 // camera: the green line stops and nothing is read until the field is left empty. A new food saved from Foods opens its
-// card, so you see what was saved and can add its photos. Never rewrite these lines to fit a change.
+// card, so you see what was saved and can add its photos; on a computer with a camera, Take a photo opens it (C7).
+// Never rewrite these lines to fit a change.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -37,7 +38,15 @@ seed.items = [];
     await page.getByLabel(/I checked the values/).check();
     await page.getByRole("button", { name: /Confirm & save food/ }).click(); await page.waitForTimeout(600);
     ok(await page.locator(".foodcard-head b").filter({ hasText: "Test Bar" }).count() === 1, "the new food's card opens");
-    ok(await page.getByRole("button", { name: /Add a photo/ }).count() === 1, "its card offers Add a photo");
+    // since 0.1.89 (canvas board C7): a computer with a camera offers Take a photo, which opens it inside Chef Mealan
+    ok(await page.getByRole("button", { name: /Take a photo/ }).count() === 1 && await page.getByRole("button", { name: /Choose a photo/ }).count() === 1, "its card offers Take a photo and Choose a photo");
+    await page.getByRole("button", { name: /Take a photo/ }).click(); await page.waitForTimeout(1500);
+    ok(await page.locator(".photo-cam").count() === 1 && /Photo of Test Bar/.test(await page.locator(".photo-cam .cam-title").textContent()), "the camera opens, titled with the food");
+    await page.getByRole("button", { name: "Take the photo" }).click(); await page.waitForTimeout(400);
+    ok(await page.getByRole("button", { name: "Take again" }).count() === 1, "the photo shows, with Take again");
+    await page.getByRole("button", { name: "Use this photo" }).click(); await page.waitForTimeout(1200);
+    ok(await page.locator(".photo-cam").count() === 0 && await page.locator(".foodcard-head").count() === 1, "Use this photo: back on the card");
+    ok(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.find((x) => x.name === "Test Bar"); return Boolean(f && (f.photos?.length || f.photoCount)); }), "the photo is the food's");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   } catch (e) { ok(false, "walkthrough error: " + e.message); }
   await b.close(); server.kill();

@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { tabOfPath } from "../back";
+import { RecipeCard } from "./RecipePages";
+import type { PublicRecipe } from "../recipes";
 import { Check } from "lucide-react";
 import { WANTS, HAVES, DEMO_GOAL, BIG_BOWL, lift, smaller } from "../landing";
 import { Mark, APP_NAME } from "../components/Mark";
@@ -14,11 +16,16 @@ export function LandingScreen() {
   useEffect(() => { if (tabOfPath(location.pathname, ["home", "journey", "meal", "chef", "foods", "me"])) history.replaceState(null, "", "/"); }, []);
   const go = async () => { setBusy(true); setErr(""); try { await signIn(); } catch (e: any) { setErr(e.message || "Sign-in failed."); } finally { setBusy(false); } };
   const toForm = () => formRef.current?.scrollIntoView({ behavior: "smooth" });
+  // from a recipe page's Ask for an invite: straight to the form
+  useEffect(() => { if (location.hash === "#ask") setTimeout(toForm, 300); }, []);
+  // the three newest public recipes (canvas board R7); the section stays hidden while there are none
+  const [recipes, setRecipes] = useState<PublicRecipe[]>([]);
+  useEffect(() => { fetch("/api/recipes?limit=3").then((r) => r.json()).then((d) => setRecipes(d.recipes ?? [])).catch(() => {}); }, []);
   return (
     <div className="landing">
       <header className="l-top">
         <div className="l-brand"><Mark size={30} color="var(--brand)" /><b>{APP_NAME}</b></div>
-        <button className="link l-signin" disabled={busy} onClick={go}>Sign in</button>
+        <span className="l-topnav"><a className="l-recipes" href="/recipes">Recipes</a><button className="link l-signin" disabled={busy} onClick={go}>Sign in</button></span>
       </header>
 
       <section className="l-hero">
@@ -50,6 +57,16 @@ export function LandingScreen() {
           <PhoneToday />
         </div>
       </section>
+
+      {recipes.length > 0 && (
+        <section className="l-kitchen">
+          <span className="l-eyebrow">From the kitchen</span>
+          <h2>Recipes with the numbers worked out</h2>
+          <p>Coach Milan cooks them, weighs them, and puts the numbers next to the photo. In the app, Mealan sets how much of each fits your goal.</p>
+          <div className="rp-grid">{recipes.map((r) => <RecipeCard key={r.slug} r={r} />)}</div>
+          <a className="l-all" href="/recipes">All recipes →</a>
+        </section>
+      )}
 
       <section className="l-week">
         <span className="l-eyebrow">Your week</span>

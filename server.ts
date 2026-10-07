@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import path from "node:path";
+import fs from "node:fs";
 import { timingSafeEqual } from "node:crypto";
 import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
@@ -16,6 +17,7 @@ import { createHash } from "node:crypto";
 import { deleteAccount as deleteAccountSteps } from "./src/accountDelete";
 import { guideForChat } from "./src/goalGuide";
 import { tidy } from "./src/labeltable";
+import { forVisitor, slugOf, type PublicRecipe } from "./src/recipes";
 const FB_PROJECT = process.env.FIREBASE_PROJECT_ID || "";
 // photos as files (storage release 1): the project's default bucket in Frankfurt
 const BUCKET = process.env.FIREBASE_STORAGE_BUCKET || (FB_PROJECT ? `${FB_PROJECT}.firebasestorage.app` : "");
@@ -443,13 +445,103 @@ app.get("/api/search", requireUser, requireMember, async (req, res) => {
     return res.json({ products: [], error: "Product database did not answer in time." });
   }
 });
+// ---- Recipes you can share (canvas boards R0 to R7) ----
+// A coach publishes a recipe from the app; everyone can read it at chefmealan.com/r/<slug>, members get more. The photo is
+// kept in the record and served at /r/<slug>/photo.jpg, also for link previews. Without accounts (local, walkthroughs), in memory.
+const memRecipes = new Map<string, any>();
+const recipeCol = () => db().collection("public_recipes");
+async function getRecipe(slug: string): Promise<any | null> {
+  if (!FB_PROJECT) return memRecipes.get(slug) ?? null;
+  const d = await recipeCol().doc(slug).get();
+  return d.exists ? d.data() : null;
+}
+async function listRecipes(limit: number): Promise<any[]> {
+  if (!FB_PROJECT) return [...memRecipes.values()].sort((a, b) => (b.publishedAt > a.publishedAt ? 1 : -1)).slice(0, limit);
+  const q = await recipeCol().orderBy("publishedAt", "desc").limit(limit).get();
+  return q.docs.map((d) => d.data());
+}
+const withoutPhoto = (r: any): PublicRecipe => { const { photo, authorUid, ...rest } = r; return { ...rest, hasPhoto: Boolean(photo) } as PublicRecipe; };
+// who is reading: a signed-in member sees a members-only recipe whole; everyone else sees what a visitor sees
+async function readsAsMember(req: express.Request): Promise<boolean> {
+  if (!FB_PROJECT) return true;
+  const token = String(req.headers.authorization || "").replace(/^Bearer /, "");
+  if (!token) return false;
+  try { const u = await adminAuth().verifyIdToken(token); const m = await membership(u.uid); return Boolean(m.member); } catch { return false; }
+}
+app.get("/api/recipes", async (req, res) => {
+  try {
+    const n = Math.max(1, Math.min(24, Number(req.query.limit) || 24));
+    res.setHeader("Cache-Control", "no-cache");
+    res.json({ recipes: (await listRecipes(n)).map((r) => forVisitor(withoutPhoto(r))) });
+  } catch (e) { fail(res, e); }
+});
+app.get("/api/recipes/:slug", async (req, res) => {
+  try {
+    const r = await getRecipe(String(req.params.slug));
+    if (!r) return res.status(404).json({ error: "This recipe isn't published, or its address changed." });
+    const plain = withoutPhoto(r);
+    res.setHeader("Cache-Control", "no-cache");
+    res.json({ recipe: (await readsAsMember(req)) ? plain : forVisitor(plain) });
+  } catch (e) { fail(res, e); }
+});
+app.get("/r/:slug/photo.jpg", async (req, res) => {
+  try {
+    const r = await getRecipe(String(req.params.slug));
+    const m = typeof r?.photo === "string" ? r.photo.match(/^data:(image\/(?:jpeg|png|webp));base64,(.+)$/) : null;
+    if (!m) return res.status(404).type("text/plain").send("No photo");
+    res.setHeader("Cache-Control", "public, max-age=3600");
+    res.type(m[1]).send(Buffer.from(m[2], "base64"));
+  } catch { res.status(500).type("text/plain").send("No photo"); }
+});
+app.post("/api/recipes", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    const b = req.body ?? {};
+    const r = b.recipe as PublicRecipe;
+    if (!r || typeof r.title !== "string" || !r.title.trim() || r.title.length > 80 || !Array.isArray(r.items) || !r.items.length || r.items.length > 40 || !Array.isArray(r.steps) || r.steps.length > 30)
+      return res.status(400).json({ error: "The recipe needs a name and its foods." });
+    const photo = typeof b.photo === "string" && /^data:image\/(jpeg|png|webp);base64,/.test(b.photo) && b.photo.length < 900_000 ? b.photo : null;
+    const slug = slugOf(r.slug || r.title);
+    const uid = (req as any).uid || "local";
+    const old = await getRecipe(slug);
+    if (old && old.authorUid && old.authorUid !== uid) return res.status(409).json({ error: "Another coach has a recipe at this address. Change the name a little." });
+    const now = new Date().toISOString();
+    const doc = { ...r, slug, authorUid: uid, publishedAt: old?.publishedAt ?? now, updatedAt: now, photo: photo ?? old?.photo ?? null };
+    if (!FB_PROJECT) memRecipes.set(slug, doc); else await recipeCol().doc(slug).set(doc);
+    res.json({ slug, url: `/r/${slug}` });
+  } catch (e) { fail(res, e); }
+});
+app.delete("/api/recipes/:slug", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    const slug = String(req.params.slug), old = await getRecipe(slug), uid = (req as any).uid || "local";
+    if (!old) return res.json({ ok: true });
+    if (old.authorUid && old.authorUid !== uid) return res.status(403).json({ error: "Only the coach who published it can take it down." });
+    if (!FB_PROJECT) memRecipes.delete(slug); else await recipeCol().doc(slug).delete();
+    res.json({ ok: true });
+  } catch (e) { fail(res, e); }
+});
+// Photos from Open Food Facts come through here, so the app can keep a copy: only their image server, only images, 4 MB at most
+const OFF_IMAGE = /^https:\/\/(images|static)\.openfoodfacts\.org\/images\/products\/[\w/.-]+\.(jpg|jpeg|png|webp)$/i;
+app.get("/api/offphoto", requireUser, requireMember, async (req, res) => {
+  const u = String(req.query.u ?? "");
+  if (!OFF_IMAGE.test(u)) return res.status(400).json({ error: "Not an Open Food Facts photo." });
+  try {
+    const r = await fetch(u, { headers: { "User-Agent": "ChefMealan/1.0 (https://chefmealan.com)" }, signal: AbortSignal.timeout(10000) });
+    const type = r.headers.get("content-type") || "";
+    if (!r.ok || !/^image\/(jpeg|png|webp)/.test(type)) return res.status(502).json({ error: "The photo could not be fetched." });
+    const buf = Buffer.from(await r.arrayBuffer());
+    if (buf.length > 4_000_000) return res.status(413).json({ error: "The photo is too large." });
+    res.json({ data: `data:${type.split(";")[0]};base64,${buf.toString("base64")}` });
+  } catch {
+    res.status(502).json({ error: "The photo could not be fetched." });
+  }
+});
 app.get("/api/product/:barcode", requireUser, requireMember, async (req, res) => {
   try {
     const barcode = String(req.params.barcode);
     if (!/^\d{8,14}$/.test(barcode))
       return res.status(400).json({ error: "Invalid numeric barcode." });
     const response = await fetch(
-      `https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,brands,nutriments,nutrition_data_per,quantity,countries_tags`,
+      `https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,brands,nutriments,nutrition_data_per,quantity,countries_tags,image_front_url,image_nutrition_url`,
       {
         headers: {
           "User-Agent":
@@ -492,6 +584,9 @@ app.get("/api/product/:barcode", requireUser, requireMember, async (req, res) =>
         ["Carbohydrate", n.carbohydrates_100g, "g", false], ["of which sugars", n.sugars_100g, "g", true], ["of which polyols", n.polyols_100g, "g", true],
         ["of which starch", n.starch_100g, "g", true], ["Fibre", n.fiber_100g, "g", false], ["Protein", n.proteins_100g, "g", false], ["Salt", n.salt_100g, "g", false],
       ] as [string, unknown, string, boolean][]).filter(([, v, , sub]) => !sub || numberInput(v) !== null).map(([name, v, unit, sub]) => ({ name, amount: tidy(numberInput(v), unit), unit, sub })),
+      // the pack's photos people put in Open Food Facts (canvas board C8): the front and the nutrition table, CC BY-SA
+      photos: ([["front", p.image_front_url], ["nutrition", p.image_nutrition_url]] as [string, unknown][])
+        .filter(([, u]) => typeof u === "string" && OFF_IMAGE.test(u as string)).map(([kind, url]) => ({ kind, url })),
       source: `Open Food Facts · ${new Date().toISOString().slice(0, 10)}`,
       notes: `Verify product variant, actual label basis and carbohydrate convention. ${perVolume ? "Volume-based record: enter confirmed per-100-g values." : ""} Markets: ${(p.countries_tags || []).slice(0, 6).join(", ")}`,
     });
@@ -956,6 +1051,31 @@ async function start() {
     // a versioned file this server does not have (a page from the next release asking during a deploy) is a plain 404,
     // never the page itself, which the browser cannot run as code and which left a blank screen
     app.get("/assets/*", (_req, res) => { res.setHeader("Cache-Control", "no-store"); res.status(404).type("text/plain").send("Not found"); });
+    // a recipe's page and the list carry their own title, words and photo, so a shared link shows the recipe (canvas R0)
+    const esc = (x: string) => x.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+    const withMeta = (title: string, desc: string, image: string, url: string) => fs.readFileSync(path.join(dist, "index.html"), "utf8")
+      .replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)
+      .replace(/(name="description" content=")[^"]*/, `$1${esc(desc)}`)
+      .replace(/(property="og:title" content=")[^"]*/, `$1${esc(title)}`)
+      .replace(/(property="og:description" content=")[^"]*/, `$1${esc(desc)}`)
+      .replace(/(property="og:image" content=")[^"]*/, `$1${esc(image)}`)
+      .replace(/(name="twitter:image" content=")[^"]*/, `$1${esc(image)}`)
+      .replace(/(property="og:url" content=")[^"]*/, `$1${esc(url)}`);
+    app.get("/r/:slug", async (req, res) => {
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      try {
+        const r = await getRecipe(String(req.params.slug));
+        if (!r) return res.sendFile(path.join(dist, "index.html"));
+        const base = `https://${req.get("host")}`;
+        const desc = `${r.lines ? r.lines + " " : ""}One ${r.servingName || "serving"}: ${r.perServing?.kcal} kcal, ${r.perServing?.protein} g protein, PD ${r.pd}.`;
+        res.type("html").send(withMeta(`${r.title} · Chef Mealan`, desc, r.photo ? `${base}/r/${r.slug}/photo.jpg` : `${base}/og.jpg?v=2`, `${base}/r/${r.slug}`));
+      } catch { res.sendFile(path.join(dist, "index.html")); }
+    });
+    app.get("/recipes", (req, res) => {
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      try { res.type("html").send(withMeta("Recipes · Chef Mealan", "From Coach Milan's kitchen. Every number is worked out from the recipe, weighed.", `https://${req.get("host")}/og.jpg?v=2`, `https://${req.get("host")}/recipes`)); }
+      catch { res.sendFile(path.join(dist, "index.html")); }
+    });
     app.get("*", (_req, res) => { res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); res.sendFile(path.join(dist, "index.html")); });
   }
   app.listen(Number(process.env.PORT) || 3000, "0.0.0.0", () =>

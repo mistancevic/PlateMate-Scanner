@@ -1,5 +1,7 @@
 import { useRef, useState } from "react";
-import { Camera, ChevronLeft, ChevronRight, Image as ImageIcon, MessageCircle, Trash2, X } from "lucide-react";
+import { Camera, ChevronLeft, ChevronRight, Globe, Image as ImageIcon, MessageCircle, Trash2, X } from "lucide-react";
+import { sig } from "../photos";
+import { PhotoCamera } from "./PhotoCamera";
 import { mixLabel, type Mix, type MixTip } from "../mixtip";
 import { log } from "../log";
 import { density, type Food } from "../pilot";
@@ -36,7 +38,15 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
   const fileRef = useRef<HTMLInputElement>(null);
   const camRef = useRef<HTMLInputElement>(null);
   // a phone or tablet: a touch screen, where a camera can be opened from the page
-  const hasCamera = typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches;
+  const isPhone = typeof window !== "undefined" && Boolean(window.matchMedia?.("(pointer: coarse)").matches);
+  // a computer with a camera, built in or plugged in (canvas board C7): Take a photo opens it inside Chef Mealan
+  const [deskCam, setDeskCam] = useState(false);
+  const [camOpen, setCamOpen] = useState(false);
+  useEffect(() => {
+    if (isPhone || !navigator.mediaDevices?.enumerateDevices) return;
+    navigator.mediaDevices.enumerateDevices().then((d) => setDeskCam(d.some((x) => x.kind === "videoinput"))).catch(() => {});
+  }, [isPhone]);
+  const hasCamera = isPhone || deskCam;
   const all = food.photos?.length ? food.photos : food.photo ? [food.photo] : [];
   // Removing a photo: a second tap arms it, and it is only really removed when the Undo note goes, eight seconds later,
   // or when the card closes. Until then the photo is just hidden.
@@ -49,6 +59,10 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
   useEffect(() => { if (!armed) return; const t = setTimeout(() => setArmed(false), 3000); return () => clearTimeout(t); }, [armed]);
   const gallery = all.filter((x) => x !== pending);
   const view = viewAt !== null ? gallery[viewAt] ?? null : null;
+  // photos from Open Food Facts carry a globe and their credit (canvas board C8)
+  const credits = new Set(food.creditPhotos ?? []);
+  const fromDb = (src: string) => credits.size > 0 && credits.has(sig(src));
+  const anyDb = gallery.some(fromDb);
   // on a computer: the arrow keys move between photos, Escape closes the photo
   useEffect(() => {
     if (!view) return;
@@ -75,15 +89,16 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         </div>
         {gallery.length > 1 && (
           <div className="food-gallery" aria-label="Photos of this product">
-            {gallery.map((src, i) => <button key={i} className="g-thumb" onClick={() => setViewAt(i)} aria-label={`Photo ${i + 1}`}><img src={src} alt="" /></button>)}
+            {gallery.map((src, i) => <button key={i} className="g-thumb" onClick={() => setViewAt(i)} aria-label={`Photo ${i + 1}`}><img src={src} alt="" />{fromDb(src) && <span className="db-globe" aria-hidden="true"><Globe size={12} /></span>}</button>)}
           </div>
         )}
+        {anyDb && <small className="credit"><Globe size={13} /> Credit: Open Food Facts, CC BY-SA</small>}
         {/* adding photos is its own part, under the photos, one button below the other (Milan, 8 October 2026). Two ways in:
             newer Android phones open only their photo picker for a plain file field, without the camera, so the camera has
             its own button; on a computer there is no camera to offer */}
         {addPhoto && gallery.length < 6 && (
           <div className="photo-add" aria-label="Add a photo">
-            {hasCamera && <button className="g-add" onClick={() => camRef.current?.click()}><Camera size={18} /><span>{gallery.length ? "Take a photo" : "Take a photo of the front"}</span></button>}
+            {hasCamera && <button className="g-add" onClick={() => (isPhone ? camRef.current?.click() : setCamOpen(true))}><Camera size={18} /><span>{gallery.length ? "Take a photo" : "Take a photo of the front"}</span></button>}
             <button className="g-add" onClick={() => fileRef.current?.click()}><ImageIcon size={18} /><span>{hasCamera ? "Choose a photo" : gallery.length ? "Add a photo" : "Add a photo of the front"}</span></button>
             {[camRef, fileRef].map((ref, k) => (
               <input key={k} ref={ref} type="file" accept="image/*" hidden {...(k === 0 ? { capture: "environment" as const } : {})} onChange={(e) => {
@@ -134,7 +149,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         <div className="label-table label-table-read" aria-label="Nutrition table per 100 g">
           {displayRows(food).map((r, i) => (
             <div className={`lt-row ${r.sub ? "sub" : ""}`} key={r.key + i}>
-              <span className="lt-name">{r.name}{r.source === "you" && <em> · added by you</em>}</span>
+              <span className="lt-name">{r.name}{r.source === "you" && <em> · added by you</em>}{r.source === "photo" && <em> · read from the photo</em>}</span>
               <b className="lt-val">{r.amount == null ? "–" : fmt(r.amount, r.unit === "kcal" ? 0 : 1)}</b>
               <span className="lt-unit">{r.unit}</span>
             </div>
@@ -144,6 +159,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         {dontHave && <button className="pill pill-wide pill-primary" onClick={dontHave}>Don't have it? Find something instead</button>}
         {review && <button className="pill pill-wide" onClick={() => { close(); review(); }}>Review the label</button>}
       </div>
+      {camOpen && addPhoto && <PhotoCamera title={food.name} onClose={() => setCamOpen(false)} onUse={(d) => { setCamOpen(false); addPhoto(d); }} />}
       {view && (() => {
         // canvas board C4 (Milan, 7 October 2026): the next photo without closing; swipe, the arrows, a photo below, or
         // the arrow keys on a computer. With several, tapping the photo doesn't close it, so a swipe can't close it by
@@ -171,6 +187,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
                 {gallery.map((src, i) => <button key={i} className={i === at ? "on" : ""} aria-label={`Show photo ${i + 1}`} aria-current={i === at} onClick={(e) => { e.stopPropagation(); setArmed(false); setViewAt(i); }}><img src={src} alt="" /></button>)}
               </div>
             )}
+            {fromDb(view) && <span className="credit-light"><Globe size={13} /> Credit: Open Food Facts, CC BY-SA</span>}
             <span>{many ? "Swipe, or tap a photo below" : "Tap the photo to close"}</span>
           </div>
         );

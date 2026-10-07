@@ -1,6 +1,6 @@
 // A food's nutrition table as printed: every line, in order. Known lines are recognised in several languages.
 export type Unit = "kcal" | "kJ" | "g" | "mg" | "µg" | "%";
-export type LabelRow = { key: string; name: string; amount: number | null; unit: Unit; sub: boolean; source: "label" | "database" | "you" };
+export type LabelRow = { key: string; name: string; amount: number | null; unit: Unit; sub: boolean; source: "label" | "database" | "you" | "photo" };
 type Known = { key: string; name: string; sub: boolean; unit: Unit; re: RegExp; core?: "calories" | "fats" | "carbs" | "fiber" | "protein" };
 // European order (Regulation 1169/2011, Annex XV), then the usual extras
 export const KNOWN: Known[] = [

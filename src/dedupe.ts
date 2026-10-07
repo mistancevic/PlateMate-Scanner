@@ -36,6 +36,7 @@ export function mergeFoods(keep: Food, other: Food, name?: string): Food {
     calories: pick("calories"), protein: pick("protein"), fats: pick("fats"), carbs: pick("carbs"), fiber: pick("fiber"),
     notes: [keep.notes, other.notes].filter(Boolean).join(" · ").slice(0, 500),
     photo: keep.photo || other.photo, photos: photos.length ? photos : undefined,
+    ...((keep as any).creditPhotos || (other as any).creditPhotos ? { creditPhotos: [...new Set([...((keep as any).creditPhotos ?? []), ...((other as any).creditPhotos ?? [])])] } : {}),
     // the fuller table wins; lines only the other one has are added
     table: (() => {
       const a = keep.table ?? [], b = other.table ?? [];

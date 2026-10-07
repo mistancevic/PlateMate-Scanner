@@ -4,9 +4,24 @@ import { fmt } from "../ui";
 import type { ScannerMode } from "../types";
 import type { AppApi } from "./api";
 import { ConfirmButton } from "../components/Confirm";
+import { useEffect, useState } from "react";
+import { PublishSheet } from "../components/PublishSheet";
+import type { PublicRecipe } from "../recipes";
 
 export function RecipesScreen(p: AppApi) {
   const { state, setState, setTab, setFeedback, setReviewMeal } = p;
+  // coaches publish recipes (canvas board R5); what is published already, by the recipe it came from
+  // a coach account, or coach mode on this phone when there are no accounts (local, walkthroughs)
+  const isCoach = p.profile?.role === "coach" || (!p.user && p.coach);
+  const [published, setPublished] = useState<Record<string, PublicRecipe>>({});
+  const [publishing, setPublishing] = useState<string | null>(null);
+  useEffect(() => {
+    if (!isCoach) return;
+    fetch("/api/recipes?limit=24").then((r) => r.json()).then((d) => setPublished(Object.fromEntries((d.recipes ?? []).filter((r: PublicRecipe) => r.mealId).map((r: PublicRecipe) => [r.mealId!, r])))).catch(() => {});
+  }, [isCoach]);
+  const first = (n?: string | null) => String(n ?? "").trim().split(/\s+/)[0] || "";
+  const author = first(p.user?.name) ? `Coach ${first(p.user?.name)}` : "Your coach";
+  const pubMeal = state.meals.find((m) => m.id === publishing);
   return (
           <div className="workspace">
             <div>
@@ -72,6 +87,7 @@ export function RecipesScreen(p: AppApi) {
                       >
                         Record feedback
                       </button>
+                      {isCoach && <button className="subtle" onClick={() => setPublishing(m.id)}>{published[m.id] ? "Published" : "Publish"}</button>}
                       <ConfirmButton className="icon" ariaLabel={`Delete recipe ${m.title}`} label={<Trash2 size={16} />} confirmLabel="Sure?"
                         onConfirm={() => setState((s) => ({ ...s, meals: s.meals.filter((x) => x.id !== m.id) }))} />
                     </div>
@@ -111,6 +127,8 @@ export function RecipesScreen(p: AppApi) {
                 ))}
               </section>
             </aside>
+          {pubMeal && <PublishSheet meal={pubMeal} cards={state.feedback} author={author} published={published[pubMeal.id] ?? null} close={() => setPublishing(null)}
+            onDone={(r) => setPublished((x) => { const y = { ...x }; if (r) y[pubMeal.id] = r; else delete y[pubMeal.id]; return y; })} />}
           </div>
   );
 }

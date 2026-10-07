@@ -39,7 +39,8 @@ import { Starting } from "./components/Starting";
 import { Welcome, AdultOnly } from "./components/Welcome";
 import { openStats } from "./openStats";
 import { merge as mergeRecords, changes as recordChanges, type Known } from "./records";
-import { installBack, pushTab, startTab, tabOfPath, useBack } from "./back";
+import { installBack, pushTab, startTab, tabOfPath, useBack, pathOfTab } from "./back";
+import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
 import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted } from "./photos";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
@@ -59,7 +60,7 @@ import { getSafety, setSafety as storeSafety, aiState, addFlag, goalSignals, all
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
-import { Home, CircleUser, Menu, Users, MessageCircle } from "lucide-react";
+import { Home, CircleUser, Menu, Users, MessageCircle, Globe } from "lucide-react";
 import {
   aggregate,
   candidateFood,
@@ -238,6 +239,7 @@ function LabelCheck({
   food,
   image,
   images,
+  dbPhotos,
   library,
   close,
   save,
@@ -257,6 +259,7 @@ function LabelCheck({
   food: Food;
   image?: string;
   images?: string[];
+  dbPhotos?: string[];
   library?: Food[];
   close: () => void;
   save: (f: Food, opts?: { open?: boolean }) => void;
@@ -274,6 +277,8 @@ function LabelCheck({
   titleAs?: string;
 }) {
   const [mainIdx, setMainIdx] = useState(0);
+  // canvas board C8: each of the database's photos has its own tick, all ticked to start
+  const [keepDb, setKeepDb] = useState<boolean[]>(() => (dbPhotos ?? []).map(() => true));
   const [choice, setChoice] = useState<"update" | "both">("update");
   const [servingGrams, setServingGrams] = useState(food.serving ? String(food.serving.grams) : ""),
     [servingName, setServingName] = useState(food.serving?.name ?? ""),
@@ -371,16 +376,38 @@ function LabelCheck({
       if (m && onMix) onMix(saved, m);
     };
     const raw = (images && images.length ? images : image ? [image] : []);
-    const all = raw.length > 1 ? [raw[mainIdx] ?? raw[0], ...raw.filter((_, i) => i !== mainIdx)] : raw;
+    const mine = raw.length > 1 ? [raw[mainIdx] ?? raw[0], ...raw.filter((_, i) => i !== mainIdx)] : raw;
+    // the database's ticked photos first, then the person's own (canvas board C8)
+    const fromDb = (dbPhotos ?? []).filter((_, i) => keepDb[i]);
+    const all = [...fromDb, ...mine];
     if (all.length && !f.photo)
       Promise.all([thumbnailBase64(all[0]).catch(() => ""), ...all.map((x) => resizeImageBase64(x, 900, 900).catch(() => ""))])
-        .then(([thumb, ...big]) => { const ok = big.filter(Boolean); finish({ ...f, photo: thumb || undefined, photos: ok.length ? ok : undefined }); })
+        .then(([thumb, ...big]) => {
+          const ok = big.filter(Boolean);
+          const credited = big.slice(0, fromDb.length).filter(Boolean).map(sig);
+          finish({ ...f, photo: thumb || undefined, photos: ok.length ? ok : undefined, ...(credited.length ? { creditPhotos: credited } : {}) } as Food);
+        })
         .catch(() => finish(f));
     else finish(f);
   }
   return (
     <Modal title={kind.title} close={close} eyebrow={kind.eyebrow}>
       <p className="small muted sheet-line">{kind.line}{fromSearch ? <> From your search: <b>{fromSearch}</b>.</> : null}</p>
+      {dbPhotos && dbPhotos.length > 0 && (
+        <div className="db-photos">
+          <div className="db-strip" aria-label="Photos from Open Food Facts">
+            {dbPhotos.map((src, i) => (
+              <button key={i} className={`db-photo ${keepDb[i] ? "on" : ""}`} aria-pressed={keepDb[i]} aria-label={`${keepDb[i] ? "Leave out" : "Keep"} database photo ${i + 1}`} onClick={() => setKeepDb((k) => k.map((x, j) => (j === i ? !x : x)))}>
+                <img src={src} alt="" />
+                <span className="db-tick" aria-hidden="true">{keepDb[i] ? "✓" : ""}</span>
+                <span className="db-globe" aria-hidden="true"><Globe size={12} /></span>
+              </button>
+            ))}
+          </div>
+          <small>Ticked photos stay with the food. Tap one to leave it out.</small>
+          <small className="credit"><Globe size={13} /> Credit: Open Food Facts, CC BY-SA</small>
+        </div>
+      )}
       {images && images.length > 1 ? (
         <div className="label-previews" aria-label="Your photos of this product">
           {images.map((src, i) => (
@@ -460,7 +487,7 @@ function LabelCheck({
           const core = knownOf(r.key)?.core;
           return (
             <div className={`lt-row ${r.sub ? "sub" : ""}`} key={r.key + i}>
-              <span className="lt-name">{r.name}{r.source === "you" && <em> · added by you</em>}{r.source === "database" && <em> · database</em>}</span>
+              <span className="lt-name">{r.name}{r.source === "you" && <em> · added by you</em>}{r.source === "database" && <em> · database</em>}{r.source === "photo" && <em className="from-photo"> · read from the photo</em>}</span>
               <input inputMode="decimal" aria-label={r.name} value={core ? values[core] : r.amount ?? ""} placeholder="–"
                 onChange={(e) => core ? setValues((v) => ({ ...v, [core]: e.target.value })) : setRows((rs) => rs.map((x, j) => j === i ? { ...x, amount: numberInput(e.target.value) } : x))} />
               <span className="lt-unit">{r.unit}</span>
@@ -678,6 +705,7 @@ export default function App() {
       return (fromPath as Tab | null) ?? (tabs.includes(h as Tab) ? (h as Tab) : "home");
     }),
     [filter, setFilter] = useState<"all" | import("./goal").PdBand>("all"),
+    [pagePath, setPagePath] = useState<string>(() => (typeof location !== "undefined" ? location.pathname : "/")),
     [coach, setCoachState] = useState<boolean>(isCoach),
     [step, setStep] = useState<Step>("in"),
     [clientName, setClientNameState] = useState<string>(getClientName),
@@ -704,6 +732,7 @@ export default function App() {
     [menuSection, setMenuSection] = useState<MenuSection | null>(null),
     [foodsView, setFoodsView] = useState<"foods" | "recipes">("foods"),
     [editFrom, setEditFrom] = useState<string>(""),
+    [dbPhotos, setDbPhotos] = useState<string[]>([]),
     [editTitle, setEditTitle] = useState<string>(""),
     [review, setReview] = useState<NumbersReview | null>(null),
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
@@ -1205,12 +1234,15 @@ export default function App() {
       .then(setServices)
       .catch(() => {});
   }, [access]);
+  // from a recipe page into the app, at a tab's address; the address bar decides what shows (canvas R2, C5)
+  const goApp = (t: Tab) => { history.pushState({ tab: t }, "", pathOfTab(t)); setPagePath(location.pathname); setTab(t); };
+  useEffect(() => { const f = () => setPagePath(location.pathname); window.addEventListener("popstate", f); return () => window.removeEventListener("popstate", f); }, []);
   const notify = (s: string) => {
     setMessage(s);
     setError("");
   };
   function blank(name = "", brand = "", from = "", barcode = "") {
-    setEditTitle("");
+    setEditTitle(""); setDbPhotos([]);
     setImage("");
     setImageSet([]);
     setEditFrom(from);
@@ -1220,7 +1252,7 @@ export default function App() {
     const existed = state.foods.some((x) => x.id === f0.id);
     // a food new to the library says when it came, so the list can mark it New for the rest of the day (canvas C5)
     const f = existed || (f0 as any).addedAt ? f0 : ({ ...f0, addedAt: new Date().toISOString() } as Food);
-    setImage(""); setImageSet([]);
+    setImage(""); setImageSet([]); setDbPhotos([]);
     setState((s) => ({
       ...s,
       foods: s.foods.some((x) => x.id === f.id)
@@ -1257,6 +1289,7 @@ export default function App() {
   const frontFirst = (images: string[], front: number) => { const i = Number(front) - 1; return i > 0 && i < images.length ? [images[i], ...images.filter((_, j) => j !== i)] : images; };
   async function scan(raw: string | string[], group = false, barcode?: string) {
     const run = ++runRef.current;
+    setDbPhotos([]);
     setBusy(group ? "Identifying products…" : "Reading label…");
     setError("");
     setCamera(false);
@@ -1313,6 +1346,24 @@ export default function App() {
       if (run === runRef.current) setBusy("");
     }
   }
+  // Canvas board C8 (8 October 2026): after a barcode, the database's photos of the pack (front, nutrition table) come
+  // through our server; the nutrition photo is read to add the lines the database lacks, never to change its own values.
+  async function dbPhotosOf(d: any): Promise<{ front?: string; nutrition?: string }> {
+    const out: { front?: string; nutrition?: string } = {};
+    await Promise.all((Array.isArray(d?.photos) ? d.photos : []).slice(0, 2).map(async (x: any) => {
+      try { const r = await api(`/api/offphoto?u=${encodeURIComponent(x.url)}`); if (r?.data && (x.kind === "front" || x.kind === "nutrition")) out[x.kind as "front" | "nutrition"] = r.data; } catch { /* no photo: fine */ }
+    }));
+    return out;
+  }
+  async function withPhotoLines(d: any, nutrition: string | undefined, code: string) {
+    if (!nutrition) return d;
+    try {
+      const img = await resizeImageBase64(nutrition, 1800, 1800);
+      const r = await api("/api/scan", { images: [img], mode: "label", barcode: code });
+      if (r?.success && Array.isArray(r.table) && r.table.length) return { ...d, table: withPackLines(rowsFromRaw(d.table ?? [], "database"), rowsFromRaw(r.table, "photo")) };
+    } catch { /* the database's lines stand */ }
+    return d;
+  }
   async function lookup(code = barcode) {
     if (!/^\d{8,14}$/.test(code.trim())) {
       setError("Enter a numeric barcode with 8–14 digits.");
@@ -1324,6 +1375,7 @@ export default function App() {
     setError("");
     setImage("");
     setImageSet([]);
+    setDbPhotos([]);
     try {
       const local = state.foods.find((f) => f.barcode === code.trim());
       if (local) {
@@ -1331,8 +1383,14 @@ export default function App() {
         setTab("foods");
         notify("Already in your foods.");
       } else {
-        const d = await api(`/api/product/${code.trim()}`);
+        const d0 = await api(`/api/product/${code.trim()}`);
         if (run !== runRef.current) return;
+        const ph = await dbPhotosOf(d0);
+        if (run !== runRef.current) return;
+        if (ph.nutrition) setBusy("Reading the nutrition photo…");
+        const d = await withPhotoLines(d0, ph.nutrition, code.trim());
+        if (run !== runRef.current) return;
+        setDbPhotos([ph.front, ph.nutrition].filter(Boolean) as string[]);
         setEdit(
           candidateFood(d, d.source || "Product database · review required"),
         );
@@ -1355,6 +1413,8 @@ export default function App() {
     try { db = await api(`/api/product/${c}`); } catch { db = null; }
     if (run !== runRef.current) return;
     if (!db) { setBusy(""); await scan(images, false, c); return; }
+    const ph = await dbPhotosOf(db);
+    if (run !== runRef.current) return;
     let read: any = null, resized: string[] = [];
     try { resized = await Promise.all(images.slice(0, 6).map((x) => resizeImageBase64(x, 1800, 1800))); } catch { resized = []; }
     if (resized.length) {
@@ -1369,9 +1429,12 @@ export default function App() {
       // the pack's lines the database lacks (sugar alcohols, often) are added to the database's (Milan, 8 October 2026)
       else if (read.table?.length) merged.table = withPackLines(rowsFromRaw(merged.table ?? [], "database"), rowsFromRaw(read.table, "label"));
     }
+    const withLines = read ? merged : await withPhotoLines(merged, ph.nutrition, c);
+    if (run !== runRef.current) return;
     const ordered = frontFirst(resized, read?.front_image ?? 0);
     setImage(ordered[0] ?? ""); setImageSet(ordered);
-    setEdit(candidateFood({ ...merged, barcode: c }, db.source || "Product database and photos · review required"));
+    setDbPhotos([ph.front, ph.nutrition].filter(Boolean) as string[]);
+    setEdit(candidateFood({ ...withLines, barcode: c }, db.source || "Product database and photos · review required"));
     setBusy("");
   }
   function updateItem(id: string, patch: Partial<Ingredient>) {
@@ -1857,6 +1920,19 @@ export default function App() {
   };
   if (!authReady) return <Starting onLocal={null} />;
   // the legal pages are public: /impressum, /privacy, /disclaimer, /about, signed in or not
+  // the recipe pages (canvas R1, R2, R6): open to everyone; a signed-in member also gets their amounts
+  if (pagePath === "/recipes" || /^\/r\/[a-z0-9-]+\/?$/.test(pagePath)) {
+    const isMember = Boolean(user && profileReady && (profile.role === "coach" || profile.coachId) && safety.adultAt);
+    const tools: MemberTools | null = isMember ? {
+      mixFor: screenProps.mixFor,
+      takeMix: (f, m) => { screenProps.takeMix(f, m); goApp("journey"); },
+      putAlone: (f, g) => { setState((s) => ({ ...s, items: [...s.items, { id: uid(), food: f, grams: g, locked: false }], portion: null })); setStep("in"); goApp("journey"); notify(`${f.name} is on your plate.`); },
+      addRecipe: (m) => { setState((s) => ({ ...s, meals: [m, ...s.meals] })); setFoodsView("recipes"); goApp("foods"); notify(`${m.title} is in your recipes.`); },
+      momentName: momentOf(moment).name, goalName: goal ? goalLabel(goal.band) : "Your goal",
+      mealKcal: todayKcal === null ? null : Math.round(todayKcal * momentKcalShare(moment)),
+    } : null;
+    return pagePath === "/recipes" ? <RecipesPage member={isMember} /> : <RecipePage slug={pagePath.split("/")[2]} member={tools} />;
+  }
   { const legal = legalPageFromPath(window.location.pathname); if (legal) return <LegalScreen page={legal} back={() => { window.history.replaceState(null, "", "/"); window.location.reload(); }} />; }
   if (cloudEnabled && !user) return <LandingScreen />;
   if (cloudEnabled && user && !profileReady) return <Starting onLocal={() => { localMode.current = true; setProfileReady(true); }} />;
@@ -1998,8 +2074,9 @@ export default function App() {
           food={edit}
           image={image}
           images={imageSet}
+          dbPhotos={dbPhotos}
           library={state.foods}
-          close={() => { setEdit(null); setImageSet([]); setEditFrom(""); setEditTitle(""); }}
+          close={() => { setEdit(null); setImageSet([]); setDbPhotos([]); setEditFrom(""); setEditTitle(""); }}
           save={saveFood}
           mixFor={screenProps.mixFor}
           onMix={screenProps.takeMix}

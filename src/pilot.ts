@@ -61,6 +61,8 @@ export type Food = Nutrition & {
   readyToEat: boolean;
   photo?: string;
   photos?: string[];
+  // fingerprints of the photos that came from Open Food Facts, shown with their credit (canvas board C8)
+  creditPhotos?: string[];
   table?: import("./labeltable").LabelRow[];
   favorite?: boolean;
   job?: string;
