@@ -2,7 +2,7 @@
 // Every finding has a number and a source, and belongs either to one day (shown under that day's row) or to the week
 // (shown under the week's line). Nothing is blocked; a finding kept on purpose is remembered with the value it was kept at.
 import { ADJ, DAY_TYPES, type DayNumbers, type DayType, type Personal } from "./personal";
-import { BANDS } from "./goal";
+import { goalLabel } from "./goal";
 import { lengthOf } from "./plan";
 
 export type Finding = { id: string; day: DayType | null; field: "kcal" | "protein" | "fats" | "carbs"; title: string; body: string; source: string; sig: string };
@@ -19,7 +19,7 @@ export function analyse(args: {
 }): Analysis {
   const { days, avg, bandId, personal, burn } = args;
   const kg = personal.weightKg ?? null;
-  const goal = BANDS.find((b) => b.id === bandId)?.name ?? "your goal";
+  const goal = goalLabel(bandId) || "your goal";
   const out: Finding[] = [], ok: string[] = [];
   // energy against the goal: the week's average against what the body burns, the goal's own step allowed, 5 points either way
   if (burn && avg.kcal > 0) {
@@ -28,7 +28,7 @@ export function analyse(args: {
       const under = off < 0;
       // plain English: "This looks more like building than maintaining"
       const looks = under ? (want <= -0.1 ? "a deeper cut" : "fat loss") : (want >= 0.1 ? "a bigger surplus" : "building");
-      const goalAs: Record<string, string> = { fatloss: "losing fat", recomp: "recomposition", maintain: "maintaining", gain: "building muscle", performance: "performance" };
+      const goalAs: Record<string, string> = { fatloss: "losing fat", recomp: "recomposition", maintain: "maintaining", gain: "building muscle", gainsteady: "building muscle steadily", performance: "performance" };
       out.push({ id: "energy", day: null, field: "kcal", title: `This looks more like ${looks} than ${goalAs[bandId] ?? goal.toLowerCase()}`,
         body: `Your average is ${avg.kcal.toLocaleString("en")}; what you burn, calculated, is ${burn.toLocaleString("en")}: ${Math.abs(pct(got))} % ${got < 0 ? "under" : "over"}. ${goal} expects ${want === 0 ? "within 5 %" : `about ${Math.abs(pct(want))} % ${want < 0 ? "under" : "over"}, give or take 5`}.`,
         source: "Mifflin–St Jeor; Compendium of Physical Activities 2024; your My week", sig: `energy:${Math.round(got * 100)}` });

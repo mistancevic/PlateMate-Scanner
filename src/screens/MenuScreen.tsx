@@ -3,7 +3,9 @@ import { FlaskConical, ChevronRight, BookOpen, ArrowLeft, Download, Upload, Slid
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
 import { exportLog, clearLog, readLog, log } from "../log";
-import { BANDS, bandOf, SOURCE_LABEL, type GoalEntry } from "../goal";
+import { BANDS, bandOf, goalLabel, SOURCE_LABEL, type GoalEntry } from "../goal";
+import { sheetOf, guideOf } from "../goalGuide";
+import { GoalSheet, GoalGuide } from "../components/GoalSheet";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
 import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, type Personal, type DayType } from "../personal";
@@ -231,11 +233,15 @@ function GoalPanel(p: AppApi) {
   const ownWay = goal?.source === "exact" || goal?.source === "coach";
   const c = calculate(p.personal, band?.id ?? "maintain", p.formula);
   const o = ownWay ? ownDayNumbers(p.personal, band?.id ?? "maintain", p.formula) : null;
+  // the goal sheet (canvas board K2): what you and your coach agree on
+  const approved = p.review?.status === "approved" ? { approvedBy: p.review.by || p.coachLabel, approvedAt: p.review.at } : {};
+  const sheet = sheetOf(goal, { weightKg: p.personal.weightKg, trainingAge: p.personal.trainingAge, coachLabel: p.coachLabel, ...approved });
+  const [about, setAbout] = useState(false);
   return (
     <>
       <section className="plan goal-head">
         <div className="plan-top"><small className="eyebrow-line">Your goal</small><span className="goal-src">{ownWay ? (goal?.setBy === "coach" ? `set by ${setBy}` : "your own numbers") : "calculated for you"}</span></div>
-        <b className="goal-name">{band ? band.name : "Not set yet"}</b>
+        <b className="goal-name">{band ? goalLabel(band.id) : "Not set yet"}</b>
         {band && <span className="goal-who">{band.who}</span>}
         {p.review && p.review.status !== "closed" && ownWay && (
           <span className={`review-state ${p.review.status}`}>
@@ -253,6 +259,13 @@ function GoalPanel(p: AppApi) {
           </>
         ) : null}
       </section>
+      {sheet && <GoalSheet sheet={sheet} />}
+      {band && guideOf(band.id) && (
+        <>
+          <button className="link about-goal" aria-expanded={about} onClick={() => setAbout((v) => !v)}>{about ? "Close About your goal" : "About your goal ›"}</button>
+          {about && <GoalGuide id={band.id} />}
+        </>
+      )}
       {!ownWay && c && <ProteinCard c={c} />}
       {p.review?.status === "change" && ownWay && (
         <section className="coach-note">
@@ -292,7 +305,7 @@ function GoalPanel(p: AppApi) {
         <p><b>At rest.</b> What your body burns doing nothing: Mifflin–St Jeor from sex, age, height and weight, or Katch–McArdle from your lean mass when you know your body fat.</p>
         <p><b>Your everyday.</b> That times how your work goes: 1.3 sitting, 1.55 on your feet, 1.75 in physical work. Then your steps, on every day: only what's above what your work already covers, about 10 minutes of walking per 1,000 steps at 3.5 METs.</p>
         <p><b>Your training.</b> Each training day adds what it costs: light about 3.5 METs, moderate 5, hard 8, or the activity's own value from your Weekly plan, times your weight and the minutes (the middle of the range), less what you burn at rest anyway.</p>
-        <p><b>Your goal.</b> Minus 20 % to lose fat, minus 10 % for recomposition, plus 10 % to build muscle, plus 5 % for performance.</p>
+        <p><b>Your goal.</b> Minus 20 % to lose fat, minus 10 % for recomposition, plus 5 % to build muscle steadily, plus 10 % to build it faster, plus 5 % for performance.</p>
         <p><b>Protein.</b> 1.6 to 2.2 g per kg if you train twice a week or more, else 1.2 to 1.6. The same every day; the energy moves with the training.</p>
         <small>Sources: Mifflin et al. 1990; Katch and McArdle; FAO/WHO/UNU 2004 activity levels; Compendium of Physical Activities 2024; US Dietary Guidelines 2025–2030; ISSN position stand 2017; Morton et al. 2018.</small>
       </section>
@@ -310,7 +323,7 @@ export function GoalHistory({ log }: { log: GoalEntry[] }) {
       <section className="card history">
         {[...log].reverse().slice(0, 20).map((e) => (
           <div className="history-row" key={e.at}>
-            <div><b>{e.band ? bandOf(e.band)?.name : "Custom"}</b><small>{new Date(e.at).toLocaleDateString([], { day: "numeric", month: "short", year: "numeric" })} · {SOURCE_LABEL[e.source]}{e.weightKg ? ` · ${e.weightKg} kg` : ""}</small></div>
+            <div><b>{e.band ? goalLabel(e.band) : "Custom"}</b><small>{new Date(e.at).toLocaleDateString([], { day: "numeric", month: "short", year: "numeric" })} · {SOURCE_LABEL[e.source]}{e.weightKg ? ` · ${e.weightKg} kg` : ""}</small></div>
             <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString() : "?"}</b><small>kcal · {e.protein ?? "?"} g{e.kcal && e.protein ? ` · ${pdText(e.protein / (e.kcal / 100))}` : ""}</small></div>
           </div>
         ))}

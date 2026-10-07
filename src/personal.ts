@@ -1,5 +1,5 @@
 // Who the person is, for calculating their numbers. Every field optional; stored on the phone and in their account only.
-import { BANDS, type Band } from "./goal";
+import { BANDS, ALL_BANDS, goalLabel, type Band, type TrainingAge } from "./goal";
 import { ymd, isPlanDay, PE, COMMUTE, isPlan, planFromCounts, lengthOf, levelMinutes, START_MIN, countsOf, metOf, minutesOf, lifestyleFromOld, baseFactor, moveOf, MOVES, weekdaysOf, dayKindOf, WEEKDAY_NAMES, planLine, planShort, loadOf, weekdayIndex, getTodayChange, setTodayChange, dayOfLoad, type Plan, type PlanDay, type Lifestyle } from "./plan";
 export type Sex = "female" | "male";
 export type Activity = "sedentary" | "light" | "moderate" | "very" | "athlete"; // before 6 October 2026; read only to move old profiles over
@@ -29,6 +29,8 @@ export type Personal = {
   life?: Life; week?: Week; easyMin?: number; hardMin?: number;
   // from 7 October 2026: steps on a usual day, for every day, training or not (canvas board T1)
   steps?: StepsBand;
+  // how long the person has trained regularly; sets the starting pace of Build muscle and what weight trend to expect
+  trainingAge?: TrainingAge;
   // Target analysis answers: a finding kept on purpose, with the value it was kept at, so a changed number asks again
   kept?: Record<string, { at: string; sig: string }>;
   dayMode?: DayMode | "follow"; ownDays?: Partial<Record<DayType, OwnDay>>;
@@ -139,10 +141,10 @@ export const canCalculate = (p: Personal) => Boolean(p.birthYear && p.heightCm &
 // Energy per day: resting burn (Mifflin–St Jeor, or Katch–McArdle with body fat) × life, plus that day's training, then the goal.
 // Protein follows whether you train, not the goal: 1.6 to 2.2 g per kg with two or more sessions a week (ISSN 2017; Morton et al. 2018),
 // else 1.2 to 1.6 (US Dietary Guidelines 2025–2030). Fat 30 % of the average day, 25 % for Performance (more carbs); carbs the rest.
-export const ADJ: Record<string, number> = { fatloss: -0.2, recomp: -0.1, maintain: 0, gain: 0.1, performance: 0.05 };
+export const ADJ: Record<string, number> = { fatloss: -0.2, recomp: -0.1, maintain: 0, gain: 0.1, gainsteady: 0.05, performance: 0.05 };
 const FAT_OF: Record<string, number> = { performance: 0.25 };
 export function suggestBand(p: Personal, current?: string): Band {
-  if (current) { const b = BANDS.find((x) => x.id === current); if (b) return b; }
+  if (current) { const b = ALL_BANDS.find((x) => x.id === current); if (b) return b; }
   const age = ageOf(p);
   return BANDS.find((b) => b.id === "maintain")!;
 }
@@ -182,7 +184,7 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   if (age < 18 && adj < 0) { adj = 0; notes.push("Under 18: no deficit, energy stays at maintenance."); }
   const base = bmr * life.factor;
   const pct = Math.round(adj * 100);
-  const goalName = BANDS.find((b) => b.id === bandId)?.name ?? "your goal";
+  const goalName = goalLabel(bandId) || "your goal";
   // protein reference: real weight, or lean-based when body fat is known and high
   let ref = w;
   if (lean && p.bodyFatPct) {

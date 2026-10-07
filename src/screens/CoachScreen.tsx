@@ -6,7 +6,9 @@ import { listClients, setClientGoal, sendRecipe, pinFormula, type ClientRow } fr
 import { SITUATIONS } from "../safety";
 import { GoalHistory } from "./MenuScreen";
 import { uid } from "../pilot";
-import { BANDS, bandOf, goalsForBand } from "../goal";
+import { BANDS, PACES, bandOf, goalLabel, goalsForBand, isBuild } from "../goal";
+import { sheetOf } from "../goalGuide";
+import { GoalSheet } from "../components/GoalSheet";
 import { fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { density } from "../pilot";
 import { MOMENTS } from "../moments";
@@ -49,7 +51,7 @@ export function CoachArea(p: AppApi) {
         <button className="card client-row" key={r.uid} onClick={() => setOpen(r)}>
           <div className="client-head">
             <span className="avatar">{r.name.slice(0, 1).toUpperCase()}</span>
-            <div><b>Client {r.name.split(" ")[0]}</b><small>{r.goal?.band ? bandOf(r.goal.band)?.name : "no goal yet"} · {r.foods} foods · {r.feedback.length} shared · {daam(r)} DaaM good · reads {r.pdUnit === "pct" ? "% protein" : "PD"}</small></div>
+            <div><b>Client {r.name.split(" ")[0]}</b><small>{r.goal?.band ? goalLabel(r.goal.band) : "no goal yet"} · {r.foods} foods · {r.feedback.length} shared · {daam(r)} DaaM good · reads {r.pdUnit === "pct" ? "% protein" : "PD"}</small></div>
           </div>
           <small className="client-last">{last(r) ? `${last(r).taste}: ${last(r).meal?.title ?? ""} · ${new Date(last(r).createdAt).toLocaleDateString()}${last(r).notes ? ` · ${last(r).notes}` : ""}` : "no meals yet"} · active {r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : "never"}</small>
         </button>
@@ -105,7 +107,7 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirm
           );
         })()}
         <div className="client-goal">
-          <div><b>{row.goal?.band ? bandOf(row.goal.band)?.name : "No goal yet"}</b><small>{row.goal?.band ? pdRange(bandOf(row.goal.band)?.range ?? "") : ""}{row.goal?.setBy === "coach" ? " · set by you" : row.goal ? " · set by them" : ""}</small></div>
+          <div><b>{row.goal?.band ? goalLabel(row.goal.band) : "No goal yet"}</b><small>{row.goal?.band ? pdRange(bandOf(row.goal.band)?.range ?? "") : ""}{row.goal?.setBy === "coach" ? " · set by you" : row.goal ? " · set by them" : ""}</small></div>
           <button className="pill pill-small" onClick={() => setEditing((v) => !v)}><Target size={14} /> {editing ? "Cancel" : "Change goal"}</button>
         </div>
         <div className="formula-row">
@@ -118,20 +120,26 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirm
           <>
             <div className="bands compact">
               {BANDS.map((b) => (
-                <button key={b.id} className={`band-card ${band === b.id ? "on" : ""}`} onClick={() => setBand(b.id)}>
+                <button key={b.id} className={`band-card ${band === b.id || (b.id === "gain" && isBuild(band)) ? "on" : ""}`} onClick={() => setBand(b.id === "gain" && isBuild(band) ? band : b.id === "gain" ? "gainsteady" : b.id)}>
                   <b>{b.name}</b><span>{pdRange(b.range)} · {b.kcal[0]}–{b.kcal[1]} kcal · {b.protein[0]}–{b.protein[1]} g</span>
                 </button>
               ))}
             </div>
+            {isBuild(band) && (
+              <div className="chip-row" role="group" aria-label="Pace">
+                {PACES.map((x) => <button key={x.id} className={`choice ${band === x.band ? "on" : ""}`} aria-pressed={band === x.band} onClick={() => setBand(x.band)}>{x.name}</button>)}
+              </div>
+            )}
             <button className="pill pill-primary pill-wide" disabled={!band || saving} onClick={async () => {
               const b = bandOf(band); if (!b) return;
               setSaving(true);
-              try { await setClientGoal(row.uid, { band }, goalsForBand(b), coachName); notify(`${row.name}'s goal set to ${b.name}.`); setEditing(false); onSaved(); }
+              try { await setClientGoal(row.uid, { band }, goalsForBand(b), coachName); notify(`${row.name}'s goal set to ${goalLabel(b.id)}.`); setEditing(false); onSaved(); }
               catch (e: any) { setError(e.message || "Could not set the goal."); }
               finally { setSaving(false); }
             }}>Set this goal</button>
           </>
         )}
+        {(() => { const sh = sheetOf(row.goal, { weightKg: row.weightKg, trainingAge: row.trainingAge, coachLabel: "you", ...(row.review?.status === "approved" ? { approvedBy: "you", approvedAt: row.review.at } : {}) }); return sh ? <GoalSheet sheet={sh} /> : null; })()}
         <GoalHistory log={row.goalLog ?? []} />
         <p className="label">The last days, from shared cards</p>
         <section className="card days">

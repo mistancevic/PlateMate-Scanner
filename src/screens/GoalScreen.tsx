@@ -1,6 +1,6 @@
 import { underAge, ADULT_ONLY } from "../safety";
 import { useState } from "react";
-import { BANDS, saveGoal } from "../goal";
+import { BANDS, PACES, TRAINING_AGES, isBuild, paceForAge, bandOf, saveGoal } from "../goal";
 import { density } from "../pilot";
 import { pdText, pdVal, pdTag } from "../ui";
 import { Mark, APP_NAME } from "../components/Mark";
@@ -35,7 +35,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const c = under ? null : calculate(d, band, p.formula);
   const by = coach ? "coach" : "you";
   const done = () => { p.notify("Your day is set. This is Today."); onDone(); };
-  const goalNow = BANDS.find((b) => b.id === band)!;
+  const goalNow = bandOf(band)!;
 
   // own numbers, every day the same
   const ownKcal = Number(own.kcal) || null, ownProtein = Number(own.protein) || null;
@@ -180,12 +180,32 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           )}
           <b className="section-title">What are you after?</b>
           <p className="small muted">Each goal says what happens to your weight, how much you eat, and what you need to do. You can change it at any time.</p>
-          <div className="goal-cards">{BANDS.map((b) => (
-            <button key={b.id} type="button" className={`goal-pick ${band === b.id ? "on" : ""}`} aria-pressed={band === b.id} onClick={() => setBand(b.id)}>
-              <span className="goal-pick-head"><b>{b.name}</b>{b.popular && <small>Most people pick this</small>}</span>
-              <ul>{b.points.map((x) => <li key={x}>{x}</li>)}</ul>
-            </button>
-          ))}</div>
+          <div className="goal-cards">{BANDS.map((b) => {
+            // Build muscle has a pace (canvas board K1): Steady or Faster, started by how long the person has trained
+            const on = band === b.id || (b.id === "gain" && isBuild(band));
+            const pick = () => setBand(b.id !== "gain" ? b.id : isBuild(band) ? band : PACES.find((x) => x.id === (d.trainingAge ? paceForAge(d.trainingAge) : "steady"))!.band);
+            return (
+              <div key={b.id} className={`goal-pick-wrap ${on ? "on" : ""}`}>
+                <button type="button" className={`goal-pick ${on ? "on" : ""}`} aria-pressed={on} onClick={pick}>
+                  <span className="goal-pick-head"><b>{b.name}</b>{b.popular && <small>Most people pick this</small>}</span>
+                  <ul>{b.points.map((x) => <li key={x}>{x}</li>)}</ul>
+                </button>
+                {on && b.id === "gain" && (
+                  <div className="pace">
+                    <small className="setting-name">Your pace</small>
+                    <div className="activity-list" role="group" aria-label="Your pace">
+                      {PACES.map((x) => <button type="button" key={x.id} className={`activity ${band === x.band ? "on" : ""}`} aria-pressed={band === x.band} onClick={() => setBand(x.band)}><b>{x.name}</b><small>{x.hint}</small></button>)}
+                    </div>
+                    <small className="setting-name">How long have you trained regularly?</small>
+                    <div className="chip-row" role="group" aria-label="How long have you trained regularly?">
+                      {TRAINING_AGES.map((x) => <button type="button" key={x.id} className={`choice ${d.trainingAge === x.id ? "on" : ""}`} aria-pressed={d.trainingAge === x.id} onClick={() => { setPersonalNow({ ...d, trainingAge: x.id }); setBand(PACES.find((q) => q.id === paceForAge(x.id))!.band); }}>{x.name}</button>)}
+                    </div>
+                    <small className="setting-hint">Sets the starting pace: the longer you've trained, the slower muscle comes. You can pick either pace.</small>
+                  </div>
+                )}
+              </div>
+            );
+          })}</div>
           {c && <ProteinCard c={c} />}
           {c ? (
             <>

@@ -42,7 +42,7 @@ import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isO
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveCards, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
-import { getGoal, clearGoal, saveGoal, bandOf, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
+import { getGoal, clearGoal, saveGoal, bandOf, goalLabel, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { setTodayChange, dayOfLoad, type PlanDay } from "./plan";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, type Personal, type DayType, type Day } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
@@ -1765,7 +1765,7 @@ export default function App() {
         </button>
         <h1>{TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
-          {menuSection === "goal" ? pdText(dayPd) : <>{goal?.band ? bandOf(goal.band)?.name : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · {pdText(dayPd)} · set by {goal?.setBy === "coach" ? coachLabel(goal.coachName || profile.coachName || COACH_NAME) : "you"}</>}
+          {menuSection === "goal" ? pdText(dayPd) : <>{goal?.band ? goalLabel(goal.band) : `${fmt(state.goals.calories, 0)} kcal · ${fmt(state.goals.protein)} g`} · {pdText(dayPd)} · set by {goal?.setBy === "coach" ? coachLabel(goal.coachName || profile.coachName || COACH_NAME) : "you"}</>}
         </button>}
         <button className="icon menu-button" aria-label="Menu" onClick={() => setMenuSection(menuSection ? null : "list")}><Menu size={22} /></button>
       </header>

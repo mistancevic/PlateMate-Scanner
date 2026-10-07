@@ -41,6 +41,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
           text: msg, image: photo || undefined, history,
           target: { pd: pdRef, mealKcal: state.goals.calories ? Math.round(state.goals.calories * 0.35) : null },
           plate: state.items.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein })),
+          goal: p.goal?.band,
           rhythm: p.usual, moment: p.moment, region: p.region, travelTo: p.moment === "travel" ? p.travelTo : null,
           library: state.foods.slice(0, 24).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })),
         }) });

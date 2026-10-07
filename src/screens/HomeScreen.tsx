@@ -3,7 +3,7 @@ import { ChefHat, Camera, BookOpen, ChevronRight, Check } from "lucide-react";
 import { aggregate, density } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
-import { bandOf } from "../goal";
+import { bandOf, goalLabel } from "../goal";
 import { DAY_TYPES, dayModeOf, dayNameAny, hasPlan, isMinor, lifestyleOf } from "../personal";
 import { planLine, schoolLine, studyLine, loadOf, LOAD_DAY, weekdaysOf, dayKindOf, type PlanDay } from "../plan";
 import { DayEditor } from "../components/DayEditor";
@@ -13,7 +13,7 @@ import type { AppApi } from "./api";
 
 export function HomeScreen(p: AppApi) {
   const { state, setTab, setStep, pdRef, setCamera, setMode, clientName, goal } = p;
-  const bandName = goal?.band ? bandOf(goal.band)?.name : null;
+  const bandName = goal?.band ? goalLabel(goal.band) : null;
   const byCoach = goal?.setBy === "coach";
   const setBy = byCoach ? `Coach ${(goal?.coachName || p.profile.coachName || COACH_NAME).split(" ")[0]}` : "you";
   const today = dayLog(state.feedback, new Date());

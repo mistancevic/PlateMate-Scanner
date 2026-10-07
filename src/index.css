@@ -822,3 +822,10 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .train-len { display: flex; flex-direction: column; gap: 6px; padding-left: 10px; border-left: 2px solid var(--line); } .train-len > small { font-weight: 800; font-size: 12.5px; }
 .train-tally { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; } .train-tally small { color: var(--muted); font-weight: 700; }
 .hard-pick { display: flex; flex-direction: column; gap: 4px; } .hard-pick .zone small { color: var(--ink); } .hard-pick .zone .zone-ex { color: var(--muted); }
+
+/* Build muscle, steady or faster (7 October 2026, canvas board K1) */
+.goal-pick-wrap { display: flex; flex-direction: column; } .goal-pick-wrap.on { background: #cfe0fb; border: 1.5px solid var(--brand); border-radius: 16px; } .goal-pick-wrap.on .goal-pick { border: 0; background: transparent; }
+.pace { display: flex; flex-direction: column; gap: 8px; padding: 0 14px 14px; } .pace .activity { background: var(--surface); } .pace .activity.on { background: #e8f0fd; }
+.goal-sheet { display: flex; flex-direction: column; } .goal-sheet .sheet-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 6px; } .goal-sheet .sheet-head b { font-size: 18px; font-weight: 900; color: var(--brand-text); } .goal-sheet .sheet-head small { color: var(--muted); font-weight: 700; }
+.sheet-row { display: flex; justify-content: space-between; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--line); } .sheet-row small { color: var(--muted); font-weight: 700; flex: 0 0 auto; } .sheet-row b { text-align: right; font-size: 13.5px; }
+.guide { display: flex; flex-direction: column; gap: 12px; } .guide div { display: flex; flex-direction: column; gap: 3px; } .guide p { margin: 0; color: var(--ink); font-size: 13.5px; line-height: 1.45; }

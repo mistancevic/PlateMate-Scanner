@@ -1,7 +1,7 @@
 import { Settings , Coffee } from "lucide-react";
 import { fmt, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
-import { bandOf } from "../goal";
+import { bandOf, goalLabel } from "../goal";
 import { MOMENTS } from "../moments";
 import { SendSheet } from "./CoachScreen";
 import { useState, type ReactNode } from "react";
@@ -42,7 +42,7 @@ export function MeScreen(p: AppApi) {
   const [sendCard, setSendCard] = useState<any>(null);
   const coachName = profile.coachName || COACH_NAME;
   const isCoach = profile.role === "coach";
-  const bandName = goal?.band ? bandOf(goal.band)?.name : null;
+  const bandName = goal?.band ? goalLabel(goal.band) : null;
   const setBy = goal?.setBy === "coach" ? (goal.coachName || coachName) : "you";
   return (
     <>
