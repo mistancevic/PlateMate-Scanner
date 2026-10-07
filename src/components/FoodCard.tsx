@@ -76,7 +76,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
             {addPhoto && gallery.length < 6 && (
               <button className="g-add" onClick={() => fileRef.current?.click()}><Camera size={16} /><span>{gallery.length ? "Add a photo" : "Add a photo of the front"}</span></button>
             )}
-            <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => {
+            <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => {
               const file = e.target.files?.[0]; e.target.value = ""; if (!file || !addPhoto) return;
               const r = new FileReader(); r.onload = () => addPhoto(String(r.result)); r.readAsDataURL(file);
             }} />
@@ -135,7 +135,8 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
       </div>
       {view && (() => {
         // canvas board C4 (Milan, 7 October 2026): the next photo without closing; swipe, the arrows, a photo below, or
-        // the arrow keys on a computer. Tapping the photo no longer closes it, so a swipe can't close it by accident.
+        // the arrow keys on a computer. With several, tapping the photo doesn't close it, so a swipe can't close it by
+        // accident; with one photo, tapping it closes it, as before (Milan, 7 October 2026).
         const at = viewAt ?? 0, many = gallery.length > 1;
         const go = (d: number) => { setArmed(false); setViewAt((at + d + gallery.length) % gallery.length); };
         return (
@@ -151,7 +152,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
               {many && <b className="photo-count">{at + 1} of {gallery.length}</b>}
               <button className="photo-close" aria-label="Close the photo" onClick={(e) => { e.stopPropagation(); setArmed(false); setViewAt(null); }}><X size={22} /></button>
             </div>
-            <img src={view} alt={`Photo ${at + 1} of ${gallery.length}`} draggable={false} />
+            <img src={view} alt={`Photo ${at + 1} of ${gallery.length}`} draggable={false} onClick={() => { if (!many) { setArmed(false); setViewAt(null); } }} />
             {many && <button className="photo-arrow prev" aria-label="Previous photo" onClick={(e) => { e.stopPropagation(); go(-1); }}><ChevronLeft size={26} /></button>}
             {many && <button className="photo-arrow next" aria-label="Next photo" onClick={(e) => { e.stopPropagation(); go(1); }}><ChevronRight size={26} /></button>}
             {many && (
@@ -159,7 +160,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
                 {gallery.map((src, i) => <button key={i} className={i === at ? "on" : ""} aria-label={`Show photo ${i + 1}`} aria-current={i === at} onClick={(e) => { e.stopPropagation(); setArmed(false); setViewAt(i); }}><img src={src} alt="" /></button>)}
               </div>
             )}
-            {many && <span>Swipe, or tap a photo below</span>}
+            <span>{many ? "Swipe, or tap a photo below" : "Tap the photo to close"}</span>
           </div>
         );
       })()}
