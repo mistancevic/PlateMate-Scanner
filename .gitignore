@@ -10,3 +10,4 @@ coverage/
 tests/screenshots/
 
 deploy/deploy.env
+deploy/.last-live
