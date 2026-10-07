@@ -811,3 +811,14 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .gate-list b { color: var(--ink); }
 .gate-actions { margin-top: auto; }
 .adult-line { margin: 0; background: var(--tint); border-radius: 12px; padding: 10px 12px; color: var(--ink); line-height: 1.45; }
+
+/* Calculate for me: your everyday, then your training (7 October 2026, canvas boards T1 and T3) */
+.calc-part { display: flex; flex-direction: column; gap: 2px; margin-top: 8px; } .calc-part b { font-size: 16px; font-weight: 900; } .calc-part small { color: var(--muted); font-weight: 600; }
+.train-week { display: flex; flex-direction: column; }
+.train-row { display: flex; flex-direction: column; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.train-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.train-name { display: flex; flex-direction: column; gap: 4px; } .train-name > b { font-size: 15px; }
+.zone { display: flex; flex-direction: column; } .zone small { font-size: 12.5px; color: var(--ink); font-weight: 600; line-height: 1.35; } .zone small b { display: inline; font-size: inherit; font-weight: 800; } .zone .zone-ex { color: var(--muted); font-size: 12px; }
+.train-len { display: flex; flex-direction: column; gap: 6px; padding-left: 10px; border-left: 2px solid var(--line); } .train-len > small { font-weight: 800; font-size: 12.5px; }
+.train-tally { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; } .train-tally small { color: var(--muted); font-weight: 700; }
+.hard-pick { display: flex; flex-direction: column; gap: 4px; } .hard-pick .zone small { color: var(--ink); } .hard-pick .zone .zone-ex { color: var(--muted); }

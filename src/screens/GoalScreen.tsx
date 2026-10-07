@@ -4,11 +4,13 @@ import { BANDS, saveGoal } from "../goal";
 import { density } from "../pilot";
 import { pdText, pdVal, pdTag } from "../ui";
 import { Mark, APP_NAME } from "../components/Mark";
-import { LIFE, DAY_TYPES, calculate, canCalculate, macroSplit, suggestBand, dayModeOf, ownDayNumbers, weekOf, lifeOf, type Personal, type DayType, type DayMode, type Week } from "../personal";
+import { LIFE, DAY_TYPES, STEPS, calculate, canCalculate, macroSplit, suggestBand, dayModeOf, ownDayNumbers, weekOf, workOf, withWork, planOf, lifestyleOf, type Personal, type DayType, type DayMode } from "../personal";
+import { INTENSITIES, LENGTHS, lengthOf, trainingCounts, withTraining, withLength, levelMinutes, planFromCounts, weekdaysOf, usualFrom, WEEKDAY_CHOICES, type Intensity, type Plan } from "../plan";
 import { DayTable, FindingList } from "../components/DayTable";
 import { analyse, isOpen as openAt, type Finding } from "../analysis";
 import type { AppApi } from "./api";
 import { ProteinCard } from "../components/ProteinCard";
+import { Zones } from "../components/Zones";
 
 // Your goal, as approved on 6 October 2026. Two ways in: Calculate for me, or My own numbers. Five goals. Life is set
 // once; training is chosen per day. Every day the same, or each day its own, with the four days as one table.
@@ -88,21 +90,36 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
       </div>
     </div>
   );
-  const Steps = ({ week }: { week: Week }) => {
-    const total = DAY_TYPES.reduce((a, x) => a + (week[x.id] || 0), 0);
-    const set = (k: DayType, v: number) => setPersonalNow({ ...d, week: { ...week, [k]: Math.max(0, Math.min(7, v)) } });
+  // Calculate for me, as approved on 7 October 2026 (canvas board T1): your everyday first, then your training.
+  // The training days are the Weekly plan's: a + or − here changes the plan itself, so the two never disagree.
+  const planNow: Plan = planOf(d) ?? planFromCounts({ passive: 7, active: 0, easy: 0, hard: 0 });
+  const setPlan = (plan: Plan) => { setPersonalNow({ ...d, plan }); p.setUsual(usualFrom(lifestyleOf(d), plan)); };
+  const TrainWeek = () => {
+    const c = trainingCounts(planNow), total = c.easy + c.moderate + c.hard;
     return (
-      <div className="week-steps">
-        {DAY_TYPES.map((x) => (
-          <div className="week-step" key={x.id}>
-            <span><b>{x.name}</b><small>{x.hint}</small></span>
-            <span className="stepper"><button type="button" aria-label={`Fewer ${x.name}`} onClick={() => set(x.id, (week[x.id] || 0) - 1)}>−</button><b>{week[x.id] || 0}</b><button type="button" aria-label={`More ${x.name}`} disabled={total >= 7} onClick={() => set(x.id, (week[x.id] || 0) + 1)}>+</button></span>
-          </div>
-        ))}
-        <small className={total === 7 ? "muted" : "notice"}>{total} of 7 days</small>
+      <div className="train-week">
+        {INTENSITIES.map((x) => {
+          const n = c[x.id], min = levelMinutes(planNow, x.id);
+          return (
+            <div className="train-row" key={x.id}>
+              <div className="train-head">
+                <span className="train-name"><b>{x.name}</b><Zones level={x.id} walkNote={x.id === "easy"} /></span>
+                <span className="stepper"><button type="button" aria-label={`Fewer ${x.name} days`} disabled={n === 0} onClick={() => setPlan(withTraining(planNow, x.id, -1))}>−</button><b>{n}</b><button type="button" aria-label={`More ${x.name} days`} disabled={total >= 7} onClick={() => setPlan(withTraining(planNow, x.id, 1))}>+</button></span>
+              </div>
+              {n > 0 && (
+                <div className="train-len" role="group" aria-label={`${x.name}, how long`}>
+                  <small>How long, usually</small>
+                  <div className="chip-row">{LENGTHS.map((r) => <button type="button" key={r.id} className={`choice ${min !== null && lengthOf(min).id === r.id ? "on" : ""}`} aria-pressed={min !== null && lengthOf(min).id === r.id} onClick={() => setPlan(withLength(planNow, x.id, r.mid))}>{r.name}</button>)}</div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+        <div className="train-tally"><b>{total} training {total === 1 ? "day" : "days"}</b><small>{7 - total} {7 - total === 1 ? "day" : "days"} without training</small></div>
       </div>
     );
   };
+  const wk = weekdaysOf(lifestyleOf(d));
 
   return (
     <div className="goal-screen">
@@ -129,7 +146,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           )}
           {consented && !editing && canCalculate(d) ? (
             <section className="card you-card">
-              <span><b>You</b><small>{[d.sex === "male" ? "Male" : d.sex === "female" ? "Female" : null, d.birthYear, d.heightCm ? `${d.heightCm} cm` : null, d.weightKg ? `${d.weightKg} kg` : null, LIFE.find((l) => l.id === lifeOf(d))!.name].filter(Boolean).join(" · ")}</small></span>
+              <span><b>You</b><small>{[d.sex === "male" ? "Male" : d.sex === "female" ? "Female" : null, d.birthYear, d.heightCm ? `${d.heightCm} cm` : null, d.weightKg ? `${d.weightKg} kg` : null, LIFE.find((l) => l.id === workOf(d))!.name, STEPS.find((x) => x.id === d.steps)?.name.concat(" steps")].filter(Boolean).join(" · ")}</small></span>
               <button className="link" onClick={() => setEditing(true)}>Edit</button>
             </section>
           ) : (
@@ -143,14 +160,20 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
                 <label className="field"><span>Weight, kg</span><input inputMode="decimal" value={d.weightKg ?? ""} placeholder="75" onChange={(e) => setD({ ...d, weightKg: num(e.target.value) })} onBlur={() => save(d)} /></label>
               </div>
               {under && <p className="small adult-line" role="alert"><b>Chef Mealan is for adults.</b> {ADULT_ONLY} This birth year means you're under 18, so you can't use Chef Mealan yet. If you typed it wrong, correct it here.</p>}
-              <div className="field"><span>Your life, without training</span>
-                <div className="activity-list">{LIFE.map((l) => <button key={l.id} className={`activity ${lifeOf(d) === l.id ? "on" : ""}`} onClick={() => setPersonalNow({ ...d, life: l.id })}><b>{l.name}</b><small>{l.hint}</small></button>)}</div>
+              <div className="calc-part"><b>Your everyday</b><small>Every day, with or without training.</small></div>
+              {wk === "work" || wk === "both" ? (
+                <div className="field"><span>Your work</span>
+                  <div className="activity-list">{LIFE.map((l) => <button key={l.id} className={`activity ${workOf(d) === l.id ? "on" : ""}`} onClick={() => setPersonalNow(withWork(d, l.id))}><b>{l.name}</b><small>{l.hint}</small></button>)}</div>
+                </div>
+              ) : (
+                <p className="small muted">Your weekdays: {WEEKDAY_CHOICES.find((x) => x.id === wk)!.name}, counted as mostly sitting. You can change it in Lifestyle.</p>
+              )}
+              <div className="field"><span>Steps on a usual day</span>
+                <div className="chip-row" role="group" aria-label="Steps on a usual day">{STEPS.map((x) => <button type="button" key={x.id} className={`choice ${d.steps === x.id ? "on" : ""}`} aria-pressed={d.steps === x.id} onClick={() => setPersonalNow({ ...d, steps: d.steps === x.id ? undefined : x.id })}>{x.name}</button>)}</div>
+                <small className="muted">All your walking goes here: to work, shopping, the dog, a walk in the park. Your phone or watch counts them.</small>
               </div>
-              <div className="field"><span>Your training week</span><Steps week={weekOf(d)} /></div>
-              <div className="field-row">
-                <label className="field"><span>Easy session, min</span><input inputMode="numeric" value={d.easyMin ?? ""} placeholder="60" onChange={(e) => setD({ ...d, easyMin: num(e.target.value) })} onBlur={() => save(d)} /></label>
-                <label className="field"><span>Hard session, min</span><input inputMode="numeric" value={d.hardMin ?? ""} placeholder="75" onChange={(e) => setD({ ...d, hardMin: num(e.target.value) })} onBlur={() => save(d)} /></label>
-              </div>
+              <div className="calc-part"><b>Your training</b><small>Only the days you train. Tap + for each.</small></div>
+              <TrainWeek />
               <label className="field"><span>Body fat %, if you know it</span><input inputMode="decimal" value={d.bodyFatPct ?? ""} placeholder="from a scale or a scan" onChange={(e) => setD({ ...d, bodyFatPct: num(e.target.value) })} onBlur={() => save(d)} /></label>
               {canCalculate(d) && <button className="pill pill-small" onClick={() => { save(d); setEditing(false); }}>Done</button>}
             </section>

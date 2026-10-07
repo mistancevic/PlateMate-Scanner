@@ -3,6 +3,7 @@
 // (shown under the week's line). Nothing is blocked; a finding kept on purpose is remembered with the value it was kept at.
 import { ADJ, DAY_TYPES, type DayNumbers, type DayType, type Personal } from "./personal";
 import { BANDS } from "./goal";
+import { lengthOf } from "./plan";
 
 export type Finding = { id: string; day: DayType | null; field: "kcal" | "protein" | "fats" | "carbs"; title: string; body: string; source: string; sig: string };
 export type Analysis = { findings: Finding[]; inRange: string[] };
@@ -50,7 +51,8 @@ export function analyse(args: {
   }
   // carbs on training days, per kg
   if (kg) {
-    const easyNeeds = (personal.easyMin ?? 60) >= 60 ? 5 : 3;
+    // about an hour: a moderate day whose range reaches 60 minutes (45–60 or longer)
+    const easyNeeds = lengthOf(DAY_TYPES.find((x) => x.id === "easy")!.minutes(personal)).max >= 60 ? 5 : 3;
     const checks: [DayType, number, string][] = [["easy", easyNeeds, easyNeeds === 5 ? "An hour of training a day usually needs 5 to 7." : "Light training usually needs 3 to 5."], ["hard", 6, "Heavy or long training usually needs 6 to 10."]];
     for (const [d, need, why] of checks) {
       // only a day the person typed: a calculated day is not their choice to question

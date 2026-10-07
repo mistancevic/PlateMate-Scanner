@@ -39,7 +39,8 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   const card = await page.locator(".today-plan").first().textContent();
   ok(/Strength, hard, in the evening\. A hard day\./.test(card) && /Today's part of your Weekly plan/.test(card), "Today reads the plan and says where it comes from: " + card.slice(0, 80));
   await page.getByRole("button", { name: "Change today's plan" }).click(); await page.waitForTimeout(200);
-  await page.locator(".today-plan").getByRole("button", { name: "Rest", exact: true }).click();
+  // since 7 October 2026 (canvas board T3) the day settings call a rest day No training
+  await page.locator(".today-plan").getByRole("button", { name: "No training", exact: true }).click();
   await page.getByRole("button", { name: "Save for today" }).click(); await page.waitForTimeout(300);
   ok(/Rest\. A rest day\./.test(await page.locator(".today-plan").first().textContent()) && /Changed for today only/.test(await page.locator(".today-plan").first().textContent()), "a change is for today only and says so");
   const plan = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")).plan[0].kind);

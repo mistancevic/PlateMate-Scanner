@@ -34,7 +34,8 @@ export const KINDS: { id: Kind; name: string; hint: string; met: [number, number
   { id: "dance",      name: "Dance",      hint: "any style",                        met: [4, 5.5, 7.8] },
 ];
 // Which activities each person sees: adults one list, school kids another (after school).
-export const ADULT_KINDS: Kind[] = ["rest", "strength", "cardio", "hiit", "mobility", "stretching", "yoga", "walk", "team"];
+// Walk is not offered since 7 October 2026: all walking is in the steps, on every day. A Walk day saved before still reads.
+export const ADULT_KINDS: Kind[] = ["rest", "strength", "cardio", "hiit", "mobility", "stretching", "yoga", "team"];
 export const KID_KINDS: Kind[] = ["rest", "club", "match", "strength", "cardio", "dance", "walk", "yoga"];
 // METs by sport at easy, moderate and hard, Compendium of Physical Activities 2024 (youth values where they exist).
 export const SPORTS: { id: Sport; name: string; met: [number, number, number] }[] = [
@@ -54,7 +55,35 @@ export const COMMUTE: Record<string, { met: number; minutes: number; name: strin
   walk: { met: 3.5, minutes: 30, name: "walking there and back" },
   bike: { met: 4, minutes: 30, name: "cycling there and back" },
 };
-export const INTENSITIES: { id: Intensity; name: string }[] = [{ id: "easy", name: "Easy" }, { id: "moderate", name: "Moderate" }, { id: "hard", name: "Hard" }];
+// How hard, as approved on 7 October 2026 (canvas boards T1 and T3): Light, Moderate, Hard, each with its heart-rate zones,
+// how each zone feels and what usually falls in it. The id "easy" stays, so saved plans keep reading.
+export const INTENSITIES: { id: Intensity; name: string }[] = [{ id: "easy", name: "Light" }, { id: "moderate", name: "Moderate" }, { id: "hard", name: "Hard" }];
+export type Zone = { zone: string; feel: string; examples: string };
+export const ZONES: Record<Intensity, Zone[]> = {
+  easy: [{ zone: "Zone 1", feel: "very easy, you breathe calmly", examples: "yoga, mobility, stretching, easy cycling" }],
+  moderate: [
+    { zone: "Zone 2", feel: "easy, you can talk in full sentences", examples: "easy jog, cycling, swimming, hiking" },
+    { zone: "Zone 3", feel: "steady, you talk in short sentences", examples: "tempo run, spin class, strength training, team practice" },
+  ],
+  hard: [
+    { zone: "Zone 4", feel: "hard, only a few words at a time", examples: "intervals, HIIT, a football match" },
+    { zone: "Zone 5", feel: "all out, no words", examples: "sprints, the last minutes of a race" },
+  ],
+};
+export const intensityWord = (x?: Intensity) => (x === "hard" ? "hard" : x === "moderate" ? "moderate" : "light");
+// How long, as ranges from 15 minutes. A range counts as its middle. A length saved before (30, 45, 60, 75, 90 minutes)
+// falls in the range it ends in: 30 in 15–30, 60 in 45–60, 75 and 90 in 60–90.
+export type Length = { id: string; name: string; mid: number; max: number };
+export const LENGTHS: Length[] = [
+  { id: "15-30", name: "15–30 min", mid: 25, max: 30 },
+  { id: "30-45", name: "30–45 min", mid: 40, max: 45 },
+  { id: "45-60", name: "45–60 min", mid: 55, max: 60 },
+  { id: "60-90", name: "60–90 min", mid: 75, max: 90 },
+  { id: "90+", name: "90+ min", mid: 100, max: Infinity },
+];
+export const lengthOf = (minutes: number) => LENGTHS.find((r) => minutes <= r.max) ?? LENGTHS[LENGTHS.length - 1];
+// the starting length of each kind: Light 30–45, Moderate 45–60, Hard 60–90
+export const START_MIN: Record<Intensity, number> = { easy: 40, moderate: 55, hard: 75 };
 export const WHENS: { id: When; name: string }[] = [{ id: "morning", name: "Morning" }, { id: "day", name: "During the day" }, { id: "evening", name: "Evening" }, { id: "late", name: "Late night" }];
 export const WHENS_KID: { id: When; name: string }[] = [{ id: "afterschool", name: "Right after school" }, { id: "lateafternoon", name: "Late afternoon" }, { id: "evening", name: "Evening" }];
 export const MINUTES = [30, 45, 60, 75, 90];
@@ -73,14 +102,14 @@ const whenShort = (w: When) => [...WHENS, ...WHENS_KID].find((x) => x.id === w)!
 export const activityName = (d: PlanDay) => d.kind === "club" ? `${sportOf(d.sport).name} training` : d.kind === "match" ? `${sportOf(d.sport).name} match` : kindOf(d.kind).name;
 // "Strength, hard, in the evening"
 export function planLine(d: PlanDay): string {
-  const act = d.kind === "rest" ? "" : `${activityName(d)}, ${d.intensity ?? "easy"}${d.when ? `, ${whenWords[d.when]}` : ""}`;
+  const act = d.kind === "rest" ? "" : `${activityName(d)}, ${intensityWord(d.intensity)}${d.when ? `, ${whenWords[d.when]}` : ""}`;
   if (d.pe) return act ? `${peName(d)}, then ${act.charAt(0).toLowerCase() + act.slice(1)}` : peName(d);
   return act || "Rest";
 }
 const peName = (d: PlanDay) => (d.study ? "Sport in class" : "Sport at school");
 // the agenda line: "Strength, hard · evening", "Sport at school, then football training, hard · late afternoon"
 export function planShort(d: PlanDay): string {
-  const act = d.kind === "rest" ? "" : `${activityName(d)}, ${d.intensity ?? "easy"}${d.when ? ` · ${whenShort(d.when)}` : ""}`;
+  const act = d.kind === "rest" ? "" : `${activityName(d)}, ${intensityWord(d.intensity)}${d.when ? ` · ${whenShort(d.when)}` : ""}`;
   if (d.pe) return act ? `${peName(d)}, then ${act.charAt(0).toLowerCase() + act.slice(1)}` : peName(d);
   return act || "Rest";
 }
@@ -98,12 +127,12 @@ export function schoolLine(d: PlanDay): string {
 
 // A starting plan for someone who had the old My week counts: hard days first on Monday and Thursday, then the easy ones,
 // the active rest on Saturday, rest where nothing is left. Work Monday to Friday. Everything stays editable.
-export function planFromCounts(c: Record<DayType, number>, easyMin = 60, hardMin = 75): Plan {
+export function planFromCounts(c: Record<DayType, number>, easyMin = START_MIN.moderate, hardMin = START_MIN.hard): Plan {
   const order = [0, 3, 1, 4, 2, 5, 6];
   const slots: PlanDay[] = [];
   for (let i = 0; i < (c.hard || 0); i++) slots.push({ work: false, kind: "strength", intensity: "hard", when: "evening", minutes: hardMin });
   for (let i = 0; i < (c.easy || 0); i++) slots.push({ work: false, kind: "strength", intensity: "moderate", when: "evening", minutes: easyMin });
-  for (let i = 0; i < (c.active || 0); i++) slots.push({ work: false, kind: "walk", intensity: "easy", when: "day", minutes: 45 });
+  for (let i = 0; i < (c.active || 0); i++) slots.push({ work: false, kind: "mobility", intensity: "easy", when: "day", minutes: START_MIN.easy });
   const plan: Plan = Array.from({ length: 7 }, (_, i) => ({ work: i < 5, kind: "rest" as Kind }));
   slots.slice(0, 7).forEach((s, n) => { const i = order[n]; plan[i] = { ...s, work: i < 5 }; });
   return plan;
@@ -115,6 +144,41 @@ export const countsOf = (plan: Plan): Record<DayType, number> => {
   for (const d of plan) c[loadOf(d)]++;
   return c;
 };
+
+// Your training week (canvas board T1, 7 October 2026): training days counted by how hard, edited on the plan itself, so the
+// goal setup and the Weekly plan never disagree. A + turns a day without training into one; a − turns the last one back.
+// The days keep what else they hold (work, study, sport in class).
+export const isTraining = (d: PlanDay) => d.kind !== "rest";
+const levelOf = (d: PlanDay): Intensity => d.intensity ?? "easy";
+export const trainingCounts = (plan: Plan): Record<Intensity, number> => {
+  const c: Record<Intensity, number> = { easy: 0, moderate: 0, hard: 0 };
+  for (const d of plan) if (isTraining(d)) c[levelOf(d)]++;
+  return c;
+};
+const ORDER = [0, 3, 1, 4, 2, 5, 6];
+export function withTraining(plan: Plan, level: Intensity, delta: 1 | -1): Plan {
+  const next = plan.map((d) => ({ ...d }));
+  if (delta > 0) {
+    const i = ORDER.find((n) => !isTraining(next[n]));
+    if (i === undefined) return plan;
+    const minutes = levelMinutes(plan, level) ?? START_MIN[level];
+    next[i] = { ...next[i], kind: level === "easy" ? "mobility" : "strength", intensity: level, when: level === "easy" ? "day" : "evening", minutes };
+  } else {
+    const i = [...ORDER].reverse().find((n) => isTraining(next[n]) && levelOf(next[n]) === level);
+    if (i === undefined) return plan;
+    const { work, study, pe } = next[i];
+    next[i] = { work, kind: "rest", ...(study ? { study } : {}), ...(pe ? { pe } : {}) };
+  }
+  return next;
+}
+// the usual length of one kind: the most common among its days, as the middle of its range; null when it has no days
+export function levelMinutes(plan: Plan, level: Intensity): number | null {
+  const ms = plan.filter((d) => isTraining(d) && levelOf(d) === level).map((d) => lengthOf(d.minutes ?? 60).mid);
+  if (!ms.length) return null;
+  const n = new Map<number, number>(); ms.forEach((m) => n.set(m, (n.get(m) ?? 0) + 1));
+  return [...n.entries()].sort((a, b) => b[1] - a[1] || b[0] - a[0])[0][0];
+}
+export const withLength = (plan: Plan, level: Intensity, minutes: number): Plan => plan.map((d) => (isTraining(d) && levelOf(d) === level ? { ...d, minutes } : d));
 
 // A change for one date is kept in the person's settings under that date (so it reaches the account) and never touches the plan.
 // The date is the local calendar date, not UTC, so a change made late in the evening stays on the right day.
@@ -141,7 +205,7 @@ export function setTodayChange(day: PlanDay | null, d = new Date()) {
 }
 // a load picked on Today by someone with no Weekly plan yet becomes a plain day of that load
 export const dayOfLoad = (t: DayType): PlanDay =>
-  t === "passive" ? { work: false, kind: "rest" } : { work: false, kind: t === "active" ? "walk" : "strength", intensity: t === "hard" ? "hard" : t === "easy" ? "moderate" : "easy", minutes: t === "active" ? 45 : 60 };
+  t === "passive" ? { work: false, kind: "rest" } : { work: false, kind: t === "active" ? "mobility" : "strength", intensity: t === "hard" ? "hard" : t === "easy" ? "moderate" : "easy", minutes: START_MIN[t === "hard" ? "hard" : t === "easy" ? "moderate" : "easy"] };
 
 // Lifestyle. Work sets the day's baseline; the rest is kept and shown now and used by the numbers in a next release.
 export type Hours = "fixed" | "flexible" | "shifts" | "none";

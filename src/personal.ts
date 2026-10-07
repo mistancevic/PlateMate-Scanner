@@ -1,6 +1,6 @@
 // Who the person is, for calculating their numbers. Every field optional; stored on the phone and in their account only.
 import { BANDS, type Band } from "./goal";
-import { ymd, isPlanDay, PE, COMMUTE, isPlan, planFromCounts, countsOf, metOf, minutesOf, lifestyleFromOld, baseFactor, moveOf, MOVES, weekdaysOf, dayKindOf, WEEKDAY_NAMES, planLine, planShort, loadOf, weekdayIndex, getTodayChange, setTodayChange, dayOfLoad, type Plan, type PlanDay, type Lifestyle } from "./plan";
+import { ymd, isPlanDay, PE, COMMUTE, isPlan, planFromCounts, lengthOf, levelMinutes, START_MIN, countsOf, metOf, minutesOf, lifestyleFromOld, baseFactor, moveOf, MOVES, weekdaysOf, dayKindOf, WEEKDAY_NAMES, planLine, planShort, loadOf, weekdayIndex, getTodayChange, setTodayChange, dayOfLoad, type Plan, type PlanDay, type Lifestyle } from "./plan";
 export type Sex = "female" | "male";
 export type Activity = "sedentary" | "light" | "moderate" | "very" | "athlete"; // before 6 October 2026; read only to move old profiles over
 export type Formula = "mifflin" | "katch";
@@ -8,11 +8,27 @@ export type DayMode = "same" | "each";
 // Life is set once: how the day goes without planned training. Training is chosen per day.
 export type Life = "desk" | "shift" | "feet" | "physical";
 export type DayType = "passive" | "active" | "easy" | "hard";
+// Your everyday (canvas board T1, 7 October 2026): steps on a usual day. All walking goes here, so it is counted once, on
+// every day. Steps add only above what the day's work already covers: about 5,000 sitting, 7,000 on shifts, 10,000 on your
+// feet, 12,000 in physical work. 1,000 steps is about 10 minutes of walking, at 3.5 METs (Compendium 2024).
+export type StepsBand = "u5" | "5to8" | "8to12" | "12p";
+export const STEPS: { id: StepsBand; name: string; mid: number }[] = [
+  { id: "u5", name: "Under 5,000", mid: 4000 }, { id: "5to8", name: "5,000–8,000", mid: 6500 },
+  { id: "8to12", name: "8,000–12,000", mid: 10000 }, { id: "12p", name: "12,000+", mid: 14000 },
+];
+const stepsCovered = (factor: number) => (factor >= 1.75 ? 12000 : factor >= 1.55 ? 10000 : factor >= 1.4 ? 7000 : 5000);
+// minutes of walking above what the day already covers
+export const stepsMinutes = (steps: StepsBand | undefined, factor: number) => {
+  const s = STEPS.find((x) => x.id === steps);
+  return s ? Math.max(0, s.mid - stepsCovered(factor)) / 100 : 0;
+};
 export type Week = Record<DayType, number>;
 export type OwnDay = { kcal?: number; protein?: number; fats?: number; carbs?: number };
 export type Personal = {
   sex?: Sex; birthYear?: number; heightCm?: number; weightKg?: number; bodyFatPct?: number; pdUnit?: "pd" | "pct";
   life?: Life; week?: Week; easyMin?: number; hardMin?: number;
+  // from 7 October 2026: steps on a usual day, for every day, training or not (canvas board T1)
+  steps?: StepsBand;
   // Target analysis answers: a finding kept on purpose, with the value it was kept at, so a changed number asks again
   kept?: Record<string, { at: string; sig: string }>;
   dayMode?: DayMode | "follow"; ownDays?: Partial<Record<DayType, OwnDay>>;
@@ -35,11 +51,13 @@ export const LIFE: { id: Life; name: string; hint: string; factor: number }[] = 
 // The four loads a day can have. The Weekly plan says what each day holds; its load decides which row of own numbers applies.
 // The METs and minutes here are only for someone with no Weekly plan yet: a walk about 3.5, most training about 5, hard about 8.
 export const DAY_TYPES: { id: DayType; name: string; hint: string; met: number; minutes: (p: Personal) => number }[] = [
-  { id: "passive", name: "Rest",     hint: "no activity",                 met: 1,   minutes: () => 0 },
-  { id: "active",  name: "Light",    hint: "walk, yoga, mobility",        met: 3.5, minutes: () => 45 },
-  { id: "easy",    name: "Moderate", hint: "most training",               met: 5,   minutes: (p) => p.easyMin ?? 60 },
-  { id: "hard",    name: "Hard",     hint: "you couldn't talk through it", met: 8,   minutes: (p) => p.hardMin ?? 75 },
+  { id: "passive", name: "Rest",     hint: "no training",                     met: 1,   minutes: () => 0 },
+  { id: "active",  name: "Light",    hint: "Zone 1 · yoga, mobility",         met: 3.5, minutes: (p) => lenOf(p, "easy") ?? START_MIN.easy },
+  { id: "easy",    name: "Moderate", hint: "Zone 2–3 · most training",        met: 5,   minutes: (p) => lenOf(p, "moderate") ?? lengthOf(p.easyMin ?? START_MIN.moderate).mid },
+  { id: "hard",    name: "Hard",     hint: "Zone 4–5 · you couldn't talk",    met: 8,   minutes: (p) => lenOf(p, "hard") ?? lengthOf(p.hardMin ?? START_MIN.hard).mid },
 ];
+// the usual length of a kind of training, from the Weekly plan
+const lenOf = (p: Personal, level: "easy" | "moderate" | "hard") => { const pl = planOf(p); return pl ? levelMinutes(pl, level) : null; };
 export const dayModeOf = (p: Personal): DayMode => (p.dayMode === "each" || p.dayMode === "follow" ? "each" : "same");
 // an old profile: its one activity is split into a life and a week the first time it is read
 const OLD_WEEK: Record<Activity, Week> = {
@@ -47,7 +65,20 @@ const OLD_WEEK: Record<Activity, Week> = {
   moderate: { passive: 2, active: 1, easy: 2, hard: 2 }, very: { passive: 1, active: 1, easy: 3, hard: 2 }, athlete: { passive: 0, active: 1, easy: 3, hard: 3 },
 };
 export const lifeOf = (p: Personal): Life => p.life ?? "desk";
-const oldWeekOf = (p: Personal): Week => p.week ?? OLD_WEEK[p.activity ?? "moderate"] ?? OLD_WEEK.moderate;
+// Your work, as the numbers read it: from the Lifestyle. Picking it in the goal setup or the profile writes the Lifestyle too.
+export const workOf = (p: Personal): Life => {
+  const l = lifestyleOf(p);
+  return l.move === "feet" ? "feet" : l.move === "physical" ? "physical" : l.hours === "shifts" ? "shift" : "desk";
+};
+export function withWork(p: Personal, life: Life): Personal {
+  const l = lifestyleOf(p);
+  const move = life === "feet" ? "feet" : life === "physical" ? "physical" : "sitting";
+  const hours = life === "shift" ? "shifts" : l.hours === "shifts" || !l.hours ? "fixed" : l.hours;
+  return { ...p, life, lifestyle: { ...l, move, hours } };
+}
+// someone new has no training until they say (7 October 2026); before, a new week started as moderate
+const NO_TRAINING: Week = { passive: 7, active: 0, easy: 0, hard: 0 };
+const oldWeekOf = (p: Personal): Week => p.week ?? (p.activity ? OLD_WEEK[p.activity] ?? OLD_WEEK.moderate : NO_TRAINING);
 // The Weekly plan: the one set on the Weekly plan page; else, for someone who had the old My week, a starting plan from it;
 // else none yet, and Today asks what kind of day it is.
 export const hasPlan = (p: Personal) => isPlan(p.plan) || !!p.week || !!p.activity;
@@ -130,6 +161,7 @@ export function macroSplit(kcal: number, protein: number, fatsFixed?: number | n
 export type DayNumbers = { kcal: number; protein: number; fats: number; carbs: number; how: string[] };
 export type Calc = { kcal: number; protein: number; fats: number; carbs: number; proteinMin: number; proteinMax: number; proteinLo: number; proteinHi: number; proteinPerKg: number; proteinWhy: string[]; perMeal: number; trains: boolean; note: string; method: string; math: string; bmr: number; tdee: number; days: Record<DayType, DayNumbers>; week: Week; weekdays: ({ name: string; day: PlanDay } & DayNumbers)[] | null; numbersOf: (d: PlanDay) => DayNumbers };
 const r50 = (x: number) => Math.round(x / 50) * 50;
+const stepsLine = (kcal: number, min: number) => `+ ${Math.round(kcal)} for your steps, about ${Math.round(min)} min of walking above what your day covers (3.5 METs)`;
 export function calculate(p: Personal, bandId: string, pinned?: Formula | null): Calc | null {
   if (!canCalculate(p)) return null;
   const age = ageOf(p)!;
@@ -177,11 +209,13 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   for (const d of DAY_TYPES) {
     const min = d.minutes(p);
     const extra = d.met > 1 ? (d.met - 1) * w * (min / 60) : 0;
-    kcalOf[d.id] = r50((base + extra) * (1 + adj));
+    const walkMin = stepsMinutes(p.steps, life.factor), walk = (3.5 - 1) * w * (walkMin / 60);
+    kcalOf[d.id] = r50((base + walk + extra) * (1 + adj));
     how[d.id] = [
       `${Math.round(bmr).toLocaleString("en")} at rest (${f === "katch" ? "Katch–McArdle, from lean mass" : "Mifflin–St Jeor: sex, age, height, weight"})`,
       `× ${life.factor} for ${life.name} = ${Math.round(base).toLocaleString("en")}`,
-      extra ? `+ ${Math.round(extra)} for ${min} min ${d.id === "active" ? "walking or mobility" : d.id === "easy" ? "easy training" : "hard training"} (${d.met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest)` : "+ 0, no training",
+      ...(walk ? [stepsLine(walk, walkMin)] : []),
+      extra ? `+ ${Math.round(extra)} for ${min} min ${d.id === "active" ? "light training" : d.id === "easy" ? "moderate training" : "hard training"} (${d.met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest)` : "+ 0, no training",
       `${pct === 0 ? "± 0" : pct > 0 ? `+ ${pct}` : `− ${Math.abs(pct)}`} % for ${goalName}`,
       `= ${kcalOf[d.id].toLocaleString("en")} kcal`,
     ];
@@ -194,20 +228,23 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   const dayKcalHow = (d: PlanDay): { kcal: number; how: string[] } => {
     const kind = dayKindOf(d, ls, minor);
     const fac = kind === "work" ? baseFactor(ls, true) : MOVES[0].factor, b = bmr * fac;
-    const min = minutesOf(d), met = metOf(d);
+    // a length saved before 7 October 2026 counts as the middle of its range (adults; the under-18 paths keep theirs)
+    const min = minor || d.kind === "rest" ? minutesOf(d) : lengthOf(minutesOf(d)).mid, met = metOf(d);
     const extra = met > 1 ? part(met, min) : 0;
+    const walkMin = stepsMinutes(p.steps, fac), walk = part(3.5, walkMin);
     // a study day (a school day under 18) can also hold sport in class and the way there and back
     const pe = kind === "study" && d.pe ? part(PE.met, PE.minutes) : 0;
     const way = kind === "study" ? COMMUTE[ls.commute ?? ""] : undefined;
     const commute = way ? part(way.met, way.minutes) : 0;
-    const kcal = r50((b + extra + pe + commute) * (1 + adj));
+    const kcal = r50((b + walk + extra + pe + commute) * (1 + adj));
     const what = d.kind === "club" || d.kind === "match" ? planShort({ ...d, pe: false, when: undefined }).toLowerCase() : planLine({ ...d, pe: false }).toLowerCase().replace(/, (in|during|late|right).*$/, "");
     return { kcal, how: [
       restLine,
       `× ${fac} for ${minor ? (d.work ? "a school day, mostly sitting" : "a day without school") : kind === "work" ? `${move.name.toLowerCase()} at work` : kind === "study" ? "a study day, mostly sitting" : wk === "home" ? "a day at home" : "a day off"} = ${Math.round(b).toLocaleString("en")}`,
+      ...(walk ? [stepsLine(walk, walkMin)] : []),
       ...(commute ? [`+ ${Math.round(commute)} for ${way!.name} (${way!.met} METs, ${way!.minutes} min)`] : []),
       ...(pe ? [`+ ${Math.round(pe)} for ${minor ? "sport at school" : "sport in class"} (${PE.met} METs, ${PE.minutes} min)`] : []),
-      extra ? `+ ${Math.round(extra)} for ${min} min ${what} (${met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest; Compendium 2024)` : pe || commute ? (minor ? "+ 0 after school" : "+ 0 after classes") : "+ 0, no activity",
+      extra ? `+ ${Math.round(extra)} for ${min} min ${what} (${met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest; Compendium 2024)` : pe || commute ? (minor ? "+ 0 after school" : "+ 0 after classes") : "+ 0, no training",
       pctLine,
       `= ${kcal.toLocaleString("en")} kcal`,
     ] };

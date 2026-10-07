@@ -6,7 +6,7 @@ import { exportLog, clearLog, readLog, log } from "../log";
 import { BANDS, bandOf, SOURCE_LABEL, type GoalEntry } from "../goal";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
-import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, planOf, lifestyleOf, ageOf, isMinor, dayFor, type Personal, type DayType } from "../personal";
+import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, type Personal, type DayType } from "../personal";
 import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, type Plan, type PlanDay, type Lifestyle } from "../plan";
 import { DayEditor } from "../components/DayEditor";
 import { ProteinCard } from "../components/ProteinCard";
@@ -141,7 +141,7 @@ function ProfilePanel(p: AppApi) {
         <div className="field"><span>Your life, without training</span>
           <div className="activity-list">
             {LIFE.map((l) => (
-              <button key={l.id} className={`activity ${lifeOf(d) === l.id ? "on" : ""}`} onClick={() => setD({ ...d, life: l.id })}>
+              <button key={l.id} className={`activity ${workOf(d) === l.id ? "on" : ""}`} onClick={() => setD(withWork(d, l.id))}>
                 <b>{l.name}</b><small>{l.hint}</small>
               </button>
             ))}
@@ -290,8 +290,8 @@ function GoalPanel(p: AppApi) {
       <p className="label">How your numbers work</p>
       <section className="card explain">
         <p><b>At rest.</b> What your body burns doing nothing: Mifflin–St Jeor from sex, age, height and weight, or Katch–McArdle from your lean mass when you know your body fat.</p>
-        <p><b>Your life.</b> That times how your day goes without training: 1.3 at a desk, 1.4 on shifts, 1.55 on your feet, 1.75 in physical work.</p>
-        <p><b>Your training.</b> Each day adds what its training costs: a walk 3.5 METs, an easy session 5, a hard one 8, times your weight and the minutes, less what you burn at rest anyway.</p>
+        <p><b>Your everyday.</b> That times how your work goes: 1.3 sitting, 1.55 on your feet, 1.75 in physical work. Then your steps, on every day: only what's above what your work already covers, about 10 minutes of walking per 1,000 steps at 3.5 METs.</p>
+        <p><b>Your training.</b> Each training day adds what it costs: light about 3.5 METs, moderate 5, hard 8, or the activity's own value from your Weekly plan, times your weight and the minutes (the middle of the range), less what you burn at rest anyway.</p>
         <p><b>Your goal.</b> Minus 20 % to lose fat, minus 10 % for recomposition, plus 10 % to build muscle, plus 5 % for performance.</p>
         <p><b>Protein.</b> 1.6 to 2.2 g per kg if you train twice a week or more, else 1.2 to 1.6. The same every day; the energy moves with the training.</p>
         <small>Sources: Mifflin et al. 1990; Katch and McArdle; FAO/WHO/UNU 2004 activity levels; Compendium of Physical Activities 2024; US Dietary Guidelines 2025–2030; ISSN position stand 2017; Morton et al. 2018.</small>
@@ -418,7 +418,8 @@ function LifestylePanel(p: AppApi) {
 
 // Weekly plan, as approved on 6 October 2026: the usual week as an agenda, then the picked day's settings.
 function PlanPanel(p: AppApi) {
-  const plan = planOf(p.personal) ?? planFromCounts({ passive: 2, active: 2, easy: 2, hard: 1 });
+  // no plan yet: a week without training, as in Calculate for me (7 October 2026)
+  const plan = planOf(p.personal) ?? planFromCounts({ passive: 7, active: 0, easy: 0, hard: 0 });
   const minor = isMinor(p.personal);
   const [tab, setTab] = useState<"date" | "usual">("date");
   const [offset, setOffset] = useState(0);

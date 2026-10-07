@@ -48,8 +48,9 @@ test("each day its own: life once, training per day, the average over the week",
   assert.equal(c.days.easy.kcal, 2800);      // + 60 minutes at 5 METs
   assert.equal(c.days.hard.kcal, 3250);      // + 75 minutes at 8 METs
   // from 6 October 2026 the average comes from the Weekly plan; old counts become a starting plan (strength for the
-  // training days, a walk for the active one), so the average moves a little from 2,800
-  assert.equal(c.kcal, 2750, "the week's average, from the starting plan");
+  // training days, a walk for the active one), so the average moves a little from 2,800; since 7 October 2026 the light day
+  // is mobility for 40 minutes and moderate counts 55 minutes (the middle of 45–60), so 2,700
+  assert.equal(c.kcal, 2700, "the week's average, from the starting plan");
   assert.equal(c.protein, 180, "1.6 to 2.2 g per kg because he trains");
   assert.ok(c.days.hard.carbs > c.days.passive.carbs && c.days.hard.fats === c.days.passive.fats && c.days.hard.protein === c.days.passive.protein, "carbs carry the difference");
   assert.ok(c.days.hard.how.some((l) => /8 METs/.test(l)) && /Mifflin/.test(c.days.hard.how[0]), "each day says how");

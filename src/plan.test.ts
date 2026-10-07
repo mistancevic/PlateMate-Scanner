@@ -17,12 +17,13 @@ const me: any = { sex: "male", birthYear: 1981, heightCm: 182, weightKg: 95, lif
 
 test("each day of the plan: resting burn x the work baseline, plus its activity at its intensity", () => {
   const c = calculate(me, "maintain")!;
-  assert.deepEqual(c.weekdays!.map((d) => d.kcal), [2900, 2450, 2850, 2500, 2800, 2650, 2450]);
+  // since 7 October 2026 a saved length counts as the middle of its range: 60 min as 55 (45–60), 45 as 40 (30–45)
+  assert.deepEqual(c.weekdays!.map((d) => d.kcal), [2850, 2450, 2800, 2500, 2800, 2650, 2450]);
   assert.equal(c.kcal, 2650, "the week's average is the mean of the seven days");
   assert.equal(c.protein, 180, "two or more moderate or hard days: 1.6 to 2.2 g per kg, middle 1.9 x 95");
   assert.equal(c.fats, Math.round((2650 * 0.3) / 9));
-  assert.equal(c.weekdays![0].carbs, Math.round((2900 - 180 * 4 - c.fats * 9) / 4));
-  assert.ok(c.weekdays![0].how.some((l) => /6 METs × 95 kg × 1 h/.test(l)), c.weekdays![0].how.join(" | "));
+  assert.equal(c.weekdays![0].carbs, Math.round((2850 - 180 * 4 - c.fats * 9) / 4));
+  assert.ok(c.weekdays![0].how.some((l) => /55 min strength, hard \(6 METs × 95 kg × 0.92 h/.test(l)), c.weekdays![0].how.join(" | "));
 });
 
 test("load: rest, light, moderate, hard; counts follow the plan", () => {
@@ -100,4 +101,40 @@ test("study only: a weekday is a study day; sport in class adds 45 minutes at 4 
   assert.ok(calculate(h, "maintain")!.numbersOf({ work: true, kind: "rest" }).how.some((x) => /× 1.3 for a day at home/.test(x)));
   assert.equal(weekdaysOf({ hours: "none" }), "home", "No fixed work from before Release B is At home");
   assert.equal(weekdaysOf({ hours: "fixed" }), "work");
+});
+
+// Calculate for me, 7 October 2026 (canvas boards T1 and T3): your everyday, then your training.
+test("training week: + turns a day without training into one, − turns the last back; + stops at 7; lengths are ranges", async () => {
+  const { withTraining, withLength, trainingCounts, levelMinutes, lengthOf, planFromCounts } = await import("./plan");
+  let pl = planFromCounts({ passive: 7, active: 0, easy: 0, hard: 0 });
+  assert.deepEqual(trainingCounts(pl), { easy: 0, moderate: 0, hard: 0 }, "a new week has no training");
+  pl = withTraining(pl, "hard", 1); pl = withTraining(pl, "moderate", 1); pl = withTraining(pl, "easy", 1);
+  assert.deepEqual(trainingCounts(pl), { easy: 1, moderate: 1, hard: 1 });
+  assert.equal(levelMinutes(pl, "easy"), 40, "Light starts at 30–45"); assert.equal(levelMinutes(pl, "moderate"), 55, "Moderate at 45–60"); assert.equal(levelMinutes(pl, "hard"), 75, "Hard at 60–90");
+  for (let i = 0; i < 6; i++) pl = withTraining(pl, "hard", 1);
+  assert.equal(pl.filter((d) => d.kind !== "rest").length, 7, "+ stops at 7 training days");
+  pl = withTraining(pl, "hard", -1);
+  assert.equal(pl.filter((d) => d.kind === "rest").length, 1, "a − gives a day back");
+  assert.ok(pl.every((d, i) => d.work === i < 5), "the days keep their work days");
+  pl = withLength(pl, "hard", 25);
+  assert.ok(pl.filter((d) => d.intensity === "hard").every((d) => d.minutes === 25), "a length sets every day of that kind");
+  assert.deepEqual([30, 45, 60, 75, 90, 120].map((m) => lengthOf(m).id), ["15-30", "30-45", "45-60", "60-90", "60-90", "90+"], "a saved length falls in the range it ends in");
+});
+test("steps count on every day, above what the work covers: 8,000–12,000 at 96 kg sitting adds about 200 kcal", async () => {
+  const { calculate } = await import("./personal");
+  const plan: any = Array.from({ length: 7 }, (_, i) => ({ work: i < 5, kind: "rest" }));
+  const me: any = { sex: "male", birthYear: 1981, heightCm: 182, weightKg: 96, lifestyle: { hours: "fixed", move: "sitting" }, plan };
+  const none = calculate(me, "maintain")!, walk = calculate({ ...me, steps: "8to12" }, "maintain")!;
+  const diff = walk.weekdays![0].kcal - none.weekdays![0].kcal;
+  assert.ok(diff >= 150 && diff <= 250, `rest days count the steps too: ${diff}`);
+  assert.ok(walk.weekdays![0].how.some((l) => /for your steps, about 50 min of walking/.test(l)), walk.weekdays![0].how.join(" | "));
+  const feet = calculate({ ...me, steps: "8to12", lifestyle: { hours: "fixed", move: "feet" } }, "maintain")!;
+  assert.ok(!feet.weekdays![0].how.some((l) => /for your steps/.test(l)), "on your feet, 10,000 steps are already covered on a work day");
+});
+test("your work in the goal setup writes the Lifestyle the numbers read", async () => {
+  const { withWork, workOf } = await import("./personal");
+  const p: any = { lifestyle: { weekdays: "work", hours: "flexible", move: "sitting" } };
+  const q = withWork(p, "feet");
+  assert.equal(workOf(q), "feet"); assert.equal(q.lifestyle!.move, "feet"); assert.equal(q.lifestyle!.hours, "flexible", "hours stay");
+  assert.equal(workOf(withWork(q, "shift")), "shift");
 });

@@ -112,7 +112,7 @@ function PhoneToday() {
   );
 }
 function PhoneWeek() {
-  const rows: [string, string, string][] = [["Mon", "Strength, hard · evening", "var(--top)"], ["Tue", "Rest", "#c9d3e6"], ["Wed", "Cardio, moderate · morning", "var(--high)"], ["Thu", "Yoga, easy · evening", "var(--mid)"], ["Fri", "Strength, moderate · morning", "var(--high)"], ["Sat", "Walk, easy · during the day", "var(--mid)"], ["Sun", "Rest", "#c9d3e6"]];
+  const rows: [string, string, string][] = [["Mon", "Strength, hard · evening", "var(--top)"], ["Tue", "Rest", "#c9d3e6"], ["Wed", "Cardio, moderate · morning", "var(--high)"], ["Thu", "Yoga, light · evening", "var(--mid)"], ["Fri", "Strength, moderate · morning", "var(--high)"], ["Sat", "Mobility, light · during the day", "var(--mid)"], ["Sun", "Rest", "#c9d3e6"]];
   return (
     <div className="l-phone-draw" aria-label="Drawing of the Weekly plan">
       <b className="l-ph-title">Weekly plan</b>
