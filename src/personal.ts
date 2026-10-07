@@ -31,6 +31,8 @@ export type Personal = {
   steps?: StepsBand;
   // how long the person has trained regularly; sets the starting pace of Build muscle and what weight trend to expect
   trainingAge?: TrainingAge;
+  // from 7 October 2026: weigh-ins, one per date (canvas boards W0 to W2)
+  weighIns?: import("./weight").WeighIn[];
   // Target analysis answers: a finding kept on purpose, with the value it was kept at, so a changed number asks again
   kept?: Record<string, { at: string; sig: string }>;
   dayMode?: DayMode | "follow"; ownDays?: Partial<Record<DayType, OwnDay>>;

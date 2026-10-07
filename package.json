@@ -1,7 +1,7 @@
 {
   "name": "platemate-mealan-pilot",
   "private": true,
-  "version": "0.1.74",
+  "version": "0.1.75",
   "type": "module",
   "scripts": {
     "dev": "node --import tsx server.ts",
@@ -12,7 +12,7 @@
     "test": "node --import tsx --test src/*.test.ts",
     "test:ui": "npm run build && node scripts/ui-smoke.cjs",
     "qa:paths": "npm run build && node tests/flows/paths.cjs",
-    "test:flows": "npm run build && node tests/flows/meal-from-empty-plate.cjs && node tests/flows/chat-then-craving.cjs && node tests/flows/dont-have-it.cjs && node tests/flows/evals-page.cjs && node tests/flows/camera-group.cjs && node tests/flows/camera-auto.cjs && node tests/flows/food-gallery.cjs && node tests/flows/duplicates-merge.cjs && node tests/flows/duplicates-review.cjs && node tests/flows/label-table.cjs && node tests/flows/label-table.cjs && node tests/flows/quick-picks.cjs && node tests/flows/today.cjs && node tests/flows/week-and-school.cjs && node tests/flows/mix-tip.cjs && node tests/flows/camera-every-mode.cjs && node tests/flows/age-gate.cjs && node tests/flows/photo-store.cjs && node tests/flows/first-goal.cjs && node tests/flows/safety.cjs && node tests/flows/find-then-add.cjs && node tests/flows/target-analysis.cjs && node tests/flows/training-week.cjs && node tests/flows/goal-pace.cjs",
+    "test:flows": "npm run build && node tests/flows/meal-from-empty-plate.cjs && node tests/flows/chat-then-craving.cjs && node tests/flows/dont-have-it.cjs && node tests/flows/evals-page.cjs && node tests/flows/camera-group.cjs && node tests/flows/camera-auto.cjs && node tests/flows/food-gallery.cjs && node tests/flows/duplicates-merge.cjs && node tests/flows/duplicates-review.cjs && node tests/flows/label-table.cjs && node tests/flows/label-table.cjs && node tests/flows/quick-picks.cjs && node tests/flows/today.cjs && node tests/flows/week-and-school.cjs && node tests/flows/mix-tip.cjs && node tests/flows/camera-every-mode.cjs && node tests/flows/age-gate.cjs && node tests/flows/photo-store.cjs && node tests/flows/first-goal.cjs && node tests/flows/safety.cjs && node tests/flows/find-then-add.cjs && node tests/flows/target-analysis.cjs && node tests/flows/training-week.cjs && node tests/flows/goal-pace.cjs && node tests/flows/weigh-ins.cjs",
     "eval:code": "node --import tsx evals/run-code.ts",
     "eval:model": "node --import tsx evals/run-model.ts",
     "eval:align": "node --import tsx evals/align.ts",

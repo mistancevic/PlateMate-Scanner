@@ -9,6 +9,7 @@ import { uid } from "../pilot";
 import { BANDS, PACES, bandOf, goalLabel, goalsForBand, isBuild } from "../goal";
 import { sheetOf } from "../goalGuide";
 import { GoalSheet } from "../components/GoalSheet";
+import { WeightTrend } from "../components/Weight";
 import { fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { density } from "../pilot";
 import { MOMENTS } from "../moments";
@@ -140,6 +141,7 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirm
           </>
         )}
         {(() => { const sh = sheetOf(row.goal, { weightKg: row.weightKg, trainingAge: row.trainingAge, coachLabel: "you", ...(row.review?.status === "approved" ? { approvedBy: "you", approvedAt: row.review.at } : {}) }); return sh ? <GoalSheet sheet={sh} /> : null; })()}
+        {row.goal?.band && !row.flags.some((f) => f.situation === "eating") && <WeightTrend list={row.weighIns} band={row.goal.band} weightKg={row.weightKg} trainingAge={row.trainingAge} coach />}
         <GoalHistory log={row.goalLog ?? []} />
         <p className="label">The last days, from shared cards</p>
         <section className="card days">

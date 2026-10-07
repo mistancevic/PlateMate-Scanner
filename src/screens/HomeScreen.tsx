@@ -4,6 +4,8 @@ import { aggregate, density } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
 import { bandOf, goalLabel } from "../goal";
+import { WeighInLine } from "../components/Weight";
+import { weighInsOff } from "../weight";
 import { DAY_TYPES, dayModeOf, dayNameAny, hasPlan, isMinor, lifestyleOf } from "../personal";
 import { planLine, schoolLine, studyLine, loadOf, LOAD_DAY, weekdaysOf, dayKindOf, type PlanDay } from "../plan";
 import { DayEditor } from "../components/DayEditor";
@@ -99,6 +101,8 @@ export function HomeScreen(p: AppApi) {
             <small>Every day the same, one set of numbers. <button className="link" onClick={() => p.openMenu("goal")}>Change in Goal ›</button></small>
           </div>
         )}
+        {/* weigh-ins (canvas board W1): with consent for body data, never for someone who declared an eating situation */}
+        {p.safety.consentBodyAt && !weighInsOff(p.safety) && <WeighInLine list={p.personal.weighIns} onSave={(w) => p.setPersonal({ ...p.personal, weighIns: w })} notify={p.notify} />}
       </section>
       {p.profile.role === "coach" && p.newShared > 0 && (
         <button className="strip strip-button" onClick={() => setTab("clients")}>{p.newShared} new {p.newShared === 1 ? "card" : "cards"} shared with you. Open Clients.</button>

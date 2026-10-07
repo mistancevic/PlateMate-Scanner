@@ -6,6 +6,8 @@ import { exportLog, clearLog, readLog, log } from "../log";
 import { BANDS, bandOf, goalLabel, SOURCE_LABEL, type GoalEntry } from "../goal";
 import { sheetOf, guideOf } from "../goalGuide";
 import { GoalSheet, GoalGuide } from "../components/GoalSheet";
+import { WeightTrend } from "../components/Weight";
+import { weighInsOff, withoutWeighIn } from "../weight";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
 import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, type Personal, type DayType } from "../personal";
@@ -114,7 +116,7 @@ function ProfilePanel(p: AppApi) {
       {!consented && (
         <section className="card consent" aria-label="Before your numbers">
           <b>Before your numbers</b>
-          <p className="small">To calculate your day, Mealan asks about your body: sex, birth year, height, weight, body fat if you know it. Here is what happens with it.</p>
+          <p className="small">To calculate your day, Mealan asks about your body: sex, birth year, height, weight, body fat if you know it, and later the weigh-ins you add. Here is what happens with it.</p>
           <ul className="small">
             <li><b>Kept:</b> only those values, and the numbers they give.</li>
             <li><b>Where:</b> on this phone, and in your account in Frankfurt, EU. Nowhere else; never sold, never shared beyond your coach.</li>
@@ -260,6 +262,11 @@ function GoalPanel(p: AppApi) {
         ) : null}
       </section>
       {sheet && <GoalSheet sheet={sheet} />}
+      {band && p.safety.consentBodyAt && !weighInsOff(p.safety) && (
+        <WeightTrend list={p.personal.weighIns} band={band.id} weightKg={p.personal.weightKg} trainingAge={p.personal.trainingAge}
+          onUpdateWeight={(kg) => { p.setPersonal({ ...p.personal, weightKg: kg }); p.notify(`Your numbers now use ${kg} kg.`); }}
+          onRemove={(date) => p.setPersonal({ ...p.personal, weighIns: withoutWeighIn(p.personal.weighIns, date) })} />
+      )}
       {band && guideOf(band.id) && (
         <>
           <button className="link about-goal" aria-expanded={about} onClick={() => setAbout((v) => !v)}>{about ? "Close About your goal" : "About your goal ›"}</button>
