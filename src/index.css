@@ -978,3 +978,24 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .publish-checks .ok { color: #13916a; } .publish-checks .plain { color: var(--muted); } .publish-checks .no { color: #b3261e; }
 .publish-done { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 14px; background: var(--tint); margin-bottom: 8px; } .publish-link { font-weight: 900; color: var(--brand-text); word-break: break-all; }
 .setting-block { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+/* Recipes, 0.1.91 (boards RG1 to RG4, RF4): the member's count, a goal just next to the range, taken down, the preview */
+.rp-goal.near { color: #3d4a63; }
+.rp-step { display: inline-flex; align-items: center; gap: 10px; }
+.rp-step b { min-width: 74px; text-align: center; }
+.rp-step button { width: 34px; height: 34px; border-radius: 17px; border: 1.5px solid #c8d8f5; background: #fff; color: var(--brand); font-size: 19px; font-weight: 900; display: inline-flex; align-items: center; justify-content: center; padding: 0; }
+.rp-step button:disabled { color: #c3cde0; }
+.rp-down { background: var(--tint); }
+.rp-down .rp-title { font-size: 24px; margin: 0; }
+.rp-preview { position: fixed; inset: 0; z-index: 80; overflow-y: auto; background: var(--base); }
+.rp-preview-bar { position: sticky; top: 0; z-index: 2; background: #fff4e0; border-bottom: 1.5px solid #f2c27a; padding: calc(10px + env(safe-area-inset-top, 0px)) 16px 10px; display: flex; flex-direction: column; gap: 8px; }
+.rp-preview-bar b { color: #8a4b00; font-size: 14px; }
+.rp-preview-bar .ways { display: flex; gap: 10px; } .rp-preview-bar .ways > * { flex: 1; }
+.pub-state { display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 12px; font-size: 12px; font-weight: 900; white-space: nowrap; border: 1.5px solid; }
+.pub-state.draft { background: #eef1f6; color: #5b6b8a; border-color: #d1dcf0; }
+.pub-state.live { background: #e6f4ec; color: #1b6b3f; border-color: #9fd3b4; }
+.pub-state.down { background: #fdecea; color: #a33a2b; border-color: #f2b8ae; }
+.pub-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.recipe-pub { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 6px; }
+.publish-ways { display: flex; gap: 10px; flex-wrap: nowrap; margin: 0; } .publish-ways > .pill { flex: 1; justify-content: center; }
+.rp-preview-bar .ways { margin: 0; flex-wrap: nowrap; } .rp-preview-bar .pill { justify-content: center; }
+.recipe-steps { margin-top: 6px; font-size: 14px; } .recipe-steps summary { color: var(--brand-text); font-weight: 800; cursor: pointer; } .recipe-steps ol { margin: 6px 0 0; padding-left: 20px; line-height: 1.45; }

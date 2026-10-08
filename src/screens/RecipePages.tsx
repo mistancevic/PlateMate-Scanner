@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { BANDS } from "../goal";
 import type { Food, Meal } from "../pilot";
 import type { Mix, MixTip } from "../mixtip";
-import type { PublicRecipe } from "../recipes";
+import { bylineOf, fitsTicked, g1, type PublicRecipe } from "../recipes";
 import { Mark, APP_NAME } from "../components/Mark";
 
-// The recipe pages of chefmealan.com (canvas boards R1, R2 and R6, approved 7 October 2026): open to everyone, no sign-in.
+// The recipe pages of chefmealan.com (canvas boards R1, R2 and R6, approved 7 October 2026; RG2, RG4 and RF4, 8 October): open to everyone, no sign-in.
 // A signed-in member also sees their own amounts, and can put the recipe on their plate or keep it in their recipes.
 export type MemberTools = {
   mixFor: (f: Food) => MixTip;
@@ -38,7 +38,7 @@ function PdScale({ pd }: { pd: number }) {
     <div className="rp-scale">
       <div className="rp-bar"><span style={{ left: `${Math.min(10, pd) * 10}%` }} /></div>
       <div className="rp-ticks">{[0, 2, 4, 6, 8, 10].map((v) => <span key={v} style={{ left: `${v * 10}%` }}>{v}</span>)}</div>
-      {order.map((b) => { const how = fits.get(b.name); return <div key={b.id} className={`rp-goal ${how ? "on" : ""}`}><span>{how ? "✓ " : ""}{b.name}</span><span>{how ? `${how} · ` : ""}{b.range}</span></div>; })}
+      {order.map((b) => { const how = fits.get(b.name); return <div key={b.id} className={`rp-goal ${how === "fits" ? "on" : how ? "near" : ""}`}><span>{how === "fits" ? "✓ " : ""}{b.name}</span><span>{how ? `${how} · ` : ""}{b.range}</span></div>; })}
     </div>
   );
 }
@@ -50,41 +50,41 @@ function asFood(r: PublicRecipe): Food {
     serving: { grams: Math.round(r.per100.grams / r.makes), name: r.servingName } } as Food;
 }
 
+// Your amounts (RF4 Q5, 8 October 2026): Mealan suggests how many; the member changes it with − and +, and the plate's
+// numbers follow. With a mix, only the recipe's count changes; what Mealan added stays.
 function Amounts({ r, m }: { r: PublicRecipe; m: MemberTools }) {
   const food = asFood(r);
   const tip = m.mixFor(food);
   const mix = tip.mixes[0];
   const per = r.per100.grams / r.makes;
   const count = (g: number) => Math.max(1, Math.round(g / per));
+  const mine = mix?.items.find((i) => i.food.id === food.id);
+  const suggested = mine ? count(mine.grams) : m.mealKcal ? Math.min(r.makes, Math.max(1, Math.round(m.mealKcal / Math.max(1, r.perServing.kcal)))) : 1;
+  const [n, setN] = useState(suggested);
+  const items = mix ? mix.items.map((i) => (i.food.id === food.id ? { ...i, grams: Math.round(n * per) } : i)) : [{ id: "r", grams: Math.round(n * per), locked: false, food }];
+  const sum = (k: "calories" | "protein") => items.reduce((t, i) => t + ((i.food[k] ?? 0) * i.grams) / 100, 0);
+  const kcal = Math.round(sum("calories")), protein = sum("protein"), pd = kcal > 0 ? (100 * protein) / kcal : 0;
+  const stepper = (
+    <span className="rp-step">
+      <button aria-label={`One ${r.servingName} less`} disabled={n <= 1} onClick={() => setN((x) => Math.max(1, x - 1))}>−</button>
+      <b>{n} {plural(n, r.servingName)}</b>
+      <button aria-label={`One ${r.servingName} more`} disabled={n >= r.makes} onClick={() => setN((x) => Math.min(r.makes, x + 1))}>+</button>
+    </span>
+  );
   return (
     <section className="rp-card rp-amounts">
       <div className="rp-card-head"><b>Your amounts</b><small>{m.goalName} · {m.momentName.toLowerCase()}</small></div>
-      {mix ? (
-        <>
-          {mix.items.map((i, k) => (
-            <div className="rp-row" key={k}><span>{i.food.id === food.id ? r.title : i.food.name}</span><b>{i.food.id === food.id ? `${count(i.grams)} ${plural(count(i.grams), r.servingName)}` : `${Math.round(i.grams)} g`}</b></div>
-          ))}
-          <div className="rp-row rp-total"><span>On your plate</span><b>{mix.kcal} kcal · {Math.round(mix.protein)} g protein · PD {mix.pd.toFixed(1)}</b></div>
-          <small className="muted">Mealan set the amounts for your {m.momentName.toLowerCase()} and added what fits your PD target. You can change any amount on the Plate.</small>
-          <button className="pill pill-wide pill-primary" onClick={() => m.takeMix(food, mix)}>Put on my plate</button>
-        </>
-      ) : (
-        (() => {
-          // it fits as it is: as many servings as this moment's energy allows, at least one, at most the whole recipe
-          const n = m.mealKcal ? Math.min(r.makes, Math.max(1, Math.round(m.mealKcal / Math.max(1, r.perServing.kcal)))) : 1;
-          return (
-            <>
-              <div className="rp-row"><span>{r.title}</span><b>{n} {plural(n, r.servingName)}</b></div>
-              <div className="rp-row rp-total"><span>On your plate</span><b>{n * r.perServing.kcal} kcal · {Math.round(n * r.perServing.protein)} g protein · PD {r.pd}</b></div>
-              <small className="muted">{tip.case === "fits" ? `It fits your PD target as it is, so nothing needs adding. ${m.mealKcal ? `${n} ${plural(n, r.servingName)} fill your ${m.momentName.toLowerCase()}.` : ""}` : tip.why}</small>
-              <button className="pill pill-wide pill-primary" onClick={() => m.putAlone(food, Math.round(n * per))}>Put on my plate</button>
-            </>
-          );
-        })()
-      )}
+      {items.map((i, k) => (
+        <div className="rp-row" key={k}><span>{i.food.id === food.id ? r.title : i.food.name}</span>{i.food.id === food.id ? stepper : <b>{Math.round(i.grams)} g</b>}</div>
+      ))}
+      <div className="rp-row rp-total"><span>On your plate</span><b>{kcal} kcal · {g1(protein)} protein · PD {pd.toFixed(1)}</b></div>
+      <small className="muted">{mix
+        ? `Mealan suggests ${suggested} ${plural(suggested, r.servingName)} for your ${m.momentName.toLowerCase()} and added what fits your PD target. Change the count with − and +.`
+        : tip.case === "fits" ? `It fits your PD target as it is, so nothing needs adding. Mealan suggests ${suggested} ${plural(suggested, r.servingName)} for your ${m.momentName.toLowerCase()}; change it with − and +.` : tip.why}</small>
+      <button className="pill pill-wide pill-primary" onClick={() => (mix ? m.takeMix(food, { ...mix, items, kcal, protein: Math.round(protein), pd }) : m.putAlone(food, Math.round(n * per)))}>Put on my plate</button>
       {r.items.every((i) => i.per100) && r.items.length > 0 && (
         <button className="link rp-center" onClick={() => m.addRecipe({
-          id: `pub-${r.slug}-${Date.now().toString(36)}`, title: r.title, portion: r.items.reduce((s, i) => s + i.grams, 0), savedAt: new Date().toISOString(),
+          id: `pub-${r.slug}-${Date.now().toString(36)}`, title: r.title, portion: r.items.reduce((s, i) => s + i.grams, 0), savedAt: new Date().toISOString(), steps: r.steps,
           items: r.items.map((i, k) => ({ id: `${r.slug}-${k}`, grams: i.grams, locked: false, food: { id: `pub-${r.slug}-${k}`, name: i.name, brand: "", basis: "100g", source: "Chef Mealan recipe", notes: "", reviewedAt: new Date().toISOString(), readyToEat: false, calories: i.per100!.kcal, protein: i.per100!.protein, fats: i.per100!.fat, carbs: i.per100!.carbs, fiber: i.per100!.fibre } as Food })),
         })}>Add to my recipes</button>
       )}
@@ -92,35 +92,30 @@ function Amounts({ r, m }: { r: PublicRecipe; m: MemberTools }) {
   );
 }
 
-export function RecipePage({ slug, member }: { slug: string; member: MemberTools | null }) {
-  const [r, setR] = useState<Loaded | null>(null);
-  const [err, setErr] = useState("");
-  useEffect(() => {
-    fetch(`/api/recipes/${encodeURIComponent(slug)}`).then(async (res) => { const d = await res.json().catch(() => ({})); if (!res.ok) throw new Error(d.error || "This recipe couldn't be opened."); setR(d.recipe); document.title = `${d.recipe.title} · ${APP_NAME}`; })
-      .catch((e) => setErr(e.message));
-  }, [slug]);
-  const right = member ? <a className="rp-link" href="/today">Open the app</a> : <a className="rp-link" href="/recipes">All recipes</a>;
-  if (err) return <div className="rp"><Top right={right} /><p className="rp-empty">{err} <a href="/recipes">All recipes</a></p><Foot /></div>;
-  if (!r) return <div className="rp"><Top right={right} /><p className="rp-empty">Opening the recipe…</p></div>;
+// The page itself, from a recipe in hand: the loaded page, or the preview from the Publish sheet (board RG2), where the photo
+// is the one chosen in the sheet and nothing is saved
+export function RecipeView({ r, member, photoSrc, top }: { r: Loaded; member: MemberTools | null; photoSrc?: string | null; top?: React.ReactNode }) {
   const s = r.perServing;
+  const ticked = fitsTicked(r);
+  const src = photoSrc !== undefined ? photoSrc : r.hasPhoto ? `/r/${r.slug}/photo.jpg` : null;
   return (
     <div className="rp">
-      <Top right={right} />
-      {r.hasPhoto && <figure className="rp-hero"><img src={`/r/${r.slug}/photo.jpg`} alt={r.title} />{r.rating === "daam" && <Daam />}</figure>}
+      {top ?? <Top right={member ? <a className="rp-link" href="/today">Open the app</a> : <a className="rp-link" href="/recipes">All recipes</a>} />}
+      {src && <figure className="rp-hero"><img src={src} alt={r.title} />{r.rating === "daam" && <Daam />}</figure>}
       <h1 className="rp-title">{r.title}</h1>
       {r.lines && <p className="rp-lines">{r.lines}</p>}
-      <small className="rp-meta">{[r.author, `${r.makes} ${plural(r.makes, r.servingName)}`, r.minutes ? `${r.minutes} minutes` : ""].filter(Boolean).join(" · ")}</small>
+      <small className="rp-meta">{[bylineOf(r.author), `${r.makes} ${plural(r.makes, r.servingName)}`, r.minutes ? `${r.minutes} minutes` : ""].filter(Boolean).join(" · ")}</small>
       <div className="rp-stats">
         <span><b>{s.kcal}</b><small>kcal</small></span>
-        <span><b>{Math.round(s.protein)} g</b><small>protein</small></span>
+        <span><b>{g1(s.protein)}</b><small>protein</small></span>
         <span className="wide"><b>PD {r.pd}</b><small>protein density</small></span>
       </div>
       <small className="rp-per">For one {r.servingName}</small>
-      {r.fits.length > 0 && (
+      {ticked.length > 0 && (
         <div className="rp-fits">
           <b>Fits best</b>
-          <div className="rp-chips">{r.fits.map((f) => <span key={f.name} className="rp-chip">✓ {f.name}</span>)}</div>
-          <small>PD {r.pd} sits in the range of {r.fits.length === 1 ? "this goal" : "these goals"}. Any goal can have it; the amount is what changes.</small>
+          <div className="rp-chips">{ticked.map((f) => <span key={f.name} className="rp-chip">✓ {f.name}</span>)}</div>
+          <small>PD {r.pd} sits in the range of {ticked.length === 1 ? "this goal" : "these goals"}. Any goal can have it; the amount is what changes.</small>
         </div>
       )}
       {member ? <Amounts r={r} m={member} /> : (
@@ -150,7 +145,7 @@ export function RecipePage({ slug, member }: { slug: string; member: MemberTools
       <section className="rp-card">
         <b>Nutrition</b>
         <div className="rp-row rp-th"><span /><small>ONE {r.servingName.toUpperCase()}</small><small>ALL {r.makes}</small></div>
-        {([["Energy", `${s.kcal} kcal`, `${r.all.kcal} kcal`], ["Protein", `${s.protein} g`, `${Math.round(r.all.protein)} g`], ["Carbs", `${s.carbs} g`, `${Math.round(r.all.carbs)} g`], ["Fat", `${s.fat} g`, `${Math.round(r.all.fat)} g`], ...(s.fibre !== null ? [["Fibre", `${s.fibre} g`, `${Math.round(r.all.fibre ?? 0)} g`]] : [])] as string[][]).map(([a, b, c]) => (
+        {([["Energy", `${s.kcal} kcal`, `${r.all.kcal} kcal`], ["Protein", g1(s.protein), g1(r.all.protein)], ["Carbs", `${s.carbs} g`, `${Math.round(r.all.carbs)} g`], ["Fat", `${s.fat} g`, `${Math.round(r.all.fat)} g`], ...(s.fibre !== null ? [["Fibre", `${s.fibre} g`, `${Math.round(r.all.fibre ?? 0)} g`]] : [])] as string[][]).map(([a, b, c]) => (
           <div className="rp-row rp-3" key={a}><span>{a}</span><b>{b}</b><small>{c}</small></div>
         ))}
         <small className="muted">Worked out from the labels of the foods used, weighed. {r.proteinShare} % of the energy is protein{r.proteinShare >= 20 ? "; the EU rule for calling food high protein is 20 %" : ""}.</small>
@@ -165,6 +160,40 @@ export function RecipePage({ slug, member }: { slug: string; member: MemberTools
   );
 }
 
+// A link to a recipe that was taken down (board RG4): it says so, and shows the recipes that are on Chef Mealan
+function TakenDown({ title, right }: { title: string; right: React.ReactNode }) {
+  const [list, setList] = useState<Loaded[]>([]);
+  useEffect(() => { document.title = `Taken down · ${APP_NAME}`; fetch("/api/recipes?limit=4").then((r) => r.json()).then((d) => setList(d.recipes ?? [])).catch(() => {}); }, []);
+  return (
+    <div className="rp">
+      <Top right={right} />
+      <section className="rp-card rp-down"><h1 className="rp-title">This recipe was taken down</h1><p>{title ? `${title} is no longer on ${APP_NAME}.` : `It is no longer on ${APP_NAME}.`}{list.length ? " These recipes are:" : ""}</p></section>
+      <div className="rp-grid">{list.map((r) => <RecipeCard key={r.slug} r={r} />)}</div>
+      <a className="pill pill-wide" href="/recipes">All recipes</a>
+      <Foot />
+    </div>
+  );
+}
+
+export function RecipePage({ slug, member }: { slug: string; member: MemberTools | null }) {
+  const [r, setR] = useState<Loaded | null>(null);
+  const [down, setDown] = useState<string | null>(null);
+  const [err, setErr] = useState("");
+  useEffect(() => {
+    fetch(`/api/recipes/${encodeURIComponent(slug)}`).then(async (res) => {
+      const d = await res.json().catch(() => ({}));
+      if (res.status === 410 && d.takenDown) { setDown(d.title || ""); return; }
+      if (!res.ok) throw new Error(d.error || "This recipe couldn't be opened.");
+      setR(d.recipe); document.title = `${d.recipe.title} · ${APP_NAME}`;
+    }).catch((e) => setErr(e.message));
+  }, [slug]);
+  const right = member ? <a className="rp-link" href="/today">Open the app</a> : <a className="rp-link" href="/recipes">All recipes</a>;
+  if (down !== null) return <TakenDown title={down} right={right} />;
+  if (err) return <div className="rp"><Top right={right} /><p className="rp-empty">{err} <a href="/recipes">All recipes</a></p><Foot /></div>;
+  if (!r) return <div className="rp"><Top right={right} /><p className="rp-empty">Opening the recipe…</p></div>;
+  return <RecipeView r={r} member={member} />;
+}
+
 export function RecipesPage({ member }: { member: boolean }) {
   const [list, setList] = useState<Loaded[] | null>(null);
   useEffect(() => { document.title = `Recipes · ${APP_NAME}`; fetch("/api/recipes").then((r) => r.json()).then((d) => setList(d.recipes ?? [])).catch(() => setList([])); }, []);
@@ -172,7 +201,7 @@ export function RecipesPage({ member }: { member: boolean }) {
     <div className="rp">
       <Top right={member ? <a className="rp-link" href="/today">Open the app</a> : <a className="rp-link" href="/">Sign in</a>} />
       <h1 className="rp-title">Recipes</h1>
-      <p className="rp-lines">From Coach Milan's kitchen. Every number is worked out from the recipe, weighed, not guessed from a photo.</p>
+      <p className="rp-lines">Recipes from our kitchens. Every number is worked out from the recipe, weighed, not guessed from a photo.</p>
       {list === null && <p className="rp-empty">Opening…</p>}
       {list && !list.length && <p className="rp-empty">The first recipes are on their way.</p>}
       <div className="rp-grid">{(list ?? []).map((r) => <RecipeCard key={r.slug} r={r} />)}</div>
@@ -190,8 +219,8 @@ export function RecipeCard({ r }: { r: PublicRecipe }) {
       {r.hasPhoto && <span className="rp-rphoto"><img src={`/r/${r.slug}/photo.jpg`} alt="" loading="lazy" />{r.rating === "daam" && <Daam />}</span>}
       <span className="rp-rtext">
         <b>{r.title}</b>
-        <span>One {r.servingName}: {r.perServing.kcal} kcal · {Math.round(r.perServing.protein)} g protein · PD {r.pd}</span>
-        {r.fits.length > 0 && <small>Fits best: {r.fits.map((f) => f.name).join(", ")}{r.minutes ? ` · ${r.minutes} min` : ""}</small>}
+        <span>One {r.servingName}: {r.perServing.kcal} kcal · {g1(r.perServing.protein)} protein · PD {r.pd}</span>
+        <small>{[bylineOf(r.author), fitsTicked(r).length ? `Fits best: ${fitsTicked(r).map((f) => f.name).join(", ")}` : "", r.minutes ? `${r.minutes} min` : ""].filter(Boolean).join(" · ")}</small>
       </span>
     </a>
   );

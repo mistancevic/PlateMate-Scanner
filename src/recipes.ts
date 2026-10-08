@@ -14,6 +14,9 @@ export type PublicRecipe = {
   hasPhoto: boolean; author: string; publishedAt: string; updatedAt: string; mealId?: string;
 };
 
+// The preview (Cloud Run tag "preview", addresses preview---…) has its own recipes, apart from chefmealan.com (Milan, 8 October 2026)
+export const isPreviewHost = (host: string) => /^preview---/i.test(host || "");
+
 // the address: words of the title, small letters, dashes between, no more than 60 characters
 export function slugOf(title: string): string {
   return title.toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/ß/g, "ss").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60).replace(/-+$/, "") || "recipe";
@@ -63,3 +66,22 @@ export const amountOf = (g: number) => (g >= 1000 ? `${r1(g / 1000)} kg` : `${Ma
 export function forVisitor(r: PublicRecipe): PublicRecipe & { locked?: boolean } {
   return r.who === "members" ? { ...r, items: [], steps: [], locked: true } : r;
 }
+
+// Who it's from (RF4 Q9, RG0): From Milan's kitchen, the cook's first name. Older pages said Coach Milan or Your coach.
+export function bylineOf(author: string | null | undefined): string {
+  const name = String(author ?? "").replace(/^coach\s+/i, "").trim();
+  return !name || /^your coach$/i.test(String(author ?? "").trim()) ? "From our kitchen" : `From ${name}${/s$/i.test(name) ? "'" : "'s"} kitchen`;
+}
+// Only the goals the recipe truly fits get a tick (RF4 Q11); just above or below stays on the scale
+export const fitsTicked = (r: Pick<PublicRecipe, "fits">) => (r.fits ?? []).filter((f) => f.how === "fits");
+// Protein with one decimal everywhere: tiles, list, images, amounts (RF4 Q12)
+export const g1 = (x: number) => `${Math.round(x * 10) / 10} g`;
+// A plain name for the page (RF4 Q2): the food's name without its brand; the cook can still change it
+export function plainName(food: { name: string; brand?: string | null }): string {
+  let n = food.name.replace(/[®™©]/g, "");
+  const brand = String(food.brand ?? "").replace(/[®™©]/g, "").trim();
+  if (brand) for (const w of [brand, ...brand.split(/[\s,&]+/).filter((x) => x.length > 2)]) n = n.replace(new RegExp(`\\b${w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi"), "");
+  n = n.replace(/\s{2,}/g, " ").replace(/^[\s,.:;·-]+|[\s,.:;·-]+$/g, "").trim();
+  return n ? n.charAt(0).toUpperCase() + n.slice(1) : food.name;
+}
+

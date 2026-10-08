@@ -77,12 +77,17 @@ export type Ingredient = {
   locked: boolean;
 };
 export type Goals = Nutrition;
+// What the Publish sheet keeps while a recipe is being made ready for its page (board RG1): a draft, never public
+export type PublishDraft = { title?: string; lines?: string; makes?: string; servingName?: string; minutes?: string; names?: string[]; photoAt?: number; savedAt?: string };
 export type Meal = {
   id: string;
   title: string;
   items: Ingredient[];
   portion: number;
   savedAt: string;
+  // the steps live with the recipe, so they are there while cooking and the page takes them from here (RF4 Q1)
+  steps?: string[];
+  publish?: PublishDraft;
 };
 export type Feedback = {
   id: string;

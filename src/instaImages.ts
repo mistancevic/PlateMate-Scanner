@@ -2,7 +2,7 @@
 // 1080 × 1350 for a carousel (the photo, the numbers, the ingredients, PD and the link), each fine alone, and the numbers
 // again in 1080 × 1920 as a reel's last frame. Drawn here from the recipe, so they say exactly what its page says.
 import type { PublicRecipe } from "./recipes";
-import { fitsOf } from "./recipes";
+import { fitsOf, g1 } from "./recipes";
 import { BANDS } from "./goal";
 
 const INK = "#172742", MUTED = "#5b6b8a", BLUE = "#2e7be8", BLUE_TEXT = "#1f5fc7", LINE = "#c9d8f2", PALE = "#eef3fc", TINT = "#dae6fb";
@@ -45,7 +45,7 @@ function thumbs(ctx: CanvasRenderingContext2D, x: number, y: number, size: numbe
   ctx.restore();
 }
 function numbersTable(ctx: CanvasRenderingContext2D, r: PublicRecipe, x: number, y: number, w: number, rowH: number, fs: number) {
-  const rows: [string, string][] = [["Energy", `${r.perServing.kcal} kcal`], ["Protein", `${Math.round(r.perServing.protein)} g`], ["Carbs", `${Math.round(r.perServing.carbs)} g`], ["Fat", `${Math.round(r.perServing.fat)} g`]];
+  const rows: [string, string][] = [["Energy", `${r.perServing.kcal} kcal`], ["Protein", g1(r.perServing.protein)], ["Carbs", `${Math.round(r.perServing.carbs)} g`], ["Fat", `${Math.round(r.perServing.fat)} g`]];
   if (r.perServing.fibre !== null) rows.push(["Fibre", `${r.perServing.fibre} g`]);
   rows.forEach(([a, b], i) => {
     const yy = y + i * rowH;
@@ -76,7 +76,7 @@ export async function instagramImages(r: PublicRecipe, photo: string | null): Pr
     ctx.font = F(900, 96); const t = wrap(ctx, r.title, W - 120, 2);
     // from the bottom up: the footer, one line of numbers, then the name
     t.forEach((l, i) => text(ctx, l, 60, H - 210 - (t.length - 1 - i) * 100, F(900, 96), "#fff"));
-    text(ctx, `${Math.round(r.perServing.protein)} g protein in each ${serving(r)}. ${r.perServing.kcal} kcal.`, 60, H - 136, F(700, 44), "rgba(255,255,255,.94)");
+    text(ctx, `${g1(r.perServing.protein)} protein in each ${serving(r)}. ${r.perServing.kcal} kcal.`, 60, H - 136, F(700, 44), "rgba(255,255,255,.94)");
     text(ctx, "CHEF MEALAN · SWIPE FOR THE NUMBERS →", 60, H - 70, F(900, 30), "rgba(255,255,255,.78)");
     out.push({ name: "1-photo.jpg", dataUrl: c.toDataURL("image/jpeg", 0.9) });
   }
@@ -109,10 +109,20 @@ export async function instagramImages(r: PublicRecipe, photo: string | null): Pr
       text(ctx, name, 66, y, F(700, 44), INK); text(ctx, it.amount, W - 66, y, F(900, 44), INK, "right");
       ctx.fillStyle = "#e3eaf7"; ctx.fillRect(66, y + 26, W - 132, 4); y += 92;
     }
-    if (r.steps[0]) {
-      const by = H - 200;
-      if (img) { ctx.save(); round(ctx, 66, by, 150, 150, 26); ctx.clip(); cover(ctx, img, 66, by, 150, 150); ctx.restore(); }
-      ctx.font = F(700, 36); wrap(ctx, r.steps[0], W - (img ? 290 : 132), 3).forEach((l, i) => text(ctx, l, img ? 250 : 66, by + 44 + i * 46, F(700, 36), "#3d4a63"));
+    // all the steps that fit (RF4 Q8, 8 October 2026); when some don't, the last line sends to the link
+    if (r.steps.length) {
+      let sy = y + 30; const bottom = H - 70, lh = 46;
+      text(ctx, "Steps", 66, sy, F(900, 44), INK); sy += 66;
+      let shown = 0;
+      for (const [k, st] of r.steps.entries()) {
+        ctx.font = F(700, 36); const ls = wrap(ctx, st, W - 132 - 70, 4);
+        const restAfter = k < r.steps.length - 1 ? lh : 0;
+        if (sy + (ls.length - 1) * lh + restAfter > bottom) break;
+        text(ctx, String(k + 1), 66, sy, F(900, 36), "#1f5fc7");
+        ls.forEach((l, i) => text(ctx, l, 136, sy + i * lh, F(700, 36), "#3d4a63"));
+        sy += ls.length * lh + 18; shown++;
+      }
+      if (shown < r.steps.length) text(ctx, `${r.steps.length - shown} more ${r.steps.length - shown === 1 ? "step" : "steps"}: link in bio`, 66, Math.min(sy, bottom), F(800, 34), "#1f5fc7");
     }
     out.push({ name: "3-ingredients.jpg", dataUrl: c.toDataURL("image/jpeg", 0.92) });
   }
@@ -131,8 +141,9 @@ export async function instagramImages(r: PublicRecipe, photo: string | null): Pr
     const fits = new Map(fitsOf(r.pd).map((f) => [f.name, f.how]));
     let y = by + 150;
     for (const b of BANDS.slice().sort((a, b2) => parseFloat(b2.range.slice(3)) - parseFloat(a.range.slice(3)))) {
+      // a tick only where it truly fits (RF4 Q11); just above or below is written, without a tick
       const how = fits.get(b.name), on = Boolean(how);
-      text(ctx, `${on ? "✓ " : ""}${b.name}`, 66, y, F(800, 38), on ? "#123a7a" : "#8b93a5");
+      text(ctx, `${how === "fits" ? "✓ " : ""}${b.name}`, 66, y, F(800, 38), on ? "#123a7a" : "#8b93a5");
       text(ctx, `${how && how !== "fits" ? how + " · " : how ? "fits · " : ""}${b.range}`, W - 66, y, F(800, 34), on ? "#123a7a" : "#8b93a5", "right");
       ctx.fillStyle = "#e3eaf7"; ctx.fillRect(66, y + 22, W - 132, 3); y += 74;
     }

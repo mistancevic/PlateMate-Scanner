@@ -17,7 +17,7 @@ import { createHash } from "node:crypto";
 import { deleteAccount as deleteAccountSteps } from "./src/accountDelete";
 import { guideForChat } from "./src/goalGuide";
 import { tidy } from "./src/labeltable";
-import { forVisitor, slugOf, type PublicRecipe } from "./src/recipes";
+import { forVisitor, isPreviewHost, slugOf, type PublicRecipe } from "./src/recipes";
 const FB_PROJECT = process.env.FIREBASE_PROJECT_ID || "";
 // photos as files (storage release 1): the project's default bucket in Frankfurt
 const BUCKET = process.env.FIREBASE_STORAGE_BUCKET || (FB_PROJECT ? `${FB_PROJECT}.firebasestorage.app` : "");
@@ -445,49 +445,58 @@ app.get("/api/search", requireUser, requireMember, async (req, res) => {
     return res.json({ products: [], error: "Product database did not answer in time." });
   }
 });
-// ---- Recipes you can share (canvas boards R0 to R7) ----
-// A coach publishes a recipe from the app; everyone can read it at chefmealan.com/r/<slug>, members get more. The photo is
-// kept in the record and served at /r/<slug>/photo.jpg, also for link previews. Without accounts (local, walkthroughs), in memory.
-const memRecipes = new Map<string, any>();
-const recipeCol = () => db().collection("public_recipes");
-async function getRecipe(slug: string): Promise<any | null> {
-  if (!FB_PROJECT) return memRecipes.get(slug) ?? null;
-  const d = await recipeCol().doc(slug).get();
+// ---- Recipes you can share (canvas boards R0 to R7, RG0 to RG4) ----
+// A coach publishes a recipe from the app; everyone can read it at chefmealan.com/r/<slug>. The photo is kept in the
+// record and served at /r/<slug>/photo.jpg, also for link previews. Without accounts (local, walkthroughs), in memory.
+// The preview has its own recipes (Milan, 8 October 2026): publishing on the preview never shows on chefmealan.com.
+// Unpublish keeps the record as taken down, so an old link says so instead of an error, and Publish again uses the same link.
+const spaceOf = (req: express.Request) => (isPreviewHost(String(req.get("host") || "")) || process.env.RECIPES_SPACE === "preview" ? "preview" : "live");
+const memRecipes = { live: new Map<string, any>(), preview: new Map<string, any>() };
+const recipeCol = (req: express.Request) => db().collection(spaceOf(req) === "preview" ? "public_recipes_preview" : "public_recipes");
+const isDown = (r: any) => r?.status === "down";
+async function getRecipe(req: express.Request, slug: string): Promise<any | null> {
+  if (!FB_PROJECT) return memRecipes[spaceOf(req)].get(slug) ?? null;
+  const d = await recipeCol(req).doc(slug).get();
   return d.exists ? d.data() : null;
 }
-async function listRecipes(limit: number): Promise<any[]> {
-  if (!FB_PROJECT) return [...memRecipes.values()].sort((a, b) => (b.publishedAt > a.publishedAt ? 1 : -1)).slice(0, limit);
-  const q = await recipeCol().orderBy("publishedAt", "desc").limit(limit).get();
+async function putRecipe(req: express.Request, slug: string, doc: any) {
+  if (!FB_PROJECT) memRecipes[spaceOf(req)].set(slug, doc); else await recipeCol(req).doc(slug).set(doc);
+}
+async function allRecipes(req: express.Request, limit: number): Promise<any[]> {
+  if (!FB_PROJECT) return [...memRecipes[spaceOf(req)].values()].sort((a, b) => (b.publishedAt > a.publishedAt ? 1 : -1)).slice(0, limit);
+  const q = await recipeCol(req).orderBy("publishedAt", "desc").limit(limit).get();
   return q.docs.map((d) => d.data());
 }
+const listRecipes = async (req: express.Request, limit: number) => (await allRecipes(req, 200)).filter((r) => !isDown(r)).slice(0, limit);
 const withoutPhoto = (r: any): PublicRecipe => { const { photo, authorUid, ...rest } = r; return { ...rest, hasPhoto: Boolean(photo) } as PublicRecipe; };
-// who is reading: a signed-in member sees a members-only recipe whole; everyone else sees what a visitor sees
-async function readsAsMember(req: express.Request): Promise<boolean> {
-  if (!FB_PROJECT) return true;
-  const token = String(req.headers.authorization || "").replace(/^Bearer /, "");
-  if (!token) return false;
-  try { const u = await adminAuth().verifyIdToken(token); const m = await membership(u.uid); return Boolean(m.member); } catch { return false; }
-}
 app.get("/api/recipes", async (req, res) => {
   try {
     const n = Math.max(1, Math.min(24, Number(req.query.limit) || 24));
     res.setHeader("Cache-Control", "no-cache");
-    res.json({ recipes: (await listRecipes(n)).map((r) => forVisitor(withoutPhoto(r))) });
+    res.json({ recipes: (await listRecipes(req, n)).map((r) => forVisitor(withoutPhoto(r))) });
+  } catch (e) { fail(res, e); }
+});
+// the cook's own recipes with where each one is (RG3): live or taken down
+app.get("/api/my-recipes", requireUser, async (req, res) => {
+  try {
+    const uid = (req as any).uid || "local";
+    res.setHeader("Cache-Control", "no-cache");
+    res.json({ recipes: (await allRecipes(req, 500)).filter((r) => (r.authorUid || "local") === uid).map((r) => ({ ...withoutPhoto(r), status: isDown(r) ? "down" : "live" })) });
   } catch (e) { fail(res, e); }
 });
 app.get("/api/recipes/:slug", async (req, res) => {
   try {
-    const r = await getRecipe(String(req.params.slug));
+    const r = await getRecipe(req, String(req.params.slug));
     if (!r) return res.status(404).json({ error: "This recipe isn't published, or its address changed." });
-    const plain = withoutPhoto(r);
     res.setHeader("Cache-Control", "no-cache");
-    res.json({ recipe: (await readsAsMember(req)) ? plain : forVisitor(plain) });
+    if (isDown(r)) return res.status(410).json({ takenDown: true, title: r.title });
+    res.json({ recipe: forVisitor(withoutPhoto(r)) });
   } catch (e) { fail(res, e); }
 });
 app.get("/r/:slug/photo.jpg", async (req, res) => {
   try {
-    const r = await getRecipe(String(req.params.slug));
-    const m = typeof r?.photo === "string" ? r.photo.match(/^data:(image\/(?:jpeg|png|webp));base64,(.+)$/) : null;
+    const r = await getRecipe(req, String(req.params.slug));
+    const m = !isDown(r) && typeof r?.photo === "string" ? r.photo.match(/^data:(image\/(?:jpeg|png|webp));base64,(.+)$/) : null;
     if (!m) return res.status(404).type("text/plain").send("No photo");
     res.setHeader("Cache-Control", "public, max-age=3600");
     res.type(m[1]).send(Buffer.from(m[2], "base64"));
@@ -502,20 +511,22 @@ app.post("/api/recipes", requireUser, requireMember, requireCoach, async (req, r
     const photo = typeof b.photo === "string" && /^data:image\/(jpeg|png|webp);base64,/.test(b.photo) && b.photo.length < 900_000 ? b.photo : null;
     const slug = slugOf(r.slug || r.title);
     const uid = (req as any).uid || "local";
-    const old = await getRecipe(slug);
-    if (old && old.authorUid && old.authorUid !== uid) return res.status(409).json({ error: "Another coach has a recipe at this address. Change the name a little." });
+    const old = await getRecipe(req, slug);
+    if (old && old.authorUid && old.authorUid !== uid) return res.status(409).json({ error: "Another cook has a recipe at this address. Change the name a little." });
     const now = new Date().toISOString();
-    const doc = { ...r, slug, authorUid: uid, publishedAt: old?.publishedAt ?? now, updatedAt: now, photo: photo ?? old?.photo ?? null };
-    if (!FB_PROJECT) memRecipes.set(slug, doc); else await recipeCol().doc(slug).set(doc);
+    const { status: _s, downAt: _d, ...clean } = r as any;
+    const doc = { ...clean, slug, authorUid: uid, status: "live", publishedAt: old?.publishedAt ?? now, updatedAt: now, photo: photo ?? old?.photo ?? null };
+    await putRecipe(req, slug, doc);
     res.json({ slug, url: `/r/${slug}` });
   } catch (e) { fail(res, e); }
 });
+// Unpublish: taken down, not deleted (RG4)
 app.delete("/api/recipes/:slug", requireUser, requireMember, requireCoach, async (req, res) => {
   try {
-    const slug = String(req.params.slug), old = await getRecipe(slug), uid = (req as any).uid || "local";
+    const slug = String(req.params.slug), old = await getRecipe(req, slug), uid = (req as any).uid || "local";
     if (!old) return res.json({ ok: true });
-    if (old.authorUid && old.authorUid !== uid) return res.status(403).json({ error: "Only the coach who published it can take it down." });
-    if (!FB_PROJECT) memRecipes.delete(slug); else await recipeCol().doc(slug).delete();
+    if (old.authorUid && old.authorUid !== uid) return res.status(403).json({ error: "Only the cook who published it can take it down." });
+    await putRecipe(req, slug, { ...old, status: "down", downAt: new Date().toISOString() });
     res.json({ ok: true });
   } catch (e) { fail(res, e); }
 });
@@ -1064,16 +1075,18 @@ async function start() {
     app.get("/r/:slug", async (req, res) => {
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       try {
-        const r = await getRecipe(String(req.params.slug));
+        const r = await getRecipe(req, String(req.params.slug));
         if (!r) return res.sendFile(path.join(dist, "index.html"));
         const base = `https://${req.get("host")}`;
+        // taken down: the page says so; search engines are told it is gone
+        if (isDown(r)) return res.status(410).type("html").send(withMeta(`Taken down · Chef Mealan`, `${r.title} is no longer on Chef Mealan.`, `${base}/og.jpg?v=2`, `${base}/r/${r.slug}`).replace("</head>", '<meta name="robots" content="noindex"></head>'));
         const desc = `${r.lines ? r.lines + " " : ""}One ${r.servingName || "serving"}: ${r.perServing?.kcal} kcal, ${r.perServing?.protein} g protein, PD ${r.pd}.`;
         res.type("html").send(withMeta(`${r.title} · Chef Mealan`, desc, r.photo ? `${base}/r/${r.slug}/photo.jpg` : `${base}/og.jpg?v=2`, `${base}/r/${r.slug}`));
       } catch { res.sendFile(path.join(dist, "index.html")); }
     });
     app.get("/recipes", (req, res) => {
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-      try { res.type("html").send(withMeta("Recipes · Chef Mealan", "From Coach Milan's kitchen. Every number is worked out from the recipe, weighed.", `https://${req.get("host")}/og.jpg?v=2`, `https://${req.get("host")}/recipes`)); }
+      try { res.type("html").send(withMeta("Recipes · Chef Mealan", "Recipes from our kitchens. Every number is worked out from the recipe, weighed.", `https://${req.get("host")}/og.jpg?v=2`, `https://${req.get("host")}/recipes`)); }
       catch { res.sendFile(path.join(dist, "index.html")); }
     });
     app.get("*", (_req, res) => { res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); res.sendFile(path.join(dist, "index.html")); });

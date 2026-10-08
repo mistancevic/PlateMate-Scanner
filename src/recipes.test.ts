@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { numbersOf, fitsOf, slugOf, claimProblem, forVisitor, amountOf } from "./recipes";
+import { numbersOf, fitsOf, slugOf, claimProblem, forVisitor, amountOf, bylineOf, plainName, fitsTicked, isPreviewHost, g1 } from "./recipes";
 
 // The crepes Milan drew on the canvas (board R1): 12 crepes from protein flour, protein milk, eggs, mascarpone
 const f = (name: string, calories: number, protein: number, carbs: number, fats: number, fiber: number | null) => ({ id: name, name, calories, protein, carbs, fats, fiber } as any);
@@ -32,4 +32,30 @@ test("the address, the claim and what a visitor sees", () => {
   const r: any = { who: "members", items: [{ name: "x" }], steps: ["y"] };
   assert.deepEqual([forVisitor(r).items.length, forVisitor(r).steps.length, (forVisitor(r) as any).locked], [0, 0, true]);
   assert.equal(amountOf(1250), "1.3 kg"); assert.equal(amountOf(49.6), "50 g");
+});
+
+// RF4 and RG0, 8 October 2026
+test("the byline: From Milan's kitchen, also for pages that said Coach Milan or Your coach", () => {
+  assert.equal(bylineOf("Milan"), "From Milan's kitchen");
+  assert.equal(bylineOf("Coach Milan"), "From Milan's kitchen");
+  assert.equal(bylineOf("Your coach"), "From our kitchen");
+  assert.equal(bylineOf(""), "From our kitchen");
+  assert.equal(bylineOf("Klaus"), "From Klaus' kitchen");
+});
+test("a plain name leaves the brand out", () => {
+  assert.equal(plainName({ name: "Arla Skyr natural", brand: "Arla" }), "Skyr natural");
+  assert.equal(plainName({ name: "PAM® protein bar", brand: "PAM" }), "Protein bar");
+  assert.equal(plainName({ name: "Eggs", brand: "" }), "Eggs");
+  assert.equal(plainName({ name: "Milbona", brand: "Milbona" }), "Milbona");
+});
+test("a tick only for the goals it truly fits; protein with one decimal", () => {
+  const r = { fits: fitsOf(7.3) };
+  assert.deepEqual(fitsTicked(r).map((f) => f.name), ["Lose fat"]);
+  assert.equal(g1(8.66), "8.7 g");
+  assert.equal(g1(9), "9 g");
+});
+test("the preview has its own recipes", () => {
+  assert.equal(isPreviewHost("preview---chefmealan-abc123-ew.a.run.app"), true);
+  assert.equal(isPreviewHost("chefmealan.com"), false);
+  assert.equal(isPreviewHost("chefmealan-abc123-ew.a.run.app"), false);
 });
