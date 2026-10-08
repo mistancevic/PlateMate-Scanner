@@ -4,6 +4,33 @@ One version per release since 2 October 2026. The number is in Menu, About, next
 
 ## 0.1.x, the pilot builds
 
+- **v0.1.92** · 2026-10-08 · Cook is a permission, not a role (canvas board RG0 to RG5): a coach is a cook and publishes; a client publishes only when their coach switched Cook on, and then the recipe waits for the coach (Send to Milan, Waiting for Milan). The coach sees the page first, then Make it live or Send back with a note the cook sees. Changes to a cook's live recipe wait the same way while the live page stays as it was. A cook can take down their own recipe.
+- **v0.1.91** · 2026-10-08 · publishing, redrawn (boards RG1 to RG4) with the RF4 answers: what is typed in the Publish sheet is kept with the recipe as a draft; See the page shows the page before anything goes live; My recipes says Draft, Live or Taken down; Unpublish takes a recipe down and its link says so and shows the other recipes, Publish again brings it back on the same link; the preview has its own recipes, apart from chefmealan.com. Steps stay with the recipe in the app; food names start without brands; only plate photos are offered; everyone sees a recipe; a member's count has − and +; image 3 shows all steps that fit; From Milan's kitchen; a tick only for the goals it truly fits; protein with one decimal everywhere.
+- **v0.1.90** · 2026-10-08 · New sits right after the food's name; the second tap on Remove is a red button with white words, Tap again to remove (the words had the button's colour).
+- **v0.1.89** · 2026-10-08 · recipes you can share: a page per recipe on chefmealan.com/r/…, All recipes, From the kitchen on the home page, five Instagram images drawn in the app; photos from the food database after a barcode, each with its own tick, a globe and Credit: Open Food Facts, CC BY-SA, and missing lines read from its nutrition photo; on a computer, Take a photo opens its camera inside the app.
+- **v0.1.88** · 2026-10-08 · Take a photo and Choose a photo in one row; values from the food database rounded; sugar alcohols (polyols) recognised in German, Serbian and English.
+- **v0.1.87** · 2026-10-08 · adding photos is its own part of the card.
+- **v0.1.86** · 2026-10-08 · Take a photo and Choose a photo on a food's card: the phone's camera, or its photos.
+- **v0.1.85** · 2026-10-08 · Add a photo can choose from the phone's photos; a single photo closes with a tap.
+- **v0.1.84** · 2026-10-07 · as on boards C0 to C5: a camera you can read (full screen, the modes as buttons, a frame, a green line while it reads); the next photo without closing (swipe, arrows, a strip, 2 of 3); Back closes what is on top, like an app, and every tab has its own address.
+- **v0.1.83** · 2026-10-07 · photos reach the other device; a new food opens its card; typing a barcode pauses the camera.
+- **v0.1.82** · 2026-10-07 · the Chef Mealan name where it still said PlateMate.
+- **v0.1.81** · 2026-10-07 · storage release 2: each food, recipe and card is its own record with its own time; a phone sends only what changed, and changes on two phones are both kept; deletions reach the other phone; no mass deletions.
+- **v0.1.80** · 2026-10-07 · preview releases: ./deploy/preview.sh puts a build on its own link while chefmealan.com keeps the one before; ./deploy/promote.sh makes it live; ./deploy/rollback.sh goes back in one command.
+- **v0.1.79** · 2026-10-07 · How was it? shows the icons above the labels again; DaaM good keeps two thumbs up.
+- **v0.1.78** · 2026-10-07 · plain English, batch 2 (boards E6 to E8): Profile, Where I shop, Account, Goal, Lifestyle and Weekly plan in sentences; the body question reads Your body: Female / Male.
+- **v0.1.77** · 2026-10-07 · the batch 1 picks (Add your foods. Mealan sets the amounts.; On plate); foods without a brand say typical values, check your pack; goal chat evals.
+- **v0.1.76** · 2026-10-07 · plain English, batch 1 (boards E0 to E3): Today, Plate, Foods and Me in sentences; DaaM good gets two thumbs up.
+- **v0.1.75** · 2026-10-07 · weigh-ins and the trend (boards W0 to W2): a Weigh in line on Today; in Goal, the last four weeks, the 7-day average and the band the goal expects, and On track, Faster or Slower.
+- **v0.1.74** · 2026-10-07 · numbers evals on the Evals page: ten adults, one per combination that matters, checked against a snapshot.
+- **v0.1.73** · 2026-10-07 · no temperature in the AI calls, as Google asked; every model uses its own defaults.
+- **v0.1.72** · 2026-10-07 · Build muscle at your pace (boards K0 to K3): Steady or Faster; the goal sheet; About your goal.
+- **v0.1.71** · 2026-10-07 · Delete my account in a safe order: the data, then the sign-in, so an open phone can't save its old copy back.
+- **v0.1.70** · 2026-10-07 · Calculate for me asks your everyday (work and steps), then your training (Light, Moderate, Hard, how long).
+- **v0.1.69** · 2026-10-07 · photos as files, three fixes after the first deploy: plate cards take a food's photos from the library, which is the one source of them.
+- **v0.1.68** · 2026-10-07 · photos as files (storage release 1): on the phone in their own photo store, in the account as files, so the saved data stays small.
+- **v0.1.67** · 2026-10-07 · work, study, or both, for any adult (release B): Your weekdays first, then only the questions that fit; a day is a Work day, a Study day or a Day off.
+- **v0.1.66** · 2026-10-07 · Chef Mealan is for adults (release A): a welcome after sign-in with one tap, I'm 18 or older; nothing opens or reaches the AI before it; a birth year under 18 is not saved.
 - **v0.1.65** · 2026-10-07 · never an empty screen while opening: the logo and "Opening your account…"; after 10 seconds, Try again or Open with what's on this phone; photos and plate cards load after the app opens; the account load has a 20-second limit, then the app opens on the phone's copy, keeps what is changed there, and tries the account again every half minute.
 - **v0.1.64** · 2026-10-07 · Today shows the day's PD target, not the plate's: a moment picked on the Plate (Before training aims at PD 3) changed the Today card and the Foods chips too; now only the Plate follows the moment.
 - **v0.1.63** · 2026-10-06 · the link preview when chefmealan.com is shared, as approved on the canvas (board P1): the home page headline, a plain description, Coach Milan's photo instead of an old app screen, no brand names, Closed pilot.
