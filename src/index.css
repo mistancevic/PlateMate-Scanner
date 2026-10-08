@@ -567,7 +567,8 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .photo-top { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 0; }
 .photo-close { width: 44px; height: 44px; border-radius: 22px; border: 0; background: rgba(255,255,255,.14); color: #fff; display: inline-flex; align-items: center; justify-content: center; }
 .photo-remove { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 17px; border: 1px solid rgba(255,255,255,.25); background: transparent; color: #c9d6ee; font: inherit; font-size: 13px; font-weight: 700; }
-.photo-remove.armed { background: var(--low); border-color: var(--low); color: #fff; }
+/* the second tap: a red button with white words, so it reads as a warning (Milan, 8 October 2026); the general .armed rule colours text red, which hid the words on red */
+.photo-remove.armed { background: #d93b2b; border-color: #d93b2b !important; color: #fff !important; font-weight: 800; }
 .undo-note { position: fixed; left: 16px; right: 16px; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 90; display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-radius: 16px; background: #172742; color: #fff; font-weight: 700; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
 .undo-note .link { color: #8fb6ff; font-weight: 900; }
 
@@ -894,7 +895,10 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .choices.three button.choice.on::before { content: none; }
 
 /* a food added today, on the Foods list (canvas C5) */
-.new-mark { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 8px; background: var(--brand); color: #fff; font-size: 11px; font-weight: 900; vertical-align: 2px; }
+/* New sits right after the name, its own size (Milan, 8 October 2026) */
+.name-line { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.name-line .name-link { min-width: 0; }
+.new-mark { flex: none; display: inline-block; margin-left: 0; padding: 1px 7px; border-radius: 8px; background: var(--brand); color: #fff; font-size: 11px; font-weight: 900; vertical-align: 2px; }
 
 /* adding photos to a food: its own row, under the photos (canvas board C6, 8 October 2026) */
 .photo-add { display: flex; gap: 8px; margin: 10px 0 12px; }
