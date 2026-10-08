@@ -128,10 +128,10 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
           <b className="field-label">Photo</b>
           <div className="publish-photos">
             {photos.map((src, i) => <button key={i} className={`publish-photo ${photoAt === i ? "on" : ""}`} onClick={() => setPhotoAt(i)} aria-label={`Photo ${i + 1}${photoAt === i ? ", the one shown" : ""}`}><img src={src} alt="" /></button>)}
-            <button className="publish-photo add" onClick={() => fileRef.current?.click()} aria-label="Choose a photo"><ImageIcon size={20} /></button>
+            <button className="publish-photo add" onClick={() => fileRef.current?.click()} aria-label="Upload a photo"><ImageIcon size={20} /></button>
             <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (!f) return; const r = new FileReader(); r.onload = () => { setExtra((x) => [String(r.result), ...x]); setPhotoAt(0); }; r.readAsDataURL(f); }} />
           </div>
-          <small className="muted">{photos.length ? "The plate photos from this recipe's cards. The one with the blue frame leads, on the page and on the images." : "Choose a photo of the plate; without one the page shows no photo."}</small>
+          <small className="muted">{photos.length ? "The plate photos from this recipe's cards. The one with the blue frame leads, on the page and on the images." : "Upload a photo of the plate; without one the page shows no photo."}</small>
         </div>
         <label className="field-label">Name<input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} /></label>
         <label className="field-label">Two lines about it<textarea value={lines} onChange={(e) => setLines(e.target.value)} maxLength={240} placeholder="Thin, soft, and they roll without breaking." /></label>

@@ -41,7 +41,7 @@ import { openStats } from "./openStats";
 import { merge as mergeRecords, changes as recordChanges, type Known } from "./records";
 import { installBack, pushTab, startTab, tabOfPath, useBack, pathOfTab } from "./back";
 import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
-import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted } from "./photos";
+import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted, realPhotosOf, isDrawn } from "./photos";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
@@ -1642,11 +1642,12 @@ export default function App() {
       }
       const [thumb, big] = await Promise.all([thumbnailBase64(dataUrl).catch(() => ""), resizeImageBase64(dataUrl, 900, 900).catch(() => "")]);
       if (!big) { setError("This photo could not be read. Try another one."); return; }
-      // a food's picture stays its first photo (journey invariant, 5 October 2026: the picture plus the added photos)
+      // a food's picture stays its first photo (journey invariant, 5 October 2026: the picture plus the added photos); a
+      // drawn picture is not a photo, so the first real photo added becomes the main one and the picture (board C9)
       setState((s) => ({ ...s, foods: s.foods.map((f) => {
         if (f.id !== foodId) return f;
-        const had = (f.photos?.length ? f.photos : f.photo ? [f.photo] : []).filter(Boolean);
-        return { ...f, photo: f.photo || thumb || undefined, photos: [...had, big].slice(0, 6) };
+        const had = realPhotosOf(f);
+        return { ...f, photo: (had.length && f.photo && !isDrawn(f.photo) ? f.photo : thumb) || undefined, photos: [...had, big].slice(0, 6) };
       }) }));
       notify("Photo added.");
     },
@@ -1692,7 +1693,7 @@ export default function App() {
     },
     removeFoodPhoto: (foodId: string, index: number) => {
       const f0 = state.foods.find((f) => f.id === foodId);
-      const gallery = f0?.photos?.length ? f0.photos : f0?.photo ? [f0.photo] : [];
+      const gallery = realPhotosOf(f0);
       const rest = gallery.filter((_, i) => i !== index);
       // the preview follows the first remaining photo (made small again), or goes back to the icon; an empty list stays
       // empty on purpose ([]), so its old photos leave the phone and the account too
@@ -1702,6 +1703,15 @@ export default function App() {
         thumbnailBase64(first).then((t) => { if (t) setState((s) => ({ ...s, foods: s.foods.map((f) => (f.id === foodId && f.photos?.[0] === first ? { ...f, photo: t } : f)) })); }).catch(() => {});
       }
       notify("Photo removed.");
+    },
+    // Make it the main photo (board C9): it moves to the front, and becomes the food's picture everywhere
+    setMainPhoto: (foodId: string, index: number) => {
+      const f0 = stateRef.current.foods.find((f) => f.id === foodId);
+      const list = realPhotosOf(f0), chosen = list[index];
+      if (!chosen || index === 0) return;
+      setState((s) => ({ ...s, foods: s.foods.map((f) => (f.id !== foodId ? f : { ...f, photos: [chosen, ...list.filter((_, i) => i !== index)] })) }));
+      thumbnailBase64(chosen).then((t) => { if (t) setState((s) => ({ ...s, foods: s.foods.map((f) => (f.id === foodId && f.photos?.[0] === chosen ? { ...f, photo: t } : f)) })); }).catch(() => {});
+      notify("That's the main photo now.");
     },
     mergeInLibrary: (keepId: string, otherId: string, name: string) => {
       setState((s) => {

@@ -39,7 +39,7 @@ seed.items = [];
     await page.getByRole("button", { name: /Confirm & save food/ }).click(); await page.waitForTimeout(600);
     ok(await page.locator(".foodcard-head b").filter({ hasText: "Test Bar" }).count() === 1, "the new food's card opens");
     // since 0.1.89 (canvas board C7): a computer with a camera offers Take a photo, which opens it inside Chef Mealan
-    ok(await page.getByRole("button", { name: /Take a photo/ }).count() === 1 && await page.getByRole("button", { name: /Choose a photo/ }).count() === 1, "its card offers Take a photo and Choose a photo");
+    ok(await page.getByRole("button", { name: /Take a photo/ }).count() === 1 && await page.getByRole("button", { name: /Upload a photo/ }).count() === 1, "its card offers Take a photo and Upload a photo"); // the second button's word: Upload a photo (Milan, 8 October 2026, board C9)
     await page.getByRole("button", { name: /Take a photo/ }).click(); await page.waitForTimeout(1500);
     ok(await page.locator(".photo-cam").count() === 1 && /Photo of Test Bar/.test(await page.locator(".photo-cam .cam-title").textContent()), "the camera opens, titled with the food");
     await page.getByRole("button", { name: "Take the photo" }).click(); await page.waitForTimeout(400);

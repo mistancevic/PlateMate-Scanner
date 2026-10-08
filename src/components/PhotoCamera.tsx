@@ -23,7 +23,7 @@ export function PhotoCamera({ title, onUse, onClose }: { title: string; onUse: (
         // the names of the cameras are known once one is allowed
         if (!cams.length) { const all = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput").map((d) => d.deviceId).filter(Boolean); if (all.length > 1 && !gone) setCams(all); }
       } catch (e: any) {
-        setError(e?.name === "NotAllowedError" ? "The camera isn't allowed for Chef Mealan. Allow it in the browser, or use Choose a photo." : "The camera could not start. Use Choose a photo instead.");
+        setError(e?.name === "NotAllowedError" ? "The camera isn't allowed for Chef Mealan. Allow it in the browser, or use Upload a photo." : "The camera could not start. Use Upload a photo instead.");
       }
     })();
     return () => { gone = true; stream?.getTracks().forEach((t) => t.stop()); };

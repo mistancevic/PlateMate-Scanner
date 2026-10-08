@@ -209,3 +209,11 @@ export async function storeDel(keys: string[]) {
 export async function storeClear() {
   try { await tx("readwrite", (s) => s.clear()); } catch { /* nothing to clear */ }
 }
+
+// A food's real photos (board C9, Milan, 8 October 2026): a drawn picture (an SVG icon) is never one of them, so it never
+// shows as a photo, and the first real photo added takes its place as the food's picture. The main photo is the first.
+export const isDrawn = (x: string | null | undefined) => typeof x === "string" && x.startsWith("data:image/svg");
+export function realPhotosOf(f: { photos?: string[]; photo?: string } | null | undefined): string[] {
+  if (!f) return [];
+  return (f.photos?.length ? f.photos : f.photo ? [f.photo] : []).filter((x) => x && !isDrawn(x));
+}

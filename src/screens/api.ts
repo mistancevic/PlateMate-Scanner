@@ -87,6 +87,7 @@ export interface AppApi {
   tipGoalKey: string;
   requestTip: (foodId: string) => Promise<void>;
   removeFoodPhoto: (foodId: string, index: number) => void;
+  setMainPhoto: (foodId: string, index: number) => void;
   mergeInLibrary: (keepId: string, otherId: string, name: string) => void;
   todayKcal: number | null;
   dayType: import("../personal").DayType;

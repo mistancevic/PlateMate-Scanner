@@ -15,9 +15,22 @@ const seed = JSON.parse(fs.readFileSync(require("node:path").resolve(__dirname, 
   await page.locator(".name-link, .row-text b").filter({ hasText: "Skyr" }).first().click(); await page.waitForTimeout(400);
   // since 0.1.86 the card has Take a photo (phones) and Choose a photo, in their own row under the photos (0.1.88, canvas C6); the photos here go in through Choose
   console.log("add button:", await page.locator(".g-add").last().textContent());
+  // Changed with Milan, 8 October 2026 (board C9): a drawn picture is not a photo, so the first real photo added becomes
+  // the food's picture and its main photo; Upload a photo is the second button; with no photo, one line asks for the front.
+  const okc = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) process.exitCode = 1; };
+  okc(/Start with the front/.test(await page.locator(".sheet").textContent()), "no photo yet: one line asks for the front");
   await page.locator('.photo-add input[type=file]:not([capture])').setInputFiles(require("node:path").resolve(__dirname, "front.jpg")); await page.waitForTimeout(900);
+  okc(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.find((x) => /Skyr/.test(x.name)); return Boolean(f && f.photo && !f.photo.startsWith("data:image/svg")); }) || await page.locator(".foodcard-head img").evaluate((i) => !i.src.startsWith("data:image/svg")), "the first real photo replaces the drawn picture");
   await page.locator('.photo-add input[type=file]:not([capture])').setInputFiles(require("node:path").resolve(__dirname, "front.jpg")); await page.waitForTimeout(900);
-  const n = await page.locator(".g-thumb").count(); console.log(n === 3 ? "ok   the picture plus two added photos" : "FAIL gallery has " + n); if (n !== 3) process.exitCode = 1;
+  await page.locator('.photo-add input[type=file]:not([capture])').setInputFiles(require("node:path").resolve(__dirname, "plate.jpg")); await page.waitForTimeout(900);
+  const n = await page.locator(".g-thumb").count(); console.log(n === 3 ? "ok   three added photos, no drawn picture among them" : "FAIL gallery has " + n); if (n !== 3) process.exitCode = 1;
+  okc(await page.locator(".g-thumb").first().locator(".g-main").count() === 1, "the main photo comes first, with a star");
+  // Make it the main photo
+  await page.locator(".g-thumb").nth(2).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /Make it the main photo/ }).click(); await page.waitForTimeout(600);
+  okc(/1 of 3/.test(await page.locator(".photo-count").textContent()) && /The main photo/.test(await page.locator(".photo-view").textContent()), "Make it the main photo: it moves to the front and says so");
+  okc(await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.find((x) => /Skyr/.test(x.name)); return (f.photos ? f.photos.length : f.photoCount) === 3; }) && (await page.locator(".photo-strip button").count()) === 3, "still three photos");
+  await page.getByRole("button", { name: "Close the photo" }).click(); await page.waitForTimeout(300);
   await page.locator(".g-thumb").first().click(); await page.waitForTimeout(300);
   console.log("full view open:", await page.locator(".photo-view").count());
   // JOURNEY INVARIANT (Milan, 5 October 2026): one tap never removes a photo. Remove sits top left, away from closing;

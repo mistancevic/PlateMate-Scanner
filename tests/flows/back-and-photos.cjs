@@ -10,7 +10,8 @@ const fs = require("node:fs"), path = require("node:path");
 const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "utf8"));
 const jpg = "data:image/jpeg;base64," + fs.readFileSync(path.resolve(__dirname, "front.jpg")).toString("base64");
 seed.items = [];
-seed.foods = seed.foods.map((f) => /Skyr/.test(f.name) ? { ...f, photos: [jpg, jpg, jpg], addedAt: new Date().toISOString() } : f);
+// Nutella gets one real photo: since board C9 (8 October 2026) a drawn picture is not a photo
+seed.foods = seed.foods.map((f) => /Skyr/.test(f.name) ? { ...f, photos: [jpg, jpg, jpg], addedAt: new Date().toISOString() } : /Nutella/.test(f.name) ? { ...f, photo: jpg, photos: [jpg] } : f);
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT: "3194", GEMINI_API_KEY: "" }, stdio: "ignore" });
   await new Promise((r) => setTimeout(r, 2500));

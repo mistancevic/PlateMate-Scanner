@@ -11,8 +11,9 @@ import { JOBS, jobOf, plainLine, todayLine } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { iconFor } from "../icons";
 import { useBack } from "../back";
+import { realPhotosOf } from "../photos";
 
-export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto, removePhoto, toggleFavorite, insight, mix }: { food: Food; target: number | null; fit: import("../goal").PdBand; close: () => void; review?: () => void; dontHave?: () => void; mix?: { tip: MixTip; momentName: string; take: (m: Mix) => void; ask: () => void }; addPhoto?: (dataUrl: string) => void; removePhoto?: (index: number) => void; toggleFavorite?: () => void; insight?: { dayKcal: number | null; eaten: number; dayName: string; goalKey: string; requestTip: () => Promise<void>; setJob: (job: string | null) => void } }) {
+export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto, removePhoto, setMain, toggleFavorite, insight, mix }: { food: Food; setMain?: (index: number) => void; target: number | null; fit: import("../goal").PdBand; close: () => void; review?: () => void; dontHave?: () => void; mix?: { tip: MixTip; momentName: string; take: (m: Mix) => void; ask: () => void }; addPhoto?: (dataUrl: string) => void; removePhoto?: (index: number) => void; toggleFavorite?: () => void; insight?: { dayKcal: number | null; eaten: number; dayName: string; goalKey: string; requestTip: () => Promise<void>; setJob: (job: string | null) => void } }) {
   const job = jobOf(food);
   const [picking, setPicking] = useState(false);
   const [tipState, setTipState] = useState<"idle" | "busy" | "failed">("idle");
@@ -47,7 +48,8 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
     navigator.mediaDevices.enumerateDevices().then((d) => setDeskCam(d.some((x) => x.kind === "videoinput"))).catch(() => {});
   }, [isPhone]);
   const hasCamera = isPhone || deskCam;
-  const all = food.photos?.length ? food.photos : food.photo ? [food.photo] : [];
+  // the real photos; a drawn picture is not one of them (board C9); the first is the main photo
+  const all = realPhotosOf(food);
   // Removing a photo: a second tap arms it, and it is only really removed when the Undo note goes, eight seconds later,
   // or when the card closes. Until then the photo is just hidden.
   const [armed, setArmed] = useState(false);
@@ -89,17 +91,18 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         </div>
         {gallery.length > 1 && (
           <div className="food-gallery" aria-label="Photos of this product">
-            {gallery.map((src, i) => <button key={i} className="g-thumb" onClick={() => setViewAt(i)} aria-label={`Photo ${i + 1}`}><img src={src} alt="" />{fromDb(src) && <span className="db-globe" aria-hidden="true"><Globe size={12} /></span>}</button>)}
+            {gallery.map((src, i) => <button key={i} className="g-thumb" onClick={() => setViewAt(i)} aria-label={`Photo ${i + 1}${src === all[0] ? ", the main photo" : ""}`}><img src={src} alt="" />{src === all[0] && <span className="g-main" aria-hidden="true">★</span>}{fromDb(src) && <span className="db-globe" aria-hidden="true"><Globe size={12} /></span>}</button>)}
           </div>
         )}
         {anyDb && <small className="credit"><Globe size={13} /> Credit: Open Food Facts, CC BY-SA</small>}
         {/* adding photos is its own part, under the photos, one button below the other (Milan, 8 October 2026). Two ways in:
             newer Android phones open only their photo picker for a plain file field, without the camera, so the camera has
             its own button; on a computer there is no camera to offer */}
+        {addPhoto && gallery.length === 0 && <small className="photo-front">Start with the front of the pack: it becomes the food's picture.</small>}
         {addPhoto && gallery.length < 6 && (
           <div className="photo-add" aria-label="Add a photo">
-            {hasCamera && <button className="g-add" onClick={() => (isPhone ? camRef.current?.click() : setCamOpen(true))}><Camera size={18} /><span>{gallery.length ? "Take a photo" : "Take a photo of the front"}</span></button>}
-            <button className="g-add" onClick={() => fileRef.current?.click()}><ImageIcon size={18} /><span>{hasCamera ? "Choose a photo" : gallery.length ? "Add a photo" : "Add a photo of the front"}</span></button>
+            {hasCamera && <button className="g-add" onClick={() => (isPhone ? camRef.current?.click() : setCamOpen(true))}><Camera size={18} /><span>Take a photo</span></button>}
+            <button className="g-add" onClick={() => fileRef.current?.click()}><ImageIcon size={18} /><span>Upload a photo</span></button>
             {[camRef, fileRef].map((ref, k) => (
               <input key={k} ref={ref} type="file" accept="image/*" hidden {...(k === 0 ? { capture: "environment" as const } : {})} onChange={(e) => {
                 const file = e.target.files?.[0]; e.target.value = ""; if (!file || !addPhoto) return;
@@ -187,6 +190,9 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
                 {gallery.map((src, i) => <button key={i} className={i === at ? "on" : ""} aria-label={`Show photo ${i + 1}`} aria-current={i === at} onClick={(e) => { e.stopPropagation(); setArmed(false); setViewAt(i); }}><img src={src} alt="" /></button>)}
               </div>
             )}
+            {many && setMain && (view === all[0]
+              ? <span className="photo-main on">★ The main photo</span>
+              : <button className="photo-main" onClick={(e) => { e.stopPropagation(); setArmed(false); const i = all.indexOf(view); if (i > 0) { setMain(i); setViewAt(0); } }}>☆ Make it the main photo</button>)}
             {fromDb(view) && <span className="credit-light"><Globe size={13} /> Credit: Open Food Facts, CC BY-SA</span>}
             <span>{many ? "Swipe, or tap a photo below" : "Tap the photo to close"}</span>
           </div>

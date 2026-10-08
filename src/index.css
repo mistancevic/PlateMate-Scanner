@@ -1006,3 +1006,9 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .cook-switch input { width: 46px; height: 28px; accent-color: var(--brand); flex: none; }
 .waiting-recipe { display: flex; flex-direction: column; gap: 8px; border-color: #f2c27a; background: #fffaf0; }
 .waiting-note { display: flex; flex-direction: column; gap: 8px; } .waiting-note textarea { min-height: 70px; }
+/* The main photo (board C9, 8 October 2026) */
+.g-thumb { position: relative; }
+.g-main { position: absolute; left: 3px; top: 3px; height: 18px; padding: 0 5px; border-radius: 9px; background: var(--brand); color: #fff; font-size: 11px; font-weight: 900; display: flex; align-items: center; }
+.photo-front { display: block; margin: 10px 0 -4px; color: #3d4a63; font-size: 13px; font-weight: 700; }
+.photo-main { height: 40px; padding: 0 16px; border-radius: 20px; border: none; background: #fff; color: var(--brand-text); font: inherit; font-size: 14.5px; font-weight: 900; display: inline-flex; align-items: center; }
+.photo-main.on { background: rgba(255,255,255,.14); color: #fff; }
