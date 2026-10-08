@@ -85,3 +85,6 @@ export function plainName(food: { name: string; brand?: string | null }): string
   return n ? n.charAt(0).toUpperCase() + n.slice(1) : food.name;
 }
 
+// Without accounts (local, walkthroughs) a phone not in coach mode is the coach's client: the recipe calls say so
+export const localAs = (client: boolean): Record<string, string> => (client ? { "x-local-as": "client" } : {});
+

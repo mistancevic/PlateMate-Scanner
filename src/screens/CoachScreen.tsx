@@ -14,6 +14,9 @@ import { fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { density } from "../pilot";
 import { MOMENTS } from "../moments";
 import type { AppApi } from "./api";
+import { RecipeView } from "./RecipePages";
+import { bylineOf, type PublicRecipe } from "../recipes";
+import { useBack } from "../back";
 
 // The coach's area on Me: the code to share, the client list, and a client's cards with a goal to set.
 export function CoachArea(p: AppApi) {
@@ -30,6 +33,16 @@ export function CoachArea(p: AppApi) {
     finally { setBusy(false); }
   }
   useEffect(() => { refresh(); p.markSharedSeen(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
+  // clients who are cooks (board RG5): one switch on the client's sheet
+  const [cooks, setCooks] = useState<Set<string>>(new Set());
+  const loadCooks = () => fetch("/api/cooks").then((r) => r.json()).then((d) => setCooks(new Set(d.uids ?? []))).catch(() => {});
+  useEffect(() => { loadCooks(); }, [user?.uid]);
+  const setCook = async (client: string, on: boolean) => {
+    const res = await fetch("/api/cooks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid: client, on }) });
+    const d = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(d.error || "That didn't work. Try again.");
+    setCooks((x) => { const y = new Set(x); on ? y.add(client) : y.delete(client); return y; });
+  };
   const daam = (r: ClientRow) => r.feedback.filter((f) => f.taste === "DaaM good").length;
   const last = (r: ClientRow) => r.feedback[0];
   return (
@@ -44,6 +57,7 @@ export function CoachArea(p: AppApi) {
           </>
         );
       })()}
+      <WaitingRecipes notify={notify} setError={setError} />
       <Invites {...p} />
       <AccessRequests {...p} />
       <p className="label">Clients ({rows.length})</p>
@@ -57,12 +71,13 @@ export function CoachArea(p: AppApi) {
           <small className="client-last">{last(r) ? `${last(r).taste}: ${last(r).meal?.title ?? ""} · ${new Date(last(r).createdAt).toLocaleDateString()}${last(r).notes ? ` · ${last(r).notes}` : ""}` : "no meals yet"} · active {r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : "never"}</small>
         </button>
       ))}
-      {open && <ClientSheet row={open} coachName={coachName} close={() => setOpen(null)} onSaved={refresh} setError={setError} notify={notify} confirmAi={p.confirmClientAi} />}
+      {open && <ClientSheet row={open} coachName={coachName} close={() => setOpen(null)} onSaved={refresh} setError={setError} notify={notify} confirmAi={p.confirmClientAi}
+        cook={cooks.has(open.uid)} setCook={(on) => setCook(open.uid, on).then(() => notify(on ? `${open.name.split(" ")[0]} is a cook: they can send you recipes to publish.` : `${open.name.split(" ")[0]} is no longer a cook.`)).catch((e) => setError(e.message))} />}
     </>
   );
 }
 
-function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirmAi }: { row: ClientRow; coachName: string; close: () => void; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void; confirmAi?: (uid: string, on: boolean) => Promise<void> }) {
+function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirmAi, cook, setCook }: { row: ClientRow; coachName: string; close: () => void; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void; confirmAi?: (uid: string, on: boolean) => Promise<void>; cook?: boolean; setCook?: (on: boolean) => void }) {
   const [band, setBand] = useState<string>(row.goal?.band ?? "");
   const [editing, setEditing] = useState(false);
   const [formula, setFormula] = useState<"mifflin" | "katch" | null>(row.formula ?? null);
@@ -89,6 +104,12 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirm
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
         <div className="card-top"><span>{row.name}</span><button className="link" onClick={close}>Close</button></div>
+        {setCook && (
+          <label className="cook-switch">
+            <span><b>Cook</b><small>Can send you recipes to publish. You see each one first.</small></span>
+            <input type="checkbox" role="switch" aria-label={`${row.name.split(" ")[0]} is a cook`} checked={Boolean(cook)} onChange={(e) => setCook(e.target.checked)} />
+          </label>
+        )}
         {(() => {
           // safety: situation and date only, never the person's words; the coach confirms Mealan's chat for a flagged account
           const needs = row.flags.some((f) => f.situation === "eating");
@@ -326,3 +347,59 @@ function ReviewCard({ row, answer, open }: { row: ClientRow; answer: (status: "a
     </section>
   );
 }
+
+// Recipes waiting for you (board RG5): a cook's recipe, or changes to their live one, wait for their coach. See the page
+// first, then Make it live; or Send back with a note, which the cook sees on the recipe.
+type Waiting = PublicRecipe & { photo: string | null; change: boolean; sentAt: string };
+export function WaitingRecipes({ notify, setError }: { notify: (m: string) => void; setError: (m: string) => void }) {
+  const [list, setList] = useState<Waiting[]>([]);
+  const [seen, setSeen] = useState<Set<string>>(new Set());
+  const [viewing, setViewing] = useState<Waiting | null>(null);
+  const [noteFor, setNoteFor] = useState<string | null>(null);
+  const [note, setNote] = useState("");
+  const load = () => fetch("/api/waiting").then((r) => r.json()).then((d) => setList(d.recipes ?? [])).catch(() => {});
+  useEffect(() => { load(); }, []);
+  useBack(Boolean(viewing), () => setViewing(null));
+  const answer = async (r: Waiting, action: "live" | "back") => {
+    try {
+      const res = await fetch(`/api/waiting/${r.slug}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, note }) });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || "That didn't work. Try again.");
+      notify(action === "live" ? `${r.title} is live.` : `${r.title} went back with your note.`);
+      setViewing(null); setNoteFor(null); setNote(""); load();
+    } catch (e: any) { setError(e.message); }
+  };
+  if (!list.length) return null;
+  return (
+    <>
+      <div className="approve-head"><p className="label">Recipes waiting for you</p><span className="approve-count">{list.length}</span></div>
+      {list.map((r) => (
+        <div className="card waiting-recipe" key={r.slug}>
+          <div className="pub-head"><b>{r.title}</b><span className="pub-state waiting">{r.change ? "Changes" : "New"}</span></div>
+          <small className="muted">{bylineOf(r.author)} · sent {new Date(r.sentAt).toLocaleDateString()} {new Date(r.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small>
+          <div className="publish-ways">
+            <button className="pill" onClick={() => { setViewing(r); setSeen((x) => new Set(x).add(r.slug)); }}>See the page</button>
+            <button className="pill pill-primary" disabled={!seen.has(r.slug)} onClick={() => answer(r, "live")}>Make it live</button>
+          </div>
+          {!seen.has(r.slug) && <small className="muted">Make it live works after See the page, so you always look first.</small>}
+          {noteFor === r.slug ? (
+            <div className="waiting-note">
+              <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="The photo is too dark. Try daylight." aria-label="Your note" />
+              <div className="publish-ways"><button className="pill" onClick={() => setNoteFor(null)}>Cancel</button><button className="pill pill-primary" disabled={!note.trim()} onClick={() => answer(r, "back")}>Send back</button></div>
+            </div>
+          ) : <button className="link" onClick={() => { setNoteFor(r.slug); setNote(""); }}>Send back with a note</button>}
+        </div>
+      ))}
+      {viewing && (
+        <div className="rp-preview" role="dialog" aria-label="See the page">
+          <RecipeView r={viewing} member={null} photoSrc={viewing.photo} top={
+            <div className="rp-preview-bar" style={{ margin: "-14px -18px 0" }}>
+              <b>{bylineOf(viewing.author)}: waiting for you. Nothing is live until you make it live.</b>
+              <div className="ways"><button className="pill" onClick={() => setViewing(null)}>Back</button><button className="pill pill-primary" onClick={() => answer(viewing, "live")}>Make it live</button></div>
+            </div>} />
+        </div>
+      )}
+    </>
+  );
+}
+

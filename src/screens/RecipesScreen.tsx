@@ -6,23 +6,30 @@ import type { AppApi } from "./api";
 import { ConfirmButton } from "../components/Confirm";
 import { useEffect, useState } from "react";
 import { PublishSheet, type Published } from "../components/PublishSheet";
+import { localAs } from "../recipes";
 
 export function RecipesScreen(p: AppApi) {
   const { state, setState, setTab, setFeedback, setReviewMeal } = p;
   // coaches publish recipes (canvas board R5); what is published already, by the recipe it came from
-  // a coach account, or coach mode on this phone when there are no accounts (local, walkthroughs)
-  const isCoach = p.profile?.role === "coach" || (!p.user && p.coach);
-  // the cook's own recipes on the site, live or taken down, by the recipe they came from (board RG3)
+  // Cook (boards RG0 to RG5): a coach is a cook and publishes; a client is a cook when their coach switched it on, and sends
+  // the recipe to their coach. Without accounts, coach mode on this phone is the coach and otherwise their client.
+  const client = !p.user && !p.coach;
+  const [cook, setCook] = useState<{ cook: boolean; direct: boolean }>({ cook: false, direct: false });
+  const isCoach = cook.cook;
+  const approver = String(p.profile?.coachName ?? "").trim().split(/\s+/)[0] || "your coach";
+  // the cook's own recipes on the site, where each one is, by the recipe they came from (board RG3)
   const [published, setPublished] = useState<Record<string, Published>>({});
   const [publishing, setPublishing] = useState<string | null>(null);
   useEffect(() => {
-    if (!isCoach) return;
-    fetch("/api/my-recipes").then((r) => r.json()).then((d) => setPublished(Object.fromEntries((d.recipes ?? []).filter((r: Published) => r.mealId).map((r: Published) => [r.mealId!, r])))).catch(() => {});
-  }, [isCoach]);
+    fetch("/api/my-recipes", { headers: localAs(client) }).then((r) => (r.ok ? r.json() : { recipes: [] })).then((d) => {
+      setCook({ cook: Boolean(d.cook), direct: Boolean(d.direct) });
+      setPublished(Object.fromEntries((d.recipes ?? []).filter((r: Published) => r.mealId).map((r: Published) => [r.mealId!, r])));
+    }).catch(() => {});
+  }, [p.user?.uid, client]);
   const first = (n?: string | null) => String(n ?? "").trim().split(/\s+/)[0] || "";
   // the byline: From Milan's kitchen (RF4 Q9)
   const author = first(p.user?.name);
-  const pubState = (id: string, draft: boolean) => (published[id] ? (published[id].status === "down" ? "down" : "live") : draft ? "draft" : null);
+  const pubState = (id: string, draft: boolean) => { const x = published[id]; return x ? (x.status === "waiting" || x.waiting ? "waiting" : x.status === "down" ? "down" : x.status === "back" ? "back" : "live") : draft ? "draft" : null; };
   const pubMeal = state.meals.find((m) => m.id === publishing);
   return (
           <div className="workspace">
@@ -68,9 +75,10 @@ export function RecipesScreen(p: AppApi) {
                         const pub = published[m.id];
                         return (
                           <div className="recipe-pub">
-                            <span className={`pub-state ${st}`}>{st === "live" ? "Live" : st === "down" ? "Taken down" : "Draft"}</span>
-                            {st === "live" && <a className="link" href={`/r/${pub.slug}`} target="_blank" rel="noreferrer">See the page</a>}
-                            <button className="link" onClick={() => setPublishing(m.id)}>{st === "live" ? "Change it" : st === "down" ? "Publish again" : "Continue"}</button>
+                            <span className={`pub-state ${st}`}>{st === "live" ? "Live" : st === "down" ? "Taken down" : st === "waiting" ? `Waiting for ${approver}` : st === "back" ? "Sent back" : "Draft"}</span>
+                            {pub && (!pub.status || pub.status === "live") && <a className="link" href={`/r/${pub.slug}`} target="_blank" rel="noreferrer">See the page</a>}
+                            <button className="link" onClick={() => setPublishing(m.id)}>{st === "waiting" ? "Open it" : st === "live" ? "Change it" : st === "down" ? (cook.direct ? "Publish again" : `Send to ${approver} again`) : "Continue"}</button>
+                            {pub?.note && st !== "waiting" && <small className="pub-note">{approver.charAt(0).toUpperCase() + approver.slice(1)}: “{pub.note}”</small>}
                           </div>
                         );
                       })()}
@@ -145,7 +153,8 @@ export function RecipesScreen(p: AppApi) {
             </aside>
           {pubMeal && <PublishSheet meal={pubMeal} cards={state.feedback} author={author} published={published[pubMeal.id] ?? null} close={() => setPublishing(null)}
             onDone={(r) => setPublished((x) => { const y = { ...x }; if (r) y[pubMeal.id] = r; else delete y[pubMeal.id]; return y; })}
-            onMeal={(patch) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === pubMeal.id ? { ...x, ...patch } : x)) }))} />}
+            onMeal={(patch) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === pubMeal.id ? { ...x, ...patch } : x)) }))}
+            direct={cook.direct} approver={approver} client={client} />}
           </div>
   );
 }

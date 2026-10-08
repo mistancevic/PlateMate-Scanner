@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Copy, Download, Image as ImageIcon, X } from "lucide-react";
 import type { Feedback, Meal, PublishDraft } from "../pilot";
-import { amountOf, bylineOf, claimProblem, fitsOf, numbersOf, plainName, slugOf, type PublicRecipe } from "../recipes";
+import { amountOf, bylineOf, claimProblem, fitsOf, localAs, numbersOf, plainName, slugOf, type PublicRecipe } from "../recipes";
 import { RecipeView } from "../screens/RecipePages";
 import { instagramImages } from "../instaImages";
 import { resizeImageBase64 } from "../utils/image";
@@ -12,9 +12,11 @@ import { useBack } from "../back";
 // recipe as a draft, never public; See the page shows it as a visitor will before anything goes live. Unpublish takes it
 // down and the link says so; Publish again brings it back on the same link. Everyone sees a recipe (Q6); the steps live
 // with the recipe (Q1); the names start without brands (Q2); the photos offered are the plate photos (Q4).
-export type Published = PublicRecipe & { status?: "live" | "down" };
-export function PublishSheet({ meal, cards, author, published, close, onDone, onMeal }: {
+// A cook who isn't a coach sends the recipe to their coach, who sees the page and makes it live or sends it back (RG1, RG5)
+export type Published = PublicRecipe & { status?: "live" | "down" | "waiting" | "back"; waiting?: boolean; note?: string };
+export function PublishSheet({ meal, cards, author, published, close, onDone, onMeal, direct = true, approver = "your coach", client = false }: {
   meal: Meal; cards: Feedback[]; author: string; published: Published | null; close: () => void; onDone: (r: Published | null) => void; onMeal: (patch: Partial<Meal>) => void;
+  direct?: boolean; approver?: string; client?: boolean;
 }) {
   useBack(true, close);
   const mine = cards.filter((c) => c.meal?.title === meal.title).sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
@@ -52,7 +54,8 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
   const [busy, setBusy] = useState("");
   const [err, setErr] = useState("");
   const [done, setDone] = useState<Published | null>(published);
-  const live = done && done.status !== "down" ? done : null;
+  const live = done && (!done.status || done.status === "live") ? done : null;
+  const waits = Boolean(done && (done.status === "waiting" || done.waiting));
   const [previewing, setPreviewing] = useState(false);
   useBack(previewing, () => setPreviewing(false));
   const fileRef = useRef<HTMLInputElement>(null);
@@ -74,17 +77,17 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
     const r = recipe(); if (!r || claim) return;
     setBusy("Publishing…"); setErr("");
     try {
-      const res = await fetch("/api/recipes", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ recipe: r, photo: await photoNow() }) });
+      const res = await fetch("/api/recipes", { method: "POST", headers: { "Content-Type": "application/json", ...localAs(client) }, body: JSON.stringify({ recipe: r, photo: await photoNow() }) });
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d.error || "Publishing didn't work. Try again.");
-      const saved: Published = { ...r, slug: d.slug || r.slug, status: "live" };
+      const saved: Published = d.status === "waiting" ? (live ? { ...live, waiting: true, note: "" } : { ...r, slug: d.slug || r.slug, status: "waiting", note: "" }) : { ...r, slug: d.slug || r.slug, status: "live" };
       setDone(saved); onDone(saved); setPreviewing(false);
     } catch (e: any) { setErr(e.message); } finally { setBusy(""); }
   };
   const unpublish = async () => {
     if (!live) return;
     setBusy("Taking it down…");
-    try { const res = await fetch(`/api/recipes/${live.slug}`, { method: "DELETE" }); if (!res.ok) throw new Error(); const down: Published = { ...live, status: "down" }; setDone(down); onDone(down); } catch { setErr("It couldn't be taken down. Try again."); } finally { setBusy(""); }
+    try { const res = await fetch(`/api/recipes/${live.slug}`, { method: "DELETE", headers: localAs(client) }); if (!res.ok) throw new Error(); const down: Published = { ...live, status: "down" }; setDone(down); onDone(down); } catch { setErr("It couldn't be taken down. Try again."); } finally { setBusy(""); }
   };
   const link = live ? `${location.origin}/r/${live.slug}` : "";
   const [copied, setCopied] = useState(false);
@@ -100,14 +103,17 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
     } catch (e: any) { if (e?.name !== "AbortError") setErr("The images couldn't be made. Try again."); } finally { setBusy(""); }
   };
 
-  const state = live ? "live" : done?.status === "down" ? "down" : "draft";
+  const state = waits ? "waiting" : live ? "live" : done?.status === "down" ? "down" : done?.status === "back" ? "back" : "draft";
+  const go = busy || (waits ? `Waiting for ${approver}` : !direct ? `Send to ${approver}` : live ? "Publish the changes" : state === "down" ? "Publish again" : "Publish");
   const preview = previewing ? recipe() : null;
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet publish-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Publish this recipe">
         <div className="card-top"><span>{meal.title}</span><button className="link" onClick={close}>Close</button></div>
-        <div className="pub-head"><h2>{live ? "Published" : "Publish this recipe"}</h2><span className={`pub-state ${state}`}>{state === "live" ? "Live" : state === "down" ? "Taken down" : "Draft"}</span></div>
-        {!live && <p className="small muted">{state === "down" ? "The link says this recipe was taken down. Publish again brings it back on the same link." : "Saved as you type, only here. Close it any time and come back."}</p>}
+        <div className="pub-head"><h2>{live ? "Published" : "Publish this recipe"}</h2><span className={`pub-state ${state}`}>{state === "live" ? "Live" : state === "down" ? "Taken down" : state === "waiting" ? `Waiting for ${approver}` : state === "back" ? "Sent back" : "Draft"}</span></div>
+        {waits && <p className="small muted">{approver.charAt(0).toUpperCase() + approver.slice(1)} sees the page first and makes it live, or sends it back with a note.{live ? " The live page stays as it is until then." : ""}</p>}
+        {!waits && done?.note && <p className="small pub-note">{approver.charAt(0).toUpperCase() + approver.slice(1)}: “{done.note}”</p>}
+        {!live && !waits && <p className="small muted">{state === "down" ? "The link says this recipe was taken down. Publish again brings it back on the same link." : "Saved as you type, only here. Close it any time and come back."}</p>}
         {live && (
           <div className="publish-done">
             <a className="publish-link" href={`/r/${live.slug}`} target="_blank" rel="noreferrer">{link.replace(/^https?:\/\//, "")}</a>
@@ -115,7 +121,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
               <button className="pill pill-small" onClick={async () => { try { await navigator.clipboard.writeText(link); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* the link is there to copy by hand */ } }}>{copied ? <><Check size={15} /> Copied</> : <><Copy size={15} /> Copy link</>}</button>
               <button className="pill pill-small pill-primary" onClick={images} disabled={Boolean(busy)}><Download size={15} /> The Instagram images</button>
             </div>
-            <small className="muted">Four images for a carousel, and the numbers as a reel's last frame. Change anything below, See the page, then Publish the changes.</small>
+            <small className="muted">Four images for a carousel, and the numbers as a reel's last frame. Change anything below, See the page, then {direct ? "Publish the changes" : `send the changes to ${approver}`}.</small>
           </div>
         )}
         <div className="setting-block">
@@ -152,7 +158,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
         {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
         <div className="ways publish-ways">
           <button className="pill pill-wide" onClick={() => setPreviewing(true)} disabled={!nums || !title.trim()}>See the page</button>
-          <button className="pill pill-wide pill-primary" onClick={publish} disabled={!nums || Boolean(claim) || Boolean(busy) || !title.trim()}>{busy || (live ? "Publish the changes" : state === "down" ? "Publish again" : "Publish")}</button>
+          <button className="pill pill-wide pill-primary" onClick={publish} disabled={!nums || Boolean(claim) || Boolean(busy) || !title.trim() || waits}>{go}</button>
         </div>
         {live && <button className="pill pill-wide" onClick={unpublish} disabled={Boolean(busy)}><X size={15} /> Unpublish</button>}
       </div>
@@ -160,8 +166,8 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
         <div className="rp-preview" role="dialog" aria-label="See the page" onClick={(e) => e.stopPropagation()}>
           <RecipeView r={preview} member={null} photoSrc={photos[photoAt] ?? null} top={
             <div className="rp-preview-bar" style={{ margin: "-14px -18px 0" }}>
-              <b>Preview: only you see this. {live ? "The live page changes when you publish." : "Nothing is live yet."}</b>
-              <div className="ways"><button className="pill" onClick={() => setPreviewing(false)}>Back to the sheet</button><button className="pill pill-primary" onClick={publish} disabled={Boolean(claim) || Boolean(busy)}>{busy || (live ? "Publish the changes" : state === "down" ? "Publish again" : "Publish")}</button></div>
+              <b>Preview: only you see this. {live ? "The live page changes when you publish." : "Nothing is live yet."}{!direct ? ` ${approver.charAt(0).toUpperCase() + approver.slice(1)} sees it before it goes live.` : ""}</b>
+              <div className="ways"><button className="pill" onClick={() => setPreviewing(false)}>Back to the sheet</button><button className="pill pill-primary" onClick={publish} disabled={Boolean(claim) || Boolean(busy) || waits}>{go}</button></div>
             </div>} />
         </div>
       )}

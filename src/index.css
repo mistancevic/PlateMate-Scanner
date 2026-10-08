@@ -999,3 +999,10 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .publish-ways { display: flex; gap: 10px; flex-wrap: nowrap; margin: 0; } .publish-ways > .pill { flex: 1; justify-content: center; }
 .rp-preview-bar .ways { margin: 0; flex-wrap: nowrap; } .rp-preview-bar .pill { justify-content: center; }
 .recipe-steps { margin-top: 6px; font-size: 14px; } .recipe-steps summary { color: var(--brand-text); font-weight: 800; cursor: pointer; } .recipe-steps ol { margin: 6px 0 0; padding-left: 20px; line-height: 1.45; }
+.pub-state.waiting { background: #fff4e0; color: #8a4b00; border-color: #f2c27a; } .pub-state.back { background: #fdecea; color: #a33a2b; border-color: #f2b8ae; }
+.pub-note { flex-basis: 100%; color: #a33a2b; font-weight: 700; }
+.cook-switch { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 14px; margin: 4px 0 10px; border: 1.5px solid var(--line); border-radius: 16px; background: var(--surface); }
+.cook-switch span { display: flex; flex-direction: column; gap: 2px; } .cook-switch small { color: var(--muted); font-weight: 600; }
+.cook-switch input { width: 46px; height: 28px; accent-color: var(--brand); flex: none; }
+.waiting-recipe { display: flex; flex-direction: column; gap: 8px; border-color: #f2c27a; background: #fffaf0; }
+.waiting-note { display: flex; flex-direction: column; gap: 8px; } .waiting-note textarea { min-height: 70px; }

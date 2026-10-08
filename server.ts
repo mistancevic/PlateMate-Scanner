@@ -467,8 +467,8 @@ async function allRecipes(req: express.Request, limit: number): Promise<any[]> {
   const q = await recipeCol(req).orderBy("publishedAt", "desc").limit(limit).get();
   return q.docs.map((d) => d.data());
 }
-const listRecipes = async (req: express.Request, limit: number) => (await allRecipes(req, 200)).filter((r) => !isDown(r)).slice(0, limit);
-const withoutPhoto = (r: any): PublicRecipe => { const { photo, authorUid, ...rest } = r; return { ...rest, hasPhoto: Boolean(photo) } as PublicRecipe; };
+const listRecipes = async (req: express.Request, limit: number) => (await allRecipes(req, 200)).filter((r) => !r.status || r.status === "live").slice(0, limit);
+const withoutPhoto = (r: any): PublicRecipe => { const { photo, authorUid, pending, waitingFor, ...rest } = r; return { ...rest, hasPhoto: Boolean(photo) } as PublicRecipe; };
 app.get("/api/recipes", async (req, res) => {
   try {
     const n = Math.max(1, Math.min(24, Number(req.query.limit) || 24));
@@ -476,18 +476,10 @@ app.get("/api/recipes", async (req, res) => {
     res.json({ recipes: (await listRecipes(req, n)).map((r) => forVisitor(withoutPhoto(r))) });
   } catch (e) { fail(res, e); }
 });
-// the cook's own recipes with where each one is (RG3): live or taken down
-app.get("/api/my-recipes", requireUser, async (req, res) => {
-  try {
-    const uid = (req as any).uid || "local";
-    res.setHeader("Cache-Control", "no-cache");
-    res.json({ recipes: (await allRecipes(req, 500)).filter((r) => (r.authorUid || "local") === uid).map((r) => ({ ...withoutPhoto(r), status: isDown(r) ? "down" : "live" })) });
-  } catch (e) { fail(res, e); }
-});
 app.get("/api/recipes/:slug", async (req, res) => {
   try {
     const r = await getRecipe(req, String(req.params.slug));
-    if (!r) return res.status(404).json({ error: "This recipe isn't published, or its address changed." });
+    if (!r || r.status === "waiting" || r.status === "back") return res.status(404).json({ error: "This recipe isn't published, or its address changed." });
     res.setHeader("Cache-Control", "no-cache");
     if (isDown(r)) return res.status(410).json({ takenDown: true, title: r.title });
     res.json({ recipe: forVisitor(withoutPhoto(r)) });
@@ -496,38 +488,129 @@ app.get("/api/recipes/:slug", async (req, res) => {
 app.get("/r/:slug/photo.jpg", async (req, res) => {
   try {
     const r = await getRecipe(req, String(req.params.slug));
-    const m = !isDown(r) && typeof r?.photo === "string" ? r.photo.match(/^data:(image\/(?:jpeg|png|webp));base64,(.+)$/) : null;
+    const m = r && (!r.status || r.status === "live") && typeof r?.photo === "string" ? r.photo.match(/^data:(image\/(?:jpeg|png|webp));base64,(.+)$/) : null;
     if (!m) return res.status(404).type("text/plain").send("No photo");
     res.setHeader("Cache-Control", "public, max-age=3600");
     res.type(m[1]).send(Buffer.from(m[2], "base64"));
   } catch { res.status(500).type("text/plain").send("No photo"); }
 });
-app.post("/api/recipes", requireUser, requireMember, requireCoach, async (req, res) => {
+// ---- Cooks (boards RG0, RG1, RG3 and RG5; Milan, 8 October 2026) ----
+// Cook is a permission, not a role: a coach is a cook and publishes; a client publishes only when their coach switched
+// Cook on, and then what they send waits for their coach: See the page, then Make it live or Send back with a note.
+// Changes to a cook's live recipe wait the same way, and the live page stays as it was until then.
+// Without accounts (local, walkthroughs) the person is the coach "local", or the client "local-client" of that coach
+// when the request says so; this is never read when accounts are on.
+const memCooks = new Map<string, any>();
+const cookCol = () => db().collection("cooks");
+type Who = { uid: string; role: "coach" | "client"; coachId: string | null };
+async function whoIs(req: express.Request): Promise<Who> {
+  if (!FB_PROJECT) return req.get("x-local-as") === "client" ? { uid: "local-client", role: "client", coachId: "local" } : { uid: "local", role: "coach", coachId: null };
+  const uid = (req as any).uid as string;
+  const snap = await db().collection("users").doc(uid).get();
+  const x = snap.exists ? (snap.data() as any) : {};
+  return { uid, role: x.role === "coach" ? "coach" : "client", coachId: x.coachId || null };
+}
+async function isCook(w: Who): Promise<boolean> {
+  if (w.role === "coach") return true;
+  if (!w.coachId) return false;
+  const c = !FB_PROJECT ? memCooks.get(w.uid) : (await cookCol().doc(w.uid).get()).data();
+  return Boolean(c?.on && c.by === w.coachId);
+}
+const isLive = (r: any) => !r?.status || r.status === "live";
+// the cook's own recipes with where each one is (RG3)
+app.get("/api/my-recipes", requireUser, async (req, res) => {
   try {
+    const w = await whoIs(req);
+    res.setHeader("Cache-Control", "no-cache");
+    const mine = (await allRecipes(req, 500)).filter((r) => (r.authorUid || "local") === w.uid);
+    res.json({ cook: await isCook(w), direct: w.role === "coach", recipes: mine.map((r) => ({ ...withoutPhoto(r), pending: undefined, waiting: Boolean(r.waitingFor), status: r.status || "live", note: r.note || "" })) });
+  } catch (e) { fail(res, e); }
+});
+app.post("/api/recipes", requireUser, requireMember, async (req, res) => {
+  try {
+    const w = await whoIs(req);
+    if (!(await isCook(w))) return res.status(403).json({ error: "Only cooks publish recipes. Your coach can make you a cook." });
     const b = req.body ?? {};
     const r = b.recipe as PublicRecipe;
     if (!r || typeof r.title !== "string" || !r.title.trim() || r.title.length > 80 || !Array.isArray(r.items) || !r.items.length || r.items.length > 40 || !Array.isArray(r.steps) || r.steps.length > 30)
       return res.status(400).json({ error: "The recipe needs a name and its foods." });
     const photo = typeof b.photo === "string" && /^data:image\/(jpeg|png|webp);base64,/.test(b.photo) && b.photo.length < 900_000 ? b.photo : null;
     const slug = slugOf(r.slug || r.title);
-    const uid = (req as any).uid || "local";
     const old = await getRecipe(req, slug);
-    if (old && old.authorUid && old.authorUid !== uid) return res.status(409).json({ error: "Another cook has a recipe at this address. Change the name a little." });
+    if (old && old.authorUid && old.authorUid !== w.uid) return res.status(409).json({ error: "Another cook has a recipe at this address. Change the name a little." });
     const now = new Date().toISOString();
-    const { status: _s, downAt: _d, ...clean } = r as any;
-    const doc = { ...clean, slug, authorUid: uid, status: "live", publishedAt: old?.publishedAt ?? now, updatedAt: now, photo: photo ?? old?.photo ?? null };
-    await putRecipe(req, slug, doc);
-    res.json({ slug, url: `/r/${slug}` });
+    const { status: _s, downAt: _d, pending: _p, waitingFor: _w, note: _n, ...clean } = r as any;
+    const fresh = { ...clean, slug, authorUid: w.uid, publishedAt: old?.publishedAt ?? now, updatedAt: now, photo: photo ?? old?.photo ?? null };
+    if (w.role === "coach") {
+      await putRecipe(req, slug, { ...fresh, status: "live" });
+      return res.json({ slug, url: `/r/${slug}`, status: "live" });
+    }
+    // a client cook: it waits for their coach; a live one keeps its page until the coach makes the changes live
+    const sentAt = now;
+    if (old && isLive(old)) {
+      const { pending: _op, note: _on, ...keep } = old;
+      await putRecipe(req, slug, { ...keep, pending: { ...fresh, status: "live" }, waitingFor: w.coachId, sentAt });
+    } else {
+      const { note: _on, ...rest } = fresh as any;
+      await putRecipe(req, slug, { ...rest, status: "waiting", waitingFor: w.coachId, sentAt });
+    }
+    res.json({ slug, url: `/r/${slug}`, status: "waiting" });
   } catch (e) { fail(res, e); }
 });
-// Unpublish: taken down, not deleted (RG4)
-app.delete("/api/recipes/:slug", requireUser, requireMember, requireCoach, async (req, res) => {
+// Unpublish: taken down, not deleted (RG4); the cook who published it, or the coach a waiting recipe is with
+app.delete("/api/recipes/:slug", requireUser, requireMember, async (req, res) => {
   try {
-    const slug = String(req.params.slug), old = await getRecipe(req, slug), uid = (req as any).uid || "local";
+    const w = await whoIs(req);
+    const slug = String(req.params.slug), old = await getRecipe(req, slug);
     if (!old) return res.json({ ok: true });
-    if (old.authorUid && old.authorUid !== uid) return res.status(403).json({ error: "Only the cook who published it can take it down." });
-    await putRecipe(req, slug, { ...old, status: "down", downAt: new Date().toISOString() });
+    if (old.authorUid && old.authorUid !== w.uid) return res.status(403).json({ error: "Only the cook who published it can take it down." });
+    const { pending: _p, waitingFor: _w, ...keep } = old;
+    await putRecipe(req, slug, { ...keep, status: "down", downAt: new Date().toISOString() });
     res.json({ ok: true });
+  } catch (e) { fail(res, e); }
+});
+// What waits for this coach (RG5): the page as it would be, with its photo, to look at before it goes live
+app.get("/api/waiting", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    const w = await whoIs(req);
+    const all = !FB_PROJECT ? [...memRecipes[spaceOf(req)].values()] : (await recipeCol(req).where("waitingFor", "==", w.uid).get()).docs.map((d) => d.data());
+    res.setHeader("Cache-Control", "no-cache");
+    res.json({ recipes: all.filter((r) => r.waitingFor === w.uid).map((r) => { const v = r.pending ?? r; const { authorUid, ...rest } = v; return { ...rest, slug: r.slug, status: "waiting", change: Boolean(r.pending), sentAt: r.sentAt, photo: v.photo ?? r.photo ?? null }; }) });
+  } catch (e) { fail(res, e); }
+});
+app.post("/api/waiting/:slug", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    const w = await whoIs(req);
+    const slug = String(req.params.slug), r = await getRecipe(req, slug);
+    if (!r || r.waitingFor !== w.uid) return res.status(404).json({ error: "This recipe isn't waiting for you any more." });
+    const action = String(req.body?.action || ""), note = String(req.body?.note || "").trim().slice(0, 400);
+    const { pending, waitingFor: _w, sentAt: _s, ...keep } = r;
+    const now = new Date().toISOString();
+    if (action === "live") await putRecipe(req, slug, pending ? { ...pending, publishedAt: r.publishedAt, updatedAt: now, photo: pending.photo ?? r.photo ?? null } : { ...keep, status: "live", note: "", publishedAt: now, updatedAt: now });
+    else if (action === "back") await putRecipe(req, slug, pending ? { ...keep, note } : { ...keep, status: "back", note });
+    else return res.status(400).json({ error: "Make it live, or send it back." });
+    res.json({ ok: true });
+  } catch (e) { fail(res, e); }
+});
+// The Cook switch on a client (RG5): only their own coach
+app.get("/api/cooks", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    const w = await whoIs(req);
+    const uids = !FB_PROJECT ? [...memCooks.entries()].filter(([, c]) => c.on && c.by === w.uid).map(([u]) => u) : (await cookCol().where("by", "==", w.uid).get()).docs.filter((d) => d.data().on).map((d) => d.id);
+    res.json({ uids });
+  } catch (e) { fail(res, e); }
+});
+app.post("/api/cooks", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    const w = await whoIs(req);
+    const client = String(req.body?.uid || ""), on = Boolean(req.body?.on);
+    if (!client) return res.status(400).json({ error: "Which client?" });
+    if (FB_PROJECT) {
+      const c = await db().collection("users").doc(client).get();
+      if (!c.exists || c.data()?.coachId !== w.uid) return res.status(403).json({ error: "Only their coach can make them a cook." });
+      await cookCol().doc(client).set({ on, by: w.uid, at: new Date().toISOString() });
+    } else memCooks.set(client, { on, by: w.uid });
+    res.json({ ok: true, on });
   } catch (e) { fail(res, e); }
 });
 // Photos from Open Food Facts come through here, so the app can keep a copy: only their image server, only images, 4 MB at most
@@ -1076,7 +1159,7 @@ async function start() {
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       try {
         const r = await getRecipe(req, String(req.params.slug));
-        if (!r) return res.sendFile(path.join(dist, "index.html"));
+        if (!r || r.status === "waiting" || r.status === "back") return res.sendFile(path.join(dist, "index.html"));
         const base = `https://${req.get("host")}`;
         // taken down: the page says so; search engines are told it is gone
         if (isDown(r)) return res.status(410).type("html").send(withMeta(`Taken down · Chef Mealan`, `${r.title} is no longer on Chef Mealan.`, `${base}/og.jpg?v=2`, `${base}/r/${r.slug}`).replace("</head>", '<meta name="robots" content="noindex"></head>'));
