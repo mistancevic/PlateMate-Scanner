@@ -11,6 +11,7 @@ import { weighInsOff, withoutWeighIn } from "../weight";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
 import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, type Personal, type DayType } from "../personal";
+import { slotsOf } from "../slots";
 import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, type Plan, type PlanDay, type Lifestyle } from "../plan";
 import { DayEditor } from "../components/DayEditor";
 import { ProteinCard } from "../components/ProteinCard";
@@ -393,6 +394,12 @@ function LifestylePanel(p: AppApi) {
             )}
           </Setting>
         )}
+        {/* 0.2.1: the slots Plan shows, with their times; the times start from the eating window above and can be changed here */}
+        <Setting name="Meal times" hint="The slots of your day in Plan. Change a time when your day runs differently.">
+          <div className="field-row slot-times">
+            {slotsOf(l).map((s) => <label key={s.id} className="field field-on"><span>{s.name}</span><input type="time" value={s.time} aria-label={`${s.name} time`} onChange={(e) => e.target.value && save({ slotTimes: { ...(l.slotTimes ?? {}), [s.id]: e.target.value } })} /></label>)}
+          </div>
+        </Setting>
         <Setting name="How you eat"><Chips items={asItems(DIETS)} on={l.diet ?? "Everything"} pick={(v) => save({ diet: v })} /></Setting>
         {age !== null && age >= ALCOHOL_AGE && (
           <Setting name="Alcohol" hint="Alcohol counts as energy, 7 kcal a gram, and slows recovery. Chef Mealan will leave room for it on those days instead of pretending it isn't there.">

@@ -1468,7 +1468,9 @@ export default function App() {
   }
   // Today's four numbers: the week's average, unless each day has its own and today's day is picked; then that day's row,
   // calculated from the profile, or the coach's or the person's own numbers for that day.
-  function todayNumbers(): { kcal: number; protein: number; fats: number; carbs: number } | null {
+  // The same for any day (0.2.1): Plan shows the numbers of the day it looks at.
+  function todayNumbers(): { kcal: number; protein: number; fats: number; carbs: number } | null { return numbersOfDay(day); }
+  function numbersOfDay(day: Day): { kcal: number; protein: number; fats: number; carbs: number } | null {
     const g = state.goals;
     if (g.calories == null || g.protein == null) return null;
     const fats = g.fats ?? macroSplit(g.calories, g.protein).fats;
@@ -1755,6 +1757,7 @@ export default function App() {
     },
     // today's four: protein and fat stay, the carbs take the day's difference
     todayMacros: todayNumbers(),
+    numbersFor: (date: Date) => numbersOfDay(getDay(personal, date)),
     openMenu: (s?: MenuSection, from?: MenuSection) => { setMenuFrom(from ?? null); setMenuSection(s ?? "list"); },
     foodsView, setFoodsView, saveFood, setEditFrom,
     // a product picked from the search opens the sheet titled by the button that picked it

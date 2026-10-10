@@ -223,6 +223,8 @@ export type Lifestyle = {
   school?: SchoolHours; commute?: Commute; peWeek?: "1" | "2" | "3" | "none";
   bed?: "early" | "mid" | "late" | "varies"; wake?: "early" | "mid" | "late" | "varies";
   where?: string[]; meals?: number; window?: { from: string; to: string } | null; diet?: string; alcohol?: string;
+  // the slots' times when changed by hand (0.2.1), by slot id: breakfast, lunch, snack, snack2, dinner
+  slotTimes?: Record<string, string>;
 };
 // Life without planned activity, as a multiple of resting burn: physical activity levels after FAO/WHO/UNU 2004, at the low
 // end of each band, because planned activity is counted per day. A day off from a job on your feet counts as a sitting day.

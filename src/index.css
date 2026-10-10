@@ -1059,3 +1059,15 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .plan-line-pen { background: none; border: 0; padding: 0; color: var(--muted); display: inline-flex; cursor: pointer; }
 /* Plan, empty for now */
 .plan-empty { display: flex; flex-direction: column; gap: 8px; } .plan-empty .card-top { font-size: 15px; color: var(--ink); } .plan-empty .card-top span { display: flex; align-items: center; gap: 8px; } .plan-empty small { color: var(--muted); font-weight: 600; }
+/* Plan (0.2.1): the day strip, the day's card with its slots and training row */
+.day-strip { display: flex; gap: 6px; margin: 0 0 12px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; } .day-strip::-webkit-scrollbar { display: none; }
+.day-strip .choice { flex: none; padding: 0 10px; }
+.plan-day { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.plan-day-head { padding: 12px 16px 8px; display: flex; flex-direction: column; gap: 2px; } .plan-day-head b { font-size: 15px; } .plan-day-head small { color: var(--muted); font-weight: 700; }
+.plan-day .menu-row { background: none; border: 0; border-top: 1px solid var(--line); width: 100%; font: inherit; color: var(--muted); padding: 12px 16px; }
+.plan-time { width: 44px; flex: none; font-size: 12px; font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
+.plan-day .menu-row-text small { font-weight: 700; color: var(--muted); } .plan-day .menu-row-text b { font-size: 16px; color: var(--ink); }
+.plan-day .plan-slot .plan-pick { color: var(--brand-text); }
+.plan-training { background: #f6f8fc; } .plan-training .menu-row-text b { font-size: 15px; color: var(--muted); }
+.plan-links { margin-top: 4px; gap: 8px; }
+.slot-times { grid-template-columns: repeat(2, 1fr); }

@@ -76,6 +76,8 @@ export interface AppApi {
   setPersonal: (p: import("../personal").Personal) => void;
   applyNumbers: (bandId: string, kcal: number, protein: number, method?: string, fats?: number, carbs?: number) => void;
   todayMacros: { kcal: number; protein: number; fats: number; carbs: number } | null;
+  // the numbers of any day, for Plan (0.2.1)
+  numbersFor: (date: Date) => { kcal: number; protein: number; fats: number; carbs: number } | null;
   goalLog: import("../goal").GoalEntry[];
   addFoodPhoto: (foodId: string, dataUrl: string) => Promise<void>;
   saveFood: (f: import("../pilot").Food) => void;

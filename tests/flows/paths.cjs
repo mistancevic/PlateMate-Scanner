@@ -9,7 +9,7 @@ const PATHS = [
   { id: "P3", name: "A craving at home: moment, foods in, Fit to my target, Make it, saved", guards: ["meal-from-empty-plate", "mix-tip"] },
   { id: "P4", name: "Out, or missing something: the helper and the chat work with what I have", guards: ["dont-have-it", "chat-then-craving"] },
   { id: "P5", name: "Around training: the fit line for the moment, the count it gives", guards: ["mix-tip"] },
-  { id: "P6", name: "The day: the plan, the day set once, what went through Mealan", guards: ["today", "quick-picks"] },
+  { id: "P6", name: "The day: the plan, the day set once, what went through Mealan", guards: ["today", "quick-picks", "plan-slots"] },
   { id: "P7", name: "With a coach: shared cards, a recipe sent, the day seen", guards: [] },
   { id: "P8", name: "Leaving, or taking my data: export, full deletion", guards: ["safety"], note: "deletion needs a live account; checked on the phone" },
 ];
