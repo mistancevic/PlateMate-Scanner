@@ -1071,3 +1071,14 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .plan-training { background: #f6f8fc; } .plan-training .menu-row-text b { font-size: 15px; color: var(--muted); }
 .plan-links { margin-top: 4px; gap: 8px; }
 .slot-times { grid-template-columns: repeat(2, 1fr); }
+/* 0.2.2: a slot with a meal, its mark, the pick sheet */
+.plan-slot-wrap { display: flex; flex-direction: column; }
+.plan-day .plan-slot-sub { font-weight: 600; font-size: 12.5px; } .fit-ok { color: var(--top); font-weight: 800; } .fit-under { color: #b36b00; font-weight: 800; }
+.plan-slot-fix { padding: 0 16px 12px; gap: 8px; } .plan-slot-fix .pill-small { flex: 1; justify-content: center; }
+.day-strip .choice.has::after { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--brand); margin-left: 2px; }
+.pick-sheet { max-height: 88dvh; } .pick-sheet .card-top { font-size: 15px; color: var(--ink); } .pick-why { color: var(--muted); font-weight: 600; margin: 4px 0 12px; }
+.pick-group { display: block; font-size: 11.5px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 6px; }
+.pick-list { margin-bottom: 12px; } .pick-row { background: none; border: 0; border-bottom: 1px solid var(--line); font: inherit; width: 100%; padding: 12px 14px; } .pick-row:last-child { border-bottom: 0; }
+.pick-pd { display: flex; flex-direction: column; align-items: flex-end; flex: none; } .pick-pd b { font-size: 20px; line-height: 1; } .pick-pd small { font-size: 11px; font-weight: 800; }
+.pick-pd.fits { color: var(--brand); } .pick-pd.under { color: #b36b00; } .pick-pd.none { color: var(--muted); }
+.pick-plate { margin: 0 0 8px; }

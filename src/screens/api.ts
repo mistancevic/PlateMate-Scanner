@@ -4,6 +4,8 @@ import type { ScannerMode } from "../types";
 
 export type Tab = "home" | "journey" | "plan" | "me" | "clients" | "meal" | "chef" | "foods" | "recipes" | "notes" | "more";
 export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "account" | "support" | "about" | "evals";
+// the slot a plate is made for (0.2.2): the date, the slot and its name and time, for the line on the Plate
+export type Filling = { date: string; slotId: string; name: string; time: string; dayName: string };
 export type Step = "in" | "recipe" | "make" | "made" | "after";
 
 export interface AppApi {
@@ -78,6 +80,12 @@ export interface AppApi {
   todayMacros: { kcal: number; protein: number; fats: number; carbs: number } | null;
   // the numbers of any day, for Plan (0.2.1)
   numbersFor: (date: Date) => { kcal: number; protein: number; fats: number; carbs: number } | null;
+  // the slots' meals (0.2.2)
+  planned: import("../planned").Planned;
+  fill: (date: string, slotId: string, meal: import("../planned").PlannedMeal | null) => void;
+  filling: Filling | null;
+  setFilling: (f: Filling | null) => void;
+  fillOnPlate: (f: Filling, meal?: Meal | null, title?: string) => void;
   goalLog: import("../goal").GoalEntry[];
   addFoodPhoto: (foodId: string, dataUrl: string) => Promise<void>;
   saveFood: (f: import("../pilot").Food) => void;

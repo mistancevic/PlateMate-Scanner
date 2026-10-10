@@ -48,6 +48,8 @@ import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalLabel, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { setTodayChange, dayOfLoad, type PlanDay } from "./plan";
+import { getPlanned, storePlanned, withPlanned, type Planned, type PlannedMeal } from "./planned";
+import type { Filling } from "./screens/api";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, type Personal, type DayType, type Day } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
@@ -740,6 +742,9 @@ export default function App() {
     [review, setReview] = useState<NumbersReview | null>(null),
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
     [talkOpen, setTalkOpen] = useState(false),
+    // the slots' meals (0.2.2) and the slot a plate is being made for
+    [planned, setPlannedState] = useState<Planned>(getPlanned),
+    [filling, setFilling] = useState<Filling | null>(null),
     [profileReady, setProfileReady] = useState(false),
     [loadTry, setLoadTry] = useState(0),
     [talkTurns, setTalkTurns] = useState<Turn[]>([]),
@@ -1764,8 +1769,16 @@ export default function App() {
     addFromDatabase: (code: string) => { setEditTitle("Add to my foods"); lookup(code); },
     searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (region ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
     peekBarcode: async (code: string) => { try { const d = await api(`/api/product/${code}`); return d?.product_name ? { code, name: d.product_name, brand: d.brand || "", quantity: "", kcal: d.calories, protein: d.protein } : null; } catch { return null; } },
+    // Plan (0.2.2): the meals in the slots, by date and slot; a plate made for a slot lands in it when saved
+    planned, filling, setFilling,
+    fill: (date: string, slotId: string, meal: PlannedMeal | null) => { const next = withPlanned(planned, date, slotId, meal); storePlanned(next); setPlannedState(next); },
+    fillOnPlate: (f: Filling, meal?: Meal | null, title?: string) => {
+      setFilling(f);
+      setState((s) => ({ ...s, title: meal?.title ?? title ?? "", items: meal ? structuredClone(meal.items) : [], portion: null }));
+      setKind("meal"); setStep(meal ? "recipe" : "in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
+    },
     // a link that changes the tab leaves any open panel or chat behind, or it would land under them and look dead
-    setTab: (t: Tab) => { setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab(t); },
+    setTab: (t: Tab) => { setMenuSection(null); setMenuFrom(null); setTalkOpen(false); if (t !== "journey") setFilling(null); setTab(t); },
     inbox,
     takeRecipe: async (item: InboxItem, how: "make" | "keep") => {
       // foods she doesn't have come along; then the recipe goes to the plate or to her recipes
@@ -2013,7 +2026,7 @@ export default function App() {
       <BackKeeper tab={tab} setTab={setTab} />
       <Opened />
       <header className="topbar">
-        <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setTab("home"); }} aria-label={`${APP_NAME}, Today`}>
+        <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setFilling(null); setTab("home"); }} aria-label={`${APP_NAME}, Today`}>
           <Mark size={28} color="var(--brand)" />
         </button>
         <h1>{TITLES[tab]}</h1>
@@ -2092,7 +2105,7 @@ export default function App() {
             key={n.id}
             className={tab === n.id || (n.id === "journey" && (tab === "meal" || tab === "chef")) ? "active" : ""}
             aria-current={tab === n.id ? "page" : undefined}
-            onClick={() => { setMenuSection(null); setTalkOpen(false); setTab(n.id); }}
+            onClick={() => { setMenuSection(null); setTalkOpen(false); if (n.id !== "journey") setFilling(null); setTab(n.id); }}
           >
             {n.icon}
             <span>{n.label}</span>

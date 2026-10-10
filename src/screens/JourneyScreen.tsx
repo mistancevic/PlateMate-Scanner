@@ -3,6 +3,7 @@ import { Camera, Pencil, Plus, Trash2, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown 
 import { ConfirmButton } from "../components/Confirm";
 import type { Mix } from "../mixtip";
 import { aggregate, density, uid, solveIngredient, servingLabel } from "../pilot";
+import { fromMeal } from "../planned";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
@@ -197,7 +198,7 @@ export function JourneyScreen(p: AppApi) {
         {/* the plan line (0.2.0, canvas S): one line says what the plate is; the kind and the moment sit behind its pencil, never asked first.
             A planned meal (0.2.2) says Lunch, 12:30 · By the plan; until then every plate is off the plan. */}
         <div className="plan-line">
-          <span>Off the plan · {momentOf(p.moment).name}{p.kind === "dessert" ? " · A dessert" : " · A mix"}</span>
+          <span>{p.filling ? `${p.filling.dayName === "today" ? "Today" : p.filling.dayName}'s ${p.filling.name.toLowerCase()}, ${p.filling.time} · By the plan` : `Off the plan · ${momentOf(p.moment).name}${p.kind === "dessert" ? " · A dessert" : " · A mix"}`}</span>
           <button className="icon plan-line-pen" aria-label="Change what this plate is" aria-expanded={lineOpen} onClick={() => setLineOpen((v) => !v)}><Pencil size={16} /></button>
         </div>
         {lineOpen && (<>
@@ -368,10 +369,21 @@ export function JourneyScreen(p: AppApi) {
           setMethod(null);
           setStep("make");
         }}>Make it</button>
+        {p.filling ? (
+          // a plate made for a slot (0.2.2): saved as a recipe and put in the slot, then back to Plan
+          <button className="pill pill-wide" onClick={() => {
+            const f = p.filling!;
+            const meal = { id: uid(), title: p.state.title || autoTitle(shown), items: structuredClone(shown), portion: shown.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
+            setState((s) => ({ ...s, meals: [structuredClone(meal), ...s.meals], items: [], portion: null, title: "" }));
+            p.fill(f.date, f.slotId, { ...fromMeal(meal, "plate"), source: "plate" });
+            p.setFilling(null); setStep("in"); setTab("plan"); notify(`${meal.title} is ${f.dayName === "today" ? "today's" : `${f.dayName}'s`} ${f.name.toLowerCase()}. Saved to My recipes too.`);
+          }}>Put it in {p.filling.dayName === "today" ? "today's" : `${p.filling.dayName}'s`} {p.filling.name.toLowerCase()}</button>
+        ) : (
         <button className="pill pill-wide" onClick={() => {
           p.keepForLater({ id: uid(), title: p.state.title || autoTitle(shown), items: structuredClone(shown), portion: shown.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
           setStep("in");
         }}>Keep for later today</button>
+        )}
         {options.length > 1 && <button className="pill pill-wide" onClick={() => {
           const next = (pick + 1) % options.length; setPick(next);
           setState((s) => ({ ...s, items: options[next].items, portion: null }));
