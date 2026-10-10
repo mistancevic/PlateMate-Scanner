@@ -26,7 +26,7 @@ seed.foods = seed.foods.map((f) => /Skyr/.test(f.name) ? { ...f, photos: [jpg, j
     await require("./adult.cjs")(page);
     await page.goto("http://127.0.0.1:3194/"); await page.waitForTimeout(900);
     ok(new URL(page.url()).pathname === "/today", "the app opens at /today: " + page.url());
-    await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(400);
+    await require("./foods.cjs")(page);
     ok(new URL(page.url()).pathname === "/foods", "Foods has its own address: " + page.url());
     const skyr = page.locator(".row-text").filter({ hasText: "Skyr" }).first();
     ok(await skyr.locator(".new-mark").count() === 1, "a food added today is marked New");
@@ -49,7 +49,7 @@ seed.foods = seed.foods.map((f) => /Skyr/.test(f.name) ? { ...f, photos: [jpg, j
     ok(await page.locator(".foodcard-head").count() === 0 && new URL(page.url()).pathname === "/foods", "Back closes the card; the Foods list stays");
     await back();
     ok(new URL(page.url()).pathname === "/today", "Back goes to the tab you came from: " + page.url());
-    await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(300);
+    await require("./foods.cjs")(page);
     // one photo: tapping it closes it
     await page.locator(".row-text").filter({ hasText: "Nutella" }).first().locator(".name-link").click(); await page.waitForTimeout(300);
     await page.getByRole("button", { name: "See the photo" }).click(); await page.waitForTimeout(300);
@@ -62,7 +62,7 @@ seed.foods = seed.foods.map((f) => /Skyr/.test(f.name) ? { ...f, photos: [jpg, j
     await page.locator(".sheet .card-top").getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(600);
     await back();
     ok(new URL(page.url()).pathname === "/today", "after Close, Back goes to the tab you came from: " + page.url());
-    await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(300);
+    await require("./foods.cjs")(page);
     await page.reload(); await page.waitForTimeout(1200);
     ok(new URL(page.url()).pathname === "/foods" && await page.getByText("Find a food").count() === 1, "a reload opens on the same tab");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));

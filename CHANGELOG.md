@@ -2,6 +2,12 @@
 
 One version per release since 2 October 2026. The number is in Menu, About, next to the commit; every release is a git tag `vX.Y.Z`; the full story of each is in the commit message (`git log`).
 
+## 0.2.x, the plan is the spine
+
+Chef Mealan 0.2 (canvas boards 0.2 · M0 to M2, X0, S and H, 10 and 11 October 2026). The promise: Chef Mealan helps you eat by your plan and steps in when life does not. Four screens, four jobs: Today eats and counts, Plan decides, Plate makes, Recipes keeps. Built in small releases, 0.2.0 to 0.2.6.
+
+- **v0.2.0** · 2026-10-11 · the bar and the voice, renames and moves only: the bar is Today, Plan, Plate, Recipes; Foods moved to the top menu under Me (the Plate's search and Quick picks keep it one tap away); Plan is a new tab that says what it will hold, with Lifestyle and Weekly plan one tap away. Today says MY GOAL (first person for what is mine; "set by" only when the coach set it), What's cooking became What's in the plan with one row, Nothing planned so far, Go to Plan, and Scan sits under the card in blue. On the Plate one line says what the plate is, Off the plan · Regular meal · A mix, and the kind and When is this for? sit behind its pencil. Walkthroughs reach Foods through the menu (tests/flows/foods.cjs) and open the line before tapping a moment (line.cjs).
+
 ## 0.1.x, the pilot builds
 
 - **v0.1.96** · 2026-10-10 · the connected flow from Today (canvas Y1, approved by Milan): under the goal card one card, What's cooking?, with Meal and Dessert as choices and Scan under them; My recipes and My foods left Today, the bar has them. Change today's plan is a pencil on the date line and the helper line says: If today goes differently, tap the pencil. The weigh-in row moved from Today to the bottom of the goal card on Me. The Plate shows the kind, Meal · Dessert, under the title and lets you change it; Make it again takes the recipe's kind; the kind is saved with the recipe and goes to Chef Mealan. A dessert takes about a tenth of the day, no more than what is left, and Fit to my target brings it down to that. The plate itself is a card, On the plate: empty it says Add a food with Scan and Type as two equal buttons; with foods it holds As it stands, the rows, Scan, Type, Empty plate and Fit to my target as its own action. My recipes empty: Your first recipe starts on the Plate, with Make my first recipe. Lifestyle: From and To look picked once Set my window is on.

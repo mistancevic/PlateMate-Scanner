@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChefHat, Camera, ChevronRight, Check, Pencil, Salad, IceCreamCone } from "lucide-react";
+import { ChefHat, Camera, ChevronRight, Check, Pencil } from "lucide-react";
 import { aggregate, density } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
@@ -51,8 +51,8 @@ export function HomeScreen(p: AppApi) {
       <section className="plan">
         {/* the goal is the headline and the way in; whose and who set it is one small line above it */}
         <div className="plan-goal">
-          <small>Your goal, set by {byCoach ? setBy : "you"}</small>
-          <button className="plan-goal-name" onClick={() => p.openMenu("goal")} aria-label="Open your goal">{bandName || "Your goal"} <ChevronRight size={22} /></button>
+          <small>{clientName ? `${clientName}'s goal` : "My goal"}{byCoach ? `, set by ${setBy}` : ""}</small>
+          <button className="plan-goal-name" onClick={() => p.openMenu("goal")} aria-label="Open my goal">{bandName || "My goal"} <ChevronRight size={22} /></button>
         </div>
         <div className="plan-row">
           <div><b>{pdVal(p.dayPd)}</b><small>{pdTag()} target{follow && p.day.source !== "assumed" ? " today" : ""}</small></div>
@@ -107,17 +107,16 @@ export function HomeScreen(p: AppApi) {
       {p.profile.role === "coach" && p.newShared > 0 && (
         <button className="strip strip-button" onClick={() => setTab("clients")}>{p.newShared} new {p.newShared === 1 ? "card" : "cards"} shared with you. Open Clients.</button>
       )}
-      {/* What's cooking? (Y1 column 1, 10 October 2026): the kind of plate as a choice, then Scan. Recipes and Foods live on the bar. */}
+      {/* What's in the plan (0.2.0, canvas S and H): the day's meals as rows once the Plan holds them (0.2.2); until then one row, Go to Plan. Then Scan, blue, the camera for what the plan is not. */}
       <section className="card cooking">
-        <div className="card-top cooking-top"><span><ChefHat size={18} /> What's cooking?</span></div>
-        <div className="cooking-kinds">
-          <button className="choice" onClick={() => { p.setKind("meal"); setStep("in"); setTab("journey"); }}><Salad size={18} /> Meal</button>
-          <button className="choice" onClick={() => { p.setKind("dessert"); setStep("in"); setTab("journey"); }}><IceCreamCone size={18} /> Dessert</button>
-        </div>
-        <button className="pill pill-tall" onClick={() => { p.setKind("meal"); setStep("in"); setTab("journey"); setMode("label"); setCamera(true); }}>
-          <Camera size={20} /> Scan
+        <div className="card-top cooking-top"><span><ChefHat size={18} /> What's in the plan</span></div>
+        <button className="menu-row plan-row-link" onClick={() => setTab("plan")}>
+          <div className="menu-row-text"><small>Nothing planned so far</small><b>Go to Plan</b><small>Set the day's meals, and they wait here</small></div><ChevronRight size={18} />
         </button>
       </section>
+      <button className="pill pill-tall pill-primary scan-today" onClick={() => { p.setKind("meal"); setStep("in"); setTab("journey"); setMode("label"); setCamera(true); }}>
+        <Camera size={20} /> Scan
+      </button>
       {inbox}
       <p className="label">Today's meals</p>
       <p className="small logged-line">{loggedLine(today, true)}</p>

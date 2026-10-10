@@ -24,7 +24,7 @@ seed.items = [];
   try {
     await require("./adult.cjs")(page);
     await page.goto("http://127.0.0.1:3190/"); await page.waitForTimeout(800);
-    await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(300);
+    await require("./foods.cjs")(page);
     await page.getByRole("button", { name: "Add a food" }).click(); await page.waitForTimeout(200);
     await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(1500);
     await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(300);

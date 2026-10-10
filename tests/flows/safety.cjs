@@ -59,7 +59,7 @@ seed.items = [];
   await page.getByRole("button", { name: /^Close$/ }).first().click().catch(() => {}); await page.waitForTimeout(300);
 
   // the allergy: never a partner, and the label check says so
-  await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(400);
+  await require("./foods.cjs")(page);
   await page.locator("button", { hasText: /^Nutella$/ }).first().click(); await page.waitForTimeout(500);
   const chips = await page.locator(".mix-chip").allTextContents();
   ok(chips.every((c) => !/Skyr|Quark|yogurt|Cottage|Whey|Milk/i.test(c)), "no dairy partner for someone avoiding milk: " + (chips.length ? chips.join(" | ").slice(0, 60) : "no mix offered"));

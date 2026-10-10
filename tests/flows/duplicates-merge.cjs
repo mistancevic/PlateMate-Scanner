@@ -15,7 +15,7 @@ seed.foods = [flip("fa", "Protein Flips Salt & Vinegar Flavour", "", undefined),
   await page.addInitScript((s) => { if (!localStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); localStorage.setItem("seeded", "1"); } }, seed);
   await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3186/"); await page.waitForTimeout(800);
-  await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(400);
+  await require("./foods.cjs")(page);
   console.log("strip:", await page.locator(".strip-button").first().textContent());
   await page.locator(".strip-button").first().click(); await page.waitForTimeout(300);
   

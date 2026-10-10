@@ -2,7 +2,7 @@ import type { Dispatch, SetStateAction, ReactNode, RefObject } from "react";
 import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
 import type { ScannerMode } from "../types";
 
-export type Tab = "home" | "journey" | "me" | "clients" | "meal" | "chef" | "foods" | "recipes" | "notes" | "more";
+export type Tab = "home" | "journey" | "plan" | "me" | "clients" | "meal" | "chef" | "foods" | "recipes" | "notes" | "more";
 export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "account" | "support" | "about" | "evals";
 export type Step = "in" | "recipe" | "make" | "made" | "after";
 

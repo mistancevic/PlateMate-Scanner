@@ -1048,3 +1048,14 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .field-on input { background: #cfe0fb; border-color: var(--brand); color: #123a7a; font-weight: 800; }
 /* My recipes, empty: a way to start */
 .recipes-empty { display: flex; flex-direction: column; gap: 10px; }
+
+/* 0.2.0 (canvas S and H, 11 October 2026): the bar Today · Plan · Plate · Recipes, Me and Foods in the menu */
+/* Today: What's in the plan as a row, Scan under the card */
+.plan-row-link { background: none; border: 0; border-top: 1px solid var(--line); width: 100%; padding: 12px 4px 4px; font: inherit; text-align: left; }
+.plan-row-link .menu-row-text b { font-size: 16px; color: var(--ink); } .plan-row-link .menu-row-text small { font-weight: 700; }
+.scan-today { margin: 12px 0 0; }
+/* the Plate: the plan line, the kind and the moment behind its pencil */
+.plan-line { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin: 0 0 10px; padding: 10px 12px; border-radius: 14px; background: #eaf1fd; color: #123a7a; font-size: 13.5px; font-weight: 800; }
+.plan-line-pen { background: none; border: 0; padding: 0; color: var(--muted); display: inline-flex; cursor: pointer; }
+/* Plan, empty for now */
+.plan-empty { display: flex; flex-direction: column; gap: 8px; } .plan-empty .card-top { font-size: 15px; color: var(--ink); } .plan-empty .card-top span { display: flex; align-items: center; gap: 8px; } .plan-empty small { color: var(--muted); font-weight: 600; }

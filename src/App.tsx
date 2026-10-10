@@ -30,6 +30,7 @@ import { MealScreen } from "./screens/MealScreen";
 import { ChefScreen } from "./screens/ChefScreen";
 import { FoodsScreen } from "./screens/FoodsScreen";
 import { RecipesScreen } from "./screens/RecipesScreen";
+import { PlanScreen } from "./screens/PlanScreen";
 import type { AppApi, Tab, Step, MenuSection } from "./screens/api";
 import { HomeScreen } from "./screens/HomeScreen";
 import { GoalScreen } from "./screens/GoalScreen";
@@ -60,7 +61,7 @@ import { getSafety, setSafety as storeSafety, aiState, addFlag, goalSignals, all
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
-import { Home, CircleUser, Menu, Users, MessageCircle, Globe } from "lucide-react";
+import { Home, CircleUser, Menu, Users, MessageCircle, Globe, CalendarDays } from "lucide-react";
 import {
   aggregate,
   candidateFood,
@@ -700,7 +701,7 @@ function BackKeeper({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
 export default function App() {
   const [state, setState] = useState<PilotState>(load),
     [tab, setTab] = useState<Tab>(() => {
-      const tabs = ["home", "journey", "meal", "chef", "recipes", "foods", "me"] as Tab[];
+      const tabs = ["home", "journey", "plan", "meal", "chef", "recipes", "foods", "me"] as Tab[];
       const fromPath = typeof location !== "undefined" ? tabOfPath(location.pathname, tabs) : null;
       const h = (typeof location !== "undefined" ? location.hash : "").replace("#", "");
       return (fromPath as Tab | null) ?? (tabs.includes(h as Tab) ? (h as Tab) : "home");
@@ -1943,16 +1944,17 @@ export default function App() {
     ),
   };
   const NAV: { id: Tab; label: string; icon: ReactNode }[] = [
+    // the bar (0.2.0, canvas X0 and H, 11 October 2026): Today eats and counts, Plan decides, Plate makes, Recipes keeps; Me and Foods in the top menu
     { id: "home", label: "Today", icon: <Home size={20} /> },
+    { id: "plan", label: "Plan", icon: <CalendarDays size={20} /> },
     { id: "journey", label: "Plate", icon: <Utensils size={20} /> },
-    // the bar holds what a day touches (X0, 10 October 2026): Recipes its own tab, Me in the top menu
     { id: "recipes", label: "Recipes", icon: <ChefHat size={20} /> },
-    { id: "foods", label: "Foods", icon: <BookOpen size={20} /> },
     ...(profile.role === "coach" ? [{ id: "clients" as Tab, label: "Clients", icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }] : []),
   ];
   const TITLES: Record<Tab, string> = {
     home: "Today",
     journey: "Plate",
+    plan: "Plan",
     recipes: "Recipes",
     me: "Me",
     clients: "Clients",
@@ -2002,9 +2004,10 @@ export default function App() {
     );
   return (
     <div className="app-shell">
-      <BackKeeper tab={tab} setTab={setTab} />
+      {/* the layers before the tab keeper: a menu row that changes the tab (Foods, 0.2.0) drops its layer first, and the tab's address is pushed once that step back has settled */}
       <MenuBack open={Boolean(menuSection)} close={() => { setMenuFrom(null); setMenuSection(null); }} />
       <MenuBack open={talkOpen && !menuSection} close={() => setTalkOpen(false)} />
+      <BackKeeper tab={tab} setTab={setTab} />
       <Opened />
       <header className="topbar">
         <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setTab("home"); }} aria-label={`${APP_NAME}, Today`}>
@@ -2058,6 +2061,7 @@ export default function App() {
         {!menuSection && !talkOpen && tab === "chef" && <ChefScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "foods" && <FoodsScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "recipes" && <RecipesScreen {...screenProps} />}
+        {!menuSection && !talkOpen && tab === "plan" && <PlanScreen {...screenProps} />}
         <input
           ref={importRef}
           type="file"

@@ -18,7 +18,7 @@ seed.items = [];
   const logOf = (ev) => page.evaluate((e) => JSON.parse(localStorage.getItem("chefmealan-log") || "[]").filter((x) => x.event === e), ev);
 
   // Foods: Nutella's card, regular meal: under target, a protein base first, up to three mixes, every one on target
-  await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(400);
+  await require("./foods.cjs")(page);
   await page.locator(".name-link, .food-name, button", { hasText: /^Nutella$/ }).first().click(); await page.waitForTimeout(500);
   ok(await page.locator(".mix-tip").count() === 1, "Nutella gets a Mix it section");
   const chips = await page.locator(".mix-chip").allTextContents();
@@ -40,14 +40,14 @@ seed.items = [];
   ok(taken.length === 1 && taken[0].partners.length === 1 && taken[0].moment === "regular", "the tap is logged with partners and moment");
 
   // a food that fits gets no mix: Eggs
-  await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(400);
+  await require("./foods.cjs")(page);
   await page.locator("button", { hasText: /^Eggs$/ }).first().click(); await page.waitForTimeout(400);
   ok(await page.locator(".mix-tip").count() === 0, "Eggs fit on their own: no Mix it");
   await page.locator(".sheet-backdrop").first().click({ position: { x: 5, y: 5 } }).catch(() => {}); await page.waitForTimeout(200);
 
   // the moment changes the mix: before training is snack-sized and never cooks
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: "Before training" }).click(); await page.waitForTimeout(200);
+  await require("./line.cjs")(page); await page.getByRole("button", { name: "Before training" }).click(); await page.waitForTimeout(200);
   await page.locator(".name-link", { hasText: "Nutella" }).first().click(); await page.waitForTimeout(400);
   const before = await page.locator(".mix-chip").allTextContents();
   ok(before.length >= 1 && before.every((c) => Number(c.match(/(\d+) kcal/)[1]) <= 300), "before training: every mix under the snack line");
@@ -63,7 +63,7 @@ seed.items = [];
 
   // the review sheet is the scan result: Type it a biscuit, Mix it shows before saving; a chip saves it and makes the plate
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: "Regular meal" }).click(); await page.waitForTimeout(200);
+  await require("./line.cjs")(page); await page.getByRole("button", { name: "Regular meal" }).click(); await page.waitForTimeout(200);
   await page.getByRole("button", { name: /Empty plate/ }).click().catch(() => {}); await page.getByRole("button", { name: /Tap again to empty/ }).click().catch(() => {}); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^Type$/ }).click(); await page.waitForTimeout(400);
   const sheet = page.locator(".modal").last();

@@ -31,6 +31,7 @@ export function JourneyScreen(p: AppApi) {
   const { state, setState, setTab, step, setStep, setCamera, setMode, blank, updateItem,
     setAdjustId, mixWith, options, pdRef, saveMeal, notify, setError, setFeedback, add } = p;
   const [q, setQ] = useState("");
+  const [lineOpen, setLineOpen] = useState(false);
   // When Mealan produces options, the first one becomes the recipe on screen.
   useEffect(() => {
     if (options.length && (step === "recipe" || step === "in")) {
@@ -193,7 +194,13 @@ export function JourneyScreen(p: AppApi) {
     return (
       <>
         <Head title="What are you craving?" sub={`Add your foods. ${CHEF_NAME} sets the amounts.`} />
-        {/* the kind of plate (Y1 column 2, 10 October 2026): from Today's What's cooking?, changeable here; a dessert takes about a tenth of the day */}
+        {/* the plan line (0.2.0, canvas S): one line says what the plate is; the kind and the moment sit behind its pencil, never asked first.
+            A planned meal (0.2.2) says Lunch, 12:30 · By the plan; until then every plate is off the plan. */}
+        <div className="plan-line">
+          <span>Off the plan · {momentOf(p.moment).name}{p.kind === "dessert" ? " · A dessert" : " · A mix"}</span>
+          <button className="icon plan-line-pen" aria-label="Change what this plate is" aria-expanded={lineOpen} onClick={() => setLineOpen((v) => !v)}><Pencil size={16} /></button>
+        </div>
+        {lineOpen && (<>
         <div className="moments kind-row" role="radiogroup" aria-label="Kind of plate">
           <button className={`choice ${p.kind === "meal" ? "on" : ""}`} aria-pressed={p.kind === "meal"} onClick={() => p.setKind("meal")}>Meal</button>
           <button className={`choice ${p.kind === "dessert" ? "on" : ""}`} aria-pressed={p.kind === "dessert"} onClick={() => p.setKind("dessert")}>Dessert</button>
@@ -205,7 +212,8 @@ export function JourneyScreen(p: AppApi) {
           ))}
         </div>
         <p className="small moment-hint">{momentOf(p.moment).hint}{p.moment !== "regular" && pdRef !== null ? ` Target for this plate: ${pdText(pdRef)}.` : ""}</p>
-        {p.moment === "travel" && (
+        </>)}
+        {lineOpen && p.moment === "travel" && (
           <>
             <p className="label">Where to?</p>
             <div className="moments">

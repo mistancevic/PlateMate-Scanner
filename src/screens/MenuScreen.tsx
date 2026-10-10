@@ -46,7 +46,10 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       <>
         <div className="menu-head"><h2>Menu</h2><button className="link" onClick={close}>Close</button></div>
         <div className="menu-list">
-          {[{ id: "me" as MenuSection, name: "Me", icon: <User size={20} /> }, { id: "support" as MenuSection, name: "Support", icon: <LifeBuoy size={20} /> }, { id: "about" as MenuSection, name: "About", icon: <Info size={20} /> }, ...(p.profile.role === "coach" || !p.cloudEnabled ? [{ id: "evals" as MenuSection, name: "Evals", icon: <FlaskConical size={20} /> }] : [])].map((it) => (
+          <button className="menu-row" onClick={() => setSection("me")}><span className="menu-icon"><User size={20} /></span><b>Me</b><ChevronRight size={18} /></button>
+          {/* Foods lives here from 0.2.0 (X0): the library, reached day to day from the Plate's search and Quick picks */}
+          <button className="menu-row" onClick={() => p.setTab("foods")}><span className="menu-icon"><BookOpen size={20} /></span><b>Foods</b><ChevronRight size={18} /></button>
+          {[{ id: "support" as MenuSection, name: "Support", icon: <LifeBuoy size={20} /> }, { id: "about" as MenuSection, name: "About", icon: <Info size={20} /> }, ...(p.profile.role === "coach" || !p.cloudEnabled ? [{ id: "evals" as MenuSection, name: "Evals", icon: <FlaskConical size={20} /> }] : [])].map((it) => (
             <button key={it.id} className="menu-row" onClick={() => setSection(it.id)}>
               <span className="menu-icon">{it.icon}</span><b>{it.name}</b><ChevronRight size={18} />
             </button>

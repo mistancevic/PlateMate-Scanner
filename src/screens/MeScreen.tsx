@@ -48,7 +48,7 @@ export function MeScreen(p: AppApi) {
   return (
     <>
       <section className="plan">
-        <div className="plan-top"><span>{clientName ? `${clientName}'s goal` : "Your goal"}{bandName ? `: ${bandName}` : ""}</span><span>set by {setBy}</span></div>
+        <div className="plan-top"><span>{clientName ? `${clientName}'s goal` : "My goal"}{bandName ? `: ${bandName}` : ""}</span><span>{goal?.setBy === "coach" ? `set by ${setBy}` : ""}</span></div>
         <div className="plan-row">
           <div><b>{pdVal(p.dayPd)}</b><small>{pdTag()} target</small></div>
           <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal a day</small></div>

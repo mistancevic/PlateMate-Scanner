@@ -15,7 +15,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.goto("http://127.0.0.1:3191/"); await page.waitForTimeout(800);
   const total = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.length);
   // make the last food a favourite, from Foods
-  await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(300);
+  await require("./foods.cjs")(page);
   const lastName = await page.evaluate(() => { const f = JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods; return f[f.length - 1].name; });
   await page.locator(".row").filter({ hasText: lastName }).getByRole("button", { name: /Favourite/ }).click(); await page.waitForTimeout(300);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(400);

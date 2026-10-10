@@ -15,7 +15,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.goto("http://127.0.0.1:3123/"); await page.waitForTimeout(700);
   const plate = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.map((i) => i.food.name));
   const expect = (label, ok, got) => { console.log(ok ? "ok  " : "FAIL", label, got !== undefined ? "-> " + JSON.stringify(got) : ""); if (!ok) process.exitCode = 1; };
-  await page.getByRole("button", { name: /^Meal$/ }).first().click(); await page.waitForTimeout(400);
+  await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(400);
   const before = await plate();
   await page.locator(".chat-fab").click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^Close$/ }).last().click(); await page.waitForTimeout(300);

@@ -8,7 +8,7 @@
 // with history.back(); a new entry asked for while that is still on its way waits for it, so entries never cross.
 import { useEffect, useRef } from "react";
 
-const TAB_PATH: Record<string, string> = { home: "/today", journey: "/plate", recipes: "/my-recipes", foods: "/foods", me: "/me" };
+const TAB_PATH: Record<string, string> = { home: "/today", journey: "/plate", plan: "/plan", recipes: "/my-recipes", foods: "/foods", me: "/me" };
 export const pathOfTab = (tab: string) => TAB_PATH[tab] ?? `/${tab}`;
 export function tabOfPath(path: string, tabs: readonly string[]): string | null {
   const hit = Object.entries(TAB_PATH).find(([, p]) => p === path)?.[0];

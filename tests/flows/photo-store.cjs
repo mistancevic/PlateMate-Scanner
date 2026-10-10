@@ -32,7 +32,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(stored >= 180, `the photos are in the phone's photo store: ${stored}`);
   // the next open: every preview shows, from the photo store
   await page.reload(); await page.waitForTimeout(2000);
-  await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(800);
+  await require("./foods.cjs")(page); await page.waitForTimeout(400);
   const back = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.filter((f) => f.id.startsWith("ph-") && typeof f.photoCount === "number").length);
   ok(back === 60, "every food remembers it has photos: " + back);
   const shown = await page.evaluate(() => [...document.querySelectorAll("img")].filter((i) => (i.getAttribute("src") || "").includes("cGhvdG8t")).length);
