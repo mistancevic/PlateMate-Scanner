@@ -21,8 +21,8 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await fab(); expect("Mealan from Today is the conversation", await page.locator(".talk-overlay h2").textContent(), "Mealan");
   expect("no floating button while talking", String(await page.locator(".chat-fab").count()), "0");
   await page.locator(".talk-overlay").getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: /I'm craving something/i }).click(); await page.waitForTimeout(400);
-  expect("I'm craving something opens the plate", await h2(), "What are you craving?");
+  await page.getByRole("button", { name: /^Meal$/ }).first().click(); await page.waitForTimeout(400);
+  expect("Meal on What's cooking? opens the plate", await h2(), "What are you craving?");
   expect("the amounts button is code, not chat", String(await page.getByRole("button", { name: /Fit to my target/ }).count()), "1");
   await fab(); expect("Mealan on a plate with food is about the plate", (await page.locator(".sheet .card-top span").first().textContent()).trim(), "Mealan, about this plate");
   await page.getByRole("button", { name: /Talk to Mealan/ }).click(); await page.waitForTimeout(300);

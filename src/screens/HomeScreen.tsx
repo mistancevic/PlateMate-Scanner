@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
-import { ChefHat, Camera, BookOpen, ChevronRight, Check } from "lucide-react";
+import { ChefHat, Camera, ChevronRight, Check, Pencil, Salad, IceCreamCone } from "lucide-react";
 import { aggregate, density } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
 import { bandOf, goalLabel } from "../goal";
-import { WeighInLine } from "../components/Weight";
-import { weighInsOff } from "../weight";
 import { DAY_TYPES, dayModeOf, dayNameAny, hasPlan, isMinor, lifestyleOf } from "../personal";
 import { planLine, schoolLine, studyLine, loadOf, LOAD_DAY, weekdaysOf, dayKindOf, type PlanDay } from "../plan";
 import { DayEditor } from "../components/DayEditor";
@@ -73,10 +71,9 @@ export function HomeScreen(p: AppApi) {
         {p.profile.coachId && !byCoach && <button className="plan-source coach-line" onClick={() => p.openMenu("coach")} aria-label="Open your coach">{p.coachLabel} <ChevronRight size={12} /></button>}
         {follow && planned && p.day.plan && !changing && (
           <div className="today-plan">
-            <b>{dateLine}</b>
+            <b className="today-date">{dateLine}<button className="icon today-pencil" aria-label="Change today's plan" onClick={() => { setDraft(p.day.plan!); setChanging(true); }}><Pencil size={16} /></button></b>
             <span className="today-what">{p.day.plan.kind === "rest" && !p.day.plan.pe ? "No training today." : `${todayLine(p.day.plan)}. ${LOAD_DAY[loadOf(p.day.plan)]}`}</span>
-            <small>{p.day.source === "today" ? "Changed for today only. Your Weekly plan stays the same." : "This comes from your Weekly plan. If today goes differently, change today's plan. The numbers follow, and your Weekly plan stays as it is."}</small>
-            <button className="pill pill-wide" onClick={() => { setDraft(p.day.plan!); setChanging(true); }}>Change today's plan</button>
+            <small>{p.day.source === "today" ? "Changed for today only. Your Weekly plan stays the same." : "If today goes differently, tap the pencil. The numbers follow, the Weekly plan stays."}</small>
             {p.day.source === "today" && <button className="link" onClick={() => p.setTodayPlan(null)}>Back to the Weekly plan</button>}
           </div>
         )}
@@ -106,26 +103,21 @@ export function HomeScreen(p: AppApi) {
             <small>Every day the same, one set of numbers. <button className="link" onClick={() => p.openMenu("goal")}>Change in Goal ›</button></small>
           </div>
         )}
-        {/* weigh-ins (canvas board W1): with consent for body data, never for someone who declared an eating situation */}
-        {p.safety.consentBodyAt && !weighInsOff(p.safety) && <WeighInLine list={p.personal.weighIns} onSave={(w) => p.setPersonal({ ...p.personal, weighIns: w })} notify={p.notify} />}
       </section>
       {p.profile.role === "coach" && p.newShared > 0 && (
         <button className="strip strip-button" onClick={() => setTab("clients")}>{p.newShared} new {p.newShared === 1 ? "card" : "cards"} shared with you. Open Clients.</button>
       )}
-      <button className="pill pill-primary pill-tall" onClick={() => { setStep("in"); setTab("journey"); }}>
-        <ChefHat size={20} /> I'm craving something
-      </button>
-      <button className="pill pill-tall" onClick={() => { setStep("in"); setTab("journey"); setMode("label"); setCamera(true); }}>
-        <Camera size={20} /> Scan
-      </button>
-      <button className="pill pill-tall" onClick={() => setTab("foods")}>
-        <BookOpen size={20} /> My foods
-      </button>
-      {state.meals.length > 0 && (
-        <button className="pill pill-tall" onClick={() => setTab("recipes")}>
-          <BookOpen size={20} /> My recipes ({state.meals.length})
+      {/* What's cooking? (Y1 column 1, 10 October 2026): the kind of plate as a choice, then Scan. Recipes and Foods live on the bar. */}
+      <section className="card cooking">
+        <div className="card-top cooking-top"><span><ChefHat size={18} /> What's cooking?</span></div>
+        <div className="cooking-kinds">
+          <button className="choice" onClick={() => { p.setKind("meal"); setStep("in"); setTab("journey"); }}><Salad size={18} /> Meal</button>
+          <button className="choice" onClick={() => { p.setKind("dessert"); setStep("in"); setTab("journey"); }}><IceCreamCone size={18} /> Dessert</button>
+        </div>
+        <button className="pill pill-tall" onClick={() => { p.setKind("meal"); setStep("in"); setTab("journey"); setMode("label"); setCamera(true); }}>
+          <Camera size={20} /> Scan
         </button>
-      )}
+      </section>
       {inbox}
       <p className="label">Today's meals</p>
       <p className="small logged-line">{loggedLine(today, true)}</p>

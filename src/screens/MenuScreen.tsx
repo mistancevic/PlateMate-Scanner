@@ -384,8 +384,8 @@ function LifestylePanel(p: AppApi) {
             <Chips items={[{ id: "none", name: "None" }, { id: "set", name: "Set my window" }]} on={l.window ? "set" : "none"} pick={(v) => save({ window: v === "set" ? (l.window ?? { from: "10:00", to: "18:00" }) : null })} />
             {l.window && (
               <div className="field-row">
-                <label className="field"><span>From</span><input type="time" value={l.window.from} onChange={(e) => save({ window: { ...l.window!, from: e.target.value } })} /></label>
-                <label className="field"><span>To</span><input type="time" value={l.window.to} onChange={(e) => save({ window: { ...l.window!, to: e.target.value } })} /></label>
+                <label className="field field-on"><span>From</span><input type="time" value={l.window.from} onChange={(e) => save({ window: { ...l.window!, from: e.target.value } })} /></label>
+                <label className="field field-on"><span>To</span><input type="time" value={l.window.to} onChange={(e) => save({ window: { ...l.window!, to: e.target.value } })} /></label>
               </div>
             )}
           </Setting>

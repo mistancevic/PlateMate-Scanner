@@ -79,6 +79,7 @@ export type Ingredient = {
 export type Goals = Nutrition;
 // What the Publish sheet keeps while a recipe is being made ready for its page (board RG1): a draft, never public
 export type PublishDraft = { title?: string; lines?: string; makes?: string; servingName?: string; minutes?: string; names?: string[]; photoAt?: number; savedAt?: string };
+export type PlateKind = "meal" | "dessert";
 export type Meal = {
   id: string;
   title: string;
@@ -90,6 +91,8 @@ export type Meal = {
   publish?: PublishDraft;
   // Coach's recipes on the Recipes tab (X0, 10 October 2026)
   from?: "coach";
+  // what kind of plate this is (Today, 10 October 2026): a meal, or a dessert sized at about a tenth of the day
+  kind?: PlateKind;
 };
 export type Feedback = {
   id: string;

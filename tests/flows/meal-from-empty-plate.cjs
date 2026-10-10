@@ -25,7 +25,7 @@ seed.items = [];
   const shot = async (n) => page.screenshot({ path: `/tmp/f2-${n}.png`, fullPage: true });
   const click = async (text) => { await page.getByRole("button", { name: text }).first().click({ timeout: 4000 }); await page.waitForTimeout(400); };
   const step = async (name, fn) => { try { await fn(); console.log("ok  ", name); } catch (e) { console.log("FAIL", name, "->", e.message.split("\n")[0]); await shot("fail-" + name.replace(/\W+/g, "_")); } };
-  await step("craving", () => click(/I'm craving something/i));
+  await step("craving", () => click(/^Meal$/));
   await step("add first food", async () => { await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300); });
   await step("add second food", async () => { await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300); });
   await shot("1-plate");

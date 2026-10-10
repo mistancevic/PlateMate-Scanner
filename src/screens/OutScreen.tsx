@@ -39,7 +39,8 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
       const res = await fetch("/api/out", { method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           text: msg, image: photo || undefined, history,
-          target: { pd: pdRef, mealKcal: state.goals.calories ? Math.round(state.goals.calories * 0.35) : null },
+          target: { pd: pdRef, mealKcal: state.goals.calories ? Math.round(state.goals.calories * (p.kind === "dessert" ? 0.1 : 0.35)) : null },
+          kind: p.kind,
           plate: state.items.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein })),
           goal: p.goal?.band,
           rhythm: p.usual, moment: p.moment, region: p.region, travelTo: p.moment === "travel" ? p.travelTo : null,

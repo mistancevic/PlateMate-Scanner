@@ -1,6 +1,8 @@
 import { Settings , Coffee } from "lucide-react";
 import { fmt, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
+import { WeighInLine } from "../components/Weight";
+import { weighInsOff } from "../weight";
 import { bandOf, goalLabel } from "../goal";
 import type { ReactNode } from "react";
 import { ChevronRight, User, Target, CalendarDays, ShoppingBasket, Users, KeyRound } from "lucide-react";
@@ -53,6 +55,8 @@ export function MeScreen(p: AppApi) {
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
         <div className="button-row"><button className="pill pill-small" onClick={() => p.openMenu("goal")}><Settings size={14} /> Goal and profile</button></div>
+        {/* weigh-ins (boards W1, Y1 column 17): moved here from Today on 10 October 2026; with consent for body data, never for someone who declared an eating situation */}
+        {p.safety.consentBodyAt && !weighInsOff(p.safety) && <WeighInLine list={p.personal.weighIns} onSave={(w) => p.setPersonal({ ...p.personal, weighIns: w })} notify={p.notify} />}
       </section>
       <div className="menu-list me-rows">
         {ME_ROWS.map((r) => (

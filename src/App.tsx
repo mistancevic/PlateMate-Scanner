@@ -91,6 +91,7 @@ import {
   symbol,
   uid,
   validateFood,
+  type PlateKind,
 } from "./pilot";
 const STORE = "platemate-pilot-v1";
 
@@ -720,6 +721,7 @@ export default function App() {
     [goalLog, setGoalLogState] = useState<GoalEntry[]>(getGoalLog),
     nextSource = useRef<GoalSource | null>(null),
     [moment, setMomentState] = useState<MomentId>("regular"),
+    [kind, setKind] = useState<PlateKind>("meal"),
     [usual, setUsualState] = useState<RhythmId[]>(getUsual),
     [region, setRegionState] = useState<RegionId | null>(getRegion),
     [travelTo, setTravelToState] = useState<RegionId | null>(getTravelTo),
@@ -1484,6 +1486,14 @@ export default function App() {
   }
   function todayKcalOf(): number | null { return todayNumbers()?.kcal ?? state.goals.calories ?? null; }
   function mix(id: string = adjustId): boolean { return mixWith(state.items, id); }
+  // the dessert's share of the day: a tenth of today's energy, no more than what is left, never under 100 kcal
+  function dessertKcal(): number {
+    const day = todayKcalOf(); if (!day) return 300;
+    const todayStr = new Date().toDateString();
+    const eaten = state.feedback.filter((f) => f.status !== "not-used" && new Date(f.createdAt).toDateString() === todayStr)
+      .reduce((a, f) => a + f.meal.items.reduce((t, i) => t + ((i.food.calories ?? 0) * i.grams) / 100, 0), 0);
+    return Math.max(100, Math.min(Math.round(day * 0.1), Math.max(100, day - eaten)));
+  }
   function mixWith(itemsIn: Ingredient[], id: string): boolean {
     setError("");
     const target = momentTarget(moment, density(state.goals.protein, todayKcalOf()));
@@ -1514,6 +1524,8 @@ export default function App() {
     const max = numberInput(limits.maxWeight),
       minP = numberInput(limits.minProtein),
       maxE = numberInput(limits.maxKcal);
+    // a dessert (Y1, 10 October 2026) takes about a tenth of the day, from what is left of it; never under 100 kcal so a real portion fits
+    const dessertCap = kind === "dessert" ? dessertKcal() : null;
     let reason = "No candidate meets the selected constraints.";
     // the person's food first and always; a swap is only offered when it goes with the rest of the plate, and a drink never is
     const others = itemsIn.filter((x) => x.id !== id).map((x) => x.food);
@@ -1538,8 +1550,13 @@ export default function App() {
       }
       // a real portion: if the target is met with less than the food's minimum portion, the minimum stands and the plate lands above the target
       const floor = minPortionOf(food);
-      const grams = Math.max(s.grams, floor);
-      const solved = grams === s.grams ? s.items : s.items.map((x) => (x.id === id ? { ...x, grams } : x));
+      let grams = Math.max(s.grams, floor);
+      let solved = grams === s.grams ? s.items : s.items.map((x) => (x.id === id ? { ...x, grams } : x));
+      if (dessertCap !== null) {
+        // over the dessert's share: the mover comes down to the cap, the dessert lands under the protein target and says so
+        const over = (aggregate(solved).calories ?? 0) - dessertCap, perG = (food.calories ?? 0) / 100;
+        if (over > 0 && perG > 0) { grams = Math.max(floor, Math.round(grams - over / perG)); solved = solved.map((x) => (x.id === id ? { ...x, grams } : x)); }
+      }
       if (max !== null && solved.reduce((a, x) => a + x.grams, 0) > max) continue;
       const t = aggregate(solved);
       if (
@@ -1631,7 +1648,7 @@ export default function App() {
     api, setImage, setEdit, setGoalsOpen, setAccessOpen, setReviewMeal,
     setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
-    pdRef, dayPd, moment, setMoment: (m: MomentId) => setMomentState(m), usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
+    pdRef, dayPd, kind, setKind, moment, setMoment: (m: MomentId) => setMomentState(m), usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },

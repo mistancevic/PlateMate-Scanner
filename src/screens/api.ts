@@ -59,6 +59,9 @@ export interface AppApi {
   totals: ReturnType<typeof import("../pilot").aggregate>;
   pdRef: number | null;
   dayPd: number | null;
+  // the kind of plate, from Today's What's cooking? or the Plate's own row; a saved recipe keeps it
+  kind: import("../pilot").PlateKind;
+  setKind: (k: import("../pilot").PlateKind) => void;
   moment: import("../moments").MomentId;
   setMoment: (m: import("../moments").MomentId) => void;
   usual: import("../moments").RhythmId[];

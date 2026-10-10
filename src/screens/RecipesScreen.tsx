@@ -39,7 +39,7 @@ export function RecipesScreen(p: AppApi) {
   const lastRating = (m: Meal) => state.feedback.find((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.taste)?.taste ?? "";
   const makeAgain = (m: Meal) => {
     setState((s) => ({ ...s, title: m.title, items: structuredClone(m.items), portion: null }));
-    p.setStep("recipe"); setTab("journey"); p.notify("On your plate. Fit to my target sets the amounts.");
+    p.setKind(m.kind ?? "meal"); p.setStep("recipe"); setTab("journey"); p.notify("On your plate. Fit to my target sets the amounts.");
   };
   return (
     <>
@@ -48,7 +48,10 @@ export function RecipesScreen(p: AppApi) {
         <button role="tab" aria-selected={view === "coach"} className={`seg ${view === "coach" ? "on" : ""}`} onClick={() => setView("coach")}>Coach's recipes{fromCoach.length ? ` (${fromCoach.length})` : ""}</button>
       </div>
       {shown.length === 0 && (
-        <section className="card"><small>{view === "mine" ? "Nothing yet. A meal you rate on the Plate can be saved here with Save in My recipes." : `Nothing yet. Recipes ${approver === "your coach" ? "your coach" : approver} sends you land here.`}</small></section>
+        <section className="card recipes-empty">
+          <small>{view === "mine" ? "Nothing here yet. Your first recipe starts on the Plate." : `Nothing yet. Recipes ${approver === "your coach" ? "your coach" : approver} sends you land here.`}</small>
+          {view === "mine" && <button className="pill pill-wide pill-primary" onClick={() => { p.setKind("meal"); p.setStep("in"); setTab("journey"); }}>Make my first recipe</button>}
+        </section>
       )}
       {shown.map((m) => {
         const photo = photoOf(m), n = madeTimes(m), rating = lastRating(m);

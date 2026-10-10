@@ -193,6 +193,11 @@ export function JourneyScreen(p: AppApi) {
     return (
       <>
         <Head title="What are you craving?" sub={`Add your foods. ${CHEF_NAME} sets the amounts.`} />
+        {/* the kind of plate (Y1 column 2, 10 October 2026): from Today's What's cooking?, changeable here; a dessert takes about a tenth of the day */}
+        <div className="moments kind-row" role="radiogroup" aria-label="Kind of plate">
+          <button className={`choice ${p.kind === "meal" ? "on" : ""}`} aria-pressed={p.kind === "meal"} onClick={() => p.setKind("meal")}>Meal</button>
+          <button className={`choice ${p.kind === "dessert" ? "on" : ""}`} aria-pressed={p.kind === "dessert"} onClick={() => p.setKind("dessert")}>Dessert</button>
+        </div>
         <p className="label">When is this for?</p>
         <div className="moments">
           {orderMoments(p.usual).map((m) => (
@@ -211,6 +216,10 @@ export function JourneyScreen(p: AppApi) {
             <p className="small moment-hint">{p.travelTo ? `${CHEF_NAME} plans with what's sold in ${REGIONS.find((r) => r.id === p.travelTo)?.name}. Use the chat to shop and cook there.` : "Pick the place and Mealan plans with its shelves."}</p>
           </>
         )}
+        {/* On the plate (Y1 columns 2 and 2b, 10 October 2026): the plate is a card of its own, with Fit to my target as its action */}
+        <section className="card plate-card">
+        <div className="card-top"><span>On the plate</span></div>
+        {items.length === 0 && <small className="plate-empty">Nothing on the plate yet. Add a food.</small>}
         {items.length > 0 && (
           <section className={`readout readout-fit-${p.fitPd(pd)}`}>
             <div className="readout-top"><span>As it stands</span><span>{pdTag()}</span></div>
@@ -258,6 +267,7 @@ export function JourneyScreen(p: AppApi) {
         {items.length === 1 && <p className="small center">One product: {CHEF_NAME} looks through your foods for a partner that brings it to your plan.</p>}
         {items.length >= 2 && <p className="small center">This works out the amounts straight away, without the AI. To ask {CHEF_NAME} something, tap the round button at the bottom right.</p>}
         {items.length >= 2 && <p className="small center">Grey is yours to type and {CHEF_NAME}'s to move. Coral is fixed. Swipe right to remove, left to swap. Tap a name for its card.</p>}
+        </section>
         {swapPanel}
         {foodCard}
         {helperSheet}
@@ -468,7 +478,7 @@ export function JourneyScreen(p: AppApi) {
       )}
       <button className="pill pill-primary pill-wide" disabled={good === null || (sharing && !shareWhy)} onClick={() => {
         const name = title.trim() || autoTitle(items);
-        const meal = { id: uid(), title: name, items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString() };
+        const meal = { id: uid(), title: name, items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString(), kind: p.kind };
         const status = good === "no" ? "not-used" : "eaten";
         const taste = TASTE[good!];
         log("feedback", { status, taste, shared: sharing ? shareWhy : null });
@@ -477,7 +487,7 @@ export function JourneyScreen(p: AppApi) {
         const allPhotos = [...photos, ...(plate ? [plate] : [])];
         const keep = saveRecipe && status === "eaten";
         setState((s) => ({ ...s, meals: keep ? [structuredClone(meal), ...s.meals] : s.meals, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
-        setGood(null); setNote(""); setTitle(""); setPlate(""); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); resetMade(); setStep("in");
+        p.setKind("meal"); setGood(null); setNote(""); setTitle(""); setPlate(""); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); resetMade(); setStep("in");
       }}>{sharing ? `Save and share with ${p.profile.coachName || "your coach"}` : "Save"}</button>
       {p.profile.coachId && !sharing && <button className="pill pill-wide" onClick={() => setSharing(true)}>Share with {p.profile.coachName || "your coach"}</button>}
       {sharing && <button className="link" onClick={() => { setSharing(false); setShareWhy(null); }}>Keep it private</button>}

@@ -1,4 +1,4 @@
-// JOURNEY INVARIANT (Milan, 7 October 2026, canvas boards W0 to W2): a quiet Weigh in line on Today; tap, type, save;
+// JOURNEY INVARIANT (Milan, 7 October 2026, canvas boards W0 to W2; moved to Me on 10 October 2026, Y1 column 17): a quiet Weigh in line on Me; tap, type, save;
 // the answer is the 7-day average, never a judgement on one morning. Me › Goal shows the last 4 weeks: the chart, the 7-day
 // average then and now, the change against what the goal expects, and the verdict in plain words. A weigh-in can be removed.
 // Someone who declared a difficult relationship with eating sees no weigh-ins and no trend.
@@ -29,15 +29,16 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   };
   try {
     const page = await open([]);
+    ok(await page.getByRole("button", { name: /Weigh in/ }).count() === 0, "Today has no weigh-in line any more (it lives on Me)");
+    await require("./me.cjs")(page);
     const line = page.getByRole("button", { name: /Weigh in/ });
-    ok(await line.count() === 1 && /7-day average/.test(await line.textContent()), "Today has a quiet Weigh in line with the 7-day average: " + (await line.textContent()).trim());
+    ok(await line.count() === 1 && /7-day average/.test(await line.textContent()), "Me has a quiet Weigh in line with the 7-day average: " + (await line.textContent()).trim());
     await line.click(); await page.waitForTimeout(150);
     await page.getByLabel("Your weight, kg").fill("96.4"); await page.getByRole("button", { name: /^Save$/ }).click(); await page.waitForTimeout(300);
     const body = await page.locator("body").textContent();
     ok(/Saved\. Your 7-day average is \d+\.\d kg\./.test(body), "saving answers with the 7-day average, not a judgement");
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")).weighIns);
     ok(saved.length === weighIns.length + 1 && saved[saved.length - 1].kg === 96.4, "today's weigh-in is kept");
-    await require("./me.cjs")(page);
     await page.locator(".me-rows .menu-row").filter({ hasText: /^Goal/ }).first().click(); await page.waitForTimeout(400);
     const trend = page.getByRole("region", { name: "The last 4 weeks" });
     const tt = await trend.textContent();
@@ -51,8 +52,8 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
     ok(page.errs.length === 0, "no page errors" + (page.errs.length ? ": " + page.errs.join("; ") : ""));
     // an eating situation: no weigh-ins, no trend
     const e = await open(["eating"]);
-    ok(await e.getByRole("button", { name: /Weigh in/ }).count() === 0, "with an eating situation, Today has no weigh-in line");
     await require("./me.cjs")(e);
+    ok(await e.getByRole("button", { name: /Weigh in/ }).count() === 0, "with an eating situation, Me has no weigh-in line");
     await e.locator(".me-rows .menu-row").filter({ hasText: /^Goal/ }).first().click(); await e.waitForTimeout(400);
     ok(await e.getByRole("region", { name: "The last 4 weeks" }).count() === 0, "and Me › Goal shows no trend");
   } catch (err) { ok(false, "walkthrough error: " + err.message); }

@@ -1025,3 +1025,26 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .meal-photos { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 4px; } .meal-photos > img { width: 72px; height: 72px; border-radius: 12px; object-fit: cover; }
 .meal-photos .plate-photo.small, .plate-photo.small { width: 72px; height: 72px; min-height: 0; padding: 0; font-size: 12px; text-align: center; display: flex; align-items: center; justify-content: center; margin: 0; }
 .save-recipe { margin: 4px 0 10px; } .save-recipe > small { display: block; margin: 4px 0 8px; }
+
+/* Today and the Plate, as approved on 10 October 2026 (canvas board Y1) */
+/* the date line carries the pencil; Change today's plan is the icon now */
+.today-plan .today-date { display: flex; justify-content: space-between; align-items: center; }
+.today-pencil { background: none; border: 0; padding: 0; color: var(--muted); display: inline-flex; cursor: pointer; }
+/* What's cooking?: the kind as two choices, then Scan, all the same height */
+.cooking { display: flex; flex-direction: column; gap: 10px; }
+.cooking-top { font-size: 15px; color: var(--ink); } .cooking-top span { display: flex; align-items: center; gap: 8px; }
+.cooking-kinds { display: flex; gap: 8px; } .cooking-kinds .choice { flex: 1; justify-content: center; height: 56px; font-size: 15px; gap: 6px; }
+.cooking .pill-tall { margin: 0; }
+/* the kind row on the Plate */
+.kind-row { margin: 2px 0 10px; }
+/* On the plate: the readout, the rows, the ways and Fit to my target in one card */
+.plate-card { display: flex; flex-direction: column; gap: 10px; margin: 6px 0 14px; }
+.plate-card .card-top { font-size: 15px; color: var(--ink); }
+.plate-card .plate-empty { color: var(--muted); font-weight: 600; }
+.plate-card .readout { margin-bottom: 0; } .plate-card .ways { margin-bottom: 0; }
+.plate-card .ways .pill-small:not(.ways-empty) { flex: 1; justify-content: center; height: 44px; }
+.plate-card .pill-wide { margin: 0; }
+/* the eating window: From and To look picked once the window is set */
+.field-on input { background: #cfe0fb; border-color: var(--brand); color: #123a7a; font-weight: 800; }
+/* My recipes, empty: a way to start */
+.recipes-empty { display: flex; flex-direction: column; gap: 10px; }
