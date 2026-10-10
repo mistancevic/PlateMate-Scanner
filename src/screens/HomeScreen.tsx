@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ChefHat, Camera, BookOpen, ChevronRight, Check } from "lucide-react";
 import { aggregate, density } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
@@ -14,6 +14,11 @@ import { X } from "lucide-react";
 import type { AppApi } from "./api";
 
 export function HomeScreen(p: AppApi) {
+  const [shareFor, setShareFor] = useState<string | null>(null);
+  // the 30 minute check (Y1 column 13): the card shows once Today is open 30 minutes or more after the meal
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => { const t = setInterval(() => setNow(Date.now()), 60_000); return () => clearInterval(t); }, []);
+  const carryDue = (f: { createdAt: string; carry?: unknown; status: string }) => f.status === "eaten" && !f.carry && now - new Date(f.createdAt).getTime() >= 30 * 60_000;
   const { state, setTab, setStep, pdRef, setCamera, setMode, clientName, goal } = p;
   const bandName = goal?.band ? goalLabel(goal.band) : null;
   const byCoach = goal?.setBy === "coach";
@@ -117,18 +122,41 @@ export function HomeScreen(p: AppApi) {
         <BookOpen size={20} /> My foods
       </button>
       {state.meals.length > 0 && (
-        <button className="pill pill-tall" onClick={() => { p.setFoodsView("recipes"); setTab("foods"); }}>
+        <button className="pill pill-tall" onClick={() => setTab("recipes")}>
           <BookOpen size={20} /> My recipes ({state.meals.length})
         </button>
       )}
       {inbox}
-      <p className="label">Logged so far</p>
-      <p className="small logged-line">{loggedLine(today, true)} This shows only the meals you made with Mealan.</p>
+      <p className="label">Today's meals</p>
+      <p className="small logged-line">{loggedLine(today, true)}</p>
       {today.logged.map((f) => (
-        <section className="card log-card" key={f.id}>
+        <section className={`card log-card ${f.photo ? "with-photo" : ""}`} key={f.id}>
+          {f.photo && <img className="log-photo" src={f.photo} alt="" />}
           <div className="card-top"><span>{f.meal.title}</span><small>{new Date(f.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small></div>
           <small>{f.meal.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}</small>
-          {(() => { const a = aggregate(f.meal.items); return <small className="log-nums">{fmt(a.calories, 0)} kcal · {fmt(a.protein, 0)} g protein · {pdText(density(a.protein, a.calories))}</small>; })()}
+          {(() => { const a = aggregate(f.meal.items); return <small className="log-nums">{fmt(a.calories, 0)} kcal · {fmt(a.protein, 0)} g protein · {pdText(density(a.protein, a.calories))}{f.taste ? ` · ${f.taste}` : ""}{f.carry ? ` · ${({ light: "light and awake", fine: "fine after", heavy: "heavy, tired" } as const)[f.carry.how]}` : ""}</small>; })()}
+          <div className="button-row log-actions">
+            {f.recipeId
+              ? <span className="pill pill-small pill-done"><Check size={14} /> In My recipes</span>
+              : <button className="pill pill-small pill-primary" onClick={() => p.saveCardAsRecipe(f.id)}>Save in My recipes</button>}
+            {p.profile.coachId && (f.shared
+              ? <span className="pill pill-small pill-done"><Check size={14} /> Shared</span>
+              : shareFor === f.id
+                ? <>{([["look", "Look at this"], ["ok", "Was this OK?"], ["help", "Help me next time"]] as const).map(([k, l]) => (
+                    <button key={k} className="pill pill-small" onClick={() => { p.shareCard(f.id, k); setShareFor(null); }}>{l}</button>
+                  ))}<button className="link" onClick={() => setShareFor(null)}>Cancel</button></>
+                : <button className="pill pill-small" onClick={() => setShareFor(f.id)}>Share with Coach</button>)}
+          </div>
+        </section>
+      ))}
+      {today.logged.filter(carryDue).map((f) => (
+        <section className="card log-card carry-card" key={`carry-${f.id}`}>
+          <div className="card-top"><span>How did it carry you?</span><small>30 min after {f.meal.title}</small></div>
+          <div className="button-row" style={{ marginTop: 8 }}>
+            {([["light", "Light and awake"], ["fine", "Fine"], ["heavy", "Heavy, tired"]] as const).map(([k, l]) => (
+              <button key={k} className="pill pill-small" onClick={() => p.setCarry(f.id, k)}>{l}</button>
+            ))}
+          </div>
         </section>
       ))}
       {today.prepared.length > 0 && (

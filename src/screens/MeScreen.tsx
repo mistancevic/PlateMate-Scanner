@@ -2,9 +2,7 @@ import { Settings , Coffee } from "lucide-react";
 import { fmt, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
 import { bandOf, goalLabel } from "../goal";
-import { MOMENTS } from "../moments";
-import { SendSheet } from "./CoachScreen";
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { ChevronRight, User, Target, CalendarDays, ShoppingBasket, Users, KeyRound } from "lucide-react";
 import type { MenuSection } from "./api";
 import { lifestyleOf, planOf } from "../personal";
@@ -42,10 +40,7 @@ function planHint(p: AppApi): string {
 }
 export function MeScreen(p: AppApi) {
   const { state, goal, profile, clientName } = p;
-  const [shareFor, setShareFor] = useState<string | null>(null);
-  const [sendCard, setSendCard] = useState<any>(null);
   const coachName = profile.coachName || COACH_NAME;
-  const isCoach = profile.role === "coach";
   const bandName = goal?.band ? goalLabel(goal.band) : null;
   const setBy = goal?.setBy === "coach" ? (goal.coachName || coachName) : "you";
   return (
@@ -67,27 +62,9 @@ export function MeScreen(p: AppApi) {
         ))}
       </div>
       <section className="card">
-        <div className="card-top"><span>Your meals</span><span>{state.feedback.length}</span></div>
-        {state.feedback.length === 0 && <small>Nothing yet. Your meals show here after the first one you make and rate.</small>}
-        {state.feedback.slice(0, 12).map((f) => (
-          <div className="fb" key={f.id}>
-            {f.photo && <img className="fb-photo" src={f.photo} alt="" />}
-            <b>{f.taste}</b>
-            <small>{f.meal.title}{f.moment && f.moment !== "regular" ? ` · ${MOMENTS.find((m) => m.id === f.moment)?.name}` : ""} · {new Date(f.createdAt).toLocaleDateString()}{f.notes ? ` · ${f.notes}` : ""}</small>
-            {profile.coachId && (f.shared
-              ? <small className="shared-tag">Shared: {({ look: "look at this", ok: "was this OK?", help: "help me next time" } as const)[f.shared.reason]}</small>
-              : shareFor === f.id
-                ? <div className="reasons">
-                    {([["look", "Look at this"], ["ok", "Was this OK?"], ["help", "Help me next time"]] as const).map(([k, l]) => (
-                      <button key={k} className="pill pill-small" onClick={() => { p.shareCard(f.id, k); setShareFor(null); }}>{l}</button>
-                    ))}
-                    <button className="link" onClick={() => setShareFor(null)}>Cancel</button>
-                  </div>
-                : <button className="link" onClick={() => setShareFor(f.id)}>Share with {coachName}</button>)}
-            {isCoach && <button className="link" onClick={() => setSendCard(f)}>Send to a client</button>}
-          </div>
-        ))}
-        {sendCard && <SendSheet card={sendCard} close={() => setSendCard(null)} {...p} />}
+        <div className="card-top"><span>Taste is part of the plan</span></div>
+        <small>What makes food work for you: creamy rather than sour, keep the chocolate flavour, small portions, quick preparation. Chef Mealan reads it; it never changes your numbers.</small>
+        <textarea placeholder="Your taste and practical preferences" value={state.preferences} onChange={(e) => p.setState((s) => ({ ...s, preferences: e.target.value }))} />
       </section>
     </>
   );

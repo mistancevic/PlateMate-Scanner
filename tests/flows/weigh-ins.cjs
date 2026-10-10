@@ -37,7 +37,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
     ok(/Saved\. Your 7-day average is \d+\.\d kg\./.test(body), "saving answers with the 7-day average, not a judgement");
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")).weighIns);
     ok(saved.length === weighIns.length + 1 && saved[saved.length - 1].kg === 96.4, "today's weigh-in is kept");
-    await page.locator("nav button").filter({ hasText: "Me" }).click(); await page.waitForTimeout(300);
+    await require("./me.cjs")(page);
     await page.locator(".me-rows .menu-row").filter({ hasText: /^Goal/ }).first().click(); await page.waitForTimeout(400);
     const trend = page.getByRole("region", { name: "The last 4 weeks" });
     const tt = await trend.textContent();
@@ -52,7 +52,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
     // an eating situation: no weigh-ins, no trend
     const e = await open(["eating"]);
     ok(await e.getByRole("button", { name: /Weigh in/ }).count() === 0, "with an eating situation, Today has no weigh-in line");
-    await e.locator("nav button").filter({ hasText: "Me" }).click(); await e.waitForTimeout(300);
+    await require("./me.cjs")(e);
     await e.locator(".me-rows .menu-row").filter({ hasText: /^Goal/ }).first().click(); await e.waitForTimeout(400);
     ok(await e.getByRole("region", { name: "The last 4 weeks" }).count() === 0, "and Me › Goal shows no trend");
   } catch (err) { ok(false, "walkthrough error: " + err.message); }

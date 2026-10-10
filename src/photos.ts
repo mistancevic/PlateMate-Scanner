@@ -22,13 +22,15 @@ const libraryIds = (state: any) => new Set<string>((state?.foods ?? []).map((f: 
 // kept through its copies.
 export function photosOf(state: any): Map<string, string> {
   const out = new Map<string, string>();
-  const food = (f: (Photoish & { id?: string }) | undefined) => {
+  const rec = (pre: string) => (f: (Photoish & { id?: string }) | undefined) => {
     if (!f || !f.id) return;
-    if (isData(f.photo) && !out.has(`food:${f.id}`)) out.set(`food:${f.id}`, f.photo);
-    (f.photos ?? []).forEach((x, n) => { if (isData(x) && !out.has(`food:${f.id}:${n + 1}`)) out.set(`food:${f.id}:${n + 1}`, x); });
+    if (isData(f.photo) && !out.has(`${pre}:${f.id}`)) out.set(`${pre}:${f.id}`, f.photo);
+    (f.photos ?? []).forEach((x, n) => { if (isData(x) && !out.has(`${pre}:${f.id}:${n + 1}`)) out.set(`${pre}:${f.id}:${n + 1}`, x); });
   };
+  const food = rec("food");
   (state?.foods ?? []).forEach(food);
-  (state?.feedback ?? []).forEach((fb: any) => { if (isData(fb?.photo)) out.set(`fb:${fb.id}`, fb.photo); });
+  // a card's photos (10 October 2026): the plate photo as the preview, the meal's photos as the copies, like a food
+  (state?.feedback ?? []).forEach(rec("fb"));
   const lib = libraryIds(state);
   copiesOf(state).filter((f) => !lib.has(f.id)).forEach(food);
   return out;
@@ -55,8 +57,9 @@ export function photosWanted(state: any): Map<string, string> {
     want.forEach((s, n) => { if (s) out.set(n === 0 ? `food:${f.id}` : `food:${f.id}:${n}`, s); });
   }
   for (const fb of state?.feedback ?? []) {
-    const s = Array.isArray(fb?.photoSigs) ? fb.photoSigs[0] : "";
-    if (fb?.id && s && !isData(fb.photo)) out.set(`fb:${fb.id}`, s);
+    const want: string[] | undefined = Array.isArray(fb?.photoSigs) ? fb.photoSigs : undefined;
+    if (!fb?.id || !want || loaded(fb)) continue;
+    want.forEach((s, n) => { if (s) out.set(n === 0 ? `fb:${fb.id}` : `fb:${fb.id}:${n}`, s); });
   }
   return out;
 }
@@ -69,40 +72,39 @@ export function withPhotos<T>(state: T, photos: Map<string, string>, accept?: Se
   if (!photos.size) return state;
   const s: any = state;
   let changed = false;
-  const food = (f: any) => {
+  const rec = (pre: string) => (f: any) => {
     if (!f || !f.id) return f;
     if (Array.isArray(f.photos) && f.photos.length === 0 && !f.photo) return f;
     const want: string[] | undefined = Array.isArray(f.photoSigs) ? f.photoSigs : undefined;
     if (want) {
       if (loaded(f) || !want.some(Boolean)) return f;
       const pick = (k: string, n: number) => { const x = photos.get(k); return x && (accept?.has(k) || sig(x) === want[n]) ? x : undefined; };
-      const thumb = want[0] ? pick(`food:${f.id}`, 0) : undefined;
+      const thumb = want[0] ? pick(`${pre}:${f.id}`, 0) : undefined;
       if (want[0] && !thumb) return f;
       const more: string[] = [];
-      for (let n = 1; n < want.length; n++) { const x = want[n] ? pick(`food:${f.id}:${n}`, n) : undefined; if (!x) return f; more.push(x); }
+      for (let n = 1; n < want.length; n++) { const x = want[n] ? pick(`${pre}:${f.id}:${n}`, n) : undefined; if (!x) return f; more.push(x); }
       changed = true;
       return { ...f, photo: thumb, photos: want.length > 1 ? more : undefined };
     }
-    const thumb = f.photo ?? photos.get(`food:${f.id}`);
+    const thumb = f.photo ?? photos.get(`${pre}:${f.id}`);
     let more = f.photos as string[] | undefined;
     if (!more) {
       const found: string[] = [];
-      for (let n = 1; n <= 12; n++) { const x = photos.get(`food:${f.id}:${n}`); if (!x) break; found.push(x); }
+      for (let n = 1; n <= 12; n++) { const x = photos.get(`${pre}:${f.id}:${n}`); if (!x) break; found.push(x); }
       if (found.length) more = found;
     }
     if (thumb === f.photo && more === f.photos) return f;
     changed = true;
     return { ...f, photo: thumb, photos: more };
   };
+  const food = rec("food"), card = rec("fb");
   const inItems = (items: any[] | undefined) => (items ?? []).map((i: any) => (i?.food ? { ...i, food: food(i.food) } : i));
   const next = {
     ...s,
     foods: (s.foods ?? []).map(food),
     feedback: (s.feedback ?? []).map((fb: any) => {
-      const want = Array.isArray(fb.photoSigs) ? fb.photoSigs[0] : undefined, k = `fb:${fb.id}`, x = photos.get(k);
-      const photo = fb.photo || (x && (!want || accept?.has(k) || sig(x) === want) ? x : undefined);
-      if (photo !== fb.photo) changed = true;
-      return { ...fb, photo, meal: fb.meal ? { ...fb.meal, items: inItems(fb.meal.items) } : fb.meal };
+      const withOwn = card(fb);
+      return { ...withOwn, meal: fb.meal ? { ...fb.meal, items: inItems(fb.meal.items) } : fb.meal };
     }),
     items: inItems(s.items),
     meals: (s.meals ?? []).map((m: any) => ({ ...m, items: inItems(m.items) })),
@@ -129,7 +131,14 @@ export function withoutStored<T>(state: T, stored: Set<string>): T {
   };
   (s.foods ?? []).forEach((f: any) => food(f));
   copiesOf(s).forEach((f) => food(f, true));
-  (s.feedback ?? []).forEach((fb: any) => { if (isData(fb?.photo) && stored.has(`fb:${fb.id}`)) { fb.photoSigs = [sig(fb.photo)]; delete fb.photo; fb.hasPhoto = true; } });
+  (s.feedback ?? []).forEach((fb: any) => {
+    if (!fb || !fb.id) return;
+    const keys = [...(isData(fb.photo) ? [`fb:${fb.id}`] : []), ...((fb.photos ?? []) as string[]).map((_, n) => `fb:${fb.id}:${n + 1}`)];
+    if (!keys.length || !keys.every((k) => stored.has(k))) return;
+    fb.photoCount = Array.isArray(fb.photos) ? fb.photos.length : 0;
+    fb.photoSigs = photoSigsOf(fb); fb.hasPhoto = isData(fb.photo);
+    delete fb.photo; delete fb.photos;
+  });
   return s;
 }
 
@@ -143,7 +152,12 @@ export const keyOf = (file: string) => file.replace(/\.jpg$/, "").replace(/~/g, 
 // A food that left the library keeps its photos while a plate, a meal or a card still shows it.
 export function isOrphan(key: string, state: any): boolean {
   const [kind, id, n] = key.split(":");
-  if (kind === "fb") return !(state?.feedback ?? []).some((f: any) => f?.id === id);
+  if (kind === "fb") {
+    const fb = (state?.feedback ?? []).find((f: any) => f?.id === id);
+    if (!fb) return true;
+    if (!n) return false;
+    return Array.isArray(fb.photos) ? fb.photos.length < Number(n) : false;
+  }
   const lib = (state?.foods ?? []).find((f: any) => f?.id === id);
   if (lib) {
     if (!Array.isArray(lib.photos)) return false;

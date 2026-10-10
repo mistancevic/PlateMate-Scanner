@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Camera,
   Plus,
-  BookOpen,
+  ChefHat, BookOpen,
   Utensils,
   SlidersHorizontal,
   LockKeyhole,
@@ -699,7 +699,7 @@ function BackKeeper({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
 export default function App() {
   const [state, setState] = useState<PilotState>(load),
     [tab, setTab] = useState<Tab>(() => {
-      const tabs = ["home", "journey", "meal", "chef", "foods", "me"] as Tab[];
+      const tabs = ["home", "journey", "meal", "chef", "recipes", "foods", "me"] as Tab[];
       const fromPath = typeof location !== "undefined" ? tabOfPath(location.pathname, tabs) : null;
       const h = (typeof location !== "undefined" ? location.hash : "").replace("#", "");
       return (fromPath as Tab | null) ?? (tabs.includes(h as Tab) ? (h as Tab) : "home");
@@ -1013,12 +1013,13 @@ export default function App() {
             incoming.foods = incoming.foods.filter((f) => !gone.has(f.id));
             const localPhoto = new Map(state.foods.map((f) => [f.id, f.photo]));
             const localFb = new Map(state.feedback.map((f) => [f.id, f.photo]));
+            const localFbMore = new Map(state.feedback.map((f) => [f.id, f.photos]));
             // the app opens on the phone's photos; the account's photos and plate cards follow in the background (they can be large)
             const localMore = new Map(state.foods.map((f) => [f.id, f.photos]));
             incoming.foods = incoming.foods.map((f) => ({ ...f, photo: f.photo ?? localPhoto.get(f.id), photos: f.photos ?? localMore.get(f.id) }));
             const byId = new Map<string, any>();
             for (const fb of [...incoming.feedback, ...state.feedback]) if (!byId.has(fb.id)) byId.set(fb.id, fb);
-            incoming.feedback = [...byId.values()].sort((x, y) => (y.createdAt > x.createdAt ? 1 : -1)).map((f) => ({ ...f, photo: f.photo ?? localFb.get(f.id) }));
+            incoming.feedback = [...byId.values()].sort((x, y) => (y.createdAt > x.createdAt ? 1 : -1)).map((f) => ({ ...f, photo: f.photo ?? localFb.get(f.id), photos: f.photos ?? localFbMore.get(f.id) }));
             void fillFromAccount(user.uid);
             fromCloud.current = true;
             setState(incoming);
@@ -1677,10 +1678,11 @@ export default function App() {
       });
       setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, tip: { text: res.tip, pairs: res.pairs ?? [], goalKey: key, at: new Date().toISOString() } } : x)) }));
     },
-    keepForLater: (meal: Meal) => {
-      // a prepared card: it shows on Today until it's eaten or dropped
-      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "prepared" as const, taste: "", notes: "", createdAt: new Date().toISOString(), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined } as any, ...s.feedback] }));
-      notify("Kept for later. It's on Today.");
+    keepForLater: (meal: Meal, extra?: { photos?: string[]; prep?: Feedback["prep"]; status?: "prepared" | "not-used" }) => {
+      // a prepared card: it shows on Today until it's eaten or dropped; not eaten after all is a note, not counted
+      const status = extra?.status ?? "prepared";
+      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status, taste: "", notes: "", photos: extra?.photos?.length ? extra.photos : undefined, photo: extra?.photos?.length ? extra.photos[extra.photos.length - 1] : undefined, prep: extra?.prep, createdAt: new Date().toISOString(), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined } as any, ...s.feedback] }));
+      notify(status === "prepared" ? "Kept for later. It's on Today." : "Noted, not counted.");
     },
     settleCard: (id: string, how: "eaten" | "not-used") => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, status: how, createdAt: how === "eaten" ? new Date().toISOString() : f.createdAt, taste: how === "eaten" ? f.taste || "Good" : f.taste } : f)) }));
@@ -1751,7 +1753,7 @@ export default function App() {
         const newFoods = (item.meal.items as Ingredient[]).map((i) => i.food).filter((f) => !have.has((f.name + "|" + f.brand).toLowerCase())).map((f) => ({ ...f, id: uid(), icon: f.icon || iconFor(f.name), reviewedAt: new Date().toISOString() }));
         const foods = [...s.foods, ...newFoods];
         const items = (item.meal.items as Ingredient[]).map((i) => { const lib = foods.find((f) => (f.name + "|" + f.brand).toLowerCase() === (i.food.name + "|" + i.food.brand).toLowerCase()); return { id: uid(), food: lib ?? i.food, grams: i.grams, locked: true }; });
-        const meal = { id: uid(), title: item.meal.title || "From your coach", items, portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
+        const meal = { id: uid(), title: item.meal.title || "From your coach", items, portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString(), from: "coach" as const };
         return how === "make"
           ? { ...s, foods, items, portion: null, title: meal.title }
           : { ...s, foods, meals: [meal, ...s.meals], feedback: [{ id: uid(), meal, status: "prepared" as const, taste: "", notes: "", createdAt: new Date().toISOString() } as any, ...s.feedback] };
@@ -1828,6 +1830,19 @@ export default function App() {
     },
     mixQuestion, mixQuestionTaken: () => setMixQuestion(null),
     recordTalk: (q: string, reply: string, plate: string[]) => setTalkTurns((t) => [...t, { role: "you", text: q, plate }, { role: "mealan", text: reply }]),
+    // a card becomes a recipe: the foods, the grams, the steps and the photo (gap C, 10 October 2026)
+    saveCardAsRecipe: (id: string) => {
+      setState((s) => {
+        const f = s.feedback.find((x) => x.id === id); if (!f || f.recipeId) return s;
+        const meal: Meal = { ...structuredClone(f.meal), id: uid(), savedAt: new Date().toISOString(), from: undefined };
+        return { ...s, meals: [meal, ...s.meals], feedback: s.feedback.map((x) => (x.id === id ? { ...x, recipeId: meal.id } : x)) };
+      });
+      notify("Saved in My recipes.");
+    },
+    setCarry: (id: string, how: "light" | "fine" | "heavy") => {
+      log("carry", { how });
+      setState((s) => ({ ...s, feedback: s.feedback.map((x) => (x.id === id ? { ...x, carry: { how, at: new Date().toISOString() } } : x)) }));
+    },
     shareCard: (id: string, reason: "look" | "ok" | "help") => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, shared: { reason, at: new Date().toISOString() } } : f)) }));
       notify(`Shared with ${profile.coachName || "your coach"}.`);
@@ -1913,13 +1928,15 @@ export default function App() {
   const NAV: { id: Tab; label: string; icon: ReactNode }[] = [
     { id: "home", label: "Today", icon: <Home size={20} /> },
     { id: "journey", label: "Plate", icon: <Utensils size={20} /> },
+    // the bar holds what a day touches (X0, 10 October 2026): Recipes its own tab, Me in the top menu
+    { id: "recipes", label: "Recipes", icon: <ChefHat size={20} /> },
     { id: "foods", label: "Foods", icon: <BookOpen size={20} /> },
-    { id: "me", label: "Me", icon: <CircleUser size={20} /> },
     ...(profile.role === "coach" ? [{ id: "clients" as Tab, label: "Clients", icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }] : []),
   ];
   const TITLES: Record<Tab, string> = {
     home: "Today",
     journey: "Plate",
+    recipes: "Recipes",
     me: "Me",
     clients: "Clients",
     meal: "Meal",
@@ -1937,7 +1954,7 @@ export default function App() {
       mixFor: screenProps.mixFor,
       takeMix: (f, m) => { screenProps.takeMix(f, m); goApp("journey"); },
       putAlone: (f, g) => { setState((s) => ({ ...s, items: [...s.items, { id: uid(), food: f, grams: g, locked: false }], portion: null })); setStep("in"); goApp("journey"); notify(`${f.name} is on your plate.`); },
-      addRecipe: (m) => { setState((s) => ({ ...s, meals: [m, ...s.meals] })); setFoodsView("recipes"); goApp("foods"); notify(`${m.title} is in your recipes.`); },
+      addRecipe: (m) => { setState((s) => ({ ...s, meals: [m, ...s.meals] })); goApp("recipes"); notify(`${m.title} is in your recipes.`); },
       momentName: momentOf(moment).name, goalName: goal ? goalLabel(goal.band) : "Your goal",
       mealKcal: todayKcal === null ? null : Math.round(todayKcal * momentKcalShare(moment)),
     } : null;
@@ -2023,6 +2040,7 @@ export default function App() {
         {!menuSection && !talkOpen && tab === "meal" && <MealScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "chef" && <ChefScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "foods" && <FoodsScreen {...screenProps} />}
+        {!menuSection && !talkOpen && tab === "recipes" && <RecipesScreen {...screenProps} />}
         <input
           ref={importRef}
           type="file"

@@ -36,7 +36,7 @@ const plan = [
     }, [seed, birthYear, plan, life]);
     await page.goto("http://127.0.0.1:3197/"); await page.waitForTimeout(900);
     if (birthYear > new Date().getFullYear() - 18) return page;
-    await page.locator("nav button").filter({ hasText: "Me" }).click(); await page.waitForTimeout(300);
+    await require("./me.cjs")(page);
     return page;
   };
   // an adult: weeks with dates
@@ -62,7 +62,7 @@ const plan = [
   await a.getByRole("button", { name: "Week before" }).click(); await a.waitForTimeout(200);
   await a.locator(".agenda-row").nth(0).click(); await a.waitForTimeout(200);
   ok((await a.getByRole("button", { name: "Change what was planned" }).count()) === 1 && /Nothing was logged|What you ate/.test(await a.locator("main").textContent()), "a past day shows what was eaten, or says nothing was");
-  ok(/Alcohol/.test(await (async () => { await a.getByRole("button", { name: /Me/ }).first().click().catch(() => {}); await a.locator("nav button").filter({ hasText: "Me" }).click(); await a.waitForTimeout(200); await a.getByText("Lifestyle", { exact: true }).first().click(); await a.waitForTimeout(300); return a.locator("main").textContent(); })()), "an adult is asked about alcohol");
+  ok(/Alcohol/.test(await (async () => { await require("./me.cjs")(a); await a.getByText("Lifestyle", { exact: true }).first().click(); await a.waitForTimeout(300); return a.locator("main").textContent(); })()), "an adult is asked about alcohol");
   ok(a.errs.length === 0, "no page errors (adult)" + (a.errs.length ? ": " + a.errs.join("; ") : ""));
   // an apprentice: work and study
   const t = await open(2003, { weekdays: "both", hours: "fixed", slot: "7-3", move: "feet", commute: "bike", peWeek: "none" });
@@ -80,7 +80,7 @@ const plan = [
   life = await t.locator("main").textContent();
   ok(!/Study hours/.test(life) && !/Working hours/.test(life) && /Your days are spent at home/.test(life), "At home: nothing more is asked, and it says what it means");
   await t.getByRole("button", { name: /^Work and study/ }).click(); await t.waitForTimeout(200);
-  await t.locator("nav button").filter({ hasText: "Me" }).click(); await t.waitForTimeout(200);
+  await require("./me.cjs")(t);
   await t.getByText("Weekly plan", { exact: true }).first().click(); await t.waitForTimeout(300);
   await t.getByRole("tab", { name: "Usual week" }).click(); await t.waitForTimeout(200);
   await t.locator(".agenda-row").nth(2).click(); await t.waitForTimeout(200);

@@ -18,7 +18,7 @@ import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
 
-const STEPS = ["in", "recipe", "make", "after"] as const;
+const STEPS = ["in", "recipe", "make", "made", "after"] as const;
 const band = (pd: number | null) => (pd === null || pd < 3 ? "low" : pd < 5 ? "mid" : "high");
 
 // sugars, saturates and salt on the plate, from the foods whose tables have them; for information only
@@ -53,6 +53,14 @@ export function JourneyScreen(p: AppApi) {
   const [note, setNote] = useState("");
   const [good, setGood] = useState<"daam" | "good" | "no" | null>(null);
   const [plate, setPlate] = useState<string>("");
+  // How did making it go? (Y1 column 9, 10 October 2026): photos while it's on the counter, how it went, how much was eaten
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [went, setWent] = useState<"as" | "not">("as");
+  const [different, setDifferent] = useState("");
+  const [ate, setAte] = useState<"all" | "portion" | "later" | "not">("all");
+  const [saveRecipe, setSaveRecipe] = useState(true);
+  const addPhoto = (file?: File | null) => { if (!file) return; const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 480).then((d) => setPhotos((x) => [...x, d])).catch(() => {}); r.readAsDataURL(file); };
+  const resetMade = () => { setPhotos([]); setWent("as"); setDifferent(""); setAte("all"); setSaveRecipe(true); };
   const [method, setMethod] = useState<string | null>(null);
   const [title, setTitle] = useState("");
   const autoTitle = (its: typeof items) => { const n = its.map((i) => i.food.name.split(",")[0].trim()); return n.length <= 1 ? n[0] ?? "Meal" : `${n.slice(0, -1).join(", ")} & ${n[n.length - 1]}`; };
@@ -376,9 +384,48 @@ export function JourneyScreen(p: AppApi) {
           const w = ways.find((x) => x.id === method);
           log("method_chosen", { method });
           setState((s) => ({ ...s, title: w ? w.name : s.title }));
-          setStep("after");
+          setStep("made");
         }}>{ways.length ? "I'm making it this way" : "Continue"}</button>
         <Back to="recipe" />
+      </>
+    );
+  }
+
+  if (step === "made") {
+    const mealNow = () => ({ id: uid(), title: p.state.title || autoTitle(items), items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
+    return (
+      <>
+        <Head title="How did making it go?" sub="A photo or two while it's on the counter, then one tap." />
+        <p className="label">Photos of the meal</p>
+        <div className="meal-photos">
+          {photos.map((ph, i) => <img key={i} src={ph} alt="" onClick={() => setPhotos((x) => x.filter((_, k) => k !== i))} />)}
+          <label className="plate-photo small"><span>Take a photo</span><input type="file" accept="image/*" capture="environment" onChange={(e) => { addPhoto(e.target.files?.[0]); e.target.value = ""; }} /></label>
+          <label className="plate-photo small"><span>My gallery</span><input type="file" accept="image/*" multiple onChange={(e) => { Array.from(e.target.files ?? []).forEach((f) => addPhoto(f)); e.target.value = ""; }} /></label>
+        </div>
+        <p className="label">How did it go?</p>
+        <div className="reasons">
+          <button className={`choice ${went === "as" ? "on" : ""}`} onClick={() => setWent("as")}>All as the recipe says</button>
+          <button className={`choice ${went === "not" ? "on" : ""}`} onClick={() => setWent("not")}>Not as the recipe says</button>
+        </div>
+        {went === "not" && <textarea placeholder="What was different" value={different} onChange={(e) => setDifferent(e.target.value)} />}
+        {went === "not" && <button className="link" onClick={p.openOut}>Help me with making it</button>}
+        <p className="label">How much did you eat?</p>
+        <div className="reasons">
+          {([["all", "All of it"], ["portion", "A portion"], ["later", "Later today"], ["not", "Not after all"]] as const).map(([k, l]) => (
+            <button key={k} className={`choice ${ate === k ? "on" : ""}`} onClick={() => setAte(k)}>{l}</button>
+          ))}
+        </div>
+        <button className="pill pill-primary pill-wide" onClick={() => {
+          log("made", { went, ate, photos: photos.length });
+          if (ate === "later" || ate === "not") {
+            // the card goes to Today without a rating: kept for later, or not eaten after all
+            p.keepForLater({ ...mealNow() }, { photos, prep: { went, different: different || undefined }, status: ate === "later" ? "prepared" : "not-used" });
+            resetMade(); setStep("in");
+            return;
+          }
+          setStep("after");
+        }}>On to How was it?</button>
+        <Back to="make" />
       </>
     );
   }
@@ -392,15 +439,26 @@ export function JourneyScreen(p: AppApi) {
         <button className={`choice ${good === "good" ? "on" : ""}`} onClick={() => setGood("good")}><ThumbsUp size={22} /><span>Good</span></button>
         <button className={`choice ${good === "no" ? "on" : ""}`} onClick={() => setGood("no")}><ThumbsDown size={24} /><span>Not really</span></button>
       </div>
-      <label className="plate-photo">
-        {plate ? <img src={plate} alt="your plate" /> : <span>Add a photo of the plate</span>}
+      <div className="meal-photos">
+        {photos.map((ph, i) => <img key={i} src={ph} alt="" />)}
+      <label className={`plate-photo ${photos.length ? "small" : ""}`}>
+        {plate ? <img src={plate} alt="your plate" /> : <span>{photos.length ? "Photo of the plate" : "Add a photo of the plate"}</span>}
         <input type="file" accept="image/*" capture="environment" onChange={(e) => {
           const file = e.target.files?.[0]; if (!file) return;
           const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 480).then(setPlate).catch(() => {}); r.readAsDataURL(file);
         }} />
       </label>
+      </div>
       <label className="field"><span>Name it</span><input value={title} placeholder={autoTitle(items)} onChange={(e) => setTitle(e.target.value)} /></label>
       <textarea placeholder="A line for your coach, if you like" value={note} onChange={(e) => setNote(e.target.value)} />
+      <section className="card save-recipe">
+        <div className="card-top"><span>Save in My recipes</span></div>
+        <small>Keeps the foods, the grams, the steps and the photos for next time.</small>
+        <div className="reasons">
+          <button className={`choice ${saveRecipe ? "on" : ""}`} onClick={() => setSaveRecipe(true)}>Yes, save it</button>
+          <button className={`choice ${!saveRecipe ? "on" : ""}`} onClick={() => setSaveRecipe(false)}>Not this one</button>
+        </div>
+      </section>
       {sharing && p.profile.coachId && (
         <div className="reasons">
           {([["look", "Look at this"], ["ok", "Was this OK?"], ["help", "Help me next time"]] as const).map(([k, l]) => (
@@ -416,12 +474,14 @@ export function JourneyScreen(p: AppApi) {
         log("feedback", { status, taste, shared: sharing ? shareWhy : null });
         setFeedback({ status, taste, notes: note });
         const shared = sharing && shareWhy ? { reason: shareWhy, at: new Date().toISOString() } : undefined;
-        setState((s) => ({ ...s, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, photo: plate || undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
-        setGood(null); setNote(""); setTitle(""); setPlate(""); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); setStep("in");
+        const allPhotos = [...photos, ...(plate ? [plate] : [])];
+        const keep = saveRecipe && status === "eaten";
+        setState((s) => ({ ...s, meals: keep ? [structuredClone(meal), ...s.meals] : s.meals, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
+        setGood(null); setNote(""); setTitle(""); setPlate(""); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); resetMade(); setStep("in");
       }}>{sharing ? `Save and share with ${p.profile.coachName || "your coach"}` : "Save"}</button>
       {p.profile.coachId && !sharing && <button className="pill pill-wide" onClick={() => setSharing(true)}>Share with {p.profile.coachName || "your coach"}</button>}
       {sharing && <button className="link" onClick={() => { setSharing(false); setShareWhy(null); }}>Keep it private</button>}
-      <Back to="recipe" />
+      <Back to="made" />
     </>
   );
 }

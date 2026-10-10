@@ -31,7 +31,7 @@ const dl = process.argv[2] || null;
   try {
     await require("./adult.cjs")(page);
     await page.goto("http://127.0.0.1:3188/"); await page.waitForTimeout(900);
-    const myRecipes = async () => { await page.locator("nav button").filter({ hasText: "Foods" }).click(); await page.waitForTimeout(300); await page.getByRole("tab", { name: "My recipes" }).click(); await page.waitForTimeout(400); };
+    const myRecipes = async () => { await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500); };
     await myRecipes();
     await page.getByRole("button", { name: "Publish", exact: true }).click(); await page.waitForTimeout(400);
     let sheet = page.locator(".publish-sheet");
@@ -46,7 +46,7 @@ const dl = process.argv[2] || null;
     ok(/High protein: 29 %/.test(checks) && /DaaM good/.test(checks) && /One crepe: 118 kcal/.test(checks), "the checks: high protein at 29 %, the rating, one crepe: " + checks.replace(/\s+/g, " "));
     // a draft: close, come back, it is all there; nothing is live
     await sheet.getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(400);
-    const row = page.locator(".recipe-row").filter({ hasText: "High protein crepes" });
+    const row = page.locator(".recipe-tile").filter({ hasText: "High protein crepes" });
     ok(/Draft/.test(await row.locator(".pub-state").textContent()), "My recipes: the recipe is a Draft");
     ok(/Steps \(3\)/.test(await row.textContent()), "the steps stay with the recipe in the app");
     ok((await page.evaluate(async () => (await fetch("/api/recipes/high-protein-crepes")).status)) === 404, "a draft is not on the site");
@@ -83,7 +83,7 @@ const dl = process.argv[2] || null;
     // Unpublish: taken down
     await page.goto("http://127.0.0.1:3188/"); await page.waitForTimeout(900);
     await myRecipes();
-    const row2 = page.locator(".recipe-row").filter({ hasText: "High protein crepes" });
+    const row2 = page.locator(".recipe-tile").filter({ hasText: "High protein crepes" });
     ok(/Live/.test(await row2.locator(".pub-state").textContent()), "My recipes: Live");
     await row2.getByRole("button", { name: "Change it" }).click(); await page.waitForTimeout(400);
     await page.locator(".publish-sheet").getByRole("button", { name: /Unpublish/ }).click(); await page.waitForTimeout(800);
@@ -99,7 +99,7 @@ const dl = process.argv[2] || null;
     // Publish again: the same link
     await page.goto("http://127.0.0.1:3188/"); await page.waitForTimeout(900);
     await myRecipes();
-    await page.locator(".recipe-row").filter({ hasText: "High protein crepes" }).getByRole("button", { name: "Publish again" }).click(); await page.waitForTimeout(400);
+    await page.locator(".recipe-tile").filter({ hasText: "High protein crepes" }).getByRole("button", { name: "Publish again" }).click(); await page.waitForTimeout(400);
     await page.locator(".publish-sheet").getByRole("button", { name: "Publish again" }).click(); await page.waitForTimeout(1200);
     ok(await page.evaluate(async () => (await fetch("/api/recipes/high-protein-crepes")).status) === 200, "Publish again: live on the same link");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));

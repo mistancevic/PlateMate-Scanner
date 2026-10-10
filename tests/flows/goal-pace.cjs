@@ -34,7 +34,7 @@ const path = require("node:path");
     await page.getByRole("button", { name: /Set my day/ }).click(); await page.waitForTimeout(600);
     const g = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-goal") || "{}"));
     ok(g.band === "gainsteady", "the goal is kept with its pace: " + g.band);
-    await page.locator("nav button").filter({ hasText: "Me" }).click(); await page.waitForTimeout(300);
+    await require("./me.cjs")(page);
     await page.locator(".me-rows .menu-row").filter({ hasText: /^Goal/ }).first().click(); await page.waitForTimeout(400);
     const main = await page.locator("main").textContent();
     ok(/Build muscle · Steady/.test(main), "Me › Goal names the goal with its pace");

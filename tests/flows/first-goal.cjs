@@ -52,7 +52,7 @@ const path = require("node:path");
   const hardK = await page.locator(".plan-row div").nth(1).locator("b").textContent();
   ok(Number(hardK.replace(/,/g, "")) > Number(avgK.replace(/,/g, "")), `a hard training day raises today's calories: ${avgK} to ${hardK}`);
   // from Me, Goal: the same screen comes with a way back
-  await page.locator("nav button").filter({ hasText: "Me" }).click(); await page.waitForTimeout(300);
+  await require("./me.cjs")(page);
   await page.locator(".me-rows .menu-row").filter({ hasText: /^Goal/ }).first().click(); await page.waitForTimeout(300);
   ok(await page.locator(".day-table").count() === 1, "Me, Goal shows the same four-day table");
   await page.getByRole("button", { name: /Change the goal/ }).click(); await page.waitForTimeout(300);

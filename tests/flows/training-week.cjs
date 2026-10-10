@@ -56,7 +56,7 @@ const path = require("node:path");
     await page.getByRole("button", { name: "Each day its own" }).click(); await page.waitForTimeout(300);
     await page.getByRole("button", { name: /Set my day|Save/ }).last().click(); await page.waitForTimeout(500);
     // the Weekly plan has the same days
-    await page.locator("nav button").filter({ hasText: "Me" }).click(); await page.waitForTimeout(300);
+    await require("./me.cjs")(page);
     await page.getByText("Weekly plan", { exact: true }).first().click(); await page.waitForTimeout(400);
     await page.getByRole("tab", { name: "Usual week" }).click(); await page.waitForTimeout(200);
     const agenda = await page.locator(".week-card").textContent();

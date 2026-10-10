@@ -13,7 +13,7 @@ export function LandingScreen() {
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   // signed out on an app address (chefmealan.com/foods): the home page sits at chefmealan.com
-  useEffect(() => { if (tabOfPath(location.pathname, ["home", "journey", "meal", "chef", "foods", "me"])) history.replaceState(null, "", "/"); }, []);
+  useEffect(() => { if (tabOfPath(location.pathname, ["home", "journey", "meal", "chef", "recipes", "foods", "me"])) history.replaceState(null, "", "/"); }, []);
   const go = async () => { setBusy(true); setErr(""); try { await signIn(); } catch (e: any) { setErr(e.message || "Sign-in failed."); } finally { setBusy(false); } };
   const toForm = () => formRef.current?.scrollIntoView({ behavior: "smooth" });
   // from a recipe page's Ask for an invite: straight to the form

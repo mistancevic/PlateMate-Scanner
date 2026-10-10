@@ -22,6 +22,7 @@ import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from
 import { EvalsScreen } from "./EvalsScreen";
 import { dayLog } from "../today";
 import { aggregate, uid } from "../pilot";
+import { MeScreen } from "./MeScreen";
 
 // the sections that belong to the person: they live under Me, and back from them goes to Me
 const ME_SECTIONS: MenuSection[] = ["profile", "goal", "life", "week", "shop", "coach", "account"];
@@ -44,9 +45,8 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
     return (
       <>
         <div className="menu-head"><h2>Menu</h2><button className="link" onClick={close}>Close</button></div>
-        <p className="small muted">Who you are and how you're set up is under Me. This is housekeeping.</p>
         <div className="menu-list">
-          {[{ id: "support" as MenuSection, name: "Support", icon: <LifeBuoy size={20} /> }, { id: "about" as MenuSection, name: "About", icon: <Info size={20} /> }, ...(p.profile.role === "coach" || !p.cloudEnabled ? [{ id: "evals" as MenuSection, name: "Evals", icon: <FlaskConical size={20} /> }] : [])].map((it) => (
+          {[{ id: "me" as MenuSection, name: "Me", icon: <User size={20} /> }, { id: "support" as MenuSection, name: "Support", icon: <LifeBuoy size={20} /> }, { id: "about" as MenuSection, name: "About", icon: <Info size={20} /> }, ...(p.profile.role === "coach" || !p.cloudEnabled ? [{ id: "evals" as MenuSection, name: "Evals", icon: <FlaskConical size={20} /> }] : [])].map((it) => (
             <button key={it.id} className="menu-row" onClick={() => setSection(it.id)}>
               <span className="menu-icon">{it.icon}</span><b>{it.name}</b><ChevronRight size={18} />
             </button>
@@ -61,8 +61,9 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
   useEffect(() => { try { window.scrollTo({ top: 0 }); document.querySelector("main")?.scrollTo?.({ top: 0 }); } catch {} }, [section]);
   return (
     <>
-      <div className="menu-head"><button className="link" onClick={() => ((from as string) === "me" || ME_SECTIONS.includes(section) && !from ? close() : setSection(from ?? "list"))}><ArrowLeft size={16} /> {(from as string) === "me" ? "Me" : from ? ITEMS.find((i) => i.id === from)?.name : ME_SECTIONS.includes(section) ? "Me" : "Menu"}</button><button className="link" onClick={close}>Close</button></div>
-      <h2 className="menu-title">{title}</h2>
+      <div className="menu-head"><button className="link" onClick={() => ((from as string) === "me" || ME_SECTIONS.includes(section) && !from ? setSection("me") : setSection(from ?? "list"))}><ArrowLeft size={16} /> {(from as string) === "me" ? "Me" : from ? ITEMS.find((i) => i.id === from)?.name : ME_SECTIONS.includes(section) ? "Me" : "Menu"}</button><button className="link" onClick={close}>Close</button></div>
+      <h2 className="menu-title">{section === "me" ? "Me" : title}</h2>
+      {section === "me" && <MeScreen {...p} />}
       {section === "profile" && <ProfilePanel {...p} />}
       {section === "goal" && <GoalPanel {...p} />}
       {section === "life" && <LifestylePanel {...p} />}
@@ -685,7 +686,7 @@ function SupportPanel(p: AppApi) {
                 <div className="button-row">
                   <button className="pill pill-small" onClick={exportData}><Download size={14} /> Backup</button>
                   <button className="pill pill-small" onClick={() => importRef.current?.click()}><Upload size={14} /> Restore</button>
-                  <button className="pill pill-small" onClick={() => { p.setFoodsView("recipes"); setTab("foods"); }}>Recipes</button>
+                  <button className="pill pill-small" onClick={() => setTab("recipes")}>Recipes</button>
                 </div>
                 <small>AI label reading: {services?.ai ? "on" : "off"} · Airtable: {services?.airtable ? "on" : "off"}</small>
               </div>

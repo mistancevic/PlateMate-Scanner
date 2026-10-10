@@ -11,7 +11,6 @@ import type { AppApi, DbProduct } from "./api";
 import { ConfirmButton } from "../components/Confirm";
 import { iconFor } from "../icons";
 import { FoodCard } from "../components/FoodCard";
-import { RecipesScreen } from "./RecipesScreen";
 import { momentOf } from "../moments";
 import type { Mix } from "../mixtip";
 import { useEffect, useState } from "react";
@@ -75,12 +74,7 @@ export function FoodsScreen(p: AppApi) {
   const nothing = q.length >= 1 && shown.length === 0 && noLabel.length === 0 && dbRows.length === 0 && !db.busy;
   return (
     <>
-      <div className="segments" role="tablist" aria-label="Foods">
-        <button role="tab" aria-selected={p.foodsView === "foods"} className={`seg ${p.foodsView === "foods" ? "on" : ""}`} onClick={() => p.setFoodsView("foods")}>My foods</button>
-        <button role="tab" aria-selected={p.foodsView === "recipes"} className={`seg ${p.foodsView === "recipes" ? "on" : ""}`} onClick={() => p.setFoodsView("recipes")}>My recipes{state.meals.length ? ` (${state.meals.length})` : ""}</button>
-      </div>
-      {p.foodsView === "recipes" && <RecipesScreen {...p} />}
-      {p.foodsView === "foods" && <>
+      <>
       <section className="find">
         <div className="find-head">
           <div className="find-title"><b>Find a food</b><small>{state.foods.length} in your foods</small></div>
@@ -188,7 +182,7 @@ export function FoodsScreen(p: AppApi) {
       {state.foods.length === 0 && (
         <div className="strip">No foods yet. Scan, type a name, or <button className="link" onClick={p.addStarter}>add twenty starter foods</button>.</div>
       )}
-      </>}
+      </>
       {cardFood && <FoodCard food={p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood} addPhoto={(d) => p.addFoodPhoto(cardFood.id, d)} removePhoto={(i) => p.removeFoodPhoto(cardFood.id, i)} setMain={(i) => p.setMainPhoto(cardFood.id, i)} toggleFavorite={() => p.toggleFavorite(cardFood.id)} insight={{ dayKcal: p.todayKcal, eaten: p.eatenTodayKcal, dayName: p.dayName, goalKey: p.tipGoalKey, requestTip: () => p.requestTip(cardFood.id), setJob: (j) => p.setFoodJob(cardFood.id, j) }} target={p.dayPd} fit={p.fitDay(density(cardFood.protein, cardFood.calories))} close={() => setCardId(null)} review={() => { setImage(""); setEdit(cardFood); }} mix={(() => { const f = p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood; const tip = p.mixFor(f); return { tip, momentName: momentOf(p.moment).name, take: (m: Mix) => { setCardId(null); p.takeMix(f, m); }, ask: () => { setCardId(null); p.askAboutMix(f, tip); } }; })()} />}
     </>
   );

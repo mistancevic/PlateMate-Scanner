@@ -88,6 +88,8 @@ export type Meal = {
   // the steps live with the recipe, so they are there while cooking and the page takes them from here (RF4 Q1)
   steps?: string[];
   publish?: PublishDraft;
+  // Coach's recipes on the Recipes tab (X0, 10 October 2026)
+  from?: "coach";
 };
 export type Feedback = {
   id: string;
@@ -100,6 +102,14 @@ export type Feedback = {
   shared?: { reason: "look" | "ok" | "help"; at: string };
   moment?: string;
   dayType?: string;
+  // Save in My recipes from the card (Y1, 10 October 2026)
+  recipeId?: string;
+  // the meal's photos and how making it went (M1 activity 6, 10 October 2026)
+  photos?: string[];
+  prep?: { went: "as" | "not"; different?: string };
+  ate?: "all" | "portion";
+  // how the meal carried the person, asked on Today 30 minutes after (M1 activity 8, 10 October 2026)
+  carry?: { how: "light" | "fine" | "heavy"; at: string };
 };
 export type PilotState = {
   version: 1;

@@ -2,9 +2,9 @@ import type { Dispatch, SetStateAction, ReactNode, RefObject } from "react";
 import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
 import type { ScannerMode } from "../types";
 
-export type Tab = "home" | "journey" | "me" | "clients" | "meal" | "chef" | "foods" | "notes" | "more";
-export type MenuSection = "list" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "account" | "support" | "about" | "evals";
-export type Step = "in" | "recipe" | "make" | "after";
+export type Tab = "home" | "journey" | "me" | "clients" | "meal" | "chef" | "foods" | "recipes" | "notes" | "more";
+export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "account" | "support" | "about" | "evals";
+export type Step = "in" | "recipe" | "make" | "made" | "after";
 
 export interface AppApi {
   state: PilotState;
@@ -79,7 +79,7 @@ export interface AppApi {
   openFoodId: string | null;
   clearOpenFood: () => void;
   toggleFavorite: (foodId: string) => void;
-  keepForLater: (meal: import("../pilot").Meal) => void;
+  keepForLater: (meal: Meal, extra?: { photos?: string[]; prep?: Feedback["prep"]; status?: "prepared" | "not-used" }) => void;
   settleCard: (id: string, how: "eaten" | "not-used") => void;
   setFoodJob: (foodId: string, job: string | null) => void;
   eatenTodayKcal: number;
@@ -117,6 +117,8 @@ export interface AppApi {
   mixQuestionTaken: () => void;
   recordTalk: (q: string, reply: string, plate: string[]) => void;
   shareCard: (id: string, reason: "look" | "ok" | "help") => void;
+  saveCardAsRecipe: (id: string) => void;
+  setCarry: (id: string, how: "light" | "fine" | "heavy") => void;
   user: import("../cloud").CloudUser | null;
   cloudEnabled: boolean;
   cloudStatus: { ok: boolean; text: string; at?: string };

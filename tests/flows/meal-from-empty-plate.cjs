@@ -50,6 +50,9 @@ seed.items = [];
   await step("make it", () => click(/^Make it$/i));
   await step("pick way", async () => { await page.locator(".way").first().click(); await page.waitForTimeout(200); });
   await step("making", () => click(/I'm making it this way/i));
+  // JOURNEY INVARIANT (M1 activity 6, 10 October 2026): after the steps, How did making it go? asks for photos, how it went and how much was eaten, then on to How was it?
+  await step("how did making it go", async () => { if (!(await page.locator("h2", { hasText: "How did making it go?" }).count())) throw new Error("the made step is missing"); });
+  await step("on to how was it", () => click(/On to How was it/i));
   await step("rate", () => click(/DaaM good/i));
   await step("save", () => click(/^Save$/i));
   console.log("feedback:", JSON.stringify(await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).feedback.map((f) => [f.meal.title, f.moment, f.dayType, f.meal.items.length]))));

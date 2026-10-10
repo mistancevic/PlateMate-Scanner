@@ -2,6 +2,8 @@
 export type LogEvent =
   | "adult_confirmed" // the welcome tap: 18 or older (Release A)
   | "account_delete" // Delete my account: done, data gone, stopped, or no answer
+  | "carry"          // How did it carry you?, 30 minutes after a meal: data.how = light | fine | heavy
+  | "made"           // How did making it go?: data.went = as | not, data.ate = all | portion | later | not, data.photos
   | "food_in"        // a food entered the meal; data.way = manual | saved | label | barcode | group
   | "barcode_miss"   // lookup failed, client falls back
   | "lock"           // data.locked

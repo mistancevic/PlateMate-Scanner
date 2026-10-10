@@ -6,7 +6,7 @@ Two kinds of checks live here, and the difference is the rule.
 
 - At the shop: Plate, Scan, the single-product camera opens (Label; Several products is the explicit choice, never the default), several sides of one product stage, Analyze, the label check with the name read, Mix it on the label check, one tap and the plate is the mix. (`camera-group.cjs`, `camera-every-mode.cjs`, `mix-tip.cjs`)
 - Several photos in every mode: the mode decides how a picture is read, never how many can be taken. Label stages two shots and sends them as one scan; Barcode reads the code, stays open for the pack's photos, and Analyze sends the code with them. (`camera-every-mode.cjs`)
-- A craving at home: Plate, pick a moment, foods in, Fit to my target, Make it, how was it, saved. (`meal-from-empty-plate.cjs`)
+- A craving at home: Plate, pick a moment, foods in, Fit to my target, Make it, the way, How did making it go? (photos, how it went, how much was eaten), How was it? with Save in My recipes, saved. (`meal-from-empty-plate.cjs`)
 - A missing food: the plate helper offers swaps from the library, never the missing food. (`dont-have-it.cjs`)
 - A barcode scanned twice opens the existing food, never a duplicate. (`duplicates-merge.cjs`)
 - Today: the day set once, read all day; the actions directly under the plan. (`today.cjs`)
@@ -20,7 +20,7 @@ Two kinds of checks live here, and the difference is the rule.
 
 **The happy paths.** The eight paths a person takes to get a job done, with the outcome they perceive and where a safety rule sits, are in the Worth Building doc, tab "Happy paths". `npm run qa:paths` runs the walkthroughs that guard each path and prints one line per path; P1, P7 and P8 have no guard in the sandbox and are checked on the phone.
 
-**The four places (5 October 2026).** Today holds the day, Plate the craving with its steps, Foods my foods and my recipes, Me the person: Profile with the door, Goal, My days, Where I shop, My coach, Account. The hamburger is housekeeping only. A walkthrough reaches Profile or Account through Me, Evals through the Menu. Nothing lights a tab it is not under.
+**The four places (10 October 2026, canvas X0).** The bar holds what a day touches: Today holds the day with today's meals, Plate the craving with its steps, Recipes my recipes and the coach's, Foods my foods. Me is the person and lives in the top menu: Profile with the door, Goal, Lifestyle, Weekly plan, Where I shop, My coach, Account, the taste notes. A walkthrough reaches Me through `me.cjs` (Menu, then Me), Evals through the Menu. Nothing lights a tab it is not under. Before 10 October Me was the fourth tab and recipes a view inside Foods.
 
 **Control checks.** Where a button is, what a label says. These follow the story that changes them.
 
