@@ -27,7 +27,7 @@ const path = require("node:path");
     const parts = await form.locator(".calc-part b").allTextContents();
     ok(parts.join("|") === "Your everyday|Your training", "your everyday first, then your training: " + parts.join(", "));
     // your everyday
-    ok(await page.getByRole("button", { name: /9 to 5 at a desk/ }).count() === 1, "your work, as before");
+    ok(await page.getByRole("button", { name: /Mostly sitting/ }).count() === 1, "your work, as before");
     await page.getByRole("group", { name: "Steps on a usual day" }).getByRole("button", { name: "8,000–12,000" }).click(); await page.waitForTimeout(150);
     ok((await saved()).steps === "8to12", "steps on a usual day are kept");
     // your training: no Rest row, a new week has no training

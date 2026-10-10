@@ -33,7 +33,7 @@ const path = require("node:path");
   ok((await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal") || "{}").birthYear)) !== 2009, "a birth year under 18 is not saved");
   await inputs.nth(0).fill("1998");
   await inputs.nth(1).fill("168"); await inputs.nth(2).fill("58"); await inputs.nth(2).blur();
-  await page.getByRole("button", { name: /9 to 5 at a desk/ }).click();
+  await page.getByRole("button", { name: /Mostly sitting/ }).click();
   await page.getByRole("button", { name: /^Lose fat/ }).click(); await page.waitForTimeout(200);
   ok(!/Chef Mealan is for adults/.test(await page.locator(".calc-way").textContent()), "an adult picking Lose fat sees no age line");
   // each day its own: the table

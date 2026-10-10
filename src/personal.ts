@@ -45,10 +45,11 @@ export type Personal = {
 // Life without planned training, as a multiple of resting burn. Physical activity levels after FAO/WHO/UNU 2004,
 // taken at the low end of each band because planned training is counted separately, per day.
 export const LIFE: { id: Life; name: string; hint: string; factor: number }[] = [
-  { id: "desk",     name: "9 to 5 at a desk", hint: "sitting most of the day",           factor: 1.3 },
-  { id: "shift",    name: "Shift work",       hint: "some standing and walking",         factor: 1.4 },
-  { id: "feet",     name: "On my feet",       hint: "shop, care, teaching, most of the day", factor: 1.55 },
-  { id: "physical", name: "Physical work",    hint: "building, farming, carrying",       factor: 1.75 },
+  // the body first, the job as the example (Milan, 10 October 2026)
+  { id: "desk",     name: "Mostly sitting",                      hint: "a desk job, 9 to 5",              factor: 1.3 },
+  { id: "shift",    name: "Standing and walking some of the day", hint: "shift work, reception, a lab",    factor: 1.4 },
+  { id: "feet",     name: "On my feet most of the day",          hint: "shop, care, teaching",            factor: 1.55 },
+  { id: "physical", name: "Hard physical work",                  hint: "building, farming, carrying",     factor: 1.75 },
 ];
 // The four days, all about training. METs from the Compendium of Physical Activities (2024): a walk or mobility about 3.5,
 // a session you could talk through about 5, a hard or heavy session about 8. Only the part above rest is added.
