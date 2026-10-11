@@ -47,12 +47,35 @@ seed.items = [];
   await page.getByRole("button", { name: /^Add$/ }).first().click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /Fit to my target/ }).click(); await page.waitForTimeout(800);
   ok(await page.getByRole("button", { name: /Put it in Monday's breakfast/ }).count() === 1, "the recipe step offers Put it in Monday's breakfast");
+  ok(/readout-fit-(plan|top|close|below)/.test(await page.locator(".readout").getAttribute("class")), "the recipe step's box is coloured by the score");
+  // the name is mine to change
+  await page.locator(".plate-name input").fill("Morning skyr"); await page.waitForTimeout(200);
   await page.getByRole("button", { name: /Put it in Monday's breakfast/ }).click(); await page.waitForTimeout(600);
   ok(await page.locator(".plan-day").count() === 1, "back on Plan");
   const bf2 = await page.locator(".plan-slot-wrap").first().textContent();
-  ok(/made on the Plate/.test(bf2) && !/under/.test(bf2), "Breakfast holds the plate's meal now, no gap: " + bf2.slice(0, 60));
-  const meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.length);
+  ok(/Morning skyr/.test(bf2) && /made on the Plate/.test(bf2) && !/under/.test(bf2), "Breakfast holds the plate's meal under my name, no gap: " + bf2.slice(0, 60));
+  let meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.length);
   ok(meals === 3, "and it is saved to My recipes");
+  // back to the Plate from the slot and in again: the same recipe, not a second copy
+  await page.getByRole("button", { name: /Breakfast at .*Morning skyr/ }).click(); await page.waitForTimeout(400);
+  await page.locator(".pick-sheet").getByRole("button", { name: /Morning skyr/ }).click(); await page.waitForTimeout(400);
+  meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.length);
+  ok(meals === 3, "picking it again from the sheet keeps one copy");
+  // Make it as it is from the first step: a plate that cannot reach the target goes in as it stands
+  await page.getByRole("button", { name: /Lunch at .*Chicken/ }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: "Create a new meal on the Plate" }).click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: /^Add$/ }).first().click(); await page.waitForTimeout(300);
+  await page.locator(".row-food", { hasText: "Leibniz" }).getByRole("button").click(); await page.waitForTimeout(300);
+  ok(await page.getByRole("button", { name: "Make it as it is" }).count() === 1 && await page.getByRole("button", { name: /Fit to my target/ }).count() === 1, "two ways out: Fit to my target and Make it as it is");
+  await page.getByRole("button", { name: "Make it as it is" }).click(); await page.waitForTimeout(600);
+  const lunch2 = await page.locator(".plan-slot-wrap").nth(1).textContent();
+  ok(/made on the Plate/.test(lunch2) && /under/.test(lunch2), "Lunch holds the plate as it stands, with its gap: " + lunch2.slice(0, 70));
+  meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.length);
+  ok(meals === 4, "saved once");
+  // Fit it on the Plate on that short meal: after Fit the box is coloured and the chef's line says what these foods reach
+  await page.locator(".plan-slot-wrap").nth(1).getByRole("button", { name: "Fit it on the Plate" }).click(); await page.waitForTimeout(600);
+  ok(await page.locator(".chef-line").count() === 1 && await page.getByRole("button", { name: /Ask Chef Mealan what to add/ }).count() === 1, "a plate that cannot reach the target gets the chef's line");
+  await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(400);
   // my own recipe in a slot, then emptied
   await page.getByRole("button", { name: /Dinner at .*pick a meal/ }).click(); await page.waitForTimeout(400);
   await page.locator(".pick-sheet").getByRole("button", { name: /Skyr bowl/ }).first().click(); await page.waitForTimeout(400);

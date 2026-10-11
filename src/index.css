@@ -1082,3 +1082,8 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .pick-pd { display: flex; flex-direction: column; align-items: flex-end; flex: none; } .pick-pd b { font-size: 20px; line-height: 1; } .pick-pd small { font-size: 11px; font-weight: 800; }
 .pick-pd.fits { color: var(--brand); } .pick-pd.under { color: #b36b00; } .pick-pd.none { color: var(--muted); }
 .pick-plate { margin: 0 0 8px; }
+/* 0.2.2 fix (canvas S, A new meal for a slot, Off the plan short): the two ways out, the name, the chef's line */
+.ways-out { display: flex; gap: 8px; } .ways-out .pill-wide { flex: 1; width: auto; margin: 0; min-width: 0; justify-content: center; }
+.plate-name { margin: 0 0 10px; }
+.chef-line { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 14px; background: #eef3fb; color: var(--ink); font-size: 13.5px; font-weight: 600; margin: 0 0 14px; }
+.chef-line-who { display: flex; align-items: center; gap: 6px; color: var(--brand-text); font-weight: 800; } .chef-line .pill-small { align-self: flex-start; }
