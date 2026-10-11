@@ -92,6 +92,15 @@ seed.items = [];
   const after = (await page.locator(".readout b").first().textContent()).trim();
   ok(Number(after) > Number(before), `Add lifts the plate and Mealan refits: ${before} to ${after}`);
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(400);
+  // a new name typed on the Plate for a meal that came from a recipe renames that recipe, no copy; Go closes the keyboard
+  const countBefore = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.length);
+  await page.locator(".plan-slot-wrap").nth(1).getByRole("button", { name: "Fit it on the Plate" }).click(); await page.waitForTimeout(600);
+  await page.locator(".title-input").click(); await page.keyboard.press("Control+A"); await page.keyboard.type("Biscuit lunch", { delay: 30 }); await page.keyboard.press("Enter"); await page.waitForTimeout(200);
+  ok(await page.evaluate(() => document.activeElement?.className !== "title-input"), "Go on the keyboard leaves the name field");
+  await page.getByRole("button", { name: "Make it as it is" }).click(); await page.waitForTimeout(600);
+  ok(/Biscuit lunch/.test(await page.locator(".plan-slot-wrap").nth(1).textContent()), "Lunch shows the new name");
+  const countAfter = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals);
+  ok(countAfter.length === countBefore && countAfter.some((m) => m.title === "Biscuit lunch") && !countAfter.some((m) => m.title === "Nutella & Leibniz Butterkeks"), "the recipe is renamed, not copied");
   // my own recipe in a slot, then emptied
   await page.getByRole("button", { name: /Dinner at .*pick a meal/ }).click(); await page.waitForTimeout(400);
   await page.locator(".pick-sheet").getByRole("button", { name: /Skyr bowl/ }).first().click(); await page.waitForTimeout(400);

@@ -91,7 +91,7 @@ export function PlanScreen(p: AppApi) {
               </button>
               {m && fit?.state === "under" && (
                 <div className="button-row plan-slot-fix">
-                  <button type="button" className="pill pill-small pill-primary" onClick={() => p.fillOnPlate(fillingOf(r.slot), m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : null, m.title)}>Fit it on the Plate</button>
+                  <button type="button" className="pill pill-small pill-primary" onClick={() => p.fillOnPlate({ ...fillingOf(r.slot), mealId: m.mealId }, m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : null, m.title)}>Fit it on the Plate</button>
                   <button type="button" className="pill pill-small" onClick={() => p.openOut()}>Ask Chef {CHEF_NAME}</button>
                 </div>
               )}

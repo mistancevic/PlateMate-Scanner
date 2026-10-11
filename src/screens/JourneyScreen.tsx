@@ -25,7 +25,7 @@ function stepHead({ n, title, sub, nameField }: { n: number; title: string; sub?
   return (
     <div className="step-head">
       <div className="step-bar">{STEPS.map((s, i) => <i key={s} className={i < n ? "on" : ""} />)}</div>
-      {nameField ? <input className="title-input" aria-label="Name of the meal" value={nameField.value} placeholder={nameField.placeholder} onChange={(e) => nameField.onChange(e.target.value)} /> : <h2>{title}</h2>}
+      {nameField ? <input className="title-input" aria-label="Name of the meal" value={nameField.value} placeholder={nameField.placeholder} onChange={(e) => nameField.onChange(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" /> : <h2>{title}</h2>}
       {sub && <p>{sub}</p>}
     </div>
   );
@@ -118,9 +118,12 @@ export function JourneyScreen(p: AppApi) {
   const putInSlot = (its: typeof items) => {
     const f = p.filling; if (!f) return;
     const title = (p.state.title || "").trim() || autoTitle(its);
-    const same = (m: Meal) => m.title === title && m.items.length === its.length && m.items.every((x, i) => x.food.id === its[i].food.id && Math.round(x.grams) === Math.round(its[i].grams));
-    const found = state.meals.find(same);
-    const meal: Meal = found ?? { id: uid(), title, items: structuredClone(its), portion: its.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
+    const sameFoods = (m: Meal) => m.items.length === its.length && m.items.every((x, i) => x.food.id === its[i].food.id && Math.round(x.grams) === Math.round(its[i].grams));
+    // the recipe this plate came from, with the same foods and amounts: a new name renames it, no copy (Milan, 11 October 2026)
+    const origin = f.mealId ? state.meals.find((m) => m.id === f.mealId && sameFoods(m)) : undefined;
+    const found = origin ?? state.meals.find((m) => m.title === title && sameFoods(m));
+    const meal: Meal = found ? { ...found, title } : { id: uid(), title, items: structuredClone(its), portion: its.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
+    if (found && found.title !== title) p.renameMeal(found.id, title);
     setState((s) => ({ ...s, meals: found ? s.meals : [structuredClone(meal), ...s.meals], items: [], portion: null, title: "" }));
     p.fill(f.date, f.slotId, { ...fromMeal(meal, "plate"), source: "plate" });
     p.setFilling(null); setStep("in"); setTab("plan"); notify(`${title} is ${slotName(f)}.${found ? "" : " Saved to My recipes too."}`);
