@@ -1534,7 +1534,9 @@ export default function App() {
   }
   function mixWith(itemsIn: Ingredient[], id: string): boolean {
     setError("");
-    const target = momentTarget(moment, density(state.goals.protein, todayKcalOf()));
+    // the target the Plate shows (pdRef): a slot's day when filling one, else the moment's (12 October 2026: Fit aimed at
+    // its own number, the time of day and the average protein, so a slot's plate fell short of the slot's target)
+    const target = pdRef;
     if (target === null || target <= 0) {
       setError("Set daily energy and protein targets first.");
       return false;
@@ -1673,7 +1675,10 @@ export default function App() {
   const totals = aggregate(state.items),
     todayKcal = todayKcalOf(),
     dayPd = density(todayNumbers()?.protein ?? state.goals.protein, todayKcal),
-    pdRef = momentTarget(moment, dayPd);
+    // a plate for a slot aims at that slot's day, the target Plan judges it by; otherwise the moment's (12 October 2026:
+    // filling breakfast after midnight fitted to the late-night target, and Plan then showed the meal under)
+    slotDay = filling ? (() => { const [y, m, d] = filling.date.split("-").map(Number); return numbersOfDay(getDay(personal, new Date(y, m - 1, d, 12))); })() : null,
+    pdRef = filling ? (slotDay ? density(slotDay.protein, slotDay.kcal) : dayPd) : momentTarget(moment, dayPd);
   const selected = portionTotals(state.items, state.portion);
   const matched =
     selected.calories !== null &&

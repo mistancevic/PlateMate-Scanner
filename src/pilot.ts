@@ -273,7 +273,14 @@ export function solveIngredient(
     };
   // a counted food lands on whole servings: more of it when it lifts the plate, fewer when it lowers it, never under one
   const lifts = (f.protein! / f.calories!) * 100 >= target;
-  const grams = f.serving ? (lifts ? snapToServing(f, exactGrams) : Math.max(1, Math.floor(exactGrams / f.serving.grams + 1e-9)) * f.serving.grams) : Math.round(exactGrams);
+  let grams = f.serving ? (lifts ? snapToServing(f, exactGrams) : Math.max(1, Math.floor(exactGrams / f.serving.grams + 1e-9)) * f.serving.grams) : Math.round(exactGrams);
+  // a dense food (a protein powder) moves the plate more than 0.05 a gram: the whole gram that lands at or just above the
+  // target stands, never the plate left as it was (12 October 2026: Fit kept 100 g of whey, PD 13 against 6.9)
+  if (!f.serving) {
+    const pdAt = (g: number) => { const r = aggregate(items.map((x) => (x.id === id ? { ...x, grams: g } : x))); return density(r.protein, r.calories); };
+    const near = pdAt(grams);
+    if (near === null || Math.abs(near - target) > 0.05) { const up = lifts ? Math.ceil(exactGrams) : Math.floor(exactGrams); if ((pdAt(up) ?? -1) >= target) grams = up; }
+  }
   if (
     maxWeight !== null &&
     (t.weight + exactGrams > maxWeight + 1e-8 || t.weight + grams > maxWeight)
@@ -285,8 +292,9 @@ export function solveIngredient(
   const result = items.map((x) => (x.id === id ? { ...x, grams } : x)),
     total = aggregate(result),
     actualPD = density(total.protein, total.calories);
-  // a counted food lands on whole servings, so it may overshoot the target; a food in grams must land within 0.05
-  const overshootOk = Boolean(f.serving) && actualPD !== null && actualPD >= target;
+  // a counted food lands on whole servings, and a dense one on the gram just above, so either may overshoot the target;
+  // otherwise a food in grams lands within 0.05
+  const overshootOk = actualPD !== null && actualPD >= target && (Boolean(f.serving) || Math.abs(grams - exactGrams) < 1);
   if (actualPD === null || (Math.abs(actualPD - target) > 0.05 && !overshootOk))
     return {
       ok: false,

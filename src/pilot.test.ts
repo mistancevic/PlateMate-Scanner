@@ -124,3 +124,14 @@ test("a counted food: what Mealan moves snaps to whole servings, never under one
   assert.equal(r.grams % 45, 0, `whole bars: ${r.grams} g`);
   assert.ok(r.grams >= 45);
 });
+test("a dense food lands on the whole gram just above the target, not left as it was (12 October 2026)", () => {
+  const base = { basis: "100g", source: "label", notes: "", reviewedAt: "2026-09-25", readyToEat: true, fats: null, carbs: null, fiber: null, sugar: null, salt: null } as unknown as Food;
+  const nutella = { ...base, id: "n1", name: "Nutella", calories: 539, protein: 6.3 } as Food;
+  const whey = { ...base, id: "w1", name: "Whey", calories: 370, protein: 80 } as Food;
+  const plate: Ingredient[] = [{ id: "a", food: nutella, grams: 50, locked: true }, { id: "b", food: whey, grams: 100, locked: false }];
+  const s = solveIngredient(plate, "b", 6.923, null);
+  assert.ok(s.ok);
+  if (!s.ok) return;
+  assert.ok(s.actualPD >= 6.923 && s.actualPD < 7.3, `PD ${s.actualPD}`);
+  assert.ok(s.grams < 40, `grams ${s.grams}`);
+});

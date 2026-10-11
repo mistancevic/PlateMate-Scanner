@@ -1,4 +1,5 @@
 // Plan, 0.2.2 (canvas S "Plan purpose one", H7): filling a slot by hand. Tap a slot, the sheet with My recipes, Coach's
+// The day picked is next week's Monday, never today, so the lines say Monday's whatever day the run falls on (12 October 2026: a run on a Monday read Today's).
 // recipes and Chef Mealan's starters with their PD marks, a meal in the slot with fits or the amber gap, Fit it on the Plate
 // with the slot on the plan line, Put it in the slot from the Plate, the day as planned adding up, emptying a slot.
 const { chromium } = require("playwright");
@@ -19,7 +20,7 @@ seed.items = [];
   await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3198/"); await page.waitForTimeout(900);
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(500);
-  await page.evaluate(() => document.querySelector(".day-strip .choice").click()); await page.waitForTimeout(300);
+  await page.evaluate(() => document.querySelectorAll(".day-strip .choice")[7].click()); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /Lunch at .*pick a meal/ }).click(); await page.waitForTimeout(400);
   const sheet = page.locator(".pick-sheet");
   ok(/Lunch, 13:45/.test(await sheet.locator(".card-top").textContent()), "the sheet names the slot and its time");
@@ -56,7 +57,7 @@ seed.items = [];
   await page.getByRole("button", { name: /Put it in Monday's breakfast/ }).click(); await page.waitForTimeout(600);
   ok(await page.locator(".plan-day").count() === 1, "back on Plan");
   const bf2 = await page.locator(".plan-slot-wrap").first().textContent();
-  ok(/Morning skyr/.test(bf2) && /made on the Plate/.test(bf2) && !/under/.test(bf2), "Breakfast holds the plate's meal under my name, no gap: " + bf2.slice(0, 60));
+  ok(/Morning skyr/.test(bf2) && /made on the Plate/.test(bf2) && !/under/.test(bf2), "Breakfast holds the plate's meal under my name, no gap: " + bf2);
   let meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.length);
   ok(meals === 3, "and it is saved to My recipes");
   // back to the Plate from the slot and in again: the same recipe, not a second copy
@@ -85,12 +86,16 @@ seed.items = [];
   await page.locator(".plan-slot-wrap").nth(1).getByRole("button", { name: "Fit it on the Plate" }).click(); await page.waitForTimeout(600);
   ok(await page.locator(".title-input").count() === 1 && /Fit to my target/.test(await page.locator(".plate-card").textContent()), "Fit it on the Plate lands on the first step, the name as the title");
   ok(await page.locator(".chef-tip").count() === 1, "and the tip is there");
+  // the tip's Add lifts the plate; then Fit aims at the slot's day, the target Plan judges by, whatever the time of day
+  // (12 October 2026: Fit used the time of day's target, so after midnight a slot's plate fell short of its slot)
+  const before = Number((await page.locator(".readout b").first().textContent()).trim());
+  await page.locator(".chef-tip").getByRole("button", { name: "+ Add" }).first().click(); await page.waitForTimeout(800);
+  const after = Number((await page.locator(".readout b").first().textContent()).trim());
+  ok(after > before, `Add lifts the plate: ${before} to ${after}`);
   await page.getByRole("button", { name: /Fit to my target/ }).click(); await page.waitForTimeout(1500);
-  const before = (await page.locator(".readout b").first().textContent()).trim();
-  ok(await page.locator(".chef-tip").count() === 1, "after Fit, still under: the tip at the recipe step");
-  await page.locator(".chef-tip").getByRole("button", { name: "+ Add" }).first().click(); await page.waitForTimeout(1800);
-  const after = (await page.locator(".readout b").first().textContent()).trim();
-  ok(Number(after) > Number(before), `Add lifts the plate and Mealan refits: ${before} to ${after}`);
+  const fitted = await page.locator(".readout").textContent();
+  const pdNow = Number((await page.locator(".readout b").first().textContent()).trim()), target = Number((fitted.match(/target (\d+\.\d)/) || [])[1]);
+  ok(target > 0 && pdNow >= target - 0.05 && await page.locator(".chef-tip").count() === 0, `after Fit the plate reaches the slot's target, no tip: PD ${pdNow}, target ${target}`);
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(400);
   // a new name typed on the Plate for a meal that came from a recipe renames that recipe, no copy; Go closes the keyboard
   const countBefore = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.length);
@@ -116,12 +121,12 @@ seed.items = [];
   await page.keyboard.press("Control+A"); await page.keyboard.type("Skyr at seven", { delay: 30 }); await page.keyboard.press("Enter"); await page.waitForTimeout(400);
   ok(await page.getByRole("button", { name: "Rename Skyr at seven" }).count() === 1, "the tile shows the new name");
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(500);
-  await page.evaluate(() => document.querySelector(".day-strip .choice").click()); await page.waitForTimeout(300);
+  await page.evaluate(() => document.querySelectorAll(".day-strip .choice")[7].click()); await page.waitForTimeout(300);
   ok(/Skyr at seven/.test(await page.locator(".plan-slot-wrap").first().textContent()), "and the slot that holds it shows the new name");
   // it all stays after a reload
   await page.reload(); await page.waitForTimeout(900);
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(500);
-  await page.evaluate(() => document.querySelector(".day-strip .choice").click()); await page.waitForTimeout(300);
+  await page.evaluate(() => document.querySelectorAll(".day-strip .choice")[7].click()); await page.waitForTimeout(300);
   ok(/1 slot open/.test(await page.locator(".plan-top").textContent()), "the slots keep their meals after a reload");
   // leaving the Plate another way drops the slot
   await page.getByRole("button", { name: /Dinner at .*pick a meal/ }).click(); await page.waitForTimeout(400);
