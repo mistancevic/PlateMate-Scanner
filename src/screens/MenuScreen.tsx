@@ -157,12 +157,16 @@ function ProfilePanel(p: AppApi) {
           </div>
           <small className="muted">Your training goes in the Weekly plan.</small>
         </div>
-        <div className="field"><span>Show protein density as</span>
-          <div className="moments">
-            <button className={`choice ${(d.pdUnit ?? "pd") === "pd" ? "on" : ""}`} onClick={() => setD({ ...d, pdUnit: "pd" })}>PD, grams per 100 kcal</button>
-            <button className={`choice ${d.pdUnit === "pct" ? "on" : ""}`} onClick={() => setD({ ...d, pdUnit: "pct" })}>% of energy from protein</button>
-          </div>
-          <small>Same thing, two ways to read it: PD 5 is 20 % of the energy from protein.</small>
+        {/* M3 (0.2.5+r4, Milan's layout, 11 October 2026): each chip with its definition beside it, then the day in both forms */}
+        <div className="field pd-unit"><span>Show protein density as</span>
+          <div className="pd-unit-row"><button type="button" className={`choice ${(d.pdUnit ?? "pd") === "pd" ? "on" : ""}`} aria-pressed={(d.pdUnit ?? "pd") === "pd"} onClick={() => setD({ ...d, pdUnit: "pd" })}>PD</button><span>g protein per 100 kcal</span></div>
+          <div className="pd-unit-row"><button type="button" className={`choice ${d.pdUnit === "pct" ? "on" : ""}`} aria-pressed={d.pdUnit === "pct"} onClick={() => setD({ ...d, pdUnit: "pct" })}>%</button><span>% of calories from protein</span></div>
+          {(() => {
+            const kcal = p.todayMacros?.kcal ?? p.state.goals.calories, pro = p.todayMacros?.protein ?? p.state.goals.protein;
+            if (!kcal || !pro) return <small className="pd-unit-day">For example: 5 g of protein in 100 kcal is PD 5, or 20 % (20 of 100 kcal).</small>;
+            const pd = (100 * pro) / kcal;
+            return <small className="pd-unit-day">Your day: {Math.round(pro)} g of protein in {Math.round(kcal).toLocaleString("en")} kcal. That is PD {pd.toFixed(1)}, or {Math.round(pd * 4)} % ({Math.round(pro * 4).toLocaleString("en")} of {Math.round(kcal).toLocaleString("en")} kcal).</small>;
+          })()}
         </div>
         <button className="pill pill-primary pill-wide" disabled={!dirty || !consented} onClick={() => { p.setClientName(name.trim()); p.setPersonal(d); if (d.pdUnit !== p.personal.pdUnit) log("pd_unit", { unit: d.pdUnit ?? "pd" }); p.notify("Profile saved."); }}>Save</button>
       </section>

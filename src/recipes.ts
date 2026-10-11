@@ -55,7 +55,7 @@ export function fitsOf(pd: number): PublicRecipe["fits"] {
 export const saysHighProtein = (s: string) => /high[- ]?protein|protein[- ]?rich|viel protein|eiwei(ß|ss)reich|proteinreich/i.test(s);
 export function claimProblem(title: string, lines: string, share: number): string | null {
   return (saysHighProtein(title) || saysHighProtein(lines)) && share < 20
-    ? `The words high protein need at least 20 % of the energy from protein; this recipe has ${share} %. Change the name or the two lines.`
+    ? `The words high protein need at least 20 % of the calories from protein; this recipe has ${share} %. Change the name or the two lines.`
     : null;
 }
 

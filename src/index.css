@@ -1115,3 +1115,6 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
    an empty one stays white; the rule from onboarding and the choices. While typing, the usual focus outline. */
 main:has(.menu-title) .field input:not([type="checkbox"]):not(:placeholder-shown) { background: #cfe0fb; border-color: var(--brand); color: #123a7a; font-weight: 800; }
 main:has(.menu-title) .field input:not([type="checkbox"]):focus { background: var(--surface); }
+/* M3: each unit chip with its definition beside it */
+.pd-unit-row { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; } .pd-unit-row .choice { flex: none; min-width: 64px; justify-content: center; } .pd-unit-row span { font-size: 14px; font-weight: 700; color: var(--ink); }
+.pd-unit-day { display: block; color: var(--muted); font-weight: 600; font-size: 13px; }

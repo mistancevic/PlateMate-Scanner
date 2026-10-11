@@ -6,6 +6,7 @@ One version per release since 2 October 2026. The number is in Menu, About, next
 
 Chef Mealan 0.2 (canvas boards 0.2 · M0 to M2, X0, S and H, 10 and 11 October 2026). The promise: Chef Mealan helps you eat by your plan and steps in when life does not. Four screens, four jobs: Today eats and counts, Plan decides, Plate makes, Recipes keeps. Built in small releases, 0.2.0 to 0.2.6.
 
+- **v0.2.5+r4** · 2026-10-11 · M3, Profile: Show protein density as. Two rows, each a chip with what it means next to it. PD (the default): g protein per 100 kcal. %: % of calories from protein. Under them, my day in both forms (Your day: 180 g of protein in 2,600 kcal. That is PD 6.9, or 28 %), from today's numbers or the goal; with no goal yet, an example. The % form reads % calories from protein everywhere it shows.
 - **v0.2.5+r3** · 2026-10-11 · M2: in Me and its sections (Profile, Goal, Lifestyle, Weekly plan) a field that holds a value is pale blue with the brand border, an empty one stays white; while typing, the plain focus look. The same rule as the choices and onboarding.
 - **v0.2.5+r2** · 2026-10-11 · a name typed on the Plate reaches the recipe the plate came from (a slot, or Recipes, Open) and the slot it is for as soon as you leave the field or press Go; before, it stayed on the plate and Today and Recipes kept the old name.
 - **v0.2.5+r1** · 2026-10-11 · a reload on Clients stayed on Today: the address /clients was not on the list a reload accepts. Now it is; once the account is known and is not a coach's, the app steps back to Today.

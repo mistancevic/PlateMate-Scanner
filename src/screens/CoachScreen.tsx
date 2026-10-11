@@ -66,7 +66,7 @@ export function CoachArea(p: AppApi) {
         <button className="card client-row" key={r.uid} onClick={() => setOpen(r)}>
           <div className="client-head">
             <span className="avatar">{r.name.slice(0, 1).toUpperCase()}</span>
-            <div><b>Client {r.name.split(" ")[0]}</b><small>{r.goal?.band ? goalLabel(r.goal.band) : "no goal yet"} · {r.foods} foods · {r.feedback.length} shared · {daam(r)} DaaM good · reads {r.pdUnit === "pct" ? "% protein" : "PD"}</small></div>
+            <div><b>Client {r.name.split(" ")[0]}</b><small>{r.goal?.band ? goalLabel(r.goal.band) : "no goal yet"} · {r.foods} foods · {r.feedback.length} shared · {daam(r)} DaaM good · reads {r.pdUnit === "pct" ? "% calories from protein" : "PD"}</small></div>
           </div>
           <small className="client-last">{last(r) ? `${last(r).taste}: ${last(r).meal?.title ?? ""} · ${new Date(last(r).createdAt).toLocaleDateString()}${last(r).notes ? ` · ${last(r).notes}` : ""}` : "no meals yet"} · active {r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : "never"}</small>
         </button>
