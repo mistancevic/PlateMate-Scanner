@@ -124,6 +124,10 @@ export interface AppApi {
   openGoal: () => void;
   // the chat knows the screen (0.2.4); "fill" opens it with the day filled
   openOut: (ask?: "fill") => void;
+  // Where does this go (0.2.5): Scan from Today, then the sheet with the saved food
+  scanFromToday: () => void;
+  where: Food | null;
+  setWhere: (f: Food | null) => void;
   closeOut: () => void;
   mealanAsk: number;
   mealanAsked: () => void;

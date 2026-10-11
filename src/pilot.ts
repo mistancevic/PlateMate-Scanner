@@ -75,7 +75,17 @@ export type Ingredient = {
   food: Food;
   grams: number;
   locked: boolean;
+  // a dish on the plate as one row (0.2.5, canvas S "A dish from the plan"): the recipe's items, n of "of" portions, base grams
+  // for one portion; the recipe is never moved by the solver, the portion and a side are the levers
+  dish?: { id: string; title: string; of: number; n: number; base: number };
 };
+// a recipe as a dish on the plate: one portion of a batch recipe (two or more foods, a portion well under the batch)
+export function asDish(m: Meal): Ingredient[] {
+  const total = m.items.reduce((n, i) => n + i.grams, 0);
+  const of = m.portion && total > m.portion * 1.5 ? Math.max(2, Math.round(total / m.portion)) : 1;
+  if (m.items.length < 2 || of < 2) return structuredClone(m.items);
+  return m.items.map((i) => ({ ...structuredClone(i), locked: true, grams: Math.round(i.grams / of), dish: { id: m.id, title: m.title, of, n: 1, base: i.grams / of } }));
+}
 export type Goals = Nutrition;
 // What the Publish sheet keeps while a recipe is being made ready for its page (board RG1): a draft, never public
 export type PublishDraft = { title?: string; lines?: string; makes?: string; servingName?: string; minutes?: string; names?: string[]; photoAt?: number; savedAt?: string };

@@ -1106,3 +1106,8 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .fill-text { flex: 1; display: flex; flex-direction: column; min-width: 0; } .fill-text b { font-size: 14px; } .fill-text small { color: var(--muted); font-weight: 600; }
 .chat-input .icon.listening { color: var(--low); }
 .plan-fill { margin: 0 0 10px; }
+/* 0.2.5: a dish as one row, the Where does this go sheet */
+.dish-row .row-text b { font-size: 15px; } .dish-fold { margin-top: 4px; } .dish-fold summary { font-size: 12.5px; font-weight: 700; color: var(--brand-text); cursor: pointer; } .dish-fold ul { margin: 4px 0; padding-left: 16px; font-size: 12.5px; color: var(--muted); }
+.dish-portions { display: flex; align-items: center; gap: 4px; flex: none; } .dish-portions b { font-size: 13px; min-width: 44px; text-align: center; font-variant-numeric: tabular-nums; } .dish-portions .icon { width: 30px; height: 30px; border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); font-size: 18px; font-weight: 800; color: var(--brand-text); display: inline-flex; align-items: center; justify-content: center; }
+.where-sheet { max-height: 88dvh; } .where-food { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; } .where-food b { font-size: 16px; } .where-food small { color: var(--muted); font-weight: 600; }
+.where-sheet .card-top { font-size: 15px; color: var(--ink); } .where-list { margin: 8px 0 12px; } .where-row { background: none; border: 0; border-bottom: 1px solid var(--line); font: inherit; width: 100%; padding: 12px 14px; text-align: left; } .where-row:last-child { border-bottom: 0; } .where-row .menu-row-text b { font-size: 15px; }

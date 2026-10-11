@@ -4,7 +4,7 @@ import { ConfirmButton } from "../components/Confirm";
 import type { Mix } from "../mixtip";
 import { aggregate, density, uid, solveIngredient, servingLabel } from "../pilot";
 import { fromMeal } from "../planned";
-import type { Meal, Food } from "../pilot";
+import type { Meal, Food, Ingredient } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
@@ -78,6 +78,44 @@ export function JourneyScreen(p: AppApi) {
   const [refit, setRefit] = useState(false);
   useEffect(() => { if (refit) { setRefit(false); askMealan(); } }, [state.items.length]); // eslint-disable-line react-hooks/exhaustive-deps
   const [title, setTitle] = useState("");
+  // A dish as one row (0.2.5, canvas S "A dish from the plan"): the recipe's items show as one row, n of its portions, the
+  // ingredients folded under it. The portion is the lever; the solver never moves a dish item. Anything added next to it is the side.
+  type Group = { kind: "item"; item: Ingredient } | { kind: "dish"; id: string; title: string; of: number; n: number; items: Ingredient[] };
+  const groupsOf = (list: Ingredient[]): Group[] => {
+    const out: Group[] = []; const seen = new Set<string>();
+    for (const i of list) {
+      if (!i.dish) { out.push({ kind: "item", item: i }); continue; }
+      if (seen.has(i.dish.id)) continue; seen.add(i.dish.id);
+      out.push({ kind: "dish", id: i.dish.id, title: i.dish.title, of: i.dish.of, n: i.dish.n, items: list.filter((x) => x.dish?.id === i.dish!.id) });
+    }
+    return out;
+  };
+  const setPortions = (dishId: string, n: number) => {
+    const k = Math.max(1, Math.min(12, n));
+    setState((s) => ({ ...s, items: s.items.map((i) => (i.dish?.id === dishId ? { ...i, grams: Math.round(i.dish.base * k), dish: { ...i.dish, n: k } } : i)), portion: null }));
+  };
+  const removeDish = (dishId: string) => setState((s) => ({ ...s, items: s.items.filter((i) => i.dish?.id !== dishId), portion: null }));
+  const DishRow = ({ g }: { g: Extract<Group, { kind: "dish" }> }) => {
+    const t = aggregate(g.items);
+    return (
+      <div className="row dish-row">
+        <span className="dot dot-locked" aria-hidden="true" />
+        <div className="row-text">
+          <b>{g.title}</b>
+          <small>{pdText(density(t.protein, t.calories))} · {fmt(t.calories, 0)} kcal · {fmt(t.protein, 0)} g protein · the recipe stays as it is</small>
+          <details className="dish-fold"><summary>Ingredients, {g.items.length}</summary>
+            <ul>{g.items.map((i) => <li key={i.id}>{fmt(i.grams, 0)} g {i.food.name}</li>)}</ul>
+            <button type="button" className="link" onClick={() => removeDish(g.id)}>Take it off the plate</button>
+          </details>
+        </div>
+        <div className="dish-portions" aria-label={`${g.n} of ${g.of} portions`}>
+          <button type="button" className="icon" aria-label="One portion less" onClick={() => setPortions(g.id, g.n - 1)}>−</button>
+          <b>{g.n} of {g.of}</b>
+          <button type="button" className="icon" aria-label="One portion more" onClick={() => setPortions(g.id, g.n + 1)}>+</button>
+        </div>
+      </div>
+    );
+  };
   // Chef Mealan's tip (canvas S, 11 October 2026): when the plate is under the target, the three foods from My foods that lift
   // it most, a normal portion each (the pack's serving, 30 g for a powder, else 100 g), with the score the plate would reach.
   const portionOf = (f: Food) => f.serving?.grams ?? (/powder|whey|protein pulver/i.test(f.name) ? 30 : 100);
@@ -120,12 +158,15 @@ export function JourneyScreen(p: AppApi) {
     const title = (p.state.title || "").trim() || autoTitle(its);
     const sameFoods = (m: Meal) => m.items.length === its.length && m.items.every((x, i) => x.food.id === its[i].food.id && Math.round(x.grams) === Math.round(its[i].grams));
     // the recipe this plate came from, with the same foods and amounts: a new name renames it, no copy (Milan, 11 October 2026)
-    const origin = f.mealId ? state.meals.find((m) => m.id === f.mealId && sameFoods(m)) : undefined;
+    const dishId = its.length > 0 && its.every((i) => i.dish && i.dish.id === its[0].dish!.id) ? its[0].dish!.id : null;
+    const origin = (dishId ? state.meals.find((m) => m.id === dishId) : undefined) ?? (f.mealId ? state.meals.find((m) => m.id === f.mealId && sameFoods(m)) : undefined);
     const found = origin ?? state.meals.find((m) => m.title === title && sameFoods(m));
     const meal: Meal = found ? { ...found, title } : { id: uid(), title, items: structuredClone(its), portion: its.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
     if (found && found.title !== title) p.renameMeal(found.id, title);
     setState((s) => ({ ...s, meals: found ? s.meals : [structuredClone(meal), ...s.meals], items: [], portion: null, title: "" }));
-    p.fill(f.date, f.slotId, { ...fromMeal(meal, "plate"), source: "plate" });
+    // the slot holds what is on the plate: the dish at its portions, plus any side
+    const t = aggregate(its);
+    p.fill(f.date, f.slotId, { ...fromMeal(meal, "plate"), source: found ? (found.from === "coach" ? "coach" : "mine") : "plate", kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0), items: structuredClone(its), portion: its.reduce((n, i) => n + i.grams, 0) });
     p.setFilling(null); setStep("in"); setTab("plan"); notify(`${title} is ${slotName(f)}.${found ? "" : " Saved to My recipes too."}`);
   };
   const autoTitle = (its: typeof items) => { const n = its.map((i) => i.food.name.split(",")[0].trim()); return n.length <= 1 ? n[0] ?? "Meal" : `${n.slice(0, -1).join(", ")} & ${n[n.length - 1]}`; };
@@ -263,7 +304,7 @@ export function JourneyScreen(p: AppApi) {
         {/* the plan line (0.2.0, canvas S): one line says what the plate is; the kind and the moment sit behind its pencil, never asked first.
             A planned meal (0.2.2) says Lunch, 12:30 · By the plan; until then every plate is off the plan. */}
         <div className="plan-line">
-          <span>{p.filling ? (p.filling.mode === "eat" ? `${p.filling.name}, ${p.filling.time} · By the plan` : `${p.filling.dayName === "today" ? "Today" : p.filling.dayName}'s ${p.filling.name.toLowerCase()}, ${p.filling.time} · By the plan`) : `Off the plan · ${momentOf(p.moment).name}${p.kind === "dessert" ? " · A dessert" : " · A mix"}`}</span>
+          <span>{p.filling ? (p.filling.mode === "eat" ? `${p.filling.name}, ${p.filling.time} · By the plan` : `${p.filling.dayName === "today" ? "Today" : p.filling.dayName}'s ${p.filling.name.toLowerCase()}, ${p.filling.time} · By the plan`) + (items.some((i) => i.dish) ? " · A dish" : "") : `Off the plan · ${momentOf(p.moment).name}${p.kind === "dessert" ? " · A dessert" : items.some((i) => i.dish) ? " · A dish" : " · A mix"}`}</span>
           <button className="icon plan-line-pen" aria-label="Change what this plate is" aria-expanded={lineOpen} onClick={() => setLineOpen((v) => !v)}><Pencil size={16} /></button>
         </div>
         {lineOpen && (<>
@@ -311,7 +352,7 @@ export function JourneyScreen(p: AppApi) {
         </div>
         {items.length > 0 && (
           <div className="rows">
-            {items.map((i) => (
+            {groupsOf(items).map((g) => g.kind === "dish" ? <DishRow key={g.id} g={g} /> : (() => { const i = g.item; return (
               <SwipeRow key={i.id} onRemove={() => remove(i.id)} onSwap={() => setSwapId(i.id)}>
               <div className="row">
                 <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Unlock" : "Lock"} ${i.food.name}`}
@@ -332,7 +373,7 @@ export function JourneyScreen(p: AppApi) {
                 )}
               </div>
               </SwipeRow>
-            ))}
+            ); })())}
           </div>
         )}
         {/* two ways out (canvas S, A new meal for a slot and Off the plan, short, 11 October 2026): Fit moves one food; Make it as it is takes the plate as it stands */}
@@ -408,7 +449,7 @@ export function JourneyScreen(p: AppApi) {
           {extras(shown.map((x) => ({ food: x.food, grams: x.grams })))}
         </section>
         <div className="rows">
-          {shown.map((i) => (
+          {groupsOf(shown).map((g) => g.kind === "dish" ? <DishRow key={g.id} g={g} /> : (() => { const i = g.item; return (
             <SwipeRow key={i.id} onRemove={() => remove(i.id)} onSwap={() => setSwapId(i.id)}>
             <div className="row">
               <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Let Mealan move" : "Keep"} ${i.food.name}`} onClick={() => toggle(i.id)} />
@@ -431,7 +472,7 @@ export function JourneyScreen(p: AppApi) {
               )}
             </div>
             </SwipeRow>
-          ))}
+          ); })())}
         </div>
         {over && <button className="pill pill-wide" onClick={() => setCap(null)}>Allow more than {cap} g</button>}
         <button className="pill pill-primary pill-wide" onClick={() => {
@@ -531,7 +572,9 @@ export function JourneyScreen(p: AppApi) {
   // the plate's name, and the recipe it is as it stands (same foods and amounts), when it came from one
   const plateName = (state.title && state.title !== "DaaM" ? state.title : "") || autoTitle(items);
   const sameAs = (m: Meal) => m.items.length === items.length && m.items.every((x, i) => x.food.id === items[i].food.id && Math.round(x.grams) === Math.round(items[i].grams));
-  const origin = state.meals.find((m) => (p.filling?.mealId === m.id || m.title === plateName) && sameAs(m));
+  // a dish on its own is its recipe, whatever the portion
+  const dishOnly = items.length > 0 && items.every((i) => i.dish && i.dish.id === items[0].dish!.id) ? items[0].dish!.id : null;
+  const origin = (dishOnly ? state.meals.find((m) => m.id === dishOnly) : undefined) ?? state.meals.find((m) => (p.filling?.mealId === m.id || m.title === plateName) && sameAs(m));
   return (
     <>
       {Head({ title: "How was it?", sub: "One tap. It stays yours unless you share it." })}

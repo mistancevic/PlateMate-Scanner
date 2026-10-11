@@ -159,7 +159,7 @@ export function HomeScreen(p: AppApi) {
       </section>
       {/* the question Scan answers (0.2.4, Milan 11 October): the job at the shelf or the counter, tied to the numbers above */}
       <div className="scan-why"><b>Does it fit my numbers?</b><small>Scan a label, a barcode, or a photo of a few products.</small></div>
-      <button className="pill pill-tall pill-primary scan-today" onClick={() => { p.setKind("meal"); setStep("in"); setTab("journey"); setMode("label"); setCamera(true); }}>
+      <button className="pill pill-tall pill-primary scan-today" onClick={() => p.scanFromToday()}>
         <Camera size={20} /> Scan
       </button>
       {inbox}

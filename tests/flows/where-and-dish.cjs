@@ -1,0 +1,79 @@
+// 0.2.5 (canvas S "Plan decides, purpose two: the store" and "Plate makes", H9, H12): Where does this go after a scan from
+// Today (on the plate now, into a planned meal with what it does to its PD, a new meal in an empty slot, keep); a dish as
+// one row on the Plate with its portions, the recipe never moved, a side as the lever; a dish eaten as it stands is its recipe.
+const { chromium } = require("playwright");
+const { spawn } = require("node:child_process");
+const path = require("node:path"), fs = require("node:fs");
+const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "utf8"));
+const f = (re) => seed.foods.find((x) => re.test(x.name));
+// sarma for 8: 2,200 g of foods, a portion of 275 g
+seed.meals = [{ id: "m4", title: "Sarma", items: [{ id: "s1", food: f(/chicken/i), grams: 800, locked: true }, { id: "s2", food: f(/^rice/i), grams: 1200, locked: true }, { id: "s3", food: f(/^oats/i), grams: 200, locked: true }], portion: 275, savedAt: "2026-10-01T08:00:00Z" }];
+seed.items = [];
+(async () => {
+  const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT: "3194" }, stdio: ["ignore", "pipe", "pipe"] });
+  await new Promise((r) => setTimeout(r, 2500));
+  const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
+  const page = await b.newPage({ viewport: { width: 390, height: 1500 }, deviceScaleFactor: 2 });
+  const errs = []; page.on("pageerror", (e) => errs.push(e.message));
+  let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
+  const click = async (re) => { await page.getByRole("button", { name: re }).first().click({ timeout: 5000 }); await page.waitForTimeout(400); };
+  await page.route("**/api/product/**", (route) => route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ product_name: "Tofu block", brand: "Testers", calories: 98, protein: 12, fats: 4.3, carbs: 3.3, fiber: 0, source: "Open Food Facts · review required" }) }));
+  const key = (() => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; })();
+  await page.addInitScript(([s, key]) => { if (!localStorage.getItem("seeded")) {
+    localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
+    localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" }));
+    localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "each", sex: "male", birthYear: 1981, heightCm: 182, weightKg: 95, plan: Array(7).fill({ work: true, kind: "strength", intensity: "hard", when: "evening", minutes: 60 }), lifestyle: { meals: 3, window: { from: "07:30", to: "20:00" } } }));
+    // lunch holds the sarma, dinner is empty
+    localStorage.setItem("chefmealan-planned", JSON.stringify({ [key]: { lunch: { title: "Sarma", kcal: 454, protein: 38, source: "mine", mealId: "m4", items: s.meals[0].items, portion: 275 } } }));
+    localStorage.setItem("seeded", "1"); } }, [seed, key]);
+  await require("./adult.cjs")(page);
+  await page.goto("http://127.0.0.1:3194/"); await page.waitForTimeout(900);
+  // the dish: lunch opens the Plate with sarma as one row, 1 of 8
+  await page.getByRole("button", { name: /Lunch at .*Sarma/ }).click(); await page.waitForTimeout(600);
+  ok(await page.locator(".dish-row").count() === 1 && /1 of 8/.test(await page.locator(".dish-portions").textContent()), "the recipe is one row, 1 of 8 portions");
+  ok(/A dish/.test(await page.locator(".plan-line").textContent()), "the line says A dish");
+  const kcalOf = async () => { const t = await page.locator(".readout-mid small").first().textContent(); const m = t.match(/([\d,.]+)\s*kcal/); if (!m) throw new Error("no kcal in: " + t); return Number(m[1].replace(/[,.]/g, "")); };
+  const kcal1 = await kcalOf();
+  await page.getByRole("button", { name: "One portion more" }).click(); await page.waitForTimeout(300);
+  const kcal2 = await kcalOf();
+  ok(/2 of 8/.test(await page.locator(".dish-portions").textContent()) && kcal2 > kcal1 * 1.8, `two portions double the plate: ${kcal1} to ${kcal2} kcal`);
+  await page.getByRole("button", { name: "One portion less" }).click(); await page.waitForTimeout(300);
+  // eaten as it stands: the card points at the recipe, no copy
+  await click(/^Make it as it is$/);
+  if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); await click(/I'm making it this way/i); } else await click(/^Continue$/);
+  await click(/On to How was it/i);
+  ok(/Sarma is in My recipes already/.test(await page.locator("main").textContent()), "the after step says the recipe exists");
+  await click(/DaaM good/i); await click(/^Save$/); await page.waitForTimeout(600);
+  const meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.map((m) => m.title));
+  ok(meals.length === 1, "no second Sarma: " + meals.join(", "));
+  // from Recipes, Open: the dish again, a side next to it; Fit moves the side, never the recipe
+  await page.getByRole("button", { name: /^Recipes$/ }).first().click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: "Open", exact: true }).first().click(); await page.waitForTimeout(600);
+  await page.locator(".row-food", { hasText: "Skyr" }).getByRole("button").click(); await page.waitForTimeout(300);
+  await click(/Fit to my target/); await page.waitForTimeout(1200);
+  ok(await page.locator(".dish-row").count() === 1 && /what Mealan moves/.test(await page.locator(".rows").textContent()), "after Fit the dish is still one row and the side is what Mealan moves");
+  const sarmaGrams = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.filter((i) => i.dish).map((i) => i.grams));
+  ok(sarmaGrams.join(",") === "100,150,25", "the recipe's amounts stay one portion: " + sarmaGrams.join(", "));
+  // Where does this go: Scan from Today, a barcode, the sheet
+  await page.getByRole("button", { name: /^Today$/ }).first().click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(1500);
+  ok(await page.locator(".cam-title").count() === 1, "Scan from Today opens the camera");
+  await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(400);
+  const field = page.locator('input[aria-label="Type the barcode"]');
+  await field.fill("4260345270123"); await page.keyboard.press("Enter"); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: "Use the code only" }).click(); await page.waitForTimeout(1200);
+  await page.getByLabel(/I checked the values/).check();
+  await page.getByRole("button", { name: /Confirm & save food/ }).click(); await page.waitForTimeout(800);
+  const sheet = page.locator(".where-sheet");
+  ok(await sheet.count() === 1 && /Tofu block/.test(await sheet.textContent()), "after the save, Where does this go? with the food on top");
+  const rows = await sheet.locator(".where-row .menu-row-text b").allTextContents();
+  ok(rows[0] === "On the plate now" && rows.includes("A new meal with it") && rows[rows.length - 1] === "Just keep it in My foods", "the ways: " + rows.join(" | "));
+  ok(await sheet.locator(".where-row", { hasText: "Sarma" }).count() === 0, "the lunch already eaten is not offered");
+  ok(await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.some((x) => x.name === "Tofu block")), "the food is in My foods either way");
+  // a new meal with it, in the empty dinner slot: the Plate opens for the slot with the food on it
+  await sheet.locator(".where-row", { hasText: "A new meal with it" }).first().click(); await page.waitForTimeout(800);
+  ok(/Today's (breakfast|dinner), \d\d:\d\d · By the plan/.test(await page.locator(".plan-line").textContent()) && /Tofu block/.test(await page.locator(".plate-card").textContent()), "the Plate opens for the slot with the food: " + (await page.locator(".plan-line").textContent()));
+  ok(errs.length === 0, errs.length ? "page errors: " + errs.join(" | ") : "no page errors");
+  await b.close(); server.kill();
+  process.exit(fail ? 1 : 0);
+})();

@@ -24,6 +24,7 @@ import { KNOWN, knownOf, displayRows, sortEuropean, tidy, withPackLines, rowsFro
 import { iconFor } from "./icons";
 import type { ScannerMode } from "./types";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange, setPdUnit } from "./ui";
+import { WhereSheet } from "./components/WhereSheet";
 import { Mark, APP_NAME, COACH_NAME } from "./components/Mark";
 import { log, isCoach, setCoach, getClientName, setClientName as storeClientName } from "./log";
 import { MealScreen } from "./screens/MealScreen";
@@ -95,6 +96,7 @@ import {
   uid,
   validateFood,
   type PlateKind,
+  asDish,
 } from "./pilot";
 const STORE = "platemate-pilot-v1";
 
@@ -742,6 +744,9 @@ export default function App() {
     [review, setReview] = useState<NumbersReview | null>(null),
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
     [talkOpen, setTalkOpen] = useState(false),
+    // Where does this go (0.2.5): a scan from Today keeps the tab and asks after the save
+    [scanFrom, setScanFrom] = useState<"today" | null>(null),
+    [where, setWhere] = useState<Food | null>(null),
     // what the chat opened for (0.2.4): "fill" shows the day filled at once
     [talkAsk, setTalkAsk] = useState<"fill" | null>(null),
     // the slots' meals (0.2.2) and the slot a plate is being made for
@@ -1271,6 +1276,8 @@ export default function App() {
         : [f, ...s.foods],
       items: repoint(s.items, f.id, f),
     }));
+    // Where does this go (0.2.5): a scan from Today asks after the save, new food or updated
+    if (scanFrom === "today") { setScanFrom(null); setCamera(false); setEdit(null); setImageSet([]); setPending((p) => p.filter((x) => x.name !== f.name || x.brand !== f.brand)); setWhere(f); return; }
     if (existed && f.reviewedAt) { setEdit(null); setImageSet([]); notify(`Updated ${f.name}.`); return; }
     setEdit(null);
     setPending((p) =>
@@ -1775,7 +1782,7 @@ export default function App() {
     planned, filling, setFilling,
     openOnPlate: (meal: Meal) => {
       setFilling(null);
-      setState((s) => ({ ...s, title: meal.title, items: structuredClone(meal.items), portion: null }));
+      setState((s) => ({ ...s, title: meal.title, items: asDish(meal), portion: null }));
       setKind(meal.kind ?? "meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
     },
     // rename a recipe (canvas S, Recipes keeps, 11 October 2026): the recipe, and every slot that holds it
@@ -1790,7 +1797,7 @@ export default function App() {
     fill: (date: string, slotId: string, meal: PlannedMeal | null) => setPlannedState((prev) => { const next = withPlanned(prev, date, slotId, meal); storePlanned(next); return next; }),
     fillOnPlate: (f: Filling, meal?: Meal | null, title?: string) => {
       setFilling(f);
-      setState((s) => ({ ...s, title: meal?.title ?? title ?? "", items: meal ? structuredClone(meal.items) : [], portion: null }));
+      setState((s) => ({ ...s, title: meal?.title ?? title ?? "", items: meal ? asDish(meal) : [], portion: null }));
       setKind("meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
     },
     // a link that changes the tab leaves any open panel or chat behind, or it would land under them and look dead
@@ -1849,6 +1856,8 @@ export default function App() {
       } catch (e: any) { setError(e.message); } finally { setBusy(""); }
     },
     openOut: (ask?: "fill") => { setTalkAsk(ask ?? null); setTalkOpen(true); },
+    scanFromToday: () => { setScanFrom("today"); setMode("label"); setCamera(true); },
+    where, setWhere,
     closeOut: () => setTalkOpen(false),
     mealanAsk, mealanAsked: () => setMealanAsk(0),
     mixFor: (food: Food) => {
@@ -2149,6 +2158,7 @@ export default function App() {
           />
         </div>
       )}
+      {where && !edit && <WhereSheet {...screenProps} food={where} close={() => setWhere(null)} />}
       {edit && (
         <LabelCheck
           key={edit.id}
