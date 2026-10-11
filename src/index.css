@@ -1087,3 +1087,9 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .plate-name { margin: 0 0 10px; }
 .chef-line { display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-radius: 14px; background: #eef3fb; color: var(--ink); font-size: 13.5px; font-weight: 600; margin: 0 0 14px; }
 .chef-line-who { display: flex; align-items: center; gap: 6px; color: var(--brand-text); font-weight: 800; } .chef-line .pill-small { align-self: flex-start; }
+/* the name as the title, the tip (canvas S, 11 October 2026) */
+.title-input { width: 100%; font: inherit; font-size: 23px; font-weight: 900; color: var(--ink); background: none; border: 0; border-bottom: 2px dashed #c8d8f5; border-radius: 0; padding: 0 0 4px; margin: 8px 0 6px; outline: none; } .title-input::placeholder { color: var(--ink); opacity: .55; } .title-input:focus { border-bottom-color: var(--brand); }
+.chef-tip { margin: 10px 0 0; } .tip-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+.tip-text { flex: 1; display: flex; flex-direction: column; min-width: 0; } .tip-text b { font-size: 14px; color: var(--ink); } .tip-text small { color: var(--muted); font-weight: 600; }
+.tip-to { display: flex; flex-direction: column; align-items: flex-end; flex: none; margin-right: 4px; color: var(--brand-text); } .tip-to b { font-size: 16px; line-height: 1; } .tip-to small { font-size: 10.5px; font-weight: 800; color: var(--muted); } .tip-to.fits { color: var(--top); }
+.tip-row .pill-small { height: 34px; flex: none; } .tip-note { color: var(--muted); font-size: 12.5px; }

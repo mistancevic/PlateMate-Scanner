@@ -49,7 +49,7 @@ seed.items = [];
   ok(await page.getByRole("button", { name: /Put it in Monday's breakfast/ }).count() === 1, "the recipe step offers Put it in Monday's breakfast");
   ok(/readout-fit-(plan|top|close|below)/.test(await page.locator(".readout").getAttribute("class")), "the recipe step's box is coloured by the score");
   // the name is mine to change
-  await page.locator(".plate-name input").fill("Morning skyr"); await page.waitForTimeout(200);
+  await page.locator(".title-input").fill("Morning skyr"); await page.waitForTimeout(200);
   await page.getByRole("button", { name: /Put it in Monday's breakfast/ }).click(); await page.waitForTimeout(600);
   ok(await page.locator(".plan-day").count() === 1, "back on Plan");
   const bf2 = await page.locator(".plan-slot-wrap").first().textContent();
@@ -67,6 +67,12 @@ seed.items = [];
   await page.getByRole("button", { name: /^Add$/ }).first().click(); await page.waitForTimeout(300);
   await page.locator(".row-food", { hasText: "Leibniz" }).getByRole("button").click(); await page.waitForTimeout(300);
   ok(await page.getByRole("button", { name: "Make it as it is" }).count() === 1 && await page.getByRole("button", { name: /Fit to my target/ }).count() === 1, "two ways out: Fit to my target and Make it as it is");
+  // the tip (canvas S, 11 October 2026): the plate is under, three foods from My foods that lift it, with the score each would reach
+  const tip = page.locator(".chef-tip");
+  ok(await tip.count() === 1 && /Your plate is [\d.]+ under/.test(await tip.textContent()), "the tip says how far under the plate is");
+  ok(await tip.locator(".tip-row").count() === 3 && await tip.locator(".tip-row .pill-primary").count() === 3, "three foods to add, each with Add");
+  const tos = (await tip.locator(".tip-to b").allTextContents()).map(Number);
+  ok(tos[0] >= tos[1] && tos[1] >= tos[2], "sorted by the score the plate would reach: " + tos.join(" "));
   await page.getByRole("button", { name: "Make it as it is" }).click(); await page.waitForTimeout(600);
   const lunch2 = await page.locator(".plan-slot-wrap").nth(1).textContent();
   ok(/made on the Plate/.test(lunch2) && /under/.test(lunch2), "Lunch holds the plate as it stands, with its gap: " + lunch2.slice(0, 70));
@@ -74,7 +80,14 @@ seed.items = [];
   ok(meals === 4, "saved once");
   // Fit it on the Plate on that short meal: after Fit the box is coloured and the chef's line says what these foods reach
   await page.locator(".plan-slot-wrap").nth(1).getByRole("button", { name: "Fit it on the Plate" }).click(); await page.waitForTimeout(600);
-  ok(await page.locator(".chef-line").count() === 1 && await page.getByRole("button", { name: /Ask Chef Mealan what to add/ }).count() === 1, "a plate that cannot reach the target gets the chef's line");
+  ok(await page.locator(".title-input").count() === 1 && /Fit to my target/.test(await page.locator(".plate-card").textContent()), "Fit it on the Plate lands on the first step, the name as the title");
+  ok(await page.locator(".chef-tip").count() === 1, "and the tip is there");
+  await page.getByRole("button", { name: /Fit to my target/ }).click(); await page.waitForTimeout(1500);
+  const before = (await page.locator(".readout b").first().textContent()).trim();
+  ok(await page.locator(".chef-tip").count() === 1, "after Fit, still under: the tip at the recipe step");
+  await page.locator(".chef-tip").getByRole("button", { name: "+ Add" }).first().click(); await page.waitForTimeout(1800);
+  const after = (await page.locator(".readout b").first().textContent()).trim();
+  ok(Number(after) > Number(before), `Add lifts the plate and Mealan refits: ${before} to ${after}`);
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(400);
   // my own recipe in a slot, then emptied
   await page.getByRole("button", { name: /Dinner at .*pick a meal/ }).click(); await page.waitForTimeout(400);

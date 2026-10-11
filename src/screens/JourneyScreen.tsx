@@ -4,7 +4,7 @@ import { ConfirmButton } from "../components/Confirm";
 import type { Mix } from "../mixtip";
 import { aggregate, density, uid, solveIngredient, servingLabel } from "../pilot";
 import { fromMeal } from "../planned";
-import type { Meal } from "../pilot";
+import type { Meal, Food } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
@@ -65,7 +65,44 @@ export function JourneyScreen(p: AppApi) {
   const addPhoto = (file?: File | null) => { if (!file) return; const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 480).then((d) => setPhotos((x) => [...x, d])).catch(() => {}); r.readAsDataURL(file); };
   const resetMade = () => { setPhotos([]); setWent("as"); setDifferent(""); setAte("all"); setSaveRecipe(true); };
   const [method, setMethod] = useState<string | null>(null);
+  // after Add in the tip at the recipe step, Mealan refits with the new food on the plate
+  const [refit, setRefit] = useState(false);
+  useEffect(() => { if (refit) { setRefit(false); askMealan(); } }, [state.items.length]); // eslint-disable-line react-hooks/exhaustive-deps
   const [title, setTitle] = useState("");
+  // Chef Mealan's tip (canvas S, 11 October 2026): when the plate is under the target, the three foods from My foods that lift
+  // it most, a normal portion each (the pack's serving, 30 g for a powder, else 100 g), with the score the plate would reach.
+  const portionOf = (f: Food) => f.serving?.grams ?? (/powder|whey|protein pulver/i.test(f.name) ? 30 : 100);
+  const lifts = (list: typeof items) => {
+    const t = aggregate(list); const cur = density(t.protein, t.calories);
+    if (cur === null || pdRef === null || cur >= pdRef - 0.05) return null;
+    const rows = state.foods.filter((f) => !list.some((i) => i.food.id === f.id) && f.calories !== null && f.protein !== null).map((f) => {
+      const g = portionOf(f); const kcal = (t.calories ?? 0) + (f.calories! * g) / 100, pro = (t.protein ?? 0) + (f.protein! * g) / 100;
+      return { f, g, to: density(pro, kcal) ?? 0 };
+    }).filter((r) => r.to > cur + 0.3).sort((a, b) => b.to - a.to).slice(0, 3);
+    return { cur, gap: pdRef - cur, rows, reaches: rows.some((r) => r.to >= pdRef - 0.05) };
+  };
+  const addPortion = (f: Food, g: number, refit: boolean) => {
+    setState((s) => ({ ...s, items: [...s.items, { id: uid(), food: { ...f, readyToEat: true }, grams: g, locked: false }], portion: null }));
+    if (refit) setRefit(true);
+  };
+  const Tip = ({ list, refit }: { list: typeof items; refit: boolean }) => {
+    const l = lifts(list); if (!l || !list.length) return null;
+    return (
+      <div className="chef-line chef-tip">
+        <span className="chef-line-who"><ChefHat size={15} /> Chef {CHEF_NAME}</span>
+        <span>Your plate is {pdVal(l.gap)} under. {l.rows.length ? `Add one of these from your foods ${refit ? `and ${CHEF_NAME} refits` : "to lift it"}:` : "Nothing in your foods lifts it on its own."}</span>
+        {l.rows.map((r) => (
+          <div key={r.f.id} className="tip-row">
+            <div className="tip-text"><b>{r.f.name}</b><small>{r.g} g · {pdText(density(r.f.protein, r.f.calories))}</small></div>
+            <div className={`tip-to ${r.to >= pdRef! - 0.05 ? "fits" : ""}`}><b>{pdVal(r.to)}</b><small>the plate</small></div>
+            <button type="button" className="pill pill-small pill-primary" onClick={() => addPortion(r.f, r.g, refit)}>+ Add</button>
+          </div>
+        ))}
+        {!l.reaches && <span className="tip-note">{l.rows.length ? `None of them reaches ${pdVal(pdRef)} on its own. ` : ""}For a dish around these foods, ask the chef.</span>}
+        {!l.reaches && <button type="button" className="pill pill-small" onClick={() => p.openOut()}>Ask Chef {CHEF_NAME} what to add</button>}
+      </div>
+    );
+  };
   // a plate made for a slot (0.2.2): put it in, saved to My recipes once. A recipe with the same name, foods and amounts is
   // the same recipe, so coming back by Fit it on the Plate and putting it in again does not double it.
   const slotName = (f: NonNullable<typeof p.filling>) => `${f.dayName === "today" ? "today's" : `${f.dayName}'s`} ${f.name.toLowerCase()}`;
@@ -187,17 +224,18 @@ export function JourneyScreen(p: AppApi) {
             <button className="row row-food row-button" key={f.id} onClick={() => swap(swapId, f, fits ? grams : grams !== null ? Math.min(grams, cap ?? 300) : null, fits)}>
               <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
               <div className="row-text"><b>{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}{pdText(density(f.protein, f.calories))}</small></div>
-              <span className={`pdpill pdpill-${fits ? "high" : grams !== null ? "mid" : "low"}`}>{grams !== null ? `${grams} g` : "no"}</span>
+              <span className={`pdpill pdpill-${fits ? "high" : grams !== null ? "mid" : "low"}`}>{grams !== null ? `${grams} g` : "can't reach"}</span>
             </button>
           ))}
         </div>
       </div>
     </div>
   );
-  const Head = ({ title, sub }: { title: string; sub?: string }) => (
+  // for a slot (canvas S, 11 October 2026) the meal's name is the title, typed in place; the foods' name until then
+  const Head = ({ title, sub, name }: { title: string; sub?: string; name?: boolean }) => (
     <div className="step-head">
       <div className="step-bar">{STEPS.map((s, i) => <i key={s} className={i < n ? "on" : ""} />)}</div>
-      <h2>{title}</h2>
+      {name ? <input className="title-input" aria-label="Name of the meal" value={state.title === "DaaM" ? "" : state.title} placeholder={items.length ? autoTitle(items) : "Name the meal"} onChange={(e) => setState((s) => ({ ...s, title: e.target.value }))} /> : <h2>{title}</h2>}
       {sub && <p>{sub}</p>}
     </div>
   );
@@ -209,7 +247,7 @@ export function JourneyScreen(p: AppApi) {
     return (
       <>
         {p.filling
-          ? <Head title={`${p.filling.dayName === "today" ? "Today" : p.filling.dayName}'s ${p.filling.name.toLowerCase()}`} sub="Add your foods. Fit them to your target, or make them as they are." />
+          ? <Head name title="" sub="Name it, or keep the foods' name. Add your foods, fit them to your target, or make them as they are." />
           : <Head title="What are you craving?" sub={`Add your foods. ${CHEF_NAME} sets the amounts.`} />}
         {/* the plan line (0.2.0, canvas S): one line says what the plate is; the kind and the moment sit behind its pencil, never asked first.
             A planned meal (0.2.2) says Lunch, 12:30 · By the plan; until then every plate is off the plan. */}
@@ -286,9 +324,6 @@ export function JourneyScreen(p: AppApi) {
             ))}
           </div>
         )}
-        {items.length > 0 && p.filling && (
-          <label className="field plate-name"><span>Name</span><input value={state.title === "DaaM" ? "" : state.title} placeholder={autoTitle(items)} onChange={(e) => setState((s) => ({ ...s, title: e.target.value }))} /></label>
-        )}
         {/* two ways out (canvas S, A new meal for a slot and Off the plan, short, 11 October 2026): Fit moves one food; Make it as it is takes the plate as it stands */}
         <div className="ways-out">
           <button className="pill pill-primary pill-wide" disabled={items.length < 1} onClick={askMealan}>
@@ -296,10 +331,10 @@ export function JourneyScreen(p: AppApi) {
           </button>
           {items.length > 0 && <button className="pill pill-wide" onClick={() => { if (p.filling) putInSlot(items); else { setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null); setStep("make"); } }}>Make it as it is</button>}
         </div>
-        {p.filling && items.length > 0 && <p className="small center">Fit moves one food to reach your target. Make it as it is puts the plate in {slotName(p.filling)} as it stands, and saves it to My recipes.</p>}
+        {p.filling && items.length > 0 && <p className="small center">Fit moves one food. Make it as it is puts the plate in {slotName(p.filling)} as it stands.</p>}
         {!p.filling && items.length === 1 && <p className="small center">One product: {CHEF_NAME} looks through your foods for a partner that brings it to your plan.</p>}
-        {!p.filling && items.length >= 2 && <p className="small center">This works out the amounts straight away, without the AI. To ask {CHEF_NAME} something, tap the round button at the bottom right.</p>}
-        {items.length >= 2 && <p className="small center">Grey is yours to type and {CHEF_NAME}'s to move. Coral is fixed. Swipe right to remove, left to swap. Tap a name for its card.</p>}
+        {!p.filling && items.length >= 2 && <p className="small center">Fit works out the amounts without the AI. Make it as it is keeps yours.</p>}
+        <Tip list={items} refit={false} />
         </section>
         {swapPanel}
         {foodCard}
@@ -350,7 +385,7 @@ export function JourneyScreen(p: AppApi) {
         : `This plate is ${share} % of your day. Fit for a meal, not a dessert.`;
     return (
       <>
-        <Head title={mover ? `${CHEF_NAME}'s recipe` : "As you set it"} sub={unplanned ? `${momentOf(p.moment).name}. Enjoy it, keep it small. Your next meal leans protein and you're back.` : over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : mover ? `${CHEF_NAME} moves the ${mover.food.name}. Change any other amount and it refits.` : `Nothing moved. This is where your amounts land. Tap a grey dot if you want ${CHEF_NAME} to fit one food.`} />
+        <Head name={Boolean(p.filling)} title={mover ? `${CHEF_NAME}'s recipe` : "As you set it"} sub={unplanned ? `${momentOf(p.moment).name}. Enjoy it, keep it small. Your next meal leans protein and you're back.` : over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : mover ? `${CHEF_NAME} moves the ${mover.food.name}. Change any other amount and it refits.` : `Nothing moved. This is where your amounts land. Tap a grey dot if you want ${CHEF_NAME} to fit one food.`} />
         <section className={`readout ${unreal ? "readout-fit-mid" : `readout-fit-${p.fitPd(opd)}`}`}>
           <div className="readout-top"><span>This plate</span><span>{pdTag()}</span></div>
           <div className="readout-mid">
@@ -360,14 +395,6 @@ export function JourneyScreen(p: AppApi) {
           {unreal && <p className="readout-note">{unrealText}</p>}
           {extras(shown.map((x) => ({ food: x.food, grams: x.grams })))}
         </section>
-        {/* the chef's line (canvas S, Off the plan, short): when the foods cannot reach the target together, say so and offer the chef */}
-        {!unreal && !unplanned && opd !== null && pdRef !== null && opd < pdRef - 0.05 && (
-          <div className="chef-line">
-            <span className="chef-line-who"><ChefHat size={15} /> Chef {CHEF_NAME}</span>
-            <span>{shown.length === 1 ? `${shown[0].food.name} tops out at ${pdVal(opd)} alone.` : `${autoTitle(shown).replace(" & ", " and ")} top out at ${pdVal(opd)} together.`} {shown.length === 1 ? "It alone doesn't" : "These alone don't"} reach your {pdVal(pdRef)}.</span>
-            <button className="pill pill-small" onClick={() => p.openOut()}>Ask Chef {CHEF_NAME} what to add</button>
-          </div>
-        )}
         <div className="rows">
           {shown.map((i) => (
             <SwipeRow key={i.id} onRemove={() => remove(i.id)} onSwap={() => setSwapId(i.id)}>
@@ -395,21 +422,22 @@ export function JourneyScreen(p: AppApi) {
           ))}
         </div>
         {over && <button className="pill pill-wide" onClick={() => setCap(null)}>Allow more than {cap} g</button>}
-        {p.filling && <label className="field plate-name"><span>Name</span><input value={state.title === "DaaM" ? "" : state.title} placeholder={autoTitle(shown)} onChange={(e) => setState((s) => ({ ...s, title: e.target.value }))} /></label>}
         <button className="pill pill-primary pill-wide" onClick={() => {
           log("mix_applied", { grams: mover ? Math.round(over ? cap! : mover.grams) : 0 });
           setState((s) => ({ ...s, items: shown, portion: null, title: s.title || "DaaM" }));
           setMethod(null);
           setStep("make");
         }}>Make it</button>
-        {p.filling ? (
+        {p.filling ? (<>
           <button className="pill pill-wide" onClick={() => putInSlot(shown)}>Put it in {slotName(p.filling)}</button>
-        ) : (
+          <Tip list={shown} refit />
+        </>) : (
         <button className="pill pill-wide" onClick={() => {
           p.keepForLater({ id: uid(), title: p.state.title || autoTitle(shown), items: structuredClone(shown), portion: shown.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
           setStep("in");
         }}>Keep for later today</button>
         )}
+        {!p.filling && !unplanned && <Tip list={shown} refit />}
         {options.length > 1 && <button className="pill pill-wide" onClick={() => {
           const next = (pick + 1) % options.length; setPick(next);
           setState((s) => ({ ...s, items: options[next].items, portion: null }));

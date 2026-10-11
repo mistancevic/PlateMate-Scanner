@@ -1775,7 +1775,7 @@ export default function App() {
     fillOnPlate: (f: Filling, meal?: Meal | null, title?: string) => {
       setFilling(f);
       setState((s) => ({ ...s, title: meal?.title ?? title ?? "", items: meal ? structuredClone(meal.items) : [], portion: null }));
-      setKind("meal"); setStep(meal ? "recipe" : "in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
+      setKind("meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
     },
     // a link that changes the tab leaves any open panel or chat behind, or it would land under them and look dead
     setTab: (t: Tab) => { setMenuSection(null); setMenuFrom(null); setTalkOpen(false); if (t !== "journey") setFilling(null); setTab(t); },
