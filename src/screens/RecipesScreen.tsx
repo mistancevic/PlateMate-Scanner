@@ -32,6 +32,9 @@ export function RecipesScreen(p: AppApi) {
   const pubMeal = state.meals.find((m) => m.id === publishing);
   // the Recipes tab (X0 and Y1, 10 October 2026): My recipes and Coach's recipes, one tile per recipe with its photo
   const [view, setView] = useState<"mine" | "coach">("mine");
+  // rename (canvas S, Recipes keeps, 11 October 2026): tap the name, it turns into the dashed field, saved on leaving it
+  const [naming, setNaming] = useState<{ id: string; title: string } | null>(null);
+  const saveName = () => { if (naming) { p.renameMeal(naming.id, naming.title); setNaming(null); } };
   const mine = state.meals.filter((m) => m.from !== "coach"), fromCoach = state.meals.filter((m) => m.from === "coach");
   const shown = view === "mine" ? mine : fromCoach;
   const photoOf = (m: Meal) => state.feedback.find((f) => f.meal.id === m.id && f.photo)?.photo ?? state.feedback.find((f) => f.meal.title === m.title && f.photo)?.photo ?? null;
@@ -60,7 +63,11 @@ export function RecipesScreen(p: AppApi) {
           <section className="card recipe-tile" key={m.id}>
             {photo ? <img src={photo} alt="" /> : <div className="recipe-tile-blank"><Utensils size={28} /></div>}
             <div className="recipe-tile-body">
-              <div className="card-top"><span>{m.title}</span>{st && <small className={`pub-state ${st}`}>{st === "live" ? "Live" : st === "down" ? "Taken down" : st === "waiting" ? `Waiting for ${approver}` : st === "back" ? "Sent back" : "Draft"}</small>}</div>
+              <div className="card-top">
+                {naming?.id === m.id
+                  ? <input className="title-input tile-name" aria-label="Name of the recipe" autoFocus value={naming.title} onChange={(e) => setNaming({ id: m.id, title: e.target.value })} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" />
+                  : <button type="button" className="tile-name-btn" aria-label={`Rename ${m.title}`} onClick={() => setNaming({ id: m.id, title: m.title })}>{m.title}</button>}
+                {st && <small className={`pub-state ${st}`}>{st === "live" ? "Live" : st === "down" ? "Taken down" : st === "waiting" ? `Waiting for ${approver}` : st === "back" ? "Sent back" : "Draft"}</small>}</div>
               <small>{m.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}{rating ? ` · ${rating}` : ""}{n ? ` · made ${n === 1 ? "once" : `${n} times`}` : ""}</small>
               {(m.steps?.length ?? 0) > 0 && <details className="recipe-steps"><summary>Steps ({m.steps!.length})</summary><ol>{m.steps!.map((x, k) => <li key={k}>{x}</li>)}</ol></details>}
               {pub?.note && st !== "waiting" && <small className="pub-note">{approver.charAt(0).toUpperCase() + approver.slice(1)}: “{pub.note}”</small>}

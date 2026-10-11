@@ -1093,3 +1093,6 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .tip-text { flex: 1; display: flex; flex-direction: column; min-width: 0; } .tip-text b { font-size: 14px; color: var(--ink); } .tip-text small { color: var(--muted); font-weight: 600; }
 .tip-to { display: flex; flex-direction: column; align-items: flex-end; flex: none; margin-right: 4px; color: var(--brand-text); } .tip-to b { font-size: 16px; line-height: 1; } .tip-to small { font-size: 10.5px; font-weight: 800; color: var(--muted); } .tip-to.fits { color: var(--top); }
 .tip-row .pill-small { height: 34px; flex: none; } .tip-note { color: var(--muted); font-size: 12.5px; }
+/* rename a recipe on its tile (canvas S, 11 October 2026) */
+.tile-name-btn { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-align: left; cursor: text; }
+.title-input.tile-name { font-size: 15px; margin: 0; padding: 0 0 2px; flex: 1; }

@@ -19,7 +19,7 @@ seed.items = [];
   await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3198/"); await page.waitForTimeout(900);
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(500);
-  await page.getByRole("tab", { name: /^Mon/ }).first().click(); await page.waitForTimeout(300);
+  await page.evaluate(() => document.querySelector(".day-strip .choice").click()); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /Lunch at .*pick a meal/ }).click(); await page.waitForTimeout(400);
   const sheet = page.locator(".pick-sheet");
   ok(/Lunch, 13:45/.test(await sheet.locator(".card-top").textContent()), "the sheet names the slot and its time");
@@ -49,7 +49,10 @@ seed.items = [];
   ok(await page.getByRole("button", { name: /Put it in Monday's breakfast/ }).count() === 1, "the recipe step offers Put it in Monday's breakfast");
   ok(/readout-fit-(plan|top|close|below)/.test(await page.locator(".readout").getAttribute("class")), "the recipe step's box is coloured by the score");
   // the name is mine to change
-  await page.locator(".title-input").fill("Morning skyr"); await page.waitForTimeout(200);
+  // typed letter by letter, as on a phone: the field keeps the focus (Milan, 11 October 2026)
+  await page.locator(".title-input").click(); await page.keyboard.press("Control+A"); await page.keyboard.type("Morning skyr", { delay: 40 }); await page.waitForTimeout(200);
+  const typed = await page.locator(".title-input").inputValue(), focused = await page.evaluate(() => document.activeElement?.className);
+  ok(typed === "Morning skyr" && focused === "title-input", `the name keeps the focus while typing: "${typed}", focus on ${focused}`);
   await page.getByRole("button", { name: /Put it in Monday's breakfast/ }).click(); await page.waitForTimeout(600);
   ok(await page.locator(".plan-day").count() === 1, "back on Plan");
   const bf2 = await page.locator(".plan-slot-wrap").first().textContent();
@@ -98,10 +101,18 @@ seed.items = [];
   ok(/Skyr bowl is in this slot/.test(await page.locator(".pick-why").textContent()), "the sheet says what is in the slot");
   await page.getByRole("button", { name: "Empty this slot" }).click(); await page.waitForTimeout(400);
   ok(/1 slot open/.test(await page.locator(".plan-top").textContent()), "emptied: 1 slot open");
+  // rename a recipe on its tile (canvas S, Recipes keeps): the slot that holds it follows
+  await page.getByRole("button", { name: /^Recipes$/ }).first().click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: "Rename Morning skyr" }).click(); await page.waitForTimeout(200);
+  await page.keyboard.press("Control+A"); await page.keyboard.type("Skyr at seven", { delay: 30 }); await page.keyboard.press("Enter"); await page.waitForTimeout(400);
+  ok(await page.getByRole("button", { name: "Rename Skyr at seven" }).count() === 1, "the tile shows the new name");
+  await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(500);
+  await page.evaluate(() => document.querySelector(".day-strip .choice").click()); await page.waitForTimeout(300);
+  ok(/Skyr at seven/.test(await page.locator(".plan-slot-wrap").first().textContent()), "and the slot that holds it shows the new name");
   // it all stays after a reload
   await page.reload(); await page.waitForTimeout(900);
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(500);
-  await page.getByRole("tab", { name: /^Mon/ }).first().click(); await page.waitForTimeout(300);
+  await page.evaluate(() => document.querySelector(".day-strip .choice").click()); await page.waitForTimeout(300);
   ok(/1 slot open/.test(await page.locator(".plan-top").textContent()), "the slots keep their meals after a reload");
   // leaving the Plate another way drops the slot
   await page.getByRole("button", { name: /Dinner at .*pick a meal/ }).click(); await page.waitForTimeout(400);

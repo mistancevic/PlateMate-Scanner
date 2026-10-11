@@ -23,7 +23,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok((await page.locator(".plan-slot .menu-row-text small").allTextContents()).join(",") === "Breakfast,Lunch,Snack,Dinner", "named Breakfast, Lunch, Snack, Dinner");
   ok(await page.locator(".plan-slot .plan-pick").count() === 4 && /4 slots open/.test(await page.locator(".plan-top").textContent()), "every slot says Pick a meal, the box counts them open");
   // Monday: a hard evening session sits between the slots at 17:30; the line carries the day's numbers
-  await page.getByRole("tab", { name: /^Mon/ }).first().click(); await page.waitForTimeout(300);
+  await page.evaluate(() => document.querySelector(".day-strip .choice").click()); await page.waitForTimeout(300);
   const rows = await page.locator(".plan-day .menu-row .plan-time").allTextContents();
   ok(rows.join(" ") === "07:30 11:40 15:50 17:30 20:00", "Monday: the training row at 17:30 between Snack and Dinner: " + rows.join(" "));
   ok(/From my Weekly plan/.test(await page.locator(".plan-training").textContent()) && /Strength, hard, 60 min/.test(await page.locator(".plan-training").textContent()), "the training row reads the Weekly plan");

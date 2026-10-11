@@ -82,6 +82,7 @@ export interface AppApi {
   numbersFor: (date: Date) => { kcal: number; protein: number; fats: number; carbs: number } | null;
   // the slots' meals (0.2.2)
   planned: import("../planned").Planned;
+  renameMeal: (id: string, title: string) => void;
   fill: (date: string, slotId: string, meal: import("../planned").PlannedMeal | null) => void;
   filling: Filling | null;
   setFilling: (f: Filling | null) => void;

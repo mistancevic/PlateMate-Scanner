@@ -1771,6 +1771,14 @@ export default function App() {
     peekBarcode: async (code: string) => { try { const d = await api(`/api/product/${code}`); return d?.product_name ? { code, name: d.product_name, brand: d.brand || "", quantity: "", kcal: d.calories, protein: d.protein } : null; } catch { return null; } },
     // Plan (0.2.2): the meals in the slots, by date and slot; a plate made for a slot lands in it when saved
     planned, filling, setFilling,
+    // rename a recipe (canvas S, Recipes keeps, 11 October 2026): the recipe, and every slot that holds it
+    renameMeal: (id: string, title: string) => {
+      const t = title.trim(); if (!t) return;
+      setState((s) => ({ ...s, meals: s.meals.map((m) => (m.id === id ? { ...m, title: t } : m)) }));
+      let next = planned, changed = false;
+      for (const [date, day] of Object.entries(planned)) for (const [slot, m] of Object.entries(day)) if (m.mealId === id && m.title !== t) { next = withPlanned(next, date, slot, { ...m, title: t }); changed = true; }
+      if (changed) { storePlanned(next); setPlannedState(next); }
+    },
     fill: (date: string, slotId: string, meal: PlannedMeal | null) => { const next = withPlanned(planned, date, slotId, meal); storePlanned(next); setPlannedState(next); },
     fillOnPlate: (f: Filling, meal?: Meal | null, title?: string) => {
       setFilling(f);
