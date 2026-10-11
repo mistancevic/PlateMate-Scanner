@@ -753,6 +753,8 @@ export default function App() {
     // the slots' meals (0.2.2) and the slot a plate is being made for
     [planned, setPlannedState] = useState<Planned>(getPlanned),
     [filling, setFilling] = useState<Filling | null>(null),
+    // the recipe the plate came from (a slot or Recipes, Open), so a new name on the Plate renames it at once
+    [plateRecipeId, setPlateRecipeId] = useState<string | null>(null),
     [profileReady, setProfileReady] = useState(false),
     [loadTry, setLoadTry] = useState(0),
     [talkTurns, setTalkTurns] = useState<Turn[]>([]),
@@ -1784,9 +1786,15 @@ export default function App() {
     // Plan (0.2.2): the meals in the slots, by date and slot; a plate made for a slot lands in it when saved
     planned, filling, setFilling,
     openOnPlate: (meal: Meal) => {
-      setFilling(null);
+      setFilling(null); setPlateRecipeId(meal.id);
       setState((s) => ({ ...s, title: meal.title, items: asDish(meal), portion: null }));
       setKind(meal.kind ?? "meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
+    },
+    // a name typed on the Plate (Milan, 11 October 2026): the recipe it came from and the slot it is for take it at once
+    renamePlate: (title: string) => {
+      const t = title.trim(); if (!t) return;
+      if (plateRecipeId && state.meals.some((m) => m.id === plateRecipeId && m.title !== t)) screenProps.renameMeal(plateRecipeId, t);
+      if (filling) setPlannedState((prev) => { const m = prev[filling.date]?.[filling.slotId]; if (!m || m.title === t) return prev; const next = withPlanned(prev, filling.date, filling.slotId, { ...m, title: t }); storePlanned(next); return next; });
     },
     // rename a recipe (canvas S, Recipes keeps, 11 October 2026): the recipe, and every slot that holds it
     renameMeal: (id: string, title: string) => {
@@ -1800,6 +1808,7 @@ export default function App() {
     fill: (date: string, slotId: string, meal: PlannedMeal | null) => setPlannedState((prev) => { const next = withPlanned(prev, date, slotId, meal); storePlanned(next); return next; }),
     fillOnPlate: (f: Filling, meal?: Meal | null, title?: string) => {
       setFilling(f);
+      setPlateRecipeId(meal?.id || f.mealId || null);
       setState((s) => ({ ...s, title: meal?.title ?? title ?? "", items: meal ? asDish(meal) : [], portion: null }));
       setKind("meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
     },

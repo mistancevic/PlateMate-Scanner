@@ -21,11 +21,11 @@ import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
 
 const STEPS = ["in", "recipe", "make", "made", "after"] as const;
-function stepHead({ n, title, sub, nameField }: { n: number; title: string; sub?: string; nameField?: { value: string; placeholder: string; onChange: (v: string) => void } }) {
+function stepHead({ n, title, sub, nameField }: { n: number; title: string; sub?: string; nameField?: { value: string; placeholder: string; onChange: (v: string) => void; onCommit?: (v: string) => void } }) {
   return (
     <div className="step-head">
       <div className="step-bar">{STEPS.map((s, i) => <i key={s} className={i < n ? "on" : ""} />)}</div>
-      {nameField ? <input className="title-input" aria-label="Name of the meal" value={nameField.value} placeholder={nameField.placeholder} onChange={(e) => nameField.onChange(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" /> : <h2>{title}</h2>}
+      {nameField ? <input className="title-input" aria-label="Name of the meal" value={nameField.value} placeholder={nameField.placeholder} onChange={(e) => nameField.onChange(e.target.value)} onBlur={(e) => nameField.onCommit?.(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" /> : <h2>{title}</h2>}
       {sub && <p>{sub}</p>}
     </div>
   );
@@ -287,7 +287,7 @@ export function JourneyScreen(p: AppApi) {
   // for a slot (canvas S, 11 October 2026) the meal's name is the title, typed in place; the foods' name until then
   // the head is a plain function, not a component made on every render: a component made inside the screen is a new type each
   // time, React remounts it and the name field loses focus after one letter (Milan, 11 October 2026)
-  const Head = ({ title, sub, name }: { title: string; sub?: string; name?: boolean }) => stepHead({ n, title, sub, nameField: name ? { value: state.title === "DaaM" ? "" : state.title, placeholder: items.length ? autoTitle(items) : "Name the meal", onChange: (v: string) => setState((s) => ({ ...s, title: v })) } : undefined });
+  const Head = ({ title, sub, name }: { title: string; sub?: string; name?: boolean }) => stepHead({ n, title, sub, nameField: name ? { value: state.title === "DaaM" ? "" : state.title, placeholder: items.length ? autoTitle(items) : "Name the meal", onChange: (v: string) => setState((s) => ({ ...s, title: v })), onCommit: (v: string) => p.renamePlate(v) } : undefined });
   const Back = ({ to }: { to: typeof STEPS[number] }) => (
     <button className="link back" onClick={() => setStep(to)}><ArrowLeft size={15} /> Back</button>
   );

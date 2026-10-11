@@ -84,6 +84,7 @@ export interface AppApi {
   // the slots' meals (0.2.2)
   planned: import("../planned").Planned;
   renameMeal: (id: string, title: string) => void;
+  renamePlate: (title: string) => void;
   // Recipes, Open (0.2.3): the recipe on the Plate with its name as the title, nothing decided yet
   openOnPlate: (meal: Meal) => void;
   fill: (date: string, slotId: string, meal: import("../planned").PlannedMeal | null) => void;
