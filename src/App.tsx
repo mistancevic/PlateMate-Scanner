@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import {
   Camera,
   Plus,
@@ -41,7 +41,8 @@ import { Starting } from "./components/Starting";
 import { Welcome, AdultOnly } from "./components/Welcome";
 import { openStats } from "./openStats";
 import { merge as mergeRecords, changes as recordChanges, type Known } from "./records";
-import { installBack, pushTab, startTab, tabOfPath, useBack, pathOfTab } from "./back";
+import { installBack, pushTab, startTab, tabOfPath, useBack, pathOfTab, MENU_PATH, menuTrailOf } from "./back";
+import { clearKept } from "./kept";
 import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
 import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted, realPhotosOf, isDrawn } from "./photos";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
@@ -685,14 +686,17 @@ function GoalsEditor({
     </Modal>
   );
 }
-function MenuBack({ open, close }: { open: boolean; close: () => void }) { useBack(open, close); return null; }
+// the pages that belong to Me (M4): the top bar says Me on them, Menu on the rest
+const ME_PAGES: MenuSection[] = ["me", "profile", "goal", "life", "week", "shop", "coach", "account"];
+function MenuBack({ open, close, path }: { open: boolean; close: () => void; path?: string }) { useBack(open, close, path); return null; }
 // The app's own address and Back (canvas board C5): mounted only while the app itself shows, never on the home page
-function BackKeeper({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
+function BackKeeper({ tab, setTab, onReady }: { tab: Tab; setTab: (t: Tab) => void; onReady: () => void }) {
   const tabRef = useRef(tab), fromBack = useRef(false), first = useRef(true);
   tabRef.current = tab;
   useEffect(() => {
     installBack((t) => { const next = (t ?? "home") as Tab; if (next !== tabRef.current) { fromBack.current = true; setTab(next); } });
     startTab(tabRef.current);
+    onReady();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   useEffect(() => {
@@ -706,7 +710,8 @@ export default function App() {
   const [state, setState] = useState<PilotState>(load),
     [tab, setTab] = useState<Tab>(() => {
       // a reload keeps the screen; Clients only for a coach (Milan, 11 October 2026: a reload on Clients opened Today)
-      const tabs = ["home", "journey", "plan", "meal", "chef", "recipes", "foods", "me", "clients"] as Tab[];
+      const tabs = ["home", "journey", "plan", "meal", "chef", "recipes", "foods", "clients"] as Tab[];
+      if (typeof location !== "undefined" && menuTrailOf(location.pathname).length) return "home";
       const fromPath = typeof location !== "undefined" ? tabOfPath(location.pathname, tabs) : null;
       const h = (typeof location !== "undefined" ? location.hash : "").replace("#", "");
       return (fromPath as Tab | null) ?? (tabs.includes(h as Tab) ? (h as Tab) : "home");
@@ -737,7 +742,9 @@ export default function App() {
     [safety, setSafetyState] = useState<Safety>(getSafety),
     [deleteSteps, setDeleteSteps] = useState(""),
     [day, setDayState] = useState<Day>(() => getDay()),
-    [menuSection, setMenuSection] = useState<MenuSection | null>(null),
+    // the pages of the top menu walked so far, each a step Back goes back over (M6); a reload on /me/profile opens Me, then Profile
+    [menuTrail, setMenuTrail] = useState<MenuSection[]>(() => (typeof location !== "undefined" ? (menuTrailOf(location.pathname) as MenuSection[]) : [])),
+    [backReady, setBackReady] = useState(false),
     [foodsView, setFoodsView] = useState<"foods" | "recipes">("foods"),
     [editFrom, setEditFrom] = useState<string>(""),
     [dbPhotos, setDbPhotos] = useState<string[]>([]),
@@ -796,6 +803,15 @@ export default function App() {
       ai: boolean;
       airtable: boolean;
     } | null>(null);
+  // the menu page on top, and moving between pages (M6): a page already walked goes back to it; up from a page opened
+  // straight (the goal from Today) swaps it for its parent; anything else is one step further
+  const menuSection: MenuSection | null = menuTrail.length ? menuTrail[menuTrail.length - 1] : null;
+  const setMenuSection = (s: MenuSection | null, up = false) => setMenuTrail((t) => {
+    if (!s) return [];
+    const i = t.indexOf(s);
+    if (i >= 0) return t.slice(0, i + 1);
+    return up && t.length ? [...t.slice(0, -1), s] : [...t, s];
+  });
   const importRef = useRef<HTMLInputElement>(null),
     runRef = useRef(0),
     fromCloud = useRef(false),
@@ -1201,8 +1217,8 @@ export default function App() {
   }, [state.goals.calories, state.goals.protein, goal?.band, goal?.source]);
   // a reload on Clients stays there; once the account is known and is not a coach's, Today instead
   useEffect(() => { if ((profileReady || (authReady && !user)) && tab === "clients" && profile.role !== "coach") setTab("home"); }, [profileReady, authReady, user, profile.role, tab]);
-  // numbers calculated from the profile follow the profile
-  useEffect(() => {
+  // numbers calculated from the profile follow the profile; before the first paint, so Today never shows ? and then jumps (T5)
+  useLayoutEffect(() => {
     if (goal?.source !== "profile" || !goal.band) return;
     const r = calculate(personal, goal.band, profile.formula ?? null);
     if (!r || (r.kcal === state.goals.calories && r.protein === state.goals.protein)) return;
@@ -1212,8 +1228,8 @@ export default function App() {
     notify(`Your numbers changed with your profile. An average day is now ${r.kcal.toLocaleString("en")} kcal and ${r.protein} g protein.`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [personal, profile.formula]);
-  // a goal band with missing numbers heals itself from the band
-  useEffect(() => {
+  // a goal band with missing numbers heals itself from the band, before the first paint (T5)
+  useLayoutEffect(() => {
     const b = goal?.band ? bandOf(goal.band) : null;
     if (b && (state.goals.calories == null || state.goals.protein == null)) {
       const g = goalsForBand(b);
@@ -1921,7 +1937,7 @@ export default function App() {
     user, cloudEnabled, cloudStatus, profile,
     joinCoach: async (code: string) => { if (!user) return; try { const r = await joinCoach(user.uid, code); setProfile((p) => ({ ...p, ...r })); notify(`You're with ${r.coachName} now.`); } catch (e: any) { setError(e.message); } },
     leaveCoach: async () => { if (!user) return; try { await leaveCoach(user.uid); setProfile((p) => ({ ...p, coachId: undefined, coachName: undefined, coachEmail: undefined, coachPhoto: undefined, joinedAt: undefined })); } catch (e: any) { setError(e.message); } },
-    signOut: async () => { await signOutCloud(); cloudLoaded.current = false; },
+    signOut: async () => { clearKept(); await signOutCloud(); cloudLoaded.current = false; },
     safety, ai,
     declareSafety: (patch, record = false) => { updateSafety((x) => { let next = { ...x, ...patch }; const now = new Date().toISOString(); for (const sid of next.situations) if (!x.situations.includes(sid)) next.flags = [...next.flags, { situation: sid, at: now, source: "door" as const }]; if (record) next = recordDeclaration(next, next.situations, next.allergies, new Date(), Boolean(next.none)); return next; }); },
     flagFromModel: (situation) => { updateSafety((x) => addFlag(x, situation, "model")); log("safety_flag", { situation, source: "model" }); },
@@ -2047,7 +2063,7 @@ export default function App() {
     return (
       <div className="app-shell">
         {menuSection
-          ? <main><MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s) => { setMenuFrom(null); setMenuSection(s); }} close={() => { setMenuFrom(null); setMenuSection(null); }} /></main>
+          ? <main><MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s, up) => { setMenuFrom(null); setMenuSection(s, up); }} under={menuTrail.length > 1 ? menuTrail[menuTrail.length - 2] : null} close={() => { setMenuFrom(null); setMenuSection(null); }} /></main>
           : <AdultOnly onCorrect={() => screenProps.openMenu("profile")} onDelete={cloudEnabled && user ? screenProps.deleteAccount : null} />}
       </div>
     );
@@ -2058,15 +2074,15 @@ export default function App() {
   return (
     <div className="app-shell">
       {/* the layers before the tab keeper: a menu row that changes the tab (Foods, 0.2.0) drops its layer first, and the tab's address is pushed once that step back has settled */}
-      <MenuBack open={Boolean(menuSection)} close={() => { setMenuFrom(null); setMenuSection(null); }} />
+      {backReady && menuTrail.map((m, i) => <MenuBack key={`${i}-${m}`} open path={MENU_PATH[m]} close={() => { setMenuFrom(null); setMenuTrail((t) => t.slice(0, i)); }} />)}
       <MenuBack open={talkOpen && !menuSection} close={() => setTalkOpen(false)} />
-      <BackKeeper tab={tab} setTab={setTab} />
+      <BackKeeper tab={tab} setTab={setTab} onReady={() => setBackReady(true)} />
       <Opened />
       <header className="topbar">
         <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setFilling(null); setTab("home"); }} aria-label={`${APP_NAME}, Today`}>
           <Mark size={28} color="var(--brand)" />
         </button>
-        <h1>{TITLES[tab]}</h1>
+        <h1>{menuSection ? (ME_PAGES.includes(menuSection) ? "Me" : "Menu") : TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
           {menuSection === "goal" ? pdText(dayPd) : <>{goal?.band ? goalLabel(goal.band).replace(" · ", ", ") : `${fmt(state.goals.calories, 0)} kcal, ${fmt(state.goals.protein)} g`} · {pdText(dayPd)}</>}
         </button>}
@@ -2097,7 +2113,7 @@ export default function App() {
             </button>
           </div>
         )}
-        {menuSection && <MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s) => { setMenuFrom(null); setMenuSection(s); }} close={() => { setMenuFrom(null); setMenuSection(null); }} />}
+        {menuSection && <MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s, up) => { setMenuFrom(null); setMenuSection(s, up); }} under={menuTrail.length > 1 ? menuTrail[menuTrail.length - 2] : null} close={() => { setMenuFrom(null); setMenuSection(null); }} />}
         {!menuSection && !talkOpen && tab === "home" && <HomeScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "journey" && <JourneyScreen {...screenProps} />}
         {talkOpen && !menuSection && <div className="talk-overlay"><OutScreen {...screenProps} tab={tab} ask={talkAsk} clearAsk={() => setTalkAsk(null)} turns={talkTurns} setTurns={(f) => setTalkTurns(f)} close={() => setTalkOpen(false)} toPlate={() => { setTalkOpen(false); setMenuSection(null); setStep("in"); setTab("journey"); }} /></div>}
@@ -2140,8 +2156,8 @@ export default function App() {
         {NAV.map((n) => (
           <button
             key={n.id}
-            className={tab === n.id || (n.id === "journey" && (tab === "meal" || tab === "chef")) ? "active" : ""}
-            aria-current={tab === n.id ? "page" : undefined}
+            className={!menuSection && (tab === n.id || (n.id === "journey" && (tab === "meal" || tab === "chef"))) ? "active" : ""}
+            aria-current={!menuSection && tab === n.id ? "page" : undefined}
             onClick={() => { setMenuSection(null); setTalkOpen(false); if (n.id !== "journey") setFilling(null); setTab(n.id); }}
           >
             {n.icon}

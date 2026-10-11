@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useKept } from "../kept";
 import { RefreshCw, Copy, Target, Send, UserPlus } from "lucide-react";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { dayNameAny } from "../personal";
@@ -21,7 +22,11 @@ import { useBack } from "../back";
 // The coach's area on Me: the code to share, the client list, and a client's cards with a goal to set.
 export function CoachArea(p: AppApi) {
   const { user, setError, notify } = p;
-  const [rows, setRows] = useState<ClientRow[]>([]);
+  // the lists show at once from the last visit, then refresh (Milan, 11 October 2026)
+  // a light copy is kept: the cards without their photos, which load again with the list
+  const [keptRows, keepRows] = useKept<ClientRow[]>(`clients-${user?.uid ?? "local"}`, []);
+  const [rows, setRowsState] = useState<ClientRow[]>(keptRows);
+  const setRows = (next: ClientRow[]) => { setRowsState(next); keepRows(next.map((r) => ({ ...r, feedback: r.feedback.map(({ photo, photos, ...f }: any) => f) }))); };
   const [open, setOpen] = useState<ClientRow | null>(null);
   const [busy, setBusy] = useState(false);
   const coachName = user?.name?.split(" ")[0] || "Coach";
@@ -34,7 +39,9 @@ export function CoachArea(p: AppApi) {
   }
   useEffect(() => { refresh(); p.markSharedSeen(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
   // clients who are cooks (board RG5): one switch on the client's sheet
-  const [cooks, setCooks] = useState<Set<string>>(new Set());
+  const [cookList, setCookList] = useKept<string[]>(`cooks-${user?.uid ?? "local"}`, []);
+  const cooks = new Set(cookList);
+  const setCooks = (next: Set<string> | ((prev: Set<string>) => Set<string>)) => setCookList((prev) => [...(typeof next === "function" ? next(new Set(prev)) : next)]);
   const loadCooks = () => fetch("/api/cooks").then((r) => r.json()).then((d) => setCooks(new Set(d.uids ?? []))).catch(() => {});
   useEffect(() => { loadCooks(); }, [user?.uid]);
   const setCook = async (client: string, on: boolean) => {
@@ -239,7 +246,7 @@ export function SendSheet(p: AppApi & { card: any; close: () => void }) {
 
 // People who asked for a code on the landing page.
 export function AccessRequests(p: AppApi) {
-  const [list, setList] = useState<any[] | null>(null);
+  const [list, setList] = useKept<any[] | null>(`requests-${p.user?.uid ?? "local"}`, null);
   const load = () => fetch("/api/access-requests").then((r) => r.json()).then((d) => setList(d.requests ?? [])).catch(() => setList([]));
   useEffect(() => { load(); }, []);
   if (!list || list.length === 0) return null;
@@ -278,7 +285,7 @@ const inviteMail = (i: { email: string; name: string; code: string; coachName: s
   `mailto:${i.email}?subject=${encodeURIComponent("Your Chef Mealan invite")}&body=${encodeURIComponent(`Hi ${i.name || ""},\n\nyour personal code for Chef Mealan: ${i.code}\n\n1. Open https://chefmealan.com\n2. Sign in with Google using this email address: ${i.email}\n3. Enter the code.\n\nThe code works once, with this email only, for 30 days.\n\n${i.coachName}`)}`;
 export function Invites(p: AppApi) {
   const [name, setName] = useState(""); const [email, setEmail] = useState("");
-  const [list, setList] = useState<any[]>([]); const [made, setMade] = useState<any>(null); const [busy, setBusy] = useState(false);
+  const [list, setList] = useKept<any[]>(`invites-${p.user?.uid ?? "local"}`, []); const [made, setMade] = useState<any>(null); const [busy, setBusy] = useState(false);
   const load = () => fetch("/api/invites").then((r) => r.json()).then((d) => setList(d.invites ?? [])).catch(() => {});
   useEffect(() => { load(); }, []);
   const create = async (n: string, e: string) => {

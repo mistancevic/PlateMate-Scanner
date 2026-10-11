@@ -40,8 +40,10 @@ const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "evals", name: "Evals", icon: <FlaskConical size={20} /> },
 ];
 
-export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: MenuSection) => void; close: () => void; from: MenuSection | null }) {
-  const { section, setSection, close, from } = p;
+export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: MenuSection, up?: boolean) => void; close: () => void; from: MenuSection | null; under?: MenuSection | null }) {
+  const { section, setSection, close } = p;
+  // the back link goes to the page walked before this one; a page opened straight goes to its parent (M6)
+  const from = (p.under ?? p.from) as MenuSection | null;
   if (section === "list")
     return (
       <>
@@ -65,7 +67,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
   useEffect(() => { try { window.scrollTo({ top: 0 }); document.querySelector("main")?.scrollTo?.({ top: 0 }); } catch {} }, [section]);
   return (
     <>
-      <div className="menu-head"><button className="link" onClick={() => ((from as string) === "me" || ME_SECTIONS.includes(section) && !from ? setSection("me") : setSection(from ?? "list"))}><ArrowLeft size={16} /> {(from as string) === "me" ? "Me" : from ? ITEMS.find((i) => i.id === from)?.name : ME_SECTIONS.includes(section) ? "Me" : "Menu"}</button><button className="link" onClick={close}>Close</button></div>
+      <div className="menu-head"><button className="link" onClick={() => ((from as string) === "me" || ME_SECTIONS.includes(section) && !from ? setSection("me", true) : setSection(from ?? "list", true))}><ArrowLeft size={16} /> {(from as string) === "me" ? "Me" : from ? (ITEMS.find((i) => i.id === from)?.name ?? "Menu") : ME_SECTIONS.includes(section) ? "Me" : "Menu"}</button><button className="link" onClick={close}>Close</button></div>
       <h2 className="menu-title">{section === "me" ? "Me" : title}</h2>
       {section === "me" && <MeScreen {...p} />}
       {section === "profile" && <ProfilePanel {...p} />}
@@ -88,7 +90,7 @@ function ProfilePanel(p: AppApi) {
   const num = (v: string) => (v.trim() === "" ? undefined : Number(v.replace(",", ".")) || undefined);
   const dirty = name.trim() !== p.clientName || JSON.stringify(d) !== JSON.stringify(p.personal);
   const consented = Boolean(p.safety.consentBodyAt);
-  // the door: situations Mealan steps back from, and what to keep off every suggestion
+  // the door: situations Chef Mealan steps back from, and what to keep off every suggestion
   const [sits, setSits] = useState<SituationId[]>(p.safety.situations);
   const [none, setNone] = useState<boolean>(Boolean(p.safety.none));
   const keys = new Set(EU_ALLERGENS.map((a) => a.key));
@@ -106,7 +108,7 @@ function ProfilePanel(p: AppApi) {
     setSits(withAllergies); setNone(isNone);
     if (!answered) { p.declareSafety({ situations: [], allergies: [], none: false, declaredAt: undefined }, false); return; }
     p.declareSafety({ situations: withAllergies, allergies, none: isNone, declaredAt: new Date().toISOString() }, true);
-    p.notify(isNone ? "Noted: none applies. Mealan cooks." : "Noted. Mealan keeps to it.");
+    p.notify(isNone ? "Noted: none applies. Chef Mealan cooks." : "Noted. Chef Mealan keeps to it.");
   };
   const tick = (id: SituationId, on: boolean) => { if (id === "allergies" && !on) { setChips([]); setFreeText(""); } commit(on ? [...sits, id] : sits.filter((y) => y !== id), on ? false : none, id === "allergies" && !on ? "" : allergyText); };
   const tickNone = (on: boolean) => { if (on) { setChips([]); setFreeText(""); } commit(on ? [] : sits, on, on ? "" : allergyText); };
@@ -121,7 +123,7 @@ function ProfilePanel(p: AppApi) {
       {!consented && (
         <section className="card consent" aria-label="Before your numbers">
           <b>Before your numbers</b>
-          <p className="small">To calculate your day, Mealan asks a few things about your body: female or male, your birth year, height, weight, and your body fat if you know it. Later, also the weigh-ins you add. Here is what happens with them.</p>
+          <p className="small">To calculate your day, Chef Mealan asks a few things about your body: female or male, your birth year, height, weight, and your body fat if you know it. Later, also the weigh-ins you add. Here is what happens with them.</p>
           <ul className="small">
             <li><b>Kept:</b> only those values, and the numbers they give.</li>
             <li><b>Where:</b> on this phone and in your account. Nowhere else: never sold, and never shared beyond your coach.</li>
@@ -172,7 +174,7 @@ function ProfilePanel(p: AppApi) {
       </section>
       <section className="card form door" aria-label="Is any of this true for you">
         <b>Is any of this true for you?</b>
-        <p className="small">Mealan is an AI chef. It reads labels and suggests plates, and it can be wrong: check a number against the pack, and check anything about your health with a professional. If one of these is true for you, Mealan steps back from that topic, tells you who to talk to, and still helps with the plate. Your coach sees that you ticked one and when, never what you wrote.</p>
+        <p className="small">Chef Mealan is an AI chef. It reads labels and suggests plates, and it can be wrong: check a number against the pack, and check anything about your health with a professional. If one of these is true for you, Chef Mealan steps back from that topic, tells you who to talk to, and still helps with the plate. Your coach sees that you ticked one and when, never what you wrote.</p>
         {SITUATIONS.filter((x) => SITUATION_FOR[x.id] === "all" || d.sex !== "male").map((x) => (
           <div key={x.id}>
             <label className="check">
@@ -186,14 +188,14 @@ function ProfilePanel(p: AppApi) {
                   {EU_ALLERGENS.map((a) => { const on = chipOn(a.key); return <button key={a.key} className={`choice ${on ? "on" : ""}`} onClick={() => toggleChip(a.key, !on)}>{a.label}</button>; })}
                 </div>
                 <label className="field"><span>Anything else</span><input value={freeText} placeholder="e.g. kiwi, histamine" onChange={(e) => setFreeText(e.target.value)} onBlur={() => commit(sits, none, joined(chips, freeText))} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /></label>
-                <small className="muted">Nothing containing these is ever suggested. Mealan checks the name and the label lines of every food.</small>
+                <small className="muted">Nothing containing these is ever suggested. Chef Mealan checks the name and the label lines of every food.</small>
               </div>
             )}
           </div>
         ))}
         <label className="check none">
           <input type="checkbox" checked={none} onChange={(e) => tickNone(e.target.checked)} />
-          <span><b>None of these applies to me</b><small> If you leave it open, Mealan doesn't take it as a no. It asks again once a year.</small></span>
+          <span><b>None of these applies to me</b><small> If you leave it open, Chef Mealan doesn't take it as a no. It asks again once a year.</small></span>
         </label>
         <p className={`small ${answered ? "muted" : "notice"}`}>{answered ? `Answered${p.safety.declaredAt ? " on " + fmtDay(p.safety.declaredAt) : ""}. Each tick is saved straight away, and you can change it any time.` : "Tick one, or none. A tick saves by itself."}</p>
         {p.safety.situations.length > 0 && (
@@ -387,23 +389,14 @@ function LifestylePanel(p: AppApi) {
       <Seg title="Nutrition" why={minor ? "How you usually eat. Chef Mealan suggests from here first." : "How you usually eat and drink. Chef Mealan plans and suggests from here first."}>
         <Setting name="Where you eat" hint="Pick all that apply."><Chips items={asItems(minor ? WHERE_KID : WHERE)} on={l.where} pick={toggle} multi /></Setting>
         <Setting name="Meals a day" hint={minor ? "Snacks count as a meal here." : undefined}><Chips items={[2, 3, 4, 5].map((n) => ({ id: n, name: n === 5 ? "5 or more" : String(n) }))} on={l.meals} pick={(n) => save({ meals: n })} /></Setting>
-        {!minor && (
-          <Setting name="Eating window" hint="For people who eat within set hours.">
-            <Chips items={[{ id: "none", name: "None" }, { id: "set", name: "Set my window" }]} on={l.window ? "set" : "none"} pick={(v) => save({ window: v === "set" ? (l.window ?? { from: "10:00", to: "18:00" }) : null })} />
-            {l.window && (
-              <div className="field-row">
-                <label className="field field-on"><span>From</span><input type="time" value={l.window.from} onChange={(e) => save({ window: { ...l.window!, from: e.target.value } })} /></label>
-                <label className="field field-on"><span>To</span><input type="time" value={l.window.to} onChange={(e) => save({ window: { ...l.window!, to: e.target.value } })} /></label>
-              </div>
-            )}
-          </Setting>
-        )}
-        {/* 0.2.1: the slots Plan shows, with their times; the times start from the eating window above and can be changed here */}
-        <Setting name="Meal times" hint="The slots of your day in Plan. Change a time when your day runs differently.">
+        {/* 0.2.1: the slots Plan shows, with their times. M8 (11 October 2026): the times are what I set; the eating window
+            follows from them, first meal to last, and is no longer set by hand. A window set before is where the times start. */}
+        <Setting name="Meal times" hint="When you eat each meal. Your eating window follows from them.">
           <div className="field-row slot-times">
             {slotsOf(l).map((s) => <label key={s.id} className="field field-on"><span>{s.name}</span><input type="time" value={s.time} aria-label={`${s.name} time`} onChange={(e) => e.target.value && save({ slotTimes: { ...(l.slotTimes ?? {}), [s.id]: e.target.value } })} /></label>)}
           </div>
         </Setting>
+        {!minor && (() => { const t = slotsOf(l).map((x) => x.time).sort(); return <p className="window-line">Eating window: {t[0]} to {t[t.length - 1]}. From your first and last meal.</p>; })()}
         <Setting name="How you eat"><Chips items={asItems(DIETS)} on={l.diet ?? "Everything"} pick={(v) => save({ diet: v })} /></Setting>
         {age !== null && age >= ALCOHOL_AGE && (
           <Setting name="Alcohol" hint="Alcohol counts as energy, 7 kcal a gram, and slows recovery. Chef Mealan will leave room for it on those days instead of pretending it isn't there.">
@@ -574,7 +567,7 @@ function ShopPanel(p: AppApi) {
   return (
     <>
     <section className="card">
-      <small>This picks your starter foods, and tells Mealan which shops you can really buy from.</small>
+      <small>This picks your starter foods, and tells Chef Mealan which shops you can really buy from.</small>
       <div className="moments" style={{ marginTop: 8 }}>
         {REGIONS.map((r) => <button key={r.id} className={`choice ${p.region === r.id ? "on" : ""}`} onClick={() => p.setRegion(r.id)}>{r.name}</button>)}
       </div>
@@ -617,7 +610,7 @@ function CoachPanel(p: AppApi) {
         </ul>
         <b>What your coach never sees</b>
         <ul className="small">
-          <li>Cards you keep private, your library, your photos, your chats with Mealan.</li>
+          <li>Cards you keep private, your library, your photos, your chats with Chef Mealan.</li>
           <li>Your body data. Only the numbers it gives.</li>
         </ul>
         <ConfirmButton className="link link-danger" label="Leave this coach" confirmLabel="Tap again to leave" onConfirm={leaveCoach} />
@@ -642,7 +635,7 @@ function AccountPanel(p: AppApi) {
       <section className="card"><small>This phone only. Your data stays here.</small></section>
       <section className="card">
         <b>Your data</b>
-        <p className="small">Everything Mealan keeps about you on this phone, in one file: your profile, your goal and its history, your foods with their photos, and your cards.</p>
+        <p className="small">Everything Chef Mealan keeps about you on this phone, in one file: your profile, your goal and its history, your foods with their photos, and your cards.</p>
         <div className="button-row"><button className="pill pill-small" onClick={p.exportMyData}><Download size={14} /> Export my data</button></div>
       </section>
     </>
@@ -656,7 +649,7 @@ function AccountPanel(p: AppApi) {
       {user && cloudStatus.text && <p className={`small sync ${cloudStatus.ok ? "" : "sync-bad"}`}>{cloudStatus.text}{cloudStatus.at ? `, ${new Date(cloudStatus.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}.</p>}
       <section className="card">
         <b>Your data</b>
-        <p className="small">Everything Mealan keeps about you, in one file: your profile, your goal and its history, your foods with their photos, your cards, recipes from your coach, and what your account stores.</p>
+        <p className="small">Everything Chef Mealan keeps about you, in one file: your profile, your goal and its history, your foods with their photos, your cards, recipes from your coach, and what your account stores.</p>
         <div className="button-row">
           <button className="pill pill-small" onClick={p.exportMyData}><Download size={14} /> Export my data</button>
         </div>
@@ -716,7 +709,7 @@ function AboutPanel() {
   return (
     <section className="card">
       <b>{APP_NAME}</b>
-      <p className="small">Mealan fits the food you want to the goal you have. The numbers come from code; the model reads labels, menus and shelves; you and your coach decide.</p>
+      <p className="small">Chef Mealan fits the food you want to the goal you have. The numbers come from code; the model reads labels, menus and shelves; you and your coach decide.</p>
       <p className="small">Pilot. Barcode data from Open Food Facts; label values are estimates, check the package. Your data sits in the EU, under your account.</p>
       <p className="small">hello@chefmealan.com</p>
       <p className="small"><a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy notice</a> · <a href="/disclaimer">Disclaimer</a></p>

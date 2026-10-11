@@ -8,7 +8,16 @@
 // with history.back(); a new entry asked for while that is still on its way waits for it, so entries never cross.
 import { useEffect, useRef } from "react";
 
-const TAB_PATH: Record<string, string> = { home: "/today", journey: "/plate", plan: "/plan", recipes: "/my-recipes", foods: "/foods", me: "/me" };
+const TAB_PATH: Record<string, string> = { home: "/today", journey: "/plate", plan: "/plan", recipes: "/my-recipes", foods: "/foods" };
+// the pages of the top menu (M6, 11 October 2026): Me and its pages under /me, the rest under /menu; Back goes one page back
+export const MENU_PATH: Record<string, string> = { me: "/me", profile: "/me/profile", goal: "/me/goal", life: "/me/lifestyle", week: "/me/weekly-plan", shop: "/me/shop", coach: "/me/coach", account: "/me/account", list: "/menu", support: "/menu/support", about: "/menu/about", evals: "/menu/evals" };
+// a reload on a menu page opens the pages that lead to it: /me/profile is Me, then Profile
+export function menuTrailOf(path: string): string[] {
+  const hit = Object.entries(MENU_PATH).find(([, p]) => p === path.replace(/\/$/, ""))?.[0];
+  if (!hit) return [];
+  if (hit === "me" || hit === "list") return [hit];
+  return [path.startsWith("/me/") ? "me" : "list", hit];
+}
 export const pathOfTab = (tab: string) => TAB_PATH[tab] ?? `/${tab}`;
 export function tabOfPath(path: string, tabs: readonly string[]): string | null {
   const hit = Object.entries(TAB_PATH).find(([, p]) => p === path)?.[0];
@@ -51,31 +60,36 @@ export function startTab(tab: string) {
   history.replaceState({ tab }, "", pathOfTab(tab));
 }
 
-function openLayer(close: () => void): Layer {
+// a layer may have an address of its own (a page in Me, M6: /me/profile); otherwise it keeps the one under it
+function openLayer(close: () => void, path?: string): Layer {
   const L: Layer = { id: ++seq, close };
-  whenSettled(L.id, () => { stack.push(L); history.pushState({ ...(history.state ?? {}), layer: L.id }, "", location.pathname); });
+  whenSettled(L.id, () => { stack.push(L); history.pushState({ ...(history.state ?? {}), layer: L.id }, "", path ?? location.pathname); });
   return L;
 }
+// layers closed together (Close on a page three deep in Me) take their steps back in one go
+let dropping = 0;
 function dropLayer(L: Layer) {
   const w = waiting.findIndex((x) => x.id === L.id);
   if (w >= 0) { waiting.splice(w, 1); return; }
   const i = stack.indexOf(L);
   if (i < 0) return;
   stack.splice(i, 1);
+  dropping++;
+  if (dropping > 1) return;
   goingBack++;
-  history.back();
+  queueMicrotask(() => { const n = dropping; dropping = 0; history.go(-n); });
   // a step back that never arrives (the browser had nothing to go back to) must not hold the next ones forever
   window.setTimeout(() => { if (goingBack > 0) { goingBack = 0; settle(); } }, 800);
 }
 
 // A layer that Back closes: open says whether it shows, close is what Back does. Closing it in the app takes its step back.
-export function useBack(open: boolean, close: () => void) {
+export function useBack(open: boolean, close: () => void, path?: string) {
   const layer = useRef<Layer | null>(null);
   const closeRef = useRef(close);
   closeRef.current = close;
   useEffect(() => {
     if (!can()) return;
-    if (open && !layer.current) layer.current = openLayer(() => { layer.current = null; closeRef.current(); });
+    if (open && !layer.current) layer.current = openLayer(() => { layer.current = null; closeRef.current(); }, path);
     else if (!open && layer.current) { const L = layer.current; layer.current = null; dropLayer(L); }
   }, [open]);
   useEffect(() => () => { if (layer.current) { const L = layer.current; layer.current = null; dropLayer(L); } }, []);

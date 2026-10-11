@@ -1,5 +1,6 @@
 import { Settings , Coffee } from "lucide-react";
 import { fmt, pdText, pdVal, pdTag, pdRange } from "../ui";
+import { density } from "../pilot";
 import { COACH_NAME } from "../components/Mark";
 import { WeighInLine } from "../components/Weight";
 import { weighInsOff } from "../weight";
@@ -50,7 +51,8 @@ export function MeScreen(p: AppApi) {
       <section className="plan">
         <div className="plan-top"><span>{clientName ? `${clientName}'s goal` : "My goal"}{bandName ? `: ${bandName}` : ""}</span><span>{goal?.setBy === "coach" ? `set by ${setBy}` : ""}</span></div>
         <div className="plan-row">
-          <div><b>{pdVal(p.dayPd)}</b><small>{pdTag()} target</small></div>
+          {/* the three numbers of the same day, the average one (11 October 2026: the PD was today's, the kcal and protein the average's) */}
+          <div><b>{pdVal(density(state.goals.protein, state.goals.calories))}</b><small>{pdTag()} a day</small></div>
           <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal a day</small></div>
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
