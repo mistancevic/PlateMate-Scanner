@@ -705,7 +705,8 @@ function BackKeeper({ tab, setTab }: { tab: Tab; setTab: (t: Tab) => void }) {
 export default function App() {
   const [state, setState] = useState<PilotState>(load),
     [tab, setTab] = useState<Tab>(() => {
-      const tabs = ["home", "journey", "plan", "meal", "chef", "recipes", "foods", "me"] as Tab[];
+      // a reload keeps the screen; Clients only for a coach (Milan, 11 October 2026: a reload on Clients opened Today)
+      const tabs = ["home", "journey", "plan", "meal", "chef", "recipes", "foods", "me", "clients"] as Tab[];
       const fromPath = typeof location !== "undefined" ? tabOfPath(location.pathname, tabs) : null;
       const h = (typeof location !== "undefined" ? location.hash : "").replace("#", "");
       return (fromPath as Tab | null) ?? (tabs.includes(h as Tab) ? (h as Tab) : "home");
@@ -1196,6 +1197,8 @@ export default function App() {
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.goals.calories, state.goals.protein, goal?.band, goal?.source]);
+  // a reload on Clients stays there; once the account is known and is not a coach's, Today instead
+  useEffect(() => { if ((profileReady || (authReady && !user)) && tab === "clients" && profile.role !== "coach") setTab("home"); }, [profileReady, authReady, user, profile.role, tab]);
   // numbers calculated from the profile follow the profile
   useEffect(() => {
     if (goal?.source !== "profile" || !goal.band) return;
