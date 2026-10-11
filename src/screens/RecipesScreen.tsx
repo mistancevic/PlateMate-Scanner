@@ -40,10 +40,6 @@ export function RecipesScreen(p: AppApi) {
   const photoOf = (m: Meal) => state.feedback.find((f) => f.meal.id === m.id && f.photo)?.photo ?? state.feedback.find((f) => f.meal.title === m.title && f.photo)?.photo ?? null;
   const madeTimes = (m: Meal) => state.feedback.filter((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.status === "eaten").length;
   const lastRating = (m: Meal) => state.feedback.find((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.taste)?.taste ?? "";
-  const makeAgain = (m: Meal) => {
-    setState((s) => ({ ...s, title: m.title, items: structuredClone(m.items), portion: null }));
-    p.setKind(m.kind ?? "meal"); p.setStep("recipe"); setTab("journey"); p.notify("On your plate. Fit to my target sets the amounts.");
-  };
   return (
     <>
       <div className="segments" role="tablist" aria-label="Recipes">
@@ -72,7 +68,8 @@ export function RecipesScreen(p: AppApi) {
               {(m.steps?.length ?? 0) > 0 && <details className="recipe-steps"><summary>Steps ({m.steps!.length})</summary><ol>{m.steps!.map((x, k) => <li key={k}>{x}</li>)}</ol></details>}
               {pub?.note && st !== "waiting" && <small className="pub-note">{approver.charAt(0).toUpperCase() + approver.slice(1)}: “{pub.note}”</small>}
               <div className="button-row" style={{ marginTop: 10 }}>
-                <button className="pill pill-small pill-primary" onClick={() => makeAgain(m)}>Make it again</button>
+                {/* Open (0.2.3, Milan 11 October): the recipe on the Plate with its name; what happens there is the person's */}
+                <button className="pill pill-small pill-primary" onClick={() => p.openOnPlate(m)}>Open</button>
                 {isCoach && !st && <button className="pill pill-small" onClick={() => setPublishing(m.id)}>Publish</button>}
                 {isCoach && st && pub && (!pub.status || pub.status === "live") && <a className="pill pill-small" href={`/r/${pub.slug}`} target="_blank" rel="noreferrer">See the page</a>}
                 {isCoach && st && <button className="pill pill-small" onClick={() => setPublishing(m.id)}>{st === "waiting" ? "Open it" : st === "live" ? "Change it" : st === "down" ? (cook.direct ? "Publish again" : `Send to ${approver} again`) : "Continue"}</button>}

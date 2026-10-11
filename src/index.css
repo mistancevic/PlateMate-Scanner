@@ -1096,3 +1096,7 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 /* rename a recipe on its tile (canvas S, 11 October 2026) */
 .tile-name-btn { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-align: left; cursor: text; }
 .title-input.tile-name { font-size: 15px; margin: 0; padding: 0 0 2px; flex: 1; }
+/* Today reads the plan (0.2.3, canvas S Today through the day) */
+.plan-slot-row .menu-row-text small .fit-ok, .plan-slot-row .menu-row-text small .fit-under { font-weight: 800; }
+.plan-mark { display: block; margin-top: 4px; font-weight: 800; }
+.day-record { margin: 12px 0; } .day-record .record-line { display: block; margin-top: 10px; color: var(--brand-text); font-weight: 600; }

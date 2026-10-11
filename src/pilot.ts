@@ -113,6 +113,8 @@ export type Feedback = {
   ate?: "all" | "portion";
   // how the meal carried the person, asked on Today 30 minutes after (M1 activity 8, 10 October 2026)
   carry?: { how: "light" | "fine" | "heavy"; at: string };
+  // eaten for a slot of the plan (0.2.3, canvas S Today through the day): by the plan; a card without a slot is extra
+  slot?: { date: string; slotId: string; name: string; time: string };
 };
 export type PilotState = {
   version: 1;

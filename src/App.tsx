@@ -1771,6 +1771,11 @@ export default function App() {
     peekBarcode: async (code: string) => { try { const d = await api(`/api/product/${code}`); return d?.product_name ? { code, name: d.product_name, brand: d.brand || "", quantity: "", kcal: d.calories, protein: d.protein } : null; } catch { return null; } },
     // Plan (0.2.2): the meals in the slots, by date and slot; a plate made for a slot lands in it when saved
     planned, filling, setFilling,
+    openOnPlate: (meal: Meal) => {
+      setFilling(null);
+      setState((s) => ({ ...s, title: meal.title, items: structuredClone(meal.items), portion: null }));
+      setKind(meal.kind ?? "meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
+    },
     // rename a recipe (canvas S, Recipes keeps, 11 October 2026): the recipe, and every slot that holds it
     renameMeal: (id: string, title: string) => {
       const t = title.trim(); if (!t) return;

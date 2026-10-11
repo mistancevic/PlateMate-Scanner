@@ -9,7 +9,12 @@ import { planLine, schoolLine, studyLine, loadOf, LOAD_DAY, weekdaysOf, dayKindO
 import { DayEditor } from "../components/DayEditor";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { X } from "lucide-react";
-import type { AppApi } from "./api";
+import type { AppApi, Filling } from "./api";
+import { slotsOf, rowsOf, trainingTime } from "../slots";
+import { dayFor, getDay } from "../personal";
+import { ymd } from "../plan";
+import { fitOf, type PlannedMeal } from "../planned";
+import { dayRecord, planLine as planDayLine, recordLine } from "../record";
 
 export function HomeScreen(p: AppApi) {
   const [shareFor, setShareFor] = useState<string | null>(null);
@@ -22,6 +27,24 @@ export function HomeScreen(p: AppApi) {
   const byCoach = goal?.setBy === "coach";
   const setBy = byCoach ? `Coach ${(goal?.coachName || p.profile.coachName || COACH_NAME).split(" ")[0]}` : "you";
   const today = dayLog(state.feedback, new Date());
+  // the day against the plan (0.2.3): today's slots, what they hold, what is eaten, what came from outside
+  const key = ymd(new Date());
+  const slots = slotsOf(lifestyleOf(p.personal));
+  const held = p.planned[key] ?? {};
+  const rec = dayRecord(slots, held, today.logged, key);
+  const hasPlanToday = Object.keys(held).length > 0 || rec.eaten.length > 0;
+  const unit = p.personal.pdUnit === "pct" ? "pct" : "pd";
+  const SOURCE: Record<PlannedMeal["source"], string> = { mine: "my recipe", coach: "the coach's recipe", starter: "starter", plate: "made on the Plate" };
+  const eatFrom = (slotId: string) => {
+    const slot = slots.find((x) => x.id === slotId)!, m = held[slotId];
+    const f: Filling = { date: key, slotId, name: slot.name, time: slot.time, dayName: "today", mealId: m.mealId, mode: "eat" };
+    p.fillOnPlate(f, m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : null, m.title);
+  };
+  // tomorrow, for the line once today is done
+  const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
+  const tTraining = dayFor(p.personal, tomorrow)?.day ?? getDay(p.personal, tomorrow).plan ?? null;
+  const tTime = trainingTime(tTraining); void rowsOf;
+  const tHeld = Object.keys(p.planned[ymd(tomorrow)] ?? {}).length;
   const past = [1, 2].map((n) => dayLog(state.feedback, daysAgo(n)));
   const follow = dayModeOf(p.personal) === "each";
   // The day pills show while the day is still assumed, and again after Change, until a pill is tapped.
@@ -110,22 +133,57 @@ export function HomeScreen(p: AppApi) {
       {/* What's in the plan (0.2.0, canvas S and H): the day's meals as rows once the Plan holds them (0.2.2); until then one row, Go to Plan. Then Scan, blue, the camera for what the plan is not. */}
       <section className="card cooking">
         <div className="card-top cooking-top"><span><ChefHat size={18} /> What's in the plan</span></div>
-        <button className="menu-row plan-row-link" onClick={() => setTab("plan")}>
-          <div className="menu-row-text"><small>Nothing planned so far</small><b>Go to Plan</b><small>Set the day's meals, and they wait here</small></div><ChevronRight size={18} />
-        </button>
+        {!hasPlanToday && (
+          <button className="menu-row plan-row-link" onClick={() => setTab("plan")}>
+            <div className="menu-row-text"><small>Nothing planned so far</small><b>Go to Plan</b><small>Set the day's meals, and they wait here</small></div><ChevronRight size={18} />
+          </button>
+        )}
+        {hasPlanToday && rec.done && (
+          <button className="menu-row plan-row-link" onClick={() => setTab("plan")}>
+            <div className="menu-row-text"><small>All {rec.planned === 1 ? "one slot" : `${rec.planned} slots`} eaten</small><b>Today went {rec.extras.length ? "mostly " : ""}by the plan</b><small>{tHeld ? `Tomorrow is set: ${tHeld} ${tHeld === 1 ? "slot" : "slots"}${tTime ? `, training at ${tTime}` : ""}` : "Tomorrow is open. Set it on Plan."}</small></div><ChevronRight size={18} />
+          </button>
+        )}
+        {hasPlanToday && !rec.done && rec.open.map((sl) => {
+          const m = held[sl.id]; const fit = fitOf(m, p.dayPd, unit);
+          return (
+            <button key={sl.id} className="menu-row plan-row-link plan-slot-row" aria-label={`${sl.name} at ${sl.time}, ${m.title}`} onClick={() => eatFrom(sl.id)}>
+              <div className="menu-row-text"><small>{sl.name}, {sl.time}</small><b>{m.title}</b><small>{SOURCE[m.source]}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</small></div><ChevronRight size={18} />
+            </button>
+          );
+        })}
+        {hasPlanToday && !rec.done && rec.empty.length > 0 && (
+          <button className="menu-row plan-row-link" onClick={() => setTab("plan")}>
+            <div className="menu-row-text"><small>{rec.empty.map((x) => x.name).join(", ")}</small><b>Pick a meal</b><small>{rec.empty.length === 1 ? "One slot open" : `${rec.empty.length} slots open`} · Go to Plan</small></div><ChevronRight size={18} />
+          </button>
+        )}
       </section>
       <button className="pill pill-tall pill-primary scan-today" onClick={() => { p.setKind("meal"); setStep("in"); setTab("journey"); setMode("label"); setCamera(true); }}>
         <Camera size={20} /> Scan
       </button>
       {inbox}
+      {/* the day's record (0.2.3, H14): once every planned slot is eaten, one line a day; the coach sees it on Friday */}
+      {rec.done && (
+        <section className="plan day-record">
+          <div className="plan-top"><span>{new Date().toLocaleDateString("en", { weekday: "long" })}, the record</span><span>{rec.extras.length ? `${rec.extras.length} extra` : "by the plan"}</span></div>
+          <div className="plan-row">
+            <div><b>{pdVal(rec.pd)}</b><small>{pdTag()}{p.dayPd !== null ? `, target ${pdVal(p.dayPd)}` : ""}</small></div>
+            <div><b>{fmt(rec.kcal, 0)}</b><small>{p.todayKcal ? `of ${fmt(p.todayKcal, 0)} kcal` : "kcal"}</small></div>
+            <div><b>{fmt(rec.protein, 0)}</b><small>{p.todayMacros?.protein ? `of ${fmt(p.todayMacros.protein, 0)} g protein` : "g protein"}</small></div>
+          </div>
+          <small className="record-line">{recordLine(rec)}{p.profile.coachId ? " Your coach sees this line on Friday." : ""}</small>
+        </section>
+      )}
       <p className="label">Today's meals</p>
-      <p className="small logged-line">{loggedLine(today, true)}</p>
+      <p className="small logged-line">{hasPlanToday ? planDayLine(rec, p.todayKcal) : loggedLine(today, true)}</p>
       {today.logged.map((f) => (
         <section className={`card log-card ${f.photo ? "with-photo" : ""}`} key={f.id}>
           {f.photo && <img className="log-photo" src={f.photo} alt="" />}
           <div className="card-top"><span>{f.meal.title}</span><small>{new Date(f.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small></div>
           <small>{f.meal.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}</small>
-          {(() => { const a = aggregate(f.meal.items); return <small className="log-nums">{fmt(a.calories, 0)} kcal · {fmt(a.protein, 0)} g protein · {pdText(density(a.protein, a.calories))}{f.taste ? ` · ${f.taste}` : ""}{f.carry ? ` · ${({ light: "light and awake", fine: "fine after", heavy: "heavy, tired" } as const)[f.carry.how]}` : ""}</small>; })()}
+          {(() => { const a = aggregate(f.meal.items); return <small className="log-nums">{f.slot ? `${f.slot.name}, by the plan · ` : ""}{fmt(a.calories, 0)} kcal · {fmt(a.protein, 0)} g protein · {pdText(density(a.protein, a.calories))}{f.taste ? ` · ${f.taste}` : ""}{f.carry ? ` · ${({ light: "light and awake", fine: "fine after", heavy: "heavy, tired" } as const)[f.carry.how]}` : ""}</small>; })()}
+          {hasPlanToday && (f.slot
+            ? <small className="plan-mark fit-ok">By the plan</small>
+            : <small className="plan-mark fit-under">Off the plan{rec.open.length && f.id === today.logged[today.logged.length - 1]?.id ? " · the next meal leans protein" : ""}</small>)}
           <div className="button-row log-actions">
             {f.recipeId
               ? <span className="pill pill-small pill-done"><Check size={14} /> In My recipes</span>

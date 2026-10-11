@@ -254,13 +254,16 @@ export function JourneyScreen(p: AppApi) {
   if (step === "in")
     return (
       <>
+        {/* the name as the title: for a slot, or for a recipe opened from Recipes (0.2.3); an empty plate asks what you are craving */}
         {p.filling
-          ? Head({ name: true, title: "", sub: "Name it, or keep the foods' name. Add your foods, fit them to your target, or make them as they are." })
-          : Head({ title: "What are you craving?", sub: `Add your foods. ${CHEF_NAME} sets the amounts.` })}
+          ? Head({ name: true, title: "", sub: p.filling.mode === "eat" ? "As planned. Change what you like, then Fit to my target or Make it as it is." : "Name it, or keep the foods' name. Add your foods, fit them to your target, or make them as they are." })
+          : state.title && state.title !== "DaaM" && items.length > 0
+            ? Head({ name: true, title: "", sub: "From My recipes. Change what you like, then Fit to my target or Make it as it is." })
+            : Head({ title: "What are you craving?", sub: `Add your foods. ${CHEF_NAME} sets the amounts.` })}
         {/* the plan line (0.2.0, canvas S): one line says what the plate is; the kind and the moment sit behind its pencil, never asked first.
             A planned meal (0.2.2) says Lunch, 12:30 · By the plan; until then every plate is off the plan. */}
         <div className="plan-line">
-          <span>{p.filling ? `${p.filling.dayName === "today" ? "Today" : p.filling.dayName}'s ${p.filling.name.toLowerCase()}, ${p.filling.time} · By the plan` : `Off the plan · ${momentOf(p.moment).name}${p.kind === "dessert" ? " · A dessert" : " · A mix"}`}</span>
+          <span>{p.filling ? (p.filling.mode === "eat" ? `${p.filling.name}, ${p.filling.time} · By the plan` : `${p.filling.dayName === "today" ? "Today" : p.filling.dayName}'s ${p.filling.name.toLowerCase()}, ${p.filling.time} · By the plan`) : `Off the plan · ${momentOf(p.moment).name}${p.kind === "dessert" ? " · A dessert" : " · A mix"}`}</span>
           <button className="icon plan-line-pen" aria-label="Change what this plate is" aria-expanded={lineOpen} onClick={() => setLineOpen((v) => !v)}><Pencil size={16} /></button>
         </div>
         {lineOpen && (<>
@@ -337,9 +340,10 @@ export function JourneyScreen(p: AppApi) {
           <button className="pill pill-primary pill-wide" disabled={items.length < 1} onClick={askMealan}>
             <ChefHat size={18} /> Fit to my target
           </button>
-          {items.length > 0 && <button className="pill pill-wide" onClick={() => { if (p.filling) putInSlot(items); else { setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null); setStep("make"); } }}>Make it as it is</button>}
+          {items.length > 0 && <button className="pill pill-wide" onClick={() => { if (p.filling?.mode !== "eat" && p.filling) putInSlot(items); else { setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null); setStep("make"); } }}>Make it as it is</button>}
         </div>
-        {p.filling && items.length > 0 && <p className="small center">Fit moves one food. Make it as it is puts the plate in {slotName(p.filling)} as it stands.</p>}
+        {p.filling && p.filling.mode !== "eat" && items.length > 0 && <p className="small center">Fit moves one food. Make it as it is puts the plate in {slotName(p.filling)} as it stands.</p>}
+        {p.filling?.mode === "eat" && items.length > 0 && <p className="small center">Fit sets the amounts. Make it as it is keeps yours. Save at the end records it as {slotName(p.filling)}.</p>}
         {!p.filling && items.length === 1 && <p className="small center">One product: {CHEF_NAME} looks through your foods for a partner that brings it to your plan.</p>}
         {!p.filling && items.length >= 2 && <p className="small center">Fit works out the amounts without the AI. Make it as it is keeps yours.</p>}
         <Tip list={items} refit={false} />
@@ -436,7 +440,7 @@ export function JourneyScreen(p: AppApi) {
           setMethod(null);
           setStep("make");
         }}>Make it</button>
-        {p.filling ? (<>
+        {p.filling && p.filling.mode !== "eat" ? (<>
           <button className="pill pill-wide" onClick={() => putInSlot(shown)}>Put it in {slotName(p.filling)}</button>
           <Tip list={shown} refit />
         </>) : (
@@ -445,7 +449,7 @@ export function JourneyScreen(p: AppApi) {
           setStep("in");
         }}>Keep for later today</button>
         )}
-        {!p.filling && !unplanned && <Tip list={shown} refit />}
+        {(!p.filling || p.filling.mode === "eat") && !unplanned && <Tip list={shown} refit />}
         {options.length > 1 && <button className="pill pill-wide" onClick={() => {
           const next = (pick + 1) % options.length; setPick(next);
           setState((s) => ({ ...s, items: options[next].items, portion: null }));
@@ -475,7 +479,8 @@ export function JourneyScreen(p: AppApi) {
         <button className="pill pill-primary pill-wide" disabled={ways.length > 0 && !method} onClick={() => {
           const w = ways.find((x) => x.id === method);
           log("method_chosen", { method });
-          setState((s) => ({ ...s, title: w ? w.name : s.title }));
+          // the way names a plate that has no name yet; a named meal (a recipe, a slot) keeps its name (0.2.3)
+          setState((s) => ({ ...s, title: w && (!s.title || s.title === "DaaM") ? w.name : s.title }));
           setStep("made");
         }}>{ways.length ? "I'm making it this way" : "Continue"}</button>
         <Back to="recipe" />
@@ -523,6 +528,10 @@ export function JourneyScreen(p: AppApi) {
   }
 
   // after
+  // the plate's name, and the recipe it is as it stands (same foods and amounts), when it came from one
+  const plateName = (state.title && state.title !== "DaaM" ? state.title : "") || autoTitle(items);
+  const sameAs = (m: Meal) => m.items.length === items.length && m.items.every((x, i) => x.food.id === items[i].food.id && Math.round(x.grams) === Math.round(items[i].grams));
+  const origin = state.meals.find((m) => (p.filling?.mealId === m.id || m.title === plateName) && sameAs(m));
   return (
     <>
       {Head({ title: "How was it?", sub: "One tap. It stays yours unless you share it." })}
@@ -541,16 +550,16 @@ export function JourneyScreen(p: AppApi) {
         }} />
       </label>
       </div>
-      <label className="field"><span>Name it</span><input value={title} placeholder={autoTitle(items)} onChange={(e) => setTitle(e.target.value)} /></label>
+      <label className="field"><span>Name it</span><input value={title} placeholder={plateName} onChange={(e) => setTitle(e.target.value)} /></label>
       <textarea placeholder="A line for your coach, if you like" value={note} onChange={(e) => setNote(e.target.value)} />
-      <section className="card save-recipe">
+      {origin ? <p className="small">{origin.title} is in My recipes already. This card points at it.</p> : <section className="card save-recipe">
         <div className="card-top"><span>Save in My recipes</span></div>
         <small>Keeps the foods, the grams, the steps and the photos for next time.</small>
         <div className="reasons">
           <button className={`choice ${saveRecipe ? "on" : ""}`} onClick={() => setSaveRecipe(true)}>Yes, save it</button>
           <button className={`choice ${!saveRecipe ? "on" : ""}`} onClick={() => setSaveRecipe(false)}>Not this one</button>
         </div>
-      </section>
+      </section>}
       {sharing && p.profile.coachId && (
         <div className="reasons">
           {([["look", "Look at this"], ["ok", "Was this OK?"], ["help", "Help me next time"]] as const).map(([k, l]) => (
@@ -559,16 +568,18 @@ export function JourneyScreen(p: AppApi) {
         </div>
       )}
       <button className="pill pill-primary pill-wide" disabled={good === null || (sharing && !shareWhy)} onClick={() => {
-        const name = title.trim() || autoTitle(items);
-        const meal = { id: uid(), title: name, items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString(), kind: p.kind };
+        const name = title.trim() || plateName;
+        const meal = { id: origin?.id ?? uid(), title: name, items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString(), kind: p.kind };
         const status = good === "no" ? "not-used" : "eaten";
         const taste = TASTE[good!];
         log("feedback", { status, taste, shared: sharing ? shareWhy : null });
         setFeedback({ status, taste, notes: note });
         const shared = sharing && shareWhy ? { reason: shareWhy, at: new Date().toISOString() } : undefined;
         const allPhotos = [...photos, ...(plate ? [plate] : [])];
-        const keep = saveRecipe && status === "eaten";
-        setState((s) => ({ ...s, meals: keep ? [structuredClone(meal), ...s.meals] : s.meals, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null }));
+        // a plate that is a recipe as it stands (0.2.3): the card points at that recipe, no second copy
+        const keep = !origin && saveRecipe && status === "eaten";
+        setState((s) => ({ ...s, meals: keep ? [structuredClone(meal), ...s.meals] : s.meals, feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : undefined, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));
+        if (p.filling) p.setFilling(null);
         p.setKind("meal"); setGood(null); setNote(""); setTitle(""); setPlate(""); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); resetMade(); setStep("in");
       }}>{sharing ? `Save and share with ${p.profile.coachName || "your coach"}` : "Save"}</button>
       {p.profile.coachId && !sharing && <button className="pill pill-wide" onClick={() => setSharing(true)}>Share with {p.profile.coachName || "your coach"}</button>}
