@@ -742,6 +742,8 @@ export default function App() {
     [review, setReview] = useState<NumbersReview | null>(null),
     [menuFrom, setMenuFrom] = useState<MenuSection | null>(null),
     [talkOpen, setTalkOpen] = useState(false),
+    // what the chat opened for (0.2.4): "fill" shows the day filled at once
+    [talkAsk, setTalkAsk] = useState<"fill" | null>(null),
     // the slots' meals (0.2.2) and the slot a plate is being made for
     [planned, setPlannedState] = useState<Planned>(getPlanned),
     [filling, setFilling] = useState<Filling | null>(null),
@@ -1784,7 +1786,8 @@ export default function App() {
       for (const [date, day] of Object.entries(planned)) for (const [slot, m] of Object.entries(day)) if (m.mealId === id && m.title !== t) { next = withPlanned(next, date, slot, { ...m, title: t }); changed = true; }
       if (changed) { storePlanned(next); setPlannedState(next); }
     },
-    fill: (date: string, slotId: string, meal: PlannedMeal | null) => { const next = withPlanned(planned, date, slotId, meal); storePlanned(next); setPlannedState(next); },
+    // from the latest state, so several fills in one go (Put them in the plan, 0.2.4) all land
+    fill: (date: string, slotId: string, meal: PlannedMeal | null) => setPlannedState((prev) => { const next = withPlanned(prev, date, slotId, meal); storePlanned(next); return next; }),
     fillOnPlate: (f: Filling, meal?: Meal | null, title?: string) => {
       setFilling(f);
       setState((s) => ({ ...s, title: meal?.title ?? title ?? "", items: meal ? structuredClone(meal.items) : [], portion: null }));
@@ -1845,7 +1848,7 @@ export default function App() {
         });
       } catch (e: any) { setError(e.message); } finally { setBusy(""); }
     },
-    openOut: () => setTalkOpen(true),
+    openOut: (ask?: "fill") => { setTalkAsk(ask ?? null); setTalkOpen(true); },
     closeOut: () => setTalkOpen(false),
     mealanAsk, mealanAsked: () => setMealanAsk(0),
     mixFor: (food: Food) => {
@@ -2076,7 +2079,7 @@ export default function App() {
         {menuSection && <MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s) => { setMenuFrom(null); setMenuSection(s); }} close={() => { setMenuFrom(null); setMenuSection(null); }} />}
         {!menuSection && !talkOpen && tab === "home" && <HomeScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "journey" && <JourneyScreen {...screenProps} />}
-        {talkOpen && !menuSection && <div className="talk-overlay"><OutScreen {...screenProps} turns={talkTurns} setTurns={(f) => setTalkTurns(f)} close={() => setTalkOpen(false)} toPlate={() => { setTalkOpen(false); setMenuSection(null); setStep("in"); setTab("journey"); }} /></div>}
+        {talkOpen && !menuSection && <div className="talk-overlay"><OutScreen {...screenProps} tab={tab} ask={talkAsk} clearAsk={() => setTalkAsk(null)} turns={talkTurns} setTurns={(f) => setTalkTurns(f)} close={() => setTalkOpen(false)} toPlate={() => { setTalkOpen(false); setMenuSection(null); setStep("in"); setTab("journey"); }} /></div>}
         {!talkOpen && (
           <button className="chat-fab" aria-label="Mealan" onClick={() => {
             // one door: on a plate with food it answers about the plate; anywhere else it's the conversation

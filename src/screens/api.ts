@@ -122,7 +122,8 @@ export interface AppApi {
   importRef: RefObject<HTMLInputElement | null>;
   goal: import("../goal").Goal | null;
   openGoal: () => void;
-  openOut: () => void;
+  // the chat knows the screen (0.2.4); "fill" opens it with the day filled
+  openOut: (ask?: "fill") => void;
   closeOut: () => void;
   mealanAsk: number;
   mealanAsked: () => void;

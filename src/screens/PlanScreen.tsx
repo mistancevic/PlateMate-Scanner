@@ -21,6 +21,8 @@ const SOURCE: Record<PlannedMeal["source"], string> = { mine: "my recipe", coach
 
 // the day looked at last, kept while the app is open, so a trip to the Plate comes back to the same day
 let remembered: string | null = null;
+// the day Plan shows, for the chef's context (0.2.4)
+export const planDateShown = () => remembered ?? ymd(new Date());
 
 export function PlanScreen(p: AppApi) {
   const today = new Date();
@@ -107,6 +109,7 @@ export function PlanScreen(p: AppApi) {
           <div><b>{fmt(sum.protein, 0)}</b><small>{numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></div>
         </div>
       </section>
+      {openCount > 0 && <button type="button" className="pill pill-tall pill-primary plan-fill" onClick={() => p.openOut("fill")}><ChefHat size={18} /> Fill the open slots with Chef {CHEF_NAME}</button>}
       <div className="button-row plan-links">
         <button type="button" className="pill pill-small" onClick={() => p.openMenu("life")}>Slots and times</button>
         <button type="button" className="pill pill-small" onClick={() => p.openMenu("week")}>Weekly plan</button>

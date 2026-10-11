@@ -505,7 +505,7 @@ export function JourneyScreen(p: AppApi) {
           <button className={`choice ${went === "not" ? "on" : ""}`} onClick={() => setWent("not")}>Not as the recipe says</button>
         </div>
         {went === "not" && <textarea placeholder="What was different" value={different} onChange={(e) => setDifferent(e.target.value)} />}
-        {went === "not" && <button className="link" onClick={p.openOut}>Help me with making it</button>}
+        {went === "not" && <button className="link" onClick={() => p.openOut()}>Help me with making it</button>}
         <p className="label">How much did you eat?</p>
         <div className="reasons">
           {([["all", "All of it"], ["portion", "A portion"], ["later", "Later today"], ["not", "Not after all"]] as const).map(([k, l]) => (

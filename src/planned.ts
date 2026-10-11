@@ -64,3 +64,27 @@ export function sumOf(day: Record<string, PlannedMeal> | undefined): { kcal: num
   const kcal = meals.reduce((n, m) => n + m.kcal, 0), protein = meals.reduce((n, m) => n + m.protein, 0);
   return { kcal, protein, pd: density(protein, kcal), n: meals.length };
 }
+
+// Fill a day (0.2.4, canvas S "Chef Mealan, about this screen", H5 and H6): the open slots filled from My recipes and the
+// starters, each with the meal that fits the slot best. The same way of picking as the tip: closest to the day's PD target
+// first, then closest to the slot's share of the day. No AI call; the chat only wraps it in words. A meal is used once a day.
+export type FillRow = { slot: Slot; meal: PlannedMeal; alternatives: PlannedMeal[] };
+export function fillDay(slots: Slot[], held: Record<string, PlannedMeal> | undefined, choices: PlannedMeal[], day: { kcal: number; protein: number } | null, target: number | null): FillRow[] {
+  const open = slots.filter((s) => !held?.[s.id]);
+  const used = new Set(Object.values(held ?? {}).map((m) => m.title));
+  const rows: FillRow[] = [];
+  for (const slot of open) {
+    const need = needOf(slots, slot, day);
+    const score = (m: PlannedMeal) => {
+      const pd = density(m.protein, m.kcal) ?? 0;
+      const pdGap = target === null ? 0 : Math.max(0, target - pd) * 2 + Math.max(0, pd - target - 3) * 0.5;
+      const kcalGap = need ? Math.abs(m.kcal - need.kcal) / need.kcal : 0;
+      return pdGap + kcalGap;
+    };
+    const ranked = choices.filter((m) => !used.has(m.title)).sort((a, b) => score(a) - score(b));
+    if (!ranked.length) continue;
+    used.add(ranked[0].title);
+    rows.push({ slot, meal: ranked[0], alternatives: ranked.slice(1, 4) });
+  }
+  return rows;
+}
