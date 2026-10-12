@@ -3,7 +3,7 @@ import { tabOfPath } from "../back";
 import { RecipeCard } from "./RecipePages";
 import type { PublicRecipe } from "../recipes";
 import { Check } from "lucide-react";
-import { WANTS, HAVES, DEMO_GOAL, BIG_BOWL, lift, smaller } from "../landing";
+import { WANTS, DEMO_GOAL, BIG_BOWL, lift, smaller, alone, havesFor, PAIR_NOTES } from "../landing";
 import { Mark, APP_NAME } from "../components/Mark";
 import { signIn } from "../cloud";
 
@@ -16,6 +16,19 @@ export function LandingScreen() {
   useEffect(() => { if (tabOfPath(location.pathname, ["home", "journey", "meal", "chef", "recipes", "foods", "me"])) history.replaceState(null, "", "/"); }, []);
   const go = async () => { setBusy(true); setErr(""); try { await signIn(); } catch (e: any) { setErr(e.message || "Sign-in failed."); } finally { setBusy(false); } };
   const toForm = () => formRef.current?.scrollIntoView({ behavior: "smooth" });
+  // HP10: the bar at the bottom shows while neither the button under the calculator nor the form is on screen
+  const ctaRef = useRef<HTMLDivElement>(null);
+  // positions on every scroll, so a fast fling past the button still shows the bar
+  const [sticky, setSticky] = useState(false);
+  useEffect(() => {
+    const check = () => {
+      const c = ctaRef.current?.getBoundingClientRect(), f = formRef.current?.getBoundingClientRect();
+      const past = Boolean(c && c.bottom < 0), atForm = Boolean(f && f.top < window.innerHeight && f.bottom > 0);
+      setSticky(past && !atForm);
+    };
+    check(); window.addEventListener("scroll", check, { passive: true }); window.addEventListener("resize", check);
+    return () => { window.removeEventListener("scroll", check); window.removeEventListener("resize", check); };
+  }, []);
   // from a recipe page's Ask for an invite: straight to the form
   useEffect(() => { if (location.hash === "#ask") setTimeout(toForm, 300); }, []);
   // the three newest public recipes (canvas board R7); the section stays hidden while there are none
@@ -28,31 +41,35 @@ export function LandingScreen() {
         <span className="l-topnav"><a className="l-recipes" href="/recipes">Recipes</a><button className="link l-signin" disabled={busy} onClick={go}>Sign in</button></span>
       </header>
 
+      {/* the top (board HP, HP5, 12 October 2026): who it is for, the promise, the calculator already answered, then the
+          one way in, Try Chef Mealan; whoever has a code uses Sign in in the top bar */}
       <section className="l-hero">
         <div className="l-hero-text">
-          <span className="l-kicker">Closed pilot</span>
-          <h1>Eat what you crave. Chef Mealan tells you how much.</h1>
-          <p>Say you want chocolate spread, and you have skyr at home. Chef Mealan tells you how many grams of each to eat, so the plate fits your goal. You don't need a food diary, and you don't need to feel guilty.</p>
-          <div className="l-cta">
-            <button className="pill pill-primary" disabled={busy} onClick={go}>I have a code</button>
-            <button className="pill" onClick={toForm}>Ask for an invite</button>
-          </div>
+          <span className="l-kicker">For people with a nutrition plan</span>
+          <h1>Live your nutrition plan, day by day.</h1>
+          <p>Chef Mealan plans your meals with you. When the day surprises you or a craving comes, Chef Mealan finds the meal that still fits your numbers. You don't need a food diary, and you don't need to feel guilty.</p>
+          <p className="l-try-lead">Try the calculator: pick what you crave, and see which food makes the craving fit your plan.</p>
           {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
         </div>
-        <figure className="l-hero-art">
-          <img className="l-chef" src="/landing/chef.webp" alt="Coach Milan, the person behind Chef Mealan, in a chef's hat" />
-          <figcaption>Coach Milan, the person behind Chef Mealan</figcaption>
-        </figure>
+        <div>
+          <TryIt />
+          <div className="l-cta-block" ref={ctaRef}>
+            <b className="l-cta-head">Your foods, your goal, your day.</b>
+            <p>The calculator above uses one goal and six foods. Chef Mealan works with your own goal, the foods in your kitchen, and the day you're actually having.</p>
+            <button className="pill pill-primary l-cta-big" onClick={toForm}>Try Chef Mealan</button>
+            <small>Chef Mealan is being tested by a small group. Leave your name and email, and Coach Milan will send you a personal code.</small>
+          </div>
+        </div>
       </section>
 
       <section className="l-steps">
         <span className="l-eyebrow">How it works</span>
-        <h2>Three steps, while you decide what to eat</h2>
+        <h2>Plan the day, eat by it, and get help when it changes</h2>
         <div className="l-split">
           <ol className="l-numbered">
-            <li><b>Tell Chef Mealan what you want to eat</b><p>Scan the barcode, take a photo of the label, or type the name. The foods you add stay in your list for next time.</p></li>
-            <li><b>Chef Mealan fits the plate to your day</b><p>Chef Mealan knows whether today is a training day or a rest day, and works out the grams so the plate matches your numbers for the day. A calculator does the math, so nothing is guessed.</p></li>
-            <li><b>Eat, then say how the plate was</b><p>One tap: great, good, or not really. Only you see your answers, unless you share them with your coach.</p></li>
+            <li><b>Plan your day</b><p>Pick a meal for each slot: breakfast, lunch, dinner. Your own recipes, your coach's, or Chef Mealan's starters. Or let Chef Mealan fill the open slots.</p></li>
+            <li><b>Eat by the plan</b><p>Today shows the next meal. One tap opens the meal, Save counts the meal. At the end of the day you see how much of the day went by the plan.</p></li>
+            <li><b>When the day changes</b><p>A lunch out, a craving, a food you didn't plan. Scan the food or ask Chef Mealan, and the plate or the next meal is fitted to your numbers.</p></li>
           </ol>
           <PhoneToday />
         </div>
@@ -62,7 +79,7 @@ export function LandingScreen() {
         <section className="l-kitchen">
           <span className="l-eyebrow">From the kitchen</span>
           <h2>Recipes with the numbers worked out</h2>
-          <p>Coach Milan cooks them, weighs them, and puts the numbers next to the photo. In the app, Mealan sets how much of each fits your goal.</p>
+          <p>Coach Milan cooks the recipes, weighs them, and puts the numbers next to the photo. In the app, Chef Mealan works out how much of each food fits your goal.</p>
           <div className="rp-grid">{recipes.map((r) => <RecipeCard key={r.slug} r={r} />)}</div>
           <a className="l-all" href="/recipes">All recipes →</a>
         </section>
@@ -77,12 +94,25 @@ export function LandingScreen() {
         </div>
       </section>
 
-      <TryIt />
-
       <section className="l-coach">
         <span className="l-eyebrow">With your coach</span>
         <h2>Your coach sees the same numbers as you</h2>
         <p>You set your goal together with your coach. If one of your numbers looks wrong, for example too little food on a training day, Chef Mealan shows a note to you and to your coach. Your coach can then approve the number or suggest a change.</p>
+      </section>
+
+      {/* who's behind Chef Mealan: the photo moved here from the top (board HP, 12 October 2026) */}
+      <section className="l-week l-behind">
+        <span className="l-eyebrow">Who's behind Chef Mealan</span>
+        <h2>Coach Milan</h2>
+        <div className="l-split">
+          <div>
+            <p>Chef Mealan is built by Coach Milan, a certified fitness and nutrition coach in Munich. He cooks every day for himself and his family, and tries every recipe and every number on himself first.</p>
+            <p><a href="/about">More about Coach Milan</a></p>
+          </div>
+          <figure className="l-hero-art">
+            <img className="l-chef" src="/landing/chef.webp" alt="Coach Milan, the person behind Chef Mealan, in a chef's hat" />
+          </figure>
+        </div>
       </section>
 
       <section className="l-built">
@@ -97,16 +127,17 @@ export function LandingScreen() {
 
       <section className="l-who">
         <span className="l-eyebrow">Who it's for</span>
-        <h2>For people with a goal who choose their own food</h2>
+        <h2>For adults with a nutrition plan</h2>
         <p>Chef Mealan is for adults. Chef Mealan is not a doctor. If a medical condition decides what you eat, if you're pregnant or have diabetes, or if eating is difficult for you, Chef Mealan doesn't give advice, and tells you who to talk to instead.</p>
       </section>
 
       <section className="l-request" ref={formRef}>
-        <h2>Ask for an invite</h2>
-        <p>Chef Mealan is a closed pilot. Most people join with a code from their coach. If you don't have a code, leave your name and email, and Coach Milan will get back to you.</p>
+        <h2>Try Chef Mealan</h2>
+        <p>Chef Mealan is being tested by a small group right now. Most people join with a code from their coach. If you don't have a code, leave your name and email, and Coach Milan will send you a personal code.</p>
         <RequestForm />
       </section>
 
+      <div className={`l-sticky ${sticky ? "on" : ""}`} aria-hidden={!sticky}><button className="pill pill-primary" tabIndex={sticky ? 0 : -1} onClick={toForm}>Try Chef Mealan</button></div>
       <footer className="l-foot">
         <span><a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a></span>
         <span><a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a> · © 2026 Milan Stancevic</span>
@@ -117,17 +148,22 @@ export function LandingScreen() {
 
 // The phones are drawings of the screens, not screenshots, so they stay right when the app's text changes.
 function PhoneToday() {
+  // the 0.2 Today (board HP): the goal, What's in the plan, Does it fit my numbers?, Scan food
   return (
     <div className="l-phone-draw" aria-label="Drawing of the Today screen">
       <b className="l-ph-title">Today</b>
       <div className="l-ph-card">
-        <small>YOUR GOAL · SET BY COACH MILAN</small>
-        <b className="l-ph-goal">Maintain ›</b>
-        <div className="l-ph-nums"><span><b>6.2</b><small>PD target</small></span><span><b>2,900</b><small>kcal today</small></span><span><b>180</b><small>g protein</small></span></div>
+        <small>MY GOAL</small>
+        <b className="l-ph-goal">Recomposition ›</b>
+        <div className="l-ph-nums"><span><b>6.9</b><small>PD target</small></span><span><b>2,600</b><small>kcal today</small></span><span><b>180</b><small>g protein</small></span></div>
         <small className="l-ph-day">Monday: strength, hard, in the evening.</small>
       </div>
-      <span className="l-ph-btn primary">I'm craving something</span>
-      <span className="l-ph-btn">Scan food</span>
+      <b className="l-ph-sub">What's in the plan</b>
+      <div className="l-ph-row"><span style={{ background: "var(--top)" }} /><b>07:30</b><small>Oats, skyr and banana · fits</small></div>
+      <div className="l-ph-row"><span style={{ background: "var(--top)" }} /><b>12:30</b><small>Chicken, rice and greens · fits</small></div>
+      <div className="l-ph-row"><span style={{ background: "#c9d3e6" }} /><b>19:30</b><small>Pick a meal</small></div>
+      <small className="l-ph-q">Does it fit my numbers?</small>
+      <span className="l-ph-btn primary">Scan food</span>
     </div>
   );
 }
@@ -140,36 +176,37 @@ function PhoneWeek() {
     </div>
   );
 }
-// Try it: the app's own lift for a few fixed foods, for Recomposition only; nothing is saved
+// The calculator (board HP, HP5 and HP6, 12 October 2026): the app's own lift for a few fixed foods, Recomposition only,
+// already answered with granola and skyr; the foods offered follow the craving, sweet or savoury; nothing is saved
 function TryIt() {
-  const [want, setWant] = useState(WANTS[0].id), [have, setHave] = useState(HAVES[0].id);
-  const w = WANTS.find((x) => x.id === want)!, h = HAVES.find((x) => x.id === have)!;
-  const r = lift(w, h, DEMO_GOAL.pd);
+  const [want, setWantState] = useState(WANTS[0].id);
+  const w = WANTS.find((x) => x.id === want)!;
+  const offered = havesFor(w);
+  const [have, setHave] = useState(offered[0].id);
+  const setWant = (id: string) => { setWantState(id); const nw = WANTS.find((x) => x.id === id)!; if (!havesFor(nw).some((h) => h.id === have)) setHave(havesFor(nw)[0].id); };
+  const h = offered.find((x) => x.id === have) ?? offered[0];
+  const r = lift(w, h, DEMO_GOAL.pd), a = alone(w);
   const big = r.grams > BIG_BOWL ? smaller(w, h, DEMO_GOAL.pd) : null;
-  const wn = w.name.toLowerCase(), hn = h.name.toLowerCase();
-  const Pick = ({ items, on, set }: { items: { id: string; name: string; grams?: number }[]; on: string; set: (v: string) => void }) => (
-    <div className="chip-row">{items.map((x) => <button key={x.id} type="button" className={`choice ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} onClick={() => set(x.id)}>{x.name}{x.grams ? `, ${x.grams} g` : ""}</button>)}</div>
+  const hn = h.name.toLowerCase();
+  const Pick = ({ items, on, set }: { items: { id: string; name: string }[]; on: string; set: (v: string) => void }) => (
+    <div className="chip-row">{items.map((x) => <button key={x.id} type="button" className={`choice ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} onClick={() => set(x.id)}>{x.name}</button>)}</div>
   );
   return (
-    <section className="l-try">
-      <span className="l-eyebrow">Try it</span>
-      <h2>You crave {w.amount}. How much {hn} makes the plate fit?</h2>
-      <p>The answer is worked out for Recomposition, the goal most people pick: lose fat and build muscle at the same time. The page uses the same math as the app, and nothing you pick here is saved.</p>
-      <div className="l-try-box">
-        <div className="setting"><small className="setting-name">You crave</small><Pick items={WANTS} on={want} set={setWant} /></div>
-        <div className="setting"><small className="setting-name">You have at home</small><Pick items={HAVES} on={have} set={setHave} /></div>
-        <div className="l-try-result" aria-live="polite">
-          <b>Add {r.grams} g of {hn}</b>
-          <span>That's {r.total} g on the plate in all: {w.amount} and {r.grams} g of {hn}. Together it's {r.kcal} kcal and {Math.round(r.protein)} g of protein, a PD of {r.pd}, a typical target for Recomposition.</span>
-          {big ? <small>That's a very big bowl. With {big.grams} g of {wn} instead, {big.partner} g of {hn} is enough, {big.grams + big.partner} g in all.</small>
-               : <small>On its own, {w.alone} very little protein. The {hn} adds the protein, so the whole plate fits.</small>}
+    <div className="l-try-box">
+      <div className="setting"><small className="setting-name">You crave</small><Pick items={WANTS} on={want} set={setWant} /></div>
+      <div className="setting"><small className="setting-name">You have at home</small><Pick items={offered} on={h.id} set={setHave} /></div>
+      <div className="l-try-result" aria-live="polite">
+        <b>Add {r.grams} g of {hn}</b>
+        <div className="l-jump">
+          <div className="l-jump-from"><small>{w.alone} alone</small><b>PD {a.pd.toFixed(1)}</b><small>{a.kcal} kcal, {a.protein} g protein</small></div>
+          <b className="l-jump-arrow" aria-hidden="true">→</b>
+          <div className="l-jump-to"><small>With the {hn}</small><b>PD {r.pd.toFixed(1)}</b><small>{r.kcal} kcal, {Math.round(r.protein)} g protein</small></div>
         </div>
-        <div className="l-pd">
-          <b>What is PD?</b>
-          <p>PD stands for protein density: how many grams of protein a food or a plate gives you for every 100 kcal. The higher the PD, the more protein you get for the same calories. Chef Mealan gives you a PD target for each day, and fits every plate to it.</p>
-        </div>
+        <span>{w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} The {hn} adds the protein, so the plate fits.</span>
+        {big && <small>{r.total} g is a very big bowl. With {big.grams} g of {w.name.toLowerCase()} instead, {big.partner} g of {hn} is enough, {big.grams + big.partner} g in all.</small>}
       </div>
-    </section>
+      <small className="l-try-small">Worked out for {DEMO_GOAL.name}, the goal most people pick. PD is grams of protein in 100 kcal. Nothing you pick here is saved.</small>
+    </div>
   );
 }
 

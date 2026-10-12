@@ -79,16 +79,25 @@ test("old profiles and goals move over", async () => {
 
 test("the home page's Try it uses the app's lift: 40 g chocolate spread needs 125 g skyr for PD 5.5", async () => {
   const { lift, WANTS, HAVES } = await import("./landing");
-  const r = lift(WANTS[0], HAVES[0], 5.5);
+  const spread = WANTS.find((w) => w.id === "spread")!, skyr = HAVES.find((h) => h.id === "skyr")!;
+  const r = lift(spread, skyr, 5.5);
   assert.equal(r.grams, 125); assert.equal(r.kcal, 294); assert.equal(Math.round(r.protein), 16); assert.equal(r.pd, 5.5);
 });
 
 test("the home page works for Recomposition at PD 6.5 and says how much is on the plate in all", async () => {
-  const { lift, smaller, WANTS, HAVES, DEMO_GOAL, BIG_BOWL } = await import("./landing");
-  const r = lift(WANTS[0], HAVES[0], DEMO_GOAL.pd);
+  const { lift, smaller, alone, havesFor, WANTS, HAVES, DEMO_GOAL, BIG_BOWL } = await import("./landing");
+  const spread = WANTS.find((w) => w.id === "spread")!, skyr = HAVES.find((h) => h.id === "skyr")!;
+  const r = lift(spread, skyr, DEMO_GOAL.pd);
   assert.equal(r.grams, 165); assert.equal(r.total, 205); assert.equal(r.kcal, 320); assert.equal(Math.round(r.protein), 21); assert.equal(r.pd, 6.5);
-  for (const w of WANTS) for (const h of HAVES) { const x = lift(w, h, DEMO_GOAL.pd); assert.ok(x.grams > 0 && x.grams <= BIG_BOWL, `${w.id}+${h.id}: ${x.grams} g`); }
-  const s = smaller({ ...WANTS[0], grams: 80 }, HAVES[1], DEMO_GOAL.pd);
+  // board HP, 12 October 2026: granola first, 145 g of skyr lifts PD 2.0 to 6.5; a pizza slice takes 40 g of tuna
+  const g = lift(WANTS[0], skyr, DEMO_GOAL.pd);
+  assert.equal(WANTS[0].id, "granola"); assert.equal(g.grams, 145); assert.equal(g.pd, 6.5); assert.equal(alone(WANTS[0]).pd, 2);
+  const pizza = WANTS.find((w) => w.id === "pizza")!;
+  assert.equal(lift(pizza, HAVES.find((h) => h.id === "tuna")!, DEMO_GOAL.pd).grams, 40);
+  // every craving with every food offered next to it stays a sensible bowl; a savoury craving is never offered skyr
+  for (const w of WANTS) for (const h of havesFor(w)) { const x = lift(w, h, DEMO_GOAL.pd); assert.ok(x.grams > 0 && x.grams <= BIG_BOWL, `${w.id}+${h.id}: ${x.grams} g`); }
+  assert.ok(!havesFor(pizza).some((h) => h.id === "skyr"));
+  const s = smaller({ ...spread, grams: 80 }, HAVES[1], DEMO_GOAL.pd);
   assert.ok(s && s.partner <= BIG_BOWL && s.grams < 80);
 });
 test("protein: the middle of the range, the top when losing fat, eating mostly plants or over 60", async () => {
