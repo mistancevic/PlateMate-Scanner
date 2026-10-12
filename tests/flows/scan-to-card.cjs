@@ -23,7 +23,7 @@ seed.items = [];
     await page.goto("http://127.0.0.1:3198/"); await page.waitForTimeout(800);
     await require("./foods.cjs")(page);
     await page.getByRole("button", { name: "Add a food" }).click(); await page.waitForTimeout(300);
-    await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2000);
+    await page.getByRole("button", { name: /^Scan( food)?$/ }).first().click(); await page.waitForTimeout(2000);
     await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(400);
     const line = () => page.locator(".cam-line").count();
     ok(await line() === 1, "the green line moves while the camera reads");

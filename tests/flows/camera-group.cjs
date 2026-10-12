@@ -13,14 +13,14 @@ const seed = JSON.parse(fs.readFileSync(require("node:path").resolve(__dirname, 
   await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3180/"); await page.waitForTimeout(800);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(400);
-  await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2500);
+  await page.getByRole("button", { name: /^Scan( food)?$/ }).first().click(); await page.waitForTimeout(2500);
   // JOURNEY INVARIANT (Milan, 4 October 2026): Scan opens the single-product camera, Label, where several sides of one product stage
   // and go as one read; Several products is the explicit choice, never the default, whatever mode was used before. Never rewrite these lines to fit a change.
   const on = async (re) => page.getByRole("button", { name: re }).evaluate((b) => b.className.includes("bg-white"));
   console.log((await on(/^Label$/)) ? "ok   Scan opens the single-product camera" : "FAIL Scan did not open the single-product camera"); if (!(await on(/^Label$/))) process.exitCode = 1;
   await page.getByRole("button", { name: /^Group$/ }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /Close camera|Cancel|Close/ }).first().click(); await page.waitForTimeout(400);
-  await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2500);
+  await page.getByRole("button", { name: /^Scan( food)?$/ }).first().click(); await page.waitForTimeout(2500);
   console.log((await on(/^Label$/)) ? "ok   Scan opens the single-product camera again after Group was used" : "FAIL Scan reopened in the last mode"); if (!(await on(/^Label$/))) process.exitCode = 1;
   await page.getByRole("button", { name: /^Group$/ }).click(); await page.waitForTimeout(400);
   await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(500);

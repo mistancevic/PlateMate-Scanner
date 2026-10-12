@@ -56,7 +56,7 @@ seed.items = [];
   ok(sarmaGrams.join(",") === "100,150,25", "the recipe's amounts stay one portion: " + sarmaGrams.join(", "));
   // Where does this go: Scan from Today, a barcode, the sheet
   await page.getByRole("button", { name: /^Today$/ }).first().click(); await page.waitForTimeout(500);
-  await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(1500);
+  await page.getByRole("button", { name: /^Scan( food)?$/ }).first().click(); await page.waitForTimeout(1500);
   ok(await page.locator(".cam-title").count() === 1, "Scan from Today opens the camera");
   await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(400);
   const field = page.locator('input[aria-label="Type the barcode"]');

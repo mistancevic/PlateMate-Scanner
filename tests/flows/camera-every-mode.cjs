@@ -21,7 +21,7 @@ seed.items = [];
   await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3199/"); await page.waitForTimeout(800);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(400);
-  await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2500);
+  await page.getByRole("button", { name: /^Scan( food)?$/ }).first().click(); await page.waitForTimeout(2500);
 
   // Label: two shots stage, nothing sent, Analyze 2 sends both as one label scan
   await page.getByRole("button", { name: /^Label$/ }).click(); await page.waitForTimeout(400);
@@ -34,7 +34,7 @@ seed.items = [];
   ok(calls.length === 1 && calls[0].images.length === 2 && calls[0].mode === "label", "label: Analyze sends both photos as one label scan");
 
   // Barcode: the code is read, the camera stays open, a photo stages, Analyze sends the code plus the photo
-  await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2500);
+  await page.getByRole("button", { name: /^Scan( food)?$/ }).first().click(); await page.waitForTimeout(2500);
   await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(400);
   await page.locator('input[aria-label^="Type t"]').fill("4260345270123"); await page.keyboard.press("Enter"); await page.waitForTimeout(600);
   ok(await page.locator("#camera-shutter-button").count() === 1, "barcode: the camera stays open after the code is read");
@@ -47,7 +47,7 @@ seed.items = [];
   ok(calls.length === 2 && calls[1].images.length === 1 && calls[1].barcode === "4260345270123", "barcode: and sends the photo with the code");
 
   // Barcode: Use the code only sends the code alone
-  await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(2500);
+  await page.getByRole("button", { name: /^Scan( food)?$/ }).first().click(); await page.waitForTimeout(2500);
   await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(400);
   await page.locator('input[aria-label^="Type t"]').fill("4260345270123"); await page.keyboard.press("Enter"); await page.waitForTimeout(600);
   await page.getByRole("button", { name: /Use the code only/ }).click(); await page.waitForTimeout(800);

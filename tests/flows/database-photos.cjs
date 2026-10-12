@@ -26,7 +26,7 @@ seed.items = [];
     await page.goto("http://127.0.0.1:3190/"); await page.waitForTimeout(800);
     await require("./foods.cjs")(page);
     await page.getByRole("button", { name: "Add a food" }).click(); await page.waitForTimeout(200);
-    await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(1500);
+    await page.getByRole("button", { name: /^Scan( food)?$/ }).first().click(); await page.waitForTimeout(1500);
     await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(300);
     await page.locator('input[aria-label="Type the barcode"]').fill("4260345270999"); await page.keyboard.press("Enter"); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "Use the code only" }).click(); await page.waitForTimeout(1800);

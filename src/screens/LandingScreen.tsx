@@ -127,7 +127,7 @@ function PhoneToday() {
         <small className="l-ph-day">Monday: strength, hard, in the evening.</small>
       </div>
       <span className="l-ph-btn primary">I'm craving something</span>
-      <span className="l-ph-btn">Scan</span>
+      <span className="l-ph-btn">Scan food</span>
     </div>
   );
 }
