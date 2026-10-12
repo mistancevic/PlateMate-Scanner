@@ -145,3 +145,11 @@ test("a photo removed on one phone goes on the other, from its own store", () =>
   assert.deepEqual(b.s.foods[0].photos, [J("1")]);
   assert.equal(b.sync("10:04").ups.length, 0);
 });
+
+test("a recipe's photos travel as fingerprints, never as pictures, and stay with the phone that has them", async () => {
+  const { clean } = await import("./records");
+  const P = (n: number) => `data:image/jpeg;base64,${"B".repeat(40 + n)}`;
+  const c = clean("recipes", { id: "m1", title: "Eggs", items: [], photo: P(1), photos: [P(2)] });
+  assert.equal(c.photo, undefined); assert.equal(c.photos, undefined);
+  assert.equal(c.photoSigs.length, 2); assert.equal(c.photoCount, 1);
+});

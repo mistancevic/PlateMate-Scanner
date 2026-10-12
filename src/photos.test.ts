@@ -73,3 +73,25 @@ test("removing every photo removes the files too; an empty list stays empty", ()
   assert.equal(isOrphan("food:f1", s), true); assert.equal(isOrphan("food:f1:1", s), true);
   assert.equal((withPhotos(s, new Map([["food:f1:1", P(2)]])) as any).foods[0].photos.length, 0);
 });
+
+// Recipe photos (0.2.5+r10, board S3, R4 to R6): a recipe keeps its cover and its other photos like a food
+test("a recipe's cover and photos are files: stored, dropped from the saved data, brought back, removed with the recipe", async () => {
+  const { recipePhotosOf, withRecipePhotos, recipeHasPhotos, photosWanted } = await import("./photos");
+  const s: any = { foods: [], feedback: [], items: [], meals: [{ id: "m1", title: "Eggs", items: [], ...withRecipePhotos([P(5), P(6)]) }, { id: "m2", title: "Oats", items: [] }] };
+  const all = photosOf(s);
+  assert.equal(all.get("meal:m1"), P(5)); assert.equal(all.get("meal:m1:1"), P(6)); assert.equal(all.has("meal:m2"), false);
+  const slim: any = withoutStored(s, new Set(["meal:m1", "meal:m1:1"]));
+  assert.equal(slim.meals[0].photo, undefined); assert.equal(slim.meals[0].photos, undefined);
+  assert.deepEqual(slim.meals[0].photoSigs, [sig(P(5)), sig(P(6))]); assert.equal(slim.meals[0].photoCount, 1);
+  assert.ok(recipeHasPhotos(slim.meals[0]), "photos still to fetch count as the recipe's own");
+  assert.deepEqual([...photosWanted(slim).keys()], ["meal:m1", "meal:m1:1"]);
+  const back: any = withPhotos(slim, all);
+  assert.deepEqual(recipePhotosOf(back.meals[0]), [P(5), P(6)]);
+  // the cover made from the second photo, then the first removed: the extra file is an orphan, the cover stays
+  const swapped: any = { ...s, meals: [{ ...s.meals[0], ...withRecipePhotos([P(6)]) }, s.meals[1]] };
+  assert.equal(isOrphan("meal:m1:1", swapped), true); assert.equal(isOrphan("meal:m1", swapped), false);
+  const none: any = { ...s, meals: [{ ...s.meals[0], ...withRecipePhotos([]) }, s.meals[1]] };
+  assert.equal(isOrphan("meal:m1", none), true, "the last photo removed takes the cover file with it");
+  assert.equal(isOrphan("meal:m1", { ...s, meals: [] }), true, "a deleted recipe takes its photos with it");
+  assert.equal(isOrphan("meal:m1", slim), false, "photos not loaded yet are never orphans");
+});

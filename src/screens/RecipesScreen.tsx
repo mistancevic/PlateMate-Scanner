@@ -1,4 +1,4 @@
-import { Utensils, Trash2 } from "lucide-react";
+import { Utensils, Trash2, Camera } from "lucide-react";
 import type { Meal } from "../pilot";
 import { fmt } from "../ui";
 import type { AppApi } from "./api";
@@ -7,6 +7,8 @@ import { useEffect, useState } from "react";
 import { useKept } from "../kept";
 import { PublishSheet, type Published } from "../components/PublishSheet";
 import { localAs } from "../recipes";
+import { RecipePhotos } from "../components/RecipePhotos";
+import { recipePhotosOf, recipeHasPhotos } from "../photos";
 
 export function RecipesScreen(p: AppApi) {
   const { state, setState, setTab } = p;
@@ -22,6 +24,24 @@ export function RecipesScreen(p: AppApi) {
   // the cook's own recipes on the site, where each one is, by the recipe they came from (board RG3)
   const [published, setPublished] = useKept<Record<string, Published>>(`published-${keptKey}`, {});
   const [publishing, setPublishing] = useState<string | null>(null);
+  // Photos of a recipe (0.2.5+r10, board S3, R5): which recipe's sheet is open
+  const [photosFor, setPhotosFor] = useState<string | null>(null);
+  const setMealPhotos = (id: string, patch: Pick<Meal, "photo" | "photos">) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === id ? { ...x, ...patch } : x)) }));
+  // R4: a live recipe whose page has a photo and the app has none takes the page's photo once, as its cover
+  useEffect(() => {
+    for (const m of state.meals) {
+      const pub = published[m.id];
+      if (!pub?.hasPhoto || !pub.slug || m.pagePhotoTaken || recipeHasPhotos(m) || (pub.status && pub.status !== "live")) continue;
+      fetch(`/r/${pub.slug}/photo.jpg`).then((r) => (r.ok ? r.blob() : null)).then((b) => new Promise<string | null>((res) => {
+        if (!b || !b.type.startsWith("image/")) return res(null);
+        const fr = new FileReader(); fr.onload = () => res(String(fr.result)); fr.onerror = () => res(null); fr.readAsDataURL(b);
+      })).then((data) => {
+        if (!data) return;
+        setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === m.id && !recipeHasPhotos(x) && !x.pagePhotoTaken ? { ...x, photo: data, photos: [], pagePhotoTaken: true } : x)) }));
+      }).catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [published, state.meals.length]);
   useEffect(() => {
     fetch("/api/my-recipes", { headers: localAs(client) }).then((r) => (r.ok ? r.json() : { recipes: [] })).then((d) => {
       setCook({ cook: Boolean(d.cook), direct: Boolean(d.direct) });
@@ -56,11 +76,15 @@ export function RecipesScreen(p: AppApi) {
         </section>
       )}
       {shown.map((m) => {
-        const photo = photoOf(m), n = madeTimes(m), rating = lastRating(m);
+        // R4: the recipe's own cover; a recipe without photos of its own shows the newest plate photo from its cards
+        const own = recipePhotosOf(m), photo = own[0] ?? photoOf(m), n = madeTimes(m), rating = lastRating(m);
         const st = isCoach ? pubState(m.id, Boolean(m.publish)) : null; const pub = published[m.id];
         return (
           <section className="card recipe-tile" key={m.id}>
-            {photo ? <img src={photo} alt="" /> : <div className="recipe-tile-blank"><Utensils size={28} /></div>}
+            <button type="button" className="recipe-tile-photo" onClick={() => setPhotosFor(m.id)} aria-label={`Photos of ${m.title}`}>
+              {photo ? <img src={photo} alt="" /> : <div className="recipe-tile-blank"><Utensils size={28} /></div>}
+              <span className="recipe-tile-photos"><Camera size={13} /> {photo ? "Photos" : "Add a photo"}</span>
+            </button>
             <div className="recipe-tile-body">
               <div className="card-top">
                 {naming?.id === m.id
@@ -83,6 +107,7 @@ export function RecipesScreen(p: AppApi) {
           </section>
         );
       })}
+          {photosFor && (() => { const pm = state.meals.find((x) => x.id === photosFor); return pm ? <RecipePhotos meal={pm} cards={state.feedback} onPhotos={(patch) => setMealPhotos(pm.id, patch)} close={() => setPhotosFor(null)} /> : null; })()}
           {pubMeal && <PublishSheet meal={pubMeal} cards={state.feedback} author={author} published={published[pubMeal.id] ?? null} close={() => setPublishing(null)}
             onDone={(r) => setPublished((x) => { const y = { ...x }; if (r) y[pubMeal.id] = r; else delete y[pubMeal.id]; return y; })}
             onMeal={(patch) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === pubMeal.id ? { ...x, ...patch } : x)) }))}

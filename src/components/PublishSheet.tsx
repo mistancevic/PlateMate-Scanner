@@ -6,6 +6,8 @@ import { RecipeView } from "../screens/RecipePages";
 import { instagramImages } from "../instaImages";
 import { resizeImageBase64 } from "../utils/image";
 import { useBack } from "../back";
+import { recipePhotosOf, withRecipePhotos } from "../photos";
+import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
 
 // Canvas board R5 (7 October 2026), redrawn as RG1 to RG3 with RF4 (8 October): a cook publishes a recipe that's already
 // in the app. The foods and grams come from the app; the cook adds what a reader needs. What is typed is kept with the
@@ -20,17 +22,15 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
 }) {
   useBack(true, close);
   const mine = cards.filter((c) => c.meal?.title === meal.title).sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
-  // photos to pick from: the plate photos of this recipe's cards; a food's pack photo can show a brand, so it isn't offered
-  const candidates = useMemo(() => {
-    const out: string[] = [];
-    for (const c of mine) if (c.photo && !out.includes(c.photo)) out.push(c.photo);
-    return out.slice(0, 8);
+  // photos to pick from (0.2.5+r10, board S3, R6): the recipe's own photos, the cover first, then the plate photos of its
+  // cards; a food's pack photo can show a brand, so it isn't offered. A photo uploaded here joins the recipe's photos.
+  const own = recipePhotosOf(meal);
+  const candidates = useMemo(() => cardPhotosOf(meal, cards).slice(0, 8),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [meal.id]);
+    [meal.id]);
   const d: PublishDraft = meal.publish ?? {};
-  const [extra, setExtra] = useState<string[]>([]);
-  const photos = [...extra, ...candidates];
-  const [photoAt, setPhotoAt] = useState(Math.min(d.photoAt ?? 0, Math.max(0, candidates.length - 1)));
+  const photos = [...own, ...candidates.filter((c) => !own.includes(c))];
+  const [photoAt, setPhotoAt] = useState(own.length ? 0 : Math.min(d.photoAt ?? 0, Math.max(0, photos.length - 1)));
   const [title, setTitle] = useState(d.title ?? published?.title ?? meal.title);
   const [lines, setLines] = useState(d.lines ?? published?.lines ?? "");
   const [makes, setMakes] = useState(d.makes ?? String(published?.makes ?? 1));
@@ -42,7 +42,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
   const first = useRef(true);
   useEffect(() => {
     if (first.current) { first.current = false; return; }
-    const t = setTimeout(() => onMeal({ steps: steps.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 30), publish: { title, lines, makes, servingName, minutes, names, photoAt: Math.max(0, photoAt - extra.length), savedAt: new Date().toISOString() } }), 500);
+    const t = setTimeout(() => onMeal({ steps: steps.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 30), publish: { title, lines, makes, servingName, minutes, names, photoAt, savedAt: new Date().toISOString() } }), 500);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, lines, makes, servingName, minutes, names, steps, photoAt]);
@@ -129,9 +129,9 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
           <div className="publish-photos">
             {photos.map((src, i) => <button key={i} className={`publish-photo ${photoAt === i ? "on" : ""}`} onClick={() => setPhotoAt(i)} aria-label={`Photo ${i + 1}${photoAt === i ? ", the one shown" : ""}`}><img src={src} alt="" /></button>)}
             <button className="publish-photo add" onClick={() => fileRef.current?.click()} aria-label="Upload a photo"><ImageIcon size={20} /></button>
-            <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (!f) return; const r = new FileReader(); r.onload = () => { setExtra((x) => [String(r.result), ...x]); setPhotoAt(0); }; r.readAsDataURL(f); }} />
+            <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (!f) return; const r = new FileReader(); r.onload = async () => { const raw = String(r.result); const data = await resizeImageBase64(raw, 1080, 1080).catch(() => raw); const list = own.includes(data) ? own : [...own, data].slice(0, MAX_RECIPE_PHOTOS); onMeal(withRecipePhotos(list)); setPhotoAt(Math.max(0, list.indexOf(data))); }; r.readAsDataURL(f); }} />
           </div>
-          <small className="muted">{photos.length ? "The plate photos from this recipe's cards. The one with the blue frame leads, on the page and on the images." : "Upload a photo of the plate; without one the page shows no photo."}</small>
+          <small className="muted">{photos.length ? "The recipe's photos, the cover first, then the plate photos from its cards. The one with the blue frame leads, on the page and on the images. An uploaded photo is kept with the recipe." : "Upload a photo of the plate; the photo is kept with the recipe. Without one the page shows no photo."}</small>
         </div>
         <label className="field-label">Name<input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} /></label>
         <label className="field-label">Two lines about it<textarea value={lines} onChange={(e) => setLines(e.target.value)} maxLength={240} placeholder="Thin, soft, and they roll without breaking." /></label>

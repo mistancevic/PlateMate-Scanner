@@ -12,12 +12,15 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   for (let i = 0; i < 60; i++) { try { await fetch("http://127.0.0.1:3197/"); break; } catch { await new Promise((r) => setTimeout(r, 500)); } }
   const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
-  for (const [w, h, tag] of [[1200, 900, "desktop"], [390, 844, "phone"]]) {
+  for (const [w, h, tag] of [[1200, 900, "desktop"], [390, 844, "phone"], [360, 780, "small phone"], [900, 900, "tablet"]]) {
     const page = await b.newPage({ viewport: { width: w, height: h } });
     const errs = []; page.on("pageerror", (e) => errs.push(e.message));
     await page.goto("http://127.0.0.1:3197/built"); await page.waitForSelector(".bt h1");
     ok(/A product built with AI/.test(await page.locator(".bt h1").textContent()), `${tag}: /built opens without signing in`);
     ok(/Milan Stancevic, a senior product manager and founder/.test(await page.locator(".bt-lead").textContent()), `${tag}: B1, the lead names the product role first`);
+    // 0.2.5+r10: the diagram is scaled to its box; no part sticks out on a narrow screen
+    const out = await page.evaluate(() => { const d = document.querySelector(".bt-diagram").getBoundingClientRect(); return [...document.querySelectorAll(".bt-node, .bt-group, .bt-quality")].filter((n) => { const x = n.getBoundingClientRect(); return x.right > d.right + 0.5 || x.left < d.left - 0.5 || x.bottom > d.bottom + 0.5; }).length; });
+    ok(out === 0, `${tag}: every part of the diagram sits inside its box (${out} outside)`);
     // the blueprint: a tap on The AI fills the panel; Follow a craving walks six steps
     await page.locator(".bt-node", { hasText: "The AI" }).click();
     ok(/The AI/.test(await page.locator(".bt-panel h3").textContent()) && /calculator decides/.test(await page.locator(".bt-panel").textContent()), `${tag}: B2, a tap on The AI shows the part and the decision`);

@@ -8,7 +8,7 @@ import { Mark, APP_NAME } from "../components/Mark";
 const VERSION = String(import.meta.env.VITE_VERSION ?? "");
 const FIX_ROUNDS = Number(/\+r(\d+)$/.exec(VERSION)?.[1] ?? 0);
 // walkthroughs: the files in tests/flows that run on their own (not the helpers, not the paths runner): node scripts/run-flows.cjs --count
-export const BUILT_FACTS = { unitTests: 165, walkthroughs: 36 };
+export const BUILT_FACTS = { unitTests: 167, walkthroughs: 37 };
 
 type Tag = "code" | "ai" | "data";
 type Part = { x: number; y: number; w: number; t: string; s: string; tag: Tag; what: string; why: string; built: string };
@@ -44,6 +44,17 @@ function Blueprint() {
   const [phone, setPhone] = useState(() => typeof window !== "undefined" && window.innerWidth < PHONE);
   useEffect(() => { const f = () => setPhone(window.innerWidth < PHONE); window.addEventListener("resize", f); return () => window.removeEventListener("resize", f); }, []);
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
+  // the diagram is drawn at one size and scaled to the box, so no part sticks out on a narrow phone (0.2.5+r10)
+  const [baseW, baseH] = phone ? [366, 690] : [746, 470];
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  useLayoutEffect(() => {
+    const el = boxRef.current; if (!el) return;
+    const fit = () => setScale(Math.min(1, el.clientWidth / baseW));
+    fit();
+    if (typeof ResizeObserver === "undefined") { window.addEventListener("resize", fit); return () => window.removeEventListener("resize", fit); }
+    const ro = new ResizeObserver(fit); ro.observe(el); return () => ro.disconnect();
+  }, [baseW]);
   const [paths, setPaths] = useState<{ d: string; lit: boolean }[]>([]);
   const lit: [string, string][] = mode === "follow" ? STEPS[step].e : phone ? E.filter(([a, b]) => a === sel || b === sel) : [];
   // the lines follow the boxes as the boxes are laid out; on a phone only the lit lines show
@@ -64,7 +75,8 @@ function Blueprint() {
         {(["parts", "follow"] as const).map((m) => <button key={m} role="tab" aria-selected={mode === m} className={mode === m ? "on" : ""} onClick={() => { setMode(m); if (m === "follow") setStep(0); }}>{m === "parts" ? "The parts" : "Follow a craving"}</button>)}
       </div>
       <div className="bt-board">
-        <div className={`bt-diagram ${mode === "follow" ? "follow" : ""}`}>
+        <div ref={boxRef} className={`bt-diagram ${mode === "follow" ? "follow" : ""}`} style={{ height: Math.round(baseH * scale) }}>
+         <div className="bt-canvas" style={{ width: baseW, height: baseH, transform: scale < 1 ? `scale(${scale})` : undefined }}>
           <svg aria-hidden="true"><g>{paths.map((p, i) => <path key={i} className={`bt-edge ${p.lit ? "lit" : ""}`} d={p.d} />)}</g></svg>
           {(phone ? G.m : G.d).map(([x, y, w, h], i) => <div key={i} className="bt-group" style={{ left: x, top: y, width: w, height: h }}><small>{i === 0 ? "Your phone" : "Outside services"}</small></div>)}
           {Object.entries(N).map(([k, n]) => {
@@ -77,6 +89,7 @@ function Blueprint() {
             );
           })}
           <button className="bt-quality" onClick={() => { setMode("parts"); setSel("quality"); }}><b>{Q.t}</b><span>{BUILT_FACTS.unitTests} unit tests · {BUILT_FACTS.walkthroughs} walkthroughs · model evals · preview, then production</span></button>
+         </div>
         </div>
         <div className="bt-panel" aria-live="polite">
           {mode === "parts" ? (

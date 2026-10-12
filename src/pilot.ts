@@ -101,6 +101,14 @@ export type Meal = {
   publish?: PublishDraft;
   // Coach's recipes on the Recipes tab (X0, 10 October 2026)
   from?: "coach";
+  // the recipe's own photos (0.2.5+r10, board S3, R4 to R6): the cover, then up to 5 more; as files in the store and the
+  // account, like a food's (photoSigs and photoCount say which, when the photos themselves are not loaded)
+  photo?: string;
+  photos?: string[];
+  photoSigs?: string[];
+  photoCount?: number;
+  // the published page's photo was taken in once as the cover, so a removed cover never comes back from the page
+  pagePhotoTaken?: boolean;
   // what kind of plate this is (Today, 10 October 2026): a meal, or a dessert sized at about a tenth of the day
   kind?: PlateKind;
 };

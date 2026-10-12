@@ -23,7 +23,7 @@ export function clean(kind: Kind, x: any): any {
   if (!c) return c;
   // which photos it has travels with it (the photos themselves are files), so another phone fetches the right ones
   if (kind === "foods") { const ps = photoSigsOf(c); if (ps) c.photoSigs = ps; stripFood(c); }
-  if (kind === "recipes") (c.items ?? []).forEach((i: any) => stripFood(i?.food));
+  if (kind === "recipes") { const ps = photoSigsOf(c); if (ps) c.photoSigs = ps; stripFood(c); (c.items ?? []).forEach((i: any) => stripFood(i?.food)); }
   if (kind === "cards") { const ps = photoSigsOf({ photo: c.photo }); if (ps) c.photoSigs = ps; delete c.photo; (c.meal?.items ?? []).forEach((i: any) => stripFood(i?.food)); }
   return c;
 }
@@ -96,7 +96,7 @@ export function merge(state: any, remote: Remote, known: Known, localAt: string)
       if (r.at > localWhen) {
         // this phone's photos stay only when they are the ones the newer copy names; otherwise they are fetched again
         const mine = samePhotos(kind === "cards" ? { photo: local.photo } : local, r.data);
-        const keep = !mine ? {} : kind === "foods" ? { photo: local.photo, photos: local.photos } : kind === "cards" ? { photo: local.photo } : {};
+        const keep = !mine ? {} : kind === "foods" || kind === "recipes" ? { photo: local.photo, photos: local.photos } : kind === "cards" ? { photo: local.photo } : {};
         list[i!] = { ...r.data, ...Object.fromEntries(Object.entries(keep).filter(([, v]) => v !== undefined)) };
         next[k] = { sig: remoteSig, at: r.at }; touched = true;
       }

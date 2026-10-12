@@ -2,6 +2,7 @@
 // On the phone they live in their own photo store (IndexedDB), never inside the saved data, which browsers cap at about 5 MB.
 // In the account they live as image files in Firebase Storage, Frankfurt, under users/{uid}/photos/.
 // Keys, as before: food:<foodId> is the small preview, food:<foodId>:<n> the larger copies, fb:<cardId> a plate photo.
+// meal:<recipeId> is a recipe's cover and meal:<recipeId>:<n> its other photos (0.2.5+r10, board S3, R4 to R6).
 
 type Photoish = { photo?: string; photos?: string[] };
 const isData = (x: unknown): x is string => typeof x === "string" && x.startsWith("data:");
@@ -31,6 +32,8 @@ export function photosOf(state: any): Map<string, string> {
   (state?.foods ?? []).forEach(food);
   // a card's photos (10 October 2026): the plate photo as the preview, the meal's photos as the copies, like a food
   (state?.feedback ?? []).forEach(rec("fb"));
+  // a recipe's own photos: the cover as the first, the others as the copies
+  (state?.meals ?? []).forEach(rec("meal"));
   const lib = libraryIds(state);
   copiesOf(state).filter((f) => !lib.has(f.id)).forEach(food);
   return out;
@@ -60,6 +63,11 @@ export function photosWanted(state: any): Map<string, string> {
     const want: string[] | undefined = Array.isArray(fb?.photoSigs) ? fb.photoSigs : undefined;
     if (!fb?.id || !want || loaded(fb)) continue;
     want.forEach((s, n) => { if (s) out.set(n === 0 ? `fb:${fb.id}` : `fb:${fb.id}:${n}`, s); });
+  }
+  for (const m of state?.meals ?? []) {
+    const want: string[] | undefined = Array.isArray(m?.photoSigs) ? m.photoSigs : undefined;
+    if (!m?.id || !want || loaded(m)) continue;
+    want.forEach((s, n) => { if (s) out.set(n === 0 ? `meal:${m.id}` : `meal:${m.id}:${n}`, s); });
   }
   return out;
 }
@@ -97,7 +105,7 @@ export function withPhotos<T>(state: T, photos: Map<string, string>, accept?: Se
     changed = true;
     return { ...f, photo: thumb, photos: more };
   };
-  const food = rec("food"), card = rec("fb");
+  const food = rec("food"), card = rec("fb"), recipe = rec("meal");
   const inItems = (items: any[] | undefined) => (items ?? []).map((i: any) => (i?.food ? { ...i, food: food(i.food) } : i));
   const next = {
     ...s,
@@ -107,7 +115,7 @@ export function withPhotos<T>(state: T, photos: Map<string, string>, accept?: Se
       return { ...withOwn, meal: fb.meal ? { ...fb.meal, items: inItems(fb.meal.items) } : fb.meal };
     }),
     items: inItems(s.items),
-    meals: (s.meals ?? []).map((m: any) => ({ ...m, items: inItems(m.items) })),
+    meals: (s.meals ?? []).map((m: any) => ({ ...recipe(m), items: inItems(m.items) })),
   };
   return changed ? next : state;
 }
@@ -139,6 +147,14 @@ export function withoutStored<T>(state: T, stored: Set<string>): T {
     fb.photoSigs = photoSigsOf(fb); fb.hasPhoto = isData(fb.photo);
     delete fb.photo; delete fb.photos;
   });
+  (s.meals ?? []).forEach((m: any) => {
+    if (!m || !m.id) return;
+    const keys = [...(isData(m.photo) ? [`meal:${m.id}`] : []), ...((m.photos ?? []) as string[]).map((_, n) => `meal:${m.id}:${n + 1}`)];
+    if (!keys.length || !keys.every((k) => stored.has(k))) return;
+    m.photoCount = Array.isArray(m.photos) ? m.photos.length : 0;
+    m.photoSigs = photoSigsOf(m);
+    delete m.photo; delete m.photos;
+  });
   return s;
 }
 
@@ -152,6 +168,13 @@ export const keyOf = (file: string) => file.replace(/\.jpg$/, "").replace(/~/g, 
 // A food that left the library keeps its photos while a plate, a meal or a card still shows it.
 export function isOrphan(key: string, state: any): boolean {
   const [kind, id, n] = key.split(":");
+  // a recipe's photo: gone with the recipe, with a cover removed, or past the end of its list
+  if (kind === "meal") {
+    const m = (state?.meals ?? []).find((x: any) => x?.id === id);
+    if (!m) return true;
+    if (!Array.isArray(m.photos)) return false;
+    return n ? m.photos.length < Number(n) : !isData(m.photo);
+  }
   if (kind === "fb") {
     const fb = (state?.feedback ?? []).find((f: any) => f?.id === id);
     if (!fb) return true;
@@ -231,3 +254,11 @@ export function realPhotosOf(f: { photos?: string[]; photo?: string } | null | u
   if (!f) return [];
   return (f.photos?.length ? f.photos : f.photo ? [f.photo] : []).filter((x) => x && !isDrawn(x));
 }
+
+// A recipe's photos in order (0.2.5+r10, board S3, R4 to R6): the cover first, then the others. Kept on the recipe as the
+// cover (photo) and the others (photos), the same shape as a food, so the photo store and the account treat them alike.
+export const recipePhotosOf = (m: { photo?: string; photos?: string[] } | null | undefined): string[] =>
+  m ? [m.photo, ...(m.photos ?? [])].filter(isData) : [];
+export const withRecipePhotos = (list: string[]) => ({ photo: list[0], photos: list.slice(1) });
+// whether a recipe has photos of its own, here or on another phone still to be fetched
+export const recipeHasPhotos = (m: any) => recipePhotosOf(m).length > 0 || (Array.isArray(m?.photoSigs) && m.photoSigs.some(Boolean));
