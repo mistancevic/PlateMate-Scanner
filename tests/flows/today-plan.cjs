@@ -51,7 +51,7 @@ seed.items = [];
   // a new name on the Plate reaches the recipe and the slot at once, before anything is saved (Milan, 11 October 2026)
   await page.locator(".title-input").click(); await page.keyboard.press("Control+A"); await page.keyboard.type("Skyr at noon", { delay: 20 }); await page.keyboard.press("Enter"); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^Recipes$/ }).first().click(); await page.waitForTimeout(500);
-  ok(await page.getByRole("button", { name: "Rename Skyr at noon" }).count() === 1 && await page.getByRole("button", { name: "Rename Morning skyr" }).count() === 0, "Recipes shows the new name");
+  ok(await page.getByRole("button", { name: "Open Skyr at noon" }).count() === 1 && await page.getByRole("button", { name: "Open Morning skyr" }).count() === 0, "Recipes shows the new name");
   await page.getByRole("button", { name: /^Today$/ }).first().click(); await page.waitForTimeout(500);
   ok(/Skyr at noon/.test(await page.locator(".cooking").textContent()), "Today's plan row shows the new name");
   await page.getByRole("button", { name: /Lunch at 08:00, Skyr at noon/ }).click(); await page.waitForTimeout(600);
@@ -80,12 +80,13 @@ seed.items = [];
   const rec = await page.locator(".day-record").textContent();
   ok(/the record/.test(rec) && /2 of 2 by the plan, 1 extra \(/.test(rec), "the record line: " + rec.replace(/\s+/g, " ").slice(0, 120));
   ok(/All 2 slots eaten/.test(await page.locator(".cooking").textContent()) && /Today went mostly by the plan/.test(await page.locator(".cooking").textContent()), "the plan card closes the day");
-  // Recipes: Open puts the recipe on the Plate with its name, nothing decided
+  // Recipes (0.2.5+r11, R7, R10): a tile opens the recipe's page; Make it puts the recipe on the Plate with its name, nothing decided
   await page.getByRole("button", { name: /^Recipes$/ }).first().click(); await page.waitForTimeout(500);
-  ok(await page.getByRole("button", { name: "Open", exact: true }).count() >= 1 && await page.getByRole("button", { name: "Make it again" }).count() === 0, "the tile says Open");
+  ok(await page.locator(".recipe-tile").count() >= 1 && await page.locator(".recipe-tile .pill").count() === 0, "a tile has no buttons; the tile itself opens the recipe");
   const meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.map((m) => m.title));
   ok(meals.length === 3 && meals.filter((t) => t === "Skyr at noon").length === 1, "eating a planned recipe as it stands saves no copy; the extra was saved: " + meals.join(", "));
-  await page.locator(".recipe-tile", { hasText: "Skyr at noon" }).getByRole("button", { name: "Open", exact: true }).click(); await page.waitForTimeout(600);
+  await page.locator(".recipe-tile", { hasText: "Skyr at noon" }).click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(600);
   const head = await page.evaluate(() => { const i = document.querySelector(".title-input"); return i ? "input:" + i.value : "h2:" + (document.querySelector("h2")?.textContent ?? ""); }); ok(/Skyr at noon|Chicken bowl/.test(head), "the Plate opens with the recipe's name: " + head);
   ok(await page.getByRole("button", { name: /Fit to my target/ }).count() === 1, "on the first step, with Fit to my target");
   ok(errs.length === 0, errs.length ? "page errors: " + errs.join(" | ") : "no page errors");

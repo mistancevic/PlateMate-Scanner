@@ -46,9 +46,10 @@ seed.items = [];
   await click(/DaaM good/i); await click(/^Save$/); await page.waitForTimeout(600);
   const meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.map((m) => m.title));
   ok(meals.length === 1, "no second Sarma: " + meals.join(", "));
-  // from Recipes, Open: the dish again, a side next to it; Fit moves the side, never the recipe
+  // from Recipes, Make it (0.2.5+r11, R10): the dish again, a side next to it; Fit moves the side, never the recipe
   await page.getByRole("button", { name: /^Recipes$/ }).first().click(); await page.waitForTimeout(500);
-  await page.getByRole("button", { name: "Open", exact: true }).first().click(); await page.waitForTimeout(600);
+  await page.locator(".recipe-tile").first().click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(600);
   await page.locator(".row-food", { hasText: "Skyr" }).getByRole("button").click(); await page.waitForTimeout(300);
   await click(/Fit to my target/); await page.waitForTimeout(1200);
   ok(await page.locator(".dish-row").count() === 1 && /what Mealan moves/.test(await page.locator(".rows").textContent()), "after Fit the dish is still one row and the side is what Mealan moves");

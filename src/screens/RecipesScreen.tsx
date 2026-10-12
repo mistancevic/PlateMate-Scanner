@@ -1,13 +1,12 @@
-import { Utensils, Trash2, Camera } from "lucide-react";
+import { Utensils, ChevronRight } from "lucide-react";
 import type { Meal } from "../pilot";
 import { fmt } from "../ui";
 import type { AppApi } from "./api";
-import { ConfirmButton } from "../components/Confirm";
 import { useEffect, useState } from "react";
 import { useKept } from "../kept";
 import { PublishSheet, type Published } from "../components/PublishSheet";
 import { localAs } from "../recipes";
-import { RecipePhotos } from "../components/RecipePhotos";
+import { RecipePage, type PubState } from "../components/RecipePage";
 import { recipePhotosOf, recipeHasPhotos } from "../photos";
 
 export function RecipesScreen(p: AppApi) {
@@ -24,9 +23,9 @@ export function RecipesScreen(p: AppApi) {
   // the cook's own recipes on the site, where each one is, by the recipe they came from (board RG3)
   const [published, setPublished] = useKept<Record<string, Published>>(`published-${keptKey}`, {});
   const [publishing, setPublishing] = useState<string | null>(null);
-  // Photos of a recipe (0.2.5+r10, board S3, R5): which recipe's sheet is open
-  const [photosFor, setPhotosFor] = useState<string | null>(null);
-  const setMealPhotos = (id: string, patch: Pick<Meal, "photo" | "photos">) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === id ? { ...x, ...patch } : x)) }));
+  // the recipe's own page (0.2.5+r11, board S3, R8 to R11): which recipe is open
+  const [openId, setOpenId] = useState<string | null>(null);
+  const patchMeal = (id: string, patch: Partial<Meal>) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === id ? { ...x, ...patch } : x)) }));
   // R4: a live recipe whose page has a photo and the app has none takes the page's photo once, as its cover
   useEffect(() => {
     for (const m of state.meals) {
@@ -51,18 +50,32 @@ export function RecipesScreen(p: AppApi) {
   const first = (n?: string | null) => String(n ?? "").trim().split(/\s+/)[0] || "";
   // the byline: From Milan's kitchen (RF4 Q9)
   const author = first(p.user?.name);
-  const pubState = (id: string, draft: boolean) => { const x = published[id]; return x ? (x.status === "waiting" || x.waiting ? "waiting" : x.status === "down" ? "down" : x.status === "back" ? "back" : "live") : draft ? "draft" : null; };
+  const pubState = (id: string, draft: boolean): PubState => { const x = published[id]; return x ? (x.status === "waiting" || x.waiting ? "waiting" : x.status === "down" ? "down" : x.status === "back" ? "back" : "live") : draft ? "draft" : null; };
   const pubMeal = state.meals.find((m) => m.id === publishing);
   // the Recipes tab (X0 and Y1, 10 October 2026): My recipes and Coach's recipes, one tile per recipe with its photo
   const [view, setView] = useState<"mine" | "coach">("mine");
-  // rename (canvas S, Recipes keeps, 11 October 2026): tap the name, it turns into the dashed field, saved on leaving it
-  const [naming, setNaming] = useState<{ id: string; title: string } | null>(null);
-  const saveName = () => { if (naming) { p.renameMeal(naming.id, naming.title); setNaming(null); } };
   const mine = state.meals.filter((m) => m.from !== "coach"), fromCoach = state.meals.filter((m) => m.from === "coach");
   const shown = view === "mine" ? mine : fromCoach;
   const photoOf = (m: Meal) => state.feedback.find((f) => f.meal.id === m.id && f.photo)?.photo ?? state.feedback.find((f) => f.meal.title === m.title && f.photo)?.photo ?? null;
   const madeTimes = (m: Meal) => state.feedback.filter((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.status === "eaten").length;
   const lastRating = (m: Meal) => state.feedback.find((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.taste)?.taste ?? "";
+  const opened = openId ? state.meals.find((m) => m.id === openId) ?? null : null;
+  const sheet = pubMeal && <PublishSheet meal={pubMeal} cards={state.feedback} author={author} published={published[pubMeal.id] ?? null} close={() => setPublishing(null)}
+    onDone={(r) => setPublished((x) => { const y = { ...x }; if (r) y[pubMeal.id] = r; else delete y[pubMeal.id]; return y; })}
+    onMeal={(patch) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === pubMeal.id ? { ...x, ...patch } : x)) }))}
+    direct={cook.direct} approver={approver} client={client} />;
+  // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
+  if (opened) return (
+    <>
+      <RecipePage meal={opened} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
+        pub={published[opened.id] ?? null} approver={approver} direct={cook.direct}
+        onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
+        onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={() => setPublishing(opened.id)}
+        onDelete={() => { setOpenId(null); setState((s) => ({ ...s, meals: s.meals.filter((x) => x.id !== opened.id) })); }}
+        close={() => setOpenId(null)} />
+      {sheet}
+    </>
+  );
   return (
     <>
       <div className="segments" role="tablist" aria-label="Recipes">
@@ -76,42 +89,21 @@ export function RecipesScreen(p: AppApi) {
         </section>
       )}
       {shown.map((m) => {
-        // R4: the recipe's own cover; a recipe without photos of its own shows the newest plate photo from its cards
+        // R7: one tap per recipe: the cover (or the newest plate photo), the name, the foods, where the recipe is
         const own = recipePhotosOf(m), photo = own[0] ?? photoOf(m), n = madeTimes(m), rating = lastRating(m);
-        const st = isCoach ? pubState(m.id, Boolean(m.publish)) : null; const pub = published[m.id];
+        const st = isCoach ? pubState(m.id, Boolean(m.publish)) : null;
         return (
-          <section className="card recipe-tile" key={m.id}>
-            <button type="button" className="recipe-tile-photo" onClick={() => setPhotosFor(m.id)} aria-label={`Photos of ${m.title}`}>
-              {photo ? <img src={photo} alt="" /> : <div className="recipe-tile-blank"><Utensils size={28} /></div>}
-              <span className="recipe-tile-photos"><Camera size={13} /> {photo ? "Photos" : "Add a photo"}</span>
-            </button>
+          <button type="button" className="card recipe-tile" key={m.id} onClick={() => setOpenId(m.id)} aria-label={`Open ${m.title}`}>
+            {photo ? <img src={photo} alt="" /> : <div className="recipe-tile-blank"><Utensils size={28} /></div>}
             <div className="recipe-tile-body">
-              <div className="card-top">
-                {naming?.id === m.id
-                  ? <input className="title-input tile-name" aria-label="Name of the recipe" autoFocus value={naming.title} onChange={(e) => setNaming({ id: m.id, title: e.target.value })} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" />
-                  : <button type="button" className="tile-name-btn" aria-label={`Rename ${m.title}`} onClick={() => setNaming({ id: m.id, title: m.title })}>{m.title}</button>}
-                {st && <small className={`pub-state ${st}`}>{st === "live" ? "Live" : st === "down" ? "Taken down" : st === "waiting" ? `Waiting for ${approver}` : st === "back" ? "Sent back" : "Draft"}</small>}</div>
+              <div className="card-top"><b className="tile-name">{m.title}</b><ChevronRight size={20} className="tile-go" /></div>
               <small>{m.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}{rating ? ` · ${rating}` : ""}{n ? ` · made ${n === 1 ? "once" : `${n} times`}` : ""}</small>
-              {(m.steps?.length ?? 0) > 0 && <details className="recipe-steps"><summary>Steps ({m.steps!.length})</summary><ol>{m.steps!.map((x, k) => <li key={k}>{x}</li>)}</ol></details>}
-              {pub?.note && st !== "waiting" && <small className="pub-note">{approver.charAt(0).toUpperCase() + approver.slice(1)}: “{pub.note}”</small>}
-              <div className="button-row" style={{ marginTop: 10 }}>
-                {/* Open (0.2.3, Milan 11 October): the recipe on the Plate with its name; what happens there is the person's */}
-                <button className="pill pill-small pill-primary" onClick={() => p.openOnPlate(m)}>Open</button>
-                {isCoach && !st && <button className="pill pill-small" onClick={() => setPublishing(m.id)}>Publish</button>}
-                {isCoach && st && pub && (!pub.status || pub.status === "live") && <a className="pill pill-small" href={`/r/${pub.slug}`} target="_blank" rel="noreferrer">See the page</a>}
-                {isCoach && st && <button className="pill pill-small" onClick={() => setPublishing(m.id)}>{st === "waiting" ? "Open it" : st === "live" ? "Change it" : st === "down" ? (cook.direct ? "Publish again" : `Send to ${approver} again`) : "Continue"}</button>}
-                <ConfirmButton className="icon tile-bin" ariaLabel={`Delete recipe ${m.title}`} label={<Trash2 size={16} />} confirmLabel="Sure?"
-                  onConfirm={() => setState((s) => ({ ...s, meals: s.meals.filter((x) => x.id !== m.id) }))} />
-              </div>
+              {st && <small className={`tile-state ${st}`}>{st === "live" ? "Live on chefmealan.com" : st === "down" ? "Taken down" : st === "waiting" ? `Waiting for ${approver}` : st === "back" ? `Sent back by ${approver}` : "Draft"}</small>}
             </div>
-          </section>
+          </button>
         );
       })}
-          {photosFor && (() => { const pm = state.meals.find((x) => x.id === photosFor); return pm ? <RecipePhotos meal={pm} cards={state.feedback} onPhotos={(patch) => setMealPhotos(pm.id, patch)} close={() => setPhotosFor(null)} /> : null; })()}
-          {pubMeal && <PublishSheet meal={pubMeal} cards={state.feedback} author={author} published={published[pubMeal.id] ?? null} close={() => setPublishing(null)}
-            onDone={(r) => setPublished((x) => { const y = { ...x }; if (r) y[pubMeal.id] = r; else delete y[pubMeal.id]; return y; })}
-            onMeal={(patch) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === pubMeal.id ? { ...x, ...patch } : x)) }))}
-            direct={cook.direct} approver={approver} client={client} />}
+      {sheet}
     </>
   );
 }

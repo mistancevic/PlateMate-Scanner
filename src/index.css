@@ -29,7 +29,9 @@
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--base); }
 h1, h2, h3, p { margin-top: 0; }
-h1 { font-size: 20px; font-weight: 900; margin: 0; white-space: nowrap; }
+h1 { font-size: 20px; font-weight: 900; margin: 0; }
+/* only the top bar keeps its title on one line (0.2.5+r11: a long recipe name made the recipe page wider than the phone) */
+.topbar h1 { white-space: nowrap; }
 h2 { font-size: 18px; font-weight: 900; margin-bottom: 8px; }
 h3 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
 p { line-height: 1.5; }
@@ -1231,3 +1233,34 @@ html:has(.bt), body:has(.bt) { background: var(--b-bg, #eef3fc); }
 .legal article p { margin: 0 0 10px; } .legal article p:last-child { margin-bottom: 0; }
 .legal article a { color: var(--brand-text); font-weight: 800; text-decoration: underline; text-underline-offset: 2px; }
 .legal .about-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; } .legal .about-links a { text-decoration: none; padding: 8px 12px; border-radius: 999px; border: 1.5px solid var(--line); background: #fff; font-size: 14px; }
+
+/* R7 (0.2.5+r11): a recipe tile is one tap, no buttons */
+button.recipe-tile { display: block; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.recipe-tile .tile-name { font-size: 15px; } .recipe-tile .tile-go { color: var(--muted); flex: none; }
+.recipe-tile .tile-state { display: inline-block; margin-top: 8px; font-weight: 800; border-radius: 8px; padding: 2px 8px; background: var(--tint); color: var(--brand-text); }
+.recipe-tile .tile-state.live { background: #e3f4ea; color: #155c34; } .recipe-tile .tile-state.back, .recipe-tile .tile-state.down { background: #fdeaea; color: #8b1a1a; }
+/* R8 to R11: the recipe's page */
+.rq { display: flex; flex-direction: column; gap: 12px; padding-bottom: 20px; }
+.rq-back { align-self: flex-start; display: inline-flex; align-items: center; gap: 2px; font-weight: 800; }
+.rq-hero { position: relative; margin: 0; } .rq-hero img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 18px; display: block; }
+.rq-hero-empty { width: 100%; aspect-ratio: 4 / 3; border-radius: 18px; border: 2px dashed var(--line); background: var(--tint); color: var(--brand-text); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font: inherit; font-weight: 800; cursor: pointer; }
+.rq-thumbs { display: flex; gap: 10px; flex-wrap: wrap; align-items: flex-start; } .rq-thumb { position: relative; flex: none; display: flex; flex-direction: column; align-items: center; }
+.rq-thumbs .publish-photo { width: 72px; height: 72px; }
+.rq-cover-tag { position: absolute; left: 4px; top: 54px; background: var(--brand); color: #fff; font-size: 10px; font-weight: 900; border-radius: 6px; padding: 1px 5px; pointer-events: none; }
+.rq-del { position: absolute; right: -6px; top: -6px; min-width: 24px; height: 24px; padding: 0 6px; border-radius: 12px; border: 0; background: #172742; color: #fff; display: inline-flex; align-items: center; justify-content: center; font: inherit; font-size: 11px; font-weight: 900; cursor: pointer; white-space: nowrap; }
+.rq-move { display: flex; gap: 4px; margin-top: 6px; } .rq-move .pill { min-width: 0; padding: 0 10px; height: 30px; }
+.rq-hint { margin-top: -4px; } .rq-offer { display: flex; flex-direction: column; gap: 6px; } .rq-offer-row { display: flex; gap: 8px; flex-wrap: wrap; } .rq-offer .publish-photo { width: 64px; height: 64px; }
+.rq-editing { align-self: flex-start; background: #172742; color: #fff; border-radius: 10px; padding: 4px 10px; font-size: 12px; font-weight: 900; }
+.rq-name { align-self: flex-start; background: none; border: 0; padding: 0; font: inherit; font-size: 24px; font-weight: 900; line-height: 1.2; color: var(--ink); text-align: left; border-bottom: 1.5px dashed #b9c9e6; cursor: text; overflow-wrap: anywhere; }
+.rq-name-input { font-size: 22px; font-weight: 900; }
+.rq-foods, .rq-steps { display: flex; flex-direction: column; gap: 6px; } .rq-foods.editing, .rq-steps.editing { border-color: var(--brand); }
+.rq-food { align-items: center; } .rq-food small { flex: 1; }
+.rq-grams { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; } .rq-grams input { width: 68px; height: 38px; text-align: right; font: inherit; font-weight: 800; border: 1.5px solid var(--brand); background: #eaf1fd; border-radius: 10px; padding: 0 8px; }
+.rq-x { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--line); background: #fff; display: grid; place-items: center; color: var(--muted); cursor: pointer; }
+.rq-addfood { align-self: flex-start; margin-top: 4px; }
+.rq-find { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; } .rq-find input { font: inherit; font-size: 16px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: 12px; }
+.rq-find-row { display: flex; flex-direction: column; align-items: flex-start; gap: 1px; padding: 8px 10px; border: 1.5px solid var(--line); border-radius: 12px; background: #fff; font: inherit; text-align: left; cursor: pointer; } .rq-find-row span { font-weight: 800; } .rq-find-row small { color: var(--muted); }
+.rq-find .link { align-self: flex-start; }
+.rq-steps textarea { font: inherit; min-height: 100px; border: 1.5px solid var(--brand); background: #eaf1fd; border-radius: 12px; padding: 10px; }
+.rq-under { margin-top: -6px; } .rq-pub { display: flex; flex-direction: column; gap: 8px; } .rq-delete { align-self: flex-start; margin-top: 4px; }
+.recipe-tile .tile-name { color: var(--ink); } .rq-foods .rq-food:last-of-type { border-bottom: 0; }

@@ -115,11 +115,14 @@ seed.items = [];
   ok(/Skyr bowl is in this slot/.test(await page.locator(".pick-why").textContent()), "the sheet says what is in the slot");
   await page.getByRole("button", { name: "Empty this slot" }).click(); await page.waitForTimeout(400);
   ok(/1 slot open/.test(await page.locator(".plan-top").textContent()), "emptied: 1 slot open");
-  // rename a recipe on its tile (canvas S, Recipes keeps): the slot that holds it follows
+  // rename a recipe on its page (canvas S, Recipes keeps; 0.2.5+r11 R8: the name is renamed on the recipe's page): the slot that holds it follows
   await page.getByRole("button", { name: /^Recipes$/ }).first().click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: "Open Morning skyr" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: "Rename Morning skyr" }).click(); await page.waitForTimeout(200);
   await page.keyboard.press("Control+A"); await page.keyboard.type("Skyr at seven", { delay: 30 }); await page.keyboard.press("Enter"); await page.waitForTimeout(400);
-  ok(await page.getByRole("button", { name: "Rename Skyr at seven" }).count() === 1, "the tile shows the new name");
+  ok(await page.getByRole("button", { name: "Rename Skyr at seven" }).count() === 1, "the recipe's page shows the new name");
+  await page.locator(".rq-back").click(); await page.waitForTimeout(300);
+  ok(await page.getByRole("button", { name: "Open Skyr at seven" }).count() === 1, "the tile shows the new name");
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(500);
   await page.evaluate(() => document.querySelectorAll(".day-strip .choice")[7].click()); await page.waitForTimeout(300);
   ok(/Skyr at seven/.test(await page.locator(".plan-slot-wrap").first().textContent()), "and the slot that holds it shows the new name");
