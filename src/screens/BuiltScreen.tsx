@@ -115,6 +115,66 @@ function Blueprint() {
 }
 
 // Books by Milan: one email when Worth Eating or Worth Living is out, nothing else
+// How the work runs (0.2.5+r12, canvas board B, B8, Milan 12 October 2026): three loops through Worth Building's six
+// decisions. Loop 1 PlateMate, the Product Faculty capstone (the course runs four of the six); loop 2 Chef Mealan in full;
+// loop 3 now. Plain English: the question, the record, the decision, the verdict, what was carried forward.
+const WB_LOOP1: [string, string, string][] = [
+  ["Direction", "Not in course", "The course starts at Discovery. Direction is Milan's own addition."],
+  ["Discovery", "Proceed", "Coached clients who follow a nutrition plan. A journey map with evidence from five channels. The deepest pain: the day the plan breaks, and the overeating that often follows."],
+  ["Design", "Proceed", "An AI agent for that day. After an off-plan snack or a surprise dinner, the agent re-plans the rest of the day into 2 or 3 options, with the math shown. A person decides. The code does the math. The AI writes the words. A safety check runs first."],
+  ["Develop", "Ready", "Built in Claude Code as one file. Six eval cases, each judged by a person against the expected result, plus a safety test with new phrasing. All data is invented."],
+  ["Deploy", "Limit", "A live demo with invented clients. It runs only the prepared cases, and each visitor brings their own AI key. Good for the course, not for real users."],
+  ["Delta", "Not in course", "Milan's own review: the idea holds, but a demo is not a product. Next: a real app for real users, through all six decisions."],
+];
+const WB_LOOP2: { n: string; when: string; q: string; d: string; r: string; v: string; vt: string; c: string }[] = [
+  { n: "Direction", when: "late August", q: "Who is the app for, and what should change for them?",
+    d: "Turn PlateMate's evidence into a real app for real users. The first focus: in the shop or at home, is this food really high in protein, or is the label only marketing? Help people decide in that moment.",
+    r: "Direction v1", v: "Set", vt: "clear enough to test.",
+    c: "One question to test: does one honest number, at the moment of choice, change what people buy and eat?" },
+  { n: "Discovery", when: "late August to early September", q: "Is the problem real, and for whom? This step looks for evidence. It does not pick a solution yet.",
+    d: "Yes, for people who already follow a plan. The evidence: intro and discovery calls about healthy meals and fake high protein meals, PlateMate's journey map, Milan's coaching, and a scan of other apps.",
+    r: "call notes and the evidence list", v: "Proceed", vt: "build a food scanner as the test tool.",
+    c: "The number to show: protein density, the grams of protein in 100 calories. A log records what people do." },
+  { n: "Design", when: "September", q: "What will the app do, and who does each part: a person, the code, or AI?",
+    d: "Scan a barcode or a label, or type the numbers in. The app shows the protein density and how the food fits the person's numbers. Accounts link a person to a coach, who sets the goal. The code does the math. AI reads the labels.",
+    r: "screen designs on the canvas", v: "Proceed", vt: "start building.",
+    c: "The screens, and a clear owner for each part." },
+  { n: "Develop", when: "September", q: "How do we build the app safely? The safety rules live in the code, not only in the AI's instructions.",
+    d: "Google sign in. Adults only. If someone mentions a health risk, the chat gives a fixed, safe answer.",
+    r: "the changelog, one version per release", v: "Ready", vt: "for friends and family.",
+    c: "A working app with accounts and the safety rules in the code." },
+  { n: "Deploy", when: "30 September", q: "Who can use the app, what may the app do for them, who is responsible, and what do we watch?",
+    d: "Live on chefmealan.com. A closed pilot: people sign in and need a code from a coach. Three testers. Changes went straight to live, which was fine while the users were friends and family.",
+    r: "the live app and the pilot log", v: "Limit", vt: "a closed pilot, by invite only.",
+    c: "Real use, and notes from three testers." },
+  { n: "Delta", when: "early October", q: "What really changed for the users? We only claim what the numbers show.",
+    d: "Testing showed a gap. The customers train, and their focus is protein. To be fully useful, the app needs their training plan. The scanner and the calculations held up: they measure a food fast and show the best fit.",
+    r: "notes from the testers", v: "Mixed", vt: "the scanner and the numbers are a strong base. Without the training plan, the app is not complete.",
+    c: "Back to Direction. Direction v2: build on the scanner and the numbers, and add the training plan. This started loop 3." },
+];
+const WB_LOOP3: [string, string, string][] = [
+  ["Direction", "Set", "Direction v2: people who train and focus on protein. Chef Mealan joins their training plan, so they can support their gym plan and thrive at work. The scanner and the numbers from loop 2 are the base."],
+  ["Discovery", "Proceed", "The gap from loop 2 testing: without the training plan, the app is not complete."],
+  ["Design", "Proceed", "Four screens with one job each: Today, Plan, Plate, Recipes. Training days set the numbers. More foods for cooking at home. The code handles the plan. AI helps when the day breaks."],
+  ["Develop", "Now", `Version 0.2, releases 0.2.0 to 0.2.5. Every release runs ${BUILT_FACTS.unitTests} unit tests and ${BUILT_FACTS.walkthroughs} walkthroughs.`],
+  ["Deploy", "Now", "Each release goes to a preview first, like staging in a product team. Then the release goes live. One command undoes a release."],
+  ["Delta", "Next", "A counter for the days people follow their plan. No claim before the numbers exist."],
+];
+function LoopStrip({ title, sub, rows, live }: { title: string; sub: React.ReactNode; rows: [string, string, string][]; live?: boolean }) {
+  return (
+    <section className={`bt-loop${live ? " live" : ""}`}>
+      <h3>{title}</h3>
+      <small>{sub}</small>
+      {rows.map(([n, v, t]) => (
+        <div key={n}>
+          <div className="bt-loop-row"><b>{n}</b><span className={`bt-v${v === "Now" ? " now" : v === "Next" || v === "Not in course" ? " off" : ""}`}>{v}</span><span>{t}</span></div>
+          {live && n === "Deploy" && <div className="bt-pipe" aria-label="Build, preview, live, roll back"><i>Build</i><i className="on">Preview</i><i>Live</i><i className="back">↩ Roll back</i></div>}
+        </div>
+      ))}
+    </section>
+  );
+}
+
 function Notify() {
   const started = useRef(Date.now());
   const [books, setBooks] = useState<string[]>(["worth-eating"]);
@@ -184,16 +244,23 @@ export function BuiltScreen() {
       </div>
 
       <h2>How the work runs: the Worth Building playbook</h2>
-      <p className="bt-sub">Chef Mealan is built with the six decisions from <a href="#books">Worth Building</a>, Milan's product playbook. Each decision leaves a record, and any decision can send the work one step back.</p>
+      <p className="bt-sub">Chef Mealan is built with <a href="#books">Worth Building</a>, Milan's product playbook. The playbook has six decisions. They are not fixed stages: the evidence decides which decision comes next, even when that means going back. Each decision answers one question and keeps a record. The verdict rules are set before anyone looks at the evidence. Chef Mealan has three loops so far. Loop 1 was PlateMate, a course project that ran four of the six decisions. Loop 2 ran all six and made a real app. Loop 3 runs now. Below: loop 1 in short, loop 2 in full, and where loop 3 stands.</p>
+      <LoopStrip title="Loop 1: PlateMate, July to early August" rows={WB_LOOP1}
+        sub={<>Done. Milan's capstone for Product Faculty's AI product management certification, built in Claude Code. The course runs four of the six decisions: Discovery, Design, Develop, Deploy. <a href="https://mistancevic.github.io/platemate/" target="_blank" rel="noreferrer">Open PlateMate</a></>} />
+      <h3 className="bt-loop-h">Loop 2: Chef Mealan, all six decisions, a real app for real users, late August to early October</h3>
       <ol className="bt-wb">
-        <li><small>Decision 1</small><b>Direction</b><span>Who Chef Mealan serves, and for which outcome: adults with a nutrition plan who want to keep the plan on real days.</span><em>Record: the purpose, versioned</em></li>
-        <li><small>Decision 2</small><b>Discovery</b><span>Real days before features: Milan's own kitchen, his clients and the first testers. Tester feedback reshaped the goal setup.</span><em>Record: tester notes and findings</em></li>
-        <li><small>Decision 3</small><b>Design</b><span>Every screen drawn on a canvas and approved before code, each screen with an ID. Mockups come from the real build.</span><em>Record: the canvas, one ID per screen</em></li>
-        <li><small>Decision 4</small><b>Develop</b><span>Built with AI in small versioned releases, reviewed change by change. {BUILT_FACTS.unitTests} unit tests and {BUILT_FACTS.walkthroughs} walkthroughs guard every release.</span><em>Record: the changelog, one version per release</em></li>
-        <li className="deploy"><small>Decision 5</small><b>Deploy</b><span>Preview first, like staging in a product team. Each release goes to its own preview link with the real accounts, while chefmealan.com keeps serving the last release. Milan checks the preview on his phone, then promotes the preview. One command brings the last release back.</span>
-          <div className="bt-pipe" aria-label="Build, preview, live, roll back"><i>Build</i><i className="on">Preview</i><i>Live</i><i className="back">↩ Roll back</i></div><em>Record: the preview link, then promote or roll back</em></li>
-        <li><small>Decision 6</small><b>Delta</b><span>Learn from real days: a small test group of coaches and clients, and model evals for the AI. Findings go back to Direction or Design.</span><em>Record: eval runs and pilot findings</em></li>
+        {WB_LOOP2.map((c, i) => (
+          <li key={c.n}>
+            <small>Loop 2 · Decision {i + 1} · {c.when}</small><b>{c.n}</b>
+            <p><i className="bt-lab">The question</i><span className="bt-q">{c.q}</span></p>
+            <em>Record: {c.r}</em>
+            <p><i className="bt-lab">Decision</i>{c.d}</p>
+            <p><i className="bt-lab">Verdict</i><strong className="bt-v">{c.v}:</strong> {c.vt}</p>
+            <p className="bt-carry"><i className="bt-lab">Carried forward</i>{c.c}</p>
+          </li>
+        ))}
       </ol>
+      <LoopStrip live title="Loop 3: training and the plan, version 0.2, since October" sub="Now. The same six decisions, run again on what loop 2 taught." rows={WB_LOOP3} />
 
       <h2 id="books">Books by Milan</h2>
       <p className="bt-sub">The Worth series: how to decide what is worth the effort, in products, in food and in life.</p>

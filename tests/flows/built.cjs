@@ -1,5 +1,5 @@
 // /built and the scroll fix (0.2.5+r9, canvas board B, 12 October 2026): How Chef Mealan is built opens for anyone; the
-// blueprint answers a tap and walks a craving; the six Worth Building decisions with Deploy's preview step; the books with
+// blueprint answers a tap and walks a craving; the Worth Building loops (B8: PlateMate, Chef Mealan's six cards, loop 3 with the preview step); the books with
 // the cover, the notify box inside its frame on a phone; the product role first. Every tab and Plate step opens at the top.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
@@ -27,10 +27,15 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
     await page.getByRole("tab", { name: "Follow a craving" }).click();
     await page.getByRole("button", { name: "Next step" }).click();
     ok(/step 2 of 6/.test(await page.locator(".bt-panel .k").textContent()) && (await page.locator(".bt-edge.lit").count()) === 2, `${tag}: B3, step 2 lights the path to the AI`);
-    // the playbook, with the preview step
-    const wb = await page.locator(".bt-wb li b").allTextContents();
-    ok(wb.join(",") === "Direction,Discovery,Design,Develop,Deploy,Delta", `${tag}: B7, the six Worth Building decisions: ${wb.join(", ")}`);
-    ok(/Preview first, like staging/.test(await page.locator(".bt-wb .deploy").textContent()) && (await page.locator(".bt-pipe i").count()) === 4, `${tag}: B7, Deploy carries the preview step and Build, Preview, Live, Roll back`);
+    // the playbook in three loops (0.2.5+r12, B8): loop 1 PlateMate in short, loop 2's six cards in full, loop 3 now
+    const loops = await page.locator(".bt-loop h3").allTextContents();
+    ok(/^Loop 1: PlateMate/.test(loops[0] ?? "") && /^Loop 3: training/.test(loops[1] ?? "") && /Product Faculty/.test(await page.locator(".bt-loop").first().textContent()), `${tag}: B8, loop 1 is PlateMate, the Product Faculty capstone, and loop 3 runs now`);
+    const wb = await page.locator(".bt-wb li > b").allTextContents();
+    ok(wb.join(",") === "Direction,Discovery,Design,Develop,Deploy,Delta", `${tag}: B8, loop 2 has the six Worth Building decisions: ${wb.join(", ")}`);
+    const card = page.locator(".bt-wb li").last();
+    ok(/The question/i.test(await card.textContent()) && /Record: notes from the testers/.test(await card.textContent()) && /Mixed:/.test(await card.textContent()) && /Carried forward/i.test(await card.textContent()), `${tag}: B8, each card has the question, the record, the decision, the verdict and what was carried forward`);
+    ok(/Preview first|preview first/.test(await page.locator(".bt-loop.live").textContent()) && (await page.locator(".bt-loop.live .bt-pipe i").count()) === 4, `${tag}: B8, loop 3's Deploy carries the preview step and Build, Preview, Live, Roll back`);
+    ok(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth) <= 0, `${tag}: B8, the loops never make the page wider than the screen`);
     // books: the cover loads; the notify button stays inside its box; the button waits for an email
     await page.locator(".bt-book img").scrollIntoViewIfNeeded();
     const img = await page.locator(".bt-book img").evaluate((i) => new Promise((r) => { if (i.complete && i.naturalWidth) return r(i.naturalWidth); i.onload = () => r(i.naturalWidth); setTimeout(() => r(i.naturalWidth), 5000); }));
