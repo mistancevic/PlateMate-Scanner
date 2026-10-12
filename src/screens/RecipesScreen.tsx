@@ -63,18 +63,20 @@ export function RecipesScreen(p: AppApi) {
   const opened = openId ? state.meals.find((m) => m.id === openId) ?? null : null;
   // R12c (0.2.5+r13, board S4): closing the sheet after a publish says so once
   const [justLive, setJustLive] = useState<string | null>(null);
-  const closeSheet = () => { if (justLive && pubMeal) p.notify(`✓ Published. ${justLive} is live on chefmealan.com.`); setJustLive(null); setPublishing(null); };
+  // Publish the changes on the recipe's page publishes at once; the sheet opens to show it worked (0.2.5+r14)
+  const [publishNow, setPublishNow] = useState(false);
+  const closeSheet = () => { if (justLive && pubMeal) p.notify(`✓ Published. ${justLive} is live on chefmealan.com.`); setJustLive(null); setPublishNow(false); setPublishing(null); };
   const sheet = pubMeal && <PublishSheet meal={pubMeal} cards={state.feedback} author={author} published={published[pubMeal.id] ?? null} close={closeSheet}
     onDone={(r) => { if (r?.status === "live" && !r.waiting) setJustLive(r.title); setPublished((x) => { const y = { ...x }; if (r) y[pubMeal.id] = r; else delete y[pubMeal.id]; return y; }); }}
     onMeal={(patch) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === pubMeal.id ? { ...x, ...patch } : x)) }))}
-    direct={cook.direct} approver={approver} client={client} />;
+    direct={cook.direct} approver={approver} client={client} publishNow={publishNow} />;
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
       <RecipePage meal={opened} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
         pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
-        onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={() => setPublishing(opened.id)}
+        onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
         onDelete={() => { setOpenId(null); setState((s) => ({ ...s, meals: s.meals.filter((x) => x.id !== opened.id) })); }}
         close={() => setOpenId(null)} />
       {sheet}

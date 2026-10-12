@@ -21,7 +21,7 @@ const uid = () => Math.random().toString(36).slice(2, 10);
 
 export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close }: {
   meal: Meal; cards: Feedback[]; foods: Food[]; cook: boolean; state: PubState; pub: Published | null; approver: string; direct: boolean; unpublished?: string[];
-  onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onPublish: () => void; onDelete: () => void; close: () => void;
+  onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onPublish: (now?: boolean) => void; onDelete: () => void; close: () => void;
 }) {
   useBack(true, close);
   useEffect(() => { try { window.scrollTo(0, 0); document.querySelector("main")?.scrollTo?.(0, 0); } catch { /* nothing to scroll */ } }, [meal.id]);
@@ -161,7 +161,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
                 : "Not on the site yet. Publishing gives the recipe its own page and link."}</small>
               <div className="button-row">
                 {live && <a className="pill pill-small" href={`/r/${pub!.slug}`} target="_blank" rel="noreferrer">See live page</a>}
-                <button className={`pill pill-small${live && unpublished.length && direct ? " pill-primary" : ""}`} onClick={onPublish}>{
+                <button className={`pill pill-small${live && unpublished.length && direct ? " pill-primary" : ""}`} onClick={() => onPublish(Boolean(live && unpublished.length && direct))}>{
                   live ? (unpublished.length && direct ? "Publish the changes" : "Change live page") : state === "waiting" ? "See what you sent" : state === "down" ? (direct ? "Publish again" : `Send to ${approver} again`) : state === "draft" || state === "back" ? "Continue" : "Publish"}</button>
               </div>
             </section>

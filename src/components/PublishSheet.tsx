@@ -82,9 +82,9 @@ const timeOf = (iso?: string) => {
   const hm = t.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
   return t.toDateString() === new Date().toDateString() ? hm : `${t.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}, ${hm}`;
 };
-export function PublishSheet({ meal, cards, author, published, close, onDone, onMeal, direct = true, approver = "your coach", client = false }: {
+export function PublishSheet({ meal, cards, author, published, close, onDone, onMeal, direct = true, approver = "your coach", client = false, publishNow = false }: {
   meal: Meal; cards: Feedback[]; author: string; published: Published | null; close: () => void; onDone: (r: Published | null) => void; onMeal: (patch: Partial<Meal>) => void;
-  direct?: boolean; approver?: string; client?: boolean;
+  direct?: boolean; approver?: string; client?: boolean; publishNow?: boolean;
 }) {
   useBack(true, close);
   const mine = cards.filter((c) => c.meal?.title === meal.title).sort((a, b) => (b.createdAt > a.createdAt ? 1 : -1));
@@ -110,11 +110,12 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
   const [sent, setSent] = useState<PubContent | undefined>(init.d.sent);
   const [sentAt, setSentAt] = useState<string | undefined>(init.d.sentAt);
   const [justPublished, setJustPublished] = useState(false);
+  const sentRef = useRef<{ sent?: PubContent; sentAt?: string }>({ sent: init.d.sent, sentAt: init.d.sentAt });
   // kept with the recipe as it is typed (a short pause first), so the sheet can close at any time
   const first = useRef(true);
   useEffect(() => {
     if (first.current) { first.current = false; return; }
-    const t = setTimeout(() => onMeal({ steps: steps.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 30), publish: { title, lines, makes, servingName, minutes, names, photoAt, savedAt: new Date().toISOString(), ...(sent ? { sent, sentAt } : {}) } }), 500);
+    const t = setTimeout(() => { const live = sentRef.current; onMeal({ steps: steps.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 30), publish: { title, lines, makes, servingName, minutes, names, photoAt, savedAt: new Date().toISOString(), ...(live.sent ? live : {}) } }); }, 500);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, lines, makes, servingName, minutes, names, steps, photoAt]);
@@ -159,12 +160,19 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
       const saved: Published = d.status === "waiting" ? (live ? { ...live, waiting: true, note: "" } : { ...r, slug: d.slug || r.slug, status: "waiting", note: "" }) : { ...r, slug: d.slug || r.slug, status: "live" };
       if (saved.status === "live") {
         const at = new Date().toISOString();
-        setSent(contentNow); setSentAt(at); setJustPublished(true);
+        setSent(contentNow); setSentAt(at); setJustPublished(true); sentRef.current = { sent: contentNow, sentAt: at };
         onMeal({ publish: { title, lines, makes, servingName, minutes, names, photoAt, savedAt: at, sent: contentNow, sentAt: at } });
       }
       setDone(saved); onDone(saved); setPreviewing(false);
     } catch (e: any) { setErr(e.message); } finally { setBusy(""); }
   };
+  const once = useRef(false);
+  useEffect(() => {
+    if (!publishNow || once.current) return;
+    once.current = true;
+    if (live && changes.length && !claim && nums && title.trim() && direct) void publish();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const unpublish = async () => {
     if (!live) return;
     setBusy("Taking it down…");

@@ -118,9 +118,9 @@ const dl = process.argv[2] || null;
     await ps.getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(400);
     ok(/Published\. High protein crepes is live on chefmealan\.com/.test(await page.locator(".toast").textContent().catch(() => "")), "R12c: closing after a publish says so once");
     ok(/Changes not published yet/.test(await page.locator(".rq-pub").textContent()) && await page.locator(".rq-pub").getByRole("button", { name: "Publish the changes" }).count() === 1, "R12c: the recipe's page says Changes not published yet, with Publish the changes");
-    await page.locator(".rq-pub").getByRole("button", { name: "Publish the changes" }).click(); await page.waitForTimeout(400);
-    await ps.locator(".publish-ways .pill-primary").click(); await page.waitForTimeout(1200);
-    ok((await goBtn.textContent()) === "Published, no changes" && /29 % of the energy/.test(await page.evaluate(async () => (await (await fetch("/api/recipes/high-protein-crepes")).json()).recipe.lines)), "R12: Publish the changes puts the new lines live, and the button sleeps again");
+    // one tap on the recipe's page publishes (0.2.5+r14, Milan 22:53: it opened the sheet and needed a second tap)
+    await page.locator(".rq-pub").getByRole("button", { name: "Publish the changes" }).click(); await page.waitForTimeout(1500);
+    ok(/✓ Published/.test(await ps.locator(".pub-band.done").textContent().catch(() => "")) && (await goBtn.textContent()) === "Published, no changes" && /29 % of the energy/.test(await page.evaluate(async () => (await (await fetch("/api/recipes/high-protein-crepes")).json()).recipe.lines)), "R12: one tap on Publish the changes puts the new lines live; the sheet shows Published and the button sleeps");
     await ps.getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(400);
     ok(/Change live page/.test(await page.locator(".rq-pub").textContent()) && !/Changes not published yet/.test(await page.locator(".rq-pub").textContent()), "R12c: with nothing new, the recipe's page offers Change live page");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
