@@ -9,6 +9,8 @@ import { useBack } from "../back";
 import { ConfirmButton } from "./Confirm";
 import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
 import type { Published } from "./PublishSheet";
+import { StepsEditor } from "./StepsEditor";
+import { stepParts } from "../steps";
 
 // The recipe's own page in the app (0.2.5+r11, canvas board S3, R8 to R11, approved 12 October 2026). Photos first: the
 // cover large, every photo with × to delete, ‹ › to move the picked one (first place is the cover), Add. Then the name
@@ -45,17 +47,17 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const [naming, setNaming] = useState<string | null>(null);
   const saveName = () => { if (naming !== null) { const t = naming.trim(); if (t && t !== meal.title) onRename(t); setNaming(null); } };
   // ---- edit mode (R11): a draft of the foods, the grams and the steps; nothing changes until Save changes ----
-  const [edit, setEdit] = useState<{ items: Ingredient[]; steps: string } | null>(null);
+  const [edit, setEdit] = useState<{ items: Ingredient[]; steps: string[] } | null>(null);
   const [find, setFind] = useState<string | null>(null);
   const items = edit ? edit.items : meal.items;
   const sum = aggregate(items.filter((i) => i.grams > 0));
   const pd = density(sum.protein, sum.calories);
-  const startEdit = () => { setEdit({ items: meal.items.map((i) => ({ ...i })), steps: (meal.steps ?? []).join("\n") }); setFind(null); };
+  const startEdit = () => { setEdit({ items: meal.items.map((i) => ({ ...i })), steps: [...(meal.steps ?? [])] }); setFind(null); };
   const save = () => {
     if (!edit) return;
     const kept = edit.items.filter((i) => i.grams > 0);
     if (!kept.length) return;
-    onPatch({ items: kept, portion: kept.reduce((n, i) => n + i.grams, 0), steps: edit.steps.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 30) });
+    onPatch({ items: kept, portion: kept.reduce((n, i) => n + i.grams, 0), steps: edit.steps.map((x) => x.replace(/\s+/g, " ").trim()).filter(Boolean).slice(0, 30) });
     setEdit(null); setFind(null);
   };
   const matches = find === null ? [] : foods.filter((f) => !items.some((i) => i.food.id === f.id) && (!find.trim() || f.name.toLowerCase().includes(find.trim().toLowerCase()))).slice(0, 8);
@@ -129,9 +131,9 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       <section className={`card rq-steps ${edit ? "editing" : ""}`}>
         <b>Steps</b>
         {edit
-          ? <><textarea aria-label="Steps" value={edit.steps} onChange={(e) => setEdit({ ...edit, steps: e.target.value })} placeholder="One step per line." /><small className="muted">One step per line.</small></>
+          ? <StepsEditor steps={edit.steps} items={edit.items} onChange={(steps) => setEdit((e) => (e ? { ...e, steps } : e))} />
           : (meal.steps?.length ?? 0) > 0
-            ? <ol className="rp-steps">{meal.steps!.map((x, k) => <li key={k}><span>{k + 1}</span>{x}</li>)}</ol>
+            ? <ol className="rp-steps">{meal.steps!.map((x, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(x, meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className={`st-amt${p.gone ? " gone" : ""}`}>{p.label}</b>))}</div></li>)}</ol>
             : <small className="muted">No steps yet. Edit recipe adds them.</small>}
       </section>
       {edit ? (

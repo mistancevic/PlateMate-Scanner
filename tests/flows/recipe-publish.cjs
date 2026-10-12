@@ -43,7 +43,12 @@ const dl = process.argv[2] || null;
     await sheet.getByLabel("Two lines about it").fill("Thin, soft, and they roll without breaking.");
     await sheet.locator(".makes input").first().fill("12"); await sheet.getByLabel("What one serving is called").fill("crepe");
     await sheet.getByLabel("Time, minutes").fill("35");
-    await sheet.getByLabel(/Steps, one per line/).fill("Whisk the eggs, the milk and the mascarpone.\nAdd the flour, rest 15 minutes.\nA thin layer in a hot pan, a minute a side.");
+    // R13 (0.2.5+r16): one field per step; Enter starts the next
+    const stepLines = ["Whisk the eggs, the milk and the mascarpone.", "Add the flour, rest 15 minutes.", "A thin layer in a hot pan, a minute a side."];
+    for (const [k, t] of stepLines.entries()) {
+      const f = sheet.getByRole("textbox", { name: `Step ${k + 1}` });
+      await f.fill(t); if (k < stepLines.length - 1) { await f.press("End"); await f.press("Enter"); await page.waitForTimeout(120); }
+    }
     await page.waitForTimeout(900);
     const checks = await sheet.locator(".publish-checks").textContent();
     ok(/High protein: 29 %/.test(checks) && /DaaM good/.test(checks) && /One crepe: 118 kcal/.test(checks), "the checks: high protein at 29 %, the rating, one crepe: " + checks.replace(/\s+/g, " "));

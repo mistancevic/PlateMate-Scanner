@@ -137,7 +137,7 @@ export function RecipeView({ r, member, photoSrc, top }: { r: Loaded; member: Me
           {r.steps.length > 0 && (
             <section className="rp-card">
               <b>Steps</b>
-              <ol className="rp-steps">{r.steps.map((x, k) => <li key={k}><span>{k + 1}</span>{x}</li>)}</ol>
+              <ol className="rp-steps">{r.steps.map((x, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{x.split(/(\d+(?:[.,]\d+)? (?:g|kg)\b)/).map((t, j) => (j % 2 ? <b key={j} className="st-amt">{t}</b> : t))}</div></li>)}</ol>
             </section>
           )}
         </>

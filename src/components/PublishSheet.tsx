@@ -8,6 +8,8 @@ import { resizeImageBase64 } from "../utils/image";
 import { useBack } from "../back";
 import { recipePhotosOf, withRecipePhotos, sig } from "../photos";
 import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
+import { StepsEditor } from "./StepsEditor";
+import { stepText } from "../steps";
 
 // Canvas board R5 (7 October 2026), redrawn as RG1 to RG3 with RF4 (8 October): a cook publishes a recipe that's already
 // in the app. The foods and grams come from the app; the cook adds what a reader needs. What is typed is kept with the
@@ -46,7 +48,7 @@ export function pubContent(meal: Meal, f: PubFields): PubContent {
   return {
     title: f.title.trim(), lines: f.lines.trim(), makes: Math.max(1, Math.round(Number(f.makes)) || 1), servingName: f.servingName.trim() || "serving",
     minutes: Number(f.minutes) > 0 ? Math.round(Number(f.minutes)) : null, names: shown.map(([i, k]) => (f.names[k] ?? i.food.name).trim() || i.food.name),
-    steps: f.steps.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 30), grams: shown.map(([i]) => Math.round(i.grams)), photo: f.photo,
+    steps: f.steps.split("\n").map((x) => stepText(x, meal.items)).filter(Boolean).slice(0, 30), grams: shown.map(([i]) => Math.round(i.grams)), photo: f.photo,
   };
 }
 const fromPublished = (r: Published): PubContent => ({
@@ -144,7 +146,8 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
       slug: published?.slug ?? slugOf(title), title: title.trim(), lines: lines.trim(), makes: Math.max(1, Math.round(n) || 1), servingName: servingName.trim() || "serving",
       minutes: Number(minutes) > 0 ? Math.round(Number(minutes)) : null,
       items: meal.items.filter((i) => i.grams > 0).map((i) => ({ name: (names[meal.items.indexOf(i)] ?? i.food.name).trim() || i.food.name, grams: Math.round(i.grams), amount: amountOf(i.grams), per100: { kcal: i.food.calories, protein: i.food.protein, fat: i.food.fats, carbs: i.food.carbs, fibre: i.food.fiber } })),
-      steps: steps.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 30), rating, who: "everyone",
+      // the page gets the steps as they read, with the amounts written in (R13c)
+      steps: steps.split("\n").map((x) => stepText(x, meal.items)).filter(Boolean).slice(0, 30), rating, who: "everyone",
       per100: nums.per100, perServing: nums.perServing, all: nums.all, pd: nums.pd, proteinShare: nums.proteinShare, fits: fitsOf(nums.pd),
       hasPhoto: photos.length > 0, author, publishedAt: published?.publishedAt ?? now, updatedAt: now, mealId: meal.id,
     };
@@ -241,8 +244,11 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
             <div className="publish-item" key={k}><input value={names[k] ?? ""} onChange={(e) => setNames((xs) => xs.map((x, j) => (j === k ? e.target.value : x)))} aria-label={`Name of food ${k + 1}`} /><span>{amountOf(i.grams)}</span></div>
           ))}
         </div>
-        <label className="field-label">Steps, one per line<textarea value={steps} onChange={(e) => setSteps(e.target.value)} rows={4} placeholder={"Whisk the eggs and the milk.\nAdd the flour and rest 15 minutes.\nA thin layer in a hot pan, a minute a side."} /></label>
-        <small className="muted" style={{ marginTop: -8 }}>The steps stay with the recipe in the app too.</small>
+        <div className="setting-block">
+          <b className="field-label">Steps</b>
+          <StepsEditor steps={steps.split("\n")} items={meal.items} onChange={(a) => setSteps(a.join("\n"))} />
+          <small className="muted">The steps stay with the recipe in the app too.</small>
+        </div>
         <div className="publish-checks">
           {nums ? <span className={nums.proteinShare >= 20 ? "ok" : "plain"}>{nums.proteinShare >= 20 ? "✓ High protein: " : "Protein: "}{nums.proteinShare} % of the energy is protein</span> : <span className="no">Some foods have no energy or protein value: add them before publishing</span>}
           {nums && <span className="ok">✓ One {servingName || "serving"}: {nums.perServing.kcal} kcal · {nums.perServing.protein} g protein · PD {nums.pd}</span>}

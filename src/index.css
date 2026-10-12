@@ -1277,3 +1277,21 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .pub-band.changed { background: #fff4e0; border: 1.5px solid #f0cf8f; } .pub-band.changed b { color: #8a5a00; font-size: 15px; }
 .pub-pending { align-self: flex-start; font-weight: 800; color: #8a5a00; background: #fff4e0; border-radius: 8px; padding: 3px 8px; }
 .publish-ways .pill-primary:disabled, .rp-preview-bar .pill-primary:disabled { background: #e9eef7; border-color: #e9eef7; color: #5b6b8a; opacity: 1; }
+
+/* R13 (0.2.5+r16, board S4): steps with the foods and their amounts */
+.st { display: flex; flex-direction: column; gap: 8px; margin-top: 8px; }
+.st-row { display: flex; gap: 8px; align-items: flex-start; }
+.st-n { flex: none; width: 24px; height: 24px; margin-top: 8px; border-radius: 12px; background: var(--brand); color: #fff; font-weight: 900; font-size: 13px; display: grid; place-items: center; }
+.st-field { flex: 1; min-width: 0; min-height: 40px; border: 1.5px solid var(--line); border-radius: 12px; padding: 7px 10px; font-size: 15px; line-height: 1.75; background: var(--surface, #fff); outline: none; white-space: pre-wrap; overflow-wrap: anywhere; }
+.st-field:focus { border-color: var(--brand); }
+.st-field:empty::before { content: attr(data-placeholder); color: #9aa7bd; }
+.st-food, .st-amt { color: var(--brand-text); font-weight: 800; }
+.st-food { display: inline-block; background: #eaf1fd; border: 1.5px solid #b9cff3; border-radius: 9px; padding: 0 7px; line-height: 22px; white-space: nowrap; }
+.st-food.gone, .st-amt.gone { color: #8a5a00; background: #fff4e0; border-color: #f0cf8f; }
+.st-add { align-self: flex-start; font-weight: 800; }
+.st-foods { display: flex; flex-direction: column; gap: 6px; margin-top: 4px; } .st-foods small { font-weight: 800; color: var(--muted); }
+.st-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.st-chip { min-height: 34px; padding: 0 12px; border-radius: 17px; border: 1.5px solid var(--brand); background: var(--brand); color: #fff; font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+.st-chip.used { background: #fff; color: var(--brand-text); border-color: #c8d8f5; }
+.st-note { margin: 2px 0 0; border-radius: 10px; padding: 8px 10px; font-size: 13.5px; font-weight: 700; } .st-note.warn { background: #fff4e0; color: #8a5a00; } .st-note.ok { background: #e3f4ea; color: #155c34; }
+.rp-step-text { flex: 1; min-width: 0; }
