@@ -45,8 +45,10 @@ function thumbs(ctx: CanvasRenderingContext2D, x: number, y: number, size: numbe
   ctx.restore();
 }
 function numbersTable(ctx: CanvasRenderingContext2D, r: PublicRecipe, x: number, y: number, w: number, rowH: number, fs: number) {
-  const rows: [string, string][] = [["Energy", `${r.perServing.kcal} kcal`], ["Protein", g1(r.perServing.protein)], ["Carbs", `${Math.round(r.perServing.carbs)} g`], ["Fat", `${Math.round(r.perServing.fat)} g`]];
+  // the EU order of a nutrition label (Regulation 1169/2011, Annex XV), as on the recipe's page
+  const rows: [string, string][] = [["Energy", `${r.perServing.kcal} kcal`], ["Fat", `${Math.round(r.perServing.fat)} g`], ["Carbohydrate", `${Math.round(r.perServing.carbs)} g`]];
   if (r.perServing.fibre !== null) rows.push(["Fibre", `${r.perServing.fibre} g`]);
+  rows.push(["Protein", g1(r.perServing.protein)]);
   rows.forEach(([a, b], i) => {
     const yy = y + i * rowH;
     text(ctx, a, x, yy, F(800, fs), INK); text(ctx, b, x + w, yy, F(800, fs), INK, "right");

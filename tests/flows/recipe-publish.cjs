@@ -72,6 +72,8 @@ const dl = process.argv[2] || null;
     await page.goto("http://127.0.0.1:3188/r/high-protein-crepes"); await page.waitForTimeout(1200);
     const body = await page.locator(".rp").textContent();
     ok(/High protein crepes/.test(body) && /118kcal/.test(body.replace(/\s/g, "")) && /PD 7\.3/.test(body) && /8\.7 g/.test(body), "the page: name, kcal, protein 8.7 g and PD for one crepe");
+    const nut = await page.locator(".rp-card").filter({ hasText: "Nutrition" }).locator(".rp-3 > span").allTextContents();
+    ok(nut.join(",") === "Energy,Fat,Carbohydrate,Fibre,Protein", "the nutrition table in the EU order: " + nut.join(", "));
     const chips = await page.locator(".rp-fits .rp-chip").allTextContents();
     ok(chips.join(",") === "✓ Lose fat", "a tick only for the goal it truly fits, not for just above: " + chips.join(", "));
     ok(await page.locator(".rp-daam").count() === 1, "DaaM good on the photo");

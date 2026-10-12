@@ -145,7 +145,8 @@ export function RecipeView({ r, member, photoSrc, top }: { r: Loaded; member: Me
       <section className="rp-card">
         <b>Nutrition</b>
         <div className="rp-row rp-th"><span /><small>ONE {r.servingName.toUpperCase()}</small><small>ALL {r.makes}</small></div>
-        {([["Energy", `${s.kcal} kcal`, `${r.all.kcal} kcal`], ["Protein", g1(s.protein), g1(r.all.protein)], ["Carbs", `${s.carbs} g`, `${Math.round(r.all.carbs)} g`], ["Fat", `${s.fat} g`, `${Math.round(r.all.fat)} g`], ...(s.fibre !== null ? [["Fibre", `${s.fibre} g`, `${Math.round(r.all.fibre ?? 0)} g`]] : [])] as string[][]).map(([a, b, c]) => (
+        {/* the EU order of a nutrition label (Regulation 1169/2011, Annex XV), as in labeltable.ts (0.2.5+r15, Milan 22:56) */}
+        {([["Energy", `${s.kcal} kcal`, `${r.all.kcal} kcal`], ["Fat", `${s.fat} g`, `${Math.round(r.all.fat)} g`], ["Carbohydrate", `${s.carbs} g`, `${Math.round(r.all.carbs)} g`], ...(s.fibre !== null ? [["Fibre", `${s.fibre} g`, `${Math.round(r.all.fibre ?? 0)} g`]] : []), ["Protein", g1(s.protein), g1(r.all.protein)]] as string[][]).map(([a, b, c]) => (
           <div className="rp-row rp-3" key={a}><span>{a}</span><b>{b}</b><small>{c}</small></div>
         ))}
         <small className="muted">Worked out from the labels of the foods used, weighed. {r.proteinShare} % of the energy is protein{r.proteinShare >= 20 ? "; the EU rule for calling food high protein is 20 %" : ""}.</small>
