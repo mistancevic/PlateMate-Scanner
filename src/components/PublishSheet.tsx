@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Copy, Download, Image as ImageIcon, X } from "lucide-react";
-import type { Feedback, Meal, PublishDraft } from "../pilot";
+import type { Feedback, Meal, PubContent, PublishDraft } from "../pilot";
 import { amountOf, bylineOf, claimProblem, fitsOf, localAs, numbersOf, plainName, slugOf, type PublicRecipe } from "../recipes";
 import { RecipeView } from "../screens/RecipePages";
 import { instagramImages } from "../instaImages";
 import { resizeImageBase64 } from "../utils/image";
 import { useBack } from "../back";
-import { recipePhotosOf, withRecipePhotos } from "../photos";
+import { recipePhotosOf, withRecipePhotos, sig } from "../photos";
 import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
 
 // Canvas board R5 (7 October 2026), redrawn as RG1 to RG3 with RF4 (8 October): a cook publishes a recipe that's already
@@ -16,6 +16,72 @@ import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
 // with the recipe (Q1); the names start without brands (Q2); the photos offered are the plate photos (Q4).
 // A cook who isn't a coach sends the recipe to their coach, who sees the page and makes it live or sends it back (RG1, RG5)
 export type Published = PublicRecipe & { status?: "live" | "down" | "waiting" | "back"; waiting?: boolean; note?: string };
+
+// What the live page holds and what is about to go there (0.2.5+r13, board S4, R12). The defaults are the sheet's own,
+// so the recipe's page and the sheet agree on what changed. A page published before this release has no record of its
+// photo, so its photo is not compared.
+export function pubDraftOf(meal: Meal, published: Published | null, cards: Feedback[]) {
+  const d: PublishDraft = meal.publish ?? {};
+  const own = recipePhotosOf(meal);
+  const photos = [...own, ...cardPhotosOf(meal, cards).slice(0, 8).filter((c) => !own.includes(c))];
+  return {
+    d, photos, photoAt: own.length ? 0 : Math.min(d.photoAt ?? 0, Math.max(0, photos.length - 1)),
+    title: d.title ?? published?.title ?? meal.title, lines: d.lines ?? published?.lines ?? "", makes: d.makes ?? String(published?.makes ?? 1),
+    servingName: d.servingName ?? published?.servingName ?? "serving", minutes: d.minutes ?? (published?.minutes ? String(published.minutes) : ""),
+    names: meal.items.map((i, k) => d.names?.[k] ?? published?.items?.[k]?.name ?? plainName(i.food)), steps: (meal.steps ?? published?.steps ?? []).join("\n"),
+  };
+}
+type PubFields = { title: string; lines: string; makes: string; servingName: string; minutes: string; names: string[]; steps: string; photo: string | null | undefined };
+// which photo leads, in a way that survives a reload: the recipe's own photo by its fingerprint, a card's plate photo by
+// the card (a card's photo can load as the small or the large copy)
+// (undefined: not known for sure, so not compared)
+export const photoKeyOf = (meal: Meal, cards: Feedback[], photo: string | null | undefined): string | null | undefined => {
+  if (!photo) return null;
+  if (recipePhotosOf(meal).includes(photo)) return `own:${sig(photo)}`;
+  const c = cards.find((x) => x.photo === photo || (x.photos ?? []).includes(photo));
+  return c ? `card:${c.id}` : undefined;
+};
+export function pubContent(meal: Meal, f: PubFields): PubContent {
+  const shown = meal.items.map((i, k) => [i, k] as const).filter(([i]) => i.grams > 0);
+  return {
+    title: f.title.trim(), lines: f.lines.trim(), makes: Math.max(1, Math.round(Number(f.makes)) || 1), servingName: f.servingName.trim() || "serving",
+    minutes: Number(f.minutes) > 0 ? Math.round(Number(f.minutes)) : null, names: shown.map(([i, k]) => (f.names[k] ?? i.food.name).trim() || i.food.name),
+    steps: f.steps.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 30), grams: shown.map(([i]) => Math.round(i.grams)), photo: f.photo,
+  };
+}
+const fromPublished = (r: Published): PubContent => ({
+  title: (r.title ?? "").trim(), lines: (r.lines ?? "").trim(), makes: r.makes ?? 1, servingName: r.servingName || "serving", minutes: r.minutes ?? null,
+  names: (r.items ?? []).map((i) => i.name), steps: r.steps ?? [], grams: (r.items ?? []).map((i) => Math.round(i.grams)),
+});
+const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
+// the parts that differ from the live page, named as the sheet names them
+export function changedParts(now: PubContent, sent: PubContent | null | undefined, published: Published | null): string[] {
+  const base = sent ?? (published ? fromPublished(published) : null);
+  if (!base) return [];
+  const out: string[] = [];
+  if (now.title !== base.title) out.push("Name");
+  if (now.lines !== base.lines) out.push("Two lines about it");
+  if (now.makes !== base.makes || now.servingName !== base.servingName) out.push("Makes");
+  if (now.minutes !== base.minutes) out.push("Time");
+  if (!same(now.grams, base.grams)) out.push("The foods and grams");
+  else if (!same(now.names, base.names)) out.push("The foods' names");
+  if (!same(now.steps, base.steps)) out.push("Steps");
+  // a photo still loading from the account is not a change
+  if (base.photo !== undefined && now.photo !== undefined && now.photo !== null && now.photo !== base.photo) out.push("Photo");
+  return out;
+}
+// the recipe's page (R12c): what is not on the live page yet, from the saved draft
+export const unpublishedOf = (meal: Meal, published: Published | null, cards: Feedback[]): string[] => {
+  if (!published || (published.status && published.status !== "live") || published.waiting) return [];
+  const x = pubDraftOf(meal, published, cards);
+  return changedParts(pubContent(meal, { ...x, photo: photoKeyOf(meal, cards, x.photos[x.photoAt]) }), x.d.sent, published);
+};
+const timeOf = (iso?: string) => {
+  if (!iso) return "";
+  const t = new Date(iso); if (Number.isNaN(t.getTime())) return "";
+  const hm = t.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+  return t.toDateString() === new Date().toDateString() ? hm : `${t.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}, ${hm}`;
+};
 export function PublishSheet({ meal, cards, author, published, close, onDone, onMeal, direct = true, approver = "your coach", client = false }: {
   meal: Meal; cards: Feedback[]; author: string; published: Published | null; close: () => void; onDone: (r: Published | null) => void; onMeal: (patch: Partial<Meal>) => void;
   direct?: boolean; approver?: string; client?: boolean;
@@ -28,21 +94,27 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
   const candidates = useMemo(() => cardPhotosOf(meal, cards).slice(0, 8),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [meal.id]);
-  const d: PublishDraft = meal.publish ?? {};
+  const init = useMemo(() => pubDraftOf(meal, published, cards),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [meal.id]);
   const photos = [...own, ...candidates.filter((c) => !own.includes(c))];
-  const [photoAt, setPhotoAt] = useState(own.length ? 0 : Math.min(d.photoAt ?? 0, Math.max(0, photos.length - 1)));
-  const [title, setTitle] = useState(d.title ?? published?.title ?? meal.title);
-  const [lines, setLines] = useState(d.lines ?? published?.lines ?? "");
-  const [makes, setMakes] = useState(d.makes ?? String(published?.makes ?? 1));
-  const [servingName, setServingName] = useState(d.servingName ?? published?.servingName ?? "serving");
-  const [minutes, setMinutes] = useState(d.minutes ?? (published?.minutes ? String(published.minutes) : ""));
-  const [names, setNames] = useState<string[]>(() => meal.items.map((i, k) => d.names?.[k] ?? published?.items[k]?.name ?? plainName(i.food)));
-  const [steps, setSteps] = useState((meal.steps ?? published?.steps ?? []).join("\n"));
+  const [photoAt, setPhotoAt] = useState(own.length ? 0 : init.photoAt);
+  const [title, setTitle] = useState(init.title);
+  const [lines, setLines] = useState(init.lines);
+  const [makes, setMakes] = useState(init.makes);
+  const [servingName, setServingName] = useState(init.servingName);
+  const [minutes, setMinutes] = useState(init.minutes);
+  const [names, setNames] = useState<string[]>(init.names);
+  const [steps, setSteps] = useState(init.steps);
+  // what the live page holds (R12): kept at Publish, written with the draft so it survives closing the sheet
+  const [sent, setSent] = useState<PubContent | undefined>(init.d.sent);
+  const [sentAt, setSentAt] = useState<string | undefined>(init.d.sentAt);
+  const [justPublished, setJustPublished] = useState(false);
   // kept with the recipe as it is typed (a short pause first), so the sheet can close at any time
   const first = useRef(true);
   useEffect(() => {
     if (first.current) { first.current = false; return; }
-    const t = setTimeout(() => onMeal({ steps: steps.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 30), publish: { title, lines, makes, servingName, minutes, names, photoAt, savedAt: new Date().toISOString() } }), 500);
+    const t = setTimeout(() => onMeal({ steps: steps.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 30), publish: { title, lines, makes, servingName, minutes, names, photoAt, savedAt: new Date().toISOString(), ...(sent ? { sent, sentAt } : {}) } }), 500);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, lines, makes, servingName, minutes, names, steps, photoAt]);
@@ -56,6 +128,10 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
   const [done, setDone] = useState<Published | null>(published);
   const live = done && (!done.status || done.status === "live") ? done : null;
   const waits = Boolean(done && (done.status === "waiting" || done.waiting));
+  // R12: what changed since the live page; with no change the button sleeps
+  const contentNow = pubContent(meal, { title, lines, makes, servingName, minutes, names, steps, photo: photoKeyOf(meal, cards, photos[photoAt]) });
+  const changes = live && !waits ? changedParts(contentNow, sent, live) : [];
+  const asleep = Boolean(live && !waits && !changes.length);
   const [previewing, setPreviewing] = useState(false);
   useBack(previewing, () => setPreviewing(false));
   const fileRef = useRef<HTMLInputElement>(null);
@@ -81,6 +157,11 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d.error || "Publishing didn't work. Try again.");
       const saved: Published = d.status === "waiting" ? (live ? { ...live, waiting: true, note: "" } : { ...r, slug: d.slug || r.slug, status: "waiting", note: "" }) : { ...r, slug: d.slug || r.slug, status: "live" };
+      if (saved.status === "live") {
+        const at = new Date().toISOString();
+        setSent(contentNow); setSentAt(at); setJustPublished(true);
+        onMeal({ publish: { title, lines, makes, servingName, minutes, names, photoAt, savedAt: at, sent: contentNow, sentAt: at } });
+      }
       setDone(saved); onDone(saved); setPreviewing(false);
     } catch (e: any) { setErr(e.message); } finally { setBusy(""); }
   };
@@ -104,7 +185,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
   };
 
   const state = waits ? "waiting" : live ? "live" : done?.status === "down" ? "down" : done?.status === "back" ? "back" : "draft";
-  const go = busy || (waits ? `Waiting for ${approver}` : !direct ? `Send to ${approver}` : live ? "Publish the changes" : state === "down" ? "Publish again" : "Publish");
+  const go = busy || (waits ? `Waiting for ${approver}` : asleep ? (direct ? "Published, no changes" : "No changes to send") : !direct ? `Send to ${approver}` : live ? "Publish the changes" : state === "down" ? "Publish again" : "Publish");
   const preview = previewing ? recipe() : null;
   return (
     <div className="sheet-backdrop" onClick={close}>
@@ -114,6 +195,12 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
         {waits && <p className="small muted">{approver.charAt(0).toUpperCase() + approver.slice(1)} sees the page first and makes it live, or sends it back with a note.{live ? " The live page stays as it is until then." : ""}</p>}
         {!waits && done?.note && <p className="small pub-note">{approver.charAt(0).toUpperCase() + approver.slice(1)}: “{done.note}”</p>}
         {!live && !waits && <p className="small muted">{state === "down" ? "The link says this recipe was taken down. Publish again brings it back on the same link." : "Saved as you type, only here. Close it any time and come back."}</p>}
+        {live && !waits && justPublished && !changes.length && (
+          <div className="pub-band done" role="status"><b>✓ Published</b><span>Anyone with the link sees the page now.</span><a className="pill pill-small pill-primary" href={`/r/${live.slug}`} target="_blank" rel="noreferrer">See live page</a></div>
+        )}
+        {changes.length > 0 && (
+          <div className="pub-band changed" role="status"><b>Changes not published yet</b><span>{timeOf(sentAt ?? live?.updatedAt ?? live?.publishedAt) ? `The live page shows the version from ${timeOf(sentAt ?? live?.updatedAt ?? live?.publishedAt)}. ` : "The live page shows the version before. "}Changed: {changes.join(", ")}.</span></div>
+        )}
         {live && (
           <div className="publish-done">
             <a className="publish-link" href={`/r/${live.slug}`} target="_blank" rel="noreferrer">{link.replace(/^https?:\/\//, "")}</a>
@@ -158,7 +245,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
         {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
         <div className="ways publish-ways">
           <button className="pill pill-wide" onClick={() => setPreviewing(true)} disabled={!nums || !title.trim()}>See the page</button>
-          <button className="pill pill-wide pill-primary" onClick={publish} disabled={!nums || Boolean(claim) || Boolean(busy) || !title.trim() || waits}>{go}</button>
+          <button className="pill pill-wide pill-primary" onClick={publish} disabled={!nums || Boolean(claim) || Boolean(busy) || !title.trim() || waits || asleep}>{go}</button>
         </div>
         {live && <button className="pill pill-wide" onClick={unpublish} disabled={Boolean(busy)}><X size={15} /> Unpublish</button>}
       </div>
@@ -167,7 +254,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
           <RecipeView r={preview} member={null} photoSrc={photos[photoAt] ?? null} top={
             <div className="rp-preview-bar" style={{ margin: "-14px -18px 0" }}>
               <b>Preview: only you see this. {live ? "The live page changes when you publish." : "Nothing is live yet."}{!direct ? ` ${approver.charAt(0).toUpperCase() + approver.slice(1)} sees it before it goes live.` : ""}</b>
-              <div className="ways"><button className="pill" onClick={() => setPreviewing(false)}>Back to the sheet</button><button className="pill pill-primary" onClick={publish} disabled={Boolean(claim) || Boolean(busy) || waits}>{go}</button></div>
+              <div className="ways"><button className="pill" onClick={() => setPreviewing(false)}>Back to the sheet</button><button className="pill pill-primary" onClick={publish} disabled={Boolean(claim) || Boolean(busy) || waits || asleep}>{go}</button></div>
             </div>} />
         </div>
       )}

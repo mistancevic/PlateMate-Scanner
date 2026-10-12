@@ -2,7 +2,7 @@
 // lines, how many it makes, the steps, who sees it; the checks say high protein only at 20 % of the energy. The page at
 // /r/<name> shows the photo, the numbers for one serving, PD, the goals it fits, the ingredients and steps, the nutrition;
 // a visitor gets Ask for an invite where a member gets their amounts. /recipes lists it; a shared link previews the recipe.
-// The Instagram images come from the same numbers. Never rewrite these lines to fit a change.
+// The Instagram images come from the same numbers. Never rewrite these lines to fit a change. R12 (0.2.5+r13): Published band, the button sleeps until a change, Changes not published yet.
 // Changed with Milan, 8 October 2026 (boards RG0 to RG4 and RF4): what is typed in the sheet is kept with the recipe as a
 // draft, never public; See the page shows the page before anything goes live; everyone sees a recipe (no Who sees it); the
 // steps stay with the recipe in the app; the page says From <first name>'s kitchen; only goals it truly fits get a tick;
@@ -89,6 +89,7 @@ const dl = process.argv[2] || null;
     ok(/Live on chefmealan\.com/.test(await row2.locator(".tile-state").textContent()), "My recipes: Live on chefmealan.com");
     await openRecipe("High protein crepes");
     ok(await page.locator(".rq-pub").getByRole("link", { name: "See live page" }).count() === 1, "R10: See live page");
+    ok(await page.locator(".rq-pub .pub-pending").count() === 0, "R12c: right after Publish nothing is waiting to be published " + (await page.locator(".rq-pub .pub-pending").getAttribute("title").catch(() => "")));
     await page.locator(".rq-pub").getByRole("button", { name: "Change live page" }).click(); await page.waitForTimeout(400);
     await page.locator(".publish-sheet").getByRole("button", { name: /Unpublish/ }).click(); await page.waitForTimeout(800);
     ok(/Taken down/.test(await page.locator(".publish-sheet .pub-state").textContent()), "Unpublish: the sheet says Taken down");
@@ -107,6 +108,21 @@ const dl = process.argv[2] || null;
     await page.locator(".rq-pub").getByRole("button", { name: "Publish again" }).click(); await page.waitForTimeout(400);
     await page.locator(".publish-sheet").getByRole("button", { name: "Publish again" }).click(); await page.waitForTimeout(1200);
     ok(await page.evaluate(async () => (await fetch("/api/recipes/high-protein-crepes")).status) === 200, "Publish again: live on the same link");
+    // R12 (0.2.5+r13, board S4): Publish says it worked; the button sleeps until something changes
+    const ps = page.locator(".publish-sheet"), goBtn = ps.locator(".publish-ways .pill-primary");
+    ok(/✓ Published/.test(await ps.locator(".pub-band.done").textContent()) && await ps.locator(".pub-band.done a", { hasText: "See live page" }).count() === 1, "R12a: a band says Published, with See live page");
+    ok((await goBtn.textContent()) === "Published, no changes" && await goBtn.isDisabled(), "R12a: with no change the button reads Published, no changes and sleeps");
+    await ps.getByLabel("Two lines about it").fill("Thin, soft, and they roll. 29 % of the energy is protein."); await page.waitForTimeout(700);
+    ok(/Changes not published yet/.test(await ps.locator(".pub-band.changed").textContent()) && /Changed: Two lines about it\./.test(await ps.locator(".pub-band.changed").textContent()) && await ps.locator(".pub-band.done").count() === 0, "R12b: a change says Changes not published yet, and what changed");
+    ok((await goBtn.textContent()) === "Publish the changes" && !(await goBtn.isDisabled()), "R12b: the change wakes Publish the changes");
+    await ps.getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(400);
+    ok(/Published\. High protein crepes is live on chefmealan\.com/.test(await page.locator(".toast").textContent().catch(() => "")), "R12c: closing after a publish says so once");
+    ok(/Changes not published yet/.test(await page.locator(".rq-pub").textContent()) && await page.locator(".rq-pub").getByRole("button", { name: "Publish the changes" }).count() === 1, "R12c: the recipe's page says Changes not published yet, with Publish the changes");
+    await page.locator(".rq-pub").getByRole("button", { name: "Publish the changes" }).click(); await page.waitForTimeout(400);
+    await ps.locator(".publish-ways .pill-primary").click(); await page.waitForTimeout(1200);
+    ok((await goBtn.textContent()) === "Published, no changes" && /29 % of the energy/.test(await page.evaluate(async () => (await (await fetch("/api/recipes/high-protein-crepes")).json()).recipe.lines)), "R12: Publish the changes puts the new lines live, and the button sleeps again");
+    await ps.getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(400);
+    ok(/Change live page/.test(await page.locator(".rq-pub").textContent()) && !/Changes not published yet/.test(await page.locator(".rq-pub").textContent()), "R12c: with nothing new, the recipe's page offers Change live page");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   } catch (e) { ok(false, "walkthrough error: " + e.message); }
   await b.close(); server.kill();

@@ -19,8 +19,8 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, onPatch, onRename, onMakeIt, onPublish, onDelete, close }: {
-  meal: Meal; cards: Feedback[]; foods: Food[]; cook: boolean; state: PubState; pub: Published | null; approver: string; direct: boolean;
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close }: {
+  meal: Meal; cards: Feedback[]; foods: Food[]; cook: boolean; state: PubState; pub: Published | null; approver: string; direct: boolean; unpublished?: string[];
   onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onPublish: () => void; onDelete: () => void; close: () => void;
 }) {
   useBack(true, close);
@@ -151,6 +151,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           {cook && (
             <section className="card rq-pub">
               <div className="card-top"><b>On chefmealan.com</b>{state && <small className={`pub-state ${state}`}>{state === "live" ? "Live" : state === "down" ? "Taken down" : state === "waiting" ? `Waiting for ${approver}` : state === "back" ? "Sent back" : "Draft"}</small>}</div>
+              {live && unpublished.length > 0 && <small className="pub-pending" title={`Changed: ${unpublished.join(", ")}`}>Changes not published yet</small>}
               <small className="muted">{
                 live ? `chefmealan.com/r/${pub!.slug}. Anyone with the link sees the page, with the cover first.`
                 : state === "waiting" ? `${approver.charAt(0).toUpperCase() + approver.slice(1)} sees the page first and makes it live, or sends it back with a note.`
@@ -160,8 +161,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
                 : "Not on the site yet. Publishing gives the recipe its own page and link."}</small>
               <div className="button-row">
                 {live && <a className="pill pill-small" href={`/r/${pub!.slug}`} target="_blank" rel="noreferrer">See live page</a>}
-                <button className="pill pill-small" onClick={onPublish}>{
-                  live ? "Change live page" : state === "waiting" ? "See what you sent" : state === "down" ? (direct ? "Publish again" : `Send to ${approver} again`) : state === "draft" || state === "back" ? "Continue" : "Publish"}</button>
+                <button className={`pill pill-small${live && unpublished.length && direct ? " pill-primary" : ""}`} onClick={onPublish}>{
+                  live ? (unpublished.length && direct ? "Publish the changes" : "Change live page") : state === "waiting" ? "See what you sent" : state === "down" ? (direct ? "Publish again" : `Send to ${approver} again`) : state === "draft" || state === "back" ? "Continue" : "Publish"}</button>
               </div>
             </section>
           )}

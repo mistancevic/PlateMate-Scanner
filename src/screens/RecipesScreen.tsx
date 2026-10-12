@@ -4,10 +4,10 @@ import { fmt } from "../ui";
 import type { AppApi } from "./api";
 import { useEffect, useState } from "react";
 import { useKept } from "../kept";
-import { PublishSheet, type Published } from "../components/PublishSheet";
+import { PublishSheet, unpublishedOf, type Published } from "../components/PublishSheet";
 import { localAs } from "../recipes";
 import { RecipePage, type PubState } from "../components/RecipePage";
-import { recipePhotosOf, recipeHasPhotos } from "../photos";
+import { recipePhotosOf, recipeHasPhotos, sig } from "../photos";
 
 export function RecipesScreen(p: AppApi) {
   const { state, setState, setTab } = p;
@@ -36,7 +36,8 @@ export function RecipesScreen(p: AppApi) {
         const fr = new FileReader(); fr.onload = () => res(String(fr.result)); fr.onerror = () => res(null); fr.readAsDataURL(b);
       })).then((data) => {
         if (!data) return;
-        setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === m.id && !recipeHasPhotos(x) && !x.pagePhotoTaken ? { ...x, photo: data, photos: [], pagePhotoTaken: true } : x)) }));
+        // the page's photo is the live photo, so the live page has not changed (R12)
+        setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === m.id && !recipeHasPhotos(x) && !x.pagePhotoTaken ? { ...x, photo: data, photos: [], pagePhotoTaken: true, ...(x.publish?.sent ? { publish: { ...x.publish, sent: { ...x.publish.sent, photo: `own:${sig(data)}` } } } : {}) } : x)) }));
       }).catch(() => {});
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -60,15 +61,18 @@ export function RecipesScreen(p: AppApi) {
   const madeTimes = (m: Meal) => state.feedback.filter((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.status === "eaten").length;
   const lastRating = (m: Meal) => state.feedback.find((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.taste)?.taste ?? "";
   const opened = openId ? state.meals.find((m) => m.id === openId) ?? null : null;
-  const sheet = pubMeal && <PublishSheet meal={pubMeal} cards={state.feedback} author={author} published={published[pubMeal.id] ?? null} close={() => setPublishing(null)}
-    onDone={(r) => setPublished((x) => { const y = { ...x }; if (r) y[pubMeal.id] = r; else delete y[pubMeal.id]; return y; })}
+  // R12c (0.2.5+r13, board S4): closing the sheet after a publish says so once
+  const [justLive, setJustLive] = useState<string | null>(null);
+  const closeSheet = () => { if (justLive && pubMeal) p.notify(`✓ Published. ${justLive} is live on chefmealan.com.`); setJustLive(null); setPublishing(null); };
+  const sheet = pubMeal && <PublishSheet meal={pubMeal} cards={state.feedback} author={author} published={published[pubMeal.id] ?? null} close={closeSheet}
+    onDone={(r) => { if (r?.status === "live" && !r.waiting) setJustLive(r.title); setPublished((x) => { const y = { ...x }; if (r) y[pubMeal.id] = r; else delete y[pubMeal.id]; return y; }); }}
     onMeal={(patch) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === pubMeal.id ? { ...x, ...patch } : x)) }))}
     direct={cook.direct} approver={approver} client={client} />;
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
       <RecipePage meal={opened} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
-        pub={published[opened.id] ?? null} approver={approver} direct={cook.direct}
+        pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
         onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={() => setPublishing(opened.id)}
         onDelete={() => { setOpenId(null); setState((s) => ({ ...s, meals: s.meals.filter((x) => x.id !== opened.id) })); }}
