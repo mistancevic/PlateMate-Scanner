@@ -17,6 +17,7 @@ import { createHash } from "node:crypto";
 import { deleteAccount as deleteAccountSteps } from "./src/accountDelete";
 import { guideForChat } from "./src/goalGuide";
 import { tidy } from "./src/labeltable";
+import { normalizePhone } from "./src/phone";
 import { forVisitor, isPreviewHost, slugOf, type PublicRecipe } from "./src/recipes";
 const FB_PROJECT = process.env.FIREBASE_PROJECT_ID || "";
 // photos as files (storage release 1): the project's default bucket in Frankfurt
@@ -388,7 +389,7 @@ app.post("/api/account/delete", requireUser, async (req, res) => {
     requests: async () => {
       if (!email) { try { email = String((await adminAuth().getUser(uid)).email || "").toLowerCase(); } catch { /* no email, nothing to clean by it */ } }
       if (!email) return;
-      for (const col of ["accessRequests", "invites"]) {
+      for (const col of ["accessRequests", "invites", "bookSignups"]) {
         const snap = await d.collection(col).where("email", "==", email).get();
         const batch = d.batch(); snap.docs.forEach((x) => batch.delete(x.ref)); if (snap.size) await batch.commit();
       }
@@ -947,6 +948,9 @@ app.post("/api/access-request", async (req, res) => {
   const name = String(b.name ?? "").trim(), email = String(b.email ?? "").trim(), note = String(b.note ?? "").trim();
   if (!name || name.length > 80 || !/^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i.test(email) || note.length > 600) return res.status(400).json({ error: "Please check your name and email." });
   if (/https?:\/\//i.test(name) || (note.match(/https?:\/\//gi) ?? []).length > 1) return ok();
+  // HP12: an optional mobile number, for a WhatsApp message or a text about joining; kept as + and digits only
+  const phone = normalizePhone(b.phone);
+  if (phone === null) return res.status(400).json({ error: "Please check the mobile number, or leave the field empty." });
   const ip = String(req.ip || "unknown");
   const now = Date.now();
   const times = (perIp.get(ip) ?? []).filter((t) => now - t < 3_600_000);
@@ -958,7 +962,7 @@ app.post("/api/access-request", async (req, res) => {
   if (!FB_PROJECT) return ok();
   try {
     await db().collection("accessRequests").add({
-      name, email, note, coach: Boolean(b.coach), who: ["client", "coach", "self"].includes(b.who) ? b.who : "", status: "new", createdAt: new Date().toISOString(),
+      name, email, note, phone, coach: Boolean(b.coach), who: ["client", "coach", "self"].includes(b.who) ? b.who : "", status: "new", createdAt: new Date().toISOString(),
       ipHash: createHash("sha256").update(ip + day).digest("hex").slice(0, 16), ua: String(req.headers["user-agent"] || "").slice(0, 160),
     });
     ok();
@@ -978,6 +982,43 @@ app.post("/api/access-requests/:id", requireUser, requireMember, requireCoach, a
   } catch (e) { fail(res, e); }
 });
 
+
+// /built, Books by Milan (board B, 12 October 2026): an email to hear when Worth Eating or Worth Living is out.
+// Public, so guarded like the access requests. One email when a book is out, nothing else. Written by the server only.
+const BOOKS = ["worth-eating", "worth-living"];
+const bookPerIp = new Map<string, number[]>();
+let bookPerDay = { day: "", n: 0 };
+app.post("/api/book-notify", async (req, res) => {
+  const b = req.body ?? {};
+  const ok = () => res.json({ ok: true });
+  if (typeof b.website === "string" && b.website.trim()) return ok();
+  const elapsed = Number(b.elapsed);
+  if (!Number.isFinite(elapsed) || elapsed < 3000 || elapsed > 3 * 3_600_000) return ok();
+  const email = String(b.email ?? "").trim().toLowerCase();
+  const books = Array.isArray(b.books) ? BOOKS.filter((x) => b.books.includes(x)) : [];
+  if (!/^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i.test(email)) return res.status(400).json({ error: "Please check your email." });
+  if (!books.length) return res.status(400).json({ error: "Please pick a book." });
+  const ip = String(req.ip || "unknown"), now = Date.now();
+  const times = (bookPerIp.get(ip) ?? []).filter((t) => now - t < 3_600_000);
+  if (times.length >= 3) return res.status(429).json({ error: "Thanks, we already have your email." });
+  const day = new Date().toISOString().slice(0, 10);
+  if (bookPerDay.day !== day) bookPerDay = { day, n: 0 };
+  if (bookPerDay.n >= 100) return res.status(429).json({ error: "Lots of sign-ups today. Please write to hello@chefmealan.com." });
+  bookPerIp.set(ip, [...times, now]); bookPerDay.n++;
+  if (!FB_PROJECT) return ok();
+  try {
+    // one record per email: a second sign-up adds books, never a second email
+    const id = createHash("sha256").update(email).digest("hex").slice(0, 32);
+    await db().collection("bookSignups").doc(id).set({ email, books: FieldValue.arrayUnion(...books), createdAt: new Date().toISOString() }, { merge: true });
+    ok();
+  } catch (e) { fail(res, e); }
+});
+app.get("/api/book-signups", requireUser, requireMember, requireCoach, async (_req, res) => {
+  try {
+    const snap = await db().collection("bookSignups").orderBy("createdAt", "desc").limit(200).get();
+    res.json({ signups: snap.docs.map((d) => ({ id: d.id, email: d.data().email, books: d.data().books ?? [], createdAt: d.data().createdAt })) });
+  } catch (e) { fail(res, e); }
+});
 
 // Personal invites: one code, one email, one use, 30 days. Only the server connects a person to a coach.
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
@@ -1174,6 +1215,13 @@ async function start() {
     app.get("/recipes", (req, res) => {
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       try { res.type("html").send(withMeta("Recipes · Chef Mealan", "Recipes from our kitchens. Every number is worked out from the recipe, weighed.", `https://${req.get("host")}/og.jpg?v=2`, `https://${req.get("host")}/recipes`)); }
+      catch { res.sendFile(path.join(dist, "index.html")); }
+    });
+    // /built carries its own title, words and picture, so the link on LinkedIn or a CV shows the build story (board B)
+    app.get(["/built", "/built/"], (req, res) => {
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      const base = `https://${req.get("host")}`;
+      try { res.type("html").send(withMeta("How Chef Mealan is built", "A product built with AI, one release at a time: the blueprint, the Worth Building playbook in practice, and Milan Stancevic, the product builder behind Chef Mealan.", `${base}/landing/built-og.jpg?v=1`, `${base}/built`)); }
       catch { res.sendFile(path.join(dist, "index.html")); }
     });
     app.get("*", (_req, res) => { res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); res.sendFile(path.join(dist, "index.html")); });

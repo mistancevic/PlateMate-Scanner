@@ -1,3 +1,4 @@
+import { waLink } from "../phone";
 import { useEffect, useState } from "react";
 import { useKept } from "../kept";
 import { RefreshCw, Copy, Target, Send, UserPlus } from "lucide-react";
@@ -67,6 +68,7 @@ export function CoachArea(p: AppApi) {
       <WaitingRecipes notify={notify} setError={setError} />
       <Invites {...p} />
       <AccessRequests {...p} />
+      <BookSignups {...p} />
       <p className="label">Clients ({rows.length})</p>
       {rows.length === 0 && <div className="strip">No clients yet. Share the code.</div>}
       {rows.map((r) => (
@@ -262,6 +264,7 @@ export function AccessRequests(p: AppApi) {
         <section className={`card request ${r.status === "handled" ? "handled" : ""}`} key={r.id}>
           <div className="card-top"><span>{r.name}{r.coach ? " · coach" : ""}{r.count > 1 ? ` · ${r.count} requests` : ""}</span><small>{new Date(r.createdAt).toLocaleDateString()}</small></div>
           <a href={`mailto:${r.email}?subject=Your%20Chef%20Mealan%20code`}>{r.email}</a>
+          {r.phone && <a href={waLink(String(r.phone))} target="_blank" rel="noreferrer">WhatsApp {r.phone}</a>}
           {r.note && <p className="client-note">“{r.note}”</p>}
           {r.status !== "handled" && (
             <div className="button-row" style={{ marginTop: 6 }}>
@@ -276,6 +279,25 @@ export function AccessRequests(p: AppApi) {
           )}
         </section>
       ))}
+    </>
+  );
+}
+
+// Book sign-ups from /built (board B): who wants one email when Worth Eating or Worth Living is out.
+const BOOK_NAMES: Record<string, string> = { "worth-eating": "Worth Eating", "worth-living": "Worth Living" };
+export function BookSignups(p: AppApi) {
+  const [list, setList] = useKept<any[] | null>(`books-${p.user?.uid ?? "local"}`, null);
+  useEffect(() => { fetch("/api/book-signups").then((r) => r.json()).then((d) => setList(d.signups ?? [])).catch(() => setList([])); }, []);
+  if (!list || list.length === 0) return null;
+  const count = (b: string) => list.filter((x) => (x.books ?? []).includes(b)).length;
+  return (
+    <>
+      <p className="label">Book sign-ups: Worth Eating {count("worth-eating")}, Worth Living {count("worth-living")}</p>
+      <section className="card">
+        {list.slice(0, 50).map((x) => (
+          <div className="card-top" key={x.id}><a href={`mailto:${x.email}`}>{x.email}</a><small>{(x.books ?? []).map((b: string) => BOOK_NAMES[b] ?? b).join(", ")}</small></div>
+        ))}
+      </section>
     </>
   );
 }

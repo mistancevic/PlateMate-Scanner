@@ -48,5 +48,6 @@ service cloud.firestore {
     // Invites and access requests are written and read by the server only.
     match /invites/{code} { allow read, write: if false; }
     match /accessRequests/{id} { allow read, write: if false; }
+    match /bookSignups/{id} { allow read, write: if false; }
   }
 }

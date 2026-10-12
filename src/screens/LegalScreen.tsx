@@ -31,8 +31,12 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
       {page === "about" && (
         <article>
           <h1>Who's behind Chef Mealan</h1>
-          <p>Chef Mealan is built and run by {OPERATOR.name}, a product manager in Munich and a certified fitness and nutrition coach.</p>
-          <p>It is a closed pilot: a coach gives out a code, a person joins with it, and the two of them decide together what the plate should be. Mealan is the AI chef in between: it reads labels, fits amounts to a goal, and stays a chef. The numbers come from code; the model reads labels, menus and shelves; you and your coach decide.</p>
+          {/* board B, 12 October 2026: the product role first, then the coaching after hours */}
+          <p><b>Chef Mealan is built and run by {OPERATOR.name} in Munich. Product builder by day, fitness and nutrition coach after hours.</b></p>
+          <p>Milan is a senior product manager with about 20 years in B2B and B2B2C software, and the founder of several startups and agencies. One of the startups, an event planner app, was acquired. He designs and builds Chef Mealan with AI, from the first sketch to every release: <a href="/built">How Chef Mealan is built</a>.</p>
+          <p>After hours, Milan is a certified fitness and nutrition coach, known to his clients as Coach Milan. He cooks every day for himself and his family, and tries every recipe and every number on himself first.</p>
+          <p>In Chef Mealan, a calculator works out the numbers, the AI reads labels and talks, and you and your coach decide. Chef Mealan is being tested by a small group right now; most people join with a code from their coach.</p>
+          <p>Author of <a href="/built#books">Worth Building</a>, a product playbook. <a href="https://www.linkedin.com/in/milanstancevic" target="_blank" rel="noreferrer">Milan on LinkedIn</a>.</p>
           <p>Questions, feedback, a code: <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>.</p>
         </article>
       )}
@@ -52,7 +56,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
       {page === "privacy" && (
         <article>
           <h1>Privacy notice</h1>
-          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 7 October 2026 (photos as files)</p>
+          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 12 October 2026 (the mobile number on a request, book sign-ups)</p>
           <h2>1. Who is responsible</h2>
           <p>{OPERATOR.name}, {OPERATOR.city}, {OPERATOR.country}. <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>. No data protection officer is appointed; the pilot is below the thresholds that require one.</p>
           <h2>2. What Chef Mealan keeps, and why</h2>
@@ -62,6 +66,8 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
             <li><b>Your declarations.</b> What you tick under "Is any of this true for you?", allergies and intolerances, with the date, so Mealan steps back where it should. Health data, same basis, same withdrawal.</li>
             <li><b>Your foods, plates, cards and photos.</b> What you scan, build, cook and rate, and the photos you take of packs and plates. Legal basis: the contract.</li>
             <li><b>The coach link.</b> Which coach you joined, what you chose to share with them, and what they sent you. Your coach sees the cards you share, the goal, and that you ticked a situation and when, never the words you typed. Legal basis: the contract.</li>
+            <li><b>A request to join, from the home page.</b> Your name, your email, what you wrote, and a mobile number if you give one, so Coach Milan can send you a personal code. The number is used only to message you on WhatsApp or by text about joining; a WhatsApp chat runs under WhatsApp's own terms. Legal basis: your request, Art. 6(1)(b). Deleted with your account, or when you ask by email.</li>
+            <li><b>Book sign-ups, from How Chef Mealan is built.</b> Your email and the books you picked, used for one email when a book is out, nothing else. Legal basis: your consent, Art. 6(1)(a); withdraw by email at any time.</li>
             <li><b>A pilot log.</b> What you tapped in the app (a mix shown, a tip taken), with no photos and no free text, to improve the pilot. Legal basis: legitimate interest, Art. 6(1)(f); you can object by email.</li>
           </ul>
           <h2>3. Where it is, and who processes it</h2>

@@ -46,6 +46,7 @@ import { clearKept } from "./kept";
 import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
 import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted, realPhotosOf, isDrawn } from "./photos";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
+import { BuiltScreen } from "./screens/BuiltScreen";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalLabel, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
@@ -1274,6 +1275,9 @@ export default function App() {
   // from a recipe page into the app, at a tab's address; the address bar decides what shows (canvas R2, C5)
   const goApp = (t: Tab) => { history.pushState({ tab: t }, "", pathOfTab(t)); setPagePath(location.pathname); setTab(t); };
   useEffect(() => { const f = () => setPagePath(location.pathname); window.addEventListener("popstate", f); return () => window.removeEventListener("popstate", f); }, []);
+  // every tab and every Plate step opens at the top, before the first paint, as the Menu pages already do (0.2.5+r9)
+  const firstScroll = useRef(true);
+  useLayoutEffect(() => { if (firstScroll.current) { firstScroll.current = false; return; } try { window.scrollTo(0, 0); document.querySelector("main")?.scrollTo?.(0, 0); } catch {} }, [tab, step]);
   const notify = (s: string) => {
     setMessage(s);
     setError("");
@@ -2053,6 +2057,8 @@ export default function App() {
     } : null;
     return pagePath === "/recipes" ? <RecipesPage member={isMember} /> : <RecipePage slug={pagePath.split("/")[2]} member={tools} />;
   }
+  // /built, How Chef Mealan is built (board B): public, signed in or not
+  if (/^\/built\/?$/.test(window.location.pathname)) return <BuiltScreen />;
   { const legal = legalPageFromPath(window.location.pathname); if (legal) return <LegalScreen page={legal} back={() => { window.history.replaceState(null, "", "/"); window.location.reload(); }} />; }
   if (cloudEnabled && !user) return <LandingScreen />;
   if (cloudEnabled && user && !profileReady) return <Starting onLocal={() => { localMode.current = true; setProfileReady(true); }} />;

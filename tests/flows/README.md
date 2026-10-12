@@ -27,3 +27,5 @@ Two kinds of checks live here, and the difference is the rule.
 The rule that was missing on 2 October 2026, and is now the rule: a walkthrough is only edited when the story names it. Changing `Photo` to `Scan` in three walkthroughs because the chip was renamed is editing the test to match the change. The journey behind it, several photos of one product from the plate, had no line of its own, so nothing failed when Scan started opening the wrong camera. The line is there now.
 
 The camera and the model do not run in the sandbox. The entry mode is asserted, the model's reading is not; Milan checks that on the phone.
+
+**Running them (12 October 2026).** `npm run test:flows:all` builds once and runs every walkthrough two at a time, each on a port of its own (`scripts/run-flows.cjs`; `LANES=3` for more, names to run only some, `--count` for how many). Helpers (`adult.cjs`, `me.cjs`, `foods.cjs`, `line.cjs`) are not walkthroughs and are left out, and so is `paths.cjs`, which only reruns the others. `built.cjs` guards /built (board B) and that every tab and Plate step opens at the top.

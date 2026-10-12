@@ -71,7 +71,7 @@ export function LandingScreen() {
             <li><b>Eat by the plan</b><p>Today shows the next meal. One tap opens the meal, Save counts the meal. At the end of the day you see how much of the day went by the plan.</p></li>
             <li><b>When the day changes</b><p>A lunch out, a craving, a food you didn't plan. Scan the food or ask Chef Mealan, and the plate or the next meal is fitted to your numbers.</p></li>
           </ol>
-          <PhoneToday />
+          <AppVideo />
         </div>
       </section>
 
@@ -100,17 +100,21 @@ export function LandingScreen() {
         <p>You set your goal together with your coach. If one of your numbers looks wrong, for example too little food on a training day, Chef Mealan shows a note to you and to your coach. Your coach can then approve the number or suggest a change.</p>
       </section>
 
-      {/* who's behind Chef Mealan: the photo moved here from the top (board HP, 12 October 2026) */}
+      {/* who's behind Chef Mealan (board B, HP11, 12 October 2026): the product role first, so nobody reads Milan as a
+          full-time coach; clients still know him as Coach Milan */}
       <section className="l-week l-behind">
         <span className="l-eyebrow">Who's behind Chef Mealan</span>
-        <h2>Coach Milan</h2>
+        <h2>Milan Stancevic</h2>
         <div className="l-split">
           <div>
-            <p>Chef Mealan is built by Coach Milan, a certified fitness and nutrition coach in Munich. He cooks every day for himself and his family, and tries every recipe and every number on himself first.</p>
-            <p><a href="/about">More about Coach Milan</a></p>
+            <p className="l-role">Product builder by day.<br />Fitness and nutrition coach after hours.</p>
+            <p>Milan is a senior product manager with about 20 years in software and the founder of several startups. He designs and builds Chef Mealan with AI, from the first sketch to every release.</p>
+            <p>After hours, Milan is a certified fitness and nutrition coach in Munich, known to his clients as Coach Milan. He cooks every day for himself and his family, and tries every recipe and every number on himself first.</p>
+            <p>Author of <a href="/built#books">Worth Building</a>. Worth Eating comes next.</p>
+            <p className="l-behind-links"><a href="/built">How Chef Mealan is built</a> · <a href="/about">More about Milan</a></p>
           </div>
           <figure className="l-hero-art">
-            <img className="l-chef" src="/landing/chef.webp" alt="Coach Milan, the person behind Chef Mealan, in a chef's hat" />
+            <img className="l-chef" src="/landing/chef.webp" alt="Milan Stancevic, the person behind Chef Mealan, in a chef's hat" />
           </figure>
         </div>
       </section>
@@ -139,34 +143,34 @@ export function LandingScreen() {
 
       <div className={`l-sticky ${sticky ? "on" : ""}`} aria-hidden={!sticky}><button className="pill pill-primary" tabIndex={sticky ? 0 : -1} onClick={toForm}>Try Chef Mealan</button></div>
       <footer className="l-foot">
-        <span><a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a></span>
+        <span><a href="/about">Who's behind it</a> · <a href="/built">How Chef Mealan is built</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a></span>
         <span><a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a> · © 2026 Milan Stancevic</span>
       </footer>
     </div>
   );
 }
 
-// The phones are drawings of the screens, not screenshots, so they stay right when the app's text changes.
-function PhoneToday() {
-  // the 0.2 Today (board HP): the goal, What's in the plan, Does it fit my numbers?, Scan food
+// How it works (board B, V1, 12 October 2026): 28 seconds of the real app, recorded by a script on a seeded day
+// (scripts in the design scratchpad, recVideo.cjs). Silent, loops, plays only while on screen.
+function AppVideo() {
+  const ref = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = ref.current; if (!v || typeof IntersectionObserver === "undefined") return;
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause(); }, { threshold: 0.3 });
+    io.observe(v); return () => io.disconnect();
+  }, []);
   return (
-    <div className="l-phone-draw" aria-label="Drawing of the Today screen">
-      <b className="l-ph-title">Today</b>
-      <div className="l-ph-card">
-        <small>MY GOAL</small>
-        <b className="l-ph-goal">Recomposition ›</b>
-        <div className="l-ph-nums"><span><b>6.9</b><small>PD target</small></span><span><b>2,600</b><small>kcal today</small></span><span><b>180</b><small>g protein</small></span></div>
-        <small className="l-ph-day">Monday: strength, hard, in the evening.</small>
-      </div>
-      <b className="l-ph-sub">What's in the plan</b>
-      <div className="l-ph-row"><span style={{ background: "var(--top)" }} /><b>07:30</b><small>Oats, skyr and banana · fits</small></div>
-      <div className="l-ph-row"><span style={{ background: "var(--top)" }} /><b>12:30</b><small>Chicken, rice and greens · fits</small></div>
-      <div className="l-ph-row"><span style={{ background: "#c9d3e6" }} /><b>19:30</b><small>Pick a meal</small></div>
-      <small className="l-ph-q">Does it fit my numbers?</small>
-      <span className="l-ph-btn primary">Scan food</span>
-    </div>
+    <figure className="l-video">
+      {/* MP4 first for Safari; WebM for a browser without H.264 */}
+      <video ref={ref} poster="/landing/chef-mealan-app.webp" muted loop playsInline preload="metadata"
+        aria-label="Chef Mealan on a phone: Today, Plan, a breakfast fitted to the target on the Plate, saved, and counted on Today">
+        <source src="/landing/chef-mealan-app.mp4" type="video/mp4" />
+        <source src="/landing/chef-mealan-app.webm" type="video/webm" />
+      </video>
+    </figure>
   );
 }
+// The weekly plan stays a drawing of the screen, so the drawing stays right when the app's text changes.
 function PhoneWeek() {
   const rows: [string, string, string][] = [["Mon", "Strength, hard · evening", "var(--top)"], ["Tue", "Rest", "#c9d3e6"], ["Wed", "Cardio, moderate · morning", "var(--high)"], ["Thu", "Yoga, light · evening", "var(--mid)"], ["Fri", "Strength, moderate · morning", "var(--high)"], ["Sat", "Mobility, light · during the day", "var(--mid)"], ["Sun", "Rest", "#c9d3e6"]];
   return (
@@ -215,6 +219,7 @@ export function RequestForm({ email: presetEmail, name: presetName }: { email?: 
   const [name, setName] = useState(presetName ?? "");
   const [email, setEmail] = useState(presetEmail ?? "");
   const [note, setNote] = useState("");
+  const [phone, setPhone] = useState("");
   const [who, setWho] = useState<"client" | "coach" | "self" | "">("");
   const [trap, setTrap] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
@@ -222,7 +227,7 @@ export function RequestForm({ email: presetEmail, name: presetName }: { email?: 
   async function send() {
     setErr(""); setState("sending");
     try {
-      const r = await fetch("/api/access-request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, note, who, coach: who === "coach", website: trap, elapsed: Date.now() - started.current }) });
+      const r = await fetch("/api/access-request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, phone, note, who, coach: who === "coach", website: trap, elapsed: Date.now() - started.current }) });
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d.error || "Couldn't send. Please write to hello@chefmealan.com.");
       setState("sent");
@@ -233,6 +238,11 @@ export function RequestForm({ email: presetEmail, name: presetName }: { email?: 
     <div className="l-form">
       <input placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} autoComplete="name" />
       <input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} autoComplete="email" />
+      {/* HP12: optional, for a WhatsApp message or a text about joining */}
+      <label className="l-mobile">
+        <input placeholder="Mobile number, optional" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={30} autoComplete="tel" />
+        <small>Coach Milan may message you on WhatsApp or by text about joining. The number is used for nothing else.</small>
+      </label>
       <textarea placeholder="What are you after? (optional)" value={note} onChange={(e) => setNote(e.target.value)} maxLength={600} />
       <div className="setting"><small className="setting-name">Which fits you?</small>
         <div className="chip-row">{([["client", "I have a coach"], ["coach", "I am a coach"], ["self", "I train on my own"]] as const).map(([k, l]) => <button key={k} type="button" className={`choice ${who === k ? "on" : ""}`} aria-pressed={who === k} onClick={() => setWho(k)}>{l}</button>)}</div>
