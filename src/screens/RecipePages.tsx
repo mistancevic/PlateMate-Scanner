@@ -79,8 +79,8 @@ function Amounts({ r, m }: { r: PublicRecipe; m: MemberTools }) {
       ))}
       <div className="rp-row rp-total"><span>On your plate</span><b>{kcal} kcal · {g1(protein)} protein · PD {pd.toFixed(1)}</b></div>
       <small className="muted">{mix
-        ? `Mealan suggests ${suggested} ${plural(suggested, r.servingName)} for your ${m.momentName.toLowerCase()} and added what fits your PD target. Change the count with − and +.`
-        : tip.case === "fits" ? `It fits your PD target as it is, so nothing needs adding. Mealan suggests ${suggested} ${plural(suggested, r.servingName)} for your ${m.momentName.toLowerCase()}; change it with − and +.` : tip.why}</small>
+        ? `Chef Mealan suggests ${suggested} ${plural(suggested, r.servingName)} for your ${m.momentName.toLowerCase()} and added what fits your PD target. Change the count with − and +.`
+        : tip.case === "fits" ? `It fits your PD target as it is, so nothing needs adding. Chef Mealan suggests ${suggested} ${plural(suggested, r.servingName)} for your ${m.momentName.toLowerCase()}; change it with − and +.` : tip.why}</small>
       <button className="pill pill-wide pill-primary" onClick={() => (mix ? m.takeMix(food, { ...mix, items, kcal, protein: Math.round(protein), pd }) : m.putAlone(food, Math.round(n * per)))}>Put on my plate</button>
       {r.items.every((i) => i.per100) && r.items.length > 0 && (
         <button className="link rp-center" onClick={() => m.addRecipe({
@@ -121,13 +121,13 @@ export function RecipeView({ r, member, photoSrc, top }: { r: Loaded; member: Me
       {member ? <Amounts r={r} m={member} /> : (
         <section className="rp-card rp-invite">
           <b>Your amounts</b>
-          <p>How many {plural(2, r.servingName)} fit your day, and what to add so the plate fits your goal: Mealan works it out for each person.</p>
-          <a className="pill pill-wide pill-primary" href="/#ask">Ask for an invite</a>
+          <p>How many {plural(2, r.servingName)} fit your day, and what to add so the plate fits your goal: Chef Mealan works it out for each person.</p>
+          <a className="pill pill-wide pill-primary" href="/#ask">Try Chef Mealan</a>
           <small>A closed pilot with coaches.</small>
         </section>
       )}
       {r.locked ? (
-        <section className="rp-card rp-locked"><b>Members only</b><p>The foods and the steps of this recipe are for members of the pilot.</p><a className="pill pill-wide" href="/#ask">Ask for an invite</a></section>
+        <section className="rp-card rp-locked"><b>Members only</b><p>The foods and the steps of this recipe are for members of the pilot.</p><a className="pill pill-wide" href="/#ask">Try Chef Mealan</a></section>
       ) : (
         <>
           <section className="rp-card">
@@ -207,7 +207,7 @@ export function RecipesPage({ member }: { member: boolean }) {
       {list && !list.length && <p className="rp-empty">The first recipes are on their way.</p>}
       <div className="rp-grid">{(list ?? []).map((r) => <RecipeCard key={r.slug} r={r} />)}</div>
       {!member && (
-        <section className="rp-card rp-invite"><b>Your amounts, for every recipe</b><p>In the app, Mealan sets how much of each recipe fits your goal and your day.</p><a className="pill pill-wide pill-primary" href="/#ask">Ask for an invite</a></section>
+        <section className="rp-card rp-invite"><b>Your amounts, for every recipe</b><p>In the app, Chef Mealan works out how much of each recipe fits your goal and your day.</p><a className="pill pill-wide pill-primary" href="/#ask">Try Chef Mealan</a></section>
       )}
       <Foot />
     </div>

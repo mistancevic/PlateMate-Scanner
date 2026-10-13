@@ -52,7 +52,7 @@ seed.items = [];
   await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(600);
   await page.locator(".row-food", { hasText: "Skyr" }).getByRole("button").click(); await page.waitForTimeout(300);
   await click(/Fit to my target/); await page.waitForTimeout(1200);
-  ok(await page.locator(".dish-row").count() === 1 && /what Mealan moves/.test(await page.locator(".rows").textContent()), "after Fit the dish is still one row and the side is what Mealan moves");
+  ok(await page.locator(".dish-row").count() === 1 && /what Chef Mealan moves/.test(await page.locator(".rows").textContent()), "after Fit the dish is still one row and the side is what Mealan moves");
   const sarmaGrams = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.filter((i) => i.dish).map((i) => i.grams));
   ok(sarmaGrams.join(",") === "100,150,25", "the recipe's amounts stay one portion: " + sarmaGrams.join(", "));
   // Where does this go: Scan from Today, a barcode, the sheet

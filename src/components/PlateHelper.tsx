@@ -32,7 +32,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
     return next.map((i) => (i.id === id ? { ...i, grams, locked: false } : i));
   };
   const toFood = (s: Suggestion): Food => library.find((f) => f.name.toLowerCase() === s.food.toLowerCase()) ?? {
-    id: uid(), name: s.food, brand: "estimate", basis: "100g", source: "estimate", notes: "estimate from Mealan", reviewedAt: new Date().toISOString(), readyToEat: true,
+    id: uid(), name: s.food, brand: "estimate", basis: "100g", source: "estimate", notes: "estimate from Chef Mealan", reviewedAt: new Date().toISOString(), readyToEat: true,
     calories: s.calories, protein: s.protein, fats: null, carbs: null, fiber: null,
   };
   function take(s: Suggestion) {
@@ -68,7 +68,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
         target: { pd: pdRef },
       }) });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Mealan could not answer.");
+      if (!res.ok) throw new Error(data.error || "Chef Mealan could not answer.");
       const taken = takeModelFlag(data.reply || ""); if (taken.flag) onFlag(taken.flag);
       // a declared allergy: a suggestion that trips it never shows, whatever the model said
       const safe = (data.suggestions ?? []).filter((x: any) => !allergyHits({ name: String(x.food ?? ""), brand: "", notes: String(x.why ?? ""), table: [] } as any, safety.allergies).length);
@@ -83,7 +83,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet helper" onClick={(e) => e.stopPropagation()}>
-        <div className="card-top"><span>{missing ? `Mealan, instead of ${missing.food.name}` : "Mealan, about this plate"}</span><button className="link" onClick={close}>Close</button></div>
+        <div className="card-top"><span>{missing ? `Chef Mealan, instead of ${missing.food.name}` : "Chef Mealan, about this plate"}</span><button className="link" onClick={close}>Close</button></div>
         <SafetyNote safety={safety} ai={ai} />
         {codeSwaps.length > 0 && (
           <>
@@ -109,7 +109,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
         </div>
         {busy && <div className="bubble mealan thinking"><span /><span /><span /></div>}
         {reply && <p className="helper-reply">{reply}</p>}
-        {openTalk && <button className="link" onClick={openTalk}>Something else? Talk to Mealan</button>}
+        {openTalk && <button className="link" onClick={openTalk}>Something else? Talk to Chef Mealan</button>}
         {sugs.map((s, k) => (
           <div className="suggestion" key={k}>
             <div>

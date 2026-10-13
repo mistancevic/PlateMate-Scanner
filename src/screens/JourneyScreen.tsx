@@ -136,7 +136,7 @@ export function JourneyScreen(p: AppApi) {
     const l = lifts(list); if (!l || !list.length) return null;
     return (
       <div className="chef-line chef-tip">
-        <span className="chef-line-who"><ChefHat size={15} /> Chef {CHEF_NAME}</span>
+        <span className="chef-line-who"><ChefHat size={15} /> {CHEF_NAME}</span>
         <span>Your plate is {pdVal(l.gap)} under. {l.rows.length ? `Add one of these from your foods ${refit ? `and ${CHEF_NAME} refits` : "to lift it"}:` : "Nothing in your foods lifts it on its own."}</span>
         {l.rows.map((r) => (
           <div key={r.f.id} className="tip-row">
@@ -146,7 +146,7 @@ export function JourneyScreen(p: AppApi) {
           </div>
         ))}
         {!l.reaches && <span className="tip-note">{l.rows.length ? `None of them reaches ${pdVal(pdRef)} on its own. ` : ""}For a dish around these foods, ask the chef.</span>}
-        {!l.reaches && <button type="button" className="pill pill-small" onClick={() => p.openOut()}>Ask Chef {CHEF_NAME} what to add</button>}
+        {!l.reaches && <button type="button" className="pill pill-small" onClick={() => p.openOut()}>Ask {CHEF_NAME} what to add</button>}
       </div>
     );
   };
@@ -204,7 +204,7 @@ export function JourneyScreen(p: AppApi) {
     let ready = items.map((i) => ({ ...i, food: { ...i.food, readyToEat: true } }));
     if (ready.length === 1) {
       const partner = [...state.foods].filter((f) => f.id !== ready[0].food.id).sort((a, b) => (density(b.protein, b.calories) ?? -1) - (density(a.protein, a.calories) ?? -1))[0];
-      if (!partner) { setError("Add a food to your library first, so Mealan has partners to choose from."); return; }
+      if (!partner) { setError("Add a food to your library first, so Chef Mealan has partners to choose from."); return; }
       ready = [{ ...ready[0], locked: true }, { id: uid(), food: { ...partner, readyToEat: true }, grams: 100, locked: false }];
     }
     const mover = moverOf(ready);
@@ -329,7 +329,7 @@ export function JourneyScreen(p: AppApi) {
                 <button key={r.id} className={`choice ${p.travelTo === r.id ? "on" : ""}`} onClick={() => p.setTravelTo(p.travelTo === r.id ? null : r.id)}>{r.name}</button>
               ))}
             </div>
-            <p className="small moment-hint">{p.travelTo ? `${CHEF_NAME} plans with what's sold in ${REGIONS.find((r) => r.id === p.travelTo)?.name}. Use the chat to shop and cook there.` : "Pick the place and Mealan plans with its shelves."}</p>
+            <p className="small moment-hint">{p.travelTo ? `${CHEF_NAME} plans with what's sold in ${REGIONS.find((r) => r.id === p.travelTo)?.name}. Use the chat to shop and cook there.` : "Pick the place and Chef Mealan plans with its shelves."}</p>
           </>
         )}
         {/* On the plate (Y1 columns 2 and 2b, 10 October 2026): the plate is a card of its own, with Fit to my target as its action */}
@@ -453,7 +453,7 @@ export function JourneyScreen(p: AppApi) {
           {groupsOf(shown).map((g) => g.kind === "dish" ? <DishRow key={g.id} g={g} /> : (() => { const i = g.item; return (
             <SwipeRow key={i.id} onRemove={() => remove(i.id)} onSwap={() => setSwapId(i.id)}>
             <div className="row">
-              <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Let Mealan move" : "Keep"} ${i.food.name}`} onClick={() => toggle(i.id)} />
+              <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Let Chef Mealan move" : "Keep"} ${i.food.name}`} onClick={() => toggle(i.id)} />
               <div className="row-text"><button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button>
                 <small>{i.locked ? "as you set it" : i.id === mover?.id ? `what ${CHEF_NAME} moves` : `${CHEF_NAME} may move it`}</small>
                 {suggest?.id === i.id && suggest.grams !== i.grams && (

@@ -138,7 +138,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           {!consented && (
             <section className="card consent" aria-label="Before your numbers">
               <b>Before your numbers</b>
-              <p className="small">To calculate your day, Mealan asks a few things about your body: female or male, your birth year, height, weight, and your body fat if you know it. Later, also the weigh-ins you add. Mealan keeps only these and the numbers they give, on this phone and in your account, for as long as you have the account. You can export or delete them any time. Nothing is kept until you agree. More in the <a href="/privacy">privacy notice</a>.</p>
+              <p className="small">To calculate your day, Chef Mealan asks a few things about your body: female or male, your birth year, height, weight, and your body fat if you know it. Later, also the weigh-ins you add. Chef Mealan keeps only these and the numbers they give, on this phone and in your account, for as long as you have the account. You can export or delete them any time. Nothing is kept until you agree. More in the <a href="/privacy">privacy notice</a>.</p>
               <div className="button-row">
                 <button className="pill pill-small pill-primary" onClick={() => p.declareSafety({ consentBodyAt: new Date().toISOString(), consentBy: "self" })}>I agree</button>
               </div>

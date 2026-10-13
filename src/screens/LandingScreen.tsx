@@ -32,7 +32,7 @@ export function LandingScreen() {
     check(); window.addEventListener("scroll", check, { passive: true }); window.addEventListener("resize", check);
     return () => { window.removeEventListener("scroll", check); window.removeEventListener("resize", check); };
   }, []);
-  // from a recipe page's Ask for an invite: straight to the form
+  // from a recipe page's Try Chef Mealan: straight to the form
   useEffect(() => { if (location.hash === "#ask") setTimeout(toForm, 300); }, []);
   // the three newest public recipes (canvas board R7); the section stays hidden while there are none
   const [recipes, setRecipes] = useState<PublicRecipe[]>([]);

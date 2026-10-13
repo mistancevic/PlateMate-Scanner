@@ -130,8 +130,8 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirm
               {needs && confirmAi && (
                 <div className="button-row">
                   {row.aiConfirmedAt
-                    ? <button className="pill pill-small" onClick={() => confirmAi(row.uid, false).then(onSaved).catch((e) => setError(e.message))}>Mealan's chat is on · switch off</button>
-                    : <button className="pill pill-small pill-primary" onClick={() => confirmAi(row.uid, true).then(onSaved).catch((e) => setError(e.message))}>Confirm Mealan's chat</button>}
+                    ? <button className="pill pill-small" onClick={() => confirmAi(row.uid, false).then(onSaved).catch((e) => setError(e.message))}>Chef Mealan's chat is on · switch off</button>
+                    : <button className="pill pill-small pill-primary" onClick={() => confirmAi(row.uid, true).then(onSaved).catch((e) => setError(e.message))}>Confirm Chef Mealan's chat</button>}
                 </div>
               )}
             </section>

@@ -488,7 +488,7 @@ function LabelCheck({
           <input aria-label="Serving grams" type="number" inputMode="decimal" min="0" placeholder="45" value={servingGrams} onChange={(e) => setServingGrams(e.target.value)} />
           <span>g</span>
         </div>
-        <small className="muted">A counted food: what Mealan moves then comes in whole servings, 1 bar, 2 bars, never 1.3.</small>
+        <small className="muted">A counted food: what Chef Mealan moves then comes in whole servings, 1 bar, 2 bars, never 1.3.</small>
       </div>
       <p className="label">Nutrition table, per 100 g, as on the pack</p>
       <div className="label-table">
@@ -609,7 +609,7 @@ function LabelCheck({
               </button>
             ))}
             <p className="small">A tap saves the food and puts the mix on the plate.</p>
-            {onAsk && <button className="link" onClick={() => askNow(tip)}><MessageCircle size={14} /> Not quite? Tell Mealan</button>}
+            {onAsk && <button className="link" onClick={() => askNow(tip)}><MessageCircle size={14} /> Not quite? Tell Chef Mealan</button>}
             {askError && <p className="notice">{askError}</p>}
           </section>
         );
@@ -1542,7 +1542,14 @@ export default function App() {
     }
     const c = calculate(personal, bandId, profile.formula ?? null);
     if (!c) return avg;
-    const d = day.plan ? c.numbersOf(day.plan) : c.days[day.type]; return { kcal: d.kcal, protein: d.protein, fats: d.fats, carbs: d.carbs };
+    const d = day.plan ? c.numbersOf(day.plan) : c.days[day.type];
+    // a goal not calculated from the profile (a quick goal) keeps its own numbers: protein and fat as set, the day's energy
+    // moves with the training as the profile says, the carbs take the difference (0.2.5+r18: Today said 180 g protein, Me 105 g)
+    if (goal?.source !== "profile") {
+      const kcal = Math.round((avg.kcal * d.kcal) / (c.kcal || d.kcal));
+      return { kcal, protein: avg.protein, fats: avg.fats, carbs: macroSplit(kcal, avg.protein, avg.fats).carbs };
+    }
+    return { kcal: d.kcal, protein: d.protein, fats: d.fats, carbs: d.carbs };
   }
   function todayKcalOf(): number | null { return todayNumbers()?.kcal ?? state.goals.calories ?? null; }
   function mix(id: string = adjustId): boolean { return mixWith(state.items, id); }
@@ -1565,14 +1572,14 @@ export default function App() {
     }
     const selected = itemsIn.find((x) => x.id === id);
     if (!selected || selected.locked) {
-      setError("Let Mealan move one product. Everything else stays as you set it.");
+      setError("Let Chef Mealan move one product. Everything else stays as you set it.");
       return false;
     }
     if (
       !selected.food.readyToEat ||
       itemsIn.some((x) => !x.food.readyToEat)
     ) {
-      setError("Mealan mixes foods you can eat as they are.");
+      setError("Chef Mealan mixes foods you can eat as they are.");
       return false;
     }
     if (
@@ -1737,7 +1744,7 @@ export default function App() {
     openFoodId, clearOpenFood: () => setOpenFoodId(null),
     setFoodJob: (foodId: string, job: string | null) => {
       setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, job: job || undefined } : x)) }));
-      notify(job ? `Labelled ${job.toLowerCase()}.` : "Back to Mealan's label.");
+      notify(job ? `Labelled ${job.toLowerCase()}.` : "Back to Chef Mealan's label.");
     },
     eatenTodayKcal: (() => {
       const today = new Date().toDateString();
@@ -1995,7 +2002,7 @@ export default function App() {
     confirmClientAi: async (clientUid: string, on: boolean) => {
       if (!user) return;
       if (on) await confirmClientAi(clientUid, user.uid); else await clearClientAi(clientUid);
-      notify(on ? "Mealan's chat is on for this client." : "Mealan's chat is off for this client.");
+      notify(on ? "Chef Mealan's chat is on for this client." : "Chef Mealan's chat is off for this client.");
     },
     // Delete my account (7 October 2026): the server runs the steps in a safe order and says which were done. From the
     // first tap this phone writes nothing to the account. Once the record is gone the phone is cleared and signed out,
@@ -2147,7 +2154,7 @@ export default function App() {
         {!menuSection && !talkOpen && tab === "journey" && <JourneyScreen {...screenProps} />}
         {talkOpen && !menuSection && <div className="talk-overlay"><OutScreen {...screenProps} tab={tab} ask={talkAsk} clearAsk={() => setTalkAsk(null)} turns={talkTurns} setTurns={(f) => setTalkTurns(f)} close={() => setTalkOpen(false)} toPlate={() => { setTalkOpen(false); setMenuSection(null); setStep("in"); setTab("journey"); }} /></div>}
         {!talkOpen && (
-          <button className="chat-fab" aria-label="Mealan" onClick={() => {
+          <button className="chat-fab" aria-label="Chef Mealan" onClick={() => {
             // one door: on a plate with food it answers about the plate; anywhere else it's the conversation
             if (!menuSection && tab === "journey" && (step === "in" || step === "recipe") && state.items.length > 0) setMealanAsk((n) => n + 1);
             else setTalkOpen(true);

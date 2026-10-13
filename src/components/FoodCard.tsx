@@ -118,7 +118,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         {picking && insight && (
           <div className="moments job-pick">
             {JOBS.map((j) => <button key={j} className={`choice ${job.job === j ? "on" : ""}`} onClick={() => { insight.setJob(j); setPicking(false); }}>{j}</button>)}
-            {job.mine && <button className="link" onClick={() => { insight.setJob(null); setPicking(false); }}>Use Mealan's label</button>}
+            {job.mine && <button className="link" onClick={() => { insight.setJob(null); setPicking(false); }}>Use Chef Mealan's label</button>}
           </div>
         )}
         <section className={`readout readout-fit-${fit}`}>
@@ -139,14 +139,14 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
                 <small>{pdText(m.pd)} · {m.kcal} kcal · {m.kind}{m.cooking ? " · cooking" : ""}{m.fromStarter.length ? " · from the starter set" : ""}</small>
               </button>
             ))}
-            <button className="link" onClick={mix.ask}><MessageCircle size={14} /> Not quite? Tell Mealan</button>
+            <button className="link" onClick={mix.ask}><MessageCircle size={14} /> Not quite? Tell Chef Mealan</button>
           </section>
         )}
         {insight && (() => { const t = todayLine(food, insight.dayKcal, insight.eaten, insight.dayName); return t ? <p className="insight insight-today">{t}</p> : null; })()}
         {insight && (
           <section className="pro-tip">
             <span className="pro-badge">Pro tip</span>
-            {tipFresh ? <p>{food.tip!.text}</p> : tipState === "busy" ? <p className="muted">Mealan is writing a tip for your goal…</p> : tipState === "failed" ? <p className="muted">No tip just now. <button className="link" onClick={() => { setTipState("busy"); insight.requestTip().then(() => setTipState("idle")).catch(() => setTipState("failed")); }}>Try again</button></p> : null}
+            {tipFresh ? <p>{food.tip!.text}</p> : tipState === "busy" ? <p className="muted">Chef Mealan is writing a tip for your goal…</p> : tipState === "failed" ? <p className="muted">No tip just now. <button className="link" onClick={() => { setTipState("busy"); insight.requestTip().then(() => setTipState("idle")).catch(() => setTipState("failed")); }}>Try again</button></p> : null}
           </section>
         )}
         <div className="label-table label-table-read" aria-label="Nutrition table per 100 g">

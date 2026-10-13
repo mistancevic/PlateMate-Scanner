@@ -67,7 +67,7 @@ async function requireMember(req: express.Request, res: express.Response, next: 
   if (!FB_PROJECT) return next();
   try {
     const m = await membership((req as any).uid);
-    if (!m.member) return res.status(403).json({ error: "Chef Mealan is in a closed pilot. Join with your coach's code to use Mealan." });
+    if (!m.member) return res.status(403).json({ error: "Chef Mealan is in a closed pilot. Join with your coach's code to use Chef Mealan." });
     // Chef Mealan is for adults: nothing that reaches the AI, or the account's data, before the welcome tap; never for a birth year under 18
     if (underAge(m.birthYear)) return res.status(403).json({ error: `${ADULT_ONLY} Your birth year means you're under 18.`, fixed: true });
     if (!m.safety.adultAt) return res.status(403).json({ error: "Confirm on the welcome screen that you're 18 or older." });
@@ -82,14 +82,14 @@ function requireCoach(req: express.Request, res: express.Response, next: express
 async function requireUser(req: express.Request, res: express.Response, next: express.NextFunction) {
   if (!FB_PROJECT) return next(); // preview and local development run without accounts
   const token = String(req.headers.authorization || "").replace(/^Bearer /, "");
-  if (!token) return res.status(401).json({ error: "Please sign in to use Mealan." });
+  if (!token) return res.status(401).json({ error: "Please sign in to use Chef Mealan." });
   try {
     const user = await adminAuth().verifyIdToken(token);
     const hour = Math.floor(Date.now() / 3_600_000);
     const u = usage.get(user.uid);
     const n = u && u.hour === hour ? u.n + 1 : 1;
     usage.set(user.uid, { hour, n });
-    if (n > HOURLY_LIMIT) return res.status(429).json({ error: "That's a lot of questions for one hour. Mealan needs a short break; try again in a few minutes." });
+    if (n > HOURLY_LIMIT) return res.status(429).json({ error: "That's a lot of questions for one hour. Chef Mealan needs a short break; try again in a few minutes." });
     (req as any).uid = user.uid;
     (req as any).email = user.email_verified ? String(user.email || "").toLowerCase() : "";
     next();

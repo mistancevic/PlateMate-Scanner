@@ -70,7 +70,7 @@ export function WhereSheet(p: AppApi & { food: Food; close: () => void }) {
             <div className="menu-row-text"><b>Just keep it in My foods</b><small>nothing planned yet</small></div><ChevronRight size={18} />
           </button>
         </div>
-        <button type="button" className="pill pill-wide" onClick={() => { close(); p.openOut(); }}><ChefHat size={18} /> Ask Chef {CHEF_NAME} what to make of it</button>
+        <button type="button" className="pill pill-wide" onClick={() => { close(); p.openOut(); }}><ChefHat size={18} /> Ask {CHEF_NAME} what to make of it</button>
       </div>
     </div>
   );

@@ -239,7 +239,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
         </div>
         <div className="setting-block">
           <b className="field-label">The foods, as the page names them</b>
-          <small className="muted">Mealan left out the brands; change a name if you like. It changes only the page.</small>
+          <small className="muted">Chef Mealan left out the brands; change a name if you like. It changes only the page.</small>
           {meal.items.map((i, k) => i.grams > 0 && (
             <div className="publish-item" key={k}><input value={names[k] ?? ""} onChange={(e) => setNames((xs) => xs.map((x, j) => (j === k ? e.target.value : x)))} aria-label={`Name of food ${k + 1}`} /><span>{amountOf(i.grams)}</span></div>
           ))}

@@ -1,7 +1,7 @@
 // JOURNEY INVARIANT (Milan, 7 October 2026, canvas boards R0 to R7): a coach publishes a recipe from the app: a photo, two
 // lines, how many it makes, the steps, who sees it; the checks say high protein only at 20 % of the energy. The page at
 // /r/<name> shows the photo, the numbers for one serving, PD, the goals it fits, the ingredients and steps, the nutrition;
-// a visitor gets Ask for an invite where a member gets their amounts. /recipes lists it; a shared link previews the recipe.
+// a visitor gets Try Chef Mealan where a member gets their amounts. /recipes lists it; a shared link previews the recipe.
 // The Instagram images come from the same numbers. Never rewrite these lines to fit a change. R12 (0.2.5+r13): Published band, the button sleeps until a change, Changes not published yet.
 // Changed with Milan, 8 October 2026 (boards RG0 to RG4 and RF4): what is typed in the sheet is kept with the recipe as a
 // draft, never public; See the page shows the page before anything goes live; everyone sees a recipe (no Who sees it); the
@@ -83,7 +83,7 @@ const dl = process.argv[2] || null;
     ok(chips.join(",") === "✓ Lose fat", "a tick only for the goal it truly fits, not for just above: " + chips.join(", "));
     ok(await page.locator(".rp-daam").count() === 1, "DaaM good on the photo");
     ok(await page.evaluate(async () => (await fetch("/r/high-protein-crepes/photo.jpg")).status) === 200, "its photo is served");
-    ok(/Ask for an invite/.test(body) && /Protein flour/.test(body) && /Whisk the eggs/.test(body), "a visitor: the recipe, the steps, and Ask for an invite for the amounts");
+    ok(/Try Chef Mealan/.test(body) && /Protein flour/.test(body) && /Whisk the eggs/.test(body), "a visitor: the recipe, the steps, and Try Chef Mealan for the amounts");
     if (dl) await page.screenshot({ path: path.join(dl, "page.png"), fullPage: true });
     const html = await page.evaluate(async () => (await fetch("/r/high-protein-crepes")).text());
     ok(/og:title" content="High protein crepes · Chef Mealan"/.test(html) && /og:image" content="[^"]*\/r\/high-protein-crepes\/photo\.jpg"/.test(html), "a shared link previews the recipe and its photo");

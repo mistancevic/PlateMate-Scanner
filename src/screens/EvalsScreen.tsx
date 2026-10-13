@@ -126,7 +126,7 @@ async function runTip(t: T): Promise<Result> {
     "numbers only from the data": numbers.every((n) => allowed.has(n) || allowed.has(String(Number(n)))),
     "foods named are in the library": (data.pairs ?? []).every((n: string) => LIB.some((x) => x.name === n)),
     "follows the playbook": tipBreaks(tip, playbookFor(f)).length === 0,
-    "written by Mealan, not the fallback": data.by !== "playbook",
+    "written by Chef Mealan, not the fallback": data.by !== "playbook",
     "under 8 seconds": ms < 8000,
   };
   return { at: new Date().toISOString(), ms, output: data, checks };

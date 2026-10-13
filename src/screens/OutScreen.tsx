@@ -121,7 +121,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
           library: state.foods.slice(0, 24).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })),
         }) });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Mealan could not answer.");
+      if (!res.ok) throw new Error(data.error || "Chef Mealan could not answer.");
       const recs: Rec[] = data.recognised ?? [];
       // build the plate from Mealan's picks, then let the solver, not the model, settle the numbers
       let picks: Ingredient[] = (data.picks ?? []).map((pk: { name: string; grams: number }) => {
@@ -157,7 +157,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   }
   function keep(t: Turn) {
     if (!t.picks?.length) return;
-    const meal = { id: uid(), title: `With Mealan: ${t.picks.map((i) => i.food.name).join(", ")}`, items: t.picks, portion: t.picks.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
+    const meal = { id: uid(), title: `With Chef Mealan: ${t.picks.map((i) => i.food.name).join(", ")}`, items: t.picks, portion: t.picks.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
     setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "eaten" as const, taste: "Chat", notes: turns.filter((x) => x.role === "you").map((x) => x.text).join(" / ").slice(0, 300), createdAt: new Date().toISOString() }, ...s.feedback] }));
     log("feedback", { status: "eaten", taste: "Chat" });
     p.notify("Saved to your meals.");

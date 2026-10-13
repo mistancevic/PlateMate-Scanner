@@ -64,7 +64,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
           <ul>
             <li><b>Account.</b> Your Google sign-in (name, email, user ID), so the app knows it is you, and the date you confirmed that you're 18 or over. Legal basis: the contract, Art. 6(1)(b).</li>
             <li><b>Body data.</b> Female or male (the formulas differ), birth year, height, weight, body fat if you give it, and the weigh-ins you add. Used only to calculate your numbers and show your trend to you and your coach. This is health data; it is kept only after you agree on the profile, Art. 9(2)(a), and you can withdraw by deleting it or the account.</li>
-            <li><b>Your declarations.</b> What you tick under "Is any of this true for you?", allergies and intolerances, with the date, so Mealan steps back where it should. Health data, same basis, same withdrawal.</li>
+            <li><b>Your declarations.</b> What you tick under "Is any of this true for you?", allergies and intolerances, with the date, so Chef Mealan steps back where it should. Health data, same basis, same withdrawal.</li>
             <li><b>Your foods, plates, cards and photos.</b> What you scan, build, cook and rate, and the photos you take of packs and plates. Legal basis: the contract.</li>
             <li><b>The coach link.</b> Which coach you joined, what you chose to share with them, and what they sent you. Your coach sees the cards you share, the goal, and that you ticked a situation and when, never the words you typed. Legal basis: the contract.</li>
             <li><b>A request to join, from the home page.</b> Your name, your email, what you wrote, and a mobile number if you give one, so Coach Milan can send you a personal code. The number is used only to message you on WhatsApp or by text about joining; a WhatsApp chat runs under WhatsApp's own terms. Legal basis: your request, Art. 6(1)(b). Deleted with your account, or when you ask by email.</li>
@@ -74,7 +74,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
           <h2>3. Where it is, and who processes it</h2>
           <ul>
             <li><b>Google Cloud, Frankfurt (EU).</b> The app runs on Cloud Run; your data sits in Firestore and Firebase Authentication, and your photos as image files in Firebase Storage, region europe-west1/europe-west3. Only you can open your photos; your coach sees a plate's photo only when you share that card. Google Ireland Ltd is the processor under its Cloud data processing terms.</li>
-            <li><b>Google Gemini API.</b> When you scan a label or write to Mealan, the photo or the text is sent to Google's Gemini API to be read, and the answer comes back. Chef Mealan uses the paid Gemini API: under its terms, Google does not use that content to train its models.</li>
+            <li><b>Google Gemini API.</b> When you scan a label or write to Chef Mealan, the photo or the text is sent to Google's Gemini API to be read, and the answer comes back. Chef Mealan uses the paid Gemini API: under its terms, Google does not use that content to train its models.</li>
             <li><b>Open Food Facts.</b> A barcode you scan is looked up there. The barcode is not personal data; nothing else is sent.</li>
             <li>No advertising, no analytics beyond the pilot log above and the visit counts in section 7, no sale or sharing of your data with anyone else.</li>
           </ul>
@@ -89,16 +89,16 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
           <p><b>Counting visits.</b> We count visits to chefmealan.com per day: how many people open a page, use the calculator or tap Try Chef Mealan. We set no cookie, and we store no IP address or visitor ID with these counts, so a count can't be traced back to you. We do this to know whether the site works (legitimate interest, Art. 6(1)(f) GDPR).</p>
           <p><b>How the pilot is used.</b> In the app, the pilot log (for example, a meal saved or a label read) goes to our server in Frankfurt with your member number, not your email. It contains no free text, photos or food names. We keep it for 12 months, and we delete it with your account.</p>
           <h2>8. Automated decisions</h2>
-          <p>Mealan is an AI chef. It suggests; it does not decide anything with legal or similar effect on you. Whether Mealan's chat is on for an account follows the rules on the profile and, for one declared situation, your coach's confirmation, which a person makes.</p>
+          <p>Chef Mealan is an AI chef. It suggests; it does not decide anything with legal or similar effect on you. Whether Chef Mealan's chat is on for an account follows the rules on the profile and, for one declared situation, your coach's confirmation, which a person makes.</p>
         </article>
       )}
       {page === "disclaimer" && (
         <article>
           <h1>Disclaimer</h1>
-          <p><b>Mealan is an AI chef, not a doctor, dietitian or therapist.</b> It can be wrong. A number it reads from a label is an estimate until you check it against the pack; a plate it suggests is a chef's suggestion, not a prescription.</p>
+          <p><b>Chef Mealan is an AI chef, not a doctor, dietitian or therapist.</b> It can be wrong. A number it reads from a label is an estimate until you check it against the pack; a plate it suggests is a chef's suggestion, not a prescription.</p>
           <p><b>Not medical advice.</b> Nothing in Chef Mealan diagnoses, treats or prevents a condition. If you are pregnant or breastfeeding, have diabetes or take insulin, have an allergy or an intolerance, take medication that affects food, or have or had a difficult relationship with eating, the app steps back and names who to talk to; that person's advice comes first. In an emergency, call 112.</p>
           <p><b>Numbers.</b> Calories, protein and the rest come from the pack, a database, or a reading by the model; the arithmetic is code. Daily numbers are calculated from what you entered on the profile with a standard formula and are a starting point, not a prescription.</p>
-          <p><b>Allergens.</b> Mealan checks a food's name and its label lines against what you declared. It cannot see what a label does not say, and it never replaces reading the pack. If you have a serious allergy, read every pack.</p>
+          <p><b>Allergens.</b> Chef Mealan checks a food's name and its label lines against what you declared. It cannot see what a label does not say, and it never replaces reading the pack. If you have a serious allergy, read every pack.</p>
           <p><b>Your coach.</b> What a coach sets or sends is the coach's; the app carries it.</p>
         </article>
       )}

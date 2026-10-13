@@ -18,15 +18,15 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   const h2 = async () => (await page.locator("h2").first().textContent()).trim();
   const expect = (label, got, want) => { const ok = got === want; console.log(ok ? "ok  " : "FAIL", label, "->", got); if (!ok) process.exitCode = 1; };
   expect("bottom bar has four tabs", String(await page.locator("nav button").count()), "4");
-  await fab(); expect("Mealan from Today is the conversation", await page.locator(".talk-overlay h2").textContent(), "Mealan");
+  await fab(); expect("Mealan from Today is the conversation", await page.locator(".talk-overlay h2").textContent(), "Chef Mealan");
   expect("no floating button while talking", String(await page.locator(".chat-fab").count()), "0");
   await page.locator(".talk-overlay").getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(300);
   await nav("Plate");
   expect("the Plate tab opens the plate", await h2(), "What are you craving?");
   expect("the amounts button is code, not chat", String(await page.getByRole("button", { name: /Fit to my target/ }).count()), "1");
-  await fab(); expect("Mealan on a plate with food is about the plate", (await page.locator(".sheet .card-top span").first().textContent()).trim(), "Mealan, about this plate");
-  await page.getByRole("button", { name: /Talk to Mealan/ }).click(); await page.waitForTimeout(300);
-  expect("and can hand over to the conversation", await page.locator(".talk-overlay h2").textContent(), "Mealan");
+  await fab(); expect("Mealan on a plate with food is about the plate", (await page.locator(".sheet .card-top span").first().textContent()).trim(), "Chef Mealan, about this plate");
+  await page.getByRole("button", { name: /Talk to Chef Mealan/ }).click(); await page.waitForTimeout(300);
+  expect("and can hand over to the conversation", await page.locator(".talk-overlay h2").textContent(), "Chef Mealan");
   await page.locator(".talk-overlay").getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(300);
   await require("./foods.cjs")(page); await nav("Plate"); expect("Plate tab after talking", await h2(), "What are you craving?");
   if (errs.length) { console.log("page errors:", errs); process.exitCode = 1; }

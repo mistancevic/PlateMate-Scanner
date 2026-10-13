@@ -27,7 +27,7 @@ seed.items = [];
   // Today: the question above Scan
   ok(/Does it fit my numbers\?/.test(await page.locator(".scan-why").textContent()), "Scan has its question above it");
   // the chat from Today knows the day
-  await page.getByRole("button", { name: "Mealan", exact: true }).click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: "Chef Mealan", exact: true }).click(); await page.waitForTimeout(500);
   const head = await page.locator(".chat-screen .head p").first().textContent();
   ok(/1 of 1 slot to come/.test(head), "from Today the chat says what is to come: " + head);
   const chipsToday = await page.locator(".chips-start .pill").allTextContents();
@@ -37,7 +37,7 @@ seed.items = [];
   // Plan: two slots open, the Fill button and the chat about the day
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(500);
   ok(await page.getByRole("button", { name: /Fill the open slots with Chef Mealan/ }).count() === 1, "Plan offers Fill the open slots");
-  await page.getByRole("button", { name: "Mealan", exact: true }).click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: "Chef Mealan", exact: true }).click(); await page.waitForTimeout(500);
   const headPlan = await page.locator(".chat-screen .head p").first().textContent();
   ok(/About today: 2 slots open, training at 17:30/.test(headPlan), "from Plan the chat says what the day needs: " + headPlan);
   ok((await page.locator(".chips-start .pill").allTextContents()).includes("Fill today"), "the first chip fills the day");

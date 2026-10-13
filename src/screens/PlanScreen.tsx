@@ -94,7 +94,7 @@ export function PlanScreen(p: AppApi) {
               {m && fit?.state === "under" && (
                 <div className="button-row plan-slot-fix">
                   <button type="button" className="pill pill-small pill-primary" onClick={() => p.fillOnPlate({ ...fillingOf(r.slot), mealId: m.mealId }, m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : null, m.title)}>Fit it on the Plate</button>
-                  <button type="button" className="pill pill-small" onClick={() => p.openOut()}>Ask Chef {CHEF_NAME}</button>
+                  <button type="button" className="pill pill-small" onClick={() => p.openOut()}>Ask {CHEF_NAME}</button>
                 </div>
               )}
             </div>
@@ -109,7 +109,7 @@ export function PlanScreen(p: AppApi) {
           <div><b>{fmt(sum.protein, 0)}</b><small>{numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></div>
         </div>
       </section>
-      {openCount > 0 && <button type="button" className="pill pill-tall pill-primary plan-fill" onClick={() => p.openOut("fill")}><ChefHat size={18} /> Fill the open slots with Chef {CHEF_NAME}</button>}
+      {openCount > 0 && <button type="button" className="pill pill-tall pill-primary plan-fill" onClick={() => p.openOut("fill")}><ChefHat size={18} /> Fill the open slots with {CHEF_NAME}</button>}
       <div className="button-row plan-links">
         <button type="button" className="pill pill-small" onClick={() => p.openMenu("life")}>Slots and times</button>
         <button type="button" className="pill pill-small" onClick={() => p.openMenu("week")}>Weekly plan</button>
@@ -141,7 +141,7 @@ function PickSheet({ p, slot, slots, day, target, unit, held, close, put, onPlat
         <p className="small pick-why">{held ? `${held.title} is in this slot. Tap another meal to swap it.` : "Tap a meal to put it in this slot."}{need ? ` It needs about ${fmt(need.kcal, 0)} kcal and ${need.protein} g of protein${target !== null ? `, ${pdText(target)}` : ""}.` : ""}</p>
         {group("My recipes", mine.map((x) => row(x.planned, x.meal.id, () => put(x.planned))))}
         {group("Coach's recipes", coach.map((x) => row(x.planned, x.meal.id, () => put(x.planned))))}
-        {group(`Chef ${CHEF_NAME}'s starters`, STARTERS.map((m) => row(m, m.title, () => put(m))))}
+        {group(`${CHEF_NAME}'s starters`, STARTERS.map((m) => row(m, m.title, () => put(m))))}
         <button type="button" className="pill pill-wide pick-plate" onClick={() => onPlate(null)}><ChefHat size={18} /> Create a new meal on the Plate</button>
         {held && <button type="button" className="pill pill-wide" onClick={clear}>Empty this slot</button>}
       </div>
