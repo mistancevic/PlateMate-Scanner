@@ -1,18 +1,25 @@
 import { useEffect, useRef, useState, type ReactElement } from "react";
-import { ChevronRight, Dumbbell, ChefHat } from "lucide-react";
+import { ChevronRight, ChefHat, Pencil } from "lucide-react";
 import type { AppApi, Filling } from "./api";
-import { dayFor, getDay, lifestyleOf } from "../personal";
-import { planLine, isoWeek, ymd } from "../plan";
+import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
+import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
 import { rowsOf, slotsOf, trainingTime, type Slot } from "../slots";
 import { fmt, pdVal, pdTag, pdText } from "../ui";
-import { density } from "../pilot";
+import { density, aggregate, uid } from "../pilot";
 import { STARTERS, fitOf, fromMeal, needOf, sumOf, type PlannedMeal } from "../planned";
 import { CHEF_NAME } from "../components/Mark";
+import { DayEditor } from "../components/DayEditor";
+import { dayLog } from "../today";
+import { dayRecord } from "../record";
+import { livedByPlan } from "../metricsCalc";
 
 // Plan decides (0.2, canvas S "Plan purpose one" and H): the calendar of the day, slot by slot. The slots come from Lifestyle
-// (meals a day, the eating window, the times), the training row from the Weekly plan. 0.2.1 shows the day with its empty
+// (meals a day, the eating window, the times), the training row from the Training week. 0.2.1 shows the day with its empty
 // slots and its numbers; 0.2.2 fills a slot by hand: tap it, pick from My recipes, Coach's recipes or the starters, each with
 // its PD mark, or make a new meal on the Plate. The day as planned adds up what the slots hold.
+// 0.2.5+r19 (canvas board TW, TW3 to TW5, Milan 13 October 2026): Plan is the one calendar with dates. The training row opens
+// that date's training (this date only; the Training week stays), and the arrows go back a week at a time: a past date
+// shows what was eaten, with Cook again, and whether the day was lived by the plan.
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const WEEKDAY = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
@@ -29,13 +36,17 @@ export function PlanScreen(p: AppApi) {
   const [picked, setPickedState] = useState<string>(remembered ?? ymd(today));
   const setPicked = (d: string) => { remembered = d; setPickedState(d); };
   const [open, setOpen] = useState<Slot | null>(null);
+  const [editing, setEditing] = useState<PlanDay | null>(null);
   const stripRef = useRef<HTMLDivElement>(null);
   // the picked day stays in view
   useEffect(() => { try { stripRef.current?.querySelector<HTMLElement>(".choice.on")?.scrollIntoView({ inline: "center", block: "nearest" }); } catch {} }, [picked]);
-  // this week and the next, Monday first
-  const monday = isoWeek(today).monday;
+  // two weeks, Monday first: this week and the next, or earlier weeks with the arrows
+  const thisMonday = isoWeek(today).monday;
+  const [offset, setOffsetState] = useState(() => { const m = isoWeek(new Date(`${picked}T12:00:00`)).monday; return Math.min(0, Math.round((m.getTime() - thisMonday.getTime()) / (7 * 864e5))); });
+  const monday = addDays(thisMonday, offset * 7);
   const strip = Array.from({ length: 14 }, (_, i) => addDays(monday, i));
-  const date = strip.find((d) => ymd(d) === picked) ?? today;
+  const goWeek = (n: number) => { const next = Math.min(0, offset + n); setOffsetState(next); setPicked(next === 0 ? ymd(today) : ymd(addDays(thisMonday, next * 7))); };
+  const date = strip.find((d) => ymd(d) === picked) ?? strip[0];
   const key = ymd(date);
   const lifestyle = lifestyleOf(p.personal);
   const slots = slotsOf(lifestyle);
@@ -44,6 +55,11 @@ export function PlanScreen(p: AppApi) {
   const numbers = p.numbersFor(date);
   const tTime = trainingTime(training);
   const isToday = key === ymd(today);
+  const isPast = key < ymd(today);
+  const minor = isMinor(p.personal);
+  const changed = !!dayFor(p.personal, date)?.changed;
+  const wk = isoWeek(monday), sunday = addDays(monday, 6);
+  const weekSpan = `Week ${wk.week}, ${monday.getDate()}${monday.getMonth() === sunday.getMonth() ? "" : ` ${MONTHS[monday.getMonth()]}`} to ${sunday.getDate()} ${MONTHS[sunday.getMonth()]}`;
   const dayName = isToday ? "today" : WEEKDAY[(date.getDay() + 6) % 7];
   const line = [
     numbers ? `${fmt(numbers.kcal, 0)} kcal · ${numbers.protein} g protein` : "No numbers yet",
@@ -58,6 +74,11 @@ export function PlanScreen(p: AppApi) {
   const put = (s: Slot, m: PlannedMeal) => { p.fill(key, s.id, m); setOpen(null); p.notify(`${m.title} is ${dayName === "today" ? "today's" : `${dayName}'s`} ${s.name.toLowerCase()}.`); };
   return (
     <>
+      <div className="week-arrows">
+        <button type="button" className="week-arrow" aria-label="Week before" onClick={() => goWeek(-1)}>‹</button>
+        <span>{weekSpan}</span>
+        <button type="button" className="week-arrow" aria-label="Week after" disabled={offset >= 0} onClick={() => goWeek(1)}>›</button>
+      </div>
       <div className="day-strip" role="tablist" aria-label="Pick a day" ref={stripRef}>
         {strip.map((d) => {
           const on = ymd(d) === key;
@@ -65,18 +86,22 @@ export function PlanScreen(p: AppApi) {
           return <button key={ymd(d)} type="button" role="tab" className={`choice ${on ? "on" : ""} ${n ? "has" : ""}`} aria-selected={on} onClick={() => setPicked(ymd(d))}>{DAYS[(d.getDay() + 6) % 7]} {d.getDate()}</button>;
         })}
       </div>
+      {isPast ? <PastDay p={p} date={date} dayKey={key} line={line} slots={slots} numbers={numbers} /> : (<>
       <section className="card plan-day">
         <div className="plan-day-head">
-          <b>{isToday ? "Today, " : ""}{WEEKDAY[(date.getDay() + 6) % 7]}, {date.getDate()} {MONTHS[date.getMonth()]}</b>
+          <b>{isToday ? "Today, " : ""}{WEEKDAY[(date.getDay() + 6) % 7]}, {date.getDate()} {MONTHS[date.getMonth()]}
+            {/* a day without training has no training row: the pencil sits by the date, as on Today */}
+            {!rows.some((r) => r.kind === "training") && <button type="button" className="icon today-pencil plan-pencil" aria-label="Change the training for this date" onClick={() => setEditing(training ?? { work: true, kind: "rest" })}><Pencil size={15} /></button>}
+          </b>
           <small>{line}</small>
         </div>
         {rows.map((r) => {
           if (r.kind === "training") return (
-            <div key="training" className="menu-row plan-training">
+            <button type="button" key="training" className="menu-row plan-training" aria-label={`Training at ${r.time}, ${planLine(r.day)}. Change it for this date`} onClick={() => setEditing(r.day)}>
               <span className="plan-time">{r.time}</span>
-              <div className="menu-row-text"><small>From my Weekly plan</small><b>{planLine({ ...r.day, when: undefined })}{r.day.minutes ? `, ${r.day.minutes} min` : ""}</b></div>
-              <Dumbbell size={18} />
-            </div>
+              <div className="menu-row-text"><small>{changed ? "Changed for this date" : "From my Training week"}</small><b>{planLine({ ...r.day, when: undefined })}{r.day.minutes ? `, ${r.day.minutes} min` : ""}</b></div>
+              <Pencil size={18} />
+            </button>
           );
           const m = held[r.slot.id];
           const fit = m ? fitOf(m, target, unit) : null;
@@ -110,12 +135,66 @@ export function PlanScreen(p: AppApi) {
         </div>
       </section>
       {openCount > 0 && <button type="button" className="pill pill-tall pill-primary plan-fill" onClick={() => p.openOut("fill")}><ChefHat size={18} /> Fill the open slots with {CHEF_NAME}</button>}
+      </>)}
       <div className="button-row plan-links">
         <button type="button" className="pill pill-small" onClick={() => p.openMenu("life")}>Slots and times</button>
-        <button type="button" className="pill pill-small" onClick={() => p.openMenu("week")}>Weekly plan</button>
+        <button type="button" className="pill pill-small" onClick={() => p.openMenu("week")}>Training week</button>
       </div>
+      {editing && (
+        <div className="sheet-backdrop" onClick={() => setEditing(null)}>
+          <div className="sheet date-sheet" role="dialog" aria-label={`${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}: training`} onClick={(e) => e.stopPropagation()}>
+            <div className="card-top"><span>{WEEKDAY[(date.getDay() + 6) % 7]}, {date.getDate()} {MONTHS[date.getMonth()]}: training</span><button type="button" className="link" onClick={() => setEditing(null)}>Close</button></div>
+            <p className="small date-sheet-why">This date only. Your Training week stays the same.</p>
+            <section className="card seg">
+              <DayEditor minor={minor} weekdays={weekdaysOf(lifestyle)} peOn={!!lifestyle.peWeek && lifestyle.peWeek !== "none"} value={editing} onChange={setEditing} workHint={workHintOf(lifestyle, minor)} />
+            </section>
+            <div className="actions date-sheet-actions">
+              <button type="button" className="pill pill-primary action-main" onClick={() => { p.setDated(date, editing); setEditing(null); p.notify(`Changed for ${dayName === "today" ? "today" : `${dayName}, ${date.getDate()} ${MONTHS[date.getMonth()]}`} only.`); }}>Save for this date</button>
+              {changed && <button type="button" className="link action-cancel" onClick={() => { p.setDated(date, null); setEditing(null); }}>Back to the usual {WEEKDAY[(date.getDay() + 6) % 7]}</button>}
+            </div>
+          </div>
+        </div>
+      )}
       {open && <PickSheet p={p} slot={open} slots={slots} day={numbers} target={target} unit={unit} held={held[open.id]} close={() => setOpen(null)} put={(m) => put(open, m)} onPlate={(meal) => { setOpen(null); p.fillOnPlate(fillingOf(open), meal); }} clear={() => { p.fill(key, open.id, null); setOpen(null); }} />}
     </>
+  );
+}
+
+// A past date (canvas board TW, TW5): the day's numbers against its target, what was eaten with Cook again, and whether the
+// day was lived by the plan (every planned meal closed, protein at least 90 %, energy within 10 %).
+function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: Date; dayKey: string; line: string; slots: Slot[]; numbers: { kcal: number; protein: number } | null }) {
+  const log = dayLog(p.state.feedback, date);
+  const rec = dayRecord(slots, p.planned[dayKey], log.logged, dayKey);
+  const lived = livedByPlan({ planned: rec.planned, open: rec.open.length, kcal: rec.kcal, protein: rec.protein }, numbers).lived;
+  const slotName = (id?: string) => slots.find((s) => s.id === id)?.name;
+  return (
+    <section className="card plan-day plan-past">
+      <div className="plan-day-head">
+        <b>{WEEKDAY[(date.getDay() + 6) % 7]}, {date.getDate()} {MONTHS[date.getMonth()]}</b>
+        <small>{line}</small>
+      </div>
+      {log.logged.length ? (
+        <>
+          <div className="past-nums">
+            <span><b>{Math.round(log.kcal).toLocaleString("en")}</b><small>{numbers ? `of ${numbers.kcal.toLocaleString("en")} kcal` : "kcal"}</small></span>
+            <span><b>{Math.round(log.protein)}</b><small>{numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></span>
+            <span><b>{log.kcal ? (Math.round((log.protein / log.kcal) * 1000) / 10).toFixed(1) : "–"}</b><small>PD that day</small></span>
+          </div>
+          <small className="setting-name past-label">What you ate</small>
+          {log.logged.map((f) => {
+            const a = aggregate(f.meal.items);
+            const name = slotName(f.slot?.slotId);
+            return (
+              <div className="past-plate" key={f.id}>
+                <span><b>{f.meal.title}</b><small>{name ? `${name}, ` : ""}{new Date(f.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} · {Math.round(a.calories ?? 0)} kcal · {Math.round(a.protein ?? 0)} g protein</small></span>
+                <button type="button" className="pill pill-small" onClick={() => { p.setState((s) => ({ ...s, items: f.meal.items.map((it) => ({ ...it, id: uid() })) })); p.setTab("journey"); }}>Cook again</button>
+              </div>
+            );
+          })}
+          {lived && <small className="past-lived">✓ A day lived by the plan</small>}
+        </>
+      ) : <small className="setting-hint past-none">Nothing was logged on this day.</small>}
+    </section>
   );
 }
 

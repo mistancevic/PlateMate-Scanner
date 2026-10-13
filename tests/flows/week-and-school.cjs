@@ -1,6 +1,6 @@
 // JOURNEY INVARIANT (Milan, 6 October 2026, as approved on the canvas):
-// the Weekly plan has real weeks with dates; a change belongs to its date only, the usual week stays;
-// earlier weeks can be browsed, and a past day shows what was eaten.
+// Plan has real weeks with dates; a change belongs to its date only, the Training week stays;
+// earlier weeks can be browsed, and a past day shows what was eaten (canvas board TW, 13 October 2026).
 // Release A (Milan, 7 October 2026): Chef Mealan is for adults. A birth year under 18 stops at "Chef Mealan is for adults",
 // with the reason (the AI) and a way to correct the year.
 // Release B (Milan, 7 October 2026, canvas B0 to B3): any adult can work, study, or both, or be at home. Lifestyle asks
@@ -39,29 +39,36 @@ const plan = [
     await require("./me.cjs")(page);
     return page;
   };
-  // an adult: weeks with dates
+  // an adult (canvas board TW, 13 October 2026): the Training week holds the usual week only; Plan is the one calendar with
+  // dates. A change on Plan belongs to its date only, and the usual week stays.
   const a = await open(1981);
-  await a.getByText("Weekly plan", { exact: true }).first().click(); await a.waitForTimeout(400);
-  const nav = await a.locator(".week-nav").textContent();
-  ok(/Week \d+/.test(nav) && /this week/.test(nav), "the plan opens on this week, with its number and dates: " + nav.trim());
-  ok(/Today/.test(await a.locator(".agenda-row.on").textContent()), "today is picked and says so");
-  // change one date: the agenda says so, the usual week stays
-  const rows = a.locator(".agenda-row");
-  const target = (await rows.nth(6).getAttribute("aria-pressed")) === "true" ? 5 : 6; // a day that is not today
-  await rows.nth(target).click(); await a.waitForTimeout(200);
-  const isPast = (await a.getByRole("button", { name: "Change what was planned" }).count()) > 0;
-  if (isPast) { await a.getByRole("button", { name: "Change what was planned" }).click(); await a.waitForTimeout(200); }
-  await a.locator(".day-editor").getByRole("button", { name: /^Strength$/ }).click(); await a.waitForTimeout(300);
-  ok(/Changed for this date/.test(await rows.nth(target).textContent()), "a changed date says so in the agenda");
-  const kept = await a.evaluate((i) => JSON.parse(localStorage.getItem("chefmealan-personal")).plan[i].kind, target);
-  ok(kept === plan[target].kind, "the usual week stays as it was: " + kept);
-  await a.getByRole("tab", { name: "Usual week" }).click(); await a.waitForTimeout(200);
-  ok(!/Changed for this date/.test(await a.locator(".week-card").textContent()), "the Usual week tab shows the plan, not the changes");
+  await a.getByText("Training week", { exact: true }).first().click(); await a.waitForTimeout(400);
+  ok(await a.locator(".seg-tabs").count() === 0 && await a.locator(".week-nav").count() === 0 && /Your usual training week/.test(await a.locator(".week-card").textContent()), "the Training week has no tabs and no dates");
+  ok(a.url().endsWith("/me/training-week"), "its address is /me/training-week: " + a.url());
+  await a.goto("http://127.0.0.1:3197/me/weekly-plan"); await a.waitForTimeout(900);
+  ok(/Training week/.test(await a.locator(".menu-title").textContent()), "the old address still opens it");
+  // Plan: next Wednesday holds cardio; its training row opens this date only
+  await a.getByRole("button", { name: /^Plan$/ }).first().click(); await a.waitForTimeout(500);
+  await a.evaluate(() => document.querySelectorAll(".day-strip .choice")[9].click()); await a.waitForTimeout(300);
+  ok(/From my Training week/.test(await a.locator(".plan-training").textContent()), "the training row comes from the Training week");
+  await a.locator(".plan-training").click(); await a.waitForTimeout(300);
+  ok(/This date only/.test(await a.locator(".date-sheet").textContent()) && await a.locator(".date-sheet .day-editor").count() === 1, "the training row opens the day editor, for this date only");
+  await a.locator(".date-sheet .day-editor").getByRole("button", { name: /^Strength$/ }).click(); await a.waitForTimeout(200);
+  await a.getByRole("button", { name: "Save for this date" }).click(); await a.waitForTimeout(300);
+  ok(/Changed for this date/.test(await a.locator(".plan-training").textContent()) && /Strength/.test(await a.locator(".plan-training").textContent()), "the changed date says so on Plan");
+  const kept = await a.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")).plan[2].kind);
+  ok(kept === plan[2].kind, "the usual week stays as it was: " + kept);
+  await a.locator(".plan-training").click(); await a.waitForTimeout(300);
+  await a.getByRole("button", { name: "Back to the usual Wednesday" }).click(); await a.waitForTimeout(300);
+  ok(/From my Training week/.test(await a.locator(".plan-training").textContent()) && /Cardio/.test(await a.locator(".plan-training").textContent()), "Back to the usual Wednesday puts the date back");
+  // a date without training: the pencil by the date
+  await a.evaluate(() => document.querySelectorAll(".day-strip .choice")[13].click()); await a.waitForTimeout(300);
+  ok(await a.getByRole("button", { name: "Change the training for this date" }).count() === 1, "a rest day has the pencil by the date");
   // an earlier week, and a past day
-  await a.getByRole("tab", { name: "By date" }).click(); await a.waitForTimeout(200);
-  await a.getByRole("button", { name: "Week before" }).click(); await a.waitForTimeout(200);
-  await a.locator(".agenda-row").nth(0).click(); await a.waitForTimeout(200);
-  ok((await a.getByRole("button", { name: "Change what was planned" }).count()) === 1 && /Nothing was logged|What you ate/.test(await a.locator("main").textContent()), "a past day shows what was eaten, or says nothing was");
+  await a.getByRole("button", { name: "Week before" }).click(); await a.waitForTimeout(300);
+  ok(/Week \d+/.test(await a.locator(".week-arrows").textContent()) && await a.getByRole("button", { name: "Week after" }).isEnabled(), "the arrows go back a week, and forward again");
+  await a.evaluate(() => document.querySelectorAll(".day-strip .choice")[0].click()); await a.waitForTimeout(300);
+  ok(await a.locator(".plan-past").count() === 1 && /Nothing was logged|What you ate/.test(await a.locator(".plan-past").textContent()) && await a.locator(".plan-slot").count() === 0, "a past day shows what was eaten, or says nothing was");
   ok(/Alcohol/.test(await (async () => { await require("./me.cjs")(a); await a.getByText("Lifestyle", { exact: true }).first().click(); await a.waitForTimeout(300); return a.locator("main").textContent(); })()), "an adult is asked about alcohol");
   ok(a.errs.length === 0, "no page errors (adult)" + (a.errs.length ? ": " + a.errs.join("; ") : ""));
   // an apprentice: work and study
@@ -81,8 +88,7 @@ const plan = [
   ok(!/Study hours/.test(life) && !/Working hours/.test(life) && /Your days are spent at home/.test(life), "At home: nothing more is asked, and it says what it means");
   await t.getByRole("button", { name: /^Work and study/ }).click(); await t.waitForTimeout(200);
   await require("./me.cjs")(t);
-  await t.getByText("Weekly plan", { exact: true }).first().click(); await t.waitForTimeout(300);
-  await t.getByRole("tab", { name: "Usual week" }).click(); await t.waitForTimeout(200);
+  await t.getByText("Training week", { exact: true }).first().click(); await t.waitForTimeout(300);
   await t.locator(".agenda-row").nth(2).click(); await t.waitForTimeout(200);
   const ed = await t.locator(".day-editor").textContent();
   ok(/Work day/.test(ed) && /Study day/.test(ed) && /Day off/.test(ed), "a day is a Work day, a Study day or a Day off");

@@ -19,12 +19,12 @@ const ME_ROWS: { id: MenuSection; name: string; icon: ReactNode; hint: (p: AppAp
   { id: "profile", name: "Profile", icon: <User size={18} />, hint: (p) => (p.safety.declaredAt ? "Your body data, and the health questions you answered" : "Your body data, and a few health questions") },
   { id: "goal", name: "Goal", icon: <Target size={18} />, hint: (p) => (p.state.goals.calories ? `${Math.round(p.state.goals.calories).toLocaleString("en")} kcal and ${p.state.goals.protein ?? "?"} g protein a day` : "Work it out, or set it") },
   { id: "life", name: "Lifestyle", icon: <Coffee size={18} />, hint: (p) => lifeHint(p) },
-  { id: "week", name: "Weekly plan", icon: <CalendarDays size={18} />, hint: (p) => planHint(p) },
+  { id: "week", name: "Training week", icon: <CalendarDays size={18} />, hint: (p) => planHint(p) },
   { id: "shop", name: "Where I shop", icon: <ShoppingBasket size={18} />, hint: () => "Pick your shops; the starter foods follow" },
   { id: "coach", name: "My coach", icon: <Users size={18} />, hint: (p) => (p.profile.coachId ? `${p.coachLabel} sees what you share` : "Join with a code") },
   { id: "account", name: "Account", icon: <KeyRound size={18} />, hint: () => "Export my data, delete my account" },
 ];
-// the two speeds: Lifestyle changes when life does, the Weekly plan when the activity does
+// the two speeds: Lifestyle changes when life does, the Training week when the activity does
 function lifeHint(p: AppApi): string {
   if (!p.personal.lifestyle) return "How you eat, work and sleep. Set once.";
   const l = lifestyleOf(p.personal);

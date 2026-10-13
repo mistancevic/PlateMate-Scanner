@@ -58,7 +58,7 @@ export function HomeScreen(p: AppApi) {
   // The day pills show while the day is still assumed, and again after Change, until a pill is tapped.
   const [changing, setChanging] = useState(false);
   const [draft, setDraft] = useState<PlanDay | null>(null);
-  // with a Weekly plan Today reads it; without one, Today asks what kind of day it is
+  // with a Training week Today reads it; without one, Today asks what kind of day it is
   const planned = hasPlan(p.personal);
   const dateLine = new Date().toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
   const inbox = p.inbox.map((it) => (
@@ -104,8 +104,8 @@ export function HomeScreen(p: AppApi) {
           <div className="today-plan">
             <b className="today-date">{dateLine}<button className="icon today-pencil" aria-label="Change today's plan" onClick={() => { setDraft(p.day.plan!); setChanging(true); }}><Pencil size={16} /></button></b>
             <span className="today-what">{p.day.plan.kind === "rest" && !p.day.plan.pe ? "No training today." : `${todayLine(p.day.plan)}. ${LOAD_DAY[loadOf(p.day.plan)]}`}</span>
-            <small>{p.day.source === "today" ? "Changed for today only. Your Weekly plan stays the same." : "If today goes differently, tap the pencil. The numbers follow, the Weekly plan stays."}</small>
-            {p.day.source === "today" && <button className="link" onClick={() => p.setTodayPlan(null)}>Back to the Weekly plan</button>}
+            <small>{p.day.source === "today" ? "Changed for today only. Your Training week stays the same." : "If today goes differently, tap the pencil. The numbers follow, the Training week stays."}</small>
+            {p.day.source === "today" && <button className="link" onClick={() => p.setTodayPlan(null)}>Back to the Training week</button>}
           </div>
         )}
         {follow && changing && draft && (
@@ -125,7 +125,7 @@ export function HomeScreen(p: AppApi) {
             <div className="day-row">
               {DAY_TYPES.map((d) => <button key={d.id} className={`choice ${p.day.type === d.id ? "on" : ""}`} onClick={() => p.setDayType(d.id)}>{d.name}</button>)}
             </div>
-            <button className="link" onClick={() => p.openMenu("week")}>Set your Weekly plan, and Chef Mealan won't need to ask ›</button>
+            <button className="link" onClick={() => p.openMenu("week")}>Set your Training week, and Chef Mealan won't need to ask ›</button>
           </div>
         )}
         {!follow && (

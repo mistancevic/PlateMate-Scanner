@@ -1,7 +1,7 @@
 import { KINDS, INTENSITIES, WHENS, WHENS_KID, MINUTES_KID, LENGTHS, lengthOf, START_MIN, ADULT_KINDS, KID_KINDS, SPORTS, PE, type PlanDay, type Kind, type Weekdays } from "../plan";
 import { Zones } from "./Zones";
 
-// One day's settings, the same on the Weekly plan, a dated week and Change today's plan.
+// One day's settings, the same on the Training week, a dated week and Change today's plan.
 // Adults: the kind of day as Lifestyle allows it (Release B: Work day, Study day, Day off; nothing to pick when At home),
 // sport in class on a study day when the studies have it, then one activity, how hard, when, how long. School kids (under 18): school or no school, sport at school,
 // then one activity after school; a club training or a match asks which sport. A rest day folds the last ones away.

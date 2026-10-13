@@ -9,11 +9,13 @@ import { loadOf, planShort, type PlanDay } from "../plan";
 // says what it comes to; Target analysis findings sit under the day they are about, week findings under the week's line.
 type Row = DayNumbers & { source?: "you" | "calculated" | "average" };
 type Field = "kcal" | "protein" | "fats" | "carbs";
+// the resting burn's source, from the formula the calculation names (canvas board TW, F1)
+const restSource = (line = "") => (/Schofield/.test(line) ? "Schofield 1985 (FAO/WHO/UNU)" : /Katch/.test(line) ? "Katch and McArdle" : "Mifflin et al. 1990");
 const LABEL: Record<Field, string> = { kcal: "kcal", protein: "protein g", fats: "fat g", carbs: "carbs g" };
 
 export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, weekdays }: {
   rows: Record<DayType, Row>;
-  // calculated from a Weekly plan: the seven days themselves, each with its own activity and numbers
+  // calculated from a Training week: the seven days themselves, each with its own activity and numbers
   weekdays?: ({ name: string; day: PlanDay } & DayNumbers)[] | null;
   avg: { kcal: number; protein: number };
   week: Week;
@@ -51,7 +53,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
           </div>
         ))}
         {avgLine}
-        <small className="muted">Protein and fat stay the same every day. Carbs go up and down with your training. The days come from your Weekly plan. Sources: Mifflin et al. 1990; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004.</small>
+        <small className="muted">Protein and fat stay the same every day. Carbs go up and down with your training. The days come from your Training week. Sources: {restSource(weekdays[0]?.how[0])}; Compendium of Physical Activities 2024; FAO/WHO/UNU 2004.</small>
       </div>
     );
   }

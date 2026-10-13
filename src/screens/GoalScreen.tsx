@@ -91,7 +91,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
     </div>
   );
   // Calculate for me, as approved on 7 October 2026 (canvas board T1): your everyday first, then your training.
-  // The training days are the Weekly plan's: a + or − here changes the plan itself, so the two never disagree.
+  // The training days are the Training week's: a + or − here changes the plan itself, so the two never disagree.
   const planNow: Plan = planOf(d) ?? planFromCounts({ passive: 7, active: 0, easy: 0, hard: 0 });
   const setPlan = (plan: Plan) => { setPersonalNow({ ...d, plan }); p.setUsual(usualFrom(lifestyleOf(d), plan)); };
   const TrainWeek = () => {

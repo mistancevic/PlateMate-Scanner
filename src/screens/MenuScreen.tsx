@@ -10,9 +10,9 @@ import { WeightTrend } from "../components/Weight";
 import { weighInsOff, withoutWeighIn } from "../weight";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
-import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, type Personal, type DayType } from "../personal";
+import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, restingBurn, schofieldBand, type Formula, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, type Personal, type DayType } from "../personal";
 import { slotsOf } from "../slots";
-import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, type Plan, type PlanDay, type Lifestyle } from "../plan";
+import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, workHintOf, type Plan, type PlanDay, type Lifestyle } from "../plan";
 import { DayEditor } from "../components/DayEditor";
 import { ProteinCard } from "../components/ProteinCard";
 import { DayTable } from "../components/DayTable";
@@ -33,7 +33,7 @@ const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "profile", name: "Profile", icon: <User size={20} /> },
   { id: "goal", name: "Goal", icon: <Target size={20} /> },
   { id: "life", name: "Lifestyle", icon: <Coffee size={20} /> },
-  { id: "week", name: "Weekly plan", icon: <CalendarDays size={20} /> },
+  { id: "week", name: "Training week", icon: <CalendarDays size={20} /> },
   { id: "shop", name: "Where I shop", icon: <ShoppingBasket size={20} /> },
   { id: "coach", name: "Coach", icon: <Users size={20} /> },
   { id: "account", name: "Account", icon: <KeyRound size={20} /> },
@@ -177,7 +177,7 @@ function ProfilePanel(p: AppApi) {
               </button>
             ))}
           </div>
-          <small className="muted">Your training goes in the Weekly plan.</small>
+          <small className="muted">Your training goes in the Training week.</small>
         </div>
         {/* M3 (0.2.5+r4, Milan's layout, 11 October 2026): each chip with its definition beside it, then the day in both forms */}
         <div className="field pd-unit"><span>Show protein density as</span>
@@ -339,19 +339,76 @@ function GoalPanel(p: AppApi) {
         <ConfirmButton className="pill pill-small" label={<><RotateCcw size={14} /> Reset</>} confirmLabel="Tap again to reset" onConfirm={resetGoal} />
       </div>
       <p className="label">How your numbers work</p>
+      <FormulaCard {...p} />
       <section className="card explain">
-        <p><b>At rest.</b> What your body burns doing nothing: Mifflin–St Jeor from sex, age, height and weight, or Katch–McArdle from your lean mass when you know your body fat.</p>
+        <p><b>At rest.</b> What your body burns doing nothing, from the formula you picked above: Mifflin St Jeor, Katch McArdle or Schofield.</p>
         <p><b>Your everyday.</b> That times how your work goes: 1.3 sitting, 1.55 on your feet, 1.75 in physical work. Then your steps, on every day: only what's above what your work already covers, about 10 minutes of walking per 1,000 steps at 3.5 METs.</p>
-        <p><b>Your training.</b> Each training day adds what it costs: light about 3.5 METs, moderate 5, hard 8, or the activity's own value from your Weekly plan, times your weight and the minutes (the middle of the range), less what you burn at rest anyway.</p>
+        <p><b>Your training.</b> Each training day adds what it costs: light about 3.5 METs, moderate 5, hard 8, or the activity's own value from your Training week, times your weight and the minutes (the middle of the range), less what you burn at rest anyway.</p>
         <p><b>Your goal.</b> Minus 20 % to lose fat, minus 10 % for recomposition, plus 5 % to build muscle steadily, plus 10 % to build it faster, plus 5 % for performance.</p>
         <p><b>Protein.</b> 1.6 to 2.2 g per kg if you train twice a week or more, else 1.2 to 1.6. The same every day; the energy moves with the training.</p>
-        <small>Sources: Mifflin et al. 1990; Katch and McArdle; FAO/WHO/UNU 2004 activity levels; Compendium of Physical Activities 2024; US Dietary Guidelines 2025–2030; ISSN position stand 2017; Morton et al. 2018.</small>
+        <small>Sources: Mifflin et al. 1990; Katch and McArdle; Schofield 1985 (FAO/WHO/UNU); FAO/WHO/UNU 2004 activity levels; Compendium of Physical Activities 2024; US Dietary Guidelines 2025–2030; ISSN position stand 2017; Morton et al. 2018.</small>
       </section>
       <GoalHistory log={p.goalLog} />
       <NextLink p={p} to="life" from="goal" text="Lifestyle" hint="How you eat, work and sleep. Set once." />
     </>
   );
 }
+
+// Resting burn: the formula (canvas board TW, F1 and F2, Milan 13 October 2026). Three published formulas side by side with
+// this person's own resting burn from each; the pick moves every number. A coach's pin wins and can't be changed here.
+function FormulaCard(p: AppApi) {
+  const [about, setAbout] = useState(false);
+  const d = p.personal;
+  if (!canCalculate(d) || isMinor(d)) return null;
+  const pinned = p.formula ?? null;
+  const on: Formula | "auto" = pinned ?? d.formula ?? "auto";
+  const n = (f: Formula) => restingBurn(d, f);
+  const kcal = (x: number | null) => (x === null ? null : `${x.toLocaleString("en")} kcal at rest`);
+  const age = ageOf(d)!;
+  const pick = (f: Formula | "auto") => {
+    if (pinned) return;
+    const { formula: _, ...rest } = d;
+    p.setPersonal(f === "auto" ? rest : { ...rest, formula: f });
+    p.notify(f === "auto" ? "Automatic: your numbers follow." : `${FORMULA_NAME[f]}: your numbers follow.`);
+  };
+  const opts: { id: Formula | "auto"; name: string; num: string; hint: string; off?: boolean }[] = [
+    { id: "auto", name: "Automatic", num: d.bodyFatPct ? "Katch McArdle now" : "Mifflin St Jeor now", hint: d.bodyFatPct ? "From your body fat." : "Katch McArdle once you add your body fat." },
+    { id: "mifflin", name: "Mifflin St Jeor", num: kcal(n("mifflin"))!, hint: "Sex, age, height, weight." },
+    n("katch") === null ? { id: "katch", name: "Katch McArdle", num: "Needs body fat", hint: "Add it in Profile.", off: true } : { id: "katch", name: "Katch McArdle", num: kcal(n("katch"))!, hint: "Lean mass, from your body fat." },
+    { id: "schofield", name: "Schofield", num: kcal(n("schofield"))!, hint: `Sex, weight, age band ${schofieldBand(age)}.` },
+  ];
+  // the difference in plain numbers: at rest, then times the everyday (the same factor every formula gets)
+  const s = n("schofield")!, m = n("mifflin")!;
+  const lifeOn = (f: Formula) => calculate({ ...d, formula: f }, "maintain", null)?.tdee ?? 0;
+  const rest = s - m, day = Math.round((lifeOn("schofield") - lifeOn("mifflin")) / 10) * 10;
+  const diff = rest === 0 ? "Schofield and Mifflin St Jeor give the same resting burn for you." : `Schofield gives ${Math.abs(rest)} kcal ${rest > 0 ? "more" : "less"} at rest than Mifflin St Jeor. With your everyday that is about ${Math.abs(day)} kcal ${rest > 0 ? "more" : "less"} a day, before training.`;
+  return (
+    <>
+      <div className="seg-head"><b>Resting burn: the formula</b><small>Three published formulas. Pick one, and all your numbers follow.</small></div>
+      <section className="card seg formula-card">
+        <div className="opt-grid" role="group" aria-label="Resting burn formula">
+          {opts.map((x) => (
+            <button type="button" key={x.id} className={`opt ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} disabled={x.off || !!pinned} onClick={() => pick(x.id)}>
+              <b>{x.name}</b><small className="opt-num">{x.num}</small><small>{x.hint}</small>
+            </button>
+          ))}
+        </div>
+        {pinned && <small className="setting-hint">Set by {p.coachLabel}. Ask {p.coachLabel} to change it.</small>}
+        <small className="setting-hint">{diff}</small>
+        <button type="button" className="link formula-about" aria-expanded={about} onClick={() => setAbout((v) => !v)}>{about ? "Close About the three formulas" : "About the three formulas ›"}</button>
+        {about && (
+          <div className="formula-text">
+            <p><b>Mifflin St Jeor (1990).</b> From sex, age, height and weight. Made from about 500 adults aged 19 to 78. In reviews it lands closest to the measured burn for most adults, so it is the default.</p>
+            <p><b>Katch McArdle.</b> From lean mass: your weight without the body fat. Sex and age don't enter. Good for lean, muscular people, when the body fat is measured well.</p>
+            <p><b>Schofield (1985).</b> The formula FAO, WHO and UNU use. From sex and weight, in three adult age bands: 18 to 30, 30 to 60, over 60. Made from about 7,000 measurements in many countries. Height doesn't enter. It often gives a little more than Mifflin St Jeor.</p>
+            <p><b>What changes.</b> Only the resting burn. Your everyday, your training, your goal and your protein stay the same.</p>
+          </div>
+        )}
+      </section>
+    </>
+  );
+}
+const FORMULA_NAME: Record<Formula, string> = { mifflin: "Mifflin St Jeor", katch: "Katch McArdle", schofield: "Schofield" };
 
 export function GoalHistory({ log }: { log: GoalEntry[] }) {
   if (!log.length) return null;
@@ -429,7 +486,7 @@ function LifestylePanel(p: AppApi) {
         <Seg title="School" why="How much school moves you on a normal day, before any sport.">
           <Setting name="School hours"><Options items={SCHOOL_HOURS} on={l.school} pick={(v) => save({ school: v })} /></Setting>
           <Setting name="How you get to school" hint="Walking or cycling there and back counts as light activity on every school day."><Chips items={COMMUTES} on={l.commute} pick={(v) => save({ commute: v })} /></Setting>
-          <Setting name="Sport at school" hint="You pick the days in your Weekly plan."><Chips items={PE_WEEK} on={l.peWeek} pick={(v) => save({ peWeek: v })} /></Setting>
+          <Setting name="Sport at school" hint="You pick the days in your Training week."><Chips items={PE_WEEK} on={l.peWeek} pick={(v) => save({ peWeek: v })} /></Setting>
         </Seg>
       ) : (
         // Release B (7 October 2026, canvas B1 and B3): what fills the weekdays first; the questions after it follow the answer
@@ -437,7 +494,7 @@ function LifestylePanel(p: AppApi) {
           <Setting name="Your weekdays"><Options items={WEEKDAY_CHOICES} on={wk} pick={(v) => save({ weekdays: v, ...(v !== "home" && l.hours === "none" ? { hours: undefined } : {}) })} /></Setting>
           {(wk === "work" || wk === "both") && (
             <>
-              <Setting name="Working hours" hint={l.hours === "fixed" ? "With fixed hours, Monday to Friday are work days in your Weekly plan. You can change any day there." : undefined}>
+              <Setting name="Working hours" hint={l.hours === "fixed" ? "With fixed hours, Monday to Friday are work days in your Training week. You can change any day there." : undefined}>
                 <Options items={HOURS_SHOWN} on={l.hours === "none" ? undefined : l.hours} pick={(v) => save({ hours: v })} />
                 {l.hours === "fixed" && <Chips items={SLOTS} on={l.slot} pick={(v) => save({ slot: v })} />}
               </Setting>
@@ -449,135 +506,72 @@ function LifestylePanel(p: AppApi) {
             <>
               <Setting name="Study hours"><Options items={STUDY_HOURS} on={l.school === "none" ? undefined : l.school} pick={(v) => save({ school: v })} /></Setting>
               <Setting name="How you get there" hint="Walking or cycling there and back counts as light activity on every study day."><Chips items={COMMUTES} on={l.commute} pick={(v) => save({ commute: v })} /></Setting>
-              <Setting name="Sport as part of your studies" hint="For courses with sport, like a sports class at school. You pick the days in your Weekly plan."><Chips items={PE_WEEK} on={l.peWeek} pick={(v) => save({ peWeek: v })} /></Setting>
+              <Setting name="Sport as part of your studies" hint="For courses with sport, like a sports class at school. You pick the days in your Training week."><Chips items={PE_WEEK} on={l.peWeek} pick={(v) => save({ peWeek: v })} /></Setting>
             </>
           )}
-          {wk === "home" && <p className="small muted">Your days are spent at home. Chef Mealan counts every day as a day at home, and your training goes in the Weekly plan.</p>}
+          {wk === "home" && <p className="small muted">Your days are spent at home. Chef Mealan counts every day as a day at home, and your training goes in the Training week.</p>}
         </Seg>
       )}
       <Seg title="Recovery" why={minor ? "Sleep is when your body grows and turns sport into progress. Most teenagers need 8 to 10 hours." : "Sleep is where training turns into progress. It also decides when a late meal makes sense."}>
         <Setting name="Bedtime"><Chips items={[{ id: "early", name: "Before 22:00" }, { id: "mid", name: "22:00 to midnight" }, { id: "late", name: "After midnight" }, ...(minor ? [] : [{ id: "varies", name: "Varies with shifts" }])]} on={l.bed} pick={(v) => save({ bed: v as Lifestyle["bed"] })} /></Setting>
         <Setting name="Wake-up"><Chips items={minor ? [{ id: "early", name: "Before 6" }, { id: "mid", name: "6 to 7" }, { id: "late", name: "After 7" }] : [{ id: "early", name: "Before 6:00" }, { id: "mid", name: "6:00 to 8:00" }, { id: "late", name: "After 8:00" }, { id: "varies", name: "Varies with shifts" }]} on={l.wake} pick={(v) => save({ wake: v as Lifestyle["wake"] })} /></Setting>
       </Seg>
-      <NextLink p={p} to="week" from="life" text="Weekly plan" hint={minor ? "What each day of your school week holds" : "What each day of your usual week holds"} />
+      <NextLink p={p} to="week" from="life" text="Training week" hint={minor ? "What each day of your school week holds" : "What each day of your usual week holds"} />
     </>
   );
 }
 
-// Weekly plan, as approved on 6 October 2026: the usual week as an agenda, then the picked day's settings.
+// Training week (canvas board TW, TW2, Milan 13 October 2026): the usual week of training only, as an agenda, then the
+// picked day's settings. No dates: a change for one date, and the days gone by, live on Plan, the one calendar with dates.
 function PlanPanel(p: AppApi) {
   // no plan yet: a week without training, as in Calculate for me (7 October 2026)
   const plan = planOf(p.personal) ?? planFromCounts({ passive: 7, active: 0, easy: 0, hard: 0 });
   const minor = isMinor(p.personal);
-  const [tab, setTab] = useState<"date" | "usual">("date");
-  const [offset, setOffset] = useState(0);
   const todayD = new Date(); todayD.setHours(0, 0, 0, 0);
   const [sel, setSel] = useState(weekdayIndex(todayD));
   const [copying, setCopying] = useState<number[] | null>(null);
-  const [editPast, setEditPast] = useState(false);
   const l = lifestyleOf(p.personal);
   const save = (next: Plan) => { p.setPersonal({ ...p.personal, plan: next }); p.setUsual(usualFrom(l, next)); };
   const setDay = (i: number, d: PlanDay) => save(plan.map((x, n) => (n === i ? d : x)));
-  const c = p.goal ? calculate(p.personal, p.goal.band ?? "maintain", p.profile.formula ?? null) : null;
+  const c = p.goal ? calculate(p.personal, p.goal.band ?? "maintain", p.formula) : null;
   // Release B: the word on the right says Work, Study, or nothing on a day off; the bar keeps its colors
   const wkd = weekdaysOf(l), peOn = !!l.peWeek && l.peWeek !== "none";
   const dayWord = (d: PlanDay) => { if (minor) return d.work ? "School" : "No school"; const k = dayKindOf(d, l); return k === "work" ? "Work" : k === "study" ? "Study" : ""; };
-  const workHint = minor ? "Monday to Friday start as school days. Mark a holiday as no school." : wkd === "both" ? "From Lifestyle: work and study. Pick which one each day is." : wkd === "work" && l.hours === "fixed" ? `From Lifestyle: fixed hours${l.slot ? `, ${SLOTS.find((s) => s.id === l.slot)!.name}` : ""}.` : undefined;
-  // the dated week: Monday of this week, moved by the arrows
-  const base = isoWeek(todayD).monday;
-  const monday = new Date(base); monday.setDate(base.getDate() + offset * 7);
-  const wk = isoWeek(monday);
-  const dates = datesOfWeek(monday);
-  const days = dates.map((d) => dayFor({ ...p.personal, plan }, d)!);
-  const span = (() => { const a = dates[0], z = dates[6]; const m = (d: Date) => d.toLocaleDateString("en-GB", { month: "long" }); return a.getMonth() === z.getMonth() ? `${a.getDate()} to ${z.getDate()} ${m(z)} ${z.getFullYear()}` : `${a.getDate()} ${m(a)} to ${z.getDate()} ${m(z)} ${z.getFullYear()}`; })();
-  const shown = tab === "date" ? days.map((x) => x.day) : plan;
-  const counts = countsOf(shown);
-  const avg = c ? Math.round(shown.reduce((t, d) => t + c.numbersOf(d).kcal, 0) / 7 / 50) * 50 : null;
-  const selDate = dates[sel], isPast = tab === "date" && selDate < todayD;
-  const log = isPast ? dayLog(p.state.feedback, selDate) : null;
-  const target = isPast && c ? c.numbersOf(days[sel].day) : null;
-  const longDate = (d: Date) => `${WEEKDAY_NAMES[weekdayIndex(d)]}, ${d.getDate()} ${d.toLocaleDateString("en-GB", { month: "long" })}`;
+  const workHint = workHintOf(l, minor);
+  const counts = countsOf(plan);
+  const avg = c ? Math.round(plan.reduce((t, d) => t + c.numbersOf(d).kcal, 0) / 7 / 50) * 50 : null;
   return (
     <>
-      <p className="small muted page-why">What each day of your week holds. Your usual week repeats by itself. If one week is different, change those dates.</p>
-      <div className="seg-tabs" role="tablist">
-        <button type="button" role="tab" aria-selected={tab === "date"} className={tab === "date" ? "on" : ""} onClick={() => { setTab("date"); setSel(offset === 0 ? weekdayIndex(todayD) : 0); }}>By date</button>
-        <button type="button" role="tab" aria-selected={tab === "usual"} className={tab === "usual" ? "on" : ""} onClick={() => { setTab("usual"); setCopying(null); }}>Usual week</button>
-      </div>
-      <section className="week-card" aria-label="Your week">
-        {tab === "date" ? (
-          <div className="week-nav">
-            <button type="button" className="round" aria-label="Week before" onClick={() => { setOffset(offset - 1); setSel(0); setEditPast(false); }}>‹</button>
-            <span><b>Week {wk.week}</b><small>{span}{offset === 0 ? ", this week" : ""}</small></span>
-            <button type="button" className="round" aria-label="Week after" onClick={() => { setOffset(offset + 1); setSel(0); setEditPast(false); }}>›</button>
-          </div>
-        ) : (
-          <div className="week-card-head"><b>Your usual week</b>{avg !== null && <small>average {avg.toLocaleString("en")} kcal</small>}</div>
-        )}
-        {shown.map((d, i) => {
-          const isToday = tab === "date" && dates[i].getTime() === todayD.getTime();
-          const sub = tab === "date" ? (isToday ? "Today" : days[i].changed ? "Changed for this date" : "") : "";
-          return (
-            <button type="button" key={i} className={`agenda-row ${sel === i ? "on" : ""}`} aria-pressed={sel === i} onClick={() => { setSel(i); setCopying(null); setEditPast(false); }}>
-              <span className={`load-bar load-${loadOf(d)}`} />
-              <b>{WEEKDAYS[i]}{tab === "date" ? ` ${dates[i].getDate()}` : ""}</b>
-              <span className="agenda-what">{planShort(d)}{sub && <small className="agenda-sub">{sub}</small>}</span>
-              <small className={dayWord(d) ? "work" : ""}>{dayWord(d)}</small>
-            </button>
-          );
-        })}
+      <p className="small muted page-why">Your usual week of training. It repeats every week. To change one date, open that day on Plan.</p>
+      <section className="week-card" aria-label="Your training week">
+        <div className="week-card-head"><b>Your usual training week</b>{avg !== null && <small>average {avg.toLocaleString("en")} kcal</small>}</div>
+        {plan.map((d, i) => (
+          <button type="button" key={i} className={`agenda-row ${sel === i ? "on" : ""}`} aria-pressed={sel === i} onClick={() => { setSel(i); setCopying(null); }}>
+            <span className={`load-bar load-${loadOf(d)}`} />
+            <b>{WEEKDAYS[i]}</b>
+            <span className="agenda-what">{planShort(d)}</span>
+            <small className={dayWord(d) ? "work" : ""}>{dayWord(d)}</small>
+          </button>
+        ))}
         <div className="load-key">{(["hard", "easy", "active", "passive"] as DayType[]).filter((t) => counts[t]).map((t) => <span key={t}><i className={`load-${t}`} />{LOAD_NAME[t]} {counts[t]}</span>)}</div>
-        <small className="week-card-foot">{tab === "date" && avg !== null ? `Average ${avg.toLocaleString("en")} kcal this week. ` : ""}The bar shows how hard the day is{minor ? ", sport at school and after school together" : ""}. Tap a day to {tab === "date" ? "change it for that date" : "set it"}.</small>
+        <small className="week-card-foot">The bar shows how hard the day is{minor ? ", sport at school and after school together" : ""}. Tap a day to set it.</small>
       </section>
-      {tab === "date" ? (
-        isPast && !editPast ? (
-          <Seg title={longDate(selDate)} why={days[sel].day.kind === "rest" && !days[sel].day.pe ? "No training that day." : `${planLine(days[sel].day)}. ${LOAD_DAY[loadOf(days[sel].day)]}`}>
-            {log && log.logged.length ? (
-              <>
-                <div className="past-nums">
-                  <span><b>{Math.round(log.kcal).toLocaleString("en")}</b><small>{target ? `of ${target.kcal.toLocaleString("en")} kcal` : "kcal"}</small></span>
-                  <span><b>{Math.round(log.protein)}</b><small>{target ? `of ${target.protein} g protein` : "g protein"}</small></span>
-                  <span><b>{log.kcal ? (Math.round((log.protein / log.kcal) * 1000) / 10).toFixed(1) : "–"}</b><small>PD that day</small></span>
-                </div>
-                <small className="setting-name">What you ate</small>
-                {log.logged.map((f) => {
-                  const a = aggregate(f.meal.items);
-                  return (
-                    <div className="past-plate" key={f.id}>
-                      <span><b>{f.meal.title}</b><small>{new Date(f.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} · {Math.round(a.calories ?? 0)} kcal · {Math.round(a.protein ?? 0)} g protein</small></span>
-                      <button type="button" className="pill pill-small" onClick={() => { p.setState((s) => ({ ...s, items: f.meal.items.map((it) => ({ ...it, id: uid() })) })); p.setTab("journey"); }}>Cook again</button>
-                    </div>
-                  );
-                })}
-              </>
-            ) : <small className="setting-hint">Nothing was logged on this day.</small>}
-            <button type="button" className="pill pill-wide" onClick={() => setEditPast(true)}>Change what was planned</button>
-            <small className="setting-hint">Search and filters by date come later. For now you browse back week by week.</small>
-          </Seg>
+      <Seg title={WEEKDAY_NAMES[sel]} why={`Every ${WEEKDAY_NAMES[sel]}. To change one date, open that day on Plan.`}>
+        <DayEditor minor={minor} weekdays={wkd} peOn={peOn} value={plan[sel]} onChange={(d) => setDay(sel, d)} workHint={workHint} />
+        {copying === null ? (
+          <button type="button" className="pill pill-wide" onClick={() => setCopying([])}>Copy {WEEKDAY_NAMES[sel]} to other days</button>
         ) : (
-          <Seg title={longDate(selDate)} why={`This date only. To change every ${WEEKDAY_NAMES[sel]}, use Usual week above.`}>
-            <DayEditor minor={minor} weekdays={wkd} peOn={peOn} value={days[sel].day} onChange={(d) => p.setDated(selDate, d)} workHint={workHint} />
-            {days[sel].changed && <button type="button" className="pill pill-wide" onClick={() => p.setDated(selDate, null)}>Back to the usual {WEEKDAY_NAMES[sel]}</button>}
-          </Seg>
-        )
-      ) : (
-        <Seg title={WEEKDAY_NAMES[sel]} why={`Every ${WEEKDAY_NAMES[sel]}, unless you change a date. The week above follows.`}>
-          <DayEditor minor={minor} weekdays={wkd} peOn={peOn} value={plan[sel]} onChange={(d) => setDay(sel, d)} workHint={workHint} />
-          {copying === null ? (
-            <button type="button" className="pill pill-wide" onClick={() => setCopying([])}>Copy {WEEKDAY_NAMES[sel]} to other days</button>
-          ) : (
-            <div className="setting">
-              <small className="setting-name">Copy {WEEKDAY_NAMES[sel]} to</small>
-              <div className="chip-row">{WEEKDAYS.map((w, i) => i === sel ? null : <button type="button" key={w} className={`choice ${copying.includes(i) ? "on" : ""}`} aria-pressed={copying.includes(i)} onClick={() => setCopying(copying.includes(i) ? copying.filter((x) => x !== i) : [...copying, i])}>{w}</button>)}</div>
-              <div className="actions">
-                <button type="button" className="pill pill-primary action-main" disabled={!copying.length} onClick={() => { save(plan.map((x, n) => (copying.includes(n) ? { ...plan[sel], work: x.work, study: x.study, pe: x.work && x.study === plan[sel].study ? plan[sel].pe : false } : x))); setCopying(null); }}>Copy to {copying.length} {copying.length === 1 ? "day" : "days"}</button>
-                <button type="button" className="link action-cancel" onClick={() => setCopying(null)}>Cancel</button>
-              </div>
-              <small className="setting-hint">Copies the activity; each day keeps its {minor ? "school day or no school" : "work day, study day or day off"}.</small>
+          <div className="setting">
+            <small className="setting-name">Copy {WEEKDAY_NAMES[sel]} to</small>
+            <div className="chip-row">{WEEKDAYS.map((w, i) => i === sel ? null : <button type="button" key={w} className={`choice ${copying.includes(i) ? "on" : ""}`} aria-pressed={copying.includes(i)} onClick={() => setCopying(copying.includes(i) ? copying.filter((x) => x !== i) : [...copying, i])}>{w}</button>)}</div>
+            <div className="actions">
+              <button type="button" className="pill pill-primary action-main" disabled={!copying.length} onClick={() => { save(plan.map((x, n) => (copying.includes(n) ? { ...plan[sel], work: x.work, study: x.study, pe: x.work && x.study === plan[sel].study ? plan[sel].pe : false } : x))); setCopying(null); }}>Copy to {copying.length} {copying.length === 1 ? "day" : "days"}</button>
+              <button type="button" className="link action-cancel" onClick={() => setCopying(null)}>Cancel</button>
             </div>
-          )}
-        </Seg>
-      )}
+            <small className="setting-hint">Copies the activity; each day keeps its {minor ? "school day or no school" : "work day, study day or day off"}.</small>
+          </div>
+        )}
+      </Seg>
       <NextLink p={p} to="shop" from="week" text="Where I shop" hint="The starter foods for your shops" />
     </>
   );

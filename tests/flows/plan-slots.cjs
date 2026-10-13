@@ -1,4 +1,4 @@
-// Plan, 0.2.1 (canvas S "Plan purpose one" and H): the day's slots from Lifestyle, the training row from the Weekly plan,
+// Plan, 0.2.1 (canvas S "Plan purpose one" and H): the day's slots from Lifestyle, the training row from the Training week,
 // the day's numbers, and the slot times changed in Lifestyle.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
@@ -22,16 +22,17 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(times.join(" ") === "07:30 11:40 15:50 20:00", "four slots spread over the eating window: " + times.join(" "));
   ok((await page.locator(".plan-slot .menu-row-text small").allTextContents()).join(",") === "Breakfast,Lunch,Snack,Dinner", "named Breakfast, Lunch, Snack, Dinner");
   ok(await page.locator(".plan-slot .plan-pick").count() === 4 && /4 slots open/.test(await page.locator(".plan-top").textContent()), "every slot says Pick a meal, the box counts them open");
-  // Monday: a hard evening session sits between the slots at 17:30; the line carries the day's numbers
-  await page.evaluate(() => document.querySelector(".day-strip .choice").click()); await page.waitForTimeout(300);
+  // next Monday (a date to come: a past date shows what was eaten instead): a hard evening session sits between the slots
+  // at 17:30; the line carries the day's numbers
+  await page.evaluate(() => document.querySelectorAll(".day-strip .choice")[7].click()); await page.waitForTimeout(300);
   const rows = await page.locator(".plan-day .menu-row .plan-time").allTextContents();
   ok(rows.join(" ") === "07:30 11:40 15:50 17:30 20:00", "Monday: the training row at 17:30 between Snack and Dinner: " + rows.join(" "));
-  ok(/From my Weekly plan/.test(await page.locator(".plan-training").textContent()) && /Strength, hard, 60 min/.test(await page.locator(".plan-training").textContent()), "the training row reads the Weekly plan");
+  ok(/From my Training week/.test(await page.locator(".plan-training").textContent()) && /Strength, hard, 60 min/.test(await page.locator(".plan-training").textContent()), "the training row reads the Training week");
   const line = await page.locator(".plan-day-head small").textContent();
   ok(/\d kcal · \d+ g protein · training at 17:30/.test(line), "the day's line: " + line);
   // Tuesday: a rest day, no training row, fewer calories
   const monKcal = Number(line.match(/([\d,]+) kcal/)[1].replace(/,/g, ""));
-  await page.getByRole("tab", { name: /^Tue/ }).first().click(); await page.waitForTimeout(300);
+  await page.evaluate(() => document.querySelectorAll(".day-strip .choice")[8].click()); await page.waitForTimeout(300);
   const tue = await page.locator(".plan-day-head small").textContent();
   ok(await page.locator(".plan-training").count() === 0 && /rest day/.test(tue), "Tuesday: a rest day, no training row");
   ok(Number(tue.match(/([\d,]+) kcal/)[1].replace(/,/g, "")) < monKcal, "and fewer calories than the training day");

@@ -1,5 +1,5 @@
-// The Weekly plan and Lifestyle, as approved on the canvas on 6 October 2026.
-// Lifestyle is set once: work, recovery, nutrition. The Weekly plan is the usual week, Monday to Sunday, one activity a day.
+// The Training week and Lifestyle, as approved on the canvas on 6 October 2026.
+// Lifestyle is set once: work, recovery, nutrition. The Training week is the usual week, Monday to Sunday, one activity a day.
 // Today reads the plan; a change for one date is kept for that date only and never touches the plan.
 import type { DayType } from "./personal";
 
@@ -147,7 +147,7 @@ export const countsOf = (plan: Plan): Record<DayType, number> => {
 };
 
 // Your training week (canvas board T1, 7 October 2026): training days counted by how hard, edited on the plan itself, so the
-// goal setup and the Weekly plan never disagree. A + turns a day without training into one; a − turns the last one back.
+// goal setup and the Training week never disagree. A + turns a day without training into one; a − turns the last one back.
 // The days keep what else they hold (work, study, sport in class).
 export const isTraining = (d: PlanDay) => d.kind !== "rest";
 const levelOf = (d: PlanDay): Intensity => d.intensity ?? "easy";
@@ -204,7 +204,7 @@ export function getTodayChange(d = new Date()): PlanDay | null {
 export function setTodayChange(day: PlanDay | null, d = new Date()) {
   try { if (day) localStorage.setItem(dateKey(d), JSON.stringify(day)); else localStorage.removeItem(dateKey(d)); } catch { /* nothing */ }
 }
-// a load picked on Today by someone with no Weekly plan yet becomes a plain day of that load
+// a load picked on Today by someone with no Training week yet becomes a plain day of that load
 export const dayOfLoad = (t: DayType): PlanDay =>
   t === "passive" ? { work: false, kind: "rest" } : { work: false, kind: t === "active" ? "mobility" : "strength", intensity: t === "hard" ? "hard" : t === "easy" ? "moderate" : "easy", minutes: START_MIN[t === "hard" ? "hard" : t === "easy" ? "moderate" : "easy"] };
 
@@ -263,6 +263,11 @@ export function dayKindOf(d: PlanDay, l: Lifestyle, minor = false): DayKind {
   return w === "home" ? "off" : w === "study" ? "study" : w === "work" ? "work" : d.study ? "study" : "work";
 }
 export const SLOTS: { id: Slot; name: string }[] = [{ id: "9-5", name: "9 to 5" }, { id: "8-4", name: "8 to 4" }, { id: "7-3", name: "7 to 3" }];
+// the line under Your day in the day editor, the same on the Training week and on a date in Plan
+export function workHintOf(l: Lifestyle, minor: boolean): string | undefined {
+  const wkd = weekdaysOf(l);
+  return minor ? "Monday to Friday start as school days. Mark a holiday as no school." : wkd === "both" ? "From Lifestyle: work and study. Pick which one each day is." : wkd === "work" && l.hours === "fixed" ? `From Lifestyle: fixed hours${l.slot ? `, ${SLOTS.find((s) => s.id === l.slot)!.name}` : ""}.` : undefined;
+}
 export const WHERE = ["Cook at home", "Meal prep for days", "Canteen at work", "Restaurants", "Takeaway", "Family dinners"];
 export const WHERE_KID = ["At home", "School lunch", "Lunch packed from home", "Bakery or shop near school", "Takeaway", "Family dinners"];
 export const SCHOOL_HOURS: { id: SchoolHours; name: string; hint: string }[] = [
@@ -287,7 +292,7 @@ export function lifestyleFromOld(life?: string): Lifestyle {
   return { hours: "fixed", slot: "9-5", move: "sitting" };
 }
 
-// Which moments come first when you cook, from the Lifestyle and the Weekly plan (it was a set of chips before).
+// Which moments come first when you cook, from the Lifestyle and the Training week (it was a set of chips before).
 import type { RhythmId } from "./moments";
 export function usualFrom(l: Lifestyle, plan: Plan | null): RhythmId[] {
   const out = new Set<RhythmId>();

@@ -740,7 +740,7 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .log-card small { display: block; } .log-nums { color: var(--brand-text); font-weight: 700; margin-top: 4px; }
 .days .history-row { align-items: center; } .days .history-num small { text-align: right; display: block; max-width: 180px; }
 
-/* Lifestyle and Weekly plan, 6 October 2026: one template per segment, title, one line why, the settings in one card */
+/* Lifestyle and Training week, 6 October 2026: one template per segment, title, one line why, the settings in one card */
 .page-why { margin: 0 2px 10px; }
 .seg-head { display: flex; flex-direction: column; gap: 2px; margin: 14px 2px 6px; } .seg-head b { font-size: 17px; font-weight: 900; } .seg-head small { color: var(--muted); font-weight: 600; }
 .card.seg { display: flex; flex-direction: column; gap: 14px; }
@@ -1314,3 +1314,26 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .mt-rows { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-size: 13.5px; }
 .mt-four { display: grid; grid-template-columns: 1fr 80px 60px; gap: 6px; font-size: 13.5px; } .mt-four small { font-weight: 800; color: var(--muted); text-align: right; } .mt-four b { text-align: right; }
 .mt-bills { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; } .mt-bills label { flex: 1; min-width: 110px; }
+
+/* Resting burn: the formula (canvas board TW, F1 and F2, 13 October 2026) */
+.formula-card .opt-num { font-size: 13px; font-weight: 900; color: inherit; }
+.formula-card .opt:disabled { opacity: .55; cursor: default; }
+.formula-card .opt.on:disabled { opacity: 1; }
+.formula-card .formula-about { align-self: flex-start; }
+.formula-text { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 4px; }
+.formula-text p { margin: 0 0 8px; font-size: 13.5px; line-height: 1.5; color: var(--ink); }
+
+/* Plan, the one calendar with dates (canvas board TW, TW3 to TW5, 13 October 2026) */
+.week-arrows { display: flex; justify-content: space-between; align-items: center; margin: 0 2px 6px; font-size: 13px; font-weight: 800; color: var(--ink); }
+.week-arrow { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid var(--line); background: var(--surface); color: var(--brand-text); font: inherit; font-size: 20px; font-weight: 900; line-height: 1; display: grid; place-items: center; padding: 0 0 2px; cursor: pointer; }
+.week-arrow:disabled { opacity: .35; cursor: default; }
+.plan-day button.plan-training { text-align: left; cursor: pointer; background: #f6f8fc; }
+.plan-pencil { margin-left: 6px; vertical-align: -2px; }
+.date-sheet { max-height: 92dvh; }
+.date-sheet .card-top span { font-weight: 800; }
+.date-sheet-why { margin: 4px 0 10px; }
+.date-sheet-actions { margin-top: 12px; }
+.plan-past .past-label { display: block; margin-top: 10px; }
+.plan-past .past-plate { margin-top: 6px; }
+.plan-past .past-lived { display: block; margin-top: 8px; color: #155c34; font-weight: 800; }
+.plan-past .past-none { padding: 4px 16px 14px; }

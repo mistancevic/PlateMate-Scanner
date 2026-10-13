@@ -145,7 +145,7 @@ export interface AppApi {
   user: import("../cloud").CloudUser | null;
   cloudEnabled: boolean;
   cloudStatus: { ok: boolean; text: string; at?: string };
-  profile: { role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string; coachPhoto?: string; joinedAt?: string; coachSetAt?: string; formula?: "mifflin" | "katch" | null };
+  profile: { role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string; coachPhoto?: string; joinedAt?: string; coachSetAt?: string; formula?: import("../personal").Formula | null };
   joinCoach: (code: string) => Promise<void>;
   leaveCoach: () => Promise<void>;
   signOut: () => Promise<void>;

@@ -48,7 +48,7 @@ test("each day its own: life once, training per day, the average over the week",
   assert.equal(c.days.active.kcal, 2600);    // + a 45-minute walk at 3.5 METs
   assert.equal(c.days.easy.kcal, 2800);      // + 60 minutes at 5 METs
   assert.equal(c.days.hard.kcal, 3250);      // + 75 minutes at 8 METs
-  // from 6 October 2026 the average comes from the Weekly plan; old counts become a starting plan (strength for the
+  // from 6 October 2026 the average comes from the Training week; old counts become a starting plan (strength for the
   // training days, a walk for the active one), so the average moves a little from 2,800; since 7 October 2026 the light day
   // is mobility for 40 minutes and moderate counts 55 minutes (the middle of 45–60), so 2,700
   assert.equal(c.kcal, 2700, "the week's average, from the starting plan");

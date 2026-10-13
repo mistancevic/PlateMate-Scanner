@@ -730,7 +730,7 @@ export default function App() {
     [localOnly, setLocalOnly] = useState<boolean>(() => localStorage.getItem("chefmealan-local-only") === "1"),
     cloudLoaded = useRef(false),
     [cloudStatus, setCloudStatus] = useState<{ ok: boolean; text: string; at?: string }>({ ok: true, text: "" }),
-    [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string; coachPhoto?: string; joinedAt?: string; coachSetAt?: string; formula?: "mifflin" | "katch" | null }>({}),
+    [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string; coachPhoto?: string; joinedAt?: string; coachSetAt?: string; formula?: import("./personal").Formula | null }>({}),
     [goalLog, setGoalLogState] = useState<GoalEntry[]>(getGoalLog),
     nextSource = useRef<GoalSource | null>(null),
     [moment, setMomentState] = useState<MomentId>("regular"),
@@ -981,7 +981,7 @@ export default function App() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-  // today's day follows the Weekly plan: when the plan changes, here or from the account, today is read again
+  // today's day follows the Training week: when the plan changes, here or from the account, today is read again
   useEffect(() => { setDayState(getDay(personal)); }, [personal]);
   useEffect(() => {
     if (!message && !error) return;
@@ -1814,9 +1814,9 @@ export default function App() {
       notify("Merged into one food.");
     },
     goalLog, formula: profile.formula ?? null, todayKcal, dayType: day.type, day, setDayType: (d: DayType | null) => { const next = withDated(personal, new Date(), d ? dayOfLoad(d) : null); storePersonal(next); setPersonalState(next); setDayState(getDay(next)); },
-    // today's plan, for this date only; the Weekly plan stays
+    // today's plan, for this date only; the Training week stays
     setTodayPlan: (d: PlanDay | null) => { setTodayChange(null); const next = withDated(personal, new Date(), d); storePersonal(next); setPersonalState(next); setDayState(getDay(next)); },
-    // a change for any date, from the Weekly plan's dated weeks; null puts the date back on the usual week
+    // a change for any date, from the Training week's dated weeks; null puts the date back on the usual week
     setDated: (date: Date, d: PlanDay | null) => { const next = withDated(personal, date, d); storePersonal(next); setPersonalState(next); setDayState(getDay(next)); },
     applyNumbers: (bandId: string, kcal: number, protein: number, method?: string, fatsIn?: number, carbsIn?: number) => {
       nextSource.current = "profile";

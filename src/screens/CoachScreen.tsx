@@ -89,7 +89,7 @@ export function CoachArea(p: AppApi) {
 function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirmAi, cook, setCook }: { row: ClientRow; coachName: string; close: () => void; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void; confirmAi?: (uid: string, on: boolean) => Promise<void>; cook?: boolean; setCook?: (on: boolean) => void }) {
   const [band, setBand] = useState<string>(row.goal?.band ?? "");
   const [editing, setEditing] = useState(false);
-  const [formula, setFormula] = useState<"mifflin" | "katch" | null>(row.formula ?? null);
+  const [formula, setFormula] = useState<import("../personal").Formula | null>(row.formula ?? null);
   const [saving, setSaving] = useState(false);
   const [photos, setPhotos] = useState<Map<string, string>>(new Map());
   // a shared plate's photo comes through our server, which checks that the card is shared with this coach (storage release 1)
@@ -143,7 +143,7 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirm
         </div>
         <div className="formula-row">
           <small>Formula</small>
-          {([[null, "Automatic"], ["mifflin", "Mifflin–St Jeor"], ["katch", "Katch–McArdle"]] as const).map(([k, l]) => (
+          {([[null, "Automatic"], ["mifflin", "Mifflin–St Jeor"], ["katch", "Katch–McArdle"], ["schofield", "Schofield"]] as const).map(([k, l]) => (
             <button key={l} className={`choice ${(formula ?? null) === k ? "on" : ""}`} onClick={async () => { try { await pinFormula(row.uid, k); setFormula(k); notify(`${row.name}: ${l.toLowerCase()}.`); } catch (e: any) { setError(e.message || "Could not set the formula."); } }}>{l}</button>
           ))}
         </div>

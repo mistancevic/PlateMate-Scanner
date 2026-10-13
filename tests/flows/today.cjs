@@ -24,16 +24,16 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   const rows = await page.locator(".days .history-row").allTextContents();
   ok(rows.length === 2 && /Yesterday/.test(rows[0]) && /Moderate/.test(rows[0]) && /2 meals logged/.test(rows[0]), "yesterday: a training day, 2 meals logged");
   ok(/Nothing logged/.test(rows[1]), "two days ago: nothing logged, said plainly");
-  // JOURNEY (approved design, 6 October 2026): without a Weekly plan Today asks, with Rest, Light, Moderate, Hard and a link
+  // JOURNEY (approved design, 6 October 2026): without a Training week Today asks, with Rest, Light, Moderate, Hard and a link
   // to the plan; with a plan Today reads it, and Change today's plan changes this date only.
   ok(/kcal, week's average/.test(await page.locator(".plan-row").textContent()), "until the day is known, the calories are the week's average");
-  ok(await page.locator(".plan .day-row .choice").count() === 4 && /What kind of day is it/.test(await page.locator(".plan").textContent()), "without a Weekly plan, Today asks with four choices");
-  ok(await page.getByRole("button", { name: /Set your Weekly plan/ }).count() === 1, "and links to the Weekly plan");
+  ok(await page.locator(".plan .day-row .choice").count() === 4 && /What kind of day is it/.test(await page.locator(".plan").textContent()), "without a Training week, Today asks with four choices");
+  ok(await page.getByRole("button", { name: /Set your Training week/ }).count() === 1, "and links to the Training week");
   const assumedKcal = (await page.locator(".plan-row b").nth(1).textContent()).trim();
   await page.getByRole("button", { name: "Hard", exact: true }).click(); await page.waitForTimeout(300);
   ok(await page.locator(".plan .day-row .choice.on").textContent() === "Hard", "the picked day is marked");
   ok(/kcal today/.test(await page.locator(".plan-row").textContent()) && (await page.locator(".plan-row b").nth(1).textContent()).trim() !== assumedKcal, "calories follow the day");
-  // with a Weekly plan (and the day picked above cleared, as a fresh week would be): today's line, the explanation inside the card, the button under it
+  // with a Training week (and the day picked above cleared, as a fresh week would be): today's line, the explanation inside the card, the button under it
   await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-personal") || "{}"); const d = { work: true, kind: "strength", intensity: "hard", when: "evening", minutes: 60 }; p.plan = [d, d, d, d, d, d, d]; delete p.dated; Object.keys(localStorage).filter((k) => k.startsWith("chefmealan-today-")).forEach((k) => localStorage.removeItem(k)); localStorage.setItem("chefmealan-personal", JSON.stringify(p)); Object.keys(localStorage).filter((k) => k.startsWith("chefmealan-today-")).forEach((k) => localStorage.removeItem(k)); });
   await page.reload(); await page.waitForTimeout(900);
   const card = await page.locator(".today-plan").first().textContent();
@@ -46,9 +46,9 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   // plain English pass (approved 7 October 2026): a day without training says "No training today."
   ok(/No training today\./.test(await page.locator(".today-plan").first().textContent()) && /Changed for today only/.test(await page.locator(".today-plan").first().textContent()), "a change is for today only and says so");
   const plan = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")).plan[0].kind);
-  ok(plan === "strength", "the Weekly plan stays the same");
-  await page.getByRole("button", { name: "Back to the Weekly plan" }).click(); await page.waitForTimeout(300);
-  ok(/A hard day/.test(await page.locator(".today-plan").first().textContent()), "back to the Weekly plan");
+  ok(plan === "strength", "the Training week stays the same");
+  await page.getByRole("button", { name: "Back to the Training week" }).click(); await page.waitForTimeout(300);
+  ok(/A hard day/.test(await page.locator(".today-plan").first().textContent()), "back to the Training week");
   // approved on the canvas, 6 October 2026: the goal itself is the link, large; who set it is one small line above it
   ok(/^my goal$/i.test((await page.locator(".plan-goal small").first().textContent()).trim()), "a small line says My goal, nothing more when I set it myself");
   await page.getByRole("button", { name: "Open my goal" }).click(); await page.waitForTimeout(300);

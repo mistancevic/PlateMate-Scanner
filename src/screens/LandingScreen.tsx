@@ -173,12 +173,12 @@ function AppVideo() {
     </figure>
   );
 }
-// The weekly plan stays a drawing of the screen, so the drawing stays right when the app's text changes.
+// The Training week stays a drawing of the screen, so the drawing stays right when the app's text changes.
 function PhoneWeek() {
   const rows: [string, string, string][] = [["Mon", "Strength, hard · evening", "var(--top)"], ["Tue", "Rest", "#c9d3e6"], ["Wed", "Cardio, moderate · morning", "var(--high)"], ["Thu", "Yoga, light · evening", "var(--mid)"], ["Fri", "Strength, moderate · morning", "var(--high)"], ["Sat", "Mobility, light · during the day", "var(--mid)"], ["Sun", "Rest", "#c9d3e6"]];
   return (
-    <div className="l-phone-draw" aria-label="Drawing of the Weekly plan">
-      <b className="l-ph-title">Weekly plan</b>
+    <div className="l-phone-draw" aria-label="Drawing of the Training week">
+      <b className="l-ph-title">Training week</b>
       {rows.map(([d, t, c]) => <div key={d} className="l-ph-row"><span style={{ background: c }} /><b>{d}</b><small>{t}</small></div>)}
     </div>
   );

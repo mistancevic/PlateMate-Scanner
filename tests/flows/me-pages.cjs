@@ -73,9 +73,9 @@ seed.items = [];
   ok(url() === "/today" && await h1() === "Today", "M6: Back from there to Today: " + url());
   // Close from two pages deep, and a tab tapped from inside Me
   await require("./me.cjs")(page);
-  await page.locator(".menu-row").filter({ hasText: /^Weekly plan/ }).first().click(); await page.waitForTimeout(500);
+  await page.locator(".menu-row").filter({ hasText: /^Training week/ }).first().click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Close" }).first().click(); await page.waitForTimeout(700);
-  ok(url() === "/today" && await page.locator(".menu-title").count() === 0, "M6: Close from Weekly plan goes to Today: " + url());
+  ok(url() === "/today" && await page.locator(".menu-title").count() === 0, "M6: Close from Training week goes to Today: " + url());
   await require("./me.cjs")(page);
   await page.locator(".menu-row").filter({ hasText: /^Profile/ }).first().click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(800);

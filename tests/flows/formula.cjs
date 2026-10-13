@@ -1,0 +1,45 @@
+// Resting burn: the formula (canvas board TW, F1 and F2, Milan 13 October 2026). On Me, Goal, three published formulas side
+// by side with the person's own resting burn; Katch McArdle needs body fat; the pick moves every number; About opens the text.
+const { chromium } = require("playwright");
+const { spawn } = require("node:child_process");
+const path = require("node:path"), fs = require("node:fs");
+const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "utf8"));
+(async () => {
+  const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT: "3197" }, stdio: ["ignore", "pipe", "pipe"] });
+  process.on("unhandledRejection", (e) => { console.log("FAIL " + e.message); server.kill(); process.exit(1); });
+  await new Promise((r) => setTimeout(r, 2500));
+  const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
+  const page = await b.newPage({ viewport: { width: 390, height: 1500 } });
+  const errs = []; page.on("pageerror", (e) => errs.push(e.message));
+  let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
+  await page.addInitScript((s) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("seeded", "1");
+    localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
+    localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "profile" }));
+    localStorage.setItem("chefmealan-personal", JSON.stringify({ sex: "male", birthYear: new Date().getFullYear() - 45, heightCm: 182, weightKg: 95, dayMode: "each", plan: Array(7).fill({ work: true, kind: "rest" }), lifestyle: { weekdays: "work", hours: "fixed", move: "sitting", meals: 3 } }));
+    localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], allergies: [], flags: [], consentBodyAt: "2026-10-05T10:00:00Z", consentBy: "self", none: true, declaredAt: "2026-10-05T10:00:00Z", adultAt: "2026-10-05T09:00:00Z" }));
+  }, seed);
+  await require("./adult.cjs")(page);
+  await page.goto("http://127.0.0.1:3197/me/goal"); await page.waitForTimeout(1200);
+  const card = page.locator(".formula-card");
+  ok(await card.count() === 1 && /Resting burn: the formula/.test(await page.locator(".seg-head").filter({ hasText: "Resting burn" }).textContent()), "Goal has the formula card, under How your numbers work");
+  const opts = await card.locator(".opt").allTextContents();
+  ok(opts.length === 4 && /^Automatic/.test(opts[0]) && /Mifflin St Jeor1,868 kcal at rest/.test(opts[1]) && /Schofield1,963 kcal at rest/.test(opts[3]), "four choices with the resting burn from each: " + opts.join(" | "));
+  ok(await card.locator(".opt").nth(2).isDisabled() && /Needs body fat/.test(opts[2]), "Katch McArdle sleeps without body fat");
+  ok(await card.locator(".opt.on").count() === 1 && /^Automatic/.test(await card.locator(".opt.on").textContent()), "Automatic is picked");
+  ok(/Schofield gives 95 kcal more at rest than Mifflin St Jeor\. With your everyday that is about 120 kcal more a day/.test(await card.textContent()), "the difference in plain numbers");
+  const before = await page.locator(".day-table").textContent();
+  await card.getByRole("button", { name: /^Schofield/ }).click(); await page.waitForTimeout(400);
+  ok(await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")).formula) === "schofield", "the pick is kept");
+  const after = await page.locator(".day-table").textContent();
+  ok(before !== after && /Schofield 1985/.test(after), "the numbers follow and the sources name Schofield");
+  await page.locator(".day-table").getByRole("button", { name: "How ›" }).first().click(); await page.waitForTimeout(200);
+  ok(/1,963 at rest \(Schofield, 30 to 60: sex and weight\)/.test(await page.locator(".day-table").textContent()), "How names the formula and the age band");
+  await card.getByRole("button", { name: "About the three formulas ›" }).click(); await page.waitForTimeout(200);
+  const about = await card.locator(".formula-text").textContent();
+  ok(/Mifflin St Jeor \(1990\)/.test(about) && /Katch McArdle/.test(about) && /Schofield \(1985\)/.test(about) && /Only the resting burn/.test(about), "About the three formulas explains each");
+  await card.getByRole("button", { name: /^Automatic/ }).click(); await page.waitForTimeout(300);
+  ok(await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")).formula) === undefined, "Automatic clears the pick");
+  ok(!/kids|children|child/i.test(await page.locator("main").textContent()), "the page says nothing about children");
+  ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
+  await b.close(); server.kill(); process.exit(fail ? 1 : 0);
+})();

@@ -51,7 +51,7 @@ export const signOutCloud = () => signOut(auth());
 
 // One document per person: the pilot state plus goal and name, and who coaches them.
 // role is set by hand in the Firebase console ("coach"); nobody can sign up as a coach.
-export type CloudDoc = { photosMovedAt?: string; photosOldGoneAt?: string; recordsMovedAt?: string; recordsOnly?: boolean; foodsCount?: number; state: unknown; goal: unknown; clientName: string; updatedAt: string; goneFoods?: string[]; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: "mifflin" | "katch" | null; role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string | null; coachPhoto?: string | null; joinedAt?: string | null; coachSetAt?: string };
+export type CloudDoc = { photosMovedAt?: string; photosOldGoneAt?: string; recordsMovedAt?: string; recordsOnly?: boolean; foodsCount?: number; state: unknown; goal: unknown; clientName: string; updatedAt: string; goneFoods?: string[]; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: import("./personal").Formula | null; role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string | null; coachPhoto?: string | null; joinedAt?: string | null; coachSetAt?: string };
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const snap = await getDoc(doc(db(), "users", uid));
   return snap.exists() ? (snap.data() as CloudDoc) : null;
@@ -84,8 +84,8 @@ export async function joinCoach(_uid: string, code: string) {
 export async function leaveCoach(uid: string) {
   await updateDoc(doc(db(), "users", uid), { coachId: null, coachName: null, coachEmail: null, coachPhoto: null, joinedAt: null });
 }
-export type ClientRow = { uid: string; name: string; review: NumbersReview | null; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: "mifflin" | "katch" | null; pdUnit: "pd" | "pct"; flags: { situation: string; at: string }[]; birthYear: number | null; aiConfirmedAt: string | null; consentBy: string | null; weightKg?: number; trainingAge?: any; weighIns?: any[] };
-export async function pinFormula(clientUid: string, formula: "mifflin" | "katch" | null) { await updateDoc(doc(db(), "users", clientUid), { formula }); }
+export type ClientRow = { uid: string; name: string; review: NumbersReview | null; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: import("./personal").Formula | null; pdUnit: "pd" | "pct"; flags: { situation: string; at: string }[]; birthYear: number | null; aiConfirmedAt: string | null; consentBy: string | null; weightKg?: number; trainingAge?: any; weighIns?: any[] };
+export async function pinFormula(clientUid: string, formula: import("./personal").Formula | null) { await updateDoc(doc(db(), "users", clientUid), { formula }); }
 export async function listClients(coachUid: string): Promise<ClientRow[]> {
   const q = query(collection(db(), "users"), where("coachId", "==", coachUid));
   const snap = await getDocs(q);

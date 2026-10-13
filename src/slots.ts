@@ -1,6 +1,6 @@
 // The slots of a day (0.2.1, canvas S and H, 11 October 2026): when I eat. A slot is a time and a name; the meal in it comes
 // in 0.2.2. The slots come from Lifestyle: meals a day gives how many, the eating window gives the first and the last time,
-// the rest sit evenly between. Times can be changed in Lifestyle; a day's training (the Weekly plan) sits between them as a row.
+// the rest sit evenly between. Times can be changed in Lifestyle; a day's training (the Training week) sits between them as a row.
 import type { Lifestyle, PlanDay, When } from "./plan";
 
 export type Slot = { id: string; name: string; time: string };
@@ -33,7 +33,7 @@ export function slotsOf(l: Pick<Lifestyle, "meals" | "window"> & { slotTimes?: R
   return names.map((name, i) => ({ id: id[i], name, time: l.slotTimes?.[id[i]] ?? times[i] }));
 }
 
-// the training's clock time from the Weekly plan's time of day
+// the training's clock time from the Training week's time of day
 export const TRAINING_TIME: Record<When, string> = { morning: "07:00", day: "12:30", evening: "17:30", late: "20:30", afterschool: "15:00", lateafternoon: "16:30" };
 export const trainingTime = (d: PlanDay | null | undefined): string | null => d && d.kind !== "rest" ? TRAINING_TIME[d.when ?? "evening"] : null;
 

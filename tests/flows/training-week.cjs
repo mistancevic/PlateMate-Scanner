@@ -1,7 +1,7 @@
 // JOURNEY INVARIANT (Milan, 7 October 2026, canvas boards T1 and T3): Calculate for me asks your everyday first (your work,
 // steps on a usual day, counted on every day), then your training: Light, Moderate and Hard, each with its zones, − and +,
 // and How long as a range from 15 minutes. There is no Rest row: the days left are days without training, and + stops at 7.
-// The training days are the Weekly plan's. The day settings say No training, have no Walk (walking is in the steps), and
+// The training days are the Training week's. The day settings say No training, have no Walk (walking is in the steps), and
 // offer Light, Moderate and Hard with their zones and the same ranges.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
@@ -55,13 +55,12 @@ const path = require("node:path");
     // the numbers count the steps on a day without training
     await page.getByRole("button", { name: "Each day its own" }).click(); await page.waitForTimeout(300);
     await page.getByRole("button", { name: /Set my day|Save/ }).last().click(); await page.waitForTimeout(500);
-    // the Weekly plan has the same days
+    // the Training week has the same days
     await require("./me.cjs")(page);
-    await page.getByText("Weekly plan", { exact: true }).first().click(); await page.waitForTimeout(400);
-    await page.getByRole("tab", { name: "Usual week" }).click(); await page.waitForTimeout(200);
+    await page.getByText("Training week", { exact: true }).first().click(); await page.waitForTimeout(400);
     const agenda = await page.locator(".week-card").textContent();
     const restRows = (await page.locator(".agenda-row").allTextContents()).filter((x) => /No training/.test(x)).length;
-    ok(restRows === 3 && /Strength, hard/.test(agenda) && /Mobility, light/.test(agenda), "the Weekly plan holds the same week: " + restRows + " days without training; " + agenda.replace(/\s+/g, " ").slice(0, 120));
+    ok(restRows === 3 && /Strength, hard/.test(agenda) && /Mobility, light/.test(agenda), "the Training week holds the same week: " + restRows + " days without training; " + agenda.replace(/\s+/g, " ").slice(0, 120));
     // the day settings
     await page.locator(".agenda-row").nth(0).click(); await page.waitForTimeout(200);
     const ed = page.locator(".day-editor");
