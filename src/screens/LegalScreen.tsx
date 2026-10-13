@@ -76,7 +76,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
             <li><b>Google Cloud, Frankfurt (EU).</b> The app runs on Cloud Run; your data sits in Firestore and Firebase Authentication, and your photos as image files in Firebase Storage, region europe-west1/europe-west3. Only you can open your photos; your coach sees a plate's photo only when you share that card. Google Ireland Ltd is the processor under its Cloud data processing terms.</li>
             <li><b>Google Gemini API.</b> When you scan a label or write to Mealan, the photo or the text is sent to Google's Gemini API to be read, and the answer comes back. Chef Mealan uses the paid Gemini API: under its terms, Google does not use that content to train its models.</li>
             <li><b>Open Food Facts.</b> A barcode you scan is looked up there. The barcode is not personal data; nothing else is sent.</li>
-            <li>No advertising, no analytics beyond the pilot log above, no sale or sharing of your data with anyone else.</li>
+            <li>No advertising, no analytics beyond the pilot log above and the visit counts in section 7, no sale or sharing of your data with anyone else.</li>
           </ul>
           <h2>4. How long</h2>
           <p>While your account exists. Delete the account, from Menu, Account, and everything goes: profile, declarations, foods, cards, photos, recipes, the sign-in. Chef Mealan keeps no separate backup copies. When the photos moved into image files in October 2026, their old copies in the database stayed for 30 days, then were removed.</p>
@@ -84,8 +84,10 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
           <p>Access, rectification, erasure, restriction, portability and objection, Art. 15 to 21. In the app: Menu, Account, Export my data gives you everything as one file; Delete my account removes it. By email: {OPERATOR.email}. You may complain to a supervisory authority; for Bavaria that is the Bayerisches Landesamt für Datenschutzaufsicht (BayLDA), Ansbach.</p>
           <h2>6. Age</h2>
           <p>Chef Mealan is for people 18 and over, because the AI it uses is only allowed for adults. You confirm your age when you first sign in. If we learn that an account belongs to someone under 18, we close it and delete its data.</p>
-          <h2>7. Cookies and storage</h2>
+          <h2>7. Cookies, storage and counting</h2>
           <p>No tracking cookies. The browser keeps your sign-in session and a local copy of your data so the app works offline; both are cleared when you sign out or delete the account.</p>
+          <p><b>Counting visits.</b> We count visits to chefmealan.com per day: how many people open a page, use the calculator or tap Try Chef Mealan. We set no cookie, and we store no IP address or visitor ID with these counts, so a count can't be traced back to you. We do this to know whether the site works (legitimate interest, Art. 6(1)(f) GDPR).</p>
+          <p><b>How the pilot is used.</b> In the app, the pilot log (for example, a meal saved or a label read) goes to our server in Frankfurt with your member number, not your email. It contains no free text, photos or food names. We keep it for 12 months, and we delete it with your account.</p>
           <h2>8. Automated decisions</h2>
           <p>Mealan is an AI chef. It suggests; it does not decide anything with legal or similar effect on you. Whether Mealan's chat is on for an account follows the rules on the profile and, for one declared situation, your coach's confirmation, which a person makes.</p>
         </article>

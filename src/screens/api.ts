@@ -3,7 +3,7 @@ import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
 import type { ScannerMode } from "../types";
 
 export type Tab = "home" | "journey" | "plan" | "me" | "clients" | "meal" | "chef" | "foods" | "recipes" | "notes" | "more";
-export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "account" | "support" | "about" | "evals";
+export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "account" | "support" | "about" | "evals" | "metrics";
 // the slot a plate is made for (0.2.2): the date, the slot and its name and time, for the line on the Plate
 // mode: "plan" fills the slot on Put it in; "eat" (from Today) records the meal for the slot on Save
 export type Filling = { date: string; slotId: string; name: string; time: string; dayName: string; mealId?: string; mode?: "plan" | "eat" };

@@ -1295,3 +1295,22 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .st-chip.used { background: #fff; color: var(--brand-text); border-color: #c8d8f5; }
 .st-note { margin: 2px 0 0; border-radius: 10px; padding: 8px 10px; font-size: 13.5px; font-weight: 700; } .st-note.warn { background: #fff4e0; color: #8a5a00; } .st-note.ok { background: #e3f4ea; color: #155c34; }
 .rp-step-text { flex: 1; min-width: 0; }
+
+/* the Metrics page (0.2.5+r17, board M) */
+.mt { display: flex; flex-direction: column; gap: 12px; }
+.mt-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.mt-card { display: flex; flex-direction: column; gap: 8px; }
+.mt-h { font-size: 16px; } .mt-k { font-size: 11.5px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; color: var(--brand-text); }
+.mt-big { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; } .mt-big b { font-size: 40px; line-height: 1; } .mt-big > span:first-of-type { font-weight: 800; }
+.mt-st { margin-left: auto; font-size: 12px; font-weight: 800; border-radius: 8px; padding: 2px 7px; background: #eef3fc; color: #45546e; white-space: nowrap; justify-self: start; }
+.mt-st.ok { background: #e3f4ea; color: #155c34; } .mt-st.low { background: #fff4e0; color: #8a5a00; }
+.mt-how summary { font-weight: 800; color: var(--brand-text); cursor: pointer; } .mt-how p { margin: 6px 0 0; font-size: 13px; line-height: 1.5; }
+.mt-kpi { display: grid; grid-template-columns: 1fr 52px 52px 64px; gap: 6px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); font-size: 13.5px; }
+.mt-kpi b, .mt-kpi small { text-align: right; } .mt-kpi small { color: var(--muted); } .mt-kpi .mt-st { margin-left: 0; }
+.mt-kpi-head { border-top: 0; padding: 0; font-size: 11.5px; font-weight: 800; color: var(--muted); } .mt-kpi-head span:nth-child(2), .mt-kpi-head span:nth-child(3) { text-align: right; }
+.mt-way { display: flex; align-items: center; gap: 8px; font-size: 13.5px; } .mt-way span { flex: none; width: 140px; } .mt-way i { flex: 1; height: 16px; background: #eef3fc; border-radius: 6px; position: relative; overflow: hidden; }
+.mt-way em { position: absolute; left: 0; top: 0; bottom: 0; background: var(--brand); border-radius: 6px; } .mt-way b { width: 40px; text-align: right; }
+.mt-row { display: grid; grid-template-columns: 1fr 52px 52px; gap: 6px; padding: 7px 0; border-top: 1px solid var(--line); font-size: 13.5px; } .mt-row b, .mt-row small { text-align: right; } .mt-row small { color: var(--muted); }
+.mt-rows { display: grid; grid-template-columns: 1fr auto; gap: 6px 12px; font-size: 13.5px; }
+.mt-four { display: grid; grid-template-columns: 1fr 80px 60px; gap: 6px; font-size: 13.5px; } .mt-four small { font-weight: 800; color: var(--muted); text-align: right; } .mt-four b { text-align: right; }
+.mt-bills { display: flex; gap: 8px; align-items: flex-end; flex-wrap: wrap; } .mt-bills label { flex: 1; min-width: 110px; }

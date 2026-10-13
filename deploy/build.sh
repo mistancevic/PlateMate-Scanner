@@ -24,4 +24,5 @@ gcloud storage buckets add-iam-policy-binding "gs://$BUCKET" --member "serviceAc
 gcloud projects add-iam-policy-binding "${FB_PROJECT_ID:-$PROJECT}" --member "serviceAccount:$PN-compute@developer.gserviceaccount.com" --role roles/firebaseauth.admin --condition=None --quiet >/dev/null 2>&1 || echo "Account delete: the server's right to remove sign-ins was not set (needs an owner of ${FB_PROJECT_ID:-$PROJECT})"
 SECRETS="GEMINI_API_KEY=gemini-key:latest"
 gcloud secrets describe airtable-key --project "$PROJECT" >/dev/null 2>&1 && SECRETS="$SECRETS,AIRTABLE_API_KEY=airtable-key:latest"
-ENVS="AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID:-},FIREBASE_PROJECT_ID=$FB_PROJECT_ID,FIRESTORE_DB_ID=$FB_DB_ID,FIREBASE_STORAGE_BUCKET=$BUCKET"
+# METRICS_EMAILS: who reads the Metrics page (0.2.5+r17), more than one separated by ";"
+ENVS="AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID:-},FIREBASE_PROJECT_ID=$FB_PROJECT_ID,FIRESTORE_DB_ID=$FB_DB_ID,FIREBASE_STORAGE_BUCKET=$BUCKET,METRICS_EMAILS=${METRICS_EMAILS:-}"

@@ -11,13 +11,14 @@ const app = express();
 // Who is asking: a Firebase ID token from the signed-in app. On when the server knows its Firebase project.
 import { initializeApp as initAdmin, getApps as adminApps } from "firebase-admin/app";
 import { getAuth as adminAuth } from "firebase-admin/auth";
-import { getFirestore as adminDb, FieldValue } from "firebase-admin/firestore";
+import { getFirestore as adminDb, FieldValue, FieldPath } from "firebase-admin/firestore";
 import { getStorage as adminStorage } from "firebase-admin/storage";
 import { createHash } from "node:crypto";
 import { deleteAccount as deleteAccountSteps } from "./src/accountDelete";
 import { guideForChat } from "./src/goalGuide";
 import { tidy } from "./src/labeltable";
 import { normalizePhone } from "./src/phone";
+import { weekStats, mondayOf, addDays, type Ev } from "./src/metricsCalc";
 import { forVisitor, isPreviewHost, slugOf, type PublicRecipe } from "./src/recipes";
 const FB_PROJECT = process.env.FIREBASE_PROJECT_ID || "";
 // photos as files (storage release 1): the project's default bucket in Frankfurt
@@ -387,6 +388,11 @@ app.post("/api/account/delete", requireUser, async (req, res) => {
     files: async () => { if (BUCKET) await adminStorage().bucket(BUCKET).deleteFiles({ prefix: `users/${uid}/` }); },
     record: async () => { await d.recursiveDelete(d.collection("users").doc(uid)); },
     requests: async () => {
+      // the counted events of this member go with the account (privacy notice section 7)
+      for (const col of ["metrics_events", "metrics_events_preview"]) {
+        const ev = await d.collection(col).where("m", "==", memberOf(uid)).get();
+        for (let i = 0; i < ev.docs.length; i += 400) { const b = d.batch(); ev.docs.slice(i, i + 400).forEach((x) => b.delete(x.ref)); await b.commit(); }
+      }
       if (!email) { try { email = String((await adminAuth().getUser(uid)).email || "").toLowerCase(); } catch { /* no email, nothing to clean by it */ } }
       if (!email) return;
       for (const col of ["accessRequests", "invites", "bookSignups"]) {
@@ -470,6 +476,145 @@ async function allRecipes(req: express.Request, limit: number): Promise<any[]> {
 }
 const listRecipes = async (req: express.Request, limit: number) => (await allRecipes(req, 200)).filter((r) => !r.status || r.status === "live").slice(0, limit);
 const withoutPhoto = (r: any): PublicRecipe => { const { photo, authorUid, pending, waitingFor, ...rest } = r; return { ...rest, hasPhoto: Boolean(photo) } as PublicRecipe; };
+
+// ---- The counter (0.2.5+r17, canvas board M; the metrics doc; privacy notice section 7) ----
+// App events arrive stripped (no free text, no food names, no health situation) and are kept under a member number made
+// from the account, never the email. Home page counts are one number per day and kind: no cookie, no IP stored, no
+// visitor id. The preview counts apart, so testing never moves the numbers. Only Milan's account reads the numbers:
+// METRICS_EMAILS in deploy.env lists who may.
+const EVENT_KINDS = new Set(["app_open", "day_closed", "fit_used", "label_read", "safety_flag", "meal_saved", "feedback", "made", "carry", "food_in", "mix_taken", "adult_confirmed"]);
+const EVENT_KEYS = new Set(["way", "how", "went", "ate", "locked", "method", "kind", "moment", "case", "status", "result", "source", "items", "pd", "kcal", "photos", "products",
+  "date", "planned", "byPlan", "extras", "swapped", "lived", "proteinPct", "energyPct", "kept"]);
+const HIT_KINDS = new Set(["hp_visit", "hp_calc", "hp_try", "built_visit"]);
+const METRICS_SALT = process.env.METRICS_SALT || FB_PROJECT || "local";
+const memberOf = (uid: string) => createHash("sha256").update(`${METRICS_SALT}:${uid}`).digest("hex").slice(0, 16);
+const berlinDay = (t = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit" }).format(t);
+const metricsName = (req: express.Request, name: string) => (spaceOf(req) === "preview" ? `${name}_preview` : name);
+const memEvents: Record<"live" | "preview", Ev[]> = { live: [], preview: [] };
+const memDaily: Record<"live" | "preview", Map<string, Record<string, number>>> = { live: new Map(), preview: new Map() };
+const memBills: Record<string, { ai: number; cloud: number }> = {};
+const cleanData = (d: unknown) => {
+  const out: Record<string, string | number | boolean> = {};
+  if (!d || typeof d !== "object") return out;
+  for (const [k, v] of Object.entries(d as Record<string, unknown>)) {
+    if (!EVENT_KEYS.has(k)) continue;
+    if (typeof v === "number" && Number.isFinite(v)) out[k] = v;
+    else if (typeof v === "boolean") out[k] = v;
+    else if (typeof v === "string" && v.length <= 24 && /^[\w .%-]*$/.test(v)) out[k] = v;
+  }
+  return out;
+};
+app.post("/api/events", requireUser, requireMember, async (req, res) => {
+  const list = Array.isArray(req.body?.events) ? req.body.events.slice(0, 100) : [];
+  const v = String(req.body?.v ?? "").slice(0, 24);
+  const today = berlinDay(), oldest = addDays(today, -10);
+  const m = memberOf(String((req as any).uid ?? "local"));
+  const rows: (Ev & { at: string; v: string })[] = [];
+  for (const x of list) {
+    const e = String(x?.e ?? "");
+    if (!EVENT_KINDS.has(e)) continue;
+    const d = cleanData(x?.d);
+    const sent = typeof d.date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(d.date) ? d.date : "";
+    const day = e === "day_closed" && sent && sent >= oldest && sent <= today ? sent : berlinDay(new Date(Math.min(Date.now(), Date.parse(String(x?.t)) || Date.now())));
+    rows.push({ m, e, day, d, at: new Date().toISOString(), v });
+  }
+  if (!rows.length) return res.status(400).json({ error: "Nothing to count." });
+  try {
+    if (!FB_PROJECT) { memEvents[spaceOf(req)].push(...rows); return res.json({ ok: true, n: rows.length }); }
+    const col = db().collection(metricsName(req, "metrics_events")), batch = db().batch();
+    rows.forEach((r) => batch.set(col.doc(), r));
+    await batch.commit();
+    res.json({ ok: true, n: rows.length });
+  } catch (e) { fail(res, e); }
+});
+// home page counts: the IP is used here only to stop a flood, held in memory for a minute, never stored
+const hitsBy = new Map<string, { min: number; n: number }>();
+app.post("/api/hit", async (req, res) => {
+  const k = String(req.body?.k ?? "");
+  if (!HIT_KINDS.has(k)) return res.status(204).end();
+  const min = Math.floor(Date.now() / 60_000), ip = String(req.ip || "");
+  const h = hitsBy.get(ip); const n = h && h.min === min ? h.n + 1 : 1;
+  hitsBy.set(ip, { min, n });
+  if (hitsBy.size > 5000) hitsBy.clear();
+  if (n > 30) return res.status(204).end();
+  const day = berlinDay();
+  try {
+    if (!FB_PROJECT) { const mm = memDaily[spaceOf(req)]; const row = mm.get(day) ?? {}; row[k] = (row[k] ?? 0) + 1; mm.set(day, row); return res.status(204).end(); }
+    await db().collection(metricsName(req, "metrics_daily")).doc(day).set({ [k]: FieldValue.increment(1) }, { merge: true });
+    res.status(204).end();
+  } catch { res.status(204).end(); }
+});
+const metricsOwner = (req: express.Request) => {
+  if (!FB_PROJECT) return true;
+  const allowed = String(process.env.METRICS_EMAILS || "").toLowerCase().split(/[;,]/).map((x) => x.trim()).filter(Boolean);
+  const email = String((req as any).email || "");
+  return Boolean(email) && allowed.includes(email);
+};
+app.get("/api/metrics/access", requireUser, (req, res) => res.json({ owner: metricsOwner(req) }));
+app.post("/api/metrics/bills", requireUser, async (req, res) => {
+  if (!metricsOwner(req)) return res.status(403).json({ error: "For Milan's account only." });
+  const month = String(req.body?.month ?? "");
+  const ai = Number(req.body?.ai), cloud = Number(req.body?.cloud);
+  if (!/^\d{4}-\d{2}$/.test(month) || !(ai >= 0) || !(cloud >= 0) || ai > 100000 || cloud > 100000) return res.status(400).json({ error: "Type the two bills in euros." });
+  try {
+    if (!FB_PROJECT) memBills[month] = { ai, cloud };
+    else await db().collection("metrics_settings").doc("bills").set({ [month]: { ai, cloud } }, { merge: true });
+    res.json({ ok: true });
+  } catch (e) { fail(res, e); }
+});
+app.get("/api/metrics", requireUser, async (req, res) => {
+  if (!metricsOwner(req)) return res.status(403).json({ error: "For Milan's account only." });
+  const today = berlinDay();
+  const q = String(req.query.week ?? "");
+  const from = mondayOf(/^\d{4}-\d{2}-\d{2}$/.test(q) ? q : today), to = addDays(from, 6);
+  const prev = addDays(from, -7), month = to.slice(0, 7);
+  try {
+    const space = spaceOf(req);
+    let evs: Ev[] = [], daily = new Map<string, Record<string, number>>(), bills: Record<string, { ai: number; cloud: number }> = {};
+    let asked = (from_: string, to_: string) => Promise.resolve(0), joined = (from_: string, to_: string) => Promise.resolve(0);
+    let flags = (from_: string, to_: string) => Promise.resolve({ total: 0, answered: 0 });
+    if (!FB_PROJECT) { evs = memEvents[space]; daily = memDaily[space]; bills = memBills; }
+    else {
+      const col = db().collection(metricsName(req, "metrics_events"));
+      // 12 months, then gone (privacy notice section 7)
+      const old = await col.where("day", "<", addDays(today, -365)).limit(300).get();
+      if (old.size) { const b = db().batch(); old.docs.forEach((d) => b.delete(d.ref)); await b.commit(); }
+      const [opens, recent] = await Promise.all([col.where("e", "==", "app_open").get(), col.where("day", ">=", addDays(prev, -35)).get()]);
+      const seen = new Set<string>();
+      for (const d of [...opens.docs, ...recent.docs]) { if (seen.has(d.id)) continue; seen.add(d.id); const x = d.data() as any; evs.push({ m: x.m, e: x.e, day: x.day, d: x.d }); }
+      const dd = await db().collection(metricsName(req, "metrics_daily")).where(FieldPath.documentId(), ">=", prev).get();
+      dd.docs.forEach((d) => daily.set(d.id, d.data() as Record<string, number>));
+      const bs = await db().collection("metrics_settings").doc("bills").get();
+      bills = (bs.exists ? bs.data() : {}) as Record<string, { ai: number; cloud: number }>;
+      // midnight in Munich, summer or winter time
+      const at = (day: string) => { const noon = new Date(`${day}T12:00:00Z`); const h = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Berlin", hour: "2-digit", hour12: false }).format(noon)); return new Date(Date.parse(`${day}T00:00:00Z`) - (h - 12) * 3_600_000); };
+      asked = async (f, t) => (await db().collection("accessRequests").where("createdAt", ">=", at(f)).where("createdAt", "<", at(addDays(t, 1))).count().get()).data().count;
+      joined = async (f, t) => (await db().collection("users").where("joinedAt", ">=", `${f}T00:00`).where("joinedAt", "<", `${addDays(t, 1)}T00:00`).count().get()).data().count;
+      const users = await db().collection("users").select("safety", "aiConfirmedAt").limit(1000).get();
+      flags = async (f, t) => {
+        let total = 0, answered = 0;
+        for (const u of users.docs) {
+          const x = u.data() as any, conf = x.aiConfirmedAt ? Date.parse(x.aiConfirmedAt) : NaN;
+          for (const fl of (x.safety?.flags ?? []) as { at: string }[]) {
+            const day = berlinDay(new Date(fl.at)); if (day < f || day > t) continue;
+            total++; const a = Date.parse(fl.at); if (conf >= a && conf - a <= 86_400_000) answered++;
+          }
+        }
+        return { total, answered };
+      };
+    }
+    const hpOf = (f: string, t: string) => { const out: Record<string, number> = {}; for (const [day, row] of daily) if (day >= f && day <= t) for (const [k, n] of Object.entries(row)) out[k] = (out[k] ?? 0) + (Number(n) || 0); return out; };
+    const monthActive = new Set(evs.filter((v) => v.e === "app_open" && v.day.startsWith(month)).map((v) => v.m)).size;
+    const extra = async (f: string, t: string) => ({ hp: hpOf(f, t), asked: await asked(f, t), joined: await joined(f, t), flags: await flags(f, t), bills: bills[month] ?? null, monthActive });
+    const stats = weekStats(evs, from, await extra(from, to)), last = weekStats(evs, prev, await extra(prev, addDays(prev, 6)));
+    const days = [...evs.map((v) => v.day), ...daily.keys()].sort();
+    const todayHp = daily.get(today) ?? {};
+    res.json({
+      stats, last, since: days[0] ?? null, today: { day: today, visits: todayHp.hp_visit ?? 0, opened: new Set(evs.filter((v) => v.e === "app_open" && v.day === today).map((v) => v.m)).size, eaten: evs.filter((v) => v.e === "feedback" && v.d?.status === "eaten" && v.day === today).length },
+      month, bills: bills[month] ?? null,
+    });
+  } catch (e) { fail(res, e); }
+});
 app.get("/api/recipes", async (req, res) => {
   try {
     const n = Math.max(1, Math.min(24, Number(req.query.limit) || 24));

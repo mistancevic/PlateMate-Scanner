@@ -15,6 +15,8 @@ import { dayFor, getDay } from "../personal";
 import { ymd } from "../plan";
 import { fitOf, type PlannedMeal } from "../planned";
 import { dayRecord, planLine as planDayLine, recordLine } from "../record";
+import { log } from "../log";
+import { closeDays, openedToday } from "../metrics";
 
 export function HomeScreen(p: AppApi) {
   const [shareFor, setShareFor] = useState<string | null>(null);
@@ -32,6 +34,12 @@ export function HomeScreen(p: AppApi) {
   const slots = slotsOf(lifestyleOf(p.personal));
   const held = p.planned[key] ?? {};
   const rec = dayRecord(slots, held, today.logged, key);
+  // the counter (0.2.5+r17, board M): Today opened once a day, and the days before closed against the plan
+  useEffect(() => {
+    openedToday(key, (e) => log(e));
+    closeDays({ today: new Date(), ymd, slots, planned: p.planned, logged: (d) => dayLog(state.feedback, d).logged, target: (d) => p.numbersFor(d), log: (e, data) => log(e, data) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [key]);
   const hasPlanToday = Object.keys(held).length > 0 || rec.eaten.length > 0;
   const unit = p.personal.pdUnit === "pct" ? "pct" : "pd";
   const SOURCE: Record<PlannedMeal["source"], string> = { mine: "my recipe", coach: "the coach's recipe", starter: "starter", plate: "made on the Plate" };

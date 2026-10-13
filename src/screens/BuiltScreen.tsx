@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
+import { hit } from "../metrics";
 import { Mark, APP_NAME } from "../components/Mark";
 
 // /built, How Chef Mealan is built (canvas board B, B1 to B7, 12 October 2026): the build story for hiring managers,
@@ -211,6 +212,7 @@ function Notify() {
 }
 
 export function BuiltScreen() {
+  useEffect(() => { hit("built_visit"); }, []);
   useEffect(() => { document.title = "How Chef Mealan is built"; if (location.hash === "#books") setTimeout(() => document.getElementById("books")?.scrollIntoView(), 200); }, []);
   return (
     <div className="bt">

@@ -26,6 +26,7 @@ import type { ScannerMode } from "./types";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange, setPdUnit } from "./ui";
 import { WhereSheet } from "./components/WhereSheet";
 import { Mark, APP_NAME, COACH_NAME } from "./components/Mark";
+import { flush as flushMetrics, autoFlush } from "./metrics";
 import { log, isCoach, setCoach, getClientName, setClientName as storeClientName } from "./log";
 import { MealScreen } from "./screens/MealScreen";
 import { ChefScreen } from "./screens/ChefScreen";
@@ -1017,6 +1018,18 @@ export default function App() {
   useEffect(() => {
     setOptions([]);
   }, [state.items, state.goals, limits]);
+  // the counter (0.2.5+r17, board M): what may leave the phone is sent while signed in, every minute and when the app hides
+  useEffect(() => {
+    // signed in on the live app; without accounts (local, walkthroughs) the local server counts
+    if (cloudEnabled && !user) return;
+    const v = String(import.meta.env.VITE_VERSION ?? "");
+    const go = () => { void flushMetrics(v); };
+    autoFlush(v); go();
+    const t = setInterval(go, 60_000);
+    const hide = () => { if (document.visibilityState === "hidden") go(); };
+    document.addEventListener("visibilitychange", hide);
+    return () => { autoFlush(null); clearInterval(t); document.removeEventListener("visibilitychange", hide); };
+  }, [user?.uid]);
   useEffect(() => watchUser((u) => { setUser(u); setAuthReady(true); if (!u) { cloudLoaded.current = false; recRef.current.uid = ""; setProfileReady(false); filesRef.current.uid = ""; filesRef.current.ready = false; setFilesFor(""); } }), []);
   useEffect(() => {
     if (!user || cloudLoaded.current) return;
@@ -1291,6 +1304,11 @@ export default function App() {
   }
   function saveFood(f0: Food, opts?: { open?: boolean }) {
     const existed = state.foods.some((x) => x.id === f0.id);
+    // an AI label read, saved: kept when the four numbers are the ones the AI read (0.2.5+r17, board M, label reads kept)
+    if (edit && !existed && /photo/i.test(String(edit.source ?? ""))) {
+      const same = (["calories", "protein", "fats", "carbs"] as const).every((k) => (edit as any)[k] === (f0 as any)[k]);
+      log("label_read", { kept: same });
+    }
     // a food new to the library says when it came, so the list can mark it New for the rest of the day (canvas C5)
     const f = existed || (f0 as any).addedAt ? f0 : ({ ...f0, addedAt: new Date().toISOString() } as Food);
     setImage(""); setImageSet([]); setDbPhotos([]);

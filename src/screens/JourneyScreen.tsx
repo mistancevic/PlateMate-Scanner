@@ -200,6 +200,7 @@ export function JourneyScreen(p: AppApi) {
   const adjustFor = (o: { items: typeof items }) => o.items.find((i) => !i.locked)?.id;
   // Mealan moves the food with the highest protein density; everything else keeps the amount you set.
   function askMealan() {
+    log("fit_used");
     let ready = items.map((i) => ({ ...i, food: { ...i.food, readyToEat: true } }));
     if (ready.length === 1) {
       const partner = [...state.foods].filter((f) => f.id !== ready[0].food.id).sort((a, b) => (density(b.protein, b.calories) ?? -1) - (density(a.protein, a.calories) ?? -1))[0];

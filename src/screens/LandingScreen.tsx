@@ -6,6 +6,7 @@ import { Check } from "lucide-react";
 import { WANTS, DEMO_GOAL, BIG_BOWL, lift, smaller, alone, havesFor, PAIR_NOTES } from "../landing";
 import { Mark, APP_NAME } from "../components/Mark";
 import { signIn } from "../cloud";
+import { hit } from "../metrics";
 
 // The front door of chefmealan.com: what it is, how it works, request a code, or sign in with one.
 export function LandingScreen() {
@@ -15,7 +16,9 @@ export function LandingScreen() {
   // signed out on an app address (chefmealan.com/foods): the home page sits at chefmealan.com
   useEffect(() => { if (tabOfPath(location.pathname, ["home", "journey", "meal", "chef", "recipes", "foods", "me"])) history.replaceState(null, "", "/"); }, []);
   const go = async () => { setBusy(true); setErr(""); try { await signIn(); } catch (e: any) { setErr(e.message || "Sign-in failed."); } finally { setBusy(false); } };
-  const toForm = () => formRef.current?.scrollIntoView({ behavior: "smooth" });
+  // home page counts (0.2.5+r17, board M): a visit, a Try tap; no cookie, no visitor id
+  useEffect(() => { hit("hp_visit"); }, []);
+  const toForm = () => { hit("hp_try"); formRef.current?.scrollIntoView({ behavior: "smooth" }); };
   // HP10: the bar at the bottom shows while neither the button under the calculator nor the form is on screen
   const ctaRef = useRef<HTMLDivElement>(null);
   // positions on every scroll, so a fast fling past the button still shows the bar
@@ -183,6 +186,9 @@ function PhoneWeek() {
 // The calculator (board HP, HP5 and HP6, 12 October 2026): the app's own lift for a few fixed foods, Recomposition only,
 // already answered with granola and skyr; the foods offered follow the craving, sweet or savoury; nothing is saved
 function TryIt() {
+  // the calculator used: counted once per visit, at the first pick
+  const counted = useRef(false);
+  const used = () => { if (!counted.current) { counted.current = true; hit("hp_calc"); } };
   const [want, setWantState] = useState(WANTS[0].id);
   const w = WANTS.find((x) => x.id === want)!;
   const offered = havesFor(w);
@@ -193,7 +199,7 @@ function TryIt() {
   const big = r.grams > BIG_BOWL ? smaller(w, h, DEMO_GOAL.pd) : null;
   const hn = h.name.toLowerCase();
   const Pick = ({ items, on, set }: { items: { id: string; name: string }[]; on: string; set: (v: string) => void }) => (
-    <div className="chip-row">{items.map((x) => <button key={x.id} type="button" className={`choice ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} onClick={() => set(x.id)}>{x.name}</button>)}</div>
+    <div className="chip-row">{items.map((x) => <button key={x.id} type="button" className={`choice ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} onClick={() => { used(); set(x.id); }}>{x.name}</button>)}</div>
   );
   return (
     <div className="l-try-box">

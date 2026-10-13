@@ -21,6 +21,8 @@ import type { AppApi, MenuSection } from "./api";
 import { openLine } from "../openStats";
 import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
+import { MetricsScreen } from "./MetricsScreen";
+import { LineChart } from "lucide-react";
 import { dayLog } from "../today";
 import { aggregate, uid } from "../pilot";
 import { MeScreen } from "./MeScreen";
@@ -38,7 +40,23 @@ const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "support", name: "Support", icon: <LifeBuoy size={20} /> },
   { id: "about", name: "About", icon: <Info size={20} /> },
   { id: "evals", name: "Evals", icon: <FlaskConical size={20} /> },
+  { id: "metrics", name: "Metrics", icon: <LineChart size={20} /> },
 ];
+// Metrics in the menu only for the account the server names (0.2.5+r17, board M, M1); kept so the row shows at once
+const OWNER = "chefmealan-metrics-owner";
+// (a component of its own: the menu list itself keeps no hooks)
+function MetricsRow({ open }: { open: () => void }) {
+  const owner = useMetricsOwner(true);
+  return owner ? <button className="menu-row" onClick={open}><span className="menu-icon"><LineChart size={20} /></span><b>Metrics</b><ChevronRight size={18} /></button> : null;
+}
+function useMetricsOwner(on: boolean) {
+  const [owner, setOwner] = useState(() => { try { return localStorage.getItem(OWNER) === "1"; } catch { return false; } });
+  useEffect(() => {
+    if (!on) return;
+    fetch("/api/metrics/access").then((r) => (r.ok ? r.json() : { owner: false })).then((d) => { setOwner(Boolean(d.owner)); try { localStorage.setItem(OWNER, d.owner ? "1" : "0"); } catch { /* shows next time */ } }).catch(() => {});
+  }, [on]);
+  return owner;
+}
 
 export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: MenuSection, up?: boolean) => void; close: () => void; from: MenuSection | null; under?: MenuSection | null }) {
   const { section, setSection, close } = p;
@@ -57,6 +75,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
               <span className="menu-icon">{it.icon}</span><b>{it.name}</b><ChevronRight size={18} />
             </button>
           ))}
+          <MetricsRow open={() => setSection("metrics")} />
         </div>
         <p className="small"><a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy notice</a> · <a href="/disclaimer">Disclaimer</a></p>
         {p.user && <div className="button-row" style={{ marginTop: 12 }}><button className="pill pill-small" onClick={p.signOut}>Sign out</button></div>}
@@ -80,6 +99,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       {section === "support" && <SupportPanel {...p} />}
       {section === "about" && <AboutPanel />}
       {section === "evals" && <EvalsScreen {...p} />}
+      {section === "metrics" && <MetricsScreen />}
     </>
   );
 }

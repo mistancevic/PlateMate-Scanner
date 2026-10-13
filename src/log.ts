@@ -1,4 +1,6 @@
-// Pilot log: the Discovery instrument. Local only, coach pulls it from More.
+// Pilot log: the Discovery instrument. Kept on the phone; since 0.2.5+r17 some events also go to the server, stripped of
+// any free text, food names and health situations (metrics.ts, privacy notice section 7).
+import { enqueue } from "./metrics";
 export type LogEvent =
   | "adult_confirmed" // the welcome tap: 18 or older (Release A)
   | "account_delete" // Delete my account: done, data gone, stopped, or no answer
@@ -19,7 +21,12 @@ export type LogEvent =
   | "safety_flag"    // a situation flagged: data.situation, data.source (door, code, model)
   | "data_export"    // the person exported their data
   | "meal_saved"
-  | "feedback";      // data.status
+  | "feedback"       // data.status
+  // the counter (0.2.5+r17, board M): these also go to the server, stripped (metrics.ts)
+  | "app_open"       // Today opened, once a day
+  | "day_closed"     // a day before today: data.date, planned, byPlan, extras, swapped, lived, proteinPct, energyPct
+  | "fit_used"       // Fit to my target tapped on the Plate
+  | "label_read";    // an AI label read saved: data.kept = saved without a change
 const KEY = "chefmealan-log";
 export function log(event: LogEvent, data: Record<string, unknown> = {}) {
   try {
@@ -30,6 +37,7 @@ export function log(event: LogEvent, data: Record<string, unknown> = {}) {
     arr.push(entry);
     localStorage.setItem(KEY, JSON.stringify(arr.slice(-2000)));
   } catch {}
+  enqueue(event, data);
 }
 export function readLog(): unknown[] {
   try { return JSON.parse(localStorage.getItem(KEY) || "[]"); } catch { return []; }

@@ -49,5 +49,11 @@ service cloud.firestore {
     match /invites/{code} { allow read, write: if false; }
     match /accessRequests/{id} { allow read, write: if false; }
     match /bookSignups/{id} { allow read, write: if false; }
+    // the counter (0.2.5+r17): written and read by our server only
+    match /metrics_events/{id} { allow read, write: if false; }
+    match /metrics_events_preview/{id} { allow read, write: if false; }
+    match /metrics_daily/{id} { allow read, write: if false; }
+    match /metrics_daily_preview/{id} { allow read, write: if false; }
+    match /metrics_settings/{id} { allow read, write: if false; }
   }
 }
