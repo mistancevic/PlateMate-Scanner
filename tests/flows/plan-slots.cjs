@@ -22,14 +22,26 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(times.join(" ") === "07:30 11:40 15:50 20:00", "four slots spread over the eating window: " + times.join(" "));
   ok((await page.locator(".plan-slot .menu-row-text small").allTextContents()).join(",") === "Breakfast,Lunch,Snack,Dinner", "named Breakfast, Lunch, Snack, Dinner");
   ok(await page.locator(".plan-slot .plan-pick").count() === 4 && /4 slots open/.test(await page.locator(".plan-top").textContent()), "every slot says Pick a meal, the box counts them open");
-  // next Monday (a date to come: a past date shows what was eaten instead): a hard evening session sits between the slots
-  // at 17:30; the line carries the day's numbers
+  // next Monday (a date to come: a past date shows what was eaten instead): a hard evening session with no time set says
+  // Evening and sits before dinner (board FX, TT2); the line carries the day's numbers
   await page.evaluate(() => document.querySelectorAll(".day-strip .choice")[7].click()); await page.waitForTimeout(300);
   const rows = await page.locator(".plan-day .menu-row .plan-time").allTextContents();
-  ok(rows.join(" ") === "07:30 11:40 15:50 17:30 20:00", "Monday: the training row at 17:30 between Snack and Dinner: " + rows.join(" "));
+  ok(rows.join(" ") === "07:30 11:40 15:50 Evening 20:00", "Monday: no clock time made up, the evening sits before Dinner: " + rows.join(" "));
   ok(/From my Training week/.test(await page.locator(".plan-training").textContent()) && /Strength, hard, 60 min/.test(await page.locator(".plan-training").textContent()), "the training row reads the Training week");
   const line = await page.locator(".plan-day-head small").textContent();
-  ok(/\d kcal · \d+ g protein · training at 17:30/.test(line), "the day's line: " + line);
+  ok(/\d kcal · \d+ g protein · training in the evening/.test(line), "the day's line: " + line);
+  // a clock time set for this date places the row and the line says it
+  await page.locator(".plan-training").click(); await page.waitForTimeout(300);
+  await page.locator(".date-sheet").getByLabel("Starts at").fill("18:15"); await page.waitForTimeout(150);
+  await page.getByRole("button", { name: "Save for this date" }).click(); await page.waitForTimeout(400);
+  ok((await page.locator(".plan-day .menu-row .plan-time").allTextContents()).join(" ") === "07:30 11:40 15:50 18:15 20:00" && /training at 18:15/.test(await page.locator(".plan-day-head small").textContent()), "Starts at 18:15: the row and the line say 18:15");
+  // weeks both ways (board FX, PW1): ahead, and This week back
+  const wk = await page.locator(".week-arrows-mid").textContent();
+  await page.getByRole("button", { name: "Week after" }).click(); await page.waitForTimeout(300);
+  ok((await page.locator(".week-arrows-mid").textContent()) !== wk && await page.getByRole("button", { name: "This week" }).count() === 1 && await page.locator(".plan-slot").count() > 0, "a week ahead has slots to fill, and This week");
+  await page.getByRole("button", { name: "This week" }).click(); await page.waitForTimeout(300);
+  ok(await page.getByRole("button", { name: "This week" }).count() === 0 && /^Today, /.test(await page.locator(".plan-day-head b").textContent()), "This week comes back to today");
+  await page.evaluate(() => document.querySelectorAll(".day-strip .choice")[7].click()); await page.waitForTimeout(300);
   // Tuesday: a rest day, no training row, fewer calories
   const monKcal = Number(line.match(/([\d,]+) kcal/)[1].replace(/,/g, ""));
   await page.evaluate(() => document.querySelectorAll(".day-strip .choice")[8].click()); await page.waitForTimeout(300);

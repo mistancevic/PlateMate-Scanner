@@ -10,12 +10,14 @@ import { WeightTrend } from "../components/Weight";
 import { weighInsOff, withoutWeighIn } from "../weight";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
-import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, restingBurn, schofieldBand, type Formula, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, type Personal, type DayType } from "../personal";
+import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, type Personal, type DayType } from "../personal";
 import { slotsOf } from "../slots";
 import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, workHintOf, type Plan, type PlanDay, type Lifestyle } from "../plan";
 import { DayEditor } from "../components/DayEditor";
 import { ProteinCard } from "../components/ProteinCard";
 import { DayTable } from "../components/DayTable";
+import { periodsOf, periodLine } from "../goalHistory";
+import { FORMULA_NAME } from "../components/FormulaCard";
 import { analyse, isOpen as openAt } from "../analysis";
 import type { AppApi, MenuSection } from "./api";
 import { openLine } from "../openStats";
@@ -292,6 +294,18 @@ function GoalPanel(p: AppApi) {
           </>
         ) : null}
       </section>
+      {p.personal.nextGoal && (() => {
+        // a goal applied from a later date waits here (canvas board FX, G2)
+        const ng = p.personal.nextGoal, day = new Date(`${ng.from}T12:00:00`);
+        return (
+          <section className="card next-goal" aria-label="Next goal">
+            <small className="next-goal-when">NEXT, FROM {day.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).toUpperCase().replace(",", "")}</small>
+            <b>{goalLabel(ng.band)}</b>
+            <small>{ng.kcal.toLocaleString("en")} kcal and {ng.protein} g protein a day on average. Plan already uses it from {day.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.</small>
+            <div className="button-row"><button className="pill pill-small" onClick={openGoal}>Change the date</button><button className="link link-danger" onClick={() => { p.cancelNextGoal(); p.notify("The next goal is cancelled."); }}>Cancel</button></div>
+          </section>
+        );
+      })()}
       {sheet && <GoalSheet sheet={sheet} />}
       {band && p.safety.consentBodyAt && !weighInsOff(p.safety) && (
         <WeightTrend list={p.personal.weighIns} band={band.id} weightKg={p.personal.weightKg} trainingAge={p.personal.trainingAge}
@@ -339,7 +353,13 @@ function GoalPanel(p: AppApi) {
         <ConfirmButton className="pill pill-small" label={<><RotateCcw size={14} /> Reset</>} confirmLabel="Tap again to reset" onConfirm={resetGoal} />
       </div>
       <p className="label">How your numbers work</p>
-      <FormulaCard {...p} />
+      {/* the formula is picked in the calculator (canvas board FX, G1a); here one line says which one is in use */}
+      {canCalculate(p.personal) && !isMinor(p.personal) && (
+        <section className="card you-card formula-line">
+          <span><b>Formula</b><small>{p.formula ? `${FORMULA_NAME[p.formula]}, set by ${p.coachLabel}` : p.personal.formula ? FORMULA_NAME[p.personal.formula] : `Automatic: ${p.personal.bodyFatPct ? "Katch McArdle" : "Mifflin St Jeor"} now`}</small></span>
+          <button className="link" onClick={openGoal}>Change</button>
+        </section>
+      )}
       <section className="card explain">
         <p><b>At rest.</b> What your body burns doing nothing, from the formula you picked above: Mifflin St Jeor, Katch McArdle or Schofield.</p>
         <p><b>Your everyday.</b> That times how your work goes: 1.3 sitting, 1.55 on your feet, 1.75 in physical work. Then your steps, on every day: only what's above what your work already covers, about 10 minutes of walking per 1,000 steps at 3.5 METs.</p>
@@ -354,72 +374,18 @@ function GoalPanel(p: AppApi) {
   );
 }
 
-// Resting burn: the formula (canvas board TW, F1 and F2, Milan 13 October 2026). Three published formulas side by side with
-// this person's own resting burn from each; the pick moves every number. A coach's pin wins and can't be changed here.
-function FormulaCard(p: AppApi) {
-  const [about, setAbout] = useState(false);
-  const d = p.personal;
-  if (!canCalculate(d) || isMinor(d)) return null;
-  const pinned = p.formula ?? null;
-  const on: Formula | "auto" = pinned ?? d.formula ?? "auto";
-  const n = (f: Formula) => restingBurn(d, f);
-  const kcal = (x: number | null) => (x === null ? null : `${x.toLocaleString("en")} kcal at rest`);
-  const age = ageOf(d)!;
-  const pick = (f: Formula | "auto") => {
-    if (pinned) return;
-    const { formula: _, ...rest } = d;
-    p.setPersonal(f === "auto" ? rest : { ...rest, formula: f });
-    p.notify(f === "auto" ? "Automatic: your numbers follow." : `${FORMULA_NAME[f]}: your numbers follow.`);
-  };
-  const opts: { id: Formula | "auto"; name: string; num: string; hint: string; off?: boolean }[] = [
-    { id: "auto", name: "Automatic", num: d.bodyFatPct ? "Katch McArdle now" : "Mifflin St Jeor now", hint: d.bodyFatPct ? "From your body fat." : "Katch McArdle once you add your body fat." },
-    { id: "mifflin", name: "Mifflin St Jeor", num: kcal(n("mifflin"))!, hint: "Sex, age, height, weight." },
-    n("katch") === null ? { id: "katch", name: "Katch McArdle", num: "Needs body fat", hint: "Add it in Profile.", off: true } : { id: "katch", name: "Katch McArdle", num: kcal(n("katch"))!, hint: "Lean mass, from your body fat." },
-    { id: "schofield", name: "Schofield", num: kcal(n("schofield"))!, hint: `Sex, weight, age band ${schofieldBand(age)}.` },
-  ];
-  // the difference in plain numbers: at rest, then times the everyday (the same factor every formula gets)
-  const s = n("schofield")!, m = n("mifflin")!;
-  const lifeOn = (f: Formula) => calculate({ ...d, formula: f }, "maintain", null)?.tdee ?? 0;
-  const rest = s - m, day = Math.round((lifeOn("schofield") - lifeOn("mifflin")) / 10) * 10;
-  const diff = rest === 0 ? "Schofield and Mifflin St Jeor give the same resting burn for you." : `Schofield gives ${Math.abs(rest)} kcal ${rest > 0 ? "more" : "less"} at rest than Mifflin St Jeor. With your everyday that is about ${Math.abs(day)} kcal ${rest > 0 ? "more" : "less"} a day, before training.`;
-  return (
-    <>
-      <div className="seg-head"><b>Resting burn: the formula</b><small>Three published formulas. Pick one, and all your numbers follow.</small></div>
-      <section className="card seg formula-card">
-        <div className="opt-grid" role="group" aria-label="Resting burn formula">
-          {opts.map((x) => (
-            <button type="button" key={x.id} className={`opt ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} disabled={x.off || !!pinned} onClick={() => pick(x.id)}>
-              <b>{x.name}</b><small className="opt-num">{x.num}</small><small>{x.hint}</small>
-            </button>
-          ))}
-        </div>
-        {pinned && <small className="setting-hint">Set by {p.coachLabel}. Ask {p.coachLabel} to change it.</small>}
-        <small className="setting-hint">{diff}</small>
-        <button type="button" className="link formula-about" aria-expanded={about} onClick={() => setAbout((v) => !v)}>{about ? "Close About the three formulas" : "About the three formulas ›"}</button>
-        {about && (
-          <div className="formula-text">
-            <p><b>Mifflin St Jeor (1990).</b> From sex, age, height and weight. Made from about 500 adults aged 19 to 78. In reviews it lands closest to the measured burn for most adults, so it is the default.</p>
-            <p><b>Katch McArdle.</b> From lean mass: your weight without the body fat. Sex and age don't enter. Good for lean, muscular people, when the body fat is measured well.</p>
-            <p><b>Schofield (1985).</b> The formula FAO, WHO and UNU use. From sex and weight, in three adult age bands: 18 to 30, 30 to 60, over 60. Made from about 7,000 measurements in many countries. Height doesn't enter. It often gives a little more than Mifflin St Jeor.</p>
-            <p><b>What changes.</b> Only the resting burn. Your everyday, your training, your goal and your protein stay the same.</p>
-          </div>
-        )}
-      </section>
-    </>
-  );
-}
-const FORMULA_NAME: Record<Formula, string> = { mifflin: "Mifflin St Jeor", katch: "Katch McArdle", schofield: "Schofield" };
-
+// History as periods (canvas board FX, G3): only goals that were applied, each with the days it held, newest first
 export function GoalHistory({ log }: { log: GoalEntry[] }) {
-  if (!log.length) return null;
+  const periods = periodsOf(log);
+  if (!periods.length) return null;
   return (
     <>
       <p className="label">History</p>
       <section className="card history">
-        {[...log].reverse().slice(0, 20).map((e) => (
+        {periods.slice(0, 20).map(({ entry: e, ...pr }) => (
           <div className="history-row" key={e.at}>
-            <div><b>{e.band ? goalLabel(e.band) : "Custom"}</b><small>{new Date(e.at).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}{SOURCE_LABEL[e.source] ? `, ${SOURCE_LABEL[e.source].charAt(0).toLowerCase()}${SOURCE_LABEL[e.source].slice(1)}` : ""}{e.weightKg ? ` at ${e.weightKg} kg` : ""}</small></div>
-            <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString() : "?"}</b><small>kcal, {e.protein ?? "?"} g protein{e.kcal && e.protein ? `, ${pdText(e.protein / (e.kcal / 100))}` : ""}</small></div>
+            <div><b>{e.band ? goalLabel(e.band) : "Custom"}{pr.now && <span className="now-tag">NOW</span>}</b><small>{periodLine({ entry: e, ...pr })}{SOURCE_LABEL[e.source] ? `, ${SOURCE_LABEL[e.source].charAt(0).toLowerCase()}${SOURCE_LABEL[e.source].slice(1)}` : ""}{e.weightKg ? `, at ${e.weightKg} kg` : ""}</small></div>
+            <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString("en") : "?"}</b><small>kcal, {e.protein ?? "?"} g protein</small></div>
           </div>
         ))}
       </section>

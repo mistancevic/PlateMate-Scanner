@@ -3,7 +3,7 @@ import { ChevronRight, ChefHat, Pencil } from "lucide-react";
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
 import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
-import { rowsOf, slotsOf, trainingTime, type Slot } from "../slots";
+import { rowsOf, slotsOf, trainingWhen, type Slot } from "../slots";
 import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
 import { STARTERS, fitOf, fromMeal, needOf, sumOf, type PlannedMeal } from "../planned";
@@ -42,10 +42,11 @@ export function PlanScreen(p: AppApi) {
   useEffect(() => { try { stripRef.current?.querySelector<HTMLElement>(".choice.on")?.scrollIntoView({ inline: "center", block: "nearest" }); } catch {} }, [picked]);
   // two weeks, Monday first: this week and the next, or earlier weeks with the arrows
   const thisMonday = isoWeek(today).monday;
-  const [offset, setOffsetState] = useState(() => { const m = isoWeek(new Date(`${picked}T12:00:00`)).monday; return Math.min(0, Math.round((m.getTime() - thisMonday.getTime()) / (7 * 864e5))); });
+  const [offset, setOffsetState] = useState(() => { const m = isoWeek(new Date(`${picked}T12:00:00`)).monday; const n = Math.round((m.getTime() - thisMonday.getTime()) / (7 * 864e5)); return n === 1 ? 0 : n; });
   const monday = addDays(thisMonday, offset * 7);
   const strip = Array.from({ length: 14 }, (_, i) => addDays(monday, i));
-  const goWeek = (n: number) => { const next = Math.min(0, offset + n); setOffsetState(next); setPicked(next === 0 ? ymd(today) : ymd(addDays(thisMonday, next * 7))); };
+  // the arrows go both ways with no limit (canvas board FX, PW1); This week comes back
+  const goWeek = (n: number) => { const next = n === 0 ? 0 : offset + n; setOffsetState(next); setPicked(next === 0 ? ymd(today) : ymd(addDays(thisMonday, next * 7))); };
   const date = strip.find((d) => ymd(d) === picked) ?? strip[0];
   const key = ymd(date);
   const lifestyle = lifestyleOf(p.personal);
@@ -53,7 +54,7 @@ export function PlanScreen(p: AppApi) {
   const training = dayFor(p.personal, date)?.day ?? getDay(p.personal, date).plan ?? null;
   const rows = rowsOf(slots, training);
   const numbers = p.numbersFor(date);
-  const tTime = trainingTime(training);
+  const tWhen = trainingWhen(training);
   const isToday = key === ymd(today);
   const isPast = key < ymd(today);
   const minor = isMinor(p.personal);
@@ -63,7 +64,7 @@ export function PlanScreen(p: AppApi) {
   const dayName = isToday ? "today" : WEEKDAY[(date.getDay() + 6) % 7];
   const line = [
     numbers ? `${fmt(numbers.kcal, 0)} kcal · ${numbers.protein} g protein` : "No numbers yet",
-    tTime ? `training at ${tTime}` : training ? "rest day" : null,
+    tWhen ? tWhen.phrase : training ? "rest day" : null,
   ].filter(Boolean).join(" · ");
   const target = numbers ? density(numbers.protein, numbers.kcal) : null;
   const unit = p.personal.pdUnit === "pct" ? "pct" : "pd";
@@ -76,8 +77,8 @@ export function PlanScreen(p: AppApi) {
     <>
       <div className="week-arrows">
         <button type="button" className="week-arrow" aria-label="Week before" onClick={() => goWeek(-1)}>‹</button>
-        <span>{weekSpan}</span>
-        <button type="button" className="week-arrow" aria-label="Week after" disabled={offset >= 0} onClick={() => goWeek(1)}>›</button>
+        <span className="week-arrows-mid">{weekSpan}{offset !== 0 && <button type="button" className="link week-back" onClick={() => goWeek(0)}>This week</button>}</span>
+        <button type="button" className="week-arrow" aria-label="Week after" onClick={() => goWeek(1)}>›</button>
       </div>
       <div className="day-strip" role="tablist" aria-label="Pick a day" ref={stripRef}>
         {strip.map((d) => {
@@ -98,8 +99,8 @@ export function PlanScreen(p: AppApi) {
         {rows.map((r) => {
           if (r.kind === "training") return (
             <button type="button" key="training" className="menu-row plan-training" aria-label={`Training at ${r.time}, ${planLine(r.day)}. Change it for this date`} onClick={() => setEditing(r.day)}>
-              <span className="plan-time">{r.time}</span>
-              <div className="menu-row-text"><small>{changed ? "Changed for this date" : "From my Training week"}</small><b>{planLine({ ...r.day, when: undefined })}{r.day.minutes ? `, ${r.day.minutes} min` : ""}</b></div>
+              <span className={`plan-time${r.exact ? "" : " plan-time-word"}`}>{r.exact ? r.label : r.label === "No time set" ? <>No time<br />set</> : r.label}</span>
+              <div className="menu-row-text"><small>{changed ? "Changed for this date" : "From my Training week"}</small><b>{planLine({ ...r.day, when: undefined })}{r.day.minutes ? `, ${r.day.minutes} min` : ""}</b>{!r.exact && r.label === "No time set" && <span className="link plan-set-time">Set a time</span>}</div>
               <Pencil size={18} />
             </button>
           );

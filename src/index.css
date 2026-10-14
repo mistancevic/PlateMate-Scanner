@@ -1337,3 +1337,20 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .plan-past .past-plate { margin-top: 6px; }
 .plan-past .past-lived { display: block; margin-top: 8px; color: #155c34; font-weight: 800; }
 .plan-past .past-none { padding: 4px 16px 14px; }
+
+/* The training time (canvas board FX, TT1, TT2) and the weeks both ways (PW1), 0.2.5+r20 */
+.starts-at-row { display: flex; gap: 10px; align-items: center; }
+.starts-at-row input { font: inherit; font-size: 16px; font-weight: 800; border: 1.5px solid var(--line); border-radius: 14px; padding: 8px 12px; background: var(--surface); color: var(--ink); min-width: 120px; }
+.plan-time-word { font-size: 13px; line-height: 1.2; }
+.plan-set-time { font-size: 13px; font-weight: 800; color: var(--brand-text); margin-top: 2px; }
+.week-arrows-mid { display: flex; flex-direction: column; align-items: center; }
+.week-back { font-size: 12.5px; }
+
+/* Goal: the waiting goal (canvas board FX, G2), the formula line, History as periods (G3) */
+.next-goal { display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; margin-top: 10px; border: 1.5px solid var(--brand); }
+.next-goal .next-goal-when { font-weight: 900; color: var(--brand-text); letter-spacing: .04em; font-size: 11.5px; }
+.next-goal b { font-size: 16px; } .next-goal small { color: var(--muted); font-weight: 700; } .next-goal .button-row { margin-top: 4px; }
+.now-tag { font-size: 11px; font-weight: 900; color: var(--brand-text); background: var(--tint); border-radius: 6px; padding: 1px 6px; margin-left: 6px; vertical-align: 1px; }
+.formula-line { margin-bottom: 10px; }
+.apply-from { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 8px; }
+.apply-from input[type=date] { font: inherit; font-size: 15px; font-weight: 700; border: 1.5px solid var(--line); border-radius: 14px; padding: 8px 12px; background: var(--surface); color: var(--ink); align-self: flex-start; }

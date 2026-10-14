@@ -31,7 +31,7 @@ const path = require("node:path");
     ok(await pace.getByRole("button", { name: /^Faster/, pressed: true }).count() === 1, "under 1 year starts on Faster");
     await age.getByRole("button", { name: "Over 3 years" }).click(); await page.waitForTimeout(200);
     ok(await pace.getByRole("button", { name: /^Steady/, pressed: true }).count() === 1, "over 3 years starts on Steady");
-    await page.getByRole("button", { name: /Set my day/ }).click(); await page.waitForTimeout(600);
+    await page.getByRole("button", { name: /^Apply from today/ }).click(); await page.waitForTimeout(600);
     const g = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-goal") || "{}"));
     ok(g.band === "gainsteady", "the goal is kept with its pace: " + g.band);
     await require("./me.cjs")(page);

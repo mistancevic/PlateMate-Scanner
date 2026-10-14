@@ -10,7 +10,7 @@ import { DayEditor } from "../components/DayEditor";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { X } from "lucide-react";
 import type { AppApi, Filling } from "./api";
-import { slotsOf, rowsOf, trainingTime } from "../slots";
+import { slotsOf, rowsOf, trainingWhen } from "../slots";
 import { dayFor, getDay } from "../personal";
 import { ymd } from "../plan";
 import { fitOf, type PlannedMeal } from "../planned";
@@ -51,7 +51,7 @@ export function HomeScreen(p: AppApi) {
   // tomorrow, for the line once today is done
   const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
   const tTraining = dayFor(p.personal, tomorrow)?.day ?? getDay(p.personal, tomorrow).plan ?? null;
-  const tTime = trainingTime(tTraining); void rowsOf;
+  const tWhen = trainingWhen(tTraining); void rowsOf;
   const tHeld = Object.keys(p.planned[ymd(tomorrow)] ?? {}).length;
   const past = [1, 2].map((n) => dayLog(state.feedback, daysAgo(n)));
   const follow = dayModeOf(p.personal) === "each";
@@ -148,7 +148,7 @@ export function HomeScreen(p: AppApi) {
         )}
         {hasPlanToday && rec.done && (
           <button className="menu-row plan-row-link" onClick={() => setTab("plan")}>
-            <div className="menu-row-text"><small>All {rec.planned === 1 ? "one slot" : `${rec.planned} slots`} eaten</small><b>Today went {rec.extras.length ? "mostly " : ""}by the plan</b><small>{tHeld ? `Tomorrow is set: ${tHeld} ${tHeld === 1 ? "slot" : "slots"}${tTime ? `, training at ${tTime}` : ""}` : "Tomorrow is open. Set it on Plan."}</small></div><ChevronRight size={18} />
+            <div className="menu-row-text"><small>All {rec.planned === 1 ? "one slot" : `${rec.planned} slots`} eaten</small><b>Today went {rec.extras.length ? "mostly " : ""}by the plan</b><small>{tHeld ? `Tomorrow is set: ${tHeld} ${tHeld === 1 ? "slot" : "slots"}${tWhen ? `, ${tWhen.phrase}` : ""}` : "Tomorrow is open. Set it on Plan."}</small></div><ChevronRight size={18} />
           </button>
         )}
         {hasPlanToday && !rec.done && rec.open.map((sl) => {

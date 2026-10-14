@@ -4,7 +4,7 @@
 import type { Lifestyle, PlanDay, When } from "./plan";
 
 export type Slot = { id: string; name: string; time: string };
-export type DayRow = { kind: "slot"; slot: Slot } | { kind: "training"; time: string; day: PlanDay };
+export type DayRow = { kind: "slot"; slot: Slot } | { kind: "training"; time: string; label: string; exact: boolean; day: PlanDay };
 
 // the names by how many meals a day: 2 to 5; 4 and 5 hold snacks
 const NAMES: Record<number, string[]> = {
@@ -33,15 +33,27 @@ export function slotsOf(l: Pick<Lifestyle, "meals" | "window"> & { slotTimes?: R
   return names.map((name, i) => ({ id: id[i], name, time: l.slotTimes?.[id[i]] ?? times[i] }));
 }
 
-// the training's clock time from the Training week's time of day
+// The training's time (canvas board FX, TT0 to TT2, Milan 14 October 2026): a clock time only when the person set one.
+// A part of the day is shown as words and only places the row among the meals; nothing set sits at the end of the day.
 export const TRAINING_TIME: Record<When, string> = { morning: "07:00", day: "12:30", evening: "17:30", late: "20:30", afterschool: "15:00", lateafternoon: "16:30" };
-export const trainingTime = (d: PlanDay | null | undefined): string | null => d && d.kind !== "rest" ? TRAINING_TIME[d.when ?? "evening"] : null;
+const WHEN_WORD: Record<When, string> = { morning: "Morning", day: "During the day", evening: "Evening", late: "Late night", afterschool: "After school", lateafternoon: "Late afternoon" };
+const WHEN_PHRASE: Record<When, string> = { morning: "in the morning", day: "during the day", evening: "in the evening", late: "late at night", afterschool: "after school", lateafternoon: "in the late afternoon" };
+const isClock = (t?: string) => !!t && /^([01]\d|2[0-3]):[0-5]\d$/.test(t);
+// the clock time the person set, or null
+export const trainingTime = (d: PlanDay | null | undefined): string | null => (d && d.kind !== "rest" && isClock(d.at) ? d.at! : null);
+// where the row goes and what its time column says
+export function trainingWhen(d: PlanDay | null | undefined): { label: string; sort: string; exact: boolean; phrase: string } | null {
+  if (!d || d.kind === "rest") return null;
+  if (isClock(d.at)) return { label: d.at!, sort: d.at!, exact: true, phrase: `training at ${d.at}` };
+  if (d.when) return { label: WHEN_WORD[d.when], sort: TRAINING_TIME[d.when], exact: false, phrase: `training ${WHEN_PHRASE[d.when]}` };
+  return { label: "No time set", sort: "23:59", exact: false, phrase: "training, no time set" };
+}
 
 // the day's rows in time order: the slots, and the training between them
 export function rowsOf(slots: Slot[], training: PlanDay | null | undefined): DayRow[] {
   const rows: DayRow[] = slots.map((slot) => ({ kind: "slot", slot }));
-  const t = trainingTime(training);
-  if (t && training) rows.push({ kind: "training", time: t, day: training });
+  const t = trainingWhen(training);
+  if (t && training) rows.push({ kind: "training", time: t.sort, label: t.label, exact: t.exact, day: training });
   return rows.sort((a, b) => toMin(a.kind === "slot" ? a.slot.time : a.time) - toMin(b.kind === "slot" ? b.slot.time : b.time));
 }
 

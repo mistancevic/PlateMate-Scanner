@@ -54,7 +54,7 @@ const path = require("node:path");
     await page.getByRole("button", { name: "Fewer Hard days" }).click(); await page.getByRole("button", { name: "Fewer Hard days" }).click(); await page.waitForTimeout(200);
     // the numbers count the steps on a day without training
     await page.getByRole("button", { name: "Each day its own" }).click(); await page.waitForTimeout(300);
-    await page.getByRole("button", { name: /Set my day|Save/ }).last().click(); await page.waitForTimeout(500);
+    await page.getByRole("button", { name: /^Apply from today/ }).last().click(); await page.waitForTimeout(500);
     // the Training week has the same days
     await require("./me.cjs")(page);
     await page.getByText("Training week", { exact: true }).first().click(); await page.waitForTimeout(400);

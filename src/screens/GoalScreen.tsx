@@ -1,11 +1,12 @@
 import { underAge, ADULT_ONLY } from "../safety";
 import { useState } from "react";
-import { BANDS, PACES, TRAINING_AGES, isBuild, paceForAge, bandOf, saveGoal } from "../goal";
+import { BANDS, PACES, TRAINING_AGES, isBuild, paceForAge, bandOf, goalLabel } from "../goal";
 import { density } from "../pilot";
 import { pdText, pdVal, pdTag } from "../ui";
 import { Mark, APP_NAME } from "../components/Mark";
-import { LIFE, DAY_TYPES, STEPS, calculate, canCalculate, macroSplit, suggestBand, dayModeOf, ownDayNumbers, weekOf, workOf, withWork, planOf, lifestyleOf, type Personal, type DayType, type DayMode } from "../personal";
-import { INTENSITIES, LENGTHS, lengthOf, trainingCounts, withTraining, withLength, levelMinutes, planFromCounts, weekdaysOf, usualFrom, WEEKDAY_CHOICES, type Intensity, type Plan } from "../plan";
+import { FormulaCard } from "../components/FormulaCard";
+import { LIFE, DAY_TYPES, STEPS, calculate, canCalculate, macroSplit, suggestBand, dayModeOf, ownDayNumbers, weekOf, workOf, withWork, planOf, lifestyleOf, type Personal, type DayType, type DayMode, type Formula } from "../personal";
+import { INTENSITIES, LENGTHS, lengthOf, trainingCounts, withTraining, withLength, levelMinutes, planFromCounts, weekdaysOf, usualFrom, WEEKDAY_CHOICES, ymd, type Intensity, type Plan } from "../plan";
 import { DayTable, FindingList } from "../components/DayTable";
 import { analyse, isOpen as openAt, type Finding } from "../analysis";
 import type { AppApi } from "./api";
@@ -14,7 +15,9 @@ import { Zones } from "../components/Zones";
 
 // Your goal, as approved on 6 October 2026. Two ways in: Calculate for me, or My own numbers. Five goals. Life is set
 // once; training is chosen per day. Every day the same, or each day its own, with the four days as one table.
-// A way out: Not now on the first open, back to Me and Close from Me. Nothing is saved until Set my day.
+// A way out: Not now on the first open, back to Me and Close from Me.
+// 0.2.5+r20 (canvas board FX, G1a and G1b, Milan 14 October 2026): a calculator. 1 You (body data, saved at once: they are
+// facts), 2 the formula, 3 the goal, 4 the days; the formula and the goal stay a draft until Apply from a date.
 type Way = "calc" | "own";
 const num = (v: string) => (v.trim() === "" ? undefined : Number(v));
 
@@ -32,7 +35,10 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const save = (next: Personal) => p.setPersonal(underAge(next.birthYear) ? { ...next, birthYear: p.personal.birthYear } : next);
   const setPersonalNow = (next: Personal) => { setD(next); save(next); };
   const setMode = (m: DayMode) => setPersonalNow({ ...d, dayMode: m });
-  const c = under ? null : calculate(d, band, p.formula);
+  // the formula picked here is part of the draft (board FX, G1a)
+  const [formula, setFormula] = useState<Formula | "auto">(p.personal.formula ?? "auto");
+  const dF: Personal = (() => { const { formula: _, ...r } = d; void _; return formula === "auto" ? r : { ...r, formula }; })();
+  const c = under ? null : calculate(dF, band, p.formula);
   const by = coach ? "coach" : "you";
   const done = () => { p.notify("Your day is set. This is Today."); onDone(); };
   const goalNow = bandOf(band)!;
@@ -42,7 +48,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const ownFats = own.fats.trim() === "" ? (ownKcal && ownProtein ? macroSplit(ownKcal, ownProtein).fats : null) : Number(own.fats);
   const ownCarbs = own.carbs.trim() === "" ? (ownKcal && ownProtein && ownFats !== null ? macroSplit(ownKcal, ownProtein, ownFats).carbs : null) : Number(own.carbs);
   // own numbers, each day its own
-  const o = ownDayNumbers(d, band, p.formula);
+  const o = ownDayNumbers(dF, band, p.formula);
   const setOwnDay = (day: DayType, patch: { kcal?: number; protein?: number; fats?: number; carbs?: number }) => {
     const prev = d.ownDays?.[day] ?? {};
     const next = { ...prev, ...patch };
@@ -53,7 +59,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const ownRows = o ? o.days : c ? Object.fromEntries(DAY_TYPES.map((x) => [x.id, { ...c.days[x.id], source: "calculated" as const }])) as Record<DayType, typeof c.days.passive & { source: "calculated" }> : emptyRows;
   const ownAvg = o ? o.avg : c ? { kcal: c.kcal, protein: c.protein } : { kcal: 0, protein: 0 };
   // Target analysis: against what this body burns at maintenance, when there is body data to tell
-  const burn = !under && canCalculate(d) ? calculate(d, "maintain", p.formula)?.kcal ?? null : null;
+  const burn = !under && canCalculate(d) ? calculate(dF, "maintain", p.formula)?.kcal ?? null : null;
   const sameRow = ownKcal && ownProtein ? { kcal: ownKcal, protein: ownProtein, fats: ownFats ?? 0, carbs: ownCarbs ?? 0, how: [] as string[] } : null;
   const analysisEach = o ? analyse({ days: o.days, avg: o.avg, bandId: band, personal: d, burn }) : null;
   const analysisSame = sameRow ? analyse({ days: Object.fromEntries(DAY_TYPES.map((x) => [x.id, sameRow])) as Record<DayType, typeof sameRow>, avg: sameRow, bandId: band, personal: d, burn }) : null;
@@ -61,7 +67,33 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   if (analysisSame) analysisSame.findings = analysisSame.findings.filter((f) => !f.id.startsWith("shape")).map((f) => ({ ...f, day: null }));
   const isOpen = (f: Finding) => openAt(f, d);
   const keep = (f: Finding) => setPersonalNow({ ...d, kept: { ...(d.kept ?? {}), [f.id]: { at: new Date().toISOString(), sig: f.sig } } });
-  const saveLabel = (a: ReturnType<typeof analyse> | null) => { const n = a ? a.findings.filter(isOpen).length : 0; return n ? `Save, ${n} kept as ${n === 1 ? "it is" : "they are"}` : "Set my day"; };
+  // Apply from (board FX, G1b): today, tomorrow, next Monday or a date picked; never a past date
+  const todayKey = ymd(new Date());
+  const dayFrom = (n: number) => { const x = new Date(); x.setDate(x.getDate() + n); return ymd(x); };
+  const tomorrow = dayFrom(1);
+  const nextMonday = (() => { const n = (8 - new Date().getDay()) % 7 || 7; const k = dayFrom(n); return k === tomorrow ? dayFrom(n + 7) : k; })();
+  const [from, setFrom] = useState(todayKey);
+  const [picking, setPicking] = useState(false);
+  const longDay = (k: string) => new Date(`${k}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "");
+  const fromName = from === todayKey ? "today" : from === tomorrow ? "tomorrow" : longDay(from);
+  const saveLabel = (a: ReturnType<typeof analyse> | null) => { const n = a ? a.findings.filter(isOpen).length : 0; return `Apply from ${fromName}${n ? `, ${n} kept as ${n === 1 ? "it is" : "they are"}` : ""}`; };
+  const ApplyFrom = () => (
+    <div className="apply-from" role="group" aria-label="Apply from">
+      <small className="setting-name">Apply from</small>
+      <div className="chip-row">
+        {[[todayKey, "Today"], [tomorrow, "Tomorrow"], [nextMonday, longDay(nextMonday)]].map(([k, l]) => <button type="button" key={k} className={`choice ${from === k && !picking ? "on" : ""}`} aria-pressed={from === k && !picking} onClick={() => { setPicking(false); setFrom(k); }}>{l}</button>)}
+        <button type="button" className={`choice ${picking ? "on" : ""}`} aria-pressed={picking} onClick={() => setPicking(true)}>Pick a date</button>
+      </div>
+      {picking && <input type="date" aria-label="Start date" min={tomorrow} value={from > todayKey ? from : ""} onChange={(e) => e.target.value && e.target.value > todayKey && setFrom(e.target.value)} />}
+      <small className="setting-hint">Days before then keep the goal they had.</small>
+    </div>
+  );
+  // the one way a goal is saved: now, or waiting for its date on Me, Goal
+  const apply = (x: { source: "profile" | "exact"; kcal: number; protein: number; fats: number; carbs: number; method?: string }) => {
+    p.applyGoal({ band, setBy: by, formula: formula === "auto" ? null : formula, ...x }, from);
+    if (from <= todayKey) done();
+    else { p.notify(`${goalLabel(band)} starts on ${longDay(from)}.`); onLater(); }
+  };
   // on save: open findings count as kept on purpose; what is kept goes to the coach; nothing kept closes a request
   const settle = (a: ReturnType<typeof analyse> | null, summary: string) => {
     const now = new Date().toISOString();
@@ -81,9 +113,9 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
       <div><b>{carbs}</b><small>g carbs</small></div>
     </div>
   );
-  const Days = () => (
+  const Days = ({ title = "Your days" }: { title?: string }) => (
     <div className="days-choice">
-      <b className="section-title">Your days</b>
+      <b className="section-title">{title}</b>
       <div className="two-way">
         <button className={`choice ${mode === "same" ? "on" : ""}`} onClick={() => setMode("same")}>Every day the same</button>
         <button className={`choice ${mode === "each" ? "on" : ""}`} onClick={() => setMode("each")}>Each day its own</button>
@@ -144,9 +176,10 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               </div>
             </section>
           )}
+          {consented && <p className="label calc-step">1. You</p>}
           {consented && !editing && canCalculate(d) ? (
             <section className="card you-card">
-              <span><b>You</b><small>{[d.sex === "male" ? "Male" : d.sex === "female" ? "Female" : null, d.birthYear, d.heightCm ? `${d.heightCm} cm` : null, d.weightKg ? `${d.weightKg} kg` : null, LIFE.find((l) => l.id === workOf(d))!.name, STEPS.find((x) => x.id === d.steps)?.name.concat(" steps")].filter(Boolean).join(" · ")}</small></span>
+              <span><b>You</b><small>{[d.sex === "male" ? "Male" : d.sex === "female" ? "Female" : null, d.birthYear, d.heightCm ? `${d.heightCm} cm` : null, d.weightKg ? `${d.weightKg} kg` : null, LIFE.find((l) => l.id === workOf(d))!.name, STEPS.find((x) => x.id === d.steps)?.name.concat(" steps")].filter(Boolean).join(" · ")}<br />Body fat: {d.bodyFatPct ? `${d.bodyFatPct} %` : "not given"}</small></span>
               <button className="link" onClick={() => setEditing(true)}>Edit</button>
             </section>
           ) : (
@@ -178,7 +211,13 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               {canCalculate(d) && <button className="pill pill-small" onClick={() => { save(d); setEditing(false); }}>Done</button>}
             </section>
           )}
-          <b className="section-title">What are you after?</b>
+          {consented && canCalculate(d) && !under && (
+            <>
+              <p className="label calc-step">2. The formula</p>
+              <FormulaCard personal={d} pinned={p.formula ?? null} coachLabel={p.coachLabel} value={formula} onPick={setFormula} />
+            </>
+          )}
+          <b className="section-title">3. What are you after?</b>
           <p className="small muted">Each goal says what happens to your weight, how much you eat, and what you need to do. You can change it at any time.</p>
           <div className="goal-cards">{BANDS.map((b) => {
             // Build muscle has a pace (canvas board K1): Steady or Faster, started by how long the person has trained
@@ -209,14 +248,15 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           {c && <ProteinCard c={c} />}
           {c ? (
             <>
-              <Days />
+              <Days title="4. Your days" />
               {mode === "same" ? (
                 <section className="card proposal"><Four kcal={c.kcal} protein={c.protein} fats={c.fats} carbs={c.carbs} /><p className="math">{c.math}</p><small>{c.method}.</small></section>
               ) : (
                 <DayTable rows={c.days} avg={{ kcal: c.kcal, protein: c.protein }} week={c.week} weekdays={c.weekdays} />
               )}
               {c.note && <small className="notice">{c.note}</small>}
-              <button className="pill pill-primary pill-wide" onClick={() => { p.applyNumbers(band, c.kcal, c.protein, c.method, c.fats, c.carbs); done(); }}>Set my day</button>
+              <ApplyFrom />
+              <button className="pill pill-primary pill-wide" onClick={() => apply({ source: "profile", kcal: c.kcal, protein: c.protein, fats: c.fats, carbs: c.carbs, method: c.method })}>{saveLabel(null)}</button>
             </>
           ) : (
             <p className="small muted">{consented ? "Your body, birth year, height and weight, and your numbers appear here." : "Agree above, then fill in your body data."}</p>
@@ -240,11 +280,10 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               </div>
               <p className="small">One number for every day. That is {pdText(density(ownProtein, ownKcal))}{ownFats !== null && ownCarbs !== null ? `, ${ownFats} g fat and ${ownCarbs} g carbs` : ""}.</p>
               {analysisSame && <FindingList analysis={analysisSame} open={isOpen} keep={keep} />}
+              <ApplyFrom />
               <button className="pill pill-primary pill-wide" disabled={!density(ownProtein, ownKcal)} onClick={() => {
-                setState((s) => ({ ...s, goals: { ...s.goals, calories: ownKcal, protein: ownProtein, fats: ownFats, carbs: ownCarbs } }));
-                saveGoal({ band, setBy: by, setAt: new Date().toISOString(), source: "exact" });
                 settle(analysisSame, `${goalNow.name} · every day the same · ${ownKcal?.toLocaleString("en")} kcal`);
-                done();
+                apply({ source: "exact", kcal: ownKcal!, protein: ownProtein!, fats: ownFats ?? 0, carbs: ownCarbs ?? 0 });
               }}>{saveLabel(analysisSame)}</button>
               {p.profile.coachId && !coach && <p className="small muted">Anything kept on purpose goes to {p.coachLabel} to approve.</p>}
             </>
@@ -252,12 +291,11 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
             <>
               <DayTable rows={ownRows} avg={ownAvg} week={weekOf(d)} own={d.ownDays ?? {}} setOwn={setOwnDay} analysis={analysisEach ?? undefined} open={isOpen} keep={keep} />
               <p className="small muted">Type any of the four. A blank one fills in and says so. Protein and carbs count 4 kcal a gram, fat 9. Chef Mealan checks a day when you leave its fields.</p>
+              <ApplyFrom />
               <button className="pill pill-primary pill-wide" disabled={!o} onClick={() => {
                 const a = o!.avg;
-                setState((s) => ({ ...s, goals: { ...s.goals, calories: a.kcal, protein: a.protein, fats: a.fats, carbs: a.carbs } }));
-                saveGoal({ band, setBy: by, setAt: new Date().toISOString(), source: "exact" });
                 settle(analysisEach, `${goalNow.name} · each day its own · week average ${a.kcal.toLocaleString("en")} kcal`);
-                done();
+                apply({ source: "exact", kcal: a.kcal, protein: a.protein, fats: a.fats, carbs: a.carbs });
               }}>{saveLabel(analysisEach)}</button>
               {p.profile.coachId && !coach && <p className="small muted">Anything kept on purpose goes to {p.coachLabel} to approve.</p>}
             </>

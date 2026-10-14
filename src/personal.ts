@@ -43,7 +43,22 @@ export type Personal = {
   dated?: Record<string, PlanDay>;
   // from 13 October 2026 (canvas board TW, F1): the resting burn formula the person picked; none is Automatic
   formula?: Formula;
+  // from 0.2.5+r20 (canvas board FX, G2): a goal applied from a later date, waiting for its day
+  nextGoal?: NextGoal;
+  // from 0.2.5+r20 (canvas board FX): each day's own target, kept once the day has it, so a later goal never changes it
+  targets?: Record<string, DayTarget>;
 };
+export type DayTarget = { kcal: number; protein: number; fats: number; carbs: number };
+export type NextGoal = { from: string; at: string; band: string; source: "profile" | "exact" | "coach" | "quick"; setBy: "you" | "coach"; kcal: number; protein: number; fats: number; carbs: number; method?: string; formula?: Formula | null };
+// today's target kept with the day; the newest 400 days stay
+export function withTarget(p: Personal, day: string, t: DayTarget): Personal {
+  const cur = p.targets?.[day];
+  if (cur && cur.kcal === t.kcal && cur.protein === t.protein && cur.fats === t.fats && cur.carbs === t.carbs) return p;
+  const all = { ...(p.targets ?? {}), [day]: t };
+  const keys = Object.keys(all).sort();
+  for (const k of keys.slice(0, Math.max(0, keys.length - 400))) delete all[k];
+  return { ...p, targets: all };
+}
 // Life without planned training, as a multiple of resting burn. Physical activity levels after FAO/WHO/UNU 2004,
 // taken at the low end of each band because planned training is counted separately, per day.
 export const LIFE: { id: Life; name: string; hint: string; factor: number }[] = [

@@ -39,7 +39,7 @@ seed.items = [];
   ok(await page.getByRole("button", { name: /Fill the open slots with Chef Mealan/ }).count() === 1, "Plan offers Fill the open slots");
   await page.getByRole("button", { name: "Chef Mealan", exact: true }).click(); await page.waitForTimeout(500);
   const headPlan = await page.locator(".chat-screen .head p").first().textContent();
-  ok(/About today: 2 slots open, training at 17:30/.test(headPlan), "from Plan the chat says what the day needs: " + headPlan);
+  ok(/About today: 2 slots open, training in the evening/.test(headPlan), "from Plan the chat says what the day needs: " + headPlan);
   ok((await page.locator(".chips-start .pill").allTextContents()).includes("Fill today"), "the first chip fills the day");
   await page.getByRole("button", { name: "Fill today", exact: true }).click(); await page.waitForTimeout(600);
   const fill = page.locator(".fill-rows");

@@ -51,10 +51,10 @@ import { BuiltScreen } from "./screens/BuiltScreen";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalLabel, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
-import { setTodayChange, dayOfLoad, type PlanDay } from "./plan";
+import { setTodayChange, dayOfLoad, ymd, type PlanDay } from "./plan";
 import { getPlanned, storePlanned, withPlanned, type Planned, type PlannedMeal } from "./planned";
 import type { Filling } from "./screens/api";
-import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, type Personal, type DayType, type Day } from "./personal";
+import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, withTarget, type Personal, type DayType, type Day, type NextGoal } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
@@ -731,7 +731,8 @@ export default function App() {
     cloudLoaded = useRef(false),
     [cloudStatus, setCloudStatus] = useState<{ ok: boolean; text: string; at?: string }>({ ok: true, text: "" }),
     [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string; coachPhoto?: string; joinedAt?: string; coachSetAt?: string; formula?: import("./personal").Formula | null }>({}),
-    [goalLog, setGoalLogState] = useState<GoalEntry[]>(getGoalLog),
+    // the log is kept collapsed from 0.2.5+r20 (board FX, G3): the first open cleans the old one
+    [goalLog, setGoalLogState] = useState<GoalEntry[]>(() => { setGoalLog(getGoalLog()); return getGoalLog(); }),
     nextSource = useRef<GoalSource | null>(null),
     [moment, setMomentState] = useState<MomentId>("regular"),
     [kind, setKind] = useState<PlateKind>("meal"),
@@ -1229,6 +1230,41 @@ export default function App() {
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.goals.calories, state.goals.protein, goal?.band, goal?.source]);
+  // the goal and profile as they are now, for numbersOfDay when it is given another goal (board FX)
+  const goalNow = goal, personalNow = personal;
+  // each day keeps its own target (board FX): today's is written with the day, so a later goal never changes it
+  const todayTarget = todayNumbers();
+  useEffect(() => {
+    if (!todayTarget) return;
+    const next = withTarget(personal, ymd(new Date()), todayTarget);
+    if (next !== personal) { storePersonal(next); setPersonalState(next); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [todayTarget?.kcal, todayTarget?.protein, todayTarget?.fats, todayTarget?.carbs]);
+  // a goal applied from a later date starts on its day by itself (board FX, G2)
+  const [dayTick, setDayTick] = useState(() => ymd(new Date()));
+  useEffect(() => {
+    const t = setInterval(() => setDayTick(ymd(new Date())), 60_000);
+    const vis = () => { if (document.visibilityState === "visible") setDayTick(ymd(new Date())); };
+    document.addEventListener("visibilitychange", vis);
+    return () => { clearInterval(t); document.removeEventListener("visibilitychange", vis); };
+  }, []);
+  useEffect(() => {
+    const ng = personal.nextGoal;
+    if (ng && ng.from <= dayTick) applyGoalNow(ng);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [personal.nextGoal?.from, dayTick]);
+  // apply a goal now: the goal, its numbers and the formula picked in the calculator; a waiting goal that starts now goes
+  function applyGoalNow(x: Omit<NextGoal, "from" | "at">) {
+    nextSource.current = x.source;
+    saveGoal({ band: x.band, setBy: x.setBy, setAt: new Date().toISOString(), source: x.source, method: x.method });
+    setGoalState(getGoal());
+    setState((s) => ({ ...s, goals: { ...s.goals, calories: x.kcal, protein: x.protein, fats: x.fats, carbs: x.carbs } }));
+    const cur = getPersonal();
+    const { nextGoal, formula, ...rest } = cur;
+    const starts = nextGoal && nextGoal.from <= ymd(new Date());
+    const next: Personal = { ...rest, ...(starts ? {} : nextGoal ? { nextGoal } : {}), ...(x.formula === undefined ? (formula ? { formula } : {}) : x.formula ? { formula: x.formula } : {}) };
+    storePersonal(next); setPersonalState(next);
+  }
   // a reload on Clients stays there; once the account is known and is not a coach's, Today instead
   useEffect(() => { if ((profileReady || (authReady && !user)) && tab === "clients" && profile.role !== "coach") setTab("home"); }, [profileReady, authReady, user, profile.role, tab]);
   // numbers calculated from the profile follow the profile; before the first paint, so Today never shows ? and then jumps (T5)
@@ -1527,8 +1563,20 @@ export default function App() {
   // calculated from the profile, or the coach's or the person's own numbers for that day.
   // The same for any day (0.2.1): Plan shows the numbers of the day it looks at.
   function todayNumbers(): { kcal: number; protein: number; fats: number; carbs: number } | null { return numbersOfDay(day); }
-  function numbersOfDay(day: Day): { kcal: number; protein: number; fats: number; carbs: number } | null {
-    const g = state.goals;
+  // any date (board FX): a day gone by keeps its own target; a date from a waiting goal's start uses that goal
+  function numbersOfDate(date: Date): { kcal: number; protein: number; fats: number; carbs: number } | null {
+    const k = ymd(date), today = ymd(new Date());
+    const kept = personal.targets?.[k];
+    if (k < today && kept) return kept;
+    const ng = personal.nextGoal;
+    if (ng && k >= ng.from) {
+      const per: Personal = ng.formula === undefined ? personal : (() => { const { formula, ...r } = personal; void formula; return ng.formula ? { ...r, formula: ng.formula } : r; })();
+      return numbersOfDay(getDay(per, date), { calories: ng.kcal, protein: ng.protein, fats: ng.fats, carbs: ng.carbs }, { band: ng.band, source: ng.source, setBy: ng.setBy, setAt: ng.at }, per);
+    }
+    return numbersOfDay(getDay(personal, date));
+  }
+  function numbersOfDay(day: Day, gIn?: { calories: number | null; protein: number | null; fats?: number | null; carbs?: number | null }, goalIn?: typeof goal, personalIn?: Personal): { kcal: number; protein: number; fats: number; carbs: number } | null {
+    const g = gIn ?? state.goals, goal = goalIn ?? goalNow, personal = personalIn ?? personalNow;
     if (g.calories == null || g.protein == null) return null;
     const fats = g.fats ?? macroSplit(g.calories, g.protein).fats;
     const avg = { kcal: g.calories, protein: g.protein, fats, carbs: g.carbs ?? macroSplit(g.calories, g.protein, fats).carbs };
@@ -1826,7 +1874,13 @@ export default function App() {
     },
     // today's four: protein and fat stay, the carbs take the day's difference
     todayMacros: todayNumbers(),
-    numbersFor: (date: Date) => numbersOfDay(getDay(personal, date)),
+    numbersFor: (date: Date) => numbersOfDate(date),
+    applyGoal: (x: Omit<NextGoal, "from" | "at">, from: string) => {
+      if (from <= ymd(new Date())) { applyGoalNow(x); return; }
+      const next: Personal = { ...getPersonal(), nextGoal: { ...x, from, at: new Date().toISOString() } };
+      storePersonal(next); setPersonalState(next);
+    },
+    cancelNextGoal: () => { const { nextGoal, ...rest } = getPersonal(); void nextGoal; storePersonal(rest); setPersonalState(rest); },
     openMenu: (s?: MenuSection, from?: MenuSection) => { setMenuFrom(from ?? null); setMenuSection(s ?? "list"); },
     foodsView, setFoodsView, saveFood, setEditFrom,
     // a product picked from the search opens the sheet titled by the button that picked it

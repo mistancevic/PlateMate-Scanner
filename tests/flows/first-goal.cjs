@@ -43,7 +43,7 @@ const path = require("node:path");
   ok(/Your week averages/.test(await page.locator(".dt-avg").textContent()), "the week's average under the table");
   await page.locator(".dt-row").last().getByRole("button", { name: /How/ }).click(); await page.waitForTimeout(150);
   ok(/METs/.test(await page.locator(".dt-how").textContent()) && /Mifflin/.test(await page.locator(".dt-how").textContent()), "How shows the arithmetic and the sources");
-  await page.getByRole("button", { name: /Set my day/ }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /^Apply from today/ }).click(); await page.waitForTimeout(600);
   const g = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).goals);
   ok(g.calories > 0 && g.protein > 0 && g.fats > 0 && g.carbs > 0, "the average is saved with all four: " + JSON.stringify(g));
   // Today: pick the day, the numbers follow it

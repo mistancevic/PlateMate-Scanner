@@ -10,7 +10,9 @@ export type Sport = "football" | "basketball" | "swimming" | "handball" | "volle
 // work: a weekday with work or study (a school day for anyone under 18); false is a day off.
 // study: on such a day, a study day rather than a work day (Release B, for anyone who works and studies).
 // pe: sport at school, or sport in class, that day. sport: for club training or a match.
-export type PlanDay = { work: boolean; study?: boolean; kind: Kind; intensity?: Intensity; when?: When; minutes?: number; pe?: boolean; sport?: Sport };
+export type PlanDay = { work: boolean; study?: boolean; kind: Kind; intensity?: Intensity; when?: When; minutes?: number; pe?: boolean; sport?: Sport;
+  // from 0.2.5+r20 (canvas board FX, TT1): the clock time the person set, "HH:MM"; none is no clock time
+  at?: string };
 export type Plan = PlanDay[]; // seven days, Monday first
 
 export const WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];

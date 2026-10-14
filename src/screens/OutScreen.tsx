@@ -8,7 +8,7 @@ import { log } from "../log";
 import type { AppApi } from "./api";
 import { SafetyNote } from "../components/SafetyNote";
 import { FIXED, takeModelFlag } from "../safety";
-import { slotsOf, trainingTime } from "../slots";
+import { slotsOf, trainingWhen } from "../slots";
 import { lifestyleOf, dayFor, getDay } from "../personal";
 import { ymd } from "../plan";
 import { STARTERS, fillDay, fromMeal, sumOf, type FillRow, type PlannedMeal } from "../planned";
@@ -39,12 +39,12 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   const held = p.planned[planDate] ?? {};
   const open = slots.filter((s) => !held[s.id]);
   const training = dayFor(p.personal, planDay)?.day ?? getDay(p.personal, planDay).plan ?? null;
-  const tTime = trainingTime(training);
+  const tWhen = trainingWhen(training);
   const numbers = p.numbersFor(planDay);
   const rec = dayRecord(slots, p.planned[ymd(new Date())], dayLog(state.feedback, new Date()).logged, ymd(new Date()));
   const plateT = aggregate(state.items); const platePd = density(plateT.protein, plateT.calories);
   const about = p.tab === "plan"
-    ? `About ${dayName === "today" ? "today" : dayName}: ${open.length ? `${open.length} ${open.length === 1 ? "slot" : "slots"} open` : "every slot set"}${tTime ? `, training at ${tTime}` : ""}${numbers ? `, ${fmt(numbers.kcal, 0)} kcal and ${numbers.protein} g to place` : ""}.`
+    ? `About ${dayName === "today" ? "today" : dayName}: ${open.length ? `${open.length} ${open.length === 1 ? "slot" : "slots"} open` : "every slot set"}${tWhen ? `, ${tWhen.phrase}` : ""}${numbers ? `, ${fmt(numbers.kcal, 0)} kcal and ${numbers.protein} g to place` : ""}.`
     : p.tab === "home"
       ? (rec.planned ? `${rec.open.length} of ${rec.planned} ${rec.planned === 1 ? "slot" : "slots"} to come${rec.extras.length ? `, ${rec.extras.length} extra so far` : ""}.` : "Nothing planned for today yet.")
       : p.tab === "journey"

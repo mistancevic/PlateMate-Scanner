@@ -1,3 +1,4 @@
+import { collapseLog } from "./goalHistory";
 import { macroSplit } from "./personal";
 // The goal a person sets once. A band from the goal bands (G1 to G6), or their own calories and protein.
 export type Band = { id: string; name: string; range: string; kcal: [number, number]; protein: [number, number]; who: string; points: string[]; popular?: boolean };
@@ -44,7 +45,8 @@ export type Goal = { band?: string; setBy: "you" | "coach"; setAt: string; coach
 export type GoalEntry = { at: string; band?: string; kcal: number | null; protein: number | null; source: GoalSource; method?: string; weightKg?: number };
 const LKEY = "chefmealan-goal-log";
 export const getGoalLog = (): GoalEntry[] => { try { return JSON.parse(localStorage.getItem(LKEY) || "[]"); } catch { return []; } };
-export const setGoalLog = (l: GoalEntry[]) => { try { localStorage.setItem(LKEY, JSON.stringify(l.slice(-60))); } catch {} };
+// kept collapsed (board FX, G3): one goal per day, the same goal one period; see goalHistory.ts
+export const setGoalLog = (l: GoalEntry[]) => { try { localStorage.setItem(LKEY, JSON.stringify(collapseLog(l).slice(-60))); } catch {} };
 export const SOURCE_LABEL: Record<GoalSource, string> = { quick: "A rough goal, the band's middle", profile: "Worked out from your profile", exact: "Your own numbers", coach: "Set by your coach" };
 export const getGoal = (): Goal | null => {
   try {

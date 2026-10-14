@@ -81,6 +81,9 @@ export interface AppApi {
   todayMacros: { kcal: number; protein: number; fats: number; carbs: number } | null;
   // the numbers of any day, for Plan (0.2.1)
   numbersFor: (date: Date) => { kcal: number; protein: number; fats: number; carbs: number } | null;
+  // 0.2.5+r20 (canvas board FX, G1b and G2): apply a goal from a date; today applies now, a later date waits on Goal
+  applyGoal: (x: Omit<import("../personal").NextGoal, "from" | "at">, from: string) => void;
+  cancelNextGoal: () => void;
   // the slots' meals (0.2.2)
   planned: import("../planned").Planned;
   renameMeal: (id: string, title: string) => void;

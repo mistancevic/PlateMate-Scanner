@@ -10,7 +10,7 @@ import { Zones } from "./Zones";
 export function DayEditor({ value, onChange, workHint, minor = false, weekdays = "work", peOn = false }: { value: PlanDay; onChange: (d: PlanDay) => void; workHint?: string; minor?: boolean; weekdays?: Weekdays; peOn?: boolean }) {
   const set = (patch: Partial<PlanDay>) => onChange({ ...value, ...patch });
   const pickKind = (k: Kind) => set(k === "rest"
-    ? { kind: k, intensity: undefined, when: undefined, minutes: undefined, sport: undefined }
+    ? { kind: k, intensity: undefined, when: undefined, at: undefined, minutes: undefined, sport: undefined }
     : { kind: k, intensity: value.intensity ?? (k === "match" ? "hard" : "moderate"), minutes: value.minutes ?? (minor ? 90 : START_MIN.moderate), sport: k === "club" || k === "match" ? value.sport ?? "football" : undefined });
   const kind = KINDS.find((k) => k.id === value.kind)!;
   // a Walk day saved before still shows, so it can be changed
@@ -100,6 +100,15 @@ export function DayEditor({ value, onChange, workHint, minor = false, weekdays =
             <div className="chip-row">
               {whens.map((x) => <Chip key={x.id} on={value.when === x.id} onClick={() => set({ when: value.when === x.id ? undefined : x.id })}>{x.name}</Chip>)}
             </div>
+          </div>
+          {/* 0.2.5+r20 (canvas board FX, TT1): an optional clock time; Plan shows a time only when one is set */}
+          <div className="setting starts-at">
+            <small className="setting-name">Starts at</small>
+            <div className="starts-at-row">
+              <input type="time" step={300} value={value.at ?? ""} aria-label="Starts at" onChange={(e) => set({ at: e.target.value || undefined })} />
+              {value.at && <button type="button" className="link" onClick={() => set({ at: undefined })}>Clear</button>}
+            </div>
+            <small className="setting-hint">Optional. Plan shows a clock time only when you set one.</small>
           </div>
           <div className="setting">
             <small className="setting-name">How long</small>
