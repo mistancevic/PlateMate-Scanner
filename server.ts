@@ -498,7 +498,7 @@ const metricsName = (req: express.Request, name: string) => (spaceOf(req) === "p
 const memEvents: Record<"live" | "preview", Ev[]> = { live: [], preview: [] };
 const memDaily: Record<"live" | "preview", Map<string, Record<string, number>>> = { live: new Map(), preview: new Map() };
 const memBills: Record<string, { ai: number; cloud: number }> = {};
-let memPrices: { in: number; out: number } | null = null;
+let memPrices: { in: number; out: number; at?: string } | null = null;
 // AI use (0.2.6+r1, board M, M5): every answer Gemini gives reports its tokens; they are added up per day and per model in the
 // same daily counts as the home page visits. No prompt, no answer, no member number. Thinking tokens are billed as output.
 // dots become underscores in the stored key (a model name has none), hyphens stay
@@ -591,7 +591,7 @@ app.post("/api/metrics/prices", requireUser, async (req, res) => {
   const pin = Number(req.body?.in), pout = Number(req.body?.out);
   if (!(pin >= 0) || !(pout >= 0) || pin > 1000 || pout > 1000) return res.status(400).json({ error: "Type the two prices in euros per million tokens." });
   try {
-    if (!FB_PROJECT) memPrices = { in: pin, out: pout };
+    if (!FB_PROJECT) memPrices = { in: pin, out: pout, at: new Date().toISOString() };
     else await db().collection("metrics_settings").doc("prices").set({ in: pin, out: pout, at: new Date().toISOString() });
     res.json({ ok: true });
   } catch (e) { fail(res, e); }
@@ -604,7 +604,7 @@ app.get("/api/metrics", requireUser, async (req, res) => {
   const prev = addDays(from, -7), month = to.slice(0, 7);
   try {
     const space = spaceOf(req);
-    let evs: Ev[] = [], daily = new Map<string, Record<string, any>>(), bills: Record<string, { ai: number; cloud: number }> = {}, prices: { in: number; out: number } | null = null;
+    let evs: Ev[] = [], daily = new Map<string, Record<string, any>>(), bills: Record<string, { ai: number; cloud: number }> = {}, prices: { in: number; out: number; at?: string } | null = null;
     let asked = (from_: string, to_: string) => Promise.resolve(0), joined = (from_: string, to_: string) => Promise.resolve(0);
     let flags = (from_: string, to_: string) => Promise.resolve({ total: 0, answered: 0 });
     if (!FB_PROJECT) { evs = memEvents[space]; daily = memDaily[space]; bills = memBills; prices = memPrices; }
@@ -622,7 +622,7 @@ app.get("/api/metrics", requireUser, async (req, res) => {
       const bs = await db().collection("metrics_settings").doc("bills").get();
       bills = (bs.exists ? bs.data() : {}) as Record<string, { ai: number; cloud: number }>;
       const ps = await db().collection("metrics_settings").doc("prices").get();
-      prices = ps.exists ? { in: Number(ps.data()!.in) || 0, out: Number(ps.data()!.out) || 0 } : null;
+      prices = ps.exists ? { in: Number(ps.data()!.in) || 0, out: Number(ps.data()!.out) || 0, at: typeof ps.data()!.at === "string" ? ps.data()!.at : undefined } : null;
       // midnight in Munich, summer or winter time
       const at = (day: string) => { const noon = new Date(`${day}T12:00:00Z`); const h = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Berlin", hour: "2-digit", hour12: false }).format(noon)); return new Date(Date.parse(`${day}T00:00:00Z`) - (h - 12) * 3_600_000); };
       asked = async (f, t) => (await db().collection("accessRequests").where("createdAt", ">=", at(f)).where("createdAt", "<", at(addDays(t, 1))).count().get()).data().count;
@@ -662,6 +662,8 @@ app.get("/api/metrics", requireUser, async (req, res) => {
       // the same three counts since the first day (board M, M5)
       sinceTotals: { visits: sinceHp.hp_visit ?? 0, opened: new Set(evs.filter((v) => v.e === "app_open" && (!since || v.day >= since)).map((v) => v.m)).size, eaten: evs.filter((v) => v.e === "feedback" && v.d?.status === "eaten" && (!since || v.day >= since)).length },
       ai: { today: aiOf(today, today), month: aiOf(`${month}-01`, `${month}-31`) },
+      // the first day with an AI call counted (Running costs, 0.2.7+r1, M6b)
+      aiSince: [...daily].filter(([, r]) => Number(r.ai_calls) > 0).map(([d]) => d).sort()[0] ?? null,
       month, bills: bills[month] ?? null, prices, monthActive,
     });
   } catch (e) { fail(res, e); }

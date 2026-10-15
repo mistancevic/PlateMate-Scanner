@@ -75,22 +75,24 @@ const monday = (d) => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDa
   if (process.env.SHOTS) await page.locator(".mt").screenshot({ path: `${process.env.SHOTS}/mt-m3.png` });
   ok(/Days lived by the plan/.test(txt) || /Counting since/.test(txt), "M2/M3: the Metrics page opens: " + txt.slice(0, 80));
   if (/Counting since/.test(txt)) ok(/Home page visits\s*2/.test(txt.replace(/\s+/g, " ")) || /Home page visits2/.test(txt), "M3: the first week shows today so far, 2 visits");
-  else ok(/The six KPIs/.test(txt) && /The way in/.test(txt), "M2: the North Star, the six KPIs and the way in");
+  else ok(/The five KPIs/.test(txt) && /The way in/.test(txt), "M2: the North Star, the five KPIs and the way in");
   if (/Counting since/.test(txt)) ok(/TODAY/.test(txt) && /SINCE \d+ [A-Z]{3}/.test(txt), "M5: next to today, the count since the first day");
-  ok(/AI use, \w+/.test(txt) && /Tokens in/.test(txt) && /Cost to serve/.test(txt), "M5: AI use and cost to serve from day one");
-  // the bills: typed once a month; cost per active member follows
-  if (await page.getByLabel("AI calls, €").count()) {
-    await page.getByLabel("AI calls, €").fill("0.41"); await page.getByLabel("Cloud, €").fill("0.83");
-    await page.getByRole("button", { name: "Save", exact: true }).first().click(); await page.waitForTimeout(800);
-    await page.getByLabel("Price in, € per million tokens").fill("0.3"); await page.getByLabel("Price out, € per million").fill("2.5");
-    await page.getByRole("button", { name: "Save", exact: true }).nth(1).click(); await page.waitForTimeout(800);
-    ok((await api()).prices?.out === 2.5 && /Estimated at your prices|No AI calls yet/.test(await page.locator(".mt").textContent()), "M5: the two prices are kept");
-    ok(/€1\.24 per active member this month/.test(await page.locator(".mt").textContent()), "cost to serve: the two bills divided by the members active this month");
-  } else {
-    const month = (await api()).month;
-    await page.evaluate(async (month) => fetch("/api/metrics/bills", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ month, ai: 0.41, cloud: 0.83 }) }), month);
-    ok((await api()).stats.cost.perActive === 1.24, "cost to serve: the two bills divided by the members active this month (the first week shows them once a week is counted)");
-  }
+  ok(!/AI use|Cost to serve|Cost per active member/.test(txt), "M6: Metrics holds product measures only, no costs");
+  // M6b: Running costs, its own page next to Metrics: AI use, cost per active member from the count, the bills as fixed cost
+  await page.goto("http://127.0.0.1:3197/today"); await page.waitForTimeout(1000); await page.getByRole("button", { name: "Menu" }).click(); await page.waitForTimeout(600);
+  ok(await page.locator(".menu-row", { hasText: "Running costs" }).count() === 1, "M6b: Running costs in the menu, next to Metrics");
+  await page.locator(".menu-row", { hasText: "Running costs" }).click(); await page.waitForTimeout(1200);
+  const ct = (await page.locator(".mt").textContent()).replace(/\s+/g, " ");
+  ok(/AI use, \w+/.test(ct) && /Tokens in/.test(ct) && /Cost per active member, \w+/.test(ct) && /Fixed cost, \w+/.test(ct) && /target under €1/.test(ct), "M6b: AI use, cost per active member and fixed cost");
+  await page.getByLabel("Price in, € per million tokens").fill("0.3"); await page.getByLabel("Price out, € per million").fill("2.5");
+  await page.getByRole("button", { name: "Save", exact: true }).first().click(); await page.waitForTimeout(800);
+  ok((await api()).prices?.out === 2.5 && /AI calls at your prices: €0\.\d\d this month, for 1 member active this month/.test((await page.locator(".mt").textContent()).replace(/\s+/g, " ")), "M6b: the prices are kept; the cost per member counts itself");
+  ok(await page.locator(".mt").getByText("Saved.", { exact: true }).count() === 1, "M6b: Saved shows once");
+  await page.getByLabel("AI bill, €").fill("0.41"); await page.getByLabel("Cloud bill, €").fill("0.83");
+  await page.getByRole("button", { name: "Save", exact: true }).nth(1).click(); await page.waitForTimeout(800);
+  const ct2 = (await page.locator(".mt").textContent()).replace(/\s+/g, " ");
+  ok(/€1\.24\s*this month/.test(ct2) && /The AI bill is €0\.41; the count at your prices is €0\.\d\d/.test(ct2), "M6b: the bills as one fixed total, not divided, with the check against the count: " + ct2.slice(-420));
+  ok(await page.locator(".mt").getByText("Saved.", { exact: true }).count() === 1, "M6b: Saved still once, under the row saved");
   // M2: once a full week is counted, the North Star, the six KPIs and the way in (a closed day 10 days ago, sent by hand)
   await page.evaluate(async (date) => fetch("/api/events", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ v: "x", events: [{ e: "day_closed", t: new Date().toISOString(), d: { date, planned: 2, byPlan: 2, extras: 0, lived: true } }] }) }), ymd(ago(10)));
   const m2 = await api();
@@ -100,7 +102,7 @@ const monday = (d) => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDa
     await page.locator(".menu-row", { hasText: "Metrics" }).click(); await page.waitForTimeout(1200);
     if (process.env.SHOTS) await page.locator(".menu, .mt").last().screenshot({ path: `${process.env.SHOTS}/mt-m2.png` });
     const t2 = (await page.locator(".mt").textContent()).replace(/\s+/g, " ");
-    ok(/Days lived by the plan/.test(t2) && /The six KPIs/.test(t2) && /The way in/.test(t2) && /This week in the app/.test(t2) && /Cost to serve/.test(t2), "M2: a full week: the North Star, the six KPIs, the way in, this week in the app, cost to serve");
+    ok(/Days lived by the plan/.test(t2) && /The five KPIs/.test(t2) && /The way in/.test(t2) && /This week in the app/.test(t2) && !/Cost per active member/.test(t2), "M2: a full week: the North Star, the five KPIs, the way in, this week in the app; no cost");
     await page.getByRole("tab", { name: "4 weeks" }).click(); await page.waitForTimeout(1200);
     ok(/The last 4 weeks/.test(await page.locator(".mt").textContent()), "M2: 4 weeks shows the North Star week by week");
   } else console.log("ok   M2: (the hand-sent day is not in a full past week on this weekday; M3 above stands)");
