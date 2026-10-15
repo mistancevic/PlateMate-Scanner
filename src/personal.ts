@@ -52,7 +52,11 @@ export type Personal = {
   measuredUse?: import("./measured").MeasuredFixed;
   // from 0.2.8 (canvas board CH, CH6): a meal's time moved for one date, by date then slot id
   timesOn?: import("./slots").TimesOn;
+  // from 0.2.9 (canvas board CH, CH4): the kitchens the person cooks, which Chef Mealan cooks in first
+  kitchens?: string[];
 };
+// The kitchens you cook (0.2.9, board CH, CH4), in the order drawn
+export const KITCHENS = ["Balkan", "Italian", "Mediterranean", "German", "French", "Spanish", "Greek", "Turkish", "Middle Eastern", "Indian", "Thai", "Chinese", "Japanese", "Korean", "Mexican", "American"];
 export type DayTarget = { kcal: number; protein: number; fats: number; carbs: number };
 export type NextGoal = { from: string; at: string; band: string; source: "profile" | "exact" | "coach" | "quick"; setBy: "you" | "coach"; kcal: number; protein: number; fats: number; carbs: number; method?: string; formula?: Formula | null; measured?: import("./measured").MeasuredFixed | null };
 // today's target kept with the day; the newest 400 days stay

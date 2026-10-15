@@ -39,7 +39,7 @@ seed.items = [];
   ok(/2 of 8/.test(await page.locator(".dish-portions").textContent()) && kcal2 > kcal1 * 1.8, `two portions double the plate: ${kcal1} to ${kcal2} kcal`);
   await page.getByRole("button", { name: "One portion less" }).click(); await page.waitForTimeout(300);
   // eaten as it stands: the card points at the recipe, no copy
-  await click(/^Make it as it is$/);
+  await click(/^Keep it as it is$/);
   if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); await click(/I'm making it this way/i); } else await click(/^Continue$/);
   await click(/On to How was it/i);
   ok(/Sarma is in My recipes already/.test(await page.locator("main").textContent()), "the after step says the recipe exists");
@@ -51,7 +51,7 @@ seed.items = [];
   await page.locator(".recipe-tile").first().click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(600);
   await page.locator(".row-food", { hasText: "Skyr" }).getByRole("button").click(); await page.waitForTimeout(300);
-  await click(/Fit to my target/); await page.waitForTimeout(1200);
+  await click(/^(Fit to my target|Make it an? \w+)$/); await page.waitForTimeout(1200);
   ok(await page.locator(".dish-row").count() === 1 && /what Chef Mealan moves/.test(await page.locator(".rows").textContent()), "after Fit the dish is still one row and the side is what Mealan moves");
   const sarmaGrams = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.filter((i) => i.dish).map((i) => i.grams));
   ok(sarmaGrams.join(",") === "100,150,25", "the recipe's amounts stay one portion: " + sarmaGrams.join(", "));

@@ -19,6 +19,19 @@ import { momentOf, orderMoments, REGIONS } from "../moments";
 import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
+import { mealShare, mealNow, routeOf, solveMeal, type Add } from "../makeMeal";
+import { slotsOn } from "../slots";
+import { lifestyleOf } from "../personal";
+import { dayRecord } from "../record";
+import { dayLog } from "../today";
+import { ymd } from "../plan";
+import { blockedByAllergy } from "../safety";
+import { minPortionOf } from "../foodjob";
+
+// Make it a meal (0.2.9, canvas board CH, CH1 to CH3): an idea from Chef Mealan, checked and with the app's grams
+type MealOption = { kitchen: string; title: string; why: string; adds: { name: string; grams: number; have: boolean; base: boolean }[]; items: Ingredient[]; kcal: number; pd: number | null };
+type ChefState = { status: "working" } | { status: "done"; options: MealOption[]; tried: string[] } | { status: "none"; tried: string[] };
+const estimate = (a: { name: string; calories: number; protein: number }): Food => ({ id: uid(), name: a.name, brand: "estimate", basis: "100g", source: "estimate", notes: `${CHEF_NAME}'s estimate`, reviewedAt: new Date().toISOString(), readyToEat: true, calories: a.calories, protein: a.protein, fats: null, carbs: null, fiber: null });
 
 const STEPS = ["in", "recipe", "make", "made", "after"] as const;
 function stepHead({ n, title, sub, nameField }: { n: number; title: string; sub?: string; nameField?: { value: string; placeholder: string; onChange: (v: string) => void; onCommit?: (v: string) => void } }) {
@@ -45,6 +58,8 @@ export function JourneyScreen(p: AppApi) {
   // the amounts before Fit: a mover that comes back unchanged means the plate was already above the target (0.2.7+r2)
   const [fitBefore, setFitBefore] = useState<Record<string, number> | null>(null);
   const [lineOpen, setLineOpen] = useState(false);
+  const [chef, setChef] = useState<ChefState | null>(null);
+  const [madeBy, setMadeBy] = useState<{ kitchen: string; base: string; from: Ingredient[]; tried: string[] } | null>(null);
   // When Mealan produces options, the first one becomes the recipe on screen.
   useEffect(() => {
     if (options.length && (step === "recipe" || step === "in")) {
@@ -239,6 +254,7 @@ export function JourneyScreen(p: AppApi) {
   }
   // Start again from nothing: the plate's foods go, the library stays.
   function emptyPlate() {
+    setMadeBy(null); setChef(null);
     setState((s) => ({ ...s, items: [], portion: null }));
     setStep("in");
   }
@@ -291,19 +307,102 @@ export function JourneyScreen(p: AppApi) {
   // for a slot (canvas S, 11 October 2026) the meal's name is the title, typed in place; the foods' name until then
   // the head is a plain function, not a component made on every render: a component made inside the screen is a new type each
   // time, React remounts it and the name field loses focus after one letter (Milan, 11 October 2026)
+  // which meal the plate is for, and how big it is: what is left of the day over the meals still to come (0.2.9, a rule)
+  const todayKey = ymd(new Date()), mealDate = p.filling?.date ?? todayKey;
+  const daySlots = slotsOn(lifestyleOf(p.personal), p.personal.timesOn, mealDate);
+  const dayRec = dayRecord(daySlots, p.planned[mealDate], mealDate === todayKey ? dayLog(state.feedback, new Date()).logged : [], mealDate);
+  const closed = new Set([...dayRec.eaten.map((f) => f.slot!.slotId), ...dayRec.skipped.map((x) => x.id)]);
+  const mealSlot = p.filling ? daySlots.find((x) => x.id === p.filling!.slotId) ?? null : mealNow(daySlots, closed, new Date());
+  const dayNums = p.numbersFor(new Date(`${mealDate}T12:00:00`));
+  const share = mealSlot && dayNums ? mealShare(daySlots, mealSlot.id, { kcal: dayNums.kcal, protein: dayNums.protein }, mealDate === todayKey ? { kcal: dayRec.kcal, protein: dayRec.protein } : { kcal: 0, protein: 0 }, closed) : null;
+  const chefable = p.kind !== "dessert" && momentOf(p.moment).planned && !!share && share.kcal >= 150 && p.filling?.mode !== "eat";
+  const mealWord = (mealSlot?.name ?? "meal").toLowerCase();
+  const Meal = mealWord.charAt(0).toUpperCase() + mealWord.slice(1);
+  // the button: the quick fit when maths does it, Chef Mealan when it cannot (Milan, 15 October 2026, 22:43)
+  function makeAMeal() {
+    if (!chefable || !share) return askMealan();
+    const t = aggregate(items), pd0 = density(t.protein, t.calories);
+    const mover = moverOf(items);
+    let fit: { ok: boolean; kcal: number } | null = null;
+    if (mover && pdRef !== null) {
+      const sol = solveIngredient(items.map((i) => (i.id === mover.id ? i : { ...i, locked: true })), mover.id, pdRef, null);
+      fit = sol.ok ? { ok: sol.grams >= minPortionOf(mover.food) && sol.grams <= (cap ?? 300), kcal: aggregate(sol.items).calories ?? 0 } : { ok: false, kcal: 0 };
+    }
+    if (routeOf({ pd: pd0, target: pdRef, kcal: t.calories ?? 0, need: share.kcal, fit }) === "fit") return askMealan();
+    if (!p.ai.on) { notify(`${CHEF_NAME}'s ideas need the AI, which is off for your account. Here is the quick fit.`); return askMealan(); }
+    log("fit_used");
+    void askChef(items, []);
+  }
+  async function askChef(base: Ingredient[], avoid: string[], failedIn: { title: string; why: string }[] = [], kept: MealOption[] = []) {
+    if (!share) return;
+    setChef({ status: "working" });
+    try {
+      const res = await fetch("/api/meal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+        plate: base.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein })), meal: mealWord, need: share.kcal, target: pdRef,
+        kitchens: p.personal.kitchens ?? [], library: state.foods.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), region: p.region, avoid: [...avoid, ...kept.map((k) => k.title)], failed: failedIn }) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || `${CHEF_NAME} could not answer.`);
+      const good = [...kept], failed: { title: string; why: string }[] = [];
+      for (const o of (data.options ?? []) as { kitchen: string; title: string; why: string; adds: { name: string; grams: number; calories: number; protein: number; base: boolean }[] }[]) {
+        if (good.length >= 3 || good.some((g) => g.title.toLowerCase() === o.title.toLowerCase())) continue;
+        const adds: Add[] = o.adds.map((a) => { const lib = state.foods.find((f) => f.name.toLowerCase() === a.name.toLowerCase()); return { food: lib ?? estimate(a), grams: a.grams, base: a.base, have: !!lib }; });
+        const sol = solveMeal(base, adds, share.kcal, pdRef, (f) => blockedByAllergy(f, p.safety.allergies ?? []), uid);
+        if (sol.ok) good.push({ kitchen: o.kitchen, title: o.title, why: o.why, adds: adds.map((a) => ({ name: a.food.name, grams: a.base || (!adds.some((x) => x.base) && sol.items.find((i) => !i.locked)?.food === a.food) ? sol.baseGrams : Math.round(a.grams), have: a.have, base: a.base })), items: sol.items, kcal: sol.kcal, pd: sol.pd });
+        else failed.push({ title: o.title, why: (sol as { why: string }).why });
+      }
+      // an idea that fails the checks goes back once, with the reason; a second miss is left out
+      if (good.length < 2 && failed.length && !failedIn.length) return askChef(base, avoid, failed, good);
+      setChef(good.length ? { status: "done", options: good, tried: [...avoid, ...good.map((g) => g.title)] } : { status: "none", tried: [...avoid, ...failed.map((f) => f.title)] });
+    } catch (e: any) { setChef(null); notify(`${e.message} Here is the quick fit.`); askMealan(); }
+  }
+  function putOnPlate(o: MealOption) {
+    const from = items, baseName = o.adds.find((a) => a.base)?.name ?? o.adds[0]?.name ?? "";
+    setState((s) => ({ ...s, items: o.items, title: o.title, portion: null }));
+    setMadeBy({ kitchen: o.kitchen, base: baseName, from, tried: chef && chef.status !== "working" ? chef.tried : [] }); setChef(null);
+  }
+  function keepAsIs() { setChef(null); if (p.filling?.mode !== "eat" && p.filling) putInSlot(items); else { setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null); setStep("make"); } }
   const Head = ({ title, sub, name }: { title: string; sub?: string; name?: boolean }) => stepHead({ n, title, sub, nameField: name ? { value: state.title === "DaaM" ? "" : state.title, placeholder: items.length ? autoTitle(items) : "Name the meal", onChange: (v: string) => setState((s) => ({ ...s, title: v })), onCommit: (v: string) => p.renamePlate(v) } : undefined });
   const Back = ({ to }: { to: typeof STEPS[number] }) => (
     <button className="link back" onClick={() => setStep(to)}><ArrowLeft size={15} /> Back</button>
   );
 
+  if (step === "in" && chef) {
+    const t = aggregate(items), pd0 = density(t.protein, t.calories), kit = (p.personal.kitchens ?? []).length > 0;
+    const opts = chef.status === "done" ? chef.options : [];
+    const lead = chef.status === "working" ? `${CHEF_NAME} is putting it together.`
+      : chef.status === "none" ? `${CHEF_NAME}'s ideas didn't pass the checks this time. Ask for other ideas, or keep the plate as it is.`
+      : `${pd0 !== null && pdRef !== null && pd0 >= pdRef ? `Your plate has the protein: ${fmt(t.protein, 0)} g, ${pdText(pd0)}.` : `Your plate is at ${pdText(pd0)}, under your ${pdVal(pdRef)}.`} ${Meal} is about ${fmt(share?.kcal ?? null, 0)} kcal${(t.calories ?? 0) < (share?.kcal ?? 0) ? `, ${fmt((share?.kcal ?? 0) - (t.calories ?? 0), 0)} more than the plate` : ""}. ${opts.length === 3 ? "Three" : opts.length === 2 ? "Two" : "One"} ${opts.length === 1 ? "way" : "ways"}${kit ? " from your kitchens" : ""}.`;
+    const chip = (a: MealOption["adds"][number]) => <span key={a.name} className={`mm-add ${a.have ? "have" : ""}`}>+ {fmt(a.grams, 0)} g {a.name.toLowerCase()}</span>;
+    return (
+      <>
+        {stepHead({ n: 2, title: `Make it a ${mealWord}`, sub: lead })}
+        <small className="mm-stays">On the plate: {items.map((i) => `${i.food.name.toLowerCase()} ${fmt(i.grams, 0)} g`).join(", ")}. {items.length === 1 ? "It stays." : "They stay."}</small>
+        {chef.status === "working" && <div className="bubble mealan thinking mm-working"><span /><span /><span /></div>}
+        {opts.map((o) => (
+          <section className="card mm-card" key={o.title}>
+            <div className="mm-top"><small className="mm-kitchen">{o.kitchen.toUpperCase()}</small><small className="mm-nums">{fmt(o.kcal, 0)} kcal · {pdText(o.pd)}</small></div>
+            <b className="mm-title">{o.title}</b>
+            <div className="mm-adds">{o.adds.map(chip)}</div>
+            <small className="mm-why">{o.why}</small>
+            <button className="pill pill-small pill-primary" style={{ alignSelf: "flex-start" }} onClick={() => putOnPlate(o)}>Put it on the plate</button>
+          </section>
+        ))}
+        {opts.length > 0 && <small className="mm-legend"><span className="mm-add have">+ in your foods</span><span className="mm-add">+ new</span> new foods are {CHEF_NAME}'s estimate; the app sets every gram.</small>}
+        {chef.status !== "working" && <div className="button-row"><button className="pill pill-small" onClick={() => askChef(items, chef.tried)}>Other ideas</button><button className="pill pill-small" onClick={keepAsIs}>Keep it as it is</button></div>}
+        <button className="link back" onClick={() => setChef(null)}><ArrowLeft size={15} /> Back</button>
+      </>
+    );
+  }
   if (step === "in")
     return (
       <>
         {/* the name as the title: for a slot, or for a recipe opened from Recipes (0.2.3); an empty plate asks what you are craving */}
         {p.filling
-          ? Head({ name: true, title: "", sub: p.filling.mode === "eat" ? "As planned. Change what you like, then Fit to my target or Make it as it is." : "Name it, or keep the foods' name. Add your foods, fit them to your target, or make them as they are." })
+          ? Head({ name: true, title: "", sub: p.filling.mode === "eat" ? "As planned. Change what you like, then Fit to my target or Keep it as it is." : "Name it, or keep the foods' name. Add your foods, fit them to your target, or make them as they are." })
+          : madeBy && items.length > 0
+            ? Head({ name: true, title: "", sub: `${CHEF_NAME}'s ${madeBy.kitchen} ${mealWord}. Your foods as you had them; the ${madeBy.base.toLowerCase()} sets the energy. Change any amount you like.` })
           : state.title && state.title !== "DaaM" && items.length > 0
-            ? Head({ name: true, title: "", sub: "From My recipes. Change what you like, then Fit to my target or Make it as it is." })
+            ? Head({ name: true, title: "", sub: `From My recipes. Change what you like, then ${chefable ? `Make it a ${mealWord}` : "Fit to my target"} or Keep it as it is.` })
             : Head({ title: "What are you craving?", sub: `Add your foods. ${CHEF_NAME} sets the amounts.` })}
         {/* the plan line (0.2.0, canvas S): one line says what the plate is; the kind and the moment sit behind its pencil, never asked first.
             A planned meal (0.2.2) says Lunch, 12:30 · By the plan; until then every plate is off the plan. */}
@@ -341,7 +440,7 @@ export function JourneyScreen(p: AppApi) {
         {items.length === 0 && <small className="plate-empty">Nothing on the plate yet. Add a food.</small>}
         {items.length > 0 && (
           <section className={`readout readout-fit-${p.fitPd(pd)}`}>
-            <div className="readout-top"><span>As it stands</span><span>{pdTag()}</span></div>
+            <div className="readout-top"><span>{madeBy ? `This ${mealWord}` : "As it stands"}</span><span>{pdTag()}</span></div>
             <div className="readout-mid">
               <b>{pdVal(pd)}</b>
               <div><span>{pd !== null && pdRef !== null ? (pd >= pdRef ? "fits your plan" : `${fixed(pdRef - pd)} under your ${fixed(pdRef)}`) : "no target set"}</span><small>{fmt(t.calories, 0)} kcal · {fmt(t.protein)} g protein · {fmt(t.weight, 0)} g</small></div>
@@ -382,15 +481,22 @@ export function JourneyScreen(p: AppApi) {
         )}
         {/* two ways out (canvas S, A new meal for a slot and Off the plan, short, 11 October 2026): Fit moves one food; Make it as it is takes the plate as it stands */}
         <div className="ways-out">
-          <button className="pill pill-primary pill-wide" disabled={items.length < 1} onClick={askMealan}>
-            <ChefHat size={18} /> Fit to my target
+          {madeBy && items.length > 0 ? (<>
+            {/* Chef Mealan's meal is on the plate (CH3): make it, or ask again from the plate as it was */}
+            <button className="pill pill-primary pill-wide" onClick={keepAsIs}><ChefHat size={18} /> Make it</button>
+            <button className="pill pill-wide" onClick={() => { const m = madeBy; setMadeBy(null); setState((s) => ({ ...s, items: m.from, title: "", portion: null })); void askChef(m.from, m.tried); }}>Other ideas</button>
+          </>) : (<>
+          <button className="pill pill-primary pill-wide" disabled={items.length < 1} onClick={makeAMeal}>
+            <ChefHat size={18} /> {chefable ? `Make it a ${mealWord}` : "Fit to my target"}
           </button>
-          {items.length > 0 && <button className="pill pill-wide" onClick={() => { if (p.filling?.mode !== "eat" && p.filling) putInSlot(items); else { setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null); setStep("make"); } }}>Make it as it is</button>}
+          {items.length > 0 && <button className="pill pill-wide" onClick={keepAsIs}>Keep it as it is</button>}
+          </>)}
         </div>
-        {p.filling && p.filling.mode !== "eat" && items.length > 0 && <p className="small center">Fit moves one food. Make it as it is puts the plate in {slotName(p.filling)} as it stands.</p>}
-        {p.filling?.mode === "eat" && items.length > 0 && <p className="small center">Fit sets the amounts. Make it as it is keeps yours. Save at the end records it as {slotName(p.filling)}.</p>}
-        {!p.filling && items.length === 1 && <p className="small center">One product: {CHEF_NAME} looks through your foods for a partner that brings it to your plan.</p>}
-        {!p.filling && items.length >= 2 && <p className="small center">Fit works out the amounts without the AI. Make it as it is keeps yours.</p>}
+        {!madeBy && chefable && share && items.length > 0 && <p className="small center">{Meal} is about {fmt(share.kcal, 0)} kcal{dayNums ? ` of your ${fmt(dayNums.kcal, 0)}` : ""}{pdRef !== null ? `, at ${pdTag()} ${pdVal(pdRef)} or more` : ""}. {CHEF_NAME} adds what it needs and sets the amounts. Keep it as it is {p.filling ? `puts the plate in ${slotName(p.filling)} as it stands` : "takes the plate as it stands"}.</p>}
+        {!chefable && p.filling && p.filling.mode !== "eat" && items.length > 0 && <p className="small center">Fit moves one food. Keep it as it is puts the plate in {slotName(p.filling)} as it stands.</p>}
+        {p.filling?.mode === "eat" && items.length > 0 && <p className="small center">Fit sets the amounts. Keep it as it is keeps yours. Save at the end records it as {slotName(p.filling)}.</p>}
+        {!chefable && !p.filling && items.length === 1 && <p className="small center">One product: {CHEF_NAME} looks through your foods for a partner that brings it to your plan.</p>}
+        {!chefable && !p.filling && items.length >= 2 && <p className="small center">Fit works out the amounts without the AI. Keep it as it is keeps yours.</p>}
         <Tip list={items} refit={false} />
         </section>
         {swapPanel}

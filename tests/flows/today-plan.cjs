@@ -21,7 +21,7 @@ seed.items = [];
   const click = async (re) => { await page.getByRole("button", { name: re }).first().click({ timeout: 5000 }); await page.waitForTimeout(400); };
   // through the Plate's steps after Make it as it is: a way when there are several foods, Continue for one, then photos, rating, Save
   const cook = async () => {
-    await click(/^Make it as it is$/);
+    await click(/^Keep it as it is$/);
     if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); await click(/I'm making it this way/i); }
     else await click(/^Continue$/);
     await click(/On to How was it/i);
@@ -88,7 +88,7 @@ seed.items = [];
   await page.locator(".recipe-tile", { hasText: "Skyr at noon" }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(600);
   const head = await page.evaluate(() => { const i = document.querySelector(".title-input"); return i ? "input:" + i.value : "h2:" + (document.querySelector("h2")?.textContent ?? ""); }); ok(/Skyr at noon|Chicken bowl/.test(head), "the Plate opens with the recipe's name: " + head);
-  ok(await page.getByRole("button", { name: /Fit to my target/ }).count() === 1, "on the first step, with Fit to my target");
+  ok(await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).count() === 1, "on the first step, with Fit to my target");
   ok(errs.length === 0, errs.length ? "page errors: " + errs.join(" | ") : "no page errors");
   await b.close(); server.kill();
   process.exit(fail ? 1 : 0);

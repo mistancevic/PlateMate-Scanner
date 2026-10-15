@@ -153,7 +153,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
           const res = await fetch("/api/swap", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
             slot: { name: slot.name, time: slot.time }, now: now ? { title: now.title, kcal: now.kcal, protein: now.protein } : null, ask: msg,
             candidates: choices.map((c) => ({ id: c.id, title: c.meal.title, kcal: c.meal.kcal, protein: c.meal.protein, from: c.meal.source })),
-            library: state.foods.slice(0, 30).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), target: tgt, need, goal: p.goal?.band, region: p.region }) });
+            library: state.foods.slice(0, 30).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), target: tgt, need, goal: p.goal?.band, region: p.region, kitchens: p.personal.kitchens ?? [] }) });
           const data = await res.json().catch(() => ({}));
           if (res.ok) for (const o of (data.options ?? []) as { id: string | null; title: string; why: string; foods: { name: string; grams: number; calories: number; protein: number }[] }[]) {
             let meal: PlannedMeal | null = choices.find((c) => c.id === o.id)?.meal ?? choices.find((c) => c.meal.title.toLowerCase() === o.title.toLowerCase())?.meal ?? null;
@@ -207,7 +207,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
           today: dayRows().map((r) => ({ slot: r.name, time: r.time, meal: r.meal, kcal: r.kcal, state: r.state })),
           left: (() => { const d = p.numbersFor(new Date()); return d ? { kcal: Math.round(d.kcal - rec.kcal), protein: Math.round(d.protein - rec.protein) } : null; })(),
           goal: p.goal?.band,
-          rhythm: p.usual, moment: p.moment, region: p.region, travelTo: p.moment === "travel" ? p.travelTo : null,
+          kitchens: p.personal.kitchens ?? [], rhythm: p.usual, moment: p.moment, region: p.region, travelTo: p.moment === "travel" ? p.travelTo : null,
           library: state.foods.slice(0, 24).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })),
         }) });
       const data = await res.json();

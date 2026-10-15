@@ -32,7 +32,7 @@ const U = "http://127.0.0.1:3202";
   await page.goto(U + "/plate"); await page.waitForTimeout(1300);
   const before = (await page.locator(".readout").first().textContent()).replace(/\s+/g, " ");
   ok(/PD16\.8/.test(before.replace(/ /g, "")), "as it stands: PD 16.8 (" + before + ")");
-  await page.getByRole("button", { name: /Fit to my target/ }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).click(); await page.waitForTimeout(1200);
   const after = (await page.locator("main").textContent()).replace(/\s+/g, " ");
   ok(/Already above your target: PD 16\.8 against [\d.]+, so nothing moved/.test(after) && !/moves the Chicken breast/.test(after), "Fit: already above the target, nothing moved, and it says so");
   ok(/This plate ?PD ?16\.8/.test(after) && /477 kcal/.test(after), "the PD and the kcal stand");

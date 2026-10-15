@@ -44,7 +44,7 @@ seed.items = [];
   await step("add first food again", async () => { await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300); });
   await step("add second food again", async () => { await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300); });
   await step("moment afterwork", async () => { await require("./line.cjs")(page); await click(/Afterwork event/i); });
-  await step("ask", () => click(/Fit to my target/i));
+  await step("ask", () => click(/^(Fit to my target|Make it an? \w+)$/i));
   await shot("2-recipe");
   console.log("recipe h2:", await page.locator("h2").first().textContent());
   await step("make it", () => click(/^Make it$/i));

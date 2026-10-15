@@ -94,8 +94,8 @@ seed.items = [];
   await page.getByRole("button", { name: /Next: Lifestyle/ }).click(); await page.waitForTimeout(300);
   ok(await page.getByRole("button", { name: /Next: Training week/ }).count() === 1, "Lifestyle leads to the Training week");
   await page.getByRole("button", { name: /Next: Training week/ }).click(); await page.waitForTimeout(300);
-  ok(await page.getByRole("button", { name: /Next: Where I shop/ }).count() === 1, "the Training week leads to Where I shop");
-  await page.getByRole("button", { name: /Next: Where I shop/ }).click(); await page.waitForTimeout(300);
+  ok(await page.getByRole("button", { name: /Next: Where I shop and cook/ }).count() === 1, "the Training week leads to Where I shop and cook");
+  await page.getByRole("button", { name: /Next: Where I shop and cook/ }).click(); await page.waitForTimeout(300);
   ok(await page.getByRole("button", { name: /Next: Coach/ }).count() === 1, "Where I shop leads to Coach");
   // the legal pages are public, at their own addresses, with a way back
   for (const [path, head] of [["/impressum", /Impressum/], ["/privacy", /Privacy notice/], ["/disclaimer", /Disclaimer/], ["/about", /Who's behind/]]) {

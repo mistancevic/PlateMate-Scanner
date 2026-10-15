@@ -23,7 +23,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.locator(".talk-overlay").getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(300);
   await nav("Plate");
   expect("the Plate tab opens the plate", await h2(), "What are you craving?");
-  expect("the amounts button is code, not chat", String(await page.getByRole("button", { name: /Fit to my target/ }).count()), "1");
+  expect("the amounts button is code, not chat", String(await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).count()), "1");
   await fab(); expect("Mealan on a plate with food is about the plate", (await page.locator(".sheet .card-top span").first().textContent()).trim(), "Chef Mealan, about this plate");
   await page.getByRole("button", { name: /Talk to Chef Mealan/ }).click(); await page.waitForTimeout(300);
   expect("and can hand over to the conversation", await page.locator(".talk-overlay h2").textContent(), "Chef Mealan");

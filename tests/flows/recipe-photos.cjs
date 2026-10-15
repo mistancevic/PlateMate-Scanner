@@ -99,7 +99,7 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   ok(/Whisk 120 g eggs/.test(await page.locator(".rq-steps").textContent()) && /Fold in 100 g chicken breast and cook slowly\./.test(await page.locator(".rq-steps").textContent()), "R13: the steps read with the amounts on the recipe's page: " + (await page.locator(".rq-steps").textContent()));
   // R10: Make it puts the recipe on the Plate and leaves the recipe as it is
   await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(600);
-  ok(new URL(page.url()).pathname === "/plate" && await page.getByRole("button", { name: /Fit to my target/ }).count() === 1, "R10: Make it opens the recipe on the Plate");
+  ok(new URL(page.url()).pathname === "/plate" && await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).count() === 1, "R10: Make it opens the recipe on the Plate");
   ok(JSON.stringify((await meal("m-emc")).items) === JSON.stringify(m1.items), "R10: Make it leaves the recipe as it is");
   // the photos stay after a reload, the cover first; the oats are offered their plate photo
   await page.goto("http://127.0.0.1:3186/my-recipes"); await page.waitForTimeout(1800);

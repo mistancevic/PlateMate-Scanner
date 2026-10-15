@@ -10,7 +10,8 @@ import { WeightTrend } from "../components/Weight";
 import { weighInsOff, withoutWeighIn } from "../weight";
 import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
-import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, type Personal, type DayType } from "../personal";
+import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, KITCHENS, type Personal, type DayType } from "../personal";
+import { CHEF_NAME } from "../components/Mark";
 import { slotsOf } from "../slots";
 import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, workHintOf, type Plan, type PlanDay, type Lifestyle } from "../plan";
 import { DayEditor } from "../components/DayEditor";
@@ -39,7 +40,7 @@ const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "goal", name: "Goal", icon: <Target size={20} /> },
   { id: "life", name: "Lifestyle", icon: <Coffee size={20} /> },
   { id: "week", name: "Training week", icon: <CalendarDays size={20} /> },
-  { id: "shop", name: "Where I shop", icon: <ShoppingBasket size={20} /> },
+  { id: "shop", name: "Where I shop and cook", icon: <ShoppingBasket size={20} /> },
   { id: "coach", name: "Coach", icon: <Users size={20} /> },
   { id: "account", name: "Account", icon: <KeyRound size={20} /> },
   { id: "support", name: "Support", icon: <LifeBuoy size={20} /> },
@@ -556,7 +557,7 @@ function PlanPanel(p: AppApi) {
           </div>
         )}
       </Seg>
-      <NextLink p={p} to="shop" from="week" text="Where I shop" hint="The starter foods for your shops" />
+      <NextLink p={p} to="shop" from="week" text="Where I shop and cook" hint="Your shops, and the kitchens you cook" />
     </>
   );
 }
@@ -574,6 +575,15 @@ function ShopPanel(p: AppApi) {
       <div className="button-row" style={{ marginTop: 8 }}>
         <button className="pill pill-small" onClick={p.addStarter}>Add starter foods for {REGIONS.find((r) => r.id === p.region)?.name ?? "my region"}</button>
       </div>
+    </section>
+    {/* The kitchens you cook (0.2.9, canvas board CH, CH4): the shops say what you can buy, the kitchens what you like to cook */}
+    <p className="label" style={{ marginTop: 14 }}>The kitchens you cook</p>
+    <section className="card kitchens" style={{ gap: 8 }}>
+      <small>{CHEF_NAME} cooks in these first: the tastes, the herbs, how a meal is put together. Pick one or more.</small>
+      <div className="moments" role="group" aria-label="The kitchens you cook">
+        {KITCHENS.map((k) => { const on = (p.personal.kitchens ?? []).includes(k); return <button key={k} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, kitchens: on ? (p.personal.kitchens ?? []).filter((x) => x !== k) : [...(p.personal.kitchens ?? []), k] })}>{k}</button>; })}
+      </div>
+      <small className="setting-hint">A plate that already has a kitchen keeps it: sarma stays Balkan, a curry stays Indian. Everything else comes from these.</small>
     </section>
       <NextLink p={p} to="coach" from="shop" text="Coach" hint="Join a coach with a code, or see yours" />
     </>
