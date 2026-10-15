@@ -8,10 +8,11 @@ import { log } from "../log";
 import type { AppApi } from "./api";
 import { SafetyNote } from "../components/SafetyNote";
 import { FIXED, takeModelFlag } from "../safety";
-import { slotsOf, trainingWhen } from "../slots";
+import { slotsOf, slotsOn, withTimeOn, trainingTime, trainingWhen } from "../slots";
+import { intentOf, wantOf, plateAnswer, planAnswer, leftAnswer, moveOf, swapOk, swapFallback, swapLead, type DaySlot } from "../chatIntent";
 import { lifestyleOf, dayFor, getDay } from "../personal";
 import { ymd } from "../plan";
-import { STARTERS, fillDay, fromMeal, sumOf, type FillRow, type PlannedMeal } from "../planned";
+import { STARTERS, fillDay, fromMeal, sumOf, needOf, type FillRow, type PlannedMeal } from "../planned";
 import { dayRecord } from "../record";
 import { dayLog } from "../today";
 import { planDateShown } from "./PlanScreen";
@@ -19,7 +20,12 @@ import { Mic } from "lucide-react";
 import type { Tab } from "./api";
 
 type Rec = { name: string; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; typical_grams: number; confidence: string };
-export type Turn = { role: "you" | "mealan"; text: string; picks?: Ingredient[]; pd?: number | null; kcal?: number | null; photo?: string; plate?: string[]; fill?: { date: string; dayName: string; rows: FillRow[]; done?: boolean } };
+export type Turn = { role: "you" | "mealan"; text: string; picks?: Ingredient[]; pd?: number | null; kcal?: number | null; photo?: string; plate?: string[]; fill?: { date: string; dayName: string; rows: FillRow[]; done?: boolean };
+  // 0.2.8 (canvas board CH, CH6): where the answer comes from, a swap to tap, a move to confirm
+  tag?: "plate" | "day" | "plan" | "chef";
+  swap?: { date: string; slotId: string; slotName: string; time: string; options: { meal: PlannedMeal; why: string }[]; done?: string };
+  move?: { date: string; slotId: string; from: string; to: string; usual: string; done?: "moved" | "kept" } };
+const TAG: Record<NonNullable<Turn["tag"]>, string> = { plate: "FROM YOUR PLATE", day: "FROM YOUR DAY", plan: "YOUR PLAN", chef: "CHEF MEALAN" };
 
 const asFood = (r: Rec): Food => ({
   id: uid(), name: r.name, brand: "estimate", basis: "100g", source: "estimate", notes: `${r.confidence} confidence`,
@@ -31,11 +37,12 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   const [text, setText] = useState("");
   // The chef in context (0.2.4, canvas S "Chef Mealan, about this screen", H5, H6, H11): the chat opens knowing the screen.
   // One line about where the person is, chips written for that screen; a chip only asks, the button on the answer acts.
-  const slots = slotsOf(lifestyleOf(p.personal));
+  const lifestyle = lifestyleOf(p.personal);
   const WEEKDAY = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   const planDate = p.tab === "plan" ? planDateShown() : ymd(new Date());
   const planDay = (() => { const [y, m, d] = planDate.split("-").map(Number); const x = new Date(y, m - 1, d, 12); return x; })();
   const dayName = planDate === ymd(new Date()) ? "today" : WEEKDAY[(planDay.getDay() + 6) % 7];
+  const slots = slotsOn(lifestyle, p.personal.timesOn, planDate);
   const held = p.planned[planDate] ?? {};
   const open = slots.filter((s) => !held[s.id]);
   const training = dayFor(p.personal, planDay)?.day ?? getDay(p.personal, planDay).plan ?? null;
@@ -50,12 +57,15 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
       : p.tab === "journey"
         ? (state.items.length ? `On the plate: ${state.items.map((i) => i.food.name).join(", ")}, ${pdText(platePd)}${pdRef !== null ? ` against your ${pdVal(pdRef)}` : ""}.` : "The plate is empty.")
         : "Out, missing something, or after an idea.";
+  // the next planned meal still to come today (0.2.8: a chip only offers what the chat can do)
+  const eatenIds = new Set(rec.eaten.map((f) => f.slot!.slotId)), skippedIds = new Set(rec.skipped.map((x) => x.id));
+  const nextHeld = slots.find((x) => held[x.id] && !eatenIds.has(x.id) && !skippedIds.has(x.id));
   const chips: string[] = p.tab === "plan"
     ? [...(open.length ? [`Fill ${dayName === "today" ? "today" : dayName}`] : []), "Make it a vegetarian day", "Lunch from what I have at home", "Something quick for dinner"]
     : p.tab === "home"
-      ? ["Swap lunch for something lighter", "I'm out, what do I take?", "Move dinner to after training", "Add a dessert that fits"]
+      ? [nextHeld ? `Swap ${nextHeld.name.toLowerCase()} for something lighter` : "What is planned today?", "What's left today?", ...(trainingTime(training) && slots.length ? [`Move ${slots[slots.length - 1].name.toLowerCase()} to after training`] : []), "I'm out, what do I take?"]
       : p.tab === "journey"
-        ? ["What goes with this?", "Better match for my target?", "Make it crunchier", "I'm out, what do I take?"]
+        ? [...(state.items.length ? ["What is on my plate?"] : []), "What goes with this?", "Better match for my target?", "I'm out, what do I take?"]
         : ["No idea, inspire me", "I'm out, what do I take?", "Hotel breakfast buffet", "Plan food for a trip", "Italian tonight, I want dessert"];
   // Fill a day: from My recipes and the starters, the same picking as the tip; a turn with the rows and one button that acts
   const choices: PlannedMeal[] = [...state.meals.map((m) => fromMeal(m, m.from === "coach" ? "coach" : "mine")), ...STARTERS];
@@ -101,10 +111,88 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }); }, [turns, thinking]);
   const history = turns.slice(-6).map((t) => ({ role: t.role === "you" ? "user" : "assistant", content: t.text }));
 
+  const say = (...t: Turn[]) => setTurns((x) => [...x, ...t]);
+  const usualOf = (id: string) => slotsOf(lifestyle).find((x) => x.id === id)?.time ?? "";
+  const trainWhat = (d: { kind?: string } | null) => (d?.kind === "strength" ? "strength session" : d?.kind === "cardio" ? "cardio" : d?.kind === "walk" ? "walk" : "training");
+  const dayRows = (): DaySlot[] => slots.map((x) => ({ name: x.name, time: x.time, meal: held[x.id]?.title ?? null, kcal: held[x.id]?.kcal ?? null,
+    state: !held[x.id] ? "empty" : planDate === ymd(new Date()) && eatenIds.has(x.id) ? "eaten" : held[x.id]?.skipped ? "skipped" : "planned" }));
+  // the swap's candidates: My recipes and Coach's recipes, then Chef Mealan's starters; each with an id Chef Mealan can name
+  const swapChoices = () => [...state.meals.map((m) => ({ id: m.id, meal: fromMeal(m, m.from === "coach" ? "coach" : "mine") })), ...STARTERS.map((m, k) => ({ id: `starter-${k}`, meal: m }))];
+  async function answerHere(msg: string, it: ReturnType<typeof intentOf>) {
+    const you: Turn = { role: "you", text: msg };
+    if (it.kind === "plate") {
+      const t = aggregate(state.items);
+      say(you, { role: "mealan", tag: "plate", text: plateAnswer(state.items.map((i) => ({ name: i.food.name, grams: i.grams })), { kcal: t.calories ?? 0, protein: t.protein ?? 0, pd: platePd !== null ? pdText(platePd) : null }, pdRef !== null ? pdVal(pdRef) : null) });
+      return;
+    }
+    if (it.kind === "day") {
+      const today = p.numbersFor(new Date());
+      const text = it.ask === "left" ? leftAnswer(today ? { kcal: today.kcal, protein: today.protein } : null, { kcal: rec.kcal, protein: rec.protein })
+        : planAnswer(dayRows(), numbers ? { kcal: numbers.kcal, protein: numbers.protein } : null, sumOf(held));
+      say(you, { role: "mealan", tag: "day", text });
+      return;
+    }
+    if (it.kind === "move") {
+      const slot = slots.find((x) => x.id === it.slotId)!;
+      const start = trainingTime(training);
+      const m = moveOf(slot, it.to, start ? { start, minutes: training?.minutes ?? 60, what: trainWhat(training) } : null, slots);
+      say(you, { role: "mealan", tag: "plan", text: m.text, move: m.ok ? { date: planDate, slotId: slot.id, from: m.from, to: m.to, usual: usualOf(slot.id) } : undefined });
+      return;
+    }
+    if (it.kind === "swap") {
+      const slot = slots.find((x) => x.id === it.slotId)!;
+      const now = held[slot.id] ?? null, want = wantOf(msg);
+      const day = numbers ? { kcal: numbers.kcal, protein: numbers.protein } : null;
+      const tgt = day ? density(day.protein, day.kcal) : pdRef;
+      const need = needOf(slots, slot, day)?.kcal ?? null;
+      const choices = swapChoices().filter((c) => !now || c.meal.title.toLowerCase() !== now.title.toLowerCase());
+      say(you); setThinking(true);
+      let options: { meal: PlannedMeal; why: string }[] = [];
+      try {
+        if (p.ai.on) {
+          const res = await fetch("/api/swap", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
+            slot: { name: slot.name, time: slot.time }, now: now ? { title: now.title, kcal: now.kcal, protein: now.protein } : null, ask: msg,
+            candidates: choices.map((c) => ({ id: c.id, title: c.meal.title, kcal: c.meal.kcal, protein: c.meal.protein, from: c.meal.source })),
+            library: state.foods.slice(0, 30).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), target: tgt, need, goal: p.goal?.band, region: p.region }) });
+          const data = await res.json().catch(() => ({}));
+          if (res.ok) for (const o of (data.options ?? []) as { id: string | null; title: string; why: string; foods: { name: string; grams: number; calories: number; protein: number }[] }[]) {
+            let meal: PlannedMeal | null = choices.find((c) => c.id === o.id)?.meal ?? choices.find((c) => c.meal.title.toLowerCase() === o.title.toLowerCase())?.meal ?? null;
+            if (!meal && o.foods?.length) {
+              // a new meal: the person's own food values where the name is theirs, else Chef Mealan's estimate
+              const items: Ingredient[] = o.foods.map((f) => { const lib = state.foods.find((x) => x.name.toLowerCase() === f.name.toLowerCase()); return { id: uid(), food: lib ?? asFood({ name: f.name, calories: f.calories, protein: f.protein, fats: null, carbs: null, typical_grams: f.grams, confidence: "medium" }), grams: f.grams, locked: false }; });
+              const t = aggregate(items);
+              meal = { title: o.title, kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0), source: "starter", items, portion: Math.round(t.weight) };
+            }
+            if (meal && swapOk(meal, now, want, tgt) === null && !options.some((x) => x.meal.title === meal!.title)) options.push({ meal, why: o.why });
+          }
+        }
+      } catch { /* the app's own picks below */ }
+      // the app's own picks fill what Chef Mealan's ideas did not (failed the checks, or no answer)
+      if (options.length < 2) for (const c of swapFallback(choices.map((x) => x.meal).filter((m) => !options.some((o) => o.meal.title === m.title)), now, want, tgt, 2 - options.length))
+        options.push({ meal: c, why: c.source === "starter" ? "One of Chef Mealan's starters." : "From your recipes." });
+      setThinking(false);
+      say({ role: "mealan", tag: "chef", text: swapLead(slot.name, now, want, options.length), swap: options.length ? { date: planDate, slotId: slot.id, slotName: slot.name, time: slot.time, options } : undefined });
+    }
+  }
+  const doSwap = (ti: number, k: number) => {
+    const turn = p.turns[ti]; const sw = turn?.swap; if (!sw) return;
+    const o = sw.options[k]; p.fill(sw.date, sw.slotId, o.meal);
+    setTurns((t) => t.map((x, i) => (i === ti && x.swap ? { ...x, swap: { ...x.swap, done: o.meal.title } } : x)));
+    p.notify(`${sw.slotName} is now ${o.meal.title.toLowerCase()}.`);
+  };
+  const doMove = (ti: number, yes: boolean) => {
+    const turn = p.turns[ti]; const mv = turn?.move; if (!mv) return;
+    if (yes) p.setPersonal({ ...p.personal, timesOn: withTimeOn(p.personal.timesOn, mv.date, mv.slotId, mv.to, mv.usual) });
+    setTurns((t) => t.map((x, i) => (i === ti && x.move ? { ...x, move: { ...x.move, done: yes ? "moved" : "kept" } } : x)));
+    if (yes) p.notify(`Moved to ${mv.to}, for ${mv.date === ymd(new Date()) ? "today" : "that day"}.`);
+  };
   async function ask(given?: string) {
     const msg = (typeof given === "string" ? given : text).trim();
     if (!msg && !photo) return;
     if (/^fill (today|monday|tuesday|wednesday|thursday|friday|saturday|sunday)$/i.test(msg)) { setText(""); fillNow(); return; }
+    // sorted first (0.2.8, board CH, CH6): the app answers what it knows, and proposes plan changes; only ideas go to the AI
+    const it = intentOf(msg, slots);
+    if (!photo && it.kind !== "ideas") { setText(""); await answerHere(msg, it); return; }
     if (!p.ai.on) { setTurns((t) => [...t, { role: "you", text: msg || "(photo)" }, { role: "mealan", text: p.ai.why || FIXED.off }]); setText(""); setPhoto(""); return; }
     const mine: Turn = { role: "you", text: msg || "(photo)", photo: photo || undefined };
     setTurns((t) => [...t, mine]); setText(""); setPhoto("");
@@ -115,7 +203,9 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
           text: msg, image: photo || undefined, history, screen: about,
           target: { pd: pdRef, mealKcal: state.goals.calories ? Math.round(state.goals.calories * (p.kind === "dessert" ? 0.1 : 0.35)) : null },
           kind: p.kind,
-          plate: state.items.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein })),
+          plate: p.tab === "journey" || /\bplate\b/i.test(msg) ? state.items.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein })) : [],
+          today: dayRows().map((r) => ({ slot: r.name, time: r.time, meal: r.meal, kcal: r.kcal, state: r.state })),
+          left: (() => { const d = p.numbersFor(new Date()); return d ? { kcal: Math.round(d.kcal - rec.kcal), protein: Math.round(d.protein - rec.protein) } : null; })(),
           goal: p.goal?.band,
           rhythm: p.usual, moment: p.moment, region: p.region, travelTo: p.moment === "travel" ? p.travelTo : null,
           library: state.foods.slice(0, 24).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })),
@@ -140,7 +230,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
       }
       const kcal = aggregate(picks).calories;
       const taken = takeModelFlag(data.reply || ""); if (taken.flag) p.flagFromModel(taken.flag);
-      const reply: Turn = { role: "mealan", text: taken.text + fitNote, picks, pd, kcal };
+      const reply: Turn = { role: "mealan", tag: "chef", text: taken.text + fitNote, picks, pd, kcal };
       setTurns((t) => [...t, reply]);
       log("out", { picks: picks.length, pd });
     } catch (e: any) { setError(e.message); } finally { setThinking(false); }
@@ -182,7 +272,24 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
           <div key={i} className={`bubble ${t.role}`}>
             {t.photo && <img src={t.photo} alt="" />}
             {t.plate && <span className="plate-chip">Plate: {t.plate.join(" · ")}</span>}
+            {t.tag && <small className={`bubble-tag tag-${t.tag}`}>{TAG[t.tag]}</small>}
             <p>{t.text}</p>
+            {t.swap && (
+              <div className="picks fill-rows">
+                {t.swap.options.filter((o) => !t.swap!.done || o.meal.title === t.swap!.done).map((o, k) => (
+                  <div key={o.meal.title} className="fill-row">
+                    <div className="fill-text"><small>{t.swap!.slotName}, {t.swap!.time}</small><b>{o.meal.title}</b><small>{fmt(o.meal.kcal, 0)} kcal · {fmt(o.meal.protein, 0)} g · {pdText(density(o.meal.protein, o.meal.kcal))}</small>{o.why && <small className="swap-why">{o.why}</small>}</div>
+                    {t.swap!.done ? <span className="pill pill-small pill-done">Swapped</span> : <button className="pill pill-small" onClick={() => doSwap(i, t.swap!.options.indexOf(o))}>Swap</button>}
+                  </div>
+                ))}
+              </div>
+            )}
+            {t.move && (
+              <div className="button-row">
+                {t.move.done ? <span className="pill pill-small pill-done">{t.move.done === "moved" ? `Moved to ${t.move.to}` : `Kept at ${t.move.from}`}</span>
+                  : <><button className="pill pill-small pill-primary" onClick={() => doMove(i, true)}>Move it</button><button className="pill pill-small" onClick={() => doMove(i, false)}>Keep {t.move.from}</button></>}
+              </div>
+            )}
             {t.fill && (
               <div className="picks fill-rows">
                 {t.fill.rows.map((r) => (

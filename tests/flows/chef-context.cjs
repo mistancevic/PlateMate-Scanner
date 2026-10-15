@@ -31,7 +31,8 @@ seed.items = [];
   const head = await page.locator(".chat-screen .head p").first().textContent();
   ok(/1 of 1 slot to come/.test(head), "from Today the chat says what is to come: " + head);
   const chipsToday = await page.locator(".chips-start .pill").allTextContents();
-  ok(chipsToday.includes("Swap lunch for something lighter") && chipsToday.includes("Add a dessert that fits"), "Today's chips: " + chipsToday.join(" | "));
+  // 0.2.8 (board CH, CH6): a chip only offers what the chat can do: swap the next planned meal, what is left, ideas
+  ok(/^Swap \w+ for something lighter$/.test(chipsToday[0]) && chipsToday.includes("What's left today?") && chipsToday.includes("I'm out, what do I take?"), "Today's chips: " + chipsToday.join(" | "));
   ok(await page.getByRole("button", { name: /Say it|Listening/ }).count() === (await page.evaluate(() => Boolean(window.SpeechRecognition || window.webkitSpeechRecognition)) ? 1 : 0), "the mic shows when the browser can listen");
   await page.getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(300);
   // Plan: two slots open, the Fill button and the chat about the day

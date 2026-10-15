@@ -47,7 +47,7 @@ export function aiState(safety: Safety, birthYear: number | undefined | null, _h
   if (underAge(birthYear, now)) return { on: false, why: ADULT_ONLY, blocked: true };
   if (!safety.adultAt) return { on: false, why: "Confirm on the welcome screen that you're 18 or older.", blocked: false };
   const confirmed = Boolean(safety.aiConfirmedAt);
-  if (!doorAnswered(safety, now)) return { on: false, why: "Answer the question on your profile first: is any of this true for you? One tap if none applies. Mealan's chat waits for that answer, and asks again once a year.", blocked: false };
+  if (!doorAnswered(safety, now)) return { on: false, why: "Answer the question on your profile first: is any of this true for you? One tap if none applies. Chef Mealan's chat waits for that answer, and asks again once a year.", blocked: false };
   if (safety.situations.includes("eating") && !confirmed) return { on: false, why: FIXED.off, blocked: false };
   return { on: true, why: "", blocked: false };
 }
@@ -59,7 +59,7 @@ export const FIXED: Record<SituationId | "off", string> = {
   diabetes: "I'm a chef. With diabetes or insulin, the timing and the carbs are your doctor's call. I show the carbs and sugars on every plate, and I fit your food to the numbers your doctor gives you. I won't advise on doses or timing.",
   allergies: "Noted. I won't suggest anything that contains what you listed, and I check the name and label of every food. The label check still shows what each pack contains, so you can check it yourself too.",
   medication: "I'm a chef, and some medication changes how food works in your body. Your doctor or pharmacist knows what to avoid. Tell me which foods, and I'll keep them out of every suggestion.",
-  off: "Mealan's chat is off for your account until your coach confirms it. Plates, numbers and your foods keep working as usual.",
+  off: "Chef Mealan's chat is off for your account until your coach confirms it. Plates, numbers and your foods keep working as usual.",
 };
 export const PROFESSIONAL: Record<SituationId, string> = { eating: "a doctor or a therapist who works with eating", pregnancy: "your midwife or doctor", diabetes: "your doctor or diabetes nurse", allergies: "your doctor or an allergist", medication: "your doctor or pharmacist" };
 

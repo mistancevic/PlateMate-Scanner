@@ -12,7 +12,7 @@ import { X } from "lucide-react";
 import { unreadNote } from "../coachNotes";
 import type { AppApi, Filling } from "./api";
 import { KnowCard, ReadyCard } from "../components/Measured";
-import { slotsOf, rowsOf, trainingWhen } from "../slots";
+import { slotsOf, slotsOn, rowsOf, trainingWhen } from "../slots";
 import { dayFor, getDay } from "../personal";
 import { ymd } from "../plan";
 import { fitOf, type PlannedMeal } from "../planned";
@@ -35,7 +35,7 @@ export function HomeScreen(p: AppApi) {
   const today = dayLog(state.feedback, new Date());
   // the day against the plan (0.2.3): today's slots, what they hold, what is eaten, what came from outside
   const key = ymd(new Date());
-  const slots = slotsOf(lifestyleOf(p.personal));
+  const slots = slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(new Date()));
   const held = p.planned[key] ?? {};
   const rec = dayRecord(slots, held, today.logged, key);
   // the counter (0.2.5+r17, board M): Today opened once a day, and the days before closed against the plan

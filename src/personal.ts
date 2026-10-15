@@ -50,6 +50,8 @@ export type Personal = {
   targets?: Record<string, DayTarget>;
   // from 0.2.7 (canvas board FT): the measured burn in use with the formula From your data, fixed on the day it was applied
   measuredUse?: import("./measured").MeasuredFixed;
+  // from 0.2.8 (canvas board CH, CH6): a meal's time moved for one date, by date then slot id
+  timesOn?: import("./slots").TimesOn;
 };
 export type DayTarget = { kcal: number; protein: number; fats: number; carbs: number };
 export type NextGoal = { from: string; at: string; band: string; source: "profile" | "exact" | "coach" | "quick"; setBy: "you" | "coach"; kcal: number; protein: number; fats: number; carbs: number; method?: string; formula?: Formula | null; measured?: import("./measured").MeasuredFixed | null };

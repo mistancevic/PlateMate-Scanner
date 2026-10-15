@@ -1444,3 +1444,7 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .cw-row .ft-squares { width: 100%; }
 .ft-rowfoot { display: block; font-weight: 800; color: var(--muted); font-size: 12.5px; margin-top: 4px; text-align: right; }
 .ft-wait { gap: 8px; }
+/* 0.2.8, the chat in three kinds (canvas board CH, CH6): where an answer comes from */
+.bubble-tag { display: block; font-size: 11px; font-weight: 900; letter-spacing: .04em; color: var(--muted); margin-bottom: 4px; }
+.bubble-tag.tag-chef { color: var(--brand-text); }
+.swap-why { color: var(--muted); font-weight: 600; line-height: 1.4; margin-top: 2px; }

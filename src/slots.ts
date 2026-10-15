@@ -33,6 +33,23 @@ export function slotsOf(l: Pick<Lifestyle, "meals" | "window"> & { slotTimes?: R
   return names.map((name, i) => ({ id: id[i], name, time: l.slotTimes?.[id[i]] ?? times[i] }));
 }
 
+// A day's own times (0.2.8, canvas board CH, CH6): a meal moved for one date from the chat ("Move dinner to after
+// training"); the usual times in Lifestyle stay as they are
+export type TimesOn = Record<string, Record<string, string>>;
+export function slotsOn(l: Pick<Lifestyle, "meals" | "window"> & { slotTimes?: Record<string, string> }, timesOn: TimesOn | undefined, date: string): Slot[] {
+  const own = timesOn?.[date];
+  return slotsOf(l).map((s) => (own?.[s.id] ? { ...s, time: own[s.id] } : s));
+}
+// a slot's time for one date; the same as the usual time takes the date's own time away; dates older than 60 days drop off
+export function withTimeOn(timesOn: TimesOn | undefined, date: string, slotId: string, time: string | null, usual: string): TimesOn {
+  const cut = new Date(Date.now() - 60 * 864e5).toISOString().slice(0, 10);
+  const next: TimesOn = Object.fromEntries(Object.entries(timesOn ?? {}).filter(([d]) => d >= cut));
+  const day = { ...(next[date] ?? {}) };
+  if (time && time !== usual) day[slotId] = time; else delete day[slotId];
+  if (Object.keys(day).length) next[date] = day; else delete next[date];
+  return next;
+}
+
 // The training's time (canvas board FX, TT0 to TT2, Milan 14 October 2026): a clock time only when the person set one.
 // A part of the day is shown as words and only places the row among the meals; nothing set sits at the end of the day.
 export const TRAINING_TIME: Record<When, string> = { morning: "07:00", day: "12:30", evening: "17:30", late: "20:30", afterschool: "15:00", lateafternoon: "16:30" };

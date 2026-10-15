@@ -50,7 +50,7 @@ export function todayLine(f: Food, dayKcal: number | null, eatenKcal: number, da
   const portion = f.serving ? `1 ${f.serving.name} (${f.serving.grams} g)` : `A ${PORTION[job]} g portion`;
   const portionKcal = Math.round((f.calories * grams) / 100);
   const left = Math.round(dayKcal - eatenKcal);
-  const so = eatenKcal > 0 ? `${Math.round(eatenKcal).toLocaleString("en")} of ${Math.round(dayKcal).toLocaleString("en")} kcal so far in Mealan` : `${Math.round(dayKcal).toLocaleString("en")} kcal planned, nothing in Mealan yet`;
+  const so = eatenKcal > 0 ? `${Math.round(eatenKcal).toLocaleString("en")} of ${Math.round(dayKcal).toLocaleString("en")} kcal so far today` : `${Math.round(dayKcal).toLocaleString("en")} kcal planned, nothing logged yet`;
   if (left <= 0) return `${dayName}: ${so}. Not today.`;
   if (portionKcal > left) return `${dayName}: ${so}. ${portion} is more than the ${left} kcal left.`;
   return `${dayName}: ${so}. ${portion} fits.`;

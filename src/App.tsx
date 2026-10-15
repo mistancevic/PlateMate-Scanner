@@ -52,7 +52,7 @@ import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveOwnNotes, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalLabel, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { setTodayChange, dayOfLoad, ymd, planLine as planLineOf, type PlanDay } from "./plan";
-import { slotsOf } from "./slots";
+import { slotsOf, slotsOn } from "./slots";
 import { dayLog } from "./today";
 import { dayLineOf, type DayLine } from "./dayLines";
 import { measure, startOf, daysFromLines, type Measured } from "./measured";
@@ -1245,10 +1245,10 @@ export default function App() {
   // The coach's week (0.2.6, board CW): the day lines that go to the account with each save, five weeks back and one ahead.
   // Planned against eaten, against each day's own target. Days with nothing planned or eaten stay out.
   function daysOut(): Record<string, DayLine> {
-    const out: Record<string, DayLine> = {}, today = ymd(new Date()), slots = slotsOf(lifestyleOf(personal));
+    const out: Record<string, DayLine> = {}, today = ymd(new Date());
     for (let i = -35; i <= 7; i++) {
       const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + i);
-      const key = ymd(d), held = planned[key];
+      const key = ymd(d), held = planned[key], slots = slotsOn(lifestyleOf(personal), personal.timesOn, key);
       const logged = i > 0 ? [] : dayLog(state.feedback, d).logged;
       if (!(held && Object.keys(held).length) && !logged.length) continue;
       const t = numbersOfDate(d), pd = dayFor(personal, d)?.day;

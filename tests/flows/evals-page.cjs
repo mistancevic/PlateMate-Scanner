@@ -17,7 +17,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.getByRole("button", { name: "Menu" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /Evals/ }).click(); await page.waitForTimeout(300);
   // ten Numbers cases and eight goal chat cases joined on 7 October 2026: 68 in all
-  expect("68 scenarios listed: ten numbers, eight goal chats, ten Pro tips", (await page.locator(".eval-case").count()) === 68, await page.locator(".eval-case").count());
+  expect("77 scenarios listed: ten numbers, nine chat (0.2.8), eight goal chats, ten Pro tips", (await page.locator(".eval-case").count()) === 77, await page.locator(".eval-case").count());
   await page.getByRole("button", { name: /^goal chat$/ }).click(); await page.waitForTimeout(200);
   expect("eight goal chat cases, each against a goal", (await page.locator(".eval-case").count()) === 8 && /Build muscle · Steady/.test(await page.locator(".eval-case").first().textContent()), await page.locator(".eval-case").count());
   // Numbers: the ten people, every check, the coach's label and own numbers

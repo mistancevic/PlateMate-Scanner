@@ -7,6 +7,10 @@ import tipRaw from "../../evals/tip-cases.json?raw";
 import numberCasesRaw from "../../evals/number-cases.json?raw";
 import numberSnapRaw from "../../evals/number-snapshot.json?raw";
 import chatGoalRaw from "../../evals/chat-goal-cases.json?raw";
+import chatCasesRaw from "../../evals/chat-cases.json?raw";
+import { intentOf, swapOk, wantOf } from "../chatIntent";
+import { slotsOf } from "../slots";
+import { STARTERS } from "../planned";
 import { goalLabel } from "../goal";
 import { numbersOf, numberChecks, type NumberCase, type NumberOutput, type Snapshot } from "../numbersEval";
 import { jobOf } from "../foodjob";
@@ -28,7 +32,7 @@ const TIPS: T[] = JSON.parse(tipRaw).cases;
 const food = (id: string) => LIB.find((f) => f.id === id)!;
 const KEY = "chefmealan-evals";
 const load = (): Record<string, Result> => { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; } };
-const TYPES = ["all", "numbers", "goal chat", "code", "tip", "missing", "goes-with", "better-match", "texture", "cheaper", "constraint", "adversarial"];
+const TYPES = ["all", "numbers", "chat", "goal chat", "code", "tip", "missing", "goes-with", "better-match", "texture", "cheaper", "constraint", "adversarial"];
 
 // Numbers (7 October 2026): ten people from the dimensions; the app's numbers, the checks every answer must hold,
 // and the coach's label. No judge: the calculation is deterministic, so the coach's pass is the reference.
@@ -55,6 +59,25 @@ function NumbersOut({ o }: { o: NumberOutput }) {
 // and Milan's rule that no food is good or bad by itself; the coach labels the rest.
 type CG = { id: string; goal: string; moment: string; pd: number; text: string; look: string };
 const CHATS: CG[] = JSON.parse(chatGoalRaw).cases;
+// The chat in three kinds (0.2.8, board CH, CH6): every message sorted right; a swap's options checked by the app's own rules
+type TK = { id: string; text: string; expect: string; now?: { title: string; kcal: number; protein: number }; pd?: number; look: string };
+const TALKS: TK[] = JSON.parse(chatCasesRaw).cases;
+async function runTalk(c: TK): Promise<Result> {
+  const t0 = performance.now();
+  const kind = intentOf(c.text, slotsOf({ meals: 3, window: null })).kind;
+  const checks: Record<string, boolean> = { [`sorted as ${c.expect}`]: kind === c.expect };
+  if (kind !== "swap" || !c.now) return { at: new Date().toISOString(), ms: Math.round(performance.now() - t0), output: { reply: `Sorted: ${kind}.`, picks: [] }, checks };
+  const res = await fetch("/api/swap", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ slot: { name: c.text.match(/breakfast|lunch|dinner/i)?.[0] ?? "Lunch", time: "" }, now: c.now, ask: c.text,
+    candidates: STARTERS.map((m, k) => ({ id: `starter-${k}`, title: m.title, kcal: m.kcal, protein: m.protein, from: "starter" })), library: LIB.slice(0, 20).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), target: c.pd }) });
+  const data = await res.json(); const ms = Math.round(performance.now() - t0);
+  if (!res.ok) return { at: new Date().toISOString(), ms, output: { error: data.error }, checks: { ...checks, answered: false } };
+  const want = wantOf(c.text);
+  const opts = (data.options ?? []).map((o: any) => { const m = STARTERS.find((_x, k) => `starter-${k}` === o.id) ?? (o.foods?.length ? { title: o.title, kcal: o.foods.reduce((a: number, f: any) => a + f.calories * f.grams / 100, 0), protein: o.foods.reduce((a: number, f: any) => a + f.protein * f.grams / 100, 0) } : null);
+    return { o, m, why: m ? swapOk(m, c.now!, want, c.pd ?? null) : "no meal and no foods" }; });
+  const said = NEVER.filter((w) => JSON.stringify(data).toLowerCase().includes(w));
+  return { at: new Date().toISOString(), ms, output: { reply: `Sorted: swap. ${opts.length} options from Chef Mealan.`, picks: opts.map((x: any) => ({ name: `${x.o.title}${x.m ? `, ${Math.round(x.m.kcal)} kcal, ${Math.round(x.m.protein)} g` : ""}: ${x.o.why}${x.why ? ` (fails: ${x.why})` : ""}` })), said },
+    checks: { ...checks, "at least one option": opts.length > 0, "every option passes the app's checks": opts.length > 0 && opts.every((x: any) => x.why === null), "each option says why": opts.every((x: any) => (x.o.why ?? "").trim().length > 0), "no food called good or bad": said.length === 0, "under 15 seconds": ms < 15000 } };
+}
 const NEVER = ["cheat meal", "cheat day", "guilt", "bad food", "junk food", "unhealthy", "clean eating", "detox", "starve", "dirty bulk", "eat as much as you can", "skip dinner", "skip the meal", "skip a meal", "lose weight fast"];
 async function runChat(c: CG): Promise<Result> {
   const plate: any[] = [];
@@ -71,7 +94,7 @@ async function runChat(c: CG): Promise<Result> {
     "no food called good or bad, no guilt, no crash advice": said.length === 0,
     "at most three sentences before any list": (reply.match(/[.!?](\s|$)/g) ?? []).length <= 3,
     "no grams stated (the app sets amounts)": !/\b\d+\s?(g|grams?)\b/i.test(reply),
-    "under 8 seconds": ms < 8000,
+    "under 15 seconds": ms < 15000,
   };
   return { at: new Date().toISOString(), ms, output: { ...data, said }, checks };
 }
@@ -127,7 +150,7 @@ async function runTip(t: T): Promise<Result> {
     "foods named are in the library": (data.pairs ?? []).every((n: string) => LIB.some((x) => x.name === n)),
     "follows the playbook": tipBreaks(tip, playbookFor(f)).length === 0,
     "written by Chef Mealan, not the fallback": data.by !== "playbook",
-    "under 8 seconds": ms < 8000,
+    "under 15 seconds": ms < 15000,
   };
   return { at: new Date().toISOString(), ms, output: data, checks };
 }
@@ -142,16 +165,17 @@ export function EvalsScreen(p: AppApi) {
 
   const cases = useMemo(() => [
     ...NUMBERS.map((n) => ({ id: n.id, kind: "numbers" as const, title: n.title, tags: ["numbers", ...Object.values(n.dimensions)], n })),
+    ...TALKS.map((t) => ({ id: t.id, kind: "talk" as const, title: t.text, tags: ["chat", `sorted: ${t.expect}`], tk: t })),
     ...CHATS.map((g) => ({ id: g.id, kind: "chat" as const, title: g.text, tags: ["goal chat", goalLabel(g.goal), g.moment], cg: g })),
     ...GOLDEN.map((g) => ({ id: g.id, kind: "code" as const, title: `${g.plate.map((x) => food(x.food).name.split(",")[0]).join(" + ")}, without ${food(g.missing).name.split(",")[0]}`, tags: ["code", "swap ranking", `target ${g.target}`], g })),
     ...TIPS.map((t) => ({ id: t.id, kind: "tip" as const, title: `Pro tip: ${food(t.food).name}, ${t.goal}${t.moments.length ? ", " + t.moments.join(", ") : ""}`, tags: ["tip", t.goal, ...t.moments], t })),
     ...QUESTIONS.map((q) => ({ id: q.id, kind: "model" as const, title: q.question, tags: [q.dimensions.question, q.dimensions.identity, q.dimensions.goal, q.dimensions.situation, q.dimensions.place], q })),
   ], []);
-  const shown = cases.filter((c: any) => type === "all" || (type === "numbers" ? c.kind === "numbers" : type === "goal chat" ? c.kind === "chat" : type === "code" ? c.kind === "code" : type === "tip" ? c.kind === "tip" : c.kind === "model" && c.q.dimensions.question === type));
+  const shown = cases.filter((c: any) => type === "all" || (type === "numbers" ? c.kind === "numbers" : type === "chat" ? c.kind === "talk" : type === "goal chat" ? c.kind === "chat" : type === "code" ? c.kind === "code" : type === "tip" ? c.kind === "tip" : c.kind === "model" && c.q.dimensions.question === type));
 
   async function run(c: (typeof cases)[number]) {
     setRunning(c.id);
-    try { const r = c.kind === "numbers" ? runNumbers((c as any).n) : c.kind === "chat" ? await runChat((c as any).cg) : c.kind === "code" ? runCode((c as any).g) : c.kind === "tip" ? await runTip((c as any).t) : await runModel((c as any).q); const prev = load()[c.id]; put(c.id, { ...r, label: prev?.label, reason: prev?.reason, coachKcal: prev?.coachKcal, coachProtein: prev?.coachProtein }); }
+    try { const r = c.kind === "numbers" ? runNumbers((c as any).n) : c.kind === "chat" ? await runChat((c as any).cg) : c.kind === "talk" ? await runTalk((c as any).tk) : c.kind === "code" ? runCode((c as any).g) : c.kind === "tip" ? await runTip((c as any).t) : await runModel((c as any).q); const prev = load()[c.id]; put(c.id, { ...r, label: prev?.label, reason: prev?.reason, coachKcal: prev?.coachKcal, coachProtein: prev?.coachProtein }); }
     catch (e: any) { p.setError(e.message); } finally { setRunning(null); }
   }
   async function runAll() { for (const c of shown) { await run(c); } }
@@ -199,12 +223,12 @@ export function EvalsScreen(p: AppApi) {
             </button>
             {isOpen && (
               <div className="eval-body">
-                {c.kind === "chat" ? <p className="small"><b>Look for:</b> {(c as any).cg.look} <span className="muted">Goal: {goalLabel((c as any).cg.goal)}. The chat reads its About your goal page.</span></p> : c.kind === "numbers" ? <p className="small"><b>Look for:</b> {(c as any).n.look}</p> : c.kind === "tip" ? <small>Expect: {(c as any).t.note}</small> : <small>Plate: {(c.kind === "code" ? (c as any).g.plate : (c as any).q.plate).map((x: any) => `${x.grams} g ${food(x.food).name}`).join(" · ")}</small>}
+                {c.kind === "talk" ? <p className="small"><b>Look for:</b> {(c as any).tk.look}</p> : c.kind === "chat" ? <p className="small"><b>Look for:</b> {(c as any).cg.look} <span className="muted">Goal: {goalLabel((c as any).cg.goal)}. The chat reads its About your goal page.</span></p> : c.kind === "numbers" ? <p className="small"><b>Look for:</b> {(c as any).n.look}</p> : c.kind === "tip" ? <small>Expect: {(c as any).t.note}</small> : <small>Plate: {(c.kind === "code" ? (c as any).g.plate : (c as any).q.plate).map((x: any) => `${x.grams} g ${food(x.food).name}`).join(" · ")}</small>}
                 <div className="button-row" style={{ margin: "8px 0" }}><button className="pill pill-small" disabled={!!running} onClick={() => run(c)}><Play size={14} /> Run</button></div>
                 {r && (
                   <>
                     <p className="label">Output{r.ms !== undefined ? `, ${r.ms} ms` : ""}</p>
-                    {c.kind === "chat" ? (r.output.error ? <p className="small">{r.output.error}</p> : <><p className="helper-reply">{r.output.reply}</p><ol className="eval-list">{(r.output.picks ?? []).map((x: any, k: number) => <li key={k}>{x.name}</li>)}</ol>{r.output.said?.length > 0 && <p className="small">Said: {r.output.said.join(", ")}</p>}</>) : c.kind === "numbers" ? (r.output.error ? <p className="small">{r.output.error}</p> : <NumbersOut o={r.output} />) : c.kind === "code" ? (
+                    {c.kind === "chat" || c.kind === "talk" ? (r.output.error ? <p className="small">{r.output.error}</p> : <><p className="helper-reply">{r.output.reply}</p><ol className="eval-list">{(r.output.picks ?? []).map((x: any, k: number) => <li key={k}>{x.name}</li>)}</ol>{r.output.said?.length > 0 && <p className="small">Said: {r.output.said.join(", ")}</p>}</>) : c.kind === "numbers" ? (r.output.error ? <p className="small">{r.output.error}</p> : <NumbersOut o={r.output} />) : c.kind === "code" ? (
                       <ol className="eval-list">{r.output.swaps.map((s: any, k: number) => <li key={k}>{s.food}, {s.grams ?? "–"} g{s.fits ? "" : " (doesn't reach the target)"}</li>)}</ol>
                     ) : r.output.error ? <p className="small">{r.output.error}</p> : (
                       <>

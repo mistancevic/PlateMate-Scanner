@@ -3,7 +3,7 @@ import { ChevronRight, ChefHat, Pencil } from "lucide-react";
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
 import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
-import { rowsOf, slotsOf, trainingWhen, type Slot } from "../slots";
+import { rowsOf, slotsOf, slotsOn, trainingWhen, type Slot } from "../slots";
 import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
 import { STARTERS, fitOf, fromMeal, needOf, sumOf, type PlannedMeal } from "../planned";
@@ -50,7 +50,7 @@ export function PlanScreen(p: AppApi) {
   const date = strip.find((d) => ymd(d) === picked) ?? strip[0];
   const key = ymd(date);
   const lifestyle = lifestyleOf(p.personal);
-  const slots = slotsOf(lifestyle);
+  const slots = slotsOn(lifestyle, p.personal.timesOn, key);
   const training = dayFor(p.personal, date)?.day ?? getDay(p.personal, date).plan ?? null;
   const rows = rowsOf(slots, training);
   const numbers = p.numbersFor(date);

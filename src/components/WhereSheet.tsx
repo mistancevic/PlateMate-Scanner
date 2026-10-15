@@ -2,7 +2,7 @@ import { ChefHat, ChevronRight } from "lucide-react";
 import { aggregate, density, uid, type Food, type Ingredient } from "../pilot";
 import { fmt, pdVal, pdText } from "../ui";
 import { CHEF_NAME } from "../components/Mark";
-import { slotsOf } from "../slots";
+import { slotsOn } from "../slots";
 import { lifestyleOf } from "../personal";
 import { ymd } from "../plan";
 import { fitOf, type PlannedMeal } from "../planned";
@@ -14,7 +14,7 @@ import type { AppApi, Filling } from "../screens/api";
 export function WhereSheet(p: AppApi & { food: Food; close: () => void }) {
   const { food, close } = p;
   const key = ymd(new Date());
-  const slots = slotsOf(lifestyleOf(p.personal));
+  const slots = slotsOn(lifestyleOf(p.personal), p.personal.timesOn, key);
   const held = p.planned[key] ?? {};
   const unit = p.personal.pdUnit === "pct" ? "pct" : "pd";
   const portion = food.serving?.grams ?? ((density(food.protein, food.calories) ?? 0) < 3 ? 50 : 100);

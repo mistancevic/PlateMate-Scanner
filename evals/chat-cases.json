@@ -1,0 +1,12 @@
+{"about": "The chat in three kinds (0.2.8, canvas board CH, CH6). Each message is sorted first: from the app's data, a change to the plan, or ideas. A swap goes to Chef Mealan; the app checks every option. Milan's screenshot questions of 15 October are the first cases.",
+ "cases": [
+  {"id": "ch-plate", "text": "What is on my plate?", "expect": "plate", "look": "Answered from the plate, no AI: the foods with grams, kcal, protein and PD."},
+  {"id": "ch-left", "text": "What's left today?", "expect": "day", "look": "Answered from the day, no AI."},
+  {"id": "ch-plan", "text": "What is planned for lunch?", "expect": "day", "look": "Answered from the plan, no AI."},
+  {"id": "ch-move", "text": "Move dinner to after training", "expect": "move", "look": "A move to confirm, around the day's training time."},
+  {"id": "ch-swap-light", "text": "Swap lunch for something lighter", "expect": "swap", "now": {"title": "Sarma with skyr", "kcal": 702, "protein": 52}, "pd": 6.4, "look": "Two lunches under 600 kcal at PD 5.4 or more, each with a reason. Would a cook serve them for lunch?"},
+  {"id": "ch-swap-protein", "text": "Swap breakfast for more protein", "expect": "swap", "now": {"title": "Oats, milk and honey", "kcal": 520, "protein": 18}, "pd": 6.0, "look": "Breakfasts with a higher PD than 3.5, that are breakfasts."},
+  {"id": "ch-swap-heavy", "text": "Change dinner, I'm hungry tonight", "expect": "swap", "now": {"title": "Cottage cheese and fruit", "kcal": 260, "protein": 28}, "pd": 5.5, "look": "A real dinner, at least 300 kcal, still at the target."},
+  {"id": "ch-ideas-out", "text": "I'm out, what do I take?", "expect": "ideas", "look": "Goes to Chef Mealan as an idea."},
+  {"id": "ch-ideas-dessert", "text": "Add a dessert that fits", "expect": "ideas", "look": "Goes to Chef Mealan as an idea."}
+ ]}
