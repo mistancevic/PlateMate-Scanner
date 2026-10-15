@@ -1,3 +1,4 @@
+import { AsyncLocalStorage } from "node:async_hooks";
 import "dotenv/config";
 import express from "express";
 import path from "node:path";
@@ -100,6 +101,9 @@ async function requireUser(req: express.Request, res: express.Response, next: ex
 }
 app.disable("x-powered-by");
 app.use(express.json({ limit: "18mb" }));
+// which space a request belongs to (live or preview), for the AI use count deep inside generate() (0.2.6+r1, board M, M5)
+const reqSpace = new AsyncLocalStorage<{ space: "live" | "preview" }>();
+app.use((req, _res, next) => reqSpace.run({ space: spaceOf(req) }, next));
 app.set("trust proxy", true);
 const primaryModel = process.env.GEMINI_MODEL || "gemini-3.8-flash";
 const fallbackModels = [
@@ -232,6 +236,7 @@ async function generate(
             // each model uses its own defaults
           },
         });
+        countAi(m, (response as any).usageMetadata);
         if (!response.text)
           throw new Error(
             "No result returned. Try another image or enter the label manually.",
@@ -493,6 +498,24 @@ const metricsName = (req: express.Request, name: string) => (spaceOf(req) === "p
 const memEvents: Record<"live" | "preview", Ev[]> = { live: [], preview: [] };
 const memDaily: Record<"live" | "preview", Map<string, Record<string, number>>> = { live: new Map(), preview: new Map() };
 const memBills: Record<string, { ai: number; cloud: number }> = {};
+let memPrices: { in: number; out: number } | null = null;
+// AI use (0.2.6+r1, board M, M5): every answer Gemini gives reports its tokens; they are added up per day and per model in the
+// same daily counts as the home page visits. No prompt, no answer, no member number. Thinking tokens are billed as output.
+// dots become underscores in the stored key (a model name has none), hyphens stay
+const modelKey = (m: string) => m.replace(/\./g, "_").replace(/[^\w-]/g, "").slice(0, 60);
+function countAi(model: string, u: any) {
+  const space = reqSpace.getStore()?.space ?? "live", day = berlinDay(), k = modelKey(model);
+  const tin = Number(u?.promptTokenCount) || 0, tout = (Number(u?.candidatesTokenCount) || 0) + (Number(u?.thoughtsTokenCount) || 0);
+  if (!FB_PROJECT) {
+    const row: any = memDaily[space].get(day) ?? {};
+    row.ai_calls = (row.ai_calls ?? 0) + 1; row.ai_in = (row.ai_in ?? 0) + tin; row.ai_out = (row.ai_out ?? 0) + tout;
+    row.ai_by = row.ai_by ?? {}; const b = row.ai_by[k] ?? { calls: 0, in: 0, out: 0 }; b.calls++; b.in += tin; b.out += tout; row.ai_by[k] = b;
+    memDaily[space].set(day, row); return;
+  }
+  void db().collection(space === "preview" ? "metrics_daily_preview" : "metrics_daily").doc(day)
+    .set({ ai_calls: FieldValue.increment(1), ai_in: FieldValue.increment(tin), ai_out: FieldValue.increment(tout), ai_by: { [k]: { calls: FieldValue.increment(1), in: FieldValue.increment(tin), out: FieldValue.increment(tout) } } }, { merge: true })
+    .catch(() => { /* a count is never worth an error */ });
+}
 const cleanData = (d: unknown) => {
   const out: Record<string, string | number | boolean> = {};
   if (!d || typeof d !== "object") return out;
@@ -562,6 +585,17 @@ app.post("/api/metrics/bills", requireUser, async (req, res) => {
     res.json({ ok: true });
   } catch (e) { fail(res, e); }
 });
+// the two prices per million tokens, typed once from Google's price list (board M, M5)
+app.post("/api/metrics/prices", requireUser, async (req, res) => {
+  if (!metricsOwner(req)) return res.status(403).json({ error: "For Milan's account only." });
+  const pin = Number(req.body?.in), pout = Number(req.body?.out);
+  if (!(pin >= 0) || !(pout >= 0) || pin > 1000 || pout > 1000) return res.status(400).json({ error: "Type the two prices in euros per million tokens." });
+  try {
+    if (!FB_PROJECT) memPrices = { in: pin, out: pout };
+    else await db().collection("metrics_settings").doc("prices").set({ in: pin, out: pout, at: new Date().toISOString() });
+    res.json({ ok: true });
+  } catch (e) { fail(res, e); }
+});
 app.get("/api/metrics", requireUser, async (req, res) => {
   if (!metricsOwner(req)) return res.status(403).json({ error: "For Milan's account only." });
   const today = berlinDay();
@@ -570,10 +604,10 @@ app.get("/api/metrics", requireUser, async (req, res) => {
   const prev = addDays(from, -7), month = to.slice(0, 7);
   try {
     const space = spaceOf(req);
-    let evs: Ev[] = [], daily = new Map<string, Record<string, number>>(), bills: Record<string, { ai: number; cloud: number }> = {};
+    let evs: Ev[] = [], daily = new Map<string, Record<string, any>>(), bills: Record<string, { ai: number; cloud: number }> = {}, prices: { in: number; out: number } | null = null;
     let asked = (from_: string, to_: string) => Promise.resolve(0), joined = (from_: string, to_: string) => Promise.resolve(0);
     let flags = (from_: string, to_: string) => Promise.resolve({ total: 0, answered: 0 });
-    if (!FB_PROJECT) { evs = memEvents[space]; daily = memDaily[space]; bills = memBills; }
+    if (!FB_PROJECT) { evs = memEvents[space]; daily = memDaily[space]; bills = memBills; prices = memPrices; }
     else {
       const col = db().collection(metricsName(req, "metrics_events"));
       // 12 months, then gone (privacy notice section 7)
@@ -582,10 +616,13 @@ app.get("/api/metrics", requireUser, async (req, res) => {
       const [opens, recent] = await Promise.all([col.where("e", "==", "app_open").get(), col.where("day", ">=", addDays(prev, -35)).get()]);
       const seen = new Set<string>();
       for (const d of [...opens.docs, ...recent.docs]) { if (seen.has(d.id)) continue; seen.add(d.id); const x = d.data() as any; evs.push({ m: x.m, e: x.e, day: x.day, d: x.d }); }
-      const dd = await db().collection(metricsName(req, "metrics_daily")).where(FieldPath.documentId(), ">=", prev).get();
+      // every day since counting began: one small document a day (needed for the counts since the first day, board M, M5)
+      const dd = await db().collection(metricsName(req, "metrics_daily")).get();
       dd.docs.forEach((d) => daily.set(d.id, d.data() as Record<string, number>));
       const bs = await db().collection("metrics_settings").doc("bills").get();
       bills = (bs.exists ? bs.data() : {}) as Record<string, { ai: number; cloud: number }>;
+      const ps = await db().collection("metrics_settings").doc("prices").get();
+      prices = ps.exists ? { in: Number(ps.data()!.in) || 0, out: Number(ps.data()!.out) || 0 } : null;
       // midnight in Munich, summer or winter time
       const at = (day: string) => { const noon = new Date(`${day}T12:00:00Z`); const h = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Berlin", hour: "2-digit", hour12: false }).format(noon)); return new Date(Date.parse(`${day}T00:00:00Z`) - (h - 12) * 3_600_000); };
       asked = async (f, t) => (await db().collection("accessRequests").where("createdAt", ">=", at(f)).where("createdAt", "<", at(addDays(t, 1))).count().get()).data().count;
@@ -603,15 +640,29 @@ app.get("/api/metrics", requireUser, async (req, res) => {
         return { total, answered };
       };
     }
-    const hpOf = (f: string, t: string) => { const out: Record<string, number> = {}; for (const [day, row] of daily) if (day >= f && day <= t) for (const [k, n] of Object.entries(row)) out[k] = (out[k] ?? 0) + (Number(n) || 0); return out; };
+    const hpOf = (f: string, t: string) => { const out: Record<string, number> = {}; for (const [day, row] of daily) if (day >= f && day <= t) for (const [k, n] of Object.entries(row)) if (typeof n === "number") out[k] = (out[k] ?? 0) + (Number(n) || 0); return out; };
+    // AI use: today and this month, with the calls by model
+    const aiOf = (f: string, t: string) => {
+      const o = { calls: 0, in: 0, out: 0, byModel: {} as Record<string, number> };
+      for (const [day, row] of daily) if (day >= f && day <= t) {
+        o.calls += Number(row.ai_calls) || 0; o.in += Number(row.ai_in) || 0; o.out += Number(row.ai_out) || 0;
+        for (const [k, b] of Object.entries((row.ai_by ?? {}) as Record<string, any>)) o.byModel[k] = (o.byModel[k] ?? 0) + (Number(b?.calls) || 0);
+      }
+      return o;
+    };
     const monthActive = new Set(evs.filter((v) => v.e === "app_open" && v.day.startsWith(month)).map((v) => v.m)).size;
     const extra = async (f: string, t: string) => ({ hp: hpOf(f, t), asked: await asked(f, t), joined: await joined(f, t), flags: await flags(f, t), bills: bills[month] ?? null, monthActive });
     const stats = weekStats(evs, from, await extra(from, to)), last = weekStats(evs, prev, await extra(prev, addDays(prev, 6)));
     const days = [...evs.map((v) => v.day), ...daily.keys()].sort();
     const todayHp = daily.get(today) ?? {};
+    const since = days[0] ?? null;
+    const sinceHp = since ? hpOf(since, today) : {};
     res.json({
-      stats, last, since: days[0] ?? null, today: { day: today, visits: todayHp.hp_visit ?? 0, opened: new Set(evs.filter((v) => v.e === "app_open" && v.day === today).map((v) => v.m)).size, eaten: evs.filter((v) => v.e === "feedback" && v.d?.status === "eaten" && v.day === today).length },
-      month, bills: bills[month] ?? null,
+      stats, last, since, today: { day: today, visits: todayHp.hp_visit ?? 0, opened: new Set(evs.filter((v) => v.e === "app_open" && v.day === today).map((v) => v.m)).size, eaten: evs.filter((v) => v.e === "feedback" && v.d?.status === "eaten" && v.day === today).length },
+      // the same three counts since the first day (board M, M5)
+      sinceTotals: { visits: sinceHp.hp_visit ?? 0, opened: new Set(evs.filter((v) => v.e === "app_open" && (!since || v.day >= since)).map((v) => v.m)).size, eaten: evs.filter((v) => v.e === "feedback" && v.d?.status === "eaten" && (!since || v.day >= since)).length },
+      ai: { today: aiOf(today, today), month: aiOf(`${month}-01`, `${month}-31`) },
+      month, bills: bills[month] ?? null, prices, monthActive,
     });
   } catch (e) { fail(res, e); }
 });

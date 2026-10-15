@@ -1405,3 +1405,7 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .coach-note-text { font-size: 14px; line-height: 1.45; color: var(--ink); }
 .coach-checkin span { display: flex; flex-direction: column; } .coach-checkin small { color: var(--muted); font-weight: 600; }
 .cw-bars-row small { white-space: nowrap; font-size: 12.5px; }
+
+/* Metrics, the first week and AI use (board M, M5) */
+.mt-grid3 { display: grid; grid-template-columns: 1fr 56px 74px; gap: 6px 10px; font-size: 13.5px; align-items: baseline; }
+.mt-grid3 > small { text-align: right; font-weight: 800; color: var(--muted); font-size: 11.5px; } .mt-grid3 > b { text-align: right; } .mt-grid3 > b.muted { color: var(--muted); }

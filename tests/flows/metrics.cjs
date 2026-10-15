@@ -76,10 +76,15 @@ const monday = (d) => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDa
   ok(/Days lived by the plan/.test(txt) || /Counting since/.test(txt), "M2/M3: the Metrics page opens: " + txt.slice(0, 80));
   if (/Counting since/.test(txt)) ok(/Home page visits\s*2/.test(txt.replace(/\s+/g, " ")) || /Home page visits2/.test(txt), "M3: the first week shows today so far, 2 visits");
   else ok(/The six KPIs/.test(txt) && /The way in/.test(txt), "M2: the North Star, the six KPIs and the way in");
+  if (/Counting since/.test(txt)) ok(/TODAY/.test(txt) && /SINCE \d+ [A-Z]{3}/.test(txt), "M5: next to today, the count since the first day");
+  ok(/AI use, \w+/.test(txt) && /Tokens in/.test(txt) && /Cost to serve/.test(txt), "M5: AI use and cost to serve from day one");
   // the bills: typed once a month; cost per active member follows
   if (await page.getByLabel("AI calls, €").count()) {
     await page.getByLabel("AI calls, €").fill("0.41"); await page.getByLabel("Cloud, €").fill("0.83");
-    await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(800);
+    await page.getByRole("button", { name: "Save", exact: true }).first().click(); await page.waitForTimeout(800);
+    await page.getByLabel("Price in, € per million tokens").fill("0.3"); await page.getByLabel("Price out, € per million").fill("2.5");
+    await page.getByRole("button", { name: "Save", exact: true }).nth(1).click(); await page.waitForTimeout(800);
+    ok((await api()).prices?.out === 2.5 && /Estimated at your prices|No AI calls yet/.test(await page.locator(".mt").textContent()), "M5: the two prices are kept");
     ok(/€1\.24 per active member this month/.test(await page.locator(".mt").textContent()), "cost to serve: the two bills divided by the members active this month");
   } else {
     const month = (await api()).month;
