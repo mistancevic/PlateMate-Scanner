@@ -42,6 +42,8 @@ export function JourneyScreen(p: AppApi) {
   const { state, setState, setTab, step, setStep, setCamera, setMode, blank, updateItem,
     setAdjustId, mixWith, options, pdRef, saveMeal, notify, setError, setFeedback, add } = p;
   const [q, setQ] = useState("");
+  // the amounts before Fit: a mover that comes back unchanged means the plate was already above the target (0.2.7+r2)
+  const [fitBefore, setFitBefore] = useState<Record<string, number> | null>(null);
   const [lineOpen, setLineOpen] = useState(false);
   // When Mealan produces options, the first one becomes the recipe on screen.
   useEffect(() => {
@@ -208,6 +210,7 @@ export function JourneyScreen(p: AppApi) {
       ready = [{ ...ready[0], locked: true }, { id: uid(), food: { ...partner, readyToEat: true }, grams: 100, locked: false }];
     }
     const mover = moverOf(ready);
+    setFitBefore(Object.fromEntries(ready.map((i) => [i.id, i.grams])));
     if (!mover) { setState((s) => ({ ...s, items: ready, portion: null })); setStep("recipe"); return; } // everything fixed: show where it lands
     setState((s) => ({ ...s, items: ready, foods: s.foods.map((f) => ready.some((x) => x.food.id === f.id) ? { ...f, readyToEat: true } : f) }));
     setAdjustId(mover.id); setPick(0);
@@ -432,6 +435,8 @@ export function JourneyScreen(p: AppApi) {
     const unplanned = !momentOf(p.moment).planned;
     const unreal = !unplanned && (tooBig.length > 0 || (share !== null && share > 50) || meetingBig);
     const onPlan = !unreal && opd !== null && pdRef !== null && opd >= pdRef - 0.05;
+    // Fit kept the plate as it stood: already above the target, so nothing moved (Milan, 15 October 2026: it said it moved the chicken)
+    const kept = !!mover && !over && onPlan && fitBefore?.[mover.id] === mover.grams && opd! > pdRef! + 0.05;
     const unrealText = tooBig.length
       ? `${fmt(tooBig[0].grams, 0)} g of ${tooBig[0].food.name} is not a portion. This food can't get you there at a normal amount; swap it or lower the others.`
       : meetingBig
@@ -439,7 +444,7 @@ export function JourneyScreen(p: AppApi) {
         : `This plate is ${share} % of your day. Fit for a meal, not a dessert.`;
     return (
       <>
-        {Head({ name: Boolean(p.filling), title: mover ? `${CHEF_NAME}'s recipe` : "As you set it", sub: unplanned ? `${momentOf(p.moment).name}. Enjoy it, keep it small. Your next meal leans protein and you're back.` : over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : mover ? `${CHEF_NAME} moves the ${mover.food.name}. Change any other amount and it refits.` : `Nothing moved. This is where your amounts land. Tap a grey dot if you want ${CHEF_NAME} to fit one food.` })}
+        {Head({ name: Boolean(p.filling), title: mover ? `${CHEF_NAME}'s recipe` : "As you set it", sub: unplanned ? `${momentOf(p.moment).name}. Enjoy it, keep it small. Your next meal leans protein and you're back.` : over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : kept ? `Already above your target: ${pdTag()} ${pdVal(opd)} against ${pdVal(pdRef)}, so nothing moved. More protein is fine. Change an amount and ${CHEF_NAME} refits.` : mover ? `${CHEF_NAME} moves the ${mover.food.name}. Change any other amount and it refits.` : `Nothing moved. This is where your amounts land. Tap a grey dot if you want ${CHEF_NAME} to fit one food.` })}
         <section className={`readout ${unreal ? "readout-fit-mid" : `readout-fit-${p.fitPd(opd)}`}`}>
           <div className="readout-top"><span>This plate</span><span>{pdTag()}</span></div>
           <div className="readout-mid">

@@ -2245,7 +2245,7 @@ export default function App() {
     <div className="app-shell">
       {/* the layers before the tab keeper: a menu row that changes the tab (Foods, 0.2.0) drops its layer first, and the tab's address is pushed once that step back has settled */}
       {backReady && menuTrail.map((m, i) => <MenuBack key={`${i}-${m}`} open path={MENU_PATH[m]} close={() => { setMenuFrom(null); setMenuTrail((t) => t.slice(0, i)); }} />)}
-      <MenuBack open={talkOpen && !menuSection} close={() => setTalkOpen(false)} />
+      <MenuBack open={talkOpen} close={() => setTalkOpen(false)} />
       <BackKeeper tab={tab} setTab={setTab} onReady={() => setBackReady(true)} />
       <Opened />
       <header className="topbar">
@@ -2283,10 +2283,11 @@ export default function App() {
             </button>
           </div>
         )}
-        {menuSection && <MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s, up) => { setMenuFrom(null); setMenuSection(s, up); }} under={menuTrail.length > 1 ? menuTrail[menuTrail.length - 2] : null} close={() => { setMenuFrom(null); setMenuSection(null); }} />}
+        {/* Chef Mealan opens over a menu page too, and closing it comes back to the page (0.2.7+r2: the button vanished there) */}
+        {menuSection && <div style={{ display: talkOpen ? "none" : "contents" }}><MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s, up) => { setMenuFrom(null); setMenuSection(s, up); }} under={menuTrail.length > 1 ? menuTrail[menuTrail.length - 2] : null} close={() => { setMenuFrom(null); setMenuSection(null); }} /></div>}
         {!menuSection && !talkOpen && tab === "home" && <HomeScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "journey" && <JourneyScreen {...screenProps} />}
-        {talkOpen && !menuSection && <div className="talk-overlay"><OutScreen {...screenProps} tab={tab} ask={talkAsk} clearAsk={() => setTalkAsk(null)} turns={talkTurns} setTurns={(f) => setTalkTurns(f)} close={() => setTalkOpen(false)} toPlate={() => { setTalkOpen(false); setMenuSection(null); setStep("in"); setTab("journey"); }} /></div>}
+        {talkOpen && <div className="talk-overlay"><OutScreen {...screenProps} tab={tab} ask={talkAsk} clearAsk={() => setTalkAsk(null)} turns={talkTurns} setTurns={(f) => setTalkTurns(f)} close={() => setTalkOpen(false)} toPlate={() => { setTalkOpen(false); setMenuSection(null); setStep("in"); setTab("journey"); }} /></div>}
         {!talkOpen && (
           <button className="chat-fab" aria-label="Chef Mealan" onClick={() => {
             // one door: on a plate with food it answers about the plate; anywhere else it's the conversation
