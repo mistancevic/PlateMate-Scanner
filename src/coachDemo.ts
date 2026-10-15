@@ -5,6 +5,7 @@ import { dayLineOf, type DayLine } from "./dayLines";
 import { slotsOf } from "./slots";
 import { isoWeek, ymd } from "./plan";
 import type { CoachNote } from "./coachNotes";
+import { measure, startOf, daysFromLines, addDays } from "./measured";
 
 const FLAG = "chefmealan-coach-demo";
 export function coachDemoOn(): boolean {
@@ -22,7 +23,7 @@ export function demoRows(): ClientRow[] {
   const held = Object.fromEntries(Object.entries(MEALS).map(([k, [id, title, kcal, protein]]) => [k, { title, kcal, protein, source: k === "dinner" ? "coach" : "mine", mealId: id }])) as any;
   const days: Record<string, DayLine> = {};
   const shared: any[] = [];
-  for (let i = -7; i <= 6; i++) {
+  for (let i = -14; i <= 6; i++) {
     const d = new Date(monday); d.setDate(d.getDate() + i); d.setHours(12, 0, 0, 0);
     const key = ymd(d); if (key > ymd(new Date(now.getTime() + 2 * 864e5))) continue;
     const at = (h: number) => { const x = new Date(d); x.setHours(h, 0, 0, 0); return x; };
@@ -38,13 +39,19 @@ export function demoRows(): ClientRow[] {
     shared.push(...logged.filter((c) => c.shared));
     days[key] = dayLineOf({ date: key, today, slots, held, logged, target: { kcal: 2200, protein: 180 }, training: wd === 0 || wd === 3 ? "strength, 60 min" : null });
   }
-  const weighIns = Array.from({ length: 24 }, (_, i) => { const d = new Date(now); d.setDate(d.getDate() - i); return { date: ymd(d), kg: Math.round((77.9 + i * 0.07) * 10) / 10 }; }).filter((_, i) => i % 2 === 0).reverse();
+  const weighIns = Array.from({ length: 24 }, (_, i) => { const d = new Date(now); d.setDate(d.getDate() - i); return { date: ymd(d), kg: Math.round((77.9 + i * 0.03) * 10) / 10 }; }).filter((_, i) => i % 2 === 0).reverse();
   const lastFriday = new Date(monday); lastFriday.setDate(lastFriday.getDate() - 3); lastFriday.setHours(18, 10, 0, 0);
   const notes: CoachNote[] = [{ at: lastFriday.toISOString(), by: "coach", name: "Milan", week: ymd(new Date(monday.getTime() - 7 * 864e5)), verdict: "approved", text: "Strong start. Two meals a day by the plan is a win.", readAt: lastFriday.toISOString() }];
   const since = new Date(now); since.setDate(since.getDate() - 17);
   const base = { review: null, foods: 58, updatedAt: now.toISOString(), goalLog: [], formula: null, pdUnit: "pd" as const, flags: [], birthYear: 1985, aiConfirmedAt: null, consentBy: "self", trainingAge: "1to3", coachGoal: null, nextGoal: null };
+  // the first two weeks and the measured burn (0.2.7, board FT, FT6 and FT7): Davorka measured, Lena on day 6 of 14
+  const dStart = ymd(since), lStartD = new Date(now.getTime() - 5 * 864e5), lStart = ymd(lStartD);
+  const dMeasured = { ...measure({ days: daysFromLines(days), weighIns, today, start: startOf({ setAt: since.toISOString() }, []) }), formulaKcal: 2000 };
+  void dStart;
+  const lDays = Object.fromEntries([1, 2, 3, 4, 5].map((k) => [addDays(lStart, k - 1), { kcal: 2600, full: k !== 3, logged: true }]));
+  const lMeasured = { ...measure({ days: lDays, weighIns: [{ date: addDays(lStart, 4), kg: 64.2 }, { date: addDays(lStart, 5), kg: 64.1 }], today, start: lStart }), formulaKcal: 2450 };
   return [
-    { ...base, uid: "demo-davorka", name: "Davorka", goal: { band: "fatloss", setBy: "coach", coachName: "Milan", setAt: since.toISOString(), source: "coach" }, goalsNow: { calories: 2200, protein: 180 }, days, feedback: shared, notes, checkinDay: (now.getDay() + 6) % 7, weightKg: 78, weighIns },
-    { ...base, uid: "demo-lena", name: "Lena", goal: { band: "gainsteady", setBy: "you", setAt: new Date(now.getTime() - 5 * 864e5).toISOString(), source: "profile" }, goalsNow: { calories: 2700, protein: 150 }, days: {}, feedback: [], notes: [], checkinDay: 0, weightKg: 64, weighIns: [] },
+    { ...base, uid: "demo-davorka", measured: dMeasured, name: "Davorka", goal: { band: "fatloss", setBy: "coach", coachName: "Milan", setAt: since.toISOString(), source: "coach" }, goalsNow: { calories: 2200, protein: 180 }, days, feedback: shared, notes, checkinDay: (now.getDay() + 6) % 7, weightKg: 78, weighIns },
+    { ...base, uid: "demo-lena", measured: lMeasured, name: "Lena", goal: { band: "gainsteady", setBy: "you", setAt: new Date(now.getTime() - 5 * 864e5).toISOString(), source: "profile" }, goalsNow: { calories: 2700, protein: 150 }, days: {}, feedback: [], notes: [], checkinDay: 0, weightKg: 64, weighIns: [] },
   ];
 }

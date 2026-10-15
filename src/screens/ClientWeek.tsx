@@ -1,3 +1,5 @@
+import { BurnCard, Squares } from "../components/Measured";
+import { shortDate } from "../measured";
 import { useState, type ReactNode } from "react";
 import type { ClientRow } from "../cloud";
 import { wordsOf, type DayLine, type SlotMark } from "../dayLines";
@@ -54,15 +56,22 @@ export function WeekBars({ row }: { row: ClientRow }) {
   );
 }
 const weekNo = (row: ClientRow) => { const at = row.goal?.setAt ? Date.parse(row.goal.setAt) : NaN; return Number.isFinite(at) ? Math.floor((Date.now() - at) / (7 * DAY)) + 1 : null; };
+// in the first two weeks (0.2.7, board FT, FT6): the day of 14, counted from the start the client's phone sent
+export const phaseDay = (row: ClientRow) => { const m = row.measured; if (!m?.phase || !m.start) return null; const d = Math.floor((Date.parse(`${ymd(new Date())}T12:00:00`) - Date.parse(`${m.start}T12:00:00`)) / DAY) + 1; return d >= 1 && d <= 28 ? d : null; };
 export function clientLine(row: ClientRow, today: boolean) {
-  const wk = weekNo(row);
-  return [row.goal?.band ? goalLabel(row.goal.band) : "No goal yet", wk ? `week ${wk}` : null, today ? "check-in today" : `check-in ${DAY_NAMES[row.checkinDay]}`].filter(Boolean).join(" · ");
+  const wk = weekNo(row), pd = phaseDay(row);
+  return [row.goal?.band ? goalLabel(row.goal.band) : "No goal yet", pd ? (pd <= 14 ? `first two weeks, day ${pd} of 14` : `day ${pd}, not measured yet`) : wk ? `week ${wk}` : null, today ? "check-in today" : `check-in ${DAY_NAMES[row.checkinDay]}`].filter(Boolean).join(" · ");
 }
 export function ClientRowCard({ row, today, open }: { row: ClientRow; today: boolean; open: () => void }) {
   return (
     <button className={`card client-row cw-row ${today ? "cw-today" : ""}`} onClick={open}>
       <div className="client-head"><span className="avatar">{row.name.slice(0, 1).toUpperCase()}</span><div><b>{first(row.name)}</b><small>{clientLine(row, today)}</small></div></div>
-      <WeekBars row={row} />
+      {phaseDay(row) && row.measured ? (
+        <div style={{ width: "100%" }}>
+          <Squares m={row.measured} ends={false} />
+          <small className="ft-rowfoot">{row.measured.fullDays} full {row.measured.fullDays === 1 ? "day" : "days"} · {row.measured.squares.filter((x) => x.weighed).length} weigh-ins · {row.measured.readyOn ? `ready ${shortDate(row.measured.readyOn).slice(4)}` : "not ready yet"}</small>
+        </div>
+      ) : <WeekBars row={row} />}
     </button>
   );
 }
@@ -167,6 +176,8 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tail }
           {trend && <small className="cw-mini-line">{trend.verdict === "too few" ? "Not enough weigh-ins yet for a trend." : `${VERDICT_WORDS[trend.verdict]} for ${goalLabel(row.goal.band)}: ${trend.change! > 0 ? "+" : ""}${trend.change} kg in 3 weeks.`}</small>}
         </section>
       )}
+      {/* the measured burn, as the client sees it (0.2.7, board FT, FT7) */}
+      {row.measured && !row.flags.some((f) => f.situation === "eating") && <BurnCard m={row.measured} formulaKcal={row.measured.formulaKcal} name={name} />}
       <section className="card cw-mini">
         <div><small>DaaM good this week</small><small>{daam.length} {daam.length === 1 ? "meal" : "meals"}</small></div>
         <small className="cw-mini-strong">{daam.length ? daam.map((f: any) => f.meal?.title).join(" · ") : `None shared this week. ${name} marks a meal DaaM good on its card.`}</small>

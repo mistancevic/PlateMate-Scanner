@@ -7,6 +7,7 @@ import type { PlannedMeal } from "./planned";
 import type { Slot } from "./slots";
 import { dayRecord } from "./record";
 import { livedByPlan } from "./metricsCalc";
+import { fullOf } from "./measured";
 
 export type SlotMark = "plan" | "swapped" | "skipped" | "missed" | "open";
 export type SlotLine = { name: string; time: string; planned: string | null; eaten: string | null; mark: SlotMark; kcal: number; protein: number };
@@ -15,6 +16,8 @@ export type DayLine = {
   planned: number; byPlan: number; swapped: number; skipped: number; missed: number; open: number;
   kcal: number; protein: number; target: { kcal: number; protein: number } | null; lived: boolean;
   slots: SlotLine[]; extras: { title: string; kcal: number; protein: number }[]; training: string | null;
+  // 0.2.7 (board FT): the meal slots of the day, and whether the day counts for the measured burn (see measured.ts)
+  slotCount?: number; full?: boolean;
 };
 const n = (f: Feedback) => { const a = aggregate(f.meal.items); return { kcal: Math.round(a.calories ?? 0), protein: Math.round(a.protein ?? 0) }; };
 
@@ -34,11 +37,12 @@ export function dayLineOf(o: { date: string; today: string; slots: Slot[]; held:
   const count = (m: SlotMark) => slots.filter((x) => x.mark === m).length;
   const target = o.target ? { kcal: Math.round(o.target.kcal), protein: Math.round(o.target.protein) } : null;
   const lived = when === "past" && livedByPlan({ planned: rec.planned, open: rec.open.length, kcal: rec.kcal, protein: rec.protein }, target).lived;
-  return {
+  const line: DayLine = {
     date: o.date, when, planned: rec.planned, byPlan: count("plan"), swapped: count("swapped"), skipped: count("skipped"), missed: count("missed"), open: count("open"),
     kcal: Math.round(rec.kcal), protein: Math.round(rec.protein), target, lived, slots,
-    extras: rec.extras.map((f) => ({ title: f.meal.title, ...n(f) })), training: o.training,
+    extras: rec.extras.map((f) => ({ title: f.meal.title, ...n(f) })), training: o.training, slotCount: o.slots.length,
   };
+  return { ...line, full: fullOf(line) };
 }
 
 // the line's words, the same on the coach's page: status, colour and the detail under it

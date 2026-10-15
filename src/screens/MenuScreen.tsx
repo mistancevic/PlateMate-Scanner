@@ -19,6 +19,7 @@ import { DayTable } from "../components/DayTable";
 import { periodsOf, periodLine } from "../goalHistory";
 import { DAY_NAMES } from "../coachNotes";
 import { FORMULA_NAME } from "../components/FormulaCard";
+import { BurnCard } from "../components/Measured";
 import { analyse, isOpen as openAt } from "../analysis";
 import type { AppApi, MenuSection } from "./api";
 import { openLine } from "../openStats";
@@ -360,9 +361,13 @@ function GoalPanel(p: AppApi) {
       {/* the formula is picked in the calculator (canvas board FX, G1a); here one line says which one is in use */}
       {canCalculate(p.personal) && !isMinor(p.personal) && (
         <section className="card you-card formula-line">
-          <span><b>Formula</b><small>{p.formula ? `${FORMULA_NAME[p.formula]}, set by ${p.coachLabel}` : p.personal.formula ? FORMULA_NAME[p.personal.formula] : `Automatic: ${p.personal.bodyFatPct ? "Katch McArdle" : "Mifflin St Jeor"} now`}</small></span>
+          <span><b>Formula</b><small>{p.formula ? `${FORMULA_NAME[p.formula]}, set by ${p.coachLabel}` : p.personal.formula ? FORMULA_NAME[p.personal.formula] : `Automatic: ${p.personal.bodyFatPct ? "Katch McArdle" : "Mifflin St Jeor"} now`}{(p.formula ?? p.personal.formula) === "data" && p.personal.measuredUse ? ` · ${p.personal.measuredUse.kcal.toLocaleString("en")} kcal a day to stay the same` : p.formulaKcal ? ` · ${p.formulaKcal.toLocaleString("en")} kcal a day to stay the same` : ""}</small></span>
           <button className="link" onClick={openGoal}>Change</button>
         </section>
+      )}
+      {/* the measured burn, next to the formula (0.2.7, board FT, FT3 and FT4) */}
+      {p.measured && canCalculate(p.personal) && !isMinor(p.personal) && (
+        <BurnCard m={p.measured} formulaKcal={p.formulaKcal} inUse={(p.formula ?? p.personal.formula) === "data" ? p.personal.measuredUse ?? null : null} onUse={p.formula ? undefined : p.useMyData} />
       )}
       <section className="card explain">
         <p><b>At rest.</b> What your body burns doing nothing, from the formula you picked above: Mifflin St Jeor, Katch McArdle or Schofield.</p>

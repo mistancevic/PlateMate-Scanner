@@ -3,7 +3,8 @@ import { BANDS, ALL_BANDS, goalLabel, type Band, type TrainingAge } from "./goal
 import { ymd, isPlanDay, PE, COMMUTE, isPlan, planFromCounts, lengthOf, levelMinutes, START_MIN, countsOf, metOf, minutesOf, lifestyleFromOld, baseFactor, moveOf, MOVES, weekdaysOf, dayKindOf, WEEKDAY_NAMES, planLine, planShort, loadOf, weekdayIndex, getTodayChange, setTodayChange, dayOfLoad, type Plan, type PlanDay, type Lifestyle } from "./plan";
 export type Sex = "female" | "male";
 export type Activity = "sedentary" | "light" | "moderate" | "very" | "athlete"; // before 6 October 2026; read only to move old profiles over
-export type Formula = "mifflin" | "katch" | "schofield";
+// "data" (0.2.7, board FT, FT5): the measured burn sets the level, a formula keeps the shape of the days
+export type Formula = "mifflin" | "katch" | "schofield" | "data";
 export type DayMode = "same" | "each";
 // Life is set once: how the day goes without planned training. Training is chosen per day.
 export type Life = "desk" | "shift" | "feet" | "physical";
@@ -47,9 +48,11 @@ export type Personal = {
   nextGoal?: NextGoal;
   // from 0.2.5+r20 (canvas board FX): each day's own target, kept once the day has it, so a later goal never changes it
   targets?: Record<string, DayTarget>;
+  // from 0.2.7 (canvas board FT): the measured burn in use with the formula From your data, fixed on the day it was applied
+  measuredUse?: import("./measured").MeasuredFixed;
 };
 export type DayTarget = { kcal: number; protein: number; fats: number; carbs: number };
-export type NextGoal = { from: string; at: string; band: string; source: "profile" | "exact" | "coach" | "quick"; setBy: "you" | "coach"; kcal: number; protein: number; fats: number; carbs: number; method?: string; formula?: Formula | null };
+export type NextGoal = { from: string; at: string; band: string; source: "profile" | "exact" | "coach" | "quick"; setBy: "you" | "coach"; kcal: number; protein: number; fats: number; carbs: number; method?: string; formula?: Formula | null; measured?: import("./measured").MeasuredFixed | null };
 // today's target kept with the day; the newest 400 days stay
 export function withTarget(p: Personal, day: string, t: DayTarget): Personal {
   const cur = p.targets?.[day];
@@ -183,6 +186,7 @@ export function schofieldAdult(sex: Sex | undefined, age: number, w: number): nu
 export function restingBurn(p: Personal, f: Formula): number | null {
   if (!canCalculate(p)) return null;
   const age = ageOf(p)!, w = p.weightKg!, h = p.heightCm!;
+  if (f === "data") return restingBurn(p, p.bodyFatPct ? "katch" : "mifflin");
   if (f === "katch") return p.bodyFatPct ? Math.round(370 + 21.6 * w * (1 - p.bodyFatPct / 100)) : null;
   if (f === "schofield") return Math.round(schofieldAdult(p.sex, age, w));
   return Math.round(10 * w + 6.25 * h - 5 * age + (p.sex === "male" ? 5 : p.sex === "female" ? -161 : -78));
@@ -198,15 +202,24 @@ export function macroSplit(kcal: number, protein: number, fatsFixed?: number | n
   return { fats, carbs };
 }
 export type DayNumbers = { kcal: number; protein: number; fats: number; carbs: number; how: string[] };
-export type Calc = { kcal: number; protein: number; fats: number; carbs: number; proteinMin: number; proteinMax: number; proteinLo: number; proteinHi: number; proteinPerKg: number; proteinWhy: string[]; perMeal: number; trains: boolean; note: string; method: string; math: string; bmr: number; tdee: number; days: Record<DayType, DayNumbers>; week: Week; weekdays: ({ name: string; day: PlanDay } & DayNumbers)[] | null; numbersOf: (d: PlanDay) => DayNumbers };
+export type Calc = { maintainRaw: number; shift: number; kcal: number; protein: number; fats: number; carbs: number; proteinMin: number; proteinMax: number; proteinLo: number; proteinHi: number; proteinPerKg: number; proteinWhy: string[]; perMeal: number; trains: boolean; note: string; method: string; math: string; bmr: number; tdee: number; days: Record<DayType, DayNumbers>; week: Week; weekdays: ({ name: string; day: PlanDay } & DayNumbers)[] | null; numbersOf: (d: PlanDay) => DayNumbers };
 const r50 = (x: number) => Math.round(x / 50) * 50;
+const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const stepsLine = (kcal: number, min: number) => `+ ${Math.round(kcal)} for your steps, about ${Math.round(min)} min of walking above what your day covers (3.5 METs)`;
 export function calculate(p: Personal, bandId: string, pinned?: Formula | null): Calc | null {
   if (!canCalculate(p)) return null;
   const age = ageOf(p)!;
   const w = p.weightKg!, h = p.heightCm!;
   const sexTerm = p.sex === "male" ? 5 : p.sex === "female" ? -161 : -78;
-  const pick = formulaFor(p, pinned);
+  const pick0 = formulaFor(p, pinned);
+  // From your data: the days keep the shape of the formula that would run otherwise; every day moves by the same amount so
+  // that the week's average to stay the same is the measured burn; then the goal as usual (0.2.7, board FT, FT5)
+  const shapeF: Formula = p.bodyFatPct ? "katch" : "mifflin";
+  const useData = pick0 === "data" && !!p.measuredUse && age >= 18;
+  const pick = pick0 === "data" ? shapeF : pick0;
+  let shift = 0;
+  if (useData) { const sh = calculate({ ...p, formula: shapeF }, "maintain", shapeF); if (sh) shift = p.measuredUse!.kcal - sh.maintainRaw; }
+  const shiftLine = useData ? `${shift >= 0 ? "+" : "−"} ${Math.abs(Math.round(shift))} to match your measured burn, ${p.measuredUse!.kcal.toLocaleString("en")} kcal a day (${p.measuredUse!.from.slice(8, 10).replace(/^0/, "")} ${MONTH_SHORT[Number(p.measuredUse!.from.slice(5, 7)) - 1]} to ${p.measuredUse!.to.slice(8, 10).replace(/^0/, "")} ${MONTH_SHORT[Number(p.measuredUse!.to.slice(5, 7)) - 1]})` : "";
   const f: Formula = pick === "katch" && p.bodyFatPct ? "katch" : pick === "schofield" ? "schofield" : "mifflin";
   const lean = p.bodyFatPct ? w * (1 - p.bodyFatPct / 100) : null;
   // Under 18: the Schofield equations for 10 to 18 years (FAO/WHO/UNU), made for children and teenagers; the adult formulas are not.
@@ -247,16 +260,19 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   const week = weekOf(p);
   const kcalOf = {} as Record<DayType, number>;
   const how = {} as Record<DayType, string[]>;
+  const rawOf = {} as Record<DayType, number>;
   for (const d of DAY_TYPES) {
     const min = d.minutes(p);
     const extra = d.met > 1 ? (d.met - 1) * w * (min / 60) : 0;
     const walkMin = stepsMinutes(p.steps, life.factor), walk = (3.5 - 1) * w * (walkMin / 60);
-    kcalOf[d.id] = r50((base + walk + extra) * (1 + adj));
+    rawOf[d.id] = base + walk + extra;
+    kcalOf[d.id] = r50((base + walk + extra + shift) * (1 + adj));
     how[d.id] = [
       `${Math.round(bmr).toLocaleString("en")} at rest (${minor ? "Schofield, for 10 to 18 years: sex and weight" : restName})`,
       `× ${life.factor} for ${life.name} = ${Math.round(base).toLocaleString("en")}`,
       ...(walk ? [stepsLine(walk, walkMin)] : []),
       extra ? `+ ${Math.round(extra)} for ${min} min ${d.id === "active" ? "light training" : d.id === "easy" ? "moderate training" : "hard training"} (${d.met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest)` : "+ 0, no training",
+      ...(shiftLine ? [shiftLine] : []),
       `${pct === 0 ? "± 0" : pct > 0 ? `+ ${pct}` : `− ${Math.abs(pct)}`} % for ${goalName}`,
       `= ${kcalOf[d.id].toLocaleString("en")} kcal`,
     ];
@@ -266,7 +282,7 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   const pctLine = `${pct === 0 ? "± 0" : pct > 0 ? `+ ${pct}` : `− ${Math.abs(pct)}`} % for ${goalName}`;
   const restLine = `${Math.round(bmr).toLocaleString("en")} at rest (${minor ? "Schofield, for 10 to 18 years: sex and weight" : restName})`;
   const part = (met: number, min: number) => (met - 1) * w * (min / 60);
-  const dayKcalHow = (d: PlanDay): { kcal: number; how: string[] } => {
+  const dayKcalHow = (d: PlanDay): { kcal: number; how: string[]; raw: number } => {
     const kind = dayKindOf(d, ls, minor);
     const fac = kind === "work" ? baseFactor(ls, true) : MOVES[0].factor, b = bmr * fac;
     // a length saved before 7 October 2026 counts as the middle of its range (adults; the under-18 paths keep theirs)
@@ -277,7 +293,8 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
     const pe = kind === "study" && d.pe ? part(PE.met, PE.minutes) : 0;
     const way = kind === "study" ? COMMUTE[ls.commute ?? ""] : undefined;
     const commute = way ? part(way.met, way.minutes) : 0;
-    const kcal = r50((b + walk + extra + pe + commute) * (1 + adj));
+    const raw = b + walk + extra + pe + commute;
+    const kcal = r50((raw + shift) * (1 + adj));
     const what = d.kind === "club" || d.kind === "match" ? planShort({ ...d, pe: false, when: undefined }).toLowerCase() : planLine({ ...d, pe: false }).toLowerCase().replace(/, (in|during|late|right).*$/, "");
     return { kcal, how: [
       restLine,
@@ -286,9 +303,10 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
       ...(commute ? [`+ ${Math.round(commute)} for ${way!.name} (${way!.met} METs, ${way!.minutes} min)`] : []),
       ...(pe ? [`+ ${Math.round(pe)} for ${minor ? "sport at school" : "sport in class"} (${PE.met} METs, ${PE.minutes} min)`] : []),
       extra ? `+ ${Math.round(extra)} for ${min} min ${what} (${met} METs × ${w} kg × ${Math.round((min / 60) * 100) / 100} h, less what you burn at rest; Compendium 2024)` : pe || commute ? (minor ? "+ 0 after school" : "+ 0 after classes") : "+ 0, no training",
+      ...(shiftLine ? [shiftLine] : []),
       pctLine,
       `= ${kcal.toLocaleString("en")} kcal`,
-    ] };
+    ], raw };
   };
   const weekdayKcal = plan ? plan.map(dayKcalHow) : null;
   const nDays = DAY_TYPES.reduce((a, d) => a + (week[d.id] || 0), 0) || 1;
@@ -299,9 +317,10 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   for (const d of DAY_TYPES) days[d.id] = { kcal: kcalOf[d.id], protein, fats, carbs: carbsOf(kcalOf[d.id]), how: how[d.id] };
   const numbersOf = (d: PlanDay): DayNumbers => { const x = dayKcalHow(d); return { kcal: x.kcal, protein, fats, carbs: carbsOf(x.kcal), how: x.how }; };
   const weekdays = plan ? plan.map((d, i) => ({ name: WEEKDAY_NAMES[i], day: d, ...numbersOf(d) })) : null;
-  const method = `${minor ? "Schofield (10 to 18 years)" : f === "katch" ? "Katch–McArdle" : f === "schofield" ? `Schofield (${schofieldBand(age)})` : "Mifflin–St Jeor"}, ${life.name} ×${life.factor}, activity per day from the Compendium of Physical Activities${pct ? `, ${pct > 0 ? "+" : ""}${pct} %` : ""}`;
+  const method = `${useData ? `From your data, ${p.measuredUse!.kcal.toLocaleString("en")} kcal a day to stay the same, with the days shaped by ` : ""}${minor ? "Schofield (10 to 18 years)" : f === "katch" ? "Katch–McArdle" : f === "schofield" ? `Schofield (${schofieldBand(age)})` : "Mifflin–St Jeor"}, ${life.name} ×${life.factor}, activity per day from the Compendium of Physical Activities${pct ? `, ${pct > 0 ? "+" : ""}${pct} %` : ""}`;
   const math = `Average over your week: ${avg.toLocaleString("en")} kcal. Protein ${lo}–${hi} g per kg${trains ? ", because you train" : ""} × ${Math.round(ref)} kg = ${proteinMin}–${proteinMax} g, target ${protein} g.`;
-  return { kcal: avg, protein, fats, carbs: carbsOf(avg), proteinMin, proteinMax, proteinLo: lo, proteinHi: hi, proteinPerKg: perKg, proteinWhy, perMeal, trains, note: notes.join(" "), method, math, bmr: Math.round(bmr), tdee: Math.round(base), days, week, weekdays, numbersOf };
+  const maintainRaw = weekdayKcal ? weekdayKcal.reduce((a, x) => a + x.raw, 0) / 7 : DAY_TYPES.reduce((a, d) => a + rawOf[d.id] * (week[d.id] || 0), 0) / nDays;
+  return { maintainRaw, shift, kcal: avg, protein, fats, carbs: carbsOf(avg), proteinMin, proteinMax, proteinLo: lo, proteinHi: hi, proteinPerKg: perKg, proteinWhy, perMeal, trains, note: notes.join(" "), method, math, bmr: Math.round(bmr), tdee: Math.round(base), days, week, weekdays, numbersOf };
 }
 // Own numbers, day by day: a typed row wins; an empty row is calculated when the profile allows, else it takes the average
 // of the typed ones. Fat stays one number for every day unless typed; carbs carry the difference.

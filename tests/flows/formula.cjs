@@ -38,8 +38,10 @@ const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0
   ok(steps.join("|").includes("1. You|2. The formula|3. What are you after?|4. Your days"), "the calculator in four steps: " + steps.join(" | "));
   ok(/Body fat: not given/.test(await page.locator(".you-card").textContent()), "You shows the body fat, or that it is not given");
   const card = page.locator(".formula-card");
-  const opts = await card.locator(".opt").allTextContents();
+  const opts = await card.locator(".opt-grid .opt").allTextContents();
   ok(opts.length === 4 && /Mifflin St Jeor1,868 kcal at rest/.test(opts[1]) && /Schofield1,963 kcal at rest/.test(opts[3]), "four choices with the resting burn from each");
+  // 0.2.7 (board FT, FT5): a fifth, From your data, greyed until the burn is measured
+  ok(await card.locator(".opt-wide").isDisabled() && /From your dataNot enough data yet/.test(await card.locator(".opt-wide").textContent()), "From your data waits, greyed, until the burn is measured");
   ok(await card.locator(".opt").nth(2).isDisabled() && /Add your body fat under You/.test(opts[2]), "Katch McArdle sleeps without body fat");
   ok(/Schofield gives 95 kcal more at rest than Mifflin St Jeor\. With your everyday that is about 120 kcal more a day/.test(await card.textContent()), "the difference in plain numbers");
   const before = await page.locator(".day-table").textContent();

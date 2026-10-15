@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { calculate, canCalculate, isMinor, restingBurn, schofieldBand, ageOf, type Formula, type Personal } from "../personal";
+import { longDate, spanOf, type Measured, type MeasuredFixed } from "../measured";
 
 // Resting burn: the formula (canvas board TW, F1 and F2, Milan 13 October 2026). Three published formulas side by side with
 // this person's own resting burn from each. From 0.2.5+r20 (board FX, G1a) it sits in the goal calculator as step 2: the
 // pick is part of the draft and is saved with Apply from. A coach's pin wins and can't be changed here.
-export const FORMULA_NAME: Record<Formula, string> = { mifflin: "Mifflin St Jeor", katch: "Katch McArdle", schofield: "Schofield" };
-export function FormulaCard({ personal: d, pinned, coachLabel, value, onPick }: { personal: Personal; pinned: Formula | null; coachLabel: string; value: Formula | "auto"; onPick: (f: Formula | "auto") => void }) {
+export const FORMULA_NAME: Record<Formula, string> = { mifflin: "Mifflin St Jeor", katch: "Katch McArdle", schofield: "Schofield", data: "From your data" };
+// From 0.2.7 (board FT, FT5): a fifth choice, From your data, wide under the four: the whole day measured, not the burn at rest.
+// Greyed until the measured burn is ready; left out for anyone who sees no weigh-ins (measured is null then).
+export const fixedOf = (m: Measured | null | undefined): MeasuredFixed | null => (m?.ready && m.kcal ? { kcal: m.kcal, from: m.from, to: m.to, at: new Date().toISOString() } : null);
+export function FormulaCard({ personal: d, pinned, coachLabel, value, onPick, measured }: { personal: Personal; pinned: Formula | null; coachLabel: string; value: Formula | "auto"; onPick: (f: Formula | "auto") => void; measured?: Measured | null }) {
   const [about, setAbout] = useState(false);
   if (!canCalculate(d) || isMinor(d)) return null;
   const on: Formula | "auto" = pinned ?? value;
@@ -23,10 +27,15 @@ export function FormulaCard({ personal: d, pinned, coachLabel, value, onPick }: 
   const s = n("schofield")!, m = n("mifflin")!;
   const lifeOn = (f: Formula) => calculate({ ...d, formula: f }, "maintain", null)?.tdee ?? 0;
   const rest = s - m, day = Math.round((lifeOn("schofield") - lifeOn("mifflin")) / 10) * 10;
-  const diff = rest === 0 ? "Schofield and Mifflin St Jeor give the same resting burn for you." : `Schofield gives ${Math.abs(rest)} kcal ${rest > 0 ? "more" : "less"} at rest than Mifflin St Jeor. With your everyday that is about ${Math.abs(day)} kcal ${rest > 0 ? "more" : "less"} a day, before training.`;
+  const fixed = d.measuredUse && on === "data" ? d.measuredUse : fixedOf(measured);
+  const shapeName = d.bodyFatPct ? "Katch McArdle" : "Mifflin St Jeor";
+  const dataGap = fixed ? fixed.kcal - (calculate({ ...d, formula: d.bodyFatPct ? "katch" : "mifflin" }, "maintain", null)?.kcal ?? fixed.kcal) : 0;
+  const dataDiff = `Your data gives ${Math.abs(dataGap)} kcal a day ${dataGap < 0 ? "less" : "more"} than ${shapeName} with your everyday and training. Your days keep their shape: training days stay higher than rest days.`;
+  const diff = on === "data" && fixed ? dataDiff : rest === 0 ? "Schofield and Mifflin St Jeor give the same resting burn for you." : `Schofield gives ${Math.abs(rest)} kcal ${rest > 0 ? "more" : "less"} at rest than Mifflin St Jeor. With your everyday that is about ${Math.abs(day)} kcal ${rest > 0 ? "more" : "less"} a day, before training.`;
   return (
     <>
-      <div className="seg-head"><b>Resting burn: the formula</b><small>Three published formulas. Pick one, and all your numbers follow.</small></div>
+      {measured ? <div className="seg-head"><b>Your burn: a formula or your data</b><small>Three published formulas, or your own 14 days. Pick one, and all your numbers follow.</small></div>
+        : <div className="seg-head"><b>Resting burn: the formula</b><small>Three published formulas. Pick one, and all your numbers follow.</small></div>}
       <section className="card seg formula-card">
         <div className="opt-grid" role="group" aria-label="Resting burn formula">
           {opts.map((x) => (
@@ -35,6 +44,13 @@ export function FormulaCard({ personal: d, pinned, coachLabel, value, onPick }: 
             </button>
           ))}
         </div>
+        {measured && (
+          <button type="button" className={`opt opt-wide ${on === "data" ? "on" : ""}`} aria-pressed={on === "data"} disabled={!fixed || !!pinned} onClick={() => pick("data")}>
+            <b>From your data</b>
+            {fixed ? <><small className="opt-num">{fixed.kcal.toLocaleString("en")} kcal a day, all in</small><small>What you ate and how your weight moved, {spanOf(fixed.from, fixed.to)}.</small></>
+              : <><small className="opt-num">Not enough data yet</small><small>{measured.readyOn ? `Ready on ${longDate(measured.readyOn)} at the earliest.` : "Needs 10 full days and 7 weigh-ins in 14 days."}</small></>}
+          </button>
+        )}
         {pinned && <small className="setting-hint">Set by {coachLabel}. Ask {coachLabel} to change it.</small>}
         <small className="setting-hint">{diff}</small>
         <button type="button" className="link formula-about" aria-expanded={about} onClick={() => setAbout((v) => !v)}>{about ? "Close About the three formulas" : "About the three formulas ›"}</button>

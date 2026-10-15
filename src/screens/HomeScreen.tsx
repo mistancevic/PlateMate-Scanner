@@ -11,6 +11,7 @@ import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { X } from "lucide-react";
 import { unreadNote } from "../coachNotes";
 import type { AppApi, Filling } from "./api";
+import { KnowCard, ReadyCard } from "../components/Measured";
 import { slotsOf, rowsOf, trainingWhen } from "../slots";
 import { dayFor, getDay } from "../personal";
 import { ymd } from "../plan";
@@ -20,6 +21,8 @@ import { log } from "../log";
 import { closeDays, openedToday } from "../metrics";
 
 export function HomeScreen(p: AppApi) {
+  // to the measured burn's card on Me, Goal (FT3, FT4)
+  const toBurn = () => { p.openMenu("goal"); setTimeout(() => document.querySelector(".ft-burn")?.scrollIntoView({ block: "center" }), 350); };
   const [shareFor, setShareFor] = useState<string | null>(null);
   // the 30 minute check (Y1 column 13): the card shows once Today is open 30 minutes or more after the meal
   const [now, setNow] = useState(Date.now());
@@ -160,6 +163,9 @@ export function HomeScreen(p: AppApi) {
         );
       })()}
       {/* What's in the plan (0.2.0, canvas S and H): the day's meals as rows once the Plan holds them (0.2.2); until then one row, Go to Plan. Then Scan, blue, the camera for what the plan is not. */}
+      {/* The first two weeks (0.2.7, board FT): FT1 while the burn is being measured, FT2 once on the day it is ready */}
+      {p.measured?.phase && <KnowCard m={p.measured} openGoal={toBurn} />}
+      {p.measured?.ready && p.measured.start && !p.measuredSeen && <ReadyCard m={p.measured} formulaKcal={p.formulaKcal} seeGoal={() => { p.seeMeasured(); toBurn(); }} gotIt={p.seeMeasured} />}
       <section className="card cooking">
         <div className="card-top cooking-top"><span><ChefHat size={18} /> What's in the plan</span></div>
         {!hasPlanToday && (

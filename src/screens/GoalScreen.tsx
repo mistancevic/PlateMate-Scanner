@@ -4,7 +4,7 @@ import { BANDS, PACES, TRAINING_AGES, isBuild, paceForAge, bandOf, goalLabel } f
 import { density } from "../pilot";
 import { pdText, pdVal, pdTag } from "../ui";
 import { Mark, APP_NAME } from "../components/Mark";
-import { FormulaCard } from "../components/FormulaCard";
+import { FormulaCard, fixedOf } from "../components/FormulaCard";
 import { LIFE, DAY_TYPES, STEPS, calculate, canCalculate, macroSplit, suggestBand, dayModeOf, ownDayNumbers, weekOf, workOf, withWork, planOf, lifestyleOf, type Personal, type DayType, type DayMode, type Formula } from "../personal";
 import { INTENSITIES, LENGTHS, lengthOf, trainingCounts, withTraining, withLength, levelMinutes, planFromCounts, weekdaysOf, usualFrom, WEEKDAY_CHOICES, ymd, type Intensity, type Plan } from "../plan";
 import { DayTable, FindingList } from "../components/DayTable";
@@ -36,9 +36,19 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const setPersonalNow = (next: Personal) => { setD(next); save(next); };
   const setMode = (m: DayMode) => setPersonalNow({ ...d, dayMode: m });
   // the formula picked here is part of the draft (board FX, G1a)
-  const [formula, setFormula] = useState<Formula | "auto">(p.personal.formula ?? "auto");
-  const dF: Personal = (() => { const { formula: _, ...r } = d; void _; return formula === "auto" ? r : { ...r, formula }; })();
+  const [formula, setFormula] = useState<Formula | "auto">(p.calcFormula && (p.calcFormula !== "data" || fixedOf(p.measured)) ? p.calcFormula : p.personal.formula ?? "auto");
+  // From your data (0.2.7, board FT, FT5): the measured burn of today, or the one already in use, fixed with Apply from
+  const dataFixed = formula === "data" ? (p.personal.formula === "data" && p.personal.measuredUse && !p.calcFormula ? p.personal.measuredUse : fixedOf(p.measured) ?? p.personal.measuredUse ?? null) : null;
+  const dF: Personal = (() => { const { formula: _, measuredUse: _m, ...r } = d; void _; void _m; return formula === "auto" ? r : formula === "data" ? (dataFixed ? { ...r, formula, measuredUse: dataFixed } : r) : { ...r, formula }; })();
   const c = under ? null : calculate(dF, band, p.formula);
+  // FT5: with From your data, how far the week moves from the formula's
+  const dataNote = (() => {
+    if (!c || formula !== "data" || !dataFixed) return undefined;
+    const { formula: _f, measuredUse: _m, ...r } = d; void _f; void _m;
+    const base = calculate(r, band, null); if (!base) return undefined;
+    const k = c.kcal - base.kcal;
+    return k === 0 ? "From your data: the same as with the formula." : `From your data: ${Math.abs(k).toLocaleString("en")} kcal ${k < 0 ? "less" : "more"} than with the formula.`;
+  })();
   const by = coach ? "coach" : "you";
   const done = () => { p.notify("Your day is set. This is Today."); onDone(); };
   const goalNow = bandOf(band)!;
@@ -90,7 +100,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   );
   // the one way a goal is saved: now, or waiting for its date on Me, Goal
   const apply = (x: { source: "profile" | "exact"; kcal: number; protein: number; fats: number; carbs: number; method?: string }) => {
-    p.applyGoal({ band, setBy: by, formula: formula === "auto" ? null : formula, ...x }, from);
+    p.applyGoal({ band, setBy: by, formula: formula === "auto" ? null : formula, ...(formula === "data" ? { measured: dataFixed } : {}), ...x }, from);
     if (from <= todayKey) done();
     else { p.notify(`${goalLabel(band)} starts on ${longDay(from)}.`); onLater(); }
   };
@@ -214,7 +224,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           {consented && canCalculate(d) && !under && (
             <>
               <p className="label calc-step">2. The formula</p>
-              <FormulaCard personal={d} pinned={p.formula ?? null} coachLabel={p.coachLabel} value={formula} onPick={setFormula} />
+              <FormulaCard personal={formula === "data" && dataFixed ? { ...d, measuredUse: dataFixed } : d} pinned={p.formula ?? null} coachLabel={p.coachLabel} value={formula} onPick={setFormula} measured={p.measured} />
             </>
           )}
           <b className="section-title">3. What are you after?</b>
@@ -252,7 +262,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               {mode === "same" ? (
                 <section className="card proposal"><Four kcal={c.kcal} protein={c.protein} fats={c.fats} carbs={c.carbs} /><p className="math">{c.math}</p><small>{c.method}.</small></section>
               ) : (
-                <DayTable rows={c.days} avg={{ kcal: c.kcal, protein: c.protein }} week={c.week} weekdays={c.weekdays} />
+                <DayTable rows={c.days} avg={{ kcal: c.kcal, protein: c.protein }} week={c.week} weekdays={c.weekdays} note={dataNote} />
               )}
               {c.note && <small className="notice">{c.note}</small>}
               <ApplyFrom />

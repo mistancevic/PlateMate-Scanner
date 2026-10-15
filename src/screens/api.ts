@@ -83,6 +83,13 @@ export interface AppApi {
   numbersFor: (date: Date) => { kcal: number; protein: number; fats: number; carbs: number } | null;
   // 0.2.5+r20 (canvas board FX, G1b and G2): apply a goal from a date; today applies now, a later date waits on Goal
   applyGoal: (x: Omit<import("../personal").NextGoal, "from" | "at">, from: string) => void;
+  // 0.2.7 (board FT): the first two weeks and the measured burn; null for anyone who sees no weigh-ins
+  measured: import("../measured").Measured | null;
+  formulaKcal: number | null;            // what the formula says to stay the same, the week's average
+  measuredSeen: boolean;                 // the day-14 card on Today was taken away
+  seeMeasured: () => void;
+  useMyData: () => void;                 // opens the calculator with From your data picked
+  calcFormula: import("../personal").Formula | null;
   cancelNextGoal: () => void;
   // 0.2.6 (canvas board CW, CW5 and CW6): the coach's notes, the check-in day, Got it and Reply
   coachNotes: import("../coachNotes").CoachNote[];

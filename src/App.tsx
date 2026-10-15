@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, useMemo } from "react";
 import {
   Camera,
   Plus,
@@ -55,6 +55,9 @@ import { setTodayChange, dayOfLoad, ymd, planLine as planLineOf, type PlanDay } 
 import { slotsOf } from "./slots";
 import { dayLog } from "./today";
 import { dayLineOf, type DayLine } from "./dayLines";
+import { measure, startOf, daysFromLines, type Measured } from "./measured";
+import { weighInsOff } from "./weight";
+import { fixedOf } from "./components/FormulaCard";
 import { coachDemoOn } from "./coachDemo";
 import { getCoachLocal, setCoachLocal, notesOf, checkinOf, type CoachLocal, type CoachNote } from "./coachNotes";
 import { getPlanned, storePlanned, withPlanned, type Planned, type PlannedMeal } from "./planned";
@@ -1060,7 +1063,7 @@ export default function App() {
         if (phoneIsNewer) {
           const kept = { ...state, foods: state.foods.filter((f) => !gone.has(f.id)) };
           if (kept.foods.length !== state.foods.length) setState(kept);
-          await saveCloud(user.uid, { ...blockOf(kept), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], days: daysOut(), updatedAt: new Date().toISOString() });
+          await saveCloud(user.uid, { ...blockOf(kept), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() });
           setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() });
         } else if (remote && !(isEmptyState(remote.state) && !isEmptyState(state))) {
           // a real account copy replaces the phone; photos are merged back from the phone by id
@@ -1098,7 +1101,7 @@ export default function App() {
           }
           setCloudStatus({ ok: true, text: "Loaded from your account", at: new Date().toISOString() });
         } else {
-          await saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), updatedAt: new Date().toISOString() });
+          await saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() });
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
         }
       } catch (e: any) {
@@ -1297,6 +1300,29 @@ export default function App() {
     if (ng && ng.from <= dayTick) applyGoalNow(ng);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [personal.nextGoal?.from, dayTick]);
+  // The first two weeks and the measured burn (0.2.7, board FT): from the day lines and the weigh-ins, never for anyone who
+  // sees no weigh-ins. What the formula says to stay the same sits next to it. The coach gets the same result with each save.
+  const measured: Measured | null = useMemo(() => {
+    if (!safety.consentBodyAt || weighInsOff(safety) || !canCalculate(personal)) return null;
+    return measure({ days: daysFromLines(daysOut()), weighIns: personal.weighIns, today: dayTick, start: startOf(goal, goalLog) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.feedback, planned, personal, safety, goal?.setAt, goalLog, dayTick]);
+  const formulaKcal = useMemo(() => {
+    const { formula, measuredUse, ...rest } = personal; void measuredUse;
+    const pin = profile.formula === "data" ? null : profile.formula ?? null;
+    return calculate(formula === "data" ? rest : { ...rest, ...(formula ? { formula } : {}) }, "maintain", pin)?.kcal ?? null;
+  }, [personal, profile.formula]);
+  function measuredOut() { return measured ? { ...measured, formulaKcal } : null; }
+  const [measuredSeen, setMeasuredSeen] = useState(() => { try { return localStorage.getItem("chefmealan-measured-seen") ?? ""; } catch { return ""; } });
+  const [calcFormula, setCalcFormula] = useState<import("./personal").Formula | null>(null);
+  useEffect(() => { if (!goalOpen) setCalcFormula(null); }, [goalOpen]);
+  // the coach pinned From your data: the measured burn of that day is the one in use, until the coach picks again (FT7)
+  useEffect(() => {
+    if (profile.formula !== "data" || personal.measuredUse) return;
+    const fx = fixedOf(measured);
+    if (fx) { const next = { ...getPersonal(), measuredUse: fx }; storePersonal(next); setPersonalState(next); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile.formula, measured?.ready]);
   // apply a goal now: the goal, its numbers and the formula picked in the calculator; a waiting goal that starts now goes
   function applyGoalNow(x: Omit<NextGoal, "from" | "at">) {
     nextSource.current = x.source;
@@ -1307,6 +1333,9 @@ export default function App() {
     const { nextGoal, formula, ...rest } = cur;
     const starts = nextGoal && nextGoal.from <= ymd(new Date());
     const next: Personal = { ...rest, ...(starts ? {} : nextGoal ? { nextGoal } : {}), ...(x.formula === undefined ? (formula ? { formula } : {}) : x.formula ? { formula: x.formula } : {}) };
+    // From your data (0.2.7, board FT, FT5): the measured burn applied with the goal stays fixed until applied again
+    if (x.formula === "data" && x.measured) next.measuredUse = x.measured;
+    else if (x.formula !== undefined && x.formula !== "data") delete next.measuredUse;
     storePersonal(next); setPersonalState(next);
   }
   // a reload on Clients stays there; once the account is known and is not a coach's, Today instead
@@ -1335,7 +1364,7 @@ export default function App() {
   useEffect(() => {
     if (!user || !cloudLoaded.current) return;
     const t = setTimeout(() => {
-      saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), updatedAt: new Date().toISOString() })
+      saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() })
         .then(async () => {
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
           // foods, recipes and cards: only the records that changed (storage release 2)
@@ -1614,7 +1643,7 @@ export default function App() {
     if (k < today && kept) return kept;
     const ng = personal.nextGoal;
     if (ng && k >= ng.from) {
-      const per: Personal = ng.formula === undefined ? personal : (() => { const { formula, ...r } = personal; void formula; return ng.formula ? { ...r, formula: ng.formula } : r; })();
+      const per: Personal = ng.formula === undefined ? personal : (() => { const { formula, ...r } = personal; void formula; return ng.formula ? { ...r, formula: ng.formula, ...(ng.formula === "data" && ng.measured ? { measuredUse: ng.measured } : {}) } : r; })();
       return numbersOfDay(getDay(per, date), { calories: ng.kcal, protein: ng.protein, fats: ng.fats, carbs: ng.carbs }, { band: ng.band, source: ng.source, setBy: ng.setBy, setAt: ng.at }, per);
     }
     return numbersOfDay(getDay(personal, date));
@@ -1922,6 +1951,10 @@ export default function App() {
     coachNotes: coachThread.notes, checkinDay: coachThread.checkinDay,
     gotNote: (at: string) => saveNotes(coachThread.notes.map((n) => (n.at === at ? { ...n, readAt: new Date().toISOString() } : n))),
     replyToCoach: (text: string, read?: string) => saveNotes([...coachThread.notes.map((n) => (n.at === read ? { ...n, readAt: new Date().toISOString() } : n)), { at: new Date().toISOString(), by: "client", text }]),
+    measured, formulaKcal, calcFormula,
+    measuredSeen: !!measured?.start && measuredSeen === measured.start,
+    seeMeasured: () => { const k = measured?.start ?? ""; try { localStorage.setItem("chefmealan-measured-seen", k); } catch {} setMeasuredSeen(k); },
+    useMyData: () => { setCalcFormula("data"); setGoalOpen(true); },
     applyGoal: (x: Omit<NextGoal, "from" | "at">, from: string) => {
       if (from <= ymd(new Date())) { applyGoalNow(x); return; }
       const next: Personal = { ...getPersonal(), nextGoal: { ...x, from, at: new Date().toISOString() } };
