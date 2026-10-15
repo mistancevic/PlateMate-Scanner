@@ -9,6 +9,7 @@ import { planLine, schoolLine, studyLine, loadOf, LOAD_DAY, weekdaysOf, dayKindO
 import { DayEditor } from "../components/DayEditor";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { X } from "lucide-react";
+import { unreadNote } from "../coachNotes";
 import type { AppApi, Filling } from "./api";
 import { slotsOf, rowsOf, trainingWhen } from "../slots";
 import { dayFor, getDay } from "../personal";
@@ -138,6 +139,26 @@ export function HomeScreen(p: AppApi) {
       {p.profile.role === "coach" && p.newShared > 0 && (
         <button className="strip strip-button" onClick={() => setTab("clients")}>{p.newShared} new {p.newShared === 1 ? "card" : "cards"} shared with you. Open Clients.</button>
       )}
+      {/* the coach's note, once (0.2.6, canvas board CW, CW5): Got it keeps it in My coach; Change the numbers opens Goal */}
+      {(() => {
+        const n = unreadNote(p.coachNotes);
+        if (!n) return null;
+        const who = n.name ? `Coach ${n.name}` : p.coachLabel;
+        const at = new Date(n.at);
+        return (
+          <section className="coach-note coach-week-note" aria-label={`A note from ${who}`}>
+            <small>{who}, {at.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}, {at.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</small>
+            <b>{n.verdict === "change" ? `${who} asks you to change your numbers` : "Your week: approved ✓"}</b>
+            {n.text && <span className="coach-note-text">{n.text}</span>}
+            <div className="button-row">
+              {n.verdict === "change"
+                ? <button className="pill pill-small pill-primary" onClick={() => { p.gotNote(n.at); p.openMenu("goal"); }}>Look at my numbers</button>
+                : <button className="pill pill-small pill-primary" onClick={() => p.gotNote(n.at)}>Got it</button>}
+              <button className="pill pill-small" onClick={() => { const r = window.prompt(`Reply to ${who}`); if (r && r.trim()) { p.replyToCoach(r.trim(), n.at); p.notify(`Sent to ${who}.`); } }}>Reply to {who}</button>
+            </div>
+          </section>
+        );
+      })()}
       {/* What's in the plan (0.2.0, canvas S and H): the day's meals as rows once the Plan holds them (0.2.2); until then one row, Go to Plan. Then Scan, blue, the camera for what the plan is not. */}
       <section className="card cooking">
         <div className="card-top cooking-top"><span><ChefHat size={18} /> What's in the plan</span></div>
@@ -148,15 +169,27 @@ export function HomeScreen(p: AppApi) {
         )}
         {hasPlanToday && rec.done && (
           <button className="menu-row plan-row-link" onClick={() => setTab("plan")}>
-            <div className="menu-row-text"><small>All {rec.planned === 1 ? "one slot" : `${rec.planned} slots`} eaten</small><b>Today went {rec.extras.length ? "mostly " : ""}by the plan</b><small>{tHeld ? `Tomorrow is set: ${tHeld} ${tHeld === 1 ? "slot" : "slots"}${tWhen ? `, ${tWhen.phrase}` : ""}` : "Tomorrow is open. Set it on Plan."}</small></div><ChevronRight size={18} />
+            <div className="menu-row-text"><small>{rec.skipped.length ? `${rec.byPlan} eaten, ${rec.skipped.length} skipped on purpose` : `All ${rec.planned === 1 ? "one slot" : `${rec.planned} slots`} eaten`}</small><b>Today went {rec.extras.length ? "mostly " : ""}by the plan</b><small>{tHeld ? `Tomorrow is set: ${tHeld} ${tHeld === 1 ? "slot" : "slots"}${tWhen ? `, ${tWhen.phrase}` : ""}` : "Tomorrow is open. Set it on Plan."}</small></div><ChevronRight size={18} />
           </button>
         )}
-        {hasPlanToday && !rec.done && rec.open.map((sl) => {
-          const m = held[sl.id]; const fit = fitOf(m, p.dayPd, unit);
+        {/* 0.2.6 (canvas board CW, CW7): each planned meal can be skipped on purpose; a skipped one stays with Undo until midnight */}
+        {hasPlanToday && slots.filter((sl) => (!rec.done && rec.open.includes(sl)) || rec.skipped.includes(sl)).map((sl) => {
+          const m = held[sl.id];
+          if (m.skipped) return (
+            <div key={sl.id} className="menu-row plan-row-link plan-slot-row plan-slot-skipped">
+              <div className="menu-row-text"><small>{sl.name}, {sl.time}</small><b>{m.title}</b><small className="skipped-mark">Skipped on purpose</small></div>
+              <button type="button" className="link plan-skip on" onClick={() => p.fill(key, sl.id, { ...m, skipped: undefined })}>Undo</button>
+            </div>
+          );
+          const fit = fitOf(m, p.dayPd, unit);
           return (
-            <button key={sl.id} className="menu-row plan-row-link plan-slot-row" aria-label={`${sl.name} at ${sl.time}, ${m.title}`} onClick={() => eatFrom(sl.id)}>
-              <div className="menu-row-text"><small>{sl.name}, {sl.time}</small><b>{m.title}</b><small>{SOURCE[m.source]}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</small></div><ChevronRight size={18} />
-            </button>
+            <div key={sl.id} className="menu-row plan-row-link plan-slot-row" onClick={() => eatFrom(sl.id)}>
+              <button type="button" className="plan-slot-main" aria-label={`${sl.name} at ${sl.time}, ${m.title}`} onClick={(e) => { e.stopPropagation(); eatFrom(sl.id); }}>
+                <span className="menu-row-text"><small>{sl.name}, {sl.time}</small><b>{m.title}</b><small>{SOURCE[m.source]}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</small></span>
+              </button>
+              <button type="button" className="link plan-skip" aria-label={`Skip ${sl.name.toLowerCase()} on purpose`} onClick={(e) => { e.stopPropagation(); p.fill(key, sl.id, { ...m, skipped: true }); }}>Skip</button>
+              <ChevronRight size={18} />
+            </div>
           );
         })}
         {hasPlanToday && !rec.done && rec.empty.length > 0 && (

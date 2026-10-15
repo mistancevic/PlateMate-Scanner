@@ -84,6 +84,11 @@ export interface AppApi {
   // 0.2.5+r20 (canvas board FX, G1b and G2): apply a goal from a date; today applies now, a later date waits on Goal
   applyGoal: (x: Omit<import("../personal").NextGoal, "from" | "at">, from: string) => void;
   cancelNextGoal: () => void;
+  // 0.2.6 (canvas board CW, CW5 and CW6): the coach's notes, the check-in day, Got it and Reply
+  coachNotes: import("../coachNotes").CoachNote[];
+  checkinDay: number;
+  gotNote: (at: string) => void;
+  replyToCoach: (text: string, read?: string) => void;
   // the slots' meals (0.2.2)
   planned: import("../planned").Planned;
   renameMeal: (id: string, title: string) => void;

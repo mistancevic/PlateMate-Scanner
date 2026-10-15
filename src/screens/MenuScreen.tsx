@@ -17,6 +17,7 @@ import { DayEditor } from "../components/DayEditor";
 import { ProteinCard } from "../components/ProteinCard";
 import { DayTable } from "../components/DayTable";
 import { periodsOf, periodLine } from "../goalHistory";
+import { DAY_NAMES } from "../coachNotes";
 import { FORMULA_NAME } from "../components/FormulaCard";
 import { analyse, isOpen as openAt } from "../analysis";
 import type { AppApi, MenuSection } from "./api";
@@ -301,8 +302,11 @@ function GoalPanel(p: AppApi) {
           <section className="card next-goal" aria-label="Next goal">
             <small className="next-goal-when">NEXT, FROM {day.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).toUpperCase().replace(",", "")}</small>
             <b>{goalLabel(ng.band)}</b>
-            <small>{ng.kcal.toLocaleString("en")} kcal and {ng.protein} g protein a day on average. Plan already uses it from {day.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.</small>
-            <div className="button-row"><button className="pill pill-small" onClick={openGoal}>Change the date</button><button className="link link-danger" onClick={() => { p.cancelNextGoal(); p.notify("The next goal is cancelled."); }}>Cancel</button></div>
+            <small>{ng.setBy === "coach" ? `Set by ${p.coachLabel}. ` : ""}{ng.kcal.toLocaleString("en")} kcal and {ng.protein} g protein a day on average. Plan already uses it from {day.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.</small>
+            {/* a goal from the coach (canvas board CW, CW9): Reply instead of Change the date and Cancel */}
+            {ng.setBy === "coach"
+              ? <div className="button-row"><button className="pill pill-small" onClick={() => { const r = window.prompt(`Reply to ${p.coachLabel}`); if (r && r.trim()) { p.replyToCoach(r.trim()); p.notify(`Sent to ${p.coachLabel}.`); } }}>Reply to {p.coachLabel}</button></div>
+              : <div className="button-row"><button className="pill pill-small" onClick={openGoal}>Change the date</button><button className="link link-danger" onClick={() => { p.cancelNextGoal(); p.notify("The next goal is cancelled."); }}>Cancel</button></div>}
           </section>
         );
       })()}
@@ -580,21 +584,32 @@ function CoachPanel(p: AppApi) {
           <small>Your coach{profile.joinedAt ? ` since ${fmtDay(profile.joinedAt)}` : ""}.</small>
         </div>
       </section>
+      {/* 0.2.6 (canvas board CW, CW6): the check-in day, what the coach sees with the week first, and the notes */}
+      <section className="card coach-checkin"><span><b>Check-in: {DAY_NAMES[p.checkinDay]}</b><small>{p.coachLabel} looks at your week and sends a note.</small></span></section>
       <section className="card">
         <b>What your coach sees</b>
         <ul className="small">
+          <li>Your week: each day, the meals planned against the meals eaten, with their names, PD and kcal. From the day you joined.</li>
           <li>Your goal and today's numbers, and may set them for you.</li>
-          <li>The cards you share, with the reason and the photo, and the days they add up to.</li>
+          <li>Your weigh-ins.</li>
+          <li>The cards you share, with the reason and the photo.</li>
           <li>Which situations you ticked on your profile and when. Never your words.</li>
-          <li>Recipes they send you land on Today.</li>
         </ul>
         <b>What your coach never sees</b>
         <ul className="small">
-          <li>Cards you keep private, your library, your photos, your chats with Chef Mealan.</li>
+          <li>Your photos and notes on cards you don't share, your library, your chats with Chef Mealan.</li>
           <li>Your body data. Only the numbers it gives.</li>
         </ul>
         <ConfirmButton className="link link-danger" label="Leave this coach" confirmLabel="Tap again to leave" onConfirm={leaveCoach} />
       </section>
+      {p.coachNotes.length > 0 && (
+        <>
+          <p className="label">Notes from {p.coachLabel}</p>
+          <section className="card days">{[...p.coachNotes].reverse().slice(0, 20).map((n) => (
+            <div className="history-row" key={n.at}><div><b>{new Date(n.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}</b><small>{n.by === "client" ? "Your reply" : n.verdict === "change" ? "Asked you to change your numbers" : "Approved your week"}</small></div><div className="history-num"><small>“{n.text}”</small></div></div>
+          ))}</section>
+        </>
+      )}
     </>
   ) : (
     <section className="card">

@@ -4,7 +4,10 @@ import { useKept } from "../kept";
 import { RefreshCw, Copy, Target, Send, UserPlus } from "lucide-react";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { dayNameAny } from "../personal";
-import { listClients, setClientGoal, sendRecipe, pinFormula, type ClientRow } from "../cloud";
+import { listClients, setClientGoal, setClientGoalFrom, sendCoachNote, setCheckinDay, sendRecipe, pinFormula, type ClientRow } from "../cloud";
+import { ClientPage, ClientRowCard, coachNumbers, todayIndex, type CoachOps } from "./ClientWeek";
+import { DAY_NAMES } from "../coachNotes";
+import { isoWeek, ymd } from "../plan";
 import { SITUATIONS } from "../safety";
 import { GoalHistory } from "./MenuScreen";
 import { uid } from "../pilot";
@@ -20,77 +23,94 @@ import { RecipeView } from "./RecipePages";
 import { bylineOf, type PublicRecipe } from "../recipes";
 import { useBack } from "../back";
 
-// The coach's area on Me: the code to share, the client list, and a client's cards with a goal to set.
-export function CoachArea(p: AppApi) {
+// The coach's area: check-ins today, the clients with their week, and a client's own page (0.2.6, canvas board CW).
+export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
   const { user, setError, notify } = p;
   // the lists show at once from the last visit, then refresh (Milan, 11 October 2026)
   // a light copy is kept: the cards without their photos, which load again with the list
   const [keptRows, keepRows] = useKept<ClientRow[]>(`clients-${user?.uid ?? "local"}`, []);
-  const [rows, setRowsState] = useState<ClientRow[]>(keptRows);
-  const setRows = (next: ClientRow[]) => { setRowsState(next); keepRows(next.map((r) => ({ ...r, feedback: r.feedback.map(({ photo, photos, ...f }: any) => f) }))); };
-  const [open, setOpen] = useState<ClientRow | null>(null);
-  const [busy, setBusy] = useState(false);
-  const coachName = user?.name?.split(" ")[0] || "Coach";
+  const [rows, setRowsState] = useState<ClientRow[]>(p.demo ?? keptRows);
+  const setRows = (next: ClientRow[]) => { setRowsState(next); if (!p.demo) keepRows(next.map((r) => ({ ...r, feedback: r.feedback.map(({ photo, photos, ...f }: any) => f) }))); };
+  const [openId, setOpenId] = useState<string | null>(null);
+  const open = rows.find((r) => r.uid === openId) ?? null;
+  const coachName = user?.name?.split(" ")[0] || (p.demo ? "Milan" : "Coach");
   async function refresh() {
-    if (!user) return;
-    setBusy(true);
-    try { const next = await listClients(user.uid); setRows(next); setOpen((o) => (o ? next.find((r) => r.uid === o.uid) ?? o : o)); }
+    if (!user || p.demo) return;
+    try { setRows(await listClients(user.uid)); }
     catch (e: any) { setError(e.message || "Could not load clients."); }
-    finally { setBusy(false); }
   }
   useEffect(() => { refresh(); p.markSharedSeen(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
-  // clients who are cooks (board RG5): one switch on the client's sheet
+  // clients who are cooks (board RG5): one switch on the client's page
   const [cookList, setCookList] = useKept<string[]>(`cooks-${user?.uid ?? "local"}`, []);
   const cooks = new Set(cookList);
   const setCooks = (next: Set<string> | ((prev: Set<string>) => Set<string>)) => setCookList((prev) => [...(typeof next === "function" ? next(new Set(prev)) : next)]);
-  const loadCooks = () => fetch("/api/cooks").then((r) => r.json()).then((d) => setCooks(new Set(d.uids ?? []))).catch(() => {});
-  useEffect(() => { loadCooks(); }, [user?.uid]);
+  const loadCooks = () => { if (!p.demo) fetch("/api/cooks").then((r) => r.json()).then((d) => setCooks(new Set(d.uids ?? []))).catch(() => {}); };
+  useEffect(() => { loadCooks(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
   const setCook = async (client: string, on: boolean) => {
     const res = await fetch("/api/cooks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid: client, on }) });
     const d = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(d.error || "That didn't work. Try again.");
     setCooks((x) => { const y = new Set(x); on ? y.add(client) : y.delete(client); return y; });
   };
-  const daam = (r: ClientRow) => r.feedback.filter((f) => f.taste === "DaaM good").length;
-  const last = (r: ClientRow) => r.feedback[0];
+  // what the coach writes on a client's account; on the local demo the rows change on this phone only
+  const patch = (uid: string, change: Partial<ClientRow>) => setRows(rows.map((r) => (r.uid === uid ? { ...r, ...change } : r)));
+  const ops: CoachOps = {
+    sendNote: async (row, notes) => { if (!p.demo) await sendCoachNote(row.uid, notes); patch(row.uid, { notes }); },
+    setCheckin: async (row, day) => { if (!p.demo) await setCheckinDay(row.uid, day); patch(row.uid, { checkinDay: day }); },
+    setGoal: async (row, band, from) => {
+      const nums = coachNumbers(band), today = ymd(new Date());
+      if (from <= today) {
+        const b = bandOf(band)!;
+        if (!p.demo) await setClientGoal(row.uid, { band }, goalsForBand(b), coachName);
+        patch(row.uid, { goal: { band, setBy: "coach", coachName, setAt: new Date().toISOString(), source: "coach" }, goalsNow: { calories: nums.kcal, protein: nums.protein } });
+      } else {
+        if (!p.demo) await setClientGoalFrom(row.uid, { band, kcal: nums.kcal, protein: nums.protein, from, by: coachName });
+        patch(row.uid, { nextGoal: { band, from, at: new Date().toISOString(), source: "coach", setBy: "coach", kcal: nums.kcal, protein: nums.protein, fats: 0, carbs: 0 } });
+      }
+    },
+  };
+  if (open) return (
+    <ClientPage row={open} coachName={coachName} ops={ops} back={() => setOpenId(null)} notify={notify} setError={setError}
+      tail={<ClientTail row={open} onSaved={refresh} setError={setError} notify={notify} confirmAi={p.confirmClientAi}
+        cook={cooks.has(open.uid)} setCook={(on) => setCook(open.uid, on).then(() => notify(on ? `${open.name.split(" ")[0]} is a cook: they can send you recipes to publish.` : `${open.name.split(" ")[0]} is no longer a cook.`)).catch((e) => setError(e.message))} />} />
+  );
+  const ti = todayIndex();
+  const due = rows.filter((r) => r.checkinDay === ti);
+  const weekKey = ymd(isoWeek(new Date()).monday);
+  const toSend = due.filter((r) => !r.notes.some((n) => n.by === "coach" && n.week === weekKey)).length;
   return (
     <>
+      {due.length > 0 && (
+        <>
+          <div className="approve-head"><p className="label">Check-ins today, {DAY_NAMES[ti]}</p><span className="approve-count">{toSend ? `${toSend} to send` : "all sent"}</span></div>
+          {due.map((r) => <ClientRowCard key={r.uid} row={r} today open={() => setOpenId(r.uid)} />)}
+        </>
+      )}
       {(() => {
         const waiting = rows.filter((r) => r.review?.status === "waiting");
         if (!waiting.length) return null;
         return (
           <>
             <div className="approve-head"><p className="label">To approve</p><span className="approve-count">{waiting.length} to approve</span></div>
-            {waiting.map((r) => <ReviewCard key={r.uid} row={r} answer={async (status, note) => { await p.answerClientReview(r.uid, status, note, r.review!); await refresh(); }} open={() => setOpen(r)} />)}
+            {waiting.map((r) => <ReviewCard key={r.uid} row={r} answer={async (status, note) => { await p.answerClientReview(r.uid, status, note, r.review!); await refresh(); }} open={() => setOpenId(r.uid)} />)}
           </>
         );
       })()}
-      <WaitingRecipes notify={notify} setError={setError} />
-      <Invites {...p} />
-      <AccessRequests {...p} />
-      <BookSignups {...p} />
+      {!p.demo && <WaitingRecipes notify={notify} setError={setError} />}
+      {!p.demo && <Invites {...p} />}
+      {!p.demo && <AccessRequests {...p} />}
+      {!p.demo && <BookSignups {...p} />}
       <p className="label">Clients ({rows.length})</p>
       {rows.length === 0 && <div className="strip">No clients yet. Share the code.</div>}
-      {rows.map((r) => (
-        <button className="card client-row" key={r.uid} onClick={() => setOpen(r)}>
-          <div className="client-head">
-            <span className="avatar">{r.name.slice(0, 1).toUpperCase()}</span>
-            <div><b>Client {r.name.split(" ")[0]}</b><small>{r.goal?.band ? goalLabel(r.goal.band) : "no goal yet"} · {r.foods} foods · {r.feedback.length} shared · {daam(r)} DaaM good · reads {r.pdUnit === "pct" ? "% calories from protein" : "PD"}</small></div>
-          </div>
-          <small className="client-last">{last(r) ? `${last(r).taste}: ${last(r).meal?.title ?? ""} · ${new Date(last(r).createdAt).toLocaleDateString()}${last(r).notes ? ` · ${last(r).notes}` : ""}` : "no meals yet"} · active {r.updatedAt ? new Date(r.updatedAt).toLocaleDateString() : "never"}</small>
-        </button>
-      ))}
-      {open && <ClientSheet row={open} coachName={coachName} close={() => setOpen(null)} onSaved={refresh} setError={setError} notify={notify} confirmAi={p.confirmClientAi}
-        cook={cooks.has(open.uid)} setCook={(on) => setCook(open.uid, on).then(() => notify(on ? `${open.name.split(" ")[0]} is a cook: they can send you recipes to publish.` : `${open.name.split(" ")[0]} is no longer a cook.`)).catch((e) => setError(e.message))} />}
+      {rows.map((r) => <ClientRowCard key={r.uid} row={r} today={false} open={() => setOpenId(r.uid)} />)}
     </>
   );
 }
 
-function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirmAi, cook, setCook }: { row: ClientRow; coachName: string; close: () => void; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void; confirmAi?: (uid: string, on: boolean) => Promise<void>; cook?: boolean; setCook?: (on: boolean) => void }) {
-  const [band, setBand] = useState<string>(row.goal?.band ?? "");
-  const [editing, setEditing] = useState(false);
+// The rest of the client's page, under the week (0.2.6): the cook switch, safety, the formula, the goal sheet, the weight
+// trend, the goal history and the shared cards. The goal is set above, in the goal section (CW8).
+export function ClientTail({ row, onSaved, setError, notify, confirmAi, cook, setCook }: { row: ClientRow; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void; confirmAi?: (uid: string, on: boolean) => Promise<void>; cook?: boolean; setCook?: (on: boolean) => void }) {
   const [formula, setFormula] = useState<import("../personal").Formula | null>(row.formula ?? null);
-  const [saving, setSaving] = useState(false);
   const [photos, setPhotos] = useState<Map<string, string>>(new Map());
   // a shared plate's photo comes through our server, which checks that the card is shared with this coach (storage release 1)
   useEffect(() => {
@@ -110,9 +130,7 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirm
   const pdOf = (items: any[]) => density(items.reduce((n, i) => n + (i.food.protein ?? 0) * i.grams / 100, 0), items.reduce((n, i) => n + (i.food.calories ?? 0) * i.grams / 100, 0));
   const kcalOf = (items: any[]) => Math.round(items.reduce((n, i) => n + (i.food.calories ?? 0) * i.grams / 100, 0));
   return (
-    <div className="sheet-backdrop" onClick={close}>
-      <div className="sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="card-top"><span>{row.name}</span><button className="link" onClick={close}>Close</button></div>
+    <div className="client-tail">
         {setCook && (
           <label className="cook-switch">
             <span><b>Cook</b><small>Can send you recipes to publish. You see each one first.</small></span>
@@ -137,51 +155,15 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirm
             </section>
           );
         })()}
-        <div className="client-goal">
-          <div><b>{row.goal?.band ? goalLabel(row.goal.band) : "No goal yet"}</b><small>{row.goal?.band ? pdRange(bandOf(row.goal.band)?.range ?? "") : ""}{row.goal?.setBy === "coach" ? " · set by you" : row.goal ? " · set by them" : ""}</small></div>
-          <button className="pill pill-small" onClick={() => setEditing((v) => !v)}><Target size={14} /> {editing ? "Cancel" : "Change goal"}</button>
-        </div>
         <div className="formula-row">
           <small>Formula</small>
           {([[null, "Automatic"], ["mifflin", "Mifflin–St Jeor"], ["katch", "Katch–McArdle"], ["schofield", "Schofield"]] as const).map(([k, l]) => (
             <button key={l} className={`choice ${(formula ?? null) === k ? "on" : ""}`} onClick={async () => { try { await pinFormula(row.uid, k); setFormula(k); notify(`${row.name}: ${l.toLowerCase()}.`); } catch (e: any) { setError(e.message || "Could not set the formula."); } }}>{l}</button>
           ))}
         </div>
-        {editing && (
-          <>
-            <div className="bands compact">
-              {BANDS.map((b) => (
-                <button key={b.id} className={`band-card ${band === b.id || (b.id === "gain" && isBuild(band)) ? "on" : ""}`} onClick={() => setBand(b.id === "gain" && isBuild(band) ? band : b.id === "gain" ? "gainsteady" : b.id)}>
-                  <b>{b.name}</b><span>{pdRange(b.range)} · {b.kcal[0]}–{b.kcal[1]} kcal · {b.protein[0]}–{b.protein[1]} g</span>
-                </button>
-              ))}
-            </div>
-            {isBuild(band) && (
-              <div className="chip-row" role="group" aria-label="Pace">
-                {PACES.map((x) => <button key={x.id} className={`choice ${band === x.band ? "on" : ""}`} aria-pressed={band === x.band} onClick={() => setBand(x.band)}>{x.name}</button>)}
-              </div>
-            )}
-            <button className="pill pill-primary pill-wide" disabled={!band || saving} onClick={async () => {
-              const b = bandOf(band); if (!b) return;
-              setSaving(true);
-              try { await setClientGoal(row.uid, { band }, goalsForBand(b), coachName); notify(`${row.name}'s goal set to ${goalLabel(b.id)}.`); setEditing(false); onSaved(); }
-              catch (e: any) { setError(e.message || "Could not set the goal."); }
-              finally { setSaving(false); }
-            }}>Set this goal</button>
-          </>
-        )}
         {(() => { const sh = sheetOf(row.goal, { weightKg: row.weightKg, trainingAge: row.trainingAge, coachLabel: "you", ...(row.review?.status === "approved" ? { approvedBy: "you", approvedAt: row.review.at } : {}) }); return sh ? <GoalSheet sheet={sh} /> : null; })()}
         {row.goal?.band && !row.flags.some((f) => f.situation === "eating") && <WeightTrend list={row.weighIns} band={row.goal.band} weightKg={row.weightKg} trainingAge={row.trainingAge} coach />}
         <GoalHistory log={row.goalLog ?? []} />
-        <p className="label">The last days, from shared cards</p>
-        <section className="card days">
-          {[0, 1, 2].map((n) => { const d = dayLog(row.feedback as any, daysAgo(n)); return (
-            <div className="history-row" key={n}>
-              <div><b>{dayLabel(d.day)}</b><small>{d.dayType ? dayNameAny(d.dayType) : "day type unknown"}</small></div>
-              <div className="history-num"><small>{loggedLine(d, n === 0).replace("logged", "shared")}</small></div>
-            </div>
-          ); })}
-        </section>
         <p className="label">Shared with you ({row.feedback.length})</p>
         {row.feedback.length === 0 && <small>Nothing yet.</small>}
         {row.feedback.slice(0, 30).map((f: any) => {
@@ -205,7 +187,6 @@ function ClientSheet({ row, coachName, close, onSaved, setError, notify, confirm
             </section>
           );
         })}
-      </div>
     </div>
   );
 }

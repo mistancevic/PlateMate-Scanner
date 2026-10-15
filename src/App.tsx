@@ -49,12 +49,17 @@ import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isO
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { BuiltScreen } from "./screens/BuiltScreen";
 import { PilotGate } from "./screens/PilotGate";
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveOwnNotes, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalLabel, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
-import { setTodayChange, dayOfLoad, ymd, type PlanDay } from "./plan";
+import { setTodayChange, dayOfLoad, ymd, planLine as planLineOf, type PlanDay } from "./plan";
+import { slotsOf } from "./slots";
+import { dayLog } from "./today";
+import { dayLineOf, type DayLine } from "./dayLines";
+import { coachDemoOn } from "./coachDemo";
+import { getCoachLocal, setCoachLocal, notesOf, checkinOf, type CoachLocal, type CoachNote } from "./coachNotes";
 import { getPlanned, storePlanned, withPlanned, type Planned, type PlannedMeal } from "./planned";
 import type { Filling } from "./screens/api";
-import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, withTarget, type Personal, type DayType, type Day, type NextGoal } from "./personal";
+import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, withTarget, lifestyleOf, dayFor, type Personal, type DayType, type Day, type NextGoal } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
@@ -730,7 +735,7 @@ export default function App() {
     [localOnly, setLocalOnly] = useState<boolean>(() => localStorage.getItem("chefmealan-local-only") === "1"),
     cloudLoaded = useRef(false),
     [cloudStatus, setCloudStatus] = useState<{ ok: boolean; text: string; at?: string }>({ ok: true, text: "" }),
-    [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string; coachPhoto?: string; joinedAt?: string; coachSetAt?: string; formula?: import("./personal").Formula | null }>({}),
+    [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string; coachPhoto?: string; joinedAt?: string; coachSetAt?: string; formula?: import("./personal").Formula | null }>(() => (coachDemoOn() ? { role: "coach" } : {})),
     // the log is kept collapsed from 0.2.5+r20 (board FX, G3): the first open cleans the old one
     [goalLog, setGoalLogState] = useState<GoalEntry[]>(() => { setGoalLog(getGoalLog()); return getGoalLog(); }),
     nextSource = useRef<GoalSource | null>(null),
@@ -745,6 +750,8 @@ export default function App() {
     [safety, setSafetyState] = useState<Safety>(getSafety),
     [deleteSteps, setDeleteSteps] = useState(""),
     [day, setDayState] = useState<Day>(() => getDay()),
+    // the coach's notes and the check-in day (0.2.6, board CW), kept on the phone and read from the account
+    [coachThread, setCoachThread] = useState<CoachLocal>(getCoachLocal),
     // the pages of the top menu walked so far, each a step Back goes back over (M6); a reload on /me/profile opens Me, then Profile
     [menuTrail, setMenuTrail] = useState<MenuSection[]>(() => (typeof location !== "undefined" ? (menuTrailOf(location.pathname) as MenuSection[]) : [])),
     [backReady, setBackReady] = useState(false),
@@ -1042,6 +1049,7 @@ export default function App() {
         if (remote) setReview(((remote as any).numbersReview as NumbersReview | undefined) ?? null);
         remoteMeta.current = { photosMovedAt: remote?.photosMovedAt, photosOldGoneAt: remote?.photosOldGoneAt, recordsMovedAt: remote?.recordsMovedAt };
         if (remote) setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
+        if (remote) takeCoach(remote);
         if (remote && Array.isArray(remote.goalLog)) { const merged = [...new Map([...(remote.goalLog as GoalEntry[]), ...getGoalLog()].map((e) => [e.at, e])).values()].sort((x, y) => (x.at > y.at ? 1 : -1)); setGoalLog(merged); setGoalLogState(merged); }
         // foods that left the library on any device stay gone
         const gone = new Set([...getGone(), ...(Array.isArray(remote?.goneFoods) ? (remote!.goneFoods as string[]) : [])]);
@@ -1052,7 +1060,7 @@ export default function App() {
         if (phoneIsNewer) {
           const kept = { ...state, foods: state.foods.filter((f) => !gone.has(f.id)) };
           if (kept.foods.length !== state.foods.length) setState(kept);
-          await saveCloud(user.uid, { ...blockOf(kept), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], updatedAt: new Date().toISOString() });
+          await saveCloud(user.uid, { ...blockOf(kept), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], days: daysOut(), updatedAt: new Date().toISOString() });
           setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() });
         } else if (remote && !(isEmptyState(remote.state) && !isEmptyState(state))) {
           // a real account copy replaces the phone; photos are merged back from the phone by id
@@ -1090,7 +1098,7 @@ export default function App() {
           }
           setCloudStatus({ ok: true, text: "Loaded from your account", at: new Date().toISOString() });
         } else {
-          await saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), updatedAt: new Date().toISOString() });
+          await saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), updatedAt: new Date().toISOString() });
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
         }
       } catch (e: any) {
@@ -1201,7 +1209,8 @@ export default function App() {
         const remote = await loadCloud(user.uid);
         if (!remote) return;
         setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
-        if (remote.coachSetAt && remote.coachSetAt !== profile.coachSetAt && remote.goal) {
+        takeCoach(remote);
+        if (remote.coachSetAt && remote.coachSetAt !== profile.coachSetAt && remote.goal && !remote.coachGoal) {
           try { localStorage.setItem("chefmealan-goal", JSON.stringify(remote.goal)); } catch {}
           setGoalState(getGoal());
           const g = (remote.state as any)?.goals;
@@ -1230,6 +1239,41 @@ export default function App() {
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.goals.calories, state.goals.protein, goal?.band, goal?.source]);
+  // The coach's week (0.2.6, board CW): the day lines that go to the account with each save, five weeks back and one ahead.
+  // Planned against eaten, against each day's own target. Days with nothing planned or eaten stay out.
+  function daysOut(): Record<string, DayLine> {
+    const out: Record<string, DayLine> = {}, today = ymd(new Date()), slots = slotsOf(lifestyleOf(personal));
+    for (let i = -35; i <= 7; i++) {
+      const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + i);
+      const key = ymd(d), held = planned[key];
+      const logged = i > 0 ? [] : dayLog(state.feedback, d).logged;
+      if (!(held && Object.keys(held).length) && !logged.length) continue;
+      const t = numbersOfDate(d), pd = dayFor(personal, d)?.day;
+      const training = pd && pd.kind !== "rest" ? `${planLineOf({ ...pd, when: undefined, pe: false }).toLowerCase()}${pd.minutes ? `, ${pd.minutes} min` : ""}` : null;
+      out[key] = dayLineOf({ date: key, today, slots, held, logged, target: t ? { kcal: t.kcal, protein: t.protein } : null, training });
+    }
+    return out;
+  }
+  // From the account (0.2.6, board CW): the coach's notes and check-in day, and a goal the coach set from a later date.
+  // A goal from a date waits on Goal (CW9); one from today applies now. Each is taken once.
+  function takeCoach(remote: any) {
+    const c: CoachLocal = { notes: notesOf(remote.coachNotes), checkinDay: checkinOf(remote.checkinDay) };
+    setCoachLocal(c); setCoachThread(c);
+    const cg = remote.coachGoal;
+    if (!cg || typeof cg.at !== "string" || !cg.band) return;
+    let seen = ""; try { seen = localStorage.getItem("chefmealan-coachgoal-at") ?? ""; } catch {}
+    if (seen === cg.at) return;
+    try { localStorage.setItem("chefmealan-coachgoal-at", cg.at); } catch {}
+    const m = macroSplit(cg.kcal, cg.protein);
+    const x = { band: cg.band, source: "coach" as const, setBy: "coach" as const, kcal: cg.kcal, protein: cg.protein, fats: m.fats, carbs: m.carbs };
+    if (cg.from > ymd(new Date())) { const next: Personal = { ...getPersonal(), nextGoal: { ...x, from: cg.from, at: cg.at } }; storePersonal(next); setPersonalState(next); notify(`${remote.coachName || "Your coach"} set your next goal, from ${new Date(`${cg.from}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}.`); }
+    else { applyGoalNow(x); notify(`${remote.coachName || "Your coach"} set your goal.`); }
+  }
+  // Got it and Reply on the coach's note (CW5): on this phone at once, then in the account
+  function saveNotes(notes: CoachNote[]) {
+    const c = { ...coachThread, notes }; setCoachLocal(c); setCoachThread(c);
+    if (user && cloudEnabled) void saveOwnNotes(user.uid, notes).catch(() => notify("Not saved to your account yet. It stays on this phone."));
+  }
   // the goal and profile as they are now, for numbersOfDay when it is given another goal (board FX)
   const goalNow = goal, personalNow = personal;
   // each day keeps its own target (board FX): today's is written with the day, so a later goal never changes it
@@ -1256,7 +1300,7 @@ export default function App() {
   // apply a goal now: the goal, its numbers and the formula picked in the calculator; a waiting goal that starts now goes
   function applyGoalNow(x: Omit<NextGoal, "from" | "at">) {
     nextSource.current = x.source;
-    saveGoal({ band: x.band, setBy: x.setBy, setAt: new Date().toISOString(), source: x.source, method: x.method });
+    saveGoal({ band: x.band, setBy: x.setBy, setAt: new Date().toISOString(), source: x.source, method: x.method, ...(x.setBy === "coach" ? { coachName: profile.coachName } : {}) });
     setGoalState(getGoal());
     setState((s) => ({ ...s, goals: { ...s.goals, calories: x.kcal, protein: x.protein, fats: x.fats, carbs: x.carbs } }));
     const cur = getPersonal();
@@ -1291,7 +1335,7 @@ export default function App() {
   useEffect(() => {
     if (!user || !cloudLoaded.current) return;
     const t = setTimeout(() => {
-      saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), updatedAt: new Date().toISOString() })
+      saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), updatedAt: new Date().toISOString() })
         .then(async () => {
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
           // foods, recipes and cards: only the records that changed (storage release 2)
@@ -1302,7 +1346,7 @@ export default function App() {
         .catch((e) => setCloudStatus({ ok: false, text: `Not saved: ${explainCloudError(e)}` }));
     }, 1000);
     return () => clearTimeout(t);
-  }, [state, goal, clientName, personal, goalLog, safety, user]);
+  }, [state, goal, clientName, personal, goalLog, safety, user, planned]);
   async function api(url: string, body?: unknown) {
     const res = await fetch(url, {
       method: body === undefined ? "GET" : "POST",
@@ -1875,6 +1919,9 @@ export default function App() {
     // today's four: protein and fat stay, the carbs take the day's difference
     todayMacros: todayNumbers(),
     numbersFor: (date: Date) => numbersOfDate(date),
+    coachNotes: coachThread.notes, checkinDay: coachThread.checkinDay,
+    gotNote: (at: string) => saveNotes(coachThread.notes.map((n) => (n.at === at ? { ...n, readAt: new Date().toISOString() } : n))),
+    replyToCoach: (text: string, read?: string) => saveNotes([...coachThread.notes.map((n) => (n.at === read ? { ...n, readAt: new Date().toISOString() } : n)), { at: new Date().toISOString(), by: "client", text }]),
     applyGoal: (x: Omit<NextGoal, "from" | "at">, from: string) => {
       if (from <= ymd(new Date())) { applyGoalNow(x); return; }
       const next: Personal = { ...getPersonal(), nextGoal: { ...x, from, at: new Date().toISOString() } };

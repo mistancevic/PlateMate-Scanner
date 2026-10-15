@@ -113,7 +113,8 @@ export function PlanScreen(p: AppApi) {
                 <div className="menu-row-text">
                   <small>{r.slot.name}</small>
                   {m ? <b>{m.title}</b> : <b className="plan-pick">Pick a meal</b>}
-                  {m && fit && <small className="plan-slot-sub">{SOURCE[m.source]} · {fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</small>}
+                  {m?.skipped && <small className="plan-slot-sub skipped-mark">Skipped on purpose</small>}
+                  {m && fit && !m.skipped && <small className="plan-slot-sub">{SOURCE[m.source]} · {fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</small>}
                 </div>
                 <ChevronRight size={18} />
               </button>

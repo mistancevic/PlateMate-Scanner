@@ -4,7 +4,9 @@ import { aggregate, density, type Ingredient, type Meal } from "./pilot";
 import type { Slot } from "./slots";
 
 export type Source = "mine" | "coach" | "starter" | "plate";
-export type PlannedMeal = { title: string; kcal: number; protein: number; source: Source; mealId?: string; items?: Ingredient[]; portion?: number };
+export type PlannedMeal = { title: string; kcal: number; protein: number; source: Source; mealId?: string; items?: Ingredient[]; portion?: number;
+  // 0.2.6 (canvas board CW, CW7): skipped on purpose; the meal counts as closed for a day lived by the plan
+  skipped?: boolean };
 export type Planned = Record<string, Record<string, PlannedMeal>>; // by date (ymd), then by slot id
 
 const KEY = "chefmealan-planned";

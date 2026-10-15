@@ -10,7 +10,8 @@ export type DayRecord = {
   planned: number;             // slots that hold a meal
   eaten: Feedback[];           // cards eaten for a slot of this day
   extras: Feedback[];          // cards eaten without a slot
-  open: Slot[];                // slots still to come: planned and not eaten
+  open: Slot[];                // slots still to come: planned, not eaten, not skipped
+  skipped: Slot[];             // planned and skipped on purpose (0.2.6, canvas board CW, CW7): closed, not open
   empty: Slot[];               // slots with nothing planned
   byPlan: number;
   kcal: number; protein: number; pd: number | null;
@@ -23,11 +24,12 @@ export function dayRecord(slots: Slot[], held: Record<string, PlannedMeal> | und
   const eaten = logged.filter((f) => f.status === "eaten" && f.slot?.date === date);
   const extras = logged.filter((f) => f.status === "eaten" && !f.slot);
   const eatenIds = new Set(eaten.map((f) => f.slot!.slotId));
-  const open = slots.filter((s) => held?.[s.id] && !eatenIds.has(s.id));
+  const open = slots.filter((s) => held?.[s.id] && !held[s.id].skipped && !eatenIds.has(s.id));
+  const skipped = slots.filter((s) => held?.[s.id]?.skipped && !eatenIds.has(s.id));
   const empty = slots.filter((s) => !held?.[s.id] && !eatenIds.has(s.id));
   const planned = slots.filter((s) => held?.[s.id] || eatenIds.has(s.id)).length;
   const n = numsOf([...eaten, ...extras]);
-  return { slots, planned, eaten, extras, open, empty, byPlan: eaten.length, kcal: n.kcal, protein: n.protein, pd: density(n.protein, n.kcal), done: planned > 0 && open.length === 0 };
+  return { slots, planned, eaten, extras, open, skipped, empty, byPlan: eaten.length, kcal: n.kcal, protein: n.protein, pd: density(n.protein, n.kcal), done: planned > 0 && open.length === 0 };
 }
 
 // "1 of 3 by the plan so far, 1 extra · 1,420 of 2,200 kcal"

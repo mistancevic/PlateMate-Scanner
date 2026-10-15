@@ -1,4 +1,5 @@
 // Sign in with Google and keep each person's data under their own account. Off entirely when not configured.
+import { notesOf, checkinOf } from "./coachNotes";
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, reauthenticateWithPopup, type User } from "firebase/auth";
 import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, type Firestore } from "firebase/firestore";
@@ -51,7 +52,7 @@ export const signOutCloud = () => signOut(auth());
 
 // One document per person: the pilot state plus goal and name, and who coaches them.
 // role is set by hand in the Firebase console ("coach"); nobody can sign up as a coach.
-export type CloudDoc = { photosMovedAt?: string; photosOldGoneAt?: string; recordsMovedAt?: string; recordsOnly?: boolean; foodsCount?: number; state: unknown; goal: unknown; clientName: string; updatedAt: string; goneFoods?: string[]; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: import("./personal").Formula | null; role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string | null; coachPhoto?: string | null; joinedAt?: string | null; coachSetAt?: string };
+export type CloudDoc = { days?: unknown; coachNotes?: unknown; checkinDay?: number; coachGoal?: unknown; photosMovedAt?: string; photosOldGoneAt?: string; recordsMovedAt?: string; recordsOnly?: boolean; foodsCount?: number; state: unknown; goal: unknown; clientName: string; updatedAt: string; goneFoods?: string[]; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: import("./personal").Formula | null; role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string | null; coachPhoto?: string | null; joinedAt?: string | null; coachSetAt?: string };
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const snap = await getDoc(doc(db(), "users", uid));
   return snap.exists() ? (snap.data() as CloudDoc) : null;
@@ -84,7 +85,7 @@ export async function joinCoach(_uid: string, code: string) {
 export async function leaveCoach(uid: string) {
   await updateDoc(doc(db(), "users", uid), { coachId: null, coachName: null, coachEmail: null, coachPhoto: null, joinedAt: null });
 }
-export type ClientRow = { uid: string; name: string; review: NumbersReview | null; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: import("./personal").Formula | null; pdUnit: "pd" | "pct"; flags: { situation: string; at: string }[]; birthYear: number | null; aiConfirmedAt: string | null; consentBy: string | null; weightKg?: number; trainingAge?: any; weighIns?: any[] };
+export type ClientRow = { days: Record<string, import("./dayLines").DayLine>; notes: import("./coachNotes").CoachNote[]; checkinDay: number; nextGoal: import("./personal").NextGoal | null; coachGoal: any; goalsNow: { calories?: number | null; protein?: number | null } | null; uid: string; name: string; review: NumbersReview | null; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: import("./personal").Formula | null; pdUnit: "pd" | "pct"; flags: { situation: string; at: string }[]; birthYear: number | null; aiConfirmedAt: string | null; consentBy: string | null; weightKg?: number; trainingAge?: any; weighIns?: any[] };
 export async function pinFormula(clientUid: string, formula: import("./personal").Formula | null) { await updateDoc(doc(db(), "users", clientUid), { formula }); }
 export async function listClients(coachUid: string): Promise<ClientRow[]> {
   const q = query(collection(db(), "users"), where("coachId", "==", coachUid));
@@ -95,7 +96,7 @@ export async function listClients(coachUid: string): Promise<ClientRow[]> {
     try { feedback = await loadSharedCards(d.id); } catch { /* none shared or not allowed */ }
     // the coach sees situation and date only, never the person's words
     const flags = Array.isArray(x.safety?.flags) ? x.safety.flags.map((f: any) => ({ situation: String(f.situation), at: String(f.at ?? "").slice(0, 10) })) : [];
-    return { uid: d.id, name: x.clientName || "unnamed", review: x.numbersReview ?? null, goal: x.goal ?? null, feedback, foods: typeof x.foodsCount === "number" ? x.foodsCount : x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: x.personal?.pdUnit ?? "pd", flags, birthYear: x.personal?.birthYear ?? null, aiConfirmedAt: x.aiConfirmedAt ?? null, consentBy: x.safety?.consentBy ?? null, weightKg: x.personal?.weightKg, trainingAge: x.personal?.trainingAge, weighIns: Array.isArray(x.personal?.weighIns) ? x.personal.weighIns : [] };
+    return { days: x.days && typeof x.days === "object" ? x.days : {}, notes: notesOf(x.coachNotes), checkinDay: checkinOf(x.checkinDay), nextGoal: x.personal?.nextGoal ?? null, coachGoal: x.coachGoal ?? null, goalsNow: x.state?.goals ?? null, uid: d.id, name: x.clientName || "unnamed", review: x.numbersReview ?? null, goal: x.goal ?? null, feedback, foods: typeof x.foodsCount === "number" ? x.foodsCount : x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: x.personal?.pdUnit ?? "pd", flags, birthYear: x.personal?.birthYear ?? null, aiConfirmedAt: x.aiConfirmedAt ?? null, consentBy: x.safety?.consentBy ?? null, weightKg: x.personal?.weightKg, trainingAge: x.personal?.trainingAge, weighIns: Array.isArray(x.personal?.weighIns) ? x.personal.weighIns : [] };
   }));
   return rows.sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1));
 }
@@ -109,11 +110,21 @@ export async function closeReview(uid: string) { await setDoc(doc(db(), "users",
 export async function answerReview(clientUid: string, status: "approved" | "change", note: string, coachName: string, prev: NumbersReview) {
   await updateDoc(doc(db(), "users", clientUid), { numbersReview: { ...prev, status, note: note.trim() || null, by: coachName, at: new Date().toISOString() } });
 }
+// 0.2.6 (canvas board CW): the coach's note, the check-in day, and a goal from a later date, written on the client's account
+export async function sendCoachNote(clientUid: string, notes: import("./coachNotes").CoachNote[]) { await updateDoc(doc(db(), "users", clientUid), { coachNotes: notes }); }
+export async function setCheckinDay(clientUid: string, day: number) { await updateDoc(doc(db(), "users", clientUid), { checkinDay: day }); }
+export async function setClientGoalFrom(clientUid: string, coachGoal: { band: string; kcal: number; protein: number; from: string; by: string }) {
+  await updateDoc(doc(db(), "users", clientUid), { coachGoal: { ...coachGoal, at: new Date().toISOString() }, coachSetAt: new Date().toISOString() });
+}
+// the client's own answer on the thread: Got it and Reply
+export async function saveOwnNotes(uid: string, notes: import("./coachNotes").CoachNote[]) { await updateDoc(doc(db(), "users", uid), { coachNotes: notes }); }
 export async function setClientGoal(clientUid: string, goal: any, goals: { calories: number; protein: number }, coachName: string) {
   await updateDoc(doc(db(), "users", clientUid), {
     goal: { ...goal, setBy: "coach", coachName, setAt: new Date().toISOString(), source: "coach" },
     "state.goals.calories": goals.calories, "state.goals.protein": goals.protein,
     coachSetAt: new Date().toISOString(),
+    // a goal from today replaces one waiting for a later date (0.2.6)
+    coachGoal: null,
   });
 }
 // Plain words for the two failures people will actually hit.

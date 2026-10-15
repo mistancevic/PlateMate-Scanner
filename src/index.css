@@ -1354,3 +1354,54 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .formula-line { margin-bottom: 10px; }
 .apply-from { display: flex; flex-direction: column; gap: 8px; margin: 12px 0 8px; }
 .apply-from input[type=date] { font: inherit; font-size: 15px; font-weight: 700; border: 1.5px solid var(--line); border-radius: 14px; padding: 8px 12px; background: var(--surface); color: var(--ink); align-self: flex-start; }
+
+/* Skip a meal on purpose (canvas board CW, CW7, 0.2.6) */
+.plan-slot-row { cursor: pointer; }
+.plan-slot-main { flex: 1; min-width: 0; display: flex; background: none; border: 0; padding: 0; font: inherit; text-align: left; color: inherit; cursor: pointer; }
+.plan-skip { font-size: 13px; font-weight: 800; padding: 6px 8px; flex: none; }
+.plan-slot-skipped { cursor: default; background: #f6f8fc; }
+.plan-slot-skipped .menu-row-text b { color: var(--muted); text-decoration: line-through; }
+.skipped-mark { color: var(--ink) !important; font-weight: 800 !important; }
+
+/* The coach's week (canvas board CW, 0.2.6) */
+.cw-row { display: flex; flex-direction: column; gap: 8px; text-align: left; width: 100%; }
+.cw-row.cw-today { border: 1.5px solid var(--brand); }
+.cw-bars-row { display: flex; justify-content: space-between; align-items: center; width: 100%; gap: 8px; }
+.cw-bars { display: flex; gap: 4px; }
+.cw-bar { width: 22px; height: 8px; border-radius: 4px; background: #dbe3f1; display: block; }
+.cw-bar.lived { background: var(--high); } .cw-bar.changed { background: var(--mid); } .cw-bar.open { background: var(--surface); border: 1.5px solid var(--brand); box-sizing: border-box; }
+.cw-lived { font-weight: 800; color: var(--top); } .cw-muted { font-weight: 800; color: var(--muted); }
+.cw-green { color: var(--top); } .cw-amber { color: #b36b00; } .cw-grey { color: var(--muted); } .cw-ink { color: var(--ink); }
+.cw-back { margin-bottom: 4px; }
+.cw-person { display: flex; gap: 10px; align-items: center; padding: 12px 14px; }
+.cw-person > div { display: flex; flex-direction: column; } .cw-person small { color: var(--muted); font-weight: 600; }
+.cw-week { padding: 12px 14px; }
+.cw-week-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; } .cw-week-nav b { font-size: 14px; }
+.cw-week-head { display: flex; justify-content: space-between; align-items: baseline; margin: 6px 0 2px; } .cw-week-head b { font-size: 15px; } .cw-week-head small { font-size: 12.5px; }
+.cw-day { display: grid; grid-template-columns: 38px 1fr auto; gap: 8px; align-items: center; padding: 10px 0; border: 0; border-top: 1px solid var(--line); background: none; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; }
+.cw-day:disabled { cursor: default; }
+.cw-day-name { font-weight: 800; color: var(--ink); }
+.cw-day-mid { display: flex; flex-direction: column; gap: 1px; } .cw-day-mid b { font-size: 14px; } .cw-day-mid small { color: var(--muted); font-weight: 600; font-size: 12.5px; line-height: 1.35; }
+.cw-day-num { display: flex; flex-direction: column; align-items: flex-end; } .cw-day-num b { font-size: 17px; } .cw-day-num small { color: var(--muted); font-weight: 700; font-size: 11.5px; }
+.cw-week-foot { display: block; color: var(--muted); font-weight: 600; padding-top: 8px; border-top: 1px solid var(--line); }
+.cw-day-sheet { padding: 16px 0 18px; max-height: 80dvh; } .cw-day-sheet .card-top { padding: 0 18px; } .cw-day-sheet .past-nums { margin: 8px 14px 10px; }
+.cw-slot { padding: 10px 14px; border-top: 1px solid var(--line); display: grid; grid-template-columns: 44px 1fr; gap: 8px; }
+.cw-slot > span { display: flex; flex-direction: column; gap: 2px; } .cw-slot-time { font-weight: 800; color: var(--muted); } .cw-slot small { font-weight: 700; } .cw-slot > span > small:first-child { color: var(--muted); } .cw-slot b { font-size: 15px; }
+.cw-shared { color: var(--ink) !important; font-weight: 600 !important; font-style: italic; }
+.cw-extras { display: block; padding: 10px 14px 0; border-top: 1px solid var(--line); color: var(--muted); font-weight: 600; }
+.cw-mini { padding: 12px 14px; display: flex; flex-direction: column; gap: 3px; } .cw-mini > div { display: flex; justify-content: space-between; } .cw-mini > div small { font-weight: 800; color: var(--muted); } .cw-mini b { font-size: 15px; }
+.cw-mini-line { color: var(--muted); font-weight: 600; } .cw-mini-strong { font-weight: 700; }
+.cw-note { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; } .cw-note > b { font-size: 15px; }
+.cw-note textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 14px; border: 1.5px solid var(--line); border-radius: 14px; padding: 10px 12px; resize: none; }
+.cw-checkin { padding: 12px 14px; }
+.cw-next { color: var(--brand-text) !important; font-weight: 800 !important; }
+.cw-goal { padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; } .cw-goal > b { font-size: 15px; }
+.cw-goal .bands.compact { display: grid; gap: 8px; }
+.cw-goal .band-card.on { border-color: var(--brand); background: #e6efff; }
+.client-tail { margin-top: 18px; }
+
+/* the coach's note on Today (canvas board CW, CW5) */
+.coach-week-note { border-color: var(--brand); }
+.coach-note-text { font-size: 14px; line-height: 1.45; color: var(--ink); }
+.coach-checkin span { display: flex; flex-direction: column; } .coach-checkin small { color: var(--muted); font-weight: 600; }
+.cw-bars-row small { white-space: nowrap; font-size: 12.5px; }
