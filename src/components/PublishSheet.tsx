@@ -154,7 +154,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
       // the page gets the steps as they read, with the amounts written in (R13c)
       steps: steps.split("\n").map((x) => stepText(x, meal.items)).filter(Boolean).slice(0, 30), rating, who: "everyone",
       per100: nums.per100, perServing: nums.perServing, all: nums.all, pd: nums.pd, proteinShare: nums.proteinShare, fits: fitsOf(nums.pd),
-      hasPhoto: photos.length > 0, photoAi: chosenAi, author, publishedAt: published?.publishedAt ?? now, updatedAt: now, mealId: meal.id,
+      hasPhoto: photos.length > 0, photoAi: chosenAi, ...(meal.source?.name ? { adaptedFrom: meal.source.name.slice(0, 80) } : {}), author, publishedAt: published?.publishedAt ?? now, updatedAt: now, mealId: meal.id,
     };
   };
   const photoNow = async () => (photos[photoAt] ? await resizeImageBase64(photos[photoAt], 1080, 1080).catch(() => photos[photoAt]) : null);

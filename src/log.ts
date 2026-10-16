@@ -29,7 +29,10 @@ export type LogEvent =
   | "label_read"     // an AI label read saved: data.kept = saved without a change
   // covers and Members (0.2.15, Milan 16 October 2026, 19:23): the numbers that decide drawn or realistic, later
   | "cover"          // data.how = drawn (Chef Mealan drew a cover) | real (a real photo replaced a drawn cover)
-  | "members";       // data.how = open | make | keep | share
+  | "members"        // data.how = open | make | keep | share
+  // a recipe from a screenshot or a link (0.2.16, board IM)
+  | "recipe_in"      // data.how = shot | link, data.result = read | plate | login | fetch | no-recipe | not-recipe
+  | "recipe_fit";    // data.way = change | side, data.result = shown | failed | yes | ok | no
 const KEY = "chefmealan-log";
 export function log(event: LogEvent, data: Record<string, unknown> = {}) {
   try {

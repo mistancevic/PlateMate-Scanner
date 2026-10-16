@@ -1513,3 +1513,37 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .try-photo { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; border: 1.5px dashed var(--line); }
 .try-shot { margin: 0; display: flex; flex-direction: column; gap: 6px; } .try-shot img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; display: block; }
 .try-shot figcaption { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; } .try-shot figcaption small { font-weight: 800; }
+
+/* A recipe from a screenshot or a link (0.2.16, canvas board IM) */
+.plate-card .card-top { align-items: center; }
+.plate-card .plate-empty-link { display: inline-flex; align-items: center; gap: 4px; color: var(--low); font-size: 13px; font-weight: 700; padding: 2px 4px; }
+.plate-card .ways-label { display: block; color: var(--muted); font-weight: 700; font-size: 12.5px; margin: 2px 0 -4px; }
+.in-card .card-top span { color: var(--ink); }
+.in-thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
+.in-thumb { position: relative; width: 78px; height: 140px; border-radius: 10px; overflow: hidden; border: 1.5px solid var(--line); background: var(--tint); display: flex; align-items: center; justify-content: center; padding: 0; flex: none; }
+.in-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.in-thumb small { position: absolute; left: 6px; bottom: 6px; background: rgba(23,39,66,.75); color: #fff; border-radius: 6px; padding: 0 6px; font-weight: 800; font-size: 11px; }
+.in-thumb.big { width: 100%; height: auto; } .in-thumb.big img { height: auto; object-fit: contain; }
+.in-thumb-x { position: absolute; right: 4px; top: 4px; width: 24px; height: 24px; border-radius: 12px; background: rgba(23,39,66,.75); color: #fff; display: flex; align-items: center; justify-content: center; padding: 0; border: 0; }
+.in-add { cursor: pointer; color: var(--brand-text); font-weight: 800; font-size: 13px; border-style: dashed; }
+.in-add input { display: none; }
+.in-makes { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.in-strong { font-weight: 700; color: var(--ink); }
+.in-stepper { display: inline-flex; align-items: center; border: 1.5px solid var(--line); border-radius: 10px; }
+.in-stepper button { background: none; border: 0; padding: 2px 10px; font-size: 16px; font-weight: 800; color: var(--brand-text); cursor: pointer; }
+.in-tag { background: #fff1c2; color: #6b4e00; border-radius: 6px; padding: 0 5px; font-weight: 700; }
+.link.in-inline { display: inline; padding: 0; font-size: inherit; }
+.in-note { background: #fff8d6; color: #5c4800; border-radius: 8px; padding: 6px 8px; font-weight: 600; }
+.in-portion, .in-way { display: flex; flex-direction: column; gap: 6px; }
+.in-portion .moments, .in-way .moments { margin: 0; }
+.in-way small { line-height: 1.45; }
+.in-cooked { align-self: flex-start; background: #eef2f8; color: var(--ink); border-radius: 6px; padding: 1px 7px; font-size: 12px; font-weight: 700; }
+.in-ways { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.in-ways .ways .pill-small { flex: 1; justify-content: center; height: 44px; }
+.plate-card .ways label.pill { cursor: pointer; }
+.rq-source { display: flex; flex-direction: column; gap: 8px; }
+.rq-source a { color: var(--brand-text); word-break: break-all; }
+.plate-card .ways label.pill, .in-thumbs label.in-thumb { margin: 0; }
+.plate-card .ways label.pill { display: inline-flex; align-items: center; gap: 6px; }
+.ways-out.ways-out-col { flex-direction: column; align-items: stretch; }
+.ways-out.ways-out-col > .pill-wide { width: 100%; flex: none; }

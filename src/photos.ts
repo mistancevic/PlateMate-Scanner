@@ -34,6 +34,8 @@ export function photosOf(state: any): Map<string, string> {
   (state?.feedback ?? []).forEach(rec("fb"));
   // a recipe's own photos: the cover as the first, the others as the copies
   (state?.meals ?? []).forEach(rec("meal"));
+  // a recipe's screenshots (0.2.16, board IM, IM6): the cook's own reference, src:<recipeId>:<n>, never a cover
+  (state?.meals ?? []).forEach((m: any) => { if (m?.id && Array.isArray(m.shots)) m.shots.forEach((x: unknown, n: number) => { if (isData(x)) out.set(`src:${m.id}:${n + 1}`, x); }); });
   const lib = libraryIds(state);
   copiesOf(state).filter((f) => !lib.has(f.id)).forEach(food);
   return out;
@@ -68,6 +70,11 @@ export function photosWanted(state: any): Map<string, string> {
     const want: string[] | undefined = Array.isArray(m?.photoSigs) ? m.photoSigs : undefined;
     if (!m?.id || !want || loaded(m)) continue;
     want.forEach((s, n) => { if (s) out.set(n === 0 ? `meal:${m.id}` : `meal:${m.id}:${n}`, s); });
+  }
+  for (const m of state?.meals ?? []) {
+    const want: string[] | undefined = Array.isArray(m?.source?.shotSigs) ? m.source.shotSigs : undefined;
+    if (!m?.id || !want || Array.isArray(m.shots)) continue;
+    want.forEach((s, n) => { if (s) out.set(`src:${m.id}:${n + 1}`, s); });
   }
   return out;
 }
@@ -105,7 +112,17 @@ export function withPhotos<T>(state: T, photos: Map<string, string>, accept?: Se
     changed = true;
     return { ...f, photo: thumb, photos: more };
   };
-  const food = rec("food"), card = rec("fb"), recipe = rec("meal");
+  const food = rec("food"), card = rec("fb"), recipe0 = rec("meal");
+  // screenshots come back only as a whole set, each the right one
+  const recipe = (m: any) => {
+    const r = recipe0(m);
+    const want: string[] | undefined = Array.isArray(m?.source?.shotSigs) ? m.source.shotSigs : undefined;
+    if (!m?.id || !want || !want.length || Array.isArray(m.shots)) return r;
+    const got: string[] = [];
+    for (let n = 0; n < want.length; n++) { const x = photos.get(`src:${m.id}:${n + 1}`); if (!x || !(accept?.has(`src:${m.id}:${n + 1}`) || sig(x) === want[n])) return r; got.push(x); }
+    changed = true;
+    return { ...r, shots: got };
+  };
   const inItems = (items: any[] | undefined) => (items ?? []).map((i: any) => (i?.food ? { ...i, food: food(i.food) } : i));
   const next = {
     ...s,
@@ -155,6 +172,13 @@ export function withoutStored<T>(state: T, stored: Set<string>): T {
     m.photoSigs = photoSigsOf(m);
     delete m.photo; delete m.photos;
   });
+  (s.meals ?? []).forEach((m: any) => {
+    if (!m || !m.id || !Array.isArray(m.shots) || !m.source) return;
+    const keys = (m.shots as string[]).map((_, n) => `src:${m.id}:${n + 1}`);
+    if (!keys.every((k) => stored.has(k))) return;
+    m.source.shotSigs = (m.shots as string[]).map((x) => (isData(x) ? sig(x) : ""));
+    delete m.shots;
+  });
   return s;
 }
 
@@ -174,6 +198,13 @@ export function isOrphan(key: string, state: any): boolean {
     if (!m) return true;
     if (!Array.isArray(m.photos)) return false;
     return n ? m.photos.length < Number(n) : !isData(m.photo);
+  }
+  // a recipe's screenshot: gone with the recipe, or past the end of its list
+  if (kind === "src") {
+    const m = (state?.meals ?? []).find((x: any) => x?.id === id);
+    if (!m) return true;
+    if (!Array.isArray(m.shots)) return !Array.isArray(m.source?.shotSigs);
+    return m.shots.length < Number(n);
   }
   if (kind === "fb") {
     const fb = (state?.feedback ?? []).find((f: any) => f?.id === id);

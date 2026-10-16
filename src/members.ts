@@ -9,7 +9,7 @@ import { blockedByAllergy } from "./safety";
 export type SharedFood = Pick<Food, "name" | "brand" | "calories" | "protein" | "fats" | "carbs" | "fiber" | "readyToEat"> & { icon?: string; serving?: Food["serving"] };
 export type SharedItem = { id: string; grams: number; food: SharedFood };
 export type SharedRecipe = {
-  id: string; title: string; items: SharedItem[]; steps: string[]; kitchen: string | null;
+  id: string; title: string; items: SharedItem[]; steps: string[]; kitchen: string | null; source?: string;
   name: string; cover: string | null; coverKind: "drawn" | "photo"; sharedAt: string; updatedAt: string; made: number; mine?: boolean;
 };
 
@@ -33,7 +33,9 @@ export function cleanShared(r: any): Omit<SharedRecipe, "id" | "name" | "cover" 
   if (!title || !items.length) return null;
   const steps = (Array.isArray(r.steps) ? r.steps : []).slice(0, 30).map((x: unknown) => str(x, 400)).filter(Boolean);
   const kitchen = str(r.kitchen, 30) || null;
-  return { title, items, steps, kitchen };
+  // where it came from, as text only (0.2.16, board IM, IM6): Adapted from
+  const source = str(r.source, 80);
+  return { title, items, steps, kitchen, ...(source ? { source } : {}) };
 }
 
 // A recipe of Mine as members get it
@@ -43,6 +45,7 @@ export function sharedOf(m: Meal, kitchen: string | null) {
     items: m.items.filter((i) => i.grams > 0).map((i) => ({ id: i.id, grams: i.grams, food: { name: i.food.name, brand: i.food.brand, calories: i.food.calories, protein: i.food.protein, fats: i.food.fats, carbs: i.food.carbs, fiber: i.food.fiber, readyToEat: i.food.readyToEat, icon: i.food.icon, serving: i.food.serving } })),
     steps: m.steps ?? [],
     kitchen,
+    ...(m.source?.name ? { source: m.source.name } : {}),
   };
 }
 // what members have of a recipe, as a short fingerprint: a change to the name, foods, amounts, steps or kitchen reaches them

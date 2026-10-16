@@ -105,6 +105,7 @@ export function RecipeView({ r, member, photoSrc, top }: { r: Loaded; member: Me
       <h1 className="rp-title">{r.title}</h1>
       {r.lines && <p className="rp-lines">{r.lines}</p>}
       <small className="rp-meta">{[bylineOf(r.author), `${r.makes} ${plural(r.makes, r.servingName)}`, r.minutes ? `${r.minutes} minutes` : ""].filter(Boolean).join(" · ")}</small>
+      {r.adaptedFrom && <small className="rp-meta">Adapted from {r.adaptedFrom}</small>}
       <div className="rp-stats">
         <span><b>{s.kcal}</b><small>kcal</small></span>
         <span><b>{g1(s.protein)}</b><small>protein</small></span>

@@ -92,6 +92,7 @@ export function MemberPage({ r, ahead, p, owner, close, takeDown }: { r: SharedR
       {r.cover ? <figure className="rq-hero"><img src={r.cover} alt={`The cover of ${r.title}`} /><span className="rq-drawn">{tag(r)}</span></figure> : null}
       <h2 className="rq-name rq-name-fixed">{r.title}</h2>
       <small className="muted mb-by">{byLine(r)}{r.made ? " by members" : ""}</small>
+      {r.source && <small className="muted mb-by">Adapted from {r.source}</small>}
       {ahead && <small className="mb-yours">Your {ahead.name}: {fmt(x.grams, 0)} g of the {fmt(x.total, 0)} g it makes</small>}
       <div className="rp-stats">
         <span><b>{fmt(x.kcal, 0)}</b><small>kcal</small></span>

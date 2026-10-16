@@ -131,6 +131,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {naming !== null
         ? <input className="title-input rq-name-input" aria-label="Name of the recipe" autoFocus value={naming} onChange={(e) => setNaming(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" maxLength={80} />
         : <button type="button" className="rq-name" aria-label={`Rename ${meal.title}`} onClick={() => setNaming(meal.title)}>{meal.title}</button>}
+      {meal.source && <SourceBox meal={meal} onPatch={onPatch} />}
       <div className="rp-stats">
         <span><b>{fmt(sum.calories, 0)}</b><small>kcal</small></span>
         <span><b>{fmt(sum.protein, 1)}</b><small>g protein</small></span>
@@ -237,6 +238,37 @@ function TryPhoto({ meal, tryPhoto, use }: { meal: Meal; tryPhoto: (model: strin
         <figure key={k} className="try-shot"><img src={s.img} alt={`Realistic test by ${s.model}`} /><figcaption><small>{TEST_MODELS.find((m) => m.id === s.model)?.name}</small>
           <span className="button-row"><button className="pill pill-small pill-primary" onClick={() => { use(s.img); setShots((x) => x.filter((_, j) => j !== k)); }}>Use as cover</button><button className="link" onClick={() => setShots((x) => x.filter((_, j) => j !== k))}>Discard</button></span></figcaption></figure>
       ))}
+    </section>
+  );
+}
+
+// Where it came from (0.2.16, canvas board IM, IM6): the account or site, which you can change; the link, added any time; and
+// your screenshots, for you only. Members and public pages get the text line only, never the screenshots.
+function SourceBox({ meal, onPatch }: { meal: Meal; onPatch: (patch: Partial<Meal>) => void }) {
+  const src = meal.source!;
+  const [name, setName] = useState<string | null>(null);
+  const [link, setLink] = useState<string | null>(null);
+  const [big, setBig] = useState<number | null>(null);
+  const shots = Array.isArray(meal.shots) ? meal.shots : [];
+  const saveName = () => { if (name !== null) { onPatch({ source: { ...src, name: name.trim().slice(0, 80) } }); setName(null); } };
+  const saveLink = () => { if (link !== null) { const u = link.trim(); onPatch({ source: { ...src, ...(/^https:\/\/\S+\.\S+/i.test(u) ? { url: u.slice(0, 2000) } : {}) } }); setLink(null); } };
+  return (
+    <section className="card rq-source">
+      <b>Where it came from</b>
+      {name !== null
+        ? <input className="search" aria-label="Where it came from" autoFocus value={name} placeholder="@account on Instagram, or the site" onChange={(e) => setName(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") saveName(); }} />
+        : <small>{src.name ? <>Adapted from <b>{src.name}</b></> : "Where it came from isn't known yet"} · <button className="link in-inline" onClick={() => setName(src.name)}>{src.name ? "Change" : "Add it"}</button></small>}
+      {src.url
+        ? <small><a href={src.url} target="_blank" rel="noopener noreferrer nofollow">{src.url.replace(/^https:\/\/(www\.)?/, "").slice(0, 60)}</a></small>
+        : link !== null
+          ? <input className="search" type="url" aria-label="Link to the original" autoFocus value={link} placeholder="https://…" onChange={(e) => setLink(e.target.value)} onBlur={saveLink} onKeyDown={(e) => { if (e.key === "Enter") saveLink(); }} />
+          : <button className="link in-inline" style={{ alignSelf: "flex-start" }} onClick={() => setLink("")}>+ Add the link</button>}
+      {meal.makes && <small className="muted">Makes {meal.makes.n} {meal.makes.n === 1 ? meal.makes.unit.replace(/s$/, "") : meal.makes.unit}, as the recipe says.</small>}
+      {shots.length > 0 && (<>
+        <div className="in-thumbs">{shots.map((x, n) => <button key={n} className={`in-thumb ${big === n ? "big" : ""}`} onClick={() => setBig(big === n ? null : n)} aria-label={`Screenshot ${n + 1}`}><img src={x} alt="" /></button>)}</div>
+        <small className="muted">Your screenshots, for you only. Never the cover, never shared with members, never published.</small>
+      </>)}
+      {!shots.length && Array.isArray(src.shotSigs) && src.shotSigs.length > 0 && <small className="muted">Your screenshots are loading.</small>}
     </section>
   );
 }

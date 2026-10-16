@@ -78,6 +78,8 @@ export type Ingredient = {
   // a dish on the plate as one row (0.2.5, canvas S "A dish from the plan"): the recipe's items, n of "of" portions, base grams
   // for one portion; the recipe is never moved by the solver, the portion and a side are the levers
   dish?: { id: string; title: string; of: number; n: number; base: number };
+  // what the food does in the dish, as read from a recipe (0.2.16, board IM): a swap keeps it
+  role?: string;
 };
 // a recipe as a dish on the plate: one portion of a batch recipe (two or more foods, a portion well under the batch)
 export function asDish(m: Meal): Ingredient[] {
@@ -122,6 +124,14 @@ export type Meal = {
   pagePhotoTaken?: boolean;
   // what kind of plate this is (Today, 10 October 2026): a meal, or a dessert sized at about a tenth of the day
   kind?: PlateKind;
+  // where it came from (0.2.16, board IM, IM6): the account or site as text, the link, when; members and public pages get
+  // the text only. The screenshots are the cook's own reference (shots, as files src:<id>:<n>), never a cover, never shared.
+  source?: { name: string; url?: string; from: "screenshot" | "link"; at: string; shotSigs?: string[] };
+  shots?: string[];
+  // how many the whole recipe makes, as read or guessed (IM3)
+  makes?: { n: number; unit: string };
+  // a swap or a side cooked and judged (IM5, IM5b): Did it work?
+  tried?: { kind: "change" | "side"; what: string; result: "yes" | "ok" | "no"; at: string }[];
 };
 export type Feedback = {
   id: string;
@@ -138,6 +148,8 @@ export type Feedback = {
   recipeId?: string;
   // the photo ask on the card when the recipe's cover is drawn (0.2.11, board CO, CO1b, CO1c)
   coverAsk?: "later" | "kept" | "used";
+  // the swap or side this meal was cooked with, and whether it worked (0.2.16, board IM)
+  tried?: { kind: "change" | "side"; what: string; result: "yes" | "ok" | "no" };
   // the meal's photos and how making it went (M1 activity 6, 10 October 2026)
   photos?: string[];
   prep?: { went: "as" | "not"; different?: string };
@@ -157,6 +169,8 @@ export type PilotState = {
   items: Ingredient[];
   title: string;
   portion: number | null;
+  // the recipe the plate came from, when it came in from a screenshot or a link (0.2.16, board IM): How was it points at it
+  fromRecipe?: string;
 };
 export const EMPTY: Nutrition = {
   calories: null,

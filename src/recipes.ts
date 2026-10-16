@@ -14,6 +14,8 @@ export type PublicRecipe = {
   hasPhoto: boolean; author: string; publishedAt: string; updatedAt: string; mealId?: string;
   // the photo is a picture made with AI: drawn by Chef Mealan, or marked by the cook (0.2.13); the page says so
   photoAi?: boolean;
+  // where it came from, as text (0.2.16, board IM, IM6): the page says Adapted from
+  adaptedFrom?: string;
 };
 
 // The preview (Cloud Run tag "preview", addresses preview---…) has its own recipes, apart from chefmealan.com (Milan, 8 October 2026)
