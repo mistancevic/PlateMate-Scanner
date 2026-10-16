@@ -4,6 +4,7 @@ import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, reauthenticateWithPopup, type User } from "firebase/auth";
 import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, type Firestore } from "firebase/firestore";
 import { getStorage, ref as fileRef, uploadString, getBytes, deleteObject, listAll } from "firebase/storage";
+import { photoSigsOf } from "./photos";
 
 // outside the browser build (the tests) there is no env: the cloud is simply off
 const env: Record<string, string | undefined> = (import.meta as any).env ?? {};
@@ -141,7 +142,9 @@ export function stripPhotos<T>(state: T): T {
   const strip = (f: any) => { if (f && typeof f === "object") { if (Array.isArray(f.photos)) f.photoCount = f.photos.length; else if (f.photo) f.photoCount = 0; delete f.photo; delete f.photos; } return f; };
   (s.foods ?? []).forEach(strip);
   (s.items ?? []).forEach((i: any) => strip(i.food));
-  (s.meals ?? []).forEach((m: any) => (m.items ?? []).forEach((i: any) => strip(i.food)));
+  // a recipe's own photos are files too (0.2.5+r10), so they never ride in the account's block either; until 0.2.14 they did,
+  // and drawn covers (0.2.11) took a block past Firestore's 1 MB (Milan, 16 October 2026, 19:05). The recipe's record names them.
+  (s.meals ?? []).forEach((m: any) => { const ps = photoSigsOf(m); if (ps) m.photoSigs = ps; strip(m); (m.items ?? []).forEach((i: any) => strip(i.food)); });
   s.feedback = []; // cards live as their own documents, see saveCards
   return s;
 }
