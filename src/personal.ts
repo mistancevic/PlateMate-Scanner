@@ -54,6 +54,8 @@ export type Personal = {
   timesOn?: import("./slots").TimesOn;
   // from 0.2.9 (canvas board CH, CH4): the kitchens the person cooks, which Chef Mealan cooks in first
   kitchens?: string[];
+  // from 0.2.10 (canvas board CH, CH7): per kitchen, the three dishes shown and the ones swapped away with Another
+  kitchenTaste?: import("./kitchens").Tastes;
 };
 // The kitchens you cook (0.2.9, board CH, CH4), in the order drawn
 export const KITCHENS = ["Balkan", "Italian", "Mediterranean", "German", "French", "Spanish", "Greek", "Turkish", "Middle Eastern", "Indian", "Thai", "Chinese", "Japanese", "Korean", "Mexican", "American"];

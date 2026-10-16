@@ -1461,3 +1461,15 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .mm-why { color: var(--muted); font-weight: 600; line-height: 1.45; }
 .mm-legend { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin: 2px 0 8px; color: var(--muted); font-weight: 600; }
 .mm-working { align-self: flex-start; margin: 10px 0; }
+/* 0.2.10, what a kitchen means (canvas board CH, CH7) */
+.kt { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 4px; display: flex; flex-direction: column; gap: 6px; }
+.kt-name { font-size: 11.5px; font-weight: 900; letter-spacing: .04em; color: var(--brand-text); }
+.kt-what { color: var(--ink); font-weight: 600; line-height: 1.45; }
+.kt-lead { color: var(--muted); font-weight: 700; }
+.kt-dish { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: #f6f8fc; border-radius: 10px; padding: 7px 10px; }
+.kt-dish b { font-size: 14px; } .kt-dish .link { font-size: 13px; font-weight: 800; flex: none; }
+.kt-dish.kt-new { background: #e3f4ea; }
+.kt-out { color: var(--muted); font-weight: 600; } .kt-out .link { font-size: 12.5px; }
+/* 0.2.10, steps drafted by Chef Mealan (canvas board CH, CH5) */
+.rq-drafted { display: block; background: #eef3fc; color: #2a4c86; border-radius: 8px; padding: 6px 8px; font-weight: 700; margin: 6px 0; }
+.rq-drafting { display: block; color: var(--muted); font-weight: 700; margin: 6px 0; }

@@ -36,3 +36,23 @@ export const missingFoods = (steps: string[], items: Ingredient[]) => {
   const used = usedIds(steps);
   return items.filter((i) => i.grams > 0 && !used.has(i.id));
 };
+
+// A draft from Chef Mealan (0.2.10, canvas board CH, CH5): the foods are written {1}, {2} in the recipe's order and become the
+// recipe's own food chips, so the amounts are the recipe's. The app checks the draft: three to eight steps, every food in a
+// step, no number that is not a food, no amount typed in the words, no food from their library that is not in the recipe.
+export type Draft = { ok: true; steps: string[] } | { ok: false; why: string };
+export function fromDraft(draft: string[], items: Ingredient[], library: string[]): Draft {
+  const steps = draft.map((x) => String(x).replace(/\s+/g, " ").trim()).filter(Boolean);
+  if (steps.length < 3 || steps.length > 8) return { ok: false, why: `${steps.length} steps; it takes three to eight` };
+  const used = new Set<number>();
+  for (const st of steps) for (const m of st.matchAll(/\{(\d+)\}/g)) { const n = Number(m[1]); if (n < 1 || n > items.length) return { ok: false, why: `{${n}} is not a food of this recipe` }; used.add(n); }
+  const missing = items.map((it, k) => (used.has(k + 1) ? null : it.food.name)).filter(Boolean);
+  if (missing.length) return { ok: false, why: `no step names ${missing.join(", ").toLowerCase()}` };
+  const words = steps.map((st) => st.replace(/\{\d+\}/g, " ")).join(" ");
+  if (/\b\d+\s?(g|grams?|kg|ml)\b/i.test(words)) return { ok: false, why: "an amount is typed in the words; the recipe's amounts are the chips" };
+  const mine = new Set(items.map((i) => shortName(i.food)));
+  const lower = words.toLowerCase();
+  const sneaked = library.map((n) => shortName({ name: n })).filter((n) => n.length >= 4 && !mine.has(n) && ![...mine].some((x) => x.includes(n) || n.includes(x)) && new RegExp(`\\b${n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`).test(lower));
+  if (sneaked.length) return { ok: false, why: `${sneaked[0]} is not in this recipe` };
+  return { ok: true, steps: steps.map((st) => st.replace(/\{(\d+)\}/g, (_, n: string) => tokenOf(items[Number(n) - 1]))) };
+}

@@ -21,7 +21,9 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close }: {
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft }: {
+  // 0.2.10 (canvas board CH, CH5): Chef Mealan drafts the steps; none without the AI
+  draft?: (() => Promise<{ ok: true; steps: string[] } | { ok: false; why: string }>) | null;
   meal: Meal; cards: Feedback[]; foods: Food[]; cook: boolean; state: PubState; pub: Published | null; approver: string; direct: boolean; unpublished?: string[];
   onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onPublish: (now?: boolean) => void; onDelete: () => void; close: () => void;
 }) {
@@ -62,6 +64,15 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   };
   const matches = find === null ? [] : foods.filter((f) => !items.some((i) => i.food.id === f.id) && (!find.trim() || f.name.toLowerCase().includes(find.trim().toLowerCase()))).slice(0, 8);
   const live = state === "live" && pub;
+  // ---- the steps, drafted by Chef Mealan (CH5): shown to read, kept only with Keep these steps ----
+  const [drafted, setDrafted] = useState<string[] | null>(null);
+  const [drafting, setDrafting] = useState<"" | "working" | string>("");
+  const askDraft = async () => {
+    if (!draft) return;
+    setDrafting("working");
+    try { const d = await draft(); if (d.ok) { setDrafted(d.steps); setDrafting(""); } else setDrafting(`Chef Mealan's draft didn't pass the checks (${(d as { why: string }).why}). Try again, or write your own.`); }
+    catch (e: any) { setDrafting(e?.message || "Chef Mealan could not answer. Try again."); }
+  };
   return (
     <div className="rq">
       <button className="link rq-back" onClick={close}><ChevronLeft size={18} /> Recipes</button>
@@ -132,8 +143,18 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         <b>Steps</b>
         {edit
           ? <StepsEditor steps={edit.steps} items={edit.items} onChange={(steps) => setEdit((e) => (e ? { ...e, steps } : e))} />
+          : drafted ? (<>
+              <small className="rq-drafted">Drafted by Chef Mealan from your foods and amounts. Read it, change any word.</small>
+              <ol className="rp-steps">{drafted.map((x, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(x, meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}</div></li>)}</ol>
+              <div className="button-row"><button className="pill pill-small pill-primary" onClick={() => { onPatch({ steps: drafted }); setDrafted(null); }}>Keep these steps</button><button className="pill pill-small" onClick={askDraft}>Draft again</button><button className="link" onClick={() => { setDrafted(null); startEdit(); }}>Write my own</button></div>
+            </>)
           : (meal.steps?.length ?? 0) > 0
             ? <ol className="rp-steps">{meal.steps!.map((x, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(x, meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className={`st-amt${p.gone ? " gone" : ""}`}>{p.label}</b>))}</div></li>)}</ol>
+            : draft ? (<>
+              <small className="muted">No steps yet.</small>
+              {drafting === "working" ? <small className="rq-drafting">Chef Mealan is writing the steps.</small> : drafting ? <small className="rq-drafting">{drafting}</small> : null}
+              <div className="button-row"><button className="pill pill-small pill-primary" disabled={drafting === "working"} onClick={askDraft}>Draft the steps with Chef Mealan</button><button className="link" onClick={startEdit}>Write my own</button></div>
+            </>)
             : <small className="muted">No steps yet. Edit recipe adds them.</small>}
       </section>
       {edit ? (

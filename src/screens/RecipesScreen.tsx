@@ -7,6 +7,7 @@ import { useKept } from "../kept";
 import { PublishSheet, unpublishedOf, type Published } from "../components/PublishSheet";
 import { localAs } from "../recipes";
 import { RecipePage, type PubState } from "../components/RecipePage";
+import { fromDraft } from "../steps";
 import { recipePhotosOf, recipeHasPhotos, sig } from "../photos";
 
 export function RecipesScreen(p: AppApi) {
@@ -78,7 +79,19 @@ export function RecipesScreen(p: AppApi) {
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
         onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
         onDelete={() => { setOpenId(null); setState((s) => ({ ...s, meals: s.meals.filter((x) => x.id !== opened.id) })); }}
-        close={() => setOpenId(null)} />
+        close={() => setOpenId(null)}
+        draft={p.ai.on ? async () => {
+          // the foods in the recipe's order, as {1}, {2}; a draft that fails the checks goes back once with why (board CH, CH5)
+          const items = opened.items.filter((i) => i.grams > 0);
+          const ask = async (failed?: string) => {
+            const res = await fetch("/api/steps", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: opened.title, items: items.map((i) => ({ name: i.food.name, grams: i.grams })), kitchens: p.personal.kitchens ?? [], failed }) });
+            const d = await res.json().catch(() => ({}));
+            if (!res.ok) throw new Error(d.error || "Chef Mealan could not answer. Try again.");
+            return fromDraft(d.steps ?? [], items, state.foods.map((f) => f.name));
+          };
+          const first = await ask();
+          return first.ok ? first : ask((first as { why: string }).why);
+        } : null} />
       {sheet}
     </>
   );

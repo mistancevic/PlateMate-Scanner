@@ -12,6 +12,7 @@ import { ConfirmButton } from "../components/Confirm";
 import { RHYTHMS, REGIONS } from "../moments";
 import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, KITCHENS, type Personal, type DayType } from "../personal";
 import { CHEF_NAME } from "../components/Mark";
+import { KITCHEN, tasteOf, another, anotherLeft, undo, type Taste } from "../kitchens";
 import { slotsOf } from "../slots";
 import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, workHintOf, type Plan, type PlanDay, type Lifestyle } from "../plan";
 import { DayEditor } from "../components/DayEditor";
@@ -583,6 +584,23 @@ function ShopPanel(p: AppApi) {
       <div className="moments" role="group" aria-label="The kitchens you cook">
         {KITCHENS.map((k) => { const on = (p.personal.kitchens ?? []).includes(k); return <button key={k} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, kitchens: on ? (p.personal.kitchens ?? []).filter((x) => x !== k) : [...(p.personal.kitchens ?? []), k] })}>{k}</button>; })}
       </div>
+      {/* What a kitchen means (0.2.10, board CH, CH7): a line, three dishes Chef Mealan would cook you, Another and Undo */}
+      {(p.personal.kitchens ?? []).filter((k) => KITCHEN[k]).map((k) => {
+        const t = tasteOf(p.personal, k), set = (next: Taste) => p.setPersonal({ ...p.personal, kitchenTaste: { ...(p.personal.kitchenTaste ?? {}), [k]: next } });
+        const last = t.out[t.out.length - 1], more = anotherLeft(t, k);
+        return (
+          <div className="kt" key={k}>
+            <small className="kt-name">{k.toUpperCase()}</small>
+            <small className="kt-what">{KITCHEN[k].what}</small>
+            <small className="kt-lead">Three dishes {CHEF_NAME} would cook you:</small>
+            {t.shown.map((d, i) => (
+              <div className={`kt-dish ${last?.with === d ? "kt-new" : ""}`} key={d}><b>{d}</b>{more && <button className="link" aria-label={`Another instead of ${d}`} onClick={() => set(another(t, k, i))}>Another</button>}</div>
+            ))}
+            {t.out.length > 0 && <small className="kt-out">Not for you: {t.out.map((o) => o.dish.toLowerCase()).join(", ")}. <button className="link" onClick={() => set(undo(t))}>Undo</button></small>}
+            {!more && <small className="kt-out">That's every dish we have for this kitchen. Tell {CHEF_NAME} in the chat what you cook.</small>}
+          </div>
+        );
+      })}
       <small className="setting-hint">A plate that already has a kitchen keeps it: sarma stays Balkan, a curry stays Indian. Everything else comes from these.</small>
     </section>
       <NextLink p={p} to="coach" from="shop" text="Coach" hint="Join a coach with a code, or see yours" />

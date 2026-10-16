@@ -27,6 +27,7 @@ import { dayLog } from "../today";
 import { ymd } from "../plan";
 import { blockedByAllergy } from "../safety";
 import { minPortionOf } from "../foodjob";
+import { tasteForChef } from "../kitchens";
 
 // Make it a meal (0.2.9, canvas board CH, CH1 to CH3): an idea from Chef Mealan, checked and with the app's grams
 type MealOption = { kitchen: string; title: string; why: string; adds: { name: string; grams: number; have: boolean; base: boolean }[]; items: Ingredient[]; kcal: number; pd: number | null };
@@ -339,7 +340,7 @@ export function JourneyScreen(p: AppApi) {
     try {
       const res = await fetch("/api/meal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         plate: base.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein })), meal: mealWord, need: share.kcal, target: pdRef,
-        kitchens: p.personal.kitchens ?? [], library: state.foods.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), region: p.region, avoid: [...avoid, ...kept.map((k) => k.title)], failed: failedIn }) });
+        kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), library: state.foods.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), region: p.region, avoid: [...avoid, ...kept.map((k) => k.title)], failed: failedIn }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `${CHEF_NAME} could not answer.`);
       const good = [...kept], failed: { title: string; why: string }[] = [];
