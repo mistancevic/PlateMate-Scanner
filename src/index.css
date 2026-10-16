@@ -1547,3 +1547,9 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .plate-card .ways label.pill { display: inline-flex; align-items: center; gap: 6px; }
 .ways-out.ways-out-col { flex-direction: column; align-items: stretch; }
 .ways-out.ways-out-col > .pill-wide { width: 100%; flex: none; }
+.in-per { display: block; }
+.in-stated { display: block; background: #eef2f8; color: var(--ink); border-radius: 8px; padding: 6px 8px; line-height: 1.45; }
+.in-stated.differs { background: #fff8d6; color: #5c4800; font-weight: 600; }
+.row.in-off { opacity: .55; }
+.in-tag.in-opt { background: #eef2f8; color: var(--ink); }
+.in-card .row-text small { white-space: normal; overflow: visible; text-overflow: clip; display: block; }

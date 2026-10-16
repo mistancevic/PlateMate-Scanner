@@ -3,15 +3,18 @@
 // every change Chef Mealan proposes. Rules the code keeps, from board IM:
 // - a swap keeps the food's role in the dish, and a melting cheese is only replaced by one that melts;
 // - code never judges a side by what is normal: sides follow the person (your way first), only cooking failures are ruled out;
-// - nothing is offered under a real portion or above one: every food at least 5 g, no single food over 600 g a portion.
+// - nothing is offered above a real portion: no single food over 600 g a portion.
 import type { Food, Ingredient } from "./pilot";
 
 export const MAX_SHOTS = 4;
 export const ROLES = ["base", "protein", "melting cheese", "cheese", "dairy", "sauce", "fat", "vegetable", "fruit", "herb or spice", "sweet", "other"] as const;
 export type Role = (typeof ROLES)[number];
 export type How = "recipe" | "converted" | "guessed";
-export type ReadItem = { name: string; written: string; grams: number; how: How; role: Role; calories: number; protein: number; fats: number | null; carbs: number | null };
-export type ReadRecipe = { title: string; source: string; servings: number; servingsUnit: string; servingsHow: "recipe" | "guessed"; items: ReadItem[] };
+// optional: the recipe says so (0.2.17, the cookie on 16 October 2026): left out of the numbers until the person adds it
+export type ReadItem = { name: string; written: string; grams: number; how: How; role: Role; calories: number; protein: number; fats: number | null; carbs: number | null; optional: boolean; on?: boolean };
+// what the recipe itself says about its numbers, per serving, when it says it (0.2.17)
+export type Stated = { kcal: number; protein: number; fats: number | null; carbs: number | null };
+export type ReadRecipe = { title: string; source: string; servings: number; servingsUnit: string; servingsHow: "recipe" | "guessed"; items: ReadItem[]; stated: Stated | null };
 export type ReadError = "login" | "fetch" | "no-recipe" | "not-recipe" | "no-amounts";
 
 // ---- the link ----
@@ -86,12 +89,21 @@ export function cleanRead(d: any): ReadRecipe | null {
     else if (how === "recipe") how = written.trim() ? "converted" : "guessed";
     const role: Role = (ROLES as readonly string[]).includes(i?.role) ? i.role : "other";
     const cal = num(i?.calories), pro = num(i?.protein), fat = num(i?.fats), carb = num(i?.carbs);
-    return { name: String(i?.name ?? "").trim().slice(0, 60), written, grams: Math.round(exact ?? num(i?.grams)), how, role,
-      calories: cal, protein: pro, fats: Number.isFinite(fat) && fat >= 0 ? fat : null, carbs: Number.isFinite(carb) && carb >= 0 ? carb : null };
+    const name = String(i?.name ?? "").trim().slice(0, 60);
+    return { name: name.charAt(0).toUpperCase() + name.slice(1), written, grams: Math.round(exact ?? num(i?.grams)), how, role,
+      calories: cal, protein: pro, fats: Number.isFinite(fat) && fat >= 0 ? fat : null, carbs: Number.isFinite(carb) && carb >= 0 ? carb : null, optional: i?.optional === true };
   }).filter((i: ReadItem) => i.name && i.grams > 0 && i.grams <= 5000 && Number.isFinite(i.calories) && i.calories >= 0 && i.calories <= 950 && Number.isFinite(i.protein) && i.protein >= 0 && i.protein <= 100);
   if (!items.length) return null;
   const n = Math.round(num(d.servings));
+  const st = d.stated && typeof d.stated === "object" ? d.stated : null;
+  const sk = num(st?.calories), sp = num(st?.protein), sf = num(st?.fats), sc = num(st?.carbs);
+  const per = Number.isFinite(n) && n >= 1 ? Math.min(24, n) : 1;
+  // the recipe's own numbers, always per serving; for the whole recipe they are divided by how many it makes
+  const div = st?.per === "recipe" ? per : 1;
+  const stated: Stated | null = Number.isFinite(sk) && sk > 0 && sk < 5000 && Number.isFinite(sp) && sp >= 0 && sp < 400
+    ? { kcal: sk / div, protein: sp / div, fats: Number.isFinite(sf) && sf >= 0 ? sf / div : null, carbs: Number.isFinite(sc) && sc >= 0 ? sc / div : null } : null;
   return {
+    stated,
     title: String(d.title ?? "").trim().slice(0, 80) || "A recipe",
     source: String(d.source ?? "").trim().slice(0, 80),
     servings: Number.isFinite(n) && n >= 1 ? Math.min(24, n) : 1,
@@ -106,16 +118,24 @@ const kcalOf = (l: { grams: number; food: Pick<Food, "calories"> }[]) => l.reduc
 const protOf = (l: { grams: number; food: Pick<Food, "protein"> }[]) => l.reduce((n, i) => n + ((i.food.protein ?? 0) * i.grams) / 100, 0);
 export const pdOf = (l: { grams: number; food: Pick<Food, "calories" | "protein"> }[]) => { const k = kcalOf(l); return k > 0 ? (100 * protOf(l)) / k : null; };
 export const kcalOfItems = kcalOf;
-// Every food by the same factor, to the nearest 5 g, at least 5 g: the rule Members uses (board CO3)
+// A scaled amount a cook can weigh, and that keeps the recipe's ratios (0.2.17, the cookie: 4 g baking soda became 5 g,
+// 22.5 g flour 25 g): under 100 g to the gram, from 100 g to the nearest 5 g, never under 1 g
+export const roundGrams = (g: number) => (g < 100 ? Math.max(1, Math.round(g)) : Math.round(g / 5) * 5);
+// Every food by the same factor
 export function scaleTo<T extends { grams: number; food: Pick<Food, "calories"> }>(whole: T[], kcal: number): T[] {
   const all = kcalOf(whole);
   if (!(all > 0) || !(kcal > 0)) return whole.map((i) => ({ ...i }));
   const k = kcal / all;
-  return whole.map((i) => ({ ...i, grams: Math.max(5, Math.round((i.grams * k) / 5) * 5) }));
+  return whole.map((i) => ({ ...i, grams: roundGrams(i.grams * k) }));
 }
-// The recipe's own portion: the whole divided by how many it makes, to the nearest 5 g
+// The recipe's own portion: the whole divided by how many it makes
 export const onePortion = <T extends { grams: number; food: Pick<Food, "calories"> }>(whole: T[], servings: number): T[] =>
-  whole.map((i) => ({ ...i, grams: Math.max(5, Math.round(i.grams / Math.max(1, servings) / 5) * 5) }));
+  whole.map((i) => ({ ...i, grams: roundGrams(i.grams / Math.max(1, servings)) }));
+// Sized for the meal only when that is between half and one and a half of the recipe's own portion; else the recipe's
+// own portion, so nobody is asked to bake 40% of a cookie (0.2.17)
+export const sizedFits = (mealKcal: number | null, portionKcal: number) => !!mealKcal && portionKcal > 0 && mealKcal / portionKcal >= 0.5 && mealKcal / portionKcal <= 1.5;
+// The recipe's own numbers against ours: differ when the energy is more than 15% apart
+export const statedDiffers = (stated: Stated, kcal: number) => Math.abs(kcal - stated.kcal) / Math.max(1, stated.kcal) > 0.15;
 
 // Add on the side (IM5b): the dish stays as the recipe makes it, a little smaller; the side brings the protein. The
 // smallest side, in 5 g steps up to 400 g, that brings the meal to the target at about the meal's size. Null when none does.
@@ -148,7 +168,7 @@ export function checkChange(original: { name: string; role: Role }[], next: Chan
   return null;
 }
 // A changed or sided plate is a real meal: every food at least 5 g, none over 600 g
-export const realPortions = (l: { grams: number }[]) => l.every((i) => i.grams >= 5 && i.grams <= 600);
+export const realPortions = (l: { grams: number; role?: string }[]) => l.every((i) => i.grams >= 1 && i.grams <= 600);
 
 // Your way (IM5b): a side is yours when you have had it before; code checks the name against your own foods
 export const isYours = (name: string, habits: string[]) => { const n = name.toLowerCase(); return habits.some((h) => { const x = h.toLowerCase().split(",")[0].trim(); return x.length > 2 && (n.includes(x) || x.includes(n)); }); };

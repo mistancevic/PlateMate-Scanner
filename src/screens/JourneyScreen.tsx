@@ -31,7 +31,7 @@ import { minPortionOf } from "../foodjob";
 import { tasteForChef } from "../kitchens";
 import { resizeImageBase64 } from "../utils/image";
 import { ShotsCard, LinkCard, ReadCard, ErrorCard, type InFlow } from "../components/RecipeIn";
-import { scaleTo, onePortion, sideAmount, pdOf, realPortions, isYours, sideWord, MAX_SHOTS, kcalOfItems, type ReadRecipe, type SideKind } from "../recipeIn";
+import { scaleTo, onePortion, sideAmount, pdOf, realPortions, isYours, sideWord, MAX_SHOTS, kcalOfItems, sizedFits, type ReadRecipe, type SideKind } from "../recipeIn";
 
 // Make it a meal (0.2.9, canvas board CH, CH1 to CH3): an idea from Chef Mealan, checked and with the app's grams
 type MealOption = { kitchen: string; title: string; why: string; adds: { name: string; grams: number; have: boolean; base: boolean }[]; items: Ingredient[]; kcal: number; pd: number | null };
@@ -384,7 +384,7 @@ export function JourneyScreen(p: AppApi) {
   async function putRead(f: Extract<InFlow, { kind: "read" }>) {
     const r = f.recipe;
     const fresh: Food[] = [];
-    const whole: Ingredient[] = r.items.map((i) => {
+    const whole: Ingredient[] = r.items.filter((i) => i.on ?? !i.optional).map((i) => {
       let food = state.foods.find((x) => x.name.toLowerCase() === i.name.toLowerCase()) ?? fresh.find((x) => x.name.toLowerCase() === i.name.toLowerCase());
       if (!food) { food = { ...estimate(i), notes: `${CHEF_NAME}'s estimate, from a recipe` }; fresh.push(food); }
       return { id: uid(), food, grams: i.grams, locked: true, role: i.role };
@@ -393,7 +393,7 @@ export function JourneyScreen(p: AppApi) {
     const total = whole.reduce((n, i) => n + i.grams, 0);
     const meal: Meal = { id: uid(), title: r.title, items: whole, portion: Math.round(total / r.servings), savedAt: new Date().toISOString(), steps: [],
       source: { name: r.source, ...(f.url ? { url: f.url } : {}), from: f.url ? "link" : "screenshot", at: new Date().toISOString() }, ...(thumbs.length ? { shots: thumbs } : {}), makes: { n: r.servings, unit: r.servingsUnit } };
-    const mode: "sized" | "recipe" = mealNeed ? "sized" : "recipe";
+    const mode: "sized" | "recipe" = sizedFits(mealNeed, kcalOfItems(whole) / r.servings) ? "sized" : "recipe";
     setPmode(mode); setWay(null);
     setState((s) => ({ ...s, foods: [...s.foods, ...fresh], meals: [meal, ...s.meals], items: portionItems(meal, mode), title: meal.title, portion: null, fromRecipe: meal.id }));
     setInFlow(null);
@@ -595,7 +595,7 @@ export function JourneyScreen(p: AppApi) {
         {/* On the plate (Y1 columns 2 and 2b, 10 October 2026): the plate is a card of its own, with Fit to my target as its action */}
         {inFlow ? (inFlow.kind === "shots" ? <ShotsCard shots={inFlow.shots} reading={inFlow.reading} add={(f) => void addShots(f, inFlow.shots)} remove={(n) => setInFlow({ kind: "shots", shots: inFlow.shots.filter((_, k) => k !== n) })} read={() => void readIn({ shots: inFlow.shots })} cancel={() => setInFlow(null)} />
           : inFlow.kind === "link" ? <LinkCard url={inFlow.url} reading={inFlow.reading} setUrl={(v) => setInFlow({ kind: "link", url: v })} read={() => void readIn({ url: inFlow.url })} cancel={() => setInFlow(null)} />
-          : inFlow.kind === "read" ? <ReadCard flow={inFlow} setSource={(v) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, source: v } })} setServings={(n) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, servings: n, servingsHow: inFlow.recipe.servingsHow } })} put={() => void putRead(inFlow)} again={() => void readIn(inFlow.url ? { url: inFlow.url } : { shots: inFlow.shots })} cancel={() => setInFlow(null)} />
+          : inFlow.kind === "read" ? <ReadCard flow={inFlow} setSource={(v) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, source: v } })} setServings={(n) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, servings: n, servingsHow: inFlow.recipe.servingsHow } })} toggle={(k) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, items: inFlow.recipe.items.map((x, j) => (j === k ? { ...x, on: !(x.on ?? !x.optional) } : x)) } })} put={() => void putRead(inFlow)} again={() => void readIn(inFlow.url ? { url: inFlow.url } : { shots: inFlow.shots })} cancel={() => setInFlow(null)} />
           : <ErrorCard flow={inFlow} next={(to) => setInFlow(to === "link" ? { kind: "link", url: inFlow.url } : { kind: "shots", shots: inFlow.code === "not-recipe" ? [] : inFlow.shots })} cancel={() => setInFlow(null)} />) : (
         <section className="card plate-card">
         <div className="card-top"><span>On the plate</span>{items.length > 0 && <ConfirmButton className="link plate-empty-link" label={<><Trash2 size={14} /> Empty plate</>} confirmLabel="Tap again to empty" onConfirm={emptyPlate} />}</div>
@@ -606,7 +606,8 @@ export function JourneyScreen(p: AppApi) {
               {mealNeed && <button className={`choice ${pmode === "sized" ? "on" : ""}`} onClick={() => setPortionMode("sized")}>Sized for your {mealWord}</button>}
               <button className={`choice ${pmode === "recipe" ? "on" : ""}`} onClick={() => setPortionMode("recipe")}>1 of {rec.makes.n} {rec.makes.n === 1 ? oneOf(rec) : unitOf(rec)}</button>
             </div>
-            {(() => { const one = kcalOfItems(rec.items) / rec.makes!.n; return <small className="muted">One {oneOf(rec)} is {fmt(one, 0)} kcal.{mealNeed ? ` Your ${mealWord} is about ${fmt(mealNeed, 0)}. Sized for it: ${Math.round((kcalOfItems(portionItems(rec, "sized")) / Math.max(1, one)) * 100)}% of one ${oneOf(rec)}.` : ""}</small>; })()}
+            {(() => { const one = kcalOfItems(rec.items) / rec.makes!.n, pct = Math.round((kcalOfItems(portionItems(rec, "sized")) / Math.max(1, one)) * 100);
+              return <small className="muted">One {oneOf(rec)} is {fmt(one, 0)} kcal.{mealNeed ? ` Your ${mealWord} is about ${fmt(mealNeed, 0)}. Sized for it${sizedFits(mealNeed, one) ? `: ${pct}% of one ${oneOf(rec)}.` : ` would be ${pct}% of one ${oneOf(rec)}, so the plate starts with one ${oneOf(rec)}, as the recipe makes it.`}` : ""}</small>; })()}
           </div>
         )}
         {imported && way?.kind === "change" && (
@@ -656,7 +657,7 @@ export function JourneyScreen(p: AppApi) {
                 <span className="thumb">{i.food.photo ? <img src={i.food.photo} alt="" /> : (i.food.icon || iconFor(i.food.name))}</span>
                 <div className="row-text">
                   <button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button>
-                  <small>{pdText(density(i.food.protein, i.food.calories))} · {imported ? "Change it if you like." : i.locked ? "This amount stays." : `${CHEF_NAME} can change this amount.`}</small>
+                  <small>{i.food.calories === 0 ? "no energy" : pdText(density(i.food.protein, i.food.calories))} · {imported ? "Change it if you like." : i.locked ? "This amount stays." : `${CHEF_NAME} can change this amount.`}</small>
                 </div>
                 {i.locked ? <b className="row-num">{fmt(i.grams, 0)} g{servingLabel(i.food, i.grams) ? <small> = {servingLabel(i.food, i.grams)}</small> : null}</b> : (
                   <label className="grams">

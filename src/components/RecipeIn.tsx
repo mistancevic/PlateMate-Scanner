@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 import type { ReadRecipe } from "../recipeIn";
-import { MAX_SHOTS } from "../recipeIn";
-import { fmt } from "../ui";
+import { MAX_SHOTS, statedDiffers } from "../recipeIn";
+import { fmt, pdText } from "../ui";
 import { iconFor } from "../icons";
 import { CHEF_NAME } from "./Mark";
 
@@ -48,12 +48,17 @@ export function LinkCard({ url, reading, setUrl, read, cancel }: { url: string; 
 }
 
 // IM3: what Chef Mealan read. Every line says where its amount came from; how many it makes can be changed.
-export function ReadCard({ flow, setSource, setServings, put, again, cancel }: {
-  flow: Extract<InFlow, { kind: "read" }>; setSource: (v: string) => void; setServings: (n: number) => void; put: () => void; again: () => void; cancel: () => void;
+export function ReadCard({ flow, setSource, setServings, toggle, put, again, cancel }: {
+  flow: Extract<InFlow, { kind: "read" }>; setSource: (v: string) => void; setServings: (n: number) => void; toggle: (k: number) => void; put: () => void; again: () => void; cancel: () => void;
 }) {
   const r = flow.recipe;
   const [editing, setEditing] = useState(false);
-  const all = r.items.reduce((n, i) => n + (i.calories * i.grams) / 100, 0), allP = r.items.reduce((n, i) => n + (i.protein * i.grams) / 100, 0);
+  // optional ingredients stay out of the numbers until added, as the recipe's own numbers leave them out (0.2.17)
+  const on = (i: ReadRecipe["items"][number]) => i.on ?? !i.optional;
+  const used = r.items.filter(on), left = r.items.filter((i) => !on(i) && i.optional);
+  const all = used.reduce((n, i) => n + (i.calories * i.grams) / 100, 0), allP = used.reduce((n, i) => n + (i.protein * i.grams) / 100, 0);
+  const pd = (k: number, p: number) => (k > 0 ? (100 * p) / k : null);
+  const st = r.stated, mine = all / r.servings;
   const from = flow.url ? "from the link" : `read from your ${flow.shots.length === 1 ? "screenshot" : `${flow.shots.length} screenshots`}`;
   const one = r.servingsUnit.replace(/s$/, "");
   return (
@@ -68,18 +73,19 @@ export function ReadCard({ flow, setSource, setServings, put, again, cancel }: {
         <small className="in-strong">{r.servings === 1 ? one : r.servingsUnit}</small>
         <small className="muted">· {r.servingsHow === "recipe" ? "on the recipe" : <span className="in-tag">guessed</span>}</small>
       </div>
-      <small className="muted">One {one}: {fmt(all / r.servings, 0)} kcal · {fmt(allP / r.servings, 0)} g protein.</small>
+      <small className="in-strong in-per">One {one}: {fmt(mine, 0)} kcal · {fmt(allP / r.servings, 0)} g protein · {pdText(pd(all, allP))}</small>
+      {st && <small className={`in-stated ${statedDiffers(st, mine) ? "differs" : ""}`}>The recipe says: {fmt(st.kcal, 0)} kcal · {fmt(st.protein, 1)} g protein · {pdText(pd(st.kcal, st.protein))} per {one}.{statedDiffers(st, mine) ? ` Our estimate is ${Math.round(Math.abs(mine - st.kcal) / st.kcal * 100)}% ${mine > st.kcal ? "higher" : "lower"}: the recipe may use other products. The plate uses ours; change any food to match yours.` : " Our estimate agrees."}</small>}
       <div className="rows">
         {r.items.map((i, k) => (
-          <div className="row" key={k}>
+          <div className={`row ${on(i) ? "" : "in-off"}`} key={k}>
             <span className="thumb thumb-sm">{iconFor(i.name)}</span>
-            <div className="row-text"><b>{i.name}</b><small>{i.written ? `${i.written} on the recipe` : "no amount on the recipe"}{i.how !== "recipe" && <> · <span className="in-tag">{i.how}</span></>}</small></div>
+            <div className="row-text"><b>{i.name}</b><small>{i.written ? `${i.written} on the recipe` : "no amount on the recipe"}{i.how !== "recipe" && <> · <span className="in-tag">{i.how}</span></>}{i.optional && <> · <span className="in-tag in-opt">optional</span> <button className="link in-inline" onClick={() => toggle(k)}>{on(i) ? "Leave it out" : "Add it"}</button></>}</small></div>
             <b className="row-num">{fmt(i.grams, 0)} g</b>
           </div>
         ))}
       </div>
       {flow.note && <small className="in-note">{flow.note}</small>}
-      <small className="muted">The whole recipe: {fmt(all, 0)} kcal · {fmt(allP, 0)} g protein. Values are typical values, marked estimate; tap a food on the plate to check or change it.</small>
+      <small className="muted">The whole recipe: {fmt(all, 0)} kcal · {fmt(allP, 0)} g protein · {pdText(pd(all, allP))}.{left.length ? ` Left out: ${left.length} optional, as the recipe's numbers do; Add it puts one in.` : ""} Values are typical values, marked estimate; tap a food on the plate to check or change it.</small>
       <button className="pill pill-primary pill-wide" onClick={put}>Put it on my plate</button>
       <button className="link" style={{ alignSelf: "center" }} onClick={again}>Not right? Read it again</button>
     </section>

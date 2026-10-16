@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { linkCheck, isPrivateIp, recipeFromLd, pageText, gramsWritten, cleanRead, scaleTo, onePortion, sideAmount, pdOf, checkChange, isYours, realPortions } from "./recipeIn";
+import { linkCheck, isPrivateIp, recipeFromLd, pageText, gramsWritten, cleanRead, scaleTo, onePortion, sideAmount, pdOf, checkChange, isYours, realPortions, roundGrams, sizedFits, statedDiffers, kcalOfItems } from "./recipeIn";
 import { cleanShared, sharedOf } from "./members";
 import { photosOf, photosWanted, withPhotos, withoutStored, isOrphan, sig } from "./photos";
 
@@ -40,18 +40,39 @@ test("IM3: grams written on the recipe win; other units are converted, no amount
   assert.equal(cleanRead({ items: [] }), null);
 });
 
-test("IM4: your portion: sized for a 933 kcal dinner, 85% of one pizza; or the recipe's own, 1 of 2", () => {
+test("IM4: your portion: sized for a 933 kcal dinner, 84% of one pizza; or the recipe's own, 1 of 2; under 100 g to the gram", () => {
   const sized = scaleTo(pizza, 933);
-  assert.deepEqual(sized.map((i) => i.grams), [210, 85, 105, 10, 5]);
-  assert.equal(Math.round(pdOf(sized)! * 10) / 10, 4.1);
-  assert.deepEqual(onePortion(pizza, 2).map((i) => i.grams), [250, 100, 125, 10, 5]);
+  assert.deepEqual(sized.map((i) => i.grams), [210, 83, 105, 8, 2]);
+  assert.equal(Math.round(pdOf(sized)! * 10) / 10, 4.2);
+  assert.deepEqual(onePortion(pizza, 2).map((i) => i.grams), [250, 100, 125, 10, 3]);
+  assert.deepEqual([0.3, 4.4, 22.5, 99.4, 102].map(roundGrams), [1, 4, 23, 99, 100]);
+});
+test("0.2.17: sized for the meal only between half and one and a half of the recipe's portion; the cookie at 22:58 starts as one cookie", () => {
+  assert.equal(sizedFits(933, 1121), true);
+  assert.equal(sizedFits(130, 300), false);
+  assert.equal(sizedFits(null, 300), false);
+  assert.equal(sizedFits(600, 300), false);
+});
+test("0.2.17: optional ingredients, the recipe's own numbers per serving, names with a capital", () => {
+  const r = cleanRead({ title: "Low Calorie, High Protein Choc Chip Cookie", source: "@christopherkaiyu on Instagram", servings: 2, servings_unit: "servings", servings_how: "recipe",
+    stated: { calories: 234, protein: 15.5, fats: 6.75, carbs: 29.5, per: "serving" }, items: [
+    { name: "light butter", written: "35g (2 tbsp)", grams: 35, how: "recipe", role: "fat", calories: 360, protein: 1, optional: false },
+    { name: "extra chocolate chips", written: "15g (1 tbsp)", grams: 15, how: "recipe", role: "sweet", calories: 500, protein: 6, optional: true },
+    { name: "chocolate chunks", written: "to taste", grams: 10, how: "guessed", role: "sweet", calories: 530, protein: 7, optional: true },
+  ] })!;
+  assert.deepEqual(r.items.map((i) => [i.name, i.optional]), [["Light butter", false], ["Extra chocolate chips", true], ["Chocolate chunks", true]]);
+  assert.deepEqual(r.stated, { kcal: 234, protein: 15.5, fats: 6.75, carbs: 29.5 });
+  assert.equal(cleanRead({ title: "x", servings: 2, stated: { calories: 468, protein: 31, per: "recipe" }, items: [{ name: "Egg", written: "", grams: 60, how: "guessed", role: "protein", calories: 143, protein: 13 }] })!.stated!.kcal, 234);
+  assert.equal(statedDiffers({ kcal: 234, protein: 15.5, fats: null, carbs: null }, 295), true);
+  assert.equal(statedDiffers({ kcal: 234, protein: 15.5, fats: null, carbs: null }, 250), false);
 });
 
-test("IM5b: add on the side: 63% of one pizza and 295 g Greek yogurt reach PD 6.4 at about 933 kcal; a side that can't is left out", () => {
+test("IM5b: add on the side: 64% of one pizza and 305 g Greek yogurt reach PD 6.4 at about 933 kcal; a side that can't is left out", () => {
   const s = sideAmount(pizza, F("Greek yogurt 2%", 73, 10), 933, 180 / 28)!;
-  assert.equal(s.grams, 295);
-  assert.deepEqual(s.dish.map((i) => i.grams), [160, 65, 80, 5, 5]);
-  assert.ok(pdOf([...s.dish, it(295, F("Greek yogurt 2%", 73, 10))])! >= 6.42);
+  assert.equal(s.grams, 305);
+  assert.deepEqual(s.dish.map((i) => i.grams), [160, 63, 79, 6, 2]);
+  assert.equal(Math.round(kcalOfItems([...s.dish, it(305, F("Greek yogurt 2%", 73, 10))])), 934);
+  assert.ok(pdOf([...s.dish, it(305, F("Greek yogurt 2%", 73, 10))])! >= 6.42);
   assert.equal(sideAmount(pizza, F("Chips", 536, 7), 933, 6.43), null);
   assert.ok(realPortions([...s.dish, { grams: s.grams }]));
 });

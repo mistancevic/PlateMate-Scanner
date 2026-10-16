@@ -14,12 +14,13 @@ seed.goals = { ...seed.goals, calories: 2800, protein: 180, fats: 93, carbs: 300
 // two days ago: Greek yogurt with a meal, so it is "your way"
 seed.feedback = [{ id: "fb-old", meal: { id: "m-old", title: "Chicken with yogurt", portion: 400, savedAt: "2026-10-14T19:00:00Z", items: [{ id: "a", grams: 200, locked: false, food: ch }, { id: "b", grams: 200, locked: false, food: greek }] }, status: "eaten", taste: "Good", notes: "", createdAt: "2026-10-14T19:30:00" }];
 const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
-const read = { recipe: { title: "Margherita pizza", source: "@account_name on Instagram", servings: 2, servingsUnit: "pizzas", servingsHow: "recipe", items: [
+const read = { recipe: { title: "Margherita pizza", source: "@account_name on Instagram", servings: 2, servingsUnit: "pizzas", servingsHow: "recipe", stated: { kcal: 1100, protein: 46, fats: null, carbs: null }, items: [
   { name: "Pizza dough", written: "500 g", grams: 500, how: "recipe", role: "base", calories: 260, protein: 8, fats: 2.5, carbs: 52 },
   { name: "Tomato passata", written: "200 g", grams: 200, how: "recipe", role: "sauce", calories: 32, protein: 1.4, fats: 0.2, carbs: 5.5 },
   { name: "Mozzarella", written: "2 balls", grams: 250, how: "converted", role: "melting cheese", calories: 280, protein: 20, fats: 21, carbs: 2 },
   { name: "Olive oil", written: "2 tbsp", grams: 20, how: "converted", role: "fat", calories: 884, protein: 0, fats: 100, carbs: 0 },
-  { name: "Basil", written: "", grams: 5, how: "guessed", role: "herb or spice", calories: 23, protein: 3.2, fats: 0.6, carbs: 2.7 }] } };
+  { name: "Basil", written: "", grams: 5, how: "guessed", role: "herb or spice", calories: 23, protein: 3.2, fats: 0.6, carbs: 2.7 },
+  { name: "Chili oil", written: "to taste", grams: 10, how: "guessed", role: "fat", calories: 884, protein: 0, fats: 100, carbs: 0, optional: true }] } };
 const changed = { title: "Margherita pizza, more protein", notes: ["Light mozzarella browns faster: take the pizza out 2 minutes earlier.", "Add the chicken, cooked and sliced, for the last 3 minutes."], items: [
   { name: "Pizza dough", grams: 400, calories: 260, protein: 8, fats: 2.5, carbs: 52, role: "base", change: "less" },
   { name: "Tomato passata", grams: 200, calories: 32, protein: 1.4, fats: 0.2, carbs: 5.5, role: "sauce", change: "same" },
@@ -75,16 +76,21 @@ const U = "http://127.0.0.1:3209";
   // IM3: what Chef Mealan read
   t = await card();
   ok(/Margherita pizza/.test(t) && /From @account_name on Instagram, read from your 2 screenshots/.test(t), "IM3: the dish, and where it came from, read from the screenshots");
-  ok(/Makes\s*−?\s*2\s*\+?\s*pizzas/.test(t) && /on the recipe/.test(t) && /One pizza: 1,121 kcal · 46 g protein/.test(t), "IM3: makes 2 pizzas, one pizza 1,121 kcal");
+  ok(/Makes\s*−?\s*2\s*\+?\s*pizzas/.test(t) && /on the recipe/.test(t) && /One pizza: 1,121 kcal · 46 g protein · PD 4\.1/.test(t), "IM3: makes 2 pizzas, one pizza 1,121 kcal, PD 4.1");
+  ok(/The recipe says: 1,100 kcal · 46 g protein · PD 4\.2 per pizza\. Our estimate agrees\./.test(t), "0.2.17: the recipe's own numbers next to ours");
+  ok(/Chili oil/.test(t) && /optional/.test(t) && /Left out: 1 optional, as the recipe's numbers do/.test(t) && /The whole recipe: 2,242 kcal/.test(t), "0.2.17: an optional ingredient is marked and left out of the numbers");
+  await page.getByRole("button", { name: "Add it" }).click(); await page.waitForTimeout(200);
+  ok(/The whole recipe: 2,330 kcal/.test(await card()), "0.2.17: Add it puts it into the numbers");
+  await page.getByRole("button", { name: "Leave it out" }).click(); await page.waitForTimeout(200);
   ok(/2 balls on the recipe · converted/.test(t) && /no amount on the recipe · guessed/.test(t) && /500 g on the recipe/.test(t), "IM3: every line says where its amount came from");
   await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(900);
 
   // IM4: your portion, sized for dinner
   t = await page.locator(".plate-card").textContent().then((x) => x.replace(/\s+/g, " "));
   ok(await page.locator(".title-input").inputValue() === "Margherita pizza", "IM4: the plate is the Margherita");
-  ok(JSON.stringify(await grams()) === JSON.stringify([210, 85, 105, 10, 5]), `IM4: sized for dinner: every food scaled the same way (${await grams()})`);
-  ok(/Sized for your dinner/.test(t) && /1 of 2 pizzas/.test(t) && /One pizza is 1,121 kcal\. Your dinner is about 933\. Sized for it: 85% of one pizza\./.test(t), "IM4: two portions to pick from, with what each is");
-  ok(/4\.1/.test(await page.locator(".plate-card .readout").textContent()), "IM4: PD 4.1, said in the readout");
+  ok(JSON.stringify(await grams()) === JSON.stringify([210, 83, 105, 8, 2]), `IM4: sized for dinner: every food scaled the same way (${await grams()})`);
+  ok(/Sized for your dinner/.test(t) && /1 of 2 pizzas/.test(t) && /One pizza is 1,121 kcal\. Your dinner is about 933\. Sized for it: 84% of one pizza\./.test(t), "IM4: two portions to pick from, with what each is");
+  ok(/4\.2/.test(await page.locator(".plate-card .readout").textContent()), "IM4: PD 4.2, said in the readout (4.1 for the whole recipe; the amounts to the gram)");
   ok(/Empty plate/.test(await page.locator(".plate-card .card-top").textContent()) && await page.locator(".plate-card .ways .ways-empty").count() === 0, "IM1b: Empty plate sits at the top of the card, out of the row that adds foods");
   ok(/Under your PD 6\.4: two ways to fit it/.test(t), "IM4: under the target: two ways to fit it");
   let s = await st();
@@ -92,7 +98,7 @@ const U = "http://127.0.0.1:3209";
   ok(m.title === "Margherita pizza" && m.source.name === "@account_name on Instagram" && m.source.from === "screenshot" && m.makes.n === 2 && (Array.isArray(m.shots) ? m.shots.length === 2 : m.source.shotSigs.length === 2), "IM6: saved in Mine with where it came from, how many it makes and the two screenshots");
   ok(!m.photo && !(m.photos ?? []).length, "IM6: a screenshot is never the recipe's photo or cover");
   await page.getByRole("button", { name: "1 of 2 pizzas" }).click(); await page.waitForTimeout(400);
-  ok(JSON.stringify(await grams()) === JSON.stringify([250, 100, 125, 10, 5]), "IM4: 1 of 2 pizzas: the recipe's own portion");
+  ok(JSON.stringify(await grams()) === JSON.stringify([250, 100, 125, 10, 3]), "IM4: 1 of 2 pizzas: the recipe's own portion");
   await page.getByRole("button", { name: "Sized for your dinner" }).click(); await page.waitForTimeout(400);
 
   // IM5: change the dish: the first try fails the checks and goes back once, with the reason
@@ -103,14 +109,14 @@ const U = "http://127.0.0.1:3209";
   ok(/Light mozzarella browns faster/.test(t) && /Not cooked yet/.test(t) && /Back to the original/.test(t), "IM5: a cooking note per swap, Not cooked yet, Back to the original");
   ok(/fits your plan/.test(await page.locator(".plate-card .readout").textContent()), "IM5: at the target now");
   await page.getByRole("button", { name: "Back to the original" }).click(); await page.waitForTimeout(400);
-  ok(JSON.stringify(await grams()) === JSON.stringify([210, 85, 105, 10, 5]) && await page.locator(".title-input").inputValue() === "Margherita pizza", "IM5: Back to the original undoes it");
+  ok(JSON.stringify(await grams()) === JSON.stringify([210, 83, 105, 8, 2]) && await page.locator(".title-input").inputValue() === "Margherita pizza", "IM5: Back to the original undoes it");
 
   // IM5b: add on the side: your way first; a side that can't reach the target is left out
   await page.getByRole("button", { name: "Add on the side" }).click(); await page.waitForTimeout(900);
   t = await page.locator(".plate-card").textContent().then((x) => x.replace(/\s+/g, " "));
   const chips = await page.locator(".in-way .choice").allTextContents();
-  ok(/Greek yogurt on the side, 295 g · your way/.test(chips[0] ?? "") && chips.some((c) => /Skyr after/.test(c)) && !chips.some((c) => /chips/i.test(c)), `IM5b: Greek yogurt first, your way, 295 g; potato chips left out (${chips.join(" | ")})`);
-  ok(JSON.stringify(await grams()) === JSON.stringify([160, 65, 80, 5, 5, 295]), `IM5b: the pizza a little smaller, the side brings the protein (${await grams()})`);
+  ok(/Greek yogurt on the side, 305 g · your way/.test(chips[0] ?? "") && chips.some((c) => /Skyr after/.test(c)) && !chips.some((c) => /chips/i.test(c)), `IM5b: Greek yogurt first, your way, 305 g; potato chips left out (${chips.join(" | ")})`);
+  ok(JSON.stringify(await grams()) === JSON.stringify([160, 63, 79, 6, 2, 305]), `IM5b: the pizza a little smaller, the side brings the protein (${await grams()})`);
   ok(/fits your plan/.test(await page.locator(".plate-card .readout").textContent()) && /The pizza is not changed/.test(await page.locator(".step-head").textContent()), "IM5b: at the target, the pizza as the recipe makes it");
 
   // Make it, then Did it work?
