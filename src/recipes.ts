@@ -12,6 +12,8 @@ export type PublicRecipe = {
   per100: PublicNutrition & { grams: number }; perServing: PublicNutrition; all: PublicNutrition;
   pd: number; proteinShare: number; fits: { name: string; range: string; how: "fits" | "just above" | "just below" }[];
   hasPhoto: boolean; author: string; publishedAt: string; updatedAt: string; mealId?: string;
+  // the photo is a picture made with AI: drawn by Chef Mealan, or marked by the cook (0.2.13); the page says so
+  photoAi?: boolean;
 };
 
 // The preview (Cloud Run tag "preview", addresses preview---…) has its own recipes, apart from chefmealan.com (Milan, 8 October 2026)

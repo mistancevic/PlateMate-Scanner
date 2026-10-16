@@ -75,6 +75,8 @@ export async function instagramImages(r: PublicRecipe, photo: string | null): Pr
     if (img) cover(ctx, img, 0, 0, W, H);
     const g = ctx.createLinearGradient(0, H * 0.4, 0, H); g.addColorStop(0, "rgba(10,20,40,0)"); g.addColorStop(1, "rgba(10,20,40,.82)"); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
     if (r.rating === "daam") { round(ctx, 60, 54, 330, 76, 38); ctx.fillStyle = BLUE; ctx.fill(); thumbs(ctx, 86, 70, 40); text(ctx, "DaaM good", 176, 106, F(900, 36), "#fff"); }
+    // a picture made with AI says so on the image itself (0.2.13)
+    if (r.photoAi && img) { ctx.font = F(800, 30); const tw = ctx.measureText("Picture made with AI").width; round(ctx, W - 60 - tw - 40, 54, tw + 40, 56, 28); ctx.fillStyle = "rgba(23,39,66,.78)"; ctx.fill(); text(ctx, "Picture made with AI", W - 60 - tw - 20, 92, F(800, 30), "#fff"); }
     ctx.font = F(900, 96); const t = wrap(ctx, r.title, W - 120, 2);
     // from the bottom up: the footer, one line of numbers, then the name
     t.forEach((l, i) => text(ctx, l, 60, H - 210 - (t.length - 1 - i) * 100, F(900, 96), "#fff"));

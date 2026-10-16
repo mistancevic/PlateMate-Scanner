@@ -62,7 +62,7 @@ function CostsRow({ open }: { open: () => void }) {
   const owner = useMetricsOwner(true);
   return owner ? <button className="menu-row" onClick={open}><span className="menu-icon"><Receipt size={20} /></span><b>Running costs</b><ChevronRight size={18} /></button> : null;
 }
-function useMetricsOwner(on: boolean) {
+export function useMetricsOwner(on: boolean) {
   const [owner, setOwner] = useState(() => { try { return localStorage.getItem(OWNER) === "1"; } catch { return false; } });
   useEffect(() => {
     if (!on) return;
@@ -83,13 +83,15 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
           <button className="menu-row" onClick={() => setSection("me")}><span className="menu-icon"><User size={20} /></span><b>Me</b><ChevronRight size={18} /></button>
           {/* Foods lives here from 0.2.0 (X0): the library, reached day to day from the Plate's search and Quick picks */}
           <button className="menu-row" onClick={() => p.setTab("foods")}><span className="menu-icon"><BookOpen size={20} /></span><b>Foods</b><ChevronRight size={18} /></button>
-          {[{ id: "support" as MenuSection, name: "Support", icon: <LifeBuoy size={20} /> }, { id: "about" as MenuSection, name: "About", icon: <Info size={20} /> }, ...(p.profile.role === "coach" || !p.cloudEnabled ? [{ id: "evals" as MenuSection, name: "Evals", icon: <FlaskConical size={20} /> }] : [])].map((it) => (
+          {[{ id: "support" as MenuSection, name: "Support", icon: <LifeBuoy size={20} /> }, ...(p.profile.role === "coach" || !p.cloudEnabled ? [{ id: "evals" as MenuSection, name: "Evals", icon: <FlaskConical size={20} /> }] : [])].map((it) => (
             <button key={it.id} className="menu-row" onClick={() => setSection(it.id)}>
               <span className="menu-icon">{it.icon}</span><b>{it.name}</b><ChevronRight size={18} />
             </button>
           ))}
           <MetricsRow open={() => setSection("metrics")} />
           <CostsRow open={() => setSection("costs")} />
+          {/* About at the bottom of the list (Milan, 16 October 2026, 18:43) */}
+          <button className="menu-row" onClick={() => setSection("about")}><span className="menu-icon"><Info size={20} /></span><b>About</b><ChevronRight size={18} /></button>
         </div>
         <p className="small"><a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy notice</a> · <a href="/disclaimer">Disclaimer</a></p>
         {p.user && <div className="button-row" style={{ marginTop: 12 }}><button className="pill pill-small" onClick={p.signOut}>Sign out</button></div>}

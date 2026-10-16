@@ -101,7 +101,7 @@ export function RecipeView({ r, member, photoSrc, top }: { r: Loaded; member: Me
   return (
     <div className="rp">
       {top ?? <Top right={member ? <a className="rp-link" href="/today">Open the app</a> : <a className="rp-link" href="/recipes">All recipes</a>} />}
-      {src && <figure className="rp-hero"><img src={src} alt={r.title} />{r.rating === "daam" && <Daam />}</figure>}
+      {src && <figure className="rp-hero"><img src={src} alt={r.title} />{r.rating === "daam" && <Daam />}{r.photoAi && <span className="rp-ai">Picture made with AI</span>}</figure>}
       <h1 className="rp-title">{r.title}</h1>
       {r.lines && <p className="rp-lines">{r.lines}</p>}
       <small className="rp-meta">{[bylineOf(r.author), `${r.makes} ${plural(r.makes, r.servingName)}`, r.minutes ? `${r.minutes} minutes` : ""].filter(Boolean).join(" · ")}</small>
@@ -217,7 +217,7 @@ export function RecipesPage({ member }: { member: boolean }) {
 export function RecipeCard({ r }: { r: PublicRecipe }) {
   return (
     <a className="rp-rcard" href={`/r/${r.slug}`}>
-      {r.hasPhoto && <span className="rp-rphoto"><img src={`/r/${r.slug}/photo.jpg`} alt="" loading="lazy" />{r.rating === "daam" && <Daam />}</span>}
+      {r.hasPhoto && <span className="rp-rphoto"><img src={`/r/${r.slug}/photo.jpg`} alt="" loading="lazy" />{r.rating === "daam" && <Daam />}{r.photoAi && <span className="rp-ai">Picture made with AI</span>}</span>}
       <span className="rp-rtext">
         <b>{r.title}</b>
         <span>One {r.servingName}: {r.perServing.kcal} kcal · {g1(r.perServing.protein)} protein · PD {r.pd}</span>

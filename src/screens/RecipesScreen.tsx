@@ -5,7 +5,9 @@ import type { AppApi } from "./api";
 import { useEffect, useState } from "react";
 import { useKept } from "../kept";
 import { PublishSheet, unpublishedOf, type Published } from "../components/PublishSheet";
-import { localAs } from "../recipes";
+import { localAs, isPreviewHost } from "../recipes";
+import { useMetricsOwner } from "./MenuScreen";
+import { resizeImageBase64 } from "../utils/image";
 import { RecipePage, type PubState } from "../components/RecipePage";
 import { fromDraft } from "../steps";
 import { recipePhotosOf, recipeHasPhotos, sig } from "../photos";
@@ -85,6 +87,9 @@ export function RecipesScreen(p: AppApi) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.meals]);
   const ahead = aheadOf(p);
+  // the realistic photo test (0.2.13): the owner only, on the preview (and here, on this computer, for the walkthroughs)
+  const isOwner = useMetricsOwner(true);
+  const testOn = isOwner && p.ai.on && (isPreviewHost(location.host) || (["localhost", "127.0.0.1"].includes(location.hostname) && (() => { try { return localStorage.getItem("chefmealan-try-photo") === "1"; } catch { return false; } })()));
   const mine = state.meals.filter((m) => m.from !== "coach"), fromCoach = state.meals.filter((m) => m.from === "coach");
   const shown = view === "mine" ? mine : fromCoach;
   const photoOf = (m: Meal) => state.feedback.find((f) => f.meal.id === m.id && f.photo)?.photo ?? state.feedback.find((f) => f.meal.title === m.title && f.photo)?.photo ?? null;
@@ -114,6 +119,12 @@ export function RecipesScreen(p: AppApi) {
         onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
         onDelete={() => { setOpenId(null); setState((s) => ({ ...s, meals: s.meals.filter((x) => x.id !== opened.id) })); }}
         close={() => setOpenId(null)}
+        tryPhoto={testOn ? async (model: string) => {
+          const r = await fetch("/api/cover", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ test: true, style: "photo", model, recipeId: opened.id, title: opened.title, items: opened.items.filter((i) => i.grams > 0).map((i) => ({ name: i.food.name, grams: i.grams })) }), signal: AbortSignal.timeout(90000) });
+          const d = await r.json().catch(() => ({}));
+          if (!r.ok || typeof d.image !== "string") throw new Error(d.error || (d.tomorrow ? "Twenty tests today. More tomorrow." : "No picture came back. Try again."));
+          return await resizeImageBase64(d.image, 960, 720).catch(() => d.image);
+        } : null}
         membersPanel={opened.from === "coach" || opened.from === "members" ? null
           : <SharePanel key={opened.id} meal={opened} p={p} made={opened.members ? memberList?.find((r) => r.id === opened.members!.id)?.made ?? null : null} onPatch={(patch) => patchMeal(opened.id, patch)} />}
         draft={p.ai.on ? async () => {

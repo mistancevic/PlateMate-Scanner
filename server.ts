@@ -21,7 +21,7 @@ import { tidy } from "./src/labeltable";
 import { normalizePhone } from "./src/phone";
 import { weekStats, mondayOf, addDays, type Ev } from "./src/metricsCalc";
 import { forVisitor, isPreviewHost, slugOf, type PublicRecipe } from "./src/recipes";
-import { coverPrompt, coverVerdict, COVER_MODELS, PICTURE_PRICE } from "./src/covers";
+import { coverPrompt, coverVerdict, photoPrompt, COVER_MODELS, TEST_MODELS, PICTURE_PRICE } from "./src/covers";
 import { cleanShared } from "./src/members";
 const FB_PROJECT = process.env.FIREBASE_PROJECT_ID || "";
 // photos as files (storage release 1): the project's default bucket in Frankfurt
@@ -1206,6 +1206,22 @@ app.post("/api/cover", requireUser, requireMember, requireAI, async (req, res) =
     const items = (Array.isArray(req.body?.items) ? req.body.items : []).slice(0, 20).map((i: any) => ({ name: String(i?.name ?? "").slice(0, 60), grams: Number(i?.grams) || 0 })).filter((i: any) => i.name && i.grams > 0);
     if (!/^[\w-]{1,64}$/.test(recipeId) || !items.length) return res.status(400).json({ error: "The recipe needs its foods first." });
     const day = berlinDay(), key = `${uid}~${recipeId}`, dayKey = `${uid}~${day}`;
+    // a realistic photo to try against the drawing (0.2.13): the owner only, on the preview only, twenty a day, never saved here
+    if (req.body?.test) {
+      if (!metricsOwner(req) || (FB_PROJECT && spaceOf(req) !== "preview")) return res.status(403).json({ error: "The realistic test is for the owner, on the preview." });
+      const model = TEST_MODELS.find((m) => m.id === req.body?.model)?.id ?? TEST_MODELS[0].id;
+      const tKey = `${uid}~test~${day}`;
+      const tests = !FB_PROJECT ? memCoverDays.get(tKey) ?? 0 : Number((await db().collection("cover_days").doc(tKey).get()).get("n")) || 0;
+      if (tests >= 20) return res.json({ tomorrow: true });
+      if (!apiKey) return res.status(503).json({ error: "AI is not configured." });
+      const ai = new GoogleGenAI({ apiKey, httpOptions: { timeout: 60000 } });
+      const r = await ai.models.generateContent({ model, contents: [{ role: "user", parts: [{ text: req.body?.style === "photo" ? photoPrompt(title || "A plate", items) : coverPrompt(title || "A plate", items) }] }], config: { responseModalities: ["IMAGE"], imageConfig: { aspectRatio: "4:3", imageSize: "1K" } } });
+      const part = (r.candidates?.[0]?.content?.parts ?? []).find((x: any) => x?.inlineData?.data);
+      if (!part?.inlineData?.data) return res.status(502).json({ error: "No picture came back. Try again." });
+      countPicture();
+      if (!FB_PROJECT) memCoverDays.set(tKey, tests + 1); else await db().collection("cover_days").doc(tKey).set({ uid, day, n: FieldValue.increment(1) }, { merge: true });
+      return res.json({ image: `data:${part.inlineData.mimeType || "image/png"};base64,${part.inlineData.data}`, model });
+    }
     const drawnBefore = !FB_PROJECT ? memCovers.has(key) : (await db().collection("covers").doc(key).get()).exists;
     const today = !FB_PROJECT ? memCoverDays.get(dayKey) ?? 0 : Number((await db().collection("cover_days").doc(dayKey).get()).get("n")) || 0;
     const verdict = coverVerdict({ drawnBefore, today });

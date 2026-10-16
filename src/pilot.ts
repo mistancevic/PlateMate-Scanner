@@ -89,7 +89,7 @@ export function asDish(m: Meal): Ingredient[] {
 export type Goals = Nutrition;
 // What the Publish sheet keeps while a recipe is being made ready for its page (board RG1): a draft, never public
 // sent: what the live page holds, kept at Publish (0.2.5+r13, board S4, R12), so the sheet knows what changed since
-export type PubContent = { title: string; lines: string; makes: number; servingName: string; minutes: number | null; names: string[]; steps: string[]; grams: number[]; photo?: string | null };
+export type PubContent = { title: string; lines: string; makes: number; servingName: string; minutes: number | null; names: string[]; steps: string[]; grams: number[]; photo?: string | null; photoAi?: boolean };
 export type PublishDraft = { title?: string; lines?: string; makes?: string; servingName?: string; minutes?: string; names?: string[]; photoAt?: number; savedAt?: string; sent?: PubContent; sentAt?: string };
 export type PlateKind = "meal" | "dessert";
 export type Meal = {
@@ -110,6 +110,8 @@ export type Meal = {
   // shared with members (0.2.11, board CO, CO4): where, since when, with which cover and name, in which kitchen
   members?: { id: string; at: string; named: boolean; coverSig: string | null; kitchen: string | null; sent: string };
   kitchen?: string;
+  // photos the cook marked as made with AI, by fingerprint (0.2.13): their page says Picture made with AI
+  aiSigs?: string[];
   // the recipe's own photos (0.2.5+r10, board S3, R4 to R6): the cover, then up to 5 more; as files in the store and the
   // account, like a food's (photoSigs and photoCount say which, when the photos themselves are not loaded)
   photo?: string;

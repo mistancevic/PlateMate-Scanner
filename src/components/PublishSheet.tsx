@@ -10,6 +10,8 @@ import { recipePhotosOf, withRecipePhotos, sig } from "../photos";
 import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
 import { StepsEditor } from "./StepsEditor";
 import { stepText } from "../steps";
+import { isAiPhoto, isDrawnPhoto } from "../covers";
+import { CHEF_NAME } from "./Mark";
 
 // Canvas board R5 (7 October 2026), redrawn as RG1 to RG3 with RF4 (8 October): a cook publishes a recipe that's already
 // in the app. The foods and grams come from the app; the cook adds what a reader needs. What is typed is kept with the
@@ -33,7 +35,7 @@ export function pubDraftOf(meal: Meal, published: Published | null, cards: Feedb
     names: meal.items.map((i, k) => d.names?.[k] ?? published?.items?.[k]?.name ?? plainName(i.food)), steps: (meal.steps ?? published?.steps ?? []).join("\n"),
   };
 }
-type PubFields = { title: string; lines: string; makes: string; servingName: string; minutes: string; names: string[]; steps: string; photo: string | null | undefined };
+type PubFields = { title: string; lines: string; makes: string; servingName: string; minutes: string; names: string[]; steps: string; photo: string | null | undefined; photoAi?: boolean };
 // which photo leads, in a way that survives a reload: the recipe's own photo by its fingerprint, a card's plate photo by
 // the card (a card's photo can load as the small or the large copy)
 // (undefined: not known for sure, so not compared)
@@ -48,12 +50,12 @@ export function pubContent(meal: Meal, f: PubFields): PubContent {
   return {
     title: f.title.trim(), lines: f.lines.trim(), makes: Math.max(1, Math.round(Number(f.makes)) || 1), servingName: f.servingName.trim() || "serving",
     minutes: Number(f.minutes) > 0 ? Math.round(Number(f.minutes)) : null, names: shown.map(([i, k]) => (f.names[k] ?? i.food.name).trim() || i.food.name),
-    steps: f.steps.split("\n").map((x) => stepText(x, meal.items)).filter(Boolean).slice(0, 30), grams: shown.map(([i]) => Math.round(i.grams)), photo: f.photo,
+    steps: f.steps.split("\n").map((x) => stepText(x, meal.items)).filter(Boolean).slice(0, 30), grams: shown.map(([i]) => Math.round(i.grams)), photo: f.photo, photoAi: Boolean(f.photoAi),
   };
 }
 const fromPublished = (r: Published): PubContent => ({
   title: (r.title ?? "").trim(), lines: (r.lines ?? "").trim(), makes: r.makes ?? 1, servingName: r.servingName || "serving", minutes: r.minutes ?? null,
-  names: (r.items ?? []).map((i) => i.name), steps: r.steps ?? [], grams: (r.items ?? []).map((i) => Math.round(i.grams)),
+  names: (r.items ?? []).map((i) => i.name), steps: r.steps ?? [], grams: (r.items ?? []).map((i) => Math.round(i.grams)), photoAi: Boolean(r.photoAi),
 });
 const same = (a: unknown, b: unknown) => JSON.stringify(a) === JSON.stringify(b);
 // the parts that differ from the live page, named as the sheet names them
@@ -70,13 +72,15 @@ export function changedParts(now: PubContent, sent: PubContent | null | undefine
   if (!same(now.steps, base.steps)) out.push("Steps");
   // a photo still loading from the account is not a change
   if (base.photo !== undefined && now.photo !== undefined && now.photo !== null && now.photo !== base.photo) out.push("Photo");
+  // the AI label: a page published before the label says nothing, so a picture made with AI is a change to publish
+  else if (now.photo !== undefined && Boolean(now.photoAi) !== Boolean(base.photoAi)) out.push("AI label");
   return out;
 }
 // the recipe's page (R12c): what is not on the live page yet, from the saved draft
 export const unpublishedOf = (meal: Meal, published: Published | null, cards: Feedback[]): string[] => {
   if (!published || (published.status && published.status !== "live") || published.waiting) return [];
   const x = pubDraftOf(meal, published, cards);
-  return changedParts(pubContent(meal, { ...x, photo: photoKeyOf(meal, cards, x.photos[x.photoAt]) }), x.d.sent, published);
+  return changedParts(pubContent(meal, { ...x, photo: photoKeyOf(meal, cards, x.photos[x.photoAt]), photoAi: isAiPhoto(meal, x.photos[x.photoAt]) }), x.d.sent, published);
 };
 const timeOf = (iso?: string) => {
   if (!iso) return "";
@@ -132,7 +136,8 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
   const live = done && (!done.status || done.status === "live") ? done : null;
   const waits = Boolean(done && (done.status === "waiting" || done.waiting));
   // R12: what changed since the live page; with no change the button sleeps
-  const contentNow = pubContent(meal, { title, lines, makes, servingName, minutes, names, steps, photo: photoKeyOf(meal, cards, photos[photoAt]) });
+  const chosen = photos[photoAt] ?? null, chosenAi = isAiPhoto(meal, chosen), chosenDrawn = isDrawnPhoto(meal, chosen ?? undefined);
+  const contentNow = pubContent(meal, { title, lines, makes, servingName, minutes, names, steps, photo: photoKeyOf(meal, cards, photos[photoAt]), photoAi: chosenAi });
   const changes = live && !waits ? changedParts(contentNow, sent, live) : [];
   const asleep = Boolean(live && !waits && !changes.length);
   const [previewing, setPreviewing] = useState(false);
@@ -149,7 +154,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
       // the page gets the steps as they read, with the amounts written in (R13c)
       steps: steps.split("\n").map((x) => stepText(x, meal.items)).filter(Boolean).slice(0, 30), rating, who: "everyone",
       per100: nums.per100, perServing: nums.perServing, all: nums.all, pd: nums.pd, proteinShare: nums.proteinShare, fits: fitsOf(nums.pd),
-      hasPhoto: photos.length > 0, author, publishedAt: published?.publishedAt ?? now, updatedAt: now, mealId: meal.id,
+      hasPhoto: photos.length > 0, photoAi: chosenAi, author, publishedAt: published?.publishedAt ?? now, updatedAt: now, mealId: meal.id,
     };
   };
   const photoNow = async () => (photos[photoAt] ? await resizeImageBase64(photos[photoAt], 1080, 1080).catch(() => photos[photoAt]) : null);
@@ -229,6 +234,10 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
             <button className="publish-photo add" onClick={() => fileRef.current?.click()} aria-label="Upload a photo"><ImageIcon size={20} /></button>
             <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (!f) return; const r = new FileReader(); r.onload = async () => { const raw = String(r.result); const data = await resizeImageBase64(raw, 1080, 1080).catch(() => raw); const list = own.includes(data) ? own : [...own, data].slice(0, MAX_RECIPE_PHOTOS); onMeal(withRecipePhotos(list)); setPhotoAt(Math.max(0, list.indexOf(data))); }; r.readAsDataURL(f); }} />
           </div>
+          {chosen && (
+            <label className="pub-ai"><input type="checkbox" checked={chosenAi} disabled={chosenDrawn} onChange={(e) => { const s = sig(chosen); const list = (meal.aiSigs ?? []).filter((x) => x !== s); onMeal({ aiSigs: e.target.checked ? [...list, s] : list }); }} />
+              <span>Made with AI{chosenDrawn ? `: drawn by ${CHEF_NAME}` : ""}. The page and the images say Picture made with AI.</span></label>
+          )}
           <small className="muted">{photos.length ? "The recipe's photos, the cover first, then the plate photos from its cards. The one with the blue frame leads, on the page and on the images. An uploaded photo is kept with the recipe." : "Upload a photo of the plate; the photo is kept with the recipe. Without one the page shows no photo."}</small>
         </div>
         <label className="field-label">Name<input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} /></label>

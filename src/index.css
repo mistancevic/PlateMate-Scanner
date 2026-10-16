@@ -1506,3 +1506,10 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 /* 0.2.12, how big the next meal is (canvas board MS, MS2): the question about a meal not logged */
 .ms-ask { border: 1.5px solid var(--line); background: #fff; border-radius: 12px; padding: 10px; margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
 .ms-q { font-weight: 700; color: var(--ink); line-height: 1.4; }
+/* 0.2.13, Picture made with AI on chefmealan.com and in the Publish sheet */
+.rp-hero, .rp-rphoto { position: relative; }
+.rp-ai { position: absolute; right: 10px; bottom: 10px; background: rgba(23,39,66,.78); color: #fff; font-size: 12px; font-weight: 800; border-radius: 8px; padding: 3px 8px; pointer-events: none; }
+.pub-ai { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; font-weight: 700; margin: 8px 0 4px; color: var(--ink); } .pub-ai input { margin-top: 2px; width: 18px; height: 18px; flex: none; padding: 0; }
+.try-photo { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; border: 1.5px dashed var(--line); }
+.try-shot { margin: 0; display: flex; flex-direction: column; gap: 6px; } .try-shot img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; display: block; }
+.try-shot figcaption { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; } .try-shot figcaption small { font-weight: 800; }

@@ -11,7 +11,8 @@ import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
 import type { Published } from "./PublishSheet";
 import { StepsEditor } from "./StepsEditor";
 import { stepParts } from "../steps";
-import { coverIsDrawn, isDrawnPhoto } from "../covers";
+import { coverIsDrawn, isDrawnPhoto, TEST_MODELS } from "../covers";
+import { sig } from "../photos";
 import { CHEF_NAME } from "./Mark";
 
 // The recipe's own page in the app (0.2.5+r11, canvas board S3, R8 to R11, approved 12 October 2026). Photos first: the
@@ -23,9 +24,11 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel }: {
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto }: {
   // 0.2.11 (canvas board CO, CO4, CO4b): For members, on a recipe of yours
   membersPanel?: React.ReactNode;
+  // 0.2.13: a realistic photo to try against the drawing; the owner only, on the preview
+  tryPhoto?: ((model: string) => Promise<string>) | null;
   // 0.2.10 (canvas board CH, CH5): Chef Mealan drafts the steps; none without the AI
   draft?: (() => Promise<{ ok: true; steps: string[] } | { ok: false; why: string }>) | null;
   meal: Meal; cards: Feedback[]; foods: Food[]; cook: boolean; state: PubState; pub: Published | null; approver: string; direct: boolean; unpublished?: string[];
@@ -121,6 +124,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           <div className="rq-offer-row">{offered.slice(0, 6).map((src, i) => <button key={i} className="publish-photo rph-offer" onClick={() => add(src)} aria-label={`Add plate photo ${i + 1} to the recipe`}><img src={src} alt="" /><span className="rph-plus"><Plus size={14} /></span></button>)}</div>
         </div>
       )}
+      {tryPhoto && <TryPhoto meal={meal} tryPhoto={tryPhoto} use={(img) => { const list = recipePhotosOf(meal).filter((x) => x !== img); onPatch({ ...withRecipePhotos([img, ...list].slice(0, MAX_RECIPE_PHOTOS)), coverSig: sig(img) }); }} />}
       {edit && <span className="rq-editing">Editing the recipe</span>}
       {/* the name: tap to rename (the dashed field, as on the Plate) */}
       {naming !== null
@@ -210,5 +214,28 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         </>
       )}
     </div>
+  );
+}
+
+// A realistic photo to try against the drawing (0.2.13, Milan 16 October 2026, 18:43). The owner only, on the preview: each
+// tap asks one model for one picture, at Google's price; nothing is kept unless Use as cover.
+function TryPhoto({ meal, tryPhoto, use }: { meal: Meal; tryPhoto: (model: string) => Promise<string>; use: (img: string) => void }) {
+  const [shots, setShots] = useState<{ model: string; img: string }[]>([]);
+  const [busy, setBusy] = useState(""), [err, setErr] = useState("");
+  const go = async (model: string) => {
+    setBusy(model); setErr("");
+    try { const img = await tryPhoto(model); setShots((x) => [{ model, img }, ...x]); } catch (e: any) { setErr(e.message); } finally { setBusy(""); }
+  };
+  return (
+    <section className="card try-photo">
+      <b>Try a realistic photo</b>
+      <small className="muted">For you, on the preview. Each tap draws one picture of {meal.title} from its foods and amounts. Nothing is kept unless you tap Use as cover.</small>
+      <div className="button-row">{TEST_MODELS.map((m) => <button key={m.id} className="pill pill-small" disabled={Boolean(busy)} onClick={() => go(m.id)}>{busy === m.id ? "Drawing…" : `${m.name}, $${m.usd}`}</button>)}</div>
+      {err && <small className="muted" style={{ color: "var(--low)" }}>{err}</small>}
+      {shots.map((s, k) => (
+        <figure key={k} className="try-shot"><img src={s.img} alt={`Realistic test by ${s.model}`} /><figcaption><small>{TEST_MODELS.find((m) => m.id === s.model)?.name}</small>
+          <span className="button-row"><button className="pill pill-small pill-primary" onClick={() => { use(s.img); setShots((x) => x.filter((_, j) => j !== k)); }}>Use as cover</button><button className="link" onClick={() => setShots((x) => x.filter((_, j) => j !== k))}>Discard</button></span></figcaption></figure>
+      ))}
+    </section>
   );
 }
