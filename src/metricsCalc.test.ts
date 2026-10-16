@@ -48,3 +48,10 @@ test("what leaves the phone: codes and numbers only, never free text, food names
   const d = stripped("day_closed", { date: "2026-10-12", planned: 3, byPlan: 3, extras: 0, swapped: 1, lived: true, proteinPct: 96, energyPct: 104 })!;
   assert.equal(d.d.lived, true); assert.equal(d.d.date, "2026-10-12");
 });
+test("covers and Members: drawn covers, the ones replaced by a real photo, and what members did (0.2.15)", () => {
+  const ev = (e: string, how: string, day = "2026-10-14"): Ev => ({ m: "a", e, day, d: { how } });
+  const s = weekStats([open("a", "2026-10-12"), ev("cover", "drawn"), ev("cover", "drawn"), ev("cover", "real"), ev("cover", "drawn", "2026-10-01"),
+    ev("members", "open"), ev("members", "open"), ev("members", "make"), ev("members", "keep"), ev("members", "share")], "2026-10-12", X);
+  assert.deepEqual(s.covers, { drawn: 2, real: 1 });
+  assert.deepEqual(s.members, { open: 2, make: 1, keep: 1, share: 1 });
+});

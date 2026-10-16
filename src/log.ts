@@ -26,7 +26,10 @@ export type LogEvent =
   | "app_open"       // Today opened, once a day
   | "day_closed"     // a day before today: data.date, planned, byPlan, extras, swapped, lived, proteinPct, energyPct
   | "fit_used"       // Fit to my target tapped on the Plate
-  | "label_read";    // an AI label read saved: data.kept = saved without a change
+  | "label_read"     // an AI label read saved: data.kept = saved without a change
+  // covers and Members (0.2.15, Milan 16 October 2026, 19:23): the numbers that decide drawn or realistic, later
+  | "cover"          // data.how = drawn (Chef Mealan drew a cover) | real (a real photo replaced a drawn cover)
+  | "members";       // data.how = open | make | keep | share
 const KEY = "chefmealan-log";
 export function log(event: LogEvent, data: Record<string, unknown> = {}) {
   try {

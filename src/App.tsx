@@ -1835,6 +1835,7 @@ export default function App() {
         else if (r.ok && d.already) cover = { state: "drawn", day: today };
       } catch { /* tried today; again tomorrow */ }
       setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id !== m.id ? x : recipeHasPhotos(x) || !photo ? { ...x, cover } : { ...x, cover, photo, photos: [], coverSig: sig(photo) })) }));
+      if (photo) log("cover", { how: "drawn" });
       coverBusy.current = false;
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -2126,6 +2127,7 @@ export default function App() {
         return { ...s, feedback: s.feedback.map((x) => (x.id === cardId ? { ...x, coverAsk: "used" as const } : x)),
           meals: s.meals.map((m) => { if (m.id !== recipeId) return m; const list = recipePhotosOf(m).filter((x) => x !== photo); return { ...m, ...withRecipePhotos([photo, ...list].slice(0, 6)) }; }) };
       });
+      log("cover", { how: "real" });
       notify("Your photo is the cover now.");
     },
     takeMember: (r: SharedRecipe, how: "make" | "keep", portion?: Ingredient[]) => {
@@ -2145,6 +2147,7 @@ export default function App() {
           ...(r.cover ? { photo: r.cover, photos: [], cover: { state: "drawn" as const, day: today }, ...(r.coverKind === "drawn" ? { coverSig: sig(r.cover) } : {}) } : {}) };
         return { ...s, foods, meals: [meal, ...s.meals] };
       });
+      log("members", { how });
       if (how === "make") { void fetch(`/api/members/${encodeURIComponent(r.id)}/made`, { method: "POST" }).catch(() => {}); setStep("recipe"); setTab("journey"); notify("On your plate, at your portion."); }
       else notify(`${r.title} is in Mine. It's yours to change.`);
     },

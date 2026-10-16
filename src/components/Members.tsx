@@ -3,7 +3,8 @@
 // kitchens; your kitchens filter the list. CO3: a member's recipe at your portion, with Make it and Keep in mine.
 // CO4 and CO4b: For members on a recipe of yours: the cover members see, your first name only when you switch it on,
 // Share with members, and Take it back. Sharing needs no coach's OK; Milan, as owner, can take any recipe down.
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { log } from "../log";
 import { ChevronLeft, Utensils } from "lucide-react";
 import type { Meal } from "../pilot";
 import { fmt, pdText, pdVal } from "../ui";
@@ -82,6 +83,7 @@ export function MembersList({ list, ahead, p, open, loading, error }: { list: Sh
 // CO3: a member's recipe at your portion; nothing here can be edited
 export function MemberPage({ r, ahead, p, owner, close, takeDown }: { r: SharedRecipe; ahead: Ahead | null; p: AppApi; owner: boolean; close: () => void; takeDown: () => void }) {
   useBack(true, close);
+  useEffect(() => { log("members", { how: "open" }); }, [r.id]);
   const x = portionOf(r, ahead?.kcal ?? null);
   const steps = r.steps ?? [];
   return (
@@ -136,6 +138,7 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d.error || "Sharing didn't work. Try again.");
       onPatch({ members: { id: d.id, at: d.sharedAt, named, coverSig: pick, kitchen, sent: contentSig(recipe) } });
+      log("members", { how: "share" });
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   };
   const takeBack = async () => {

@@ -6,6 +6,7 @@ import { fmt, pdText } from "../ui";
 import { recipePhotosOf, withRecipePhotos } from "../photos";
 import { resizeImageBase64 } from "../utils/image";
 import { useBack } from "../back";
+import { log } from "../log";
 import { ConfirmButton } from "./Confirm";
 import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
 import type { Published } from "./PublishSheet";
@@ -47,7 +48,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const drawn = coverIsDrawn(meal);
   const add = (data: string) => {
     if (list.includes(data) || list.length >= MAX_RECIPE_PHOTOS) return;
-    if (drawn) { setPhotos([data, ...list]); setAt(0); return; }
+    if (drawn) { setPhotos([data, ...list]); setAt(0); log("cover", { how: "real" }); return; }
     setPhotos([...list, data]); setAt(list.length);
   };
   const fromFile = async (f: File | undefined) => {

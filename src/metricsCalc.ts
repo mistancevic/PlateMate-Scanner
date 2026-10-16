@@ -17,6 +17,9 @@ const num = (v: unknown) => (typeof v === "number" && Number.isFinite(v) ? v : 0
 export type Ratio = { n: number; of: number };
 export type WeekStats = {
   week: { from: string; to: string };
+  // covers and Members (0.2.15): drawn covers, drawn covers replaced by a real photo, and what members did with Members
+  covers: { drawn: number; real: number };
+  members: { open: number; make: number; keep: number; share: number };
   active: number;                          // members who opened Today in the week
   northStar: number | null;                // days lived by the plan, per active member
   lived: number;
@@ -62,6 +65,8 @@ export function weekStats(all: Ev[], from: string, x: Extra): WeekStats {
     mealsByPlan: byPlan + extras ? Math.round((byPlan / (byPlan + extras)) * 100) : null,
     daysSaved: days.filter((c) => c.d?.lived === true && num(c.d?.swapped) > 0).length,
     fitted: week.filter((v) => v.e === "fit_used").length,
+    covers: { drawn: week.filter((v) => v.e === "cover" && v.d?.how === "drawn").length, real: week.filter((v) => v.e === "cover" && v.d?.how === "real").length },
+    members: Object.fromEntries(["open", "make", "keep", "share"].map((h) => [h, week.filter((v) => v.e === "members" && v.d?.how === h).length])) as WeekStats["members"],
     weeklyActive: [...activeDays.values()].filter((s) => s.size >= 3).length,
     retention: { n: cohort.filter((m) => activeDays.has(m)).length, of: cohort.length },
     firstPlanned: { n: firstPlanned, of: fresh.length },

@@ -110,6 +110,14 @@ export function MetricsScreen() {
             ["Days saved (a meal changed, day on target)", s.daysSaved, l.daysSaved], ["Plates fitted with Fit to my target", s.fitted, l.fitted], ["Weekly active members (Today on 3 or more days)", s.weeklyActive, l.weeklyActive]]
             .map(([a, n, m]) => <div className="mt-row" key={String(a)}><span>{a}</span><b>{n}</b><small>{m}</small></div>)}
         </section>
+        <section className="card mt-card">
+          <b className="mt-h">Covers and Members</b>
+          <small className="muted">Real photos are the goal: how many drawn covers get a real photo decides drawn or realistic, later. Counts, no pictures, no recipe names.</small>
+          {[["Covers drawn by Chef Mealan", s.covers?.drawn ?? 0, l.covers?.drawn ?? 0], ["Drawn covers replaced by a real photo", s.covers?.real ?? 0, l.covers?.real ?? 0],
+            ["Members recipes opened", s.members?.open ?? 0, l.members?.open ?? 0], ["Made from Members", s.members?.make ?? 0, l.members?.make ?? 0],
+            ["Kept in Mine from Members", s.members?.keep ?? 0, l.members?.keep ?? 0], ["Shared with members", s.members?.share ?? 0, l.members?.share ?? 0]]
+            .map(([a, n, m]) => <div className="mt-row" key={String(a)}><span>{a}</span><b>{n}</b><small>{m}</small></div>)}
+        </section>
       </>)}
     </div>
   );

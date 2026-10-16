@@ -504,7 +504,7 @@ const withoutPhoto = (r: any): PublicRecipe => { const { photo, authorUid, pendi
 // from the account, never the email. Home page counts are one number per day and kind: no cookie, no IP stored, no
 // visitor id. The preview counts apart, so testing never moves the numbers. Only Milan's account reads the numbers:
 // METRICS_EMAILS in deploy.env lists who may.
-const EVENT_KINDS = new Set(["app_open", "day_closed", "fit_used", "label_read", "safety_flag", "meal_saved", "feedback", "made", "carry", "food_in", "mix_taken", "adult_confirmed"]);
+const EVENT_KINDS = new Set(["app_open", "day_closed", "fit_used", "label_read", "safety_flag", "meal_saved", "feedback", "made", "carry", "food_in", "mix_taken", "adult_confirmed", "cover", "members"]);
 const EVENT_KEYS = new Set(["way", "how", "went", "ate", "locked", "method", "kind", "moment", "case", "status", "result", "source", "items", "pd", "kcal", "photos", "products",
   "date", "planned", "byPlan", "extras", "swapped", "lived", "proteinPct", "energyPct", "kept"]);
 const HIT_KINDS = new Set(["hp_visit", "hp_calc", "hp_try", "built_visit"]);
