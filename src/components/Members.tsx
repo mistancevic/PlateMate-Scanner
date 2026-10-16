@@ -15,7 +15,8 @@ import { isDrawnPhoto } from "../covers";
 import { resizeImageBase64 } from "../utils/image";
 import { ConfirmButton } from "./Confirm";
 import { portionOf, membersFor, sharedOf, contentSig, firstName, type SharedRecipe } from "../members";
-import { mealShare, mealNow } from "../makeMeal";
+import { mealShare, mealNow, closedSlots } from "../makeMeal";
+import { answersFor } from "../unlogged";
 import { slotsOn } from "../slots";
 import { lifestyleOf } from "../personal";
 import { dayRecord } from "../record";
@@ -29,7 +30,7 @@ export function aheadOf(p: AppApi): Ahead | null {
   const today = ymd(new Date());
   const slots = slotsOn(lifestyleOf(p.personal), p.personal.timesOn, today);
   const rec = dayRecord(slots, p.planned[today], dayLog(p.state.feedback, new Date()).logged, today);
-  const closed = new Set([...rec.eaten.map((f) => f.slot!.slotId), ...rec.skipped.map((x) => x.id)]);
+  const closed = closedSlots(slots, rec, answersFor(today));
   const slot = mealNow(slots, closed, new Date());
   const nums = p.numbersFor(new Date());
   if (!slot || !nums) return null;

@@ -48,3 +48,29 @@ test("CH3: Chef Mealan's Balkan lunch lands on 927 kcal at PD 10.1; the bread's 
   const sweet = food("Honey", 304, 0.3);
   assert.match((solveMeal([{ id: "c", food: CO, grams: 100, locked: false }], [{ food: sweet, grams: 50, base: true, have: false }], 600, 6.4, () => false, uid) as any).why, /under the target/);
 });
+
+import { closedSlots, unloggedMeal } from "./makeMeal";
+test("MS1: a meal eaten off the plan closes the meal nearest its time; dinner gets 937 of the 1,873 kcal left", () => {
+  const at = (h: number, m = 0) => new Date(2026, 9, 16, h, m).toISOString();
+  const rec = { eaten: [], skipped: [], extras: [{ createdAt: at(13, 10) }] };
+  const closed = closedSlots(slots, rec);
+  assert.deepEqual([...closed], ["lunch"]);
+  assert.deepEqual(mealShare(slots, "dinner", { kcal: 2800, protein: 180 }, { kcal: 927, protein: 94 }, new Set()), { kcal: 624, protein: 29 });
+  assert.deepEqual(mealShare(slots, "dinner", { kcal: 2800, protein: 180 }, { kcal: 927, protein: 94 }, closed), { kcal: 937, protein: 43 });
+  // between two windows (breakfast ends 09:00, lunch starts 12:45): no meal closes
+  assert.equal(closedSlots(slots, { eaten: [], skipped: [], extras: [{ createdAt: at(10, 30) }] }).size, 0);
+  // two plates at lunch: the second goes to the next meal in its window, if any
+  assert.deepEqual([...closedSlots(slots, { eaten: [], skipped: [], extras: [{ createdAt: at(13, 10) }, { createdAt: at(14, 0) }] })], ["lunch"]);
+});
+test("MS2: a passed meal not logged is asked once; I skipped it gives its share to the meals to come", () => {
+  const now = new Date(2026, 9, 16, 17, 30);
+  const closed = new Set(["lunch"]);
+  assert.equal(unloggedMeal(slots, closed, {}, now, "dinner")?.id, "breakfast");
+  assert.equal(unloggedMeal(slots, closed, { breakfast: "had" }, now, "dinner"), null);
+  assert.equal(unloggedMeal(slots, new Set(), {}, new Date(2026, 9, 16, 8, 30), "breakfast"), null);
+  const skipped = closedSlots(slots, { eaten: [], skipped: [], extras: [{ createdAt: new Date(2026, 9, 16, 13, 10).toISOString() }] }, { breakfast: "skipped" });
+  assert.deepEqual(mealShare(slots, "dinner", { kcal: 2800, protein: 180 }, { kcal: 927, protein: 94 }, skipped), { kcal: 1873, protein: 86 });
+  // the CH1 example: 11:00, nothing logged: lunch stays 933; breakfast skipped: 1,400
+  assert.deepEqual(mealShare(slots, "lunch", { kcal: 2800, protein: 180 }, { kcal: 0, protein: 0 }, new Set()), { kcal: 933, protein: 60 });
+  assert.deepEqual(mealShare(slots, "lunch", { kcal: 2800, protein: 180 }, { kcal: 0, protein: 0 }, new Set(["breakfast"])), { kcal: 1400, protein: 90 });
+});

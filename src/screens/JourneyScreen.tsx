@@ -19,7 +19,8 @@ import { momentOf, orderMoments, REGIONS } from "../moments";
 import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
-import { mealShare, mealNow, routeOf, solveMeal, type Add } from "../makeMeal";
+import { mealShare, mealNow, routeOf, solveMeal, closedSlots, unloggedMeal, type Add } from "../makeMeal";
+import { answersFor, setAnswer } from "../unlogged";
 import { slotsOn } from "../slots";
 import { lifestyleOf } from "../personal";
 import { dayRecord } from "../record";
@@ -312,11 +313,23 @@ export function JourneyScreen(p: AppApi) {
   const todayKey = ymd(new Date()), mealDate = p.filling?.date ?? todayKey;
   const daySlots = slotsOn(lifestyleOf(p.personal), p.personal.timesOn, mealDate);
   const dayRec = dayRecord(daySlots, p.planned[mealDate], mealDate === todayKey ? dayLog(state.feedback, new Date()).logged : [], mealDate);
-  const closed = new Set([...dayRec.eaten.map((f) => f.slot!.slotId), ...dayRec.skipped.map((x) => x.id)]);
+  // which meals are done (0.2.12, board MS): a plate off the plan closes the meal nearest its time; I skipped it closes too
+  const [answers, setAnswers] = useState(() => answersFor(todayKey));
+  const closed = mealDate === todayKey ? closedSlots(daySlots, dayRec, answers) : new Set([...dayRec.eaten.map((f) => f.slot!.slotId), ...dayRec.skipped.map((x) => x.id)]);
   const mealSlot = p.filling ? daySlots.find((x) => x.id === p.filling!.slotId) ?? null : mealNow(daySlots, closed, new Date());
   const dayNums = p.numbersFor(new Date(`${mealDate}T12:00:00`));
   const share = mealSlot && dayNums ? mealShare(daySlots, mealSlot.id, { kcal: dayNums.kcal, protein: dayNums.protein }, mealDate === todayKey ? { kcal: dayRec.kcal, protein: dayRec.protein } : { kcal: 0, protein: 0 }, closed) : null;
   const chefable = p.kind !== "dessert" && momentOf(p.moment).planned && !!share && share.kcal >= 150 && p.filling?.mode !== "eat";
+  // MS2: a meal whose time has passed and isn't logged: one question, here, when the size matters
+  const unlogged = mealDate === todayKey ? unloggedMeal(daySlots, closed, answers, new Date(), mealSlot?.id ?? null) : null;
+  const [justSkipped, setJustSkipped] = useState<string | null>(null);
+  const answer = (slotId: string, a: "had" | "skipped" | null) => {
+    const held = p.planned[todayKey]?.[slotId];
+    // a planned meal skips the way Skip on Today does, so Today and Plan say the same; otherwise the answer is for the size only
+    if (held) p.fill(todayKey, slotId, a === "skipped" ? { ...held, skipped: true } : { ...held, skipped: undefined });
+    setAnswer(todayKey, slotId, a); setAnswers(answersFor(todayKey));
+    setJustSkipped(a === "skipped" ? slotId : null);
+  };
   const mealWord = (mealSlot?.name ?? "meal").toLowerCase();
   const Meal = mealWord.charAt(0).toUpperCase() + mealWord.slice(1);
   // the button: the quick fit when maths does it, Chef Mealan when it cannot (Milan, 15 October 2026, 22:43)
@@ -494,6 +507,21 @@ export function JourneyScreen(p: AppApi) {
           </>)}
         </div>
         {!madeBy && chefable && share && items.length > 0 && <p className="small center">{Meal} is about {fmt(share.kcal, 0)} kcal{dayNums ? ` of your ${fmt(dayNums.kcal, 0)}` : ""}{pdRef !== null ? `, at ${pdTag()} ${pdVal(pdRef)} or more` : ""}. {CHEF_NAME} adds what it needs and sets the amounts. Keep it as it is {p.filling ? `puts the plate in ${slotName(p.filling)} as it stands` : "takes the plate as it stands"}.</p>}
+        {!madeBy && chefable && share && items.length > 0 && unlogged && (() => {
+          const name = unlogged.name.charAt(0).toUpperCase() + unlogged.name.slice(1);
+          const ifSkipped = mealSlot && dayNums ? mealShare(daySlots, mealSlot.id, { kcal: dayNums.kcal, protein: dayNums.protein }, { kcal: dayRec.kcal, protein: dayRec.protein }, new Set([...closed, unlogged.id])) : null;
+          return (
+            <div className="ms-ask">
+              <small className="ms-q">{name} isn't logged today. Did you have it?</small>
+              <div className="button-row"><button className="pill pill-small" onClick={() => answer(unlogged.id, "had")}>I had it</button><button className="pill pill-small" onClick={() => answer(unlogged.id, "skipped")}>I skipped it</button></div>
+              <small className="muted">I had it: {mealWord} stays about {fmt(share.kcal, 0)} kcal. I skipped it: {unlogged.name.toLowerCase()}'s share moves to {mealWord}{ifSkipped ? `, about ${fmt(ifSkipped.kcal, 0)} kcal` : ""}.</small>
+            </div>
+          );
+        })()}
+        {!madeBy && chefable && share && items.length > 0 && justSkipped && (() => {
+          const sk = daySlots.find((x) => x.id === justSkipped);
+          return sk ? <div className="ms-ask"><small className="ms-q">{sk.name.charAt(0).toUpperCase() + sk.name.slice(1)} skipped today. Its share moved to {mealWord}.</small><button className="link" style={{ alignSelf: "flex-start" }} onClick={() => answer(sk.id, null)}>Undo</button></div> : null;
+        })()}
         {!chefable && p.filling && p.filling.mode !== "eat" && items.length > 0 && <p className="small center">Fit moves one food. Keep it as it is puts the plate in {slotName(p.filling)} as it stands.</p>}
         {p.filling?.mode === "eat" && items.length > 0 && <p className="small center">Fit sets the amounts. Keep it as it is keeps yours. Save at the end records it as {slotName(p.filling)}.</p>}
         {!chefable && !p.filling && items.length === 1 && <p className="small center">One product: {CHEF_NAME} looks through your foods for a partner that brings it to your plan.</p>}

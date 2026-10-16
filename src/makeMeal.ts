@@ -19,6 +19,27 @@ export function mealShare(slots: Slot[], slotId: string, day: Nums | null, eaten
   const total = toCome.reduce((n, s) => n + weightOf(s), 0) || 1, share = weightOf(slot) / total;
   return { kcal: Math.round(Math.max(0, day.kcal - eaten.kcal) * share), protein: Math.round(Math.max(0, day.protein - eaten.protein) * share) };
 }
+// Which meals are done for today (0.2.12, canvas board MS, MS1 and MS2; Milan 16 October 2026, 18:08): eaten for the plan,
+// skipped on purpose, a meal eaten off the plan for the meal nearest its time (from an hour before that meal to an hour and
+// a half after, the window that decides which meal a plate is for), and a meal the person said they skipped. For the size
+// only: the plan still shows a plate off the plan as extra.
+export const WINDOW = { before: 60, after: 90 };
+export function closedSlots(slots: Slot[], rec: { eaten: { slot?: { slotId: string } }[]; skipped: Slot[]; extras: { createdAt: string }[] }, answers: Record<string, "had" | "skipped"> = {}): Set<string> {
+  const closed = new Set<string>([...rec.eaten.map((f) => f.slot!.slotId), ...rec.skipped.map((x) => x.id)]);
+  for (const [id, a] of Object.entries(answers)) if (a === "skipped") closed.add(id);
+  for (const f of [...rec.extras].sort((x, y) => (x.createdAt < y.createdAt ? -1 : 1))) {
+    const d = new Date(f.createdAt), t = d.getHours() * 60 + d.getMinutes();
+    const near = slots.filter((s) => !closed.has(s.id) && t >= toMin(s.time) - WINDOW.before && t <= toMin(s.time) + WINDOW.after)
+      .sort((x, y) => Math.abs(t - toMin(x.time)) - Math.abs(t - toMin(y.time)))[0];
+    if (near) closed.add(near.id);
+  }
+  return closed;
+}
+// A meal whose time has passed and isn't logged (MS2): the first one, unless the person already answered for it today
+export function unloggedMeal(slots: Slot[], closed: Set<string>, answers: Record<string, "had" | "skipped">, now: Date, current: string | null): Slot | null {
+  const m = now.getHours() * 60 + now.getMinutes();
+  return slots.find((s) => s.id !== current && !closed.has(s.id) && !answers[s.id] && toMin(s.time) + WINDOW.after < m) ?? null;
+}
 // the meal a plate off the plan is for: the next meal not yet eaten or skipped, by the time now; after the last, the last
 export function mealNow(slots: Slot[], closed: Set<string>, now: Date): Slot | null {
   const m = now.getHours() * 60 + now.getMinutes();
