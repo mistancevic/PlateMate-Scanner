@@ -156,6 +156,12 @@ export interface AppApi {
   recordTalk: (q: string, reply: string, plate: string[]) => void;
   shareCard: (id: string, reason: "look" | "ok" | "help") => void;
   saveCardAsRecipe: (id: string) => void;
+  // the photo ask on a meal card when the recipe's cover is drawn (0.2.11, board CO, CO1b, CO1c)
+  setCardPhoto: (id: string, data: string) => void;
+  setCoverAsk: (id: string, v: "later" | "kept" | "used") => void;
+  useCardAsCover: (cardId: string, recipeId: string) => void;
+  // Members (0.2.11, board CO, CO2 to CO4b): a member's recipe on the plate at your portion, or kept in Mine
+  takeMember: (r: import("../members").SharedRecipe, how: "make" | "keep", portion?: import("../pilot").Ingredient[]) => void;
   setCarry: (id: string, how: "light" | "fine" | "heavy") => void;
   user: import("../cloud").CloudUser | null;
   cloudEnabled: boolean;

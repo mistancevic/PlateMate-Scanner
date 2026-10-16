@@ -9,6 +9,10 @@ import { localAs } from "../recipes";
 import { RecipePage, type PubState } from "../components/RecipePage";
 import { fromDraft } from "../steps";
 import { recipePhotosOf, recipeHasPhotos, sig } from "../photos";
+import { coverIsDrawn } from "../covers";
+import { CHEF_NAME } from "../components/Mark";
+import { MembersList, MemberPage, SharePanel, aheadOf } from "../components/Members";
+import { sharedOf, contentSig, type SharedRecipe } from "../members";
 
 export function RecipesScreen(p: AppApi) {
   const { state, setState, setTab } = p;
@@ -54,14 +58,40 @@ export function RecipesScreen(p: AppApi) {
   const author = first(p.user?.name);
   const pubState = (id: string, draft: boolean): PubState => { const x = published[id]; return x ? (x.status === "waiting" || x.waiting ? "waiting" : x.status === "down" ? "down" : x.status === "back" ? "back" : "live") : draft ? "draft" : null; };
   const pubMeal = state.meals.find((m) => m.id === publishing);
-  // the Recipes tab (X0 and Y1, 10 October 2026): My recipes and Coach's recipes, one tile per recipe with its photo
-  const [view, setView] = useState<"mine" | "coach">("mine");
+  // the Recipes tab (X0 and Y1, 10 October 2026): My recipes and Coach's recipes, one tile per recipe with its photo;
+  // Members as a third tab, and the tabs shorter so three fit: Mine, Coach's, Members (0.2.11, board CO, CO2)
+  const [view, setView] = useState<"mine" | "coach" | "members">("mine");
+  const [memberList, setMemberList] = useState<SharedRecipe[] | null>(null);
+  const [owner, setOwner] = useState(false), [loadingMembers, setLoadingMembers] = useState(false), [membersErr, setMembersErr] = useState("");
+  const [memberOpen, setMemberOpen] = useState<string | null>(null);
+  const loadMembers = () => {
+    setLoadingMembers(true); setMembersErr("");
+    fetch("/api/members").then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || "Members didn't load. Try again."); setMemberList(d.recipes ?? []); setOwner(Boolean(d.owner)); })
+      .catch((e) => setMembersErr(e.message)).finally(() => setLoadingMembers(false));
+  };
+  const anyShared = state.meals.some((m) => m.members);
+  useEffect(() => { if (view === "members" || anyShared) loadMembers(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [view, p.user?.uid, anyShared]);
+  // a change to a shared recipe reaches members (CO4b): the name, the foods, the amounts, the steps; the cover stays
+  useEffect(() => {
+    for (const m of state.meals) {
+      if (!m.members) continue;
+      const recipe = sharedOf(m, m.members.kitchen), now = contentSig(recipe);
+      if (now === m.members.sent) continue;
+      const id = m.members.id, named = m.members.named;
+      fetch("/api/members", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id, recipe, named, name: p.user?.name ?? "" }) })
+        .then((r) => { if (r.ok) setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === m.id && x.members ? { ...x, members: { ...x.members, sent: now } } : x)) })); })
+        .catch(() => {});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.meals]);
+  const ahead = aheadOf(p);
   const mine = state.meals.filter((m) => m.from !== "coach"), fromCoach = state.meals.filter((m) => m.from === "coach");
   const shown = view === "mine" ? mine : fromCoach;
   const photoOf = (m: Meal) => state.feedback.find((f) => f.meal.id === m.id && f.photo)?.photo ?? state.feedback.find((f) => f.meal.title === m.title && f.photo)?.photo ?? null;
   const madeTimes = (m: Meal) => state.feedback.filter((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.status === "eaten").length;
   const lastRating = (m: Meal) => state.feedback.find((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.taste)?.taste ?? "";
   const opened = openId ? state.meals.find((m) => m.id === openId) ?? null : null;
+
   // R12c (0.2.5+r13, board S4): closing the sheet after a publish says so once
   const [justLive, setJustLive] = useState<string | null>(null);
   // Publish the changes on the recipe's page publishes at once; the sheet opens to show it worked (0.2.5+r14)
@@ -71,6 +101,10 @@ export function RecipesScreen(p: AppApi) {
     onDone={(r) => { if (r?.status === "live" && !r.waiting) setJustLive(r.title); setPublished((x) => { const y = { ...x }; if (r) y[pubMeal.id] = r; else delete y[pubMeal.id]; return y; }); }}
     onMeal={(patch) => setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === pubMeal.id ? { ...x, ...patch } : x)) }))}
     direct={cook.direct} approver={approver} client={client} publishNow={publishNow} />;
+  // CO3: a member's recipe
+  const member = memberOpen ? memberList?.find((r) => r.id === memberOpen) ?? null : null;
+  if (member) return <MemberPage r={member} ahead={ahead} p={p} owner={owner} close={() => setMemberOpen(null)}
+    takeDown={() => { fetch(`/api/members/${encodeURIComponent(member.id)}`, { method: "DELETE" }).then(() => { setMemberOpen(null); loadMembers(); p.notify("Taken down for every member."); }).catch(() => {}); }} />;
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
@@ -80,6 +114,8 @@ export function RecipesScreen(p: AppApi) {
         onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
         onDelete={() => { setOpenId(null); setState((s) => ({ ...s, meals: s.meals.filter((x) => x.id !== opened.id) })); }}
         close={() => setOpenId(null)}
+        membersPanel={opened.from === "coach" || opened.from === "members" ? null
+          : <SharePanel key={opened.id} meal={opened} p={p} made={opened.members ? memberList?.find((r) => r.id === opened.members!.id)?.made ?? null : null} onPatch={(patch) => patchMeal(opened.id, patch)} />}
         draft={p.ai.on ? async () => {
           // the foods in the recipe's order, as {1}, {2}; a draft that fails the checks goes back once with why (board CH, CH5)
           const items = opened.items.filter((i) => i.grams > 0);
@@ -98,25 +134,30 @@ export function RecipesScreen(p: AppApi) {
   return (
     <>
       <div className="segments" role="tablist" aria-label="Recipes">
-        <button role="tab" aria-selected={view === "mine"} className={`seg ${view === "mine" ? "on" : ""}`} onClick={() => setView("mine")}>My recipes{mine.length ? ` (${mine.length})` : ""}</button>
-        <button role="tab" aria-selected={view === "coach"} className={`seg ${view === "coach" ? "on" : ""}`} onClick={() => setView("coach")}>Coach's recipes{fromCoach.length ? ` (${fromCoach.length})` : ""}</button>
+        <button role="tab" aria-selected={view === "mine"} className={`seg ${view === "mine" ? "on" : ""}`} onClick={() => setView("mine")}>Mine{mine.length ? ` (${mine.length})` : ""}</button>
+        <button role="tab" aria-selected={view === "coach"} className={`seg ${view === "coach" ? "on" : ""}`} onClick={() => setView("coach")}>Coach's{fromCoach.length ? ` (${fromCoach.length})` : ""}</button>
+        <button role="tab" aria-selected={view === "members"} className={`seg ${view === "members" ? "on" : ""}`} onClick={() => setView("members")}>Members</button>
       </div>
-      {shown.length === 0 && (
+      {view === "members" && <MembersList list={memberList} ahead={ahead} p={p} open={setMemberOpen} loading={loadingMembers} error={membersErr} />}
+      {view !== "members" && shown.length === 0 && (
         <section className="card recipes-empty">
           <small>{view === "mine" ? "Nothing here yet. Your first recipe starts on the Plate." : `Nothing yet. Recipes ${approver === "your coach" ? "your coach" : approver} sends you land here.`}</small>
           {view === "mine" && <button className="pill pill-wide pill-primary" onClick={() => { p.setKind("meal"); p.setStep("in"); setTab("journey"); }}>Make my first recipe</button>}
         </section>
       )}
-      {shown.map((m) => {
+      {view !== "members" && shown.map((m) => {
         // R7: one tap per recipe: the cover (or the newest plate photo), the name, the foods, where the recipe is
         const own = recipePhotosOf(m), photo = own[0] ?? photoOf(m), n = madeTimes(m), rating = lastRating(m);
         const st = isCoach ? pubState(m.id, Boolean(m.publish)) : null;
         return (
           <button type="button" className="card recipe-tile" key={m.id} onClick={() => setOpenId(m.id)} aria-label={`Open ${m.title}`}>
-            {photo ? <img src={photo} alt="" /> : <div className="recipe-tile-blank"><Utensils size={28} /></div>}
+            {photo
+              ? (coverIsDrawn(m) && own[0] === photo ? <span className="recipe-tile-cover"><img src={photo} alt="" /><span className="tile-drawn">Picture by {CHEF_NAME}</span></span> : <img src={photo} alt="" />)
+              : <div className="recipe-tile-blank"><span><Utensils size={28} />{m.cover?.state === "tomorrow" && <small>Picture tomorrow</small>}</span></div>}
             <div className="recipe-tile-body">
               <div className="card-top"><b className="tile-name">{m.title}</b><ChevronRight size={20} className="tile-go" /></div>
               <small>{m.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}{rating ? ` · ${rating}` : ""}{n ? ` · made ${n === 1 ? "once" : `${n} times`}` : ""}</small>
+              {m.members && <small className="tile-state live">Shared with members</small>}
               {st && <small className={`tile-state ${st}`}>{st === "live" ? "Live on chefmealan.com" : st === "down" ? "Taken down" : st === "waiting" ? `Waiting for ${approver}` : st === "back" ? `Sent back by ${approver}` : "Draft"}</small>}
             </div>
           </button>

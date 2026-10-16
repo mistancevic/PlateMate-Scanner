@@ -45,7 +45,9 @@ import { merge as mergeRecords, changes as recordChanges, type Known } from "./r
 import { installBack, pushTab, startTab, tabOfPath, useBack, pathOfTab, MENU_PATH, menuTrailOf } from "./back";
 import { clearKept } from "./kept";
 import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
-import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted, realPhotosOf, isDrawn } from "./photos";
+import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted, realPhotosOf, isDrawn, recipePhotosOf, withRecipePhotos, recipeHasPhotos } from "./photos";
+import { needsCover, cardHasPhoto } from "./covers";
+import { itemsOf as itemsOfShared, type SharedRecipe } from "./members";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { BuiltScreen } from "./screens/BuiltScreen";
 import { PilotGate } from "./screens/PilotGate";
@@ -1813,6 +1815,30 @@ export default function App() {
   setPdUnit(personal.pdUnit);
   const ai = aiState(safety, personal.birthYear, Boolean(profile.coachId) || profile.role === "coach");
   const updateSafety = (fn: (s: Safety) => Safety) => { const next = fn(getSafety()); storeSafety(next); setSafetyState(next); };
+  // A cover drawn by Chef Mealan (0.2.11, board CO, CO1): a recipe kept without a photo gets one picture, once, one recipe at
+  // a time. The server keeps the counts: one per recipe, ten a day per member, then Picture tomorrow and the next day.
+  const coverBusy = useRef(false);
+  useEffect(() => {
+    if (!ai.on || coverBusy.current || (cloudEnabled && !user)) return;
+    const today = ymd(new Date());
+    // a recipe whose cards already hold a real plate photo shows that photo, so it never gets a drawing
+    const m = state.meals.find((x) => needsCover(x, today) && !cardHasPhoto(x, state.feedback));
+    if (!m) return;
+    coverBusy.current = true;
+    (async () => {
+      let cover: NonNullable<Meal["cover"]> = { state: "failed", day: today }, photo: string | undefined;
+      try {
+        const r = await fetch("/api/cover", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ recipeId: m.id, title: m.title, items: m.items.filter((i) => i.grams > 0).map((i) => ({ name: i.food.name, grams: i.grams })) }), signal: AbortSignal.timeout(90000) });
+        const d = await r.json().catch(() => ({}));
+        if (r.ok && typeof d.image === "string") { photo = await resizeImageBase64(d.image, 960, 720).catch(() => d.image); cover = { state: "drawn", day: today }; }
+        else if (r.ok && d.tomorrow) cover = { state: "tomorrow", day: today };
+        else if (r.ok && d.already) cover = { state: "drawn", day: today };
+      } catch { /* tried today; again tomorrow */ }
+      setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id !== m.id ? x : recipeHasPhotos(x) || !photo ? { ...x, cover } : { ...x, cover, photo, photos: [], coverSig: sig(photo) })) }));
+      coverBusy.current = false;
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.meals, ai.on, user]);
   // code signal: a custom goal under the body's resting burn, or a loss faster than 1 percent a week, raises a flag
   useEffect(() => {
     if (!goal || goal.source !== "exact" || state.goals.calories === null || !canCalculate(personal)) return;
@@ -2086,6 +2112,42 @@ export default function App() {
     mixQuestion, mixQuestionTaken: () => setMixQuestion(null),
     recordTalk: (q: string, reply: string, plate: string[]) => setTalkTurns((t) => [...t, { role: "you", text: q, plate }, { role: "mealan", text: reply }]),
     // a card becomes a recipe: the foods, the grams, the steps and the photo (gap C, 10 October 2026)
+    setCardPhoto: (id: string, data: string) => {
+      setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, photo: data, photos: [...(f.photos ?? []), data] } : f)) }));
+    },
+    setCoverAsk: (id: string, v: "later" | "kept" | "used") => {
+      setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, coverAsk: v } : f)) }));
+    },
+    // the plate photo becomes the cover: first in the recipe's photos; the drawn picture stays behind it, for members
+    useCardAsCover: (cardId: string, recipeId: string) => {
+      setState((s) => {
+        const f = s.feedback.find((x) => x.id === cardId), photo = f?.photo;
+        if (!f || !photo) return s;
+        return { ...s, feedback: s.feedback.map((x) => (x.id === cardId ? { ...x, coverAsk: "used" as const } : x)),
+          meals: s.meals.map((m) => { if (m.id !== recipeId) return m; const list = recipePhotosOf(m).filter((x) => x !== photo); return { ...m, ...withRecipePhotos([photo, ...list].slice(0, 6)) }; }) };
+      });
+      notify("Your photo is the cover now.");
+    },
+    takeMember: (r: SharedRecipe, how: "make" | "keep", portion?: Ingredient[]) => {
+      // foods she doesn't have come along with their values, as from a coach's recipe
+      setState((s) => {
+        const key = (n: string, b: string) => `${n}|${b}`.toLowerCase();
+        const have = new Map(s.foods.map((f) => [key(f.name, f.brand), f] as const));
+        const fresh: Food[] = [];
+        const libOf = (i: Ingredient) => { const k = key(i.food.name, i.food.brand); let f = have.get(k); if (!f) { f = { ...i.food, id: uid(), icon: i.food.icon || iconFor(i.food.name) }; have.set(k, f); fresh.push(f); } return f; };
+        const src = how === "make" && portion ? portion : itemsOfShared(r);
+        const items = src.map((i) => ({ ...i, food: libOf(i), locked: how === "make" }));
+        const foods = [...s.foods, ...fresh];
+        if (how === "make") return { ...s, foods, items, portion: null, title: r.title };
+        const today = ymd(new Date());
+        const meal: Meal = { id: uid(), title: r.title, items, portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString(), steps: r.steps, from: "members", memberOf: r.id,
+          ...(r.kitchen ? { kitchen: r.kitchen } : {}),
+          ...(r.cover ? { photo: r.cover, photos: [], cover: { state: "drawn" as const, day: today }, ...(r.coverKind === "drawn" ? { coverSig: sig(r.cover) } : {}) } : {}) };
+        return { ...s, foods, meals: [meal, ...s.meals] };
+      });
+      if (how === "make") { void fetch(`/api/members/${encodeURIComponent(r.id)}/made`, { method: "POST" }).catch(() => {}); setStep("recipe"); setTab("journey"); notify("On your plate, at your portion."); }
+      else notify(`${r.title} is in Mine. It's yours to change.`);
+    },
     saveCardAsRecipe: (id: string) => {
       setState((s) => {
         const f = s.feedback.find((x) => x.id === id); if (!f || f.recipeId) return s;

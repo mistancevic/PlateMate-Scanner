@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 // app"). For Milan only, from the menu, next to Metrics. AI use as counted on our server; cost per active member from that
 // count at the two prices typed once (what one more member costs, automatic); the month's two bills as fixed cost, a total,
 // not divided, with a check of the count against the AI bill. Later: the bills from Google's billing export.
-type Use = { calls: number; in: number; out: number; byModel: Record<string, number> };
-type Data = { ai?: { today: Use; month: Use }; aiSince?: string | null; prices?: { in: number; out: number; at?: string } | null; monthActive?: number; month: string; bills: { ai: number; cloud: number } | null };
+type Use = { calls: number; in: number; out: number; pictures?: number; byModel: Record<string, number> };
+type Data = { ai?: { today: Use; month: Use }; aiSince?: string | null; prices?: { in: number; out: number; at?: string } | null; monthActive?: number; month: string; bills: { ai: number; cloud: number } | null; picture?: { usd: number; eur: number; at: string } };
 const eur = (n: number | null) => (n === null ? "–" : `€${n.toFixed(2)}`);
 const DAY = (d: string) => new Date(`${d.slice(0, 10)}T12:00:00Z`).toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "UTC" });
 export const COST_TARGET = 1; // euros per active member a month (the metrics doc)
@@ -36,7 +36,9 @@ export function CostsScreen() {
   };
   const monthName = new Date(`${data.month}-15T12:00:00Z`).toLocaleDateString("en-GB", { month: "long", timeZone: "UTC" });
   const p = data.prices && (data.prices.in || data.prices.out) ? data.prices : null;
-  const est = (u: Use) => (p ? (u.in / 1e6) * p.in + (u.out / 1e6) * p.out : null);
+  // pictures are priced per picture, not per token (0.2.11, board CO): Google's price, checked on the day in the line below
+  const pic = data.picture?.eur ?? 0;
+  const est = (u: Use) => (p ? (u.in / 1e6) * p.in + (u.out / 1e6) * p.out + (u.pictures ?? 0) * pic : null);
   const n = (x: number) => x.toLocaleString("en");
   const ai = data.ai, active = data.monthActive ?? 0;
   const aiMonth = ai ? est(ai.month) : null;
@@ -54,9 +56,10 @@ export function CostsScreen() {
             <span>Calls</span><b>{n(ai.today.calls)}</b><b className="muted">{n(ai.month.calls)}</b>
             <span>Tokens in</span><b>{n(ai.today.in)}</b><b className="muted">{n(ai.month.in)}</b>
             <span>Tokens out</span><b>{n(ai.today.out)}</b><b className="muted">{n(ai.month.out)}</b>
+            <span>Pictures drawn</span><b>{n(ai.today.pictures ?? 0)}</b><b className="muted">{n(ai.month.pictures ?? 0)}</b>
             <span>At your prices</span><b>{p ? eur(est(ai.today)) : "–"}</b><b className="muted">{p ? eur(aiMonth) : "–"}</b>
           </div>
-          <small className="muted">{Object.keys(ai.month.byModel).length ? `By model this month: ${Object.entries(ai.month.byModel).sort((a, b) => b[1] - a[1]).map(([k, c]) => `${k.replace(/_/g, ".")} ${c} ${c === 1 ? "call" : "calls"}`).join(", ")}.` : "No AI calls yet this month."}{data.aiSince ? ` Counting since ${DAY(data.aiSince)}.` : ""}</small>
+          <small className="muted">{Object.keys(ai.month.byModel).length ? `By model this month: ${Object.entries(ai.month.byModel).sort((a, b) => b[1] - a[1]).map(([k, c]) => `${k.replace(/_/g, ".")} ${c} ${c === 1 ? "call" : "calls"}`).join(", ")}.` : "No AI calls yet this month."}{data.aiSince ? ` Counting since ${DAY(data.aiSince)}.` : ""}{data.picture ? ` Pictures at €${data.picture.eur.toFixed(2)} each ($${data.picture.usd}, Google's price on ${DAY(data.picture.at)}), in the line above.` : ""}</small>
         </section>
       )}
       <section className="card mt-card">

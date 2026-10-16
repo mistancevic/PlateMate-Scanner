@@ -101,8 +101,15 @@ export type Meal = {
   // the steps live with the recipe, so they are there while cooking and the page takes them from here (RF4 Q1)
   steps?: string[];
   publish?: PublishDraft;
-  // Coach's recipes on the Recipes tab (X0, 10 October 2026)
-  from?: "coach";
+  // Coach's recipes on the Recipes tab (X0, 10 October 2026); a member's recipe kept in Mine (0.2.11, board CO, CO3)
+  from?: "coach" | "members";
+  memberOf?: string;
+  // the cover Chef Mealan drew (0.2.11, board CO, CO1): tried or drawn once, and the drawn picture's fingerprint
+  cover?: { state: "drawn" | "tomorrow" | "failed"; day: string };
+  coverSig?: string;
+  // shared with members (0.2.11, board CO, CO4): where, since when, with which cover and name, in which kitchen
+  members?: { id: string; at: string; named: boolean; coverSig: string | null; kitchen: string | null; sent: string };
+  kitchen?: string;
   // the recipe's own photos (0.2.5+r10, board S3, R4 to R6): the cover, then up to 5 more; as files in the store and the
   // account, like a food's (photoSigs and photoCount say which, when the photos themselves are not loaded)
   photo?: string;
@@ -127,6 +134,8 @@ export type Feedback = {
   dayType?: string;
   // Save in My recipes from the card (Y1, 10 October 2026)
   recipeId?: string;
+  // the photo ask on the card when the recipe's cover is drawn (0.2.11, board CO, CO1b, CO1c)
+  coverAsk?: "later" | "kept" | "used";
   // the meal's photos and how making it went (M1 activity 6, 10 October 2026)
   photos?: string[];
   prep?: { went: "as" | "not"; different?: string };

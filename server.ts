@@ -21,6 +21,8 @@ import { tidy } from "./src/labeltable";
 import { normalizePhone } from "./src/phone";
 import { weekStats, mondayOf, addDays, type Ev } from "./src/metricsCalc";
 import { forVisitor, isPreviewHost, slugOf, type PublicRecipe } from "./src/recipes";
+import { coverPrompt, coverVerdict, COVER_MODELS, PICTURE_PRICE } from "./src/covers";
+import { cleanShared } from "./src/members";
 const FB_PROJECT = process.env.FIREBASE_PROJECT_ID || "";
 // photos as files (storage release 1): the project's default bucket in Frankfurt
 const BUCKET = process.env.FIREBASE_STORAGE_BUCKET || (FB_PROJECT ? `${FB_PROJECT}.firebasestorage.app` : "");
@@ -45,6 +47,19 @@ async function membership(uid: string): Promise<Member> {
   if (member && safety.adultAt && !underAge(m.birthYear)) members.set(uid, { m, at: Date.now() });
   return m;
 }
+// The hourly guard (0.2.11, Milan 16 October 2026): it counts only the calls that reach the AI, so saving, syncing and the
+// counter never use it up. It stops scripts and runaway loops; a person using Chef Mealan as meant never meets it.
+function hourly(req: express.Request, res: express.Response, next: express.NextFunction) {
+  if (!FB_PROJECT) return next();
+  const uid = String((req as any).uid || "");
+  if (!uid) return next();
+  const hour = Math.floor(Date.now() / 3_600_000);
+  const u = usage.get(uid);
+  const n = u && u.hour === hour ? u.n + 1 : 1;
+  usage.set(uid, { hour, n });
+  if (n > HOURLY_LIMIT) return res.status(429).json({ error: "That's a lot of questions for one hour. Chef Mealan needs a short break; try again in a few minutes." });
+  next();
+}
 // The AI parts answer only when the safety rules say the chat is on for this account; otherwise the fixed line, never the model.
 function requireAI(req: express.Request, res: express.Response, next: express.NextFunction) {
   if (!FB_PROJECT) return next();
@@ -52,7 +67,7 @@ function requireAI(req: express.Request, res: express.Response, next: express.Ne
   if (!m) return next();
   const st = aiState(m.safety, m.birthYear, m.hasCoach || m.role === "coach");
   if (!st.on) return res.status(403).json({ error: st.why || FIXED.off, fixed: true });
-  next();
+  hourly(req, res, next);
 }
 // What every prompt carries about the person: declared situations and allergies. The model is told; code already enforces.
 function safetyNote(req: express.Request): string {
@@ -86,11 +101,6 @@ async function requireUser(req: express.Request, res: express.Response, next: ex
   if (!token) return res.status(401).json({ error: "Please sign in to use Chef Mealan." });
   try {
     const user = await adminAuth().verifyIdToken(token);
-    const hour = Math.floor(Date.now() / 3_600_000);
-    const u = usage.get(user.uid);
-    const n = u && u.hour === hour ? u.n + 1 : 1;
-    usage.set(user.uid, { hour, n });
-    if (n > HOURLY_LIMIT) return res.status(429).json({ error: "That's a lot of questions for one hour. Chef Mealan needs a short break; try again in a few minutes." });
     (req as any).uid = user.uid;
     (req as any).email = user.email_verified ? String(user.email || "").toLowerCase() : "";
     next();
@@ -299,7 +309,7 @@ function fail(res: express.Response, error: unknown) {
   console.error("Service request failed:", status, e?.name || "Error", message);
   res.status(status >= 400 && status < 600 ? status : 502).json({ error: text });
 }
-app.post("/api/scan", requireUser, requireMember, async (req, res) => {
+app.post("/api/scan", requireUser, requireMember, hourly, async (req, res) => {
   try {
     const raw = req.body?.images;
     if (!Array.isArray(raw) || raw.length < 1 || raw.length > 6)
@@ -395,6 +405,11 @@ app.post("/api/account/delete", requireUser, async (req, res) => {
     files: async () => { if (BUCKET) await adminStorage().bucket(BUCKET).deleteFiles({ prefix: `users/${uid}/` }); },
     record: async () => { await d.recursiveDelete(d.collection("users").doc(uid)); },
     requests: async () => {
+      // what they shared with members and the cover counts go with the account (0.2.11, board CO)
+      for (const col of ["member_recipes", "member_recipes_preview", "covers", "cover_days"]) {
+        const mine = await d.collection(col).where("uid", "==", uid).get();
+        for (let i = 0; i < mine.docs.length; i += 400) { const b = d.batch(); mine.docs.slice(i, i + 400).forEach((x) => b.delete(x.ref)); await b.commit(); }
+      }
       // the counted events of this member go with the account (privacy notice section 7)
       for (const col of ["metrics_events", "metrics_events_preview"]) {
         const ev = await d.collection(col).where("m", "==", memberOf(uid)).get();
@@ -645,9 +660,9 @@ app.get("/api/metrics", requireUser, async (req, res) => {
     const hpOf = (f: string, t: string) => { const out: Record<string, number> = {}; for (const [day, row] of daily) if (day >= f && day <= t) for (const [k, n] of Object.entries(row)) if (typeof n === "number") out[k] = (out[k] ?? 0) + (Number(n) || 0); return out; };
     // AI use: today and this month, with the calls by model
     const aiOf = (f: string, t: string) => {
-      const o = { calls: 0, in: 0, out: 0, byModel: {} as Record<string, number> };
+      const o = { calls: 0, in: 0, out: 0, pictures: 0, byModel: {} as Record<string, number> };
       for (const [day, row] of daily) if (day >= f && day <= t) {
-        o.calls += Number(row.ai_calls) || 0; o.in += Number(row.ai_in) || 0; o.out += Number(row.ai_out) || 0;
+        o.calls += Number(row.ai_calls) || 0; o.in += Number(row.ai_in) || 0; o.out += Number(row.ai_out) || 0; o.pictures += Number((row as any).img_calls) || 0;
         for (const [k, b] of Object.entries((row.ai_by ?? {}) as Record<string, any>)) o.byModel[k] = (o.byModel[k] ?? 0) + (Number(b?.calls) || 0);
       }
       return o;
@@ -666,7 +681,7 @@ app.get("/api/metrics", requireUser, async (req, res) => {
       ai: { today: aiOf(today, today), month: aiOf(`${month}-01`, `${month}-31`) },
       // the first day with an AI call counted (Running costs, 0.2.7+r1, M6b)
       aiSince: [...daily].filter(([, r]) => Number(r.ai_calls) > 0).map(([d]) => d).sort()[0] ?? null,
-      month, bills: bills[month] ?? null, prices, monthActive,
+      month, bills: bills[month] ?? null, prices, monthActive, picture: PICTURE_PRICE,
     });
   } catch (e) { fail(res, e); }
 });
@@ -1172,6 +1187,108 @@ app.post("/api/steps", requireUser, requireMember, requireAI, async (req, res) =
   } catch (error) {
     fail(res, error);
   }
+});
+
+// ---- A cover drawn by Chef Mealan (0.2.11, canvas board CO, CO1; Milan 16 October 2026, 15:23 to 16:24) ----
+// One picture per recipe, drawn once and never again; up to ten a day per member, then Picture tomorrow. The server keeps
+// both counts, so no button trick runs up the bill. Pictures are counted apart from tokens: an image costs per picture.
+const memCovers = new Set<string>(), memCoverDays = new Map<string, number>();
+function countPicture() {
+  const space = reqSpace.getStore()?.space ?? "live", day = berlinDay();
+  if (!FB_PROJECT) { const row: any = memDaily[space].get(day) ?? {}; row.img_calls = (row.img_calls ?? 0) + 1; memDaily[space].set(day, row); return; }
+  void db().collection(space === "preview" ? "metrics_daily_preview" : "metrics_daily").doc(day).set({ img_calls: FieldValue.increment(1) }, { merge: true }).catch(() => { /* a count is never worth an error */ });
+}
+app.post("/api/cover", requireUser, requireMember, requireAI, async (req, res) => {
+  try {
+    const uid = String((req as any).uid || "local");
+    const recipeId = String(req.body?.recipeId ?? "");
+    const title = String(req.body?.title ?? "").trim().slice(0, 80);
+    const items = (Array.isArray(req.body?.items) ? req.body.items : []).slice(0, 20).map((i: any) => ({ name: String(i?.name ?? "").slice(0, 60), grams: Number(i?.grams) || 0 })).filter((i: any) => i.name && i.grams > 0);
+    if (!/^[\w-]{1,64}$/.test(recipeId) || !items.length) return res.status(400).json({ error: "The recipe needs its foods first." });
+    const day = berlinDay(), key = `${uid}~${recipeId}`, dayKey = `${uid}~${day}`;
+    const drawnBefore = !FB_PROJECT ? memCovers.has(key) : (await db().collection("covers").doc(key).get()).exists;
+    const today = !FB_PROJECT ? memCoverDays.get(dayKey) ?? 0 : Number((await db().collection("cover_days").doc(dayKey).get()).get("n")) || 0;
+    const verdict = coverVerdict({ drawnBefore, today });
+    if (verdict === "already") return res.json({ already: true });
+    if (verdict === "tomorrow") return res.json({ tomorrow: true });
+    if (!apiKey) return res.status(503).json({ error: "AI is not configured." });
+    const ai = new GoogleGenAI({ apiKey, httpOptions: { timeout: 60000 } });
+    let image: { data: string; mimeType: string } | null = null, lastError: any = null;
+    for (const model of COVER_MODELS) {
+      try {
+        const r = await ai.models.generateContent({ model, contents: [{ role: "user", parts: [{ text: coverPrompt(title || "A plate", items) }] }], config: { responseModalities: ["IMAGE"], imageConfig: { aspectRatio: "4:3", imageSize: "1K" } } });
+        const part = (r.candidates?.[0]?.content?.parts ?? []).find((x: any) => x?.inlineData?.data);
+        if (part?.inlineData?.data) { image = { data: part.inlineData.data, mimeType: part.inlineData.mimeType || "image/png" }; countPicture(); break; }
+        lastError = new Error("No picture came back.");
+      } catch (e: any) { console.warn(`[cover] ${model}: ${Number(e?.status) || "?"} ${String(e?.message || "").slice(0, 160)}`); lastError = e; }
+    }
+    if (!image) throw lastError || new Error("Chef Mealan could not draw the picture.");
+    if (!FB_PROJECT) { memCovers.add(key); memCoverDays.set(dayKey, today + 1); }
+    else {
+      await db().collection("covers").doc(key).set({ uid, recipeId, at: new Date().toISOString() });
+      await db().collection("cover_days").doc(dayKey).set({ uid, day, n: FieldValue.increment(1) }, { merge: true });
+    }
+    res.json({ image: `data:${image.mimeType};base64,${image.data}` });
+  } catch (e) { fail(res, e); }
+});
+
+// ---- Members: the recipes members share with each other (0.2.11, canvas board CO, CO2 to CO4b; Milan 16 October 2026) ----
+// Open to every member, inside the app only. Sharing needs no coach's OK. A shared recipe carries the cover, the name, the
+// foods, the amounts, the steps and a kitchen; the cook's first name only when they switch it on. Never notes, ratings,
+// plate photos they did not pick, or anything from the safety answers. Take it back removes it; Milan, as owner, can
+// take any recipe down. The preview has its own Members. Without accounts (local, walkthroughs), in memory.
+const memMembers = { live: new Map<string, any>(), preview: new Map<string, any>() };
+// who is asking; without accounts (local, walkthroughs) a request may say it is another cook, never read when accounts are on
+const memberUid = (req: express.Request) => String((req as any).uid || (!FB_PROJECT && /^[a-z]{2,20}$/.test(String(req.get("x-local-as") || "")) ? `local-${req.get("x-local-as")}` : "local"));
+const membersCol = (req: express.Request) => db().collection(spaceOf(req) === "preview" ? "member_recipes_preview" : "member_recipes");
+async function memberRecipe(req: express.Request, id: string): Promise<any | null> {
+  if (!FB_PROJECT) return memMembers[spaceOf(req)].get(id) ?? null;
+  const d = await membersCol(req).doc(id).get(); return d.exists ? d.data() : null;
+}
+app.get("/api/members", requireUser, requireMember, async (req, res) => {
+  try {
+    const uid = memberUid(req);
+    const all = !FB_PROJECT ? [...memMembers[spaceOf(req)].values()] : (await membersCol(req).orderBy("sharedAt", "desc").limit(300).get()).docs.map((d) => d.data());
+    res.setHeader("Cache-Control", "no-cache");
+    res.json({ owner: metricsOwner(req), recipes: all.sort((a, b) => (b.sharedAt > a.sharedAt ? 1 : -1)).map(({ uid: who, ...r }) => ({ ...r, mine: who === uid })) });
+  } catch (e) { fail(res, e); }
+});
+app.post("/api/members", requireUser, requireMember, async (req, res) => {
+  try {
+    const uid = memberUid(req);
+    const b = req.body ?? {};
+    const r = cleanShared(b.recipe);
+    if (!r) return res.status(400).json({ error: "The recipe needs a name and its foods." });
+    const cover = typeof b.cover === "string" && /^data:image\/(jpeg|png|webp);base64,/.test(b.cover) && b.cover.length < 300_000 ? b.cover : null;
+    const id = typeof b.id === "string" && /^[\w-]{6,40}$/.test(b.id) ? b.id : `m${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+    const old = await memberRecipe(req, id);
+    if (old && old.uid !== uid) return res.status(403).json({ error: "Only the cook who shared it can change it." });
+    const now = new Date().toISOString();
+    // a change to the recipe reaches members with the cover they already see, unless a new one is sent
+    const keep = b.cover === undefined && old;
+    const doc = { ...r, id, uid, name: b.named && typeof b.name === "string" ? b.name.trim().split(/\s+/)[0].slice(0, 30) : "", cover: keep ? old.cover : cover, coverKind: keep ? old.coverKind : b.coverKind === "photo" ? "photo" : "drawn", sharedAt: old?.sharedAt ?? now, updatedAt: now, made: old?.made ?? 0 };
+    if (!FB_PROJECT) memMembers[spaceOf(req)].set(id, doc); else await membersCol(req).doc(id).set(doc);
+    res.json({ id, sharedAt: doc.sharedAt, made: doc.made });
+  } catch (e) { fail(res, e); }
+});
+app.delete("/api/members/:id", requireUser, requireMember, async (req, res) => {
+  try {
+    const uid = memberUid(req), id = String(req.params.id);
+    const old = await memberRecipe(req, id);
+    if (!old) return res.json({ ok: true });
+    if (old.uid !== uid && !metricsOwner(req)) return res.status(403).json({ error: "Only the cook who shared it can take it back." });
+    if (!FB_PROJECT) memMembers[spaceOf(req)].delete(id); else await membersCol(req).doc(id).delete();
+    res.json({ ok: true });
+  } catch (e) { fail(res, e); }
+});
+app.post("/api/members/:id/made", requireUser, requireMember, async (req, res) => {
+  try {
+    const id = String(req.params.id);
+    const old = await memberRecipe(req, id);
+    if (!old) return res.status(404).json({ error: "This recipe was taken back." });
+    if (!FB_PROJECT) old.made = (old.made ?? 0) + 1; else await membersCol(req).doc(id).set({ made: FieldValue.increment(1) }, { merge: true });
+    res.json({ ok: true });
+  } catch (e) { fail(res, e); }
 });
 
 // Questions about the plate being built. Answers come back as actions the app can apply; the app's solver sets the grams.

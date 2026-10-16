@@ -55,5 +55,10 @@ service cloud.firestore {
     match /metrics_daily/{id} { allow read, write: if false; }
     match /metrics_daily_preview/{id} { allow read, write: if false; }
     match /metrics_settings/{id} { allow read, write: if false; }
+    // Members and the cover counts (0.2.11, board CO): only the server reads and writes them
+    match /member_recipes/{id} { allow read, write: if false; }
+    match /member_recipes_preview/{id} { allow read, write: if false; }
+    match /covers/{id} { allow read, write: if false; }
+    match /cover_days/{id} { allow read, write: if false; }
   }
 }

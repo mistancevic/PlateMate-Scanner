@@ -57,7 +57,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
       {page === "privacy" && (
         <article>
           <h1>Privacy notice</h1>
-          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 12 October 2026 (the mobile number on a request, book sign-ups)</p>
+          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 16 October 2026 (recipes shared with members, pictures drawn by Chef Mealan)</p>
           <h2>1. Who is responsible</h2>
           <p>{OPERATOR.name}, {OPERATOR.city}, {OPERATOR.country}. <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>. No data protection officer is appointed; the pilot is below the thresholds that require one.</p>
           <h2>2. What Chef Mealan keeps, and why</h2>
@@ -68,18 +68,20 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
             <li><b>Your foods, plates, cards and photos.</b> What you scan, build, cook and rate, and the photos you take of packs and plates. Legal basis: the contract.</li>
             <li><b>The coach link.</b> Which coach you joined, what you chose to share with them, and what they sent you. Your coach sees the cards you share, the goal, and that you ticked a situation and when, never the words you typed. Your coach also sees your week: each day, the meals planned against the meals eaten, with their names, PD and kcal, and your weigh-ins, and your measured burn: what you ate on full days, what your weight line did, and the result. Your coach's notes and your replies are kept with your account. Legal basis: the contract.</li>
             <li><b>A request to join, from the home page.</b> Your name, your email, what you wrote, and a mobile number if you give one, so Coach Milan can send you a personal code. The number is used only to message you on WhatsApp or by text about joining; a WhatsApp chat runs under WhatsApp's own terms. Legal basis: your request, Art. 6(1)(b). Deleted with your account, or when you ask by email.</li>
+            <li><b>Recipes you share with members.</b> When you tap Share with members on a recipe, every member of Chef Mealan can see its name, foods, amounts, steps, kitchen and the cover you picked, worked out for their own day. Your first name goes with it only when you switch Show my first name on; it is off until you do. Never your notes, ratings, other photos or anything you declared. Take it back removes it; a copy a member already kept stays theirs. Coach Milan, who runs the pilot, can take a shared recipe down. Legal basis: the contract, Art. 6(1)(b).</li>
+            <li><b>Pictures drawn by Chef Mealan.</b> A recipe you keep without a photo gets one drawn picture, made from its name, foods and amounts, labelled Picture by Chef Mealan. The picture stays with your recipe. Our server keeps only which recipes got one and how many were drawn each day, to hold the limits. Legal basis: the contract.</li>
             <li><b>Book sign-ups, from How Chef Mealan is built.</b> Your email and the books you picked, used for one email when a book is out, nothing else. Legal basis: your consent, Art. 6(1)(a); withdraw by email at any time.</li>
             <li><b>A pilot log.</b> What you tapped in the app (a mix shown, a tip taken), with no photos and no free text, to improve the pilot. Legal basis: legitimate interest, Art. 6(1)(f); you can object by email.</li>
           </ul>
           <h2>3. Where it is, and who processes it</h2>
           <ul>
             <li><b>Google Cloud, Frankfurt (EU).</b> The app runs on Cloud Run; your data sits in Firestore and Firebase Authentication, and your photos as image files in Firebase Storage, region europe-west1/europe-west3. Only you can open your photos; your coach sees a plate's photo only when you share that card. Google Ireland Ltd is the processor under its Cloud data processing terms.</li>
-            <li><b>Google Gemini API.</b> When you scan a label or write to Chef Mealan, the photo or the text is sent to Google's Gemini API to be read, and the answer comes back. Chef Mealan uses the paid Gemini API: under its terms, Google does not use that content to train its models.</li>
+            <li><b>Google Gemini API.</b> When you scan a label or write to Chef Mealan, the photo or the text is sent to Google's Gemini API to be read, and the answer comes back. For a drawn cover, the recipe's name, foods and amounts are sent, and a picture comes back. Chef Mealan uses the paid Gemini API: under its terms, Google does not use that content to train its models.</li>
             <li><b>Open Food Facts.</b> A barcode you scan is looked up there. The barcode is not personal data; nothing else is sent.</li>
             <li>No advertising, no analytics beyond the pilot log above and the visit counts in section 7, no sale or sharing of your data with anyone else.</li>
           </ul>
           <h2>4. How long</h2>
-          <p>While your account exists. Delete the account, from Menu, Account, and everything goes: profile, declarations, foods, cards, photos, recipes, the sign-in. Chef Mealan keeps no separate backup copies. When the photos moved into image files in October 2026, their old copies in the database stayed for 30 days, then were removed.</p>
+          <p>While your account exists. Delete the account, from Menu, Account, and everything goes: profile, declarations, foods, cards, photos, recipes, the recipes you shared with members, the sign-in. Chef Mealan keeps no separate backup copies. When the photos moved into image files in October 2026, their old copies in the database stayed for 30 days, then were removed.</p>
           <h2>5. Your rights</h2>
           <p>Access, rectification, erasure, restriction, portability and objection, Art. 15 to 21. In the app: Menu, Account, Export my data gives you everything as one file; Delete my account removes it. By email: {OPERATOR.email}. You may complain to a supervisory authority; for Bavaria that is the Bayerisches Landesamt für Datenschutzaufsicht (BayLDA), Ansbach.</p>
           <h2>6. Age</h2>

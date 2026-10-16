@@ -11,6 +11,8 @@ import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
 import type { Published } from "./PublishSheet";
 import { StepsEditor } from "./StepsEditor";
 import { stepParts } from "../steps";
+import { coverIsDrawn, isDrawnPhoto } from "../covers";
+import { CHEF_NAME } from "./Mark";
 
 // The recipe's own page in the app (0.2.5+r11, canvas board S3, R8 to R11, approved 12 October 2026). Photos first: the
 // cover large, every photo with × to delete, ‹ › to move the picked one (first place is the cover), Add. Then the name
@@ -21,7 +23,9 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft }: {
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel }: {
+  // 0.2.11 (canvas board CO, CO4, CO4b): For members, on a recipe of yours
+  membersPanel?: React.ReactNode;
   // 0.2.10 (canvas board CH, CH5): Chef Mealan drafts the steps; none without the AI
   draft?: (() => Promise<{ ok: true; steps: string[] } | { ok: false; why: string }>) | null;
   meal: Meal; cards: Feedback[]; foods: Food[]; cook: boolean; state: PubState; pub: Published | null; approver: string; direct: boolean; unpublished?: string[];
@@ -36,7 +40,13 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const fileRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const setPhotos = (next: string[]) => onPatch(withRecipePhotos(next.slice(0, MAX_RECIPE_PHOTOS)));
-  const add = (data: string) => { if (list.includes(data) || list.length >= MAX_RECIPE_PHOTOS) return; setPhotos([...list, data]); setAt(list.length); };
+  // a drawn cover (0.2.11, board CO, CO1): your own photo goes first; the drawn picture stays behind it, for members
+  const drawn = coverIsDrawn(meal);
+  const add = (data: string) => {
+    if (list.includes(data) || list.length >= MAX_RECIPE_PHOTOS) return;
+    if (drawn) { setPhotos([data, ...list]); setAt(0); return; }
+    setPhotos([...list, data]); setAt(list.length);
+  };
   const fromFile = async (f: File | undefined) => {
     if (!f) return;
     setBusy(true);
@@ -77,10 +87,16 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
     <div className="rq">
       <button className="link rq-back" onClick={close}><ChevronLeft size={18} /> Recipes</button>
       {/* R8: the photos first */}
-      {list.length > 0
-        ? <figure className="rq-hero"><img src={list[sel]} alt={sel === 0 ? `The cover of ${meal.title}` : `Photo ${sel + 1} of ${meal.title}`} />{sel === 0 && <span className="rph-cover">Cover</span>}</figure>
+      {drawn
+        ? <figure className="rq-hero"><img src={list[0]} alt={`Picture of ${meal.title} by ${CHEF_NAME}`} /><span className="rq-drawn">Picture by {CHEF_NAME}</span></figure>
+        : list.length > 0
+        ? <figure className="rq-hero"><img src={list[sel]} alt={sel === 0 ? `The cover of ${meal.title}` : `Photo ${sel + 1} of ${meal.title}`} />{sel === 0 && <span className="rph-cover">Cover</span>}{isDrawnPhoto(meal, list[sel]) && <span className="rq-drawn">Picture by {CHEF_NAME}</span>}</figure>
         : <button className="rq-hero rq-hero-empty" onClick={() => fileRef.current?.click()}><Camera size={26} /><span>Add a photo</span></button>}
-      <div className="rq-thumbs">
+      {drawn && (<>
+        <small className="muted rq-hint">{CHEF_NAME} drew it from your foods and amounts when you kept the dish, so you find it at a glance. Your own photo replaces it.</small>
+        <div className="button-row rq-drawn-row"><button className="pill pill-small" disabled={busy} onClick={() => fileRef.current?.click()}>Add my photo</button></div>
+      </>)}
+      <div className="rq-thumbs" hidden={drawn}>
         {list.map((src, i) => (
           <div key={i} className="rq-thumb">
             <button className={`publish-photo ${sel === i ? "on" : ""}`} onClick={() => setAt(i)} aria-label={`Photo ${i + 1}${i === 0 ? ", the cover" : ""}${sel === i ? ", picked" : ""}`}><img src={src} alt="" /></button>
@@ -98,7 +114,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         {!full && <button className="publish-photo add rph-add" disabled={busy} onClick={() => fileRef.current?.click()}><Camera size={18} /><span>Add</span></button>}
         <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; void fromFile(f); }} />
       </div>
-      <small className="muted rq-hint">{list.length === 0 ? "A photo makes the recipe easy to find, here and on its page." : list.length === 1 ? "This photo is the cover. × deletes it." : sel === 0 ? "The first photo is the cover. Tap a photo to move it with ‹ ›; × deletes it." : `Photo ${sel + 1} of ${list.length}. ‹ moves it earlier: in first place it becomes the cover.`}</small>
+      {!drawn && <small className="muted rq-hint">{list.length === 0 ? (meal.cover?.state === "tomorrow" ? `${CHEF_NAME} draws a picture of it tomorrow. A photo of your own is always better.` : "A photo makes the recipe easy to find, here and on its page.") : list.length === 1 ? "This photo is the cover. × deletes it." : sel === 0 ? "The first photo is the cover. Tap a photo to move it with ‹ ›; × deletes it." : `Photo ${sel + 1} of ${list.length}. ‹ moves it earlier: in first place it becomes the cover.`}</small>}
       {offered.length > 0 && !full && (
         <div className="rq-offer">
           <small className="muted">From the times you made it, a tap adds the photo:</small>
@@ -189,6 +205,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
               </div>
             </section>
           )}
+          {membersPanel}
           <ConfirmButton className="link link-danger rq-delete" label="Delete recipe" confirmLabel="Sure? Tap again to delete" onConfirm={onDelete} />
         </>
       )}

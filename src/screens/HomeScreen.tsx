@@ -19,6 +19,11 @@ import { fitOf, type PlannedMeal } from "../planned";
 import { dayRecord, planLine as planDayLine, recordLine } from "../record";
 import { log } from "../log";
 import { closeDays, openedToday } from "../metrics";
+import { coverIsDrawn, ownPhotosOf } from "../covers";
+import { recipePhotosOf } from "../photos";
+import { resizeImageBase64 } from "../utils/image";
+import { CHEF_NAME } from "../components/Mark";
+import type { Feedback, Meal } from "../pilot";
 
 export function HomeScreen(p: AppApi) {
   // to the measured burn's card on Me, Goal (FT3, FT4)
@@ -245,6 +250,7 @@ export function HomeScreen(p: AppApi) {
                   ))}<button className="link" onClick={() => setShareFor(null)}>Cancel</button></>
                 : <button className="pill pill-small" onClick={() => setShareFor(f.id)}>Share with Coach</button>)}
           </div>
+          <CoverAsk f={f} recipe={recipeOfCard(f, state.meals)} p={p} />
         </section>
       ))}
       {today.logged.filter(carryDue).map((f) => (
@@ -282,5 +288,42 @@ export function HomeScreen(p: AppApi) {
         ))}
       </section>
     </>
+  );
+}
+
+// The recipe a meal card is of: saved from the card, or the same recipe made again
+const recipeOfCard = (f: Feedback, meals: Meal[]) => meals.find((m) => m.id === f.recipeId) ?? meals.find((m) => m.id === f.meal?.id || (!!f.meal?.title && m.title === f.meal.title)) ?? null;
+// The photo ask (0.2.11, canvas board CO, CO1b and CO1c): you eat a recipe whose cover is drawn, and the card asks once, while
+// the plate is in front of you. Not now ends it for this meal. With a photo: Use as cover, or Keep it just for me; a plate
+// photo becomes the cover only when you say so.
+function CoverAsk({ f, recipe, p }: { f: Feedback; recipe: Meal | null; p: AppApi }) {
+  const [busy, setBusy] = useState(false);
+  if (!recipe || f.status !== "eaten" || f.coverAsk || !coverIsDrawn(recipe) || ownPhotosOf(recipe).length) return null;
+  if (f.photo) return (
+    <div className="cover-ask">
+      <small className="cover-ask-q">Use this photo as the cover of {recipe.title}?</small>
+      <div className="button-row">
+        <button className="pill pill-small pill-primary" onClick={() => p.useCardAsCover(f.id, recipe.id)}>Use as cover</button>
+        <button className="pill pill-small" onClick={() => p.setCoverAsk(f.id, "kept")}>Keep it just for me</button>
+      </div>
+      <small className="muted">Just for you: it stays on this card and with the recipe's photos. Members never see it unless you pick it when sharing.</small>
+    </div>
+  );
+  const take = async (file: File | undefined) => {
+    if (!file) return;
+    setBusy(true);
+    try {
+      const raw = await new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(file); });
+      p.setCardPhoto(f.id, await resizeImageBase64(raw, 1080, 1080).catch(() => raw));
+    } finally { setBusy(false); }
+  };
+  return (
+    <div className="cover-ask">
+      <div className="cover-ask-row"><img src={recipePhotosOf(recipe)[0]} alt="" /><small className="cover-ask-q">The cover of this recipe is a picture by {CHEF_NAME}. Take a photo of your plate? It can become the cover.</small></div>
+      <div className="button-row">
+        <label className={`pill pill-small pill-primary${busy ? " disabled" : ""}`}>Take a photo<input type="file" accept="image/*" capture="environment" hidden onChange={(e) => { const x = e.target.files?.[0]; e.target.value = ""; void take(x); }} /></label>
+        <button className="link" onClick={() => p.setCoverAsk(f.id, "later")}>Not now</button>
+      </div>
+    </div>
   );
 }
