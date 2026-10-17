@@ -83,7 +83,7 @@ const U = "http://127.0.0.1:3209";
   ok(/The whole recipe: 2,330 kcal/.test(await card()), "0.2.17: Add it puts it into the numbers");
   await page.getByRole("button", { name: "Leave it out" }).click(); await page.waitForTimeout(200);
   ok(/2 balls on the recipe · converted/.test(t) && /no amount on the recipe · guessed/.test(t) && /500 g on the recipe/.test(t), "IM3: every line says where its amount came from");
-  await require("./put.cjs")(page); await page.waitForTimeout(900);
+  await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(900);
 
   // IM4: your portion, sized for dinner
   t = await page.locator(".plate-card").textContent().then((x) => x.replace(/\s+/g, " "));
@@ -92,7 +92,7 @@ const U = "http://127.0.0.1:3209";
   ok(/Sized for your dinner/.test(t) && /1 of 2 pizzas/.test(t) && /One pizza is 1,121 kcal\. Your dinner is about 933\. Sized for it: 84% of one pizza\./.test(t), "IM4: two portions to pick from, with what each is");
   ok(/4\.2/.test(await page.locator(".plate-card .readout").textContent()), "IM4: PD 4.2, said in the readout (4.1 for the whole recipe; the amounts to the gram)");
   ok(/Empty plate/.test(await page.locator(".plate-card .card-top").textContent()) && await page.locator(".plate-card .ways .ways-empty").count() === 0, "IM1b: Empty plate sits at the top of the card, out of the row that adds foods");
-  ok(/Under your PD 6\.4\. Make it as it is, or fit it one of two ways:/.test(t), "IM4 (0.2.27, PF A6): under the target: as it is, or two ways");
+  ok(/Under your PD 6\.4: two ways to fit it/.test(t), "IM4: under the target: two ways to fit it");
   let s = await st();
   const m = s.meals[0];
   ok(m.title === "Margherita pizza" && m.source.name === "@account_name on Instagram" && m.source.from === "screenshot" && m.makes.n === 2 && (Array.isArray(m.shots) ? m.shots.length === 2 : m.source.shotSigs.length === 2), "IM6: saved in Mine with where it came from, how many it makes and the two screenshots");
@@ -102,7 +102,7 @@ const U = "http://127.0.0.1:3209";
   await page.getByRole("button", { name: "Sized for your dinner" }).click(); await page.waitForTimeout(400);
 
   // IM5: change the dish: the first try fails the checks and goes back once, with the reason
-  await page.getByRole("button", { name: "Change the recipe" }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: "Change the dish" }).click(); await page.waitForTimeout(1200);
   ok(fitCalls === 2 && sent.filter((x) => x.way === "change").pop().failed === "Cottage cheese doesn't melt like Mozzarella.", "IM5: a change that fails the checks goes back once, with why");
   ok(await page.locator(".title-input").inputValue() === "Margherita pizza, more protein", "IM5: the changed dish has its own name");
   t = await page.locator(".plate-card").textContent().then((x) => x.replace(/\s+/g, " "));
@@ -115,14 +115,12 @@ const U = "http://127.0.0.1:3209";
   await page.getByRole("button", { name: "Add on the side" }).click(); await page.waitForTimeout(900);
   t = await page.locator(".plate-card").textContent().then((x) => x.replace(/\s+/g, " "));
   const chips = await page.locator(".in-way .choice").allTextContents();
-  // 0.2.27 (board PF4, rule 1): the side stays a real portion, at most 300 g; the piece is the biggest, in quarters, it carries
-  ok(/Greek yogurt on the side, 245 g · your way/.test(chips[0] ?? "") && chips.some((c) => /Skyr after/.test(c)) && !chips.some((c) => /chips/i.test(c)), `IM5b: Greek yogurt first, your way, 245 g; potato chips left out (${chips.join(" | ")})`);
-  ok(JSON.stringify(await grams()) === JSON.stringify([125, 50, 63, 5, 1, 245]), `IM5b, rule 1: half a pizza with 245 g yogurt, the side under 300 g (${await grams()})`);
-  ok(/as it is, ½ of one pizza, and Greek yogurt on the side/.test(await page.locator(".step-head").textContent()), "rule 1: the line says the piece");
+  ok(/Greek yogurt on the side, 305 g · your way/.test(chips[0] ?? "") && chips.some((c) => /Skyr after/.test(c)) && !chips.some((c) => /chips/i.test(c)), `IM5b: Greek yogurt first, your way, 305 g; potato chips left out (${chips.join(" | ")})`);
+  ok(JSON.stringify(await grams()) === JSON.stringify([160, 63, 79, 6, 2, 305]), `IM5b: the pizza a little smaller, the side brings the protein (${await grams()})`);
   ok(/fits your plan/.test(await page.locator(".plate-card .readout").textContent()) && /The pizza is not changed/.test(await page.locator(".step-head").textContent()), "IM5b: at the target, the pizza as the recipe makes it");
 
   // Make it, then Did it work?
-  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(600);
   if (await page.locator(".way").count()) await page.locator(".way").first().click();
   await page.getByRole("button", { name: /I'm making it|Continue/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "On to How was it?" }).click(); await page.waitForTimeout(400);

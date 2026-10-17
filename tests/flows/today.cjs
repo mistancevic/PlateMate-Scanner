@@ -61,7 +61,7 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   ok(Math.abs(nums[0] - Math.round((nums[2] / nums[1]) * 1000) / 10) <= 0.1, `the day's PD is protein over calories: ${nums[2]} g in ${nums[1]} kcal is ${nums[0]}`);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(300);
   await require("./line.cjs")(page); await page.getByRole("button", { name: /^Before training$/ }).first().click().catch(() => {}); await page.waitForTimeout(200);
-  const plateHint = await page.locator(".moment-hint").last().textContent().catch(() => ""); // 0.2.27: What is it for? has its own hint above
+  const plateHint = await page.locator(".moment-hint").textContent().catch(() => "");
   await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(300);
   ok(/Target for this plate: PD 3/.test(plateHint) && (await page.locator(".plan-row b").first().textContent()).trim() === dayPd, `Before training sets the plate to PD 3; Today still shows the day's ${dayPd}`);
   await page.goto("http://127.0.0.1:3193/"); await page.waitForTimeout(600);

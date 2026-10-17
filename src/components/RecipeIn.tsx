@@ -59,8 +59,8 @@ export function LinkCard({ url, reading, slow, setUrl, read, cancel }: { url: st
 }
 
 // IM3: what Chef Mealan read. Every line says where its amount came from; how many it makes can be changed.
-export function ReadCard({ flow, setSource, setServings, toggle, put, end, again, cancel }: {
-  flow: Extract<InFlow, { kind: "read" }>; setSource: (v: string) => void; setServings: (n: number) => void; toggle: (k: number) => void; put: () => void; end?: React.ReactNode; again: () => void; cancel: () => void;
+export function ReadCard({ flow, setSource, setServings, toggle, put, again, cancel }: {
+  flow: Extract<InFlow, { kind: "read" }>; setSource: (v: string) => void; setServings: (n: number) => void; toggle: (k: number) => void; put: () => void; again: () => void; cancel: () => void;
 }) {
   const r = flow.recipe;
   const [editing, setEditing] = useState(false);
@@ -103,8 +103,7 @@ export function ReadCard({ flow, setSource, setServings, toggle, put, end, again
           : <small className="muted">The {flow.url ? "page" : "screenshot"} shows no steps. {CHEF_NAME} can draft them on the recipe page.</small>}
       </div>
       <small className="muted">The whole recipe: {fmt(all, 0)} kcal · {fmt(allP, 0)} g protein · {pdText(pd(all, allP))}.{left.length ? ` Left out: ${left.length} optional, as the recipe's numbers do; Add it puts one in.` : ""} Values are typical values, marked estimate; tap a food on the plate to check or change it.</small>
-      {/* PF2 (0.2.27): the end follows what the plate is for: Put it on my plate for a meal; Save in Mine, Plan it, Make it now when exploring */}
-      {end ?? <button className="pill pill-primary pill-wide" onClick={put}>Put it on my plate</button>}
+      <button className="pill pill-primary pill-wide" onClick={put}>Put it on my plate</button>
       <button className="link" style={{ alignSelf: "center" }} onClick={again}>Not right? Read it again</button>
     </section>
   );

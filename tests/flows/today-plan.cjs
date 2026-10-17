@@ -65,7 +65,7 @@ seed.items = [];
   ok(await page.locator(".day-record").count() === 0, "no record yet, a slot is still to come");
   // a meal from outside: the Plate without a slot, saved: extra, Off the plan
   await page.getByRole("button", { name: /^Plate$/ }).first().click(); await page.waitForTimeout(500);
-  ok(/Exploring/.test(await page.locator(".plan-line").textContent()), "the Plate on its own is off the plan (0.2.27: it says Exploring)");
+  ok(/Off the plan/.test(await page.locator(".plan-line").textContent()), "the Plate on its own is off the plan");
   await page.getByRole("button", { name: /^Add$/ }).first().click(); await page.waitForTimeout(300);
   await cook();
   await page.getByRole("button", { name: /^Today$/ }).first().click(); await page.waitForTimeout(500);
@@ -86,7 +86,7 @@ seed.items = [];
   const meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.map((m) => m.title));
   ok(meals.length === 3 && meals.filter((t) => t === "Skyr at noon").length === 1, "eating a planned recipe as it stands saves no copy; the extra was saved: " + meals.join(", "));
   await page.locator(".recipe-tile", { hasText: "Skyr at noon" }).click(); await page.waitForTimeout(500);
-  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(600);
   const head = await page.evaluate(() => { const i = document.querySelector(".title-input"); return i ? "input:" + i.value : "h2:" + (document.querySelector("h2")?.textContent ?? ""); }); ok(/Skyr at noon|Chicken bowl/.test(head), "the Plate opens with the recipe's name: " + head);
   ok(await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).count() === 1, "on the first step, with Fit to my target");
   ok(errs.length === 0, errs.length ? "page errors: " + errs.join(" | ") : "no page errors");

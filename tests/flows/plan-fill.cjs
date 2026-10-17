@@ -137,7 +137,7 @@ seed.items = [];
   ok(/Monday's dinner/.test(await page.locator(".plan-line").textContent()), "Create a new meal opens the Plate for the slot");
   await page.getByRole("button", { name: /^Today$/ }).first().click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^Plate$/ }).first().click(); await page.waitForTimeout(300);
-  ok(/Exploring/.test(await page.locator(".plan-line").textContent()), "leaving the Plate drops the slot (0.2.27: an off-plan plate says Exploring)");
+  ok(/Off the plan/.test(await page.locator(".plan-line").textContent()), "leaving the Plate drops the slot");
   ok(errs.length === 0, errs.length ? "page errors: " + errs.join(" | ") : "no page errors");
   await b.close(); server.kill();
   process.exit(fail ? 1 : 0);

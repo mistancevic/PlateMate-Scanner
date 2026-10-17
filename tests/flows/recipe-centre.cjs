@@ -60,7 +60,7 @@ const U = "http://127.0.0.1:3217";
   // RP1 (Milan 19:43): the steps show with the foods, right after the read
   ok(/As the page writes them, for the whole recipe/.test(await text(".in-card .in-steps")) && await page.locator(".in-card .in-steps .rp-orig li").count() === 4 && /it’s helpful/.test(await text(".in-card .in-steps")), "RP1: the read card shows the steps with the foods");
   await shot("rp1-read", ".in-card");
-  await require("./put.cjs")(page); await page.waitForTimeout(1300);
+  await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
   ok(await page.locator(".in-steps-plate .rp-orig li").count() === 4, "RP1: the Plate shows the recipe's steps to review before Make it");
   await shot("rp1-plate", ".in-steps-plate");
   await nav("Recipes");
@@ -88,9 +88,9 @@ const U = "http://127.0.0.1:3217";
   await shot("rp1c", ".rq-steps");
 
   // RP3, RP1b: Make it, Change the dish, How to make it
-  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(1200);
-  await page.getByRole("button", { name: "Change the recipe" }).click(); await page.waitForTimeout(1200);
-  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: "Change the dish" }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(800);
   t = await text("main");
   ok(/Your dish has light cream cheese and vanilla whey protein powder\. The original has cream cheese\./.test(t) && await page.getByRole("button", { name: "Write the steps for my dish" }).count() === 1 && /The original, for the original foods/.test(t), `RP1b: your dish differs: the line says how; the original for the original foods (${t.slice(0, 200)})`);
   ok(/You make all 12 slices\s*[\d,]+ g · [\d,]+ kcal/.test(t) && /You eat your plate\s*\d+ g · [\d,]+ kcal · PD/.test(t), "RP3: You make, You eat, each with weight and energy");
@@ -104,8 +104,8 @@ const U = "http://127.0.0.1:3217";
   // the original, made again: it ends on its page too
   await page.locator(".rq-back").click(); await page.waitForTimeout(500);
   await page.getByText("No-bake cheesecake", { exact: true }).last().click(); await page.waitForTimeout(800);
-  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(1200);
-  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(800);
   await page.getByRole("button", { name: "I'm making it" }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: /On to How was it\?/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Good", exact: true }).first().click();

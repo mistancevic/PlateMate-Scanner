@@ -65,12 +65,6 @@ export interface AppApi {
   // the kind of plate, from Today's What's cooking? or the Plate's own row; a saved recipe keeps it
   kind: import("../pilot").PlateKind;
   setKind: (k: import("../pilot").PlateKind) => void;
-  // what the plate is for (0.2.27, boards PF to PF3): Exploring until a meal, Meal prep or Plan it is picked
-  purpose: import("../purpose").Purpose;
-  setPurpose: (p: import("../purpose").Purpose) => void;
-  // the Plate opens its line, so the person sees and can change what it is for (the recipe page's Make it)
-  purposeAsk: boolean;
-  setPurposeAsk: (v: boolean) => void;
   moment: import("../moments").MomentId;
   setMoment: (m: import("../moments").MomentId) => void;
   usual: import("../moments").RhythmId[];

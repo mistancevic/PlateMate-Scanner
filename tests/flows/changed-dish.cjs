@@ -59,20 +59,20 @@ const U = "http://127.0.0.1:3215";
   ok(/This page takes longer than most\. Chef Mealan keeps reading: up to two minutes\./.test(await text(".in-card")), "IM23d: after 20 seconds the card says it takes longer");
   await shot("im23d", ".in-card");
   await page.waitForTimeout(1500);
-  await require("./put.cjs")(page); await page.waitForTimeout(1300);
+  await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
   const orig = (await st()).meals.find((m) => m.title === "No-bake cheesecake");
 
   // IM23: Change the dish, then How to make it drafts the steps for the changed foods
-  await page.getByRole("button", { name: "Change the recipe" }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: "Change the dish" }).click(); await page.waitForTimeout(1200);
   ok(sent[0].items.find((i) => i.name === "Cream cheese").part === "Filling", "IM23: the change is asked with the recipe's parts");
-  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
-  ok(/No-bake cheesecake, more protein, changed/.test(await text(".step-head")), "IM23 (0.2.27, PF A7): How to make it says it is the changed recipe");
+  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(800);
+  ok(/No steps yet for your changed dish/.test(await text("main")), "IM23: How to make it is for the changed dish");
   await page.getByRole("button", { name: "Write the steps for my dish" }).first().click(); await page.waitForTimeout(900);
   const ask = sent.find((x) => Array.isArray(x.original));
   ok(ask && ask.items.some((i) => i.name === "Light cream cheese" && i.grams === 678 && i.part === "Filling") && ask.items.some((i) => i.name === "Vanilla whey protein powder" && i.grams === 60) && !ask.items.some((i) => i.name === "Cream cheese"), "IM23: the draft is asked for the changed foods, at the whole recipe's grams, with their parts");
   ok(ask && ask.changed.includes("Light cream cheese: new") && ask.changed.includes("Cream cheese: not in it any more") && ask.original.length === 4, "IM23: the draft knows what changed, and follows the original method");
   let t = await text("main");
-  ok(/, changed/.test(await text(".step-head")) && /678 g light cream cheese/.test(t) && /60 g vanilla whey protein powder/.test(t) && /Added: your change, the whey/.test(t), "IM23: the steps show the changed foods at all 10 slices, marked your change");
+  ok(/Chef Mealan's steps for your changed dish, from the original/.test(t) && /678 g light cream cheese/.test(t) && /60 g vanilla whey protein powder/.test(t) && /Added: your change, the whey/.test(t), "IM23: the steps show the changed foods at all 10 slices, marked your change");
   await shot("im23", "main");
   ok(/No-bake cheesecake, more protein: the steps go with it when you save/.test(t), "IM23: the steps go with the changed dish when you save");
   ok(!(await st()).meals.find((m) => m.id === orig.id).steps?.length, "IM23: the original recipe is not touched by the draft");
@@ -109,8 +109,8 @@ const U = "http://127.0.0.1:3215";
   // a recipe you have made before ends on its page too (0.2.25, RP4, Milan 17:42)
   await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500);
   await page.getByText("No-bake cheesecake, more protein", { exact: true }).last().click(); await page.waitForTimeout(700);
-  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(1200);
-  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(800);
   const mk = page.getByRole("button", { name: /Make it from the original|I'm making it/ }); if (await mk.count()) { await mk.first().click(); await page.waitForTimeout(500); }
   await page.getByRole("button", { name: /On to How was it\?/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Good", exact: true }).first().click();

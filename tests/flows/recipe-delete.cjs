@@ -41,7 +41,7 @@ const U = "http://127.0.0.1:3214";
     await page.goto(U + "/plate"); await page.waitForTimeout(1300);
     await page.locator(".plate-card label").filter({ hasText: "Screenshot" }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }]);
     await page.waitForTimeout(500); await page.getByRole("button", { name: "Read it" }).click(); await page.waitForTimeout(800);
-    await require("./put.cjs")(page); await page.waitForTimeout(1300);
+    await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
     await page.unroute("**/api/recipe/read");
   };
   const openRecipe = async (title) => { await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(800); await page.getByText(title, { exact: true }).last().click(); await page.waitForTimeout(900); };

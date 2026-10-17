@@ -288,7 +288,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         <>
           {/* R10: two intentions, two buttons */}
           <button className="pill pill-wide pill-primary" onClick={() => onMakeIt()}>Make it</button>
-          <small className="muted rq-under">Asks what it is for, then puts it on your plate, sized for it. The recipe stays as it is.</small>
+          <small className="muted rq-under">Cook it now: the recipe goes on the Plate, Fit to my target sets today's amounts. The recipe stays as it is.</small>
           <button className="pill pill-wide" onClick={startEdit}>Edit recipe</button>
           <small className="muted rq-under">Change the recipe itself: the foods, the grams, the steps.</small>
           {cook && (

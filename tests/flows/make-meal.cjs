@@ -32,7 +32,7 @@ const answer = { options: [
   let asked = null, calls = 0;
   await page.route("**/api/meal", async (route) => { calls++; asked = JSON.parse(route.request().postData() || "{}"); await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(answer) }); });
   // CH1: the plate says what it is for and what it aims at
-  await page.goto(U + "/plate"); await page.waitForTimeout(1300); await require("./purpose.cjs")(page, "Lunch"); // 0.2.27 (PF): the plate starts Exploring; pick the meal
+  await page.goto(U + "/plate"); await page.waitForTimeout(1300);
   ok(await page.getByRole("button", { name: "Make it a lunch" }).count() === 1 && await page.getByRole("button", { name: "Keep it as it is" }).count() === 1, "CH1: Make it a lunch, and Keep it as it is");
   ok(/Lunch is about 933 kcal of your 2,800, at PD 6\.4 or more\. Chef Mealan adds what it needs and sets the amounts\./.test(await page.locator(".plate-card").textContent()), "CH1: lunch is about 933 kcal: what is left of the day over the three meals to come");
   // CH2: PD above the target, half a lunch: maths cannot make it a meal, so Chef Mealan
