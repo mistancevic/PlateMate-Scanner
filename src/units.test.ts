@@ -30,6 +30,8 @@ test("UN: oven heat rounds the way dials step; 350 °F is 175 °C, 180 °C is 35
   assert.equal(tempsIn("Heat to 400 degrees F, then 2 c of milk.", "c"), "Heat to 205 °C, then 2 c of milk.");
   assert.equal(tempsIn("Bake at 180°C / 350°F.", "f"), "Bake at 180°C / 350°F.");
   assert.equal(tempsIn("Mix 2 eggs.", "f"), "Mix 2 eggs.");
+  // a food's token keeps its id, even one that looks like a temperature (0.2.20)
+  assert.equal(tempsIn("Beat [[i:ab-120c-9|cream cheese]] at 180 °C.", "f"), "Beat [[i:ab-120c-9|cream cheese]] at 350 °F.");
 });
 
 test("UN: recipe measures turned into grams by code, per food kind; a measure we don't know stays the model's", () => {

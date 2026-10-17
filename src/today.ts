@@ -6,7 +6,9 @@ export type DayLog = { day: Date; logged: Feedback[]; prepared: Feedback[]; kcal
 export function dayLog(feedback: Feedback[], day: Date): DayLog {
   const onDay = feedback.filter((f) => sameDay(f.createdAt, day));
   const logged = onDay.filter((f) => f.status === "eaten").sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1));
-  const prepared = onDay.filter((f) => f.status === "prepared");
+  // portions left of a recipe made on an earlier day stay ready on today's Today (0.2.20, board IM19)
+  const isToday = sameDay(new Date().toISOString(), day);
+  const prepared = [...feedback.filter((f) => isToday && f.status === "prepared" && (f.left ?? 0) > 0 && !sameDay(f.createdAt, day) && new Date(f.createdAt) < day), ...onDay.filter((f) => f.status === "prepared")];
   const totals = logged.reduce((t, f) => { const a = aggregate(f.meal.items); return { kcal: t.kcal + (a.calories ?? 0), protein: t.protein + (a.protein ?? 0) }; }, { kcal: 0, protein: 0 });
   const dayType = (onDay.find((f) => (f as any).dayType) as any)?.dayType ?? null;
   return { day, logged, prepared, kcal: totals.kcal, protein: totals.protein, dayType };

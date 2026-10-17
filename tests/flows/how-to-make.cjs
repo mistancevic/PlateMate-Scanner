@@ -1,0 +1,128 @@
+// How to make it (0.2.20, canvas board IM, IM19, IM19b, IM19c, IM20; Milan 17 October 2026, 12:29 to 12:57). After Make it, a dish
+// from a recipe gets its steps, not the ways to eat a mix: the cheesecake makes 8, so the whole cake is made, the steps are drafted
+// on this step (faked here: no AI key), at the whole recipe's grams or your slice's, and the 7 slices left go to Keep for later,
+// on Today day after day until eaten or removed. A cookie that makes 2 starts with just yours. Your own bowl in parts is a
+// checklist. A mix of ready foods keeps How do you want to eat it?
+const { chromium } = require("playwright");
+const { spawn } = require("node:child_process");
+const fs = require("node:fs"), path = require("node:path");
+const ROOT = path.resolve(__dirname, "../..");
+const seed = JSON.parse(fs.readFileSync(path.join(ROOT, "tests/flows/seed.json"), "utf8"));
+seed.items = []; seed.meals = []; seed.feedback = [];
+seed.goals = { ...seed.goals, calories: 2800, protein: 180, fats: 93, carbs: 300 };
+const PNG = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==", "base64");
+const it = (name, written, grams, role, calories, protein, part, extra = {}) => ({ name, written, grams, how: "recipe", role, calories, protein, fats: null, carbs: null, optional: false, part, ...extra });
+const read = { recipe: { title: "Protein cheesecake", source: "@highproteinbakes on Instagram", servings: 8, servingsUnit: "slices", servingsHow: "recipe", stated: null, steps: ["Crush the biscuits and mix with the melted butter.", "Beat the filling and bake at 320°F for 45 minutes.", "Top with raspberries."], items: [
+  it("Digestive biscuits", "120g", 120, "base", 480, 7, "Base"), it("Butter", "40g", 40, "fat", 740, 0.7, "Base"),
+  it("Low-fat quark", "500g", 500, "dairy", 67, 12, "Filling"), it("Cream cheese", "200g", 200, "cheese", 342, 6, "Filling"), it("Eggs", "2 large", 120, "protein", 143, 12.6, "Filling"), it("Vanilla whey protein powder", "30g", 30, "protein", 390, 78, "Filling"), it("Sweetener", "40g", 40, "sweet", 0, 0, "Filling"),
+  it("Raspberries", "150g", 150, "fruit", 52, 1.2, "Topping"), it("Dark chocolate", "20g", 20, "sweet", 550, 7, "Topping", { optional: true, note: "to drizzle" })] } };
+const F = (id, name, calories, protein, icon) => ({ ...seed.foods[0], id, name, brand: "estimate", source: "estimate", calories, protein, carbs: null, fats: null, fiber: null, photo: undefined, photos: undefined, icon });
+const BOWL = [F("b1", "Basmati rice, cooked", 130, 2.7, "🍚"), F("b2", "Chicken breast, grilled", 165, 31, "🍗"), F("b3", "Black beans, cooked", 132, 8.9, "🫘"), F("b4", "Cheddar", 403, 25, "🧀"), F("b5", "Sour cream", 193, 2.4, "🥛")];
+const U = "http://127.0.0.1:3212";
+const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu on Instagram", servings: 2, servingsUnit: "cookies", servingsHow: "recipe", stated: null, steps: ["Preheat oven to 350 degrees Fahrenheit.", "Mix wet, then dry. Bake 10-13 minutes."], items: [
+  it("Light butter", "35g", 35, "fat", 360, 1, ""), it("Egg", "50g", 50, "protein", 143, 12.6, ""), it("All-purpose flour", "45g", 45, "base", 364, 10, ""), it("Casein protein powder", "25g", 25, "protein", 360, 80, "")] } };
+(async () => {
+  const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT: "3212", GEMINI_API_KEY: "" }, stdio: "ignore" });
+  for (let i = 0; i < 60; i++) { try { await fetch(U + "/"); break; } catch { await new Promise((r) => setTimeout(r, 500)); } }
+  const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
+  const fails = []; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fails.push(m); };
+  const errs = [];
+  const open = async (state, at = "2026-10-17T10:20:00") => {
+    const ctx = await b.newContext({ viewport: { width: 390, height: 1600 }, deviceScaleFactor: 1 });
+    const page = await ctx.newPage();
+    page.on("pageerror", (e) => errs.push(e.message));
+    await page.clock.setFixedTime(new Date(at));
+    await page.addInitScript((s) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
+      localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "exact" }));
+      localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "same", sex: "male", birthYear: 1981, heightCm: 182, weightKg: 95, kitchens: ["Italian"], plan: Array(7).fill({ work: true, kind: "rest" }), lifestyle: { weekdays: "work", hours: "fixed", move: "sitting", meals: 3 } }));
+      localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z" }));
+      localStorage.setItem("chefmealan-unlogged", JSON.stringify({}));
+      localStorage.setItem("seeded", "1"); }, state);
+    await require("./adult.cjs")(page);
+    await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
+    return page;
+  };
+  const text = (page, sel) => page.locator(sel).first().textContent().then((t) => t.replace(/\s+/g, " "));
+  const readIn = async (page, rd) => {
+    await page.route("**/api/recipe/read", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(rd) }));
+    await page.goto(U + "/plate"); await page.waitForTimeout(1300);
+    await page.locator(".plate-card label").filter({ hasText: "Screenshot" }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }]);
+    await page.waitForTimeout(500); await page.getByRole("button", { name: "Read it" }).click(); await page.waitForTimeout(800);
+    await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
+    await page.unroute("**/api/recipe/read");
+  };
+
+  // ---- the cheesecake: the whole cake, steps drafted on this step, 7 slices for later ----
+  const page = await open(seed);
+  await readIn(page, read);
+  await page.route("**/api/steps", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
+    steps: ["Crush {1} and mix with {2}, melted; press into a tin.", "Heat the oven to 160 °C.", "Beat {3}, {4}, {5}, {6} and {7} until smooth; pour over the base and bake 45 minutes.", "Chill 4 hours, then top with {8}."],
+    marks: [{ kind: "same", why: "" }, { kind: "adapted", why: "320 °F in the original" }, { kind: "same", why: "" }, { kind: "added", why: "how long to chill it" }], parts: ["Base", "Filling", "Filling", "Topping"] }) }));
+  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(800);
+  let t = await text(page, "main");
+  ok(/How to make it/.test(t) && !/How do you want to eat it/.test(t), "IM19: after Make it, a recipe gets How to make it");
+  ok(await page.locator('[aria-label="What you make"] .choice.on').textContent() === "All 8 slices" && /You eat 1 slice/.test(t) && /The 7 slices left go to Keep for later/.test(t), "IM19: it makes 8, so the whole cake is made; you eat 1 slice; 7 for later");
+  ok(/No steps yet for this recipe/.test(t) && await page.locator("details.rq-orig[open]").count() === 1 && /Preheat|Crush the biscuits/.test(await text(page, "details.rq-orig")), "IM19b: no steps yet: the original open below, for you only");
+  ok(await page.getByRole("button", { name: "Make it from the original" }).count() === 1, "IM19b: you can make it from the original");
+  await page.getByRole("button", { name: "Draft the steps with Chef Mealan" }).click(); await page.waitForTimeout(900);
+  t = await text(page, "main");
+  ok(JSON.stringify(await page.locator(".mk-card .rp-step-part").allTextContents()) === JSON.stringify(["The base", "The filling", "The topping"]) && /120 g digestive biscuits/.test(t) && /200 g cream cheese/.test(t) && /Adapted: 320 °F in the original/.test(t), "IM19: the steps drafted here, part by part, at the whole cake's grams, with the marks");
+  ok((await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")))).meals[0].steps.length === 4, "IM19b: the steps are kept with the recipe");
+  await page.getByRole("button", { name: "Just your slice" }).click(); await page.waitForTimeout(300);
+  ok(/15 g digestive biscuits/.test(await text(page, "main")) && /every amount at your portion/.test(await text(page, "main")), "IM20: just your slice: the steps at your plate's grams");
+  await page.getByRole("button", { name: "All 8 slices" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "I'm making it", exact: true }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: "On to How was it?" }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: "DaaM good" }).click();
+  await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(600);
+  let st = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
+  const kept = st.feedback.find((f) => f.status === "prepared");
+  ok(kept && kept.left === 7 && kept.meal.title === "Protein cheesecake" && kept.meal.items.find((i) => /Digestive/.test(i.food.name)).grams === 15, "IM19: one card for later, 7 slices left, each one slice's foods");
+  await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(800);
+  t = await text(page, "main");
+  ok(/Prepared for later/.test(t) && /Protein cheesecake7 left/.test(t), "IM19: on Today: Protein cheesecake, 7 left");
+  await page.getByRole("button", { name: "I ate one" }).click(); await page.waitForTimeout(500);
+  st = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
+  ok(st.feedback.filter((f) => f.status === "eaten" && f.meal.title === "Protein cheesecake").length === 2 && st.feedback.find((f) => f.status === "prepared").left === 6, "IM19: I ate one logs one slice; 6 left");
+  await page.close();
+  // the next day: still there, until eaten or removed
+  const page2 = await (async () => { const pg = await b.newPage({ viewport: { width: 390, height: 1600 } }); pg.on("pageerror", (e) => errs.push(e.message)); return pg; })();
+  await page2.close();
+  const p3 = await open({ ...st }, "2026-10-18T09:00:00");
+  await p3.goto(U + "/"); await p3.waitForTimeout(1200);
+  t = await text(p3, "main");
+  ok(/Protein cheesecake6 left/.test(t), "IM19: the next day the slices are still on Today: 6 left");
+  await p3.getByRole("button", { name: "Remove" }).click(); await p3.waitForTimeout(400);
+  ok(!/6 left/.test(await text(p3, "main")), "IM19: Remove drops them");
+  await p3.close();
+
+  // ---- the cookie: makes 2, so just yours first ----
+  const p4 = await open(seed);
+  await readIn(p4, cookie);
+  await p4.getByRole("button", { name: "Make it", exact: true }).click(); await p4.waitForTimeout(800);
+  ok(await p4.locator('[aria-label="What you make"] .choice.on').textContent() === "Just your cookie" && /The recipe makes 2/.test(await text(p4, "main")), "IM20: a recipe that makes 2 starts with just your cookie");
+  await p4.getByRole("button", { name: "Both cookies" }).click(); await p4.waitForTimeout(200);
+  ok(/The other cookie goes to Keep for later/.test(await text(p4, "main")), "IM20: Both cookies: the other one goes to Keep for later");
+  await p4.close();
+
+  // ---- your own bowl in parts: a checklist; a mix of ready foods keeps the ways to eat it ----
+  const bowl = [[0, 180, "Rice"], [1, 150, "Chicken"], [2, 80, "Chicken"], [3, 20, "Toppings"]].map(([k, g, pt]) => ({ id: `w${k}`, grams: g, locked: false, food: BOWL[k], part: pt }));
+  const p5 = await open({ ...seed, foods: [...seed.foods, ...BOWL], items: bowl, title: "Burrito bowl" });
+  await p5.goto(U + "/plate"); await p5.waitForTimeout(1300);
+  await p5.getByRole("button", { name: "Keep it as it is" }).click(); await p5.waitForTimeout(800);
+  const checks = await p5.locator(".mk-check").allTextContents();
+  ok(/How to make it/.test(await text(p5, "main")) && checks.length === 4 && /Rice: 180 g Basmati rice, cooked/.test(checks[0]) && /Put it together/.test(checks[3]), `IM19c: your bowl in parts as a checklist (${checks.join(" | ")})`);
+  await p5.locator(".mk-check").first().click(); await p5.waitForTimeout(150);
+  ok(await p5.locator(".mk-check.on").count() === 1, "IM19c: tick a part as you go");
+  await p5.close();
+  const yog = seed.foods.find((f) => /Skyr/.test(f.name)), nut = seed.foods.find((f) => /Nutella/.test(f.name));
+  const p6 = await open({ ...seed, items: [{ id: "y", grams: 200, locked: false, food: yog }, { id: "n", grams: 15, locked: false, food: nut }], title: "" });
+  await p6.goto(U + "/plate"); await p6.waitForTimeout(1300);
+  await p6.getByRole("button", { name: "Keep it as it is" }).click(); await p6.waitForTimeout(800);
+  ok(/How do you want to eat it\?/.test(await text(p6, "main")), "A mix of ready foods keeps How do you want to eat it?");
+  await p6.close();
+  ok(errs.length === 0, "no page errors " + errs.join(" | "));
+  await b.close(); server.kill();
+  console.log(fails.length ? `${fails.length} FAILED` : "all ok");
+  process.exit(fails.length ? 1 : 0);
+})();

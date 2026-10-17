@@ -122,7 +122,7 @@ const U = "http://127.0.0.1:3209";
   // Make it, then Did it work?
   await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(600);
   if (await page.locator(".way").count()) await page.locator(".way").first().click();
-  await page.getByRole("button", { name: /I'm making it this way|Continue/ }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: /I'm making it|Continue/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "On to How was it?" }).click(); await page.waitForTimeout(400);
   t = await page.locator("main").textContent().then((x) => x.replace(/\s+/g, " "));
   ok(/Did the side work\?/.test(t) && /Greek yogurt on the side/.test(t) && /Margherita pizza is in My recipes already/.test(t), "After: Did the side work?, and the card points at the recipe, no second copy");

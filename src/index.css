@@ -1602,3 +1602,13 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .rq-part, .rp-part { font-weight: 800; font-size: 13.5px; color: var(--ink); padding: 10px 0 2px; border-top: 2px solid var(--line); margin-top: 4px; }
 .rq-food-edit { display: flex; flex-direction: column; min-width: 0; }
 .rp-step-part { list-style: none; display: block !important; font-weight: 800; color: var(--ink); font-size: 14px; padding: 8px 0 2px; border-top: 2px solid var(--line); }
+/* 0.2.20, boards IM19, IM19b, IM19c, IM20: How to make it */
+.mk-card { display: flex; flex-direction: column; gap: 8px; }
+.mk-card > b { font-size: 15px; color: var(--ink); }
+.mk-card .moments { display: flex; flex-wrap: wrap; gap: 8px; }
+.mk-eat { display: flex; justify-content: space-between; gap: 8px; background: var(--tint); border-radius: 12px; padding: 8px 10px; font-weight: 800; color: var(--ink); font-size: 13.5px; }
+.mk-check { display: flex; gap: 10px; align-items: flex-start; padding: 9px 0; border: none; border-bottom: 1px solid var(--line); background: none; font: inherit; font-size: 14.5px; color: var(--ink); text-align: left; cursor: pointer; }
+.mk-check.on > span:last-child { opacity: 0.55; }
+.mk-box { flex: none; width: 22px; height: 22px; border: 2px solid var(--line); border-radius: 6px; margin-top: 1px; display: flex; align-items: center; justify-content: center; font-weight: 900; color: var(--brand-text); }
+.mk-check.on .mk-box { border-color: var(--brand); background: var(--tint); }
+.left-tag { background: var(--tint); color: var(--brand-text); border-radius: 10px; padding: 1px 8px; font-weight: 800; font-size: 12px; }

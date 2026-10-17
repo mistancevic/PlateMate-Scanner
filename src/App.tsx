@@ -1925,14 +1925,21 @@ export default function App() {
       });
       setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, tip: { text: res.tip, pairs: res.pairs ?? [], goalKey: key, at: new Date().toISOString() } } : x)) }));
     },
-    keepForLater: (meal: Meal, extra?: { photos?: string[]; prep?: Feedback["prep"]; status?: "prepared" | "not-used" }) => {
+    keepForLater: (meal: Meal, extra?: { photos?: string[]; prep?: Feedback["prep"]; status?: "prepared" | "not-used"; left?: number }) => {
       // a prepared card: it shows on Today until it's eaten or dropped; not eaten after all is a note, not counted
       const status = extra?.status ?? "prepared";
-      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status, taste: "", notes: "", photos: extra?.photos?.length ? extra.photos : undefined, photo: extra?.photos?.length ? extra.photos[extra.photos.length - 1] : undefined, prep: extra?.prep, createdAt: new Date().toISOString(), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined } as any, ...s.feedback] }));
+      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status, ...(extra?.left ? { left: extra.left } : {}), taste: "", notes: "", photos: extra?.photos?.length ? extra.photos : undefined, photo: extra?.photos?.length ? extra.photos[extra.photos.length - 1] : undefined, prep: extra?.prep, createdAt: new Date().toISOString(), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined } as any, ...s.feedback] }));
       notify(status === "prepared" ? "Kept for later. It's on Today." : "Noted, not counted.");
     },
     settleCard: (id: string, how: "eaten" | "not-used") => {
-      setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, status: how, createdAt: how === "eaten" ? new Date().toISOString() : f.createdAt, taste: how === "eaten" ? f.taste || "Good" : f.taste } : f)) }));
+      // portions left (0.2.20, IM19): eating one logs one and keeps the rest; Remove drops them all
+      const card = state.feedback.find((f) => f.id === id);
+      if (card && how === "eaten" && (card.left ?? 0) > 1) {
+        const now = new Date().toISOString();
+        setState((s) => ({ ...s, feedback: [{ ...structuredClone(card), id: uid(), status: "eaten", left: undefined, createdAt: now, taste: card.taste || "Good" }, ...s.feedback.map((f) => (f.id === id ? { ...f, left: (f.left ?? 1) - 1 } : f))] }));
+        notify(`Logged. ${(card.left ?? 1) - 1} left.`); return;
+      }
+      setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, status: how, left: undefined, createdAt: how === "eaten" ? new Date().toISOString() : f.createdAt, taste: how === "eaten" ? f.taste || "Good" : f.taste } : f)) }));
       notify(how === "eaten" ? "Logged." : "Dropped for today.");
     },
     toggleFavorite: (foodId: string) => {

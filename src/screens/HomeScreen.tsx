@@ -268,11 +268,11 @@ export function HomeScreen(p: AppApi) {
           <p className="label">Prepared for later</p>
           {today.prepared.map((f) => (
             <section className="card log-card" key={f.id}>
-              <div className="card-top"><span>{f.meal.title}</span></div>
-              <small>{f.meal.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}</small>
+              <div className="card-top"><span>{f.meal.title}</span>{(f.left ?? 0) > 0 && <small className="left-tag">{f.left} left</small>}</div>
+              <small>{(f.left ?? 0) > 0 ? "One portion: " : ""}{f.meal.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}</small>
               <div className="button-row" style={{ marginTop: 8 }}>
-                <button className="pill pill-small pill-primary" onClick={() => p.settleCard(f.id, "eaten")}><Check size={14} /> I ate it</button>
-                <button className="pill pill-small" onClick={() => p.settleCard(f.id, "not-used")}><X size={14} /> Not today</button>
+                <button className="pill pill-small pill-primary" onClick={() => p.settleCard(f.id, "eaten")}><Check size={14} /> {(f.left ?? 0) > 0 ? "I ate one" : "I ate it"}</button>
+                <button className="pill pill-small" onClick={() => p.settleCard(f.id, "not-used")}><X size={14} /> {(f.left ?? 0) > 0 ? "Remove" : "Not today"}</button>
               </div>
             </section>
           ))}

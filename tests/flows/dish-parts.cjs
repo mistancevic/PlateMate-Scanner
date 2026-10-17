@@ -113,7 +113,7 @@ const U = "http://127.0.0.1:3211";
   // Keep it as it is, made, saved in My recipes with its parts
   await p2.getByRole("button", { name: "Keep it as it is" }).click(); await p2.waitForTimeout(600);
   if (await p2.locator(".way").count()) await p2.locator(".way").first().click();
-  await p2.getByRole("button", { name: /I'm making it this way|Continue/ }).click(); await p2.waitForTimeout(400);
+  await p2.getByRole("button", { name: /I'm making it|Continue/ }).click(); await p2.waitForTimeout(400);
   await p2.getByRole("button", { name: "On to How was it?" }).click(); await p2.waitForTimeout(400);
   await p2.getByRole("button", { name: "DaaM good" }).click();
   await p2.getByRole("button", { name: "Save", exact: true }).click(); await p2.waitForTimeout(600);

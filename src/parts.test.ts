@@ -48,3 +48,13 @@ test("IM15 to IM18: members get the parts as headings; a food kept with a recipe
   assert.equal(cleanShared({ ...sh, items: [{ ...sh.items[0], part: "  for the base " }] })!.items[0].part, "Base");
   assert.equal((leanFood({ ...food("X", 1, 1), photo: "data:image/jpeg;base64,AAA", photos: ["data:x"] }) as any).photo, undefined);
 });
+
+test("0.2.20: a plate with parts, optional foods, a part left out and a card with portions left is stored data that reads back", async () => {
+  const { parseState, freshState } = await import("./pilot");
+  const f = food("Digestive biscuits", 480, 7);
+  const it = { id: "a", grams: 15, locked: false, food: f, part: "Base" };
+  const st: any = { ...freshState(), items: [it], optional: [{ id: "o", name: "Dark chocolate", grams: 3, food: food("Dark chocolate", 550, 7), part: "Topping" }], leftOut: [{ part: "Filling", items: [{ ...it, id: "b" }], at: 1 }],
+    feedback: [{ id: "k", meal: { id: "m", title: "Protein cheesecake", items: [it], portion: 15, savedAt: "2026-10-17T10:00:00Z" }, status: "prepared", left: 7, taste: "", notes: "", createdAt: "2026-10-17T10:00:00Z" }] };
+  const back = parseState(JSON.stringify(st));
+  assert.equal(back.feedback[0].left, 7); assert.equal(back.items[0].part, "Base"); assert.equal(back.optional![0].part, "Topping");
+});

@@ -52,6 +52,11 @@ export const asF = (c: number) => { const f = cToF(c); return c >= 100 ? Math.ro
 const TEMP = /(\d{2,3})(?:\s*(?:°|º|˚|degrees?|deg\.?)\s*|\s*)(c|f|celsius|fahrenheit)\b/gi;
 // every temperature in a text in one unit; a text that already gives both (180 °C / 350 °F) is left as it is
 export function tempsIn(text: string, to: "c" | "f" = U.temp): string {
+  // a food in a step is a token with an id ([[i:<id>|name]]); only the words around it are read (an id can look like 120c)
+  if (String(text).includes("[[i:")) return String(text).split(/(\[\[i:[^\]]*\]\])/).map((x) => (x.startsWith("[[i:") ? x : tempsInWords(x, to))).join("");
+  return tempsInWords(text, to);
+}
+function tempsInWords(text: string, to: "c" | "f"): string {
   // a degree mark or the word, or an oven number (350F); never "2 c", which is two cups
   const isTemp = (all: string, n: string, u: string) => /[°º˚]|deg/i.test(all) || /celsius|fahrenheit/i.test(u) || Number(n) >= 100;
   const found = [...String(text).matchAll(TEMP)].filter((m) => isTemp(m[0], m[1], m[2]));

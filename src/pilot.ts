@@ -156,6 +156,8 @@ export type Feedback = {
   id: string;
   meal: Meal;
   status: "prepared" | "eaten" | "not-used";
+  // portions left of a whole recipe made (0.2.20, board IM19): the card stays on Today, day after day, until eaten or removed
+  left?: number;
   taste: string;
   notes: string;
   createdAt: string;
