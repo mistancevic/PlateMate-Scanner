@@ -101,8 +101,8 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   await readIn(p4, cookie);
   await p4.getByRole("button", { name: "Make it", exact: true }).click(); await p4.waitForTimeout(800);
   ok(await p4.locator('[aria-label="What you make"] .choice.on').textContent() === "Just your cookie" && /The recipe makes 2/.test(await text(p4, "main")), "IM20: a recipe that makes 2 starts with just your cookie");
-  await p4.getByRole("button", { name: "Both cookies" }).click(); await p4.waitForTimeout(200);
-  ok(/The other cookie goes to Keep for later/.test(await text(p4, "main")), "IM20: Both cookies: the other one goes to Keep for later");
+  await p4.getByRole("button", { name: "All 2 cookies" }).click(); await p4.waitForTimeout(200);
+  ok(/The other cookie goes to Keep for later/.test(await text(p4, "main")), "IM20: All 2 cookies, an exact count: the other one goes to Keep for later");
   await p4.close();
 
   // ---- your own bowl in parts: a checklist; a mix of ready foods keeps the ways to eat it ----

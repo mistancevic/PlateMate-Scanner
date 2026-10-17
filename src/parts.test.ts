@@ -58,3 +58,25 @@ test("0.2.20: a plate with parts, optional foods, a part left out and a card wit
   const back = parseState(JSON.stringify(st));
   assert.equal(back.feedback[0].left, 7); assert.equal(back.items[0].part, "Base"); assert.equal(back.optional![0].part, "Topping");
 });
+
+test("IM21: the nutrition table: EU order, exact counts, polyols from a sweetener with no energy, a missing value named", async () => {
+  const { nutritionOf, byPart, polyolsOf } = await import("./nutrition");
+  const { validateFood } = await import("./pilot");
+  const F2 = (name: string, calories: number, protein: number, fats: number | null, carbs: number | null, fiber: number | null) => ({ ...food(name, calories, protein), fats, carbs, fiber });
+  // erythritol: no energy, all carbohydrate, as labels print it (Milan, 14:02): a real food, counted as polyols
+  const ery = F2("Erythritol", 0, 0, 0, 100, 0);
+  assert.deepEqual(validateFood(ery), []);
+  assert.equal(validateFood(F2("Odd", 0, 5, 0, 0, 0)).length, 1);
+  assert.equal(polyolsOf(ery), 100);
+  const items = [{ grams: 120, food: F2("Digestive biscuits", 480, 7, 21, 64, 3), part: "Base" }, { grams: 500, food: F2("Low-fat quark", 67, 12, 0.2, 4, 0), part: "Filling" }, { grams: 40, food: ery, part: "Filling" }];
+  const n = nutritionOf(items as any, 8)!;
+  assert.deepEqual(n.rows.map((r) => r.label), ["Energy", "Fat", "Carbohydrate", "of which polyols", "Fibre", "Protein"]);
+  assert.equal(Math.round(n.rows[0].serving!), 114); assert.equal(Math.round(n.rows[0].all!), 911);
+  assert.equal(n.rows[3].serving, 5);
+  assert.equal(Math.round(n.pd! * 10) / 10, 7.5);
+  const m = nutritionOf([...items, { grams: 10, food: F2("Mystery sprinkles", 400, 0, null, 90, null) }] as any, 8)!;
+  assert.equal(m.rows.some((r) => r.key === "fibre"), false, "fibre is voluntary: no row when a food has no value");
+  assert.deepEqual(m.rows.find((r) => r.key === "fat")!.missing, ["Mystery sprinkles"]); assert.equal(m.rows.find((r) => r.key === "fat")!.serving, null);
+  assert.ok(m.rows.find((r) => r.key === "energy")!.serving! > 0);
+  assert.deepEqual(byPart(items as any, 8).map((p) => [p.part, Math.round(p.kcal)]), [["Base", 72], ["Filling", 42]]);
+});

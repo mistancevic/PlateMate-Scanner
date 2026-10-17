@@ -6,7 +6,7 @@ const path = require("node:path");
 const PATHS = [
   { id: "PA1", name: "Getting in: landing, access, sign-in, coach code, profile with consent, goal", guards: ["safety", "first-goal"], note: "sign-in and the coach code are checked on the phone" },
   { id: "PA2", name: "At the shelf: Scan, label check, PD, fit, Mix it, one tap to a plate", guards: ["camera-group", "camera-every-mode", "mix-tip", "find-then-add"] },
-  { id: "PA3", name: "A craving at home: moment, foods in, Fit to my target, Make it, saved; or a recipe from a screenshot or a link", guards: ["meal-from-empty-plate", "mix-tip", "recipe-import", "recipe-after", "dish-parts", "how-to-make"] },
+  { id: "PA3", name: "A craving at home: moment, foods in, Fit to my target, Make it, saved; or a recipe from a screenshot or a link", guards: ["meal-from-empty-plate", "mix-tip", "recipe-import", "recipe-after", "dish-parts", "how-to-make", "recipe-nutrition"] },
   { id: "PA4", name: "Out, or missing something: the helper and the chat work with what I have", guards: ["dont-have-it", "chat-then-craving"] },
   { id: "PA5", name: "Around training: the fit line for the moment, the count it gives", guards: ["mix-tip"] },
   { id: "PA6", name: "The day: the plan, the day set once, what went through Mealan", guards: ["today", "quick-picks", "plan-slots", "plan-fill", "today-plan", "chef-context", "where-and-dish"] },

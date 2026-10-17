@@ -143,6 +143,8 @@ export type Meal = {
   optional?: { name: string; written: string; note?: string; grams: number; food: Food; part?: string }[];
   // the part of each step, aligned with steps (0.2.19, IM17); none when the recipe is one list
   stepParts?: string[];
+  // the recipe's own numbers per serving, as it gives them (0.2.21, IM21b): shown under ours on the recipe page
+  stated?: { kcal: number; protein: number; fats: number | null; carbs: number | null };
   // how each of Chef Mealan's steps relates to the original (0.2.18, IM9, IM10b); cleared when the steps are edited
   stepMarks?: StepMark[];
   stepsKitchen?: string;
@@ -382,9 +384,11 @@ export function validateFood(food: Food): string[] {
     errors.push(
       "Macro grams exceed the food weight. Check serving basis and carbohydrate/fibre convention.",
     );
-  if (food.calories === 0 && MACROS.some((k) => (food[k] ?? 0) > 0))
+  // a sweetener such as erythritol has no energy and carbohydrate (polyols): a real food, as labels show it (0.2.21,
+  // Milan 17 October 2026, 14:02); protein or fat with no energy still can't be right
+  if (food.calories === 0 && ((food.protein ?? 0) > 0.5 || (food.fats ?? 0) > 0.5))
     errors.push(
-      "Zero energy conflicts with nutrient amounts. Check the label.",
+      "Zero energy conflicts with protein or fat. Check the label.",
     );
   return errors;
 }

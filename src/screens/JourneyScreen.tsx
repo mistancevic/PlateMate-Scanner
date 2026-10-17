@@ -461,7 +461,7 @@ export function JourneyScreen(p: AppApi) {
     const optional = r.items.filter((i) => i.optional && !(i.on ?? false)).map((i) => ({ name: i.name, written: i.written, ...(i.note ? { note: i.note } : {}), grams: i.grams, ...(i.part ? { part: i.part } : {}),
       food: leanFood(state.foods.find((x) => x.name.toLowerCase() === i.name.toLowerCase()) ?? { ...estimate(i), notes: `${CHEF_NAME}'s estimate, from a recipe` }) }));
     const meal: Meal = { id: uid(), title: r.title, items: whole, portion: Math.round(total / r.servings), savedAt: new Date().toISOString(), steps: [],
-      source: { name: r.source, ...(f.url ? { url: f.url } : {}), from: f.url ? "link" : "screenshot", at: new Date().toISOString(), ...(r.steps?.length ? { steps: r.steps } : {}) }, ...(thumbs.length ? { shots: thumbs } : {}), makes: { n: r.servings, unit: r.servingsUnit }, ...(optional.length ? { optional } : {}) };
+      source: { name: r.source, ...(f.url ? { url: f.url } : {}), from: f.url ? "link" : "screenshot", at: new Date().toISOString(), ...(r.steps?.length ? { steps: r.steps } : {}) }, ...(thumbs.length ? { shots: thumbs } : {}), makes: { n: r.servings, unit: r.servingsUnit }, ...(optional.length ? { optional } : {}), ...(r.stated ? { stated: r.stated } : {}) };
     const mode: "sized" | "recipe" = sizedFits(mealNeed, kcalOfItems(whole) / r.servings) ? "sized" : "recipe";
     setPmode(mode); setWay(null); setPartsMode(false);
     setState((s) => ({ ...s, foods: [...s.foods, ...fresh], meals: [meal, ...s.meals], ...recipePlate(meal, mode), title: meal.title, portion: null, fromRecipe: meal.id }));
@@ -1014,7 +1014,7 @@ export function JourneyScreen(p: AppApi) {
           <section className="card mk-card" aria-label="What you make">
             <b>What you make</b>
             <div className="moments">
-              <button className={`choice ${madeWhole ? "on" : ""}`} aria-pressed={madeWhole} onClick={() => setMakeAll(true)}>{n === 2 ? `Both ${unit}` : `All ${n} ${unit}`}</button>
+              <button className={`choice ${madeWhole ? "on" : ""}`} aria-pressed={madeWhole} onClick={() => setMakeAll(true)}>All {n} {unit}</button>
               <button className={`choice ${!madeWhole ? "on" : ""}`} aria-pressed={!madeWhole} onClick={() => setMakeAll(false)}>{onePlate ? `Just your ${one}` : "Just your plate"}</button>
             </div>
             <div className="mk-eat"><span>You eat {onePlate ? `1 ${one}` : "your plate"}</span><span>{fmt(t0.calories, 0)} kcal · {pdText(pd0)}</span></div>

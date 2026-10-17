@@ -17,6 +17,8 @@ import { coverIsDrawn, isDrawnPhoto, TEST_MODELS } from "../covers";
 import { sig } from "../photos";
 import { CHEF_NAME } from "./Mark";
 import { partsOf, cleanPart, leanFood } from "../parts";
+import { nutritionOf, byPart } from "../nutrition";
+import { portionsIn } from "../pilot";
 
 // The recipe's own page in the app (0.2.5+r11, canvas board S3, R8 to R11, approved 12 October 2026). Photos first: the
 // cover large, every photo with × to delete, ‹ › to move the picked one (first place is the cover), Add. Then the name
@@ -75,6 +77,9 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const [find, setFind] = useState<string | null>(null);
   const items = edit ? edit.items : meal.items;
   const sum = aggregate(items.filter((i) => i.grams > 0));
+  // how many servings the numbers are for (IM21): the recipe's own count, or the portions the plate divides it into
+  const serves = meal.makes?.n ?? portionsIn(meal);
+  const oneWord = meal.makes ? meal.makes.unit.replace(/s$/, "") : "portion";
   const pd = density(sum.protein, sum.calories);
   const startEdit = () => { setEdit({ items: meal.items.map((i) => ({ ...i })), steps: [...(meal.steps ?? [])], optional: [...(meal.optional ?? [])] }); setFind(null); setExtraParts([]); };
   // parts in Edit recipe (0.2.19, IM18): each food's part, a new part, optional on and off
@@ -159,9 +164,10 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         ? <input className="title-input rq-name-input" aria-label="Name of the recipe" autoFocus value={naming} onChange={(e) => setNaming(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" maxLength={80} />
         : <button type="button" className="rq-name" aria-label={`Rename ${meal.title}`} onClick={() => setNaming(meal.title)}>{meal.title}</button>}
       {meal.source && <SourceBox meal={meal} onPatch={onPatch} />}
+      {/* IM21: one serving first, when the recipe makes more than one */}
       <div className="rp-stats">
-        <span><b>{fmt(sum.calories, 0)}</b><small>kcal</small></span>
-        <span><b>{fmt(sum.protein, 1)}</b><small>g protein</small></span>
+        <span><b>{fmt((sum.calories ?? 0) / serves, 0)}</b><small>kcal{serves > 1 ? `, 1 ${oneWord}` : ""}</small></span>
+        <span><b>{fmt((sum.protein ?? 0) / serves, 1)}</b><small>g protein</small></span>
         <span className="wide"><b>{pdText(pd)}</b><small>protein density</small></span>
       </div>
       <section className={`card rq-foods ${edit ? "editing" : ""}`}>
@@ -209,6 +215,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           <small className="muted">The recipe's numbers leave them out, and so do ours. Make it, and add any of them on the plate.</small>
         </section>
       )}
+      {!edit && <NutritionCard items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={meal.stated ?? null} />}
       <section className={`card rq-steps ${edit ? "editing" : ""}`}>
         <b>Steps</b>
         {edit
@@ -344,4 +351,44 @@ function partHead(parts: string[] | undefined, k: number) {
   const pt = parts?.[k];
   if (!pt || (k > 0 && parts![k - 1] === pt)) return null;
   return <li key={`p${k}`} className="rp-step-part">The {pt.toLowerCase()}</li>;
+}
+
+// IM21, IM21b: Nutrition, worked out by code from the foods and their grams, in the EU label order; exact counts (All 2)
+function NutritionCard({ items, serves, one, all, stated }: { items: Ingredient[]; serves: number; one: string; all: string; stated: Meal["stated"] | null }) {
+  const n = nutritionOf(items, serves);
+  if (!n) return null;
+  const many = serves > 1;
+  const v = (x: number | null, unit: string, d: number) => (x === null ? "?" : unit === "kcal" ? `${fmt(x, 0)} kcal` : `${fmt(x, d)} g`);
+  const parts = byPart(items, serves);
+  const energy = n.rows[0].serving;
+  const pdS = stated && stated.kcal > 0 ? (100 * stated.protein) / stated.kcal : null;
+  const diff = stated && energy ? Math.round(((energy - stated.kcal) / stated.kcal) * 100) : null;
+  const missing = [...new Set(n.rows.flatMap((r) => r.missing))];
+  return (
+    <section className="card nt-card" aria-label="Nutrition">
+      <b>Nutrition</b>
+      <div className={`nt-row nt-th ${many ? "" : "nt-two"}`}><span />{many && <b>1 {one.toUpperCase()}</b>}<small>{many ? `ALL ${serves % 1 === 0 ? serves : fmt(serves, 1)}` : "ALL"}</small><small>100 G</small></div>
+      {n.rows.map((r) => (
+        <div className={`nt-row ${r.sub ? "nt-sub" : ""} ${many ? "" : "nt-two"}`} key={r.key}>
+          <span>{r.label}</span>
+          {many && <b>{v(r.serving, r.unit, 1)}</b>}
+          <small>{v(r.all, r.unit, 0)}</small>
+          <small>{v(r.per100, r.unit, 1)}</small>
+        </div>
+      ))}
+      <div className={`nt-row nt-pd ${many ? "" : "nt-two"}`}><span>PD</span>{many && <b>{n.pd === null ? "?" : (Math.round(n.pd * 10) / 10).toFixed(1)}</b>}<small>{many ? "" : n.pd === null ? "?" : (Math.round(n.pd * 10) / 10).toFixed(1)}</small><small>{n.share === null ? "" : `${n.share} % kcal`}</small></div>
+      {missing.length > 0 && <small className="muted">? : no value for {missing.join(", ")}. Add it on the food and the table follows.</small>}
+      {parts.length > 1 && (
+        <div className="nt-parts-box">
+          <b>By part{many ? `, 1 ${one}` : ""}</b>
+          <div className="nt-parts nt-th"><span /><b>KCAL</b><b>PROTEIN</b><b>PD</b></div>
+          {parts.map((pt) => <div className="nt-parts" key={pt.part}><span>{pt.part}</span><b>{fmt(pt.kcal, 0)}</b><b>{fmt(pt.protein, 1)} g</b><b>{pt.pd === null ? "?" : (Math.round(pt.pd * 10) / 10).toFixed(1)}</b></div>)}
+        </div>
+      )}
+      {stated && (
+        <small className="nt-says">The recipe says, per {one}: {fmt(stated.kcal, 0)} kcal{stated.fats !== null ? ` · ${fmt(stated.fats, 1)} g fat` : ""}{stated.carbs !== null ? ` · ${fmt(stated.carbs, 1)} g carbohydrate` : ""} · {fmt(stated.protein, 1)} g protein{pdS !== null ? ` · PD ${fmt(pdS, 1)}` : ""}.{diff !== null && Math.abs(diff) > 15 ? ` Ours is ${Math.abs(diff)}% ${diff > 0 ? "higher" : "lower"} in energy: the recipe may use other products.` : " Ours agrees."}{n.rows.some((r) => r.key === "polyols") && stated.carbs !== null ? " Its carbohydrate may leave out the sweetener's polyols." : ""}</small>
+      )}
+      <small className="muted">From the foods and their grams; each value is the food's label or a typical value, marked estimate.{many ? " The plate rounds each food to the gram, so one serving there can read a little apart." : ""}</small>
+    </section>
+  );
 }
