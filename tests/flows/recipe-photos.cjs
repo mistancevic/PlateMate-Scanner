@@ -108,11 +108,11 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   ok(await page.locator(".rq-offer .rph-offer").count() === 1, "R8: the plate photos from the times it was made are offered");
   await page.locator(".rq-offer .rph-offer").first().click(); await page.waitForTimeout(300);
   ok(await page.locator(".rq-hero img").count() === 1 && await page.locator(".rq-offer").count() === 0, "R8: a tap adds the plate photo to the recipe, as its cover");
-  // Delete recipe asks first
+  // Delete recipe says what goes first (0.2.22, IM22): its photos go with it
   await page.getByRole("button", { name: "Delete recipe" }).click(); await page.waitForTimeout(150);
-  ok((await meal("m-oats")) !== undefined, "R10: Delete recipe asks Sure? first");
-  await page.getByRole("button", { name: /Sure\? Tap again to delete/ }).click(); await page.waitForTimeout(300);
-  ok((await meal("m-oats")) === undefined && await page.locator(".rq").count() === 0, "R10: the second tap deletes the recipe and goes back to Recipes");
+  ok((await meal("m-oats")) !== undefined && /Its photo, from this phone and from your account\./.test(await page.locator(".dl-card").textContent()), "IM22: Delete recipe says what goes first: its photo");
+  await page.locator(".dl-card .dl-go").click(); await page.waitForTimeout(300);
+  ok((await meal("m-oats")) === undefined && await page.locator(".rq").count() === 0 && /Its picture leaves your account with the next save\./.test(await page.locator(".dl-done").textContent()), "IM22: Delete recipe deletes the recipe and goes back to Recipes, saying what was done");
   ok(errs.length === 0, "no page errors " + errs.join(" | "));
   await b.close(); server.kill();
   console.log(fail ? `\n${fail} FAILED` : "\nall passed");

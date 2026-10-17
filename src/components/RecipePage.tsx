@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { tempsIn } from "../units";
 import { Camera, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import type { Feedback, Food, Ingredient, Meal, StepMark } from "../pilot";
@@ -39,7 +39,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   // 0.2.10 (canvas board CH, CH5): Chef Mealan drafts the steps; none without the AI
   draft?: (() => Promise<{ ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[] } | { ok: false; why: string; cannot?: boolean }>) | null;
   meal: Meal; cards: Feedback[]; foods: Food[]; cook: boolean; state: PubState; pub: Published | null; approver: string; direct: boolean; unpublished?: string[];
-  onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onPublish: (now?: boolean) => void; onDelete: () => void; close: () => void;
+  onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onPublish: (now?: boolean) => void; onDelete: ReactNode; close: () => void;
 }) {
   useBack(true, close);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -271,7 +271,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
             </section>
           )}
           {membersPanel}
-          <ConfirmButton className="link link-danger rq-delete" label="Delete recipe" confirmLabel="Sure? Tap again to delete" onConfirm={onDelete} />
+          {onDelete}
         </>
       )}
     </div>

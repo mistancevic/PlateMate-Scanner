@@ -789,6 +789,12 @@ app.delete("/api/recipes/:slug", requireUser, requireMember, async (req, res) =>
     const slug = String(req.params.slug), old = await getRecipe(req, slug);
     if (!old) return res.json({ ok: true });
     if (old.authorUid && old.authorUid !== w.uid) return res.status(403).json({ error: "Only the cook who published it can take it down." });
+    // the recipe deleted in the app (0.2.22, IM22): the page goes down and its content goes; the link still says it was
+    // taken down, and the address stays the cook's. A version waiting for the coach goes with it.
+    if (req.query.forget === "1") {
+      await putRecipe(req, slug, { slug, title: old.title, authorUid: old.authorUid ?? w.uid, status: "down", downAt: new Date().toISOString(), deleted: true });
+      return res.json({ ok: true });
+    }
     const { pending: _p, waitingFor: _w, ...keep } = old;
     await putRecipe(req, slug, { ...keep, status: "down", downAt: new Date().toISOString() });
     res.json({ ok: true });
@@ -1369,6 +1375,16 @@ app.get("/api/cover/today", requireUser, requireMember, async (req, res) => {
     const uid = String((req as any).uid || "local"), dayKey = `${uid}~${berlinDay()}`;
     const used = !FB_PROJECT ? memCoverDays.get(dayKey) ?? 0 : Number((await db().collection("cover_days").doc(dayKey).get()).get("n")) || 0;
     res.json({ used: Math.min(used, COVER_DAILY), limit: COVER_DAILY });
+  } catch (e) { fail(res, e); }
+});
+// the recipe deleted in the app (0.2.22, IM22): the record that a picture was drawn for it goes; the day's count stays
+app.delete("/api/cover/:recipeId", requireUser, requireMember, async (req, res) => {
+  try {
+    const uid = String((req as any).uid || "local"), recipeId = String(req.params.recipeId);
+    if (!/^[\w-]{1,64}$/.test(recipeId)) return res.status(400).json({ error: "Which recipe?" });
+    const key = `${uid}~${recipeId}`;
+    if (!FB_PROJECT) memCovers.delete(key); else await db().collection("covers").doc(key).delete();
+    res.json({ ok: true });
   } catch (e) { fail(res, e); }
 });
 app.post("/api/cover", requireUser, requireMember, requireAI, async (req, res) => {

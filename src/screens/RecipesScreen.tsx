@@ -19,6 +19,8 @@ import { coverIsDrawn } from "../covers";
 import { CHEF_NAME } from "../components/Mark";
 import { MembersList, MemberPage, SharePanel, aheadOf } from "../components/Members";
 import { sharedOf, contentSig, type SharedRecipe } from "../members";
+import { DeleteRecipe, type DeleteChoice } from "../components/DeleteRecipe";
+import { deletePlan, deletedLine, forgetRecipe } from "../recipeDelete";
 
 export function RecipesScreen(p: AppApi) {
   const { state, setState, setTab } = p;
@@ -100,6 +102,33 @@ export function RecipesScreen(p: AppApi) {
   const madeTimes = (m: Meal) => state.feedback.filter((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.status === "eaten").length;
   const lastRating = (m: Meal) => state.feedback.find((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.taste)?.taste ?? "";
   const opened = openId ? state.meals.find((m) => m.id === openId) ?? null : null;
+  // IM22c (0.2.22): after Delete recipe, a line on Recipes says what was done
+  const [deleted, setDeleted] = useState<{ title: string; line: string } | null>(null);
+  // IM22 (0.2.22): what others see goes first; if that fails, nothing is deleted. The recipe then leaves the state, and its
+  // photos and screenshots leave the phone and the account with the next save (isOrphan). Meals, portions left and foods stay.
+  const deleteRecipe = async (m: Meal, c: DeleteChoice) => {
+    const pub = published[m.id] ?? null, plan = deletePlan(m, state, pub);
+    const did = { members: false, page: false };
+    if (m.members && c.members) {
+      const r = await fetch(`/api/members/${encodeURIComponent(m.members.id)}`, { method: "DELETE" }).catch(() => null);
+      if (!r?.ok) throw new Error("It couldn't be taken back from Members. Nothing was deleted. Try again.");
+      did.members = true;
+    }
+    // a page that is live or waiting goes when ticked; one already down or sent back loses its content without a tick
+    const pageTick = plan.page === "live" || plan.page === "live+waiting" || plan.page === "waiting";
+    if (pub?.slug && (pageTick ? c.page : true)) {
+      const r = await fetch(`/api/recipes/${encodeURIComponent(pub.slug)}?forget=1`, { method: "DELETE", headers: localAs(client) }).catch(() => null);
+      if (!r?.ok) throw new Error(`${did.members ? "It was taken back from Members, but the page" : "The page"} couldn't be taken down. Nothing else was deleted. Try again.`);
+      did.page = pageTick;
+    }
+    // the record that a picture was drawn for it (the day's count stays)
+    if (m.cover?.state === "drawn" || m.coverSig) void fetch(`/api/cover/${encodeURIComponent(m.id)}`, { method: "DELETE" }).catch(() => {});
+    setOpenId(null);
+    setPublished((x) => { const y = { ...x }; delete y[m.id]; return y; });
+    setState((s) => forgetRecipe(s, m));
+    setDeleted({ title: m.title, line: deletedLine(plan, did, approver) });
+    if (memberList && did.members) setMemberList(memberList.filter((r) => r.id !== m.members!.id));
+  };
 
   // R12c (0.2.5+r13, board S4): closing the sheet after a publish says so once
   const [justLive, setJustLive] = useState<string | null>(null);
@@ -121,7 +150,7 @@ export function RecipesScreen(p: AppApi) {
         pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
         onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
-        onDelete={() => { setOpenId(null); setState((s) => ({ ...s, meals: s.meals.filter((x) => x.id !== opened.id) })); }}
+        onDelete={<DeleteRecipe key={`del-${opened.id}`} plan={deletePlan(opened, state, published[opened.id] ?? null)} slug={published[opened.id]?.slug ?? null} approver={approver} run={(c) => deleteRecipe(opened, c)} />}
         close={() => setOpenId(null)}
         tryPhoto={testOn ? async (model: string) => {
           const r = await fetch("/api/cover", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ test: true, style: "photo", model, recipeId: opened.id, title: opened.title, items: opened.items.filter((i) => i.grams > 0).map((i) => ({ name: i.food.name, grams: i.grams })) }), signal: AbortSignal.timeout(90000) });
@@ -138,6 +167,12 @@ export function RecipesScreen(p: AppApi) {
   );
   return (
     <>
+      {deleted && (
+        <section className="card dl-done" role="status">
+          <div className="card-top"><b>{deleted.title} is deleted.</b><button className="link" onClick={() => setDeleted(null)}>OK</button></div>
+          {deleted.line && <small className="muted">{deleted.line}</small>}
+        </section>
+      )}
       <div className="segments" role="tablist" aria-label="Recipes">
         <button role="tab" aria-selected={view === "mine"} className={`seg ${view === "mine" ? "on" : ""}`} onClick={() => setView("mine")}>Mine{mine.length ? ` (${mine.length})` : ""}</button>
         <button role="tab" aria-selected={view === "coach"} className={`seg ${view === "coach" ? "on" : ""}`} onClick={() => setView("coach")}>Coach's{fromCoach.length ? ` (${fromCoach.length})` : ""}</button>

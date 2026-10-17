@@ -1629,3 +1629,17 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .nt-parts b { text-align: right; }
 .nt-says { display: block; background: #fff8e1; border-radius: 10px; padding: 8px 10px; color: #5c4800; font-weight: 700; font-size: 13px; line-height: 1.45; margin-top: 8px; }
 .nt-card > small.muted { margin-top: 8px; }
+/* Deleting a recipe (0.2.22, canvas board Parts02, IM22 to IM22c) */
+.dl-card { display: flex; flex-direction: column; gap: 8px; border: 1.5px solid #f0b4a8; }
+.dl-card > b { font-size: 16px; color: var(--ink); }
+.dl-h { font-size: 12px; font-weight: 800; color: var(--muted); letter-spacing: .03em; margin-top: 6px; }
+.dl-li { display: flex; gap: 8px; font-size: 14px; line-height: 1.45; color: var(--ink); }
+.dl-li i { font-style: normal; flex: none; width: 18px; text-align: center; }
+.dl-check { display: flex; gap: 10px; align-items: flex-start; padding: 8px 10px; border: 1.5px solid var(--line); border-radius: 12px; font-size: 14px; color: var(--ink); cursor: pointer; }
+.dl-check input { flex: none; width: 20px; height: 20px; margin: 0; accent-color: var(--brand); }
+.dl-check small { display: block; color: var(--muted); font-weight: 600; font-size: 12.5px; }
+.dl-go { background: #c8402c; color: #fff; border: none; }
+.dl-err { color: var(--low); font-weight: 700; }
+.dl-done { display: flex; flex-direction: column; gap: 4px; }
+.dl-check > span { font-weight: 500; }
+.dl-done .card-top b { color: var(--ink); font-size: 15px; }
