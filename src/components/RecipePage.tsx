@@ -12,6 +12,7 @@ import { ConfirmButton } from "./Confirm";
 import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
 import type { Published } from "./PublishSheet";
 import { StepsEditor } from "./StepsEditor";
+import { CountAmount, isCounted } from "./CountAmount";
 import { stepParts } from "../steps";
 import { coverIsDrawn, isDrawnPhoto, TEST_MODELS } from "../covers";
 import { sig } from "../photos";
@@ -185,7 +186,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
                   <input inputMode="numeric" aria-label={`Grams of ${it.food.name}`} value={String(it.grams || "")} onChange={(e) => { const g = Math.min(5000, Number(e.target.value.replace(/[^\d]/g, "")) || 0); setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, grams: g } : x)) }); }} /> g
                   <button className="rq-x" aria-label={`Remove ${it.food.name}`} onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k) })}><X size={14} /></button>
                 </span>
-              : <b>{fmt(it.grams, 0)} g</b>}
+              : isCounted(it) ? <CountAmount item={it} editable={false} onGrams={() => {}} /> : <b>{fmt(it.grams, 0)} g</b>}
           </div>)];
         })}
         {edit && edit.optional.map((o, k) => (

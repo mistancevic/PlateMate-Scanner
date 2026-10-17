@@ -1,3 +1,4 @@
+import { countOf, gramsOfOne, KINDS } from "./counted";
 import { rowsFromRaw } from "./labeltable";
 /** Versioned pilot contract: numbers are unrounded; null means unknown. */
 export type Nutrient = "calories" | "protein" | "fats" | "carbs" | "fiber";
@@ -82,6 +83,8 @@ export type Ingredient = {
   role?: string;
   // the dish's part it belongs to (0.2.19, boards IM15 to IM18): Base, Filling, Topping; none when the dish is one list
   part?: string;
+  // a counted food (0.2.24, board CT): eggs and bananas by size; the grams stay the truth for the numbers
+  count?: import("./counted").Count;
   // an optional food added to the plate (0.2.19, IM12b): Leave it out sends it back to the optional list
   optional?: { written?: string; note?: string };
 };
@@ -314,7 +317,9 @@ export function solveIngredient(
       ok: false,
       reason: "Confirm energy and protein for every ingredient first.",
     };
-  const f = selected.food,
+  // a counted food (0.2.24, board CT): an egg or a banana lands on whole ones, as a pack's piece does
+  const cnt = countOf(selected);
+  const f = cnt && !selected.food.serving ? { ...selected.food, serving: { grams: gramsOfOne(cnt), name: KINDS[cnt.kind].one } } : selected.food,
     others = items.filter((x) => x.id !== id),
     t = aggregate(others);
   const E = t.calories ?? 0,

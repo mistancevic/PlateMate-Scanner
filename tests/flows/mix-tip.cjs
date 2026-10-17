@@ -139,7 +139,7 @@ seed.items = [];
   await page.evaluate((s) => { s.items = [{ id: "sk", food: s.foods.find((f) => f.name === "Skyr, natural"), grams: 150, locked: true }, { id: "br", food: s.foods.find((f) => f.name === "Protein bar 50%"), grams: 45, locked: false }]; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); }, st4);
   await page.goto("http://127.0.0.1:3196/"); await page.waitForTimeout(800);
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(300);
-  ok(/= 1 bar/.test(await page.locator("main").textContent()), "the plate shows the count next to the grams");
+  ok(/1 bar\b/.test(await page.locator(".plate-card .ct-num").first().textContent()), "the plate shows the count first, the grams small (0.2.24, CT)");
   await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).click(); await page.waitForTimeout(900);
   const barItem = (await state()).items.find((i) => i.food.name === "Protein bar 50%");
   ok(barItem && barItem.grams % 45 === 0 && barItem.grams >= 45, "what Mealan moves lands on whole bars: " + (barItem && barItem.grams) + " g");

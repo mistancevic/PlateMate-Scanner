@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, Fragment } from "react";
 import { tempsIn } from "../units";
 import { Camera, Pencil, Plus, Trash2, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 import { ConfirmButton } from "../components/Confirm";
@@ -36,8 +36,10 @@ import { minPortionOf } from "../foodjob";
 import { tasteForChef } from "../kitchens";
 import { resizeImageBase64 } from "../utils/image";
 import { ShotsCard, LinkCard, ReadCard, ErrorCard, type InFlow } from "../components/RecipeIn";
-import { changesOf, scaleTo, onePortion, sideAmount, pdOf, realPortions, isYours, sideWord, MAX_SHOTS, kcalOfItems, sizedFits, roundGrams, type ReadRecipe, type SideKind } from "../recipeIn";
+import { changesOf, countItem, scaleTo, onePortion, sideAmount, pdOf, realPortions, isYours, sideWord, MAX_SHOTS, kcalOfItems, sizedFits, roundGrams, type ReadRecipe, type SideKind } from "../recipeIn";
 import { countOf } from "../recipeDelete";
+import { countOf as countedOf } from "../counted";
+import { CountAmount, SizePicker, isCounted } from "../components/CountAmount";
 
 // Make it a meal (0.2.9, canvas board CH, CH1 to CH3): an idea from Chef Mealan, checked and with the app's grams
 type MealOption = { kitchen: string; title: string; why: string; adds: { name: string; grams: number; have: boolean; base: boolean }[]; items: Ingredient[]; kcal: number; pd: number | null };
@@ -364,6 +366,8 @@ export function JourneyScreen(p: AppApi) {
   const [tried, setTried] = useState<"yes" | "ok" | "no" | null>(null);
   // steps drafted on How to make it in this meal: the recipe page opens after How was it (0.2.23, IM23c)
   const [mkDrafted, setMkDrafted] = useState(false);
+  // CT4, CT5 (0.2.24): the size of a counted food, open under its row
+  const [sizeOpen, setSizeOpen] = useState<string | null>(null);
   const rec = state.fromRecipe ? state.meals.find((m) => m.id === state.fromRecipe) : undefined;
   // the plate is the recipe that came in while its foods are the recipe's (or a way to fit it is on); add a food and it is a plate like any other
   const imported = !!rec && items.length > 0 && (way !== null || items.every((i) => !!i.optional || rec.items.some((r) => r.food.id === i.food.id)));
@@ -452,7 +456,8 @@ export function JourneyScreen(p: AppApi) {
       if (!res.ok) throw new Error(data.error || `${CHEF_NAME} could not read it.`);
       if (data.error) { log("recipe_in", { how: shots.length ? "shot" : "link", result: String(data.error) }); setInFlow({ kind: "error", code: data.error, message: data.message || "", back: shots.length ? "shots" : "link", shots, url }); return; }
       log("recipe_in", { how: shots.length ? "shot" : "link", result: "read" });
-      setInFlow({ kind: "read", recipe: data.recipe as ReadRecipe, shots, url: data.url, note: data.note });
+      const got = data.recipe as ReadRecipe;
+      setInFlow({ kind: "read", recipe: { ...got, items: (got.items ?? []).map(countItem) }, shots, url: data.url, note: data.note });
     } catch (e: any) { setInFlow(shots.length ? { kind: "shots", shots } : { kind: "link", url }); setError(e.message); }
     finally { clearTimeout(slow); setSlowRead(false); }
   }
@@ -463,7 +468,7 @@ export function JourneyScreen(p: AppApi) {
     const whole: Ingredient[] = r.items.filter((i) => i.on ?? !i.optional).map((i) => {
       let food = state.foods.find((x) => x.name.toLowerCase() === i.name.toLowerCase()) ?? fresh.find((x) => x.name.toLowerCase() === i.name.toLowerCase());
       if (!food) { food = { ...estimate(i), notes: `${CHEF_NAME}'s estimate, from a recipe` }; fresh.push(food); }
-      return { id: uid(), food, grams: i.grams, locked: true, role: i.role, ...(i.part ? { part: i.part } : {}) };
+      return { id: uid(), food, grams: i.grams, locked: true, role: i.role, ...(i.part ? { part: i.part } : {}), ...(i.count ? { count: i.count } : {}) };
     });
     const thumbs = await Promise.all(f.shots.map((x) => resizeImageBase64(x, 900, 900).catch(() => x)));
     const total = whole.reduce((n, i) => n + i.grams, 0);
@@ -535,7 +540,7 @@ export function JourneyScreen(p: AppApi) {
       if (!why) {
         // the change answers for the whole recipe; each food keeps its part (a swap the part of the food it replaces)
         const partOf = (i: any): string | undefined => i.part || rec.items.find((r) => r.food.name.toLowerCase() === String(i.name).toLowerCase() || (i.was && r.food.name.toLowerCase() === String(i.was).toLowerCase()))?.part;
-        const whole: Ingredient[] = (d.items as any[]).map((i) => { const pt = partOf(i); return { id: uid(), food: libFood(i), grams: Math.round(Number(i.grams) || 0), locked: false, role: i.role, ...(pt ? { part: pt } : {}) }; });
+        const whole: Ingredient[] = (d.items as any[]).map((i) => { const pt = partOf(i); const was = rec.items.find((r) => r.food.name.toLowerCase() === String(i.name).toLowerCase()); return { id: uid(), food: libFood(i), grams: Math.round(Number(i.grams) || 0), locked: false, role: i.role, ...(pt ? { part: pt } : {}), ...(was?.count ? { count: was.count } : {}) }; });
         wholeNow = whole;
         out = scaleTo(whole, mealNeed ?? kcalOfItems(portionItems(rec, "recipe")));
         const pd1 = pdOf(out);
@@ -764,7 +769,8 @@ export function JourneyScreen(p: AppApi) {
         {items.length + opts.length > 0 && (() => {
           // the plate's rows (0.2.19): in the dish's parts when it has them (IM15, IM18b), optional foods inside their part
           const itemRow = (i: Ingredient) => (
-              <SwipeRow key={i.id} onRemove={() => remove(i.id)} onSwap={() => setSwapId(i.id)}>
+              <Fragment key={i.id}>
+              <SwipeRow onRemove={() => remove(i.id)} onSwap={() => setSwapId(i.id)}>
               <div className="row">
                 <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Unlock" : "Lock"} ${i.food.name}`}
                   onClick={() => { log("lock", { locked: !i.locked }); updateItem(i.id, { locked: !i.locked }); }} />
@@ -775,7 +781,10 @@ export function JourneyScreen(p: AppApi) {
                     : i.optional ? <small className="pt-wrap">optional, added · <button className="link pt-inline" onClick={() => leaveOpt(i.id)}>Leave it out</button></small>
                     : <small>{i.food.calories === 0 ? "no energy" : pdText(density(i.food.protein, i.food.calories))} · {imported ? "Change it if you like." : i.locked ? "This amount stays." : `${CHEF_NAME} can change this amount.`}</small>}
                 </div>
-                {i.locked ? <b className="row-num">{fmt(i.grams, 0)} g{servingLabel(i.food, i.grams) ? <small> = {servingLabel(i.food, i.grams)}</small> : null}</b> : (
+                {/* CT (0.2.24): eggs, bananas and a pack's pieces are counted; the size and the grams small */}
+                {isCounted(i) ? <CountAmount item={i} editable={!i.locked && !imported} open={sizeOpen === i.id} onToggle={countedOf(i) && !i.locked && !imported ? () => setSizeOpen(sizeOpen === i.id ? null : i.id) : undefined}
+                    onGrams={(g, c) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: g, ...(c ? { count: c } : {}) }); }} />
+                : i.locked ? <b className="row-num">{fmt(i.grams, 0)} g{servingLabel(i.food, i.grams) ? <small> = {servingLabel(i.food, i.grams)}</small> : null}</b> : (
                   <label className="grams">
                     <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : i.grams}
                       onChange={(e) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0) }); }}
@@ -786,6 +795,8 @@ export function JourneyScreen(p: AppApi) {
                 )}
               </div>
               </SwipeRow>
+              {sizeOpen === i.id && countedOf(i) && <SizePicker item={i} onGrams={(g, c) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: g, count: c }); }} />}
+              </Fragment>
           );
           const optRow = (o: PlateOpt) => partsMode
             ? <div className="pt-opt" key={o.id}><span className="thumb thumb-sm">{o.food.icon || iconFor(o.name)}</span><span className="pt-opt-text"><b>{o.name}</b><small className="pt-chips"><PartChip value={o.part ?? ""} onPick={(v) => setPartOf(o.id, v)} /> <button type="button" className="pt-chip" aria-pressed={true} onClick={() => setOptional(o.id, false)}>✓ Optional</button></small></span><b className="pt-opt-g">{fmt(o.grams, 0)} g</b></div>
@@ -957,7 +968,7 @@ export function JourneyScreen(p: AppApi) {
                   </button>
                 )}
               </div>
-              {i.locked ? <b className="row-num">{fmt(i.grams, 0)} g</b> : (
+              {isCounted(i) ? <CountAmount item={i} editable={!i.locked} onGrams={(g) => edit(i.id, g)} /> : i.locked ? <b className="row-num">{fmt(i.grams, 0)} g</b> : (
                 <label className="grams">
                   <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : i.grams}
                     onChange={(e) => edit(i.id, Math.max(0, Number(e.target.value) || 0))}

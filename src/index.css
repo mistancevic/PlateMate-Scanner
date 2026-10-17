@@ -1643,3 +1643,19 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .dl-done { display: flex; flex-direction: column; gap: 4px; }
 .dl-check > span { font-weight: 500; }
 .dl-done .card-top b { color: var(--ink); font-size: 15px; }
+/* Counted foods (0.2.24, canvas board CT): the count large, the size and the grams small */
+.ct-num { display: flex; flex-direction: column; align-items: flex-end; line-height: 1.15; min-width: 84px; flex: none; }
+.ct-num > b, .ct-num .ct-step b { font-size: 16px; color: var(--ink); font-weight: 800; white-space: nowrap; }
+.ct-num small { font-size: 11.5px; color: var(--muted); font-weight: 600; white-space: nowrap; }
+button.ct-small { background: none; border: none; padding: 2px 0 0; font: inherit; color: var(--brand-text); font-size: 11.5px; font-weight: 700; cursor: pointer; text-decoration: underline dotted; text-underline-offset: 3px; }
+.ct-step { display: flex; align-items: center; gap: 6px; }
+.ct-step button { width: 30px; height: 30px; border-radius: 9px; border: 1.5px solid var(--line); background: #fff; font-weight: 800; color: var(--brand-text); font-size: 16px; line-height: 1; padding: 0; }
+.ct-pick { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; margin: 2px 0 8px; border-radius: 12px; background: var(--tint); }
+.ct-pick > b { font-size: 13.5px; color: var(--ink); }
+.ct-pick small { font-size: 12.5px; color: var(--muted); }
+.ct-sizes { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0; }
+.ct-sizes button { border: 1.5px solid var(--line); border-radius: 999px; padding: 5px 10px; font-size: 13px; font-weight: 700; color: var(--ink); background: #fff; }
+.ct-sizes button.on { border-color: var(--brand); background: var(--tint); color: var(--brand-text); }
+.ct-sizes button small { color: var(--muted); font-weight: 600; margin-left: 4px; font-size: 12px; }
+.ct-weigh { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--ink); }
+.ct-weigh input { width: 76px; padding: 5px 8px; border: 1.5px solid var(--line); border-radius: 8px; font-size: 14px; }

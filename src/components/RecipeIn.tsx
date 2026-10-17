@@ -5,6 +5,7 @@ import { MAX_SHOTS, statedDiffers } from "../recipeIn";
 import { fmt, pdText } from "../ui";
 import { iconFor } from "../icons";
 import { CHEF_NAME } from "./Mark";
+import { countLabel, type Count } from "../counted";
 
 // A recipe from screenshots or a link (0.2.16, canvas board IM, IM2, IM2b, IM3, IM7). The plate card gives way to these
 // while a recipe comes in; Put it on my plate hands it back to the plate.
@@ -19,6 +20,11 @@ const Thumb = ({ src, n, onRemove }: { src: string; n: number; onRemove?: () => 
 );
 
 // IM2: the pictures, in the order they are read
+// CT (0.2.24): a counted food, the count large, the size and the grams small
+export function CountNum({ c, grams }: { c: Count; grams: number }) {
+  const l = countLabel(c, grams);
+  return <span className="ct-num"><b>{l.main}</b><small>{l.small}</small></span>;
+}
 // IM23d (0.2.23): a read that takes longer than 20 seconds says so
 const SLOW = `This page takes longer than most. ${CHEF_NAME} keeps reading: up to two minutes.`;
 export function ShotsCard({ shots, reading, slow, add, remove, read, cancel }: { shots: string[]; reading?: boolean; slow?: boolean; add: (files: FileList | null) => void; remove: (n: number) => void; read: () => void; cancel: () => void }) {
@@ -83,8 +89,8 @@ export function ReadCard({ flow, setSource, setServings, toggle, put, again, can
         {r.items.map((i, k) => (
           <div className={`row ${on(i) ? "" : "in-off"}`} key={k}>
             <span className="thumb thumb-sm">{iconFor(i.name)}</span>
-            <div className="row-text"><b>{i.name}</b><small>{i.written ? `${i.written} on the recipe` : "no amount on the recipe"}{i.how !== "recipe" && <> · <span className="in-tag">{i.how}</span></>}{i.optional && <> · <span className="in-tag in-opt">optional</span> <button className="link in-inline" onClick={() => toggle(k)}>{on(i) ? "Leave it out" : "Add it"}</button></>}</small></div>
-            <b className="row-num">{fmt(i.grams, 0)} g</b>
+            <div className="row-text"><b>{i.name}</b><small>{i.written ? `${i.written} on the recipe` : "no amount on the recipe"}{i.count ? <> · counted, size {i.count.size}</> : i.how !== "recipe" && <> · <span className="in-tag">{i.how}</span></>}{i.optional && <> · <span className="in-tag in-opt">optional</span> <button className="link in-inline" onClick={() => toggle(k)}>{on(i) ? "Leave it out" : "Add it"}</button></>}</small></div>
+            {i.count ? <CountNum c={i.count} grams={i.grams} /> : <b className="row-num">{fmt(i.grams, 0)} g</b>}
           </div>
         ))}
       </div>

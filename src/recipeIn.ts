@@ -7,13 +7,15 @@
 import type { Food, Ingredient } from "./pilot";
 import { gramsFromMeasure } from "./units";
 import { cleanPart } from "./parts";
+import { countRead, type Count } from "./counted";
 
 export const MAX_SHOTS = 4;
 export const ROLES = ["base", "protein", "melting cheese", "cheese", "dairy", "sauce", "fat", "vegetable", "fruit", "herb or spice", "sweet", "other"] as const;
 export type Role = (typeof ROLES)[number];
 export type How = "recipe" | "converted" | "guessed";
 // optional: the recipe says so (0.2.17, the cookie on 16 October 2026): left out of the numbers until the person adds it
-export type ReadItem = { name: string; written: string; grams: number; how: How; role: Role; calories: number; protein: number; fats: number | null; carbs: number | null; optional: boolean; on?: boolean; note?: string; part?: string };
+// count: an egg or a banana, by the size the recipe names (0.2.24, board CT1)
+export type ReadItem = { name: string; written: string; grams: number; how: How; role: Role; calories: number; protein: number; fats: number | null; carbs: number | null; optional: boolean; on?: boolean; note?: string; part?: string; count?: Count };
 // what the recipe itself says about its numbers, per serving, when it says it (0.2.17)
 export type Stated = { kcal: number; protein: number; fats: number | null; carbs: number | null };
 // steps: the recipe's own method as written (0.2.18, board IM, IM9b), kept for the person only
@@ -87,6 +89,12 @@ export function gramsWritten(written: string): number | null {
   const v = Number(m[1]) * (/^kg$/i.test(m[2]) ? 1000 : 1);
   return v > 0 && v < 10000 ? v : null;
 }
+// eggs and bananas are counted, at the size the recipe names; code sets the grams from the count (0.2.24, CT1). The same
+// on the server and on the phone, and the same again on an item already counted.
+export function countItem<T extends { name: string; written: string; grams: number; how: How; count?: Count }>(i: T): T {
+  const c = countRead(i.name, i.written, i.grams);
+  return c ? { ...i, count: c.count, grams: c.grams, ...(c.grams !== i.grams && i.how === "guessed" && i.written ? { how: "converted" as How } : {}) } : i;
+}
 export function cleanRead(d: any): ReadRecipe | null {
   if (!d || typeof d !== "object") return null;
   const items: ReadItem[] = (Array.isArray(d.items) ? d.items : []).slice(0, 30).map((i: any) => {
@@ -103,7 +111,7 @@ export function cleanRead(d: any): ReadRecipe | null {
     if (measured !== null) how = "converted";
     return { name: name.charAt(0).toUpperCase() + name.slice(1), written, grams: Math.round(exact ?? measured ?? num(i?.grams)), how, role,
       calories: cal, protein: pro, fats: Number.isFinite(fat) && fat >= 0 ? fat : null, carbs: Number.isFinite(carb) && carb >= 0 ? carb : null, optional: i?.optional === true, ...(i?.optional === true && String(i?.note ?? "").trim() ? { note: String(i.note).trim().slice(0, 60) } : {}), ...(cleanPart(i?.part) ? { part: cleanPart(i.part) } : {}) };
-  }).filter((i: ReadItem) => i.name && i.grams > 0 && i.grams <= 5000 && Number.isFinite(i.calories) && i.calories >= 0 && i.calories <= 950 && Number.isFinite(i.protein) && i.protein >= 0 && i.protein <= 100);
+  }).map(countItem).filter((i: ReadItem) => i.name && i.grams > 0 && i.grams <= 5000 && Number.isFinite(i.calories) && i.calories >= 0 && i.calories <= 950 && Number.isFinite(i.protein) && i.protein >= 0 && i.protein <= 100);
   if (!items.length) return null;
   // parts only when the recipe groups its foods into two or more (0.2.19, IM15); a single group is one list
   if (new Set(items.map((i) => i.part).filter(Boolean)).size < 2) for (const i of items) delete i.part;
