@@ -1553,3 +1553,22 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .row.in-off { opacity: .55; }
 .in-tag.in-opt { background: #eef2f8; color: var(--ink); }
 .in-card .row-text small { white-space: normal; overflow: visible; text-overflow: clip; display: block; }
+
+/* 0.2.18, board UN: the Units group on Profile */
+.units-box { border: 1.5px solid var(--line); border-radius: var(--r-card, 16px); padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.units-box > b { font-size: 14px; color: var(--ink); margin-top: 4px; }
+.units-box .moments { display: flex; gap: 8px; flex-wrap: wrap; }
+.units-box small { font-size: 13px; font-weight: 600; }
+/* 0.2.18, board IM, IM8 to IM10b */
+.rq-optional { display: flex; flex-direction: column; gap: 4px; }
+.rq-opt-row { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.rq-opt-name { display: flex; flex-direction: column; min-width: 0; } .rq-opt-name span { font-weight: 600; font-size: 14px; color: var(--ink); } .rq-opt-name small { color: var(--muted); font-weight: 600; }
+.rq-opt-row .link { white-space: nowrap; font-size: 14px; }
+.rq-orig { border: 1.5px solid var(--line); border-radius: 14px; padding: 10px 12px; }
+.rq-orig summary { font-weight: 700; color: var(--ink); cursor: pointer; }
+.rq-orig ul { list-style: none; margin: 8px 0; padding: 0 0 0 14px; display: flex; flex-direction: column; gap: 4px; font-size: 14px; color: var(--ink); }
+.st-mark { display: block; width: fit-content; margin-top: 4px; padding: 2px 8px; border-radius: 8px; font-size: 12px; font-weight: 700; background: var(--line); color: var(--ink); }
+.st-mark.adapted { background: var(--tint); color: var(--brand-text); }
+.st-mark.added { background: #fdf0c4; color: #6b5200; }
+.cook-with .moments { display: flex; flex-wrap: wrap; gap: 8px; }
+.rq-nopic { display: flex; flex-direction: column; gap: 8px; }

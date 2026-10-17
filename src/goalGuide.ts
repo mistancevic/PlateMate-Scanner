@@ -1,4 +1,5 @@
 // About your goal (canvas boards K2 and K3, approved 7 October 2026): one page per goal, and the goal sheet the person
+import { wIn, wUnit } from "./units";
 // and the coach agree on. The chat reads the same page, so Chef Mealan and the coach say the same thing.
 // Sources: Iraki et al. 2019 (surplus, weekly rate, protein per meal); Aragon (muscle gain by training age);
 // Helms et al. 2014 (protein when losing fat); ISSN 2017 (protein range).
@@ -66,8 +67,8 @@ export const guideOf = (id?: string): Guide | null => (id ? GUIDES[id] ?? null :
 const kg = (w: number | undefined, pctLo: number, pctHi: number) => {
   if (!w) return `${pctLo}–${pctHi} % of your weight`;
   // to 0.05 kg under half a kilo, to 0.1 kg above: 0.25–0.5 kg, 0.5–1 kg
-  const f = (pct: number) => { const v = (w * pct) / 100; const r = v < 0.5 ? Math.round(v * 20) / 20 : Math.round(v * 10) / 10; return String(Number(r.toFixed(2))); };
-  return `${f(pctLo)}–${f(pctHi)} kg`;
+  const f = (pct: number) => { const v = wIn((w * pct) / 100); const r = v < 0.5 ? Math.round(v * 20) / 20 : Math.round(v * 10) / 10; return String(Number(r.toFixed(2))); };
+  return `${f(pctLo)}–${f(pctHi)} ${wUnit()}`;
 };
 export type Sheet = { title: string; byLine: string; food: string; weight: string; counted: string; progress: string; checkIn: string };
 const FOOD: Record<string, string> = { fatloss: "about 20 % less than you burn", recomp: "about 10 % less than you burn", maintain: "as much as you burn", gainsteady: "about 5 % more than you burn", gain: "about 10 % more than you burn", performance: "about 5 % more, more of it carbs" };
@@ -77,7 +78,7 @@ export function weightToExpect(id: string, weightKg?: number, age?: TrainingAge)
   if (id === "gain") return `up ${kg(weightKg, 0.25, 0.5)} a week`;
   if (id === "gainsteady") return age === "3p" ? `up ${kg(weightKg, 0.25, 0.5)} a month` : `up ${kg(weightKg, 0.5, 1)} a month`;
   if (id === "recomp") return "about the same; your waist goes down";
-  if (id === "maintain") return "within 1–2 kg";
+  if (id === "maintain") return wUnit() === "lb" ? "within 2–4 lb" : "within 1–2 kg";
   return "stable";
 }
 const day = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long" });

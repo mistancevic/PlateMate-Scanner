@@ -1,4 +1,6 @@
 import { underAge, ADULT_ONLY } from "../safety";
+import { WeightField, HeightField } from "../components/UnitFields";
+import { units, hText, wText, wIn } from "../units";
 import { useState } from "react";
 import { BANDS, PACES, TRAINING_AGES, isBuild, paceForAge, bandOf, goalLabel } from "../goal";
 import { density } from "../pilot";
@@ -189,7 +191,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           {consented && <p className="label calc-step">1. You</p>}
           {consented && !editing && canCalculate(d) ? (
             <section className="card you-card">
-              <span><b>You</b><small>{[d.sex === "male" ? "Male" : d.sex === "female" ? "Female" : null, d.birthYear, d.heightCm ? `${d.heightCm} cm` : null, d.weightKg ? `${d.weightKg} kg` : null, LIFE.find((l) => l.id === workOf(d))!.name, STEPS.find((x) => x.id === d.steps)?.name.concat(" steps")].filter(Boolean).join(" · ")}<br />Body fat: {d.bodyFatPct ? `${d.bodyFatPct} %` : "not given"}</small></span>
+              <span><b>You</b><small>{[d.sex === "male" ? "Male" : d.sex === "female" ? "Female" : null, d.birthYear, d.heightCm ? hText(d.heightCm) : null, d.weightKg ? wText(d.weightKg, Number.isInteger(wIn(d.weightKg)) ? 0 : 1) : null, LIFE.find((l) => l.id === workOf(d))!.name, STEPS.find((x) => x.id === d.steps)?.name.concat(" steps")].filter(Boolean).join(" · ")}<br />Body fat: {d.bodyFatPct ? `${d.bodyFatPct} %` : "not given"}</small></span>
               <button className="link" onClick={() => setEditing(true)}>Edit</button>
             </section>
           ) : (
@@ -199,8 +201,8 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               </div>
               <div className="field-row">
                 <label className="field"><span>Birth year</span><input inputMode="numeric" value={d.birthYear ?? ""} placeholder="1985" onChange={(e) => setD({ ...d, birthYear: num(e.target.value) })} onBlur={() => save(d)} /></label>
-                <label className="field"><span>Height, cm</span><input inputMode="numeric" value={d.heightCm ?? ""} placeholder="175" onChange={(e) => setD({ ...d, heightCm: num(e.target.value) })} onBlur={() => save(d)} /></label>
-                <label className="field"><span>Weight, kg</span><input inputMode="decimal" value={d.weightKg ?? ""} placeholder="75" onChange={(e) => setD({ ...d, weightKg: num(e.target.value) })} onBlur={() => save(d)} /></label>
+                <HeightField cm={d.heightCm} unit={units().height} onCm={(v) => setD({ ...d, heightCm: v })} onDone={() => save(d)} />
+                <WeightField kg={d.weightKg} unit={units().weight} onKg={(v) => setD({ ...d, weightKg: v })} onDone={() => save(d)} />
               </div>
               {under && <p className="small adult-line" role="alert"><b>Chef Mealan is for adults.</b> {ADULT_ONLY} This birth year means you're under 18, so you can't use Chef Mealan yet. If you typed it wrong, correct it here.</p>}
               <div className="calc-part"><b>Your everyday</b><small>Every day, with or without training.</small></div>

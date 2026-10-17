@@ -20,7 +20,7 @@ const ME_ROWS: { id: MenuSection; name: string; icon: ReactNode; hint: (p: AppAp
   { id: "goal", name: "Goal", icon: <Target size={18} />, hint: (p) => (p.state.goals.calories ? `${Math.round(p.state.goals.calories).toLocaleString("en")} kcal and ${p.state.goals.protein ?? "?"} g protein a day` : "Work it out, or set it") },
   { id: "life", name: "Lifestyle", icon: <Coffee size={18} />, hint: (p) => lifeHint(p) },
   { id: "week", name: "Training week", icon: <CalendarDays size={18} />, hint: (p) => planHint(p) },
-  { id: "shop", name: "Where I shop and cook", icon: <ShoppingBasket size={18} />, hint: () => "Your shops, and the kitchens you cook" },
+  { id: "shop", name: "Where I shop and cook", icon: <ShoppingBasket size={18} />, hint: () => "Your shops, the kitchens you cook, and what you cook with" },
   { id: "coach", name: "My coach", icon: <Users size={18} />, hint: (p) => (p.profile.coachId ? `${p.coachLabel} sees what you share` : "Join with a code") },
   { id: "account", name: "Account", icon: <KeyRound size={18} />, hint: () => "Export my data, delete my account" },
 ];

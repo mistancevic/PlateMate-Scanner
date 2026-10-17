@@ -21,7 +21,7 @@ test("IM2b: the link: public https only; Instagram and TikTok need a screenshot;
 
 test("IM2b: a page's own recipe data is read first, in a @graph too; else the page as plain text", () => {
   const html = `<html><head><meta property="og:site_name" content="Good Food"><script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebPage"},{"@type":["Recipe"],"name":"Chicken shawarma bowl","recipeYield":["4","4 bowls"],"author":{"@type":"Person","name":"Ana"},"recipeIngredient":["500 g chicken thighs","2 tbsp olive oil"]}]}</script></head><body><script>var x=1</script><p>Hello &amp; welcome</p></body></html>`;
-  assert.deepEqual(recipeFromLd(html), { name: "Chicken shawarma bowl", ingredients: ["500 g chicken thighs", "2 tbsp olive oil"], yield: "4", author: "Ana" });
+  assert.deepEqual(recipeFromLd(html), { name: "Chicken shawarma bowl", ingredients: ["500 g chicken thighs", "2 tbsp olive oil"], yield: "4", author: "Ana", steps: [] });
   assert.equal(recipeFromLd("<p>no recipe</p>"), null);
   assert.equal(pageText(html), "Hello & welcome");
 });

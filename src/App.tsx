@@ -24,6 +24,7 @@ import { KNOWN, knownOf, displayRows, sortEuropean, tidy, withPackLines, rowsFro
 import { iconFor } from "./icons";
 import type { ScannerMode } from "./types";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange, setPdUnit } from "./ui";
+import { setUnits } from "./units";
 import { WhereSheet } from "./components/WhereSheet";
 import { Mark, APP_NAME, COACH_NAME } from "./components/Mark";
 import { flush as flushMetrics, autoFlush } from "./metrics";
@@ -110,6 +111,7 @@ import {
   validateFood,
   type PlateKind,
   asDish,
+  portionsIn,
 } from "./pilot";
 const STORE = "platemate-pilot-v1";
 
@@ -1813,31 +1815,38 @@ export default function App() {
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
   setPdUnit(personal.pdUnit);
+  setUnits(personal.units);
   const ai = aiState(safety, personal.birthYear, Boolean(profile.coachId) || profile.role === "coach");
   const updateSafety = (fn: (s: Safety) => Safety) => { const next = fn(getSafety()); storeSafety(next); setSafetyState(next); };
-  // A cover drawn by Chef Mealan (0.2.11, board CO, CO1): a recipe kept without a photo gets one picture, once, one recipe at
-  // a time. The server keeps the counts: one per recipe, ten a day per member, then Picture tomorrow and the next day.
+  // A cover drawn by Chef Mealan (0.2.11, board CO, CO1; 0.2.18, board IM, IM11): a recipe kept without a photo gets one
+  // try, right away, one recipe at a time. A try that doesn't draw waits for Draw a picture on the recipe page, with the
+  // day's count in sight: nothing runs later on its own. The server keeps the counts: one per recipe, ten a day per member.
   const coverBusy = useRef(false);
+  const [coverDrawing, setCoverDrawing] = useState<string | null>(null);
+  const [coverCount, setCoverCount] = useState<{ used: number; limit: number } | null>(null);
+  const refreshCoverCount = () => { if (!ai.on || (cloudEnabled && !user)) return; void fetch("/api/cover/today").then((r) => (r.ok ? r.json() : null)).then((d) => { if (d && typeof d.used === "number") setCoverCount({ used: d.used, limit: d.limit }); }).catch(() => { /* the count shows when it comes */ }); };
+  const drawCover = async (m: Meal) => {
+    if (coverBusy.current) return;
+    coverBusy.current = true; setCoverDrawing(m.id);
+    const today = ymd(new Date());
+    let cover: NonNullable<Meal["cover"]> = { state: "failed", day: today }, photo: string | undefined;
+    try {
+      const r = await fetch("/api/cover", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ recipeId: m.id, title: m.title, items: m.items.filter((i) => i.grams > 0).map((i) => ({ name: i.food.name, grams: i.grams })) }), signal: AbortSignal.timeout(90000) });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok && typeof d.used === "number") setCoverCount({ used: d.used, limit: d.limit });
+      if (r.ok && typeof d.image === "string") { photo = await resizeImageBase64(d.image, 960, 720).catch(() => d.image); cover = { state: "drawn", day: today }; }
+      else if (r.ok && d.tomorrow) cover = { state: "tomorrow", day: today };
+      else if (r.ok && d.already) cover = { state: "drawn", day: today };
+    } catch { /* not drawn; Draw a picture tries again */ }
+    setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id !== m.id ? x : recipeHasPhotos(x) || !photo ? { ...x, cover } : { ...x, cover, photo, photos: [], coverSig: sig(photo) })) }));
+    if (photo) log("cover", { how: "drawn" });
+    coverBusy.current = false; setCoverDrawing(null);
+  };
   useEffect(() => {
     if (!ai.on || coverBusy.current || (cloudEnabled && !user)) return;
-    const today = ymd(new Date());
     // a recipe whose cards already hold a real plate photo shows that photo, so it never gets a drawing
-    const m = state.meals.find((x) => needsCover(x, today) && !cardHasPhoto(x, state.feedback));
-    if (!m) return;
-    coverBusy.current = true;
-    (async () => {
-      let cover: NonNullable<Meal["cover"]> = { state: "failed", day: today }, photo: string | undefined;
-      try {
-        const r = await fetch("/api/cover", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ recipeId: m.id, title: m.title, items: m.items.filter((i) => i.grams > 0).map((i) => ({ name: i.food.name, grams: i.grams })) }), signal: AbortSignal.timeout(90000) });
-        const d = await r.json().catch(() => ({}));
-        if (r.ok && typeof d.image === "string") { photo = await resizeImageBase64(d.image, 960, 720).catch(() => d.image); cover = { state: "drawn", day: today }; }
-        else if (r.ok && d.tomorrow) cover = { state: "tomorrow", day: today };
-        else if (r.ok && d.already) cover = { state: "drawn", day: today };
-      } catch { /* tried today; again tomorrow */ }
-      setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id !== m.id ? x : recipeHasPhotos(x) || !photo ? { ...x, cover } : { ...x, cover, photo, photos: [], coverSig: sig(photo) })) }));
-      if (photo) log("cover", { how: "drawn" });
-      coverBusy.current = false;
-    })();
+    const m = state.meals.find((x) => needsCover(x) && !cardHasPhoto(x, state.feedback));
+    if (m) void drawCover(m);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.meals, ai.on, user]);
   // code signal: a custom goal under the body's resting burn, or a loss faster than 1 percent a week, raises a flag
@@ -1996,9 +2005,13 @@ export default function App() {
     peekBarcode: async (code: string) => { try { const d = await api(`/api/product/${code}`); return d?.product_name ? { code, name: d.product_name, brand: d.brand || "", quantity: "", kcal: d.calories, protein: d.protein } : null; } catch { return null; } },
     // Plan (0.2.2): the meals in the slots, by date and slot; a plate made for a slot lands in it when saved
     planned, filling, setFilling,
-    openOnPlate: (meal: Meal) => {
+    cover: { count: coverCount, drawing: coverDrawing, draw: (m: Meal) => { void drawCover(m); }, refresh: refreshCoverCount },
+    openOnPlate: (meal: Meal, extra?: Meal["optional"]) => {
       setFilling(null); setPlateRecipeId(meal.id);
-      setState((s) => ({ ...s, title: meal.title, items: asDish(meal), portion: null }));
+      // an optional food added when cooking (0.2.18, board IM, IM8): one portion's share, with its numbers
+      const of = portionsIn(meal);
+      const more: Ingredient[] = (extra ?? []).map((o) => ({ id: `opt-${Math.random().toString(36).slice(2, 9)}`, food: o.food, grams: Math.max(1, Math.round(o.grams / of)), locked: false }));
+      setState((s) => ({ ...s, title: meal.title, items: [...asDish(meal), ...more], portion: null, foods: [...s.foods, ...more.map((i) => i.food).filter((f) => !s.foods.some((x) => x.id === f.id || x.name.toLowerCase() === f.name.toLowerCase()))] }));
       setKind(meal.kind ?? "meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
     },
     // a name typed on the Plate (Milan, 11 October 2026): the recipe it came from and the slot it is for take it at once

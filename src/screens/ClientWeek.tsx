@@ -1,4 +1,6 @@
 import { BurnCard, Squares } from "../components/Measured";
+import { fmtKg } from "../weight";
+import { wIn, wText } from "../units";
 import { shortDate } from "../measured";
 import { useState, type ReactNode } from "react";
 import type { ClientRow } from "../cloud";
@@ -172,8 +174,8 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tail }
       {!row.flags.some((f) => f.situation === "eating") && (
         <section className="card cw-mini">
           <div><small>Weigh-ins</small><small>{weighs.length} this week</small></div>
-          {weighs.length ? <b>{weighs.length > 1 ? `${weighs[0].kg} → ${weighs[weighs.length - 1].kg} kg` : `${weighs[0].kg} kg`}{a7 ? ` · 7-day average ${a7.toFixed(1)}` : ""}</b> : <b>No weigh-ins this week</b>}
-          {trend && <small className="cw-mini-line">{trend.verdict === "too few" ? "Not enough weigh-ins yet for a trend." : `${VERDICT_WORDS[trend.verdict]} for ${goalLabel(row.goal.band)}: ${trend.change! > 0 ? "+" : ""}${trend.change} kg in 3 weeks.`}</small>}
+          {weighs.length ? <b>{weighs.length > 1 ? `${wIn(weighs[0].kg).toFixed(1)} → ${wText(weighs[weighs.length - 1].kg)}` : wText(weighs[0].kg)}{a7 ? ` · 7-day average ${wIn(a7).toFixed(1)}` : ""}</b> : <b>No weigh-ins this week</b>}
+          {trend && <small className="cw-mini-line">{trend.verdict === "too few" ? "Not enough weigh-ins yet for a trend." : `${VERDICT_WORDS[trend.verdict]} for ${goalLabel(row.goal.band)}: ${fmtKg(trend.change!)} in 3 weeks.`}</small>}
         </section>
       )}
       {/* the measured burn, as the client sees it (0.2.7, board FT, FT7) */}

@@ -9,8 +9,10 @@ import { GoalSheet, GoalGuide } from "../components/GoalSheet";
 import { WeightTrend } from "../components/Weight";
 import { weighInsOff, withoutWeighIn } from "../weight";
 import { ConfirmButton } from "../components/Confirm";
+import { WeightField, HeightField } from "../components/UnitFields";
+import { cleanUnits, asF, ftIn, kgToLb, wText, wIn, type Units } from "../units";
 import { RHYTHMS, REGIONS } from "../moments";
-import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, KITCHENS, type Personal, type DayType } from "../personal";
+import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, KITCHENS, EQUIPMENT, equipmentOf, type Personal, type DayType } from "../personal";
 import { CHEF_NAME } from "../components/Mark";
 import { KITCHEN, tasteOf, another, anotherLeft, undo, type Taste } from "../kitchens";
 import { slotsOf } from "../slots";
@@ -182,8 +184,8 @@ function ProfilePanel(p: AppApi) {
         </div>
         <div className="field-row">
           <label className="field"><span>Birth year</span><input inputMode="numeric" value={d.birthYear ?? ""} placeholder="1985" onChange={(e) => setD({ ...d, birthYear: num(e.target.value) })} /></label>
-          <label className="field"><span>Height, cm</span><input inputMode="numeric" value={d.heightCm ?? ""} placeholder="175" onChange={(e) => setD({ ...d, heightCm: num(e.target.value) })} /></label>
-          <label className="field"><span>Weight, kg</span><input inputMode="decimal" value={d.weightKg ?? ""} placeholder="75" onChange={(e) => setD({ ...d, weightKg: num(e.target.value) })} /></label>
+          <HeightField cm={d.heightCm} unit={cleanUnits(d.units).height} onCm={(v) => setD((x) => ({ ...x, heightCm: v }))} />
+          <WeightField kg={d.weightKg} unit={cleanUnits(d.units).weight} onKg={(v) => setD((x) => ({ ...x, weightKg: v }))} />
         </div>
         <label className="field"><span>Body fat %, if you know it</span><input inputMode="decimal" value={d.bodyFatPct ?? ""} placeholder="from a scale or a scan" onChange={(e) => setD({ ...d, bodyFatPct: num(e.target.value) })} /></label>
         <div className="field"><span>Your work</span>
@@ -196,6 +198,26 @@ function ProfilePanel(p: AppApi) {
           </div>
           <small className="muted">Your training goes in the Training week.</small>
         </div>
+        {/* Units (0.2.18, canvas board UN, UN1 and UN2): shown in these, kept in kg, cm and °C */}
+        {(() => {
+          const u = cleanUnits(d.units), set = (k: keyof Units, v: string) => setD((x) => ({ ...x, units: { ...cleanUnits(x.units), [k]: v } }));
+          const chip = (k: keyof Units, v: string, label: string) => <button type="button" key={v} className={`choice ${u[k] === v ? "on" : ""}`} aria-pressed={u[k] === v} onClick={() => set(k, v)}>{label}</button>;
+          const h = d.heightCm ? ftIn(d.heightCm) : null;
+          return (
+            <div className="field units-box" role="group" aria-label="Units"><span>Units</span>
+              <b>Temperature</b>
+              <div className="moments">{chip("temp", "c", "°C")}{chip("temp", "f", "°F")}</div>
+              <small className="muted">{u.temp === "c" ? `Oven heat in the steps: 175 °C. A recipe in °F is converted for you: 350 °F is ${175} °C.` : `Oven heat in the steps: ${asF(175)} °F. A recipe in °C is converted for you.`}</small>
+              <b>Body weight</b>
+              <div className="moments">{chip("weight", "kg", "kg")}{chip("weight", "lb", "lb")}</div>
+              <small className="muted">{u.weight === "kg" ? "Weigh-ins, your goal and the trend." : d.weightKg ? `${Math.round(d.weightKg * 10) / 10} kg is ${(Math.round(kgToLb(d.weightKg) * 10) / 10).toFixed(1)} lb, on weigh-ins and your goal.` : "Weigh-ins, your goal and the trend, in lb."}</small>
+              <b>Height</b>
+              <div className="moments">{chip("height", "cm", "cm")}{chip("height", "ftin", "ft and in")}</div>
+              {u.height === "ftin" && h && <small className="muted">{Math.round(d.heightCm!)} cm is {h.ft} ft {h.inch} in.</small>}
+              <small className="muted">Food amounts stay in grams: labels and the numbers per 100 g are in grams. Energy stays in kcal.</small>
+            </div>
+          );
+        })()}
         {/* M3 (0.2.5+r4, Milan's layout, 11 October 2026): each chip with its definition beside it, then the day in both forms */}
         <div className="field pd-unit"><span>Show protein density as</span>
           <div className="pd-unit-row"><button type="button" className={`choice ${(d.pdUnit ?? "pd") === "pd" ? "on" : ""}`} aria-pressed={(d.pdUnit ?? "pd") === "pd"} onClick={() => setD({ ...d, pdUnit: "pd" })}>PD</button><span>g protein per 100 kcal</span></div>
@@ -327,7 +349,7 @@ function GoalPanel(p: AppApi) {
       {sheet && <GoalSheet sheet={sheet} />}
       {band && p.safety.consentBodyAt && !weighInsOff(p.safety) && (
         <WeightTrend list={p.personal.weighIns} band={band.id} weightKg={p.personal.weightKg} trainingAge={p.personal.trainingAge}
-          onUpdateWeight={(kg) => { p.setPersonal({ ...p.personal, weightKg: kg }); p.notify(`Your numbers now use ${kg} kg.`); }}
+          onUpdateWeight={(kg) => { p.setPersonal({ ...p.personal, weightKg: kg }); p.notify(`Your numbers now use ${wText(kg, 0)}.`); }}
           onRemove={(date) => p.setPersonal({ ...p.personal, weighIns: withoutWeighIn(p.personal.weighIns, date) })} />
       )}
       {band && guideOf(band.id) && (
@@ -406,7 +428,7 @@ export function GoalHistory({ log }: { log: GoalEntry[] }) {
       <section className="card history">
         {periods.slice(0, 20).map(({ entry: e, ...pr }) => (
           <div className="history-row" key={e.at}>
-            <div><b>{e.band ? goalLabel(e.band) : "Custom"}{pr.now && <span className="now-tag">NOW</span>}</b><small>{periodLine({ entry: e, ...pr })}{SOURCE_LABEL[e.source] ? `, ${SOURCE_LABEL[e.source].charAt(0).toLowerCase()}${SOURCE_LABEL[e.source].slice(1)}` : ""}{e.weightKg ? `, at ${e.weightKg} kg` : ""}</small></div>
+            <div><b>{e.band ? goalLabel(e.band) : "Custom"}{pr.now && <span className="now-tag">NOW</span>}</b><small>{periodLine({ entry: e, ...pr })}{SOURCE_LABEL[e.source] ? `, ${SOURCE_LABEL[e.source].charAt(0).toLowerCase()}${SOURCE_LABEL[e.source].slice(1)}` : ""}{e.weightKg ? `, at ${wText(e.weightKg, Number.isInteger(wIn(e.weightKg)) ? 0 : 1)}` : ""}</small></div>
             <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString("en") : "?"}</b><small>kcal, {e.protein ?? "?"} g protein</small></div>
           </div>
         ))}
@@ -560,7 +582,7 @@ function PlanPanel(p: AppApi) {
           </div>
         )}
       </Seg>
-      <NextLink p={p} to="shop" from="week" text="Where I shop and cook" hint="Your shops, and the kitchens you cook" />
+      <NextLink p={p} to="shop" from="week" text="Where I shop and cook" hint="Your shops, the kitchens you cook, and what you cook with" />
     </>
   );
 }
@@ -604,6 +626,14 @@ function ShopPanel(p: AppApi) {
         );
       })}
       <small className="setting-hint">A plate that already has a kitchen keeps it: sarma stays Balkan, a curry stays Indian. Everything else comes from these.</small>
+    </section>
+    {/* What you cook with (0.2.18, canvas board IM, IM10): the steps are written for these */}
+    <p className="label" style={{ marginTop: 14 }}>What you cook with</p>
+    <section className="card cook-with" style={{ gap: 8 }}>
+      <small>{CHEF_NAME} writes the steps for what you have. A recipe that needs something you don't have says how to make it without, or that it can't.</small>
+      <div className="moments" role="group" aria-label="What you cook with">
+        {EQUIPMENT.map(([id, name]) => { const has = equipmentOf(p.personal), on = has.includes(id); return <button key={id} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, equipment: on ? has.filter((x) => x !== id) : [...has, id] })}>{name}</button>; })}
+      </div>
     </section>
       <NextLink p={p} to="coach" from="shop" text="Coach" hint="Join a coach with a code, or see yours" />
     </>

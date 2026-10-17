@@ -15,6 +15,7 @@ test("one weigh-in per date; the newest replaces; the 7-day average", () => {
   assert.equal(l.length, 2); assert.equal(l[1].kg, 95.8); assert.equal(l[0].kg, 96);
   assert.equal(avg7(l, now), 95.9);
   assert.equal(avg7(withWeighIn([], 90, ago(10)), now), null, "older than 7 days does not count");
+  assert.equal(withWeighIn([], 94.347, ago(1), true)[0].kg, 94.35, "0.2.18: typed in lb, kept to 10 g");
 });
 test("what each goal expects over 3 weeks, in kg", () => {
   assert.deepEqual(expectedChange("gainsteady", 96, 3, "3p").map((x) => Math.round(x * 100) / 100), [0.17, 0.33]);

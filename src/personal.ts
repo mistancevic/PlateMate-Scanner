@@ -56,7 +56,15 @@ export type Personal = {
   kitchens?: string[];
   // from 0.2.10 (canvas board CH, CH7): per kitchen, the three dishes shown and the ones swapped away with Another
   kitchenTaste?: import("./kitchens").Tastes;
+  // from 0.2.18 (canvas board UN): the units shown; the account keeps kg, cm and °C. None is metric.
+  units?: import("./units").Units;
+  // from 0.2.18 (canvas board IM, IM10): what the person cooks with; none is oven, stovetop and microwave
+  equipment?: string[];
 };
+// What you cook with (0.2.18, board IM, IM10): oven, stovetop and microwave are on until the person says otherwise
+export const EQUIPMENT: [string, string][] = [["oven", "Oven"], ["stovetop", "Stovetop"], ["microwave", "Microwave"], ["airfryer", "Air fryer"], ["blender", "Blender"], ["thermomix", "Thermomix"], ["scale", "Kitchen scale"]];
+export const DEFAULT_EQUIPMENT = ["oven", "stovetop", "microwave"];
+export const equipmentOf = (p: Pick<Personal, "equipment">) => (Array.isArray(p.equipment) ? p.equipment.filter((x) => EQUIPMENT.some(([id]) => id === x)) : DEFAULT_EQUIPMENT);
 // The kitchens you cook (0.2.9, board CH, CH4), in the order drawn
 export const KITCHENS = ["Balkan", "Italian", "Mediterranean", "German", "French", "Spanish", "Greek", "Turkish", "Middle Eastern", "Indian", "Thai", "Chinese", "Japanese", "Korean", "Mexican", "American"];
 export type DayTarget = { kcal: number; protein: number; fats: number; carbs: number };

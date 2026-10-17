@@ -1,4 +1,5 @@
 // Members on the Recipes tab (0.2.11, canvas board CO, CO2 to CO4b; Milan 16 October 2026, 15:37 to 16:24).
+import { tempsIn } from "../units";
 // CO2: the recipes members shared, each at your portion for the meal ahead; at or above your PD target first, then your
 // kitchens; your kitchens filter the list. CO3: a member's recipe at your portion, with Make it and Keep in mine.
 // CO4 and CO4b: For members on a recipe of yours: the cover members see, your first name only when you switch it on,
@@ -106,7 +107,7 @@ export function MemberPage({ r, ahead, p, owner, close, takeDown }: { r: SharedR
       <section className="card rq-steps">
         <b>Steps</b>
         {steps.length
-          ? <ol className="rp-steps">{steps.map((s, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(s, x.items).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</div></li>)}</ol>
+          ? <ol className="rp-steps">{steps.map((s, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(s), x.items).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</div></li>)}</ol>
           : <small className="muted">The cook shared no steps.</small>}
       </section>
       <button className="pill pill-wide pill-primary" onClick={() => { close(); p.takeMember(r, "make", x.items); }}>Make it</button>

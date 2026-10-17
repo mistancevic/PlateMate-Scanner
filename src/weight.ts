@@ -1,4 +1,5 @@
 // Weigh-ins and the trend (canvas boards W0 to W2, approved 7 October 2026). One weigh-in per date; one morning is noise,
+import { wDelta } from "./units";
 // so the app only ever reads the 7-day average. The last 4 weeks compare the first week's average with the last week's,
 // against what the goal expects for the same time. Numbers change only when the person says so.
 import type { Safety } from "./safety";
@@ -10,9 +11,10 @@ const dayNo = (ymd: string) => Math.round(new Date(`${ymd}T12:00:00`).getTime() 
 
 export const isWeight = (kg: number) => Number.isFinite(kg) && kg >= 30 && kg <= 300;
 // the newest weigh-in of a date replaces the one before; kept sorted, a year and a half at most
-export function withWeighIn(list: WeighIn[] | undefined, kg: number, date = new Date()): WeighIn[] {
+// kg to 100 g as typed; a weight typed in lb to 10 g, so it comes back as typed (0.2.18, board UN): 208.0 lb is 94.35 kg
+export function withWeighIn(list: WeighIn[] | undefined, kg: number, date = new Date(), inLb = false): WeighIn[] {
   const d = ymdOf(date);
-  const next = [...(list ?? []).filter((w) => w.date !== d), { date: d, kg: Math.round(kg * 10) / 10 }].sort((a, b) => (a.date < b.date ? -1 : 1));
+  const next = [...(list ?? []).filter((w) => w.date !== d), { date: d, kg: inLb ? Math.round(kg * 100) / 100 : Math.round(kg * 10) / 10 }].sort((a, b) => (a.date < b.date ? -1 : 1));
   return next.slice(-550);
 }
 export const withoutWeighIn = (list: WeighIn[] | undefined, date: string) => (list ?? []).filter((w) => w.date !== date);
@@ -76,4 +78,5 @@ export function verdictNote(band: string, v: Verdict): string | null {
   return n[band]?.[v] ?? "More change than this goal expects. Small changes in food or steps bring it back; talk to your coach if it goes on.";
 }
 // the trend in a sentence of numbers, for the coach's list
-export const fmtKg = (x: number) => `${x > 0 ? "+" : x < 0 ? "−" : "±"}${Math.abs(x).toFixed(1)} kg`;
+// in the unit the person chose (0.2.18, board UN): +0.4 kg or +0.9 lb
+export const fmtKg = (x: number) => wDelta(x);

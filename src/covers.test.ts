@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { coverVerdict, coverPrompt, needsCover, coverIsDrawn, ownPhotosOf, cardHasPhoto, COVER_DAILY } from "./covers";
+import { coverVerdict, coverPrompt, needsCover, canDrawCover, coverIsDrawn, ownPhotosOf, cardHasPhoto, COVER_DAILY } from "./covers";
 import { sig } from "./photos";
 
 const items = [{ id: "a", grams: 200, locked: false, food: { name: "Chicken" } as any }];
@@ -10,13 +10,18 @@ test("one picture per recipe; ten a day per member, then tomorrow", () => {
   assert.equal(coverVerdict({ drawnBefore: false, today: COVER_DAILY }), "tomorrow");
   assert.equal(coverVerdict({ drawnBefore: true, today: 0 }), "already");
 });
-test("which recipes still need a picture: none of their own, never drawn, and not tried today", () => {
+test("which recipes get a picture on their own: none of their own, never tried; Draw a picture for the rest", () => {
   assert.equal(needsCover({ items } as any, "2026-10-16"), true);
   assert.equal(needsCover({ items, photo: "data:image/jpeg;base64,x" } as any, "2026-10-16"), false);
   assert.equal(needsCover({ items, photoSigs: ["9:abc"] } as any, "2026-10-16"), false);
   assert.equal(needsCover({ items, cover: { state: "drawn", day: "2026-10-01" } } as any, "2026-10-16"), false);
   assert.equal(needsCover({ items, cover: { state: "tomorrow", day: "2026-10-16" } } as any, "2026-10-16"), false);
-  assert.equal(needsCover({ items, cover: { state: "tomorrow", day: "2026-10-15" } } as any, "2026-10-16"), true);
+  // 0.2.18 (board IM, IM11): no retry on a later day; Draw a picture on the recipe page instead
+  assert.equal(needsCover({ items, cover: { state: "tomorrow", day: "2026-10-15" } } as any, "2026-10-16"), false);
+  assert.equal(needsCover({ items, cover: { state: "failed", day: "2026-10-15" } } as any, "2026-10-16"), false);
+  assert.equal(canDrawCover({ items, cover: { state: "tomorrow", day: "2026-10-15" } } as any), true);
+  assert.equal(canDrawCover({ items, cover: { state: "drawn", day: "2026-10-15" } } as any), false);
+  assert.equal(canDrawCover({ items, photo: "data:image/jpeg;base64,x" } as any), false);
   assert.equal(needsCover({ items: [] } as any, "2026-10-16"), false);
 });
 test("the drawn picture is known by its fingerprint wherever it sits; own photos leave it out", () => {

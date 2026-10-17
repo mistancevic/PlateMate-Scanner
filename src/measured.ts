@@ -1,4 +1,5 @@
 // The first two weeks and the measured burn (0.2.7, canvas board FT, Milan 15 October 2026). The first 14 days after the
+import { wIn, wUnit } from "./units";
 // first goal are for getting to know the person. The burn is then measured: what was eaten on average on full days, plus what
 // the weight did, 1 kg counting as 7,700 kcal. A range, never by itself: it changes no number until the person or the coach
 // applies it, and then it stays fixed until applied again. Off for anyone who declared a hard relationship with eating.
@@ -103,4 +104,4 @@ const MO = ["January", "February", "March", "April", "May", "June", "July", "Aug
 export const longDate = (ymd: string) => { const d = new Date(`${ymd}T12:00:00`); return `${WD[d.getDay()]} ${d.getDate()} ${MO[d.getMonth()]}`; };
 export const shortDate = (ymd: string) => { const d = new Date(`${ymd}T12:00:00`); return `${WD[d.getDay()].slice(0, 3)} ${d.getDate()} ${MO[d.getMonth()].slice(0, 3)}`; };
 export const spanOf = (from: string, to: string) => { const a = new Date(`${from}T12:00:00`), b = new Date(`${to}T12:00:00`); return a.getMonth() === b.getMonth() ? `${a.getDate()} to ${b.getDate()} ${MO[b.getMonth()]}` : `${a.getDate()} ${MO[a.getMonth()]} to ${b.getDate()} ${MO[b.getMonth()]}`; };
-export const kgText = (x: number) => `${Math.abs(x).toFixed(2).replace(/0$/, "").replace(/\.0$/, "")} kg`;
+export const kgText = (x: number) => `${Math.abs(wIn(x)).toFixed(2).replace(/0$/, "").replace(/\.0$/, "")} ${wUnit()}`;

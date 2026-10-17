@@ -82,9 +82,13 @@ export type Ingredient = {
   role?: string;
 };
 // a recipe as a dish on the plate: one portion of a batch recipe (two or more foods, a portion well under the batch)
-export function asDish(m: Meal): Ingredient[] {
+// how many portions the recipe's foods make, as the plate divides them
+export function portionsIn(m: Meal): number {
   const total = m.items.reduce((n, i) => n + i.grams, 0);
-  const of = m.portion && total > m.portion * 1.5 ? Math.max(2, Math.round(total / m.portion)) : 1;
+  return m.portion && total > m.portion * 1.5 ? Math.max(2, Math.round(total / m.portion)) : 1;
+}
+export function asDish(m: Meal): Ingredient[] {
+  const of = portionsIn(m);
   if (m.items.length < 2 || of < 2) return structuredClone(m.items);
   return m.items.map((i) => ({ ...structuredClone(i), locked: true, grams: Math.round(i.grams / of), dish: { id: m.id, title: m.title, of, n: 1, base: i.grams / of } }));
 }
@@ -94,6 +98,7 @@ export type Goals = Nutrition;
 export type PubContent = { title: string; lines: string; makes: number; servingName: string; minutes: number | null; names: string[]; steps: string[]; grams: number[]; photo?: string | null; photoAi?: boolean };
 export type PublishDraft = { title?: string; lines?: string; makes?: string; servingName?: string; minutes?: string; names?: string[]; photoAt?: number; savedAt?: string; sent?: PubContent; sentAt?: string };
 export type PlateKind = "meal" | "dessert";
+export type StepMark = { kind: "same" | "adapted" | "added"; why: string };
 export type Meal = {
   id: string;
   title: string;
@@ -126,7 +131,13 @@ export type Meal = {
   kind?: PlateKind;
   // where it came from (0.2.16, board IM, IM6): the account or site as text, the link, when; members and public pages get
   // the text only. The screenshots are the cook's own reference (shots, as files src:<id>:<n>), never a cover, never shared.
-  source?: { name: string; url?: string; from: "screenshot" | "link"; at: string; shotSigs?: string[] };
+  // steps: the original method as read (0.2.18, board IM, IM9b): for the person only, never shared or published
+  source?: { name: string; url?: string; from: "screenshot" | "link"; at: string; shotSigs?: string[]; steps?: string[] };
+  // optional ingredients the recipe names (0.2.18, IM8): kept out of the numbers, whole-recipe grams, added when cooking
+  optional?: { name: string; written: string; note?: string; grams: number; food: Food }[];
+  // how each of Chef Mealan's steps relates to the original (0.2.18, IM9, IM10b); cleared when the steps are edited
+  stepMarks?: StepMark[];
+  stepsKitchen?: string;
   shots?: string[];
   // how many the whole recipe makes, as read or guessed (IM3)
   makes?: { n: number; unit: string };

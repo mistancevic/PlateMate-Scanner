@@ -3,6 +3,7 @@ import { Plus, X } from "lucide-react";
 import { avg7, isWeight, trendOf, verdictNote, withWeighIn, withoutWeighIn, VERDICT_WORDS, fmtKg, type WeighIn } from "../weight";
 import { goalLabel } from "../goal";
 import { ConfirmButton } from "./Confirm";
+import { wText, wIn, wFrom, wUnit } from "../units";
 
 const dayName = (ymd: string) => new Date(`${ymd}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" });
 const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
@@ -14,24 +15,24 @@ export function WeighInLine({ list, onSave, notify }: { list: WeighIn[] | undefi
   const avg = avg7(list);
   const [v, setV] = useState("");
   const save = () => {
-    const kg = Number(v.replace(",", "."));
+    const kg = wFrom(Number(v.replace(",", ".")));
     if (!isWeight(kg)) return;
-    const next = withWeighIn(list, kg);
+    const next = withWeighIn(list, kg, new Date(), wUnit() === "lb");
     onSave(next); setOpen(false); setV("");
-    notify(`Saved. Your 7-day average is ${avg7(next)!.toFixed(1)} kg.`);
+    notify(`Saved. Your 7-day average is ${wText(avg7(next)!)}.`);
   };
   if (!open) return (
-    <button className="weigh-line" onClick={() => { setV(last ? String(last.kg) : ""); setOpen(true); }}>
-      <span><b>Weigh in</b><small>{last ? `last: ${last.kg.toFixed(1)} kg, ${last.date === today() ? "today" : dayName(last.date)}${avg ? ` · 7-day average ${avg.toFixed(1)} kg` : ""}` : "Any morning, before breakfast."}</small></span>
+    <button className="weigh-line" onClick={() => { setV(last ? wIn(last.kg).toFixed(1) : ""); setOpen(true); }}>
+      <span><b>Weigh in</b><small>{last ? `last: ${wText(last.kg)}, ${last.date === today() ? "today" : dayName(last.date)}${avg ? ` · 7-day average ${wText(avg)}` : ""}` : "Any morning, before breakfast."}</small></span>
       <Plus size={20} />
     </button>
   );
   return (
     <div className="weigh-entry" role="group" aria-label="Weigh in">
       <div className="weigh-entry-top"><b>Weigh in</b><button className="link" onClick={() => setOpen(false)}>Cancel</button></div>
-      <label className="weigh-input"><input inputMode="decimal" autoFocus aria-label="Your weight, kg" value={v} placeholder="75.0" onChange={(e) => setV(e.target.value)} onKeyDown={(e) => e.key === "Enter" && save()} /><span>kg</span></label>
+      <label className="weigh-input"><input inputMode="decimal" autoFocus aria-label={`Your weight, ${wUnit()}`} value={v} placeholder={wUnit() === "lb" ? "165.0" : "75.0"} onChange={(e) => setV(e.target.value)} onKeyDown={(e) => e.key === "Enter" && save()} /><span>{wUnit()}</span></label>
       <small>Today, {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</small>
-      <button className="pill pill-primary pill-wide" disabled={!isWeight(Number(v.replace(",", ".")))} onClick={save}>Save</button>
+      <button className="pill pill-primary pill-wide" disabled={!isWeight(wFrom(Number(v.replace(",", "."))))} onClick={save}>Save</button>
     </div>
   );
 }
@@ -72,19 +73,19 @@ export function WeightTrend({ list, band, weightKg, trainingAge, onUpdateWeight,
       <b>The last 4 weeks</b>
       <Chart t={t} />
       <div className="trend-legend"><span><i className="sw-dot" />{coach ? "weigh-ins" : "your weigh-ins"}</span><span><i className="sw-line" />7-day average</span><span><i className="sw-band" />expected for {goalLabel(band)}</span></div>
-      {t.first !== null && t.last !== null && <div className="sheet-row"><small>7-day average</small><b>{t.first.toFixed(1)} → {t.last.toFixed(1)} kg</b></div>}
+      {t.first !== null && t.last !== null && <div className="sheet-row"><small>7-day average</small><b>{wIn(t.first).toFixed(1)} → {wText(t.last)}</b></div>}
       {t.change !== null && <div className="sheet-row"><small>Change</small><b>{fmtKg(t.change)} in 3 weeks</b></div>}
-      <div className="sheet-row"><small>Expected</small><b>{fmtKg(t.expected[0]).replace(" kg", "")} to {fmtKg(t.expected[1])}</b></div>
+      <div className="sheet-row"><small>Expected</small><b>{fmtKg(t.expected[0]).replace(` ${wUnit()}`, "")} to {fmtKg(t.expected[1])}</b></div>
       <span className={`trend-chip ${tone}`}>{VERDICT_WORDS[t.verdict]}</span>
       <small className="muted">{t.count} weigh-in{t.count === 1 ? "" : "s"} in 4 weeks.</small>
       {note && <p className="trend-note">{note}{coach ? "" : " Your coach sees the same."}</p>}
       {!coach && onUpdateWeight && avg !== null && weightKg && Math.abs(avg - weightKg) >= 2 && (
-        <button className="pill pill-small" onClick={() => onUpdateWeight(Math.round(avg))}>Update my numbers to {Math.round(avg)} kg</button>
+        <button className="pill pill-small" onClick={() => onUpdateWeight(wFrom(Math.round(wIn(avg))))}>Update my numbers to {Math.round(wIn(avg))} {wUnit()}</button>
       )}
       {!coach && onRemove && (
         <>
           <button className="link" aria-expanded={showAll} onClick={() => setShowAll((s) => !s)}>{showAll ? "Hide weigh-ins" : "Your weigh-ins"}</button>
-          {showAll && <ul className="weigh-list">{[...list].reverse().slice(0, 28).map((w) => <li key={w.date}><span>{new Date(`${w.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}</span><b>{w.kg.toFixed(1)} kg</b><ConfirmButton className="link" label={<X size={14} />} ariaLabel={`Remove the weigh-in of ${w.date}`} confirmLabel="Remove" onConfirm={() => onRemove(w.date)} /></li>)}</ul>}
+          {showAll && <ul className="weigh-list">{[...list].reverse().slice(0, 28).map((w) => <li key={w.date}><span>{new Date(`${w.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}</span><b>{wText(w.kg)}</b><ConfirmButton className="link" label={<X size={14} />} ariaLabel={`Remove the weigh-in of ${w.date}`} confirmLabel="Remove" onConfirm={() => onRemove(w.date)} /></li>)}</ul>}
         </>
       )}
     </section>

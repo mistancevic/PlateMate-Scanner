@@ -5,16 +5,18 @@
 // - code never judges a side by what is normal: sides follow the person (your way first), only cooking failures are ruled out;
 // - nothing is offered above a real portion: no single food over 600 g a portion.
 import type { Food, Ingredient } from "./pilot";
+import { gramsFromMeasure } from "./units";
 
 export const MAX_SHOTS = 4;
 export const ROLES = ["base", "protein", "melting cheese", "cheese", "dairy", "sauce", "fat", "vegetable", "fruit", "herb or spice", "sweet", "other"] as const;
 export type Role = (typeof ROLES)[number];
 export type How = "recipe" | "converted" | "guessed";
 // optional: the recipe says so (0.2.17, the cookie on 16 October 2026): left out of the numbers until the person adds it
-export type ReadItem = { name: string; written: string; grams: number; how: How; role: Role; calories: number; protein: number; fats: number | null; carbs: number | null; optional: boolean; on?: boolean };
+export type ReadItem = { name: string; written: string; grams: number; how: How; role: Role; calories: number; protein: number; fats: number | null; carbs: number | null; optional: boolean; on?: boolean; note?: string };
 // what the recipe itself says about its numbers, per serving, when it says it (0.2.17)
 export type Stated = { kcal: number; protein: number; fats: number | null; carbs: number | null };
-export type ReadRecipe = { title: string; source: string; servings: number; servingsUnit: string; servingsHow: "recipe" | "guessed"; items: ReadItem[]; stated: Stated | null };
+// steps: the recipe's own method as written (0.2.18, board IM, IM9b), kept for the person only
+export type ReadRecipe = { title: string; source: string; servings: number; servingsUnit: string; servingsHow: "recipe" | "guessed"; items: ReadItem[]; stated: Stated | null; steps: string[] };
 export type ReadError = "login" | "fetch" | "no-recipe" | "not-recipe" | "no-amounts";
 
 // ---- the link ----
@@ -40,7 +42,7 @@ export function isPrivateIp(ip: string): boolean {
 }
 
 // The recipe a page publishes as structured data (schema.org Recipe in JSON-LD), when it has one
-export function recipeFromLd(html: string): { name: string; ingredients: string[]; yield: string; author: string } | null {
+export function recipeFromLd(html: string): { name: string; ingredients: string[]; yield: string; author: string; steps: string[] } | null {
   const blocks = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1]);
   const isRecipe = (x: any) => x && typeof x === "object" && ([] as unknown[]).concat(x["@type"] ?? []).some((t) => String(t).toLowerCase() === "recipe");
   const find = (x: any): any => {
@@ -57,7 +59,10 @@ export function recipeFromLd(html: string): { name: string; ingredients: string[
     const ingredients = ([] as unknown[]).concat(r.recipeIngredient ?? r.ingredients ?? []).map((x) => String(x).replace(/\s+/g, " ").trim()).filter(Boolean).slice(0, 40);
     if (!ingredients.length) continue;
     const who = (x: any) => (typeof x === "string" ? x : Array.isArray(x) ? who(x[0]) : x && typeof x === "object" ? String(x.name ?? "") : "");
-    return { name: String(r.name ?? "").trim().slice(0, 100), ingredients, yield: String(([] as unknown[]).concat(r.recipeYield ?? [])[0] ?? "").slice(0, 40), author: who(r.author) || who(r.publisher) };
+    // the method: text, HowToStep, or HowToSection with its own steps (0.2.18, IM9b)
+    const stepsOf = (x: any): string[] => typeof x === "string" ? x.split(/\n+/) : Array.isArray(x) ? x.flatMap(stepsOf) : x && typeof x === "object" ? (Array.isArray(x.itemListElement) ? stepsOf(x.itemListElement) : [String(x.text ?? x.name ?? "")]) : [];
+    const steps = cleanSteps(stepsOf(r.recipeInstructions ?? []).map((s) => pageText(s)));
+    return { name: String(r.name ?? "").trim().slice(0, 100), ingredients, yield: String(([] as unknown[]).concat(r.recipeYield ?? [])[0] ?? "").slice(0, 40), author: who(r.author) || who(r.publisher), steps };
   }
   return null;
 }
@@ -69,6 +74,8 @@ export function pageText(html: string): string {
 export const siteName = (html: string, host: string) =>
   (html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']{1,60})["']/i)?.[1] ?? host.replace(/^www\./, "")).trim();
 
+// the original steps: at most 20, each at most 400 letters, no empty lines
+export const cleanSteps = (l: unknown): string[] => (Array.isArray(l) ? l : []).map((x) => String(x ?? "").replace(/\s+/g, " ").trim().slice(0, 400)).filter(Boolean).slice(0, 20);
 // ---- what was read, checked ----
 const num = (x: unknown) => (typeof x === "number" && Number.isFinite(x) ? x : Number(x));
 // Grams written on the recipe win over the model's: 500 g, 0.5 kg. Other units (2 tbsp, 2 balls) are the model's,
@@ -84,14 +91,17 @@ export function cleanRead(d: any): ReadRecipe | null {
   const items: ReadItem[] = (Array.isArray(d.items) ? d.items : []).slice(0, 30).map((i: any) => {
     const written = String(i?.written ?? "").slice(0, 60);
     const exact = gramsWritten(written);
+    const name = String(i?.name ?? "").trim().slice(0, 60);
+    // cups, spoons, ounces and sticks: grams by code from the food's kind (0.2.18, board UN), else the model's
+    const measured = exact === null ? gramsFromMeasure(written, name) : null;
     let how: How = ["recipe", "converted", "guessed"].includes(i?.how) ? i.how : "guessed";
     if (exact !== null) how = "recipe";
     else if (how === "recipe") how = written.trim() ? "converted" : "guessed";
     const role: Role = (ROLES as readonly string[]).includes(i?.role) ? i.role : "other";
     const cal = num(i?.calories), pro = num(i?.protein), fat = num(i?.fats), carb = num(i?.carbs);
-    const name = String(i?.name ?? "").trim().slice(0, 60);
-    return { name: name.charAt(0).toUpperCase() + name.slice(1), written, grams: Math.round(exact ?? num(i?.grams)), how, role,
-      calories: cal, protein: pro, fats: Number.isFinite(fat) && fat >= 0 ? fat : null, carbs: Number.isFinite(carb) && carb >= 0 ? carb : null, optional: i?.optional === true };
+    if (measured !== null) how = "converted";
+    return { name: name.charAt(0).toUpperCase() + name.slice(1), written, grams: Math.round(exact ?? measured ?? num(i?.grams)), how, role,
+      calories: cal, protein: pro, fats: Number.isFinite(fat) && fat >= 0 ? fat : null, carbs: Number.isFinite(carb) && carb >= 0 ? carb : null, optional: i?.optional === true, ...(i?.optional === true && String(i?.note ?? "").trim() ? { note: String(i.note).trim().slice(0, 60) } : {}) };
   }).filter((i: ReadItem) => i.name && i.grams > 0 && i.grams <= 5000 && Number.isFinite(i.calories) && i.calories >= 0 && i.calories <= 950 && Number.isFinite(i.protein) && i.protein >= 0 && i.protein <= 100);
   if (!items.length) return null;
   const n = Math.round(num(d.servings));
@@ -104,6 +114,7 @@ export function cleanRead(d: any): ReadRecipe | null {
     ? { kcal: sk / div, protein: sp / div, fats: Number.isFinite(sf) && sf >= 0 ? sf / div : null, carbs: Number.isFinite(sc) && sc >= 0 ? sc / div : null } : null;
   return {
     stated,
+    steps: cleanSteps(d.method),
     title: String(d.title ?? "").trim().slice(0, 80) || "A recipe",
     source: String(d.source ?? "").trim().slice(0, 80),
     servings: Number.isFinite(n) && n >= 1 ? Math.min(24, n) : 1,

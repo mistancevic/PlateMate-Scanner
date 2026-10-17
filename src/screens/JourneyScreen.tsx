@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { tempsIn } from "../units";
 import { Camera, Pencil, Plus, Trash2, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 import { ConfirmButton } from "../components/Confirm";
 import type { Mix } from "../mixtip";
@@ -391,8 +392,11 @@ export function JourneyScreen(p: AppApi) {
     });
     const thumbs = await Promise.all(f.shots.map((x) => resizeImageBase64(x, 900, 900).catch(() => x)));
     const total = whole.reduce((n, i) => n + i.grams, 0);
+    // IM8: an optional food not added stays with the recipe, in its own list, out of the numbers
+    const optional = r.items.filter((i) => i.optional && !(i.on ?? false)).map((i) => ({ name: i.name, written: i.written, ...(i.note ? { note: i.note } : {}), grams: i.grams,
+      food: state.foods.find((x) => x.name.toLowerCase() === i.name.toLowerCase()) ?? { ...estimate(i), notes: `${CHEF_NAME}'s estimate, from a recipe` } }));
     const meal: Meal = { id: uid(), title: r.title, items: whole, portion: Math.round(total / r.servings), savedAt: new Date().toISOString(), steps: [],
-      source: { name: r.source, ...(f.url ? { url: f.url } : {}), from: f.url ? "link" : "screenshot", at: new Date().toISOString() }, ...(thumbs.length ? { shots: thumbs } : {}), makes: { n: r.servings, unit: r.servingsUnit } };
+      source: { name: r.source, ...(f.url ? { url: f.url } : {}), from: f.url ? "link" : "screenshot", at: new Date().toISOString(), ...(r.steps?.length ? { steps: r.steps } : {}) }, ...(thumbs.length ? { shots: thumbs } : {}), makes: { n: r.servings, unit: r.servingsUnit }, ...(optional.length ? { optional } : {}) };
     const mode: "sized" | "recipe" = sizedFits(mealNeed, kcalOfItems(whole) / r.servings) ? "sized" : "recipe";
     setPmode(mode); setWay(null);
     setState((s) => ({ ...s, foods: [...s.foods, ...fresh], meals: [meal, ...s.meals], items: portionItems(meal, mode), title: meal.title, portion: null, fromRecipe: meal.id }));
@@ -847,7 +851,7 @@ export function JourneyScreen(p: AppApi) {
             <button key={w.id} className={`way ${method === w.id ? "on" : ""}`} onClick={() => setMethod(w.id)}>
               <b>{w.name}</b>
               <small>{w.why}</small>
-              <ol>{w.steps.map((s, i) => <li key={i}>{s}</li>)}</ol>
+              <ol>{w.steps.map((s, i) => <li key={i}>{tempsIn(s)}</li>)}</ol>
             </button>
           ))}
         </div>
