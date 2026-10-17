@@ -48,7 +48,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
     await page.goto(U + "/plate"); await page.waitForTimeout(1300);
     await page.locator(".plate-card label").filter({ hasText: "Screenshot" }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }]);
     await page.waitForTimeout(500); await page.getByRole("button", { name: "Read it" }).click(); await page.waitForTimeout(800);
-    await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
+    await require("./put.cjs")(page); await page.waitForTimeout(1300);
     await page.unroute("**/api/recipe/read");
   };
 
@@ -58,11 +58,11 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   await page.route("**/api/steps", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
     steps: ["Crush {1} and mix with {2}, melted; press into a tin.", "Heat the oven to 160 °C.", "Beat {3}, {4}, {5}, {6} and {7} until smooth; pour over the base and bake 45 minutes.", "Chill 4 hours, then top with {8}."],
     marks: [{ kind: "same", why: "" }, { kind: "adapted", why: "320 °F in the original" }, { kind: "same", why: "" }, { kind: "added", why: "how long to chill it" }], parts: ["Base", "Filling", "Filling", "Topping"] }) }));
-  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
   let t = await text(page, "main");
   ok(/How to make it/.test(t) && !/How do you want to eat it/.test(t), "IM19: after Make it, a recipe gets How to make it");
   ok(await page.locator('[aria-label="What you make"] .choice.on').textContent() === "All 8 slices" && /You eat 1 slice/.test(t) && /The 7 slices left go to Keep for later/.test(t), "IM19: it makes 8, so the whole cake is made; you eat 1 slice; 7 for later");
-  ok(/The recipe's own steps/.test(t) && await page.locator(".mk-card .rp-orig li").count() > 0 && /Preheat|Crush the biscuits/.test(await text(page, ".mk-card .rp-orig")) && /The original works with your foods as they are/.test(t), "RP1 (was IM19b): the original is the steps, and a line says it works; no steps yet: the original open below, for you only");
+  ok(/, as it is[.,]/.test(t) && await page.locator(".mk-card .rp-orig li").count() > 0 && /Preheat|Crush the biscuits/.test(await text(page, ".mk-card .rp-orig")) && /The original works with your foods as they are/.test(t), "RP1 (was IM19b): the original is the steps, and a line says it works; no steps yet: the original open below, for you only");
   ok(await page.getByRole("button", { name: "Chef Mealan's way" }).count() === 1 && await page.getByRole("button", { name: "I'm making it" }).count() === 1, "RP1: Chef Mealan's way on a tap; I'm making it");
   await page.getByRole("button", { name: "Chef Mealan's way" }).click(); await page.waitForTimeout(900);
   t = await text(page, "main");
@@ -99,7 +99,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   // ---- the cookie: makes 2, so just yours first ----
   const p4 = await open(seed);
   await readIn(p4, cookie);
-  await p4.getByRole("button", { name: "Make it", exact: true }).click(); await p4.waitForTimeout(800);
+  await p4.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await p4.waitForTimeout(800);
   ok(await p4.locator('[aria-label="What you make"] .choice.on').textContent() === "Just your cookie" && /The recipe makes 2/.test(await text(p4, "main")), "IM20: a recipe that makes 2 starts with just your cookie");
   await p4.getByRole("button", { name: "All 2 cookies" }).click(); await p4.waitForTimeout(200);
   ok(/The other cookie goes to Keep for later/.test(await text(p4, "main")), "IM20: All 2 cookies, an exact count: the other one goes to Keep for later");

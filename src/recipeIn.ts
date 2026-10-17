@@ -82,9 +82,20 @@ export function decodeEntities(t: string): string {
 export const siteName = (html: string, host: string) =>
   (html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']{1,60})["']/i)?.[1] ?? host.replace(/^www\./, "")).trim();
 
-// the original steps: at most 20, each at most 400 letters, no empty lines
+// the original steps: at most 20, no empty lines
 // the page's signs as letters, and a range written with a dash as words: 10–20 minutes reads 10 to 20 minutes (0.2.25)
-export const cleanSteps = (l: unknown): string[] => (Array.isArray(l) ? l : []).map((x) => decodeEntities(String(x ?? "")).replace(/(\d)\s*[\u2013\u2014]\s*(\d)/g, "$1 to $2").replace(/\s+/g, " ").trim().slice(0, 400)).filter(Boolean).slice(0, 20);
+// a step longer than 400 letters is never cut (0.2.26 cut one at "perfectly s"): code splits it at the ends of its sentences,
+// sentences kept whole, each piece up to 400 letters where the sentences allow (0.2.27, board PF, A5)
+export function splitLong(step: string, max = 400): string[] {
+  if (step.length <= max) return [step];
+  const sentences = step.match(/[^.!?]+(?:[.!?]+(?=\s|$)|$)/g)?.map((x) => x.trim()).filter(Boolean) ?? [step];
+  const out: string[] = [];
+  // a heading the page writes inside the block ("Make the filling: Whip ...") starts a new step
+  const heads = (x: string) => /^[A-Z][^.:!?]{2,40}:\s/.test(x);
+  for (const x of sentences) { const last = out[out.length - 1]; if (last && !heads(x) && last.length + 1 + x.length <= max) out[out.length - 1] = `${last} ${x}`; else out.push(x); }
+  return out;
+}
+export const cleanSteps = (l: unknown): string[] => (Array.isArray(l) ? l : []).map((x) => decodeEntities(String(x ?? "")).replace(/(\d)\s*[\u2013\u2014]\s*(\d)/g, "$1 to $2").replace(/\s+/g, " ").trim()).filter(Boolean).flatMap((x) => splitLong(x)).slice(0, 20);
 // one block of method split into steps by Chef Mealan (0.2.25, RP1b): every word kept, in order, nothing added
 export const sameWords = (block: string, steps: string[]) => { const w = (s: string) => decodeEntities(s).replace(/[\u2013\u2014]/g, " to ").toLowerCase().replace(/[^a-z0-9\u00c0-\u024f]+/g, " ").trim(); return steps.length > 1 && w(block) === w(steps.join(" ")); };
 // ---- what was read, checked ----
@@ -165,8 +176,35 @@ export const onePortion = <T extends { grams: number; food: Pick<Food, "calories
 // Sized for the meal only when that is between half and one and a half of the recipe's own portion; else the recipe's
 // own portion, so nobody is asked to bake 40% of a cookie (0.2.17)
 export const sizedFits = (mealKcal: number | null, portionKcal: number) => !!mealKcal && portionKcal > 0 && mealKcal / portionKcal >= 0.5 && mealKcal / portionKcal <= 1.5;
+// Change the recipe (0.2.27, board PF4, rule 2): Chef Mealan's version is sized like any plate, never forced to the whole meal:
+// the meal's size when that is near one portion, else one portion as the recipe makes it
+export const plateSize = <T extends { grams: number; food: Pick<Food, "calories"> }>(whole: T[], servings: number, need: number | null): T[] =>
+  need && sizedFits(need, kcalOf(whole) / Math.max(1, servings)) ? scaleTo(whole, need) : onePortion(whole, servings);
 // The recipe's own numbers against ours: differ when the energy is more than 15% apart
 export const statedDiffers = (stated: Stated, kcal: number) => Math.abs(kcal - stated.kcal) / Math.max(1, stated.kcal) > 0.15;
+
+// Add on the side (0.2.27, board PF4, rule 1; Milan 17 October 2026, 20:24: "Small piece plus high PD combined still can
+// form a meal"): the mix tip's rule for a recipe. The side stays a real portion, from its minimum up to 300 g; code finds the
+// biggest piece of the recipe, in quarters of one portion, that the side carries to the target. The plate may be smaller than
+// the meal (the rest of the day stays free), never bigger. With no meal picked, at most one portion. Null when no piece works.
+export const SIDE_CAP = 300;
+export function sideFit<T extends { grams: number; food: Pick<Food, "calories" | "protein"> }>(whole: T[], servings: number, side: Pick<Food, "calories" | "protein">, target: number, o: { maxKcal: number | null; minGrams: number; cap?: number }): { dish: T[]; quarters: number; grams: number } | null {
+  if (!(side.calories && side.calories > 0)) return null;
+  const portion = kcalOf(whole) / Math.max(1, servings);
+  if (!(portion > 0)) return null;
+  const capG = o.cap ?? SIDE_CAP, maxK = o.maxKcal && o.maxKcal > 0 ? o.maxKcal * 1.05 : null;
+  const topQ = maxK ? Math.max(1, Math.min(8, Math.floor((4 * (o.maxKcal as number)) / portion))) : 4;
+  for (let q = topQ; q >= 1; q--) {
+    const dish = whole.map((i) => ({ ...i, grams: roundGrams((i.grams * q) / 4 / Math.max(1, servings)) }));
+    for (let g = Math.max(5, Math.ceil(o.minGrams / 5) * 5); g <= capG; g += 5) {
+      const all = [...dish, { grams: g, food: side } as unknown as T];
+      if (maxK !== null && kcalOf(all) > maxK) break;
+      const pd = pdOf(all);
+      if (pd !== null && pd >= target) return { dish, quarters: q, grams: g };
+    }
+  }
+  return null;
+}
 
 // Add on the side (IM5b): the dish stays as the recipe makes it, a little smaller; the side brings the protein. The
 // smallest side, in 5 g steps up to 400 g, that brings the meal to the target at about the meal's size. Null when none does.

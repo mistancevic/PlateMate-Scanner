@@ -30,6 +30,8 @@ const SOURCE: Record<PlannedMeal["source"], string> = { mine: "my recipe", coach
 let remembered: string | null = null;
 // the day Plan shows, for the chef's context (0.2.4)
 export const planDateShown = () => remembered ?? ymd(new Date());
+// a recipe planned from its read (0.2.27, board PF2, C2) opens Plan on its day
+export const showPlanDay = (d: string) => { remembered = d; };
 
 export function PlanScreen(p: AppApi) {
   const today = new Date();

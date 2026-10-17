@@ -30,7 +30,7 @@ const U = "http://127.0.0.1:3207";
   await require("./adult.cjs")(page);
   await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
   const card = () => page.locator(".plate-card").textContent().then((t) => t.replace(/\s+/g, " "));
-  await page.goto(U + "/plate"); await page.waitForTimeout(1300);
+  await page.goto(U + "/plate"); await page.waitForTimeout(1300); await require("./purpose.cjs")(page, "Dinner"); // 0.2.27 (PF): the plate starts Exploring; pick the meal
   ok(await page.getByRole("button", { name: "Make it a dinner" }).count() === 1, "the plate at 17:30 is for dinner");
   ok(/Dinner is about 936 kcal of your 2,800/.test(await card()), "MS1: the lunch eaten off the plan closes lunch: dinner about 936 kcal (it was 624; the drawing said 937, the lunch is 927.4 kcal)");
   ok(/Breakfast isn't logged today\. Did you have it\?/.test(await card()) && /I skipped it: breakfast's share moves to dinner, about 1,873 kcal/.test(await card()), "MS2: the plate asks once about breakfast, with what each answer means");
@@ -40,7 +40,7 @@ const U = "http://127.0.0.1:3207";
   ok(/Dinner is about 936 kcal/.test(await card()) && /Breakfast isn't logged today/.test(await card()), "MS2b: Undo puts it back, and the question with it");
   await page.getByRole("button", { name: "I had it" }).click(); await page.waitForTimeout(400);
   ok(/Dinner is about 936 kcal/.test(await card()) && !/isn't logged/.test(await card()), "MS2: I had it: dinner stays about 936, and the plate asks no more");
-  await page.reload(); await page.waitForTimeout(1300);
+  await page.reload(); await page.waitForTimeout(1300); await require("./purpose.cjs")(page, "Dinner"); // 0.2.27 (PF): the plate starts Exploring; pick the meal
   ok(!/isn't logged/.test(await card()), "MS2: the answer holds for today");
   // Members sizes the same way
   await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500);

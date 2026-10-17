@@ -71,11 +71,15 @@ const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(600);
   const kcalOf = async () => Number((await page.locator(".plan-day-head small").textContent()).match(/([\d,]+) kcal/)[1].replace(/,/g, ""));
   const todayKcal = await kcalOf();
+  // on a Sunday next Monday is in the week after (found 18 October 2026)
+  const sunday = new Date().getDay() === 0;
+  if (sunday) { await page.getByRole("button", { name: "Week after" }).click(); await page.waitForTimeout(300); }
   const nextMon = await page.evaluate((from) => [...document.querySelectorAll(".day-strip .choice")].findIndex((x) => x.textContent.trim().endsWith(" " + String(Number(from.slice(8))))), p1.nextGoal.from);
   await page.evaluate((i) => document.querySelectorAll(".day-strip .choice")[i].click(), nextMon); await page.waitForTimeout(300);
   ok(nextMon >= 0 && await kcalOf() < todayKcal, "Plan already uses the waiting goal from its date");
   // a day gone by keeps its own target
   const yIdx = (y.getDay() + 6) % 7;
+  if (sunday) { await page.getByRole("button", { name: "Week before" }).click(); await page.waitForTimeout(300); }
   if ((new Date().getDay() + 6) % 7 === 0) { await page.getByRole("button", { name: "Week before" }).click(); await page.waitForTimeout(300); }
   await page.evaluate((i) => document.querySelectorAll(".day-strip .choice")[i].click(), yIdx); await page.waitForTimeout(300);
   ok(/1,234 kcal/.test(await page.locator(".plan-day-head small").textContent()), "yesterday keeps the target it had");

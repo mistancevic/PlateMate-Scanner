@@ -77,6 +77,7 @@ import { playbookFor } from "./playbook";
 import { fitnessFor, SOURCES, dayName } from "./fitness";
 import { getSafety, setSafety as storeSafety, aiState, addFlag, goalSignals, allergyHits, recordDeclaration, FIXED, EMPTY_SAFETY, type Safety, type SituationId } from "./safety";
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
+import { EXPLORING, type Purpose } from "./purpose";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
 import { Home, CircleUser, Menu, Users, MessageCircle, Globe, CalendarDays } from "lucide-react";
@@ -749,6 +750,7 @@ export default function App() {
     nextSource = useRef<GoalSource | null>(null),
     [moment, setMomentState] = useState<MomentId>("regular"),
     [kind, setKind] = useState<PlateKind>("meal"),
+    [purpose, setPurpose] = useState<Purpose>(EXPLORING), [purposeAsk, setPurposeAsk] = useState(false),
     [usual, setUsualState] = useState<RhythmId[]>(getUsual),
     [region, setRegionState] = useState<RegionId | null>(getRegion),
     [travelTo, setTravelToState] = useState<RegionId | null>(getTravelTo),
@@ -1880,7 +1882,7 @@ export default function App() {
     api, setImage, setEdit, setGoalsOpen, setAccessOpen, setReviewMeal,
     setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
-    pdRef, dayPd, kind, setKind, moment, setMoment: (m: MomentId) => setMomentState(m), usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
+    pdRef, dayPd, kind, setKind, purpose, setPurpose, purposeAsk, setPurposeAsk, moment, setMoment: (m: MomentId) => setMomentState(m), usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },

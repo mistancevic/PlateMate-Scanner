@@ -47,7 +47,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
     await page.goto(U + "/plate"); await page.waitForTimeout(1300);
     await page.locator(".plate-card label").filter({ hasText: "Screenshot" }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }]);
     await page.waitForTimeout(500); await page.getByRole("button", { name: "Read it" }).click(); await page.waitForTimeout(800);
-    await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
+    await require("./put.cjs")(page); await page.waitForTimeout(1300);
     await page.unroute("**/api/recipe/read");
   };
   const openRecipe = async (page, title) => { await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(700); await page.getByText(title, { exact: true }).last().click(); await page.waitForTimeout(900); };

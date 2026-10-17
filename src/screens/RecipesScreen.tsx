@@ -1,4 +1,8 @@
-import { Utensils, ChevronRight } from "lucide-react";
+import { Utensils, ChevronRight, Plus } from "lucide-react";
+import { EXPLORING, nextPurpose } from "../purpose";
+import { slotsOn } from "../slots";
+import { lifestyleOf } from "../personal";
+import { ymd } from "../plan";
 import { draftSteps } from "../draftSteps";
 import { canDrawCover } from "../covers";
 import { equipmentOf } from "../personal";
@@ -25,6 +29,13 @@ import { foodNames, originalFoodsOf, diffFoods } from "../stepsState";
 
 export function RecipesScreen(p: AppApi) {
   const { state, setState, setTab } = p;
+  // Make it (0.2.27, PF2, B4): the Plate opens with its line open, the next meal picked, so what it is for is asked first
+  const makeIt = (m: Meal) => {
+    const now = new Date();
+    p.setPurpose(nextPurpose(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(now)), new Set(), now));
+    p.setPurposeAsk(true);
+    p.openOnPlate(m);
+  };
   // coaches publish recipes (canvas board R5); what is published already, by the recipe it came from
   // Cook (boards RG0 to RG5): a coach is a cook and publishes; a client is a cook when their coach switched it on, and sends
   // the recipe to their coach. Without accounts, coach mode on this phone is the coach and otherwise their client.
@@ -164,7 +175,7 @@ export function RecipesScreen(p: AppApi) {
             {landed.line && <small className="muted">{landed.line}</small>}
           </section>) : null}
         openOriginal={opened.basedOn && state.meals.some((m) => m.id === opened.basedOn!.id) ? () => { setLanded(null); setOpenId(opened.basedOn!.id); } : null}
-        onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
+        onMakeIt={() => { setOpenId(null); makeIt(opened); }} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
         onDelete={<DeleteRecipe key={`del-${opened.id}`} plan={deletePlan(opened, state, published[opened.id] ?? null)} slug={published[opened.id]?.slug ?? null} approver={approver} run={(c) => deleteRecipe(opened, c)} />}
         close={() => { setOpenId(null); setLanded(null); }}
         tryPhoto={testOn ? async (model: string) => {
@@ -189,6 +200,11 @@ export function RecipesScreen(p: AppApi) {
           {deleted.line && <small className="muted">{deleted.line}</small>}
         </section>
       )}
+      {/* PF2, B0 (0.2.27): a recipe from a link, screenshots, or a dish by its name, without saying what it is for yet */}
+      <div className="add-recipe">
+        <button className="pill pill-primary pill-wide" onClick={() => { p.setPurpose(EXPLORING); p.setKind("meal"); p.setStep("in"); setTab("journey"); }}><Plus size={16} /> Add a recipe</button>
+        <small className="muted">From a link or screenshots.</small>
+      </div>
       <div className="segments" role="tablist" aria-label="Recipes">
         <button role="tab" aria-selected={view === "mine"} className={`seg ${view === "mine" ? "on" : ""}`} onClick={() => setView("mine")}>Mine{mine.length ? ` (${mine.length})` : ""}</button>
         <button role="tab" aria-selected={view === "coach"} className={`seg ${view === "coach" ? "on" : ""}`} onClick={() => setView("coach")}>Coach's{fromCoach.length ? ` (${fromCoach.length})` : ""}</button>

@@ -22,13 +22,13 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   expect("no floating button while talking", String(await page.locator(".chat-fab").count()), "0");
   await page.locator(".talk-overlay").getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(300);
   await nav("Plate");
-  expect("the Plate tab opens the plate", await h2(), "What are you craving?");
+  expect("the Plate tab opens the plate", await h2(), "Add a recipe or foods"); // 0.2.27 (PF A1): the empty Plate starts Exploring
   expect("the amounts button is code, not chat", String(await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).count()), "1");
   await fab(); expect("Mealan on a plate with food is about the plate", (await page.locator(".sheet .card-top span").first().textContent()).trim(), "Chef Mealan, about this plate");
   await page.getByRole("button", { name: /Talk to Chef Mealan/ }).click(); await page.waitForTimeout(300);
   expect("and can hand over to the conversation", await page.locator(".talk-overlay h2").textContent(), "Chef Mealan");
   await page.locator(".talk-overlay").getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(300);
-  await require("./foods.cjs")(page); await nav("Plate"); expect("Plate tab after talking", await h2(), "What are you craving?");
+  await require("./foods.cjs")(page); await nav("Plate"); expect("Plate tab after talking", await h2(), "Add a recipe or foods"); // 0.2.27 (PF A1): the empty Plate starts Exploring
   if (errs.length) { console.log("page errors:", errs); process.exitCode = 1; }
   await b.close(); server.kill();
 })();

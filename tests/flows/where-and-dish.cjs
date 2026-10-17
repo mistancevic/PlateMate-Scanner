@@ -49,7 +49,7 @@ seed.items = [];
   // from Recipes, Make it (0.2.5+r11, R10): the dish again, a side next to it; Fit moves the side, never the recipe
   await page.getByRole("button", { name: /^Recipes$/ }).first().click(); await page.waitForTimeout(500);
   await page.locator(".recipe-tile").first().click(); await page.waitForTimeout(500);
-  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(600);
   await page.locator(".row-food", { hasText: "Skyr" }).getByRole("button").click(); await page.waitForTimeout(300);
   await click(/^(Fit to my target|Make it an? \w+)$/); await page.waitForTimeout(1200);
   ok(await page.locator(".dish-row").count() === 1 && /what Chef Mealan moves/.test(await page.locator(".rows").textContent()), "after Fit the dish is still one row and the side is what Mealan moves");

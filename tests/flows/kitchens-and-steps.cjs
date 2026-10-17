@@ -56,7 +56,7 @@ const U = "http://127.0.0.1:3205";
   // the taste goes to Chef Mealan with Make it a lunch
   let asked = null;
   await page.route("**/api/meal", async (route) => { asked = JSON.parse(route.request().postData() || "{}"); await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ options: [] }) }); });
-  await page.goto(U + "/plate"); await page.waitForTimeout(1200);
+  await page.goto(U + "/plate"); await page.waitForTimeout(1200); await require("./purpose.cjs")(page, "Lunch"); // 0.2.27 (PF): the plate starts Exploring; pick the meal
   await page.getByRole("button", { name: "Make it a lunch" }).click(); await page.waitForTimeout(800);
   const tb = asked?.taste?.find((x) => x.kitchen === "Balkan");
   ok(tb && tb.leave_out.join() === "Sarma" && tb.cook_toward.includes("Šopska salad with grilled chicken") && asked.taste.find((x) => x.kitchen === "Italian")?.cook_toward.length === 3, "the taste is sent: cook toward the dishes kept, leave out Sarma");

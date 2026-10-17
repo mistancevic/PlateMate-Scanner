@@ -1673,3 +1673,17 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .in-steps { display: flex; flex-direction: column; gap: 6px; margin: 4px 0; }
 .in-steps > b { font-size: 15px; color: var(--ink); }
 .in-steps-plate { margin-top: 10px; }
+/* 0.2.27 (boards PF to PF4): the line says what the plate is for; a tap anywhere opens it; Done where the pencil was */
+.plan-line { cursor: pointer; }
+.plan-line-done { padding: 4px 8px; font-weight: 800; }
+.for-prep { display: flex; flex-direction: column; gap: 6px; border-top: 1px solid var(--line); margin-top: 4px; padding-top: 8px; }
+.for-prep .in-stepper { align-self: flex-start; }
+.ways-why { display: block; margin-top: 6px; }
+.in-ways .ways .pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.in-read-end { display: flex; flex-direction: column; gap: 8px; }
+.in-read-end .moments { margin: 0; }
+.in-panel { border-top: 1px solid var(--line); padding-top: 8px; }
+.in-for { display: block; }
+.mk-foods .rq-part:first-of-type { margin-top: 0; }
+.add-recipe { display: flex; flex-direction: column; gap: 6px; margin: 0 0 12px; }
+.add-recipe small { text-align: center; }

@@ -98,7 +98,7 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   ok(m1.items.map((i) => `${i.food.name}:${i.grams}`).join(",") === "Eggs:120,Chicken breast, cooked:100,Skyr, natural:100" && m1.steps.length === 3 && /\[\[i:c\|chicken breast\]\]/.test(m1.steps[1]) && m1.portion === 320, "R11: Save changes keeps the foods, the grams and the steps: " + m1.items.map((i) => `${i.food.name} ${i.grams}`).join(", "));
   ok(/Whisk 2 eggs \(L\)/.test(await page.locator(".rq-steps").textContent()) && /Fold in 100 g chicken breast and cook slowly\./.test(await page.locator(".rq-steps").textContent()), "R13: the steps read with the amounts on the recipe's page: " + (await page.locator(".rq-steps").textContent()));
   // R10: Make it puts the recipe on the Plate and leaves the recipe as it is
-  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(600);
   ok(new URL(page.url()).pathname === "/plate" && await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).count() === 1, "R10: Make it opens the recipe on the Plate");
   ok(JSON.stringify((await meal("m-emc")).items) === JSON.stringify(m1.items), "R10: Make it leaves the recipe as it is");
   // the photos stay after a reload, the cover first; the oats are offered their plate photo

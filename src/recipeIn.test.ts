@@ -120,3 +120,31 @@ test("IM23: what a changed dish changed, for the step draft (0.2.23)", async () 
   assert.deepEqual(changesOf([f("Butter", 113), f("Cream cheese", 678), f("Sugar", 100)], [f("Butter", 113), f("Light cream cheese", 678), f("Sugar", 60), f("Whey", 60)], ["Chill it overnight."]),
     ["Light cream cheese: new", "Sugar: 60 g instead of 100 g", "Whey: new", "Cream cheese: not in it any more", "cooking note: Chill it overnight."]);
 });
+
+// 0.2.27 (board PF4): the two ways at any PD, by the portion
+import { sideFit, plateSize, splitLong } from "./recipeIn";
+const cake = [F("Graham cracker crumbs", 430, 7), F("Brown sugar", 380, 0), F("Butter", 717, 0.9), F("Heavy cream", 340, 2.8), F("Cream cheese", 342, 6), F("Granulated sugar", 387, 0), F("Sour cream", 193, 2.4)]
+  .map((food, k) => ({ food, grams: [240, 67, 113, 300, 678, 100, 60][k] }));
+test("Add on the side: the biggest piece, in quarters of a slice, that a real side carries to the target (rule 1)", () => {
+  const skyr = F("Skyr, natural", 63, 11);
+  const s = sideFit(cake, 12, skyr, 6.4, { maxKcal: 933, minGrams: 80 })!;
+  assert.equal(s.quarters, 3, "¾ slice"); assert.ok(s.grams >= 280 && s.grams <= 290, "about 280 g skyr");
+  assert.ok(pdOf([...s.dish, { grams: s.grams, food: skyr }])! >= 6.4, "reaches the target, not just rounds to it");
+  assert.ok(kcalOfItems([...s.dish, { grams: s.grams, food: skyr }]) < 933, "smaller than the meal: the rest of the day stays free");
+  assert.equal(sideFit(cake, 12, skyr, 6.4, { maxKcal: null, minGrams: 80 })!.quarters, 3, "no meal picked: at most one slice");
+  assert.equal(sideFit(cake, 12, F("Chips", 536, 7), 6.4, { maxKcal: 933, minGrams: 30 }), null, "a side that can't lift it");
+  assert.ok(sideFit(cake, 12, skyr, 6.4, { maxKcal: 933, minGrams: 80 })!.grams <= 300, "the side stays a real portion");
+});
+test("Change the recipe is sized like any plate, never forced to the whole meal (rule 2)", () => {
+  assert.equal(kcalOfItems(plateSize(cake, 12, 933)).toFixed(0), kcalOfItems(onePortion(cake, 12)).toFixed(0), "a slice is far from 933: one slice");
+  assert.ok(Math.abs(kcalOfItems(plateSize(cake, 12, 600)) - 600) < 15, "near one slice: the meal's size");
+  assert.equal(kcalOfItems(plateSize(cake, 12, null)).toFixed(0), kcalOfItems(onePortion(cake, 12)).toFixed(0));
+});
+test("a long step is split at the ends of sentences, never cut", () => {
+  const block = "Make the crust: Stir the graham cracker crust ingredients together. Pour into a 9-inch springform pan and pack in very tightly. If it's helpful, use the bottom of a measuring cup. Freeze for 10 to 20 minutes as you prepare the filling. Make the filling: Whip the cold heavy cream into stiff peaks, about 4 to 5 minutes. Set aside. Beat the cream cheese and granulated sugar together until perfectly smooth and creamy.";
+  const parts = splitLong(block);
+  assert.ok(parts.length >= 2); assert.equal(parts.join(" "), block, "every word kept, in order");
+  assert.ok(parts.every((x) => x.length <= 400)); assert.ok(parts[parts.length - 1].endsWith("creamy."));
+  assert.ok(parts[1].startsWith("Make the filling:"), "a heading inside the block starts a step");
+  assert.deepEqual(splitLong("Short step."), ["Short step."]);
+});
