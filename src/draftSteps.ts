@@ -4,11 +4,12 @@ import type { Meal, StepMark } from "./pilot";
 import { fromDraft } from "./steps";
 
 export type Drafted = { ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[] } | { ok: false; why: string; cannot?: boolean };
-export async function draftSteps(meal: Meal, o: { library: string[]; equipment: string[]; kitchens: string[] }): Promise<Drafted> {
+// changed: a dish changed on the plate (0.2.23, IM23), how its foods differ from the original, so the marks say "your change"
+export async function draftSteps(meal: Meal, o: { library: string[]; equipment: string[]; kitchens: string[]; changed?: string[] }): Promise<Drafted> {
   const items = meal.items.filter((i) => i.grams > 0);
   const ask = async (failed?: string): Promise<Drafted> => {
     const res = await fetch("/api/steps", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: meal.title, items: items.map((i) => ({ name: i.food.name, grams: i.grams, part: i.part ?? "" })), optional: (meal.optional ?? []).map((x) => ({ name: x.name, part: x.part ?? "" })), kitchens: o.kitchens, failed,
-      original: meal.source?.steps ?? [], equipment: o.equipment, makes: meal.makes ?? null }) });
+      original: meal.source?.steps ?? [], equipment: o.equipment, makes: meal.makes ?? null, ...(o.changed?.length ? { changed: o.changed } : {}) }) });
     const d = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(d.error || "Chef Mealan could not answer. Try again.");
     if (typeof d.cannot === "string" && d.cannot) return { ok: false, why: d.cannot, cannot: true };

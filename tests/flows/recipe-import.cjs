@@ -133,9 +133,9 @@ const U = "http://127.0.0.1:3209";
   ok(s.feedback[0].tried && s.feedback[0].tried.result === "yes" && s.feedback[0].recipeId === m.id, "After: the card keeps that the side worked, and points at the recipe");
   ok(s.meals.filter((x) => x.title === "Margherita pizza").length === 1 && s.meals[0].tried?.[0]?.what === "Greek yogurt on the side" && !s.fromRecipe, "After: the recipe remembers it, once");
 
+  // IM23c (0.2.23): made for the first time, the recipe from the screenshots opens after How was it
+  ok(/Saved in Mine/.test(await page.locator(".rq-landed").textContent().catch(() => "")) && /Margherita pizza/.test(await page.locator(".rq").textContent()), "IM23c: the first time a recipe that came in is made, you land on it");
   // IM6: the recipe page says where it came from
-  await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(600);
-  await page.getByText("Margherita pizza").first().click(); await page.waitForTimeout(700);
   t = await page.locator(".rq-source").textContent().then((x) => x.replace(/\s+/g, " "));
   ok(/Where it came from/.test(t) && /Adapted from @account_name on Instagram/.test(t) && /\+ Add the link/.test(t) && /Makes 2 pizzas, as the recipe says/.test(t), "IM6: Where it came from, Adapted from, Add the link, makes 2");
   ok(/Your screenshots, for you only\. Never the cover, never shared with members, never published\./.test(t) && await page.locator(".rq-source .in-thumb img").count() === 2, "IM6: the two screenshots, for you only");

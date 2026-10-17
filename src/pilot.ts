@@ -143,6 +143,8 @@ export type Meal = {
   optional?: { name: string; written: string; note?: string; grams: number; food: Food; part?: string }[];
   // the part of each step, aligned with steps (0.2.19, IM17); none when the recipe is one list
   stepParts?: string[];
+  // a dish changed on the plate and kept as its own recipe (0.2.23, IM23b): the recipe it was adapted from
+  basedOn?: { id: string; title: string };
   // the recipe's own numbers per serving, as it gives them (0.2.21, IM21b): shown under ours on the recipe page
   stated?: { kcal: number; protein: number; fats: number | null; carbs: number | null };
   // how each of Chef Mealan's steps relates to the original (0.2.18, IM9, IM10b); cleared when the steps are edited

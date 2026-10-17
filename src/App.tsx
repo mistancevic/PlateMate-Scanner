@@ -780,6 +780,8 @@ export default function App() {
     [filling, setFilling] = useState<Filling | null>(null),
     // the recipe the plate came from (a slot or Recipes, Open), so a new name on the Plate renames it at once
     [plateRecipeId, setPlateRecipeId] = useState<string | null>(null),
+    // after How was it (0.2.23, IM23c): the recipe the meal made or changed opens on Recipes, with one line for today
+    [landing, setLanding] = useState<{ id: string; line: string } | null>(null),
     [profileReady, setProfileReady] = useState(false),
     [loadTry, setLoadTry] = useState(0),
     [talkTurns, setTalkTurns] = useState<Turn[]>([]),
@@ -2014,6 +2016,8 @@ export default function App() {
     // Plan (0.2.2): the meals in the slots, by date and slot; a plate made for a slot lands in it when saved
     planned, filling, setFilling,
     cover: { count: coverCount, drawing: coverDrawing, draw: (m: Meal) => { void drawCover(m); }, refresh: refreshCoverCount },
+    landing, clearLanding: () => setLanding(null),
+    landOnRecipe: (id: string, line: string) => { setLanding({ id, line }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
     openOnPlate: (meal: Meal) => {
       setFilling(null); setPlateRecipeId(meal.id);
       // a recipe that came in from a screenshot or a link opens as it did the first time (0.2.19, IM13): the Plate does it

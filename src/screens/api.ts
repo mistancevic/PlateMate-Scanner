@@ -102,6 +102,10 @@ export interface AppApi {
   renamePlate: (title: string) => void;
   // Recipes, Open (0.2.3): the recipe on the Plate with its name as the title, nothing decided yet
   openOnPlate: (meal: Meal) => void;
+  // after How was it (0.2.23, IM23c): open a recipe on Recipes with one line for today
+  landing: { id: string; line: string } | null;
+  clearLanding: () => void;
+  landOnRecipe: (id: string, line: string) => void;
   // Chef Mealan's pictures (0.2.18, board IM, IM11): the day's count, the recipe being drawn, Draw a picture
   cover: { count: { used: number; limit: number } | null; drawing: string | null; draw: (meal: Meal) => void; refresh: () => void };
   fill: (date: string, slotId: string, meal: import("../planned").PlannedMeal | null) => void;

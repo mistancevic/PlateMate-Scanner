@@ -168,7 +168,7 @@ export function sideAmount<T extends { grams: number; food: Pick<Food, "calories
 
 // Change the dish (IM5): Chef Mealan's version of the whole recipe; code checks it before anyone sees it
 const NO_MELT = /cottage|h(ü|u)ttenk|quark|skyr|yog(h)?urt|ricotta|frischk|cream cheese|kefir/i;
-export type Changed = { name: string; grams: number; calories: number; protein: number; fats: number | null; carbs: number | null; role: Role; was: string | null; change: "same" | "swap" | "add" | "less" };
+export type Changed = { name: string; grams: number; calories: number; protein: number; fats: number | null; carbs: number | null; role: Role; was: string | null; change: "same" | "swap" | "add" | "less"; part?: string };
 export function checkChange(original: { name: string; role: Role }[], next: Changed[]): string | null {
   for (const o of original) {
     const kept = next.find((x) => (x.change === "same" || x.change === "less") && x.name.toLowerCase() === o.name.toLowerCase());
@@ -194,3 +194,12 @@ export type SideKind = "side" | "top" | "after";
 export const sideWord = (k: SideKind) => (k === "top" ? "on top" : k === "after" ? "after" : "on the side");
 // The plate's foods as ingredients
 export const asItems = (l: { grams: number; food: Food }[], id: () => string): Ingredient[] => l.map((i) => ({ id: id(), grams: i.grams, locked: true, food: i.food }));
+
+// How a dish changed on the plate differs from the original (0.2.23, IM23): for the step draft, so its marks say "your change"
+export function changesOf(orig: { grams: number; food: { name: string } }[], next: { grams: number; food: { name: string } }[], notes: string[] = []): string[] {
+  const find = (l: typeof orig, n: string) => l.find((x) => x.food.name.toLowerCase() === n.toLowerCase());
+  const out: string[] = [];
+  for (const i of next) { const o = find(orig, i.food.name); if (!o) out.push(`${i.food.name}: new`); else if (Math.abs(o.grams - i.grams) > Math.max(1, o.grams * 0.02)) out.push(`${i.food.name}: ${Math.round(i.grams)} g instead of ${Math.round(o.grams)} g`); }
+  for (const o of orig) if (!find(next, o.food.name)) out.push(`${o.food.name}: not in it any more`);
+  return [...out, ...notes.map((n) => `cooking note: ${n}`)].slice(0, 8);
+}

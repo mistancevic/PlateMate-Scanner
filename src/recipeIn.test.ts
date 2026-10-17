@@ -113,3 +113,10 @@ test("IM6: the screenshots are files (src:<recipe>:<n>), named by fingerprint in
   assert.deepEqual((withPhotos(lean, new Map([["src:m1:1", a]])) as any).meals[0].shots, undefined);
   assert.deepEqual((withPhotos(lean, new Map([["src:m1:1", a], ["src:m1:2", b]])) as any).meals[0].shots, [a, b]);
 });
+
+test("IM23: what a changed dish changed, for the step draft (0.2.23)", async () => {
+  const { changesOf } = await import("./recipeIn");
+  const f = (name: string, grams: number) => ({ grams, food: { name } });
+  assert.deepEqual(changesOf([f("Butter", 113), f("Cream cheese", 678), f("Sugar", 100)], [f("Butter", 113), f("Light cream cheese", 678), f("Sugar", 60), f("Whey", 60)], ["Chill it overnight."]),
+    ["Light cream cheese: new", "Sugar: 60 g instead of 100 g", "Whey: new", "Cream cheese: not in it any more", "cooking note: Chill it overnight."]);
+});

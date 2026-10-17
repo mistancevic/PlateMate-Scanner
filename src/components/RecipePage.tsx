@@ -29,7 +29,7 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture }: {
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, openOriginal }: {
   // 0.2.18 (canvas board IM, IM11, IM11b): Draw a picture, with the day's count; none without the AI
   picture?: { count: { used: number; limit: number } | null; drawing: boolean; draw: () => void; refresh: () => void } | null;
   // 0.2.11 (canvas board CO, CO4, CO4b): For members, on a recipe of yours
@@ -40,6 +40,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   draft?: (() => Promise<{ ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[] } | { ok: false; why: string; cannot?: boolean }>) | null;
   meal: Meal; cards: Feedback[]; foods: Food[]; cook: boolean; state: PubState; pub: Published | null; approver: string; direct: boolean; unpublished?: string[];
   onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onPublish: (now?: boolean) => void; onDelete: ReactNode; close: () => void;
+  // IM23c (0.2.23): one line for today after How was it; the recipe a changed dish was adapted from
+  top?: ReactNode; openOriginal?: (() => void) | null;
 }) {
   useBack(true, close);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -109,6 +111,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   return (
     <div className="rq">
       <button className="link rq-back" onClick={close}><ChevronLeft size={18} /> Recipes</button>
+      {top}
       {/* R8: the photos first */}
       {drawn
         ? <figure className="rq-hero"><img src={list[0]} alt={`Picture of ${meal.title} by ${CHEF_NAME}`} /><span className="rq-drawn">Picture by {CHEF_NAME}</span></figure>
@@ -163,7 +166,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {naming !== null
         ? <input className="title-input rq-name-input" aria-label="Name of the recipe" autoFocus value={naming} onChange={(e) => setNaming(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" maxLength={80} />
         : <button type="button" className="rq-name" aria-label={`Rename ${meal.title}`} onClick={() => setNaming(meal.title)}>{meal.title}</button>}
-      {meal.source && <SourceBox meal={meal} onPatch={onPatch} />}
+      {meal.source && <SourceBox meal={meal} onPatch={onPatch} openOriginal={openOriginal ?? null} />}
       {/* IM21: one serving first, when the recipe makes more than one */}
       <div className="rp-stats">
         <span><b>{fmt((sum.calories ?? 0) / serves, 0)}</b><small>kcal{serves > 1 ? `, 1 ${oneWord}` : ""}</small></span>
@@ -303,7 +306,7 @@ function TryPhoto({ meal, tryPhoto, use }: { meal: Meal; tryPhoto: (model: strin
 
 // Where it came from (0.2.16, canvas board IM, IM6): the account or site, which you can change; the link, added any time; and
 // your screenshots, for you only. Members and public pages get the text line only, never the screenshots.
-function SourceBox({ meal, onPatch }: { meal: Meal; onPatch: (patch: Partial<Meal>) => void }) {
+function SourceBox({ meal, onPatch, openOriginal }: { meal: Meal; onPatch: (patch: Partial<Meal>) => void; openOriginal: (() => void) | null }) {
   const src = meal.source!;
   const [name, setName] = useState<string | null>(null);
   const [link, setLink] = useState<string | null>(null);
@@ -314,7 +317,9 @@ function SourceBox({ meal, onPatch }: { meal: Meal; onPatch: (patch: Partial<Mea
   return (
     <section className="card rq-source">
       <b>Where it came from</b>
-      {name !== null
+      {meal.basedOn && name === null
+        ? <small>Adapted from <b>{meal.basedOn.title}</b>{src.name ? `, ${src.name}` : ""}{openOriginal && <> · <button className="link in-inline" onClick={openOriginal}>Open the original</button></>}</small>
+        : name !== null
         ? <input className="search" aria-label="Where it came from" autoFocus value={name} placeholder="@account on Instagram, or the site" onChange={(e) => setName(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") saveName(); }} />
         : <small>{src.name ? <>Adapted from <b>{src.name}</b></> : "Where it came from isn't known yet"} · <button className="link in-inline" onClick={() => setName(src.name)}>{src.name ? "Change" : "Add it"}</button></small>}
       {src.url

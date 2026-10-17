@@ -102,6 +102,14 @@ export function RecipesScreen(p: AppApi) {
   const madeTimes = (m: Meal) => state.feedback.filter((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.status === "eaten").length;
   const lastRating = (m: Meal) => state.feedback.find((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.taste)?.taste ?? "";
   const opened = openId ? state.meals.find((m) => m.id === openId) ?? null : null;
+  // IM23c (0.2.23): after How was it, the recipe the meal made or changed opens here, with one line for today
+  const [landed, setLanded] = useState<{ id: string; line: string } | null>(null);
+  useEffect(() => {
+    const l = p.landing; if (!l) return;
+    if (state.meals.some((m) => m.id === l.id)) { setView("mine"); setOpenId(l.id); setLanded(l); }
+    p.clearLanding();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p.landing]);
   // IM22c (0.2.22): after Delete recipe, a line on Recipes says what was done
   const [deleted, setDeleted] = useState<{ title: string; line: string } | null>(null);
   // IM22 (0.2.22): what others see goes first; if that fails, nothing is deleted. The recipe then leaves the state, and its
@@ -149,9 +157,15 @@ export function RecipesScreen(p: AppApi) {
       <RecipePage meal={opened} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
         pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
+        top={landed && landed.id === opened.id ? (
+          <section className="card dl-done rq-landed" role="status">
+            <div className="card-top"><b>✓ Saved in Mine</b><button className="link" onClick={() => { setLanded(null); setOpenId(null); setTab("home"); }}>Today</button></div>
+            {landed.line && <small className="muted">{landed.line}</small>}
+          </section>) : null}
+        openOriginal={opened.basedOn && state.meals.some((m) => m.id === opened.basedOn!.id) ? () => { setLanded(null); setOpenId(opened.basedOn!.id); } : null}
         onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
         onDelete={<DeleteRecipe key={`del-${opened.id}`} plan={deletePlan(opened, state, published[opened.id] ?? null)} slug={published[opened.id]?.slug ?? null} approver={approver} run={(c) => deleteRecipe(opened, c)} />}
-        close={() => setOpenId(null)}
+        close={() => { setOpenId(null); setLanded(null); }}
         tryPhoto={testOn ? async (model: string) => {
           const r = await fetch("/api/cover", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ test: true, style: "photo", model, recipeId: opened.id, title: opened.title, items: opened.items.filter((i) => i.grams > 0).map((i) => ({ name: i.food.name, grams: i.grams })) }), signal: AbortSignal.timeout(90000) });
           const d = await r.json().catch(() => ({}));
