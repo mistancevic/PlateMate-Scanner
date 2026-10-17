@@ -9,7 +9,7 @@ import type { Meal, Food, Ingredient, PlateOpt, StepMark } from "../pilot";
 import { partsOf, optAt, optToItem, itemToOpt, canLeaveOut, leanFood } from "../parts";
 import { draftSteps } from "../draftSteps";
 import { equipmentOf } from "../personal";
-import { stepParts } from "../steps";
+import { stepParts, stepText } from "../steps";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
@@ -876,6 +876,14 @@ export function JourneyScreen(p: AppApi) {
           {items.length > 0 && <button className="pill pill-wide" onClick={keepAsIs}>Keep it as it is</button>}
           </>)}
         </div>
+        {/* RP1 (0.2.25, Milan 17:42 and 19:43): the recipe's steps, to review on the Plate before you make it */}
+        {imported && rec && (rec.steps?.length || rec.source?.steps?.length) ? (
+          <section className="card in-steps in-steps-plate" aria-label="The recipe's steps">
+            <b>Steps</b>
+            {rec.steps?.length ? <><small className="muted">{rec.stepMarks ? `${CHEF_NAME}'s steps, for the whole recipe.` : "Your steps, for the whole recipe."}</small><ol className="rp-steps">{rec.steps.map((x, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepText(tempsIn(x), rec.items)}</div></li>)}</ol></>
+              : <><small className="muted">{rec.source?.from === "link" ? "As the page writes them" : "As the recipe writes them"}, for the whole recipe.</small><OriginalSteps steps={rec.source!.steps!} /></>}
+          </section>
+        ) : null}
         {imported && share && <p className="small center">{Meal} is about {fmt(share.kcal, 0)} kcal{dayNums ? ` of your ${fmt(dayNums.kcal, 0)}` : ""}{pdRef !== null ? `, at ${pdTag()} ${pdVal(pdRef)} or more` : ""}.</p>}
         {!imported && !madeBy && chefable && share && items.length > 0 && <p className="small center">{Meal} is about {fmt(share.kcal, 0)} kcal{dayNums ? ` of your ${fmt(dayNums.kcal, 0)}` : ""}{pdRef !== null ? `, at ${pdTag()} ${pdVal(pdRef)} or more` : ""}. {CHEF_NAME} adds what it needs and sets the amounts. Keep it as it is {p.filling ? `puts the plate in ${slotName(p.filling)} as it stands` : "takes the plate as it stands"}.</p>}
         {!madeBy && chefable && share && items.length > 0 && unlogged && (() => {

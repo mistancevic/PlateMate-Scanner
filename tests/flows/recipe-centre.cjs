@@ -57,7 +57,12 @@ const U = "http://127.0.0.1:3217";
   await page.locator(".plate-card").getByRole("button", { name: "Link" }).click(); await page.waitForTimeout(300);
   await page.getByLabel("Link to a recipe").fill(URL_);
   await page.getByRole("button", { name: "Read it" }).click(); await page.waitForTimeout(900);
+  // RP1 (Milan 19:43): the steps show with the foods, right after the read
+  ok(/As the page writes them, for the whole recipe/.test(await text(".in-card .in-steps")) && await page.locator(".in-card .in-steps .rp-orig li").count() === 4 && /it’s helpful/.test(await text(".in-card .in-steps")), "RP1: the read card shows the steps with the foods");
+  await shot("rp1-read", ".in-card");
   await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
+  ok(await page.locator(".in-steps-plate .rp-orig li").count() === 4, "RP1: the Plate shows the recipe's steps to review before Make it");
+  await shot("rp1-plate", ".in-steps-plate");
   await nav("Recipes");
   await page.getByText("No-bake cheesecake", { exact: true }).last().click(); await page.waitForTimeout(900);
   let t = await text(".rq-steps");

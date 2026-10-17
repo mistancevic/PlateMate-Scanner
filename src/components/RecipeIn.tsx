@@ -6,6 +6,7 @@ import { fmt, pdText } from "../ui";
 import { iconFor } from "../icons";
 import { CHEF_NAME } from "./Mark";
 import { countLabel, type Count } from "../counted";
+import { OriginalSteps } from "./StepsView";
 
 // A recipe from screenshots or a link (0.2.16, canvas board IM, IM2, IM2b, IM3, IM7). The plate card gives way to these
 // while a recipe comes in; Put it on my plate hands it back to the plate.
@@ -95,6 +96,12 @@ export function ReadCard({ flow, setSource, setServings, toggle, put, again, can
         ))}
       </div>
       {flow.note && <small className="in-note">{flow.note}</small>}
+      {/* RP1 (0.2.25, Milan 18:05 and 19:43): the original's steps came with the read, so they show with the foods */}
+      <div className="in-steps">
+        <b>Steps</b>
+        {r.steps?.length ? <><small className="muted">{flow.url ? "As the page writes them" : "As the recipe writes them"}, for the whole recipe.</small><OriginalSteps steps={r.steps} /></>
+          : <small className="muted">The {flow.url ? "page" : "screenshot"} shows no steps. {CHEF_NAME} can draft them on the recipe page.</small>}
+      </div>
       <small className="muted">The whole recipe: {fmt(all, 0)} kcal · {fmt(allP, 0)} g protein · {pdText(pd(all, allP))}.{left.length ? ` Left out: ${left.length} optional, as the recipe's numbers do; Add it puts one in.` : ""} Values are typical values, marked estimate; tap a food on the plate to check or change it.</small>
       <button className="pill pill-primary pill-wide" onClick={put}>Put it on my plate</button>
       <button className="link" style={{ alignSelf: "center" }} onClick={again}>Not right? Read it again</button>
