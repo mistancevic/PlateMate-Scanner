@@ -24,8 +24,8 @@ seed.items = [];
     localStorage.setItem("seeded", "1"); } }, [seed, key]);
   await require("./adult.cjs")(page);
   await page.goto("http://127.0.0.1:3195/"); await page.waitForTimeout(900);
-  // Today: the question above Scan
-  ok(/Does it fit my numbers\?/.test(await page.locator(".scan-why").textContent()), "Scan has its question above it");
+  // Today keeps the day; scanning lives on the Plate (0.2.25, RP5)
+  ok(await page.locator(".scan-why").count() === 0, "RP5: Today has no Scan; it lives on the Plate");
   // the chat from Today knows the day
   await page.getByRole("button", { name: "Chef Mealan", exact: true }).click(); await page.waitForTimeout(500);
   const head = await page.locator(".chat-screen .head p").first().textContent();

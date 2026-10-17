@@ -97,6 +97,6 @@ export function countRead(name: string, written: string, grams: number): { count
   const size = sizeFrom(written, k);
   const n = countFrom(written);
   // "3 tbsp beaten egg" or "100 g banana": a measure, not a count; the grams stay, the size is a guide
-  if (n === null || /\b(g|gr|gram|grams|kg|ml|cup|cups|tbsp|tsp|tablespoons?|teaspoons?|oz|ounces?)\b/i.test(written)) return { count: { kind: k, size: n === null ? guessSize(k, grams) : size }, grams };
+  if (n === null || /(?:\d|\s|^)(g|gr|grams?|kg|ml|l|cups?|tbsp|tsp|tablespoons?|teaspoons?|oz|ounces?|lbs?|pounds?)\b/i.test(written)) return { count: { kind: k, size: n === null ? guessSize(k, grams) : size }, grams };
   return { count: { kind: k, size }, grams: Math.round(n * KINDS[k].sizes[size]!) };
 }

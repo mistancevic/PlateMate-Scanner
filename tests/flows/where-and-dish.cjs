@@ -55,25 +55,21 @@ seed.items = [];
   ok(await page.locator(".dish-row").count() === 1 && /what Chef Mealan moves/.test(await page.locator(".rows").textContent()), "after Fit the dish is still one row and the side is what Mealan moves");
   const sarmaGrams = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.filter((i) => i.dish).map((i) => i.grams));
   ok(sarmaGrams.join(",") === "100,150,25", "the recipe's amounts stay one portion: " + sarmaGrams.join(", "));
-  // Where does this go: Scan from Today, a barcode, the sheet
-  await page.getByRole("button", { name: /^Today$/ }).first().click(); await page.waitForTimeout(500);
-  await page.getByRole("button", { name: /^Scan( food)?$/ }).first().click(); await page.waitForTimeout(1500);
-  ok(await page.locator(".cam-title").count() === 1, "Scan from Today opens the camera");
+  // Where does this go: Scan on the Plate (0.2.25, RP5: Today has no camera), a barcode, the sheet
+  await page.getByRole("button", { name: /Back$/ }).first().click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(1500);
+  ok(await page.locator(".cam-title").count() === 1, "Scan on the Plate opens the camera");
   await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(400);
   const field = page.locator('input[aria-label="Type the barcode"]');
   await field.fill("4260345270123"); await page.keyboard.press("Enter"); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Use the code only" }).click(); await page.waitForTimeout(1200);
   await page.getByLabel(/I checked the values/).check();
   await page.getByRole("button", { name: /Confirm & save food/ }).click(); await page.waitForTimeout(800);
-  const sheet = page.locator(".where-sheet");
-  ok(await sheet.count() === 1 && /Tofu block/.test(await sheet.textContent()), "after the save, Where does this go? with the food on top");
-  const rows = await sheet.locator(".where-row .menu-row-text b").allTextContents();
-  ok(rows[0] === "On the plate now" && rows.includes("A new meal with it") && rows[rows.length - 1] === "Just keep it in My foods", "the ways: " + rows.join(" | "));
-  ok(await sheet.locator(".where-row", { hasText: "Sarma" }).count() === 0, "the lunch already eaten is not offered");
-  ok(await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.some((x) => x.name === "Tofu block")), "the food is in My foods either way");
-  // a new meal with it, in the empty dinner slot: the Plate opens for the slot with the food on it
-  await sheet.locator(".where-row", { hasText: "A new meal with it" }).first().click(); await page.waitForTimeout(800);
-  ok(/Today's (breakfast|dinner), \d\d:\d\d · By the plan/.test(await page.locator(".plan-line").textContent()) && /Tofu block/.test(await page.locator(".plate-card").textContent()), "the Plate opens for the slot with the food: " + (await page.locator(".plan-line").textContent()));
+  // 0.2.25 (RP5): Today has no camera, so Where does this go? (the question after a scan from Today) is not asked; Scan on the
+  // Plate puts the food on the plate, and keeps it in My foods
+  await page.waitForTimeout(500);
+  ok(await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.some((x) => x.name === "Tofu block")), "the food is in My foods");
+  ok(/Tofu block/.test(await page.locator("main").textContent()), "Scan on the Plate puts the food on the plate");
   ok(errs.length === 0, errs.length ? "page errors: " + errs.join(" | ") : "no page errors");
   await b.close(); server.kill();
   process.exit(fail ? 1 : 0);

@@ -89,7 +89,7 @@ const U = "http://127.0.0.1:3211";
   await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(700);
   await page.getByText("Protein cheesecake", { exact: true }).last().click(); await page.waitForTimeout(900);
   ok(JSON.stringify(await page.locator(".rq-foods .rq-part").allTextContents()) === JSON.stringify(["Base", "Filling", "Topping"]), "IM15: the recipe page lists the foods in their parts");
-  await page.getByRole("button", { name: "Draft the steps with Chef Mealan" }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /^(Draft the steps with Chef Mealan|Chef Mealan's way|Write the steps for my dish)$/ }).click(); await page.waitForTimeout(800);
   ok(stepsReq && stepsReq.items.every((i) => i.part) && stepsReq.optional?.[0]?.name === "Dark chocolate" && stepsReq.optional[0].part === "Topping", "IM17: Chef Mealan gets the parts and the optional chocolate in the topping");
   ok(JSON.stringify(await page.locator(".rq-steps .rp-step-part").allTextContents()) === JSON.stringify(["The base", "The filling", "The topping"]), "IM17: the steps part by part");
   await page.getByRole("button", { name: "Keep these steps" }).click(); await page.waitForTimeout(400);

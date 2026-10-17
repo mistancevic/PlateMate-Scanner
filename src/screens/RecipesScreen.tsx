@@ -21,6 +21,7 @@ import { MembersList, MemberPage, SharePanel, aheadOf } from "../components/Memb
 import { sharedOf, contentSig, type SharedRecipe } from "../members";
 import { DeleteRecipe, type DeleteChoice } from "../components/DeleteRecipe";
 import { deletePlan, deletedLine, forgetRecipe } from "../recipeDelete";
+import { foodNames, originalFoodsOf, diffFoods } from "../stepsState";
 
 export function RecipesScreen(p: AppApi) {
   const { state, setState, setTab } = p;
@@ -103,7 +104,7 @@ export function RecipesScreen(p: AppApi) {
   const lastRating = (m: Meal) => state.feedback.find((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.taste)?.taste ?? "";
   const opened = openId ? state.meals.find((m) => m.id === openId) ?? null : null;
   // IM23c (0.2.23): after How was it, the recipe the meal made or changed opens here, with one line for today
-  const [landed, setLanded] = useState<{ id: string; line: string } | null>(null);
+  const [landed, setLanded] = useState<{ id: string; line: string; title?: string } | null>(null);
   useEffect(() => {
     const l = p.landing; if (!l) return;
     if (state.meals.some((m) => m.id === l.id)) { setView("mine"); setOpenId(l.id); setLanded(l); }
@@ -159,7 +160,7 @@ export function RecipesScreen(p: AppApi) {
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
         top={landed && landed.id === opened.id ? (
           <section className="card dl-done rq-landed" role="status">
-            <div className="card-top"><b>✓ Saved in Mine</b><button className="link" onClick={() => { setLanded(null); setOpenId(null); setTab("home"); }}>Today</button></div>
+            <div className="card-top"><b>{landed.title ?? "✓ Saved in Mine"}</b><button className="link" onClick={() => { setLanded(null); setOpenId(null); setTab("home"); }}>Today</button></div>
             {landed.line && <small className="muted">{landed.line}</small>}
           </section>) : null}
         openOriginal={opened.basedOn && state.meals.some((m) => m.id === opened.basedOn!.id) ? () => { setLanded(null); setOpenId(opened.basedOn!.id); } : null}
@@ -175,7 +176,8 @@ export function RecipesScreen(p: AppApi) {
         membersPanel={opened.from === "coach" || opened.from === "members" ? null
           : <SharePanel key={opened.id} meal={opened} p={p} made={opened.members ? memberList?.find((r) => r.id === opened.members!.id)?.made ?? null : null} onPatch={(patch) => patchMeal(opened.id, patch)} />}
         picture={p.ai.on && !opened.from && canDrawCover(opened) ? { count: p.cover.count, drawing: p.cover.drawing === opened.id, draw: () => p.cover.draw(opened), refresh: p.cover.refresh } : null}
-        draft={p.ai.on ? () => draftSteps(opened, { library: state.foods.map((f) => f.name), equipment: equipmentOf(p.personal), kitchens: p.personal.kitchens ?? [] }) : null} />
+        originalFoods={originalFoodsOf(opened, state.meals)} pdRef={p.pdRef} fitPd={p.fitPd}
+        draft={p.ai.on ? () => { const d = diffFoods(foodNames(opened.items), originalFoodsOf(opened, state.meals)); return draftSteps(opened, { library: state.foods.map((f) => f.name), equipment: equipmentOf(p.personal), kitchens: p.personal.kitchens ?? [], ...(d ? { changed: [...d.added.map((x) => `${x}: new`), ...d.gone.map((x) => `${x}: not in it any more`)] } : {}) }); } : null} />
       {sheet}
     </>
   );

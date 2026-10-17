@@ -63,7 +63,7 @@ export function recipeFromLd(html: string): { name: string; ingredients: string[
     if (!ingredients.length) continue;
     const who = (x: any) => (typeof x === "string" ? x : Array.isArray(x) ? who(x[0]) : x && typeof x === "object" ? String(x.name ?? "") : "");
     // the method: text, HowToStep, or HowToSection with its own steps (0.2.18, IM9b)
-    const stepsOf = (x: any): string[] => typeof x === "string" ? x.split(/\n+/) : Array.isArray(x) ? x.flatMap(stepsOf) : x && typeof x === "object" ? (Array.isArray(x.itemListElement) ? stepsOf(x.itemListElement) : [String(x.text ?? x.name ?? "")]) : [];
+    const stepsOf = (x: any): string[] => typeof x === "string" ? x.split(/\n+|<\/?(?:li|p|br|ol|ul)\b[^>]*>/i) : Array.isArray(x) ? x.flatMap(stepsOf) : x && typeof x === "object" ? (Array.isArray(x.itemListElement) ? stepsOf(x.itemListElement) : [String(x.text ?? x.name ?? "")]) : [];
     const steps = cleanSteps(stepsOf(r.recipeInstructions ?? []).map((s) => pageText(s)));
     return { name: String(r.name ?? "").trim().slice(0, 100), ingredients, yield: String(([] as unknown[]).concat(r.recipeYield ?? [])[0] ?? "").slice(0, 40), author: who(r.author) || who(r.publisher), steps };
   }
@@ -71,14 +71,22 @@ export function recipeFromLd(html: string): { name: string; ingredients: string[
 }
 // The page as plain text, when it has no structured recipe: no scripts, no styles, no tags, at most 20,000 letters
 export function pageText(html: string): string {
-  return html.replace(/<(script|style|noscript|svg|nav|footer|header)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ")
-    .replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&#39;|&apos;/g, "'").replace(/&quot;/g, '"').replace(/\s+/g, " ").trim().slice(0, 20000);
+  return decodeEntities(html.replace(/<(script|style|noscript|svg|nav|footer|header)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim().slice(0, 20000);
+}
+// A page's signs read as the letters they are (0.2.25, board RP1b: it&#8217;s showed as code): numbers, and the common names
+const NAMED: Record<string, string> = { nbsp: " ", amp: "&", quot: '"', apos: "'", lt: "<", gt: ">", rsquo: "\u2019", lsquo: "\u2018", rdquo: "\u201d", ldquo: "\u201c", ndash: "\u2013", mdash: "\u2014", hellip: "\u2026", deg: "\u00b0", frac12: "\u00bd", frac14: "\u00bc", frac34: "\u00be", times: "\u00d7", eacute: "\u00e9", egrave: "\u00e8", uuml: "\u00fc", ouml: "\u00f6", auml: "\u00e4", szlig: "\u00df" };
+export function decodeEntities(t: string): string {
+  const cp = (n: number) => (Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : "");
+  return String(t).replace(/&#(\d{1,7});/g, (_, n) => cp(Number(n))).replace(/&#x([0-9a-f]{1,6});/gi, (_, h) => cp(parseInt(h, 16))).replace(/&([a-z][a-z0-9]{1,8});/gi, (m, k) => NAMED[k.toLowerCase()] ?? m);
 }
 export const siteName = (html: string, host: string) =>
   (html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']{1,60})["']/i)?.[1] ?? host.replace(/^www\./, "")).trim();
 
 // the original steps: at most 20, each at most 400 letters, no empty lines
-export const cleanSteps = (l: unknown): string[] => (Array.isArray(l) ? l : []).map((x) => String(x ?? "").replace(/\s+/g, " ").trim().slice(0, 400)).filter(Boolean).slice(0, 20);
+// the page's signs as letters, and a range written with a dash as words: 10–20 minutes reads 10 to 20 minutes (0.2.25)
+export const cleanSteps = (l: unknown): string[] => (Array.isArray(l) ? l : []).map((x) => decodeEntities(String(x ?? "")).replace(/(\d)\s*[\u2013\u2014]\s*(\d)/g, "$1 to $2").replace(/\s+/g, " ").trim().slice(0, 400)).filter(Boolean).slice(0, 20);
+// one block of method split into steps by Chef Mealan (0.2.25, RP1b): every word kept, in order, nothing added
+export const sameWords = (block: string, steps: string[]) => { const w = (s: string) => decodeEntities(s).replace(/[\u2013\u2014]/g, " to ").toLowerCase().replace(/[^a-z0-9\u00c0-\u024f]+/g, " ").trim(); return steps.length > 1 && w(block) === w(steps.join(" ")); };
 // ---- what was read, checked ----
 const num = (x: unknown) => (typeof x === "number" && Number.isFinite(x) ? x : Number(x));
 // Grams written on the recipe win over the model's: 500 g, 0.5 kg. Other units (2 tbsp, 2 balls) are the model's,

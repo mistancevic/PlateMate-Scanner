@@ -9,7 +9,7 @@ import { Mark, APP_NAME } from "../components/Mark";
 const VERSION = String(import.meta.env.VITE_VERSION ?? "");
 const FIX_ROUNDS = Number(/\+r(\d+)$/.exec(VERSION)?.[1] ?? 0);
 // walkthroughs: the files in tests/flows that run on their own (not the helpers, not the paths runner): node scripts/run-flows.cjs --count
-export const BUILT_FACTS = { unitTests: 250, walkthroughs: 57 };
+export const BUILT_FACTS = { unitTests: 252, walkthroughs: 58 };
 
 type Tag = "code" | "ai" | "data";
 type Part = { x: number; y: number; w: number; t: string; s: string; tag: Tag; what: string; why: string; built: string };
@@ -25,7 +25,7 @@ const N: Record<string, Part> = {
 const Q = { t: "Checked before every release", what: `Every push carries a version; preview first, then production, with a one-line rollback. ${BUILT_FACTS.unitTests} unit tests check the rules, ${BUILT_FACTS.walkthroughs} walkthroughs click through the app like a person, and model evals score the AI's answers with a judge model and the coach's labels.`, why: "Design first: every screen is drawn and approved before code, with an ID on every screen.", built: "Node test runner, Playwright, an evals page in the app" };
 const E: [string, string][] = [["app", "calc"], ["app", "server"], ["server", "ai"], ["server", "food"], ["app", "account"], ["server", "account"], ["coach", "account"]];
 const STEPS: { t: string; n: string[]; e: [string, string][]; p: string }[] = [
-  { t: "Scan food", n: ["app"], e: [], p: "At the shop, the person taps Scan food and points the phone at the label of a chocolate spread." },
+  { t: "Scan on the Plate", n: ["app"], e: [], p: "At the shop, the person opens the Plate, taps Scan and points the phone at the label of a chocolate spread." },
   { t: "The AI reads the label", n: ["app", "server", "ai"], e: [["app", "server"], ["server", "ai"]], p: "The photo goes to the server, which checks the person is a member, then asks the AI to read the energy and the protein from the label." },
   { t: "The person checks the label", n: ["app"], e: [], p: "The values come back marked as read from a photo. The person compares them with the pack and saves the food. Nothing the AI read counts before this tap." },
   { t: "The calculator fits the plate", n: ["app", "calc"], e: [["app", "calc"]], p: "Chocolate spread alone is PD 1.2. The calculator works out how much skyr lifts the plate to the day's target: 165 g for 40 g of spread." },

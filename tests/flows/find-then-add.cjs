@@ -72,7 +72,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   // add: Type carries the search, the sheet is titled Type under Add a food, and a food without a label is suggested
   await page.getByRole("button", { name: "Add a food", exact: true }).click(); await page.waitForTimeout(150); await page.locator(".add-strip").getByRole("button", { name: /^Type/ }).click(); await page.waitForTimeout(400);
   const sheet = page.locator(".modal").last();
-  ok(/Add a food/.test(await sheet.locator(".eyebrow-line").textContent()) && (await sheet.locator("h2").textContent()) === "Type", "the sheet is titled Type, under Add a food");
+  ok(/Add a food/.test(await sheet.locator(".eyebrow-line").textContent()) && (await sheet.locator("h2").textContent()) === "Manual", "the sheet is titled Manual, under Add a food");
   ok(/From your search: tikvice/.test(await sheet.locator(".sheet-line").textContent()), "the search text rides along");
   ok((await sheet.locator("input").first().inputValue()) === "tikvice" && await sheet.locator(".ref-row").count() >= 1, "the name is filled and the food without a label is suggested");
   await sheet.getByRole("button", { name: "Close dialog" }).click(); await page.waitForTimeout(200);
@@ -82,7 +82,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(/the number comes with you/.test(await page.locator(".end-add").textContent().catch(() => "")), "digits found nowhere: the number comes with you");
   await page.getByRole("button", { name: "Add a food", exact: true }).click(); await page.waitForTimeout(150); await page.locator(".add-strip").getByRole("button", { name: /^Type/ }).click(); await page.waitForTimeout(300);
   const sheetB = page.locator(".modal").last();
-  ok((await sheetB.locator("h2").textContent()) === "Type" && (await sheetB.locator(".barcode-row input").inputValue()) === "4311501670408", "the Type sheet holds the number in its barcode field");
+  ok((await sheetB.locator("h2").textContent()) === "Manual" && (await sheetB.locator(".barcode-row input").inputValue()) === "4311501670408", "the Manual sheet holds the number in its barcode field");
   await sheetB.getByRole("button", { name: /^Look up$/ }).click(); await page.waitForTimeout(800);
   ok(lookups.some((u) => /4311501670408/.test(u)), "Look up asks the database");
   // the camera header says Scan under Add a food

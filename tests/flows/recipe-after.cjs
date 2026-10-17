@@ -60,10 +60,9 @@ const U = "http://127.0.0.1:3210";
   let t = await text(".rq-optional");
   ok(/Optional, not in the numbers/.test(t) && /Vanilla extract5 ml on the recipe5 g/.test(t) && /for max gooeyness/.test(t) && /on top, to taste/.test(t) && (await page.locator(".rq-optional").getByRole("button", { name: "Add when cooking" }).count()) === 0, "IM8, IM14: Optional, not in the numbers: each with its words and grams; the plate adds them, not this page");
   ok(/leave them out, and so do ours\. Make it, and add any of them on the plate\./.test(t), "IM14: the recipe's numbers leave them out; Make it, and add them on the plate");
-  t = await text(".rq-source");
-  ok(/Original steps, from your screenshot/.test(t) && /For you only, like the screenshot\. Members and public pages get Chef Mealan's steps\./.test(t), "IM9b: Original steps, from your screenshot, for you only");
-  await page.locator(".rq-orig summary").click(); await page.waitForTimeout(200);
-  ok(/Preheat oven to 175 °C\./.test(await text(".rq-orig ul")), "UN: the original's 350 degrees Fahrenheit shows as 175 °C (the account starts metric)");
+  t = await text(".rq-steps");
+  ok(await page.locator(".rq-steps .rp-orig li").count() > 0 && !/Original steps, from/.test(await text(".rq-source")), "RP1 (was IM9b): the original is the steps, no longer folded under Where it came from");
+  ok(/Preheat oven to 175 °C\./.test(await text(".rq-steps .rp-orig")), "UN: the original's 350 degrees Fahrenheit shows as 175 °C (the account starts metric)");
   t = await text(".rq-nopic");
   ok(/No picture yet\./.test(t) && /Chef Mealan's pictures today: 3 of 10\. Your own photo is always better\./.test(t), "IM11: No picture yet, with the day's count: 3 of 10");
   ok(coverCalls === 1, "IM11: nothing tried again on its own");
@@ -75,7 +74,7 @@ const U = "http://127.0.0.1:3210";
   // IM9: Chef Mealan's steps, marked against the original; °F in the original converted by code
   stepsAnswer = { steps: ["Heat the oven to 175 °C and line a tray with baking paper.", "Mix {1} and {2} in a bowl until smooth, about 1 minute.", "In a second bowl, mix {3} and {4}.", "Fold the wet into the dry, then fold in {5}. Shape 2 cookies about 1 cm thick.", "Bake 10 to 13 minutes and take them out slightly underdone."],
     marks: [{ kind: "adapted", why: "350 °F in the original" }, { kind: "added", why: "the original says only Mix" }, { kind: "same", why: "" }, { kind: "added", why: "the original doesn't say how to shape them" }, { kind: "same", why: "" }] };
-  await page.getByRole("button", { name: "Draft the steps with Chef Mealan" }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /^(Draft the steps with Chef Mealan|Chef Mealan's way|Write the steps for my dish)$/ }).click(); await page.waitForTimeout(800);
   ok(steps[0] && steps[0].original?.length === 5 && JSON.stringify(steps[0].equipment) === JSON.stringify(["oven", "stovetop", "microwave"]) && steps[0].makes?.n === 2, "IM9, IM10: the original steps, oven, stovetop and microwave, and how many it makes go to Chef Mealan");
   t = await text(".rq-steps");
   ok(/from the original, for your amounts and your kitchen\. Each says how it relates to the original\./.test(t), "IM9: the steps say they come from the original");
@@ -101,7 +100,7 @@ const U = "http://127.0.0.1:3210";
   await page.goto(U + "/plate"); await page.waitForTimeout(900); await openRecipe();
   stepsAnswer = { cannot: "This needs an oven; the air fryer would burn the top before the middle is done." };
   const before = steps.length;
-  await page.getByRole("button", { name: "Draft the steps with Chef Mealan" }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /^(Draft the steps with Chef Mealan|Chef Mealan's way|Write the steps for my dish)$/ }).click(); await page.waitForTimeout(800);
   ok(JSON.stringify(steps[steps.length - 1].equipment) === JSON.stringify(["stovetop", "microwave", "airfryer"]), "IM10b: Chef Mealan gets what you cook with");
   ok(steps.length === before + 1 && /This needs an oven; the air fryer would burn the top before the middle is done\./.test(await text(".rq-steps")) && !/didn't pass the checks/.test(await text(".rq-steps")), "IM10b: no sensible way: said plainly, asked once");
 
@@ -134,8 +133,8 @@ const U = "http://127.0.0.1:3210";
   const w = (await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")))).weighIns.pop();
   ok(Math.abs(w.kg - 94.35) < 0.01 && /last: 208\.0 lb/.test(await text(".weigh-line")), `UN2: 208.0 lb typed is kept as ${w.kg} kg, and shows as 208.0 lb`);
   await page.goto(U + "/plate"); await page.waitForTimeout(900); await openRecipe();
-  await page.locator(".rq-orig summary").click(); await page.waitForTimeout(200);
-  ok(/Preheat oven to 350 °F\./.test(await text(".rq-orig ul")), "UN2: with °F chosen, the original's oven heat is 350 °F");
+  const tab = page.getByRole("tab", { name: "Original" }); if (await tab.count()) { await tab.click(); await page.waitForTimeout(200); }
+  ok(/Preheat oven to 350 °F\./.test(await text(".rq-steps .rp-orig")), "UN2: with °F chosen, the original's oven heat is 350 °F");
   ok(errs.length === 0, "no page errors " + errs.join(" | "));
   await b.close(); server.kill();
   console.log(fails.length ? `${fails.length} FAILED` : "all ok");

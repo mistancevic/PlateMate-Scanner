@@ -49,7 +49,7 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   await tile("Eggs, Milk").click(); await page.waitForTimeout(500);
   ok(await page.locator(".rq-hero img").count() === 1 && /Cover/.test(await page.locator(".rq-hero").textContent()), "R8: the page opens with the cover large");
   ok(await wide() <= 0, "the long name never makes the page wider than the phone (360 px)");
-  ok(/365/.test(await page.locator(".rp-stats").textContent()) && /43\.8/.test(await page.locator(".rp-stats").textContent()), "R8: the recipe's numbers: 365 kcal, 43.8 g protein");
+  ok(/365/.test(await page.locator(".rq-readout").textContent()) && /43\.8/.test(await page.locator(".rq-readout").textContent()), "R8: the recipe's numbers: 365 kcal, 43.8 g protein");
   // × asks Sure? before deleting
   await page.getByRole("button", { name: "Delete photo 1" }).click(); await page.waitForTimeout(150);
   ok(await page.locator(".rq-hero img").count() === 1, "R9: × asks Sure? first; nothing is deleted on the first tap");
@@ -71,7 +71,7 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   await page.getByRole("button", { name: "Edit recipe" }).click(); await page.waitForTimeout(200);
   ok(await page.locator(".rq-editing").count() === 1, "R11: Editing the recipe");
   await page.getByLabel("Grams of Chicken breast, cooked").fill("100"); await page.waitForTimeout(150);
-  ok(/398/.test(await page.locator(".rp-stats").textContent()) && /50(\.0)?\s*g protein/.test(await page.locator(".rp-stats").textContent()) && /PD 12\.6/.test(await page.locator(".rp-stats").textContent()), "R11: the numbers follow as you type: 398 kcal, 50 g protein, PD 12.6");
+  ok(/398/.test(await page.locator(".rq-readout").textContent()) && /50(\.0)?\s*g protein/.test(await page.locator(".rq-readout").textContent()) && /12\.6/.test(await page.locator(".rq-readout").textContent()), "R11: the numbers follow as you type: 398 kcal, 50 g protein, PD 12.6");
   await page.getByRole("button", { name: "Cancel" }).click(); await page.waitForTimeout(200);
   ok((await meal("m-emc")).items.find((i) => i.id === "c").grams === 80, "R11: Cancel leaves the recipe as it was");
   await page.getByRole("button", { name: "Edit recipe" }).click(); await page.waitForTimeout(200);

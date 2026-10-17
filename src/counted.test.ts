@@ -15,6 +15,8 @@ test("CT1: the size and the count the recipe names; code sets the grams", () => 
   assert.deepEqual(countRead("Eggs", "2 large", 120), { count: { kind: "egg", size: "L" }, grams: 122 });
   assert.deepEqual(countRead("Banana", "1 medium", 120), { count: { kind: "banana", size: "M" }, grams: 118 });
   assert.equal(countRead("Eggs", "100 g", 100)!.grams, 100, "a measure keeps its grams");
+  assert.equal(countRead("Egg", "50g", 50)!.grams, 50, "50g is grams, not 50 eggs");
+  assert.equal(countRead("Banana", "120 g", 120)!.grams, 120);
   assert.equal(countRead("Flour", "2 cups", 240), null);
 });
 

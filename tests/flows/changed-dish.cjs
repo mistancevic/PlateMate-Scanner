@@ -67,7 +67,7 @@ const U = "http://127.0.0.1:3215";
   ok(sent[0].items.find((i) => i.name === "Cream cheese").part === "Filling", "IM23: the change is asked with the recipe's parts");
   await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(800);
   ok(/No steps yet for your changed dish/.test(await text("main")), "IM23: How to make it is for the changed dish");
-  await page.getByRole("button", { name: /Draft the steps with/ }).first().click(); await page.waitForTimeout(900);
+  await page.getByRole("button", { name: "Write the steps for my dish" }).first().click(); await page.waitForTimeout(900);
   const ask = sent.find((x) => Array.isArray(x.original));
   ok(ask && ask.items.some((i) => i.name === "Light cream cheese" && i.grams === 678 && i.part === "Filling") && ask.items.some((i) => i.name === "Vanilla whey protein powder" && i.grams === 60) && !ask.items.some((i) => i.name === "Cream cheese"), "IM23: the draft is asked for the changed foods, at the whole recipe's grams, with their parts");
   ok(ask && ask.changed.includes("Light cream cheese: new") && ask.changed.includes("Cream cheese: not in it any more") && ask.original.length === 4, "IM23: the draft knows what changed, and follows the original method");
@@ -106,7 +106,7 @@ const U = "http://127.0.0.1:3215";
   ok(/No-bake cheesecake/.test(await text(".rq h1, .rq .rq-name, .rq")) && !(await page.locator(".rq-landed").count()), "IM23c: Open the original opens it");
   await page.locator(".rq-back").click(); await page.waitForTimeout(400);
 
-  // a recipe you have made before: How was it ends on the Plate as before, not on the recipe
+  // a recipe you have made before ends on its page too (0.2.25, RP4, Milan 17:42)
   await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500);
   await page.getByText("No-bake cheesecake, more protein", { exact: true }).last().click(); await page.waitForTimeout(700);
   await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(1200);
@@ -115,7 +115,7 @@ const U = "http://127.0.0.1:3215";
   await page.getByRole("button", { name: /On to How was it\?/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Good", exact: true }).first().click();
   await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(900);
-  ok(await page.locator(".rq-landed").count() === 0 && await page.locator(".rq").count() === 0, "IM23c: a recipe made before does not open its page after How was it");
+  ok(/Made today/.test(await text(".rq-landed")) && /No-bake cheesecake, more protein/.test(await text(".rq")), "RP4: a recipe made before ends on its page too");
   await page.reload(); await page.waitForTimeout(1300);
   ok(!/could not be read/.test(await text("main")), "The stored data reads back");
   ok(errs.length === 0, `No page errors${errs.length ? `: ${errs.join(" | ")}` : ""}`);

@@ -34,7 +34,7 @@ seed.items = [];
     const sub = page.locator(".step-head p, .step-head small").first();
     const box = await sub.boundingBox(); if (!box || box.height > 24) throw new Error("the sub line wraps: " + (box && box.height));
     // 0.2.16 (board IM, IM1b, Milan 21:48): Empty plate moved out of the row that adds foods, to the top of the plate card
-    const ways = await page.locator(".ways .pill").allTextContents(); if (ways.length !== 2 || !/Scan/.test(ways[0]) || !/^Type/.test(ways[1].replace(/^[^A-Za-z]*/, ""))) throw new Error("ways: " + ways.join(" | "));
+    const ways = await page.locator(".ways .pill").allTextContents(); if (ways.length !== 2 || !/^Manual/.test(ways[0].replace(/^[^A-Za-z]*/, "")) || !/Scan/.test(ways[1])) throw new Error("ways: " + ways.join(" | "));
     if (!/Empty plate/.test(await page.locator(".plate-card .card-top").textContent())) throw new Error("Empty plate is not at the top of the plate card");
     const tops = await page.locator(".ways .pill").evaluateAll((es) => es.map((e) => Math.round(e.getBoundingClientRect().top))); if (new Set(tops).size !== 1) throw new Error("ways on more than one row: " + tops.join(","));
   });

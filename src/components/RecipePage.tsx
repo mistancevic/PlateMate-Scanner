@@ -13,6 +13,8 @@ import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
 import type { Published } from "./PublishSheet";
 import { StepsEditor } from "./StepsEditor";
 import { CountAmount, isCounted } from "./CountAmount";
+import { OriginalSteps, StepsHint } from "./StepsView";
+import { foodNames, diffFoods, diffLine } from "../stepsState";
 import { stepParts } from "../steps";
 import { coverIsDrawn, isDrawnPhoto, TEST_MODELS } from "../covers";
 import { sig } from "../photos";
@@ -30,7 +32,7 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, openOriginal }: {
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, openOriginal, originalFoods, pdRef, fitPd }: {
   // 0.2.18 (canvas board IM, IM11, IM11b): Draw a picture, with the day's count; none without the AI
   picture?: { count: { used: number; limit: number } | null; drawing: boolean; draw: () => void; refresh: () => void } | null;
   // 0.2.11 (canvas board CO, CO4, CO4b): For members, on a recipe of yours
@@ -43,6 +45,10 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onPublish: (now?: boolean) => void; onDelete: ReactNode; close: () => void;
   // IM23c (0.2.23): one line for today after How was it; the recipe a changed dish was adapted from
   top?: ReactNode; openOriginal?: (() => void) | null;
+  // RP1b (0.2.25): the foods the original steps were written for, so the page can say what differs
+  originalFoods?: string[] | null;
+  // RP2 (0.2.25): the readout above the Nutrition table, against your target
+  pdRef?: number | null; fitPd?: (pd: number | null) => string;
 }) {
   useBack(true, close);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,6 +109,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   // ---- the steps, drafted by Chef Mealan (CH5): shown to read, kept only with Keep these steps ----
   const [drafted, setDrafted] = useState<{ steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[] } | null>(null);
   const [drafting, setDrafting] = useState<"" | "working" | string>("");
+  // RP1c (0.2.25): Chef Mealan's steps or the original, when both are there
+  const [stepView, setStepView] = useState<"own" | "orig">("own");
   const askDraft = async () => {
     if (!draft) return;
     setDrafting("working");
@@ -169,11 +177,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         : <button type="button" className="rq-name" aria-label={`Rename ${meal.title}`} onClick={() => setNaming(meal.title)}>{meal.title}</button>}
       {meal.source && <SourceBox meal={meal} onPatch={onPatch} openOriginal={openOriginal ?? null} />}
       {/* IM21: one serving first, when the recipe makes more than one */}
-      <div className="rp-stats">
-        <span><b>{fmt((sum.calories ?? 0) / serves, 0)}</b><small>kcal{serves > 1 ? `, 1 ${oneWord}` : ""}</small></span>
-        <span><b>{fmt((sum.protein ?? 0) / serves, 1)}</b><small>g protein</small></span>
-        <span className="wide"><b>{pdText(pd)}</b><small>protein density</small></span>
-      </div>
+      {/* RP2 (0.2.25): the three tiles gave way to the PD readout above the Nutrition table */}
       <section className={`card rq-foods ${edit ? "editing" : ""}`}>
         <b>Foods</b>
         {edit && <div className="pt-h pt-mode"><span><small>Parts: give a food its part, or make it optional. Optional foods stay out of the numbers.</small></span><span className="pt-acts">{newPart === null ? <button className="link" onClick={() => setNewPart("")}>New part</button> : <input className="pt-new" autoFocus aria-label="Name of the new part" placeholder="Topping" value={newPart} onChange={(e) => setNewPart(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = cleanPart(newPart); if (v) setExtraParts((l) => [...l, v]); setNewPart(null); } }} onBlur={() => setNewPart(null)} />}</span></div>}
@@ -219,7 +223,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           <small className="muted">The recipe's numbers leave them out, and so do ours. Make it, and add any of them on the plate.</small>
         </section>
       )}
-      {!edit && <NutritionCard items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={meal.stated ?? null} />}
+      <NutritionCard items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={meal.stated ?? null} pdRef={pdRef ?? null} fitPd={fitPd} readoutOnly={Boolean(edit)} />
       <section className={`card rq-steps ${edit ? "editing" : ""}`}>
         <b>Steps</b>
         {edit
@@ -228,19 +232,50 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
               <small className="rq-drafted">{drafted.marks ? (drafted.kitchen || `${CHEF_NAME}'s steps, from the original, for your amounts and your kitchen. Each says how it relates to the original.`) : "Drafted by Chef Mealan from your foods and amounts. Read it, change any word."}</small>
               {drafted.marks && drafted.kitchen && <small className="muted">Each step says how it relates to the original.</small>}
               <ol className="rp-steps">{drafted.steps.map((x, k) => [partHead(drafted.parts, k), <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}<Mark m={drafted.marks?.[k]} /></div></li>])}</ol>
-              <div className="button-row"><button className="pill pill-small pill-primary" onClick={() => { onPatch({ steps: drafted.steps, stepMarks: drafted.marks, stepsKitchen: drafted.kitchen, stepParts: drafted.parts }); setDrafted(null); }}>Keep these steps</button><button className="pill pill-small" onClick={askDraft}>Draft again</button><button className="link" onClick={() => { setDrafted(null); startEdit(); }}>Write my own</button></div>
+              <div className="button-row"><button className="pill pill-small pill-primary" onClick={() => { onPatch({ steps: drafted.steps, stepMarks: drafted.marks, stepsKitchen: drafted.kitchen, stepParts: drafted.parts, stepsFor: foodNames(meal.items) }); setDrafted(null); }}>Keep these steps</button><button className="pill pill-small" onClick={askDraft}>Draft again</button><button className="link" onClick={() => { setDrafted(null); startEdit(); }}>Write my own</button></div>
             </>)
-          : (meal.steps?.length ?? 0) > 0
-            ? (<>
+          : (() => {
+            // RP1 to RP1c (0.2.25): the original is the steps; Chef Mealan's on demand, with a line for the case
+            const orig = meal.source?.steps ?? [], own = meal.steps ?? [];
+            const now = foodNames(meal.items);
+            const diff = diffFoods(now, originalFoods ?? null), stale = own.length ? diffFoods(now, meal.stepsFor) : null;
+            const status = drafting === "working" ? <small className="rq-drafting">Chef Mealan is writing the steps.</small> : drafting ? <small className="rq-drafting">{drafting}</small> : null;
+            const by = meal.source?.name ? `As ${meal.source.name} writes them, for the whole recipe.` : "As the original writes them, for the whole recipe.";
+            const ownList = (<>
+              {stale && <StepsHint tone="warn">These steps were written for the earlier foods. {diffLine(stale)}</StepsHint>}
+              {stale && draft && <div className="button-row"><button className="pill pill-small pill-primary" disabled={drafting === "working"} onClick={askDraft}>Write them again</button></div>}
               {meal.stepMarks && <small className="muted">{meal.stepsKitchen || `${CHEF_NAME}'s steps, from the original, for your amounts and your kitchen. Each says how it relates to the original.`}</small>}
-              <ol className="rp-steps">{meal.steps!.map((x, k) => [partHead(meal.stepParts, k), <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className={`st-amt${p.gone ? " gone" : ""}`}>{p.label}</b>))}<Mark m={meal.stepMarks?.[k]} /></div></li>])}</ol>
-            </>)
-            : draft ? (<>
+              <ol className="rp-steps">{own.map((x, k) => [partHead(meal.stepParts, k), <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className={`st-amt${p.gone ? " gone" : ""}`}>{p.label}</b>))}<Mark m={meal.stepMarks?.[k]} /></div></li>])}</ol>
+            </>);
+            if (own.length && orig.length) return (<>
+              <div className="segments rq-steps-seg" role="tablist" aria-label="Which steps">
+                <button role="tab" aria-selected={stepView === "own"} className={`seg ${stepView === "own" ? "on" : ""}`} onClick={() => setStepView("own")}>{meal.stepMarks ? `${CHEF_NAME}'s` : "Yours"}</button>
+                <button role="tab" aria-selected={stepView === "orig"} className={`seg ${stepView === "orig" ? "on" : ""}`} onClick={() => setStepView("orig")}>Original</button>
+              </div>
+              {status}
+              {stepView === "own" ? ownList : <><small className="muted">{by}</small><OriginalSteps steps={orig} /></>}
+            </>);
+            if (own.length) return <>{status}{ownList}</>;
+            if (orig.length) return diff ? (<>
+              <StepsHint tone="warn">{diffLine(diff)}</StepsHint>
+              {status}
+              {draft && <div className="button-row"><button className="pill pill-small pill-primary" disabled={drafting === "working"} onClick={askDraft}>Write the steps for my dish</button></div>}
+              <small className="muted">The original, for the original foods:</small>
+              <OriginalSteps steps={orig} />
+            </>) : (<>
+              <small className="muted">{by}</small>
+              <OriginalSteps steps={orig} />
+              <StepsHint tone="ok">The original works with your foods as they are.</StepsHint>
+              {status}
+              {draft && <><div className="button-row"><button className="pill pill-small" disabled={drafting === "working"} onClick={askDraft}>{CHEF_NAME}'s way</button></div>
+                <small className="muted">{CHEF_NAME} writes the steps for your amounts and your kitchen, when you want them.</small></>}
+            </>);
+            return draft ? (<>
               <small className="muted">No steps yet.</small>
-              {drafting === "working" ? <small className="rq-drafting">Chef Mealan is writing the steps.</small> : drafting ? <small className="rq-drafting">{drafting}</small> : null}
+              {status}
               <div className="button-row"><button className="pill pill-small pill-primary" disabled={drafting === "working"} onClick={askDraft}>Draft the steps with Chef Mealan</button><button className="link" onClick={startEdit}>Write my own</button></div>
-            </>)
-            : <small className="muted">No steps yet. Edit recipe adds them.</small>}
+            </>) : <small className="muted">No steps yet. Edit recipe adds them.</small>;
+          })()}
       </section>
       {edit ? (
         <>
@@ -335,13 +370,6 @@ function SourceBox({ meal, onPatch, openOriginal }: { meal: Meal; onPatch: (patc
       </>)}
       {!shots.length && Array.isArray(src.shotSigs) && src.shotSigs.length > 0 && <small className="muted">Your screenshots are loading.</small>}
       {/* IM9b: the original method, read from the screenshot or the page, for the person only */}
-      {(src.steps?.length ?? 0) > 0 && (
-        <details className="rq-orig">
-          <summary>Original steps, from {src.from === "link" ? "the page" : (src.shotSigs?.length ?? shots.length) > 1 ? "your screenshots" : "your screenshot"}</summary>
-          <ul>{src.steps!.map((x, k) => <li key={k}>{tempsIn(x)}</li>)}</ul>
-          <small className="muted">For you only, like the {src.from === "link" ? "link" : "screenshot"}. Members and public pages get {CHEF_NAME}'s steps.</small>
-        </details>
-      )}
     </section>
   );
 }
@@ -360,7 +388,7 @@ function partHead(parts: string[] | undefined, k: number) {
 }
 
 // IM21, IM21b: Nutrition, worked out by code from the foods and their grams, in the EU label order; exact counts (All 2)
-function NutritionCard({ items, serves, one, all, stated }: { items: Ingredient[]; serves: number; one: string; all: string; stated: Meal["stated"] | null }) {
+function NutritionCard({ items, serves, one, all, stated, pdRef, fitPd, readoutOnly }: { items: Ingredient[]; serves: number; one: string; all: string; stated: Meal["stated"] | null; pdRef: number | null; fitPd?: (pd: number | null) => string; readoutOnly?: boolean }) {
   const n = nutritionOf(items, serves);
   if (!n) return null;
   const many = serves > 1;
@@ -370,10 +398,24 @@ function NutritionCard({ items, serves, one, all, stated }: { items: Ingredient[
   const pdS = stated && stated.kcal > 0 ? (100 * stated.protein) / stated.kcal : null;
   const diff = stated && energy ? Math.round(((energy - stated.kcal) / stated.kcal) * 100) : null;
   const missing = [...new Set(n.rows.flatMap((r) => r.missing))];
-  return (
-    <section className="card nt-card" aria-label="Nutrition">
+  // RP2 (0.2.25): what each column weighs, and PD above the table, as on the Plate
+  const grams = items.filter((i) => i.grams > 0).reduce((k, i) => k + i.grams, 0);
+  const prot = n.rows.find((r) => r.key === "protein");
+  const pd1 = n.pd === null ? null : Math.round(n.pd * 10) / 10;
+  const w = (g: number) => <span className="nt-w">{fmt(g, 0)} g</span>;
+  return (<>
+    <section className={`readout readout-fit-${fitPd ? fitPd(n.pd) : "plan"} rq-readout`} aria-label="Protein density">
+      <div className="readout-top"><span>{many ? `One ${one}` : "All of it"}</span><span>PD</span></div>
+      <div className="readout-mid">
+        <b>{pd1 === null ? "?" : pd1.toFixed(1)}</b>
+        <div><span>{pd1 === null || pdRef === null ? "no target set" : n.pd! >= pdRef ? "fits your plan" : `${(Math.round((pdRef - n.pd!) * 10) / 10).toFixed(1)} under your ${pdRef.toFixed(1)}`}</span>
+          <small>{energy === null ? "?" : fmt(many ? energy : n.rows[0].all ?? 0, 0)} kcal · {fmt((many ? prot?.serving : prot?.all) ?? 0, 1)} g protein · {fmt(grams / (many ? serves : 1), 0)} g</small></div>
+      </div>
+    </section>
+    {/* editing: the readout follows as you type; the table comes back with Save */}
+    {!readoutOnly && <section className="card nt-card" aria-label="Nutrition">
       <b>Nutrition</b>
-      <div className={`nt-row nt-th ${many ? "" : "nt-two"}`}><span />{many && <b>1 {one.toUpperCase()}</b>}<small>{many ? `ALL ${serves % 1 === 0 ? serves : fmt(serves, 1)}` : "ALL"}</small><small>100 G</small></div>
+      <div className={`nt-row nt-th ${many ? "" : "nt-two"}`}><span />{many && <b>1 {one.toUpperCase()}{w(grams / serves)}</b>}<small>{many ? `ALL ${serves % 1 === 0 ? serves : fmt(serves, 1)}` : "ALL"}{w(grams)}</small><small>100 G</small></div>
       {n.rows.map((r) => (
         <div className={`nt-row ${r.sub ? "nt-sub" : ""} ${many ? "" : "nt-two"}`} key={r.key}>
           <span>{r.label}</span>
@@ -382,7 +424,6 @@ function NutritionCard({ items, serves, one, all, stated }: { items: Ingredient[
           <small>{v(r.per100, r.unit, 1)}</small>
         </div>
       ))}
-      <div className={`nt-row nt-pd ${many ? "" : "nt-two"}`}><span>PD</span>{many && <b>{n.pd === null ? "?" : (Math.round(n.pd * 10) / 10).toFixed(1)}</b>}<small>{many ? "" : n.pd === null ? "?" : (Math.round(n.pd * 10) / 10).toFixed(1)}</small><small>{n.share === null ? "" : `${n.share} % kcal`}</small></div>
       {missing.length > 0 && <small className="muted">? : no value for {missing.join(", ")}. Add it on the food and the table follows.</small>}
       {parts.length > 1 && (
         <div className="nt-parts-box">
@@ -395,6 +436,6 @@ function NutritionCard({ items, serves, one, all, stated }: { items: Ingredient[
         <small className="nt-says">The recipe says, per {one}: {fmt(stated.kcal, 0)} kcal{stated.fats !== null ? ` · ${fmt(stated.fats, 1)} g fat` : ""}{stated.carbs !== null ? ` · ${fmt(stated.carbs, 1)} g carbohydrate` : ""} · {fmt(stated.protein, 1)} g protein{pdS !== null ? ` · PD ${fmt(pdS, 1)}` : ""}.{diff !== null && Math.abs(diff) > 15 ? ` Ours is ${Math.abs(diff)}% ${diff > 0 ? "higher" : "lower"} in energy: the recipe may use other products.` : " Ours agrees."}{n.rows.some((r) => r.key === "polyols") && stated.carbs !== null ? " Its carbohydrate may leave out the sweetener's polyols." : ""}</small>
       )}
       <small className="muted">From the foods and their grams; each value is the food's label or a typical value, marked estimate.{many ? " The plate rounds each food to the gram, so one serving there can read a little apart." : ""}</small>
-    </section>
-  );
+    </section>}
+  </>);
 }

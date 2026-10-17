@@ -62,9 +62,9 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   let t = await text(page, "main");
   ok(/How to make it/.test(t) && !/How do you want to eat it/.test(t), "IM19: after Make it, a recipe gets How to make it");
   ok(await page.locator('[aria-label="What you make"] .choice.on').textContent() === "All 8 slices" && /You eat 1 slice/.test(t) && /The 7 slices left go to Keep for later/.test(t), "IM19: it makes 8, so the whole cake is made; you eat 1 slice; 7 for later");
-  ok(/No steps yet for this recipe/.test(t) && await page.locator("details.rq-orig[open]").count() === 1 && /Preheat|Crush the biscuits/.test(await text(page, "details.rq-orig")), "IM19b: no steps yet: the original open below, for you only");
-  ok(await page.getByRole("button", { name: "Make it from the original" }).count() === 1, "IM19b: you can make it from the original");
-  await page.getByRole("button", { name: "Draft the steps with Chef Mealan" }).click(); await page.waitForTimeout(900);
+  ok(/The recipe's own steps/.test(t) && await page.locator(".mk-card .rp-orig li").count() > 0 && /Preheat|Crush the biscuits/.test(await text(page, ".mk-card .rp-orig")) && /The original works with your foods as they are/.test(t), "RP1 (was IM19b): the original is the steps, and a line says it works; no steps yet: the original open below, for you only");
+  ok(await page.getByRole("button", { name: "Chef Mealan's way" }).count() === 1 && await page.getByRole("button", { name: "I'm making it" }).count() === 1, "RP1: Chef Mealan's way on a tap; I'm making it");
+  await page.getByRole("button", { name: "Chef Mealan's way" }).click(); await page.waitForTimeout(900);
   t = await text(page, "main");
   ok(JSON.stringify(await page.locator(".mk-card .rp-step-part").allTextContents()) === JSON.stringify(["The base", "The filling", "The topping"]) && /120 g digestive biscuits/.test(t) && /200 g cream cheese/.test(t) && /Adapted: 320 °F in the original/.test(t), "IM19: the steps drafted here, part by part, at the whole cake's grams, with the marks");
   ok((await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")))).meals[0].steps.length === 4, "IM19b: the steps are kept with the recipe");

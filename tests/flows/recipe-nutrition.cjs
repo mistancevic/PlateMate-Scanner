@@ -58,17 +58,17 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   await page.reload(); await page.waitForTimeout(1300);
   ok(!/could not be read/.test(await text(page, "main")), "A sweetener with no energy and carbohydrate is a real food: the stored data reads back");
   await openRecipe(page, "Protein cheesecake");
-  const stats = await text(page, ".rp-stats");
-  ok(/kcal, 1 slice/.test(stats), `IM21: the stats say one slice (${stats})`);
+  const stats = await text(page, ".rq-readout");
+  ok(/One slice/.test(stats) && /kcal · [\d.]+ g protein · \d+ g/.test(stats), `RP2 (was IM21): the readout says one slice, with its weight (${stats})`);
   const head = (await page.locator('[aria-label="Nutrition"] .nt-th').first().textContent()).replace(/\s+/g, " ").trim();
-  ok(head === "1 SLICEALL 8100 G", `IM21: columns: 1 slice, All 8, 100 g (${head})`);
+  ok(/^1 SLICE\d+ gALL 8[\d,]+ g100 G$/.test(head), `IM21, RP2: columns: 1 slice, All 8, 100 g, each with its weight (${head})`);
   const labels = await page.locator('[aria-label="Nutrition"] .nt-row > span').allTextContents();
-  ok(JSON.stringify(labels.filter(Boolean)) === JSON.stringify(["Energy", "Fat", "Carbohydrate", "of which polyols", "Protein", "PD"]), `IM21: the EU order, with the sweetener's polyols (${labels.filter(Boolean)})`);
+  ok(JSON.stringify(labels.filter(Boolean)) === JSON.stringify(["Energy", "Fat", "Carbohydrate", "of which polyols", "Protein"]), `IM21: the EU order, with the sweetener's polyols (${labels.filter(Boolean)})`);
   const poly = await text(page, '[aria-label="Nutrition"] .nt-sub');
   ok(/of which polyols\s*5 g\s*40 g/.test(poly.replace(/\s+/g, " ")), `IM21: 40 g erythritol, 5 g a slice (${poly})`);
   const nut = await text(page, '[aria-label="Nutrition"]');
   ok(/By part, 1 slice/.test(nut) && /Base/.test(nut) && /Filling/.test(nut) && /Topping/.test(nut), "IM21: a line by part, for one slice");
-  ok(/% kcal/.test(nut) && !/The recipe says/.test(nut) && !/no value for/.test(nut), "IM21: PD with the share of energy from protein; no recipe numbers when it gives none; nothing missing");
+  ok(!/The recipe says/.test(nut) && !/no value for/.test(nut) && /PD/.test(await text(page, ".rq-readout")), "RP2: PD in the readout above, not in the table; no recipe numbers when it gives none; nothing missing");
   await page.close();
 
   // the cookie: All 2, the recipe's own numbers under ours
@@ -76,7 +76,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   await readIn(p2, cookie);
   await openRecipe(p2, "Choc chip cookie");
   const h2 = (await p2.locator('[aria-label="Nutrition"] .nt-th').first().textContent()).replace(/\s+/g, " ").trim();
-  ok(h2 === "1 COOKIEALL 2100 G", `IM21b: exact counts: 1 cookie, All 2 (${h2})`);
+  ok(/^1 COOKIE\d+ gALL 2\d+ g100 G$/.test(h2), `IM21b, RP2: exact counts: 1 cookie, All 2, with their weights (${h2})`);
   const says = await text(p2, ".nt-says");
   ok(/The recipe says, per cookie: 234 kcal · 6.8 g fat · 29.5 g carbohydrate · 15.5 g protein · PD 6.6\./.test(says), `IM21b: the recipe's own numbers (${says})`);
   await p2.close();

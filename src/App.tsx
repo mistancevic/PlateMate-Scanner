@@ -340,7 +340,7 @@ function LabelCheck({
     if (titleAs) return { eyebrow: "Find a food", title: titleAs, line: "Check what the database says against the pack, then save." };
     if (/barcode|product database|open food facts/i.test(src)) return { eyebrow: where, title: "Barcode", line: "Check what the database says against the pack, then save." };
     if (/photo|label/i.test(src)) return { eyebrow: where, title: "Scan", line: "Check what was read against the pack, then save." };
-    return { eyebrow: where, title: "Type", line: "Name the food, fill the values as on the pack, save." };
+    return { eyebrow: where, title: "Manual", line: "Name the food, fill the values as on the pack, save." };
   })();
   const [refOpen, setRefOpen] = useState(() => Boolean(food.name) && /manual/i.test(food.source || ""));
   const [code, setCode] = useState(food.barcode ?? "");
@@ -483,7 +483,7 @@ function LabelCheck({
         Brand
         <input value={brand} onChange={(e) => setBrand(e.target.value)} />
       </label>
-      {kind.title === "Type" && onLookup && (
+      {kind.title === "Manual" && onLookup && (
         <label className="barcode-field">
           Barcode number, if the pack has one
           <div className="barcode-row">
@@ -781,7 +781,7 @@ export default function App() {
     // the recipe the plate came from (a slot or Recipes, Open), so a new name on the Plate renames it at once
     [plateRecipeId, setPlateRecipeId] = useState<string | null>(null),
     // after How was it (0.2.23, IM23c): the recipe the meal made or changed opens on Recipes, with one line for today
-    [landing, setLanding] = useState<{ id: string; line: string } | null>(null),
+    [landing, setLanding] = useState<{ id: string; line: string; title?: string } | null>(null),
     [profileReady, setProfileReady] = useState(false),
     [loadTry, setLoadTry] = useState(0),
     [talkTurns, setTalkTurns] = useState<Turn[]>([]),
@@ -2017,7 +2017,7 @@ export default function App() {
     planned, filling, setFilling,
     cover: { count: coverCount, drawing: coverDrawing, draw: (m: Meal) => { void drawCover(m); }, refresh: refreshCoverCount },
     landing, clearLanding: () => setLanding(null),
-    landOnRecipe: (id: string, line: string) => { setLanding({ id, line }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
+    landOnRecipe: (id: string, line: string, title?: string) => { setLanding({ id, line, title }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
     openOnPlate: (meal: Meal) => {
       setFilling(null); setPlateRecipeId(meal.id);
       // a recipe that came in from a screenshot or a link opens as it did the first time (0.2.19, IM13): the Plate does it
