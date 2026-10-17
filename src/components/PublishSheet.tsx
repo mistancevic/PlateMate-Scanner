@@ -150,7 +150,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
     return {
       slug: published?.slug ?? slugOf(title), title: title.trim(), lines: lines.trim(), makes: Math.max(1, Math.round(n) || 1), servingName: servingName.trim() || "serving",
       minutes: Number(minutes) > 0 ? Math.round(Number(minutes)) : null,
-      items: meal.items.filter((i) => i.grams > 0).map((i) => ({ name: (names[meal.items.indexOf(i)] ?? i.food.name).trim() || i.food.name, grams: Math.round(i.grams), amount: amountOf(i.grams), per100: { kcal: i.food.calories, protein: i.food.protein, fat: i.food.fats, carbs: i.food.carbs, fibre: i.food.fiber } })),
+      items: meal.items.filter((i) => i.grams > 0).map((i) => ({ name: (names[meal.items.indexOf(i)] ?? i.food.name).trim() || i.food.name, grams: Math.round(i.grams), amount: amountOf(i.grams), ...(i.part ? { part: i.part } : {}), per100: { kcal: i.food.calories, protein: i.food.protein, fat: i.food.fats, carbs: i.food.carbs, fibre: i.food.fiber } })),
       // the page gets the steps as they read, with the amounts written in (R13c)
       steps: steps.split("\n").map((x) => stepText(x, meal.items)).filter(Boolean).slice(0, 30), rating, who: "everyone",
       per100: nums.per100, perServing: nums.perServing, all: nums.all, pd: nums.pd, proteinShare: nums.proteinShare, fits: fitsOf(nums.pd),

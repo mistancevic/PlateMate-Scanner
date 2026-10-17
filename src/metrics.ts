@@ -8,7 +8,7 @@ import type { Slot } from "./slots";
 import { dayRecord } from "./record";
 import { livedByPlan } from "./metricsCalc";
 
-const SEND = new Set(["app_open", "day_closed", "fit_used", "label_read", "safety_flag", "meal_saved", "feedback", "made", "carry", "food_in", "mix_taken", "adult_confirmed", "cover", "members", "recipe_in", "recipe_fit"]);
+const SEND = new Set(["app_open", "day_closed", "fit_used", "label_read", "safety_flag", "meal_saved", "feedback", "made", "carry", "food_in", "mix_taken", "adult_confirmed", "cover", "members", "recipe_in", "recipe_fit", "parts"]);
 const KEYS = new Set(["way", "how", "went", "ate", "locked", "method", "kind", "moment", "case", "status", "result", "source", "items", "pd", "kcal", "photos", "products",
   "date", "planned", "byPlan", "extras", "swapped", "lived", "proteinPct", "energyPct", "kept"]);
 // the event as it may leave the phone: short codes and numbers only

@@ -32,7 +32,8 @@ export type LogEvent =
   | "members"        // data.how = open | make | keep | share
   // a recipe from a screenshot or a link (0.2.16, board IM)
   | "recipe_in"      // data.how = shot | link, data.result = read | plate | login | fetch | no-recipe | not-recipe
-  | "recipe_fit";    // data.way = change | side, data.result = shown | failed | yes | ok | no
+  | "recipe_fit"     // data.way = change | side, data.result = shown | failed | yes | ok | no
+  | "parts";         // data.how = leave | change | set (0.2.19, boards IM15 to IM18)
 const KEY = "chefmealan-log";
 export function log(event: LogEvent, data: Record<string, unknown> = {}) {
   try {

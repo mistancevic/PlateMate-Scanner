@@ -133,7 +133,7 @@ export function RecipeView({ r, member, photoSrc, top }: { r: Loaded; member: Me
         <>
           <section className="rp-card">
             <div className="rp-card-head"><b>Ingredients</b><small>for {r.makes} {plural(r.makes, r.servingName)}</small></div>
-            {r.items.map((i, k) => <div className="rp-row" key={k}><span>{i.name}</span><b>{i.amount}</b></div>)}
+            {r.items.map((i, k) => [i.part && (k === 0 || r.items[k - 1].part !== i.part) ? <div className="rp-part" key={`h${k}`}>{i.part}</div> : null, <div className="rp-row" key={k}><span>{i.name}</span><b>{i.amount}</b></div>])}
           </section>
           {r.steps.length > 0 && (
             <section className="rp-card">

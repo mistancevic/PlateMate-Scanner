@@ -58,8 +58,8 @@ const U = "http://127.0.0.1:3210";
   // IM8, IM9b, IM11 on the recipe page
   await openRecipe();
   let t = await text(".rq-optional");
-  ok(/Optional, not in the numbers/.test(t) && /Vanilla extract5 ml on the recipe5 g/.test(t) && /for max gooeyness/.test(t) && /on top, to taste/.test(t) && (await page.locator(".rq-optional").getByRole("button", { name: "Add when cooking" }).count()) === 3, "IM8: Optional, not in the numbers: each with its words, grams and Add when cooking");
-  ok(/Left out|leave them out, and so do ours/.test(t), "IM8: the recipe's numbers leave them out, and so do ours");
+  ok(/Optional, not in the numbers/.test(t) && /Vanilla extract5 ml on the recipe5 g/.test(t) && /for max gooeyness/.test(t) && /on top, to taste/.test(t) && (await page.locator(".rq-optional").getByRole("button", { name: "Add when cooking" }).count()) === 0, "IM8, IM14: Optional, not in the numbers: each with its words and grams; the plate adds them, not this page");
+  ok(/leave them out, and so do ours\. Make it, and add any of them on the plate\./.test(t), "IM14: the recipe's numbers leave them out; Make it, and add them on the plate");
   t = await text(".rq-source");
   ok(/Original steps, from your screenshot/.test(t) && /For you only, like the screenshot\. Members and public pages get Chef Mealan's steps\./.test(t), "IM9b: Original steps, from your screenshot, for you only");
   await page.locator(".rq-orig summary").click(); await page.waitForTimeout(200);
@@ -105,11 +105,16 @@ const U = "http://127.0.0.1:3210";
   ok(JSON.stringify(steps[steps.length - 1].equipment) === JSON.stringify(["stovetop", "microwave", "airfryer"]), "IM10b: Chef Mealan gets what you cook with");
   ok(steps.length === before + 1 && /This needs an oven; the air fryer would burn the top before the middle is done\./.test(await text(".rq-steps")) && !/didn't pass the checks/.test(await text(".rq-steps")), "IM10b: no sensible way: said plainly, asked once");
 
-  // IM8: Add when cooking: one portion's share on the plate
-  await page.locator(".rq-opt-row").filter({ hasText: "Extra chocolate chips" }).getByRole("button", { name: "Add when cooking" }).click(); await page.waitForTimeout(900);
-  const rows = await page.locator(".plate-card .rows .row-text b").allTextContents();
-  const grams = await page.locator('.plate-card .rows input[aria-label^="Grams of"]').evaluateAll((l) => l.map((x) => Number(x.value)));
-  ok(/Extra chocolate chips/.test(await text(".plate-card .rows")) && grams[grams.length - 1] === 8, `IM8: Add when cooking puts it on the plate, one serving's share: 8 g (${grams})`);
+  // IM13, IM12, IM12b: Make it opens the plate of the first time, with the optional foods; + Add puts one on, Leave it out sends it back
+  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(1200);
+  ok(await page.locator(".plate-card .in-portion").count() === 1 && await page.locator(".plate-card .dish-row").count() === 0 && await page.locator('.plate-card .rows input[aria-label^="Grams of"]').count() === 5, "IM13: Make it from Recipes: the foods one by one, with the two portions, not one locked block");
+  ok(/Optional, not on the plate/.test(await text(".pt-optlist")) && await page.locator(".pt-optlist .pt-opt").count() === 3, "IM12: the three optional foods under the foods, out of the numbers");
+  const kcal0 = await text(".plate-card .readout");
+  await page.getByRole("button", { name: "Add Extra chocolate chips" }).click(); await page.waitForTimeout(500);
+  ok(/Extra chocolate chips/.test(await text(".plate-card .rows")) && /optional, added · Leave it out/.test(await text(".plate-card .rows")) && await page.locator(".pt-optlist .pt-opt").count() === 2 && (await text(".plate-card .readout")) !== kcal0, "IM12b: + Add puts it on the plate as a food like the others; the numbers move");
+  ok(await page.locator(".plate-card .in-portion").count() === 1, "IM12b: still the recipe's plate, with its two portions");
+  await page.locator(".plate-card .rows").getByRole("button", { name: "Leave it out" }).click(); await page.waitForTimeout(400);
+  ok(await page.locator(".pt-optlist .pt-opt").count() === 3 && (await text(".plate-card .readout")) === kcal0, "IM12b: Leave it out sends it back; the numbers as before");
 
   // UN: °F, lb and ft and in on Profile; the account keeps kg, cm and °C
   await page.goto(U + "/me/profile"); await page.waitForTimeout(900);

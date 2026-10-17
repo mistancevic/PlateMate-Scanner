@@ -119,7 +119,7 @@ export function RecipesScreen(p: AppApi) {
       <RecipePage meal={opened} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
         pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
-        onMakeIt={(extra) => { setOpenId(null); p.openOnPlate(opened, extra); }} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
+        onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
         onDelete={() => { setOpenId(null); setState((s) => ({ ...s, meals: s.meals.filter((x) => x.id !== opened.id) })); }}
         close={() => setOpenId(null)}
         tryPhoto={testOn ? async (model: string) => {
@@ -136,13 +136,16 @@ export function RecipesScreen(p: AppApi) {
           const items = opened.items.filter((i) => i.grams > 0);
           const ask = async (failed?: string) => {
             // 0.2.18 (board IM, IM9, IM10): the original method, what the person cooks with, how many it makes
-            const res = await fetch("/api/steps", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: opened.title, items: items.map((i) => ({ name: i.food.name, grams: i.grams })), kitchens: p.personal.kitchens ?? [], failed,
+            const res = await fetch("/api/steps", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: opened.title, items: items.map((i) => ({ name: i.food.name, grams: i.grams, part: i.part ?? "" })), optional: (opened.optional ?? []).map((o) => ({ name: o.name, part: o.part ?? "" })), kitchens: p.personal.kitchens ?? [], failed,
               original: opened.source?.steps ?? [], equipment: equipmentOf(p.personal), makes: opened.makes ?? null }) });
             const d = await res.json().catch(() => ({}));
             if (!res.ok) throw new Error(d.error || "Chef Mealan could not answer. Try again.");
             if (typeof d.cannot === "string" && d.cannot) return { ok: false as const, why: d.cannot, cannot: true };
-            const r = fromDraft(d.steps ?? [], items, state.foods.map((f) => f.name));
-            return r.ok ? { ...r, ...(Array.isArray(d.marks) ? { marks: d.marks as StepMark[] } : {}), ...(typeof d.kitchen === "string" ? { kitchen: d.kitchen } : {}) } : r;
+            // optional foods may be named in words, where the original puts them (IM17)
+            const optNames = new Set((opened.optional ?? []).map((o) => o.name.toLowerCase()));
+            const r = fromDraft(d.steps ?? [], items, state.foods.map((f) => f.name).filter((n) => !optNames.has(n.toLowerCase())));
+            const parts = Array.isArray(d.parts) && items.some((i) => i.part) ? (d.parts as unknown[]).map((x) => String(x ?? "")) : undefined;
+            return r.ok ? { ...r, ...(Array.isArray(d.marks) ? { marks: d.marks as StepMark[] } : {}), ...(typeof d.kitchen === "string" ? { kitchen: d.kitchen } : {}), ...(parts ? { parts } : {}) } : r;
           };
           const first = await ask();
           return first.ok || (first as { cannot?: boolean }).cannot ? first : ask((first as { why: string }).why);

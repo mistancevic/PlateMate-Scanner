@@ -4,7 +4,7 @@
 import type { Meal } from "./pilot";
 import { BANDS } from "./goal";
 
-export type PublicItem = { name: string; grams: number; amount: string; per100?: { kcal: number | null; protein: number | null; fat: number | null; carbs: number | null; fibre: number | null } };
+export type PublicItem = { name: string; grams: number; amount: string; part?: string; per100?: { kcal: number | null; protein: number | null; fat: number | null; carbs: number | null; fibre: number | null } };
 export type PublicNutrition = { kcal: number; protein: number; carbs: number; fat: number; fibre: number | null };
 export type PublicRecipe = {
   slug: string; title: string; lines: string; makes: number; servingName: string; minutes: number | null;

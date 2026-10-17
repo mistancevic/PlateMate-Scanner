@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, useMemo } from "react";
+import { optAt } from "./parts";
 import {
   Camera,
   Plus,
@@ -2006,12 +2007,11 @@ export default function App() {
     // Plan (0.2.2): the meals in the slots, by date and slot; a plate made for a slot lands in it when saved
     planned, filling, setFilling,
     cover: { count: coverCount, drawing: coverDrawing, draw: (m: Meal) => { void drawCover(m); }, refresh: refreshCoverCount },
-    openOnPlate: (meal: Meal, extra?: Meal["optional"]) => {
+    openOnPlate: (meal: Meal) => {
       setFilling(null); setPlateRecipeId(meal.id);
-      // an optional food added when cooking (0.2.18, board IM, IM8): one portion's share, with its numbers
-      const of = portionsIn(meal);
-      const more: Ingredient[] = (extra ?? []).map((o) => ({ id: `opt-${Math.random().toString(36).slice(2, 9)}`, food: o.food, grams: Math.max(1, Math.round(o.grams / of)), locked: false }));
-      setState((s) => ({ ...s, title: meal.title, items: [...asDish(meal), ...more], portion: null, foods: [...s.foods, ...more.map((i) => i.food).filter((f) => !s.foods.some((x) => x.id === f.id || x.name.toLowerCase() === f.name.toLowerCase()))] }));
+      // a recipe that came in from a screenshot or a link opens as it did the first time (0.2.19, IM13): the Plate does it
+      if (meal.makes) setState((s) => ({ ...s, title: meal.title, items: [], portion: null, optional: undefined, leftOut: undefined, openRecipe: meal.id }));
+      else setState((s) => ({ ...s, title: meal.title, items: asDish(meal), portion: null, fromRecipe: undefined, leftOut: undefined, optional: optAt(meal.optional, 1 / portionsIn(meal), uid) }));
       setKind(meal.kind ?? "meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
     },
     // a name typed on the Plate (Milan, 11 October 2026): the recipe it came from and the slot it is for take it at once
@@ -2033,7 +2033,7 @@ export default function App() {
     fillOnPlate: (f: Filling, meal?: Meal | null, title?: string) => {
       setFilling(f);
       setPlateRecipeId(meal?.id || f.mealId || null);
-      setState((s) => ({ ...s, title: meal?.title ?? title ?? "", items: meal ? asDish(meal) : [], portion: null }));
+      setState((s) => ({ ...s, title: meal?.title ?? title ?? "", items: meal ? asDish(meal) : [], portion: null, fromRecipe: undefined, leftOut: undefined, optional: meal ? optAt(meal.optional, 1 / portionsIn(meal), uid) : undefined }));
       setKind("meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
     },
     // a link that changes the tab leaves any open panel or chat behind, or it would land under them and look dead

@@ -80,7 +80,13 @@ export type Ingredient = {
   dish?: { id: string; title: string; of: number; n: number; base: number };
   // what the food does in the dish, as read from a recipe (0.2.16, board IM): a swap keeps it
   role?: string;
+  // the dish's part it belongs to (0.2.19, boards IM15 to IM18): Base, Filling, Topping; none when the dish is one list
+  part?: string;
+  // an optional food added to the plate (0.2.19, IM12b): Leave it out sends it back to the optional list
+  optional?: { written?: string; note?: string };
 };
+// an optional food on the plate, out of the numbers until added (0.2.19, IM12): grams for this plate's portion
+export type PlateOpt = { id: string; name: string; written?: string; note?: string; grams: number; food: Food; part?: string };
 // a recipe as a dish on the plate: one portion of a batch recipe (two or more foods, a portion well under the batch)
 // how many portions the recipe's foods make, as the plate divides them
 export function portionsIn(m: Meal): number {
@@ -134,7 +140,9 @@ export type Meal = {
   // steps: the original method as read (0.2.18, board IM, IM9b): for the person only, never shared or published
   source?: { name: string; url?: string; from: "screenshot" | "link"; at: string; shotSigs?: string[]; steps?: string[] };
   // optional ingredients the recipe names (0.2.18, IM8): kept out of the numbers, whole-recipe grams, added when cooking
-  optional?: { name: string; written: string; note?: string; grams: number; food: Food }[];
+  optional?: { name: string; written: string; note?: string; grams: number; food: Food; part?: string }[];
+  // the part of each step, aligned with steps (0.2.19, IM17); none when the recipe is one list
+  stepParts?: string[];
   // how each of Chef Mealan's steps relates to the original (0.2.18, IM9, IM10b); cleared when the steps are edited
   stepMarks?: StepMark[];
   stepsKitchen?: string;
@@ -182,6 +190,11 @@ export type PilotState = {
   portion: number | null;
   // the recipe the plate came from, when it came in from a screenshot or a link (0.2.16, board IM): How was it points at it
   fromRecipe?: string;
+  // 0.2.19 (IM12, IM16b): the plate's optional foods, and the parts left out with their foods (Put it back restores them)
+  optional?: PlateOpt[];
+  leftOut?: { part: string; items: Ingredient[]; at?: number }[];
+  // a recipe that came in, opened from Recipes (0.2.19, IM13): the plate puts it on as the first time, then clears this
+  openRecipe?: string;
 };
 export const EMPTY: Nutrition = {
   calories: null,

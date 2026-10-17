@@ -16,6 +16,7 @@ import { stepParts } from "../steps";
 import { coverIsDrawn, isDrawnPhoto, TEST_MODELS } from "../covers";
 import { sig } from "../photos";
 import { CHEF_NAME } from "./Mark";
+import { partsOf, cleanPart, leanFood } from "../parts";
 
 // The recipe's own page in the app (0.2.5+r11, canvas board S3, R8 to R11, approved 12 October 2026). Photos first: the
 // cover large, every photo with × to delete, ‹ › to move the picked one (first place is the cover), Add. Then the name
@@ -34,9 +35,9 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   // 0.2.13: a realistic photo to try against the drawing; the owner only, on the preview
   tryPhoto?: ((model: string) => Promise<string>) | null;
   // 0.2.10 (canvas board CH, CH5): Chef Mealan drafts the steps; none without the AI
-  draft?: (() => Promise<{ ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string } | { ok: false; why: string; cannot?: boolean }>) | null;
+  draft?: (() => Promise<{ ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[] } | { ok: false; why: string; cannot?: boolean }>) | null;
   meal: Meal; cards: Feedback[]; foods: Food[]; cook: boolean; state: PubState; pub: Published | null; approver: string; direct: boolean; unpublished?: string[];
-  onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: (extra?: Meal["optional"]) => void; onPublish: (now?: boolean) => void; onDelete: () => void; close: () => void;
+  onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onPublish: (now?: boolean) => void; onDelete: () => void; close: () => void;
 }) {
   useBack(true, close);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,12 +69,17 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const [naming, setNaming] = useState<string | null>(null);
   const saveName = () => { if (naming !== null) { const t = naming.trim(); if (t && t !== meal.title) onRename(t); setNaming(null); } };
   // ---- edit mode (R11): a draft of the foods, the grams and the steps; nothing changes until Save changes ----
-  const [edit, setEdit] = useState<{ items: Ingredient[]; steps: string[] } | null>(null);
+  const [edit, setEdit] = useState<{ items: Ingredient[]; steps: string[]; optional: NonNullable<Meal["optional"]> } | null>(null);
+  const [newPart, setNewPart] = useState<string | null>(null);
+  const [extraParts, setExtraParts] = useState<string[]>([]);
   const [find, setFind] = useState<string | null>(null);
   const items = edit ? edit.items : meal.items;
   const sum = aggregate(items.filter((i) => i.grams > 0));
   const pd = density(sum.protein, sum.calories);
-  const startEdit = () => { setEdit({ items: meal.items.map((i) => ({ ...i })), steps: [...(meal.steps ?? [])] }); setFind(null); };
+  const startEdit = () => { setEdit({ items: meal.items.map((i) => ({ ...i })), steps: [...(meal.steps ?? [])], optional: [...(meal.optional ?? [])] }); setFind(null); setExtraParts([]); };
+  // parts in Edit recipe (0.2.19, IM18): each food's part, a new part, optional on and off
+  const editParts = edit ? [...new Set([...partsOf(edit.items, edit.optional), ...extraParts])] : [];
+  const PartPick = ({ value, onPick }: { value: string; onPick: (v: string) => void }) => <select className="pt-chip pt-select" aria-label="Part" value={value} onChange={(e) => onPick(e.target.value)}><option value="">No part</option>{[...new Set([...editParts, ...(value ? [value] : [])])].map((x) => <option key={x} value={x}>{x}</option>)}</select>;
   const save = () => {
     if (!edit) return;
     const kept = edit.items.filter((i) => i.grams > 0);
@@ -81,18 +87,18 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
     const steps = edit.steps.map((x) => x.replace(/\s+/g, " ").trim()).filter(Boolean).slice(0, 30), total = kept.reduce((n, i) => n + i.grams, 0);
     // a recipe that says how many it makes keeps its portions; steps changed by hand lose their marks (0.2.18, IM9)
     const same = JSON.stringify(steps) === JSON.stringify(meal.steps ?? []);
-    onPatch({ items: kept, portion: meal.makes ? Math.round(total / meal.makes.n) : total, steps, ...(same ? {} : { stepMarks: undefined, stepsKitchen: undefined }) });
+    onPatch({ items: kept, portion: meal.makes ? Math.round(total / meal.makes.n) : total, steps, optional: edit.optional.length ? edit.optional : undefined, ...(same ? {} : { stepMarks: undefined, stepsKitchen: undefined, stepParts: undefined }) });
     setEdit(null); setFind(null);
   };
   const matches = find === null ? [] : foods.filter((f) => !items.some((i) => i.food.id === f.id) && (!find.trim() || f.name.toLowerCase().includes(find.trim().toLowerCase()))).slice(0, 8);
   const live = state === "live" && pub;
   // ---- the steps, drafted by Chef Mealan (CH5): shown to read, kept only with Keep these steps ----
-  const [drafted, setDrafted] = useState<{ steps: string[]; marks?: StepMark[]; kitchen?: string } | null>(null);
+  const [drafted, setDrafted] = useState<{ steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[] } | null>(null);
   const [drafting, setDrafting] = useState<"" | "working" | string>("");
   const askDraft = async () => {
     if (!draft) return;
     setDrafting("working");
-    try { const d = await draft(); if (d.ok) { setDrafted({ steps: d.steps, marks: d.marks, kitchen: d.kitchen }); setDrafting(""); } else if ((d as { cannot?: boolean }).cannot) setDrafting((d as { why: string }).why); else setDrafting(`Chef Mealan's draft didn't pass the checks (${(d as { why: string }).why}). Try again, or write your own.`); }
+    try { const d = await draft(); if (d.ok) { setDrafted({ steps: d.steps, marks: d.marks, kitchen: d.kitchen, parts: d.parts }); setDrafting(""); } else if ((d as { cannot?: boolean }).cannot) setDrafting((d as { why: string }).why); else setDrafting(`Chef Mealan's draft didn't pass the checks (${(d as { why: string }).why}). Try again, or write your own.`); }
     catch (e: any) { setDrafting(e?.message || "Chef Mealan could not answer. Try again."); }
   };
   return (
@@ -160,15 +166,23 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       </div>
       <section className={`card rq-foods ${edit ? "editing" : ""}`}>
         <b>Foods</b>
-        {items.map((it, k) => (
+        {edit && <div className="pt-h pt-mode"><span><small>Parts: give a food its part, or make it optional. Optional foods stay out of the numbers.</small></span><span className="pt-acts">{newPart === null ? <button className="link" onClick={() => setNewPart("")}>New part</button> : <input className="pt-new" autoFocus aria-label="Name of the new part" placeholder="Topping" value={newPart} onChange={(e) => setNewPart(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = cleanPart(newPart); if (v) setExtraParts((l) => [...l, v]); setNewPart(null); } }} onBlur={() => setNewPart(null)} />}</span></div>}
+        {items.map((it, k) => {
+          const head = !edit && it.part && (k === 0 || items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{it.part}</div> : null;
+          return [head, (
           <div className="sheet-row rq-food" key={it.id}>
-            <small>{it.food.name}</small>
-            {edit
+            {edit ? <span className="rq-food-edit"><small>{it.food.name}</small><span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>Optional</button></span></span> : <small>{it.food.name}</small>}            {edit
               ? <span className="rq-grams">
                   <input inputMode="numeric" aria-label={`Grams of ${it.food.name}`} value={String(it.grams || "")} onChange={(e) => { const g = Math.min(5000, Number(e.target.value.replace(/[^\d]/g, "")) || 0); setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, grams: g } : x)) }); }} /> g
                   <button className="rq-x" aria-label={`Remove ${it.food.name}`} onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k) })}><X size={14} /></button>
                 </span>
               : <b>{fmt(it.grams, 0)} g</b>}
+          </div>)];
+        })}
+        {edit && edit.optional.map((o, k) => (
+          <div className="sheet-row rq-food rq-food-opt" key={`o${k}`}>
+            <span className="rq-food-edit"><small>{o.name}</small><span className="pt-chips"><PartPick value={o.part ?? ""} onPick={(v) => setEdit({ ...edit, optional: edit.optional.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip" onClick={() => setEdit({ ...edit, optional: edit.optional.filter((_, j) => j !== k), items: [...edit.items, { id: uid(), food: o.food, grams: o.grams, locked: false, ...(o.part ? { part: o.part } : {}) }] })}>✓ Optional</button></span></span>
+            <b>{fmt(o.grams, 0)} g</b>
           </div>
         ))}
         {edit && (find === null
@@ -182,18 +196,17 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
             </div>
           ))}
       </section>
-      {/* IM8: optional foods stay with the recipe, out of the numbers; Add when cooking puts one on the plate */}
+      {/* IM8, IM14: optional foods stay with the recipe, out of the numbers; the plate adds them */}
       {!edit && (meal.optional?.length ?? 0) > 0 && (
         <section className="card rq-optional" aria-label="Optional, not in the numbers">
           <b>Optional, not in the numbers</b>
           {meal.optional!.map((o, k) => (
             <div className="rq-opt-row" key={k}>
-              <span className="rq-opt-name"><span>{o.name}</span><small>{o.note || (o.written ? `${o.written} on the recipe` : "no amount on the recipe")}</small></span>
+              <span className="rq-opt-name"><span>{o.name}</span><small>{[o.part, o.note || (o.written ? `${o.written} on the recipe` : "")].filter(Boolean).join(" · ") || "optional"}</small></span>
               <b>{fmt(o.grams, 0)} g</b>
-              <button className="link" onClick={() => onMakeIt([o])}>Add when cooking</button>
             </div>
           ))}
-          <small className="muted">The recipe's numbers leave them out, and so do ours. Add when cooking puts one on the plate with its numbers.</small>
+          <small className="muted">The recipe's numbers leave them out, and so do ours. Make it, and add any of them on the plate.</small>
         </section>
       )}
       <section className={`card rq-steps ${edit ? "editing" : ""}`}>
@@ -203,13 +216,13 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           : drafted ? (<>
               <small className="rq-drafted">{drafted.marks ? (drafted.kitchen || `${CHEF_NAME}'s steps, from the original, for your amounts and your kitchen. Each says how it relates to the original.`) : "Drafted by Chef Mealan from your foods and amounts. Read it, change any word."}</small>
               {drafted.marks && drafted.kitchen && <small className="muted">Each step says how it relates to the original.</small>}
-              <ol className="rp-steps">{drafted.steps.map((x, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}<Mark m={drafted.marks?.[k]} /></div></li>)}</ol>
-              <div className="button-row"><button className="pill pill-small pill-primary" onClick={() => { onPatch({ steps: drafted.steps, stepMarks: drafted.marks, stepsKitchen: drafted.kitchen }); setDrafted(null); }}>Keep these steps</button><button className="pill pill-small" onClick={askDraft}>Draft again</button><button className="link" onClick={() => { setDrafted(null); startEdit(); }}>Write my own</button></div>
+              <ol className="rp-steps">{drafted.steps.map((x, k) => [partHead(drafted.parts, k), <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}<Mark m={drafted.marks?.[k]} /></div></li>])}</ol>
+              <div className="button-row"><button className="pill pill-small pill-primary" onClick={() => { onPatch({ steps: drafted.steps, stepMarks: drafted.marks, stepsKitchen: drafted.kitchen, stepParts: drafted.parts }); setDrafted(null); }}>Keep these steps</button><button className="pill pill-small" onClick={askDraft}>Draft again</button><button className="link" onClick={() => { setDrafted(null); startEdit(); }}>Write my own</button></div>
             </>)
           : (meal.steps?.length ?? 0) > 0
             ? (<>
               {meal.stepMarks && <small className="muted">{meal.stepsKitchen || `${CHEF_NAME}'s steps, from the original, for your amounts and your kitchen. Each says how it relates to the original.`}</small>}
-              <ol className="rp-steps">{meal.steps!.map((x, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className={`st-amt${p.gone ? " gone" : ""}`}>{p.label}</b>))}<Mark m={meal.stepMarks?.[k]} /></div></li>)}</ol>
+              <ol className="rp-steps">{meal.steps!.map((x, k) => [partHead(meal.stepParts, k), <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className={`st-amt${p.gone ? " gone" : ""}`}>{p.label}</b>))}<Mark m={meal.stepMarks?.[k]} /></div></li>])}</ol>
             </>)
             : draft ? (<>
               <small className="muted">No steps yet.</small>
@@ -324,4 +337,11 @@ function SourceBox({ meal, onPatch }: { meal: Meal; onPatch: (patch: Partial<Mea
 function Mark({ m }: { m?: StepMark }) {
   if (!m) return null;
   return <small className={`st-mark ${m.kind}`}>{m.kind === "same" ? "As the original" : `${m.kind === "adapted" ? "Adapted" : "Added"}${m.why ? `: ${m.why}` : ""}`}</small>;
+}
+
+// IM17: a heading where the steps move to another part: The base, The filling
+function partHead(parts: string[] | undefined, k: number) {
+  const pt = parts?.[k];
+  if (!pt || (k > 0 && parts![k - 1] === pt)) return null;
+  return <li key={`p${k}`} className="rp-step-part">The {pt.toLowerCase()}</li>;
 }

@@ -5,7 +5,8 @@ import { ConfirmButton } from "../components/Confirm";
 import type { Mix } from "../mixtip";
 import { aggregate, density, uid, solveIngredient, servingLabel } from "../pilot";
 import { fromMeal } from "../planned";
-import type { Meal, Food, Ingredient } from "../pilot";
+import type { Meal, Food, Ingredient, PlateOpt } from "../pilot";
+import { partsOf, optAt, optToItem, itemToOpt, canLeaveOut, leanFood } from "../parts";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
@@ -32,7 +33,7 @@ import { minPortionOf } from "../foodjob";
 import { tasteForChef } from "../kitchens";
 import { resizeImageBase64 } from "../utils/image";
 import { ShotsCard, LinkCard, ReadCard, ErrorCard, type InFlow } from "../components/RecipeIn";
-import { scaleTo, onePortion, sideAmount, pdOf, realPortions, isYours, sideWord, MAX_SHOTS, kcalOfItems, sizedFits, type ReadRecipe, type SideKind } from "../recipeIn";
+import { scaleTo, onePortion, sideAmount, pdOf, realPortions, isYours, sideWord, MAX_SHOTS, kcalOfItems, sizedFits, roundGrams, type ReadRecipe, type SideKind } from "../recipeIn";
 
 // Make it a meal (0.2.9, canvas board CH, CH1 to CH3): an idea from Chef Mealan, checked and with the app's grams
 type MealOption = { kitchen: string; title: string; why: string; adds: { name: string; grams: number; have: boolean; base: boolean }[]; items: Ingredient[]; kcal: number; pd: number | null };
@@ -40,7 +41,8 @@ type ChefState = { status: "working" } | { status: "done"; options: MealOption[]
 const estimate = (a: { name: string; calories: number; protein: number; fats?: number | null; carbs?: number | null }): Food => ({ id: uid(), name: a.name, brand: "estimate", basis: "100g", source: "estimate", notes: `${CHEF_NAME}'s estimate`, reviewedAt: new Date().toISOString(), readyToEat: true, calories: a.calories, protein: a.protein, fats: a.fats ?? null, carbs: a.carbs ?? null, fiber: null, icon: iconFor(a.name) });
 // a recipe from a screenshot or a link (0.2.16, board IM): Change the dish, or Add on the side
 type SideOpt = { name: string; kind: SideKind; note: string; food: Food; grams: number; dish: Ingredient[]; yours: boolean };
-type Way = { kind: "change"; title: string; notes: string[] } | { kind: "side"; options: SideOpt[]; pick: number };
+// part and before (0.2.19, IM16): a change inside one part, and the plate before it, for Back to the original
+type Way = { kind: "change"; title: string; notes: string[]; part?: string; before?: Ingredient[] } | { kind: "side"; options: SideOpt[]; pick: number };
 const readFile = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 
 const STEPS = ["in", "recipe", "make", "made", "after"] as const;
@@ -265,8 +267,8 @@ export function JourneyScreen(p: AppApi) {
   // Start again from nothing: the plate's foods go, the library stays.
   function emptyPlate() {
     setMadeBy(null); setChef(null); setWay(null);
-    setState((s) => ({ ...s, items: [], portion: null, fromRecipe: undefined }));
-    setStep("in");
+    setState((s) => ({ ...s, items: [], portion: null, fromRecipe: undefined, optional: undefined, leftOut: undefined }));
+    setPartsMode(false); setStep("in");
   }
   function remove(id: string) {
     const rest = items.filter((i) => i.id !== id);
@@ -344,11 +346,22 @@ export function JourneyScreen(p: AppApi) {
   const [inFlow, setInFlow] = useState<InFlow | null>(null);
   const [pmode, setPmode] = useState<"sized" | "recipe">("sized");
   const [way, setWay] = useState<Way | null>(null);
-  const [wayBusy, setWayBusy] = useState<"change" | "side" | null>(null);
+  const [wayBusy, setWayBusy] = useState<string | null>(null);
+  // Parts on the plate (0.2.19, IM18): each food gets a part and can be optional; new parts wait here until a food has one
+  const [partsMode, setPartsMode] = useState(false);
+  const [newParts, setNewParts] = useState<string[]>([]);
+  const [naming, setNaming] = useState<string | null>(null);
   const [tried, setTried] = useState<"yes" | "ok" | "no" | null>(null);
   const rec = state.fromRecipe ? state.meals.find((m) => m.id === state.fromRecipe) : undefined;
   // the plate is the recipe that came in while its foods are the recipe's (or a way to fit it is on); add a food and it is a plate like any other
-  const imported = !!rec && items.length > 0 && (way !== null || items.every((i) => rec.items.some((r) => r.food.id === i.food.id)));
+  const imported = !!rec && items.length > 0 && (way !== null || items.every((i) => !!i.optional || rec.items.some((r) => r.food.id === i.food.id)));
+  const opts: PlateOpt[] = state.optional ?? [], leftOut = state.leftOut ?? [];
+  // a part left out keeps its place among the parts
+  const plateParts = (() => { const l = partsOf(items, opts); for (const x of [...leftOut].sort((a, b) => (a.at ?? 99) - (b.at ?? 99))) if (!l.includes(x.part)) l.splice(Math.min(x.at ?? l.length, l.length), 0, x.part); return l; })();
+  const PartChip = ({ value, onPick }: { value: string; onPick: (v: string) => void }) => {
+    const all = [...new Set([...plateParts, ...newParts, ...(value ? [value] : [])])];
+    return <select className="pt-chip pt-select" aria-label="Part" value={value} onChange={(e) => onPick(e.target.value)}><option value="">No part</option>{all.map((x) => <option key={x} value={x}>{x}</option>)}</select>;
+  };
   const mealNeed = share && share.kcal >= 150 && p.kind !== "dessert" ? share.kcal : null;
   const unitOf = (m: Meal) => m.makes?.unit || "portions", oneOf = (m: Meal) => unitOf(m).replace(/s$/, "");
   const portionItems = (m: Meal, mode: "sized" | "recipe"): Ingredient[] => {
@@ -356,6 +369,51 @@ export function JourneyScreen(p: AppApi) {
     const list = mode === "sized" && mealNeed ? scaleTo(whole, mealNeed) : onePortion(whole, m.makes?.n ?? 1);
     return list.map((i) => ({ ...i, id: uid(), locked: false }));
   };
+  // the recipe on the plate at a portion: its foods, its optional foods at the same share, no part left out (IM12, IM13)
+  const factorOf = (m: Meal, mode: "sized" | "recipe") => (mode === "sized" && mealNeed && kcalOfItems(m.items) > 0 ? mealNeed / kcalOfItems(m.items) : 1 / (m.makes?.n ?? 1));
+  const recipePlate = (m: Meal, mode: "sized" | "recipe") => ({ items: portionItems(m, mode), optional: optAt(m.optional, factorOf(m, mode), uid), leftOut: undefined });
+  const modeFor = (m: Meal): "sized" | "recipe" => (sizedFits(mealNeed, kcalOfItems(m.items) / (m.makes?.n ?? 1)) ? "sized" : "recipe");
+  // IM13: a recipe that came in, opened from Recipes, gets the plate it had the first time
+  useEffect(() => {
+    const id = state.openRecipe; if (!id) return;
+    const m = state.meals.find((x) => x.id === id);
+    if (!m) { setState((s) => ({ ...s, openRecipe: undefined })); return; }
+    const mode = modeFor(m);
+    setPmode(mode); setWay(null); setPartsMode(false);
+    setState((s) => ({ ...s, ...recipePlate(m, mode), title: m.title, portion: null, fromRecipe: m.id, openRecipe: undefined }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.openRecipe]);
+  // + Add (IM12b): sized for the meal, the meal keeps its size and every food moves by the same factor; else it goes on top
+  function addOpt(o: PlateOpt) {
+    const next = [...items, optToItem(o)];
+    const sized = imported && pmode === "sized" && mealNeed && !way;
+    setState((s) => ({ ...s, items: sized ? scaleTo(next, mealNeed!) : next, optional: (s.optional ?? []).filter((x) => x.id !== o.id), portion: null }));
+  }
+  function leaveOpt(id: string) {
+    const it = items.find((i) => i.id === id); if (!it) return;
+    const rest = items.filter((i) => i.id !== id);
+    const sized = imported && pmode === "sized" && mealNeed && !way;
+    setState((s) => ({ ...s, items: sized ? scaleTo(rest, mealNeed!) : rest, optional: [...(s.optional ?? []), itemToOpt(it)], portion: null }));
+  }
+  // Leave it out and Put it back (IM16b): the whole part, with its numbers
+  function leavePart(part: string) {
+    if (!canLeaveOut(items, part)) return;
+    const at = plateParts.indexOf(part);
+    setState((s) => ({ ...s, items: s.items.filter((i) => i.part !== part), leftOut: [...(s.leftOut ?? []), { part, items: s.items.filter((i) => i.part === part), at }], portion: null }));
+    log("parts", { how: "leave" });
+  }
+  function putBack(part: string) {
+    const l = leftOut.find((x) => x.part === part); if (!l) return;
+    const order = plateParts;
+    const all = [...items, ...l.items].sort((a, b) => order.indexOf(a.part ?? "") - order.indexOf(b.part ?? ""));
+    setState((s) => ({ ...s, items: all, leftOut: (s.leftOut ?? []).filter((x) => x.part !== part), portion: null }));
+  }
+  // Parts on your own plate (IM18): a food's part, a new part, optional on and off
+  const setPartOf = (id: string, part: string) => setState((s) => ({ ...s, items: s.items.map((i) => (i.id === id ? { ...i, part: part || undefined } : i)), optional: (s.optional ?? []).map((o) => (o.id === id ? { ...o, part: part || undefined } : o)) }));
+  function setOptional(id: string, on: boolean) {
+    if (on) { const it = items.find((i) => i.id === id); if (!it) return; setState((s) => ({ ...s, items: s.items.filter((i) => i.id !== id), optional: [...(s.optional ?? []), itemToOpt({ ...it, food: leanFood(it.food) })], portion: null })); }
+    else { const o = opts.find((x) => x.id === id); if (!o) return; setState((s) => ({ ...s, items: [...s.items, { ...optToItem(o), optional: undefined }], optional: (s.optional ?? []).filter((x) => x.id !== id), portion: null })); }
+  }
   const habits = (() => {
     const n = new Map<string, number>();
     for (const fb of state.feedback.slice(0, 40)) for (const i of fb.meal?.items ?? []) n.set(i.food.name, (n.get(i.food.name) ?? 0) + 1);
@@ -388,18 +446,18 @@ export function JourneyScreen(p: AppApi) {
     const whole: Ingredient[] = r.items.filter((i) => i.on ?? !i.optional).map((i) => {
       let food = state.foods.find((x) => x.name.toLowerCase() === i.name.toLowerCase()) ?? fresh.find((x) => x.name.toLowerCase() === i.name.toLowerCase());
       if (!food) { food = { ...estimate(i), notes: `${CHEF_NAME}'s estimate, from a recipe` }; fresh.push(food); }
-      return { id: uid(), food, grams: i.grams, locked: true, role: i.role };
+      return { id: uid(), food, grams: i.grams, locked: true, role: i.role, ...(i.part ? { part: i.part } : {}) };
     });
     const thumbs = await Promise.all(f.shots.map((x) => resizeImageBase64(x, 900, 900).catch(() => x)));
     const total = whole.reduce((n, i) => n + i.grams, 0);
     // IM8: an optional food not added stays with the recipe, in its own list, out of the numbers
-    const optional = r.items.filter((i) => i.optional && !(i.on ?? false)).map((i) => ({ name: i.name, written: i.written, ...(i.note ? { note: i.note } : {}), grams: i.grams,
-      food: state.foods.find((x) => x.name.toLowerCase() === i.name.toLowerCase()) ?? { ...estimate(i), notes: `${CHEF_NAME}'s estimate, from a recipe` } }));
+    const optional = r.items.filter((i) => i.optional && !(i.on ?? false)).map((i) => ({ name: i.name, written: i.written, ...(i.note ? { note: i.note } : {}), grams: i.grams, ...(i.part ? { part: i.part } : {}),
+      food: leanFood(state.foods.find((x) => x.name.toLowerCase() === i.name.toLowerCase()) ?? { ...estimate(i), notes: `${CHEF_NAME}'s estimate, from a recipe` }) }));
     const meal: Meal = { id: uid(), title: r.title, items: whole, portion: Math.round(total / r.servings), savedAt: new Date().toISOString(), steps: [],
       source: { name: r.source, ...(f.url ? { url: f.url } : {}), from: f.url ? "link" : "screenshot", at: new Date().toISOString(), ...(r.steps?.length ? { steps: r.steps } : {}) }, ...(thumbs.length ? { shots: thumbs } : {}), makes: { n: r.servings, unit: r.servingsUnit }, ...(optional.length ? { optional } : {}) };
     const mode: "sized" | "recipe" = sizedFits(mealNeed, kcalOfItems(whole) / r.servings) ? "sized" : "recipe";
-    setPmode(mode); setWay(null);
-    setState((s) => ({ ...s, foods: [...s.foods, ...fresh], meals: [meal, ...s.meals], items: portionItems(meal, mode), title: meal.title, portion: null, fromRecipe: meal.id }));
+    setPmode(mode); setWay(null); setPartsMode(false);
+    setState((s) => ({ ...s, foods: [...s.foods, ...fresh], meals: [meal, ...s.meals], ...recipePlate(meal, mode), title: meal.title, portion: null, fromRecipe: meal.id }));
     setInFlow(null);
     log("recipe_in", { how: f.url ? "link" : "shot", result: "plate" });
     notify(`${meal.title} is on your plate, and saved in Mine.`);
@@ -407,12 +465,41 @@ export function JourneyScreen(p: AppApi) {
   function setPortionMode(mode: "sized" | "recipe") {
     if (!rec) return;
     setPmode(mode); setWay(null);
-    setState((s) => ({ ...s, items: portionItems(rec, mode), title: rec.title, portion: null }));
+    setState((s) => ({ ...s, ...recipePlate(rec, mode), title: rec.title, portion: null }));
   }
   function backToOriginal() {
+    if (way?.kind === "change" && way.before) { const before = way.before; setWay(null); setState((s) => ({ ...s, items: before, portion: null })); return; }
     if (!rec) return;
     setWay(null);
-    setState((s) => ({ ...s, items: portionItems(rec, pmode), title: rec.title, portion: null }));
+    setState((s) => ({ ...s, ...recipePlate(rec, pmode), title: rec.title, portion: null }));
+  }
+  // IM16: Chef Mealan changes one part; code keeps every other food as it was, and checks the PD, real portions and allergies
+  async function changePart(part: string, failed?: string) {
+    if (pdRef === null || way) return;
+    setWayBusy(part);
+    try {
+      const before = items;
+      const res = await fetch("/api/recipe/fit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ way: "change", part, title: state.title || autoTitle(items), servings: 1, need: kcalOfItems(items), target: pdRef,
+        items: items.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein, role: i.role ?? "other", part: i.part ?? "" })), kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), habits, failed }) });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || `${CHEF_NAME} could not answer.`);
+      let why: string | null = d.failed ?? null, out: Ingredient[] = [];
+      if (!why) {
+        out = (d.items as any[]).map((x) => {
+          const was = items.find((i) => i.food.name.toLowerCase() === String(x.name).toLowerCase());
+          return was && was.part !== part ? was : { id: was?.id ?? uid(), food: libFood(x), grams: roundGrams(Number(x.grams) || 0), locked: false, role: x.role, part };
+        });
+        const pd0 = pdOf(items), pd1 = pdOf(out);
+        if (pd1 === null || pd0 === null || pd1 < pd0 + 0.05) why = `It reaches PD ${pd1?.toFixed(1) ?? "?"}, no better than ${pd0?.toFixed(1) ?? "?"}.`;
+        else if (!realPortions(out)) why = "One of the foods is not a real portion at this size.";
+        else if (out.some((i) => blockedByAllergy(i.food, p.safety.allergies ?? []))) why = "It has a food with one of their allergies.";
+      }
+      if (why) { if (!failed) return changePart(part, why); log("recipe_fit", { way: "change", result: "failed" }); notify(`${CHEF_NAME}'s change to the ${part.toLowerCase()} didn't pass the checks: ${why}`); return; }
+      const fresh = out.map((i) => i.food).filter((f) => !state.foods.some((x) => x.id === f.id));
+      setState((s) => ({ ...s, foods: [...s.foods, ...fresh.filter((f, k) => fresh.findIndex((x) => x.id === f.id) === k)], items: out, portion: null }));
+      setWay({ kind: "change", title: state.title || autoTitle(items), notes: (d.notes ?? []) as string[], part, before });
+      log("recipe_fit", { way: "change", result: "shown" }); log("parts", { how: "change" });
+    } catch (e: any) { setError(e.message); } finally { setWayBusy(null); }
   }
   const fitBody = (m: Meal, w: "change" | "side", failed?: string) => JSON.stringify({ way: w, title: m.title, servings: m.makes?.n ?? 1, need: mealNeed ?? kcalOfItems(portionItems(m, "recipe")), target: pdRef,
     items: m.items.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein, role: i.role ?? "other" })), kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), habits, failed });
@@ -471,7 +558,7 @@ export function JourneyScreen(p: AppApi) {
     setState((s) => ({ ...s, foods: [...s.foods, ...fresh.filter((f) => !s.foods.some((x) => x.id === f.id))], items: [...o.dish, { id: uid(), food: o.food, grams: o.grams, locked: false }], title: rec?.title ?? s.title, portion: null }));
     setWay({ ...w, pick: k });
   }
-  const wayWhat = (w: Way | null) => (!w ? "" : w.kind === "change" ? w.title : `${w.options[w.pick].name} ${sideWord(w.options[w.pick].kind)}`);
+  const wayWhat = (w: Way | null) => (!w ? "" : w.kind === "change" ? (w.part ? `${w.part}, changed` : w.title) : `${w.options[w.pick].name} ${sideWord(w.options[w.pick].kind)}`);
   const triedNote = (w: Way | null) => {
     const t = w && rec?.tried?.find((x) => x.kind === w.kind && x.what === wayWhat(w));
     return !t ? "Not cooked yet" : t.result === "yes" ? "You cooked it: it worked" : t.result === "ok" ? "You cooked it: it was OK" : "You cooked it: it didn't work";
@@ -614,7 +701,7 @@ export function JourneyScreen(p: AppApi) {
               return <small className="muted">One {oneOf(rec)} is {fmt(one, 0)} kcal.{mealNeed ? ` Your ${mealWord} is about ${fmt(mealNeed, 0)}. Sized for it${sizedFits(mealNeed, one) ? `: ${pct}% of one ${oneOf(rec)}.` : ` would be ${pct}% of one ${oneOf(rec)}, so the plate starts with one ${oneOf(rec)}, as the recipe makes it.`}` : ""}</small>; })()}
           </div>
         )}
-        {imported && way?.kind === "change" && (
+        {imported && way?.kind === "change" && !way.part && (
           <div className="in-way">
             {way.notes.map((n, k) => <small key={k}>{n}</small>)}
             <span className="in-cooked">{triedNote(way)}</span>
@@ -651,9 +738,9 @@ export function JourneyScreen(p: AppApi) {
             <button className="pill pill-small" onClick={() => setInFlow({ kind: "link", url: "" })}><LinkIcon size={15} /> Link</button>
           </div>
         </>}
-        {items.length > 0 && (
-          <div className="rows">
-            {groupsOf(items).map((g) => g.kind === "dish" ? <DishRow key={g.id} g={g} /> : (() => { const i = g.item; return (
+        {items.length + opts.length > 0 && (() => {
+          // the plate's rows (0.2.19): in the dish's parts when it has them (IM15, IM18b), optional foods inside their part
+          const itemRow = (i: Ingredient) => (
               <SwipeRow key={i.id} onRemove={() => remove(i.id)} onSwap={() => setSwapId(i.id)}>
               <div className="row">
                 <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Unlock" : "Lock"} ${i.food.name}`}
@@ -661,7 +748,9 @@ export function JourneyScreen(p: AppApi) {
                 <span className="thumb">{i.food.photo ? <img src={i.food.photo} alt="" /> : (i.food.icon || iconFor(i.food.name))}</span>
                 <div className="row-text">
                   <button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button>
-                  <small>{i.food.calories === 0 ? "no energy" : pdText(density(i.food.protein, i.food.calories))} · {imported ? "Change it if you like." : i.locked ? "This amount stays." : `${CHEF_NAME} can change this amount.`}</small>
+                  {partsMode ? <small className="pt-chips"><PartChip value={i.part ?? ""} onPick={(v) => setPartOf(i.id, v)} /> <button type="button" className="pt-chip off" aria-pressed={false} onClick={() => setOptional(i.id, true)}>Optional</button></small>
+                    : i.optional ? <small className="pt-wrap">optional, added · <button className="link pt-inline" onClick={() => leaveOpt(i.id)}>Leave it out</button></small>
+                    : <small>{i.food.calories === 0 ? "no energy" : pdText(density(i.food.protein, i.food.calories))} · {imported ? "Change it if you like." : i.locked ? "This amount stays." : `${CHEF_NAME} can change this amount.`}</small>}
                 </div>
                 {i.locked ? <b className="row-num">{fmt(i.grams, 0)} g{servingLabel(i.food, i.grams) ? <small> = {servingLabel(i.food, i.grams)}</small> : null}</b> : (
                   <label className="grams">
@@ -674,9 +763,55 @@ export function JourneyScreen(p: AppApi) {
                 )}
               </div>
               </SwipeRow>
-            ); })())}
-          </div>
-        )}
+          );
+          const optRow = (o: PlateOpt) => partsMode
+            ? <div className="pt-opt" key={o.id}><span className="thumb thumb-sm">{o.food.icon || iconFor(o.name)}</span><span className="pt-opt-text"><b>{o.name}</b><small className="pt-chips"><PartChip value={o.part ?? ""} onPick={(v) => setPartOf(o.id, v)} /> <button type="button" className="pt-chip" aria-pressed={true} onClick={() => setOptional(o.id, false)}>✓ Optional</button></small></span><b className="pt-opt-g">{fmt(o.grams, 0)} g</b></div>
+            : <div className="pt-opt" key={o.id}><span className="thumb thumb-sm">{o.food.icon || iconFor(o.name)}</span><span className="pt-opt-text"><b>{o.name}</b><small>{o.note || (o.written ? `${o.written} on the recipe` : "optional")}</small></span><b className="pt-opt-g">{fmt(o.grams, 0)} g</b><button className="pill pill-small" aria-label={`Add ${o.name}`} onClick={() => addOpt(o)}>+ Add</button></div>;
+          const PartHead = ({ part }: { part: string }) => {
+            const left = leftOut.find((l) => l.part === part);
+            if (left) return <div className="pt-h"><span><b>{part}, left out</b><small>{left.items.length} {left.items.length === 1 ? "food" : "foods"} · {fmt(kcalOfItems(left.items), 0)} kcal less</small></span><span className="pt-acts"><button className="link" onClick={() => putBack(part)}>Put it back</button></span></div>;
+            const its = items.filter((i) => i.part === part), k = kcalOfItems(its), pdp = pdOf(its), nOpt = opts.filter((o) => o.part === part).length;
+            const changed = way?.kind === "change" && way.part === part;
+            return (
+              <div className="pt-h" aria-label={`Part: ${part}`}>
+                <span><b>{part}{changed ? ", changed" : ""}</b><small>{its.length} {its.length === 1 ? "food" : "foods"}{nOpt ? `, ${nOpt} optional` : ""} · {fmt(k, 0)} kcal{pdp !== null && k > 0 ? ` · ${pdText(pdp)}` : ""}{changed ? ` · ${triedNote(way)}` : ""}</small></span>
+                <span className="pt-acts">{changed ? <button className="link" onClick={backToOriginal}>Back to the original</button> : <>
+                  {p.ai.on && pdRef !== null && its.length > 0 && <button className="link" disabled={!!wayBusy || !!way} onClick={() => void changePart(part)}>{wayBusy === part ? `${CHEF_NAME} is changing it…` : "Change"}</button>}
+                  {canLeaveOut(items, part) && <button className="link" onClick={() => leavePart(part)}>Leave it out</button>}
+                </>}</span>
+              </div>
+            );
+          };
+          const dishes = items.some((i) => i.dish);
+          const grouped = !dishes && !partsMode && plateParts.length > 0;
+          const noPart = items.filter((i) => !i.part), noPartOpts = opts.filter((o) => !o.part);
+          return (<>
+            {!dishes && (partsMode
+              ? <div className="pt-h pt-mode"><span><b>Parts</b><small>Tap a food's part to move it, or New part. Optional keeps it off the plate until added.</small></span><span className="pt-acts">
+                  {naming === null ? <button className="link" onClick={() => setNaming("")}>New part</button> : <input className="pt-new" autoFocus aria-label="Name of the new part" placeholder="Sauce" value={naming} onChange={(e) => setNaming(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = naming.trim().slice(0, 30); if (v) setNewParts((l) => [...l, v.charAt(0).toUpperCase() + v.slice(1)]); setNaming(null); } }} onBlur={() => setNaming(null)} />}
+                  <button className="link" onClick={() => { if (plateParts.length) log("parts", { how: "set" }); setPartsMode(false); setNaming(null); setNewParts([]); }}>Done</button></span></div>
+              : items.length + opts.length >= 2 && <button className="link pt-open" onClick={() => setPartsMode(true)}>{plateParts.length ? "Parts" : "Group into parts"}</button>)}
+            <div className="rows">
+              {dishes ? groupsOf(items).map((g) => g.kind === "dish" ? <DishRow key={g.id} g={g} /> : itemRow(g.item))
+                : !grouped ? <>{items.map(itemRow)}{partsMode && opts.map(optRow)}</>
+                : <>
+                  {plateParts.map((part) => <div key={part} className="pt-group"><PartHead part={part} />
+                    {way?.kind === "change" && way.part === part && way.notes.map((nt, k) => <small key={k} className="pt-note">{nt}</small>)}
+                    {!leftOut.some((l) => l.part === part) && <>{items.filter((i) => i.part === part).map(itemRow)}{opts.filter((o) => o.part === part).map(optRow)}</>}
+                  </div>)}
+                  {(noPart.length > 0 || noPartOpts.length > 0) && <div className="pt-group"><div className="pt-h"><span><b>Other</b></span></div>{noPart.map(itemRow)}{noPartOpts.map(optRow)}</div>}
+                </>}
+            </div>
+            {/* IM12: a dish without parts: its optional foods in one list under the foods */}
+            {!grouped && !partsMode && opts.length > 0 && (
+              <div className="pt-optlist" aria-label="Optional, not on the plate">
+                <small className="pt-optlist-h">Optional, not on the plate</small>
+                {opts.map(optRow)}
+                <small className="muted">{rec ? "Left out of the numbers, as the recipe's own numbers leave them out." : "Left out of the numbers until added."} Add puts one on the plate as a food like the others.</small>
+              </div>
+            )}
+          </>);
+        })()}
         {/* two ways out (canvas S, A new meal for a slot and Off the plan, short, 11 October 2026): Fit moves one food; Make it as it is takes the plate as it stands */}
         <div className={`ways-out${imported && !way ? " ways-out-col" : ""}`}>
           {imported && rec ? (<>
@@ -964,6 +1099,10 @@ export function JourneyScreen(p: AppApi) {
         const name = title.trim() || plateName;
         const src = way?.kind === "change" && fromRec?.source ? { source: { name: fromRec.source.name, ...(fromRec.source.url ? { url: fromRec.source.url } : {}), from: fromRec.source.from, at: fromRec.source.at } } : {};
         const meal: Meal = { id: origin?.id ?? uid(), title: name, items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString(), kind: p.kind, ...src };
+        // the recipe kept (0.2.19, IM18b): its parts on its foods; optional foods, added or not, in its optional list
+        const keptOpt = [...(state.optional ?? []), ...items.filter((i) => i.optional).map(itemToOpt)].map((o) => ({ name: o.name, written: o.written ?? "", ...(o.note ? { note: o.note } : {}), grams: o.grams, food: leanFood(o.food), ...(o.part ? { part: o.part } : {}) }));
+        const keptItems = structuredClone(items.filter((i) => !i.optional));
+        const kept: Meal = { ...meal, items: keptItems, portion: keptItems.reduce((n, i) => n + i.grams, 0), ...(keptOpt.length ? { optional: keptOpt } : {}) };
         const triedNow = tryCtx && tried ? { kind: tryCtx.kind, what: tryCtx.what, result: tried } : undefined;
         const status = good === "no" ? "not-used" : "eaten";
         const taste = TASTE[good!];
@@ -974,7 +1113,7 @@ export function JourneyScreen(p: AppApi) {
         // a plate that is a recipe as it stands (0.2.3): the card points at that recipe, no second copy
         const keep = !origin && saveRecipe && status === "eaten";
         if (triedNow) log("recipe_fit", { way: triedNow.kind, result: triedNow.result });
-        setState((s) => ({ ...s, fromRecipe: undefined, meals: (keep ? [structuredClone(meal), ...s.meals] : s.meals).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)), feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : undefined, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));
+        setState((s) => ({ ...s, fromRecipe: undefined, optional: undefined, leftOut: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)), feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : undefined, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));
         if (p.filling) p.setFilling(null);
         setWay(null); setTried(null);
         p.setKind("meal"); setGood(null); setNote(""); setTitle(""); setPlate(""); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); resetMade(); setStep("in");

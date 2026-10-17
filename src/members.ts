@@ -5,9 +5,10 @@
 import type { Food, Ingredient, Meal } from "./pilot";
 import { aggregate, density } from "./pilot";
 import { blockedByAllergy } from "./safety";
+import { cleanPart } from "./parts";
 
 export type SharedFood = Pick<Food, "name" | "brand" | "calories" | "protein" | "fats" | "carbs" | "fiber" | "readyToEat"> & { icon?: string; serving?: Food["serving"] };
-export type SharedItem = { id: string; grams: number; food: SharedFood };
+export type SharedItem = { id: string; grams: number; food: SharedFood; part?: string };
 export type SharedRecipe = {
   id: string; title: string; items: SharedItem[]; steps: string[]; kitchen: string | null; source?: string;
   name: string; cover: string | null; coverKind: "drawn" | "photo"; sharedAt: string; updatedAt: string; made: number; mine?: boolean;
@@ -23,6 +24,8 @@ export function cleanShared(r: any): Omit<SharedRecipe, "id" | "name" | "cover" 
   const items: SharedItem[] = (Array.isArray(r.items) ? r.items : []).slice(0, 30).map((i: any) => ({
     id: str(i?.id, 40) || Math.random().toString(36).slice(2, 10),
     grams: num(i?.grams) ?? 0,
+    // the dish's part, as a heading (0.2.19, IM15 to IM18)
+    ...(cleanPart(i?.part) ? { part: cleanPart(i.part) } : {}),
     food: {
       name: str(i?.food?.name, 80), brand: str(i?.food?.brand, 60),
       calories: num(i?.food?.calories), protein: num(i?.food?.protein), fats: num(i?.food?.fats), carbs: num(i?.food?.carbs), fiber: num(i?.food?.fiber),
@@ -42,7 +45,7 @@ export function cleanShared(r: any): Omit<SharedRecipe, "id" | "name" | "cover" 
 export function sharedOf(m: Meal, kitchen: string | null) {
   return {
     title: m.title,
-    items: m.items.filter((i) => i.grams > 0).map((i) => ({ id: i.id, grams: i.grams, food: { name: i.food.name, brand: i.food.brand, calories: i.food.calories, protein: i.food.protein, fats: i.food.fats, carbs: i.food.carbs, fiber: i.food.fiber, readyToEat: i.food.readyToEat, icon: i.food.icon, serving: i.food.serving } })),
+    items: m.items.filter((i) => i.grams > 0).map((i) => ({ id: i.id, grams: i.grams, food: { name: i.food.name, brand: i.food.brand, calories: i.food.calories, protein: i.food.protein, fats: i.food.fats, carbs: i.food.carbs, fiber: i.food.fiber, readyToEat: i.food.readyToEat, icon: i.food.icon, serving: i.food.serving }, ...(i.part ? { part: i.part } : {}) })),
     steps: m.steps ?? [],
     kitchen,
     ...(m.source?.name ? { source: m.source.name } : {}),
@@ -59,7 +62,7 @@ export const firstName = (name: string | null | undefined) => String(name ?? "")
 
 // A shared food as a food of yours: the values, no photos, no notes
 export const foodOf = (f: SharedFood, id: string): Food => ({ id, name: f.name, brand: f.brand ?? "", calories: f.calories, protein: f.protein, fats: f.fats, carbs: f.carbs, fiber: f.fiber, basis: "100g", source: "members", notes: "", reviewedAt: new Date().toISOString(), readyToEat: f.readyToEat, ...(f.icon ? { icon: f.icon } : {}), ...(f.serving ? { serving: f.serving } : {}) });
-export const itemsOf = (r: Pick<SharedRecipe, "items">): Ingredient[] => r.items.map((i) => ({ id: i.id, grams: i.grams, locked: false, food: foodOf(i.food, `m-${i.id}`) }));
+export const itemsOf = (r: Pick<SharedRecipe, "items">): Ingredient[] => r.items.map((i) => ({ id: i.id, grams: i.grams, locked: false, food: foodOf(i.food, `m-${i.id}`), ...(i.part ? { part: i.part } : {}) }));
 
 // The recipe at your portion: every food scaled by the same factor, to the nearest 5 g (at least 5 g)
 export function portionOf(r: Pick<SharedRecipe, "items">, need: number | null) {

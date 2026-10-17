@@ -6,13 +6,14 @@
 // - nothing is offered above a real portion: no single food over 600 g a portion.
 import type { Food, Ingredient } from "./pilot";
 import { gramsFromMeasure } from "./units";
+import { cleanPart } from "./parts";
 
 export const MAX_SHOTS = 4;
 export const ROLES = ["base", "protein", "melting cheese", "cheese", "dairy", "sauce", "fat", "vegetable", "fruit", "herb or spice", "sweet", "other"] as const;
 export type Role = (typeof ROLES)[number];
 export type How = "recipe" | "converted" | "guessed";
 // optional: the recipe says so (0.2.17, the cookie on 16 October 2026): left out of the numbers until the person adds it
-export type ReadItem = { name: string; written: string; grams: number; how: How; role: Role; calories: number; protein: number; fats: number | null; carbs: number | null; optional: boolean; on?: boolean; note?: string };
+export type ReadItem = { name: string; written: string; grams: number; how: How; role: Role; calories: number; protein: number; fats: number | null; carbs: number | null; optional: boolean; on?: boolean; note?: string; part?: string };
 // what the recipe itself says about its numbers, per serving, when it says it (0.2.17)
 export type Stated = { kcal: number; protein: number; fats: number | null; carbs: number | null };
 // steps: the recipe's own method as written (0.2.18, board IM, IM9b), kept for the person only
@@ -101,9 +102,12 @@ export function cleanRead(d: any): ReadRecipe | null {
     const cal = num(i?.calories), pro = num(i?.protein), fat = num(i?.fats), carb = num(i?.carbs);
     if (measured !== null) how = "converted";
     return { name: name.charAt(0).toUpperCase() + name.slice(1), written, grams: Math.round(exact ?? measured ?? num(i?.grams)), how, role,
-      calories: cal, protein: pro, fats: Number.isFinite(fat) && fat >= 0 ? fat : null, carbs: Number.isFinite(carb) && carb >= 0 ? carb : null, optional: i?.optional === true, ...(i?.optional === true && String(i?.note ?? "").trim() ? { note: String(i.note).trim().slice(0, 60) } : {}) };
+      calories: cal, protein: pro, fats: Number.isFinite(fat) && fat >= 0 ? fat : null, carbs: Number.isFinite(carb) && carb >= 0 ? carb : null, optional: i?.optional === true, ...(i?.optional === true && String(i?.note ?? "").trim() ? { note: String(i.note).trim().slice(0, 60) } : {}), ...(cleanPart(i?.part) ? { part: cleanPart(i.part) } : {}) };
   }).filter((i: ReadItem) => i.name && i.grams > 0 && i.grams <= 5000 && Number.isFinite(i.calories) && i.calories >= 0 && i.calories <= 950 && Number.isFinite(i.protein) && i.protein >= 0 && i.protein <= 100);
   if (!items.length) return null;
+  // parts only when the recipe groups its foods into two or more (0.2.19, IM15); a single group is one list
+  if (new Set(items.map((i) => i.part).filter(Boolean)).size < 2) for (const i of items) delete i.part;
+  else for (const i of items) if (!i.part) i.part = "Other";
   const n = Math.round(num(d.servings));
   const st = d.stated && typeof d.stated === "object" ? d.stated : null;
   const sk = num(st?.calories), sp = num(st?.protein), sf = num(st?.fats), sc = num(st?.carbs);

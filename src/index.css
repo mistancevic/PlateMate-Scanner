@@ -1572,3 +1572,33 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 .st-mark.added { background: #fdf0c4; color: #6b5200; }
 .cook-with .moments { display: flex; flex-wrap: wrap; gap: 8px; }
 .rq-nopic { display: flex; flex-direction: column; gap: 8px; }
+/* 0.2.19, boards IM12 to IM18: optional foods on the plate, dishes in parts */
+.pt-h { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; padding: 12px 2px 4px; border-top: 2px solid var(--line); margin-top: 4px; }
+.pt-h > span:first-child { display: flex; flex-direction: column; min-width: 0; }
+.pt-h b { font-size: 14px; color: var(--ink); }
+.pt-h small { color: var(--muted); font-weight: 600; font-size: 12.5px; }
+.pt-h.pt-mode { border-top: none; margin-top: 0; }
+.pt-acts { display: flex; gap: 12px; flex: none; align-items: center; }
+.pt-acts .link { font-size: 13px; padding: 0; white-space: nowrap; }
+.pt-group:first-child .pt-h { border-top: none; margin-top: 0; }
+.pt-opt { display: flex; align-items: center; gap: 10px; padding: 8px 0 8px 6px; border-bottom: 1px solid var(--line); }
+.pt-opt-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pt-opt-text b { font-size: 14px; color: var(--muted); }
+.pt-opt-text small { color: var(--muted); font-weight: 600; font-size: 12.5px; }
+.pt-opt-g { color: var(--muted); flex: none; }
+.pt-opt .pill { flex: none; }
+.pt-optlist { border: 1.5px solid var(--line); border-radius: 14px; padding: 10px; margin-top: 6px; display: flex; flex-direction: column; gap: 2px; }
+.pt-optlist-h { font-weight: 800; color: var(--ink); font-size: 13px; }
+.pt-optlist > small.muted { margin-top: 6px; }
+.pt-note { display: block; background: var(--tint); color: var(--brand-text); border-radius: 8px; padding: 6px 8px; margin: 4px 0 6px; font-size: 12.5px; font-weight: 700; }
+.pt-chips { display: flex !important; flex-wrap: wrap; gap: 6px; margin-top: 5px; white-space: normal !important; overflow: visible !important; }
+.pt-chip { display: inline-flex; align-items: center; border-radius: 12px; padding: 2px 9px; font: inherit; font-size: 12px; font-weight: 800; background: var(--tint); color: var(--brand-text); border: 1.5px solid var(--brand); cursor: pointer; }
+.pt-chip.off { background: var(--surface); color: var(--muted); border-color: var(--line); }
+.pt-select { appearance: auto; max-width: 160px; }
+.pt-new { width: 110px; font: inherit; font-size: 13px; padding: 2px 8px; border: 1.5px solid var(--brand); border-radius: 10px; }
+.pt-open { display: block; margin: 6px 0 -2px auto; font-size: 13px; padding: 0; }
+.pt-wrap { white-space: normal !important; overflow: visible !important; }
+.pt-inline { padding: 0; font-size: inherit; }
+.rq-part, .rp-part { font-weight: 800; font-size: 13.5px; color: var(--ink); padding: 10px 0 2px; border-top: 2px solid var(--line); margin-top: 4px; }
+.rq-food-edit { display: flex; flex-direction: column; min-width: 0; }
+.rp-step-part { list-style: none; display: block !important; font-weight: 800; color: var(--ink); font-size: 14px; padding: 8px 0 2px; border-top: 2px solid var(--line); }

@@ -101,7 +101,7 @@ export interface AppApi {
   renameMeal: (id: string, title: string) => void;
   renamePlate: (title: string) => void;
   // Recipes, Open (0.2.3): the recipe on the Plate with its name as the title, nothing decided yet
-  openOnPlate: (meal: Meal, extra?: Meal["optional"]) => void;
+  openOnPlate: (meal: Meal) => void;
   // Chef Mealan's pictures (0.2.18, board IM, IM11): the day's count, the recipe being drawn, Draw a picture
   cover: { count: { used: number; limit: number } | null; drawing: string | null; draw: (meal: Meal) => void; refresh: () => void };
   fill: (date: string, slotId: string, meal: import("../planned").PlannedMeal | null) => void;

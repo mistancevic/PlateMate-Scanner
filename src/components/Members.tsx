@@ -102,7 +102,7 @@ export function MemberPage({ r, ahead, p, owner, close, takeDown }: { r: SharedR
       </div>
       <section className="card rq-foods">
         <b>{ahead ? "Foods for your portion" : "Foods"}</b>
-        {x.items.map((it) => <div className="sheet-row rq-food" key={it.id}><small>{it.food.name}</small><b>{fmt(it.grams, 0)} g</b></div>)}
+        {x.items.map((it, k) => [it.part && (k === 0 || x.items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{it.part}</div> : null, <div className="sheet-row rq-food" key={it.id}><small>{it.food.name}</small><b>{fmt(it.grams, 0)} g</b></div>])}
       </section>
       <section className="card rq-steps">
         <b>Steps</b>
