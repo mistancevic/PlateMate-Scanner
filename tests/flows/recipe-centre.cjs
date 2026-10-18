@@ -88,9 +88,9 @@ const U = "http://127.0.0.1:3217";
   await shot("rp1c", ".rq-steps");
 
   // RP3, RP1b: Make it, Change the dish, How to make it
-  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(1200);
-  await page.getByRole("button", { name: "Change the dish" }).click(); await page.waitForTimeout(1200);
-  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: "Change the recipe" }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
   t = await text("main");
   ok(/Your dish has light cream cheese and vanilla whey protein powder\. The original has cream cheese\./.test(t) && await page.getByRole("button", { name: "Write the steps for my dish" }).count() === 1 && /The original, for the original foods/.test(t), `RP1b: your dish differs: the line says how; the original for the original foods (${t.slice(0, 200)})`);
   ok(/You make all 12 slices\s*[\d,]+ g · [\d,]+ kcal/.test(t) && /You eat your plate\s*\d+ g · [\d,]+ kcal · PD/.test(t), "RP3: You make, You eat, each with weight and energy");
@@ -104,8 +104,8 @@ const U = "http://127.0.0.1:3217";
   // the original, made again: it ends on its page too
   await page.locator(".rq-back").click(); await page.waitForTimeout(500);
   await page.getByText("No-bake cheesecake", { exact: true }).last().click(); await page.waitForTimeout(800);
-  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(1200);
-  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
   await page.getByRole("button", { name: "I'm making it" }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: /On to How was it\?/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Good", exact: true }).first().click();

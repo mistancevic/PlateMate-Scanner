@@ -1678,3 +1678,6 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .pt-add { padding: 10px 4px 6px; }
 /* R9 (0.2.33): what the search held back, and why */
 .held-back { display: block; padding: 10px 2px; }
+/* PF A6 (0.2.35): the line under the two ways, and the hat beside their words */
+.ways-why { display: block; margin-top: 6px; }
+.in-ways .ways .pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }

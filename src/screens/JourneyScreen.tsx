@@ -611,7 +611,7 @@ export function JourneyScreen(p: AppApi) {
         opts.push({ name: sd.name, kind: sd.kind, note: sd.note, food, grams: fit.grams, dish: fit.dish.map((i) => ({ ...i, id: uid(), locked: false })), yours: isYours(sd.name, habits) });
       }
       const sorted = [...opts.filter((o) => o.yours), ...opts.filter((o) => !o.yours)].slice(0, 4);
-      if (!sorted.length) { log("recipe_fit", { way: "side", result: "failed" }); notify(`None of ${CHEF_NAME}'s sides brings this dish to your target at a normal amount. Try Change the dish.`); return; }
+      if (!sorted.length) { log("recipe_fit", { way: "side", result: "failed" }); notify(`None of ${CHEF_NAME}'s sides brings this dish to your target at a normal amount. Try Change the recipe.`); return; }
       pickSide({ kind: "side", options: sorted, pick: 0 }, 0);
       log("recipe_fit", { way: "side", result: "shown" });
     } catch (e: any) { setError(e.message); } finally { setWayBusy(null); }
@@ -888,15 +888,18 @@ export function JourneyScreen(p: AppApi) {
         {/* two ways out (canvas S, A new meal for a slot and Off the plan, short, 11 October 2026): Fit moves one food; Make it as it is takes the plate as it stands */}
         <div className={`ways-out${imported && !way ? " ways-out-col" : ""}`}>
           {imported && rec ? (<>
-            <button className="pill pill-primary pill-wide" onClick={keepAsIs}><ChefHat size={18} /> Make it</button>
+            {/* PF A6 (0.2.35, Milan 23:11 and 23:21 on 17 October, back after the 0.2.27 revert): Make it as it is is not Chef
+                Mealan's work, so no hat; the two ways are his, so both carry it. Wording and icons only: the ways work as before. */}
+            <button className="pill pill-primary pill-wide" onClick={keepAsIs}>{!way && pd !== null && pdRef !== null && pd < pdRef - 0.05 ? "Make it as it is" : "Make it"}</button>
             {way && <button className="pill pill-wide" onClick={backToOriginal}>Back to the original</button>}
             {!way && pd !== null && pdRef !== null && pd < pdRef - 0.05 && p.ai.on && (
               <div className="in-ways">
-                <small className="ways-label">Under your {pdTag()} {pdVal(pdRef)}: two ways to fit it</small>
+                <small className="ways-label">Under your {pdTag()} {pdVal(pdRef)}. Make it as it is, or fit it one of two ways:</small>
                 <div className="ways">
-                  <button className="pill pill-small" disabled={!!wayBusy} onClick={() => void changeDish()}>{wayBusy === "change" ? `${CHEF_NAME} is changing it…` : "Change the dish"}</button>
-                  <button className="pill pill-small" disabled={!!wayBusy} onClick={() => void addSide()}>{wayBusy === "side" ? `${CHEF_NAME} is looking…` : "Add on the side"}</button>
+                  <button className="pill pill-small" disabled={!!wayBusy} onClick={() => void changeDish()}><ChefHat size={16} /> {wayBusy === "change" ? `${CHEF_NAME} is changing it…` : "Change the recipe"}</button>
+                  <button className="pill pill-small" disabled={!!wayBusy} onClick={() => void addSide()}><ChefHat size={16} /> {wayBusy === "side" ? `${CHEF_NAME} is looking…` : "Add on the side"}</button>
                 </div>
+                <small className="muted ways-why">Change the recipe: {CHEF_NAME} swaps foods or uses less of them. Add on the side: a high protein side, like skyr, next to your piece. Both aim at your {pdVal(pdRef)}.</small>
               </div>
             )}
           </>) : madeBy && items.length > 0 ? (<>
