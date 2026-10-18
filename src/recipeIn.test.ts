@@ -45,7 +45,8 @@ test("IM4: your portion: sized for a 933 kcal dinner, 84% of one pizza; or the r
   assert.deepEqual(sized.map((i) => i.grams), [210, 83, 105, 8, 2]);
   assert.equal(Math.round(pdOf(sized)! * 10) / 10, 4.2);
   assert.deepEqual(onePortion(pizza, 2).map((i) => i.grams), [250, 100, 125, 10, 3]);
-  assert.deepEqual([0.3, 4.4, 22.5, 99.4, 102].map(roundGrams), [1, 4, 23, 99, 100]);
+  // R15 (0.2.41): a tiny amount keeps its tenth of a gram, so one portion is one share of the recipe
+  assert.deepEqual([0.3, 0.08, 4.4, 22.5, 99.4, 102].map(roundGrams), [0.3, 0.1, 4, 23, 99, 100]);
 });
 test("0.2.17: sized for the meal only between half and one and a half of the recipe's portion; the cookie at 22:58 starts as one cookie", () => {
   assert.equal(sizedFits(933, 1121), true);

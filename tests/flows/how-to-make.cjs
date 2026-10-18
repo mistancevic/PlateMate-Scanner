@@ -43,18 +43,20 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
     return page;
   };
   const text = (page, sel) => page.locator(sel).first().textContent().then((t) => t.replace(/\s+/g, " "));
-  const readIn = async (page, rd) => {
+  const readIn = async (page, rd, pick) => {
     await page.route("**/api/recipe/read", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(rd) }));
     await page.goto(U + "/plate"); await page.waitForTimeout(1300);
     await page.locator(".plate-card label").filter({ hasText: "Screenshot" }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }]);
     await page.waitForTimeout(500); await page.getByRole("button", { name: "Read it" }).click(); await page.waitForTimeout(800);
     await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
+    // R15 (Milan 15:55 to 16:16, board RS12): the plate now starts with the whole recipe; this journey picks the portion it had.
+    if (pick) { await page.locator(".in-portion").getByRole("button", { name: pick }).click(); await page.waitForTimeout(500); }
     await page.unroute("**/api/recipe/read");
   };
 
   // ---- the cheesecake: the whole cake, steps drafted on this step, 7 slices for later ----
   const page = await open(seed);
-  await readIn(page, read);
+  await readIn(page, read, "One slice, as the recipe makes it");
   await page.route("**/api/steps", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({
     steps: ["Crush {1} and mix with {2}, melted; press into a tin.", "Heat the oven to 160 °C.", "Beat {3}, {4}, {5}, {6} and {7} until smooth; pour over the base and bake 45 minutes.", "Chill 4 hours, then top with {8}."],
     marks: [{ kind: "same", why: "" }, { kind: "adapted", why: "320 °F in the original" }, { kind: "same", why: "" }, { kind: "added", why: "how long to chill it" }], parts: ["Base", "Filling", "Filling", "Topping"] }) }));
@@ -98,7 +100,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
 
   // ---- the cookie: makes 2, so just yours first ----
   const p4 = await open(seed);
-  await readIn(p4, cookie);
+  await readIn(p4, cookie, "One cookie, as the recipe makes it");
   await p4.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await p4.waitForTimeout(800);
   ok(await p4.locator('[aria-label="What you make"] .choice.on').textContent() === "Just your plate" && /The recipe makes 2/.test(await text(p4, "main")), "IM20: a recipe that makes 2 starts with just your cookie");
   await p4.getByRole("button", { name: "The whole recipe" }).click(); await p4.waitForTimeout(200);

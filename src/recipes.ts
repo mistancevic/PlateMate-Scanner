@@ -64,7 +64,7 @@ export function claimProblem(title: string, lines: string, share: number): strin
 }
 
 // grams as a reader cooks them: whole grams, or a kilo and more in kilos
-export const amountOf = (g: number) => (g >= 1000 ? `${r1(g / 1000)} kg` : `${Math.round(g)} g`);
+export const amountOf = (g: number) => (g >= 1000 ? `${r1(g / 1000)} kg` : g > 0 && g < 1 ? `${Math.round(g * 10) / 10} g` : `${Math.round(g)} g`);
 
 // What a visitor sees of a members-only recipe: the photo, the name, the numbers; the foods and the steps stay for members
 export function forVisitor(r: PublicRecipe): PublicRecipe & { locked?: boolean } {

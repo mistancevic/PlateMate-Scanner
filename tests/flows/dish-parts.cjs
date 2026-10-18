@@ -58,6 +58,8 @@ const U = "http://127.0.0.1:3211";
   await page.locator(".plate-card label").filter({ hasText: "Screenshot" }).locator("input").setInputFiles([{ name: "a.png", mimeType: "image/png", buffer: PNG }]);
   await page.waitForTimeout(500); await page.getByRole("button", { name: "Read it" }).click(); await page.waitForTimeout(800);
   await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
+  // R15 (Milan 15:55 to 16:16, board RS12): the plate now starts with the whole recipe; this journey picks the portion it had.
+  await page.locator(".in-portion").getByRole("button", { name: "One slice, as the recipe makes it" }).click(); await page.waitForTimeout(500);
   ok(JSON.stringify(await heads(page)) === JSON.stringify(["Base", "Filling", "Topping"]), `IM15: the plate in the recipe's parts (${await heads(page)})`);
   const top = await text(page, '.plate-card [aria-label="Part: Topping"]');
   ok(/1 food, 1 optional/.test(top) && /Dark chocolate/.test(await text(page, ".plate-card .rows")) && await page.getByRole("button", { name: "Add Dark chocolate" }).count() === 1 && await page.locator(".pt-optlist").count() === 0, "IM15: the optional chocolate sits inside the topping, with + Add");
