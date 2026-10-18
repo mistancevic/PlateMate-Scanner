@@ -6,3 +6,16 @@ export function decodeEntities(t: string): string {
 }
 // a name as the page wrote it, read as letters (0.2.29, R1: Sally&#039;s Baking showed as code): one line, trimmed
 export const cleanText = (t: unknown, max: number) => decodeEntities(String(t ?? "")).replace(/\s+/g, " ").trim().slice(0, max);
+// R1 (0.2.29): names saved before the reader cleaned them (Sally&#039;s Baking) read as letters. Returns a copy when it changes.
+const txt = (t: unknown) => (typeof t === "string" && /&#?[a-z0-9]+;/i.test(t) ? decodeEntities(t) : t);
+export function cleanMealNames(m: any): any {
+  if (!m || typeof m !== "object") return m;
+  const out = { ...m, title: txt(m.title) };
+  if (m.source && typeof m.source === "object") out.source = { ...m.source, name: txt(m.source.name) };
+  if (m.basedOn && typeof m.basedOn === "object") out.basedOn = { ...m.basedOn, title: txt(m.basedOn.title) };
+  if (Array.isArray(m.items)) out.items = m.items.map((i: any) => (i?.food ? { ...i, food: { ...i.food, name: txt(i.food.name) } } : i));
+  return out;
+}
+export const cleanFoodNames = (f: any) => (f && typeof f === "object" ? { ...f, name: txt(f.name) } : f);
+export const cleanCardNames = (c: any) => (c && typeof c === "object" ? { ...c, meal: cleanMealNames(c.meal) } : c);
+export const cleanText1 = txt;

@@ -153,3 +153,17 @@ test("a recipe's photos travel as fingerprints, never as pictures, and stay with
   assert.equal(c.photo, undefined); assert.equal(c.photos, undefined);
   assert.equal(c.photoSigs.length, 2); assert.equal(c.photoCount, 1);
 });
+
+test("R1 (0.2.29): a recipe in the account with the page's codes in its names reads as letters, and the clean copy goes back up", () => {
+  const acc = account();
+  const rec = { id: "r1", title: "Apple fritters", items: [], portion: 0, savedAt: "2026-10-18T00:00:00Z", source: { name: "Sally McKenney, Sally&#039;s Baking", from: "link", at: "2026-10-18T00:00:00Z" } };
+  acc.write([{ kind: "recipes", id: "r1", data: rec, at: "2026-10-18T00:30:00Z" }], []);
+  // a phone that has the same recipe, cleaned when the app opened, and one that has nothing yet
+  const a = phone(acc, st([], [{ ...rec, source: { ...rec.source, name: "Sally McKenney, Sally's Baking" } }]));
+  const b = phone(acc, st([]));
+  b.sync("2026-10-18T01:00:00Z");
+  assert.equal(b.s.meals[0].source.name, "Sally McKenney, Sally's Baking");
+  a.sync("2026-10-18T01:01:00Z");
+  assert.equal(a.s.meals[0].source.name, "Sally McKenney, Sally's Baking");
+  assert.equal(acc.read().recipes[0].data.source.name, "Sally McKenney, Sally's Baking", "the account holds the clean name");
+});

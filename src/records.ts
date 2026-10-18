@@ -3,6 +3,9 @@
 // of each record, one by one, so two changes on two phones are both kept. A deleted record leaves a "deleted" note, so
 // the other phone deletes it too instead of bringing it back. Pure functions here; the account calls are in cloud.ts.
 import { photoSigsOf, samePhotos, sig } from "./photos";
+import { cleanMealNames, cleanCardNames, cleanFoodNames } from "./entities";
+// R1 (0.2.29): a record from the account with the page's codes in its names reads as letters; the clean copy goes back up
+const cleanNames = (kind: Kind, d: any) => (kind === "foods" ? cleanFoodNames(d) : kind === "recipes" ? cleanMealNames(d) : cleanCardNames(d));
 export type Kind = "foods" | "recipes" | "cards";
 export const KINDS: Kind[] = ["foods", "recipes", "cards"];
 // what this phone last sent or took, per record: the fingerprint of its content and its "changed at"; "-" is a deleted note
@@ -87,20 +90,23 @@ export function merge(state: any, remote: Remote, known: Known, localAt: string)
         continue;
       }
       if (!r.data) continue;
-      const remoteSig = sigOf(kind, r.data);
-      if (local && localSig === remoteSig) { next[k] = { sig: remoteSig, at: r.at > localWhen ? r.at : localWhen }; continue; }
+      const data = cleanNames(kind, r.data), rawSig = sigOf(kind, r.data);
+      const remoteSig = sigOf(kind, data);
+      // when the names were cleaned, this phone knows the account's copy as it is, so the clean one is sent up
+      const knownSig = rawSig;
+      if (local && localSig === remoteSig) { next[k] = { sig: knownSig, at: r.at > localWhen ? r.at : localWhen }; continue; }
       if (!local) {
         if (kn?.sig === "-" && kn.at >= r.at) continue; // deleted here after the account's change
         if (kn && kn.sig !== "-" && r.at <= kn.at) continue; // deleted here and not sent yet: the account still has the version this phone knew
-        list.push(r.data); at.set(r.id, list.length - 1); next[k] = { sig: remoteSig, at: r.at }; touched = true;
+        list.push(data); at.set(r.id, list.length - 1); next[k] = { sig: knownSig, at: r.at }; touched = true;
         continue;
       }
       if (r.at > localWhen) {
         // this phone's photos stay only when they are the ones the newer copy names; otherwise they are fetched again
-        const mine = samePhotos(kind === "cards" ? { photo: local.photo } : local, r.data);
+        const mine = samePhotos(kind === "cards" ? { photo: local.photo } : local, data);
         const keep = !mine ? {} : kind === "foods" || kind === "recipes" ? { photo: local.photo, photos: local.photos } : kind === "cards" ? { photo: local.photo } : {};
-        list[i!] = { ...r.data, ...Object.fromEntries(Object.entries(keep).filter(([, v]) => v !== undefined)) };
-        next[k] = { sig: remoteSig, at: r.at }; touched = true;
+        list[i!] = { ...data, ...Object.fromEntries(Object.entries(keep).filter(([, v]) => v !== undefined)) };
+        next[k] = { sig: knownSig, at: r.at }; touched = true;
       }
     }
     if (touched) {
