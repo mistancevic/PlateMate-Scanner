@@ -109,7 +109,8 @@ export function RecipesScreen(p: AppApi) {
   // the realistic photo test (0.2.13): the owner only, on the preview (and here, on this computer, for the walkthroughs)
   const isOwner = useMetricsOwner(true);
   const testOn = isOwner && p.ai.on && (isPreviewHost(location.host) || (["localhost", "127.0.0.1"].includes(location.hostname) && (() => { try { return localStorage.getItem("chefmealan-try-photo") === "1"; } catch { return false; } })()));
-  const mine = state.meals.filter((m) => m.from !== "coach"), fromCoach = state.meals.filter((m) => m.from === "coach");
+  // R17 (0.2.45): Chef Mealan's ideas wait at the top of Mine until made once or removed
+  const mine = [...state.meals.filter((m) => m.from !== "coach" && m.idea), ...state.meals.filter((m) => m.from !== "coach" && !m.idea)], fromCoach = state.meals.filter((m) => m.from === "coach");
   const shown = view === "mine" ? mine : fromCoach;
   const photoOf = (m: Meal) => state.feedback.find((f) => f.meal.id === m.id && f.photo)?.photo ?? state.feedback.find((f) => f.meal.title === m.title && f.photo)?.photo ?? null;
   const madeTimes = (m: Meal) => state.feedback.filter((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.status === "eaten").length;
@@ -248,6 +249,7 @@ export function RecipesScreen(p: AppApi) {
             <div className="recipe-tile-body">
               <div className="card-top"><b className="tile-name">{m.title}</b><ChevronRight size={20} className="tile-go" /></div>
               <small>{m.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}{rating ? ` · ${rating}` : ""}{n ? ` · made ${n === 1 ? "once" : `${n} times`}` : ""}</small>
+              {m.idea && <small className="tile-state">{CHEF_NAME}'s idea, not made yet</small>}
               {m.members && <small className="tile-state live">Shared with members</small>}
               {st && <small className={`tile-state ${st}`}>{st === "live" ? "Live on chefmealan.com" : st === "down" ? "Taken down" : st === "waiting" ? `Waiting for ${approver}` : st === "back" ? `Sent back by ${approver}` : "Draft"}</small>}
             </div>

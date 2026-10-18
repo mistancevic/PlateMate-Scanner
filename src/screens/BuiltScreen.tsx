@@ -9,7 +9,7 @@ import { Mark, APP_NAME } from "../components/Mark";
 const VERSION = String(import.meta.env.VITE_VERSION ?? "");
 const FIX_ROUNDS = Number(/\+r(\d+)$/.exec(VERSION)?.[1] ?? 0);
 // walkthroughs: the files in tests/flows that run on their own (not the helpers, not the paths runner): node scripts/run-flows.cjs --count
-export const BUILT_FACTS = { unitTests: 267, walkthroughs: 72 };
+export const BUILT_FACTS = { unitTests: 271, walkthroughs: 73 };
 
 type Tag = "code" | "ai" | "data";
 type Part = { x: number; y: number; w: number; t: string; s: string; tag: Tag; what: string; why: string; built: string };
