@@ -1,4 +1,5 @@
 import { countOf, gramsOfOne, KINDS } from "./counted";
+import { decodeEntities } from "./entities";
 import { rowsFromRaw } from "./labeltable";
 /** Versioned pilot contract: numbers are unrounded; null means unknown. */
 export type Nutrient = "calories" | "protein" | "fats" | "carbs" | "fiber";
@@ -457,6 +458,13 @@ export function repairState(v: any): any {
   fixItems(v.items);
   if (Array.isArray(v.meals)) for (const m of v.meals) fixItems(m?.items);
   if (Array.isArray(v.feedback)) for (const f of v.feedback) fixItems(f?.meal?.items);
+  // R1 (0.2.29): a recipe read before kept the page's codes in its names (Sally&#039;s Baking); they read as letters now
+  const txt = (t: unknown) => (typeof t === "string" && /&#?[a-z0-9]+;/i.test(t) ? decodeEntities(t) : t);
+  const fixMeal = (m: any) => { if (!m || typeof m !== "object") return; m.title = txt(m.title); if (m.source && typeof m.source === "object") m.source.name = txt(m.source.name); if (m.basedOn && typeof m.basedOn === "object") m.basedOn.title = txt(m.basedOn.title); if (Array.isArray(m.items)) for (const i of m.items) if (i?.food) i.food.name = txt(i.food.name); };
+  if (Array.isArray(v.meals)) v.meals.forEach(fixMeal);
+  if (Array.isArray(v.feedback)) for (const f of v.feedback) fixMeal(f?.meal);
+  if (Array.isArray(v.foods)) for (const f of v.foods) if (f) f.name = txt(f.name);
+  v.title = txt(v.title);
   return v;
 }
 export function parseState(raw: string): PilotState {

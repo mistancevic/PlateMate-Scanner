@@ -73,14 +73,10 @@ export function recipeFromLd(html: string): { name: string; ingredients: string[
 export function pageText(html: string): string {
   return decodeEntities(html.replace(/<(script|style|noscript|svg|nav|footer|header)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim().slice(0, 20000);
 }
-// A page's signs read as the letters they are (0.2.25, board RP1b: it&#8217;s showed as code): numbers, and the common names
-const NAMED: Record<string, string> = { nbsp: " ", amp: "&", quot: '"', apos: "'", lt: "<", gt: ">", rsquo: "\u2019", lsquo: "\u2018", rdquo: "\u201d", ldquo: "\u201c", ndash: "\u2013", mdash: "\u2014", hellip: "\u2026", deg: "\u00b0", frac12: "\u00bd", frac14: "\u00bc", frac34: "\u00be", times: "\u00d7", eacute: "\u00e9", egrave: "\u00e8", uuml: "\u00fc", ouml: "\u00f6", auml: "\u00e4", szlig: "\u00df" };
-export function decodeEntities(t: string): string {
-  const cp = (n: number) => (Number.isFinite(n) && n > 0 && n < 0x110000 ? String.fromCodePoint(n) : "");
-  return String(t).replace(/&#(\d{1,7});/g, (_, n) => cp(Number(n))).replace(/&#x([0-9a-f]{1,6});/gi, (_, h) => cp(parseInt(h, 16))).replace(/&([a-z][a-z0-9]{1,8});/gi, (m, k) => NAMED[k.toLowerCase()] ?? m);
-}
+export { decodeEntities, cleanText } from "./entities";
+import { decodeEntities, cleanText } from "./entities";
 export const siteName = (html: string, host: string) =>
-  (html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']{1,60})["']/i)?.[1] ?? host.replace(/^www\./, "")).trim();
+  decodeEntities(html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']{1,60})["']/i)?.[1] ?? host.replace(/^www\./, "")).trim();
 
 // the original steps: at most 20, each at most 400 letters, no empty lines
 // the page's signs as letters, and a range written with a dash as words: 10–20 minutes reads 10 to 20 minutes (0.2.25)
@@ -106,9 +102,9 @@ export function countItem<T extends { name: string; written: string; grams: numb
 export function cleanRead(d: any): ReadRecipe | null {
   if (!d || typeof d !== "object") return null;
   const items: ReadItem[] = (Array.isArray(d.items) ? d.items : []).slice(0, 30).map((i: any) => {
-    const written = String(i?.written ?? "").slice(0, 60);
+    const written = cleanText(i?.written, 60);
     const exact = gramsWritten(written);
-    const name = String(i?.name ?? "").trim().slice(0, 60);
+    const name = cleanText(i?.name, 60);
     // cups, spoons, ounces and sticks: grams by code from the food's kind (0.2.18, board UN), else the model's
     const measured = exact === null ? gramsFromMeasure(written, name) : null;
     let how: How = ["recipe", "converted", "guessed"].includes(i?.how) ? i.how : "guessed";
@@ -118,7 +114,7 @@ export function cleanRead(d: any): ReadRecipe | null {
     const cal = num(i?.calories), pro = num(i?.protein), fat = num(i?.fats), carb = num(i?.carbs);
     if (measured !== null) how = "converted";
     return { name: name.charAt(0).toUpperCase() + name.slice(1), written, grams: Math.round(exact ?? measured ?? num(i?.grams)), how, role,
-      calories: cal, protein: pro, fats: Number.isFinite(fat) && fat >= 0 ? fat : null, carbs: Number.isFinite(carb) && carb >= 0 ? carb : null, optional: i?.optional === true, ...(i?.optional === true && String(i?.note ?? "").trim() ? { note: String(i.note).trim().slice(0, 60) } : {}), ...(cleanPart(i?.part) ? { part: cleanPart(i.part) } : {}) };
+      calories: cal, protein: pro, fats: Number.isFinite(fat) && fat >= 0 ? fat : null, carbs: Number.isFinite(carb) && carb >= 0 ? carb : null, optional: i?.optional === true, ...(i?.optional === true && String(i?.note ?? "").trim() ? { note: cleanText(i.note, 60) } : {}), ...(cleanPart(i?.part) ? { part: cleanPart(i.part) } : {}) };
   }).map(countItem).filter((i: ReadItem) => i.name && i.grams > 0 && i.grams <= 5000 && Number.isFinite(i.calories) && i.calories >= 0 && i.calories <= 950 && Number.isFinite(i.protein) && i.protein >= 0 && i.protein <= 100);
   if (!items.length) return null;
   // parts only when the recipe groups its foods into two or more (0.2.19, IM15); a single group is one list
@@ -135,10 +131,10 @@ export function cleanRead(d: any): ReadRecipe | null {
   return {
     stated,
     steps: cleanSteps(d.method),
-    title: String(d.title ?? "").trim().slice(0, 80) || "A recipe",
-    source: String(d.source ?? "").trim().slice(0, 80),
+    title: cleanText(d.title, 80) || "A recipe",
+    source: cleanText(d.source, 80),
     servings: Number.isFinite(n) && n >= 1 ? Math.min(24, n) : 1,
-    servingsUnit: String(d.servings_unit ?? "").trim().slice(0, 24) || "portions",
+    servingsUnit: cleanText(d.servings_unit, 24) || "portions",
     servingsHow: d.servings_how === "recipe" && Number.isFinite(n) && n >= 1 ? "recipe" : "guessed",
     items,
   };

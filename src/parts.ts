@@ -1,3 +1,4 @@
+import { decodeEntities } from "./entities";
 // Dishes in parts, and optional foods inside them (0.2.19, canvas boards IM, IM12 to IM14, and IM15 to IM18; Milan 17 October
 // 2026, 10:32 to 11:26). A part is a name on a food: Base, Filling, Topping; a bowl's Rice, Chicken, Toppings. Parts come from
 // the recipe as read, from the person (Parts on the plate, Edit recipe), never invented by code. Rules the code keeps:
@@ -9,7 +10,7 @@ import type { Food, Ingredient, PlateOpt } from "./pilot";
 import type { Changed } from "./recipeIn";
 import { checkChange, roundGrams } from "./recipeIn";
 
-export const cleanPart = (x: unknown): string => { const t = String(x ?? "").replace(/\s+/g, " ").trim().replace(/^(for the|for|the)\s+/i, "").replace(/[:.]+$/, "").trim().slice(0, 30); return t ? t.charAt(0).toUpperCase() + t.slice(1) : ""; };
+export const cleanPart = (x: unknown): string => { const t = decodeEntities(String(x ?? "")).replace(/\s+/g, " ").trim().replace(/^(for the|for|the)\s+/i, "").replace(/[:.]+$/, "").trim().slice(0, 30); return t ? t.charAt(0).toUpperCase() + t.slice(1) : ""; };
 // the parts in the order they first come: the plate's foods, then its optional foods, then the parts left out
 export function partsOf(items: { part?: string }[], opts: { part?: string }[] = [], leftOut: { part: string }[] = []): string[] {
   const out: string[] = [];

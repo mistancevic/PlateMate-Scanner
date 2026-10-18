@@ -120,3 +120,13 @@ test("IM23: what a changed dish changed, for the step draft (0.2.23)", async () 
   assert.deepEqual(changesOf([f("Butter", 113), f("Cream cheese", 678), f("Sugar", 100)], [f("Butter", 113), f("Light cream cheese", 678), f("Sugar", 60), f("Whey", 60)], ["Chill it overnight."]),
     ["Light cream cheese: new", "Sugar: 60 g instead of 100 g", "Whey: new", "Cream cheese: not in it any more", "cooking note: Chill it overnight."]);
 });
+
+test("R1 (0.2.29): the read's names read as letters, never as the page's codes", () => {
+  const r = cleanRead({ title: "Mom&#8217;s apple fritters", source: "Sally McKenney, Sally&#039;s Baking Addiction", servings: 12, servings_unit: "fritters", servings_how: "recipe", items: [
+    { name: "Confectioners&#039; sugar", written: "3 cups (360g)", grams: 360, how: "recipe", role: "sweet", calories: 389, protein: 0, part: "For the glaze &amp; topping" },
+    { name: "Whole milk", written: "1 cup", grams: 240, how: "converted", role: "dairy", calories: 61, protein: 3.2, part: "Dough" }] })!;
+  assert.equal(r.source, "Sally McKenney, Sally's Baking Addiction");
+  assert.equal(r.title, "Mom’s apple fritters");
+  assert.equal(r.items[0].name, "Confectioners' sugar");
+  assert.equal(r.items[0].part, "Glaze & topping");
+});

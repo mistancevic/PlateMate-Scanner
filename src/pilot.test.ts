@@ -9,6 +9,8 @@ import {
   Ingredient,
   numberInput,
   parseState,
+  freshState,
+  repairState,
   portionTotals,
   solveIngredient,
   symbol,
@@ -134,4 +136,12 @@ test("a dense food lands on the whole gram just above the target, not left as it
   if (!s.ok) return;
   assert.ok(s.actualPD >= 6.923 && s.actualPD < 7.3, `PD ${s.actualPD}`);
   assert.ok(s.grams < 40, `grams ${s.grams}`);
+});
+
+test("R1 (0.2.29): a recipe saved with the page's codes in its names reads as letters when the app opens", () => {
+  const s = JSON.parse(JSON.stringify(freshState()));
+  s.meals = [{ id: "m1", title: "Sally&#039;s bars", items: [], portion: 0, savedAt: "2026-10-18T00:00:00Z", source: { name: "Sally McKenney, Sally&#039;s Baking", from: "link", at: "2026-10-18T00:00:00Z" } }];
+  const v = repairState(s);
+  assert.equal(v.meals[0].source.name, "Sally McKenney, Sally's Baking");
+  assert.equal(v.meals[0].title, "Sally's bars");
 });
