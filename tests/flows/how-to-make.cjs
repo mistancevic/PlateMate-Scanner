@@ -3,6 +3,8 @@
 // on this step (faked here: no AI key), at the whole recipe's grams or your slice's, and the 7 slices left go to Keep for later,
 // on Today day after day until eaten or removed. A cookie that makes 2 starts with just yours. Your own bowl in parts is a
 // checklist. A mix of ready foods keeps How do you want to eat it?
+// Changed by story R16 (Milan 21:56 to 22:11, board RS15): the slices left are not followed: no card for later, nothing on
+// Today; to eat them on other days, the recipe goes on Plan.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -63,7 +65,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
   let t = await text(page, "main");
   ok(/How to make it/.test(t) && !/How do you want to eat it/.test(t), "IM19: after Make it, a recipe gets How to make it");
-  ok(await page.locator('[aria-label="What you make"] .choice.on').textContent() === "The whole recipe" && /You eat 1 slice/.test(t) && /The 7 slices left go to Keep for later/.test(t), "IM19: it makes 8, so the whole cake is made; you eat 1 slice; 7 for later");
+  ok(await page.locator('[aria-label="What you make"] .choice.on').textContent() === "The whole recipe" && /You eat 1 slice/.test(t) && /7 slices are left\. To eat them on other days, put the recipe on Plan\./.test(t), "IM19: it makes 8, so the whole cake is made; you eat 1 slice; R16: the other 7 go on Plan, not Today");
   ok(/The recipe's own steps/.test(t) && await page.locator(".mk-card .rp-orig li").count() > 0 && /Preheat|Crush the biscuits/.test(await text(page, ".mk-card .rp-orig")) && /The original works with your foods as they are/.test(t), "RP1 (was IM19b): the original is the steps, and a line says it works; no steps yet: the original open below, for you only");
   ok(await page.getByRole("button", { name: "Chef Mealan's way" }).count() === 1 && await page.getByRole("button", { name: "I'm making it" }).count() === 1, "RP1: Chef Mealan's way on a tap; I'm making it");
   await page.getByRole("button", { name: "Chef Mealan's way" }).click(); await page.waitForTimeout(900);
@@ -78,26 +80,16 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   await page.getByRole("button", { name: "DaaM good" }).click();
   await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(600);
   let st = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
-  const kept = st.feedback.find((f) => f.status === "prepared");
-  ok(kept && kept.left === 7 && kept.meal.title === "Protein cheesecake" && kept.meal.items.find((i) => /Digestive/.test(i.food.name)).grams === 15, "IM19: one card for later, 7 slices left, each one slice's foods");
+  // R16 (0.2.44, Milan 21:56, board RS15): the rest of the cake is not followed: no card for later, nothing on Today
+  ok(!st.feedback.some((f) => f.status === "prepared") && st.feedback.filter((f) => f.status === "eaten" && f.meal.title === "Protein cheesecake").length === 1, "R16: one slice logged; no card for the 7 left");
   await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(800);
   t = await text(page, "main");
-  // R5 (Milan 17:23 to 19:00, board RS13): the batch sits under what comes next, labelled from your batch; I ate one asks which meal, then Log it
-  ok(/from your batch/.test(t) && /Protein cheesecake7 left/.test(t), "IM19: on Today: Protein cheesecake, 7 left");
-  await page.getByRole("button", { name: "I ate one" }).click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: "Log it" }).click(); await page.waitForTimeout(500);
-  st = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
-  ok(st.feedback.filter((f) => f.status === "eaten" && f.meal.title === "Protein cheesecake").length === 2 && st.feedback.find((f) => f.status === "prepared").left === 6, "IM19: I ate one logs one slice; 6 left");
+  ok(!/from your batch/.test(t) && !/7 left/.test(t) && await page.getByRole("button", { name: "I ate one" }).count() === 0, "R16: Today shows no batch: what is left may go to the family or to work");
   await page.close();
-  // the next day: still there, until eaten or removed
-  const page2 = await (async () => { const pg = await b.newPage({ viewport: { width: 390, height: 1600 } }); pg.on("pageerror", (e) => errs.push(e.message)); return pg; })();
-  await page2.close();
+  // the next day: Today still shows no batch; the cake reaches a day through the plan (batch-linked walks that)
   const p3 = await open({ ...st }, "2026-10-18T09:00:00");
   await p3.goto(U + "/"); await p3.waitForTimeout(1200);
-  t = await text(p3, "main");
-  ok(/Protein cheesecake6 left/.test(t), "IM19: the next day the slices are still on Today: 6 left");
-  await p3.getByRole("button", { name: "Remove" }).click(); await p3.waitForTimeout(400);
-  ok(!/6 left/.test(await text(p3, "main")), "IM19: Remove drops them");
+  ok(await p3.locator(".left-tag").count() === 0 && !/from your batch/.test(await text(p3, "main")) && !/Protein cheesecake/.test(await text(p3, ".next-meal")), "R16: the next day, nothing from the cake waits on Today");
   await p3.close();
 
   // ---- the cookie: makes 2, so just yours first ----
@@ -106,7 +98,8 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   await p4.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await p4.waitForTimeout(800);
   ok(await p4.locator('[aria-label="What you make"] .choice.on').textContent() === "Just your plate" && /The recipe makes 2/.test(await text(p4, "main")), "IM20: a recipe that makes 2 starts with just your cookie");
   await p4.getByRole("button", { name: "The whole recipe" }).click(); await p4.waitForTimeout(200);
-  ok(/The other cookie goes to Keep for later/.test(await text(p4, "main")), "IM20: All 2 cookies, an exact count: the other one goes to Keep for later");
+  // R16 (Milan 21:56 to 22:11, board RS15): the other cookie goes on Plan, not to Keep for later
+  ok(/1 cookie is left\. To eat it on other days, put the recipe on Plan\./.test(await text(p4, "main")), "IM20: All 2 cookies, an exact count: the other one is left, for Plan");
   await p4.close();
 
   // ---- your own bowl in parts: a checklist; a mix of ready foods keeps the ways to eat it ----

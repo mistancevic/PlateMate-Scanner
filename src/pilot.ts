@@ -144,7 +144,8 @@ export type Meal = {
   // where it came from (0.2.16, board IM, IM6): the account or site as text, the link, when; members and public pages get
   // the text only. The screenshots are the cook's own reference (shots, as files src:<id>:<n>), never a cover, never shared.
   // steps: the original method as read (0.2.18, board IM, IM9b): for the person only, never shared or published
-  source?: { name: string; url?: string; from: "screenshot" | "link"; at: string; shotSigs?: string[]; steps?: string[]; foods?: string[] };
+  // photo (0.2.44, R16): the page's own photo of the dish, an https address, for the person only, like the screenshots
+  source?: { name: string; url?: string; from: "screenshot" | "link"; at: string; shotSigs?: string[]; steps?: string[]; foods?: string[]; photo?: string };
   // the foods Chef Mealan's steps were written for (0.2.25, RP1c): changed foods since, and a line says so
   stepsFor?: string[];
   // optional ingredients the recipe names (0.2.18, IM8): kept out of the numbers, whole-recipe grams, added when cooking

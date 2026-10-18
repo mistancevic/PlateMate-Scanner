@@ -29,7 +29,7 @@ import type { InFlow } from "../components/RecipeIn";
 export function RecipesScreen(p: AppApi) {
   const { state, setState, setTab } = p;
   // R6 (0.2.43, Milan 19:45 to 19:58, board RS14): add a recipe here, the same block as the Plate; it saves to My recipes
-  const recipeIn = useRecipeIn({ kitchens: p.personal.kitchens ?? [], region: p.region, onError: (m) => p.notify(m) });
+  const recipeIn = useRecipeIn({ kitchens: p.personal.kitchens ?? [], region: p.region, onError: (m) => p.notify(m), pdRef: p.pdRef, fitPd: p.fitPd });
   async function saveRead(f: Extract<InFlow, { kind: "read" }>) {
     const { meal, fresh } = await mealFromRead(f, state.foods);
     setState((s) => ({ ...s, foods: [...s.foods, ...fresh], meals: [meal, ...s.meals] }));

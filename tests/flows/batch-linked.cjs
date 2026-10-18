@@ -4,6 +4,8 @@
 // before this change finds its recipe by the recipe's name. A plate that is no recipe can still be saved from Today.
 // Never rewrite these lines to fit a change.
 // Changed by story R5 (Milan 17:23 to 19:00, board RS13): a linked meal shows Open the recipe in place of In My recipes, and I ate one asks which meal it is.
+// Changed by story R16 (Milan 21:56 to 22:11, board RS15): the slices left are not followed, so no card waits for later; a slice
+// reaches a day through the plan, and I ate it on Today logs it, linked to the cheesecake.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -56,14 +58,19 @@ const U = "http://127.0.0.1:3225";
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(700);
     let st = await state(page);
     const recipe = st.meals.find((m) => m.title === "Protein cheesecake");
-    const kept = st.feedback.find((f) => f.status === "prepared");
-    ok(!!recipe && kept && kept.left === 7 && kept.recipeId === recipe.id, "the 7 slices left wait for later, and the card knows its recipe");
+    ok(!!recipe && !st.feedback.some((f) => f.status === "prepared"), "R16: the cheesecake is in My recipes; no card waits for the 7 left");
+    // R16: a slice for the next meal goes in through the plan
     await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(800);
-    await page.getByRole("button", { name: "I ate one" }).click(); await page.waitForTimeout(300);
-    await page.getByRole("button", { name: "Log it" }).click(); await page.waitForTimeout(600);
+    const nextName = ((await page.locator("p.label").filter({ hasText: /^Next: / }).first().textContent()) ?? "").replace(/^Next: /, "").split(",")[0].trim();
+    await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(700);
+    await page.locator(".plan-slot").filter({ hasText: new RegExp(nextName, "i") }).first().click(); await page.waitForTimeout(500);
+    await page.locator(".pick-row").filter({ hasText: "Protein cheesecake" }).first().click(); await page.waitForTimeout(500);
+    await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(800);
+    ok(/Protein cheesecake/.test(await page.locator(".next-planned").textContent()) && await page.getByRole("button", { name: "I ate it", exact: true }).count() === 1, "R16: Today's next meal is the planned slice, with I ate it");
+    await page.getByRole("button", { name: "I ate it", exact: true }).click(); await page.waitForTimeout(600);
     st = await state(page);
     const eaten = st.feedback.filter((f) => f.status === "eaten" && f.meal.title === "Protein cheesecake");
-    ok(eaten.length === 2 && eaten.every((f) => f.recipeId === recipe.id), "I ate one logs a slice linked to the cheesecake");
+    ok(eaten.length === 2 && eaten.every((f) => f.recipeId === recipe.id), "I ate it logs a slice linked to the cheesecake");
     const cards = cardOf(page, "Protein cheesecake");
     const n = [await cards.count(), await cards.getByRole("button", { name: /Open the recipe/ }).count(), await cards.getByRole("button", { name: "Save in My recipes" }).count()];
     ok(n[0] === 2 && n[1] === 2 && await cards.getByRole("button", { name: "Save in My recipes" }).count() === 0, "both cheesecake meals on Today say In My recipes; no Save in My recipes " + JSON.stringify(n));

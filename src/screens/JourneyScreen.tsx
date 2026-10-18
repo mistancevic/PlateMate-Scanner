@@ -381,7 +381,7 @@ export function JourneyScreen(p: AppApi) {
     : mealSlot ? `${capName(mealSlot.name)}, by the clock: a guess, off the plan. Tap ${capName(mealSlot.name)} to make it your ${mealSlot.name.toLowerCase()}: it counts by the plan.` : "Pick what it is for.";
   // ---- a recipe from screenshots or a link (0.2.16, canvas board IM) ----
   // R6 (0.2.43): the read is the shared block, the same as on Recipes
-  const recipeIn = useRecipeIn({ kitchens: p.personal.kitchens ?? [], region: p.region, onError: (m) => setError(m) });
+  const recipeIn = useRecipeIn({ kitchens: p.personal.kitchens ?? [], region: p.region, onError: (m) => setError(m), pdRef, fitPd: p.fitPd });
   const { inFlow, setInFlow } = recipeIn;
   // R15 (0.2.41, board RS12): "whole" is the recipe as mapped, where a recipe starts on the plate
   const [pmode, setPmode] = useState<"whole" | "sized" | "recipe">("sized");
@@ -1135,7 +1135,7 @@ export function JourneyScreen(p: AppApi) {
             {/* RP3 (0.2.25): what you make and what you eat, each with its weight and energy */}
             <div className="mk-eat mk-make"><span><b>You make</b> {madeWhole ? (sizedPlate ? `the whole recipe, about ${yours} of your ${leftMany}` : "the whole recipe") : onePlate ? `1 ${one}` : "your plate"}</span><span>{fmt(tMake.weight, 0)} g · {fmt(tMake.calories, 0)} kcal</span></div>
             <div className="mk-eat"><span><b>You eat</b> {wholePlate ? "the whole recipe" : sizedPlate ? `one ${mealWord}` : onePlate ? `1 ${one}` : rec && pmode === "recipe" && !way ? `your plate, 1 ${one}` : "your plate"}</span><span>{fmt(t0.weight, 0)} g · {fmt(t0.calories, 0)} kcal · {pdText(pd0)}</span></div>
-            <small className="muted">{madeWhole ? `The steps are for the whole recipe. ${leftK < 1 ? "Your plate is the whole recipe, so nothing is left." : sizedPlate ? `${leftK} of your ${leftK === 1 ? leftOne : leftMany} ${leftK === 1 ? "is" : "are"} left, each the size of your ${mealWord}. ${leftK === 1 ? "It goes" : "They go"} to Keep for later when you save, ready for the coming days.` : `${leftK === 1 ? `The other ${one} goes` : `The ${leftK} ${unit} left go`} to Keep for later when you save, ready for the coming days.`}` : `The recipe makes ${n}. The steps are for your plate: every amount at your portion, to the gram.`}</small>
+            <small className="muted">{madeWhole ? `The steps are for the whole recipe. ${leftK < 1 ? "Your plate is the whole recipe, so nothing is left." : `${leftWords(leftK)} ${leftK === 1 ? "is" : "are"} left. To eat ${leftK === 1 ? "it" : "them"} on other days, put the recipe on Plan.`}` : `The recipe makes ${n}. The steps are for your plate: every amount at your portion, to the gram.`}</small>
           </section>
         )}
         {/* RP1 to RP1c (0.2.25): the original is the steps; Chef Mealan's on demand, with a line for the case */}
@@ -1184,7 +1184,7 @@ export function JourneyScreen(p: AppApi) {
           </section>
         )}
         <button className="pill pill-primary pill-wide" onClick={() => { log("method_chosen", { method: madeWhole ? "whole" : "plate" }); setStep("made"); }}>I'm making it</button>
-        {madeWhole && leftK > 0 && <small className="muted center" style={{ display: "block", marginTop: 6 }}>{leftWords(leftK)} {leftK === 1 ? "goes" : "go"} to Keep for later when you save.</small>}
+        {madeWhole && leftK > 0 && <small className="muted center" style={{ display: "block", marginTop: 6 }}>To eat the rest on other days, put the recipe on Plan.</small>}
         <Back to="in" />
       </>
     );
@@ -1340,16 +1340,14 @@ export function JourneyScreen(p: AppApi) {
         // a plate that is a recipe as it stands (0.2.3): the card points at that recipe, no second copy
         const keep = !origin && saveRecipe && status === "eaten";
         if (triedNow) log("recipe_fit", { way: triedNow.kind, result: triedNow.result });
-        // the whole recipe made (IM19): the portions left go to Keep for later, one card with how many are left
-        // R4 (0.2.38): the card carries the recipe, so each portion eaten from it is In My recipes, not a plate of its own
-        // a changed dish leaves portions of the changed recipe (0.2.23)
-        if (madeWhole && rec?.makes && status === "eaten" && leftK > 0) { const left = chgW ? onePortion(chgW.whole!, rec.makes.n).map((i) => ({ ...i, id: uid() })) : way ? structuredClone(items) : sizedPlate ? structuredClone(items).map((i) => ({ ...i, id: uid() })) : portionItems(rec, "recipe"); p.keepForLater({ id: uid(), title: chgW ? name : rec.title, items: left, portion: left.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() }, { left: leftK, leftOf: leftOne, recipeId: keep ? kept.id : (fromRec ?? origin)?.id }); }
+        // R16 (0.2.44, Milan 21:56, board RS15): the rest of a whole recipe made is not followed: it may go to the family or to
+        // work. The recipe goes on Plan for the days you eat it; Today shows it there, and I ate it logs it with its recipe.
         // where you land (0.2.23, IM23c): the recipe the meal made or changed, a recipe made for the first time, or steps drafted now
         const firstTime = !!fromRec && !state.feedback.some((f) => f.status === "eaten" && (f.recipeId === fromRec.id || f.meal?.id === fromRec.id));
         // RP4 (0.2.25, Milan 17:42): every recipe you make ends on its page; a plate that is no recipe ends on Today
         const landId = keep ? kept.id : (fromRec ?? origin)?.id ?? null;
         const leftN = madeWhole && rec?.makes ? Math.max(0, leftK) : 0;
-        const landLine = status !== "eaten" ? "" : [`You ate ${rec && pmode === "recipe" && !way ? `1 ${oneOf(rec)}` : "your plate"}.`, leftN > 0 ? `${sizedPlate ? leftWords(leftN) : countOf(leftN, unitOf(rec!))} left on Today.` : "", chgKept && fromRec ? `The original, ${fromRec.title}, stays as it was.` : ""].filter(Boolean).join(" ");
+        const landLine = status !== "eaten" ? "" : [`You ate ${rec && pmode === "recipe" && !way ? `1 ${oneOf(rec)}` : "your plate"}.`, leftN > 0 ? `${sizedPlate ? leftWords(leftN) : countOf(leftN, unitOf(rec!))} left: to eat ${leftN === 1 ? "it" : "them"} on other days, put the recipe on Plan.` : "", chgKept && fromRec ? `The original, ${fromRec.title}, stays as it was.` : ""].filter(Boolean).join(" ");
         setState((s) => ({ ...s, fromRecipe: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)), feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : pickSlot ? { date: todayKey, slotId: pickSlot.id, name: pickSlot.name, time: pickSlot.time } : undefined, ...(p.filling?.mode !== "eat" && !pickSlot && mealSlot ? { which: capName(mealSlot.name) } : {}), createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));
         if (p.filling) p.setFilling(null);
         setWay(null); setTried(null);

@@ -25,7 +25,7 @@ import { coverPrompt, coverVerdict, photoPrompt, COVER_MODELS, TEST_MODELS, PICT
 import { cleanShared } from "./src/members";
 import dns from "node:dns";
 import https from "node:https";
-import { linkCheck, isPrivateIp, recipeFromLd, ingredientGroups, pageText, siteName, cleanRead, cleanSteps, sameWords, checkChange, ROLES, MAX_SHOTS, type ReadError, type Changed } from "./src/recipeIn";
+import { linkCheck, isPrivateIp, recipeFromLd, ingredientGroups, pageText, pagePhoto, siteName, cleanRead, cleanSteps, sameWords, checkChange, ROLES, MAX_SHOTS, type ReadError, type Changed } from "./src/recipeIn";
 import { tempsIn, fNotes } from "./src/units";
 import { cleanPart, checkPart } from "./src/parts";
 const CHEF_NAME_SERVER = "Chef Mealan";
@@ -1309,13 +1309,14 @@ app.post("/api/recipe/read", requireUser, requireMember, requireAI, async (req, 
       if (!m) return res.status(400).json({ error: "One of the pictures can't be read. Try another." });
       images.push({ inlineData: { mimeType: m[1], data: m[2] } });
     }
-    let what = "", site = "", ld: ReturnType<typeof recipeFromLd> = null, block: string | null = null;
+    let what = "", site = "", ld: ReturnType<typeof recipeFromLd> = null, block: string | null = null, photo: string | null = null;
     if (link) {
       const chk = linkCheck(link);
       if (!chk.ok) { const k = (chk as { error: ReadError }).error; return res.json({ error: k, message: READ_TEXT[k] }); }
       let page: { html: string; url: URL };
       try { page = await fetchPage((chk as { url: URL }).url); } catch (e: any) { const k: ReadError = e?.kind === "login" ? "login" : "fetch"; return res.json({ error: k, message: READ_TEXT[k] }); }
       ld = recipeFromLd(page.html);
+      photo = pagePhoto(page.html, page.url);
       site = ld?.author ? `${ld.author}, ${siteName(page.html, page.url.hostname)}` : siteName(page.html, page.url.hostname);
       // a method given as one block of text goes to Chef Mealan in this same call, to be split into its steps (0.2.25, RP1b)
       block = ld && ld.steps.length === 1 && ld.steps[0].length > 200 ? ld.steps[0] : null;
@@ -1332,7 +1333,7 @@ app.post("/api/recipe/read", requireUser, requireMember, requireAI, async (req, 
     // the page's own method wins over the model's reading of it (0.2.18, IM9b)
     if (ld?.steps.length) r.steps = block && sameWords(block, r.steps) ? r.steps : ld.steps;
     const allGuessed = r.items.every((i) => i.how === "guessed");
-    res.json({ recipe: r, ...(link ? { url: link } : {}), ...(allGuessed ? { note: READ_TEXT["no-amounts"] } : {}) });
+    res.json({ recipe: r, ...(link ? { url: link } : {}), ...(photo ? { photo } : {}), ...(allGuessed ? { note: READ_TEXT["no-amounts"] } : {}) });
   } catch (error) { fail(res, error); }
 });
 // Change the dish or add on the side (IM5, IM5b): Chef Mealan proposes, code checks and sets every gram

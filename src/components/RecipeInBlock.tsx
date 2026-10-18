@@ -19,7 +19,7 @@ export const estimate = (a: { name: string; calories: number; protein: number; f
 const readFile = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 
 // the read, its state and its steps; onError says what went wrong where the screen shows errors
-export function useRecipeIn(o: { kitchens: string[]; region: unknown; onError: (m: string) => void }) {
+export function useRecipeIn(o: { kitchens: string[]; region: unknown; onError: (m: string) => void; pdRef?: number | null; fitPd?: (pd: number | null) => string }) {
   const [inFlow, setInFlow] = useState<InFlow | null>(null);
   // a slow read (0.2.23, IM23d): after 20 seconds the card says it takes longer
   const [slowRead, setSlowRead] = useState(false);
@@ -43,11 +43,11 @@ export function useRecipeIn(o: { kitchens: string[]; region: unknown; onError: (
       const got = data.recipe as ReadRecipe;
       // the oil rule again on the phone (R3, 0.2.38): the same result on an answer already capped, so it never counts twice
       const stepsGot = cleanSteps(got.steps ?? []);
-      setInFlow({ kind: "read", recipe: { ...got, items: capOil((got.items ?? []).map(countItem), stepsGot), steps: stepsGot }, shots, url: data.url, note: data.note });
+      setInFlow({ kind: "read", recipe: { ...got, items: capOil((got.items ?? []).map(countItem), stepsGot), steps: stepsGot }, shots, url: data.url, note: data.note, ...(typeof data.photo === "string" && /^https:\/\//.test(data.photo) ? { photo: data.photo } : {}) });
     } catch (e: any) { setInFlow(shots.length ? { kind: "shots", shots } : { kind: "link", url }); o.onError(e.message); }
     finally { clearTimeout(slow); setSlowRead(false); }
   }
-  return { inFlow, setInFlow, slowRead, addShots, readIn };
+  return { inFlow, setInFlow, slowRead, addShots, readIn, pdRef: o.pdRef ?? null, fitPd: o.fitPd };
 }
 export type RecipeIn = ReturnType<typeof useRecipeIn>;
 
@@ -67,7 +67,7 @@ export function RecipeInFlow({ flow, put, putLabel }: { flow: RecipeIn; put: (f:
   if (!inFlow) return null;
   if (inFlow.kind === "shots") return <ShotsCard shots={inFlow.shots} reading={inFlow.reading} slow={slowRead} add={(f) => void addShots(f, inFlow.shots)} remove={(n) => setInFlow({ kind: "shots", shots: inFlow.shots.filter((_, k) => k !== n) })} read={() => void readIn({ shots: inFlow.shots })} cancel={() => setInFlow(null)} />;
   if (inFlow.kind === "link") return <LinkCard url={inFlow.url} reading={inFlow.reading} slow={slowRead} setUrl={(v) => setInFlow({ kind: "link", url: v })} read={() => void readIn({ url: inFlow.url })} cancel={() => setInFlow(null)} />;
-  if (inFlow.kind === "read") return <ReadCard flow={inFlow} putLabel={putLabel} setSource={(v) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, source: v } })} setServings={(n) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, servings: n, servingsHow: inFlow.recipe.servingsHow } })} toggle={(k) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, items: inFlow.recipe.items.map((x, j) => (j === k ? { ...x, on: !(x.on ?? !x.optional) } : x)) } })} put={() => put(inFlow)} again={() => void readIn(inFlow.url ? { url: inFlow.url } : { shots: inFlow.shots })} cancel={() => setInFlow(null)} />;
+  if (inFlow.kind === "read") return <ReadCard flow={inFlow} putLabel={putLabel} pdRef={flow.pdRef ?? null} fitPd={flow.fitPd} setSource={(v) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, source: v } })} setServings={(n) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, servings: n, servingsHow: inFlow.recipe.servingsHow } })} toggle={(k) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, items: inFlow.recipe.items.map((x, j) => (j === k ? { ...x, on: !(x.on ?? !x.optional) } : x)) } })} put={() => put(inFlow)} again={() => void readIn(inFlow.url ? { url: inFlow.url } : { shots: inFlow.shots })} cancel={() => setInFlow(null)} />;
   return <ErrorCard flow={inFlow} next={(to) => setInFlow(to === "link" ? { kind: "link", url: inFlow.url } : { kind: "shots", shots: inFlow.code === "not-recipe" ? [] : inFlow.shots })} cancel={() => setInFlow(null)} />;
 }
 
@@ -86,6 +86,6 @@ export async function mealFromRead(f: Extract<InFlow, { kind: "read" }>, foods: 
   const optional = r.items.filter((i) => i.optional && !(i.on ?? false)).map((i) => ({ name: i.name, written: i.written, ...(i.note ? { note: i.note } : {}), grams: i.grams, ...(i.part ? { part: i.part } : {}),
     food: leanFood(foods.find((x) => x.name.toLowerCase() === i.name.toLowerCase()) ?? { ...estimate(i), notes: `${CHEF_NAME}'s estimate, from a recipe` }) }));
   const meal: Meal = { id: uid(), title: r.title, items: whole, portion: Math.round(total / r.servings), savedAt: new Date().toISOString(), steps: [],
-    source: { name: r.source, ...(f.url ? { url: f.url } : {}), from: f.url ? "link" : "screenshot", at: new Date().toISOString(), ...(r.steps?.length ? { steps: r.steps } : {}), foods: foodNames(whole) }, ...(thumbs.length ? { shots: thumbs } : {}), makes: { n: r.servings, unit: r.servingsUnit }, ...(optional.length ? { optional } : {}), ...(r.stated ? { stated: r.stated } : {}) };
+    source: { name: r.source, ...(f.url ? { url: f.url } : {}), from: f.url ? "link" : "screenshot", at: new Date().toISOString(), ...(r.steps?.length ? { steps: r.steps } : {}), foods: foodNames(whole), ...(f.url && f.photo ? { photo: f.photo } : {}) }, ...(thumbs.length ? { shots: thumbs } : {}), makes: { n: r.servings, unit: r.servingsUnit }, ...(optional.length ? { optional } : {}), ...(r.stated ? { stated: r.stated } : {}) };
   return { meal, fresh };
 }

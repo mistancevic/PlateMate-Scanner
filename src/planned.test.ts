@@ -33,3 +33,19 @@ test("a recipe becomes a planned meal at its portion", () => {
   const m = fromMeal({ id: "m", title: "Skyr bowl", items: [{ id: "i", food, grams: 300, locked: true }], portion: 150, savedAt: "" }, "mine");
   assert.equal(m.kcal, 95); assert.equal(m.protein, 17); assert.equal(m.source, "mine"); assert.equal(m.mealId, "m");
 });
+
+test("R16: I ate it logs one portion of the planned recipe, as the plan counts it", async () => {
+  const { plannedPortion, fromMeal } = await import("./planned");
+  const food = (id: string, calories: number, protein: number, fats: number, carbs: number) => ({ id, name: id, brand: "", basis: "100g", source: "estimate", notes: "", reviewedAt: "", readyToEat: true, calories, protein, fats, carbs, fiber: null }) as any;
+  const recipe = { id: "r1", title: "Fritters", items: [{ id: "a", food: food("dough", 302, 8, 10, 45), grams: 2000, locked: true }, { id: "b", food: food("glaze", 400, 0, 0, 100), grams: 340, locked: true }], portion: 195, savedAt: "" } as any;
+  const planned = fromMeal(recipe, "mine");
+  const meal = plannedPortion(planned, "r1", "2026-10-19T07:05:00Z")!;
+  assert.ok(Math.abs(meal.portion - 195) < 0.5, "one portion: " + meal.portion);
+  const { parseState, aggregate, KEYS } = await import("./pilot");
+  assert.ok(meal.portion <= aggregate(meal.items).weight, "the portion never weighs more than its foods");
+  const st = { version: 1, goals: Object.fromEntries(KEYS.map((k) => [k, null])), foods: [], items: [], meals: [], feedback: [{ id: "f1", meal, status: "eaten", taste: "", notes: "", createdAt: "2026-10-19T07:05:00Z" }], preferences: "", title: "", portion: null };
+  assert.doesNotThrow(() => parseState(JSON.stringify(st)), "the logged meal is read back");
+  const kcal = meal.items.reduce((n, i) => n + (i.food.calories * i.grams) / 100, 0);
+  assert.ok(Math.abs(kcal - planned.kcal) <= 1, `the log counts what the plan counts: ${kcal} vs ${planned.kcal}`);
+  assert.equal(plannedPortion({ title: "Skyr bowl", kcal: 420, protein: 46, source: "starter" }, "x", ""), null, "a starter has no foods to log");
+});

@@ -42,7 +42,6 @@ export function DeleteRecipe({ plan, slug, approver, run }: { plan: DeletePlan; 
         : <Check on={page} set={setPage} label="Take the live page down" sub={`chefmealan.com/r/${slug} stops showing it.${plan.page === "live+waiting" ? ` The version waiting for ${approver} is withdrawn.` : ""}`} />)}
       {stays && <div className="dl-h">STAYS</div>}
       {plan.eaten > 0 && <Li ok>{plan.eaten === 1 ? "Your meal" : `Your ${plan.eaten} meals`} with it, on Today and in your history: what you ate stays what you ate.</Li>}
-      {plan.left > 0 && <Li ok>{countOf(plan.left, plan.unit)} left on Today, until you eat them or remove them.</Li>}
       {plan.foods > 0 && <Li ok>{plan.foods === 1 ? "The food it uses" : `The ${plan.foods} foods it uses`}, in your Foods. A food holds nothing personal.</Li>}
       {err && <small className="dl-err" role="alert">{err}</small>}
       <div className="button-row">

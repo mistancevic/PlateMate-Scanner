@@ -3,6 +3,8 @@
 // is chosen next. On How to make it, the whole recipe sized for your lunch is about N of your lunches; the rest is left, each
 // the size of your lunch, and goes to Keep for later. The landing line and the Today card count lunches, not bowls.
 // Who eats the rest stays open. Never rewrite these lines to fit a change.
+// Changed by story R16 (Milan 21:56 to 22:11, board RS15): who eats the rest is not followed. The rest is counted in lunches
+// and goes on Plan for other days, not to Keep for later; no card waits on Today.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -58,20 +60,18 @@ const U = "http://127.0.0.1:3226";
     await page.locator(".mk-card").getByRole("button", { name: "The whole recipe" }).click(); await page.waitForTimeout(300);
     const mk = await text(".mk-card");
     ok(new RegExp(`You make the whole recipe, about ${N} of your lunches`).test(mk) && /You eat one lunch/.test(mk) && !/3 bowls/.test(mk), "You make the whole recipe, about N of your lunches; you eat one lunch: " + mk.slice(0, 160));
-    ok(new RegExp(`${N - 1} of your lunches are left, each the size of your lunch\\. They go to Keep for later`).test(mk), "the rest is left in lunches, each the size of your lunch");
-    ok(new RegExp(`${N - 1} lunches go to Keep for later when you save`).test(await text("main")), "the bottom line counts lunches");
+    // R16 (Milan 21:56 to 22:11, board RS15): the rest is counted in lunches and goes on Plan, not to Keep for later
+    ok(new RegExp(`${N - 1} lunches are left\\. To eat them on other days, put the recipe on Plan\\.`).test(mk), "the rest is counted in lunches; to eat them on other days, Plan");
+    ok(/To eat the rest on other days, put the recipe on Plan\./.test(await text("main")) && !/Keep for later when you save/.test(await text("main")), "the bottom line points to Plan");
     await page.getByRole("button", { name: "I'm making it", exact: true }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "On to How was it?" }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "DaaM good" }).click();
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(800);
-    ok(new RegExp(`${N - 1} lunches left on Today\\.`).test(await text("main")), "the landing line: N lunches left on Today");
+    ok(new RegExp(`${N - 1} lunches left: to eat them on other days, put the recipe on Plan\\.`).test(await text("main")), "the landing line: N lunches left, put the recipe on Plan");
     st = await state();
-    const kept = st.feedback.find((f) => f.status === "prepared");
-    ok(kept && kept.left === N - 1 && kept.leftOf === "lunch" && Math.abs(kcal(kept.meal.items) - plate) < 2, "Keep for later holds lunches, each the size of yours");
+    ok(!st.feedback.some((f) => f.status === "prepared"), "R16: no card waits for the lunches left");
     await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(800);
-    const card = await text(".log-card:has(.left-tag)");
-    // R5 (Milan 17:23 to 19:00, board RS13): the batch card says Each one lunch, with its numbers in place of its foods
-    ok(new RegExp(`${N - 1} left`).test(card) && /Each one lunch: /.test(card), "the Today card: N left, one lunch each: " + card.slice(0, 120));
+    ok(await page.locator(".log-card .left-tag").count() === 0 && !/from your batch/.test(await text("main")), "R16: Today shows no batch");
   } catch (e) { ok(false, "walkthrough error: " + e.message.split("\n").slice(0, 3).join(" / ")); }
   ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   await b.close(); server.kill();

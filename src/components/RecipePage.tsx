@@ -178,6 +178,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         ? <input className="title-input rq-name-input" aria-label="Name of the recipe" autoFocus value={naming} onChange={(e) => setNaming(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" maxLength={80} />
         : <button type="button" className="rq-name" aria-label={`Rename ${meal.title}`} onClick={() => setNaming(meal.title)}>{meal.title}</button>}
       {meal.source && <SourceBox meal={meal} onPatch={onPatch} openOriginal={openOriginal ?? null} />}
+      {/* R16 (0.2.44, board RS15): PD on top, under Where it came from, as on the Plate; it follows the grams while editing */}
+      <NutritionCard readoutOnly items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={null} pdRef={pdRef ?? null} fitPd={fitPd} />
       {/* IM21: one serving first, when the recipe makes more than one */}
       {/* RP2 (0.2.25): the three tiles gave way to the PD readout above the Nutrition table */}
       <section className={`card rq-foods ${edit ? "editing" : ""}`}>
@@ -225,7 +227,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           <small className="muted">The recipe's numbers leave them out, and so do ours. Make it, and add any of them on the plate.</small>
         </section>
       )}
-      <NutritionCard items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={meal.stated ?? null} pdRef={pdRef ?? null} fitPd={fitPd} readoutOnly={Boolean(edit)} />
+      {!edit && <NutritionCard tableOnly items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={meal.stated ?? null} pdRef={pdRef ?? null} fitPd={fitPd} />}
       <section className={`card rq-steps ${edit ? "editing" : ""}`}>
         <b>Steps</b>
         {edit

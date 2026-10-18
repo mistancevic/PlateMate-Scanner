@@ -155,3 +155,17 @@ test("R2 fix (0.2.34): the recipe card's ingredient groups are read from the pag
   assert.equal(ingredientGroups(oneList), null, "one list: no groups");
   assert.equal(ingredientGroups("<p>No recipe card here.</p>"), null);
 });
+
+test("R16: the page's photo of the dish: the recipe's image first, else og:image; https only", async () => {
+  const { pagePhoto } = await import("./recipeIn");
+  const base = new URL("https://example.com/recipes/fritters/");
+  const ld = (image: unknown) => `<script type="application/ld+json">${JSON.stringify({ "@graph": [{ "@type": "WebPage" }, { "@type": "Recipe", name: "Fritters", image }] })}</script>`;
+  assert.equal(pagePhoto(ld("https://cdn.example.com/a.jpg"), base), "https://cdn.example.com/a.jpg");
+  assert.equal(pagePhoto(ld(["https://cdn.example.com/b.jpg", "https://cdn.example.com/c.jpg"]), base), "https://cdn.example.com/b.jpg");
+  assert.equal(pagePhoto(ld({ "@type": "ImageObject", url: "/img/d.jpg" }), base), "https://example.com/img/d.jpg", "relative, made whole");
+  assert.equal(pagePhoto(`<meta property="og:image" content="https://example.com/og.jpg?a=1&amp;b=2">`, base), "https://example.com/og.jpg?a=1&b=2");
+  assert.equal(pagePhoto(`<meta content="https://example.com/og2.jpg" property="og:image">`, base), "https://example.com/og2.jpg");
+  assert.equal(pagePhoto(`<meta property="og:image" content="http://example.com/plain.jpg">`, base), null, "not https: none");
+  assert.equal(pagePhoto(`<meta property="og:image" content="javascript:alert(1)">`, base), null);
+  assert.equal(pagePhoto("<p>no picture</p>", base), null);
+});

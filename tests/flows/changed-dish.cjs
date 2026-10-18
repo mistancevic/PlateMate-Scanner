@@ -3,6 +3,8 @@
 // are drafted for the changed foods and marked "your change". Save keeps the changed dish as a whole recipe that makes 10,
 // adapted from the original, with its steps and the original steps; you land on it with one line for today. The original
 // stays as it was. A read that takes longer than 20 seconds says so. AI answers faked (no key here).
+// Changed by story R16 (Milan 21:56 to 22:11, board RS15): the slices left are not kept as a card for later; the landing line
+// says they go on Plan, not on Today.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -93,12 +95,12 @@ const U = "http://127.0.0.1:3215";
   const o2 = s.meals.find((m) => m.id === orig.id);
   ok(o2.items.find((i) => i.food.name === "Cream cheese").grams === 678 && !o2.steps?.length && o2.tried?.[0]?.result === "yes", "IM23b: the original stays as it was, and remembers the change worked");
   const later = s.feedback.find((f) => f.status === "prepared");
-  ok(later && later.left === 9 && later.meal.title === "No-bake cheesecake, more protein" && later.meal.items.find((i) => i.food.name === "Light cream cheese").grams === 68, "IM23b: 9 slices for later, each a slice of the changed dish");
+  ok(!later, "R16: no card waits for the 9 slices left; they go on Plan");
   ok(s.feedback.find((f) => f.status === "eaten").recipeId === nw.id, "IM23b: the meal points at the changed recipe");
 
   // IM23c: you land on the changed recipe, with one line for today
   t = await text("main");
-  ok(/Saved in Mine/.test(t) && /You ate your plate\. 9 slices left on Today\. The original, No-bake cheesecake, stays as it was\./.test(t) && /No-bake cheesecake, more protein/.test(await text(".rq")), `IM23c: you land on the changed recipe with a line for today (${t.slice(0, 160)})`);
+  ok(/Saved in Mine/.test(t) && /You ate your plate\. 9 slices left: to eat them on other days, put the recipe on Plan\. The original, No-bake cheesecake, stays as it was\./.test(t) && /No-bake cheesecake, more protein/.test(await text(".rq")), `IM23c: you land on the changed recipe with a line for today (${t.slice(0, 160)})`);
   await shot("im23c", ".rq");
   ok(/Beat 678 g light cream cheese and 100 g granulated sugar until smooth/.test(await text(".rq-steps")) && await page.locator(".rq-steps .st-amt.gone").count() === 0, "IM23c: the kept steps show the changed foods with their amounts");
   ok(/Adapted from No-bake cheesecake, Sally's Baking Addiction/.test(await text(".rq-source")), "IM23c: Where it came from says it is adapted from the original");

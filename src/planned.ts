@@ -21,6 +21,17 @@ export function withPlanned(p: Planned, date: string, slotId: string, meal: Plan
   return next;
 }
 
+// R16 (0.2.44, board RS15): I ate it on Today logs the planned meal as it is in the plan: one portion of the recipe, its
+// foods scaled as the plan counts them (fromMeal). A meal without foods (a starter) has nothing to log; the Plate makes it.
+export function plannedPortion(m: PlannedMeal, id: string, savedAt: string): Meal | null {
+  if (!m.items?.length) return null;
+  const weight = m.items.reduce((n, i) => n + (i.grams > 0 ? i.grams : 0), 0);
+  const ratio = m.portion && weight > 0 ? Math.min(1, m.portion / weight) : 1;
+  const items = m.items.map((i) => ({ ...i, grams: Math.round(i.grams * ratio * 10) / 10 }));
+  // the portion is the foods' own weight, never rounded past it: a stored meal heavier than its foods is not read back
+  return { id, title: m.title, items, portion: items.reduce((n, i) => n + i.grams, 0), savedAt };
+}
+
 // a recipe as a planned meal: its numbers at the portion saved
 export function fromMeal(m: Meal, source: Source): PlannedMeal {
   const t = aggregate(m.items);
