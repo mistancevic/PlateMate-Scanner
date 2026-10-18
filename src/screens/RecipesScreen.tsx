@@ -22,9 +22,21 @@ import { sharedOf, contentSig, type SharedRecipe } from "../members";
 import { DeleteRecipe, type DeleteChoice } from "../components/DeleteRecipe";
 import { deletePlan, deletedLine, forgetRecipe } from "../recipeDelete";
 import { foodNames, originalFoodsOf, diffFoods } from "../stepsState";
+import { useRecipeIn, RecipeInFlow, StartWays, mealFromRead } from "../components/RecipeInBlock";
+import { log } from "../log";
+import type { InFlow } from "../components/RecipeIn";
 
 export function RecipesScreen(p: AppApi) {
   const { state, setState, setTab } = p;
+  // R6 (0.2.43, Milan 19:45 to 19:58, board RS14): add a recipe here, the same block as the Plate; it saves to My recipes
+  const recipeIn = useRecipeIn({ kitchens: p.personal.kitchens ?? [], region: p.region, onError: (m) => p.notify(m) });
+  async function saveRead(f: Extract<InFlow, { kind: "read" }>) {
+    const { meal, fresh } = await mealFromRead(f, state.foods);
+    setState((s) => ({ ...s, foods: [...s.foods, ...fresh], meals: [meal, ...s.meals] }));
+    recipeIn.setInFlow(null);
+    log("recipe_in", { how: f.url ? "link" : "shot", result: "saved" });
+    p.landOnRecipe(meal.id, "Make it puts it on the Plate when you want to cook it.", "✓ Saved in My recipes", "recipes");
+  }
   // coaches publish recipes (canvas board R5); what is published already, by the recipe it came from
   // Cook (boards RG0 to RG5): a coach is a cook and publishes; a client is a cook when their coach switched it on, and sends
   // the recipe to their coach. Without accounts, coach mode on this phone is the coach and otherwise their client.
@@ -104,7 +116,7 @@ export function RecipesScreen(p: AppApi) {
   const lastRating = (m: Meal) => state.feedback.find((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.taste)?.taste ?? "";
   const opened = openId ? state.meals.find((m) => m.id === openId) ?? null : null;
   // IM23c (0.2.23): after How was it, the recipe the meal made or changed opens here, with one line for today
-  const [landed, setLanded] = useState<{ id: string; line: string; title?: string } | null>(null);
+  const [landed, setLanded] = useState<{ id: string; line: string; title?: string; back?: "recipes" } | null>(null);
   useEffect(() => {
     const l = p.landing; if (!l) return;
     if (state.meals.some((m) => m.id === l.id)) { setView("mine"); setOpenId(l.id); if (!l.quiet) setLanded(l); }
@@ -174,7 +186,7 @@ export function RecipesScreen(p: AppApi) {
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
         top={landed && landed.id === opened.id ? (
           <section className="card dl-done rq-landed" role="status">
-            <div className="card-top"><b>{landed.title ?? "✓ Saved in Mine"}</b><button className="link" onClick={() => { setLanded(null); setOpenId(null); setTab("home"); }}>Today</button></div>
+            <div className="card-top"><b>{landed.title ?? "✓ Saved in Mine"}</b>{/* R6: saved from Recipes, the way back is the Recipes list */}{landed.back === "recipes" ? <button className="link" onClick={() => { setLanded(null); setOpenId(null); }}>Recipes</button> : <button className="link" onClick={() => { setLanded(null); setOpenId(null); setTab("home"); }}>Today</button>}</div>
             {landed.line && <small className="muted">{landed.line}</small>}
           </section>) : null}
         openOriginal={opened.basedOn && state.meals.some((m) => m.id === opened.basedOn!.id) ? () => { setLanded(null); setOpenId(opened.basedOn!.id); } : null}
@@ -208,14 +220,23 @@ export function RecipesScreen(p: AppApi) {
         <button role="tab" aria-selected={view === "coach"} className={`seg ${view === "coach" ? "on" : ""}`} onClick={() => setView("coach")}>Coach's{fromCoach.length ? ` (${fromCoach.length})` : ""}</button>
         <button role="tab" aria-selected={view === "members"} className={`seg ${view === "members" ? "on" : ""}`} onClick={() => setView("members")}>Members</button>
       </div>
+      {view === "mine" && (recipeIn.inFlow
+        ? <RecipeInFlow flow={recipeIn} put={(f) => void saveRead(f)} putLabel="Save in My recipes" />
+        : (
+          <section className="card plate-card recipe-add" aria-label="Add a recipe">
+            <div className="card-top"><span>Add a recipe</span></div>
+            <small className="muted">From a link or screenshots, as on the Plate. It goes into My recipes; nothing goes on the Plate.</small>
+            <StartWays flow={recipeIn} />
+          </section>
+        ))}
       {view === "members" && <MembersList list={memberList} ahead={ahead} p={p} open={setMemberOpen} loading={loadingMembers} error={membersErr} />}
-      {view !== "members" && shown.length === 0 && (
+      {view !== "members" && !(view === "mine" && recipeIn.inFlow) && shown.length === 0 && (
         <section className="card recipes-empty">
-          <small>{view === "mine" ? "Nothing here yet. Your first recipe starts on the Plate." : `Nothing yet. Recipes ${approver === "your coach" ? "your coach" : approver} sends you land here.`}</small>
+          <small>{view === "mine" ? "Nothing here yet. Add one above, or make your first on the Plate." : `Nothing yet. Recipes ${approver === "your coach" ? "your coach" : approver} sends you land here.`}</small>
           {view === "mine" && <button className="pill pill-wide pill-primary" onClick={() => { p.setKind("meal"); p.setStep("in"); setTab("journey"); }}>Make my first recipe</button>}
         </section>
       )}
-      {view !== "members" && shown.map((m) => {
+      {view !== "members" && !(view === "mine" && recipeIn.inFlow) && shown.map((m) => {
         // R7: one tap per recipe: the cover (or the newest plate photo), the name, the foods, where the recipe is
         const own = recipePhotosOf(m), photo = own[0] ?? photoOf(m), n = madeTimes(m), rating = lastRating(m);
         const st = isCoach ? pubState(m.id, Boolean(m.publish)) : null;
