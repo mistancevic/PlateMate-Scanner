@@ -21,7 +21,15 @@ export function menuTrailOf(path: string): string[] {
   return [path.startsWith("/me/") ? "me" : "list", hit];
 }
 export const pathOfTab = (tab: string) => TAB_PATH[tab] ?? `/${tab}`;
+// R8 (0.2.31, Milan 02:08 and 02:22): every recipe has its own page, /my-recipes/<id>: a reload, Back and a saved link open it
+export const recipePath = (id: string) => `${TAB_PATH.recipes}/${encodeURIComponent(id)}`;
+export function recipeIdOfPath(path: string): string | null {
+  const m = path.match(/^\/my-recipes\/([^/]+)\/?$/);
+  if (!m) return null;
+  try { return decodeURIComponent(m[1]) || null; } catch { return null; }
+}
 export function tabOfPath(path: string, tabs: readonly string[]): string | null {
+  if (recipeIdOfPath(path)) return "recipes";
   const hit = Object.entries(TAB_PATH).find(([, p]) => p === path)?.[0];
   if (hit) return hit;
   const t = path.replace(/^\//, "");

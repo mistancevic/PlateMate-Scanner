@@ -7,6 +7,7 @@ Two kinds of checks live here, and the difference is the rule.
 - At the shop: Plate, Scan, the single-product camera opens (Label; Several products is the explicit choice, never the default), several sides of one product stage, Analyze, the label check with the name read, Mix it on the label check, one tap and the plate is the mix. (`camera-group.cjs`, `camera-every-mode.cjs`, `mix-tip.cjs`)
 - Several photos in every mode: the mode decides how a picture is read, never how many can be taken. Label stages two shots and sends them as one scan; Barcode reads the code, stays open for the pack's photos, and Analyze sends the code with them. (`camera-every-mode.cjs`)
 - A craving at home: Plate, pick a moment, foods in, Fit to my target, Make it, the way, How did making it go? (photos, how it went, how much was eaten), How was it? with Save in My recipes, saved. (`meal-from-empty-plate.cjs`)
+- Every recipe has its own page (18 October 2026, story R8): an open recipe is at /my-recipes/<its id>; a reload stays on it, Back goes to the list, a saved link opens it, an address with no such recipe opens the list. (`recipe-address.cjs`)
 - A missing food: the plate helper offers swaps from the library, never the missing food. (`dont-have-it.cjs`)
 - A barcode scanned twice opens the existing food, never a duplicate. (`duplicates-merge.cjs`)
 - Today: the day set once, read all day; the actions directly under the plan. (`today.cjs`)

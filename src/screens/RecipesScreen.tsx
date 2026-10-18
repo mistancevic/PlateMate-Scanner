@@ -111,6 +111,13 @@ export function RecipesScreen(p: AppApi) {
     p.clearLanding();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p.landing]);
+  // R8 (0.2.31): the address names a recipe (a reload, Back, a saved link): it opens once it is here; the account may bring it a moment later
+  useEffect(() => {
+    const id = p.openFromPath; if (!id) return;
+    const m = state.meals.find((x) => x.id === id); if (!m) return;
+    setView(m.from === "coach" ? "coach" : "mine"); setOpenId(id); p.clearOpenFromPath();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p.openFromPath, state.meals]);
   // IM22c (0.2.22): after Delete recipe, a line on Recipes says what was done
   const [deleted, setDeleted] = useState<{ title: string; line: string } | null>(null);
   // IM22 (0.2.22): what others see goes first; if that fails, nothing is deleted. The recipe then leaves the state, and its
@@ -155,7 +162,7 @@ export function RecipesScreen(p: AppApi) {
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
-      <RecipePage meal={opened} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
+      <RecipePage key={opened.id} meal={opened} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
         pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
         top={landed && landed.id === opened.id ? (

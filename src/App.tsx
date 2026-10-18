@@ -44,7 +44,7 @@ import { Starting } from "./components/Starting";
 import { Welcome, AdultOnly } from "./components/Welcome";
 import { openStats } from "./openStats";
 import { merge as mergeRecords, changes as recordChanges, type Known } from "./records";
-import { installBack, pushTab, startTab, tabOfPath, useBack, pathOfTab, MENU_PATH, menuTrailOf } from "./back";
+import { installBack, pushTab, startTab, tabOfPath, useBack, pathOfTab, MENU_PATH, menuTrailOf, recipeIdOfPath } from "./back";
 import { clearKept } from "./kept";
 import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
 import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted, realPhotosOf, isDrawn, recipePhotosOf, withRecipePhotos, recipeHasPhotos } from "./photos";
@@ -782,6 +782,8 @@ export default function App() {
     [plateRecipeId, setPlateRecipeId] = useState<string | null>(null),
     // after How was it (0.2.23, IM23c): the recipe the meal made or changed opens on Recipes, with one line for today
     [landing, setLanding] = useState<{ id: string; line: string; title?: string } | null>(null),
+    // R8 (0.2.31): a reload or a saved link on /my-recipes/<id> opens that recipe, once Back is ready
+    [recipeFromPath, setRecipeFromPath] = useState<string | null>(() => (typeof location !== "undefined" ? recipeIdOfPath(location.pathname) : null)),
     [profileReady, setProfileReady] = useState(false),
     [loadTry, setLoadTry] = useState(0),
     [talkTurns, setTalkTurns] = useState<Turn[]>([]),
@@ -2017,6 +2019,7 @@ export default function App() {
     planned, filling, setFilling,
     cover: { count: coverCount, drawing: coverDrawing, draw: (m: Meal) => { void drawCover(m); }, refresh: refreshCoverCount },
     landing, clearLanding: () => setLanding(null),
+    openFromPath: backReady ? recipeFromPath : null, clearOpenFromPath: () => setRecipeFromPath(null),
     landOnRecipe: (id: string, line: string, title?: string) => { setLanding({ id, line, title }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
     openOnPlate: (meal: Meal) => {
       setFilling(null); setPlateRecipeId(meal.id);

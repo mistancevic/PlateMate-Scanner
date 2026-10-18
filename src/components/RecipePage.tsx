@@ -6,7 +6,7 @@ import { aggregate, density } from "../pilot";
 import { fmt, pdText } from "../ui";
 import { recipePhotosOf, withRecipePhotos } from "../photos";
 import { resizeImageBase64 } from "../utils/image";
-import { useBack } from "../back";
+import { useBack, recipePath } from "../back";
 import { log } from "../log";
 import { ConfirmButton } from "./Confirm";
 import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
@@ -50,7 +50,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   // RP2 (0.2.25): the readout above the Nutrition table, against your target
   pdRef?: number | null; fitPd?: (pd: number | null) => string;
 }) {
-  useBack(true, close);
+  // R8 (0.2.31): the page has its own address while it is open; Back goes to the list
+  useBack(true, close, recipePath(meal.id));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { picture?.refresh(); }, [meal.id]);
   useEffect(() => { try { window.scrollTo(0, 0); document.querySelector("main")?.scrollTo?.(0, 0); } catch { /* nothing to scroll */ } }, [meal.id]);

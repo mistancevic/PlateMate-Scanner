@@ -105,6 +105,9 @@ export interface AppApi {
   // after How was it (0.2.23, IM23c): open a recipe on Recipes with one line for today
   landing: { id: string; line: string; title?: string } | null;
   clearLanding: () => void;
+  // R8 (0.2.31): the recipe named by the address, /my-recipes/<id>
+  openFromPath: string | null;
+  clearOpenFromPath: () => void;
   landOnRecipe: (id: string, line: string, title?: string) => void;
   // Chef Mealan's pictures (0.2.18, board IM, IM11): the day's count, the recipe being drawn, Draw a picture
   cover: { count: { used: number; limit: number } | null; drawing: string | null; draw: (meal: Meal) => void; refresh: () => void };
