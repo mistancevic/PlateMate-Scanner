@@ -17,6 +17,7 @@ import { iconFor } from "../icons";
 import { quickPicks } from "../quick";
 import { lineTotal } from "../labeltable";
 import { SwipeRow } from "../components/SwipeRow";
+import { dishTaste, goesInDish, heldBackLine } from "../dishTaste";
 import { methodsFor } from "../methods";
 import { rankSwaps } from "../swaps";
 import { PlateHelper } from "../components/PlateHelper";
@@ -161,7 +162,9 @@ export function JourneyScreen(p: AppApi) {
   const lifts = (list: typeof items) => {
     const t = aggregate(list); const cur = density(t.protein, t.calories);
     if (cur === null || pdRef === null || cur >= pdRef - 0.05) return null;
-    const rows = state.foods.filter((f) => !list.some((i) => i.food.id === f.id) && f.calories !== null && f.protein !== null).map((f) => {
+    // R9 (0.2.33): Chef Mealan offers only foods that go with the dish on the plate, a plate of your own too
+    const dish = dishTaste(list.map((i) => i.food.name));
+    const rows = state.foods.filter((f) => !list.some((i) => i.food.id === f.id) && f.calories !== null && f.protein !== null && goesInDish(dish, f.name)).map((f) => {
       const g = portionOf(f); const kcal = (t.calories ?? 0) + (f.calories! * g) / 100, pro = (t.protein ?? 0) + (f.protein! * g) / 100;
       return { f, g, to: density(pro, kcal) ?? 0 };
     }).filter((r) => r.to > cur + 0.3).sort((a, b) => b.to - a.to).slice(0, 3);
@@ -383,6 +386,12 @@ export function JourneyScreen(p: AppApi) {
   // an emptied part shows only while the plate still has parts (R2, 0.2.32)
   const emptyParts = state.emptyParts ?? [];
   const plateParts = (() => { const l = partsOf(items, opts); const keepEmpty = l.length > 0 || leftOut.length > 0; for (const x of [...leftOut, ...(keepEmpty ? emptyParts : [])].sort((a, b) => (a.at ?? 99) - (b.at ?? 99))) if (!l.includes(x.part)) l.splice(Math.min(x.at ?? l.length, l.length), 0, x.part); return l; })();
+  // R9 (0.2.33): the taste of the recipe on the plate; a plate of your own has none here, what you search for and add is yours
+  const recipeOn = Boolean(state.fromRecipe) || plateParts.length > 0 || items.some((i) => i.dish);
+  const recipeTaste = recipeOn ? dishTaste([...items.map((i) => i.food.name), ...opts.map((o) => o.name), ...leftOut.flatMap((l) => l.items.map((i) => i.food.name))]) : null;
+  const matches = q.trim() ? state.foods.filter((f) => (f.name + " " + f.brand).toLowerCase().includes(q.toLowerCase())).slice(0, 60) : [];
+  const found = matches.filter((f) => goesInDish(recipeTaste, f.name));
+  const heldBack = matches.filter((f) => !goesInDish(recipeTaste, f.name)).map((f) => f.name).slice(0, 3);
   const isEmptyPart = (part: string) => !items.some((i) => i.part === part) && !opts.some((o) => o.part === part) && !leftOut.some((l) => l.part === part) && emptyParts.some((x) => x.part === part);
   // + Add a food to a part: the next food put on the plate goes into it
   const [addTo, setAddTo] = useState<string | null>(null);
@@ -595,6 +604,8 @@ export function JourneyScreen(p: AppApi) {
       for (const sd of (d.sides ?? []) as { name: string; kind: SideKind; calories: number; protein: number; fats: number | null; carbs: number | null; note: string }[]) {
         const food = libFood(sd);
         if (blockedByAllergy(food, p.safety.allergies ?? [])) continue;
+        // R9 (0.2.33): a side Chef Mealan names goes with the dish, by the same rule as every offer
+        if (!goesInDish(dishTaste(whole.map((i) => i.food.name)), sd.name)) continue;
         const fit = sideAmount(whole, food, need, pdRef);
         if (!fit) continue;
         opts.push({ name: sd.name, kind: sd.kind, note: sd.note, food, grams: fit.grams, dish: fit.dish.map((i) => ({ ...i, id: uid(), locked: false })), yours: isYours(sd.name, habits) });
@@ -936,9 +947,9 @@ export function JourneyScreen(p: AppApi) {
         <p className="label">{q.trim() ? "From all your foods" : "Quick picks"}</p>
         <input className="search" aria-label="Search all my foods" placeholder="Search all my foods" value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="rows">
-          {(q.trim()
-            ? state.foods.filter((f) => (f.name + " " + f.brand).toLowerCase().includes(q.toLowerCase())).slice(0, 60)
-            : quick.picks
+          {/* R9 (0.2.33, boards RS4 and RS5): while a recipe is on the plate, only foods that go with the dish; one line names what was held back */}
+          {heldBack.length > 0 && recipeTaste && <small className="muted held-back">{heldBackLine(recipeTaste, heldBack)}</small>}
+          {(q.trim() ? found : quick.picks.filter((f) => goesInDish(recipeTaste, f.name))
           ).map((f) => {
               const inList = items.some((i) => i.food.id === f.id);
               const why = q.trim() ? null : quick.why.get(f.id);

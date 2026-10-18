@@ -1676,3 +1676,5 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 
 /* R2 (0.2.32): an emptied part keeps its place and offers + Add a food to it */
 .pt-add { padding: 10px 4px 6px; }
+/* R9 (0.2.33): what the search held back, and why */
+.held-back { display: block; padding: 10px 2px; }
