@@ -6,7 +6,7 @@ import type { Mix } from "../mixtip";
 import { aggregate, density, uid, solveIngredient, servingLabel } from "../pilot";
 import { fromMeal } from "../planned";
 import type { Meal, Food, Ingredient, PlateOpt, StepMark } from "../pilot";
-import { partsOf, optAt, optToItem, itemToOpt, canLeaveOut, leanFood } from "../parts";
+import { pairItems, partsOf, optAt, optToItem, itemToOpt, canLeaveOut, leanFood } from "../parts";
 import { draftSteps } from "../draftSteps";
 import { equipmentOf } from "../personal";
 import { stepParts, stepText } from "../steps";
@@ -581,7 +581,8 @@ export function JourneyScreen(p: AppApi) {
       setState((s) => ({ ...s, foods: [...s.foods, ...fresh.filter((f, k) => fresh.findIndex((x) => x.id === f.id) === k)], items: out, portion: null }));
       // the whole recipe as changed: the other parts as the recipe makes them, the changed part back at the recipe's size
       const f = rec ? factorOf(rec, pmode) : 0;
-      const whole = rec && f > 0 ? out.map((i) => { const r = i.part !== part ? rec.items.find((x) => x.food.id === i.food.id) : undefined; return { ...i, grams: r ? r.grams : Math.round(i.grams / f) }; }) : undefined;
+      const twin = rec ? pairItems(out, rec.items) : [];
+      const whole = rec && f > 0 ? out.map((i, k) => { const r = i.part !== part ? twin[k] : undefined; return { ...i, grams: r ? r.grams : Math.round(i.grams / f) }; }) : undefined;
       setWay({ kind: "change", title: state.title || autoTitle(items), notes: (d.notes ?? []) as string[], part, before, ...(whole ? { whole } : {}) });
       log("recipe_fit", { way: "change", result: "shown" }); log("parts", { how: "change" });
     } catch (e: any) { setError(e.message); } finally { setWayBusy(null); }
@@ -1135,7 +1136,7 @@ export function JourneyScreen(p: AppApi) {
     const onePlate = !!rec && pmode === "recipe" && !way;
     const t0 = aggregate(items), pd0 = density(t0.protein, t0.calories);
     // the amounts in the steps follow what you make: the whole recipe's grams, or your plate's
-    const amounts = (): Ingredient[] => !recipe ? items : madeWhole ? recipe.items : recipe.items.map((r) => { const on = items.find((i) => i.id === r.id || i.food.id === r.food.id); return { ...r, grams: on?.grams ?? 0 }; });
+    const amounts = (): Ingredient[] => !recipe ? items : madeWhole ? recipe.items : (() => { const on = pairItems(recipe.items, items); return recipe.items.map((r, k) => ({ ...r, grams: on[k]?.grams ?? 0 })); })();
     // R3, the fix (0.2.39): the steps cook with the pot, even for just your plate; what you make counts what is taken up
     const counted = amounts();
     const stepsFor = madeWhole ? counted : counted.map((i) => (i.fry ? { ...i, fry: { ...i.fry, plate: true } } : i));
