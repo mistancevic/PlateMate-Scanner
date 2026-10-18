@@ -1052,7 +1052,7 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .today-plan .today-date { display: flex; justify-content: space-between; align-items: center; }
 .today-pencil { background: none; border: 0; padding: 0; color: var(--muted); display: inline-flex; cursor: pointer; }
 /* What's cooking?: the kind as two choices, then Scan, all the same height */
-.cooking { display: flex; flex-direction: column; gap: 10px; }
+.cooking, .tomorrow-plan { display: flex; flex-direction: column; gap: 10px; }
 .cooking-top { font-size: 15px; color: var(--ink); } .cooking-top span { display: flex; align-items: center; gap: 8px; }
 .cooking-kinds { display: flex; gap: 8px; } .cooking-kinds .choice { flex: 1; justify-content: center; height: 56px; font-size: 15px; gap: 6px; }
 .cooking .pill-tall { margin: 0; }
@@ -1728,3 +1728,7 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .crave-kept { display: block; font-weight: 800; color: var(--brand-text); }
 .crave-idea .link.crave-again { align-self: center; }
 .crave-err { color: #8b1a1a; font-weight: 700; }
+
+/* R18 (0.2.46, board RS17): which day the plan card is for; a meal eaten by the plan while slots are still to come */
+.cooking .plan-day, .tomorrow-plan .plan-day { display: block; font-weight: 800; color: var(--brand-text); margin: -2px 0 6px; }
+.cooking .plan-eaten { display: block; margin: 0 0 4px; }

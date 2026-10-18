@@ -43,3 +43,9 @@ test("a recipe whose card holds a plate photo, even one still to load, gets no d
   assert.equal(cardHasPhoto(m, [{ meal: { id: "x", title: "Other" }, recipeId: "r1", photoSigs: ["12:abc"] } as any]), true);
   assert.equal(cardHasPhoto(m, [{ meal: { id: "x", title: "Skyr bowl" }, photo: "data:image/svg+xml;base64,x" } as any]), false);
 });
+
+test("0.2.46: an idea not made yet gets no picture; made once, it does", () => {
+  const items = [{ id: "a", grams: 100, locked: true, food: { name: "Quark" } }];
+  assert.equal(needsCover({ items, idea: { at: "2026-10-19T00:10:00Z" } } as any, "2026-10-19"), false);
+  assert.equal(needsCover({ items } as any, "2026-10-19"), true);
+});

@@ -39,7 +39,7 @@ const U = "http://127.0.0.1:3234";
     await require("./adult.cjs")(page);
     await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
     await page.route("**/api/members", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ recipes: [MEMBER] }) }));
-    await page.route("**/api/crave", (r) => { asked.push(JSON.parse(r.request().postData() || "{}")); const c = asked[asked.length - 1].craving; return r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ idea: /sarma/i.test(c) ? { ...IDEA, title: "Lean sarma", items: IDEA.items.slice(0, 2) } : IDEA }) }); });
+    await page.route("**/api/crave", async (r) => { asked.push(JSON.parse(r.request().postData() || "{}")); const c = asked[asked.length - 1].craving; await new Promise((ok) => setTimeout(ok, 600)); return r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ idea: /sarma/i.test(c) ? { ...IDEA, title: "Lean sarma", items: IDEA.items.slice(0, 2) } : IDEA }) }); });
     return page;
   };
   const state = (page) => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
@@ -78,8 +78,14 @@ const U = "http://127.0.0.1:3234";
     await p2.getByLabel("What are you craving?").fill("sarma"); await p2.waitForTimeout(400);
     t = await text(p2, ".crave");
     ok(/Chef Mealan's starters/i.test(t) && /Sarma/.test(t) && /410 kcal · 21 g protein/.test(t) && /1\.3 under/.test(t), "sarma: Chef Mealan's starter, under your PD, still shown");
-    await p2.locator(".crave .pick-row").filter({ hasText: "Sarma" }).click(); await p2.waitForTimeout(800);
-    ok(asked.length === 1 && asked[0].craving === "Sarma", "a starter has no foods: the tap asks Chef Mealan for it");
+    // 0.2.46 (Milan 00:12): taps while Chef Mealan is thinking make no second idea; he says he is working
+    const sarmaRow = p2.locator(".crave .pick-row").filter({ hasText: "Sarma" });
+    await sarmaRow.click(); await p2.waitForTimeout(100);
+    ok(/Chef Mealan is making an idea for Sarma/.test(await text(p2, ".crave")) && await sarmaRow.count() === 0, "while he thinks: Chef Mealan is making an idea for Sarma, and the rows are gone");
+    await sarmaRow.click({ timeout: 300 }).catch(() => {}); await sarmaRow.click({ timeout: 300 }).catch(() => {});
+    await p2.waitForTimeout(1200);
+    ok(asked.length === 1 && asked[0].craving === "Sarma", "a starter has no foods: the tap asks Chef Mealan for it, once, however many taps");
+    ok((await state(p2)).meals.filter((m) => m.idea).length === 1, "one idea kept, not one per tap");
     // tiramisu: nothing found; Chef Mealan only on the tap; the idea kept
     await p2.getByLabel("What are you craving?").fill("tiramisu"); await p2.waitForTimeout(400);
     t = await text(p2, ".crave");

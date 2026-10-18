@@ -21,6 +21,9 @@ const oneList = { url: "https://example.com/bowl/", recipe: { title: "Skyr bowl"
   await new Promise((r) => setTimeout(r, 2500));
   const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
   const page = await b.newPage({ viewport: { width: 390, height: 900 } });
+  // the clock of the evening this was written (19 October 2026, 00:20: after midnight the plate is sized for breakfast, the page
+  // grows, and a row scrolled into view sits under the sticky bar, so the swipe missed it; the journey is unchanged)
+  await page.clock.setFixedTime(new Date("2026-10-18T19:00:00"));
   const errs = []; page.on("pageerror", (e) => errs.push(e.message));
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
   await page.addInitScript((s) => { if (!localStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); localStorage.setItem("seeded", "1"); } }, seed);
