@@ -107,7 +107,7 @@ export function RecipesScreen(p: AppApi) {
   const [landed, setLanded] = useState<{ id: string; line: string; title?: string } | null>(null);
   useEffect(() => {
     const l = p.landing; if (!l) return;
-    if (state.meals.some((m) => m.id === l.id)) { setView("mine"); setOpenId(l.id); setLanded(l); }
+    if (state.meals.some((m) => m.id === l.id)) { setView("mine"); setOpenId(l.id); if (!l.quiet) setLanded(l); }
     p.clearLanding();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p.landing]);

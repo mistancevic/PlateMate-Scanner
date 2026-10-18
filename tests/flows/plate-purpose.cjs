@@ -48,8 +48,9 @@ seed.items = []; seed.meals = []; seed.feedback = []; seed.goals = { ...seed.goa
     for (const name of ["Continue", "I'm making it", "On to How was it?"]) { const bt = page.getByRole("button", { name, exact: true }); if (await bt.count()) { await bt.first().click(); await page.waitForTimeout(600); } }
     await page.getByRole("button", { name: "Good", exact: true }).click(); await page.getByRole("button", { name: /^Save/ }).first().click(); await page.waitForTimeout(1200);
     if (!/today/.test(page.url())) { await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(600); }
-    const nums = await page.locator(".log-nums").first().textContent();
-    ok(/^Dinner, by the plan · /.test(nums), "Today counts it as dinner, by the plan: " + nums);
+    // R5 (Milan 17:23 to 19:00, board RS13): which meal it was is its own line; By the plan is its mark
+    const nums = (await page.locator(".log-card .meal-which").first().textContent()).trim() + " · " + (await page.locator(".log-card .plan-mark").first().textContent()).trim();
+    ok(/^Dinner\b/.test(nums) && /By the plan$/.test(nums), "Today counts it as dinner, by the plan: " + nums);
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(600);
     ok(/by the clock · Off the plan/.test(await line()), "after saving, a new plate starts from the clock again: " + await line());
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));

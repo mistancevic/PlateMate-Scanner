@@ -47,9 +47,10 @@ const path = require("node:path");
   const g = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).goals);
   ok(g.calories > 0 && g.protein > 0 && g.fats > 0 && g.carbs > 0, "the average is saved with all four: " + JSON.stringify(g));
   // Today: pick the day, the numbers follow it
-  const avgK = await page.locator(".plan-row div").nth(1).locator("b").textContent();
+  // R5 (Milan 17:23 to 19:00, board RS13): the goal card shows today against it; the target is the "of N kcal" under the eaten kcal
+  const avgK = (await page.locator(".plan-row div").nth(1).locator("small").textContent()).match(/of ([\d,]+) kcal/)[1];
   await page.getByRole("button", { name: "Hard", exact: true }).click(); await page.waitForTimeout(300);
-  const hardK = await page.locator(".plan-row div").nth(1).locator("b").textContent();
+  const hardK = (await page.locator(".plan-row div").nth(1).locator("small").textContent()).match(/of ([\d,]+) kcal/)[1];
   ok(Number(hardK.replace(/,/g, "")) > Number(avgK.replace(/,/g, "")), `a hard training day raises today's calories: ${avgK} to ${hardK}`);
   // from Me, Goal: the same screen comes with a way back
   await require("./me.cjs")(page);

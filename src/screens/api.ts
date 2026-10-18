@@ -106,7 +106,7 @@ export interface AppApi {
   // Recipes, Open (0.2.3): the recipe on the Plate with its name as the title, nothing decided yet
   openOnPlate: (meal: Meal) => void;
   // after How was it (0.2.23, IM23c): open a recipe on Recipes with one line for today
-  landing: { id: string; line: string; title?: string } | null;
+  landing: { id: string; line: string; title?: string; quiet?: boolean } | null;
   clearLanding: () => void;
   // R8 (0.2.31): the recipe named by the address, /my-recipes/<id>
   openFromPath: string | null;
@@ -114,6 +114,8 @@ export interface AppApi {
   // R8, choice A: counts taps on the Recipes tab while it shows; each one goes to the list
   recipesHome: number;
   landOnRecipe: (id: string, line: string, title?: string) => void;
+  // R5 (0.2.42): Today opens the recipe a meal came from, with no line
+  openRecipePage: (id: string) => void;
   // Chef Mealan's pictures (0.2.18, board IM, IM11): the day's count, the recipe being drawn, Draw a picture
   cover: { count: { used: number; limit: number } | null; drawing: string | null; draw: (meal: Meal) => void; refresh: () => void };
   fill: (date: string, slotId: string, meal: import("../planned").PlannedMeal | null) => void;
@@ -127,7 +129,7 @@ export interface AppApi {
   clearOpenFood: () => void;
   toggleFavorite: (foodId: string) => void;
   keepForLater: (meal: Meal, extra?: { photos?: string[]; prep?: Feedback["prep"]; status?: "prepared" | "not-used"; left?: number; leftOf?: string; recipeId?: string }) => void;
-  settleCard: (id: string, how: "eaten" | "not-used") => void;
+  settleCard: (id: string, how: "eaten" | "not-used", as?: { slot?: Feedback["slot"]; which?: string }) => void;
   setFoodJob: (foodId: string, job: string | null) => void;
   eatenTodayKcal: number;
   dayName: string;

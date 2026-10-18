@@ -784,7 +784,7 @@ export default function App() {
     // the recipe the plate came from (a slot or Recipes, Open), so a new name on the Plate renames it at once
     [plateRecipeId, setPlateRecipeId] = useState<string | null>(null),
     // after How was it (0.2.23, IM23c): the recipe the meal made or changed opens on Recipes, with one line for today
-    [landing, setLanding] = useState<{ id: string; line: string; title?: string } | null>(null),
+    [landing, setLanding] = useState<{ id: string; line: string; title?: string; quiet?: boolean } | null>(null),
     // R8 (0.2.31): a reload or a saved link on /my-recipes/<id> opens that recipe, once Back is ready
     // R8, choice A (Milan 02:38): the Recipes tab, tapped while a recipe is open, goes to the list
     [recipesHome, setRecipesHome] = useState(0),
@@ -1940,15 +1940,17 @@ export default function App() {
       setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status, ...(extra?.left ? { left: extra.left } : {}), ...(extra?.recipeId ? { recipeId: extra.recipeId } : {}), ...(extra?.leftOf ? { leftOf: extra.leftOf } : {}), taste: "", notes: "", photos: extra?.photos?.length ? extra.photos : undefined, photo: extra?.photos?.length ? extra.photos[extra.photos.length - 1] : undefined, prep: extra?.prep, createdAt: new Date().toISOString(), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined } as any, ...s.feedback] }));
       notify(status === "prepared" ? "Kept for later. It's on Today." : "Noted, not counted.");
     },
-    settleCard: (id: string, how: "eaten" | "not-used") => {
+    settleCard: (id: string, how: "eaten" | "not-used", as?: { slot?: Feedback["slot"]; which?: string }) => {
+      // R5 (0.2.42): I ate one says which meal it was: a meal of the day keeps its slot, a snack says so
+      const asMeal = how === "eaten" && as ? { ...(as.slot ? { slot: as.slot } : {}), ...(as.which ? { which: as.which } : {}) } : {};
       // portions left (0.2.20, IM19): eating one logs one and keeps the rest; Remove drops them all
       const card = state.feedback.find((f) => f.id === id);
       if (card && how === "eaten" && (card.left ?? 0) > 1) {
         const now = new Date().toISOString();
-        setState((s) => ({ ...s, feedback: [{ ...structuredClone(card), id: uid(), status: "eaten", left: undefined, createdAt: now, taste: card.taste || "Good" }, ...s.feedback.map((f) => (f.id === id ? { ...f, left: (f.left ?? 1) - 1 } : f))] }));
+        setState((s) => ({ ...s, feedback: [{ ...structuredClone(card), id: uid(), status: "eaten", left: undefined, createdAt: now, taste: card.taste || "Good", ...asMeal }, ...s.feedback.map((f) => (f.id === id ? { ...f, left: (f.left ?? 1) - 1 } : f))] }));
         notify(`Logged. ${(card.left ?? 1) - 1} left.`); return;
       }
-      setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, status: how, left: undefined, createdAt: how === "eaten" ? new Date().toISOString() : f.createdAt, taste: how === "eaten" ? f.taste || "Good" : f.taste } : f)) }));
+      setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, status: how, left: undefined, createdAt: how === "eaten" ? new Date().toISOString() : f.createdAt, taste: how === "eaten" ? f.taste || "Good" : f.taste, ...asMeal } : f)) }));
       notify(how === "eaten" ? "Logged." : "Dropped for today.");
     },
     toggleFavorite: (foodId: string) => {
@@ -2026,6 +2028,7 @@ export default function App() {
     landing, clearLanding: () => setLanding(null),
     openFromPath: backReady ? recipeFromPath : null, clearOpenFromPath: () => setRecipeFromPath(null), recipesHome,
     landOnRecipe: (id: string, line: string, title?: string) => { setLanding({ id, line, title }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
+    openRecipePage: (id: string) => { setLanding({ id, line: "", quiet: true }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
     openOnPlate: (meal: Meal) => {
       setFilling(null); setPlateRecipeId(meal.id);
       // a recipe that came in from a screenshot or a link opens as it did the first time (0.2.19, IM13): the Plate does it

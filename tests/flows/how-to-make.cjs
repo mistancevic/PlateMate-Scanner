@@ -82,8 +82,10 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   ok(kept && kept.left === 7 && kept.meal.title === "Protein cheesecake" && kept.meal.items.find((i) => /Digestive/.test(i.food.name)).grams === 15, "IM19: one card for later, 7 slices left, each one slice's foods");
   await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(800);
   t = await text(page, "main");
-  ok(/Prepared for later/.test(t) && /Protein cheesecake7 left/.test(t), "IM19: on Today: Protein cheesecake, 7 left");
-  await page.getByRole("button", { name: "I ate one" }).click(); await page.waitForTimeout(500);
+  // R5 (Milan 17:23 to 19:00, board RS13): the batch sits under what comes next, labelled from your batch; I ate one asks which meal, then Log it
+  ok(/from your batch/.test(t) && /Protein cheesecake7 left/.test(t), "IM19: on Today: Protein cheesecake, 7 left");
+  await page.getByRole("button", { name: "I ate one" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Log it" }).click(); await page.waitForTimeout(500);
   st = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   ok(st.feedback.filter((f) => f.status === "eaten" && f.meal.title === "Protein cheesecake").length === 2 && st.feedback.find((f) => f.status === "prepared").left === 6, "IM19: I ate one logs one slice; 6 left");
   await page.close();
