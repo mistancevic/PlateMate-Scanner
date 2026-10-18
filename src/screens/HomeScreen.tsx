@@ -235,7 +235,8 @@ export function HomeScreen(p: AppApi) {
             ? <small className="plan-mark fit-ok">By the plan</small>
             : <small className="plan-mark fit-under">Off the plan{rec.open.length && f.id === today.logged[today.logged.length - 1]?.id ? " · the next meal leans protein" : ""}</small>)}
           <div className="button-row log-actions">
-            {f.recipeId
+            {/* R4 (0.2.38): a portion from a batch is linked to its recipe; older cards find it by the recipe's name */}
+            {f.recipeId || recipeOfCard(f, state.meals)
               ? <span className="pill pill-small pill-done"><Check size={14} /> In My recipes</span>
               : <button className="pill pill-small pill-primary" onClick={() => p.saveCardAsRecipe(f.id)}>Save in My recipes</button>}
             {p.profile.coachId && (f.shared

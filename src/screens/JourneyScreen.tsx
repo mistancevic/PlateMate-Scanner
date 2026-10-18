@@ -1364,8 +1364,9 @@ export function JourneyScreen(p: AppApi) {
         const keep = !origin && saveRecipe && status === "eaten";
         if (triedNow) log("recipe_fit", { way: triedNow.kind, result: triedNow.result });
         // the whole recipe made (IM19): the portions left go to Keep for later, one card with how many are left
+        // R4 (0.2.38): the card carries the recipe, so each portion eaten from it is In My recipes, not a plate of its own
         // a changed dish leaves portions of the changed recipe (0.2.23)
-        if (madeWhole && rec?.makes && status === "eaten") { const left = chgW ? onePortion(chgW.whole!, rec.makes.n).map((i) => ({ ...i, id: uid() })) : way ? structuredClone(items) : portionItems(rec, "recipe"); p.keepForLater({ id: uid(), title: chgW ? name : rec.title, items: left, portion: left.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() }, { left: rec.makes.n - 1 }); }
+        if (madeWhole && rec?.makes && status === "eaten") { const left = chgW ? onePortion(chgW.whole!, rec.makes.n).map((i) => ({ ...i, id: uid() })) : way ? structuredClone(items) : portionItems(rec, "recipe"); p.keepForLater({ id: uid(), title: chgW ? name : rec.title, items: left, portion: left.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() }, { left: rec.makes.n - 1, recipeId: keep ? kept.id : (fromRec ?? origin)?.id }); }
         // where you land (0.2.23, IM23c): the recipe the meal made or changed, a recipe made for the first time, or steps drafted now
         const firstTime = !!fromRec && !state.feedback.some((f) => f.status === "eaten" && (f.recipeId === fromRec.id || f.meal?.id === fromRec.id));
         // RP4 (0.2.25, Milan 17:42): every recipe you make ends on its page; a plate that is no recipe ends on Today
