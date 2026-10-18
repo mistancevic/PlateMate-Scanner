@@ -783,6 +783,8 @@ export default function App() {
     // after How was it (0.2.23, IM23c): the recipe the meal made or changed opens on Recipes, with one line for today
     [landing, setLanding] = useState<{ id: string; line: string; title?: string } | null>(null),
     // R8 (0.2.31): a reload or a saved link on /my-recipes/<id> opens that recipe, once Back is ready
+    // R8, choice A (Milan 02:38): the Recipes tab, tapped while a recipe is open, goes to the list
+    [recipesHome, setRecipesHome] = useState(0),
     [recipeFromPath, setRecipeFromPath] = useState<string | null>(() => (typeof location !== "undefined" ? recipeIdOfPath(location.pathname) : null)),
     [profileReady, setProfileReady] = useState(false),
     [loadTry, setLoadTry] = useState(0),
@@ -2019,7 +2021,7 @@ export default function App() {
     planned, filling, setFilling,
     cover: { count: coverCount, drawing: coverDrawing, draw: (m: Meal) => { void drawCover(m); }, refresh: refreshCoverCount },
     landing, clearLanding: () => setLanding(null),
-    openFromPath: backReady ? recipeFromPath : null, clearOpenFromPath: () => setRecipeFromPath(null),
+    openFromPath: backReady ? recipeFromPath : null, clearOpenFromPath: () => setRecipeFromPath(null), recipesHome,
     landOnRecipe: (id: string, line: string, title?: string) => { setLanding({ id, line, title }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
     openOnPlate: (meal: Meal) => {
       setFilling(null); setPlateRecipeId(meal.id);
@@ -2421,7 +2423,7 @@ export default function App() {
             key={n.id}
             className={!menuSection && (tab === n.id || (n.id === "journey" && (tab === "meal" || tab === "chef"))) ? "active" : ""}
             aria-current={!menuSection && tab === n.id ? "page" : undefined}
-            onClick={() => { setMenuSection(null); setTalkOpen(false); if (n.id !== "journey") setFilling(null); setTab(n.id); }}
+            onClick={() => { if (n.id === "recipes" && tab === "recipes") setRecipesHome((k) => k + 1); setMenuSection(null); setTalkOpen(false); if (n.id !== "journey") setFilling(null); setTab(n.id); }}
           >
             {n.icon}
             <span>{n.label}</span>

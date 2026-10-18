@@ -1,7 +1,7 @@
 // JOURNEY INVARIANT (Milan, 18 October 2026, 02:08 and 02:22, story R8 on canvas board RS3): every recipe has its own
 // page. Open a recipe and the address is /my-recipes/<its id>. A reload on that page stays on it; Back goes to the list;
-// a saved link opens the recipe; an address with a recipe that isn't there opens the list. Never rewrite these lines to
-// fit a change.
+// a saved link opens the recipe; an address with a recipe that isn't there opens the list; the Recipes tab, tapped on an
+// open recipe, goes to the list (choice A, 02:38). Never rewrite these lines to fit a change.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -43,6 +43,10 @@ seed.feedback = [];
     ok(url() === "/my-recipes" && (await page.locator(".rq").count()) === 0, "Back from a saved link goes to the list");
     await page.goto(B + "/my-recipes/not-there"); await page.waitForTimeout(1200);
     ok(url() === "/my-recipes" && (await page.locator(".recipe-tile").count()) === 2, "an address with no such recipe opens the list");
+    // choice A (Milan 02:38): the Recipes tab, tapped on an open recipe, goes to the list
+    await page.locator(".recipe-tile").filter({ hasText: "High protein crepes" }).click(); await page.waitForTimeout(500);
+    await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(700);
+    ok(url() === "/my-recipes" && (await page.locator(".rq").count()) === 0 && (await page.locator(".recipe-tile").count()) === 2, "the Recipes tab on an open recipe goes to the list");
     await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(400);
     ok(url() === "/today", "the tabs keep their addresses");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));

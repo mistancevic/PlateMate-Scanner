@@ -6,7 +6,7 @@ import type { StepMark } from "../pilot";
 import type { Meal } from "../pilot";
 import { fmt } from "../ui";
 import type { AppApi } from "./api";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useKept } from "../kept";
 import { PublishSheet, unpublishedOf, type Published } from "../components/PublishSheet";
 import { localAs, isPreviewHost } from "../recipes";
@@ -111,6 +111,13 @@ export function RecipesScreen(p: AppApi) {
     p.clearLanding();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p.landing]);
+  // R8, choice A (Milan 02:38): the Recipes tab tapped on an open recipe goes to the list, as a tab does in most apps
+  const homeTaps = useRef(p.recipesHome);
+  useEffect(() => {
+    if (p.recipesHome === homeTaps.current) return;
+    homeTaps.current = p.recipesHome; setOpenId(null); setLanded(null); p.clearOpenFromPath();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [p.recipesHome]);
   // R8 (0.2.31): the address names a recipe (a reload, Back, a saved link): it opens once it is here; the account may bring it a moment later
   useEffect(() => {
     const id = p.openFromPath; if (!id) return;
