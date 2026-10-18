@@ -1681,3 +1681,6 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 /* PF A6 (0.2.35): the line under the two ways, and the hat beside their words */
 .ways-why { display: block; margin-top: 6px; }
 .in-ways .ways .pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+/* R10 (0.2.36): the slow line under the two ways, with Stop */
+.way-slow { display: flex; gap: 10px; align-items: flex-start; margin-top: 8px; }
+.way-slow small { flex: 1; margin: 0; }

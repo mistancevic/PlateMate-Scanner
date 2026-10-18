@@ -363,6 +363,9 @@ export function JourneyScreen(p: AppApi) {
   const [pmode, setPmode] = useState<"sized" | "recipe">("sized");
   const [way, setWay] = useState<Way | null>(null);
   const [wayBusy, setWayBusy] = useState<string | null>(null);
+  // R10 (0.2.36): the wait for Change the recipe: the slow line, and what stops it (Stop, or the minute)
+  const [waySlow, setWaySlow] = useState(false);
+  const wayStop = useRef<AbortController | null>(null), wayStopWhy = useRef<"time" | null>(null);
   // Parts on the plate (0.2.19, IM18): each food gets a part and can be optional; new parts wait here until a food has one
   const [partsMode, setPartsMode] = useState(false);
   // How to make it (0.2.20, boards IM19, IM19b, IM19c, IM20): what you make, the draft on this step, the checklist ticks
@@ -563,11 +566,17 @@ export function JourneyScreen(p: AppApi) {
   const fitBody = (m: Meal, w: "change" | "side", failed?: string) => JSON.stringify({ way: w, title: m.title, servings: m.makes?.n ?? 1, need: mealNeed ?? kcalOfItems(portionItems(m, "recipe")), target: pdRef,
     items: m.items.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein, role: i.role ?? "other", part: i.part ?? "" })), kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), habits, failed });
   // IM5: Chef Mealan changes the dish; code checks the roles, the portion, the PD and allergies, and sends a failed try back once
-  async function changeDish(failed?: string) {
+  // R10 (0.2.36, board RS6): Change the recipe has a limit. After 20 seconds the slow line and Stop; at one minute in all it
+  // stops by itself; the second round is asked only while there is time for it. The plate stays as it was.
+  async function changeDish(failed?: string, deadline = Date.now() + 60_000) {
     if (!rec || pdRef === null) return;
     setWayBusy("change");
+    const ac = new AbortController(); wayStop.current = ac;
+    const slowAt = window.setTimeout(() => setWaySlow(true), Math.max(0, deadline - 40_000 - Date.now()));
+    const endAt = window.setTimeout(() => { wayStopWhy.current = "time"; ac.abort(); }, Math.max(0, deadline - Date.now()));
+    let again = false;
     try {
-      const res = await fetch("/api/recipe/fit", { method: "POST", headers: { "Content-Type": "application/json" }, body: fitBody(rec, "change", failed) });
+      const res = await fetch("/api/recipe/fit", { method: "POST", headers: { "Content-Type": "application/json" }, body: fitBody(rec, "change", failed), signal: ac.signal });
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d.error || `${CHEF_NAME} could not answer.`);
       let why: string | null = d.failed ?? null, out: Ingredient[] = [], wholeNow: Ingredient[] = [];
@@ -582,13 +591,16 @@ export function JourneyScreen(p: AppApi) {
         else if (!realPortions(out)) why = "One of the foods is not a real portion at this size.";
         else if (out.some((i) => blockedByAllergy(i.food, p.safety.allergies ?? []))) why = "It has a food with one of their allergies.";
       }
-      if (why) { if (!failed) return changeDish(why); log("recipe_fit", { way: "change", result: "failed" }); notify(`${CHEF_NAME}'s change didn't pass the checks: ${why} Try Add on the side.`); return; }
+      if (why) { if (!failed && deadline - Date.now() > 15_000) { again = true; window.clearTimeout(slowAt); window.clearTimeout(endAt); return changeDish(why, deadline); } log("recipe_fit", { way: "change", result: "failed" }); notify(`${CHEF_NAME}'s change didn't pass the checks: ${why} Try Add on the side.`); return; }
       const fresh = out.map((i) => i.food).filter((f) => !state.foods.some((x) => x.id === f.id));
       const title = String(d.title || `${rec.title}, more protein`);
       setState((s) => ({ ...s, foods: [...s.foods, ...fresh.filter((f, k) => fresh.findIndex((x) => x.id === f.id) === k)], items: out, title, portion: null }));
       setWay({ kind: "change", title, notes: (d.notes ?? []) as string[], whole: wholeNow });
       log("recipe_fit", { way: "change", result: "shown" });
-    } catch (e: any) { setError(e.message); } finally { setWayBusy(null); }
+    } catch (e: any) {
+      if (e?.name === "AbortError") notify(wayStopWhy.current === "time" ? `${CHEF_NAME} took too long, so nothing changed. Try again, or Add on the side.` : "Stopped. Nothing changed. Try again, or Add on the side.");
+      else setError(e.message);
+    } finally { if (!again) { window.clearTimeout(slowAt); window.clearTimeout(endAt); setWayBusy(null); setWaySlow(false); wayStop.current = null; wayStopWhy.current = null; } }
   }
   // IM5b: the dish as it is, a little smaller, and a side that brings the protein; your way first
   async function addSide() {
@@ -899,6 +911,7 @@ export function JourneyScreen(p: AppApi) {
                   <button className="pill pill-small" disabled={!!wayBusy} onClick={() => void changeDish()}><ChefHat size={16} /> {wayBusy === "change" ? `${CHEF_NAME} is changing it…` : "Change the recipe"}</button>
                   <button className="pill pill-small" disabled={!!wayBusy} onClick={() => void addSide()}><ChefHat size={16} /> {wayBusy === "side" ? `${CHEF_NAME} is looking…` : "Add on the side"}</button>
                 </div>
+                {wayBusy === "change" && waySlow && <div className="way-slow"><small className="rq-drafting in-slow" role="status">This takes longer than most. {CHEF_NAME} keeps going: up to one minute.</small><button className="link" onClick={() => wayStop.current?.abort()}>Stop</button></div>}
                 <small className="muted ways-why">Change the recipe: {CHEF_NAME} swaps foods or uses less of them. Add on the side: a high protein side, like skyr, next to your piece. Both aim at your {pdVal(pdRef)}.</small>
               </div>
             )}
