@@ -89,7 +89,7 @@ const U = "http://127.0.0.1:3209";
   t = await page.locator(".plate-card").textContent().then((x) => x.replace(/\s+/g, " "));
   ok(await page.locator(".title-input").inputValue() === "Margherita pizza", "IM4: the plate is the Margherita");
   ok(JSON.stringify(await grams()) === JSON.stringify([210, 83, 105, 8, 2]), `IM4: sized for dinner: every food scaled the same way (${await grams()})`);
-  ok(/Sized for your dinner/.test(t) && /1 of 2 pizzas/.test(t) && /One pizza is 1,121 kcal\. Your dinner is about 933\. Sized for it: 84% of one pizza\./.test(t), "IM4: two portions to pick from, with what each is");
+  ok(/Sized for your dinner/.test(t) && /One pizza, as the recipe makes it/.test(t) && /One pizza is 1,121 kcal\. Your dinner is about 933\. Sized for it: 84% of one pizza\./.test(t), "IM4: two portions to pick from, with what each is");
   ok(/4\.2/.test(await page.locator(".plate-card .readout").textContent()), "IM4: PD 4.2, said in the readout (4.1 for the whole recipe; the amounts to the gram)");
   ok(/Empty plate/.test(await page.locator(".plate-card .card-top").textContent()) && await page.locator(".plate-card .ways .ways-empty").count() === 0, "IM1b: Empty plate sits at the top of the card, out of the row that adds foods");
   ok(/Under your PD 6\.4\. Make it as it is, or fit it one of two ways:/.test(t), "IM4: under the target: two ways to fit it (wording of board PF, A6, 0.2.35)");
@@ -97,7 +97,7 @@ const U = "http://127.0.0.1:3209";
   const m = s.meals[0];
   ok(m.title === "Margherita pizza" && m.source.name === "@account_name on Instagram" && m.source.from === "screenshot" && m.makes.n === 2 && (Array.isArray(m.shots) ? m.shots.length === 2 : m.source.shotSigs.length === 2), "IM6: saved in Mine with where it came from, how many it makes and the two screenshots");
   ok(!m.photo && !(m.photos ?? []).length, "IM6: a screenshot is never the recipe's photo or cover");
-  await page.getByRole("button", { name: "1 of 2 pizzas" }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: "One pizza, as the recipe makes it" }).click(); await page.waitForTimeout(400);
   ok(JSON.stringify(await grams()) === JSON.stringify([250, 100, 125, 10, 3]), "IM4: 1 of 2 pizzas: the recipe's own portion");
   await page.getByRole("button", { name: "Sized for your dinner" }).click(); await page.waitForTimeout(400);
 

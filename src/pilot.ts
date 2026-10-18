@@ -170,6 +170,8 @@ export type Feedback = {
   status: "prepared" | "eaten" | "not-used";
   // portions left of a whole recipe made (0.2.20, board IM19): the card stays on Today, day after day, until eaten or removed
   left?: number;
+  // R12 (0.2.38): what one of the portions left is, in your words: lunch, or the recipe's fritter
+  leftOf?: string;
   taste: string;
   notes: string;
   createdAt: string;

@@ -61,16 +61,16 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
   let t = await text(page, "main");
   ok(/How to make it/.test(t) && !/How do you want to eat it/.test(t), "IM19: after Make it, a recipe gets How to make it");
-  ok(await page.locator('[aria-label="What you make"] .choice.on').textContent() === "All 8 slices" && /You eat 1 slice/.test(t) && /The 7 slices left go to Keep for later/.test(t), "IM19: it makes 8, so the whole cake is made; you eat 1 slice; 7 for later");
+  ok(await page.locator('[aria-label="What you make"] .choice.on').textContent() === "The whole recipe" && /You eat 1 slice/.test(t) && /The 7 slices left go to Keep for later/.test(t), "IM19: it makes 8, so the whole cake is made; you eat 1 slice; 7 for later");
   ok(/The recipe's own steps/.test(t) && await page.locator(".mk-card .rp-orig li").count() > 0 && /Preheat|Crush the biscuits/.test(await text(page, ".mk-card .rp-orig")) && /The original works with your foods as they are/.test(t), "RP1 (was IM19b): the original is the steps, and a line says it works; no steps yet: the original open below, for you only");
   ok(await page.getByRole("button", { name: "Chef Mealan's way" }).count() === 1 && await page.getByRole("button", { name: "I'm making it" }).count() === 1, "RP1: Chef Mealan's way on a tap; I'm making it");
   await page.getByRole("button", { name: "Chef Mealan's way" }).click(); await page.waitForTimeout(900);
   t = await text(page, "main");
   ok(JSON.stringify(await page.locator(".mk-card .rp-step-part").allTextContents()) === JSON.stringify(["The base", "The filling", "The topping"]) && /120 g digestive biscuits/.test(t) && /200 g cream cheese/.test(t) && /Adapted: 320 °F in the original/.test(t), "IM19: the steps drafted here, part by part, at the whole cake's grams, with the marks");
   ok((await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")))).meals[0].steps.length === 4, "IM19b: the steps are kept with the recipe");
-  await page.getByRole("button", { name: "Just your slice" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Just your plate" }).click(); await page.waitForTimeout(300);
   ok(/15 g digestive biscuits/.test(await text(page, "main")) && /every amount at your portion/.test(await text(page, "main")), "IM20: just your slice: the steps at your plate's grams");
-  await page.getByRole("button", { name: "All 8 slices" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "The whole recipe" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: "I'm making it", exact: true }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "On to How was it?" }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "DaaM good" }).click();
@@ -100,8 +100,8 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   const p4 = await open(seed);
   await readIn(p4, cookie);
   await p4.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await p4.waitForTimeout(800);
-  ok(await p4.locator('[aria-label="What you make"] .choice.on').textContent() === "Just your cookie" && /The recipe makes 2/.test(await text(p4, "main")), "IM20: a recipe that makes 2 starts with just your cookie");
-  await p4.getByRole("button", { name: "All 2 cookies" }).click(); await p4.waitForTimeout(200);
+  ok(await p4.locator('[aria-label="What you make"] .choice.on').textContent() === "Just your plate" && /The recipe makes 2/.test(await text(p4, "main")), "IM20: a recipe that makes 2 starts with just your cookie");
+  await p4.getByRole("button", { name: "The whole recipe" }).click(); await p4.waitForTimeout(200);
   ok(/The other cookie goes to Keep for later/.test(await text(p4, "main")), "IM20: All 2 cookies, an exact count: the other one goes to Keep for later");
   await p4.close();
 
