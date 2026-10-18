@@ -1684,3 +1684,7 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 /* R10 (0.2.36): the slow line under the two ways, with Stop */
 .way-slow { display: flex; gap: 10px; align-items: flex-start; margin-top: 8px; }
 .way-slow small { flex: 1; margin: 0; }
+/* R11 (0.2.37): the whole line opens its section; Done stands where the pencil was */
+.plan-line { cursor: pointer; }
+.plan-line-done { font-weight: 800; padding: 6px 4px; }
+.for-hint { margin: 0 0 10px; }

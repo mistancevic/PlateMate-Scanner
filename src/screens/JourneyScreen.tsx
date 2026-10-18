@@ -279,6 +279,7 @@ export function JourneyScreen(p: AppApi) {
   }
   // Start again from nothing: the plate's foods go, the library stays.
   function emptyPlate() {
+    p.setPick(null);
     setMadeBy(null); setChef(null); setWay(null);
     setState((s) => ({ ...s, items: [], portion: null, fromRecipe: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined }));
     setPartsMode(false); setStep("in");
@@ -342,7 +343,11 @@ export function JourneyScreen(p: AppApi) {
   // which meals are done (0.2.12, board MS): a plate off the plan closes the meal nearest its time; I skipped it closes too
   const [answers, setAnswers] = useState(() => answersFor(todayKey));
   const closed = mealDate === todayKey ? closedSlots(daySlots, dayRec, answers) : new Set([...dayRec.eaten.map((f) => f.slot!.slotId), ...dayRec.skipped.map((x) => x.id)]);
-  const mealSlot = p.filling ? daySlots.find((x) => x.id === p.filling!.slotId) ?? null : mealNow(daySlots, closed, new Date());
+  // R11 (0.2.37, board RS8): what the plate is for. A meal picked in the line's section sizes the plate and counts by the plan;
+  // Exploring and a snack off the plan size nothing; with nothing picked, the meal the clock is in, shown as a guess
+  const pickSlot = !p.filling && p.pick?.startsWith("meal:") ? daySlots.find((x) => x.id === p.pick!.slice(5)) ?? null : null;
+  const unsized = !p.filling && (p.pick === "exploring" || p.pick === "snack");
+  const mealSlot = p.filling ? daySlots.find((x) => x.id === p.filling!.slotId) ?? null : unsized ? null : pickSlot ?? mealNow(daySlots, closed, new Date());
   const dayNums = p.numbersFor(new Date(`${mealDate}T12:00:00`));
   const share = mealSlot && dayNums ? mealShare(daySlots, mealSlot.id, { kcal: dayNums.kcal, protein: dayNums.protein }, mealDate === todayKey ? { kcal: dayRec.kcal, protein: dayRec.protein } : { kcal: 0, protein: 0 }, closed) : null;
   const chefable = p.kind !== "dessert" && momentOf(p.moment).planned && !!share && share.kcal >= 150 && p.filling?.mode !== "eat";
@@ -358,6 +363,20 @@ export function JourneyScreen(p: AppApi) {
   };
   const mealWord = (mealSlot?.name ?? "meal").toLowerCase();
   const Meal = mealWord.charAt(0).toUpperCase() + mealWord.slice(1);
+  // R11 (0.2.37): the line says what the plate is for; the section's chips and their hint
+  const capName = (n: string) => n.charAt(0).toUpperCase() + n.slice(1);
+  const numsOf = share ? `${fmt(share.kcal, 0)} kcal · ${fmt(share.protein, 0)} g protein · ${pdText(pdRef)}` : "";
+  const kindPart = p.kind === "dessert" ? " · A dessert" : items.some((i) => i.dish) ? " · A dish" : " · A mix";
+  const momentPart = p.moment !== "regular" ? ` · ${momentOf(p.moment).name}` : "";
+  const lineNow = pickSlot ? `${capName(pickSlot.name)}, ${pickSlot.time}${numsOf ? ` · ${numsOf}` : ""} · By the plan${momentPart}${kindPart === " · A mix" ? "" : kindPart}`
+    : p.pick === "exploring" ? `Exploring · not sized for a meal${momentPart}${kindPart === " · A mix" ? "" : kindPart}`
+    : p.pick === "snack" ? `Snack · off the plan${momentPart}${kindPart === " · A mix" ? "" : kindPart}`
+    : `${mealSlot ? `${capName(mealSlot.name)}, ${mealSlot.time} by the clock · ` : ""}Off the plan · ${momentOf(p.moment).name}${kindPart}`;
+  const forKey = p.pick ?? (mealSlot ? `meal:${mealSlot.id}` : "exploring");
+  const forHint = pickSlot ? `${capName(pickSlot.name)}, ${pickSlot.time}: ${numsOf ? `${numsOf}, from your plan for today. ` : ""}It counts as your ${pickSlot.name.toLowerCase()}.`
+    : p.pick === "exploring" ? "Exploring: nothing is sized for a meal. Pick a meal to see what your plan has for it."
+    : p.pick === "snack" ? "Snack: off the plan, not sized for a meal."
+    : mealSlot ? `${capName(mealSlot.name)}, by the clock: a guess, off the plan. Tap ${capName(mealSlot.name)} to make it your ${mealSlot.name.toLowerCase()}: it counts by the plan.` : "Pick what it is for.";
   // ---- a recipe from screenshots or a link (0.2.16, canvas board IM) ----
   const [inFlow, setInFlow] = useState<InFlow | null>(null);
   const [pmode, setPmode] = useState<"sized" | "recipe">("sized");
@@ -731,16 +750,29 @@ export function JourneyScreen(p: AppApi) {
             : Head({ title: "What are you craving?", sub: `Add your foods. ${CHEF_NAME} sets the amounts.` })}
         {/* the plan line (0.2.0, canvas S): one line says what the plate is; the kind and the moment sit behind its pencil, never asked first.
             A planned meal (0.2.2) says Lunch, 12:30 · By the plan; until then every plate is off the plan. */}
-        <div className="plan-line">
-          <span>{p.filling ? (p.filling.mode === "eat" ? `${p.filling.name}, ${p.filling.time} · By the plan` : `${p.filling.dayName === "today" ? "Today" : p.filling.dayName}'s ${p.filling.name.toLowerCase()}, ${p.filling.time} · By the plan`) + (items.some((i) => i.dish) ? " · A dish" : "") : `Off the plan · ${momentOf(p.moment).name}${p.kind === "dessert" ? " · A dessert" : items.some((i) => i.dish) ? " · A dish" : " · A mix"}`}</span>
-          <button className="icon plan-line-pen" aria-label="Change what this plate is" aria-expanded={lineOpen} onClick={() => setLineOpen((v) => !v)}><Pencil size={16} /></button>
+        {/* R11: a tap anywhere on the line opens its section; the pencil (or Done) stays the button for keyboards and readers */}
+        <div className="plan-line" onClick={() => setLineOpen((v) => !v)}>
+          <span>{p.filling ? (p.filling.mode === "eat" ? `${p.filling.name}, ${p.filling.time} · By the plan` : `${p.filling.dayName === "today" ? "Today" : p.filling.dayName}'s ${p.filling.name.toLowerCase()}, ${p.filling.time} · By the plan`) + (items.some((i) => i.dish) ? " · A dish" : "") : lineNow}</span>
+          {lineOpen
+            ? <button className="link plan-line-done" onClick={(e) => { e.stopPropagation(); setLineOpen(false); }}>Done</button>
+            : <button className="icon plan-line-pen" aria-label="Change what this plate is" aria-expanded={lineOpen} onClick={(e) => { e.stopPropagation(); setLineOpen(true); }}><Pencil size={16} /></button>}
         </div>
         {lineOpen && (<>
+        {/* R11 (0.2.37, board RS8): What is it for: Exploring, the day's meals, a snack off the plan; a meal from the Plan keeps its own slot */}
+        {!p.filling && <>
+          <p className="label">What is it for?</p>
+          <div className="moments for-row" role="radiogroup" aria-label="What the plate is for">
+            <button className={`choice ${forKey === "exploring" ? "on" : ""}`} aria-pressed={forKey === "exploring"} onClick={() => p.setPick("exploring")}>Exploring</button>
+            {daySlots.map((x) => <button key={x.id} className={`choice ${forKey === `meal:${x.id}` ? "on" : ""}`} aria-pressed={forKey === `meal:${x.id}`} onClick={() => p.setPick(`meal:${x.id}`)}>{capName(x.name)}</button>)}
+            {!daySlots.some((x) => /snack/i.test(x.name)) && <button className={`choice ${forKey === "snack" ? "on" : ""}`} aria-pressed={forKey === "snack"} onClick={() => p.setPick("snack")}>Snack</button>}
+          </div>
+          <p className="small for-hint">{forHint}</p>
+        </>}
         <div className="moments kind-row" role="radiogroup" aria-label="Kind of plate">
           <button className={`choice ${p.kind === "meal" ? "on" : ""}`} aria-pressed={p.kind === "meal"} onClick={() => p.setKind("meal")}>Meal</button>
           <button className={`choice ${p.kind === "dessert" ? "on" : ""}`} aria-pressed={p.kind === "dessert"} onClick={() => p.setKind("dessert")}>Dessert</button>
         </div>
-        <p className="label">When is this for?</p>
+        <p className="label">What kind of moment?</p>
         <div className="moments">
           {orderMoments(p.usual).map((m) => (
             <button key={m.id} className={`choice ${p.moment === m.id ? "on" : ""} ${m.planned ? "" : "pill-unplanned"}`} onClick={() => p.setMoment(m.id)}>{m.name}</button>
@@ -1336,13 +1368,13 @@ export function JourneyScreen(p: AppApi) {
         const landId = keep ? kept.id : (fromRec ?? origin)?.id ?? null;
         const leftN = madeWhole && rec?.makes ? rec.makes.n - 1 : 0;
         const landLine = status !== "eaten" ? "" : [`You ate ${rec && pmode === "recipe" && !way ? `1 ${oneOf(rec)}` : "your plate"}.`, leftN > 0 ? `${countOf(leftN, unitOf(rec!))} left on Today.` : "", chgKept && fromRec ? `The original, ${fromRec.title}, stays as it was.` : ""].filter(Boolean).join(" ");
-        setState((s) => ({ ...s, fromRecipe: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)), feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : undefined, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));
+        setState((s) => ({ ...s, fromRecipe: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)), feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : pickSlot ? { date: todayKey, slotId: pickSlot.id, name: pickSlot.name, time: pickSlot.time } : undefined, createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));
         if (p.filling) p.setFilling(null);
         setWay(null); setTried(null);
         setMakeAll(null); setTicks(new Set()); setMkDraft(""); setMkDrafted(false);
         if (landId) p.landOnRecipe(landId, landLine, keep ? "✓ Saved in Mine" : "✓ Made today");
         else setTab("home");
-        p.setKind("meal"); setGood(null); setNote(""); setTitle(""); setPlate(""); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); resetMade(); setStep("in");
+        p.setKind("meal"); p.setPick(null); setGood(null); setNote(""); setTitle(""); setPlate(""); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); resetMade(); setStep("in");
       }}>{sharing ? `Save and share with ${p.profile.coachName || "your coach"}` : "Save"}</button>
       {p.profile.coachId && !sharing && <button className="pill pill-wide" onClick={() => setSharing(true)}>Share with {p.profile.coachName || "your coach"}</button>}
       {sharing && <button className="link" onClick={() => { setSharing(false); setShareWhy(null); }}>Keep it private</button>}

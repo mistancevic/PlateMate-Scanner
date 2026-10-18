@@ -748,6 +748,9 @@ export default function App() {
     [goalLog, setGoalLogState] = useState<GoalEntry[]>(() => { setGoalLog(getGoalLog()); return getGoalLog(); }),
     nextSource = useRef<GoalSource | null>(null),
     [moment, setMomentState] = useState<MomentId>("regular"),
+    // R11 (0.2.37, board RS8): what the plate is for. null: the meal the clock is in, a guess, off the plan; "exploring" sizes
+    // nothing; "snack" is off the plan, unsized; "meal:<slot>" is that meal of today, sized for it and counted by the plan
+    [pick, setPick] = useState<string | null>(null),
     [kind, setKind] = useState<PlateKind>("meal"),
     [usual, setUsualState] = useState<RhythmId[]>(getUsual),
     [region, setRegionState] = useState<RegionId | null>(getRegion),
@@ -1884,7 +1887,7 @@ export default function App() {
     api, setImage, setEdit, setGoalsOpen, setAccessOpen, setReviewMeal,
     setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
-    pdRef, dayPd, kind, setKind, moment, setMoment: (m: MomentId) => setMomentState(m), usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
+    pdRef, dayPd, kind, setKind, moment, setMoment: (m: MomentId) => setMomentState(m), pick, setPick, usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },

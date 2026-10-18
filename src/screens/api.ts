@@ -67,6 +67,9 @@ export interface AppApi {
   setKind: (k: import("../pilot").PlateKind) => void;
   moment: import("../moments").MomentId;
   setMoment: (m: import("../moments").MomentId) => void;
+  // R11 (0.2.37): what the plate is for: null (the meal by the clock), "exploring", "snack" or "meal:<slot id>"
+  pick: string | null;
+  setPick: (v: string | null) => void;
   usual: import("../moments").RhythmId[];
   setUsual: (ids: import("../moments").RhythmId[]) => void;
   region: import("../moments").RegionId | null;
