@@ -9,7 +9,7 @@ test("R3: deep frying counts the oil the food takes up, 15% of the fried food; t
   const out = capOil(fritters, ["Heat the oil to 350°F.", "Fry 2 to 3 fritters at a time."]);
   const oil = out.find((x) => x.name === "Vegetable oil")!;
   assert.equal(oil.grams, Math.round((563 + 240 + 360) * 0.15));
-  assert.deepEqual(oil.fry, { pot: 1380 });
+  assert.deepEqual(oil.fry, { pot: 1380, written: "1 to 2 quarts (1 to 1.9 L)" });
   assert.equal(out.find((x) => x.name === "Whole milk")!.grams, 240, "every other food stays");
 });
 test("R3: a splash in a pan, a stir fry and a cake's oil are counted in full", () => {
@@ -24,5 +24,17 @@ test("R3: a splash in a pan, a stir fry and a cake's oil are counted in full", (
 });
 test("R3: a schnitzel in 1 cm of oil counts what the meat takes up", () => {
   const s = capOil([it("Pork cutlets", "4 (600g)", 600), it("Breadcrumbs", "100g", 100), it("Sunflower oil", "for frying, about 300 ml", 270)], ["Fry the cutlets in hot oil, 3 minutes a side."]);
-  assert.equal(s[2].grams, 105); assert.deepEqual((s[2] as any).fry, { pot: 270 });
+  assert.equal(s[2].grams, 105); assert.deepEqual((s[2] as any).fry, { pot: 270, written: "for frying, about 300 ml" });
+});
+
+test("R3, the fix: the steps cook with the pot; the numbers count what is taken up", async () => {
+  const { stepParts, tokenOf } = await import("./steps");
+  const { potLine } = await import("./frying");
+  const oil = { id: "o1", food: { id: "f1", name: "Vegetable oil" }, grams: 207, fry: { pot: 1380, written: "1 to 2 quarts (1 to 1.9 L)" } } as any;
+  const step = `Heat ${tokenOf(oil)} to 177 °C.`;
+  const whole = stepParts(step, [oil]).find((p) => "label" in p) as { label: string };
+  assert.equal(whole.label, "1 to 2 quarts (1 to 1.9 L) vegetable oil");
+  const plate = stepParts(step, [{ ...oil, grams: 29, fry: { ...oil.fry, plate: true } }]).find((p) => "label" in p) as { label: string };
+  assert.equal(plate.label, "enough to fry: 1 to 2 quarts (1 to 1.9 L) vegetable oil, as the recipe says");
+  assert.equal(potLine({ pot: 1380 }, "vegetable oil", (g) => `${g} g`), "1380 g vegetable oil");
 });

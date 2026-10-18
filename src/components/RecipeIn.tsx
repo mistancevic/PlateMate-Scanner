@@ -7,7 +7,7 @@ import { iconFor } from "../icons";
 import { CHEF_NAME } from "./Mark";
 import { countLabel, type Count } from "../counted";
 import { OriginalSteps } from "./StepsView";
-import { TAKEN_UP_LINE } from "../frying";
+import { countedLine } from "../frying";
 
 // A recipe from screenshots or a link (0.2.16, canvas board IM, IM2, IM2b, IM3, IM7). The plate card gives way to these
 // while a recipe comes in; Put it on my plate hands it back to the plate.
@@ -76,8 +76,8 @@ export function ReadCard({ flow, setSource, setServings, toggle, put, again, can
   const row = (i: ReadRecipe["items"][number], k: number) => (
     <div className={`row ${on(i) ? "" : "in-off"}`} key={k}>
             <span className="thumb thumb-sm">{iconFor(i.name)}</span>
-            <div className="row-text"><b>{i.name}</b><small>{i.written ? `${i.written} on the recipe` : "no amount on the recipe"}{i.count ? <> · counted, size {i.count.size}</> : i.fry ? <> · <span className="in-tag in-opt">for frying</span> {TAKEN_UP_LINE}</> : i.how !== "recipe" && <> · <span className="in-tag">{i.how}</span></>}{i.optional && <> · <span className="in-tag in-opt">optional</span> <button className="link in-inline" onClick={() => toggle(k)}>{on(i) ? "Leave it out" : "Add it"}</button></>}</small></div>
-            {i.count ? <CountNum c={i.count} grams={i.grams} /> : <b className="row-num">{fmt(i.grams, 0)} g</b>}
+            <div className="row-text"><b>{i.name}</b><small>{i.written ? `${i.written} on the recipe` : "no amount on the recipe"}{i.count ? <> · counted, size {i.count.size}</> : i.fry ? <> · <span className="in-tag in-opt">for frying</span> {countedLine(`${fmt(i.grams, 0)} g`)}</> : i.how !== "recipe" && <> · <span className="in-tag">{i.how}</span></>}{i.optional && <> · <span className="in-tag in-opt">optional</span> <button className="link in-inline" onClick={() => toggle(k)}>{on(i) ? "Leave it out" : "Add it"}</button></>}</small></div>
+            {i.count ? <CountNum c={i.count} grams={i.grams} /> : <b className="row-num">{fmt(i.fry ? i.fry.pot : i.grams, 0)} g</b>}
           </div>
   );
   // the recipe's groups, in the order it lists them; a food counts in its group's numbers as it counts in the recipe's

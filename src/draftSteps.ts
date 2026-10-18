@@ -8,7 +8,7 @@ export type Drafted = { ok: true; steps: string[]; marks?: StepMark[]; kitchen?:
 export async function draftSteps(meal: Meal, o: { library: string[]; equipment: string[]; kitchens: string[]; changed?: string[] }): Promise<Drafted> {
   const items = meal.items.filter((i) => i.grams > 0);
   const ask = async (failed?: string): Promise<Drafted> => {
-    const res = await fetch("/api/steps", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: meal.title, items: items.map((i) => ({ name: i.food.name, grams: i.grams, part: i.part ?? "" })), optional: (meal.optional ?? []).map((x) => ({ name: x.name, part: x.part ?? "" })), kitchens: o.kitchens, failed,
+    const res = await fetch("/api/steps", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ title: meal.title, items: items.map((i) => ({ name: i.food.name, grams: i.fry?.pot ?? i.grams, part: i.part ?? "" })), optional: (meal.optional ?? []).map((x) => ({ name: x.name, part: x.part ?? "" })), kitchens: o.kitchens, failed,
       original: meal.source?.steps ?? [], equipment: o.equipment, makes: meal.makes ?? null, ...(o.changed?.length ? { changed: o.changed } : {}) }) });
     const d = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(d.error || "Chef Mealan could not answer. Try again.");

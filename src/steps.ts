@@ -1,6 +1,7 @@
 import type { Ingredient } from "./pilot";
 import { amountOf, plainName } from "./recipes";
 import { countOf, countInStep } from "./counted";
+import { potLine } from "./frying";
 
 // Steps that carry the foods with their exact amounts (0.2.5+r16, canvas board S4, R13a to R13c, Milan 22:02: crafting
 // steps with exact measurements from the food list is hard). A food in a step is kept as a token that names the food
@@ -12,6 +13,8 @@ export const tokenOf = (item: Ingredient) => `[[i:${item.id}|${shortName(item.fo
 const amountFor = (id: string, name: string, items: Ingredient[]) => {
   const it = items.find((i) => i.id === id && i.grams > 0);
   if (!it) return name;
+  // R3, the fix (0.2.39): a step is for cooking, so frying oil is the whole pot, as the recipe writes it
+  if (it.fry) return potLine(it.fry, name, (g) => amountOf(g));
   // an egg or a banana is counted (0.2.24, board CT2): "2 eggs (L)"
   const c = countOf(it);
   return c ? countInStep(c, it.grams) : `${amountOf(it.grams)} ${name}`;

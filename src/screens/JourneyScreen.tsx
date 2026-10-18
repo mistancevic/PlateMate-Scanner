@@ -1136,8 +1136,10 @@ export function JourneyScreen(p: AppApi) {
     const t0 = aggregate(items), pd0 = density(t0.protein, t0.calories);
     // the amounts in the steps follow what you make: the whole recipe's grams, or your plate's
     const amounts = (): Ingredient[] => !recipe ? items : madeWhole ? recipe.items : recipe.items.map((r) => { const on = items.find((i) => i.id === r.id || i.food.id === r.food.id); return { ...r, grams: on?.grams ?? 0 }; });
-    const stepsFor = amounts();
-    const tMake = aggregate(stepsFor);
+    // R3, the fix (0.2.39): the steps cook with the pot, even for just your plate; what you make counts what is taken up
+    const counted = amounts();
+    const stepsFor = madeWhole ? counted : counted.map((i) => (i.fry ? { ...i, fry: { ...i.fry, plate: true } } : i));
+    const tMake = aggregate(counted);
     const mark = (m?: { kind: string; why: string }) => !m ? null : <small className={`st-mark ${m.kind}`}>{m.kind === "same" ? "As the original" : `${m.kind === "adapted" ? "Adapted" : "Added"}${m.why ? `: ${m.why}` : ""}`}</small>;
     const draftHere = async () => {
       if (!recipe) return;

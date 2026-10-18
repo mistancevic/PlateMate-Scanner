@@ -15,7 +15,7 @@ export type Role = (typeof ROLES)[number];
 export type How = "recipe" | "converted" | "guessed";
 // optional: the recipe says so (0.2.17, the cookie on 16 October 2026): left out of the numbers until the person adds it
 // count: an egg or a banana, by the size the recipe names (0.2.24, board CT1)
-export type ReadItem = { name: string; written: string; grams: number; how: How; role: Role; calories: number; protein: number; fats: number | null; carbs: number | null; optional: boolean; on?: boolean; note?: string; part?: string; count?: Count; fry?: { pot: number } };
+export type ReadItem = { name: string; written: string; grams: number; how: How; role: Role; calories: number; protein: number; fats: number | null; carbs: number | null; optional: boolean; on?: boolean; note?: string; part?: string; count?: Count; fry?: { pot: number; written?: string } };
 // what the recipe itself says about its numbers, per serving, when it says it (0.2.17)
 export type Stated = { kcal: number; protein: number; fats: number | null; carbs: number | null };
 // steps: the recipe's own method as written (0.2.18, board IM, IM9b), kept for the person only
