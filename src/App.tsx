@@ -784,7 +784,7 @@ export default function App() {
     // the recipe the plate came from (a slot or Recipes, Open), so a new name on the Plate renames it at once
     [plateRecipeId, setPlateRecipeId] = useState<string | null>(null),
     // after How was it (0.2.23, IM23c): the recipe the meal made or changed opens on Recipes, with one line for today
-    [landing, setLanding] = useState<{ id: string; line: string; title?: string; quiet?: boolean } | null>(null),
+    [landing, setLanding] = useState<{ id: string; line: string; title?: string; quiet?: boolean; back?: "recipes" } | null>(null),
     // R8 (0.2.31): a reload or a saved link on /my-recipes/<id> opens that recipe, once Back is ready
     // R8, choice A (Milan 02:38): the Recipes tab, tapped while a recipe is open, goes to the list
     [recipesHome, setRecipesHome] = useState(0),
@@ -2027,7 +2027,7 @@ export default function App() {
     cover: { count: coverCount, drawing: coverDrawing, draw: (m: Meal) => { void drawCover(m); }, refresh: refreshCoverCount },
     landing, clearLanding: () => setLanding(null),
     openFromPath: backReady ? recipeFromPath : null, clearOpenFromPath: () => setRecipeFromPath(null), recipesHome,
-    landOnRecipe: (id: string, line: string, title?: string) => { setLanding({ id, line, title }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
+    landOnRecipe: (id: string, line: string, title?: string, back?: "recipes") => { setLanding({ id, line, title, ...(back ? { back } : {}) }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
     openRecipePage: (id: string) => { setLanding({ id, line: "", quiet: true }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
     openOnPlate: (meal: Meal) => {
       setFilling(null); setPlateRecipeId(meal.id);

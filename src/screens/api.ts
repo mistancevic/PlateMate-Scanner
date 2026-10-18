@@ -106,14 +106,14 @@ export interface AppApi {
   // Recipes, Open (0.2.3): the recipe on the Plate with its name as the title, nothing decided yet
   openOnPlate: (meal: Meal) => void;
   // after How was it (0.2.23, IM23c): open a recipe on Recipes with one line for today
-  landing: { id: string; line: string; title?: string; quiet?: boolean } | null;
+  landing: { id: string; line: string; title?: string; quiet?: boolean; back?: "recipes" } | null;
   clearLanding: () => void;
   // R8 (0.2.31): the recipe named by the address, /my-recipes/<id>
   openFromPath: string | null;
   clearOpenFromPath: () => void;
   // R8, choice A: counts taps on the Recipes tab while it shows; each one goes to the list
   recipesHome: number;
-  landOnRecipe: (id: string, line: string, title?: string) => void;
+  landOnRecipe: (id: string, line: string, title?: string, back?: "recipes") => void;
   // R5 (0.2.42): Today opens the recipe a meal came from, with no line
   openRecipePage: (id: string) => void;
   // Chef Mealan's pictures (0.2.18, board IM, IM11): the day's count, the recipe being drawn, Draw a picture

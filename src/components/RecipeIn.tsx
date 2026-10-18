@@ -8,6 +8,8 @@ import { CHEF_NAME } from "./Mark";
 import { countLabel, type Count } from "../counted";
 import { OriginalSteps } from "./StepsView";
 import { countedLine } from "../frying";
+import { NutritionCard } from "./NutritionCard";
+import type { Food } from "../pilot";
 
 // A recipe from screenshots or a link (0.2.16, canvas board IM, IM2, IM2b, IM3, IM7). The plate card gives way to these
 // while a recipe comes in; Put it on my plate hands it back to the plate.
@@ -60,8 +62,8 @@ export function LinkCard({ url, reading, slow, setUrl, read, cancel }: { url: st
 }
 
 // IM3: what Chef Mealan read. Every line says where its amount came from; how many it makes can be changed.
-export function ReadCard({ flow, setSource, setServings, toggle, put, again, cancel }: {
-  flow: Extract<InFlow, { kind: "read" }>; setSource: (v: string) => void; setServings: (n: number) => void; toggle: (k: number) => void; put: () => void; again: () => void; cancel: () => void;
+export function ReadCard({ flow, setSource, setServings, toggle, put, again, cancel, putLabel }: {
+  flow: Extract<InFlow, { kind: "read" }>; setSource: (v: string) => void; setServings: (n: number) => void; toggle: (k: number) => void; put: () => void; again: () => void; cancel: () => void; putLabel?: string;
 }) {
   const r = flow.recipe;
   const [editing, setEditing] = useState(false);
@@ -111,6 +113,8 @@ export function ReadCard({ flow, setSource, setServings, toggle, put, again, can
         )) : r.items.map((i, k) => row(i, k))}
       </div>
       {r.items.some((i) => i.fry) && <small className="muted in-fry">The frying oil: the recipe needs the whole pot; the numbers count what the food takes up. That amount is an estimate, 15% of the fried food, from a glazed doughnut's fat (USDA).</small>}
+      {/* R6 (0.2.43, board RS14): the Nutrition table after the foods, as on the recipe page, to check what the recipe says */}
+      <NutritionCard tableOnly items={used.map((i, k) => ({ id: `r${k}`, grams: i.grams, locked: true, ...(i.part ? { part: i.part } : {}), food: { id: `r${k}`, name: i.name, brand: "", basis: "100g", source: "estimate", notes: "", reviewedAt: "", readyToEat: true, calories: i.calories, protein: i.protein, fats: i.fats, carbs: i.carbs, fiber: null } as Food }))} serves={r.servings} one={one} all={r.servingsUnit} stated={null} pdRef={null} />
       {flow.note && <small className="in-note">{flow.note}</small>}
       {/* RP1 (0.2.25, Milan 18:05 and 19:43): the original's steps came with the read, so they show with the foods */}
       <div className="in-steps">
@@ -119,7 +123,7 @@ export function ReadCard({ flow, setSource, setServings, toggle, put, again, can
           : <small className="muted">The {flow.url ? "page" : "screenshot"} shows no steps. {CHEF_NAME} can draft them on the recipe page.</small>}
       </div>
       <small className="muted">The whole recipe: {fmt(all, 0)} kcal · {fmt(allP, 0)} g protein · {pdText(pd(all, allP))}.{left.length ? ` Left out: ${left.length} optional, as the recipe's numbers do; Add it puts one in.` : ""} Values are typical values, marked estimate; tap a food on the plate to check or change it.</small>
-      <button className="pill pill-primary pill-wide" onClick={put}>Put it on my plate</button>
+      <button className="pill pill-primary pill-wide" onClick={put}>{putLabel ?? "Put it on my plate"}</button>
       <button className="link" style={{ alignSelf: "center" }} onClick={again}>Not right? Read it again</button>
     </section>
   );

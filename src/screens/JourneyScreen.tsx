@@ -38,7 +38,8 @@ import { blockedByAllergy } from "../safety";
 import { minPortionOf } from "../foodjob";
 import { tasteForChef } from "../kitchens";
 import { resizeImageBase64 } from "../utils/image";
-import { ShotsCard, LinkCard, ReadCard, ErrorCard, type InFlow } from "../components/RecipeIn";
+import { type InFlow } from "../components/RecipeIn";
+import { useRecipeIn, RecipeInFlow, StartWays, mealFromRead, estimate } from "../components/RecipeInBlock";
 import { changesOf, countItem, cleanSteps, scaleTo, onePortion, sideAmount, pdOf, realPortions, isYours, sideWord, MAX_SHOTS, kcalOfItems, sizedFits, roundGrams, type ReadRecipe, type SideKind } from "../recipeIn";
 import { countOf } from "../recipeDelete";
 import { foodNames, originalFoodsOf, diffFoods, diffLine } from "../stepsState";
@@ -49,7 +50,6 @@ import { CountAmount, SizePicker, isCounted } from "../components/CountAmount";
 // Make it a meal (0.2.9, canvas board CH, CH1 to CH3): an idea from Chef Mealan, checked and with the app's grams
 type MealOption = { kitchen: string; title: string; why: string; adds: { name: string; grams: number; have: boolean; base: boolean }[]; items: Ingredient[]; kcal: number; pd: number | null };
 type ChefState = { status: "working" } | { status: "done"; options: MealOption[]; tried: string[] } | { status: "none"; tried: string[] };
-const estimate = (a: { name: string; calories: number; protein: number; fats?: number | null; carbs?: number | null }): Food => ({ id: uid(), name: a.name, brand: "estimate", basis: "100g", source: "estimate", notes: `${CHEF_NAME}'s estimate`, reviewedAt: new Date().toISOString(), readyToEat: true, calories: a.calories, protein: a.protein, fats: a.fats ?? null, carbs: a.carbs ?? null, fiber: null, icon: iconFor(a.name) });
 // a recipe from a screenshot or a link (0.2.16, board IM): Change the dish, or Add on the side
 type SideOpt = { name: string; kind: SideKind; note: string; food: Food; grams: number; dish: Ingredient[]; yours: boolean };
 // part and before (0.2.19, IM16): a change inside one part, and the plate before it, for Back to the original
@@ -380,7 +380,9 @@ export function JourneyScreen(p: AppApi) {
     : p.pick === "snack" ? "Snack: off the plan, not sized for a meal."
     : mealSlot ? `${capName(mealSlot.name)}, by the clock: a guess, off the plan. Tap ${capName(mealSlot.name)} to make it your ${mealSlot.name.toLowerCase()}: it counts by the plan.` : "Pick what it is for.";
   // ---- a recipe from screenshots or a link (0.2.16, canvas board IM) ----
-  const [inFlow, setInFlow] = useState<InFlow | null>(null);
+  // R6 (0.2.43): the read is the shared block, the same as on Recipes
+  const recipeIn = useRecipeIn({ kitchens: p.personal.kitchens ?? [], region: p.region, onError: (m) => setError(m) });
+  const { inFlow, setInFlow } = recipeIn;
   // R15 (0.2.41, board RS12): "whole" is the recipe as mapped, where a recipe starts on the plate
   const [pmode, setPmode] = useState<"whole" | "sized" | "recipe">("sized");
   const [way, setWay] = useState<Way | null>(null);
@@ -497,49 +499,11 @@ export function JourneyScreen(p: AppApi) {
     return [...n.entries()].sort((a, b) => b[1] - a[1]).slice(0, 15).map(([k]) => k);
   })();
   const libFood = (a: { name: string; calories: number; protein: number; fats?: number | null; carbs?: number | null }) => state.foods.find((f) => f.name.toLowerCase() === a.name.toLowerCase()) ?? estimate(a);
-  async function addShots(files: FileList | null, base: string[] = []) {
-    const list = Array.from(files ?? []).slice(0, MAX_SHOTS - base.length);
-    if (!list.length) return;
-    const read = await Promise.all(list.map(async (f) => { const raw = await readFile(f); return resizeImageBase64(raw, 1600, 1600).catch(() => raw); }));
-    setInFlow({ kind: "shots", shots: [...base, ...read].slice(0, MAX_SHOTS) });
-  }
-  // a slow read (0.2.23, IM23d): after 20 seconds the card says it takes longer
-  const [slowRead, setSlowRead] = useState(false);
-  async function readIn(from: { shots: string[] } | { url: string }) {
-    const shots = "shots" in from ? from.shots : [], url = "url" in from ? from.url.trim() : "";
-    setInFlow("shots" in from ? { kind: "shots", shots, reading: true } : { kind: "link", url, reading: true });
-    setSlowRead(false);
-    const slow = setTimeout(() => setSlowRead(true), 20000);
-    try {
-      const res = await fetch("/api/recipe/read", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...(shots.length ? { images: shots } : { url }), kitchens: p.personal.kitchens ?? [], region: p.region }) });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || `${CHEF_NAME} could not read it.`);
-      if (data.error) { log("recipe_in", { how: shots.length ? "shot" : "link", result: String(data.error) }); setInFlow({ kind: "error", code: data.error, message: data.message || "", back: shots.length ? "shots" : "link", shots, url }); return; }
-      log("recipe_in", { how: shots.length ? "shot" : "link", result: "read" });
-      const got = data.recipe as ReadRecipe;
-      // the oil rule again on the phone (R3, 0.2.38): the same result on an answer already capped, so it never counts twice
-      const stepsGot = cleanSteps(got.steps ?? []);
-      setInFlow({ kind: "read", recipe: { ...got, items: capOil((got.items ?? []).map(countItem), stepsGot), steps: stepsGot }, shots, url: data.url, note: data.note });
-    } catch (e: any) { setInFlow(shots.length ? { kind: "shots", shots } : { kind: "link", url }); setError(e.message); }
-    finally { clearTimeout(slow); setSlowRead(false); }
-  }
   // IM3 → IM4: the recipe is saved in Mine with where it came from; your portion goes on the plate
   async function putRead(f: Extract<InFlow, { kind: "read" }>) {
     const r = f.recipe;
-    const fresh: Food[] = [];
-    const whole: Ingredient[] = r.items.filter((i) => i.on ?? !i.optional).map((i) => {
-      let food = state.foods.find((x) => x.name.toLowerCase() === i.name.toLowerCase()) ?? fresh.find((x) => x.name.toLowerCase() === i.name.toLowerCase());
-      if (!food) { food = { ...estimate(i), notes: `${CHEF_NAME}'s estimate, from a recipe` }; fresh.push(food); }
-      return { id: uid(), food, grams: i.grams, locked: true, role: i.role, ...(i.part ? { part: i.part } : {}), ...(i.count ? { count: i.count } : {}), ...(i.fry ? { fry: i.fry } : {}) };
-    });
-    const thumbs = await Promise.all(f.shots.map((x) => resizeImageBase64(x, 900, 900).catch(() => x)));
-    const total = whole.reduce((n, i) => n + i.grams, 0);
-    // IM8: an optional food not added stays with the recipe, in its own list, out of the numbers
-    const optional = r.items.filter((i) => i.optional && !(i.on ?? false)).map((i) => ({ name: i.name, written: i.written, ...(i.note ? { note: i.note } : {}), grams: i.grams, ...(i.part ? { part: i.part } : {}),
-      food: leanFood(state.foods.find((x) => x.name.toLowerCase() === i.name.toLowerCase()) ?? { ...estimate(i), notes: `${CHEF_NAME}'s estimate, from a recipe` }) }));
-    const meal: Meal = { id: uid(), title: r.title, items: whole, portion: Math.round(total / r.servings), savedAt: new Date().toISOString(), steps: [],
-      source: { name: r.source, ...(f.url ? { url: f.url } : {}), from: f.url ? "link" : "screenshot", at: new Date().toISOString(), ...(r.steps?.length ? { steps: r.steps } : {}), foods: foodNames(whole) }, ...(thumbs.length ? { shots: thumbs } : {}), makes: { n: r.servings, unit: r.servingsUnit }, ...(optional.length ? { optional } : {}), ...(r.stated ? { stated: r.stated } : {}) };
-    const mode: "whole" | "sized" | "recipe" = !p.filling && r.servings >= 2 ? "whole" : sizedFits(mealNeed, kcalOfItems(whole) / r.servings) ? "sized" : "recipe";
+    const { meal, fresh } = await mealFromRead(f, state.foods);
+    const mode: "whole" | "sized" | "recipe" = !p.filling && r.servings >= 2 ? "whole" : sizedFits(mealNeed, kcalOfItems(meal.items) / r.servings) ? "sized" : "recipe";
     setPmode(mode); setWay(null); setPartsMode(false);
     setState((s) => ({ ...s, foods: [...s.foods, ...fresh], meals: [meal, ...s.meals], ...recipePlate(meal, mode), title: meal.title, portion: null, fromRecipe: meal.id }));
     setInFlow(null);
@@ -799,10 +763,7 @@ export function JourneyScreen(p: AppApi) {
           </>
         )}
         {/* On the plate (Y1 columns 2 and 2b, 10 October 2026): the plate is a card of its own, with Fit to my target as its action */}
-        {inFlow ? (inFlow.kind === "shots" ? <ShotsCard shots={inFlow.shots} reading={inFlow.reading} slow={slowRead} add={(f) => void addShots(f, inFlow.shots)} remove={(n) => setInFlow({ kind: "shots", shots: inFlow.shots.filter((_, k) => k !== n) })} read={() => void readIn({ shots: inFlow.shots })} cancel={() => setInFlow(null)} />
-          : inFlow.kind === "link" ? <LinkCard url={inFlow.url} reading={inFlow.reading} slow={slowRead} setUrl={(v) => setInFlow({ kind: "link", url: v })} read={() => void readIn({ url: inFlow.url })} cancel={() => setInFlow(null)} />
-          : inFlow.kind === "read" ? <ReadCard flow={inFlow} setSource={(v) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, source: v } })} setServings={(n) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, servings: n, servingsHow: inFlow.recipe.servingsHow } })} toggle={(k) => setInFlow({ ...inFlow, recipe: { ...inFlow.recipe, items: inFlow.recipe.items.map((x, j) => (j === k ? { ...x, on: !(x.on ?? !x.optional) } : x)) } })} put={() => void putRead(inFlow)} again={() => void readIn(inFlow.url ? { url: inFlow.url } : { shots: inFlow.shots })} cancel={() => setInFlow(null)} />
-          : <ErrorCard flow={inFlow} next={(to) => setInFlow(to === "link" ? { kind: "link", url: inFlow.url } : { kind: "shots", shots: inFlow.code === "not-recipe" ? [] : inFlow.shots })} cancel={() => setInFlow(null)} />) : (
+        {inFlow ? <RecipeInFlow flow={recipeIn} put={(f) => void putRead(f)} /> : (
         <section className="card plate-card">
         <div className="card-top"><span>On the plate</span>{items.length > 0 && <ConfirmButton className="link plate-empty-link" label={<><Trash2 size={14} /> Empty plate</>} confirmLabel="Tap again to empty" onConfirm={emptyPlate} />}</div>
         {items.length === 0 && <small className="plate-empty">Nothing on the plate yet.</small>}
@@ -854,10 +815,7 @@ export function JourneyScreen(p: AppApi) {
         {/* Start from a recipe (0.2.16, board IM, IM1): only on an empty plate, because a recipe fills the plate */}
         {items.length === 0 && <>
           <small className="ways-label">Start from a recipe</small>
-          <div className="ways">
-            <label className="pill pill-small"><ImageIcon size={15} /> Screenshot<input type="file" accept="image/*" multiple hidden onChange={(e) => { void addShots(e.target.files); e.target.value = ""; }} /></label>
-            <button className="pill pill-small" onClick={() => setInFlow({ kind: "link", url: "" })}><LinkIcon size={15} /> Link</button>
-          </div>
+          <StartWays flow={recipeIn} />
         </>}
         {items.length + opts.length > 0 && (() => {
           // the plate's rows (0.2.19): in the dish's parts when it has them (IM15, IM18b), optional foods inside their part
