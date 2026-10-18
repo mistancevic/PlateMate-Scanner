@@ -15,7 +15,7 @@ export type Role = (typeof ROLES)[number];
 export type How = "recipe" | "converted" | "guessed";
 // optional: the recipe says so (0.2.17, the cookie on 16 October 2026): left out of the numbers until the person adds it
 // count: an egg or a banana, by the size the recipe names (0.2.24, board CT1)
-export type ReadItem = { name: string; written: string; grams: number; how: How; role: Role; calories: number; protein: number; fats: number | null; carbs: number | null; optional: boolean; on?: boolean; note?: string; part?: string; count?: Count };
+export type ReadItem = { name: string; written: string; grams: number; how: How; role: Role; calories: number; protein: number; fats: number | null; carbs: number | null; optional: boolean; on?: boolean; note?: string; part?: string; count?: Count; fry?: { pot: number } };
 // what the recipe itself says about its numbers, per serving, when it says it (0.2.17)
 export type Stated = { kcal: number; protein: number; fats: number | null; carbs: number | null };
 // steps: the recipe's own method as written (0.2.18, board IM, IM9b), kept for the person only
@@ -101,6 +101,7 @@ export function pageText(html: string): string {
   return decodeEntities(html.replace(/<(script|style|noscript|svg|nav|footer|header)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim().slice(0, 20000);
 }
 export { decodeEntities, cleanText } from "./entities";
+import { capOil } from "./frying";
 import { decodeEntities, cleanText } from "./entities";
 export const siteName = (html: string, host: string) =>
   decodeEntities(html.match(/<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']{1,60})["']/i)?.[1] ?? host.replace(/^www\./, "")).trim();
@@ -147,6 +148,10 @@ export function cleanRead(d: any): ReadRecipe | null {
   // parts only when the recipe groups its foods into two or more (0.2.19, IM15); a single group is one list
   if (new Set(items.map((i) => i.part).filter(Boolean)).size < 2) for (const i of items) delete i.part;
   else for (const i of items) if (!i.part) i.part = "Other";
+  // R3 (0.2.38): the oil a recipe fries in counts what the food takes up, an estimate; the whole pot stays as written
+  const steps = cleanSteps(d.method);
+  const capped = capOil(items, steps);
+  items.splice(0, items.length, ...capped);
   const n = Math.round(num(d.servings));
   const st = d.stated && typeof d.stated === "object" ? d.stated : null;
   const sk = num(st?.calories), sp = num(st?.protein), sf = num(st?.fats), sc = num(st?.carbs);
@@ -157,7 +162,7 @@ export function cleanRead(d: any): ReadRecipe | null {
     ? { kcal: sk / div, protein: sp / div, fats: Number.isFinite(sf) && sf >= 0 ? sf / div : null, carbs: Number.isFinite(sc) && sc >= 0 ? sc / div : null } : null;
   return {
     stated,
-    steps: cleanSteps(d.method),
+    steps,
     title: cleanText(d.title, 80) || "A recipe",
     source: cleanText(d.source, 80),
     servings: Number.isFinite(n) && n >= 1 ? Math.min(24, n) : 1,

@@ -50,7 +50,7 @@ const U = "http://127.0.0.1:3216";
   ok(/2 large on the recipe · counted, size L/.test(t) && /2 eggs/.test(t) && /L · 122 g/.test(t), `CT1: the read card counts the eggs: 2 eggs, L · 122 g (${t})`);
   await shot(page, "ct1", page.locator(".in-card .rows"));
   await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
-  const one = page.getByRole("button", { name: /1 of 8 slices/ }); if (await one.count()) { await one.click(); await page.waitForTimeout(500); }
+  const one = page.getByRole("button", { name: /One slice, as the recipe makes it/ }); if (await one.count()) { await one.click(); await page.waitForTimeout(500); }
   t = (await row(page, "Eggs").textContent()).replace(/\s+/g, " ");
   ok(/¼ egg/.test(t) && /L · 15 g/.test(t), `CT3: one slice is ¼ egg, L · 15 g (${t})`);
   await shot(page, "ct3", page.locator(".plate-card .rows"));

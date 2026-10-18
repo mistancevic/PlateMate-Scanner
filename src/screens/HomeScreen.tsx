@@ -235,7 +235,8 @@ export function HomeScreen(p: AppApi) {
             ? <small className="plan-mark fit-ok">By the plan</small>
             : <small className="plan-mark fit-under">Off the plan{rec.open.length && f.id === today.logged[today.logged.length - 1]?.id ? " · the next meal leans protein" : ""}</small>)}
           <div className="button-row log-actions">
-            {f.recipeId
+            {/* R4 (0.2.38): a portion from a batch is linked to its recipe; older cards find it by the recipe's name */}
+            {f.recipeId || recipeOfCard(f, state.meals)
               ? <span className="pill pill-small pill-done"><Check size={14} /> In My recipes</span>
               : <button className="pill pill-small pill-primary" onClick={() => p.saveCardAsRecipe(f.id)}>Save in My recipes</button>}
             {p.profile.coachId && (f.shared
@@ -265,7 +266,7 @@ export function HomeScreen(p: AppApi) {
           {today.prepared.map((f) => (
             <section className="card log-card" key={f.id}>
               <div className="card-top"><span>{f.meal.title}</span>{(f.left ?? 0) > 0 && <small className="left-tag">{f.left} left</small>}</div>
-              <small>{(f.left ?? 0) > 0 ? "One portion: " : ""}{f.meal.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}</small>
+              <small>{(f.left ?? 0) > 0 ? `One ${f.leftOf ?? "portion"}: ` : ""}{f.meal.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}</small>
               <div className="button-row" style={{ marginTop: 8 }}>
                 <button className="pill pill-small pill-primary" onClick={() => p.settleCard(f.id, "eaten")}><Check size={14} /> {(f.left ?? 0) > 0 ? "I ate one" : "I ate it"}</button>
                 <button className="pill pill-small" onClick={() => p.settleCard(f.id, "not-used")}><X size={14} /> {(f.left ?? 0) > 0 ? "Remove" : "Not today"}</button>

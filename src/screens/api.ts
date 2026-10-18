@@ -126,7 +126,7 @@ export interface AppApi {
   openFoodId: string | null;
   clearOpenFood: () => void;
   toggleFavorite: (foodId: string) => void;
-  keepForLater: (meal: Meal, extra?: { photos?: string[]; prep?: Feedback["prep"]; status?: "prepared" | "not-used"; left?: number }) => void;
+  keepForLater: (meal: Meal, extra?: { photos?: string[]; prep?: Feedback["prep"]; status?: "prepared" | "not-used"; left?: number; leftOf?: string; recipeId?: string }) => void;
   settleCard: (id: string, how: "eaten" | "not-used") => void;
   setFoodJob: (foodId: string, job: string | null) => void;
   eatenTodayKcal: number;
