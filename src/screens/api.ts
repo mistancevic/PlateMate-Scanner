@@ -199,6 +199,8 @@ export interface AppApi {
   importAirtable: () => Promise<void>;
   resetGoal: () => void;
   fitPd: (pd: number | null) => import("../goal").PdBand;
+  // R16 (0.2.44): I ate it on Today, for the next slot's planned meal
+  logPlanned: (m: import("../planned").PlannedMeal, slot: NonNullable<import("../pilot").Feedback["slot"]>) => void;
   fitDay: (pd: number | null) => import("../goal").PdBand;
   clientName: string;
   setClientName: (v: string) => void;

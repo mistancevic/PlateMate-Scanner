@@ -96,6 +96,21 @@ export function recipeFromLd(html: string): { name: string; ingredients: string[
   }
   return null;
 }
+// R16 (0.2.44, board RS15): the page's own photo of the dish, to show the person while reading; the recipe's structured image,
+// else og:image. Only an https address; the person's own browser loads it, never the server, and it is never published.
+export function pagePhoto(html: string, base: URL): string | null {
+  const pick = (x: any): string => (typeof x === "string" ? x : Array.isArray(x) ? pick(x[0]) : x && typeof x === "object" ? String(x.url ?? x.contentUrl ?? "") : "");
+  const isRecipe = (x: any) => x && typeof x === "object" && ([] as unknown[]).concat(x["@type"] ?? []).some((t) => String(t).toLowerCase() === "recipe");
+  const find = (x: any): any => (!x || typeof x !== "object" ? null : isRecipe(x) ? x : Array.isArray(x) ? x.map(find).find(Boolean) ?? null : Array.isArray(x["@graph"]) ? find(x["@graph"]) : null);
+  let raw = "";
+  for (const m of html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
+    let data: any; try { data = JSON.parse(m[1].trim()); } catch { continue; }
+    const r = find(data); if (r && (raw = pick(r.image))) break;
+  }
+  if (!raw) raw = html.match(/<meta[^>]+property=["']og:image(?::secure_url)?["'][^>]+content=["']([^"']{1,1000})["']/i)?.[1] ?? html.match(/<meta[^>]+content=["']([^"']{1,1000})["'][^>]+property=["']og:image["']/i)?.[1] ?? "";
+  if (!raw) return null;
+  try { const u = new URL(decodeEntities(raw.trim()), base); return u.protocol === "https:" && u.href.length <= 1000 ? u.href : null; } catch { return null; }
+}
 // The page as plain text, when it has no structured recipe: no scripts, no styles, no tags, at most 20,000 letters
 export function pageText(html: string): string {
   return decodeEntities(html.replace(/<(script|style|noscript|svg|nav|footer|header)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim().slice(0, 20000);

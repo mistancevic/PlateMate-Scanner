@@ -64,7 +64,7 @@ import { weighInsOff } from "./weight";
 import { fixedOf } from "./components/FormulaCard";
 import { coachDemoOn } from "./coachDemo";
 import { getCoachLocal, setCoachLocal, notesOf, checkinOf, type CoachLocal, type CoachNote } from "./coachNotes";
-import { getPlanned, storePlanned, withPlanned, type Planned, type PlannedMeal } from "./planned";
+import { getPlanned, storePlanned, withPlanned, plannedPortion, type Planned, type PlannedMeal } from "./planned";
 import type { Filling } from "./screens/api";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, withTarget, lifestyleOf, dayFor, type Personal, type DayType, type Day, type NextGoal } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
@@ -1939,6 +1939,12 @@ export default function App() {
       const status = extra?.status ?? "prepared";
       setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status, ...(extra?.left ? { left: extra.left } : {}), ...(extra?.recipeId ? { recipeId: extra.recipeId } : {}), ...(extra?.leftOf ? { leftOf: extra.leftOf } : {}), taste: "", notes: "", photos: extra?.photos?.length ? extra.photos : undefined, photo: extra?.photos?.length ? extra.photos[extra.photos.length - 1] : undefined, prep: extra?.prep, createdAt: new Date().toISOString(), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined } as any, ...s.feedback] }));
       notify(status === "prepared" ? "Kept for later. It's on Today." : "Noted, not counted.");
+    },
+    logPlanned: (m: PlannedMeal, slot: NonNullable<Feedback["slot"]>) => {
+      const now = new Date().toISOString(), meal = plannedPortion(m, m.mealId ?? uid(), now);
+      if (!meal) return;
+      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "eaten", slot, ...(m.mealId ? { recipeId: m.mealId } : {}), taste: "", notes: "", createdAt: now, dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined } as Feedback, ...s.feedback] }));
+      notify("Logged, as planned.");
     },
     settleCard: (id: string, how: "eaten" | "not-used", as?: { slot?: Feedback["slot"]; which?: string }) => {
       // R5 (0.2.42): I ate one says which meal it was: a meal of the day keeps its slot, a snack says so

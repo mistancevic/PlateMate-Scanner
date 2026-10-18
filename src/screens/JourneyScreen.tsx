@@ -381,7 +381,7 @@ export function JourneyScreen(p: AppApi) {
     : mealSlot ? `${capName(mealSlot.name)}, by the clock: a guess, off the plan. Tap ${capName(mealSlot.name)} to make it your ${mealSlot.name.toLowerCase()}: it counts by the plan.` : "Pick what it is for.";
   // ---- a recipe from screenshots or a link (0.2.16, canvas board IM) ----
   // R6 (0.2.43): the read is the shared block, the same as on Recipes
-  const recipeIn = useRecipeIn({ kitchens: p.personal.kitchens ?? [], region: p.region, onError: (m) => setError(m) });
+  const recipeIn = useRecipeIn({ kitchens: p.personal.kitchens ?? [], region: p.region, onError: (m) => setError(m), pdRef, fitPd: p.fitPd });
   const { inFlow, setInFlow } = recipeIn;
   // R15 (0.2.41, board RS12): "whole" is the recipe as mapped, where a recipe starts on the plate
   const [pmode, setPmode] = useState<"whole" | "sized" | "recipe">("sized");

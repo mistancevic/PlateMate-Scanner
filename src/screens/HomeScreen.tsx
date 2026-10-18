@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ChefHat, Camera, ChevronRight, Check, Pencil } from "lucide-react";
+import { ChefHat, Camera, ChevronRight, Check, Pencil, Utensils } from "lucide-react";
 import { aggregate, density } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
@@ -85,6 +85,10 @@ export function HomeScreen(p: AppApi) {
     const f: Filling = { date: key, slotId, name: slot.name, time: slot.time, dayName: "today", mealId: m.mealId, mode: "eat" };
     p.fillOnPlate(f, m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : null, m.title);
   };
+  // R16: the next slot's planned meal, and a meal kept for later today (a batch's rest is not Today's)
+  const nextHeld = next && held[next.id] && !held[next.id].skipped ? held[next.id] : null;
+  const nextRecipe = nextHeld?.mealId ? state.meals.find((m) => m.id === nextHeld.mealId) ?? null : null;
+  const kept = today.prepared.filter((f) => !((f.left ?? 0) > 0));
   // tomorrow, for the line once today is done
   const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
   const tTraining = dayFor(p.personal, tomorrow)?.day ?? getDay(p.personal, tomorrow).plan ?? null;
@@ -202,18 +206,31 @@ export function HomeScreen(p: AppApi) {
       {/* R5: what comes next, the one main action; then the batch as a way to eat it */}
       <p className="label">{next ? `Next: ${next.name.toLowerCase()}, ${next.time}` : "Next: tomorrow"}</p>
       <section className="next-meal">
+        {/* R16 (0.2.44, board RS15): the planned meal itself, with its picture; I ate it logs it as planned, in one tap */}
+        {nextHeld && (
+          <div className="card next-planned">
+            <Picture src={pictureOfRecipe(nextRecipe)} />
+            <div className="next-planned-text"><b>{nextHeld.title}</b><small>As planned · {fmt(nextHeld.kcal, 0)} kcal · {fmt(nextHeld.protein, 0)} g protein · {pdText(density(nextHeld.protein, nextHeld.kcal))}</small></div>
+          </div>
+        )}
         {next
-          ? <button className="pill pill-primary pill-wide" onClick={makeNext}>Make your {next.name.toLowerCase()}</button>
+          ? (nextHeld?.items?.length
+            ? <button className="pill pill-primary pill-wide" onClick={() => p.logPlanned(nextHeld, { date: key, slotId: next.id, name: next.name, time: next.time })}>I ate it</button>
+            : <button className="pill pill-primary pill-wide" onClick={makeNext}>{nextHeld ? "Make it on the Plate" : `Make your ${next.name.toLowerCase()}`}</button>)
           : <button className="pill pill-primary pill-wide" onClick={() => setTab("plan")}>Plan tomorrow</button>}
         <small className="muted next-line">{next
           ? (left > 150 ? `${next.name}, ${next.time} by the clock: about ${fmt(left, 0)} kcal and ${fmt(pLeft, 0)} g protein left today.` : `You are at your day's kcal. A light ${next.name.toLowerCase()} keeps you there.`)
           : today.logged.length ? `${eatenAs} ${today.logged.length === 1 ? "is" : "are"} logged: ${left >= 0 ? `${fmt(left, 0)} kcal left today` : `${fmt(-left, 0)} kcal over today`}.` : "Nothing logged today."}</small>
-        <button className="link next-log" onClick={logMeal}>Log a meal</button>
+        {next && nextHeld?.items?.length
+          ? <div className="next-links"><button className="link" onClick={() => eatFrom(next.id)}>Change it on the Plate</button><button className="link next-log" onClick={logMeal}>Log a meal</button></div>
+          : <button className="link next-log" onClick={logMeal}>Log a meal</button>}
       </section>
-      {today.prepared.length > 0 && (
+      {/* R16 (0.2.44, Milan 21:56): what is left of a batch is not Today's: it may go to the family or to work. A batch reaches
+          a day through the plan. A meal kept for later today still waits here. */}
+      {kept.length > 0 && (
         <>
           <p className="label">{next ? "Or one from your batch" : "For tomorrow, from your batch"}</p>
-          {today.prepared.map((f) => {
+          {kept.map((f) => {
             const a = sumOf(f.meal.items), r = recipeOfCard(f, state.meals), many = (f.left ?? 0) > 0;
             return (
               <section className="card log-card" key={f.id}>
@@ -297,8 +314,8 @@ export function HomeScreen(p: AppApi) {
       {newest.map((f) => {
         const a = sumOf(f.meal.items), r = recipeOfCard(f, state.meals);
         return [
-          <section className={`card log-card ${f.photo ? "with-photo" : ""}`} key={f.id}>
-            {f.photo && <img className="log-photo" src={f.photo} alt="" />}
+          <section className="card log-card with-photo" key={f.id}>
+            <Picture src={f.photo ?? pictureOfRecipe(r)} />
             <div className="card-top"><span>{f.meal.title}</span><small>{new Date(f.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small></div>
             <small className="meal-which"><b>{whichOf(f)}</b>{r && <> · <button className="link in-inline" onClick={() => p.openRecipePage(r.id)}>Open the recipe ›</button></>}</small>
             <small className="log-nums">{fmt(a.kcal, 0)} kcal · {fmt(a.protein, 0)} g protein{a.gap ? "" : ` · ${fmt(a.fats, 0)} g fat · ${fmt(a.carbs, 0)} g carbs`} · {pdText(density(a.protein, a.kcal))}</small>
@@ -387,4 +404,18 @@ function CoverAsk({ f, recipe, p }: { f: Feedback; recipe: Meal | null; p: AppAp
       </div>
     </div>
   );
+}
+
+// R16 (0.2.44, board RS15): a small square picture: the plate's photo, else the recipe's cover or photo, else the dish's
+// picture from where it came from (your screenshot or the page's photo, for you only), else the blank tile
+const isPicture = (x: unknown): x is string => typeof x === "string" && /^(data:image\/|https:\/\/|blob:)/.test(x);
+export function pictureOfRecipe(m: Meal | null | undefined): string | null {
+  if (!m) return null;
+  return [...recipePhotosOf(m), m.source?.photo, m.shots?.[0]].find(isPicture) ?? null;
+}
+function Picture({ src }: { src: string | null }) {
+  const [broken, setBroken] = useState(false);
+  return src && !broken
+    ? <img className="log-photo" src={src} alt="" referrerPolicy="no-referrer" onError={() => setBroken(true)} />
+    : <div className="log-photo recipe-tile-blank"><Utensils size={22} /></div>;
 }

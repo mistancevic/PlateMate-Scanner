@@ -16,7 +16,7 @@ import type { Food } from "../pilot";
 export type InFlow =
   | { kind: "shots"; shots: string[]; reading?: boolean }
   | { kind: "link"; url: string; reading?: boolean }
-  | { kind: "read"; recipe: ReadRecipe; shots: string[]; url?: string; note?: string }
+  | { kind: "read"; recipe: ReadRecipe; shots: string[]; url?: string; note?: string; photo?: string }
   | { kind: "error"; code: string; message: string; back: "shots" | "link"; shots: string[]; url: string };
 
 const Thumb = ({ src, n, onRemove }: { src: string; n: number; onRemove?: () => void }) => (
@@ -62,8 +62,8 @@ export function LinkCard({ url, reading, slow, setUrl, read, cancel }: { url: st
 }
 
 // IM3: what Chef Mealan read. Every line says where its amount came from; how many it makes can be changed.
-export function ReadCard({ flow, setSource, setServings, toggle, put, again, cancel, putLabel }: {
-  flow: Extract<InFlow, { kind: "read" }>; setSource: (v: string) => void; setServings: (n: number) => void; toggle: (k: number) => void; put: () => void; again: () => void; cancel: () => void; putLabel?: string;
+export function ReadCard({ flow, setSource, setServings, toggle, put, again, cancel, putLabel, pdRef, fitPd }: {
+  flow: Extract<InFlow, { kind: "read" }>; setSource: (v: string) => void; setServings: (n: number) => void; toggle: (k: number) => void; put: () => void; again: () => void; cancel: () => void; putLabel?: string; pdRef?: number | null; fitPd?: (pd: number | null) => string;
 }) {
   const r = flow.recipe;
   const [editing, setEditing] = useState(false);
@@ -75,6 +75,11 @@ export function ReadCard({ flow, setSource, setServings, toggle, put, again, can
   const st = r.stated, mine = all / r.servings;
   const from = flow.url ? "from the link" : `read from your ${flow.shots.length === 1 ? "screenshot" : `${flow.shots.length} screenshots`}`;
   const one = r.servingsUnit.replace(/s$/, "");
+  // R16 (0.2.44, board RS15): the foods as the table and the PD block count them; the dish's picture: your first screenshot,
+  // else the page's own photo (for you only, never published); a picture that does not load leaves no gap
+  const asItems = used.map((i, k) => ({ id: `r${k}`, grams: i.grams, locked: true, ...(i.part ? { part: i.part } : {}), food: { id: `r${k}`, name: i.name, brand: "", basis: "100g", source: "estimate", notes: "", reviewedAt: "", readyToEat: true, calories: i.calories, protein: i.protein, fats: i.fats, carbs: i.carbs, fiber: null } as Food }));
+  const picture = flow.shots[0] ?? flow.photo ?? null;
+  const [noPicture, setNoPicture] = useState(false);
   const row = (i: ReadRecipe["items"][number], k: number) => (
     <div className={`row ${on(i) ? "" : "in-off"}`} key={k}>
             <span className="thumb thumb-sm">{iconFor(i.name)}</span>
@@ -92,6 +97,7 @@ export function ReadCard({ flow, setSource, setServings, toggle, put, again, can
   return (
     <section className="card plate-card in-card">
       <div className="card-top"><span>{r.title}</span><button className="link" onClick={cancel}>Cancel</button></div>
+      {picture && !noPicture && <img className="in-picture" src={picture} alt="" referrerPolicy="no-referrer" onError={() => setNoPicture(true)} />}
       {editing
         ? <input className="search" aria-label="Where it came from" autoFocus value={r.source} placeholder="@account on Instagram, or the site" onChange={(e) => setSource(e.target.value)} onBlur={() => setEditing(false)} onKeyDown={(e) => { if (e.key === "Enter") setEditing(false); }} />
         : <small className="muted">{r.source ? <>From {r.source}, {from}</> : <>Where it came from isn't shown, {from}</>} · <button className="link in-inline" onClick={() => setEditing(true)}>{r.source ? "Change" : "Add it"}</button></small>}
@@ -101,7 +107,7 @@ export function ReadCard({ flow, setSource, setServings, toggle, put, again, can
         <small className="in-strong">{r.servings === 1 ? one : r.servingsUnit}</small>
         <small className="muted">· {r.servingsHow === "recipe" ? "on the recipe" : <span className="in-tag">guessed</span>}</small>
       </div>
-      <small className="in-strong in-per">One {one}: {fmt(mine, 0)} kcal · {fmt(allP / r.servings, 0)} g protein · {pdText(pd(all, allP))}</small>
+      <NutritionCard readoutOnly items={asItems} serves={r.servings} one={one} all={r.servingsUnit} stated={null} pdRef={pdRef ?? null} fitPd={fitPd} />
       {st && <small className={`in-stated ${statedDiffers(st, mine) ? "differs" : ""}`}>The recipe says: {fmt(st.kcal, 0)} kcal · {fmt(st.protein, 1)} g protein · {pdText(pd(st.kcal, st.protein))} per {one}.{statedDiffers(st, mine) ? ` Our estimate is ${Math.round(Math.abs(mine - st.kcal) / st.kcal * 100)}% ${mine > st.kcal ? "higher" : "lower"}: the recipe may use other products. The plate uses ours; change any food to match yours.` : " Our estimate agrees."}</small>}
       {/* R2 (0.2.32, Milan 10:08): the foods under the recipe's own groups, with the plate's part heading; no groups, one list */}
       <div className="rows">
@@ -114,7 +120,7 @@ export function ReadCard({ flow, setSource, setServings, toggle, put, again, can
       </div>
       {r.items.some((i) => i.fry) && <small className="muted in-fry">The frying oil: the recipe needs the whole pot; the numbers count what the food takes up. That amount is an estimate, 15% of the fried food, from a glazed doughnut's fat (USDA).</small>}
       {/* R6 (0.2.43, board RS14): the Nutrition table after the foods, as on the recipe page, to check what the recipe says */}
-      <NutritionCard tableOnly items={used.map((i, k) => ({ id: `r${k}`, grams: i.grams, locked: true, ...(i.part ? { part: i.part } : {}), food: { id: `r${k}`, name: i.name, brand: "", basis: "100g", source: "estimate", notes: "", reviewedAt: "", readyToEat: true, calories: i.calories, protein: i.protein, fats: i.fats, carbs: i.carbs, fiber: null } as Food }))} serves={r.servings} one={one} all={r.servingsUnit} stated={null} pdRef={null} />
+      <NutritionCard tableOnly items={asItems} serves={r.servings} one={one} all={r.servingsUnit} stated={null} pdRef={null} />
       {flow.note && <small className="in-note">{flow.note}</small>}
       {/* RP1 (0.2.25, Milan 18:05 and 19:43): the original's steps came with the read, so they show with the foods */}
       <div className="in-steps">
