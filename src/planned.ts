@@ -28,7 +28,8 @@ export function plannedPortion(m: PlannedMeal, id: string, savedAt: string): Mea
   const weight = m.items.reduce((n, i) => n + (i.grams > 0 ? i.grams : 0), 0);
   const ratio = m.portion && weight > 0 ? Math.min(1, m.portion / weight) : 1;
   const items = m.items.map((i) => ({ ...i, grams: Math.round(i.grams * ratio * 10) / 10 }));
-  return { id, title: m.title, items, portion: Math.round(items.reduce((n, i) => n + i.grams, 0)), savedAt };
+  // the portion is the foods' own weight, never rounded past it: a stored meal heavier than its foods is not read back
+  return { id, title: m.title, items, portion: items.reduce((n, i) => n + i.grams, 0), savedAt };
 }
 
 // a recipe as a planned meal: its numbers at the portion saved

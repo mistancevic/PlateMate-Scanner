@@ -3,6 +3,8 @@
 // Under it, by time and importance: what comes next, with its one main action (the next meal, or Plan tomorrow when the day's
 // meals are done); the batch as a way to eat it, where I ate one asks which meal it is; the plan; today's meals newest first, each
 // with which meal it was, its numbers and its recipe, no foods. Never rewrite these lines to fit a change.
+// Changed by story R16 (Milan 21:56 to 22:11, board RS15): Today follows the plan and the calendar, not what is left of a batch.
+// No batch block; a planned meal shows in what comes next, with its picture, and I ate it logs it in one tap.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -61,18 +63,23 @@ const open = async (state, at = "2026-10-18T12:20:00") => {
     const meal = page.locator(".log-card").filter({ hasText: "Protein cheesecake" }).filter({ has: page.locator(".meal-which") }).first();
     const mt = (await meal.textContent()).replace(/\s+/g, " ");
     ok(/Open the recipe/.test(mt) && /kcal · \d+ g protein/.test(mt) && !/Digestive biscuits/.test(mt) && !/In My recipes/.test(mt), "a meal: which meal, its numbers, its recipe; no foods: " + mt);
-    ok(await page.locator("p.label").filter({ hasText: "Or one from your batch" }).count() === 1, "the batch is a way to eat the next meal");
-    const prep = page.locator(".log-card").filter({ hasText: "7 left" });
-    ok(/Each one slice: \d+ kcal · \d+ g protein/.test((await prep.textContent()).replace(/\s+/g, " ")) && !/Digestive/.test(await prep.textContent()), "the batch card: each one slice with its numbers, no foods");
-    await prep.getByRole("button", { name: "I ate one" }).click(); await page.waitForTimeout(300);
-    ok(await prep.getByText("Which meal is it?").count() === 1 && await prep.getByRole("button", { name: "Snack" }).count() === 1, "I ate one asks which meal it is, with Snack");
-    await prep.getByRole("button", { name: "Snack" }).click(); await prep.getByRole("button", { name: "Log it" }).click(); await page.waitForTimeout(600);
+    ok(await page.locator(".log-card .left-tag").count() === 0 && !/from your batch/.test(await text("main")), "R16: no batch block: the 7 slices left are not Today's");
+    // R16: the next meal planned with the cheesecake shows in what comes next; I ate it logs it
+    const nextName = ((await page.locator("p.label").filter({ hasText: /^Next: / }).first().textContent()) ?? "").replace(/^Next: /, "").split(",")[0].trim();
+    await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(700);
+    await page.locator(".plan-slot").filter({ hasText: new RegExp(nextName, "i") }).first().click(); await page.waitForTimeout(500);
+    await page.locator(".pick-row").filter({ hasText: "Protein cheesecake" }).first().click(); await page.waitForTimeout(500);
+    await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(800);
+    const planned = await text(".next-planned");
+    ok(/Protein cheesecake/.test(planned) && /As planned · \d+ kcal · \d+ g protein/.test(planned) && await page.locator(".next-planned .log-photo").count() === 1, "R16: what comes next is the planned meal, with its picture and numbers: " + planned);
+    ok(await page.locator(".next-meal").getByRole("button", { name: "Change it on the Plate" }).count() === 1, "R16: Change it on the Plate is a tap away");
+    await page.getByRole("button", { name: "I ate it", exact: true }).click(); await page.waitForTimeout(600);
     const first = (await page.locator(".log-card").filter({ has: page.locator(".meal-which") }).first().textContent()).replace(/\s+/g, " ");
-    ok(/^Protein cheesecake04:00 PM ?Snack/.test(first) || /Snack/.test(await page.locator(".log-card .meal-which").first().textContent()), "the newest meal comes first and says Snack: " + first.slice(0, 80));
+    ok(new RegExp(nextName, "i").test(await page.locator(".log-card .meal-which").first().textContent()) && /By the plan/.test(first), "the newest meal comes first and says which meal: " + first.slice(0, 80));
     await page.locator(".log-card .meal-which").first().getByRole("button", { name: /Open the recipe/ }).click(); await page.waitForTimeout(800);
     ok(/Protein cheesecake/.test(await text(".rq")) && await page.locator(".rq-landed").count() === 0, "Open the recipe opens its page, with no saved line");
     await at("2026-10-18T23:30:00");
-    ok(/Next: tomorrow/.test(await text("main")) && await page.getByRole("button", { name: "Plan tomorrow" }).count() === 1 && /For tomorrow, from your batch/.test(await text("main")), "late in the day, what comes next is tomorrow: Plan tomorrow, the batch for tomorrow");
+    ok(/Next: tomorrow/.test(await text("main")) && await page.getByRole("button", { name: "Plan tomorrow", exact: true }).count() === 1 && !/from your batch/.test(await text("main")), "late in the day, what comes next is tomorrow: Plan tomorrow, and no batch");
   } catch (e) { ok(false, "walkthrough error: " + e.message.split("\n").slice(0, 3).join(" / ")); }
   ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   await b.close(); server.kill();

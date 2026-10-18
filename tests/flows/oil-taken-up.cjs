@@ -4,6 +4,7 @@
 // recipe page. A splash of oil in a pan is counted in full, with no note. Never rewrite these lines to fit a change.
 // Changed by story R3, the fix (Milan 15:12 and 15:15, board RS10): the recipe follows the original, so the read card and the
 // recipe page show the pot as the amount, and the counted oil as the small line; the steps are in cook-with-the-pot.cjs.
+// Changed by story R16 (Milan 21:08, board RS15): the read's one-portion numbers are in the PD block, not a small line.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -43,7 +44,7 @@ const CAP = Math.round((240 + 85 + 563 + 360 + 100 + 31) * 0.15);
     ok(new RegExp(`Counted: ${CAP} g`).test(oilText) && /1,380 g$/.test(oilText.trim()), `the read shows the 1,380 g pot and counts ${CAP} g of oil: ` + oilText);
     ok(/1 to 2 quarts .* on the recipe/.test(oilText) && /for frying/.test(oilText) && /Counted: \d+ g, taken up in frying, an estimate/.test(oilText), "the row keeps the recipe's pot, says for frying, and that the amount is an estimate");
     ok(/an estimate, 15% of the fried food/.test(await page.locator(".in-fry").textContent()), "a line under the foods says the oil counted is an estimate, and where it comes from");
-    const one = Number((await page.locator(".in-card .in-per").textContent()).match(/([\d,]+) kcal/)[1].replace(",", ""));
+    const one = Number((await page.locator(".in-card .rq-readout .readout-mid small").textContent()).match(/([\d,]+) kcal/)[1].replace(",", ""));
     ok(one > 400 && one < 750, "one fritter is no longer 1,486 kcal: " + one);
     await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1200);
     const plateOil = page.locator(".plate-card .row").filter({ hasText: "Vegetable oil" });

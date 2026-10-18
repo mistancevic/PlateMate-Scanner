@@ -3,6 +3,7 @@
 // read by Chef Mealan (faked here: no AI key), saved in Mine with where it came from, sized for dinner, then fitted:
 // Change the dish (the first try fails the checks and goes back once), Add on the side (your way first, a side that
 // can't reach the target left out), Did it work? after cooking. A link from Instagram is refused with the next step.
+// Changed by story R16 (Milan 21:08, board RS15): one pizza's numbers and PD are in the PD block on the read, not a small line.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -76,7 +77,7 @@ const U = "http://127.0.0.1:3209";
   // IM3: what Chef Mealan read
   t = await card();
   ok(/Margherita pizza/.test(t) && /From @account_name on Instagram, read from your 2 screenshots/.test(t), "IM3: the dish, and where it came from, read from the screenshots");
-  ok(/Makes\s*−?\s*2\s*\+?\s*pizzas/.test(t) && /on the recipe/.test(t) && /One pizza: 1,121 kcal · 46 g protein · PD 4\.1/.test(t), "IM3: makes 2 pizzas, one pizza 1,121 kcal, PD 4.1");
+  ok(/Makes\s*−?\s*2\s*\+?\s*pizzas/.test(t) && /on the recipe/.test(t) && /^One pizza/.test(await page.locator(".in-card .rq-readout .readout-top").textContent()) && (await page.locator(".in-card .rq-readout .readout-mid > b").textContent()) === "4.1" && /^1,121 kcal · 4[56]\.\d g protein/.test(await page.locator(".in-card .rq-readout .readout-mid small").textContent()), "IM3: makes 2 pizzas, one pizza 1,121 kcal, PD 4.1 (R16: in the PD block)");
   ok(/The recipe says: 1,100 kcal · 46 g protein · PD 4\.2 per pizza\. Our estimate agrees\./.test(t), "0.2.17: the recipe's own numbers next to ours");
   ok(/Chili oil/.test(t) && /optional/.test(t) && /Left out: 1 optional, as the recipe's numbers do/.test(t) && /The whole recipe: 2,242 kcal/.test(t), "0.2.17: an optional ingredient is marked and left out of the numbers");
   await page.getByRole("button", { name: "Add it" }).click(); await page.waitForTimeout(200);
