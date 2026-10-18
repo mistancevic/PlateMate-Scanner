@@ -2026,8 +2026,8 @@ export default function App() {
     openOnPlate: (meal: Meal) => {
       setFilling(null); setPlateRecipeId(meal.id);
       // a recipe that came in from a screenshot or a link opens as it did the first time (0.2.19, IM13): the Plate does it
-      if (meal.makes) setState((s) => ({ ...s, title: meal.title, items: [], portion: null, optional: undefined, leftOut: undefined, openRecipe: meal.id }));
-      else setState((s) => ({ ...s, title: meal.title, items: asDish(meal), portion: null, fromRecipe: undefined, leftOut: undefined, optional: optAt(meal.optional, 1 / portionsIn(meal), uid) }));
+      if (meal.makes) setState((s) => ({ ...s, title: meal.title, items: [], portion: null, optional: undefined, leftOut: undefined, emptyParts: undefined, openRecipe: meal.id }));
+      else setState((s) => ({ ...s, title: meal.title, items: asDish(meal), portion: null, fromRecipe: undefined, leftOut: undefined, emptyParts: undefined, optional: optAt(meal.optional, 1 / portionsIn(meal), uid) }));
       setKind(meal.kind ?? "meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
     },
     // a name typed on the Plate (Milan, 11 October 2026): the recipe it came from and the slot it is for take it at once
@@ -2049,7 +2049,7 @@ export default function App() {
     fillOnPlate: (f: Filling, meal?: Meal | null, title?: string) => {
       setFilling(f);
       setPlateRecipeId(meal?.id || f.mealId || null);
-      setState((s) => ({ ...s, title: meal?.title ?? title ?? "", items: meal ? asDish(meal) : [], portion: null, fromRecipe: undefined, leftOut: undefined, optional: meal ? optAt(meal.optional, 1 / portionsIn(meal), uid) : undefined }));
+      setState((s) => ({ ...s, title: meal?.title ?? title ?? "", items: meal ? asDish(meal) : [], portion: null, fromRecipe: undefined, leftOut: undefined, emptyParts: undefined, optional: meal ? optAt(meal.optional, 1 / portionsIn(meal), uid) : undefined }));
       setKind("meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
     },
     // a link that changes the tab leaves any open panel or chat behind, or it would land under them and look dead

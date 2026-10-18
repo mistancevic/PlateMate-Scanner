@@ -72,6 +72,20 @@ export function ReadCard({ flow, setSource, setServings, toggle, put, again, can
   const st = r.stated, mine = all / r.servings;
   const from = flow.url ? "from the link" : `read from your ${flow.shots.length === 1 ? "screenshot" : `${flow.shots.length} screenshots`}`;
   const one = r.servingsUnit.replace(/s$/, "");
+  const row = (i: ReadRecipe["items"][number], k: number) => (
+    <div className={`row ${on(i) ? "" : "in-off"}`} key={k}>
+            <span className="thumb thumb-sm">{iconFor(i.name)}</span>
+            <div className="row-text"><b>{i.name}</b><small>{i.written ? `${i.written} on the recipe` : "no amount on the recipe"}{i.count ? <> · counted, size {i.count.size}</> : i.how !== "recipe" && <> · <span className="in-tag">{i.how}</span></>}{i.optional && <> · <span className="in-tag in-opt">optional</span> <button className="link in-inline" onClick={() => toggle(k)}>{on(i) ? "Leave it out" : "Add it"}</button></>}</small></div>
+            {i.count ? <CountNum c={i.count} grams={i.grams} /> : <b className="row-num">{fmt(i.grams, 0)} g</b>}
+          </div>
+  );
+  // the recipe's groups, in the order it lists them; a food counts in its group's numbers as it counts in the recipe's
+  const groups = r.items.some((i) => i.part) ? r.items.reduce((l, i, k) => {
+    const name = i.part || "Other"; let g = l.find((x) => x.part === name);
+    if (!g) { g = { part: name, rows: [], kcal: 0, prot: 0 }; l.push(g); }
+    g.rows.push({ i, k }); if (on(i)) { g.kcal += (i.calories * i.grams) / 100; g.prot += (i.protein * i.grams) / 100; }
+    return l;
+  }, [] as { part: string; rows: { i: ReadRecipe["items"][number]; k: number }[]; kcal: number; prot: number }[]) : null;
   return (
     <section className="card plate-card in-card">
       <div className="card-top"><span>{r.title}</span><button className="link" onClick={cancel}>Cancel</button></div>
@@ -86,14 +100,14 @@ export function ReadCard({ flow, setSource, setServings, toggle, put, again, can
       </div>
       <small className="in-strong in-per">One {one}: {fmt(mine, 0)} kcal · {fmt(allP / r.servings, 0)} g protein · {pdText(pd(all, allP))}</small>
       {st && <small className={`in-stated ${statedDiffers(st, mine) ? "differs" : ""}`}>The recipe says: {fmt(st.kcal, 0)} kcal · {fmt(st.protein, 1)} g protein · {pdText(pd(st.kcal, st.protein))} per {one}.{statedDiffers(st, mine) ? ` Our estimate is ${Math.round(Math.abs(mine - st.kcal) / st.kcal * 100)}% ${mine > st.kcal ? "higher" : "lower"}: the recipe may use other products. The plate uses ours; change any food to match yours.` : " Our estimate agrees."}</small>}
+      {/* R2 (0.2.32, Milan 10:08): the foods under the recipe's own groups, with the plate's part heading; no groups, one list */}
       <div className="rows">
-        {r.items.map((i, k) => (
-          <div className={`row ${on(i) ? "" : "in-off"}`} key={k}>
-            <span className="thumb thumb-sm">{iconFor(i.name)}</span>
-            <div className="row-text"><b>{i.name}</b><small>{i.written ? `${i.written} on the recipe` : "no amount on the recipe"}{i.count ? <> · counted, size {i.count.size}</> : i.how !== "recipe" && <> · <span className="in-tag">{i.how}</span></>}{i.optional && <> · <span className="in-tag in-opt">optional</span> <button className="link in-inline" onClick={() => toggle(k)}>{on(i) ? "Leave it out" : "Add it"}</button></>}</small></div>
-            {i.count ? <CountNum c={i.count} grams={i.grams} /> : <b className="row-num">{fmt(i.grams, 0)} g</b>}
+        {groups ? groups.map((g) => (
+          <div className="pt-group" key={g.part}>
+            <div className="pt-h" aria-label={`Part: ${g.part}`}><span><b>{g.part}</b><small>{g.rows.length} {g.rows.length === 1 ? "food" : "foods"} · {fmt(g.kcal, 0)} kcal{g.kcal > 0 ? ` · ${pdText(pd(g.kcal, g.prot))}` : ""}</small></span></div>
+            {g.rows.map(({ i, k }) => row(i, k))}
           </div>
-        ))}
+        )) : r.items.map((i, k) => row(i, k))}
       </div>
       {flow.note && <small className="in-note">{flow.note}</small>}
       {/* RP1 (0.2.25, Milan 18:05 and 19:43): the original's steps came with the read, so they show with the foods */}

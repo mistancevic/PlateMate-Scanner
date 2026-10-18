@@ -205,6 +205,8 @@ export type PilotState = {
   // 0.2.19 (IM12, IM16b): the plate's optional foods, and the parts left out with their foods (Put it back restores them)
   optional?: PlateOpt[];
   leftOut?: { part: string; items: Ingredient[]; at?: number }[];
+  // R2 (0.2.32): a part whose last food was taken off stays, empty, where it was, until a food goes back in or the plate changes
+  emptyParts?: { part: string; at: number }[];
   // a recipe that came in, opened from Recipes (0.2.19, IM13): the plate puts it on as the first time, then clears this
   openRecipe?: string;
 };
