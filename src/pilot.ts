@@ -141,6 +141,8 @@ export type Meal = {
   pagePhotoTaken?: boolean;
   // what kind of plate this is (Today, 10 October 2026): a meal, or a dessert sized at about a tenth of the day
   kind?: PlateKind;
+  // R17 (0.2.45, board RS16): Chef Mealan's idea for a craving, kept until it is made once or removed
+  idea?: { at: string; craving?: string };
   // where it came from (0.2.16, board IM, IM6): the account or site as text, the link, when; members and public pages get
   // the text only. The screenshots are the cook's own reference (shots, as files src:<id>:<n>), never a cover, never shared.
   // steps: the original method as read (0.2.18, board IM, IM9b): for the person only, never shared or published
