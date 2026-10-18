@@ -70,7 +70,8 @@ const U = "http://127.0.0.1:3226";
     ok(kept && kept.left === N - 1 && kept.leftOf === "lunch" && Math.abs(kcal(kept.meal.items) - plate) < 2, "Keep for later holds lunches, each the size of yours");
     await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(800);
     const card = await text(".log-card:has(.left-tag)");
-    ok(new RegExp(`${N - 1} left`).test(card) && /One lunch: /.test(card), "the Today card: N left, one lunch each: " + card.slice(0, 120));
+    // R5 (Milan 17:23 to 19:00, board RS13): the batch card says Each one lunch, with its numbers in place of its foods
+    ok(new RegExp(`${N - 1} left`).test(card) && /Each one lunch: /.test(card), "the Today card: N left, one lunch each: " + card.slice(0, 120));
   } catch (e) { ok(false, "walkthrough error: " + e.message.split("\n").slice(0, 3).join(" / ")); }
   ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   await b.close(); server.kill();

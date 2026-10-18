@@ -20,7 +20,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
       localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "each", sex: "male", birthYear: 1977, heightCm: 184, weightKg: 95, plan: Array(7).fill({ work: true, kind: "strength", intensity: "hard", when: "evening", minutes: 60 }), lifestyle: { meals: 3 } }));
       localStorage.setItem("seeded", "1"); }, [seed, source]);
     await require("./adult.cjs")(page);
-    const protein = async (url) => { await page.goto(`http://127.0.0.1:3198${url}`); await page.waitForTimeout(1300); return page.evaluate(() => { const s = [...document.querySelectorAll("small")].find((x) => /^g protein$/.test(x.textContent.trim())); return s ? s.parentElement.querySelector("b").textContent.trim() : null; }); };
+    const protein = async (url) => { await page.goto(`http://127.0.0.1:3198${url}`); await page.waitForTimeout(1300); return page.evaluate(() => { const s = [...document.querySelectorAll("small")].find((x) => /^(of [\d,]+ )?g protein$/.test(x.textContent.trim())); const of = s?.textContent.trim().match(/^of ([\d,]+)/); return s ? (of ? of[1] : s.parentElement.querySelector("b").textContent.trim()) : null; }); }; // R5 (Milan 17:23 to 19:00, board RS13): on Today the target is "of N g protein" under what is eaten
     const today = await protein("/today"), me = await protein("/me");
     ok(today && today === me, `a ${source} goal: Today ${today} g protein, Me ${me} g`);
     await ctx.close();

@@ -18,8 +18,10 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   await page.goto("http://127.0.0.1:3193/"); await page.waitForTimeout(900);
   const line = await page.locator(".logged-line").textContent();
   ok(/1 meal logged, 189 kcal and 33 g protein so far/.test(line), "logged line is information: " + line.trim());
-  ok(await page.getByText("Prepared for later").count() === 1, "a prepared card waits");
+  // R5 (Milan 17:23 to 19:00, board RS13): the batch sits under what comes next, as a way to eat it; I ate it asks which meal it is, then Log it
+  ok(await page.getByText(/from your batch$/).count() === 1, "a prepared card waits");
   await page.getByRole("button", { name: /I ate it/ }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Log it" }).click(); await page.waitForTimeout(300);
   ok(/2 meals logged, 378 kcal/.test(await page.locator(".logged-line").textContent()), "I ate it moves it into the log");
   const rows = await page.locator(".days .history-row").allTextContents();
   ok(rows.length === 2 && /Yesterday/.test(rows[0]) && /Moderate/.test(rows[0]) && /2 meals logged/.test(rows[0]), "yesterday: a training day, 2 meals logged");
@@ -29,10 +31,11 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   ok(/kcal, week's average/.test(await page.locator(".plan-row").textContent()), "until the day is known, the calories are the week's average");
   ok(await page.locator(".plan .day-row .choice").count() === 4 && /What kind of day is it/.test(await page.locator(".plan").textContent()), "without a Training week, Today asks with four choices");
   ok(await page.getByRole("button", { name: /Set your Training week/ }).count() === 1, "and links to the Training week");
-  const assumedKcal = (await page.locator(".plan-row b").nth(1).textContent()).trim();
+  // R5 (Milan 17:23 to 19:00, board RS13): the day's kcal target is the "of N kcal" under what is eaten
+  const assumedKcal = (await page.locator(".plan-row small").nth(1).textContent()).trim();
   await page.getByRole("button", { name: "Hard", exact: true }).click(); await page.waitForTimeout(300);
   ok(await page.locator(".plan .day-row .choice.on").textContent() === "Hard", "the picked day is marked");
-  ok(/kcal today/.test(await page.locator(".plan-row").textContent()) && (await page.locator(".plan-row b").nth(1).textContent()).trim() !== assumedKcal, "calories follow the day");
+  ok(/kcal today/.test(await page.locator(".plan-row").textContent()) && (await page.locator(".plan-row small").nth(1).textContent()).trim() !== assumedKcal, "calories follow the day");
   // with a Training week (and the day picked above cleared, as a fresh week would be): today's line, the explanation inside the card, the button under it
   await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-personal") || "{}"); const d = { work: true, kind: "strength", intensity: "hard", when: "evening", minutes: 60 }; p.plan = [d, d, d, d, d, d, d]; delete p.dated; Object.keys(localStorage).filter((k) => k.startsWith("chefmealan-today-")).forEach((k) => localStorage.removeItem(k)); localStorage.setItem("chefmealan-personal", JSON.stringify(p)); Object.keys(localStorage).filter((k) => k.startsWith("chefmealan-today-")).forEach((k) => localStorage.removeItem(k)); });
   await page.reload(); await page.waitForTimeout(900);

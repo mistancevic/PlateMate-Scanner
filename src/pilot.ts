@@ -172,6 +172,8 @@ export type Feedback = {
   left?: number;
   // R12 (0.2.38): what one of the portions left is, in your words: lunch, or the recipe's fritter
   leftOf?: string;
+  // R5 (0.2.42): a meal eaten as a snack off the plan says so; a meal of the day keeps its slot
+  which?: string;
   taste: string;
   notes: string;
   createdAt: string;

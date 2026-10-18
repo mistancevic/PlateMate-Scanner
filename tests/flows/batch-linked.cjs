@@ -3,6 +3,7 @@
 // recipe. I ate one logs a meal that is In My recipes, never Save in My recipes, which would make a one-slice copy. A card from
 // before this change finds its recipe by the recipe's name. A plate that is no recipe can still be saved from Today.
 // Never rewrite these lines to fit a change.
+// Changed by story R5 (Milan 17:23 to 19:00, board RS13): a linked meal shows Open the recipe in place of In My recipes, and I ate one asks which meal it is.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -58,13 +59,14 @@ const U = "http://127.0.0.1:3225";
     const kept = st.feedback.find((f) => f.status === "prepared");
     ok(!!recipe && kept && kept.left === 7 && kept.recipeId === recipe.id, "the 7 slices left wait for later, and the card knows its recipe");
     await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(800);
-    await page.getByRole("button", { name: "I ate one" }).click(); await page.waitForTimeout(600);
+    await page.getByRole("button", { name: "I ate one" }).click(); await page.waitForTimeout(300);
+    await page.getByRole("button", { name: "Log it" }).click(); await page.waitForTimeout(600);
     st = await state(page);
     const eaten = st.feedback.filter((f) => f.status === "eaten" && f.meal.title === "Protein cheesecake");
     ok(eaten.length === 2 && eaten.every((f) => f.recipeId === recipe.id), "I ate one logs a slice linked to the cheesecake");
     const cards = cardOf(page, "Protein cheesecake");
-    const n = [await cards.count(), await cards.getByText("In My recipes").count(), await cards.getByRole("button", { name: "Save in My recipes" }).count()];
-    ok(n[0] === 2 && await cards.getByText("In My recipes").count() === 2 && await cards.getByRole("button", { name: "Save in My recipes" }).count() === 0, "both cheesecake meals on Today say In My recipes; no Save in My recipes " + JSON.stringify(n));
+    const n = [await cards.count(), await cards.getByRole("button", { name: /Open the recipe/ }).count(), await cards.getByRole("button", { name: "Save in My recipes" }).count()];
+    ok(n[0] === 2 && n[1] === 2 && await cards.getByRole("button", { name: "Save in My recipes" }).count() === 0, "both cheesecake meals on Today say In My recipes; no Save in My recipes " + JSON.stringify(n));
     ok(st.meals.filter((m) => m.title === "Protein cheesecake").length === 1, "no one-slice copy in My recipes");
     await page.context().close();
 
@@ -74,7 +76,7 @@ const U = "http://127.0.0.1:3225";
     const mine = { ...old, id: "own1", meal: { ...old.meal, id: "plate1", title: "My lunch bowl" } };
     const p2 = await open({ ...seed, meals: st.meals, feedback: [old, mine] });
     await p2.goto(U + "/"); await p2.waitForTimeout(1200);
-    ok(await cardOf(p2, "Protein cheesecake").getByText("In My recipes").count() === 1, "a card from before finds its recipe by name: In My recipes");
+    ok(await cardOf(p2, "Protein cheesecake").getByRole("button", { name: /Open the recipe/ }).count() === 1, "a card from before finds its recipe by name: In My recipes");
     ok(await cardOf(p2, "My lunch bowl").getByRole("button", { name: "Save in My recipes" }).count() === 1, "a plate that is no recipe can still be saved from Today");
     await p2.context().close();
   } catch (e) { ok(false, "walkthrough error: " + e.message.split("\n").slice(0, 3).join(" / ")); }

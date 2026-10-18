@@ -61,7 +61,8 @@ seed.items = [];
   ok(await page.locator(".cooking .plan-slot-row").count() === 1 && !/Morning skyr/.test(await page.locator(".cooking").textContent()), "the eaten slot left the plan card");
   ok(/1 of 2 by the plan so far/.test(await page.locator(".logged-line").textContent()), "1 of 2 by the plan so far");
   const first = page.locator(".log-card").first();
-  ok(/By the plan/.test(await first.locator(".plan-mark").textContent()) && /Lunch, by the plan/.test(await first.locator(".log-nums").textContent()), "the card is marked By the plan");
+  // R5 (Milan 17:23 to 19:00, board RS13): the meal says which meal it was on its own line; By the plan is its mark
+  ok(/By the plan/.test(await first.locator(".plan-mark").textContent()) && /^Lunch/.test((await first.locator(".meal-which").textContent()).trim()), "the card is marked By the plan");
   ok(await page.locator(".day-record").count() === 0, "no record yet, a slot is still to come");
   // a meal from outside: the Plate without a slot, saved: extra, Off the plan
   await page.getByRole("button", { name: /^Plate$/ }).first().click(); await page.waitForTimeout(500);
