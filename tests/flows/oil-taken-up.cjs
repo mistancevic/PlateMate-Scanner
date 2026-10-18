@@ -2,6 +2,8 @@
 // than the food takes up. A recipe that fries keeps its whole pot of oil listed, as it needs it; the numbers count what the
 // fried food takes up, 15% of its weight, and every place that shows it says it is an estimate: the read, the plate, the
 // recipe page. A splash of oil in a pan is counted in full, with no note. Never rewrite these lines to fit a change.
+// Changed by story R3, the fix (Milan 15:12 and 15:15, board RS10): the recipe follows the original, so the read card and the
+// recipe page show the pot as the amount, and the counted oil as the small line; the steps are in cook-with-the-pot.cjs.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -38,8 +40,8 @@ const CAP = Math.round((240 + 85 + 563 + 360 + 100 + 31) * 0.15);
     await read(fritters);
     const oilRow = page.locator(".in-card .row").filter({ hasText: "Vegetable oil" });
     const oilText = (await oilRow.textContent()).replace(/\s+/g, " ");
-    ok(new RegExp(`${CAP} g`).test(oilText), `the read counts ${CAP} g of oil, not the 1,380 g pot: ` + oilText);
-    ok(/1 to 2 quarts .* on the recipe/.test(oilText) && /for frying/.test(oilText) && /taken up in frying, an estimate: 15% of the food/.test(oilText), "the row keeps the recipe's pot, says for frying, and that the amount is an estimate");
+    ok(new RegExp(`Counted: ${CAP} g`).test(oilText) && /1,380 g$/.test(oilText.trim()), `the read shows the 1,380 g pot and counts ${CAP} g of oil: ` + oilText);
+    ok(/1 to 2 quarts .* on the recipe/.test(oilText) && /for frying/.test(oilText) && /Counted: \d+ g, taken up in frying, an estimate/.test(oilText), "the row keeps the recipe's pot, says for frying, and that the amount is an estimate");
     ok(/an estimate, 15% of the fried food/.test(await page.locator(".in-fry").textContent()), "a line under the foods says the oil counted is an estimate, and where it comes from");
     const one = Number((await page.locator(".in-card .in-per").textContent()).match(/([\d,]+) kcal/)[1].replace(",", ""));
     ok(one > 400 && one < 750, "one fritter is no longer 1,486 kcal: " + one);
@@ -49,7 +51,7 @@ const CAP = Math.round((240 + 85 + 563 + 360 + 100 + 31) * 0.15);
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500);
     await page.locator(".recipe-tile").filter({ hasText: "Homemade apple fritters" }).click(); await page.waitForTimeout(600);
     const rq = (await page.locator(".rq-food").filter({ hasText: "Vegetable oil" }).textContent()).replace(/\s+/g, " ");
-    ok(/taken up in frying, an estimate/.test(rq) && /The recipe uses 1,380 g\./.test(rq) && new RegExp(`${CAP} g`).test(rq), "the recipe page counts what is taken up, and names the pot: " + rq);
+    ok(new RegExp(`1 to 2 quarts \\(1 to 1\\.9 L\\), for frying\\. Counted: ${CAP} g, taken up in frying, an estimate\\.`).test(rq) && /1,380 g/.test(rq), "the recipe page shows the pot as written, and counts what is taken up: " + rq);
     // a splash in a pan: counted in full, no note
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(400);
     const empty = page.getByRole("button", { name: /Empty plate/ }); if (await empty.count()) { await empty.click(); await page.waitForTimeout(200); const again = page.getByRole("button", { name: /Tap again/ }); if (await again.count()) await again.click(); await page.waitForTimeout(400); }

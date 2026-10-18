@@ -89,7 +89,7 @@ export type Ingredient = {
   // an optional food added to the plate (0.2.19, IM12b): Leave it out sends it back to the optional list
   optional?: { written?: string; note?: string };
   // oil a recipe fries in (0.2.38, R3): the grams are what the food takes up, an estimate; pot is the recipe's whole amount
-  fry?: { pot: number };
+  fry?: { pot: number; written?: string; plate?: boolean };
 };
 // an optional food on the plate, out of the numbers until added (0.2.19, IM12): grams for this plate's portion
 export type PlateOpt = { id: string; name: string; written?: string; note?: string; grams: number; food: Food; part?: string };

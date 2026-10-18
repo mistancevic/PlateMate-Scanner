@@ -16,12 +16,20 @@ const POT = /(quart|litre|liter|\b\d+(\.\d+)?\s*l\b|for (deep[- ])?frying|zum fr
 // the parts that never go into the oil: they are not the fried food
 const NOT_FRIED = /(glaze|icing|frosting|topping|sauce|dressing|\bdip\b|syrup|garnish|to serve|for serving|glasur|soße|guss)/i;
 
-export type Fried<T> = T & { fry?: { pot: number } };
+// R3, the fix (0.2.39, Milan 15:12 and 15:15, board RS10): the recipe and its steps follow the original. The pot is one
+// number, the plate the other: grams is what is counted (taken up), fry.pot and fry.written are what you cook with.
+export type Fry = { pot: number; written?: string; plate?: boolean };
+export type Fried<T> = T & { fry?: Fry };
 export function capOil<T extends { name: string; written: string; grams: number; optional?: boolean; part?: string }>(items: T[], steps: string[]): Fried<T>[] {
   const fries = FRIES.test(steps.join(" ")) || items.some((i) => OIL.test(i.name) && POT.test(i.written));
   if (!fries) return items;
   const isOil = (i: T) => OIL.test(i.name) && !NOT_OIL.test(i.name) && !NOT_OIL.test(i.written) && !i.optional;
   const food = items.filter((i) => !isOil(i) && !i.optional && !(i.part && NOT_FRIED.test(i.part))).reduce((n, i) => n + i.grams, 0);
   const cap = Math.round(food * TAKEN_UP);
-  return items.map((i) => (isOil(i) && food > 0 && i.grams > cap ? { ...i, grams: cap, fry: { pot: i.grams } } : i));
+  return items.map((i) => (isOil(i) && food > 0 && i.grams > cap ? { ...i, grams: cap, fry: { pot: i.grams, ...(i.written ? { written: i.written } : {}) } } : i));
 }
+
+// the oil as you cook with it: the recipe's own words for the pot, or its grams; just your plate still needs the whole pot
+export const potLine = (f: Fry, name: string, fmtGrams: (g: number) => string) =>
+  `${f.plate ? "enough to fry: " : ""}${f.written ? `${f.written} ${name}` : `${fmtGrams(f.pot)} ${name}`}${f.plate ? ", as the recipe says" : ""}`;
+export const countedLine = (grams: string) => `Counted: ${grams}, taken up in frying, an estimate`;
