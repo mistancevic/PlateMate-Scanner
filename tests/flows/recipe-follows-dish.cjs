@@ -28,6 +28,9 @@ const tacos = { url: "https://example.com/chicken-tacos/", recipe: { title: "Chi
   const errs = [];
   const open = async () => {
     const page = await b.newPage({ viewport: { width: 390, height: 900 } }); page.on("pageerror", (e) => errs.push(e.message));
+    // the clock of the evening this was written (19 October 2026, 00:20: after midnight the plate is sized for breakfast, the page
+    // grows, and a row scrolled into view sits under the sticky bar, so the swipe missed it; the journey is unchanged)
+    await page.clock.setFixedTime(new Date("2026-10-18T19:00:00"));
     await page.addInitScript((s) => { if (!localStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); localStorage.setItem("seeded", "1"); } }, seed);
     page.next = fritters;
     await page.route("**/api/recipe/read", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(page.next) }));

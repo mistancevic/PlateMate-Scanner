@@ -11,6 +11,7 @@ import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { X } from "lucide-react";
 import { unreadNote } from "../coachNotes";
 import type { AppApi, Filling } from "./api";
+import { showPlanOn } from "./PlanScreen";
 import { KnowCard, ReadyCard } from "../components/Measured";
 import { slotsOf, slotsOn, rowsOf, trainingWhen, toMin } from "../slots";
 import { closedSlots, WINDOW } from "../makeMeal";
@@ -94,6 +95,16 @@ export function HomeScreen(p: AppApi) {
   const tTraining = dayFor(p.personal, tomorrow)?.day ?? getDay(p.personal, tomorrow).plan ?? null;
   const tWhen = trainingWhen(tTraining); void rowsOf;
   const tHeld = Object.keys(p.planned[ymd(tomorrow)] ?? {}).length;
+  // R18 (0.2.46, Milan 23:22, board RS17): the plan card says which day it is; tomorrow has the same card, under today's
+  // meals; when tomorrow is planned you are asked to check it, not to plan it; both open Plan on tomorrow
+  const tKey = ymd(tomorrow), tPlan = p.planned[tKey] ?? {};
+  const tSlots = slotsOn(lifestyleOf(p.personal), p.personal.timesOn, tKey);
+  const toTomorrow = () => { showPlanOn(tKey); setTab("plan"); };
+  const longDate = (d: Date) => d.toLocaleDateString("en", { weekday: "long", month: "long", day: "numeric" });
+  const tWeekday = tomorrow.toLocaleDateString("en", { weekday: "long" });
+  // the day went by the plan only when no slot of today is still to come (still open, as Next counts it)
+  const emptyAhead = rec.empty.filter((s) => openSlots.includes(s));
+  const dayDone = rec.done && emptyAhead.length === 0;
   const past = [1, 2].map((n) => dayLog(state.feedback, daysAgo(n)));
   const follow = dayModeOf(p.personal) === "each";
   // The day pills show while the day is still assumed, and again after Change, until a pill is tapped.
@@ -217,7 +228,7 @@ export function HomeScreen(p: AppApi) {
           ? (nextHeld?.items?.length
             ? <button className="pill pill-primary pill-wide" onClick={() => p.logPlanned(nextHeld, { date: key, slotId: next.id, name: next.name, time: next.time })}>I ate it</button>
             : <button className="pill pill-primary pill-wide" onClick={makeNext}>{nextHeld ? "Make it on the Plate" : `Make your ${next.name.toLowerCase()}`}</button>)
-          : <button className="pill pill-primary pill-wide" onClick={() => setTab("plan")}>Plan tomorrow</button>}
+          : <button className="pill pill-primary pill-wide" onClick={toTomorrow}>{tHeld ? "Check tomorrow" : "Plan tomorrow"}</button>}
         <small className="muted next-line">{next
           ? (left > 150 ? `${next.name}, ${next.time} by the clock: about ${fmt(left, 0)} kcal and ${fmt(pLeft, 0)} g protein left today.` : `You are at your day's kcal. A light ${next.name.toLowerCase()} keeps you there.`)
           : today.logged.length ? `${eatenAs} ${today.logged.length === 1 ? "is" : "are"} logged: ${left >= 0 ? `${fmt(left, 0)} kcal left today` : `${fmt(-left, 0)} kcal over today`}.` : "Nothing logged today."}</small>
@@ -260,14 +271,16 @@ export function HomeScreen(p: AppApi) {
       {inbox}
       <section className="card cooking">
         <div className="card-top cooking-top"><span><ChefHat size={18} /> What's in the plan</span></div>
+        <small className="plan-day">Today: {longDate(new Date(now))}</small>
         {!hasPlanToday && (
           <button className="menu-row plan-row-link" onClick={() => setTab("plan")}>
             <div className="menu-row-text"><small>Nothing planned so far</small><b>Go to Plan</b><small>Set the day's meals, and they wait here</small></div><ChevronRight size={18} />
           </button>
         )}
-        {hasPlanToday && rec.done && (
+        {hasPlanToday && rec.done && !dayDone && <small className="muted plan-eaten">{rec.eaten.map((f) => f.slot!.name).join(", ")} eaten, by the plan.</small>}
+        {dayDone && (
           <button className="menu-row plan-row-link" onClick={() => setTab("plan")}>
-            <div className="menu-row-text"><small>{rec.skipped.length ? `${rec.byPlan} eaten, ${rec.skipped.length} skipped on purpose` : `All ${rec.planned === 1 ? "one slot" : `${rec.planned} slots`} eaten`}</small><b>Today went {rec.extras.length ? "mostly " : ""}by the plan</b><small>{tHeld ? `Tomorrow is set: ${tHeld} ${tHeld === 1 ? "slot" : "slots"}${tWhen ? `, ${tWhen.phrase}` : ""}` : "Tomorrow is open. Set it on Plan."}</small></div><ChevronRight size={18} />
+            <div className="menu-row-text"><small>{rec.skipped.length ? `${rec.byPlan} eaten, ${rec.skipped.length} skipped on purpose` : `All ${rec.planned === 1 ? "one slot" : `${rec.planned} slots`} eaten`}</small><b>Today went {rec.extras.length ? "mostly " : ""}by the plan</b></div><ChevronRight size={18} />
           </button>
         )}
         {/* 0.2.6 (canvas board CW, CW7): each planned meal can be skipped on purpose; a skipped one stays with Undo until midnight */}
@@ -290,7 +303,7 @@ export function HomeScreen(p: AppApi) {
             </div>
           );
         })}
-        {hasPlanToday && !rec.done && rec.empty.length > 0 && (
+        {hasPlanToday && !dayDone && rec.empty.length > 0 && (
           <button className="menu-row plan-row-link" onClick={() => setTab("plan")}>
             <div className="menu-row-text"><small>{rec.empty.map((x) => x.name).join(", ")}</small><b>Pick a meal</b><small>{rec.empty.length === 1 ? "One slot open" : `${rec.empty.length} slots open`} · Go to Plan</small></div><ChevronRight size={18} />
           </button>
@@ -298,7 +311,7 @@ export function HomeScreen(p: AppApi) {
       </section>
       {/* RP5 (0.2.25, Milan 17:42): Today keeps the day; scanning lives on the Plate, at the top */}
       {/* the day's record (0.2.3, H14): once every planned slot is eaten, one line a day; the coach sees it on Friday */}
-      {rec.done && (
+      {dayDone && (
         <section className="plan day-record">
           <div className="plan-top"><span>{new Date().toLocaleDateString("en", { weekday: "long" })}, the record</span><span>{rec.extras.length ? `${rec.extras.length} extra` : "by the plan"}</span></div>
           <div className="plan-row">
@@ -310,7 +323,7 @@ export function HomeScreen(p: AppApi) {
         </section>
       )}
       <p className="label">Today's meals</p>
-      <p className="small logged-line">{hasPlanToday ? planDayLine(rec, p.todayKcal) : loggedLine(today, true)}</p>
+      <p className="small logged-line">{hasPlanToday ? planDayLine({ ...rec, done: dayDone }, p.todayKcal) : loggedLine(today, true)}</p>
       {newest.map((f) => {
         const a = sumOf(f.meal.items), r = recipeOfCard(f, state.meals);
         return [
@@ -348,6 +361,25 @@ export function HomeScreen(p: AppApi) {
           ),
         ];
       })}
+      {/* R18: tomorrow, the same card; its rows and its button open Plan on tomorrow */}
+      <section className="card tomorrow-plan" aria-label="Tomorrow's plan">
+        <div className="card-top cooking-top"><span><ChefHat size={18} /> What's in the plan</span></div>
+        <small className="plan-day">Tomorrow: {longDate(tomorrow)}{tWhen ? ` · ${tWhen.phrase}` : ""}</small>
+        {tHeld > 0 && tSlots.map((sl) => {
+          const m = tPlan[sl.id];
+          const fit = m ? fitOf(m, p.dayPd, unit) : null;
+          return (
+            <button key={sl.id} type="button" className="menu-row plan-row-link plan-slot-row" aria-label={`${sl.name} tomorrow, ${m ? m.title : "pick a meal"}`} onClick={toTomorrow}>
+              <div className="menu-row-text"><small>{sl.name}, {sl.time}</small>{m ? <b>{m.title}</b> : <b className="plan-pick">Pick a meal</b>}
+                <small>{!m ? "One slot open" : m.skipped ? "Skipped on purpose" : <>{SOURCE[m.source]}{fit?.state === "fits" ? <span className="fit-ok"> · fits</span> : fit?.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</>}</small></div>
+              <ChevronRight size={18} />
+            </button>
+          );
+        })}
+        <button type="button" className="menu-row plan-row-link" onClick={toTomorrow}>
+          <div className="menu-row-text"><b>{tHeld ? "Check tomorrow" : "Plan tomorrow"}</b><small>{tHeld ? `${Math.min(tHeld, tSlots.length)} of ${tSlots.length} planned · Plan, ${tWeekday}` : `Nothing planned so far · Set ${tWeekday}'s meals`}</small></div><ChevronRight size={18} />
+        </button>
+      </section>
       <p className="label">The last few days</p>
       <section className="card days">
         {past.map((d) => (

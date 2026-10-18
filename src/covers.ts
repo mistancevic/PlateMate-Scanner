@@ -47,8 +47,9 @@ export function photoPrompt(title: string, items: { name: string; grams: number 
 
 // Which recipes get a picture on their own: no photo of their own and never tried. One try, when the recipe is kept;
 // a try that didn't draw waits for Draw a picture on the recipe page, so nothing appears overnight (0.2.18, board IM, IM11)
-export function needsCover(m: Pick<Meal, "photo" | "photos" | "photoSigs" | "cover" | "items">, _today?: string): boolean {
-  return canDrawCover(m) && !m.cover;
+// an idea of Chef Mealan's not made yet gets no picture: the day's pictures go to recipes you cook (0.2.46, Milan 00:12)
+export function needsCover(m: Pick<Meal, "photo" | "photos" | "photoSigs" | "cover" | "items"> & { idea?: Meal["idea"] }, _today?: string): boolean {
+  return canDrawCover(m) && !m.cover && !m.idea;
 }
 // Whether Draw a picture can be offered: no photo of its own, foods with amounts, not drawn yet
 export function canDrawCover(m: Pick<Meal, "photo" | "photos" | "photoSigs" | "cover" | "items">): boolean {

@@ -2,7 +2,7 @@
 // Code looks first, at once and for free: your recipes, Coach's, the members' and Chef Mealan's starters, and your foods; PD 7+
 // is a filter, shown as a chip. Chef Mealan is asked only on a tap; his idea is kept in My recipes as an idea, not made yet,
 // and the app works out every number from the foods. Picking a dish puts it on the plate, as Make it does.
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import type { AppApi } from "../screens/api";
 import type { Food, Meal } from "../pilot";
@@ -25,7 +25,9 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
   const [members, setMembers] = useState<SharedRecipe[] | null>(null);
   const [showUnder, setShowUnder] = useState(false);
   const [idea, setIdea] = useState<Idea | null>(null);
-  const [asking, setAsking] = useState(false);
+  // one question to Chef Mealan at a time (0.2.46, Milan 00:12: taps while he was thinking each made another idea)
+  const [asking, setAsking] = useState<string | null>(null);
+  const busy = useRef(false);
   const [err, setErr] = useState("");
   const [shown, setShown] = useState<string[]>([]);
   const c = useMemo(() => parseCraving(q), [q]);
@@ -55,13 +57,15 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, c, state.meals, state.foods, members, target, need]);
   const take = (ref: Ref) => {
+    if (busy.current) return;
     if (ref.kind === "mine" || ref.kind === "coach") { setQ(""); p.openOnPlate(ref.meal); return; }
     if (ref.kind === "member") { setQ(""); p.takeMember(ref.r, "make", portionOf(ref.r, need).items); return; }
     if (ref.kind === "starter") void askChef(ref.m.title);
   };
   // Chef Mealan's idea: kept in My recipes as an idea, not made yet; every number from its foods
   async function askChef(craving: string) {
-    setAsking(true); setErr("");
+    if (busy.current) return;
+    busy.current = true; setAsking(craving); setErr("");
     try {
       const res = await fetch("/api/crave", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         craving, minPd: c.minPd, target, need, kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), region: p.region,
@@ -80,7 +84,7 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
       setState((s) => ({ ...s, meals: [meal, ...s.meals] }));
       setShown((l) => [...l, meal.title].slice(-9));
       setIdea({ meal, why: String(data.idea.why ?? "") });
-    } catch (e: any) { setErr(e.message); } finally { setAsking(false); }
+    } catch (e: any) { setErr(e.message); } finally { busy.current = false; setAsking(null); }
   }
   const pdCell = (r: { kcal: number; protein: number }) => { const fit = fitOf(r, target, pdUnit()); return <div className={`pick-pd ${fit.state}`}><b>{pdVal(fit.pd)}</b><small>{fit.text}</small></div>; };
   const row = (r: Row<Ref>) => (
@@ -95,7 +99,8 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
     <div className="crave">
       <input className="search crave-box" aria-label="What are you craving?" placeholder="Crêpes, sarma, chocolate PD 7+…" value={q} onChange={(e) => { setQ(e.target.value); setIdea(null); }} />
       {!active && <small className="muted crave-hint">Finds dishes in your recipes, Coach's, the members' and {CHEF_NAME}'s, and your foods. Add PD 7+ to keep only dishes at PD 7 or more.</small>}
-      {active && groups && !idea && (<>
+      {asking && <div className="card crave-ask crave-thinking" role="status"><b>{CHEF_NAME} is making {/^(a|an|the|some)\b/i.test(asking) ? asking : `an idea for ${asking}`}…</b><small className="muted">It takes a few seconds. One idea at a time.</small></div>}
+      {active && groups && !idea && !asking && (<>
         {c.minPd !== null && <div className="crave-chips"><button type="button" className="pill pill-small" aria-label={`Remove the filter PD ${c.minPd} and up`} onClick={() => setQ(q.replace(/\bpd\s*(?:of\s*)?(?:>=|≥|>|over|above|at least)?\s*\d{1,2}(?:[.,]\d)?\s*(?:\+|or more|and up|or higher|plus)?/i, "").replace(/\s+/g, " ").trim())}>PD {fmt(c.minPd, 1)} and up ✕</button></div>}
         {groups.groups.map((g) => <div key={g.key}><small className="pick-group crave-group">{g.title}</small><div className="menu-list pick-list">{g.shown.map(row)}</div></div>)}
         {groups.under.length > 0 && (showUnder
@@ -110,12 +115,12 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
         {groups.groups.length === 0
           ? <div className="card crave-ask">
               <small className="muted">Nothing in your recipes, Coach's, the members' or your foods is {crave}{c.minPd !== null ? ` at PD ${fmt(c.minPd, 1)} or more` : ""}.</small>
-              <button type="button" className="pill pill-wide pill-primary" disabled={asking || !crave} onClick={() => void askChef(crave)}>{asking ? `${CHEF_NAME} is thinking…` : `Ask ${CHEF_NAME} for one`}</button>
+              <button type="button" className="pill pill-wide pill-primary" disabled={Boolean(asking) || !crave} onClick={() => void askChef(crave)}>{asking ? `${CHEF_NAME} is thinking…` : `Ask ${CHEF_NAME} for one`}</button>
               {err && <small className="crave-err" role="alert">{err}</small>}
             </div>
-          : <small className="muted crave-line">Tap a dish and it goes on the plate. <button type="button" className="link in-inline" disabled={asking || !crave} onClick={() => void askChef(crave)}>{asking ? `${CHEF_NAME} is thinking…` : `Ask ${CHEF_NAME} for another`}</button>{err && <span className="crave-err" role="alert"> {err}</span>}</small>}
+          : <small className="muted crave-line">Tap a dish and it goes on the plate. <button type="button" className="link in-inline" disabled={Boolean(asking) || !crave} onClick={() => void askChef(crave)}>{asking ? `${CHEF_NAME} is thinking…` : `Ask ${CHEF_NAME} for another`}</button>{err && <span className="crave-err" role="alert"> {err}</span>}</small>}
       </>)}
-      {idea && ideaNums && (<>
+      {idea && ideaNums && !asking && (<>
         <small className="pick-group crave-group">{CHEF_NAME}'s idea</small>
         <div className="card crave-idea">
           <div className="crave-idea-top"><b>{idea.meal.title}</b>{pdCell(ideaNums)}</div>
@@ -124,7 +129,7 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
           <small className="muted">The numbers are from the foods, worked out by the app; a food you don't have is {CHEF_NAME}'s estimate.</small>
           <small className="crave-kept">Kept in My recipes as an idea, not made yet.</small>
           <button type="button" className="pill pill-primary pill-wide" onClick={() => { const m = idea.meal; setIdea(null); setQ(""); p.openOnPlate(m); }}>Put it on my plate</button>
-          <button type="button" className="link crave-again" disabled={asking} onClick={() => void askChef(crave)}>{asking ? `${CHEF_NAME} is thinking…` : "Another idea"}</button>
+          <button type="button" className="link crave-again" disabled={Boolean(asking)} onClick={() => void askChef(crave)}>{asking ? `${CHEF_NAME} is thinking…` : "Another idea"}</button>
           {err && <small className="crave-err" role="alert">{err}</small>}
         </div>
       </>)}
