@@ -45,6 +45,33 @@ export function isPrivateIp(ip: string): boolean {
 }
 
 // The recipe a page publishes as structured data (schema.org Recipe in JSON-LD), when it has one
+// The recipe's own ingredient groups, from the recipe card on the page (R2 fix, 0.2.34, Milan 11:28: the fritters from the
+// link came as one list). A page's structured data lists the ingredients without their groups, so the groups are read from
+// the card itself: Tasty Recipes, WP Recipe Maker, Mediavine Create, or any ingredients block with headings over its lists.
+// Two or more named groups with ingredients, or none.
+export function ingredientGroups(html: string): { group: string; ingredients: string[] }[] | null {
+  const start = html.search(/class=["'][^"']*\b(tasty-recipes-ingredients|wprm-recipe-ingredients-container|mv-create-ingredients|recipe-ingredients|ingredients-section)\b[^"']*["']/i);
+  if (start < 0) return null;
+  const rest = html.slice(start, start + 80000);
+  const end = rest.search(/class=["'][^"']*\b(tasty-recipes-instructions|wprm-recipe-instructions-container|mv-create-instructions|recipe-instructions|instructions-section)\b[^"']*["']/i);
+  const sect = end > 0 ? rest.slice(0, end) : rest;
+  const text = (h: string) => decodeEntities(h.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").replace(/\s+([,.;:)])/g, "$1").replace(/\(\s+/g, "(").trim();
+  const out: { group: string; ingredients: string[] }[] = [];
+  const re = /<(h[2-6])\b[^>]*>([\s\S]*?)<\/\1>|<p\b[^>]*>\s*<(strong|b)\b[^>]*>([\s\S]*?)<\/\3>\s*:?\s*<\/p>|<li\b[^>]*>([\s\S]*?)<\/li>/gi;
+  let m: RegExpExecArray | null, cur: { group: string; ingredients: string[] } | null = null;
+  while ((m = re.exec(sect))) {
+    const head = m[2] ?? m[4];
+    if (head !== undefined) {
+      const g = text(head).replace(/[:.]+$/, "").trim();
+      if (!g || /^ingredients?$/i.test(g) || g.length > 40) { cur = null; continue; }
+      cur = { group: g, ingredients: [] }; out.push(cur); continue;
+    }
+    const li = text(m[5] ?? "");
+    if (li && cur) cur.ingredients.push(li.slice(0, 120));
+  }
+  const groups = out.filter((g) => g.ingredients.length);
+  return groups.length >= 2 ? groups.slice(0, 8) : null;
+}
 export function recipeFromLd(html: string): { name: string; ingredients: string[]; yield: string; author: string; steps: string[] } | null {
   const blocks = [...html.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)].map((m) => m[1]);
   const isRecipe = (x: any) => x && typeof x === "object" && ([] as unknown[]).concat(x["@type"] ?? []).some((t) => String(t).toLowerCase() === "recipe");

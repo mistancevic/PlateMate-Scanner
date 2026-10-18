@@ -130,3 +130,27 @@ test("R1 (0.2.29): the read's names read as letters, never as the page's codes",
   assert.equal(r.items[0].name, "Confectioners' sugar");
   assert.equal(r.items[0].part, "Glaze & topping");
 });
+
+test("R2 fix (0.2.34): the recipe card's ingredient groups are read from the page, Tasty Recipes and WP Recipe Maker", async () => {
+  const { ingredientGroups } = await import("./recipeIn");
+  const tasty = `<div class="tasty-recipes-ingredients"><div class="tasty-recipes-ingredients-header"><h3>Ingredients</h3><span class="tasty-recipes-scale">1x 2x</span></div>
+    <div class="tasty-recipes-ingredients-body"><h4>Dough</h4><ul><li data-tr-ingredient-checkbox=""><span data-amount="1" data-unit="cup">1 cup</span> (240g/ml) <strong>whole milk</strong>, warmed</li>
+    <li data-tr-ingredient-checkbox=""><span data-amount="4.5">4 1/2</span> cups (563g) <strong>all-purpose flour</strong></li></ul>
+    <h4>Filling</h4><ul><li><span>3 cups</span> (360g) <strong>peeled and diced apples</strong></li></ul>
+    <h4>For Shaping &amp; Frying:</h4><ul><li>1/4 cup (31g) <strong>all-purpose flour</strong></li><li>1–2 quarts <strong>vegetable oil</strong></li></ul>
+    <h4>Glaze</h4><ul><li>3 cups (360g) <strong>confectioners&#8217; sugar</strong></li></ul></div></div>
+    <div class="tasty-recipes-instructions"><h3>Instructions</h3><ol><li>Make the dough.</li></ol></div>`;
+  const g = ingredientGroups(tasty)!;
+  assert.deepEqual(g.map((x) => x.group), ["Dough", "Filling", "For Shaping & Frying", "Glaze"]);
+  assert.equal(g[0].ingredients.length, 2);
+  assert.match(g[0].ingredients[0], /^1 cup \(240g\/ml\) whole milk, warmed$/);
+  assert.match(g[3].ingredients[0], /confectioners’ sugar/);
+  const wprm = `<div class="wprm-recipe-ingredients-container"><h3 class="wprm-recipe-header">Ingredients</h3>
+    <div class="wprm-recipe-ingredient-group"><h4 class="wprm-recipe-group-name wprm-recipe-ingredient-group-name">Crust</h4><ul class="wprm-recipe-ingredients"><li class="wprm-recipe-ingredient"><span class="wprm-recipe-ingredient-amount">2</span> <span class="wprm-recipe-ingredient-unit">cups</span> <span class="wprm-recipe-ingredient-name">graham cracker crumbs</span></li></ul></div>
+    <div class="wprm-recipe-ingredient-group"><h4 class="wprm-recipe-group-name">Filling</h4><ul><li class="wprm-recipe-ingredient">24 ounces cream cheese</li></ul></div></div>
+    <div class="wprm-recipe-instructions-container"><ol><li>Stir.</li></ol></div>`;
+  assert.deepEqual(ingredientGroups(wprm)!.map((x) => [x.group, x.ingredients.length]), [["Crust", 1], ["Filling", 1]]);
+  const oneList = `<div class="tasty-recipes-ingredients"><h3>Ingredients</h3><ul><li>2 eggs</li><li>1 cup milk</li></ul></div><div class="tasty-recipes-instructions"></div>`;
+  assert.equal(ingredientGroups(oneList), null, "one list: no groups");
+  assert.equal(ingredientGroups("<p>No recipe card here.</p>"), null);
+});
