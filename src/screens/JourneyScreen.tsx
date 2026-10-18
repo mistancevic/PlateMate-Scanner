@@ -18,6 +18,7 @@ import { quickPicks } from "../quick";
 import { lineTotal } from "../labeltable";
 import { SwipeRow } from "../components/SwipeRow";
 import { dishTaste, goesInDish, heldBackLine } from "../dishTaste";
+import { TAKEN_UP_SHORT, capOil } from "../frying";
 import { methodsFor } from "../methods";
 import { rankSwaps } from "../swaps";
 import { PlateHelper } from "../components/PlateHelper";
@@ -513,7 +514,9 @@ export function JourneyScreen(p: AppApi) {
       if (data.error) { log("recipe_in", { how: shots.length ? "shot" : "link", result: String(data.error) }); setInFlow({ kind: "error", code: data.error, message: data.message || "", back: shots.length ? "shots" : "link", shots, url }); return; }
       log("recipe_in", { how: shots.length ? "shot" : "link", result: "read" });
       const got = data.recipe as ReadRecipe;
-      setInFlow({ kind: "read", recipe: { ...got, items: (got.items ?? []).map(countItem), steps: cleanSteps(got.steps ?? []) }, shots, url: data.url, note: data.note });
+      // the oil rule again on the phone (R3, 0.2.38): the same result on an answer already capped, so it never counts twice
+      const stepsGot = cleanSteps(got.steps ?? []);
+      setInFlow({ kind: "read", recipe: { ...got, items: capOil((got.items ?? []).map(countItem), stepsGot), steps: stepsGot }, shots, url: data.url, note: data.note });
     } catch (e: any) { setInFlow(shots.length ? { kind: "shots", shots } : { kind: "link", url }); setError(e.message); }
     finally { clearTimeout(slow); setSlowRead(false); }
   }
@@ -524,7 +527,7 @@ export function JourneyScreen(p: AppApi) {
     const whole: Ingredient[] = r.items.filter((i) => i.on ?? !i.optional).map((i) => {
       let food = state.foods.find((x) => x.name.toLowerCase() === i.name.toLowerCase()) ?? fresh.find((x) => x.name.toLowerCase() === i.name.toLowerCase());
       if (!food) { food = { ...estimate(i), notes: `${CHEF_NAME}'s estimate, from a recipe` }; fresh.push(food); }
-      return { id: uid(), food, grams: i.grams, locked: true, role: i.role, ...(i.part ? { part: i.part } : {}), ...(i.count ? { count: i.count } : {}) };
+      return { id: uid(), food, grams: i.grams, locked: true, role: i.role, ...(i.part ? { part: i.part } : {}), ...(i.count ? { count: i.count } : {}), ...(i.fry ? { fry: i.fry } : {}) };
     });
     const thumbs = await Promise.all(f.shots.map((x) => resizeImageBase64(x, 900, 900).catch(() => x)));
     const total = whole.reduce((n, i) => n + i.grams, 0);
@@ -860,6 +863,7 @@ export function JourneyScreen(p: AppApi) {
                   <button className="name-link" onClick={() => setCardId(i.id)}>{i.food.name}</button>
                   {partsMode ? <small className="pt-chips"><PartChip value={i.part ?? ""} onPick={(v) => setPartOf(i.id, v)} /> <button type="button" className="pt-chip off" aria-pressed={false} onClick={() => setOptional(i.id, true)}>Optional</button></small>
                     : i.optional ? <small className="pt-wrap">optional, added · <button className="link pt-inline" onClick={() => leaveOpt(i.id)}>Leave it out</button></small>
+                    : i.fry ? <small>{TAKEN_UP_SHORT}</small>
                     : <small>{i.food.calories === 0 ? "no energy" : pdText(density(i.food.protein, i.food.calories))} · {imported ? "Change it if you like." : i.locked ? "This amount stays." : `${CHEF_NAME} can change this amount.`}</small>}
                 </div>
                 {/* CT (0.2.24): eggs, bananas and a pack's pieces are counted; the size and the grams small */}
