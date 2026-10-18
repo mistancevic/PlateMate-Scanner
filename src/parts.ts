@@ -37,3 +37,13 @@ export function checkPart(original: { name: string; grams: number; part?: string
   const outsideNames = new Set(original.filter((x) => x.part !== part).map((x) => x.name.toLowerCase()));
   return checkChange(inside, next.filter((x) => !outsideNames.has(x.name.toLowerCase())));
 }
+// R14 (0.2.40, Milan 18 October 2026, 15:50 to 15:59, board RS11): a recipe can hold one food twice, like flour in the dough
+// and flour for dusting. Each recipe food finds its own on the plate: the same id, else the same food in the same part, else
+// the same food in the same order. A plate food is used once.
+export function pairItems<B extends { id: string; food: { id: string }; part?: string }>(from: { id: string; food: { id: string }; part?: string }[], to: B[]): (B | undefined)[] {
+  const used = new Set<number>();
+  const pick = (ok: (b: B) => boolean) => { const k = to.findIndex((b, j) => !used.has(j) && ok(b)); if (k < 0) return undefined; used.add(k); return to[k]; };
+  const byId = from.map((r) => pick((b) => b.id === r.id));
+  const byPart = from.map((r, k) => byId[k] ?? pick((b) => b.food.id === r.food.id && (b.part ?? "") === (r.part ?? "")));
+  return from.map((r, k) => byPart[k] ?? pick((b) => b.food.id === r.food.id));
+}

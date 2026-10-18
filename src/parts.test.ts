@@ -80,3 +80,13 @@ test("IM21: the nutrition table: EU order, exact counts, polyols from a sweetene
   assert.ok(m.rows.find((r) => r.key === "energy")!.serving! > 0);
   assert.deepEqual(byPart(items as any, 8).map((p) => [p.part, Math.round(p.kcal)]), [["Base", 72], ["Filling", 42]]);
 });
+
+test("R14: one food twice, each finds its own: flour in the dough and flour for dusting", async () => {
+  const { pairItems } = await import("./parts");
+  const flour = { id: "flour" };
+  const recipe = [{ id: "r1", food: flour, part: "Dough" }, { id: "r2", food: { id: "milk" }, part: "Dough" }, { id: "r3", food: flour, part: "Shaping and frying" }];
+  const plate = [{ id: "p1", food: flour, part: "Dough", grams: 67 }, { id: "p2", food: { id: "milk" }, part: "Dough", grams: 29 }, { id: "p3", food: flour, part: "Shaping and frying", grams: 4 }];
+  assert.deepEqual(pairItems(recipe, plate).map((x) => x?.grams), [67, 29, 4]);
+  const noParts = [{ id: "a", food: flour }, { id: "b", food: flour }];
+  assert.deepEqual(pairItems(noParts, [{ id: "x", food: flour, grams: 10 }, { id: "y", food: flour, grams: 2 }]).map((x) => x?.grams), [10, 2], "without parts, the same order");
+});
