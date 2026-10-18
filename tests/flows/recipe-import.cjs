@@ -84,6 +84,8 @@ const U = "http://127.0.0.1:3209";
   await page.getByRole("button", { name: "Leave it out" }).click(); await page.waitForTimeout(200);
   ok(/2 balls on the recipe · converted/.test(t) && /no amount on the recipe · guessed/.test(t) && /500 g on the recipe/.test(t), "IM3: every line says where its amount came from");
   await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(900);
+  // R15 (Milan 15:55 to 16:16, board RS12): the plate now starts with the whole recipe; this journey picks the portion it had.
+  await page.locator(".in-portion").getByRole("button", { name: "Sized for your dinner" }).click(); await page.waitForTimeout(500);
 
   // IM4: your portion, sized for dinner
   t = await page.locator(".plate-card").textContent().then((x) => x.replace(/\s+/g, " "));

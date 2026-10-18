@@ -229,7 +229,7 @@ export function HomeScreen(p: AppApi) {
         <section className={`card log-card ${f.photo ? "with-photo" : ""}`} key={f.id}>
           {f.photo && <img className="log-photo" src={f.photo} alt="" />}
           <div className="card-top"><span>{f.meal.title}</span><small>{new Date(f.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small></div>
-          <small>{f.meal.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}</small>
+          <small>{f.meal.items.map((i) => `${fmt(i.grams, i.grams < 1 ? 1 : 0)} g ${i.food.name}`).join(" · ")}</small>
           {(() => { const a = aggregate(f.meal.items); return <small className="log-nums">{f.slot ? `${f.slot.name}, by the plan · ` : ""}{fmt(a.calories, 0)} kcal · {fmt(a.protein, 0)} g protein · {pdText(density(a.protein, a.calories))}{f.taste ? ` · ${f.taste}` : ""}{f.carry ? ` · ${({ light: "light and awake", fine: "fine after", heavy: "heavy, tired" } as const)[f.carry.how]}` : ""}</small>; })()}
           {hasPlanToday && (f.slot
             ? <small className="plan-mark fit-ok">By the plan</small>
@@ -266,7 +266,7 @@ export function HomeScreen(p: AppApi) {
           {today.prepared.map((f) => (
             <section className="card log-card" key={f.id}>
               <div className="card-top"><span>{f.meal.title}</span>{(f.left ?? 0) > 0 && <small className="left-tag">{f.left} left</small>}</div>
-              <small>{(f.left ?? 0) > 0 ? `One ${f.leftOf ?? "portion"}: ` : ""}{f.meal.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}</small>
+              <small>{(f.left ?? 0) > 0 ? `One ${f.leftOf ?? "portion"}: ` : ""}{f.meal.items.map((i) => `${fmt(i.grams, i.grams < 1 ? 1 : 0)} g ${i.food.name}`).join(" · ")}</small>
               <div className="button-row" style={{ marginTop: 8 }}>
                 <button className="pill pill-small pill-primary" onClick={() => p.settleCard(f.id, "eaten")}><Check size={14} /> {(f.left ?? 0) > 0 ? "I ate one" : "I ate it"}</button>
                 <button className="pill pill-small" onClick={() => p.settleCard(f.id, "not-used")}><X size={14} /> {(f.left ?? 0) > 0 ? "Remove" : "Not today"}</button>

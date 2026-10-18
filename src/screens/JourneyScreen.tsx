@@ -381,7 +381,8 @@ export function JourneyScreen(p: AppApi) {
     : mealSlot ? `${capName(mealSlot.name)}, by the clock: a guess, off the plan. Tap ${capName(mealSlot.name)} to make it your ${mealSlot.name.toLowerCase()}: it counts by the plan.` : "Pick what it is for.";
   // ---- a recipe from screenshots or a link (0.2.16, canvas board IM) ----
   const [inFlow, setInFlow] = useState<InFlow | null>(null);
-  const [pmode, setPmode] = useState<"sized" | "recipe">("sized");
+  // R15 (0.2.41, board RS12): "whole" is the recipe as mapped, where a recipe starts on the plate
+  const [pmode, setPmode] = useState<"whole" | "sized" | "recipe">("sized");
   const [way, setWay] = useState<Way | null>(null);
   const [wayBusy, setWayBusy] = useState<string | null>(null);
   // R10 (0.2.36): the wait for Change the recipe: the slow line, and what stops it (Stop, or the minute)
@@ -438,15 +439,16 @@ export function JourneyScreen(p: AppApi) {
   };
   const mealNeed = share && share.kcal >= 150 && p.kind !== "dessert" ? share.kcal : null;
   const unitOf = (m: Meal) => m.makes?.unit || "portions", oneOf = (m: Meal) => unitOf(m).replace(/s$/, "");
-  const portionItems = (m: Meal, mode: "sized" | "recipe"): Ingredient[] => {
+  const portionItems = (m: Meal, mode: "whole" | "sized" | "recipe"): Ingredient[] => {
     const whole = m.items.map((i) => ({ ...i, dish: undefined }));
-    const list = mode === "sized" && mealNeed ? scaleTo(whole, mealNeed) : onePortion(whole, m.makes?.n ?? 1);
+    const list = mode === "whole" ? whole : mode === "sized" && mealNeed ? scaleTo(whole, mealNeed) : onePortion(whole, m.makes?.n ?? 1);
     return list.map((i) => ({ ...i, id: uid(), locked: false }));
   };
   // the recipe on the plate at a portion: its foods, its optional foods at the same share, no part left out (IM12, IM13)
-  const factorOf = (m: Meal, mode: "sized" | "recipe") => (mode === "sized" && mealNeed && kcalOfItems(m.items) > 0 ? mealNeed / kcalOfItems(m.items) : 1 / (m.makes?.n ?? 1));
-  const recipePlate = (m: Meal, mode: "sized" | "recipe") => ({ items: portionItems(m, mode), optional: optAt(m.optional, factorOf(m, mode), uid), leftOut: undefined, emptyParts: undefined });
-  const modeFor = (m: Meal): "sized" | "recipe" => (sizedFits(mealNeed, kcalOfItems(m.items) / (m.makes?.n ?? 1)) ? "sized" : "recipe");
+  const factorOf = (m: Meal, mode: "whole" | "sized" | "recipe") => (mode === "whole" ? 1 : mode === "sized" && mealNeed && kcalOfItems(m.items) > 0 ? mealNeed / kcalOfItems(m.items) : 1 / (m.makes?.n ?? 1));
+  const recipePlate = (m: Meal, mode: "whole" | "sized" | "recipe") => ({ items: portionItems(m, mode), optional: optAt(m.optional, factorOf(m, mode), uid), leftOut: undefined, emptyParts: undefined });
+  // R15: a recipe starts whole, as mapped, unless the plate fills a meal of the Plan
+  const modeFor = (m: Meal): "whole" | "sized" | "recipe" => (!p.filling && (m.makes?.n ?? 1) >= 2 ? "whole" : sizedFits(mealNeed, kcalOfItems(m.items) / (m.makes?.n ?? 1)) ? "sized" : "recipe");
   // IM13: a recipe that came in, opened from Recipes, gets the plate it had the first time
   useEffect(() => {
     const id = state.openRecipe; if (!id) return;
@@ -537,14 +539,14 @@ export function JourneyScreen(p: AppApi) {
       food: leanFood(state.foods.find((x) => x.name.toLowerCase() === i.name.toLowerCase()) ?? { ...estimate(i), notes: `${CHEF_NAME}'s estimate, from a recipe` }) }));
     const meal: Meal = { id: uid(), title: r.title, items: whole, portion: Math.round(total / r.servings), savedAt: new Date().toISOString(), steps: [],
       source: { name: r.source, ...(f.url ? { url: f.url } : {}), from: f.url ? "link" : "screenshot", at: new Date().toISOString(), ...(r.steps?.length ? { steps: r.steps } : {}), foods: foodNames(whole) }, ...(thumbs.length ? { shots: thumbs } : {}), makes: { n: r.servings, unit: r.servingsUnit }, ...(optional.length ? { optional } : {}), ...(r.stated ? { stated: r.stated } : {}) };
-    const mode: "sized" | "recipe" = sizedFits(mealNeed, kcalOfItems(whole) / r.servings) ? "sized" : "recipe";
+    const mode: "whole" | "sized" | "recipe" = !p.filling && r.servings >= 2 ? "whole" : sizedFits(mealNeed, kcalOfItems(whole) / r.servings) ? "sized" : "recipe";
     setPmode(mode); setWay(null); setPartsMode(false);
     setState((s) => ({ ...s, foods: [...s.foods, ...fresh], meals: [meal, ...s.meals], ...recipePlate(meal, mode), title: meal.title, portion: null, fromRecipe: meal.id }));
     setInFlow(null);
     log("recipe_in", { how: f.url ? "link" : "shot", result: "plate" });
     notify(`${meal.title} is on your plate, and saved in Mine.`);
   }
-  function setPortionMode(mode: "sized" | "recipe") {
+  function setPortionMode(mode: "whole" | "sized" | "recipe") {
     if (!rec) return;
     setPmode(mode); setWay(null);
     setState((s) => ({ ...s, ...recipePlate(rec, mode), title: rec.title, portion: null }));
@@ -749,7 +751,7 @@ export function JourneyScreen(p: AppApi) {
           : imported && rec
             ? Head({ name: true, title: "", sub: way?.kind === "change" ? `Your ${rec.title}, changed. Still sized for your ${mealWord}.`
               : way?.kind === "side" ? `Your ${rec.title} as it is, ${Math.round((kcalOfItems(way.options[way.pick].dish) / Math.max(1, kcalOfItems(rec.items) / (rec.makes?.n ?? 1))) * 100)}% of one ${oneOf(rec)}, and ${way.options[way.pick].name} ${sideWord(way.options[way.pick].kind)}. The ${oneOf(rec)} is not changed.`
-              : `From ${rec.source?.name || (rec.source?.from === "link" ? "the link" : "your screenshot")}. ${pmode === "sized" && mealNeed ? `The recipe's mix, sized for your ${mealWord}: every food scaled the same way.` : `One ${oneOf(rec)}, as the recipe makes it.`} Change what you like.` })
+              : `From ${rec.source?.name || (rec.source?.from === "link" ? "the link" : "your screenshot")}. ${pmode === "whole" ? "The whole recipe, as you mapped it." : pmode === "sized" && mealNeed ? `The recipe's mix, sized for your ${mealWord}: every food scaled the same way.` : `One ${oneOf(rec)}, as the recipe makes it.`} Change what you like.` })
           : state.title && state.title !== "DaaM" && items.length > 0
             ? Head({ name: true, title: "", sub: `From My recipes. Change what you like, then ${chefable ? `Make it a ${mealWord}` : "Fit to my target"} or Keep it as it is.` })
             : Head({ title: "What are you craving?", sub: `Add your foods. ${CHEF_NAME} sets the amounts.` })}
@@ -807,13 +809,16 @@ export function JourneyScreen(p: AppApi) {
         {imported && rec && !way && rec.makes && (
           <div className="in-portion">
             <div className="moments">
+              {/* R15 (0.2.41, board RS12): the whole recipe first, as mapped; then what you eat */}
+              {rec.makes.n >= 2 && <button className={`choice ${pmode === "whole" ? "on" : ""}`} onClick={() => setPortionMode("whole")}>The whole recipe</button>}
               {mealNeed && <button className={`choice ${pmode === "sized" ? "on" : ""}`} onClick={() => setPortionMode("sized")}>Sized for your {mealWord}</button>}
               <button className={`choice ${pmode === "recipe" ? "on" : ""}`} onClick={() => setPortionMode("recipe")}>One {oneOf(rec)}, as the recipe makes it</button>
             </div>
             {/* R12 (0.2.38): no recipe numbers here; the whole recipe is chosen on How to make it */}
-            {rec.makes.n >= 2 && <small className="muted in-next">Next, on How to make it: the whole recipe, or just your plate.</small>}
-            {(() => { const one = kcalOfItems(rec.items) / rec.makes!.n, pct = Math.round((kcalOfItems(portionItems(rec, "sized")) / Math.max(1, one)) * 100);
-              return <small className="muted">One {oneOf(rec)} is {fmt(one, 0)} kcal.{mealNeed ? ` Your ${mealWord} is about ${fmt(mealNeed, 0)}. Sized for it${sizedFits(mealNeed, one) ? `: ${pct}% of one ${oneOf(rec)}.` : ` would be ${pct}% of one ${oneOf(rec)}, so the plate starts with one ${oneOf(rec)}, as the recipe makes it.`}` : ""}</small>; })()}
+            {rec.makes.n >= 2 && pmode !== "whole" && <small className="muted in-next">Next, on How to make it: the whole recipe, or just your plate.</small>}
+            {(() => { const one = kcalOfItems(portionItems(rec, "recipe")), pct = Math.round((kcalOfItems(portionItems(rec, "sized")) / Math.max(1, one)) * 100);
+              // R15: one portion's kcal is the plate's own, so the line and the card give one number
+              return <small className="muted">{pmode === "whole" ? `The whole recipe, as you mapped it: ${countOf(rec.makes!.n, unitOf(rec))}. ` : ""}One {oneOf(rec)} is {fmt(one, 0)} kcal.{mealNeed ? ` Your ${mealWord} is about ${fmt(mealNeed, 0)}. Sized for it${sizedFits(mealNeed, one) ? `: ${pct}% of one ${oneOf(rec)}.` : ` would be ${pct}% of one ${oneOf(rec)}, so one ${oneOf(rec)}, as the recipe makes it, is the better pick.`}` : ""}{pmode === "whole" ? " Pick what you eat." : ""}</small>; })()}
           </div>
         )}
         {imported && way?.kind === "change" && !way.part && (
@@ -832,7 +837,7 @@ export function JourneyScreen(p: AppApi) {
         )}
         {items.length > 0 && (
           <section className={`readout readout-fit-${p.fitPd(pd)}`}>
-            <div className="readout-top"><span>{madeBy || (imported && mealNeed) ? `This ${mealWord}` : "As it stands"}</span><span>{pdTag()}</span></div>
+            <div className="readout-top"><span>{imported && pmode === "whole" && !way && (rec?.makes?.n ?? 1) >= 2 ? "The whole recipe" : madeBy || (imported && mealNeed) ? `This ${mealWord}` : "As it stands"}</span><span>{pdTag()}</span></div>
             <div className="readout-mid">
               <b>{pdVal(pd)}</b>
               <div><span>{pd !== null && pdRef !== null ? (pd >= pdRef ? "fits your plan" : `${fixed(pdRef - pd)} under your ${fixed(pdRef)}`) : "no target set"}</span><small>{fmt(t.calories, 0)} kcal · {fmt(t.protein)} g protein · {fmt(t.weight, 0)} g</small></div>
@@ -1115,10 +1120,11 @@ export function JourneyScreen(p: AppApi) {
 
   // the recipe the plate is: one that came in, or one of yours opened on the plate (by its slot or its name)
   const plateRecipe = rec ?? state.meals.find((m) => (p.filling?.mealId ? m.id === p.filling.mealId : !!state.title && m.title === state.title) && m.items.length > 0);
-  const madeWhole = !!rec?.makes && rec.makes.n >= 2 && (makeAll ?? rec.makes.n >= 4);
+  const wholePlate = !!rec?.makes && rec.makes.n >= 2 && pmode === "whole" && !way;
+  const madeWhole = !!rec?.makes && rec.makes.n >= 2 && (wholePlate || (makeAll ?? rec.makes.n >= 4));
   // R12 (0.2.38, board RS9): the whole recipe in your portions; a plate sized for your lunch leaves lunches, not the recipe's pieces
   const sizedPlate = !!rec?.makes && imported && pmode === "sized" && !!mealNeed && !way;
-  const yours = !rec?.makes ? 1 : sizedPlate ? yourPortions(kcalOfItems(rec.items), kcalOfItems(items)) : rec.makes.n;
+  const yours = !rec?.makes || wholePlate ? 1 : sizedPlate ? yourPortions(kcalOfItems(rec.items), kcalOfItems(items)) : rec.makes.n;
   const leftK = yours - 1;
   const leftOne = sizedPlate ? mealWord : rec ? oneOf(rec) : "portion", leftMany = sizedPlate ? plural(mealWord) : rec ? unitOf(rec) : "portions";
   const leftWords = (k: number) => `${k} ${k === 1 ? leftOne : leftMany}`;
@@ -1163,13 +1169,14 @@ export function JourneyScreen(p: AppApi) {
         {rec?.makes && n >= 2 && (
           <section className="card mk-card" aria-label="What you make">
             <b>What you make</b>
-            <div className="moments">
+            {/* R15: with the whole recipe on the plate, you make all of it: no choice to ask */}
+            {!wholePlate && <div className="moments">
               <button className={`choice ${madeWhole ? "on" : ""}`} aria-pressed={madeWhole} onClick={() => setMakeAll(true)}>The whole recipe</button>
               <button className={`choice ${!madeWhole ? "on" : ""}`} aria-pressed={!madeWhole} onClick={() => setMakeAll(false)}>Just your plate</button>
-            </div>
+            </div>}
             {/* RP3 (0.2.25): what you make and what you eat, each with its weight and energy */}
             <div className="mk-eat mk-make"><span><b>You make</b> {madeWhole ? (sizedPlate ? `the whole recipe, about ${yours} of your ${leftMany}` : "the whole recipe") : onePlate ? `1 ${one}` : "your plate"}</span><span>{fmt(tMake.weight, 0)} g · {fmt(tMake.calories, 0)} kcal</span></div>
-            <div className="mk-eat"><span><b>You eat</b> {sizedPlate ? `one ${mealWord}` : onePlate ? `1 ${one}` : rec && pmode === "recipe" && !way ? `your plate, 1 ${one}` : "your plate"}</span><span>{fmt(t0.weight, 0)} g · {fmt(t0.calories, 0)} kcal · {pdText(pd0)}</span></div>
+            <div className="mk-eat"><span><b>You eat</b> {wholePlate ? "the whole recipe" : sizedPlate ? `one ${mealWord}` : onePlate ? `1 ${one}` : rec && pmode === "recipe" && !way ? `your plate, 1 ${one}` : "your plate"}</span><span>{fmt(t0.weight, 0)} g · {fmt(t0.calories, 0)} kcal · {pdText(pd0)}</span></div>
             <small className="muted">{madeWhole ? `The steps are for the whole recipe. ${leftK < 1 ? "Your plate is the whole recipe, so nothing is left." : sizedPlate ? `${leftK} of your ${leftK === 1 ? leftOne : leftMany} ${leftK === 1 ? "is" : "are"} left, each the size of your ${mealWord}. ${leftK === 1 ? "It goes" : "They go"} to Keep for later when you save, ready for the coming days.` : `${leftK === 1 ? `The other ${one} goes` : `The ${leftK} ${unit} left go`} to Keep for later when you save, ready for the coming days.`}` : `The recipe makes ${n}. The steps are for your plate: every amount at your portion, to the gram.`}</small>
           </section>
         )}

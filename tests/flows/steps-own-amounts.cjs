@@ -44,6 +44,8 @@ const U = "http://127.0.0.1:3228";
     await page.locator(".plate-card").getByRole("button", { name: "Link" }).click(); await page.waitForTimeout(300);
     await page.getByLabel("Link to a recipe").fill(fritters.url); await page.getByRole("button", { name: /^Read/ }).first().click(); await page.waitForTimeout(1200);
     await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1200);
+    // R15 (Milan 15:55 to 16:16, board RS12): the plate now starts with the whole recipe; this journey picks the portion it had.
+    await page.locator(".in-portion").getByRole("button", { name: "Sized for your lunch" }).click(); await page.waitForTimeout(500);
     const onPlate = await page.locator(".plate-card .row").filter({ hasText: "All-purpose flour" }).locator("input[type=number]").evaluateAll((xs) => xs.map((x) => Number(x.value)));
     ok(onPlate.length === 2 && onPlate[0] > onPlate[1], "the plate lists both flours, the dough's and the dusting's: " + JSON.stringify(onPlate));
     await page.getByRole("button", { name: /^Make it( as it is)?$/ }).first().click(); await page.waitForTimeout(900);

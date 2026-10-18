@@ -179,7 +179,8 @@ export const pdOf = (l: { grams: number; food: Pick<Food, "calories" | "protein"
 export const kcalOfItems = kcalOf;
 // A scaled amount a cook can weigh, and that keeps the recipe's ratios (0.2.17, the cookie: 4 g baking soda became 5 g,
 // 22.5 g flour 25 g): under 100 g to the gram, from 100 g to the nearest 5 g, never under 1 g
-export const roundGrams = (g: number) => (g < 100 ? Math.max(1, Math.round(g)) : Math.round(g / 5) * 5);
+// R15 (0.2.41): a tiny amount keeps its tenth of a gram (nutmeg 0.08 g is 0.1 g, not 1 g), so one portion is one share of the recipe
+export const roundGrams = (g: number) => (g < 1 ? Math.max(0.1, Math.round(g * 10) / 10) : g < 100 ? Math.round(g) : Math.round(g / 5) * 5);
 // Every food by the same factor
 export function scaleTo<T extends { grams: number; food: Pick<Food, "calories"> }>(whole: T[], kcal: number): T[] {
   const all = kcalOf(whole);
