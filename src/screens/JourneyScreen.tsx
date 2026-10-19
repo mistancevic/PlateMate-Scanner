@@ -1,4 +1,5 @@
 import { carriedLists } from "../carry";
+import { tasteForReq } from "../tasteChips";
 import { useState, useEffect, useRef, Fragment } from "react";
 import { tempsIn } from "../units";
 import { Camera, Pencil, Plus, Trash2, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
@@ -18,7 +19,7 @@ import { iconFor } from "../icons";
 import { quickPicks } from "../quick";
 import { lineTotal } from "../labeltable";
 import { SwipeRow } from "../components/SwipeRow";
-import { dishTaste, goesInDish, heldBackLine } from "../dishTaste";
+import { dishTaste, goesInDish, heldBackLine, offerTaste, presetOf, bothPartOf, PLATE_TASTE_WORD, PLATE_TASTE_LINE, type PlateTaste } from "../dishTaste";
 import { TAKEN_UP_SHORT, capOil } from "../frying";
 import { plural, yourPortions } from "../portions";
 import { methodsFor } from "../methods";
@@ -167,7 +168,7 @@ export function JourneyScreen(p: AppApi) {
     const t = aggregate(list); const cur = density(t.protein, t.calories);
     if (cur === null || pdRef === null || cur >= pdRef - 0.05) return null;
     // R9 (0.2.33): Chef Mealan offers only foods that go with the dish on the plate, a plate of your own too
-    const dish = dishTaste(list.map((i) => i.food.name));
+    const dish = p.plateTaste ? offerTaste(p.plateTaste, null) : dishTaste(list.map((i) => i.food.name));
     const rows = state.foods.filter((f) => !list.some((i) => i.food.id === f.id) && f.calories !== null && f.protein !== null && goesInDish(dish, f.name)).map((f) => {
       const g = portionOf(f); const kcal = (t.calories ?? 0) + (f.calories! * g) / 100, pro = (t.protein ?? 0) + (f.protein! * g) / 100;
       return { f, g, to: density(pro, kcal) ?? 0 };
@@ -239,7 +240,7 @@ export function JourneyScreen(p: AppApi) {
   const cardItem = items.find((i) => i.id === cardId);
   const foodCard = cardItem && <FoodCard food={state.foods.find((x) => x.id === cardItem.food.id) ?? cardItem.food} addPhoto={(d) => p.addFoodPhoto(cardItem.food.id, d)} toggleFavorite={() => p.toggleFavorite(cardItem.food.id)} insight={{ dayKcal: p.todayKcal, eaten: p.eatenTodayKcal, dayName: p.dayName, goalKey: p.tipGoalKey, requestTip: () => p.requestTip(cardItem.food.id), setJob: (j) => p.setFoodJob(cardItem.food.id, j) }} removePhoto={(i) => p.removeFoodPhoto(cardItem.food.id, i)} setMain={(i) => p.setMainPhoto(cardItem.food.id, i)} target={pdRef} fit={p.fitPd(density(cardItem.food.protein, cardItem.food.calories))} close={() => setCardId(null)} dontHave={() => { setHelper({ missing: cardItem.id }); setCardId(null); }} mix={mixProps(state.foods.find((x) => x.id === cardItem.food.id) ?? cardItem.food)} />;
   const helperSheet = helper && (
-    <PlateHelper safety={p.safety} ai={p.ai} onFlag={p.flagFromModel} items={items} library={state.foods} pdRef={pdRef} cap={cap ?? null} missing={helper.missing ? items.find((i) => i.id === helper.missing) ?? null : null} prefill={helper.prefill}
+    <PlateHelper tastes={tasteForReq(p.personal.tasteChips, state.preferences)} safety={p.safety} ai={p.ai} onFlag={p.flagFromModel} items={items} library={state.foods} pdRef={pdRef} cap={cap ?? null} missing={helper.missing ? items.find((i) => i.id === helper.missing) ?? null : null} prefill={helper.prefill}
       setError={setError} close={() => setHelper(null)} openTalk={() => { setHelper(null); p.openOut(); }} record={p.recordTalk}
       apply={(next, note) => { setState((s) => ({ ...s, items: next, portion: null })); p.notify(note); if (step === "recipe") recalc(next); }} />
   );
@@ -283,7 +284,7 @@ export function JourneyScreen(p: AppApi) {
   }
   // Start again from nothing: the plate's foods go, the library stays.
   function emptyPlate() {
-    p.setPick(null);
+    p.setPick(null); p.setPlateTaste(null);
     setMadeBy(null); setChef(null); setWay(null);
     setState((s) => ({ ...s, items: [], portion: null, fromRecipe: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined }));
     setPartsMode(false); setStep("in");
@@ -370,7 +371,7 @@ export function JourneyScreen(p: AppApi) {
   // R11 (0.2.37): the line says what the plate is for; the section's chips and their hint
   const capName = (n: string) => n.charAt(0).toUpperCase() + n.slice(1);
   const numsOf = share ? `${fmt(share.kcal, 0)} kcal · ${fmt(share.protein, 0)} g protein · ${pdText(pdRef)}` : "";
-  const kindPart = p.kind === "dessert" ? " · A dessert" : items.some((i) => i.dish) ? " · A dish" : " · A mix";
+  const kindPart = items.some((i) => i.dish) ? " · A dish" : " · A mix";
   const momentPart = p.moment !== "regular" ? ` · ${momentOf(p.moment).name}` : "";
   const lineNow = pickSlot ? `${capName(pickSlot.name)}, ${pickSlot.time}${numsOf ? ` · ${numsOf}` : ""} · By the plan${momentPart}${kindPart === " · A mix" ? "" : kindPart}`
     : p.pick === "exploring" ? `Exploring · not sized for a meal${momentPart}${kindPart === " · A mix" ? "" : kindPart}`
@@ -419,9 +420,23 @@ export function JourneyScreen(p: AppApi) {
   const recipeOn = Boolean(state.fromRecipe) || plateParts.length > 0 || items.some((i) => i.dish);
   const recipeTaste = recipeOn ? dishTaste([...items.map((i) => i.food.name), ...opts.map((o) => o.name), ...leftOut.flatMap((l) => l.items.map((i) => i.food.name))]) : null;
   const matches = q.trim() ? state.foods.filter((f) => (f.name + " " + f.brand).toLowerCase().includes(q.toLowerCase())).slice(0, 60) : [];
-  const found = matches.filter((f) => goesInDish(recipeTaste, f.name));
-  const heldBack = matches.filter((f) => !goesInDish(recipeTaste, f.name)).map((f) => f.name).slice(0, 3);
+  // R22 (0.2.50, board RS21): what is offered follows What is it?, on a plate of your own too; nothing picked, the recipe's taste
+  const shownTaste = p.plateTaste ?? presetOf(recipeTaste);
+  const plateTasteOf = offerTaste(p.plateTaste, recipeTaste);
+  const found = matches.filter((f) => goesInDish(plateTasteOf, f.name));
+  const heldBack = matches.filter((f) => !goesInDish(plateTasteOf, f.name)).map((f) => f.name).slice(0, 3);
   const isEmptyPart = (part: string) => !items.some((i) => i.part === part) && !opts.some((o) => o.part === part) && !leftOut.some((l) => l.part === part) && emptyParts.some((x) => x.part === part);
+  const slotWord = (pickSlot ?? mealSlot)?.name.toLowerCase() ?? "meal";
+  const tasteHint = shownTaste === "daam" ? `A full ${slotWord} that tastes like dessert${pdRef !== null ? `, at your ${pdText(pdRef)}` : ""}. Sweet foods are offered, savoury ones held back; ${CHEF_NAME} leans on quark, skyr and whey.`
+    : shownTaste === "savoury" ? `A savoury ${slotWord}${pdRef !== null ? ` at your ${pdText(pdRef)}` : ""}. Sweet foods are held back.`
+    : shownTaste === "both" ? `Savoury and sweet in one ${slotWord}, its kcal shared: a main and a sweet finish, two parts on the plate. Nothing is held back.`
+    : "Nothing picked: everything is offered. Each is a full meal at your PD; a small thing is a Snack, above.";
+  // a tap picks it, a tap on the one picked clears it; Both puts what is on the plate into the main and the sweet finish
+  const pickTaste = (t: PlateTaste) => {
+    const next = p.plateTaste === t ? null : t;
+    p.setPlateTaste(next);
+    if (next === "both") setState((s) => ({ ...s, items: s.items.map((i) => (i.part || i.dish ? i : { ...i, part: bothPartOf(i.food.name) })) }));
+  };
   // + Add a food to a part: the next food put on the plate goes into it
   const [addTo, setAddTo] = useState<string | null>(null);
   const seenIds = useRef<Set<string>>(new Set(items.map((i) => i.id)));
@@ -652,7 +667,7 @@ export function JourneyScreen(p: AppApi) {
     try {
       const res = await fetch("/api/meal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         plate: base.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein })), meal: mealWord, need: share.kcal, target: pdRef,
-        kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), library: state.foods.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), region: p.region, avoid: [...avoid, ...kept.map((k) => k.title)], failed: failedIn, carried: carriedLists(state.meals, state.feedback) }) });
+        kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), library: state.foods.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), region: p.region, avoid: [...avoid, ...kept.map((k) => k.title)], failed: failedIn, carried: carriedLists(state.meals, state.feedback), tastes: tasteForReq(p.personal.tasteChips, state.preferences), what: shownTaste }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `${CHEF_NAME} could not answer.`);
       const good = [...kept], failed: { title: string; why: string }[] = [];
@@ -727,7 +742,7 @@ export function JourneyScreen(p: AppApi) {
             A planned meal (0.2.2) says Lunch, 12:30 · By the plan; until then every plate is off the plan. */}
         {/* R11: a tap anywhere on the line opens its section; the pencil (or Done) stays the button for keyboards and readers */}
         <div className="plan-line" onClick={() => setLineOpen((v) => !v)}>
-          <span>{p.filling ? (p.filling.mode === "eat" ? `${p.filling.name}, ${p.filling.time} · By the plan` : `${p.filling.dayName === "today" ? "Today" : p.filling.dayName}'s ${p.filling.name.toLowerCase()}, ${p.filling.time} · By the plan`) + (items.some((i) => i.dish) ? " · A dish" : "") : lineNow}</span>
+          <span>{p.filling ? (p.filling.mode === "eat" ? `${p.filling.name}, ${p.filling.time} · By the plan` : `${p.filling.dayName === "today" ? "Today" : p.filling.dayName}'s ${p.filling.name.toLowerCase()}, ${p.filling.time} · By the plan`) + (items.some((i) => i.dish) ? " · A dish" : "") : lineNow}{shownTaste && <b className="plate-taste-line"> · {PLATE_TASTE_LINE[shownTaste]}</b>}</span>
           {lineOpen
             ? <button className="link plan-line-done" onClick={(e) => { e.stopPropagation(); setLineOpen(false); }}>Done</button>
             : <button className="icon plan-line-pen" aria-label="Change what this plate is" aria-expanded={lineOpen} onClick={(e) => { e.stopPropagation(); setLineOpen(true); }}><Pencil size={16} /></button>}
@@ -743,10 +758,14 @@ export function JourneyScreen(p: AppApi) {
           </div>
           <p className="small for-hint">{forHint}</p>
         </>}
-        <div className="moments kind-row" role="radiogroup" aria-label="Kind of plate">
-          <button className={`choice ${p.kind === "meal" ? "on" : ""}`} aria-pressed={p.kind === "meal"} onClick={() => p.setKind("meal")}>Meal</button>
-          <button className={`choice ${p.kind === "dessert" ? "on" : ""}`} aria-pressed={p.kind === "dessert"} onClick={() => p.setKind("dessert")}>Dessert</button>
+        {/* R22 (0.2.50, board RS21): What is it? in place of Meal or Dessert; a small thing is a Snack, above */}
+        <p className="label">What is it?</p>
+        <div className="moments taste-row" role="radiogroup" aria-label="What is it?">
+          {(["savoury", "daam", "both"] as const).map((t) => (
+            <button key={t} className={`choice ${shownTaste === t ? "on" : ""}`} aria-pressed={shownTaste === t} onClick={() => pickTaste(t)}>{PLATE_TASTE_WORD[t]}</button>
+          ))}
         </div>
+        <p className="small taste-hint">{tasteHint}</p>
         <p className="label">What kind of moment?</p>
         <div className="moments">
           {orderMoments(p.usual).map((m) => (
@@ -971,8 +990,8 @@ export function JourneyScreen(p: AppApi) {
         <input className="search" aria-label="Search all my foods" placeholder="Search all my foods" value={q} onChange={(e) => setQ(e.target.value)} />
         <div className="rows">
           {/* R9 (0.2.33, boards RS4 and RS5): while a recipe is on the plate, only foods that go with the dish; one line names what was held back */}
-          {heldBack.length > 0 && recipeTaste && <small className="muted held-back">{heldBackLine(recipeTaste, heldBack)}</small>}
-          {(q.trim() ? found : quick.picks.filter((f) => goesInDish(recipeTaste, f.name))
+          {heldBack.length > 0 && plateTasteOf && <small className="muted held-back">{heldBackLine(plateTasteOf, heldBack)}</small>}
+          {(q.trim() ? found : quick.picks.filter((f) => goesInDish(plateTasteOf, f.name))
           ).map((f) => {
               const inList = items.some((i) => i.food.id === f.id);
               const why = q.trim() ? null : quick.why.get(f.id);
@@ -1114,7 +1133,7 @@ export function JourneyScreen(p: AppApi) {
       if (!recipe) return;
       setMkDraft("working");
       try {
-        const d = await draftSteps(recipe, { library: state.foods.map((f) => f.name), equipment: equipmentOf(p.personal), kitchens: p.personal.kitchens ?? [], ...(chg && rec ? { changed: changesOf(rec.items, chg.whole!, chg.notes) } : {}) });
+        const d = await draftSteps(recipe, { library: state.foods.map((f) => f.name), equipment: equipmentOf(p.personal), kitchens: p.personal.kitchens ?? [], tastes: tasteForReq(p.personal.tasteChips, state.preferences), ...(chg && rec ? { changed: changesOf(rec.items, chg.whole!, chg.notes) } : {}) });
         if (d.ok) {
           if (chg) setWay({ ...chg, drafted: { steps: d.steps, marks: d.marks, kitchen: d.kitchen, parts: d.parts } });
           else setState((s) => ({ ...s, meals: s.meals.map((m) => (m.id === recipe.id ? { ...m, steps: d.steps, stepMarks: d.marks, stepsKitchen: d.kitchen, stepParts: d.parts, stepsFor: foodNames(m.items) } : m)) }));

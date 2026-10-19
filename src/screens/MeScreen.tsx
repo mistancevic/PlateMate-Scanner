@@ -8,6 +8,7 @@ import { bandOf, goalLabel } from "../goal";
 import type { ReactNode } from "react";
 import { ChevronRight, User, Target, CalendarDays, ShoppingBasket, Users, KeyRound } from "lucide-react";
 import type { MenuSection } from "./api";
+import { TASTE_CHIPS, toggleChip } from "../tasteChips";
 import { lifestyleOf, planOf } from "../personal";
 import { HOURS, SLOTS, weekdaysOf, WEEKDAY_CHOICES } from "../plan";
 import type { AppApi } from "./api";
@@ -67,10 +68,22 @@ export function MeScreen(p: AppApi) {
           </button>
         ))}
       </div>
-      <section className="card">
+      {/* R22 (0.2.50, board RS21): chips first, each one fixed meaning; your own words for what no chip says */}
+      <section className="card taste-card" aria-label="Taste is part of the plan">
         <div className="card-top"><span>Taste is part of the plan</span></div>
-        <small>What makes food work for you: creamy rather than sour, keep the chocolate flavour, small portions, quick preparation. Chef Mealan reads it; it never changes your numbers.</small>
-        <textarea placeholder="Your taste and practical preferences" value={state.preferences} onChange={(e) => p.setState((s) => ({ ...s, preferences: e.target.value }))} />
+        <small>Tap what is true for you. Chef Mealan reads it with every idea, every answer about a plate and every set of steps. It never changes your numbers.</small>
+        {([["like", "I like"], ["not", "Rather not"], ["how", "How I eat"]] as const).map(([g, title]) => (
+          <div key={g} className="taste-group">
+            <p className="label">{title}</p>
+            <div className="moments" role="group" aria-label={title}>
+              {TASTE_CHIPS[g].map((c) => { const on = (p.personal.tasteChips?.[g] ?? []).includes(c); return (
+                <button key={c} type="button" className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, tasteChips: toggleChip(p.personal.tasteChips, g, c) })}>{c}</button>
+              ); })}
+            </div>
+          </div>
+        ))}
+        <p className="label">In your own words</p>
+        <textarea className="taste-words" aria-label="Your taste in your own words" placeholder="Anything the chips don't say" value={state.preferences} onChange={(e) => p.setState((s) => ({ ...s, preferences: e.target.value }))} />
       </section>
     </>
   );

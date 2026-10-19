@@ -56,6 +56,8 @@ export type Personal = {
   kitchens?: string[];
   // from 0.2.10 (canvas board CH, CH7): per kitchen, the three dishes shown and the ones swapped away with Another
   kitchenTaste?: import("./kitchens").Tastes;
+  // R22 (0.2.50, board RS21): your taste on Me as chips
+  tasteChips?: import("./tasteChips").TasteChips;
   // from 0.2.18 (canvas board UN): the units shown; the account keeps kg, cm and °C. None is metric.
   units?: import("./units").Units;
   // from 0.2.18 (canvas board IM, IM10): what the person cooks with; none is oven, stovetop and microwave

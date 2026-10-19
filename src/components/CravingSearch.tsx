@@ -3,6 +3,8 @@
 // is a filter, shown as a chip. Chef Mealan is asked only on a tap; his idea is kept in My recipes as an idea, not made yet,
 // and the app works out every number from the foods. Picking a dish puts it on the plate, as Make it does.
 import { carriedLists } from "../carry";
+import { tasteOfWords } from "../craving";
+import { tasteForReq } from "../tasteChips";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus } from "lucide-react";
 import type { AppApi } from "../screens/api";
@@ -57,8 +59,11 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
     return { groups: split.filter((g) => g.shown.length), under: split.flatMap((g) => g.under), foods: foodsShown.slice(0, 5), foodsUnder: foods.filter((f) => !foodsShown.includes(f)) };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, c, state.meals, state.foods, members, target, need]);
+  // R22 (0.2.50): sweet, DaaM or savoury in your words sets What is it? on the plate, once you take a dish or a food
+  const keepTaste = () => { const t = tasteOfWords(c.words); if (t) p.setPlateTaste(t); };
   const take = (ref: Ref) => {
     if (busy.current) return;
+    keepTaste();
     if (ref.kind === "mine" || ref.kind === "coach") { setQ(""); p.openOnPlate(ref.meal); return; }
     if (ref.kind === "member") { setQ(""); p.takeMember(ref.r, "make", portionOf(ref.r, need).items); return; }
     if (ref.kind === "starter") void askChef(ref.m.title);
@@ -70,7 +75,7 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
     try {
       const res = await fetch("/api/crave", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         craving, minPd: c.minPd, target, need, kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), region: p.region,
-        library: state.foods.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), avoid: shown, carried: carriedLists(state.meals, state.feedback) }) });
+        library: state.foods.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), avoid: shown, carried: carriedLists(state.meals, state.feedback), tastes: tasteForReq(p.personal.tasteChips, state.preferences) }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `${CHEF_NAME} could not answer.`);
       if (data.error) throw new Error(data.message || `${CHEF_NAME} has no idea for that right now.`);
@@ -108,7 +113,7 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
           ? <><small className="pick-group crave-group">Under PD {fmt(c.minPd, 1)}</small><div className="menu-list pick-list">{groups.under.map(row)}</div></>
           : <small className="muted crave-line">Under PD {fmt(c.minPd, 1)}: {groups.under.length === 1 ? `1 more dish, ${groups.under[0].title}, ${pdText(groups.under[0].pd)}` : `${groups.under.length} more dishes`}. <button type="button" className="link in-inline" onClick={() => setShowUnder(true)}>Show {groups.under.length === 1 ? "it" : "them"}</button></small>)}
         {groups.foods.length > 0 && <><small className="pick-group crave-group">Your foods</small><div className="menu-list pick-list">{groups.foods.map((f) => (
-          <button key={f.id} type="button" className="menu-row pick-row" onClick={() => onFood(f)} aria-label={`Add ${f.name}`}>
+          <button key={f.id} type="button" className="menu-row pick-row" onClick={() => { keepTaste(); onFood(f); }} aria-label={`Add ${f.name}`}>
             <div className="menu-row-text"><b>{f.name}</b><small>{f.brand} · {pdText(foodPd(f))}</small></div><span className="crave-add"><Plus size={14} /> Add</span>
           </button>))}</div></>}
         {groups.foods.length === 0 && groups.foodsUnder.length > 0 && <small className="muted crave-line">No food of yours at PD {fmt(c.minPd, 1)} or more. {groups.foodsUnder.slice(0, 2).map((f) => `${f.name} is ${pdText(foodPd(f))}`).join("; ")}.</small>}
@@ -129,7 +134,7 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
           <small className="muted">{idea.meal.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}. One serving: {fmt(ideaNums.kcal, 0)} kcal · {fmt(ideaNums.protein, 0)} g protein.</small>
           <small className="muted">The numbers are from the foods, worked out by the app; a food you don't have is {CHEF_NAME}'s estimate.</small>
           <small className="crave-kept">Kept in My recipes as an idea, not made yet.</small>
-          <button type="button" className="pill pill-primary pill-wide" onClick={() => { const m = idea.meal; setIdea(null); setQ(""); p.openOnPlate(m); }}>Put it on my plate</button>
+          <button type="button" className="pill pill-primary pill-wide" onClick={() => { const m = idea.meal; keepTaste(); setIdea(null); setQ(""); p.openOnPlate(m); }}>Put it on my plate</button>
           <button type="button" className="link crave-again" disabled={Boolean(asking)} onClick={() => void askChef(crave)}>{asking ? `${CHEF_NAME} is thinking…` : "Another idea"}</button>
           {err && <small className="crave-err" role="alert">{err}</small>}
         </div>
