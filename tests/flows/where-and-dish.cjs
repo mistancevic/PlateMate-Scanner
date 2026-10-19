@@ -1,6 +1,8 @@
 // 0.2.5 (canvas S "Plan decides, purpose two: the store" and "Plate makes", H9, H12): Where does this go after a scan from
 // Today (on the plate now, into a planned meal with what it does to its PD, a new meal in an empty slot, keep); a dish as
 // one row on the Plate with its portions, the recipe never moved, a side as the lever; a dish eaten as it stands is its recipe.
+// Changed by story R19 (Milan 06:04 to 06:41, board RS18): the lunch row opens the meal, with its slot on top; Change it on
+// the Plate there opens the Plate for the slot, as the row did. Everything after is unchanged.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -30,6 +32,7 @@ seed.items = [];
   await page.goto("http://127.0.0.1:3194/"); await page.waitForTimeout(900);
   // the dish: lunch opens the Plate with sarma as one row, 1 of 8
   await page.getByRole("button", { name: /Lunch at .*Sarma/ }).click(); await page.waitForTimeout(600);
+  if (await page.locator(".rq-slot").count()) { await page.locator(".rq-slot").getByRole("button", { name: "Change it on the Plate" }).click(); await page.waitForTimeout(600); }
   ok(await page.locator(".dish-row").count() === 1 && /1 of 8/.test(await page.locator(".dish-portions").textContent()), "the recipe is one row, 1 of 8 portions");
   ok(/A dish/.test(await page.locator(".plan-line").textContent()), "the line says A dish");
   const kcalOf = async () => { const t = await page.locator(".readout-mid small").first().textContent(); const m = t.match(/([\d,.]+)\s*kcal/); if (!m) throw new Error("no kcal in: " + t); return Number(m[1].replace(/[,.]/g, "")); };

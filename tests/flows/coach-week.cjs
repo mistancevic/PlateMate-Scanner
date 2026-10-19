@@ -28,7 +28,8 @@ const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0
   await page.goto("http://127.0.0.1:3197/today"); await page.waitForTimeout(1200);
   // CW7: skip on purpose
   const snack = page.locator(".plan-slot-row").filter({ hasText: "Cottage cheese" });
-  await snack.getByRole("button", { name: /^Skip snack on purpose$/ }).click(); await page.waitForTimeout(300);
+  // Changed by story R19 (Milan 06:04 to 06:41, board RS18): Skip left the row; a swipe to the right skips, as on the Plate
+  await require("./swipe.cjs")(page, snack, "right");
   ok(/Skipped on purpose/.test(await snack.textContent()) && await snack.getByRole("button", { name: "Undo" }).count() === 1, "Skip: the row says Skipped on purpose, with Undo");
   ok(await page.evaluate((t) => JSON.parse(localStorage.getItem("chefmealan-planned"))[t].snack.skipped === true, today), "the skip is kept with the plan");
   await snack.getByRole("button", { name: "Undo" }).click(); await page.waitForTimeout(300);

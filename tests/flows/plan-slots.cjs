@@ -18,14 +18,19 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(500);
   ok(await page.locator(".day-strip .choice").count() === 14 && await page.locator(".day-strip .choice.on").count() === 1, "a strip of two weeks, today marked");
   ok(/^Today, /.test(await page.locator(".plan-day-head b").textContent()), "the card names today");
-  const times = await page.locator(".plan-slot .plan-time").allTextContents();
+  // Changed by story R19 (Milan 06:36, board RS18): a slot's time sits in its line, Breakfast, 07:30, not in a column of its own;
+  // the training row keeps its column. These read the times and names from there; what they check is unchanged.
+  const slotTimes = async () => (await page.locator(".plan-slot .menu-row-text small:first-child").allTextContents()).map((t) => t.split(", ")[1]);
+  const slotNames = async () => (await page.locator(".plan-slot .menu-row-text small:first-child").allTextContents()).map((t) => t.split(",")[0]);
+  const rowTimes = () => page.evaluate(() => [...document.querySelectorAll(".plan-day .plan-training, .plan-day .plan-slot")].map((r) => r.querySelector(".plan-time")?.textContent.trim() ?? (r.querySelector(".menu-row-text small")?.textContent.split(", ")[1] ?? "")));
+  const times = await slotTimes();
   ok(times.join(" ") === "07:30 11:40 15:50 20:00", "four slots spread over the eating window: " + times.join(" "));
-  ok((await page.locator(".plan-slot .menu-row-text small").allTextContents()).join(",") === "Breakfast,Lunch,Snack,Dinner", "named Breakfast, Lunch, Snack, Dinner");
+  ok((await slotNames()).join(",") === "Breakfast,Lunch,Snack,Dinner", "named Breakfast, Lunch, Snack, Dinner");
   ok(await page.locator(".plan-slot .plan-pick").count() === 4 && /4 slots open/.test(await page.locator(".plan-top").textContent()), "every slot says Pick a meal, the box counts them open");
   // next Monday (a date to come: a past date shows what was eaten instead): a hard evening session with no time set says
   // Evening and sits before dinner (board FX, TT2); the line carries the day's numbers
   await page.evaluate(() => document.querySelectorAll(".day-strip .choice")[7].click()); await page.waitForTimeout(300);
-  const rows = await page.locator(".plan-day .menu-row .plan-time").allTextContents();
+  const rows = await rowTimes();
   ok(rows.join(" ") === "07:30 11:40 15:50 Evening 20:00", "Monday: no clock time made up, the evening sits before Dinner: " + rows.join(" "));
   ok(/From my Training week/.test(await page.locator(".plan-training").textContent()) && /Strength, hard, 60 min/.test(await page.locator(".plan-training").textContent()), "the training row reads the Training week");
   const line = await page.locator(".plan-day-head small").textContent();
@@ -34,7 +39,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.locator(".plan-training").click(); await page.waitForTimeout(300);
   await page.locator(".date-sheet").getByLabel("Starts at").fill("18:15"); await page.waitForTimeout(150);
   await page.getByRole("button", { name: "Save for this date" }).click(); await page.waitForTimeout(400);
-  ok((await page.locator(".plan-day .menu-row .plan-time").allTextContents()).join(" ") === "07:30 11:40 15:50 18:15 20:00" && /training at 18:15/.test(await page.locator(".plan-day-head small").textContent()), "Starts at 18:15: the row and the line say 18:15");
+  ok((await rowTimes()).join(" ") === "07:30 11:40 15:50 18:15 20:00" && /training at 18:15/.test(await page.locator(".plan-day-head small").textContent()), "Starts at 18:15: the row and the line say 18:15");
   // weeks both ways (board FX, PW1): ahead, and This week back
   const wk = await page.locator(".week-arrows-mid").textContent();
   await page.getByRole("button", { name: "Week after" }).click(); await page.waitForTimeout(300);
@@ -53,12 +58,12 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(await page.locator(".slot-times input").count() === 4, "Lifestyle shows the four slot times");
   await page.locator(".slot-times input").nth(1).fill("12:30"); await page.waitForTimeout(300);
   await page.getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(500);
-  ok((await page.locator(".plan-slot .plan-time").allTextContents()).join(" ") === "07:30 12:30 15:50 20:00", "Lunch moved to 12:30 in Plan");
+  ok((await slotTimes()).join(" ") === "07:30 12:30 15:50 20:00", "Lunch moved to 12:30 in Plan");
   await page.getByRole("button", { name: "Slots and times" }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "3", exact: true }).click(); await page.waitForTimeout(300);
   ok(await page.locator(".slot-times input").count() === 3, "three meals a day gives three slots");
   await page.getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(500);
-  ok((await page.locator(".plan-slot .menu-row-text small").allTextContents()).join(",") === "Breakfast,Lunch,Dinner" && /3 slots open/.test(await page.locator(".plan-top").textContent()), "Plan shows Breakfast, Lunch, Dinner, 3 open");
+  ok((await slotNames()).join(",") === "Breakfast,Lunch,Dinner" && /3 slots open/.test(await page.locator(".plan-top").textContent()), "Plan shows Breakfast, Lunch, Dinner, 3 open");
   ok(errs.length === 0, errs.length ? "page errors: " + errs.join(" | ") : "no page errors");
   await b.close(); server.kill();
   process.exit(fail ? 1 : 0);

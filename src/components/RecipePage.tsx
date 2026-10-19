@@ -33,7 +33,9 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, openOriginal, originalFoods, pdRef, fitPd }: {
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, openOriginal, originalFoods, pdRef, fitPd, backLabel }: {
+  // R19 (0.2.47): opened from Today or Plan, the way back says so
+  backLabel?: string;
   // 0.2.18 (canvas board IM, IM11, IM11b): Draw a picture, with the day's count; none without the AI
   picture?: { count: { used: number; limit: number } | null; drawing: boolean; draw: () => void; refresh: () => void } | null;
   // 0.2.11 (canvas board CO, CO4, CO4b): For members, on a recipe of yours
@@ -121,7 +123,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   };
   return (
     <div className="rq">
-      <button className="link rq-back" onClick={close}><ChevronLeft size={18} /> Recipes</button>
+      <button className="link rq-back" onClick={close}><ChevronLeft size={18} /> {backLabel ?? "Recipes"}</button>
       {top}
       {/* R8: the photos first */}
       {drawn
