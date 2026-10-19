@@ -4,6 +4,8 @@
 // whose time has passed asks under its row: Did you have it? I ate it logs it as planned, Change it opens the Plate for it,
 // Skipped it closes it on purpose. A recipe put on the Plate presets What is it? from its foods, a one-portion recipe too.
 // Never rewrite these lines to fit a change.
+// Changed by story R24, 01:02 to 01:03 (Milan: the band sticking to the top looks weird; blue, not black): the band is in
+// the app's blue and scrolls with the page. Everything else is unchanged.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -49,7 +51,7 @@ const U = "http://127.0.0.1:3240";
     const bands = await page.locator(".day-band").allTextContents();
     ok(JSON.stringify(bands) === JSON.stringify(["TodayMonday, October 19", "TomorrowTuesday, October 20", "Earlierthe last few days"]), "three bands: " + bands.join(" | "));
     ok(await page.locator(".plan-day").count() === 0, "no small blue day line inside the cards");
-    ok(await page.locator(".day-band").first().evaluate((e) => getComputedStyle(e).position) === "sticky", "a band stays on top while you scroll its day");
+    ok(await page.locator(".day-band").first().evaluate((e) => getComputedStyle(e).position) !== "sticky" && await page.locator(".day-band").first().evaluate((e) => getComputedStyle(e).backgroundColor) === "rgb(46, 123, 232)", "a band in the app's blue, in the page, scrolling with it");
     const order = await page.evaluate(() => { const at = (sel) => { const e = document.querySelector(sel); return e ? e.getBoundingClientRect().top + scrollY : -1; }; const bs = [...document.querySelectorAll(".day-band")].map((e) => e.getBoundingClientRect().top + scrollY); return { today: bs[0], plan: at("section.cooking"), know: at(".ft-know"), tomorrow: bs[1], tCard: at(".tomorrow-plan"), earlier: bs[2], days: at("section.card.days") }; });
     ok(order.today < order.plan && order.plan < order.know && order.know < order.tomorrow && order.tomorrow < order.tCard && order.tCard < order.earlier && order.earlier < order.days, "Today (plan, Getting to know you), then Tomorrow, then Earlier (the last few days)");
     const asks = page.locator(".missed-ask");
