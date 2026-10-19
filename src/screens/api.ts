@@ -65,6 +65,9 @@ export interface AppApi {
   // the kind of plate, from Today's What's cooking? or the Plate's own row; a saved recipe keeps it
   kind: import("../pilot").PlateKind;
   setKind: (k: import("../pilot").PlateKind) => void;
+  // R22 (0.2.50, board RS21): What is it? Savoury, Sweet as a DaaM (Dessert as a Meal), or Both; null: not picked, all offered
+  plateTaste: import("../dishTaste").PlateTaste | null;
+  setPlateTaste: (t: import("../dishTaste").PlateTaste | null) => void;
   moment: import("../moments").MomentId;
   setMoment: (m: import("../moments").MomentId) => void;
   // R11 (0.2.37): what the plate is for: null (the meal by the clock), "exploring", "snack" or "meal:<slot id>"

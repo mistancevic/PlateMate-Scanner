@@ -38,7 +38,7 @@ export function matchesCraving(words: string[], h: Haystack): boolean {
   const text = norm([h.title, ...h.foods, ...(h.parts ?? [])].join(" "));
   let taste: ReturnType<typeof dishTaste> | undefined;
   return words.every((w) => {
-    if (w === "sweet" || w === "savoury" || w === "savory") { taste ??= dishTaste(h.foods); return taste === (w === "sweet" ? "sweet" : "savoury"); }
+    if (w === "sweet" || w === "daam" || w === "savoury" || w === "savory") { taste ??= dishTaste(h.foods); return taste === (w === "sweet" || w === "daam" ? "sweet" : "savoury"); }
     const alts = ALSO[w] ?? ALSO[stem(w)] ?? [stem(w)];
     return alts.some((a) => text.includes(a));
   });
@@ -70,4 +70,11 @@ export function safeIdeaItem(i: { name?: unknown; grams?: unknown; calories?: un
   if (fats !== null && protein + fats > 101) return null;
   if (calories === 0 && (protein > 0.5 || (fats ?? 0) > 0.5)) return null;
   return { name: name.charAt(0).toUpperCase() + name.slice(1), grams, calories, protein, fats, carbs };
+}
+
+// R22 (0.2.50, board RS21): sweet or DaaM in your words makes the plate a DaaM, savoury makes it savoury, once you take a dish
+export function tasteOfWords(words: string[]): "savoury" | "daam" | null {
+  if (words.some((w) => w === "sweet" || w === "daam")) return "daam";
+  if (words.some((w) => w === "savoury" || w === "savory")) return "savoury";
+  return null;
 }

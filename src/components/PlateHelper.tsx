@@ -10,7 +10,9 @@ import { log } from "../log";
 type Suggestion = { action: "add" | "swap" | "amount"; food: string; replaces: string | null; grams: number | null; calories: number | null; protein: number | null; why: string; known: boolean };
 
 // Help inside the plate: ask about it, get up to three actions, tap one. Closing leaves the plate as it was, plus what you tapped.
-export function PlateHelper({ items, library, pdRef, cap, missing, prefill, apply, close, setError, openTalk, record, safety, ai, onFlag }: {
+export function PlateHelper({ items, library, pdRef, cap, missing, prefill, apply, close, setError, openTalk, record, safety, ai, onFlag, tastes }: {
+  // R22 (0.2.50): your taste chips and words, read with the question
+  tastes?: ReturnType<typeof import("../tasteChips").tasteForReq>;
   items: Ingredient[]; library: Food[]; pdRef: number | null; cap: number | null; missing?: Ingredient | null; prefill?: string;
   apply: (next: Ingredient[], note: string) => void; close: () => void; setError: (m: string) => void; openTalk?: () => void; record?: (q: string, reply: string, plate: string[]) => void;
   safety: Safety; ai: AiState; onFlag: (s: SituationId) => void;
@@ -65,7 +67,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
         question, missing: missing?.food.name,
         plate: items.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein })),
         library: library.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })),
-        target: { pd: pdRef },
+        target: { pd: pdRef }, tastes,
       }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Chef Mealan could not answer.");

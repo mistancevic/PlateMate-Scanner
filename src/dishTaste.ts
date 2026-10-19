@@ -39,3 +39,17 @@ export function heldBackLine(dish: Exclude<DishTaste, null>, names: string[]): s
   const list = names.length <= 1 ? names.join("") : `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
   return `${list} ${names.length === 1 ? "is" : "are"} in your foods, but ${names.length === 1 ? "it doesn't" : "they don't"} go with this ${dish === "sweet" ? "dessert" : "dish"}.`;
 }
+
+// R22 (0.2.50, Milan 22:27 to 23:15, board RS21): What is it? One question in place of Meal or Dessert. Each is a full meal at
+// the PD: Savoury holds sweet foods back, Sweet, a DaaM (Dessert as a Meal) holds savoury ones back, Both holds nothing back
+// and puts a savoury main and a sweet finish on the plate as two parts. A small thing is a Snack, in What is it for.
+export type PlateTaste = "savoury" | "daam" | "both";
+export const PLATE_TASTE_WORD: Record<PlateTaste, string> = { savoury: "Savoury", daam: "Sweet, a DaaM", both: "Both" };
+export const PLATE_TASTE_LINE: Record<PlateTaste, string> = { savoury: "Savoury", daam: "Sweet, a DaaM", both: "Savoury and sweet" };
+// what is offered: the taste picked, else the recipe's own, else nothing held back
+export const offerTaste = (picked: PlateTaste | null, recipe: DishTaste): DishTaste => (picked === "savoury" ? "savoury" : picked === "daam" ? "sweet" : picked === "both" ? null : recipe);
+// the taste a recipe presets, shown as picked until you pick
+export const presetOf = (recipe: DishTaste): PlateTaste | null => (recipe === "sweet" ? "daam" : recipe === "savoury" ? "savoury" : null);
+// Both: a food's part on the plate, the main or the sweet finish
+export const BOTH_PARTS = { main: "Main", sweet: "Sweet finish" } as const;
+export const bothPartOf = (name: string): string => { const t = tasteOf(name); return t === "sweet" || t === "fruit" ? BOTH_PARTS.sweet : BOTH_PARTS.main; };

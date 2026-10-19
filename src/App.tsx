@@ -45,6 +45,7 @@ import { Welcome, AdultOnly } from "./components/Welcome";
 import { openStats } from "./openStats";
 import { merge as mergeRecords, changes as recordChanges, type Known } from "./records";
 import { recipeSig } from "./carry";
+import { bothPartOf } from "./dishTaste";
 import { installBack, pushTab, startTab, tabOfPath, useBack, pathOfTab, MENU_PATH, menuTrailOf, recipeIdOfPath } from "./back";
 import { clearKept } from "./kept";
 import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
@@ -753,6 +754,7 @@ export default function App() {
     // nothing; "snack" is off the plan, unsized; "meal:<slot>" is that meal of today, sized for it and counted by the plan
     [pick, setPick] = useState<string | null>(null),
     [kind, setKind] = useState<PlateKind>("meal"),
+    [plateTaste, setPlateTaste] = useState<import("./dishTaste").PlateTaste | null>(null),
     [usual, setUsualState] = useState<RhythmId[]>(getUsual),
     [region, setRegionState] = useState<RegionId | null>(getRegion),
     [travelTo, setTravelToState] = useState<RegionId | null>(getTravelTo),
@@ -1460,7 +1462,8 @@ export default function App() {
       ...s,
       items: [
         ...s.items,
-        { id: uid(), food: { ...food }, grams: (density(food.protein, food.calories) ?? 0) < 3 ? 50 : 150, locked: false },
+        // R22 (0.2.50): with Both picked, a food goes into the main or the sweet finish
+        { id: uid(), food: { ...food }, grams: (density(food.protein, food.calories) ?? 0) < 3 ? 50 : 150, locked: false, ...(plateTaste === "both" ? { part: bothPartOf(food.name) } : {}) },
       ],
       portion: null,
     }));
@@ -1888,7 +1891,7 @@ export default function App() {
     api, setImage, setEdit, setGoalsOpen, setAccessOpen, setReviewMeal,
     setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
-    pdRef, dayPd, kind, setKind, moment, setMoment: (m: MomentId) => setMomentState(m), pick, setPick, usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
+    pdRef, dayPd, kind, setKind, plateTaste, setPlateTaste, moment, setMoment: (m: MomentId) => setMomentState(m), pick, setPick, usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },
