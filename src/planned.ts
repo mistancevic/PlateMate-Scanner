@@ -81,8 +81,12 @@ export function sumOf(day: Record<string, PlannedMeal> | undefined): { kcal: num
 // Fill a day (0.2.4, canvas S "Chef Mealan, about this screen", H5 and H6): the open slots filled from My recipes and the
 // starters, each with the meal that fits the slot best. The same way of picking as the tip: closest to the day's PD target
 // first, then closest to the slot's share of the day. No AI call; the chat only wraps it in words. A meal is used once a day.
-export type FillRow = { slot: Slot; meal: PlannedMeal; alternatives: PlannedMeal[] };
-export function fillDay(slots: Slot[], held: Record<string, PlannedMeal> | undefined, choices: PlannedMeal[], day: { kcal: number; protein: number } | null, target: number | null): FillRow[] {
+export type FillRow = { slot: Slot; meal: PlannedMeal; alternatives: PlannedMeal[]; why?: string };
+// R20 (0.2.48, board RS19, R20e): how a meal carries you. Among meals that fit about as well, a light one comes first and a
+// heavy one second; one sentence says so when it changed the pick. A heavy meal is never left out.
+export type FillRead = (m: PlannedMeal) => { read: "light" | "heavy" | null; heavy: number } | null | undefined;
+export const CARRY_NUDGE = { light: -0.1, heavy: 0.25 };
+export function fillDay(slots: Slot[], held: Record<string, PlannedMeal> | undefined, choices: PlannedMeal[], day: { kcal: number; protein: number } | null, target: number | null, read?: FillRead): FillRow[] {
   const open = slots.filter((s) => !held?.[s.id]);
   const used = new Set(Object.values(held ?? {}).map((m) => m.title));
   const rows: FillRow[] = [];
@@ -94,10 +98,21 @@ export function fillDay(slots: Slot[], held: Record<string, PlannedMeal> | undef
       const kcalGap = need ? Math.abs(m.kcal - need.kcal) / need.kcal : 0;
       return pdGap + kcalGap;
     };
-    const ranked = choices.filter((m) => !used.has(m.title)).sort((a, b) => score(a) - score(b));
+    const nudge = (m: PlannedMeal) => { const r = read?.(m)?.read; return r ? CARRY_NUDGE[r] : 0; };
+    const free = choices.filter((m) => !used.has(m.title));
+    const plain = [...free].sort((a, b) => score(a) - score(b));
+    let ranked = [...free].sort((a, b) => score(a) + nudge(a) - (score(b) + nudge(b)));
     if (!ranked.length) continue;
+    let why: string | undefined;
+    if (ranked[0] !== plain[0]) {
+      const passed = plain[0], r = read?.(passed);
+      if (r?.read === "heavy") {
+        why = `${passed.title} fits ${slot.name.toLowerCase()} as well, though it left you heavy, tired ${r.heavy === 1 ? "once" : r.heavy === 2 ? "twice" : `${r.heavy} times`}, so it comes second: Change brings it.`;
+        ranked = [ranked[0], passed, ...ranked.slice(1).filter((m) => m !== passed)];
+      } else if (read?.(ranked[0])?.read === "light") why = `${ranked[0].title} keeps you light, so it comes first for ${slot.name.toLowerCase()}.`;
+    }
     used.add(ranked[0].title);
-    rows.push({ slot, meal: ranked[0], alternatives: ranked.slice(1, 4) });
+    rows.push({ slot, meal: ranked[0], alternatives: ranked.slice(1, 4), ...(why ? { why } : {}) });
   }
   return rows;
 }

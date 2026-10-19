@@ -26,6 +26,7 @@ import { log } from "../log";
 import { closeDays, openedToday } from "../metrics";
 import { coverIsDrawn, ownPhotosOf } from "../covers";
 import { recipePhotosOf } from "../photos";
+import { CARRY_WORDS, momentOf } from "../carry";
 import { resizeImageBase64 } from "../utils/image";
 import { CHEF_NAME } from "../components/Mark";
 import type { Feedback, Meal } from "../pilot";
@@ -73,6 +74,10 @@ export function HomeScreen(p: AppApi) {
     return slots.filter((s) => Math.abs(t - toMin(s.time)) <= 120).sort((x, y) => Math.abs(t - toMin(x.time)) - Math.abs(t - toMin(y.time)))[0]?.name ?? "Snack";
   };
   const newest = [...today.logged].sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+  // R20: the moment a meal was eaten in, kept with the answer: the meal, a training or rest day, before or after training
+  const [changingCarry, setChangingCarry] = useState<string | null>(null);
+  const todayPlan = dayFor(p.personal, new Date())?.day ?? getDay(p.personal, new Date()).plan ?? null;
+  const carryMoment = (f: Feedback) => { const w = trainingWhen(todayPlan); return momentOf(whichOf(f), new Date(f.createdAt), todayPlan ? { kind: todayPlan.kind, time: w && w.sort !== "23:59" ? w.sort : null } : null); };
   const eatenAs = (() => { const w = [...today.logged].sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1)).map((f) => (whichOf(f) === "Snack" ? "a snack" : whichOf(f).toLowerCase())); const t = w.length <= 1 ? w.join("") : `${w.slice(0, -1).join(", ")} and ${w[w.length - 1]}`; return t.charAt(0).toUpperCase() + t.slice(1); })();
   const makeNext = () => { if (!next) return; if (held[next.id] && !held[next.id].skipped) { eatFrom(next.id); return; } p.setPick(`meal:${next.id}`); setStep("in"); setTab("journey"); };
   const logMeal = () => { p.setPick(null); setStep("in"); setTab("journey"); };
@@ -358,17 +363,19 @@ export function HomeScreen(p: AppApi) {
               </div>
             )}
             <CoverAsk f={f} recipe={r} p={p} />
+            {/* R20 (0.2.48, board RS19): the question on the meal's own card, full width under the photo and the numbers; the
+                answer stays on it, with Change for a wrong tap */}
+            {(carryDue(f) || changingCarry === f.id)
+              ? <div className="carry-in" aria-label={`How did ${f.meal.title} carry you?`}>
+                  <small className="carry-q">How did it carry you?</small>
+                  <div className="carry-acts">
+                    {(["light", "fine", "heavy"] as const).map((k) => (
+                      <button key={k} type="button" className={`pill pill-small ${f.carry?.how === k ? "pill-done" : ""}`} onClick={() => { p.setCarry(f.id, k, carryMoment(f)); setChangingCarry(null); }}>{CARRY_WORDS[k]}</button>
+                    ))}
+                  </div>
+                </div>
+              : f.carry && <small className="carry-in carry-done">Carried you: <b>{CARRY_WORDS[f.carry.how]}</b> · <button type="button" className="link in-inline" onClick={() => setChangingCarry(f.id)}>Change</button></small>}
           </section>,
-          carryDue(f) && (
-            <section className="card log-card carry-card" key={`carry-${f.id}`}>
-              <div className="card-top"><span>How did it carry you?</span><small>30 min after {f.meal.title}</small></div>
-              <div className="button-row" style={{ marginTop: 8 }}>
-                {([["light", "Light and awake"], ["fine", "Fine"], ["heavy", "Heavy, tired"]] as const).map(([k, l]) => (
-                  <button key={k} className="pill pill-small" onClick={() => p.setCarry(f.id, k)}>{l}</button>
-                ))}
-              </div>
-            </section>
-          ),
         ];
       })}
       {/* R18: tomorrow, the same card; its rows and its button open Plan on tomorrow */}
