@@ -1,10 +1,10 @@
 // What is in the slots (0.2.2, canvas S "Plan purpose one" and H7): a meal per slot per date, with its numbers, so the day
 // adds up before anything is cooked. A meal comes from My recipes, Coach's recipes, Chef Mealan's starters, or the Plate.
-import { aggregate, density, type Ingredient, type Meal } from "./pilot";
+import { aggregate, density, servingsOf, type Ingredient, type Meal } from "./pilot";
 import type { Slot } from "./slots";
 
 export type Source = "mine" | "coach" | "starter" | "plate";
-export type PlannedMeal = { title: string; kcal: number; protein: number; source: Source; mealId?: string; items?: Ingredient[]; portion?: number;
+export type PlannedMeal = { title: string; kcal: number; protein: number; source: Source; mealId?: string; items?: Ingredient[]; portion?: number; servings?: number;
   // 0.2.6 (canvas board CW, CW7): skipped on purpose; the meal counts as closed for a day lived by the plan
   skipped?: boolean };
 export type Planned = Record<string, Record<string, PlannedMeal>>; // by date (ymd), then by slot id
@@ -12,6 +12,22 @@ export type Planned = Record<string, Record<string, PlannedMeal>>; // by date (y
 const KEY = "chefmealan-planned";
 export const getPlanned = (): Planned => { try { return JSON.parse(localStorage.getItem(KEY) || "{}"); } catch { return {}; } };
 export const storePlanned = (p: Planned) => { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch {} };
+// R21 (0.2.49, board RS20): a recipe planned before 0.2.49 kept the numbers of the portion saved in grams (649 kcal for a
+// fritter the recipe counts at 650); read again, it counts one of what the recipe makes, as every screen now does
+export function refreshPlanned(p: Planned, meals: Meal[]): Planned {
+  const byId = new Map(meals.map((m) => [m.id, m]));
+  let changed = false;
+  const next: Planned = {};
+  for (const [date, day] of Object.entries(p)) {
+    next[date] = {};
+    for (const [slot, m] of Object.entries(day)) {
+      const r = m.mealId && !m.servings ? byId.get(m.mealId) : undefined;
+      if (r && servingsOf(r) > 1) { const f = fromMeal(r, m.source); next[date][slot] = { ...m, kcal: f.kcal, protein: f.protein, servings: f.servings }; changed = true; }
+      else next[date][slot] = m;
+    }
+  }
+  return changed ? next : p;
+}
 // put a meal in a slot, or empty it with null; a date with nothing left disappears
 export function withPlanned(p: Planned, date: string, slotId: string, meal: PlannedMeal | null): Planned {
   const day = { ...(p[date] ?? {}) };
@@ -26,17 +42,19 @@ export function withPlanned(p: Planned, date: string, slotId: string, meal: Plan
 export function plannedPortion(m: PlannedMeal, id: string, savedAt: string): Meal | null {
   if (!m.items?.length) return null;
   const weight = m.items.reduce((n, i) => n + (i.grams > 0 ? i.grams : 0), 0);
-  const ratio = m.portion && weight > 0 ? Math.min(1, m.portion / weight) : 1;
-  const items = m.items.map((i) => ({ ...i, grams: Math.round(i.grams * ratio * 10) / 10 }));
+  const ratio = m.servings && m.servings > 1 ? 1 / m.servings : m.portion && weight > 0 ? Math.min(1, m.portion / weight) : 1;
+  const items = m.items.map((i) => ({ ...i, grams: i.grams * ratio }));
   // the portion is the foods' own weight, never rounded past it: a stored meal heavier than its foods is not read back
   return { id, title: m.title, items, portion: items.reduce((n, i) => n + i.grams, 0), savedAt };
 }
 
 // a recipe as a planned meal: its numbers at the portion saved
+// R21 (0.2.49): a recipe that makes several counts one of them, the recipe divided by what it makes, as the Plate does
 export function fromMeal(m: Meal, source: Source): PlannedMeal {
   const t = aggregate(m.items);
-  const ratio = m.portion && t.weight > 0 ? Math.min(1, m.portion / t.weight) : 1;
-  return { title: m.title, kcal: Math.round((t.calories ?? 0) * ratio), protein: Math.round((t.protein ?? 0) * ratio), source, mealId: m.id, items: m.items, portion: m.portion };
+  const n = servingsOf(m);
+  const ratio = n > 1 ? 1 / n : m.portion && t.weight > 0 ? Math.min(1, m.portion / t.weight) : 1;
+  return { title: m.title, kcal: Math.round((t.calories ?? 0) * ratio), protein: Math.round((t.protein ?? 0) * ratio), source, mealId: m.id, items: m.items, portion: m.portion, ...(n > 1 ? { servings: n } : {}) };
 }
 
 // Chef Mealan's starters: a few meals so a plan can start before any recipe exists. Removable later; seeded per market later.

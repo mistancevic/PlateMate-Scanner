@@ -65,7 +65,7 @@ import { weighInsOff } from "./weight";
 import { fixedOf } from "./components/FormulaCard";
 import { coachDemoOn } from "./coachDemo";
 import { getCoachLocal, setCoachLocal, notesOf, checkinOf, type CoachLocal, type CoachNote } from "./coachNotes";
-import { getPlanned, storePlanned, withPlanned, plannedPortion, type Planned, type PlannedMeal } from "./planned";
+import { getPlanned, refreshPlanned, storePlanned, withPlanned, plannedPortion, type Planned, type PlannedMeal } from "./planned";
 import type { Filling } from "./screens/api";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, withTarget, lifestyleOf, dayFor, type Personal, type DayType, type Day, type NextGoal } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
@@ -780,7 +780,7 @@ export default function App() {
     // what the chat opened for (0.2.4): "fill" shows the day filled at once
     [talkAsk, setTalkAsk] = useState<"fill" | null>(null),
     // the slots' meals (0.2.2) and the slot a plate is being made for
-    [planned, setPlannedState] = useState<Planned>(getPlanned),
+    [planned, setPlannedState] = useState<Planned>(() => refreshPlanned(getPlanned(), state.meals)),
     [filling, setFilling] = useState<Filling | null>(null),
     // the recipe the plate came from (a slot or Recipes, Open), so a new name on the Plate renames it at once
     [plateRecipeId, setPlateRecipeId] = useState<string | null>(null),

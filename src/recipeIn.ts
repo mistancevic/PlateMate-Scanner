@@ -204,8 +204,10 @@ export function scaleTo<T extends { grams: number; food: Pick<Food, "calories"> 
   return whole.map((i) => ({ ...i, grams: roundGrams(i.grams * k) }));
 }
 // The recipe's own portion: the whole divided by how many it makes
+// R21 (0.2.49, board RS20): one portion keeps the exact grams, so its kcal is the recipe's divided by what it makes; the Plate
+// shows the grams to a tenth
 export const onePortion = <T extends { grams: number; food: Pick<Food, "calories"> }>(whole: T[], servings: number): T[] =>
-  whole.map((i) => ({ ...i, grams: roundGrams(i.grams / Math.max(1, servings)) }));
+  whole.map((i) => ({ ...i, grams: i.grams / Math.max(1, servings) }));
 // Sized for the meal only when that is between half and one and a half of the recipe's own portion; else the recipe's
 // own portion, so nobody is asked to bake 40% of a cookie (0.2.17)
 export const sizedFits = (mealKcal: number | null, portionKcal: number) => !!mealKcal && portionKcal > 0 && mealKcal / portionKcal >= 0.5 && mealKcal / portionKcal <= 1.5;
