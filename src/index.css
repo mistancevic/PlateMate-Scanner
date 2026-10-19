@@ -1752,3 +1752,16 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 /* out of sight, still read and reached by keyboard (R19: a swipe's actions) */
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 .sr-only button:focus { position: static; }
+/* R20 (0.2.48, board RS19): How did it carry you? on the meal's own card, full width under the photo and the numbers (Milan
+   18:15); the three answers in one row. The meal's page: How it carries you. */
+.log-card.with-photo > .carry-in, .log-card > .carry-in { grid-column: 1 / -1; display: block; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+.carry-in .carry-q { display: block; font-weight: 800; }
+.carry-acts { display: flex; gap: 8px; margin-top: 8px; }
+.carry-acts .pill { flex: 1 1 auto; justify-content: center; white-space: nowrap; padding-left: 10px; padding-right: 10px; }
+.rq-carry { padding: 12px 14px; }
+.rq-carry small { display: block; }
+.rq-carry .carry-row { margin-top: 4px; }
+.rq-carry .carry-row.before { color: var(--muted); }
+.rq-carry .carry-read { margin-top: 8px; font-weight: 700; }
+.carry-light { color: var(--top); font-weight: 800; }
+.carry-heavy { color: #b36b00; font-weight: 800; }

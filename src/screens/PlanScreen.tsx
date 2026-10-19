@@ -1,3 +1,4 @@
+import { carryReads } from "../carry";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { ChevronRight, ChefHat, Pencil } from "lucide-react";
 import type { AppApi, Filling } from "./api";
@@ -219,11 +220,14 @@ function PickSheet({ p, slot, slots, day, target, unit, held, close, put, onPlat
   const need = needOf(slots, slot, day);
   const mine = p.state.meals.filter((m) => m.from !== "coach").map((m) => ({ meal: m, planned: fromMeal(m, "mine") }));
   const coach = p.state.meals.filter((m) => m.from === "coach").map((m) => ({ meal: m, planned: fromMeal(m, "coach") }));
+  // R20 (0.2.48, board RS19, R20d): a meal with a clear answer says so where you pick it
+  const reads = carryReads(p.state.meals, p.state.feedback);
   const row = (m: PlannedMeal, k: string, pick: () => void) => {
     const fit = fitOf(m, target, unit);
+    const read = m.mealId ? reads.get(m.mealId)?.read : null;
     return (
       <button key={k} type="button" className="menu-row pick-row" onClick={pick}>
-        <div className="menu-row-text"><b>{m.title}</b><small>{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein</small></div>
+        <div className="menu-row-text"><b>{m.title}</b><small>{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein</small>{read && <small className={read === "light" ? "carry-light" : "carry-heavy"}>{read === "light" ? "Light for you" : "Heavy for you"}</small>}</div>
         <div className={`pick-pd ${fit.state}`}><b>{pdVal(fit.pd)}</b><small>{fit.text}</small></div>
       </button>
     );

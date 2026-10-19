@@ -22,6 +22,7 @@ import { sig } from "../photos";
 import { CHEF_NAME } from "./Mark";
 import { partsOf, cleanPart, leanFood } from "../parts";
 import { NutritionCard } from "./NutritionCard";
+import { CarryBlock } from "./CarryBlock";
 import { portionsIn } from "../pilot";
 
 // The recipe's own page in the app (0.2.5+r11, canvas board S3, R8 to R11, approved 12 October 2026). Photos first: the
@@ -230,6 +231,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         </section>
       )}
       {!edit && <NutritionCard tableOnly items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={meal.stated ?? null} pdRef={pdRef ?? null} fitPd={fitPd} />}
+      {!edit && <CarryBlock meal={meal} cards={cards} />}
       <section className={`card rq-steps ${edit ? "editing" : ""}`}>
         <b>Steps</b>
         {edit

@@ -1,3 +1,4 @@
+import { carryReads } from "../carry";
 import { useEffect, useRef, useState } from "react";
 import { Camera, Send } from "lucide-react";
 import { aggregate, density, solveIngredient, uid, type Ingredient, type Food } from "../pilot";
@@ -72,11 +73,12 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   const choices: PlannedMeal[] = [...state.meals.map((m) => fromMeal(m, m.from === "coach" ? "coach" : "mine")), ...STARTERS];
   const target = numbers ? density(numbers.protein, numbers.kcal) : pdRef;
   const fillNow = () => {
-    const rows = fillDay(slots, held, choices, numbers, target);
+    const reads = carryReads(state.meals, state.feedback);
+    const rows = fillDay(slots, held, choices, numbers, target, (m) => (m.mealId ? reads.get(m.mealId) : null));
     const sum = sumOf(Object.fromEntries(rows.map((r) => [r.slot.id, r.meal])));
     const heldSum = sumOf(held);
     const text = rows.length
-      ? `${dayName === "today" ? "Today" : dayName}, filled: ${rows.map((r) => `${r.slot.name} ${r.meal.title}`).join(", ")}. The day lands at ${fmt(sum.kcal + heldSum.kcal, 0)} kcal and ${fmt(sum.protein + heldSum.protein, 0)} g protein${numbers ? ` of ${fmt(numbers.kcal, 0)} and ${numbers.protein}` : ""}. Change one, or put them in.`
+      ? `${dayName === "today" ? "Today" : dayName}, filled: ${rows.map((r) => `${r.slot.name} ${r.meal.title}`).join(", ")}. The day lands at ${fmt(sum.kcal + heldSum.kcal, 0)} kcal and ${fmt(sum.protein + heldSum.protein, 0)} g protein${numbers ? ` of ${fmt(numbers.kcal, 0)} and ${numbers.protein}` : ""}. Change one, or put them in.${rows.some((r) => r.why) ? ` ${rows.map((r) => r.why).filter(Boolean).join(" ")}` : ""}`
       : "Every slot is set already.";
     setTurns((t) => [...t, { role: "you", text: `Fill ${dayName === "today" ? "today" : dayName}` }, { role: "mealan", text, fill: rows.length ? { date: planDate, dayName, rows } : undefined }]);
   };

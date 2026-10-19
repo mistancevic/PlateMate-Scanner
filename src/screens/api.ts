@@ -180,7 +180,7 @@ export interface AppApi {
   useCardAsCover: (cardId: string, recipeId: string) => void;
   // Members (0.2.11, board CO, CO2 to CO4b): a member's recipe on the plate at your portion, or kept in Mine
   takeMember: (r: import("../members").SharedRecipe, how: "make" | "keep", portion?: import("../pilot").Ingredient[]) => void;
-  setCarry: (id: string, how: "light" | "fine" | "heavy") => void;
+  setCarry: (id: string, how: "light" | "fine" | "heavy", moment?: import("../carry").CarryMoment) => void;
   user: import("../cloud").CloudUser | null;
   cloudEnabled: boolean;
   cloudStatus: { ok: boolean; text: string; at?: string };

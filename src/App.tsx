@@ -44,6 +44,7 @@ import { Starting } from "./components/Starting";
 import { Welcome, AdultOnly } from "./components/Welcome";
 import { openStats } from "./openStats";
 import { merge as mergeRecords, changes as recordChanges, type Known } from "./records";
+import { recipeSig } from "./carry";
 import { installBack, pushTab, startTab, tabOfPath, useBack, pathOfTab, MENU_PATH, menuTrailOf, recipeIdOfPath } from "./back";
 import { clearKept } from "./kept";
 import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
@@ -2201,9 +2202,13 @@ export default function App() {
       });
       notify("Saved in My recipes.");
     },
-    setCarry: (id: string, how: "light" | "fine" | "heavy") => {
-      log("carry", { how });
-      setState((s) => ({ ...s, feedback: s.feedback.map((x) => (x.id === id ? { ...x, carry: { how, at: new Date().toISOString() } } : x)) }));
+    // R20 (0.2.48): the answer keeps its moment and the recipe's foods as they were; a change of answer (Change) is not counted again
+    setCarry: (id: string, how: "light" | "fine" | "heavy", moment?: import("./carry").CarryMoment) => {
+      const f = state.feedback.find((x) => x.id === id);
+      if (!f?.carry) log("carry", { how });
+      const r = f ? state.meals.find((m) => m.id === f.recipeId) ?? state.meals.find((m) => m.id === f.meal?.id || m.title === f.meal?.title) : null;
+      const sig = r ? recipeSig(r) : undefined;
+      setState((s) => ({ ...s, feedback: s.feedback.map((x) => (x.id === id ? { ...x, carry: { how, at: new Date().toISOString(), ...(moment ? { moment } : {}), ...(sig ? { sig } : {}) } } : x)) }));
     },
     shareCard: (id: string, reason: "look" | "ok" | "help") => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, shared: { reason, at: new Date().toISOString() } } : f)) }));

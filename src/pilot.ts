@@ -195,7 +195,9 @@ export type Feedback = {
   prep?: { went: "as" | "not"; different?: string };
   ate?: "all" | "portion";
   // how the meal carried the person, asked on Today 30 minutes after (M1 activity 8, 10 October 2026)
-  carry?: { how: "light" | "fine" | "heavy"; at: string };
+  // R20 (0.2.48, board RS19): the moment it was eaten in, and the recipe's foods as they were (recipeSig), so an answer from
+  // before a change stops counting
+  carry?: { how: "light" | "fine" | "heavy"; at: string; moment?: { meal: string; day?: "training" | "rest"; training?: "before" | "after" }; sig?: string };
   // eaten for a slot of the plan (0.2.3, canvas S Today through the day): by the plan; a card without a slot is extra
   slot?: { date: string; slotId: string; name: string; time: string };
 };
