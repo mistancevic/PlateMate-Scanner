@@ -45,7 +45,7 @@ import { Welcome, AdultOnly } from "./components/Welcome";
 import { openStats } from "./openStats";
 import { merge as mergeRecords, changes as recordChanges, type Known } from "./records";
 import { recipeSig } from "./carry";
-import { bothPartOf } from "./dishTaste";
+import { bothPartOf, dishTaste, presetOf } from "./dishTaste";
 import { installBack, pushTab, startTab, tabOfPath, useBack, pathOfTab, MENU_PATH, menuTrailOf, recipeIdOfPath } from "./back";
 import { clearKept } from "./kept";
 import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
@@ -2042,6 +2042,8 @@ export default function App() {
     openRecipePage: (id: string) => { setLanding({ id, line: "", quiet: true }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
     openOnPlate: (meal: Meal) => {
       setFilling(null); setPlateRecipeId(meal.id);
+      // R22 fix (0.2.51): a recipe presets What is it? from its foods, a one-portion recipe too (the quark pudding: a DaaM)
+      setPlateTaste(presetOf(dishTaste(meal.items.map((i) => i.food.name))));
       // a recipe that came in from a screenshot or a link opens as it did the first time (0.2.19, IM13): the Plate does it
       if (meal.makes) setState((s) => ({ ...s, title: meal.title, items: [], portion: null, optional: undefined, leftOut: undefined, emptyParts: undefined, openRecipe: meal.id }));
       else setState((s) => ({ ...s, title: meal.title, items: asDish(meal), portion: null, fromRecipe: undefined, leftOut: undefined, emptyParts: undefined, optional: optAt(meal.optional, 1 / portionsIn(meal), uid) }));

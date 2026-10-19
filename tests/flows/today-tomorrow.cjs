@@ -4,6 +4,8 @@
 // the main button when the day is done; both open Plan on tomorrow. Today went by the plan, and the day's record, only when
 // no slot of today is still to come; until then: Breakfast eaten, by the plan, and the open slots. Never rewrite these lines
 // to fit a change.
+// Changed by story R24 (Milan 00:06 to 00:16, board RS24): the day is said in its band, Today or Tomorrow with the date, not
+// as a line inside the card. Everything else is unchanged.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -43,9 +45,9 @@ const U = "http://127.0.0.1:3235";
   try {
     const page = await open({ "2026-10-19": { breakfast: planned(crepes, "mine") }, "2026-10-20": { breakfast: planned(crepes, "mine"), lunch: planned(pudding, "coach") } });
     await page.goto(U + "/"); await page.waitForTimeout(1300);
-    ok(/Today: Monday, October 19/.test(await text(page, "section.cooking")), "the plan card says which day: Today: Monday, October 19");
+    ok(/^TodayMonday, October 19$/.test((await page.locator(".day-band").first().textContent()).trim()), "Today says which day, in its band: Today, Monday, October 19");
     const tm = await text(page, ".tomorrow-plan");
-    ok(/Tomorrow: Tuesday, October 20/.test(tm) && /Breakfast, 07:30 ?DaaM good protein crêpes/.test(tm) && /Lunch, 13:45 ?Chocolate quark pudding/.test(tm) && /Dinner, 20:00 ?Pick a meal ?One slot open/.test(tm), "the Tomorrow card: its slots and meals, an open slot as Pick a meal: " + tm.slice(0, 160));
+    ok(/^TomorrowTuesday, October 20$/.test((await page.locator(".day-band").nth(1).textContent()).trim()) && /Breakfast, 07:30 ?DaaM good protein crêpes/.test(tm) && /Lunch, 13:45 ?Chocolate quark pudding/.test(tm) && /Dinner, 20:00 ?Pick a meal ?One slot open/.test(tm), "the Tomorrow card: its slots and meals, an open slot as Pick a meal: " + tm.slice(0, 160));
     ok(/Check tomorrow ?2 of 3 planned · Plan, Tuesday/.test(tm), "tomorrow is planned: Check tomorrow");
     ok(await page.evaluate(() => { const meals = [...document.querySelectorAll("p.label")].find((x) => x.textContent === "Today's meals"), t = document.querySelector(".tomorrow-plan"); return !!meals && !!t && Boolean(meals.compareDocumentPosition(t) & Node.DOCUMENT_POSITION_FOLLOWING); }), "the Tomorrow card sits under today's meals");
     // 10:00, breakfast eaten: lunch and dinner still to come, so the day has not gone by the plan yet
@@ -65,7 +67,7 @@ const U = "http://127.0.0.1:3235";
     // nothing planned for tomorrow
     const p2 = await open({ "2026-10-19": { breakfast: planned(crepes, "mine") } });
     await p2.goto(U + "/"); await p2.waitForTimeout(1300);
-    ok(/Tomorrow: Tuesday, October 20 ?Plan tomorrow ?Nothing planned so far · Set Tuesday's meals/.test(await text(p2, ".tomorrow-plan")) && await p2.locator(".tomorrow-plan .plan-slot-row").count() === 0, "nothing planned tomorrow: Plan tomorrow, no slots");
+    ok(/^TomorrowTuesday, October 20$/.test((await p2.locator(".day-band").nth(1).textContent()).trim()) && /Plan tomorrow ?Nothing planned so far · Set Tuesday's meals/.test(await text(p2, ".tomorrow-plan")) && await p2.locator(".tomorrow-plan .plan-slot-row").count() === 0, "nothing planned tomorrow: Plan tomorrow, no slots");
     await at(p2, "2026-10-19T23:00:00");
     ok(await p2.locator(".next-meal").getByRole("button", { name: "Plan tomorrow", exact: true }).count() === 1, "and the main button says Plan tomorrow");
     await p2.locator(".tomorrow-plan").getByRole("button", { name: /Plan tomorrow/ }).click(); await p2.waitForTimeout(700);

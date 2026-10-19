@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
 import { hit } from "../metrics";
 import { Mark, APP_NAME } from "../components/Mark";
+import { DayVideo } from "./LandingScreen";
 
 // /built, How Chef Mealan is built (canvas board B, B1 to B7, 12 October 2026): the build story for hiring managers,
 // linked from the home page and the footer. Public, signed in or not. The home page stays for people with a plan.
@@ -9,7 +10,7 @@ import { Mark, APP_NAME } from "../components/Mark";
 const VERSION = String(import.meta.env.VITE_VERSION ?? "");
 const FIX_ROUNDS = Number(/\+r(\d+)$/.exec(VERSION)?.[1] ?? 0);
 // walkthroughs: the files in tests/flows that run on their own (not the helpers, not the paths runner): node scripts/run-flows.cjs --count
-export const BUILT_FACTS = { unitTests: 283, walkthroughs: 78 };
+export const BUILT_FACTS = { unitTests: 283, walkthroughs: 79 };
 
 type Tag = "code" | "ai" | "data";
 type Part = { x: number; y: number; w: number; t: string; s: string; tag: Tag; what: string; why: string; built: string };
@@ -229,6 +230,11 @@ export function BuiltScreen() {
         <span>{BUILT_FACTS.unitTests} unit tests<small>and {BUILT_FACTS.walkthroughs} walkthroughs</small></span>
         <span>Model evals<small>judge model and coach labels</small></span>
       </div>
+
+      {/* R23 (0.2.51, board RS22): the app at work, the same minute as on the home page */}
+      <h2>See it work</h2>
+      <p className="bt-sub">About a minute of the real app, recorded by a script on test data: Today, Plan, a craving, a recipe from a link, and how a meal carried you.</p>
+      <div className="l-moments"><DayVideo src="/landing/day-all.mp4" poster="/landing/day-all.webp" big label="All five, about a minute: Today, Plan, a craving, a recipe from a link, and how a meal carried you" /></div>
 
       <h2>The blueprint</h2>
       <p className="bt-sub">Tap a part to see what the part does and the decision behind the part. Or follow one craving through the whole system.</p>
