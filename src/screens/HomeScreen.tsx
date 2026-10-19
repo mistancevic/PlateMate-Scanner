@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { ChefHat, Camera, ChevronRight, Check, Pencil, Utensils } from "lucide-react";
 import { aggregate, density } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
@@ -145,6 +145,8 @@ export function HomeScreen(p: AppApi) {
   const todayLine = (d: PlanDay) => (minor ? schoolLine(d) : dayKindOf(d, ls) === "study" ? studyLine({ ...d, study: true }) : planLine(d));
   return (
     <>
+      {/* R24 (0.2.51, board RS24): the day stays in sight while you scroll: Today, Tomorrow, Earlier */}
+      <DayBand day="Today" date={longDate(new Date(now))} />
       <section className="plan">
         {/* the goal is the headline and the way in; whose and who set it is one small line above it */}
         <div className="plan-goal">
@@ -289,7 +291,6 @@ export function HomeScreen(p: AppApi) {
       {inbox}
       <section className="card cooking">
         <div className="card-top cooking-top"><span><ChefHat size={18} /> What's in the plan</span></div>
-        <small className="plan-day">Today: {longDate(new Date(now))}</small>
         {!hasPlanToday && (
           <button className="menu-row plan-row-link" onClick={() => setTab("plan")}>
             <div className="menu-row-text"><small>Nothing planned so far</small><b>Go to Plan</b><small>Set the day's meals, and they wait here</small></div><ChevronRight size={18} />
@@ -311,11 +312,27 @@ export function HomeScreen(p: AppApi) {
             </div>
           );
           const fit = fitOf(m, p.dayPd, unit);
+          // R24 (0.2.51, board RS24): a planned meal whose time has passed asks, under its row, the card's full width
+          const missed = sl.id !== next?.id && toMin(sl.time) <= nowMin;
           return (
-            <PlanRow key={sl.id} className="plan-row-link plan-slot-row" label={`${sl.name}, ${sl.time}`} title={m.title} photo={pictureOfRecipe(recipeOf(m))}
+            <Fragment key={sl.id}>
+            <PlanRow className="plan-row-link plan-slot-row" label={`${sl.name}, ${sl.time}`} title={m.title} photo={pictureOfRecipe(recipeOf(m))}
               ariaLabel={`${sl.name} at ${sl.time}, ${m.title}`}
               sub={<>{SOURCE[m.source]}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</>}
               onOpen={() => openSlotMeal(key, sl, m, () => eatFrom(sl.id))} onSwap={() => swapOn(key, sl.id)} onRight={() => p.fill(key, sl.id, { ...m, skipped: true })} rightLabel="Skip" swapName={`Swap ${sl.name.toLowerCase()}`} rightName={`Skip ${sl.name.toLowerCase()} on purpose`} />
+            {missed && (
+              <div className="missed-ask" role="group" aria-label={`${sl.name}, ${sl.time}: did you have it?`}>
+                <small>{sl.time} has passed. Did you have it?</small>
+                <div className="button-row">
+                  {m.items?.length
+                    ? <button type="button" className="pill pill-small pill-primary" onClick={() => p.logPlanned(m, { date: key, slotId: sl.id, name: sl.name, time: sl.time })}><Check size={14} /> I ate it</button>
+                    : null}
+                  <button type="button" className="pill pill-small" onClick={() => eatFrom(sl.id)}>{m.items?.length ? "Change it" : "Make it on the Plate"}</button>
+                  <button type="button" className="pill pill-small" onClick={() => p.fill(key, sl.id, { ...m, skipped: true })}>Skipped it</button>
+                </div>
+              </div>
+            )}
+            </Fragment>
           );
         })}
         {hasPlanToday && !dayDone && rec.empty.length > 0 && (
@@ -374,10 +391,13 @@ export function HomeScreen(p: AppApi) {
           </section>,
         ];
       })}
-      {/* R18: tomorrow, the same card; its rows and its button open Plan on tomorrow */}
+      {/* R5: Getting to know you is about logging; R24: it stays with today */}
+      {p.measured?.phase && <KnowCard m={p.measured} openGoal={toBurn} />}
+      {/* R18: tomorrow, the same card; its rows and its button open Plan on tomorrow; R24: under its own band */}
+      <DayBand day="Tomorrow" date={longDate(tomorrow)} />
       <section className="card tomorrow-plan" aria-label="Tomorrow's plan">
         <div className="card-top cooking-top"><span><ChefHat size={18} /> What's in the plan</span></div>
-        <small className="plan-day">Tomorrow: {longDate(tomorrow)}{tWhen ? ` · ${tWhen.phrase}` : ""}</small>
+        {tWhen && <small className="muted plan-when">{tWhen.phrase.charAt(0).toUpperCase() + tWhen.phrase.slice(1)}</small>}
         {tHeld > 0 && tSlots.map((sl) => {
           const m = tPlan[sl.id];
           const fit = m ? fitOf(m, p.dayPd, unit) : null;
@@ -399,8 +419,8 @@ export function HomeScreen(p: AppApi) {
           <div className="menu-row-text"><b>{tHeld ? "Check tomorrow" : "Plan tomorrow"}</b><small>{tHeld ? `${Math.min(tHeld, tSlots.length)} of ${tSlots.length} planned · Plan, ${tWeekday}` : `Nothing planned so far · Set ${tWeekday}'s meals`}</small></div><ChevronRight size={18} />
         </button>
       </section>
-      <p className="label">The last few days</p>
-      <section className="card days">
+      <DayBand day="Earlier" date="the last few days" />
+      <section className="card days" aria-label="The last few days">
         {past.map((d) => (
           <div className="history-row" key={d.day.toISOString()}>
             <div><b>{dayLabel(d.day)}</b><small>{d.dayType ? dayNameAny(d.dayType) : "No kind of day was set"}</small></div>
@@ -408,10 +428,12 @@ export function HomeScreen(p: AppApi) {
           </div>
         ))}
       </section>
-      {/* R5: Getting to know you is about logging, not today's target: below the last days */}
-      {p.measured?.phase && <KnowCard m={p.measured} openGoal={toBurn} />}
     </>
   );
+}
+// R24 (0.2.51, board RS24): a dark band with the day and its date, on top while you scroll through that day
+function DayBand({ day, date }: { day: string; date: string }) {
+  return <div className="day-band" role="heading" aria-level={2}><b>{day}</b><span>{date}</span></div>;
 }
 // R5: a list's numbers; fat and carbs count what is known, and gap says a food has no value for them
 function sumOf(items: Feedback["meal"]["items"]) {

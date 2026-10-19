@@ -1770,3 +1770,18 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .plate-taste-line { font-weight: 800; }
 .taste-card .taste-group .label { margin: 10px 0 4px; }
 .taste-card .taste-words { min-height: 60px; }
+/* R24 (0.2.51, board RS24): the day bands on Today; a missed meal asks under its row */
+.day-band { position: sticky; top: calc(64px + env(safe-area-inset-top, 0px)); z-index: 20; background: #172742; color: #fff; border-radius: 12px; padding: 10px 14px; margin: 14px 0 10px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; box-shadow: 0 4px 12px rgba(23, 39, 66, .2); }
+.day-band b { font-size: 20px; }
+.day-band span { font-weight: 700; text-align: right; }
+.missed-ask { padding: 10px 2px 12px; border-bottom: 1px solid var(--line); }
+.missed-ask small { display: block; font-weight: 800; }
+.missed-ask .button-row { margin-top: 8px; justify-content: flex-end; }
+.plan-when { display: block; margin-top: 2px; }
+/* R23 (0.2.51, board RS22): the home page's moments, each with its clip */
+.l-moments .l-video { margin: 14px auto 0; }
+.l-moments .l-video-all { width: 280px; }
+.l-moments .l-video-one { width: 220px; border-width: 6px; border-radius: 24px; }
+.l-moment { margin-top: 34px; }
+.l-moment h3 { margin: 4px 0 6px; font-size: 22px; }
+@media (min-width: 900px) { .l-moments { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; } .l-moments > .l-eyebrow, .l-moments > h2, .l-moments > .l-video-all { grid-column: 1 / -1; } }

@@ -65,17 +65,20 @@ export function LandingScreen() {
         </div>
       </section>
 
-      <section className="l-steps">
-        <span className="l-eyebrow">How it works</span>
-        <h2>Plan the day, eat by it, and get help when it changes</h2>
-        <div className="l-split">
-          <ol className="l-numbered">
-            <li><b>Plan your day</b><p>Pick a meal for each slot: breakfast, lunch, dinner. Your own recipes, your coach's, or Chef Mealan's starters. Or let Chef Mealan fill the open slots.</p></li>
-            <li><b>Eat by the plan</b><p>Today shows the next meal. One tap opens the meal, Save counts the meal. At the end of the day you see how much of the day went by the plan.</p></li>
-            <li><b>When the day changes</b><p>A lunch out, a craving, a food you didn't plan. Scan the food or ask Chef Mealan, and the plate or the next meal is fitted to your numbers.</p></li>
-          </ol>
-          <AppVideo />
-        </div>
+      {/* R23 (0.2.51, board RS22): what Chef Mealan does for you, five moments of the day, each with a short clip of the real
+          app recorded on test data; all five joined on top. In place of How it works and Your week. */}
+      <section className="l-steps l-moments">
+        <span className="l-eyebrow">In your day</span>
+        <h2>What Chef Mealan does for you</h2>
+        <DayVideo src="/landing/day-all.mp4" poster="/landing/day-all.webp" big label="All five, about a minute: Today, Plan, a craving, a recipe from a link, and how a meal carried you" />
+        {MOMENTS.map((m, k) => (
+          <div className="l-moment" key={m.title}>
+            <span className="l-eyebrow">{m.when}</span>
+            <h3>{m.title}</h3>
+            <p>{m.line}</p>
+            <DayVideo src={`/landing/day-${k + 1}.mp4`} poster={`/landing/day-${k + 1}.webp`} label={`${m.title}: ${m.line}`} />
+          </div>
+        ))}
       </section>
 
       {recipes.length > 0 && (
@@ -87,15 +90,6 @@ export function LandingScreen() {
           <a className="l-all" href="/recipes">All recipes →</a>
         </section>
       )}
-
-      <section className="l-week">
-        <span className="l-eyebrow">Your week</span>
-        <h2>Plan your usual week once</h2>
-        <div className="l-split">
-          <p>Tell Chef Mealan what a normal week looks like: the days you train, what you do, and at what time. On training days you get more food, and on rest days less, without counting anything yourself. If one day turns out different, you change only that day.</p>
-          <PhoneWeek />
-        </div>
-      </section>
 
       <section className="l-coach">
         <span className="l-eyebrow">With your coach</span>
@@ -153,9 +147,16 @@ export function LandingScreen() {
   );
 }
 
-// How it works (board B, V1, 12 October 2026): 28 seconds of the real app, recorded by a script on a seeded day
-// (scripts in the design scratchpad, recVideo.cjs). Silent, loops, plays only while on screen.
-function AppVideo() {
+// R23 (0.2.51, board RS22): the moments and their clips, recorded by a script on a seeded day (recordClips.cjs in the design
+// scratchpad, board RS23). Silent, loops, plays only while on screen; a still frame until then.
+const MOMENTS = [
+  { when: "Every day", title: "Eat by your plan today", line: "Today shows the next meal. One tap logs it as planned, and the day counts against the plan." },
+  { when: "Sunday evening", title: "Plan your week in minutes", line: "Chef Mealan fills the open slots with your meals. Swipe one to swap it, or to skip it." },
+  { when: "When a craving hits", title: "Make what you crave fit", line: "Type chocolate PD 7+. Your DaaM, Dessert as a Meal, comes up, fitted to your target." },
+  { when: "When you find a recipe", title: "Bring it in", line: "Paste a link or a screenshot. The foods, one portion's numbers and the PD are worked out." },
+  { when: "After a meal", title: "Learn what works for you", line: "Thirty minutes after a meal: how did it carry you? Two answers that agree, and Chef Mealan picks with them." },
+];
+export function DayVideo({ src, poster, label, big }: { src: string; poster: string; label: string; big?: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     const v = ref.current; if (!v || typeof IntersectionObserver === "undefined") return;
@@ -163,28 +164,15 @@ function AppVideo() {
     io.observe(v); return () => io.disconnect();
   }, []);
   return (
-    <figure className="l-video">
-      {/* MP4 first for Safari; WebM for a browser without H.264 */}
-      <video ref={ref} poster="/landing/chef-mealan-app.webp" muted loop playsInline preload="metadata"
-        aria-label="Chef Mealan on a phone: Today, Plan, a breakfast fitted to the target on the Plate, saved, and counted on Today">
-        <source src="/landing/chef-mealan-app.mp4" type="video/mp4" />
-        <source src="/landing/chef-mealan-app.webm" type="video/webm" />
+    <figure className={`l-video ${big ? "l-video-all" : "l-video-one"}`}>
+      <video ref={ref} poster={poster} muted loop playsInline preload="metadata" aria-label={label}>
+        {/* MP4 first for Safari; WebM for a browser without H.264 */}
+        <source src={src} type="video/mp4" />
+        <source src={src.replace(/\.mp4$/, ".webm")} type="video/webm" />
       </video>
     </figure>
   );
 }
-// The Training week stays a drawing of the screen, so the drawing stays right when the app's text changes.
-function PhoneWeek() {
-  const rows: [string, string, string][] = [["Mon", "Strength, hard · evening", "var(--top)"], ["Tue", "Rest", "#c9d3e6"], ["Wed", "Cardio, moderate · morning", "var(--high)"], ["Thu", "Yoga, light · evening", "var(--mid)"], ["Fri", "Strength, moderate · morning", "var(--high)"], ["Sat", "Mobility, light · during the day", "var(--mid)"], ["Sun", "Rest", "#c9d3e6"]];
-  return (
-    <div className="l-phone-draw" aria-label="Drawing of the Training week">
-      <b className="l-ph-title">Training week</b>
-      {rows.map(([d, t, c]) => <div key={d} className="l-ph-row"><span style={{ background: c }} /><b>{d}</b><small>{t}</small></div>)}
-    </div>
-  );
-}
-// The calculator (board HP, HP5 and HP6, 12 October 2026): the app's own lift for a few fixed foods, Recomposition only,
-// already answered with granola and skyr; the foods offered follow the craving, sweet or savoury; nothing is saved
 function TryIt() {
   // the calculator used: counted once per visit, at the first pick
   const counted = useRef(false);
