@@ -2,6 +2,8 @@
 // A protein cheesecake from Instagram, read by Chef Mealan (faked here: no AI key), in three parts with an optional chocolate
 // in the topping: the plate in parts (IM15), Leave it out and Put it back (IM16b), Change one part (IM16), + Add inside a part,
 // the steps part by part (IM17). Then a bowl of your own put into parts on the plate, kept with its parts (IM18, IM18b).
+// Changed by story R21 (Milan 22:27, board RS20): one slice is the recipe divided by what it makes, from the exact grams, so
+// the kcal read one lower (284, 175, 301). Everything else is unchanged.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -64,10 +66,10 @@ const U = "http://127.0.0.1:3211";
   const top = await text(page, '.plate-card [aria-label="Part: Topping"]');
   ok(/1 food, 1 optional/.test(top) && /Dark chocolate/.test(await text(page, ".plate-card .rows")) && await page.getByRole("button", { name: "Add Dark chocolate" }).count() === 1 && await page.locator(".pt-optlist").count() === 0, "IM15: the optional chocolate sits inside the topping, with + Add");
   const k0 = await kcalOf(page);
-  ok(k0 === 285, `IM15: one slice, 285 kcal (${k0})`);
+  ok(k0 === 284, `IM15: one slice, 284 kcal (${k0})`);
   // IM16b: Leave it out on the base, then Put it back
   await page.locator('.plate-card [aria-label="Part: Base"]').getByRole("button", { name: "Leave it out" }).click(); await page.waitForTimeout(400);
-  ok(JSON.stringify(await heads(page)) === JSON.stringify(["Base, left out", "Filling", "Topping"]) && await kcalOf(page) === 176 && !/Digestive biscuits/.test(await text(page, ".plate-card .rows")), `IM16b: the base left out with its numbers: 176 kcal (${await kcalOf(page)})`);
+  ok(JSON.stringify(await heads(page)) === JSON.stringify(["Base, left out", "Filling", "Topping"]) && await kcalOf(page) === 175 && !/Digestive biscuits/.test(await text(page, ".plate-card .rows")), `IM16b: the base left out with its numbers: 175 kcal (${await kcalOf(page)})`);
   ok(await page.locator('.plate-card [aria-label="Part: Filling"]').getByRole("button", { name: "Leave it out" }).count() === 1, "IM16b: the filling can still go");
   await page.locator('.plate-card [aria-label="Part: Filling"]').getByRole("button", { name: "Leave it out" }).click(); await page.waitForTimeout(300);
   ok(await page.locator('.plate-card [aria-label="Part: Topping"]').getByRole("button", { name: "Leave it out" }).count() === 0, "IM16b: the last part with foods can't be left out");
@@ -82,7 +84,7 @@ const U = "http://127.0.0.1:3211";
   ok(await kcalOf(page) === k0 && (await heads(page))[1] === "Filling", "IM16: Back to the original undoes it");
   // + Add inside a part: one slice's share
   await page.getByRole("button", { name: "Add Dark chocolate" }).click(); await page.waitForTimeout(400);
-  ok(/Dark chocolate/.test(await text(page, '.plate-card .pt-group:nth-child(3)')) && /optional, added/.test(await text(page, ".plate-card .rows")) && await kcalOf(page) === 302, `IM12b: the chocolate in the topping, 3 g: 302 kcal (${await kcalOf(page)})`);
+  ok(/Dark chocolate/.test(await text(page, '.plate-card .pt-group:nth-child(3)')) && /optional, added/.test(await text(page, ".plate-card .rows")) && await kcalOf(page) === 301, `IM12b: the chocolate in the topping, 3 g: 301 kcal (${await kcalOf(page)})`);
   // IM17: the steps part by part, on the recipe page
   let stepsReq = null;
   await page.route("**/api/steps", (r) => { stepsReq = JSON.parse(r.request().postData() || "{}"); r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({

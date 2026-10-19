@@ -99,10 +99,21 @@ export function portionsIn(m: Meal): number {
   const total = m.items.reduce((n, i) => n + i.grams, 0);
   return m.portion && total > m.portion * 1.5 ? Math.max(2, Math.round(total / m.portion)) : 1;
 }
+// R21 (0.2.49, board RS20): how many the recipe makes, as it says (12 fritters), else as the plate divides it; one portion is
+// the recipe divided by it, from the exact grams, on the Plate, Plan, the tile, the recipe page and Today alike
+export const servingsOf = (m: Pick<Meal, "items" | "portion" | "makes">): number => (m.makes?.n && m.makes.n >= 1 ? m.makes.n : portionsIn(m as Meal));
 export function asDish(m: Meal): Ingredient[] {
-  const of = portionsIn(m);
+  const of = servingsOf(m);
   if (m.items.length < 2 || of < 2) return structuredClone(m.items);
-  return m.items.map((i) => ({ ...structuredClone(i), locked: true, grams: Math.round(i.grams / of), dish: { id: m.id, title: m.title, of, n: 1, base: i.grams / of } }));
+  return m.items.map((i) => ({ ...structuredClone(i), locked: true, grams: i.grams / of, dish: { id: m.id, title: m.title, of, n: 1, base: i.grams / of } }));
+}
+// one portion's numbers, for a tile or a line: One fritter · 650 kcal · 8 g protein · PD 1.2
+export function portionOf(m: Meal): { n: number; word: string; kcal: number; protein: number; pd: number | null } | null {
+  const t = aggregate(m.items);
+  if (t.calories === null || t.protein === null || t.calories <= 0) return null;
+  const n = servingsOf(m);
+  const word = m.makes?.unit && n > 1 ? m.makes.unit.replace(/ies$/, "y").replace(/(?<!s)s$/, "") : "portion";
+  return { n, word, kcal: t.calories / n, protein: t.protein / n, pd: (100 * t.protein) / t.calories };
 }
 export type Goals = Nutrition;
 // What the Publish sheet keeps while a recipe is being made ready for its page (board RG1): a draft, never public

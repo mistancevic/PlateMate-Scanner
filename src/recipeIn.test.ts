@@ -44,7 +44,8 @@ test("IM4: your portion: sized for a 933 kcal dinner, 84% of one pizza; or the r
   const sized = scaleTo(pizza, 933);
   assert.deepEqual(sized.map((i) => i.grams), [210, 83, 105, 8, 2]);
   assert.equal(Math.round(pdOf(sized)! * 10) / 10, 4.2);
-  assert.deepEqual(onePortion(pizza, 2).map((i) => i.grams), [250, 100, 125, 10, 3]);
+  // R21 (0.2.49): one portion keeps the exact grams, so it is exactly the recipe divided by what it makes
+  assert.deepEqual(onePortion(pizza, 2).map((i) => i.grams), [250, 100, 125, 10, 2.5]);
   // R15 (0.2.41): a tiny amount keeps its tenth of a gram, so one portion is one share of the recipe
   assert.deepEqual([0.3, 0.08, 4.4, 22.5, 99.4, 102].map(roundGrams), [0.3, 0.1, 4, 23, 99, 100]);
 });

@@ -1,10 +1,11 @@
+import { portionOf } from "../pilot";
 import { Utensils, ChevronRight, Check } from "lucide-react";
 import { draftSteps } from "../draftSteps";
 import { canDrawCover } from "../covers";
 import { equipmentOf } from "../personal";
 import type { StepMark } from "../pilot";
 import type { Meal } from "../pilot";
-import { fmt } from "../ui";
+import { fmt, pdText } from "../ui";
 import type { AppApi, MealFrom } from "./api";
 import { showPlanOn } from "./PlanScreen";
 import { ymd } from "../plan";
@@ -253,7 +254,8 @@ export function RecipesScreen(p: AppApi) {
               : <div className="recipe-tile-blank"><span><Utensils size={28} />{m.cover?.state === "tomorrow" && <small>Picture tomorrow</small>}</span></div>}
             <div className="recipe-tile-body">
               <div className="card-top"><b className="tile-name">{m.title}</b><ChevronRight size={20} className="tile-go" /></div>
-              <small>{m.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}{rating ? ` · ${rating}` : ""}{n ? ` · made ${n === 1 ? "once" : `${n} times`}` : ""}</small>
+              {/* R21 (0.2.49, board RS20): a tile says what one portion is; the foods are on the recipe's page */}
+              <small>{(() => { const o = portionOf(m); return o ? `One ${o.word} · ${fmt(o.kcal, 0)} kcal · ${fmt(o.protein, 0)} g protein · ${pdText(o.pd)}${o.n > 1 ? ` · makes ${o.n}` : ""}` : `${m.items.length} ${m.items.length === 1 ? "food" : "foods"}`; })()}{rating ? ` · ${rating}` : ""}{n ? ` · made ${n === 1 ? "once" : `${n} times`}` : ""}</small>
               {m.idea && <small className="tile-state">{CHEF_NAME}'s idea, not made yet</small>}
               {m.members && <small className="tile-state live">Shared with members</small>}
               {st && <small className={`tile-state ${st}`}>{st === "live" ? "Live on chefmealan.com" : st === "down" ? "Taken down" : st === "waiting" ? `Waiting for ${approver}` : st === "back" ? `Sent back by ${approver}` : "Draft"}</small>}

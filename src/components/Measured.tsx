@@ -23,7 +23,8 @@ export function KnowCard({ m, openGoal }: { m: Measured; openGoal: () => void })
   const weighed = m.squares.filter((s) => s.weighed).length;
   return (
     <section className="card ft-card ft-know">
-      <small className="ft-caps">GETTING TO KNOW YOU · DAY {m.day} OF {WINDOW}</small>
+      {/* R21 (0.2.49, board RS20): past day 14 the count is over the last 14 days, and the card says so */}
+      <small className="ft-caps">GETTING TO KNOW YOU · {m.day! > WINDOW ? "THE LAST 14 DAYS" : `DAY ${m.day} OF ${WINDOW}`}</small>
       <b className="ft-ask">Log every meal, and weigh in most mornings.</b>
       <Squares m={m} />
       <Legend />
@@ -77,7 +78,7 @@ export function BurnCard({ m, formulaKcal, name, inUse, onUse }: { m: Measured; 
   if (!m.ready) {
     return (
       <section className="card ft-card ft-burn ft-wait">
-        <small className="ft-caps">{whose} BURN, MEASURED{m.day ? ` · DAY ${m.day} OF ${WINDOW}` : ""}</small>
+        <small className="ft-caps">{whose} BURN, MEASURED{m.day ? (m.day > WINDOW ? " · THE LAST 14 DAYS" : ` · DAY ${m.day} OF ${WINDOW}`) : ""}</small>
         <b style={{ fontSize: 16 }}>Not enough data yet</b>
         <Squares m={m} />
         <Bar label="Full days" have={m.fullDays} need={NEED_FULL} />

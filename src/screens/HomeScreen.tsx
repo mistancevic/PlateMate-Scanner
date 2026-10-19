@@ -329,11 +329,7 @@ export function HomeScreen(p: AppApi) {
       {dayDone && (
         <section className="plan day-record">
           <div className="plan-top"><span>{new Date().toLocaleDateString("en", { weekday: "long" })}, the record</span><span>{rec.extras.length ? `${rec.extras.length} extra` : "by the plan"}</span></div>
-          <div className="plan-row">
-            <div><b>{pdVal(rec.pd)}</b><small>{pdTag()}{p.dayPd !== null ? `, target ${pdVal(p.dayPd)}` : ""}</small></div>
-            <div><b>{fmt(rec.kcal, 0)}</b><small>{p.todayKcal ? `of ${fmt(p.todayKcal, 0)} kcal` : "kcal"}</small></div>
-            <div><b>{fmt(rec.protein, 0)}</b><small>{p.todayMacros?.protein ? `of ${fmt(p.todayMacros.protein, 0)} g protein` : "g protein"}</small></div>
-          </div>
+          {/* R21 (0.2.49, board RS20): the numbers are on the goal card at the top, once; the record keeps its line */}
           <small className="record-line">{recordLine(rec)}{p.profile.coachId ? " Your coach sees this line on Friday." : ""}</small>
         </section>
       )}

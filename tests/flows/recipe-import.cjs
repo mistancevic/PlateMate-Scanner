@@ -4,6 +4,8 @@
 // Change the dish (the first try fails the checks and goes back once), Add on the side (your way first, a side that
 // can't reach the target left out), Did it work? after cooking. A link from Instagram is refused with the next step.
 // Changed by story R16 (Milan 21:08, board RS15): one pizza's numbers and PD are in the PD block on the read, not a small line.
+// Changed by story R21 (Milan 22:27, board RS20): one pizza keeps the exact grams, 2.5 g of the 5 g, shown to a tenth.
+// Everything else is unchanged.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -101,7 +103,7 @@ const U = "http://127.0.0.1:3209";
   ok(m.title === "Margherita pizza" && m.source.name === "@account_name on Instagram" && m.source.from === "screenshot" && m.makes.n === 2 && (Array.isArray(m.shots) ? m.shots.length === 2 : m.source.shotSigs.length === 2), "IM6: saved in Mine with where it came from, how many it makes and the two screenshots");
   ok(!m.photo && !(m.photos ?? []).length, "IM6: a screenshot is never the recipe's photo or cover");
   await page.getByRole("button", { name: "One pizza, as the recipe makes it" }).click(); await page.waitForTimeout(400);
-  ok(JSON.stringify(await grams()) === JSON.stringify([250, 100, 125, 10, 3]), "IM4: 1 of 2 pizzas: the recipe's own portion");
+  ok(JSON.stringify(await grams()) === JSON.stringify([250, 100, 125, 10, 2.5]), "IM4: 1 of 2 pizzas: the recipe's own portion");
   await page.getByRole("button", { name: "Sized for your dinner" }).click(); await page.waitForTimeout(400);
 
   // IM5: change the dish: the first try fails the checks and goes back once, with the reason

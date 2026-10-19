@@ -78,8 +78,10 @@ export function measure(o: { days: Record<string, DayIn>; weighIns: WeighIn[] | 
   const kcal = ate !== null && ln ? r10(ate - ln.slope * KCAL_PER_KG) : null;
   const half = ln && Number.isFinite(ln.se) ? Math.max(MIN_HALF, r10(ln.se * KCAL_PER_KG)) : MIN_HALF;
   const ready = enough && kcal !== null;
+  // R21 (0.2.49, board RS20): the squares are the days counted: the first 14 from the start, after day 14 the last 14, today last
+  const sq0 = s && day! <= WINDOW ? dayNo(s) : f;
   const squares: Square[] = s ? Array.from({ length: WINDOW }, (_, i) => {
-    const n = dayNo(s) + i, k = ymdOf(n), d = o.days[k];
+    const n = sq0 + i, k = ymdOf(n), d = o.days[k];
     return { date: k, state: n === t ? "today" : n > t ? "todo" : d?.full ? "full" : "part", weighed: (o.weighIns ?? []).some((w) => w.date === k) };
   }) : [];
   return {
