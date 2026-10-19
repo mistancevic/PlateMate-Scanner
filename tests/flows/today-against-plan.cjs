@@ -72,7 +72,8 @@ const open = async (state, at = "2026-10-18T12:20:00") => {
     await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(800);
     const planned = await text(".next-planned");
     ok(/Protein cheesecake/.test(planned) && /As planned · \d+ kcal · \d+ g protein/.test(planned) && await page.locator(".next-planned .log-photo").count() === 1, "R16: what comes next is the planned meal, with its picture and numbers: " + planned);
-    ok(await page.locator(".next-meal").getByRole("button", { name: "Change it on the Plate" }).count() === 1, "R16: Change it on the Plate is a tap away");
+    // Changed by story R19 (board RS18): the planned meal's two buttons sit on its card: I ate it, Change it
+    ok(await page.locator(".next-planned").getByRole("button", { name: "Change it", exact: true }).count() === 1, "R16: Change it, the Plate, is a tap away, on the card");
     await page.getByRole("button", { name: "I ate it", exact: true }).click(); await page.waitForTimeout(600);
     const first = (await page.locator(".log-card").filter({ has: page.locator(".meal-which") }).first().textContent()).replace(/\s+/g, " ");
     ok(new RegExp(nextName, "i").test(await page.locator(".log-card .meal-which").first().textContent()) && /By the plan/.test(first), "the newest meal comes first and says which meal: " + first.slice(0, 80));

@@ -1732,3 +1732,23 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 /* R18 (0.2.46, board RS17): which day the plan card is for; a meal eaten by the plan while slots are still to come */
 .cooking .plan-day, .tomorrow-plan .plan-day { display: block; font-weight: 800; color: var(--brand-text); margin: -2px 0 6px; }
 .cooking .plan-eaten { display: block; margin: 0 0 4px; }
+
+/* R19 (0.2.47, board RS18): one rule for meals. A planned meal: its small photo, which slot, the title as the link; the whole
+   row opens the meal; a swipe, as on the Plate, swaps or skips. The next meal is a card you tap, its buttons on the right. */
+.meal-thumb { width: 44px; height: 44px; flex: none; border-radius: 10px; object-fit: cover; }
+.meal-thumb.recipe-tile-blank { display: flex; align-items: center; justify-content: center; height: 44px; }
+.plan-meal-row { display: flex; align-items: center; gap: 12px; cursor: pointer; width: 100%; }
+.plan-meal-row .menu-row-text { flex: 1; min-width: 0; }
+.plan-meal-row .menu-row-text .plan-meal-title { color: var(--brand-text); }
+.plan-day .plan-meal-row { padding: 12px 16px; border-top: 1px solid var(--line); border-bottom: 0; color: var(--muted); }
+.swipe-fg:has(> .plan-meal-row) { background: var(--surface); }
+.next-planned { flex-wrap: wrap; cursor: pointer; align-items: center; }
+.next-planned .next-planned-go { flex: none; color: var(--muted); }
+.next-planned .next-planned-acts { flex-basis: 100%; justify-content: flex-end; margin-top: 2px; }
+.next-meal .next-log { display: block; margin: 4px auto 0; }
+.log-card-open { cursor: pointer; }
+.rq-slot { padding: 12px 14px; margin: 6px 0 10px; display: flex; flex-direction: column; gap: 8px; }
+.rq-slot-line { font-weight: 800; color: var(--brand-text); }
+/* out of sight, still read and reached by keyboard (R19: a swipe's actions) */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.sr-only button:focus { position: static; }

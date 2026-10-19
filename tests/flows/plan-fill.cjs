@@ -2,6 +2,8 @@
 // The day picked is next week's Monday, never today, so the lines say Monday's whatever day the run falls on (12 October 2026: a run on a Monday read Today's).
 // recipes and Chef Mealan's starters with their PD marks, a meal in the slot with fits or the amber gap, Fit it on the Plate
 // with the slot on the plan line, Put it in the slot from the Plate, the day as planned adding up, emptying a slot.
+// Changed by story R19 (Milan 06:04 to 06:41, board RS18): a tap on a planned meal opens the meal; Pick a meal opens with a
+// swipe to the left (Swap). An open slot still opens Pick a meal on a tap.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -61,12 +63,12 @@ seed.items = [];
   let meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.length);
   ok(meals === 3, "and it is saved to My recipes");
   // back to the Plate from the slot and in again: the same recipe, not a second copy
-  await page.getByRole("button", { name: /Breakfast at .*Morning skyr/ }).click(); await page.waitForTimeout(400);
+  await require("./swipe.cjs")(page, page.getByRole("button", { name: /Breakfast at .*Morning skyr/ }), "left"); // R19: a planned meal opens on a tap; a swipe left swaps
   await page.locator(".pick-sheet").getByRole("button", { name: /Morning skyr/ }).click(); await page.waitForTimeout(400);
   meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.length);
   ok(meals === 3, "picking it again from the sheet keeps one copy");
   // Make it as it is from the first step: a plate that cannot reach the target goes in as it stands
-  await page.getByRole("button", { name: /Lunch at .*Chicken/ }).click(); await page.waitForTimeout(400);
+  await require("./swipe.cjs")(page, page.getByRole("button", { name: /Lunch at .*Chicken/ }), "left"); // R19: a planned meal opens on a tap; a swipe left swaps
   await page.getByRole("button", { name: "Create a new meal on the Plate" }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: /^Add$/ }).first().click(); await page.waitForTimeout(300);
   await page.locator(".row-food", { hasText: "Leibniz" }).getByRole("button").click(); await page.waitForTimeout(300);
@@ -111,7 +113,7 @@ seed.items = [];
   await page.locator(".pick-sheet").getByRole("button", { name: /Skyr bowl/ }).first().click(); await page.waitForTimeout(400);
   ok(/all slots set/.test(await page.locator(".plan-top").textContent()), "all slots set");
   ok(/my recipe/.test(await page.locator(".plan-slot-wrap").nth(2).textContent()), "Dinner says my recipe");
-  await page.getByRole("button", { name: /Dinner at .*Skyr bowl/ }).click(); await page.waitForTimeout(400);
+  await require("./swipe.cjs")(page, page.getByRole("button", { name: /Dinner at .*Skyr bowl/ }), "left"); // R19: a planned meal opens on a tap; a swipe left swaps
   ok(/Skyr bowl is in this slot/.test(await page.locator(".pick-why").textContent()), "the sheet says what is in the slot");
   await page.getByRole("button", { name: "Empty this slot" }).click(); await page.waitForTimeout(400);
   ok(/1 slot open/.test(await page.locator(".plan-top").textContent()), "emptied: 1 slot open");

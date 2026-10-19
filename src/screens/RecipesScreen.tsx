@@ -1,11 +1,13 @@
-import { Utensils, ChevronRight } from "lucide-react";
+import { Utensils, ChevronRight, Check } from "lucide-react";
 import { draftSteps } from "../draftSteps";
 import { canDrawCover } from "../covers";
 import { equipmentOf } from "../personal";
 import type { StepMark } from "../pilot";
 import type { Meal } from "../pilot";
 import { fmt } from "../ui";
-import type { AppApi } from "./api";
+import type { AppApi, MealFrom } from "./api";
+import { showPlanOn } from "./PlanScreen";
+import { ymd } from "../plan";
 import { useEffect, useRef, useState } from "react";
 import { useKept } from "../kept";
 import { PublishSheet, unpublishedOf, type Published } from "../components/PublishSheet";
@@ -118,9 +120,11 @@ export function RecipesScreen(p: AppApi) {
   const opened = openId ? state.meals.find((m) => m.id === openId) ?? null : null;
   // IM23c (0.2.23): after How was it, the recipe the meal made or changed opens here, with one line for today
   const [landed, setLanded] = useState<{ id: string; line: string; title?: string; back?: "recipes" } | null>(null);
+  // R19 (0.2.47, board RS18): a meal opened from Today or Plan: the way back, and the slot it is planned for with its buttons
+  const [cameFrom, setCameFrom] = useState<{ id: string; from: MealFrom } | null>(null);
   useEffect(() => {
     const l = p.landing; if (!l) return;
-    if (state.meals.some((m) => m.id === l.id)) { setView("mine"); setOpenId(l.id); if (!l.quiet) setLanded(l); }
+    if (state.meals.some((m) => m.id === l.id)) { setView("mine"); setOpenId(l.id); if (!l.quiet) setLanded(l); setCameFrom(l.from ? { id: l.id, from: l.from } : null); }
     p.clearLanding();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p.landing]);
@@ -189,11 +193,12 @@ export function RecipesScreen(p: AppApi) {
           <section className="card dl-done rq-landed" role="status">
             <div className="card-top"><b>{landed.title ?? "✓ Saved in Mine"}</b>{/* R6: saved from Recipes, the way back is the Recipes list */}{landed.back === "recipes" ? <button className="link" onClick={() => { setLanded(null); setOpenId(null); }}>Recipes</button> : <button className="link" onClick={() => { setLanded(null); setOpenId(null); setTab("home"); }}>Today</button>}</div>
             {landed.line && <small className="muted">{landed.line}</small>}
-          </section>) : null}
+          </section>) : cameFrom && cameFrom.id === opened.id && cameFrom.from.slot ? <SlotBar p={p} from={cameFrom.from} back={() => { const tab = cameFrom.from.tab; setCameFrom(null); setOpenId(null); p.setTab(tab); }} /> : null}
+        backLabel={cameFrom && cameFrom.id === opened.id ? (cameFrom.from.tab === "home" ? "Today" : "Plan") : undefined}
         openOriginal={opened.basedOn && state.meals.some((m) => m.id === opened.basedOn!.id) ? () => { setLanded(null); setOpenId(opened.basedOn!.id); } : null}
         onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
         onDelete={<DeleteRecipe key={`del-${opened.id}`} plan={deletePlan(opened, state, published[opened.id] ?? null)} slug={published[opened.id]?.slug ?? null} approver={approver} run={(c) => deleteRecipe(opened, c)} />}
-        close={() => { setOpenId(null); setLanded(null); }}
+        close={() => { const back = cameFrom && cameFrom.id === opened.id ? cameFrom.from.tab : null; setOpenId(null); setLanded(null); setCameFrom(null); if (back) p.setTab(back); }}
         tryPhoto={testOn ? async (model: string) => {
           const r = await fetch("/api/cover", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ test: true, style: "photo", model, recipeId: opened.id, title: opened.title, items: opened.items.filter((i) => i.grams > 0).map((i) => ({ name: i.food.name, grams: i.grams })) }), signal: AbortSignal.timeout(90000) });
           const d = await r.json().catch(() => ({}));
@@ -258,5 +263,35 @@ export function RecipesScreen(p: AppApi) {
       })}
       {sheet}
     </>
+  );
+}
+
+// R19 (0.2.47, board RS18): a meal opened from a slot says which slot, with that slot's buttons on top. From today's plan:
+// I ate it, Change it on the Plate, and Swap it, Skip it today for when you don't swipe. From Plan or tomorrow: Swap it,
+// Empty the slot. Each goes back where you came from.
+function SlotBar({ p, from, back }: { p: AppApi; from: MealFrom; back: () => void }) {
+  const sl = from.slot;
+  const m = sl ? p.planned[sl.date]?.[sl.slotId] : undefined;
+  if (!sl || !m || m.skipped) return null;
+  const swap = () => { showPlanOn(sl.date, sl.slotId); p.setTab("plan"); };
+  if (from.tab === "home" && sl.date === ymd(new Date())) return (
+    <section className="card rq-slot" aria-label="In today's plan">
+      <small className="rq-slot-line">{sl.name}, {sl.time} · by the plan · today</small>
+      <div className="button-row">
+        {m.items?.length ? <button type="button" className="pill pill-small pill-primary" onClick={() => { p.logPlanned(m, sl); back(); }}><Check size={14} /> I ate it</button> : null}
+        <button type="button" className="pill pill-small" onClick={() => p.fillOnPlate({ date: sl.date, slotId: sl.slotId, name: sl.name, time: sl.time, dayName: "today", mealId: m.mealId, mode: "eat" }, m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : null, m.title)}>Change it on the Plate</button>
+      </div>
+      <small><button type="button" className="link in-inline" onClick={swap}>Swap it</button> · <button type="button" className="link in-inline" onClick={() => { p.fill(sl.date, sl.slotId, { ...m, skipped: true }); back(); }}>Skip it today</button></small>
+    </section>
+  );
+  const day = new Date(`${sl.date}T12:00:00`).toLocaleDateString("en", { weekday: "long" });
+  return (
+    <section className="card rq-slot" aria-label="In the plan">
+      <small className="rq-slot-line">{day}'s {sl.name.toLowerCase()}, {sl.time} · in the plan</small>
+      <div className="button-row">
+        <button type="button" className="pill pill-small" onClick={swap}>Swap it</button>
+        <button type="button" className="pill pill-small" onClick={() => { p.fill(sl.date, sl.slotId, null); back(); }}>Empty the slot</button>
+      </div>
+    </section>
   );
 }

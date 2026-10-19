@@ -106,7 +106,9 @@ export interface AppApi {
   // Recipes, Open (0.2.3): the recipe on the Plate with its name as the title, nothing decided yet
   openOnPlate: (meal: Meal) => void;
   // after How was it (0.2.23, IM23c): open a recipe on Recipes with one line for today
-  landing: { id: string; line: string; title?: string; quiet?: boolean; back?: "recipes" } | null;
+  landing: { id: string; line: string; title?: string; quiet?: boolean; back?: "recipes"; from?: MealFrom } | null;
+  // R19 (0.2.47): a meal opened from Today or Plan, with the slot it is planned for
+  openMeal: (id: string, from: MealFrom) => void;
   clearLanding: () => void;
   // R8 (0.2.31): the recipe named by the address, /my-recipes/<id>
   openFromPath: string | null;
@@ -211,3 +213,5 @@ export interface AppApi {
 }
 
 export type DbProduct = { code: string; name: string; brand: string; quantity: string; kcal: number | null; protein: number | null };
+// R19 (0.2.47, board RS18): where a meal's page was opened from, and the slot it is planned for
+export type MealFrom = { tab: "home" | "plan"; slot?: { date: string; slotId: string; name: string; time: string } };

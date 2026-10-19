@@ -8,6 +8,8 @@ import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
 import { STARTERS, fitOf, fromMeal, needOf, sumOf, type PlannedMeal } from "../planned";
 import { CHEF_NAME } from "../components/Mark";
+import { PlanRow } from "../components/PlanRow";
+import { pictureOfRecipe } from "../components/MealPicture";
 import { DayEditor } from "../components/DayEditor";
 import { dayLog } from "../today";
 import { dayRecord } from "../record";
@@ -31,7 +33,9 @@ let remembered: string | null = null;
 // the day Plan shows, for the chef's context (0.2.4)
 export const planDateShown = () => remembered ?? ymd(new Date());
 // R18 (0.2.46): Today's Check tomorrow and Plan tomorrow open Plan on that day
-export const showPlanOn = (d: string) => { remembered = d; };
+export const showPlanOn = (d: string, slotId?: string) => { remembered = d; pickOnArrival = slotId ?? null; };
+// R19 (0.2.47): Swap on Today opens Plan on that day with Pick a meal open for the slot
+let pickOnArrival: string | null = null;
 
 export function PlanScreen(p: AppApi) {
   const today = new Date();
@@ -55,6 +59,9 @@ export function PlanScreen(p: AppApi) {
   const slots = slotsOn(lifestyle, p.personal.timesOn, key);
   const training = dayFor(p.personal, date)?.day ?? getDay(p.personal, date).plan ?? null;
   const rows = rowsOf(slots, training);
+  // R19: arriving from a Swap on Today, Pick a meal opens for that slot, once
+  useEffect(() => { if (pickOnArrival) { const sl = slots.find((x) => x.id === pickOnArrival); pickOnArrival = null; if (sl) setOpen(sl); } // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const numbers = p.numbersFor(date);
   const tWhen = trainingWhen(training);
   const isToday = key === ymd(today);
@@ -110,16 +117,21 @@ export function PlanScreen(p: AppApi) {
           const fit = m ? fitOf(m, target, unit) : null;
           return (
             <div key={r.slot.id} className={`plan-slot-wrap ${fit?.state === "under" ? "plan-slot-under" : ""}`}>
-              <button type="button" className={`menu-row plan-slot ${m ? "plan-slot-set" : ""}`} aria-label={m ? `${r.slot.name} at ${r.slot.time}, ${m.title}` : `${r.slot.name} at ${r.slot.time}, pick a meal`} onClick={() => setOpen(r.slot)}>
-                <span className="plan-time">{r.slot.time}</span>
-                <div className="menu-row-text">
-                  <small>{r.slot.name}</small>
-                  {m ? <b>{m.title}</b> : <b className="plan-pick">Pick a meal</b>}
-                  {m?.skipped && <small className="plan-slot-sub skipped-mark">Skipped on purpose</small>}
-                  {m && fit && !m.skipped && <small className="plan-slot-sub">{SOURCE[m.source]} · {fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</small>}
-                </div>
-                <ChevronRight size={18} />
-              </button>
+              {/* R19 (0.2.47, board RS18): a planned meal is a row you tap to see it, swipe to Swap or Empty; the time is in its line */}
+              {m && !m.skipped
+                ? <PlanRow className="plan-slot plan-slot-set" label={`${r.slot.name}, ${r.slot.time}`} title={m.title} photo={pictureOfRecipe(m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null)}
+                    ariaLabel={`${r.slot.name} at ${r.slot.time}, ${m.title}`}
+                    sub={fit ? <>{SOURCE[m.source]} · {fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</> : null}
+                    onOpen={() => { const rec = m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null; if (rec) p.openMeal(rec.id, { tab: "plan", slot: { date: key, slotId: r.slot.id, name: r.slot.name, time: r.slot.time } }); else setOpen(r.slot); }}
+                    onSwap={() => setOpen(r.slot)} onRight={() => p.fill(key, r.slot.id, null)} rightLabel="Empty" swapName={`Swap ${r.slot.name.toLowerCase()}`} rightName={`Empty ${r.slot.name.toLowerCase()}`} />
+                : <button type="button" className={`menu-row plan-slot ${m ? "plan-slot-set" : ""}`} aria-label={m ? `${r.slot.name} at ${r.slot.time}, ${m.title}` : `${r.slot.name} at ${r.slot.time}, pick a meal`} onClick={() => setOpen(r.slot)}>
+                    <div className="menu-row-text">
+                      <small>{r.slot.name}, {r.slot.time}</small>
+                      {m ? <b>{m.title}</b> : <b className="plan-pick">Pick a meal</b>}
+                      {m?.skipped && <small className="plan-slot-sub skipped-mark">Skipped on purpose</small>}
+                    </div>
+                    <ChevronRight size={18} />
+                  </button>}
               {m && fit?.state === "under" && (
                 <div className="button-row plan-slot-fix">
                   <button type="button" className="pill pill-small pill-primary" onClick={() => p.fillOnPlate({ ...fillingOf(r.slot), mealId: m.mealId }, m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : null, m.title)}>Fit it on the Plate</button>

@@ -1,6 +1,8 @@
 // Today reads the plan, 0.2.3 (canvas S "Today eats and counts" and "Today through the day", H8 to H14): the day's slots as
 // rows on Today, a row opens the Plate for the slot, Save records the meal as by the plan and the row leaves, a meal from
 // outside counts as extra, the line counts both, and the record card appears once every planned slot is eaten. Recipes: Open.
+// Changed by story R19 (Milan 06:04 to 06:41, board RS18): a row opens the meal, with its slot on top; Change it on the Plate
+// there opens the Plate for the slot, as the row did. Everything after is unchanged.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -45,6 +47,7 @@ seed.items = [];
   ok(/0 of 2 by the plan so far/.test(await page.locator(".logged-line").textContent()), "the line counts by the plan: " + (await page.locator(".logged-line").textContent()));
   // a row opens the Plate for that slot, in eat mode
   await page.getByRole("button", { name: /Lunch at 08:00, Morning skyr/ }).click(); await page.waitForTimeout(600);
+  if (await page.locator(".rq-slot").count()) { await page.locator(".rq-slot").getByRole("button", { name: "Change it on the Plate" }).click(); await page.waitForTimeout(600); }
   ok(/Lunch, 08:00 · By the plan/.test(await page.locator(".plan-line").textContent()), "the Plate's line says Lunch, 08:00 · By the plan");
   ok(await page.locator(".title-input").inputValue() === "Morning skyr", "the meal's name is the title");
   ok(await page.getByRole("button", { name: /Put it in/ }).count() === 0, "no Put it in: this is eating, not planning");
@@ -55,6 +58,7 @@ seed.items = [];
   await page.getByRole("button", { name: /^Today$/ }).first().click(); await page.waitForTimeout(500);
   ok(/Skyr at noon/.test(await page.locator(".cooking").textContent()), "Today's plan row shows the new name");
   await page.getByRole("button", { name: /Lunch at 08:00, Skyr at noon/ }).click(); await page.waitForTimeout(600);
+  if (await page.locator(".rq-slot").count()) { await page.locator(".rq-slot").getByRole("button", { name: "Change it on the Plate" }).click(); await page.waitForTimeout(600); }
   await cook();
   // back on Today: the row left, the card says by the plan, the line counts 1 of 2
   await page.getByRole("button", { name: /^Today$/ }).first().click(); await page.waitForTimeout(500);
@@ -75,6 +79,7 @@ seed.items = [];
   ok(marks.some((m) => /Off the plan · the next meal leans protein/.test(m)), "the extra is marked Off the plan, the next meal leans protein");
   // the last slot eaten: the record
   await page.getByRole("button", { name: /Dinner at 19:00, Chicken bowl/ }).click(); await page.waitForTimeout(600);
+  if (await page.locator(".rq-slot").count()) { await page.locator(".rq-slot").getByRole("button", { name: "Change it on the Plate" }).click(); await page.waitForTimeout(600); }
   await cook();
   await page.getByRole("button", { name: /^Today$/ }).first().click(); await page.waitForTimeout(500);
   ok(await page.locator(".day-record").count() === 1, "every planned slot eaten: the record card");

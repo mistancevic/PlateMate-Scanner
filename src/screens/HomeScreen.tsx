@@ -11,6 +11,8 @@ import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { X } from "lucide-react";
 import { unreadNote } from "../coachNotes";
 import type { AppApi, Filling } from "./api";
+import { Picture, pictureOfRecipe } from "../components/MealPicture";
+import { PlanRow } from "../components/PlanRow";
 import { showPlanOn } from "./PlanScreen";
 import { KnowCard, ReadyCard } from "../components/Measured";
 import { slotsOf, slotsOn, rowsOf, trainingWhen, toMin } from "../slots";
@@ -90,6 +92,13 @@ export function HomeScreen(p: AppApi) {
   const nextHeld = next && held[next.id] && !held[next.id].skipped ? held[next.id] : null;
   const nextRecipe = nextHeld?.mealId ? state.meals.find((m) => m.id === nextHeld.mealId) ?? null : null;
   const kept = today.prepared.filter((f) => !((f.left ?? 0) > 0));
+  // R19 (0.2.47, board RS18): one rule for meals. A tap shows the meal (its page, with the slot on top); actions are buttons
+  // and swipes. A planned meal without a recipe (a starter) opens the Plate, where Chef Mealan makes it.
+  const recipeOf = (m: PlannedMeal | undefined) => (m?.mealId ? state.meals.find((x) => x.id === m.mealId) ?? null : null);
+  const openSlotMeal = (date: string, sl: { id: string; name: string; time: string }, m: PlannedMeal, orElse: () => void) => {
+    const r = recipeOf(m); if (r) p.openMeal(r.id, { tab: "home", slot: { date, slotId: sl.id, name: sl.name, time: sl.time } }); else orElse();
+  };
+  const swapOn = (date: string, slotId: string) => { showPlanOn(date, slotId); setTab("plan"); };
   // tomorrow, for the line once today is done
   const tomorrow = new Date(); tomorrow.setDate(tomorrow.getDate() + 1);
   const tTraining = dayFor(p.personal, tomorrow)?.day ?? getDay(p.personal, tomorrow).plan ?? null;
@@ -218,23 +227,27 @@ export function HomeScreen(p: AppApi) {
       <p className="label">{next ? `Next: ${next.name.toLowerCase()}, ${next.time}` : "Next: tomorrow"}</p>
       <section className="next-meal">
         {/* R16 (0.2.44, board RS15): the planned meal itself, with its picture; I ate it logs it as planned, in one tap */}
-        {nextHeld && (
-          <div className="card next-planned">
-            <Picture src={pictureOfRecipe(nextRecipe)} />
-            <div className="next-planned-text"><b>{nextHeld.title}</b><small>As planned · {fmt(nextHeld.kcal, 0)} kcal · {fmt(nextHeld.protein, 0)} g protein · {pdText(density(nextHeld.protein, nextHeld.kcal))}</small></div>
-          </div>
-        )}
-        {next
-          ? (nextHeld?.items?.length
-            ? <button className="pill pill-primary pill-wide" onClick={() => p.logPlanned(nextHeld, { date: key, slotId: next.id, name: next.name, time: next.time })}>I ate it</button>
-            : <button className="pill pill-primary pill-wide" onClick={makeNext}>{nextHeld ? "Make it on the Plate" : `Make your ${next.name.toLowerCase()}`}</button>)
-          : <button className="pill pill-primary pill-wide" onClick={toTomorrow}>{tHeld ? "Check tomorrow" : "Plan tomorrow"}</button>}
+        {next && nextHeld
+          ? <div className="card next-planned" role="button" tabIndex={0} aria-label={`${nextHeld.title}: see the meal`}
+              onClick={(e) => { if ((e.target as HTMLElement).closest(".button-row")) return; openSlotMeal(key, next, nextHeld, makeNext); }}
+              onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); openSlotMeal(key, next, nextHeld, makeNext); } }}>
+              <Picture src={pictureOfRecipe(nextRecipe)} />
+              <div className="next-planned-text"><b>{nextHeld.title}</b><small>As planned · {fmt(nextHeld.kcal, 0)} kcal · {fmt(nextHeld.protein, 0)} g protein · {pdText(density(nextHeld.protein, nextHeld.kcal))}</small></div>
+              <ChevronRight size={20} className="next-planned-go" />
+              <div className="button-row next-planned-acts">
+                {nextHeld.items?.length
+                  ? <><button type="button" className="pill pill-small pill-primary" onClick={() => p.logPlanned(nextHeld, { date: key, slotId: next.id, name: next.name, time: next.time })}><Check size={14} /> I ate it</button>
+                    <button type="button" className="pill pill-small" onClick={() => eatFrom(next.id)}>Change it</button></>
+                  : <button type="button" className="pill pill-small pill-primary" onClick={makeNext}>Make it on the Plate</button>}
+              </div>
+            </div>
+          : next
+            ? <button className="pill pill-primary pill-wide" onClick={makeNext}>Make your {next.name.toLowerCase()}</button>
+            : <button className="pill pill-primary pill-wide" onClick={toTomorrow}>{tHeld ? "Check tomorrow" : "Plan tomorrow"}</button>}
         <small className="muted next-line">{next
           ? (left > 150 ? `${next.name}, ${next.time} by the clock: about ${fmt(left, 0)} kcal and ${fmt(pLeft, 0)} g protein left today.` : `You are at your day's kcal. A light ${next.name.toLowerCase()} keeps you there.`)
           : today.logged.length ? `${eatenAs} ${today.logged.length === 1 ? "is" : "are"} logged: ${left >= 0 ? `${fmt(left, 0)} kcal left today` : `${fmt(-left, 0)} kcal over today`}.` : "Nothing logged today."}</small>
-        {next && nextHeld?.items?.length
-          ? <div className="next-links"><button className="link" onClick={() => eatFrom(next.id)}>Change it on the Plate</button><button className="link next-log" onClick={logMeal}>Log a meal</button></div>
-          : <button className="link next-log" onClick={logMeal}>Log a meal</button>}
+        <button className="link next-log" onClick={logMeal}>Log a meal</button>
       </section>
       {/* R16 (0.2.44, Milan 21:56): what is left of a batch is not Today's: it may go to the family or to work. A batch reaches
           a day through the plan. A meal kept for later today still waits here. */}
@@ -294,13 +307,10 @@ export function HomeScreen(p: AppApi) {
           );
           const fit = fitOf(m, p.dayPd, unit);
           return (
-            <div key={sl.id} className="menu-row plan-row-link plan-slot-row" onClick={() => eatFrom(sl.id)}>
-              <button type="button" className="plan-slot-main" aria-label={`${sl.name} at ${sl.time}, ${m.title}`} onClick={(e) => { e.stopPropagation(); eatFrom(sl.id); }}>
-                <span className="menu-row-text"><small>{sl.name}, {sl.time}</small><b>{m.title}</b><small>{SOURCE[m.source]}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</small></span>
-              </button>
-              <button type="button" className="link plan-skip" aria-label={`Skip ${sl.name.toLowerCase()} on purpose`} onClick={(e) => { e.stopPropagation(); p.fill(key, sl.id, { ...m, skipped: true }); }}>Skip</button>
-              <ChevronRight size={18} />
-            </div>
+            <PlanRow key={sl.id} className="plan-row-link plan-slot-row" label={`${sl.name}, ${sl.time}`} title={m.title} photo={pictureOfRecipe(recipeOf(m))}
+              ariaLabel={`${sl.name} at ${sl.time}, ${m.title}`}
+              sub={<>{SOURCE[m.source]}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</>}
+              onOpen={() => openSlotMeal(key, sl, m, () => eatFrom(sl.id))} onSwap={() => swapOn(key, sl.id)} onRight={() => p.fill(key, sl.id, { ...m, skipped: true })} rightLabel="Skip" swapName={`Swap ${sl.name.toLowerCase()}`} rightName={`Skip ${sl.name.toLowerCase()} on purpose`} />
           );
         })}
         {hasPlanToday && !dayDone && rec.empty.length > 0 && (
@@ -327,7 +337,7 @@ export function HomeScreen(p: AppApi) {
       {newest.map((f) => {
         const a = sumOf(f.meal.items), r = recipeOfCard(f, state.meals);
         return [
-          <section className="card log-card with-photo" key={f.id}>
+          <section className={`card log-card with-photo ${r ? "log-card-open" : ""}`} key={f.id} onClick={(e) => { if (!r || (e.target as HTMLElement).closest("button,input,a,label,textarea")) return; p.openMeal(r.id, { tab: "home" }); }}>
             <Picture src={f.photo ?? pictureOfRecipe(r)} />
             <div className="card-top"><span>{f.meal.title}</span><small>{new Date(f.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small></div>
             <small className="meal-which"><b>{whichOf(f)}</b>{r && <> · <button className="link in-inline" onClick={() => p.openRecipePage(r.id)}>Open the recipe ›</button></>}</small>
@@ -368,10 +378,16 @@ export function HomeScreen(p: AppApi) {
         {tHeld > 0 && tSlots.map((sl) => {
           const m = tPlan[sl.id];
           const fit = m ? fitOf(m, p.dayPd, unit) : null;
+          if (m && !m.skipped) return (
+            <PlanRow key={sl.id} className="plan-row-link plan-slot-row" label={`${sl.name}, ${sl.time}`} title={m.title} photo={pictureOfRecipe(recipeOf(m))}
+              ariaLabel={`${sl.name} tomorrow, ${m.title}`}
+              sub={<>{SOURCE[m.source]}{fit?.state === "fits" ? <span className="fit-ok"> · fits</span> : fit?.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</>}
+              onOpen={() => openSlotMeal(tKey, sl, m, toTomorrow)} onSwap={() => swapOn(tKey, sl.id)} onRight={() => p.fill(tKey, sl.id, { ...m, skipped: true })} rightLabel="Skip" swapName={`Swap ${sl.name.toLowerCase()} tomorrow`} rightName={`Skip ${sl.name.toLowerCase()} tomorrow`} />
+          );
           return (
-            <button key={sl.id} type="button" className="menu-row plan-row-link plan-slot-row" aria-label={`${sl.name} tomorrow, ${m ? m.title : "pick a meal"}`} onClick={toTomorrow}>
+            <button key={sl.id} type="button" className="menu-row plan-row-link plan-slot-row" aria-label={`${sl.name} tomorrow, ${m ? m.title : "pick a meal"}`} onClick={() => (m ? toTomorrow() : swapOn(tKey, sl.id))}>
               <div className="menu-row-text"><small>{sl.name}, {sl.time}</small>{m ? <b>{m.title}</b> : <b className="plan-pick">Pick a meal</b>}
-                <small>{!m ? "One slot open" : m.skipped ? "Skipped on purpose" : <>{SOURCE[m.source]}{fit?.state === "fits" ? <span className="fit-ok"> · fits</span> : fit?.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</>}</small></div>
+                <small>{!m ? "One slot open" : "Skipped on purpose"}</small></div>
               <ChevronRight size={18} />
             </button>
           );
@@ -436,18 +452,4 @@ function CoverAsk({ f, recipe, p }: { f: Feedback; recipe: Meal | null; p: AppAp
       </div>
     </div>
   );
-}
-
-// R16 (0.2.44, board RS15): a small square picture: the plate's photo, else the recipe's cover or photo, else the dish's
-// picture from where it came from (your screenshot or the page's photo, for you only), else the blank tile
-const isPicture = (x: unknown): x is string => typeof x === "string" && /^(data:image\/|https:\/\/|blob:)/.test(x);
-export function pictureOfRecipe(m: Meal | null | undefined): string | null {
-  if (!m) return null;
-  return [...recipePhotosOf(m), m.source?.photo, m.shots?.[0]].find(isPicture) ?? null;
-}
-function Picture({ src }: { src: string | null }) {
-  const [broken, setBroken] = useState(false);
-  return src && !broken
-    ? <img className="log-photo" src={src} alt="" referrerPolicy="no-referrer" onError={() => setBroken(true)} />
-    : <div className="log-photo recipe-tile-blank"><Utensils size={22} /></div>;
 }
