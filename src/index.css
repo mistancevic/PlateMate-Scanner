@@ -1771,7 +1771,8 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .taste-card .taste-group .label { margin: 10px 0 4px; }
 .taste-card .taste-words { min-height: 60px; }
 /* R24 (0.2.51, board RS24): the day bands on Today; a missed meal asks under its row */
-.day-band { position: sticky; top: calc(64px + env(safe-area-inset-top, 0px)); z-index: 20; background: #172742; color: #fff; border-radius: 12px; padding: 10px 14px; margin: 14px 0 10px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; box-shadow: 0 4px 12px rgba(23, 39, 66, .2); }
+/* 0.2.52 (Milan 00:58, 01:02, RS24 R24f): in the app's blue, not black; it stays in the page and scrolls with it */
+.day-band { background: var(--brand); color: #fff; border-radius: 12px; padding: 10px 14px; margin: 14px 0 10px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; box-shadow: 0 4px 12px rgba(46, 123, 232, .25); }
 .day-band b { font-size: 20px; }
 .day-band span { font-weight: 700; text-align: right; }
 .missed-ask { padding: 10px 2px 12px; border-bottom: 1px solid var(--line); }
