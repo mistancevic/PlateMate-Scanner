@@ -1771,8 +1771,6 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .taste-card .taste-group .label { margin: 10px 0 4px; }
 .taste-card .taste-words { min-height: 60px; }
 /* R24 (0.2.51, board RS24): the day bands on Today; a missed meal asks under its row */
-/* 0.2.52 (Milan 00:58, 01:02, RS24 R24f): in the app's blue, not black; it stays in the page and scrolls with it */
-.day-band { background: var(--brand); color: #fff; border-radius: 12px; padding: 10px 14px; margin: 14px 0 10px; display: flex; justify-content: space-between; align-items: baseline; gap: 10px; box-shadow: 0 4px 12px rgba(46, 123, 232, .25); }
 .day-band b { font-size: 20px; }
 .day-band span { font-weight: 700; text-align: right; }
 .missed-ask { padding: 10px 2px 12px; border-bottom: 1px solid var(--line); }
@@ -1786,3 +1784,15 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .l-moment { margin-top: 34px; }
 .l-moment h3 { margin: 4px 0 6px; font-size: 22px; }
 @media (min-width: 900px) { .l-moments { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; } .l-moments > .l-eyebrow, .l-moments > h2, .l-moments > .l-video-all { grid-column: 1 / -1; } }
+/* R25 (0.2.53, board RS25): how many of a whole recipe were eaten; a big meal asked once */
+.eat-count { display: flex; align-items: center; gap: 12px; margin: 4px 0 6px; }
+.eat-count b { font-size: 22px; min-width: 1.4em; text-align: center; }
+.eat-count small { margin-left: auto; }
+.eat-left { display: block; margin-bottom: 6px; }
+.big-ask { padding: 12px 14px; margin: 10px 0; }
+.big-ask small { display: block; margin-top: 4px; }
+.big-ask .button-row { margin-top: 8px; justify-content: flex-end; }
+/* 0.2.53 (Milan 01:23, board RS26): the day as a header, not a button: dark text, the date in grey, a blue line under */
+.day-band { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; background: transparent; color: var(--ink); box-shadow: none; border-radius: 0; padding: 4px 2px 8px; border-bottom: 3px solid var(--brand); margin: 22px 0 12px; }
+.day-band b { font-size: 24px; }
+.day-band span { color: #5b6b8a; }
