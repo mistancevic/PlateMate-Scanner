@@ -145,9 +145,11 @@ export function replanMeal(s: ShopStore, n: number, date: string, slot: string, 
     lines = lines.filter(keep); carried = carried.filter(keep);
     const needed = (k: string) => [...lines, ...carried].some((x) => x.key === k && (x.uses ?? []).length > 0);
     const missing = (l.missing ?? []).filter(needed);
-    if (quiet) return { ...l, lines: lines.sort((a, b) => a.name.localeCompare(b.name)), carried, missing };
+    // the list counts the meal by its new name, so the plan and the list agree on what was shopped for (SL7)
+    const counted = l.counted ? l.counted.map((c) => (c.date === date && c.slot === slot && foods.length ? { ...c, title } : c)) : undefined;
+    if (quiet) return { ...l, lines: lines.sort((a, b) => a.name.localeCompare(b.name)), carried, missing, ...(counted ? { counted } : {}) };
     const changes = [...(l.changes ?? []).filter((c) => !(c.date === date && c.slot === slot)), { date, slot, from: (l.changes ?? []).find((c) => c.date === date && c.slot === slot)?.from ?? from, to: title, because: (l.changes ?? []).find((c) => c.date === date && c.slot === slot)?.because ?? because }];
-    return { ...l, lines: lines.sort((a, b) => a.name.localeCompare(b.name)), carried, missing, changes };
+    return { ...l, lines: lines.sort((a, b) => a.name.localeCompare(b.name)), carried, missing, changes, ...(counted ? { counted } : {}) };
   }) };
 }
 
@@ -160,7 +162,7 @@ export function followPlan(s: ShopStore, planned: Planned): ShopStore {
   for (const m of shortMeals(l)) {
     const held = planned[m.date]?.[m.slot] ?? null;
     const portion = held ? plannedPortion(held, "list", "") : null;
-    const needs = portion ? portion.items.some((i) => m.foods.some((f) => f.toLowerCase() === i.food.name.toLowerCase())) : false;
+    const needs = portion ? portion.items.some((i) => m.foods.some((f) => [i.food.name, buyAs(i.food.name, "", 1, i.food.calories).name].some((n) => n.toLowerCase() === f.toLowerCase()))) : false;
     if (needs) continue;
     next = replanMeal(next, l.n, m.date, m.slot, held?.title ?? m.title, (portion?.items ?? []).map((i) => ({ name: i.food.name, brand: i.food.brand ?? "", grams: i.grams, kcal: i.food.calories })), "", [], true);
   }
