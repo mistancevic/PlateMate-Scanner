@@ -1913,6 +1913,8 @@ export default function App() {
       notify("Photo added.");
     },
     openFoodId, clearOpenFood: () => setOpenFoodId(null),
+    // 0.2.56 (board DS4, F): open one food in Foods, from the note under Today's numbers
+    openFood: (id: string) => { setMenuSection(null); setOpenFoodId(id); setTab("foods"); },
     setFoodJob: (foodId: string, job: string | null) => {
       setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, job: job || undefined } : x)) }));
       notify(job ? `Labelled ${job.toLowerCase()}.` : "Back to Chef Mealan's label.");

@@ -817,7 +817,7 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 /* the back link: the arrow beside the word, not above it */
 .menu-head .link { display: inline-flex; flex-direction: row; align-items: center; gap: 6px; white-space: nowrap; }
 /* chefmealan.com, as approved on 6 October 2026 (canvas boards H1 to H3) */
-.l-signin { font-weight: 900; }
+.l-signin.pill { height: 32px; padding: 0 12px; }
 .l-hero-art { height: auto; margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .l-hero-art .l-chef { position: static; height: auto; width: 220px; max-width: 70%; border-radius: var(--r-card); -webkit-mask-image: none; mask-image: none; filter: none; box-shadow: var(--shadow-float); }
 .l-hero-art figcaption { font-size: 13px; color: var(--muted); font-weight: 700; }
@@ -1213,9 +1213,9 @@ html:has(.bt), body:has(.bt) { background: var(--b-bg, var(--base)); }
 .bt-facts span small { display: block; color: var(--b-muted); font-weight: 700; font-size: 12px; }
 .bt h2 { font-size: 26px; margin: 34px 0 6px; } .bt-sub { color: var(--b-muted); margin: 0 0 14px; font-size: 15px; line-height: 1.5; } .bt-sub a { color: var(--b-brand-text); font-weight: 900; }
 .bt-role { color: var(--b-ink); }
-.bt-modes { display: inline-flex; background: var(--surface); border: 1.5px solid var(--b-line); border-radius: var(--r-control); padding: 4px; gap: 4px; margin-bottom: 14px; }
-.bt-modes button { border: 0; background: transparent; padding: 9px 14px; border-radius: var(--r-control); font: inherit; font-weight: 900; color: var(--b-brand-text); cursor: pointer; }
-.bt-modes button.on { background: var(--b-brand); color: var(--surface); }
+.bt-modes { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.bt-modes button { height: 34px; padding: 0 12px; border: 1.5px solid var(--line); background: var(--surface); border-radius: var(--r-chip); font: inherit; font-size: var(--fs-label); font-weight: 600; color: var(--ink); cursor: pointer; }
+.bt-modes button.on { background: var(--tint); border-color: var(--brand); color: var(--navy); font-weight: 900; } .bt-modes button.on::before { content: "✓ "; }
 .bt-board { display: grid; grid-template-columns: minmax(0, 1fr) 330px; gap: 18px; align-items: start; }
 .bt-diagram { position: relative; background: var(--surface); border: 1.5px solid var(--b-line); border-radius: var(--r-card); overflow: hidden;
   background-image: linear-gradient(var(--b-tint) 1px, transparent 1px), linear-gradient(90deg, var(--b-tint) 1px, transparent 1px); background-size: 24px 24px; }
@@ -1843,3 +1843,16 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .day-band b { font-weight: 900; }
 /* Section (18 · 900): a card's heading: Foods, Nutrition, Steps, What's in the plan, How it carries you */
 .card > b:first-child, .cooking-top > span, .rq-carry .card-top > span { font-size: var(--fs-section); font-weight: 900; color: var(--ink); line-height: 1.2; }
+
+/* ================= 0.2.56 (boards DS4 and DS5) ================= */
+/* F: the note under Today's numbers: why fat and carbs are not complete, which food; its name opens it */
+.macro-gap { display: block; margin-top: var(--s2); color: var(--muted); }
+.macro-gap .link.in-inline { font-weight: inherit; color: var(--brand-text); text-decoration: underline; text-underline-offset: 2px; }
+/* H: links look like links, on the home page and /built too. A link inside a sentence is underlined, in the sentence's weight;
+   a link on its own line ends with ›, at 700, one per line; a link in the top bar is Blue text at 700; Sign in is a small
+   outlined button; one filled button in view: Read Worth Building and Milan on LinkedIn are outlined */
+.l-recipes, .bt .bt-home { font-weight: 700; }
+.l-behind p a, .bt-sub a:not(.bt-btn), .bt p a:not(.bt-btn) { font-weight: inherit; text-decoration: underline; text-underline-offset: 2px; color: var(--brand-text); }
+.l-behind .l-behind-links { display: flex; flex-direction: column; gap: var(--s2); }
+.l-behind .l-behind-links a { font-weight: 700; text-decoration: none; }
+.bt-btn.bt-btn-line { background: var(--surface); color: var(--brand-text); border: 1.5px solid var(--line); box-shadow: none; }
