@@ -89,8 +89,9 @@ export function RecipesScreen(p: AppApi) {
   type View = "mine" | "coach" | "members";
   const q = () => { try { return new URLSearchParams(location.search); } catch { return new URLSearchParams(); } };
   const [view, setViewState] = useState<View>(() => { const v = q().get("view"); return v === "coach" || v === "members" ? v : "mine"; });
-  const [cookPick, setCookState] = useState<string | null>(() => q().get("cook"));
-  const toUrl = (v: View, c: string | null) => { try { if (/^\/my-recipes\/?$/.test(location.pathname)) history.replaceState(history.state, "", `${location.pathname}${v === "mine" ? "" : `?view=${v}${v === "members" && c ? `&cook=${encodeURIComponent(c)}` : ""}`}`); } catch { /* the address stays */ } };
+  // 0.2.67: the address says member (cook still read, for links from 0.2.61 to 0.2.66)
+  const [cookPick, setCookState] = useState<string | null>(() => q().get("member") ?? q().get("cook"));
+  const toUrl = (v: View, c: string | null) => { try { if (/^\/my-recipes\/?$/.test(location.pathname)) history.replaceState(history.state, "", `${location.pathname}${v === "mine" ? "" : `?view=${v}${v === "members" && c ? `&member=${encodeURIComponent(c)}` : ""}`}`); } catch { /* the address stays */ } };
   const setView = (v: View) => { setViewState(v); toUrl(v, cookPick); };
   const setCookPick = (c: string | null) => { setCookState(c); toUrl("members", c); };
   const [memberList, setMemberList] = useState<SharedRecipe[] | null>(null);
