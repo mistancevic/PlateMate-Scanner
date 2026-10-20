@@ -1,5 +1,5 @@
 // SL5 (0.2.63, Milan 15:48 to 19:00): Chef Mealan helps a meal left short at the shop. Asked from the shopping list, it
-// offers a food that stands in for what wasn't there, so the dish is still the dish, and another meal for that slot. The
+// offers a swap for the food that wasn't there, so the recipe stays the same otherwise, and another meal for that slot. The
 // app builds each option's foods, drops one that hits a declared allergy or still needs a missing food, and shows its PD
 // against the day's target. Use this puts it in the plan for that day only (the recipe stays as it is), and the list follows.
 import { useState } from "react";
@@ -41,9 +41,10 @@ export function ShortHelp({ p, date, slot, label, title, missing, onUsed }: { p:
     }
     if (!items.length || items.some((i) => isMissing(i.food.name) || blockedByAllergy(i.food, p.safety.allergies ?? []))) return null;
     const a = aggregate(items), kcal = Math.round(a.calories ?? 0), protein = Math.round(a.protein ?? 0);
+    // who did what, said plainly: Chef Mealan suggests, the person picks, the app changes the plan
     const note = o.kind === "standin"
-      ? `Changed at the shop with ${CHEF_NAME}: ${(o.swaps ?? []).map((w: any) => `${String(w.name).toLowerCase()} for ${String(w.missing).toLowerCase()}`).join(", ")}. This day only; ${title} stays as it is.`
-      : `Changed at the shop with ${CHEF_NAME}, in place of ${title}, which needed ${missing.join(", ").toLowerCase()}. This day only.`;
+      ? `You swapped ${missing.join(", ").toLowerCase()} for ${(o.swaps ?? []).map((w: any) => String(w.name).toLowerCase()).join(", ")} at the shop, from ${CHEF_NAME}'s ideas. This day only; ${title} stays as it is.`
+      : `You picked this at the shop in place of ${title}, which needed ${missing.join(", ").toLowerCase()}, from ${CHEF_NAME}'s ideas. This day only.`;
     return { kind: o.kind === "meal" ? "meal" : "standin", title: name, why: String(o.why || ""), note, items, kcal, protein, pd: density(protein, kcal), mealId, source };
   };
   const ask = async () => {
@@ -81,7 +82,7 @@ export function ShortHelp({ p, date, slot, label, title, missing, onUsed }: { p:
         const fits = target === null || (o.pd !== null && o.pd >= target - 0.05);
         return (
           <div key={k} className="shop-help-opt">
-            <small className="shop-help-kind">{o.kind === "standin" ? "Keep the dish" : "Another meal"}</small>
+            <small className="shop-help-kind">{o.kind === "standin" ? "Swap a food" : "Another meal"}</small>
             <b>{o.title}</b>
             {o.why && <small>{o.why}</small>}
             <small className={fits ? "fit-ok" : "fit-under"}>{fmt(o.kcal, 0)} kcal · {o.protein} g protein · PD {pdVal(o.pd)}{fits ? " · fits" : ` · under your ${pdVal(target)}`}</small>

@@ -284,10 +284,10 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
           {/* SL6: what Chef Mealan changed from this list stays said here, with the way to the day */}
           {(shown.changes ?? []).length > 0 && (
             <section className="shop-changed">
-              <b>Changed with {CHEF_NAME}</b>
+              <b>Changed at the shop</b>
               {(shown.changes ?? []).map((c) => (
                 <div key={`${c.date}${c.slot}`} className="shop-changed-row">
-                  <small>{WEEKDAY[(dt(c.date).getDay() + 6) % 7]} {slotName(c.date, c.slot).toLowerCase()} is now {c.to}{c.from ? `, in place of ${c.from}` : ""}. This day only.</small>
+                  <small>{WEEKDAY[(dt(c.date).getDay() + 6) % 7]} {slotName(c.date, c.slot).toLowerCase()} is now {c.to}{c.from ? `, in place of ${c.from}` : ""}. You picked it from {CHEF_NAME}'s ideas; this day only.</small>
                   <button type="button" className="link" onClick={() => showDay(c.date)}>See it in Plan ›</button>
                 </div>
               ))}
