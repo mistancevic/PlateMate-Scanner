@@ -1875,3 +1875,12 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .days .day-card .plan-row-link { border-top: 0; padding-left: 0; padding-right: 0; }
 .days .older-link { margin: var(--s1) 0 var(--s4); }
 .days .older-link .link { font-weight: 700; }
+
+/* 0.2.60, board SL1: the shopping list, a sheet from Plan */
+.shop-why, .shop-without { margin: 4px 0 10px; }
+.shop-without { color: var(--close-text); font-weight: 700; }
+.shop-list { margin-bottom: 12px; }
+.plan-shop { margin-top: 12px; } .shop-row { gap: 10px; align-items: center; } .shop-row .menu-row-text { flex: 1 1 auto; min-width: 0; } .shop-row .shop-grams { margin-left: auto; text-align: right; } .shop-row > svg { color: var(--brand); flex: none; }
+.shop-row .menu-row-text b { font-size: var(--fs-body); color: var(--ink); }
+.shop-row .shop-grams { font-size: var(--fs-body); font-weight: 900; color: var(--ink); white-space: nowrap; }
+.shop-row.got .menu-row-text b, .shop-row.got .shop-grams { text-decoration: line-through; color: var(--muted); } .shop-row.got > svg { color: var(--top); }
