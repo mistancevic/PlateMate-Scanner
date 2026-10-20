@@ -3,7 +3,9 @@
 // foods saved (a starter) can't be counted, so the list names it instead of leaving it out quietly.
 import { plannedPortion, type Planned } from "./planned";
 
-export type ShopLine = { key: string; name: string; brand: string; grams: number; meals: number };
+// SL4 (0.2.62): each food knows the meals it is for, so the list can say what it is for and show itself meal by meal
+export type ShopUse = { date: string; slot: string; title: string; grams: number };
+export type ShopLine = { key: string; name: string; brand: string; grams: number; meals: number; uses?: ShopUse[] };
 export type ShopList = { days: string[]; meals: number; lines: ShopLine[]; without: { date: string; title: string }[] };
 
 // grams as a shop reads them: under 50 g to the gram, else to 10 g
@@ -22,14 +24,16 @@ export function shoppingList(planned: Planned, days: string[]): ShopList {
       for (const i of portion.items) {
         if (!(i.grams > 0) || !i.food?.name) continue;
         const key = `${i.food.name}|${i.food.brand ?? ""}`.toLowerCase();
-        const line = by.get(key) ?? { key, name: i.food.name, brand: i.food.brand ?? "", grams: 0, meals: 0, seen: new Set<string>() };
+        const line = by.get(key) ?? { key, name: i.food.name, brand: i.food.brand ?? "", grams: 0, meals: 0, uses: [] as ShopUse[], seen: new Set<string>() };
         line.grams += i.grams;
+        const use = line.uses!.find((u) => u.date === d && u.slot === slot);
+        if (use) use.grams += i.grams; else line.uses!.push({ date: d, slot, title: m.title, grams: i.grams });
         if (!line.seen.has(d + slot)) { line.seen.add(d + slot); line.meals++; }
         by.set(key, line);
       }
     }
   }
-  const lines = [...by.values()].map(({ seen, ...l }) => ({ ...l, grams: shopGrams(l.grams) })).sort((a, b) => a.name.localeCompare(b.name));
+  const lines = [...by.values()].map(({ seen, ...l }) => ({ ...l, grams: shopGrams(l.grams), uses: (l.uses ?? []).map((u) => ({ ...u, grams: shopGrams(u.grams) })) })).sort((a, b) => a.name.localeCompare(b.name));
   return { days, meals, lines, without };
 }
 
@@ -43,7 +47,8 @@ export function shoppingText(list: ShopList, span: string, ticked: Set<string>):
 // What is on it is what it is; a later change to the plan does not touch it. One list is open at a time. The next list starts
 // the day after the last one ends, so nothing is bought twice. Finishing asks about the foods not ticked: carry them to the
 // next list, or leave them. On this phone only; another phone makes its own.
-export type SavedList = { n: number; madeAt: string; from: string; to: string; meals: number; lines: ShopLine[]; without: ShopList["without"]; carried: ShopLine[]; carriedFrom: number | null; ticked: string[]; doneAt?: string };
+// missing: the foods marked Not there in the shop (SL4); they stay on the list and count as not bought
+export type SavedList = { n: number; madeAt: string; from: string; to: string; meals: number; lines: ShopLine[]; without: ShopList["without"]; carried: ShopLine[]; carriedFrom: number | null; ticked: string[]; missing?: string[]; doneAt?: string };
 export type ShopStore = { lists: SavedList[]; carry: { from: number; lines: ShopLine[] } | null };
 const LKEY = "chefmealan-shopping-lists";
 export const getStore = (): ShopStore => { try { const s = JSON.parse(localStorage.getItem(LKEY) || "{}"); return { lists: Array.isArray(s.lists) ? s.lists : [], carry: s.carry ?? null }; } catch { return { lists: [], carry: null }; } };
@@ -63,7 +68,28 @@ export function makeList(s: ShopStore, planned: Planned, days: string[], madeAt:
   const list: SavedList = { n, madeAt, from: days[0], to: days[days.length - 1], meals: l.meals, lines: l.lines, without: l.without, carried: (s.carry?.lines ?? []).map((x) => ({ ...x, key: `c:${x.key.replace(/^c:/, "")}` })), carriedFrom: s.carry?.from ?? null, ticked: [] };
   return { lists: [list, ...s.lists], carry: null };
 }
-export const tickIn = (s: ShopStore, n: number, key: string): ShopStore => ({ ...s, lists: s.lists.map((l) => (l.n !== n ? l : { ...l, ticked: l.ticked.includes(key) ? l.ticked.filter((k) => k !== key) : [...l.ticked, key] })) });
+// a tap moves a food on: to buy, then in the basket, then not there, then back to buy (SL4)
+export const stateOf = (l: SavedList, key: string): "buy" | "got" | "missing" => (l.ticked.includes(key) ? "got" : (l.missing ?? []).includes(key) ? "missing" : "buy");
+export const tickIn = (s: ShopStore, n: number, key: string): ShopStore => ({ ...s, lists: s.lists.map((l) => {
+  if (l.n !== n) return l;
+  const st = stateOf(l, key), missing = (l.missing ?? []).filter((k) => k !== key), ticked = l.ticked.filter((k) => k !== key);
+  return st === "buy" ? { ...l, ticked: [...ticked, key], missing } : st === "got" ? { ...l, ticked, missing: [...missing, key] } : { ...l, ticked, missing };
+}) });
+// the meals a food marked Not there leaves short, in the order of the days
+export function shortMeals(l: SavedList): { date: string; slot: string; title: string; foods: string[] }[] {
+  const out: { date: string; slot: string; title: string; foods: string[] }[] = [];
+  for (const x of [...l.carried, ...l.lines]) {
+    if (!(l.missing ?? []).includes(x.key)) continue;
+    for (const u of x.uses ?? []) { const m = out.find((o) => o.date === u.date && o.slot === u.slot); if (m) m.foods.push(x.name); else out.push({ date: u.date, slot: u.slot, title: u.title, foods: [x.name] }); }
+  }
+  return out.sort((a, b) => a.date.localeCompare(b.date));
+}
+// the list as meals: each day's planned meals with what each needs (SL4, By meal); the carried foods are not of these days
+export function byMeal(l: SavedList): { date: string; slot: string; title: string; foods: { line: ShopLine; grams: number }[] }[] {
+  const out: { date: string; slot: string; title: string; foods: { line: ShopLine; grams: number }[] }[] = [];
+  for (const x of l.lines) for (const u of x.uses ?? []) { const m = out.find((o) => o.date === u.date && o.slot === u.slot); if (m) m.foods.push({ line: x, grams: u.grams }); else out.push({ date: u.date, slot: u.slot, title: u.title, foods: [{ line: x, grams: u.grams }] }); }
+  return out.sort((a, b) => a.date.localeCompare(b.date));
+}
 export const notTicked = (l: SavedList) => [...l.carried, ...l.lines].filter((x) => !l.ticked.includes(x.key));
 export function finishList(s: ShopStore, n: number, carry: boolean, at: string): ShopStore {
   const l = s.lists.find((x) => x.n === n);
@@ -73,5 +99,5 @@ export function finishList(s: ShopStore, n: number, carry: boolean, at: string):
 }
 export function listText(l: SavedList, span: string): string {
   const shown = (x: ShopLine) => `${x.name}${x.brand && !/typical values|generic|check your/i.test(x.brand) ? ` (${x.brand})` : ""}: ${x.grams.toLocaleString("en")} g`;
-  return [`Shopping list ${l.n}, ${span}`, "", ...notTicked(l).map(shown)].join("\n");
+  return [`Shopping list ${l.n}, ${span}`, "", ...notTicked(l).map((x) => shown(x) + ((l.missing ?? []).includes(x.key) ? " (not at the last shop)" : ""))].join("\n");
 }

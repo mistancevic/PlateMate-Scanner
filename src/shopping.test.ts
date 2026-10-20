@@ -48,3 +48,20 @@ test("SL3: lists are saved and numbered, the next starts after the last, finishi
   s = finishList(s, 2, false, "2026-10-23T10:00:00Z");
   assert.equal(s.carry, null);
 });
+
+test("SL4: a food knows its meals; By meal; a tap goes to buy, in the basket, not there", async () => {
+  const { makeList, daysFrom, tickIn, stateOf, shortMeals, byMeal, openList, notTicked, listText } = await import("./shopping");
+  const plan = { "2026-10-20": { lunch: curry, breakfast: bowl }, "2026-10-21": { lunch: curry } };
+  let s = makeList({ lists: [], carry: null }, plan as any, daysFrom("2026-10-20", 2), "2026-10-20T15:00:00Z");
+  const l = openList(s)!;
+  const rice = l.lines.find((x) => x.name === "Rice, cooked")!;
+  assert.deepEqual(rice.uses, [{ date: "2026-10-20", slot: "lunch", title: "Chicken curry", grams: 300 }, { date: "2026-10-21", slot: "lunch", title: "Chicken curry", grams: 300 }]);
+  assert.deepEqual(byMeal(l).map((m) => `${m.date} ${m.slot} ${m.title}: ${m.foods.map((f) => `${f.line.name} ${f.grams}`).join(", ")}`), [
+    "2026-10-20 lunch Chicken curry: Chicken breast, raw 200, Rice, cooked 300", "2026-10-20 breakfast Skyr bowl: Skyr, natural 250", "2026-10-21 lunch Chicken curry: Chicken breast, raw 200, Rice, cooked 300"]);
+  s = tickIn(s, 1, rice.key); assert.equal(stateOf(openList(s)!, rice.key), "got");
+  s = tickIn(s, 1, rice.key); assert.equal(stateOf(openList(s)!, rice.key), "missing");
+  assert.deepEqual(shortMeals(openList(s)!).map((m) => `${m.date} ${m.slot}: ${m.foods.join(",")}`), ["2026-10-20 lunch: Rice, cooked", "2026-10-21 lunch: Rice, cooked"]);
+  assert.ok(notTicked(openList(s)!).some((x) => x.key === rice.key), "not there counts as not bought");
+  assert.ok(/Rice, cooked: 600 g \(not at the last shop\)/.test(listText(openList(s)!, "x")));
+  s = tickIn(s, 1, rice.key); assert.equal(stateOf(openList(s)!, rice.key), "buy");
+});

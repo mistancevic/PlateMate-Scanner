@@ -1,7 +1,7 @@
 import { carryReads } from "../carry";
 import { useEffect, useRef, useState, type ReactElement } from "react";
-import { ChevronRight, ChefHat, Pencil, Circle, CircleCheck, ShoppingBasket } from "lucide-react";
-import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, type ShopStore, type SavedList, type ShopLine } from "../shopping";
+import { ChevronRight, ChefHat, Pencil, Circle, CircleCheck, CircleSlash, ShoppingBasket } from "lucide-react";
+import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, stateOf, shortMeals, byMeal, type ShopStore, type SavedList, type ShopLine } from "../shopping";
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
 import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
@@ -242,13 +242,23 @@ function ShopSheet({ p, close }: { p: AppApi; close: () => void }) {
   const preview = shoppingList(p.planned, days);
   const nextN = store.lists.reduce((m, x) => Math.max(m, x.n), 0) + 1;
   const shown = reading !== null ? store.lists.find((l) => l.n === reading) ?? null : open;
-  const row = (l: SavedList, x: ShopLine, live: boolean) => {
-    const got = l.ticked.includes(x.key);
+  // SL4: what each food is for, and the list meal by meal; a tap goes to buy, in the basket, not there
+  const [by, setBy] = useState<"food" | "meal">("food");
+  const slotName = (date: string, slot: string) => slotsOn(lifestyleOf(p.personal), p.personal.timesOn, date).find((x) => x.id === slot)?.name ?? slot.charAt(0).toUpperCase() + slot.slice(1);
+  const short = (d: string) => DAYS[(dt(d).getDay() + 6) % 7];
+  const forWhat = (x: ShopLine) => {
+    if (!x.uses?.length) return `${x.meals} ${x.meals === 1 ? "meal" : "meals"}`;
+    // one part per meal and slot: Sarma: Wed, Fri lunch
+    const parts = [...new Set(x.uses.map((u) => `${u.title}\u0000${slotName(u.date, u.slot).toLowerCase()}`))];
+    return parts.map((k) => { const [t, sl] = k.split("\u0000"); return `${t}: ${x.uses!.filter((u) => u.title === t && slotName(u.date, u.slot).toLowerCase() === sl).map((u) => short(u.date)).join(", ")} ${sl}`; }).join(" · ");
+  };
+  const row = (l: SavedList, x: ShopLine, live: boolean, grams = x.grams, note = true) => {
+    const st = stateOf(l, x.key);
     return (
-      <button key={x.key} type="button" className={`menu-row shop-row ${got ? "got" : ""}`} aria-pressed={got} disabled={!live} onClick={() => save(tickIn(store, l.n, x.key))}>
-        {got ? <CircleCheck size={20} /> : <Circle size={20} />}
-        <div className="menu-row-text"><b>{x.name}</b><small>{x.brand && !/typical values|generic|check your/i.test(x.brand) ? `${x.brand} · ` : ""}{x.meals} {x.meals === 1 ? "meal" : "meals"}</small></div>
-        <b className="shop-grams">{x.grams.toLocaleString("en")} g</b>
+      <button key={x.key} type="button" className={`menu-row shop-row ${st === "got" ? "got" : st === "missing" ? "missing" : ""}`} aria-label={`${x.name}, ${grams} g${st === "got" ? ", in the basket" : st === "missing" ? ", not there" : ""}`} disabled={!live} onClick={() => save(tickIn(store, l.n, x.key))}>
+        {st === "got" ? <CircleCheck size={20} /> : st === "missing" ? <CircleSlash size={20} /> : <Circle size={20} />}
+        <div className="menu-row-text"><b>{x.name}</b>{note && <small>{x.brand && !/typical values|generic|check your/i.test(x.brand) ? `${x.brand} · ` : ""}{forWhat(x)}</small>}{st === "missing" && <small className="shop-missing-note">Not there</small>}</div>
+        <b className="shop-grams">{grams.toLocaleString("en")} g</b>
       </button>
     );
   };
@@ -260,11 +270,40 @@ function ShopSheet({ p, close }: { p: AppApi; close: () => void }) {
         <div className="card-top"><span>{reading !== null ? <button type="button" className="link" onClick={() => setReading(null)}>‹ Shopping lists</button> : "Shopping lists"}</span><button type="button" className="link" onClick={close}>Close</button></div>
         {shown ? (<>
           <b className="shop-title">Shopping list {shown.n}</b>
-          <p className="small shop-why">Made {madeOn(shown.madeAt)}, for {spanOf(shown.from, shown.to)}: {shown.meals} planned {shown.meals === 1 ? "meal" : "meals"}, one portion each.{shown.doneAt ? ` Finished ${madeOn(shown.doneAt)}.` : " Tap a food when it is in the basket."}</p>
+          <p className="small shop-why">Made {madeOn(shown.madeAt)}, for {spanOf(shown.from, shown.to)}: {shown.meals} planned {shown.meals === 1 ? "meal" : "meals"}, one portion each.{shown.doneAt ? ` Finished ${madeOn(shown.doneAt)}.` : ""}</p>
           {shown.without.length > 0 && <p className="small shop-without">Not on the list, no foods saved: {shown.without.map((w) => `${w.title} (${WEEKDAY[(dt(w.date).getDay() + 6) % 7]})`).join(", ")}.</p>}
+          {!shown.doneAt && <p className="small shop-why">Tap a food once when it is in the basket, twice when the shop doesn't have it.</p>}
+          {shortMeals(shown).length > 0 && <p className="small shop-short">Not there: {[...new Set(shortMeals(shown).flatMap((m) => m.foods))].join(", ")}. Short now: {shortMeals(shown).map((m) => `${WEEKDAY[(dt(m.date).getDay() + 6) % 7]} ${slotName(m.date, m.slot).toLowerCase()}, ${m.title}`).join("; ")}.</p>}
+          {shown.lines.some((x) => x.uses?.length) && (
+            <div className="segments shop-by" role="tablist" aria-label="Show the list">
+              <button type="button" role="tab" aria-selected={by === "food"} className={`seg ${by === "food" ? "on" : ""}`} onClick={() => setBy("food")}>By food</button>
+              <button type="button" role="tab" aria-selected={by === "meal"} className={`seg ${by === "meal" ? "on" : ""}`} onClick={() => setBy("meal")}>By meal</button>
+            </div>
+          )}
           {shown.carried.length > 0 && (<><small className="pick-group">From list {shown.carriedFrom}</small><div className="menu-list shop-list">{shown.carried.map((x) => row(shown, x, !shown.doneAt))}</div></>)}
-          {shown.carried.length > 0 && shown.lines.length > 0 && <small className="pick-group">For these days</small>}
-          {shown.lines.length > 0 && <div className="menu-list shop-list">{shown.lines.map((x) => row(shown, x, !shown.doneAt))}</div>}
+          {by === "food" ? (<>
+            {shown.carried.length > 0 && shown.lines.length > 0 && <small className="pick-group">For these days</small>}
+            {shown.lines.length > 0 && <div className="menu-list shop-list">{shown.lines.map((x) => row(shown, x, !shown.doneAt))}</div>}
+          </>) : daysFrom(shown.from, Math.round((dt(shown.to).getTime() - dt(shown.from).getTime()) / 864e5) + 1).map((d) => {
+            const order = slotsOn(lifestyleOf(p.personal), p.personal.timesOn, d).map((x) => x.id), at = (id: string) => { const i = order.indexOf(id); return i < 0 ? 99 : i; };
+            const meals = byMeal(shown).filter((m) => m.date === d).sort((a, b) => at(a.slot) - at(b.slot)), none = shown.without.filter((w) => w.date === d);
+            if (!meals.length && !none.length) return null;
+            return (
+              <div key={d} className="shop-day">
+                <small className="pick-group">{WEEKDAY[(dt(d).getDay() + 6) % 7]} {dt(d).getDate()} {MONTHS[dt(d).getMonth()]}</small>
+                {meals.map((m) => {
+                  const miss = m.foods.filter((f) => stateOf(shown, f.line.key) === "missing").map((f) => f.line.name);
+                  return (
+                    <div key={m.slot} className="menu-list shop-list shop-meal">
+                      <div className="shop-meal-head"><b>{slotName(d, m.slot)} · {m.title}</b>{miss.length > 0 && <small className="shop-missing-note">Short: {miss.join(", ")}</small>}</div>
+                      {m.foods.map((f) => row(shown, f.line, !shown.doneAt, f.grams, false))}
+                    </div>
+                  );
+                })}
+                {none.map((w) => <p key={w.title} className="small shop-without">{w.title}: no foods saved.</p>)}
+              </div>
+            );
+          })}
           {!shown.doneAt && (asking ? (
             <section className="card shop-ask">
               <b>{notTicked(shown).length} {notTicked(shown).length === 1 ? "food isn't" : "foods aren't"} ticked. Carry {notTicked(shown).length === 1 ? "it" : "them"} to the next list?</b>

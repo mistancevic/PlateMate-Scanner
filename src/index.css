@@ -1900,3 +1900,10 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .shop-finish, .shop-make { margin-top: 12px; }
 .shop-ask { margin: 12px 0 0; gap: 10px; } .shop-ask b { font-size: var(--fs-body); }
 .shop-earlier { margin-top: 6px; }
+/* SL4: what each food is for, By meal, Not there */
+.shop-by { margin: 4px 0 10px; }
+.shop-short { color: var(--low-text); background: var(--low-soft); border-radius: var(--r-control); padding: 10px 12px; font-weight: 700; margin: 4px 0 10px; }
+.shop-row.missing > svg { color: var(--low); } .shop-row.missing .menu-row-text b { color: var(--low-text); }
+.shop-missing-note { color: var(--low-text) !important; font-weight: 700 !important; }
+.shop-meal { margin-bottom: 10px; } .shop-meal-head { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px 8px; border-bottom: 1px solid var(--line); }
+.shop-meal-head b { font-size: var(--fs-body); font-weight: 900; color: var(--ink); }
