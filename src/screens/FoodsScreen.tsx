@@ -1,6 +1,6 @@
 import { Camera, X, Pencil, Plus } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
-import { findReference, referenceFood, localName } from "../reference";
+import { findReference, referenceFood, localName, otherNames as refOtherNames } from "../reference";
 import { BAND_LABEL, BAND_LINE_IDLE, bandHint } from "../goal";
 
 import { duplicatePairs } from "../dedupe";
@@ -56,7 +56,7 @@ export function FoodsScreen(p: AppApi) {
   // a chip must never hide a match in silence: say how many, and where
   const hiddenByChip = q && filter !== "all" ? foods.filter(({ f, b }) => nameHit(f) && b !== filter) : [];
   const have = new Set(state.foods.flatMap((f) => [f.name, ...(f.aliases ?? []), ...((/Also: ([^\n]*)/.exec(f.notes ?? "")?.[1] ?? "").split("·"))]).map((x) => x.trim().replace(/\.$/, "").toLowerCase()).filter(Boolean));
-  const noLabel = !isCode && q.length >= 2 ? findReference(q, 6, q.length < 3).filter((r) => ![r.en, r.de, r.sr, r.cyr].some((n) => have.has(n.toLowerCase()))) : [];
+  const noLabel = !isCode && q.length >= 2 ? findReference(q, 6, q.length < 3).filter((r) => ![r.en, r.de, r.sr, r.cyr, r.el ?? ""].some((n) => n && have.has(n.toLowerCase()))) : [];
   const [db, setDb] = useState<{ q: string; products: DbProduct[]; busy: boolean }>({ q: "", products: [], busy: false });
   useEffect(() => {
     const wantsDb = isCode ? !state.foods.some((f) => f.barcode === q) : q.length >= 3;
@@ -147,7 +147,7 @@ export function FoodsScreen(p: AppApi) {
               <span className="thumb">{iconFor(localName(r, p.region))}</span>
               <div className="row-text">
                 <b className="name-plain">{localName(r, p.region)}</b>
-                <small>{[...new Set([r.en, r.sr, r.de])].filter((x) => x !== localName(r, p.region)).slice(0, 2).join(" · ")} · {r.kcal} kcal · {r.protein} g protein{r.ready ? "" : " · needs cooking"}</small>
+                <small>{refOtherNames(r, p.region).join(" · ")} · {r.kcal} kcal · {r.protein} g protein{r.ready ? "" : " · needs cooking"}</small>
               </div>
               <button className="pill pill-small" onClick={() => { p.saveFood(referenceFood(r, p.region, uid)); p.notify(`${localName(r, p.region)} is in your foods.`); }}>Add to my foods</button>
             </div>

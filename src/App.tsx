@@ -73,7 +73,7 @@ import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, type Mix, type MixTip } from "./mixtip";
-import { findReference, referenceFood, localName } from "./reference";
+import { findReference, referenceFood, localName, otherNames } from "./reference";
 import { jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
 import { fitnessFor, SOURCES, dayName } from "./fitness";
@@ -475,7 +475,7 @@ function LabelCheck({
               setValues(Object.fromEntries(KEYS.map((k) => [k, inputValue((rf as any)[k], k)])) as Record<string, string>);
               setRows(displayRows(rf)); setRefPicked(r.id); setRefOpen(false);
             }}>
-              <b>{localName(r, region)}</b><small>{[r.en, r.sr, r.de].filter((x) => x !== localName(r, region)).slice(0, 2).join(" · ")} · {r.kcal} kcal · {r.protein} g protein</small>
+              <b>{localName(r, region)}</b><small>{otherNames(r, region).join(" · ")} · {r.kcal} kcal · {r.protein} g protein</small>
             </button>
           ))}
         </div>
@@ -2032,7 +2032,7 @@ export default function App() {
     foodsView, setFoodsView, saveFood, setEditFrom,
     // a product picked from the search opens the sheet titled by the button that picked it
     addFromDatabase: (code: string) => { setEditTitle("Add to my foods"); lookup(code); },
-    searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (region ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
+    searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (region ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "cy", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
     peekBarcode: async (code: string) => { try { const d = await api(`/api/product/${code}`); return d?.product_name ? { code, name: d.product_name, brand: d.brand || "", quantity: "", kcal: d.calories, protein: d.protein } : null; } catch { return null; } },
     // Plan (0.2.2): the meals in the slots, by date and slot; a plate made for a slot lands in it when saved
     planned, filling, setFilling,

@@ -48,7 +48,7 @@ export function orderMoments(rhythm: RhythmId[]): Moment[] {
 }
 
 // Where the person shops. Decides the starter foods and tells Mealan which shelves are real.
-export type RegionId = "munich" | "germany" | "austria" | "switzerland" | "belgrade" | "serbia" | "madrid" | "spain" | "elsewhere";
+export type RegionId = "munich" | "germany" | "austria" | "switzerland" | "belgrade" | "serbia" | "madrid" | "spain" | "limassol" | "cyprus" | "elsewhere";
 export const REGIONS: { id: RegionId; name: string; tags: string[] }[] = [
   { id: "munich",      name: "Munich",             tags: ["*", "de", "munich"] },
   { id: "germany",     name: "Germany, elsewhere", tags: ["*", "de"] },
@@ -58,6 +58,8 @@ export const REGIONS: { id: RegionId; name: string; tags: string[] }[] = [
   { id: "serbia",      name: "Serbia, elsewhere",  tags: ["*", "rs"] },
   { id: "madrid",      name: "Madrid",             tags: ["*", "es", "madrid"] },
   { id: "spain",       name: "Spain, elsewhere",   tags: ["*", "es"] },
+  { id: "limassol",    name: "Limassol",           tags: ["*", "cy", "limassol"] },
+  { id: "cyprus",      name: "Cyprus, elsewhere",  tags: ["*", "cy"] },
   { id: "elsewhere",   name: "Elsewhere",          tags: ["*"] },
 ];
 // Where a trip goes. Chosen on the craving screen when the moment is Travel; Mealan plans with that place's shelves.

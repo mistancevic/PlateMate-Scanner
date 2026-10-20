@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { REFERENCE, findReference, referenceFood, localName } from "./reference";
+import { REFERENCE, findReference, referenceFood, localName, otherNames } from "./reference";
 
 test("the table has the basics, each with four names and the carbohydrate convention", () => {
   assert.ok(REFERENCE.length >= 120, `${REFERENCE.length} foods`);
@@ -51,4 +51,29 @@ test("a food saved under its Munich name carries its other names, so Kupus finds
   assert.equal(f.name, "Weißkohl, roh");
   assert.ok(f.aliases!.includes("Kupus") && f.aliases!.includes("Купус") && f.aliases!.includes("Cabbage, raw"));
   assert.ok(/Also: .*Kupus/.test(f.notes), "older saves keep the names in the notes too");
+});
+
+test("Cyprus: fifty local foods, each with its Greek name, found in Greek, English and Serbian", async () => {
+  const cy = REFERENCE.filter((r) => r.id.startsWith("cy-"));
+  assert.equal(cy.length, 50);
+  for (const r of cy) assert.ok(r.el && /[Ͱ-Ͽ]/.test(r.el), `${r.id} has a Greek name`);
+  assert.equal(new Set(REFERENCE.map((r) => r.id)).size, REFERENCE.length, "no id twice");
+  assert.equal(findReference("halloumi")[0].id, "cy-halloumi");
+  assert.equal(findReference("χαλλούμι")[0].id, "cy-halloumi");
+  assert.equal(findReference("χαλλουμι")[0].id, "cy-halloumi", "no accent typed");
+  assert.equal(findReference("seftalija")[0].id, "cy-sheftalia");
+  assert.equal(findReference("kolokasi")[0].id, "cy-kolokasi", "the raw root before the stew");
+  const { REGIONS } = await import("./moments");
+  assert.deepEqual(REGIONS.find((r) => r.id === "limassol")?.tags, ["*", "cy", "limassol"]);
+  assert.ok(REGIONS.some((r) => r.id === "cyprus"));
+});
+
+test("a Cypriot food in Limassol keeps its English name and shows the Greek one first", () => {
+  const r = REFERENCE.find((x) => x.id === "cy-koupepia")!;
+  assert.equal(localName(r, "limassol"), "Koupepia, vine leaves stuffed with mince and rice");
+  assert.equal(otherNames(r, "limassol")[0], "Κουπέπια");
+  const f = referenceFood(r, "limassol", () => "f3");
+  assert.ok(f.aliases!.includes("Κουπέπια") && f.aliases!.includes("Kupepija, sarma od vinovog lista"));
+  assert.ok(/typical home recipe, an estimate/.test(f.notes));
+  assert.equal(otherNames(REFERENCE.find((x) => x.id === "courgette")!, "munich").join(" · "), "Courgette (zucchini), raw · Tikvice, sveže");
 });
