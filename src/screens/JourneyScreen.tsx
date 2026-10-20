@@ -79,6 +79,8 @@ function extras(items: { food: any; grams: number }[]) {
     .map(([key, word]) => { const v = lineTotal(items, key); return v === null ? null : `${fmt(v)} g ${word}`; }).filter(Boolean);
   return parts.length ? <small className="readout-extra">{parts.join(" · ")}{items.some((i) => !i.food.table?.length) ? " · from foods with a full table" : ""}</small> : null;
 }
+// R25 (0.2.53, board RS25): a meal above this, or above the whole day, is asked once before it is logged
+const BIG_MEAL = 2000;
 export function JourneyScreen(p: AppApi) {
   const { state, setState, setTab, step, setStep, setCamera, setMode, blank, updateItem,
     setAdjustId, mixWith, options, pdRef, saveMeal, notify, setError, setFeedback, add } = p;
@@ -117,7 +119,10 @@ export function JourneyScreen(p: AppApi) {
   const [ate, setAte] = useState<"all" | "portion" | "later" | "not">("all");
   const [saveRecipe, setSaveRecipe] = useState(true);
   const addPhoto = (file?: File | null) => { if (!file) return; const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 480).then((d) => setPhotos((x) => [...x, d])).catch(() => {}); r.readAsDataURL(file); };
-  const resetMade = () => { setPhotos([]); setWent("as"); setDifferent(""); setAte("all"); setSaveRecipe(true); };
+  // R25 (0.2.53, board RS25): how many of a whole recipe were eaten, starting on one; a big meal is checked once
+  const [eatN, setEatN] = useState(1);
+  const [bigAsk, setBigAsk] = useState(false);
+  const resetMade = () => { setPhotos([]); setWent("as"); setDifferent(""); setAte("all"); setSaveRecipe(true); setEatN(1); setBigAsk(false); };
   const [method, setMethod] = useState<string | null>(null);
   // after Add in the tip at the recipe step, Mealan refits with the new food on the plate
   const [refit, setRefit] = useState(false);
@@ -1107,6 +1112,11 @@ export function JourneyScreen(p: AppApi) {
   const sizedPlate = !!rec?.makes && imported && pmode === "sized" && !!mealNeed && !way;
   const yours = !rec?.makes || wholePlate ? 1 : sizedPlate ? yourPortions(kcalOfItems(rec.items), kcalOfItems(items)) : rec.makes.n;
   const leftK = yours - 1;
+  // R25: the whole recipe on the plate, counted; what one is; what is eaten; the day's kcal for the big meal check
+  const wholeN = wholePlate ? rec!.makes!.n : 0;
+  const perOne = wholeN > 1 ? kcalOfItems(items) / wholeN : 0;
+  const eatenKcal = wholeN > 1 ? perOne * eatN : kcalOfItems(items);
+  const dayKcal = p.todayKcal ?? state.goals.calories ?? null;
   const leftOne = sizedPlate ? mealWord : rec ? oneOf(rec) : "portion", leftMany = sizedPlate ? plural(mealWord) : rec ? unitOf(rec) : "portions";
   const leftWords = (k: number) => `${k} ${k === 1 ? leftOne : leftMany}`;
   if (step === "make" && (rec || (plateRecipe?.steps?.length ?? 0) > 0 || partsOf(items).length > 0)) {
@@ -1256,22 +1266,54 @@ export function JourneyScreen(p: AppApi) {
         </div>
         {went === "not" && <textarea placeholder="What was different" value={different} onChange={(e) => setDifferent(e.target.value)} />}
         {went === "not" && <button className="link" onClick={() => p.openOut()}>Help me with making it</button>}
-        <p className="label">How much did you eat?</p>
-        <div className="reasons">
-          {([["all", "All of it"], ["portion", "A portion"], ["later", "Later today"], ["not", "Not after all"]] as const).map(([k, l]) => (
-            <button key={k} className={`choice ${ate === k ? "on" : ""}`} onClick={() => setAte(k)}>{l}</button>
-          ))}
-        </div>
-        <button className="pill pill-primary pill-wide" onClick={() => {
-          log("made", { went, ate, photos: photos.length });
+        {/* R25 (0.2.53, board RS25): a whole recipe that makes several is counted, starting on one, never logged whole by
+            accident; the rest is said, not followed (R16) */}
+        {wholeN > 1 && rec ? <>
+          <p className="label">You made {countOf(wholeN, unitOf(rec))}. How many did you eat?</p>
+          <div className="eat-count" role="group" aria-label="How many did you eat?">
+            <button type="button" className="pill pill-small" aria-label="One less" disabled={ate !== "all" || eatN <= 1} onClick={() => { setEatN((k) => Math.max(1, k - 1)); setBigAsk(false); }}>−</button>
+            <b aria-live="polite">{ate === "all" ? eatN : 0}</b><span>{ate === "all" && eatN === 1 ? oneOf(rec) : unitOf(rec)}</span>
+            <button type="button" className="pill pill-small" aria-label="One more" disabled={ate !== "all" || eatN >= wholeN} onClick={() => { setEatN((k) => Math.min(wholeN, k + 1)); setBigAsk(false); }}>+</button>
+            {ate === "all" && <small className="muted">{fmt(perOne * eatN, 0)} kcal · {pdText(density(aggregate(items).protein, aggregate(items).calories))}</small>}
+          </div>
+          {ate === "all" && wholeN - eatN > 0 && <small className="eat-left">{countOf(wholeN - eatN, unitOf(rec))} left: to eat {wholeN - eatN === 1 ? "it" : "them"} on other days, put the recipe on Plan.</small>}
+          <div className="reasons">
+            <button className={`choice ${ate === "all" && eatN === wholeN ? "on" : ""}`} onClick={() => { setAte("all"); setEatN(wholeN); setBigAsk(false); }}>All {wholeN}</button>
+            {([["later", "Later today"], ["not", "Not after all"]] as const).map(([k, l]) => (
+              <button key={k} className={`choice ${ate === k ? "on" : ""}`} onClick={() => { setAte(ate === k ? "all" : k); setBigAsk(false); }}>{l}</button>
+            ))}
+          </div>
+        </> : <>
+          <p className="label">How much did you eat?</p>
+          <div className="reasons">
+            {([["all", "All of it"], ["portion", "A portion"], ["later", "Later today"], ["not", "Not after all"]] as const).map(([k, l]) => (
+              <button key={k} className={`choice ${ate === k ? "on" : ""}`} onClick={() => { setAte(k); setBigAsk(false); }}>{l}</button>
+            ))}
+          </div>
+        </>}
+        {/* R25: a meal over 2,000 kcal, or over the whole day, is asked once; nothing is blocked */}
+        {bigAsk && (
+          <section className="card big-ask" role="alertdialog" aria-label="A big meal">
+            <b>{fmt(eatenKcal, 0)} kcal in one meal?</b>
+            <small>{dayKcal && eatenKcal > dayKcal ? `That is more than your whole day, ${fmt(dayKcal, 0)} kcal.` : "That is a lot for one meal."} {wholeN > 1 && rec ? `If you ate ${eatN === wholeN ? `all ${wholeN}` : countOf(eatN, unitOf(rec))}, log it; if not, say how many.` : "If you ate all of it, log it; if not, change the amounts."}</small>
+            <div className="button-row">
+              <button type="button" className="pill pill-small" onClick={() => { setBigAsk(false); log("made", { went, ate, photos: photos.length }); setStep("after"); }}>{wholeN > 1 && eatN === wholeN ? `Yes, all ${wholeN}` : "Yes, I ate it"}</button>
+              <button type="button" className="pill pill-small pill-primary" onClick={() => { setBigAsk(false); if (!(wholeN > 1)) setStep("in"); }}>{wholeN > 1 ? "How many I ate" : "Change the amounts"}</button>
+            </div>
+          </section>
+        )}
+        {!bigAsk && <button className="pill pill-primary pill-wide" onClick={() => {
           if (ate === "later" || ate === "not") {
+            log("made", { went, ate, photos: photos.length });
             // the card goes to Today without a rating: kept for later, or not eaten after all
             p.keepForLater({ ...mealNow() }, { photos, prep: { went, different: different || undefined }, status: ate === "later" ? "prepared" : "not-used" });
             resetMade(); setStep("in");
             return;
           }
+          if (ate === "all" && (eatenKcal > BIG_MEAL || (dayKcal !== null && eatenKcal > dayKcal))) { setBigAsk(true); return; }
+          log("made", { went, ate, photos: photos.length });
           setStep("after");
-        }}>On to How was it?</button>
+        }}>On to How was it?</button>}
         <Back to="make" />
       </>
     );
@@ -1352,6 +1394,10 @@ export function JourneyScreen(p: AppApi) {
             ...(fromRec.makes ? { makes: fromRec.makes } : {}), ...(fromRec.optional?.length ? { optional: fromRec.optional } : {}),
             steps: d?.steps ?? [], ...(d?.steps?.length ? { stepsFor: foodNames(whole) } : {}), ...(d?.marks ? { stepMarks: d.marks } : {}), ...(d?.kitchen ? { stepsKitchen: d.kitchen } : {}), ...(d?.parts ? { stepParts: d.parts } : {}) };
         })() : null;
+        // R25: the card counts what was eaten, a number of the recipe's pieces; the recipe is kept whole
+        // the portion is the sum of the very grams kept, never a hair above them: a stored meal heavier than its foods is not read back
+        const eatenItems = wholeN > 1 && eatN < wholeN ? meal.items.map((i) => ({ ...i, grams: (i.grams * eatN) / wholeN })) : null;
+        const eatenMeal: Meal = eatenItems ? { ...meal, items: eatenItems, portion: eatenItems.reduce((n, i) => n + i.grams, 0) } : meal;
         const kept: Meal = chgKept ?? { ...meal, items: keptItems, portion: keptItems.reduce((n, i) => n + i.grams, 0), ...(keptOpt.length ? { optional: keptOpt } : {}) };
         const triedNow = tryCtx && tried ? { kind: tryCtx.kind, what: tryCtx.what, result: tried } : undefined;
         const status = good === "no" ? "not-used" : "eaten";
@@ -1369,9 +1415,9 @@ export function JourneyScreen(p: AppApi) {
         const firstTime = !!fromRec && !state.feedback.some((f) => f.status === "eaten" && (f.recipeId === fromRec.id || f.meal?.id === fromRec.id));
         // RP4 (0.2.25, Milan 17:42): every recipe you make ends on its page; a plate that is no recipe ends on Today
         const landId = keep ? kept.id : (fromRec ?? origin)?.id ?? null;
-        const leftN = madeWhole && rec?.makes ? Math.max(0, leftK) : 0;
-        const landLine = status !== "eaten" ? "" : [`You ate ${rec && pmode === "recipe" && !way ? `1 ${oneOf(rec)}` : "your plate"}.`, leftN > 0 ? `${sizedPlate ? leftWords(leftN) : countOf(leftN, unitOf(rec!))} left: to eat ${leftN === 1 ? "it" : "them"} on other days, put the recipe on Plan.` : "", chgKept && fromRec ? `The original, ${fromRec.title}, stays as it was.` : ""].filter(Boolean).join(" ");
-        setState((s) => ({ ...s, fromRecipe: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)).map((m) => (m.idea && status === "eaten" && (m.id === origin?.id || m.id === fromRec?.id || m.id === landId) ? { ...m, idea: undefined } : m)), feedback: [{ id: uid(), meal: structuredClone(meal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : pickSlot ? { date: todayKey, slotId: pickSlot.id, name: pickSlot.name, time: pickSlot.time } : undefined, ...(p.filling?.mode !== "eat" && !pickSlot && mealSlot ? { which: capName(mealSlot.name) } : {}), createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));
+        const leftN = wholeN > 1 ? wholeN - eatN : madeWhole && rec?.makes ? Math.max(0, leftK) : 0;
+        const landLine = status !== "eaten" ? "" : [`You ate ${wholeN > 1 && rec ? (eatN === wholeN ? `all ${wholeN}` : countOf(eatN, unitOf(rec))) : rec && pmode === "recipe" && !way ? `1 ${oneOf(rec)}` : "your plate"}.`, leftN > 0 ? `${sizedPlate ? leftWords(leftN) : countOf(leftN, unitOf(rec!))} left: to eat ${leftN === 1 ? "it" : "them"} on other days, put the recipe on Plan.` : "", chgKept && fromRec ? `The original, ${fromRec.title}, stays as it was.` : ""].filter(Boolean).join(" ");
+        setState((s) => ({ ...s, fromRecipe: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)).map((m) => (m.idea && status === "eaten" && (m.id === origin?.id || m.id === fromRec?.id || m.id === landId) ? { ...m, idea: undefined } : m)), feedback: [{ id: uid(), meal: structuredClone(eatenMeal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : pickSlot ? { date: todayKey, slotId: pickSlot.id, name: pickSlot.name, time: pickSlot.time } : undefined, ...(p.filling?.mode !== "eat" && !pickSlot && mealSlot ? { which: capName(mealSlot.name) } : {}), createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));
         if (p.filling) p.setFilling(null);
         setWay(null); setTried(null);
         setMakeAll(null); setTicks(new Set()); setMkDraft(""); setMkDrafted(false);

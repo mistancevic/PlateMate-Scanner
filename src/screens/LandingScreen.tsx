@@ -70,7 +70,7 @@ export function LandingScreen() {
       <section className="l-steps l-moments">
         <span className="l-eyebrow">In your day</span>
         <h2>What Chef Mealan does for you</h2>
-        <DayVideo src="/landing/day-all.mp4" poster="/landing/day-all.webp" big label="All five, about a minute: Today, Plan, a craving, a recipe from a link, and how a meal carried you" />
+        <DayVideo src="/landing/day-all.mp4" poster="/landing/day-all.webp" big label="All five, a minute and a half: Today, Plan, a craving, a recipe from a link, and how a meal carried you" />
         {MOMENTS.map((m, k) => (
           <div className="l-moment" key={m.title}>
             <span className="l-eyebrow">{m.when}</span>
