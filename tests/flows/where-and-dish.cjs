@@ -59,7 +59,8 @@ seed.items = [];
   const sarmaGrams = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.filter((i) => i.dish).map((i) => i.grams));
   ok(sarmaGrams.join(",") === "100,150,25", "the recipe's amounts stay one portion: " + sarmaGrams.join(", "));
   // Where does this go: Scan on the Plate (0.2.25, RP5: Today has no camera), a barcode, the sheet
-  await page.getByRole("button", { name: /Back$/ }).first().click(); await page.waitForTimeout(500);
+  // Changed by story DS rule E (Milan 07:30, board DS2): Back sits top left and says where it goes, Back to the plate
+  await page.getByRole("button", { name: /^Back/ }).first().click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(1500);
   ok(await page.locator(".cam-title").count() === 1, "Scan on the Plate opens the camera");
   await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(400);

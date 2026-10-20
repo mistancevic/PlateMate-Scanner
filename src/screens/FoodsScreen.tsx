@@ -149,7 +149,7 @@ export function FoodsScreen(p: AppApi) {
                 <b className="name-plain">{localName(r, p.region)}</b>
                 <small>{[...new Set([r.en, r.sr, r.de])].filter((x) => x !== localName(r, p.region)).slice(0, 2).join(" · ")} · {r.kcal} kcal · {r.protein} g protein{r.ready ? "" : " · needs cooking"}</small>
               </div>
-              <button className="pill pill-small pill-primary" onClick={() => { p.saveFood(referenceFood(r, p.region, uid)); p.notify(`${localName(r, p.region)} is in your foods.`); }}>Add to my foods</button>
+              <button className="pill pill-small" onClick={() => { p.saveFood(referenceFood(r, p.region, uid)); p.notify(`${localName(r, p.region)} is in your foods.`); }}>Add to my foods</button>
             </div>
           ))}
         </section>
@@ -164,7 +164,7 @@ export function FoodsScreen(p: AppApi) {
                 <b className="name-plain">{x.name}</b>
                 <small>{[x.brand, x.quantity].filter(Boolean).join(" · ")}{x.kcal !== null ? ` · ${Math.round(x.kcal)} kcal` : ""}{x.protein !== null ? ` · ${x.protein} g protein` : ""} per 100 g</small>
               </div>
-              <button className="pill pill-small pill-primary" onClick={() => p.addFromDatabase(x.code)}>Add to my foods</button>
+              <button className="pill pill-small" onClick={() => p.addFromDatabase(x.code)}>Add to my foods</button>
             </div>
           ))}
         </section>

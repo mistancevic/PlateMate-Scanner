@@ -160,7 +160,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           <section className="card rq-nopic" aria-label="No picture yet">
             <b>No picture yet.</b>
             <div className="button-row">
-              <button className={`pill pill-small ${out ? "" : "pill-primary"}`} disabled={out || picture.drawing} onClick={picture.draw}>{picture.drawing ? `${CHEF_NAME} is drawing…` : "Draw a picture"}</button>
+              <button className="pill pill-small" disabled={out || picture.drawing} onClick={picture.draw}>{picture.drawing ? `${CHEF_NAME} is drawing…` : "Draw a picture"}</button>
               <button className={`pill pill-small ${out ? "pill-primary" : ""}`} disabled={busy} onClick={() => fileRef.current?.click()}>Add my photo</button>
             </div>
             <small className="muted">{c ? `${CHEF_NAME}'s pictures today: ${c.used} of ${c.limit}. ${out ? "Draw one tomorrow, or add your own photo now." : "Your own photo is always better."}` : "Your own photo is always better."}</small>
@@ -281,7 +281,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
             return draft ? (<>
               <small className="muted">No steps yet.</small>
               {status}
-              <div className="button-row"><button className="pill pill-small pill-primary" disabled={drafting === "working"} onClick={askDraft}>Draft the steps with Chef Mealan</button><button className="link" onClick={startEdit}>Write my own</button></div>
+              <div className="button-row"><button className="pill pill-small" disabled={drafting === "working"} onClick={askDraft}>Draft the steps with {CHEF_NAME}</button><button className="pill pill-small" onClick={startEdit}>Write my own</button></div>
             </>) : <small className="muted">No steps yet. Edit recipe adds them.</small>;
           })()}
       </section>

@@ -1,5 +1,5 @@
 import { useState, useEffect, type ReactNode } from "react";
-import { FlaskConical, ChevronRight, BookOpen, ArrowLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator, Coffee } from "lucide-react";
+import { FlaskConical, ChevronRight, BookOpen, ChevronLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator, Coffee } from "lucide-react";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
 import { exportLog, clearLog, readLog, log } from "../log";
@@ -104,7 +104,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
   useEffect(() => { try { window.scrollTo({ top: 0 }); document.querySelector("main")?.scrollTo?.({ top: 0 }); } catch {} }, [section]);
   return (
     <>
-      <div className="menu-head"><button className="link" onClick={() => ((from as string) === "me" || ME_SECTIONS.includes(section) && !from ? setSection("me", true) : setSection(from ?? "list", true))}><ArrowLeft size={16} /> {(from as string) === "me" ? "Me" : from ? (ITEMS.find((i) => i.id === from)?.name ?? "Menu") : ME_SECTIONS.includes(section) ? "Me" : "Menu"}</button><button className="link" onClick={close}>Close</button></div>
+      <div className="menu-head"><button className="link" onClick={() => ((from as string) === "me" || ME_SECTIONS.includes(section) && !from ? setSection("me", true) : setSection(from ?? "list", true))}><ChevronLeft size={16} /> {(from as string) === "me" ? "Me" : from ? (ITEMS.find((i) => i.id === from)?.name ?? "Menu") : ME_SECTIONS.includes(section) ? "Me" : "Menu"}</button><button className="link" onClick={close}>Close</button></div>
       <h2 className="menu-title">{section === "me" ? "Me" : title}</h2>
       {section === "me" && <MeScreen {...p} />}
       {section === "profile" && <ProfilePanel {...p} />}

@@ -5,6 +5,8 @@
 // with which meal it was, its numbers and its recipe, no foods. Never rewrite these lines to fit a change.
 // Changed by story R16 (Milan 21:56 to 22:11, board RS15): Today follows the plan and the calendar, not what is left of a batch.
 // No batch block; a planned meal shows in what comes next, with its picture, and I ate it logs it in one tap.
+// Changed by story DS rule D (Milan 07:06 to 07:30, boards DS1 and DS2): Today has no wide button. A next meal with nothing
+// planned is a card with Pick a meal and Make it on the Plate; late in the day the Tomorrow card opens tomorrow's plan.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -59,7 +61,7 @@ const open = async (state, at = "2026-10-18T12:20:00") => {
     const goal = await text("section.plan");
     ok(/Today so far, against your goal/.test(goal) && /of 2,800 kcal/.test(goal) && /of 180 g protein/.test(goal) && /at least \d+ ?of \d+ g fat/.test(goal), "the goal card: today against it, fat and carbs at least when a food has no value: " + goal.slice(0, 200));
     const next = await text(".next-meal");
-    ok(/^Next: /.test(await page.locator("p.label").filter({ hasText: /^Next: / }).first().textContent()) && /Make your /.test(next) && /Log a meal/.test(next), "what comes next: the next meal, its main action, Log a meal: " + next);
+    ok(/^Next: /.test(await page.locator("p.label").filter({ hasText: /^Next: / }).first().textContent()) && /Nothing planned yet/.test(next) && /Pick a meal/.test(next) && /Make it on the Plate/.test(next) && /Log a meal/.test(next), "what comes next: the next meal, Pick a meal or Make it on the Plate, Log a meal: " + next);
     const meal = page.locator(".log-card").filter({ hasText: "Protein cheesecake" }).filter({ has: page.locator(".meal-which") }).first();
     const mt = (await meal.textContent()).replace(/\s+/g, " ");
     ok(/Open the recipe/.test(mt) && /kcal · \d+ g protein/.test(mt) && !/Digestive biscuits/.test(mt) && !/In My recipes/.test(mt), "a meal: which meal, its numbers, its recipe; no foods: " + mt);
@@ -80,7 +82,7 @@ const open = async (state, at = "2026-10-18T12:20:00") => {
     await page.locator(".log-card .meal-which").first().getByRole("button", { name: /Open the recipe/ }).click(); await page.waitForTimeout(800);
     ok(/Protein cheesecake/.test(await text(".rq")) && await page.locator(".rq-landed").count() === 0, "Open the recipe opens its page, with no saved line");
     await at("2026-10-18T23:30:00");
-    ok(/Next: tomorrow/.test(await text("main")) && await page.getByRole("button", { name: "Plan tomorrow", exact: true }).count() === 1 && !/from your batch/.test(await text("main")), "late in the day, what comes next is tomorrow: Plan tomorrow, and no batch");
+    ok(/Next: tomorrow/.test(await text("main")) && await page.locator(".tomorrow-plan").getByRole("button", { name: /Plan tomorrow/ }).count() === 1 && await page.locator(".next-meal .pill-wide").count() === 0 && !/from your batch/.test(await text("main")), "late in the day, what comes next is tomorrow: the Tomorrow card says Plan tomorrow, no wide button, and no batch");
   } catch (e) { ok(false, "walkthrough error: " + e.message.split("\n").slice(0, 3).join(" / ")); }
   ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   await b.close(); server.kill();

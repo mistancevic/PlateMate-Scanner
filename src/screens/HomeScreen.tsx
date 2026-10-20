@@ -249,8 +249,15 @@ export function HomeScreen(p: AppApi) {
               </div>
             </div>
           : next
-            ? <button className="pill pill-primary pill-wide" onClick={makeNext}>Make your {next.name.toLowerCase()}</button>
-            : <button className="pill pill-primary pill-wide" onClick={toTomorrow}>{tHeld ? "Check tomorrow" : "Plan tomorrow"}</button>}
+            // 0.2.54, design system rule D (board DS2): Today has no wide button. A next meal with nothing planned is a card, with its two ways
+            ? <div className="card next-planned next-open">
+                <div className="next-planned-text"><b>Nothing planned yet</b><small>Pick one of your meals, or make one on the Plate.</small></div>
+                <div className="button-row next-planned-acts">
+                  <button type="button" className="pill pill-small pill-primary" onClick={() => swapOn(key, next.id)}>Pick a meal</button>
+                  <button type="button" className="pill pill-small" onClick={makeNext}>Make it on the Plate</button>
+                </div>
+              </div>
+            : null}
         <small className="muted next-line">{next
           ? (left > 150 ? `${next.name}, ${next.time} by the clock: about ${fmt(left, 0)} kcal and ${fmt(pLeft, 0)} g protein left today.` : `You are at your day's kcal. A light ${next.name.toLowerCase()} keeps you there.`)
           : today.logged.length ? `${eatenAs} ${today.logged.length === 1 ? "is" : "are"} logged: ${left >= 0 ? `${fmt(left, 0)} kcal left today` : `${fmt(-left, 0)} kcal over today`}.` : "Nothing logged today."}</small>
@@ -383,7 +390,7 @@ export function HomeScreen(p: AppApi) {
                   <small className="carry-q">How did it carry you?</small>
                   <div className="carry-acts">
                     {(["light", "fine", "heavy"] as const).map((k) => (
-                      <button key={k} type="button" className={`pill pill-small ${f.carry?.how === k ? "pill-done" : ""}`} onClick={() => { p.setCarry(f.id, k, carryMoment(f)); setChangingCarry(null); }}>{CARRY_WORDS[k]}</button>
+                      <button key={k} type="button" className={`choice${f.carry?.how === k ? " on" : ""}`} onClick={() => { p.setCarry(f.id, k, carryMoment(f)); setChangingCarry(null); }}>{CARRY_WORDS[k]}</button>
                     ))}
                   </div>
                 </div>
