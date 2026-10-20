@@ -1,4 +1,4 @@
-// SL5 (0.2.63, Milan 15:48 to 19:00): Chef Mealan helps a meal left short at the shop. Asked from the shopping list, it
+// SL5 (0.2.63, Milan 15:48 to 19:00): Chef Mealan helps a meal left short by a food marked Not this time. Asked from the shopping list, it
 // offers a swap for the food that wasn't there, so the recipe stays the same otherwise, and another meal for that slot. The
 // app builds each option's foods, drops one that hits a declared allergy or still needs a missing food, and shows its PD
 // against the day's target. Use this puts it in the plan for that day only (the recipe stays as it is), and the list follows.
@@ -19,7 +19,7 @@ const estimate = (f: { name: string; calories: number; protein: number; fats: nu
   reviewedAt: new Date().toISOString(), readyToEat: true, calories: f.calories, protein: f.protein, fats: f.fats, carbs: f.carbs, fiber: null,
 } as Food);
 
-export function ShortHelp({ p, date, slot, label, title, missing, onUsed }: { p: AppApi; date: string; slot: string; label: string; title: string; missing: string[]; onUsed: (title: string, foods: NewFood[]) => void }) {
+export function ShortHelp({ p, list, date, slot, label, title, missing, onUsed }: { p: AppApi; list: number; date: string; slot: string; label: string; title: string; missing: string[]; onUsed: (title: string, foods: NewFood[]) => void }) {
   const [busy, setBusy] = useState(false), [opts, setOpts] = useState<Opt[] | null>(null), [err, setErr] = useState("");
   const held = p.planned[date]?.[slot] ?? null;
   const portion = held ? plannedPortion(held, "short", "") : null;
@@ -42,9 +42,10 @@ export function ShortHelp({ p, date, slot, label, title, missing, onUsed }: { p:
     if (!items.length || items.some((i) => isMissing(i.food.name) || blockedByAllergy(i.food, p.safety.allergies ?? []))) return null;
     const a = aggregate(items), kcal = Math.round(a.calories ?? 0), protein = Math.round(a.protein ?? 0);
     // who did what, said plainly: Chef Mealan suggests, the person picks, the app changes the plan
+    const foods = missing.join(", ").toLowerCase();
     const note = o.kind === "standin"
-      ? `You swapped ${missing.join(", ").toLowerCase()} for ${(o.swaps ?? []).map((w: any) => String(w.name).toLowerCase()).join(", ")} at the shop, from ${CHEF_NAME}'s ideas. This day only; ${title} stays as it is.`
-      : `You picked this at the shop in place of ${title}, which needed ${missing.join(", ").toLowerCase()}, from ${CHEF_NAME}'s ideas. This day only.`;
+      ? `You swapped ${foods} for ${(o.swaps ?? []).map((w: any) => String(w.name).toLowerCase()).join(", ")} because you marked ${foods} Not this time on shopping list ${list}. From ${CHEF_NAME}'s ideas. This day only; ${title} stays as it is.`
+      : `You picked this in place of ${title} because you marked ${foods} Not this time on shopping list ${list}. From ${CHEF_NAME}'s ideas. This day only.`;
     return { kind: o.kind === "meal" ? "meal" : "standin", title: name, why: String(o.why || ""), note, items, kcal, protein, pd: density(protein, kcal), mealId, source };
   };
   const ask = async () => {

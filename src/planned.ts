@@ -7,7 +7,7 @@ export type Source = "mine" | "coach" | "starter" | "plate";
 export type PlannedMeal = { title: string; kcal: number; protein: number; source: Source; mealId?: string; items?: Ingredient[]; portion?: number; servings?: number;
   // 0.2.6 (canvas board CW, CW7): skipped on purpose; the meal counts as closed for a day lived by the plan
   skipped?: boolean;
-  // SL6 (0.2.64): how a meal changed for this day only came to be (at the shop, with Chef Mealan); shown when it is opened
+  // SL6 (0.2.64): how a meal changed for this day only came to be (from a shopping list, picked from Chef Mealan's ideas); shown when it is opened
   note?: string };
 export type Planned = Record<string, Record<string, PlannedMeal>>; // by date (ymd), then by slot id
 

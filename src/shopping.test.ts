@@ -49,7 +49,7 @@ test("SL3: lists are saved and numbered, the next starts after the last, finishi
   assert.equal(s.carry, null);
 });
 
-test("SL4: a food knows its meals; By meal; a tap goes to buy, in the basket, not there", async () => {
+test("SL4: a food knows its meals; By meal; a tap goes to buy, in the basket, not this time", async () => {
   const { makeList, daysFrom, tickIn, stateOf, shortMeals, byMeal, openList, notTicked, listText } = await import("./shopping");
   const plan = { "2026-10-20": { lunch: curry, breakfast: bowl }, "2026-10-21": { lunch: curry } };
   let s = makeList({ lists: [], carry: null }, plan as any, daysFrom("2026-10-20", 2), "2026-10-20T15:00:00Z");
@@ -62,7 +62,7 @@ test("SL4: a food knows its meals; By meal; a tap goes to buy, in the basket, no
   s = tickIn(s, 1, rice.key); assert.equal(stateOf(openList(s)!, rice.key), "missing");
   assert.deepEqual(shortMeals(openList(s)!).map((m) => `${m.date} ${m.slot}: ${m.foods.join(",")}`), ["2026-10-20 lunch: Rice, cooked", "2026-10-21 lunch: Rice, cooked"]);
   assert.ok(notTicked(openList(s)!).some((x) => x.key === rice.key), "not there counts as not bought");
-  assert.ok(/Rice, cooked: 600 g \(not at the last shop\)/.test(listText(openList(s)!, "x")));
+  assert.ok(/Rice, cooked: 600 g \(not bought last time\)/.test(listText(openList(s)!, "x")));
   s = tickIn(s, 1, rice.key); assert.equal(stateOf(openList(s)!, rice.key), "buy");
 });
 
@@ -99,12 +99,12 @@ test("SL6: a meal changed from the foods carried from the last list: the carried
   const skyr = "c:skyr, natural|arla";
   s = tickIn(tickIn(s, 2, skyr), 2, skyr);                         // skyr not there
   assert.equal(shortMeals(openList(s)!).length, 1);
-  s = replanMeal(s, 2, "2026-10-21", "snack", "Quark bowl", [{ name: "Quark", brand: "", grams: 250 }], "Skyr bowl");
+  s = replanMeal(s, 2, "2026-10-21", "snack", "Quark bowl", [{ name: "Quark", brand: "", grams: 250 }], "Skyr bowl", ["Skyr, natural"]);
   const l = openList(s)!;
   assert.equal(shortMeals(l).length, 0, "the snack is no longer short");
   assert.ok(!l.carried.some((x) => x.key === skyr) && !(l.missing ?? []).length, "the carried skyr leaves, nothing is short");
   assert.ok(l.carried.some((x) => x.name === "Rice, cooked"), "the carried foods of other meals stay");
-  assert.deepEqual(l.changes, [{ date: "2026-10-21", slot: "snack", from: "Skyr bowl", to: "Quark bowl" }]);
+  assert.deepEqual(l.changes, [{ date: "2026-10-21", slot: "snack", from: "Skyr bowl", to: "Quark bowl", because: ["Skyr, natural"] }]);
   s = replanMeal(s, 2, "2026-10-21", "snack", "Cottage cheese", [{ name: "Cottage cheese", brand: "", grams: 200 }], "Quark bowl");
-  assert.deepEqual(openList(s)!.changes, [{ date: "2026-10-21", slot: "snack", from: "Skyr bowl", to: "Cottage cheese" }], "a second change keeps what the meal was at first");
+  assert.deepEqual(openList(s)!.changes, [{ date: "2026-10-21", slot: "snack", from: "Skyr bowl", to: "Cottage cheese", because: ["Skyr, natural"] }], "a second change keeps what the meal was at first, and why");
 });
