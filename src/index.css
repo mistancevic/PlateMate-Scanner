@@ -1890,3 +1890,13 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .plan-head .plan-day-head small { font-size: var(--fs-label); font-weight: 700; color: var(--brand-text); }
 .plan-card-links { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 16px 4px; border-top: 1px solid var(--line); }
 .plan-card-links .link { font-weight: 700; font-size: var(--fs-label); }
+/* 0.2.61, board MB: a cook's shelf and the name in Members */
+.mb-shelf { display: block; font-size: var(--fs-section); font-weight: 900; color: var(--ink); margin: 8px 0 2px; }
+.mb-cook-link { font-weight: 700; margin: 2px 0 8px; align-self: flex-start; }
+.mb-name { width: 100%; box-sizing: border-box; font: inherit; font-size: var(--fs-body); padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--r-control); background: var(--surface); color: var(--ink); }
+.mb-name-ok { color: var(--good-text); font-weight: 700; }
+/* SL3: saved shopping lists */
+.shop-title { display: block; font-size: var(--fs-section); font-weight: 900; color: var(--ink); margin-top: 6px; }
+.shop-finish, .shop-make { margin-top: 12px; }
+.shop-ask { margin: 12px 0 0; gap: 10px; } .shop-ask b { font-size: var(--fs-body); }
+.shop-earlier { margin-top: 6px; }

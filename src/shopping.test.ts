@@ -23,3 +23,28 @@ test("grams read as a shop reads them, and the text leaves out what is ticked", 
   const l = shoppingList({ "2026-10-20": { lunch: curry, breakfast: bowl } }, ["2026-10-20"]);
   assert.equal(shoppingText(l, "20 to 26 October", new Set(["rice, cooked|"])), "Shopping list, 20 to 26 October\n\nChicken breast, raw: 200 g\nSkyr, natural (Arla): 250 g");
 });
+
+test("SL3: lists are saved and numbered, the next starts after the last, finishing can carry what wasn't ticked", async () => {
+  const { makeList, nextStart, daysFrom, tickIn, finishList, openList, listText } = await import("./shopping");
+  const plan = { "2026-10-20": { lunch: curry }, "2026-10-21": { lunch: curry, breakfast: bowl }, "2026-10-23": { lunch: curry } };
+  let s = { lists: [], carry: null } as any;
+  assert.equal(nextStart(s, "2026-10-20"), "2026-10-20", "the first list starts today");
+  s = makeList(s, plan, daysFrom("2026-10-20", 3), "2026-10-20T15:00:00Z");
+  const one = openList(s)!;
+  assert.equal(one.n, 1); assert.equal(one.from, "2026-10-20"); assert.equal(one.to, "2026-10-22"); assert.equal(one.meals, 3);
+  assert.equal(nextStart(s, "2026-10-20"), "2026-10-23", "the next list starts the day after");
+  // the plan changes: the saved list does not
+  (plan as any)["2026-10-21"].dinner = curry;
+  assert.equal(openList(s)!.meals, 3);
+  s = tickIn(s, 1, "chicken breast, raw|");
+  s = finishList(s, 1, true, "2026-10-21T10:00:00Z");
+  assert.equal(openList(s), null);
+  assert.deepEqual(s.carry.lines.map((x: any) => x.name), ["Rice, cooked", "Skyr, natural"], "the two not ticked wait for the next list");
+  s = makeList(s, plan, daysFrom(nextStart(s, "2026-10-21"), 1), "2026-10-22T09:00:00Z");
+  const two = openList(s)!;
+  assert.equal(two.n, 2); assert.equal(two.from, "2026-10-23"); assert.equal(two.carriedFrom, 1); assert.equal(two.carried.length, 2); assert.equal(s.carry, null);
+  assert.ok(listText(two, "Friday 23 October").startsWith("Shopping list 2, Friday 23 October\n\nRice, cooked: 600 g\nSkyr, natural (Arla): 250 g\nChicken breast, raw: 200 g\nRice, cooked: 300 g"), "carried first, then the new days");
+  // leave them: nothing waits
+  s = finishList(s, 2, false, "2026-10-23T10:00:00Z");
+  assert.equal(s.carry, null);
+});

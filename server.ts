@@ -432,7 +432,7 @@ app.post("/api/account/delete", requireUser, async (req, res) => {
     record: async () => { await d.recursiveDelete(d.collection("users").doc(uid)); },
     requests: async () => {
       // what they shared with members and the cover counts go with the account (0.2.11, board CO)
-      for (const col of ["member_recipes", "member_recipes_preview", "covers", "cover_days"]) {
+      for (const col of ["member_recipes", "member_recipes_preview", "member_names", "member_names_preview", "covers", "cover_days"]) {
         const mine = await d.collection(col).where("uid", "==", uid).get();
         for (let i = 0; i < mine.docs.length; i += 400) { const b = d.batch(); mine.docs.slice(i, i + 400).forEach((x) => b.delete(x.ref)); await b.commit(); }
       }
@@ -1536,6 +1536,72 @@ async function memberRecipe(req: express.Request, id: string): Promise<any | nul
   if (!FB_PROJECT) return memMembers[spaceOf(req)].get(id) ?? null;
   const d = await membersCol(req).doc(id).get(); return d.exists ? d.data() : null;
 }
+// Members names (0.2.61, board MB, Milan 16:46 to 16:50): a cook picks one name for Members, checked here so no two cooks
+// share it; filtering by cook is then one name per cook. Letters, digits, dot and underscore, 3 to 20; Marko and marko are
+// the same name. Every recipe shared with the name shows it; a new name reaches them all. Closed to the app like the rest.
+const memNames = { live: new Map<string, { uid: string; name: string }>(), preview: new Map<string, { uid: string; name: string }>() };
+const namesCol = (req: express.Request) => db().collection(spaceOf(req) === "preview" ? "member_names_preview" : "member_names");
+const NAME_OK = /^[\p{L}\p{N}._]{3,20}$/u;
+const nameKey = (n: string) => n.normalize("NFKC").toLowerCase();
+async function memberNameOf(req: express.Request, uid: string): Promise<string | null> {
+  if (!FB_PROJECT) { for (const v of memNames[spaceOf(req)].values()) if (v.uid === uid) return v.name; return null; }
+  const q = await namesCol(req).where("uid", "==", uid).limit(1).get(); return q.empty ? null : String(q.docs[0].get("name"));
+}
+async function nameHolder(req: express.Request, name: string): Promise<string | null> {
+  const k = nameKey(name);
+  if (!FB_PROJECT) return memNames[spaceOf(req)].get(k)?.uid ?? null;
+  const d = await namesCol(req).doc(k).get(); return d.exists ? String(d.get("uid")) : null;
+}
+app.get("/api/members/name", requireUser, requireMember, async (req, res) => {
+  try {
+    const uid = memberUid(req), mine = await memberNameOf(req, uid);
+    const check = String(req.query.check ?? "").trim();
+    if (!check) return res.json({ name: mine });
+    if (!NAME_OK.test(check)) return res.json({ name: mine, ok: false, why: "3 to 20 letters or digits; a dot or _ is fine, no spaces." });
+    const holder = await nameHolder(req, check);
+    res.json({ name: mine, ok: !holder || holder === uid, why: holder && holder !== uid ? `${check} is taken.` : "" });
+  } catch (e) { fail(res, e); }
+});
+// take a name for a cook: false when another cook holds it; the old name is let go; named recipes show the new one
+async function takeMemberName(req: express.Request, uid: string, name: string): Promise<boolean> {
+  const k = nameKey(name), old = await memberNameOf(req, uid);
+  if (!FB_PROJECT) {
+    const m = memNames[spaceOf(req)], h = m.get(k);
+    if (h && h.uid !== uid) return false;
+    if (old && nameKey(old) !== k) m.delete(nameKey(old));
+    m.set(k, { uid, name });
+    for (const r of memMembers[spaceOf(req)].values()) if (r.uid === uid && r.name) r.name = name;
+    return true;
+  }
+  const col = namesCol(req);
+  const ok = await db().runTransaction(async (t) => {
+    const d = await t.get(col.doc(k));
+    if (d.exists && d.get("uid") !== uid) return false;
+    if (old && nameKey(old) !== k) t.delete(col.doc(nameKey(old)));
+    t.set(col.doc(k), { uid, name, at: new Date().toISOString() });
+    return true;
+  });
+  if (ok) { const mine = await membersCol(req).where("uid", "==", uid).get(); for (const d of mine.docs) if (d.get("name")) await d.ref.update({ name }); }
+  return ok;
+}
+app.post("/api/members/name", requireUser, requireMember, async (req, res) => {
+  try {
+    const uid = memberUid(req), name = String(req.body?.name ?? "").trim();
+    if (!NAME_OK.test(name)) return res.status(400).json({ error: "3 to 20 letters or digits; a dot or _ is fine, no spaces." });
+    if (!(await takeMemberName(req, uid, name))) return res.status(409).json({ error: `${name} is taken.` });
+    res.json({ name });
+  } catch (e) { fail(res, e); }
+});
+// the name a shared recipe shows: the cook's name in Members; a cook who shared by first name before 0.2.61 gets that name
+// the first time it is free, or keeps the one the recipe had
+async function sharedName(req: express.Request, uid: string, b: any, old: any): Promise<string> {
+  if (!b?.named) return "";
+  const have = await memberNameOf(req, uid);
+  if (have) return have;
+  const want = typeof b.name === "string" ? b.name.trim().split(/\s+/)[0].slice(0, 20) : "";
+  if (want && NAME_OK.test(want) && (await takeMemberName(req, uid, want))) return want;
+  return old?.name ?? "";
+}
 app.get("/api/members", requireUser, requireMember, async (req, res) => {
   try {
     const uid = memberUid(req);
@@ -1557,7 +1623,7 @@ app.post("/api/members", requireUser, requireMember, async (req, res) => {
     const now = new Date().toISOString();
     // a change to the recipe reaches members with the cover they already see, unless a new one is sent
     const keep = b.cover === undefined && old;
-    const doc = { ...r, id, uid, name: b.named && typeof b.name === "string" ? b.name.trim().split(/\s+/)[0].slice(0, 30) : "", cover: keep ? old.cover : cover, coverKind: keep ? old.coverKind : b.coverKind === "photo" ? "photo" : "drawn", sharedAt: old?.sharedAt ?? now, updatedAt: now, made: old?.made ?? 0 };
+    const doc = { ...r, id, uid, name: await sharedName(req, uid, b, old), cover: keep ? old.cover : cover, coverKind: keep ? old.coverKind : b.coverKind === "photo" ? "photo" : "drawn", sharedAt: old?.sharedAt ?? now, updatedAt: now, made: old?.made ?? 0 };
     if (!FB_PROJECT) memMembers[spaceOf(req)].set(id, doc); else await membersCol(req).doc(id).set(doc);
     res.json({ id, sharedAt: doc.sharedAt, made: doc.made });
   } catch (e) { fail(res, e); }

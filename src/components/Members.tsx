@@ -39,23 +39,35 @@ export function aheadOf(p: AppApi): Ahead | null {
   const share = mealShare(slots, slot.id, { kcal: nums.kcal, protein: nums.protein }, { kcal: rec.kcal, protein: rec.protein }, closed);
   return share ? { name: slot.name.toLowerCase(), kcal: share.kcal, target: p.dayPd ?? p.pdRef } : null;
 }
+export const cooksOf = (list: SharedRecipe[]) => { const n = new Map<string, number>(); for (const r of list) if (r.name && !r.mine) n.set(r.name, (n.get(r.name) ?? 0) + 1); return [...n.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map((x) => x[0]); };
 const byLine = (r: SharedRecipe) => [r.kitchen, r.mine ? "shared by you" : r.name ? `shared by ${r.name}` : "shared by a member", r.made ? `made ${r.made === 1 ? "once" : `${r.made} times`}` : ""].filter(Boolean).join(" · ");
 const tag = (r: SharedRecipe) => (r.coverKind === "photo" ? (r.name ? `Photo by ${r.name}` : r.mine ? "Your photo" : "Photo by a member") : `Picture by ${CHEF_NAME}`);
 
 // CO2: the list
-export function MembersList({ list, ahead, p, open, loading, error }: { list: SharedRecipe[] | null; ahead: Ahead | null; p: AppApi; open: (id: string) => void; loading: boolean; error: string }) {
+export function MembersList({ list, ahead, p, open, loading, error, cook, setCook }: { list: SharedRecipe[] | null; ahead: Ahead | null; p: AppApi; open: (id: string) => void; loading: boolean; error: string; cook: string | null; setCook: (c: string | null) => void }) {
   const kitchens = p.personal.kitchens ?? [];
   const [kitchen, setKitchen] = useState<string | null>(null);
-  const shown = list ? membersFor(list, { target: ahead?.target ?? null, kitchens, allergies: p.safety.allergies ?? [], kitchen }) : [];
+  // MB2 (0.2.61): the cooks who shared with their name, most recipes first; one name is one cook
+  const cooks = cooksOf(list ?? []);
+  const on = cook ? cooks.find((c) => c.toLowerCase() === cook.toLowerCase()) ?? null : null;
+  const byCook = on ? (list ?? []).filter((r) => (r.name ?? "").toLowerCase() === on.toLowerCase()) : list;
+  const shown = byCook ? membersFor(byCook, { target: ahead?.target ?? null, kitchens, allergies: p.safety.allergies ?? [], kitchen }) : [];
   return (
     <>
       <section className="card mb-head">
         <small className="mb-lead">{ahead
           ? `Recipes members cooked and shared, worked out for your day. ${ahead.name.charAt(0).toUpperCase() + ahead.name.slice(1)} is about ${fmt(ahead.kcal, 0)} kcal${ahead.target !== null ? ` at ${pdText(ahead.target)} or more, so these come first` : ""}.`
           : "Recipes members cooked and shared. Set your goal and every recipe shows your portion."}</small>
+        {on && <b className="mb-shelf">{on}'s kitchen · {shown.length} {shown.length === 1 ? "recipe" : "recipes"}</b>}
+        {cooks.length > 0 && (
+          <div className="mb-chips" role="group" aria-label="Cooks">
+            <button className={`choice ${on === null ? "on" : ""}`} onClick={() => setCook(null)}>All cooks</button>
+            {cooks.map((c) => <button key={c} className={`choice ${on === c ? "on" : ""}`} onClick={() => setCook(on === c ? null : c)}>{c}</button>)}
+          </div>
+        )}
         {kitchens.length > 0 && (
           <div className="mb-chips" role="group" aria-label="Kitchens">
-            <button className={`choice ${kitchen === null ? "on" : ""}`} onClick={() => setKitchen(null)}>All</button>
+            <button className={`choice ${kitchen === null ? "on" : ""}`} onClick={() => setKitchen(null)}>All kitchens</button>
             {kitchens.map((k) => <button key={k} className={`choice ${kitchen === k ? "on" : ""}`} onClick={() => setKitchen(kitchen === k ? null : k)}>{k}</button>)}
           </div>
         )}
@@ -82,7 +94,7 @@ export function MembersList({ list, ahead, p, open, loading, error }: { list: Sh
 }
 
 // CO3: a member's recipe at your portion; nothing here can be edited
-export function MemberPage({ r, ahead, p, owner, close, takeDown }: { r: SharedRecipe; ahead: Ahead | null; p: AppApi; owner: boolean; close: () => void; takeDown: () => void }) {
+export function MemberPage({ r, ahead, p, owner, close, takeDown, toCook }: { r: SharedRecipe; ahead: Ahead | null; p: AppApi; owner: boolean; close: () => void; takeDown: () => void; toCook?: (name: string) => void }) {
   useBack(true, close);
   useEffect(() => { log("members", { how: "open" }); }, [r.id]);
   const x = portionOf(r, ahead?.kcal ?? null);
@@ -94,6 +106,7 @@ export function MemberPage({ r, ahead, p, owner, close, takeDown }: { r: SharedR
       <h2 className="rq-name rq-name-fixed">{r.title}</h2>
       <small className="muted mb-by">{byLine(r)}{r.made ? " by members" : ""}</small>
       {r.source && <small className="muted mb-by">Adapted from {r.source}</small>}
+      {r.name && !r.mine && toCook && <button className="link mb-cook-link" onClick={() => toCook(r.name)}>All of {r.name}'s recipes ›</button>}
       {ahead && <small className="mb-yours">Your {ahead.name}: {fmt(x.grams, 0)} g of the {fmt(x.total, 0)} g it makes</small>}
       <div className="rp-stats">
         <span><b>{fmt(x.kcal, 0)}</b><small>kcal</small></span>
@@ -126,14 +139,30 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
   const drawnFirst = photos.find((x) => isDrawnPhoto(meal, x));
   const [pick, setPick] = useState<string | null>(shared?.coverSig ?? (drawnFirst ? sig(drawnFirst) : photos[0] ? sig(photos[0]) : null));
   const [named, setNamed] = useState(shared?.named ?? false);
+  // MB1 (0.2.61): one name in Members, unique, checked by the server; asked the first time you share with your name
+  const [memberName, setMemberName] = useState<string | null | undefined>(undefined);
+  const [typed, setTyped] = useState(""), [check, setCheck] = useState<{ ok: boolean; why: string } | null>(null);
+  // asked only when the name matters: the switch on, or a recipe already shared with it (the server allows 30 calls a minute)
+  useEffect(() => { if (!named || memberName !== undefined) return; fetch("/api/members/name").then((r) => r.json()).then((d) => { setMemberName(d.name ?? null); if (!d.name) setTyped(firstName(p.user?.name) || ""); }).catch(() => setMemberName(null)); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [named]);
+  useEffect(() => {
+    if (memberName || !typed.trim()) { setCheck(null); return; }
+    const t = setTimeout(() => { fetch(`/api/members/name?check=${encodeURIComponent(typed.trim())}`).then((r) => r.json()).then((d) => setCheck({ ok: Boolean(d.ok), why: d.why || "" })).catch(() => setCheck(null)); }, 350);
+    return () => clearTimeout(t);
+  }, [typed, memberName]);
   const kitchens = p.personal.kitchens ?? [];
   const [kitchen, setKitchen] = useState<string | null>(shared?.kitchen ?? meal.kitchen ?? null);
   const [busy, setBusy] = useState(false), [err, setErr] = useState("");
-  const name = firstName(p.user?.name) || "you";
+  const name = memberName || "you";
   const chosen = photos.find((x) => sig(x) === pick) ?? null;
   const share = async () => {
     setBusy(true); setErr("");
     try {
+      if (named && !memberName) {
+        const r = await fetch("/api/members/name", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: typed.trim() }) });
+        const d = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(d.error || "That name didn't work. Try another.");
+        setMemberName(d.name);
+      }
       const cover = chosen ? await resizeImageBase64(chosen, 640, 480).catch(() => null) : null;
       const recipe = sharedOf(meal, kitchen);
       const r = await fetch("/api/members", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ recipe, cover, coverKind: chosen && isDrawnPhoto(meal, chosen) ? "drawn" : "photo", named, name: p.user?.name ?? "" }) });
@@ -174,9 +203,14 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
           <small className="mb-sub">Its kitchen</small>
           <div className="mb-chips" role="group" aria-label="Its kitchen">{kitchens.map((k) => <button key={k} className={`choice ${kitchen === k ? "on" : ""}`} onClick={() => setKitchen(kitchen === k ? null : k)}>{k}</button>)}</div>
         </>)}
-        <label className="mb-switch"><input type="checkbox" role="switch" checked={named} onChange={(e) => setNamed(e.target.checked)} /><span className="mb-knob" aria-hidden="true" />Show my first name</label>
-        <small className="muted">{named ? `On: members see it as ${name === "you" ? "yours, by your first name" : `${name}'s`}. Off: as a member's.` : `Off: members see it as a member's. On: as ${name === "you" ? "yours, by your first name" : `${name}'s`}.`}</small>
-        <div className="button-row"><button className="pill pill-small" disabled={busy} onClick={share}>Share with members</button></div>
+        <label className="mb-switch"><input type="checkbox" role="switch" checked={named} onChange={(e) => setNamed(e.target.checked)} /><span className="mb-knob" aria-hidden="true" />Show my name</label>
+        {named && memberName === null && (<>
+          <small className="mb-sub">Your name in Members</small>
+          <input className="mb-name" aria-label="Your name in Members" value={typed} maxLength={20} onChange={(e) => setTyped(e.target.value)} />
+          <small className={check?.ok ? "mb-name-ok" : "muted"}>{check ? (check.ok ? `${typed.trim()} is free. It is yours once you share.` : check.why) : "One name per cook, so members find all your recipes under it."}</small>
+        </>)}
+        <small className="muted">{named ? `On: members see it as ${name === "you" ? "yours, by your name in Members" : `${name}'s`}. Off: as a member's.` : `Off: members see it as a member's. On: as ${name === "you" ? "yours, by your name in Members" : `${name}'s`}.`}</small>
+        <div className="button-row"><button className="pill pill-small" disabled={busy || (named && memberName === null && !check?.ok)} onClick={share}>Share with members</button></div>
       </>)}
       {err && <small className="muted" style={{ color: "var(--low)" }}>{err}</small>}
     </section>
