@@ -274,7 +274,7 @@ export function BuiltScreen() {
       <p className="bt-sub">The Worth series: how to decide what is worth the effort, in products, in food and in life.</p>
       <div className="bt-book">
         <img src="/landing/worth-building.webp" alt="Worth Building by Milan Stancevic, the cover" width={986} height={596} loading="lazy" />
-        <div><span className="bt-pub">Published · Version 2.0</span><b>Worth Building</b><p>A product playbook: from "Is this worth building?" to a better product decision. Six product decisions, from Direction to Delta, with humans, code and AI each doing the part they do best. 44 pages, free PDF on GitHub.</p><a className="bt-btn" href="https://github.com/mistancevic/worth-building/blob/main/Worth-Building-v2-Milan-Stancevic.pdf" target="_blank" rel="noreferrer">Read Worth Building</a></div>
+        <div><span className="bt-pub">Published · Version 2.0</span><b>Worth Building</b><p>A product playbook: from "Is this worth building?" to a better product decision. Six product decisions, from Direction to Delta, with humans, code and AI each doing the part they do best. 44 pages, free PDF on GitHub.</p><a className="bt-btn bt-btn-line" href="https://github.com/mistancevic/worth-building/blob/main/Worth-Building-v2-Milan-Stancevic.pdf" target="_blank" rel="noreferrer">Read Worth Building</a></div>
       </div>
       <div className="bt-cards">
         <div><span className="bt-soon">Coming soon</span><b>Worth Eating</b><p>Learn up front how a food serves you, and let one number do the math. The thinking behind Chef Mealan.</p></div>
@@ -290,7 +290,7 @@ export function BuiltScreen() {
         <div><small>Coach, after hours</small><b>Fitness and nutrition</b><p>Certified fitness and nutrition coach. Cooks every day and tries every recipe and every number on himself first.</p></div>
         <div><small>Author</small><b>The Worth series</b><p>Worth Building is out. Worth Eating and Worth Living come next.</p></div>
       </div>
-      <a className="bt-btn" href="https://www.linkedin.com/in/milanstancevic" target="_blank" rel="noreferrer">Milan on LinkedIn</a>
+      <a className="bt-btn bt-btn-line" href="https://www.linkedin.com/in/milanstancevic" target="_blank" rel="noreferrer">Milan on LinkedIn</a>
 
       <footer className="l-foot">
         <span><a href="/">Home</a> · <a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a></span>

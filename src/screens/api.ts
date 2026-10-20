@@ -131,6 +131,7 @@ export interface AppApi {
   addFoodPhoto: (foodId: string, dataUrl: string) => Promise<void>;
   saveFood: (f: import("../pilot").Food) => void;
   openFoodId: string | null;
+  openFood: (id: string) => void;
   clearOpenFood: () => void;
   toggleFavorite: (foodId: string) => void;
   keepForLater: (meal: Meal, extra?: { photos?: string[]; prep?: Feedback["prep"]; status?: "prepared" | "not-used"; left?: number; leftOf?: string; recipeId?: string }) => void;

@@ -125,6 +125,12 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   return (
     <div className="rq">
       <button className="link rq-back" onClick={close}><ChevronLeft size={18} /> {backLabel ?? "Recipes"}</button>
+      {/* 0.2.56 (board DS4, G, Milan 08:49): the page's title comes first, under Back; then the photo */}
+      {edit && <span className="rq-editing">Editing the recipe</span>}
+      {/* the name: tap to rename (the dashed field, as on the Plate) */}
+      {naming !== null
+        ? <input className="title-input rq-name-input" aria-label="Name of the recipe" autoFocus value={naming} onChange={(e) => setNaming(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" maxLength={80} />
+        : <button type="button" className="rq-name" aria-label={`Rename ${meal.title}`} onClick={() => setNaming(meal.title)}>{meal.title}</button>}
       {top}
       {/* R8: the photos first */}
       {drawn
@@ -175,11 +181,6 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         </div>
       )}
       {tryPhoto && <TryPhoto meal={meal} tryPhoto={tryPhoto} use={(img) => { const list = recipePhotosOf(meal).filter((x) => x !== img); onPatch({ ...withRecipePhotos([img, ...list].slice(0, MAX_RECIPE_PHOTOS)), coverSig: sig(img) }); }} />}
-      {edit && <span className="rq-editing">Editing the recipe</span>}
-      {/* the name: tap to rename (the dashed field, as on the Plate) */}
-      {naming !== null
-        ? <input className="title-input rq-name-input" aria-label="Name of the recipe" autoFocus value={naming} onChange={(e) => setNaming(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" maxLength={80} />
-        : <button type="button" className="rq-name" aria-label={`Rename ${meal.title}`} onClick={() => setNaming(meal.title)}>{meal.title}</button>}
       {meal.source && <SourceBox meal={meal} onPatch={onPatch} openOriginal={openOriginal ?? null} />}
       {/* R16 (0.2.44, board RS15): PD on top, under Where it came from, as on the Plate; it follows the grams while editing */}
       <NutritionCard readoutOnly items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={null} pdRef={pdRef ?? null} fitPd={fitPd} />

@@ -41,7 +41,7 @@ export function LandingScreen() {
     <div className="landing">
       <header className="l-top">
         <div className="l-brand"><Mark size={30} color="var(--brand)" /><b>{APP_NAME}</b></div>
-        <span className="l-topnav"><a className="l-recipes" href="/recipes">Recipes</a><button className="link l-signin" disabled={busy} onClick={go}>Sign in</button></span>
+        <span className="l-topnav"><a className="l-recipes" href="/recipes">Recipes</a><button className="pill pill-small l-signin" disabled={busy} onClick={go}>Sign in</button></span>
       </header>
 
       {/* the top (board HP, HP5, 12 October 2026): who it is for, the promise, the calculator already answered, then the
@@ -108,7 +108,7 @@ export function LandingScreen() {
             <p>Milan is a senior product manager with about 20 years in software and the founder of several startups. He designs and builds Chef Mealan with AI, from the first sketch to every release.</p>
             <p>After hours, Milan is a certified fitness and nutrition coach in Munich, known to his clients as Coach Milan. He cooks every day for himself and his family, and tries every recipe and every number on himself first.</p>
             <p>Author of <a href="/built#books">Worth Building</a>. Worth Eating comes next.</p>
-            <p className="l-behind-links"><a href="/built">How Chef Mealan is built</a> · <a href="/about">More about Milan</a></p>
+            <p className="l-behind-links"><a href="/built">How Chef Mealan is built ›</a><a href="/about">More about Milan ›</a></p>
           </div>
           <figure className="l-hero-art">
             <img className="l-chef" src="/landing/chef.webp" alt="Milan Stancevic, the person behind Chef Mealan, in a chef's hat" />

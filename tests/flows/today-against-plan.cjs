@@ -7,6 +7,8 @@
 // No batch block; a planned meal shows in what comes next, with its picture, and I ate it logs it in one tap.
 // Changed by story DS rule D (Milan 07:06 to 07:30, boards DS1 and DS2): Today has no wide button. A next meal with nothing
 // planned is a card with Pick a meal and Make it on the Plate; late in the day the Tomorrow card opens tomorrow's plan.
+// Changed by story DS4 F (Milan 08:33 to 08:58, board DS4): fat and carbs no longer say at least inside the number. A plus
+// on the number, and one note under the numbers names the foods with no value; a food in your foods opens there.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -59,7 +61,8 @@ const open = async (state, at = "2026-10-18T12:20:00") => {
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(700);
     await at("2026-10-18T16:00:00");
     const goal = await text("section.plan");
-    ok(/Today so far, against your goal/.test(goal) && /of 2,800 kcal/.test(goal) && /of 180 g protein/.test(goal) && /at least \d+ ?of \d+ g fat/.test(goal), "the goal card: today against it, fat and carbs at least when a food has no value: " + goal.slice(0, 200));
+    ok(/Today so far, against your goal/.test(goal) && /of 2,800 kcal/.test(goal) && /of 180 g protein/.test(goal) && /\d+\+ ?of \d+ g fat/.test(goal) && !/at least/.test(goal) && /\+ Not complete: .+ (has|have) no (fat or carbs|fat|carbs) value\./.test(goal), "the goal card: today against it, fat and carbs with a plus and a note naming the food when a food has no value: " + goal.slice(0, 200));
+    ok(/Not complete: .*Digestive biscuits/.test(await text(".macro-gap")), "the note names the food with no value: " + (await text(".macro-gap")));
     const next = await text(".next-meal");
     ok(/^Next: /.test(await page.locator("p.label").filter({ hasText: /^Next: / }).first().textContent()) && /Nothing planned yet/.test(next) && /Pick a meal/.test(next) && /Make it on the Plate/.test(next) && /Log a meal/.test(next), "what comes next: the next meal, Pick a meal or Make it on the Plate, Log a meal: " + next);
     const meal = page.locator(".log-card").filter({ hasText: "Protein cheesecake" }).filter({ has: page.locator(".meal-which") }).first();

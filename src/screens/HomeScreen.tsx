@@ -162,10 +162,16 @@ export function HomeScreen(p: AppApi) {
         {!p.goal && <button className="strip strip-button" onClick={p.openGoal}>Set your goal: your day in four numbers, every plate measured against them.</button>}
         {p.todayMacros && (
           <div className="plan-macros">
-            <div><b>{dayT.gap ? "at least " : ""}{fmt(dayT.fats, 0)}</b><small>of {p.todayMacros.fats} g fat</small></div>
-            <div><b>{dayT.gap ? "at least " : ""}{fmt(dayT.carbs, 0)}</b><small>of {p.todayMacros.carbs} g carbs</small></div>
+            <div><b>{fmt(dayT.fats, 0)}{dayT.gap ? "+" : ""}</b><small>of {p.todayMacros.fats} g fat</small></div>
+            <div><b>{fmt(dayT.carbs, 0)}{dayT.gap ? "+" : ""}</b><small>of {p.todayMacros.carbs} g carbs</small></div>
             <div />
           </div>
+        )}
+        {/* 0.2.56 (board DS4, F, Milan 08:49 to 08:58): not "at least" in the number; a plus, and one note of value under the
+            numbers: why they are not complete and which food; the name of a food in your foods opens it there, to add the values;
+            a food that lives only in a recipe is named, not linked, since nothing can add its values yet */}
+        {p.todayMacros && dayT.missing.length > 0 && (
+          <small className="macro-gap">+ Not complete: {dayT.missing.map((m, k) => <span key={m.id}>{k ? (k === dayT.missing.length - 1 ? " and " : ", ") : ""}{state.foods.some((x) => x.id === m.id) ? <button type="button" className="link in-inline" onClick={() => p.openFood(m.id)}>{m.name}</button> : m.name}</span>)} {dayT.missing.length === 1 ? "has" : "have"} no {dayT.missing.every((m) => m.what === dayT.missing[0].what) ? dayT.missing[0].what : "fat or carbs"} value.</small>
         )}
         {p.review?.status === "change" && <button className="strip strip-button review-ask" onClick={() => p.openMenu("goal")}>{p.review.by || p.coachLabel} asks you to change {p.review.kept?.length === 1 ? "one number" : "your numbers"} ›</button>}
         {p.profile.coachId && !byCoach && <button className="plan-source coach-line" onClick={() => p.openMenu("coach")} aria-label="Open your coach">{p.coachLabel} <ChevronRight size={12} /></button>}
@@ -442,10 +448,11 @@ export function HomeScreen(p: AppApi) {
 function DayBand({ day, date }: { day: string; date: string }) {
   return <div className="day-band" role="heading" aria-level={2}><b>{day}</b><span>{date}</span></div>;
 }
-// R5: a list's numbers; fat and carbs count what is known, and gap says a food has no value for them
+// R5: a list's numbers; fat and carbs count what is known, and gap says a food has no value for them;
+// 0.2.56 (board DS4, F): missing names those foods, once each, so the note under the numbers can say which
 function sumOf(items: Feedback["meal"]["items"]) {
-  const t = { kcal: 0, protein: 0, fats: 0, carbs: 0, gap: false };
-  for (const i of items) { if (!(i.grams > 0)) continue; const k = i.grams / 100; t.kcal += k * (i.food.calories ?? 0); t.protein += k * (i.food.protein ?? 0); if (i.food.fats == null || i.food.carbs == null) t.gap = true; t.fats += k * (i.food.fats ?? 0); t.carbs += k * (i.food.carbs ?? 0); }
+  const t = { kcal: 0, protein: 0, fats: 0, carbs: 0, gap: false, missing: [] as { id: string; name: string; what: string }[] };
+  for (const i of items) { if (!(i.grams > 0)) continue; const k = i.grams / 100; t.kcal += k * (i.food.calories ?? 0); t.protein += k * (i.food.protein ?? 0); if (i.food.fats == null || i.food.carbs == null) { t.gap = true; if (!t.missing.some((x) => x.id === i.food.id)) t.missing.push({ id: i.food.id, name: i.food.name, what: i.food.fats == null && i.food.carbs == null ? "fat or carbs" : i.food.fats == null ? "fat" : "carbs" }); } t.fats += k * (i.food.fats ?? 0); t.carbs += k * (i.food.carbs ?? 0); }
   return t;
 }
 
