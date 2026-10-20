@@ -25,10 +25,20 @@ export function refreshPlanned(p: Planned, meals: Meal[]): Planned {
     for (const [slot, m] of Object.entries(day)) {
       const r = m.mealId && !m.servings ? byId.get(m.mealId) : undefined;
       if (r && servingsOf(r) > 1) { const f = fromMeal(r, m.source); next[date][slot] = { ...m, kcal: f.kcal, protein: f.protein, servings: f.servings }; changed = true; }
+      else if (!m.mealId && m.items?.length && twice(m.items)) { next[date][slot] = withoutTwice(m); changed = true; }
       else next[date][slot] = m;
     }
   }
   return changed ? next : p;
+}
+// 0.2.65 (Milan 20:46): before 0.2.64, a second Use this on a meal already changed added Chef Mealan's food again (spelt
+// flakes twice). A meal changed for one day that holds the same estimated food twice, same grams and part, keeps it once.
+const sameItem = (a: Ingredient, b: Ingredient) => a.food.source === "estimate" && b.food.source === "estimate" && a.food.name.toLowerCase() === b.food.name.toLowerCase() && Math.round(a.grams) === Math.round(b.grams) && (a.part ?? "") === (b.part ?? "");
+const twice = (items: Ingredient[]) => items.some((x, i) => items.slice(0, i).some((y) => sameItem(x, y)));
+function withoutTwice(m: PlannedMeal): PlannedMeal {
+  const items = m.items!.filter((x, i) => !m.items!.slice(0, i).some((y) => sameItem(x, y)));
+  const t = aggregate(items);
+  return { ...m, items, kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0), portion: Math.round(items.reduce((n, i) => n + i.grams, 0)) };
 }
 // put a meal in a slot, or empty it with null; a date with nothing left disappears
 export function withPlanned(p: Planned, date: string, slotId: string, meal: PlannedMeal | null): Planned {

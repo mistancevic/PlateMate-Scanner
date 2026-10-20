@@ -30,7 +30,8 @@ export function ShortHelp({ p, list, date, slot, label, title, missing, onUsed }
   const build = (o: any): Opt | null => {
     let items: Ingredient[] = [], mealId: string | undefined, source: PlannedMeal["source"] = held?.source ?? "plate", name = String(o.title || "");
     if (o.kind === "standin") {
-      if (!portion) return null;
+      // a swap only where the meal still has the food: never twice on a meal already changed (0.2.65, Milan 20:46)
+      if (!portion || !portion.items.some((i) => isMissing(i.food.name))) return null;
       items = [...portion.items.filter((i) => !isMissing(i.food.name)).map((i) => ({ ...i, id: uid() })),
         ...(o.swaps ?? []).map((w: any) => ({ id: uid(), food: lib(w.name) ?? estimate(w), grams: w.grams, locked: false }))];
     } else {

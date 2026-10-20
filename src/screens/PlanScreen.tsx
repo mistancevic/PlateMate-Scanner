@@ -1,7 +1,7 @@
 import { carryReads } from "../carry";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { ChevronRight, ChefHat, Pencil, Circle, CircleCheck, CircleSlash, ShoppingBasket } from "lucide-react";
-import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, stateOf, shortMeals, byMeal, replanMeal, type ShopStore, type SavedList, type ShopLine } from "../shopping";
+import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, stateOf, shortMeals, byMeal, replanMeal, followPlan, type ShopStore, type SavedList, type ShopLine } from "../shopping";
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
 import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
@@ -234,7 +234,8 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
 // at a time; tap a food when it is in the basket; Finish the list asks about the foods not ticked. Earlier lists stay readable.
 const DAY_CHOICES = [1, 3, 7];
 function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDay: (date: string) => void }) {
-  const [store, setStore] = useState<ShopStore>(getStore);
+  // the list follows the plan when it opens: a short meal the plan has already changed is not short (0.2.65)
+  const [store, setStore] = useState<ShopStore>(() => { const s0 = getStore(), s1 = followPlan(s0, p.planned); if (s1 !== s0) putStore(s1); return s1; });
   const save = (s: ShopStore) => { putStore(s); setStore(s); };
   const [reading, setReading] = useState<number | null>(null);
   const [asking, setAsking] = useState(false);

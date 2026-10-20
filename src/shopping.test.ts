@@ -108,3 +108,23 @@ test("SL6: a meal changed from the foods carried from the last list: the carried
   s = replanMeal(s, 2, "2026-10-21", "snack", "Cottage cheese", [{ name: "Cottage cheese", brand: "", grams: 200 }], "Quark bowl");
   assert.deepEqual(openList(s)!.changes, [{ date: "2026-10-21", slot: "snack", from: "Skyr bowl", to: "Cottage cheese", because: ["Skyr, natural"] }], "a second change keeps what the meal was at first, and why");
 });
+
+test("0.2.65: the list follows a plan already changed; a food doubled by a second swap is kept once", async () => {
+  const { makeList, daysFrom, tickIn, openList, shortMeals, followPlan } = await import("./shopping");
+  const { refreshPlanned } = await import("./planned");
+  const plan: any = { "2026-10-21": { lunch: curry } };
+  let s = makeList({ lists: [], carry: null }, plan, daysFrom("2026-10-21", 1), "x");
+  s = tickIn(tickIn(s, 1, "rice, cooked|"), 1, "rice, cooked|");
+  assert.equal(shortMeals(openList(s)!).length, 1);
+  // the plan changed elsewhere: lunch has bulgur now, twice, as the old second Use this left it
+  const est = (name: string) => ({ ...food(name), source: "estimate" });
+  const changed = { title: "Chicken curry with bulgur", kcal: 1, protein: 1, source: "mine", items: [it(food("Chicken breast, raw"), 200), it(est("Bulgur, cooked"), 300), it(est("Bulgur, cooked"), 300)], portion: 800 };
+  const fixed = refreshPlanned({ "2026-10-21": { lunch: changed } } as any, []);
+  assert.deepEqual(fixed["2026-10-21"].lunch.items!.map((i: any) => i.food.name), ["Chicken breast, raw", "Bulgur, cooked"], "bulgur once");
+  assert.equal(fixed["2026-10-21"].lunch.portion, 500);
+  s = followPlan(s, fixed);
+  const l = openList(s)!;
+  assert.equal(shortMeals(l).length, 0, "lunch is no longer short");
+  assert.deepEqual(l.lines.map((x) => [x.name, x.grams]), [["Bulgur, cooked", 300], ["Chicken breast, raw", 200]], "rice leaves; the list holds what the plan holds");
+  assert.equal((l.changes ?? []).length, 0, "followed quietly, not said as a change you made");
+});
