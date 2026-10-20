@@ -1,7 +1,7 @@
 {
   "name": "chefmealan",
   "private": true,
-  "version": "0.2.54",
+  "version": "0.2.55",
   "type": "module",
   "scripts": {
     "dev": "node --import tsx server.ts",
@@ -20,6 +20,7 @@
     "eval:numbers": "node --import tsx evals/run-numbers.ts"
   },
   "dependencies": {
+    "@fontsource/nunito": "^5.3.0",
     "@google/genai": "^2.4.0",
     "@tailwindcss/vite": "^4.1.14",
     "@vitejs/plugin-react": "^5.0.4",

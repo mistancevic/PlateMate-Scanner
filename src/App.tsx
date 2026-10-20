@@ -2410,7 +2410,7 @@ export default function App() {
             // one door: on a plate with food it answers about the plate; anywhere else it's the conversation
             if (!menuSection && tab === "journey" && (step === "in" || step === "recipe") && state.items.length > 0) setMealanAsk((n) => n + 1);
             else setTalkOpen(true);
-          }}><Mark size={30} color="#fff" /></button>
+          }}><Mark size={30} color="var(--surface)" /></button>
         )}
         {!menuSection && !talkOpen && tab === "me" && <MeScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "clients" && <ClientsScreen {...screenProps} />}

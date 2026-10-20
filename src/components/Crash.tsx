@@ -20,18 +20,18 @@ export class Crash extends Component<{ children: ReactNode }, { error: Error | n
       location.reload();
     };
     return (
-      <div style={{ padding: 24, fontFamily: "Nunito, system-ui, sans-serif", color: "#172742", background: "#eef3fc", minHeight: "100vh", boxSizing: "border-box" }}>
+      <div style={{ padding: 24, fontFamily: "Nunito, system-ui, sans-serif", color: "var(--ink)", background: "var(--base)", minHeight: "100vh", boxSizing: "border-box" }}>
         <h2 style={{ margin: "8px 0" }}>Chef Mealan could not open</h2>
         <p>Your data is still on this phone and in your account. Send Milan a screenshot of this screen.</p>
-        <pre style={{ whiteSpace: "pre-wrap", fontSize: 12, background: "#fff", padding: 12, borderRadius: 12, border: "1.5px solid #d1dcf0" }}>{version}{"\n"}{e.message}{"\n"}{(e.stack ?? "").split("\n").slice(1, 5).join("\n")}</pre>
+        <pre style={{ whiteSpace: "pre-wrap", fontSize: 12.5, background: "var(--surface)", padding: 12, borderRadius: 12, border: "1.5px solid var(--line)" }}>{version}{"\n"}{e.message}{"\n"}{(e.stack ?? "").split("\n").slice(1, 5).join("\n")}</pre>
         <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 12 }}>
           <button onClick={() => location.reload()} style={btn}>Try again</button>
           <button onClick={exportCopy} style={btn}>Save this phone's copy as a file</button>
-          <button onClick={fromAccount} style={{ ...btn, background: "#2e7be8", color: "#fff", borderColor: "#2e7be8" }}>Open from the account copy</button>
+          <button onClick={fromAccount} style={{ ...btn, background: "var(--brand)", color: "var(--surface)", borderColor: "var(--brand)" }}>Open from the account copy</button>
         </div>
-        <p style={{ fontSize: 13, color: "#5b6b8a" }}>Open from the account copy sets this phone's copy aside, not deleted, and loads the one in your account.</p>
+        <p style={{ fontSize: 13, color: "var(--muted)" }}>Open from the account copy sets this phone's copy aside, not deleted, and loads the one in your account.</p>
       </div>
     );
   }
 }
-const btn = { height: 46, borderRadius: 23, border: "1.5px solid #d1dcf0", background: "#fff", color: "#1f5fc7", font: "inherit", fontWeight: 800, fontSize: 15 } as const;
+const btn = { height: 46, borderRadius: 23, border: "1.5px solid var(--line)", background: "var(--surface)", color: "var(--brand-text)", font: "inherit", fontWeight: 800, fontSize: 15 } as const;
