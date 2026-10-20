@@ -596,7 +596,7 @@ function ShopPanel(p: AppApi) {
         {REGIONS.map((r) => <button key={r.id} className={`choice ${p.region === r.id ? "on" : ""}`} onClick={() => p.setRegion(r.id)}>{r.name}</button>)}
       </div>
       <p className="label" style={{ marginTop: 16 }}>Starter foods</p>
-      <small>About twenty common foods from your shops, with checked values, so the plate works from day one. Foods you already have are skipped, so you can tap again after changing where you shop.</small>
+      <small>About twenty common foods from your shops, with checked values, so the plate works from day one{(REGIONS.find((r) => r.id === p.region)?.tags ?? []).includes("cy") ? ", and fifty Cypriot foods with their Greek names" : ""}. Foods you already have are skipped, so you can tap again after changing where you shop.</small>
       <div className="button-row" style={{ marginTop: 8 }}>
         <button className="pill pill-small" onClick={p.addStarter}>Add starter foods for {REGIONS.find((r) => r.id === p.region)?.name ?? "my region"}</button>
       </div>

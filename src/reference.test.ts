@@ -77,3 +77,10 @@ test("a Cypriot food in Limassol keeps its English name and shows the Greek one 
   assert.ok(/typical home recipe, an estimate/.test(f.notes));
   assert.equal(otherNames(REFERENCE.find((x) => x.id === "courgette")!, "munich").join(" · "), "Courgette (zucchini), raw · Tikvice, sveže");
 });
+
+test("Limassol's starter foods bring the fifty Cypriot ones; Munich's bring none", async () => {
+  const { marketFoods } = await import("./reference");
+  assert.equal(marketFoods(["*", "cy", "limassol"]).length, 50);
+  assert.equal(marketFoods(["*", "cy"]).length, 50);
+  assert.equal(marketFoods(["*", "de", "munich"]).length, 0);
+});
