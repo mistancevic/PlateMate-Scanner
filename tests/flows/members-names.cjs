@@ -57,16 +57,17 @@ const R = {
   ok(/\/my-recipes\?view=members$/.test(page.url()), "MB: Members is in the address: " + page.url());
   await page.reload(); await page.waitForTimeout(1500);
   ok(await page.getByRole("tab", { name: "Members" }).getAttribute("aria-selected") === "true", "MB: a reload stays on Members");
-  const cooks = await page.getByRole("group", { name: "Cooks" }).getByRole("button").allTextContents();
-  ok(cooks.join(",") === "All cooks,Marko,Davorka", "MB: the cooks, most recipes first: " + cooks.join(","));
-  await page.getByRole("group", { name: "Cooks" }).getByRole("button", { name: "Marko" }).click(); await page.waitForTimeout(500);
-  ok(/view=members&cook=Marko$/.test(page.url()) && /Marko's kitchen · 2 recipes/.test(await page.locator(".mb-shelf").textContent()) && await page.locator(".recipe-tile").count() === 2, "MB: Marko's kitchen, his two recipes");
+  // Changed by story MB5 (0.2.67, Milan 22:14): Cook is the publishing permission on Clients, so Members says member
+  const cooks = await page.getByRole("group", { name: "Members" }).getByRole("button").allTextContents();
+  ok(cooks.join(",") === "All members,Marko,Davorka", "MB: the members who shared with their name, most recipes first: " + cooks.join(","));
+  await page.getByRole("group", { name: "Members" }).getByRole("button", { name: "Marko" }).click(); await page.waitForTimeout(500);
+  ok(/view=members&member=Marko$/.test(page.url()) && /Marko's recipes · 2/.test(await page.locator(".mb-shelf").textContent()) && await page.locator(".recipe-tile").count() === 2, "MB: Marko's recipes, his two");
   await page.reload(); await page.waitForTimeout(1500);
-  ok(await page.locator(".recipe-tile").count() === 2 && await page.locator(".mb-shelf").count() === 1, "MB: a reload keeps Marko's kitchen");
-  await page.getByRole("group", { name: "Cooks" }).getByRole("button", { name: "All cooks" }).click(); await page.waitForTimeout(300);
+  ok(await page.locator(".recipe-tile").count() === 2 && await page.locator(".mb-shelf").count() === 1, "MB: a reload keeps Marko's recipes");
+  await page.getByRole("group", { name: "Members" }).getByRole("button", { name: "All members" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: `Open ${R.koupepia.title}` }).click(); await page.waitForTimeout(700);
   await page.getByRole("button", { name: "All of Marko's recipes ›" }).click(); await page.waitForTimeout(600);
-  ok(await page.locator(".recipe-tile").count() === 2 && /cook=Marko/.test(page.url()), "MB: All of Marko's recipes › opens his kitchen");
+  ok(await page.locator(".recipe-tile").count() === 2 && /member=Marko/.test(page.url()), "MB: All of Marko's recipes › opens his recipes");
   // sharing with my name: asked once, checked
   await page.getByRole("tab", { name: /^Mine/ }).click(); await page.waitForTimeout(400);
   await page.locator(".recipe-tile").first().click(); await page.waitForTimeout(900);

@@ -48,7 +48,7 @@ const tag = (r: SharedRecipe) => (r.coverKind === "photo" ? (r.name ? `Photo by 
 export function MembersList({ list, ahead, p, open, loading, error, cook, setCook }: { list: SharedRecipe[] | null; ahead: Ahead | null; p: AppApi; open: (id: string) => void; loading: boolean; error: string; cook: string | null; setCook: (c: string | null) => void }) {
   const kitchens = p.personal.kitchens ?? [];
   const [kitchen, setKitchen] = useState<string | null>(null);
-  // MB2 (0.2.61): the cooks who shared with their name, most recipes first; one name is one cook
+  // MB2 (0.2.61): the members who shared with their name, most recipes first; one name is one member (0.2.67: Cook is the publishing permission on Clients, so Members says member)
   const cooks = cooksOf(list ?? []);
   const on = cook ? cooks.find((c) => c.toLowerCase() === cook.toLowerCase()) ?? null : null;
   const byCook = on ? (list ?? []).filter((r) => (r.name ?? "").toLowerCase() === on.toLowerCase()) : list;
@@ -61,10 +61,10 @@ export function MembersList({ list, ahead, p, open, loading, error, cook, setCoo
           : ahead
           ? `Recipes members cooked and shared, worked out for your day. ${ahead.name.charAt(0).toUpperCase() + ahead.name.slice(1)} is about ${fmt(ahead.kcal, 0)} kcal${ahead.target !== null ? ` at ${pdText(ahead.target)} or more, so these come first` : ""}.`
           : "Recipes members cooked and shared. Set your goal and every recipe shows your portion."}</small>
-        {on && <b className="mb-shelf">{on}'s kitchen · {shown.length} {shown.length === 1 ? "recipe" : "recipes"}</b>}
+        {on && <b className="mb-shelf">{on}'s recipes · {shown.length}</b>}
         {cooks.length > 0 && (
-          <div className="mb-chips" role="group" aria-label="Cooks">
-            <button className={`choice ${on === null ? "on" : ""}`} onClick={() => setCook(null)}>All cooks</button>
+          <div className="mb-chips" role="group" aria-label="Members">
+            <button className={`choice ${on === null ? "on" : ""}`} onClick={() => setCook(null)}>All members</button>
             {cooks.map((c) => <button key={c} className={`choice ${on === c ? "on" : ""}`} onClick={() => setCook(on === c ? null : c)}>{c}</button>)}
           </div>
         )}
@@ -124,12 +124,12 @@ export function MemberPage({ r, ahead, p, owner, close, takeDown, toCook }: { r:
         <b>Steps</b>
         {steps.length
           ? <ol className="rp-steps">{steps.map((s, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(s), x.items).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</div></li>)}</ol>
-          : <small className="muted">The cook shared no steps.</small>}
+          : <small className="muted">{r.name || "The member"} shared no steps.</small>}
       </section>
       <button className="pill pill-wide pill-primary" onClick={() => { close(); p.takeMember(r, "make", x.items); }}>Make it</button>
       <small className="muted rq-under">Your portion goes on the Plate: {fmt(x.grams, 0)} g, {fmt(x.kcal, 0)} kcal. Fit to my target can still move it.</small>
       {!r.mine && <><button className="pill pill-wide" onClick={() => { close(); p.takeMember(r, "keep"); }}>Keep in mine</button>
-        <small className="muted rq-under">A copy in Mine, to change as you like. {r.name ? `${r.name}'s` : "The cook's"} recipe stays theirs.</small></>}
+        <small className="muted rq-under">A copy in Mine, to change as you like. {r.name ? `${r.name}'s` : "The member's"} recipe stays theirs.</small></>}
       {owner && !r.mine && <ConfirmButton className="link link-danger rq-delete" label="Take it down (owner)" confirmLabel="Sure? It goes for every member" onConfirm={takeDown} />}
     </div>
   );
@@ -231,7 +231,7 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
         {named && memberName === null && (<>
           <small className="mb-sub">Your name in Members</small>
           <input className="mb-name" aria-label="Your name in Members" value={typed} maxLength={20} onChange={(e) => setTyped(e.target.value)} />
-          <small className={check?.ok ? "mb-name-ok" : "muted"}>{check ? (check.ok ? `${typed.trim()} is free. It is yours once you share.` : check.why) : "One name per cook, so members find all your recipes under it."}</small>
+          <small className={check?.ok ? "mb-name-ok" : "muted"}>{check ? (check.ok ? `${typed.trim()} is free. It is yours once you share.` : check.why) : "One name per member, so members find all your recipes under it."}</small>
         </>)}
         <small className="muted">{named ? `On: members see it as ${name === "you" ? "yours, by your name in Members" : `${name}'s`}. Off: as a member's.` : `Off: members see it as a member's. On: as ${name === "you" ? "yours, by your name in Members" : `${name}'s`}.`}</small>
         <div className="button-row"><button className="pill pill-small" disabled={busy || (named && memberName === null && !check?.ok)} onClick={share}>Share with members</button></div>
