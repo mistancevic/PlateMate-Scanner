@@ -56,9 +56,10 @@ export function LandingScreen() {
         </div>
         <div>
           <TryIt />
-          <div className="l-cta-block" ref={ctaRef}>
-            <b className="l-cta-head">Your foods, your goal, your day.</b>
-            <p>The calculator above uses one goal and six foods. Chef Mealan works with your own goal, the foods in your kitchen, and the day you're actually having.</p>
+          {/* HP68 (Milan 23:53): the sign-up box picks up where the calculator stops, at its one target */}
+          <div className="l-cta-block l-cta-hook" ref={ctaRef}>
+            <b className="l-cta-head">Your own target, at every meal</b>
+            <p>This calculator uses one target, PD {DEMO_GOAL.pd}. Your own target comes from your goal, your body and your training. Chef Mealan works it out for you, then plans each meal to reach it with the foods in your kitchen.</p>
             <button className="pill pill-primary l-cta-big" onClick={toForm}>Try Chef Mealan</button>
             <small>Chef Mealan is being tested by a small group. Leave your name and email, and Coach Milan will send you a personal code.</small>
           </div>
@@ -219,11 +220,6 @@ function TryIt() {
         <Weigh f={w} value={wg} set={setWg} />
         <Weigh f={h} value={hg} set={setHg} />
       </div>
-      {/* HP68: what PD is, before the first PD number a cold reader meets; Milan 23:48: no goal name, no "mostly energy" */}
-      <div className="l-pd">
-        <b>PD means protein density</b>
-        <p>PD is grams of protein in 100 kcal of food. A higher PD means more protein for the same calories. This calculator aims for PD {DEMO_GOAL.pd}, a usual target when you want to lose fat and build muscle at the same time. Below {DEMO_GOAL.pd}, the plate gives you the calories but too little protein.</p>
-      </div>
       <div className="l-try-result" aria-live="polite">
         <b>{fits ? "The plate fits" : `Under PD ${DEMO_GOAL.pd}`}</b>
         <div className="l-jump">
@@ -233,6 +229,12 @@ function TryIt() {
         </div>
         <span>{w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} {fits ? `The ${hn} adds the protein, so the plate fits.` : reach ? `${need.grams} ${hu} of ${hn} reaches PD ${DEMO_GOAL.pd}.` : `${h.name} has too little protein for its calories to bring this plate to PD ${DEMO_GOAL.pd}.${others.length ? ` Try ${others.length > 1 ? `${others.slice(0, -1).join(", ")} or ${others[others.length - 1]}` : others[0]}.` : ""}`}</span>
         {reach && <button type="button" className="pill pill-small" onClick={() => { used(); setHg(need.grams); }}>Use {need.grams} {hu}</button>}
+        <a className="l-pd-link" href="#what-pd" onClick={(e) => { e.preventDefault(); document.getElementById("what-pd")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}>What PD means ↓</a>
+      </div>
+      {/* HP68: what PD is, right below the result (Milan 23:53); Milan 23:48: no goal name, no "mostly energy" */}
+      <div className="l-pd" id="what-pd">
+        <b>PD means protein density</b>
+        <p>PD is grams of protein in 100 kcal of food. A higher PD means more protein for the same calories. This calculator aims for PD {DEMO_GOAL.pd}, a usual target when you want to lose fat and build muscle at the same time. Below {DEMO_GOAL.pd}, the plate gives you the calories but too little protein.</p>
       </div>
       <small className="l-try-small">A simplified version of Chef Mealan: one goal, six cravings and typical values from food labels. Nothing you pick here is saved.</small>
     </div>
