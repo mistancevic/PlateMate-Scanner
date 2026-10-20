@@ -1884,3 +1884,9 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .shop-row .menu-row-text b { font-size: var(--fs-body); color: var(--ink); }
 .shop-row .shop-grams { font-size: var(--fs-body); font-weight: 900; color: var(--ink); white-space: nowrap; }
 .shop-row.got .menu-row-text b, .shop-row.got .shop-grams { text-decoration: line-through; color: var(--muted); } .shop-row.got > svg { color: var(--top); }
+/* SL2: Plan's head card (the day and the day as planned in one) and the day's settings as links in the day card */
+.plan-head .plan-day-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 12px; padding: 0; border: 0; }
+.plan-head .plan-day-head b { font-size: var(--fs-section); font-weight: 900; color: var(--ink); display: flex; align-items: center; gap: 6px; }
+.plan-head .plan-day-head small { font-size: var(--fs-label); font-weight: 700; color: var(--brand-text); }
+.plan-card-links { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 16px 4px; border-top: 1px solid var(--line); }
+.plan-card-links .link { font-weight: 700; font-size: var(--fs-label); }

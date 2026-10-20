@@ -100,14 +100,22 @@ export function PlanScreen(p: AppApi) {
         })}
       </div>
       {isPast ? <PastDay p={p} date={date} dayKey={key} line={line} slots={slots} numbers={numbers} /> : (<>
-      <section className="card plan-day">
+      {/* SL2 (Milan 16:03): the day's head and the day as planned are one card at the top: the date, the kind of day and the
+          open slots, then the plan against the target. The target is said once, in the numbers. */}
+      <section className="plan plan-head">
         <div className="plan-day-head">
           <b>{isToday ? "Today, " : ""}{WEEKDAY[(date.getDay() + 6) % 7]}, {date.getDate()} {MONTHS[date.getMonth()]}
-            {/* a day without training has no training row: the pencil sits by the date, as on Today */}
             {!rows.some((r) => r.kind === "training") && <button type="button" className="icon today-pencil plan-pencil" aria-label="Change the training for this date" onClick={() => setEditing(training ?? { work: true, kind: "rest" })}><Pencil size={15} /></button>}
           </b>
-          <small>{line}</small>
+          <small>{[tWhen ? tWhen.phrase : training ? "rest day" : null, openCount ? `${openCount} ${openCount === 1 ? "slot" : "slots"} open` : "all slots set"].filter(Boolean).join(" · ")}</small>
         </div>
+        <div className="plan-row">
+          <div><b>{sum.n ? pdVal(sum.pd) : "—"}</b><small>{target !== null ? `of ${pdVal(target)} ${pdTag()}` : pdTag()}</small></div>
+          <div><b>{fmt(sum.kcal, 0)}</b><small>{numbers ? `of ${fmt(numbers.kcal, 0)} kcal` : "kcal"}</small></div>
+          <div><b>{fmt(sum.protein, 0)}</b><small>{numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></div>
+        </div>
+      </section>
+      <section className="card plan-day">
         {rows.map((r) => {
           if (r.kind === "training") return (
             <button type="button" key="training" className="menu-row plan-training" aria-label={`Training at ${r.time}, ${planLine(r.day)}. Change it for this date`} onClick={() => setEditing(r.day)}>
@@ -144,22 +152,15 @@ export function PlanScreen(p: AppApi) {
             </div>
           );
         })}
-      </section>
-      <section className="plan">
-        <div className="plan-top"><span>The day as planned</span><span>{openCount ? `${openCount} ${openCount === 1 ? "slot" : "slots"} open` : "all slots set"}</span></div>
-        <div className="plan-row">
-          <div><b>{sum.n ? pdVal(sum.pd) : "—"}</b><small>{target !== null ? `of ${pdVal(target)} ${pdTag()}` : pdTag()}</small></div>
-          <div><b>{fmt(sum.kcal, 0)}</b><small>{numbers ? `of ${fmt(numbers.kcal, 0)} kcal` : "kcal"}</small></div>
-          <div><b>{fmt(sum.protein, 0)}</b><small>{numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></div>
+        {/* SL2: the day's settings sit with the day, as links, one per line */}
+        <div className="plan-card-links">
+          <button type="button" className="link" onClick={() => p.openMenu("life")}>Slots and times ›</button>
+          <button type="button" className="link" onClick={() => p.openMenu("week")}>Training week ›</button>
         </div>
       </section>
       {openCount > 0 && <button type="button" className="pill pill-tall pill-primary plan-fill" onClick={() => p.openOut("fill")}><ChefHat size={18} /> Fill the open slots with {CHEF_NAME}</button>}
       </>)}
       <button type="button" className="pill pill-wide plan-shop" onClick={() => setShopping(true)}><ShoppingBasket size={18} /> Shopping list, the next 7 days</button>
-      <div className="button-row plan-links">
-        <button type="button" className="pill pill-small" onClick={() => p.openMenu("life")}>Slots and times</button>
-        <button type="button" className="pill pill-small" onClick={() => p.openMenu("week")}>Training week</button>
-      </div>
       {shopping && <ShopSheet p={p} close={() => setShopping(false)} />}
       {editing && (
         <div className="sheet-backdrop" onClick={() => setEditing(null)}>
