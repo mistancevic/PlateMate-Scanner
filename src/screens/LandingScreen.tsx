@@ -3,7 +3,7 @@ import { tabOfPath } from "../back";
 import { RecipeCard } from "./RecipePages";
 import type { PublicRecipe } from "../recipes";
 import { Check } from "lucide-react";
-import { WANTS, DEMO_GOAL, BIG_BOWL, lift, smaller, alone, havesFor, PAIR_NOTES } from "../landing";
+import { WANTS, DEMO_GOAL, BIG_BOWL, lift, smaller, alone, havesFor, PAIR_NOTES, startAmounts, describe, type Amounts } from "../landing";
 import { Mark, APP_NAME } from "../components/Mark";
 import { signIn } from "../cloud";
 import { hit } from "../metrics";
@@ -174,36 +174,57 @@ export function DayVideo({ src, poster, label, big }: { src: string; poster: str
   );
 }
 function TryIt() {
-  // the calculator used: counted once per visit, at the first pick
+  // the calculator used: counted once per visit, at the first pick or step
   const counted = useRef(false);
   const used = () => { if (!counted.current) { counted.current = true; hit("hp_calc"); } };
   const [want, setWantState] = useState(WANTS[0].id);
   const w = WANTS.find((x) => x.id === want)!;
   const offered = havesFor(w);
   const [have, setHave] = useState(offered[0].id);
-  const setWant = (id: string) => { setWantState(id); const nw = WANTS.find((x) => x.id === id)!; if (!havesFor(nw).some((h) => h.id === have)) setHave(havesFor(nw)[0].id); };
+  // HP68: the grams of the craving, and the milk with granola, each with a stepper; a new craving starts from its usual amount
+  const [amt, setAmt] = useState<Amounts>(startAmounts(WANTS[0]));
+  const setWant = (id: string) => { setWantState(id); const nw = WANTS.find((x) => x.id === id)!; setAmt(startAmounts(nw)); if (!havesFor(nw).some((h) => h.id === have)) setHave(havesFor(nw)[0].id); };
   const h = offered.find((x) => x.id === have) ?? offered[0];
-  const r = lift(w, h, DEMO_GOAL.pd), a = alone(w);
-  const big = r.grams > BIG_BOWL ? smaller(w, h, DEMO_GOAL.pd) : null;
-  const hn = h.name.toLowerCase();
+  const r = lift(w, h, DEMO_GOAL.pd, amt), a = alone(w, amt);
+  const big = r.grams > BIG_BOWL ? smaller(w, h, DEMO_GOAL.pd, amt) : null;
+  const hn = h.name.toLowerCase(), what = w.of ?? w.name.toLowerCase();
   const Pick = ({ items, on, set }: { items: { id: string; name: string }[]; on: string; set: (v: string) => void }) => (
     <div className="chip-row">{items.map((x) => <button key={x.id} type="button" className={`choice ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} onClick={() => { used(); set(x.id); }}>{x.name}</button>)}</div>
   );
+  const Step = ({ name, value, unit, step, min, max, set }: { name: string; value: number; unit: string; step: number; min: number; max: number; set: (v: number) => void }) => (
+    <div className="l-amount">
+      <span>{name}</span>
+      <span className="rp-step">
+        <button type="button" aria-label={`${step} ${unit} less ${name.toLowerCase()}`} disabled={value - step < min} onClick={() => { used(); set(value - step); }}>−</button>
+        <b>{value} {unit}</b>
+        <button type="button" aria-label={`${step} ${unit} more ${name.toLowerCase()}`} disabled={value + step > max} onClick={() => { used(); set(value + step); }}>+</button>
+      </span>
+    </div>
+  );
   return (
     <div className="l-try-box">
-      <div className="setting"><small className="setting-name">You crave</small><Pick items={WANTS} on={want} set={setWant} /></div>
+      <div className="setting">
+        <small className="setting-name">You crave</small><Pick items={WANTS} on={want} set={setWant} />
+        <Step name={what[0].toUpperCase() + what.slice(1)} value={amt.grams} unit="g" step={w.step ?? 10} min={w.min ?? 10} max={w.max ?? 200} set={(g) => setAmt({ ...amt, grams: g })} />
+        {w.milk && <Step name={w.milk.name[0].toUpperCase() + w.milk.name.slice(1)} value={amt.ml} unit="ml" step={w.milk.step} min={0} max={w.milk.max} set={(ml) => setAmt({ ...amt, ml })} />}
+      </div>
       <div className="setting"><small className="setting-name">You have at home</small><Pick items={offered} on={h.id} set={setHave} /></div>
+      {/* HP68: what PD is, before the first PD number a cold reader meets */}
+      <div className="l-pd">
+        <b>PD means protein density</b>
+        <p>PD is grams of protein in 100 kcal. For {DEMO_GOAL.name}, a meal should reach about PD {DEMO_GOAL.pd}. A lower PD means the meal is mostly energy, and the protein you need has to come later in the day.</p>
+      </div>
       <div className="l-try-result" aria-live="polite">
-        <b>Add {r.grams} g of {hn}</b>
+        <b>{r.grams > 0 ? `Add ${r.grams} g of ${hn}` : "This already fits"}</b>
         <div className="l-jump">
-          <div className="l-jump-from"><small>{w.alone} alone</small><b>PD {a.pd.toFixed(1)}</b><small>{a.kcal} kcal, {a.protein} g protein</small></div>
+          <div className="l-jump-from"><small>{describe(w, amt)}</small><b>PD {a.pd.toFixed(1)}</b><small>{a.kcal} kcal, {a.protein} g protein</small></div>
           <b className="l-jump-arrow" aria-hidden="true">→</b>
           <div className="l-jump-to"><small>With the {hn}</small><b>PD {r.pd.toFixed(1)}</b><small>{r.kcal} kcal, {Math.round(r.protein)} g protein</small></div>
         </div>
         <span>{w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} The {hn} adds the protein, so the plate fits.</span>
-        {big && <small>{r.total} g is a very big bowl. With {big.grams} g of {w.name.toLowerCase()} instead, {big.partner} g of {hn} is enough, {big.grams + big.partner} g in all.</small>}
+        {big && <small>{r.total} g is a very big bowl. With {big.grams} g of {what} instead, {big.partner} g of {hn} is enough.</small>}
       </div>
-      <small className="l-try-small">Worked out for {DEMO_GOAL.name}, the goal most people pick. PD is grams of protein in 100 kcal. Nothing you pick here is saved.</small>
+      <small className="l-try-small">A simplified version of Chef Mealan: one goal, six cravings and typical values from food labels. Nothing you pick here is saved.</small>
     </div>
   );
 }
