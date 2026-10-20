@@ -1856,3 +1856,22 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .l-behind .l-behind-links { display: flex; flex-direction: column; gap: var(--s2); }
 .l-behind .l-behind-links a { font-weight: 700; text-decoration: none; }
 .bt-btn.bt-btn-line { background: var(--surface); color: var(--brand-text); border: 1.5px solid var(--line); box-shadow: none; }
+
+/* ================= 0.2.57 (boards DS6 and DS7): Today keeps one shape; Next, the plan, the meals and the days are one card ================= */
+/* the card's heading: inside, Section style, no icon, no line under it */
+.card-head, .next-planned .next-head { display: block; flex-basis: 100%; margin: 0 0 var(--s2); font-size: var(--fs-section); font-weight: 900; line-height: 1.2; color: var(--ink); }
+.card > .card-head + .plan-row-link, .card > .card-head + .plan-when + .plan-row-link, .card > .card-head + .swipe .plan-row-link, .card > .card-head + .plan-when + .swipe .plan-row-link, .card > .card-head + .plan-eaten + .plan-row-link { border-top: 0; }
+/* Next: what is left is the card's own line, before its buttons */
+.next-meal .next-planned .next-line { flex-basis: 100%; text-align: left; color: var(--muted); margin: var(--s1) 0 0; }
+.next-done > *:not(.next-head) { flex-basis: 100%; }
+.next-done .plan-row-link { border-top: 0; padding-left: 0; padding-right: 0; }
+/* Today's meals: one card, a row per meal like the plan's rows, Log a meal at the bottom */
+.meals-card .logged-line { margin: -4px 0 4px; color: var(--muted); }
+.meals-card .log-card { padding: var(--s3) 0; border-top: 1px solid var(--line); }
+.meals-card .logged-line + .log-card { border-top: 0; }
+.meals-card .meals-acts { margin-top: var(--s2); }
+/* Earlier: two day cards, then one link */
+.days .day-card { margin-bottom: var(--s3); }
+.days .day-card .plan-row-link { border-top: 0; padding-left: 0; padding-right: 0; }
+.days .older-link { margin: var(--s1) 0 var(--s4); }
+.days .older-link .link { font-weight: 700; }

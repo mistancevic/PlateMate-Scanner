@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { ChefHat, Camera, ChevronRight, Check, Pencil, Utensils } from "lucide-react";
+import { Camera, ChevronRight, Check, Pencil, Plus, Utensils } from "lucide-react";
 import { aggregate, density } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { COACH_NAME } from "../components/Mark";
@@ -21,7 +21,7 @@ import { answersFor } from "../unlogged";
 import { dayFor, getDay } from "../personal";
 import { ymd } from "../plan";
 import { fitOf, type PlannedMeal } from "../planned";
-import { dayRecord, planLine as planDayLine, recordLine } from "../record";
+import { dayRecord, planLine as planDayLine } from "../record";
 import { log } from "../log";
 import { closeDays, openedToday } from "../metrics";
 import { coverIsDrawn, ownPhotosOf } from "../covers";
@@ -78,7 +78,6 @@ export function HomeScreen(p: AppApi) {
   const [changingCarry, setChangingCarry] = useState<string | null>(null);
   const todayPlan = dayFor(p.personal, new Date())?.day ?? getDay(p.personal, new Date()).plan ?? null;
   const carryMoment = (f: Feedback) => { const w = trainingWhen(todayPlan); return momentOf(whichOf(f), new Date(f.createdAt), todayPlan ? { kind: todayPlan.kind, time: w && w.sort !== "23:59" ? w.sort : null } : null); };
-  const eatenAs = (() => { const w = [...today.logged].sort((a, b) => (a.createdAt < b.createdAt ? -1 : 1)).map((f) => (whichOf(f) === "Snack" ? "a snack" : whichOf(f).toLowerCase())); const t = w.length <= 1 ? w.join("") : `${w.slice(0, -1).join(", ")} and ${w[w.length - 1]}`; return t.charAt(0).toUpperCase() + t.slice(1); })();
   const makeNext = () => { if (!next) return; if (held[next.id] && !held[next.id].skipped) { eatFrom(next.id); return; } p.setPick(`meal:${next.id}`); setStep("in"); setTab("journey"); };
   const logMeal = () => { p.setPick(null); setStep("in"); setTab("journey"); };
   // I ate one asks which meal it is (Q2): the meals still to come, and a snack; the meal by the clock is picked
@@ -120,13 +119,17 @@ export function HomeScreen(p: AppApi) {
   const emptyAhead = rec.empty.filter((s) => openSlots.includes(s));
   const dayDone = rec.done && emptyAhead.length === 0;
   const past = [1, 2].map((n) => dayLog(state.feedback, daysAgo(n)));
+  // 0.2.57 (board DS6, L): what is left, inside the Next card; once the day is done, tomorrow's first planned meal
+  const leftLine = next
+    ? (left > 150 ? `About ${fmt(left, 0)} kcal and ${fmt(pLeft, 0)} g protein left for today.` : `You are at your day's kcal. A light ${next.name.toLowerCase()} keeps you there.`)
+    : today.logged.length ? (left >= 0 ? `${fmt(left, 0)} kcal left today, if you want a snack.` : `${fmt(-left, 0)} kcal over today.`) : "Nothing logged today.";
+  const tFirst = (() => { for (const sl of tSlots) { const m = tPlan[sl.id]; if (m && !m.skipped) return { sl, m }; } return null; })();
   const follow = dayModeOf(p.personal) === "each";
   // The day pills show while the day is still assumed, and again after Change, until a pill is tapped.
   const [changing, setChanging] = useState(false);
   const [draft, setDraft] = useState<PlanDay | null>(null);
   // with a Training week Today reads it; without one, Today asks what kind of day it is
   const planned = hasPlan(p.personal);
-  const dateLine = new Date().toLocaleDateString([], { weekday: "long", day: "numeric", month: "long" });
   const inbox = p.inbox.map((it) => (
     <section className="card inbox" key={it.id}>
       <div className="card-top"><span>{p.coachLabel} sent you a recipe</span><button className="link" onClick={() => p.dismissRecipe(it)}>Dismiss</button></div>
@@ -171,13 +174,13 @@ export function HomeScreen(p: AppApi) {
             numbers: why they are not complete and which food; the name of a food in your foods opens it there, to add the values;
             a food that lives only in a recipe is named, not linked, since nothing can add its values yet */}
         {p.todayMacros && dayT.missing.length > 0 && (
-          <small className="macro-gap">+ Not complete: {dayT.missing.map((m, k) => <span key={m.id}>{k ? (k === dayT.missing.length - 1 ? " and " : ", ") : ""}{state.foods.some((x) => x.id === m.id) ? <button type="button" className="link in-inline" onClick={() => p.openFood(m.id)}>{m.name}</button> : m.name}</span>)} {dayT.missing.length === 1 ? "has" : "have"} no {dayT.missing.every((m) => m.what === dayT.missing[0].what) ? dayT.missing[0].what : "fat or carbs"} value.</small>
+          <small className="macro-gap">Why the +: {dayT.missing.map((m, k) => <span key={m.id}>{k ? (k === dayT.missing.length - 1 ? " and " : ", ") : ""}{state.foods.some((x) => x.id === m.id) ? <button type="button" className="link in-inline" onClick={() => p.openFood(m.id)}>{m.name}</button> : m.name}</span>)} {dayT.missing.length === 1 ? "has" : "have"} no {dayT.missing.every((m) => m.what === dayT.missing[0].what) ? dayT.missing[0].what : "fat or carbs"} value, so {dayT.missing.every((m) => m.what === dayT.missing[0].what) && dayT.missing[0].what !== "fat or carbs" ? dayT.missing[0].what : "fat and carbs"} {dayT.missing.every((m) => m.what === dayT.missing[0].what) && dayT.missing[0].what !== "fat or carbs" ? "is" : "are"} counted without {dayT.missing.length === 1 ? "it" : "them"}. The real numbers are higher.</small>
         )}
         {p.review?.status === "change" && <button className="strip strip-button review-ask" onClick={() => p.openMenu("goal")}>{p.review.by || p.coachLabel} asks you to change {p.review.kept?.length === 1 ? "one number" : "your numbers"} ›</button>}
         {p.profile.coachId && !byCoach && <button className="plan-source coach-line" onClick={() => p.openMenu("coach")} aria-label="Open your coach">{p.coachLabel} <ChevronRight size={12} /></button>}
         {follow && planned && p.day.plan && !changing && (
           <div className="today-plan">
-            <b className="today-date">{dateLine}<button className="icon today-pencil" aria-label="Change today's plan" onClick={() => { setDraft(p.day.plan!); setChanging(true); }}><Pencil size={16} /></button></b>
+            <b className="today-date">Kind of day<button className="icon today-pencil" aria-label="Change today's plan" onClick={() => { setDraft(p.day.plan!); setChanging(true); }}><Pencil size={16} /></button></b>
             <span className="today-what">{p.day.plan.kind === "rest" && !p.day.plan.pe ? "No training today." : `${todayLine(p.day.plan)}. ${LOAD_DAY[loadOf(p.day.plan)]}`}</span>
             <small>{p.day.source === "today" ? "Changed for today only. Your Training week stays the same." : "If today goes differently, tap the pencil. The numbers follow, the Training week stays."}</small>
             {p.day.source === "today" && <button className="link" onClick={() => p.setTodayPlan(null)}>Back to the Training week</button>}
@@ -185,7 +188,7 @@ export function HomeScreen(p: AppApi) {
         )}
         {follow && changing && draft && (
           <div className="today-plan">
-            <b>{dateLine}, today only</b>
+            <b>Kind of day, today only</b>
             <DayEditor minor={minor} weekdays={wkd} peOn={peOn} value={draft} onChange={setDraft} />
             <div className="actions">
               <button className="pill pill-primary action-main" onClick={() => { p.setTodayPlan(draft); setChanging(false); }}>Save for today</button>
@@ -195,20 +198,15 @@ export function HomeScreen(p: AppApi) {
         )}
         {follow && !planned && (
           <div className="today-plan">
-            <b>{dateLine}</b>
-            <small>What kind of day is it?</small>
+            <b>What kind of day is it?</b>
             <div className="day-row">
               {DAY_TYPES.map((d) => <button key={d.id} className={`choice ${p.day.type === d.id ? "on" : ""}`} onClick={() => p.setDayType(d.id)}>{d.name}</button>)}
             </div>
             <button className="link" onClick={() => p.openMenu("week")}>Set your Training week, and Chef Mealan won't need to ask ›</button>
           </div>
         )}
-        {!follow && (
-          <div className="today-plan">
-            <b>{dateLine}</b>
-            <small>Every day the same, one set of numbers. <button className="link" onClick={() => p.openMenu("goal")}>Change in Goal ›</button></small>
-          </div>
-        )}
+        {/* 0.2.57 (board DS6, I, Milan 10:21 to 10:46): no day part. The day header has the date; Maintain › opens Goal; one set
+            of numbers every day has nothing to say here. Where training and rest days differ, the kind of day stays, without the date. */}
       </section>
       {p.profile.role === "coach" && p.newShared > 0 && (
         <button className="strip strip-button" onClick={() => setTab("clients")}>{p.newShared} new {p.newShared === 1 ? "card" : "cards"} shared with you. Open Clients.</button>
@@ -236,17 +234,18 @@ export function HomeScreen(p: AppApi) {
       {/* What's in the plan (0.2.0, canvas S and H): the day's meals as rows once the Plan holds them (0.2.2); until then one row, Go to Plan. Then Scan, blue, the camera for what the plan is not. */}
       {/* The first two weeks (0.2.7, board FT): FT1 while the burn is being measured, FT2 once on the day it is ready */}
       {p.measured?.ready && p.measured.start && !p.measuredSeen && <ReadyCard m={p.measured} formulaKcal={p.formulaKcal} seeGoal={() => { p.seeMeasured(); toBurn(); }} gotIt={p.seeMeasured} />}
-      {/* R5: what comes next, the one main action; then the batch as a way to eat it */}
-      <p className="label">{next ? `Next: ${next.name.toLowerCase()}, ${next.time}` : "Next: tomorrow"}</p>
+      {/* R5: what comes next, the one main action; 0.2.57 (board DS6, L, Milan 10:53 to 11:02): Next is always one card, its
+          heading inside, the line inside; before a meal, the meal; nothing planned, its two ways; the day done, tomorrow's first meal */}
       <section className="next-meal">
-        {/* R16 (0.2.44, board RS15): the planned meal itself, with its picture; I ate it logs it as planned, in one tap */}
         {next && nextHeld
           ? <div className="card next-planned" role="button" tabIndex={0} aria-label={`${nextHeld.title}: see the meal`}
               onClick={(e) => { if ((e.target as HTMLElement).closest(".button-row")) return; openSlotMeal(key, next, nextHeld, makeNext); }}
               onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); openSlotMeal(key, next, nextHeld, makeNext); } }}>
+              <p className="label next-head">Next: {next.name.toLowerCase()}, {next.time}</p>
               <Picture src={pictureOfRecipe(nextRecipe)} />
               <div className="next-planned-text"><b>{nextHeld.title}</b><small>As planned · {fmt(nextHeld.kcal, 0)} kcal · {fmt(nextHeld.protein, 0)} g protein · {pdText(density(nextHeld.protein, nextHeld.kcal))}</small></div>
               <ChevronRight size={20} className="next-planned-go" />
+              <small className="next-line">{leftLine}</small>
               <div className="button-row next-planned-acts">
                 {nextHeld.items?.length
                   ? <><button type="button" className="pill pill-small pill-primary" onClick={() => p.logPlanned(nextHeld, { date: key, slotId: next.id, name: next.name, time: next.time })}><Check size={14} /> I ate it</button>
@@ -257,17 +256,26 @@ export function HomeScreen(p: AppApi) {
           : next
             // 0.2.54, design system rule D (board DS2): Today has no wide button. A next meal with nothing planned is a card, with its two ways
             ? <div className="card next-planned next-open">
+                <p className="label next-head">Next: {next.name.toLowerCase()}, {next.time}</p>
                 <div className="next-planned-text"><b>Nothing planned yet</b><small>Pick one of your meals, or make one on the Plate.</small></div>
+                <small className="next-line">{leftLine}</small>
                 <div className="button-row next-planned-acts">
                   <button type="button" className="pill pill-small pill-primary" onClick={() => swapOn(key, next.id)}>Pick a meal</button>
                   <button type="button" className="pill pill-small" onClick={makeNext}>Make it on the Plate</button>
                 </div>
               </div>
-            : null}
-        <small className="muted next-line">{next
-          ? (left > 150 ? `${next.name}, ${next.time} by the clock: about ${fmt(left, 0)} kcal and ${fmt(pLeft, 0)} g protein left today.` : `You are at your day's kcal. A light ${next.name.toLowerCase()} keeps you there.`)
-          : today.logged.length ? `${eatenAs} ${today.logged.length === 1 ? "is" : "are"} logged: ${left >= 0 ? `${fmt(left, 0)} kcal left today` : `${fmt(-left, 0)} kcal over today`}.` : "Nothing logged today."}</small>
-        <button className="link next-log" onClick={logMeal}>Log a meal</button>
+            : <div className="card next-planned next-open next-done">
+                <p className="label next-head">Next: tomorrow</p>
+                {tFirst
+                  ? <PlanRow className="plan-row-link plan-slot-row" label={`${tFirst.sl.name}, ${tFirst.sl.time}`} title={tFirst.m.title} photo={pictureOfRecipe(recipeOf(tFirst.m))}
+                      ariaLabel={`${tFirst.sl.name} tomorrow, ${tFirst.m.title}`} sub={<>{SOURCE[tFirst.m.source]}</>}
+                      onOpen={() => openSlotMeal(tKey, tFirst.sl, tFirst.m, toTomorrow)} onSwap={() => swapOn(tKey, tFirst.sl.id)} onRight={() => p.fill(tKey, tFirst.sl.id, { ...tFirst.m, skipped: true })} rightLabel="Skip" swapName={`Swap ${tFirst.sl.name.toLowerCase()} tomorrow`} rightName={`Skip ${tFirst.sl.name.toLowerCase()} tomorrow`} />
+                  : <div className="next-planned-text"><b>Nothing planned for tomorrow yet</b><small>Set {tWeekday}'s meals, and they wait here.</small></div>}
+                <small className="next-line">{leftLine}</small>
+                <div className="button-row next-planned-acts">
+                  <button type="button" className="pill pill-small pill-primary" onClick={toTomorrow}>{tHeld ? "Check tomorrow" : "Plan tomorrow"}</button>
+                </div>
+              </div>}
       </section>
       {/* R16 (0.2.44, Milan 21:56): what is left of a batch is not Today's: it may go to the family or to work. A batch reaches
           a day through the plan. A meal kept for later today still waits here. */}
@@ -303,7 +311,7 @@ export function HomeScreen(p: AppApi) {
       )}
       {inbox}
       <section className="card cooking">
-        <div className="card-top cooking-top"><span><ChefHat size={18} /> What's in the plan</span></div>
+        <p className="card-head">What's in the plan</p>
         {!hasPlanToday && (
           <button className="menu-row plan-row-link" onClick={() => setTab("plan")}>
             <div className="menu-row-text"><small>Nothing planned so far</small><b>Go to Plan</b><small>Set the day's meals, and they wait here</small></div><ChevronRight size={18} />
@@ -354,21 +362,14 @@ export function HomeScreen(p: AppApi) {
           </button>
         )}
       </section>
-      {/* RP5 (0.2.25, Milan 17:42): Today keeps the day; scanning lives on the Plate, at the top */}
-      {/* the day's record (0.2.3, H14): once every planned slot is eaten, one line a day; the coach sees it on Friday */}
-      {dayDone && (
-        <section className="plan day-record">
-          <div className="plan-top"><span>{new Date().toLocaleDateString("en", { weekday: "long" })}, the record</span><span>{rec.extras.length ? `${rec.extras.length} extra` : "by the plan"}</span></div>
-          {/* R21 (0.2.49, board RS20): the numbers are on the goal card at the top, once; the record keeps its line */}
-          <small className="record-line">{recordLine(rec)}{p.profile.coachId ? " Your coach sees this line on Friday." : ""}</small>
-        </section>
-      )}
-      <p className="label">Today's meals</p>
+      {/* 0.2.57 (board DS6, K): no record box; the plan card's row says how the day went, Today's meals says the extras */}
+      <section className="card meals-card" aria-label="Today's meals">
+      <p className="card-head">Today's meals</p>
       <p className="small logged-line">{hasPlanToday ? planDayLine({ ...rec, done: dayDone }, p.todayKcal) : loggedLine(today, true)}</p>
       {newest.map((f) => {
         const a = sumOf(f.meal.items), r = recipeOfCard(f, state.meals);
         return [
-          <section className={`card log-card with-photo ${r ? "log-card-open" : ""}`} key={f.id} onClick={(e) => { if (!r || (e.target as HTMLElement).closest("button,input,a,label,textarea")) return; p.openMeal(r.id, { tab: "home" }); }}>
+          <div className={`log-card meal-row with-photo ${r ? "log-card-open" : ""}`} key={f.id} onClick={(e) => { if (!r || (e.target as HTMLElement).closest("button,input,a,label,textarea")) return; p.openMeal(r.id, { tab: "home" }); }}>
             <Picture src={f.photo ?? pictureOfRecipe(r)} />
             <div className="card-top"><span>{f.meal.title}</span><small>{new Date(f.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small></div>
             <small className="meal-which"><b>{whichOf(f)}</b>{r && <> · <button className="link in-inline" onClick={() => p.openRecipePage(r.id)}>Open the recipe ›</button></>}</small>
@@ -378,7 +379,7 @@ export function HomeScreen(p: AppApi) {
               : <small className="plan-mark fit-under">Off the plan{rec.open.length && f.id === today.logged[today.logged.length - 1]?.id ? " · the next meal leans protein" : ""}</small>)}
             {(!r || p.profile.coachId) && (
               <div className="button-row log-actions">
-                {!r && <button className="pill pill-small pill-primary" onClick={() => p.saveCardAsRecipe(f.id)}>Save in My recipes</button>}
+                {!r && <button className="pill pill-small" onClick={() => p.saveCardAsRecipe(f.id)}>Save in My recipes</button>}
             {p.profile.coachId && (f.shared
                   ? <span className="pill pill-small pill-done"><Check size={14} /> Shared</span>
                   : shareFor === f.id
@@ -401,15 +402,17 @@ export function HomeScreen(p: AppApi) {
                   </div>
                 </div>
               : f.carry && <small className="carry-in carry-done">Carried you: <b>{CARRY_WORDS[f.carry.how]}</b> · <button type="button" className="link in-inline" onClick={() => setChangingCarry(f.id)}>Change</button></small>}
-          </section>,
+          </div>,
         ];
       })}
+      <div className="button-row meals-acts"><button type="button" className="pill pill-small" onClick={logMeal}><Plus size={14} /> Log a meal</button></div>
+      </section>
       {/* R5: Getting to know you is about logging; R24: it stays with today */}
       {p.measured?.phase && <KnowCard m={p.measured} openGoal={toBurn} />}
       {/* R18: tomorrow, the same card; its rows and its button open Plan on tomorrow; R24: under its own band */}
       <DayBand day="Tomorrow" date={longDate(tomorrow)} />
       <section className="card tomorrow-plan" aria-label="Tomorrow's plan">
-        <div className="card-top cooking-top"><span><ChefHat size={18} /> What's in the plan</span></div>
+        <p className="card-head">What's in the plan</p>
         {tWhen && <small className="muted plan-when">{tWhen.phrase.charAt(0).toUpperCase() + tWhen.phrase.slice(1)}</small>}
         {tHeld > 0 && tSlots.map((sl) => {
           const m = tPlan[sl.id];
@@ -432,15 +435,25 @@ export function HomeScreen(p: AppApi) {
           <div className="menu-row-text"><b>{tHeld ? "Check tomorrow" : "Plan tomorrow"}</b><small>{tHeld ? `${Math.min(tHeld, tSlots.length)} of ${tSlots.length} planned · Plan, ${tWeekday}` : `Nothing planned so far · Set ${tWeekday}'s meals`}</small></div><ChevronRight size={18} />
         </button>
       </section>
-      <DayBand day="Earlier" date="the last few days" />
-      <section className="card days" aria-label="The last few days">
-        {past.map((d) => (
-          <div className="history-row" key={d.day.toISOString()}>
-            <div><b>{dayLabel(d.day)}</b><small>{d.dayType ? dayNameAny(d.dayType) : "No kind of day was set"}</small></div>
-            <div className="history-num"><small>{loggedLine(d, false)}</small></div>
-          </div>
-        ))}
-      </section>
+      {/* 0.2.57 (board DS7, N, Milan 11:26): Earlier keeps its name; two day cards, the same component, each with its exact day;
+          the row opens that day in Plan, its meals against its plan; older days are in Plan */}
+      <DayBand day="Earlier" date="the last two days" />
+      <div className="days" aria-label="The last two days">
+        {past.map((d) => {
+          const dk = ymd(d.day), dHeld = p.planned[dk];
+          const dRec = dHeld && Object.keys(dHeld).length ? dayRecord(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, dk), dHeld, d.logged, dk) : null;
+          const head = `${dayLabel(d.day) === "Yesterday" ? "Yesterday, " : ""}${d.day.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}`;
+          return (
+            <section className="card day-card" key={dk} aria-label={head}>
+              <p className="card-head">{head}</p>
+              <button type="button" className="menu-row plan-row-link" onClick={() => { showPlanOn(dk); setTab("plan"); }}>
+                <div className="menu-row-text"><small>{d.dayType ? dayNameAny(d.dayType) : "No kind of day was set"}</small><b>{dRec ? planDayLine({ ...dRec, done: true }, p.numbersFor(d.day)?.kcal ?? null) : loggedLine(d, false)}</b><small>See the day against its plan</small></div><ChevronRight size={18} />
+              </button>
+            </section>
+          );
+        })}
+        <p className="older-link"><button type="button" className="link" onClick={() => setTab("plan")}>Older days are in Plan ›</button></p>
+      </div>
     </>
   );
 }

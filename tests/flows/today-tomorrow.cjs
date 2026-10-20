@@ -8,6 +8,8 @@
 // as a line inside the card. Everything else is unchanged.
 // Changed by story DS rule D (Milan 07:06 to 07:30, boards DS1 and DS2): Today has no wide button, so there is no main
 // button when the day is done; the Tomorrow card's row says Check tomorrow or Plan tomorrow and opens Plan on tomorrow.
+// Changed by story DS6 K and M (Milan 10:21 to 11:26, board DS6): Today's meals is one card with its heading inside; no record
+// box, the plan card's row says the day went by the plan.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -51,7 +53,7 @@ const U = "http://127.0.0.1:3235";
     const tm = await text(page, ".tomorrow-plan");
     ok(/^TomorrowTuesday, October 20$/.test((await page.locator(".day-band").nth(1).textContent()).trim()) && /Breakfast, 07:30 ?DaaM good protein crêpes/.test(tm) && /Lunch, 13:45 ?Chocolate quark pudding/.test(tm) && /Dinner, 20:00 ?Pick a meal ?One slot open/.test(tm), "the Tomorrow card: its slots and meals, an open slot as Pick a meal: " + tm.slice(0, 160));
     ok(/Check tomorrow ?2 of 3 planned · Plan, Tuesday/.test(tm), "tomorrow is planned: Check tomorrow");
-    ok(await page.evaluate(() => { const meals = [...document.querySelectorAll("p.label")].find((x) => x.textContent === "Today's meals"), t = document.querySelector(".tomorrow-plan"); return !!meals && !!t && Boolean(meals.compareDocumentPosition(t) & Node.DOCUMENT_POSITION_FOLLOWING); }), "the Tomorrow card sits under today's meals");
+    ok(await page.evaluate(() => { const meals = document.querySelector(".meals-card"), t = document.querySelector(".tomorrow-plan"); return !!meals && !!t && Boolean(meals.compareDocumentPosition(t) & Node.DOCUMENT_POSITION_FOLLOWING); }), "the Tomorrow card sits under today's meals");
     // 10:00, breakfast eaten: lunch and dinner still to come, so the day has not gone by the plan yet
     await page.getByRole("button", { name: "I ate it", exact: true }).click(); await page.waitForTimeout(600);
     await at(page, "2026-10-19T10:00:00");
@@ -61,7 +63,7 @@ const U = "http://127.0.0.1:3235";
     // 23:00, the day is done
     await at(page, "2026-10-19T23:00:00");
     today = await text(page, "section.cooking");
-    ok(/Today went by the plan/.test(today) && !/Tomorrow is/.test(today) && await page.locator(".day-record").count() === 1, "23:00: Today went by the plan, the record; the small tomorrow line is gone");
+    ok(/Today went by the plan/.test(today) && !/Tomorrow is/.test(today) && await page.locator(".day-record").count() === 0, "23:00: Today went by the plan, said once, in the plan card; the small tomorrow line is gone");
     ok(await page.locator(".next-meal .pill-wide").count() === 0 && await page.locator(".tomorrow-plan").getByRole("button", { name: /Check tomorrow/ }).count() === 1, "no wide button; the Tomorrow card: Check tomorrow");
     await page.locator(".tomorrow-plan").getByRole("button", { name: /Check tomorrow/ }).click(); await page.waitForTimeout(700);
     ok(/Tuesday, 20 October/.test(await text(page, "main")) && /Chocolate quark pudding/.test(await text(page, "main")), "it opens Plan on Tuesday");

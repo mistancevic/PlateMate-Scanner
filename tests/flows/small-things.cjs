@@ -3,6 +3,8 @@
 // divided by what it makes, the same number on the tile, Plan, the Plate and Today, a recipe planned before included. The
 // day's record keeps its line only; the numbers are on the goal card. After day 14, Getting to know you says THE LAST 14
 // DAYS and its squares are those days, today last. Never rewrite these lines to fit a change.
+// Changed by story DS6 K (Milan 10:21 to 11:26, board DS6): the record box goes; the plan card's row says how the day went
+// (Today went by the plan) and Today's meals says the extras.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -66,7 +68,7 @@ const U = "http://127.0.0.1:3238";
     await page.locator(".next-planned").getByRole("button", { name: /I ate it/ }).click(); await page.waitForTimeout(700);
     const meal = (await page.locator(".log-card").filter({ hasText: "fritters" }).first().textContent()) ?? "";
     ok(meal.includes(`${N} kcal`), `Today, I ate it on the dinner planned before 0.2.49: ${N} kcal, not ${old}`);
-    ok(await page.locator(".day-record").count() === 1 && await page.locator(".day-record .plan-row").count() === 0 && /1 of 1 by the plan/.test(await page.locator(".day-record").textContent()), "the record keeps its line only: 1 of 1 by the plan");
+    ok(await page.locator(".day-record").count() === 0 && /Today went by the plan/.test(await page.locator("section.cooking").textContent()) && /1 of 1 by the plan/.test(await page.locator(".logged-line").textContent()), "the day's record is the plan card's row and Today's meals' line: 1 of 1 by the plan");
 
     // ---- 4. after day 14 ----
     const know = page.locator(".ft-know");
