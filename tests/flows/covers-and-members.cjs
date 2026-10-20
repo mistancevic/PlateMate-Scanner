@@ -107,7 +107,8 @@ const toast = { title: "Toast with peanut butter", kitchen: null, steps: [], ite
   ok(/shared by you/.test(await tiles.filter({ hasText: "rye bread" }).textContent()), "CO2: your own shared recipe is there, shared by you");
   await page.locator(".mb-chips").getByRole("button", { name: "Mediterranean" }).click(); await page.waitForTimeout(200);
   ok((await tiles.locator(".tile-name").allTextContents()).join() === "Salmon with lemon potatoes", "CO2: a kitchen filters the list");
-  await page.locator(".mb-chips").getByRole("button", { name: "All" }).click(); await page.waitForTimeout(200);
+  // Changed by story MB (0.2.61, board MB): the kitchens' first chip reads All kitchens, next to All cooks
+  await page.locator(".mb-chips").getByRole("button", { name: "All kitchens" }).click(); await page.waitForTimeout(200);
 
   // CO3: a member's recipe at your portion
   await tiles.filter({ hasText: "stir-fry" }).click(); await page.waitForTimeout(500);

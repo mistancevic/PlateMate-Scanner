@@ -142,7 +142,8 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
   // MB1 (0.2.61): one name in Members, unique, checked by the server; asked the first time you share with your name
   const [memberName, setMemberName] = useState<string | null | undefined>(undefined);
   const [typed, setTyped] = useState(""), [check, setCheck] = useState<{ ok: boolean; why: string } | null>(null);
-  useEffect(() => { fetch("/api/members/name").then((r) => r.json()).then((d) => { setMemberName(d.name ?? null); if (!d.name) setTyped(firstName(p.user?.name) || ""); }).catch(() => setMemberName(null)); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+  // asked only when the name matters: the switch on, or a recipe already shared with it (the server allows 30 calls a minute)
+  useEffect(() => { if (!named || memberName !== undefined) return; fetch("/api/members/name").then((r) => r.json()).then((d) => { setMemberName(d.name ?? null); if (!d.name) setTyped(firstName(p.user?.name) || ""); }).catch(() => setMemberName(null)); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [named]);
   useEffect(() => {
     if (memberName || !typed.trim()) { setCheck(null); return; }
     const t = setTimeout(() => { fetch(`/api/members/name?check=${encodeURIComponent(typed.trim())}`).then((r) => r.json()).then((d) => setCheck({ ok: Boolean(d.ok), why: d.why || "" })).catch(() => setCheck(null)); }, 350);

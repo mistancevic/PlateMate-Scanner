@@ -1,4 +1,4 @@
-// JOURNEY (0.2.60, boards SL1 and SL2; Milan 15:48 to 16:11): Plan says the day once, in one head card, with one main step.
+// JOURNEY (0.2.60, boards SL1 and SL2; Milan 15:48 to 16:11; changed by story SL3 in 0.2.61): Plan says the day once, in one head card, with one main step.
 // Shopping list, the next 7 days adds up the planned meals' foods, names a meal without foods, keeps ticks, copies what is left.
 const { chromium } = require("playwright");
 const path = require("node:path"); const S = { MAIN: path.resolve(__dirname, "../..") };
@@ -38,23 +38,40 @@ const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
   ok(/Today, Tuesday, 20 October/.test(head) && /rest day · 1 slot open/.test(head) && /of 2,800 kcal/.test(head) && await page.getByText("The day as planned").count() === 0, "SL2: one head card, the day and its numbers; The day as planned is gone: " + head);
   ok(await page.locator("main .pill-primary").count() === 1 && /Fill the open slots/.test(await page.locator("main .pill-primary").textContent()), "SL2: one filled button, Fill the open slots");
   ok(await page.locator(".plan-day .plan-card-links").getByRole("button", { name: "Slots and times ›" }).count() === 1 && await page.locator(".plan-day .plan-card-links").getByRole("button", { name: "Training week ›" }).count() === 1, "SL2: Slots and times and Training week are links in the day card");
-  // SL1: the list
-  const shop = page.getByRole("button", { name: "Shopping list, the next 7 days" });
-  ok(await shop.count() === 1 && !(await shop.getAttribute("class")).includes("pill-primary"), "SL1: Shopping list, the next 7 days, outlined");
+  // SL1, changed by story SL3 (Milan 16:46 to 17:11, board SL3): a list is made, numbered and dated, and kept
+  const shop = page.locator(".plan-shop");
+  ok(/Make a shopping list/.test(await shop.textContent()) && !(await shop.getAttribute("class")).includes("pill-primary"), "SL3: Make a shopping list, outlined");
   await shop.click(); await page.waitForTimeout(500);
-  const sheet = page.getByRole("dialog", { name: "Shopping list" });
+  const sheet = page.getByRole("dialog", { name: "Shopping lists" });
   const st = (await sheet.textContent()).replace(/\s+/g, " ");
-  ok(/Tuesday 20 to Monday 26 October: 15 planned meals, one portion each/.test(st), "the seven days and the meals counted: " + st.slice(0, 120));
-  ok(/Not on the list, no foods saved: Chicken, rice and greens \(Wednesday\)/.test(st), "the starter without foods is named");
-  ok(await sheet.locator(".shop-row").count() === 8 && /Quark, low fat \(Magerquark\)\s*4 meals\s*1,000 g/.test(await sheet.locator(".shop-row").nth(5).textContent()), "eight foods added up by name, quark 1,000 g for four meals");
+  ok(/Shopping list 1/.test(st) && /It starts today/.test(st) && /Tuesday 20 to Monday 26 October: 15 planned meals, 8 foods/.test(st), "SL3: list 1 starts today; 7 days: 15 meals, 8 foods: " + st.slice(0, 200));
+  await sheet.getByRole("button", { name: "Make shopping list 1" }).click(); await page.waitForTimeout(400);
+  const one = (await sheet.textContent()).replace(/\s+/g, " ");
+  ok(/Made Tuesday 20 October, for Tuesday 20 to Monday 26 October: 15 planned meals, one portion each/.test(one), "SL3: named and dated: " + one.slice(0, 160));
+  ok(/Not on the list, no foods saved: Chicken, rice and greens \(Wednesday\)/.test(one), "SL1: the starter without foods is named");
+  ok(await sheet.locator(".shop-row").count() === 8 && /Quark, low fat \(Magerquark\)\s*4 meals\s*1,000 g/.test(await sheet.locator(".shop-row").nth(5).textContent()), "SL1: eight foods added up by name, quark 1,000 g for four meals");
   await sheet.locator(".shop-row").filter({ hasText: "Eggs" }).click(); await page.waitForTimeout(200);
   ok(await sheet.locator(".shop-row.got").count() === 1, "a tap ticks a food");
-  await sheet.getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(200);
-  await shop.click(); await page.waitForTimeout(400);
-  ok(await page.locator(".shop-row.got").filter({ hasText: "Eggs" }).count() === 1, "the tick stays for these seven days");
-  await page.getByRole("button", { name: "Copy the list" }).click(); await page.waitForTimeout(400);
+  // the plan changes: the list doesn't
+  await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-planned")); p["2026-10-22"].dinner = p["2026-10-22"].lunch; localStorage.setItem("chefmealan-planned", JSON.stringify(p)); });
+  await page.reload(); await page.waitForTimeout(1500);
+  ok(/Shopping list 1, open/.test(await page.locator(".plan-shop").textContent()), "SL3: Plan's button names the open list");
+  await page.locator(".plan-shop").click(); await page.waitForTimeout(400);
+  ok(/15 planned meals/.test(await sheet.textContent()) && await page.locator(".shop-row.got").filter({ hasText: "Eggs" }).count() === 1, "SL3: a later change to the plan doesn't touch the list; the tick stays");
+  await sheet.getByRole("button", { name: "Copy the list" }).click(); await page.waitForTimeout(400);
   const text = await page.evaluate(() => navigator.clipboard.readText());
-  ok(/^Shopping list, Tuesday 20 to Monday 26 October\n\n/.test(text) && !/Eggs/.test(text) && /Quark, low fat \(Magerquark\): 1,000 g/.test(text) && text.split("\n").length === 9, "Copy the list: what is left, one food per line");
+  ok(/^Shopping list 1, Tuesday 20 to Monday 26 October\n\n/.test(text) && !/Eggs/.test(text) && /Quark, low fat \(Magerquark\): 1,000 g/.test(text) && text.split("\n").length === 9, "Copy the list: what is left, one food per line");
+  await sheet.getByRole("button", { name: "Finish the list" }).click(); await page.waitForTimeout(300);
+  ok(/7 foods aren't ticked\. Carry them to the next list\?/.test(await sheet.locator(".shop-ask").textContent()), "SL3: Finish asks about the 7 foods not ticked");
+  await sheet.getByRole("button", { name: "Carry them" }).click(); await page.waitForTimeout(400);
+  const two = (await sheet.textContent()).replace(/\s+/g, " ");
+  ok(/Shopping list 2/.test(two) && /It starts Tuesday 27 October, the day after your last list/.test(two) && /plus 7 from list 1/.test(two), "SL3: list 2 starts the day after list 1 and brings its 7 foods: " + two.slice(0, 220));
+  ok(await sheet.locator(".shop-earlier .menu-row").count() === 1 && /Shopping list 1\s*Tuesday 20 to Monday 26 October · 8 foods · finished/.test(await sheet.locator(".shop-earlier").textContent()), "SL3: list 1 under Earlier lists");
+  await sheet.getByRole("group", { name: "Days" }).getByRole("button", { name: "1 day" }).click();
+  await sheet.getByRole("button", { name: "Make shopping list 2" }).click(); await page.waitForTimeout(400);
+  ok(/From list 1/.test(await sheet.textContent()) && await sheet.locator(".shop-row").count() === 7, "SL3: list 2 opens with the 7 foods from list 1");
+  await sheet.locator(".shop-earlier .menu-row").click(); await page.waitForTimeout(300);
+  ok(/Shopping list 1/.test(await sheet.locator(".shop-title").textContent()) && /Finished/.test(await sheet.textContent()) && await sheet.getByRole("button", { name: "Finish the list" }).count() === 0 && await sheet.locator(".shop-row[disabled]").count() === 8, "SL3: an earlier list reads, nothing to tick");
   await b.close(); server.kill();
   console.log(fails.length ? `${fails.length} FAILED` : "all ok");
   process.exit(fails.length ? 1 : 0);

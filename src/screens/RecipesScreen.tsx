@@ -190,7 +190,10 @@ export function RecipesScreen(p: AppApi) {
     direct={cook.direct} approver={approver} client={client} publishNow={publishNow} />;
   // CO3: a member's recipe
   const member = memberOpen ? memberList?.find((r) => r.id === memberOpen) ?? null : null;
-  if (member) return <MemberPage r={member} ahead={ahead} p={p} owner={owner} close={() => setMemberOpen(null)} toCook={(n) => { setMemberOpen(null); setViewState("members"); setCookPick(n); }}
+  if (member) return <MemberPage r={member} ahead={ahead} p={p} owner={owner} close={() => setMemberOpen(null)} toCook={(n) => { setMemberOpen(null); setViewState("members"); setCookState(n);
+      // closing the recipe steps the browser back; the cook goes into the address once that step has landed
+      let done = false; const put = () => { if (done) return; done = true; window.removeEventListener("popstate", put); toUrl("members", n); };
+      window.addEventListener("popstate", put); window.setTimeout(put, 900); }}
     takeDown={() => { fetch(`/api/members/${encodeURIComponent(member.id)}`, { method: "DELETE" }).then(() => { setMemberOpen(null); loadMembers(); p.notify("Taken down for every member."); }).catch(() => {}); }} />;
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
