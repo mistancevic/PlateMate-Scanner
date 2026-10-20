@@ -1,7 +1,7 @@
 import { carryReads } from "../carry";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { ChevronRight, ChefHat, Pencil, Circle, CircleCheck, ShoppingBasket } from "lucide-react";
-import { shoppingList, shoppingText, getTicked, storeTicked } from "../shopping";
+import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, type ShopStore, type SavedList, type ShopLine } from "../shopping";
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
 import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
@@ -46,6 +46,8 @@ export function PlanScreen(p: AppApi) {
   const [open, setOpen] = useState<Slot | null>(null);
   const [editing, setEditing] = useState<PlanDay | null>(null);
   const [shopping, setShopping] = useState(false);
+  // SL3: the button names the open list; it is read again when the sheet closes
+  const shopOpen = shopping ? null : openList(getStore());
   const stripRef = useRef<HTMLDivElement>(null);
   // the picked day stays in view
   useEffect(() => { try { stripRef.current?.querySelector<HTMLElement>(".choice.on")?.scrollIntoView({ inline: "center", block: "nearest" }); } catch {} }, [picked]);
@@ -160,7 +162,7 @@ export function PlanScreen(p: AppApi) {
       </section>
       {openCount > 0 && <button type="button" className="pill pill-tall pill-primary plan-fill" onClick={() => p.openOut("fill")}><ChefHat size={18} /> Fill the open slots with {CHEF_NAME}</button>}
       </>)}
-      <button type="button" className="pill pill-wide plan-shop" onClick={() => setShopping(true)}><ShoppingBasket size={18} /> Shopping list, the next 7 days</button>
+      <button type="button" className="pill pill-wide plan-shop" onClick={() => setShopping(true)}><ShoppingBasket size={18} /> {shopOpen ? `Shopping list ${shopOpen.n}, open` : "Make a shopping list"}</button>
       {shopping && <ShopSheet p={p} close={() => setShopping(false)} />}
       {editing && (
         <div className="sheet-backdrop" onClick={() => setEditing(null)}>
@@ -220,40 +222,72 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
   );
 }
 
-// The shopping list (0.2.60, board SL1): seven days from today, one portion per planned meal, every food added up.
-// Tap a food when it is in the basket; the ticks stay for these seven days. Copy the list sends what is left to a message.
+// The shopping lists (0.2.60 board SL1; 0.2.61 board SL3): a list is saved, named and dated, for the days you pick. One is open
+// at a time; tap a food when it is in the basket; Finish the list asks about the foods not ticked. Earlier lists stay readable.
+const DAY_CHOICES = [1, 3, 7];
 function ShopSheet({ p, close }: { p: AppApi; close: () => void }) {
-  const first = new Date(); first.setHours(12, 0, 0, 0);
-  const days = Array.from({ length: 7 }, (_, i) => ymd(addDays(first, i)));
-  const last = addDays(first, 6);
-  const from = days[0];
-  const span = `${WEEKDAY[(first.getDay() + 6) % 7]} ${first.getDate()}${first.getMonth() === last.getMonth() ? "" : ` ${MONTHS[first.getMonth()]}`} to ${WEEKDAY[(last.getDay() + 6) % 7]} ${last.getDate()} ${MONTHS[last.getMonth()]}`;
-  const list = shoppingList(p.planned, days);
-  const [ticked, setTicked] = useState<Set<string>>(() => getTicked(from));
-  const tick = (k: string) => { const t = new Set(ticked); if (t.has(k)) t.delete(k); else t.add(k); storeTicked(from, t); setTicked(t); };
-  const dayOf = (d: string) => WEEKDAY[(new Date(`${d}T12:00:00`).getDay() + 6) % 7];
-  const copy = async () => { try { await navigator.clipboard.writeText(shoppingText(list, span, ticked)); p.notify("The list is copied. Paste it in a message or a note."); } catch { p.notify("Copying didn't work on this phone."); } };
+  const [store, setStore] = useState<ShopStore>(getStore);
+  const save = (s: ShopStore) => { putStore(s); setStore(s); };
+  const [reading, setReading] = useState<number | null>(null);
+  const [asking, setAsking] = useState(false);
+  const [span, setSpan] = useState(7);
+  const today = ymd(new Date());
+  const open = openList(store);
+  const dt = (d: string) => new Date(`${d}T12:00:00`);
+  const dayWord = (d: string) => `${WEEKDAY[(dt(d).getDay() + 6) % 7]} ${dt(d).getDate()}`;
+  const spanOf = (from: string, to: string) => from === to ? `${dayWord(from)} ${MONTHS[dt(from).getMonth()]}` : `${dayWord(from)}${dt(from).getMonth() === dt(to).getMonth() ? "" : ` ${MONTHS[dt(from).getMonth()]}`} to ${dayWord(to)} ${MONTHS[dt(to).getMonth()]}`;
+  const madeOn = (iso: string) => { const d = new Date(iso); return `${WEEKDAY[(d.getDay() + 6) % 7]} ${d.getDate()} ${MONTHS[d.getMonth()]}`; };
+  const start = nextStart(store, today);
+  const days = daysFrom(start, span);
+  const preview = shoppingList(p.planned, days);
+  const nextN = store.lists.reduce((m, x) => Math.max(m, x.n), 0) + 1;
+  const shown = reading !== null ? store.lists.find((l) => l.n === reading) ?? null : open;
+  const row = (l: SavedList, x: ShopLine, live: boolean) => {
+    const got = l.ticked.includes(x.key);
+    return (
+      <button key={x.key} type="button" className={`menu-row shop-row ${got ? "got" : ""}`} aria-pressed={got} disabled={!live} onClick={() => save(tickIn(store, l.n, x.key))}>
+        {got ? <CircleCheck size={20} /> : <Circle size={20} />}
+        <div className="menu-row-text"><b>{x.name}</b><small>{x.brand && !/typical values|generic|check your/i.test(x.brand) ? `${x.brand} · ` : ""}{x.meals} {x.meals === 1 ? "meal" : "meals"}</small></div>
+        <b className="shop-grams">{x.grams.toLocaleString("en")} g</b>
+      </button>
+    );
+  };
+  const copy = async (l: SavedList) => { try { await navigator.clipboard.writeText(listText(l, spanOf(l.from, l.to))); p.notify("The list is copied. Paste it in a message or a note."); } catch { p.notify("Copying didn't work on this phone."); } };
+  const finish = (l: SavedList, carry: boolean) => { save(finishList(store, l.n, carry, new Date().toISOString())); setAsking(false); p.notify(`Shopping list ${l.n} is finished.${carry ? " What wasn't ticked waits for the next list." : ""}`); };
   return (
     <div className="sheet-backdrop" onClick={close}>
-      <div className="sheet date-sheet shop-sheet" role="dialog" aria-label="Shopping list" onClick={(e) => e.stopPropagation()}>
-        <div className="card-top"><span>Shopping list</span><button type="button" className="link" onClick={close}>Close</button></div>
-        <p className="small shop-why">{span}: {list.meals} planned {list.meals === 1 ? "meal" : "meals"}, one portion each, as the plan counts them. Tap a food when it is in the basket.</p>
-        {list.without.length > 0 && <p className="small shop-without">Not on the list, no foods saved: {list.without.map((w) => `${w.title} (${dayOf(w.date)})`).join(", ")}.</p>}
-        {list.lines.length ? (
-          <div className="menu-list shop-list">
-            {list.lines.map((l) => {
-              const got = ticked.has(l.key);
-              return (
-                <button key={l.key} type="button" className={`menu-row shop-row ${got ? "got" : ""}`} aria-pressed={got} onClick={() => tick(l.key)}>
-                  {got ? <CircleCheck size={20} /> : <Circle size={20} />}
-                  <div className="menu-row-text"><b>{l.name}</b><small>{l.brand && !/typical values|generic|check your/i.test(l.brand) ? `${l.brand} · ` : ""}{l.meals} {l.meals === 1 ? "meal" : "meals"}</small></div>
-                  <b className="shop-grams">{l.grams.toLocaleString("en")} g</b>
-                </button>
-              );
-            })}
-          </div>
-        ) : <p className="small">{list.meals ? "The planned meals have no foods saved yet." : "Nothing is planned for these seven days yet."}</p>}
-        {list.lines.length > 0 && <div className="button-row"><button type="button" className="pill pill-small" onClick={copy}>Copy the list</button></div>}
+      <div className="sheet date-sheet shop-sheet" role="dialog" aria-label="Shopping lists" onClick={(e) => e.stopPropagation()}>
+        <div className="card-top"><span>{reading !== null ? <button type="button" className="link" onClick={() => setReading(null)}>‹ Shopping lists</button> : "Shopping lists"}</span><button type="button" className="link" onClick={close}>Close</button></div>
+        {shown ? (<>
+          <b className="shop-title">Shopping list {shown.n}</b>
+          <p className="small shop-why">Made {madeOn(shown.madeAt)}, for {spanOf(shown.from, shown.to)}: {shown.meals} planned {shown.meals === 1 ? "meal" : "meals"}, one portion each.{shown.doneAt ? ` Finished ${madeOn(shown.doneAt)}.` : " Tap a food when it is in the basket."}</p>
+          {shown.without.length > 0 && <p className="small shop-without">Not on the list, no foods saved: {shown.without.map((w) => `${w.title} (${WEEKDAY[(dt(w.date).getDay() + 6) % 7]})`).join(", ")}.</p>}
+          {shown.carried.length > 0 && (<><small className="pick-group">From list {shown.carriedFrom}</small><div className="menu-list shop-list">{shown.carried.map((x) => row(shown, x, !shown.doneAt))}</div></>)}
+          {shown.carried.length > 0 && shown.lines.length > 0 && <small className="pick-group">For these days</small>}
+          {shown.lines.length > 0 && <div className="menu-list shop-list">{shown.lines.map((x) => row(shown, x, !shown.doneAt))}</div>}
+          {!shown.doneAt && (asking ? (
+            <section className="card shop-ask">
+              <b>{notTicked(shown).length} {notTicked(shown).length === 1 ? "food isn't" : "foods aren't"} ticked. Carry {notTicked(shown).length === 1 ? "it" : "them"} to the next list?</b>
+              <div className="moments"><button type="button" className="choice" onClick={() => finish(shown, true)}>Carry {notTicked(shown).length === 1 ? "it" : "them"}</button><button type="button" className="choice" onClick={() => finish(shown, false)}>Leave {notTicked(shown).length === 1 ? "it" : "them"}</button></div>
+            </section>
+          ) : (<>
+            <div className="button-row"><button type="button" className="pill pill-small" onClick={() => copy(shown)}>Copy the list</button></div>
+            <button type="button" className="pill pill-wide pill-primary shop-finish" onClick={() => (notTicked(shown).length ? setAsking(true) : finish(shown, false))}>Finish the list</button>
+          </>))}
+        </>) : (<>
+          <b className="shop-title">Shopping list {nextN}</b>
+          <p className="small shop-why">Which days is it for? It starts {start === today ? "today" : `${dayWord(start)} ${MONTHS[dt(start).getMonth()]}, the day after your last list`}.</p>
+          <div className="moments" role="group" aria-label="Days">{DAY_CHOICES.map((n) => <button key={n} type="button" className={`choice ${span === n ? "on" : ""}`} onClick={() => setSpan(n)}>{n === 1 ? "1 day" : `${n} days`}</button>)}</div>
+          <p className="small shop-why">{spanOf(days[0], days[days.length - 1])}: {preview.meals} planned {preview.meals === 1 ? "meal" : "meals"}, {preview.lines.length} {preview.lines.length === 1 ? "food" : "foods"}{store.carry ? `, plus ${store.carry.lines.length} from list ${store.carry.from}` : ""}.</p>
+          <button type="button" className="pill pill-wide pill-primary shop-make" disabled={!preview.lines.length && !store.carry} onClick={() => save(makeList(store, p.planned, days, new Date().toISOString()))}>Make shopping list {nextN}</button>
+        </>)}
+        {reading === null && store.lists.some((l) => l.doneAt) && (<>
+          <small className="pick-group">Earlier lists</small>
+          <div className="menu-list shop-earlier">{store.lists.filter((l) => l.doneAt).map((l) => (
+            <button key={l.n} type="button" className="menu-row" onClick={() => setReading(l.n)}>
+              <div className="menu-row-text"><b>Shopping list {l.n}</b><small>{spanOf(l.from, l.to)} · {l.lines.length + l.carried.length} foods · finished {madeOn(l.doneAt!)}</small></div><ChevronRight size={18} />
+            </button>))}</div>
+        </>)}
       </div>
     </div>
   );

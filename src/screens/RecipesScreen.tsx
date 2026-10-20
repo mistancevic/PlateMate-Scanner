@@ -85,7 +85,14 @@ export function RecipesScreen(p: AppApi) {
   const pubMeal = state.meals.find((m) => m.id === publishing);
   // the Recipes tab (X0 and Y1, 10 October 2026): My recipes and Coach's recipes, one tile per recipe with its photo;
   // Members as a third tab, and the tabs shorter so three fit: Mine, Coach's, Members (0.2.11, board CO, CO2)
-  const [view, setView] = useState<"mine" | "coach" | "members">("mine");
+  // MB3 (0.2.61, Milan 16:46): the tab, and on Members the cook, are in the address, so a reload keeps them
+  type View = "mine" | "coach" | "members";
+  const q = () => { try { return new URLSearchParams(location.search); } catch { return new URLSearchParams(); } };
+  const [view, setViewState] = useState<View>(() => { const v = q().get("view"); return v === "coach" || v === "members" ? v : "mine"; });
+  const [cookPick, setCookState] = useState<string | null>(() => q().get("cook"));
+  const toUrl = (v: View, c: string | null) => { try { if (/^\/my-recipes\/?$/.test(location.pathname)) history.replaceState(history.state, "", `${location.pathname}${v === "mine" ? "" : `?view=${v}${v === "members" && c ? `&cook=${encodeURIComponent(c)}` : ""}`}`); } catch { /* the address stays */ } };
+  const setView = (v: View) => { setViewState(v); toUrl(v, cookPick); };
+  const setCookPick = (c: string | null) => { setCookState(c); toUrl("members", c); };
   const [memberList, setMemberList] = useState<SharedRecipe[] | null>(null);
   const [owner, setOwner] = useState(false), [loadingMembers, setLoadingMembers] = useState(false), [membersErr, setMembersErr] = useState("");
   const [memberOpen, setMemberOpen] = useState<string | null>(null);
@@ -183,7 +190,7 @@ export function RecipesScreen(p: AppApi) {
     direct={cook.direct} approver={approver} client={client} publishNow={publishNow} />;
   // CO3: a member's recipe
   const member = memberOpen ? memberList?.find((r) => r.id === memberOpen) ?? null : null;
-  if (member) return <MemberPage r={member} ahead={ahead} p={p} owner={owner} close={() => setMemberOpen(null)}
+  if (member) return <MemberPage r={member} ahead={ahead} p={p} owner={owner} close={() => setMemberOpen(null)} toCook={(n) => { setMemberOpen(null); setViewState("members"); setCookPick(n); }}
     takeDown={() => { fetch(`/api/members/${encodeURIComponent(member.id)}`, { method: "DELETE" }).then(() => { setMemberOpen(null); loadMembers(); p.notify("Taken down for every member."); }).catch(() => {}); }} />;
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
@@ -237,7 +244,7 @@ export function RecipesScreen(p: AppApi) {
             <StartWays flow={recipeIn} />
           </section>
         ))}
-      {view === "members" && <MembersList list={memberList} ahead={ahead} p={p} open={setMemberOpen} loading={loadingMembers} error={membersErr} />}
+      {view === "members" && <MembersList list={memberList} ahead={ahead} p={p} open={setMemberOpen} loading={loadingMembers} error={membersErr} cook={cookPick} setCook={setCookPick} />}
       {view !== "members" && !(view === "mine" && recipeIn.inFlow) && shown.length === 0 && (
         <section className="card recipes-empty">
           <small>{view === "mine" ? "Nothing here yet. Add one above, or make your first on the Plate." : `Nothing yet. Recipes ${approver === "your coach" ? "your coach" : approver} sends you land here.`}</small>

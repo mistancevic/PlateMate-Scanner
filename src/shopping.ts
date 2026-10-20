@@ -39,7 +39,39 @@ export function shoppingText(list: ShopList, span: string, ticked: Set<string>):
   return [`Shopping list, ${span}`, "", ...left.map((l) => `${l.name}${l.brand && !/typical values|generic|check your/i.test(l.brand) ? ` (${l.brand})` : ""}: ${l.grams.toLocaleString("en")} g`)].join("\n");
 }
 
-// what was ticked, kept for the same seven days only
-const KEY = "chefmealan-shopping";
-export const getTicked = (from: string): Set<string> => { try { const s = JSON.parse(localStorage.getItem(KEY) || "{}"); return new Set(s.from === from ? s.ticked ?? [] : []); } catch { return new Set(); } };
-export const storeTicked = (from: string, t: Set<string>) => { try { localStorage.setItem(KEY, JSON.stringify({ from, ticked: [...t] })); } catch {} };
+// SL3 (0.2.61, Milan 16:46 to 16:50): a list is saved, named and dated: Shopping list 1, made on a day, for the days picked.
+// What is on it is what it is; a later change to the plan does not touch it. One list is open at a time. The next list starts
+// the day after the last one ends, so nothing is bought twice. Finishing asks about the foods not ticked: carry them to the
+// next list, or leave them. On this phone only; another phone makes its own.
+export type SavedList = { n: number; madeAt: string; from: string; to: string; meals: number; lines: ShopLine[]; without: ShopList["without"]; carried: ShopLine[]; carriedFrom: number | null; ticked: string[]; doneAt?: string };
+export type ShopStore = { lists: SavedList[]; carry: { from: number; lines: ShopLine[] } | null };
+const LKEY = "chefmealan-shopping-lists";
+export const getStore = (): ShopStore => { try { const s = JSON.parse(localStorage.getItem(LKEY) || "{}"); return { lists: Array.isArray(s.lists) ? s.lists : [], carry: s.carry ?? null }; } catch { return { lists: [], carry: null }; } };
+export const putStore = (s: ShopStore) => { try { localStorage.setItem(LKEY, JSON.stringify(s)); } catch {} };
+export const openList = (s: ShopStore) => s.lists.find((l) => !l.doneAt) ?? null;
+const plusDay = (d: string, n: number) => { const x = new Date(`${d}T12:00:00`); x.setDate(x.getDate() + n); return `${x.getFullYear()}-${String(x.getMonth() + 1).padStart(2, "0")}-${String(x.getDate()).padStart(2, "0")}`; };
+// the next list starts where the last one ended, never before today
+export function nextStart(s: ShopStore, today: string): string {
+  const ends = s.lists.map((l) => l.to).sort();
+  const after = ends.length ? plusDay(ends[ends.length - 1], 1) : today;
+  return after > today ? after : today;
+}
+export const daysFrom = (from: string, n: number) => Array.from({ length: n }, (_, i) => plusDay(from, i));
+export function makeList(s: ShopStore, planned: Planned, days: string[], madeAt: string): ShopStore {
+  const l = shoppingList(planned, days);
+  const n = s.lists.reduce((m, x) => Math.max(m, x.n), 0) + 1;
+  const list: SavedList = { n, madeAt, from: days[0], to: days[days.length - 1], meals: l.meals, lines: l.lines, without: l.without, carried: (s.carry?.lines ?? []).map((x) => ({ ...x, key: `c:${x.key.replace(/^c:/, "")}` })), carriedFrom: s.carry?.from ?? null, ticked: [] };
+  return { lists: [list, ...s.lists], carry: null };
+}
+export const tickIn = (s: ShopStore, n: number, key: string): ShopStore => ({ ...s, lists: s.lists.map((l) => (l.n !== n ? l : { ...l, ticked: l.ticked.includes(key) ? l.ticked.filter((k) => k !== key) : [...l.ticked, key] })) });
+export const notTicked = (l: SavedList) => [...l.carried, ...l.lines].filter((x) => !l.ticked.includes(x.key));
+export function finishList(s: ShopStore, n: number, carry: boolean, at: string): ShopStore {
+  const l = s.lists.find((x) => x.n === n);
+  if (!l) return s;
+  const left = notTicked(l);
+  return { lists: s.lists.map((x) => (x.n === n ? { ...x, doneAt: at } : x)), carry: carry && left.length ? { from: n, lines: left } : s.carry };
+}
+export function listText(l: SavedList, span: string): string {
+  const shown = (x: ShopLine) => `${x.name}${x.brand && !/typical values|generic|check your/i.test(x.brand) ? ` (${x.brand})` : ""}: ${x.grams.toLocaleString("en")} g`;
+  return [`Shopping list ${l.n}, ${span}`, "", ...notTicked(l).map(shown)].join("\n");
+}
