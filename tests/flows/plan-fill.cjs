@@ -76,7 +76,8 @@ seed.items = [];
   // the tip (canvas S, 11 October 2026): the plate is under, three foods from My foods that lift it, with the score each would reach
   const tip = page.locator(".chef-tip");
   ok(await tip.count() === 1 && /Your plate is [\d.]+ under/.test(await tip.textContent()), "the tip says how far under the plate is");
-  ok(await tip.locator(".tip-row").count() === 3 && await tip.locator(".tip-row .pill-primary").count() === 3, "three foods to add, each with Add");
+  // Changed by story DS rule A (Milan 07:30, board DS2): the Add in a list is outlined, so the check reads its button, not its fill
+  ok(await tip.locator(".tip-row").count() === 3 && await tip.locator(".tip-row button.pill").filter({ hasText: /Add|Swap|Set/ }).count() === 3, "three foods to add, each with Add");
   const tos = (await tip.locator(".tip-to b").allTextContents()).map(Number);
   ok(tos[0] >= tos[1] && tos[1] >= tos[2], "sorted by the score the plate would reach: " + tos.join(" "));
   await page.getByRole("button", { name: "Keep it as it is" }).click(); await page.waitForTimeout(600);

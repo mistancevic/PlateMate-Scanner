@@ -281,7 +281,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
             return draft ? (<>
               <small className="muted">No steps yet.</small>
               {status}
-              <div className="button-row"><button className="pill pill-small" disabled={drafting === "working"} onClick={askDraft}>Ask {CHEF_NAME}</button><button className="pill pill-small" onClick={startEdit}>Write my own</button></div>
+              <div className="button-row"><button className="pill pill-small" disabled={drafting === "working"} onClick={askDraft}>Draft the steps with {CHEF_NAME}</button><button className="pill pill-small" onClick={startEdit}>Write my own</button></div>
             </>) : <small className="muted">No steps yet. Edit recipe adds them.</small>;
           })()}
       </section>
