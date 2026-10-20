@@ -35,7 +35,8 @@ seed.items = [];
   ok(await page.locator(".pick-sheet").count() === 0, "the sheet closes");
   const lunch = page.locator(".plan-slot-wrap").nth(1);
   ok(/Chicken, rice and greens/.test(await lunch.textContent()) && /starter · 640 kcal · 52 g/.test(await lunch.textContent()) && /fits/.test(await lunch.textContent()), "Lunch holds the starter with its numbers and fits");
-  ok(/2 slots open/.test(await page.locator(".plan-top").textContent()), "two slots open");
+  // Changed by story SL2 (Milan 16:03 to 16:11, board SL2): the open slots are in the day's line in the head card at the top
+  ok(/2 slots open/.test(await page.locator(".plan-head .plan-day-head small").textContent()), "two slots open");
   let nums = await page.locator(".plan-row b").allTextContents();
   ok(nums[1].replace(/,/g, "") === "640" && nums[2] === "52", "the day as planned adds up: " + nums.join(" "));
   // a meal that falls short: the amber gap and the two ways out
@@ -112,12 +113,12 @@ seed.items = [];
   // my own recipe in a slot, then emptied
   await page.getByRole("button", { name: /Dinner at .*pick a meal/ }).click(); await page.waitForTimeout(400);
   await page.locator(".pick-sheet").getByRole("button", { name: /Skyr bowl/ }).first().click(); await page.waitForTimeout(400);
-  ok(/all slots set/.test(await page.locator(".plan-top").textContent()), "all slots set");
+  ok(/all slots set/.test(await page.locator(".plan-head .plan-day-head small").textContent()), "all slots set");
   ok(/my recipe/.test(await page.locator(".plan-slot-wrap").nth(2).textContent()), "Dinner says my recipe");
   await require("./swipe.cjs")(page, page.getByRole("button", { name: /Dinner at .*Skyr bowl/ }), "left"); // R19: a planned meal opens on a tap; a swipe left swaps
   ok(/Skyr bowl is in this slot/.test(await page.locator(".pick-why").textContent()), "the sheet says what is in the slot");
   await page.getByRole("button", { name: "Empty this slot" }).click(); await page.waitForTimeout(400);
-  ok(/1 slot open/.test(await page.locator(".plan-top").textContent()), "emptied: 1 slot open");
+  ok(/1 slot open/.test(await page.locator(".plan-head .plan-day-head small").textContent()), "emptied: 1 slot open");
   // rename a recipe on its page (canvas S, Recipes keeps; 0.2.5+r11 R8: the name is renamed on the recipe's page): the slot that holds it follows
   await page.getByRole("button", { name: /^Recipes$/ }).first().click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Open Morning skyr" }).click(); await page.waitForTimeout(300);
@@ -133,7 +134,7 @@ seed.items = [];
   await page.reload(); await page.waitForTimeout(900);
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(500);
   await page.evaluate(() => document.querySelectorAll(".day-strip .choice")[7].click()); await page.waitForTimeout(300);
-  ok(/1 slot open/.test(await page.locator(".plan-top").textContent()), "the slots keep their meals after a reload");
+  ok(/1 slot open/.test(await page.locator(".plan-head .plan-day-head small").textContent()), "the slots keep their meals after a reload");
   // leaving the Plate another way drops the slot
   await page.getByRole("button", { name: /Dinner at .*pick a meal/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "Create a new meal on the Plate" }).click(); await page.waitForTimeout(500);

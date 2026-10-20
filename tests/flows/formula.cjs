@@ -69,7 +69,8 @@ const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0
   await page.goto("http://127.0.0.1:3197/me/goal"); await page.waitForTimeout(1000);
   ok(/NEXT, FROM MONDAY/.test(await page.locator(".next-goal").textContent()) && /Lose fat/.test(await page.locator(".next-goal").textContent()), "Me, Goal shows the waiting goal with its date");
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(600);
-  const kcalOf = async () => Number((await page.locator(".plan-day-head small").textContent()).match(/([\d,]+) kcal/)[1].replace(/,/g, ""));
+  // Changed by story SL2 (board SL2): a day ahead says its target in the head card's numbers; a past day keeps its line
+  const kcalOf = async () => Number((await page.locator(".plan-head .plan-row > div:nth-child(2) small, .plan-past .plan-day-head small").first().textContent()).match(/([\d,]+) kcal/)[1].replace(/,/g, ""));
   const todayKcal = await kcalOf();
   // on a Sunday next Monday is in the week after (found 18 October 2026)
   const sunday = new Date().getDay() === 0;

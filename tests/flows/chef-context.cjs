@@ -54,7 +54,8 @@ seed.items = [];
   await page.getByRole("button", { name: "Put them in the plan" }).click(); await page.waitForTimeout(500);
   ok(/In the plan/.test(await fill.textContent()), "the button acted and says so");
   await page.getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(400);
-  ok(/all slots set/.test(await page.locator(".plan-top").textContent()), "Plan shows every slot set");
+  // Changed by story SL2 (Milan 16:03 to 16:11, board SL2): the open slots are in the day's line in the head card at the top
+  ok(/all slots set/.test(await page.locator(".plan-head .plan-day-head small").textContent()), "Plan shows every slot set");
   ok(await page.getByRole("button", { name: /Fill the open slots/ }).count() === 0, "and no Fill button when nothing is open");
   // the Fill button opens the chat with the day filled at once
   await page.evaluate(() => { const pl = JSON.parse(localStorage.getItem("chefmealan-planned")); const k = Object.keys(pl)[0]; delete pl[k].dinner; localStorage.setItem("chefmealan-planned", JSON.stringify(pl)); });

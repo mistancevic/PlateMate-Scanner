@@ -1,6 +1,7 @@
 import { carryReads } from "../carry";
 import { useEffect, useRef, useState, type ReactElement } from "react";
-import { ChevronRight, ChefHat, Pencil } from "lucide-react";
+import { ChevronRight, ChefHat, Pencil, Circle, CircleCheck, ShoppingBasket } from "lucide-react";
+import { shoppingList, shoppingText, getTicked, storeTicked } from "../shopping";
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
 import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
@@ -44,6 +45,7 @@ export function PlanScreen(p: AppApi) {
   const setPicked = (d: string) => { remembered = d; setPickedState(d); };
   const [open, setOpen] = useState<Slot | null>(null);
   const [editing, setEditing] = useState<PlanDay | null>(null);
+  const [shopping, setShopping] = useState(false);
   const stripRef = useRef<HTMLDivElement>(null);
   // the picked day stays in view
   useEffect(() => { try { stripRef.current?.querySelector<HTMLElement>(".choice.on")?.scrollIntoView({ inline: "center", block: "nearest" }); } catch {} }, [picked]);
@@ -98,14 +100,22 @@ export function PlanScreen(p: AppApi) {
         })}
       </div>
       {isPast ? <PastDay p={p} date={date} dayKey={key} line={line} slots={slots} numbers={numbers} /> : (<>
-      <section className="card plan-day">
+      {/* SL2 (Milan 16:03): the day's head and the day as planned are one card at the top: the date, the kind of day and the
+          open slots, then the plan against the target. The target is said once, in the numbers. */}
+      <section className="plan plan-head">
         <div className="plan-day-head">
           <b>{isToday ? "Today, " : ""}{WEEKDAY[(date.getDay() + 6) % 7]}, {date.getDate()} {MONTHS[date.getMonth()]}
-            {/* a day without training has no training row: the pencil sits by the date, as on Today */}
             {!rows.some((r) => r.kind === "training") && <button type="button" className="icon today-pencil plan-pencil" aria-label="Change the training for this date" onClick={() => setEditing(training ?? { work: true, kind: "rest" })}><Pencil size={15} /></button>}
           </b>
-          <small>{line}</small>
+          <small>{[tWhen ? tWhen.phrase : training ? "rest day" : null, openCount ? `${openCount} ${openCount === 1 ? "slot" : "slots"} open` : "all slots set"].filter(Boolean).join(" · ")}</small>
         </div>
+        <div className="plan-row">
+          <div><b>{sum.n ? pdVal(sum.pd) : "—"}</b><small>{target !== null ? `of ${pdVal(target)} ${pdTag()}` : pdTag()}</small></div>
+          <div><b>{fmt(sum.kcal, 0)}</b><small>{numbers ? `of ${fmt(numbers.kcal, 0)} kcal` : "kcal"}</small></div>
+          <div><b>{fmt(sum.protein, 0)}</b><small>{numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></div>
+        </div>
+      </section>
+      <section className="card plan-day">
         {rows.map((r) => {
           if (r.kind === "training") return (
             <button type="button" key="training" className="menu-row plan-training" aria-label={`Training at ${r.time}, ${planLine(r.day)}. Change it for this date`} onClick={() => setEditing(r.day)}>
@@ -142,21 +152,16 @@ export function PlanScreen(p: AppApi) {
             </div>
           );
         })}
-      </section>
-      <section className="plan">
-        <div className="plan-top"><span>The day as planned</span><span>{openCount ? `${openCount} ${openCount === 1 ? "slot" : "slots"} open` : "all slots set"}</span></div>
-        <div className="plan-row">
-          <div><b>{sum.n ? pdVal(sum.pd) : "—"}</b><small>{target !== null ? `of ${pdVal(target)} ${pdTag()}` : pdTag()}</small></div>
-          <div><b>{fmt(sum.kcal, 0)}</b><small>{numbers ? `of ${fmt(numbers.kcal, 0)} kcal` : "kcal"}</small></div>
-          <div><b>{fmt(sum.protein, 0)}</b><small>{numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></div>
+        {/* SL2: the day's settings sit with the day, as links, one per line */}
+        <div className="plan-card-links">
+          <button type="button" className="link" onClick={() => p.openMenu("life")}>Slots and times ›</button>
+          <button type="button" className="link" onClick={() => p.openMenu("week")}>Training week ›</button>
         </div>
       </section>
       {openCount > 0 && <button type="button" className="pill pill-tall pill-primary plan-fill" onClick={() => p.openOut("fill")}><ChefHat size={18} /> Fill the open slots with {CHEF_NAME}</button>}
       </>)}
-      <div className="button-row plan-links">
-        <button type="button" className="pill pill-small" onClick={() => p.openMenu("life")}>Slots and times</button>
-        <button type="button" className="pill pill-small" onClick={() => p.openMenu("week")}>Training week</button>
-      </div>
+      <button type="button" className="pill pill-wide plan-shop" onClick={() => setShopping(true)}><ShoppingBasket size={18} /> Shopping list, the next 7 days</button>
+      {shopping && <ShopSheet p={p} close={() => setShopping(false)} />}
       {editing && (
         <div className="sheet-backdrop" onClick={() => setEditing(null)}>
           <div className="sheet date-sheet" role="dialog" aria-label={`${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}: training`} onClick={(e) => e.stopPropagation()}>
@@ -212,6 +217,45 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
         </>
       ) : <small className="setting-hint past-none">Nothing was logged on this day.</small>}
     </section>
+  );
+}
+
+// The shopping list (0.2.60, board SL1): seven days from today, one portion per planned meal, every food added up.
+// Tap a food when it is in the basket; the ticks stay for these seven days. Copy the list sends what is left to a message.
+function ShopSheet({ p, close }: { p: AppApi; close: () => void }) {
+  const first = new Date(); first.setHours(12, 0, 0, 0);
+  const days = Array.from({ length: 7 }, (_, i) => ymd(addDays(first, i)));
+  const last = addDays(first, 6);
+  const from = days[0];
+  const span = `${WEEKDAY[(first.getDay() + 6) % 7]} ${first.getDate()}${first.getMonth() === last.getMonth() ? "" : ` ${MONTHS[first.getMonth()]}`} to ${WEEKDAY[(last.getDay() + 6) % 7]} ${last.getDate()} ${MONTHS[last.getMonth()]}`;
+  const list = shoppingList(p.planned, days);
+  const [ticked, setTicked] = useState<Set<string>>(() => getTicked(from));
+  const tick = (k: string) => { const t = new Set(ticked); if (t.has(k)) t.delete(k); else t.add(k); storeTicked(from, t); setTicked(t); };
+  const dayOf = (d: string) => WEEKDAY[(new Date(`${d}T12:00:00`).getDay() + 6) % 7];
+  const copy = async () => { try { await navigator.clipboard.writeText(shoppingText(list, span, ticked)); p.notify("The list is copied. Paste it in a message or a note."); } catch { p.notify("Copying didn't work on this phone."); } };
+  return (
+    <div className="sheet-backdrop" onClick={close}>
+      <div className="sheet date-sheet shop-sheet" role="dialog" aria-label="Shopping list" onClick={(e) => e.stopPropagation()}>
+        <div className="card-top"><span>Shopping list</span><button type="button" className="link" onClick={close}>Close</button></div>
+        <p className="small shop-why">{span}: {list.meals} planned {list.meals === 1 ? "meal" : "meals"}, one portion each, as the plan counts them. Tap a food when it is in the basket.</p>
+        {list.without.length > 0 && <p className="small shop-without">Not on the list, no foods saved: {list.without.map((w) => `${w.title} (${dayOf(w.date)})`).join(", ")}.</p>}
+        {list.lines.length ? (
+          <div className="menu-list shop-list">
+            {list.lines.map((l) => {
+              const got = ticked.has(l.key);
+              return (
+                <button key={l.key} type="button" className={`menu-row shop-row ${got ? "got" : ""}`} aria-pressed={got} onClick={() => tick(l.key)}>
+                  {got ? <CircleCheck size={20} /> : <Circle size={20} />}
+                  <div className="menu-row-text"><b>{l.name}</b><small>{l.brand && !/typical values|generic|check your/i.test(l.brand) ? `${l.brand} · ` : ""}{l.meals} {l.meals === 1 ? "meal" : "meals"}</small></div>
+                  <b className="shop-grams">{l.grams.toLocaleString("en")} g</b>
+                </button>
+              );
+            })}
+          </div>
+        ) : <p className="small">{list.meals ? "The planned meals have no foods saved yet." : "Nothing is planned for these seven days yet."}</p>}
+        {list.lines.length > 0 && <div className="button-row"><button type="button" className="pill pill-small" onClick={copy}>Copy the list</button></div>}
+      </div>
+    </div>
   );
 }
 

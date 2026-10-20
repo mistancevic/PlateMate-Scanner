@@ -80,7 +80,8 @@ const U = "http://127.0.0.1:3236";
     ok(/Tuesday's breakfast, 07:30 · in the plan/.test(await text(page, ".rq-slot")) && /Plan/.test(await text(page, ".rq-back")), "a tap on Plan shows the meal, its slot, ‹ Plan");
     await page.locator(".rq-back").click(); await page.waitForTimeout(600);
     await swipe(page, page.locator(".plan-slot-set").first(), "right");
-    ok(await page.locator(".plan-slot-set").count() === 0 && /3 slots open/.test(await text(page, ".plan-top")), "swipe right on Plan empties the slot");
+    // Changed by story SL2 (Milan 16:03 to 16:11, board SL2): the open slots are in the day's line in the head card at the top
+    ok(await page.locator(".plan-slot-set").count() === 0 && /3 slots open/.test(await text(page, ".plan-head .plan-day-head small")), "swipe right on Plan empties the slot");
     await page.context().close();
   } catch (e) { ok(false, "walkthrough error: " + e.message.split("\n").slice(0, 3).join(" / ")); }
   ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));

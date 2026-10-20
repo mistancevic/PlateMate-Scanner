@@ -12,6 +12,9 @@ const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0
   await new Promise((r) => setTimeout(r, 2500));
   const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
   const page = await b.newPage({ viewport: { width: 390, height: 1400 } });
+  // Changed (0.2.60): the walkthrough ran at the hour it was run, so after the snack's time the snack left the plan rows and
+  // Skip had nothing to swipe. The day now starts at 08:00, every slot still ahead.
+  { const at = new Date(); at.setHours(8, 0, 0, 0); await page.clock.setFixedTime(at); }
   const errs = []; page.on("pageerror", (e) => errs.push(e.message));
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
   const today = ymd(new Date());
