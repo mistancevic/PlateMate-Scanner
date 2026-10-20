@@ -3,7 +3,7 @@ import { tabOfPath } from "../back";
 import { RecipeCard } from "./RecipePages";
 import type { PublicRecipe } from "../recipes";
 import { Check } from "lucide-react";
-import { WANTS, DEMO_GOAL, BIG_BOWL, lift, smaller, alone, havesFor, PAIR_NOTES, startAmounts, describe, type Amounts } from "../landing";
+import { WANTS, DEMO_GOAL, BIG_BOWL, lift, smaller, alone, havesFor, PAIR_NOTES, startAmounts, describe, MILK_MIN, type Amounts } from "../landing";
 import { Mark, APP_NAME } from "../components/Mark";
 import { signIn } from "../cloud";
 import { hit } from "../metrics";
@@ -206,7 +206,9 @@ function TryIt() {
       <div className="setting">
         <small className="setting-name">You crave</small><Pick items={WANTS} on={want} set={setWant} />
         <Step name={what[0].toUpperCase() + what.slice(1)} value={amt.grams} unit="g" step={w.step ?? 10} min={w.min ?? 10} max={w.max ?? 200} set={(g) => setAmt({ ...amt, grams: g })} />
-        {w.milk && <Step name={w.milk.name[0].toUpperCase() + w.milk.name.slice(1)} value={amt.ml} unit="ml" step={w.milk.step} min={0} max={w.milk.max} set={(ml) => setAmt({ ...amt, ml })} />}
+        {/* Milan 23:26: milk is a chip of its own, on or off; its stepper shows only when it is on, so it never reads 0 ml */}
+        {w.milk && <div className="l-amount"><span>With</span><button type="button" className={`choice ${amt.ml > 0 ? "on" : ""}`} aria-pressed={amt.ml > 0} onClick={() => { used(); setAmt({ ...amt, ml: amt.ml > 0 ? 0 : w.milk!.ml }); }}>{w.milk.name[0].toUpperCase() + w.milk.name.slice(1)}</button></div>}
+        {w.milk && amt.ml > 0 && <Step name={w.milk.name[0].toUpperCase() + w.milk.name.slice(1)} value={amt.ml} unit="ml" step={w.milk.step} min={MILK_MIN} max={w.milk.max} set={(ml) => setAmt({ ...amt, ml })} />}
       </div>
       <div className="setting"><small className="setting-name">You have at home</small><Pick items={offered} on={h.id} set={setHave} /></div>
       {/* HP68: what PD is, before the first PD number a cold reader meets */}
@@ -221,7 +223,7 @@ function TryIt() {
           <b className="l-jump-arrow" aria-hidden="true">→</b>
           <div className="l-jump-to"><small>With the {hn}</small><b>PD {r.pd.toFixed(1)}</b><small>{r.kcal} kcal, {Math.round(r.protein)} g protein</small></div>
         </div>
-        <span>{w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} The {hn} adds the protein, so the plate fits.</span>
+        <span>{amt.ml > 0 && w.withMilk ? w.withMilk : w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} The {hn} adds the protein, so the plate fits.</span>
         {big && <small>{r.total} g is a very big bowl. With {big.grams} g of {what} instead, {big.partner} g of {hn} is enough.</small>}
       </div>
       <small className="l-try-small">A simplified version of Chef Mealan: one goal, six cravings and typical values from food labels. Nothing you pick here is saved.</small>

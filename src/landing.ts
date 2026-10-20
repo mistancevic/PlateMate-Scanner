@@ -6,12 +6,13 @@
 // dairy or whey, a savoury one gets tuna, chicken, egg whites or a yogurt dip, never skyr on a pizza.
 // HP68 (board Stories41, Milan 20 October 2026): granola comes with milk 1.5% (47 kcal and 3.4 g protein per 100 ml,
 // a typical label), the same bowl as page 8 of Worthy Numbers: 60 g with 200 ml is PD 3.4. Every craving has a stepper
-// for its grams, and granola one more for the milk.
+// for its grams. Milan 23:26: milk is its own chip under the granola, on or off; when on, a stepper from 50 to 300 ml.
 export type Milk = { name: string; ml: number; kcal: number; protein: number; step: number; max: number };
-export type DemoFood = { id: string; name: string; of?: string; grams?: number; step?: number; min?: number; max?: number; milk?: Milk; kcal: number; protein: number; kind: "sweet" | "savoury"; note?: string };
+export type DemoFood = { id: string; name: string; of?: string; withMilk?: string; grams?: number; step?: number; min?: number; max?: number; milk?: Milk; kcal: number; protein: number; kind: "sweet" | "savoury"; note?: string };
 export const MILK: Milk = { name: "milk 1.5%", ml: 200, kcal: 47, protein: 3.4, step: 50, max: 300 };
+export const MILK_MIN = 50;
 export const WANTS: DemoFood[] = [
-  { id: "granola", name: "Granola with milk", of: "granola", grams: 60, step: 10, min: 30, max: 100, milk: MILK, kcal: 450, protein: 9, kind: "sweet", note: "Granola with milk looks like a good breakfast, but the bowl is mostly energy." },
+  { id: "granola", name: "Granola", of: "granola", grams: 60, step: 10, min: 30, max: 100, milk: MILK, kcal: 450, protein: 9, kind: "sweet", note: "Granola looks healthy, but granola alone is mostly energy.", withMilk: "Granola with milk looks like a good breakfast, but the bowl is mostly energy." },
   { id: "spread", name: "Chocolate spread", of: "chocolate spread", grams: 40, step: 10, min: 20, max: 80, kcal: 539, protein: 6.3, kind: "sweet", note: "Chocolate spread alone is mostly sugar and fat." },
   { id: "peanut", name: "Peanut butter", of: "peanut butter", grams: 30, step: 10, min: 20, max: 60, kcal: 588, protein: 25.1, kind: "sweet", note: "Peanut butter has protein, but peanut butter alone is mostly fat." },
   { id: "icecream", name: "Ice cream", of: "ice cream", grams: 100, step: 25, min: 50, max: 200, kcal: 207, protein: 3.5, kind: "sweet", note: "Ice cream alone is mostly sugar and fat." },

@@ -89,7 +89,7 @@ test("the home page works for Recomposition at PD 6.5 and says how much is on th
   const spread = WANTS.find((w) => w.id === "spread")!, skyr = HAVES.find((h) => h.id === "skyr")!;
   const r = lift(spread, skyr, DEMO_GOAL.pd);
   assert.equal(r.grams, 165); assert.equal(r.total, 205); assert.equal(r.kcal, 320); assert.equal(Math.round(r.protein), 21); assert.equal(r.pd, 6.5);
-  // Changed by story HP68 (Milan, 20 October 2026): granola comes with milk 1.5%, the bowl of Worthy Numbers page 8.
+  // Changed by story HP68 (Milan, 20 October 2026): granola starts with the Milk 1.5% chip on, the bowl of Worthy Numbers page 8.
   // 60 g with 200 ml is 364 kcal, 12.2 g protein, PD 3.4; 165 g of skyr lifts it to 6.5. Without milk, 60 g of granola is PD 2.0.
   const g = lift(WANTS[0], skyr, DEMO_GOAL.pd), g0 = alone(WANTS[0]);
   assert.equal(WANTS[0].id, "granola"); assert.equal(g0.kcal, 364); assert.equal(g0.protein, 12.2); assert.equal(g0.pd, 3.4);
@@ -101,7 +101,7 @@ test("the home page works for Recomposition at PD 6.5 and says how much is on th
   // every craving with every food offered next to it stays a sensible bowl; a savoury craving is never offered skyr
   for (const w of WANTS) for (const h of havesFor(w)) { const x = lift(w, h, DEMO_GOAL.pd); assert.ok(x.grams > 0 && x.grams <= BIG_BOWL, `${w.id}+${h.id}: ${x.grams} g`); }
   // HP68: at every stepper value, the answer is a sensible bowl, or a smaller amount of the craving that is
-  for (const w of WANTS) for (const h of havesFor(w)) for (let gr = w.min!; gr <= w.max!; gr += w.step!) for (let ml = 0; ml <= (w.milk?.max ?? 0); ml += w.milk?.step ?? 1) {
+  for (const w of WANTS) for (const h of havesFor(w)) for (let gr = w.min!; gr <= w.max!; gr += w.step!) for (const ml of w.milk ? [0, ...Array.from({ length: (w.milk.max - 50) / w.milk.step + 1 }, (_, i) => 50 + i * w.milk!.step)] : [0]) {
     const am = { grams: gr, ml }, x = lift(w, h, DEMO_GOAL.pd, am);
     assert.ok(x.pd >= 6 && Number.isFinite(x.pd), `${w.id}+${h.id} ${gr} g ${ml} ml: PD ${x.pd}`);
     if (x.grams > BIG_BOWL) assert.ok(smaller(w, h, DEMO_GOAL.pd, am), `${w.id}+${h.id} ${gr} g: no smaller bowl`);
