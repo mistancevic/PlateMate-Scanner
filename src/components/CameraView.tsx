@@ -312,7 +312,7 @@ export function CameraView({
         <div className="flex-1 flex flex-col items-center justify-center p-8 text-center z-20">
           <Camera className="w-16 h-16 text-neutral-400 mb-4" />
           <p className="text-white font-semibold mb-6 leading-relaxed max-w-[280px]">{cameraError}</p>
-          <button onClick={() => fileInputRef.current?.click()} className="px-6 py-4 bg-white text-[#172742] rounded-2xl font-extrabold flex items-center gap-3">
+          <button onClick={() => fileInputRef.current?.click()} className="px-6 py-4 bg-white text-[var(--ink)] rounded-2xl font-black flex items-center gap-3">
             <ImageIcon className="w-5 h-5" /> Choose from your photos
           </button>
         </div>
@@ -358,7 +358,7 @@ export function CameraView({
               <span />
               {auto && (scannerMode !== "barcode" || codeRead) && (
                 <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 80 80" aria-hidden="true">
-                  <circle cx="40" cy="40" r="37" fill="none" stroke="#2e7be8" strokeWidth="5" strokeLinecap="round" strokeDasharray={2 * Math.PI * 37} strokeDashoffset={(1 - steady) * 2 * Math.PI * 37} style={{ transition: "stroke-dashoffset 120ms linear" }} />
+                  <circle cx="40" cy="40" r="37" fill="none" stroke="var(--brand)" strokeWidth="5" strokeLinecap="round" strokeDasharray={2 * Math.PI * 37} strokeDashoffset={(1 - steady) * 2 * Math.PI * 37} style={{ transition: "stroke-dashoffset 120ms linear" }} />
                 </svg>
               )}
             </button>
