@@ -3,7 +3,7 @@ import { tabOfPath } from "../back";
 import { RecipeCard } from "./RecipePages";
 import type { PublicRecipe } from "../recipes";
 import { Check } from "lucide-react";
-import { WANTS, DEMO_GOAL, BIG_BOWL, lift, smaller, alone, havesFor, PAIR_NOTES } from "../landing";
+import { WANTS, HAVES, DEMO_GOAL, lift, alone, part, plate, unitOf, havesFor, PAIR_NOTES, type DemoFood } from "../landing";
 import { Mark, APP_NAME } from "../components/Mark";
 import { signIn } from "../cloud";
 import { hit } from "../metrics";
@@ -56,9 +56,10 @@ export function LandingScreen() {
         </div>
         <div>
           <TryIt />
-          <div className="l-cta-block" ref={ctaRef}>
-            <b className="l-cta-head">Your foods, your goal, your day.</b>
-            <p>The calculator above uses one goal and six foods. Chef Mealan works with your own goal, the foods in your kitchen, and the day you're actually having.</p>
+          {/* HP68 (Milan 23:53): the sign-up box picks up where the calculator stops, at its one target */}
+          <div className="l-cta-block l-cta-hook" ref={ctaRef}>
+            <b className="l-cta-head">Your own target, at every meal</b>
+            <p>This calculator uses one target, PD {DEMO_GOAL.pd}. Your own target comes from your goal, your body and your training. Chef Mealan works it out for you, then plans each meal to reach it with the foods in your kitchen.</p>
             <button className="pill pill-primary l-cta-big" onClick={toForm}>Try Chef Mealan</button>
             <small>Chef Mealan is being tested by a small group. Leave your name and email, and Coach Milan will send you a personal code.</small>
           </div>
@@ -174,36 +175,68 @@ export function DayVideo({ src, poster, label, big }: { src: string; poster: str
   );
 }
 function TryIt() {
-  // the calculator used: counted once per visit, at the first pick
+  // the calculator used: counted once per visit, at the first pick or step
   const counted = useRef(false);
   const used = () => { if (!counted.current) { counted.current = true; hit("hp_calc"); } };
+  // HP68 (Milan 23:35): pick a craving and a food you have, then set the weight of each; the plate's numbers follow
   const [want, setWantState] = useState(WANTS[0].id);
   const w = WANTS.find((x) => x.id === want)!;
   const offered = havesFor(w);
-  const [have, setHave] = useState(offered[0].id);
-  const setWant = (id: string) => { setWantState(id); const nw = WANTS.find((x) => x.id === id)!; if (!havesFor(nw).some((h) => h.id === have)) setHave(havesFor(nw)[0].id); };
+  const [have, setHaveState] = useState(offered[0].id);
   const h = offered.find((x) => x.id === have) ?? offered[0];
-  const r = lift(w, h, DEMO_GOAL.pd), a = alone(w);
-  const big = r.grams > BIG_BOWL ? smaller(w, h, DEMO_GOAL.pd) : null;
-  const hn = h.name.toLowerCase();
+  const [wg, setWg] = useState(w.grams ?? 40);
+  const [hg, setHg] = useState(h.grams ?? 100);
+  const setWant = (id: string) => { setWantState(id); const nw = WANTS.find((x) => x.id === id)!; setWg(nw.grams ?? 40); const nh = havesFor(nw).find((x) => x.id === have) ?? havesFor(nw)[0]; setHaveState(nh.id); setHg(nh.grams ?? 100); };
+  const setHave = (id: string) => { setHaveState(id); setHg(HAVES.find((x) => x.id === id)!.grams ?? 100); };
+  const a = alone(w, wg), p = plate(w, wg, h, hg);
+  const fits = p.pd >= DEMO_GOAL.pd;
+  const need = lift(w, h, DEMO_GOAL.pd, wg);
+  const reach = !fits && need.grams <= (h.max ?? 300);
+  const others = offered.filter((x) => x.id !== h.id && lift(w, x, DEMO_GOAL.pd, wg).grams <= (x.max ?? 300)).map((x) => (x.name.startsWith("Greek") ? x.name : x.name.toLowerCase()));
+  const hn = h.name.toLowerCase(), wn = w.of ?? w.name.toLowerCase(), hu = unitOf(h);
   const Pick = ({ items, on, set }: { items: { id: string; name: string }[]; on: string; set: (v: string) => void }) => (
     <div className="chip-row">{items.map((x) => <button key={x.id} type="button" className={`choice ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} onClick={() => { used(); set(x.id); }}>{x.name}</button>)}</div>
   );
+  // one picked food: its name, a stepper for its weight, and what that weight brings
+  const Weigh = ({ f, value, set }: { f: DemoFood; value: number; set: (v: number) => void }) => {
+    const u = unitOf(f), st = f.step ?? 10, n = part(f, value);
+    return (
+      <div className="l-amount">
+        <span><b>{f.name}</b><small>{n.kcal} kcal, {n.protein} g protein</small></span>
+        <span className="rp-step">
+          <button type="button" aria-label={`${st} ${u} less ${f.name.toLowerCase()}`} disabled={value - st < (f.min ?? st)} onClick={() => { used(); set(value - st); }}>−</button>
+          <b>{value} {u}</b>
+          <button type="button" aria-label={`${st} ${u} more ${f.name.toLowerCase()}`} disabled={value + st > (f.max ?? 300)} onClick={() => { used(); set(value + st); }}>+</button>
+        </span>
+      </div>
+    );
+  };
   return (
     <div className="l-try-box">
       <div className="setting"><small className="setting-name">You crave</small><Pick items={WANTS} on={want} set={setWant} /></div>
       <div className="setting"><small className="setting-name">You have at home</small><Pick items={offered} on={h.id} set={setHave} /></div>
-      <div className="l-try-result" aria-live="polite">
-        <b>Add {r.grams} g of {hn}</b>
-        <div className="l-jump">
-          <div className="l-jump-from"><small>{w.alone} alone</small><b>PD {a.pd.toFixed(1)}</b><small>{a.kcal} kcal, {a.protein} g protein</small></div>
-          <b className="l-jump-arrow" aria-hidden="true">→</b>
-          <div className="l-jump-to"><small>With the {hn}</small><b>PD {r.pd.toFixed(1)}</b><small>{r.kcal} kcal, {Math.round(r.protein)} g protein</small></div>
-        </div>
-        <span>{w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} The {hn} adds the protein, so the plate fits.</span>
-        {big && <small>{r.total} g is a very big bowl. With {big.grams} g of {w.name.toLowerCase()} instead, {big.partner} g of {hn} is enough, {big.grams + big.partner} g in all.</small>}
+      <div className="setting">
+        <small className="setting-name">Your plate</small>
+        <Weigh f={w} value={wg} set={setWg} />
+        <Weigh f={h} value={hg} set={setHg} />
       </div>
-      <small className="l-try-small">Worked out for {DEMO_GOAL.name}, the goal most people pick. PD is grams of protein in 100 kcal. Nothing you pick here is saved.</small>
+      <div className="l-try-result" aria-live="polite">
+        <b>{fits ? "The plate fits" : `Under PD ${DEMO_GOAL.pd}`}</b>
+        <div className="l-jump">
+          <div className="l-jump-from"><small>{wg} g of {wn} alone</small><b>PD {a.pd.toFixed(1)}</b><small>{a.kcal} kcal, {a.protein} g protein</small></div>
+          <b className="l-jump-arrow" aria-hidden="true">→</b>
+          <div className={fits ? "l-jump-to" : "l-jump-from"}><small>With {hg} {hu} of {hn}</small><b>PD {p.pd.toFixed(1)}</b><small>{p.kcal} kcal, {Math.round(p.protein)} g protein</small></div>
+        </div>
+        <span>{w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} {fits ? `The ${hn} adds the protein, so the plate fits.` : reach ? `${need.grams} ${hu} of ${hn} reaches PD ${DEMO_GOAL.pd}.` : `${h.name} has too little protein for its calories to bring this plate to PD ${DEMO_GOAL.pd}.${others.length ? ` Try ${others.length > 1 ? `${others.slice(0, -1).join(", ")} or ${others[others.length - 1]}` : others[0]}.` : ""}`}</span>
+        {reach && <button type="button" className="pill pill-small" onClick={() => { used(); setHg(need.grams); }}>Use {need.grams} {hu}</button>}
+        <a className="l-pd-link" href="#what-pd" onClick={(e) => { e.preventDefault(); document.getElementById("what-pd")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}>What PD means ↓</a>
+      </div>
+      {/* HP68: what PD is, right below the result (Milan 23:53); Milan 23:48: no goal name, no "mostly energy" */}
+      <div className="l-pd" id="what-pd">
+        <b>PD means protein density</b>
+        <p>PD is grams of protein in 100 kcal of food. A higher PD means more protein for the same calories. This calculator aims for PD {DEMO_GOAL.pd}, a usual target when you want to lose fat and build muscle at the same time. Below {DEMO_GOAL.pd}, the plate gives you the calories but too little protein.</p>
+      </div>
+      <small className="l-try-small">A simplified version of Chef Mealan: one goal, six cravings and typical values from food labels. Nothing you pick here is saved.</small>
     </div>
   );
 }
