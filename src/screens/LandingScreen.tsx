@@ -212,7 +212,7 @@ function TryIt() {
       {/* HP68: what PD is, before the first PD number a cold reader meets */}
       <div className="l-pd">
         <b>PD means protein density</b>
-        <p>PD is grams of protein in 100 kcal. For {DEMO_GOAL.name}, a meal should reach about PD {DEMO_GOAL.pd}. A lower PD means the meal is mostly energy, and the protein you need has to come later in the day.</p>
+        <p>PD is grams of protein in 100 kcal. {DEMO_GOAL.name} aims for about PD {DEMO_GOAL.pd} at every meal. Below that, the meal is mostly energy.</p>
       </div>
       <div className="l-try-result" aria-live="polite">
         <b>{r.grams > 0 ? `Add ${r.grams} g of ${hn}` : "This already fits"}</b>
