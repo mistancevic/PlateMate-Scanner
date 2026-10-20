@@ -106,7 +106,7 @@ export function listText(l: SavedList, span: string): string {
 // follows it: the old meal's foods leave that meal, the new meal's foods join, marked as added. A food already in the
 // basket stays on the list even when no meal needs it now; a food marked Not this time that no meal needs now leaves the list.
 export type NewFood = { name: string; brand: string; grams: number };
-export function replanMeal(s: ShopStore, n: number, date: string, slot: string, title: string, foods: NewFood[], from = "", because: string[] = []): ShopStore {
+export function replanMeal(s: ShopStore, n: number, date: string, slot: string, title: string, foods: NewFood[], from = "", because: string[] = [], quiet = false): ShopStore {
   return { ...s, lists: s.lists.map((l) => {
     if (l.n !== n) return l;
     // the old meal's foods leave that meal: in the foods for these days and in the foods carried from the last list
@@ -128,7 +128,24 @@ export function replanMeal(s: ShopStore, n: number, date: string, slot: string, 
     lines = lines.filter(keep); carried = carried.filter(keep);
     const needed = (k: string) => [...lines, ...carried].some((x) => x.key === k && (x.uses ?? []).length > 0);
     const missing = (l.missing ?? []).filter(needed);
+    if (quiet) return { ...l, lines: lines.sort((a, b) => a.name.localeCompare(b.name)), carried, missing };
     const changes = [...(l.changes ?? []).filter((c) => !(c.date === date && c.slot === slot)), { date, slot, from: (l.changes ?? []).find((c) => c.date === date && c.slot === slot)?.from ?? from, to: title, because: (l.changes ?? []).find((c) => c.date === date && c.slot === slot)?.because ?? because }];
     return { ...l, lines: lines.sort((a, b) => a.name.localeCompare(b.name)), carried, missing, changes };
   }) };
+}
+
+// 0.2.65 (Milan 20:46): the list follows the plan. A meal the list counts as short that the plan no longer has, or that no
+// longer needs the food marked Not this time (changed before 0.2.64, or by hand in Plan), takes the plan's foods quietly.
+export function followPlan(s: ShopStore, planned: Planned): ShopStore {
+  const l = openList(s);
+  if (!l) return s;
+  let next = s;
+  for (const m of shortMeals(l)) {
+    const held = planned[m.date]?.[m.slot] ?? null;
+    const portion = held ? plannedPortion(held, "list", "") : null;
+    const needs = portion ? portion.items.some((i) => m.foods.some((f) => f.toLowerCase() === i.food.name.toLowerCase())) : false;
+    if (needs) continue;
+    next = replanMeal(next, l.n, m.date, m.slot, held?.title ?? m.title, (portion?.items ?? []).map((i) => ({ name: i.food.name, brand: i.food.brand ?? "", grams: i.grams })), "", [], true);
+  }
+  return next;
 }
