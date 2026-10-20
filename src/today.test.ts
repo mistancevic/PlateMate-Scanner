@@ -89,13 +89,14 @@ test("the home page works for Recomposition at PD 6.5 and says how much is on th
   const spread = WANTS.find((w) => w.id === "spread")!, skyr = HAVES.find((h) => h.id === "skyr")!;
   const r = lift(spread, skyr, DEMO_GOAL.pd);
   assert.equal(r.grams, 165); assert.equal(r.total, 205); assert.equal(r.kcal, 320); assert.equal(Math.round(r.protein), 21); assert.equal(r.pd, 6.5);
-  // Changed by story HP68 (Milan, 20 October 2026, 23:35): a craving and a food you have, each at its own weight. The page
-  // opens on 60 g of granola with 150 g of skyr: PD 6.0, under the goal, and 175 g of skyr reaches 6.5.
-  // Milk 1.5% is a food you have: 60 g of granola with 200 ml is 364 kcal, 12.2 g protein, PD 3.4, and milk can't reach 6.5.
+  // Changed by story HP68 (Milan, 20 October 2026, 23:35 and 23:48): a craving and a food you have, each at its own weight.
+  // The page opens on a usual bowl, 30 g of granola with 200 ml of milk 1.5%: 229 kcal, 9.5 g protein, PD 4.1. Milk can't
+  // reach 6.5; 90 g of skyr with the same granola does. 60 g of granola with 200 ml is the book's bowl as poured, PD 3.4.
   const milk = HAVES.find((h) => h.id === "milk")!;
-  assert.equal(WANTS[0].id, "granola"); assert.equal(havesFor(WANTS[0])[0].id, "skyr"); assert.equal(havesFor(WANTS[0])[1].id, "milk");
-  const open = plate(WANTS[0], 60, skyr, 150); assert.equal(open.pd, 6); assert.equal(open.kcal, 365);
-  assert.equal(lift(WANTS[0], skyr, DEMO_GOAL.pd, 60).grams, 175); assert.equal(plate(WANTS[0], 60, skyr, 175).pd, 6.5);
+  assert.equal(WANTS[0].id, "granola"); assert.equal(WANTS[0].grams, 30); assert.equal(havesFor(WANTS[0])[0].id, "milk"); assert.equal(milk.grams, 200);
+  const open = plate(WANTS[0], 30, milk, 200); assert.equal(open.kcal, 229); assert.equal(open.protein, 9.5); assert.equal(open.pd, 4.1);
+  assert.ok(lift(WANTS[0], milk, DEMO_GOAL.pd, 30).grams > milk.max!, "milk alone can't lift granola to the goal");
+  assert.equal(lift(WANTS[0], skyr, DEMO_GOAL.pd, 30).grams, 90); assert.ok(plate(WANTS[0], 30, skyr, 90).pd >= 6.5);
   const m = plate(WANTS[0], 60, milk, 200); assert.equal(m.kcal, 364); assert.equal(m.protein, 12.2); assert.equal(m.pd, 3.4);
   assert.ok(lift(WANTS[0], milk, DEMO_GOAL.pd, 60).grams > milk.max!, "milk alone can't lift granola to the goal");
   assert.equal(alone(WANTS[0], 60).pd, 2); assert.equal(part(milk, 200).protein, 6.8);

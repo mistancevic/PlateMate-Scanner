@@ -6,11 +6,11 @@
 // dairy or whey, a savoury one gets tuna, chicken, egg whites or a yogurt dip, never skyr on a pizza.
 // HP68 (board Stories41, Milan 20 October 2026, 23:35): you pick a craving and a food you have, then set the weight of
 // each with a stepper; the plate's kcal, protein and PD follow from the two weights. Milk 1.5% (47 kcal and 3.4 g protein
-// per 100 ml, a typical label) is one of the foods you have, next to skyr. The page opens on 60 g of granola with 150 g of
-// skyr, PD 6.0, and says how much of the food you have reaches the goal: 175 g of skyr.
+// per 100 ml, a typical label) is one of the foods you have, next to skyr. Milan 23:48: the page opens on a usual bowl,
+// 30 g of granola with 200 ml of milk, PD 4.1; milk can't lift it to the goal, and the page names the foods that can.
 export type DemoFood = { id: string; name: string; of?: string; unit?: "g" | "ml"; grams?: number; step?: number; min?: number; max?: number; kcal: number; protein: number; kind: "sweet" | "savoury"; note?: string };
 export const WANTS: DemoFood[] = [
-  { id: "granola", name: "Granola", of: "granola", grams: 60, step: 10, min: 20, max: 120, kcal: 450, protein: 9, kind: "sweet", note: "Granola looks healthy, but granola alone is mostly energy." },
+  { id: "granola", name: "Granola", of: "granola", grams: 30, step: 10, min: 20, max: 120, kcal: 450, protein: 9, kind: "sweet", note: "Granola looks healthy, but it brings many calories and little protein." },
   { id: "spread", name: "Chocolate spread", of: "chocolate spread", grams: 40, step: 10, min: 10, max: 80, kcal: 539, protein: 6.3, kind: "sweet", note: "Chocolate spread alone is mostly sugar and fat." },
   { id: "peanut", name: "Peanut butter", of: "peanut butter", grams: 30, step: 10, min: 10, max: 60, kcal: 588, protein: 25.1, kind: "sweet", note: "Peanut butter has protein, but peanut butter alone is mostly fat." },
   { id: "icecream", name: "Ice cream", of: "ice cream", grams: 100, step: 25, min: 50, max: 200, kcal: 207, protein: 3.5, kind: "sweet", note: "Ice cream alone is mostly sugar and fat." },
@@ -19,8 +19,8 @@ export const WANTS: DemoFood[] = [
 ];
 // grams is the amount a page opens with for that food
 export const HAVES: DemoFood[] = [
-  { id: "skyr", name: "Skyr", grams: 150, step: 25, min: 25, max: 300, kcal: 63, protein: 11, kind: "sweet" },
   { id: "milk", name: "Milk 1.5%", unit: "ml", grams: 200, step: 50, min: 50, max: 400, kcal: 47, protein: 3.4, kind: "sweet" },
+  { id: "skyr", name: "Skyr", grams: 150, step: 25, min: 25, max: 300, kcal: 63, protein: 11, kind: "sweet" },
   { id: "yogurt", name: "Greek yogurt", grams: 150, step: 25, min: 25, max: 300, kcal: 73, protein: 10, kind: "sweet" },
   { id: "cottage", name: "Cottage cheese", grams: 150, step: 25, min: 25, max: 300, kcal: 98, protein: 11.1, kind: "sweet" },
   { id: "whey", name: "Whey powder", grams: 25, step: 5, min: 5, max: 60, kcal: 380, protein: 78, kind: "sweet" },

@@ -219,10 +219,10 @@ function TryIt() {
         <Weigh f={w} value={wg} set={setWg} />
         <Weigh f={h} value={hg} set={setHg} />
       </div>
-      {/* HP68: what PD is, before the first PD number a cold reader meets */}
+      {/* HP68: what PD is, before the first PD number a cold reader meets; Milan 23:48: no goal name, no "mostly energy" */}
       <div className="l-pd">
         <b>PD means protein density</b>
-        <p>PD is grams of protein in 100 kcal. {DEMO_GOAL.name} aims for about PD {DEMO_GOAL.pd} at every meal. Below that, the meal is mostly energy.</p>
+        <p>PD is grams of protein in 100 kcal of food. A higher PD means more protein for the same calories. This calculator aims for PD {DEMO_GOAL.pd}, a usual target when you want to lose fat and build muscle at the same time. Below {DEMO_GOAL.pd}, the plate gives you the calories but too little protein.</p>
       </div>
       <div className="l-try-result" aria-live="polite">
         <b>{fits ? "The plate fits" : `Under PD ${DEMO_GOAL.pd}`}</b>
@@ -231,7 +231,7 @@ function TryIt() {
           <b className="l-jump-arrow" aria-hidden="true">→</b>
           <div className={fits ? "l-jump-to" : "l-jump-from"}><small>With {hg} {hu} of {hn}</small><b>PD {p.pd.toFixed(1)}</b><small>{p.kcal} kcal, {Math.round(p.protein)} g protein</small></div>
         </div>
-        <span>{w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} {fits ? `The ${hn} adds the protein, so the plate fits.` : reach ? `${need.grams} ${hu} of ${hn} reaches PD ${DEMO_GOAL.pd}.` : `${h.name} has too little protein for its energy to bring this plate to PD ${DEMO_GOAL.pd}.${others.length ? ` Try ${others.length > 1 ? `${others.slice(0, -1).join(", ")} or ${others[others.length - 1]}` : others[0]}.` : ""}`}</span>
+        <span>{w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} {fits ? `The ${hn} adds the protein, so the plate fits.` : reach ? `${need.grams} ${hu} of ${hn} reaches PD ${DEMO_GOAL.pd}.` : `${h.name} has too little protein for its calories to bring this plate to PD ${DEMO_GOAL.pd}.${others.length ? ` Try ${others.length > 1 ? `${others.slice(0, -1).join(", ")} or ${others[others.length - 1]}` : others[0]}.` : ""}`}</span>
         {reach && <button type="button" className="pill pill-small" onClick={() => { used(); setHg(need.grams); }}>Use {need.grams} {hu}</button>}
       </div>
       <small className="l-try-small">A simplified version of Chef Mealan: one goal, six cravings and typical values from food labels. Nothing you pick here is saved.</small>
