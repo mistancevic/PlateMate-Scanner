@@ -1,7 +1,7 @@
 import { carryReads } from "../carry";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { ChevronRight, ChefHat, Pencil, Circle, CircleCheck, CircleSlash, ShoppingBasket } from "lucide-react";
-import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, stateOf, shortMeals, byMeal, type ShopStore, type SavedList, type ShopLine } from "../shopping";
+import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, stateOf, shortMeals, byMeal, replanMeal, type ShopStore, type SavedList, type ShopLine } from "../shopping";
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
 import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
@@ -11,6 +11,7 @@ import { density, aggregate, uid } from "../pilot";
 import { STARTERS, fitOf, fromMeal, needOf, sumOf, type PlannedMeal } from "../planned";
 import { CHEF_NAME } from "../components/Mark";
 import { PlanRow } from "../components/PlanRow";
+import { ShortHelp } from "../components/ShortHelp";
 import { pictureOfRecipe } from "../components/MealPicture";
 import { DayEditor } from "../components/DayEditor";
 import { dayLog } from "../today";
@@ -257,7 +258,7 @@ function ShopSheet({ p, close }: { p: AppApi; close: () => void }) {
     return (
       <button key={x.key} type="button" className={`menu-row shop-row ${st === "got" ? "got" : st === "missing" ? "missing" : ""}`} aria-label={`${x.name}, ${grams} g${st === "got" ? ", in the basket" : st === "missing" ? ", not there" : ""}`} disabled={!live} onClick={() => save(tickIn(store, l.n, x.key))}>
         {st === "got" ? <CircleCheck size={20} /> : st === "missing" ? <CircleSlash size={20} /> : <Circle size={20} />}
-        <div className="menu-row-text"><b>{x.name}</b>{note && <small>{x.brand && !/typical values|generic|check your/i.test(x.brand) ? `${x.brand} · ` : ""}{forWhat(x)}</small>}{st === "missing" && <small className="shop-missing-note">Not there</small>}</div>
+        <div className="menu-row-text"><b>{x.name}</b>{note && <small>{x.added ? "Added · " : ""}{x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? `${x.brand} · ` : ""}{forWhat(x)}</small>}{st === "missing" && <small className="shop-missing-note">Not there</small>}</div>
         <b className="shop-grams">{grams.toLocaleString("en")} g</b>
       </button>
     );
@@ -273,7 +274,19 @@ function ShopSheet({ p, close }: { p: AppApi; close: () => void }) {
           <p className="small shop-why">Made {madeOn(shown.madeAt)}, for {spanOf(shown.from, shown.to)}: {shown.meals} planned {shown.meals === 1 ? "meal" : "meals"}, one portion each.{shown.doneAt ? ` Finished ${madeOn(shown.doneAt)}.` : ""}</p>
           {shown.without.length > 0 && <p className="small shop-without">Not on the list, no foods saved: {shown.without.map((w) => `${w.title} (${WEEKDAY[(dt(w.date).getDay() + 6) % 7]})`).join(", ")}.</p>}
           {!shown.doneAt && <p className="small shop-why">Tap a food once when it is in the basket, twice when the shop doesn't have it.</p>}
-          {shortMeals(shown).length > 0 && <p className="small shop-short">Not there: {[...new Set(shortMeals(shown).flatMap((m) => m.foods))].join(", ")}. Short now: {shortMeals(shown).map((m) => `${WEEKDAY[(dt(m.date).getDay() + 6) % 7]} ${slotName(m.date, m.slot).toLowerCase()}, ${m.title}`).join("; ")}.</p>}
+          {shortMeals(shown).length > 0 && (
+            <section className="shop-short-box">
+              <p className="small shop-short">Not there: {[...new Set(shortMeals(shown).flatMap((m) => m.foods))].join(", ")}. Short now: {shortMeals(shown).map((m) => `${WEEKDAY[(dt(m.date).getDay() + 6) % 7]} ${slotName(m.date, m.slot).toLowerCase()}, ${m.title}`).join("; ")}.</p>
+              {/* SL5: Chef Mealan helps each short meal, from here */}
+              {!shown.doneAt && shortMeals(shown).map((m) => {
+                const label = `${WEEKDAY[(dt(m.date).getDay() + 6) % 7]} ${slotName(m.date, m.slot).toLowerCase()}`;
+                return <ShortHelp key={`${m.date}${m.slot}`} p={p} date={m.date} slot={m.slot} label={label} title={m.title} missing={m.foods}
+                  onUsed={(title, foods) => { const before = new Set(shown.lines.map((x) => x.key)); const next = replanMeal(getStore(), shown.n, m.date, m.slot, title, foods); save(next);
+                    const added = (openList(next)?.lines ?? []).filter((x) => x.added && !before.has(x.key)).map((x) => x.name);
+                    p.notify(`${label} is now ${title}.${added.length ? ` ${added.join(", ")} ${added.length === 1 ? "is" : "are"} on your list.` : ""}`); }} />;
+              })}
+            </section>
+          )}
           {shown.lines.some((x) => x.uses?.length) && (
             <div className="segments shop-by" role="tablist" aria-label="Show the list">
               <button type="button" role="tab" aria-selected={by === "food"} className={`seg ${by === "food" ? "on" : ""}`} onClick={() => setBy("food")}>By food</button>

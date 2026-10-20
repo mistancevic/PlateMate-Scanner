@@ -65,3 +65,28 @@ test("SL4: a food knows its meals; By meal; a tap goes to buy, in the basket, no
   assert.ok(/Rice, cooked: 600 g \(not at the last shop\)/.test(listText(openList(s)!, "x")));
   s = tickIn(s, 1, rice.key); assert.equal(stateOf(openList(s)!, rice.key), "buy");
 });
+
+test("SL5: a short meal changed with Chef Mealan's help: the list follows the plan's new meal", async () => {
+  const { makeList, daysFrom, tickIn, openList, replanMeal, shortMeals } = await import("./shopping");
+  const plan = { "2026-10-20": { lunch: curry }, "2026-10-21": { lunch: curry } };
+  let s = makeList({ lists: [], carry: null }, plan as any, daysFrom("2026-10-20", 2), "x");
+  const rice = "rice, cooked|", chicken = "chicken breast, raw|";
+  s = tickIn(s, 1, chicken);                      // chicken in the basket
+  s = tickIn(tickIn(s, 1, rice), 1, rice);        // rice not there
+  assert.equal(shortMeals(openList(s)!).length, 2);
+  // Tuesday's lunch: bulgur stands in for rice
+  s = replanMeal(s, 1, "2026-10-20", "lunch", "Chicken curry with bulgur", [{ name: "Chicken breast, raw", brand: "", grams: 200 }, { name: "Bulgur, cooked", brand: "", grams: 320 }]);
+  let l = openList(s)!;
+  assert.deepEqual(l.lines.map((x) => [x.name, x.grams, x.meals, Boolean(x.added)]), [["Bulgur, cooked", 320, 1, true], ["Chicken breast, raw", 400, 2, false], ["Rice, cooked", 300, 1, false]]);
+  assert.deepEqual(shortMeals(l).map((m) => m.date), ["2026-10-21"], "only Wednesday is short now");
+  // Wednesday's lunch: another meal, no rice, no chicken
+  s = replanMeal(s, 1, "2026-10-21", "lunch", "Skyr bowl", [{ name: "Skyr, natural", brand: "Arla", grams: 250 }]);
+  l = openList(s)!;
+  assert.deepEqual(l.lines.map((x) => [x.name, x.grams]), [["Bulgur, cooked", 320], ["Chicken breast, raw", 200], ["Skyr, natural", 250]], "rice leaves the list; chicken is in the basket, so it stays");
+  assert.deepEqual(l.missing, [], "nothing is short");
+  // a food the new meal shares with the old one stays as it was, not as added
+  let t = makeList({ lists: [], carry: null }, { "2026-10-20": { lunch: curry } } as any, daysFrom("2026-10-20", 1), "x");
+  t = tickIn(tickIn(t, 1, rice), 1, rice);
+  t = replanMeal(t, 1, "2026-10-20", "lunch", "Chicken curry with bulgur", [{ name: "Chicken breast, raw", brand: "", grams: 200 }, { name: "Bulgur, cooked", brand: "", grams: 300 }]);
+  assert.deepEqual(openList(t)!.lines.map((x) => [x.name, Boolean(x.added)]), [["Bulgur, cooked", true], ["Chicken breast, raw", false]]);
+});

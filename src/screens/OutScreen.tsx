@@ -11,6 +11,7 @@ import { SafetyNote } from "../components/SafetyNote";
 import { FIXED, takeModelFlag } from "../safety";
 import { slotsOf, slotsOn, withTimeOn, trainingTime, trainingWhen } from "../slots";
 import { tasteForChef } from "../kitchens";
+import { getStore, openList, shortMeals } from "../shopping";
 import { intentOf, wantOf, plateAnswer, planAnswer, leftAnswer, moveOf, swapOk, swapFallback, swapLead, type DaySlot } from "../chatIntent";
 import { lifestyleOf, dayFor, getDay } from "../personal";
 import { ymd } from "../plan";
@@ -212,6 +213,8 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
           goal: p.goal?.band,
           kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), rhythm: p.usual, moment: p.moment, region: p.region, travelTo: p.moment === "travel" ? p.travelTo : null,
           library: state.foods.slice(0, 24).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })),
+          // SL5 (0.2.63): the meals the open shopping list left short, so Chef Mealan knows when asked
+          short: (() => { const l = openList(getStore()); return l ? shortMeals(l).map((m) => ({ day: m.date, slot: m.slot, meal: m.title, not_at_the_shop: m.foods })) : []; })(),
         }) });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Chef Mealan could not answer.");

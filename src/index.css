@@ -1907,3 +1907,13 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .shop-missing-note { color: var(--low-text) !important; font-weight: 700 !important; }
 .shop-meal { margin-bottom: 10px; } .shop-meal-head { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px 8px; border-bottom: 1px solid var(--line); }
 .shop-meal-head b { font-size: var(--fs-body); font-weight: 900; color: var(--ink); }
+/* SL5: Chef Mealan helps a short meal, from the shopping list */
+.shop-short-box { display: flex; flex-direction: column; gap: 8px; margin: 4px 0 10px; } .shop-short-box .shop-short { margin: 0; }
+.shop-help { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-card); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.shop-help-head { display: flex; align-items: center; gap: 10px; } .shop-help-head .menu-row-text b { font-size: var(--fs-body); color: var(--ink); }
+.shop-help-head .menu-row-text small { color: var(--low-text); font-weight: 700; }
+.shop-help-opt { border-top: 1px solid var(--line); padding-top: 10px; display: flex; flex-direction: column; gap: 3px; }
+.shop-help-opt b { font-size: var(--fs-body); color: var(--ink); } .shop-help-opt small { color: var(--muted); }
+.shop-help-opt .fit-ok { color: var(--good-text); font-weight: 700; } .shop-help-opt .fit-under { color: var(--close-text); font-weight: 700; }
+.shop-help-kind { font-size: var(--fs-caps) !important; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; color: var(--brand-text) !important; }
+.shop-help-opt .button-row { margin-top: 6px; }
