@@ -11,7 +11,7 @@ import { blockedByAllergy } from "../safety";
 import { tasteForChef } from "../kitchens";
 import { fmt, pdVal } from "../ui";
 import { CHEF_NAME } from "./Mark";
-import type { NewFood } from "../shopping";
+import { buyAs, type NewFood } from "../shopping";
 
 type Opt = { kind: "standin" | "meal"; title: string; why: string; note: string; items: Ingredient[]; kcal: number; protein: number; pd: number | null; mealId?: string; source: PlannedMeal["source"] };
 const estimate = (f: { name: string; calories: number; protein: number; fats: number; carbs: number }): Food => ({
@@ -25,7 +25,12 @@ export function ShortHelp({ p, list, date, slot, label, title, missing, onUsed }
   const portion = held ? plannedPortion(held, "short", "") : null;
   const day = p.numbersFor(new Date(`${date}T12:00:00`));
   const target = day ? density(day.protein, day.kcal) : p.pdRef;
-  const isMissing = (n: string) => missing.some((m) => m.toLowerCase() === n.toLowerCase());
+  // the list may say a food raw (Rice, white, raw) where the meal counts it cooked (Rice, cooked): both are the same food (SL7)
+  const isMissingFood = (f: { name: string; calories?: number | null }) => missing.some((m) => [f.name, buyAs(f.name, "", 1, f.calories).name].some((n) => n.toLowerCase() === m.toLowerCase()));
+  const isMissing = (n: string) => isMissingFood({ name: n, calories: portion?.items.find((i) => i.food.name === n)?.food.calories ?? null });
+  // the missing foods as the meal names them, for Chef Mealan and for the notes
+  const asInMeal = portion ? [...new Set(portion.items.filter((i) => isMissingFood(i.food)).map((i) => i.food.name))] : [];
+  const named = asInMeal.length ? asInMeal : missing;
   const lib = (name: string) => p.state.foods.find((f) => f.name.toLowerCase() === name.toLowerCase()) ?? null;
   const build = (o: any): Opt | null => {
     let items: Ingredient[] = [], mealId: string | undefined, source: PlannedMeal["source"] = held?.source ?? "plate", name = String(o.title || "");
@@ -43,10 +48,11 @@ export function ShortHelp({ p, list, date, slot, label, title, missing, onUsed }
     if (!items.length || items.some((i) => isMissing(i.food.name) || blockedByAllergy(i.food, p.safety.allergies ?? []))) return null;
     const a = aggregate(items), kcal = Math.round(a.calories ?? 0), protein = Math.round(a.protein ?? 0);
     // who did what, said plainly: Chef Mealan suggests, the person picks, the app changes the plan
-    const foods = missing.join(", ").toLowerCase();
+    // what was swapped, as the meal names it; what was marked, as the list says it
+    const foods = named.join(", ").toLowerCase(), marked = missing.join(", ").toLowerCase();
     const note = o.kind === "standin"
-      ? `You swapped ${foods} for ${(o.swaps ?? []).map((w: any) => String(w.name).toLowerCase()).join(", ")} because you marked ${foods} Not this time on shopping list ${list}. From ${CHEF_NAME}'s ideas. This day only; ${title} stays as it is.`
-      : `You picked this in place of ${title} because you marked ${foods} Not this time on shopping list ${list}. From ${CHEF_NAME}'s ideas. This day only.`;
+      ? `You swapped ${foods} for ${(o.swaps ?? []).map((w: any) => String(w.name).toLowerCase()).join(", ")} because you marked ${marked} Not this time on shopping list ${list}. From ${CHEF_NAME}'s ideas. This day only; ${title} stays as it is.`
+      : `You picked this in place of ${title} because you marked ${marked} Not this time on shopping list ${list}. From ${CHEF_NAME}'s ideas. This day only.`;
     return { kind: o.kind === "meal" ? "meal" : "standin", title: name, why: String(o.why || ""), note, items, kcal, protein, pd: density(protein, kcal), mealId, source };
   };
   const ask = async () => {
@@ -55,7 +61,7 @@ export function ShortHelp({ p, list, date, slot, label, title, missing, onUsed }
     setBusy(true); setErr("");
     try {
       const r = await fetch("/api/short", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-        slot: label, missing, target,
+        slot: label, missing: named, target,
         meal: { title, foods: portion.items.map((i) => ({ name: i.food.name, grams: Math.round(i.grams), calories: i.food.calories, protein: i.food.protein, fats: i.food.fats, carbs: i.food.carbs })) },
         candidates: p.state.meals.slice(0, 40).map((m) => { const pm = fromMeal(m, "mine"); return { id: m.id, title: m.title, kcal: pm.kcal, protein: pm.protein, uses: m.items.map((i) => i.food.name) }; }),
         library: p.state.foods.slice(0, 30).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })),
@@ -70,7 +76,7 @@ export function ShortHelp({ p, list, date, slot, label, title, missing, onUsed }
     if (using) return; setUsing(true);
     const weight = o.items.reduce((n, i) => n + i.grams, 0);
     p.fill(date, slot, { title: o.title, kcal: o.kcal, protein: o.protein, source: o.source, ...(o.mealId ? { mealId: o.mealId } : { note: o.note }), items: o.items, portion: Math.round(weight) });
-    onUsed(o.title, o.items.map((i) => ({ name: i.food.name, brand: i.food.brand ?? "", grams: i.grams })));
+    onUsed(o.title, o.items.map((i) => ({ name: i.food.name, brand: i.food.brand ?? "", grams: i.grams, kcal: i.food.calories })));
   };
   return (
     <div className="shop-help">

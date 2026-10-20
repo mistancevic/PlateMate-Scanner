@@ -1,7 +1,7 @@
 import { carryReads } from "../carry";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { ChevronRight, ChefHat, Pencil, Circle, CircleCheck, CircleSlash, ShoppingBasket } from "lucide-react";
-import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, stateOf, shortMeals, byMeal, replanMeal, followPlan, type ShopStore, type SavedList, type ShopLine } from "../shopping";
+import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, stateOf, shortMeals, byMeal, replanMeal, followPlan, notCounted, planChanges, updateList, type ShopStore, type SavedList, type ShopLine } from "../shopping";
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
 import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
@@ -94,14 +94,17 @@ export function PlanScreen(p: AppApi) {
     <>
       <div className="week-arrows">
         <button type="button" className="week-arrow" aria-label="Week before" onClick={() => goWeek(-1)}>‹</button>
-        <span className="week-arrows-mid">{weekSpan}{offset !== 0 && <button type="button" className="link week-back" onClick={() => goWeek(0)}>This week</button>}</span>
+        <span className="week-arrows-mid">{weekSpan}{offset !== 0 ? <button type="button" className="link week-back" onClick={() => goWeek(0)}>This week</button>
+          : key !== ymd(today) && <button type="button" className="link week-back" onClick={() => goWeek(0)}>Today</button>}</span>
         <button type="button" className="week-arrow" aria-label="Week after" onClick={() => goWeek(1)}>›</button>
       </div>
       <div className="day-strip" role="tablist" aria-label="Pick a day" ref={stripRef}>
         {strip.map((d) => {
           const on = ymd(d) === key;
           const n = Object.keys(p.planned[ymd(d)] ?? {}).length;
-          return <button key={ymd(d)} type="button" role="tab" className={`choice ${on ? "on" : ""} ${n ? "has" : ""}`} aria-selected={on} onClick={() => setPicked(ymd(d))}>{DAYS[(d.getDay() + 6) % 7]} {d.getDate()}</button>;
+          // SL7 (Milan 21:20): today's day is always marked, picked or not
+          const isT = ymd(d) === ymd(today);
+          return <button key={ymd(d)} type="button" role="tab" className={`choice ${on ? "on" : ""} ${n ? "has" : ""} ${isT ? "is-today" : ""}`} aria-selected={on} onClick={() => setPicked(ymd(d))}>{isT ? "Today" : DAYS[(d.getDay() + 6) % 7]} {d.getDate()}</button>;
         })}
       </div>
       {isPast ? <PastDay p={p} date={date} dayKey={key} line={line} slots={slots} numbers={numbers} /> : (<>
@@ -246,9 +249,9 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
   const dayWord = (d: string) => `${WEEKDAY[(dt(d).getDay() + 6) % 7]} ${dt(d).getDate()}`;
   const spanOf = (from: string, to: string) => from === to ? `${dayWord(from)} ${MONTHS[dt(from).getMonth()]}` : `${dayWord(from)}${dt(from).getMonth() === dt(to).getMonth() ? "" : ` ${MONTHS[dt(from).getMonth()]}`} to ${dayWord(to)} ${MONTHS[dt(to).getMonth()]}`;
   const madeOn = (iso: string) => { const d = new Date(iso); return `${WEEKDAY[(d.getDay() + 6) % 7]} ${d.getDate()} ${MONTHS[d.getMonth()]}`; };
-  const start = nextStart(store, today);
+  const start = nextStart(store, today, p.planned);
   const days = daysFrom(start, span);
-  const preview = shoppingList(p.planned, days);
+  const preview = shoppingList(notCounted(store, p.planned, days), days);
   const nextN = store.lists.reduce((m, x) => Math.max(m, x.n), 0) + 1;
   const shown = reading !== null ? store.lists.find((l) => l.n === reading) ?? null : open;
   // SL4: what each food is for, and the list meal by meal; a tap goes to buy, in the basket, not this time
@@ -266,7 +269,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
     return (
       <button key={x.key} type="button" className={`menu-row shop-row ${st === "got" ? "got" : st === "missing" ? "missing" : ""}`} aria-label={`${x.name}, ${grams} g${st === "got" ? ", in the basket" : st === "missing" ? ", not this time" : ""}`} disabled={!live} onClick={() => save(tickIn(store, l.n, x.key))}>
         {st === "got" ? <CircleCheck size={20} /> : st === "missing" ? <CircleSlash size={20} /> : <Circle size={20} />}
-        <div className="menu-row-text"><b>{x.name}</b>{note && <small>{x.added ? "Added · " : ""}{x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? `${x.brand} · ` : ""}{forWhat(x)}</small>}{st === "missing" && <small className="shop-missing-note">Not this time</small>}</div>
+        <div className="menu-row-text"><b>{x.name}</b>{note && <small>{x.added ? "Added · " : ""}{x.cooked ? `${x.cooked.toLocaleString("en")} g cooked · ` : ""}{x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? `${x.brand} · ` : ""}{forWhat(x)}</small>}{st === "missing" && <small className="shop-missing-note">Not this time</small>}</div>
         <b className="shop-grams">{grams.toLocaleString("en")} g</b>
       </button>
     );
@@ -282,7 +285,17 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
           <p className="small shop-why">Made {madeOn(shown.madeAt)}, for {spanOf(shown.from, shown.to)}: {shown.meals} planned {shown.meals === 1 ? "meal" : "meals"}, one portion each.{shown.doneAt ? ` Finished ${madeOn(shown.doneAt)}.` : ""}</p>
           {shown.without.length > 0 && <p className="small shop-without">Not on the list, no foods saved: {shown.without.map((w) => `${w.title} (${WEEKDAY[(dt(w.date).getDay() + 6) % 7]})`).join(", ")}.</p>}
           {!shown.doneAt && <p className="small shop-why">Tap a food once when it is in the basket, twice for not this time.</p>}
-          {/* SL6: what Chef Mealan changed from this list stays said here, with the way to the day */}
+          {/* SL7: the plan changed for this list's days since it was made: a new meal needs new shopping, whatever the reason */}
+          {!shown.doneAt && planChanges(shown, p.planned).length > 0 && (
+            <section className="shop-plan-changed">
+              <b>The plan changed since this list was made</b>
+              {planChanges(shown, p.planned).map((c) => <small key={`${c.date}${c.slot}${c.kind}`}>{WEEKDAY[(dt(c.date).getDay() + 6) % 7]} {slotName(c.date, c.slot).toLowerCase()}: {c.kind === "new" ? `${c.title}, new` : c.kind === "changed" ? `${c.title}, in place of ${c.was}` : `${c.title}, no longer planned`}</small>)}
+              <div className="button-row"><button type="button" className="pill pill-small" onClick={() => { const n = planChanges(shown, p.planned); save(updateList(getStore(), shown.n, p.planned, new Date().toISOString()));
+                p.notify(`Shopping list ${shown.n} is updated: ${n.length} ${n.length === 1 ? "meal" : "meals"} changed in the plan.`); }}>Update the list</button></div>
+            </section>
+          )}
+          {shown.updatedAt && !shown.doneAt && planChanges(shown, p.planned).length === 0 && <p className="small shop-why">Updated {madeOn(shown.updatedAt)} to follow the plan.</p>}
+          {/* SL6: what was changed from this list stays said here (the person picked it from Chef Mealan's ideas), with the way to the day */}
           {(shown.changes ?? []).length > 0 && (
             <section className="shop-changed">
               <b>Changed from this list</b>
@@ -348,7 +361,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
           </>))}
         </>) : (<>
           <b className="shop-title">Shopping list {nextN}</b>
-          <p className="small shop-why">Which days is it for? It starts {start === today ? "today" : `${dayWord(start)} ${MONTHS[dt(start).getMonth()]}, the day after your last list`}.</p>
+          <p className="small shop-why">Which days is it for? It starts {start === today ? "today" : `${dayWord(start)} ${MONTHS[dt(start).getMonth()]}`}{store.lists.some((l) => l.to >= start) ? ", with the planned meals no list has counted yet" : start === today ? "" : ", the day after your last list"}.</p>
           <div className="moments" role="group" aria-label="Days">{DAY_CHOICES.map((n) => <button key={n} type="button" className={`choice ${span === n ? "on" : ""}`} onClick={() => setSpan(n)}>{n === 1 ? "1 day" : `${n} days`}</button>)}</div>
           <p className="small shop-why">{spanOf(days[0], days[days.length - 1])}: {preview.meals} planned {preview.meals === 1 ? "meal" : "meals"}, {preview.lines.length} {preview.lines.length === 1 ? "food" : "foods"}{store.carry ? `, plus ${store.carry.lines.length} from list ${store.carry.from}` : ""}.</p>
           <button type="button" className="pill pill-wide pill-primary shop-make" disabled={!preview.lines.length && !store.carry} onClick={() => save(makeList(store, p.planned, days, new Date().toISOString()))}>Make shopping list {nextN}</button>

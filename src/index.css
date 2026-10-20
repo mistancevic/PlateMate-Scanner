@@ -1925,3 +1925,8 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .meal-view-row .menu-row-text b { font-size: var(--fs-body); color: var(--ink); } .meal-view-nums { margin: 10px 0; font-weight: 700; }
 .meal-view-make { margin-top: 12px; }
 .meal-view-row { display: flex; align-items: center; gap: 10px; } .meal-view-row .menu-row-text { flex: 1 1 auto; min-width: 0; } .meal-view-row .shop-grams { margin-left: auto; text-align: right; font-size: var(--fs-body); font-weight: 900; color: var(--ink); }
+/* SL7: the plan changed since the list was made; today's day always marked */
+.shop-plan-changed { background: var(--close-soft); border-radius: var(--r-control); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px; margin: 4px 0 10px; }
+.shop-plan-changed > b { color: var(--close-text); font-size: var(--fs-label); font-weight: 900; } .shop-plan-changed small { color: var(--close-text); font-weight: 700; }
+.shop-plan-changed .button-row { margin-top: 6px; }
+.day-strip .choice.is-today { border-color: var(--brand); color: var(--brand-text); font-weight: 900; }

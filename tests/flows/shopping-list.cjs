@@ -41,6 +41,13 @@ const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
     { kind: "meal", id: null, title: "Rice bowl", why: "Still rice.", swaps: [], foods: [{ name: "Rice, cooked", grams: 200, calories: 130, protein: 2.7, fats: 0.3, carbs: 28 }] },
     { kind: "meal", id: null, title: "Chicken, potatoes and salad", why: "No rice needed.", swaps: [], foods: [{ name: "Chicken breast, cooked", grams: 160, calories: 165, protein: 31, fats: 3.6, carbs: 0 }, { name: "Potato, boiled", grams: 250, calories: 87, protein: 1.9, fats: 0.1, carbs: 20.1 }] } ] }) }); });
   await page.goto(U + "/plan"); await page.waitForTimeout(1500);
+  // SL7 (Milan 21:20): today's day is always marked; another day of this week picked, a Today link brings it back
+  ok(/Today 20/.test(await page.getByRole("tab", { name: /Today 20/ }).textContent()) && /is-today/.test(await page.getByRole("tab", { name: /Today 20/ }).getAttribute("class")), "SL7: today's day reads Today 20 and is marked");
+  ok(await page.locator(".week-arrows-mid").getByRole("button", { name: "Today" }).count() === 0, "SL7: no Today link while today is picked");
+  await page.getByRole("tab", { name: "Wed 21" }).click(); await page.waitForTimeout(300);
+  ok(/is-today/.test(await page.getByRole("tab", { name: /Today 20/ }).getAttribute("class")), "SL7: Wednesday picked, today stays marked");
+  await page.locator(".week-arrows-mid").getByRole("button", { name: "Today" }).click(); await page.waitForTimeout(300);
+  ok(/^Today, Tuesday, 20 October/.test(await page.locator(".plan-head .plan-day-head b").textContent()), "SL7: the Today link brings today back");
   // SL2: the day said once, one main step
   const head = (await page.locator(".plan-head").textContent()).replace(/\s+/g, " ");
   ok(/Today, Tuesday, 20 October/.test(head) && /rest day · 1 slot open/.test(head) && /of 2,800 kcal/.test(head) && await page.getByText("The day as planned").count() === 0, "SL2: one head card, the day and its numbers; The day as planned is gone: " + head);
@@ -67,25 +74,28 @@ const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
   ok(/Shopping list 1, open/.test(await page.locator(".plan-shop").textContent()), "SL3: Plan's button names the open list");
   await page.locator(".plan-shop").click(); await page.waitForTimeout(400);
   ok(/15 planned meals/.test(await sheet.textContent()) && await page.locator(".shop-row.got").filter({ hasText: "Eggs" }).count() === 1, "SL3: a later change to the plan doesn't touch the list; the tick stays");
+  // SL7: the list sees the change and offers to follow it; here it is left as made, so the next list takes the new dinner
+  ok(/The plan changed since this list was made\s*Thursday dinner: Chocolate quark pudding, new\s*Update the list/.test(await sheet.locator(".shop-plan-changed").textContent()), "SL7: the open list says the plan changed: Thursday dinner, new");
   // Changed by story SL6 (0.2.64, Milan 19:54 to 20:22): the neutral mark is Not this time; Swap a food, not Keep the dish
   // SL4: Not this time, and the list by meal
-  const rice = sheet.locator(".shop-row").filter({ hasText: "Rice, cooked" });
+  // Changed by story SL7 (0.2.66, Milan 21:00 to 21:39): the list buys raw, so rice is Rice, white, raw with its cooked grams; Chef Mealan still gets the meal's own name, Rice, cooked
+  const rice = sheet.locator(".shop-row").filter({ hasText: "Rice, white, raw" });
   await rice.click(); await rice.click(); await page.waitForTimeout(200);
   ok(await sheet.locator(".shop-row.missing").count() === 1 && /Not this time/.test(await rice.textContent()), "SL4: a second tap marks rice Not this time");
-  ok(/Not this time: Rice, cooked\. Short now: Wednesday lunch, Sarma; Friday lunch, Sarma; Sunday lunch, Sarma\./.test(await sheet.locator(".shop-short").textContent()), "SL4: the list says which meals are short: " + await sheet.locator(".shop-short").textContent());
+  ok(/Not this time: Rice, white, raw\. Short now: Wednesday lunch, Sarma; Friday lunch, Sarma; Sunday lunch, Sarma\./.test(await sheet.locator(".shop-short").textContent()), "SL4: the list says which meals are short: " + await sheet.locator(".shop-short").textContent());
   await sheet.getByRole("tab", { name: "By meal" }).click(); await page.waitForTimeout(300);
   const days = await sheet.locator(".shop-day .pick-group").allTextContents();
   const wed = sheet.locator(".shop-day").nth(1);
-  ok(days.length === 7 && /Tuesday 20 October/i.test(days[0]) && /Breakfast · DaaM good protein crêpes/.test(await wed.locator(".shop-meal-head").first().textContent()) && /Lunch · Sarma\s*Short: Rice, cooked/.test(await wed.locator(".shop-meal-head").nth(1).textContent()), "SL4: By meal, day by day, meals in their order, Wednesday's lunch short of rice");
+  ok(days.length === 7 && /Tuesday 20 October/i.test(days[0]) && /Breakfast · DaaM good protein crêpes/.test(await wed.locator(".shop-meal-head").first().textContent()) && /Lunch · Sarma\s*Short: Rice, white, raw/.test(await wed.locator(".shop-meal-head").nth(1).textContent()), "SL4: By meal, day by day, meals in their order, Wednesday's lunch short of rice");
   ok(/Chicken, rice and greens: no foods saved/.test(await wed.textContent()), "SL4: the meal with no foods says so in its day");
   ok(await wed.locator(".shop-meal").nth(1).locator(".shop-row").count() === 3, "SL4: Sarma needs three foods, in its own grams");
   await sheet.getByRole("tab", { name: "By food" }).click(); await page.waitForTimeout(200);
   await sheet.getByRole("button", { name: "Copy the list" }).click(); await page.waitForTimeout(400);
   const text = await page.evaluate(() => navigator.clipboard.readText());
-  ok(/^Shopping list 1, Tuesday 20 to Monday 26 October\n\n/.test(text) && !/Eggs/.test(text) && /Quark, low fat \(Magerquark\): 1,000 g/.test(text) && /Rice, cooked: [\d,]+ g \(not bought last time\)/.test(text) && text.split("\n").length === 9, "Copy the list: what is left, one food per line; rice not bought last time");
+  ok(/^Shopping list 1, Tuesday 20 to Monday 26 October\n\n/.test(text) && !/Eggs/.test(text) && /Quark, low fat \(Magerquark\): 1,000 g/.test(text) && /Rice, white, raw: [\d,]+ g \([\d,]+ g cooked\) \(not bought last time\)/.test(text) && text.split("\n").length === 9, "Copy the list: what is left, one food per line; rice not bought last time");
   // SL5: Chef Mealan helps Wednesday's lunch, short of rice
   const helps = sheet.locator(".shop-help");
-  ok(await helps.count() === 3 && /Wednesday lunch, Sarma\s*Short: Rice, cooked/.test(await helps.first().textContent()), "SL5: one card per short meal, with Ask Chef Mealan");
+  ok(await helps.count() === 3 && /Wednesday lunch, Sarma\s*Short: Rice, white, raw/.test(await helps.first().textContent()), "SL5: one card per short meal, with Ask Chef Mealan");
   await helps.first().getByRole("button", { name: "Ask Chef Mealan" }).click(); await page.waitForTimeout(600);
   ok(shortAsk && shortAsk.missing.join() === "Rice, cooked" && shortAsk.meal.title === "Sarma" && shortAsk.meal.foods.length === 3 && shortAsk.slot === "Wednesday lunch", "SL5: Chef Mealan is asked about Sarma, short of rice");
   const opts = helps.first().locator(".shop-help-opt");
@@ -93,38 +103,38 @@ const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
   await opts.first().getByRole("button", { name: "Use this" }).click(); await page.waitForTimeout(500);
   const wedLunch = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-planned"))["2026-10-21"].lunch);
   ok(wedLunch.title === "Sarma with bulgur" && wedLunch.items.some((i) => i.food.name === "Bulgur, cooked") && !wedLunch.items.some((i) => i.food.name === "Rice, cooked"), "SL5: Wednesday's lunch in the plan is Sarma with bulgur");
-  ok(/Added · Sarma with bulgur: Wed lunch/.test(await sheet.locator(".shop-row").filter({ hasText: "Bulgur, cooked" }).textContent()) && await helps.count() === 2 && /Friday lunch, Sarma/.test(await helps.first().textContent()), "SL5: bulgur on the list, marked Added; Wednesday is no longer short, Friday and Sunday still are");
-  ok(/Rice, cooked\s*Sarma: Fri, Sun lunch/.test(await sheet.locator(".shop-row").filter({ hasText: "Rice, cooked" }).textContent()), "SL5: rice stays for Friday and Sunday");
+  ok(/Added · [\d,]+ g cooked · Sarma with bulgur: Wed lunch/.test(await sheet.locator(".shop-row").filter({ hasText: "Bulgur, dry" }).textContent()) && await helps.count() === 2 && /Friday lunch, Sarma/.test(await helps.first().textContent()), "SL5: bulgur on the list, marked Added; Wednesday is no longer short, Friday and Sunday still are");
+  ok(/Rice, white, raw\s*[\d,]+ g cooked · Sarma: Fri, Sun lunch/.test(await sheet.locator(".shop-row").filter({ hasText: "Rice, white, raw" }).textContent()), "SL5: rice stays for Friday and Sunday");
   // Changed by story SL5: bulgur is on the list now, so 8 foods are not ticked, and list 1 has 9 foods
   await sheet.getByRole("button", { name: "Finish the list" }).click(); await page.waitForTimeout(300);
   ok(/8 foods aren't ticked\. Carry them to the next list\?/.test(await sheet.locator(".shop-ask").textContent()), "SL3: Finish asks about the 8 foods not ticked");
   await sheet.getByRole("button", { name: "Carry them" }).click(); await page.waitForTimeout(400);
   const two = (await sheet.textContent()).replace(/\s+/g, " ");
-  ok(/Shopping list 2/.test(two) && /It starts Tuesday 27 October, the day after your last list/.test(two) && /plus 8 from list 1/.test(two), "SL3: list 2 starts the day after list 1 and brings its 8 foods: " + two.slice(0, 220));
+  ok(/Shopping list 2/.test(two) && /It starts Thursday 22 October, with the planned meals no list has counted yet/.test(two) && /Thursday 22 to Wednesday 28 October: 1 planned meal, 4 foods, plus 8 from list 1/.test(two), "SL3, changed by story SL7: list 2 starts with Thursday's dinner, the one meal no list counted, and brings list 1's 8 foods: " + two.slice(0, 220));
   ok(await sheet.locator(".shop-earlier .menu-row").count() === 1 && /Shopping list 1\s*Tuesday 20 to Monday 26 October · 9 foods · finished/.test(await sheet.locator(".shop-earlier").textContent()), "SL3: list 1 under Earlier lists");
   await sheet.getByRole("group", { name: "Days" }).getByRole("button", { name: "1 day" }).click();
   await sheet.getByRole("button", { name: "Make shopping list 2" }).click(); await page.waitForTimeout(400);
-  ok(/From list 1/.test(await sheet.textContent()) && await sheet.locator(".shop-row").count() === 8, "SL3: list 2 opens with the 8 foods from list 1");
+  ok(/From list 1/.test(await sheet.textContent()) && await sheet.locator(".shop-list").first().locator(".shop-row").count() === 8 && await sheet.locator(".shop-row").count() === 12, "SL3: list 2 opens with the 8 foods from list 1 (and SL7: Thursday dinner's 4)");
   await sheet.locator(".shop-earlier .menu-row").click(); await page.waitForTimeout(300);
   ok(/Shopping list 1/.test(await sheet.locator(".shop-title").textContent()) && /Finished/.test(await sheet.textContent()) && await sheet.getByRole("button", { name: "Finish the list" }).count() === 0 && await sheet.locator(".shop-row[disabled]").count() === 9, "SL3: an earlier list reads, nothing to tick");
   // SL6: a food carried from list 1, marked Not this time on list 2; the change is said on the list; Plan opens the meal
   await sheet.getByRole("button", { name: "‹ Shopping lists" }).click(); await page.waitForTimeout(300);
-  const cRice = sheet.locator(".shop-list").first().locator(".shop-row").filter({ hasText: "Rice, cooked" });
+  const cRice = sheet.locator(".shop-list").first().locator(".shop-row").filter({ hasText: "Rice, white, raw" });
   ok(/Sarma: Fri, Sun lunch/.test(await cRice.textContent()), "SL6: rice comes from list 1, for Friday's and Sunday's lunch");
   await cRice.click(); await cRice.click(); await page.waitForTimeout(300);
   ok(await sheet.locator(".shop-help").count() === 2 && /Friday lunch, Sarma/.test(await sheet.locator(".shop-help").first().textContent()), "SL6: the carried rice leaves Friday and Sunday short");
   await sheet.locator(".shop-help").first().getByRole("button", { name: "Ask Chef Mealan" }).click(); await page.waitForTimeout(600);
   const use6 = sheet.locator(".shop-help").first().locator(".shop-help-opt").first().getByRole("button", { name: "Use this" });
   await use6.click(); await page.waitForTimeout(500);
-  ok(await sheet.locator(".shop-help").count() === 1 && /Sunday lunch, Sarma/.test(await sheet.locator(".shop-help").first().textContent()) && /Sarma: Sun lunch/.test(await sheet.locator(".shop-list").first().locator(".shop-row").filter({ hasText: "Rice, cooked" }).textContent()), "SL6: Friday is no longer short; the carried rice stays only for Sunday");
+  ok(await sheet.locator(".shop-help").count() === 1 && /Sunday lunch, Sarma/.test(await sheet.locator(".shop-help").first().textContent()) && /Sarma: Sun lunch/.test(await sheet.locator(".shop-list").first().locator(".shop-row").filter({ hasText: "Rice, white, raw" }).textContent()), "SL6: Friday is no longer short; the carried rice stays only for Sunday");
   const box = (await sheet.locator(".shop-changed").textContent()).replace(/\s+/g, " ");
-  ok(/Changed from this list/.test(box) && /Friday lunch is now Sarma with bulgur, in place of Sarma, because you marked rice, cooked Not this time\. You picked it from Chef Mealan's ideas\. This day only\./.test(box) && !/at the shop/.test(box), "SL6: the list says what changed, why, and who picked it: " + box);
+  ok(/Changed from this list/.test(box) && /Friday lunch is now Sarma with bulgur, in place of Sarma, because you marked rice, white, raw Not this time\. You picked it from Chef Mealan's ideas\. This day only\./.test(box) && !/at the shop/.test(box), "SL6: the list says what changed, why, and who picked it: " + box);
   await sheet.getByRole("button", { name: "See it in Plan ›" }).click(); await page.waitForTimeout(700);
   ok(/Friday, 23 October/.test(await page.locator(".plan-head .plan-day-head b").textContent()), "SL6: See it in Plan opens Friday");
   await page.getByRole("button", { name: /^Lunch at .*, Sarma with bulgur/ }).click(); await page.waitForTimeout(500);
   const ms = page.getByRole("dialog", { name: /Sarma with bulgur/ });
   const mt = (await ms.textContent()).replace(/\s+/g, " ");
-  ok(/You swapped rice, cooked for bulgur, cooked because you marked rice, cooked Not this time on shopping list 2\. From Chef Mealan's ideas\. This day only; Sarma stays as it is\./.test(mt) && /Bulgur, cooked\s*Chef Mealan's estimate/.test(mt) && /PD [\d.]+/.test(mt), "SL6: Plan opens the meal: how it came to be, its foods, its numbers: " + mt.slice(0, 200));
+  ok(/You swapped rice, cooked for bulgur, cooked because you marked rice, white, raw Not this time on shopping list 2\. From Chef Mealan's ideas\. This day only; Sarma stays as it is\./.test(mt) && /Bulgur, cooked\s*Chef Mealan's estimate/.test(mt) && /PD [\d.]+/.test(mt), "SL6: Plan opens the meal: how it came to be, its foods, its numbers: " + mt.slice(0, 200));
   ok(await ms.getByRole("button", { name: "Swap" }).count() === 1 && await ms.getByRole("button", { name: "Make it on the Plate" }).count() === 1, "SL6: Swap, Save in My recipes, Make it on the Plate");
   await ms.getByRole("button", { name: "Save in My recipes" }).click(); await page.waitForTimeout(500);
   const fri = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-planned"))["2026-10-23"].lunch);
