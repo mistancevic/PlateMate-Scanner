@@ -2,7 +2,7 @@ import { carriedLists } from "../carry";
 import { tasteForReq } from "../tasteChips";
 import { useState, useEffect, useRef, Fragment } from "react";
 import { tempsIn } from "../units";
-import { Camera, Pencil, Plus, Trash2, ArrowLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
+import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 import { ConfirmButton } from "../components/Confirm";
 import type { Mix } from "../mixtip";
 import { aggregate, density, uid, solveIngredient, servingLabel } from "../pilot";
@@ -62,9 +62,10 @@ type Way = { kind: "change"; title: string; notes: string[]; part?: string; befo
 const readFile = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 
 const STEPS = ["in", "recipe", "make", "made", "after"] as const;
-function stepHead({ n, title, sub, nameField }: { n: number; title: string; sub?: string; nameField?: { value: string; placeholder: string; onChange: (v: string) => void; onCommit?: (v: string) => void } }) {
+function stepHead({ n, title, sub, nameField, back }: { n: number; title: string; sub?: string; back?: React.ReactNode; nameField?: { value: string; placeholder: string; onChange: (v: string) => void; onCommit?: (v: string) => void } }) {
   return (
     <div className="step-head">
+      {back}
       <div className="step-bar">{STEPS.map((s, i) => <i key={s} className={i < n ? "on" : ""} />)}</div>
       {nameField ? <input className="title-input" aria-label="Name of the meal" value={nameField.value} placeholder={nameField.placeholder} onChange={(e) => nameField.onChange(e.target.value)} onBlur={(e) => nameField.onCommit?.(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" /> : <h2>{title}</h2>}
       {sub && <p>{sub}</p>}
@@ -194,7 +195,7 @@ export function JourneyScreen(p: AppApi) {
           <div key={r.f.id} className="tip-row">
             <div className="tip-text"><b>{r.f.name}</b><small>{r.g} g · {pdText(density(r.f.protein, r.f.calories))}</small></div>
             <div className={`tip-to ${r.to >= pdRef! - 0.05 ? "fits" : ""}`}><b>{pdVal(r.to)}</b><small>the plate</small></div>
-            <button type="button" className="pill pill-small pill-primary" onClick={() => addPortion(r.f, r.g, refit)}>+ Add</button>
+            <button type="button" className="pill pill-small" onClick={() => addPortion(r.f, r.g, refit)}>+ Add</button>
           </div>
         ))}
         {!l.reaches && <span className="tip-note">{l.rows.length ? `None of them reaches ${pdVal(pdRef)} on its own. ` : ""}For a dish around these foods, ask the chef.</span>}
@@ -694,9 +695,11 @@ export function JourneyScreen(p: AppApi) {
     setMadeBy({ kitchen: o.kitchen, base: baseName, from, tried: chef && chef.status !== "working" ? chef.tried : [] }); setChef(null);
   }
   function keepAsIs() { setChef(null); if (p.filling?.mode !== "eat" && p.filling) putInSlot(items); else { setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null); setStep("make"); } }
-  const Head = ({ title, sub, name }: { title: string; sub?: string; name?: boolean }) => stepHead({ n, title, sub, nameField: name ? { value: state.title === "DaaM" ? "" : state.title, placeholder: items.length ? autoTitle(items) : "Name the meal", onChange: (v: string) => setState((s) => ({ ...s, title: v })), onCommit: (v: string) => p.renamePlate(v) } : undefined });
+  const Head = ({ title, sub, name, back }: { title: string; sub?: string; name?: boolean; back?: typeof STEPS[number] }) => stepHead({ n, title, sub, back: back ? <Back to={back} /> : undefined, nameField: name ? { value: state.title === "DaaM" ? "" : state.title, placeholder: items.length ? autoTitle(items) : "Name the meal", onChange: (v: string) => setState((s) => ({ ...s, title: v })), onCommit: (v: string) => p.renamePlate(v) } : undefined });
+  // 0.2.54, design system rule E (board DS2): Back sits top left, above the step bar, and says where it goes
+  const BACK_TO: Record<string, string> = { in: "the plate", recipe: "the amounts", make: "making it", made: "how it went" };
   const Back = ({ to }: { to: typeof STEPS[number] }) => (
-    <button className="link back" onClick={() => setStep(to)}><ArrowLeft size={15} /> Back</button>
+    <button className="link back back-top" onClick={() => setStep(to)}><ChevronLeft size={16} /> Back to {BACK_TO[to] ?? "the last step"}</button>
   );
 
   if (step === "in" && chef) {
@@ -708,7 +711,7 @@ export function JourneyScreen(p: AppApi) {
     const chip = (a: MealOption["adds"][number]) => <span key={a.name} className={`mm-add ${a.have ? "have" : ""}`}>+ {fmt(a.grams, 0)} g {a.name.toLowerCase()}</span>;
     return (
       <>
-        {stepHead({ n: 2, title: `Make it a ${mealWord}`, sub: lead })}
+        {stepHead({ n: 2, title: `Make it a ${mealWord}`, sub: lead, back: <button className="link back back-top" onClick={() => setChef(null)}><ChevronLeft size={16} /> Back to the plate</button> })}
         <small className="mm-stays">On the plate: {items.map((i) => `${i.food.name.toLowerCase()} ${fmt(i.grams, 0)} g`).join(", ")}. {items.length === 1 ? "It stays." : "They stay."}</small>
         {chef.status === "working" && <div className="bubble mealan thinking mm-working"><span /><span /><span /></div>}
         {opts.map((o) => (
@@ -717,12 +720,11 @@ export function JourneyScreen(p: AppApi) {
             <b className="mm-title">{o.title}</b>
             <div className="mm-adds">{o.adds.map(chip)}</div>
             <small className="mm-why">{o.why}</small>
-            <button className="pill pill-small pill-primary" style={{ alignSelf: "flex-start" }} onClick={() => putOnPlate(o)}>Put it on the plate</button>
+            <button className="pill pill-small pill-primary" style={{ alignSelf: "stretch" }} onClick={() => putOnPlate(o)}>Put it on the plate</button>
           </section>
         ))}
         {opts.length > 0 && <small className="mm-legend"><span className="mm-add have">+ in your foods</span><span className="mm-add">+ new</span> new foods are {CHEF_NAME}'s estimate; the app sets every gram.</small>}
         {chef.status !== "working" && <div className="button-row"><button className="pill pill-small" onClick={() => askChef(items, chef.tried)}>Other ideas</button><button className="pill pill-small" onClick={keepAsIs}>Keep it as it is</button></div>}
-        <button className="link back" onClick={() => setChef(null)}><ArrowLeft size={15} /> Back</button>
       </>
     );
   }
@@ -1004,7 +1006,7 @@ export function JourneyScreen(p: AppApi) {
                 <div className="row row-food" key={f.id}>
                   <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
                   <div className="row-text"><b>{f.favorite && <span className="fav-mark" aria-label="Favourite">★ </span>}{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}{pdText(density(f.protein, f.calories))}{why === "often" ? " · often" : ""}</small></div>
-                  <button className={`pill pill-small ${inList ? "" : "pill-primary"}`} disabled={inList} onClick={() => add(f)}>{inList ? "On plate" : <><Plus size={14} /> Add</>}</button>
+                  <button className={`pill pill-small${inList ? " pill-done" : ""}`} disabled={inList} onClick={() => add(f)}>{inList ? "On plate" : <><Plus size={14} /> Add</>}</button>
                 </div>
               );
             })}
@@ -1039,7 +1041,7 @@ export function JourneyScreen(p: AppApi) {
         : `This plate is ${share} % of your day. Fit for a meal, not a dessert.`;
     return (
       <>
-        {Head({ name: Boolean(p.filling), title: mover ? `${CHEF_NAME}'s recipe` : "As you set it", sub: unplanned ? `${momentOf(p.moment).name}. Enjoy it, keep it small. Your next meal leans protein and you're back.` : over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : kept ? `Already above your target: ${pdTag()} ${pdVal(opd)} against ${pdVal(pdRef)}, so nothing moved. More protein is fine. Change an amount and ${CHEF_NAME} refits.` : mover ? `${CHEF_NAME} moves the ${mover.food.name}. Change any other amount and it refits.` : `Nothing moved. This is where your amounts land. Tap a grey dot if you want ${CHEF_NAME} to fit one food.` })}
+        {Head({ back: "in", name: Boolean(p.filling), title: mover ? `${CHEF_NAME}'s recipe` : "As you set it", sub: unplanned ? `${momentOf(p.moment).name}. Enjoy it, keep it small. Your next meal leans protein and you're back.` : over ? `${mover!.food.name} would need ${fmt(mover!.grams, 0)} g to reach ${fixed(pdRef)}. At ${cap} g this is as close as it gets.` : kept ? `Already above your target: ${pdTag()} ${pdVal(opd)} against ${pdVal(pdRef)}, so nothing moved. More protein is fine. Change an amount and ${CHEF_NAME} refits.` : mover ? `${CHEF_NAME} moves the ${mover.food.name}. Change any other amount and it refits.` : `Nothing moved. This is where your amounts land. Tap a grey dot if you want ${CHEF_NAME} to fit one food.` })}
         <section className={`readout ${unreal ? "readout-fit-mid" : `readout-fit-${p.fitPd(opd)}`}`}>
           <div className="readout-top"><span>This plate</span><span>{pdTag()}</span></div>
           <div className="readout-mid">
@@ -1096,7 +1098,6 @@ export function JourneyScreen(p: AppApi) {
           const next = (pick + 1) % options.length; setPick(next);
           setState((s) => ({ ...s, items: options[next].items, portion: null }));
         }}>Try another mix ({(pick % options.length) + 1} of {options.length})</button>}
-        <Back to="in" />
         {swapPanel}
         {foodCard}
         {helperSheet}
@@ -1155,7 +1156,7 @@ export function JourneyScreen(p: AppApi) {
     const parts = partsOf(items);
     return (
       <>
-        {Head({ title: "How to make it", sub: chg ? (steps.length ? `${CHEF_NAME}'s steps for your changed dish, from the original.` : "No steps yet for your changed dish.") : steps.length ? `${CHEF_NAME}'s steps${recipe?.stepParts?.some(Boolean) ? ", part by part," : ""} for what you make.` : origSteps.length ? "The recipe's own steps." : rec ? "No steps yet for this recipe." : "Your dish, part by part. Tick each as you go." })}
+        {Head({ back: "in", title: "How to make it", sub: chg ? (steps.length ? `${CHEF_NAME}'s steps for your changed dish, from the original.` : "No steps yet for your changed dish.") : steps.length ? `${CHEF_NAME}'s steps${recipe?.stepParts?.some(Boolean) ? ", part by part," : ""} for what you make.` : origSteps.length ? "The recipe's own steps." : rec ? "No steps yet for this recipe." : "Your dish, part by part. Tick each as you go." })}
         {/* IM19, IM20: what you make, and what you eat */}
         {rec?.makes && n >= 2 && (
           <section className="card mk-card" aria-label="What you make">
@@ -1218,7 +1219,6 @@ export function JourneyScreen(p: AppApi) {
         )}
         <button className="pill pill-primary pill-wide" onClick={() => { log("method_chosen", { method: madeWhole ? "whole" : "plate" }); setStep("made"); }}>I'm making it</button>
         {madeWhole && leftK > 0 && <small className="muted center" style={{ display: "block", marginTop: 6 }}>To eat the rest on other days, put the recipe on Plan.</small>}
-        <Back to="in" />
       </>
     );
   }
@@ -1226,7 +1226,7 @@ export function JourneyScreen(p: AppApi) {
     const ways = methodsFor(items);
     return (
       <>
-        {Head({ title: "How do you want to eat it?", sub: ways.length ? `Same amounts, ${ways.length === 1 ? "one way" : `${ways.length} ways`}. Pick the one you feel like.` : "One food, nothing to combine. Enjoy it as it is." })}
+        {Head({ back: "recipe", title: "How do you want to eat it?", sub: ways.length ? `Same amounts, ${ways.length === 1 ? "one way" : `${ways.length} ways`}. Pick the one you feel like.` : "One food, nothing to combine. Enjoy it as it is." })}
         <div className="how">
           {ways.map((w) => (
             <button key={w.id} className={`way ${method === w.id ? "on" : ""}`} onClick={() => setMethod(w.id)}>
@@ -1243,7 +1243,6 @@ export function JourneyScreen(p: AppApi) {
           setState((s) => ({ ...s, title: w && (!s.title || s.title === "DaaM") ? w.name : s.title }));
           setStep("made");
         }}>{ways.length ? "I'm making it this way" : "Continue"}</button>
-        <Back to="recipe" />
       </>
     );
   }
@@ -1252,7 +1251,7 @@ export function JourneyScreen(p: AppApi) {
     const mealNow = () => ({ id: uid(), title: p.state.title || autoTitle(items), items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
     return (
       <>
-        {Head({ title: "How did making it go?", sub: "A photo or two while it's on the counter, then one tap." })}
+        {Head({ back: "make", title: "How did making it go?", sub: "A photo or two while it's on the counter, then one tap." })}
         <p className="label">Photos of the meal</p>
         <div className="meal-photos">
           {photos.map((ph, i) => <img key={i} src={ph} alt="" onClick={() => setPhotos((x) => x.filter((_, k) => k !== i))} />)}
@@ -1314,7 +1313,6 @@ export function JourneyScreen(p: AppApi) {
           log("made", { went, ate, photos: photos.length });
           setStep("after");
         }}>On to How was it?</button>}
-        <Back to="make" />
       </>
     );
   }
@@ -1333,7 +1331,7 @@ export function JourneyScreen(p: AppApi) {
   const chgW = way && way.kind === "change" && way.whole && fromRec ? way : null;
   return (
     <>
-      {Head({ title: "How was it?", sub: "One tap. It stays yours unless you share it." })}
+      {Head({ back: "made", title: "How was it?", sub: "One tap. It stays yours unless you share it." })}
       <div className="choices three">
         <button className={`choice ${good === "daam" ? "on" : ""}`} onClick={() => setGood("daam")}><span className="double-thumbs" aria-hidden="true"><ThumbsUp size={22} /><ThumbsUp size={22} /></span><span>DaaM good</span></button>
         <button className={`choice ${good === "good" ? "on" : ""}`} onClick={() => setGood("good")}><ThumbsUp size={22} /><span>Good</span></button>
@@ -1427,7 +1425,6 @@ export function JourneyScreen(p: AppApi) {
       }}>{sharing ? `Save and share with ${p.profile.coachName || "your coach"}` : "Save"}</button>
       {p.profile.coachId && !sharing && <button className="pill pill-wide" onClick={() => setSharing(true)}>Share with {p.profile.coachName || "your coach"}</button>}
       {sharing && <button className="link" onClick={() => { setSharing(false); setShareWhy(null); }}>Keep it private</button>}
-      <Back to="made" />
     </>
   );
 }

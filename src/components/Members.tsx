@@ -176,7 +176,7 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
         </>)}
         <label className="mb-switch"><input type="checkbox" role="switch" checked={named} onChange={(e) => setNamed(e.target.checked)} /><span className="mb-knob" aria-hidden="true" />Show my first name</label>
         <small className="muted">{named ? `On: members see it as ${name === "you" ? "yours, by your first name" : `${name}'s`}. Off: as a member's.` : `Off: members see it as a member's. On: as ${name === "you" ? "yours, by your first name" : `${name}'s`}.`}</small>
-        <div className="button-row"><button className="pill pill-small pill-primary" disabled={busy} onClick={share}>Share with members</button></div>
+        <div className="button-row"><button className="pill pill-small" disabled={busy} onClick={share}>Share with members</button></div>
       </>)}
       {err && <small className="muted" style={{ color: "var(--low)" }}>{err}</small>}
     </section>

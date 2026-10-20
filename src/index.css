@@ -1796,3 +1796,16 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .day-band { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; background: transparent; color: var(--ink); box-shadow: none; border-radius: 0; padding: 4px 2px 8px; border-bottom: 3px solid var(--brand); margin: 22px 0 12px; }
 .day-band b { font-size: 24px; }
 .day-band span { color: #5b6b8a; }
+
+/* ================= 0.2.54, the design system's button rules (boards DS1 and DS2, Milan 07:30) ================= */
+/* Rule B: a card's buttons share one row under everything else in the card, the card's full width, equal widths.
+   Only rows of buttons; a row with a link in it stays as it is. */
+:is(.card, .log-card, .plan, .missed-ask, [role="dialog"]) .button-row:not(:has(> :not(.pill))) { flex-wrap: nowrap; width: 100%; justify-content: stretch; }
+:is(.card, .log-card, .plan, .missed-ask, [role="dialog"]) .button-row:not(:has(> :not(.pill))) > .pill { flex: 1 1 0; min-width: 0; justify-content: center; text-align: center; }
+:is(.card, .log-card, .plan, .missed-ask, [role="dialog"]) .button-row:not(:has(> :not(.pill))) > .pill-small { height: auto; min-height: 36px; padding: 6px 8px; line-height: 1.15; white-space: normal; }
+/* Rule C: How did it carry you? answers are chips, one row, the card's full width */
+.carry-acts .choice { flex: 1 1 auto; min-width: 0; justify-content: center; white-space: nowrap; padding: 0 8px; }
+/* Rule D: a next meal with nothing planned is a card, not a wide button; it opens nothing by itself */
+.next-planned.next-open { cursor: default; }
+/* Rule E: Back sits top left, above the step bar, and says where it goes */
+.back.back-top { display: inline-flex; margin: 0 0 8px; }

@@ -6,6 +6,8 @@
 // to fit a change.
 // Changed by story R24 (Milan 00:06 to 00:16, board RS24): the day is said in its band, Today or Tomorrow with the date, not
 // as a line inside the card. Everything else is unchanged.
+// Changed by story DS rule D (Milan 07:06 to 07:30, boards DS1 and DS2): Today has no wide button, so there is no main
+// button when the day is done; the Tomorrow card's row says Check tomorrow or Plan tomorrow and opens Plan on tomorrow.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -60,8 +62,8 @@ const U = "http://127.0.0.1:3235";
     await at(page, "2026-10-19T23:00:00");
     today = await text(page, "section.cooking");
     ok(/Today went by the plan/.test(today) && !/Tomorrow is/.test(today) && await page.locator(".day-record").count() === 1, "23:00: Today went by the plan, the record; the small tomorrow line is gone");
-    ok(await page.locator(".next-meal").getByRole("button", { name: "Check tomorrow", exact: true }).count() === 1, "the main button: Check tomorrow");
-    await page.locator(".next-meal").getByRole("button", { name: "Check tomorrow", exact: true }).click(); await page.waitForTimeout(700);
+    ok(await page.locator(".next-meal .pill-wide").count() === 0 && await page.locator(".tomorrow-plan").getByRole("button", { name: /Check tomorrow/ }).count() === 1, "no wide button; the Tomorrow card: Check tomorrow");
+    await page.locator(".tomorrow-plan").getByRole("button", { name: /Check tomorrow/ }).click(); await page.waitForTimeout(700);
     ok(/Tuesday, 20 October/.test(await text(page, "main")) && /Chocolate quark pudding/.test(await text(page, "main")), "it opens Plan on Tuesday");
     await page.context().close();
     // nothing planned for tomorrow
@@ -69,7 +71,7 @@ const U = "http://127.0.0.1:3235";
     await p2.goto(U + "/"); await p2.waitForTimeout(1300);
     ok(/^TomorrowTuesday, October 20$/.test((await p2.locator(".day-band").nth(1).textContent()).trim()) && /Plan tomorrow ?Nothing planned so far · Set Tuesday's meals/.test(await text(p2, ".tomorrow-plan")) && await p2.locator(".tomorrow-plan .plan-slot-row").count() === 0, "nothing planned tomorrow: Plan tomorrow, no slots");
     await at(p2, "2026-10-19T23:00:00");
-    ok(await p2.locator(".next-meal").getByRole("button", { name: "Plan tomorrow", exact: true }).count() === 1, "and the main button says Plan tomorrow");
+    ok(await p2.locator(".next-meal .pill-wide").count() === 0 && await p2.locator(".tomorrow-plan").getByRole("button", { name: /Plan tomorrow/ }).count() === 1, "no wide button; the Tomorrow card says Plan tomorrow");
     await p2.locator(".tomorrow-plan").getByRole("button", { name: /Plan tomorrow/ }).click(); await p2.waitForTimeout(700);
     ok(/Tuesday, 20 October/.test(await text(p2, "main")), "Plan tomorrow opens Plan on Tuesday");
     await p2.context().close();

@@ -93,7 +93,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
             {codeSwaps.map(({ f, grams }) => (
               <div className="suggestion" key={f.id}>
                 <div><b>{f.name}</b><small>{fmt(grams, 0)} g brings the plate to your target · {pdText(density(f.protein, f.calories))}</small></div>
-                <button className="pill pill-small pill-primary" onClick={() => takeCode(f)}><Replace size={14} /> Swap</button>
+                <button className="pill pill-small" onClick={() => takeCode(f)}><Replace size={14} /> Swap</button>
               </div>
             ))}
           </>
@@ -120,7 +120,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
             </div>
             {taken.has(k)
               ? <span className="pill pill-small taken"><Check size={14} /> On the plate</span>
-              : <button className="pill pill-small pill-primary" onClick={() => { setTaken((t) => new Set(t).add(k)); take(s); }}>
+              : <button className="pill pill-small" onClick={() => { setTaken((t) => new Set(t).add(k)); take(s); }}>
                   {s.action === "swap" ? <><Replace size={14} /> Swap</> : s.action === "add" ? <><Plus size={14} /> Add</> : <><Scale size={14} /> Set</>}
                 </button>}
           </div>
