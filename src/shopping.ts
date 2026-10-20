@@ -48,7 +48,7 @@ export function shoppingText(list: ShopList, span: string, ticked: Set<string>):
 // the day after the last one ends, so nothing is bought twice. Finishing asks about the foods not ticked: carry them to the
 // next list, or leave them. On this phone only; another phone makes its own.
 // missing: the foods marked Not there in the shop (SL4); they stay on the list and count as not bought
-export type SavedList = { n: number; madeAt: string; from: string; to: string; meals: number; lines: ShopLine[]; without: ShopList["without"]; carried: ShopLine[]; carriedFrom: number | null; ticked: string[]; missing?: string[]; doneAt?: string };
+export type SavedList = { n: number; madeAt: string; from: string; to: string; meals: number; lines: ShopLine[]; without: ShopList["without"]; carried: ShopLine[]; carriedFrom: number | null; ticked: string[]; missing?: string[]; changes?: { date: string; slot: string; from: string; to: string }[]; doneAt?: string };
 export type ShopStore = { lists: SavedList[]; carry: { from: number; lines: ShopLine[] } | null };
 const LKEY = "chefmealan-shopping-lists";
 export const getStore = (): ShopStore => { try { const s = JSON.parse(localStorage.getItem(LKEY) || "{}"); return { lists: Array.isArray(s.lists) ? s.lists : [], carry: s.carry ?? null }; } catch { return { lists: [], carry: null }; } };
@@ -106,14 +106,15 @@ export function listText(l: SavedList, span: string): string {
 // follows it: the old meal's foods leave that meal, the new meal's foods join, marked as added. A food already in the
 // basket stays on the list even when no meal needs it now; a food not there that no meal needs now leaves the list.
 export type NewFood = { name: string; brand: string; grams: number };
-export function replanMeal(s: ShopStore, n: number, date: string, slot: string, title: string, foods: NewFood[]): ShopStore {
+export function replanMeal(s: ShopStore, n: number, date: string, slot: string, title: string, foods: NewFood[], from = ""): ShopStore {
   return { ...s, lists: s.lists.map((l) => {
     if (l.n !== n) return l;
-    let lines = l.lines.map((x) => {
+    // the old meal's foods leave that meal: in the foods for these days and in the foods carried from the last list
+    const drop = (x: ShopLine) => {
       const uses = (x.uses ?? []).filter((u) => !(u.date === date && u.slot === slot));
-      if (uses.length === (x.uses ?? []).length) return x;
-      return { ...x, uses, grams: shopGrams(uses.reduce((g, u) => g + u.grams, 0)), meals: uses.length };
-    });
+      return uses.length === (x.uses ?? []).length ? x : { ...x, uses, grams: shopGrams(uses.reduce((g, u) => g + u.grams, 0)), meals: uses.length };
+    };
+    let lines = l.lines.map(drop), carried = l.carried.map(drop);
     for (const f of foods) {
       if (!(f.grams > 0)) continue;
       const key = `${f.name}|${f.brand ?? ""}`.toLowerCase();
@@ -123,8 +124,11 @@ export function replanMeal(s: ShopStore, n: number, date: string, slot: string, 
     }
     // a food no meal needs now leaves, unless it is in the basket; the new meal's foods were matched first, so a food it
     // shares with the old meal stays as it was, not as added
-    lines = lines.filter((x) => (x.uses ?? []).length > 0 || l.ticked.includes(x.key) || !x.uses);
-    const missing = (l.missing ?? []).filter((k) => lines.some((x) => x.key === k && (x.uses ?? []).length > 0) || l.carried.some((x) => x.key === k));
-    return { ...l, lines: lines.sort((a, b) => a.name.localeCompare(b.name)), missing };
+    const keep = (x: ShopLine) => (x.uses ?? []).length > 0 || l.ticked.includes(x.key) || !x.uses;
+    lines = lines.filter(keep); carried = carried.filter(keep);
+    const needed = (k: string) => [...lines, ...carried].some((x) => x.key === k && (x.uses ?? []).length > 0);
+    const missing = (l.missing ?? []).filter(needed);
+    const changes = [...(l.changes ?? []).filter((c) => !(c.date === date && c.slot === slot)), { date, slot, from: (l.changes ?? []).find((c) => c.date === date && c.slot === slot)?.from ?? from, to: title }];
+    return { ...l, lines: lines.sort((a, b) => a.name.localeCompare(b.name)), carried, missing, changes };
   }) };
 }

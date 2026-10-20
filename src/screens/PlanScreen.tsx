@@ -8,7 +8,7 @@ import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "..
 import { rowsOf, slotsOf, slotsOn, trainingWhen, type Slot } from "../slots";
 import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
-import { STARTERS, fitOf, fromMeal, needOf, sumOf, type PlannedMeal } from "../planned";
+import { STARTERS, fitOf, fromMeal, needOf, sumOf, plannedPortion, type PlannedMeal } from "../planned";
 import { CHEF_NAME } from "../components/Mark";
 import { PlanRow } from "../components/PlanRow";
 import { ShortHelp } from "../components/ShortHelp";
@@ -47,6 +47,8 @@ export function PlanScreen(p: AppApi) {
   const [open, setOpen] = useState<Slot | null>(null);
   const [editing, setEditing] = useState<PlanDay | null>(null);
   const [shopping, setShopping] = useState(false);
+  // SL6: a planned meal with foods but no recipe behind it (changed for this day only) opens to show what it is
+  const [viewing, setViewing] = useState<Slot | null>(null);
   // SL3: the button names the open list; it is read again when the sheet closes
   const shopOpen = shopping ? null : openList(getStore());
   const stripRef = useRef<HTMLDivElement>(null);
@@ -136,7 +138,7 @@ export function PlanScreen(p: AppApi) {
                 ? <PlanRow className="plan-slot plan-slot-set" label={`${r.slot.name}, ${r.slot.time}`} title={m.title} photo={pictureOfRecipe(m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null)}
                     ariaLabel={`${r.slot.name} at ${r.slot.time}, ${m.title}`}
                     sub={fit ? <>{SOURCE[m.source]} · {fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</> : null}
-                    onOpen={() => { const rec = m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null; if (rec) p.openMeal(rec.id, { tab: "plan", slot: { date: key, slotId: r.slot.id, name: r.slot.name, time: r.slot.time } }); else setOpen(r.slot); }}
+                    onOpen={() => { const rec = m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null; if (rec) p.openMeal(rec.id, { tab: "plan", slot: { date: key, slotId: r.slot.id, name: r.slot.name, time: r.slot.time } }); else if (m.items?.length) setViewing(r.slot); else setOpen(r.slot); }}
                     onSwap={() => setOpen(r.slot)} onRight={() => p.fill(key, r.slot.id, null)} rightLabel="Empty" swapName={`Swap ${r.slot.name.toLowerCase()}`} rightName={`Empty ${r.slot.name.toLowerCase()}`} />
                 : <button type="button" className={`menu-row plan-slot ${m ? "plan-slot-set" : ""}`} aria-label={m ? `${r.slot.name} at ${r.slot.time}, ${m.title}` : `${r.slot.name} at ${r.slot.time}, pick a meal`} onClick={() => setOpen(r.slot)}>
                     <div className="menu-row-text">
@@ -164,7 +166,12 @@ export function PlanScreen(p: AppApi) {
       {openCount > 0 && <button type="button" className="pill pill-tall pill-primary plan-fill" onClick={() => p.openOut("fill")}><ChefHat size={18} /> Fill the open slots with {CHEF_NAME}</button>}
       </>)}
       <button type="button" className="pill pill-wide plan-shop" onClick={() => setShopping(true)}><ShoppingBasket size={18} /> {shopOpen ? `Shopping list ${shopOpen.n}, open` : "Make a shopping list"}</button>
-      {shopping && <ShopSheet p={p} close={() => setShopping(false)} />}
+      {shopping && <ShopSheet p={p} close={() => setShopping(false)} showDay={(d) => { setShopping(false); const n = Math.floor((isoWeek(new Date(`${d}T12:00:00`)).monday.getTime() - thisMonday.getTime()) / (7 * 864e5)); setOffsetState(n === 1 ? 0 : n); setPicked(d); }} />}
+      {viewing && held[viewing.id]?.items?.length ? <MealSheet p={p} slot={viewing} m={held[viewing.id]} dayName={dayName} target={target} unit={unit}
+        close={() => setViewing(null)} swap={() => { setOpen(viewing); setViewing(null); }}
+        onPlate={() => { const m = held[viewing.id]; setViewing(null); p.fillOnPlate(fillingOf(viewing), { id: "", title: m.title, items: m.items!, portion: m.portion ?? 0, savedAt: "" }, m.title); }}
+        keep={() => { const m = held[viewing.id]; const meal = { id: uid(), title: m.title, items: m.items!, portion: m.portion ?? m.items!.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
+          p.setState((st) => ({ ...st, meals: [...st.meals, meal] })); p.fill(key, viewing.id, { ...m, mealId: meal.id, source: "mine", note: undefined }); setViewing(null); p.notify(`${m.title} is in My recipes.`); }} /> : null}
       {editing && (
         <div className="sheet-backdrop" onClick={() => setEditing(null)}>
           <div className="sheet date-sheet" role="dialog" aria-label={`${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}: training`} onClick={(e) => e.stopPropagation()}>
@@ -226,7 +233,7 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
 // The shopping lists (0.2.60 board SL1; 0.2.61 board SL3): a list is saved, named and dated, for the days you pick. One is open
 // at a time; tap a food when it is in the basket; Finish the list asks about the foods not ticked. Earlier lists stay readable.
 const DAY_CHOICES = [1, 3, 7];
-function ShopSheet({ p, close }: { p: AppApi; close: () => void }) {
+function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDay: (date: string) => void }) {
   const [store, setStore] = useState<ShopStore>(getStore);
   const save = (s: ShopStore) => { putStore(s); setStore(s); };
   const [reading, setReading] = useState<number | null>(null);
@@ -274,6 +281,18 @@ function ShopSheet({ p, close }: { p: AppApi; close: () => void }) {
           <p className="small shop-why">Made {madeOn(shown.madeAt)}, for {spanOf(shown.from, shown.to)}: {shown.meals} planned {shown.meals === 1 ? "meal" : "meals"}, one portion each.{shown.doneAt ? ` Finished ${madeOn(shown.doneAt)}.` : ""}</p>
           {shown.without.length > 0 && <p className="small shop-without">Not on the list, no foods saved: {shown.without.map((w) => `${w.title} (${WEEKDAY[(dt(w.date).getDay() + 6) % 7]})`).join(", ")}.</p>}
           {!shown.doneAt && <p className="small shop-why">Tap a food once when it is in the basket, twice when the shop doesn't have it.</p>}
+          {/* SL6: what Chef Mealan changed from this list stays said here, with the way to the day */}
+          {(shown.changes ?? []).length > 0 && (
+            <section className="shop-changed">
+              <b>Changed with {CHEF_NAME}</b>
+              {(shown.changes ?? []).map((c) => (
+                <div key={`${c.date}${c.slot}`} className="shop-changed-row">
+                  <small>{WEEKDAY[(dt(c.date).getDay() + 6) % 7]} {slotName(c.date, c.slot).toLowerCase()} is now {c.to}{c.from ? `, in place of ${c.from}` : ""}. This day only.</small>
+                  <button type="button" className="link" onClick={() => showDay(c.date)}>See it in Plan ›</button>
+                </div>
+              ))}
+            </section>
+          )}
           {shortMeals(shown).length > 0 && (
             <section className="shop-short-box">
               <p className="small shop-short">Not there: {[...new Set(shortMeals(shown).flatMap((m) => m.foods))].join(", ")}. Short now: {shortMeals(shown).map((m) => `${WEEKDAY[(dt(m.date).getDay() + 6) % 7]} ${slotName(m.date, m.slot).toLowerCase()}, ${m.title}`).join("; ")}.</p>
@@ -281,7 +300,7 @@ function ShopSheet({ p, close }: { p: AppApi; close: () => void }) {
               {!shown.doneAt && shortMeals(shown).map((m) => {
                 const label = `${WEEKDAY[(dt(m.date).getDay() + 6) % 7]} ${slotName(m.date, m.slot).toLowerCase()}`;
                 return <ShortHelp key={`${m.date}${m.slot}`} p={p} date={m.date} slot={m.slot} label={label} title={m.title} missing={m.foods}
-                  onUsed={(title, foods) => { const before = new Set(shown.lines.map((x) => x.key)); const next = replanMeal(getStore(), shown.n, m.date, m.slot, title, foods); save(next);
+                  onUsed={(title, foods) => { const before = new Set(shown.lines.map((x) => x.key)); const next = replanMeal(getStore(), shown.n, m.date, m.slot, title, foods, m.title); save(next);
                     const added = (openList(next)?.lines ?? []).filter((x) => x.added && !before.has(x.key)).map((x) => x.name);
                     p.notify(`${label} is now ${title}.${added.length ? ` ${added.join(", ")} ${added.length === 1 ? "is" : "are"} on your list.` : ""}`); }} />;
               })}
@@ -340,6 +359,30 @@ function ShopSheet({ p, close }: { p: AppApi; close: () => void }) {
               <div className="menu-row-text"><b>Shopping list {l.n}</b><small>{spanOf(l.from, l.to)} · {l.lines.length + l.carried.length} foods · finished {madeOn(l.doneAt!)}</small></div><ChevronRight size={18} />
             </button>))}</div>
         </>)}
+      </div>
+    </div>
+  );
+}
+
+// SL6 (0.2.64): a meal in the plan with its foods but no recipe behind it, as Chef Mealan changed it at the shop: what it is,
+// why it is there, its foods and numbers; Make it on the Plate, Save in My recipes, or Swap it
+function MealSheet({ p, slot, m, dayName, target, unit, close, swap, onPlate, keep }: { p: AppApi; slot: Slot; m: PlannedMeal; dayName: string; target: number | null; unit: "pd" | "pct"; close: () => void; swap: () => void; onPlate: () => void; keep: () => void }) {
+  const portion = plannedPortion(m, "view", "");
+  const fit = fitOf(m, target, unit);
+  return (
+    <div className="sheet-backdrop" onClick={close}>
+      <div className="sheet date-sheet meal-view" role="dialog" aria-label={`${slot.name}, ${m.title}`} onClick={(e) => e.stopPropagation()}>
+        <div className="card-top"><span>{dayName === "today" ? "Today" : dayName.charAt(0).toUpperCase() + dayName.slice(1)}, {slot.name.toLowerCase()}, {slot.time}</span><button type="button" className="link" onClick={close}>Close</button></div>
+        <b className="shop-title">{m.title}</b>
+        <p className="small shop-why">{m.note ?? "This day only. No recipe stands behind it."}</p>
+        <div className="menu-list shop-list">
+          {(portion?.items ?? []).map((i) => (
+            <div key={i.id} className="menu-row meal-view-row"><div className="menu-row-text"><b>{i.food.name}</b>{i.food.source === "estimate" && <small>{CHEF_NAME}'s estimate</small>}</div><b className="shop-grams">{Math.round(i.grams)} g</b></div>
+          ))}
+        </div>
+        <p className="small meal-view-nums">{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</p>
+        <div className="button-row"><button type="button" className="pill pill-small" onClick={swap}>Swap</button><button type="button" className="pill pill-small" onClick={keep}>Save in My recipes</button></div>
+        <button type="button" className="pill pill-wide pill-primary meal-view-make" onClick={onPlate}>Make it on the Plate</button>
       </div>
     </div>
   );

@@ -1917,3 +1917,11 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .shop-help-opt .fit-ok { color: var(--good-text); font-weight: 700; } .shop-help-opt .fit-under { color: var(--close-text); font-weight: 700; }
 .shop-help-kind { font-size: var(--fs-caps) !important; font-weight: 900; letter-spacing: .05em; text-transform: uppercase; color: var(--brand-text) !important; }
 .shop-help-opt .button-row { margin-top: 6px; }
+/* SL6: what Chef Mealan changed, said on the list; a meal changed for one day, opened from Plan */
+.shop-changed { background: var(--good-soft); border-radius: var(--r-control); padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; margin: 4px 0 10px; }
+.shop-changed > b { color: var(--good-text); font-size: var(--fs-label); font-weight: 900; }
+.shop-changed-row { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; } .shop-changed-row small { color: var(--good-text); font-weight: 700; }
+.shop-changed-row .link { font-weight: 700; font-size: var(--fs-label); }
+.meal-view-row .menu-row-text b { font-size: var(--fs-body); color: var(--ink); } .meal-view-nums { margin: 10px 0; font-weight: 700; }
+.meal-view-make { margin-top: 12px; }
+.meal-view-row { display: flex; align-items: center; gap: 10px; } .meal-view-row .menu-row-text { flex: 1 1 auto; min-width: 0; } .meal-view-row .shop-grams { margin-left: auto; text-align: right; font-size: var(--fs-body); font-weight: 900; color: var(--ink); }
