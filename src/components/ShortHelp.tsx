@@ -70,7 +70,7 @@ export function ShortHelp({ p, list, date, slot, label, title, missing, onUsed }
     if (using) return; setUsing(true);
     const weight = o.items.reduce((n, i) => n + i.grams, 0);
     p.fill(date, slot, { title: o.title, kcal: o.kcal, protein: o.protein, source: o.source, ...(o.mealId ? { mealId: o.mealId } : { note: o.note }), items: o.items, portion: Math.round(weight) });
-    onUsed(o.title, o.items.map((i) => ({ name: i.food.name, brand: i.food.brand ?? "", grams: i.grams })));
+    onUsed(o.title, o.items.map((i) => ({ name: i.food.name, brand: i.food.brand ?? "", grams: i.grams, kcal: i.food.calories })));
   };
   return (
     <div className="shop-help">

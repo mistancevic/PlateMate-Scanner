@@ -19,7 +19,7 @@ import { resizeImageBase64 } from "../utils/image";
 import { RecipePage, type PubState } from "../components/RecipePage";
 import { fromDraft } from "../steps";
 import { recipePhotosOf, recipeHasPhotos, sig } from "../photos";
-import { coverIsDrawn } from "../covers";
+import { coverIsDrawn, isDrawnPhoto } from "../covers";
 import { CHEF_NAME } from "../components/Mark";
 import { MembersList, MemberPage, SharePanel, aheadOf } from "../components/Members";
 import { sharedOf, contentSig, type SharedRecipe } from "../members";
@@ -103,6 +103,22 @@ export function RecipesScreen(p: AppApi) {
   };
   const anyShared = state.meals.some((m) => m.members);
   useEffect(() => { if (view === "members" || anyShared) loadMembers(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [view, p.user?.uid, anyShared]);
+  // MB4 (0.2.66, Milan 21:14): Chef Mealan's picture of a shared recipe reaches members when they see no cover or an older
+  // picture; your own photos never go without your pick (Change the cover on the recipe)
+  const coverSent = useRef(new Set<string>());
+  useEffect(() => {
+    for (const m of state.meals) {
+      if (!m.members) continue;
+      const photos = recipePhotosOf(m), drawn = photos.find((x) => isDrawnPhoto(m, x));
+      if (!drawn || sig(drawn) === m.members.coverSig || coverSent.current.has(m.id + sig(drawn))) continue;
+      if (m.members.coverSig && photos.some((x) => sig(x) === m.members!.coverSig && !isDrawnPhoto(m, x))) continue;
+      coverSent.current.add(m.id + sig(drawn));
+      const sh = m.members, recipe = sharedOf(m, sh.kitchen), want = sig(drawn);
+      void resizeImageBase64(drawn, 640, 480).catch(() => null).then((cover) => cover && fetch("/api/members", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: sh.id, recipe, cover, coverKind: "drawn", named: sh.named, name: p.user?.name ?? "" }) })
+        .then((r) => { if (r.ok) { setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === m.id && x.members ? { ...x, members: { ...x.members, coverSig: want, sent: contentSig(recipe) } } : x)) })); loadMembers(); } }).catch(() => {}));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.meals]);
   // a change to a shared recipe reaches members (CO4b): the name, the foods, the amounts, the steps; the cover stays
   useEffect(() => {
     for (const m of state.meals) {

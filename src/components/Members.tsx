@@ -26,7 +26,8 @@ import { dayLog } from "../today";
 import { ymd } from "../plan";
 import type { AppApi } from "../screens/api";
 
-export type Ahead = { name: string; kcal: number; target: number | null };
+// full: the day is planned or eaten in full, so nothing is left for the meal ahead (0.2.66, Milan 21:14: Dinner is about 0 kcal)
+export type Ahead = { name: string; kcal: number; target: number | null; full?: boolean };
 // The meal ahead and its size: what is left of the day shared over the meals still to come (the rule of Make it a meal, CH1)
 export function aheadOf(p: AppApi): Ahead | null {
   const today = ymd(new Date());
@@ -37,7 +38,7 @@ export function aheadOf(p: AppApi): Ahead | null {
   const nums = p.numbersFor(new Date());
   if (!slot || !nums) return null;
   const share = mealShare(slots, slot.id, { kcal: nums.kcal, protein: nums.protein }, { kcal: rec.kcal, protein: rec.protein }, closed);
-  return share ? { name: slot.name.toLowerCase(), kcal: share.kcal, target: p.dayPd ?? p.pdRef } : null;
+  return share ? { name: slot.name.toLowerCase(), kcal: share.kcal, target: p.dayPd ?? p.pdRef, ...(share.kcal < 50 ? { full: true } : {}) } : null;
 }
 export const cooksOf = (list: SharedRecipe[]) => { const n = new Map<string, number>(); for (const r of list) if (r.name && !r.mine) n.set(r.name, (n.get(r.name) ?? 0) + 1); return [...n.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map((x) => x[0]); };
 const byLine = (r: SharedRecipe) => [r.kitchen, r.mine ? "shared by you" : r.name ? `shared by ${r.name}` : "shared by a member", r.made ? `made ${r.made === 1 ? "once" : `${r.made} times`}` : ""].filter(Boolean).join(" · ");
@@ -55,7 +56,9 @@ export function MembersList({ list, ahead, p, open, loading, error, cook, setCoo
   return (
     <>
       <section className="card mb-head">
-        <small className="mb-lead">{ahead
+        <small className="mb-lead">{ahead?.full
+          ? `Recipes members cooked and shared. Your day is planned in full, so each shows the whole recipe; Make it puts your portion on the Plate.`
+          : ahead
           ? `Recipes members cooked and shared, worked out for your day. ${ahead.name.charAt(0).toUpperCase() + ahead.name.slice(1)} is about ${fmt(ahead.kcal, 0)} kcal${ahead.target !== null ? ` at ${pdText(ahead.target)} or more, so these come first` : ""}.`
           : "Recipes members cooked and shared. Set your goal and every recipe shows your portion."}</small>
         {on && <b className="mb-shelf">{on}'s kitchen · {shown.length} {shown.length === 1 ? "recipe" : "recipes"}</b>}
@@ -76,7 +79,7 @@ export function MembersList({ list, ahead, p, open, loading, error, cook, setCoo
       {error && <small className="muted">{error}</small>}
       {list && shown.length === 0 && <section className="card recipes-empty"><small>{kitchen ? `Nothing from the ${kitchen} kitchen yet.` : "Nothing shared yet. A recipe of yours can be the first: open it, then Share with members."}</small></section>}
       {shown.map((r) => {
-        const x = portionOf(r, ahead?.kcal ?? null);
+        const x = portionOf(r, ahead && !ahead.full ? ahead.kcal : null);
         const ok = ahead?.target == null || (x.pd !== null && x.pd >= ahead.target - 0.05);
         return (
           <button type="button" className="card recipe-tile" key={r.id} onClick={() => open(r.id)} aria-label={`Open ${r.title}`}>
@@ -84,7 +87,7 @@ export function MembersList({ list, ahead, p, open, loading, error, cook, setCoo
             <div className="recipe-tile-body">
               <div className="card-top"><b className="tile-name">{r.title}</b></div>
               <small>{byLine(r)}</small>
-              <small className={`tile-state ${ok ? "live" : "under"}`}>{ahead ? `Your ${ahead.name}: ${fmt(x.grams, 0)} g · ${fmt(x.kcal, 0)} kcal · ${pdText(x.pd)}` : `${fmt(x.grams, 0)} g · ${fmt(x.kcal, 0)} kcal · ${pdText(x.pd)}`}{ok ? "" : `, under your ${pdVal(ahead!.target)}`}</small>
+              <small className={`tile-state ${ok ? "live" : "under"}`}>{ahead && !ahead.full ? `Your ${ahead.name}: ${fmt(x.grams, 0)} g · ${fmt(x.kcal, 0)} kcal · ${pdText(x.pd)}` : ahead?.full ? `The whole recipe: ${fmt(x.grams, 0)} g · ${fmt(x.kcal, 0)} kcal · ${pdText(x.pd)}` : `${fmt(x.grams, 0)} g · ${fmt(x.kcal, 0)} kcal · ${pdText(x.pd)}`}{ok ? "" : `, under your ${pdVal(ahead!.target)}`}</small>
             </div>
           </button>
         );
@@ -97,7 +100,7 @@ export function MembersList({ list, ahead, p, open, loading, error, cook, setCoo
 export function MemberPage({ r, ahead, p, owner, close, takeDown, toCook }: { r: SharedRecipe; ahead: Ahead | null; p: AppApi; owner: boolean; close: () => void; takeDown: () => void; toCook?: (name: string) => void }) {
   useBack(true, close);
   useEffect(() => { log("members", { how: "open" }); }, [r.id]);
-  const x = portionOf(r, ahead?.kcal ?? null);
+  const x = portionOf(r, ahead && !ahead.full ? ahead.kcal : null);
   const steps = r.steps ?? [];
   return (
     <div className="rq">
@@ -107,14 +110,14 @@ export function MemberPage({ r, ahead, p, owner, close, takeDown, toCook }: { r:
       <small className="muted mb-by">{byLine(r)}{r.made ? " by members" : ""}</small>
       {r.source && <small className="muted mb-by">Adapted from {r.source}</small>}
       {r.name && !r.mine && toCook && <button className="link mb-cook-link" onClick={() => toCook(r.name)}>All of {r.name}'s recipes ›</button>}
-      {ahead && <small className="mb-yours">Your {ahead.name}: {fmt(x.grams, 0)} g of the {fmt(x.total, 0)} g it makes</small>}
+      {ahead && !ahead.full && <small className="mb-yours">Your {ahead.name}: {fmt(x.grams, 0)} g of the {fmt(x.total, 0)} g it makes</small>}
       <div className="rp-stats">
         <span><b>{fmt(x.kcal, 0)}</b><small>kcal</small></span>
         <span><b>{fmt(x.protein, 0)}</b><small>g protein</small></span>
         <span className="wide"><b>{pdText(x.pd)}</b><small>protein density</small></span>
       </div>
       <section className="card rq-foods">
-        <b>{ahead ? "Foods for your portion" : "Foods"}</b>
+        <b>{ahead && !ahead.full ? "Foods for your portion" : "Foods"}</b>
         {x.items.map((it, k) => [it.part && (k === 0 || x.items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{it.part}</div> : null, <div className="sheet-row rq-food" key={it.id}><small>{it.food.name}</small><b>{fmt(it.grams, 0)} g</b></div>])}
       </section>
       <section className="card rq-steps">
@@ -172,6 +175,18 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
       log("members", { how: "share" });
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   };
+  const changeCover = async () => {
+    if (!shared) return;
+    setBusy(true); setErr("");
+    try {
+      const cover = chosen ? await resizeImageBase64(chosen, 640, 480).catch(() => null) : null;
+      const recipe = sharedOf(meal, shared.kitchen);
+      const r = await fetch("/api/members", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: shared.id, recipe, cover, coverKind: chosen && isDrawnPhoto(meal, chosen) ? "drawn" : "photo", named: shared.named, name: p.user?.name ?? "" }) });
+      if (!r.ok) throw new Error("The cover didn't change. Try again.");
+      onPatch({ members: { ...shared, coverSig: pick, sent: contentSig(recipe) } });
+      p.notify("Members see the new cover.");
+    } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
+  };
   const takeBack = async () => {
     setBusy(true); setErr("");
     try {
@@ -186,6 +201,15 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
     <section className="card mb-share">
       <div className="card-top"><b>For members</b><small className={`mb-state ${shared ? "live" : "none"}`}>{shared ? "Shared" : "Not shared"}</small></div>
       {shared ? (<>
+        {/* MB4 (0.2.66, Milan 21:14): the cover members see can change; your own photos only when you pick one */}
+        {photos.length > 0 && (<>
+          <small className="mb-sub">The cover members see</small>
+          <div className="mb-covers">{photos.map((x) => {
+            const d = isDrawnPhoto(meal, x), on = sig(x) === pick;
+            return <button key={sig(x)} className={`mb-cover ${on ? "on" : ""}`} onClick={() => setPick(sig(x))} aria-pressed={on}><img src={x} alt="" /><small>{on ? "✓ " : ""}{d ? `Picture by ${CHEF_NAME}` : "Your photo"}</small></button>;
+          })}</div>
+          {pick !== (shared.coverSig ?? null) && <div className="button-row"><button className="pill pill-small" disabled={busy} onClick={changeCover}>Change the cover</button></div>}
+        </>)}
         <small className="muted">Members see it since {since}, as {shared.named ? name : "a member"}, with {coverWord}.{made !== null ? ` Made ${made === 0 ? "0 times so far" : made === 1 ? "once" : `${made} times`}.` : ""} A change you make here reaches them too.</small>
         <div className="button-row"><button className="pill pill-small" disabled={busy} onClick={takeBack}>Take it back</button></div>
         <small className="muted">Take it back removes it from Members; members who kept a copy keep theirs.</small>

@@ -103,21 +103,29 @@ const R: [string, string, string, string, string, number, number, number, number
   ["butter", "Butter", "Butter", "Maslac", "Маслац", 717, 0.9, 81.1, 0.1, 0, true],
   // grains, bread, legumes
   ["rice-white-cooked", "Rice, white, cooked", "Reis, weiß, gekocht", "Pirinač, kuvan", "Пиринач, куван", 130, 2.7, 0.3, 28.2, 0.4, true],
+  ["rice-white-raw", "Rice, white, raw", "Reis, weiß, roh", "Pirinač, sirov", "Пиринач, сиров", 365, 7.1, 0.7, 80.0, 1.3, false],
+  ["rice-brown-raw", "Rice, brown, raw", "Vollkornreis, roh", "Integralni pirinač, sirov", "Интегрални пиринач, сиров", 370, 7.9, 2.9, 77.2, 3.5, false],
   ["rice-brown-cooked", "Rice, brown, cooked", "Vollkornreis, gekocht", "Integralni pirinač, kuvan", "Интегрални пиринач, куван", 112, 2.3, 0.9, 23.5, 1.8, true],
   ["pasta-cooked", "Pasta, cooked", "Nudeln, gekocht", "Testenina, kuvana", "Тестенина, кувана", 158, 5.8, 0.9, 30.9, 1.8, true],
   ["pasta-dry", "Pasta, dry", "Nudeln, trocken", "Testenina, suva", "Тестенина, сува", 371, 13.0, 1.5, 74.7, 3.2, false],
   ["oats", "Oats, rolled", "Haferflocken", "Ovsene pahuljice", "Овсене пахуљице", 379, 13.2, 6.5, 67.7, 10.1, true],
   ["bulgur-cooked", "Bulgur, cooked", "Bulgur, gekocht", "Bulgur, kuvan", "Булгур, куван", 83, 3.1, 0.2, 18.6, 4.5, true],
+  ["bulgur-dry", "Bulgur, dry", "Bulgur, trocken", "Bulgur, suv", "Булгур, сув", 342, 12.3, 1.3, 75.9, 18.3, false],
   ["couscous-cooked", "Couscous, cooked", "Couscous, gekocht", "Kuskus, kuvan", "Кускус, куван", 112, 3.8, 0.2, 23.2, 1.4, true],
+  ["couscous-dry", "Couscous, dry", "Couscous, trocken", "Kuskus, suv", "Кускус, сув", 376, 12.8, 0.6, 77.4, 5.0, false],
   ["quinoa-cooked", "Quinoa, cooked", "Quinoa, gekocht", "Kinoa, kuvana", "Киноа, кувана", 120, 4.4, 1.9, 21.3, 2.8, true],
+  ["quinoa-raw", "Quinoa, raw", "Quinoa, roh", "Kinoa, sirova", "Киноа, сирова", 368, 14.1, 6.1, 64.2, 7.0, false],
   ["polenta-cooked", "Polenta, cooked", "Polenta, gekocht", "Palenta, kuvana", "Палента, кувана", 70, 1.6, 0.2, 15.0, 1.0, true, T],
   ["bread-white", "Bread, white", "Weißbrot", "Beli hleb", "Бели хлеб", 265, 8.9, 3.2, 49.4, 2.7, true],
   ["bread-wholegrain", "Bread, wholegrain", "Vollkornbrot", "Integralni hleb", "Интегрални хлеб", 247, 12.5, 3.4, 41.3, 6.0, true],
   ["tortilla", "Tortilla, wheat", "Weizentortilla", "Tortilja", "Тортиља", 312, 8.0, 8.0, 52.0, 3.0, true, T],
   ["flour-wheat", "Wheat flour, white", "Weizenmehl", "Brašno, belo", "Брашно, бело", 364, 10.3, 1.0, 76.3, 2.7, false],
   ["lentils-cooked", "Lentils, cooked", "Linsen, gekocht", "Sočivo, kuvano", "Сочиво, кувано", 116, 9.0, 0.4, 20.1, 7.9, true],
+  ["lentils-dry", "Lentils, dry", "Linsen, trocken", "Sočivo, suvo", "Сочиво, суво", 352, 24.6, 1.1, 63.4, 10.7, false],
   ["chickpeas-cooked", "Chickpeas, cooked", "Kichererbsen, gekocht", "Leblebije, kuvane", "Леблебије, куване", 164, 8.9, 2.6, 27.4, 7.6, true],
+  ["chickpeas-dry", "Chickpeas, dry", "Kichererbsen, trocken", "Leblebije, suve", "Леблебије, суве", 378, 20.5, 6.0, 63.0, 12.2, false],
   ["beans-white-cooked", "White beans, cooked", "Weiße Bohnen, gekocht", "Pasulj, kuvan", "Пасуљ, куван", 139, 9.7, 0.4, 25.1, 6.3, true],
+  ["beans-white-dry", "White beans, dry", "Weiße Bohnen, trocken", "Pasulj, suv", "Пасуљ, сув", 333, 23.4, 0.9, 60.3, 15.2, false],
   ["beans-kidney-cooked", "Kidney beans, cooked", "Kidneybohnen, gekocht", "Crveni pasulj, kuvan", "Црвени пасуљ, куван", 127, 8.7, 0.5, 22.8, 6.4, true],
   ["tofu", "Tofu, firm", "Tofu, fest", "Tofu", "Тофу", 144, 17.3, 8.7, 2.8, 2.3, true],
   ["hummus", "Hummus", "Hummus", "Humus", "Хумус", 166, 7.9, 9.6, 14.3, 6.0, true],
@@ -267,4 +275,28 @@ export function referenceFood(r: RefFood, region: string | null | undefined, uid
     readyToEat: r.ready, notes: `Reference table: ${r.source}. Per 100 g${/raw|sirov|roh|sveže/i.test(name) ? ", raw" : ""}. Carbohydrate without fibre. Also: ${namesOf(r).filter((x) => x !== name).join(" · ")}.`,
     source: "Reference table", reviewedAt: new Date().toISOString(),
   } as Food;
+}
+
+// SL7 (0.2.66, Milan 21:00 and 21:20): what you buy is raw. A food counted cooked whose raw form is in this table is bought
+// raw: same food, different water, so the raw grams are the cooked grams times cooked kcal over raw kcal (rice 130 over 365:
+// 450 g cooked is 160 g raw). The plan and the numbers keep counting what you eat; only the shopping list says what you buy.
+const COOKED = /(cooked|boiled|gekocht|gegart|kuvan|kuvana|kuvano|kuvane|pecen|pecena)/;
+const RAW_OF: [RegExp, string][] = [
+  [/(brown|vollkorn|integral).*(rice|reis|pirinac)|(rice|reis|pirinac).*brown/, "rice-brown-raw"],
+  [/(rice|reis|pirinac)/, "rice-white-raw"],
+  [/(pasta|nudel|testenin|spaghetti|penne|fusilli|macaroni)/, "pasta-dry"],
+  [/bulgur/, "bulgur-dry"], [/(couscous|kuskus)/, "couscous-dry"], [/(quinoa|kinoa)/, "quinoa-raw"],
+  [/(lentil|linsen|socivo)/, "lentils-dry"], [/(chickpea|kichererbse|leblebij)/, "chickpeas-dry"],
+  [/(white beans|weisse bohnen|pasulj)/, "beans-white-dry"],
+  [/(potato|kartoffel|krompir)/, "potato"],
+  [/(chicken breast|hahnchenbrust|pileca prsa|pileci file)/, "chicken-breast-raw"],
+];
+export function rawOf(name: string, kcalCooked: number | null | undefined): { raw: RefFood; factor: number } | null {
+  const n = fold(name).replace(/ß/g, "ss");
+  if (!COOKED.test(n) || !kcalCooked || kcalCooked <= 0) return null;
+  const hit = RAW_OF.find(([re]) => re.test(n));
+  const raw = hit ? REFERENCE.find((r) => r.id === hit[1]) : null;
+  if (!raw) return null;
+  const factor = kcalCooked / raw.kcal;
+  return factor > 0.15 && factor < 1.6 ? { raw, factor } : null;
 }
