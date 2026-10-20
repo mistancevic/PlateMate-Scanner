@@ -5,7 +5,7 @@ import { plannedPortion, type Planned } from "./planned";
 
 // SL4 (0.2.62): each food knows the meals it is for, so the list can say what it is for and show itself meal by meal
 export type ShopUse = { date: string; slot: string; title: string; grams: number };
-export type ShopLine = { key: string; name: string; brand: string; grams: number; meals: number; uses?: ShopUse[] };
+export type ShopLine = { key: string; name: string; brand: string; grams: number; meals: number; uses?: ShopUse[]; added?: boolean };
 export type ShopList = { days: string[]; meals: number; lines: ShopLine[]; without: { date: string; title: string }[] };
 
 // grams as a shop reads them: under 50 g to the gram, else to 10 g
@@ -100,4 +100,31 @@ export function finishList(s: ShopStore, n: number, carry: boolean, at: string):
 export function listText(l: SavedList, span: string): string {
   const shown = (x: ShopLine) => `${x.name}${x.brand && !/typical values|generic|check your/i.test(x.brand) ? ` (${x.brand})` : ""}: ${x.grams.toLocaleString("en")} g`;
   return [`Shopping list ${l.n}, ${span}`, "", ...notTicked(l).map((x) => shown(x) + ((l.missing ?? []).includes(x.key) ? " (not at the last shop)" : ""))].join("\n");
+}
+
+// SL5 (0.2.63): a short meal changed with Chef Mealan's help. The plan's meal for that slot is new, and the open list
+// follows it: the old meal's foods leave that meal, the new meal's foods join, marked as added. A food already in the
+// basket stays on the list even when no meal needs it now; a food not there that no meal needs now leaves the list.
+export type NewFood = { name: string; brand: string; grams: number };
+export function replanMeal(s: ShopStore, n: number, date: string, slot: string, title: string, foods: NewFood[]): ShopStore {
+  return { ...s, lists: s.lists.map((l) => {
+    if (l.n !== n) return l;
+    let lines = l.lines.map((x) => {
+      const uses = (x.uses ?? []).filter((u) => !(u.date === date && u.slot === slot));
+      if (uses.length === (x.uses ?? []).length) return x;
+      return { ...x, uses, grams: shopGrams(uses.reduce((g, u) => g + u.grams, 0)), meals: uses.length };
+    });
+    for (const f of foods) {
+      if (!(f.grams > 0)) continue;
+      const key = `${f.name}|${f.brand ?? ""}`.toLowerCase();
+      const at = lines.findIndex((x) => x.key === key), use = { date, slot, title, grams: shopGrams(f.grams) };
+      if (at >= 0) { const x = lines[at]; const uses = [...(x.uses ?? []), use]; lines[at] = { ...x, uses, grams: shopGrams(uses.reduce((g, u) => g + u.grams, 0)), meals: uses.length }; }
+      else lines.push({ key, name: f.name, brand: f.brand ?? "", grams: use.grams, meals: 1, uses: [use], added: true });
+    }
+    // a food no meal needs now leaves, unless it is in the basket; the new meal's foods were matched first, so a food it
+    // shares with the old meal stays as it was, not as added
+    lines = lines.filter((x) => (x.uses ?? []).length > 0 || l.ticked.includes(x.key) || !x.uses);
+    const missing = (l.missing ?? []).filter((k) => lines.some((x) => x.key === k && (x.uses ?? []).length > 0) || l.carried.some((x) => x.key === k));
+    return { ...l, lines: lines.sort((a, b) => a.name.localeCompare(b.name)), missing };
+  }) };
 }

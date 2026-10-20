@@ -32,6 +32,14 @@ const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
     localStorage.setItem("seeded", "1"); }, [seed, PLAN]);
   await require("./adult.cjs")(page);
   await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
+  // SL5: Chef Mealan's answer for a short meal, stubbed: one food that stands in, one other meal that still needs rice
+  // (the app must drop that one), one meal that needs no rice
+  let shortAsk = null;
+  await page.route("**/api/status", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ai: true, airtable: false, accessRequired: false }) }));
+  await page.route("**/api/short", (r) => { shortAsk = JSON.parse(r.request().postData() || "{}"); r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ options: [
+    { kind: "standin", id: null, title: "Sarma with bulgur", why: "Bulgur holds the filling like rice.", swaps: [{ missing: "Rice, cooked", name: "Bulgur, cooked", grams: 150, calories: 83, protein: 3.1, fats: 0.2, carbs: 18.6 }], foods: [] },
+    { kind: "meal", id: null, title: "Rice bowl", why: "Still rice.", swaps: [], foods: [{ name: "Rice, cooked", grams: 200, calories: 130, protein: 2.7, fats: 0.3, carbs: 28 }] },
+    { kind: "meal", id: null, title: "Chicken, potatoes and salad", why: "No rice needed.", swaps: [], foods: [{ name: "Chicken breast, cooked", grams: 160, calories: 165, protein: 31, fats: 3.6, carbs: 0 }, { name: "Potato, boiled", grams: 250, calories: 87, protein: 1.9, fats: 0.1, carbs: 20.1 }] } ] }) }); });
   await page.goto(U + "/plan"); await page.waitForTimeout(1500);
   // SL2: the day said once, one main step
   const head = (await page.locator(".plan-head").textContent()).replace(/\s+/g, " ");
@@ -74,17 +82,30 @@ const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
   await sheet.getByRole("button", { name: "Copy the list" }).click(); await page.waitForTimeout(400);
   const text = await page.evaluate(() => navigator.clipboard.readText());
   ok(/^Shopping list 1, Tuesday 20 to Monday 26 October\n\n/.test(text) && !/Eggs/.test(text) && /Quark, low fat \(Magerquark\): 1,000 g/.test(text) && /Rice, cooked: [\d,]+ g \(not at the last shop\)/.test(text) && text.split("\n").length === 9, "Copy the list: what is left, one food per line; rice not at the last shop");
+  // SL5: Chef Mealan helps Wednesday's lunch, short of rice
+  const helps = sheet.locator(".shop-help");
+  ok(await helps.count() === 3 && /Wednesday lunch, Sarma\s*Short: Rice, cooked/.test(await helps.first().textContent()), "SL5: one card per short meal, with Ask Chef Mealan");
+  await helps.first().getByRole("button", { name: "Ask Chef Mealan" }).click(); await page.waitForTimeout(600);
+  ok(shortAsk && shortAsk.missing.join() === "Rice, cooked" && shortAsk.meal.title === "Sarma" && shortAsk.meal.foods.length === 3 && shortAsk.slot === "Wednesday lunch", "SL5: Chef Mealan is asked about Sarma, short of rice");
+  const opts = helps.first().locator(".shop-help-opt");
+  ok(await opts.count() === 2 && /Keep the dish\s*Sarma with bulgur/.test(await opts.first().textContent()) && /PD [\d.]+ · fits/.test(await opts.first().textContent()) && /Another meal\s*Chicken, potatoes and salad/.test(await opts.nth(1).textContent()), "SL5: the stand in and the other meal; the meal that still needs rice is dropped");
+  await opts.first().getByRole("button", { name: "Use this" }).click(); await page.waitForTimeout(500);
+  const wedLunch = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-planned"))["2026-10-21"].lunch);
+  ok(wedLunch.title === "Sarma with bulgur" && wedLunch.items.some((i) => i.food.name === "Bulgur, cooked") && !wedLunch.items.some((i) => i.food.name === "Rice, cooked"), "SL5: Wednesday's lunch in the plan is Sarma with bulgur");
+  ok(/Added · Sarma with bulgur: Wed lunch/.test(await sheet.locator(".shop-row").filter({ hasText: "Bulgur, cooked" }).textContent()) && await helps.count() === 2 && /Friday lunch, Sarma/.test(await helps.first().textContent()), "SL5: bulgur on the list, marked Added; Wednesday is no longer short, Friday and Sunday still are");
+  ok(/Rice, cooked\s*Sarma: Fri, Sun lunch/.test(await sheet.locator(".shop-row").filter({ hasText: "Rice, cooked" }).textContent()), "SL5: rice stays for Friday and Sunday");
+  // Changed by story SL5: bulgur is on the list now, so 8 foods are not ticked, and list 1 has 9 foods
   await sheet.getByRole("button", { name: "Finish the list" }).click(); await page.waitForTimeout(300);
-  ok(/7 foods aren't ticked\. Carry them to the next list\?/.test(await sheet.locator(".shop-ask").textContent()), "SL3: Finish asks about the 7 foods not ticked");
+  ok(/8 foods aren't ticked\. Carry them to the next list\?/.test(await sheet.locator(".shop-ask").textContent()), "SL3: Finish asks about the 8 foods not ticked");
   await sheet.getByRole("button", { name: "Carry them" }).click(); await page.waitForTimeout(400);
   const two = (await sheet.textContent()).replace(/\s+/g, " ");
-  ok(/Shopping list 2/.test(two) && /It starts Tuesday 27 October, the day after your last list/.test(two) && /plus 7 from list 1/.test(two), "SL3: list 2 starts the day after list 1 and brings its 7 foods: " + two.slice(0, 220));
-  ok(await sheet.locator(".shop-earlier .menu-row").count() === 1 && /Shopping list 1\s*Tuesday 20 to Monday 26 October · 8 foods · finished/.test(await sheet.locator(".shop-earlier").textContent()), "SL3: list 1 under Earlier lists");
+  ok(/Shopping list 2/.test(two) && /It starts Tuesday 27 October, the day after your last list/.test(two) && /plus 8 from list 1/.test(two), "SL3: list 2 starts the day after list 1 and brings its 8 foods: " + two.slice(0, 220));
+  ok(await sheet.locator(".shop-earlier .menu-row").count() === 1 && /Shopping list 1\s*Tuesday 20 to Monday 26 October · 9 foods · finished/.test(await sheet.locator(".shop-earlier").textContent()), "SL3: list 1 under Earlier lists");
   await sheet.getByRole("group", { name: "Days" }).getByRole("button", { name: "1 day" }).click();
   await sheet.getByRole("button", { name: "Make shopping list 2" }).click(); await page.waitForTimeout(400);
-  ok(/From list 1/.test(await sheet.textContent()) && await sheet.locator(".shop-row").count() === 7, "SL3: list 2 opens with the 7 foods from list 1");
+  ok(/From list 1/.test(await sheet.textContent()) && await sheet.locator(".shop-row").count() === 8, "SL3: list 2 opens with the 8 foods from list 1");
   await sheet.locator(".shop-earlier .menu-row").click(); await page.waitForTimeout(300);
-  ok(/Shopping list 1/.test(await sheet.locator(".shop-title").textContent()) && /Finished/.test(await sheet.textContent()) && await sheet.getByRole("button", { name: "Finish the list" }).count() === 0 && await sheet.locator(".shop-row[disabled]").count() === 8, "SL3: an earlier list reads, nothing to tick");
+  ok(/Shopping list 1/.test(await sheet.locator(".shop-title").textContent()) && /Finished/.test(await sheet.textContent()) && await sheet.getByRole("button", { name: "Finish the list" }).count() === 0 && await sheet.locator(".shop-row[disabled]").count() === 9, "SL3: an earlier list reads, nothing to tick");
   await b.close(); server.kill();
   console.log(fails.length ? `${fails.length} FAILED` : "all ok");
   process.exit(fails.length ? 1 : 0);
