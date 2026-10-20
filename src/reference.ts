@@ -249,6 +249,11 @@ export function localName(r: RefFood, region: string | null | undefined): string
   if (/munich|berlin|vienna|zurich|germany|austria|switzerland|de|at|ch/i.test(region)) return r.de;
   return r.en;
 }
+// a market's own foods, added with the starter foods for that place: Cyprus has fifty
+export function marketFoods(tags: Iterable<string>): RefFood[] {
+  const t = new Set(tags);
+  return t.has("cy") ? REFERENCE.filter((r) => r.id.startsWith("cy-")) : [];
+}
 // the two names shown under the local one: the Greek a Cypriot shop prints comes first, then English, Serbian, German
 export function otherNames(r: RefFood, region: string | null | undefined): string[] {
   const here = localName(r, region);

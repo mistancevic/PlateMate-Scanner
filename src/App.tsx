@@ -73,7 +73,7 @@ import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, type Mix, type MixTip } from "./mixtip";
-import { findReference, referenceFood, localName, otherNames } from "./reference";
+import { findReference, referenceFood, localName, otherNames, marketFoods } from "./reference";
 import { jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
 import { fitnessFor, SOURCES, dayName } from "./fitness";
@@ -2109,8 +2109,11 @@ export default function App() {
         const add = STARTER_FOODS
           .filter((f) => (STARTER_REGION[f.id] ?? ["*"]).some((t) => tags.has(t)))
           .filter((f) => !have.has((f.name + "|" + f.brand).toLowerCase())).map((f) => ({ ...f, id: uid(), reviewedAt: new Date().toISOString() }));
-        notify(add.length ? `${add.length} starter foods added.` : "Starter foods are already in your library.");
-        return { ...s, foods: [...s.foods, ...add] };
+        // the place's own foods come with them (Limassol: fifty Cypriot foods), each once, under any of its names
+        const named = new Set(s.foods.flatMap((f) => [f.name, ...(f.aliases ?? [])]).map((n) => n.toLowerCase()));
+        const local = marketFoods(tags).filter((r) => ![r.en, r.de, r.sr, r.cyr, r.el ?? ""].some((n) => n && named.has(n.toLowerCase()))).map((r) => referenceFood(r, region, uid));
+        notify(add.length + local.length ? `${add.length + local.length} starter foods added${local.length ? `, ${local.length} of them local` : ""}.` : "Starter foods are already in your library.");
+        return { ...s, foods: [...s.foods, ...add, ...local] };
       });
     },
     importAirtable: async () => {
