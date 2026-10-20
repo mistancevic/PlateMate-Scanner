@@ -3,7 +3,7 @@ import { tabOfPath } from "../back";
 import { RecipeCard } from "./RecipePages";
 import type { PublicRecipe } from "../recipes";
 import { Check } from "lucide-react";
-import { WANTS, DEMO_GOAL, BIG_BOWL, lift, smaller, alone, havesFor, PAIR_NOTES, startAmounts, describe, MILK_MIN, type Amounts } from "../landing";
+import { WANTS, HAVES, DEMO_GOAL, lift, alone, part, plate, unitOf, havesFor, PAIR_NOTES, type DemoFood } from "../landing";
 import { Mark, APP_NAME } from "../components/Mark";
 import { signIn } from "../cloud";
 import { hit } from "../metrics";
@@ -177,54 +177,62 @@ function TryIt() {
   // the calculator used: counted once per visit, at the first pick or step
   const counted = useRef(false);
   const used = () => { if (!counted.current) { counted.current = true; hit("hp_calc"); } };
+  // HP68 (Milan 23:35): pick a craving and a food you have, then set the weight of each; the plate's numbers follow
   const [want, setWantState] = useState(WANTS[0].id);
   const w = WANTS.find((x) => x.id === want)!;
   const offered = havesFor(w);
-  const [have, setHave] = useState(offered[0].id);
-  // HP68: the grams of the craving, and the milk with granola, each with a stepper; a new craving starts from its usual amount
-  const [amt, setAmt] = useState<Amounts>(startAmounts(WANTS[0]));
-  const setWant = (id: string) => { setWantState(id); const nw = WANTS.find((x) => x.id === id)!; setAmt(startAmounts(nw)); if (!havesFor(nw).some((h) => h.id === have)) setHave(havesFor(nw)[0].id); };
+  const [have, setHaveState] = useState(offered[0].id);
   const h = offered.find((x) => x.id === have) ?? offered[0];
-  const r = lift(w, h, DEMO_GOAL.pd, amt), a = alone(w, amt);
-  const big = r.grams > BIG_BOWL ? smaller(w, h, DEMO_GOAL.pd, amt) : null;
-  const hn = h.name.toLowerCase(), what = w.of ?? w.name.toLowerCase();
+  const [wg, setWg] = useState(w.grams ?? 40);
+  const [hg, setHg] = useState(h.grams ?? 100);
+  const setWant = (id: string) => { setWantState(id); const nw = WANTS.find((x) => x.id === id)!; setWg(nw.grams ?? 40); const nh = havesFor(nw).find((x) => x.id === have) ?? havesFor(nw)[0]; setHaveState(nh.id); setHg(nh.grams ?? 100); };
+  const setHave = (id: string) => { setHaveState(id); setHg(HAVES.find((x) => x.id === id)!.grams ?? 100); };
+  const a = alone(w, wg), p = plate(w, wg, h, hg);
+  const fits = p.pd >= DEMO_GOAL.pd;
+  const need = lift(w, h, DEMO_GOAL.pd, wg);
+  const reach = !fits && need.grams <= (h.max ?? 300);
+  const others = offered.filter((x) => x.id !== h.id && lift(w, x, DEMO_GOAL.pd, wg).grams <= (x.max ?? 300)).map((x) => x.name.toLowerCase());
+  const hn = h.name.toLowerCase(), wn = w.of ?? w.name.toLowerCase(), hu = unitOf(h);
   const Pick = ({ items, on, set }: { items: { id: string; name: string }[]; on: string; set: (v: string) => void }) => (
     <div className="chip-row">{items.map((x) => <button key={x.id} type="button" className={`choice ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} onClick={() => { used(); set(x.id); }}>{x.name}</button>)}</div>
   );
-  const Step = ({ name, value, unit, step, min, max, set }: { name: string; value: number; unit: string; step: number; min: number; max: number; set: (v: number) => void }) => (
-    <div className="l-amount">
-      <span>{name}</span>
-      <span className="rp-step">
-        <button type="button" aria-label={`${step} ${unit} less ${name.toLowerCase()}`} disabled={value - step < min} onClick={() => { used(); set(value - step); }}>−</button>
-        <b>{value} {unit}</b>
-        <button type="button" aria-label={`${step} ${unit} more ${name.toLowerCase()}`} disabled={value + step > max} onClick={() => { used(); set(value + step); }}>+</button>
-      </span>
-    </div>
-  );
+  // one picked food: its name, a stepper for its weight, and what that weight brings
+  const Weigh = ({ f, value, set }: { f: DemoFood; value: number; set: (v: number) => void }) => {
+    const u = unitOf(f), st = f.step ?? 10, n = part(f, value);
+    return (
+      <div className="l-amount">
+        <span><b>{f.name}</b><small>{n.kcal} kcal, {n.protein} g protein</small></span>
+        <span className="rp-step">
+          <button type="button" aria-label={`${st} ${u} less ${f.name.toLowerCase()}`} disabled={value - st < (f.min ?? st)} onClick={() => { used(); set(value - st); }}>−</button>
+          <b>{value} {u}</b>
+          <button type="button" aria-label={`${st} ${u} more ${f.name.toLowerCase()}`} disabled={value + st > (f.max ?? 300)} onClick={() => { used(); set(value + st); }}>+</button>
+        </span>
+      </div>
+    );
+  };
   return (
     <div className="l-try-box">
-      <div className="setting">
-        <small className="setting-name">You crave</small><Pick items={WANTS} on={want} set={setWant} />
-        <Step name={what[0].toUpperCase() + what.slice(1)} value={amt.grams} unit="g" step={w.step ?? 10} min={w.min ?? 10} max={w.max ?? 200} set={(g) => setAmt({ ...amt, grams: g })} />
-        {/* Milan 23:26: milk is a chip of its own, on or off; its stepper shows only when it is on, so it never reads 0 ml */}
-        {w.milk && <div className="l-amount"><span>With</span><button type="button" className={`choice ${amt.ml > 0 ? "on" : ""}`} aria-pressed={amt.ml > 0} onClick={() => { used(); setAmt({ ...amt, ml: amt.ml > 0 ? 0 : w.milk!.ml }); }}>{w.milk.name[0].toUpperCase() + w.milk.name.slice(1)}</button></div>}
-        {w.milk && amt.ml > 0 && <Step name={w.milk.name[0].toUpperCase() + w.milk.name.slice(1)} value={amt.ml} unit="ml" step={w.milk.step} min={MILK_MIN} max={w.milk.max} set={(ml) => setAmt({ ...amt, ml })} />}
-      </div>
+      <div className="setting"><small className="setting-name">You crave</small><Pick items={WANTS} on={want} set={setWant} /></div>
       <div className="setting"><small className="setting-name">You have at home</small><Pick items={offered} on={h.id} set={setHave} /></div>
+      <div className="setting">
+        <small className="setting-name">Your plate</small>
+        <Weigh f={w} value={wg} set={setWg} />
+        <Weigh f={h} value={hg} set={setHg} />
+      </div>
       {/* HP68: what PD is, before the first PD number a cold reader meets */}
       <div className="l-pd">
         <b>PD means protein density</b>
         <p>PD is grams of protein in 100 kcal. {DEMO_GOAL.name} aims for about PD {DEMO_GOAL.pd} at every meal. Below that, the meal is mostly energy.</p>
       </div>
       <div className="l-try-result" aria-live="polite">
-        <b>{r.grams > 0 ? `Add ${r.grams} g of ${hn}` : "This already fits"}</b>
+        <b>{fits ? "The plate fits" : `Under PD ${DEMO_GOAL.pd}`}</b>
         <div className="l-jump">
-          <div className="l-jump-from"><small>{describe(w, amt)}</small><b>PD {a.pd.toFixed(1)}</b><small>{a.kcal} kcal, {a.protein} g protein</small></div>
+          <div className="l-jump-from"><small>{wg} g of {wn} alone</small><b>PD {a.pd.toFixed(1)}</b><small>{a.kcal} kcal, {a.protein} g protein</small></div>
           <b className="l-jump-arrow" aria-hidden="true">→</b>
-          <div className="l-jump-to"><small>With the {hn}</small><b>PD {r.pd.toFixed(1)}</b><small>{r.kcal} kcal, {Math.round(r.protein)} g protein</small></div>
+          <div className={fits ? "l-jump-to" : "l-jump-from"}><small>With {hg} {hu} of {hn}</small><b>PD {p.pd.toFixed(1)}</b><small>{p.kcal} kcal, {Math.round(p.protein)} g protein</small></div>
         </div>
-        <span>{amt.ml > 0 && w.withMilk ? w.withMilk : w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} The {hn} adds the protein, so the plate fits.</span>
-        {big && <small>{r.total} g is a very big bowl. With {big.grams} g of {what} instead, {big.partner} g of {hn} is enough.</small>}
+        <span>{w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} {fits ? `The ${hn} adds the protein, so the plate fits.` : reach ? `${need.grams} ${hu} of ${hn} reaches PD ${DEMO_GOAL.pd}.` : `${h.name} has too little protein for its energy to bring this plate to PD ${DEMO_GOAL.pd}.${others.length ? ` Try ${others.join(", ")}.` : ""}`}</span>
+        {reach && <button type="button" className="pill pill-small" onClick={() => { used(); setHg(need.grams); }}>Use {need.grams} {hu}</button>}
       </div>
       <small className="l-try-small">A simplified version of Chef Mealan: one goal, six cravings and typical values from food labels. Nothing you pick here is saved.</small>
     </div>

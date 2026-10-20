@@ -85,30 +85,30 @@ test("the home page's Try it uses the app's lift: 40 g chocolate spread needs 12
 });
 
 test("the home page works for Recomposition at PD 6.5 and says how much is on the plate in all", async () => {
-  const { lift, smaller, alone, havesFor, describe, startAmounts, WANTS, HAVES, DEMO_GOAL, BIG_BOWL } = await import("./landing");
+  const { lift, smaller, alone, part, plate, havesFor, WANTS, HAVES, DEMO_GOAL, BIG_BOWL } = await import("./landing");
   const spread = WANTS.find((w) => w.id === "spread")!, skyr = HAVES.find((h) => h.id === "skyr")!;
   const r = lift(spread, skyr, DEMO_GOAL.pd);
   assert.equal(r.grams, 165); assert.equal(r.total, 205); assert.equal(r.kcal, 320); assert.equal(Math.round(r.protein), 21); assert.equal(r.pd, 6.5);
-  // Changed by story HP68 (Milan, 20 October 2026): granola starts with the Milk 1.5% chip on, the bowl of Worthy Numbers page 8.
-  // 60 g with 200 ml is 364 kcal, 12.2 g protein, PD 3.4; 165 g of skyr lifts it to 6.5. Without milk, 60 g of granola is PD 2.0.
-  const g = lift(WANTS[0], skyr, DEMO_GOAL.pd), g0 = alone(WANTS[0]);
-  assert.equal(WANTS[0].id, "granola"); assert.equal(g0.kcal, 364); assert.equal(g0.protein, 12.2); assert.equal(g0.pd, 3.4);
-  assert.equal(g.grams, 165); assert.equal(g.pd, 6.5);
-  assert.equal(alone(WANTS[0], { grams: 60, ml: 0 }).pd, 2);
-  assert.equal(describe(WANTS[0]), "60 g of granola with 200 ml of milk 1.5%"); assert.equal(describe(WANTS[0], { grams: 50, ml: 0 }), "50 g of granola");
+  // Changed by story HP68 (Milan, 20 October 2026, 23:35): a craving and a food you have, each at its own weight. The page
+  // opens on 60 g of granola with 150 g of skyr: PD 6.0, under the goal, and 175 g of skyr reaches 6.5.
+  // Milk 1.5% is a food you have: 60 g of granola with 200 ml is 364 kcal, 12.2 g protein, PD 3.4, and milk can't reach 6.5.
+  const milk = HAVES.find((h) => h.id === "milk")!;
+  assert.equal(WANTS[0].id, "granola"); assert.equal(havesFor(WANTS[0])[0].id, "skyr"); assert.equal(havesFor(WANTS[0])[1].id, "milk");
+  const open = plate(WANTS[0], 60, skyr, 150); assert.equal(open.pd, 6); assert.equal(open.kcal, 365);
+  assert.equal(lift(WANTS[0], skyr, DEMO_GOAL.pd, 60).grams, 175); assert.equal(plate(WANTS[0], 60, skyr, 175).pd, 6.5);
+  const m = plate(WANTS[0], 60, milk, 200); assert.equal(m.kcal, 364); assert.equal(m.protein, 12.2); assert.equal(m.pd, 3.4);
+  assert.ok(lift(WANTS[0], milk, DEMO_GOAL.pd, 60).grams > milk.max!, "milk alone can't lift granola to the goal");
+  assert.equal(alone(WANTS[0], 60).pd, 2); assert.equal(part(milk, 200).protein, 6.8);
   const pizza = WANTS.find((w) => w.id === "pizza")!;
   assert.equal(lift(pizza, HAVES.find((h) => h.id === "tuna")!, DEMO_GOAL.pd).grams, 40);
   // every craving with every food offered next to it stays a sensible bowl; a savoury craving is never offered skyr
-  for (const w of WANTS) for (const h of havesFor(w)) { const x = lift(w, h, DEMO_GOAL.pd); assert.ok(x.grams > 0 && x.grams <= BIG_BOWL, `${w.id}+${h.id}: ${x.grams} g`); }
-  // HP68: at every stepper value, the answer is a sensible bowl, or a smaller amount of the craving that is
-  for (const w of WANTS) for (const h of havesFor(w)) for (let gr = w.min!; gr <= w.max!; gr += w.step!) for (const ml of w.milk ? [0, ...Array.from({ length: (w.milk.max - 50) / w.milk.step + 1 }, (_, i) => 50 + i * w.milk!.step)] : [0]) {
-    const am = { grams: gr, ml }, x = lift(w, h, DEMO_GOAL.pd, am);
-    assert.ok(x.pd >= 6 && Number.isFinite(x.pd), `${w.id}+${h.id} ${gr} g ${ml} ml: PD ${x.pd}`);
-    if (x.grams > BIG_BOWL) assert.ok(smaller(w, h, DEMO_GOAL.pd, am), `${w.id}+${h.id} ${gr} g: no smaller bowl`);
-  }
-  for (const w of WANTS) assert.equal(startAmounts(w).grams, w.grams);
+  // milk is the one food you have that can never lift a craving to the goal; the page says so and names the others
+  for (const w of WANTS) for (const h of havesFor(w).filter((h) => h.id !== "milk")) { const x = lift(w, h, DEMO_GOAL.pd); assert.ok(x.grams > 0 && x.grams <= h.max!, `${w.id}+${h.id}: ${x.grams} g`); }
+  // HP68: every stepper stays on its own range, and the plate's PD is always a number
+  for (const w of WANTS) for (const h of havesFor(w)) { assert.ok(h.grams! >= h.min! && h.grams! <= h.max!); for (let gr = w.min!; gr <= w.max!; gr += w.step!) assert.ok(Number.isFinite(plate(w, gr, h, h.grams!).pd)); }
+
   assert.ok(!havesFor(pizza).some((h) => h.id === "skyr"));
-  const s = smaller({ ...spread, grams: 80 }, HAVES[1], DEMO_GOAL.pd);
+  const s = smaller({ ...spread, grams: 80 }, HAVES.find((h) => h.id === "yogurt")!, DEMO_GOAL.pd);
   assert.ok(s && s.partner <= BIG_BOWL && s.grams < 80);
 });
 test("protein: the middle of the range, the top when losing fat, eating mostly plants or over 60", async () => {
