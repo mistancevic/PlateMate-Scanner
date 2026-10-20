@@ -6,7 +6,9 @@ import type { Slot } from "./slots";
 export type Source = "mine" | "coach" | "starter" | "plate";
 export type PlannedMeal = { title: string; kcal: number; protein: number; source: Source; mealId?: string; items?: Ingredient[]; portion?: number; servings?: number;
   // 0.2.6 (canvas board CW, CW7): skipped on purpose; the meal counts as closed for a day lived by the plan
-  skipped?: boolean };
+  skipped?: boolean;
+  // SL6 (0.2.64): how a meal changed for this day only came to be (from a shopping list, picked from Chef Mealan's ideas); shown when it is opened
+  note?: string };
 export type Planned = Record<string, Record<string, PlannedMeal>>; // by date (ymd), then by slot id
 
 const KEY = "chefmealan-planned";

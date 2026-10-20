@@ -47,8 +47,8 @@ export function shoppingText(list: ShopList, span: string, ticked: Set<string>):
 // What is on it is what it is; a later change to the plan does not touch it. One list is open at a time. The next list starts
 // the day after the last one ends, so nothing is bought twice. Finishing asks about the foods not ticked: carry them to the
 // next list, or leave them. On this phone only; another phone makes its own.
-// missing: the foods marked Not there in the shop (SL4); they stay on the list and count as not bought
-export type SavedList = { n: number; madeAt: string; from: string; to: string; meals: number; lines: ShopLine[]; without: ShopList["without"]; carried: ShopLine[]; carriedFrom: number | null; ticked: string[]; missing?: string[]; doneAt?: string };
+// missing: the foods marked Not this time (SL4, named 20:14); they stay on the list and count as not bought
+export type SavedList = { n: number; madeAt: string; from: string; to: string; meals: number; lines: ShopLine[]; without: ShopList["without"]; carried: ShopLine[]; carriedFrom: number | null; ticked: string[]; missing?: string[]; changes?: { date: string; slot: string; from: string; to: string; because?: string[] }[]; doneAt?: string };
 export type ShopStore = { lists: SavedList[]; carry: { from: number; lines: ShopLine[] } | null };
 const LKEY = "chefmealan-shopping-lists";
 export const getStore = (): ShopStore => { try { const s = JSON.parse(localStorage.getItem(LKEY) || "{}"); return { lists: Array.isArray(s.lists) ? s.lists : [], carry: s.carry ?? null }; } catch { return { lists: [], carry: null }; } };
@@ -68,14 +68,14 @@ export function makeList(s: ShopStore, planned: Planned, days: string[], madeAt:
   const list: SavedList = { n, madeAt, from: days[0], to: days[days.length - 1], meals: l.meals, lines: l.lines, without: l.without, carried: (s.carry?.lines ?? []).map((x) => ({ ...x, key: `c:${x.key.replace(/^c:/, "")}` })), carriedFrom: s.carry?.from ?? null, ticked: [] };
   return { lists: [list, ...s.lists], carry: null };
 }
-// a tap moves a food on: to buy, then in the basket, then not there, then back to buy (SL4)
+// a tap moves a food on: to buy, then in the basket, then not this time, then back to buy (SL4)
 export const stateOf = (l: SavedList, key: string): "buy" | "got" | "missing" => (l.ticked.includes(key) ? "got" : (l.missing ?? []).includes(key) ? "missing" : "buy");
 export const tickIn = (s: ShopStore, n: number, key: string): ShopStore => ({ ...s, lists: s.lists.map((l) => {
   if (l.n !== n) return l;
   const st = stateOf(l, key), missing = (l.missing ?? []).filter((k) => k !== key), ticked = l.ticked.filter((k) => k !== key);
   return st === "buy" ? { ...l, ticked: [...ticked, key], missing } : st === "got" ? { ...l, ticked, missing: [...missing, key] } : { ...l, ticked, missing };
 }) });
-// the meals a food marked Not there leaves short, in the order of the days
+// the meals a food marked Not this time leaves short, in the order of the days
 export function shortMeals(l: SavedList): { date: string; slot: string; title: string; foods: string[] }[] {
   const out: { date: string; slot: string; title: string; foods: string[] }[] = [];
   for (const x of [...l.carried, ...l.lines]) {
@@ -99,21 +99,22 @@ export function finishList(s: ShopStore, n: number, carry: boolean, at: string):
 }
 export function listText(l: SavedList, span: string): string {
   const shown = (x: ShopLine) => `${x.name}${x.brand && !/typical values|generic|check your/i.test(x.brand) ? ` (${x.brand})` : ""}: ${x.grams.toLocaleString("en")} g`;
-  return [`Shopping list ${l.n}, ${span}`, "", ...notTicked(l).map((x) => shown(x) + ((l.missing ?? []).includes(x.key) ? " (not at the last shop)" : ""))].join("\n");
+  return [`Shopping list ${l.n}, ${span}`, "", ...notTicked(l).map((x) => shown(x) + ((l.missing ?? []).includes(x.key) ? " (not bought last time)" : ""))].join("\n");
 }
 
 // SL5 (0.2.63): a short meal changed with Chef Mealan's help. The plan's meal for that slot is new, and the open list
 // follows it: the old meal's foods leave that meal, the new meal's foods join, marked as added. A food already in the
-// basket stays on the list even when no meal needs it now; a food not there that no meal needs now leaves the list.
+// basket stays on the list even when no meal needs it now; a food marked Not this time that no meal needs now leaves the list.
 export type NewFood = { name: string; brand: string; grams: number };
-export function replanMeal(s: ShopStore, n: number, date: string, slot: string, title: string, foods: NewFood[]): ShopStore {
+export function replanMeal(s: ShopStore, n: number, date: string, slot: string, title: string, foods: NewFood[], from = "", because: string[] = []): ShopStore {
   return { ...s, lists: s.lists.map((l) => {
     if (l.n !== n) return l;
-    let lines = l.lines.map((x) => {
+    // the old meal's foods leave that meal: in the foods for these days and in the foods carried from the last list
+    const drop = (x: ShopLine) => {
       const uses = (x.uses ?? []).filter((u) => !(u.date === date && u.slot === slot));
-      if (uses.length === (x.uses ?? []).length) return x;
-      return { ...x, uses, grams: shopGrams(uses.reduce((g, u) => g + u.grams, 0)), meals: uses.length };
-    });
+      return uses.length === (x.uses ?? []).length ? x : { ...x, uses, grams: shopGrams(uses.reduce((g, u) => g + u.grams, 0)), meals: uses.length };
+    };
+    let lines = l.lines.map(drop), carried = l.carried.map(drop);
     for (const f of foods) {
       if (!(f.grams > 0)) continue;
       const key = `${f.name}|${f.brand ?? ""}`.toLowerCase();
@@ -123,8 +124,11 @@ export function replanMeal(s: ShopStore, n: number, date: string, slot: string, 
     }
     // a food no meal needs now leaves, unless it is in the basket; the new meal's foods were matched first, so a food it
     // shares with the old meal stays as it was, not as added
-    lines = lines.filter((x) => (x.uses ?? []).length > 0 || l.ticked.includes(x.key) || !x.uses);
-    const missing = (l.missing ?? []).filter((k) => lines.some((x) => x.key === k && (x.uses ?? []).length > 0) || l.carried.some((x) => x.key === k));
-    return { ...l, lines: lines.sort((a, b) => a.name.localeCompare(b.name)), missing };
+    const keep = (x: ShopLine) => (x.uses ?? []).length > 0 || l.ticked.includes(x.key) || !x.uses;
+    lines = lines.filter(keep); carried = carried.filter(keep);
+    const needed = (k: string) => [...lines, ...carried].some((x) => x.key === k && (x.uses ?? []).length > 0);
+    const missing = (l.missing ?? []).filter(needed);
+    const changes = [...(l.changes ?? []).filter((c) => !(c.date === date && c.slot === slot)), { date, slot, from: (l.changes ?? []).find((c) => c.date === date && c.slot === slot)?.from ?? from, to: title, because: (l.changes ?? []).find((c) => c.date === date && c.slot === slot)?.because ?? because }];
+    return { ...l, lines: lines.sort((a, b) => a.name.localeCompare(b.name)), carried, missing, changes };
   }) };
 }

@@ -1,5 +1,5 @@
-// SL5 (0.2.63, Milan 15:48 to 19:00): Chef Mealan helps a meal left short at the shop. Asked from the shopping list, it
-// offers a food that stands in for what wasn't there, so the dish is still the dish, and another meal for that slot. The
+// SL5 (0.2.63, Milan 15:48 to 19:00): Chef Mealan helps a meal left short by a food marked Not this time. Asked from the shopping list, it
+// offers a swap for the food that wasn't there, so the recipe stays the same otherwise, and another meal for that slot. The
 // app builds each option's foods, drops one that hits a declared allergy or still needs a missing food, and shows its PD
 // against the day's target. Use this puts it in the plan for that day only (the recipe stays as it is), and the list follows.
 import { useState } from "react";
@@ -13,13 +13,13 @@ import { fmt, pdVal } from "../ui";
 import { CHEF_NAME } from "./Mark";
 import type { NewFood } from "../shopping";
 
-type Opt = { kind: "standin" | "meal"; title: string; why: string; items: Ingredient[]; kcal: number; protein: number; pd: number | null; mealId?: string; source: PlannedMeal["source"] };
+type Opt = { kind: "standin" | "meal"; title: string; why: string; note: string; items: Ingredient[]; kcal: number; protein: number; pd: number | null; mealId?: string; source: PlannedMeal["source"] };
 const estimate = (f: { name: string; calories: number; protein: number; fats: number; carbs: number }): Food => ({
   id: uid(), name: f.name, brand: "estimate", basis: "100g", source: "estimate", notes: `${CHEF_NAME}'s estimate`,
   reviewedAt: new Date().toISOString(), readyToEat: true, calories: f.calories, protein: f.protein, fats: f.fats, carbs: f.carbs, fiber: null,
 } as Food);
 
-export function ShortHelp({ p, date, slot, label, title, missing, onUsed }: { p: AppApi; date: string; slot: string; label: string; title: string; missing: string[]; onUsed: (title: string, foods: NewFood[]) => void }) {
+export function ShortHelp({ p, list, date, slot, label, title, missing, onUsed }: { p: AppApi; list: number; date: string; slot: string; label: string; title: string; missing: string[]; onUsed: (title: string, foods: NewFood[]) => void }) {
   const [busy, setBusy] = useState(false), [opts, setOpts] = useState<Opt[] | null>(null), [err, setErr] = useState("");
   const held = p.planned[date]?.[slot] ?? null;
   const portion = held ? plannedPortion(held, "short", "") : null;
@@ -41,7 +41,12 @@ export function ShortHelp({ p, date, slot, label, title, missing, onUsed }: { p:
     }
     if (!items.length || items.some((i) => isMissing(i.food.name) || blockedByAllergy(i.food, p.safety.allergies ?? []))) return null;
     const a = aggregate(items), kcal = Math.round(a.calories ?? 0), protein = Math.round(a.protein ?? 0);
-    return { kind: o.kind === "meal" ? "meal" : "standin", title: name, why: String(o.why || ""), items, kcal, protein, pd: density(protein, kcal), mealId, source };
+    // who did what, said plainly: Chef Mealan suggests, the person picks, the app changes the plan
+    const foods = missing.join(", ").toLowerCase();
+    const note = o.kind === "standin"
+      ? `You swapped ${foods} for ${(o.swaps ?? []).map((w: any) => String(w.name).toLowerCase()).join(", ")} because you marked ${foods} Not this time on shopping list ${list}. From ${CHEF_NAME}'s ideas. This day only; ${title} stays as it is.`
+      : `You picked this in place of ${title} because you marked ${foods} Not this time on shopping list ${list}. From ${CHEF_NAME}'s ideas. This day only.`;
+    return { kind: o.kind === "meal" ? "meal" : "standin", title: name, why: String(o.why || ""), note, items, kcal, protein, pd: density(protein, kcal), mealId, source };
   };
   const ask = async () => {
     if (!p.ai.on) { setErr(p.ai.why || `${CHEF_NAME} is not available right now.`); return; }
@@ -59,9 +64,11 @@ export function ShortHelp({ p, date, slot, label, title, missing, onUsed }: { p:
       setOpts(((d.options ?? []) as any[]).map(build).filter((x): x is Opt => !!x));
     } catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   };
+  const [using, setUsing] = useState(false);
   const use = (o: Opt) => {
+    if (using) return; setUsing(true);
     const weight = o.items.reduce((n, i) => n + i.grams, 0);
-    p.fill(date, slot, { title: o.title, kcal: o.kcal, protein: o.protein, source: o.source, ...(o.mealId ? { mealId: o.mealId } : {}), items: o.items, portion: Math.round(weight) });
+    p.fill(date, slot, { title: o.title, kcal: o.kcal, protein: o.protein, source: o.source, ...(o.mealId ? { mealId: o.mealId } : { note: o.note }), items: o.items, portion: Math.round(weight) });
     onUsed(o.title, o.items.map((i) => ({ name: i.food.name, brand: i.food.brand ?? "", grams: i.grams })));
   };
   return (
@@ -76,11 +83,11 @@ export function ShortHelp({ p, date, slot, label, title, missing, onUsed }: { p:
         const fits = target === null || (o.pd !== null && o.pd >= target - 0.05);
         return (
           <div key={k} className="shop-help-opt">
-            <small className="shop-help-kind">{o.kind === "standin" ? "Keep the dish" : "Another meal"}</small>
+            <small className="shop-help-kind">{o.kind === "standin" ? "Swap a food" : "Another meal"}</small>
             <b>{o.title}</b>
             {o.why && <small>{o.why}</small>}
             <small className={fits ? "fit-ok" : "fit-under"}>{fmt(o.kcal, 0)} kcal · {o.protein} g protein · PD {pdVal(o.pd)}{fits ? " · fits" : ` · under your ${pdVal(target)}`}</small>
-            <div className="button-row"><button type="button" className="pill pill-small" onClick={() => use(o)}>Use this</button></div>
+            <div className="button-row"><button type="button" className="pill pill-small" disabled={using} onClick={() => use(o)}>Use this</button></div>
           </div>
         );
       })}

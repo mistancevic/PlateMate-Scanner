@@ -1,4 +1,4 @@
-// JOURNEY (0.2.60, boards SL1 and SL2; Milan 15:48 to 16:11; changed by story SL3 in 0.2.61 and SL4 in 0.2.62): Plan says the day once, in one head card, with one main step.
+// JOURNEY (0.2.60, boards SL1 and SL2; Milan 15:48 to 16:11; changed by story SL3 in 0.2.61, SL4 in 0.2.62, SL5 in 0.2.63 and SL6 in 0.2.64): Plan says the day once, in one head card, with one main step.
 // Shopping list, the next 7 days adds up the planned meals' foods, names a meal without foods, keeps ticks, copies what is left.
 const { chromium } = require("playwright");
 const path = require("node:path"); const S = { MAIN: path.resolve(__dirname, "../..") };
@@ -67,11 +67,12 @@ const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
   ok(/Shopping list 1, open/.test(await page.locator(".plan-shop").textContent()), "SL3: Plan's button names the open list");
   await page.locator(".plan-shop").click(); await page.waitForTimeout(400);
   ok(/15 planned meals/.test(await sheet.textContent()) && await page.locator(".shop-row.got").filter({ hasText: "Eggs" }).count() === 1, "SL3: a later change to the plan doesn't touch the list; the tick stays");
-  // SL4: Not there, and the list by meal
+  // Changed by story SL6 (0.2.64, Milan 19:54 to 20:22): the neutral mark is Not this time; Swap a food, not Keep the dish
+  // SL4: Not this time, and the list by meal
   const rice = sheet.locator(".shop-row").filter({ hasText: "Rice, cooked" });
   await rice.click(); await rice.click(); await page.waitForTimeout(200);
-  ok(await sheet.locator(".shop-row.missing").count() === 1 && /Not there/.test(await rice.textContent()), "SL4: a second tap marks rice Not there");
-  ok(/Not there: Rice, cooked\. Short now: Wednesday lunch, Sarma; Friday lunch, Sarma; Sunday lunch, Sarma\./.test(await sheet.locator(".shop-short").textContent()), "SL4: the list says which meals are short: " + await sheet.locator(".shop-short").textContent());
+  ok(await sheet.locator(".shop-row.missing").count() === 1 && /Not this time/.test(await rice.textContent()), "SL4: a second tap marks rice Not this time");
+  ok(/Not this time: Rice, cooked\. Short now: Wednesday lunch, Sarma; Friday lunch, Sarma; Sunday lunch, Sarma\./.test(await sheet.locator(".shop-short").textContent()), "SL4: the list says which meals are short: " + await sheet.locator(".shop-short").textContent());
   await sheet.getByRole("tab", { name: "By meal" }).click(); await page.waitForTimeout(300);
   const days = await sheet.locator(".shop-day .pick-group").allTextContents();
   const wed = sheet.locator(".shop-day").nth(1);
@@ -81,14 +82,14 @@ const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
   await sheet.getByRole("tab", { name: "By food" }).click(); await page.waitForTimeout(200);
   await sheet.getByRole("button", { name: "Copy the list" }).click(); await page.waitForTimeout(400);
   const text = await page.evaluate(() => navigator.clipboard.readText());
-  ok(/^Shopping list 1, Tuesday 20 to Monday 26 October\n\n/.test(text) && !/Eggs/.test(text) && /Quark, low fat \(Magerquark\): 1,000 g/.test(text) && /Rice, cooked: [\d,]+ g \(not at the last shop\)/.test(text) && text.split("\n").length === 9, "Copy the list: what is left, one food per line; rice not at the last shop");
+  ok(/^Shopping list 1, Tuesday 20 to Monday 26 October\n\n/.test(text) && !/Eggs/.test(text) && /Quark, low fat \(Magerquark\): 1,000 g/.test(text) && /Rice, cooked: [\d,]+ g \(not bought last time\)/.test(text) && text.split("\n").length === 9, "Copy the list: what is left, one food per line; rice not bought last time");
   // SL5: Chef Mealan helps Wednesday's lunch, short of rice
   const helps = sheet.locator(".shop-help");
   ok(await helps.count() === 3 && /Wednesday lunch, Sarma\s*Short: Rice, cooked/.test(await helps.first().textContent()), "SL5: one card per short meal, with Ask Chef Mealan");
   await helps.first().getByRole("button", { name: "Ask Chef Mealan" }).click(); await page.waitForTimeout(600);
   ok(shortAsk && shortAsk.missing.join() === "Rice, cooked" && shortAsk.meal.title === "Sarma" && shortAsk.meal.foods.length === 3 && shortAsk.slot === "Wednesday lunch", "SL5: Chef Mealan is asked about Sarma, short of rice");
   const opts = helps.first().locator(".shop-help-opt");
-  ok(await opts.count() === 2 && /Keep the dish\s*Sarma with bulgur/.test(await opts.first().textContent()) && /PD [\d.]+ · fits/.test(await opts.first().textContent()) && /Another meal\s*Chicken, potatoes and salad/.test(await opts.nth(1).textContent()), "SL5: the stand in and the other meal; the meal that still needs rice is dropped");
+  ok(await opts.count() === 2 && /Swap a food\s*Sarma with bulgur/.test(await opts.first().textContent()) && /PD [\d.]+ · fits/.test(await opts.first().textContent()) && /Another meal\s*Chicken, potatoes and salad/.test(await opts.nth(1).textContent()), "SL5: the stand in and the other meal; the meal that still needs rice is dropped");
   await opts.first().getByRole("button", { name: "Use this" }).click(); await page.waitForTimeout(500);
   const wedLunch = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-planned"))["2026-10-21"].lunch);
   ok(wedLunch.title === "Sarma with bulgur" && wedLunch.items.some((i) => i.food.name === "Bulgur, cooked") && !wedLunch.items.some((i) => i.food.name === "Rice, cooked"), "SL5: Wednesday's lunch in the plan is Sarma with bulgur");
@@ -106,6 +107,29 @@ const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
   ok(/From list 1/.test(await sheet.textContent()) && await sheet.locator(".shop-row").count() === 8, "SL3: list 2 opens with the 8 foods from list 1");
   await sheet.locator(".shop-earlier .menu-row").click(); await page.waitForTimeout(300);
   ok(/Shopping list 1/.test(await sheet.locator(".shop-title").textContent()) && /Finished/.test(await sheet.textContent()) && await sheet.getByRole("button", { name: "Finish the list" }).count() === 0 && await sheet.locator(".shop-row[disabled]").count() === 9, "SL3: an earlier list reads, nothing to tick");
+  // SL6: a food carried from list 1, marked Not this time on list 2; the change is said on the list; Plan opens the meal
+  await sheet.getByRole("button", { name: "‹ Shopping lists" }).click(); await page.waitForTimeout(300);
+  const cRice = sheet.locator(".shop-list").first().locator(".shop-row").filter({ hasText: "Rice, cooked" });
+  ok(/Sarma: Fri, Sun lunch/.test(await cRice.textContent()), "SL6: rice comes from list 1, for Friday's and Sunday's lunch");
+  await cRice.click(); await cRice.click(); await page.waitForTimeout(300);
+  ok(await sheet.locator(".shop-help").count() === 2 && /Friday lunch, Sarma/.test(await sheet.locator(".shop-help").first().textContent()), "SL6: the carried rice leaves Friday and Sunday short");
+  await sheet.locator(".shop-help").first().getByRole("button", { name: "Ask Chef Mealan" }).click(); await page.waitForTimeout(600);
+  const use6 = sheet.locator(".shop-help").first().locator(".shop-help-opt").first().getByRole("button", { name: "Use this" });
+  await use6.click(); await page.waitForTimeout(500);
+  ok(await sheet.locator(".shop-help").count() === 1 && /Sunday lunch, Sarma/.test(await sheet.locator(".shop-help").first().textContent()) && /Sarma: Sun lunch/.test(await sheet.locator(".shop-list").first().locator(".shop-row").filter({ hasText: "Rice, cooked" }).textContent()), "SL6: Friday is no longer short; the carried rice stays only for Sunday");
+  const box = (await sheet.locator(".shop-changed").textContent()).replace(/\s+/g, " ");
+  ok(/Changed from this list/.test(box) && /Friday lunch is now Sarma with bulgur, in place of Sarma, because you marked rice, cooked Not this time\. You picked it from Chef Mealan's ideas\. This day only\./.test(box) && !/at the shop/.test(box), "SL6: the list says what changed, why, and who picked it: " + box);
+  await sheet.getByRole("button", { name: "See it in Plan ›" }).click(); await page.waitForTimeout(700);
+  ok(/Friday, 23 October/.test(await page.locator(".plan-head .plan-day-head b").textContent()), "SL6: See it in Plan opens Friday");
+  await page.getByRole("button", { name: /^Lunch at .*, Sarma with bulgur/ }).click(); await page.waitForTimeout(500);
+  const ms = page.getByRole("dialog", { name: /Sarma with bulgur/ });
+  const mt = (await ms.textContent()).replace(/\s+/g, " ");
+  ok(/You swapped rice, cooked for bulgur, cooked because you marked rice, cooked Not this time on shopping list 2\. From Chef Mealan's ideas\. This day only; Sarma stays as it is\./.test(mt) && /Bulgur, cooked\s*Chef Mealan's estimate/.test(mt) && /PD [\d.]+/.test(mt), "SL6: Plan opens the meal: how it came to be, its foods, its numbers: " + mt.slice(0, 200));
+  ok(await ms.getByRole("button", { name: "Swap" }).count() === 1 && await ms.getByRole("button", { name: "Make it on the Plate" }).count() === 1, "SL6: Swap, Save in My recipes, Make it on the Plate");
+  await ms.getByRole("button", { name: "Save in My recipes" }).click(); await page.waitForTimeout(500);
+  const fri = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-planned"))["2026-10-23"].lunch);
+  const kept = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.find((m) => m.title === "Sarma with bulgur"));
+  ok(kept && fri.mealId === kept.id && !fri.note, "SL6: Save in My recipes keeps it as a recipe, and the plan points at it");
   await b.close(); server.kill();
   console.log(fails.length ? `${fails.length} FAILED` : "all ok");
   process.exit(fails.length ? 1 : 0);
