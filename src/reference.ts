@@ -1,10 +1,10 @@
 // The reference table: basic foods that carry no label and no barcode. Vegetables, fruit, eggs, meat, fish, dairy by
 // its generic name, grains, legumes, nuts, oils, basics. Values per 100 g from USDA FoodData Central (SR Legacy) unless
 // the source says otherwise; carbohydrate stored excluding fibre, the app's convention. Names in English, German and
-// Serbian (Latin and Cyrillic), so "tikvice" finds the courgette. A courgette is a courgette in every city.
+// Serbian (Latin and Cyrillic), and Greek for the Cypriot foods, so "tikvice" finds the courgette and "χαλλούμι" the halloumi. A courgette is a courgette in every city.
 import type { Food } from "./pilot";
 
-export type RefFood = { id: string; en: string; de: string; sr: string; cyr: string; kcal: number; protein: number; fats: number; carbsTotal: number; fiber: number; ready: boolean; source?: string };
+export type RefFood = { id: string; en: string; de: string; sr: string; cyr: string; el?: string; kcal: number; protein: number; fats: number; carbsTotal: number; fiber: number; ready: boolean; source?: string };
 const U = "USDA FoodData Central, SR Legacy";
 const T = "typical values, producers vary";
 // id, en, de, sr, cyr, kcal, protein, fats, carbs (total, as USDA prints), fibre, ready to eat
@@ -147,14 +147,81 @@ const R: [string, string, string, string, string, number, number, number, number
   ["tomato-passata", "Tomato passata", "Passierte Tomaten", "Pasirani paradajz", "Пасирани парадајз", 38, 1.6, 0.2, 7.0, 1.5, true, T],
 ];
 // the groups, by the first id of each: the table is written in this order
+// Cyprus, for Limassol (0.2.58): fifty foods from Cypriot shops, grills, tavernas and home kitchens. Same columns, plus the
+// Greek name the shop or menu prints. Cheeses, cured meats and breads are typical label values; dishes are a typical home
+// recipe per 100 g as served, so the estimate says so; plain produce is USDA.
+const D = "typical home recipe, an estimate, recipes vary";
+// id, en, el, de, sr, cyr, kcal, protein, fats, carbs (total), fibre, ready to eat, source
+const CY: [string, string, string, string, string, string, number, number, number, number, number, boolean, string][] = [
+  // cheese and dairy
+  ["cy-halloumi", "Halloumi", "Χαλλούμι", "Halloumi", "Halumi", "Халуми", 321, 21.5, 25, 1.8, 0, true, T],
+  ["cy-anari-fresh", "Anari, fresh whey cheese", "Αναρή, φρέσκια", "Anari, frischer Molkenkäse", "Anari, sveži sir od surutke", "Анари, свежи сир од сурутке", 170, 11, 12.5, 3, 0, true, T],
+  ["cy-anari-dry", "Anari, dried, for grating", "Αναρή, ξερή", "Anari, getrocknet, zum Reiben", "Anari, suvi, za rendanje", "Анари, суви, за рендање", 370, 32, 26, 3, 0, true, T],
+  ["cy-kefalotyri", "Kefalotyri, hard cheese", "Κεφαλοτύρι", "Kefalotyri, Hartkäse", "Kefalotiri, tvrdi sir", "Кефалотири, тврди сир", 400, 26, 33, 1, 0, true, T],
+  ["cy-yoghurt-sheep", "Sheep's milk yoghurt, Cypriot", "Πρόβειο γιαούρτι", "Schafsjoghurt, zyprisch", "Ovčiji jogurt, kiparski", "Овчији јогурт, кипарски", 105, 5.5, 6.5, 5, 0, true, T],
+  ["cy-trahanas", "Trahanas, dried (cracked wheat and sour milk)", "Τραχανάς", "Trahanas, getrocknet (Weizenschrot und Sauermilch)", "Tarana, suva (prekrupa i kiselo mleko)", "Тарана, сува (прекрупа и кисело млеко)", 360, 14, 4, 70, 4, false, T],
+  // grill, meat dishes and charcuterie
+  ["cy-souvla", "Souvla, pork, spit grilled", "Σούβλα χοιρινή", "Souvla, Schwein, am Spieß gegrillt", "Suvla, svinjetina sa ražnja", "Сувла, свињетина са ражња", 250, 26, 16, 0, 0, true, T],
+  ["cy-souvlaki-pork", "Souvlaki, pork, grilled", "Σουβλάκι χοιρινό", "Souvlaki, Schwein, gegrillt", "Suvlaki, svinjski, sa roštilja", "Сувлаки, свињски, са роштиља", 230, 27, 13.5, 0, 0, true, T],
+  ["cy-souvlaki-chicken", "Souvlaki, chicken, grilled", "Σουβλάκι κοτόπουλο", "Souvlaki, Hähnchen, gegrillt", "Suvlaki, pileći, sa roštilja", "Сувлаки, пилећи, са роштиља", 175, 29, 6.5, 0, 0, true, T],
+  ["cy-sheftalia", "Sheftalia, grilled (pork sausage in caul fat)", "Σεφταλιά", "Sheftalia, gegrillt (Schweinewurst im Netz)", "Šeftalija, sa roštilja (u maramici)", "Шефталија, са роштиља (у марамици)", 290, 17, 23, 4, 0.5, true, D],
+  ["cy-loukaniko", "Loukaniko, Cypriot village sausage", "Λουκάνικο χωριάτικο", "Loukaniko, zyprische Wurst", "Lukaniko, kiparska kobasica", "Луканико, кипарска кобасица", 400, 20, 35, 1, 0, true, T],
+  ["cy-lountza", "Lountza, smoked pork loin", "Λούντζα", "Lountza, geräuchertes Schweinefilet", "Lundza, dimljeni svinjski file", "Лунџа, димљени свињски филе", 200, 26, 10, 1, 0, true, T],
+  ["cy-hiromeri", "Hiromeri, cured ham", "Χοιρομέρι", "Hiromeri, Rohschinken", "Hiromeri, sušena šunka", "Хиромери, сушена шунка", 280, 30, 18, 0.5, 0, true, T],
+  ["cy-pastourmas", "Pastourmas, Cypriot spiced sausage", "Παστουρμάς", "Pastourmas, würzige Wurst", "Pastrma kobasica, kiparska", "Пастрма кобасица, кипарска", 330, 25, 25, 2, 0, true, T],
+  ["cy-kleftiko", "Kleftiko, slow baked lamb", "Κλέφτικο", "Kleftiko, langsam gebackenes Lamm", "Kleftiko, sporo pečena jagnjetina", "Клефтико, споро печена јагњетина", 270, 23, 19, 1, 0, true, D],
+  ["cy-stifado", "Stifado, beef with onions", "Στιφάδο", "Stifado, Rind mit Zwiebeln", "Stifado, junetina sa lukom", "Стифадо, јунетина са луком", 160, 14, 9, 7, 1, true, D],
+  ["cy-afelia", "Afelia, pork in red wine and coriander", "Αφέλια", "Afelia, Schwein in Rotwein und Koriander", "Afelija, svinjetina u crnom vinu i korijanderu", "Афелија, свињетина у црном вину и коријандеру", 230, 20, 15, 3, 0.3, true, D],
+  ["cy-koupepia", "Koupepia, vine leaves stuffed with mince and rice", "Κουπέπια", "Koupepia, Weinblätter mit Hack und Reis", "Kupepija, sarma od vinovog lista", "Купепија, сарма од виновог листа", 170, 8, 9, 15.5, 1.5, true, D],
+  ["cy-keftedes", "Keftedes, Cypriot fried meatballs", "Κεφτέδες", "Keftedes, frittierte Fleischbällchen", "Keftedes, pržene kiparske ćufte", "Кефтедес, пржене кипарске ћуфте", 290, 15, 20, 14, 1, true, D],
+  ["cy-makaronia-fournou", "Makaronia tou fournou, baked pasta with mince", "Μακαρόνια του φούρνου", "Makaronia tou fournou, Nudelauflauf mit Hack", "Makaronija tu furnu, pečene makarone sa mlevenim mesom", "Макаронија ту фурну, печене макароне са млевеним месом", 210, 10, 11, 19, 1, true, D],
+  ["cy-tavas", "Tavas, lamb baked with onions and cumin", "Ταβάς", "Tavas, Lamm mit Zwiebeln und Kreuzkümmel", "Tavas, jagnjetina sa lukom i kuminom", "Тавас, јагњетина са луком и кумином", 170, 13, 10, 8, 1, true, D],
+  // fish and seafood
+  ["cy-octopus", "Octopus, grilled", "Χταπόδι ψητό", "Oktopus, gegrillt", "Hobotnica, sa roštilja", "Хоботница, са роштиља", 164, 29.8, 2.1, 4.4, 0, true, U],
+  ["cy-kalamari", "Kalamari, fried", "Καλαμάρι τηγανητό", "Calamari, frittiert", "Lignje, pržene", "Лигње, пржене", 175, 17.9, 7.5, 7.8, 0, true, U],
+  ["cy-tsipoura", "Sea bream (tsipoura), grilled", "Τσιπούρα ψητή", "Dorade, gegrillt", "Orada, sa roštilja", "Орада, са роштиља", 135, 24, 4.4, 0, 0, true, T],
+  ["cy-marides", "Marides, small fried fish", "Μαρίδες τηγανητές", "Marides, kleine frittierte Fische", "Maride, sitna pržena riba", "Мариде, ситна пржена риба", 270, 19, 19, 6, 0.3, true, D],
+  // vegetables, beans, salads and dips
+  ["cy-kolokasi", "Kolokasi (taro root), raw", "Κολοκάσι", "Kolokasi (Taro), roh", "Kolokasi (taro), sirov", "Колокаси (таро), сиров", 112, 1.5, 0.2, 26.5, 4.1, false, U],
+  ["cy-kolokasi-pork", "Kolokasi with pork, stew", "Κολοκάσι με χοιρινό", "Kolokasi mit Schwein, Eintopf", "Kolokasi sa svinjetinom, varivo", "Колокаси са свињетином, вариво", 130, 7, 6, 13.5, 1.8, true, D],
+  ["cy-louvi", "Louvi (black eyed beans), boiled", "Λουβί βραστό", "Augenbohnen, gekocht", "Crnooki pasulj, kuvan", "Црнооки пасуљ, куван", 116, 7.7, 0.5, 20.8, 6.5, true, U],
+  ["cy-fasolada", "Fasolada, bean soup", "Φασολάδα", "Fasolada, Bohnensuppe", "Fasolada, čorba od pasulja", "Фасолада, чорба од пасуља", 90, 4.5, 3.5, 11, 4, true, D],
+  ["cy-glistrida", "Glistrida (purslane), raw", "Γλιστρίδα", "Portulak, roh", "Tušt, svež", "Тушт, свеж", 20, 2, 0.4, 3.4, 0, true, U],
+  ["cy-capers", "Capers, pickled", "Κάπαρη", "Kapern", "Kapar", "Капар", 23, 2.4, 0.9, 4.9, 3.2, true, U],
+  ["cy-patates-antinaktes", "Patates antinaktes, crushed potatoes with coriander", "Πατάτες αντινάχτες", "Patates antinaktes, Kartoffeln mit Koriander", "Patates antinaktes, krompir sa korijanderom", "Пататес антинактес, кромпир са коријандером", 150, 2, 7, 21, 2, true, D],
+  ["cy-village-salad", "Village salad with feta", "Χωριάτικη σαλάτα", "Bauernsalat mit Feta", "Seoska salata sa fetom", "Сеоска салата са фетом", 120, 3.5, 10, 5, 1.3, true, D],
+  ["cy-talattouri", "Talattouri, yoghurt with cucumber and mint", "Ταλαττούρι", "Talattouri, Joghurt mit Gurke und Minze", "Talaturi, jogurt sa krastavcem i nanom", "Талатури, јогурт са краставцем и наном", 90, 4, 6, 5, 0.3, true, D],
+  ["cy-tahini-dip", "Tahini dip", "Ταχινοσαλάτα", "Tahini Dip", "Tahini sos", "Тахини сос", 300, 8.5, 27, 9, 4.5, true, D],
+  ["cy-taramosalata", "Taramosalata", "Ταραμοσαλάτα", "Taramosalata", "Taramosalata", "Тарамосалата", 480, 3, 50, 8, 0.5, true, T],
+  // bread, grains and pastry
+  ["cy-pourgouri", "Pourgouri, bulgur pilaf", "Πουργούρι πιλάφι", "Pourgouri, Bulgur Pilaw", "Purguri, pilav od bulgura", "Пургури, пилав од булгура", 160, 4, 4.5, 28, 4, true, D],
+  ["cy-koulouri", "Koulouri, village bread with sesame", "Κουλούρι χωριάτικο", "Koulouri, Landbrot mit Sesam", "Kuluri, seoski hleb sa susamom", "Кулури, сеоски хлеб са сусамом", 290, 9, 5, 54, 3, true, T],
+  ["cy-pitta", "Pitta bread, Cypriot", "Πίττα", "Pitta, zyprisch", "Pita hleb, kiparski", "Пита хлеб, кипарски", 275, 9.1, 1.2, 55.7, 2.2, true, U],
+  ["cy-flaouna", "Flaouna, cheese pastry", "Φλαούνα", "Flaouna, Käsegebäck", "Flauna, pecivo sa sirom", "Флауна, пециво са сиром", 360, 15, 19, 33.5, 1.5, true, T],
+  ["cy-koupes", "Koupes, bulgur shells with mince, fried", "Κούπες", "Koupes, Bulgurtaschen mit Hack, frittiert", "Kupes, bulgur sa mlevenim mesom, pržen", "Купес, булгур са млевеним месом, пржен", 280, 10, 16, 27, 3, true, D],
+  ["cy-bourekia", "Bourekia with anari, fried", "Πουρέκια με αναρή", "Bourekia mit Anari, frittiert", "Burekija sa anarijem, pržena", "Бурекија са анаријем, пржена", 360, 9, 20, 37, 1, true, D],
+  ["cy-tahinopitta", "Tahinopitta, tahini pie", "Ταχινόπιττα", "Tahinopitta, Tahini Gebäck", "Tahinopita, pita sa tahinijem", "Тахинопита, пита са тахинијем", 430, 8, 18, 61, 3, true, T],
+  ["cy-elioti", "Elioti, olive bread", "Ελιωτή", "Elioti, Olivenbrot", "Elioti, hleb sa maslinama", "Елиоти, хлеб са маслинама", 300, 7, 10, 47.5, 2.5, true, T],
+  // sweets and fruit
+  ["cy-mahallepi", "Mahallepi with rose syrup", "Μαχαλλεπί", "Mahallepi mit Rosensirup", "Mahalepi sa sirupom od ruže", "Махалепи са сирупом од руже", 110, 0.2, 0.1, 27, 0, true, D],
+  ["cy-soutzoukos", "Soutzoukos, grape must with almonds", "Σουτζιούκος", "Soutzoukos, Traubenmost mit Mandeln", "Sudžuk od šire sa bademima", "Суџук од шире са бадемима", 380, 5, 9, 73, 3, true, T],
+  ["cy-loukoumades", "Loukoumades, honey puffs", "Λουκουμάδες", "Loukoumades, Honigbällchen", "Lukumades, uštipci sa medom", "Лукумадес, уштипци са медом", 330, 4.5, 14, 48, 1, true, D],
+  ["cy-carob-syrup", "Carob syrup", "Χαρουπόμελο", "Johannisbrotsirup", "Sirup od rogača", "Сируп од рогача", 290, 0.9, 0.2, 73, 0.5, true, T],
+  ["cy-prickly-pear", "Prickly pear, raw", "Παπουτσόσυκο", "Kaktusfeige", "Kaktusova smokva", "Кактусова смоква", 41, 0.7, 0.5, 9.6, 3.6, true, U],
+  ["cy-loquat", "Loquat, raw", "Μούσμουλο", "Mispel (Loquat)", "Mušmula japanska", "Мушмула јапанска", 47, 0.4, 0.2, 12.1, 1.7, true, U],
+];
 const GROUP_STARTS: [string, string][] = [["courgette", "Vegetables"], ["apple", "Fruit"], ["egg", "Eggs, meat and fish"], ["milk-whole", "Dairy"], ["rice-white-cooked", "Grains, bread and legumes"], ["almonds", "Nuts, seeds and oils"], ["sugar", "Basics"]];
 export function groupOf(id: string): string {
   let g = GROUP_STARTS[0][1];
   for (const r of R) { const hit = GROUP_STARTS.find((x) => x[0] === r[0]); if (hit) g = hit[1]; if (r[0] === id) return g; }
-  return g;
+  return id.startsWith("cy-") ? "Cyprus" : g;
 }
-export const GROUPS = GROUP_STARTS.map((x) => x[1]);
-export const REFERENCE: RefFood[] = R.map(([id, en, de, sr, cyr, kcal, protein, fats, carbsTotal, fiber, ready, source]) => ({ id, en, de, sr, cyr, kcal, protein, fats, carbsTotal, fiber, ready, source: source ?? U }));
+export const GROUPS = [...GROUP_STARTS.map((x) => x[1]), "Cyprus"];
+export const REFERENCE: RefFood[] = [
+  ...R.map(([id, en, de, sr, cyr, kcal, protein, fats, carbsTotal, fiber, ready, source]) => ({ id, en, de, sr, cyr, kcal, protein, fats, carbsTotal, fiber, ready, source: source ?? U })),
+  ...CY.map(([id, en, el, de, sr, cyr, kcal, protein, fats, carbsTotal, fiber, ready, source]) => ({ id, en, el, de, sr, cyr, kcal, protein, fats, carbsTotal, fiber, ready, source })),
+];
+const namesOf = (r: RefFood) => [r.en, r.de, r.sr, r.cyr, ...(r.el ? [r.el] : [])];
 
 const fold = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/ć/g, "c").replace(/č/g, "c").replace(/š/g, "s").replace(/ž/g, "z");
 // find by any name: a word start beats a substring; two characters minimum
@@ -162,7 +229,7 @@ export function findReference(query: string, limit = 6, wordStartOnly = false): 
   const q = fold(query.trim());
   if (q.length < 2) return [];
   const score = (r: RefFood) => {
-    const names = [r.en, r.de, r.sr, r.cyr].map(fold);
+    const names = namesOf(r).map(fold);
     let best = 0;
     for (const n of names) {
       if (n === q) best = Math.max(best, 100);
@@ -182,12 +249,17 @@ export function localName(r: RefFood, region: string | null | undefined): string
   if (/munich|berlin|vienna|zurich|germany|austria|switzerland|de|at|ch/i.test(region)) return r.de;
   return r.en;
 }
+// the two names shown under the local one: the Greek a Cypriot shop prints comes first, then English, Serbian, German
+export function otherNames(r: RefFood, region: string | null | undefined): string[] {
+  const here = localName(r, region);
+  return [...new Set([r.el, r.en, r.sr, r.de].filter((x): x is string => !!x && x !== here))].slice(0, 2);
+}
 // a reference food as a library food, values per 100 g, carbohydrate without fibre
 export function referenceFood(r: RefFood, region: string | null | undefined, uid: () => string): Food {
   const name = localName(r, region);
   return {
-    id: uid(), name, brand: "", basis: "100g", aliases: [r.en, r.de, r.sr, r.cyr].filter((x) => x !== name), calories: r.kcal, protein: r.protein, fats: r.fats, carbs: Math.max(0, Math.round((r.carbsTotal - r.fiber) * 10) / 10), fiber: r.fiber,
-    readyToEat: r.ready, notes: `Reference table: ${r.source}. Per 100 g${/raw|sirov|roh|sveže/i.test(name) ? ", raw" : ""}. Carbohydrate without fibre. Also: ${[r.en, r.de, r.sr, r.cyr].filter((x) => x !== name).join(" · ")}.`,
+    id: uid(), name, brand: "", basis: "100g", aliases: namesOf(r).filter((x) => x !== name), calories: r.kcal, protein: r.protein, fats: r.fats, carbs: Math.max(0, Math.round((r.carbsTotal - r.fiber) * 10) / 10), fiber: r.fiber,
+    readyToEat: r.ready, notes: `Reference table: ${r.source}. Per 100 g${/raw|sirov|roh|sveže/i.test(name) ? ", raw" : ""}. Carbohydrate without fibre. Also: ${namesOf(r).filter((x) => x !== name).join(" · ")}.`,
     source: "Reference table", reviewedAt: new Date().toISOString(),
   } as Food;
 }

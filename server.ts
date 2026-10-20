@@ -480,7 +480,7 @@ app.get("/api/client-photo/:client/:card", requireUser, requireMember, requireCo
 });
 // Search the product database by name: top five with values per 100 g, for the country where the person shops.
 // Open Food Facts' country sites filter to products sold there; per-volume records and records without energy or protein are skipped.
-const OFF_COUNTRY: Record<string, string> = { rs: "rs", de: "de", at: "at", ch: "ch", hr: "hr", ba: "ba", si: "si", hu: "hu", it: "it", fr: "fr", es: "es", gb: "uk", us: "us" };
+const OFF_COUNTRY: Record<string, string> = { rs: "rs", de: "de", at: "at", ch: "ch", hr: "hr", ba: "ba", si: "si", hu: "hu", it: "it", fr: "fr", es: "es", cy: "cy", gb: "uk", us: "us" };
 app.get("/api/search", requireUser, requireMember, async (req, res) => {
   const q = String(req.query.q ?? "").trim();
   const cc = OFF_COUNTRY[String(req.query.cc ?? "").toLowerCase()] ?? "world";
