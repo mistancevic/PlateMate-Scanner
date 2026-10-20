@@ -162,7 +162,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
             let meal: PlannedMeal | null = choices.find((c) => c.id === o.id)?.meal ?? choices.find((c) => c.meal.title.toLowerCase() === o.title.toLowerCase())?.meal ?? null;
             if (!meal && o.foods?.length) {
               // a new meal: the person's own food values where the name is theirs, else Chef Mealan's estimate
-              const items: Ingredient[] = o.foods.map((f) => { const lib = state.foods.find((x) => x.name.toLowerCase() === f.name.toLowerCase()); return { id: uid(), food: lib ?? asFood({ name: f.name, calories: f.calories, protein: f.protein, fats: null, carbs: null, typical_grams: f.grams, confidence: "medium" }), grams: f.grams, locked: false }; });
+              const items: Ingredient[] = o.foods.map((f) => { const lib = state.foods.find((x) => x.name.toLowerCase() === f.name.toLowerCase()); return { id: uid(), food: lib ?? asFood({ name: f.name, calories: f.calories, protein: f.protein, fats: (f as { fats?: number | null }).fats ?? null, carbs: (f as { carbs?: number | null }).carbs ?? null, typical_grams: f.grams, confidence: "medium" }), grams: f.grams, locked: false }; });
               const t = aggregate(items);
               meal = { title: o.title, kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0), source: "starter", items, portion: Math.round(t.weight) };
             }

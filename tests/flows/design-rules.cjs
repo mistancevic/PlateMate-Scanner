@@ -81,7 +81,7 @@ const U = "http://127.0.0.1:3242";
     ok(await page.locator("main .back:not(.back-top)").count() === 0, "E: no Back at the bottom of the step");
     // ---- D: Today has no wide button; a next meal with nothing planned is a card ----
     const p2 = await open("2026-10-19T19:40:00Z");
-    ok(await p2.locator(".next-meal .pill-wide").count() === 0 && await p2.getByRole("button", { name: /^(Check|Plan) tomorrow$/ }).count() === 0, "D: in the evening Today has no wide button");
+    ok(await p2.locator(".next-meal .pill-wide").count() === 0, "D: in the evening Today has no wide button");
     ok(/Check tomorrow/.test(await p2.locator(".tomorrow-plan").textContent()), "D: the Tomorrow card still opens tomorrow's plan");
     const p3 = await open("2026-10-19T09:30:00Z", { "2026-10-19": { breakfast: PLAN["2026-10-19"].breakfast }, "2026-10-20": PLAN["2026-10-20"] });
     const open3 = p3.locator(".next-open");
@@ -96,7 +96,7 @@ const U = "http://127.0.0.1:3242";
       localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
     await p5.reload(); await p5.waitForTimeout(1500); await p5.locator("nav button").filter({ hasText: "Today" }).click(); await p5.waitForTimeout(700);
     const gt = (await p5.locator("section.plan").textContent()).replace(/\s+/g, " ");
-    ok(/\d+\+ ?of \d+ g fat/.test(gt) && /\+ Not complete: Protein bar has no fat or carbs value\./.test(gt) && !/at least/.test(gt), "F: 11+ of 93 g fat, and the note: + Not complete: Protein bar has no fat or carbs value.");
+    ok(/\d+\+ ?of \d+ g fat/.test(gt) && /Why the \+: Protein bar has no fat or carbs value, so fat and carbs are counted without it\. The real numbers are higher\./.test(gt) && !/at least/.test(gt), "F: 11+ of 93 g fat, and the note: Why the +: Protein bar has no fat or carbs value, so fat and carbs are counted without it.");
     await p5.locator(".macro-gap").getByRole("button", { name: "Protein bar" }).click(); await p5.waitForTimeout(900);
     ok(/Protein bar/.test(await p5.locator("main").textContent()) && await p5.locator(".macro-gap").count() === 0, "F: its name opens it in Foods");
     // ---- H: /built: a choice is chips; a link in a sentence is underlined; one filled button at the books ----

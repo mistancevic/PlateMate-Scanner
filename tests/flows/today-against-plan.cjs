@@ -9,6 +9,8 @@
 // planned is a card with Pick a meal and Make it on the Plate; late in the day the Tomorrow card opens tomorrow's plan.
 // Changed by story DS4 F (Milan 08:33 to 08:58, board DS4): fat and carbs no longer say at least inside the number. A plus
 // on the number, and one note under the numbers names the foods with no value; a food in your foods opens there.
+// Changed by story DS6 J and L (Milan 10:21 to 11:26, board DS6): the note says why the plus, in a full sentence; Log a meal
+// sits in Today's meals, not in Next.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -61,10 +63,10 @@ const open = async (state, at = "2026-10-18T12:20:00") => {
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(700);
     await at("2026-10-18T16:00:00");
     const goal = await text("section.plan");
-    ok(/Today so far, against your goal/.test(goal) && /of 2,800 kcal/.test(goal) && /of 180 g protein/.test(goal) && /\d+\+ ?of \d+ g fat/.test(goal) && !/at least/.test(goal) && /\+ Not complete: .+ (has|have) no (fat or carbs|fat|carbs) value\./.test(goal), "the goal card: today against it, fat and carbs with a plus and a note naming the food when a food has no value: " + goal.slice(0, 200));
-    ok(/Not complete: .*Digestive biscuits/.test(await text(".macro-gap")), "the note names the food with no value: " + (await text(".macro-gap")));
+    ok(/Today so far, against your goal/.test(goal) && /of 2,800 kcal/.test(goal) && /of 180 g protein/.test(goal) && /\d+\+ ?of \d+ g fat/.test(goal) && !/at least/.test(goal) && /Why the \+: .+ (has|have) no (fat or carbs|fat|carbs) value, so .+ counted without (it|them)\. The real numbers are higher\./.test(goal), "the goal card: today against it, fat and carbs with a plus and a note naming the food when a food has no value: " + goal.slice(0, 200));
+    ok(/Why the \+: .*Digestive biscuits/.test(await text(".macro-gap")), "the note names the food with no value: " + (await text(".macro-gap")));
     const next = await text(".next-meal");
-    ok(/^Next: /.test(await page.locator("p.label").filter({ hasText: /^Next: / }).first().textContent()) && /Nothing planned yet/.test(next) && /Pick a meal/.test(next) && /Make it on the Plate/.test(next) && /Log a meal/.test(next), "what comes next: the next meal, Pick a meal or Make it on the Plate, Log a meal: " + next);
+    ok(/^Next: /.test(await page.locator("p.label").filter({ hasText: /^Next: / }).first().textContent()) && /Nothing planned yet/.test(next) && /Pick a meal/.test(next) && /Make it on the Plate/.test(next) && /left for today/.test(next) && /Log a meal/.test(await text(".meals-card")), "what comes next: the next meal, Pick a meal or Make it on the Plate, what is left for today; Log a meal in Today's meals: " + next);
     const meal = page.locator(".log-card").filter({ hasText: "Protein cheesecake" }).filter({ has: page.locator(".meal-which") }).first();
     const mt = (await meal.textContent()).replace(/\s+/g, " ");
     ok(/Open the recipe/.test(mt) && /kcal · \d+ g protein/.test(mt) && !/Digestive biscuits/.test(mt) && !/In My recipes/.test(mt), "a meal: which meal, its numbers, its recipe; no foods: " + mt);

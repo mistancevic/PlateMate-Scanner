@@ -23,7 +23,8 @@ seed.feedback = [card("eaten", 0, "Skyr bowl"), card("prepared", 0, "Evening sky
   await page.getByRole("button", { name: /I ate it/ }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: "Log it" }).click(); await page.waitForTimeout(300);
   ok(/2 meals logged, 378 kcal/.test(await page.locator(".logged-line").textContent()), "I ate it moves it into the log");
-  const rows = await page.locator(".days .history-row").allTextContents();
+  // Changed by story DS7 N (Milan 11:26, board DS7): each of the last two days is its own card, with its exact day
+  const rows = await page.locator(".days .day-card").allTextContents();
   ok(rows.length === 2 && /Yesterday/.test(rows[0]) && /Moderate/.test(rows[0]) && /2 meals logged/.test(rows[0]), "yesterday: a training day, 2 meals logged");
   ok(/Nothing logged/.test(rows[1]), "two days ago: nothing logged, said plainly");
   // JOURNEY (approved design, 6 October 2026): without a Training week Today asks, with Rest, Light, Moderate, Hard and a link

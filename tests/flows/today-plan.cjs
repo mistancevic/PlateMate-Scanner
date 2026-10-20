@@ -3,6 +3,8 @@
 // outside counts as extra, the line counts both, and the record card appears once every planned slot is eaten. Recipes: Open.
 // Changed by story R19 (Milan 06:04 to 06:41, board RS18): a row opens the meal, with its slot on top; Change it on the Plate
 // there opens the Plate for the slot, as the row did. Everything after is unchanged.
+// Changed by story DS6 K (Milan 10:21 to 11:26, board DS6): the record box goes; the plan card's row says how the day went
+// (Today went by the plan) and Today's meals says the extras.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -82,9 +84,9 @@ seed.items = [];
   if (await page.locator(".rq-slot").count()) { await page.locator(".rq-slot").getByRole("button", { name: "Change it on the Plate" }).click(); await page.waitForTimeout(600); }
   await cook();
   await page.getByRole("button", { name: /^Today$/ }).first().click(); await page.waitForTimeout(500);
-  ok(await page.locator(".day-record").count() === 1, "every planned slot eaten: the record card");
-  const rec = await page.locator(".day-record").textContent();
-  ok(/the record/.test(rec) && /2 of 2 by the plan, 1 extra \(/.test(rec), "the record line: " + rec.replace(/\s+/g, " ").slice(0, 120));
+  ok(/went (mostly )?by the plan/.test(await page.locator("section.cooking").textContent()) && await page.locator(".day-record").count() === 0, "every planned slot eaten: the plan card says the day went by the plan; no record box");
+  const rec = await page.locator(".logged-line").textContent();
+  ok(/2 of 2 by the plan, 1 extra/.test(rec), "the day's line, in Today's meals: " + rec.replace(/\s+/g, " ").slice(0, 120));
   ok(/All 2 slots eaten/.test(await page.locator(".cooking").textContent()) && /Today went mostly by the plan/.test(await page.locator(".cooking").textContent()), "the plan card closes the day");
   // Recipes (0.2.5+r11, R7, R10): a tile opens the recipe's page; Make it puts the recipe on the Plate with its name, nothing decided
   await page.getByRole("button", { name: /^Recipes$/ }).first().click(); await page.waitForTimeout(500);

@@ -7,7 +7,7 @@ import { rankSwaps, sameFood } from "../swaps";
 import { fmt, pdText } from "../ui";
 import { log } from "../log";
 
-type Suggestion = { action: "add" | "swap" | "amount"; food: string; replaces: string | null; grams: number | null; calories: number | null; protein: number | null; why: string; known: boolean };
+type Suggestion = { action: "add" | "swap" | "amount"; food: string; replaces: string | null; grams: number | null; calories: number | null; protein: number | null; fats?: number | null; carbs?: number | null; why: string; known: boolean };
 
 // Help inside the plate: ask about it, get up to three actions, tap one. Closing leaves the plate as it was, plus what you tapped.
 export function PlateHelper({ items, library, pdRef, cap, missing, prefill, apply, close, setError, openTalk, record, safety, ai, onFlag, tastes }: {
@@ -35,7 +35,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
   };
   const toFood = (s: Suggestion): Food => library.find((f) => f.name.toLowerCase() === s.food.toLowerCase()) ?? {
     id: uid(), name: s.food, brand: "estimate", basis: "100g", source: "estimate", notes: "estimate from Chef Mealan", reviewedAt: new Date().toISOString(), readyToEat: true,
-    calories: s.calories, protein: s.protein, fats: null, carbs: null, fiber: null,
+    calories: s.calories, protein: s.protein, fats: s.fats ?? null, carbs: s.carbs ?? null, fiber: null,
   };
   function take(s: Suggestion) {
     let next = items.map((i) => ({ ...i }));
