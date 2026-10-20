@@ -191,7 +191,7 @@ function TryIt() {
   const fits = p.pd >= DEMO_GOAL.pd;
   const need = lift(w, h, DEMO_GOAL.pd, wg);
   const reach = !fits && need.grams <= (h.max ?? 300);
-  const others = offered.filter((x) => x.id !== h.id && lift(w, x, DEMO_GOAL.pd, wg).grams <= (x.max ?? 300)).map((x) => x.name.toLowerCase());
+  const others = offered.filter((x) => x.id !== h.id && lift(w, x, DEMO_GOAL.pd, wg).grams <= (x.max ?? 300)).map((x) => (x.name.startsWith("Greek") ? x.name : x.name.toLowerCase()));
   const hn = h.name.toLowerCase(), wn = w.of ?? w.name.toLowerCase(), hu = unitOf(h);
   const Pick = ({ items, on, set }: { items: { id: string; name: string }[]; on: string; set: (v: string) => void }) => (
     <div className="chip-row">{items.map((x) => <button key={x.id} type="button" className={`choice ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} onClick={() => { used(); set(x.id); }}>{x.name}</button>)}</div>
@@ -231,7 +231,7 @@ function TryIt() {
           <b className="l-jump-arrow" aria-hidden="true">→</b>
           <div className={fits ? "l-jump-to" : "l-jump-from"}><small>With {hg} {hu} of {hn}</small><b>PD {p.pd.toFixed(1)}</b><small>{p.kcal} kcal, {Math.round(p.protein)} g protein</small></div>
         </div>
-        <span>{w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} {fits ? `The ${hn} adds the protein, so the plate fits.` : reach ? `${need.grams} ${hu} of ${hn} reaches PD ${DEMO_GOAL.pd}.` : `${h.name} has too little protein for its energy to bring this plate to PD ${DEMO_GOAL.pd}.${others.length ? ` Try ${others.join(", ")}.` : ""}`}</span>
+        <span>{w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} {fits ? `The ${hn} adds the protein, so the plate fits.` : reach ? `${need.grams} ${hu} of ${hn} reaches PD ${DEMO_GOAL.pd}.` : `${h.name} has too little protein for its energy to bring this plate to PD ${DEMO_GOAL.pd}.${others.length ? ` Try ${others.length > 1 ? `${others.slice(0, -1).join(", ")} or ${others[others.length - 1]}` : others[0]}.` : ""}`}</span>
         {reach && <button type="button" className="pill pill-small" onClick={() => { used(); setHg(need.grams); }}>Use {need.grams} {hu}</button>}
       </div>
       <small className="l-try-small">A simplified version of Chef Mealan: one goal, six cravings and typical values from food labels. Nothing you pick here is saved.</small>
