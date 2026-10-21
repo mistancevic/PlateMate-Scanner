@@ -133,7 +133,7 @@ export function LandingScreen() {
         <span className="l-eyebrow">A free guide</span>
         <h2>{BOOKS["worthy-numbers"].name}</h2>
         <div className="l-split">
-          <div>
+          <div className="l-book-text">
             <p className="l-role">{BOOKS["worthy-numbers"].kicker}. {BOOKS["worthy-numbers"].subtitle}</p>
             <p>PD, the number no pack prints, and five more numbers about your food: what each one tells you, and how to use it at your next meal.</p>
             <p><a className="l-book-link" href="/worthy-numbers?from=hp">See the book ›</a></p>

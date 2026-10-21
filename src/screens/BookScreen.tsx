@@ -63,12 +63,12 @@ export function BookScreen({ slug, signedIn }: { slug: string; signedIn: boolean
       )}
 
       <h2>Live the day, so it counts</h2>
-      <p className="bt-sub">PD helps you decide at the plate or on the go. What counts is the whole day: calories in and out, protein, carbohydrate and fat, vitamins and minerals, an active day, strength training, sleep and recovery. Chef Mealan supports you on that journey.</p>
+      <p className="bt-sub">PD helps you decide at the plate or on the go. What counts is the whole day: calories in and out, protein, carbohydrate and fat, vitamins and minerals, an active day, strength training, sleep and recovery. Chef Mealan plans the food part of that day with you.</p>
       <div className="bk-target">
         <small>Your own target, calculated</small>
         {/* the same two people as in the book: different bodies, goals and amounts, the same PD */}
-        <div><span><b>A man of 80 kg, 182 cm</b><span>trains twice a week, wants to keep his weight</span></span><span className="bk-who"><b className="bk-pd">PD 6.4</b><span>2,350 kcal · 150 g protein</span></span></div>
-        <div><span><b>A woman of 66 kg, 168 cm</b><span>trains three times a week, wants to build muscle</span></span><span className="bk-who"><b className="bk-pd">PD 6.4</b><span>1,950 kcal · 125 g protein</span></span></div>
+        <div><span><b>A man of 80 kg, 182 cm</b><span>trains twice a week, wants to keep his weight</span><span>2,350 kcal and 150 g protein a day</span></span><b className="bk-pd">PD 6.4</b></div>
+        <div><span><b>A woman of 66 kg, 168 cm</b><span>trains three times a week, wants to build muscle</span><span>1,950 kcal and 125 g protein a day</span></span><b className="bk-pd">PD 6.4</b></div>
       </div>
       {signedIn ? (
         <a className="pill pill-primary bk-read" href="/">Open Chef Mealan</a>
