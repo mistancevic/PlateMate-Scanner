@@ -18,7 +18,7 @@ export const BOOKS: Record<string, BookPage> = {
   "worthy-numbers": {
     name: "Worthy Numbers",
     kicker: "A guide to food labels",
-    subtitle: "The numbers on your food, and which ones help you decide.",
+    subtitle: "The numbers about your food, and which ones help you decide.",
     intro: "Short pages on the numbers you see on food every day: what each one tells you, what it can't, and how to use it at your next meal.",
     cover: "/books/worthy-numbers-cover.webp",
     share: "/books/worthy-numbers-og.jpg",
@@ -37,7 +37,7 @@ export const BOOKS: Record<string, BookPage> = {
         "Granola: 9\u00a0g of protein in 450\u00a0kcal is PD 2. Skyr: 11\u00a0g in 63\u00a0kcal is about PD 17. The higher the PD, the more protein you get for the same calories.",
       ],
       from: { label: "60\u00a0g of granola with 200\u00a0ml of milk 1.5%", pd: "PD 3.4", sub: "364\u00a0kcal, 12\u00a0g protein" },
-      to: { label: "With 150\u00a0g of skyr on top", pd: "PD 6.3", sub: "459\u00a0kcal, 29\u00a0g protein" },
+      to: { label: "With 170\u00a0g of skyr instead of the milk", pd: "PD 6.4", sub: "377\u00a0kcal, 24\u00a0g protein" },
       after: "The book shows how PD works next to the label, the protein claims and Nutri-Score, and how to set your own target.",
       tryIt: "Try PD on your own craving",
     },

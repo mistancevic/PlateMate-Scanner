@@ -54,11 +54,11 @@ export function BookScreen({ slug, signedIn }: { slug: string; signedIn: boolean
       )}
 
       <h2>Live the day, so it counts</h2>
-      <p className="bt-sub">PD helps you decide at the plate. What counts is the whole day: calories in and out, protein, carbohydrate and fat, vitamins and minerals, an active day, strength training, sleep and recovery. Chef Mealan supports you on that journey.</p>
+      <p className="bt-sub">PD helps you decide at the plate or on the go. What counts is the whole day: calories in and out, protein, carbohydrate and fat, vitamins and minerals, an active day, strength training, sleep and recovery. Chef Mealan supports you on that journey.</p>
       <div className="bk-target">
-        <small>Your own target, worked out</small>
-        <span>Example: wants to lose fat and build muscle · 66 kg, 168 cm · three strength sessions a week</span>
-        <div><b>1,700 kcal and 125 g protein a day</b><b className="bk-pd">PD 7.4</b></div>
+        <small>Your own target, calculated</small>
+        <span>Example: wants to keep his weight · 80 kg, 182 cm · two strength sessions a week</span>
+        <div><b>2,350 kcal and 150 g protein a day</b><b className="bk-pd">PD 6.4</b></div>
       </div>
       {signedIn ? (
         <a className="pill pill-primary bk-read" href="/">Open Chef Mealan</a>
