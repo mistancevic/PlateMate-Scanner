@@ -18,7 +18,7 @@ import { getStorage as adminStorage } from "firebase-admin/storage";
 import { createHash } from "node:crypto";
 import { deleteAccount as deleteAccountSteps } from "./src/accountDelete";
 import { guideForChat } from "./src/goalGuide";
-import { BOOK_PAGES, BOOK_HITS } from "./src/bookPages";
+import { BOOK_PAGES, BOOK_HITS, BOOKS as BOOK_LIST } from "./src/bookPages";
 import { tidy } from "./src/labeltable";
 import { normalizePhone } from "./src/phone";
 import { weekStats, mondayOf, addDays, type Ev } from "./src/metricsCalc";
@@ -2019,6 +2019,13 @@ async function start() {
     app.get("/recipes", (req, res) => {
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       try { res.type("html").send(withMeta("Recipes · Chef Mealan", "Recipes from our kitchens. Every number is worked out from the recipe, weighed.", `https://${req.get("host")}/og.jpg?v=2`, `https://${req.get("host")}/recipes`)); }
+      catch { res.sendFile(path.join(dist, "index.html")); }
+    });
+    // BP70: a book's page carries the book's title, words and share picture, so a link in a social post shows the book
+    app.get(Object.keys(BOOK_LIST).flatMap((s) => [`/${s}`, `/${s}/`]), (req, res) => {
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      const base = `https://${req.get("host")}`, slug = req.path.replace(/\//g, ""), b = BOOK_LIST[slug];
+      try { res.type("html").send(withMeta(`${b.name}, ${b.kicker.toLowerCase()} · Chef Mealan`, `${b.subtitle} ${b.intro}`, `${base}${b.share}`, `${base}/${slug}`)); }
       catch { res.sendFile(path.join(dist, "index.html")); }
     });
     // /built carries its own title, words and picture, so the link on LinkedIn or a CV shows the build story (board B)

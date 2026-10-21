@@ -54,6 +54,8 @@ import { needsCover, cardHasPhoto } from "./covers";
 import { itemsOf as itemsOfShared, type SharedRecipe } from "./members";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
 import { BuiltScreen } from "./screens/BuiltScreen";
+import { BookScreen } from "./screens/BookScreen";
+import { bookOfPath } from "./bookPages";
 import { PilotGate } from "./screens/PilotGate";
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveOwnNotes, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalLabel, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
@@ -2340,6 +2342,8 @@ export default function App() {
   }
   // /built, How Chef Mealan is built (board B): public, signed in or not
   if (/^\/built\/?$/.test(window.location.pathname)) return <BuiltScreen />;
+  // BP70: a book's page, chefmealan.com/worthy-numbers: public, signed in or not
+  { const book = bookOfPath(window.location.pathname); if (book) return <BookScreen slug={book} signedIn={!cloudEnabled || Boolean(user)} />; }
   { const legal = legalPageFromPath(window.location.pathname); if (legal) return <LegalScreen page={legal} back={() => { window.history.replaceState(null, "", "/"); window.location.reload(); }} />; }
   if (cloudEnabled && !user) return <LandingScreen />;
   if (cloudEnabled && user && !profileReady) return <Starting onLocal={() => { localMode.current = true; setProfileReady(true); }} />;

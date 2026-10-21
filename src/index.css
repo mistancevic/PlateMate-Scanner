@@ -1186,6 +1186,26 @@ main:has(.menu-title) .field input:not([type="checkbox"]):focus { background: va
 .l-cta-block p { margin: 0; font-size: 15px; color: var(--ink); line-height: 1.5; }
 .l-cta-block small { font-size: 14px; color: var(--ink); line-height: 1.45; }
 /* HP68: the sign-up box right under the calculator, one card that carries on from it */
+/* BP70: a book's page, in the /built frame: the cover beside the words, then what is inside, Chef Mealan, the author */
+.bk-hero { display: grid; grid-template-columns: 300px minmax(0, 1fr); gap: 28px; align-items: center; margin-top: 18px; }
+.bk-cover { width: 100%; height: auto; border-radius: 6px; box-shadow: 0 14px 34px rgba(1, 43, 79, 0.28); }
+.bk-text h1 { margin-top: 6px; }
+.bk-sub { font-size: 20px; line-height: 1.4; font-weight: 800; color: var(--ink); margin: 0 0 10px; }
+.bk-read { display: inline-flex; align-items: center; justify-content: center; margin-top: 16px; height: 52px; padding: 0 24px; font-size: 17px; font-weight: 900; text-decoration: none; }
+.bk-soon { margin-top: 16px; display: flex; flex-direction: column; gap: 2px; background: var(--surface); border: 1.5px dashed var(--line); border-radius: var(--r-control); padding: 12px 14px; }
+.bk-soon span { color: var(--muted); font-weight: 700; }
+.bk-inside { background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-card); padding: 4px 16px; max-width: 560px; }
+.bk-inside div { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line); font-size: 16px; }
+.bk-inside div:last-child { border-bottom: 0; }
+.bk-inside span { font-weight: 700; } .bk-inside b { font-weight: 900; text-align: right; }
+.bk-inside div.key { margin: 6px -10px; padding: 10px; border: 0; border-radius: var(--r-control); background: var(--brand); color: #fff; }
+.bk-target { max-width: 560px; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-card); padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
+.bk-target small { font-size: 12.5px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.bk-target span { color: var(--muted); font-weight: 700; }
+.bk-target div { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; padding-top: 8px; border-top: 1.5px solid var(--ink); }
+.bk-pd { font-size: 26px; color: var(--brand-text); white-space: nowrap; }
+.bk-join { max-width: 560px; border-top: 0; padding-top: 0; }
+@media (max-width: 700px) { .bk-hero { grid-template-columns: 1fr; } .bk-cover { max-width: 260px; justify-self: center; } }
 /* BK69: one line for readers who come from the book */
 .l-request .l-book-line { margin: 14px 0; background: var(--surface); border: 2px solid var(--brand); border-radius: var(--r-control); padding: 10px 12px; font-weight: 700; color: var(--ink); }
 .l-cta-hook { margin-top: 12px; background: var(--surface); border: 2px solid var(--brand); border-radius: var(--r-card); padding: 16px; }
