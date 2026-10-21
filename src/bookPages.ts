@@ -11,6 +11,7 @@ export type BookPage = {
   share: string;          // 1200 x 630, for links in social posts
   inside: { name: string; says: string; key?: boolean }[];
   pdf?: string;           // empty while the book is in its last edit: the page shows a placeholder
+  pages?: number; version?: string;
   // BP70 (Milan 11:29): the book's key idea, explained for a cold reader, with one worked example and a way to try it
   hook?: { title: string; text: string[]; from: { label: string; pd: string; sub: string }; to: { label: string; pd: string; sub: string }; after: string; tryIt: string };
 };
@@ -22,6 +23,7 @@ export const BOOKS: Record<string, BookPage> = {
     intro: "Short pages on the numbers you see on food every day: what each one tells you, what it can't, and how to use it at your next meal.",
     cover: "/books/worthy-numbers-cover.webp",
     share: "/books/worthy-numbers-og.jpg",
+    pdf: "/books/worthy-numbers.pdf", pages: 11, version: "1.0",  // RB72 (Milan 21 October 17:04): version 1.0, final
     inside: [
       { name: "The label", says: "100 g" },
       { name: "Nutri-Score", says: "A to E" },
@@ -33,7 +35,7 @@ export const BOOKS: Record<string, BookPage> = {
     hook: {
       title: "PD, the number no pack prints",
       text: [
-        "PD means protein density: grams of protein in 100\u00a0kcal. You work it out from two lines of any label, protein and energy.",
+        "PD means protein density: grams of protein in 100\u00a0kcal. You calculate it from two lines of any label, protein and energy.",
         "Granola: 9\u00a0g of protein in 450\u00a0kcal is PD 2. Skyr: 11\u00a0g in 63\u00a0kcal is about PD 17. The higher the PD, the more protein you get for the same calories.",
       ],
       from: { label: "60\u00a0g of granola with 200\u00a0ml of milk 1.5%", pd: "PD 3.4", sub: "364\u00a0kcal, 12\u00a0g protein" },

@@ -59,7 +59,7 @@ export function MembersList({ list, ahead, p, open, loading, error, cook, setCoo
         <small className="mb-lead">{ahead?.full
           ? `Recipes members cooked and shared. Your day is planned in full, so each shows the whole recipe; Make it puts your portion on the Plate.`
           : ahead
-          ? `Recipes members cooked and shared, worked out for your day. ${ahead.name.charAt(0).toUpperCase() + ahead.name.slice(1)} is about ${fmt(ahead.kcal, 0)} kcal${ahead.target !== null ? ` at ${pdText(ahead.target)} or more, so these come first` : ""}.`
+          ? `Recipes members cooked and shared, calculated for your day. ${ahead.name.charAt(0).toUpperCase() + ahead.name.slice(1)} is about ${fmt(ahead.kcal, 0)} kcal${ahead.target !== null ? ` at ${pdText(ahead.target)} or more, so these come first` : ""}.`
           : "Recipes members cooked and shared. Set your goal and every recipe shows your portion."}</small>
         {on && <b className="mb-shelf">{on}'s recipes · {shown.length}</b>}
         {cooks.length > 0 && (
@@ -214,7 +214,7 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
         <div className="button-row"><button className="pill pill-small" disabled={busy} onClick={takeBack}>Take it back</button></div>
         <small className="muted">Take it back removes it from Members; members who kept a copy keep theirs.</small>
       </>) : (<>
-        <small className="muted">Members see the cover, the foods, the amounts and the steps, worked out for their own day. Never your notes or your ratings.</small>
+        <small className="muted">Members see the cover, the foods, the amounts and the steps, calculated for their own day. Never your notes or your ratings.</small>
         {photos.length > 0 && (<>
           <small className="mb-sub">The cover members see</small>
           <div className="mb-covers">{photos.map((x) => {

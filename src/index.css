@@ -1969,3 +1969,5 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 /* MT71: each Metrics card says which days it counts */
 .mt-when { margin-top: -4px; }
 .mt-frame span { font-size: var(--fs-label); line-height: 1.45; }
+/* RB72: the book's PDF, with what it is under the button */
+.bk-read-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
