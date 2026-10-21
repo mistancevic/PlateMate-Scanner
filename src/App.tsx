@@ -57,6 +57,8 @@ import { BuiltScreen } from "./screens/BuiltScreen";
 import { BookScreen } from "./screens/BookScreen";
 import { bookOfPath } from "./bookPages";
 import { PilotGate } from "./screens/PilotGate";
+import { takeCodeFromUrl } from "./pendingCode";
+takeCodeFromUrl();  // SH73: chefmealan.com/?code=AB12CD from a coach's QR code
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveOwnNotes, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalLabel, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { setTodayChange, dayOfLoad, ymd, planLine as planLineOf, type PlanDay } from "./plan";

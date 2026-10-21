@@ -7,6 +7,7 @@ import { Check } from "lucide-react";
 import { WANTS, HAVES, DEMO_GOAL, lift, alone, part, plate, unitOf, havesFor, PAIR_NOTES, type DemoFood } from "../landing";
 import { Mark, APP_NAME } from "../components/Mark";
 import { signIn } from "../cloud";
+import { pendingCode } from "../pendingCode";
 import { hit } from "../metrics";
 
 // The front door of chefmealan.com: what it is, how it works, request a code, or sign in with one.
@@ -44,6 +45,14 @@ export function LandingScreen() {
         <div className="l-brand"><Mark size={30} color="var(--brand)" /><b>{APP_NAME}</b></div>
         <span className="l-topnav"><a className="l-recipes" href="/recipes">Recipes</a><button className="pill pill-small l-signin" disabled={busy} onClick={go}>Sign in</button></span>
       </header>
+      {/* SH73: someone who scanned a coach's QR code sees their code and the one step left */}
+      {pendingCode() && (
+        <section className="sh-arrived">
+          <b>Your personal code: {pendingCode()}</b>
+          <span>Sign in with Google using the email your code was made for. The code is filled in for you.</span>
+          <button className="pill pill-primary" disabled={busy} onClick={go}>Sign in</button>
+        </section>
+      )}
 
       {/* the top (board HP, HP5, 12 October 2026): who it is for, the promise, the calculator already answered, then the
           one way in, Try Chef Mealan; whoever has a code uses Sign in in the top bar */}

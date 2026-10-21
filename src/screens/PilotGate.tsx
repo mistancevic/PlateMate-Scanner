@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Mark, APP_NAME } from "../components/Mark";
 import { RequestForm } from "./LandingScreen";
 import type { AppApi } from "./api";
+import { pendingCode } from "../pendingCode";
 
 // Signed in, but no coach yet: a code, or a request for one.
 export function PilotGate(p: AppApi) {
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(pendingCode());  // SH73: filled in from the QR code
   return (
     <div className="goal-screen">
       <div className="hero"><Mark size={52} color="var(--brand)" /><h2>Almost there{p.user?.name ? `, ${p.user.name.split(" ")[0]}` : ""}</h2><p>{APP_NAME} is a closed pilot. You join with the personal code from your invite.</p></div>
