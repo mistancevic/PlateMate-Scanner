@@ -19,6 +19,7 @@ import { createHash } from "node:crypto";
 import { deleteAccount as deleteAccountSteps } from "./src/accountDelete";
 import { guideForChat } from "./src/goalGuide";
 import { BOOK_PAGES, BOOK_HITS, BOOKS as BOOK_LIST, BOOK_SOURCES } from "./src/bookPages";
+import { spotsAfterInvite } from "./src/share";
 import { tidy } from "./src/labeltable";
 import { normalizePhone } from "./src/phone";
 import { weekStats, mondayOf, addDays, type Ev } from "./src/metricsCalc";
@@ -535,7 +536,7 @@ const EVENT_KINDS = new Set(["app_open", "day_closed", "fit_used", "label_read",
 const EVENT_KEYS = new Set(["way", "how", "went", "ate", "locked", "method", "kind", "moment", "case", "status", "result", "source", "items", "pd", "kcal", "photos", "products",
   "date", "planned", "byPlan", "extras", "swapped", "lived", "proteinPct", "energyPct", "kept"]);
 // BK69 (Milan 21 October 2026): a visit to a book address (chefmealan.com/worthy-numbers) counts per book
-const HIT_KINDS = new Set(["hp_visit", "hp_calc", "hp_try", "built_visit", ...BOOK_HITS]);
+const HIT_KINDS = new Set(["hp_visit", "hp_qr", "hp_calc", "hp_try", "built_visit", ...BOOK_HITS]);  // hp_qr: SH73, chefmealan.com/?from=qr
 const METRICS_SALT = process.env.METRICS_SALT || FB_PROJECT || "local";
 const memberOf = (uid: string) => createHash("sha256").update(`${METRICS_SALT}:${uid}`).digest("hex").slice(0, 16);
 const berlinDay = (t = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit" }).format(t);
@@ -1858,7 +1859,18 @@ app.post("/api/invites", requireUser, requireMember, requireCoach, async (req, r
     for (let i = 0; i < 5 && (await db().collection("invites").doc(code).get()).exists; i++) code = newCode();
     const now = Date.now();
     await db().collection("invites").doc(code).set({ code, email, name, coachId: (req as any).uid, coachName, status: "open", createdAt: new Date(now).toISOString(), expiresAt: new Date(now + 30 * 86_400_000).toISOString() });
-    res.json({ code, email, name, coachName });
+    // SH73 (Milan 23:42): a code Milan makes lowers Beta spots left by one; no number set stays unset
+    let spots: number | null = null;
+    if (metricsOwner(req)) {
+      try {
+        spots = await db().runTransaction(async (t) => {
+          const d = await t.get(spotsDoc(req)); const n = d.exists ? (d.data() as any)?.n : null; const next = spotsAfterInvite(n);
+          if (next !== null && next !== n) t.set(spotsDoc(req), { n: next, at: new Date().toISOString() });
+          return next;
+        });
+      } catch {}
+    }
+    res.json({ code, email, name, coachName, spots });
   } catch (e) { fail(res, e); }
 });
 app.get("/api/invites", requireUser, requireMember, requireCoach, async (req, res) => {

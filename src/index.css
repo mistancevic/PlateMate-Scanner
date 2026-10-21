@@ -1984,3 +1984,4 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .sh-card .l-form { width: 100%; text-align: left; }
 .sh-arrived { margin: 12px auto 0; max-width: 960px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; padding: 14px 16px; border-radius: 14px; background: var(--brand-soft, #dae6fb); color: var(--brand-text, #123a7a); }
 .sh-arrived b { font-size: var(--fs-card); }
+.sh-spots { font-weight: 800; color: var(--brand-text, #123a7a); }

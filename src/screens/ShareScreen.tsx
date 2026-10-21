@@ -2,15 +2,11 @@ import { useState } from "react";
 import { Share2, Copy } from "lucide-react";
 import { QrCode } from "../components/QrCode";
 import type { AppApi } from "./api";
+import { SHARE_TARGETS as TARGETS, inviteUrl } from "../share";
 
-// SH73 (Milan 21 October 2026, 21:10 and 23:11), drawn for a decision: Share Chef Mealan, from the menu. Show the link: a QR
-// code for chefmealan.com or for the book, with Share and Copy, for every member. Invite now: a coach types the person's
+// SH73 (Milan 21 October 2026, 21:10 to 23:42): Share Chef Mealan, from the menu, for Milan only for now. Show the link: a
+// QR code for chefmealan.com or for the book, with Share and Copy; both count as QR in Metrics. Invite now: a coach types the person's
 // email, makes a personal code and shows it as a QR code; scanning it opens chefmealan.com with the code filled in.
-const SITE = "https://chefmealan.com";
-const TARGETS = [
-  { id: "site", name: "chefmealan.com", url: SITE, line: "Opens the home page: what Chef Mealan does, the calculator, and the form to ask for a code." },
-  { id: "book", name: "Worthy Numbers", url: `${SITE}/worthy-numbers?from=qr`, line: "Opens the book page: the free book, and the form to ask for a code." },
-] as const;
 
 export function ShareScreen(p: AppApi) {
   const coach = p.profile.role === "coach" || !p.cloudEnabled;
@@ -56,7 +52,7 @@ function ShowLink(p: AppApi) {
 
 function InviteNow(p: AppApi) {
   const [name, setName] = useState(""), [email, setEmail] = useState("");
-  const [made, setMade] = useState<{ code: string; email: string; name: string } | null>(null), [busy, setBusy] = useState(false);
+  const [made, setMade] = useState<{ code: string; email: string; name: string; spots?: number | null } | null>(null), [busy, setBusy] = useState(false);
   const make = async () => {
     setBusy(true);
     try {
@@ -69,22 +65,23 @@ function InviteNow(p: AppApi) {
   if (made)
     return (
       <section className="card sh-card">
-        <div className="sh-qr"><QrCode text={`${SITE}/?code=${made.code}`} label={`QR code with the personal code for ${made.email}`} /></div>
+        <div className="sh-qr"><QrCode text={inviteUrl(made.code)} label={`QR code with the personal code for ${made.email}`} /></div>
         <b className="sh-code">{made.code}</b>
         <small className="muted sh-line">For {made.name ? `${made.name}, ` : ""}{made.email}. They scan it, sign in with Google using this email, and the code is filled in. Used once, valid 30 days.</small>
         <div className="button-row sh-buttons">
           <button className="pill" onClick={() => { setMade(null); setName(""); setEmail(""); }}>Make another</button>
         </div>
+        {typeof made.spots === "number" && <small className="sh-spots">Beta spots left: {made.spots}</small>}
         <small className="muted">You find it in Clients, under Invite a client, where you can take it back.</small>
       </section>
     );
   return (
     <section className="card sh-card">
       <b>Invite someone now</b>
-      <small className="muted">A personal code for one email: used once, valid 30 days. You show it as a QR code; they scan it and join.</small>
+      <small className="muted">A personal code for one Google email: used once, valid 30 days. You show it as a QR code; they scan it, sign in with Google and join. Making a code lowers Beta spots left by one.</small>
       <div className="l-form" style={{ marginTop: 8 }}>
         <input aria-label="Name" placeholder="Name (optional)" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} />
-        <input aria-label="Email they sign in with" placeholder="Email they sign in with" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input aria-label="Their Google email" placeholder="Their Google email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <button className="pill pill-primary" disabled={busy || !/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i.test(email.trim())} onClick={make}>Make a code</button>
       </div>
     </section>

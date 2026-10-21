@@ -19,7 +19,11 @@ export function LandingScreen() {
   useEffect(() => { if (tabOfPath(location.pathname, ["home", "journey", "meal", "chef", "recipes", "foods", "me"])) history.replaceState(null, "", "/"); }, []);
   const go = async () => { setBusy(true); setErr(""); try { await signIn(); } catch (e: any) { setErr(e.message || "Sign-in failed."); } finally { setBusy(false); } };
   // home page counts (0.2.5+r17, board M): a visit, a Try tap; no cookie, no visitor id
-  useEffect(() => { hit("hp_visit"); }, []);
+  useEffect(() => {
+    hit("hp_visit");
+    // SH73: a visit from Milan's QR code counts as QR too; the ending leaves the address
+    try { const u = new URL(window.location.href); if (u.searchParams.get("from") === "qr") { hit("hp_qr"); u.searchParams.delete("from"); window.history.replaceState(null, "", u.pathname + u.search + u.hash); } } catch {}
+  }, []);
   const toForm = () => { hit("hp_try"); formRef.current?.scrollIntoView({ behavior: "smooth" }); };
   // HP10: the bar at the bottom shows while neither the button under the calculator nor the form is on screen
   const ctaRef = useRef<HTMLDivElement>(null);

@@ -72,3 +72,16 @@ test("BK69: only a known book's address is a book page", async () => {
   assert.equal(sourceOf("?from=spam"), null); assert.equal(sourceOf(""), null);
   assert.equal(hitOf("worthy-numbers", "qr"), "book_worthy_numbers__qr"); assert.ok(BOOK_HITS.includes("book_worthy_numbers__hp"));
 });
+
+// SH73 (Milan 23:42): a code lowers Beta spots left by one; the home page QR counts as QR under Home page visits
+import { spotsAfterInvite, SHARE_TARGETS, inviteUrl } from "./share";
+test("SH73: a code lowers the spots by one, never below 0; no number stays no number", () => {
+  assert.equal(spotsAfterInvite(3), 2); assert.equal(spotsAfterInvite(1), 0); assert.equal(spotsAfterInvite(0), 0);
+  assert.equal(spotsAfterInvite(null), null); assert.equal(spotsAfterInvite(undefined), null); assert.equal(spotsAfterInvite("3"), null);
+});
+test("SH73: both QR codes are counted as QR, and an invite opens the home page with the code", () => {
+  assert.deepEqual(SHARE_TARGETS.map((t) => t.url), ["https://chefmealan.com/?from=qr", "https://chefmealan.com/worthy-numbers?from=qr"]);
+  assert.equal(inviteUrl("K7Q2MX"), "https://chefmealan.com/?code=K7Q2MX");
+  assert.equal(weekStats([], "2026-10-19", { ...X, hp: { ...X.hp, hp_qr: 5 } }).wayIn.qr, 5);
+  assert.equal(weekStats([], "2026-10-19", X).wayIn.qr, 0);
+});

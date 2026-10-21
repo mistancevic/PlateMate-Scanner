@@ -61,16 +61,30 @@ function MetricsRow({ open }: { open: () => void }) {
   const owner = useMetricsOwner(true);
   return owner ? <button className="menu-row" onClick={open}><span className="menu-icon"><LineChart size={20} /></span><b>Metrics</b><ChevronRight size={18} /></button> : null;
 }
+// SH73 (Milan 23:42): Share Chef Mealan, only for Milan for now, like Metrics
+function ShareRow({ open }: { open: () => void }) {
+  const owner = useMetricsOwner(true);
+  return owner ? <button className="menu-row" onClick={open}><span className="menu-icon"><QrCode size={20} /></span><b>Share Chef Mealan</b><ChevronRight size={18} /></button> : null;
+}
 // Running costs, next to Metrics, for the same account only (0.2.7+r1, board M, M6b)
 function CostsRow({ open }: { open: () => void }) {
   const owner = useMetricsOwner(true);
   return owner ? <button className="menu-row" onClick={open}><span className="menu-icon"><Receipt size={20} /></span><b>Running costs</b><ChevronRight size={18} /></button> : null;
 }
+function ShareGuard(p: AppApi) { return useMetricsOwner(true) ? <ShareScreen {...p} /> : null; }
+// SH73: one question to the server per menu open for every owner-only row (Metrics, Running costs, Share), and a busy or
+// failed answer changes nothing: before, a 429 from the per-minute limit hid Metrics until the next open.
+let ownerAsk: { at: number; p: Promise<boolean | null> } | null = null;
+const askOwner = () => {
+  const now = Date.now();
+  if (!ownerAsk || now - ownerAsk.at > 5000) ownerAsk = { at: now, p: fetch("/api/metrics/access").then((r) => (r.ok ? r.json().then((d) => Boolean(d.owner)) : null)).catch(() => null) };
+  return ownerAsk.p;
+};
 export function useMetricsOwner(on: boolean) {
   const [owner, setOwner] = useState(() => { try { return localStorage.getItem(OWNER) === "1"; } catch { return false; } });
   useEffect(() => {
     if (!on) return;
-    fetch("/api/metrics/access").then((r) => (r.ok ? r.json() : { owner: false })).then((d) => { setOwner(Boolean(d.owner)); try { localStorage.setItem(OWNER, d.owner ? "1" : "0"); } catch { /* shows next time */ } }).catch(() => {});
+    askOwner().then((o) => { if (o === null) return; setOwner(o); try { localStorage.setItem(OWNER, o ? "1" : "0"); } catch { /* shows next time */ } });
   }, [on]);
   return owner;
 }
@@ -88,7 +102,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
           {/* Foods lives here from 0.2.0 (X0): the library, reached day to day from the Plate's search and Quick picks */}
           <button className="menu-row" onClick={() => p.setTab("foods")}><span className="menu-icon"><BookOpen size={20} /></span><b>Foods</b><ChevronRight size={18} /></button>
           {/* SH73 (Milan 21 October 21:10): a QR code to share chefmealan.com or the book, and for a coach a code to join, shown as a QR code */}
-          <button className="menu-row" onClick={() => setSection("share")}><span className="menu-icon"><QrCode size={20} /></span><b>Share Chef Mealan</b><ChevronRight size={18} /></button>
+          <ShareRow open={() => setSection("share")} />
           {[{ id: "support" as MenuSection, name: "Support", icon: <LifeBuoy size={20} /> }, ...(p.profile.role === "coach" || !p.cloudEnabled ? [{ id: "evals" as MenuSection, name: "Evals", icon: <FlaskConical size={20} /> }] : [])].map((it) => (
             <button key={it.id} className="menu-row" onClick={() => setSection(it.id)}>
               <span className="menu-icon">{it.icon}</span><b>{it.name}</b><ChevronRight size={18} />
@@ -123,7 +137,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       {section === "evals" && <EvalsScreen {...p} />}
       {section === "metrics" && <MetricsScreen />}
       {section === "costs" && <CostsScreen />}
-      {section === "share" && <ShareScreen {...p} />}
+      {section === "share" && <ShareGuard {...p} />}
     </>
   );
 }
