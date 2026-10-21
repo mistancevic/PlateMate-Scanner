@@ -1,3 +1,4 @@
+import { BOOKS } from "../bookPages";
 import { useEffect, useRef, useState } from "react";
 import { tabOfPath } from "../back";
 import { RecipeCard } from "./RecipePages";
@@ -108,7 +109,7 @@ export function LandingScreen() {
             <p className="l-role">Product builder by day.<br />Fitness and nutrition coach after hours.</p>
             <p>Milan is a senior product manager with about 20 years in software and the founder of several startups. He designs and builds Chef Mealan with AI, from the first sketch to every release.</p>
             <p>After hours, Milan is a certified fitness and nutrition coach in Munich, known to his clients as Coach Milan. He cooks every day for himself and his family, and tries every recipe and every number on himself first.</p>
-            <p>Author of <a href="/built#books">Worth Building</a>. Worth Eating comes next.</p>
+            <p>Author of <a href="/built#books">Worth Building</a> and <a href="/worthy-numbers?from=hp">Worthy Numbers</a>. Worth Eating comes next.</p>
             <p className="l-behind-links"><a href="/built">How Chef Mealan is built ›</a><a href="/about">More about Milan ›</a></p>
           </div>
           <figure className="l-hero-art">
@@ -124,6 +125,20 @@ export function LandingScreen() {
           <div><b>A calculator does the math</b><p>Your daily numbers and the grams on each plate come from published formulas. You can open any number and see how Chef Mealan got to it.</p></div>
           <div><b>AI reads, a calculator decides</b><p>Chef Mealan uses AI to read labels, menus and shop shelves, and to answer you in the chat. The numbers themselves come from a calculator, not from the AI. When the AI has to guess a number from a photo, the app marks that number as an estimate.</p></div>
           <div><b>Your data stays in the EU</b><p>Your data is stored in Frankfurt, in your account. You can download all of it, or delete all of it, at any time.</p></div>
+        </div>
+      </section>
+
+      {/* BP70 (Milan 12:41): the book gets one block here and its own page, so there is one place to update */}
+      <section className="l-week l-book">
+        <span className="l-eyebrow">A free guide</span>
+        <h2>{BOOKS["worthy-numbers"].name}</h2>
+        <div className="l-split">
+          <div>
+            <p className="l-role">{BOOKS["worthy-numbers"].kicker}. {BOOKS["worthy-numbers"].subtitle}</p>
+            <p>PD, the number no pack prints, and five more numbers about your food: what each one tells you, and how to use it at your next meal.</p>
+            <p><a className="l-book-link" href="/worthy-numbers?from=hp">See the book ›</a></p>
+          </div>
+          <figure className="l-hero-art"><a href="/worthy-numbers?from=hp"><img className="l-book-cover" src={BOOKS["worthy-numbers"].cover} alt={`The cover of ${BOOKS["worthy-numbers"].name}`} width={220} height={312} /></a></figure>
         </div>
       </section>
 
@@ -241,7 +256,7 @@ function TryIt() {
   );
 }
 
-export function RequestForm({ email: presetEmail, name: presetName, from }: { email?: string; name?: string; from?: string }) {
+export function RequestForm({ email: presetEmail, name: presetName, from, src }: { email?: string; name?: string; from?: string; src?: string }) {
   const started = useRef(Date.now());
   const [name, setName] = useState(presetName ?? "");
   const [email, setEmail] = useState(presetEmail ?? "");
@@ -254,7 +269,7 @@ export function RequestForm({ email: presetEmail, name: presetName, from }: { em
   async function send() {
     setErr(""); setState("sending");
     try {
-      const r = await fetch("/api/access-request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, phone, note, who, coach: who === "coach", from, website: trap, elapsed: Date.now() - started.current }) });
+      const r = await fetch("/api/access-request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, phone, note, who, coach: who === "coach", from, src, website: trap, elapsed: Date.now() - started.current }) });
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d.error || "Couldn't send. Please write to hello@chefmealan.com.");
       setState("sent");

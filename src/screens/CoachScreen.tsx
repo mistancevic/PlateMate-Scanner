@@ -1,4 +1,4 @@
-import { BOOK_PAGES } from "../bookPages";
+import { BOOK_PAGES, BOOK_SOURCES } from "../bookPages";
 import { waLink } from "../phone";
 import { useEffect, useState } from "react";
 import { useKept } from "../kept";
@@ -242,9 +242,10 @@ export function AccessRequests(p: AppApi) {
   return (
     <>
       <p className="label">Access requests ({open.length} new)</p>
+      <BetaSpots />
       {people.slice(0, 20).map((r) => (
         <section className={`card request ${r.status === "handled" ? "handled" : ""}`} key={r.id}>
-          <div className="card-top"><span>{r.name}{r.coach ? " · coach" : ""}{BOOK_PAGES[r.from] ? ` · from ${BOOK_PAGES[r.from]}` : ""}{r.count > 1 ? ` · ${r.count} requests` : ""}</span><small>{new Date(r.createdAt).toLocaleDateString()}</small></div>
+          <div className="card-top"><span>{r.name}{r.coach ? " · coach" : ""}{BOOK_PAGES[r.from] ? ` · from ${BOOK_PAGES[r.from]}${BOOK_SOURCES[r.src] ? `, ${BOOK_SOURCES[r.src]}` : ""}` : ""}{r.count > 1 ? ` · ${r.count} requests` : ""}</span><small>{new Date(r.createdAt).toLocaleDateString()}</small></div>
           <a href={`mailto:${r.email}?subject=Your%20Chef%20Mealan%20code`}>{r.email}</a>
           {r.phone && <a href={waLink(String(r.phone))} target="_blank" rel="noreferrer">WhatsApp {r.phone}</a>}
           {r.note && <p className="client-note">“{r.note}”</p>}
@@ -414,3 +415,33 @@ export function WaitingRecipes({ notify, setError }: { notify: (m: string) => vo
   );
 }
 
+
+// BP70 (Milan 12:29): beta spots left in this round, shown on a book's page. Milan lowers it as people join; Clear hides it.
+// Only Milan's account sees it (the same rule as Metrics).
+function BetaSpots() {
+  const [owner, setOwner] = useState(false);
+  const [spots, setSpots] = useState<number | null>(null);
+  const [err, setErr] = useState("");
+  useEffect(() => {
+    fetch("/api/metrics/access").then((r) => r.json()).then((d) => setOwner(Boolean(d?.owner))).catch(() => {});
+    fetch("/api/beta/spots").then((r) => r.json()).then((d) => setSpots(Number.isInteger(d?.spots) ? d.spots : null)).catch(() => {});
+  }, []);
+  const save = async (n: number | null) => {
+    setErr("");
+    const r = await fetch("/api/beta/spots", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ spots: n }) }).catch(() => null);
+    if (r?.ok) setSpots(n); else setErr("Couldn't save. Try again.");
+  };
+  if (!owner) return null;
+  return (
+    <section className="card beta-spots">
+      <div className="card-top"><span>Beta spots left</span><small>{spots === null ? "not shown" : "shown on the book page"}</small></div>
+      <span className="rp-step">
+        <button type="button" aria-label="One spot less" disabled={spots === null || spots === 0} onClick={() => save((spots ?? 0) - 1)}>−</button>
+        <b>{spots === null ? "–" : spots}</b>
+        <button type="button" aria-label="One spot more" disabled={spots !== null && spots >= 999} onClick={() => save((spots ?? 0) + 1)}>+</button>
+      </span>
+      {spots !== null && <button type="button" className="link" onClick={() => save(null)}>Don't show a number</button>}
+      {err && <small className="muted">{err}</small>}
+    </section>
+  );
+}

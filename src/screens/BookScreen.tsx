@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { hit } from "../metrics";
 import { Mark, APP_NAME } from "../components/Mark";
-import { BOOKS, bookHit } from "../bookPages";
+import { BOOKS, bookHit, sourceOf } from "../bookPages";
 import { RequestForm } from "./LandingScreen";
 
 // BP70 (Milan 21 October 2026, 10:49 and 10:52): a book's own page at chefmealan.com/<slug>, the same for everyone. The book,
@@ -9,7 +9,16 @@ import { RequestForm } from "./LandingScreen";
 // form when signed out, Open Chef Mealan when signed in. The back cover of the book points here.
 export function BookScreen({ slug, signedIn }: { slug: string; signedIn: boolean }) {
   const b = BOOKS[slug];
-  useEffect(() => { hit(bookHit(slug) as `book_${string}`); document.title = `${b.name} · ${APP_NAME}`; }, [slug]);
+  // BP70: where the reader came from (?from=qr), counted once, then the address bar shows the plain address
+  const [src] = useState(() => (typeof location !== "undefined" ? sourceOf(location.search) : null));
+  useEffect(() => {
+    hit(bookHit(slug) as `book_${string}`); if (src) hit(bookHit(slug, src) as `book_${string}`);
+    if (src) history.replaceState(null, "", location.pathname);
+    document.title = `${b.name} · ${APP_NAME}`;
+  }, [slug]);
+  // BP70: beta spots left, set by Milan; nothing is shown while no number is set
+  const [spots, setSpots] = useState<number | null>(null);
+  useEffect(() => { fetch("/api/beta/spots").then((r) => r.json()).then((d) => setSpots(Number.isInteger(d?.spots) ? d.spots : null)).catch(() => {}); }, []);
   return (
     <div className="bt bk">
       <header className="l-top">
@@ -57,8 +66,9 @@ export function BookScreen({ slug, signedIn }: { slug: string; signedIn: boolean
       <p className="bt-sub">PD helps you decide at the plate or on the go. What counts is the whole day: calories in and out, protein, carbohydrate and fat, vitamins and minerals, an active day, strength training, sleep and recovery. Chef Mealan supports you on that journey.</p>
       <div className="bk-target">
         <small>Your own target, calculated</small>
-        <span>Example: wants to keep his weight · 80 kg, 182 cm · two strength sessions a week</span>
-        <div><b>2,350 kcal and 150 g protein a day</b><b className="bk-pd">PD 6.4</b></div>
+        {/* the same two people as in the book: different bodies, goals and amounts, the same PD */}
+        <div><span><b>A man of 80 kg, 182 cm</b><span>trains twice a week, wants to keep his weight</span></span><span className="bk-who"><b className="bk-pd">PD 6.4</b><span>2,350 kcal · 150 g protein</span></span></div>
+        <div><span><b>A woman of 66 kg, 168 cm</b><span>trains three times a week, wants to build muscle</span></span><span className="bk-who"><b className="bk-pd">PD 6.4</b><span>1,950 kcal · 125 g protein</span></span></div>
       </div>
       {signedIn ? (
         <a className="pill pill-primary bk-read" href="/">Open Chef Mealan</a>
@@ -66,7 +76,8 @@ export function BookScreen({ slug, signedIn }: { slug: string; signedIn: boolean
         <div className="l-request bk-join">
           <h2>Get your personal code</h2>
           <p className="l-book-line">Chef Mealan is free while it is in beta, and spots are limited. Leave your name and email, and you get your code within a day.</p>
-          <RequestForm from={slug} />
+          {spots !== null && <p className={`bk-spots ${spots === 0 ? "full" : ""}`}>{spots === 0 ? "This round is full. Leave your name and email, and you’re first in line for the next round." : `${spots} ${spots === 1 ? "spot" : "spots"} left in this round.`}</p>}
+          <RequestForm from={slug} src={src ?? undefined} />
         </div>
       )}
 

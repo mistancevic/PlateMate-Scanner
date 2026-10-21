@@ -49,6 +49,10 @@ export function bookOfPath(path: string): string | null {
   const m = /^\/([a-z0-9-]{1,40})\/?$/.exec(path);
   return m && BOOKS[m[1]] ? m[1] : null;
 }
-// the daily count for a book: book_worthy_numbers
-export const bookHit = (slug: string) => `book_${slug.replace(/-/g, "_")}`;
-export const BOOK_HITS = Object.keys(BOOKS).map(bookHit);
+// BP70 (Milan 12:29): where a reader came from, by the ending of the link (chefmealan.com/worthy-numbers?from=qr). A fixed
+// list: anything else counts as the plain address. Only the short word is kept, never the link itself.
+export const BOOK_SOURCES: Record<string, string> = { qr: "QR", pdf: "PDF", li: "LinkedIn", ig: "Instagram", wa: "WhatsApp", gh: "GitHub", hp: "Home page" };
+export const sourceOf = (search: string): string | null => { const s = new URLSearchParams(search).get("from"); return s && BOOK_SOURCES[s] ? s : null; };
+// the daily count for a book, book_worthy_numbers, and per source, book_worthy_numbers__qr
+export const bookHit = (slug: string, src?: string | null) => `book_${slug.replace(/-/g, "_")}${src ? `__${src}` : ""}`;
+export const BOOK_HITS = Object.keys(BOOKS).flatMap((slug) => [bookHit(slug), ...Object.keys(BOOK_SOURCES).map((s) => bookHit(slug, s))]);
