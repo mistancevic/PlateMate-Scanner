@@ -53,7 +53,7 @@ const monday = (d) => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDa
   ok(yc.lived === (yc.proteinPct >= 90 && yc.energyPct >= 90 && yc.energyPct <= 110), `lived by the plan follows the rule: protein ${yc.proteinPct} %, energy ${yc.energyPct} %, lived ${yc.lived}`);
   ok(box.length === 0, "sent within seconds: the outbox is empty (" + box.length + ")");
   // home page counts: one number per day and kind, no cookie
-  await page.evaluate(async () => { for (const k of ["hp_visit", "hp_visit", "hp_calc", "hp_try", "nonsense"]) await fetch("/api/hit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k }) }); });
+  await page.evaluate(async () => { for (const k of ["hp_visit", "hp_visit", "hp_calc", "hp_try", "nonsense", "book_worthy_numbers", "book_worthy_numbers__qr"]) await fetch("/api/hit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k }) }); });
   await page.goto("http://127.0.0.1:3197/built"); await page.waitForTimeout(1200);
   ok((await page.context().cookies()).length === 0, "no cookie is set by the counts");
   const api = (w) => page.evaluate(async (w) => (await fetch(`/api/metrics${w ? `?week=${w}` : ""}`)).json(), w);
@@ -73,10 +73,20 @@ const monday = (d) => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDa
   if (!(await page.locator(".mt").count())) { await page.screenshot({ path: "/tmp/claude-0/-home-claude/eb1a4d76-58dd-5eb0-821a-03f8b6297cd5/scratchpad/shots/_mt.png" }); console.log("DEBUG " + errs.join(" | ") + " :: " + (await page.locator("body").textContent()).slice(0, 300)); }
   const txt = await page.locator(".mt").textContent();
   if (process.env.SHOTS) await page.locator(".mt").screenshot({ path: `${process.env.SHOTS}/mt-m3.png` });
-  ok(/Days lived by the plan/.test(txt) || /Counting since/.test(txt), "M2/M3: the Metrics page opens: " + txt.slice(0, 80));
-  if (/Counting since/.test(txt)) ok(/Home page visits\s*2/.test(txt.replace(/\s+/g, " ")) || /Home page visits2/.test(txt), "M3: the first week shows today so far, 2 visits");
-  else ok(/The five KPIs/.test(txt) && /The way in/.test(txt), "M2: the North Star, the five KPIs and the way in");
-  if (/Counting since/.test(txt)) ok(/TODAY/.test(txt) && /SINCE \d+ [A-Z]{3}/.test(txt), "M5: next to today, the count since the first day");
+  const t1 = (await page.locator(".mt").innerText()).replace(/\s+/g, " ");
+  ok(/Days lived by the plan/.test(t1) && /The five KPIs/.test(t1) && /The way in/.test(t1), "MT71: the whole page shows from the first day of counting: " + t1.slice(0, 80));
+  ok(/This week \d+ \w+ to today\./.test(t1) && /Compared with \d+ to \d+ \w+/.test(t1) && /Counting began on \d+ \w+\. Today is \d+ \w+\./.test(t1), "MT71: the time frame on top, and since when it counts");
+  ok((await page.locator(".mt-when").count()) === 4, "MT71: each card says which days it counts");
+  ok(/Home page visits\s*2/.test(t1), "MT71: the way in shows this week's visits so far, 2");
+  ok(/From Worthy Numbers 1 QR 1/.test(t1), "MT71: the book's visit and its QR code show this week, before a full week is counted");
+  ok(/TODAY/.test(t1) && /SINCE \d+ [A-Z]{3}/.test(t1), "M5: next to today, the count since the first day");
+  await page.getByRole("tab", { name: "Last week" }).click(); await page.waitForTimeout(1500);
+  const t2 = (await page.locator(".mt").innerText()).replace(/\s+/g, " ");
+  ok(/Last week \d+ to \d+ \w+/.test(t2) && !/to today/.test(t2), "MT71: Last week names its own days");
+  await page.getByRole("tab", { name: "4 weeks" }).click(); await page.waitForTimeout(1500);
+  const t3 = (await page.locator(".mt").innerText()).replace(/\s+/g, " ");
+  ok(/The last 4 weeks \d+ \w+ to \d+ \w+, one row per week/.test(t3) && /not counted yet/.test(t3), "MT71: 4 weeks says its days, and a week before the first day says not counted yet");
+  await page.getByRole("tab", { name: "This week" }).click(); await page.waitForTimeout(800);
   ok(!/AI use|Cost to serve|Cost per active member/.test(txt), "M6: Metrics holds product measures only, no costs");
   // M6b: Running costs, its own page next to Metrics: AI use, cost per active member from the count, the bills as fixed cost
   await page.goto("http://127.0.0.1:3197/today"); await page.waitForTimeout(1000); await page.getByRole("button", { name: "Menu" }).click(); await page.waitForTimeout(600);
@@ -101,10 +111,10 @@ const monday = (d) => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDa
     await page.getByRole("button", { name: "Menu" }).click(); await page.waitForTimeout(600);
     await page.locator(".menu-row", { hasText: "Metrics" }).click(); await page.waitForTimeout(1200);
     if (process.env.SHOTS) await page.locator(".menu, .mt").last().screenshot({ path: `${process.env.SHOTS}/mt-m2.png` });
-    const t2 = (await page.locator(".mt").textContent()).replace(/\s+/g, " ");
+    const t2 = (await page.locator(".mt").innerText()).replace(/\s+/g, " ");
     ok(/Days lived by the plan/.test(t2) && /The five KPIs/.test(t2) && /The way in/.test(t2) && /This week in the app/.test(t2) && !/Cost per active member/.test(t2), "M2: a full week: the North Star, the five KPIs, the way in, this week in the app; no cost");
     await page.getByRole("tab", { name: "4 weeks" }).click(); await page.waitForTimeout(1200);
-    ok(/The last 4 weeks/.test(await page.locator(".mt").textContent()), "M2: 4 weeks shows the North Star week by week");
+    ok(/The last 4 weeks/.test(await page.locator(".mt").textContent()) && /Week by week/.test(await page.locator(".mt").textContent()), "M2: 4 weeks shows the North Star week by week");
   } else console.log("ok   M2: (the hand-sent day is not in a full past week on this weekday; M3 above stands)");
   // M4: the privacy notice
   await page.goto("http://127.0.0.1:3197/privacy"); await page.waitForTimeout(900);

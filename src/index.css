@@ -1966,3 +1966,6 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .shop-plan-changed > b { color: var(--close-text); font-size: var(--fs-label); font-weight: 900; } .shop-plan-changed small { color: var(--close-text); font-weight: 700; }
 .shop-plan-changed .button-row { margin-top: 6px; }
 .day-strip .choice.is-today { border-color: var(--brand); color: var(--brand-text); font-weight: 900; }
+/* MT71: each Metrics card says which days it counts */
+.mt-when { margin-top: -4px; }
+.mt-frame span { font-size: var(--fs-label); line-height: 1.45; }
