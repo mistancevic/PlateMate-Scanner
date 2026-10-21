@@ -1,4 +1,4 @@
-import { BOOK_PAGES, bookOfPath, bookHit } from "../bookPages";
+import { BOOKS } from "../bookPages";
 import { useEffect, useRef, useState } from "react";
 import { tabOfPath } from "../back";
 import { RecipeCard } from "./RecipePages";
@@ -17,9 +17,6 @@ export function LandingScreen() {
   // signed out on an app address (chefmealan.com/foods): the home page sits at chefmealan.com
   useEffect(() => { if (tabOfPath(location.pathname, ["home", "journey", "meal", "chef", "recipes", "foods", "me"])) history.replaceState(null, "", "/"); }, []);
   const go = async () => { setBusy(true); setErr(""); try { await signIn(); } catch (e: any) { setErr(e.message || "Sign-in failed."); } finally { setBusy(false); } };
-  // BK69: a book address (chefmealan.com/worthy-numbers), printed in the book and used in social posts, opens the home page
-  // at the form; counted per book, and the request says which book. The address bar then shows chefmealan.com.
-  const [fromBook] = useState(() => (typeof location !== "undefined" ? bookOfPath(location.pathname) : null));
   // home page counts (0.2.5+r17, board M): a visit, a Try tap; no cookie, no visitor id
   useEffect(() => { hit("hp_visit"); }, []);
   const toForm = () => { hit("hp_try"); formRef.current?.scrollIntoView({ behavior: "smooth" }); };
@@ -38,7 +35,6 @@ export function LandingScreen() {
   }, []);
   // from a recipe page's Try Chef Mealan: straight to the form
   useEffect(() => { if (location.hash === "#ask") setTimeout(toForm, 300); }, []);
-  useEffect(() => { if (!fromBook) return; hit(bookHit(fromBook) as `book_${string}`); history.replaceState(null, "", "/"); setTimeout(toForm, 300); }, []);
   // the three newest public recipes (canvas board R7); the section stays hidden while there are none
   const [recipes, setRecipes] = useState<PublicRecipe[]>([]);
   useEffect(() => { fetch("/api/recipes?limit=3").then((r) => r.json()).then((d) => setRecipes(d.recipes ?? [])).catch(() => {}); }, []);
@@ -113,7 +109,7 @@ export function LandingScreen() {
             <p className="l-role">Product builder by day.<br />Fitness and nutrition coach after hours.</p>
             <p>Milan is a senior product manager with about 20 years in software and the founder of several startups. He designs and builds Chef Mealan with AI, from the first sketch to every release.</p>
             <p>After hours, Milan is a certified fitness and nutrition coach in Munich, known to his clients as Coach Milan. He cooks every day for himself and his family, and tries every recipe and every number on himself first.</p>
-            <p>Author of <a href="/built#books">Worth Building</a>. Worth Eating comes next.</p>
+            <p>Author of <a href="/built#books">Worth Building</a> and <a href="/worthy-numbers?from=hp">Worthy Numbers</a>. Worth Eating comes next.</p>
             <p className="l-behind-links"><a href="/built">How Chef Mealan is built ›</a><a href="/about">More about Milan ›</a></p>
           </div>
           <figure className="l-hero-art">
@@ -132,6 +128,20 @@ export function LandingScreen() {
         </div>
       </section>
 
+      {/* BP70 (Milan 12:41): the book gets one block here and its own page, so there is one place to update */}
+      <section className="l-week l-book">
+        <span className="l-eyebrow">A free guide</span>
+        <h2>{BOOKS["worthy-numbers"].name}</h2>
+        <div className="l-split">
+          <div className="l-book-text">
+            <p className="l-role">{BOOKS["worthy-numbers"].kicker}. {BOOKS["worthy-numbers"].subtitle}</p>
+            <p>PD, the number no pack prints, and five more numbers about your food: what each one tells you, and how to use it at your next meal.</p>
+            <p><a className="l-book-link" href="/worthy-numbers?from=hp">See the book ›</a></p>
+          </div>
+          <figure className="l-hero-art"><a href="/worthy-numbers?from=hp"><img className="l-book-cover" src={BOOKS["worthy-numbers"].cover} alt={`The cover of ${BOOKS["worthy-numbers"].name}`} width={220} height={312} /></a></figure>
+        </div>
+      </section>
+
       <section className="l-who">
         <span className="l-eyebrow">Who it's for</span>
         <h2>For adults with a nutrition plan</h2>
@@ -141,9 +151,7 @@ export function LandingScreen() {
       <section className="l-request" ref={formRef}>
         <h2>Try Chef Mealan</h2>
         <p>Chef Mealan is being tested by a small group right now. Most people join with a code from their coach. If you don't have a code, leave your name and email, and Coach Milan will send you a personal code.</p>
-        {/* BK69: the same promise the back cover of Worthy Numbers makes */}
-        {fromBook && <p className="l-book-line">From the book {BOOK_PAGES[fromBook]}: Chef Mealan is free while it is in beta, and you get your code within a day.</p>}
-        <RequestForm from={fromBook ?? undefined} />
+        <RequestForm />
       </section>
 
       <div className={`l-sticky ${sticky ? "on" : ""}`} aria-hidden={!sticky}><button className="pill pill-primary" tabIndex={sticky ? 0 : -1} onClick={toForm}>Try Chef Mealan</button></div>
@@ -248,7 +256,7 @@ function TryIt() {
   );
 }
 
-export function RequestForm({ email: presetEmail, name: presetName, from }: { email?: string; name?: string; from?: string }) {
+export function RequestForm({ email: presetEmail, name: presetName, from, src }: { email?: string; name?: string; from?: string; src?: string }) {
   const started = useRef(Date.now());
   const [name, setName] = useState(presetName ?? "");
   const [email, setEmail] = useState(presetEmail ?? "");
@@ -261,7 +269,7 @@ export function RequestForm({ email: presetEmail, name: presetName, from }: { em
   async function send() {
     setErr(""); setState("sending");
     try {
-      const r = await fetch("/api/access-request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, phone, note, who, coach: who === "coach", from, website: trap, elapsed: Date.now() - started.current }) });
+      const r = await fetch("/api/access-request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, phone, note, who, coach: who === "coach", from, src, website: trap, elapsed: Date.now() - started.current }) });
       const d = await r.json().catch(() => ({}));
       if (!r.ok) throw new Error(d.error || "Couldn't send. Please write to hello@chefmealan.com.");
       setState("sent");

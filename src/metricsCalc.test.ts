@@ -57,8 +57,8 @@ test("covers and Members: drawn covers, the ones replaced by a real photo, and w
 });
 
 test("BK69: visits from a book address count per book in the way in, and none counts as none", () => {
-  const w = weekStats([], "2026-10-19", { ...X, hp: { ...X.hp, book_worthy_numbers: 4 } }).wayIn;
-  assert.deepEqual(w.books, [{ name: "Worthy Numbers", n: 4 }]); assert.equal(w.visits, 214);
+  const w = weekStats([], "2026-10-19", { ...X, hp: { ...X.hp, book_worthy_numbers: 4, book_worthy_numbers__qr: 3, book_worthy_numbers__li: 1 } }).wayIn;
+  assert.deepEqual(w.books, [{ name: "Worthy Numbers", n: 4, by: [{ name: "QR", n: 3 }, { name: "LinkedIn", n: 1 }] }]); assert.equal(w.visits, 214);
   assert.equal(weekStats([], "2026-10-19", X).wayIn.books[0].n, 0);
 });
 test("BK69: only a known book's address is a book page", async () => {
@@ -66,4 +66,9 @@ test("BK69: only a known book's address is a book page", async () => {
   assert.equal(bookOfPath("/worthy-numbers"), "worthy-numbers"); assert.equal(bookOfPath("/worthy-numbers/"), "worthy-numbers");
   assert.equal(bookOfPath("/book"), null); assert.equal(bookOfPath("/foods"), null); assert.equal(bookOfPath("/worthy-numbers/x"), null);
   assert.equal(bookHit("worthy-numbers"), "book_worthy_numbers");
+  // BP70: a link's ending says where the reader came from, from a fixed list only
+  const { sourceOf, bookHit: hitOf, BOOK_HITS } = await import("./bookPages");
+  assert.equal(sourceOf("?from=qr"), "qr"); assert.equal(sourceOf("?from=li&x=1"), "li");
+  assert.equal(sourceOf("?from=spam"), null); assert.equal(sourceOf(""), null);
+  assert.equal(hitOf("worthy-numbers", "qr"), "book_worthy_numbers__qr"); assert.ok(BOOK_HITS.includes("book_worthy_numbers__hp"));
 });
