@@ -34,7 +34,7 @@ export function BookScreen({ slug, signedIn }: { slug: string; signedIn: boolean
           <p className="bk-sub">{b.subtitle}</p>
           <p className="bt-lead">{b.intro}</p>
           {b.pdf
-            ? <a className="pill pill-primary bk-read" href={b.pdf} target="_blank" rel="noreferrer">Read the book</a>
+            ? <div className="bk-read-wrap"><a className="pill pill-primary bk-read" href={b.pdf} target="_blank" rel="noreferrer">Read the book</a><small className="muted">Free PDF, {b.pages} pages, version {b.version}. No sign-up.</small></div>
             : <div className="bk-soon"><b>The book is in its last edit.</b><span>It will be free to read and download here, with no sign-up.</span></div>}
         </div>
       </section>

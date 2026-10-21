@@ -122,7 +122,7 @@ export function RecipeView({ r, member, photoSrc, top }: { r: Loaded; member: Me
       {member ? <Amounts r={r} m={member} /> : (
         <section className="rp-card rp-invite">
           <b>Your amounts</b>
-          <p>How many {plural(2, r.servingName)} fit your day, and what to add so the plate fits your goal: Chef Mealan works it out for each person.</p>
+          <p>How many {plural(2, r.servingName)} fit your day, and what to add so the plate fits your goal: Chef Mealan calculates it for each person.</p>
           <a className="pill pill-wide pill-primary" href="/#ask">Try Chef Mealan</a>
           <small>A closed pilot with coaches.</small>
         </section>
@@ -150,7 +150,7 @@ export function RecipeView({ r, member, photoSrc, top }: { r: Loaded; member: Me
         {([["Energy", `${s.kcal} kcal`, `${r.all.kcal} kcal`], ["Fat", `${s.fat} g`, `${Math.round(r.all.fat)} g`], ["Carbohydrate", `${s.carbs} g`, `${Math.round(r.all.carbs)} g`], ...(s.fibre !== null ? [["Fibre", `${s.fibre} g`, `${Math.round(r.all.fibre ?? 0)} g`]] : []), ["Protein", g1(s.protein), g1(r.all.protein)]] as string[][]).map(([a, b, c]) => (
           <div className="rp-row rp-3" key={a}><span>{a}</span><b>{b}</b><small>{c}</small></div>
         ))}
-        <small className="muted">Worked out from the labels of the foods used, weighed. {r.proteinShare} % of the energy is protein{r.proteinShare >= 20 ? "; the EU rule for calling food high protein is 20 %" : ""}.</small>
+        <small className="muted">Calculated from the labels of the foods used, weighed. {r.proteinShare} % of the energy is protein{r.proteinShare >= 20 ? "; the EU rule for calling food high protein is 20 %" : ""}.</small>
       </section>
       <section className="rp-card">
         <b>What is PD?</b>
@@ -203,12 +203,12 @@ export function RecipesPage({ member }: { member: boolean }) {
     <div className="rp">
       <Top right={member ? <a className="rp-link" href="/today">Open the app</a> : <a className="rp-link" href="/">Sign in</a>} />
       <h1 className="rp-title">Recipes</h1>
-      <p className="rp-lines">Recipes from our kitchens. Every number is worked out from the recipe, weighed, not guessed from a photo.</p>
+      <p className="rp-lines">Recipes from our kitchens. Every number is calculated from the recipe, weighed, not guessed from a photo.</p>
       {list === null && <p className="rp-empty">Opening…</p>}
       {list && !list.length && <p className="rp-empty">The first recipes are on their way.</p>}
       <div className="rp-grid">{(list ?? []).map((r) => <RecipeCard key={r.slug} r={r} />)}</div>
       {!member && (
-        <section className="rp-card rp-invite"><b>Your amounts, for every recipe</b><p>In the app, Chef Mealan works out how much of each recipe fits your goal and your day.</p><a className="pill pill-wide pill-primary" href="/#ask">Try Chef Mealan</a></section>
+        <section className="rp-card rp-invite"><b>Your amounts, for every recipe</b><p>In the app, Chef Mealan calculates how much of each recipe fits your goal and your day.</p><a className="pill pill-wide pill-primary" href="/#ask">Try Chef Mealan</a></section>
       )}
       <Foot />
     </div>

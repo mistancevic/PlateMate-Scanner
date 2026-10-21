@@ -2038,7 +2038,7 @@ async function start() {
     });
     app.get("/recipes", (req, res) => {
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-      try { res.type("html").send(withMeta("Recipes · Chef Mealan", "Recipes from our kitchens. Every number is worked out from the recipe, weighed.", `https://${req.get("host")}/og.jpg?v=2`, `https://${req.get("host")}/recipes`)); }
+      try { res.type("html").send(withMeta("Recipes · Chef Mealan", "Recipes from our kitchens. Every number is calculated from the recipe, weighed.", `https://${req.get("host")}/og.jpg?v=2`, `https://${req.get("host")}/recipes`)); }
       catch { res.sendFile(path.join(dist, "index.html")); }
     });
     // BP70: a book's page carries the book's title, words and share picture, so a link in a social post shows the book

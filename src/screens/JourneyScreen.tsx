@@ -987,7 +987,7 @@ export function JourneyScreen(p: AppApi) {
         {!chefable && p.filling && p.filling.mode !== "eat" && items.length > 0 && <p className="small center">Fit moves one food. Keep it as it is puts the plate in {slotName(p.filling)} as it stands.</p>}
         {p.filling?.mode === "eat" && items.length > 0 && <p className="small center">Fit sets the amounts. Keep it as it is keeps yours. Save at the end records it as {slotName(p.filling)}.</p>}
         {!imported && !chefable && !p.filling && items.length === 1 && <p className="small center">One product: {CHEF_NAME} looks through your foods for a partner that brings it to your plan.</p>}
-        {!imported && !chefable && !p.filling && items.length >= 2 && <p className="small center">Fit works out the amounts without the AI. Keep it as it is keeps yours.</p>}
+        {!imported && !chefable && !p.filling && items.length >= 2 && <p className="small center">Fit calculates the amounts without the AI. Keep it as it is keeps yours.</p>}
         {!imported && <Tip list={items} refit={false} />}
         </section>)}
         {swapPanel}

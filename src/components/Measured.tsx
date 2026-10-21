@@ -29,7 +29,7 @@ export function KnowCard({ m, openGoal }: { m: Measured; openGoal: () => void })
       <Squares m={m} />
       <Legend />
       <small className="ft-text">{m.day! < WINDOW
-        ? `On day 14, Chef Mealan works out what your body really burns, from what you ate and how your weight moved. ${m.fullDays} full ${m.fullDays === 1 ? "day" : "days"} and ${weighed} ${weighed === 1 ? "weigh-in" : "weigh-ins"} so far.`
+        ? `On day 14, Chef Mealan calculates what your body really burns, from what you ate and how your weight moved. ${m.fullDays} full ${m.fullDays === 1 ? "day" : "days"} and ${weighed} ${weighed === 1 ? "weigh-in" : "weigh-ins"} so far.`
         : `Not enough data yet: ${m.fullDays} of ${NEED_FULL} full days and ${m.weighIns} of ${NEED_WEIGH} weigh-ins in the last 14 days. It goes on until it is ready.`}</small>
       <button className="link" style={{ alignSelf: "flex-start" }} onClick={openGoal}>How it works ›</button>
     </section>
@@ -103,7 +103,7 @@ export function BurnCard({ m, formulaKcal, name, inUse, onUse }: { m: Measured; 
       {gap?.line && <small className="ft-gap">{n(Math.abs(gap.kcal))} kcal {gap.kcal > 0 ? "more" : "less"} than the formula, {Math.abs(gap.pct)} %. {gap.line}</small>}
       {coach ? <small className="ft-text">To use it, pick From {name}'s data under Formula, or set a new goal from a date.</small> : (
         <>
-          <div className="button-row" style={{ marginTop: 6 }}>{onUse && <button className="pill pill-small pill-primary" onClick={onUse}>Use my data</button>}<button className="link" aria-expanded={how} onClick={() => setHow((v) => !v)}>{how ? "Close How it's worked out" : "How it's worked out ›"}</button></div>
+          <div className="button-row" style={{ marginTop: 6 }}>{onUse && <button className="pill pill-small pill-primary" onClick={onUse}>Use my data</button>}<button className="link" aria-expanded={how} onClick={() => setHow((v) => !v)}>{how ? "Close How it's calculated" : "How it's calculated ›"}</button></div>
           {how && (
             <div className="ft-how">
               <p><b>What you ate.</b> The average of your full days: every planned meal eaten, swapped or skipped on purpose, and anything extra logged. Days with a meal missing don't count.</p>

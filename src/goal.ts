@@ -47,7 +47,7 @@ const LKEY = "chefmealan-goal-log";
 export const getGoalLog = (): GoalEntry[] => { try { return JSON.parse(localStorage.getItem(LKEY) || "[]"); } catch { return []; } };
 // kept collapsed (board FX, G3): one goal per day, the same goal one period; see goalHistory.ts
 export const setGoalLog = (l: GoalEntry[]) => { try { localStorage.setItem(LKEY, JSON.stringify(collapseLog(l).slice(-60))); } catch {} };
-export const SOURCE_LABEL: Record<GoalSource, string> = { quick: "A rough goal, the band's middle", profile: "Worked out from your profile", exact: "Your own numbers", coach: "Set by your coach" };
+export const SOURCE_LABEL: Record<GoalSource, string> = { quick: "A rough goal, the band's middle", profile: "Calculated from your profile", exact: "Your own numbers", coach: "Set by your coach" };
 export const getGoal = (): Goal | null => {
   try {
     const r = localStorage.getItem(KEY); if (!r) return null;

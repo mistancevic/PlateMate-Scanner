@@ -133,7 +133,7 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
           <div className="crave-idea-top"><b>{idea.meal.title}</b>{pdCell(ideaNums)}</div>
           {idea.why && <small className="muted">{idea.why}</small>}
           <small className="muted">{idea.meal.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}. One serving: {fmt(ideaNums.kcal, 0)} kcal · {fmt(ideaNums.protein, 0)} g protein.</small>
-          <small className="muted">The numbers are from the foods, worked out by the app; a food you don't have is {CHEF_NAME}'s estimate.</small>
+          <small className="muted">The numbers are from the foods, calculated by the app; a food you don't have is {CHEF_NAME}'s estimate.</small>
           <small className="crave-kept">Kept in My recipes as an idea, not made yet.</small>
           <button type="button" className="pill pill-primary pill-wide" onClick={() => { const m = idea.meal; setIdea(null); setQ(""); p.openOnPlate(m); keepTaste(); }}>Put it on my plate</button>
           <button type="button" className="link crave-again" disabled={Boolean(asking)} onClick={() => void askChef(crave)}>{asking ? `${CHEF_NAME} is thinking…` : "Another idea"}</button>

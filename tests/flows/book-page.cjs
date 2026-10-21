@@ -22,6 +22,11 @@ const U = "http://127.0.0.1:3245";
   ok(new URL(page.url()).search === "" && new URL(page.url()).pathname === "/worthy-numbers", "the ?from= ending is dropped from the address");
   ok(hits.some((h) => h.includes("book_worthy_numbers__qr")) && hits.some((h) => /"book_worthy_numbers"/.test(h)), "the visit counts for the book and for the QR code");
   ok(await page.getByRole("link", { name: "Open Chef Mealan" }).count() === 1, "signed in, the page offers Open Chef Mealan instead of the form");
+  // RB72: version 1.0 is out: Read the book opens the PDF, served from chefmealan.com
+  const read = page.getByRole("link", { name: "Read the book" });
+  ok(await read.count() === 1 && (await read.getAttribute("href")) === "/books/worthy-numbers.pdf" && /Free PDF, 11 pages, version 1\.0\. No sign-up\./.test(await page.locator("main, body").first().textContent()), "Read the book, with what it is: free PDF, 11 pages, version 1.0");
+  const pdf = await page.evaluate(async () => { const r = await fetch("/books/worthy-numbers.pdf"); const b = new Uint8Array(await r.arrayBuffer()); return { ok: r.ok, type: r.headers.get("content-type"), head: String.fromCharCode(...b.slice(0, 5)), size: b.length }; });
+  ok(pdf.ok && /pdf/.test(pdf.type || "") && pdf.head === "%PDF-" && pdf.size > 100000, "the PDF is served: " + JSON.stringify(pdf));
   ok(/PD, the number no pack prints/.test(await page.locator("main, body").first().textContent()), "PD is explained on the page");
   const set = await (await fetch(U + "/api/beta/spots", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ spots: 3 }) })).json().catch(() => ({}));
   const got = await (await fetch(U + "/api/beta/spots")).json();

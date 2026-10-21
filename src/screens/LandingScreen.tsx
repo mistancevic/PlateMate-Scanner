@@ -60,7 +60,7 @@ export function LandingScreen() {
           {/* HP68 (Milan 23:53): the sign-up box picks up where the calculator stops, at its one target */}
           <div className="l-cta-block l-cta-hook" ref={ctaRef}>
             <b className="l-cta-head">Your own target, at every meal</b>
-            <p>This calculator uses one target, PD {DEMO_GOAL.pd}. Your own target comes from your goal, your body and your training. Chef Mealan works it out for you, then plans each meal to reach it with the foods in your kitchen.</p>
+            <p>This calculator uses one target, PD {DEMO_GOAL.pd}. Your own target comes from your goal, your body and your training. Chef Mealan calculates it for you, then plans each meal to reach it with the foods in your kitchen.</p>
             <button className="pill pill-primary l-cta-big" onClick={toForm}>Try Chef Mealan</button>
             <small>Chef Mealan is being tested by a small group. Leave your name and email, and Coach Milan will send you a personal code.</small>
           </div>
@@ -86,8 +86,8 @@ export function LandingScreen() {
       {recipes.length > 0 && (
         <section className="l-kitchen">
           <span className="l-eyebrow">From the kitchen</span>
-          <h2>Recipes with the numbers worked out</h2>
-          <p>Coach Milan cooks the recipes, weighs them, and puts the numbers next to the photo. In the app, Chef Mealan works out how much of each food fits your goal.</p>
+          <h2>Recipes with the numbers calculated</h2>
+          <p>Coach Milan cooks the recipes, weighs them, and puts the numbers next to the photo. In the app, Chef Mealan calculates how much of each food fits your goal.</p>
           <div className="rp-grid">{recipes.map((r) => <RecipeCard key={r.slug} r={r} />)}</div>
           <a className="l-all" href="/recipes">All recipes →</a>
         </section>
@@ -169,7 +169,7 @@ const MOMENTS = [
   { when: "Every day", title: "Eat by your plan today", line: "Today shows the next meal. One tap logs it as planned, and the day counts against the plan." },
   { when: "Sunday evening", title: "Plan your week in minutes", line: "Chef Mealan fills the open slots with your meals. Swipe one to swap it, or to skip it." },
   { when: "When a craving hits", title: "Make what you crave fit", line: "Type chocolate PD 7+. Your DaaM, Dessert as a Meal, comes up, fitted to your target." },
-  { when: "When you find a recipe", title: "Bring it in", line: "Paste a link or a screenshot. The foods, one portion's numbers and the PD are worked out." },
+  { when: "When you find a recipe", title: "Bring it in", line: "Paste a link or a screenshot. The foods, one portion's numbers and the PD are calculated." },
   { when: "After a meal", title: "Learn what works for you", line: "Thirty minutes after a meal: how did it carry you? Two answers that agree, and Chef Mealan picks with them." },
 ];
 export function DayVideo({ src, poster, label, big }: { src: string; poster: string; label: string; big?: boolean }) {
