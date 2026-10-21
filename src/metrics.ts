@@ -51,7 +51,7 @@ export async function flush(version: string) {
   } catch { /* offline: next time */ } finally { sending = false; }
 }
 // a home page count: one per tap or page, nothing stored on the device
-export function hit(k: "hp_visit" | "hp_calc" | "hp_try" | "built_visit" | "book_visit") {
+export function hit(k: "hp_visit" | "hp_calc" | "hp_try" | "built_visit" | `book_${string}`) {
   try {
     const body = JSON.stringify({ k });
     if (typeof navigator !== "undefined" && navigator.sendBeacon) navigator.sendBeacon("/api/hit", new Blob([body], { type: "application/json" }));

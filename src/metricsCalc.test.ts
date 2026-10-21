@@ -56,8 +56,14 @@ test("covers and Members: drawn covers, the ones replaced by a real photo, and w
   assert.deepEqual(s.members, { open: 2, make: 1, keep: 1, share: 1 });
 });
 
-test("BK69: visits from chefmealan.com/book count apart in the way in, and none counts as none", () => {
-  const w = weekStats([], "2026-10-19", { ...X, hp: { ...X.hp, book_visit: 4 } }).wayIn;
-  assert.equal(w.book, 4); assert.equal(w.visits, 214);
-  assert.equal(weekStats([], "2026-10-19", X).wayIn.book, 0);
+test("BK69: visits from a book address count per book in the way in, and none counts as none", () => {
+  const w = weekStats([], "2026-10-19", { ...X, hp: { ...X.hp, book_worthy_numbers: 4 } }).wayIn;
+  assert.deepEqual(w.books, [{ name: "Worthy Numbers", n: 4 }]); assert.equal(w.visits, 214);
+  assert.equal(weekStats([], "2026-10-19", X).wayIn.books[0].n, 0);
+});
+test("BK69: only a known book's address is a book page", async () => {
+  const { bookOfPath, bookHit } = await import("./bookPages");
+  assert.equal(bookOfPath("/worthy-numbers"), "worthy-numbers"); assert.equal(bookOfPath("/worthy-numbers/"), "worthy-numbers");
+  assert.equal(bookOfPath("/book"), null); assert.equal(bookOfPath("/foods"), null); assert.equal(bookOfPath("/worthy-numbers/x"), null);
+  assert.equal(bookHit("worthy-numbers"), "book_worthy_numbers");
 });

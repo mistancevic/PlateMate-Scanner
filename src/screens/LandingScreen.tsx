@@ -1,3 +1,4 @@
+import { BOOK_PAGES, bookOfPath, bookHit } from "../bookPages";
 import { useEffect, useRef, useState } from "react";
 import { tabOfPath } from "../back";
 import { RecipeCard } from "./RecipePages";
@@ -16,9 +17,9 @@ export function LandingScreen() {
   // signed out on an app address (chefmealan.com/foods): the home page sits at chefmealan.com
   useEffect(() => { if (tabOfPath(location.pathname, ["home", "journey", "meal", "chef", "recipes", "foods", "me"])) history.replaceState(null, "", "/"); }, []);
   const go = async () => { setBusy(true); setErr(""); try { await signIn(); } catch (e: any) { setErr(e.message || "Sign-in failed."); } finally { setBusy(false); } };
-  // BK69: chefmealan.com/book, printed in Worthy Numbers, opens the home page at the form; counted apart, and the request
-  // says it came from the book. The address bar then shows chefmealan.com.
-  const [fromBook] = useState(() => typeof location !== "undefined" && /^\/book\/?$/.test(location.pathname));
+  // BK69: a book address (chefmealan.com/worthy-numbers), printed in the book and used in social posts, opens the home page
+  // at the form; counted per book, and the request says which book. The address bar then shows chefmealan.com.
+  const [fromBook] = useState(() => (typeof location !== "undefined" ? bookOfPath(location.pathname) : null));
   // home page counts (0.2.5+r17, board M): a visit, a Try tap; no cookie, no visitor id
   useEffect(() => { hit("hp_visit"); }, []);
   const toForm = () => { hit("hp_try"); formRef.current?.scrollIntoView({ behavior: "smooth" }); };
@@ -37,7 +38,7 @@ export function LandingScreen() {
   }, []);
   // from a recipe page's Try Chef Mealan: straight to the form
   useEffect(() => { if (location.hash === "#ask") setTimeout(toForm, 300); }, []);
-  useEffect(() => { if (!fromBook) return; hit("book_visit"); history.replaceState(null, "", "/"); setTimeout(toForm, 300); }, []);
+  useEffect(() => { if (!fromBook) return; hit(bookHit(fromBook) as `book_${string}`); history.replaceState(null, "", "/"); setTimeout(toForm, 300); }, []);
   // the three newest public recipes (canvas board R7); the section stays hidden while there are none
   const [recipes, setRecipes] = useState<PublicRecipe[]>([]);
   useEffect(() => { fetch("/api/recipes?limit=3").then((r) => r.json()).then((d) => setRecipes(d.recipes ?? [])).catch(() => {}); }, []);
@@ -141,8 +142,8 @@ export function LandingScreen() {
         <h2>Try Chef Mealan</h2>
         <p>Chef Mealan is being tested by a small group right now. Most people join with a code from their coach. If you don't have a code, leave your name and email, and Coach Milan will send you a personal code.</p>
         {/* BK69: the same promise the back cover of Worthy Numbers makes */}
-        {fromBook && <p className="l-book-line">You came from Worthy Numbers. Chef Mealan is free while it is in beta, and you get your code within a day.</p>}
-        <RequestForm from={fromBook ? "book" : undefined} />
+        {fromBook && <p className="l-book-line">From the book {BOOK_PAGES[fromBook]}: Chef Mealan is free while it is in beta, and you get your code within a day.</p>}
+        <RequestForm from={fromBook ?? undefined} />
       </section>
 
       <div className={`l-sticky ${sticky ? "on" : ""}`} aria-hidden={!sticky}><button className="pill pill-primary" tabIndex={sticky ? 0 : -1} onClick={toForm}>Try Chef Mealan</button></div>
@@ -247,7 +248,7 @@ function TryIt() {
   );
 }
 
-export function RequestForm({ email: presetEmail, name: presetName, from }: { email?: string; name?: string; from?: "book" }) {
+export function RequestForm({ email: presetEmail, name: presetName, from }: { email?: string; name?: string; from?: string }) {
   const started = useRef(Date.now());
   const [name, setName] = useState(presetName ?? "");
   const [email, setEmail] = useState(presetEmail ?? "");
