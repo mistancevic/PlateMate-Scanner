@@ -11,6 +11,8 @@ export type BookPage = {
   share: string;          // 1200 x 630, for links in social posts
   inside: { name: string; says: string; key?: boolean }[];
   pdf?: string;           // empty while the book is in its last edit: the page shows a placeholder
+  // BP70 (Milan 11:29): the book's key idea, explained for a cold reader, with one worked example and a way to try it
+  hook?: { title: string; text: string[]; from: { label: string; pd: string; sub: string }; to: { label: string; pd: string; sub: string }; after: string; tryIt: string };
 };
 export const BOOKS: Record<string, BookPage> = {
   "worthy-numbers": {
@@ -28,6 +30,17 @@ export const BOOKS: Record<string, BookPage> = {
       { name: "GI and GL", says: "0 to 100, per portion" },
       { name: "Protein density (PD)", says: "protein per 100 kcal", key: true },
     ],
+    hook: {
+      title: "PD, the number no pack prints",
+      text: [
+        "PD means protein density: grams of protein in 100 kcal. You work it out from two lines of any label, protein and energy.",
+        "Granola: 9 g of protein in 450 kcal is PD 2. Skyr: 11 g in 63 kcal is about PD 17. The higher the PD, the more protein you get for the same calories.",
+      ],
+      from: { label: "60 g of granola with 200 ml of milk 1.5%", pd: "PD 3.4", sub: "364 kcal, 12 g protein" },
+      to: { label: "With 150 g of skyr on top", pd: "PD 6.3", sub: "459 kcal, 29 g protein" },
+      after: "The book shows how PD works next to the label, the protein claims and Nutri-Score, and how to set your own target.",
+      tryIt: "Try PD on your own craving",
+    },
   },
 };
 export const BOOK_PAGES: Record<string, string> = Object.fromEntries(Object.entries(BOOKS).map(([slug, b]) => [slug, b.name]));

@@ -36,6 +36,23 @@ export function BookScreen({ slug, signedIn }: { slug: string; signedIn: boolean
         {b.inside.map((x) => <div key={x.name} className={x.key ? "key" : ""}><span>{x.name}</span><b>{x.says}</b></div>)}
       </div>
 
+      {/* BP70 (Milan 11:29): PD explained for a cold reader, one bowl as the example, and a way to try it */}
+      {b.hook && (
+        <section className="bk-hook">
+          <h2>{b.hook.title}</h2>
+          {b.hook.text.map((t) => <p key={t} className="bt-sub">{t}</p>)}
+          <div className="l-try-result bk-jump">
+            <div className="l-jump">
+              <div className="l-jump-from"><small>{b.hook.from.label}</small><b>{b.hook.from.pd}</b><small>{b.hook.from.sub}</small></div>
+              <b className="l-jump-arrow" aria-hidden="true">→</b>
+              <div className="l-jump-to"><small>{b.hook.to.label}</small><b>{b.hook.to.pd}</b><small>{b.hook.to.sub}</small></div>
+            </div>
+          </div>
+          <p className="bt-sub">{b.hook.after}</p>
+          {!signedIn && <a className="bk-try" href="/">{b.hook.tryIt} ›</a>}
+        </section>
+      )}
+
       <h2>Live the day, so it counts</h2>
       <p className="bt-sub">PD helps you decide at the plate. What counts is the whole day: calories in and out, protein, carbohydrate and fat, vitamins and minerals, an active day, strength training, sleep and recovery. Chef Mealan supports you on that journey.</p>
       <div className="bk-target">
