@@ -1,3 +1,4 @@
+import { BOOK_PAGES } from "../bookPages";
 import { waLink } from "../phone";
 import { useEffect, useState } from "react";
 import { useKept } from "../kept";
@@ -243,7 +244,7 @@ export function AccessRequests(p: AppApi) {
       <p className="label">Access requests ({open.length} new)</p>
       {people.slice(0, 20).map((r) => (
         <section className={`card request ${r.status === "handled" ? "handled" : ""}`} key={r.id}>
-          <div className="card-top"><span>{r.name}{r.coach ? " · coach" : ""}{r.count > 1 ? ` · ${r.count} requests` : ""}</span><small>{new Date(r.createdAt).toLocaleDateString()}</small></div>
+          <div className="card-top"><span>{r.name}{r.coach ? " · coach" : ""}{BOOK_PAGES[r.from] ? ` · from ${BOOK_PAGES[r.from]}` : ""}{r.count > 1 ? ` · ${r.count} requests` : ""}</span><small>{new Date(r.createdAt).toLocaleDateString()}</small></div>
           <a href={`mailto:${r.email}?subject=Your%20Chef%20Mealan%20code`}>{r.email}</a>
           {r.phone && <a href={waLink(String(r.phone))} target="_blank" rel="noreferrer">WhatsApp {r.phone}</a>}
           {r.note && <p className="client-note">“{r.note}”</p>}
