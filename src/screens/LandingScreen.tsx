@@ -140,6 +140,8 @@ export function LandingScreen() {
       <section className="l-request" ref={formRef}>
         <h2>Try Chef Mealan</h2>
         <p>Chef Mealan is being tested by a small group right now. Most people join with a code from their coach. If you don't have a code, leave your name and email, and Coach Milan will send you a personal code.</p>
+        {/* BK69: the same promise the back cover of Worthy Numbers makes */}
+        {fromBook && <p className="l-book-line">You came from Worthy Numbers. Chef Mealan is free while it is in beta, and you get your code within a day.</p>}
         <RequestForm from={fromBook ? "book" : undefined} />
       </section>
 
