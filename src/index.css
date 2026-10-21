@@ -1187,7 +1187,7 @@ main:has(.menu-title) .field input:not([type="checkbox"]):focus { background: va
 .l-cta-block small { font-size: 14px; color: var(--ink); line-height: 1.45; }
 /* HP68: the sign-up box right under the calculator, one card that carries on from it */
 /* BK69: one line for readers who come from the book */
-.l-book-line { margin: 12px 0 14px; background: var(--surface); border: 2px solid var(--brand); border-radius: var(--r-control); padding: 10px 12px; font-weight: 700; color: var(--ink); }
+.l-request .l-book-line { margin: 14px 0; background: var(--surface); border: 2px solid var(--brand); border-radius: var(--r-control); padding: 10px 12px; font-weight: 700; color: var(--ink); }
 .l-cta-hook { margin-top: 12px; background: var(--surface); border: 2px solid var(--brand); border-radius: var(--r-card); padding: 16px; }
 .l-pd-link { align-self: flex-start; margin-top: 4px; font-size: 14px; font-weight: 800; color: var(--brand-text); }
 .l-cta-big { width: 100%; height: 58px; font-size: 19px; font-weight: 900; box-shadow: var(--shadow-main); }
