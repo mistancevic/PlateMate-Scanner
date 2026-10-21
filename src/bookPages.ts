@@ -33,11 +33,11 @@ export const BOOKS: Record<string, BookPage> = {
     hook: {
       title: "PD, the number no pack prints",
       text: [
-        "PD means protein density: grams of protein in 100 kcal. You work it out from two lines of any label, protein and energy.",
-        "Granola: 9 g of protein in 450 kcal is PD 2. Skyr: 11 g in 63 kcal is about PD 17. The higher the PD, the more protein you get for the same calories.",
+        "PD means protein density: grams of protein in 100\u00a0kcal. You work it out from two lines of any label, protein and energy.",
+        "Granola: 9\u00a0g of protein in 450\u00a0kcal is PD 2. Skyr: 11\u00a0g in 63\u00a0kcal is about PD 17. The higher the PD, the more protein you get for the same calories.",
       ],
-      from: { label: "60 g of granola with 200 ml of milk 1.5%", pd: "PD 3.4", sub: "364 kcal, 12 g protein" },
-      to: { label: "With 150 g of skyr on top", pd: "PD 6.3", sub: "459 kcal, 29 g protein" },
+      from: { label: "60\u00a0g of granola with 200\u00a0ml of milk 1.5%", pd: "PD 3.4", sub: "364\u00a0kcal, 12\u00a0g protein" },
+      to: { label: "With 150\u00a0g of skyr on top", pd: "PD 6.3", sub: "459\u00a0kcal, 29\u00a0g protein" },
       after: "The book shows how PD works next to the label, the protein claims and Nutri-Score, and how to set your own target.",
       tryIt: "Try PD on your own craving",
     },
