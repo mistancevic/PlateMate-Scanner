@@ -55,3 +55,9 @@ test("covers and Members: drawn covers, the ones replaced by a real photo, and w
   assert.deepEqual(s.covers, { drawn: 2, real: 1 });
   assert.deepEqual(s.members, { open: 2, make: 1, keep: 1, share: 1 });
 });
+
+test("BK69: visits from chefmealan.com/book count apart in the way in, and none counts as none", () => {
+  const w = weekStats([], "2026-10-19", { ...X, hp: { ...X.hp, book_visit: 4 } }).wayIn;
+  assert.equal(w.book, 4); assert.equal(w.visits, 214);
+  assert.equal(weekStats([], "2026-10-19", X).wayIn.book, 0);
+});

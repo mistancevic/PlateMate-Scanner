@@ -102,7 +102,7 @@ export function MetricsScreen() {
         <section className="card mt-card">
           <b className="mt-h">The way in</b>
           <small className="muted">Home page counts have no cookie and no visitor id; one visit is one page open.</small>
-          {bar("Home page visits", w.visits)}{bar("Calculator used", w.calc)}{bar("Try Chef Mealan", w.tried)}{bar("Asked for access", w.asked)}{bar("Joined with a code", w.joined)}{bar("Active this week", w.active)}
+          {bar("Home page visits", w.visits)}{bar("From the book", w.book)}{bar("Calculator used", w.calc)}{bar("Try Chef Mealan", w.tried)}{bar("Asked for access", w.asked)}{bar("Joined with a code", w.joined)}{bar("Active this week", w.active)}
         </section>
         <section className="card mt-card">
           <b className="mt-h">{view === "last" ? "That week in the app" : "This week in the app"}</b>

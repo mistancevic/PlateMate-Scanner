@@ -32,7 +32,7 @@ export type WeekStats = {
   firstPlanned: Ratio;                     // new members with a planned day within their first 7 days
   labelKept: Ratio;                        // AI label reads saved without a change
   flags: Ratio;
-  wayIn: { visits: number; calc: number; tried: number; asked: number; joined: number; active: number };
+  wayIn: { visits: number; book: number; calc: number; tried: number; asked: number; joined: number; active: number };
   cost: { perActive: number | null; total: number | null };
 };
 export function weekStats(all: Ev[], from: string, x: Extra): WeekStats {
@@ -72,7 +72,7 @@ export function weekStats(all: Ev[], from: string, x: Extra): WeekStats {
     firstPlanned: { n: firstPlanned, of: fresh.length },
     labelKept: { n: labels.filter((v) => v.d?.kept === true).length, of: labels.length },
     flags: { n: x.flags.answered, of: x.flags.total },
-    wayIn: { visits: x.hp.hp_visit ?? 0, calc: x.hp.hp_calc ?? 0, tried: x.hp.hp_try ?? 0, asked: x.asked, joined: x.joined, active },
+    wayIn: { visits: x.hp.hp_visit ?? 0, book: x.hp.book_visit ?? 0, calc: x.hp.hp_calc ?? 0, tried: x.hp.hp_try ?? 0, asked: x.asked, joined: x.joined, active },
     cost: { total, perActive: total !== null && x.monthActive ? Math.round((total / x.monthActive) * 100) / 100 : null },
   };
 }

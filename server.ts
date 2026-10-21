@@ -533,7 +533,8 @@ const withoutPhoto = (r: any): PublicRecipe => { const { photo, authorUid, pendi
 const EVENT_KINDS = new Set(["app_open", "day_closed", "fit_used", "label_read", "safety_flag", "meal_saved", "feedback", "made", "carry", "food_in", "mix_taken", "adult_confirmed", "cover", "members", "recipe_in", "recipe_fit", "parts"]);
 const EVENT_KEYS = new Set(["way", "how", "went", "ate", "locked", "method", "kind", "moment", "case", "status", "result", "source", "items", "pd", "kcal", "photos", "products",
   "date", "planned", "byPlan", "extras", "swapped", "lived", "proteinPct", "energyPct", "kept"]);
-const HIT_KINDS = new Set(["hp_visit", "hp_calc", "hp_try", "built_visit"]);
+// BK69 (Milan 21 October 2026): book_visit counts chefmealan.com/book, the address printed in Worthy Numbers
+const HIT_KINDS = new Set(["hp_visit", "hp_calc", "hp_try", "built_visit", "book_visit"]);
 const METRICS_SALT = process.env.METRICS_SALT || FB_PROJECT || "local";
 const memberOf = (uid: string) => createHash("sha256").update(`${METRICS_SALT}:${uid}`).digest("hex").slice(0, 16);
 const berlinDay = (t = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit" }).format(t);
@@ -1764,7 +1765,7 @@ app.post("/api/access-request", async (req, res) => {
   if (!FB_PROJECT) return ok();
   try {
     await db().collection("accessRequests").add({
-      name, email, note, phone, coach: Boolean(b.coach), who: ["client", "coach", "self"].includes(b.who) ? b.who : "", status: "new", createdAt: new Date().toISOString(),
+      name, email, note, phone, coach: Boolean(b.coach), who: ["client", "coach", "self"].includes(b.who) ? b.who : "", from: b.from === "book" ? "book" : "", status: "new", createdAt: new Date().toISOString(),
       ipHash: createHash("sha256").update(ip + day).digest("hex").slice(0, 16), ua: String(req.headers["user-agent"] || "").slice(0, 160),
     });
     ok();
