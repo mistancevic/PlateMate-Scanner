@@ -339,7 +339,7 @@ export function HomeScreen(p: AppApi) {
             <Fragment key={sl.id}>
             <PlanRow className="plan-row-link plan-slot-row" label={`${sl.name}, ${sl.time}`} title={m.title} photo={pictureOfRecipe(recipeOf(m))}
               ariaLabel={`${sl.name} at ${sl.time}, ${m.title}`}
-              sub={<>{SOURCE[m.source]}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</>}
+              sub={<>{SOURCE[m.source]}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</>}
               onOpen={() => openSlotMeal(key, sl, m, () => eatFrom(sl.id))} onSwap={() => swapOn(key, sl.id)} onRight={() => p.fill(key, sl.id, { ...m, skipped: true })} rightLabel="Skip" swapName={`Swap ${sl.name.toLowerCase()}`} rightName={`Skip ${sl.name.toLowerCase()} on purpose`} />
             {missed && (
               <div className="missed-ask" role="group" aria-label={`${sl.name}, ${sl.time}: did you have it?`}>
@@ -420,7 +420,7 @@ export function HomeScreen(p: AppApi) {
           if (m && !m.skipped) return (
             <PlanRow key={sl.id} className="plan-row-link plan-slot-row" label={`${sl.name}, ${sl.time}`} title={m.title} photo={pictureOfRecipe(recipeOf(m))}
               ariaLabel={`${sl.name} tomorrow, ${m.title}`}
-              sub={<>{SOURCE[m.source]}{fit?.state === "fits" ? <span className="fit-ok"> · fits</span> : fit?.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</>}
+              sub={<>{SOURCE[m.source]}{fit?.state === "fits" ? <span className="fit-ok"> · fits</span> : fit?.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit?.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</>}
               onOpen={() => openSlotMeal(tKey, sl, m, toTomorrow)} onSwap={() => swapOn(tKey, sl.id)} onRight={() => p.fill(tKey, sl.id, { ...m, skipped: true })} rightLabel="Skip" swapName={`Swap ${sl.name.toLowerCase()} tomorrow`} rightName={`Skip ${sl.name.toLowerCase()} tomorrow`} />
           );
           return (

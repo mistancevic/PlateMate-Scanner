@@ -8,7 +8,7 @@ import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "..
 import { rowsOf, slotsOf, slotsOn, trainingWhen, type Slot } from "../slots";
 import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
-import { STARTERS, fitOf, fromMeal, needOf, sumOf, plannedPortion, type PlannedMeal } from "../planned";
+import { STARTERS, fitOf, fromMeal, leftOf, sumOf, plannedPortion, dayOff, fitPortions, usualPortions, amountText, type PlannedMeal } from "../planned";
 import { CHEF_NAME } from "../components/Mark";
 import { PlanRow } from "../components/PlanRow";
 import { ShortHelp } from "../components/ShortHelp";
@@ -88,6 +88,12 @@ export function PlanScreen(p: AppApi) {
   const held = p.planned[key] ?? {};
   const sum = sumOf(held);
   const openCount = slots.filter((s) => !held[s.id]).length;
+  // DT74 (board DT74, Anna's first run): every target names its day; a full day well off its kcal says so, and can fit
+  const dayPoss = isToday ? "today's" : `${WEEKDAY[(date.getDay() + 6) % 7]}'s`;
+  const off = dayOff(sum, numbers, openCount);
+  const fitted = Object.values(held).some((m) => m.amount && m.amount !== 1);
+  const fitDay = () => { if (!numbers) return; const next = fitPortions(held, numbers); for (const [id, m] of Object.entries(next)) p.fill(key, id, m); p.notify(`Portions fitted to ${dayName === "today" ? "today" : dayName}: the day lands on ${fmt(numbers.kcal, 0)} kcal.`); };
+  const usualDay = () => { const next = usualPortions(held); for (const [id, m] of Object.entries(next)) p.fill(key, id, m); p.notify("Back to the usual portions."); };
   const fillingOf = (s: Slot): Filling => ({ date: key, slotId: s.id, name: s.name, time: s.time, dayName });
   const put = (s: Slot, m: PlannedMeal) => { p.fill(key, s.id, m); setOpen(null); p.notify(`${m.title} is ${dayName === "today" ? "today's" : `${dayName}'s`} ${s.name.toLowerCase()}.`); };
   return (
@@ -118,10 +124,17 @@ export function PlanScreen(p: AppApi) {
           <small>{[tWhen ? tWhen.phrase : training ? "rest day" : null, openCount ? `${openCount} ${openCount === 1 ? "slot" : "slots"} open` : "all slots set"].filter(Boolean).join(" · ")}</small>
         </div>
         <div className="plan-row">
-          <div><b>{sum.n ? pdVal(sum.pd) : "—"}</b><small>{target !== null ? `of ${pdVal(target)} ${pdTag()}` : pdTag()}</small></div>
+          <div><b>{sum.n ? pdVal(sum.pd) : "—"}</b><small>{target !== null ? `of ${pdText(target)}, ${dayPoss} target` : pdTag()}</small></div>
           <div><b>{fmt(sum.kcal, 0)}</b><small>{numbers ? `of ${fmt(numbers.kcal, 0)} kcal` : "kcal"}</small></div>
           <div><b>{fmt(sum.protein, 0)}</b><small>{numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></div>
         </div>
+        {off && numbers && (
+          <div className="plan-off" role="status">
+            <p><b>{fmt(off.by, 0)} kcal {off.short ? "short" : "over"}</b> of {dayPoss} {fmt(numbers.kcal, 0)} kcal. {off.short ? "Add a snack, or make the portions bigger." : "Make the portions smaller, or swap a meal."}</p>
+            <button type="button" className="pill pill-small pill-primary" onClick={fitDay}>Fit the portions to {dayName === "today" ? "today" : dayName}</button>
+          </div>
+        )}
+        {fitted && <button type="button" className="link plan-usual" onClick={usualDay}>Back to the usual portions</button>}
       </section>
       <section className="card plan-day">
         {rows.map((r) => {
@@ -133,6 +146,7 @@ export function PlanScreen(p: AppApi) {
             </button>
           );
           const m = held[r.slot.id];
+          // a planned meal's mark is its protein; the size of the whole day is the head card's to say (plan-off)
           const fit = m ? fitOf(m, target, unit) : null;
           return (
             <div key={r.slot.id} className={`plan-slot-wrap ${fit?.state === "under" ? "plan-slot-under" : ""}`}>
@@ -140,7 +154,7 @@ export function PlanScreen(p: AppApi) {
               {m && !m.skipped
                 ? <PlanRow className="plan-slot plan-slot-set" label={`${r.slot.name}, ${r.slot.time}`} title={m.title} photo={pictureOfRecipe(m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null)}
                     ariaLabel={`${r.slot.name} at ${r.slot.time}, ${m.title}`}
-                    sub={fit ? <>{SOURCE[m.source]} · {fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</> : null}
+                    sub={fit ? <>{SOURCE[m.source]}{amountText(m) ? ` · ${amountText(m)}` : ""} · {fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</> : null}
                     onOpen={() => { const rec = m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null; if (rec) p.openMeal(rec.id, { tab: "plan", slot: { date: key, slotId: r.slot.id, name: r.slot.name, time: r.slot.time } }); else if (m.items?.length) setViewing(r.slot); else setOpen(r.slot); }}
                     onSwap={() => setOpen(r.slot)} onRight={() => p.fill(key, r.slot.id, null)} rightLabel="Empty" swapName={`Swap ${r.slot.name.toLowerCase()}`} rightName={`Empty ${r.slot.name.toLowerCase()}`} />
                 : <button type="button" className={`menu-row plan-slot ${m ? "plan-slot-set" : ""}`} aria-label={m ? `${r.slot.name} at ${r.slot.time}, ${m.title}` : `${r.slot.name} at ${r.slot.time}, pick a meal`} onClick={() => setOpen(r.slot)}>
@@ -153,7 +167,7 @@ export function PlanScreen(p: AppApi) {
                   </button>}
               {m && fit?.state === "under" && (
                 <div className="button-row plan-slot-fix">
-                  <button type="button" className="pill pill-small pill-primary" onClick={() => p.fillOnPlate({ ...fillingOf(r.slot), mealId: m.mealId }, m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : null, m.title)}>Fit it on the Plate</button>
+                  <button type="button" className="pill pill-small pill-primary" onClick={() => p.fillOnPlate({ ...fillingOf(r.slot), mealId: m.mealId }, m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: (m.portion ?? 0) * (m.amount ?? 1), savedAt: "" } : null, m.title)}>Fit it on the Plate</button>
                   <button type="button" className="pill pill-small" onClick={() => p.openOut()}>Ask {CHEF_NAME}</button>
                 </div>
               )}
@@ -172,7 +186,7 @@ export function PlanScreen(p: AppApi) {
       {shopping && <ShopSheet p={p} close={() => setShopping(false)} showDay={(d) => { setShopping(false); const n = Math.floor((isoWeek(new Date(`${d}T12:00:00`)).monday.getTime() - thisMonday.getTime()) / (7 * 864e5)); setOffsetState(n === 1 ? 0 : n); setPicked(d); }} />}
       {viewing && held[viewing.id]?.items?.length ? <MealSheet p={p} slot={viewing} m={held[viewing.id]} dayName={dayName} target={target} unit={unit}
         close={() => setViewing(null)} swap={() => { setOpen(viewing); setViewing(null); }}
-        onPlate={() => { const m = held[viewing.id]; setViewing(null); p.fillOnPlate(fillingOf(viewing), { id: "", title: m.title, items: m.items!, portion: m.portion ?? 0, savedAt: "" }, m.title); }}
+        onPlate={() => { const m = held[viewing.id]; setViewing(null); p.fillOnPlate(fillingOf(viewing), { id: "", title: m.title, items: m.items!, portion: (m.portion ?? 0) * (m.amount ?? 1), savedAt: "" }, m.title); }}
         keep={() => { const m = held[viewing.id]; const meal = { id: uid(), title: m.title, items: m.items!, portion: m.portion ?? m.items!.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
           p.setState((st) => ({ ...st, meals: [...st.meals, meal] })); p.fill(key, viewing.id, { ...m, mealId: meal.id, source: "mine", note: undefined }); setViewing(null); p.notify(`${m.title} is in My recipes.`); }} /> : null}
       {editing && (
@@ -190,7 +204,7 @@ export function PlanScreen(p: AppApi) {
           </div>
         </div>
       )}
-      {open && <PickSheet p={p} slot={open} slots={slots} day={numbers} target={target} unit={unit} held={held[open.id]} close={() => setOpen(null)} put={(m) => put(open, m)} onPlate={(meal) => { setOpen(null); p.fillOnPlate(fillingOf(open), meal); }} clear={() => { p.fill(key, open.id, null); setOpen(null); }} />}
+      {open && <PickSheet p={p} slot={open} slots={slots} day={numbers} planned={held} target={target} unit={unit} held={held[open.id]} close={() => setOpen(null)} put={(m) => put(open, m)} onPlate={(meal) => { setOpen(null); p.fillOnPlate(fillingOf(open), meal); }} clear={() => { p.fill(key, open.id, null); setOpen(null); }} />}
     </>
   );
 }
@@ -394,7 +408,7 @@ function MealSheet({ p, slot, m, dayName, target, unit, close, swap, onPlate, ke
             <div key={i.id} className="menu-row meal-view-row"><div className="menu-row-text"><b>{i.food.name}</b>{i.food.source === "estimate" && <small>{CHEF_NAME}'s estimate</small>}</div><b className="shop-grams">{Math.round(i.grams)} g</b></div>
           ))}
         </div>
-        <p className="small meal-view-nums">{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</p>
+        <p className="small meal-view-nums">{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</p>
         <div className="button-row"><button type="button" className="pill pill-small" onClick={swap}>Swap</button><button type="button" className="pill pill-small" onClick={keep}>Save in My recipes</button></div>
         <button type="button" className="pill pill-wide pill-primary meal-view-make" onClick={onPlate}>Make it on the Plate</button>
       </div>
@@ -403,19 +417,21 @@ function MealSheet({ p, slot, m, dayName, target, unit, close, swap, onPlate, ke
 }
 
 // the sheet for a slot: what it needs, then My recipes, Coach's recipes and the starters, each with its PD mark on the right
-function PickSheet({ p, slot, slots, day, target, unit, held, close, put, onPlate, clear }: { p: AppApi; slot: Slot; slots: Slot[]; day: { kcal: number; protein: number } | null; target: number | null; unit: "pd" | "pct"; held?: PlannedMeal; close: () => void; put: (m: PlannedMeal) => void; onPlate: (meal: import("../pilot").Meal | null) => void; clear: () => void }) {
-  const need = needOf(slots, slot, day);
+function PickSheet({ p, slot, slots, day, planned, target, unit, held, close, put, onPlate, clear }: { p: AppApi; slot: Slot; slots: Slot[]; day: { kcal: number; protein: number } | null; planned: Record<string, PlannedMeal>; target: number | null; unit: "pd" | "pct"; held?: PlannedMeal; close: () => void; put: (m: PlannedMeal) => void; onPlate: (meal: import("../pilot").Meal | null) => void; clear: () => void }) {
+  // DT74: what this slot has left once the other slots' meals are counted
+  const need = leftOf(slots, slot, day, planned);
+  const othersSet = slots.some((s) => s.id !== slot.id && planned[s.id]);
   const mine = p.state.meals.filter((m) => m.from !== "coach").map((m) => ({ meal: m, planned: fromMeal(m, "mine") }));
   const coach = p.state.meals.filter((m) => m.from === "coach").map((m) => ({ meal: m, planned: fromMeal(m, "coach") }));
   // R20 (0.2.48, board RS19, R20d): a meal with a clear answer says so where you pick it
   const reads = carryReads(p.state.meals, p.state.feedback);
   const row = (m: PlannedMeal, k: string, pick: () => void) => {
-    const fit = fitOf(m, target, unit);
+    const fit = fitOf(m, target, unit, need);
     const read = m.mealId ? reads.get(m.mealId)?.read : null;
     return (
       <button key={k} type="button" className="menu-row pick-row" onClick={pick}>
         <div className="menu-row-text"><b>{m.title}</b><small>{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein</small>{read && <small className={read === "light" ? "carry-light" : "carry-heavy"}>{read === "light" ? "Light for you" : "Heavy for you"}</small>}</div>
-        <div className={`pick-pd ${fit.state}`}><b>{pdVal(fit.pd)}</b><small>{fit.text}</small></div>
+        <div className={`pick-pd ${fit.state}`}><b>{unit === "pct" ? `${pdVal(fit.pd)} %` : `PD ${pdVal(fit.pd)}`}</b><small>{fit.text}</small></div>
       </button>
     );
   };
@@ -424,7 +440,7 @@ function PickSheet({ p, slot, slots, day, target, unit, held, close, put, onPlat
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet pick-sheet" role="dialog" aria-label={`${slot.name}, ${slot.time}`} onClick={(e) => e.stopPropagation()}>
         <div className="card-top"><span>{slot.name}, {slot.time}</span><button type="button" className="link" onClick={close}>Close</button></div>
-        <p className="small pick-why">{held ? `${held.title} is in this slot. Tap another meal to swap it.` : "Tap a meal to put it in this slot."}{need ? ` It needs about ${fmt(need.kcal, 0)} kcal and ${need.protein} g of protein${target !== null ? `, ${pdText(target)}` : ""}.` : ""}</p>
+        <p className="small pick-why">{held ? `${held.title} is in this slot. Tap another meal to swap it.` : "Tap a meal to put it in this slot."}{need ? othersSet ? ` With the other meals planned, it has about ${fmt(need.kcal, 0)} kcal and ${need.protein} g of protein left${target !== null ? `, ${pdText(target)}` : ""}.` : ` It needs about ${fmt(need.kcal, 0)} kcal and ${need.protein} g of protein${target !== null ? `, ${pdText(target)}` : ""}.` : ""}</p>
         {group("My recipes", mine.map((x) => row(x.planned, x.meal.id, () => put(x.planned))))}
         {group("Coach's recipes", coach.map((x) => row(x.planned, x.meal.id, () => put(x.planned))))}
         {group(`${CHEF_NAME}'s starters`, STARTERS.map((m) => row(m, m.title, () => put(m))))}

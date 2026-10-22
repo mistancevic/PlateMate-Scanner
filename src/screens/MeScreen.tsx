@@ -53,8 +53,8 @@ export function MeScreen(p: AppApi) {
         <div className="plan-top"><span>{clientName ? `${clientName}'s goal` : "My goal"}{bandName ? `: ${bandName}` : ""}</span><span>{goal?.setBy === "coach" ? `set by ${setBy}` : ""}</span></div>
         <div className="plan-row">
           {/* the three numbers of the same day, the average one (11 October 2026: the PD was today's, the kcal and protein the average's) */}
-          <div><b>{pdVal(density(state.goals.protein, state.goals.calories))}</b><small>{pdTag()} a day</small></div>
-          <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal a day</small></div>
+          <div><b>{pdVal(density(state.goals.protein, state.goals.calories))}</b><small>{pdTag()}, average day</small></div>
+          <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal, average day</small></div>
           <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
         </div>
         <div className="button-row"><button className="pill pill-small" onClick={() => p.openMenu("goal")}><Settings size={14} /> Goal and profile</button></div>

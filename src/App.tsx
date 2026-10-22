@@ -2382,7 +2382,7 @@ export default function App() {
         </button>
         <h1>{menuSection ? (ME_PAGES.includes(menuSection) ? "Me" : "Menu") : TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
-          {menuSection === "goal" ? pdText(dayPd) : <>{goal?.band ? goalLabel(goal.band).replace(" · ", ", ") : `${fmt(state.goals.calories, 0)} kcal, ${fmt(state.goals.protein)} g`} · {pdText(dayPd)}</>}
+          {menuSection === "goal" ? `${pdText(dayPd)} today` : <>{goal?.band ? goalLabel(goal.band).split(" · ")[0] : `${fmt(state.goals.calories, 0)} kcal, ${fmt(state.goals.protein)} g`} · {pdText(dayPd)} today</>}
         </button>}
         <button className="icon menu-button" aria-label="Menu" onClick={() => setMenuSection(menuSection ? null : "list")}><Menu size={22} /></button>
       </header>
