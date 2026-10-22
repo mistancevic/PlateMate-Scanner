@@ -18,7 +18,7 @@ if (process.argv[3]) {
   const img = (n, alt) => { const p = path.join(dir, "thumbs", n + ".jpg"); return fs.existsSync(p) ? `<img src="data:image/jpeg;base64,${fs.readFileSync(p).toString("base64")}" alt="${esc(alt)}" width="150" loading="lazy">` : ""; };
   const sev = { Blocker: "bad", Friction: "warn", Polish: "soft" };
   blindHtml = `<section class="blind" id="blind-tab" hidden>
-    <div class="persona"><div class="eyebrow">Blind walkthrough · ${esc(b.build)}</div><h2>${esc(b.who.split(",")[0])}, first run</h2><p>${esc(b.who)}</p><p><b>Goal:</b> ${esc(b.goal)}</p><p class="result"><b>Result:</b> ${esc(b.result)}</p></div>
+    <div class="persona"><div class="eyebrow">Blind walkthrough</div><h2>${esc(b.who.split(",")[0])}, first run</h2><p>${esc(b.who)}</p><p class="fix">Build: ${esc(b.build)}</p><p><b>Goal:</b> ${esc(b.goal)}</p><p class="result"><b>Result:</b> ${esc(b.result)}</p></div>
     <h3>Her path</h3>
     <ol class="steps">${b.steps.map(([n, t], i) => `<li>${img(n, "Step " + (i + 1))}<span><b>${i + 1}.</b> ${esc(t)}</span></li>`).join("")}</ol>
     <h3>What slowed her down, most important first</h3>
