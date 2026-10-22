@@ -7,6 +7,7 @@ import { Check } from "lucide-react";
 import { WANTS, HAVES, DEMO_GOAL, lift, alone, part, plate, unitOf, havesFor, PAIR_NOTES, type DemoFood } from "../landing";
 import { Mark, APP_NAME } from "../components/Mark";
 import { signIn } from "../cloud";
+import { pendingCode } from "../pendingCode";
 import { hit } from "../metrics";
 
 // The front door of chefmealan.com: what it is, how it works, request a code, or sign in with one.
@@ -18,7 +19,11 @@ export function LandingScreen() {
   useEffect(() => { if (tabOfPath(location.pathname, ["home", "journey", "meal", "chef", "recipes", "foods", "me"])) history.replaceState(null, "", "/"); }, []);
   const go = async () => { setBusy(true); setErr(""); try { await signIn(); } catch (e: any) { setErr(e.message || "Sign-in failed."); } finally { setBusy(false); } };
   // home page counts (0.2.5+r17, board M): a visit, a Try tap; no cookie, no visitor id
-  useEffect(() => { hit("hp_visit"); }, []);
+  useEffect(() => {
+    hit("hp_visit");
+    // SH73: a visit from Milan's QR code counts as QR too; the ending leaves the address
+    try { const u = new URL(window.location.href); if (u.searchParams.get("from") === "qr") { hit("hp_qr"); u.searchParams.delete("from"); window.history.replaceState(null, "", u.pathname + u.search + u.hash); } } catch {}
+  }, []);
   const toForm = () => { hit("hp_try"); formRef.current?.scrollIntoView({ behavior: "smooth" }); };
   // HP10: the bar at the bottom shows while neither the button under the calculator nor the form is on screen
   const ctaRef = useRef<HTMLDivElement>(null);
@@ -44,6 +49,14 @@ export function LandingScreen() {
         <div className="l-brand"><Mark size={30} color="var(--brand)" /><b>{APP_NAME}</b></div>
         <span className="l-topnav"><a className="l-recipes" href="/recipes">Recipes</a><button className="pill pill-small l-signin" disabled={busy} onClick={go}>Sign in</button></span>
       </header>
+      {/* SH73: someone who scanned a coach's QR code sees their code and the one step left */}
+      {pendingCode() && (
+        <section className="sh-arrived">
+          <b>Your personal code: {pendingCode()}</b>
+          <span>Sign in with Google using the email your code was made for. The code is filled in for you.</span>
+          <button className="pill pill-primary" disabled={busy} onClick={go}>Sign in</button>
+        </section>
+      )}
 
       {/* the top (board HP, HP5, 12 October 2026): who it is for, the promise, the calculator already answered, then the
           one way in, Try Chef Mealan; whoever has a code uses Sign in in the top bar */}

@@ -1971,3 +1971,17 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .mt-frame span { font-size: var(--fs-label); line-height: 1.45; }
 /* RB72: the book's PDF, with what it is under the button */
 .bk-read-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+/* SH73: Share Chef Mealan, a QR code to show; the code that arrived from one */
+.sh { display: flex; flex-direction: column; gap: 12px; }
+.sh-card { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; }
+.sh-chips { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.sh-qr { padding: 8px; background: #fff; border-radius: 16px; box-shadow: 0 0 0 1px var(--line, #d1dcf0); margin-top: 4px; }
+.sh-qr .qr { display: block; width: min(248px, 64vw); height: auto; }
+.sh-name { font-size: var(--fs-card); }
+.sh-code { font-size: 28px; letter-spacing: .12em; font-weight: 900; }
+.sh-line { max-width: 34ch; }
+.sh-buttons { justify-content: center; }
+.sh-card .l-form { width: 100%; text-align: left; }
+.sh-arrived { margin: 12px auto 0; max-width: 960px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; padding: 14px 16px; border-radius: 14px; background: var(--brand-soft, #dae6fb); color: var(--brand-text, #123a7a); }
+.sh-arrived b { font-size: var(--fs-card); }
+.sh-spots { font-weight: 800; color: var(--brand-text, #123a7a); }
