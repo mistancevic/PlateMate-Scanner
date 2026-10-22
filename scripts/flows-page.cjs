@@ -45,7 +45,7 @@ const html = `<title>Chef Mealan Walkthroughs</title>
 :root[data-theme="dark"] {
   --bg: #0d1626; --card: #15223a; --ink: #e7eefb; --muted: #9fb0cc; --line: #2a3a57;
   --brand: #8db6ff; --brand-soft: #1e3358; --ok: #6fd6a2; --ok-soft: #133528; --bad: #ff8a80; --bad-soft: #3d1a1a; --warn: #f3c565; --warn-soft: #3a2c10; color-scheme: dark }
-* { box-sizing: border-box }
+* { box-sizing: border-box } [hidden] { display: none !important; }
 body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.5; }
 .wrap { max-width: 860px; margin: 0 auto; padding-block: 28px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 18px; }
 .eyebrow { font-size: 12px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: var(--brand); }
