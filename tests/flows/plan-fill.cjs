@@ -4,6 +4,8 @@
 // with the slot on the plan line, Put it in the slot from the Plate, the day as planned adding up, emptying a slot.
 // Changed by story R19 (Milan 06:04 to 06:41, board RS18): a tap on a planned meal opens the meal; Pick a meal opens with a
 // swipe to the left (Swap). An open slot still opens Pick a meal on a tap.
+// Changed by story DT74 (Milan 22 October 2026, board DT74): a meal around the target says close, not fits; fits is kept for
+// a meal within 0.2 of it. The marks are fits, close or under.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -30,11 +32,11 @@ seed.items = [];
   const groups = await sheet.locator(".pick-group").allTextContents();
   ok(groups.join("|") === "My recipes|Coach's recipes|Chef Mealan's starters", "My recipes, Coach's recipes, the starters: " + groups.join("|"));
   ok(await sheet.locator(".pick-row").count() === 2 + 8, "two of mine and eight starters");
-  ok(await sheet.locator(".pick-pd.fits").count() >= 1 && await sheet.locator(".pick-pd.under").count() >= 1, "each row carries its PD mark, fits or under");
+  ok(await sheet.locator(".pick-pd.fits, .pick-pd.close").count() >= 1 && await sheet.locator(".pick-pd.under").count() >= 1 && await sheet.locator(".pick-pd").count() === await sheet.locator(".pick-row").count(), "each row carries its PD mark, fits, close or under");
   await sheet.getByRole("button", { name: /Chicken, rice and greens/ }).click(); await page.waitForTimeout(400);
   ok(await page.locator(".pick-sheet").count() === 0, "the sheet closes");
   const lunch = page.locator(".plan-slot-wrap").nth(1);
-  ok(/Chicken, rice and greens/.test(await lunch.textContent()) && /starter · 640 kcal · 52 g/.test(await lunch.textContent()) && /fits/.test(await lunch.textContent()), "Lunch holds the starter with its numbers and fits");
+  ok(/Chicken, rice and greens/.test(await lunch.textContent()) && /starter · 640 kcal · 52 g/.test(await lunch.textContent()) && /fits|close/.test(await lunch.textContent()), "Lunch holds the starter with its numbers and its mark: " + (await lunch.textContent()).slice(0, 90));
   // Changed by story SL2 (Milan 16:03 to 16:11, board SL2): the open slots are in the day's line in the head card at the top
   ok(/2 slots open/.test(await page.locator(".plan-head .plan-day-head small").textContent()), "two slots open");
   let nums = await page.locator(".plan-row b").allTextContents();
