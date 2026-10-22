@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { withPlanned, needOf, fitOf, sumOf, fromMeal, leftOf, dayOff, fitPortions, usualPortions, plannedPortion, amountText } from "./planned";
+import { withPlanned, needOf, fitOf, sumOf, fromMeal, leftOf, dayOff, proteinOff, bandOf, fitPortions, usualPortions, plannedPortion, amountText } from "./planned";
 import type { Slot } from "./slots";
 
 const slots: Slot[] = [{ id: "breakfast", name: "Breakfast", time: "07:30" }, { id: "lunch", name: "Lunch", time: "12:30" }, { id: "snack", name: "Snack", time: "16:00" }, { id: "dinner", name: "Dinner", time: "20:00" }];
@@ -62,31 +62,52 @@ test("DT74: a slot has what is left once the other slots are planned; with nothi
   assert.deepEqual(leftOf(slots, slots[0], day, held), needOf(slots, slots[0], day));
   assert.deepEqual(leftOf(slots, slots[1], day, { breakfast: { title: "Huge", kcal: 3000, protein: 200, source: "starter" } }), { kcal: 0, protein: 0 });
 });
-test("DT74: fits only when it fits; within a point under is close; size named against what is left", () => {
+test("DT74: fits only when it fits; within a point under is close", () => {
   assert.equal(fitOf({ kcal: 410, protein: 21 }, 5.6).state, "close");               // Sarma, PD 5.1 against 5.6
   assert.equal(fitOf({ kcal: 410, protein: 21 }, 5.6).text, "close");
   assert.equal(fitOf({ kcal: 420, protein: 46 }, 5.6).state, "fits");
   assert.equal(fitOf({ kcal: 640, protein: 52 }, 8.2).state, "fits");                 // 8.1: the same number on screen
   assert.equal(fitOf({ kcal: 410, protein: 21 }, 8.2).state, "under");
-  const big = fitOf({ kcal: 640, protein: 52 }, 7, "pd", { kcal: 400, protein: 30 });
-  assert.equal(big.size, "big"); assert.equal(big.state, "close"); assert.equal(big.text, "big for this slot");
-  assert.equal(fitOf({ kcal: 260, protein: 28 }, 6, "pd", { kcal: 700, protein: 45 }).text, "small for this slot");
-  assert.equal(fitOf({ kcal: 410, protein: 21 }, 8.2, "pd", { kcal: 700, protein: 45 }).text, "3.1 under · small for this slot");
+  // DT75: no size mark; protein already covered (target 0): any meal fits
+  assert.equal(fitOf({ kcal: 260, protein: 28 }, 6).text, "fits");
+  assert.equal(fitOf({ kcal: 410, protein: 21 }, 0).state, "fits");
 });
-test("DT74: a full day off by more than a tenth says so; fitting the portions lands it; back to the usual undoes it", () => {
-  assert.deepEqual(dayOff({ kcal: 1350, n: 3 }, { kcal: 2100 }, 0), { by: 750, short: true });
+test("DT75: the day's kcal is a range, a tenth either side, rounded to 50; off says how far from its edge", () => {
+  assert.deepEqual(bandOf(2100), { lo: 1900, hi: 2300 });
+  assert.deepEqual(bandOf(2150), { lo: 1950, hi: 2350 });
+  assert.deepEqual(dayOff({ kcal: 1350, n: 3 }, { kcal: 2100 }, 0), { by: 550, short: true, lo: 1900, hi: 2300 });
   assert.equal(dayOff({ kcal: 1350, n: 3 }, { kcal: 2100 }, 1), null);                  // a slot still open: not yet
-  assert.equal(dayOff({ kcal: 2000, n: 3 }, { kcal: 2100 }, 0), null);                  // within a tenth: land around
-  assert.deepEqual(dayOff({ kcal: 2500, n: 3 }, { kcal: 2100 }, 0), { by: 400, short: false });
+  assert.equal(dayOff({ kcal: 2000, n: 3 }, { kcal: 2100 }, 0), null);                  // inside the range: nothing to say
+  assert.equal(dayOff({ kcal: 2290, n: 3 }, { kcal: 2100 }, 0), null);
+  assert.deepEqual(dayOff({ kcal: 2500, n: 3 }, { kcal: 2100 }, 0), { by: 200, short: false, lo: 1900, hi: 2300 });
+});
+test("DT75: protein against the person's range, once every slot is set", () => {
+  const r = { min: 100, max: 140 };
+  assert.deepEqual(proteinOff({ protein: 167, n: 3 }, r, 0), { by: 27, above: true });
+  assert.deepEqual(proteinOff({ protein: 90, n: 3 }, r, 0), { by: 10, above: false });
+  assert.equal(proteinOff({ protein: 120, n: 3 }, r, 0), null);
+  assert.equal(proteinOff({ protein: 167, n: 3 }, r, 1), null);
+  assert.equal(proteinOff({ protein: 167, n: 3 }, null, 0), null);
+});
+test("DT75: fitting the portions aims at the target in quarters, inside the range, spread over the meals; back to the usual undoes it", () => {
   const held = { a: { title: "A", kcal: 420, protein: 46, source: "starter" as const }, b: { title: "B", kcal: 480, protein: 36, source: "starter" as const }, c: { title: "C", kcal: 450, protein: 34, source: "starter" as const, skipped: true } };
-  const fit = fitPortions(held, { kcal: 2100 });
-  assert.equal(fit.c, held.c);                                                            // skipped stays
-  assert.equal(fit.a.amount, 2); assert.equal(fit.a.kcal, 840);                          // never more than double
-  const fair = fitPortions({ a: held.a, b: held.b }, { kcal: 1200 });
-  assert.equal(fair.a.amount, 1.35); assert.ok(Math.abs(fair.a.kcal + fair.b.kcal - 1200) / 1200 <= 0.1);
-  assert.equal(amountText(fair.a), "1.35 portions"); assert.equal(amountText(held.a), null);
+  const most = fitPortions(held, { kcal: 2100 });
+  assert.equal(most.c, held.c);                                                           // skipped stays
+  assert.equal(most.a.amount, 2); assert.equal(most.a.kcal, 840);                        // never more than double: as close as they get
+  const fair = fitPortions({ a: held.a, b: held.b }, { kcal: 1200 });                    // range 1,100 to 1,300
+  // 1,125 (both 1¼) is inside but 6 % off; 1,140 (one 1½) is within a twentieth
+  assert.equal(fair.a.amount, undefined); assert.equal(fair.b.amount, 1.5); assert.equal(fair.a.kcal + fair.b.kcal, 1140);
+  // Anna's kind of day: 420 + 480 + 450 against 2,100: all 1½, 2,025, not 1¼ at the range's edge
+  const day = fitPortions({ a: held.a, b: held.b, c: { ...held.c, skipped: false } }, { kcal: 2100 });
+  assert.deepEqual([day.a.amount, day.b.amount, day.c.amount], [1.5, 1.5, 1.5]);
+  assert.equal(day.a.kcal + day.b.kcal + day.c.kcal, 2025);
+  // already fitted: it starts from the usual portion, not from the fitted one
+  assert.deepEqual(fitPortions(day, { kcal: 2100 }), day);
+  assert.equal(amountText(day.a), "1½ portions"); assert.equal(amountText(held.a), null); assert.equal(amountText({ ...held.a, amount: 1.25 }), "1¼ portions");
+  assert.equal(amountText({ ...held.a, amount: 0.5 }), "½ portion"); assert.equal(amountText({ ...held.a, amount: 0.75 }), "¾ portion");
+  assert.equal(amountText({ ...held.a, amount: 1.5 }), "1½ portions"); assert.equal(amountText({ ...held.a, amount: 2 }), "2 portions");
   const back = usualPortions(fair);
-  assert.equal(back.a.amount, undefined); assert.equal(back.a.kcal, 420); assert.equal(back.b.kcal, 480);
+  assert.equal(back.b.amount, undefined); assert.equal(back.a.kcal, 420); assert.equal(back.b.kcal, 480);
 });
 test("DT74: a fitted meal is eaten at its amount", () => {
   const m = fromMeal({ id: "m", title: "Skyr bowl", items: [{ id: "i", food, grams: 200, locked: true }], portion: 200, savedAt: "" } as any, "mine");

@@ -75,7 +75,8 @@ const monday = (d) => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDa
   if (process.env.SHOTS) await page.locator(".mt").screenshot({ path: `${process.env.SHOTS}/mt-m3.png` });
   const t1 = (await page.locator(".mt").innerText()).replace(/\s+/g, " ");
   ok(/Days lived by the plan/.test(t1) && /The five KPIs/.test(t1) && /The way in/.test(t1), "MT71: the whole page shows from the first day of counting: " + t1.slice(0, 80));
-  ok(/This week \d+ \w+ to today\./.test(t1) && /Compared with \d+ to \d+ \w+/.test(t1) && /Counting began on \d+ \w+\. Today is \d+ \w+\./.test(t1), "MT71: the time frame on top, and since when it counts");
+  // 23 October 2026: counting began three days ago; from Thursday on that is after Monday, and the line says counted from it
+  ok(/This week \d+ \w+ to today( \(counted from \d+ \w+\))?\./.test(t1) && /Compared with \d+ to \d+ \w+/.test(t1) && /Counting began on \d+ \w+\. Today is \d+ \w+\./.test(t1), "MT71: the time frame on top, and since when it counts");
   ok((await page.locator(".mt-when").count()) === 4, "MT71: each card says which days it counts");
   ok(/Home page visits\s*2/.test(t1), "MT71: the way in shows this week's visits so far, 2");
   ok(/Home page visits 2 QR 1/.test(t1), "SH73: a visit from the chefmealan.com QR code counts as QR under Home page visits");

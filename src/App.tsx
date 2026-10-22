@@ -2019,6 +2019,8 @@ export default function App() {
     // today's four: protein and fat stay, the carbs take the day's difference
     todayMacros: todayNumbers(),
     numbersFor: (date: Date) => numbersOfDate(date),
+    // DT75: the person's protein range, g per kg times weight, the same every day; null without a profile to calculate it
+    proteinRange: (() => { const c = calculate(personalNow, goalNow?.band ?? "maintain", profile.formula ?? null); return c ? { min: c.proteinMin, max: c.proteinMax } : null; })(),
     coachNotes: coachThread.notes, checkinDay: coachThread.checkinDay,
     gotNote: (at: string) => saveNotes(coachThread.notes.map((n) => (n.at === at ? { ...n, readAt: new Date().toISOString() } : n))),
     replyToCoach: (text: string, read?: string) => saveNotes([...coachThread.notes.map((n) => (n.at === read ? { ...n, readAt: new Date().toISOString() } : n)), { at: new Date().toISOString(), by: "client", text }]),

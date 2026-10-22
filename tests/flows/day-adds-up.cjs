@@ -4,6 +4,10 @@
 // "fits" only where a meal fits, "close" where it lands around the target, its size named; a full day well off its kcal
 // says so, and Fit the portions brings it within a tenth; Back to the usual portions undoes it; every target names its day,
 // and the same day's target is the same number on Plan and in the top bar.
+// Changed by story DT75 (Milan 22 October 23:54 to 23:58, board DT75, Anna's second run): the day's kcal is a range, a tenth
+// either side (2,100: 1,900 to 2,300); off says how far from its edge; Fit the portions lands inside it in quarters and says
+// so; protein shows the person's range, and above it a quiet line; the slot line gives the PD of what is left, and the
+// picker judges against it, with no size mark.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -39,10 +43,14 @@ seed.meals = []; seed.items = []; seed.feedback = [];
   await page.waitForTimeout(300);
   const dayName = (await txt(".plan-day-head b")).split(",")[0].trim();
   ok(new RegExp(`of PD [\\d.]+, ${dayName}'s target`).test(await txt(".plan-head .plan-row")), `the day planned names its own target: ${dayName}'s`);
-  const dayKcal = num((await txt(".plan-head .plan-row")).match(/of ([\d,]+) kcal/)[1]);
+  const range = (await txt(".plan-head .plan-row")).match(/of ([\d,]+) to ([\d,]+) kcal/);
+  const lo = num(range[1]), hi = num(range[2]);
 
   await page.getByRole("button", { name: /Breakfast at .*pick a meal/ }).click(); await page.waitForTimeout(400);
   const need1 = num((await txt(".pick-sheet .pick-why")).match(/needs about ([\d,]+) kcal/)[1]);
+  const dayKcal = need1 * 3;                                    // three meals, equal shares (give or take the rounding)
+  ok(Math.abs(lo - dayKcal * 0.9) <= 26 && Math.abs(hi - dayKcal * 1.1) <= 26 && lo % 50 === 0 && hi % 50 === 0, `the day's kcal is a range, a tenth either side: ${lo} to ${hi} around ${dayKcal}`);
+  ok(await page.locator(".pick-sheet .pick-pd small", { hasText: /for this slot/ }).count() === 0, "no size mark in the picker");
   // Sarma, under the target: never "fits"; its number is named PD
   const sarma = page.locator(".pick-sheet .pick-row", { hasText: "Sarma" });
   const sarmaMark = ((await sarma.locator(".pick-pd").textContent()) ?? "").replace(/\s+/g, " ");
@@ -54,23 +62,29 @@ seed.meals = []; seed.items = []; seed.feedback = [];
   const why2 = await txt(".pick-sheet .pick-why");
   const need2 = num((why2.match(/about ([\d,]+) kcal/) || [])[1]);
   ok(/With the other meals planned, it has about [\d,]+ kcal and \d+ g of protein left/.test(why2) && need2 > 0, "the next slot counts what is already planned: " + why2.slice(0, 120));
-  ok(need2 === Math.round((dayKcal - 420) / 2), `lunch has the day less breakfast, shared with dinner: ${need2} = (${dayKcal} − 420) ÷ 2`);
+  const left = why2.match(/about ([\d,]+) kcal and (\d+) g of protein left, PD (\d+\.\d)/);
+  ok(!!left && Number(left[3]).toFixed(1) === (num(left[2]) / num(left[1]) * 100).toFixed(1), `its PD is the PD of what is left, not the day's: ${left && left.slice(1).join(", ")}`);
+  ok(Math.abs(need2 - (dayKcal - 420) / 2) <= 1, `lunch has the day less breakfast, shared with dinner: ${need2} = (${dayKcal} − 420) ÷ 2`);
   ok(need2 !== need1, `it moved: ${need1} before breakfast, ${need2} after`);
   await page.locator(".pick-sheet").getByRole("button", { name: /Tuna salad wrap/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: /Dinner at .*pick a meal/ }).click(); await page.waitForTimeout(400);
   await page.locator(".pick-sheet").getByRole("button", { name: /Omelette with bread/ }).click(); await page.waitForTimeout(400);
 
   // the whole day: 420 + 480 + 450 = 1,350 kcal against the day's target, more than a tenth short
-  const sumKcal = () => txt(".plan-head .plan-row").then((t) => num(t.match(/([\d,]+)\s*of [\d,]+ kcal/)[1]));
+  const sumKcal = () => txt(".plan-head .plan-row").then((t) => num(t.match(/([\d,]+)\s*of [\d,]+ to [\d,]+ kcal/)[1]));
   ok(/all slots set/.test(await txt(".plan-head .plan-day-head small")) && await sumKcal() === 1350, "all slots set, 1,350 kcal planned");
   const off = await txt(".plan-off");
-  ok(new RegExp(`${(dayKcal - 1350).toLocaleString("en")} kcal short of ${dayName}'s ${dayKcal.toLocaleString("en")} kcal`).test(off) && /Add a snack, or make the portions bigger/.test(off), "the day says it is short, by how much: " + off.slice(0, 90));
+  ok(new RegExp(`${(lo - 1350).toLocaleString("en")} kcal under ${dayName}'s range of ${lo.toLocaleString("en")} to ${hi.toLocaleString("en")} kcal`).test(off) && /Add a snack, or make the portions bigger/.test(off), "the day says it is under its range, by how much: " + off.slice(0, 90));
   await page.getByRole("button", { name: `Fit the portions to ${dayName}` }).click(); await page.waitForTimeout(500);
   const after = await sumKcal();
-  ok(Math.abs(after - dayKcal) / dayKcal <= 0.1 && await page.locator(".plan-off").count() === 0, `Fit the portions: the day lands within a tenth, ${after} of ${dayKcal} kcal, and the warning goes`);
-  ok(/\d(\.\d+)? portions/.test(await txt(".plan-slot-wrap")), "each meal says how much of it: " + (await txt(".plan-slot-wrap")).slice(0, 80));
+  ok(after >= lo && after <= hi && await page.locator(".plan-off").count() === 0, `Fit the portions: the day lands inside its range, ${after} in ${lo} to ${hi} kcal, and the warning goes`);
+  ok(new RegExp(`${dayName} is inside its range: ${after.toLocaleString("en")} kcal`).test(await txt(".toast, [role=status], body")), "the message says where the day landed");
+  const amounts = (await page.locator(".plan-slot-wrap").allTextContents()).join(" ");
+  ok(/(\d|½|¼|¾) portions?/.test(amounts) && !/\d\.\d+ portions/.test(amounts), "each meal says how much of it, in quarters: " + (amounts.match(/[\d½¼¾]+ portions?/g) || []).join(", "));
+  const note = await page.locator(".plan-protein-note").count() ? await txt(".plan-protein-note") : "";
+  ok(/g of protein, above your range of \d+ to \d+ g\. That does no harm/.test(note), "protein above the range is said quietly: " + note.slice(0, 80));
   await page.getByRole("button", { name: "Back to the usual portions" }).click(); await page.waitForTimeout(500);
-  ok(await sumKcal() === 1350 && await page.locator(".plan-off").count() === 1, "Back to the usual portions: 1,350 kcal again, the warning back");
+  ok(await sumKcal() === 1350 && await page.locator(".plan-off").count() === 1 && await page.locator(".plan-protein-note").count() === 0, "Back to the usual portions: 1,350 kcal again, the warning back");
 
   // Me: the average day is called that
   await page.getByRole("button", { name: "Menu" }).click(); await page.waitForTimeout(500);
