@@ -8,7 +8,9 @@ export type PlannedMeal = { title: string; kcal: number; protein: number; source
   // 0.2.6 (canvas board CW, CW7): skipped on purpose; the meal counts as closed for a day lived by the plan
   skipped?: boolean;
   // SL6 (0.2.64): how a meal changed for this day only came to be (from a shopping list, picked from Chef Mealan's ideas); shown when it is opened
-  note?: string };
+  note?: string;
+  // DT74 (0.2.74): how much of the meal, when the day's portions were fitted (1.3 is a third more); kcal and protein are counted at it
+  amount?: number };
 export type Planned = Record<string, Record<string, PlannedMeal>>; // by date (ymd), then by slot id
 
 const KEY = "chefmealan-planned";
@@ -24,7 +26,7 @@ export function refreshPlanned(p: Planned, meals: Meal[]): Planned {
     next[date] = {};
     for (const [slot, m] of Object.entries(day)) {
       const r = m.mealId && !m.servings ? byId.get(m.mealId) : undefined;
-      if (r && servingsOf(r) > 1) { const f = fromMeal(r, m.source); next[date][slot] = { ...m, kcal: f.kcal, protein: f.protein, servings: f.servings }; changed = true; }
+      if (r && servingsOf(r) > 1) { const f = fromMeal(r, m.source); const a = m.amount ?? 1; next[date][slot] = { ...m, kcal: Math.round(f.kcal * a), protein: Math.round(f.protein * a), servings: f.servings }; changed = true; }
       else if (!m.mealId && m.items?.length && twice(m.items)) { next[date][slot] = withoutTwice(m); changed = true; }
       else next[date][slot] = m;
     }
@@ -54,7 +56,7 @@ export function withPlanned(p: Planned, date: string, slotId: string, meal: Plan
 export function plannedPortion(m: PlannedMeal, id: string, savedAt: string): Meal | null {
   if (!m.items?.length) return null;
   const weight = m.items.reduce((n, i) => n + (i.grams > 0 ? i.grams : 0), 0);
-  const ratio = m.servings && m.servings > 1 ? 1 / m.servings : m.portion && weight > 0 ? Math.min(1, m.portion / weight) : 1;
+  const ratio = (m.servings && m.servings > 1 ? 1 / m.servings : m.portion && weight > 0 ? Math.min(1, m.portion / weight) : 1) * (m.amount ?? 1);
   const items = m.items.map((i) => ({ ...i, grams: i.grams * ratio }));
   // the portion is the foods' own weight, never rounded past it: a stored meal heavier than its foods is not read back
   return { id, title: m.title, items, portion: items.reduce((n, i) => n + i.grams, 0), savedAt };
@@ -90,16 +92,65 @@ export function needOf(slots: Slot[], slot: Slot, day: { kcal: number; protein: 
   return { kcal: Math.round(day.kcal * share), protein: Math.round(day.protein * share) };
 }
 
-// the mark next to a meal: fits when its PD reaches the day's target, within a point; else how far under
-export type Fit = { pd: number | null; state: "fits" | "under" | "none"; gap: number | null; text: string };
-export function fitOf(meal: { kcal: number; protein: number }, target: number | null, unit: "pd" | "pct" = "pd"): Fit {
+// DT74 (0.2.74, board DT74, Anna's first run): what a slot has left. The day's numbers less what the other slots already
+// hold, shared among the slots still open and this one, a snack half of a meal. With nothing planned it is needOf.
+export function leftOf(slots: Slot[], slot: Slot, day: { kcal: number; protein: number } | null, held: Record<string, PlannedMeal> | undefined): { kcal: number; protein: number } | null {
+  if (!day) return null;
+  const others = slots.filter((s) => s.id !== slot.id && held?.[s.id]);
+  const used = others.reduce((n, s) => { const m = held![s.id]; return m.skipped ? n : { kcal: n.kcal + m.kcal, protein: n.protein + m.protein }; }, { kcal: 0, protein: 0 });
+  const sharing = slots.filter((s) => s.id === slot.id || !held?.[s.id]);
+  const total = sharing.reduce((n, s) => n + weightOf(s), 0) || 1;
+  const share = weightOf(slot) / total;
+  return { kcal: Math.max(0, Math.round((day.kcal - used.kcal) * share)), protein: Math.max(0, Math.round((day.protein - used.protein) * share)) };
+}
+
+// the mark next to a meal. DT74: "fits" only when it does. Its PD at the target (a tenth or two under is the same number on
+// screen) fits; within a point under is "close", landing around the target as Milan wants; further under says how far.
+// Given what the slot has left, a meal far off it in size says so: big or small for this slot.
+export type Fit = { pd: number | null; state: "fits" | "close" | "under" | "none"; gap: number | null; text: string; size?: "big" | "small" };
+export function fitOf(meal: { kcal: number; protein: number }, target: number | null, unit: "pd" | "pct" = "pd", need?: { kcal: number; protein: number } | null): Fit {
   const pd = density(meal.protein, meal.kcal);
   if (pd === null || target === null) return { pd, state: "none", gap: null, text: "" };
   const gap = target - pd;
-  if (gap <= 1) return { pd, state: "fits", gap: 0, text: "fits" };
+  const ratio = need && need.kcal > 0 ? meal.kcal / need.kcal : 1;
+  const size = ratio > 1.3 ? "big" : ratio < 0.75 ? "small" : undefined;
+  const sizeText = size ? ` · ${size} for this slot` : "";
+  if (gap <= 0.2) return { pd, state: size ? "close" : "fits", gap: 0, text: size ? sizeText.slice(3) : "fits", ...(size ? { size } : {}) };
+  if (gap <= 1) return { pd, state: "close", gap, text: `close${sizeText}`, ...(size ? { size } : {}) };
   const g = unit === "pct" ? `${Math.round(gap * 4)} %` : gap.toFixed(1);
-  return { pd, state: "under", gap, text: `${g} under` };
+  return { pd, state: "under", gap, text: `${g} under${sizeText}`, ...(size ? { size } : {}) };
 }
+
+// DT74: the planned day against its numbers. Off when every slot is set and the kcal miss by more than a tenth (land around,
+// not exact); fitting the portions scales every meal not skipped by the same amount, so the day lands on its kcal.
+export function dayOff(sum: { kcal: number; n: number }, day: { kcal: number } | null, open: number): { by: number; short: boolean } | null {
+  if (!day || open > 0 || !sum.n || sum.kcal <= 0) return null;
+  const by = day.kcal - sum.kcal;
+  return Math.abs(by) / day.kcal > 0.1 ? { by: Math.abs(by), short: by > 0 } : null;
+}
+export function fitPortions(held: Record<string, PlannedMeal>, day: { kcal: number }): Record<string, PlannedMeal> {
+  const live = Object.values(held).filter((m) => !m.skipped);
+  const kcal = live.reduce((n, m) => n + m.kcal, 0);
+  if (kcal <= 0) return held;
+  const f = Math.min(2, Math.max(0.5, day.kcal / kcal));
+  const out: Record<string, PlannedMeal> = {};
+  for (const [id, m] of Object.entries(held)) {
+    if (m.skipped) { out[id] = m; continue; }
+    const a = Math.round((m.amount ?? 1) * f * 20) / 20, k = a / (m.amount ?? 1);
+    out[id] = { ...m, amount: a, kcal: Math.round(m.kcal * k), protein: Math.round(m.protein * k) };
+  }
+  return out;
+}
+// back to the portions as saved
+export function usualPortions(held: Record<string, PlannedMeal>): Record<string, PlannedMeal> {
+  const out: Record<string, PlannedMeal> = {};
+  for (const [id, m] of Object.entries(held)) {
+    const a = m.amount ?? 1;
+    out[id] = a === 1 ? m : (({ amount: _a, ...rest }) => ({ ...rest, kcal: Math.round(m.kcal / a), protein: Math.round(m.protein / a) }))(m);
+  }
+  return out;
+}
+export const amountText = (m: PlannedMeal) => (m.amount && m.amount !== 1 ? `${m.amount.toFixed(2).replace(/0$/, "")} portions` : null);
 
 // the day as planned: what the slots hold, added up
 export function sumOf(day: Record<string, PlannedMeal> | undefined): { kcal: number; protein: number; pd: number | null; n: number } {

@@ -1146,7 +1146,7 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .tile-name-btn { background: none; border: 0; padding: 0; font: inherit; color: inherit; text-align: left; cursor: text; }
 .title-input.tile-name { font-size: var(--fs-body); margin: 0; padding: 0 0 2px; flex: 1; }
 /* Today reads the plan (0.2.3, canvas S Today through the day) */
-.plan-slot-row .menu-row-text small .fit-ok, .plan-slot-row .menu-row-text small .fit-under { font-weight: 900; }
+.plan-slot-row .menu-row-text small .fit-ok, .plan-slot-row .menu-row-text small .fit-under, .plan-slot-row .menu-row-text small .fit-close { font-weight: 900; }
 .plan-mark { display: block; margin-top: 4px; font-weight: 900; }
 .day-record { margin: 12px 0; } .day-record .record-line { display: block; margin-top: 10px; color: var(--brand-text); font-weight: 600; }
 /* 0.2.4: the question above Scan, the fill rows in the chat, the mic, the Fill button on Plan */
@@ -1984,4 +1984,10 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .sh-card .l-form { width: 100%; text-align: left; }
 .sh-arrived { margin: 12px auto 0; max-width: 960px; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; align-items: flex-start; padding: 14px 16px; border-radius: 14px; background: var(--brand-soft, #dae6fb); color: var(--brand-text, #123a7a); }
 .sh-arrived b { font-size: var(--fs-card); }
-.sh-spots { font-weight: 800; color: var(--brand-text, #123a7a); }
+.sh-spots { font-weight: 900; color: var(--brand-text, #123a7a); }
+/* DT74: "close" is landing around the target, quiet; a full day well off its kcal says so in the day's head */
+.fit-close { color: var(--muted); font-weight: 900; }
+.pick-pd.close { color: var(--ink); } .pick-pd.close small { color: var(--muted); }
+.plan-off { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--close-soft); color: var(--close-text); display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.plan-off p { margin: 0; font-size: var(--fs-label); line-height: 1.4; }
+.plan-usual { margin-top: 6px; }
