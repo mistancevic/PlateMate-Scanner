@@ -1,7 +1,9 @@
 // The Walkthroughs page (Milan, 22 October 2026: "I would like to have these walkthroughs visible somewhere"). Reads
 // tests/flows-report.json, written by every full run of scripts/run-flows.cjs, and writes one self-contained HTML page:
 // each walkthrough, what it covers, every check with ok or failed, the version and the time of the run.
-//   node scripts/flows-page.cjs <out.html>
+//   node scripts/flows-page.cjs <out.html> [blind/findings.json]
+// With a second argument the page gets a second tab, Blind walkthroughs: a reviewer who has never seen the app plays a new
+// member, step by step with screenshots (thumbs/<name>.jpg next to the json), and lists every place they hesitated.
 const fs = require("node:fs"), path = require("node:path");
 const r = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../tests/flows-report.json"), "utf8"));
 const out = process.argv[2] || path.resolve(__dirname, "../tests/walkthroughs.html");
@@ -9,6 +11,22 @@ const name = (f) => { const s = f.replace(/\.cjs$/, "").replace(/[-_]+/g, " "); 
 const flows = r.flows.map((f) => ({ id: f.file.replace(/\.cjs$/, "").replace(/[^a-z0-9]+/gi, "-").toLowerCase(), name: name(f.file), file: f.file, about: f.about, pass: f.pass, seconds: f.seconds, checks: f.checks }));
 const passed = flows.filter((f) => f.pass).length, checks = flows.reduce((n, f) => n + f.checks.length, 0);
 const when = new Date(r.at).toLocaleString("en-GB", { timeZone: "Europe/Berlin", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
+const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+let blindHtml = "";
+if (process.argv[3]) {
+  const b = JSON.parse(fs.readFileSync(process.argv[3], "utf8")), dir = path.dirname(process.argv[3]);
+  const img = (n, alt) => { const p = path.join(dir, "thumbs", n + ".jpg"); return fs.existsSync(p) ? `<img src="data:image/jpeg;base64,${fs.readFileSync(p).toString("base64")}" alt="${esc(alt)}" width="150" loading="lazy">` : ""; };
+  const sev = { Blocker: "bad", Friction: "warn", Polish: "soft" };
+  blindHtml = `<section class="blind" id="blind-tab" hidden>
+    <div class="persona"><div class="eyebrow">Blind walkthrough · ${esc(b.build)}</div><h2>${esc(b.who.split(",")[0])}, first run</h2><p>${esc(b.who)}</p><p><b>Goal:</b> ${esc(b.goal)}</p><p class="result"><b>Result:</b> ${esc(b.result)}</p></div>
+    <h3>Her path</h3>
+    <ol class="steps">${b.steps.map(([n, t], i) => `<li>${img(n, "Step " + (i + 1))}<span><b>${i + 1}.</b> ${esc(t)}</span></li>`).join("")}</ol>
+    <h3>What slowed her down, most important first</h3>
+    <ol class="finds">${b.findings.map(([s, title, what, fix, n]) => `<li><div class="fhead"><span class="pill ${sev[s] || "soft"}">${esc(s)}</span><b>${esc(title)}</b></div><div class="fbody">${img(n, title)}<div><p>${esc(what)}</p><p class="fix"><b>Fix:</b> ${esc(fix)}</p></div></div></li>`).join("")}</ol>
+    <h3>Good moments</h3><p>${esc(b.good)}</p>
+    <h3>Not tried here: needs the AI</h3><ul>${b.ai.map((a) => `<li>${esc(a)}</li>`).join("")}</ul>
+  </section>`;
+}
 const data = JSON.stringify({ version: r.version, commit: r.commit, when, minutes: r.minutes, passed, total: flows.length, checks, flows }).replace(/</g, "\\u003c");
 const html = `<title>Chef Mealan Walkthroughs</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -17,16 +35,16 @@ const html = `<title>Chef Mealan Walkthroughs</title>
 /* a release checklist: summary first, then one row per journey that opens to its checks */
 :root {
   --bg: #eef3fb; --card: #ffffff; --ink: #172742; --muted: #5b6b8a; --line: #d1dcf0;
-  --brand: #1f5fc7; --brand-soft: #dae6fb; --ok: #13804f; --ok-soft: #dcf3e8; --bad: #b3261e; --bad-soft: #fbe3e1;
+  --brand: #1f5fc7; --brand-soft: #dae6fb; --ok: #13804f; --ok-soft: #dcf3e8; --bad: #b3261e; --bad-soft: #fbe3e1; --warn: #8a5a00; --warn-soft: #fdf0d5;
   --font: "Nunito", ui-rounded, system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0d1626; --card: #15223a; --ink: #e7eefb; --muted: #9fb0cc; --line: #2a3a57;
-  --brand: #8db6ff; --brand-soft: #1e3358; --ok: #6fd6a2; --ok-soft: #133528; --bad: #ff8a80; --bad-soft: #3d1a1a; color-scheme: dark } }
+  --brand: #8db6ff; --brand-soft: #1e3358; --ok: #6fd6a2; --ok-soft: #133528; --bad: #ff8a80; --bad-soft: #3d1a1a; --warn: #f3c565; --warn-soft: #3a2c10; color-scheme: dark } }
 :root[data-theme="dark"] {
   --bg: #0d1626; --card: #15223a; --ink: #e7eefb; --muted: #9fb0cc; --line: #2a3a57;
-  --brand: #8db6ff; --brand-soft: #1e3358; --ok: #6fd6a2; --ok-soft: #133528; --bad: #ff8a80; --bad-soft: #3d1a1a; color-scheme: dark }
+  --brand: #8db6ff; --brand-soft: #1e3358; --ok: #6fd6a2; --ok-soft: #133528; --bad: #ff8a80; --bad-soft: #3d1a1a; --warn: #f3c565; --warn-soft: #3a2c10; color-scheme: dark }
 * { box-sizing: border-box }
 body { background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.5; }
 .wrap { max-width: 860px; margin: 0 auto; padding-block: 28px 56px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: flex; flex-direction: column; gap: 18px; }
@@ -61,6 +79,26 @@ ol.checks li span { overflow-wrap: anywhere; min-width: 0; }
 ol.checks li i { font-style: normal; font-weight: 900; color: var(--ok); } ol.checks li.bad i { color: var(--bad); } ol.checks li.bad span { color: var(--bad); font-weight: 700; }
 .empty { padding: 18px 16px; color: var(--muted); }
 footer { font-size: 13px; color: var(--muted); }
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.tabpanel { display: flex; flex-direction: column; gap: 18px; }
+.blind { display: flex; flex-direction: column; gap: 14px; }
+.blind h2 { margin: 2px 0 6px; font-size: 26px; font-weight: 900; }
+.blind h3 { margin: 10px 0 0; font-size: 18px; font-weight: 900; }
+.blind p { margin: 0 0 6px; max-width: 70ch; }
+.persona { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; }
+.persona .result { background: var(--brand-soft); border-radius: 10px; padding: 10px 12px; margin-top: 8px; }
+ol.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+ol.steps li { display: flex; flex-direction: column; gap: 6px; font-size: 13px; min-width: 0; }
+.blind img { width: 150px; max-width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line); display: block; }
+ol.finds { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+ol.finds li { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.fhead { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.fbody { display: grid; grid-template-columns: 110px 1fr; gap: 12px; align-items: start; }
+.fbody img { width: 110px; }
+.fbody > div { min-width: 0; }
+.fix { color: var(--muted); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); } .pill.soft { background: var(--brand-soft); color: var(--brand); }
+@media (max-width: 520px) { .fbody { grid-template-columns: 1fr; } }
 @media (max-width: 520px) { summary { grid-template-columns: 1fr auto; } summary .meta { grid-column: 1 / -1; } }
 </style>
 <div class="wrap">
@@ -68,6 +106,8 @@ footer { font-size: 13px; color: var(--muted); }
     <div class="eyebrow">Chef Mealan · release checks</div>
     <h1>Walkthroughs</h1>
   </header>
+  ${blindHtml ? '<nav class="tabs" role="tablist" aria-label="Kinds of walkthrough"><button class="chip" role="tab" id="t-checks" aria-pressed="true">Release checks</button><button class="chip" role="tab" id="t-blind" aria-pressed="false">Blind walkthroughs</button></nav>' : ""}
+  <div id="checks-tab" class="tabpanel">
   <p class="lead">Every journey the app is checked on before a release. A script opens the app in a real browser on a phone-sized screen, taps through it the way a person would, and checks what it sees. Open a walkthrough to see what it covers and every check it made.</p>
   <section class="summary" id="summary" aria-label="The last run"></section>
   <div class="tools">
@@ -79,6 +119,8 @@ footer { font-size: 13px; color: var(--muted); }
   </div>
   <div class="list" id="list"></div>
   <footer id="foot"></footer>
+  </div>
+  ${blindHtml}
 </div>
 <script>
 const D = ${data};
@@ -105,6 +147,11 @@ const setF = (v) => { onlyFailed = v; document.getElementById("all").setAttribut
 document.getElementById("all").addEventListener("click", () => setF(false));
 document.getElementById("failed").addEventListener("click", () => setF(true));
 render();
+const tab = (t) => { const b = t === "blind"; document.getElementById("checks-tab").hidden = b; const bl = document.getElementById("blind-tab"); if (bl) bl.hidden = !b;
+  document.getElementById("t-checks")?.setAttribute("aria-pressed", String(!b)); document.getElementById("t-blind")?.setAttribute("aria-pressed", String(b)); };
+document.getElementById("t-checks")?.addEventListener("click", () => tab("checks"));
+document.getElementById("t-blind")?.addEventListener("click", () => tab("blind"));
+if (location.hash === "#blind") tab("blind");
 if (location.hash) document.getElementById(location.hash.slice(1))?.scrollIntoView();
 </script>
 `;
