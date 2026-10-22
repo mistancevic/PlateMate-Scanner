@@ -8,7 +8,7 @@ import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "..
 import { rowsOf, slotsOf, slotsOn, trainingWhen, type Slot } from "../slots";
 import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
-import { STARTERS, fitOf, fromMeal, leftOf, sumOf, plannedPortion, dayOff, fitPortions, usualPortions, amountText, type PlannedMeal } from "../planned";
+import { STARTERS, fitOf, fromMeal, leftOf, sumOf, plannedPortion, dayOff, proteinOff, bandOf, fitPortions, usualPortions, amountText, type PlannedMeal } from "../planned";
 import { CHEF_NAME } from "../components/Mark";
 import { PlanRow } from "../components/PlanRow";
 import { ShortHelp } from "../components/ShortHelp";
@@ -91,8 +91,15 @@ export function PlanScreen(p: AppApi) {
   // DT74 (board DT74, Anna's first run): every target names its day; a full day well off its kcal says so, and can fit
   const dayPoss = isToday ? "today's" : `${WEEKDAY[(date.getDay() + 6) % 7]}'s`;
   const off = dayOff(sum, numbers, openCount);
+  // DT75: the day's kcal as a range, a tenth either side; protein in the person's range (g per kg), the target inside it
+  const band = numbers ? bandOf(numbers.kcal) : null;
+  const pr = p.proteinRange && numbers ? { min: Math.min(p.proteinRange.min, numbers.protein), max: Math.max(p.proteinRange.max, numbers.protein) } : null;
+  const pOff = proteinOff(sum, pr, openCount);
+  const Day = dayName === "today" ? "Today" : dayName;
   const fitted = Object.values(held).some((m) => m.amount && m.amount !== 1);
-  const fitDay = () => { if (!numbers) return; const next = fitPortions(held, numbers); for (const [id, m] of Object.entries(next)) p.fill(key, id, m); p.notify(`Portions fitted to ${dayName === "today" ? "today" : dayName}: the day lands on ${fmt(numbers.kcal, 0)} kcal.`); };
+  const fitDay = () => { if (!numbers) return; const next = fitPortions(held, numbers); for (const [id, m] of Object.entries(next)) p.fill(key, id, m);
+    const k = sumOf(next).kcal, b = bandOf(numbers.kcal);
+    p.notify(k >= b.lo && k <= b.hi ? `${Day} is inside its range: ${fmt(k, 0)} kcal.` : `Portions fitted to ${Day === "Today" ? "today" : Day}: ${fmt(k, 0)} kcal, as close as these meals get.`); };
   const usualDay = () => { const next = usualPortions(held); for (const [id, m] of Object.entries(next)) p.fill(key, id, m); p.notify("Back to the usual portions."); };
   const fillingOf = (s: Slot): Filling => ({ date: key, slotId: s.id, name: s.name, time: s.time, dayName });
   const put = (s: Slot, m: PlannedMeal) => { p.fill(key, s.id, m); setOpen(null); p.notify(`${m.title} is ${dayName === "today" ? "today's" : `${dayName}'s`} ${s.name.toLowerCase()}.`); };
@@ -125,15 +132,17 @@ export function PlanScreen(p: AppApi) {
         </div>
         <div className="plan-row">
           <div><b>{sum.n ? pdVal(sum.pd) : "—"}</b><small>{target !== null ? `of ${pdText(target)}, ${dayPoss} target` : pdTag()}</small></div>
-          <div><b>{fmt(sum.kcal, 0)}</b><small>{numbers ? `of ${fmt(numbers.kcal, 0)} kcal` : "kcal"}</small></div>
-          <div><b>{fmt(sum.protein, 0)}</b><small>{numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></div>
+          <div><b>{fmt(sum.kcal, 0)}</b><small>{band ? `of ${fmt(band.lo, 0)} to ${fmt(band.hi, 0)} kcal` : "kcal"}</small></div>
+          <div><b>{fmt(sum.protein, 0)}</b><small>{pr ? `of ${pr.min} to ${pr.max} g protein` : numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></div>
         </div>
         {off && numbers && (
           <div className="plan-off" role="status">
-            <p><b>{fmt(off.by, 0)} kcal {off.short ? "short" : "over"}</b> of {dayPoss} {fmt(numbers.kcal, 0)} kcal. {off.short ? "Add a snack, or make the portions bigger." : "Make the portions smaller, or swap a meal."}</p>
+            <p><b>{fmt(off.by, 0)} kcal {off.short ? "under" : "over"}</b> {dayPoss} range of {fmt(off.lo, 0)} to {fmt(off.hi, 0)} kcal. {off.short ? "Add a snack, or make the portions bigger." : "Make the portions smaller, or swap a meal."}</p>
             <button type="button" className="pill pill-small pill-primary" onClick={fitDay}>Fit the portions to {dayName === "today" ? "today" : dayName}</button>
           </div>
         )}
+        {pOff && !pOff.above && <div className="plan-off" role="status"><p><b>{fmt(sum.protein, 0)} g of protein</b>, under your range of {pr!.min} to {pr!.max} g. Swap one meal for one with more protein.</p></div>}
+        {pOff && pOff.above && <p className="small plan-protein-note" role="status">{fmt(sum.protein, 0)} g of protein, above your range of {pr!.min} to {pr!.max} g. That does no harm. To bring it down, swap one meal for one with less protein.</p>}
         {fitted && <button type="button" className="link plan-usual" onClick={usualDay}>Back to the usual portions</button>}
       </section>
       <section className="card plan-day">
@@ -421,12 +430,14 @@ function PickSheet({ p, slot, slots, day, planned, target, unit, held, close, pu
   // DT74: what this slot has left once the other slots' meals are counted
   const need = leftOf(slots, slot, day, planned);
   const othersSet = slots.some((s) => s.id !== slot.id && planned[s.id]);
+  // DT75: the marks are judged against what is left: its PD, not the day's. Protein already covered: any meal fits.
+  const leftPd = need && need.kcal > 0 ? (need.protein > 0 ? density(need.protein, need.kcal) : 0) : target;
   const mine = p.state.meals.filter((m) => m.from !== "coach").map((m) => ({ meal: m, planned: fromMeal(m, "mine") }));
   const coach = p.state.meals.filter((m) => m.from === "coach").map((m) => ({ meal: m, planned: fromMeal(m, "coach") }));
   // R20 (0.2.48, board RS19, R20d): a meal with a clear answer says so where you pick it
   const reads = carryReads(p.state.meals, p.state.feedback);
   const row = (m: PlannedMeal, k: string, pick: () => void) => {
-    const fit = fitOf(m, target, unit, need);
+    const fit = fitOf(m, leftPd, unit);
     const read = m.mealId ? reads.get(m.mealId)?.read : null;
     return (
       <button key={k} type="button" className="menu-row pick-row" onClick={pick}>
@@ -440,7 +451,7 @@ function PickSheet({ p, slot, slots, day, planned, target, unit, held, close, pu
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet pick-sheet" role="dialog" aria-label={`${slot.name}, ${slot.time}`} onClick={(e) => e.stopPropagation()}>
         <div className="card-top"><span>{slot.name}, {slot.time}</span><button type="button" className="link" onClick={close}>Close</button></div>
-        <p className="small pick-why">{held ? `${held.title} is in this slot. Tap another meal to swap it.` : "Tap a meal to put it in this slot."}{need ? othersSet ? ` With the other meals planned, it has about ${fmt(need.kcal, 0)} kcal and ${need.protein} g of protein left${target !== null ? `, ${pdText(target)}` : ""}.` : ` It needs about ${fmt(need.kcal, 0)} kcal and ${need.protein} g of protein${target !== null ? `, ${pdText(target)}` : ""}.` : ""}</p>
+        <p className="small pick-why">{held ? `${held.title} is in this slot. Tap another meal to swap it.` : "Tap a meal to put it in this slot."}{need ? othersSet ? need.kcal <= 0 ? " The other meals planned already reach the day's kcal." : need.protein <= 0 ? ` With the other meals planned, the day's protein is covered. It has about ${fmt(need.kcal, 0)} kcal left.` : ` With the other meals planned, it has about ${fmt(need.kcal, 0)} kcal and ${need.protein} g of protein left, ${pdText(leftPd)}.` : ` It needs about ${fmt(need.kcal, 0)} kcal and ${need.protein} g of protein, ${pdText(leftPd)}.` : ""}</p>
         {group("My recipes", mine.map((x) => row(x.planned, x.meal.id, () => put(x.planned))))}
         {group("Coach's recipes", coach.map((x) => row(x.planned, x.meal.id, () => put(x.planned))))}
         {group(`${CHEF_NAME}'s starters`, STARTERS.map((m) => row(m, m.title, () => put(m))))}

@@ -1991,3 +1991,5 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .plan-off { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--close-soft); color: var(--close-text); display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
 .plan-off p { margin: 0; font-size: var(--fs-label); line-height: 1.4; }
 .plan-usual { margin-top: 6px; }
+/* DT75: protein above the range is said quietly, under it in the amber block */
+.plan-protein-note { margin: 8px 0 0; color: var(--muted); line-height: 1.4; }

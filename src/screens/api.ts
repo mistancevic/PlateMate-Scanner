@@ -87,6 +87,7 @@ export interface AppApi {
   todayMacros: { kcal: number; protein: number; fats: number; carbs: number } | null;
   // the numbers of any day, for Plan (0.2.1)
   numbersFor: (date: Date) => { kcal: number; protein: number; fats: number; carbs: number } | null;
+  proteinRange: { min: number; max: number } | null;   // DT75: the person's protein range for a day, in g
   // 0.2.5+r20 (canvas board FX, G1b and G2): apply a goal from a date; today applies now, a later date waits on Goal
   applyGoal: (x: Omit<import("../personal").NextGoal, "from" | "at">, from: string) => void;
   // 0.2.7 (board FT): the first two weeks and the measured burn; null for anyone who sees no weigh-ins
