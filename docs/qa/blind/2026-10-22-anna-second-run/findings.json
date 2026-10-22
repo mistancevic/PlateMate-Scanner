@@ -1,0 +1,184 @@
+{
+ "title": "Anna, second run, after The day adds up",
+ "who": "Anna, 34, office worker in Munich, lifts three times a week (Monday, Wednesday, Friday, 45 to 60 minutes), 168 cm, 63 kg, wants to build muscle, cooks German and Mediterranean food with a kitchen scale.",
+ "goal": "Go from the first screen to tomorrow's breakfast, lunch and dinner planned from what the app offers, check that the day meets her target, then read Today and Me.",
+ "result": "She got there in about 35 taps and 10 minutes, 7 of them to move her training days to Monday, Wednesday and Friday. The day does not add up cleanly: after \"Fit the portions to Friday\" protein lands at 167 g, above her 100 to 140 g range, and every meal still says \"fits\". She also cannot see what \"1.35 portions\" means in grams, so she cannot cook or shop the plan.",
+ "build": "0.2.74, the local build without accounts and without the AI (sign-in and the code step skipped).",
+ "compared": "Before, on 0.2.73: 42 taps, and a finished day 540 kcal short with no warning. Every meal said fits, the slot need stayed at 717 kcal, and three PD targets had no day named. Now, on 0.2.74: 35 taps. The day says when it is short, and Fit the portions brings Friday to 2,174 of 2,150 kcal. Lunch and dinner count the meals before them, at 815 and 990 kcal. Plan names Friday's target, and the top bar says today. Still open: protein lands at 167 g after fitting, the PD in the slot line is the day's target, not what is left, and the picker's small for this slot disagrees with fits once planned.",
+ "steps": [
+  [
+   "01-first-screen",
+   "She reads the welcome and taps \"I'm 18 or older, let's start\"; nothing mentions PD, the book or a coach."
+  ],
+  [
+   "02-after-start",
+   "She taps \"I agree\" on the privacy note and sees \"Maintain\" already selected under \"3. What are you after?\"."
+  ],
+  [
+   "04-body-filled",
+   "She enters Female, 1992, 168 cm, 63 kg, taps \"Mostly sitting\" and \"5,000 to 8,000\" steps."
+  ],
+  [
+   "05-training-3",
+   "She taps + three times on Moderate; 45 to 60 min is already on, and her protein range jumps to 100 to 140 g."
+  ],
+  [
+   "06b-pace",
+   "She picks Build muscle, keeps Steady, taps \"1 to 3 years\" and sees 2,000 kcal, 120 g protein, PD 6.0."
+  ],
+  [
+   "07-each-day",
+   "Under \"Each day its own\" she sees Monday, Tuesday and Thursday as training days, not her Monday, Wednesday and Friday, and finds no way to change them here."
+  ],
+  [
+   "08-after-apply",
+   "She taps \"Apply from today\"; Today says \"PD today, target 5.6\" and 2,150 kcal for Thursday, a day she does not train."
+  ],
+  [
+   "09b-plan-viewport",
+   "She taps \"Plan tomorrow\" and sees Friday as a \"rest day\" with 1,900 kcal."
+  ],
+  [
+   "11-training-week-fixed",
+   "Through \"Training week\" she moves training to Monday, Wednesday and Friday with 7 taps."
+  ],
+  [
+   "12-plan-friday",
+   "Friday now reads training, 2,150 kcal, \"PD 5.6, Friday's target\", while the header still says \"PD 6.3 today\"."
+  ],
+  [
+   "13-pick-breakfast",
+   "The breakfast picker asks for 717 kcal and marks 7 of 8 starters \"small for this slot\"; the only \"fits\" is Chicken, rice and greens."
+  ],
+  [
+   "14-after-oats",
+   "She picks Oats, skyr and banana, and the slot now calls it \"fits\"."
+  ],
+  [
+   "17-pick-dinner",
+   "She picks Chicken, rice and greens for lunch; the dinner picker says \"990 kcal and 30 g of protein left, PD 5.6\" and marks all starters small, so she picks Omelette with bread."
+  ],
+  [
+   "18-day-planned",
+   "The day shows 1,610 of 2,150 kcal and 124 of 120 g protein with \"540 kcal short\" and a button \"Fit the portions to Friday\"."
+  ],
+  [
+   "19-fit-portions",
+   "After the fit every meal is \"1.35 portions\"; the day shows 2,174 kcal and 167 g protein, and the toast says \"the day lands on 2,150 kcal\"."
+  ],
+  [
+   "22b-shopping-disabled",
+   "She opens the shopping list: \"3 planned meals, 0 foods\" and a greyed out \"Make shopping list 1\" button."
+  ],
+  [
+   "20b-today-full",
+   "Today lists tomorrow's three meals with \"fits\" but no kcal, protein or portions."
+  ],
+  [
+   "26-me",
+   "Me shows \"6.0 PD, average day\", 2,000 kcal and 120 g; she finds \"Where I shop and cook\" there and sets Munich, German, Mediterranean and kitchen scale."
+  ]
+ ],
+ "findings": [
+  [
+   "Friction",
+   "Fitting the portions overshoots protein and still says fits",
+   "On Friday \"Fit the portions to Friday\" scaled all three meals to \"1.35 portions\". The day shows \"167 of 120 g protein\" and 2,174 kcal. Her range is \"100 to 140 g a day\", so the day sits 27 g above the top. Each meal still says \"fits\", and the toast says \"the day lands on 2,150 kcal\". Nothing warns her.",
+   "Fit kcal and protein together, for example scale the lower PD meals more, and cap protein at the top of her range. Flag a day above the range in the Friday card. Make the toast quote the number the card shows.",
+   "19-fit-portions"
+  ],
+  [
+   "Friction",
+   "Onboarding counts training days but picks the weekdays for her",
+   "She entered 3 moderate days. The app made Monday, Tuesday and Thursday training days. Tomorrow, her Friday session, showed as \"rest day\" at 1,900 kcal instead of 2,150. \"The days come from your Training week\" names a screen she has not seen. She fixed it only because she opened \"Training week\" from Plan, with 7 taps.",
+   "Ask which weekdays in onboarding: after the + taps, show seven day chips with the count preselected. Show the chosen days in the \"Each day its own\" table so she can check them before \"Apply from today\".",
+   "07-each-day"
+  ],
+  [
+   "Friction",
+   "The picker and the slot disagree on what fits",
+   "In the breakfast picker Oats, skyr and banana is \"small for this slot\". After she picks it, the slot says \"PD 7.3 · fits\" in green. Seven of eight starters are \"small for this slot\" for every meal, and the only breakfast that \"fits\" is Chicken, rice and greens. The picker shows the same eight starters for breakfast, lunch and dinner.",
+   "Use one rule on both screens. In the picker, say that portions scale later, for example \"fits at 1.4 portions\". Sort or label the starters by meal so breakfast shows breakfast foods first.",
+   "13-pick-breakfast"
+  ],
+  [
+   "Friction",
+   "Portions have no grams, so she cannot cook or shop the plan",
+   "The plan says \"1.35 portions · 702 kcal · 51 g\". Tapping the meal only reopens the picker. The shopping list says \"Friday 23 October: 3 planned meals, 0 foods\" and the \"Make shopping list 1\" button stays grey with no reason. She owns a kitchen scale and still does not know how many grams of oats or skyr to weigh tomorrow.",
+   "Give each starter a fixed ingredient list in grams that works without the AI, show it when she taps a planned meal, and scale it with the portions. When the list cannot be made, say why on the sheet.",
+   "22b-shopping-disabled"
+  ],
+  [
+   "Friction",
+   "PD changes from screen to screen and nobody defines it",
+   "Onboarding shows \"6.0 PD\" without saying what PD is. Today first said \"target 5.6\", later \"target 6.3\". On Plan the header says \"PD 6.3 today\" while the Friday card says \"PD 5.6, Friday's target\". Me says \"6.0 PD, average day\". The only definition, \"6 g protein per 100 kcal\", sits in a sheet behind the header. \"7.7 of PD 5.6\" reads like a progress bar that is not full yet.",
+   "Define PD once in onboarding: grams of protein per 100 kcal. Label every PD with its day (\"Friday's target\", \"average day\"). Make the header follow the day she is viewing. Write the day's PD as \"7.7, target 5.6 or more\".",
+   "12-plan-friday"
+  ],
+  [
+   "Friction",
+   "The slot PD target ignores what is left",
+   "The lunch picker says \"about 815 kcal and 41 g of protein left, PD 5.6\". 41 g in 815 kcal is PD 5.0. The dinner picker says \"990 kcal and 30 g of protein left, PD 5.6\", which is PD 3.0. The PD shown is the day's target, not the slot's.",
+   "Calculate the slot PD from what is left, or drop the PD from that sentence and keep kcal and protein.",
+   "17-pick-dinner"
+  ],
+  [
+   "Polish",
+   "Where she shops and cooks is not part of onboarding",
+   "Onboarding never asks where she lives, which kitchens she likes, or what she cooks with. She found \"Where I shop and cook\" by chance in Me. There she set Munich, German, Mediterranean and kitchen scale and added starter foods. The starters she planned from earlier include Sarma, a Balkan dish.",
+   "Add a short shop and kitchen step after the goal, or a card on Today that points to it on day 1.",
+   "27-shop-cook"
+  ],
+  [
+   "Polish",
+   "Today shows tomorrow without numbers and repeats empty cards",
+   "Today shows \"Next: tomorrow\" with only the breakfast, then \"What's in the plan: Nothing planned so far, Go to Plan\" for today, then \"Tomorrow\" with all three meals marked \"fits\". No kcal, protein, PD or portions appear for tomorrow. Before planning, two \"Plan tomorrow\" buttons appear on one screen.",
+   "Show tomorrow's totals against its target and the portion sizes. Hide today's empty plan card when tomorrow is the next thing to do.",
+   "20b-today-full"
+  ],
+  [
+   "Polish",
+   "Shopping list copy talks about a list that does not exist",
+   "The first shopping list sheet says \"It starts Friday 23 October, the day after your last list.\" She never made a list.",
+   "For the first list say \"It starts tomorrow, Friday 23 October.\"",
+   "22-shopping"
+  ],
+  [
+   "Polish",
+   "Training week edits lose the time and announce a change that did not happen",
+   "Monday from onboarding reads \"Strength, moderate · evening\". Wednesday and Friday, set in Training week, read \"Strength, moderate\" with no time. The toast said \"Your numbers changed with your profile. An average day is now 2,000 kcal and 120 g protein\", which were the same numbers as before.",
+   "Copy the time from the other training days when she switches a day to Strength. Show the toast only when a number changes.",
+   "11-training-week-fixed"
+  ],
+  [
+   "Polish",
+   "Goal setup preselects and the pace text stays generic",
+   "The app preselects \"Maintain\" before she chooses a goal. After she picks \"1 to 3 years\", Steady still says \"weight up 0.25 to 1 % a month, by how long you've trained\". Me later says \"up 0.3 to 0.6 kg a month\".",
+   "Leave the goal unselected until she taps one. After the training years, show her own figure in kg, the same one Me shows.",
+   "06b-pace"
+  ],
+  [
+   "Polish",
+   "The header opens an edit form for her targets",
+   "Tapping \"PD 6.3 today\" opens \"Your daily reference\" with 2000, 67, 229 and 120 filled in and a big \"Save daily reference\" button. These are the average day numbers, not today's 1,900 kcal and 204 g carbs. She closed it, afraid to overwrite her plan.",
+   "Make the header open a read only view of the day she is viewing, with the edit form one step further for coaches or own numbers.",
+   "30-header-ref"
+  ],
+  [
+   "Polish",
+   "Member menu shows internal pages",
+   "The menu lists \"Evals\", \"Metrics\" and \"Running costs\" next to \"Me\" and \"Foods\". This may come from the local build without accounts.",
+   "Hide these items for members.",
+   "25-menu"
+  ]
+ ],
+ "good": "The onboarding asks plain questions in her own terms: desk job, steps, Zone 3 with \"strength training\" as an example, and it shows the protein range with the reason (\"because you train regularly\"). The \"How\" line per day lets her check every kcal step by step: 1,349 at rest, times 1.3, plus 39 for steps, plus 231 for strength, plus 5 %, which matches the Mifflin St Jeor result for her. Weekly averages agree across onboarding, Goal and Me (2,000 kcal, 120 g, PD 6.0), and the per day table changes correctly after she moves her training days. The Plan day card counts as she adds meals and names the gap plainly: \"540 kcal short of Friday's 2,150 kcal. Add a snack, or make the portions bigger.\" The fit button is one tap and \"Back to the usual portions\" undoes it. Planning three meals took only six taps once the week was right.",
+ "ai": [
+  "Scan a food label or a photo of a plate.",
+  "Tap a starter on the Plate to build it from her own foods with amounts in grams (the Plate said \"AI is not configured\").",
+  "\"Fill the open slots with Chef Mealan\" to plan the day for her.",
+  "Ask Chef Mealan in the chat for another dish or a recipe for her German and Mediterranean taste.",
+  "Add a recipe from a link or screenshots.",
+  "See whether her taste choices on Me change the ideas she gets."
+ ]
+}
