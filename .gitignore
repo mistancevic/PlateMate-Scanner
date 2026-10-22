@@ -11,3 +11,7 @@ tests/screenshots/
 
 deploy/deploy.env
 deploy/.last-live
+
+# the last walkthrough run, for the Walkthroughs page
+tests/flows-report.json
+tests/walkthroughs.html
