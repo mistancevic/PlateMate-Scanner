@@ -4,7 +4,7 @@
 //   node scripts/run-flows.cjs today plan  only the names given
 //   node scripts/run-flows.cjs --count    how many walkthroughs there are
 //   LANES=3 node scripts/run-flows.cjs    more lanes
-// Every run also writes tests/flows-report.json (not in git): each walkthrough, what it covers (its opening comment), every
+// Every full run also writes tests/flows-report.json (not in git) and docs/qa/runs/<version>.json (in git): each walkthrough, what it covers (its opening comment), every
 // check it made with ok or FAIL, and the time; scripts/flows-page.cjs turns it into the Walkthroughs page (Milan, 22 October).
 const fs = require("node:fs"), path = require("node:path"), { spawn } = require("node:child_process");
 const DIR = path.resolve(__dirname, "../tests/flows");
@@ -42,7 +42,9 @@ Promise.all(Array.from({ length: LANES }, (_, i) => lane(i))).then(() => {
   try {
     const pkg = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../package.json"), "utf8"));
     const commit = require("node:child_process").execSync("git rev-parse --short HEAD", { cwd: path.resolve(__dirname, "..") }).toString().trim();
-    if (!args.length) fs.writeFileSync(path.resolve(__dirname, "../tests/flows-report.json"), JSON.stringify({ version: pkg.version, commit, at: new Date().toISOString(), minutes: Math.round((Date.now() - t0) / 60000), flows: report.sort((a, b) => a.file.localeCompare(b.file)) }, null, 1));
+    // the run is kept in the repo, one file per version (docs/qa/runs), so the Walkthroughs page shows the history
+    const rep = JSON.stringify({ version: pkg.version, commit, at: new Date().toISOString(), minutes: Math.round((Date.now() - t0) / 60000), flows: report.sort((a, b) => a.file.localeCompare(b.file)) }, null, 1);
+    if (!args.length) { fs.writeFileSync(path.resolve(__dirname, "../tests/flows-report.json"), rep); fs.mkdirSync(path.resolve(__dirname, "../docs/qa/runs"), { recursive: true }); fs.writeFileSync(path.resolve(__dirname, `../docs/qa/runs/${pkg.version}.json`), rep); }
   } catch {}
   console.log(`\n${pick.length - failed.length} of ${pick.length} walkthroughs passed in ${Math.round((Date.now() - t0) / 60000)} min${failed.length ? ": failed " + failed.join(", ") : ""}`);
   process.exit(failed.length ? 1 : 0);

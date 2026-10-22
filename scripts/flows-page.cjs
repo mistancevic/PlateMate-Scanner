@@ -1,11 +1,17 @@
 // The Walkthroughs page (Milan, 22 October 2026: "I would like to have these walkthroughs visible somewhere"). Reads
 // tests/flows-report.json, written by every full run of scripts/run-flows.cjs, and writes one self-contained HTML page:
 // each walkthrough, what it covers, every check with ok or failed, the version and the time of the run.
-//   node scripts/flows-page.cjs <out.html> [blind/findings.json]
+//   node scripts/flows-page.cjs <out.html>        (reads docs/qa: every run kept, and every blind walkthrough)
 // With a second argument the page gets a second tab, Blind walkthroughs: a reviewer who has never seen the app plays a new
 // member, step by step with screenshots (thumbs/<name>.jpg next to the json), and lists every place they hesitated.
 const fs = require("node:fs"), path = require("node:path");
-const r = JSON.parse(fs.readFileSync(path.resolve(__dirname, "../tests/flows-report.json"), "utf8"));
+// the runs kept in the repo (docs/qa/runs, one per version) and the blind walkthroughs (docs/qa/blind/<date>-<name>)
+const QA = path.resolve(__dirname, "../docs/qa");
+const ver = (v) => v.split(".").map(Number).reduce((n, x) => n * 1000 + x, 0);
+const runs = fs.readdirSync(path.join(QA, "runs")).filter((f) => f.endsWith(".json")).map((f) => JSON.parse(fs.readFileSync(path.join(QA, "runs", f), "utf8"))).sort((a, b) => ver(b.version) - ver(a.version));
+const r = runs[0];
+const history = runs.map((x) => ({ version: x.version, at: new Date(x.at).toLocaleDateString("en-GB", { timeZone: "Europe/Berlin", day: "numeric", month: "short", year: "numeric" }), passed: x.flows.filter((f) => f.pass).length, total: x.flows.length, checks: x.flows.reduce((n, f) => n + f.checks.length, 0) }));
+const blindDirs = fs.existsSync(path.join(QA, "blind")) ? fs.readdirSync(path.join(QA, "blind")).filter((d) => fs.existsSync(path.join(QA, "blind", d, "findings.json"))).sort().reverse() : [];
 const out = process.argv[2] || path.resolve(__dirname, "../tests/walkthroughs.html");
 const name = (f) => { const s = f.replace(/\.cjs$/, "").replace(/[-_]+/g, " "); return s.charAt(0).toUpperCase() + s.slice(1); };
 const flows = r.flows.map((f) => ({ id: f.file.replace(/\.cjs$/, "").replace(/[^a-z0-9]+/gi, "-").toLowerCase(), name: name(f.file), file: f.file, about: f.about, pass: f.pass, seconds: f.seconds, checks: f.checks }));
@@ -13,11 +19,11 @@ const passed = flows.filter((f) => f.pass).length, checks = flows.reduce((n, f) 
 const when = new Date(r.at).toLocaleString("en-GB", { timeZone: "Europe/Berlin", day: "numeric", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit" });
 const esc = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 let blindHtml = "";
-if (process.argv[3]) {
-  const b = JSON.parse(fs.readFileSync(process.argv[3], "utf8")), dir = path.dirname(process.argv[3]);
+for (const d of blindDirs) {
+  const dir = path.join(QA, "blind", d), b = JSON.parse(fs.readFileSync(path.join(dir, "findings.json"), "utf8"));
   const img = (n, alt) => { const p = path.join(dir, "thumbs", n + ".jpg"); return fs.existsSync(p) ? `<img src="data:image/jpeg;base64,${fs.readFileSync(p).toString("base64")}" alt="${esc(alt)}" width="150" loading="lazy">` : ""; };
   const sev = { Blocker: "bad", Friction: "warn", Polish: "soft" };
-  blindHtml = `<section class="blind" id="blind-tab" hidden>
+  blindHtml += `<article class="blind-one">
     <div class="persona"><div class="eyebrow">Blind walkthrough</div><h2>${esc(b.who.split(",")[0])}, first run</h2><p>${esc(b.who)}</p><p class="fix">Build: ${esc(b.build)}</p><p><b>Goal:</b> ${esc(b.goal)}</p><p class="result"><b>Result:</b> ${esc(b.result)}</p></div>
     <h3>Her path</h3>
     <ol class="steps">${b.steps.map(([n, t], i) => `<li>${img(n, "Step " + (i + 1))}<span><b>${i + 1}.</b> ${esc(t)}</span></li>`).join("")}</ol>
@@ -25,8 +31,11 @@ if (process.argv[3]) {
     <ol class="finds">${b.findings.map(([s, title, what, fix, n]) => `<li><div class="fhead"><span class="pill ${sev[s] || "soft"}">${esc(s)}</span><b>${esc(title)}</b></div><div class="fbody">${img(n, title)}<div><p>${esc(what)}</p><p class="fix"><b>Fix:</b> ${esc(fix)}</p></div></div></li>`).join("")}</ol>
     <h3>Good moments</h3><p>${esc(b.good)}</p>
     <h3>Not tried here: needs the AI</h3><ul>${b.ai.map((a) => `<li>${esc(a)}</li>`).join("")}</ul>
-  </section>`;
+    <p class="fix">Kept in the repo: docs/qa/blind/${esc(d)}</p>
+  </article>`;
 }
+if (blindHtml) blindHtml = `<section class="blind" id="blind-tab" hidden>${blindHtml}</section>`;
+const histHtml = history.length > 1 ? `<h2 class="sec">Every release run</h2><div class="hist"><table><thead><tr><th>Version</th><th>Run</th><th>Passed</th><th>Checks</th></tr></thead><tbody>${history.map((h) => `<tr><td>${esc(h.version)}</td><td>${esc(h.at)}</td><td class="${h.passed === h.total ? "okc" : "badc"}">${h.passed} of ${h.total}</td><td>${h.checks.toLocaleString("en")}</td></tr>`).join("")}</tbody></table></div>` : "";
 const data = JSON.stringify({ version: r.version, commit: r.commit, when, minutes: r.minutes, passed, total: flows.length, checks, flows }).replace(/</g, "\\u003c");
 const html = `<title>Chef Mealan Walkthroughs</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -79,6 +88,14 @@ ol.checks li span { overflow-wrap: anywhere; min-width: 0; }
 ol.checks li i { font-style: normal; font-weight: 900; color: var(--ok); } ol.checks li.bad i { color: var(--bad); } ol.checks li.bad span { color: var(--bad); font-weight: 700; }
 .empty { padding: 18px 16px; color: var(--muted); }
 footer { font-size: 13px; color: var(--muted); }
+.sec { margin: 8px 0 0; font-size: 20px; font-weight: 900; }
+.hist { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 14px; }
+.hist table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.hist th, .hist td { text-align: left; padding: 8px 14px; border-top: 1px solid var(--line); font-size: 14px; }
+.hist th { border-top: 0; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.okc { color: var(--ok); font-weight: 800; } .badc { color: var(--bad); font-weight: 800; }
+.blind-one { display: flex; flex-direction: column; gap: 14px; padding-bottom: 18px; }
+.blind-one + .blind-one { border-top: 2px solid var(--line); padding-top: 18px; }
 .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
 .tabpanel { display: flex; flex-direction: column; gap: 18px; }
 .blind { display: flex; flex-direction: column; gap: 14px; }
@@ -118,6 +135,7 @@ ol.finds li { background: var(--card); border: 1px solid var(--line); border-rad
     <span class="count" id="count"></span>
   </div>
   <div class="list" id="list"></div>
+  ${histHtml}
   <footer id="foot"></footer>
   </div>
   ${blindHtml}
