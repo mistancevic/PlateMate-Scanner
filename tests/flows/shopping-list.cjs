@@ -50,7 +50,8 @@ const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
   ok(/^Today, Tuesday, 20 October/.test(await page.locator(".plan-head .plan-day-head b").textContent()), "SL7: the Today link brings today back");
   // SL2: the day said once, one main step
   const head = (await page.locator(".plan-head").textContent()).replace(/\s+/g, " ");
-  ok(/Today, Tuesday, 20 October/.test(head) && /rest day · 1 slot open/.test(head) && /of 2,800 kcal/.test(head) && await page.getByText("The day as planned").count() === 0, "SL2: one head card, the day and its numbers; The day as planned is gone: " + head);
+  // Changed by story DT75 (board DT75): the day's kcal is a range, 2,800 give or take a tenth
+  ok(/Today, Tuesday, 20 October/.test(head) && /rest day · 1 slot open/.test(head) && /of 2,500 to 3,100 kcal/.test(head) && await page.getByText("The day as planned").count() === 0, "SL2: one head card, the day and its numbers; The day as planned is gone: " + head);
   ok(await page.locator("main .pill-primary").count() === 1 && /Fill the open slots/.test(await page.locator("main .pill-primary").textContent()), "SL2: one filled button, Fill the open slots");
   ok(await page.locator(".plan-day .plan-card-links").getByRole("button", { name: "Slots and times ›" }).count() === 1 && await page.locator(".plan-day .plan-card-links").getByRole("button", { name: "Training week ›" }).count() === 1, "SL2: Slots and times and Training week are links in the day card");
   // SL1, changed by story SL3 (Milan 16:46 to 17:11, board SL3): a list is made, numbered and dated, and kept
