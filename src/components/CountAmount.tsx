@@ -7,7 +7,7 @@ import { countLabel, countOf, resize, sizesOf, stepCount, weighed, KINDS, type C
 // own plate − and + move whole ones; the size opens under the row; a banana can be weighed, and typed grams win.
 // A pack that prints a piece (1 bar 45 g) shows the count first too.
 export const isCounted = (i: Ingredient) => Boolean(countOf(i) || i.food.serving);
-export function CountAmount({ item, editable, open, onToggle, onGrams }: { item: Ingredient; editable: boolean; open?: boolean; onToggle?: () => void; onGrams: (grams: number, count?: Count) => void }) {
+export function CountAmount({ item, editable, open, onToggle, onGrams, whole }: { item: Ingredient; editable: boolean; open?: boolean; onToggle?: () => void; onGrams: (grams: number, count?: Count) => void; whole?: boolean }) {
   const c = countOf(item);
   if (!c) {
     // a pack's piece: the count first, the grams small
@@ -21,7 +21,7 @@ export function CountAmount({ item, editable, open, onToggle, onGrams }: { item:
       </span>
     );
   }
-  const l = countLabel(c, item.grams), k = KINDS[c.kind];
+  const l = countLabel(c, item.grams, whole), k = KINDS[c.kind];
   return (
     <span className="ct-num">
       {editable
@@ -43,8 +43,8 @@ export function SizePicker({ item, onGrams }: { item: Ingredient; onGrams: (gram
       <div className="ct-sizes">{sizesOf(c.kind).map(([s, g]) => (
         <button key={s} type="button" className={c.size === s ? "on" : ""} aria-pressed={c.size === s} onClick={() => { const r = resize(c, item.grams, s); onGrams(r.grams, r.count); }}>{s}<small>{g} g</small></button>
       ))}</div>
-      <small>{c.kind === "egg" ? "Each egg without the shell. Fit to my target moves eggs one at a time." : "Peeled. Bananas vary more than eggs, so the size is a guide."}</small>
-      {c.kind === "banana" && (
+      <small>{c.kind === "egg" ? "Each egg without the shell. Fit to my target moves eggs one at a time." : c.kind === "apple" ? "A whole apple, with the core. Apples vary, so the size is a guide." : "Peeled. Bananas vary more than eggs, so the size is a guide."}</small>
+      {c.kind !== "egg" && (
         <span className="ct-weigh">Weighed it? <input inputMode="numeric" aria-label={`Grams of ${k.one}, weighed`} placeholder="134" value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d.,]/g, ""))} onBlur={weigh} onKeyDown={(e) => { if (e.key === "Enter") weigh(); }} /> g {k.note}</span>
       )}
     </div>

@@ -14,6 +14,7 @@ import { cardPhotosOf, MAX_RECIPE_PHOTOS } from "./RecipePhotos";
 import type { Published } from "./PublishSheet";
 import { StepsEditor } from "./StepsEditor";
 import { CountAmount, isCounted } from "./CountAmount";
+import { countOf, countWord, howMany, KINDS } from "../counted";
 import { OriginalSteps, StepsHint } from "./StepsView";
 import { foodNames, diffFoods, diffLine } from "../stepsState";
 import { stepParts } from "../steps";
@@ -198,7 +199,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
                   <input inputMode="numeric" aria-label={`Grams of ${it.food.name}`} value={String(it.grams || "")} onChange={(e) => { const g = Math.min(5000, Number(e.target.value.replace(/[^\d]/g, "")) || 0); setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, grams: g } : x)) }); }} /> g
                   <button className="rq-x" aria-label={`Remove ${it.food.name}`} onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k) })}><X size={14} /></button>
                 </span>
-              : isCounted(it) ? <CountAmount item={it} editable={false} onGrams={() => {}} /> : <b>{fmt(it.fry ? it.fry.pot : it.grams, 0)} g</b>}
+              : isCounted(it) ? <CountAmount item={it} editable={false} whole onGrams={() => {}} /> : <b>{fmt(it.fry ? it.fry.pot : it.grams, 0)} g</b>}
           </div>)];
         })}
         {edit && edit.optional.map((o, k) => (
@@ -217,6 +218,14 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
               <button className="link" onClick={() => setFind(null)}>Close the search</button>
             </div>
           ))}
+        {/* DT77 (Milan 23 October 09:52): the whole recipe is cooked with whole eggs, bananas and apples; a portion keeps its
+            share for the numbers, and this says so once */}
+        {!edit && serves > 1 && (() => {
+          const it = items.find((x) => !x.optional && countOf(x));
+          if (!it) return null;
+          const c = countOf(it)!, k = KINDS[c.kind], share = howMany(c, it.grams) / serves;
+          return <small className="muted rq-count-note">{k.many.charAt(0).toUpperCase() + k.many.slice(1)} and other foods counted by the piece are whole here, for the whole recipe. One {oneWord} holds its share, {countWord(share)} {share > 1 ? k.many : k.one}: that is for the numbers, not for cooking.</small>;
+        })()}
       </section>
       {/* IM8, IM14: optional foods stay with the recipe, out of the numbers; the plate adds them */}
       {!edit && (meal.optional?.length ?? 0) > 0 && (

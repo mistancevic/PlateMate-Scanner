@@ -4,11 +4,12 @@
 import { plannedPortion, type Planned } from "./planned";
 import { rawOf } from "./reference";
 import { kindOf, KINDS } from "./counted";
-// DT76: eggs and bananas are bought by the piece: 210 g of eggs is 4 eggs (size M), at least one
+// DT76: eggs and bananas are bought by the piece: 210 g of eggs is 4 eggs (size M), at least one. DT77: apples too, and
+// a part of one is bought whole (1.7 eggs is 2); a list sums shares of many portions, so it rounds up, a little slack kept
 export function shopAmount(name: string, grams: number): string {
   const k = kindOf(name);
   if (!k) return `${grams.toLocaleString("en")} g`;
-  const n = Math.max(1, Math.round(grams / KINDS[k].sizes.M!));
+  const n = Math.max(1, Math.ceil(grams / KINDS[k].sizes.M! - 0.15));
   return `${n} ${n === 1 ? KINDS[k].one : KINDS[k].many}`;
 }
 
