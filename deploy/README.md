@@ -17,8 +17,17 @@ Data stays in Firestore, europe-west3 (Frankfurt). Address: chefmealan.com.
 6. Namecheap, Advanced DNS: delete the parking CNAME and the URL redirect; add the A and AAAA records shown for @,
    and CNAME www -> ghs.googlehosted.com. Keep Mail Settings on Email Forwarding. The certificate follows within an hour or so.
 
+## How a change gets here (Milan, 23 October 2026)
+1. Brainstorm: the idea is agreed; nothing is drawn yet.
+2. Design: the board on the canvas.
+3. Milan approves, or asks for changes and the board is updated, as many rounds as it takes.
+4. Build: only after his approval. Merged into main, then the preview command below, for main only.
+5. Milan promotes, after checking the preview or straight away. A preview that shows something wrong goes back to step 3.
+Only main is ever deployed. No branch is checked out or previewed in Cloud Shell. The preview command and the promote
+are given as separate steps, never in one block: a pasted second line runs on its own when the first one ends.
+
 ## Every release, the careful way (from 7 October 2026)
-   cd ~/PlateMate-Scanner && git pull && ./deploy/preview.sh
+   cd ~/PlateMate-Scanner && git checkout main && git pull && ./deploy/preview.sh
 Builds the new commit and puts it on its own preview link; chefmealan.com keeps serving the release before. The preview
 uses the real accounts and data. The first time, it adds the preview's address to Firebase's sign-in list (or says how).
 Check the preview on the phone, then:
