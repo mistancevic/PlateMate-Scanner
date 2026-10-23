@@ -147,3 +147,17 @@ test("DT76: a starter planned before 0.2.76 takes its foods, at its amount", () 
   assert.equal(m.kcal, Math.round(STARTERS[0].kcal * 1.5)); assert.equal(m.amount, 1.5);
   assert.equal(refreshPlanned(next, []), next);                                          // once
 });
+test("DT76: a fitted starter keeps eggs and bananas whole, and counts at those grams; back to the usual is exact", () => {
+  const om = STARTERS.find((m) => m.title === "Omelette with bread")!;
+  const p = plannedPortion({ ...om, amount: 1.25 }, "x", "")!;
+  assert.equal(p.items.find((i) => /^Egg, whole/.test(i.food.name))!.grams, 4 * 52);     // 3¾ eggs is 4
+  assert.equal(Math.round(p.items.find((i) => /^Egg white/.test(i.food.name))!.grams), 125);
+  const fitted = fitPortions({ d: om }, { kcal: 585 });
+  assert.equal(fitted.d.amount, 1.25);
+  const egg = 52 * 1.43 / 1;                                                                // one more M egg: 74 kcal
+  assert.ok(fitted.d.kcal > Math.round(om.kcal * 1.25) && fitted.d.kcal - Math.round(om.kcal * 1.25) < egg, `counted at whole eggs: ${fitted.d.kcal}`);
+  assert.equal(usualPortions(fitted).d.kcal, om.kcal);
+  // a share of a batch recipe stays a share
+  const batch = { ...om, servings: 4, amount: 1.25 };
+  assert.ok(plannedPortion(batch, "x", "")!.items.find((i) => /^Egg, whole/.test(i.food.name))!.grams % 52 !== 0);
+});

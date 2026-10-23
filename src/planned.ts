@@ -3,7 +3,7 @@
 import { aggregate, density, servingsOf, type Ingredient, type Meal } from "./pilot";
 import type { Slot } from "./slots";
 import { REFERENCE, referenceFood } from "./reference";
-import { kindOf } from "./counted";
+import { kindOf, countOf, howMany, gramsOfOne } from "./counted";
 
 export type Source = "mine" | "coach" | "starter" | "plate";
 export type PlannedMeal = { title: string; kcal: number; protein: number; source: Source; mealId?: string; items?: Ingredient[]; portion?: number; servings?: number;
@@ -64,7 +64,13 @@ export function plannedPortion(m: PlannedMeal, id: string, savedAt: string): Mea
   if (!m.items?.length) return null;
   const weight = m.items.reduce((n, i) => n + (i.grams > 0 ? i.grams : 0), 0);
   const ratio = (m.servings && m.servings > 1 ? 1 / m.servings : m.portion && weight > 0 ? Math.min(1, m.portion / weight) : 1) * (m.amount ?? 1);
-  const items = m.items.map((i) => ({ ...i, grams: i.grams * ratio }));
+  // DT76: a meal cooked as one portion and fitted to another amount keeps eggs and bananas whole (3¾ eggs is 4); a share
+  // of a batch recipe stays a share. The plan counts the meal at these grams (fitPortions, usualPortions).
+  const whole = !!m.amount && m.amount !== 1 && !(m.servings && m.servings > 1);
+  const items = m.items.map((i) => {
+    const grams = i.grams * ratio, c = whole ? countOf({ ...i, grams: i.grams }) : null;
+    return c ? { ...i, grams: Math.max(1, Math.round(howMany(c, grams))) * gramsOfOne(c) } : { ...i, grams };
+  });
   // the portion is the foods' own weight, never rounded past it: a stored meal heavier than its foods is not read back
   return { id, title: m.title, items, portion: items.reduce((n, i) => n + i.grams, 0), savedAt };
 }
@@ -164,7 +170,7 @@ export const QUARTERS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 export function fitPortions(held: Record<string, PlannedMeal>, day: { kcal: number }): Record<string, PlannedMeal> {
   const ids = Object.keys(held).filter((id) => !held[id].skipped);
   if (!ids.length) return held;
-  const base = ids.map((id) => { const m = held[id], a = m.amount ?? 1; return { kcal: m.kcal / a, protein: m.protein / a }; });
+  const base = ids.map((id) => usualOf(held[id]));
   const { lo, hi } = bandOf(day.kcal);
   let best: { qs: number[]; key: number[] } | null = null;
   const less = (a: number[], b: number[]) => { for (let j = 0; j < a.length; j++) if (Math.abs(a[j] - b[j]) > 1e-9) return a[j] < b[j]; return false; };
@@ -185,16 +191,33 @@ export function fitPortions(held: Record<string, PlannedMeal>, day: { kcal: numb
   ids.forEach((id, j) => {
     const q = found ? found.qs[j] : 1, m = held[id];
     if (q === 1) { const { amount: _a, ...rest } = m; void _a; out[id] = { ...rest, kcal: Math.round(base[j].kcal), protein: Math.round(base[j].protein) }; }
-    else out[id] = { ...m, amount: q, kcal: Math.round(base[j].kcal * q), protein: Math.round(base[j].protein * q) };
+    else out[id] = counted({ ...m, amount: q, kcal: Math.round(base[j].kcal * q), protein: Math.round(base[j].protein * q) });
   });
   return out;
+}
+// a meal's numbers at one portion: from its foods when it has them (DT76: a fitted one may hold whole eggs), else divided back
+function usualOf(m: PlannedMeal): { kcal: number; protein: number } {
+  const a = m.amount ?? 1;
+  if (a === 1) return { kcal: m.kcal, protein: m.protein };
+  const { amount: _a, ...one } = m; void _a;
+  const p = m.items?.some((i) => countOf(i)) ? plannedPortion(one, "n", "") : null;
+  if (!p) return { kcal: m.kcal / a, protein: m.protein / a };
+  const t = aggregate(p.items);
+  return { kcal: t.calories ?? 0, protein: t.protein ?? 0 };
+}
+// DT76: a fitted meal with whole eggs or bananas counts at the grams it is weighed at
+function counted(m: PlannedMeal): PlannedMeal {
+  const p = m.items?.some((i) => countOf(i)) ? plannedPortion(m, "n", "") : null;
+  if (!p) return m;
+  const t = aggregate(p.items);
+  return { ...m, kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0) };
 }
 // back to the portions as saved
 export function usualPortions(held: Record<string, PlannedMeal>): Record<string, PlannedMeal> {
   const out: Record<string, PlannedMeal> = {};
   for (const [id, m] of Object.entries(held)) {
-    const a = m.amount ?? 1;
-    out[id] = a === 1 ? m : (({ amount: _a, ...rest }) => ({ ...rest, kcal: Math.round(m.kcal / a), protein: Math.round(m.protein / a) }))(m);
+    const a = m.amount ?? 1, u = usualOf(m);
+    out[id] = a === 1 ? m : (({ amount: _a, ...rest }) => ({ ...rest, kcal: Math.round(u.kcal), protein: Math.round(u.protein) }))(m);
   }
   return out;
 }
