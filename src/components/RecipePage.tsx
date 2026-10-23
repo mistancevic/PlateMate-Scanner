@@ -88,7 +88,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const [naming, setNaming] = useState<string | null>(null);
   const saveName = () => { if (naming !== null) { const t = naming.trim(); if (t && t !== meal.title) onRename(t); setNaming(null); } };
   // ---- edit mode (R11): a draft of the foods, the grams and the steps; nothing changes until Save changes ----
-  const [edit, setEdit] = useState<{ items: Ingredient[]; steps: string[]; optional: NonNullable<Meal["optional"]> } | null>(null);
+  // DT80: Edit also says what the recipe makes, 8 sarmas; empty or 1, and the Plate divides it by weight as before
+  const [edit, setEdit] = useState<{ items: Ingredient[]; steps: string[]; optional: NonNullable<Meal["optional"]>; makesN: string; makesUnit: string } | null>(null);
   const [newPart, setNewPart] = useState<string | null>(null);
   const [extraParts, setExtraParts] = useState<string[]>([]);
   const [find, setFind] = useState<string | null>(null);
@@ -98,7 +99,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const serves = meal.makes?.n ?? portionsIn(meal);
   const oneWord = meal.makes ? meal.makes.unit.replace(/s$/, "") : "portion";
   const pd = density(sum.protein, sum.calories);
-  const startEdit = () => { setEdit({ items: meal.items.map((i) => ({ ...i })), steps: [...(meal.steps ?? [])], optional: [...(meal.optional ?? [])] }); setFind(null); setExtraParts([]); };
+  const startEdit = () => { setEdit({ items: meal.items.map((i) => ({ ...i })), steps: [...(meal.steps ?? [])], optional: [...(meal.optional ?? [])], makesN: meal.makes ? String(meal.makes.n) : "", makesUnit: meal.makes?.unit ?? "" }); setFind(null); setExtraParts([]); };
   // parts in Edit recipe (0.2.19, IM18): each food's part, a new part, optional on and off
   const editParts = edit ? [...new Set([...partsOf(edit.items, edit.optional), ...extraParts])] : [];
   const PartPick = ({ value, onPick }: { value: string; onPick: (v: string) => void }) => <select className="pt-chip pt-select" aria-label="Part" value={value} onChange={(e) => onPick(e.target.value)}><option value="">No part</option>{[...new Set([...editParts, ...(value ? [value] : [])])].map((x) => <option key={x} value={x}>{x}</option>)}</select>;
@@ -109,7 +110,9 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
     const steps = edit.steps.map((x) => x.replace(/\s+/g, " ").trim()).filter(Boolean).slice(0, 30), total = kept.reduce((n, i) => n + i.grams, 0);
     // a recipe that says how many it makes keeps its portions; steps changed by hand lose their marks (0.2.18, IM9)
     const same = JSON.stringify(steps) === JSON.stringify(meal.steps ?? []);
-    onPatch({ items: kept, portion: meal.makes ? Math.round(total / meal.makes.n) : total, steps, optional: edit.optional.length ? edit.optional : undefined, ...(same ? {} : { stepMarks: undefined, stepsKitchen: undefined, stepParts: undefined }) });
+    const n = Math.round(Number(edit.makesN) || 0), typed = edit.makesUnit.trim().toLowerCase() || "portions", unit = /s$/.test(typed) ? typed : `${typed}s`;
+    const makes = n >= 2 && n <= 100 ? { n, unit } : undefined;
+    onPatch({ items: kept, makes, portion: makes ? Math.round(total / makes.n) : total, steps, optional: edit.optional.length ? edit.optional : undefined, ...(same ? {} : { stepMarks: undefined, stepsKitchen: undefined, stepParts: undefined }) });
     setEdit(null); setFind(null);
   };
   const matches = find === null ? [] : foods.filter((f) => !items.some((i) => i.food.id === f.id) && (!find.trim() || f.name.toLowerCase().includes(find.trim().toLowerCase()))).slice(0, 8);
@@ -192,6 +195,15 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {/* RP2 (0.2.25): the three tiles gave way to the PD readout above the Nutrition table */}
       <section className={`card rq-foods ${edit ? "editing" : ""}`}>
         <b>Foods</b>
+        {!edit && meal.makes && !meal.source && <small className="muted rq-makes-line">Makes {meal.makes.n} {meal.makes.unit}.</small>}
+        {edit && (
+          <div className="rq-makes" role="group" aria-label="What the recipe makes">
+            <small>Makes</small>
+            <input inputMode="numeric" aria-label="How many it makes" placeholder="8" value={edit.makesN} onChange={(e) => setEdit({ ...edit, makesN: e.target.value.replace(/[^\d]/g, "").slice(0, 3) })} />
+            <input aria-label="Of what" placeholder="sarmas" value={edit.makesUnit} maxLength={24} onChange={(e) => setEdit({ ...edit, makesUnit: e.target.value })} />
+            <small className="muted">Plan counts it in these, and the shopping list buys the whole batch. Empty: the Plate divides it by weight.</small>
+          </div>
+        )}
         {edit && <div className="pt-h pt-mode"><span><small>Parts: give a food its part, or make it optional. Optional foods stay out of the numbers.</small></span><span className="pt-acts">{newPart === null ? <button className="link" onClick={() => setNewPart("")}>New part</button> : <input className="pt-new" autoFocus aria-label="Name of the new part" placeholder="Topping" value={newPart} onChange={(e) => setNewPart(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = cleanPart(newPart); if (v) setExtraParts((l) => [...l, v]); setNewPart(null); } }} onBlur={() => setNewPart(null)} />}</span></div>}
         {items.map((it, k) => {
           const head = !edit && it.part && (k === 0 || items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{it.part}</div> : null;

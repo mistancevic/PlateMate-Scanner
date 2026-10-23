@@ -1999,3 +1999,8 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .plan-pieces button.icon:disabled { opacity: .4; }
 .plan-pieces b { font-size: var(--fs-label); white-space: nowrap; }
 .plan-pieces small { color: var(--muted); }
+/* DT80: what a recipe makes, in Edit */
+.rq-makes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0 10px; }
+.rq-makes input { width: 64px; }
+.rq-makes input + input { width: 140px; }
+.rq-makes small.muted { flex-basis: 100%; }
