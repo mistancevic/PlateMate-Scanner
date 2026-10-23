@@ -36,7 +36,8 @@ const planned = { [today]: { breakfast: { title: "Oats, skyr and banana", kcal: 
   await send("What's left today?");
   ok(/^FROM YOUR DAYNothing eaten yet today\. Left: 2,800 kcal and 180 g protein\.$/.test(await last()), "1. what is left of the day: " + await last());
   await send("What is planned for lunch?");
-  ok(/^FROM YOUR DAYToday: breakfast at 07:30, oats, skyr and banana; lunch at 13:45, sarma with skyr; dinner at 20:00, chicken, rice and greens\. 1,814 kcal and 140 g protein planned of 2,800 and 180\.$/.test(await last()), "1. the day's plan: " + await last());
+  // Changed by story DT76 (board DT76): the starters' numbers come from their foods (1,814 kcal and 140 g before)
+  ok(/^FROM YOUR DAYToday: breakfast at 07:30, oats, skyr and banana; lunch at 13:45, sarma with skyr; dinner at 20:00, chicken, rice and greens\. 1,821 kcal and 144 g protein planned of 2,800 and 180\.$/.test(await last()), "1. the day's plan: " + await last());
   // 2. a swap: the app's own picks here (no AI key), lighter and at the target
   await send("Swap lunch for something lighter"); await page.waitForTimeout(300);
   const sw = await last();
