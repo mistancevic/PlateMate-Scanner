@@ -20,10 +20,13 @@ function batchLine(m: Meal, planned: Planned): string | null {
   const d = new Date(), today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const use = batchUse(planned, m.id, today);
   if (!use.length) return null;
-  const n = m.makes.n, unit = m.makes.unit, total = use.reduce((a, u) => a + u.n, 0), batches = Math.ceil(total / n - 1e-9), left = batches * n - total;
+  const n = m.makes.n, unit = m.makes.unit, total = use.reduce((a, u) => a + u.n, 0);
+  // DT81: a batch set in Cook it covers the plan when it is big enough
+  const cook = m.cook && m.cook.n >= total ? m.cook.n : 0;
+  const batches = cook ? 1 : Math.ceil(total / n - 1e-9), left = cook ? cook - total : batches * n - total;
   const day = (s: string) => WD[new Date(`${s}T12:00:00`).getDay()];
   const leftText = left === 0 ? "none left" : `${left} ${left === 1 ? oneWord(unit) : unit} left`;
-  return `${n} ${unit}: ${use.map((u) => `${u.n} on ${day(u.date)} ${u.slot}`).join(", ")}. ${batches > 1 ? `${batches} batches, ` : ""}${leftText}.`;
+  return `${n} ${unit}: ${use.map((u) => `${u.n} on ${day(u.date)} ${u.slot}`).join(", ")}. ${cook ? `Cooking ${cook}, ` : batches > 1 ? `${batches} batches, ` : ""}${leftText}.`;
 }
 import type { AppApi, MealFrom } from "./api";
 import { showPlanOn } from "./PlanScreen";

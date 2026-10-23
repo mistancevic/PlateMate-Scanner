@@ -2002,7 +2002,8 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 /* DT80: what a recipe makes, in Edit */
 .rq-makes { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 6px 0 10px; }
 .rq-makes input { width: 64px; }
-.rq-makes input + input { width: 140px; }
+.rq-makes input + input { width: 120px; }
+.rq-makes > small:first-child { white-space: nowrap; }
 .rq-makes small.muted { flex-basis: 100%; }
 /* DT81: the recipe's label, and Cook it */
 .rq-label { display: block; margin: -4px 0 10px; font-weight: 700; color: var(--brand-text); }
