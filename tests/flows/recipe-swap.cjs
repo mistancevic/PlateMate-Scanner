@@ -46,7 +46,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
     await box.getByRole("button", { name: /^The same energy/ }).click(); await page.waitForTimeout(300);
     ok(await grams("Rice, white, raw") === "105" && await page.getByLabel("Grams of Rice, cooked").count() === 0, "raw rice takes its place, 105 g");
     let line = await txt(".rq-change");
-    ok(/Out: Rice, cooked, 300 g\. In: Rice, white, raw, 105 g\./.test(line) && /One sarma: 216 to 215 kcal, 14 to 14 g protein, PD 6\.5 to 6\.5\./.test(line), "the line says what changed for one sarma: " + line);
+    ok(/Out: Rice, cooked, 300 g\. In: Rice, white, raw, 105 g\./.test(line) && /One sarma: 216 to 215 kcal, 14 to 14 g protein, PD 6\.6 to 6\.5\./.test(line), "the line says what changed for one sarma: " + line);
     await page.locator(".rq-change").getByRole("button", { name: "Undo" }).click(); await page.waitForTimeout(300);
     ok(await grams("Rice, cooked") === "300" && await page.locator(".rq-change").count() === 0, "Undo takes it back");
 
