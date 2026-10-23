@@ -181,7 +181,7 @@ export function PlanScreen(p: AppApi) {
                   <button type="button" className="icon" aria-label={`One ${oneWord(m.unit ?? "portions")} less`} disabled={(m.amount ?? 1) <= 1} onClick={() => p.fill(key, r.slot.id, withPieces(m, (m.amount ?? 1) - 1))}>−</button>
                   <b>{amountText(m)}</b>
                   <button type="button" className="icon" aria-label={`One ${oneWord(m.unit ?? "portions")} more`} disabled={(m.amount ?? 1) >= (m.servings ?? 1)} onClick={() => p.fill(key, r.slot.id, withPieces(m, (m.amount ?? 1) + 1))}>+</button>
-                  <small>of {m.servings} the recipe makes</small>
+                  <small>of the {m.servings} it makes</small>
                 </div>
               )}
               {m && fit?.state === "under" && (

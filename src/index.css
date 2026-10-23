@@ -1997,5 +1997,5 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .plan-pieces { display: flex; align-items: center; gap: 10px; padding: 0 16px 12px 72px; }
 .plan-pieces button.icon { width: 32px; height: 32px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); font-size: 18px; font-weight: 900; line-height: 1; color: var(--brand-text); }
 .plan-pieces button.icon:disabled { opacity: .4; }
-.plan-pieces b { font-size: var(--fs-label); }
+.plan-pieces b { font-size: var(--fs-label); white-space: nowrap; }
 .plan-pieces small { color: var(--muted); }
