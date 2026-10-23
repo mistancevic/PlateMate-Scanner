@@ -9,7 +9,7 @@ const f = (n) => seed.foods.find((x) => x.name === n);
 seed.items = []; seed.feedback = [];
 // 8 sarmas: about 1,440 kcal, 180 a sarma (test data, from the seed's foods)
 seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", makes: { n: 8, unit: "sarmas" }, portion: 160,
-  items: [["Rice, cooked", 400], ["Chicken breast, cooked", 360], ["Milk 1.5%", 300]].map(([n, g], i) => ({ id: "s" + i, food: f(n), grams: g, locked: true }))];
+  items: [["Rice, cooked", 400], ["Chicken breast, cooked", 360], ["Milk 1.5%", 300]].map(([n, g], i) => ({ id: "s" + i, food: f(n), grams: g, locked: true })) }];
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT: "3196" }, stdio: ["ignore", "pipe", "pipe"] });
   await new Promise((r) => setTimeout(r, 2500));
@@ -31,11 +31,12 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   await pickDay(1); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /Lunch at .*pick a meal/ }).click(); await page.waitForTimeout(400);
   const need = num((await txt(".pick-sheet .pick-why")).match(/needs about ([\d,]+) kcal/)[1]);
-  const row = await txt(".pick-sheet .pick-row");
+  // my recipe, not Chef Mealan's starter of the same name: it comes in sarmas
+  const row = ((await page.locator(".pick-sheet .pick-row", { hasText: /sarmas?/ }).first().textContent()) ?? "").replace(/\s+/g, " ");
   const pieces = Number((row.match(/(\d+) sarmas?/) || [])[1]);
-  const one = 1440 / 8, want = Math.max(1, Math.min(8, Math.round(need / one)));
+  const one = num((row.match(/([\d,]+) kcal/) || [])[1]) / pieces, want = Math.max(1, Math.min(8, Math.round(need / one)));
   ok(/Sarma/.test(row) && Math.abs(pieces - want) <= 1, `the picker offers Sarma in the sarmas that fit the slot: ${pieces} for about ${need} kcal (${row.slice(0, 60)})`);
-  await page.locator(".pick-sheet").getByRole("button", { name: /Sarma/ }).click(); await page.waitForTimeout(400);
+  await page.locator(".pick-sheet .pick-row", { hasText: /sarmas?/ }).first().click(); await page.waitForTimeout(400);
   const lunch = page.locator(".plan-slot-wrap", { hasText: "Sarma" });
   ok(new RegExp(`${pieces} sarmas`).test(await lunch.textContent()) && await lunch.locator(".plan-pieces").count() === 1, `lunch holds ${pieces} sarmas, with − and +`);
   await lunch.getByRole("button", { name: "One sarma more" }).click(); await page.waitForTimeout(300);
@@ -44,12 +45,12 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   // the next day, another lunch of it
   await pickDay(2); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /Lunch at .*pick a meal/ }).click(); await page.waitForTimeout(400);
-  await page.locator(".pick-sheet").getByRole("button", { name: /Sarma/ }).click(); await page.waitForTimeout(400);
+  await page.locator(".pick-sheet .pick-row", { hasText: /sarmas?/ }).first().click(); await page.waitForTimeout(400);
   const second = Number(((await txt(".plan-slot-wrap .plan-pieces")).match(/(\d+) sarmas?/) || [])[1]);
   const total = pieces + 1 + second;
   // the shopping list: one batch for what both lunches take, each meal its share
   await page.getByRole("button", { name: "Make a shopping list" }).click(); await page.waitForTimeout(500);
-  await page.getByRole("button", { name: /^7 days$/ }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /7 days$/ }).click(); await page.waitForTimeout(300);
   const batches = Math.ceil(total / 8);
   ok(new RegExp(`Sarma: ${batches === 1 ? "one batch" : `${batches} batches`} of 8, for the ${total} planned\\.`).test(await txt(".sheet")), `the list buys the whole batch: ${(await txt(".shop-batch")).slice(0, 80)}`);
   await page.getByRole("button", { name: /^Make shopping list \d/ }).click(); await page.waitForTimeout(500);
