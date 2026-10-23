@@ -6,12 +6,14 @@
 // and up); the shell is 11% of the weight (Illinois Extension), so from the middle of each grade, without the shell:
 // S 43, M 52, L 61, XL 68 g. Bananas, peeled (USDA SR28): XS 81, S 101, M 118, L 136, XL 152 g.
 // Egg whites, yolks and bottled liquid egg stay in grams.
-export type CountKind = "egg" | "banana";
+// DT77 (Milan 23 October 09:52): apples too. USDA SR Legacy household measures, whole apple: S 149, M 182, L 223 g.
+export type CountKind = "egg" | "banana" | "apple";
 export type Size = "XS" | "S" | "M" | "L" | "XL";
 export type Count = { kind: CountKind; size: Size; weighed?: boolean };
 export const KINDS: Record<CountKind, { one: string; many: string; sizes: Partial<Record<Size, number>>; note: string }> = {
   egg: { one: "egg", many: "eggs", sizes: { S: 43, M: 52, L: 61, XL: 68 }, note: "" },
   banana: { one: "banana", many: "bananas", sizes: { XS: 81, S: 101, M: 118, L: 136, XL: 152 }, note: "peeled" },
+  apple: { one: "apple", many: "apples", sizes: { S: 149, M: 182, L: 223 }, note: "" },
 };
 export const sizesOf = (k: CountKind) => Object.entries(KINDS[k].sizes) as [Size, number][];
 export const gramsOfOne = (c: Count) => KINDS[c.kind].sizes[c.size] ?? KINDS[c.kind].sizes.M!;
@@ -19,8 +21,10 @@ export const gramsOfOne = (c: Count) => KINDS[c.kind].sizes[c.size] ?? KINDS[c.k
 // which foods are counted, by their name
 export function kindOf(name: string): CountKind | null {
   const n = String(name).toLowerCase();
-  if (/\beggs?\b/.test(n) && !/white|yolk|liquid|powder|noodle|pasta|replac|substitut|vegan|plant|chocolate|easter|nog|plant/.test(n)) return "egg";
-  if (/\bbananas?\b/.test(n) && !/chip|dried|bread|flour|powder|pur[eé]e|cake|muffin|pancake|smoothie|split|milk|yog/.test(n)) return "banana";
+  // DT77: German and Serbian names count too (Eier, jaja; Banane; Apfel, jabuka)
+  if (/(?<!\p{L})(eggs?|ei|eier|jaj[ea])(?!\p{L})/u.test(n) && !/white|yolk|liquid|powder|noodle|pasta|replac|substitut|vegan|plant|chocolate|easter|nog|plant|nudel|teigware|likör|belanc|žumanc/.test(n)) return "egg";
+  if (/(?<!\p{L})(bananas?|bananen?)(?!\p{L})/u.test(n) && !/chip|dried|bread|flour|powder|pur[eé]e|cake|muffin|pancake|smoothie|split|milk|yog|brot|kuchen|getrocknet/.test(n)) return "banana";
+  if (/(?<!\p{L})(apples?|apfel|äpfel|jabuk[ae])(?!\p{L})/u.test(n) && !/juice|sauce|cider|vinegar|dried|chip|pie|pur[eé]e|strudel|crumble|cake|muffin|jam|saft|mus|essig|kuchen|getrocknet|sok|pita/.test(n)) return "apple";
   return null;
 }
 // the size a recipe names: "2 large eggs" is L; none named, M
@@ -68,9 +72,11 @@ export function countWord(n: number): string {
   return (Math.round(n * 10) / 10).toString();
 }
 // what the plate and the recipe say: the count large, the size and the grams small
-export function countLabel(c: Count, grams: number): { main: string; small: string } {
+// DT77 (Milan 23 October 09:52): a whole recipe is cooked with whole ones; whole rounds to the nearest, at least one, and
+// the grams stay as saved. A portion keeps its share (0.45 eggs), for the numbers.
+export function countLabel(c: Count, grams: number, whole = false): { main: string; small: string } {
   const k = KINDS[c.kind];
-  const n = c.weighed ? Math.max(1, Math.round(howMany(c, grams))) : howMany(c, grams);
+  const n = c.weighed || whole ? Math.max(1, Math.round(howMany(c, grams))) : howMany(c, grams);
   const word = countWord(n);
   const many = word !== "1" && !(n < 1);
   return { main: `${word} ${many ? k.many : k.one}`, small: `${c.size} · ${Math.round(grams)} g${k.note ? ` ${k.note}` : ""}${c.weighed ? ", weighed" : ""}` };

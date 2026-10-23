@@ -60,6 +60,9 @@ const U = "http://127.0.0.1:3216";
   await page.getByText("Protein cheesecake", { exact: true }).last().click(); await page.waitForTimeout(900);
   t = (await page.locator(".rq-foods .rq-food").filter({ hasText: "Eggs" }).textContent()).replace(/\s+/g, " ");
   ok(/2 eggs/.test(t) && /L · 122 g/.test(t), `CT2: the recipe page counts the eggs (${t})`);
+  // Changed by story DT77 (Milan 23 October 09:52, board DT77): the whole recipe in whole eggs, and one note says a slice holds its share
+  const note = ((await page.locator(".rq-count-note").count()) ? await page.locator(".rq-count-note").textContent() : "").replace(/\s+/g, " ");
+  ok(/Eggs and other foods counted by the piece are whole here, for the whole recipe\. One slice holds its share, ¼ egg: that is for the numbers, not for cooking\./.test(note), "DT77: the recipe page says a slice holds its share: " + note);
   await shot(page, "ct2", page.locator(".rq-foods"));
   await page.close();
 

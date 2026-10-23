@@ -175,4 +175,8 @@ test("DT76: eggs and bananas are bought by the piece", () => {
   assert.equal(shopAmount("Banana, raw", 40), "1 banana");
   assert.equal(shopAmount("Egg white, raw", 130), "130 g");
   assert.equal(shopAmount("Oats, rolled", 1200), "1,200 g");
+  // DT77: a part of one is bought whole: 90 g of eggs is 2, an apple and a half is 2 apples
+  assert.equal(shopAmount("Eggs", 90), "2 eggs");
+  assert.equal(shopAmount("Apple, raw", 270), "2 apples");
+  assert.equal(shopAmount("Eggs", 110), "2 eggs");                 // 2.1 eggs: the slack keeps it at 2
 });

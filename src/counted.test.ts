@@ -54,3 +54,19 @@ test("CT2, CT4: steps count eggs; Fit to my target lands on whole eggs", async (
   const g = (r as any).items.find((x: any) => x.id === "e").grams;
   assert.equal(g % 52, 0, `whole M eggs (${g} g)`);
 });
+
+// DT77 (Milan 23 October 09:52): a whole recipe in whole ones; apples counted; other languages
+test("DT77: the whole recipe says whole eggs; a portion keeps its share", () => {
+  const c = { kind: "egg" as const, size: "M" as const };
+  assert.equal(countLabel(c, 94).main, "1⅘ eggs");                 // a portion's share, for the numbers
+  assert.equal(countLabel(c, 94, true).main, "2 eggs");             // the whole recipe, for cooking
+  assert.equal(countLabel(c, 94, true).small, "M · 94 g");          // the grams stay as saved
+  assert.equal(countLabel(c, 20, true).main, "1 egg");              // at least one
+});
+test("DT77: apples are counted; German and Serbian names count too", () => {
+  for (const n of ["Apple, raw", "Äpfel", "Apfel Braeburn", "Jabuka"]) assert.equal(kindOf(n), "apple", n);
+  for (const n of ["Apple juice", "Apfelmus", "Pineapple, raw", "Apple pie", "Apfelsaft"]) assert.equal(kindOf(n), null, n);
+  for (const n of ["Eier, Freiland", "Bio Ei", "Jaja"]) assert.equal(kindOf(n), "egg", n);
+  for (const n of ["Eiweiß", "Eis Vanille", "Eiernudeln"]) assert.equal(kindOf(n), null, n);
+  assert.equal(kindOf("Banane"), "banana");
+});
