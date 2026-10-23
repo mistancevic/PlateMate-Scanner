@@ -1,11 +1,12 @@
-// DT82 (Milan 23 October 2026, 19:45 and 19:53, after Marko's tuna): a food packed in a liquid. One can counts as what
-// you eat of it, the drained weight, with the label's values per 100 g drained (they hold the oil that stays on the fish).
-// The oil you pour off is its own food, held together with the can on the Plate: None, A spoon or All, set by the person.
-// Water and brine add nothing, so they stay one row. Syrup waits for a value of its own.
+// DT82 (Milan 23 October 2026, 19:45, 19:53 and 20:51, after Marko's tuna): a food packed in a liquid. My foods keeps the
+// label as printed, 1 can, 160 g, so it compares with the pack. On the Plate a can whose values are per 100 g drained comes
+// as a bundle: the can on top, and under it two foods, the drained fish at the drained weight with the label's values (they
+// hold the oil that stays on the fish), and the oil you pour off, None, A spoon or All, set by the person. Water and brine
+// add nothing, so they bring no second food. Values for the whole contents: the can stays one food. Syrup waits.
 import type { Food } from "./pilot";
 import { REFERENCE, referenceFood } from "./reference";
 
-export type Pack = { net: number; drained: number | null; liquid: string; per: "drained" | "whole" | "unknown" };
+export type Pack = { net: number; drained: number | null; liquid: string; per: "drained" | "whole" | "unknown"; can?: string };
 const LIQUIDS = ["olive oil", "sunflower oil", "oil", "water", "brine", "syrup", "juice", "other"];
 
 export function packOf(x: any): Pack | undefined {
@@ -39,22 +40,26 @@ export function oilFood(f: Pick<Food, "pack">, uid: () => string): Food | null {
   return { ...food, name: `${o.kind === "oil" ? "Oil" : o.kind.charAt(0).toUpperCase() + o.kind.slice(1)} from the can`, icon: "🫒" };
 }
 
-// the serving a scanned pack counts as: drained weight when the values are per drained, the whole can when per whole
-export function packServing(p: Pack | undefined, name: string | undefined): { grams: number; name: string } | undefined {
-  if (!p) return undefined;
-  const one = name && name !== "serving" && name !== "portion" ? name : "can";
-  if (p.per === "drained" && p.drained) return { grams: p.drained, name: one };
-  if (p.per === "whole") return { grams: p.net, name: one };
-  return undefined;
+// the drained food the Plate puts under the can: its own id, so My foods keeps the label as printed; the can's name rides in
+// pack.can for the bundle's line on top
+export const DRAINED = "~drained";
+export const libraryId = (id: string) => id.replace(/~drained$/, "");
+export const isDrained = (f: Pick<Food, "id">) => f.id.endsWith(DRAINED);
+export function drainedOf(f: Food): Food | null {
+  const p = f.pack;
+  if (!p || p.per !== "drained" || !p.drained || isDrained(f)) return null;
+  const base = f.name.replace(/\s+(in|im|u|en|à la|al)\s+.*$/i, "").trim() || f.name;
+  return { ...f, id: f.id + DRAINED, name: `${base}, drained`, serving: { grams: p.drained, name: f.serving?.name && !/^(serving|portion)$/.test(f.serving.name) ? f.serving.name : "can" }, pack: { ...p, can: f.name } };
 }
 
 // one line for the food's card and the label check
-export function packLine(f: Pick<Food, "pack" | "serving">): string | null {
+export function packLine(f: Pick<Food, "pack" | "name">): string | null {
   const p = f.pack;
   if (!p) return null;
   const inWhat = `In ${p.liquid}: ${p.net} g${p.drained ? `, ${p.drained} g drained` : ""}.`;
-  const one = f.serving?.name ?? "can";
-  if (p.per === "drained" && p.drained) return `${inWhat} The values are per 100 g drained, so one ${one} counts as ${p.drained} g.${canOil(f) ? ` The ${p.liquid} you pour off can go on the plate too.` : ""}`;
-  if (p.per === "whole") return `${inWhat} The values are for the whole contents, ${p.liquid} included, so one ${one} counts as ${p.net} g.`;
-  return `${inWhat} The label does not say whether its values are per drained weight or the whole contents. Check it, and set the serving to match.`;
+  const base = f.name.replace(/\s+(in|im|u|en|à la|al)\s+.*$/i, "").trim() || f.name, oil = canOil(f);
+  const oilName = oil ? `${oil.kind.charAt(0).toUpperCase() + oil.kind.slice(1)} from the can` : "";
+  if (p.per === "drained" && p.drained) return `${inWhat} The values are per 100 g drained. On the Plate the can comes as ${oil ? `two foods: ${base}, drained, ${p.drained} g, and ${oilName}, up to ${oil.grams} g, if you add it` : `${base}, drained, ${p.drained} g`}.`;
+  if (p.per === "whole") return `${inWhat} The values are for the whole contents, ${p.liquid} included, so the can is one food, ${p.net} g.`;
+  return `${inWhat} The label does not say whether its values are per drained weight or the whole contents. Check it.`;
 }

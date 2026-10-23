@@ -1,7 +1,7 @@
 import { countOf, gramsOfOne, KINDS } from "./counted";
 import { cleanMealNames, cleanCardNames, cleanFoodNames, cleanText1 } from "./entities";
 import { rowsFromRaw } from "./labeltable";
-import { packOf, packServing } from "./canned";
+import { packOf } from "./canned";
 /** Versioned pilot contract: numbers are unrounded; null means unknown. */
 export type Nutrient = "calories" | "protein" | "fats" | "carbs" | "fiber";
 // the order printed on European labels, so checking against the pack goes line by line
@@ -561,7 +561,8 @@ export function candidateFood(input: any, source: string): Food {
     name: typeof input.product_name === "string" ? input.product_name : "",
     brand: typeof input.brand === "string" && !/^\s*(unknown|n\/?a|none|-)?\s*$/i.test(input.brand) ? input.brand : "",
     barcode: typeof input.barcode === "string" ? input.barcode : undefined,
-    ...(() => { const pack = packOf(input.pack); const serving = packServing(pack, servingOf(input.serving)?.name) ?? servingOf(input.serving); return { serving, ...(pack ? { pack } : {}) }; })(),
+    serving: servingOf(input.serving),
+    ...(packOf(input.pack) ? { pack: packOf(input.pack) } : {}),
     basis: "100g",
     source,
     notes: typeof input.notes === "string" ? input.notes : "",

@@ -1,9 +1,10 @@
 // JOURNEY INVARIANT (DT82, Milan 23 October 2026, 19:37 to 20:00, after Marko's call): what you scan on the Plate lands
 // on the plate, and stays in My foods, as decided in 0.2.25 (RP5); a code for a food you already have puts that food on the
-// plate. A food the pack sells as one piece goes on as one: 1 pot, 1 can, never 0.9 cans. A can in oil counts as its
-// drained weight, with the label's values per 100 g drained; the oil you pour off sits with the can's row, outside the
-// numbers until set: None, A spoon, All. It goes when the can goes, and Fit never moves it. Never rewrite these lines to
-// fit a change.
+// plate. A food the pack sells as one piece goes on as one: 1 pot, 1 can, never 0.9 cans. My foods keeps the label as
+// printed (Milan 20:51): 1 can, 160 g. On the Plate a can in oil with values per 100 g drained is a bundle: the can on top,
+// as the label names it, and under it two foods, the drained tuna at 120 g with the label's values, and the oil you pour
+// off, outside the numbers until set: None, A spoon, All. Both go when the can goes, and Fit never moves the oil. Never
+// rewrite these lines to fit a change.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -53,13 +54,17 @@ const tuna = { success: true, product_name: "Thunfisch in Olivenöl", brand: "Ri
     await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(600);
     await page.getByRole("button", { name: /Analyze 1 photo/ }).click(); await page.waitForTimeout(1500);
     const line = (await page.locator(".pack-line").textContent()) || "";
-    ok(/In olive oil: 160 g, 120 g drained\. The values are per 100 g drained, so one can counts as 120 g\./.test(line), "the label check says what one can counts as: " + line);
-    ok(await page.getByLabel("Serving grams").inputValue() === "120", "the serving is the drained weight, 120 g");
+    ok(line === "In olive oil: 160 g, 120 g drained. The values are per 100 g drained. On the Plate the can comes as two foods: Thunfisch, drained, 120 g, and Olive oil from the can, up to 40 g, if you add it.", "the label check says how the can comes on the plate: " + line);
+    ok(await page.getByLabel("Serving grams").inputValue() === "160", "the serving is the can as printed, 160 g");
     await page.getByLabel(/I checked the values/).check();
     await page.getByRole("button", { name: /Confirm & save food/ }).click(); await page.waitForTimeout(1200);
     it = await items();
     ok(it.length === 1 && /Thunfisch/.test(it[0].name) && it[0].grams === 120, "Scan on the Plate puts the can on the plate, 120 g drained: " + JSON.stringify(it));
-    ok(await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.some((f) => /Thunfisch/.test(f.name))), "and keeps it in My foods");
+    const lib = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.find((f) => /Thunfisch/.test(f.name)));
+    ok(lib && lib.name === "Thunfisch in Olivenöl" && lib.serving.grams === 160 && lib.calories === 190, "My foods keeps the label as printed: " + JSON.stringify(lib && [lib.name, lib.serving, lib.calories]));
+    ok(it[0].name === "Thunfisch, drained", "the plate holds the drained tuna");
+    const head = (await page.locator(".can-head").textContent()) || "";
+    ok(/^Thunfisch in Olivenöl1 can · 228\s*kcal in the numbers$/.test(head), "the can on top, as the label names it: " + head);
     ok(/1 can/.test(await rows()) && !/0\.9/.test(await rows()), "the row says 1 can");
     const kcal0 = await page.evaluate(() => Number(document.querySelector(".readout").textContent.match(/([\d,]+)\s*kcal\s*·/)[1].replace(",", "")));
     ok(kcal0 === 228, "the numbers count 120 g of tuna: " + kcal0 + " kcal");

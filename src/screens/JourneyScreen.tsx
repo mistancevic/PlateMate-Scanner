@@ -8,7 +8,7 @@ import type { Mix } from "../mixtip";
 import { aggregate, density, uid, solveIngredient, servingLabel, sizedFor } from "../pilot";
 import { fromMeal } from "../planned";
 import type { Meal, Food, Ingredient, PlateOpt, StepMark } from "../pilot";
-import { canOil, oilChoices, oilFood } from "../canned";
+import { canOil, isDrained, libraryId, oilChoices, oilFood } from "../canned";
 import { pairItems, partsOf, optAt, optToItem, itemToOpt, canLeaveOut, leanFood } from "../parts";
 import { draftSteps } from "../draftSteps";
 import { equipmentOf } from "../personal";
@@ -878,10 +878,17 @@ export function JourneyScreen(p: AppApi) {
               </div>
             );
           };
+          // DT82 (Milan 20:51): the can on top, as the label names it, with what of it is in the numbers; its two foods under it
+          const canHead = (i: Ingredient) => {
+            if (!isDrained(i.food) || !i.food.pack?.can) return null;
+            const oil = items.find((x) => x.from === i.id), k = aggregate([i, ...(oil ? [oil] : [])]).calories, n = Math.round((i.grams / (i.food.serving?.grams || i.grams)) * 10) / 10;
+            return <div className="can-head" aria-label={`The can: ${i.food.pack.can}`}><b>{i.food.pack.can}</b><small>{fmt(n, n % 1 ? 1 : 0)} {n === 1 ? i.food.serving?.name ?? "can" : `${i.food.serving?.name ?? "can"}s`} · {fmt(k, 0)} kcal in the numbers</small></div>;
+          };
           const itemRow = (i: Ingredient) => heldOil(i) ? null : (
               <Fragment key={i.id}>
+              {canHead(i)}
               <SwipeRow onRemove={() => remove(i.id)} onSwap={() => setSwapId(i.id)}>
-              <div className="row">
+              <div className={`row${isDrained(i.food) ? " can-food" : ""}`}>
                 <button className={`dot ${i.locked ? "dot-locked" : "dot-free"}`} aria-label={`${i.locked ? "Unlock" : "Lock"} ${i.food.name}`}
                   onClick={() => { log("lock", { locked: !i.locked }); updateItem(i.id, { locked: !i.locked }); }} />
                 <span className="thumb">{i.food.photo ? <img src={i.food.photo} alt="" /> : (i.food.icon || iconFor(i.food.name))}</span>
@@ -1030,7 +1037,7 @@ export function JourneyScreen(p: AppApi) {
           {heldBack.length > 0 && plateTasteOf && <small className="muted held-back">{heldBackLine(plateTasteOf, heldBack)}</small>}
           {(q.trim() ? found : quick.picks.filter((f) => goesInDish(plateTasteOf, f.name))
           ).map((f) => {
-              const inList = items.some((i) => i.food.id === f.id);
+              const inList = items.some((i) => libraryId(i.food.id) === f.id);
               const why = q.trim() ? null : quick.why.get(f.id);
               return (
                 <div className="row row-food" key={f.id}>

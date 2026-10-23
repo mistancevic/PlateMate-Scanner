@@ -1,6 +1,6 @@
 import { servingsOf } from "./pilot";
 import { wholeOnPlate } from "./counted";
-import { packLine } from "./canned";
+import { drainedOf, libraryId, packLine } from "./canned";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, useMemo } from "react";
 import { optAt } from "./parts";
 import {
@@ -511,7 +511,7 @@ function LabelCheck({
           <span>g</span>
         </div>
         <small className="muted">A counted food: what Chef Mealan moves then comes in whole servings, 1 bar, 2 bars, never 1.3.</small>
-        {packLine({ pack: food.pack, serving: servingNow() }) && <small className="pack-line">{packLine({ pack: food.pack, serving: servingNow() })}</small>}
+        {packLine({ pack: food.pack, name: name || food.name }) && <small className="pack-line">{packLine({ pack: food.pack, name: name || food.name })}</small>}
       </div>
       <p className="label">Nutrition table, per 100 g, as on the pack</p>
       <div className="label-table">
@@ -1472,7 +1472,7 @@ export default function App() {
     if (scanFrom === "today") { setScanFrom(null); setCamera(false); setEdit(null); setImageSet([]); setPending((p) => p.filter((x) => x.name !== f.name || x.brand !== f.brand)); setWhere(f); return; }
     // DT82 (Marko, 23 October 2026): Scan or Manual on the Plate puts the food on the plate and keeps it in My foods, as
     // decided in 0.2.25 (RP5); a food already on the plate is only updated there
-    if (opts?.plate) { setEdit(null); setImageSet([]); setPending((p) => p.filter((x) => x.name !== f.name || x.brand !== f.brand)); if (!state.items.some((i) => i.food.id === f.id)) add(f); else notify(`Updated ${f.name}.`); return; }
+    if (opts?.plate) { setEdit(null); setImageSet([]); setPending((p) => p.filter((x) => x.name !== f.name || x.brand !== f.brand)); if (!state.items.some((i) => libraryId(i.food.id) === f.id)) add(f); else notify(`Updated ${f.name}.`); return; }
     if (existed && f.reviewedAt) { setEdit(null); setImageSet([]); notify(`Updated ${f.name}.`); return; }
     setEdit(null);
     setPending((p) =>
@@ -1482,7 +1482,10 @@ export default function App() {
     if (opts?.open) { setOpenFoodId(f.id); setTab("foods"); notify(`${f.name} is in your foods.`); return; }
     notify(`${f.name} is in your foods.`);
   }
-  function add(food: Food) {
+  function add(food0: Food) {
+    // DT82 (Milan 20:51): a can whose values are per 100 g drained goes on as the drained food, under the can's name; My
+    // foods keeps the label as printed
+    const food = drainedOf(food0) ?? food0;
     log("food_in", { way: food.barcode ? "barcode" : food.source === "label" ? "label" : food.source === "manual" ? "manual" : "saved", source: food.source });
     setState((s) => ({
       ...s,
