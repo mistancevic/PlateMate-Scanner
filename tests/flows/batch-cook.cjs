@@ -94,19 +94,23 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   // clearly more than one meal: the save asks, with the Plate's guess in it
   await nav("Plate");
   await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300);
   for (const inp of await page.locator('input[aria-label^="Grams of"]').all()) { await inp.fill("900"); }
   await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^Keep it as it is$/ }).first().click(); await page.waitForTimeout(800);
-  const making = page.getByRole("button", { name: /I'm making it/ }); if (await making.count()) { await making.first().click(); await page.waitForTimeout(600); }
+  if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); }
+  await page.getByRole("button", { name: /I'm making it/ }).first().click(); await page.waitForTimeout(600);
+  // a big plate eaten all at once is asked about (R25); you ate a portion of it
+  await page.getByRole("button", { name: "A portion" }).click(); await page.waitForTimeout(200);
   await page.getByRole("button", { name: /On to How was it/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "DaaM good" }).click();
   const big = page.getByRole("group", { name: "What it makes" });
   const bigText = ((await big.textContent()) ?? "").replace(/\s+/g, " ");
   const guess = await big.getByLabel("How many it makes").inputValue();
-  ok(/This is about \d+ of your meals\. How many does it make\?/.test(bigText) && Number(guess) >= 2, `clearly more than a meal: the save asks, ${guess} filled in (${bigText.slice(0, 70)})`);
-  ok(await big.getByRole("button", { name: "One plate, I ate it all" }).count() === 1, "and One plate, I ate it all");
+  ok(/You ate a portion of it, and it is about \d+ of your meals\. How many does it make\?/.test(bigText) && Number(guess) >= 2, `you ate a portion of a big plate: the save asks, ${guess} filled in (${bigText.slice(0, 90)})`);
+  ok(await big.getByRole("button", { name: "One plate" }).count() === 1, "and One plate");
   await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(900);
-  const st = await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); return { m: s.meals[0], f: s.feedback.filter((x) => x.status === "eaten").slice(-1)[0] }; });
+  const st = await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); return { m: s.meals[0], f: s.feedback.filter((x) => x.status === "eaten")[0] }; });
   const kc = (items) => items.reduce((a, i) => a + i.food.calories * i.grams / 100, 0);
   ok(st.m.makes?.n === Number(guess) && Math.abs(kc(st.f.meal.items) - kc(st.m.items) / Number(guess)) < 2, `saved as ${guess} portions, and today counts one of them`);
   ok(errs.length === 0, "no page errors " + errs.join(" | "));
