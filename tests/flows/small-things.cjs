@@ -52,7 +52,10 @@ const U = "http://127.0.0.1:3238";
     await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(700);
     await page.evaluate(() => [...document.querySelectorAll("button")].find((x) => x.textContent.trim() === "Swap dinner")?.click()); await page.waitForTimeout(600);
     const row = (await page.locator(".pick-row").filter({ hasText: "fritters" }).first().textContent()) ?? "";
-    ok(row.includes(`${N} kcal`), `Pick a meal: ${N} kcal`);
+    // Changed by story DT79 (Milan 23 October 11:15, board DT79): a recipe that makes several comes in the pieces that fit the
+    // slot, so the row says how many and their kcal: one number per fritter, times the count
+    const cnt = Number((row.match(/(\d+) fritters?/) || [])[1]);
+    ok(cnt >= 1 && row.includes(`${(N * cnt).toLocaleString("en")} kcal`), `Pick a meal: ${cnt} fritters at ${N} kcal each (${row.slice(0, 80)})`);
     await page.getByRole("dialog").getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(400);
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500);
     await page.locator(".recipe-tile").filter({ hasText: "fritters" }).first().click(); await page.waitForTimeout(700);

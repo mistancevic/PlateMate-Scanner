@@ -161,3 +161,23 @@ test("DT76: a fitted starter keeps eggs and bananas whole, and counts at those g
   const batch = { ...om, servings: 4, amount: 1.25 };
   assert.ok(plannedPortion(batch, "x", "")!.items.find((i) => /^Egg, whole/.test(i.food.name))!.grams % 52 !== 0);
 });
+import { piecesFor, withPieces, isFitted } from "./planned";
+test("DT79: a batch recipe is planned in whole pieces, as many as the slot has left", () => {
+  const one = { title: "Sarma", kcal: 180, protein: 10, source: "mine" as const, mealId: "sa", servings: 8, unit: "sarmas" };
+  assert.equal(piecesFor(one, { kcal: 700 }), 4);                     // 700 ÷ 180 = 3.9
+  assert.equal(piecesFor(one, { kcal: 560 }), 3);                     // a rest day's lunch
+  assert.equal(piecesFor(one, { kcal: 5000 }), 8);                    // never more than the batch
+  assert.equal(piecesFor(one, { kcal: 20 }), 1);                      // at least one
+  const four = withPieces(one, 4, false);
+  assert.equal(four.kcal, 720); assert.equal(four.amount, 4); assert.equal(four.usual, 4);
+  assert.equal(amountText(four), "4 sarmas"); assert.equal(amountText(withPieces(one, 1)), "1 sarma");
+  assert.equal(isFitted({ l: four }), false);
+  // Fit the portions moves whole pieces; back to the usual returns to the count picked
+  const fit = fitPortions({ l: four, b: { title: "Skyr bowl", kcal: 420, protein: 46, source: "mine" as const } }, { kcal: 2000 });
+  assert.ok(Number.isInteger(fit.l.amount) && fit.l.amount! > 4, `more sarmas: ${fit.l.amount}`); assert.equal(fit.l.usual, 4);
+  assert.equal(isFitted(fit), true);
+  const back = usualPortions(fit);
+  assert.equal(back.l.amount, 4); assert.equal(back.l.kcal, 720);
+  // a share of the batch for the numbers
+  assert.equal(plannedPortion({ ...four, items: [{ id: "c", food, grams: 800, locked: true }] }, "x", "")!.items[0].grams, 400);
+});

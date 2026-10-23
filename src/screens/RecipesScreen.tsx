@@ -7,6 +7,21 @@ import { equipmentOf } from "../personal";
 import type { StepMark } from "../pilot";
 import type { Meal } from "../pilot";
 import { fmt, pdText } from "../ui";
+import { batchUse, oneWord } from "../planned";
+import type { Planned } from "../planned";
+
+// DT79 (Milan 23 October 11:15): a recipe that makes pieces says what the plan takes of it, from today on
+const WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+function batchLine(m: Meal, planned: Planned): string | null {
+  if (!m.makes || m.makes.n < 2) return null;
+  const d = new Date(), today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const use = batchUse(planned, m.id, today);
+  if (!use.length) return null;
+  const n = m.makes.n, unit = m.makes.unit, total = use.reduce((a, u) => a + u.n, 0), batches = Math.ceil(total / n - 1e-9), left = batches * n - total;
+  const day = (s: string) => WD[new Date(`${s}T12:00:00`).getDay()];
+  const leftText = left === 0 ? "none left" : `${left} ${left === 1 ? oneWord(unit) : unit} left`;
+  return `${n} ${unit}: ${use.map((u) => `${u.n} on ${day(u.date)} ${u.slot}`).join(", ")}. ${batches > 1 ? `${batches} batches, ` : ""}${leftText}.`;
+}
 import type { AppApi, MealFrom } from "./api";
 import { showPlanOn } from "./PlanScreen";
 import { ymd } from "../plan";
@@ -215,7 +230,7 @@ export function RecipesScreen(p: AppApi) {
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
-      <RecipePage key={opened.id} meal={opened} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
+      <RecipePage key={opened.id} meal={opened} plannedLine={batchLine(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
         pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
         top={landed && landed.id === opened.id ? (

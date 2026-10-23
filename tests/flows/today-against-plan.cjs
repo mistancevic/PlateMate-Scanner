@@ -77,8 +77,9 @@ const open = async (state, at = "2026-10-18T12:20:00") => {
     await page.locator(".plan-slot").filter({ hasText: new RegExp(nextName, "i") }).first().click(); await page.waitForTimeout(500);
     await page.locator(".pick-row").filter({ hasText: "Protein cheesecake" }).first().click(); await page.waitForTimeout(500);
     await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(800);
+    // Changed by story DT79 (board DT79): the cheesecake makes 8 slices, so it comes in the slices that fit dinner, over 1,000 kcal
     const planned = await text(".next-planned");
-    ok(/Protein cheesecake/.test(planned) && /As planned · \d+ kcal · \d+ g protein/.test(planned) && await page.locator(".next-planned .log-photo").count() === 1, "R16: what comes next is the planned meal, with its picture and numbers: " + planned);
+    ok(/Protein cheesecake/.test(planned) && /As planned · [\d,]+ kcal · \d+ g protein/.test(planned) && await page.locator(".next-planned .log-photo").count() === 1, "R16: what comes next is the planned meal, with its picture and numbers: " + planned);
     // Changed by story R19 (board RS18): the planned meal's two buttons sit on its card: I ate it, Change it
     ok(await page.locator(".next-planned").getByRole("button", { name: "Change it", exact: true }).count() === 1, "R16: Change it, the Plate, is a tap away, on the card");
     await page.getByRole("button", { name: "I ate it", exact: true }).click(); await page.waitForTimeout(600);

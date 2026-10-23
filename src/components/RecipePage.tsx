@@ -35,7 +35,9 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, openOriginal, originalFoods, pdRef, fitPd, backLabel }: {
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, openOriginal, originalFoods, pdRef, fitPd, backLabel, plannedLine }: {
+  // DT79: what the plan takes of this batch, 8 sarmas: 3 on Monday lunch, 1 left
+  plannedLine?: string | null;
   // R19 (0.2.47): opened from Today or Plan, the way back says so
   backLabel?: string;
   // 0.2.18 (canvas board IM, IM11, IM11b): Draw a picture, with the day's count; none without the AI
@@ -184,6 +186,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {tryPhoto && <TryPhoto meal={meal} tryPhoto={tryPhoto} use={(img) => { const list = recipePhotosOf(meal).filter((x) => x !== img); onPatch({ ...withRecipePhotos([img, ...list].slice(0, MAX_RECIPE_PHOTOS)), coverSig: sig(img) }); }} />}
       {meal.source && <SourceBox meal={meal} onPatch={onPatch} openOriginal={openOriginal ?? null} />}
       {/* R16 (0.2.44, board RS15): PD on top, under Where it came from, as on the Plate; it follows the grams while editing */}
+      {plannedLine && <small className="muted rq-planned">{plannedLine}</small>}
       <NutritionCard readoutOnly items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={null} pdRef={pdRef ?? null} fitPd={fitPd} />
       {/* IM21: one serving first, when the recipe makes more than one */}
       {/* RP2 (0.2.25): the three tiles gave way to the PD readout above the Nutrition table */}

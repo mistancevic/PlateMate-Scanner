@@ -1,7 +1,7 @@
 // A shopping list from the plan (0.2.60, board SL1; Milan 15:48 to 15:50: as simple as possible, to try it). The planned
 // meals of seven days from today, one portion each as the plan counts it, every food added up by name. A meal with no
 // foods saved (a starter) can't be counted, so the list names it instead of leaving it out quietly.
-import { plannedPortion, type Planned } from "./planned";
+import { plannedPortion, isBatch, type Planned, type PlannedMeal } from "./planned";
 import { rawOf } from "./reference";
 import { kindOf, KINDS } from "./counted";
 // DT76: eggs and bananas are bought by the piece: 210 g of eggs is 4 eggs (size M), at least one. DT77: apples too, and
@@ -22,7 +22,7 @@ export function buyAs(name: string, brand: string, grams: number, kcal?: number 
   const r = rawOf(name, kcal);
   return r ? { name: r.raw.en, brand: "", grams: grams * r.factor, cooked: grams } : { name, brand, grams };
 }
-export type ShopList = { days: string[]; meals: number; lines: ShopLine[]; without: { date: string; title: string }[] };
+export type ShopList = { days: string[]; meals: number; lines: ShopLine[]; without: { date: string; title: string }[]; batches?: { title: string; n: number; pieces: number; batches: number }[] };
 
 // grams as a shop reads them: under 50 g to the gram, else to 10 g
 export const shopGrams = (g: number) => (g < 50 ? Math.max(1, Math.round(g)) : Math.round(g / 10) * 10);
@@ -31,11 +31,22 @@ export function shoppingList(planned: Planned, days: string[]): ShopList {
   const by = new Map<string, ShopLine & { seen: Set<string> }>();
   const without: ShopList["without"] = [];
   let meals = 0;
+  // DT79 (Milan 23 October 11:15): a batch recipe is cooked whole. Its pieces planned in these days are added up, and the list
+  // buys whole batches: 7 sarmas planned of a recipe that makes 8 is one batch; 11 is two. Each meal still says its share.
+  // Only a recipe that says what it makes (8 sarmas); one the Plate divided into portions is bought as its share.
+  const batch = new Map<string, { n: number; pieces: number; batches: number; title: string; items: PlannedMeal["items"] }>();
+  for (const d of days) for (const m of Object.values(planned[d] ?? {})) {
+    if (m.skipped || !isBatch(m) || !m.unit || !m.mealId || !m.items?.length) continue;
+    const b = batch.get(m.mealId) ?? { n: m.servings!, pieces: 0, batches: 0, title: m.title, items: m.items };
+    b.pieces += m.amount ?? 1; batch.set(m.mealId, b);
+  }
+  for (const b of batch.values()) b.batches = Math.max(1, Math.ceil(b.pieces / b.n - 1e-9));
   for (const d of days) {
     for (const [slot, m] of Object.entries(planned[d] ?? {})) {
       if (m.skipped) continue;
       meals++;
-      const portion = plannedPortion(m, "shop", "");
+      const bt = isBatch(m) && m.mealId ? batch.get(m.mealId) : undefined;
+      const portion = bt ? { items: bt.items!.map((i) => ({ ...i, grams: i.grams * ((m.amount ?? 1) / bt.n) })) } : plannedPortion(m, "shop", "");
       if (!portion) { without.push({ date: d, title: m.title }); continue; }
       for (const i of portion.items) {
         if (!(i.grams > 0) || !i.food?.name) continue;
@@ -51,8 +62,18 @@ export function shoppingList(planned: Planned, days: string[]): ShopList {
       }
     }
   }
+  // a batch's foods: what its planned pieces take, topped up to the whole batches cooked
+  for (const b of batch.values()) for (const i of b.items ?? []) {
+    if (!(i.grams > 0) || !i.food?.name) continue;
+    const full = buyAs(i.food.name, i.food.brand ?? "", i.grams * b.batches, i.food.calories), share = buyAs(i.food.name, i.food.brand ?? "", i.grams * (b.pieces / b.n), i.food.calories);
+    const line = by.get(`${full.name}|${full.brand}`.toLowerCase());
+    if (!line) continue;
+    line.grams += full.grams - share.grams;
+    if (full.cooked && share.cooked) line.cooked = (line.cooked ?? 0) + full.cooked - share.cooked;
+  }
+  const batches = [...batch.values()].map((b) => ({ title: b.title, n: b.n, pieces: b.pieces, batches: b.batches }));
   const lines = [...by.values()].map(({ seen, ...l }) => ({ ...l, grams: shopGrams(l.grams), ...(l.cooked ? { cooked: shopGrams(l.cooked) } : {}), uses: (l.uses ?? []).map((u) => ({ ...u, grams: shopGrams(u.grams) })) })).sort((a, b) => a.name.localeCompare(b.name));
-  return { days, meals, lines, without };
+  return { days, meals, lines, without, ...(batches.length ? { batches } : {}) };
 }
 
 // the list as text, to paste in a message or a note
