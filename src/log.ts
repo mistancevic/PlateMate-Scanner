@@ -34,7 +34,8 @@ export type LogEvent =
   | "recipe_in"      // data.how = shot | link, data.result = read | plate | login | fetch | no-recipe | not-recipe
   | "recipe_fit"     // data.way = change | side, data.result = shown | failed | yes | ok | no
   | "parts"          // data.how = leave | change | set (0.2.19, boards IM15 to IM18)
-  | "can_oil";       // the oil of a can on the Plate (DT82): data.how = none | spoon | all
+  | "can_oil"        // the oil of a can on the Plate (DT82): data.how = none | spoon | all
+  | "swap";          // a food swapped in Edit recipe (DT83): data.way = energy | weight, data.kind = same | other, data.how = swap | after-remove
 const KEY = "chefmealan-log";
 export function log(event: LogEvent, data: Record<string, unknown> = {}) {
   try {

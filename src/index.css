@@ -2024,3 +2024,12 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .can-head { display: flex; flex-direction: column; padding: 10px 6px 4px; border-top: 1px solid var(--line); }
 .can-head small { color: var(--muted); }
 .row.can-food { margin-left: 16px; }
+/* DT83: swap a food in a recipe, and what changed for one portion */
+.rq-swap-link { margin-left: 8px; font-size: var(--fs-small); }
+.rq-swap { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding: 10px 12px; margin: 8px 0; border-radius: var(--r-control); background: var(--tint); }
+.rq-change { display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; margin: 8px 0; border-radius: var(--r-control); background: var(--tint); }
+.rq-change-big { background: var(--close-soft); color: var(--close-text); }
+.rq-change .link { align-self: flex-start; }
+.rq-find-h { display: block; margin-bottom: 6px; }
+.rq-need { display: block; color: var(--close-text); margin: 6px 0; }
+.rq-g-need { border-color: var(--close-text) !important; }

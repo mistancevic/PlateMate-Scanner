@@ -79,6 +79,10 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
   await page.getByRole("button", { name: "Remove Milk 1.5%" }).click();
   await page.getByRole("button", { name: "Add a food" }).click(); await page.getByLabel("Search my foods").fill("skyr"); await page.waitForTimeout(150);
   await page.locator(".rq-find-row").first().click(); await page.waitForTimeout(150);
+  // Changed by story DT83 (Milan 23 October 2026): an Add right after a Remove asks whether the new food takes the removed
+  // one's place; a food of its own asks for its grams instead of putting in 100 g
+  await page.getByRole("button", { name: "No, a food of its own" }).click(); await page.waitForTimeout(150);
+  await page.getByLabel("Grams of Skyr, natural").fill("100"); await page.waitForTimeout(150);
   // R13 (0.2.5+r16, board S4): one field per step, Enter starts the next; the foods as chips with their amounts
   await page.getByRole("textbox", { name: "Step 1" }).fill("Whisk "); await page.getByRole("button", { name: /^Put 120 g Eggs/ }).click(); await page.waitForTimeout(150);
   await page.getByRole("textbox", { name: "Step 1" }).press("End");
