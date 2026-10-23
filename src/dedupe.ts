@@ -36,6 +36,10 @@ export function mergeFoods(keep: Food, other: Food, name?: string): Food {
     calories: pick("calories"), protein: pick("protein"), fats: pick("fats"), carbs: pick("carbs"), fiber: pick("fiber"),
     notes: [keep.notes, other.notes].filter(Boolean).join(" · ").slice(0, 500),
     photo: keep.photo || other.photo, photos: photos.length ? photos : undefined,
+    // DT82 fix (Milan 23 October 23:09): a can read again and saved as an Update keeps what the new read knows and the old
+    // food does not: the pack (net and drained weight, the liquid) and the serving
+    ...(keep.pack || other.pack ? { pack: keep.pack ?? other.pack } : {}),
+    ...(keep.serving || other.serving ? { serving: keep.serving ?? other.serving } : {}),
     ...((keep as any).creditPhotos || (other as any).creditPhotos ? { creditPhotos: [...new Set([...((keep as any).creditPhotos ?? []), ...((other as any).creditPhotos ?? [])])] } : {}),
     // the fuller table wins; lines only the other one has are added
     table: (() => {

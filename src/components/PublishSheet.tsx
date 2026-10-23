@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Copy, Download, Image as ImageIcon, X } from "lucide-react";
 import type { Feedback, Meal, PubContent, PublishDraft } from "../pilot";
+import { keptName } from "../pubNames";
 import { amountOf, bylineOf, claimProblem, fitsOf, localAs, numbersOf, plainName, slugOf, type PublicRecipe } from "../recipes";
 import { RecipeView } from "../screens/RecipePages";
 import { instagramImages } from "../instaImages";
@@ -32,7 +33,7 @@ export function pubDraftOf(meal: Meal, published: Published | null, cards: Feedb
     d, photos, photoAt: own.length ? 0 : Math.min(d.photoAt ?? 0, Math.max(0, photos.length - 1)),
     title: d.title ?? published?.title ?? meal.title, lines: d.lines ?? published?.lines ?? "", makes: d.makes ?? String(published?.makes ?? 1),
     servingName: d.servingName ?? published?.servingName ?? "serving", minutes: d.minutes ?? (published?.minutes ? String(published.minutes) : ""),
-    names: meal.items.map((i, k) => d.names?.[k] ?? published?.items?.[k]?.name ?? plainName(i.food)), steps: (meal.steps ?? published?.steps ?? []).join("\n"),
+    names: meal.items.map((_, k) => keptName(meal, k, d, published)), steps: (meal.steps ?? published?.steps ?? []).join("\n"),
   };
 }
 type PubFields = { title: string; lines: string; makes: string; servingName: string; minutes: string; names: string[]; steps: string; photo: string | null | undefined; photoAi?: boolean };
@@ -121,7 +122,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
   const first = useRef(true);
   useEffect(() => {
     if (first.current) { first.current = false; return; }
-    const t = setTimeout(() => { const live = sentRef.current; onMeal({ steps: steps.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 30), publish: { title, lines, makes, servingName, minutes, names, photoAt, savedAt: new Date().toISOString(), ...(live.sent ? live : {}) } }); }, 500);
+    const t = setTimeout(() => { const live = sentRef.current; onMeal({ steps: steps.split("\n").map((x) => x.trim()).filter(Boolean).slice(0, 30), publish: { title, lines, makes, servingName, minutes, names, nameIds: meal.items.map((i) => i.food.id), photoAt, savedAt: new Date().toISOString(), ...(live.sent ? live : {}) } }); }, 500);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title, lines, makes, servingName, minutes, names, steps, photoAt]);
@@ -169,7 +170,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
       if (saved.status === "live") {
         const at = new Date().toISOString();
         setSent(contentNow); setSentAt(at); setJustPublished(true); sentRef.current = { sent: contentNow, sentAt: at };
-        onMeal({ publish: { title, lines, makes, servingName, minutes, names, photoAt, savedAt: at, sent: contentNow, sentAt: at } });
+        onMeal({ publish: { title, lines, makes, servingName, minutes, names, nameIds: meal.items.map((i) => i.food.id), photoAt, savedAt: at, sent: contentNow, sentAt: at } });
       }
       setDone(saved); onDone(saved); setPreviewing(false);
     } catch (e: any) { setErr(e.message); } finally { setBusy(""); }
