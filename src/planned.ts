@@ -2,6 +2,8 @@
 // adds up before anything is cooked. A meal comes from My recipes, Coach's recipes, Chef Mealan's starters, or the Plate.
 import { aggregate, density, servingsOf, type Ingredient, type Meal } from "./pilot";
 import type { Slot } from "./slots";
+import { REFERENCE, referenceFood } from "./reference";
+import { kindOf, countOf, howMany, gramsOfOne } from "./counted";
 
 export type Source = "mine" | "coach" | "starter" | "plate";
 export type PlannedMeal = { title: string; kcal: number; protein: number; source: Source; mealId?: string; items?: Ingredient[]; portion?: number; servings?: number;
@@ -28,6 +30,11 @@ export function refreshPlanned(p: Planned, meals: Meal[]): Planned {
       const r = m.mealId && !m.servings ? byId.get(m.mealId) : undefined;
       if (r && servingsOf(r) > 1) { const f = fromMeal(r, m.source); const a = m.amount ?? 1; next[date][slot] = { ...m, kcal: Math.round(f.kcal * a), protein: Math.round(f.protein * a), servings: f.servings }; changed = true; }
       else if (!m.mealId && m.items?.length && twice(m.items)) { next[date][slot] = withoutTwice(m); changed = true; }
+      // DT76: a starter planned before 0.2.76 had no foods; it takes them, its numbers from the foods, at its amount
+      else if (m.source === "starter" && !m.items?.length && STARTERS.some((x) => x.title === m.title)) {
+        const st = STARTERS.find((x) => x.title === m.title)!, a = m.amount ?? 1;
+        next[date][slot] = { ...m, items: st.items, portion: st.portion, kcal: Math.round(st.kcal * a), protein: Math.round(st.protein * a) }; changed = true;
+      }
       else next[date][slot] = m;
     }
   }
@@ -52,12 +59,18 @@ export function withPlanned(p: Planned, date: string, slotId: string, meal: Plan
 }
 
 // R16 (0.2.44, board RS15): I ate it on Today logs the planned meal as it is in the plan: one portion of the recipe, its
-// foods scaled as the plan counts them (fromMeal). A meal without foods (a starter) has nothing to log; the Plate makes it.
+// foods scaled as the plan counts them (fromMeal). A meal without foods has nothing to log; the Plate makes it. DT76: starters have foods.
 export function plannedPortion(m: PlannedMeal, id: string, savedAt: string): Meal | null {
   if (!m.items?.length) return null;
   const weight = m.items.reduce((n, i) => n + (i.grams > 0 ? i.grams : 0), 0);
   const ratio = (m.servings && m.servings > 1 ? 1 / m.servings : m.portion && weight > 0 ? Math.min(1, m.portion / weight) : 1) * (m.amount ?? 1);
-  const items = m.items.map((i) => ({ ...i, grams: i.grams * ratio }));
+  // DT76: a meal cooked as one portion and fitted to another amount keeps eggs and bananas whole (3¾ eggs is 4); a share
+  // of a batch recipe stays a share. The plan counts the meal at these grams (fitPortions, usualPortions).
+  const whole = !!m.amount && m.amount !== 1 && !(m.servings && m.servings > 1);
+  const items = m.items.map((i) => {
+    const grams = i.grams * ratio, c = whole ? countOf({ ...i, grams: i.grams }) : null;
+    return c ? { ...i, grams: Math.max(1, Math.round(howMany(c, grams))) * gramsOfOne(c) } : { ...i, grams };
+  });
   // the portion is the foods' own weight, never rounded past it: a stored meal heavier than its foods is not read back
   return { id, title: m.title, items, portion: items.reduce((n, i) => n + i.grams, 0), savedAt };
 }
@@ -72,16 +85,32 @@ export function fromMeal(m: Meal, source: Source): PlannedMeal {
 }
 
 // Chef Mealan's starters: a few meals so a plan can start before any recipe exists. Removable later; seeded per market later.
-export const STARTERS: PlannedMeal[] = [
-  { title: "Skyr bowl with berries", kcal: 420, protein: 46, source: "starter" },
-  { title: "Oats, skyr and banana", kcal: 520, protein: 38, source: "starter" },
-  { title: "Omelette with bread", kcal: 450, protein: 34, source: "starter" },
-  { title: "Chicken, rice and greens", kcal: 640, protein: 52, source: "starter" },
-  { title: "Tuna salad wrap", kcal: 480, protein: 36, source: "starter" },
-  { title: "Protein pancakes", kcal: 520, protein: 44, source: "starter" },
-  { title: "Sarma", kcal: 410, protein: 21, source: "starter" },
-  { title: "Cottage cheese and fruit", kcal: 260, protein: 28, source: "starter" },
+// DT76 (0.2.76, board DT76, Anna's second run): each starter is its foods in grams, from the reference table, so a portion
+// says what to weigh (1½ portions: the grams times 1½), I ate it logs the foods, and the shopping list has them. Eggs and
+// bananas are counted, size M. The numbers come from the foods, close to what the starters said before. The amounts are
+// not locked: on the Plate, Chef Mealan may move them to fit the slot.
+const STARTER_FOODS: [string, [string, number][]][] = [
+  ["Skyr bowl with berries", [["skyr", 350], ["blueberries", 100], ["oats", 30], ["honey", 10]]],
+  ["Oats, skyr and banana", [["oats", 60], ["skyr", 200], ["banana", 118], ["milk-15", 100]]],
+  ["Omelette with bread", [["egg", 156], ["egg-white", 100], ["bread-wholegrain", 60], ["tomato", 100], ["olive-oil", 3]]],
+  ["Chicken, rice and greens", [["chicken-breast", 150], ["rice-white-cooked", 200], ["broccoli", 150], ["olive-oil", 10]]],
+  ["Tuna salad wrap", [["tortilla", 70], ["tuna-canned", 100], ["yogurt-greek", 50], ["lettuce", 40], ["tomato", 80], ["cucumber", 60], ["olive-oil", 8]]],
+  ["Protein pancakes", [["oats", 60], ["egg", 104], ["quark-lowfat", 150], ["blueberries", 80], ["milk-15", 50]]],
+  ["Sarma", [["cabbage", 150], ["beef-mince", 90], ["rice-white-raw", 25], ["onion", 30], ["tomato-passata", 80], ["olive-oil", 5]]],
+  ["Cottage cheese and fruit", [["cottage", 250], ["strawberries", 100]]],
 ];
+function starterOf(title: string, foods: [string, number][], k: number): PlannedMeal {
+  const items: Ingredient[] = foods.map(([id, grams], j) => {
+    const r = REFERENCE.find((x) => x.id === id);
+    if (!r) throw new Error(`starter food ${id} is not in the reference table`);
+    const food = referenceFood(r, null, () => `starter-${k}-${j}`);
+    const kind = kindOf(food.name);
+    return { id: `starter-${k}-${j}`, food, grams, locked: false, ...(kind ? { count: { kind, size: "M" as const } } : {}) };
+  });
+  const t = aggregate(items);
+  return { title, kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0), source: "starter", items, portion: Math.round(items.reduce((n, i) => n + i.grams, 0)) };
+}
+export const STARTERS: PlannedMeal[] = STARTER_FOODS.map(([t, f], k) => starterOf(t, f, k));
 
 // what a slot needs: the day's numbers shared out by slot, a snack half of a meal
 export const weightOf = (s: Slot) => (/snack/i.test(s.name) ? 0.5 : 1);
@@ -142,7 +171,7 @@ export const QUARTERS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 export function fitPortions(held: Record<string, PlannedMeal>, day: { kcal: number }): Record<string, PlannedMeal> {
   const ids = Object.keys(held).filter((id) => !held[id].skipped);
   if (!ids.length) return held;
-  const base = ids.map((id) => { const m = held[id], a = m.amount ?? 1; return { kcal: m.kcal / a, protein: m.protein / a }; });
+  const base = ids.map((id) => usualOf(held[id]));
   const { lo, hi } = bandOf(day.kcal);
   let best: { qs: number[]; key: number[] } | null = null;
   const less = (a: number[], b: number[]) => { for (let j = 0; j < a.length; j++) if (Math.abs(a[j] - b[j]) > 1e-9) return a[j] < b[j]; return false; };
@@ -163,16 +192,33 @@ export function fitPortions(held: Record<string, PlannedMeal>, day: { kcal: numb
   ids.forEach((id, j) => {
     const q = found ? found.qs[j] : 1, m = held[id];
     if (q === 1) { const { amount: _a, ...rest } = m; void _a; out[id] = { ...rest, kcal: Math.round(base[j].kcal), protein: Math.round(base[j].protein) }; }
-    else out[id] = { ...m, amount: q, kcal: Math.round(base[j].kcal * q), protein: Math.round(base[j].protein * q) };
+    else out[id] = counted({ ...m, amount: q, kcal: Math.round(base[j].kcal * q), protein: Math.round(base[j].protein * q) });
   });
   return out;
+}
+// a meal's numbers at one portion: from its foods when it has them (DT76: a fitted one may hold whole eggs), else divided back
+function usualOf(m: PlannedMeal): { kcal: number; protein: number } {
+  const a = m.amount ?? 1;
+  if (a === 1) return { kcal: m.kcal, protein: m.protein };
+  const { amount: _a, ...one } = m; void _a;
+  const p = m.items?.some((i) => countOf(i)) ? plannedPortion(one, "n", "") : null;
+  if (!p) return { kcal: m.kcal / a, protein: m.protein / a };
+  const t = aggregate(p.items);
+  return { kcal: t.calories ?? 0, protein: t.protein ?? 0 };
+}
+// DT76: a fitted meal with whole eggs or bananas counts at the grams it is weighed at
+function counted(m: PlannedMeal): PlannedMeal {
+  const p = m.items?.some((i) => countOf(i)) ? plannedPortion(m, "n", "") : null;
+  if (!p) return m;
+  const t = aggregate(p.items);
+  return { ...m, kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0) };
 }
 // back to the portions as saved
 export function usualPortions(held: Record<string, PlannedMeal>): Record<string, PlannedMeal> {
   const out: Record<string, PlannedMeal> = {};
   for (const [id, m] of Object.entries(held)) {
-    const a = m.amount ?? 1;
-    out[id] = a === 1 ? m : (({ amount: _a, ...rest }) => ({ ...rest, kcal: Math.round(m.kcal / a), protein: Math.round(m.protein / a) }))(m);
+    const a = m.amount ?? 1, u = usualOf(m);
+    out[id] = a === 1 ? m : (({ amount: _a, ...rest }) => ({ ...rest, kcal: Math.round(u.kcal), protein: Math.round(u.protein) }))(m);
   }
   return out;
 }

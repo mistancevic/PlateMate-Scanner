@@ -1,13 +1,14 @@
 import { carryReads } from "../carry";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { ChevronRight, ChefHat, Pencil, Circle, CircleCheck, CircleSlash, ShoppingBasket } from "lucide-react";
-import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, stateOf, shortMeals, byMeal, replanMeal, followPlan, notCounted, planChanges, updateList, type ShopStore, type SavedList, type ShopLine } from "../shopping";
+import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, shopAmount, stateOf, shortMeals, byMeal, replanMeal, followPlan, notCounted, planChanges, updateList, type ShopStore, type SavedList, type ShopLine } from "../shopping";
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
 import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
 import { rowsOf, slotsOf, slotsOn, trainingWhen, type Slot } from "../slots";
 import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
+import { countOf, countLabel } from "../counted";
 import { STARTERS, fitOf, fromMeal, leftOf, sumOf, plannedPortion, dayOff, proteinOff, bandOf, fitPortions, usualPortions, amountText, type PlannedMeal } from "../planned";
 import { CHEF_NAME } from "../components/Mark";
 import { PlanRow } from "../components/PlanRow";
@@ -290,10 +291,10 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
   const row = (l: SavedList, x: ShopLine, live: boolean, grams = x.grams, note = true) => {
     const st = stateOf(l, x.key);
     return (
-      <button key={x.key} type="button" className={`menu-row shop-row ${st === "got" ? "got" : st === "missing" ? "missing" : ""}`} aria-label={`${x.name}, ${grams} g${st === "got" ? ", in the basket" : st === "missing" ? ", not this time" : ""}`} disabled={!live} onClick={() => save(tickIn(store, l.n, x.key))}>
+      <button key={x.key} type="button" className={`menu-row shop-row ${st === "got" ? "got" : st === "missing" ? "missing" : ""}`} aria-label={`${x.name}, ${shopAmount(x.name, grams)}${st === "got" ? ", in the basket" : st === "missing" ? ", not this time" : ""}`} disabled={!live} onClick={() => save(tickIn(store, l.n, x.key))}>
         {st === "got" ? <CircleCheck size={20} /> : st === "missing" ? <CircleSlash size={20} /> : <Circle size={20} />}
         <div className="menu-row-text"><b>{x.name}</b>{note && <small>{x.added ? "Added · " : ""}{x.cooked ? `${x.cooked.toLocaleString("en")} g cooked · ` : ""}{x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? `${x.brand} · ` : ""}{forWhat(x)}</small>}{st === "missing" && <small className="shop-missing-note">Not this time</small>}</div>
-        <b className="shop-grams">{grams.toLocaleString("en")} g</b>
+        <b className="shop-grams">{shopAmount(x.name, grams)}</b>
       </button>
     );
   };
@@ -384,7 +385,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
           </>))}
         </>) : (<>
           <b className="shop-title">Shopping list {nextN}</b>
-          <p className="small shop-why">Which days is it for? It starts {start === today ? "today" : `${dayWord(start)} ${MONTHS[dt(start).getMonth()]}`}{store.lists.some((l) => l.to >= start) ? ", with the planned meals no list has counted yet" : start === today ? "" : ", the day after your last list"}.</p>
+          <p className="small shop-why">Which days is it for? It starts {start === today ? "today" : `${dayWord(start)} ${MONTHS[dt(start).getMonth()]}`}{store.lists.some((l) => l.to >= start) ? ", with the planned meals no list has counted yet" : start === today ? "" : store.lists.length ? ", the day after your last list" : ", the first day with meals planned"}.</p>
           <div className="moments" role="group" aria-label="Days">{DAY_CHOICES.map((n) => <button key={n} type="button" className={`choice ${span === n ? "on" : ""}`} onClick={() => setSpan(n)}>{n === 1 ? "1 day" : `${n} days`}</button>)}</div>
           <p className="small shop-why">{spanOf(days[0], days[days.length - 1])}: {preview.meals} planned {preview.meals === 1 ? "meal" : "meals"}, {preview.lines.length} {preview.lines.length === 1 ? "food" : "foods"}{store.carry ? `, plus ${store.carry.lines.length} from list ${store.carry.from}` : ""}.</p>
           <button type="button" className="pill pill-wide pill-primary shop-make" disabled={!preview.lines.length && !store.carry} onClick={() => save(makeList(store, p.planned, days, new Date().toISOString()))}>Make shopping list {nextN}</button>
@@ -411,11 +412,15 @@ function MealSheet({ p, slot, m, dayName, target, unit, close, swap, onPlate, ke
       <div className="sheet date-sheet meal-view" role="dialog" aria-label={`${slot.name}, ${m.title}`} onClick={(e) => e.stopPropagation()}>
         <div className="card-top"><span>{dayName === "today" ? "Today" : dayName.charAt(0).toUpperCase() + dayName.slice(1)}, {slot.name.toLowerCase()}, {slot.time}</span><button type="button" className="link" onClick={close}>Close</button></div>
         <b className="shop-title">{m.title}</b>
-        <p className="small shop-why">{m.note ?? "This day only. No recipe stands behind it."}</p>
+        {/* DT76: a starter says what it is and how much of it, then the foods to weigh, eggs and bananas counted */}
+        <p className="small shop-why">{m.note ?? (m.source === "starter" ? `${CHEF_NAME}'s starter${amountText(m) ? `, ${amountText(m)}` : ", one portion"}. These are the foods to weigh.` : "This day only. No recipe stands behind it.")}</p>
         <div className="menu-list shop-list">
-          {(portion?.items ?? []).map((i) => (
-            <div key={i.id} className="menu-row meal-view-row"><div className="menu-row-text"><b>{i.food.name}</b>{i.food.source === "estimate" && <small>{CHEF_NAME}'s estimate</small>}</div><b className="shop-grams">{Math.round(i.grams)} g</b></div>
-          ))}
+          {(portion?.items ?? []).map((i) => {
+            const c = countOf(i), cl = c ? countLabel(c, i.grams) : null;
+            return (
+              <div key={i.id} className="menu-row meal-view-row"><div className="menu-row-text"><b>{i.food.name}</b>{i.food.source === "estimate" && <small>{CHEF_NAME}'s estimate</small>}{cl && <small>{cl.small}</small>}</div><b className="shop-grams">{cl ? cl.main : `${Math.round(i.grams)} g`}</b></div>
+            );
+          })}
         </div>
         <p className="small meal-view-nums">{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</p>
         <div className="button-row"><button type="button" className="pill pill-small" onClick={swap}>Swap</button><button type="button" className="pill pill-small" onClick={keep}>Save in My recipes</button></div>

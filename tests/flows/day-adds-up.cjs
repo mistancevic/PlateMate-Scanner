@@ -8,6 +8,8 @@
 // either side (2,100: 1,900 to 2,300); off says how far from its edge; Fit the portions lands inside it in quarters and says
 // so; protein shows the person's range, and above it a quiet line; the slot line gives the PD of what is left, and the
 // picker judges against it, with no size mark.
+// Changed by story DT76 (Milan 23 October 07:17, board DT76): a starter is its foods in grams; a fitted one opens with the
+// grams to weigh at its portions, eggs counted, and the shopping list for the day has its foods.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -56,6 +58,8 @@ seed.meals = []; seed.items = []; seed.feedback = [];
   const sarmaMark = ((await sarma.locator(".pick-pd").textContent()) ?? "").replace(/\s+/g, " ");
   ok(/^PD [\d.]+/.test(sarmaMark) && !/fits/.test(sarmaMark), `a meal under the target never says fits, and its number says PD: "${sarmaMark}"`);
   ok(await page.locator(".pick-sheet .pick-pd.fits").count() >= 1, "a starter that does fit still says fits");
+  const kcalOf = async (name) => num(((await page.locator(".pick-sheet .pick-row", { hasText: name }).first().textContent()) ?? "").match(/([\d,]+) kcal/)[1]);
+  const kB = await kcalOf("Skyr bowl with berries");
   await page.locator(".pick-sheet").getByRole("button", { name: /Skyr bowl with berries/ }).click(); await page.waitForTimeout(400);
 
   await page.getByRole("button", { name: /Lunch at .*pick a meal/ }).click(); await page.waitForTimeout(400);
@@ -64,27 +68,40 @@ seed.meals = []; seed.items = []; seed.feedback = [];
   ok(/With the other meals planned, it has about [\d,]+ kcal and \d+ g of protein left/.test(why2) && need2 > 0, "the next slot counts what is already planned: " + why2.slice(0, 120));
   const left = why2.match(/about ([\d,]+) kcal and (\d+) g of protein left, PD (\d+\.\d)/);
   ok(!!left && Number(left[3]).toFixed(1) === (num(left[2]) / num(left[1]) * 100).toFixed(1), `its PD is the PD of what is left, not the day's: ${left && left.slice(1).join(", ")}`);
-  ok(Math.abs(need2 - (dayKcal - 420) / 2) <= 1, `lunch has the day less breakfast, shared with dinner: ${need2} = (${dayKcal} − 420) ÷ 2`);
+  ok(Math.abs(need2 - (dayKcal - kB) / 2) <= 1, `lunch has the day less breakfast, shared with dinner: ${need2} = (${dayKcal} − ${kB}) ÷ 2`);
   ok(need2 !== need1, `it moved: ${need1} before breakfast, ${need2} after`);
+  const kL = await kcalOf("Tuna salad wrap");
   await page.locator(".pick-sheet").getByRole("button", { name: /Tuna salad wrap/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: /Dinner at .*pick a meal/ }).click(); await page.waitForTimeout(400);
+  const kD = await kcalOf("Omelette with bread"), usual = kB + kL + kD;
   await page.locator(".pick-sheet").getByRole("button", { name: /Omelette with bread/ }).click(); await page.waitForTimeout(400);
 
-  // the whole day: 420 + 480 + 450 = 1,350 kcal against the day's target, more than a tenth short
+  // the whole day: the three starters added up (DT76: about 1,360 kcal) against the day's range, under it
   const sumKcal = () => txt(".plan-head .plan-row").then((t) => num(t.match(/([\d,]+)\s*of [\d,]+ to [\d,]+ kcal/)[1]));
-  ok(/all slots set/.test(await txt(".plan-head .plan-day-head small")) && await sumKcal() === 1350, "all slots set, 1,350 kcal planned");
+  ok(/all slots set/.test(await txt(".plan-head .plan-day-head small")) && await sumKcal() === usual, `all slots set, ${usual} kcal planned`);
   const off = await txt(".plan-off");
-  ok(new RegExp(`${(lo - 1350).toLocaleString("en")} kcal under ${dayName}'s range of ${lo.toLocaleString("en")} to ${hi.toLocaleString("en")} kcal`).test(off) && /Add a snack, or make the portions bigger/.test(off), "the day says it is under its range, by how much: " + off.slice(0, 90));
+  ok(new RegExp(`${(lo - usual).toLocaleString("en")} kcal under ${dayName}'s range of ${lo.toLocaleString("en")} to ${hi.toLocaleString("en")} kcal`).test(off) && /Add a snack, or make the portions bigger/.test(off), "the day says it is under its range, by how much: " + off.slice(0, 90));
   await page.getByRole("button", { name: `Fit the portions to ${dayName}` }).click(); await page.waitForTimeout(500);
   const after = await sumKcal();
   ok(after >= lo && after <= hi && await page.locator(".plan-off").count() === 0, `Fit the portions: the day lands inside its range, ${after} in ${lo} to ${hi} kcal, and the warning goes`);
   ok(new RegExp(`${dayName} is inside its range: ${after.toLocaleString("en")} kcal`).test(await txt(".toast, [role=status], body")), "the message says where the day landed");
   const amounts = (await page.locator(".plan-slot-wrap").allTextContents()).join(" ");
   ok(/(\d|½|¼|¾) portions?/.test(amounts) && !/\d\.\d+ portions/.test(amounts), "each meal says how much of it, in quarters: " + (amounts.match(/[\d½¼¾]+ portions?/g) || []).join(", "));
+  // DT76: a fitted starter opens with the foods to weigh; the shopping list has them
+  const fittedRow = page.locator(".plan-slot-wrap", { hasText: /portions/ }).first();
+  const fittedTitle = ((await fittedRow.locator(".plan-slot").first().getAttribute("aria-label")) ?? "").split(", ").slice(1).join(", ");
+  await fittedRow.getByRole("button", { name: new RegExp(fittedTitle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")) }).first().click(); await page.waitForTimeout(500);
+  const sheet = (await page.locator(".meal-view").count()) ? await txt(".meal-view") : "";
+  ok(/Chef Mealan's starter, [\d½¼¾]+ portions?\. These are the foods to weigh\./.test(sheet) && /\d+ g/.test(sheet), "a fitted starter opens with the foods to weigh: " + sheet.slice(0, 140));
+  await page.locator(".meal-view").getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Make a shopping list" }).click(); await page.waitForTimeout(500);
+  const shop = await txt(".sheet");
+  ok(!/0 foods/.test(shop) && await page.getByRole("button", { name: /^Make shopping list \d/ }).isEnabled(), "the shopping list has the starters' foods: " + shop.slice(0, 120));
+  await page.locator(".sheet").getByRole("button", { name: "Close" }).first().click(); await page.waitForTimeout(300);
   const note = await page.locator(".plan-protein-note").count() ? await txt(".plan-protein-note") : "";
   ok(/g of protein, above your range of \d+ to \d+ g\. That does no harm/.test(note), "protein above the range is said quietly: " + note.slice(0, 80));
   await page.getByRole("button", { name: "Back to the usual portions" }).click(); await page.waitForTimeout(500);
-  ok(await sumKcal() === 1350 && await page.locator(".plan-off").count() === 1 && await page.locator(".plan-protein-note").count() === 0, "Back to the usual portions: 1,350 kcal again, the warning back");
+  ok(await sumKcal() === usual && await page.locator(".plan-off").count() === 1 && await page.locator(".plan-protein-note").count() === 0, `Back to the usual portions: ${usual} kcal again, the warning back`);
 
   // Me: the average day is called that
   await page.getByRole("button", { name: "Menu" }).click(); await page.waitForTimeout(500);

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { shoppingList, shoppingText, shopGrams } from "./shopping";
+import { shoppingList, shoppingText, shopGrams, shopAmount } from "./shopping";
 
 const food = (name: string, brand = "") => ({ id: name, name, brand, basis: "100g", calories: 100, protein: 10, fats: 1, carbs: 10, fiber: 0, source: "label", notes: "", reviewedAt: "", readyToEat: true }) as any;
 const it = (f: any, grams: number) => ({ id: f.name + grams, food: f, grams, locked: true });
@@ -168,4 +168,11 @@ test("SL7: a list follows the plan's changes; a day shopped for keeps its meals 
   // the same meals never come on a next list again
   s = finishList(s, 2, false, "u");
   assert.notEqual(nextStart(s, "2026-10-20", plan), "2026-10-22");
+});
+test("DT76: eggs and bananas are bought by the piece", () => {
+  assert.equal(shopAmount("Egg, whole, raw", 210), "4 eggs");
+  assert.equal(shopAmount("Banana, raw", 120), "1 banana");
+  assert.equal(shopAmount("Banana, raw", 40), "1 banana");
+  assert.equal(shopAmount("Egg white, raw", 130), "130 g");
+  assert.equal(shopAmount("Oats, rolled", 1200), "1,200 g");
 });

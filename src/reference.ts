@@ -91,6 +91,8 @@ const R: [string, string, string, string, string, number, number, number, number
   ["kefir", "Kefir", "Kefir", "Kefir", "Кефир", 41, 3.3, 1.0, 4.5, 0, true, T],
   ["yogurt-plain", "Yogurt, plain, whole", "Naturjoghurt, 3,5 %", "Jogurt, 2,8 %", "Јогурт, 2,8 %", 61, 3.5, 3.3, 4.7, 0, true],
   ["yogurt-greek", "Greek yogurt, 2 %", "Griechischer Joghurt 2 %", "Grčki jogurt, 2 %", "Грчки јогурт, 2 %", 73, 9.9, 1.9, 3.9, 0, true],
+  // DT76 (0.2.76): skyr, for Chef Mealan's starters; not in SR Legacy, so typical values of plain skyr
+  ["skyr", "Skyr, natural", "Skyr, natur", "Skyr", "Скир", 63, 11.0, 0.2, 4.0, 0, true, T],
   ["quark-lowfat", "Quark, low fat", "Magerquark", "Posni sir (kvark)", "Посни сир (кварк)", 67, 12.0, 0.2, 4.0, 0, true],
   ["cottage", "Cottage cheese", "Hüttenkäse", "Svež sir, zrnasti", "Свеж сир, зрнасти", 98, 11.1, 4.3, 3.4, 0, true],
   ["white-cheese", "White cheese, brined (feta type)", "Feta / Weißkäse in Lake", "Beli sir, sitni", "Бели сир, ситни", 264, 14.2, 21.3, 4.1, 0, true],

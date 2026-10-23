@@ -3,6 +3,14 @@
 // foods saved (a starter) can't be counted, so the list names it instead of leaving it out quietly.
 import { plannedPortion, type Planned } from "./planned";
 import { rawOf } from "./reference";
+import { kindOf, KINDS } from "./counted";
+// DT76: eggs and bananas are bought by the piece: 210 g of eggs is 4 eggs (size M), at least one
+export function shopAmount(name: string, grams: number): string {
+  const k = kindOf(name);
+  if (!k) return `${grams.toLocaleString("en")} g`;
+  const n = Math.max(1, Math.round(grams / KINDS[k].sizes.M!));
+  return `${n} ${n === 1 ? KINDS[k].one : KINDS[k].many}`;
+}
 
 // SL4 (0.2.62): each food knows the meals it is for, so the list can say what it is for and show itself meal by meal
 export type ShopUse = { date: string; slot: string; title: string; grams: number };
@@ -49,7 +57,7 @@ export function shoppingList(planned: Planned, days: string[]): ShopList {
 // the list as text, to paste in a message or a note
 export function shoppingText(list: ShopList, span: string, ticked: Set<string>): string {
   const left = list.lines.filter((l) => !ticked.has(l.key));
-  return [`Shopping list, ${span}`, "", ...left.map((l) => `${l.name}${l.brand && !/typical values|generic|check your/i.test(l.brand) ? ` (${l.brand})` : ""}: ${l.grams.toLocaleString("en")} g`)].join("\n");
+  return [`Shopping list, ${span}`, "", ...left.map((l) => `${l.name}${l.brand && !/typical values|generic|check your/i.test(l.brand) ? ` (${l.brand})` : ""}: ${shopAmount(l.name, l.grams)}`)].join("\n");
 }
 
 // SL3 (0.2.61, Milan 16:46 to 16:50): a list is saved, named and dated: Shopping list 1, made on a day, for the days picked.
@@ -114,7 +122,7 @@ export function finishList(s: ShopStore, n: number, carry: boolean, at: string):
   return { lists: s.lists.map((x) => (x.n === n ? { ...x, doneAt: at } : x)), carry: carry && left.length ? { from: n, lines: left } : s.carry };
 }
 export function listText(l: SavedList, span: string): string {
-  const shown = (x: ShopLine) => `${x.name}${x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? ` (${x.brand})` : ""}: ${x.grams.toLocaleString("en")} g${x.cooked ? ` (${x.cooked.toLocaleString("en")} g cooked)` : ""}`;
+  const shown = (x: ShopLine) => `${x.name}${x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? ` (${x.brand})` : ""}: ${shopAmount(x.name, x.grams)}${x.cooked ? ` (${x.cooked.toLocaleString("en")} g cooked)` : ""}`;
   return [`Shopping list ${l.n}, ${span}`, "", ...notTicked(l).map((x) => shown(x) + ((l.missing ?? []).includes(x.key) ? " (not bought last time)" : ""))].join("\n");
 }
 

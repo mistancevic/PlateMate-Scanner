@@ -12,7 +12,9 @@ const sarma = meal("m3", "Sarma", [[/chicken/i, 800], [/^Rice/, 1200], [/^Oats/,
 seed.items = []; seed.meals = [crepes, sarma, pudding]; seed.feedback = [];
 seed.goals = { ...seed.goals, calories: 2800, protein: 180, fats: 93, carbs: 300 };
 const planned = (m, source) => { const w = m.items.reduce((s, i) => s + i.grams, 0), r = Math.min(1, m.portion / w); const k = m.items.reduce((s, i) => s + (i.food.calories * i.grams) / 100, 0) * r, p = m.items.reduce((s, i) => s + (i.food.protein * i.grams) / 100, 0) * r; return { title: m.title, kcal: Math.round(k), protein: Math.round(p), source, mealId: m.id, items: m.items, portion: m.portion }; };
-const starter = { title: "Chicken, rice and greens", kcal: 640, protein: 52, source: "starter" };
+// Changed by story DT76 (board DT76): every starter has its foods now; a meal without foods is one planned long ago under a
+// name no starter has any more, so the list still names it
+const starter = { title: "Lentil soup", kcal: 640, protein: 52, source: "starter" };
 const PLAN = {};
 ["20", "21", "22", "23", "24", "25", "26"].forEach((d, i) => { PLAN[`2026-10-${d}`] = { breakfast: planned(crepes, "mine"), lunch: i % 2 ? planned(sarma, "mine") : planned(pudding, "coach"), ...(i === 1 ? { dinner: starter } : {}) }; });
 const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
@@ -64,7 +66,7 @@ const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
   await sheet.getByRole("button", { name: "Make shopping list 1" }).click(); await page.waitForTimeout(400);
   const one = (await sheet.textContent()).replace(/\s+/g, " ");
   ok(/Made Tuesday 20 October, for Tuesday 20 to Monday 26 October: 15 planned meals, one portion each/.test(one), "SL3: named and dated: " + one.slice(0, 160));
-  ok(/Not on the list, no foods saved: Chicken, rice and greens \(Wednesday\)/.test(one), "SL1: the starter without foods is named");
+  ok(/Not on the list, no foods saved: Lentil soup \(Wednesday\)/.test(one), "SL1: the starter without foods is named");
   // Changed by story SL4 (0.2.62, Milan 17:15 to 18:29, board SL4): under each food, the meals it is for, not a count
   ok(await sheet.locator(".shop-row").count() === 8 && /Quark, low fat \(Magerquark\)\s*Chocolate quark pudding: Tue, Thu, Sat, Mon lunch\s*1,000 g/.test(await sheet.locator(".shop-row").nth(5).textContent()), "SL1, SL4: eight foods added up by name; quark 1,000 g says the four lunches it is for: " + (await sheet.locator(".shop-row").nth(5).textContent()));
   await sheet.locator(".shop-row").filter({ hasText: "Eggs" }).click(); await page.waitForTimeout(200);
@@ -88,7 +90,7 @@ const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
   const days = await sheet.locator(".shop-day .pick-group").allTextContents();
   const wed = sheet.locator(".shop-day").nth(1);
   ok(days.length === 7 && /Tuesday 20 October/i.test(days[0]) && /Breakfast · DaaM good protein crêpes/.test(await wed.locator(".shop-meal-head").first().textContent()) && /Lunch · Sarma\s*Short: Rice, white, raw/.test(await wed.locator(".shop-meal-head").nth(1).textContent()), "SL4: By meal, day by day, meals in their order, Wednesday's lunch short of rice");
-  ok(/Chicken, rice and greens: no foods saved/.test(await wed.textContent()), "SL4: the meal with no foods says so in its day");
+  ok(/Lentil soup: no foods saved/.test(await wed.textContent()), "SL4: the meal with no foods says so in its day");
   ok(await wed.locator(".shop-meal").nth(1).locator(".shop-row").count() === 3, "SL4: Sarma needs three foods, in its own grams");
   await sheet.getByRole("tab", { name: "By food" }).click(); await page.waitForTimeout(200);
   await sheet.getByRole("button", { name: "Copy the list" }).click(); await page.waitForTimeout(400);

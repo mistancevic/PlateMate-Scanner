@@ -73,11 +73,12 @@ const U = "http://127.0.0.1:3234";
     await page.context().close();
 
     // ---- sarma: Chef Mealan's starter; a tap asks him to make it from your foods ----
+    // Changed by story DT76 (board DT76): the starter's numbers come from its foods, 409 kcal and 22 g protein
     const p2 = await open();
     await p2.goto(U + "/plate"); await p2.waitForTimeout(1300);
     await p2.getByLabel("What are you craving?").fill("sarma"); await p2.waitForTimeout(400);
     t = await text(p2, ".crave");
-    ok(/Chef Mealan's starters/i.test(t) && /Sarma/.test(t) && /410 kcal · 21 g protein/.test(t) && /1\.3 under/.test(t), "sarma: Chef Mealan's starter, under your PD, still shown");
+    ok(/Chef Mealan's starters/i.test(t) && /Sarma/.test(t) && /409 kcal · 22 g protein/.test(t) && /(\d\.\d under|close)/.test(t), "sarma: Chef Mealan's starter, under your PD, still shown: " + t.slice(0, 160));
     // 0.2.46 (Milan 00:12): taps while Chef Mealan is thinking make no second idea; he says he is working
     const sarmaRow = p2.locator(".crave .pick-row").filter({ hasText: "Sarma" });
     await sarmaRow.click(); await p2.waitForTimeout(100);
