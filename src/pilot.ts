@@ -102,6 +102,8 @@ export function portionsIn(m: Meal): number {
 // R21 (0.2.49, board RS20): how many the recipe makes, as it says (12 fritters), else as the plate divides it; one portion is
 // the recipe divided by it, from the exact grams, on the Plate, Plan, the tile, the recipe page and Today alike
 export const servingsOf = (m: Pick<Meal, "items" | "portion" | "makes">): number => (m.makes?.n && m.makes.n >= 1 ? m.makes.n : portionsIn(m as Meal));
+// DT81: the foods of a recipe sized for n of what it makes (10 sarmas of 8: every food times 10/8)
+export const sizedFor = (m: Pick<Meal, "items" | "makes">, n: number): Ingredient[] => (m.makes && m.makes.n > 0 && n !== m.makes.n ? m.items.map((i) => ({ ...i, grams: (i.grams * n) / m.makes!.n })) : m.items);
 export function asDish(m: Meal): Ingredient[] {
   const of = servingsOf(m);
   if (m.items.length < 2 || of < 2) return structuredClone(m.items);
@@ -175,6 +177,11 @@ export type Meal = {
   shots?: string[];
   // how many the whole recipe makes, as read or guessed (IM3)
   makes?: { n: number; unit: string };
+  // DT81 (Milan 23 October 13:26 and 15:11): one recipe, a batch each time you cook it. cook: how many you will make next
+  // time (10 sarmas of a recipe that makes 8: every food times 10/8). batch: the last batch, sized for cooked and counted
+  // after: it made 11, so one sarma of it is a 11th of what was cooked
+  cook?: { n: number };
+  batch?: { cooked: number; made: number; at: string };
   // a swap or a side cooked and judged (IM5, IM5b): Did it work?
   tried?: { kind: "change" | "side"; what: string; result: "yes" | "ok" | "no"; at: string }[];
 };

@@ -22,25 +22,30 @@ export function buyAs(name: string, brand: string, grams: number, kcal?: number 
   const r = rawOf(name, kcal);
   return r ? { name: r.raw.en, brand: "", grams: grams * r.factor, cooked: grams } : { name, brand, grams };
 }
-export type ShopList = { days: string[]; meals: number; lines: ShopLine[]; without: { date: string; title: string }[]; batches?: { title: string; n: number; pieces: number; batches: number }[] };
+export type ShopList = { days: string[]; meals: number; lines: ShopLine[]; without: { date: string; title: string }[]; batches?: { title: string; n: number; pieces: number; batches: number; cook?: number }[] };
 
 // grams as a shop reads them: under 50 g to the gram, else to 10 g
 export const shopGrams = (g: number) => (g < 50 ? Math.max(1, Math.round(g)) : Math.round(g / 10) * 10);
 
-export function shoppingList(planned: Planned, days: string[]): ShopList {
+// DT81: cookOf says how many of a recipe you will cook next (Cook it on its page); the list buys for that batch
+export function shoppingList(planned: Planned, days: string[], cookOf?: (mealId: string) => number | undefined): ShopList {
   const by = new Map<string, ShopLine & { seen: Set<string> }>();
   const without: ShopList["without"] = [];
   let meals = 0;
   // DT79 (Milan 23 October 11:15): a batch recipe is cooked whole. Its pieces planned in these days are added up, and the list
   // buys whole batches: 7 sarmas planned of a recipe that makes 8 is one batch; 11 is two. Each meal still says its share.
   // Only a recipe that says what it makes (8 sarmas); one the Plate divided into portions is bought as its share.
-  const batch = new Map<string, { n: number; pieces: number; batches: number; title: string; items: PlannedMeal["items"] }>();
+  const batch = new Map<string, { n: number; pieces: number; batches: number; title: string; items: PlannedMeal["items"]; cook?: number }>();
   for (const d of days) for (const m of Object.values(planned[d] ?? {})) {
     if (m.skipped || !isBatch(m) || !m.unit || !m.mealId || !m.items?.length) continue;
     const b = batch.get(m.mealId) ?? { n: m.servings!, pieces: 0, batches: 0, title: m.title, items: m.items };
     b.pieces += m.amount ?? 1; batch.set(m.mealId, b);
   }
-  for (const b of batch.values()) b.batches = Math.max(1, Math.ceil(b.pieces / b.n - 1e-9));
+  for (const [id, b] of batch) {
+    b.batches = Math.max(1, Math.ceil(b.pieces / b.n - 1e-9));
+    const c = cookOf?.(id);
+    if (c && c >= b.pieces) b.cook = c;                                  // cooked as one batch of that size
+  }
   for (const d of days) {
     for (const [slot, m] of Object.entries(planned[d] ?? {})) {
       if (m.skipped) continue;
@@ -65,13 +70,13 @@ export function shoppingList(planned: Planned, days: string[]): ShopList {
   // a batch's foods: what its planned pieces take, topped up to the whole batches cooked
   for (const b of batch.values()) for (const i of b.items ?? []) {
     if (!(i.grams > 0) || !i.food?.name) continue;
-    const full = buyAs(i.food.name, i.food.brand ?? "", i.grams * b.batches, i.food.calories), share = buyAs(i.food.name, i.food.brand ?? "", i.grams * (b.pieces / b.n), i.food.calories);
+    const full = buyAs(i.food.name, i.food.brand ?? "", i.grams * (b.cook ? b.cook / b.n : b.batches), i.food.calories), share = buyAs(i.food.name, i.food.brand ?? "", i.grams * (b.pieces / b.n), i.food.calories);
     const line = by.get(`${full.name}|${full.brand}`.toLowerCase());
     if (!line) continue;
     line.grams += full.grams - share.grams;
     if (full.cooked && share.cooked) line.cooked = (line.cooked ?? 0) + full.cooked - share.cooked;
   }
-  const batches = [...batch.values()].map((b) => ({ title: b.title, n: b.n, pieces: b.pieces, batches: b.batches }));
+  const batches = [...batch.values()].map((b) => ({ title: b.title, n: b.n, pieces: b.pieces, batches: b.batches, ...(b.cook ? { cook: b.cook } : {}) }));
   const lines = [...by.values()].map(({ seen, ...l }) => ({ ...l, grams: shopGrams(l.grams), ...(l.cooked ? { cooked: shopGrams(l.cooked) } : {}), uses: (l.uses ?? []).map((u) => ({ ...u, grams: shopGrams(u.grams) })) })).sort((a, b) => a.name.localeCompare(b.name));
   return { days, meals, lines, without, ...(batches.length ? { batches } : {}) };
 }
@@ -105,10 +110,10 @@ export function nextStart(s: ShopStore, today: string, planned?: Planned): strin
   return after > today ? after : today;
 }
 export const daysFrom = (from: string, n: number) => Array.from({ length: n }, (_, i) => plusDay(from, i));
-export function makeList(s: ShopStore, planned: Planned, days: string[], madeAt: string): ShopStore {
+export function makeList(s: ShopStore, planned: Planned, days: string[], madeAt: string, cookOf?: (mealId: string) => number | undefined): ShopStore {
   // only the meals no list has counted yet: a day shopped for keeps its meals off, a meal added later comes on (SL7)
   const fresh = notCounted(s, planned, days);
-  const l = shoppingList(fresh, days);
+  const l = shoppingList(fresh, days, cookOf);
   const counted: Counted[] = days.flatMap((d) => Object.entries(fresh[d] ?? {}).filter(([, m]) => !m.skipped).map(([slot, m]) => ({ date: d, slot, title: m.title })));
   const n = s.lists.reduce((m, x) => Math.max(m, x.n), 0) + 1;
   const list: SavedList = { n, madeAt, from: days[0], to: days[days.length - 1], meals: l.meals, lines: l.lines, without: l.without, counted, carried: (s.carry?.lines ?? []).map((x) => ({ ...x, key: `c:${x.key.replace(/^c:/, "")}` })), carriedFrom: s.carry?.from ?? null, ticked: [] };

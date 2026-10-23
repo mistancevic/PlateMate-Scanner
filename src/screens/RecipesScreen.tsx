@@ -12,6 +12,9 @@ import type { Planned } from "../planned";
 
 // DT79 (Milan 23 October 11:15): a recipe that makes pieces says what the plan takes of it, from today on
 const WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+// DT81: how many pieces the plan takes from today, for Cook it's suggestion
+const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+function plannedCountOf(m: Meal, planned: Planned): number { return m.makes && m.makes.n >= 2 ? batchUse(planned, m.id, todayKey()).reduce((a, u) => a + u.n, 0) : 0; }
 function batchLine(m: Meal, planned: Planned): string | null {
   if (!m.makes || m.makes.n < 2) return null;
   const d = new Date(), today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
@@ -230,7 +233,7 @@ export function RecipesScreen(p: AppApi) {
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
-      <RecipePage key={opened.id} meal={opened} plannedLine={batchLine(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
+      <RecipePage key={opened.id} meal={opened} plannedLine={batchLine(opened, p.planned)} plannedCount={plannedCountOf(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
         pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
         top={landed && landed.id === opened.id ? (

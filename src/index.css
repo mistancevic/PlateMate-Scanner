@@ -2004,3 +2004,13 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .rq-makes input { width: 64px; }
 .rq-makes input + input { width: 140px; }
 .rq-makes small.muted { flex-basis: 100%; }
+/* DT81: the recipe's label, and Cook it */
+.rq-label { display: block; margin: -4px 0 10px; font-weight: 700; color: var(--brand-text); }
+.rq-label.muted { color: var(--muted); font-weight: 600; }
+.rq-cook { display: flex; flex-direction: column; gap: 8px; }
+.rq-cook-row { display: flex; align-items: center; gap: 12px; }
+.rq-cook-row button.icon { width: 36px; height: 36px; border-radius: 999px; border: 1.5px solid var(--line); background: var(--surface); font-size: 18px; font-weight: 900; line-height: 1; color: var(--brand-text); }
+.rq-cook-row button.icon:disabled { opacity: .4; }
+.rq-cook-row b { font-size: var(--fs-card); }
+.rq-cook .link { align-self: flex-start; }
+.rq-parts-open { align-self: flex-start; margin: 2px 0 8px; }

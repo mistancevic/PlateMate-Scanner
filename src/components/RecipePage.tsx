@@ -2,7 +2,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { tempsIn } from "../units";
 import { Camera, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import type { Feedback, Food, Ingredient, Meal, StepMark } from "../pilot";
-import { aggregate, density } from "../pilot";
+import { aggregate, density, sizedFor } from "../pilot";
 import { fmt, pdText } from "../ui";
 import { recipePhotosOf, withRecipePhotos } from "../photos";
 import { resizeImageBase64 } from "../utils/image";
@@ -35,7 +35,9 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, openOriginal, originalFoods, pdRef, fitPd, backLabel, plannedLine }: {
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, openOriginal, originalFoods, pdRef, fitPd, backLabel, plannedLine, plannedCount }: {
+  // DT81: how many of its pieces the plan takes from today, for Cook it's suggestion
+  plannedCount?: number;
   // DT79: what the plan takes of this batch, 8 sarmas: 3 on Monday lunch, 1 left
   plannedLine?: string | null;
   // R19 (0.2.47): opened from Today or Plan, the way back says so
@@ -91,6 +93,13 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   // DT80: Edit also says what the recipe makes, 8 sarmas; empty or 1, and the Plate divides it by weight as before
   const [edit, setEdit] = useState<{ items: Ingredient[]; steps: string[]; optional: NonNullable<Meal["optional"]>; makesN: string; makesUnit: string } | null>(null);
   const [newPart, setNewPart] = useState<string | null>(null);
+  // DT81: parts and optional foods in Edit only when the recipe has them, or on a tap
+  const [partsOpen, setPartsOpen] = useState(false);
+  const partsShown = partsOpen || meal.items.some((i) => i.part) || (meal.optional?.length ?? 0) > 0;
+  // DT81: how many to cook next time; the foods below follow it, eggs and bananas whole
+  const makesN = meal.makes && meal.makes.n >= 2 ? meal.makes.n : 0;
+  const cookN = makesN ? meal.cook?.n ?? makesN : 0;
+  const setCook = (n: number) => { if (!makesN) return; const c = Math.max(1, Math.min(200, n)); onPatch({ cook: c === makesN ? undefined : { n: c } }); };
   const [extraParts, setExtraParts] = useState<string[]>([]);
   const [find, setFind] = useState<string | null>(null);
   const items = edit ? edit.items : meal.items;
@@ -137,6 +146,9 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {naming !== null
         ? <input className="title-input rq-name-input" aria-label="Name of the recipe" autoFocus value={naming} onChange={(e) => setNaming(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" maxLength={80} />
         : <button type="button" className="rq-name" aria-label={`Rename ${meal.title}`} onClick={() => setNaming(meal.title)}>{meal.title}</button>}
+      {/* DT81 (Milan 23 October 12:48 to 15:11): what the whole recipe makes is its label, under the name */}
+      {makesN ? <small className="rq-label">The whole recipe makes {makesN} {meal.makes!.unit} · one {meal.makes!.unit.replace(/ies$/, "y").replace(/(?<!s)s$/, "")} {fmt((aggregate(meal.items).calories ?? 0) / makesN, 0)} kcal</small>
+        : serves > 1 ? <small className="rq-label muted">The whole recipe: {serves} portions by weight. Edit recipe can say what it makes.</small> : null}
       {top}
       {/* R8: the photos first */}
       {drawn
@@ -193,23 +205,37 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       <NutritionCard readoutOnly items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={null} pdRef={pdRef ?? null} fitPd={fitPd} />
       {/* IM21: one serving first, when the recipe makes more than one */}
       {/* RP2 (0.2.25): the three tiles gave way to the PD readout above the Nutrition table */}
+      {/* DT81: Cook it. The recipe stays as written; this batch can be bigger or smaller, and the foods below follow */}
+      {!edit && makesN > 0 && (
+        <section className="card rq-cook" aria-label="Cook it">
+          <b>Cook it</b>
+          <div className="rq-cook-row">
+            <button type="button" className="icon" aria-label={`One ${meal.makes!.unit.replace(/(?<!s)s$/, "")} less`} disabled={cookN <= 1} onClick={() => setCook(cookN - 1)}>−</button>
+            <b>{cookN} {meal.makes!.unit}</b>
+            <button type="button" className="icon" aria-label={`One ${meal.makes!.unit.replace(/(?<!s)s$/, "")} more`} onClick={() => setCook(cookN + 1)}>+</button>
+          </div>
+          <small className="muted">{cookN === makesN ? "As the recipe makes it." : `The recipe makes ${makesN}; the foods below are for ${cookN}.`}</small>
+          {!!plannedCount && plannedCount !== cookN && <button type="button" className="link rq-cook-plan" onClick={() => setCook(plannedCount)}>The plan takes {plannedCount}: cook {plannedCount}</button>}
+          {cookN !== makesN && <button type="button" className="link rq-cook-back" onClick={() => setCook(makesN)}>Back to {makesN}, as written</button>}
+        </section>
+      )}
       <section className={`card rq-foods ${edit ? "editing" : ""}`}>
         <b>Foods</b>
-        {!edit && meal.makes && !meal.source && <small className="muted rq-makes-line">Makes {meal.makes.n} {meal.makes.unit}.</small>}
         {edit && (
           <div className="rq-makes" role="group" aria-label="What the recipe makes">
-            <small>Makes</small>
+            <small>The whole recipe makes</small>
             <input inputMode="numeric" aria-label="How many it makes" placeholder="8" value={edit.makesN} onChange={(e) => setEdit({ ...edit, makesN: e.target.value.replace(/[^\d]/g, "").slice(0, 3) })} />
             <input aria-label="Of what" placeholder="sarmas" value={edit.makesUnit} maxLength={24} onChange={(e) => setEdit({ ...edit, makesUnit: e.target.value })} />
-            <small className="muted">Plan counts it in these, and the shopping list buys the whole batch. Empty: the Plate divides it by weight.</small>
+            <small className="muted">Cooked as written. Plan counts it in these, and each meal takes as many as it needs. Empty: the Plate divides it by weight.</small>
           </div>
         )}
-        {edit && <div className="pt-h pt-mode"><span><small>Parts: give a food its part, or make it optional. Optional foods stay out of the numbers.</small></span><span className="pt-acts">{newPart === null ? <button className="link" onClick={() => setNewPart("")}>New part</button> : <input className="pt-new" autoFocus aria-label="Name of the new part" placeholder="Topping" value={newPart} onChange={(e) => setNewPart(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = cleanPart(newPart); if (v) setExtraParts((l) => [...l, v]); setNewPart(null); } }} onBlur={() => setNewPart(null)} />}</span></div>}
-        {items.map((it, k) => {
+        {edit && !partsShown && <button type="button" className="link rq-parts-open" onClick={() => setPartsOpen(true)}>Parts and optional foods</button>}
+        {edit && partsShown && <div className="pt-h pt-mode"><span><small>Parts: give a food its part, or make it optional. Optional foods stay out of the numbers.</small></span><span className="pt-acts">{newPart === null ? <button className="link" onClick={() => setNewPart("")}>New part</button> : <input className="pt-new" autoFocus aria-label="Name of the new part" placeholder="Topping" value={newPart} onChange={(e) => setNewPart(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = cleanPart(newPart); if (v) setExtraParts((l) => [...l, v]); setNewPart(null); } }} onBlur={() => setNewPart(null)} />}</span></div>}
+        {(edit || !cookN || cookN === makesN ? items : sizedFor(meal, cookN)).map((it, k) => {
           const head = !edit && it.part && (k === 0 || items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{it.part}</div> : null;
           return [head, (
           <div className="sheet-row rq-food" key={it.id}>
-            {edit ? <span className="rq-food-edit"><small>{it.food.name}</small><span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>Optional</button></span></span> : <small>{it.food.name}{it.fry && <span className="rq-fry">{it.fry.written ? `${it.fry.written}, for frying` : "For frying"}. {countedLine(`${fmt(it.grams, 0)} g`)}.</span>}</small>}            {edit
+            {edit ? <span className="rq-food-edit"><small>{it.food.name}</small>{partsShown && <span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>Optional</button></span>}</span> : <small>{it.food.name}{it.fry && <span className="rq-fry">{it.fry.written ? `${it.fry.written}, for frying` : "For frying"}. {countedLine(`${fmt(it.grams, 0)} g`)}.</span>}</small>}            {edit
               ? <span className="rq-grams">
                   <input inputMode="numeric" aria-label={`Grams of ${it.food.name}`} value={String(it.grams || "")} onChange={(e) => { const g = Math.min(5000, Number(e.target.value.replace(/[^\d]/g, "")) || 0); setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, grams: g } : x)) }); }} /> g
                   <button className="rq-x" aria-label={`Remove ${it.food.name}`} onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k) })}><X size={14} /></button>

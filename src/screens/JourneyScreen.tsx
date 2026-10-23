@@ -5,7 +5,7 @@ import { tempsIn } from "../units";
 import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 import { ConfirmButton } from "../components/Confirm";
 import type { Mix } from "../mixtip";
-import { aggregate, density, uid, solveIngredient, servingLabel } from "../pilot";
+import { aggregate, density, uid, solveIngredient, servingLabel, sizedFor } from "../pilot";
 import { fromMeal } from "../planned";
 import type { Meal, Food, Ingredient, PlateOpt, StepMark } from "../pilot";
 import { pairItems, partsOf, optAt, optToItem, itemToOpt, canLeaveOut, leanFood } from "../parts";
@@ -123,7 +123,10 @@ export function JourneyScreen(p: AppApi) {
   // R25 (0.2.53, board RS25): how many of a whole recipe were eaten, starting on one; a big meal is checked once
   const [eatN, setEatN] = useState(1);
   const [bigAsk, setBigAsk] = useState(false);
-  const resetMade = () => { setPhotos([]); setWent("as"); setDifferent(""); setAte("all"); setSaveRecipe(true); setEatN(1); setBigAsk(false); };
+  // DT81: how many the batch made, counted after cooking (null: as cooked); a new recipe's number, asked when it is saved
+  const [madeN, setMadeN] = useState<number | null>(null), [keepMade, setKeepMade] = useState(false);
+  const [newMakesN, setNewMakesN] = useState(""), [newMakesUnit, setNewMakesUnit] = useState("");
+  const resetMade = () => { setPhotos([]); setWent("as"); setDifferent(""); setAte("all"); setSaveRecipe(true); setEatN(1); setBigAsk(false); setMadeN(null); setKeepMade(false); setNewMakesN(""); setNewMakesUnit(""); };
   const [method, setMethod] = useState<string | null>(null);
   // after Add in the tip at the recipe step, Mealan refits with the new food on the plate
   const [refit, setRefit] = useState(false);
@@ -466,11 +469,12 @@ export function JourneyScreen(p: AppApi) {
   const unitOf = (m: Meal) => m.makes?.unit || "portions", oneOf = (m: Meal) => unitOf(m).replace(/s$/, "");
   const portionItems = (m: Meal, mode: "whole" | "sized" | "recipe"): Ingredient[] => {
     const whole = m.items.map((i) => ({ ...i, dish: undefined }));
-    const list = mode === "whole" ? whole : mode === "sized" && mealNeed ? scaleTo(whole, mealNeed) : onePortion(whole, m.makes?.n ?? 1);
+    // DT81: the whole recipe goes on the plate as the batch you cook (Cook it on its page: 10 sarmas of 8)
+    const list = mode === "whole" ? (m.cook && m.makes ? sizedFor({ ...m, items: whole }, m.cook.n) : whole) : mode === "sized" && mealNeed ? scaleTo(whole, mealNeed) : onePortion(whole, m.makes?.n ?? 1);
     return list.map((i) => ({ ...i, id: uid(), locked: false }));
   };
   // the recipe on the plate at a portion: its foods, its optional foods at the same share, no part left out (IM12, IM13)
-  const factorOf = (m: Meal, mode: "whole" | "sized" | "recipe") => (mode === "whole" ? 1 : mode === "sized" && mealNeed && kcalOfItems(m.items) > 0 ? mealNeed / kcalOfItems(m.items) : 1 / (m.makes?.n ?? 1));
+  const factorOf = (m: Meal, mode: "whole" | "sized" | "recipe") => (mode === "whole" ? (m.cook && m.makes ? m.cook.n / m.makes.n : 1) : mode === "sized" && mealNeed && kcalOfItems(m.items) > 0 ? mealNeed / kcalOfItems(m.items) : 1 / (m.makes?.n ?? 1));
   const recipePlate = (m: Meal, mode: "whole" | "sized" | "recipe") => ({ items: portionItems(m, mode), optional: optAt(m.optional, factorOf(m, mode), uid), leftOut: undefined, emptyParts: undefined });
   // R15: a recipe starts whole, as mapped, unless the plate fills a meal of the Plan
   const modeFor = (m: Meal): "whole" | "sized" | "recipe" => (!p.filling && (m.makes?.n ?? 1) >= 2 ? "whole" : sizedFits(mealNeed, kcalOfItems(m.items) / (m.makes?.n ?? 1)) ? "sized" : "recipe");
@@ -1114,7 +1118,8 @@ export function JourneyScreen(p: AppApi) {
   const yours = !rec?.makes || wholePlate ? 1 : sizedPlate ? yourPortions(kcalOfItems(rec.items), kcalOfItems(items)) : rec.makes.n;
   const leftK = yours - 1;
   // R25: the whole recipe on the plate, counted; what one is; what is eaten; the day's kcal for the big meal check
-  const wholeN = wholePlate ? rec!.makes!.n : 0;
+  const cookCount = rec?.makes ? rec.cook?.n ?? rec.makes.n : 0;
+  const wholeN = wholePlate ? madeN ?? cookCount : 0;
   const perOne = wholeN > 1 ? kcalOfItems(items) / wholeN : 0;
   const eatenKcal = wholeN > 1 ? perOne * eatN : kcalOfItems(items);
   const dayKcal = p.todayKcal ?? state.goals.calories ?? null;
@@ -1268,6 +1273,14 @@ export function JourneyScreen(p: AppApi) {
         {/* R25 (0.2.53, board RS25): a whole recipe that makes several is counted, starting on one, never logged whole by
             accident; the rest is said, not followed (R16) */}
         {wholeN > 1 && rec ? <>
+          {/* DT81: count what the batch really made; one of them is then that share of what was cooked */}
+          <div className="eat-count made-count" role="group" aria-label="How many it made">
+            <small className="muted">Counted them? It made</small>
+            <button type="button" className="pill pill-small" aria-label="It made one less" disabled={wholeN <= 2} onClick={() => { setMadeN(wholeN - 1); setEatN((k) => Math.min(k, wholeN - 1)); }}>−</button>
+            <b aria-live="polite">{wholeN}</b><span>{unitOf(rec)}</span>
+            <button type="button" className="pill pill-small" aria-label="It made one more" onClick={() => setMadeN(wholeN + 1)}>+</button>
+          </div>
+          {wholeN !== cookCount && cookCount === rec.makes!.n && <button type="button" className={`choice ${keepMade ? "on" : ""}`} aria-pressed={keepMade} onClick={() => setKeepMade(!keepMade)}>It always makes {wholeN}: make {wholeN} the recipe's number</button>}
           <p className="label">You made {countOf(wholeN, unitOf(rec))}. How many did you eat?</p>
           <div className="eat-count" role="group" aria-label="How many did you eat?">
             <button type="button" className="pill pill-small" aria-label="One less" disabled={ate !== "all" || eatN <= 1} onClick={() => { setEatN((k) => Math.max(1, k - 1)); setBigAsk(false); }}>−</button>
@@ -1367,6 +1380,15 @@ export function JourneyScreen(p: AppApi) {
           <button className={`choice ${saveRecipe ? "on" : ""}`} onClick={() => setSaveRecipe(true)}>Yes, save it</button>
           <button className={`choice ${!saveRecipe ? "on" : ""}`} onClick={() => setSaveRecipe(false)}>Not this one</button>
         </div>
+        {/* DT81: a recipe made from scratch gets its number here: what these foods made */}
+        {saveRecipe && !chgW && !fromRec && (
+          <div className="rq-makes" role="group" aria-label="What it makes">
+            <small>It makes</small>
+            <input inputMode="numeric" aria-label="How many it makes" placeholder="10" value={newMakesN} onChange={(e) => setNewMakesN(e.target.value.replace(/[^\d]/g, "").slice(0, 3))} />
+            <input aria-label="Of what" placeholder="sarmas" value={newMakesUnit} maxLength={24} onChange={(e) => setNewMakesUnit(e.target.value)} />
+            <small className="muted">If you made several, say how many: Plan then counts them. Empty: one meal.</small>
+          </div>
+        )}
       </section>}
       {sharing && p.profile.coachId && (
         <div className="reasons">
@@ -1396,7 +1418,11 @@ export function JourneyScreen(p: AppApi) {
         // the portion is the sum of the very grams kept, never a hair above them: a stored meal heavier than its foods is not read back
         const eatenItems = wholeN > 1 && eatN < wholeN ? meal.items.map((i) => ({ ...i, grams: (i.grams * eatN) / wholeN })) : null;
         const eatenMeal: Meal = eatenItems ? { ...meal, items: eatenItems, portion: eatenItems.reduce((n, i) => n + i.grams, 0) } : meal;
-        const kept: Meal = chgKept ?? { ...meal, items: keptItems, portion: keptItems.reduce((n, i) => n + i.grams, 0), ...(keptOpt.length ? { optional: keptOpt } : {}) };
+        // DT81: a recipe from scratch keeps what it made, when said: It makes 10 sarmas
+        const mk = Math.round(Number(newMakesN) || 0), mkTyped = newMakesUnit.trim().toLowerCase() || "portions";
+        const newMakes = !chgKept && !fromRec && mk >= 2 && mk <= 100 ? { n: mk, unit: /s$/.test(mkTyped) ? mkTyped : `${mkTyped}s` } : null;
+        const keptWeight = keptItems.reduce((n, i) => n + i.grams, 0);
+        const kept: Meal = chgKept ?? { ...meal, items: keptItems, portion: newMakes ? Math.round(keptWeight / newMakes.n) : keptWeight, ...(newMakes ? { makes: newMakes } : {}), ...(keptOpt.length ? { optional: keptOpt } : {}) };
         const triedNow = tryCtx && tried ? { kind: tryCtx.kind, what: tryCtx.what, result: tried } : undefined;
         const status = good === "no" ? "not-used" : "eaten";
         const taste = TASTE[good!];
@@ -1416,6 +1442,13 @@ export function JourneyScreen(p: AppApi) {
         const leftN = wholeN > 1 ? wholeN - eatN : madeWhole && rec?.makes ? Math.max(0, leftK) : 0;
         const landLine = status !== "eaten" ? "" : [`You ate ${wholeN > 1 && rec ? (eatN === wholeN ? `all ${wholeN}` : countOf(eatN, unitOf(rec))) : rec && pmode === "recipe" && !way ? `1 ${oneOf(rec)}` : "your plate"}.`, leftN > 0 ? `${sizedPlate ? leftWords(leftN) : countOf(leftN, unitOf(rec!))} left: to eat ${leftN === 1 ? "it" : "them"} on other days, put the recipe on Plan.` : "", chgKept && fromRec ? `The original, ${fromRec.title}, stays as it was.` : ""].filter(Boolean).join(" ");
         setState((s) => ({ ...s, fromRecipe: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)).map((m) => (m.idea && status === "eaten" && (m.id === origin?.id || m.id === fromRec?.id || m.id === landId) ? { ...m, idea: undefined } : m)), feedback: [{ id: uid(), meal: structuredClone(eatenMeal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : pickSlot ? { date: todayKey, slotId: pickSlot.id, name: pickSlot.name, time: pickSlot.time } : undefined, ...(p.filling?.mode !== "eat" && !pickSlot && mealSlot ? { which: capName(mealSlot.name) } : {}), createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));
+        // DT81: the batch just made, counted: Plan's pieces of it are its share; or it always makes this many, the recipe's number
+        if (status === "eaten" && wholeN > 1 && rec?.makes) {
+          const made = wholeN, cooked = cookCount, recId = rec.id;
+          setState((s) => ({ ...s, meals: s.meals.map((m) => m.id !== recId ? m
+            : keepMade ? { ...m, makes: { ...m.makes!, n: made }, portion: Math.round(m.items.reduce((k, i) => k + i.grams, 0) / made), batch: undefined, cook: undefined }
+            : { ...m, batch: { cooked, made, at: new Date().toISOString() }, cook: undefined }) }));
+        }
         if (p.filling) p.setFilling(null);
         setWay(null); setTried(null);
         setMakeAll(null); setTicks(new Set()); setMkDraft(""); setMkDrafted(false);

@@ -43,7 +43,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", po
   await page.getByLabel("How many it makes").fill("8"); await page.getByLabel("Of what").fill("sarma");
   await page.getByRole("button", { name: "Save changes" }).click(); await page.waitForTimeout(800);
   const pageText = await txt(".rq");
-  ok(/Makes 8 sarmas\./.test(pageText) && /One sarma/.test(pageText), "the page: Makes 8 sarmas, and one sarma's numbers: " + pageText.slice(0, 200));
+  ok(/The whole recipe makes 8 sarmas · one sarma \d+ kcal/.test(pageText) && /One sarma/.test(pageText), "the page: Makes 8 sarmas, and one sarma's numbers: " + pageText.slice(0, 200));
   ok(/^8 sarmas: \d+ on \w+ lunch\. \d+ sarmas? left\./.test(await txt(".rq-planned")), "the page says what the plan takes: " + await txt(".rq-planned"));
   // Plan: the lunch is now in sarmas, about the same kcal
   await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(700);

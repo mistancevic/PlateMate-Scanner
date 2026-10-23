@@ -284,7 +284,8 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
   const madeOn = (iso: string) => { const d = new Date(iso); return `${WEEKDAY[(d.getDay() + 6) % 7]} ${d.getDate()} ${MONTHS[d.getMonth()]}`; };
   const start = nextStart(store, today, p.planned);
   const days = daysFrom(start, span);
-  const preview = shoppingList(notCounted(store, p.planned, days), days);
+  const cookOf = (id: string) => p.state.meals.find((x) => x.id === id)?.cook?.n;
+  const preview = shoppingList(notCounted(store, p.planned, days), days, cookOf);
   const nextN = store.lists.reduce((m, x) => Math.max(m, x.n), 0) + 1;
   const shown = reading !== null ? store.lists.find((l) => l.n === reading) ?? null : open;
   // SL4: what each food is for, and the list meal by meal; a tap goes to buy, in the basket, not this time
@@ -398,8 +399,8 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
           <div className="moments" role="group" aria-label="Days">{DAY_CHOICES.map((n) => <button key={n} type="button" className={`choice ${span === n ? "on" : ""}`} onClick={() => setSpan(n)}>{n === 1 ? "1 day" : `${n} days`}</button>)}</div>
           <p className="small shop-why">{spanOf(days[0], days[days.length - 1])}: {preview.meals} planned {preview.meals === 1 ? "meal" : "meals"}, {preview.lines.length} {preview.lines.length === 1 ? "food" : "foods"}{store.carry ? `, plus ${store.carry.lines.length} from list ${store.carry.from}` : ""}.</p>
           {/* DT79: a batch recipe is bought whole */}
-          {(preview.batches ?? []).map((b) => <p key={b.title} className="small shop-why shop-batch">{b.title}: {b.batches === 1 ? "one batch" : `${b.batches} batches`} of {b.n}, for the {b.pieces} planned.{b.batches * b.n - b.pieces > 0 ? ` ${b.batches * b.n - b.pieces} left over.` : ""}</p>)}
-          <button type="button" className="pill pill-wide pill-primary shop-make" disabled={!preview.lines.length && !store.carry} onClick={() => save(makeList(store, p.planned, days, new Date().toISOString()))}>Make shopping list {nextN}</button>
+          {(preview.batches ?? []).map((b) => <p key={b.title} className="small shop-why shop-batch">{b.cook ? <>{b.title}: cook {b.cook}, for the {b.pieces} planned.{b.cook - b.pieces > 0 ? ` ${b.cook - b.pieces} left over.` : ""}</> : <>{b.title}: {b.batches === 1 ? "one batch" : `${b.batches} batches`} of {b.n}, for the {b.pieces} planned.{b.batches * b.n - b.pieces > 0 ? ` ${b.batches * b.n - b.pieces} left over.` : ""}</>}</p>)}
+          <button type="button" className="pill pill-wide pill-primary shop-make" disabled={!preview.lines.length && !store.carry} onClick={() => save(makeList(store, p.planned, days, new Date().toISOString(), cookOf))}>Make shopping list {nextN}</button>
         </>)}
         {reading === null && store.lists.some((l) => l.doneAt) && (<>
           <small className="pick-group">Earlier lists</small>
