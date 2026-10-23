@@ -246,6 +246,8 @@ export function findReference(query: string, limit = 6, wordStartOnly = false): 
       else if (n.startsWith(q)) best = Math.max(best, 80);
       else if (n.split(/[\s,()]+/).some((w) => w.startsWith(q))) best = Math.max(best, 60);
       else if (!wordStartOnly && n.includes(q)) best = Math.max(best, 30);
+      // DT81 (Milan 23 October 15:51): words in any order, "raw rice" finds Rice, white, raw; every word starts a word of the name
+      else if (/\s/.test(q)) { const ws = n.split(/[\s,()]+/); if (q.split(/\s+/).filter(Boolean).every((t) => ws.some((w) => w.startsWith(t)))) best = Math.max(best, 50); }
     }
     return best;
   };

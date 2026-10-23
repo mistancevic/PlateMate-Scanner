@@ -3,6 +3,7 @@ import { tempsIn } from "../units";
 import { Camera, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import type { Feedback, Food, Ingredient, Meal, StepMark } from "../pilot";
 import { aggregate, density, sizedFor } from "../pilot";
+import { findReference, referenceFood } from "../reference";
 import { fmt, pdText } from "../ui";
 import { recipePhotosOf, withRecipePhotos } from "../photos";
 import { resizeImageBase64 } from "../utils/image";
@@ -124,6 +125,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
     onPatch({ items: kept, makes, portion: makes ? Math.round(total / makes.n) : total, steps, optional: edit.optional.length ? edit.optional : undefined, ...(same ? {} : { stepMarks: undefined, stepsKitchen: undefined, stepParts: undefined }) });
     setEdit(null); setFind(null);
   };
+  // DT81 (Milan 23 October 15:51): the search also finds foods without a label (raw rice, cabbage), not only My foods
+  const refMatches = find === null || find.trim().length < 2 ? [] : findReference(find.trim(), 6, find.trim().length < 3).filter((r) => !foods.some((f) => f.name.toLowerCase() === r.en.toLowerCase()) && !items.some((i) => i.food.name.toLowerCase() === r.en.toLowerCase()));
   const matches = find === null ? [] : foods.filter((f) => !items.some((i) => i.food.id === f.id) && (!find.trim() || f.name.toLowerCase().includes(find.trim().toLowerCase()))).slice(0, 8);
   const live = state === "live" && pub;
   // ---- the steps, drafted by Chef Mealan (CH5): shown to read, kept only with Keep these steps ----
@@ -255,7 +258,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
             <div className="rq-find">
               <input autoFocus placeholder="Search my foods" aria-label="Search my foods" value={find} onChange={(e) => setFind(e.target.value)} />
               {matches.map((f) => <button key={f.id} className="rq-find-row" onClick={() => { setEdit({ ...edit, items: [...edit.items, { id: uid(), food: f, grams: 100, locked: false }] }); setFind(null); }}><span>{f.name}</span><small>{fmt(f.calories, 0)} kcal · {fmt(f.protein, 1)} g protein per 100 g</small></button>)}
-              {matches.length === 0 && <small className="muted">No food with that name. Foods come from Foods in the menu, or a scan on the Plate.</small>}
+              {refMatches.map((r) => <button key={r.id} className="rq-find-row" onClick={() => { setEdit({ ...edit, items: [...edit.items, { id: uid(), food: referenceFood(r, null, uid), grams: 100, locked: false }] }); setFind(null); }}><span>{r.en}</span><small>{fmt(r.kcal, 0)} kcal · {r.protein} g protein per 100 g · a food without a label</small></button>)}
+              {matches.length === 0 && refMatches.length === 0 && <small className="muted">No food with that name. Foods come from Foods in the menu, or a scan on the Plate.</small>}
               <button className="link" onClick={() => setFind(null)}>Close the search</button>
             </div>
           ))}
