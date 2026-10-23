@@ -26,6 +26,7 @@ import { partsOf, cleanPart, leanFood } from "../parts";
 import { NutritionCard } from "./NutritionCard";
 import { CarryBlock } from "./CarryBlock";
 import { portionsIn } from "../pilot";
+import { changeOf, sameKind, swapChoices, type SwapWay } from "../swap";
 
 // The recipe's own page in the app (0.2.5+r11, canvas board S3, R8 to R11, approved 12 October 2026). Photos first: the
 // cover large, every photo with × to delete, ‹ › to move the picked one (first place is the cover), Add. Then the name
@@ -103,18 +104,29 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const setCook = (n: number) => { if (!makesN) return; const c = Math.max(1, Math.min(200, n)); onPatch({ cook: c === makesN ? undefined : { n: c } }); };
   const [extraParts, setExtraParts] = useState<string[]>([]);
   const [find, setFind] = useState<string | null>(null);
+  // DT83 (Milan 23 October 16:49 and 20:00): Swap on a food, the same energy or the same weight; Remove then Add asks if the
+  // new food takes the removed one's place; a food added on its own asks for its grams; Undo takes back the last change
+  const [swapAt, setSwapAt] = useState<string | null>(null);
+  const [pick, setPick] = useState<{ food: Food; old: Ingredient; at: number; mode: "swap" | "after-remove" } | null>(null);
+  const [removed, setRemoved] = useState<{ item: Ingredient; at: number } | null>(null);
+  const [undo, setUndo] = useState<Ingredient[][]>([]);
+  const [fresh, setFresh] = useState<string[]>([]);
+  const [need, setNeed] = useState<string | null>(null);
   const items = edit ? edit.items : meal.items;
   const sum = aggregate(items.filter((i) => i.grams > 0));
   // how many servings the numbers are for (IM21): the recipe's own count, or the portions the plate divides it into
   const serves = meal.makes?.n ?? portionsIn(meal);
   const oneWord = meal.makes ? meal.makes.unit.replace(/s$/, "") : "portion";
   const pd = density(sum.protein, sum.calories);
-  const startEdit = () => { setEdit({ items: meal.items.map((i) => ({ ...i })), steps: [...(meal.steps ?? [])], optional: [...(meal.optional ?? [])], makesN: meal.makes ? String(meal.makes.n) : "", makesUnit: meal.makes?.unit ?? "" }); setFind(null); setExtraParts([]); };
+  const resetSwap = () => { setSwapAt(null); setPick(null); setRemoved(null); setUndo([]); setFresh([]); setNeed(null); };
+  const startEdit = () => { resetSwap(); setEdit({ items: meal.items.map((i) => ({ ...i })), steps: [...(meal.steps ?? [])], optional: [...(meal.optional ?? [])], makesN: meal.makes ? String(meal.makes.n) : "", makesUnit: meal.makes?.unit ?? "" }); setFind(null); setExtraParts([]); };
   // parts in Edit recipe (0.2.19, IM18): each food's part, a new part, optional on and off
   const editParts = edit ? [...new Set([...partsOf(edit.items, edit.optional), ...extraParts])] : [];
   const PartPick = ({ value, onPick }: { value: string; onPick: (v: string) => void }) => <select className="pt-chip pt-select" aria-label="Part" value={value} onChange={(e) => onPick(e.target.value)}><option value="">No part</option>{[...new Set([...editParts, ...(value ? [value] : [])])].map((x) => <option key={x} value={x}>{x}</option>)}</select>;
   const save = () => {
     if (!edit) return;
+    const missing = edit.items.find((i) => fresh.includes(i.id) && !(i.grams > 0));
+    if (missing) { setNeed(missing.food.name); return; }
     const kept = edit.items.filter((i) => i.grams > 0);
     if (!kept.length) return;
     const steps = edit.steps.map((x) => x.replace(/\s+/g, " ").trim()).filter(Boolean).slice(0, 30), total = kept.reduce((n, i) => n + i.grams, 0);
@@ -123,8 +135,33 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
     const n = Math.round(Number(edit.makesN) || 0), typed = edit.makesUnit.trim().toLowerCase() || "portions", unit = /s$/.test(typed) ? typed : `${typed}s`;
     const makes = n >= 2 && n <= 100 ? { n, unit } : undefined;
     onPatch({ items: kept, makes, portion: makes ? Math.round(total / makes.n) : total, steps, optional: edit.optional.length ? edit.optional : undefined, ...(same ? {} : { stepMarks: undefined, stepsKitchen: undefined, stepParts: undefined }) });
-    setEdit(null); setFind(null);
+    setEdit(null); setFind(null); resetSwap();
   };
+  // DT83: every change to the foods can be taken back, one at a time
+  const change = (items: Ingredient[]) => { if (!edit) return; setUndo((u) => [...u, edit.items]); setEdit({ ...edit, items }); setNeed(null); };
+  const takeBack = () => { if (!edit || !undo.length) return; setEdit({ ...edit, items: undo[undo.length - 1] }); setUndo((u) => u.slice(0, -1)); setPick(null); setRemoved(null); };
+  const chosen = (food: Food) => {
+    if (!edit) return;
+    const at = swapAt ? edit.items.findIndex((i) => i.id === swapAt) : -1;
+    setFind(null); setSwapAt(null);
+    if (at >= 0) { setPick({ food, old: edit.items[at], at, mode: "swap" }); return; }
+    if (removed) { setPick({ food, old: removed.item, at: removed.at, mode: "after-remove" }); return; }
+    const id = uid(); change([...edit.items, { id, food, grams: 0, locked: false }]); setFresh((f) => [...f, id]);
+  };
+  const place = (way: SwapWay | "new") => {
+    if (!edit || !pick) return;
+    const { food, old, at, mode } = pick;
+    if (way === "new") { const id = uid(); change([...edit.items, { id, food, grams: 0, locked: false }]); setFresh((f) => [...f, id]); }
+    else {
+      const grams = swapChoices(old, food).find((c) => c.way === way)?.grams ?? old.grams;
+      const next: Ingredient = { id: uid(), food, grams, locked: old.locked, ...(old.part ? { part: old.part } : {}), ...(old.role ? { role: old.role } : {}) };
+      log("swap", { way, kind: sameKind(old.food, food) ? "same" : "other", how: mode });
+      change(mode === "swap" ? edit.items.map((x, j) => (j === at ? next : x)) : [...edit.items.slice(0, at), next, ...edit.items.slice(at)]);
+    }
+    setPick(null); setRemoved(null);
+  };
+  const delta = edit ? changeOf(meal.items, edit.items, serves) : null;
+  const whole = (n: number) => fmt(n, 0);
   // DT81 (Milan 23 October 15:51): the search also finds foods without a label (raw rice, cabbage), not only My foods
   const refMatches = find === null || find.trim().length < 2 ? [] : findReference(find.trim(), 6, find.trim().length < 3).filter((r) => !foods.some((f) => f.name.toLowerCase() === r.en.toLowerCase()) && !items.some((i) => i.food.name.toLowerCase() === r.en.toLowerCase()));
   const matches = find === null ? [] : foods.filter((f) => !items.some((i) => i.food.id === f.id) && (!find.trim() || f.name.toLowerCase().includes(find.trim().toLowerCase()))).slice(0, 8);
@@ -232,16 +269,23 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
             <small className="muted">Cooked as written. Plan counts it in these, and each meal takes as many as it needs. Empty: the Plate divides it by weight.</small>
           </div>
         )}
+        {edit && delta && (
+          <div className={`rq-change${delta.big ? " rq-change-big" : ""}`} role="status" aria-label="What changed">
+            <small>{[delta.out.length ? `Out: ${delta.out.join("; ")}.` : "", delta.in.length ? `In: ${delta.in.join("; ")}.` : "", delta.moved.length ? `Changed: ${delta.moved.join("; ")}.` : ""].filter(Boolean).join(" ")}</small>
+            <small><b>One {oneWord}: {whole(delta.kcal[0])} to {whole(delta.kcal[1])} kcal, {whole(delta.protein[0])} to {whole(delta.protein[1])} g protein{delta.pd[0] !== null && delta.pd[1] !== null ? `, PD ${fmt(delta.pd[0], 1)} to ${fmt(delta.pd[1], 1)}` : ""}.</b>{delta.big ? " More than a fifth apart: check that the recipe still does what it was for." : ""}</small>
+            {undo.length > 0 && <button type="button" className="link" onClick={takeBack}>Undo</button>}
+          </div>
+        )}
         {edit && !partsShown && <button type="button" className="link rq-parts-open" onClick={() => setPartsOpen(true)}>Parts and optional foods</button>}
         {edit && partsShown && <div className="pt-h pt-mode"><span><small>Parts: give a food its part, or make it optional. Optional foods stay out of the numbers.</small></span><span className="pt-acts">{newPart === null ? <button className="link" onClick={() => setNewPart("")}>New part</button> : <input className="pt-new" autoFocus aria-label="Name of the new part" placeholder="Topping" value={newPart} onChange={(e) => setNewPart(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = cleanPart(newPart); if (v) setExtraParts((l) => [...l, v]); setNewPart(null); } }} onBlur={() => setNewPart(null)} />}</span></div>}
         {(edit || !cookN || cookN === makesN ? items : sizedFor(meal, cookN)).map((it, k) => {
           const head = !edit && it.part && (k === 0 || items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{it.part}</div> : null;
           return [head, (
           <div className="sheet-row rq-food" key={it.id}>
-            {edit ? <span className="rq-food-edit"><small>{it.food.name}</small>{partsShown && <span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>Optional</button></span>}</span> : <small>{it.food.name}{it.fry && <span className="rq-fry">{it.fry.written ? `${it.fry.written}, for frying` : "For frying"}. {countedLine(`${fmt(it.grams, 0)} g`)}.</span>}</small>}            {edit
+            {edit ? <span className="rq-food-edit"><small>{it.food.name}</small><button type="button" className="link rq-swap-link" aria-label={`Swap ${it.food.name}`} onClick={() => { setSwapAt(it.id); setPick(null); setFind(""); }}>Swap</button>{partsShown && <span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>Optional</button></span>}</span> : <small>{it.food.name}{it.fry && <span className="rq-fry">{it.fry.written ? `${it.fry.written}, for frying` : "For frying"}. {countedLine(`${fmt(it.grams, 0)} g`)}.</span>}</small>}            {edit
               ? <span className="rq-grams">
-                  <input inputMode="numeric" aria-label={`Grams of ${it.food.name}`} value={String(it.grams || "")} onChange={(e) => { const g = Math.min(5000, Number(e.target.value.replace(/[^\d]/g, "")) || 0); setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, grams: g } : x)) }); }} /> g
-                  <button className="rq-x" aria-label={`Remove ${it.food.name}`} onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k) })}><X size={14} /></button>
+                  <input inputMode="numeric" aria-label={`Grams of ${it.food.name}`} className={fresh.includes(it.id) && !(it.grams > 0) ? "rq-g-need" : undefined} placeholder={fresh.includes(it.id) ? "?" : undefined} autoFocus={fresh.includes(it.id) && !(it.grams > 0)} value={String(it.grams || "")} onChange={(e) => { const g = Math.min(5000, Number(e.target.value.replace(/[^\d]/g, "")) || 0); setNeed(null); setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, grams: g } : x)) }); }} /> g
+                  <button className="rq-x" aria-label={`Remove ${it.food.name}`} onClick={() => { setRemoved({ item: it, at: k }); setPick(null); setFresh((f) => f.filter((x) => x !== it.id)); change(edit.items.filter((_, j) => j !== k)); }}><X size={14} /></button>
                 </span>
               : isCounted(it) ? <CountAmount item={it} editable={false} whole onGrams={() => {}} /> : <b>{fmt(it.fry ? it.fry.pot : it.grams, 0)} g</b>}
           </div>)];
@@ -252,15 +296,29 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
             <b>{fmt(o.grams, 0)} g</b>
           </div>
         ))}
-        {edit && (find === null
-          ? <button className="pill pill-small rq-addfood" onClick={() => setFind("")}><Plus size={14} /> Add a food</button>
+        {edit && pick && (() => {
+          const ch = swapChoices(pick.old, pick.food), one = (c: { way: SwapWay; grams: number }) => `${c.way === "energy" ? "The same energy" : "The same weight"}: ${whole(c.grams)} g ${pick.food.name}`;
+          return (
+            <div className="rq-swap" role="group" aria-label={`In place of ${pick.old.food.name}`}>
+              <small><b>{pick.mode === "swap" ? `In place of ${pick.old.food.name}, ${whole(pick.old.grams)} g:` : `In place of ${pick.old.food.name}, ${whole(pick.old.grams)} g, removed just now?`}</b></small>
+              {ch.map((c) => <button key={c.way} type="button" className="pill pill-small" onClick={() => place(c.way)}>{one(c)}</button>)}
+              {pick.mode === "after-remove" && <button type="button" className="pill pill-small" onClick={() => place("new")}>No, a food of its own</button>}
+              <small className="muted">{ch.length < 2 ? "One of the two has no energy on its label, so only the weight can match." : sameKind(pick.old.food, pick.food) ? "The same food, raw or cooked: the same energy keeps the recipe as it was." : "A different food: the same weight keeps the dish its size."}</small>
+              <button type="button" className="link" onClick={() => setPick(null)}>Cancel</button>
+            </div>
+          );
+        })()}
+        {edit && need && <small className="rq-need" role="alert">Set the grams of {need}, or remove it.</small>}
+        {edit && !pick && (find === null
+          ? <button className="pill pill-small rq-addfood" onClick={() => { setSwapAt(null); setFind(""); }}><Plus size={14} /> Add a food</button>
           : (
             <div className="rq-find">
               <input autoFocus placeholder="Search my foods" aria-label="Search my foods" value={find} onChange={(e) => setFind(e.target.value)} />
-              {matches.map((f) => <button key={f.id} className="rq-find-row" onClick={() => { setEdit({ ...edit, items: [...edit.items, { id: uid(), food: f, grams: 100, locked: false }] }); setFind(null); }}><span>{f.name}</span><small>{fmt(f.calories, 0)} kcal · {fmt(f.protein, 1)} g protein per 100 g</small></button>)}
-              {refMatches.map((r) => <button key={r.id} className="rq-find-row" onClick={() => { setEdit({ ...edit, items: [...edit.items, { id: uid(), food: referenceFood(r, null, uid), grams: 100, locked: false }] }); setFind(null); }}><span>{r.en}</span><small>{fmt(r.kcal, 0)} kcal · {r.protein} g protein per 100 g · a food without a label</small></button>)}
+              {swapAt && <small className="rq-find-h">Swap {edit.items.find((i) => i.id === swapAt)?.food.name} for:</small>}
+              {matches.map((f) => <button key={f.id} className="rq-find-row" onClick={() => chosen(f)}><span>{f.name}</span><small>{fmt(f.calories, 0)} kcal · {fmt(f.protein, 1)} g protein per 100 g</small></button>)}
+              {refMatches.map((r) => <button key={r.id} className="rq-find-row" onClick={() => chosen(referenceFood(r, null, uid))}><span>{r.en}</span><small>{fmt(r.kcal, 0)} kcal · {r.protein} g protein per 100 g · a food without a label</small></button>)}
               {matches.length === 0 && refMatches.length === 0 && <small className="muted">No food with that name. Foods come from Foods in the menu, or a scan on the Plate.</small>}
-              <button className="link" onClick={() => setFind(null)}>Close the search</button>
+              <button className="link" onClick={() => { setFind(null); setSwapAt(null); }}>Close the search</button>
             </div>
           ))}
         {/* DT77 (Milan 23 October 09:52): the whole recipe is cooked with whole eggs, bananas and apples; a portion keeps its
@@ -344,7 +402,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         <>
           <button className="pill pill-wide pill-primary" disabled={!edit.items.some((i) => i.grams > 0)} onClick={save}>Save changes</button>
           <small className="muted rq-under">{edit.items.some((i) => i.grams > 0) ? "The numbers above follow as you type." : "A recipe needs at least one food."}</small>
-          <button className="pill pill-wide" onClick={() => { setEdit(null); setFind(null); }}>Cancel</button>
+          <button className="pill pill-wide" onClick={() => { setEdit(null); setFind(null); resetSwap(); }}>Cancel</button>
           {live && <small className="muted rq-under">Live on chefmealan.com: the live page changes only with Change live page.</small>}
         </>
       ) : (
