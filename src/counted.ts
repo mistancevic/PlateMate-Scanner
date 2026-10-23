@@ -24,7 +24,7 @@ export function kindOf(name: string): CountKind | null {
   // DT77: German and Serbian names count too (Eier, jaja; Banane; Apfel, jabuka)
   if (/(?<!\p{L})(eggs?|ei|eier|jaj[ea])(?!\p{L})/u.test(n) && !/white|yolk|liquid|powder|noodle|pasta|replac|substitut|vegan|plant|chocolate|easter|nog|plant|nudel|teigware|likör|belanc|žumanc/.test(n)) return "egg";
   if (/(?<!\p{L})(bananas?|bananen?)(?!\p{L})/u.test(n) && !/chip|dried|bread|flour|powder|pur[eé]e|cake|muffin|pancake|smoothie|split|milk|yog|brot|kuchen|getrocknet/.test(n)) return "banana";
-  if (/(?<!\p{L})(apples?|apfel|äpfel|jabuk[ae])(?!\p{L})/u.test(n) && !/juice|sauce|cider|vinegar|dried|chip|pie|pur[eé]e|strudel|crumble|cake|muffin|jam|saft|mus|essig|kuchen|getrocknet|sok|pita/.test(n)) return "apple";
+  if (/(?<!\p{L})(apples?|apfel|äpfel|jabuk[ae])(?!\p{L})/u.test(n) && !/juice|sauce|cider|vinegar|dried|chip|pie|pur[eé]e|strudel|crumble|cake|muffin|jam|saft|mus|essig|kuchen|getrocknet|sok|pita|dic|slic|chop|grat|cube|würfel|gerieben|geschnitten|kockic|rendan/.test(n)) return "apple";
   return null;
 }
 // the size a recipe names: "2 large eggs" is L; none named, M

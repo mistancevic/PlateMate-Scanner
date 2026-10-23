@@ -65,7 +65,7 @@ test("DT77: the whole recipe says whole eggs; a portion keeps its share", () => 
 });
 test("DT77: apples are counted; German and Serbian names count too", () => {
   for (const n of ["Apple, raw", "Äpfel", "Apfel Braeburn", "Jabuka"]) assert.equal(kindOf(n), "apple", n);
-  for (const n of ["Apple juice", "Apfelmus", "Pineapple, raw", "Apple pie", "Apfelsaft"]) assert.equal(kindOf(n), null, n);
+  for (const n of ["Apple juice", "Apfelmus", "Pineapple, raw", "Apple pie", "Apfelsaft", "Apples, peeled and diced", "Apple, grated"]) assert.equal(kindOf(n), null, n);   // DT78: cut apple is weighed
   for (const n of ["Eier, Freiland", "Bio Ei", "Jaja"]) assert.equal(kindOf(n), "egg", n);
   for (const n of ["Eiweiß", "Eis Vanille", "Eiernudeln"]) assert.equal(kindOf(n), null, n);
   assert.equal(kindOf("Banane"), "banana");
