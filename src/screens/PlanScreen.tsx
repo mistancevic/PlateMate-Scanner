@@ -1,7 +1,7 @@
 import { carryReads } from "../carry";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { ChevronRight, ChefHat, Pencil, Circle, CircleCheck, CircleSlash, ShoppingBasket } from "lucide-react";
-import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, stateOf, shortMeals, byMeal, replanMeal, followPlan, notCounted, planChanges, updateList, type ShopStore, type SavedList, type ShopLine } from "../shopping";
+import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, shopAmount, stateOf, shortMeals, byMeal, replanMeal, followPlan, notCounted, planChanges, updateList, type ShopStore, type SavedList, type ShopLine } from "../shopping";
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
 import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
@@ -291,10 +291,10 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
   const row = (l: SavedList, x: ShopLine, live: boolean, grams = x.grams, note = true) => {
     const st = stateOf(l, x.key);
     return (
-      <button key={x.key} type="button" className={`menu-row shop-row ${st === "got" ? "got" : st === "missing" ? "missing" : ""}`} aria-label={`${x.name}, ${grams} g${st === "got" ? ", in the basket" : st === "missing" ? ", not this time" : ""}`} disabled={!live} onClick={() => save(tickIn(store, l.n, x.key))}>
+      <button key={x.key} type="button" className={`menu-row shop-row ${st === "got" ? "got" : st === "missing" ? "missing" : ""}`} aria-label={`${x.name}, ${shopAmount(x.name, grams)}${st === "got" ? ", in the basket" : st === "missing" ? ", not this time" : ""}`} disabled={!live} onClick={() => save(tickIn(store, l.n, x.key))}>
         {st === "got" ? <CircleCheck size={20} /> : st === "missing" ? <CircleSlash size={20} /> : <Circle size={20} />}
         <div className="menu-row-text"><b>{x.name}</b>{note && <small>{x.added ? "Added · " : ""}{x.cooked ? `${x.cooked.toLocaleString("en")} g cooked · ` : ""}{x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? `${x.brand} · ` : ""}{forWhat(x)}</small>}{st === "missing" && <small className="shop-missing-note">Not this time</small>}</div>
-        <b className="shop-grams">{grams.toLocaleString("en")} g</b>
+        <b className="shop-grams">{shopAmount(x.name, grams)}</b>
       </button>
     );
   };
