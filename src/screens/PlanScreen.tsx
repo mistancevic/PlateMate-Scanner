@@ -9,7 +9,7 @@ import { rowsOf, slotsOf, slotsOn, trainingWhen, type Slot } from "../slots";
 import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
 import { countOf, countLabel } from "../counted";
-import { STARTERS, fitOf, fromMeal, leftOf, sumOf, plannedPortion, dayOff, proteinOff, bandOf, fitPortions, usualPortions, amountText, type PlannedMeal } from "../planned";
+import { STARTERS, fitOf, fromMeal, leftOf, sumOf, plannedPortion, dayOff, proteinOff, bandOf, fitPortions, usualPortions, amountText, isBatch, isFitted, piecesFor, withPieces, oneWord, type PlannedMeal } from "../planned";
 import { CHEF_NAME } from "../components/Mark";
 import { PlanRow } from "../components/PlanRow";
 import { ShortHelp } from "../components/ShortHelp";
@@ -97,7 +97,7 @@ export function PlanScreen(p: AppApi) {
   const pr = p.proteinRange && numbers ? { min: Math.min(p.proteinRange.min, numbers.protein), max: Math.max(p.proteinRange.max, numbers.protein) } : null;
   const pOff = proteinOff(sum, pr, openCount);
   const Day = dayName === "today" ? "Today" : dayName;
-  const fitted = Object.values(held).some((m) => m.amount && m.amount !== 1);
+  const fitted = isFitted(held);
   const fitDay = () => { if (!numbers) return; const next = fitPortions(held, numbers); for (const [id, m] of Object.entries(next)) p.fill(key, id, m);
     const k = sumOf(next).kcal, b = bandOf(numbers.kcal);
     p.notify(k >= b.lo && k <= b.hi ? `${Day} is inside its range: ${fmt(k, 0)} kcal.` : `Portions fitted to ${Day === "Today" ? "today" : Day}: ${fmt(k, 0)} kcal, as close as these meals get.`); };
@@ -175,6 +175,15 @@ export function PlanScreen(p: AppApi) {
                     </div>
                     <ChevronRight size={18} />
                   </button>}
+              {/* DT79: a batch recipe in whole pieces; − and + by one, and that count is the usual one */}
+              {m && !m.skipped && isBatch(m) && (
+                <div className="plan-pieces" role="group" aria-label={`${m.title}: how many`}>
+                  <button type="button" className="icon" aria-label={`One ${oneWord(m.unit ?? "portions")} less`} disabled={(m.amount ?? 1) <= 1} onClick={() => p.fill(key, r.slot.id, withPieces(m, (m.amount ?? 1) - 1))}>−</button>
+                  <b>{amountText(m)}</b>
+                  <button type="button" className="icon" aria-label={`One ${oneWord(m.unit ?? "portions")} more`} disabled={(m.amount ?? 1) >= (m.servings ?? 1)} onClick={() => p.fill(key, r.slot.id, withPieces(m, (m.amount ?? 1) + 1))}>+</button>
+                  <small>of {m.servings} the recipe makes</small>
+                </div>
+              )}
               {m && fit?.state === "under" && (
                 <div className="button-row plan-slot-fix">
                   <button type="button" className="pill pill-small pill-primary" onClick={() => p.fillOnPlate({ ...fillingOf(r.slot), mealId: m.mealId }, m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: (m.portion ?? 0) * (m.amount ?? 1), savedAt: "" } : null, m.title)}>Fit it on the Plate</button>
@@ -388,6 +397,8 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
           <p className="small shop-why">Which days is it for? It starts {start === today ? "today" : `${dayWord(start)} ${MONTHS[dt(start).getMonth()]}`}{store.lists.some((l) => l.to >= start) ? ", with the planned meals no list has counted yet" : start === today ? "" : store.lists.length ? ", the day after your last list" : ", the first day with meals planned"}.</p>
           <div className="moments" role="group" aria-label="Days">{DAY_CHOICES.map((n) => <button key={n} type="button" className={`choice ${span === n ? "on" : ""}`} onClick={() => setSpan(n)}>{n === 1 ? "1 day" : `${n} days`}</button>)}</div>
           <p className="small shop-why">{spanOf(days[0], days[days.length - 1])}: {preview.meals} planned {preview.meals === 1 ? "meal" : "meals"}, {preview.lines.length} {preview.lines.length === 1 ? "food" : "foods"}{store.carry ? `, plus ${store.carry.lines.length} from list ${store.carry.from}` : ""}.</p>
+          {/* DT79: a batch recipe is bought whole */}
+          {(preview.batches ?? []).map((b) => <p key={b.title} className="small shop-why shop-batch">{b.title}: {b.batches === 1 ? "one batch" : `${b.batches} batches`} of {b.n}, for the {b.pieces} planned.{b.batches * b.n - b.pieces > 0 ? ` ${b.batches * b.n - b.pieces} left over.` : ""}</p>)}
           <button type="button" className="pill pill-wide pill-primary shop-make" disabled={!preview.lines.length && !store.carry} onClick={() => save(makeList(store, p.planned, days, new Date().toISOString()))}>Make shopping list {nextN}</button>
         </>)}
         {reading === null && store.lists.some((l) => l.doneAt) && (<>
@@ -437,8 +448,10 @@ function PickSheet({ p, slot, slots, day, planned, target, unit, held, close, pu
   const othersSet = slots.some((s) => s.id !== slot.id && planned[s.id]);
   // DT75: the marks are judged against what is left: its PD, not the day's. Protein already covered: any meal fits.
   const leftPd = need && need.kcal > 0 ? (need.protein > 0 ? density(need.protein, need.kcal) : 0) : target;
-  const mine = p.state.meals.filter((m) => m.from !== "coach").map((m) => ({ meal: m, planned: fromMeal(m, "mine") }));
-  const coach = p.state.meals.filter((m) => m.from === "coach").map((m) => ({ meal: m, planned: fromMeal(m, "coach") }));
+  // DT79: a batch recipe comes in the pieces closest to what this slot has left, 4 sarmas
+  const sized = (m: PlannedMeal) => (isBatch(m) ? withPieces(m, piecesFor(m, need), false) : m);
+  const mine = p.state.meals.filter((m) => m.from !== "coach").map((m) => ({ meal: m, planned: sized(fromMeal(m, "mine")) }));
+  const coach = p.state.meals.filter((m) => m.from === "coach").map((m) => ({ meal: m, planned: sized(fromMeal(m, "coach")) }));
   // R20 (0.2.48, board RS19, R20d): a meal with a clear answer says so where you pick it
   const reads = carryReads(p.state.meals, p.state.feedback);
   const row = (m: PlannedMeal, k: string, pick: () => void) => {
@@ -446,7 +459,7 @@ function PickSheet({ p, slot, slots, day, planned, target, unit, held, close, pu
     const read = m.mealId ? reads.get(m.mealId)?.read : null;
     return (
       <button key={k} type="button" className="menu-row pick-row" onClick={pick}>
-        <div className="menu-row-text"><b>{m.title}</b><small>{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein</small>{read && <small className={read === "light" ? "carry-light" : "carry-heavy"}>{read === "light" ? "Light for you" : "Heavy for you"}</small>}</div>
+        <div className="menu-row-text"><b>{m.title}</b><small>{isBatch(m) ? `${amountText(m)} · ` : ""}{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein</small>{read && <small className={read === "light" ? "carry-light" : "carry-heavy"}>{read === "light" ? "Light for you" : "Heavy for you"}</small>}</div>
         <div className={`pick-pd ${fit.state}`}><b>{unit === "pct" ? `${pdVal(fit.pd)} %` : `PD ${pdVal(fit.pd)}`}</b><small>{fit.text}</small></div>
       </button>
     );

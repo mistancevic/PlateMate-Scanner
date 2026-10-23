@@ -180,3 +180,15 @@ test("DT76: eggs and bananas are bought by the piece", () => {
   assert.equal(shopAmount("Apple, raw", 270), "2 apples");
   assert.equal(shopAmount("Eggs", 110), "2 eggs");                 // 2.1 eggs: the slack keeps it at 2
 });
+
+// DT79 (Milan 23 October 11:12 and 11:15): a recipe that says what it makes is cooked, and bought, as whole batches
+test("DT79: pieces of a batch recipe add up, and the list buys whole batches", () => {
+  const cabbage = food("Cabbage, raw"), mince = food("Beef mince, raw");
+  const sarma = { title: "Sarma", kcal: 360, protein: 20, source: "mine" as const, mealId: "sa", items: [it(cabbage, 800), it(mince, 600)], portion: 175, servings: 8, unit: "sarmas", amount: 3 };
+  const l = shoppingList({ "2026-10-20": { lunch: sarma }, "2026-10-22": { lunch: { ...sarma, amount: 4 } } }, ["2026-10-20", "2026-10-21", "2026-10-22"]);
+  assert.deepEqual(l.batches, [{ title: "Sarma", n: 8, pieces: 7, batches: 1 }]);
+  assert.deepEqual(l.lines.map((x) => [x.name, x.grams]), [["Beef mince, raw", 600], ["Cabbage, raw", 800]]);
+  assert.deepEqual(l.lines.find((x) => /Cabbage/.test(x.name))!.uses!.map((u) => u.grams), [300, 400]);   // each meal its share
+  const two = shoppingList({ "2026-10-20": { lunch: { ...sarma, amount: 6 } }, "2026-10-22": { lunch: { ...sarma, amount: 5 } } }, ["2026-10-20", "2026-10-22"]);
+  assert.equal(two.batches![0].batches, 2); assert.equal(two.lines.find((x) => /Cabbage/.test(x.name))!.grams, 1600);
+});

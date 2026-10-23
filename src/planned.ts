@@ -12,7 +12,11 @@ export type PlannedMeal = { title: string; kcal: number; protein: number; source
   // SL6 (0.2.64): how a meal changed for this day only came to be (from a shopping list, picked from Chef Mealan's ideas); shown when it is opened
   note?: string;
   // DT74 (0.2.74): how much of the meal, when the day's portions were fitted (1.3 is a third more); kcal and protein are counted at it
-  amount?: number };
+  // DT79 (0.2.79): for a batch recipe (servings > 1) it is whole pieces of what the recipe makes, 3 sarmas
+  amount?: number;
+  // DT79: what a batch recipe says it makes, plural (sarmas, bars), and the count picked for the slot or set by hand. Without
+  // a unit the recipe was divided by the Plate into portions, and is shopped as its share
+  unit?: string; usual?: number };
 export type Planned = Record<string, Record<string, PlannedMeal>>; // by date (ymd), then by slot id
 
 const KEY = "chefmealan-planned";
@@ -81,8 +85,33 @@ export function fromMeal(m: Meal, source: Source): PlannedMeal {
   const t = aggregate(m.items);
   const n = servingsOf(m);
   const ratio = n > 1 ? 1 / n : m.portion && t.weight > 0 ? Math.min(1, m.portion / t.weight) : 1;
-  return { title: m.title, kcal: Math.round((t.calories ?? 0) * ratio), protein: Math.round((t.protein ?? 0) * ratio), source, mealId: m.id, items: m.items, portion: m.portion, ...(n > 1 ? { servings: n } : {}) };
+  return { title: m.title, kcal: Math.round((t.calories ?? 0) * ratio), protein: Math.round((t.protein ?? 0) * ratio), source, mealId: m.id, items: m.items, portion: m.portion, ...(n > 1 ? { servings: n, ...(m.makes?.unit && m.makes.n > 1 ? { unit: m.makes.unit } : {}) } : {}) };
 }
+
+// DT79 (Milan 23 October 11:12 and 11:15): a batch recipe is planned in whole pieces of what it makes, 3 sarmas. Chef Mealan
+// picks the count closest to what the slot has left, so a training day or a bigger person gets more; − and + change it by
+// one, and that count is the one Back to the usual portions returns to.
+export const isBatch = (m: PlannedMeal) => (m.servings ?? 1) > 1;
+export const oneWord = (unit: string) => unit.replace(/ies$/, "y").replace(/(?<!s)s$/, "");
+const perPiece = (m: PlannedMeal) => { const a = m.amount ?? 1; return { kcal: m.kcal / a, protein: m.protein / a }; };
+export function piecesFor(m: PlannedMeal, need: { kcal: number } | null): number {
+  if (!isBatch(m)) return 1;
+  const one = perPiece(m).kcal;
+  const c = need && need.kcal > 0 && one > 0 ? Math.round(need.kcal / one) : 1;
+  return Math.max(1, Math.min(m.servings!, c));
+}
+export function withPieces(m: PlannedMeal, count: number, byHand = true): PlannedMeal {
+  if (!isBatch(m)) return m;
+  const one = perPiece(m), c = Math.max(1, Math.round(count));
+  return { ...m, amount: c, kcal: Math.round(one.kcal * c), protein: Math.round(one.protein * c), ...(byHand || m.usual === undefined ? { usual: c } : {}) };
+}
+// DT79: what the plan takes of a batch recipe from a day on: 8 sarmas: 3 on Monday lunch, 4 on Wednesday lunch, 1 left
+export function batchUse(planned: Planned, mealId: string, from: string): { date: string; slot: string; n: number }[] {
+  const out: { date: string; slot: string; n: number }[] = [];
+  for (const d of Object.keys(planned).sort()) if (d >= from) for (const [slot, m] of Object.entries(planned[d])) if (m.mealId === mealId && !m.skipped) out.push({ date: d, slot, n: m.amount ?? 1 });
+  return out;
+}
+export const usualCount = (m: PlannedMeal) => (isBatch(m) ? m.usual ?? m.amount ?? 1 : 1);
 
 // Chef Mealan's starters: a few meals so a plan can start before any recipe exists. Removable later; seeded per market later.
 // DT76 (0.2.76, board DT76, Anna's second run): each starter is its foods in grams, from the reference table, so a portion
@@ -166,37 +195,52 @@ export function proteinOff(sum: { protein: number; n: number }, range: { min: nu
 // Fit the portions: amounts people cook, in quarters from a half to two. It aims at the target, and the range takes up what
 // quarters can't hit: inside the range first, then within a twentieth of the target (an edge of the range eaten every day
 // is a tenth off every day), then the smallest largest change, so it spreads over the meals, then the least change in all,
+// DT79: a day is fitted when any meal is off its usual amount (a batch: its usual count)
+export const isFitted = (held: Record<string, PlannedMeal>) => Object.values(held).some((m) => (isBatch(m) ? (m.amount ?? 1) !== usualCount(m) : !!m.amount && m.amount !== 1));
 // then nearest the target. If no amounts reach the range, the nearest they get.
 export const QUARTERS = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
 export function fitPortions(held: Record<string, PlannedMeal>, day: { kcal: number }): Record<string, PlannedMeal> {
   const ids = Object.keys(held).filter((id) => !held[id].skipped);
   if (!ids.length) return held;
-  const base = ids.map((id) => usualOf(held[id]));
+  // each meal's choices: quarters of its usual portion, or (DT79) whole pieces of a batch around the usual count
+  type Opt = { amount: number; kcal: number; change: number };
+  const opts: Opt[][] = ids.map((id) => {
+    const m = held[id];
+    if (isBatch(m)) {
+      const one = perPiece(m).kcal, u = usualCount(m), out: Opt[] = [];
+      for (let c = Math.max(1, u - 3); c <= Math.min(m.servings!, u + 3); c++) out.push({ amount: c, kcal: one * c, change: Math.abs(c / u - 1) });
+      return out;
+    }
+    const b = usualOf(m);
+    return QUARTERS.map((q) => ({ amount: q, kcal: b.kcal * q, change: Math.abs(q - 1) }));
+  });
   const { lo, hi } = bandOf(day.kcal);
-  let best: { qs: number[]; key: number[] } | null = null;
+  let best: { pick: number[]; key: number[] } | null = null;
   const less = (a: number[], b: number[]) => { for (let j = 0; j < a.length; j++) if (Math.abs(a[j] - b[j]) > 1e-9) return a[j] < b[j]; return false; };
-  const qs = ids.map(() => 1);
+  const pick = ids.map(() => 0);
   const walk = (i: number) => {
     if (i === ids.length) {
-      const kcal = qs.reduce((n, q, j) => n + q * base[j].kcal, 0);
+      const chosen = pick.map((k, j) => opts[j][k]);
+      const kcal = chosen.reduce((n, o) => n + o.kcal, 0);
       const out = kcal < lo ? lo - kcal : kcal > hi ? kcal - hi : 0;
-      const key = [out, Math.abs(kcal - day.kcal) <= day.kcal * 0.05 ? 0 : 1, Math.max(...qs.map((q) => Math.abs(q - 1))), qs.reduce((n, q) => n + Math.abs(q - 1), 0), Math.abs(kcal - day.kcal)];
-      if (!best || less(key, best.key)) best = { qs: [...qs], key };
+      const key = [out, Math.abs(kcal - day.kcal) <= day.kcal * 0.05 ? 0 : 1, Math.max(...chosen.map((o) => o.change)), chosen.reduce((n, o) => n + o.change, 0), Math.abs(kcal - day.kcal)];
+      if (!best || less(key, best.key)) best = { pick: [...pick], key };
       return;
     }
-    for (const q of QUARTERS) { qs[i] = q; walk(i + 1); }
+    for (let k = 0; k < opts[i].length; k++) { pick[i] = k; walk(i + 1); }
   };
   if (ids.length <= 6) walk(0);
-  const found = best as { qs: number[]; key: number[] } | null;
+  const found = best as { pick: number[]; key: number[] } | null;
   const out: Record<string, PlannedMeal> = { ...held };
   ids.forEach((id, j) => {
-    const q = found ? found.qs[j] : 1, m = held[id];
-    if (q === 1) { const { amount: _a, ...rest } = m; void _a; out[id] = { ...rest, kcal: Math.round(base[j].kcal), protein: Math.round(base[j].protein) }; }
-    else out[id] = counted({ ...m, amount: q, kcal: Math.round(base[j].kcal * q), protein: Math.round(base[j].protein * q) });
+    const m = held[id];
+    if (isBatch(m)) { const c = found ? opts[j][found.pick[j]].amount : usualCount(m); out[id] = { ...withPieces(m, c, false), usual: usualCount(m) }; return; }
+    const q = found ? opts[j][found.pick[j]].amount : 1, base = usualOf(m);
+    if (q === 1) { const { amount: _a, ...rest } = m; void _a; out[id] = { ...rest, kcal: Math.round(base.kcal), protein: Math.round(base.protein) }; }
+    else out[id] = counted({ ...m, amount: q, kcal: Math.round(base.kcal * q), protein: Math.round(base.protein * q) });
   });
   return out;
 }
-// a meal's numbers at one portion: from its foods when it has them (DT76: a fitted one may hold whole eggs), else divided back
 function usualOf(m: PlannedMeal): { kcal: number; protein: number } {
   const a = m.amount ?? 1;
   if (a === 1) return { kcal: m.kcal, protein: m.protein };
@@ -217,6 +261,7 @@ function counted(m: PlannedMeal): PlannedMeal {
 export function usualPortions(held: Record<string, PlannedMeal>): Record<string, PlannedMeal> {
   const out: Record<string, PlannedMeal> = {};
   for (const [id, m] of Object.entries(held)) {
+    if (isBatch(m)) { out[id] = withPieces(m, usualCount(m), false); continue; }
     const a = m.amount ?? 1, u = usualOf(m);
     out[id] = a === 1 ? m : (({ amount: _a, ...rest }) => ({ ...rest, kcal: Math.round(u.kcal), protein: Math.round(u.protein) }))(m);
   }
@@ -225,6 +270,8 @@ export function usualPortions(held: Record<string, PlannedMeal>): Record<string,
 // DT75: in quarters, as people cook: ½ portion, 1¼ portions
 const FRACTION: Record<number, string> = { 0: "", 0.25: "¼", 0.5: "½", 0.75: "¾" };
 export const amountText = (m: PlannedMeal) => {
+  // DT79: a batch recipe always says its pieces, 1 sarma, 3 sarmas
+  if (isBatch(m)) { const c = m.amount ?? 1, u = m.unit ?? "portions"; return `${c} ${c === 1 ? oneWord(u) : u}`; }
   if (!m.amount || m.amount === 1) return null;
   const whole = Math.floor(m.amount), part = FRACTION[Math.round((m.amount - whole) * 4) / 4];
   if (part === undefined) return `${m.amount.toFixed(2).replace(/0$/, "")} portions`;
@@ -259,7 +306,8 @@ export function fillDay(slots: Slot[], held: Record<string, PlannedMeal> | undef
       return pdGap + kcalGap;
     };
     const nudge = (m: PlannedMeal) => { const r = read?.(m)?.read; return r ? CARRY_NUDGE[r] : 0; };
-    const free = choices.filter((m) => !used.has(m.title));
+    // DT79: a batch recipe comes in the pieces that fit this slot
+    const free = choices.filter((m) => !used.has(m.title)).map((m) => (isBatch(m) ? withPieces(m, piecesFor(m, need), false) : m));
     const plain = [...free].sort((a, b) => score(a) - score(b));
     let ranked = [...free].sort((a, b) => score(a) + nudge(a) - (score(b) + nudge(b)));
     if (!ranked.length) continue;
