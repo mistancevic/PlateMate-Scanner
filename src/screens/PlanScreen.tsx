@@ -8,6 +8,7 @@ import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "..
 import { rowsOf, slotsOf, slotsOn, trainingWhen, type Slot } from "../slots";
 import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
+import { countOf, countLabel } from "../counted";
 import { STARTERS, fitOf, fromMeal, leftOf, sumOf, plannedPortion, dayOff, proteinOff, bandOf, fitPortions, usualPortions, amountText, type PlannedMeal } from "../planned";
 import { CHEF_NAME } from "../components/Mark";
 import { PlanRow } from "../components/PlanRow";
@@ -411,11 +412,15 @@ function MealSheet({ p, slot, m, dayName, target, unit, close, swap, onPlate, ke
       <div className="sheet date-sheet meal-view" role="dialog" aria-label={`${slot.name}, ${m.title}`} onClick={(e) => e.stopPropagation()}>
         <div className="card-top"><span>{dayName === "today" ? "Today" : dayName.charAt(0).toUpperCase() + dayName.slice(1)}, {slot.name.toLowerCase()}, {slot.time}</span><button type="button" className="link" onClick={close}>Close</button></div>
         <b className="shop-title">{m.title}</b>
-        <p className="small shop-why">{m.note ?? "This day only. No recipe stands behind it."}</p>
+        {/* DT76: a starter says what it is and how much of it, then the foods to weigh, eggs and bananas counted */}
+        <p className="small shop-why">{m.note ?? (m.source === "starter" ? `${CHEF_NAME}'s starter${amountText(m) ? `, ${amountText(m)}` : ", one portion"}. These are the foods to weigh.` : "This day only. No recipe stands behind it.")}</p>
         <div className="menu-list shop-list">
-          {(portion?.items ?? []).map((i) => (
-            <div key={i.id} className="menu-row meal-view-row"><div className="menu-row-text"><b>{i.food.name}</b>{i.food.source === "estimate" && <small>{CHEF_NAME}'s estimate</small>}</div><b className="shop-grams">{Math.round(i.grams)} g</b></div>
-          ))}
+          {(portion?.items ?? []).map((i) => {
+            const c = countOf(i), cl = c ? countLabel(c, i.grams) : null;
+            return (
+              <div key={i.id} className="menu-row meal-view-row"><div className="menu-row-text"><b>{i.food.name}</b>{i.food.source === "estimate" && <small>{CHEF_NAME}'s estimate</small>}{cl && <small>{cl.small}</small>}</div><b className="shop-grams">{cl ? cl.main : `${Math.round(i.grams)} g`}</b></div>
+            );
+          })}
         </div>
         <p className="small meal-view-nums">{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</p>
         <div className="button-row"><button type="button" className="pill pill-small" onClick={swap}>Swap</button><button type="button" className="pill pill-small" onClick={keep}>Save in My recipes</button></div>

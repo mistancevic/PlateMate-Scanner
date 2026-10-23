@@ -114,3 +114,36 @@ test("DT74: a fitted meal is eaten at its amount", () => {
   const one = plannedPortion(m, "x", "")!, more = plannedPortion({ ...m, amount: 1.5 }, "x", "")!;
   assert.equal(Math.round(more.items[0].grams), Math.round(one.items[0].grams * 1.5));
 });
+
+// DT76 (board DT76, Anna's second run): starters with their foods
+import { STARTERS, refreshPlanned } from "./planned";
+import { shoppingList } from "./shopping";
+test("DT76: every starter is its foods in grams; its numbers come from them, close to before", () => {
+  const before: Record<string, [number, number]> = { "Skyr bowl with berries": [420, 46], "Oats, skyr and banana": [520, 38], "Omelette with bread": [450, 34], "Chicken, rice and greens": [640, 52], "Tuna salad wrap": [480, 36], "Protein pancakes": [520, 44], "Sarma": [410, 21], "Cottage cheese and fruit": [260, 28] };
+  assert.equal(STARTERS.length, 8);
+  for (const m of STARTERS) {
+    assert.ok(m.items && m.items.length >= 2, m.title + " has foods");
+    const [k, p] = before[m.title];
+    assert.ok(Math.abs(m.kcal - k) / k <= 0.1, `${m.title}: ${m.kcal} kcal near ${k}`);
+    assert.ok(Math.abs(m.protein - p) <= 6, `${m.title}: ${m.protein} g near ${p}`);
+  }
+  const om = STARTERS.find((m) => m.title === "Omelette with bread")!;
+  assert.deepEqual(om.items!.find((i) => /^Egg, whole/.test(i.food.name))!.count, { kind: "egg", size: "M" });   // 3 eggs, M
+});
+test("DT76: 1½ portions of a starter is its grams times 1½; I ate it and the shopping list have its foods", () => {
+  const skyr = STARTERS[0];
+  const p = plannedPortion({ ...skyr, amount: 1.5 }, "x", "")!;
+  assert.equal(Math.round(p.items.find((i) => /Skyr/.test(i.food.name))!.grams), 525);
+  const list = shoppingList({ "2026-10-24": { breakfast: { ...skyr, amount: 1.5 }, lunch: STARTERS[3] } }, ["2026-10-24"]);
+  assert.equal(list.without.length, 0);
+  assert.ok(list.lines.some((l) => /Skyr/.test(l.name) && l.grams >= 520), "skyr on the list");
+  assert.ok(list.lines.some((l) => /Rice, white, raw/.test(l.name)), "the rice bought raw");
+});
+test("DT76: a starter planned before 0.2.76 takes its foods, at its amount", () => {
+  const old = { "2026-10-24": { breakfast: { title: "Skyr bowl with berries", kcal: 630, protein: 69, source: "starter" as const, amount: 1.5 } } };
+  const next = refreshPlanned(old, []);
+  const m = next["2026-10-24"].breakfast;
+  assert.equal(m.items!.length, STARTERS[0].items!.length);
+  assert.equal(m.kcal, Math.round(STARTERS[0].kcal * 1.5)); assert.equal(m.amount, 1.5);
+  assert.equal(refreshPlanned(next, []), next);                                          // once
+});
