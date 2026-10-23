@@ -126,7 +126,7 @@ export type Goals = Nutrition;
 // What the Publish sheet keeps while a recipe is being made ready for its page (board RG1): a draft, never public
 // sent: what the live page holds, kept at Publish (0.2.5+r13, board S4, R12), so the sheet knows what changed since
 export type PubContent = { title: string; lines: string; makes: number; servingName: string; minutes: number | null; names: string[]; steps: string[]; grams: number[]; photo?: string | null; photoAi?: boolean };
-export type PublishDraft = { title?: string; lines?: string; makes?: string; servingName?: string; minutes?: string; names?: string[]; photoAt?: number; savedAt?: string; sent?: PubContent; sentAt?: string };
+export type PublishDraft = { title?: string; lines?: string; makes?: string; servingName?: string; minutes?: string; names?: string[]; nameIds?: string[]; photoAt?: number; savedAt?: string; sent?: PubContent; sentAt?: string };
 export type PlateKind = "meal" | "dessert";
 export type StepMark = { kind: "same" | "adapted" | "added"; why: string };
 export type Meal = {
