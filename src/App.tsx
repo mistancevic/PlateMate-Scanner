@@ -1,3 +1,5 @@
+import { servingsOf } from "./pilot";
+import { wholeOnPlate } from "./counted";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, useMemo } from "react";
 import { optAt } from "./parts";
 import {
@@ -1050,6 +1052,16 @@ export default function App() {
   useEffect(() => {
     setOptions([]);
   }, [state.items, state.goals, limits]);
+  // DT78: eggs, bananas and apples on the Plate are whole ones, however they arrived (a recipe, a scan, grams typed)
+  // A share of a batch recipe on the Plate (one slice, or sized for a meal) keeps its share, for the numbers; the whole recipe
+  // and any meal of your own land on whole ones
+  useEffect(() => {
+    const rec = state.fromRecipe ? state.meals.find((m) => m.id === state.fromRecipe) : null;
+    const weight = (xs: { grams: number }[]) => xs.reduce((n, i) => n + (i.grams > 0 ? i.grams : 0), 0);
+    if (rec && servingsOf(rec) > 1 && weight(state.items) < weight(rec.items) * 0.95) return;
+    const next = wholeOnPlate(state.items);
+    if (next) setState((s) => ({ ...s, items: wholeOnPlate(s.items) ?? s.items }));
+  }, [state.items, state.fromRecipe, state.meals]);
   // the counter (0.2.5+r17, board M): what may leave the phone is sent while signed in, every minute and when the app hides
   useEffect(() => {
     // signed in on the live app; without accounts (local, walkthroughs) the local server counts

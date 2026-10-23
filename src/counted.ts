@@ -24,7 +24,7 @@ export function kindOf(name: string): CountKind | null {
   // DT77: German and Serbian names count too (Eier, jaja; Banane; Apfel, jabuka)
   if (/(?<!\p{L})(eggs?|ei|eier|jaj[ea])(?!\p{L})/u.test(n) && !/white|yolk|liquid|powder|noodle|pasta|replac|substitut|vegan|plant|chocolate|easter|nog|plant|nudel|teigware|likör|belanc|žumanc/.test(n)) return "egg";
   if (/(?<!\p{L})(bananas?|bananen?)(?!\p{L})/u.test(n) && !/chip|dried|bread|flour|powder|pur[eé]e|cake|muffin|pancake|smoothie|split|milk|yog|brot|kuchen|getrocknet/.test(n)) return "banana";
-  if (/(?<!\p{L})(apples?|apfel|äpfel|jabuk[ae])(?!\p{L})/u.test(n) && !/juice|sauce|cider|vinegar|dried|chip|pie|pur[eé]e|strudel|crumble|cake|muffin|jam|saft|mus|essig|kuchen|getrocknet|sok|pita/.test(n)) return "apple";
+  if (/(?<!\p{L})(apples?|apfel|äpfel|jabuk[ae])(?!\p{L})/u.test(n) && !/juice|sauce|cider|vinegar|dried|chip|pie|pur[eé]e|strudel|crumble|cake|muffin|jam|saft|mus|essig|kuchen|getrocknet|sok|pita|dic|slic|chop|grat|cube|würfel|gerieben|geschnitten|kockic|rendan/.test(n)) return "apple";
   return null;
 }
 // the size a recipe names: "2 large eggs" is L; none named, M
@@ -105,4 +105,21 @@ export function countRead(name: string, written: string, grams: number): { count
   // "3 tbsp beaten egg" or "100 g banana": a measure, not a count; the grams stay, the size is a guide
   if (n === null || /(?:\d|\s|^)(g|gr|grams?|kg|ml|l|cups?|tbsp|tsp|tablespoons?|teaspoons?|oz|ounces?|lbs?|pounds?)\b/i.test(written)) return { count: { kind: k, size: n === null ? guessSize(k, grams) : size }, grams };
   return { count: { kind: k, size }, grams: Math.round(n * KINDS[k].sizes[size]!) };
+}
+
+// DT78 (Milan 23 October 11:00 to 11:05): the Plate is a meal you cook and eat, so eggs, bananas and apples on it land on
+// whole ones: 92 g of eggs (1.8, size M) is 2 eggs, 104 g, and the numbers follow. A banana or apple weighed keeps its grams;
+// a portion of a batch recipe (a dish row) keeps its share. Null when nothing changes.
+export function wholeOnPlate<T extends { grams: number; food: { name: string }; count?: Count; dish?: unknown }>(items: T[]): T[] | null {
+  let changed = false;
+  const out = items.map((i) => {
+    if (i.dish) return i;
+    const c = countOf(i);
+    if (!c || c.weighed || !(i.grams > 0)) return i;
+    const n = howMany(c, i.grams), whole = Math.max(1, Math.round(n));
+    if (Math.abs(n - whole) < 0.02) return i;
+    changed = true;
+    return { ...i, grams: whole * gramsOfOne(c), count: { kind: c.kind, size: c.size } };
+  });
+  return changed ? out : null;
 }
