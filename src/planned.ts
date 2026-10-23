@@ -87,7 +87,8 @@ export function fromMeal(m: Meal, source: Source): PlannedMeal {
 // Chef Mealan's starters: a few meals so a plan can start before any recipe exists. Removable later; seeded per market later.
 // DT76 (0.2.76, board DT76, Anna's second run): each starter is its foods in grams, from the reference table, so a portion
 // says what to weigh (1½ portions: the grams times 1½), I ate it logs the foods, and the shopping list has them. Eggs and
-// bananas are counted, size M. The numbers come from the foods, close to what the starters said before.
+// bananas are counted, size M. The numbers come from the foods, close to what the starters said before. The amounts are
+// not locked: on the Plate, Chef Mealan may move them to fit the slot.
 const STARTER_FOODS: [string, [string, number][]][] = [
   ["Skyr bowl with berries", [["skyr", 350], ["blueberries", 100], ["oats", 30], ["honey", 10]]],
   ["Oats, skyr and banana", [["oats", 60], ["skyr", 200], ["banana", 118], ["milk-15", 100]]],
@@ -104,7 +105,7 @@ function starterOf(title: string, foods: [string, number][], k: number): Planned
     if (!r) throw new Error(`starter food ${id} is not in the reference table`);
     const food = referenceFood(r, null, () => `starter-${k}-${j}`);
     const kind = kindOf(food.name);
-    return { id: `starter-${k}-${j}`, food, grams, locked: true, ...(kind ? { count: { kind, size: "M" as const } } : {}) };
+    return { id: `starter-${k}-${j}`, food, grams, locked: false, ...(kind ? { count: { kind, size: "M" as const } } : {}) };
   });
   const t = aggregate(items);
   return { title, kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0), source: "starter", items, portion: Math.round(items.reduce((n, i) => n + i.grams, 0)) };

@@ -5,7 +5,7 @@
 // Changed by story R19 (Milan 06:04 to 06:41, board RS18): a tap on a planned meal opens the meal; Pick a meal opens with a
 // swipe to the left (Swap). An open slot still opens Pick a meal on a tap.
 // Changed by story DT74 (Milan 22 October 2026, board DT74): a meal around the target says close, not fits; fits is kept for
-// a meal within 0.2 of it. The marks are fits, close or under.
+// a meal within 0.2 of it. The marks are fits, close or under. DT76: the starter's numbers come from its foods (647 and 56).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -36,11 +36,11 @@ seed.items = [];
   await sheet.getByRole("button", { name: /Chicken, rice and greens/ }).click(); await page.waitForTimeout(400);
   ok(await page.locator(".pick-sheet").count() === 0, "the sheet closes");
   const lunch = page.locator(".plan-slot-wrap").nth(1);
-  ok(/Chicken, rice and greens/.test(await lunch.textContent()) && /starter · 640 kcal · 52 g/.test(await lunch.textContent()) && /fits|close/.test(await lunch.textContent()), "Lunch holds the starter with its numbers and its mark: " + (await lunch.textContent()).slice(0, 90));
+  ok(/Chicken, rice and greens/.test(await lunch.textContent()) && /starter · 647 kcal · 56 g/.test(await lunch.textContent()) && /fits|close/.test(await lunch.textContent()), "Lunch holds the starter with its numbers and its mark: " + (await lunch.textContent()).slice(0, 90));
   // Changed by story SL2 (Milan 16:03 to 16:11, board SL2): the open slots are in the day's line in the head card at the top
   ok(/2 slots open/.test(await page.locator(".plan-head .plan-day-head small").textContent()), "two slots open");
   let nums = await page.locator(".plan-row b").allTextContents();
-  ok(nums[1].replace(/,/g, "") === "640" && nums[2] === "52", "the day as planned adds up: " + nums.join(" "));
+  ok(nums[1].replace(/,/g, "") === "647" && nums[2] === "56", "the day as planned adds up: " + nums.join(" "));
   // a meal that falls short: the amber gap and the two ways out
   await page.getByRole("button", { name: /Breakfast at .*pick a meal/ }).click(); await page.waitForTimeout(400);
   await page.locator(".pick-sheet").getByRole("button", { name: /^Sarma/ }).click(); await page.waitForTimeout(400);
@@ -50,7 +50,10 @@ seed.items = [];
   // Fit it on the Plate: the Plate opens for this slot, the line says so; Put it in fills the slot and comes back
   await bf.getByRole("button", { name: "Fit it on the Plate" }).click(); await page.waitForTimeout(600);
   ok(/Monday's breakfast, 07:30 · By the plan/.test(await page.locator(".plan-line").textContent()), "the Plate's line names the slot: " + (await page.locator(".plan-line").textContent()));
-  await page.getByRole("button", { name: /^Add$/ }).first().click(); await page.waitForTimeout(300);
+  // Changed by story DT76 (board DT76): a starter has its foods, so the Plate opens with Sarma's foods, not empty; the first
+  // of Chef Mealan's lifters goes on, and the plate is made for the slot
+  ok(/Cabbage, raw/.test(await page.locator("main").innerText()) && /Beef mince/.test(await page.locator("main").innerText()), "the Plate opens with Sarma's foods");
+  await page.getByRole("button", { name: /^\+ ?Add$/ }).first().click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).click(); await page.waitForTimeout(800);
   ok(await page.getByRole("button", { name: /Put it in Monday's breakfast/ }).count() === 1, "the recipe step offers Put it in Monday's breakfast");
   ok(/readout-fit-(plan|top|close|below)/.test(await page.locator(".readout").getAttribute("class")), "the recipe step's box is coloured by the score");
