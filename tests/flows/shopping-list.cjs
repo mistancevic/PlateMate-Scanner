@@ -12,6 +12,7 @@ const sarma = meal("m3", "Sarma", [[/chicken/i, 800], [/^Rice/, 1200], [/^Oats/,
 seed.items = []; seed.meals = [crepes, sarma, pudding]; seed.feedback = [];
 seed.goals = { ...seed.goals, calories: 2800, protein: 180, fats: 93, carbs: 300 };
 const planned = (m, source) => { const w = m.items.reduce((s, i) => s + i.grams, 0), r = Math.min(1, m.portion / w); const k = m.items.reduce((s, i) => s + (i.food.calories * i.grams) / 100, 0) * r, p = m.items.reduce((s, i) => s + (i.food.protein * i.grams) / 100, 0) * r; return { title: m.title, kcal: Math.round(k), protein: Math.round(p), source, mealId: m.id, items: m.items, portion: m.portion }; };
+// Changed by story DT77 (Milan 23 October 10:48): a saved list says 15 planned meals, no longer one portion each.
 // Changed by story DT76 (board DT76): every starter has its foods now; a meal without foods is one planned long ago under a
 // name no starter has any more, so the list still names it
 const starter = { title: "Lentil soup", kcal: 640, protein: 52, source: "starter" };
@@ -65,7 +66,7 @@ const PORT = 3245, U = `http://127.0.0.1:${PORT}`;
   ok(/Shopping list 1/.test(st) && /It starts today/.test(st) && /Tuesday 20 to Monday 26 October: 15 planned meals, 8 foods/.test(st), "SL3: list 1 starts today; 7 days: 15 meals, 8 foods: " + st.slice(0, 200));
   await sheet.getByRole("button", { name: "Make shopping list 1" }).click(); await page.waitForTimeout(400);
   const one = (await sheet.textContent()).replace(/\s+/g, " ");
-  ok(/Made Tuesday 20 October, for Tuesday 20 to Monday 26 October: 15 planned meals, one portion each/.test(one), "SL3: named and dated: " + one.slice(0, 160));
+  ok(/Made Tuesday 20 October, for Tuesday 20 to Monday 26 October: 15 planned meals\./.test(one) && !/one portion each/.test(one), "SL3: named and dated: " + one.slice(0, 160));
   ok(/Not on the list, no foods saved: Lentil soup \(Wednesday\)/.test(one), "SL1: the starter without foods is named");
   // Changed by story SL4 (0.2.62, Milan 17:15 to 18:29, board SL4): under each food, the meals it is for, not a count
   ok(await sheet.locator(".shop-row").count() === 8 && /Quark, low fat \(Magerquark\)\s*Chocolate quark pudding: Tue, Thu, Sat, Mon lunch\s*1,000 g/.test(await sheet.locator(".shop-row").nth(5).textContent()), "SL1, SL4: eight foods added up by name; quark 1,000 g says the four lunches it is for: " + (await sheet.locator(".shop-row").nth(5).textContent()));

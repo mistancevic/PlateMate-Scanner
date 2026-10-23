@@ -306,7 +306,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
         <div className="card-top"><span>{reading !== null ? <button type="button" className="link" onClick={() => setReading(null)}>‹ Shopping lists</button> : "Shopping lists"}</span><button type="button" className="link" onClick={close}>Close</button></div>
         {shown ? (<>
           <b className="shop-title">Shopping list {shown.n}</b>
-          <p className="small shop-why">Made {madeOn(shown.madeAt)}, for {spanOf(shown.from, shown.to)}: {shown.meals} planned {shown.meals === 1 ? "meal" : "meals"}, one portion each.{shown.doneAt ? ` Finished ${madeOn(shown.doneAt)}.` : ""}</p>
+          <p className="small shop-why">Made {madeOn(shown.madeAt)}, for {spanOf(shown.from, shown.to)}: {shown.meals} planned {shown.meals === 1 ? "meal" : "meals"}.{shown.doneAt ? ` Finished ${madeOn(shown.doneAt)}.` : ""}</p>
           {shown.without.length > 0 && <p className="small shop-without">Not on the list, no foods saved: {shown.without.map((w) => `${w.title} (${WEEKDAY[(dt(w.date).getDay() + 6) % 7]})`).join(", ")}.</p>}
           {!shown.doneAt && <p className="small shop-why">Tap a food once when it is in the basket, twice for not this time.</p>}
           {/* SL7: the plan changed for this list's days since it was made: a new meal needs new shopping, whatever the reason */}
