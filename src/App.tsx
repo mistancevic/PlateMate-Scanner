@@ -1,5 +1,6 @@
 import { servingsOf } from "./pilot";
 import { wholeOnPlate } from "./counted";
+import { packLine } from "./canned";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, useMemo } from "react";
 import { optAt } from "./parts";
 import {
@@ -292,7 +293,7 @@ function LabelCheck({
   dbPhotos?: string[];
   library?: Food[];
   close: () => void;
-  save: (f: Food, opts?: { open?: boolean }) => void;
+  save: (f: Food, opts?: { open?: boolean; plate?: boolean }) => void;
   mixFor?: (f: Food) => MixTip;
   onMix?: (f: Food, m: Mix) => void;
   onAsk?: (f: Food, tip: MixTip) => void;
@@ -402,7 +403,7 @@ function LabelCheck({
     const finish = (g: Food) => {
       const saved = match && choice === "update" ? { ...mergeFoods(match.food, g), reviewedAt: g.reviewedAt } : g;
       const m = pendingMix.current; pendingMix.current = null;
-      save(saved, { open: isNew && !(match && choice === "update") && !(m && onMix) && addTo !== "plate" });
+      save(saved, { open: isNew && !(match && choice === "update") && !(m && onMix) && addTo !== "plate", plate: addTo === "plate" && !(m && onMix) });
       if (m && onMix) onMix(saved, m);
     };
     const raw = (images && images.length ? images : image ? [image] : []);
@@ -510,6 +511,7 @@ function LabelCheck({
           <span>g</span>
         </div>
         <small className="muted">A counted food: what Chef Mealan moves then comes in whole servings, 1 bar, 2 bars, never 1.3.</small>
+        {packLine({ pack: food.pack, serving: servingNow() }) && <small className="pack-line">{packLine({ pack: food.pack, serving: servingNow() })}</small>}
       </div>
       <p className="label">Nutrition table, per 100 g, as on the pack</p>
       <div className="label-table">
@@ -1449,7 +1451,7 @@ export default function App() {
     setEditFrom(from);
     setEdit(candidateFood({ product_name: name, brand, ...(barcode ? { barcode } : {}) }, "Manual entry"));
   }
-  function saveFood(f0: Food, opts?: { open?: boolean }) {
+  function saveFood(f0: Food, opts?: { open?: boolean; plate?: boolean }) {
     const existed = state.foods.some((x) => x.id === f0.id);
     // an AI label read, saved: kept when the four numbers are the ones the AI read (0.2.5+r17, board M, label reads kept)
     if (edit && !existed && /photo/i.test(String(edit.source ?? ""))) {
@@ -1468,6 +1470,9 @@ export default function App() {
     }));
     // Where does this go (0.2.5): a scan from Today asks after the save, new food or updated
     if (scanFrom === "today") { setScanFrom(null); setCamera(false); setEdit(null); setImageSet([]); setPending((p) => p.filter((x) => x.name !== f.name || x.brand !== f.brand)); setWhere(f); return; }
+    // DT82 (Marko, 23 October 2026): Scan or Manual on the Plate puts the food on the plate and keeps it in My foods, as
+    // decided in 0.2.25 (RP5); a food already on the plate is only updated there
+    if (opts?.plate) { setEdit(null); setImageSet([]); setPending((p) => p.filter((x) => x.name !== f.name || x.brand !== f.brand)); if (!state.items.some((i) => i.food.id === f.id)) add(f); else notify(`Updated ${f.name}.`); return; }
     if (existed && f.reviewedAt) { setEdit(null); setImageSet([]); notify(`Updated ${f.name}.`); return; }
     setEdit(null);
     setPending((p) =>
@@ -1484,15 +1489,14 @@ export default function App() {
       items: [
         ...s.items,
         // R22 (0.2.50): with Both picked, a food goes into the main or the sweet finish
-        { id: uid(), food: { ...food }, grams: (density(food.protein, food.calories) ?? 0) < 3 ? 50 : 150, locked: false, ...(plateTaste === "both" ? { part: bothPartOf(food.name) } : {}) },
+        // DT82 (Marko's tuna, 0.9 cans): a food the pack sells as one piece goes on as one, 1 can, 1 bar, 1 pot
+        { id: uid(), food: { ...food }, grams: food.serving ? food.serving.grams : (density(food.protein, food.calories) ?? 0) < 3 ? 50 : 150, locked: false, ...(plateTaste === "both" ? { part: bothPartOf(food.name) } : {}) },
       ],
       portion: null,
     }));
     setStep("in");
     setTab("journey");
-    notify(
-      "Added. Set the amount you actually have.",
-    );
+    notify(food.serving ? `Added: 1 ${food.serving.name}, ${fmt(food.serving.grams, 0)} g. Set the amount you actually have.` : "Added. Set the amount you actually have.");
   }
   // the photo that shows the front goes first: it becomes the main photo and the card's picture
   const frontFirst = (images: string[], front: number) => { const i = Number(front) - 1; return i > 0 && i < images.length ? [images[i], ...images.filter((_, j) => j !== i)] : images; };
@@ -1587,7 +1591,9 @@ export default function App() {
     setDbPhotos([]);
     try {
       const local = state.foods.find((f) => f.barcode === code.trim());
-      if (local) {
+      // DT82: a code scanned on the Plate for a food you have puts it on the plate (decided in 0.2.25, RP5)
+      if (local && tab === "journey") { setCamera(false); add(local); }
+      else if (local) {
         setOpenFoodId(local.id);
         setTab("foods");
         notify("Already in your foods.");
@@ -1615,6 +1621,7 @@ export default function App() {
   async function lookupWithPhotos(code: string, images: string[]) {
     const c = code.trim();
     const local = state.foods.find((f) => f.barcode === c);
+    if (local && tab === "journey") { setCamera(false); add(local); return; }
     if (local) { setCamera(false); setOpenFoodId(local.id); setTab("foods"); notify("Already in your foods."); return; }
     const run = ++runRef.current;
     setBusy("Looking up product…"); setError(""); setCamera(false);

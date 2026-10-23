@@ -2015,3 +2015,8 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .rq-cook-row b { font-size: var(--fs-card); }
 .rq-cook .link { align-self: flex-start; }
 .rq-parts-open { align-self: flex-start; margin: 2px 0 8px; }
+/* DT82: the oil of a can, held with the can's row */
+.can-oil { display: flex; flex-direction: column; gap: 6px; margin: -2px 0 8px 46px; padding: 8px 10px; border-left: 3px solid var(--line, #e3e6ea); }
+.can-oil-h { display: flex; flex-direction: column; }
+.can-oil-h small { color: var(--muted, #5b6470); }
+.pack-line { display: block; margin-top: 6px; }

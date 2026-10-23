@@ -1,6 +1,7 @@
 import { countOf, gramsOfOne, KINDS } from "./counted";
 import { cleanMealNames, cleanCardNames, cleanFoodNames, cleanText1 } from "./entities";
 import { rowsFromRaw } from "./labeltable";
+import { packOf, packServing } from "./canned";
 /** Versioned pilot contract: numbers are unrounded; null means unknown. */
 export type Nutrient = "calories" | "protein" | "fats" | "carbs" | "fiber";
 // the order printed on European labels, so checking against the pack goes line by line
@@ -56,6 +57,8 @@ export type Food = Nutrition & {
   aliases?: string[];
   // a counted food: the pack prints a serving (1 bar 45 g, 1 piece 30 g); what Mealan moves then snaps to whole servings
   serving?: { grams: number; name: string };
+  // DT82: a food packed in a liquid (tuna in olive oil): net and drained weight, the liquid, and what the values are per
+  pack?: import("./canned").Pack;
   basis: "100g";
   source: string;
   notes: string;
@@ -90,6 +93,8 @@ export type Ingredient = {
   optional?: { written?: string; note?: string };
   // oil a recipe fries in (0.2.38, R3): the grams are what the food takes up, an estimate; pot is the recipe's whole amount
   fry?: { pot: number; written?: string; plate?: boolean };
+  // DT82: the oil poured from a can, held with the can's row (its id); it goes when the can goes, and Fit never moves it
+  from?: string;
 };
 // an optional food on the plate, out of the numbers until added (0.2.19, IM12): grams for this plate's portion
 export type PlateOpt = { id: string; name: string; written?: string; note?: string; grams: number; food: Food; part?: string };
@@ -556,7 +561,7 @@ export function candidateFood(input: any, source: string): Food {
     name: typeof input.product_name === "string" ? input.product_name : "",
     brand: typeof input.brand === "string" && !/^\s*(unknown|n\/?a|none|-)?\s*$/i.test(input.brand) ? input.brand : "",
     barcode: typeof input.barcode === "string" ? input.barcode : undefined,
-    serving: servingOf(input.serving),
+    ...(() => { const pack = packOf(input.pack); const serving = packServing(pack, servingOf(input.serving)?.name) ?? servingOf(input.serving); return { serving, ...(pack ? { pack } : {}) }; })(),
     basis: "100g",
     source,
     notes: typeof input.notes === "string" ? input.notes : "",
