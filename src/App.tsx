@@ -1052,6 +1052,10 @@ export default function App() {
   useEffect(() => {
     setOptions([]);
   }, [state.items, state.goals, limits]);
+  // DT80: when a recipe changes what it makes, the meals planned from it follow
+  useEffect(() => {
+    setPlannedState((prev) => { const next = refreshPlanned(prev, state.meals); if (next !== prev) storePlanned(next); return next; });
+  }, [state.meals]);
   // DT78: eggs, bananas and apples on the Plate are whole ones, however they arrived (a recipe, a scan, grams typed)
   // A share of a batch recipe on the Plate (one slice, or sized for a meal) keeps its share, for the numbers; the whole recipe
   // and any meal of your own land on whole ones

@@ -32,7 +32,15 @@ export function refreshPlanned(p: Planned, meals: Meal[]): Planned {
     next[date] = {};
     for (const [slot, m] of Object.entries(day)) {
       const r = m.mealId && !m.servings ? byId.get(m.mealId) : undefined;
-      if (r && servingsOf(r) > 1) { const f = fromMeal(r, m.source); const a = m.amount ?? 1; next[date][slot] = { ...m, kcal: Math.round(f.kcal * a), protein: Math.round(f.protein * a), servings: f.servings }; changed = true; }
+      if (r && servingsOf(r) > 1) { const f = fromMeal(r, m.source); const a = m.amount ?? 1; next[date][slot] = { ...m, kcal: Math.round(f.kcal * a), protein: Math.round(f.protein * a), servings: f.servings, ...(f.unit ? { unit: f.unit } : {}) }; changed = true; }
+      // DT80: a recipe now says what it makes (or makes something else): a planned meal of it takes the new pieces, as many as
+      // keep its kcal, so the day stays as planned
+      else if (m.mealId && m.servings && byId.get(m.mealId) && (servingsOf(byId.get(m.mealId)!) !== m.servings || (fromMeal(byId.get(m.mealId)!, m.source).unit ?? "") !== (m.unit ?? ""))) {
+        const f = fromMeal(byId.get(m.mealId)!, m.source);
+        if (!isBatch(f)) next[date][slot] = { ...m, ...f, amount: undefined, usual: undefined, unit: undefined, servings: undefined, note: m.note };
+        else { const c = Math.max(1, Math.min(f.servings!, Math.round(m.kcal / Math.max(1, f.kcal)))); next[date][slot] = { ...withPieces({ ...f, title: m.title, note: m.note }, c, false), usual: c }; }
+        changed = true;
+      }
       else if (!m.mealId && m.items?.length && twice(m.items)) { next[date][slot] = withoutTwice(m); changed = true; }
       // DT76: a starter planned before 0.2.76 had no foods; it takes them, its numbers from the foods, at its amount
       else if (m.source === "starter" && !m.items?.length && STARTERS.some((x) => x.title === m.title)) {

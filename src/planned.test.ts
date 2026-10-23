@@ -181,3 +181,17 @@ test("DT79: a batch recipe is planned in whole pieces, as many as the slot has l
   // a share of the batch for the numbers
   assert.equal(plannedPortion({ ...four, items: [{ id: "c", food, grams: 800, locked: true }] }, "x", "")!.items[0].grams, 400);
 });
+import { refreshPlanned as refresh80 } from "./planned";
+test("DT80: a recipe that now says it makes 8 sarmas: its planned meal takes the sarmas that keep its kcal", () => {
+  const items = [{ id: "a", food, grams: 1600, locked: true }];
+  const before = { id: "sa", title: "Sarma", items, portion: 400, savedAt: "" } as any;                       // the Plate divided it: 4 portions
+  const m = fromMeal(before, "mine");
+  assert.equal(m.servings, 4); assert.equal(m.unit, undefined);
+  const plan = { "2026-10-24": { lunch: { ...m } } };
+  const after = { ...before, makes: { n: 8, unit: "sarmas" }, portion: 200 };
+  const next = refresh80(plan, [after]);
+  const l = next["2026-10-24"].lunch;
+  assert.equal(l.unit, "sarmas"); assert.equal(l.servings, 8); assert.equal(l.amount, 2); assert.equal(l.usual, 2);   // one portion was two sarmas
+  assert.equal(Math.abs(l.kcal - m.kcal) <= 1, true);
+  assert.equal(refresh80(next, [after]), next);                                                                    // once
+});
