@@ -125,8 +125,9 @@ export function JourneyScreen(p: AppApi) {
   const [bigAsk, setBigAsk] = useState(false);
   // DT81: how many the batch made, counted after cooking (null: as cooked); a new recipe's number, asked when it is saved
   const [madeN, setMadeN] = useState<number | null>(null), [keepMade, setKeepMade] = useState(false);
-  const [newMakesN, setNewMakesN] = useState(""), [newMakesUnit, setNewMakesUnit] = useState("");
-  const resetMade = () => { setPhotos([]); setWent("as"); setDifferent(""); setAte("all"); setSaveRecipe(true); setEatN(1); setBigAsk(false); setMadeN(null); setKeepMade(false); setNewMakesN(""); setNewMakesUnit(""); };
+  // null: not touched, so the Plate's own guess stands (about 3 of your meals: 3 portions); "": one plate
+  const [newMakesN, setNewMakesN] = useState<string | null>(null), [newMakesUnit, setNewMakesUnit] = useState(""), [makesOpen, setMakesOpen] = useState(false);
+  const resetMade = () => { setPhotos([]); setWent("as"); setDifferent(""); setAte("all"); setSaveRecipe(true); setEatN(1); setBigAsk(false); setMadeN(null); setKeepMade(false); setNewMakesN(null); setNewMakesUnit(""); setMakesOpen(false); };
   const [method, setMethod] = useState<string | null>(null);
   // after Add in the tip at the recipe step, Mealan refits with the new food on the plate
   const [refit, setRefit] = useState(false);
@@ -1119,6 +1120,10 @@ export function JourneyScreen(p: AppApi) {
   const leftK = yours - 1;
   // R25: the whole recipe on the plate, counted; what one is; what is eaten; the day's kcal for the big meal check
   const cookCount = rec?.makes ? rec.cook?.n ?? rec.makes.n : 0;
+  // DT81: a plate from scratch against one of your meals: about 3 of them is a batch, and the save step asks
+  const plateMeals = mealNeed && mealNeed > 0 ? Math.max(1, Math.round(kcalOfItems(items) / mealNeed)) : 1;
+  const plateBig = !!mealNeed && kcalOfItems(items) / mealNeed >= 1.6;
+  const makesShown = newMakesN ?? (plateBig ? String(Math.max(2, plateMeals)) : "");
   const wholeN = wholePlate ? madeN ?? cookCount : 0;
   const perOne = wholeN > 1 ? kcalOfItems(items) / wholeN : 0;
   const eatenKcal = wholeN > 1 ? perOne * eatN : kcalOfItems(items);
@@ -1380,15 +1385,18 @@ export function JourneyScreen(p: AppApi) {
           <button className={`choice ${saveRecipe ? "on" : ""}`} onClick={() => setSaveRecipe(true)}>Yes, save it</button>
           <button className={`choice ${!saveRecipe ? "on" : ""}`} onClick={() => setSaveRecipe(false)}>Not this one</button>
         </div>
-        {/* DT81: a recipe made from scratch gets its number here: what these foods made */}
-        {saveRecipe && !chgW && !fromRec && (
+        {/* DT81 (Milan 23 October 15:53 and 15:55): a recipe made from scratch gets its number here. The Plate compares its
+            foods with one of your meals: about one meal says nothing and stays one plate; clearly more asks, with its guess */}
+        {saveRecipe && !chgW && !fromRec && (plateBig || makesOpen ? (
           <div className="rq-makes" role="group" aria-label="What it makes">
+            {plateBig && <small className="rq-makes-ask">This is about {plateMeals} of your meals. How many does it make?</small>}
             <small>It makes</small>
-            <input inputMode="numeric" aria-label="How many it makes" placeholder="10" value={newMakesN} onChange={(e) => setNewMakesN(e.target.value.replace(/[^\d]/g, "").slice(0, 3))} />
-            <input aria-label="Of what" placeholder="sarmas" value={newMakesUnit} maxLength={24} onChange={(e) => setNewMakesUnit(e.target.value)} />
-            <small className="muted">If you made several, say how many: Plan then counts them. Empty: one meal.</small>
+            <input inputMode="numeric" aria-label="How many it makes" placeholder="10" value={makesShown} onChange={(e) => setNewMakesN(e.target.value.replace(/[^\d]/g, "").slice(0, 3))} />
+            <input aria-label="Of what" placeholder="portions" value={newMakesUnit} maxLength={24} onChange={(e) => setNewMakesUnit(e.target.value)} />
+            {plateBig && <button type="button" className={`choice ${makesShown === "" ? "on" : ""}`} aria-pressed={makesShown === ""} onClick={() => setNewMakesN("")}>One plate, I ate it all</button>}
+            <small className="muted">Plan then counts it in these, and you eat one of them now. Empty: one plate.</small>
           </div>
-        )}
+        ) : <button type="button" className="link rq-makes-open" onClick={() => setMakesOpen(true)}>It makes more than one</button>)}
       </section>}
       {sharing && p.profile.coachId && (
         <div className="reasons">
@@ -1416,10 +1424,12 @@ export function JourneyScreen(p: AppApi) {
         })() : null;
         // R25: the card counts what was eaten, a number of the recipe's pieces; the recipe is kept whole
         // the portion is the sum of the very grams kept, never a hair above them: a stored meal heavier than its foods is not read back
-        const eatenItems = wholeN > 1 && eatN < wholeN ? meal.items.map((i) => ({ ...i, grams: (i.grams * eatN) / wholeN })) : null;
+        // DT81: a batch from scratch: you ate one of what it makes now; the rest goes on Plan
+        const scratchN = !chgW && !fromRec && saveRecipe ? Math.round(Number(makesShown) || 0) : 0;
+        const eatenItems = wholeN > 1 && eatN < wholeN ? meal.items.map((i) => ({ ...i, grams: (i.grams * eatN) / wholeN })) : scratchN >= 2 && scratchN <= 100 ? meal.items.map((i) => ({ ...i, grams: i.grams / scratchN })) : null;
         const eatenMeal: Meal = eatenItems ? { ...meal, items: eatenItems, portion: eatenItems.reduce((n, i) => n + i.grams, 0) } : meal;
         // DT81: a recipe from scratch keeps what it made, when said: It makes 10 sarmas
-        const mk = Math.round(Number(newMakesN) || 0), mkTyped = newMakesUnit.trim().toLowerCase() || "portions";
+        const mk = Math.round(Number(makesShown) || 0), mkTyped = newMakesUnit.trim().toLowerCase() || "portions";
         const newMakes = !chgKept && !fromRec && mk >= 2 && mk <= 100 ? { n: mk, unit: /s$/.test(mkTyped) ? mkTyped : `${mkTyped}s` } : null;
         const keptWeight = keptItems.reduce((n, i) => n + i.grams, 0);
         const kept: Meal = chgKept ?? { ...meal, items: keptItems, portion: newMakes ? Math.round(keptWeight / newMakes.n) : keptWeight, ...(newMakes ? { makes: newMakes } : {}), ...(keptOpt.length ? { optional: keptOpt } : {}) };
