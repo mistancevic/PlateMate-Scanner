@@ -385,7 +385,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
           </>))}
         </>) : (<>
           <b className="shop-title">Shopping list {nextN}</b>
-          <p className="small shop-why">Which days is it for? It starts {start === today ? "today" : `${dayWord(start)} ${MONTHS[dt(start).getMonth()]}`}{store.lists.some((l) => l.to >= start) ? ", with the planned meals no list has counted yet" : start === today ? "" : ", the day after your last list"}.</p>
+          <p className="small shop-why">Which days is it for? It starts {start === today ? "today" : `${dayWord(start)} ${MONTHS[dt(start).getMonth()]}`}{store.lists.some((l) => l.to >= start) ? ", with the planned meals no list has counted yet" : start === today ? "" : store.lists.length ? ", the day after your last list" : ", the first day with meals planned"}.</p>
           <div className="moments" role="group" aria-label="Days">{DAY_CHOICES.map((n) => <button key={n} type="button" className={`choice ${span === n ? "on" : ""}`} onClick={() => setSpan(n)}>{n === 1 ? "1 day" : `${n} days`}</button>)}</div>
           <p className="small shop-why">{spanOf(days[0], days[days.length - 1])}: {preview.meals} planned {preview.meals === 1 ? "meal" : "meals"}, {preview.lines.length} {preview.lines.length === 1 ? "food" : "foods"}{store.carry ? `, plus ${store.carry.lines.length} from list ${store.carry.from}` : ""}.</p>
           <button type="button" className="pill pill-wide pill-primary shop-make" disabled={!preview.lines.length && !store.carry} onClick={() => save(makeList(store, p.planned, days, new Date().toISOString()))}>Make shopping list {nextN}</button>
