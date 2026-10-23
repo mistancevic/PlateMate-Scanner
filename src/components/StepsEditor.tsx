@@ -125,7 +125,7 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
       {gone.length > 0 && <p className="st-note warn">{gone.join(", ")} {gone.length === 1 ? "is" : "are"} in a step but no longer in the recipe. Change the step, or tap the food that takes {gone.length === 1 ? "its" : "their"} place.</p>}
       {missing.length > 0
         ? <p className="st-note warn">{missing.map((i) => i.food.name).join(", ")} {missing.length === 1 ? "is" : "are"} not in any step yet.</p>
-        : used.size > 0 && <p className="st-note ok">✓ Every food is in a step. The amounts follow the foods.</p>}
+        : used.size > 0 && gone.length === 0 && <p className="st-note ok">✓ Every food is in a step. The amounts follow the foods.</p>}
     </div>
   );
 }
