@@ -96,6 +96,8 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
   useEffect(() => () => { els.current.clear(); }, []);
   const used = usedIds(values.current);
   const missing = missingFoods(values.current, items);
+  // DT83 fix (Milan 21:56): a food taken out of the recipe and still named in a step is said, so the steps don't keep it
+  const gone = [...new Set(values.current.flatMap((x) => stepParts(x, items).filter((p): p is Extract<typeof p, { gone: boolean }> => "gone" in p && p.gone).map((p) => p.name)))];
   return (
     <div className="st">
       {rows.map((key, k) => (
@@ -120,6 +122,7 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
           </div>
         </div>
       )}
+      {gone.length > 0 && <p className="st-note warn">{gone.join(", ")} {gone.length === 1 ? "is" : "are"} in a step but no longer in the recipe. Change the step, or tap the food that takes {gone.length === 1 ? "its" : "their"} place.</p>}
       {missing.length > 0
         ? <p className="st-note warn">{missing.map((i) => i.food.name).join(", ")} {missing.length === 1 ? "is" : "are"} not in any step yet.</p>
         : used.size > 0 && <p className="st-note ok">✓ Every food is in a step. The amounts follow the foods.</p>}

@@ -3,7 +3,9 @@
 // food in another state (cooked rice to raw rice) leads with the same energy; a different food leads with the same weight.
 // While editing, one line says what changed for one portion, before and after, and Undo takes back the last change; more
 // than a fifth apart turns it amber. Add right after a Remove asks whether the new food takes the removed one's place; a food
-// of its own asks for its grams and the recipe is not saved without them. Never rewrite these lines to fit a change.
+// of its own asks for its grams and the recipe is not saved without them. The steps follow a swap (Milan 21:56): the food
+// that takes another's place takes its place in the steps, and Undo takes that back too. Never rewrite these lines to fit
+// a change.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -12,7 +14,8 @@ seed.items = []; seed.feedback = [];
 const ref = (id, name, kcal, protein, fats, carbs) => ({ id, name, brand: "", basis: "100g", calories: kcal, protein, fats, carbs, fiber: 0, readyToEat: false, source: "Reference table", notes: "", reviewedAt: "2026-10-01T08:00:00Z" });
 // test data: a sarma written with cooked rice, 8 sarmas
 seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", makes: { n: 8, unit: "sarmas" }, portion: 219,
-  items: [[ref("cab", "Cabbage, raw", 25, 1.3, 0.1, 3.3), 800], [ref("min", "Beef mince, 15 % fat, raw", 215, 18.6, 15, 0), 500], [seed.foods.find((x) => x.name === "Rice, cooked"), 300], [ref("oni", "Onion, raw", 40, 1.1, 0.1, 7.6), 150]].map(([food, g], i) => ({ id: "s" + i, food, grams: g, locked: true })) }];
+  items: [[ref("cab", "Cabbage, raw", 25, 1.3, 0.1, 3.3), 800], [ref("min", "Beef mince, 15 % fat, raw", 215, 18.6, 15, 0), 500], [seed.foods.find((x) => x.name === "Rice, cooked"), 300], [ref("oni", "Onion, raw", 40, 1.1, 0.1, 7.6), 150]].map(([food, g], i) => ({ id: "s" + i, food, grams: g, locked: true })),
+  steps: ["Soften the [[i:s0|cabbage]] leaves in hot water.", "Mix the [[i:s1|beef mince]] with the [[i:s2|rice]] and the [[i:s3|onion]].", "Roll the leaves around the filling and simmer for an hour."] }];
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT: "3247", GEMINI_API_KEY: "" }, stdio: "ignore" });
   await new Promise((r) => setTimeout(r, 2500));
@@ -45,10 +48,14 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
     ok(/The same food, raw or cooked/.test(await box.textContent()), "it says why");
     await box.getByRole("button", { name: /^The same energy/ }).click(); await page.waitForTimeout(300);
     ok(await grams("Rice, white, raw") === "105" && await page.getByLabel("Grams of Rice, cooked").count() === 0, "raw rice takes its place, 105 g");
+    const step2 = async () => ((await page.getByRole("textbox", { name: "Step 2" }).textContent()) ?? "").replace(/\s+/g, " ");
+    ok(/105 g rice/.test(await step2()) && !/300 g rice/.test(await step2()), "the steps follow: step 2 names the raw rice, 105 g: " + await step2());
+    ok(!/not in any step/.test(await txt(".st")), "no food is left out of the steps");
+    ok(/The steps follow: one step names Rice, white, raw where it named Rice, cooked\./.test(await txt(".rq-change")), "the line says the steps followed");
     let line = await txt(".rq-change");
     ok(/Out: Rice, cooked, 300 g\. In: Rice, white, raw, 105 g\./.test(line) && /One sarma: 216 to 215 kcal, 14 to 14 g protein, PD 6\.6 to 6\.5\./.test(line), "the line says what changed for one sarma: " + line);
     await page.locator(".rq-change").getByRole("button", { name: "Undo" }).click(); await page.waitForTimeout(300);
-    ok(await grams("Rice, cooked") === "300" && await page.locator(".rq-change").count() === 0, "Undo takes it back");
+    ok(await grams("Rice, cooked") === "300" && await page.locator(".rq-change").count() === 0 && /300 g rice/.test(await step2()), "Undo takes it back, in the steps too");
 
     // a different food: the same weight first; more than a fifth apart turns the line amber
     await page.getByRole("button", { name: "Swap Beef mince, 15 % fat, raw" }).click(); await page.waitForTimeout(200);
@@ -69,6 +76,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
     const box3 = page.getByRole("group", { name: "In place of Onion, raw" });
     ok(/removed just now\?/.test(await box3.textContent()) && await box3.getByRole("button", { name: "No, a food of its own" }).count() === 1, "Add after Remove asks if it takes the onion's place");
     await box3.getByRole("button", { name: "No, a food of its own" }).click(); await page.waitForTimeout(300);
+    ok(/onion is in a step but no longer in the recipe\./.test(await txt(".st")), "a removed food still named in a step is said: " + await txt(".st-note"));
     ok(await grams("Oats") === "", "a food of its own comes without grams, not 100 g");
     await page.getByRole("button", { name: "Save changes" }).click(); await page.waitForTimeout(300);
     ok(/Set the grams of Oats, or remove it\./.test(await txt(".rq-need")) && await page.locator(".rq-editing").count() === 1, "Save waits for the grams");

@@ -18,7 +18,7 @@ import { CountAmount, isCounted } from "./CountAmount";
 import { countOf, countWord, howMany, KINDS } from "../counted";
 import { OriginalSteps, StepsHint } from "./StepsView";
 import { foodNames, diffFoods, diffLine } from "../stepsState";
-import { stepParts } from "../steps";
+import { stepParts, tokenOf } from "../steps";
 import { coverIsDrawn, isDrawnPhoto, TEST_MODELS } from "../covers";
 import { sig } from "../photos";
 import { CHEF_NAME } from "./Mark";
@@ -109,7 +109,10 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const [swapAt, setSwapAt] = useState<string | null>(null);
   const [pick, setPick] = useState<{ food: Food; old: Ingredient; at: number; mode: "swap" | "after-remove" } | null>(null);
   const [removed, setRemoved] = useState<{ item: Ingredient; at: number } | null>(null);
-  const [undo, setUndo] = useState<Ingredient[][]>([]);
+  const [undo, setUndo] = useState<{ items: Ingredient[]; steps: string[] }[]>([]);
+  const [followed, setFollowed] = useState<string | null>(null);
+  // the steps editor fills its fields once; a swap that rewrites the steps gives it fresh fields
+  const [stepsKey, setStepsKey] = useState(0);
   const [fresh, setFresh] = useState<string[]>([]);
   const [need, setNeed] = useState<string | null>(null);
   const items = edit ? edit.items : meal.items;
@@ -118,7 +121,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const serves = meal.makes?.n ?? portionsIn(meal);
   const oneWord = meal.makes ? meal.makes.unit.replace(/s$/, "") : "portion";
   const pd = density(sum.protein, sum.calories);
-  const resetSwap = () => { setSwapAt(null); setPick(null); setRemoved(null); setUndo([]); setFresh([]); setNeed(null); };
+  const resetSwap = () => { setSwapAt(null); setPick(null); setRemoved(null); setUndo([]); setFresh([]); setNeed(null); setFollowed(null); };
   const startEdit = () => { resetSwap(); setEdit({ items: meal.items.map((i) => ({ ...i })), steps: [...(meal.steps ?? [])], optional: [...(meal.optional ?? [])], makesN: meal.makes ? String(meal.makes.n) : "", makesUnit: meal.makes?.unit ?? "" }); setFind(null); setExtraParts([]); };
   // parts in Edit recipe (0.2.19, IM18): each food's part, a new part, optional on and off
   const editParts = edit ? [...new Set([...partsOf(edit.items, edit.optional), ...extraParts])] : [];
@@ -138,8 +141,11 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
     setEdit(null); setFind(null); resetSwap();
   };
   // DT83: every change to the foods can be taken back, one at a time
-  const change = (items: Ingredient[]) => { if (!edit) return; setUndo((u) => [...u, edit.items]); setEdit({ ...edit, items }); setNeed(null); };
-  const takeBack = () => { if (!edit || !undo.length) return; setEdit({ ...edit, items: undo[undo.length - 1] }); setUndo((u) => u.slice(0, -1)); setPick(null); setRemoved(null); };
+  const change = (items: Ingredient[], steps?: string[]) => { if (!edit) return; setUndo((u) => [...u, { items: edit.items, steps: edit.steps }]); setEdit({ ...edit, items, ...(steps ? { steps } : {}) }); setNeed(null); };
+  const takeBack = () => { if (!edit || !undo.length) return; const last = undo[undo.length - 1]; if (last.steps !== edit.steps) setStepsKey((k) => k + 1); setEdit({ ...edit, items: last.items, steps: last.steps }); setUndo((u) => u.slice(0, -1)); setPick(null); setRemoved(null); setFollowed(null); };
+  // DT83 fix (Milan 21:56, Sarma on 0.2.83): the steps name a food by its row; a food that takes another's place takes its
+  // place in the steps too, so the steps never keep rice after rice is swapped for oats
+  const followSteps = (steps: string[], oldId: string, next: Ingredient) => steps.map((x) => x.replace(/\[\[i:([^|\]]*)\|[^\]]*\]\]/g, (t, id: string) => (id === oldId ? tokenOf(next) : t)));
   const chosen = (food: Food) => {
     if (!edit) return;
     const at = swapAt ? edit.items.findIndex((i) => i.id === swapAt) : -1;
@@ -156,7 +162,10 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       const grams = swapChoices(old, food).find((c) => c.way === way)?.grams ?? old.grams;
       const next: Ingredient = { id: uid(), food, grams, locked: old.locked, ...(old.part ? { part: old.part } : {}), ...(old.role ? { role: old.role } : {}) };
       log("swap", { way, kind: sameKind(old.food, food) ? "same" : "other", how: mode });
-      change(mode === "swap" ? edit.items.map((x, j) => (j === at ? next : x)) : [...edit.items.slice(0, at), next, ...edit.items.slice(at)]);
+      const steps = followSteps(edit.steps, old.id, next), n = steps.filter((x, j) => x !== edit.steps[j]).length;
+      if (n) setStepsKey((k) => k + 1);
+      setFollowed(n ? `The steps follow: ${n === 1 ? "one step names" : `${n} steps name`} ${pick.food.name} where ${n === 1 ? "it" : "they"} named ${old.food.name}.` : null);
+      change(mode === "swap" ? edit.items.map((x, j) => (j === at ? next : x)) : [...edit.items.slice(0, at), next, ...edit.items.slice(at)], steps);
     }
     setPick(null); setRemoved(null);
   };
@@ -273,6 +282,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           <div className={`rq-change${delta.big ? " rq-change-big" : ""}`} role="status" aria-label="What changed">
             <small>{[delta.out.length ? `Out: ${delta.out.join("; ")}.` : "", delta.in.length ? `In: ${delta.in.join("; ")}.` : "", delta.moved.length ? `Changed: ${delta.moved.join("; ")}.` : ""].filter(Boolean).join(" ")}</small>
             <small><b>One {oneWord}: {whole(delta.kcal[0])} to {whole(delta.kcal[1])} kcal, {whole(delta.protein[0])} to {whole(delta.protein[1])} g protein{delta.pd[0] !== null && delta.pd[1] !== null ? `, PD ${fmt(delta.pd[0], 1)} to ${fmt(delta.pd[1], 1)}` : ""}.</b>{delta.big ? " More than a fifth apart: check that the recipe still does what it was for." : ""}</small>
+            {followed && <small>{followed}</small>}
             {undo.length > 0 && <button type="button" className="link" onClick={takeBack}>Undo</button>}
           </div>
         )}
@@ -348,7 +358,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       <section className={`card rq-steps ${edit ? "editing" : ""}`}>
         <b>Steps</b>
         {edit
-          ? <StepsEditor steps={edit.steps} items={edit.items} onChange={(steps) => setEdit((e) => (e ? { ...e, steps } : e))} />
+          ? <StepsEditor key={stepsKey} steps={edit.steps} items={edit.items} onChange={(steps) => setEdit((e) => (e ? { ...e, steps } : e))} />
           : drafted ? (<>
               <small className="rq-drafted">{drafted.marks ? (drafted.kitchen || `${CHEF_NAME}'s steps, from the original, for your amounts and your kitchen. Each says how it relates to the original.`) : "Drafted by Chef Mealan from your foods and amounts. Read it, change any word."}</small>
               {drafted.marks && drafted.kitchen && <small className="muted">Each step says how it relates to the original.</small>}
