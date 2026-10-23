@@ -12,15 +12,21 @@ import type { Planned } from "../planned";
 
 // DT79 (Milan 23 October 11:15): a recipe that makes pieces says what the plan takes of it, from today on
 const WD = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+// DT81: how many pieces the plan takes from today, for Cook it's suggestion
+const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
+function plannedCountOf(m: Meal, planned: Planned): number { return m.makes && m.makes.n >= 2 ? batchUse(planned, m.id, todayKey()).reduce((a, u) => a + u.n, 0) : 0; }
 function batchLine(m: Meal, planned: Planned): string | null {
   if (!m.makes || m.makes.n < 2) return null;
   const d = new Date(), today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   const use = batchUse(planned, m.id, today);
   if (!use.length) return null;
-  const n = m.makes.n, unit = m.makes.unit, total = use.reduce((a, u) => a + u.n, 0), batches = Math.ceil(total / n - 1e-9), left = batches * n - total;
+  const n = m.makes.n, unit = m.makes.unit, total = use.reduce((a, u) => a + u.n, 0);
+  // DT81: a batch set in Cook it covers the plan when it is big enough
+  const cook = m.cook && m.cook.n >= total ? m.cook.n : 0;
+  const batches = cook ? 1 : Math.ceil(total / n - 1e-9), left = cook ? cook - total : batches * n - total;
   const day = (s: string) => WD[new Date(`${s}T12:00:00`).getDay()];
   const leftText = left === 0 ? "none left" : `${left} ${left === 1 ? oneWord(unit) : unit} left`;
-  return `${n} ${unit}: ${use.map((u) => `${u.n} on ${day(u.date)} ${u.slot}`).join(", ")}. ${batches > 1 ? `${batches} batches, ` : ""}${leftText}.`;
+  return `${n} ${unit}: ${use.map((u) => `${u.n} on ${day(u.date)} ${u.slot}`).join(", ")}. ${cook ? `Cooking ${cook}, ` : batches > 1 ? `${batches} batches, ` : ""}${leftText}.`;
 }
 import type { AppApi, MealFrom } from "./api";
 import { showPlanOn } from "./PlanScreen";
@@ -230,7 +236,7 @@ export function RecipesScreen(p: AppApi) {
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
-      <RecipePage key={opened.id} meal={opened} plannedLine={batchLine(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
+      <RecipePage key={opened.id} meal={opened} plannedLine={batchLine(opened, p.planned)} plannedCount={plannedCountOf(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
         pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
         top={landed && landed.id === opened.id ? (

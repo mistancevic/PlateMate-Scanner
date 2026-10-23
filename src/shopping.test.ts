@@ -192,3 +192,12 @@ test("DT79: pieces of a batch recipe add up, and the list buys whole batches", (
   const two = shoppingList({ "2026-10-20": { lunch: { ...sarma, amount: 6 } }, "2026-10-22": { lunch: { ...sarma, amount: 5 } } }, ["2026-10-20", "2026-10-22"]);
   assert.equal(two.batches![0].batches, 2); assert.equal(two.lines.find((x) => /Cabbage/.test(x.name))!.grams, 1600);
 });
+test("DT81: Cook it 10 of a recipe that makes 8: the list buys one batch for 10, not two of 8", () => {
+  const cabbage = food("Cabbage, raw");
+  const sarma = { title: "Sarma", kcal: 100, protein: 10, source: "mine" as const, mealId: "sa", items: [it(cabbage, 800)], portion: 100, servings: 8, unit: "sarmas", amount: 5 };
+  const plan = { "2026-10-20": { lunch: sarma }, "2026-10-22": { lunch: { ...sarma } } };
+  const two = shoppingList(plan, ["2026-10-20", "2026-10-22"]);
+  assert.equal(two.lines[0].grams, 1600);
+  const ten = shoppingList(plan, ["2026-10-20", "2026-10-22"], (id) => (id === "sa" ? 10 : undefined));
+  assert.equal(ten.lines[0].grams, 1000); assert.deepEqual(ten.batches, [{ title: "Sarma", n: 8, pieces: 10, batches: 2, cook: 10 }]);
+});

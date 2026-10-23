@@ -195,3 +195,16 @@ test("DT80: a recipe that now says it makes 8 sarmas: its planned meal takes the
   assert.equal(Math.abs(l.kcal - m.kcal) <= 1, true);
   assert.equal(refresh80(next, [after]), next);                                                                    // once
 });
+import { sizedFor } from "./pilot";
+test("DT81: Cook it sizes the recipe; a counted batch sets what one piece is", () => {
+  const items = [{ id: "a", food, grams: 800, locked: true }];
+  const sarma = { id: "sa", title: "Sarma", items, portion: 100, savedAt: "", makes: { n: 8, unit: "sarmas" } } as any;
+  assert.equal(sizedFor(sarma, 10)[0].grams, 1000);                    // 10 of 8: every food times 10/8
+  assert.equal(sizedFor(sarma, 8), sarma.items);                        // as written
+  const one = fromMeal(sarma, "mine");
+  assert.equal(one.servings, 8); assert.equal(one.kcal, Math.round(800 * food.calories / 100 / 8));
+  // cooked for 10, it made 11: one sarma is an 11th of the 10-batch
+  const after = fromMeal({ ...sarma, batch: { cooked: 10, made: 11, at: "" } }, "mine");
+  assert.equal(after.servings, 11); assert.equal(after.kcal, Math.round(1000 * food.calories / 100 / 11));
+  assert.equal(after.items![0].grams, 1000);
+});

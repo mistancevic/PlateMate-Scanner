@@ -1062,7 +1062,8 @@ export default function App() {
   useEffect(() => {
     const rec = state.fromRecipe ? state.meals.find((m) => m.id === state.fromRecipe) : null;
     const weight = (xs: { grams: number }[]) => xs.reduce((n, i) => n + (i.grams > 0 ? i.grams : 0), 0);
-    if (rec && servingsOf(rec) > 1 && weight(state.items) < weight(rec.items) * 0.95) return;
+    const batch = rec?.cook && rec.makes ? rec.cook.n / rec.makes.n : 1;           // DT81: the whole batch as cooked
+    if (rec && servingsOf(rec) > 1 && weight(state.items) < weight(rec.items) * batch * 0.95) return;
     const next = wholeOnPlate(state.items);
     if (next) setState((s) => ({ ...s, items: wholeOnPlate(s.items) ?? s.items }));
   }, [state.items, state.fromRecipe, state.meals]);

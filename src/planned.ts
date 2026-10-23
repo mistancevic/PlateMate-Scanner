@@ -1,6 +1,6 @@
 // What is in the slots (0.2.2, canvas S "Plan purpose one" and H7): a meal per slot per date, with its numbers, so the day
 // adds up before anything is cooked. A meal comes from My recipes, Coach's recipes, Chef Mealan's starters, or the Plate.
-import { aggregate, density, servingsOf, type Ingredient, type Meal } from "./pilot";
+import { aggregate, density, servingsOf, sizedFor, type Ingredient, type Meal } from "./pilot";
 import type { Slot } from "./slots";
 import { REFERENCE, referenceFood } from "./reference";
 import { kindOf, countOf, howMany, gramsOfOne } from "./counted";
@@ -35,7 +35,7 @@ export function refreshPlanned(p: Planned, meals: Meal[]): Planned {
       if (r && servingsOf(r) > 1) { const f = fromMeal(r, m.source); const a = m.amount ?? 1; next[date][slot] = { ...m, kcal: Math.round(f.kcal * a), protein: Math.round(f.protein * a), servings: f.servings, ...(f.unit ? { unit: f.unit } : {}) }; changed = true; }
       // DT80: a recipe now says what it makes (or makes something else): a planned meal of it takes the new pieces, as many as
       // keep its kcal, so the day stays as planned
-      else if (m.mealId && m.servings && byId.get(m.mealId) && (servingsOf(byId.get(m.mealId)!) !== m.servings || (fromMeal(byId.get(m.mealId)!, m.source).unit ?? "") !== (m.unit ?? ""))) {
+      else if (m.mealId && m.servings && byId.get(m.mealId) && ((fromMeal(byId.get(m.mealId)!, m.source).servings ?? 1) !== m.servings || (fromMeal(byId.get(m.mealId)!, m.source).unit ?? "") !== (m.unit ?? ""))) {
         const f = fromMeal(byId.get(m.mealId)!, m.source);
         if (!isBatch(f)) next[date][slot] = { ...m, ...f, amount: undefined, usual: undefined, unit: undefined, servings: undefined, note: m.note };
         else { const c = Math.max(1, Math.min(f.servings!, Math.round(m.kcal / Math.max(1, f.kcal)))); next[date][slot] = { ...withPieces({ ...f, title: m.title, note: m.note }, c, false), usual: c }; }
@@ -90,10 +90,13 @@ export function plannedPortion(m: PlannedMeal, id: string, savedAt: string): Mea
 // a recipe as a planned meal: its numbers at the portion saved
 // R21 (0.2.49): a recipe that makes several counts one of them, the recipe divided by what it makes, as the Plate does
 export function fromMeal(m: Meal, source: Source): PlannedMeal {
-  const t = aggregate(m.items);
-  const n = servingsOf(m);
+  // DT81: a recipe with a batch counted after cooking: its pieces are what that batch made (11 sarmas of what was cooked for 10)
+  const b = m.batch && m.makes && m.makes.n > 1 && m.batch.made > 1 ? m.batch : null;
+  const items = b ? sizedFor(m, b.cooked) : m.items;
+  const t = aggregate(items);
+  const n = b ? b.made : servingsOf(m);
   const ratio = n > 1 ? 1 / n : m.portion && t.weight > 0 ? Math.min(1, m.portion / t.weight) : 1;
-  return { title: m.title, kcal: Math.round((t.calories ?? 0) * ratio), protein: Math.round((t.protein ?? 0) * ratio), source, mealId: m.id, items: m.items, portion: m.portion, ...(n > 1 ? { servings: n, ...(m.makes?.unit && m.makes.n > 1 ? { unit: m.makes.unit } : {}) } : {}) };
+  return { title: m.title, kcal: Math.round((t.calories ?? 0) * ratio), protein: Math.round((t.protein ?? 0) * ratio), source, mealId: m.id, items, portion: m.portion, ...(n > 1 ? { servings: n, ...(m.makes?.unit && m.makes.n > 1 ? { unit: m.makes.unit } : {}) } : {}) };
 }
 
 // DT79 (Milan 23 October 11:12 and 11:15): a batch recipe is planned in whole pieces of what it makes, 3 sarmas. Chef Mealan

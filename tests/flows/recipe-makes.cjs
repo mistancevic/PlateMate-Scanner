@@ -40,10 +40,15 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", po
   await page.getByText("Sarma", { exact: true }).last().click(); await page.waitForTimeout(900);
   await page.getByRole("button", { name: "Edit recipe" }).click(); await page.waitForTimeout(400);
   ok(await page.getByRole("group", { name: "What the recipe makes" }).count() === 1, "Edit recipe asks what it makes");
+  // Changed by story DT81 (Milan 23 October 15:51): Add a food finds foods without a label, words in any order
+  await page.getByRole("button", { name: "Add a food" }).click(); await page.waitForTimeout(200);
+  await page.getByLabel("Search my foods").fill("raw rice"); await page.waitForTimeout(300);
+  ok(await page.locator(".rq-find-row", { hasText: "Rice, white, raw" }).count() === 1 && /a food without a label/.test(await txt(".rq-find")), "Add a food: raw rice finds Rice, white, raw, a food without a label");
+  await page.getByRole("button", { name: "Close the search" }).click(); await page.waitForTimeout(200);
   await page.getByLabel("How many it makes").fill("8"); await page.getByLabel("Of what").fill("sarma");
   await page.getByRole("button", { name: "Save changes" }).click(); await page.waitForTimeout(800);
   const pageText = await txt(".rq");
-  ok(/Makes 8 sarmas\./.test(pageText) && /One sarma/.test(pageText), "the page: Makes 8 sarmas, and one sarma's numbers: " + pageText.slice(0, 200));
+  ok(/The whole recipe makes 8 sarmas · one sarma \d+ kcal/.test(pageText) && /One sarma/.test(pageText), "the page: Makes 8 sarmas, and one sarma's numbers: " + pageText.slice(0, 200));
   ok(/^8 sarmas: \d+ on \w+ lunch\. \d+ sarmas? left\./.test(await txt(".rq-planned")), "the page says what the plan takes: " + await txt(".rq-planned"));
   // Plan: the lunch is now in sarmas, about the same kcal
   await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(700);
