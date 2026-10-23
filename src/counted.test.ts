@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { kindOf, sizeFrom, countFrom, countRead, countLabel, countWord, stepCount, resize, weighed, guessSize, countOf, countInStep } from "./counted";
+import { kindOf, sizeFrom, countFrom, countRead, countLabel, countWord, stepCount, resize, weighed, guessSize, countOf, countInStep, wholeOnPlate } from "./counted";
 
 test("CT: which foods are counted; egg whites, yolks and liquid egg stay in grams", () => {
   assert.equal(kindOf("Eggs"), "egg"); assert.equal(kindOf("Egg"), "egg"); assert.equal(kindOf("Large eggs"), "egg");
@@ -69,4 +69,14 @@ test("DT77: apples are counted; German and Serbian names count too", () => {
   for (const n of ["Eier, Freiland", "Bio Ei", "Jaja"]) assert.equal(kindOf(n), "egg", n);
   for (const n of ["Eiweiß", "Eis Vanille", "Eiernudeln"]) assert.equal(kindOf(n), null, n);
   assert.equal(kindOf("Banane"), "banana");
+});
+test("DT78: on the Plate eggs, bananas and apples land on whole ones; weighed and dish shares stay", () => {
+  const egg = { food: { name: "Eggs" }, grams: 92, count: { kind: "egg" as const, size: "M" as const } };
+  const out = wholeOnPlate([egg])!;
+  assert.equal(out[0].grams, 104); assert.deepEqual(out[0].count, { kind: "egg", size: "M" });
+  assert.equal(wholeOnPlate([{ ...egg, grams: 104 }]), null);                                // already whole
+  assert.equal(wholeOnPlate([{ ...egg, grams: 20 }])![0].grams, 52);                         // at least one
+  assert.equal(wholeOnPlate([{ food: { name: "Banana" }, grams: 134, count: { kind: "banana" as const, size: "L" as const, weighed: true } }]), null);
+  assert.equal(wholeOnPlate([{ ...egg, dish: { id: "d" } }]), null);                         // a share of a batch
+  assert.equal(wholeOnPlate([{ food: { name: "Oats" }, grams: 37 }]), null);
 });

@@ -1,3 +1,4 @@
+import { wholeOnPlate } from "./counted";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, useMemo } from "react";
 import { optAt } from "./parts";
 import {
@@ -1050,6 +1051,11 @@ export default function App() {
   useEffect(() => {
     setOptions([]);
   }, [state.items, state.goals, limits]);
+  // DT78: eggs, bananas and apples on the Plate are whole ones, however they arrived (a recipe, a scan, grams typed)
+  useEffect(() => {
+    const next = wholeOnPlate(state.items);
+    if (next) setState((s) => ({ ...s, items: wholeOnPlate(s.items) ?? s.items }));
+  }, [state.items]);
   // the counter (0.2.5+r17, board M): what may leave the phone is sent while signed in, every minute and when the app hides
   useEffect(() => {
     // signed in on the live app; without accounts (local, walkthroughs) the local server counts
