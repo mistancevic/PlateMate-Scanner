@@ -1,3 +1,4 @@
+import { ClearField } from "../components/ClearField";
 import { Camera, X, Pencil, Plus } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
 import { findReference, referenceFood, localName, otherNames as refOtherNames } from "../reference";
@@ -88,7 +89,7 @@ export function FoodsScreen(p: AppApi) {
             </div>
           </div>
         )}
-        <input className="search" aria-label="Find a food" placeholder="A name, or a barcode you saved" value={query} onChange={(e) => setQuery(e.target.value)} />
+        <ClearField value={query} onClear={() => setQuery("")} label="Clear the search"><input className="search" aria-label="Find a food" placeholder="A name, or a barcode you saved" value={query} onChange={(e) => setQuery(e.target.value)} /></ClearField>
       </section>
       {pairs.length > 0 && (
         <button className="strip strip-button" onClick={() => setDupOpen(true)}>{pairs.length} possible {pairs.length === 1 ? "duplicate" : "duplicates"} in your foods. Check and merge.</button>

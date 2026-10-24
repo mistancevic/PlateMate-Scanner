@@ -5,7 +5,10 @@ import { tempsIn } from "../units";
 import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 import { ConfirmButton } from "../components/Confirm";
 import { fitsPlate, isIngredient, type Mix } from "../mixtip";
-import { lettersOf, letterLine, LETTER_ORDER, per100kcal, BANDS_NOTE } from "../letters";
+import { lettersOf } from "../letters";
+import { Letters } from "../components/Letters";
+import { ClearField } from "../components/ClearField";
+import { WaitSteps, type WaitStep } from "../components/WaitSteps";
 import { aggregate, density, uid, solveIngredient, servingLabel, sizedFor } from "../pilot";
 import { fromMeal } from "../planned";
 import type { Meal, Food, Ingredient, PlateOpt, StepMark } from "../pilot";
@@ -51,7 +54,7 @@ import { changesOf, countItem, cleanSteps, scaleTo, onePortion, sideAmount, pdOf
 import { countOf } from "../recipeDelete";
 import { foodNames, originalFoodsOf, diffFoods, diffLine } from "../stepsState";
 import { OriginalSteps, StepsHint } from "../components/StepsView";
-import { countOf as countedOf } from "../counted";
+import { countOf as countedOf, gramsOfOne } from "../counted";
 import { CountAmount, SizePicker, isCounted } from "../components/CountAmount";
 import { cookName, cookPhrase, weighLine, aroundWord, needsCooking, rawHint, cookTitle } from "../cookWords";
 
@@ -94,19 +97,6 @@ function extras(items: { food: any; grams: number }[]) {
 }
 // R25 (0.2.53, board RS25): a meal above this, or above the whole day, is asked once before it is logged
 const BIG_MEAL = 2000;
-// DT108 (0.2.92, board Stories65): the four letters under the readout, with the lines behind them on a tap
-function Letters({ n, rates, who }: { n: { calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber?: number | null }; rates: NonNullable<AppApi["rates"]>; who: string }) {
-  const [open, setOpen] = useState(false);
-  const ls = lettersOf(n, rates);
-  return (
-    <div className="readout-letters">
-      <button type="button" className="letters-row" aria-expanded={open} aria-label={`The four letters for ${who}: ${ls.join(" ")}`} onClick={() => setOpen((o) => !o)}>
-        <span className="letters">{ls.join("  ")}</span><small>against your day</small>
-      </button>
-      {open && <div className="letters-lines">{LETTER_ORDER.map((m) => <small key={m}>{letterLine(m, per100kcal(n[m], n.calories), rates[m])}</small>)}<small className="muted">{BANDS_NOTE}</small></div>}
-    </div>
-  );
-}
 export function JourneyScreen(p: AppApi) {
   const { state, setState, setTab, step, setStep, setCamera, setMode, blank, updateItem,
     setAdjustId, mixWith, options, pdRef, saveMeal, notify, setError, setFeedback, add } = p;
@@ -757,11 +747,21 @@ export function JourneyScreen(p: AppApi) {
     log("fit_used");
     void askChef(items, []);
   }
+  // DT111 (0.2.94): the stages of the ask, shown while it runs
+  const [chefStage, setChefStage] = useState<{ at: string; done: string[] }>({ at: "read", done: [] });
+  const stage = (at: string, ...done: string[]) => setChefStage((c) => ({ at, done: [...new Set([...c.done, ...done])] }));
+  const chefSteps = (): WaitStep[] => [
+    { key: "read", text: `Read your plate: ${items.map((i) => cookPhrase(i.food.name, i.grams)).join(", ")}, ${fmt(t.calories, 0)} kcal` },
+    { key: "ask", text: `Asked ${CHEF_NAME} for three ${plural(mealWord)}${(p.personal.kitchens ?? []).length ? ` from your kitchens, ${(p.personal.kitchens ?? []).join(" and ")}` : ""}` },
+    { key: "check", text: `Checking his ideas against ${share ? `${fmt(mealRange(share.kcal)[0], 0)} to ${fmt(mealRange(share.kcal)[1], 0)} kcal` : "the meal"}${pdRef !== null ? ` and PD ${pdVal(pdRef)}` : ""}` },
+    { key: "again", text: "Asking again for an idea that missed" },
+  ];
   async function askChef(base: Ingredient[], avoid: string[], failedIn: { title: string; why: string }[] = [], kept: MealOption[] = []) {
     if (!share) return;
     // DT102 (0.2.91): Other ideas: the last dish's cooking foods go before the new ideas come
     setState((s) => (s.cooking ? { ...s, cooking: undefined, cookingFor: undefined } : s));
     setChef({ status: "working" });
+    if (failedIn.length) stage("again", "read", "ask", "check"); else { setChefStage({ at: "read", done: [] }); window.setTimeout(() => setChefStage((c) => (c.at === "read" ? { at: "ask", done: ["read"] } : c)), 400); }
     try {
       const res = await fetch("/api/meal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         plate: base.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein })), meal: mealWord, need: share.kcal, target: pdRef,
@@ -769,6 +769,7 @@ export function JourneyScreen(p: AppApi) {
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `${CHEF_NAME} could not answer.`);
       const good = [...kept], failed: { title: string; why: string }[] = [];
+      stage("check", "read", "ask");
       for (const o0 of (data.options ?? []) as { kitchen: string; title: string; why: string; for_cooking?: string[]; adds: { name: string; grams: number; calories: number; protein: number; base: boolean }[] }[]) {
         // DT100 (0.2.90): the title as a cook says it
         const o = { ...o0, title: cookTitle(o0.title) };
@@ -809,6 +810,41 @@ export function JourneyScreen(p: AppApi) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dishSig, dishWanted, dishTry]);
   const dishNow = dish && dish.sig === dishSig && dishWanted ? dish : null;
+  // DT110 (0.2.94, board Stories67; Milan 25 October 00:25: three ideas, none of value, on a plate of 1,232 kcal for a breakfast of
+  // 619 to 757): a plate over its meal (C31) never goes to the ideas. Code says what it is and offers three ways.
+  const [bigKept, setBigKept] = useState<string | null>(null);
+  const bigN = tooBig && share && !imported && !madeBy ? Math.max(2, Math.round((t.calories ?? 0) / share.kcal)) : 0;
+  const bigPlate = bigN > 0 && bigKept !== dishSig;
+  const mealsWord = plural(mealWord);
+  const numWord = (n: number) => ["", "one", "two", "three", "four", "five"][n] ?? String(n);
+  // Make it N breakfasts: saved as a recipe that makes N; one portion stays on the plate, the next one goes on Plan for tomorrow
+  const makeItN = () => {
+    if (!share || !bigN) return;
+    const name = (state.title && state.title !== "DaaM" ? state.title : "") || autoTitle(items);
+    const whole = structuredClone(items).map((i) => ({ ...i, locked: true }));
+    const meal: Meal = { id: uid(), title: name, items: whole, portion: Math.round((t.weight ?? 0) / bigN), savedAt: new Date().toISOString(), kind: p.kind, makes: { n: bigN, unit: mealsWord } };
+    const one = items.map((i) => ({ ...i, grams: Math.round(i.grams / bigN) }));
+    setState((s) => ({ ...s, meals: [meal, ...s.meals], items: one, title: name, portion: null, fromRecipe: meal.id, recipeFoods: whole.filter((i) => !i.optional).map((i) => i.food.id) }));
+    setPmode("sized");
+    if (mealSlot) { const d = new Date(); d.setDate(d.getDate() + 1); p.fill(ymd(d), mealSlot.id, fromMeal(meal, "mine")); }
+    notify(`${name} makes ${bigN} ${mealsWord}. One is on the plate; ${bigN === 2 ? "the other" : "the next"} is tomorrow's ${mealWord} on Plan.`);
+  };
+  // Shrink it to one: every amount scaled into the meal's range, each food within its portion; a counted food on whole pieces
+  const shrinkToOne = () => {
+    if (!share || !(t.calories ?? 0)) return;
+    const f = share.kcal / (t.calories ?? 1);
+    const next = items.map((i) => {
+      const r = portionRange(i.food), c = countedOf(i);
+      let g = Math.max(r.min, Math.min(r.max, i.grams * f));
+      // a counted food on whole pieces, a pack's piece on whole pieces (one bar, not 52 g)
+      if (c) { const one = gramsOfOne(c); g = Math.max(one, Math.round(g / one) * one); }
+      else if (i.food.serving?.grams) { const one = i.food.serving.grams; g = Math.max(one, Math.round(g / one) * one); }
+      return { ...i, grams: Math.round(g) };
+    });
+    setState((s) => ({ ...s, items: next, portion: null }));
+    setFit(null);
+    notify(`Shrunk to one ${mealWord}: ${fmt(next.reduce((k, i) => k + ((i.food.calories ?? 0) * i.grams) / 100, 0), 0)} kcal.`);
+  };
   // DT105 (0.2.92, board Stories64): an ingredient on the plate is caught by code before any read (rule C6 in the gate, C30)
   const ingredientsOn = items.filter((i) => !i.optional && isIngredient(i.food));
   const [dishKept, setDishKept] = useState<string>("");
@@ -856,7 +892,7 @@ export function JourneyScreen(p: AppApi) {
       <>
         {stepHead({ n: 2, title: `A ${mealWord} around your ${aroundWord(items.map((i) => i.food.name))}`, sub: lead, back: <button className="link back back-top" onClick={() => setChef(null)}><ChevronLeft size={16} /> Back to the plate</button> })}
         <small className="mm-stays">On the plate: {items.map((i) => cookPhrase(i.food.name, i.grams)).join(", ")}. {items.length === 1 ? "It stays." : "They stay."}</small>
-        {chef.status === "working" && <div className="bubble mealan thinking mm-working"><span /><span /><span /></div>}
+        {chef.status === "working" && <div className="mm-working"><WaitSteps steps={chefSteps()} at={chefStage.at} done={chefStage.done} /></div>}
         {opts.map((o) => (
           <section className="card mm-card" key={o.title}>
             <div className="mm-top"><small className="mm-kitchen">{o.kitchen.toUpperCase()}</small><small className="mm-nums">{fmt(o.kcal, 0)} kcal · {pdText(o.pd)}</small></div>
@@ -1129,9 +1165,17 @@ export function JourneyScreen(p: AppApi) {
         )}
         {/* DT97 (0.2.90, board Stories62): one place for Chef Mealan above the buttons, there from the second food on, so nothing
             below it moves when his answer comes. His verdict (DT93, rule 2), then Fit's line under it, then the three ways. */}
-        {(dishWanted || (fit && !imported) || (ingredientsOn.length > 0 && !imported)) && (
+        {(dishWanted || (fit && !imported) || (ingredientsOn.length > 0 && !imported) || bigPlate) && (
           <section className="card gate-card" aria-label={`${CHEF_NAME} on this plate`}>
             <b><ChefHat size={16} /> {CHEF_NAME}</b>
+            {bigPlate && (<div className="gate-big">
+              <small>Your plate is already about {numWord(bigN)} {mealsWord}: {fmt(t.calories, 0)} kcal of {fmt(mealRange(share!.kcal)[0], 0)} to {fmt(mealRange(share!.kcal)[1], 0)}. Nothing can be added to make it one.</small>
+              <div className="button-row">
+                <button className="pill pill-small pill-primary" onClick={makeItN}>Make it {numWord(bigN)} {mealsWord}</button>
+                <button className="pill pill-small" onClick={shrinkToOne}>Shrink it to one {mealWord}</button>
+                <button className="pill pill-small" onClick={() => setBigKept(dishSig)}>Keep it as it is</button>
+              </div>
+            </div>)}
             {ingredientsOn.map((i) => (
               <div key={i.id} className="gate-ingredient">
                 <small>{cookName(i.food.name).short} is an ingredient, not a food. It needs a dish around it: a dough, a batter, a pot. On its own it is not a {mealWord}.</small>
@@ -1147,8 +1191,8 @@ export function JourneyScreen(p: AppApi) {
               <small>{CHEF_NAME} could not read your plate.</small>
               <div className="button-row"><button className="pill pill-small" onClick={() => setDishTry((n) => n + 1)}>Try again</button></div>
             </>)}
-            {dishNow && dishNow.status === "done" && dishNow.makesIt && dishNow.why && <small className="gate-ok">{dishNow.why}</small>}
-            {dishNow && dishNow.status === "done" && !dishNow.makesIt && dishKept !== dishSig && (<>
+            {dishNow && dishNow.status === "done" && dishNow.makesIt && dishNow.why && !bigPlate && <small className="gate-ok">{dishNow.why}</small>}
+            {dishNow && dishNow.status === "done" && !dishNow.makesIt && dishKept !== dishSig && !bigPlate && (<>
               <small>{dishNow.why}</small>
               <div className="button-row">
                 {chefable && <button className="pill pill-small pill-primary" onClick={() => void askChef(items, [])}>Make it a {mealWord}{dishNow.around ? ` around the ${cookName(dishNow.around).short.toLowerCase()}` : ""}</button>}
@@ -1234,7 +1278,7 @@ export function JourneyScreen(p: AppApi) {
         {foodCard}
         {helperSheet}
         <p className="label">{q.trim() ? "From all your foods" : "Quick picks"}</p>
-        <input className="search" aria-label="Search all my foods" placeholder="Search all my foods" value={q} onChange={(e) => setQ(e.target.value)} />
+        <ClearField value={q} onClear={() => setQ("")} label="Clear the search"><input className="search" aria-label="Search all my foods" placeholder="Search all my foods" value={q} onChange={(e) => setQ(e.target.value)} /></ClearField>
         <div className="rows">
           {/* R9 (0.2.33, boards RS4 and RS5): while a recipe is on the plate, only foods that go with the dish; one line names what was held back */}
           {heldBack.length > 0 && plateTasteOf && <small className="muted held-back">{heldBackLine(plateTasteOf, heldBack)}</small>}

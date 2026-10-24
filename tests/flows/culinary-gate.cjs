@@ -45,7 +45,9 @@ const U = "http://127.0.0.1:3262";
   ok(/not a lunch yet/.test(await text(".readout")) && /about 2 lunches/.test(await text(".readout")), "DT93: the readout says not a lunch yet, about 2 lunches");
   // rule 2: Chef Mealan's read, once per set of foods
   const gate = page.locator(".gate-card").first();
-  ok(dishAsked === 1 && /do not make a lunch/.test(await gate.textContent()) && !/Reading your plate/.test(await gate.textContent()) && await gate.getByRole("button", { name: /^Make it a lunch around the clean protein bar/ }).count() === 1 && await gate.getByRole("button", { name: "Make it a snack" }).count() === 1 && await gate.getByRole("button", { name: "Keep it as it is" }).count() === 1, "DT93: Chef Mealan's card: why, and three ways");
+  // changed by DT110 (0.2.94): a plate of 1,515 kcal for a lunch of 917 is two lunches, so the gate says so and offers Make it two
+  // lunches, Shrink it to one lunch, Keep it as it is; Chef Mealan's ideas are never offered for a plate over its meal
+  ok(dishAsked === 1 && /Your plate is already about two lunches/.test(await gate.textContent()) && await gate.getByRole("button", { name: /^Make it a lunch around/ }).count() === 0 && await gate.getByRole("button", { name: "Make it two lunches" }).count() === 1 && await gate.getByRole("button", { name: "Shrink it to one lunch" }).count() === 1 && await gate.getByRole("button", { name: "Keep it as it is" }).count() === 1, "DT93, DT110: a plate of two lunches: the three ways, no ideas");
   await page.locator(".grams input").nth(1).fill("25"); await page.waitForTimeout(600);
   ok(dishAsked === 1, "DT93: changing an amount does not ask Chef Mealan again");
   // Fit in place: the yeast stays at its portion, the line says so, the plate stays on Craft

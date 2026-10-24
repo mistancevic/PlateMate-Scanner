@@ -38,7 +38,7 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, backLabel, plannedLine, plannedCount }: {
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount }: {
   // DT81: how many of its pieces the plan takes from today, for Cook it's suggestion
   plannedCount?: number;
   // DT79: what the plan takes of this batch, 8 sarmas: 3 on Monday lunch, 1 left
@@ -62,7 +62,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   // RP1b (0.2.25): the foods the original steps were written for, so the page can say what differs
   originalFoods?: string[] | null;
   // RP2 (0.2.25): the readout above the Nutrition table, against your target
-  pdRef?: number | null; fitPd?: (pd: number | null) => string;
+  pdRef?: number | null; fitPd?: (pd: number | null) => string; rates?: import("../letters").Rates | null;
 }) {
   // R8 (0.2.31): the page has its own address while it is open; Back goes to the list
   useBack(true, close, recipePath(meal.id));
@@ -267,7 +267,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {meal.source && <SourceBox meal={meal} onPatch={onPatch} openOriginal={openOriginal ?? null} />}
       {/* R16 (0.2.44, board RS15): PD on top, under Where it came from, as on the Plate; it follows the grams while editing */}
       {plannedLine && <small className="muted rq-planned">{plannedLine}</small>}
-      <NutritionCard readoutOnly items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={null} pdRef={pdRef ?? null} fitPd={fitPd} />
+      <NutritionCard readoutOnly rates={rates} items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={null} pdRef={pdRef ?? null} fitPd={fitPd} />
       {/* IM21: one serving first, when the recipe makes more than one */}
       {/* RP2 (0.2.25): the three tiles gave way to the PD readout above the Nutrition table */}
       {/* DT81: Cook it. The recipe stays as written; this batch can be bigger or smaller, and the foods below follow */}

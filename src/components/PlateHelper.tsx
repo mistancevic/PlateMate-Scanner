@@ -1,3 +1,4 @@
+import { ClearField } from "./ClearField";
 import { useEffect, useRef, useState } from "react";
 import { Send, Replace, Plus, Scale, Check } from "lucide-react";
 import { SafetyNote } from "./SafetyNote";
@@ -106,7 +107,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
           </div>
         )}
         <div className="chat-input">
-          <input value={q} placeholder="What goes with this? What instead of…?" onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} enterKeyHint="send" />
+          <ClearField value={q} onClear={() => setQ("")} label="Clear the question"><input value={q} placeholder="What goes with this? What instead of…?" onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} enterKeyHint="send" /></ClearField>
           <button className="icon" aria-label="Ask" onClick={() => ask()} disabled={busy}><Send size={20} /></button>
         </div>
         {busy && <div className="bubble mealan thinking"><span /><span /><span /></div>}

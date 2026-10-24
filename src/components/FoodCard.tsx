@@ -9,21 +9,11 @@ import { displayRows } from "../labeltable";
 import { useEffect } from "react";
 import { JOBS, jobOf, plainLine, todayLine } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
-import { lettersOf, letterLine, LETTER_ORDER, per100kcal, BANDS_NOTE, type Rates } from "../letters";
+import { Letters } from "./Letters";
 import { iconFor } from "../icons";
 import { useBack } from "../back";
 import { realPhotosOf } from "../photos";
 
-function FoodLetters({ food, rates }: { food: Food; rates: Rates }) {
-  const [open, setOpen] = useState(false);
-  const ls = lettersOf(food, rates);
-  return (
-    <div className="readout-letters">
-      <button type="button" className="letters-row" aria-expanded={open} aria-label={`The four letters: ${ls.join(" ")}`} onClick={() => setOpen((o) => !o)}><span className="letters">{ls.join("  ")}</span><small>against your day</small></button>
-      {open && <div className="letters-lines">{LETTER_ORDER.map((m) => <small key={m}>{letterLine(m, per100kcal(food[m], food.calories), rates[m])}</small>)}<small className="muted">{BANDS_NOTE}</small></div>}
-    </div>
-  );
-}
 export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto, removePhoto, setMain, toggleFavorite, insight, mix, rates }: { rates?: import("../letters").Rates | null; food: Food; setMain?: (index: number) => void; target: number | null; fit: import("../goal").PdBand; close: () => void; review?: () => void; dontHave?: () => void; mix?: { tip: MixTip; momentName: string; take: (m: Mix) => void; ask: () => void }; addPhoto?: (dataUrl: string) => void; removePhoto?: (index: number) => void; toggleFavorite?: () => void; insight?: { dayKcal: number | null; eaten: number; dayName: string; goalKey: string; requestTip: () => Promise<void>; setJob: (job: string | null) => void } }) {
   const job = jobOf(food);
   const [picking, setPicking] = useState(false);
@@ -139,7 +129,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
             <div><span>{fitText}{target !== null ? `, target ${fixed(target)}` : ""}</span><small>{share !== null ? `${share} % of its energy is protein` : "no protein value"}</small></div>
           </div>
           {/* DT108 (0.2.92): the four letters, F C Fi P, with a line each on a tap */}
-          {rates && food.calories ? <FoodLetters food={food} rates={rates} /> : null}
+          {rates && food.calories ? <Letters n={food} rates={rates} who={food.name} /> : null}
         </section>
         <p className="insight">{plainLine(food, target)}</p>
         {mix && mix.tip.case !== "fits" && mix.tip.case !== "unknown" && (

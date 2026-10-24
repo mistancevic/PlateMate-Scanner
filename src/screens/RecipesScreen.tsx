@@ -274,7 +274,7 @@ export function RecipesScreen(p: AppApi) {
         membersPanel={opened.from === "coach" || opened.from === "members" ? null
           : <SharePanel key={opened.id} meal={opened} p={p} made={opened.members ? memberList?.find((r) => r.id === opened.members!.id)?.made ?? null : null} onPatch={(patch) => patchMeal(opened.id, patch)} />}
         picture={p.ai.on && !opened.from && canDrawCover(opened) ? { count: p.cover.count, drawing: p.cover.drawing === opened.id, draw: () => p.cover.draw(opened), refresh: p.cover.refresh } : null}
-        originalFoods={originalFoodsOf(opened, state.meals)} pdRef={p.pdRef} fitPd={p.fitPd}
+        originalFoods={originalFoodsOf(opened, state.meals)} pdRef={p.pdRef} fitPd={p.fitPd} rates={p.rates}
         draft={p.ai.on ? () => { const d = diffFoods(foodNames(opened.items), originalFoodsOf(opened, state.meals)); return draftSteps(opened, { library: state.foods.map((f) => f.name), equipment: equipmentOf(p.personal), kitchens: p.personal.kitchens ?? [], tastes: tasteForReq(p.personal.tasteChips, state.preferences), ...(d ? { changed: [...d.added.map((x) => `${x}: new`), ...d.gone.map((x) => `${x}: not in it any more`)] } : {}) }); } : null} />
       {sheet}
     </>

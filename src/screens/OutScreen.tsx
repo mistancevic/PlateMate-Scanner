@@ -19,6 +19,8 @@ import { STARTERS, fillDay, fromMeal, sumOf, needOf, type FillRow, type PlannedM
 import { dayRecord } from "../record";
 import { dayLog } from "../today";
 import { chatRows, type ChatRow } from "../chatFoods";
+import { ClearField } from "../components/ClearField";
+import { WaitSteps } from "../components/WaitSteps";
 import { cookName } from "../cookWords";
 import { planDateShown } from "./PlanScreen";
 import { Mic } from "lucide-react";
@@ -42,6 +44,7 @@ const asFood = (r: Rec): Food => ({
 export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; turns: Turn[]; setTurns: (f: (t: Turn[]) => Turn[]) => void; tab: Tab; ask?: "fill" | "plate" | "around" | null; clearAsk: () => void }) {
   const { pdRef, setState, setError, state } = p;
   const [text, setText] = useState("");
+  const [chatStage, setChatStage] = useState<"ask" | "match">("ask");
   // The chef in context (0.2.4, canvas S "Chef Mealan, about this screen", H5, H6, H11): the chat opens knowing the screen.
   // One line about where the person is, chips written for that screen; a chip only asks, the button on the answer acts.
   const lifestyle = lifestyleOf(p.personal);
@@ -210,7 +213,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
     if (!p.ai.on) { setTurns((t) => [...t, { role: "you", text: msg || "(photo)" }, { role: "mealan", text: p.ai.why || FIXED.off }]); setText(""); setPhoto(""); return; }
     const mine: Turn = { role: "you", text: msg || "(photo)", photo: photo || undefined };
     setTurns((t) => [...t, mine]); setText(""); setPhoto("");
-    setThinking(true);
+    setThinking(true); setChatStage("ask");
     try {
       const res = await fetch("/api/out", { method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -246,6 +249,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
       }
       const kcal = aggregate(picks).calories;
       const taken = takeModelFlag(data.reply || ""); if (taken.flag) p.flagFromModel(taken.flag);
+      setChatStage("match");
       // DT106: the foods he named, as rows under the answer, through the rules; only when a plate is open
       const rows = p.tab === "journey" && state.items.length ? chatRows(data.named ?? [], data.skip ?? [], state.foods, state.items, p.region, uid) : [];
       const reply: Turn = { role: "mealan", tag: "chef", text: taken.text + fitNote, picks, pd, kcal, ...(rows.length ? { rows } : {}) };
@@ -361,14 +365,15 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
             ))}
           </div>
         )}
-        {thinking && <div className="bubble mealan thinking"><span /><span /><span /></div>}
+        {/* DT111 (0.2.94): the wait shows its steps, collapsed, above the field */}
+        {thinking && <WaitSteps steps={[{ key: "ask", text: `Asked ${CHEF_NAME}` }, { key: "match", text: "Matching the foods he names to yours" }]} at={chatStage} done={chatStage === "match" ? ["ask"] : []} />}
         <div ref={endRef} />
       </div>
       <div className="chat-bottom">
       {photo && <div className="strip">Photo attached. <button className="link" onClick={() => setPhoto("")}>Remove</button></div>}
       <div className="chat-input">
         <button className="icon" aria-label="Add a photo" onClick={() => fileRef.current?.click()}><Camera size={20} /></button>
-        <input value={text} placeholder="Or ask in your words" onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} enterKeyHint="send" />
+        <ClearField value={text} onClear={() => setText("")} label="Clear the question"><input value={text} placeholder="Or ask in your words" onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} enterKeyHint="send" /></ClearField>
         {Speech && <button className={`icon ${listening ? "listening" : ""}`} aria-label={listening ? "Listening" : "Say it"} onClick={listen}><Mic size={20} /></button>}
         <button className="icon" aria-label="Send" onClick={() => ask()}><Send size={20} /></button>
         <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => {

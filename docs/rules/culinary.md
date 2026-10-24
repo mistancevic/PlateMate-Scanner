@@ -110,6 +110,7 @@ Every place that offers, accepts or moves a food, and the rules it goes through.
 | Fit | moves the densest free food within its portion | C10, C12, C13 | `fit` in src/screens/JourneyScreen.tsx, src/foodjob.ts |
 | The portion line | red line under a food outside its portion | C10, C11 | `portionLine` in src/foodjob.ts |
 | The culinary gate | reads two or more foods, says whether they make the meal; a failed read says so, with Try again (DT104) | C24, C30, C31 | /api/dish in server.ts, the Plate |
+| A plate over its meal | says it is about two breakfasts and offers Make it two, Shrink it to one, Keep it; never the ideas (DT110) | C31, C10 | `bigPlate`, `makeItN`, `shrinkToOne` in src/screens/JourneyScreen.tsx |
 | The ingredient line | an ingredient on the plate gets a line at once, by code, before any read: Take it out, Ask Chef Mealan for a dish around it (DT105) | C6 | `isIngredient`, the gate card in src/screens/JourneyScreen.tsx |
 | A chat answer | the foods Chef Mealan names become rows: + Add, Take it out, Scan it; a name the rules refuse is no row (DT106) | C6, C20, C21, C10 | `chatRows` in src/chatFoods.ts, `fitsPlate` |
 | Chef Mealan's ideas | three dishes around the plate, by kitchen | C14, C15, C20, C25, C32, C33, C34, C36 | /api/meal in server.ts, `solveMeal` in src/makeMeal.ts |
@@ -136,3 +137,4 @@ A row that names a rule the code does not call is a gap and goes to section 7. C
 - 24 October: C3, C4, C5, C14, C15, C32, C33, C40, C43 (0.2.87); C10 to C13, C30, C31 (0.2.88); C10 the start amount (0.2.89). First draft of this file.
 - 24 October, evening: C6 in code; the tip, quick picks, swaps and partners all go through the one module; section 6, where each rule is applied, and the process rule (0.2.91, DT101 to DT103).
 - 24 October, night: C6 in the gate by code, a failed read says so, the chat's answer as rows (0.2.92, DT104 to DT107); a recipe leaves the plate with its foods (0.2.93, DT109).
+- 25 October: C31 in the gate, a plate over its meal never goes to the ideas (0.2.94, DT110).

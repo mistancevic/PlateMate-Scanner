@@ -98,7 +98,8 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300);
   for (const inp of await page.locator('input[aria-label^="Grams of"]').all()) { await inp.fill("900"); }
   await page.waitForTimeout(300);
-  await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe)$/ }).first().click(); await page.waitForTimeout(800);
+  // changed by DT110 (0.2.94): a plate this big gets Chef Mealan's two-lunches card with its own Keep it as it is; the step on is Lock the recipe
+  await page.getByRole("button", { name: "Lock the recipe" }).first().click(); await page.waitForTimeout(800);
   if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); }
   await page.getByRole("button", { name: /I'm making it|Lock the recipe/ }).first().click(); await page.waitForTimeout(600);
   // a big plate eaten all at once is asked about (R25); you ate a portion of it

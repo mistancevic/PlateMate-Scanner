@@ -1,11 +1,13 @@
 // IM21, IM21b (0.2.21), RP2 (0.2.25): the Nutrition table, worked out by code from the foods and their grams. Shared by the
 // recipe page and, since R6 (0.2.43, board RS14), the read card on the Plate and on Recipes.
+import { aggregate } from "../pilot";
+import { Letters } from "./Letters";
 import type { Ingredient, Meal } from "../pilot";
 import { fmt } from "../ui";
 import { nutritionOf, byPart } from "../nutrition";
 
 // IM21, IM21b: Nutrition, worked out by code from the foods and their grams, in the EU label order; exact counts (All 2)
-export function NutritionCard({ items, serves, one, all, stated, pdRef, fitPd, readoutOnly, tableOnly }: { items: Ingredient[]; serves: number; one: string; all: string; stated: Meal["stated"] | null; pdRef: number | null; fitPd?: (pd: number | null) => string; readoutOnly?: boolean; tableOnly?: boolean }) {
+export function NutritionCard({ items, serves, one, all, stated, pdRef, fitPd, readoutOnly, tableOnly, rates }: { rates?: import("../letters").Rates | null; items: Ingredient[]; serves: number; one: string; all: string; stated: Meal["stated"] | null; pdRef: number | null; fitPd?: (pd: number | null) => string; readoutOnly?: boolean; tableOnly?: boolean }) {
   const n = nutritionOf(items, serves);
   if (!n) return null;
   const many = serves > 1;
@@ -29,6 +31,8 @@ export function NutritionCard({ items, serves, one, all, stated, pdRef, fitPd, r
         <div><span>{pd1 === null || pdRef === null ? "no target set" : n.pd! >= pdRef ? "fits your plan" : `${(Math.round((pdRef - n.pd!) * 10) / 10).toFixed(1)} under your ${pdRef.toFixed(1)}`}</span>
           <small>{energy === null ? "?" : fmt(many ? energy : n.rows[0].all ?? 0, 0)} kcal · {fmt((many ? prot?.serving : prot?.all) ?? 0, 1)} g protein · {fmt(grams / (many ? serves : 1), 0)} g</small></div>
       </div>
+      {/* DT113 (0.2.94): the four letters, the same for one portion or all of it (they are rates) */}
+      {rates && (() => { const t = aggregate(items); return t.calories ? <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={rates} who="this recipe" /> : null; })()}
     </section>}
     {/* editing: the readout follows as you type; the table comes back with Save */}
     {!readoutOnly && <section className="card nt-card" aria-label="Nutrition">
