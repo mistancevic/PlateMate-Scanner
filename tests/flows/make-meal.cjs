@@ -33,24 +33,24 @@ const answer = { options: [
   await page.route("**/api/meal", async (route) => { calls++; asked = JSON.parse(route.request().postData() || "{}"); await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(answer) }); });
   // CH1: the plate says what it is for and what it aims at
   await page.goto(U + "/plate"); await page.waitForTimeout(1300);
-  ok(await page.getByRole("button", { name: "Make it a lunch" }).count() === 1 && await page.getByRole("button", { name: "Keep it as it is" }).count() === 1, "CH1: Make it a lunch, and Keep it as it is");
-  ok(/Lunch is about 933 kcal of your 2,800, at PD 6\.4 or more\. Chef Mealan adds what it needs and sets the amounts\./.test(await page.locator(".plate-card").textContent()), "CH1: lunch is about 933 kcal: what is left of the day over the three meals to come");
+  ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 1 && await page.getByRole("button", { name: "Keep it as it is" }).count() === 1, "CH1, DT87 (0.2.87): Fit to my target, and Keep it as it is");
+  ok(/Lunch is about 933 kcal of your 2,800, at PD 6\.4 or more\. Chef Mealan adds what it needs to land your lunch in its range\./.test(await page.locator(".plate-card").textContent()), "CH1: lunch is about 933 kcal: what is left of the day over the three meals to come");
   // CH2: PD above the target, half a lunch: maths cannot make it a meal, so Chef Mealan
-  await page.getByRole("button", { name: "Make it a lunch" }).click(); await page.waitForTimeout(900);
+  await page.getByRole("button", { name: "Fit to my target" }).click(); await page.waitForTimeout(900);
   ok(calls === 1 && asked.meal === "lunch" && asked.need === 933 && asked.kitchens.join(",") === "Balkan,Italian,Mediterranean" && asked.plate.length === 2, "CH2: Chef Mealan is asked for a lunch of 933 kcal, in the three kitchens, with the plate");
   const cards = page.locator(".mm-card");
-  ok(await cards.count() === 2, "CH2: the idea that fails the checks (peanut, a declared allergy) is left out: " + await cards.count());
+  ok(await cards.count() === 2 && await page.locator(".mm-fail").count() === 0, "CH2: the idea that fails the checks (peanut, a declared allergy) is left out, not even shown as a miss: " + await cards.count());
   const c1 = (await cards.first().textContent()).replace(/\s+/g, " ");
   ok(/^BALKAN927 kcal · PD 10\.1Šopska plate with bread/.test(c1) && /\+ 125 g wholegrain bread/.test(c1) && /\+ 150 g tomato/.test(c1), "CH2: the Balkan lunch, 927 kcal, PD 10.1, the bread's grams set by the app: " + c1.slice(0, 140));
   ok(await cards.first().locator(".mm-add.have").count() === 1, "CH2: bread is in your foods; the rest is new");
-  ok(/Your plate has the protein: 80 g, PD 16\.8\. Lunch is about 933 kcal, 456 more than the plate\. Two ways from your kitchens\./.test(await page.locator(".step-head").textContent()), "CH2: the line on top says what the plate has and what lunch needs");
+  ok(/Your plate has the protein: 80 g, PD 16\.8\. Lunch is 840 to 1,026 kcal, about 456 more than the plate\. Two ways from your kitchens, each in that range\./.test(await page.locator(".step-head").textContent()), "CH2: the line on top says what the plate has and what lunch needs");
   // CH3: on the plate
   await cards.first().getByRole("button", { name: "Put it on the plate" }).click(); await page.waitForTimeout(700);
   const st = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   ok(st.items.length === 6 && st.title === "Šopska plate with bread" && st.items.filter((i) => !i.locked).length === 1, "CH3: six foods on the plate, the dish's name as the title, only the bread free to move");
   const ro = (await page.locator(".readout").first().textContent()).replace(/\s+/g, " ");
   ok(/This lunch/.test(ro) && /10\.1/.test(ro) && /927 kcal/.test(ro), "CH3: This lunch, PD 10.1, 927 kcal: " + ro);
-  ok(/Chef Mealan's Balkan lunch\. Your foods as you had them; the wholegrain bread sets the energy\./.test(await page.locator(".step-head").textContent()), "CH3: the line says whose lunch it is and what sets the energy");
+  ok(/Chef Mealan's Balkan lunch, around your foods\. Change any amount you like\./.test(await page.locator(".step-head").textContent()), "CH3, DT88 (0.2.87): the line says whose lunch it is, around your foods");
   ok(await page.getByRole("button", { name: "Make it" }).count() === 1 && await page.getByRole("button", { name: "Other ideas" }).count() === 1, "CH3: Make it, or Other ideas");
   await page.getByRole("button", { name: "Other ideas" }).click(); await page.waitForTimeout(900);
   ok(calls === 2 && asked.plate.length === 2 && asked.avoid.includes("Šopska plate with bread"), "Other ideas: from the plate as it was, and not the same ideas again");

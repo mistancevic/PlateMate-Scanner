@@ -2039,3 +2039,14 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .rq-shared { color: var(--brand-text); font-weight: 700; }
 .rq-share-ask { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 .rq-share-ask .button-row { flex-wrap: wrap; gap: 8px; }
+/* DT87 and DT88 (0.2.87, board Stories58): the chef hat keeps its size next to a second button; the empty plate says why
+   Fit to my target waits; how to weigh a food sits under its short name */
+.pill svg { flex: none; }
+.plate-card .ways-wait { margin: 8px 0 0; font-weight: 600; }
+.row-text small.weigh { color: var(--brand-text); font-weight: 700; }
+.rq-bychef { font-weight: 700; }
+.rq-weigh { color: var(--brand-text); font-weight: 700; }
+/* DT91 (0.2.88, board Stories59): the cooking foods, not counted; an idea that missed the range, with why */
+.pt-cook, .mm-cook { display: block; color: var(--muted); line-height: 1.4; }
+.plate-card .pt-cook { margin: 8px 0 4px; }
+.mm-card.mm-fail { opacity: .85; border-style: dashed; }

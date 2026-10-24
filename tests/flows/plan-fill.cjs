@@ -52,7 +52,8 @@ seed.items = [];
   ok(/Monday's breakfast, 07:30 · By the plan/.test(await page.locator(".plan-line").textContent()), "the Plate's line names the slot: " + (await page.locator(".plan-line").textContent()));
   // Changed by story DT76 (board DT76): a starter has its foods, so the Plate opens with Sarma's foods, not empty; the first
   // of Chef Mealan's lifters goes on, and the plate is made for the slot
-  ok(/Cabbage, raw/.test(await page.locator("main").innerText()) && /Beef mince/.test(await page.locator("main").innerText()), "the Plate opens with Sarma's foods");
+  // DT88 (0.2.87): the plate's rows in a cook's words: Cabbage, weigh it raw
+  ok(/Cabbage\s+weigh it raw/.test(await page.locator("main").innerText()) && /Beef mince/.test(await page.locator("main").innerText()), "the Plate opens with Sarma's foods");
   await page.getByRole("button", { name: /^\+ ?Add$/ }).first().click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).click(); await page.waitForTimeout(800);
   ok(await page.getByRole("button", { name: /Put it in Monday's breakfast/ }).count() === 1, "the recipe step offers Put it in Monday's breakfast");

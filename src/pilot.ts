@@ -174,6 +174,10 @@ export type Meal = {
   stepParts?: string[];
   // a dish changed on the plate and kept as its own recipe (0.2.23, IM23b): the recipe it was adapted from
   basedOn?: { id: string; title: string };
+  // DT90 (0.2.87, board Stories58): Chef Mealan's dinner, made around your food: the recipe page says so
+  byChef?: { kitchen: string; meal: string; around: string; at: string };
+  // DT91 (0.2.88, board Stories59): for cooking, not counted: dried oregano, salt and pepper
+  cooking?: string[];
   // the recipe's own numbers per serving, as it gives them (0.2.21, IM21b): shown under ours on the recipe page
   stated?: { kcal: number; protein: number; fats: number | null; carbs: number | null };
   // how each of Chef Mealan's steps relates to the original (0.2.18, IM9, IM10b); cleared when the steps are edited
@@ -241,6 +245,8 @@ export type PilotState = {
   leftOut?: { part: string; items: Ingredient[]; at?: number }[];
   // R2 (0.2.32): a part whose last food was taken off stays, empty, where it was, until a food goes back in or the plate changes
   emptyParts?: { part: string; at: number }[];
+  // DT91 (0.2.88): the herbs and spices Chef Mealan's dinner on the plate uses, not counted
+  cooking?: string[];
   // a recipe that came in, opened from Recipes (0.2.19, IM13): the plate puts it on as the first time, then clears this
   openRecipe?: string;
 };

@@ -7,6 +7,7 @@
 import { aggregate, density, type Food, type Ingredient } from "./pilot";
 import { minPortionOf } from "./foodjob";
 import { weightOf } from "./planned";
+import { baseRange } from "./cookWords";
 import type { Slot } from "./slots";
 import { toMin } from "./slots";
 
@@ -60,26 +61,40 @@ export function routeOf(o: { pd: number | null; target: number | null; kcal: num
   return near(o.kcal) ? "fit" : "chef";
 }
 
-// an idea from Chef Mealan on the plate: the plate as it stands, the foods Chef Mealan adds at their amounts, and the base
-// that carries the energy, whose grams the app works out so the meal lands on its size. Then the checks.
+// an idea from Chef Mealan on the plate: the plate as it stands, the foods Chef Mealan adds, and the base that carries the
+// energy. DT91 (0.2.88, board Stories59; Milan 24 October 12:12): the meal lands in its range, within 10 % of its size (the
+// measure Metrics uses for a day lived by the plan). The base stays a normal portion for its kind (cookWords.baseRange); the
+// rest of the energy comes from the other foods Chef Mealan added, all scaled together, from half to twice his amounts. An
+// idea that still falls outside the range says why, in plain words, and is shown with that reason.
 export type Add = { food: Food; grams: number; base: boolean; have: boolean };
 export type Solved = { ok: true; items: Ingredient[]; kcal: number; protein: number; pd: number | null; baseGrams: number } | { ok: false; why: string };
+export const RANGE = 0.1;
 const r5 = (g: number) => Math.round(g / 5) * 5;
+// small amounts (garlic, oil) to the gram, the rest to 5 g
+const rg = (g: number) => (g < 20 ? Math.max(1, Math.round(g)) : r5(g));
+export function mealRange(need: number): [number, number] { return [Math.round(need * (1 - RANGE)), Math.round(need * (1 + RANGE))]; }
 export function solveMeal(plate: Ingredient[], adds: Add[], need: number, target: number | null, allergic: (f: Food) => boolean, uid: () => string): Solved {
   if (!adds.length) return { ok: false, why: "nothing to add" };
   const bad = adds.find((a) => allergic(a.food)); if (bad) return { ok: false, why: `${bad.food.name} clashes with an allergy` };
   if (adds.some((a) => !(Number(a.food.calories) >= 0) || !(Number(a.food.protein) >= 0))) return { ok: false, why: "a food without numbers" };
   const base = adds.find((a) => a.base) ?? [...adds].sort((x, y) => (y.food.calories ?? 0) * y.grams - (x.food.calories ?? 0) * x.grams)[0];
-  const kept = plate.map((i) => ({ ...i, locked: true }));
-  const fixed = [...kept, ...adds.filter((a) => a !== base).map((a) => ({ id: uid(), food: a.food, grams: Math.max(0, Math.round(a.grams)), locked: true }))];
-  const kcalFixed = aggregate(fixed).calories ?? 0, per = (base.food.calories ?? 0) / 100;
+  const per = (base.food.calories ?? 0) / 100;
   if (per <= 0) return { ok: false, why: `${base.food.name} carries no energy` };
-  const raw = (need - kcalFixed) / per, min = minPortionOf(base.food);
-  if (raw < min) return { ok: false, why: `${base.food.name} would be ${Math.max(0, Math.round(raw))} g, under a portion` };
-  if (raw > 450) return { ok: false, why: `${base.food.name} would be ${Math.round(raw)} g, not a portion` };
-  const baseGrams = r5(raw);
-  const items: Ingredient[] = [...fixed, { id: uid(), food: base.food, grams: baseGrams, locked: false }];
-  const t = aggregate(items), pd = density(t.protein, t.calories);
+  const kept = plate.map((i) => ({ ...i, locked: true }));
+  const others = adds.filter((a) => a !== base);
+  const kcalOf = (its: { food: Food; grams: number }[]) => aggregate(its as Ingredient[]).calories ?? 0;
+  const keptK = kcalOf(kept), othersK = kcalOf(others.map((a) => ({ food: a.food, grams: Math.max(0, a.grams) })));
+  // the base: the grams that land the meal on its size, kept in a normal portion
+  const [lo, hi] = baseRange(base.food.name, minPortionOf(base.food));
+  const baseGrams = Math.min(hi, Math.max(lo, r5((need - keptK - othersK) / per)));
+  // the rest: the other foods together, by what is still missing or too much
+  const gap = need - keptK - othersK - baseGrams * per;
+  const f = othersK > 0 && Math.abs(gap) > need * 0.03 ? Math.min(2, Math.max(0.5, 1 + gap / othersK)) : 1;
+  const items: Ingredient[] = [...kept, ...others.map((a) => ({ id: uid(), food: a.food, grams: rg(Math.max(0, a.grams) * f), locked: true })), { id: uid(), food: base.food, grams: baseGrams, locked: false }];
+  const t = aggregate(items), pd = density(t.protein, t.calories), kcal = t.calories ?? 0;
+  const [min, max] = mealRange(need), bn = base.food.name.toLowerCase();
+  if (kcal < min) return { ok: false, why: `${Math.round(kcal)} kcal, under the ${min} to ${max} kcal of this meal, even with ${baseGrams} g ${bn}` };
+  if (kcal > max) return { ok: false, why: `${Math.round(kcal)} kcal, over the ${min} to ${max} kcal of this meal, even with ${baseGrams} g ${bn}` };
   if (target !== null && pd !== null && pd < target - 0.05) return { ok: false, why: `PD ${pd.toFixed(1)} under the target ${target.toFixed(1)}` };
-  return { ok: true, items, kcal: Math.round(t.calories ?? 0), protein: Math.round((t.protein ?? 0) * 10) / 10, pd, baseGrams };
+  return { ok: true, items, kcal: Math.round(kcal), protein: Math.round((t.protein ?? 0) * 10) / 10, pd, baseGrams };
 }

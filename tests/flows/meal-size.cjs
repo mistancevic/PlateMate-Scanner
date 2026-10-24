@@ -31,7 +31,7 @@ const U = "http://127.0.0.1:3207";
   await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
   const card = () => page.locator(".plate-card").textContent().then((t) => t.replace(/\s+/g, " "));
   await page.goto(U + "/plate"); await page.waitForTimeout(1300);
-  ok(await page.getByRole("button", { name: "Make it a dinner" }).count() === 1, "the plate at 17:30 is for dinner");
+  ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 1 && /Dinner is about/.test(await page.locator(".plate-card").textContent()), "the plate at 17:30 is for dinner");
   ok(/Dinner is about 936 kcal of your 2,800/.test(await card()), "MS1: the lunch eaten off the plan closes lunch: dinner about 936 kcal (it was 624; the drawing said 937, the lunch is 927.4 kcal)");
   ok(/Breakfast isn't logged today\. Did you have it\?/.test(await card()) && /I skipped it: breakfast's share moves to dinner, about 1,873 kcal/.test(await card()), "MS2: the plate asks once about breakfast, with what each answer means");
   await page.getByRole("button", { name: "I skipped it" }).click(); await page.waitForTimeout(400);

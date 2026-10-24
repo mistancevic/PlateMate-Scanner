@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { cookName, weighLine } from "../cookWords";
 import { tempsIn } from "../units";
 import { Camera, ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
 import type { Feedback, Food, Ingredient, Meal, StepMark } from "../pilot";
@@ -200,6 +201,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {naming !== null
         ? <input className="title-input rq-name-input" aria-label="Name of the recipe" autoFocus value={naming} onChange={(e) => setNaming(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" maxLength={80} />
         : <button type="button" className="rq-name" aria-label={`Rename ${meal.title}`} onClick={() => setNaming(meal.title)}>{meal.title}</button>}
+      {/* DT90 (0.2.87, board Stories58): Chef Mealan's dinner says who made it, around which food, and when */}
+      {meal.byChef && <small className="rq-label rq-bychef">{CHEF_NAME}'s {meal.byChef.kitchen} {meal.byChef.meal}, around your {meal.byChef.around}. Made on {new Date(meal.byChef.at).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.</small>}
       {/* DT81 (Milan 23 October 12:48 to 15:11): what the whole recipe makes is its label, under the name */}
       {makesN ? <small className="rq-label">The whole recipe makes {makesN} {meal.makes!.unit} · one {meal.makes!.unit.replace(/ies$/, "y").replace(/(?<!s)s$/, "")} {fmt((aggregate(meal.items).calories ?? 0) / makesN, 0)} kcal</small>
         : serves > 1 ? <small className="rq-label muted">The whole recipe: {serves} portions by weight. Edit recipe can say what it makes.</small> : null}
@@ -283,6 +286,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       )}
       <section className={`card rq-foods ${edit ? "editing" : ""}`}>
         <b>Foods</b>
+        {/* DT91 (0.2.88): what the dish uses for cooking, not counted */}
+        {!edit && meal.cooking?.length ? <small className="muted rq-cook-line"><b>For cooking, not counted:</b> {meal.cooking.join(", ")}.</small> : null}
         {edit && (
           <div className="rq-makes" role="group" aria-label="What the recipe makes">
             <small>The whole recipe makes</small>
@@ -305,7 +310,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           const head = !edit && it.part && (k === 0 || items[k - 1].part !== it.part) ? <div className="rq-part" key={`h${k}`}>{it.part}</div> : null;
           return [head, (
           <div className="sheet-row rq-food" key={it.id}>
-            {edit ? <span className="rq-food-edit"><small>{it.food.name}</small><button type="button" className="link rq-swap-link" aria-label={`Swap ${it.food.name}`} onClick={() => { setSwapAt(it.id); setPick(null); setFind(""); }}>Swap</button>{partsShown && <span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>Optional</button></span>}</span> : <small>{it.food.name}{it.fry && <span className="rq-fry">{it.fry.written ? `${it.fry.written}, for frying` : "For frying"}. {countedLine(`${fmt(it.grams, 0)} g`)}.</span>}</small>}            {edit
+            {edit ? <span className="rq-food-edit"><small>{it.food.name}</small><button type="button" className="link rq-swap-link" aria-label={`Swap ${it.food.name}`} onClick={() => { setSwapAt(it.id); setPick(null); setFind(""); }}>Swap</button>{partsShown && <span className="pt-chips"><PartPick value={it.part ?? ""} onPick={(v) => setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, part: v || undefined } : x)) })} /> <button type="button" className="pt-chip off" onClick={() => setEdit({ ...edit, items: edit.items.filter((_, j) => j !== k), optional: [...edit.optional, { name: it.food.name, written: "", grams: it.grams, food: leanFood(it.food), ...(it.part ? { part: it.part } : {}) }] })}>Optional</button></span>}</span> : <small>{cookName(it.food.name).short}{weighLine(it.food.name) && <span className="rq-weigh"> · {weighLine(it.food.name)}</span>}{it.fry && <span className="rq-fry">{it.fry.written ? `${it.fry.written}, for frying` : "For frying"}. {countedLine(`${fmt(it.grams, 0)} g`)}.</span>}</small>}            {edit
               ? <span className="rq-grams">
                   <input inputMode="numeric" aria-label={`Grams of ${it.food.name}`} className={fresh.includes(it.id) && !(it.grams > 0) ? "rq-g-need" : undefined} placeholder={fresh.includes(it.id) ? "?" : undefined} autoFocus={fresh.includes(it.id) && !(it.grams > 0)} value={String(it.grams || "")} onChange={(e) => { const g = Math.min(5000, Number(e.target.value.replace(/[^\d]/g, "")) || 0); setNeed(null); setEdit({ ...edit, items: edit.items.map((x, j) => (j === k ? { ...x, grams: g } : x)) }); }} /> g
                   <button className="rq-x" aria-label={`Remove ${it.food.name}`} onClick={() => { setRemoved({ item: it, at: k }); setPick(null); setFresh((f) => f.filter((x) => x !== it.id)); change(edit.items.filter((_, j) => j !== k)); }}><X size={14} /></button>
