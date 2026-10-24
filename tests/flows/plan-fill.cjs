@@ -54,7 +54,10 @@ seed.items = [];
   // of Chef Mealan's lifters goes on, and the plate is made for the slot
   // DT88 (0.2.87): the plate's rows in a cook's words: Cabbage, weigh it raw
   ok(/Cabbage\s+weigh it raw/.test(await page.locator("main").innerText()) && /Beef mince/.test(await page.locator("main").innerText()), "the Plate opens with Sarma's foods");
-  await page.getByRole("button", { name: /^\+ ?Add$/ }).first().click(); await page.waitForTimeout(300);
+  // Changed by story DT101 (0.2.91): the tip goes through the rules module; nothing in these foods goes with sarma (cabbage, beef,
+  // rice), so the tip offers no food and points to Chef Mealan instead of putting skyr on a sarma plate
+  const tipRows = await page.locator(".tip-row").count();
+  ok(tipRows === 0 && await page.getByRole("button", { name: "Ask Chef Mealan what to add" }).count() === 1, "DT101: no lifter goes with sarma; the tip offers Ask Chef Mealan: rows " + tipRows);
   await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).click(); await page.waitForTimeout(800);
   ok(await page.getByRole("button", { name: /Put it in Monday's breakfast/ }).count() === 1, "after Fit (in place, 0.2.88) the Plate offers Put it in Monday's breakfast");
   ok(/readout-fit-(plan|top|close|below|high|mid|low)/.test(await page.locator(".readout").getAttribute("class")), "the box is coloured by the score");
@@ -104,9 +107,10 @@ seed.items = [];
   ok(after > before, `Add lifts the plate: ${before} to ${after}`);
   await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).click(); await page.waitForTimeout(1500);
   const fitted = await page.locator(".readout").textContent();
-  // 0.2.89 (DT96): the whey comes on at 30 g, its normal portion; Fit lifts it within its portion and the plate reaches the slot's target
+  // 0.2.89 (DT96): the lifter comes on at its normal portion; Fit lifts it within its portion and the plate reaches the slot's target
+  // (0.2.91, DT101: the lifter is the quark, the first food that goes with a Nutella and biscuit plate; the whey no longer leads)
   const pdNow = Number((await page.locator(".readout b").first().textContent()).trim());
-  ok(pdNow >= 6.9 && /fits your plan/.test(fitted) && await page.locator(".chef-tip").count() === 0, `after Fit the plate reaches the slot's target within the whey's portion, no tip: PD ${pdNow}`);
+  ok(pdNow >= 6.9 && /fits your plan/.test(fitted) && await page.locator(".chef-tip").count() === 0, `after Fit the plate reaches the slot's target within the lifter's portion, no tip: PD ${pdNow}`);
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(400);
   // a new name typed on the Plate for a meal that came from a recipe renames that recipe, no copy; Go closes the keyboard
   const countBefore = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.length);

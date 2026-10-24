@@ -13,3 +13,8 @@ test("old meals don't count", () => {
   const { picks } = quickPicks([food("a"), food("b")], [card(["b"], 90)]);
   assert.equal(picks[0].id, "a");
 });
+test("C6 (DT103, 0.2.91): quick picks are foods you eat as they are; yeast, flour and oil stay in the list", () => {
+  const foods = [food("Skyr"), food("Active dry yeast", { favorite: true }), food("Wheat flour"), food("Olive oil"), food("Apple")];
+  const { picks } = quickPicks(foods, [card(["Olive oil"], 1)]);
+  assert.deepEqual(picks.map((f) => f.id), ["Skyr", "Apple"]);
+});

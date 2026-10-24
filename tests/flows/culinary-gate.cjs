@@ -73,7 +73,7 @@ const U = "http://127.0.0.1:3262";
   await page.reload(); await page.waitForTimeout(1800);
   ok(await page.locator(".gate-line").count() === 0 && /A peanut banana toast with the bar on the side/.test(await text(".gate-ok")), "DT93: a plate that is food: no red lines, Chef Mealan's one line that says what it is");
   // DT98 (0.2.90): the cooking foods as chips; x takes one out
-  await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.cooking = ["ground cinnamon", "lemon zest"]; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
+  await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.cooking = ["ground cinnamon", "lemon zest"]; s.cookingFor = s.items.map((i) => i.food.id); localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
   await page.reload(); await page.waitForTimeout(1500);
   ok(await page.locator(".pt-cook .pt-chip").count() === 2, "DT98: For cooking as two chips");
   await page.getByRole("button", { name: "Take out lemon zest" }).click(); await page.waitForTimeout(300);

@@ -79,7 +79,7 @@ import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, get
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
-import { mixTip, mixLabel, catOf, plateOk, type Mix, type MixTip } from "./mixtip";
+import { mixTip, mixLabel, catOf, plateOk, isIngredient, type Mix, type MixTip } from "./mixtip";
 import { findReference, referenceFood, localName, otherNames, marketFoods } from "./reference";
 import { startGrams, jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
@@ -1771,7 +1771,7 @@ export default function App() {
     const others = itemsIn.filter((x) => x.id !== id).map((x) => x.food);
     const foods = [
       selected.food,
-      ...state.foods.filter((f) => f.id !== selected.food.id && f.readyToEat && catOf(f) !== "drink" && plateOk([...others, f])),
+      ...state.foods.filter((f) => f.id !== selected.food.id && f.readyToEat && catOf(f) !== "drink" && !isIngredient(f) && plateOk([...others, f])),
     ];
     const results = [];
     for (const food of foods) {

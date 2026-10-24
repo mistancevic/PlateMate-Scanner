@@ -247,6 +247,8 @@ export type PilotState = {
   emptyParts?: { part: string; at: number }[];
   // DT91 (0.2.88): the herbs and spices Chef Mealan's dinner on the plate uses, not counted
   cooking?: string[];
+  // DT102 (0.2.91): the foods the cooking list was written for; the chips live only while all of them are on the plate
+  cookingFor?: string[];
   // a recipe that came in, opened from Recipes (0.2.19, IM13): the plate puts it on as the first time, then clears this
   openRecipe?: string;
 };

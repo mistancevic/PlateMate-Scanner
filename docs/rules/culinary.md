@@ -1,6 +1,6 @@
 # Chef Mealan: culinary rules
 
-Version 1, 24 October 2026. Drafted from the code as it is in 0.2.88, plus the culinary gate added that afternoon. Milan asked for this on 18 October: written culinary rules and nutrition rules, kept as a document that new stories check against. The nutrition rules are a sister file, docs/rules/nutrition.md.
+Version 1, 24 October 2026. Drafted from the code as it is in 0.2.88, plus the culinary gate added that afternoon; section 6 and C6 in code since 0.2.91. Milan asked for this on 18 October: written culinary rules and nutrition rules, kept as a document that new stories check against. The nutrition rules are a sister file, docs/rules/nutrition.md.
 
 How to read it. Every rule has a number, one line that says who enforces it, and where. Three kinds:
 
@@ -9,6 +9,8 @@ How to read it. Every rule has a number, one line that says who enforces it, and
 - Both: code holds the basics, Chef Mealan the rest, and he is told what code decided.
 
 A story that touches food on the Plate names the rules it changes. A rule nobody enforces yet says so.
+
+The process rule (Milan, 24 October 20:48, after one bar on the plate got a spoon of oil as the tip): the rules live in one module, src/mixtip.ts with src/foodjob.ts and src/dishTaste.ts behind it, and every place that puts a food in front of a person calls it. No screen gets food logic of its own. Section 7 lists the places; a story that adds a place adds a row, and names the rules it goes through, before it is drawn as finished. One walkthrough per touched rule, so a rule that stops working fails a test and not a plate.
 
 The standing principles behind every rule (Milan, 7 and 18 October): no food is good or bad by itself, only against the person and the moment; what can be added follows culinary logic, and the whole dish decides, never one layer; a mapped recipe follows the original, and from there we play around.
 
@@ -24,7 +26,7 @@ C4. A food that goes in the pot raw or dry is cooked by the steps: raw meat and 
 
 C5. A cooked meat, pasta or grain on the plate says about how much that is raw or dry: meat loses about a quarter of its weight when cooked, pasta takes up water to about 2.4 times its dry weight, rice and grains about 2.5 times. Shown for these only. Code: `rawHint` in src/cookWords.ts.
 
-C6. Some foods are ingredients, not food: yeast, flour, baking powder, raw egg, a stock cube. They need a dish around them. Chef Mealan, in the dish check (rule C20). Not yet in code.
+C6. Some foods are ingredients, not food: yeast, flour, baking powder, a stock cube, oil, sugar, salt, spices, vinegar, starch, a sauce base (soy sauce, tomato paste, mustard). They need a dish around them, so on their own they are never a quick pick, never a tip, never a partner, never a swap. A food named by a generic word is one only when that word names it (Olive oil, Sugar); Sardines in olive oil and Low sugar yogurt stay food. An egg is not an ingredient: it is cooked and eaten as it is (C7). Code: `isIngredient` in src/mixtip.ts, one list (DT103, 0.2.91). Chef Mealan sees the same in the dish check (C30).
 
 C7. Whole eggs and bananas are counted, by size, never in grams on the screen; the grams stay the truth for the numbers. Eggs by the EU grades, bananas by the USDA sizes. A pack that prints a piece (1 bar 45 g) is counted in pieces. Code: src/counted.ts.
 
@@ -94,11 +96,31 @@ C47. A recipe that makes several pieces is made whole; the steps are for the who
 
 C48. An optional food is never numbered in the steps; it is named in words, once, where it goes, as "if you add it". Chef Mealan: /api/steps; code: `fromDraft`.
 
-## 6. Not yet a rule, open
+## 6. Where the rules are applied
+
+Every place that offers, accepts or moves a food, and the rules it goes through. Code first, Chef Mealan after.
+
+| Place | What it does | Rules | Code |
+|---|---|---|---|
+| Add, the food list and search | puts a food on the plate at its start amount | C10 | `startGrams` in src/foodjob.ts, `add` in src/App.tsx |
+| Quick picks | the eight foods you reach for | C6, C25 | `quickPicks` in src/quick.ts |
+| The tip under the plate | up to three foods from your foods that lift the plate | C6, C20, C21, C22, C23, C10 | `fitsPlate` in src/mixtip.ts, `lifts` in src/screens/JourneyScreen.tsx |
+| The mix tip on a food card | partners for a scanned food, by moment and job | C2, C6, C20, C22, C25, N-rules for the moment | `mixTip`, `candidates` in src/mixtip.ts |
+| Swap a food on the plate | foods that can take this one's place | C6, C20, C21, C25 | `mixWith` in src/App.tsx, src/swaps.ts |
+| Fit | moves the densest free food within its portion | C10, C12, C13 | `fit` in src/screens/JourneyScreen.tsx, src/foodjob.ts |
+| The portion line | red line under a food outside its portion | C10, C11 | `portionLine` in src/foodjob.ts |
+| The culinary gate | reads two or more foods, says whether they make the meal | C6, C24, C30, C31 | /api/dish in server.ts, the Plate |
+| Chef Mealan's ideas | three dishes around the plate, by kitchen | C14, C15, C20, C25, C32, C33, C34, C36 | /api/meal in server.ts, `solveMeal` in src/makeMeal.ts |
+| The steps | the method for a plate you cook | C3, C4, C5, C40 to C48 | /api/steps in server.ts, src/draftSteps.ts, src/cookWords.ts |
+| A recipe from a link or screenshot | the original, then your changes | C35, C45, C46, C47, C48 | /api/recipe/* in server.ts |
+| Counted foods and cans | eggs, bananas, pieces; a can and its liquid | C7, C8 | src/counted.ts, src/canned.ts |
+
+A row that names a rule the code does not call is a gap and goes to section 7. Checked for 0.2.91: the tip and quick picks were the gaps (DT101, DT103).
+
+## 7. Not yet a rule, open
 
 - Cuisines, heat and timings as a table code could check (3 October: "wait for the session").
 - A meal needs a base, a protein and something fresh: true for most lunches and dinners, false for a bowl of skyr; not a rule until Milan says where it holds.
-- Which ingredients are ingredients (C6) as a code list, so the gate does not depend on the model for yeast and flour.
 - Fruit in syrup: the can bundle waits for a value for the syrup (C8).
 - Cook mode, hands free, with the steps spoken: in the backlog.
 
@@ -109,3 +131,4 @@ C48. An optional food is never numbered in the steps; it is named in words, once
 - 18 October: C22, C23, C35, C45, C46. Milan asked for this document.
 - 23 October: C8.
 - 24 October: C3, C4, C5, C14, C15, C32, C33, C40, C43 (0.2.87); C10 to C13, C30, C31 (0.2.88); C10 the start amount (0.2.89). First draft of this file.
+- 24 October, evening: C6 in code; the tip, quick picks, swaps and partners all go through the one module; section 6, where each rule is applied, and the process rule (0.2.91, DT101 to DT103).

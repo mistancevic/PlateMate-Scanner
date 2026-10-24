@@ -79,7 +79,7 @@ test("a partner that cannot reach the target is not offered", () => {
 });
 
 // ---- Culinary rules, version 1 (3 October 2026): one test per rule, with the real starter foods
-import { catOf, goesWith, plateOk } from "./mixtip";
+import { catOf, goesWith, plateOk, isIngredient, fitsPlate } from "./mixtip";
 const mk = (name: string, calories: number, protein: number, fats: number, carbs: number, extra: Partial<typeof nutella> = {}) =>
   ({ ...nutella, id: name, name, brand: "", calories, protein, fats, carbs, fiber: null, table: [], photo: undefined, ...extra });
 const snackBalls = mk("Snack balls, date and hazelnut", 353, 4.6, 10, 51.8);
@@ -187,4 +187,24 @@ test("rule 10: a sauce goes on a meal, and what Mealan moves is a real portion",
   assert.ok(proteinGrams >= 80, `a real portion of the protein base, not a pinch: ${proteinGrams} g`);
   assert.equal(t.mixes[0].items[1].grams, 80, "the floor stands when the target came sooner");
   assert.ok(t.mixes[0].pd >= 5.5, "the plate lands on or above the target");
+});
+
+test("C6 (DT103, 0.2.91): an ingredient is not food", () => {
+  for (const n of ["Active dry yeast", "Wheat flour, type 405", "Baking powder", "Olive oil", "Sunflower oil", "Sugar", "Salt", "Chicken stock cube", "Vegetable stock", "Soy sauce", "Tomato paste", "Cinnamon", "Dried oregano, spice", "Dijon mustard"])
+    assert.equal(isIngredient({ name: n }), true, n);
+  for (const n of ["Sardines in olive oil", "Low sugar yogurt", "Salted peanuts", "Peanut butter", "Protein bar", "Eggs", "Oats", "Skyr, natural", "Chicken breast, cooked", "Salami"])
+    assert.equal(isIngredient({ name: n }), false, n);
+});
+
+test("DT101 (0.2.91): the tip asks the rules module: one bar gets skyr or an apple, never oil, yeast or a drink", () => {
+  const bar = mk("Protein bar, chocolate", 380, 30, 12, 35, { table: [{ key: "sugars", name: "Sugars", amount: 20, unit: "g", sub: true }] as any });
+  const oil = mk("Olive oil", 884, 0, 100, 0);
+  const yeast = mk("Active dry yeast", 325, 40, 7, 41);
+  assert.equal(fitsPlate(byName("Skyr, natural"), [bar]), true);
+  assert.equal(fitsPlate(byName("Apple"), [bar]), true);
+  assert.equal(fitsPlate(oil, [bar]), false);
+  assert.equal(fitsPlate(yeast, [bar]), false);
+  assert.equal(fitsPlate(cola, [bar]), false);
+  assert.equal(fitsPlate(byName("Chicken breast, cooked"), [bar]), false);
+  assert.equal(fitsPlate(bar, [bar]), false); // already on the plate
 });

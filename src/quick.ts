@@ -1,5 +1,6 @@
 // Quick picks for the plate: favourites first, then what this person has actually used lately.
 import type { Food, Feedback } from "./pilot";
+import { isIngredient } from "./mixtip";
 export const QUICK_MAX = 8;
 const WINDOW_DAYS = 42;
 export function usageCounts(feedback: Feedback[], now = Date.now()): Map<string, number> {
@@ -10,7 +11,9 @@ export function usageCounts(feedback: Feedback[], now = Date.now()): Map<string,
   }
   return counts;
 }
-export function quickPicks(foods: Food[], feedback: Feedback[], now = Date.now()): { picks: Food[]; why: Map<string, "favourite" | "often" | "new"> } {
+export function quickPicks(foods0: Food[], feedback: Feedback[], now = Date.now()): { picks: Food[]; why: Map<string, "favourite" | "often" | "new"> } {
+  // C6 (DT103, 0.2.91): quick picks are foods you eat as they are; an ingredient (yeast, flour, oil) stays in the list and the search
+  const foods = foods0.filter((f) => !isIngredient(f));
   const used = usageCounts(feedback, now);
   const why = new Map<string, "favourite" | "often" | "new">();
   const favs = foods.filter((f) => f.favorite).sort((a, b) => (used.get(b.id) ?? 0) - (used.get(a.id) ?? 0) || a.name.localeCompare(b.name));

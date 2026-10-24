@@ -124,6 +124,22 @@ const GOES: Record<Cat, Cat[]> = {
   drink:      [],
 };
 export const goesWith = (a: Food, b: Food) => GOES[catOf(a)].includes(catOf(b)) && GOES[catOf(b)].includes(catOf(a));
+
+// C6 (DT103, 0.2.91): some foods are ingredients, not food. Yeast, flour, baking powder, a stock cube, oil, sugar, salt, spices,
+// vinegar, starch. They need a dish around them, so they are never a quick pick, never a tip, never a partner on their own.
+// Eggs are not here: an egg is cooked and eaten as it is (C7). Butter and peanut butter stay spreads (C21). One list, here.
+// Words that make a food an ingredient wherever they stand (yeast, flour, baking powder) and words that do so only when the
+// food is named by them, as the last word (Olive oil, Sugar, Salt), so Sardines in olive oil and Low sugar yogurt stay food.
+const INGREDIENT_ANY = /\b(yeast|hefe|flour|mehl|baking (powder|soda)|backpulver|natron|stock( cubes?)?|bouillon|brühe|vinegar|essig|(corn|potato)?starch|stärke|gelatine?|cocoa powder|kakaopulver|vanilla (extract|sugar)|vanille(zucker|extrakt)|cinnamon|zimt|spices?|gewürz|soy sauce|sojasauce|tomato paste|tomatenmark)\b/i;
+const INGREDIENT_LEAD = /^([\p{L}-]+ ){0,2}(oil|öl|sugar|zucker|salt|salz|pepper|pfeffer|herbs?|kräuter|mustard|senf|ketchup|mayonnaise|mayo|paprika)\s*(,.*)?$/iu;
+export const isIngredient = (f: Pick<Food, "name">) => { const n = String(f.name ?? "").trim(); return INGREDIENT_ANY.test(n) || INGREDIENT_LEAD.test(n); };
+// C20 plus C6, for a food offered to a plate: it goes with every food already there, it makes a plate with them, it is no drink
+// and no ingredient. The tip, quick picks and swaps all ask this one question (DT101).
+export function fitsPlate(f: Food, plate: Food[]): boolean {
+  if (catOf(f) === "drink" || isIngredient(f)) return false;
+  if (plate.some((p) => p.id === f.id)) return false;
+  return plateOk([...plate, f]);
+}
 // A spread needs a carrier: bread, oats or dairy. Fruit alone is not a carrier.
 const spreadWithoutCarrier = (all: Food[]) => all.some((f) => catOf(f) === "spread") && !all.some((f) => ["bgrain", "dairy", "cottage", "supplement"].includes(catOf(f)));
 // Every food on the plate must go with every other, and a spread must have its carrier.
@@ -143,6 +159,7 @@ function candidates(role: Job, scanned: Food, library: Food[], starter: Food[], 
     .filter((f) => moment !== "before" || playbookFor(f).beforeTraining.ok)
     .filter((f) => moment !== "after" || playbookFor(f).afterTraining.ok)
     .filter((f) => catOf(f) !== "drink")
+    .filter((f) => !isIngredient(f)) // C6: yeast or oil is never a partner on its own
     .filter((f) => goesWith(scanned, f))
     .sort((a, b) => Number(Boolean(b.favorite)) - Number(Boolean(a.favorite)) || Number(library.includes(b)) - Number(library.includes(a)));
 }
