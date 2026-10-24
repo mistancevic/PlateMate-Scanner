@@ -162,9 +162,10 @@ export interface AppApi {
   goal: import("../goal").Goal | null;
   openGoal: () => void;
   // the chat knows the screen (0.2.4); "fill" opens it with the day filled
-  openOut: (ask?: "fill" | "plate") => void;
+  openOut: (ask?: "fill" | "plate" | "around") => void;
   // Where does this go (0.2.5): Scan from Today, then the sheet with the saved food
   scanFromToday: () => void;
+  openScan: () => void; // DT106: Scan it from a chat row
   where: Food | null;
   setWhere: (f: Food | null) => void;
   closeOut: () => void;
@@ -206,6 +207,7 @@ export interface AppApi {
   importAirtable: () => Promise<void>;
   resetGoal: () => void;
   fitPd: (pd: number | null) => import("../goal").PdBand;
+  rates: import("../letters").Rates | null; // DT108: the day's rates for the four letters, F C Fi P
   // R16 (0.2.44): I ate it on Today, for the next slot's planned meal
   logPlanned: (m: import("../planned").PlannedMeal, slot: NonNullable<import("../pilot").Feedback["slot"]>) => void;
   fitDay: (pd: number | null) => import("../goal").PdBand;

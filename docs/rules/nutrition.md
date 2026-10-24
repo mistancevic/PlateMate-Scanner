@@ -50,6 +50,8 @@ N24. A meal Chef Mealan builds is checked by code after he answers: every added 
 
 N25. Numbers come from the foods and their grams; each value is the food's label or a typical value, marked estimate. A new food Chef Mealan names gets his estimate for a common product sold where the person shops, marked as such. Code: src/pilot.ts `aggregate`; the recipe page's line.
 
+N26. Four letters read a food, a plate or a recipe against the person's day, in the EU label order: F fat, C carbohydrate, Fi fibre, P protein. Each letter reads the macro's grams per 100 kcal against the day's rate, with the PD bands (N12): capital with a plus from 1.5 times the rate (High, High+), capital from 0.9 (On plan), small from 0.6 (Low), small with a minus under that (Low−), a question mark when the food has no value for it. Protein's letter never disagrees with its PD band. The rates come from the plan: protein from the PD target, fat and carbs from the day's numbers (fat 30 percent of energy, carbs the rest), fibre 14 g per 1,000 kcal (Dietary Guidelines for Americans 2020 to 2025) until the plan has its own. A letter says the level, never good or bad. Code: src/letters.ts; shown on the Plate's readout, each food row and the food card (DT108, 0.2.92). From the first version of 21 September (XP, XF, XC, XFi and the string [ P | f | C | fi ]).
+
 ## 4. What is counted
 
 N30. Oil taken up in frying: 15 % of the fried food's weight, an estimate, never the whole pot (C46). Code: src/frying.ts.
@@ -97,3 +99,4 @@ N53. The app tells people Chef Mealan is an AI chef that can make mistakes: chec
 - 15 and 16 October: N11 closed meals, N15, N24.
 - 23 October: N14, N31, N34.
 - 24 October: N12 for a meal, N24 the range, N33. First draft of this file.
+- 24 October, night: N26, the four letters (0.2.92).

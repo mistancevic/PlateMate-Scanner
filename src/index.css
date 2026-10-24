@@ -2065,3 +2065,14 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .gate-card .gate-wait { color: var(--muted); }
 .gate-card .fit-note { display: block; }
 .pt-cook .pt-chips { display: inline-flex; gap: 6px; flex-wrap: wrap; vertical-align: middle; }
+/* DT106, DT107 (0.2.92): rows under a chat answer; the chips under every answer */
+.chat-rows { margin-top: 8px; } .chat-rows .tip-row:first-child { border-top: 0; padding-top: 2px; }
+.chips-again { margin: 4px 0 8px; }
+.gate-ingredient { display: block; margin-bottom: 6px; }
+/* DT108 (0.2.92): the four letters, F C Fi P, under the readout and on a food's row */
+.letters { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; letter-spacing: .06em; white-space: pre; }
+.readout-letters { margin-top: 8px; }
+.letters-row { display: flex; align-items: baseline; gap: 10px; width: 100%; border: 0; background: rgba(255,255,255,.22); color: inherit; border-radius: 10px; padding: 6px 10px; font: inherit; font-size: var(--fs-body); text-align: left; cursor: pointer; }
+.letters-row small { margin-left: auto; font-size: var(--fs-small); opacity: .9; }
+.letters-lines { display: grid; gap: 4px; margin-top: 8px; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.18); font-size: var(--fs-small); }
+.row small .letters { font-weight: 700; }

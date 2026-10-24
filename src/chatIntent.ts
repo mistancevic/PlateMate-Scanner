@@ -33,12 +33,15 @@ export function intentOf(raw: string, slots: Slot[]): Intent {
     if (s && when) return { kind: "move", slotId: s.id, to: when[1].toLowerCase() as "after" | "before" };
     if (s && at) return { kind: "move", slotId: s.id, to: `${at[1].padStart(2, "0")}:${at[2]}` };
   }
-  if (/\b(swap|change|replace)\b/i.test(m)) {
+  // DT107 (0.2.92): a question about the plate (What should I change on my plate so it makes a snack?) is never a slot swap
+  if (/\b(swap|change|replace)\b/i.test(m) && !/\bplate\b/i.test(m)) {
     const s = slotIn();
     if (s) return { kind: "swap", slotId: s.id, want: m };
   }
   // 1. what the app knows: the plate, the day's plan, what is left
-  if (/\bplate\b/i.test(m) && /^(what|what's|whats|show|list|tell me)\b/i.test(m) && !/\b(add|goes|go with|better|improve|instead|swap|missing|need)\b/i.test(m)) return { kind: "plate" };
+  // DT107 (0.2.92): the questions the Plate's buttons send (What should I change on my plate so it makes a snack? What dish can I
+  // make around what is on my plate?) are ideas for Chef Mealan, never the app's own reading of the plate
+  if (/\bplate\b/i.test(m) && /^(what|what's|whats|show|list|tell me)\b/i.test(m) && !/\b(add|goes|go with|better|improve|instead|swap|change|make|makes|dish|around|cook|missing|need)\b/i.test(m)) return { kind: "plate" };
   if (/\b(left|remaining|to go)\b/i.test(m) && !/\bleftover/i.test(m)) return { kind: "day", ask: "left" };
   if (/\bhow much (protein|kcal|calories|energy)\b/i.test(m)) return { kind: "day", ask: "left" };
   if (/^(what|what's|whats)\b.*\b(planned|on the plan|my plan|for (breakfast|lunch|dinner|today|tonight)|today's meals|do i (eat|have))\b/i.test(m)) return { kind: "day", ask: "plan" };

@@ -26,7 +26,7 @@ C4. A food that goes in the pot raw or dry is cooked by the steps: raw meat and 
 
 C5. A cooked meat, pasta or grain on the plate says about how much that is raw or dry: meat loses about a quarter of its weight when cooked, pasta takes up water to about 2.4 times its dry weight, rice and grains about 2.5 times. Shown for these only. Code: `rawHint` in src/cookWords.ts.
 
-C6. Some foods are ingredients, not food: yeast, flour, baking powder, a stock cube, oil, sugar, salt, spices, vinegar, starch, a sauce base (soy sauce, tomato paste, mustard). They need a dish around them, so on their own they are never a quick pick, never a tip, never a partner, never a swap. A food named by a generic word is one only when that word names it (Olive oil, Sugar); Sardines in olive oil and Low sugar yogurt stay food. An egg is not an ingredient: it is cooked and eaten as it is (C7). Code: `isIngredient` in src/mixtip.ts, one list (DT103, 0.2.91). Chef Mealan sees the same in the dish check (C30).
+C6. Some foods are ingredients, not food: yeast, flour, baking powder, a stock cube, oil, sugar, salt, spices, vinegar, starch, a sauce base (soy sauce, tomato paste, mustard). They need a dish around them, so on their own they are never a quick pick, never a tip, never a partner, never a swap. A food named by a generic word is one only when that word names it (Olive oil, Sugar); Sardines in olive oil and Low sugar yogurt stay food. An egg is not an ingredient: it is cooked and eaten as it is (C7). Code: `isIngredient` in src/mixtip.ts, one list (DT103, 0.2.91). On the plate, the gate says it at once, by code, before any read (DT105, 0.2.92).
 
 C7. Whole eggs and bananas are counted, by size, never in grams on the screen; the grams stay the truth for the numbers. Eggs by the EU grades, bananas by the USDA sizes. A pack that prints a piece (1 bar 45 g) is counted in pieces. Code: src/counted.ts.
 
@@ -109,13 +109,15 @@ Every place that offers, accepts or moves a food, and the rules it goes through.
 | Swap a food on the plate | foods that can take this one's place | C6, C20, C21, C25 | `mixWith` in src/App.tsx, src/swaps.ts |
 | Fit | moves the densest free food within its portion | C10, C12, C13 | `fit` in src/screens/JourneyScreen.tsx, src/foodjob.ts |
 | The portion line | red line under a food outside its portion | C10, C11 | `portionLine` in src/foodjob.ts |
-| The culinary gate | reads two or more foods, says whether they make the meal | C6, C24, C30, C31 | /api/dish in server.ts, the Plate |
+| The culinary gate | reads two or more foods, says whether they make the meal; a failed read says so, with Try again (DT104) | C24, C30, C31 | /api/dish in server.ts, the Plate |
+| The ingredient line | an ingredient on the plate gets a line at once, by code, before any read: Take it out, Ask Chef Mealan for a dish around it (DT105) | C6 | `isIngredient`, the gate card in src/screens/JourneyScreen.tsx |
+| A chat answer | the foods Chef Mealan names become rows: + Add, Take it out, Scan it; a name the rules refuse is no row (DT106) | C6, C20, C21, C10 | `chatRows` in src/chatFoods.ts, `fitsPlate` |
 | Chef Mealan's ideas | three dishes around the plate, by kitchen | C14, C15, C20, C25, C32, C33, C34, C36 | /api/meal in server.ts, `solveMeal` in src/makeMeal.ts |
 | The steps | the method for a plate you cook | C3, C4, C5, C40 to C48 | /api/steps in server.ts, src/draftSteps.ts, src/cookWords.ts |
 | A recipe from a link or screenshot | the original, then your changes | C35, C45, C46, C47, C48 | /api/recipe/* in server.ts |
 | Counted foods and cans | eggs, bananas, pieces; a can and its liquid | C7, C8 | src/counted.ts, src/canned.ts |
 
-A row that names a rule the code does not call is a gap and goes to section 7. Checked for 0.2.91: the tip and quick picks were the gaps (DT101, DT103).
+A row that names a rule the code does not call is a gap and goes to section 7. Checked for 0.2.91: the tip and quick picks were the gaps (DT101, DT103). 0.2.92: the gate gets C6 by code (DT105) and the chat's answer gets a row (DT106).
 
 ## 7. Not yet a rule, open
 
@@ -132,3 +134,4 @@ A row that names a rule the code does not call is a gap and goes to section 7. C
 - 23 October: C8.
 - 24 October: C3, C4, C5, C14, C15, C32, C33, C40, C43 (0.2.87); C10 to C13, C30, C31 (0.2.88); C10 the start amount (0.2.89). First draft of this file.
 - 24 October, evening: C6 in code; the tip, quick picks, swaps and partners all go through the one module; section 6, where each rule is applied, and the process rule (0.2.91, DT101 to DT103).
+- 24 October, night: C6 in the gate by code, a failed read says so, the chat's answer as rows (0.2.92, DT104 to DT107).

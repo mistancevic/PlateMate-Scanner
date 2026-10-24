@@ -80,6 +80,7 @@ import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, isIngredient, type Mix, type MixTip } from "./mixtip";
+import { ratesOf } from "./letters";
 import { findReference, referenceFood, localName, otherNames, marketFoods } from "./reference";
 import { startGrams, jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
@@ -788,7 +789,7 @@ export default function App() {
     [scanFrom, setScanFrom] = useState<"today" | null>(null),
     [where, setWhere] = useState<Food | null>(null),
     // what the chat opened for (0.2.4): "fill" shows the day filled at once
-    [talkAsk, setTalkAsk] = useState<"fill" | "plate" | null>(null),
+    [talkAsk, setTalkAsk] = useState<"fill" | "plate" | "around" | null>(null),
     // the slots' meals (0.2.2) and the slot a plate is being made for
     [planned, setPlannedState] = useState<Planned>(() => refreshPlanned(getPlanned(), state.meals)),
     [filling, setFilling] = useState<Filling | null>(null),
@@ -1911,6 +1912,8 @@ export default function App() {
     // filling breakfast after midnight fitted to the late-night target, and Plan then showed the meal under)
     slotDay = filling ? (() => { const [y, m, d] = filling.date.split("-").map(Number); return numbersOfDay(getDay(personal, new Date(y, m - 1, d, 12))); })() : null,
     pdRef = filling ? (slotDay ? density(slotDay.protein, slotDay.kcal) : dayPd) : momentTarget(moment, dayPd);
+  // DT108 (0.2.92): the day's rates for the four letters, from the plan; protein from the PD target
+  const rates = ratesOf(slotDay ?? todayNumbers(), pdRef);
   const selected = portionTotals(state.items, state.portion);
   const matched =
     selected.calories !== null &&
@@ -1923,7 +1926,7 @@ export default function App() {
     api, setImage, setEdit, setGoalsOpen, setAccessOpen, setReviewMeal,
     setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
-    pdRef, dayPd, kind, setKind, plateTaste, setPlateTaste, moment, setMoment: (m: MomentId) => setMomentState(m), pick, setPick, usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
+    pdRef, rates, dayPd, kind, setKind, plateTaste, setPlateTaste, moment, setMoment: (m: MomentId) => setMomentState(m), pick, setPick, usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },
@@ -2165,8 +2168,9 @@ export default function App() {
         });
       } catch (e: any) { setError(e.message); } finally { setBusy(""); }
     },
-    openOut: (ask?: "fill" | "plate") => { setTalkAsk(ask ?? null); setTalkOpen(true); },
+    openOut: (ask?: "fill" | "plate" | "around") => { setTalkAsk(ask ?? null); setTalkOpen(true); },
     scanFromToday: () => { setScanFrom("today"); setMode("label"); setCamera(true); },
+    openScan: () => { setTalkOpen(false); setMode("label"); setCamera(true); },
     where, setWhere,
     closeOut: () => setTalkOpen(false),
     mealanAsk, mealanAsked: () => setMealanAsk(0),

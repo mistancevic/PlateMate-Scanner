@@ -58,10 +58,12 @@ const U = "http://127.0.0.1:3262";
   ok((await st()).items.find((i) => i.id === "b").grams === 10, "DT93: the yeast is 10 g in the state");
   const ways = page.locator(".gate-card").first();
   ok(await page.locator(".gate-card").count() === 1, "DT97: one Chef Mealan place, not two cards");
-  ok(/These foods top out at PD 4\.7 within their portions/.test(await ways.textContent()) && await ways.getByRole("button", { name: "Add foods for a lunch" }).count() === 1 && await ways.getByRole("button", { name: "Swap a food" }).count() === 1 && await ways.getByRole("button", { name: "Ask Chef Mealan" }).count() === 1, "DT93: the foods top out: Add foods, Swap a food, Ask Chef Mealan");
+  ok(/These foods top out at PD 4\.7 within their portions/.test(await ways.textContent()) && await ways.getByRole("button", { name: "Add foods for a lunch" }).count() === 1 && await ways.getByRole("button", { name: "Swap a food" }).count() === 1 && await ways.getByRole("button", { name: "Ask Chef Mealan", exact: true }).count() === 1, "DT93: the foods top out: Add foods, Swap a food, Ask Chef Mealan");
+  // changed by DT105 (0.2.92): the yeast on the plate gets its own line and buttons in the same card
+  ok(/Active dry yeast is an ingredient, not a food/.test(await ways.textContent()) && await ways.getByRole("button", { name: "Ask Chef Mealan for a dish around it" }).count() === 1, "DT105: the yeast is named as an ingredient, with its own Ask");
   ok(await page.getByRole("button", { name: "Fit again" }).count() === 1 && await page.getByRole("button", { name: "Lock the recipe" }).count() === 1, "DT94: Fit again and Lock the recipe on the Plate");
   // Ask Chef Mealan opens the chat with the plate in the first question
-  await ways.getByRole("button", { name: "Ask Chef Mealan" }).click(); await page.waitForTimeout(900);
+  await ways.getByRole("button", { name: "Ask Chef Mealan", exact: true }).click(); await page.waitForTimeout(900);
   const talk = await text(".talk-overlay");
   ok(/What should I change on my plate so it makes a lunch\? 150 g Clean Protein Bar Peanut Love, 10 g Active dry yeast, 150 g Peanut butter\./.test(talk), "DT93: the chat opens with the plate in the question: " + talk.slice(0, 200));
   await page.locator(".talk-overlay").getByRole("button", { name: /Close|Back/ }).first().click().catch(() => {}); await page.waitForTimeout(400);
