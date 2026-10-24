@@ -76,7 +76,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   ok(/15 g digestive biscuits/.test(await text(page, "main")) && /every amount at your portion/.test(await text(page, "main")), "IM20: just your slice: the steps at your plate's grams");
   await page.getByRole("button", { name: "The whole recipe" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^(I'm making it|Lock the recipe)$/ }).click(); await page.waitForTimeout(400);
-  await page.getByRole("button", { name: "On to How was it?" }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: /^(On to How was it\?|Rate it)$/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "DaaM good" }).click();
   await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(600);
   let st = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));

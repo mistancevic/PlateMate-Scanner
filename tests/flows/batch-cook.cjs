@@ -62,7 +62,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   ok(new RegExp(`It made\\s*−\\s*${planned}\\s*sarmas`).test(((await made.textContent()) ?? "").replace(/\s+/g, " ")), `It made ${planned}, as cooked`);
   await made.getByRole("button", { name: "It made one more" }).click(); await page.waitForTimeout(300);
   ok(new RegExp(`You made ${planned + 1} sarmas\\. How many did you eat\\?`).test(await txt("main")), `counted: You made ${planned + 1} sarmas`);
-  await page.getByRole("button", { name: "On to How was it?" }).click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: /^(On to How was it\?|Rate it)$/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "DaaM good" }).click();
   await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(900);
   const m = await store();
@@ -81,7 +81,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   await page.getByRole("button", { name: /^Lock the recipe$/ }).first().click(); await page.waitForTimeout(600);
   await page.locator(".way").first().click(); await page.waitForTimeout(200);
   await page.getByRole("button", { name: /I'm making it this way|Lock the recipe, this way/ }).click(); await page.waitForTimeout(600);
-  await page.getByRole("button", { name: /On to How was it/ }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: /On to How was it|Rate it/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "DaaM good" }).click();
   // about one meal: the save says nothing about it, one plate unless you say more (DT81, Milan 15:53 and 15:55)
   ok(await page.getByRole("group", { name: "What it makes" }).count() === 0 && await page.getByRole("button", { name: "It makes more than one" }).count() === 1, "about one meal: no question, only It makes more than one");
@@ -103,7 +103,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   await page.getByRole("button", { name: /I'm making it|Lock the recipe/ }).first().click(); await page.waitForTimeout(600);
   // a big plate eaten all at once is asked about (R25); you ate a portion of it
   await page.getByRole("button", { name: "A portion" }).click(); await page.waitForTimeout(200);
-  await page.getByRole("button", { name: /On to How was it/ }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: /On to How was it|Rate it/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "DaaM good" }).click();
   const big = page.getByRole("group", { name: "What it makes" });
   const bigText = ((await big.textContent()) ?? "").replace(/\s+/g, " ");

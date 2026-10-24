@@ -2,6 +2,7 @@
 // Code looks first, at once and for free: your recipes, Coach's, the members' and Chef Mealan's starters, and your foods; PD 7+
 // is a filter, shown as a chip. Chef Mealan is asked only on a tap; his idea is kept in My recipes as an idea, not made yet,
 // and the app works out every number from the foods. Picking a dish puts it on the plate, as Make it does.
+import { cookTitle } from "../cookWords";
 import { carriedLists } from "../carry";
 import { tasteOfWords } from "../craving";
 import { tasteForReq } from "../tasteChips";
@@ -87,7 +88,7 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
       if (items.length < 2) throw new Error(`${CHEF_NAME} has no idea for that right now. Try other words.`);
       if (items.some((i: { food: Food }) => blockedByAllergy(i.food, allergies))) throw new Error(`${CHEF_NAME}'s idea had a food you can't have. Ask again.`);
       const total = items.reduce((n: number, i: { grams: number }) => n + i.grams, 0);
-      const meal: Meal = { id: uid(), title: String(data.idea.title).slice(0, 80), items, portion: total, savedAt: new Date().toISOString(), steps: [], idea: { at: new Date().toISOString(), craving: craving.slice(0, 80) } };
+      const meal: Meal = { id: uid(), title: cookTitle(String(data.idea.title).slice(0, 80)), items, portion: total, savedAt: new Date().toISOString(), steps: [], idea: { at: new Date().toISOString(), craving: craving.slice(0, 80) } };
       setState((s) => ({ ...s, meals: [meal, ...s.meals] }));
       setShown((l) => [...l, meal.title].slice(-9));
       setIdea({ meal, why: String(data.idea.why ?? "") });

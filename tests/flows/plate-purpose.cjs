@@ -45,7 +45,7 @@ seed.items = []; seed.meals = []; seed.feedback = []; seed.goals = { ...seed.goa
     await page.locator(".row-food").filter({ hasText: "Skyr, natural" }).getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(500);
     ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 1 && /Dinner is about/.test(await page.locator(".plate-card").textContent()), "the plate is sized for dinner: Dinner is about, Fit to my target");
     await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe)$/ }).click(); await page.waitForTimeout(800);
-    for (const name of ["Continue", "Lock the recipe", "I'm making it", "On to How was it?"]) { const bt = page.getByRole("button", { name, exact: true }); if (await bt.count()) { await bt.first().click(); await page.waitForTimeout(600); } }
+    for (const name of ["Continue", "Lock the recipe", "I'm making it", "Rate it", "On to How was it?"]) { const bt = page.getByRole("button", { name, exact: true }); if (await bt.count()) { await bt.first().click(); await page.waitForTimeout(600); } }
     await page.getByRole("button", { name: "Good", exact: true }).click(); await page.getByRole("button", { name: /^Save/ }).first().click(); await page.waitForTimeout(1200);
     if (!/today/.test(page.url())) { await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(600); }
     // R5 (Milan 17:23 to 19:00, board RS13): which meal it was is its own line; By the plan is its mark

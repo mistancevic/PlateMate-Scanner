@@ -73,3 +73,24 @@ export function baseRange(name: string, min: number): [number, number] {
   if (/\b(bread|roll|tortilla|wrap|pita|baguette)\b/.test(n)) return [50, 150];
   return [Math.max(30, min), 300];
 }
+
+// DT100 (0.2.90, board Stories62; Milan 24 October 18:55): a title as a cook says it. The model gives Balkan Low-Fat Quark Toast
+// Plate; code makes it Quark toast with apple: sentence case, Plate dropped at the end, Bowl of and Plate of at the start, and
+// label words (Low-Fat, High-Protein, Protein) at the start. Names of places and kitchens keep their capital. A name the
+// person typed is never touched: this runs only on titles Chef Mealan gives.
+const PROPER = /^(balkan|italian|mediterranean|german|french|spanish|greek|turkish|indian|thai|chinese|japanese|korean|mexican|american|asian|serbian|croatian|bosnian|bavarian|parmigiano|parmesan|dijon|daam)$/i;
+export function cookTitle(raw: string): string {
+  let t = String(raw ?? "").replace(/\s+/g, " ").trim();
+  if (!t) return t;
+  t = t.replace(/^(a |the )?(bowl|plate|dish) of /i, "").replace(/\s+(plate|dish)$/i, "");
+  t = t.replace(/^((low|high|reduced)[- ](fat|protein|carb|sugar|calorie)|healthy|quick|easy)\s+/i, "");
+  t = t.replace(/\b(low|high)-(fat|protein|carb)\b\s*/gi, "");
+  const words = t.split(" ").filter(Boolean).map((w, k) => {
+    const core = w.replace(/[^\p{L}\p{N}'-]/gu, "");
+    if (PROPER.test(core)) return core.charAt(0).toUpperCase() + core.slice(1).toLowerCase() + w.slice(core.length);
+    if (/^[A-Z0-9]{2,}$/.test(core)) return w; // PD, DaaM style words stay
+    const low = w.toLowerCase();
+    return k === 0 ? low.charAt(0).toUpperCase() + low.slice(1) : low;
+  });
+  return words.join(" ").trim();
+}

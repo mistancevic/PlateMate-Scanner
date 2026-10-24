@@ -118,7 +118,7 @@ const U = "http://127.0.0.1:3211";
   await p2.getByRole("button", { name: /^(Keep it as it is|Lock the recipe)$/ }).click(); await p2.waitForTimeout(600);
   if (await p2.locator(".way").count()) await p2.locator(".way").first().click();
   await p2.getByRole("button", { name: /I'm making it|Lock the recipe|Continue/ }).click(); await p2.waitForTimeout(400);
-  await p2.getByRole("button", { name: "On to How was it?" }).click(); await p2.waitForTimeout(400);
+  await p2.getByRole("button", { name: /^(On to How was it\?|Rate it)$/ }).click(); await p2.waitForTimeout(400);
   await p2.getByRole("button", { name: "DaaM good" }).click();
   await p2.getByRole("button", { name: "Save", exact: true }).click(); await p2.waitForTimeout(600);
   const s2 = await p2.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));

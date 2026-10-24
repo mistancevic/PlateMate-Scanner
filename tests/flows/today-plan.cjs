@@ -28,7 +28,7 @@ seed.items = [];
     await click(/^(Keep it as it is|Lock the recipe)$/);
     if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); await click(/I'm making it this way|Lock the recipe, this way/i); }
     else await click(/^(Continue|Lock the recipe)$/);
-    await click(/On to How was it/i);
+    await click(/On to How was it|Rate it/i);
     await click(/DaaM good/i);
     await click(/^Save$/);
     await page.waitForTimeout(600);

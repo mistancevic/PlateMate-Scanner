@@ -45,17 +45,19 @@ const U = "http://127.0.0.1:3262";
   ok(/not a lunch yet/.test(await text(".readout")) && /about 2 lunches/.test(await text(".readout")), "DT93: the readout says not a lunch yet, about 2 lunches");
   // rule 2: Chef Mealan's read, once per set of foods
   const gate = page.locator(".gate-card").first();
-  ok(dishAsked === 1 && /do not make a lunch/.test(await gate.textContent()) && await gate.getByRole("button", { name: /^Make it a lunch around the clean protein bar/ }).count() === 1 && await gate.getByRole("button", { name: "Make it a snack" }).count() === 1 && await gate.getByRole("button", { name: "Keep it as it is" }).count() === 1, "DT93: Chef Mealan's card: why, and three ways");
+  ok(dishAsked === 1 && /do not make a lunch/.test(await gate.textContent()) && !/Reading your plate/.test(await gate.textContent()) && await gate.getByRole("button", { name: /^Make it a lunch around the clean protein bar/ }).count() === 1 && await gate.getByRole("button", { name: "Make it a snack" }).count() === 1 && await gate.getByRole("button", { name: "Keep it as it is" }).count() === 1, "DT93: Chef Mealan's card: why, and three ways");
   await page.locator(".grams input").nth(1).fill("25"); await page.waitForTimeout(600);
   ok(dishAsked === 1, "DT93: changing an amount does not ask Chef Mealan again");
   // Fit in place: the yeast stays at its portion, the line says so, the plate stays on Craft
   await page.locator(".grams input").nth(1).fill("10"); await page.waitForTimeout(300);
   await page.getByRole("button", { name: "Fit to my target" }).click(); await page.waitForTimeout(1500);
   ok(await page.locator(".phase-bar span.on").count() === 1 && await page.locator(".title-input").count() === 1 && await page.getByRole("button", { name: "Manual" }).count() === 1, "DT93: Fit stays on the Plate: the name field and Manual are still there");
-  const fitLine = await page.locator(".fit-line").allTextContents();
-  ok(fitLine.length === 1 && /^Fit set 10 g active dry yeast, the most for a portion \(it asked for \d+ g\)\.$/.test(fitLine[0]), "DT93: Fit never moves the yeast past 10 g, and says what it asked for: " + fitLine[0]);
+  // DT97 (0.2.90): Fit's line lives in Chef Mealan's one place, not under the row
+  const fitLine = await page.locator(".fit-note").allTextContents();
+  ok(fitLine.length === 1 && /^Fit set 10 g active dry yeast, the most for a portion \(it asked for \d+ g\)\.$/.test(fitLine[0]), "DT93, DT97: Fit never moves the yeast past 10 g, says what it asked for, in Chef Mealan's place: " + fitLine[0]);
   ok((await st()).items.find((i) => i.id === "b").grams === 10, "DT93: the yeast is 10 g in the state");
-  const ways = page.locator(".gate-card").nth(1);
+  const ways = page.locator(".gate-card").first();
+  ok(await page.locator(".gate-card").count() === 1, "DT97: one Chef Mealan place, not two cards");
   ok(/These foods top out at PD 4\.7 within their portions/.test(await ways.textContent()) && await ways.getByRole("button", { name: "Add foods for a lunch" }).count() === 1 && await ways.getByRole("button", { name: "Swap a food" }).count() === 1 && await ways.getByRole("button", { name: "Ask Chef Mealan" }).count() === 1, "DT93: the foods top out: Add foods, Swap a food, Ask Chef Mealan");
   ok(await page.getByRole("button", { name: "Fit again" }).count() === 1 && await page.getByRole("button", { name: "Lock the recipe" }).count() === 1, "DT94: Fit again and Lock the recipe on the Plate");
   // Ask Chef Mealan opens the chat with the plate in the first question
@@ -70,6 +72,12 @@ const U = "http://127.0.0.1:3262";
   await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); const f = (id) => s.foods.find((x) => x.id === id); s.items = [{ id: "a", food: f("bar"), grams: 50, locked: false }, { id: "d", food: f("f-bread"), grams: 80, locked: false }, { id: "e", food: f("f-banana"), grams: 120, locked: false }, { id: "c", food: f("pb"), grams: 20, locked: false }]; s.title = "Peanut banana toast"; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
   await page.reload(); await page.waitForTimeout(1800);
   ok(await page.locator(".gate-line").count() === 0 && /A peanut banana toast with the bar on the side/.test(await text(".gate-ok")), "DT93: a plate that is food: no red lines, Chef Mealan's one line that says what it is");
+  // DT98 (0.2.90): the cooking foods as chips; x takes one out
+  await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.cooking = ["ground cinnamon", "lemon zest"]; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
+  await page.reload(); await page.waitForTimeout(1500);
+  ok(await page.locator(".pt-cook .pt-chip").count() === 2, "DT98: For cooking as two chips");
+  await page.getByRole("button", { name: "Take out lemon zest" }).click(); await page.waitForTimeout(300);
+  ok(JSON.stringify((await st()).cooking) === JSON.stringify(["ground cinnamon"]) && await page.locator(".pt-cook .pt-chip").count() === 1, "DT98: x takes the lemon zest out, the cinnamon stays");
   await page.getByRole("button", { name: "Lock the recipe" }).click(); await page.waitForTimeout(900);
   // a mix of ready foods: the ways, inside Craft, ending with Lock the recipe
   ok(await page.locator(".phase-bar span.on").count() === 1 && /How do you want to eat it\?/.test(await text()), "DT94: the ways to eat a mix stay inside Craft");
@@ -78,7 +86,8 @@ const U = "http://127.0.0.1:3262";
   const ticks = page.locator(".mk-check");
   ok(await ticks.count() >= 2 && /Tick the steps as you go/.test(await text()), "DT94: the steps to tick on the Make screen: " + await ticks.count());
   await ticks.first().click(); ok(await page.locator(".mk-check.on").count() === 1, "DT94: a step ticked");
-  await page.getByRole("button", { name: "On to How was it?" }).click(); await page.waitForTimeout(800);
+  ok(await page.getByRole("button", { name: "Rate it" }).count() === 1 && await page.getByRole("button", { name: /On to/ }).count() === 0, "DT99: the button on Make is Rate it");
+  await page.getByRole("button", { name: "Rate it" }).click(); await page.waitForTimeout(800);
   ok(await page.locator(".phase-bar span.on").count() === 3 && /Feedback: how was it\?/.test(await text("h2")) && /Peanut banana toast · named in Craft/.test(await text()) && await page.getByLabel("Name it").count() === 0, "DT94: Feedback, the name from Craft, no Name it");
   await page.getByRole("button", { name: "DaaM good" }).click(); await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1200);
   ok((await st()).meals[0]?.title === "Peanut banana toast", "DT94: saved under the name from Craft");

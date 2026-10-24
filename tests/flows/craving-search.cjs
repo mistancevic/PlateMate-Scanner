@@ -110,7 +110,7 @@ const U = "http://127.0.0.1:3234";
     if (await p2.locator(".way").count()) { await p2.locator(".way").first().click(); await p2.waitForTimeout(200); await p2.getByRole("button", { name: /I'm making it this way|Lock the recipe, this way/i }).click(); }
     else await p2.getByRole("button", { name: /^Continue$/ }).click();
     await p2.waitForTimeout(400);
-    await p2.getByRole("button", { name: /On to How was it/i }).click(); await p2.waitForTimeout(300);
+    await p2.getByRole("button", { name: /On to How was it|Rate it/i }).click(); await p2.waitForTimeout(300);
     await p2.getByRole("button", { name: /DaaM good/i }).click();
     await p2.getByRole("button", { name: /^Save$/ }).click(); await p2.waitForTimeout(700);
     st = await state(p2);

@@ -2061,3 +2061,7 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .gate-ok { display: flex; align-items: center; gap: 6px; }
 .plate-steps .rp-steps { margin: 4px 0 0; }
 .fb-name { display: block; font-weight: 700; }
+/* DT97, DT98 (0.2.90, board Stories62): one place for Chef Mealan; the cooking foods as chips you can take out */
+.gate-card .gate-wait { color: var(--muted); }
+.gate-card .fit-note { display: block; }
+.pt-cook .pt-chips { display: inline-flex; gap: 6px; flex-wrap: wrap; vertical-align: middle; }

@@ -64,7 +64,7 @@ const U = "http://127.0.0.1:3226";
     ok(new RegExp(`${N - 1} lunches are left\\. To eat them on other days, put the recipe on Plan\\.`).test(mk), "the rest is counted in lunches; to eat them on other days, Plan");
     ok(/To eat the rest on other days, put the recipe on Plan\./.test(await text("main")) && !/Keep for later when you save/.test(await text("main")), "the bottom line points to Plan");
     await page.getByRole("button", { name: /^(I'm making it|Lock the recipe)$/ }).click(); await page.waitForTimeout(400);
-    await page.getByRole("button", { name: "On to How was it?" }).click(); await page.waitForTimeout(400);
+    await page.getByRole("button", { name: /^(On to How was it\?|Rate it)$/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "DaaM good" }).click();
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(800);
     ok(new RegExp(`${N - 1} lunches left: to eat them on other days, put the recipe on Plan\\.`).test(await text("main")), "the landing line: N lunches left, put the recipe on Plan");

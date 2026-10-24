@@ -81,7 +81,7 @@ const U = "http://127.0.0.1:3215";
 
   // IM23b: Save keeps the changed dish as a whole recipe
   await page.getByRole("button", { name: /^(I'm making it|Lock the recipe)$/ }).click(); await page.waitForTimeout(500);
-  await page.getByRole("button", { name: /On to How was it\?/ }).click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: /On to How was it\?|Rate it/ }).click(); await page.waitForTimeout(500);
   t = await text("main");
   ok(/Save your changed dish/.test(t) && /No-bake cheesecake, more protein: the whole recipe, 10 slices, with the steps for your change\. Adapted from No-bake cheesecake, Sally's Baking Addiction; its original steps come along, for you only\./.test(t), "IM23b: Save your changed dish says what is kept");
   await shot("im23b", '.save-recipe:has-text("Save your changed dish")');
@@ -114,7 +114,7 @@ const U = "http://127.0.0.1:3215";
   await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(1200);
   await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
   const mk = page.getByRole("button", { name: /Make it from the original|I'm making it|Lock the recipe/ }); if (await mk.count()) { await mk.first().click(); await page.waitForTimeout(500); }
-  await page.getByRole("button", { name: /On to How was it\?/ }).click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: /On to How was it\?|Rate it/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Good", exact: true }).first().click();
   await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(900);
   ok(/Made today/.test(await text(".rq-landed")) && /No-bake cheesecake, more protein/.test(await text(".rq")), "RP4: a recipe made before ends on its page too");
