@@ -61,6 +61,8 @@ const STEPS = { steps: [
   ok(await fit.count() === 1 && !(await fit.isEnabled()) && /Add one food first\. Chef Mealan builds the dinner around it\./.test(await text(page, ".plate-card")), "DT87: empty plate: Fit to my target waits, and the line says why");
   ok(await page.getByRole("button", { name: /^Make it an? \w+$/ }).count() === 0, "DT87: no Make it a dinner");
   await page.locator(".row-food").filter({ hasText: "Chicken breast, cooked" }).getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(700);
+  // DT96 (0.2.89): Add lands at a normal portion, 190 g of chicken; this story is at 150 g, as Milan's plate of 24 October
+  await page.locator(".grams input").first().fill("150"); await page.waitForTimeout(400);
   ok(await fit.isEnabled() && /Chef Mealan adds what it needs to land your dinner in its range\./.test(await text(page, ".plate-card")), "DT87: one food: Fit to my target, and the line names the range");
   const hat = await page.locator(".ways-out .pill-primary svg").boundingBox();
   ok(hat && hat.width >= 16, "DT87: the chef hat keeps its size next to Keep it as it is: " + (hat && Math.round(hat.width)));

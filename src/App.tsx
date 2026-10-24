@@ -81,7 +81,7 @@ import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, type Mix, type MixTip } from "./mixtip";
 import { findReference, referenceFood, localName, otherNames, marketFoods } from "./reference";
-import { jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
+import { startGrams, jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
 import { fitnessFor, SOURCES, dayName } from "./fitness";
 import { getSafety, setSafety as storeSafety, aiState, addFlag, goalSignals, allergyHits, recordDeclaration, FIXED, EMPTY_SAFETY, type Safety, type SituationId } from "./safety";
@@ -1493,7 +1493,8 @@ export default function App() {
         ...s.items,
         // R22 (0.2.50): with Both picked, a food goes into the main or the sweet finish
         // DT82 (Tester 3's tuna, 0.9 cans): a food the pack sells as one piece goes on as one, 1 can, 1 bar, 1 pot
-        { id: uid(), food: { ...food }, grams: food.serving ? food.serving.grams : (density(food.protein, food.calories) ?? 0) < 3 ? 50 : 150, locked: false, ...(plateTaste === "both" ? { part: bothPartOf(food.name) } : {}) },
+        // DT96 (0.2.89): at its normal portion: 1 bar, 1 can, 1 egg, else the middle of its range (yeast 7 g, peanut butter 25 g, chicken 190 g)
+        { id: uid(), food: { ...food }, grams: startGrams(food), locked: false, ...(plateTaste === "both" ? { part: bothPartOf(food.name) } : {}) },
       ],
       portion: null,
     }));

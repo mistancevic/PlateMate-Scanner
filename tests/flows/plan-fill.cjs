@@ -104,9 +104,9 @@ seed.items = [];
   ok(after > before, `Add lifts the plate: ${before} to ${after}`);
   await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).click(); await page.waitForTimeout(1500);
   const fitted = await page.locator(".readout").textContent();
-  // 0.2.88 (DT93): Fit never moves the whey past its portion, 40 g, so the plate stays 1.0 under, the line under the whey says what Fit did, and the three ways are offered
+  // 0.2.89 (DT96): the whey comes on at 30 g, its normal portion; Fit lifts it within its portion and the plate reaches the slot's target
   const pdNow = Number((await page.locator(".readout b").first().textContent()).trim());
-  ok(pdNow === 6 && /1\.0 under your 6\.9/.test(fitted) && /Fit set 40 g whey protein powder, the most for a portion/.test(await page.locator(".plate-card").textContent()) && await page.getByRole("button", { name: "Swap a food" }).count() === 1, `after Fit the whey stops at its portion, 40 g, and the plate says 1.0 under with three ways out: PD ${pdNow}`);
+  ok(pdNow >= 6.9 && /fits your plan/.test(fitted) && await page.locator(".chef-tip").count() === 0, `after Fit the plate reaches the slot's target within the whey's portion, no tip: PD ${pdNow}`);
   await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(400);
   // a new name typed on the Plate for a meal that came from a recipe renames that recipe, no copy; Go closes the keyboard
   const countBefore = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.length);

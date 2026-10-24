@@ -32,7 +32,7 @@ C8. A can packed in a liquid is a bundle: the drained food at the drained weight
 
 ## 2. Portions
 
-C10. Every food has a normal portion, a range in grams, by its name first, then a pack's piece, then its job. Examples: a bar 35 to 100 g (one bar about 50 g), yeast 3 to 10 g, protein powder 20 to 40 g (a scoop about 30 g), nut butter 15 to 40 g, oil 5 to 25 g, nuts 15 to 50 g, cheese 20 to 80 g, meat and fish 80 to 300 g, dry pasta and grains 40 to 120 g, cooked grains 100 to 300 g, bread 30 to 150 g, potatoes 100 to 400 g, skyr and quark 100 to 400 g. By job when no name matches: a protein base 80 to 300 g, a flavour food 10 to 50 g, a carb base 40 to 250 g, a fat 5 to 40 g, a volume food 50 to 400 g. Code: `portionOf` in src/foodjob.ts.
+C10. Every food has a normal portion, a range in grams, and Add puts it on the plate at that portion: a piece when the pack has one, one M egg or banana when counted, else the middle of the range (`startGrams`, 0.2.89). The range is by its name first, then a pack's piece, then its job. Examples: a bar 35 to 100 g (one bar about 50 g), yeast 3 to 10 g, protein powder 20 to 40 g (a scoop about 30 g), nut butter 15 to 40 g, oil 5 to 25 g, nuts 15 to 50 g, cheese 20 to 80 g, meat and fish 80 to 300 g, dry pasta and grains 40 to 120 g, cooked grains 100 to 300 g, bread 30 to 150 g, potatoes 100 to 400 g, skyr and quark 100 to 400 g. By job when no name matches: a protein base 80 to 300 g, a flavour food 10 to 50 g, a carb base 40 to 250 g, a fat 5 to 40 g, a volume food 50 to 400 g. Code: `portionOf` in src/foodjob.ts.
 
 C11. A food outside its portion gets a line under it on the Plate, in red: 150 g is 3 bars. One bar is about 50 g. The line says the range when there is no piece. The person may keep it; the app only says. Code: `portionLine` in src/foodjob.ts.
 
@@ -108,4 +108,4 @@ C48. An optional food is never numbered in the steps; it is named in words, once
 - 17 October: C7.
 - 18 October: C22, C23, C35, C45, C46. Milan asked for this document.
 - 23 October: C8.
-- 24 October: C3, C4, C5, C14, C15, C32, C33, C40, C43 (0.2.87); C10 to C13, C30, C31 (0.2.88). First draft of this file.
+- 24 October: C3, C4, C5, C14, C15, C32, C33, C40, C43 (0.2.87); C10 to C13, C30, C31 (0.2.88); C10 the start amount (0.2.89). First draft of this file.

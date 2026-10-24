@@ -1,6 +1,7 @@
 // What a food is, by its job on a plate. A property of the food, never a verdict: that depends on the day (see todayLine).
 import { density, type Food } from "./pilot";
 import { roleOf } from "./swaps";
+import { kindOf, gramsOfOne } from "./counted";
 export const JOBS = ["Protein base", "Flavour food", "Carb base", "Fat source", "Volume food", "Drink", "Mixed"] as const;
 export type Job = (typeof JOBS)[number];
 const SPREAD = /nutella|spread|aufstrich|creme|crème|butter|peanut ?butter|erdnussmus|nussmus|honig|honey|jam|marmelade|konfit/i;
@@ -96,4 +97,16 @@ export function portionLine(f: Food, grams: number): string | null {
   if (grams > p.max && p.piece) { const n = Math.round(grams / p.piece.grams); return `${Math.round(grams)} g is ${n} ${p.piece.name}${n === 1 ? "" : "s"}. ${p.note}`.trim(); }
   if (grams > p.max) return `${Math.round(grams)} g is over a portion of ${short}, ${p.min} to ${p.max} g.${p.note ? ` ${p.note}` : ""}`;
   return `${Math.round(grams)} g is under a portion of ${short}, ${p.min} to ${p.max} g.`;
+}
+// DT96 (0.2.89, board Stories61; Milan 24 October 17:04): Add puts a food on the plate at its normal portion: a piece when the
+// pack prints one (1 bar, 1 can), one M egg or banana when it is counted, else the middle of its range, to 5 g. Before, every
+// Add landed at 150 g (50 g under PD 3), so a bar came as 3 bars and yeast as 150 g.
+export function startGrams(f: Food): number {
+  if (f.serving && f.serving.grams > 0) return f.serving.grams;
+  const k = kindOf(f.name);
+  if (k) return gramsOfOne({ kind: k, size: "M" });
+  const p = portionOf(f);
+  if (p.piece) return p.piece.grams;
+  const mid = (p.min + p.max) / 2;
+  return mid < 20 ? Math.round(mid) : Math.round(mid / 5) * 5;
 }
