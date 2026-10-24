@@ -37,7 +37,7 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, openOriginal, originalFoods, pdRef, fitPd, backLabel, plannedLine, plannedCount }: {
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, backLabel, plannedLine, plannedCount }: {
   // DT81: how many of its pieces the plan takes from today, for Cook it's suggestion
   plannedCount?: number;
   // DT79: what the plan takes of this batch, 8 sarmas: 3 on Monday lunch, 1 left
@@ -56,6 +56,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onPublish: (now?: boolean) => void; onDelete: ReactNode; close: () => void;
   // IM23c (0.2.23): one line for today after How was it; the recipe a changed dish was adapted from
   top?: ReactNode; openOriginal?: (() => void) | null;
+  // DT84 and DT85: the Made today card, under the photos; and whether the cover is the photo from the meal just made
+  landing?: ReactNode; coverToday?: boolean;
   // RP1b (0.2.25): the foods the original steps were written for, so the page can say what differs
   originalFoods?: string[] | null;
   // RP2 (0.2.25): the readout above the Nutrition table, against your target
@@ -75,8 +77,11 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const setPhotos = (next: string[]) => onPatch(withRecipePhotos(next.slice(0, MAX_RECIPE_PHOTOS)));
   // a drawn cover (0.2.11, board CO, CO1): your own photo goes first; the drawn picture stays behind it, for members
   const drawn = coverIsDrawn(meal);
+  // DT85: Change the cover: the next photo added goes first
+  const coverNext = useRef(false);
   const add = (data: string) => {
     if (list.includes(data) || list.length >= MAX_RECIPE_PHOTOS) return;
+    if (coverNext.current) { coverNext.current = false; setPhotos([data, ...list]); setAt(0); log("cover", { how: "real" }); return; }
     if (drawn) { setPhotos([data, ...list]); setAt(0); log("cover", { how: "real" }); return; }
     setPhotos([...list, data]); setAt(list.length);
   };
@@ -240,7 +245,14 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           </section>
         );
       })()}
-      {!drawn && !(picture && list.length === 0) && <small className="muted rq-hint">{list.length === 0 ? "A photo makes the recipe easy to find, here and on its page." : list.length === 1 ? "This photo is the cover. × deletes it." : sel === 0 ? "The first photo is the cover. Tap a photo to move it with ‹ ›; × deletes it." : `Photo ${sel + 1} of ${list.length}. ‹ moves it earlier: in first place it becomes the cover.`}</small>}
+      {coverToday && list.length > 0 && !drawn && (<>
+        <small className="muted rq-hint">Your photo from today is the cover. When you share with members, you choose which photo they see.</small>
+        <div className="button-row rq-drawn-row">
+          <button className="pill pill-small" disabled={busy} onClick={() => { coverNext.current = true; fileRef.current?.click(); }}>Change the cover</button>
+          <ConfirmButton className="link" ariaLabel="Remove the cover" label="Remove it" confirmLabel="Sure? Remove it" onConfirm={() => { setPhotos(list.slice(1)); setAt(0); }} />
+        </div>
+      </>)}
+      {!coverToday && !drawn && !(picture && list.length === 0) && <small className="muted rq-hint">{list.length === 0 ? "A photo makes the recipe easy to find, here and on its page." : list.length === 1 ? "This photo is the cover. × deletes it." : sel === 0 ? "The first photo is the cover. Tap a photo to move it with ‹ ›; × deletes it." : `Photo ${sel + 1} of ${list.length}. ‹ moves it earlier: in first place it becomes the cover.`}</small>}
       {offered.length > 0 && !full && (
         <div className="rq-offer">
           <small className="muted">From the times you made it, a tap adds the photo:</small>
@@ -248,6 +260,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         </div>
       )}
       {tryPhoto && <TryPhoto meal={meal} tryPhoto={tryPhoto} use={(img) => { const list = recipePhotosOf(meal).filter((x) => x !== img); onPatch({ ...withRecipePhotos([img, ...list].slice(0, MAX_RECIPE_PHOTOS)), coverSig: sig(img) }); }} />}
+      {landing}
       {meal.source && <SourceBox meal={meal} onPatch={onPatch} openOriginal={openOriginal ?? null} />}
       {/* R16 (0.2.44, board RS15): PD on top, under Where it came from, as on the Plate; it follows the grams while editing */}
       {plannedLine && <small className="muted rq-planned">{plannedLine}</small>}

@@ -2033,3 +2033,9 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .rq-find-h { display: block; margin-bottom: 6px; }
 .rq-need { display: block; color: var(--close-text); margin: 6px 0; }
 .rq-g-need { border-color: var(--close-text) !important; }
+/* DT84: share with the coach from the Made today card, under the photos */
+.rq-landed { margin-top: 12px; }
+.rq-share-link { display: inline; padding: 0; font-size: inherit; }
+.rq-shared { color: var(--brand-text); font-weight: 700; }
+.rq-share-ask { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.rq-share-ask .button-row { flex-wrap: wrap; gap: 8px; }
