@@ -1,4 +1,4 @@
-// Cyprus and Limassol (0.2.58 and 0.2.59, Milan 14:58 and 15:19, for Marko). Marko's library had twenty starter foods
+// Cyprus and Limassol (0.2.58 and 0.2.59, Milan 14:58 and 15:19, for Tester 3). Tester 3's library had twenty starter foods
 // picked for Munich. He picks Limassol, taps Add starter foods for Limassol, and gets the fifty Cypriot foods with their
 // Greek names; a second tap adds nothing. Foods finds a Cypriot food in Greek.
 const { chromium } = require("playwright");

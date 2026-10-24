@@ -1,4 +1,4 @@
-// Boards DT84 and DT85 (Milan 23 October 20:58, Marko's call; drawn 24 October 00:37): Share with Coach Milan after making a
+// Boards DT84 and DT85 (Milan 23 October 20:58, Tester 3's call; drawn 24 October 00:37): Share with Coach Milan after making a
 // meal, and the photo taken while making it as the cover. Drawn on a copy of main with a joined coach; nothing in the repo changed.
 const { chromium } = require("/home/claude/PlateMate-Scanner/node_modules/playwright");
 const { spawn } = require("node:child_process");

@@ -1,4 +1,4 @@
-// JOURNEY INVARIANT (DT84 and DT85, Milan 23 October 20:58, 24 October 00:46 and 09:44, from Marko's call): after a meal is
+// JOURNEY INVARIANT (DT84 and DT85, Milan 23 October 20:58, 24 October 00:46 and 09:44, from Tester 3's call): after a meal is
 // made from a recipe, the recipe page shows the recipe first: the photo, then the Made today card under it. The photo taken
 // while making it becomes the cover of a recipe with no photo of its own (no cover, or one Chef Mealan drew), with a line that
 // says so, Change the cover, and Remove it behind a second tap. A cover of your own stays. Share with the coach sits in the

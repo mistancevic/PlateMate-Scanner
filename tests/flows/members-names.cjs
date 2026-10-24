@@ -19,7 +19,7 @@ const PORT = 3246, U = `http://127.0.0.1:${PORT}`;
 const it = (name, grams, calories, protein, fats, carbs) => ({ id: name.slice(0, 6) + grams, grams, food: { name, brand: "", calories, protein, fats, carbs, fiber: 0, readyToEat: true } });
 const R = {
   souvla: { title: "Chicken souvlaki with talattouri", kitchen: "Mediterranean", steps: ["Grill the chicken.", "Serve with talattouri and pitta."], items: [it("Chicken breast, raw", 600, 120, 22.5, 2.6, 0), it("Talattouri", 300, 90, 4, 6, 4.7), it("Pitta bread", 240, 275, 9.1, 1.2, 53.5)] },
-  koupepia: { title: "Koupepia, Marko's mother's way", kitchen: "Mediterranean", steps: ["Roll the vine leaves.", "Simmer 45 minutes."], items: [it("Beef mince, raw", 500, 215, 18.6, 15, 0), it("Rice, raw", 200, 360, 6.6, 0.6, 79), it("Vine leaves", 150, 93, 5.6, 2.1, 6.3)] },
+  koupepia: { title: "Koupepia, Tester3's mother's way", kitchen: "Mediterranean", steps: ["Roll the vine leaves.", "Simmer 45 minutes."], items: [it("Beef mince, raw", 500, 215, 18.6, 15, 0), it("Rice, raw", 200, 360, 6.6, 0.6, 79), it("Vine leaves", 150, 93, 5.6, 2.1, 6.3)] },
   stir: { title: "Davorka's chicken stir fry", kitchen: "Asian", steps: ["Fry hot and fast."], items: [it("Chicken breast, raw", 400, 120, 22.5, 2.6, 0), it("Rice, cooked", 400, 130, 2.7, 0.3, 28)] },
   oats: { title: "Overnight oats with skyr", kitchen: null, steps: ["Mix and leave overnight."], items: [it("Oats", 60, 372, 13.5, 7, 58.7), it("Skyr, natural", 200, 63, 11, 0.2, 4)] },
 };
@@ -42,12 +42,12 @@ const R = {
   // the server allows 30 calls a minute from one address; this walkthrough makes more, so a 429 waits and asks again
   const call = async (path, who, body) => { for (let i = 0; i < 20; i++) { const r = await page.evaluate(async ([path, who, body]) => { const r = await fetch(path, { method: body ? "POST" : "GET", headers: { "Content-Type": "application/json", ...(who ? { "x-local-as": who } : {}) }, ...(body ? { body: JSON.stringify(body) } : {}) }); return [r.status, await r.json()]; }, [path, who, body]); if (r[0] !== 429) return r; await new Promise((z) => setTimeout(z, 4000)); } return [429, {}]; };
   // MB: one name per cook, checked by the server
-  ok((await call("/api/members/name", "marko", { name: "Marko" }))[0] === 200, "MB: Marko takes his name");
-  const [, taken] = await call("/api/members/name?check=marko");
-  ok(taken.ok === false && /taken/.test(taken.why), "MB: marko is taken, whatever the capitals");
+  ok((await call("/api/members/name", "testerthree", { name: "Tester3" }))[0] === 200, "MB: Tester3 takes his name");
+  const [, taken] = await call("/api/members/name?check=tester3");
+  ok(taken.ok === false && /taken/.test(taken.why), "MB: tester3 is taken, whatever the capitals");
   ok((await call("/api/members/name?check=Mi"))[1].ok === false && (await call("/api/members/name", null, { name: "Mi lan" }))[0] === 400, "MB: too short or with a space is refused");
-  await call("/api/members", "marko", { recipe: R.souvla, cover: null, coverKind: "drawn", named: true });
-  await call("/api/members", "marko", { recipe: R.koupepia, cover: null, coverKind: "drawn", named: true });
+  await call("/api/members", "testerthree", { recipe: R.souvla, cover: null, coverKind: "drawn", named: true });
+  await call("/api/members", "testerthree", { recipe: R.koupepia, cover: null, coverKind: "drawn", named: true });
   await call("/api/members", "davorka", { recipe: R.stir, cover: null, coverKind: "drawn", named: true, name: "Davorka Bokic" });
   await call("/api/members", "member", { recipe: R.oats, cover: null, coverKind: "drawn", named: false });
   const list = (await call("/api/members"))[1].recipes;
@@ -59,21 +59,21 @@ const R = {
   ok(await page.getByRole("tab", { name: "Members" }).getAttribute("aria-selected") === "true", "MB: a reload stays on Members");
   // Changed by story MB5 (0.2.67, Milan 22:14): Cook is the publishing permission on Clients, so Members says member
   const cooks = await page.getByRole("group", { name: "Members" }).getByRole("button").allTextContents();
-  ok(cooks.join(",") === "All members,Marko,Davorka", "MB: the members who shared with their name, most recipes first: " + cooks.join(","));
-  await page.getByRole("group", { name: "Members" }).getByRole("button", { name: "Marko" }).click(); await page.waitForTimeout(500);
-  ok(/view=members&member=Marko$/.test(page.url()) && /Marko's recipes · 2/.test(await page.locator(".mb-shelf").textContent()) && await page.locator(".recipe-tile").count() === 2, "MB: Marko's recipes, his two");
+  ok(cooks.join(",") === "All members,Tester3,Davorka", "MB: the members who shared with their name, most recipes first: " + cooks.join(","));
+  await page.getByRole("group", { name: "Members" }).getByRole("button", { name: "Tester3" }).click(); await page.waitForTimeout(500);
+  ok(/view=members&member=Tester3$/.test(page.url()) && /Tester3's recipes · 2/.test(await page.locator(".mb-shelf").textContent()) && await page.locator(".recipe-tile").count() === 2, "MB: Tester3's recipes, his two");
   await page.reload(); await page.waitForTimeout(1500);
-  ok(await page.locator(".recipe-tile").count() === 2 && await page.locator(".mb-shelf").count() === 1, "MB: a reload keeps Marko's recipes");
+  ok(await page.locator(".recipe-tile").count() === 2 && await page.locator(".mb-shelf").count() === 1, "MB: a reload keeps Tester3's recipes");
   await page.getByRole("group", { name: "Members" }).getByRole("button", { name: "All members" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: `Open ${R.koupepia.title}` }).click(); await page.waitForTimeout(700);
-  await page.getByRole("button", { name: "All of Marko's recipes ›" }).click(); await page.waitForTimeout(600);
-  ok(await page.locator(".recipe-tile").count() === 2 && /member=Marko/.test(page.url()), "MB: All of Marko's recipes › opens his recipes");
+  await page.getByRole("button", { name: "All of Tester3's recipes ›" }).click(); await page.waitForTimeout(600);
+  ok(await page.locator(".recipe-tile").count() === 2 && /member=Tester3/.test(page.url()), "MB: All of Tester3's recipes › opens his recipes");
   // sharing with my name: asked once, checked
   await page.getByRole("tab", { name: /^Mine/ }).click(); await page.waitForTimeout(400);
   await page.locator(".recipe-tile").first().click(); await page.waitForTimeout(900);
   await page.locator(".mb-share .mb-switch").click(); await page.waitForTimeout(300);
-  await page.getByLabel("Your name in Members").fill("marko"); await page.waitForTimeout(900);
-  ok(/marko is taken/.test(await page.locator(".mb-share").textContent()) && await page.getByRole("button", { name: "Share with members" }).isDisabled(), "MB: a taken name says so, and Share waits");
+  await page.getByLabel("Your name in Members").fill("tester3"); await page.waitForTimeout(900);
+  ok(/tester3 is taken/.test(await page.locator(".mb-share").textContent()) && await page.getByRole("button", { name: "Share with members" }).isDisabled(), "MB: a taken name says so, and Share waits");
   await page.getByLabel("Your name in Members").fill("Milan"); await page.waitForTimeout(900);
   ok(/Milan is free/.test(await page.locator(".mb-share").textContent()), "MB: Milan is free");
   await page.getByRole("button", { name: "Share with members" }).click(); await page.waitForTimeout(900);
@@ -83,7 +83,7 @@ const R = {
   // a new name reaches every named recipe; the old one is free again; nobody takes mine
   await call("/api/members/name", null, { name: "Milan.S" });
   mine = (await call("/api/members"))[1].recipes.filter((r) => r.mine);
-  ok(mine[0].name === "Milan.S" && (await call("/api/members/name?check=Milan", "marko"))[1].ok === true && (await call("/api/members/name", "marko", { name: "milan.s" }))[0] === 409, "MB: a new name reaches my recipe; Milan is free again; Marko can't take Milan.S");
+  ok(mine[0].name === "Milan.S" && (await call("/api/members/name?check=Milan", "testerthree"))[1].ok === true && (await call("/api/members/name", "testerthree", { name: "milan.s" }))[0] === 409, "MB: a new name reaches my recipe; Milan is free again; Tester3 can't take Milan.S");
   await b.close(); server.kill();
   console.log(fails.length ? `${fails.length} FAILED` : "all ok");
   process.exit(fails.length ? 1 : 0);

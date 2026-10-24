@@ -179,7 +179,7 @@ const labelSchema = {
     error_reason: { type: "string" },
     front_image: { type: "integer" },
     serving: { type: ["object", "null"], properties: { grams: { type: "number" }, name: { type: "string" } }, required: ["grams", "name"] },
-    // DT82 (Milan 23 October 2026, 19:53, Marko's tuna): a food packed in a liquid, its weights and what the values are per
+    // DT82 (Milan 23 October 2026, 19:53, Tester 3's tuna): a food packed in a liquid, its weights and what the values are per
     pack: { type: ["object", "null"], properties: { net: { type: "number" }, drained: { type: ["number", "null"] }, liquid: { type: "string", enum: ["olive oil", "sunflower oil", "oil", "water", "brine", "syrup", "juice", "other"] }, per: { type: "string", enum: ["drained", "whole", "unknown"] } }, required: ["net", "liquid", "per"] },
     table: { type: "array", items: { type: "object", properties: { name: { type: "string" }, amount: { type: ["number", "null"] }, unit: { type: "string" }, sub: { type: "boolean" } }, required: ["name"] } },
   },
@@ -1601,7 +1601,7 @@ async function memberRecipe(req: express.Request, id: string): Promise<any | nul
   const d = await membersCol(req).doc(id).get(); return d.exists ? d.data() : null;
 }
 // Members names (0.2.61, board MB, Milan 16:46 to 16:50): a cook picks one name for Members, checked here so no two cooks
-// share it; filtering by cook is then one name per cook. Letters, digits, dot and underscore, 3 to 20; Marko and marko are
+// share it; filtering by cook is then one name per cook. Letters, digits, dot and underscore, 3 to 20; Tester3 and tester3 are
 // the same name. Every recipe shared with the name shows it; a new name reaches them all. Closed to the app like the rest.
 const memNames = { live: new Map<string, { uid: string; name: string }>(), preview: new Map<string, { uid: string; name: string }>() };
 const namesCol = (req: express.Request) => db().collection(spaceOf(req) === "preview" ? "member_names_preview" : "member_names");

@@ -128,7 +128,7 @@ const STORE = "platemate-pilot-v1";
 let unreadableBackup: string | null = null;
 // a request that does not answer in time ends with "timeout" instead of waiting forever
 const withTimeout = <T,>(p: Promise<T>, ms: number) => new Promise<T>((res, rej) => { const t = setTimeout(() => rej(new Error("timeout")), ms); p.then((v) => { clearTimeout(t); res(v); }, (e) => { clearTimeout(t); rej(e); }); });
-// names say who is who: Coach Milan, Chef Mealan, Client Mia
+// names say who is who: Coach Milan, Chef Mealan, Client Tester 1
 const firstName = (n?: string | null) => (n ?? "").trim().split(/\s+/)[0] || "";
 const coachLabel = (n?: string | null) => (firstName(n) ? `Coach ${firstName(n)}` : "Your coach");
 // when the phone's copy last changed by a person's hand, and which foods left the library (merged away, removed)
@@ -1470,7 +1470,7 @@ export default function App() {
     }));
     // Where does this go (0.2.5): a scan from Today asks after the save, new food or updated
     if (scanFrom === "today") { setScanFrom(null); setCamera(false); setEdit(null); setImageSet([]); setPending((p) => p.filter((x) => x.name !== f.name || x.brand !== f.brand)); setWhere(f); return; }
-    // DT82 (Marko, 23 October 2026): Scan or Manual on the Plate puts the food on the plate and keeps it in My foods, as
+    // DT82 (Tester 3, 23 October 2026): Scan or Manual on the Plate puts the food on the plate and keeps it in My foods, as
     // decided in 0.2.25 (RP5); a food already on the plate is only updated there
     if (opts?.plate) { setEdit(null); setImageSet([]); setPending((p) => p.filter((x) => x.name !== f.name || x.brand !== f.brand)); if (!state.items.some((i) => libraryId(i.food.id) === f.id)) add(f); else notify(`Updated ${f.name}.`); return; }
     if (existed && f.reviewedAt) { setEdit(null); setImageSet([]); notify(`Updated ${f.name}.`); return; }
@@ -1492,7 +1492,7 @@ export default function App() {
       items: [
         ...s.items,
         // R22 (0.2.50): with Both picked, a food goes into the main or the sweet finish
-        // DT82 (Marko's tuna, 0.9 cans): a food the pack sells as one piece goes on as one, 1 can, 1 bar, 1 pot
+        // DT82 (Tester 3's tuna, 0.9 cans): a food the pack sells as one piece goes on as one, 1 can, 1 bar, 1 pot
         { id: uid(), food: { ...food }, grams: food.serving ? food.serving.grams : (density(food.protein, food.calories) ?? 0) < 3 ? 50 : 150, locked: false, ...(plateTaste === "both" ? { part: bothPartOf(food.name) } : {}) },
       ],
       portion: null,

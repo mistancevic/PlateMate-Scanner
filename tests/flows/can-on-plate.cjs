@@ -1,4 +1,4 @@
-// JOURNEY INVARIANT (DT82, Milan 23 October 2026, 19:37 to 20:00, after Marko's call): what you scan on the Plate lands
+// JOURNEY INVARIANT (DT82, Milan 23 October 2026, 19:37 to 20:00, after Tester 3's call): what you scan on the Plate lands
 // on the plate, and stays in My foods, as decided in 0.2.25 (RP5); a code for a food you already have puts that food on the
 // plate. A food the pack sells as one piece goes on as one: 1 pot, 1 can, never 0.9 cans. My foods keeps the label as
 // printed (Milan 20:51): 1 can, 160 g. On the Plate a can in oil with values per 100 g drained is a bundle: the can on top,
@@ -14,7 +14,7 @@ seed.items = [];
 seed.foods.push({ id: "f-pudding", name: "Protein pudding", brand: "Ehrmann", barcode: "4006040000001", basis: "100g", source: "label", notes: "", reviewedAt: "2026-10-01T00:00:00.000Z", readyToEat: true, calories: 75, protein: 10, fats: 1.5, carbs: 5, fiber: 0, serving: { grams: 200, name: "pot" }, icon: "🍮" });
 const tuna = { success: true, product_name: "Thunfisch in Olivenöl", brand: "Rio Mare", basis: "100g", calories: 190, protein: 26, fats: 9.5, carbs: 0, fiber: 0, notes: "", error_reason: "", front_image: 1, serving: { grams: 160, name: "can" }, pack: { net: 160, drained: 120, liquid: "olive oil", per: "drained" }, table: [] };
 (async () => {
-  const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT: "3246", GEMINI_API_KEY: "" }, stdio: "ignore" });
+  const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT: "3250", GEMINI_API_KEY: "" }, stdio: "ignore" });
   await new Promise((r) => setTimeout(r, 2500));
   const b = await chromium.launch({ ...(process.env.CHROME ? { executablePath: process.env.CHROME } : {}), args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"] });
   const page = await (await b.newContext({ viewport: { width: 390, height: 844 }, permissions: ["camera"] })).newPage();
@@ -27,7 +27,7 @@ const tuna = { success: true, product_name: "Thunfisch in Olivenöl", brand: "Ri
   const rows = () => page.locator(".rows").first().textContent();
   try {
     await require("./adult.cjs")(page);
-    await page.goto("http://127.0.0.1:3246/"); await page.waitForTimeout(800);
+    await page.goto("http://127.0.0.1:3250/"); await page.waitForTimeout(800);
     await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(500);
 
     // + Add on a food the pack sells as one piece

@@ -73,7 +73,7 @@ seed.items = [];
   // Plate puts the food on the plate, and keeps it in My foods
   await page.waitForTimeout(500);
   ok(await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.some((x) => x.name === "Tofu block")), "the food is in My foods");
-  // Changed by story DT82 (Milan 23 October 2026, after Marko's call): the check reads the plate's rows, not the whole screen;
+  // Changed by story DT82 (Milan 23 October 2026, after Tester 3's call): the check reads the plate's rows, not the whole screen;
   // the food list under the Plate also shows the name, so the old check passed while the plate stayed empty
   ok(await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.some((i) => i.food.name === "Tofu block")), "Scan on the Plate puts the food on the plate");
   ok(errs.length === 0, errs.length ? "page errors: " + errs.join(" | ") : "no page errors");

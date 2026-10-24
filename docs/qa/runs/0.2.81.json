@@ -1557,7 +1557,7 @@
   },
   {
    "file": "cyprus.cjs",
-   "about": "Cyprus and Limassol (0.2.58 and 0.2.59, Milan 14:58 and 15:19, for Marko). Marko's library had twenty starter foods picked for Munich. He picks Limassol, taps Add starter foods for Limassol, and gets the fifty Cypriot foods with their Greek names; a second tap adds nothing. Foods finds a Cypriot food in Greek.",
+   "about": "Cyprus and Limassol (0.2.58 and 0.2.59, Milan 14:58 and 15:19, for Tester 3). Tester 3's library had twenty starter foods picked for Munich. He picks Limassol, taps Add starter foods for Limassol, and gets the fifty Cypriot foods with their Greek names; a second tap adds nothing. Foods finds a Cypriot food in Greek.",
    "pass": true,
    "seconds": 7,
    "checks": [
@@ -3209,11 +3209,11 @@
    "checks": [
     {
      "ok": true,
-     "text": "MB: Marko takes his name"
+     "text": "MB: Tester3 takes his name"
     },
     {
      "ok": true,
-     "text": "MB: marko is taken, whatever the capitals"
+     "text": "MB: tester3 is taken, whatever the capitals"
     },
     {
      "ok": true,
@@ -3233,19 +3233,19 @@
     },
     {
      "ok": true,
-     "text": "MB: the members who shared with their name, most recipes first: All members,Marko,Davorka"
+     "text": "MB: the members who shared with their name, most recipes first: All members,Tester3,Davorka"
     },
     {
      "ok": true,
-     "text": "MB: Marko's recipes, his two"
+     "text": "MB: Tester3's recipes, his two"
     },
     {
      "ok": true,
-     "text": "MB: a reload keeps Marko's recipes"
+     "text": "MB: a reload keeps Tester3's recipes"
     },
     {
      "ok": true,
-     "text": "MB: All of Marko's recipes › opens his recipes"
+     "text": "MB: All of Tester3's recipes › opens his recipes"
     },
     {
      "ok": true,
@@ -3265,7 +3265,7 @@
     },
     {
      "ok": true,
-     "text": "MB: a new name reaches my recipe; Milan is free again; Marko can't take Milan.S"
+     "text": "MB: a new name reaches my recipe; Milan is free again; Tester3 can't take Milan.S"
     }
    ]
   },

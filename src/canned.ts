@@ -1,4 +1,4 @@
-// DT82 (Milan 23 October 2026, 19:45, 19:53 and 20:51, after Marko's tuna): a food packed in a liquid. My foods keeps the
+// DT82 (Milan 23 October 2026, 19:45, 19:53 and 20:51, after Tester 3's tuna): a food packed in a liquid. My foods keeps the
 // label as printed, 1 can, 160 g, so it compares with the pack. On the Plate a can whose values are per 100 g drained comes
 // as a bundle: the can on top, and under it two foods, the drained fish at the drained weight with the label's values (they
 // hold the oil that stays on the fish), and the oil you pour off, None, A spoon or All, set by the person. Water and brine
