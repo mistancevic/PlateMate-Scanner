@@ -1,0 +1,58 @@
+# Board B: How Chef Mealan is built (/built), the blueprint, the home page video, and the product line on the home page.
+S = __import__("os").environ.get("BOARDS_DIR", __import__("os").path.dirname(__import__("os").path.abspath(__file__)))
+exec(open(f"{S}/genRG.py").read().split("\nboards = {}\n")[0])
+import os
+D = "/home/claude/canvas/project"
+YH = json.load(open(f"{S}/yh.json")) if os.path.exists(f"{S}/yh.json") else {}
+def img(name, w, border=True):
+    im = Image.open(f"{S}/shots/{name}.png").convert("RGB"); im = im.resize((w * 2, int(im.size[1] * w * 2 / im.size[0]))); b = io.BytesIO(); im.save(b, "WEBP", quality=70)
+    return f'<img src="data:image/webp;base64,{base64.b64encode(b.getvalue()).decode()}" style="width: {w}px; border-radius: 12px; {"border: 1.5px solid #2e7be8;" if border else ""} display: block">'
+def col(sid, title, body, w):
+    return (f'<div style="width: {w}px; flex: none; display: flex; flex-direction: column; gap: 10px">'
+            f'<div style="background: #172742; color: #fff; border-radius: 10px; padding: 8px 10px; font-size: 13px; font-weight: 800"><span style="display: inline-block; background: #2e7be8; border-radius: 6px; padding: 1px 7px; margin-right: 6px; font-size: 14px">{sid}</span>{title}</div>{body}</div>')
+row1 = [
+  col("B1", "/built on a desktop: the whole page", img("r9-bp-desk-parts", 900) + txt("Built 0.2.5+r9 at chefmealan.com/built, open to anyone, with its own link preview. The top: How Chef Mealan is built, A product built with AI, one release at a time, then the lead names Milan Stancevic as senior product manager and founder first, and the coaching after hours, four facts (live since 30 September, version 0.2 in 6 releases and 8 fix rounds in 3 days, 165 unit tests and 36 walkthroughs (38 counted two helpers and the paths runner), model evals). Then the blueprint, Why Chef Mealan exists, four principles (was Decisions that shape the product, renamed so the word decision belongs to the playbook), how the work runs as the six Worth Building decisions (B7), Books by Milan (Worth Building with the cover photo from LinkedIn Featured, published, Version 2.0, free PDF on GitHub with Read Worth Building; Worth Eating and Worth Living coming soon, one email field with a chip per book and Notify me: one email when a book is out, nothing else), and Who builds Chef Mealan: the bold line Product builder by day. Fitness and nutrition coach after hours. Then four cards, Product (senior product manager, about 20 years in B2B and B2B2C software), Founder (several startups and agencies; one startup, an event planner app, was acquired), Coach, Author, then the button Milan on LinkedIn (linkedin.com/in/milanstancevic). This URL goes on the CV and in LinkedIn Featured.", 12.5), 900),
+  col("B2 to B4", "The blueprint, three states", img("r9-bp-desk-ai", 700) + txt("B2. The parts: a tap on The AI. The panel says what the part does, the decision behind the part (the AI reads and talks, the calculator decides; a guessed number is an estimate) and what the part is built with. CODE, AI and DATA tags tell the three kinds apart.", 12.5)
+      + img("r9-bp-desk-follow2", 700) + txt("B3. Follow a craving, step 2 of 6: the photo goes through the server to the AI; the path lights up and moves. Steps: Scan food, the AI reads the label, the person checks the label, the calculator fits the plate, Save, the coach sees the week.", 12.5)
+      + img("r9-bp-desk-follow4", 700) + txt("B4. Step 4: the calculator fits the plate: chocolate spread alone PD 1.2, 165 g of skyr lifts the plate to the target. Every part and every step names only what is built.", 12.5), 700),
+  col("B5", "/built on a phone", img("r9-bp-phone", 300) + txt("Built 0.2.5+r9. The boxes sit two to a row; on a phone only the lines of the tapped part or of the current step show, so the picture stays readable.", 12.5), 300),
+  col("B6", "Books and Who builds, desktop and phone", img("r9-bp-desk-books", 700) + txt("B6. Desktop: Worth Building as a wide card with the cover photo; the two coming books below; the email box with Notify me inside the box (fixed: the email field could not shrink, so the button was pushed out of the box). Then Who builds Chef Mealan as four cards.", 12.5)
+      + img("r9-bp-phone-books", 300) + txt("B6 on a phone: the cover above the text, the email field and Notify me stacked, the four cards one under another.", 12.5), 700),
+]
+frames = "".join(f'<div style="display: flex; flex-direction: column; gap: 4px; width: 180px">{img("vid-" + t, 180)}{txt(c, 11.5)}</div>' for t, c in [("0.5", "0 s: Today, the day's plan, breakfast 1.1 under"), ("4", "4 s: Plan, the whole day, from the top"), ("9.5", "9 s: the breakfast on the Plate, PD 6.2"), ("12.5", "12 s: Fit to my target, PD 6.9, on plan"), ("16.5", "16 s: the circle on All in one, before the tap"), ("32.3", "32 s: Today counts the breakfast, by the plan")])
+row2 = [
+  col("HP11", "Home page: Who's behind Chef Mealan, the product role first", img("r9-hp-behind", 300) + txt("Built 0.2.5+r9. So a recruiter never reads Milan as a full-time coach: the heading is Milan Stancevic (was Coach Milan), then the role line in bold: Product builder by day. Fitness and nutrition coach after hours. Then the product paragraph first (senior product manager, about 20 years in software, founder of several startups, designs and builds Chef Mealan with AI), then the coach paragraph (after hours, certified coach in Munich, known to his clients as Coach Milan, cooks every day), then Author of Worth Building, then How Chef Mealan is built and More about Milan. The footer gains How Chef Mealan is built. The rest of the home page keeps Coach Milan, the name clients know.", 12.5), 300),
+  col("HP12", "Home page form: the mobile number", img("r9-hp-form", 300) + txt("Built 0.2.5+r9. After Email: Mobile number, optional, and the line: Coach Milan may message you on WhatsApp or by text about joining. The number is used for nothing else. On the Clients screen each request shows the number with a WhatsApp link. The privacy page gains one line on the number.", 12.5), 300),
+  col("V1", "Home page video: the real app, 33 seconds", f'<div style="display: flex; gap: 10px">{frames}</div>' + txt("Built 0.2.5+r9 in How it works on the home page (MP4, and WebM for a browser without H.264). Recorded again for 0.2.5+r10: 33 seconds, 0.7 MB. Each tap shows first: the circle sits on the button, fades, then the tap, so the screen changes after the circle (Milan: the circle came after the change). A silent loop of the real app, recorded by a script on a seeded day, so the video is made again in a minute when the screens change. Plan, Today, a breakfast 1.1 under, Fit to my target lifts the breakfast to PD 6.9, Save, Today counts the breakfast by the plan. Every screen now starts at the top. The circle sits on the centre of the tapped button, shows just before the tap and fades right after. Replaces the phone drawing in How it works (HP8), plays when on screen. The file: chef-mealan-app.mp4.", 12.5), 1150),
+  col("B", "Built in 0.2.5+r9; still open", '<div style="display: flex; flex-direction: column; gap: 8px">' + "".join(txt("• " + t, 13) for t in [
+      "Built in 0.2.5+r9: the book sign-ups listed on Clients under the access requests; the privacy notice with the number and the sign-ups; the About page with the product role first; every tab and Plate step opens at the top; the home page link preview without Closed pilot.",
+      "Worth Living: one line from Milan on what the book is about (now: The third book of the Worth series).",
+      "The /built words about Milan: senior product manager, about 20 years in B2B and B2B2C software, certified fitness and nutrition coach, author, Munich. Milan's check.",
+      "B7: each Worth Building decision card names a record. Milan's check that each record exists as named, mostly the tester notes.",
+      "The role line, Product builder by day. Fitness and nutrition coach after hours: Milan's check. After hours tells a hiring manager the coaching does not take work time; by passion would not.",
+      "Founder card: the word small is left out of the acquisition (One of the startups, an event planner app, was acquired). Milan's check.",
+      "App text that still says Mealan alone: the Plate (Mealan moves, Mealan sets the amounts, Mealan can ...) and the recipe pages. For the writing pass.",
+      "Model eval scores join the facts once the first saved run exists.",
+      "The video after the fix pass shows the screens as fixed; the script makes the new one.",
+      "In the video, the Plate asks How do you want to eat it?: a line for the writing pass.",
+  ]) + '</div>', 420),
+]
+row3 = [
+  col("B7", "How the work runs: the Worth Building playbook", img("r9-bp-desk-wb", 900) + txt("B7, built 0.2.5+r9. The section that was five steps is now the six decisions from Worth Building, applied to Chef Mealan: Direction, Discovery, Design, Develop, Deploy, Delta. Each card says what Milan did and names the record each decision leaves (the purpose, tester notes, the canvas, the changelog, the preview link, eval runs). Deploy is marked: preview first, like staging in a product team; each release on its own preview link with the real accounts while chefmealan.com keeps the last release; promote after the check on the phone; one command rolls back (deploy/rollback.sh). The sub line links to Worth Building in Books.", 12.5), 900),
+  col("B8", "Each decision: what was decided, what was carried forward", img("b7-dec-desk", 850) + txt("B8, design 12 October, plain English. Three loops (Milan 20:38). Timeline (Milan 20:54): loop 2 starts late August with intro and discovery calls on healthy meals and fake high protein meals. Loop 1: PlateMate, his capstone for Product Faculty\'s AI product management certification, built in Claude Code; the course runs four decisions, so Direction and Delta say Not in course. Loop 2: Chef Mealan, all six decisions, in cards (Deploy Limit, Delta Mixed). Loop 3 (Milan 20:59): loop 2 testing showed the customers train and focus on protein, so the app needs their training plan; the scanner and calculations are the base. Loop 3: training and the plan, 0.2, now.", 12.5), 900),
+  col("B7", "On a phone", img("r9-bp-phone-wb", 300) + txt("The six cards one under another; Deploy keeps the blue frame and the Build, Preview, Live, Roll back strip.", 12.5), 300),
+]
+W = max(300 + 300 + 1150 + 420 + 3 * 60 + 80, 900 + 700 + 300 + 700 + 3 * 60 + 80)
+H = min(8000, YH.get("Built02", 3000))
+html = wide2("0.2 · B. How Chef Mealan is built", W, H, "\n".join([
+    H2("0.2 · B. How Chef Mealan is built: /built, the blueprint, the video, the product line on the home page"),
+    txt("12 October 2026. For hiring managers: one page with the build story, linked from the home page and the footer; the home page stays for people with a plan. The blueprint is a working prototype; these shots are the prototype in the app's colours.", 14),
+    f'<div style="display: flex; gap: 60px; align-items: flex-start">{"".join(row1)}</div>',
+    f'<div style="display: flex; gap: 60px; align-items: flex-start; margin-top: 40px">{"".join(row2)}</div>',
+    f'<div style="display: flex; gap: 60px; align-items: flex-start; margin-top: 40px">{"".join(row3)}</div>',
+]), "#fff")
+open(f"{D}/Built02.dc.html", "w").write(html)
+cj = json.load(open(f"{D}/canvas.json"))
+if "Built02.dc.html" not in cj["order"]: cj["order"].append("Built02.dc.html")
+cj["boards"]["Built02.dc.html"] = {"x": 5340, "y": 66400, "w": W, "h": H, "title": "0.2 · B. How Chef Mealan is built"}
+json.dump(cj, open(f"{D}/canvas.json", "w")); print("ok", W, H, len(html) // 1024, "KB")
