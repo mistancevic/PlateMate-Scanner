@@ -249,6 +249,9 @@ export type PilotState = {
   cooking?: string[];
   // DT102 (0.2.91): the foods the cooking list was written for; the chips live only while all of them are on the plate
   cookingFor?: string[];
+  // DT109 (0.2.93): the recipe's foods as they stand on the plate (a swap keeps the link, the new food takes the old one's
+  // place here); the link to the recipe (fromRecipe) lives only while at least half of them are on the plate
+  recipeFoods?: string[];
   // a recipe that came in, opened from Recipes (0.2.19, IM13): the plate puts it on as the first time, then clears this
   openRecipe?: string;
 };

@@ -352,7 +352,7 @@ export function JourneyScreen(p: AppApi) {
   function emptyPlate() {
     p.setPick(null); p.setPlateTaste(null);
     setMadeBy(null); setChef(null); setWay(null);
-    setState((s) => ({ ...s, items: [], portion: null, fromRecipe: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined }));
+    setState((s) => ({ ...s, items: [], portion: null, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined }));
     setPartsMode(false); setStep("in");
   }
   // DT82: None takes the can's oil off; A spoon or All puts it on, after the can, locked, so Fit never moves it
@@ -378,7 +378,9 @@ export function JourneyScreen(p: AppApi) {
   function swap(id: string, food: typeof state.foods[number], grams?: number | null, keep = false) {
     // a food that works arrives kept at the grams the list promised; one that doesn't arrives at the cap, grey, and the plate says how far that gets you
     const next = items.map((i) => (i.id === id ? { ...i, food: { ...food, readyToEat: true }, grams: grams ?? i.grams, locked: keep } : i));
-    setState((s) => ({ ...s, items: next, portion: null }));
+    const was = items.find((i) => i.id === id)?.food.id;
+    // DT109: a swap keeps the recipe's link; the new food takes the old one's place among the recipe's foods
+    setState((s) => ({ ...s, items: next, portion: null, ...(s.recipeFoods && was ? { recipeFoods: s.recipeFoods.map((x) => (x === was ? food.id : x)) } : {}) }));
     setSwapId(null);
     if (step === "recipe" && !keep) { setTouched((t) => new Set(t).add(id)); recalc(next); }
   }
@@ -487,6 +489,21 @@ export function JourneyScreen(p: AppApi) {
   // RP1c (0.2.25): Chef Mealan's steps or the original on How to make it
   const [mkView, setMkView] = useState<"own" | "orig">("own");
   const rec = state.fromRecipe ? state.meals.find((m) => m.id === state.fromRecipe) : undefined;
+  // DT109 (0.2.93, board Stories66; Milan 23:34: chicken and rice locked as the fritters): the link to a recipe lives only
+  // while at least half of its foods are on the plate. Under that, the link goes, with its optional and left-out foods, and a
+  // toast says so. A plate linked before 0.2.93 has no recipeFoods: the recipe's own foods count.
+  const recipeFoodIds = rec ? (state.recipeFoods ?? rec.items.filter((i) => !i.optional).map((i) => i.food.id)) : [];
+  // a part left out (IM16b) holds its foods aside, Put it back brings them: they still count as on the plate
+  const onPlateIds = new Set([...state.items.map((i) => i.food.id), ...(state.leftOut ?? []).flatMap((l) => l.items.map((i) => i.food.id))]);
+  const recipeStillOn = !rec || recipeFoodIds.length === 0 || recipeFoodIds.filter((id) => onPlateIds.has(id)).length * 2 >= recipeFoodIds.length;
+  useEffect(() => {
+    if (!rec || recipeStillOn || wayBusy) return;
+    const title = rec.title;
+    setWay(null); setPmode("sized");
+    setState((s) => ({ ...s, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, title: s.title === title ? "" : s.title }));
+    notify(`No longer ${title}: its foods are gone. The plate is yours.`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recipeStillOn, rec?.id, wayBusy]);
   // the plate is the recipe that came in while its foods are the recipe's (or a way to fit it is on); add a food and it is a plate like any other
   const imported = !!rec && items.length > 0 && (way !== null || items.every((i) => !!i.optional || rec.items.some((r) => r.food.id === i.food.id)));
   const opts: PlateOpt[] = state.optional ?? [], leftOut = state.leftOut ?? [];
@@ -554,7 +571,7 @@ export function JourneyScreen(p: AppApi) {
     if (!m) { setState((s) => ({ ...s, openRecipe: undefined })); return; }
     const mode = modeFor(m);
     setPmode(mode); setWay(null); setPartsMode(false);
-    setState((s) => ({ ...s, ...recipePlate(m, mode), title: m.title, portion: null, fromRecipe: m.id, openRecipe: undefined }));
+    setState((s) => ({ ...s, ...recipePlate(m, mode), title: m.title, portion: null, fromRecipe: m.id, recipeFoods: m.items.filter((i) => !i.optional).map((i) => i.food.id), openRecipe: undefined }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.openRecipe]);
   // + Add (IM12b): sized for the meal, the meal keeps its size and every food moves by the same factor; else it goes on top
@@ -640,7 +657,7 @@ export function JourneyScreen(p: AppApi) {
       }
       if (why) { if (!failed) return changePart(part, why); log("recipe_fit", { way: "change", result: "failed" }); notify(`${CHEF_NAME}'s change to the ${part.toLowerCase()} didn't pass the checks: ${why}`); return; }
       const fresh = out.map((i) => i.food).filter((f) => !state.foods.some((x) => x.id === f.id));
-      setState((s) => ({ ...s, foods: [...s.foods, ...fresh.filter((f, k) => fresh.findIndex((x) => x.id === f.id) === k)], items: out, portion: null }));
+      setState((s) => ({ ...s, foods: [...s.foods, ...fresh.filter((f, k) => fresh.findIndex((x) => x.id === f.id) === k)], items: out, portion: null, recipeFoods: out.filter((i) => !i.optional).map((i) => i.food.id) }));
       // the whole recipe as changed: the other parts as the recipe makes them, the changed part back at the recipe's size
       const f = rec ? factorOf(rec, pmode) : 0;
       const twin = rec ? pairItems(out, rec.items) : [];
@@ -680,7 +697,7 @@ export function JourneyScreen(p: AppApi) {
       if (why) { if (!failed && deadline - Date.now() > 15_000) { again = true; window.clearTimeout(slowAt); window.clearTimeout(endAt); return changeDish(why, deadline); } log("recipe_fit", { way: "change", result: "failed" }); notify(`${CHEF_NAME}'s change didn't pass the checks: ${why} Try Add on the side.`); return; }
       const fresh = out.map((i) => i.food).filter((f) => !state.foods.some((x) => x.id === f.id));
       const title = String(d.title || `${rec.title}, more protein`);
-      setState((s) => ({ ...s, foods: [...s.foods, ...fresh.filter((f, k) => fresh.findIndex((x) => x.id === f.id) === k)], items: out, title, portion: null }));
+      setState((s) => ({ ...s, foods: [...s.foods, ...fresh.filter((f, k) => fresh.findIndex((x) => x.id === f.id) === k)], items: out, title, portion: null, recipeFoods: out.filter((i) => !i.optional).map((i) => i.food.id) }));
       setWay({ kind: "change", title, notes: (d.notes ?? []) as string[], whole: wholeNow });
       log("recipe_fit", { way: "change", result: "shown" });
     } catch (e: any) {
@@ -1708,7 +1725,7 @@ export function JourneyScreen(p: AppApi) {
         const landId = keep ? kept.id : (fromRec ?? origin)?.id ?? null;
         const leftN = wholeN > 1 ? wholeN - eatN : madeWhole && rec?.makes ? Math.max(0, leftK) : 0;
         const landLine = status !== "eaten" ? "" : [`You ate ${wholeN > 1 && rec ? (eatN === wholeN ? `all ${wholeN}` : countOf(eatN, unitOf(rec))) : rec && pmode === "recipe" && !way ? `1 ${oneOf(rec)}` : "your plate"}.`, leftN > 0 ? `${sizedPlate ? leftWords(leftN) : countOf(leftN, unitOf(rec!))} left: to eat ${leftN === 1 ? "it" : "them"} on other days, put the recipe on Plan.` : "", chgKept && fromRec ? `The original, ${fromRec.title}, stays as it was.` : ""].filter(Boolean).join(" ");
-        setState((s) => ({ ...s, fromRecipe: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)).map((m) => (m.idea && status === "eaten" && (m.id === origin?.id || m.id === fromRec?.id || m.id === landId) ? { ...m, idea: undefined } : m))
+        setState((s) => ({ ...s, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)).map((m) => (m.idea && status === "eaten" && (m.id === origin?.id || m.id === fromRec?.id || m.id === landId) ? { ...m, idea: undefined } : m))
           // DT85 (Milan 23 October 20:58 and 24 October 09:44): the photo taken while making it is the cover of a recipe with no
           // photo of its own yet (no cover, or one Chef Mealan drew); a drawn picture stays behind it. A cover of your own stays.
           .map((m) => (coverNow && m.id === landId && !ownPhotosOf(m).length ? { ...m, ...withRecipePhotos([coverNow, ...recipePhotosOf(m).filter((x) => x !== coverNow)].slice(0, 6)) } : m)), feedback: [{ id: uid(), meal: structuredClone(eatenMeal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, ...(coverNow && landId && !ownPhotosOf(s.meals.find((m) => m.id === landId) ?? {}).length ? { coverAsk: "used" as const } : {}), prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : pickSlot ? { date: todayKey, slotId: pickSlot.id, name: pickSlot.name, time: pickSlot.time } : undefined, ...(p.filling?.mode !== "eat" && !pickSlot && mealSlot ? { which: capName(mealSlot.name) } : {}), createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));

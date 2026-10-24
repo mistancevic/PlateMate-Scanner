@@ -116,6 +116,7 @@ Every place that offers, accepts or moves a food, and the rules it goes through.
 | The steps | the method for a plate you cook | C3, C4, C5, C40 to C48 | /api/steps in server.ts, src/draftSteps.ts, src/cookWords.ts |
 | A recipe from a link or screenshot | the original, then your changes | C35, C45, C46, C47, C48 | /api/recipe/* in server.ts |
 | Counted foods and cans | eggs, bananas, pieces; a can and its liquid | C7, C8 | src/counted.ts, src/canned.ts |
+| What a dish brings with it | the recipe's link, its cooking foods, its optional and left-out foods: they belong to the dish and leave the plate with it (DT102, DT109) | C30 | `recipeStillOn`, `cookingOn` in src/screens/JourneyScreen.tsx |
 
 A row that names a rule the code does not call is a gap and goes to section 7. Checked for 0.2.91: the tip and quick picks were the gaps (DT101, DT103). 0.2.92: the gate gets C6 by code (DT105) and the chat's answer gets a row (DT106).
 
@@ -134,4 +135,4 @@ A row that names a rule the code does not call is a gap and goes to section 7. C
 - 23 October: C8.
 - 24 October: C3, C4, C5, C14, C15, C32, C33, C40, C43 (0.2.87); C10 to C13, C30, C31 (0.2.88); C10 the start amount (0.2.89). First draft of this file.
 - 24 October, evening: C6 in code; the tip, quick picks, swaps and partners all go through the one module; section 6, where each rule is applied, and the process rule (0.2.91, DT101 to DT103).
-- 24 October, night: C6 in the gate by code, a failed read says so, the chat's answer as rows (0.2.92, DT104 to DT107).
+- 24 October, night: C6 in the gate by code, a failed read says so, the chat's answer as rows (0.2.92, DT104 to DT107); a recipe leaves the plate with its foods (0.2.93, DT109).
