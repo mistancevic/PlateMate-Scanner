@@ -386,7 +386,7 @@ export function HomeScreen(p: AppApi) {
                     ? <>{([["look", "Look at this"], ["ok", "Was this OK?"], ["help", "Help me next time"]] as const).map(([k, l]) => (
                         <button key={k} className="pill pill-small" onClick={() => { p.shareCard(f.id, k); setShareFor(null); }}>{l}</button>
                       ))}<button className="link" onClick={() => setShareFor(null)}>Cancel</button></>
-                    : <button className="pill pill-small" onClick={() => setShareFor(f.id)}>Share with Coach</button>)}
+                    : <button className="pill pill-small" onClick={() => setShareFor(f.id)}>Share with {p.coachLabel}</button>)}
               </div>
             )}
             <CoverAsk f={f} recipe={r} p={p} />

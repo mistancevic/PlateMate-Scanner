@@ -2255,7 +2255,7 @@ export default function App() {
     },
     shareCard: (id: string, reason: "look" | "ok" | "help") => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, shared: { reason, at: new Date().toISOString() } } : f)) }));
-      notify(`Shared with ${profile.coachName || "your coach"}.`);
+      notify(`Shared with ${coachLabel(profile.coachName)}.`);
     },
     user, cloudEnabled, cloudStatus, profile,
     joinCoach: async (code: string) => { if (!user) return; try { const r = await joinCoach(user.uid, code); setProfile((p) => ({ ...p, ...r })); notify(`You're with ${r.coachName} now.`); } catch (e: any) { setError(e.message); } },

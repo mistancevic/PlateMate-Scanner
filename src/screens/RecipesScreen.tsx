@@ -167,6 +167,9 @@ export function RecipesScreen(p: AppApi) {
   const opened = openId ? state.meals.find((m) => m.id === openId) ?? null : null;
   // IM23c (0.2.23): after How was it, the recipe the meal made or changed opens here, with one line for today
   const [landed, setLanded] = useState<{ id: string; line: string; title?: string; back?: "recipes" } | null>(null);
+  // DT84 (Milan 23 October 20:58, 24 October 00:46 to 09:44): after a meal is made, the Made today card sits under the photos
+  // and its line ends with Share with Coach Milan; a tap asks what the coach should do with it, as on Today
+  const [askShare, setAskShare] = useState(false);
   // R19 (0.2.47, board RS18): a meal opened from Today or Plan: the way back, and the slot it is planned for with its buttons
   const [cameFrom, setCameFrom] = useState<{ id: string; from: MealFrom } | null>(null);
   useEffect(() => {
@@ -239,11 +242,24 @@ export function RecipesScreen(p: AppApi) {
       <RecipePage key={opened.id} meal={opened} plannedLine={batchLine(opened, p.planned)} plannedCount={plannedCountOf(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
         pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
-        top={landed && landed.id === opened.id ? (
+        landing={landed && landed.id === opened.id ? (() => {
+          const card = landed.title === "✓ Made today" ? state.feedback.find((f) => f.status === "eaten" && (f.recipeId === opened.id || f.meal?.id === opened.id)) : undefined;
+          const canShare = Boolean(card && p.profile.coachId);
+          return (
           <section className="card dl-done rq-landed" role="status">
             <div className="card-top"><b>{landed.title ?? "✓ Saved in Mine"}</b>{/* R6: saved from Recipes, the way back is the Recipes list */}{landed.back === "recipes" ? <button className="link" onClick={() => { setLanded(null); setOpenId(null); }}>Recipes</button> : <button className="link" onClick={() => { setLanded(null); setOpenId(null); setTab("home"); }}>Today</button>}</div>
-            {landed.line && <small className="muted">{landed.line}</small>}
-          </section>) : cameFrom && cameFrom.id === opened.id && cameFrom.from.slot ? <SlotBar p={p} from={cameFrom.from} back={() => { const tab = cameFrom.from.tab; setCameFrom(null); setOpenId(null); p.setTab(tab); }} /> : null}
+            {(landed.line || canShare) && <small className="muted">{landed.line}{canShare && <> {card!.shared ? <span className="rq-shared">✓ Shared with {p.coachLabel}</span> : <button className="link rq-share-link" onClick={() => setAskShare((x) => !x)}>Share with {p.coachLabel} ›</button>}</>}</small>}
+            {canShare && !card!.shared && askShare && (
+              <div className="rq-share-ask">
+                <small className="muted">What should {p.coachLabel} do with it?</small>
+                <div className="button-row">{([["look", "Look at this"], ["ok", "Was this OK?"], ["help", "Help me next time"]] as const).map(([k, l]) => (
+                  <button key={k} className="pill pill-small" onClick={() => { p.shareCard(card!.id, k); setAskShare(false); }}>{l}</button>
+                ))}<button className="link" onClick={() => setAskShare(false)}>Cancel</button></div>
+              </div>
+            )}
+          </section>); })() : null}
+        coverToday={Boolean(landed && landed.id === opened.id && landed.title === "✓ Made today" && (() => { const c = state.feedback.find((f) => f.status === "eaten" && (f.recipeId === opened.id || f.meal?.id === opened.id)); return c?.coverAsk === "used" && c.photo && recipePhotosOf(opened)[0] === c.photo; })())}
+        top={cameFrom && cameFrom.id === opened.id && cameFrom.from.slot ? <SlotBar p={p} from={cameFrom.from} back={() => { const tab = cameFrom.from.tab; setCameFrom(null); setOpenId(null); p.setTab(tab); }} /> : null}
         backLabel={cameFrom && cameFrom.id === opened.id ? (cameFrom.from.tab === "home" ? "Today" : "Plan") : undefined}
         openOriginal={opened.basedOn && state.meals.some((m) => m.id === opened.basedOn!.id) ? () => { setLanded(null); setOpenId(opened.basedOn!.id); } : null}
         onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
