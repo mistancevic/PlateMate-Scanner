@@ -55,3 +55,45 @@ export function todayLine(f: Food, dayKcal: number | null, eatenKcal: number, da
   if (portionKcal > left) return `${dayName}: ${so}. ${portion} is more than the ${left} kcal left.`;
   return `${dayName}: ${so}. ${portion} fits.`;
 }
+
+// DT93 (0.2.88, board Stories60; Milan 24 October 13:58): a normal portion of a food, by its name first, else by its job.
+// Code holds these, not the AI. Fit never moves a food past its range, and a food outside it gets a line under it.
+// A counted food (a bar, an egg) goes by its piece: one to three pieces.
+const NAMED: [RegExp, [number, number], string][] = [
+  [/\byeast\b|hefe/i, [3, 10], "A dough uses 5 to 10 g."],
+  [/\b(baking powder|baking soda|backpulver|natron)\b/i, [2, 10], ""],
+  [/\b(salt|salz|pepper|pfeffer)\b/i, [1, 5], ""],
+  [/\b(protein|whey|casein) ?(powder|pulver)\b|\bwhey\b|\bcasein\b/i, [20, 40], "One scoop is about 30 g."],
+  [/peanut ?butter|erdnussmus|nussmus|almond butter|tahini|nutella|spread|aufstrich/i, [15, 40], ""],
+  [/\b(honey|honig|jam|marmelade|maple|sirup|syrup|sugar|zucker)\b/i, [5, 30], ""],
+  [/\b(oil|öl|butter|ghee|lard|schmalz)\b/i, [5, 25], ""],
+  [/\b(nuts?|almonds?|walnuts?|cashews?|hazelnuts?|pistachios?|seeds?|nüsse|mandeln)\b/i, [15, 50], "A handful is about 30 g."],
+  [/\b(parmesan|feta|cheddar|gouda|mozzarella|cheese|käse)\b/i, [20, 80], ""],
+  [/\b(chocolate|schokolade)\b/i, [10, 40], ""],
+  [/\b(cookie|keks|biscuit|cracker)\b/i, [15, 60], ""],
+  [/\b(chicken|turkey|beef|pork|lamb|veal|steak|mince|salmon|tuna|cod|fish|trout|breast|thigh|tofu|tempeh)\b/i, [80, 300], ""],
+  [/\b(egg|eggs|eier)\b/i, [50, 200], ""],
+  [/\b(rice|reis|bulgur|couscous|quinoa|pasta|penne|spaghetti|noodles?|nudeln)\b.*\b(cooked|boiled|gekocht)\b/i, [100, 300], ""],
+  [/\b(rice|reis|bulgur|couscous|quinoa|pasta|penne|spaghetti|noodles?|nudeln|oats?|haferflocken)\b/i, [40, 120], ""],
+  [/\b(bread|brot|roll|brötchen|tortilla|wrap|pita|toast)\b/i, [30, 150], ""],
+  [/\b(potato|kartoffel)/i, [100, 400], ""],
+  [/\b(skyr|quark|yogurt|yoghurt|joghurt|cottage|hüttenkäse)\b/i, [100, 400], ""],
+];
+const JOB_RANGE: Record<Job, [number, number]> = { "Protein base": [80, 300], "Flavour food": [10, 50], "Carb base": [40, 250], "Fat source": [5, 40], "Volume food": [50, 400], "Drink": [100, 500], "Mixed": [50, 300] };
+export type Portion = { min: number; max: number; note: string; piece?: { grams: number; name: string } };
+export function portionOf(f: Food): Portion {
+  if (f.serving && f.serving.grams > 0) return { min: f.serving.grams, max: f.serving.grams * 3, note: `One ${f.serving.name} is ${Math.round(f.serving.grams)} g.`, piece: f.serving };
+  if (/\bbar\b|riegel/i.test(f.name)) return { min: 35, max: 100, note: "One bar is about 50 g.", piece: { grams: 50, name: "bar" } };
+  for (const [re, [min, max], note] of NAMED) if (re.test(f.name)) return { min, max, note };
+  const [min, max] = JOB_RANGE[jobOf(f).job];
+  return { min, max, note: "" };
+}
+// the line under a food outside its portion: 150 g is 3 bars. One bar is 50 g. / 158 g is over a portion of yeast, 3 to 10 g. A dough uses 5 to 10 g.
+export function portionLine(f: Food, grams: number): string | null {
+  const p = portionOf(f);
+  if (grams <= p.max && grams >= p.min) return null;
+  const short = f.name.split(",")[0].trim().toLowerCase();
+  if (grams > p.max && p.piece) { const n = Math.round(grams / p.piece.grams); return `${Math.round(grams)} g is ${n} ${p.piece.name}${n === 1 ? "" : "s"}. ${p.note}`.trim(); }
+  if (grams > p.max) return `${Math.round(grams)} g is over a portion of ${short}, ${p.min} to ${p.max} g.${p.note ? ` ${p.note}` : ""}`;
+  return `${Math.round(grams)} g is under a portion of ${short}, ${p.min} to ${p.max} g.`;
+}

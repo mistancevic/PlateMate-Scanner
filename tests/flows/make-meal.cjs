@@ -33,7 +33,7 @@ const answer = { options: [
   await page.route("**/api/meal", async (route) => { calls++; asked = JSON.parse(route.request().postData() || "{}"); await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(answer) }); });
   // CH1: the plate says what it is for and what it aims at
   await page.goto(U + "/plate"); await page.waitForTimeout(1300);
-  ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 1 && await page.getByRole("button", { name: "Keep it as it is" }).count() === 1, "CH1, DT87 (0.2.87): Fit to my target, and Keep it as it is");
+  ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 1 && await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe)$/ }).count() === 1, "CH1, DT87 (0.2.87): Fit to my target, and Keep it as it is");
   ok(/Lunch is about 933 kcal of your 2,800, at PD 6\.4 or more\. Chef Mealan adds what it needs to land your lunch in its range\./.test(await page.locator(".plate-card").textContent()), "CH1: lunch is about 933 kcal: what is left of the day over the three meals to come");
   // CH2: PD above the target, half a lunch: maths cannot make it a meal, so Chef Mealan
   await page.getByRole("button", { name: "Fit to my target" }).click(); await page.waitForTimeout(900);
@@ -54,7 +54,7 @@ const answer = { options: [
   ok(await page.getByRole("button", { name: "Make it" }).count() === 1 && await page.getByRole("button", { name: "Other ideas" }).count() === 1, "CH3: Make it, or Other ideas");
   await page.getByRole("button", { name: "Other ideas" }).click(); await page.waitForTimeout(900);
   ok(calls === 2 && asked.plate.length === 2 && asked.avoid.includes("Šopska plate with bread"), "Other ideas: from the plate as it was, and not the same ideas again");
-  await page.getByRole("button", { name: "Keep it as it is" }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe)$/ }).click(); await page.waitForTimeout(600);
   ok(await page.locator(".mm-card").count() === 0, "Keep it as it is closes the ideas");
   // CH4: the kitchens you cook
   await page.goto(U + "/me/shop"); await page.waitForTimeout(1100);

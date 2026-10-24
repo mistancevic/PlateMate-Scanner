@@ -52,7 +52,7 @@ const U = "http://127.0.0.1:3225";
     // R15 (Milan 15:55 to 16:16, board RS12): the plate now starts with the whole recipe; this journey picks the portion it had.
     await page.locator(".in-portion").getByRole("button", { name: "One slice, as the recipe makes it" }).click(); await page.waitForTimeout(500);
     await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
-    await page.getByRole("button", { name: "I'm making it", exact: true }).click(); await page.waitForTimeout(400);
+    await page.getByRole("button", { name: /^(I'm making it|Lock the recipe)$/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "On to How was it?" }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "DaaM good" }).click();
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(700);

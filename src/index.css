@@ -2050,3 +2050,14 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .pt-cook, .mm-cook { display: block; color: var(--muted); line-height: 1.4; }
 .plate-card .pt-cook { margin: 8px 0 4px; }
 .mm-card.mm-fail { opacity: .85; border-style: dashed; }
+/* DT93 and DT94 (0.2.88, board Stories60): the three phases; the portion gate; what Fit did; Chef Mealan's read of the plate */
+.phase-bar { display: flex; gap: 8px; margin: 2px 0 10px; }
+.phase-bar span { flex: 1; font-size: var(--fs-small); font-weight: 700; color: var(--muted); text-align: center; }
+.phase-bar span i { display: block; height: 5px; border-radius: 3px; background: var(--line); margin-bottom: 4px; }
+.phase-bar span.on { color: var(--brand-text); } .phase-bar span.on i { background: var(--brand); }
+.gate-line { display: block; color: #b3261e; font-weight: 700; font-size: var(--fs-small); margin: -4px 12px 8px 64px; }
+.fit-line { display: block; color: var(--brand-text); font-weight: 700; font-size: var(--fs-small); margin: -4px 12px 8px 64px; }
+.gate-card { gap: 8px; } .gate-card > b { display: flex; align-items: center; gap: 6px; }
+.gate-ok { display: flex; align-items: center; gap: 6px; }
+.plate-steps .rp-steps { margin: 4px 0 0; }
+.fb-name { display: block; font-weight: 700; }

@@ -788,7 +788,7 @@ export default function App() {
     [scanFrom, setScanFrom] = useState<"today" | null>(null),
     [where, setWhere] = useState<Food | null>(null),
     // what the chat opened for (0.2.4): "fill" shows the day filled at once
-    [talkAsk, setTalkAsk] = useState<"fill" | null>(null),
+    [talkAsk, setTalkAsk] = useState<"fill" | "plate" | null>(null),
     // the slots' meals (0.2.2) and the slot a plate is being made for
     [planned, setPlannedState] = useState<Planned>(() => refreshPlanned(getPlanned(), state.meals)),
     [filling, setFilling] = useState<Filling | null>(null),
@@ -2164,7 +2164,7 @@ export default function App() {
         });
       } catch (e: any) { setError(e.message); } finally { setBusy(""); }
     },
-    openOut: (ask?: "fill") => { setTalkAsk(ask ?? null); setTalkOpen(true); },
+    openOut: (ask?: "fill" | "plate") => { setTalkAsk(ask ?? null); setTalkOpen(true); },
     scanFromToday: () => { setScanFrom("today"); setMode("label"); setCamera(true); },
     where, setWhere,
     closeOut: () => setTalkOpen(false),

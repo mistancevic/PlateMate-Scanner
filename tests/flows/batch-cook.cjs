@@ -56,8 +56,8 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   await page.getByRole("button", { name: "Make it" }).first().click(); await page.waitForTimeout(900);
   const plateG = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.reduce((s, i) => s + i.grams, 0));
   ok(Math.abs(plateG - 1060 * planned / 8) <= 2, `the Plate holds the batch for ${planned}: ${Math.round(plateG)} g`);
-  await page.getByRole("button", { name: /^Make it( as it is)?$|^Keep it as it is$/ }).first().click(); await page.waitForTimeout(900);
-  await page.getByRole("button", { name: /^I'm making it/ }).first().click(); await page.waitForTimeout(700);
+  await page.getByRole("button", { name: /^Make it( as it is)?$|^Keep it as it is$|^Lock the recipe$/ }).first().click(); await page.waitForTimeout(900);
+  await page.getByRole("button", { name: /^I'm making it|^Lock the recipe/ }).first().click(); await page.waitForTimeout(700);
   const made = page.getByRole("group", { name: "How many it made" });
   ok(new RegExp(`It made\\s*−\\s*${planned}\\s*sarmas`).test(((await made.textContent()) ?? "").replace(/\s+/g, " ")), `It made ${planned}, as cooked`);
   await made.getByRole("button", { name: "It made one more" }).click(); await page.waitForTimeout(300);
@@ -77,9 +77,10 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).first().click(); await page.waitForTimeout(900);
-  await page.getByRole("button", { name: /^Make it$/ }).first().click(); await page.waitForTimeout(600);
+  // 0.2.88 (DT93, DT94): Fit works in place; Lock the recipe goes on
+  await page.getByRole("button", { name: /^Lock the recipe$/ }).first().click(); await page.waitForTimeout(600);
   await page.locator(".way").first().click(); await page.waitForTimeout(200);
-  await page.getByRole("button", { name: /I'm making it this way/ }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /I'm making it this way|Lock the recipe, this way/ }).click(); await page.waitForTimeout(600);
   await page.getByRole("button", { name: /On to How was it/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "DaaM good" }).click();
   // about one meal: the save says nothing about it, one plate unless you say more (DT81, Milan 15:53 and 15:55)
@@ -97,9 +98,9 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300);
   for (const inp of await page.locator('input[aria-label^="Grams of"]').all()) { await inp.fill("900"); }
   await page.waitForTimeout(300);
-  await page.getByRole("button", { name: /^Keep it as it is$/ }).first().click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe)$/ }).first().click(); await page.waitForTimeout(800);
   if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); }
-  await page.getByRole("button", { name: /I'm making it/ }).first().click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /I'm making it|Lock the recipe/ }).first().click(); await page.waitForTimeout(600);
   // a big plate eaten all at once is asked about (R25); you ate a portion of it
   await page.getByRole("button", { name: "A portion" }).click(); await page.waitForTimeout(200);
   await page.getByRole("button", { name: /On to How was it/ }).click(); await page.waitForTimeout(400);

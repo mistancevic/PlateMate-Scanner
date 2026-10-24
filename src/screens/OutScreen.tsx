@@ -35,7 +35,7 @@ const asFood = (r: Rec): Food => ({
   reviewedAt: new Date().toISOString(), readyToEat: true, calories: r.calories, protein: r.protein, fats: r.fats, carbs: r.carbs, fiber: null,
 });
 
-export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; turns: Turn[]; setTurns: (f: (t: Turn[]) => Turn[]) => void; tab: Tab; ask?: "fill" | null; clearAsk: () => void }) {
+export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; turns: Turn[]; setTurns: (f: (t: Turn[]) => Turn[]) => void; tab: Tab; ask?: "fill" | "plate" | null; clearAsk: () => void }) {
   const { pdRef, setState, setError, state } = p;
   const [text, setText] = useState("");
   // The chef in context (0.2.4, canvas S "Chef Mealan, about this screen", H5, H6, H11): the chat opens knowing the screen.
@@ -53,6 +53,8 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   const numbers = p.numbersFor(planDay);
   const rec = dayRecord(slots, p.planned[ymd(new Date())], dayLog(state.feedback, new Date()).logged, ymd(new Date()));
   const plateT = aggregate(state.items); const platePd = density(plateT.protein, plateT.calories);
+  // DT93: the meal the plate is for, by the clock: for the chips and the first question from the Plate
+  const mealName = (() => { const m = new Date().getHours() * 60 + new Date().getMinutes(); const sl = slots.find((x) => { const [h, mi] = x.time.split(":").map(Number); return h * 60 + mi + 90 >= m; }) ?? slots[slots.length - 1]; return (sl?.name ?? "meal").toLowerCase(); })();
   const about = p.tab === "plan"
     ? `About ${dayName === "today" ? "today" : dayName}: ${open.length ? `${open.length} ${open.length === 1 ? "slot" : "slots"} open` : "every slot set"}${tWhen ? `, ${tWhen.phrase}` : ""}${numbers ? `, ${fmt(numbers.kcal, 0)} kcal and ${numbers.protein} g to place` : ""}.`
     : p.tab === "home"
@@ -68,7 +70,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
     : p.tab === "home"
       ? [nextHeld ? `Swap ${nextHeld.name.toLowerCase()} for something lighter` : "What is planned today?", "What's left today?", ...(trainingTime(training) && slots.length ? [`Move ${slots[slots.length - 1].name.toLowerCase()} to after training`] : []), "I'm out, what do I take?"]
       : p.tab === "journey"
-        ? [...(state.items.length ? ["What is on my plate?"] : []), "What goes with this?", "Better match for my target?", "I'm out, what do I take?"]
+        ? [...(state.items.length ? ["Swap a food on my plate", `Make my plate a ${mealName}`, "Make my plate a snack"] : []), "What goes with this?", "Better match for my target?", "I'm out, what do I take?"]
         : ["No idea, inspire me", "I'm out, what do I take?", "Hotel breakfast buffet", "Plan food for a trip", "Italian tonight, I want dessert"];
   // Fill a day: from My recipes and the starters, the same picking as the tip; a turn with the rows and one button that acts
   const choices: PlannedMeal[] = [...state.meals.map((m) => fromMeal(m, m.from === "coach" ? "coach" : "mine")), ...STARTERS];
@@ -95,6 +97,8 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
     p.notify(`${turn.fill.rows.length === 1 ? "The slot is" : `${turn.fill.rows.length} slots are`} set for ${turn.fill.dayName}.`);
   };
   useEffect(() => { if (p.ask === "fill") { p.clearAsk(); fillNow(); } }, [p.ask]); // eslint-disable-line react-hooks/exhaustive-deps
+  // DT93 (0.2.88): Ask Chef Mealan from the Plate: the plate goes in the first question, asked at once
+  useEffect(() => { if (p.ask === "plate") { p.clearAsk(); void ask(`What should I change on my plate so it makes a ${mealName}? ${state.items.map((i) => `${Math.round(i.grams)} g ${i.food.name}`).join(", ")}.`); } }, [p.ask]); // eslint-disable-line react-hooks/exhaustive-deps
   // the mic (0.2.4): the browser's own speech recognition, when it has one; the words land in the field
   const Speech = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
   const [listening, setListening] = useState(false);

@@ -63,7 +63,7 @@ const U = "http://127.0.0.1:3226";
     // R16 (Milan 21:56 to 22:11, board RS15): the rest is counted in lunches and goes on Plan, not to Keep for later
     ok(new RegExp(`${N - 1} lunches are left\\. To eat them on other days, put the recipe on Plan\\.`).test(mk), "the rest is counted in lunches; to eat them on other days, Plan");
     ok(/To eat the rest on other days, put the recipe on Plan\./.test(await text("main")) && !/Keep for later when you save/.test(await text("main")), "the bottom line points to Plan");
-    await page.getByRole("button", { name: "I'm making it", exact: true }).click(); await page.waitForTimeout(400);
+    await page.getByRole("button", { name: /^(I'm making it|Lock the recipe)$/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "On to How was it?" }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "DaaM good" }).click();
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(800);

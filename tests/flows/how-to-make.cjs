@@ -67,7 +67,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   ok(/How to make it/.test(t) && !/How do you want to eat it/.test(t), "IM19: after Make it, a recipe gets How to make it");
   ok(await page.locator('[aria-label="What you make"] .choice.on').textContent() === "The whole recipe" && /You eat 1 slice/.test(t) && /7 slices are left\. To eat them on other days, put the recipe on Plan\./.test(t), "IM19: it makes 8, so the whole cake is made; you eat 1 slice; R16: the other 7 go on Plan, not Today");
   ok(/The recipe's own steps/.test(t) && await page.locator(".mk-card .rp-orig li").count() > 0 && /Preheat|Crush the biscuits/.test(await text(page, ".mk-card .rp-orig")) && /The original works with your foods as they are/.test(t), "RP1 (was IM19b): the original is the steps, and a line says it works; no steps yet: the original open below, for you only");
-  ok(await page.getByRole("button", { name: "Chef Mealan's way" }).count() === 1 && await page.getByRole("button", { name: "I'm making it" }).count() === 1, "RP1: Chef Mealan's way on a tap; I'm making it");
+  ok(await page.getByRole("button", { name: "Chef Mealan's way" }).count() === 1 && await page.getByRole("button", { name: /^(I'm making it|Lock the recipe)$/ }).count() === 1, "RP1: Chef Mealan's way on a tap; I'm making it");
   await page.getByRole("button", { name: "Chef Mealan's way" }).click(); await page.waitForTimeout(900);
   t = await text(page, "main");
   ok(JSON.stringify(await page.locator(".mk-card .rp-step-part").allTextContents()) === JSON.stringify(["The base", "The filling", "The topping"]) && /120 g digestive biscuits/.test(t) && /200 g cream cheese/.test(t) && /Adapted: 320 °F in the original/.test(t), "IM19: the steps drafted here, part by part, at the whole cake's grams, with the marks");
@@ -75,7 +75,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   await page.getByRole("button", { name: "Just your plate" }).click(); await page.waitForTimeout(300);
   ok(/15 g digestive biscuits/.test(await text(page, "main")) && /every amount at your portion/.test(await text(page, "main")), "IM20: just your slice: the steps at your plate's grams");
   await page.getByRole("button", { name: "The whole recipe" }).click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: "I'm making it", exact: true }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: /^(I'm making it|Lock the recipe)$/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "On to How was it?" }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "DaaM good" }).click();
   await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(600);
@@ -106,7 +106,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   const bowl = [[0, 180, "Rice"], [1, 150, "Chicken"], [2, 80, "Chicken"], [3, 20, "Toppings"]].map(([k, g, pt]) => ({ id: `w${k}`, grams: g, locked: false, food: BOWL[k], part: pt }));
   const p5 = await open({ ...seed, foods: [...seed.foods, ...BOWL], items: bowl, title: "Burrito bowl" });
   await p5.goto(U + "/plate"); await p5.waitForTimeout(1300);
-  await p5.getByRole("button", { name: "Keep it as it is" }).click(); await p5.waitForTimeout(800);
+  await p5.getByRole("button", { name: /^(Keep it as it is|Lock the recipe)$/ }).click(); await p5.waitForTimeout(800);
   const checks = await p5.locator(".mk-check").allTextContents();
   ok(/How to make it/.test(await text(p5, "main")) && checks.length === 4 && /Rice: 180 g Basmati rice, cooked/.test(checks[0]) && /Put it together/.test(checks[3]), `IM19c: your bowl in parts as a checklist (${checks.join(" | ")})`);
   await p5.locator(".mk-check").first().click(); await p5.waitForTimeout(150);
@@ -115,7 +115,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   const yog = seed.foods.find((f) => /Skyr/.test(f.name)), nut = seed.foods.find((f) => /Nutella/.test(f.name));
   const p6 = await open({ ...seed, items: [{ id: "y", grams: 200, locked: false, food: yog }, { id: "n", grams: 15, locked: false, food: nut }], title: "" });
   await p6.goto(U + "/plate"); await p6.waitForTimeout(1300);
-  await p6.getByRole("button", { name: "Keep it as it is" }).click(); await p6.waitForTimeout(800);
+  await p6.getByRole("button", { name: /^(Keep it as it is|Lock the recipe)$/ }).click(); await p6.waitForTimeout(800);
   ok(/How do you want to eat it\?/.test(await text(p6, "main")), "A mix of ready foods keeps How do you want to eat it?");
   await p6.close();
   ok(errs.length === 0, "no page errors " + errs.join(" | "));

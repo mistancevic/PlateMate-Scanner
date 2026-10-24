@@ -48,12 +48,12 @@ seed.items = [];
   await step("moment afterwork", async () => { await require("./line.cjs")(page); await click(/Afterwork event/i); });
   await step("ask", () => click(/^(Fit to my target|Make it an? \w+)$/i));
   await shot("2-recipe");
-  console.log("recipe h2:", await page.locator("h2").first().textContent());
-  await step("make it", () => click(/^Make it$/i));
+  // 0.2.88 (DT93, DT94): Fit works in place on the Plate; Lock the recipe goes on
+  await step("lock it", () => click(/^Lock the recipe$/i));
   await step("pick way", async () => { await page.locator(".way").first().click(); await page.waitForTimeout(200); });
-  await step("making", () => click(/I'm making it this way/i));
+  await step("making", () => click(/I'm making it this way|Lock the recipe, this way/i));
   // JOURNEY INVARIANT (M1 activity 6, 10 October 2026): after the steps, How did making it go? asks for photos, how it went and how much was eaten, then on to How was it?
-  await step("how did making it go", async () => { if (!(await page.locator("h2", { hasText: "How did making it go?" }).count())) throw new Error("the made step is missing"); });
+  await step("how did making it go", async () => { if (!(await page.locator("h2", { hasText: /^Make: |How did making it go\?/ }).count())) throw new Error("the made step is missing"); });
   await step("on to how was it", () => click(/On to How was it/i));
   await step("rate", () => click(/DaaM good/i));
   await step("save", () => click(/^Save$/i));

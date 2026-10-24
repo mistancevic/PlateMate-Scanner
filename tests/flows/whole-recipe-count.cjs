@@ -42,7 +42,7 @@ const U = "http://127.0.0.1:3241";
     await page.getByLabel("Link to a recipe").fill(fritters.url); await page.getByRole("button", { name: /^Read/ }).first().click(); await page.waitForTimeout(1200);
     await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1200);
     await page.getByRole("button", { name: /^Make it( as it is)?$/ }).first().click(); await page.waitForTimeout(900);
-    await page.getByRole("button", { name: /^I'm making it/ }).first().click(); await page.waitForTimeout(700);
+    await page.getByRole("button", { name: /^I'm making it|^Lock the recipe/ }).first().click(); await page.waitForTimeout(700);
   };
   try {
     await page.goto(U + "/"); await page.waitForTimeout(900);

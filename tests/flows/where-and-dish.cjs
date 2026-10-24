@@ -42,8 +42,8 @@ seed.items = [];
   ok(/2 of 8/.test(await page.locator(".dish-portions").textContent()) && kcal2 > kcal1 * 1.8, `two portions double the plate: ${kcal1} to ${kcal2} kcal`);
   await page.getByRole("button", { name: "One portion less" }).click(); await page.waitForTimeout(300);
   // eaten as it stands: the card points at the recipe, no copy
-  await click(/^Keep it as it is$/);
-  if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); await click(/I'm making it this way/i); } else await click(/^Continue$/);
+  await click(/^(Keep it as it is|Lock the recipe)$/);
+  if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); await click(/I'm making it this way|Lock the recipe, this way/i); } else await click(/^Continue$/);
   await click(/On to How was it/i);
   ok(/Sarma is in My recipes already/.test(await page.locator("main").textContent()), "the after step says the recipe exists");
   await click(/DaaM good/i); await click(/^Save$/); await page.waitForTimeout(600);
@@ -55,12 +55,13 @@ seed.items = [];
   await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(600);
   await page.locator(".row-food", { hasText: "Skyr" }).getByRole("button").click(); await page.waitForTimeout(300);
   await click(/^(Fit to my target|Make it an? \w+)$/); await page.waitForTimeout(1200);
-  ok(await page.locator(".dish-row").count() === 1 && /what Chef Mealan moves/.test(await page.locator(".rows").textContent()), "after Fit the dish is still one row and the side is what Mealan moves");
+  ok(await page.locator(".dish-row").count() === 1 && /Fit set \d+ g skyr|Already above your target/.test(await page.locator(".plate-card").textContent()), "after Fit (in place, 0.2.88) the dish is still one row and the side is what Fit moved");
   const sarmaGrams = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.filter((i) => i.dish).map((i) => i.grams));
   ok(sarmaGrams.join(",") === "100,150,25", "the recipe's amounts stay one portion: " + sarmaGrams.join(", "));
   // Where does this go: Scan on the Plate (0.2.25, RP5: Today has no camera), a barcode, the sheet
   // Changed by story DS rule E (Milan 07:30, board DS2): Back sits top left and says where it goes, Back to the plate
-  await page.getByRole("button", { name: /^Back/ }).first().click(); await page.waitForTimeout(500);
+  // 0.2.88: Fit stays on the Plate, so no Back to tap
+  if (await page.getByRole("button", { name: /^Back/ }).count()) { await page.getByRole("button", { name: /^Back/ }).first().click(); await page.waitForTimeout(500); }
   await page.getByRole("button", { name: /^Scan$/ }).first().click(); await page.waitForTimeout(1500);
   ok(await page.locator(".cam-title").count() === 1, "Scan on the Plate opens the camera");
   await page.getByRole("button", { name: /^Barcode$/ }).click(); await page.waitForTimeout(400);
