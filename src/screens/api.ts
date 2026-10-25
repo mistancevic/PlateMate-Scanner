@@ -27,6 +27,8 @@ export interface AppApi {
   searchDatabase: (q: string) => Promise<DbProduct[]>;
   peekBarcode: (code: string) => Promise<DbProduct | null>;
   // DT115 (0.2.97): the members' catalogue
+  readMealPhoto: (image: string) => Promise<boolean>;
+  ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean }) => void;
   memberFoods: (q: string) => Promise<import("../memberFoods").MemberFood[]>;
   addMemberFood: (m: import("../memberFoods").MemberFood, to?: "foods" | "plate") => void;
   add: (f: Food) => void;

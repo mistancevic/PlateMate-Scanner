@@ -3,6 +3,7 @@ import { tasteForReq } from "../tasteChips";
 import { useState, useEffect, useRef, Fragment } from "react";
 import { tempsIn } from "../units";
 import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
+import { photoAdvice, aboutKcal, kcalRange } from "../mealPhoto";
 import { ConfirmButton } from "../components/Confirm";
 import { fitsPlate, isIngredient, type Mix } from "../mixtip";
 import { lettersOf } from "../letters";
@@ -348,8 +349,8 @@ export function JourneyScreen(p: AppApi) {
   function emptyPlate() {
     p.setPick(null); p.setPlateTaste(null);
     setMadeBy(null); setChef(null); setWay(null);
-    setState((s) => ({ ...s, items: [], portion: null, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined }));
-    setPartsMode(false); setStep("in");
+    setState((s) => ({ ...s, items: [], portion: null, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo: undefined }));
+    setPartsMode(false); setStep("in"); setPhotoBig(false);
   }
   // DT82: None takes the can's oil off; A spoon or All puts it on, after the can, locked, so Fit never moves it
   const setCanOil = (can: Ingredient, grams: number) => setState((s) => {
@@ -885,6 +886,9 @@ export function JourneyScreen(p: AppApi) {
   // DT110 (0.2.94, board Stories67; Milan 25 October 00:25: three ideas, none of value, on a plate of 1,232 kcal for a breakfast of
   // 619 to 757): a plate over its meal (C31) never goes to the ideas. Code says what it is and offers three ways.
   const [bigKept, setBigKept] = useState<string | null>(null);
+  // DT127: the meal photo, small in the line or large with the foods over it
+  const [photoBig, setPhotoBig] = useState(false);
+  const photoTime = (iso: string) => { const d = new Date(iso); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
   const bigN = tooBig && share && !imported && !madeBy ? Math.max(2, Math.round((t.calories ?? 0) / share.kcal)) : 0;
   const bigPlate = bigN > 0 && bigKept !== dishSig;
   const mealsWord = plural(mealWord);
@@ -918,7 +922,8 @@ export function JourneyScreen(p: AppApi) {
     notify(`Shrunk to one ${mealWord}: ${fmt(next.reduce((k, i) => k + ((i.food.calories ?? 0) * i.grams) / 100, 0), 0)} kcal.`);
   };
   // DT105 (0.2.92, board Stories64): an ingredient on the plate is caught by code before any read (rule C6 in the gate, C30)
-  const ingredientsOn = items.filter((i) => !i.optional && isIngredient(i.food));
+  // DT127: a food read from a photo of the meal is part of the dish (oil in a dressing, butter in a sauce), so C6 lets it be
+  const ingredientsOn = items.filter((i) => !i.optional && !i.est && !state.photo && isIngredient(i.food));
   const [dishKept, setDishKept] = useState<string>("");
   // DT93: after Fit, when the foods cannot reach the target within their portions, three ways out
   const fitShort = !!fit && fit.id !== null && pd !== null && pdRef !== null && pd < pdRef - 0.05 && !imported;
@@ -998,6 +1003,8 @@ export function JourneyScreen(p: AppApi) {
             ? Head({ name: true, title: "", sub: way?.kind === "change" ? `Your ${rec.title}, changed. Still sized for your ${mealWord}.`
               : way?.kind === "side" ? `Your ${rec.title} as it is, ${Math.round((kcalOfItems(way.options[way.pick].dish) / Math.max(1, kcalOfItems(rec.items) / (rec.makes?.n ?? 1))) * 100)}% of one ${oneOf(rec)}, and ${way.options[way.pick].name} ${sideWord(way.options[way.pick].kind)}. The ${oneOf(rec)} is not changed.`
               : `From ${rec.source?.name || (rec.source?.from === "link" ? "the link" : "your screenshot")}. ${pmode === "whole" ? "The whole recipe, as you mapped it." : pmode === "sized" && mealNeed ? `The recipe's mix, sized for your ${mealWord}: every food scaled the same way.` : `One ${oneOf(rec)}, as the recipe makes it.`} Change what you like.` })
+          : state.photo && items.length > 0
+            ? Head({ name: true, title: "", sub: `Read from your photo. Correct an amount if you know better; ${CHEF_NAME} says what to do with it below.` })
           : state.title && state.title !== "DaaM" && items.length > 0
             ? Head({ name: true, title: "", sub: "From My recipes. Change what you like, then Fit to my target or Keep it as it is." })
             : items.length > 0 ? Head({ name: true, title: "", sub: `Name it, or keep the foods' name.` })
@@ -1054,6 +1061,35 @@ export function JourneyScreen(p: AppApi) {
         {/* On the plate (Y1 columns 2 and 2b, 10 October 2026): the plate is a card of its own, with Fit to my target as its action */}
         {inFlow ? <RecipeInFlow flow={recipeIn} put={(f) => void putRead(f)} /> : (
         <section className="card plate-card">
+        {/* DT127 (0.2.108, board Stories75): the photo the plate was read from stays on it; a tap opens it large with the foods over it */}
+        {state.photo && (photoBig ? (
+          <div className="mp-big">
+            <div className="mp-big-img"><img src={state.photo.image} alt="your meal" />
+              <div className="mp-tags">{items.map((i) => <span key={i.id}>{i.food.name.split(",")[0]} {i.est ? "~" : ""}{Math.round(i.grams)} g</span>)}</div></div>
+            <div className="mp-big-row"><small className="muted">{photoTime(state.photo.at)} · at the table</small>
+              <label className="link mp-retake">Retake<input type="file" accept="image/*" capture="environment" hidden onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = () => { void p.readMealPhoto(String(r.result)); }; r.readAsDataURL(f); e.target.value = ""; }} /></label>
+              <button type="button" className="link" onClick={() => setPhotoBig(false)}>Close</button></div>
+          </div>
+        ) : (
+          <button type="button" className="mp-line" onClick={() => setPhotoBig(true)} aria-label="Your photo, tap to see it large">
+            <img src={state.photo.image} alt="" />
+            <span><b>Your photo, {photoTime(state.photo.at)}.</b> {items.length} {items.length === 1 ? "food" : "foods"} read, amounts estimated (~). Tap the photo to see it large; tap an amount to correct it.</span>
+          </button>
+        ))}
+        {state.photo?.unsure && items.some((i) => i.food.name.toLowerCase() === state.photo!.unsure!.name.toLowerCase() && i.est) && (() => {
+          const u = state.photo!.unsure!, it = items.find((i) => i.food.name.toLowerCase() === u.name.toLowerCase())!;
+          const pick = (g: number | null) => { if (g !== null) updateItem(it.id, { grams: g, est: undefined }); setState((st) => ({ ...st, photo: st.photo ? { ...st.photo, unsure: null } : st.photo })); };
+          return (
+            <div className="mp-ask" role="group" aria-label="One thing the read is unsure about">
+              <small><b>One thing I cannot tell from the photo:</b> is the {it.food.name.split(",")[0].toLowerCase()} about {u.options[0]} g or {u.options[1]} g?</small>
+              <div className="button-row">
+                <button type="button" className="choice" onClick={() => pick(u.options[0])}>~{u.options[0]} g</button>
+                <button type="button" className="choice" onClick={() => pick(u.options[1])}>~{u.options[1]} g</button>
+                <button type="button" className="link" onClick={() => pick(null)}>Skip</button>
+              </div>
+            </div>
+          );
+        })()}
         <div className="card-top"><span>On the plate</span>{items.length > 0 && <ConfirmButton className="link plate-empty-link" label={<><Trash2 size={14} /> Empty plate</>} confirmLabel="Tap again to empty" onConfirm={emptyPlate} />}</div>
         {items.length === 0 && <small className="plate-empty">Nothing on the plate yet.</small>}
         {imported && rec && !way && rec.makes && (
@@ -1103,6 +1139,8 @@ export function JourneyScreen(p: AppApi) {
           {/* RP5b (0.2.25, Milan 17:42): Manual on the left, Scan on the right, where the thumb is */}
           <button className="pill pill-small" onClick={() => blank()}><Pencil size={15} /> Manual</button>
           <button className="pill pill-small" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> Scan</button>
+          {/* DT127: a photo of the meal in front of you, read onto the plate as estimates */}
+          {p.ai.on && <label className="pill pill-small mp-button"><Camera size={15} /> Photo of my meal<input type="file" accept="image/*" capture="environment" hidden onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = () => { void p.readMealPhoto(String(r.result)); }; r.readAsDataURL(f); e.target.value = ""; }} /></label>}
         </div>
         {/* Start from a recipe (0.2.16, board IM, IM1): only on an empty plate, because a recipe fills the plate */}
         {items.length === 0 && <>
@@ -1152,6 +1190,7 @@ export function JourneyScreen(p: AppApi) {
                     onGrams={(g, c) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: g, ...(c ? { count: c } : {}) }); }} />
                 : i.locked ? <b className="row-num">{fmt(i.grams, 0)} g{servingLabel(i.food, i.grams) ? <small> = {servingLabel(i.food, i.grams)}</small> : null}</b> : (
                   <label className="grams">
+                    {i.est && <span className="mp-est" aria-label="estimated">~</span>}
                     <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : Math.round(i.grams * 10) / 10}
                       onChange={(e) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0) }); }}
                       onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done"
@@ -1288,6 +1327,24 @@ export function JourneyScreen(p: AppApi) {
             </>)}
           </section>
         )}
+        {/* DT127: under the gates, one line what to do with the plate in front of you, by code, and the buttons, the advice first */}
+        {state.photo && items.length > 0 && !p.filling && (() => {
+          const adv = photoAdvice({ items, protein: t.protein ?? 0, mealWord, mealKcal: share?.kcal ?? null, big: bigN, nutrition: nutri, day: dayLine, culinaryOk: dishNow?.status === "done" ? Boolean(dishNow.makesIt) : null });
+          const mealOf = (): Meal => ({ id: uid(), title: state.title && state.title !== "DaaM" ? state.title : autoTitle(items), items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
+          const slot = mealSlot ? { date: mealDate, slotId: mealSlot.id, name: mealSlot.name, time: mealSlot.time } : null;
+          const b = {
+            all: <button key="all" className={`pill pill-small ${adv.first === "all" ? "pill-primary" : ""}`} onClick={() => p.ateNow(mealOf(), slot, { photo: state.photo!.image })}>Ate it</button>,
+            half: <button key="half" className={`pill pill-small ${adv.first === "half" ? "pill-primary" : ""}`} onClick={() => p.ateNow(mealOf(), slot, { photo: state.photo!.image, half: true })}>Ate half</button>,
+            add: <button key="add" className={`pill pill-small ${adv.first === "add" ? "pill-primary" : ""}`} onClick={() => { document.querySelector<HTMLInputElement>("input.search")?.focus(); }}>Add a food</button>,
+          };
+          const order = adv.first === "half" ? [b.half, b.all, b.add] : adv.first === "add" ? [b.add, b.all, b.half] : [b.all, b.half, b.add];
+          return (
+            <section className="card mp-say" aria-label={`${CHEF_NAME} on your meal`}>
+              <small><b>{CHEF_NAME}:</b> {adv.line}</small>
+              <div className="button-row">{order}<button className="link" onClick={emptyPlate}>Not mine</button></div>
+            </section>
+          );
+        })()}
         <div className={`ways-out${imported && !way ? " ways-out-col" : ""}`}>
           {imported && rec ? (<>
             {/* PF A6 (0.2.35, Milan 23:11 and 23:21 on 17 October, back after the 0.2.27 revert): Make it as it is is not Chef
@@ -1435,6 +1492,7 @@ export function JourneyScreen(p: AppApi) {
               </div>
               {isCounted(i) ? <CountAmount item={i} editable={!i.locked} onGrams={(g) => edit(i.id, g)} /> : i.locked ? <b className="row-num">{fmt(i.grams, 0)} g</b> : (
                 <label className="grams">
+                  {i.est && <span className="mp-est" aria-label="estimated">~</span>}
                   <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : Math.round(i.grams * 10) / 10}
                     onChange={(e) => edit(i.id, Math.max(0, Number(e.target.value) || 0))}
                     onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done"

@@ -97,6 +97,8 @@ export type Ingredient = {
   fry?: { pot: number; written?: string; plate?: boolean };
   // DT82: the oil poured from a can, held with the can's row (its id); it goes when the can goes, and Fit never moves it
   from?: string;
+  // DT127 (0.2.108): an amount estimated from a photo of the meal, with its range; a corrected amount drops it
+  est?: { low: number; high: number };
 };
 // an optional food on the plate, out of the numbers until added (0.2.19, IM12): grams for this plate's portion
 export type PlateOpt = { id: string; name: string; written?: string; note?: string; grams: number; food: Food; part?: string };
@@ -258,6 +260,8 @@ export type PilotState = {
   recipeFoods?: string[];
   // a recipe that came in, opened from Recipes (0.2.19, IM13): the plate puts it on as the first time, then clears this
   openRecipe?: string;
+  // DT127 (0.2.108): the photo of the meal the plate was read from, when it was taken, and the one question the read was unsure about
+  photo?: { image: string; at: string; unsure?: { name: string; options: [number, number] } | null };
 };
 export const EMPTY: Nutrition = {
   calories: null,

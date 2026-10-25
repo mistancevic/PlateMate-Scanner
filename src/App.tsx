@@ -82,6 +82,7 @@ import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, isIngredient, type Mix, type MixTip } from "./mixtip";
 import { ratesOf } from "./letters";
 import { asMine, travels, toShare } from "./memberFoods";
+import { cleanRead, itemsOfRead } from "./mealPhoto";
 import { identityTwins } from "./foodId";
 import { findReference, referenceFood, localName, otherNames, marketFoods } from "./reference";
 import { startGrams, jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
@@ -2111,6 +2112,36 @@ export default function App() {
     // a product picked from the search opens the sheet titled by the button that picked it
     addFromDatabase: (code: string) => { setEditTitle("Add to my foods"); lookup(code); },
     searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (region ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "cy", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
+    // DT127 (0.2.108, board Stories75): a photo of the meal in front of you, read onto the Plate as estimates
+    readMealPhoto: async (image: string) => {
+      setBusy("Reading your plate…");
+      try {
+        const [sent, thumb] = await Promise.all([resizeImageBase64(image, 1280, 1280), thumbnailBase64(image, 640)]);
+        const d = await api("/api/plate-photo", { image: sent, region: region ?? null, library: state.foods.slice(0, 60).map((f) => f.name) });
+        const read = cleanRead(d);
+        if (!read) { setError("Nothing I can read on that plate. Try once more, from above, with the whole plate in."); return false; }
+        const { items, fresh } = itemsOfRead(read, state.foods, region, uid);
+        const at = new Date().toISOString();
+        setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined,
+          photo: { image: thumb, at, unsure: read.unsure } }));
+        setKind("meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
+        log("meal_photo", { foods: items.length, unsure: Boolean(read.unsure) });
+        return true;
+      } catch (e: any) { setError(e?.message || "The read didn't work. Try again."); return false; } finally { setBusy(""); }
+    },
+    // the plate eaten now, at the table: whole, or half with the other half kept on Today
+    ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean }) => {
+      const now = new Date().toISOString();
+      const halve = (m: Meal): Meal => ({ ...m, id: uid(), items: m.items.map((i) => ({ ...i, grams: Math.round(i.grams / 2), est: undefined })), portion: Math.round((m.portion ?? 0) / 2) });
+      const eaten = x.half ? halve(meal) : { ...meal, items: meal.items.map((i) => ({ ...i, est: undefined })) };
+      setState((s) => ({ ...s,
+        feedback: [{ id: uid(), meal: structuredClone(eaten), status: "eaten" as const, taste: "", notes: "", createdAt: now, ...(slot ? { slot } : {}), ...(x.photo ? { photo: x.photo, photos: [x.photo] } : {}), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined, moment } as Feedback,
+          ...(x.half ? [{ id: uid(), meal: structuredClone({ ...halve(meal), title: `${meal.title}, the other half` }), status: "prepared" as const, taste: "", notes: "", createdAt: now, ...(x.photo ? { photo: x.photo } : {}) } as Feedback] : []),
+          ...s.feedback],
+        items: [], portion: null, title: "", photo: undefined }));
+      setStep("in"); setTab("home");
+      notify(x.half ? "Half logged. The other half is on Today." : "Logged. It's on Today.");
+    },
     // DT115 (0.2.97): the members' catalogue, searched by words; a member's food becomes a copy in your library
     memberFoods: async (q: string) => { try { const d = await api(`/api/members/foods?q=${encodeURIComponent(q)}&region=${encodeURIComponent(region ?? "")}`); return Array.isArray(d?.foods) ? d.foods : []; } catch { return []; } },
     addMemberFood: (m, to = "foods") => {
@@ -2133,7 +2164,7 @@ export default function App() {
       // R22 fix (0.2.51): a recipe presets What is it? from its foods, a one-portion recipe too (the quark pudding: a DaaM)
       setPlateTaste(presetOf(dishTaste(meal.items.map((i) => i.food.name))));
       // a recipe that came in from a screenshot or a link opens as it did the first time (0.2.19, IM13): the Plate does it
-      if (meal.makes) setState((s) => ({ ...s, title: meal.title, items: [], portion: null, optional: undefined, leftOut: undefined, emptyParts: undefined, openRecipe: meal.id }));
+      if (meal.makes) setState((s) => ({ ...s, title: meal.title, items: [], portion: null, photo: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, openRecipe: meal.id }));
       else setState((s) => ({ ...s, title: meal.title, items: asDish(meal), portion: null, fromRecipe: undefined, leftOut: undefined, emptyParts: undefined, optional: optAt(meal.optional, 1 / portionsIn(meal), uid) }));
       setKind(meal.kind ?? "meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
     },

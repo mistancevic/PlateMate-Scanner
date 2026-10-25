@@ -1370,6 +1370,31 @@ app.post("/api/meal", requireUser, requireMember, requireAI, async (req, res) =>
   }
 });
 
+// DT127 (0.2.108, board Stories75; Milan 25 October 14:26 to 16:29): a photo of the meal in front of the person. Chef Mealan
+// names every food on the plate with a chef's values per 100 g and an estimated amount with its range, and the one food he
+// is least sure about, with two plausible amounts. Only words and numbers: the app makes the rows, marks them as estimates,
+// and the gates and Chef Mealan's line are code (src/mealPhoto.ts). No menu, no shelf, no pack: those stay in I'm out and Scan.
+const photoSchema = { type: "object", properties: {
+  dish: { type: "string" },
+  foods: { type: "array", items: { type: "object", properties: {
+    name: { type: "string" }, grams: { type: "number" }, low: { type: "number" }, high: { type: "number" },
+    calories: { type: "number" }, protein: { type: "number" }, fats: { type: "number" }, carbs: { type: "number" }, fiber: { type: "number" },
+    confidence: { type: "string", enum: ["high", "medium", "low"] } }, required: ["name", "grams", "low", "high", "calories", "protein", "fats", "carbs", "confidence"] } },
+  unsure: { type: "object", properties: { name: { type: "string" }, options: { type: "array", items: { type: "number" } } }, required: ["name", "options"], nullable: true },
+}, required: ["dish", "foods"] };
+app.post("/api/plate-photo", requireUser, requireMember, requireAI, async (req, res) => {
+  try {
+    const { image } = req.body ?? {};
+    const match = typeof image === "string" && image.length <= 4_000_000 ? image.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/) : null;
+    if (!match) return res.status(400).json({ error: "A photo of the plate is needed." });
+    const region = typeof req.body.region === "string" ? req.body.region.slice(0, 20) : "unknown";
+    const library = (Array.isArray(req.body.library) ? req.body.library : []).slice(0, 60).map((x: unknown) => String(x).slice(0, 60));
+    const prompt = `You are Chef Mealan, a chef reading a photo of one plate of food, taken at the table by the person about to eat it. Name every food you can see on the plate, as a cook names it on a plate (Chicken breast, grilled; Rice, cooked; Mixed salad, dressed; Olive oil as dressing), in English, one entry per food, at most 8. For each give a chef's typical values per 100 g as served (calories, protein, fats, carbs, fiber in grams) and your estimate of the amount on the plate in grams, with a low and a high you would still believe (a photo cannot tell weight well: be honest, 30 percent either way is normal; a plate is about 26 cm unless the photo says otherwise). Set confidence high only when the amount is plain (one egg, one slice). Name the dish in two to four words. In unsure, name the one food that moves the energy or the protein most and whose amount you are least sure about, with two plausible amounts in grams that a person could tell apart by eye (one breast or two: 180 and 350); null when every amount is plain. Oil, butter and sauces you can see or that the dish needs count as foods on the plate. The person's market: ${region}. Foods they already have, prefer these names when they match: ${library.join(", ") || "none"}. Only what is on this one plate: no menu, no pack, no other plate.`;
+    const data = await generate(prompt, photoSchema, [{ inlineData: { mimeType: match[1], data: match[2] } }]);
+    res.json({ dish: String(data.dish ?? "").slice(0, 60), foods: Array.isArray(data.foods) ? data.foods.slice(0, 8) : [], unsure: data.unsure ?? null });
+  } catch (error) { fail(res, error); }
+});
+
 // DT93 (0.2.88, board Stories60; Milan 24 October 13:58): the culinary gate. Chef Mealan reads a plate with two or more foods and
 // says whether they make the meal it is for, as a cook would: a bar, yeast and peanut butter do not make a lunch. One line why,
 // and what would. Only words: the app does the amounts. Cached by the app per set of foods.
