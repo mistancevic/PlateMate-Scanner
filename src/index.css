@@ -2106,4 +2106,6 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .gate-line-row > b { font-size: var(--fs-label); } .gate-yes > b { color: #1b7f4b; } .gate-no > b { color: #b3261e; }
 .gate-line-row small { color: var(--ink); }
 .gate-sweet { display: block; font-weight: 700; color: #1b7f4b; }
-.readout-grams { display: block; margin-top: 6px; opacity: .92; }
+.letters-grid { display: flex; gap: 18px; flex: 1; min-width: 0; }
+.letter-cell { display: grid; justify-items: start; gap: 1px; } .letter-cell small { font-size: var(--fs-small); opacity: .9; font-weight: 600; }
+.letters-note { align-self: flex-end; }

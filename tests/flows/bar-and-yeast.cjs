@@ -51,8 +51,8 @@ const U = "http://127.0.0.1:3264";
   await gate.getByRole("button", { name: "Try again" }).click(); await page.waitForTimeout(900);
   ok(dishCalls === 2 && /A bar and yeast do not make a snack/.test(await gate.textContent()) && !/could not read/.test(await gate.textContent()), "DT104: Try again reads the plate again: calls " + dishCalls);
   // DT108: the four letters on the readout and on the rows, F C Fi P
-  const ro = await page.locator(".readout .letters").first().textContent();
-  ok(/^[Ff][+?-]?\s+[Cc][+?-]?\s+[Ff]i[+?-]?\s+[Pp][+?-]?$/.test(ro.trim()), "DT108: four letters under the readout, F C Fi P: " + JSON.stringify(ro));
+  const ro = (await page.locator(".readout .letters").allTextContents()).join(" ");
+  ok(/^[Ff][+?-]? [Cc][+?-]? [Ff]i[+?-]? [Pp][+?-]?$/.test(ro.trim()), "DT108: four letters under the readout, F C Fi P: " + JSON.stringify(ro));
   const rowLetters = await page.locator(".plate-card .row small .letters").allTextContents();
   ok(rowLetters.length === 2 && /^F\+ C fi\? p-$|^F\+ C fi\? p$/.test(rowLetters[0]) === false || rowLetters.length === 2, "DT108: letters on each row: " + rowLetters.join(" | "));
   ok(/^f/.test(rowLetters[1]) && /P\+$/.test(rowLetters[1]), "DT108: yeast reads low fat and high protein: " + rowLetters[1]);

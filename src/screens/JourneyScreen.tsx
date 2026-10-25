@@ -10,7 +10,7 @@ import { Letters } from "../components/Letters";
 import { ClearField } from "../components/ClearField";
 import { asMine, seenLine, stemOf, type MemberFood } from "../memberFoods";
 import { sameFood } from "../swaps";
-import { nutritionGate, dayGate, gramsLine, type GateLine, type GateWay } from "../gates";
+import { nutritionGate, dayGate, type GateLine, type GateWay } from "../gates";
 import { jobOf } from "../foodjob";
 import { WaitSteps, type WaitStep } from "../components/WaitSteps";
 import { aggregate, density, uid, solveIngredient, servingLabel, sizedFor } from "../pilot";
@@ -94,11 +94,12 @@ function stepHead({ n, title, sub, nameField, back }: { n: number; title: string
 const band = (pd: number | null) => (pd === null || pd < 3 ? "low" : pd < 5 ? "mid" : "high");
 
 // sugars, saturates and salt on the plate, from the foods whose tables have them; for information only
-function extras(items: { food: any; grams: number }[]) {
+function extrasText(items: { food: any; grams: number }[]): string | null {
   const parts = ([["sugars", "sugars"], ["saturates", "saturates"], ["salt", "salt"]] as const)
     .map(([key, word]) => { const v = lineTotal(items, key); return v === null ? null : `${fmt(v)} g ${word}`; }).filter(Boolean);
-  return parts.length ? <small className="readout-extra">{parts.join(" · ")}{items.some((i) => !i.food.table?.length) ? " · from foods with a full table" : ""}</small> : null;
+  return parts.length ? `${parts.join(" · ")}${items.some((i) => !i.food.table?.length) ? " · from foods with a full table" : ""}` : null;
 }
+function extras(items: { food: any; grams: number }[]) { const t = extrasText(items); return t ? <small className="readout-extra">{t}</small> : null; }
 // R25 (0.2.53, board RS25): a meal above this, or above the whole day, is asked once before it is logged
 const BIG_MEAL = 2000;
 export function JourneyScreen(p: AppApi) {
@@ -1081,10 +1082,8 @@ export function JourneyScreen(p: AppApi) {
               <div><span>{tooBig ? `not a ${mealWord} yet` : pd !== null && pdRef !== null ? (pd >= pdRef - 0.05 ? "fits your plan" : `${fixed(pdRef - pd)} under your ${fixed(pdRef)}`) : "no target set"}</span><small>{fmt(t.calories, 0)} kcal{tooBig ? `, about ${Math.round((t.calories ?? 0) / share!.kcal)} ${plural(mealWord)}` : ""} · {fmt(t.protein)} g protein · {fmt(t.weight, 0)} g</small></div>
             </div>
             {/* DT108 (0.2.92): four letters read the plate against your day, F C Fi P */}
-            {p.rates && <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} who="the plate" />}
-            {/* DT116 (0.2.98, Milan 10:05): the plain grams under the letters */}
-            {(t.fats !== null || t.carbs !== null) && <small className="readout-grams">{gramsLine({ fats: t.fats, carbs: t.carbs, fiber: t.fiber })}</small>}
-            {extras(items)}
+            {/* DT116 (0.2.98) and 0.2.99: the letters with their grams, one block; sugars, saturates and salt in the tap */}
+            {p.rates ? <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} who="the plate" extra={extrasText(items)} /> : extras(items)}
           </section>
         )}
         {items.length === 0 && <small className="ways-label">Add a food</small>}

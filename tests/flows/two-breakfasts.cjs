@@ -90,8 +90,8 @@ const U = "http://127.0.0.1:3266";
   // DT113: the letters on the recipe page
   await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(900);
   await page.getByText(/Clean Protein Bar Peanut Love, Peanut butter/).first().click().catch(async () => { await page.locator(".tile, .recipe-row").first().click(); }); await page.waitForTimeout(1200);
-  const rl = await page.locator(".rq-readout .letters").first().textContent().catch(() => "");
-  ok(/^[Ff][+?-]?\s+[Cc][+?-]?\s+[Ff]i[+?-]?\s+[Pp][+?-]?$/.test((rl || "").trim()), "DT113: four letters under the recipe's PD: " + JSON.stringify(rl));
+  const rl = (await page.locator(".rq-readout .letters").allTextContents().catch(() => [])).join(" ");
+  ok(/^[Ff][+?-]? [Cc][+?-]? [Ff]i[+?-]? [Pp][+?-]?$/.test((rl || "").trim()), "DT113: four letters under the recipe's PD: " + JSON.stringify(rl));
   // DT112: the chat's field
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(700);
   await page.locator(".chat-fab").first().click(); await page.waitForTimeout(800);

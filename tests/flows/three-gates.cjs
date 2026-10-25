@@ -44,8 +44,9 @@ const U = "http://127.0.0.1:3268";
   await page.goto(U + "/plate"); await page.waitForTimeout(1800);
   const gate = page.locator(".gate-card").first();
   // the grams under the letters
-  const grams = await page.locator(".readout-grams").textContent();
-  ok(/^\d+ g fat · \d+ g carbs · (\d+ g fibre|fibre \?)$/.test(grams.trim()), "DT116: the plain grams under the letters: " + grams);
+  const cells = await page.locator(".readout .letter-cell").allTextContents();
+  ok(cells.length === 4 && cells.every((c) => /^[A-Za-z]+[+?-]?(\d+g|\?)$/.test(c.replace(/\s+/g, ""))), "0.2.99: each letter with its grams under it, one block: " + cells.join(" | "));
+  ok(await page.locator(".readout .readout-extra").count() === 0, "0.2.99: sugars, saturates and salt are not a line in the readout");
   // N28: a shake with biscuits as a lunch
   let lines = await gate.locator(".gate-line-row").allTextContents();
   ok(lines.length === 3 && /^✓ Culinary/.test(lines[0]) && /^✕ Nutrition/.test(lines[1]) && /^✓ Your day/.test(lines[2]), "DT116: three lines, culinary and your day pass, nutrition fails: " + lines.map((l) => l.slice(0, 14)).join(" | "));
