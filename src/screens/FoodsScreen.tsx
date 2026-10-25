@@ -160,7 +160,7 @@ export function FoodsScreen(p: AppApi) {
           <p className="label group-label">Members' foods <small>your market first</small></p>
           {mfRows.map((m) => (
             <div className="row outside-row" key={m.key}>
-              <span className="thumb">{iconFor(m.name)}</span>
+              <span className="thumb">{m.photo ? <img src={m.photo} alt="" loading="lazy" /> : iconFor(m.name)}</span>
               <div className="row-text">
                 <b className="name-plain">{m.name}</b>
                 <small>{[m.brand || (m.barcode ? "" : "no barcode"), `${fmt(m.calories, 0)} kcal`, `${fmt(m.protein)} g protein per 100 g`, seenLine(m, p.region)].filter(Boolean).join(" · ")}</small>

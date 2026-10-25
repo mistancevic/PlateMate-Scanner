@@ -74,6 +74,8 @@ const U = "http://127.0.0.1:3267";
   let s = await st();
   const copy = s.foods.find((f) => f.name === "Tuna in water, drained");
   ok(copy && copy.calories === 99 && copy.barcode === "8004030044005" && copy.source === "Members' foods" && /checked by a member/.test(copy.notes), "DT115: a copy in your foods with the values and the source");
+  // 0.2.101: the pack's photo from Open Food Facts travels as a link when the server could fetch it; here the workspace cannot reach OFF, so the row shows the icon and the copy has no photo
+  ok(!copy.photo || /^https:\/\/images\.openfoodfacts\.org\//.test(copy.photo), "0.2.101: a copy's photo is only ever an Open Food Facts link: " + (copy.photo || "none"));
   ok(await mf.locator(".name-plain").count() === 3, "DT115: the copied food left the members' group");
   // the barcode answers from the catalogue before Open Food Facts
   const prod = await page.evaluate(async () => (await fetch("/api/product/3850102001234")).json());

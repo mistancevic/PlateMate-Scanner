@@ -5,9 +5,9 @@ import { REGIONS } from "./moments";
 import { sameFood, stem } from "./swaps";
 import { cookName } from "./cookWords";
 
-export type MemberFood = { key: string; name: string; brand: string; barcode?: string; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber: number | null; serving?: { grams: number; name: string } | null; readyToEat?: boolean; source: string; seenIn: string[]; updatedAt: string };
+export type MemberFood = { key: string; name: string; brand: string; barcode?: string; photo?: string | null; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber: number | null; serving?: { grams: number; name: string } | null; readyToEat?: boolean; source: string; seenIn: string[]; updatedAt: string };
 
-export const marketName = (id: string) => REGIONS.find((r) => r.id === id)?.name.replace(/, elsewhere$/, "") ?? id;
+export const marketName = (id: string) => { const n = REGIONS.find((r) => r.id === id)?.name.replace(/, elsewhere$/, "") ?? id; return n === "Elsewhere" ? "elsewhere" : n; };
 export const seenLine = (m: Pick<MemberFood, "seenIn">, mine: string | null | undefined) => {
   const ids = m.seenIn ?? [];
   if (!ids.length) return "";
@@ -22,6 +22,8 @@ export const asMine = (m: MemberFood, uid: () => string): Food => ({
   id: uid(), name: m.name, brand: m.brand, basis: "100g", source: "Members' foods", notes: `Members' foods, checked by a member on ${m.updatedAt.slice(0, 10)}${m.seenIn?.length ? `; ${seenLine(m, null)}` : ""}.`,
   reviewedAt: new Date().toISOString(), readyToEat: m.readyToEat !== false, calories: m.calories, protein: m.protein, fats: m.fats, carbs: m.carbs, fiber: m.fiber,
   ...(m.barcode ? { barcode: m.barcode } : {}), ...(m.serving ? { serving: m.serving } : {}),
+  // the pack's photo from Open Food Facts travels with the copy (a link, CC BY-SA); a member's own photo never does
+  ...(m.photo ? { photo: m.photo, photos: [m.photo] } : {}),
 } as Food);
 // the same food in another state, from the catalogue, for the line under a food of yours: tuna in water under tuna in olive oil
 export function alsoSeen(mine: Food, catalogue: MemberFood[]): MemberFood | null {
