@@ -58,11 +58,11 @@ const U = "http://127.0.0.1:3267";
   await page.getByLabel("Find a food").fill("tuna"); await page.waitForTimeout(1200);
   const mf = page.locator(".members-foods");
   ok(await mf.count() === 1, "DT115: a Members' foods group in Find a food");
-  const names = await mf.locator(".name-plain").allTextContents();
+  const names = await mf.locator(".name-link").allTextContents();
   ok(names.length === 4 && names.includes("Τόνος σε νερό") && !names.includes("Tuna in olive oil, drained"), "DT115, 0.2.100: the four foods the others scanned, the Greek tuna found by the English word, never your own: " + names.join(", "));
   // 0.2.100: and the other way round, the Serbian word finds them all
   await page.getByLabel("Find a food").fill("tunjevina"); await page.waitForTimeout(1200);
-  ok((await page.locator(".members-foods .name-plain").allTextContents()).length >= 3, "0.2.100: tunjevina finds the tuna of every language");
+  ok((await page.locator(".members-foods .name-link").allTextContents()).length >= 3, "0.2.100: tunjevina finds the tuna of every language");
   await page.getByLabel("Find a food").fill("tuna"); await page.waitForTimeout(1200);
   const mt = await mf.textContent();
   ok(/seen in Belgrade/.test(mt) && /seen in Cyprus/.test(mt) && /no barcode/.test(mt), "DT115: each says where it was seen; a food without a barcode says so");
@@ -76,12 +76,22 @@ const U = "http://127.0.0.1:3267";
   ok(copy && copy.calories === 99 && copy.barcode === "8004030044005" && copy.source === "Members' foods" && /checked by a member/.test(copy.notes), "DT115: a copy in your foods with the values and the source");
   // 0.2.101: the pack's photo from Open Food Facts travels as a link when the server could fetch it; here the workspace cannot reach OFF, so the row shows the icon and the copy has no photo
   ok(!copy.photo || /^https:\/\/images\.openfoodfacts\.org\//.test(copy.photo), "0.2.101: a copy's photo is only ever an Open Food Facts link: " + (copy.photo || "none"));
-  ok(await mf.locator(".name-plain").count() === 3, "DT115: the copied food left the members' group");
+  ok(await mf.locator(".name-link").count() === 3, "DT115: the copied food left the members' group");
+  // 0.2.103: the copy is found by the English word on the Plate, and the Greek tin opens its card before you take it
+  ok(Array.isArray(copy.aliases) && copy.aliases.includes("tunjevina"), "0.2.103: the copy carries the other languages' words: " + JSON.stringify(copy.aliases));
+  await mf.locator(".name-link", { hasText: "Τόνος" }).click(); await page.waitForTimeout(600);
+  ok(/Τόνος σε νερό/.test(await text(".food-card, .sheet, main")) && await page.getByRole("button", { name: /Close/ }).count() >= 1, "0.2.103: a member's food opens its card");
+  await page.getByRole("button", { name: /Close/ }).first().click(); await page.waitForTimeout(400);
   // the barcode answers from the catalogue before Open Food Facts
   const prod = await page.evaluate(async () => (await fetch("/api/product/3850102001234")).json());
   ok(prod.members === true && prod.product_name === "Tuna in brine, drained" && /Members' foods · checked by a member on 2026/.test(prod.source) && prod.calories === 105, "DT115: a barcode a member checked answers from the catalogue: " + prod.source);
   // the swap list on the Plate: the same tuna in another state leads, with the difference per can
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(900);
+  await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.foods.push({ ...s.foods.find((f) => f.name === "Tuna in water, drained"), id: "sr-tuna", name: "Tunjevina u maslinovom ulju", brand: "Eva", barcode: undefined, aliases: ["tuna", "thunfisch"] }); localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
+  await page.reload(); await page.waitForTimeout(1500);
+  await page.getByLabel("Search all my foods").fill("tuna"); await page.waitForTimeout(500);
+  ok((await page.locator(".rows .row-food").allTextContents()).some((t) => /Tunjevina u maslinovom ulju/.test(t)), "0.2.103: tuna finds Tunjevina in the Plate's search");
+  await page.getByLabel("Search all my foods").fill(""); await page.waitForTimeout(300);
   await require("./swipe.cjs")(page, page.locator(".swipe-fg", { hasText: "Tuna" }).locator(".name-link, .thumb").first(), "left"); await page.waitForTimeout(1500);
   const rows = await page.locator(".sheet .row-button").allTextContents();
   ok(rows.length > 0 && /^\W*Tuna in (water|brine)/.test(rows[0]) && /the same tuna, another state/.test(rows[0]) && /kcal less per can/.test(rows[0]), "DT115: the same tuna in another state leads the swaps, with the difference per can: " + rows[0]?.slice(0, 160));

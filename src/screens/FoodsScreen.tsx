@@ -1,9 +1,10 @@
 import { ClearField } from "../components/ClearField";
-import { alsoSeen, seenLine, type MemberFood } from "../memberFoods";
+import { alsoSeen, seenLine, asMine, type MemberFood } from "../memberFoods";
+import type { Food } from "../pilot";
 import { cookName } from "../cookWords";
 import { Camera, X, Pencil, Plus } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
-import { findReference, referenceFood, localName, otherNames as refOtherNames } from "../reference";
+import { findReference, referenceFood, localName, otherNames as refOtherNames, synonymsOf } from "../reference";
 import { BAND_LABEL, BAND_LINE_IDLE, bandHint } from "../goal";
 
 import { duplicatePairs } from "../dedupe";
@@ -53,7 +54,9 @@ export function FoodsScreen(p: AppApi) {
     if (!q) return true;
     if (isCode) return (f.barcode ?? "") === q;
     const hay = fold(`${f.name} ${f.brand} ${otherNames(f)}`);
-    return q.length < 3 ? hay.split(/[\s,()/-]+/).some((w) => w.startsWith(qf)) : hay.includes(qf);
+    if (q.length < 3 ? hay.split(/[\s,()/-]+/).some((w) => w.startsWith(qf)) : hay.includes(qf)) return true;
+    // 0.2.103: the other languages' words for what was typed (tuna: tunjevina, Thunfisch, τόνος)
+    return q.length >= 3 && synonymsOf(q.toLowerCase()).some((w) => hay.includes(fold(w)));
   };
   const shown = foods.filter(({ f, b }) => nameHit(f) && (filter === "all" || b === filter));
   // a chip must never hide a match in silence: say how many, and where
@@ -82,6 +85,7 @@ export function FoodsScreen(p: AppApi) {
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
+  const [mfCard, setMfCard] = useState<Food | null>(null); // 0.2.103: a member's food opens its card before you take it
   const mfRows = (mf.q === q ? mf.foods : []).filter((m) => !state.foods.some((f) => (m.barcode && f.barcode === m.barcode) || (f.name.toLowerCase() === m.name.toLowerCase() && (f.brand ?? "").toLowerCase() === m.brand.toLowerCase())));
   const nothing = q.length >= 1 && shown.length === 0 && noLabel.length === 0 && dbRows.length === 0 && !db.busy;
   return (
@@ -162,7 +166,7 @@ export function FoodsScreen(p: AppApi) {
             <div className="row outside-row" key={m.key}>
               <span className="thumb">{m.photo ? <img src={m.photo} alt="" loading="lazy" /> : iconFor(m.name)}</span>
               <div className="row-text">
-                <b className="name-plain">{m.name}</b>
+                <button className="name-link" onClick={() => setMfCard(asMine(m, () => `mf:${m.key}`))}>{m.name}</button>
                 <small>{[m.brand || (m.barcode ? "" : "no barcode"), `${fmt(m.calories, 0)} kcal`, `${fmt(m.protein)} g protein per 100 g`, seenLine(m, p.region)].filter(Boolean).join(" · ")}</small>
               </div>
               <button className="pill pill-small" onClick={() => p.addMemberFood(m)}>Add to my foods</button>
@@ -214,6 +218,7 @@ export function FoodsScreen(p: AppApi) {
         <div className="strip">No foods yet. Scan, type a name, or <button className="link" onClick={p.addStarter}>add twenty starter foods</button>.</div>
       )}
       </>
+      {mfCard && <FoodCard rates={p.rates} food={mfCard} target={p.dayPd} fit={p.fitDay(density(mfCard.protein, mfCard.calories))} close={() => setMfCard(null)} />}
       {cardFood && <FoodCard rates={p.rates} food={p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood} addPhoto={(d) => p.addFoodPhoto(cardFood.id, d)} removePhoto={(i) => p.removeFoodPhoto(cardFood.id, i)} setMain={(i) => p.setMainPhoto(cardFood.id, i)} toggleFavorite={() => p.toggleFavorite(cardFood.id)} insight={{ dayKcal: p.todayKcal, eaten: p.eatenTodayKcal, dayName: p.dayName, goalKey: p.tipGoalKey, requestTip: () => p.requestTip(cardFood.id), setJob: (j) => p.setFoodJob(cardFood.id, j) }} target={p.dayPd} fit={p.fitDay(density(cardFood.protein, cardFood.calories))} close={() => setCardId(null)} review={() => { setImage(""); setEdit(cardFood); }} mix={(() => { const f = p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood; const tip = p.mixFor(f); return { tip, momentName: momentOf(p.moment).name, take: (m: Mix) => { setCardId(null); p.takeMix(f, m); }, ask: () => { setCardId(null); p.askAboutMix(f, tip); } }; })()} />}
     </>
   );

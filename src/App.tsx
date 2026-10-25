@@ -1027,7 +1027,7 @@ export default function App() {
     const t = window.setTimeout(async () => {
       let sent: Record<string, string> = {}; try { sent = JSON.parse(localStorage.getItem("chefmealan-shared-foods") || "{}"); } catch {}
       // 0.2.102: the market is part of what was sent, so a food goes again when Where I shop is set or changed
-      const mark = `${region ?? ""}`;
+      const mark = `${region ?? ""}|v2`; // v2 (0.2.103): every food goes once more, so the catalogue gains the pack photos and the markets
       const due = state.foods.filter((f) => travels(f) && sent[f.id] !== `${f.reviewedAt}|${mark}`).slice(0, 60);
       if (!due.length) return;
       try { await api("/api/members/foods", { foods: due.map(toShare), region: region ?? null }); for (const f of due) sent[f.id] = `${f.reviewedAt}|${mark}`; localStorage.setItem("chefmealan-shared-foods", JSON.stringify(sent)); } catch {}

@@ -10,6 +10,7 @@ import { Letters } from "../components/Letters";
 import { ClearField } from "../components/ClearField";
 import { asMine, seenLine, stemOf, type MemberFood } from "../memberFoods";
 import { sameFood } from "../swaps";
+import { synonymsOf } from "../reference";
 import { nutritionGate, dayGate, type GateLine, type GateWay } from "../gates";
 import { jobOf } from "../foodjob";
 import { WaitSteps, type WaitStep } from "../components/WaitSteps";
@@ -532,7 +533,9 @@ export function JourneyScreen(p: AppApi) {
   // R9 (0.2.33): the taste of the recipe on the plate; a plate of your own has none here, what you search for and add is yours
   const recipeOn = Boolean(state.fromRecipe) || plateParts.length > 0 || items.some((i) => i.dish);
   const recipeTaste = recipeOn ? dishTaste([...items.map((i) => i.food.name), ...opts.map((o) => o.name), ...leftOut.flatMap((l) => l.items.map((i) => i.food.name))]) : null;
-  const matches = q.trim() ? state.foods.filter((f) => (f.name + " " + f.brand).toLowerCase().includes(q.toLowerCase())).slice(0, 60) : [];
+  // 0.2.103: the search on the Plate matches a food's aliases and the other languages' words too (tuna finds Tunjevina)
+  const qWords = q.trim() ? [q.trim().toLowerCase(), ...synonymsOf(q.trim().toLowerCase())] : [];
+  const matches = q.trim() ? state.foods.filter((f) => { const hay = `${f.name} ${f.brand} ${(f.aliases ?? []).join(" ")}`.toLowerCase(); return qWords.some((w) => hay.includes(w)); }).slice(0, 60) : [];
   // R22 (0.2.50, board RS21): what is offered follows What is it?, on a plate of your own too; nothing picked, the recipe's taste
   const shownTaste = p.plateTaste ?? presetOf(recipeTaste);
   const plateTasteOf = offerTaste(p.plateTaste, recipeTaste);
