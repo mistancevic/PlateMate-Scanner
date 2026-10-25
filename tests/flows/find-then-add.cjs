@@ -28,25 +28,29 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   // find, by what was typed: one letter, my foods by word start, nothing else, no database call
   const before = (await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.length));
   await page.getByLabel("Find a food").fill("s"); await page.waitForTimeout(700);
-  ok((await page.locator(".rows .row").count()) >= 1 && (await page.locator(".outside").count()) === 0 && searches.length === 0, "one letter: my foods by word start, nothing from outside");
+  // changed by DT125 (0.2.104): one list for one word; your foods first, then the basic foods as rows of the same list, the product database behind a line
+  ok((await page.locator(".rows .row").count()) >= 1 && (await page.locator(".rows .row-basic").count()) === 0 && searches.length === 0, "one letter: my foods by word start, nothing from outside");
   // two letters: plus foods without a label, still no database
   await page.getByLabel("Find a food").fill("ti"); await page.waitForTimeout(700);
-  ok(await page.getByLabel("Without a label").count() === 1 && searches.length === 0, "two letters: foods without a label join, no database yet");
+  ok(await page.locator(".rows .row-basic").count() >= 1 && searches.length === 0, "two letters: the basic foods join the one list, no database yet");
   // three letters: my foods, foods without a label, and the database, in three labelled groups
   await page.getByLabel("Find a food").fill("skyr"); await page.waitForTimeout(900);
-  ok((await page.locator(".rows .row").count()) >= 1 && /In your foods/.test(await page.locator("main").textContent()), "three letters: my foods first, labelled");
-  ok(searches.length === 1 && await page.getByLabel("In the product database").locator(".row").count() === 2, "and the database, up to five, labelled");
+  ok((await page.locator(".rows .row").first().locator(".name-link").count()) === 1 && /skyr · \d+ foods?/.test(await page.locator(".group-label").first().textContent()), "three letters: one list, my foods first, the word and the count on top");
+  ok(searches.length === 1 && await page.getByRole("button", { name: /More from the product database/ }).count() === 1, "and the database behind one line");
+  await page.getByRole("button", { name: /More from the product database/ }).click(); await page.waitForTimeout(300);
+  ok(await page.getByLabel("In the product database").locator(".row").count() === 2, "the line opens the database rows, up to five");
   ok((await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.length)) === before, "finding added nothing by itself");
   ok(/Can't find what you want\?/.test(await page.locator(".end-add").textContent()), "with results, the end card asks in plain words");
   // a food without a label goes straight in
   await page.getByLabel("Find a food").fill("tikvice"); await page.waitForTimeout(900);
-  await page.getByLabel("Without a label").getByRole("button", { name: /Add to my foods/ }).first().click(); await page.waitForTimeout(400);
-  ok((await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.some((f) => /Tikvice/.test(f.name)))), "Add to my foods puts a food without a label in my foods");
+  await page.locator(".rows .row-basic").first().getByRole("button", { name: "Take it" }).click(); await page.waitForTimeout(400);
+  ok((await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.some((f) => /Tikvice/.test(f.name) && f.refId))), "Take it puts a basic food in my foods, with its identity");
+  await page.waitForTimeout(500);
+  ok(await page.locator(".rows .row-basic").filter({ hasText: /Tikvice/ }).count() === 0, "DT125: the same food is never two rows: the basic row is gone, yours stands");
   // a food without a label saved under the shop's name is found by any of its names, and a chip never hides it in silence
   await page.evaluate(() => localStorage.setItem("chefmealan-region", "munich"));
   await page.getByLabel("Find a food").fill("kupus"); await page.waitForTimeout(900);
-  await page.getByLabel("Without a label").locator(".row").filter({ hasText: "Weißkohl" }).getByRole("button", { name: /Add to my foods/ }).click().catch(async () => {
-    await page.getByLabel("Without a label").getByRole("button", { name: /Add to my foods/ }).first().click(); });
+  await page.locator(".rows .row-basic").filter({ hasText: /Weißkohl|Kupus/ }).first().getByRole("button", { name: "Take it" }).click(); await page.waitForTimeout(400);
   await page.waitForTimeout(400);
   await page.getByLabel("Find a food").fill(""); await page.getByLabel("Find a food").fill("Kupus"); await page.waitForTimeout(900);
   ok((await page.locator(".rows .row").filter({ hasText: /Weißkohl|Kupus|Kiseli/ }).count()) >= 1, "a food saved under its Munich name is found by its Serbian one: " + (await page.locator(".rows .row b").allTextContents()).join(", "));
@@ -54,14 +58,10 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(/more in your foods under/.test(await page.locator(".hidden-by-chip").textContent().catch(() => "")), "a chip that hides the match says so, with Show all");
   await page.locator(".hidden-by-chip").getByRole("button", { name: "Show all" }).click(); await page.waitForTimeout(200);
   ok((await page.locator(".rows .row").count()) >= 1, "Show all brings the match back");
-  // Add all on the Without a label group puts every row in my foods at once
-  await page.getByLabel("Find a food").fill("pa"); await page.waitForTimeout(700);
-  const nRows = await page.getByLabel("Without a label").locator(".row").count();
-  const beforeAll = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.length);
-  await page.getByLabel("Without a label").getByRole("button", { name: "Add all" }).click(); await page.waitForTimeout(400);
-  ok(nRows > 1 && (await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.length)) === beforeAll + nRows, "Add all adds every food without a label in the group: " + nRows);
+  // Add all went with the groups (DT125): a basic food is taken one at a time, from the one list
   // a database product opens the sheet titled by the button
   await page.getByLabel("Find a food").fill("skyr"); await page.waitForTimeout(900);
+  await page.getByRole("button", { name: /More from the product database/ }).click(); await page.waitForTimeout(300);
   await page.getByLabel("In the product database").getByRole("button", { name: /Add to my foods/ }).first().click(); await page.waitForTimeout(800);
   ok(lookups.some((u) => /4008452021131/.test(u)), "a database product is fetched by its barcode");
   // nothing anywhere: says so, and names what Type keeps

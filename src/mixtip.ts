@@ -9,6 +9,7 @@ import type { MomentId } from "./moments";
 import type { DayType } from "./personal";
 import { preTraining, proteinFloor } from "./fitness";
 import { blockedByAllergy } from "./safety";
+import { englishName } from "./foodId";
 
 export type MixCase = "fits" | "under" | "over" | "unknown";
 export type MixKind = "DaaM dessert" | "meal" | "snack";
@@ -87,7 +88,7 @@ const SPREAD = /nutella|spread|aufstrich|creme|crème|peanut ?butter|erdnussmus|
 const BREAKFAST = /oat|hafer|müsli|muesli|granola|bread|brot|toast|knäcke|cracker/i;
 const MILK = /milk|milch|kefir|buttermilk/i;
 export function catOf(f: Food): Cat {
-  const { job, taste } = jobOf(f), role = roleOf(f.name), n = f.name;
+  const { job, taste } = jobOf(f), n = englishName(f), role = roleOf(n); // DT125: by what the food is, in English
   if (job === "Drink" && !MILK.test(n)) return "drink";
   if (role === "supplement") return "supplement";
   if (SAUCE.test(n)) return "sauce";

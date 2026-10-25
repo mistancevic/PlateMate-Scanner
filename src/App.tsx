@@ -82,6 +82,7 @@ import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, isIngredient, type Mix, type MixTip } from "./mixtip";
 import { ratesOf } from "./letters";
 import { asMine, travels, toShare } from "./memberFoods";
+import { identityTwins } from "./foodId";
 import { findReference, referenceFood, localName, otherNames, marketFoods } from "./reference";
 import { startGrams, jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
@@ -1019,6 +1020,27 @@ export default function App() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  // DT125 (0.2.104): two foods of yours with the same identity (the same barcode, or the same basic food) fold into one, once,
+  // the older kept; the plate's items point at the one that stays. A line says so. Look-alikes stay a question to you.
+  const twinsDone = useRef(false);
+  useEffect(() => {
+    if (twinsDone.current || !state.foods.length) return;
+    const twins = identityTwins(state.foods);
+    if (!twins.length) { twinsDone.current = true; return; }
+    twinsDone.current = true;
+    setState((s) => {
+      let foods = s.foods, items = s.items;
+      for (const [keep0, other] of twins) {
+        const keep = foods.find((x) => x.id === keep0.id); if (!keep || !foods.some((x) => x.id === other.id)) continue;
+        const merged = mergeFoods(keep, other);
+        foods = foods.filter((x) => x.id !== other.id).map((x) => (x.id === keep.id ? merged : x));
+        items = repoint(repoint(items, other.id, merged), keep.id, merged);
+      }
+      return { ...s, foods, items };
+    });
+    notify(`${twins.length === 1 ? "Two entries of the same food" : `${twins.length + 1} entries of the same foods`} folded into one.`);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.foods.length]);
   // DT115 (0.2.97): every reviewed food of yours goes to the members' catalogue once (no photo, no name); a food changed after
   // a new review goes again. Kept in a small list of what was sent, so nothing is sent twice.
   const shareOn = cloudEnabled ? Boolean(user && profileReady && (profile.role === "coach" || profile.coachId)) : true;

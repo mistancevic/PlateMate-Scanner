@@ -55,6 +55,8 @@ export type Food = Nutrition & {
   barcode?: string;
   // other names the same food goes by (a food without a label carries English, German and Serbian in both scripts); search reads them
   aliases?: string[];
+  // DT125 (0.2.104): the basic food this is a copy of, its identity in the basic foods table
+  refId?: string;
   // a counted food: the pack prints a serving (1 bar 45 g, 1 piece 30 g); what Mealan moves then snaps to whole servings
   serving?: { grams: number; name: string };
   // DT82: a food packed in a liquid (tuna in olive oil): net and drained weight, the liquid, and what the values are per

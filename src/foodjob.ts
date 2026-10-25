@@ -1,4 +1,5 @@
 // What a food is, by its job on a plate. A property of the food, never a verdict: that depends on the day (see todayLine).
+import { englishName } from "./foodId";
 import { density, type Food } from "./pilot";
 import { roleOf } from "./swaps";
 import { kindOf, gramsOfOne } from "./counted";
@@ -7,16 +8,19 @@ export type Job = (typeof JOBS)[number];
 const SPREAD = /nutella|spread|aufstrich|creme|crème|butter|peanut ?butter|erdnussmus|nussmus|honig|honey|jam|marmelade|konfit/i;
 const DRINK = /drink|juice|saft|milk\b|milch\b|cola|soda|tea\b|tee\b|coffee|kaffee|smoothie|shake|wasser|water|bier|beer|wein|wine/i;
 export function jobOf(f: Food): { job: Job; note: string; taste: "sweet" | "savoury" | null; mine: boolean } {
-  const role = roleOf(f.name);
+  // DT125 (0.2.104): the job comes from what the food is, by its English name, never from a name in another language
+  // (Thunfisch in Wasser read as a Drink because of Wasser)
+  const name = englishName(f);
+  const role = roleOf(name);
   const sugarsLine = f.table?.find((r) => r.key === "sugars")?.amount ?? null;
   const taste = role === "sweet" || role === "fruit" ? "sweet" : role === "savoury" ? "savoury" : sugarsLine !== null && sugarsLine >= 25 ? "sweet" : null;
-  if (f.job && (JOBS as readonly string[]).includes(f.job)) return { job: f.job as Job, note: SPREAD.test(f.name) ? "spread" : "", taste, mine: true };
+  if (f.job && (JOBS as readonly string[]).includes(f.job)) return { job: f.job as Job, note: SPREAD.test(name) ? "spread" : "", taste, mine: true };
   const kcal = f.calories ?? 0, pd = density(f.protein, f.calories) ?? 0;
   const fat = kcal ? ((f.fats ?? 0) * 9) / kcal : 0, carb = kcal ? ((f.carbs ?? 0) * 4) / kcal : 0;
   const sugars = f.table?.find((r) => r.key === "sugars")?.amount ?? null;
-  const spread = SPREAD.test(f.name);
+  const spread = SPREAD.test(name);
   let job: Job;
-  if ((f.basis as string) === "100ml" || (DRINK.test(f.name) && kcal < 120)) job = "Drink";
+  if ((f.basis as string) === "100ml" || (DRINK.test(name) && kcal < 120)) job = "Drink";
   else if (pd >= 8) job = "Protein base";
   else if (kcal > 0 && kcal < 60) job = "Volume food";
   else if (pd < 3 && (role === "sweet" || spread || (sugars !== null && sugars >= 25))) job = "Flavour food";

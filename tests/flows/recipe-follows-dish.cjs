@@ -69,7 +69,8 @@ const tacos = { url: "https://example.com/chicken-tacos/", recipe: { title: "Chi
     await search(page, "nutella");
     ok(await offered(page, "Nutella") === 0 && await line(page) === "Nutella is in your foods, but it doesn't go with this dish.", "the savoury dish holds Nutella back, and says why");
     await search(page, "cottage");
-    ok(await offered(page, "Cottage cheese") === 1, "a basic, cottage cheese, is offered for the tacos");
+    // DT125: your copy of the basic food and the table's row are one food, so one row
+    ok(await offered(page, "Cottage cheese") === 1 && (await page.locator(".row-basic").filter({ hasText: "Cottage cheese" }).count()) === 0, "cottage cheese is offered for the tacos, once: your copy, the basic food folded into it");
     // a plate of your own: Nutella alone
     page = await open(); await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(500);
     await page.locator(".row-food").filter({ hasText: "Nutella" }).getByRole("button", { name: /Add/ }).click(); await page.waitForTimeout(700);
@@ -78,7 +79,8 @@ const tacos = { url: "https://example.com/chicken-tacos/", recipe: { title: "Chi
     const tipText = await tip.textContent();
     ok(!/Chicken|Salmon|Tuna/.test(tipText), "his offers for Nutella hold back chicken, salmon and tuna: " + tipText.replace(/\s+/g, " ").slice(0, 160));
     await search(page, "chicken");
-    ok(await offered(page, "Chicken breast") === 1 && (await page.locator(".held-back").count()) === 0, "on your own plate your search still offers chicken: your choice");
+    ok(await page.locator(".row-food:not(.row-basic):not(.row-member)").filter({ hasText: "Chicken breast" }).count() === 1 && (await page.locator(".held-back").count()) === 0, "on your own plate your search still offers chicken: your choice");
+    ok((await page.locator(".row-basic").filter({ hasText: "Chicken breast, raw" }).count()) === 1, "DT125: the basic foods you don't have follow, with Take it");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   } catch (e) { ok(false, "walkthrough error: " + e.message.split("\n")[0]); }
   await b.close(); server.kill();

@@ -54,32 +54,32 @@ const U = "http://127.0.0.1:3267";
   ok(shared && shared.region === "munich" && shared.foods.length === 2 && shared.foods.some((f) => f.name === "Tuna in olive oil, drained" && f.barcode === "8004030044012") && !JSON.stringify(shared).includes("base64"), "DT115: your two reviewed foods travel once, no photo, no starter foods: " + (shared ? shared.foods.map((f) => f.name).join(", ") : "nothing sent"));
   const sentNote = await page.evaluate(() => localStorage.getItem("chefmealan-shared-foods"));
   ok(sentNote && Object.keys(JSON.parse(sentNote)).length >= 2, "DT115: what was sent is noted, so nothing goes twice");
-  // Find a food: Members' foods, your market first
+  // Find a food (changed by DT125, 0.2.104): one list; your tuna first, then the members' tins, your market first, then the basic tuna
   await page.getByLabel("Find a food").fill("tuna"); await page.waitForTimeout(1200);
-  const mf = page.locator(".members-foods");
-  ok(await mf.count() === 1, "DT115: a Members' foods group in Find a food");
+  const mf = page.locator(".rows .row-member");
+  ok(await mf.count() === 4, "DT115, DT125: the four foods the others scanned as rows of the one list: " + await mf.count());
   const names = await mf.locator(".name-link").allTextContents();
-  ok(names.length === 4 && names.includes("Τόνος σε νερό") && !names.includes("Tuna in olive oil, drained"), "DT115, 0.2.100: the four foods the others scanned, the Greek tuna found by the English word, never your own: " + names.join(", "));
+  ok(names.includes("Τόνος σε νερό") && !names.includes("Tuna in olive oil, drained"), "DT115, 0.2.100: the Greek tuna found by the English word, never your own: " + names.join(", "));
+  const order = await page.locator(".rows .row").allTextContents();
+  ok(/Tuna in olive oil/.test(order[0]) && /Tuna in water, drained/.test(order[1]) && /basic food/.test(order[order.length - 1]), "DT125: yours first, then members', your market (Munich) first, the basic food last");
   // 0.2.100: and the other way round, the Serbian word finds them all
   await page.getByLabel("Find a food").fill("tunjevina"); await page.waitForTimeout(1200);
-  ok((await page.locator(".members-foods .name-link").allTextContents()).length >= 3, "0.2.100: tunjevina finds the tuna of every language");
+  ok((await page.locator(".rows .row-member").count()) >= 3, "0.2.100: tunjevina finds the tuna of every language");
   await page.getByLabel("Find a food").fill("tuna"); await page.waitForTimeout(1200);
-  const mt = await mf.textContent();
+  const mt = (await mf.allTextContents()).join(" ");
   ok(/seen in Belgrade/.test(mt) && /seen in Cyprus/.test(mt) && /no barcode/.test(mt), "DT115: each says where it was seen; a food without a barcode says so");
-  // the line under your own tuna
-  const also = page.locator(".also-seen");
-  ok(await also.count() === 1 && /Also seen by members, in place of Tuna in olive oil/.test(await also.textContent()) && /Tuna in (water|brine)/.test(await also.textContent()), "DT115: one line under your tuna: " + (await also.textContent()));
-  // Add to my foods copies it
-  await mf.locator(".row", { hasText: "Tuna in water" }).getByRole("button", { name: "Add to my foods" }).click(); await page.waitForTimeout(600);
+  ok(await page.locator(".also-seen").count() === 0 && await page.locator(".members-foods").count() === 0, "DT125: the old groups and the line under your tuna are gone; one list");
+  // Take it copies it
+  await mf.filter({ hasText: "Tuna in water" }).getByRole("button", { name: "Take it" }).click(); await page.waitForTimeout(600);
   let s = await st();
   const copy = s.foods.find((f) => f.name === "Tuna in water, drained");
   ok(copy && copy.calories === 99 && copy.barcode === "8004030044005" && copy.source === "Members' foods" && /checked by a member/.test(copy.notes), "DT115: a copy in your foods with the values and the source");
   // 0.2.101: the pack's photo from Open Food Facts travels as a link when the server could fetch it; here the workspace cannot reach OFF, so the row shows the icon and the copy has no photo
   ok(!copy.photo || /^https:\/\/images\.openfoodfacts\.org\//.test(copy.photo), "0.2.101: a copy's photo is only ever an Open Food Facts link: " + (copy.photo || "none"));
-  ok(await mf.locator(".name-link").count() === 3, "DT115: the copied food left the members' group");
+  ok(await page.locator(".rows .row-member").count() === 3 && await page.locator(".rows .row").filter({ hasText: "Tuna in water, drained" }).count() === 1, "DT125: the copied food is one row, yours, never twice");
   // 0.2.103: the copy is found by the English word on the Plate, and the Greek tin opens its card before you take it
   ok(Array.isArray(copy.aliases) && copy.aliases.includes("tunjevina"), "0.2.103: the copy carries the other languages' words: " + JSON.stringify(copy.aliases));
-  await mf.locator(".name-link", { hasText: "Τόνος" }).click(); await page.waitForTimeout(600);
+  await page.locator(".rows .row-member .name-link", { hasText: "Τόνος" }).click(); await page.waitForTimeout(600);
   ok(/Τόνος σε νερό/.test(await text(".food-card, .sheet, main")) && await page.getByRole("button", { name: /Close/ }).count() >= 1, "0.2.103: a member's food opens its card");
   await page.getByRole("button", { name: /Close/ }).first().click(); await page.waitForTimeout(400);
   // the barcode answers from the catalogue before Open Food Facts

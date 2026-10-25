@@ -10,7 +10,7 @@ import { Letters } from "../components/Letters";
 import { ClearField } from "../components/ClearField";
 import { asMine, seenLine, stemOf, type MemberFood } from "../memberFoods";
 import { sameFood } from "../swaps";
-import { synonymsOf } from "../reference";
+import { oneList, rowLine } from "../oneList";
 import { nutritionGate, dayGate, type GateLine, type GateWay } from "../gates";
 import { jobOf } from "../foodjob";
 import { WaitSteps, type WaitStep } from "../components/WaitSteps";
@@ -533,12 +533,21 @@ export function JourneyScreen(p: AppApi) {
   // R9 (0.2.33): the taste of the recipe on the plate; a plate of your own has none here, what you search for and add is yours
   const recipeOn = Boolean(state.fromRecipe) || plateParts.length > 0 || items.some((i) => i.dish);
   const recipeTaste = recipeOn ? dishTaste([...items.map((i) => i.food.name), ...opts.map((o) => o.name), ...leftOut.flatMap((l) => l.items.map((i) => i.food.name))]) : null;
-  // 0.2.103: the search on the Plate matches a food's aliases and the other languages' words too (tuna finds Tunjevina)
-  const qWords = q.trim() ? [q.trim().toLowerCase(), ...synonymsOf(q.trim().toLowerCase())] : [];
-  const matches = q.trim() ? state.foods.filter((f) => { const hay = `${f.name} ${f.brand} ${(f.aliases ?? []).join(" ")}`.toLowerCase(); return qWords.some((w) => hay.includes(w)); }).slice(0, 60) : [];
+  // DT125 (0.2.104): the Plate's search is the one list: your foods by any of their names, then members' and basic foods
+  const [plateMf, setPlateMf] = useState<{ q: string; foods: MemberFood[] }>({ q: "", foods: [] });
+  useEffect(() => {
+    const w = q.trim(); if (w.length < 2) { setPlateMf({ q: "", foods: [] }); return; }
+    const t = window.setTimeout(async () => { const foods = await p.memberFoods(w); setPlateMf({ q: w, foods }); }, 350);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q]);
+  const plateList = q.trim() ? oneList({ q: q.trim(), mine: state.foods, members: plateMf.q === q.trim() ? plateMf.foods : [], db: [], region: p.region, uid, basics: 4 }) : null;
+  const matches = plateList ? plateList.rows.filter((r) => r.kind === "mine").map((r) => r.food).slice(0, 60) : [];
+
   // R22 (0.2.50, board RS21): what is offered follows What is it?, on a plate of your own too; nothing picked, the recipe's taste
   const shownTaste = p.plateTaste ?? presetOf(recipeTaste);
   const plateTasteOf = offerTaste(p.plateTaste, recipeTaste);
+  const plateOthers = plateList ? plateList.rows.filter((r) => r.kind !== "mine" && goesInDish(plateTasteOf, r.food.name)).slice(0, 6) : [];
   const found = matches.filter((f) => goesInDish(plateTasteOf, f.name));
   const heldBack = matches.filter((f) => !goesInDish(plateTasteOf, f.name)).map((f) => f.name).slice(0, 3);
   const isEmptyPart = (part: string) => !items.some((i) => i.part === part) && !opts.some((o) => o.part === part) && !leftOut.some((l) => l.part === part) && emptyParts.some((x) => x.part === part);
@@ -1361,6 +1370,15 @@ export function JourneyScreen(p: AppApi) {
                 </div>
               );
             })}
+          {/* DT125 (0.2.104): the Plate's search reads the one list too: after your foods, the members' and the basic foods, Take it
+              puts a copy in your foods and on the plate */}
+          {q.trim() && plateOthers.map((r) => (
+            <div className={`row row-food row-${r.kind}`} key={r.key}>
+              <span className="thumb thumb-sm">{r.food.photo ? <img src={r.food.photo} alt="" /> : (r.kind === "basic" ? "📘" : iconFor(r.food.name))}</span>
+              <div className="row-text"><b>{r.names[0]}</b><small>{rowLine(r)}</small></div>
+              <button className="pill pill-small" onClick={() => { if (r.kind === "member") p.addMemberFood(r.member, "plate"); else { const f = { ...r.food, id: uid(), reviewedAt: new Date().toISOString() }; setState((st) => ({ ...st, foods: [f, ...st.foods] })); add(f); } }}>Take it</button>
+            </div>
+          ))}
           {state.foods.length === 0 && <small>No saved foods yet. Scan or type one above.</small>}
         </div>
         {!q.trim() && state.foods.length > quick.picks.length && (
