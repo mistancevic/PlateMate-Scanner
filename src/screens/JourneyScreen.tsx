@@ -10,6 +10,8 @@ import { Letters } from "../components/Letters";
 import { ClearField } from "../components/ClearField";
 import { asMine, seenLine, stemOf, type MemberFood } from "../memberFoods";
 import { sameFood } from "../swaps";
+import { nutritionGate, dayGate, gramsLine, type GateLine, type GateWay } from "../gates";
+import { jobOf } from "../foodjob";
 import { WaitSteps, type WaitStep } from "../components/WaitSteps";
 import { aggregate, density, uid, solveIngredient, servingLabel, sizedFor } from "../pilot";
 import { fromMeal } from "../planned";
@@ -835,6 +837,38 @@ export function JourneyScreen(p: AppApi) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dishSig, dishWanted, dishTry]);
   const dishNow = dish && dish.sig === dishSig && dishWanted ? dish : null;
+  // DT116 (0.2.98, boards G3 and Stories69): the three gates. Culinary is Chef Mealan's read (dishNow) with the code lines in
+  // front; nutrition and your day are arithmetic (src/gates.ts). Each answers for itself; all three green is the sweet spot.
+  const gateOn = items.length >= 1 && !imported && !madeBy && !partsMode && (t.calories ?? 0) >= 100;
+  const nutri = gateOn ? nutritionGate({ items, kind: p.kind === "dessert" ? "dessert" : p.pick === "snack" || mealWord === "snack" ? "snack" : "meal", beforeTraining: p.moment === "before", mealWord }) : { ok: true as const };
+  const dayLine = gateOn ? dayGate({ items, moment: p.moment, now: new Date(), window: lifestyleOf(p.personal).window, kind: p.kind, mealWord, needsCooking }) : { ok: true as const };
+  const [gateKept, setGateKept] = useState<string>("");
+  const culinaryOk = dishNow?.status === "done" ? dishNow.makesIt : null;
+  const sweetSpotOf = (noIngredient: boolean) => gateOn && culinaryOk === true && nutri.ok && dayLine.ok && noIngredient;
+  // the ways out, in the plate's own words
+  const addBase = (job: "Protein base" | "Carb base") => {
+    const plateFoods = items.map((i) => state.foods.find((x) => x.id === i.food.id) ?? i.food);
+    const pick = state.foods.filter((f) => f.calories !== null && f.protein !== null && jobOf(f).job === job && fitsPlate(f, plateFoods))
+      .sort((a, b) => (job === "Protein base" ? (density(b.protein, b.calories) ?? 0) - (density(a.protein, a.calories) ?? 0) : (b.carbs ?? 0) - (a.carbs ?? 0)))[0];
+    if (!pick) { p.openOut("plate"); return; }
+    add(pick); notify(`${fmt(startGrams(pick), 0)} g ${cookName(pick.name).short.toLowerCase()} on the plate.`);
+  };
+  const wayButton = (w: GateWay, k: number) => {
+    const primary = k === 0 ? " pill-primary" : "";
+    if (w === "protein") return <button key={w} className={`pill pill-small${primary}`} onClick={() => addBase("Protein base")}>Add a protein base</button>;
+    if (w === "carb") return <button key={w} className={`pill pill-small${primary}`} onClick={() => addBase("Carb base")}>Add a carb base</button>;
+    if (w === "snack") return <button key={w} className={`pill pill-small${primary}`} onClick={() => p.setPick("snack")}>Make it a snack</button>;
+    if (w === "nocook") return <button key={w} className={`pill pill-small${primary}`} onClick={() => p.openOut("plate")}>Ask {CHEF_NAME} for a plate without cooking</button>;
+    if (w === "window") return null;
+    return <button key={w} className="pill pill-small" onClick={() => setGateKept(dishSig)}>Keep it as it is</button>;
+  };
+  const gateLine = (name: string, g: GateLine) => (
+    <div key={name} className={`gate-line-row ${g.ok ? "gate-yes" : "gate-no"}`}>
+      <b>{g.ok ? "✓" : "✕"} {name}</b>
+      {g.ok === false && <small>{g.why}</small>}
+      {g.ok === false && gateKept !== dishSig && <div className="button-row">{g.ways.map((w, k) => wayButton(w, k))}</div>}
+    </div>
+  );
   // DT110 (0.2.94, board Stories67; Milan 25 October 00:25: three ideas, none of value, on a plate of 1,232 kcal for a breakfast of
   // 619 to 757): a plate over its meal (C31) never goes to the ideas. Code says what it is and offers three ways.
   const [bigKept, setBigKept] = useState<string | null>(null);
@@ -1048,6 +1082,8 @@ export function JourneyScreen(p: AppApi) {
             </div>
             {/* DT108 (0.2.92): four letters read the plate against your day, F C Fi P */}
             {p.rates && <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} who="the plate" />}
+            {/* DT116 (0.2.98, Milan 10:05): the plain grams under the letters */}
+            {(t.fats !== null || t.carbs !== null) && <small className="readout-grams">{gramsLine({ fats: t.fats, carbs: t.carbs, fiber: t.fiber })}</small>}
             {extras(items)}
           </section>
         )}
@@ -1190,7 +1226,7 @@ export function JourneyScreen(p: AppApi) {
         )}
         {/* DT97 (0.2.90, board Stories62): one place for Chef Mealan above the buttons, there from the second food on, so nothing
             below it moves when his answer comes. His verdict (DT93, rule 2), then Fit's line under it, then the three ways. */}
-        {(dishWanted || (fit && !imported) || (ingredientsOn.length > 0 && !imported) || bigPlate) && (
+        {(dishWanted || (fit && !imported) || (ingredientsOn.length > 0 && !imported) || bigPlate || (gateOn && (!nutri.ok || !dayLine.ok))) && (
           <section className="card gate-card" aria-label={`${CHEF_NAME} on this plate`}>
             <b><ChefHat size={16} /> {CHEF_NAME}</b>
             {bigPlate && (<div className="gate-big">
@@ -1216,16 +1252,20 @@ export function JourneyScreen(p: AppApi) {
               <small>{CHEF_NAME} could not read your plate.</small>
               <div className="button-row"><button className="pill pill-small" onClick={() => setDishTry((n) => n + 1)}>Try again</button></div>
             </>)}
-            {dishNow && dishNow.status === "done" && dishNow.makesIt && dishNow.why && !bigPlate && <small className="gate-ok">{dishNow.why}</small>}
+            {dishNow && dishNow.status === "done" && dishNow.makesIt && dishNow.why && !bigPlate && <div className="gate-line-row gate-yes"><b>✓ Culinary</b><small>{dishNow.why}</small></div>}
             {dishNow && dishNow.status === "done" && !dishNow.makesIt && dishKept !== dishSig && !bigPlate && (<>
-              <small>{dishNow.why}</small>
+              <div className="gate-line-row gate-no"><b>✕ Culinary</b><small>{dishNow.why}</small></div>
               <div className="button-row">
                 {chefable && <button className="pill pill-small pill-primary" onClick={() => void askChef(items, [])}>Make it a {mealWord}{dishNow.around ? ` around the ${cookName(dishNow.around).short.toLowerCase()}` : ""}</button>}
                 {dishNow.betterAs === "snack" && <button className="pill pill-small" onClick={() => p.setPick("snack")}>Make it a snack</button>}
                 <button className="pill pill-small" onClick={() => setDishKept(dishSig)}>Keep it as it is</button>
               </div>
             </>)}
-            {dishNow && dishNow.status === "done" && !dishNow.makesIt && dishKept === dishSig && <small className="gate-ok">Kept as it is.</small>}
+            {dishNow && dishNow.status === "done" && !dishNow.makesIt && dishKept === dishSig && <div className="gate-line-row gate-yes"><b>✓ Culinary</b><small>Kept as it is.</small></div>}
+            {/* DT116: nutrition and your day, each its own line; the sweet spot when all three hold */}
+            {gateOn && !bigPlate && (dishNow?.status === "done" || !nutri.ok || !dayLine.ok) && gateLine("Nutrition", nutri)}
+            {gateOn && !bigPlate && (dishNow?.status === "done" || !nutri.ok || !dayLine.ok) && gateLine("Your day", dayLine)}
+            {sweetSpotOf(ingredientsOn.length === 0) && <small className="gate-sweet">DaaM Good spot: a dish, the numbers, and your day, all three.</small>}
             {fit && !imported && <small className="fit-note">{/^Fit /.test(fit.note) ? <><b>Fit</b> {fit.note.slice(4)}</> : fit.note}{fit.id && fit.before !== undefined && fit.before !== Math.round(items.find((i) => i.id === fit.id)?.grams ?? -1) ? <> <button className="link pt-inline" onClick={() => { updateItem(fit.id!, { grams: fit.before! }); setFit(null); }}>Undo</button></> : null}</small>}
             {fitShort && !madeBy && (<>
               <small>These foods top out at {pdText(pd)} within their portions{share && (t.calories ?? 0) < share.kcal * 0.6 ? `, and ${fmt(t.calories, 0)} kcal is under half a ${mealWord}` : ""}. {CHEF_NAME} can:</small>

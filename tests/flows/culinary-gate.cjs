@@ -75,7 +75,7 @@ const U = "http://127.0.0.1:3262";
   await page.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "A peanut banana toast with the bar on the side: a plain lunch.", around: "Wholegrain bread", betterAs: "meal" }) }));
   await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); const f = (id) => s.foods.find((x) => x.id === id); s.items = [{ id: "a", food: f("bar"), grams: 50, locked: false }, { id: "d", food: f("f-bread"), grams: 80, locked: false }, { id: "e", food: f("f-banana"), grams: 120, locked: false }, { id: "c", food: f("pb"), grams: 20, locked: false }]; s.title = "Peanut banana toast"; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
   await page.reload(); await page.waitForTimeout(1800);
-  ok(await page.locator(".gate-line").count() === 0 && /A peanut banana toast with the bar on the side/.test(await text(".gate-ok")), "DT93: a plate that is food: no red lines, Chef Mealan's one line that says what it is");
+  ok(await page.locator(".gate-line").count() === 0 && /A peanut banana toast with the bar on the side/.test(await text(".gate-card .gate-yes")), "DT93, DT116: a plate that is food: no red lines, Chef Mealan's one line that says what it is");
   // DT98 (0.2.90): the cooking foods as chips; x takes one out
   await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.cooking = ["ground cinnamon", "lemon zest"]; s.cookingFor = s.items.map((i) => i.food.id); localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
   await page.reload(); await page.waitForTimeout(1500);

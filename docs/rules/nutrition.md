@@ -52,6 +52,14 @@ N25. Numbers come from the foods and their grams; each value is the food's label
 
 N26. Four letters read a food, a plate or a recipe against the person's day, in the EU label order: F fat, C carbohydrate, Fi fibre, P protein. Each letter reads the macro's grams per 100 kcal against the day's rate, with the PD bands (N12): capital with a plus from 1.5 times the rate (High, High+), capital from 0.9 (On plan), small from 0.6 (Low), small with a minus under that (Low−), a question mark when the food has no value for it. Protein's letter never disagrees with its PD band. The rates come from the plan: protein from the PD target, fat and carbs from the day's numbers (fat 30 percent of energy, carbs the rest), fibre 14 g per 1,000 kcal (Dietary Guidelines for Americans 2020 to 2025) until the plan has its own. A letter says the level, never good or bad. Code: src/letters.ts; shown on the Plate's readout, each food row and the food card (DT108, 0.2.92). From the first version of 21 September (XP, XF, XC, XFi and the string [ P | f | C | fi ]).
 
+N27. The nutrition gate, fat: more than half of a meal's energy from fat fails the gate (a snack or a dessert is not held to it). The line says the share and the grams. Code: `nutritionGate` in src/gates.ts (DT116, 0.2.98).
+
+N28. The nutrition gate, a supplement: more than half of the plate's protein from foods of the kind supplement (whey, a protein powder, a shake) fails the gate, once the plate has 15 g protein or more: a shake with biscuits is not a lunch. Code: `nutritionGate`.
+
+N29. The nutrition gate, carbs before training: for the meal before training, carbs under 10 percent of the energy fail the gate; elsewhere a low-carb plate is a choice, not a fault. Fibre under a few grams is not a check yet: too many foods have no value (0.2.98). Code: `nutritionGate`.
+
+N30. Your day, version 1: the third gate reads the plate against the moment and the time of day. Before training, a meeting or travel: nothing to cook. Before training: under 600 kcal. After training: protein first, 15 g at least (N40 to N42 behind it). Outside the eating window from Lifestyle, a plate of 300 kcal or more sits on tomorrow. The week, budget and where you eat wait for version 2. Code: `dayGate` in src/gates.ts.
+
 ## 4. What is counted
 
 N30. Oil taken up in frying: 15 % of the fried food's weight, an estimate, never the whole pot (C46). Code: src/frying.ts.
@@ -86,6 +94,8 @@ N53. The app tells people Chef Mealan is an AI chef that can make mistakes: chec
 
 ## 7. Not yet a rule, open
 
+- The nutrition gate's fibre check (N29) waits for fibre values in the catalogue.
+
 - The nutrition gate proper. A plate the numbers alone pass, but a person should not eat as a meal: the make-up is off (a lunch that is three quarters fat, a meal with no fibre, a dinner of protein powder and oil). Today only the size is caught (N15) and the PD. Proposed: a few plain checks by code on the plate as it stands, each with a line in words and never a block: fat over 50 % of the meal's energy; carbs under 10 % on a training day; fibre under a few grams where the foods have a table; more than half the protein from a supplement. Milan decides which hold.
 - Micronutrients: nothing in the app yet; a plate's sugars, saturates and salt are shown for information where the foods have a full table.
 - Under 18: excluded for now; the logic for a teen's protein range (1.3 to 1.8 g per kg for adolescent athletes) is noted, not built.
@@ -100,3 +110,4 @@ N53. The app tells people Chef Mealan is an AI chef that can make mistakes: chec
 - 23 October: N14, N31, N34.
 - 24 October: N12 for a meal, N24 the range, N33. First draft of this file.
 - 24 October, night: N26, the four letters (0.2.92).
+- 25 October: N27 to N30, the nutrition gate and Your day (0.2.98).

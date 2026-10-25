@@ -111,6 +111,7 @@ Every place that offers, accepts or moves a food, and the rules it goes through.
 | Fit | moves the densest free food within its portion | C10, C12, C13 | `fit` in src/screens/JourneyScreen.tsx, src/foodjob.ts |
 | The portion line | red line under a food outside its portion | C10, C11 | `portionLine` in src/foodjob.ts |
 | The culinary gate | reads two or more foods, says whether they make the meal; a failed read says so, with Try again (DT104) | C24, C30, C31 | /api/dish in server.ts, the Plate |
+| The three gates | Chef Mealan's card: Culinary (C30 with C6 and C31 in front), Nutrition (N27 to N29), Your day (N30); the sweet spot when all three hold (DT116) | C30, C6, C31; N27 to N30 | `gateLine` in src/screens/JourneyScreen.tsx, src/gates.ts |
 | A plate over its meal | says it is about two breakfasts and offers Make it two, Shrink it to one, Keep it; never the ideas (DT110) | C31, C10 | `bigPlate`, `makeItN`, `shrinkToOne` in src/screens/JourneyScreen.tsx |
 | The ingredient line | an ingredient on the plate gets a line at once, by code, before any read: Take it out, Ask Chef Mealan for a dish around it (DT105) | C6 | `isIngredient`, the gate card in src/screens/JourneyScreen.tsx |
 | A chat answer | the foods Chef Mealan names become rows: + Add, Take it out, Scan it; a name the rules refuse is no row (DT106) | C6, C20, C21, C10 | `chatRows` in src/chatFoods.ts, `fitsPlate` |

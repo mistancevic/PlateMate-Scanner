@@ -2100,3 +2100,10 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 /* DT115 (0.2.97): members' foods in Find a food, and the one line under a food of yours */
 .members-foods { margin-top: 12px; }
 .also-seen { margin: 6px 0 2px; font-size: var(--fs-small); color: var(--muted); } .also-seen .link { font-size: var(--fs-small); font-weight: 700; }
+/* DT116 (0.2.98): the three gates in Chef Mealan's card, and the grams under the letters */
+.gate-line-row { display: grid; gap: 4px; padding: 6px 0; border-top: 1px solid var(--line); }
+.gate-line-row:first-of-type { border-top: 0; }
+.gate-line-row > b { font-size: var(--fs-label); } .gate-yes > b { color: #1b7f4b; } .gate-no > b { color: #b3261e; }
+.gate-line-row small { color: var(--ink); }
+.gate-sweet { display: block; font-weight: 700; color: #1b7f4b; }
+.readout-grams { display: block; margin-top: 6px; opacity: .92; }
