@@ -549,7 +549,7 @@ async function mfPut(req: express.Request, f: MemberFood) {
 }
 app.post("/api/members/foods", requireUser, requireMember, async (req, res) => {
   try {
-    const region = String(req.body.region ?? "elsewhere").slice(0, 20);
+    const region = req.body.region ? String(req.body.region).slice(0, 20) : ""; // no market set: the entry carries none
     const foods = (Array.isArray(req.body.foods) ? req.body.foods : []).slice(0, 60);
     const now = new Date().toISOString();
     let n = 0;
@@ -559,7 +559,7 @@ app.post("/api/members/foods", requireUser, requireMember, async (req, res) => {
       if (/reference table/i.test(String(x.source ?? ""))) continue; // the basic foods are shared already
       const barcode = /^\d{8,14}$/.test(String(x.barcode ?? "")) ? String(x.barcode) : undefined;
       const f: MemberFood = { key: mfKeyOf({ barcode, name, brand }), name, brand, ...(barcode ? { barcode } : {}), calories: mfNum(x.calories), protein: mfNum(x.protein), fats: mfNum(x.fats), carbs: mfNum(x.carbs), fiber: mfNum(x.fiber),
-        serving: x.serving && typeof x.serving.grams === "number" ? { grams: x.serving.grams, name: String(x.serving.name ?? "piece").slice(0, 20) } : null, readyToEat: x.readyToEat !== false, source: String(x.source ?? "label").slice(0, 60), markets: { [region]: now }, updatedAt: now, n: 0 };
+        serving: x.serving && typeof x.serving.grams === "number" ? { grams: x.serving.grams, name: String(x.serving.name ?? "piece").slice(0, 20) } : null, readyToEat: x.readyToEat !== false, source: String(x.source ?? "label").slice(0, 60), markets: region ? { [region]: now } : {}, updatedAt: now, n: 0 };
       if (barcode && n < 12) f.photo = await offFrontPhoto(barcode); // at most a dozen lookups per send
       await mfPut(req, f); n++;
     }

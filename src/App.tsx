@@ -1026,13 +1026,15 @@ export default function App() {
     if (!shareOn) return;
     const t = window.setTimeout(async () => {
       let sent: Record<string, string> = {}; try { sent = JSON.parse(localStorage.getItem("chefmealan-shared-foods") || "{}"); } catch {}
-      const due = state.foods.filter((f) => travels(f) && sent[f.id] !== f.reviewedAt).slice(0, 60);
+      // 0.2.102: the market is part of what was sent, so a food goes again when Where I shop is set or changed
+      const mark = `${region ?? ""}`;
+      const due = state.foods.filter((f) => travels(f) && sent[f.id] !== `${f.reviewedAt}|${mark}`).slice(0, 60);
       if (!due.length) return;
-      try { await api("/api/members/foods", { foods: due.map(toShare), region: region ?? "elsewhere" }); for (const f of due) sent[f.id] = f.reviewedAt!; localStorage.setItem("chefmealan-shared-foods", JSON.stringify(sent)); } catch {}
+      try { await api("/api/members/foods", { foods: due.map(toShare), region: region ?? null }); for (const f of due) sent[f.id] = `${f.reviewedAt}|${mark}`; localStorage.setItem("chefmealan-shared-foods", JSON.stringify(sent)); } catch {}
     }, 4000);
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state.foods, shareOn]);
+  }, [state.foods, shareOn, region]);
   // today's day follows the Training week: when the plan changes, here or from the account, today is read again
   useEffect(() => { setDayState(getDay(personal)); }, [personal]);
   useEffect(() => {
@@ -1119,7 +1121,7 @@ export default function App() {
         if (phoneIsNewer) {
           const kept = { ...state, foods: state.foods.filter((f) => !gone.has(f.id)) };
           if (kept.foods.length !== state.foods.length) setState(kept);
-          await saveCloud(user.uid, { ...blockOf(kept), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() });
+          await saveCloud(user.uid, { ...blockOf(kept), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() });
           setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() });
         } else if (remote && !(isEmptyState(remote.state) && !isEmptyState(state))) {
           // a real account copy replaces the phone; photos are merged back from the phone by id
@@ -1145,6 +1147,8 @@ export default function App() {
           if (remote.goal) { try { localStorage.setItem("chefmealan-goal", JSON.stringify(remote.goal)); } catch {} setGoalState(getGoal()); setGoalOpen(!remote.goal); }
           if (remote.clientName) { storeClientName(remote.clientName); setClientNameState(remote.clientName); }
           if (remote.personal && typeof remote.personal === "object") { storePersonal(remote.personal as Personal); setPersonalState(remote.personal as Personal); }
+          // 0.2.102 (Milan 12:36: Tester 3 has Limassol, the catalogue said elsewhere): Where I shop lives in the account too, not only on the phone that set it
+          if (typeof remote.region === "string" && REGIONS.some((r) => r.id === remote.region) && !getRegion()) { setRegion(remote.region as RegionId); setRegionState(remote.region as RegionId); }
           {
             // the newer answer wins: a door answered on this phone after the account's last save is not overwritten by the account's older copy
             const local = getSafety();
@@ -1157,7 +1161,7 @@ export default function App() {
           }
           setCloudStatus({ ok: true, text: "Loaded from your account", at: new Date().toISOString() });
         } else {
-          await saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() });
+          await saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() });
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
         }
       } catch (e: any) {
@@ -1420,7 +1424,7 @@ export default function App() {
   useEffect(() => {
     if (!user || !cloudLoaded.current) return;
     const t = setTimeout(() => {
-      saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() })
+      saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() })
         .then(async () => {
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
           // foods, recipes and cards: only the records that changed (storage release 2)
@@ -2296,7 +2300,7 @@ export default function App() {
       // everything: the profile, the goal and its history, the foods with their photos, the cards, the recipes, and what the account holds
       let cloud: any = null;
       if (user) { try { cloud = await exportAccount(user.uid); } catch (e: any) { cloud = { error: explainCloudError(e) }; } }
-      const data = { exportedAt: new Date().toISOString(), name: clientName, personal: getPersonal(), safety: getSafety(), goal: getGoal(), goalLog: getGoalLog(), foods: state.foods, cards: state.feedback, items: state.items, recipes: inbox, account: cloud };
+      const data = { exportedAt: new Date().toISOString(), name: clientName, personal: getPersonal(), region: getRegion(), safety: getSafety(), goal: getGoal(), goalLog: getGoalLog(), foods: state.foods, cards: state.feedback, items: state.items, recipes: inbox, account: cloud };
       const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
       const a = document.createElement("a"); a.href = url; a.download = `chef-mealan-my-data-${new Date().toISOString().slice(0, 10)}.json`; a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);

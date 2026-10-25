@@ -53,7 +53,7 @@ export const signOutCloud = () => signOut(auth());
 
 // One document per person: the pilot state plus goal and name, and who coaches them.
 // role is set by hand in the Firebase console ("coach"); nobody can sign up as a coach.
-export type CloudDoc = { days?: unknown; measured?: unknown; coachNotes?: unknown; checkinDay?: number; coachGoal?: unknown; photosMovedAt?: string; photosOldGoneAt?: string; recordsMovedAt?: string; recordsOnly?: boolean; foodsCount?: number; state: unknown; goal: unknown; clientName: string; updatedAt: string; goneFoods?: string[]; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: import("./personal").Formula | null; role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string | null; coachPhoto?: string | null; joinedAt?: string | null; coachSetAt?: string };
+export type CloudDoc = { region?: string | null; days?: unknown; measured?: unknown; coachNotes?: unknown; checkinDay?: number; coachGoal?: unknown; photosMovedAt?: string; photosOldGoneAt?: string; recordsMovedAt?: string; recordsOnly?: boolean; foodsCount?: number; state: unknown; goal: unknown; clientName: string; updatedAt: string; goneFoods?: string[]; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: import("./personal").Formula | null; role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string | null; coachPhoto?: string | null; joinedAt?: string | null; coachSetAt?: string };
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const snap = await getDoc(doc(db(), "users", uid));
   return snap.exists() ? (snap.data() as CloudDoc) : null;
