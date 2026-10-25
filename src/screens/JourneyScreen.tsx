@@ -8,6 +8,8 @@ import { fitsPlate, isIngredient, type Mix } from "../mixtip";
 import { lettersOf } from "../letters";
 import { Letters } from "../components/Letters";
 import { ClearField } from "../components/ClearField";
+import { asMine, seenLine, stemOf, type MemberFood } from "../memberFoods";
+import { sameFood } from "../swaps";
 import { WaitSteps, type WaitStep } from "../components/WaitSteps";
 import { aggregate, density, uid, solveIngredient, servingLabel, sizedFor } from "../pilot";
 import { fromMeal } from "../planned";
@@ -388,7 +390,30 @@ export function JourneyScreen(p: AppApi) {
     setSuggest(null);
   }
   const quick = quickPicks(state.foods, state.feedback);
-  const swapCandidates = !swapId || pdRef === null ? [] : rankSwaps(items, swapId, state.foods, pdRef, cap ?? null, undefined, fitsPlate);
+  // DT115 (0.2.97): the swap list reaches the members' catalogue after your own foods: the same food in another state leads
+  // (tuna in water for tuna in olive oil), only foods seen in your market or with a barcode (the same tin everywhere)
+  const [swapMf, setSwapMf] = useState<{ id: string; foods: Food[] }>({ id: "", foods: [] });
+  useEffect(() => {
+    const it = swapId ? items.find((i) => i.id === swapId) : null;
+    if (!it) { setSwapMf({ id: "", foods: [] }); return; }
+    let gone = false;
+    p.memberFoods(stemOf(it.food.name)).then((ms) => { if (gone) return;
+      const ok = ms.filter((m) => m.barcode || !p.region || (m.seenIn ?? []).includes(p.region)).filter((m) => !state.foods.some((f) => (m.barcode && f.barcode === m.barcode) || f.name.toLowerCase() === m.name.toLowerCase()));
+      setSwapMf({ id: it.id, foods: ok.map((m) => ({ ...asMine(m, uid), id: `mf:${m.key}`, notes: `${(m as MemberFood).brand ? `${m.brand} · ` : ""}a member's food, ${seenLine(m, p.region)}` })) }); });
+    return () => { gone = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [swapId]);
+  const swapPool = swapId && swapMf.id === swapId ? [...state.foods, ...swapMf.foods] : state.foods;
+  // the same food in another state: the difference per portion, said plainly (95 kcal less per can, the same protein)
+  const swapDiff = (f: Food) => {
+    const it = swapId ? items.find((i) => i.id === swapId) : null; if (!it || !sameFood(f.name, cookName(it.food.name).short) || f.calories === null || it.food.calories === null) return "";
+    const g = it.grams, dk = Math.round(((it.food.calories - f.calories) * g) / 100), dp = Math.round(((f.protein ?? 0) - (it.food.protein ?? 0)) * g) / 100;
+    const per = it.food.serving?.name ? `per ${it.food.serving.name}` : "per portion";
+    const kcal = dk > 5 ? `${dk} kcal less ${per}` : dk < -5 ? `${-dk} kcal more ${per}` : `about the same energy`;
+    const prot = Math.abs(dp) < 2 ? "the same protein" : dp > 0 ? `${Math.round(dp)} g more protein` : `${Math.round(-dp)} g less protein`;
+    return ` · the same ${stemOf(it.food.name)}, another state · ${kcal}, ${prot}`;
+  };
+  const swapCandidates = !swapId || pdRef === null ? [] : rankSwaps(items, swapId, swapPool, pdRef, cap ?? null, undefined, fitsPlate);
   const swapPanel = swapId && (
     <div className="sheet-backdrop" onClick={() => setSwapId(null)}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -396,9 +421,9 @@ export function JourneyScreen(p: AppApi) {
         <p className="small">Sorted by how well each one brings the plate to your {pdVal(pdRef)}, with the rest kept as it is.</p>
         <div className="rows">
           {swapCandidates.map(({ f, grams, fits }) => (
-            <button className="row row-food row-button" key={f.id} onClick={() => swap(swapId, f, fits ? grams : grams !== null ? Math.min(grams, cap ?? 300) : null, fits)}>
+            <button className="row row-food row-button" key={f.id} onClick={() => { const mine = f.id.startsWith("mf:") ? { ...f, id: uid(), notes: f.notes } : f; if (mine !== f) setState((s) => ({ ...s, foods: [mine, ...s.foods] })); swap(swapId, mine, fits ? grams : grams !== null ? Math.min(grams, cap ?? 300) : null, fits); }}>
               <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
-              <div className="row-text"><b>{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}{pdText(density(f.protein, f.calories))}</small></div>
+              <div className="row-text"><b>{f.name}</b><small>{f.id.startsWith("mf:") ? `${f.notes} · ` : f.brand ? `${f.brand} · ` : ""}{pdText(density(f.protein, f.calories))}{swapDiff(f)}</small></div>
               <span className={`pdpill pdpill-${fits ? "high" : grams !== null ? "mid" : "low"}`}>{grams !== null ? `${grams} g` : "can't reach"}</span>
             </button>
           ))}

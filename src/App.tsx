@@ -81,6 +81,7 @@ import { ClientsScreen } from "./screens/ClientsScreen";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, isIngredient, type Mix, type MixTip } from "./mixtip";
 import { ratesOf } from "./letters";
+import { asMine, travels, toShare } from "./memberFoods";
 import { findReference, referenceFood, localName, otherNames, marketFoods } from "./reference";
 import { startGrams, jobOf, PORTION, minPortionOf, todayLine } from "./foodjob";
 import { playbookFor } from "./playbook";
@@ -1018,6 +1019,20 @@ export default function App() {
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  // DT115 (0.2.97): every reviewed food of yours goes to the members' catalogue once (no photo, no name); a food changed after
+  // a new review goes again. Kept in a small list of what was sent, so nothing is sent twice.
+  const shareOn = cloudEnabled ? Boolean(user && profileReady && (profile.role === "coach" || profile.coachId)) : true;
+  useEffect(() => {
+    if (!shareOn) return;
+    const t = window.setTimeout(async () => {
+      let sent: Record<string, string> = {}; try { sent = JSON.parse(localStorage.getItem("chefmealan-shared-foods") || "{}"); } catch {}
+      const due = state.foods.filter((f) => travels(f) && sent[f.id] !== f.reviewedAt).slice(0, 60);
+      if (!due.length) return;
+      try { await api("/api/members/foods", { foods: due.map(toShare), region: region ?? "elsewhere" }); for (const f of due) sent[f.id] = f.reviewedAt!; localStorage.setItem("chefmealan-shared-foods", JSON.stringify(sent)); } catch {}
+    }, 4000);
+    return () => window.clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.foods, shareOn]);
   // today's day follows the Training week: when the plan changes, here or from the account, today is read again
   useEffect(() => { setDayState(getDay(personal)); }, [personal]);
   useEffect(() => {
@@ -2070,6 +2085,14 @@ export default function App() {
     // a product picked from the search opens the sheet titled by the button that picked it
     addFromDatabase: (code: string) => { setEditTitle("Add to my foods"); lookup(code); },
     searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (region ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "cy", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
+    // DT115 (0.2.97): the members' catalogue, searched by words; a member's food becomes a copy in your library
+    memberFoods: async (q: string) => { try { const d = await api(`/api/members/foods?q=${encodeURIComponent(q)}&region=${encodeURIComponent(region ?? "")}`); return Array.isArray(d?.foods) ? d.foods : []; } catch { return []; } },
+    addMemberFood: (m, to = "foods") => {
+      const have = state.foods.find((f) => (m.barcode && f.barcode === m.barcode) || (f.name.toLowerCase() === m.name.toLowerCase() && (f.brand ?? "").toLowerCase() === m.brand.toLowerCase()));
+      const food = have ?? asMine(m, uid);
+      if (!have) setState((s) => ({ ...s, foods: [food, ...s.foods] }));
+      if (to === "plate") add(food); else notify(`${food.name} is in your foods.`);
+    },
     peekBarcode: async (code: string) => { try { const d = await api(`/api/product/${code}`); return d?.product_name ? { code, name: d.product_name, brand: d.brand || "", quantity: "", kcal: d.calories, protein: d.protein } : null; } catch { return null; } },
     // Plan (0.2.2): the meals in the slots, by date and slot; a plate made for a slot lands in it when saved
     planned, filling, setFilling,

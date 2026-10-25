@@ -107,6 +107,7 @@ Every place that offers, accepts or moves a food, and the rules it goes through.
 | The tip under the plate | up to three foods from your foods that lift the plate | C6, C20, C21, C22, C23, C10 | `fitsPlate` in src/mixtip.ts, `lifts` in src/screens/JourneyScreen.tsx |
 | The mix tip on a food card | partners for a scanned food, by moment and job | C2, C6, C20, C22, C25, N-rules for the moment | `mixTip`, `candidates` in src/mixtip.ts |
 | Swap a food on the plate | foods that can take this one's place | C6, C20, C21, C25 | `mixWith` in src/App.tsx; `rankSwaps` in src/swaps.ts with `fitsPlate` (since 0.2.96: it offered yeast for tuna) |
+| Members' foods | the catalogue in Find a food, the barcode scan and the swap list; your market first, a member's food copied into your library when taken (DT115) | C6, C20, C21 through the swap list; the catalogue itself holds no rule | src/memberFoods.ts, /api/members/foods in server.ts |
 | Fit | moves the densest free food within its portion | C10, C12, C13 | `fit` in src/screens/JourneyScreen.tsx, src/foodjob.ts |
 | The portion line | red line under a food outside its portion | C10, C11 | `portionLine` in src/foodjob.ts |
 | The culinary gate | reads two or more foods, says whether they make the meal; a failed read says so, with Try again (DT104) | C24, C30, C31 | /api/dish in server.ts, the Plate |

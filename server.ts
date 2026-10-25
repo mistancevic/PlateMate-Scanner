@@ -507,6 +507,63 @@ app.get("/api/search", requireUser, requireMember, async (req, res) => {
     return res.json({ products: [], error: "Product database did not answer in time." });
   }
 });
+// ---- Members' foods (0.2.97, canvas board Stories68, DT115; Milan 24 October 19:00 and 25 October 01:47) ----
+// One catalogue of every reviewed scan: name, brand, barcode, the numbers, the source, where it was seen (the member's market).
+// No photo and no name of who scanned it. One entry per barcode; a food without a barcode by name and brand; a second scan of
+// the same food updates the numbers. The preview has its own catalogue. Without Firestore (local, walkthroughs), in memory.
+type MemberFood = { key: string; name: string; brand: string; barcode?: string; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber: number | null; serving?: { grams: number; name: string } | null; readyToEat?: boolean; source: string; markets: Record<string, string>; updatedAt: string; n: number };
+const mfSlug = (x: string) => String(x ?? "").toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+const mfKeyOf = (f: { barcode?: string; name: string; brand?: string }) => (f.barcode && /^\d{8,14}$/.test(f.barcode) ? `b:${f.barcode}` : `n:${mfSlug(f.name)}|${mfSlug(f.brand ?? "")}`);
+const haveFirestore = () => Boolean(FB_PROJECT);
+const mfMem = new Map<string, MemberFood>();
+const mfCache: Record<string, { at: number; rows: MemberFood[] }> = {};
+const mfCol = (req: express.Request) => db().collection(spaceOf(req) === "preview" ? "members_foods_preview" : "members_foods");
+const mfNum = (v: unknown) => (typeof v === "number" && Number.isFinite(v) && v >= 0 ? Math.round(v * 10) / 10 : null);
+async function mfAll(req: express.Request): Promise<MemberFood[]> {
+  if (!haveFirestore()) return [...mfMem.values()];
+  const space = spaceOf(req), c = mfCache[space];
+  if (c && Date.now() - c.at < 60_000) return c.rows;
+  const snap = await mfCol(req).orderBy("updatedAt", "desc").limit(3000).get();
+  const rows = snap.docs.map((d) => d.data() as MemberFood);
+  mfCache[space] = { at: Date.now(), rows };
+  return rows;
+}
+async function mfPut(req: express.Request, f: MemberFood) {
+  if (!haveFirestore()) { mfMem.set(f.key, f); return; }
+  const ref = mfCol(req).doc(f.key.replace(/\//g, "_"));
+  await ref.set({ ...f, n: FieldValue.increment(1) }, { merge: true });
+  delete mfCache[spaceOf(req)];
+}
+app.post("/api/members/foods", requireUser, requireMember, async (req, res) => {
+  try {
+    const region = String(req.body.region ?? "elsewhere").slice(0, 20);
+    const foods = (Array.isArray(req.body.foods) ? req.body.foods : []).slice(0, 60);
+    const now = new Date().toISOString();
+    let n = 0;
+    for (const x of foods) {
+      const name = String(x?.name ?? "").trim().slice(0, 80), brand = String(x?.brand ?? "").trim().slice(0, 60);
+      if (!name || mfNum(x.calories) === null || mfNum(x.protein) === null) continue;
+      if (/reference table/i.test(String(x.source ?? ""))) continue; // the basic foods are shared already
+      const barcode = /^\d{8,14}$/.test(String(x.barcode ?? "")) ? String(x.barcode) : undefined;
+      const f: MemberFood = { key: mfKeyOf({ barcode, name, brand }), name, brand, ...(barcode ? { barcode } : {}), calories: mfNum(x.calories), protein: mfNum(x.protein), fats: mfNum(x.fats), carbs: mfNum(x.carbs), fiber: mfNum(x.fiber),
+        serving: x.serving && typeof x.serving.grams === "number" ? { grams: x.serving.grams, name: String(x.serving.name ?? "piece").slice(0, 20) } : null, readyToEat: x.readyToEat !== false, source: String(x.source ?? "label").slice(0, 60), markets: { [region]: now }, updatedAt: now, n: 0 };
+      await mfPut(req, f); n++;
+    }
+    res.json({ ok: true, shared: n });
+  } catch (error) { fail(res, error); }
+});
+app.get("/api/members/foods", requireUser, requireMember, async (req, res) => {
+  try {
+    const q = mfSlug(String(req.query.q ?? "")), region = String(req.query.region ?? "");
+    const words = q.split(" ").filter((w) => w.length >= 2);
+    if (!words.length) return res.json({ foods: [] });
+    const all = await mfAll(req);
+    const hit = all.filter((f) => { const hay = mfSlug(`${f.name} ${f.brand}`); return words.every((w) => hay.includes(w)); });
+    const mine = (f: MemberFood) => (region && f.markets && f.markets[region] ? 0 : 1);
+    hit.sort((a, b) => mine(a) - mine(b) || (b.updatedAt > a.updatedAt ? 1 : -1));
+    res.json({ foods: hit.slice(0, 12).map((f) => ({ ...f, seenIn: Object.keys(f.markets ?? {}) })) });
+  } catch (error) { fail(res, error); }
+});
 // ---- Recipes you can share (canvas boards R0 to R7, RG0 to RG4) ----
 // A coach publishes a recipe from the app; everyone can read it at chefmealan.com/r/<slug>. The photo is kept in the
 // record and served at /r/<slug>/photo.jpg, also for link previews. Without accounts (local, walkthroughs), in memory.
@@ -913,6 +970,12 @@ app.get("/api/product/:barcode", requireUser, requireMember, async (req, res) =>
     const barcode = String(req.params.barcode);
     if (!/^\d{8,14}$/.test(barcode))
       return res.status(400).json({ error: "Invalid numeric barcode." });
+    // DT115: a code a member already checked comes from the members' catalogue, before Open Food Facts
+    try {
+      const m = (await mfAll(req)).find((f) => f.barcode === barcode);
+      if (m) return res.json({ product_name: m.name, brand: m.brand, barcode, calories: m.calories, protein: m.protein, fats: m.fats, carbs: m.carbs, fiber: m.fiber, table: [], serving: m.serving ?? undefined,
+        source: `Members' foods · checked by a member on ${m.updatedAt.slice(0, 10)}`, members: true, seenIn: Object.keys(m.markets ?? {}) });
+    } catch {}
     const response = await fetch(
       `https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,brands,nutriments,nutrition_data_per,quantity,countries_tags,image_front_url,image_nutrition_url`,
       {

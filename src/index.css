@@ -2097,3 +2097,6 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .wait-done { color: var(--muted); } li.wait-now { color: var(--ink); font-weight: 700; } .wait-next { color: var(--muted); opacity: .7; }
 .mm-working { margin: 6px 0; }
 .chat .wait-steps { margin: 4px 0 2px; }
+/* DT115 (0.2.97): members' foods in Find a food, and the one line under a food of yours */
+.members-foods { margin-top: 12px; }
+.also-seen { margin: 6px 0 2px; font-size: var(--fs-small); color: var(--muted); } .also-seen .link { font-size: var(--fs-small); font-weight: 700; }

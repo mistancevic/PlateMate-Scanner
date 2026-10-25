@@ -1,7 +1,7 @@
 // Ranking replacements for one food on a plate. Pure code: the evals run it directly.
 import { solveIngredient, type Ingredient, type Food } from "./pilot";
 export type SwapOption = { f: Food; grams: number | null; fits: boolean };
-const stem = (name: string) => name.toLowerCase().split(/[\s,(]+/).filter((w) => w.length >= 3)[0] ?? name.toLowerCase();
+export const stem = (name: string) => name.toLowerCase().split(/[\s,(]+/).filter((w) => w.length >= 3)[0] ?? name.toLowerCase();
 // A replacement never is, or contains, the food that's missing.
 export const sameFood = (a: string, b: string) => { const s = stem(b); return a.toLowerCase().includes(s); };
 // What a food does in a dish, from its name. Crude on purpose; the evals say when it needs more.
@@ -23,10 +23,13 @@ export function rankSwaps(items: Ingredient[], slotId: string, library: Food[], 
   const role = roleOf(slot.food.name);
   const sweetPlate = items.some((i) => i.id !== slotId && ["sweet", "fruit"].includes(roleOf(i.food.name)));
   // same role first, a near role next, anything else last; no savoury protein in a sweet dish
-  const rank = (f: Food) => { const r = roleOf(f.name); return r === role ? 0 : NEAR[role]?.includes(r) ? 1 : 2; };
+  // DT115 (0.2.97): the same food in another state (tuna in water for tuna in olive oil) leads; the same food by the same
+  // name is no swap. Before, any food with the same stem was left out.
+  const same = (f: Food) => sameFood(f.name, gone) && f.name.trim().toLowerCase() !== gone.trim().toLowerCase();
+  const rank = (f: Food) => { if (same(f)) return -1; const r = roleOf(f.name); return r === role ? 0 : NEAR[role]?.includes(r) ? 1 : 2; };
   return library
     .filter((f) => !items.some((i) => i.food.id === f.id))
-    .filter((f) => !sameFood(f.name, gone))
+    .filter((f) => f.name.trim().toLowerCase() !== gone.trim().toLowerCase())
     .filter((f) => !(sweetPlate && roleOf(f.name) === "savoury"))
     // DT115 (0.2.96), found on the board: the swap goes through the rules module like every other list (C6 no ingredient, C20
     // who goes with whom, C21 a spread's carrier), judged against the rest of the plate without the food that leaves

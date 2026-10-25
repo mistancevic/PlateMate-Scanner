@@ -1,4 +1,6 @@
 import { ClearField } from "../components/ClearField";
+import { alsoSeen, seenLine, type MemberFood } from "../memberFoods";
+import { cookName } from "../cookWords";
 import { Camera, X, Pencil, Plus } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
 import { findReference, referenceFood, localName, otherNames as refOtherNames } from "../reference";
@@ -72,6 +74,15 @@ export function FoodsScreen(p: AppApi) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
   const dbRows = db.q === q ? db.products : [];
+  // DT115 (0.2.97): the members' catalogue, searched with the same words; your own market first
+  const [mf, setMf] = useState<{ q: string; foods: MemberFood[] }>({ q: "", foods: [] });
+  useEffect(() => {
+    if (isCode || q.trim().length < 2) { setMf({ q: "", foods: [] }); return; }
+    const t = setTimeout(async () => { const foods = await p.memberFoods(q.trim()); setMf({ q, foods }); }, 350);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [q]);
+  const mfRows = (mf.q === q ? mf.foods : []).filter((m) => !state.foods.some((f) => (m.barcode && f.barcode === m.barcode) || (f.name.toLowerCase() === m.name.toLowerCase() && (f.brand ?? "").toLowerCase() === m.brand.toLowerCase())));
   const nothing = q.length >= 1 && shown.length === 0 && noLabel.length === 0 && dbRows.length === 0 && !db.busy;
   return (
     <>
@@ -140,6 +151,25 @@ export function FoodsScreen(p: AppApi) {
           </div>
         ))}
       </div>
+      {/* DT115: the same food in another state, seen by a member, under a food of yours: one line */}
+      {q.length >= 2 && shown.length > 0 && (() => { const pairs = shown.map(({ f }) => [f, alsoSeen(f, mfRows)] as const).filter((x) => x[1]); const [f, m] = pairs[0] ?? []; return m ? (
+        <p className="also-seen"><small>Also seen by members, in place of {cookName(f!.name).short}: </small><button className="link" onClick={() => p.addMemberFood(m)}>{m.name}{m.brand ? `, ${m.brand}` : ""}, {fmt(m.calories, 0)} kcal ›</button></p>) : null; })()}
+      {/* DT115: Members' foods, between your foods and the product database */}
+      {mfRows.length > 0 && (
+        <section className="outside members-foods" aria-label="Members' foods">
+          <p className="label group-label">Members' foods <small>your market first</small></p>
+          {mfRows.map((m) => (
+            <div className="row outside-row" key={m.key}>
+              <span className="thumb">{iconFor(m.name)}</span>
+              <div className="row-text">
+                <b className="name-plain">{m.name}</b>
+                <small>{[m.brand || (m.barcode ? "" : "no barcode"), `${fmt(m.calories, 0)} kcal`, `${fmt(m.protein)} g protein per 100 g`, seenLine(m, p.region)].filter(Boolean).join(" · ")}</small>
+              </div>
+              <button className="pill pill-small" onClick={() => p.addMemberFood(m)}>Add to my foods</button>
+            </div>
+          ))}
+        </section>
+      )}
       {noLabel.length > 0 && (
         <section className="outside" aria-label="Without a label">
           <div className="group-head"><p className="label group-label">Without a label <small>per 100 g</small></p>{noLabel.length > 1 && <button className="pill pill-small" onClick={() => { noLabel.forEach((r) => p.saveFood(referenceFood(r, p.region, uid))); p.notify(`${noLabel.length} foods added to your foods.`); }}>Add all</button>}</div>
