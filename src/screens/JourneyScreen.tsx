@@ -388,7 +388,7 @@ export function JourneyScreen(p: AppApi) {
     setSuggest(null);
   }
   const quick = quickPicks(state.foods, state.feedback);
-  const swapCandidates = !swapId || pdRef === null ? [] : rankSwaps(items, swapId, state.foods, pdRef, cap ?? null);
+  const swapCandidates = !swapId || pdRef === null ? [] : rankSwaps(items, swapId, state.foods, pdRef, cap ?? null, undefined, fitsPlate);
   const swapPanel = swapId && (
     <div className="sheet-backdrop" onClick={() => setSwapId(null)}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
@@ -1723,7 +1723,9 @@ export function JourneyScreen(p: AppApi) {
         const name = title.trim() || plateName;
         const src = way?.kind === "change" && fromRec?.source ? { source: { name: fromRec.source.name, ...(fromRec.source.url ? { url: fromRec.source.url } : {}), from: fromRec.source.from, at: fromRec.source.at } } : {};
         // DT89 and DT90 (0.2.87): the steps from How to make it, Chef Mealan's kitchen, and who made it go with the recipe
-        const ps = cooksPlate(items) && plateSteps?.steps.length ? { steps: plateSteps.steps, stepsFor: foodNames(items) } : {};
+        // 02:11: a bowl way chosen at Lock (All in one, Topped, Protein first) is the recipe's process too; it was lost at Save
+        const wayNow = method ? methodsFor(items).find((w) => w.id === method) : undefined;
+        const ps = cooksPlate(items) && plateSteps?.steps.length ? { steps: plateSteps.steps, stepsFor: foodNames(items) } : wayNow ? { steps: wayNow.steps, stepsFor: foodNames(items), way: wayNow.name } : {};
         const chefMade = madeBy ? { ...(state.cooking?.length ? { cooking: state.cooking } : {}), kitchen: madeBy.kitchen, byChef: { kitchen: madeBy.kitchen, meal: mealWord, around: aroundWord(madeBy.from.map((i) => i.food.name)), at: new Date().toISOString() } } : {};
         const meal: Meal = { id: origin?.id ?? uid(), title: name, items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString(), kind: p.kind, ...src, ...adaptedFrom, ...ps, ...chefMade };
         // the recipe kept (0.2.19, IM18b): its parts on its foods; optional foods, added or not, in its optional list

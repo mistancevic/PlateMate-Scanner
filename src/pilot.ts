@@ -168,6 +168,8 @@ export type Meal = {
   source?: { name: string; url?: string; from: "screenshot" | "link"; at: string; shotSigs?: string[]; steps?: string[]; foods?: string[]; photo?: string };
   // the foods Chef Mealan's steps were written for (0.2.25, RP1c): changed foods since, and a line says so
   stepsFor?: string[];
+  // 0.2.96: the bowl way the steps came from (All in one, Topped, Protein first), when they did
+  way?: string;
   // optional ingredients the recipe names (0.2.18, IM8): kept out of the numbers, whole-recipe grams, added when cooking
   optional?: { name: string; written: string; note?: string; grams: number; food: Food; part?: string }[];
   // the part of each step, aligned with steps (0.2.19, IM17); none when the recipe is one list

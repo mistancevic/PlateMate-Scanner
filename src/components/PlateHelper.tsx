@@ -1,3 +1,4 @@
+import { fitsPlate } from "../mixtip";
 import { ClearField } from "./ClearField";
 import { useEffect, useRef, useState } from "react";
 import { Send, Replace, Plus, Scale, Check } from "lucide-react";
@@ -25,7 +26,7 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
   const [reply, setReply] = useState("");
   const [sugs, setSugs] = useState<Suggestion[]>([]);
   const asked = useRef(false);
-  const codeSwaps = missing && pdRef !== null ? rankSwaps(items, missing.id, library, pdRef, cap, missing.food.name).filter((s) => s.fits).slice(0, 3) : [];
+  const codeSwaps = missing && pdRef !== null ? rankSwaps(items, missing.id, library, pdRef, cap, missing.food.name, fitsPlate).filter((s) => s.fits).slice(0, 3) : [];
 
   // the solver, not the model, sets the grams of anything added or swapped in
   const fit = (next: Ingredient[], id: string, fallback: number) => {

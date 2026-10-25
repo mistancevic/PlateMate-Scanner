@@ -17,7 +17,7 @@ const ROLES: [Role, RegExp][] = [
 ];
 export const roleOf = (name: string): Role => ROLES.find(([, re]) => re.test(name))?.[0] ?? "other";
 const NEAR: Partial<Record<Role, Role[]>> = { dairy: ["supplement"], supplement: ["dairy"], sweet: ["fruit"], fruit: ["sweet"], nut: ["sweet"] };
-export function rankSwaps(items: Ingredient[], slotId: string, library: Food[], target: number, cap: number | null, missing?: string): SwapOption[] {
+export function rankSwaps(items: Ingredient[], slotId: string, library: Food[], target: number, cap: number | null, missing?: string, rules?: (f: Food, plate: Food[]) => boolean): SwapOption[] {
   const slot = items.find((i) => i.id === slotId); if (!slot) return [];
   const gone = missing ?? slot.food.name;
   const role = roleOf(slot.food.name);
@@ -28,6 +28,9 @@ export function rankSwaps(items: Ingredient[], slotId: string, library: Food[], 
     .filter((f) => !items.some((i) => i.food.id === f.id))
     .filter((f) => !sameFood(f.name, gone))
     .filter((f) => !(sweetPlate && roleOf(f.name) === "savoury"))
+    // DT115 (0.2.96), found on the board: the swap goes through the rules module like every other list (C6 no ingredient, C20
+    // who goes with whom, C21 a spread's carrier), judged against the rest of the plate without the food that leaves
+    .filter((f) => rules ? rules(f, items.filter((i) => i.id !== slotId).map((i) => i.food)) : true)
     .map((f) => {
       const trial = items.map((i) => (i.id === slotId ? { ...i, food: { ...f, readyToEat: true }, locked: false } : { ...i, locked: true }));
       const r = solveIngredient(trial, slotId, target, null);

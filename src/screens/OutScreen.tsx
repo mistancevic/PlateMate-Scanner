@@ -343,9 +343,12 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
                     {r.kind === "scan" && <><div className="tip-text"><b>{r.name}</b><small>not in your foods</small></div>
                       <button type="button" className="pill pill-small" onClick={() => rowScan(i, r)}>Scan it</button></>}
                   </div>); })}
+                {/* 02:08: a way back to the Plate under the rows, not only Close at the top */}
+                {p.tab === "journey" && <div className="button-row"><button type="button" className="pill pill-small" onClick={close}>Back to the plate</button></div>}
               </div>
             )}
-            {t.picks && t.picks.length > 0 && (
+            {/* 02:08: the photo block (Work on it with Chef Mealan, This is what I had) belongs to a photo; a written answer with rows never shows it */}
+            {t.picks && t.picks.length > 0 && !(t.rows && t.rows.length) && (
               <div className="picks">
                 {t.picks.map((i) => <div key={i.id}><b>{fmt(i.grams, 0)} g</b> {i.food.name} <small>~{fmt(i.food.calories, 0)} kcal · {fmt(i.food.protein)} g protein per 100 g</small></div>)}
                 <div className="picks-total">{pdText(t.pd ?? null)}{pdRef !== null ? ` · target ${pdVal(pdRef)}` : ""} · {fmt(t.kcal ?? null, 0)} kcal</div>

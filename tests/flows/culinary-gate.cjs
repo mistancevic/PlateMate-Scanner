@@ -95,6 +95,8 @@ const U = "http://127.0.0.1:3262";
   ok(await page.locator(".phase-bar span.on").count() === 3 && /Feedback: how was it\?/.test(await text("h2")) && /Peanut banana toast · named in Craft/.test(await text()) && await page.getByLabel("Name it").count() === 0, "DT94: Feedback, the name from Craft, no Name it");
   await page.getByRole("button", { name: "DaaM good" }).click(); await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1200);
   ok((await st()).meals[0]?.title === "Peanut banana toast", "DT94: saved under the name from Craft");
+  // 0.2.96 (Milan 02:11): the bowl way chosen at Lock is saved as the recipe's steps, with the way's name
+  ok(((await st()).meals[0]?.steps ?? []).length >= 2 && typeof (await st()).meals[0]?.way === "string", "0.2.96: the way's steps are saved with the recipe: " + JSON.stringify((await st()).meals[0]?.way));
   ok(errs.length === 0, "no page errors " + errs.join(" | "));
   await b.close(); server.kill();
   console.log(fails.length ? `${fails.length} FAILED` : "all ok");
