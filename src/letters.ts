@@ -53,4 +53,10 @@ export function letterLine(macro: Macro, value: number | null, rate: number): st
   const how = l.endsWith("+") ? "more than" : l === CAP[macro] ? "as" : l.endsWith("-") ? "close to none against" : "under";
   return `${l} ${w}: ${v} g per 100 kcal, ${how} your day's ${r}.`;
 }
+// the word under a letter's grams in the readout cells (DT128, 0.2.107): fat, high · carbs, under · fibre, no value
+export function letterWord(macro: Macro, value: number | null, rate: number): string {
+  const l = letterOf(macro, value, rate), w = WORD[macro];
+  if (value === null) return `${w}, no value`;
+  return `${w}, ${l.endsWith("+") ? "high" : l === CAP[macro] ? "as your day" : l.endsWith("-") ? "close to none" : "under"}`;
+}
 export const BANDS_NOTE = `Capital with a plus: more than your day (from ${BAND_EDGES.high} times its rate). Capital: as your day needs (${BAND_EDGES.plan} to ${BAND_EDGES.high} times). Small: under. Small with a minus: close to none (under ${BAND_EDGES.close} times).`;

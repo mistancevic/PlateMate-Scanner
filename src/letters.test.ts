@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { ratesOf, lettersOf, letterOf, letterLine } from "./letters";
+import { ratesOf, lettersOf, letterOf, letterLine, letterWord } from "./letters";
 
 const day = { kcal: 2750, protein: 180, fats: 92, carbs: 300 };
 test("DT108: the day's rates come from the plan, protein from the PD target", () => {
@@ -26,4 +26,12 @@ test("DT108: a letter never disagrees with the PD band", () => {
   assert.equal(letterOf("protein", 6.5 * 1.6, 6.5), "P+");
   assert.equal(letterLine("fats", 12.5, 3.3), "F+ fat: 12.5 g per 100 kcal, more than your day's 3.3.");
   assert.equal(letterLine("fiber", null, 1.4), "fi? fibre: no value on the label.");
+});
+
+test("DT128: the word under a cell: fat, high · carbs, under · fibre, no value · protein, as your day", () => {
+  assert.equal(letterWord("fats", 12.5, 3.3), "fat, high");
+  assert.equal(letterWord("carbs", 8, 10.9), "carbs, under");
+  assert.equal(letterWord("fiber", null, 1.4), "fibre, no value");
+  assert.equal(letterWord("protein", 6.5, 6.5), "protein, as your day");
+  assert.equal(letterWord("carbs", 1, 10.9), "carbs, close to none");
 });

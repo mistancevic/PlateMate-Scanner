@@ -45,7 +45,10 @@ const U = "http://127.0.0.1:3268";
   const gate = page.locator(".gate-card").first();
   // the grams under the letters
   const cells = await page.locator(".readout .letter-cell").allTextContents();
-  ok(cells.length === 4 && cells.every((c) => /^[A-Za-z]+[+?-]?(\d+g|\?)$/.test(c.replace(/\s+/g, ""))), "0.2.99: each letter with its grams under it, one block: " + cells.join(" | "));
+  // Changed by story DT128 (0.2.107, board Stories76, Version 2): the letter, the grams on one line, the word under it
+  ok(cells.length === 4 && cells.every((c) => /^[A-Za-z]+[+?-]?(\d+g|\?)(fat|carbs|fibre|protein),(high|asyourday|under|closetonone|novalue)$/.test(c.replace(/\s+/g, ""))), "DT128: four cells, each the letter, its grams and the word: " + cells.join(" | "));
+  const gw = await page.locator(".readout .letter-g").evaluateAll((els) => els.map((e) => e.getBoundingClientRect().height));
+  ok(gw.every((h) => h < 24), "DT128: the grams never break into two lines");
   ok(await page.locator(".readout .readout-extra").count() === 0, "0.2.99: sugars, saturates and salt are not a line in the readout");
   // N28: a shake with biscuits as a lunch
   let lines = await gate.locator(".gate-line-row").allTextContents();

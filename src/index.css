@@ -2072,8 +2072,8 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 /* DT108 (0.2.92): the four letters, F C Fi P, under the readout and on a food's row */
 .letters { font-family: ui-monospace, Menlo, Consolas, monospace; font-weight: 700; letter-spacing: .06em; white-space: pre; }
 .readout-letters { margin-top: 8px; }
-.letters-row { display: flex; align-items: baseline; gap: 10px; width: 100%; border: 0; background: rgba(255,255,255,.22); color: inherit; border-radius: 10px; padding: 6px 10px; font: inherit; font-size: var(--fs-body); text-align: left; cursor: pointer; }
-.letters-row small { margin-left: auto; font-size: var(--fs-small); opacity: .9; }
+.letters-row { display: flex; flex-direction: column; align-items: stretch; gap: 6px; width: 100%; border: 0; background: rgba(255,255,255,.18); color: inherit; border-radius: 10px; padding: 8px; font: inherit; font-size: var(--fs-body); text-align: left; cursor: pointer; }
+.letters-row > small { margin-left: auto; font-size: var(--fs-small); opacity: .9; }
 .letters-lines { display: grid; gap: 4px; margin-top: 8px; padding: 8px 10px; border-radius: 10px; background: rgba(255,255,255,.18); font-size: var(--fs-small); }
 .row small .letters { font-weight: 700; }
 /* DT112 (0.2.94): a text field with text gets an x at its right; one tap empties it */
@@ -2106,8 +2106,12 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .gate-line-row > b { font-size: var(--fs-label); } .gate-yes > b { color: #1b7f4b; } .gate-no > b { color: #b3261e; }
 .gate-line-row small { color: var(--ink); }
 .gate-sweet { display: block; font-weight: 700; color: #1b7f4b; }
-.letters-grid { display: flex; gap: 18px; flex: 1; min-width: 0; }
-.letter-cell { display: grid; justify-items: start; gap: 1px; } .letter-cell small { font-size: var(--fs-small); opacity: .9; font-weight: 600; }
+/* DT128 (0.2.107): four filled cells, the letter, the grams on one line, the word under it */
+.letters-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; width: 100%; }
+.letter-cell { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; background: rgba(255,255,255,.28); border-radius: 9px; padding: 6px 8px; }
+.letter-cell .letters { font-size: var(--fs-section); line-height: 1; }
+.letter-cell .letter-g { font-size: var(--fs-small); font-weight: 900; white-space: nowrap; opacity: .95; }
+.letter-cell .letter-word { font-size: var(--fs-caps); line-height: 1.15; opacity: .85; font-weight: 600; }
 .letters-note { align-self: flex-end; }
 
 /* DT126 (0.2.105, board Stories72): the recipes bar: search, drop-downs, chips, sort, the count line */
@@ -2117,7 +2121,7 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .rb-chips .choice { height: 32px; padding: 0 10px; font-size: var(--fs-small); }
 .rb-chips .choice.on::before { content: none; }
 .rb-sheet { display: flex; flex-direction: column; border: 1.5px solid var(--line); border-radius: var(--r-control); background: var(--tint); padding: 6px 10px; }
-.rb-sheet-title { font-weight: 800; letter-spacing: .04em; color: var(--muted); text-transform: uppercase; font-size: 11px; padding: 4px 0; }
+.rb-sheet-title { font-weight: 700; letter-spacing: .04em; color: var(--muted); text-transform: uppercase; font-size: var(--fs-caps); padding: 4px 0; }
 .rb-line { display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 0; border-top: 1px solid var(--line); background: transparent; padding: 9px 0; font: inherit; font-weight: 600; color: var(--ink); text-align: left; }
 .rb-line.on { color: var(--brand-text); font-weight: 900; } .rb-line.on span::before { content: "✓ "; }
 .rb-line small { color: var(--muted); font-weight: 600; }
@@ -2131,3 +2135,20 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .rc-group-title { margin: 6px 0 0; }
 .rc-lead { display: block; margin-top: -4px; }
 .rc-more { align-self: flex-start; font-weight: 800; margin: -2px 0 6px; }
+
+/* DT127 (0.2.108, board Stories75): the photo of the meal on the Plate, the estimates, Chef Mealan's line */
+.mp-line { display: flex; gap: 10px; align-items: center; width: 100%; border: 0; background: var(--tint); border-radius: var(--r-control); padding: 8px 10px; margin: 0 0 10px; font: inherit; font-size: var(--fs-small); color: var(--ink); text-align: left; line-height: 1.4; cursor: pointer; }
+.mp-line img { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; flex: none; border: 2px solid var(--brand); }
+.mp-big { border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--line); margin: 0 0 10px; background: var(--surface); }
+.mp-big-img { position: relative; } .mp-big-img img { width: 100%; display: block; aspect-ratio: 9 / 7; object-fit: cover; }
+.mp-tags { position: absolute; left: 10px; bottom: 10px; display: flex; gap: 6px; flex-wrap: wrap; }
+.mp-tags span { background: rgba(23,39,66,.82); color: #fff; border-radius: 999px; padding: 4px 10px; font-size: var(--fs-small); font-weight: 900; }
+.mp-big-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 12px; } .mp-retake { cursor: pointer; }
+.mp-ask { background: var(--warn-soft, #fff8d6); border-radius: var(--r-control); padding: 10px 12px; margin: 0 0 10px; display: flex; flex-direction: column; gap: 8px; }
+.mp-ask .button-row { align-items: center; }
+.mp-est { font-weight: 900; color: var(--brand-text); margin-right: 2px; }
+.mp-button { cursor: pointer; }
+.mp-say { display: flex; flex-direction: column; gap: 10px; } .mp-say > small { font-size: var(--fs-body); line-height: 1.45; color: var(--ink); }
+.mp-card { display: flex; gap: 12px; align-items: center; cursor: pointer; }
+.mp-card-icon { width: 52px; height: 52px; border-radius: 14px; background: var(--brand); color: #fff; display: flex; align-items: center; justify-content: center; flex: none; }
+.mp-card-text { display: flex; flex-direction: column; gap: 2px; } .mp-card-text b { font-size: var(--fs-section); } .mp-card-text small { color: var(--muted); }
