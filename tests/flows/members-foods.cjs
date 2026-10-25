@@ -27,8 +27,8 @@ const U = "http://127.0.0.1:3267";
   // the other members' scans, as their apps send them
   const post = (region, foods) => fetch(U + "/api/members/foods", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ region, foods }) }).then((r) => r.json());
   const r1 = await post("belgrade", [{ name: "Tuna in brine, drained", brand: "Eva", barcode: "3850102001234", calories: 105, protein: 24, fats: 1, carbs: 0, fiber: 0, source: "label", photo: "data:image/png;base64,xxx" }]);
-  const r2 = await post("cyprus", [{ name: "Tuna steak, fresh", brand: "", calories: 130, protein: 28, fats: 1.5, carbs: 0, fiber: 0, source: "label" }, { name: "Tuna in water, drained", brand: "Rio Mare", barcode: "8004030044005", calories: 99, protein: 23, fats: 0.5, carbs: 0, fiber: 0, source: "label", serving: { grams: 52, name: "can" } }]);
-  ok(r1.shared === 1 && r2.shared === 2, "the other members' reviewed scans are in the catalogue: " + JSON.stringify([r1, r2]));
+  const r2 = await post("cyprus", [{ name: "Τόνος σε νερό", brand: "Trata", barcode: "5201054000011", calories: 103, protein: 24, fats: 0.8, carbs: 0, fiber: 0, source: "label" }, { name: "Tuna steak, fresh", brand: "", calories: 130, protein: 28, fats: 1.5, carbs: 0, fiber: 0, source: "label" }, { name: "Tuna in water, drained", brand: "Rio Mare", barcode: "8004030044005", calories: 99, protein: 23, fats: 0.5, carbs: 0, fiber: 0, source: "label", serving: { grams: 52, name: "can" } }]);
+  ok(r1.shared === 1 && r2.shared === 3, "the other members' reviewed scans are in the catalogue: " + JSON.stringify([r1, r2]));
   const page = await b.newPage({ viewport: { width: 390, height: 1400 }, deviceScaleFactor: 1 });
   page.on("pageerror", (e) => errs.push(e.message));
   await page.clock.setFixedTime(new Date("2026-10-25T12:10:00"));
@@ -59,7 +59,11 @@ const U = "http://127.0.0.1:3267";
   const mf = page.locator(".members-foods");
   ok(await mf.count() === 1, "DT115: a Members' foods group in Find a food");
   const names = await mf.locator(".name-plain").allTextContents();
-  ok(names.length === 3 && !names.includes("Tuna in olive oil, drained"), "DT115: the three foods the others scanned, never your own: " + names.join(", "));
+  ok(names.length === 4 && names.includes("Τόνος σε νερό") && !names.includes("Tuna in olive oil, drained"), "DT115, 0.2.100: the four foods the others scanned, the Greek tuna found by the English word, never your own: " + names.join(", "));
+  // 0.2.100: and the other way round, the Serbian word finds them all
+  await page.getByLabel("Find a food").fill("tunjevina"); await page.waitForTimeout(1200);
+  ok((await page.locator(".members-foods .name-plain").allTextContents()).length >= 3, "0.2.100: tunjevina finds the tuna of every language");
+  await page.getByLabel("Find a food").fill("tuna"); await page.waitForTimeout(1200);
   const mt = await mf.textContent();
   ok(/seen in Belgrade/.test(mt) && /seen in Cyprus/.test(mt) && /no barcode/.test(mt), "DT115: each says where it was seen; a food without a barcode says so");
   // the line under your own tuna
@@ -70,7 +74,7 @@ const U = "http://127.0.0.1:3267";
   let s = await st();
   const copy = s.foods.find((f) => f.name === "Tuna in water, drained");
   ok(copy && copy.calories === 99 && copy.barcode === "8004030044005" && copy.source === "Members' foods" && /checked by a member/.test(copy.notes), "DT115: a copy in your foods with the values and the source");
-  ok(await mf.locator(".name-plain").count() === 2, "DT115: the copied food left the members' group");
+  ok(await mf.locator(".name-plain").count() === 3, "DT115: the copied food left the members' group");
   // the barcode answers from the catalogue before Open Food Facts
   const prod = await page.evaluate(async () => (await fetch("/api/product/3850102001234")).json());
   ok(prod.members === true && prod.product_name === "Tuna in brine, drained" && /Members' foods · checked by a member on 2026/.test(prod.source) && prod.calories === 105, "DT115: a barcode a member checked answers from the catalogue: " + prod.source);

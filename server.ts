@@ -18,6 +18,7 @@ import { getStorage as adminStorage } from "firebase-admin/storage";
 import { createHash } from "node:crypto";
 import { deleteAccount as deleteAccountSteps } from "./src/accountDelete";
 import { guideForChat } from "./src/goalGuide";
+import { synonymsOf } from "./src/reference";
 import { BOOK_PAGES, BOOK_HITS, BOOKS as BOOK_LIST, BOOK_SOURCES } from "./src/bookPages";
 import { spotsAfterInvite } from "./src/share";
 import { tidy } from "./src/labeltable";
@@ -512,7 +513,7 @@ app.get("/api/search", requireUser, requireMember, async (req, res) => {
 // No photo and no name of who scanned it. One entry per barcode; a food without a barcode by name and brand; a second scan of
 // the same food updates the numbers. The preview has its own catalogue. Without Firestore (local, walkthroughs), in memory.
 type MemberFood = { key: string; name: string; brand: string; barcode?: string; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber: number | null; serving?: { grams: number; name: string } | null; readyToEat?: boolean; source: string; markets: Record<string, string>; updatedAt: string; n: number };
-const mfSlug = (x: string) => String(x ?? "").toLowerCase().normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, " ").trim();
+const mfSlug = (x: string) => String(x ?? "").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^\p{L}\p{N}]+/gu, " ").trim(); // letters of any script (0.2.100: туњевина, τόνος)
 const mfKeyOf = (f: { barcode?: string; name: string; brand?: string }) => (f.barcode && /^\d{8,14}$/.test(f.barcode) ? `b:${f.barcode}` : `n:${mfSlug(f.name)}|${mfSlug(f.brand ?? "")}`);
 const haveFirestore = () => Boolean(FB_PROJECT);
 const mfMem = new Map<string, MemberFood>();
@@ -558,7 +559,9 @@ app.get("/api/members/foods", requireUser, requireMember, async (req, res) => {
     const words = q.split(" ").filter((w) => w.length >= 2);
     if (!words.length) return res.json({ foods: [] });
     const all = await mfAll(req);
-    const hit = all.filter((f) => { const hay = mfSlug(`${f.name} ${f.brand}`); return words.every((w) => hay.includes(w)); });
+    // 0.2.100: a word matches in any of the pilot's languages, through the basic foods table (tuna, tunjevina, Thunfisch, τόνος)
+    const forms = words.map((w) => [w, ...synonymsOf(w).map(mfSlug).filter(Boolean)]);
+    const hit = all.filter((f) => { const hay = mfSlug(`${f.name} ${f.brand}`); return forms.every((fs) => fs.some((w) => hay.includes(w))); });
     const mine = (f: MemberFood) => (region && f.markets && f.markets[region] ? 0 : 1);
     hit.sort((a, b) => mine(a) - mine(b) || (b.updatedAt > a.updatedAt ? 1 : -1));
     res.json({ foods: hit.slice(0, 12).map((f) => ({ ...f, seenIn: Object.keys(f.markets ?? {}) })) });

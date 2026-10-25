@@ -231,7 +231,10 @@ export const REFERENCE: RefFood[] = [
   ...R.map(([id, en, de, sr, cyr, kcal, protein, fats, carbsTotal, fiber, ready, source]) => ({ id, en, de, sr, cyr, kcal, protein, fats, carbsTotal, fiber, ready, source: source ?? U })),
   ...CY.map(([id, en, el, de, sr, cyr, kcal, protein, fats, carbsTotal, fiber, ready, source]) => ({ id, en, el, de, sr, cyr, kcal, protein, fats, carbsTotal, fiber, ready, source })),
 ];
-const namesOf = (r: RefFood) => [r.en, r.de, r.sr, r.cyr, ...(r.el ? [r.el] : [])];
+// 0.2.100: Greek for the staple foods too, so Tester 3's scans in Cyprus are found by the English word and back; the Cypriot
+// dishes carry their own Greek name above. Head words, the way people type them.
+const EL: Record<string, string> = { "tuna-canned": "Τόνος σε νερό", "chicken-breast-raw": "Κοτόπουλο στήθος, ωμό", "chicken-breast": "Κοτόπουλο στήθος, μαγειρεμένο", "rice-white-cooked": "Ρύζι, βρασμένο", "rice-white-raw": "Ρύζι, ωμό", "egg": "Αυγό", "egg-boiled": "Αυγό βραστό", "milk-whole": "Γάλα πλήρες", "milk-15": "Γάλα 1,5 %", "yogurt-plain": "Γιαούρτι", "yogurt-greek": "Γιαούρτι στραγγιστό 2 %", "apple": "Μήλο", "banana": "Μπανάνα", "potato": "Πατάτα, ωμή", "potato-boiled": "Πατάτα, βραστή", "tomato": "Ντομάτα", "cucumber": "Αγγούρι", "beef-mince": "Κιμάς μοσχαρίσιος", "pork-loin-raw": "Χοιρινό φιλέτο", "salmon-raw": "Σολομός", "cottage": "Τυρί κότατζ", "skyr": "Skyr", "quark-lowfat": "Κουάρκ" };
+export const namesOf = (r: RefFood) => [r.en, r.de, r.sr, r.cyr, ...(r.el ? [r.el] : EL[r.id] ? [EL[r.id]] : [])];
 
 const fold = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/đ/g, "d").replace(/ć/g, "c").replace(/č/g, "c").replace(/š/g, "s").replace(/ž/g, "z");
 // find by any name: a word start beats a substring; two characters minimum
@@ -303,4 +306,19 @@ export function rawOf(name: string, kcalCooked: number | null | undefined): { ra
   if (!raw) return null;
   const factor = kcalCooked / raw.kcal;
   return factor > 0.15 && factor < 1.6 ? { raw, factor } : null;
+}
+
+// 0.2.100 (Milan 25 October 11:57: "tuna" found nothing of Tester 2's tunjevina): the words a word stands for in the other
+// languages the pilot sees, from this table. tuna -> tunjevina, thunfisch, туњевина, τόνος, and the other way round. The
+// first word of each name, lower case, accents kept as written; the caller matches without accents.
+const head = (n: string) => n.toLowerCase().split(/[\s,(]+/).filter((w) => w.length >= 3)[0] ?? n.toLowerCase();
+export function synonymsOf(word: string): string[] {
+  const w = word.toLowerCase();
+  const out = new Set<string>();
+  for (const r of REFERENCE) {
+    const heads = namesOf(r).map(head);
+    if (heads.some((h) => h.includes(w) || w.includes(h) && h.length >= 4)) heads.forEach((h) => out.add(h));
+  }
+  out.delete(w);
+  return [...out];
 }
