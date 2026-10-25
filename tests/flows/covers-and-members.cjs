@@ -105,10 +105,12 @@ const toast = { title: "Toast with peanut butter", kitchen: null, steps: [], ite
   ok(/Balkan · shared by Davorka/.test(stirTile) && /Your dinner: [\d,]+ g · [\d,]+ kcal · PD 9\.2/.test(stirTile) && Math.abs(tileKcal - need) <= need * 0.05, "CO2: Davorka's stir-fry at your dinner, within 5 % of its size: " + stirTile);
   ok(/under your 6\.4/.test(await tiles.filter({ hasText: "Salmon" }).textContent()) && /Photo by a member/.test(await tiles.filter({ hasText: "Salmon" }).textContent()), "CO2: the salmon is marked under your target, with a member's photo");
   ok(/shared by you/.test(await tiles.filter({ hasText: "rye bread" }).textContent()), "CO2: your own shared recipe is there, shared by you");
-  await page.locator(".mb-chips").getByRole("button", { name: "Mediterranean" }).click(); await page.waitForTimeout(200);
-  ok((await tiles.locator(".tile-name").allTextContents()).join() === "Salmon with lemon potatoes", "CO2: a kitchen filters the list");
-  // Changed by story MB (0.2.61, board MB): the kitchens' first chip reads All kitchens, next to All cooks
-  await page.locator(".mb-chips").getByRole("button", { name: "All kitchens" }).click(); await page.waitForTimeout(200);
+  // Changed by story DT126 (0.2.105, board Stories72): Kitchen is a drop-down in the bar, one line per kitchen with its count
+  await page.getByRole("button", { name: /^Kitchen/ }).click(); await page.waitForTimeout(200);
+  await page.locator(".rb-line").filter({ hasText: "Mediterranean" }).click(); await page.waitForTimeout(300);
+  ok((await tiles.locator(".tile-name").allTextContents()).join() === "Salmon with lemon potatoes" && /Kitchen: Mediterranean/.test(await page.locator(".rb-count").textContent()), "CO2: a kitchen filters the list, and the line says so");
+  await page.getByRole("button", { name: /^Kitchen: Mediterranean/ }).click(); await page.waitForTimeout(200);
+  await page.locator(".rb-line").filter({ hasText: "All kitchens" }).click(); await page.waitForTimeout(200);
 
   // CO3: a member's recipe at your portion
   await tiles.filter({ hasText: "stir-fry" }).click(); await page.waitForTimeout(500);

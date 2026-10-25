@@ -2109,3 +2109,20 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .letters-grid { display: flex; gap: 18px; flex: 1; min-width: 0; }
 .letter-cell { display: grid; justify-items: start; gap: 1px; } .letter-cell small { font-size: var(--fs-small); opacity: .9; font-weight: 600; }
 .letters-note { align-self: flex-end; }
+
+/* DT126 (0.2.105, board Stories72): the recipes bar: search, drop-downs, chips, sort, the count line */
+.rb { display: flex; flex-direction: column; gap: 8px; }
+.rb .clear-field > input.search { margin: 0; }
+.rb-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.rb-chips .choice { height: 32px; padding: 0 10px; font-size: var(--fs-small); }
+.rb-chips .choice.on::before { content: none; }
+.rb-sheet { display: flex; flex-direction: column; border: 1.5px solid var(--line); border-radius: var(--r-control); background: var(--tint); padding: 6px 10px; }
+.rb-sheet-title { font-weight: 800; letter-spacing: .04em; color: var(--muted); text-transform: uppercase; font-size: 11px; padding: 4px 0; }
+.rb-line { display: flex; justify-content: space-between; align-items: center; gap: 10px; border: 0; border-top: 1px solid var(--line); background: transparent; padding: 9px 0; font: inherit; font-weight: 600; color: var(--ink); text-align: left; }
+.rb-line.on { color: var(--brand-text); font-weight: 900; } .rb-line.on span::before { content: "✓ "; }
+.rb-line small { color: var(--muted); font-weight: 600; }
+.rb-sort { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: var(--fs-small); color: var(--muted); }
+.rb-sort b { color: var(--ink); margin-right: 2px; }
+.rb-sort-link { font-size: var(--fs-small); font-weight: 600; color: var(--muted); padding: 2px 0; }
+.rb-sort-link.on { color: var(--brand-text); font-weight: 900; text-decoration: underline; }
+.rb-count { display: block; }

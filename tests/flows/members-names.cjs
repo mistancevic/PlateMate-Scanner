@@ -58,13 +58,17 @@ const R = {
   await page.reload(); await page.waitForTimeout(1500);
   ok(await page.getByRole("tab", { name: "Members" }).getAttribute("aria-selected") === "true", "MB: a reload stays on Members");
   // Changed by story MB5 (0.2.67, Milan 22:14): Cook is the publishing permission on Clients, so Members says member
-  const cooks = await page.getByRole("group", { name: "Members" }).getByRole("button").allTextContents();
-  ok(cooks.join(",") === "All members,Tester3,Davorka", "MB: the members who shared with their name, most recipes first: " + cooks.join(","));
-  await page.getByRole("group", { name: "Members" }).getByRole("button", { name: "Tester3" }).click(); await page.waitForTimeout(500);
-  ok(/view=members&member=Tester3$/.test(page.url()) && /Tester3's recipes · 2/.test(await page.locator(".mb-shelf").textContent()) && await page.locator(".recipe-tile").count() === 2, "MB: Tester3's recipes, his two");
+  // Changed by story DT126 (0.2.105, board Stories72): Member is a drop-down in the bar, one line per member with a count,
+  // most recipes first, then the recipes shared without a name
+  await page.getByRole("button", { name: /^Member/ }).click(); await page.waitForTimeout(200);
+  const cooks = (await page.locator(".rb-line").allTextContents()).map((x) => x.replace(/\s+/g, " ").trim());
+  ok(cooks.join(",") === "All members4,Tester32,Davorka1,Without a name1", "MB: the Member drop-down: all, the cooks with their counts, the unnamed: " + cooks.join(","));
+  await page.locator(".rb-line").filter({ hasText: "Tester3" }).click(); await page.waitForTimeout(500);
+  ok(/view=members&member=Tester3$/.test(page.url()) && /2 of 4 recipes · Member: Tester3/.test(await page.locator(".rb-count").textContent()) && await page.locator(".recipe-tile").count() === 2, "MB: Tester3's recipes, his two, and the line says 2 of 4");
   await page.reload(); await page.waitForTimeout(1500);
-  ok(await page.locator(".recipe-tile").count() === 2 && await page.locator(".mb-shelf").count() === 1, "MB: a reload keeps Tester3's recipes");
-  await page.getByRole("group", { name: "Members" }).getByRole("button", { name: "All members" }).click(); await page.waitForTimeout(300);
+  ok(await page.locator(".recipe-tile").count() === 2 && /Member: Tester3/.test(await page.locator(".rb-count").textContent()), "MB: a reload keeps Tester3's recipes");
+  await page.getByRole("button", { name: /^Member: Tester3/ }).click(); await page.waitForTimeout(200);
+  await page.locator(".rb-line").filter({ hasText: "All members" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: `Open ${R.koupepia.title}` }).click(); await page.waitForTimeout(700);
   await page.getByRole("button", { name: "All of Tester3's recipes ›" }).click(); await page.waitForTimeout(600);
   ok(await page.locator(".recipe-tile").count() === 2 && /member=Tester3/.test(page.url()), "MB: All of Tester3's recipes › opens his recipes");

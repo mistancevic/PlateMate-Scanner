@@ -1,4 +1,7 @@
 import { portionOf } from "../pilot";
+import { RecipeBar } from "../components/RecipeBar";
+import { EMPTY, activeCount, applyFilters, sortRows, kitchenLines, type Filters, type Sort, type Context, type RecipeRow } from "../recipeFilter";
+import { needsCooking } from "../cookWords";
 import { tasteForReq } from "../tasteChips";
 import { Utensils, ChevronRight, Check } from "lucide-react";
 import { draftSteps } from "../draftSteps";
@@ -160,10 +163,18 @@ export function RecipesScreen(p: AppApi) {
   const testOn = isOwner && p.ai.on && (isPreviewHost(location.host) || (["localhost", "127.0.0.1"].includes(location.hostname) && (() => { try { return localStorage.getItem("chefmealan-try-photo") === "1"; } catch { return false; } })()));
   // R17 (0.2.45): Chef Mealan's ideas wait at the top of Mine until made once or removed
   const mine = [...state.meals.filter((m) => m.from !== "coach" && m.idea), ...state.meals.filter((m) => m.from !== "coach" && !m.idea)], fromCoach = state.meals.filter((m) => m.from === "coach");
-  const shown = view === "mine" ? mine : fromCoach;
   const photoOf = (m: Meal) => state.feedback.find((f) => f.meal.id === m.id && f.photo)?.photo ?? state.feedback.find((f) => f.meal.title === m.title && f.photo)?.photo ?? null;
   const madeTimes = (m: Meal) => state.feedback.filter((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.status === "eaten").length;
   const lastRating = (m: Meal) => state.feedback.find((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.taste)?.taste ?? "";
+  // DT126 (0.2.105, board Stories72): the bar on Mine and Coach's: search, Kitchen and Shared drop-downs, chips, sort
+  const [bar, setBar] = useState<Filters>(EMPTY);
+  const [sort, setSort] = useState<Sort>("new");
+  const rowOfMeal = (m: Meal): RecipeRow => { const o = portionOf(m); return { id: m.id, title: m.title, foods: m.items.map((i) => i.food.name), steps: m.steps ?? [], kitchen: m.kitchen ?? null, cook: "", mine: true, at: m.savedAt, made: madeTimes(m), kcal: o ? Math.round(o.kcal) : null, pd: o?.pd ?? null, shared: m.members ? "members" : "none" }; };
+  const base = view === "mine" ? mine : fromCoach;
+  const rows = base.map(rowOfMeal);
+  const ctx: Context = { target: p.dayPd ?? p.pdRef, dayKcal: p.numbersFor(new Date())?.kcal ?? null, myFoods: state.foods.map((x) => x.name), needsCooking };
+  const order = new Map(sortRows(applyFilters(rows, bar, ctx), sort).map((r, k) => [r.id, k]));
+  const shown = sort === "new" && !activeCount(bar) && !bar.q ? base : base.filter((m) => order.has(m.id)).sort((a, b) => order.get(a.id)! - order.get(b.id)!);
   const opened = openId ? state.meals.find((m) => m.id === openId) ?? null : null;
   // IM23c (0.2.23): after How was it, the recipe the meal made or changed opens here, with one line for today
   const [landed, setLanded] = useState<{ id: string; line: string; title?: string; back?: "recipes" } | null>(null);
@@ -301,11 +312,12 @@ export function RecipesScreen(p: AppApi) {
             <StartWays flow={recipeIn} />
           </section>
         ))}
+      {view !== "members" && base.length > 0 && !(view === "mine" && recipeIn.inFlow) && <RecipeBar f={bar} set={setBar} sort={sort} setSort={setSort} kitchens={kitchenLines(applyFilters(rows, { ...bar, kitchen: null }, ctx))} members={[]} shown={shown.length} total={rows.length} kind="mine" />}
       {view === "members" && <MembersList list={memberList} ahead={ahead} p={p} open={setMemberOpen} loading={loadingMembers} error={membersErr} cook={cookPick} setCook={setCookPick} />}
       {view !== "members" && !(view === "mine" && recipeIn.inFlow) && shown.length === 0 && (
         <section className="card recipes-empty">
-          <small>{view === "mine" ? "Nothing here yet. Add one above, or make your first on the Plate." : `Nothing yet. Recipes ${approver === "your coach" ? "your coach" : approver} sends you land here.`}</small>
-          {view === "mine" && <button className="pill pill-wide pill-primary" onClick={() => { p.setKind("meal"); p.setStep("in"); setTab("journey"); }}>Make my first recipe</button>}
+          <small>{rows.length ? "Nothing matches. Clear a filter or the search." : view === "mine" ? "Nothing here yet. Add one above, or make your first on the Plate." : `Nothing yet. Recipes ${approver === "your coach" ? "your coach" : approver} sends you land here.`}</small>
+          {view === "mine" && !rows.length && <button className="pill pill-wide pill-primary" onClick={() => { p.setKind("meal"); p.setStep("in"); setTab("journey"); }}>Make my first recipe</button>}
         </section>
       )}
       {view !== "members" && !(view === "mine" && recipeIn.inFlow) && shown.map((m) => {

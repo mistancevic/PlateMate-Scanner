@@ -25,6 +25,9 @@ import { dayRecord } from "../record";
 import { dayLog } from "../today";
 import { ymd } from "../plan";
 import type { AppApi } from "../screens/api";
+import { RecipeBar } from "./RecipeBar";
+import { EMPTY, YOU, NONE, applyFilters, sortRows, kitchenLines, memberLines, type Filters, type Sort, type Context, type RecipeRow } from "../recipeFilter";
+import { needsCooking } from "../cookWords";
 
 // full: the day is planned or eaten in full, so nothing is left for the meal ahead (0.2.66, Milan 21:14: Dinner is about 0 kcal)
 export type Ahead = { name: string; kcal: number; target: number | null; full?: boolean };
@@ -41,43 +44,41 @@ export function aheadOf(p: AppApi): Ahead | null {
   return share ? { name: slot.name.toLowerCase(), kcal: share.kcal, target: p.dayPd ?? p.pdRef, ...(share.kcal < 50 ? { full: true } : {}) } : null;
 }
 export const cooksOf = (list: SharedRecipe[]) => { const n = new Map<string, number>(); for (const r of list) if (r.name && !r.mine) n.set(r.name, (n.get(r.name) ?? 0) + 1); return [...n.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map((x) => x[0]); };
-const byLine = (r: SharedRecipe) => [r.kitchen, r.mine ? "shared by you" : r.name ? `shared by ${r.name}` : "shared by a member", r.made ? `made ${r.made === 1 ? "once" : `${r.made} times`}` : ""].filter(Boolean).join(" · ");
+const byLine = (r: SharedRecipe) => [r.kitchen, r.mine ? (r.name ? "shared by you" : "shared by you, without your name") : r.name ? `shared by ${r.name}` : "shared by a member", r.made ? `made ${r.made === 1 ? "once" : `${r.made} times`}` : ""].filter(Boolean).join(" · ");
 const tag = (r: SharedRecipe) => (r.coverKind === "photo" ? (r.name ? `Photo by ${r.name}` : r.mine ? "Your photo" : "Photo by a member") : `Picture by ${CHEF_NAME}`);
 
-// CO2: the list
+// a shared recipe as the bar reads it (DT126)
+export const rowOfShared = (r: SharedRecipe): RecipeRow => { const w = portionOf(r, null); return { id: r.id, title: r.title, foods: r.items.map((i) => i.food.name), steps: r.steps ?? [], kitchen: r.kitchen ?? null, cook: r.name ?? "", mine: Boolean(r.mine), at: r.sharedAt ?? "", made: r.made ?? 0, kcal: w.kcal || null, pd: w.pd, shared: "members" }; };
+// CO2: the list. DT126 (0.2.105): the bar on top, search, Kitchen and Member as drop-downs, chips, sort; the two chip rows go
 export function MembersList({ list, ahead, p, open, loading, error, cook, setCook }: { list: SharedRecipe[] | null; ahead: Ahead | null; p: AppApi; open: (id: string) => void; loading: boolean; error: string; cook: string | null; setCook: (c: string | null) => void }) {
   const kitchens = p.personal.kitchens ?? [];
-  const [kitchen, setKitchen] = useState<string | null>(null);
-  // MB2 (0.2.61): the members who shared with their name, most recipes first; one name is one member (0.2.67: Cook is the publishing permission on Clients, so Members says member)
-  const cooks = cooksOf(list ?? []);
-  const on = cook ? cooks.find((c) => c.toLowerCase() === cook.toLowerCase()) ?? null : null;
-  const byCook = on ? (list ?? []).filter((r) => (r.name ?? "").toLowerCase() === on.toLowerCase()) : list;
-  const shown = byCook ? membersFor(byCook, { target: ahead?.target ?? null, kitchens, allergies: p.safety.allergies ?? [], kitchen }) : [];
+  const [f, setF] = useState<Filters>({ ...EMPTY, member: cook ?? null });
+  const [sort, setSort] = useState<Sort>("fit");
+  const set = (n: Filters) => { setF(n); if (n.member !== f.member) setCook(n.member && n.member !== YOU && n.member !== NONE ? n.member : null); };
+  // the cook in the address (a reload, All of Tester3's recipes ›) picks the member
+  useEffect(() => { const want = cook ?? null; const have = f.member === YOU || f.member === NONE ? null : f.member; if (want !== have) setF((x) => ({ ...x, member: want })); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [cook]);
+  // the allergy filter, silent and always on, and the rank for your day (membersFor); then the bar
+  const safe = list ? membersFor(list, { target: ahead?.target ?? null, kitchens, allergies: p.safety.allergies ?? [], kitchen: null }) : [];
+  const rows = safe.map(rowOfShared);
+  const ctx: Context = { target: ahead?.target ?? null, dayKcal: p.numbersFor(new Date())?.kcal ?? null, myFoods: p.state.foods.map((x) => x.name), needsCooking };
+  const kept = sortRows(applyFilters(rows, f, ctx), sort);
+  const byId = new Map(safe.map((r) => [r.id, r]));
+  const shown = kept.map((r) => byId.get(r.id)!);
+  // the drop-downs count over the rows the other filters leave
+  const kitchenRows = applyFilters(rows, { ...f, kitchen: null }, ctx), memberRows = applyFilters(rows, { ...f, member: null }, ctx);
   return (
     <>
+      {list && list.length > 0 && <RecipeBar f={f} set={set} sort={sort} setSort={setSort} kitchens={kitchenLines(kitchenRows)} members={memberLines(memberRows)} shown={shown.length} total={rows.length} kind="members" />}
       <section className="card mb-head">
         <small className="mb-lead">{ahead?.full
           ? `Recipes members cooked and shared. Your day is planned in full, so each shows the whole recipe; Make it puts your portion on the Plate.`
           : ahead
           ? `Recipes members cooked and shared, calculated for your day. ${ahead.name.charAt(0).toUpperCase() + ahead.name.slice(1)} is about ${fmt(ahead.kcal, 0)} kcal${ahead.target !== null ? ` at ${pdText(ahead.target)} or more, so these come first` : ""}.`
           : "Recipes members cooked and shared. Set your goal and every recipe shows your portion."}</small>
-        {on && <b className="mb-shelf">{on}'s recipes · {shown.length}</b>}
-        {cooks.length > 0 && (
-          <div className="mb-chips" role="group" aria-label="Members">
-            <button className={`choice ${on === null ? "on" : ""}`} onClick={() => setCook(null)}>All members</button>
-            {cooks.map((c) => <button key={c} className={`choice ${on === c ? "on" : ""}`} onClick={() => setCook(on === c ? null : c)}>{c}</button>)}
-          </div>
-        )}
-        {kitchens.length > 0 && (
-          <div className="mb-chips" role="group" aria-label="Kitchens">
-            <button className={`choice ${kitchen === null ? "on" : ""}`} onClick={() => setKitchen(null)}>All kitchens</button>
-            {kitchens.map((k) => <button key={k} className={`choice ${kitchen === k ? "on" : ""}`} onClick={() => setKitchen(kitchen === k ? null : k)}>{k}</button>)}
-          </div>
-        )}
       </section>
       {loading && !list && <small className="muted">Loading what members shared…</small>}
       {error && <small className="muted">{error}</small>}
-      {list && shown.length === 0 && <section className="card recipes-empty"><small>{kitchen ? `Nothing from the ${kitchen} kitchen yet.` : "Nothing shared yet. A recipe of yours can be the first: open it, then Share with members."}</small></section>}
+      {list && shown.length === 0 && <section className="card recipes-empty"><small>{rows.length ? "Nothing matches. Clear a filter or the search." : "Nothing shared yet. A recipe of yours can be the first: open it, then Share with members."}</small></section>}
       {shown.map((r) => {
         const x = portionOf(r, ahead && !ahead.full ? ahead.kcal : null);
         const ok = ahead?.target == null || (x.pd !== null && x.pd >= ahead.target - 0.05);
