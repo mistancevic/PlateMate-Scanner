@@ -1,7 +1,8 @@
-// JOURNEY (0.2.105, board Stories72, DT126; Milan 25 October 13:48 to 14:26): the recipes bar on Members and Mine. One
-// search over the title, the foods (in any of the pilot's languages) and the cook; Kitchen and Member as drop-downs with
-// counts; chips that stack; a sort; the line that says what is shown of what. A recipe shared without a name is found by
-// the search and counted under Without a name; the cook sees it under You, "2, one without your name".
+// JOURNEY (0.2.105 and 0.2.106, boards Stories72 and Stories74, DT126 and DT126c; Milan 25 October 13:48 to 15:12): Recipes
+// is one list under one bar, no tabs. One search over the title, the foods (in any of the pilot's languages) and the cook;
+// Made by and Kitchen as drop-downs with counts; chips that stack; a sort; the line that says what is shown of what. Idle,
+// the list is grouped by who made it, two rows per group and a line for the rest. A recipe shared without a name is found
+// by the search and counted under A member without a name; a recipe of yours shared without your name says so on its tile.
 const { chromium } = require("playwright");
 const path = require("node:path"); const S = { MAIN: path.resolve(__dirname, "../..") };
 const { spawn } = require("node:child_process"); const fs = require("node:fs");
@@ -10,9 +11,10 @@ const F = (re) => seed.foods.find((f) => re.test(f.name));
 const meal = (id, title, parts, n, extra = {}) => { const items = parts.map(([f, g], k) => ({ id: `${id}${k}`, food: F(f), grams: g, locked: true })); const w = items.reduce((s, i) => s + i.grams, 0); return { id, title, items, portion: Math.round(w / n), savedAt: `2026-10-2${id.slice(1)}T10:00:00Z`, ...extra }; };
 const crepes = meal("m1", "DaaM good protein crêpes", [[/^Eggs/, 240], [/^Milk/, 500], [/^Oats/, 120], [/^Whey/, 60]], 4, { steps: ["Blend.", "Fry thin."], kitchen: "Balkan" });
 const pudding = meal("m2", "Chocolate quark pudding", [[/^Quark/, 250], [/^Whey/, 25], [/^Nutella/, 15], [/^Milk/, 50]], 1, { members: { id: "x1", kitchen: null, named: false, sent: "" } });
+const coachQ = meal("m5", "Quark bowl, berries", [[/^Quark/, 300], [/^Whey/, 20], [/^Apple/, 100]], 1, { from: "coach" });
 const sarma = meal("m3", "Sarma", [[/chicken/i, 800], [/^Rice/, 1200], [/^Oats/, 200]], 8, { steps: ["Roll.", "Simmer two hours."], kitchen: "Balkan" });
 const quark = meal("m4", "Quark with apple", [[/^Quark/, 250], [/^Apple/, 150]], 1);
-seed.items = []; seed.meals = [crepes, sarma, pudding, quark]; seed.feedback = [];
+seed.items = []; seed.meals = [crepes, sarma, pudding, quark, coachQ]; seed.feedback = [];
 seed.goals = { ...seed.goals, calories: 2750, protein: 180, fats: 90, carbs: 300 };
 const it = (name, grams, calories, protein, fats, carbs) => ({ id: name.slice(0, 6) + grams, grams, food: { name, brand: "", calories, protein, fats, carbs, fiber: 0, readyToEat: true } });
 const R = (id, title, name, kitchen, items, steps, sharedAt, made, mine = false) => ({ id, title, name, kitchen, items, steps, sharedAt, updatedAt: sharedAt, made, mine, cover: null, coverKind: "drawn" });
@@ -49,67 +51,68 @@ const PORT = 3268, U = `http://127.0.0.1:${PORT}`;
   const count = (page) => page.locator(".rb-count").textContent();
   const lines = async (page) => (await page.locator(".rb-line").allTextContents()).map((x) => x.replace(/\s+/g, " ").trim());
 
-  // Members: the search
+  const groupTitles = (page) => page.locator(".rc-group-title").allTextContents();
+  // idle: no tabs, one bar, the groups
   let page = await open(SHARED);
-  await page.getByRole("tab", { name: "Members" }).click(); await page.waitForTimeout(900);
-  ok(await page.locator(".mb-chips").count() === 0 && await page.locator(".rb").count() === 1, "DT126: the two chip rows are gone; the bar is on top of Members");
-  ok((await titles(page)).length === 5 && /5 of 5 recipes/.test(await count(page)), "DT126: all five, and the line says 5 of 5");
+  ok(await page.getByRole("tab").count() === 0 && await page.locator(".rb").count() === 1, "DT126c: no tabs; one bar on top of Recipes");
+  ok((await groupTitles(page)).join(" | ") === "Made by me · 4 | Made by your coach · 1 | Made by members · 5", "DT126c: idle, three groups with counts: " + (await groupTitles(page)).join(" | "));
+  ok((await titles(page)).length === 2 + 1 + 2 && /10 recipes/.test(await count(page)), "DT126c: two rows per group and a line for the rest; the line says 10 recipes");
+  ok(await page.getByRole("button", { name: "2 more of mine ›" }).count() === 1 && await page.getByRole("button", { name: "3 more from members ›" }).count() === 1, "DT126c: the rest behind a line per group");
+  ok(/is about|Set your goal|planned in full/.test(await page.locator(".rc-lead").textContent({ timeout: 3000 }).catch(() => "")), "DT126c: the members' group says your portion for the meal ahead: " + await page.locator(".rc-lead").textContent({ timeout: 1000 }).catch(() => "(none)"));
+  await page.getByLabel("Search recipes").fill("pudding"); await page.waitForTimeout(400);
+  ok(/Shared with members, without your name/.test(await page.locator(".recipe-tile").filter({ hasText: "Chocolate quark pudding" }).textContent()), "DT126c: your recipe shared without your name says so on its tile");
+  await page.getByLabel("Clear the search").click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "3 more from members ›" }).click(); await page.waitForTimeout(400);
+  ok((await titles(page)).length === 5 && /5 of 10 recipes · Made by: members/.test(await count(page)) && /Made by: members/.test(await page.getByRole("button", { name: /^Made by/ }).textContent()), "DT126c: more from members opens Made by: members, all five");
+  // the search
+  await page.getByRole("button", { name: "Clear all" }).click(); await page.waitForTimeout(300);
   await page.getByLabel("Search recipes").fill("tuna"); await page.waitForTimeout(400);
-  ok((await titles(page)).join() === "Tuna salata" && /1 of 5 recipes/.test(await count(page)), "DT126: tuna finds Tuna salata by its food, in Slovenian: " + (await titles(page)).join());
+  ok((await titles(page)).join() === "Tuna salata" && /1 of 10 recipes/.test(await count(page)) && (await groupTitles(page)).join() === "Made by members · 1", "DT126: tuna finds Tuna salata by its food, in Slovenian, under its group: " + (await titles(page)).join());
   ok(/shared by a member/.test(await page.locator(".recipe-tile").first().textContent()), "DT126: shared without a name, it says shared by a member");
+  await page.getByLabel("Search recipes").fill("quark"); await page.waitForTimeout(400);
+  ok((await groupTitles(page)).join(" | ") === "Made by me · 2 | Made by your coach · 1" && (await titles(page)).length === 3, "DT126c: quark: the hits of two groups, every one shown, the empty group gone");
   await page.getByLabel("Search recipes").fill("darinka"); await page.waitForTimeout(400);
   ok((await titles(page)).join() === "Sarma", "DT126: the cook's name finds her recipe");
   await page.getByLabel("Clear the search").click(); await page.waitForTimeout(300);
-  // the Member drop-down and the unnamed
-  await page.getByRole("button", { name: /^Member/ }).click(); await page.waitForTimeout(200);
-  ok((await lines(page)).join(",") === "All members5,Darinka1,Davorka1,Marko1,Without a name2", "DT126: Member: all, the cooks with counts, Without a name · 2: " + (await lines(page)).join(","));
-  await page.locator(".rb-line").filter({ hasText: "Without a name" }).click(); await page.waitForTimeout(300);
-  ok((await titles(page)).sort().join() === "Overnight oats with skyr,Tuna salata" && /Member: without a name/.test(await count(page)), "DT126: Without a name shows the two unnamed");
-  // chips stack; the count line names them
-  await page.getByRole("button", { name: /^Member: without a name/ }).click(); await page.locator(".rb-line").filter({ hasText: "All members" }).click(); await page.waitForTimeout(200);
-  await page.getByRole("button", { name: "Fits my day" }).click(); await page.waitForTimeout(300);
-  ok((await titles(page)).length === 4 && !(await titles(page)).includes("Sarma") && /4 of 5 recipes · Fits my day/.test(await count(page)), "DT126: Fits my day drops the sarma, PD 5.9 under your 6.5: " + (await titles(page)).join());
-  await page.getByRole("button", { name: "No cooking" }).click(); await page.waitForTimeout(300);
-  ok((await titles(page)).sort().join() === "Overnight oats with skyr,Tuna salata" && /2 of 5 recipes · Fits my day · No cooking/.test(await count(page)), "DT126: No cooking stacks on it: the two with no pot, and the line names both: " + await count(page));
+  // Made by
+  await page.getByRole("button", { name: /^Made by/ }).click(); await page.waitForTimeout(200);
+  ok((await lines(page)).join(",") === "All10,Me4, one shared without your name,Your coach1,All members5,Darinka1,Davorka1,Marko1,A member without a name2", "DT126c: Made by: all, me, the coach, the cooks with counts, a member without a name: " + (await lines(page)).join(","));
+  await page.locator(".rb-line").filter({ hasText: "A member without a name" }).click(); await page.waitForTimeout(300);
+  ok((await titles(page)).sort().join() === "Overnight oats with skyr,Tuna salata" && /Made by: a member without a name/.test(await count(page)), "DT126c: A member without a name shows the two unnamed");
+  await page.getByRole("button", { name: /^Made by/ }).click(); await page.locator(".rb-line").filter({ hasText: "Your coach" }).click(); await page.waitForTimeout(300);
+  ok((await titles(page)).join() === "Quark bowl, berries" && /made=coach/.test(page.url()), "DT126c: Made by: your coach, and the address says made=coach");
   await page.getByRole("button", { name: "Clear all" }).click(); await page.waitForTimeout(300);
-  ok((await titles(page)).length === 5, "DT126: Clear all brings every recipe back");
-  // the sort
+  // chips stack; the count line names them
+  await page.getByRole("button", { name: "Fits my day" }).click(); await page.waitForTimeout(300);
+  ok((await titles(page)).filter((t) => t === "Sarma").length === 1 && /9 of 10 recipes · Fits my day/.test(await count(page)), "DT126: Fits my day drops Darinka's sarma, PD 5.9 under your 6.5; your own sarma stays: " + await count(page));
+  await page.getByRole("button", { name: "No cooking" }).click(); await page.waitForTimeout(300);
+  const nc = await titles(page);
+  ok(!nc.includes("Protein first") && !nc.includes("Davorka's chicken stir fry") && nc.includes("Tuna salata") && /Fits my day · No cooking/.test(await count(page)), "DT126: No cooking stacks on it, and the line names both: " + await count(page));
+  await page.getByRole("button", { name: "Clear all" }).click(); await page.waitForTimeout(300);
+  ok((await titles(page)).length === 5 && /10 recipes/.test(await count(page)), "DT126: Clear all brings the idle list back");
+  // the sort, inside the members' group
+  await page.getByRole("button", { name: /^Made by/ }).click(); await page.locator(".rb-line").filter({ hasText: "Marko" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /^Made by: Marko/ }).click(); await page.locator(".rb-line").filter({ hasText: "All" }).first().click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "3 more from members ›" }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: "Highest PD" }).click(); await page.waitForTimeout(300);
   const byPd = await titles(page);
   ok(byPd[0] === "Protein first" && byPd[1] === "Tuna salata" && byPd[4] === "Sarma", "DT126: Highest PD: Protein first, Tuna salata, ... Sarma last: " + byPd.join(" | "));
   await page.getByRole("button", { name: "Most made" }).click(); await page.waitForTimeout(300);
   ok((await titles(page))[0] === "Overnight oats with skyr", "DT126: Most made puts the oats, made 4 times, first");
-  await page.getByRole("button", { name: "Kitchen" }).click(); await page.waitForTimeout(200);
-  ok((await lines(page)).join(",") === "All kitchens5,Asian1,Balkan1,Mediterranean1", "DT126: Kitchen: one line per kitchen with its count: " + (await lines(page)).join(","));
+  await page.getByRole("button", { name: /^Kitchen/ }).click(); await page.waitForTimeout(200);
+  ok((await lines(page)).join(",") === "All kitchens10,Asian1,Balkan1,Mediterranean1", "DT126: Kitchen: one line per kitchen with its count, over the rows the other filters leave: " + (await lines(page)).join(","));
   await page.locator(".rb-line").filter({ hasText: "Balkan" }).click(); await page.waitForTimeout(300);
   ok((await titles(page)).join() === "Sarma" && /Kitchen: Balkan/.test(await count(page)) && /Kitchen: Balkan/.test(await page.getByRole("button", { name: /^Kitchen/ }).textContent()), "DT126: the pick shows in the chip and in the line");
+  await page.getByRole("button", { name: "Clear all" }).click(); await page.waitForTimeout(300);
+  // the chips on mine: With my foods
+  await page.getByRole("button", { name: "With my foods" }).click(); await page.waitForTimeout(300);
+  ok((await titles(page)).includes("Chocolate quark pudding") && !(await titles(page)).includes("Protein first") && /With my foods/.test(await count(page)), "DT126: With my foods keeps the recipes whose every food is in your list");
   await page.close();
 
-  // as the cook sees it: his unnamed recipe counts under You
+  // as the cook sees it: his own shared recipes are not repeated under members
   const MINE = SHARED.map((r) => (r.id === "s1" || r.id === "s2" ? { ...r, mine: true } : r));
   page = await open(MINE);
-  await page.getByRole("tab", { name: "Members" }).click(); await page.waitForTimeout(900);
-  await page.getByRole("button", { name: /^Member/ }).click(); await page.waitForTimeout(200);
-  ok((await lines(page))[1] === "You2, one without your name", "DT126: You · 2, one without your name: " + (await lines(page))[1]);
-  await page.locator(".rb-line").filter({ hasText: "You" }).click(); await page.waitForTimeout(300);
-  ok((await titles(page)).sort().join() === "Protein first,Tuna salata" && /shared by you, without your name/.test(await page.locator(".recipe-tile").filter({ hasText: "Tuna salata" }).textContent()), "DT126: both of his, and the unnamed one says shared by you, without your name");
-  await page.close();
-
-  // Mine: the same bar, Shared in place of Member
-  page = await open(SHARED);
-  ok(await page.locator(".rb").count() === 1 && await page.getByRole("button", { name: /^Shared/ }).count() === 1 && await page.getByRole("button", { name: /^Member/ }).count() === 0, "DT126: Mine has the bar, with Shared in place of Member");
-  ok(/4 of 4 recipes/.test(await count(page)), "DT126: Mine: 4 of 4");
-  await page.getByLabel("Search recipes").fill("quark"); await page.waitForTimeout(400);
-  ok((await titles(page)).sort().join() === "Chocolate quark pudding,Quark with apple" && /2 of 4 recipes/.test(await count(page)), "DT126: quark finds the two quark recipes: " + (await titles(page)).join());
-  await page.getByLabel("Clear the search").click(); await page.waitForTimeout(200);
-  await page.getByRole("button", { name: /^Kitchen/ }).click(); await page.locator(".rb-line").filter({ hasText: "Balkan" }).click(); await page.waitForTimeout(300);
-  ok((await titles(page)).sort().join() === "DaaM good protein crêpes,Sarma", "DT126: Kitchen: Balkan on Mine: the crêpes and the sarma");
-  await page.getByRole("button", { name: /^Kitchen: Balkan/ }).click(); await page.locator(".rb-line").filter({ hasText: "All kitchens" }).click(); await page.waitForTimeout(200);
-  await page.getByRole("button", { name: /^Shared/ }).click(); await page.locator(".rb-line").filter({ hasText: "With members" }).click(); await page.waitForTimeout(300);
-  ok((await titles(page)).join() === "Chocolate quark pudding" && /Shared with members/.test(await count(page)), "DT126: Shared: with members keeps the one shared");
-  await page.getByRole("button", { name: "With my foods" }).click(); await page.waitForTimeout(300);
-  ok((await titles(page)).length === 1 && /With my foods/.test(await count(page)), "DT126: With my foods on Mine: every food of the pudding is in your list");
-  ok(await page.getByRole("button", { name: "For your day" }).count() === 0, "DT126: For your day, the Members rank, is not a sort on Mine");
+  ok((await groupTitles(page)).join(" | ") === "Made by me · 4 | Made by your coach · 1 | Made by members · 3", "DT126c: a recipe of yours shared with members is one row, under me: " + (await groupTitles(page)).join(" | "));
   await page.close();
 
   ok(errors.length === 0, "no page errors" + (errors.length ? ": " + errors.join(" | ") : ""));

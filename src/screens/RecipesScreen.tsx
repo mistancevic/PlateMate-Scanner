@@ -1,6 +1,7 @@
 import { portionOf } from "../pilot";
 import { RecipeBar } from "../components/RecipeBar";
-import { EMPTY, activeCount, applyFilters, sortRows, kitchenLines, type Filters, type Sort, type Context, type RecipeRow } from "../recipeFilter";
+import { EMPTY, ME, COACH, MEMBERS, isIdle, applyFilters, sortRows, kitchenLines, madeByLines, groupRows, type Filters, type Sort, type Context, type RecipeRow } from "../recipeFilter";
+import { membersFor } from "../members";
 import { needsCooking } from "../cookWords";
 import { tasteForReq } from "../tasteChips";
 import { Utensils, ChevronRight, Check } from "lucide-react";
@@ -45,7 +46,7 @@ import { fromDraft } from "../steps";
 import { recipePhotosOf, recipeHasPhotos, sig } from "../photos";
 import { coverIsDrawn, isDrawnPhoto } from "../covers";
 import { CHEF_NAME } from "../components/Mark";
-import { MembersList, MemberPage, SharePanel, aheadOf } from "../components/Members";
+import { MemberPage, MemberTile, SharePanel, aheadOf, membersLead, rowOfShared, MEMBERS_CACHE, forgetMembers } from "../components/Members";
 import { sharedOf, contentSig, type SharedRecipe } from "../members";
 import { DeleteRecipe, type DeleteChoice } from "../components/DeleteRecipe";
 import { deletePlan, deletedLine, forgetRecipe } from "../recipeDelete";
@@ -107,27 +108,34 @@ export function RecipesScreen(p: AppApi) {
   const author = first(p.user?.name);
   const pubState = (id: string, draft: boolean): PubState => { const x = published[id]; return x ? (x.status === "waiting" || x.waiting ? "waiting" : x.status === "down" ? "down" : x.status === "back" ? "back" : "live") : draft ? "draft" : null; };
   const pubMeal = state.meals.find((m) => m.id === publishing);
-  // the Recipes tab (X0 and Y1, 10 October 2026): My recipes and Coach's recipes, one tile per recipe with its photo;
-  // Members as a third tab, and the tabs shorter so three fit: Mine, Coach's, Members (0.2.11, board CO, CO2)
-  // MB3 (0.2.61, Milan 16:46): the tab, and on Members the cook, are in the address, so a reload keeps them
-  type View = "mine" | "coach" | "members";
+  // the Recipes tab (X0 and Y1, 10 October 2026): My recipes and Coach's recipes; Members as a third tab (0.2.11, CO2);
+  // DT126c (0.2.106, board Stories74; Milan 25 October 15:08): the tabs are gone. One list under one bar, and who made a recipe
+  // is a filter, Made by. The address keeps it: ?made=me|coach|members|<name>|none; the old view= and member= still read.
   const q = () => { try { return new URLSearchParams(location.search); } catch { return new URLSearchParams(); } };
-  const [view, setViewState] = useState<View>(() => { const v = q().get("view"); return v === "coach" || v === "members" ? v : "mine"; });
-  // 0.2.67: the address says member (cook still read, for links from 0.2.61 to 0.2.66)
-  const [cookPick, setCookState] = useState<string | null>(() => q().get("member") ?? q().get("cook"));
-  const toUrl = (v: View, c: string | null) => { try { if (/^\/my-recipes\/?$/.test(location.pathname)) history.replaceState(history.state, "", `${location.pathname}${v === "mine" ? "" : `?view=${v}${v === "members" && c ? `&member=${encodeURIComponent(c)}` : ""}`}`); } catch { /* the address stays */ } };
-  const setView = (v: View) => { setViewState(v); toUrl(v, cookPick); };
-  const setCookPick = (c: string | null) => { setCookState(c); toUrl("members", c); };
+  const madeFromUrl = (): string | null => { const u = q(); const made = u.get("made"); if (made) return made; const m = u.get("member") ?? u.get("cook"); if (m) return m; const v = u.get("view"); return v === "members" ? MEMBERS : v === "coach" ? COACH : null; };
+  const toUrl = (made: string | null) => { try { if (/^\/my-recipes\/?$/.test(location.pathname)) history.replaceState(history.state, "", `${location.pathname}${made ? `?made=${encodeURIComponent(made)}` : ""}`); } catch { /* the address stays */ } };
   const [memberList, setMemberList] = useState<SharedRecipe[] | null>(null);
   const [owner, setOwner] = useState(false), [loadingMembers, setLoadingMembers] = useState(false), [membersErr, setMembersErr] = useState("");
   const [memberOpen, setMemberOpen] = useState<string | null>(null);
-  const loadMembers = () => {
+  // the members' list, kept for a minute in the tab (DT126c: Recipes loads it on every open, and the server allows 30 calls a
+  // minute from one address); a share, a take back or a take down asks again at once (force)
+  const loadMembers = (force = false) => {
+    const KEY = MEMBERS_CACHE;
+    if (!force) { try { const c = JSON.parse(sessionStorage.getItem(KEY) ?? "null"); if (c && c.uid === (p.user?.uid ?? "") && Date.now() - c.at < 60_000) { setMemberList(c.recipes); setOwner(Boolean(c.owner)); return; } } catch { /* no cache */ } }
     setLoadingMembers(true); setMembersErr("");
-    fetch("/api/members").then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || "Members didn't load. Try again."); setMemberList(d.recipes ?? []); setOwner(Boolean(d.owner)); })
+    fetch("/api/members").then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || "Members didn't load. Try again."); setMemberList(d.recipes ?? []); setOwner(Boolean(d.owner)); try { sessionStorage.setItem(KEY, JSON.stringify({ at: Date.now(), uid: p.user?.uid ?? "", recipes: d.recipes ?? [], owner: Boolean(d.owner) })); } catch { /* no room */ } })
       .catch((e) => setMembersErr(e.message)).finally(() => setLoadingMembers(false));
   };
-  const anyShared = state.meals.some((m) => m.members);
-  useEffect(() => { if (view === "members" || anyShared) loadMembers(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [view, p.user?.uid, anyShared]);
+  // loaded when Recipes opens (from the minute's cache when there is one) and fresh when the tab is tapped again
+  useEffect(() => { loadMembers(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [p.user?.uid]);
+  // the Recipes tab tapped again: the list fresh, past the minute's cache (a member's new share shows); a tap in the first
+  // seconds after the page loaded only closes an open recipe
+  const tapped = useRef(p.recipesHome);
+  useEffect(() => { if (p.recipesHome === tapped.current) return; tapped.current = p.recipesHome; if (performance.now() > 3000) loadMembers(true); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [p.recipesHome]);
+  // a share or a take back of yours: the list again at once
+  const sharedIds = state.meals.filter((m) => m.members).map((m) => m.members!.id).sort().join(",");
+  const firstShared = useRef(true);
+  useEffect(() => { if (firstShared.current) { firstShared.current = false; return; } forgetMembers(); loadMembers(true); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [sharedIds]);
   // MB4 (0.2.66, Milan 21:14): Chef Mealan's picture of a shared recipe reaches members when they see no cover or an older
   // picture; your own photos never go without your pick (Change the cover on the recipe)
   const coverSent = useRef(new Set<string>());
@@ -140,7 +148,7 @@ export function RecipesScreen(p: AppApi) {
       coverSent.current.add(m.id + sig(drawn));
       const sh = m.members, recipe = sharedOf(m, sh.kitchen), want = sig(drawn);
       void resizeImageBase64(drawn, 640, 480).catch(() => null).then((cover) => cover && fetch("/api/members", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: sh.id, recipe, cover, coverKind: "drawn", named: sh.named, name: p.user?.name ?? "" }) })
-        .then((r) => { if (r.ok) { setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === m.id && x.members ? { ...x, members: { ...x.members, coverSig: want, sent: contentSig(recipe) } } : x)) })); loadMembers(); } }).catch(() => {}));
+        .then((r) => { if (r.ok) { setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === m.id && x.members ? { ...x, members: { ...x.members, coverSig: want, sent: contentSig(recipe) } } : x)) })); loadMembers(true); } }).catch(() => {}));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.meals]);
@@ -166,15 +174,39 @@ export function RecipesScreen(p: AppApi) {
   const photoOf = (m: Meal) => state.feedback.find((f) => f.meal.id === m.id && f.photo)?.photo ?? state.feedback.find((f) => f.meal.title === m.title && f.photo)?.photo ?? null;
   const madeTimes = (m: Meal) => state.feedback.filter((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.status === "eaten").length;
   const lastRating = (m: Meal) => state.feedback.find((f) => (f.meal.id === m.id || f.meal.title === m.title) && f.taste)?.taste ?? "";
-  // DT126 (0.2.105, board Stories72): the bar on Mine and Coach's: search, Kitchen and Shared drop-downs, chips, sort
-  const [bar, setBar] = useState<Filters>(EMPTY);
-  const [sort, setSort] = useState<Sort>("new");
-  const rowOfMeal = (m: Meal): RecipeRow => { const o = portionOf(m); return { id: m.id, title: m.title, foods: m.items.map((i) => i.food.name), steps: m.steps ?? [], kitchen: m.kitchen ?? null, cook: "", mine: true, at: m.savedAt, made: madeTimes(m), kcal: o ? Math.round(o.kcal) : null, pd: o?.pd ?? null, shared: m.members ? "members" : "none" }; };
-  const base = view === "mine" ? mine : fromCoach;
-  const rows = base.map(rowOfMeal);
-  const ctx: Context = { target: p.dayPd ?? p.pdRef, dayKcal: p.numbersFor(new Date())?.kcal ?? null, myFoods: state.foods.map((x) => x.name), needsCooking };
-  const order = new Map(sortRows(applyFilters(rows, bar, ctx), sort).map((r, k) => [r.id, k]));
-  const shown = sort === "new" && !activeCount(bar) && !bar.q ? base : base.filter((m) => order.has(m.id)).sort((a, b) => order.get(a.id)! - order.get(b.id)!);
+  // DT126 and DT126c: the one filter set, the rows of every source, the groups
+  const [bar, setBarState] = useState<Filters>(() => ({ ...EMPTY, madeBy: madeFromUrl() }));
+  const setBar = (f: Filters) => { setBarState(f); if (f.madeBy !== bar.madeBy) toUrl(f.madeBy); };
+  const [sort, setSort] = useState<Sort>("fit"); // For your day: the order each source has today (ideas first, members at or above your PD first)
+  const rowOfMeal = (m: Meal): RecipeRow => { const o = portionOf(m); return { id: m.id, title: m.title, foods: m.items.map((i) => i.food.name), steps: m.steps ?? [], kitchen: m.kitchen ?? null, source: m.from === "coach" ? "coach" : "me", cook: "", unnamed: Boolean(m.members && !m.members.named), at: m.savedAt, made: madeTimes(m), kcal: o ? Math.round(o.kcal) : null, pd: o?.pd ?? null }; };
+  // the members' rows: the allergy filter and the rank for your day first (membersFor); a recipe of yours shared with members is one row, under me
+  const safeMembers = memberList ? membersFor(memberList.filter((r) => !r.mine), { target: ahead?.target ?? null, kitchens: p.personal.kitchens ?? [], allergies: p.safety.allergies ?? [], kitchen: null }) : [];
+  const rows: RecipeRow[] = [...mine.map(rowOfMeal), ...fromCoach.map(rowOfMeal), ...safeMembers.map(rowOfShared)];
+  const ctx: Context = { target: ahead?.target ?? null, dayKcal: p.numbersFor(new Date())?.kcal ?? null, myFoods: state.foods.map((x) => x.name), needsCooking };
+  const kept = sortRows(applyFilters(rows, bar, ctx), sort);
+  const groups = groupRows(kept, p.coachLabel);
+  const idle = isIdle(bar);
+  const mealOf = new Map(state.meals.map((m) => [m.id, m])), sharedOfId = new Map(safeMembers.map((r) => [r.id, r]));
+  const mealTile = (m: Meal) => {
+    // R7: one tap per recipe: the cover (or the newest plate photo), the name, the foods, where the recipe is
+    const own = recipePhotosOf(m), photo = own[0] ?? photoOf(m), n = madeTimes(m), rating = lastRating(m);
+    const st = isCoach ? pubState(m.id, Boolean(m.publish)) : null;
+    return (
+      <button type="button" className="card recipe-tile" key={m.id} onClick={() => setOpenId(m.id)} aria-label={`Open ${m.title}`}>
+        {photo
+          ? (coverIsDrawn(m) && own[0] === photo ? <span className="recipe-tile-cover"><img src={photo} alt="" /><span className="tile-drawn">Picture by {CHEF_NAME}</span></span> : <img src={photo} alt="" />)
+          : <div className="recipe-tile-blank"><span><Utensils size={28} />{m.cover?.state === "tomorrow" && <small>Picture tomorrow</small>}</span></div>}
+        <div className="recipe-tile-body">
+          <div className="card-top"><b className="tile-name">{m.title}</b><ChevronRight size={20} className="tile-go" /></div>
+          {/* R21 (0.2.49, board RS20): a tile says what one portion is; the foods are on the recipe's page */}
+          <small>{(() => { const o = portionOf(m); return o ? `One ${o.word} · ${fmt(o.kcal, 0)} kcal · ${fmt(o.protein, 0)} g protein · ${pdText(o.pd)}${o.n > 1 ? ` · makes ${o.n}` : ""}` : `${m.items.length} ${m.items.length === 1 ? "food" : "foods"}`; })()}{rating ? ` · ${rating}` : ""}{n ? ` · made ${n === 1 ? "once" : `${n} times`}` : ""}</small>
+          {m.idea && <small className="tile-state">{CHEF_NAME}'s idea, not made yet</small>}
+          {m.members && <small className="tile-state live">Shared with members{m.members.named ? "" : ", without your name"}</small>}
+          {st && <small className={`tile-state ${st}`}>{st === "live" ? "Live on chefmealan.com" : st === "down" ? "Taken down" : st === "waiting" ? `Waiting for ${approver}` : st === "back" ? `Sent back by ${approver}` : "Draft"}</small>}
+        </div>
+      </button>
+    );
+  };
   const opened = openId ? state.meals.find((m) => m.id === openId) ?? null : null;
   // IM23c (0.2.23): after How was it, the recipe the meal made or changed opens here, with one line for today
   const [landed, setLanded] = useState<{ id: string; line: string; title?: string; back?: "recipes" } | null>(null);
@@ -185,7 +217,7 @@ export function RecipesScreen(p: AppApi) {
   const [cameFrom, setCameFrom] = useState<{ id: string; from: MealFrom } | null>(null);
   useEffect(() => {
     const l = p.landing; if (!l) return;
-    if (state.meals.some((m) => m.id === l.id)) { setView("mine"); setOpenId(l.id); if (!l.quiet) setLanded(l); setCameFrom(l.from ? { id: l.id, from: l.from } : null); }
+    if (state.meals.some((m) => m.id === l.id)) { setOpenId(l.id); if (!l.quiet) setLanded(l); setCameFrom(l.from ? { id: l.id, from: l.from } : null); }
     p.clearLanding();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p.landing]);
@@ -200,7 +232,7 @@ export function RecipesScreen(p: AppApi) {
   useEffect(() => {
     const id = p.openFromPath; if (!id) return;
     const m = state.meals.find((x) => x.id === id); if (!m) return;
-    setView(m.from === "coach" ? "coach" : "mine"); setOpenId(id); p.clearOpenFromPath();
+    setOpenId(id); p.clearOpenFromPath();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [p.openFromPath, state.meals]);
   // IM22c (0.2.22): after Delete recipe, a line on Recipes says what was done
@@ -228,7 +260,7 @@ export function RecipesScreen(p: AppApi) {
     setPublished((x) => { const y = { ...x }; delete y[m.id]; return y; });
     setState((s) => forgetRecipe(s, m));
     setDeleted({ title: m.title, line: deletedLine(plan, did, approver) });
-    if (memberList && did.members) setMemberList(memberList.filter((r) => r.id !== m.members!.id));
+    if (memberList && did.members) { forgetMembers(); setMemberList(memberList.filter((r) => r.id !== m.members!.id)); }
   };
 
   // R12c (0.2.5+r13, board S4): closing the sheet after a publish says so once
@@ -242,11 +274,11 @@ export function RecipesScreen(p: AppApi) {
     direct={cook.direct} approver={approver} client={client} publishNow={publishNow} />;
   // CO3: a member's recipe
   const member = memberOpen ? memberList?.find((r) => r.id === memberOpen) ?? null : null;
-  if (member) return <MemberPage r={member} ahead={ahead} p={p} owner={owner} close={() => setMemberOpen(null)} toCook={(n) => { setMemberOpen(null); setViewState("members"); setCookState(n);
+  if (member) return <MemberPage r={member} ahead={ahead} p={p} owner={owner} close={() => setMemberOpen(null)} toCook={(n) => { setMemberOpen(null); setBarState((f) => ({ ...f, madeBy: n }));
       // closing the recipe steps the browser back; the cook goes into the address once that step has landed
-      let done = false; const put = () => { if (done) return; done = true; window.removeEventListener("popstate", put); toUrl("members", n); };
+      let done = false; const put = () => { if (done) return; done = true; window.removeEventListener("popstate", put); toUrl(n); };
       window.addEventListener("popstate", put); window.setTimeout(put, 900); }}
-    takeDown={() => { fetch(`/api/members/${encodeURIComponent(member.id)}`, { method: "DELETE" }).then(() => { setMemberOpen(null); loadMembers(); p.notify("Taken down for every member."); }).catch(() => {}); }} />;
+    takeDown={() => { fetch(`/api/members/${encodeURIComponent(member.id)}`, { method: "DELETE" }).then(() => { setMemberOpen(null); loadMembers(true); p.notify("Taken down for every member."); }).catch(() => {}); }} />;
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
@@ -298,48 +330,38 @@ export function RecipesScreen(p: AppApi) {
           {deleted.line && <small className="muted">{deleted.line}</small>}
         </section>
       )}
-      <div className="segments" role="tablist" aria-label="Recipes">
-        <button role="tab" aria-selected={view === "mine"} className={`seg ${view === "mine" ? "on" : ""}`} onClick={() => setView("mine")}>Mine{mine.length ? ` (${mine.length})` : ""}</button>
-        <button role="tab" aria-selected={view === "coach"} className={`seg ${view === "coach" ? "on" : ""}`} onClick={() => setView("coach")}>Coach's{fromCoach.length ? ` (${fromCoach.length})` : ""}</button>
-        <button role="tab" aria-selected={view === "members"} className={`seg ${view === "members" ? "on" : ""}`} onClick={() => setView("members")}>Members</button>
-      </div>
-      {view === "mine" && (recipeIn.inFlow
+      {recipeIn.inFlow
         ? <RecipeInFlow flow={recipeIn} put={(f) => void saveRead(f)} putLabel="Save in My recipes" />
-        : (
+        : (<>
+          {(rows.length > 0 || bar.madeBy) && <RecipeBar f={bar} set={setBar} sort={sort} setSort={setSort} kitchens={kitchenLines(applyFilters(rows, { ...bar, kitchen: null }, ctx))} madeBy={madeByLines(applyFilters(rows, { ...bar, madeBy: null }, ctx), p.coachLabel)} shown={kept.length} total={rows.length} coachLabel={p.coachLabel} />}
           <section className="card plate-card recipe-add" aria-label="Add a recipe">
             <div className="card-top"><span>Add a recipe</span></div>
             <small className="muted">From a link or screenshots, as on the Plate. It goes into My recipes; nothing goes on the Plate.</small>
             <StartWays flow={recipeIn} />
           </section>
-        ))}
-      {view !== "members" && base.length > 0 && !(view === "mine" && recipeIn.inFlow) && <RecipeBar f={bar} set={setBar} sort={sort} setSort={setSort} kitchens={kitchenLines(applyFilters(rows, { ...bar, kitchen: null }, ctx))} members={[]} shown={shown.length} total={rows.length} kind="mine" />}
-      {view === "members" && <MembersList list={memberList} ahead={ahead} p={p} open={setMemberOpen} loading={loadingMembers} error={membersErr} cook={cookPick} setCook={setCookPick} />}
-      {view !== "members" && !(view === "mine" && recipeIn.inFlow) && shown.length === 0 && (
-        <section className="card recipes-empty">
-          <small>{rows.length ? "Nothing matches. Clear a filter or the search." : view === "mine" ? "Nothing here yet. Add one above, or make your first on the Plate." : `Nothing yet. Recipes ${approver === "your coach" ? "your coach" : approver} sends you land here.`}</small>
-          {view === "mine" && !rows.length && <button className="pill pill-wide pill-primary" onClick={() => { p.setKind("meal"); p.setStep("in"); setTab("journey"); }}>Make my first recipe</button>}
-        </section>
-      )}
-      {view !== "members" && !(view === "mine" && recipeIn.inFlow) && shown.map((m) => {
-        // R7: one tap per recipe: the cover (or the newest plate photo), the name, the foods, where the recipe is
-        const own = recipePhotosOf(m), photo = own[0] ?? photoOf(m), n = madeTimes(m), rating = lastRating(m);
-        const st = isCoach ? pubState(m.id, Boolean(m.publish)) : null;
-        return (
-          <button type="button" className="card recipe-tile" key={m.id} onClick={() => setOpenId(m.id)} aria-label={`Open ${m.title}`}>
-            {photo
-              ? (coverIsDrawn(m) && own[0] === photo ? <span className="recipe-tile-cover"><img src={photo} alt="" /><span className="tile-drawn">Picture by {CHEF_NAME}</span></span> : <img src={photo} alt="" />)
-              : <div className="recipe-tile-blank"><span><Utensils size={28} />{m.cover?.state === "tomorrow" && <small>Picture tomorrow</small>}</span></div>}
-            <div className="recipe-tile-body">
-              <div className="card-top"><b className="tile-name">{m.title}</b><ChevronRight size={20} className="tile-go" /></div>
-              {/* R21 (0.2.49, board RS20): a tile says what one portion is; the foods are on the recipe's page */}
-              <small>{(() => { const o = portionOf(m); return o ? `One ${o.word} · ${fmt(o.kcal, 0)} kcal · ${fmt(o.protein, 0)} g protein · ${pdText(o.pd)}${o.n > 1 ? ` · makes ${o.n}` : ""}` : `${m.items.length} ${m.items.length === 1 ? "food" : "foods"}`; })()}{rating ? ` · ${rating}` : ""}{n ? ` · made ${n === 1 ? "once" : `${n} times`}` : ""}</small>
-              {m.idea && <small className="tile-state">{CHEF_NAME}'s idea, not made yet</small>}
-              {m.members && <small className="tile-state live">Shared with members</small>}
-              {st && <small className={`tile-state ${st}`}>{st === "live" ? "Live on chefmealan.com" : st === "down" ? "Taken down" : st === "waiting" ? `Waiting for ${approver}` : st === "back" ? `Sent back by ${approver}` : "Draft"}</small>}
-            </div>
-          </button>
-        );
-      })}
+          {rows.length === 0 && bar.madeBy !== MEMBERS && (
+            <section className="card recipes-empty">
+              <small>Nothing here yet. Add one above, or make your first on the Plate.</small>
+              <button className="pill pill-wide pill-primary" onClick={() => { p.setKind("meal"); p.setStep("in"); setTab("journey"); }}>Make my first recipe</button>
+            </section>
+          )}
+          {kept.length === 0 && bar.madeBy === MEMBERS && isIdle({ ...bar, madeBy: null }) && <section className="card recipes-empty"><small className="rc-lead">{membersLead(ahead)}</small><small>Nothing shared yet. A recipe of yours can be the first: open it, then Share with members.</small></section>}
+          {rows.length > 0 && kept.length === 0 && !(bar.madeBy === MEMBERS && isIdle({ ...bar, madeBy: null })) && <section className="card recipes-empty"><small>Nothing matches. Clear a filter or the search.</small></section>}
+          {membersErr && <small className="muted">{membersErr}</small>}
+          {groups.map((g) => {
+            // idle: two rows per group and a line for the rest (a lone group, or one of three rows or fewer, shows whole); a search or a filter: every hit
+            const cut = idle && groups.length > 1 && g.rows.length > 3 ? 2 : g.rows.length, shownRows = g.rows.slice(0, cut), more = g.rows.length - shownRows.length;
+            return (
+              <section key={g.key} className="rc-group" aria-label={g.title}>
+                <p className="label rc-group-title">{g.title} · {g.rows.length}</p>
+                {g.key === "member" && <small className="muted rc-lead">{membersLead(ahead)}</small>}
+                {shownRows.map((r) => (g.key === "member" ? <MemberTile key={r.id} r={sharedOfId.get(r.id)!} ahead={ahead} open={setMemberOpen} /> : mealTile(mealOf.get(r.id)!)))}
+                {more > 0 && <button type="button" className="link rc-more" onClick={() => setBar({ ...bar, madeBy: g.key === "me" ? ME : g.key === "coach" ? COACH : MEMBERS })}>{more} more {g.key === "me" ? "of mine" : g.key === "coach" ? `from ${p.coachLabel}` : "from members"} ›</button>}
+              </section>
+            );
+          })}
+          {loadingMembers && !memberList && <small className="muted">Loading what members shared…</small>}
+        </>)}
       {sheet}
     </>
   );

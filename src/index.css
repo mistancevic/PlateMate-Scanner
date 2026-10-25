@@ -2126,3 +2126,8 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .rb-sort-link { font-size: var(--fs-small); font-weight: 600; color: var(--muted); padding: 2px 0; }
 .rb-sort-link.on { color: var(--brand-text); font-weight: 900; text-decoration: underline; }
 .rb-count { display: block; }
+/* DT126c (0.2.106, board Stories74): no tabs; the one list in groups by who made it */
+.rc-group { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+.rc-group-title { margin: 6px 0 0; }
+.rc-lead { display: block; margin-top: -4px; }
+.rc-more { align-self: flex-start; font-weight: 800; margin: -2px 0 6px; }

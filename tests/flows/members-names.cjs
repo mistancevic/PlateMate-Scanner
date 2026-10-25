@@ -53,27 +53,25 @@ const R = {
   const list = (await call("/api/members"))[1].recipes;
   ok(list.find((r) => r.title === R.stir.title).name === "Davorka" && list.find((r) => r.title === R.oats.title).name === "" && !JSON.stringify(list).includes("local-"), "MB: an earlier first name share gets that name; no name stays no name; who holds it never leaves the server");
   // the tab and the cook in the address
-  await page.getByRole("tab", { name: "Members" }).click(); await page.waitForTimeout(900);
-  ok(/\/my-recipes\?view=members$/.test(page.url()), "MB: Members is in the address: " + page.url());
-  await page.reload(); await page.waitForTimeout(1500);
-  ok(await page.getByRole("tab", { name: "Members" }).getAttribute("aria-selected") === "true", "MB: a reload stays on Members");
-  // Changed by story MB5 (0.2.67, Milan 22:14): Cook is the publishing permission on Clients, so Members says member
-  // Changed by story DT126 (0.2.105, board Stories72): Member is a drop-down in the bar, one line per member with a count,
-  // most recipes first, then the recipes shared without a name
-  await page.getByRole("button", { name: /^Member/ }).click(); await page.waitForTimeout(200);
+  // Changed by story DT126c (0.2.106, board Stories74): no tabs. Made by is a drop-down in the bar, one line per member with
+  // a count, most recipes first, then the recipes shared without a name; the pick is in the address as made=
+  // the list is kept for a minute; the Recipes tab tapped again (a few seconds after the page opened) asks fresh
+  await page.waitForTimeout(3200);
+  await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(900);
+  await page.getByRole("button", { name: /^Made by/ }).click(); await page.waitForTimeout(300);
   const cooks = (await page.locator(".rb-line").allTextContents()).map((x) => x.replace(/\s+/g, " ").trim());
-  ok(cooks.join(",") === "All members4,Tester32,Davorka1,Without a name1", "MB: the Member drop-down: all, the cooks with their counts, the unnamed: " + cooks.join(","));
+  ok(cooks.join(",") === "All7,Me2,Your coach1,All members4,Tester32,Davorka1,A member without a name1", "MB: Made by: all, me, the cooks with their counts, the unnamed: " + cooks.join(","));
   await page.locator(".rb-line").filter({ hasText: "Tester3" }).click(); await page.waitForTimeout(500);
-  ok(/view=members&member=Tester3$/.test(page.url()) && /2 of 4 recipes · Member: Tester3/.test(await page.locator(".rb-count").textContent()) && await page.locator(".recipe-tile").count() === 2, "MB: Tester3's recipes, his two, and the line says 2 of 4");
+  ok(/\/my-recipes\?made=Tester3$/.test(page.url()) && /2 of 7 recipes · Made by: Tester3/.test(await page.locator(".rb-count").textContent()) && await page.locator(".recipe-tile").count() === 2, "MB: Tester3's recipes, his two, in the address, and the line says 2 of 7: " + page.url());
   await page.reload(); await page.waitForTimeout(1500);
-  ok(await page.locator(".recipe-tile").count() === 2 && /Member: Tester3/.test(await page.locator(".rb-count").textContent()), "MB: a reload keeps Tester3's recipes");
-  await page.getByRole("button", { name: /^Member: Tester3/ }).click(); await page.waitForTimeout(200);
-  await page.locator(".rb-line").filter({ hasText: "All members" }).click(); await page.waitForTimeout(300);
+  ok(await page.locator(".recipe-tile").count() === 2 && /Made by: Tester3/.test(await page.locator(".rb-count").textContent()), "MB: a reload keeps Tester3's recipes");
+  await page.getByRole("button", { name: /^Made by: Tester3/ }).click(); await page.locator(".rb-line").filter({ hasText: "All" }).first().click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /more from members/ }).click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: `Open ${R.koupepia.title}` }).click(); await page.waitForTimeout(700);
   await page.getByRole("button", { name: "All of Tester3's recipes ›" }).click(); await page.waitForTimeout(600);
-  ok(await page.locator(".recipe-tile").count() === 2 && /member=Tester3/.test(page.url()), "MB: All of Tester3's recipes › opens his recipes");
+  ok(await page.locator(".recipe-tile").count() === 2 && /made=Tester3/.test(page.url()), "MB: All of Tester3's recipes › opens his recipes: " + page.url());
   // sharing with my name: asked once, checked
-  await page.getByRole("tab", { name: /^Mine/ }).click(); await page.waitForTimeout(400);
+  await page.goto(U + "/my-recipes?made=me"); await page.waitForTimeout(1200);
   await page.locator(".recipe-tile").first().click(); await page.waitForTimeout(900);
   await page.locator(".mb-share .mb-switch").click(); await page.waitForTimeout(300);
   await page.getByLabel("Your name in Members").fill("tester3"); await page.waitForTimeout(900);

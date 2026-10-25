@@ -90,9 +90,10 @@ const toast = { title: "Toast with peanut butter", kitchen: null, steps: [], ite
   await as("davorka", { recipe: stir, cover: pic, coverKind: "drawn", named: true, name: "Davorka Bokic" });
   await as("member", { recipe: salmon, cover: pic, coverKind: "photo", named: false });
   await as("member", { recipe: toast, cover: null, coverKind: "drawn", named: false });
-  await page.getByRole("tab", { name: "Members" }).click(); await page.waitForTimeout(900);
-  ok(await page.getByRole("tab", { name: /^Mine/ }).count() === 1 && await page.getByRole("tab", { name: /^Coach's/ }).count() === 1, "CO2: the tabs read Mine, Coach's, Members");
-  const head = (await page.locator(".mb-lead").textContent()).replace(/\s+/g, " ");
+  // Changed by story DT126c (0.2.106, board Stories74): no tabs; Made by: members is the members' part of the one list
+  await recipes(); await page.getByRole("button", { name: /^Made by/ }).click(); await page.locator(".rb-line").filter({ hasText: /^All members/ }).click(); await page.waitForTimeout(600);
+  ok(await page.getByRole("tab").count() === 0 && /Made by: members/.test(await page.getByRole("button", { name: /^Made by/ }).textContent()) && /made=members/.test(page.url()), "CO2: no tabs; Made by: All members, and the address says so: " + page.url());
+  const head = (await page.locator(".rc-lead").textContent()).replace(/\s+/g, " ");
   const need = Number((head.match(/about ([\d,]+) kcal/) || [])[1]?.replace(",", ""));
   ok(/Dinner is about [\d,]+ kcal at PD 6\.4 or more/.test(head), "CO2: the line says the meal ahead, its size and the target: " + head);
   const tiles = page.locator(".recipe-tile");
@@ -104,7 +105,13 @@ const toast = { title: "Toast with peanut butter", kitchen: null, steps: [], ite
   // the foods are rounded to 5 g each, so the portion lands near the meal's size, not on it
   ok(/Balkan · shared by Davorka/.test(stirTile) && /Your dinner: [\d,]+ g · [\d,]+ kcal · PD 9\.2/.test(stirTile) && Math.abs(tileKcal - need) <= need * 0.05, "CO2: Davorka's stir-fry at your dinner, within 5 % of its size: " + stirTile);
   ok(/under your 6\.4/.test(await tiles.filter({ hasText: "Salmon" }).textContent()) && /Photo by a member/.test(await tiles.filter({ hasText: "Salmon" }).textContent()), "CO2: the salmon is marked under your target, with a member's photo");
-  ok(/shared by you/.test(await tiles.filter({ hasText: "rye bread" }).textContent()), "CO2: your own shared recipe is there, shared by you");
+  // DT126c: a recipe of yours shared with members is one row, under Made by me, with its state
+  ok(await tiles.filter({ hasText: "rye bread" }).count() === 0, "CO2: your own shared recipe is not repeated under members");
+  await page.getByRole("button", { name: /^Made by/ }).click(); await page.locator(".rb-line").filter({ hasText: /^Me\d/ }).click(); await page.waitForTimeout(400);
+  ok(/Shared with members/.test(await tiles.filter({ hasText: "rye bread" }).textContent()), "CO2: under Made by me it says Shared with members");
+  await page.getByRole("button", { name: /^Made by/ }).click(); await page.locator(".rb-line").filter({ hasText: /^A member without a name/ }).click(); await page.waitForTimeout(400);
+  ok((await tiles.locator(".tile-name").allTextContents()).join() === "Salmon with lemon potatoes", "CO2: A member without a name: the salmon (the toast is held back by your allergy)");
+  await page.getByRole("button", { name: /^Made by/ }).click(); await page.locator(".rb-line").filter({ hasText: /^All members/ }).click(); await page.waitForTimeout(400);
   // Changed by story DT126 (0.2.105, board Stories72): Kitchen is a drop-down in the bar, one line per kitchen with its count
   await page.getByRole("button", { name: /^Kitchen/ }).click(); await page.waitForTimeout(200);
   await page.locator(".rb-line").filter({ hasText: "Mediterranean" }).click(); await page.waitForTimeout(300);
@@ -123,19 +130,19 @@ const toast = { title: "Toast with peanut butter", kitchen: null, steps: [], ite
   await page.getByRole("button", { name: "Keep in mine" }).click(); await page.waitForTimeout(500);
   const kept = (await st()).meals.find((m) => m.memberOf);
   ok(kept && kept.from === "members" && kept.title === "Chicken and broccoli stir-fry with rice" && kept.items[0].grams === 400 && coverOf(kept) === kept.coverSig, "CO3: Keep in mine copies the recipe, its amounts and its drawn cover");
-  await recipes(); await page.getByRole("tab", { name: "Members" }).click(); await page.waitForTimeout(700);
+  await recipes(); await page.waitForTimeout(600);
   await tiles.filter({ hasText: "stir-fry" }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "Make it" }).click(); await page.waitForTimeout(800);
   const plate = await st();
   ok(plate.title === "Chicken and broccoli stir-fry with rice" && plate.items.map((i) => i.grams).join() === grams.join(), "CO3: Make it puts your portion on the plate");
   ok((await api("/api/members")).d.recipes.find((r) => r.title.includes("stir-fry")).made === 1, "CO3: made counts once for the cook");
   // the owner's take down
-  await recipes(); await page.getByRole("tab", { name: "Members" }).click(); await page.waitForTimeout(700);
+  await recipes(); await page.waitForTimeout(600);
   await tiles.filter({ hasText: "Salmon" }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: /Take it down/ }).click(); await page.getByRole("button", { name: /Sure\?/ }).click(); await page.waitForTimeout(800);
   ok(!(await api("/api/members")).d.recipes.some((r) => r.title.startsWith("Salmon")), "the owner takes a recipe down for every member");
   // CO4b: Take it back
-  await page.getByRole("tab", { name: /^Mine/ }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /^Made by/ }).click(); await page.locator(".rb-line").filter({ hasText: /^Me\d/ }).click(); await page.waitForTimeout(400);
   await page.locator(".recipe-tile").filter({ hasText: "rye bread" }).click(); await page.waitForTimeout(500);
   await page.locator(".mb-share").getByRole("button", { name: "Take it back" }).click(); await page.waitForTimeout(800);
   ok(!(await meal("m-sopska")).members && !(await api("/api/members")).d.recipes.some((r) => r.title.includes("rye")), "CO4b: Take it back removes it from Members");

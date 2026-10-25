@@ -44,8 +44,9 @@ const U = "http://127.0.0.1:3207";
   ok(!/isn't logged/.test(await card()), "MS2: the answer holds for today");
   // Members sizes the same way
   await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500);
-  await page.getByRole("tab", { name: "Members" }).click(); await page.waitForTimeout(700);
-  ok(/Dinner is about 936 kcal/.test(await page.locator(".mb-lead").textContent()), "Members sizes dinner by the same rule");
+  // Changed by story DT126c (0.2.106): no Members tab; the members' group of the one list carries the line
+  await page.goto(U + "/my-recipes?made=members"); await page.waitForTimeout(900);
+  ok(/Dinner is about 936 kcal/.test(await page.locator(".rc-lead").textContent()), "Members sizes dinner by the same rule");
   ok(errs.length === 0, "no page errors " + errs.join(" | "));
   await b.close(); server.kill();
   console.log(fails.length ? `${fails.length} FAILED` : "all ok");
