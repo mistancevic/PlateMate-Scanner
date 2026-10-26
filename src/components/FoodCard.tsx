@@ -9,7 +9,7 @@ import { displayRows } from "../labeltable";
 import { useEffect } from "react";
 import { JOBS, jobOf, plainLine, todayLine } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
-import { Letters } from "./Letters";
+import { Letters, NumbersTable } from "./Letters";
 import { iconFor } from "../icons";
 import { useBack } from "../back";
 import { realPhotosOf } from "../photos";
@@ -129,7 +129,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
             <div><span>{fitText}{target !== null ? `, target ${fixed(target)}` : ""}</span><small>{share !== null ? `${share} % of its energy is protein` : "no protein value"}</small></div>
           </div>
           {/* DT108 (0.2.92): the four letters, F C Fi P, with a line each on a tap */}
-          {rates && food.calories ? <Letters n={food} rates={rates} who={food.name} /> : null}
+          {rates && food.calories ? <Letters n={food} rates={rates} who={food.name} table={<NumbersTable n={food} rates={rates} weight={100} day={null} plan={null} />} /> : null}
         </section>
         <p className="insight">{plainLine(food, target)}</p>
         {mix && mix.tip.case !== "fits" && mix.tip.case !== "unknown" && (

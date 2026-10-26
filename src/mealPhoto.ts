@@ -61,11 +61,14 @@ export const aboutKcal = (x: { low: number; high: number; kcal: number }) => (x.
 export type Advice = { line: string; first: "all" | "half" | "add" };
 export function photoAdvice(x: { items: Ingredient[]; protein: number; mealWord: string; mealKcal: number | null; big: number; nutrition: GateLine; day: GateLine; culinaryOk: boolean | null; snackKcal?: number }): Advice {
   const k = kcalRange(x.items), kcal = aboutKcal(k), prot = `${Math.round(x.protein)} g protein`;
-  const n = x.nutrition, d = x.day;
-  if (x.big >= 2) return { line: `Eat half and take the rest home. The whole plate is ${kcal}, about ${x.big} ${plural(x.mealWord)} for your day${n.ok ? "" : ", and " + n.why.charAt(0).toLowerCase() + n.why.slice(1).replace(/\.$/, "")}. Half is a ${x.mealWord}.`, first: "half" };
+  // the gates' lines, read without relying on narrowing (this project builds without strictNullChecks)
+  type No = { ok: false; why: string; ways: string[] };
+  const n = x.nutrition as GateLine & Partial<No>, d = x.day as GateLine & Partial<No>;
+  const nWhy = n.why ?? "", dWhy = d.why ?? "", nWays = n.ways ?? [];
+  if (x.big >= 2) return { line: `Eat half and take the rest home. The whole plate is ${kcal}, about ${x.big} ${plural(x.mealWord)} for your day${n.ok ? "" : ", and " + nWhy.charAt(0).toLowerCase() + nWhy.slice(1).replace(/\.$/, "")}. Half is a ${x.mealWord}.`, first: "half" };
   if (x.mealKcal && k.kcal < Math.max(150, x.mealKcal * 0.4)) return { line: `This is a snack, not your ${x.mealWord}: ${kcal} and ${prot}. Eat it, and your ${x.mealWord} is still to come.`, first: "all" };
-  if (!n.ok && n.ways.includes("protein")) return { line: `${n.why} Add a protein side and it is your ${x.mealWord}; as it stands it is ${kcal} and ${prot}.`, first: "add" };
-  if (!n.ok) return { line: `${n.why} As it stands it is ${kcal} and ${prot}.`, first: "all" };
-  if (!d.ok) return { line: `${d.why} ${kcal} and ${prot}.`, first: "all" };
+  if (!n.ok && nWays.includes("protein")) return { line: `${nWhy} Add a protein side and it is your ${x.mealWord}; as it stands it is ${kcal} and ${prot}.`, first: "add" };
+  if (!n.ok) return { line: `${nWhy} As it stands it is ${kcal} and ${prot}.`, first: "all" };
+  if (!d.ok) return { line: `${dWhy} ${kcal} and ${prot}.`, first: "all" };
   return { line: `Eat it as it is. ${kcal.charAt(0).toUpperCase() + kcal.slice(1)} and ${prot}, a full ${x.mealWord} for your day${x.culinaryOk === false ? "" : x.culinaryOk ? ", and nothing on it argues with the dish" : ""}.`, first: "all" };
 }

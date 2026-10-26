@@ -7,7 +7,7 @@ import { photoAdvice, aboutKcal, kcalRange } from "../mealPhoto";
 import { ConfirmButton } from "../components/Confirm";
 import { fitsPlate, isIngredient, type Mix } from "../mixtip";
 import { lettersOf } from "../letters";
-import { Letters } from "../components/Letters";
+import { Letters, NumbersTable, type PlanNumbers } from "../components/Letters";
 import { ClearField } from "../components/ClearField";
 import { asMine, seenLine, stemOf, type MemberFood } from "../memberFoods";
 import { sameFood } from "../swaps";
@@ -16,7 +16,7 @@ import { nutritionGate, dayGate, type GateLine, type GateWay } from "../gates";
 import { jobOf } from "../foodjob";
 import { WaitSteps, type WaitStep } from "../components/WaitSteps";
 import { aggregate, density, uid, solveIngredient, servingLabel, sizedFor } from "../pilot";
-import { fromMeal } from "../planned";
+import { fromMeal, plannedPortion } from "../planned";
 import type { Meal, Food, Ingredient, PlateOpt, StepMark } from "../pilot";
 import { canOil, isDrained, libraryId, oilChoices, oilFood } from "../canned";
 import { ownPhotosOf } from "../covers";
@@ -886,6 +886,15 @@ export function JourneyScreen(p: AppApi) {
   // DT110 (0.2.94, board Stories67; Milan 25 October 00:25: three ideas, none of value, on a plate of 1,232 kcal for a breakfast of
   // 619 to 757): a plate over its meal (C31) never goes to the ideas. Code says what it is and offers three ways.
   const [bigKept, setBigKept] = useState<string | null>(null);
+  // DT129 (0.2.109, board Stories86): the numbers behind the four letters, under the PD block; the meal planned in this slot
+  const [numbersOpen, setNumbersOpen] = useState(false);
+  const planNow: PlanNumbers | null = (() => {
+    const m = mealSlot ? p.planned[mealDate]?.[mealSlot.id] : undefined;
+    if (!m || m.skipped || !(m.kcal > 0)) return null;
+    const portion = plannedPortion(m, "plan", "");
+    if (portion) { const a = aggregate(portion.items); return { word: mealWord, kcal: Math.round(a.calories ?? m.kcal), grams: Math.round(a.weight ?? 0) || null, protein: Math.round(a.protein ?? m.protein) }; }
+    return { word: mealWord, kcal: Math.round(m.kcal), grams: null, protein: Math.round(m.protein) };
+  })();
   // DT127: the meal photo, small in the line or large with the foods over it
   const [photoBig, setPhotoBig] = useState(false);
   const photoTime = (iso: string) => { const d = new Date(iso); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
@@ -1123,17 +1132,18 @@ export function JourneyScreen(p: AppApi) {
         )}
         {items.length > 0 && (
           <section className={`readout readout-fit-${p.fitPd(pd)}`}>
-            <div className="readout-top"><span>{imported && pmode === "whole" && !way && (rec?.makes?.n ?? 1) >= 2 ? "The whole recipe" : madeBy || (imported && mealNeed) ? `This ${mealWord}` : "As it stands"}</span><span>{pdTag()}</span></div>
+            <div className="readout-top"><span>{imported && pmode === "whole" && !way && (rec?.makes?.n ?? 1) >= 2 ? "The whole recipe" : mealSlot ? mealSlot.name.charAt(0).toUpperCase() + mealSlot.name.slice(1) : madeBy || (imported && mealNeed) ? `This ${mealWord}` : "As it stands"}</span><span>{pdTag()}</span></div>
             <div className="readout-mid">
               <b>{pdVal(pd)}</b>
               {/* DT93, rule 3: a plate far over the meal says so, instead of going to the maths */}
-              <div><span>{tooBig ? `not a ${mealWord} yet` : pd !== null && pdRef !== null ? (pd >= pdRef - 0.05 ? "fits your plan" : `${fixed(pdRef - pd)} under your ${fixed(pdRef)}`) : "no target set"}</span><small>{fmt(t.calories, 0)} kcal{tooBig ? `, about ${Math.round((t.calories ?? 0) / share!.kcal)} ${plural(mealWord)}` : ""} · {fmt(t.protein)} g protein · {fmt(t.weight, 0)} g</small></div>
+              <div><span>{tooBig ? `not a ${mealWord} yet` : pd !== null && pdRef !== null ? (pd >= pdRef - 0.05 ? "fits your plan" : `${fixed(pdRef - pd)} under your ${fixed(pdRef)}`) : "no target set"}</span><small className="rd-rows"><span>Energy</span><b>{fmt(t.calories, 0)}</b> <span>kcal</span><span>Weight</span><b>{fmt(t.weight, 0)}</b> <span>g</span><span>Protein</span><b>{fmt(t.protein, 0)}</b> <span>g</span></small></div>
             </div>
             {/* DT108 (0.2.92): four letters read the plate against your day, F C Fi P */}
             {/* DT116 (0.2.98) and 0.2.99: the letters with their grams, one block; sugars, saturates and salt in the tap */}
-            {p.rates ? <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} who="the plate" extra={extrasText(items)} /> : extras(items)}
+            {p.rates ? <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} who="the plate" extra={extrasText(items)} open={numbersOpen} setOpen={setNumbersOpen} /> : extras(items)}
           </section>
         )}
+        {items.length > 0 && numbersOpen && p.rates && <NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} extra={extrasText(items)} weight={t.weight ?? null} day={dayNums} plan={planNow} />}
         {items.length === 0 && <small className="ways-label">Add a food</small>}
         <div className="ways">
           {/* RP5b (0.2.25, Milan 17:42): Manual on the left, Scan on the right, where the thumb is */}

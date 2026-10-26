@@ -75,7 +75,8 @@ const U = "http://127.0.0.1:3217";
   ok(await page.locator(".rp-stats").count() === 0, "RP2: the three tiles gave way");
   const ro = await text(".rq-readout");
   // changed by DT113 (0.2.94): the four letters sit under the readout, so it ends with against your day
-  ok(/One slice/.test(ro) && /PD/.test(ro) && / g\s*[FfCc][+?-]?.*against your day$/.test(ro.trim()), `RP2: the readout above the table, one slice, then the letters (${ro})`);
+  // Changed by story DT129 (0.2.109): the letters on one line, › to open the numbers
+  ok(/One slice/.test(ro) && /PD/.test(ro) && / g\s*[Ff][+?-]?[Cc][+?-]?[Ff]i[+?-]?[Pp][+?-]?\s*›$/.test(ro.trim()), `RP2: the readout above the table, one slice, then the four letters (${ro})`);
   const th = await text(".nt-card .nt-th");
   ok(/1 SLICE\s*\d+ g/.test(th) && /ALL 12\s*1,131 g/.test(th), `RP2: each column says its weight (${th})`);
   ok(await page.locator(".nt-card .nt-pd").count() === 0, "RP2: PD is no row of the table");

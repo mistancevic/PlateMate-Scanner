@@ -35,7 +35,8 @@ const U = "http://127.0.0.1:3202";
   await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).click(); await page.waitForTimeout(1200);
   const after = (await page.locator("main").textContent()).replace(/\s+/g, " ");
   ok(/Already above your target: PD 16\.8 against [\d.]+, so nothing moved/.test(after) && !/moves the Chicken breast/.test(after), "Fit: already above the target, nothing moved, and it says so");
-  ok(/As it stands ?PD ?16\.8/.test(after) && /477 kcal/.test(after), "the PD and the kcal stand (in place, 0.2.88)");
+  // Changed by story DT129 (0.2.109): the heading is the meal by name; the kcal sit in the Energy row
+  ok(/(Breakfast|Lunch|Dinner|Snack|As it stands) ?PD ?16\.8/.test(after) && /Energy ?477 ?kcal/.test(after), "the PD and the kcal stand (in place, 0.2.88)");
   await b.close(); server.kill();
   console.log(fails.length ? `${fails.length} FAILED` : "all ok");
   process.exit(fails.length ? 1 : 0);

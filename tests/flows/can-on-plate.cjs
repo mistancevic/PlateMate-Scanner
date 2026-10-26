@@ -66,7 +66,7 @@ const tuna = { success: true, product_name: "Thunfisch in Olivenöl", brand: "Ri
     const head = (await page.locator(".can-head").textContent()) || "";
     ok(/^Thunfisch in Olivenöl1 can · 228\s*kcal in the numbers$/.test(head), "the can on top, as the label names it: " + head);
     ok(/1 can/.test(await rows()) && !/0\.9/.test(await rows()), "the row says 1 can");
-    const kcal0 = await page.evaluate(() => Number(document.querySelector(".readout").textContent.match(/([\d,]+)\s*kcal\s*·/)[1].replace(",", "")));
+    const kcal0 = await page.evaluate(() => Number(document.querySelector(".readout").textContent.match(/Energy\s*([\d,]+)\s*kcal/)[1].replace(",", "")));
     ok(kcal0 === 228, "the numbers count 120 g of tuna: " + kcal0 + " kcal");
 
     // the oil from the can

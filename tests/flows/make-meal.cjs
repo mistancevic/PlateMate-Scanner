@@ -49,7 +49,8 @@ const answer = { options: [
   const st = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   ok(st.items.length === 6 && st.title === "Šopska plate with bread" && st.items.filter((i) => !i.locked).length === 1, "CH3: six foods on the plate, the dish's name as the title, only the bread free to move");
   const ro = (await page.locator(".readout").first().textContent()).replace(/\s+/g, " ");
-  ok(/This lunch/.test(ro) && /10\.1/.test(ro) && /927 kcal/.test(ro), "CH3: This lunch, PD 10.1, 927 kcal: " + ro);
+  // Changed by story DT129 (0.2.109): the heading is the meal by name; the kcal sit in the Energy row
+  ok(/^Lunch/.test(ro) && /10\.1/.test(ro) && /Energy ?927 ?kcal/.test(ro), "CH3: Lunch, PD 10.1, Energy 927 kcal: " + ro);
   ok(/Chef Mealan's Balkan lunch, around your foods\. Change any amount you like\./.test(await page.locator(".step-head").textContent()), "CH3, DT88 (0.2.87): the line says whose lunch it is, around your foods");
   ok(await page.getByRole("button", { name: "Make it" }).count() === 1 && await page.getByRole("button", { name: "Other ideas" }).count() === 1, "CH3: Make it, or Other ideas");
   await page.getByRole("button", { name: "Other ideas" }).click(); await page.waitForTimeout(900);

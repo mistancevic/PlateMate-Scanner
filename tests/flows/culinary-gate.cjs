@@ -42,7 +42,8 @@ const U = "http://127.0.0.1:3262";
   const gates = await page.locator(".gate-line").allTextContents();
   ok(gates.length === 2 && gates[0] === "150 g is 3 bars. One bar is about 50 g." && gates[1] === "150 g is over a portion of peanut butter, 15 to 40 g.", "DT93: red lines under the bar and the peanut butter, none under 10 g of yeast: " + gates.join(" | "));
   // rule 3: the size
-  ok(/not a lunch yet/.test(await text(".readout")) && /about 2 lunches/.test(await text(".readout")), "DT93: the readout says not a lunch yet, about 2 lunches");
+  // Changed by story DT129 (0.2.109): the readout keeps the status; about two lunches is the gate card's line
+  ok(/not a lunch yet/.test(await text(".readout")) && /about two lunches/.test(await text(".gate-card")), "DT93: the readout says not a lunch yet; the gate card, about two lunches");
   // rule 2: Chef Mealan's read, once per set of foods
   const gate = page.locator(".gate-card").first();
   // changed by DT110 (0.2.94): a plate of 1,515 kcal for a lunch of 917 is two lunches, so the gate says so and offers Make it two

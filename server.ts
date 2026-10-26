@@ -745,7 +745,8 @@ app.get("/api/metrics", requireUser, async (req, res) => {
   const today = berlinDay();
   const q = String(req.query.week ?? "");
   const from = mondayOf(/^\d{4}-\d{2}-\d{2}$/.test(q) ? q : today), to = addDays(from, 6);
-  const prev = addDays(from, -7), month = to.slice(0, 7);
+  // "this month" is the month of today in the current week (a week can end in the next month), else the week's last day
+  const prev = addDays(from, -7), month = (today >= from && today <= to ? today : to).slice(0, 7);
   try {
     const space = spaceOf(req);
     let evs: Ev[] = [], daily = new Map<string, Record<string, any>>(), bills: Record<string, { ai: number; cloud: number }> = {}, prices: { in: number; out: number; at?: string } | null = null;

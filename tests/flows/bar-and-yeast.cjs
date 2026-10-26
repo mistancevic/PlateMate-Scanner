@@ -56,8 +56,11 @@ const U = "http://127.0.0.1:3264";
   const rowLetters = await page.locator(".plate-card .row small .letters").allTextContents();
   ok(rowLetters.length === 2 && /^F\+ C fi\? p-$|^F\+ C fi\? p$/.test(rowLetters[0]) === false || rowLetters.length === 2, "DT108: letters on each row: " + rowLetters.join(" | "));
   ok(/^f/.test(rowLetters[1]) && /P\+$/.test(rowLetters[1]), "DT108: yeast reads low fat and high protein: " + rowLetters[1]);
+  // Changed by story DT129 (0.2.109, board Stories86): the tap opens the numbers; Per 100 kcal opens the four sentences
   await page.locator(".readout .letters-row").click(); await page.waitForTimeout(300);
-  ok(/fat: .* g per 100 kcal, .* your day's 3\.3/.test(await text(".readout")) && /fibre/.test(await text(".readout")), "DT108: the tap shows a line per letter against the day's rates");
+  ok(await page.locator(".nt").count() === 1 && /Against your planned day/.test(await text(".nt")) && /% plate/.test(await text(".nt")), "DT129: the tap opens the numbers under the PD block");
+  await page.locator(".nt").getByRole("button", { name: /Per 100 kcal/ }).click(); await page.waitForTimeout(200);
+  ok(/fat: .* g per 100 kcal, .* your day's 3\.3/.test(await text(".nt")) && /fibre/.test(await text(".nt")), "DT108: Per 100 kcal shows a line per letter against the day's rates");
   // DT105: Ask Chef Mealan for a dish around it opens the chat with the question
   await gate.getByRole("button", { name: "Ask Chef Mealan for a dish around it" }).click(); await page.waitForTimeout(1200);
   ok(outCalls.length === 1 && /^What dish can I make around what is on my plate, so it makes a \w+\? 50 g Clean Protein Bar Peanut Love, 7 g Active dry yeast\./.test(outCalls[0]), "DT105: the chat asks for a dish around the plate: " + outCalls[0]);
