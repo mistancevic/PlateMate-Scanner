@@ -18,6 +18,8 @@ seed.items = [];
   await new Promise((r) => setTimeout(r, 2500));
   const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
   const page = await b.newPage({ viewport: { width: 390, height: 1500 }, deviceScaleFactor: 2 });
+  // today from 16:00, as when it was written: the walkthrough reads the same at any hour (after 21:00 the eating window turned the plate into a snack)
+  await page.clock.install({ time: new Date(new Date().setHours(16, 0, 0, 0)) }); await page.clock.resume();
   const errs = []; page.on("pageerror", (e) => errs.push(e.message));
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
   await page.addInitScript((s) => { if (!localStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "recomp", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "profile" })); localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "each", sex: "male", birthYear: 1981, heightCm: 182, weightKg: 95, plan: [{ work: true, kind: "strength", intensity: "hard", when: "evening", minutes: 60 }, { work: true, kind: "rest" }, { work: true, kind: "strength", intensity: "hard", when: "evening", minutes: 60 }, { work: true, kind: "rest" }, { work: true, kind: "rest" }, { work: false, kind: "rest" }, { work: false, kind: "rest" }], lifestyle: { meals: 3, window: { from: "07:30", to: "20:00" } } })); localStorage.setItem("seeded", "1"); } }, seed);

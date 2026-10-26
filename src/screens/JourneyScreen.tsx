@@ -3,7 +3,7 @@ import { tasteForReq } from "../tasteChips";
 import { useState, useEffect, useRef, Fragment } from "react";
 import { tempsIn } from "../units";
 import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
-import { photoAdvice, ideaAdvice, aboutKcal, kcalRange } from "../mealPhoto";
+import { photoAdvice, ideaAdvice, aboutKcal, kcalRange, mealsOn } from "../mealPhoto";
 import { PhotoAsk } from "../components/PhotoAsk";
 import { ConfirmButton } from "../components/Confirm";
 import { fitsPlate, isIngredient, type Mix } from "../mixtip";
@@ -908,7 +908,7 @@ export function JourneyScreen(p: AppApi) {
   // DT130: Put it in my plan, for an idea: the day and the meal picked in two rows of chips
   const [ideaPlan, setIdeaPlan] = useState<{ date: string; slotId: string } | null>(null);
   const photoTime = (iso: string) => { const d = new Date(iso); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
-  const bigN = tooBig && share && !imported && !madeBy ? Math.max(2, Math.round((t.calories ?? 0) / share.kcal)) : 0;
+  const bigN = tooBig && share && !imported && !madeBy ? mealsOn(t.calories ?? 0, share.kcal) : 0;
   const bigPlate = bigN > 0 && bigKept !== dishSig;
   const mealsWord = plural(mealWord);
   const numWord = (n: number) => ["", "one", "two", "three", "four", "five"][n] ?? String(n);

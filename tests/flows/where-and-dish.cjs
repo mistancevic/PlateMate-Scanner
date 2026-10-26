@@ -16,6 +16,8 @@ seed.items = [];
   await new Promise((r) => setTimeout(r, 2500));
   const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
   const page = await b.newPage({ viewport: { width: 390, height: 1500 }, deviceScaleFactor: 2 });
+  // today from 16:00, as when it was written: the walkthrough reads the same at any hour (after 21:00 the eating window turned the plate into a snack)
+  await page.clock.install({ time: new Date(new Date().setHours(16, 0, 0, 0)) }); await page.clock.resume();
   const errs = []; page.on("pageerror", (e) => errs.push(e.message));
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
   const click = async (re) => { await page.getByRole("button", { name: re }).first().click({ timeout: 5000 }); await page.waitForTimeout(400); };

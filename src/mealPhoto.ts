@@ -6,6 +6,7 @@ import type { Food, Ingredient } from "./pilot";
 import { basicOf } from "./foodId";
 import { referenceFood } from "./reference";
 import type { GateLine } from "./gates";
+import { NEAR } from "./makeMeal";
 
 export type PhotoFood = { name: string; grams: number; low: number; high: number; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber: number | null; confidence: "high" | "medium" | "low" };
 export type PhotoRead = { dish: string; foods: PhotoFood[]; unsure: { name: string; options: [number, number] } | null };
@@ -53,9 +54,12 @@ export function kcalRange(items: Ingredient[]): { low: number; high: number; kca
   const per = (i: Ingredient, g: number) => ((i.food.calories ?? 0) * g) / 100;
   return { low: Math.round(items.reduce((n, i) => n + per(i, i.est ? i.est.low : i.grams), 0)), high: Math.round(items.reduce((n, i) => n + per(i, i.est ? i.est.high : i.grams), 0)), kcal: Math.round(items.reduce((n, i) => n + per(i, i.grams), 0)) };
 }
-const r10 = (n: number) => Math.round(n / 10) * 10;
+const r10 = (n: number) => (Math.round(n / 10) * 10).toLocaleString("en-US");
 const plural = (w: string) => (/(ch|sh|s|x)$/.test(w) ? `${w}es` : `${w}s`);
 export const aboutKcal = (x: { low: number; high: number; kcal: number }) => (x.high - x.low < 60 ? `about ${r10(x.kcal)} kcal` : `about ${r10(x.low)} to ${r10(x.high)} kcal`);
+
+// how many meals the plate is (C31): over 1.4 times the meal's energy it is at least two, else 0; the eval runs this same rule
+export const mealsOn = (kcal: number, mealKcal: number | null | undefined): number => (mealKcal && mealKcal >= 150 && kcal > mealKcal * NEAR[1] ? Math.max(2, Math.round(kcal / mealKcal)) : 0);
 
 // Chef Mealan's one line, by code, from what the gates and the size said; the first button is the advice
 export type Advice = { line: string; first: "all" | "half" | "add" };
@@ -69,7 +73,7 @@ export function photoAdvice(x: { items: Ingredient[]; protein: number; mealWord:
   if (x.mealKcal && k.kcal < Math.max(150, x.mealKcal * 0.4)) return { line: `This is a snack, not your ${x.mealWord}: ${kcal} and ${prot}. Eat it, and your ${x.mealWord} is still to come.`, first: "all" };
   if (!n.ok && nWays.includes("protein")) return { line: `${nWhy} Add a protein side and it is your ${x.mealWord}; as it stands it is ${kcal} and ${prot}.`, first: "add" };
   if (!n.ok) return { line: `${nWhy} As it stands it is ${kcal} and ${prot}.`, first: "all" };
-  if (!d.ok) return { line: `${dWhy} ${kcal} and ${prot}.`, first: "all" };
+  if (!d.ok) return { line: `${dWhy} ${kcal.charAt(0).toUpperCase() + kcal.slice(1)} and ${prot}.`, first: "all" };
   return { line: `Eat it as it is. ${kcal.charAt(0).toUpperCase() + kcal.slice(1)} and ${prot}, a full ${x.mealWord} for your day${x.culinaryOk === false ? "" : x.culinaryOk ? ", and nothing on it argues with the dish" : ""}.`, first: "all" };
 }
 

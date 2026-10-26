@@ -1,0 +1,855 @@
+{
+ "about": "Eval 1 for Photo of my meal (DT127, DT130): Chef Mealan's line and first button are written by code from the read plate. Each case is one combination of plate size, the nutrition rules, your day, the dish check and whose plate. The expected line is the coach's rule, not a copy of the output. The read's estimates are the grams give or take a quarter.",
+ "foods": {
+  "chicken": {
+   "name": "Chicken breast, grilled",
+   "calories": 165,
+   "protein": 31,
+   "fats": 3.6,
+   "carbs": 0,
+   "fiber": 0
+  },
+  "rice": {
+   "name": "Rice, cooked",
+   "calories": 130,
+   "protein": 2.7,
+   "fats": 0.3,
+   "carbs": 28,
+   "fiber": 0.4
+  },
+  "salad": {
+   "name": "Mixed salad, dressed",
+   "calories": 60,
+   "protein": 1.2,
+   "fats": 4.5,
+   "carbs": 3.5,
+   "fiber": 1.5
+  },
+  "oil": {
+   "name": "Olive oil",
+   "calories": 884,
+   "protein": 0,
+   "fats": 100,
+   "carbs": 0,
+   "fiber": 0
+  },
+  "schnitzel": {
+   "name": "Pork schnitzel, breaded, fried",
+   "calories": 290,
+   "protein": 20,
+   "fats": 18,
+   "carbs": 12,
+   "fiber": 0.5
+  },
+  "fries": {
+   "name": "Fries",
+   "calories": 312,
+   "protein": 3.4,
+   "fats": 15,
+   "carbs": 41,
+   "fiber": 3.5
+  },
+  "quark": {
+   "name": "Quark, low fat",
+   "calories": 67,
+   "protein": 12,
+   "fats": 0.3,
+   "carbs": 4,
+   "fiber": 0
+  },
+  "oats": {
+   "name": "Oats",
+   "calories": 372,
+   "protein": 13.5,
+   "fats": 7,
+   "carbs": 58.7,
+   "fiber": 10
+  },
+  "apple": {
+   "name": "Apple",
+   "calories": 52,
+   "protein": 0.3,
+   "fats": 0.2,
+   "carbs": 14,
+   "fiber": 2
+  },
+  "pb": {
+   "name": "Peanut butter",
+   "calories": 588,
+   "protein": 25,
+   "fats": 50,
+   "carbs": 20,
+   "fiber": 6
+  },
+  "whey": {
+   "name": "Whey protein powder",
+   "calories": 380,
+   "protein": 80,
+   "fats": 6,
+   "carbs": 8,
+   "fiber": 0
+  },
+  "banana": {
+   "name": "Banana",
+   "calories": 89,
+   "protein": 1.1,
+   "fats": 0.3,
+   "carbs": 23,
+   "fiber": 2.6
+  },
+  "salmon": {
+   "name": "Salmon, baked",
+   "calories": 208,
+   "protein": 20,
+   "fats": 13,
+   "carbs": 0,
+   "fiber": 0
+  },
+  "potatoes": {
+   "name": "Potatoes, boiled",
+   "calories": 87,
+   "protein": 1.9,
+   "fats": 0.1,
+   "carbs": 20,
+   "fiber": 1.8
+  },
+  "pasta": {
+   "name": "Pasta, cooked",
+   "calories": 158,
+   "protein": 5.8,
+   "fats": 0.9,
+   "carbs": 31,
+   "fiber": 1.8
+  },
+  "sauce": {
+   "name": "Tomato sauce",
+   "calories": 50,
+   "protein": 1.5,
+   "fats": 2,
+   "carbs": 7,
+   "fiber": 1.5
+  },
+  "cheese": {
+   "name": "Gouda cheese",
+   "calories": 356,
+   "protein": 25,
+   "fats": 27,
+   "carbs": 2.2,
+   "fiber": 0
+  },
+  "avocado": {
+   "name": "Avocado",
+   "calories": 160,
+   "protein": 2,
+   "fats": 15,
+   "carbs": 9,
+   "fiber": 7
+  }
+ },
+ "window": {
+  "from": "07:00",
+  "to": "21:00"
+ },
+ "cases": [
+  {
+   "id": "a01",
+   "title": "one lunch, numbers fine, dish fine",
+   "dimensions": {
+    "size": "one meal",
+    "nutrition": "ok",
+    "day": "ok",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "chicken",
+     "grams": 180
+    },
+    {
+     "food": "rice",
+     "grams": 150
+    },
+    {
+     "food": "salad",
+     "grams": 90
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "13:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "all",
+    "says": "^Eat it as it is\\. About .* a full lunch for your day, and nothing on it argues with the dish\\.$"
+   }
+  },
+  {
+   "id": "a02",
+   "title": "restaurant plate, two lunches",
+   "dimensions": {
+    "size": "two meals",
+    "nutrition": "ok",
+    "day": "ok",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "schnitzel",
+     "grams": 300
+    },
+    {
+     "food": "fries",
+     "grams": 250
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "13:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "half",
+    "says": "^Eat half and take the rest home\\. The whole plate is about 1,\\d{3} to 2,\\d{3} kcal, about 2 lunches for your day\\. Half is a lunch\\.$"
+   }
+  },
+  {
+   "id": "a03",
+   "title": "big pasta dinner",
+   "dimensions": {
+    "size": "two meals",
+    "nutrition": "ok",
+    "day": "ok",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "dinner"
+   },
+   "plate": [
+    {
+     "food": "pasta",
+     "grams": 500
+    },
+    {
+     "food": "sauce",
+     "grams": 200
+    },
+    {
+     "food": "cheese",
+     "grams": 60
+    }
+   ],
+   "meal": "dinner",
+   "mealKcal": 700,
+   "moment": "regular",
+   "time": "19:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "half",
+    "says": "^Eat half and take the rest home\\..*about 2 dinners"
+   }
+  },
+  {
+   "id": "a04",
+   "title": "an apple at breakfast time",
+   "dimensions": {
+    "size": "snack",
+    "nutrition": "ok",
+    "day": "ok",
+    "dish": "unknown",
+    "who": "eat",
+    "meal": "breakfast"
+   },
+   "plate": [
+    {
+     "food": "apple",
+     "grams": 150
+    }
+   ],
+   "meal": "breakfast",
+   "mealKcal": 700,
+   "moment": "regular",
+   "time": "08:00",
+   "culinaryOk": null,
+   "who": "eat",
+   "expect": {
+    "first": "all",
+    "says": "^This is a snack, not your breakfast:.*your breakfast is still to come\\.$"
+   }
+  },
+  {
+   "id": "a05",
+   "title": "fish, avocado and oil: fat over half",
+   "dimensions": {
+    "size": "one meal",
+    "nutrition": "fat over half",
+    "day": "ok",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "salmon",
+     "grams": 200
+    },
+    {
+     "food": "avocado",
+     "grams": 150
+    },
+    {
+     "food": "oil",
+     "grams": 20
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "13:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "add",
+    "says": "^More than half of this lunch's energy is fat: \\d+ percent.*Add a protein side",
+    "never": "Eat it as it is"
+   }
+  },
+  {
+   "id": "a06",
+   "title": "shake breakfast: protein from the powder",
+   "dimensions": {
+    "size": "one meal",
+    "nutrition": "protein from supplement",
+    "day": "ok",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "breakfast"
+   },
+   "plate": [
+    {
+     "food": "whey",
+     "grams": 40
+    },
+    {
+     "food": "oats",
+     "grams": 80
+    },
+    {
+     "food": "banana",
+     "grams": 120
+    }
+   ],
+   "meal": "breakfast",
+   "mealKcal": 700,
+   "moment": "regular",
+   "time": "08:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "add",
+    "says": "^Most of this breakfast's protein comes from the powder",
+    "never": "Eat it as it is"
+   }
+  },
+  {
+   "id": "a07",
+   "title": "after training, little protein",
+   "dimensions": {
+    "size": "one meal",
+    "nutrition": "ok",
+    "day": "after training, low protein",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "dinner"
+   },
+   "plate": [
+    {
+     "food": "potatoes",
+     "grams": 400
+    },
+    {
+     "food": "salad",
+     "grams": 100
+    }
+   ],
+   "meal": "dinner",
+   "mealKcal": 900,
+   "moment": "after",
+   "time": "19:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "all",
+    "says": "^After training protein comes first, and this plate has \\d+ g\\. About [\\d,]+ to [\\d,]+ kcal and \\d+ g protein\\.$",
+    "never": "Eat it as it is"
+   }
+  },
+  {
+   "id": "a08",
+   "title": "before training, a heavy plate",
+   "dimensions": {
+    "size": "one meal",
+    "nutrition": "ok",
+    "day": "before training, heavy",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "pasta",
+     "grams": 400
+    },
+    {
+     "food": "sauce",
+     "grams": 150
+    },
+    {
+     "food": "chicken",
+     "grams": 100
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "before",
+   "time": "13:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "all",
+    "says": "^Before training [\\d,]+ kcal is a lot to carry; a smaller plate sits better\\. About [\\d,]+ to [\\d,]+ kcal",
+    "never": "Eat it as it is"
+   }
+  },
+  {
+   "id": "a09",
+   "title": "before training, no carbs",
+   "dimensions": {
+    "size": "one meal",
+    "nutrition": "no carbs before training",
+    "day": "ok",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "chicken",
+     "grams": 250
+    },
+    {
+     "food": "salad",
+     "grams": 150
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "before",
+   "time": "13:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "all",
+    "says": "^Before training the plate wants carbs",
+    "never": "Add a protein side|Eat it as it is"
+   }
+  },
+  {
+   "id": "a10",
+   "title": "outside the eating window",
+   "dimensions": {
+    "size": "one meal",
+    "nutrition": "ok",
+    "day": "outside window",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "dinner"
+   },
+   "plate": [
+    {
+     "food": "chicken",
+     "grams": 150
+    },
+    {
+     "food": "rice",
+     "grams": 200
+    }
+   ],
+   "meal": "dinner",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "22:30",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "all",
+    "says": "^22:30, and your eating window is 07:00 to 21:00\\. A full plate now sits on tomorrow\\. About ",
+    "never": "Eat it as it is"
+   }
+  },
+  {
+   "id": "a11",
+   "title": "the dish does not hold",
+   "dimensions": {
+    "size": "one meal",
+    "nutrition": "ok",
+    "day": "ok",
+    "dish": "not a dish",
+    "who": "eat",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "chicken",
+     "grams": 180
+    },
+    {
+     "food": "rice",
+     "grams": 150
+    },
+    {
+     "food": "salad",
+     "grams": 90
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "13:00",
+   "culinaryOk": false,
+   "who": "eat",
+   "expect": {
+    "first": "all",
+    "says": "a full lunch for your day\\.$",
+    "never": "argues"
+   }
+  },
+  {
+   "id": "a12",
+   "title": "the dish not checked yet",
+   "dimensions": {
+    "size": "one meal",
+    "nutrition": "ok",
+    "day": "ok",
+    "dish": "unknown",
+    "who": "eat",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "chicken",
+     "grams": 180
+    },
+    {
+     "food": "rice",
+     "grams": 150
+    },
+    {
+     "food": "salad",
+     "grams": 90
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "13:00",
+   "culinaryOk": null,
+   "who": "eat",
+   "expect": {
+    "first": "all",
+    "says": "a full lunch for your day\\.$",
+    "never": "argues"
+   }
+  },
+  {
+   "id": "a13",
+   "title": "two lunches and fat over half",
+   "dimensions": {
+    "size": "two meals",
+    "nutrition": "fat over half",
+    "day": "ok",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "schnitzel",
+     "grams": 400
+    },
+    {
+     "food": "fries",
+     "grams": 300
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "13:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "half",
+    "says": "^Eat half.*about 2 lunches for your day, and more than half of this lunch's energy is fat",
+    "never": "[Mm]ore than half[^.]*: 50 percent"
+   },
+   "open": "Waiting for Milan (26 October): 50.2 percent fat is shown as 50 percent under More than half."
+  },
+  {
+   "id": "a14",
+   "title": "three dinners on one plate",
+   "dimensions": {
+    "size": "three meals",
+    "nutrition": "ok",
+    "day": "ok",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "dinner"
+   },
+   "plate": [
+    {
+     "food": "pasta",
+     "grams": 900
+    },
+    {
+     "food": "cheese",
+     "grams": 100
+    },
+    {
+     "food": "sauce",
+     "grams": 300
+    }
+   ],
+   "meal": "dinner",
+   "mealKcal": 600,
+   "moment": "regular",
+   "time": "19:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "half",
+    "says": "about 3 dinners for your day",
+    "never": "Half is a dinner"
+   },
+   "open": "Waiting for Milan (26 October): a plate of 3 dinners is told to eat half, and half of it is 1.5 dinners."
+  },
+  {
+   "id": "a15",
+   "title": "a large lunch, still one",
+   "dimensions": {
+    "size": "large meal, under 1.4",
+    "nutrition": "ok",
+    "day": "ok",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "chicken",
+     "grams": 300
+    },
+    {
+     "food": "rice",
+     "grams": 400
+    },
+    {
+     "food": "salad",
+     "grams": 150
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "13:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "all",
+    "says": "^Eat it as it is\\."
+   }
+  },
+  {
+   "id": "a16",
+   "title": "an idea, one lunch",
+   "dimensions": {
+    "size": "one meal",
+    "nutrition": "ok",
+    "day": "ok",
+    "dish": "ok",
+    "who": "idea",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "chicken",
+     "grams": 180
+    },
+    {
+     "food": "rice",
+     "grams": 150
+    },
+    {
+     "food": "salad",
+     "grams": 90
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "13:00",
+   "culinaryOk": true,
+   "who": "idea",
+   "expect": {
+    "says": "^A lunch as the photo shows it: about .* kcal and \\d+ g protein\\. Fit it and it is sized for your day\\.$",
+    "never": "\\bEat\\b|\\bAte\\b"
+   }
+  },
+  {
+   "id": "a17",
+   "title": "an idea, two lunches",
+   "dimensions": {
+    "size": "two meals",
+    "nutrition": "ok",
+    "day": "ok",
+    "dish": "ok",
+    "who": "idea",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "schnitzel",
+     "grams": 300
+    },
+    {
+     "food": "fries",
+     "grams": 250
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "13:00",
+   "culinaryOk": true,
+   "who": "idea",
+   "expect": {
+    "says": "about 2 lunches for your day\\. Fit it and it is one lunch\\.$",
+    "never": "\\bEat\\b|\\bAte\\b"
+   }
+  },
+  {
+   "id": "a18",
+   "title": "an idea, fat over half",
+   "dimensions": {
+    "size": "one meal",
+    "nutrition": "fat over half",
+    "day": "ok",
+    "dish": "ok",
+    "who": "idea",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "salmon",
+     "grams": 200
+    },
+    {
+     "food": "avocado",
+     "grams": 150
+    },
+    {
+     "food": "oil",
+     "grams": 20
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "13:00",
+   "culinaryOk": true,
+   "who": "idea",
+   "expect": {
+    "says": "^More than half of this lunch's energy is fat.*Fit it and Chef Mealan sizes it for your lunch\\.$",
+    "never": "\\bEat\\b|\\bAte\\b"
+   }
+  },
+  {
+   "id": "a19",
+   "title": "banana and peanut butter at dinner time",
+   "dimensions": {
+    "size": "snack",
+    "nutrition": "ok",
+    "day": "ok",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "dinner"
+   },
+   "plate": [
+    {
+     "food": "banana",
+     "grams": 120
+    },
+    {
+     "food": "pb",
+     "grams": 20
+    }
+   ],
+   "meal": "dinner",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "19:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "all",
+    "says": "^This is a snack, not your dinner"
+   }
+  },
+  {
+   "id": "a20",
+   "title": "quark bowl breakfast",
+   "dimensions": {
+    "size": "one meal",
+    "nutrition": "ok",
+    "day": "ok",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "breakfast"
+   },
+   "plate": [
+    {
+     "food": "quark",
+     "grams": 250
+    },
+    {
+     "food": "oats",
+     "grams": 50
+    },
+    {
+     "food": "apple",
+     "grams": 150
+    },
+    {
+     "food": "pb",
+     "grams": 15
+    }
+   ],
+   "meal": "breakfast",
+   "mealKcal": 700,
+   "moment": "regular",
+   "time": "08:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "all",
+    "says": "^Eat it as it is\\..* a full breakfast for your day"
+   }
+  }
+ ]
+}

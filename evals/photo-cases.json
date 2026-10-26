@@ -1,0 +1,10 @@
+{
+ "about": "Eval 2 and 3 for Photo of my meal (DT127, DT130). One entry per weighed plate. Weigh every food before the photo; the photo goes in evals/photos with the file name below. name: what you would call the food; also: other names it goes by (the read may say basmati for rice); grams: weighed; calories: kcal per 100 g from the pack or the table, when you know it (without it the plate's kcal is not checked). by: Milan or Tester 3. The first entry shows the shape; replace it.",
+ "cases": [
+  { "id": "p01", "file": "p01.jpg", "by": "Milan", "meal": "lunch", "region": "de", "foods": [
+   { "name": "Chicken breast, grilled", "also": ["chicken"], "grams": 182, "calories": 165 },
+   { "name": "Rice, cooked", "also": ["basmati"], "grams": 160, "calories": 130 },
+   { "name": "Cucumber salad", "also": ["salad"], "grams": 90, "calories": 40 }
+  ] }
+ ]
+}

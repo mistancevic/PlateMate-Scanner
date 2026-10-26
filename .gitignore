@@ -15,3 +15,8 @@ deploy/.last-live
 # the last walkthrough run, for the Walkthroughs page
 tests/flows-report.json
 tests/walkthroughs.html
+
+# Eval 2 (Photo of my meal): the weighed plate photos and the run results stay on your machine
+evals/photos/*
+!evals/photos/README.md
+evals/results/
