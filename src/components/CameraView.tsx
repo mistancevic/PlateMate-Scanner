@@ -9,6 +9,7 @@ import {
 import { motion, AnimatePresence } from "motion/react";
 import type { ScannerMode } from "../types";
 import { useBack } from "../back";
+import { exifTime } from "../photoAsk";
 
 interface CameraViewProps {
   key?: string;
@@ -27,6 +28,10 @@ interface CameraViewProps {
   cartCount?: number;
   onOpenCart?: () => void;
   targetMissingItemName?: string | null;
+  // DT130 (0.2.110, board Stories78, A): Meal, a fourth mode, when the AI is on: one photo of the whole plate, read at once;
+  // a photo from Your photos comes with its time, for whose plate and when
+  meal?: boolean;
+  onMeal?: (image: string, takenAt: string | null) => void;
 }
 
 export function CameraView({
@@ -45,6 +50,8 @@ export function CameraView({
   cartCount = 0,
   onOpenCart,
   targetMissingItemName,
+  meal = false,
+  onMeal,
 }: CameraViewProps) {
   const scannerMode = propScannerMode || mode || "label";
   useBack(true, onCancel);
@@ -176,7 +183,7 @@ export function CameraView({
   const busyRef = useRef(false);
   const setAutoMode = (on: boolean) => { setAuto(on); try { localStorage.setItem("chefmealan-camera-auto", on ? "auto" : "manual"); } catch {} };
   useEffect(() => {
-    if (!auto || (scannerMode === "barcode" && !codeRead) || cameraError) { setSteady(0); return; }
+    if (!auto || scannerMode === "meal" || (scannerMode === "barcode" && !codeRead) || cameraError) { setSteady(0); return; }
     const small = document.createElement("canvas"); small.width = 48; small.height = 48;
     const sctx = small.getContext("2d", { willReadFrequently: true });
     let prev: Uint8ClampedArray | null = null, still = 0, armed = !(scannerMode === "barcode" && typedRef.current), last = performance.now();
@@ -233,6 +240,7 @@ export function CameraView({
     const image = captureImageFromVideo();
     if (!image) return;
     if (scannerMode === "barcode" && !codeRead) { await processBarcodeFallback(image); return; }
+    if (scannerMode === "meal") { onMeal?.(image, null); return; }
     stage(image);
   };
 
@@ -242,6 +250,14 @@ export function CameraView({
     if (!file) return;
     if (file.size > 15_000_000) {
       setToastMessage("Choose an image smaller than 15 MB.");
+      return;
+    }
+    if (scannerMode === "meal") {
+      // the photo's own time: the camera's EXIF when it has one, else the file's time
+      void file.arrayBuffer().then((buf) => {
+        const at = exifTime(buf) ?? new Date(file.lastModified || Date.now());
+        const r = new FileReader(); r.onload = () => { if (r.result) onMeal?.(String(r.result), at.toISOString()); }; r.readAsDataURL(file);
+      });
       return;
     }
     const reader = new FileReader();
@@ -266,14 +282,14 @@ export function CameraView({
       <div className="cam-top">
         <div className="cam-row">
           <button onClick={onCancel} aria-label="Close camera" className="cam-round"><X className="w-5 h-5" /></button>
-          <b className="cam-title" aria-label={`${addTo === "plate" ? "Add to plate" : "Add a food"}: Scan`}>{addTo === "plate" ? "Scan for your plate" : "Scan a food"}</b>
+          <b className="cam-title" aria-label={scannerMode === "meal" ? "Photo of my meal" : `${addTo === "plate" ? "Add to plate" : "Add a food"}: Scan`}>{scannerMode === "meal" ? "Photo of my meal" : addTo === "plate" ? "Scan for your plate" : "Scan a food"}</b>
           <button onClick={onOpenCart} aria-label="Your plate" className="cam-round relative">
             <ShoppingBag className="w-5 h-5" />
             {cartCount > 0 && <span className="cam-badge">{cartCount}</span>}
           </button>
         </div>
         <div className="cam-modes" role="group" aria-label="What to scan">
-          {([["barcode", "Barcode"], ["label", "Label"], ["group", "Group"]] as const).map(([m, name]) => (
+          {([["barcode", "Barcode"], ["label", "Label"], ["group", "Group"], ...(meal ? [["meal", "Meal"]] as const : [])] as const).map(([m, name]) => (
             <button key={m} aria-pressed={scannerMode === m} className={scannerMode === m ? "bg-white on" : ""} onClick={() => { if (m !== "barcode") setCodeRead(null); onModeChange(m); }}>{name}</button>
           ))}
         </div>
@@ -281,7 +297,7 @@ export function CameraView({
           <span className="cam-say" role="status">
             {scannerMode === "barcode"
               ? codeRead ? "Now photos of the pack's front and back, or use the code only" : typing ? "Paused while you type the code" : "Hold the barcode inside the frame"
-              : scannerMode === "group" ? "The whole product, one side per photo" : "Hold the nutrition table inside the frame"}
+              : scannerMode === "group" ? "The whole product, one side per photo" : scannerMode === "meal" ? "The whole plate, from above" : "Hold the nutrition table inside the frame"}
           </span>
         )}
         {targetMissingItemName && <span className="cam-say cam-missing">Scanning for: {targetMissingItemName}</span>}
@@ -296,7 +312,7 @@ export function CameraView({
         <>
           <video ref={videoRef as any} autoPlay playsInline muted className="absolute inset-0 h-full w-full object-cover" />
           <div className="cam-frame-area" aria-hidden="true">
-            {scannerMode === "group" ? (
+            {scannerMode === "meal" ? <div className="meal-frame" /> : scannerMode === "group" ? (
               <div className="group-frame"><span className="corner tl" /><span className="corner tr" /><span className="corner bl" /><span className="corner br" /></div>
             ) : (
               <div ref={frameRef} className={`cam-frame ${scannerMode === "barcode" ? "barcode" : "label"}`}>
@@ -354,9 +370,9 @@ export function CameraView({
             <small>Your photos</small>
           </button>
           {!cameraError ? (
-            <button id="camera-shutter-button" onClick={handleShutterClick} className="cam-shutter" title={scannerMode === "group" ? "Take a photo of one side" : "Take a photo"}>
+            <button id="camera-shutter-button" onClick={handleShutterClick} className="cam-shutter" title={scannerMode === "group" ? "Take a photo of one side" : scannerMode === "meal" ? "Take the photo of your meal" : "Take a photo"}>
               <span />
-              {auto && (scannerMode !== "barcode" || codeRead) && (
+              {auto && scannerMode !== "meal" && (scannerMode !== "barcode" || codeRead) && (
                 <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 80 80" aria-hidden="true">
                   <circle cx="40" cy="40" r="37" fill="none" stroke="var(--brand)" strokeWidth="5" strokeLinecap="round" strokeDasharray={2 * Math.PI * 37} strokeDashoffset={(1 - steady) * 2 * Math.PI * 37} style={{ transition: "stroke-dashoffset 120ms linear" }} />
                 </svg>
@@ -371,7 +387,8 @@ export function CameraView({
             )}
           </span>
         </div>
-        {!cameraError && (scannerMode !== "barcode" || codeRead) && (
+        {!cameraError && scannerMode === "meal" && <small className="cam-small auto-note">Tap to take it. Or pick one from Your photos.</small>}
+        {!cameraError && scannerMode !== "meal" && (scannerMode !== "barcode" || codeRead) && (
           <button className="auto-switch" onClick={() => setAutoMode(!auto)} aria-pressed={auto}>
             {auto ? "Auto shot: hold still · tap for manual" : "Manual shot: tap to take · tap for auto"}
           </button>

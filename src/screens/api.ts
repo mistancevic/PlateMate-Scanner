@@ -27,8 +27,14 @@ export interface AppApi {
   searchDatabase: (q: string) => Promise<DbProduct[]>;
   peekBarcode: (code: string) => Promise<DbProduct | null>;
   // DT115 (0.2.97): the members' catalogue
-  readMealPhoto: (image: string) => Promise<boolean>;
-  ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean }) => void;
+  readMealPhoto: (image: string, x?: { at?: string; who?: "ate" | "now" | "idea" }) => Promise<boolean>;
+  ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string }) => void;
+  // DT130 (0.2.110): Photo of my meal opens the meal camera; a photo from Your photos waits on the Plate for whose and when
+  mealCamera: () => void;
+  photoAsk: { image: string; at: string } | null;
+  dropPhotoAsk: () => void;
+  // DT130: An idea kept: in Mine with the photo as its picture, at the top until made once; a slot in the plan when given
+  saveIdea: (meal: Meal, photo: string | null, slot?: { date: string; slotId: string } | null) => void;
   memberFoods: (q: string) => Promise<import("../memberFoods").MemberFood[]>;
   addMemberFood: (m: import("../memberFoods").MemberFood, to?: "foods" | "plate") => void;
   add: (f: Food) => void;

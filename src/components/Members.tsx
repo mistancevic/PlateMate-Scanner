@@ -114,7 +114,7 @@ export function MemberPage({ r, ahead, p, owner, close, takeDown, toCook }: { r:
 // CO4 and CO4b: For members, on a recipe of yours
 export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; made: number | null; onPatch: (patch: Partial<Meal>) => void }) {
   const shared = meal.members ?? null;
-  const photos = recipePhotosOf(meal).slice(0, 4);
+  const photos = recipePhotosOf(meal).filter((x) => !meal.foreignPhotos?.includes(sig(x))).slice(0, 4); // DT130: never a photo that is not yours
   const drawnFirst = photos.find((x) => isDrawnPhoto(meal, x));
   const [pick, setPick] = useState<string | null>(shared?.coverSig ?? (drawnFirst ? sig(drawnFirst) : photos[0] ? sig(photos[0]) : null));
   const [named, setNamed] = useState(shared?.named ?? false);

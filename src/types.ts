@@ -1,1 +1,1 @@
-export type ScannerMode = "barcode" | "label" | "group";
+export type ScannerMode = "barcode" | "label" | "group" | "meal";

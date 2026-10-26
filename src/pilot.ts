@@ -164,7 +164,10 @@ export type Meal = {
   // what kind of plate this is (Today, 10 October 2026): a meal, or a dessert sized at about a tenth of the day
   kind?: PlateKind;
   // R17 (0.2.45, board RS16): Chef Mealan's idea for a craving, kept until it is made once or removed
-  idea?: { at: string; craving?: string };
+  idea?: { at: string; craving?: string; from?: "photo" };
+  // DT130 (0.2.110): photos that are not the person's own (an idea from a friend's plate, a plate online), by fingerprint:
+  // the recipe's picture for the person, never offered to members or the public page
+  foreignPhotos?: string[];
   // where it came from (0.2.16, board IM, IM6): the account or site as text, the link, when; members and public pages get
   // the text only. The screenshots are the cook's own reference (shots, as files src:<id>:<n>), never a cover, never shared.
   // steps: the original method as read (0.2.18, board IM, IM9b): for the person only, never shared or published
@@ -261,7 +264,9 @@ export type PilotState = {
   // a recipe that came in, opened from Recipes (0.2.19, IM13): the plate puts it on as the first time, then clears this
   openRecipe?: string;
   // DT127 (0.2.108): the photo of the meal the plate was read from, when it was taken, and the one question the read was unsure about
-  photo?: { image: string; at: string; unsure?: { name: string; options: [number, number] } | null };
+  photo?: { image: string; at: string; unsure?: { name: string; options: [number, number] } | null;
+    // DT130 (0.2.110): a photo from Your photos says whose plate and when: ate (logged at the photo's time), idea (nothing logged)
+    who?: "ate" | "now" | "idea" };
 };
 export const EMPTY: Nutrition = {
   calories: null,

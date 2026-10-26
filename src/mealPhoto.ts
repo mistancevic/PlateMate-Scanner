@@ -72,3 +72,13 @@ export function photoAdvice(x: { items: Ingredient[]; protein: number; mealWord:
   if (!d.ok) return { line: `${dWhy} ${kcal} and ${prot}.`, first: "all" };
   return { line: `Eat it as it is. ${kcal.charAt(0).toUpperCase() + kcal.slice(1)} and ${prot}, a full ${x.mealWord} for your day${x.culinaryOk === false ? "" : x.culinaryOk ? ", and nothing on it argues with the dish" : ""}.`, first: "all" };
 }
+
+// DT130 (0.2.110): a plate that is an idea (a friend's dinner, a plate online): nothing to eat now, so the line says what it
+// is as the photo shows it and what Fit does; the buttons are for cooking it, not for logging it
+export function ideaAdvice(x: { items: Ingredient[]; protein: number; mealWord: string; big: number; nutrition: GateLine }): string {
+  const k = kcalRange(x.items), kcal = aboutKcal(k), prot = `${Math.round(x.protein)} g protein`;
+  const n = x.nutrition as GateLine & { why?: string };
+  if (x.big >= 2) return `As the photo shows it, ${kcal} and ${prot}, about ${x.big} ${plural(x.mealWord)} for your day. Fit it and it is one ${x.mealWord}.`;
+  if (!n.ok && n.why) return `${n.why} As the photo shows it, ${kcal} and ${prot}. Fit it and Chef Mealan sizes it for your ${x.mealWord}.`;
+  return `A ${x.mealWord} as the photo shows it: ${kcal} and ${prot}. Fit it and it is sized for your day.`;
+}

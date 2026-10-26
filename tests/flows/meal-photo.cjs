@@ -25,10 +25,10 @@ const BIG = { dish: "Schnitzel with fries", foods: [
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
   for (let i = 0; i < 60; i++) { try { await fetch(U + "/"); break; } catch { await new Promise((r) => setTimeout(r, 500)); } }
-  const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
+  const b = await chromium.launch({ ...(process.env.CHROME ? { executablePath: process.env.CHROME } : {}), args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"] });
   const fails = []; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fails.push(m); };
   const errs = [];
-  const page = await b.newPage({ viewport: { width: 390, height: 1400 }, deviceScaleFactor: 1 });
+  const page = await (await b.newContext({ viewport: { width: 390, height: 1400 }, deviceScaleFactor: 1, permissions: ["camera"] })).newPage();
   page.on("pageerror", (e) => errs.push(e.message));
   await page.clock.setFixedTime(new Date("2026-10-25T13:05:00"));
   await page.addInitScript((s) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
@@ -44,12 +44,13 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   await page.route("**/api/members/foods**", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ ok: true, foods: [] }) }));
   const text = async (sel = "main") => (await page.locator(sel).first().textContent()).replace(/\s+/g, " ");
   const st = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
-  const snap = async (sel) => { const buf = Buffer.from(PHOTO.split(",")[1], "base64"); await page.locator(sel).setInputFiles({ name: "plate.jpg", mimeType: "image/jpeg", buffer: buf }); await page.waitForTimeout(1500); };
+  // 0.2.110 (DT130): Photo of my meal opens the meal camera; the shutter reads at once
+  const snap = async (sel) => { await page.locator(sel).click(); await page.waitForTimeout(1500); await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(2000); };
 
   // Today: one tap
   await page.goto(U + "/"); await page.waitForTimeout(1500);
   ok(await page.locator(".mp-card").count() === 1 && /Photo of my meal/.test(await text(".mp-card")), "DT127: Today has Photo of my meal");
-  await snap(".mp-card input[type=file]");
+  await snap(".mp-card");
   ok(sent.length === 1 && /^data:image\/jpeg;base64,/.test(sent[0].image) && Array.isArray(sent[0].library), "DT127: the photo goes to the read, with your food names");
   ok(/\/plate/.test(page.url()) || await page.locator(".plate-card").count() === 1, "DT127: the read lands on the Plate");
   // the rows as estimates, the photo in the line
@@ -88,7 +89,7 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   read = BIG;
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(600);
   ok(await page.locator(".mp-button").count() === 1, "DT127: the Plate has Photo of my meal next to Manual and Scan");
-  await snap(".mp-button input[type=file]");
+  await snap(".mp-button");
   const big = await text(".mp-say");
   ok(/^Chef Mealan: Eat half and take the rest home\. The whole plate is about [\d,]+ to [\d,]+ kcal, about 2 (lunches|dinners) for your day/.test(big), "DT127: the big plate: eat half, by code from the size line: " + big);
   ok((await page.locator(".mp-say .button-row button").allTextContents())[0] === "Ate half", "DT127: Ate half is the first button when it is the advice");
@@ -99,7 +100,7 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   // Not mine clears it
   read = READ;
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(600);
-  await snap(".mp-button input[type=file]");
+  await snap(".mp-button");
   await page.getByRole("button", { name: "Not mine" }).click(); await page.waitForTimeout(400);
   const s5 = await st();
   ok(s5.items.length === 0 && !s5.photo, "DT127: Not mine empties the plate and drops the photo");

@@ -73,7 +73,7 @@ import { weighInsOff } from "./weight";
 import { fixedOf } from "./components/FormulaCard";
 import { coachDemoOn } from "./coachDemo";
 import { getCoachLocal, setCoachLocal, notesOf, checkinOf, type CoachLocal, type CoachNote } from "./coachNotes";
-import { getPlanned, refreshPlanned, storePlanned, withPlanned, plannedPortion, type Planned, type PlannedMeal } from "./planned";
+import { getPlanned, refreshPlanned, storePlanned, withPlanned, plannedPortion, fromMeal, type Planned, type PlannedMeal } from "./planned";
 import type { Filling } from "./screens/api";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, withTarget, lifestyleOf, dayFor, type Personal, type DayType, type Day, type NextGoal } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
@@ -810,6 +810,8 @@ export default function App() {
     [mealanAsk, setMealanAsk] = useState(0),
     [mixQuestion, setMixQuestion] = useState<string | null>(null),
     [camera, setCamera] = useState(false),
+    // DT130 (0.2.110): a photo picked from Your photos in the meal camera, waiting on the Plate for whose plate and when
+    [photoAsk, setPhotoAsk] = useState<{ image: string; at: string } | null>(null),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
     [message, setMessage] = useState(""),
@@ -2113,7 +2115,7 @@ export default function App() {
     addFromDatabase: (code: string) => { setEditTitle("Add to my foods"); lookup(code); },
     searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (region ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "cy", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
     // DT127 (0.2.108, board Stories75): a photo of the meal in front of you, read onto the Plate as estimates
-    readMealPhoto: async (image: string) => {
+    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea" }) => {
       setBusy("Reading your plate…");
       try {
         const [sent, thumb] = await Promise.all([resizeImageBase64(image, 1280, 1280), thumbnailBase64(image, 640)]);
@@ -2121,17 +2123,18 @@ export default function App() {
         const read = cleanRead(d);
         if (!read) { setError("Nothing I can read on that plate. Try once more, from above, with the whole plate in."); return false; }
         const { items, fresh } = itemsOfRead(read, state.foods, region, uid);
-        const at = new Date().toISOString();
+        const at = x?.who === "ate" && x.at ? x.at : new Date().toISOString();
         setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined,
-          photo: { image: thumb, at, unsure: read.unsure } }));
+          photo: { image: thumb, at, unsure: read.unsure, ...(x?.who && x.who !== "now" ? { who: x.who } : {}) } }));
+        setPhotoAsk(null);
         setKind("meal"); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
-        log("meal_photo", { foods: items.length, unsure: Boolean(read.unsure) });
+        log("meal_photo", { foods: items.length, unsure: Boolean(read.unsure), who: x?.who ?? "camera" });
         return true;
       } catch (e: any) { setError(e?.message || "The read didn't work. Try again."); return false; } finally { setBusy(""); }
     },
     // the plate eaten now, at the table: whole, or half with the other half kept on Today
-    ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean }) => {
-      const now = new Date().toISOString();
+    ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string }) => {
+      const now = x.at ?? new Date().toISOString();
       const halve = (m: Meal): Meal => ({ ...m, id: uid(), items: m.items.map((i) => ({ ...i, grams: Math.round(i.grams / 2), est: undefined })), portion: Math.round((m.portion ?? 0) / 2) });
       const eaten = x.half ? halve(meal) : { ...meal, items: meal.items.map((i) => ({ ...i, est: undefined })) };
       setState((s) => ({ ...s,
@@ -2140,7 +2143,18 @@ export default function App() {
           ...s.feedback],
         items: [], portion: null, title: "", photo: undefined }));
       setStep("in"); setTab("home");
-      notify(x.half ? "Half logged. The other half is on Today." : "Logged. It's on Today.");
+      notify(x.half ? "Half logged. The other half is on Today." : x.at ? `Logged at ${new Date(x.at).toTimeString().slice(0, 5)}. It's on Today.` : "Logged. It's on Today.");
+    },
+    // DT130 (0.2.110, board Stories78, A): Photo of my meal opens the same camera as Scan, in Meal mode
+    mealCamera: () => { setTalkOpen(false); setMode("meal"); setCamera(true); },
+    photoAsk, dropPhotoAsk: () => setPhotoAsk(null),
+    saveIdea: (meal: Meal, photo: string | null, slot?: { date: string; slotId: string } | null) => {
+      const m: Meal = { ...meal, items: meal.items.map((i) => ({ ...i, est: undefined })), steps: meal.steps ?? [], idea: { at: new Date().toISOString(), from: "photo" }, ...(photo ? { ...withRecipePhotos([photo]), foreignPhotos: [sig(photo)] } : {}) };
+      setState((s) => ({ ...s, meals: [m, ...s.meals], items: [], portion: null, title: "", photo: undefined }));
+      if (slot) setPlannedState((prev) => { const next = withPlanned(prev, slot.date, slot.slotId, fromMeal(m, "mine")); storePlanned(next); return next; });
+      log("meal_photo_idea", { plan: Boolean(slot) });
+      setStep("in");
+      setLanding({ id: m.id, line: slot ? "An idea from a photo, in your plan and in Mine." : "An idea from a photo. It waits at the top of Mine until you make it.", quiet: false }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes");
     },
     // DT115 (0.2.97): the members' catalogue, searched by words; a member's food becomes a copy in your library
     memberFoods: async (q: string) => { try { const d = await api(`/api/members/foods?q=${encodeURIComponent(q)}&region=${encodeURIComponent(region ?? "")}`); return Array.isArray(d?.foods) ? d.foods : []; } catch { return []; } },
@@ -2584,6 +2598,13 @@ export default function App() {
             scannerMode={mode}
             onModeChange={setMode}
             onCapture={(x) => scan(x)}
+            meal={screenProps.ai.on}
+            onMeal={(image, at) => {
+              setCamera(false);
+              if (!at) { void screenProps.readMealPhoto(image); return; }
+              // from Your photos: whose plate and when, asked on the Plate before the read
+              setPhotoAsk({ image, at }); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
+            }}
             processGroupScan={(x) => scan(x, true)}
             onBarcode={(x) => lookup(x)}
             onBarcodeWithPhotos={(c, x) => lookupWithPhotos(c, x)}

@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { cleanRead, itemsOfRead, kcalRange, aboutKcal, photoAdvice } from "./mealPhoto";
+import { cleanRead, itemsOfRead, kcalRange, aboutKcal, photoAdvice, ideaAdvice } from "./mealPhoto";
 
 const raw = { dish: "Grilled chicken with rice and salad", foods: [
   { name: "Chicken breast, grilled", grams: 180, low: 140, high: 240, calories: 165, protein: 31, fats: 3.6, carbs: 0, fiber: 0, confidence: "medium" },
@@ -46,4 +46,13 @@ test("DT127: Chef Mealan's line by code: eat it, eat half, a snack, add protein"
   assert.equal(snack.first, "all"); assert.match(snack.line, /^This is a snack, not your lunch/);
   const add = photoAdvice({ items, protein: 10, mealWord: "dinner", mealKcal: 900, big: 0, nutrition: { ok: false, why: "Most of this dinner's protein comes from the powder: 20 of 25 g.", ways: ["protein", "snack", "keep"] }, day: ok, culinaryOk: true });
   assert.equal(add.first, "add"); assert.match(add.line, /Add a protein side/);
+});
+test("DT130: an idea's line: what it is as the photo shows it, and what Fit does; no eating words", () => {
+  const r = cleanRead(raw)!;
+  const { items } = itemsOfRead(r, [], null, (() => { let n = 0; return () => `i${++n}`; })());
+  const ok = { ok: true as const };
+  const a = ideaAdvice({ items, protein: 60, mealWord: "breakfast", big: 0, nutrition: ok });
+  assert.match(a, /^A breakfast as the photo shows it: about .* kcal and 60 g protein\. Fit it and it is sized for your day\.$/);
+  assert.match(ideaAdvice({ items, protein: 60, mealWord: "lunch", big: 2, nutrition: ok }), /about 2 lunches for your day\. Fit it and it is one lunch\.$/);
+  assert.doesNotMatch(a, /Eat|Ate/);
 });

@@ -87,7 +87,7 @@ B = Board(); y = 30
 cy = storyCard(B, y, "DT130", "A photo of a plate from your photos: inside the meal camera, as for labels", [
   ("Milan, 26 October 12:00", "Also upload a photo of the plate, inside the taking of the photo, the same UX as for labels. When I cannot work on the Plate in the moment I take a photo to work on it later; someone shared their meal with me; I found something online."),
   ("Why", "In 0.2.108 Photo of my meal is a plain file field: on a phone it goes straight to the camera, with no frame, no hint, and no way to pick a photo already taken. The label scan has all three. And a photo from earlier, or of someone else's plate, cannot be logged as now."),
-  ("Variant A: one camera, a Meal mode, and Your photos", "Photo of my meal opens the same camera as Scan, with Meal as a fourth mode next to Barcode, Label and Group: the round frame, The whole plate, from above, the shutter, and Your photos at the bottom left, as for labels. A photo from Your photos asks one thing before the read: whose plate, and when. The time comes from the photo; a tap changes it. Mine, I ate it at 12:40: Ate it logs it at 12:40, in the meal that time belongs to. Mine, I am eating it now: as from the camera. Not mine: an idea to cook: the same read and gates, and the buttons change to Fit it to my breakfast, Save as an idea (in Mine, the photo as its picture), Put it in my plan. No Ate it."),
+  ("Variant A: one camera, a Meal mode, and Your photos", "Photo of my meal opens the same camera as Scan, with Meal as a fourth mode next to Barcode, Label and Group: the round frame, The whole plate, from above, the shutter, and Your photos at the bottom left, as for labels. A photo from Your photos asks one thing before the read: whose plate, and when. The time comes from the photo; a tap changes it. Three chips, one on, and one button, Read the plate (Milan 15:45: chips, not buttons, and short; 16:18: An idea, not Not mine). Ate at 12:40: Ate it logs it at 12:40, in the meal that time belongs to. Eating now: as from the camera. An idea: the same read and gates, and the buttons change to Fit it to my breakfast, Save as an idea (in Mine, the photo as its picture), Put it in my plan. No Ate it."),
   ("Variant B: read it later", "After the shutter, Read now or Keep for later. Kept photos wait on Today as Plates to read with their time; nothing goes to the AI until you tap one; it is logged at the photo's time. Your photos is there as in A. The share from WhatsApp or the browser straight into Chef Mealan comes later still: it needs Chef Mealan installed as an app on the phone, which it is not yet."),
   ("My pick", "A, with B's Keep for later as a second step if you find you take photos and forget them. A covers all three of your cases with one question; B adds a pile to look after."),
   ("Rules", "The same as DT127: C6 with its photo note, C10, C30, C31, N27 to N29, Your day. A plate that is not yours is never logged, and its photo is never shared with members."),
@@ -95,12 +95,12 @@ cy = storyCard(B, y, "DT130", "A photo of a plate from your photos: inside the m
 h = rowEnd(cy,
   B.screen("DT130a", 0, y, "Now: a plain file field", "r130now", "now", "0.2.108: the button goes to the phone's camera; nothing picks a photo already taken."),
   B.screen("DT130b", 1, y, "A: the meal camera", "r130cam", "changed", "Meal as a fourth mode, the round frame, the hint, Your photos bottom left."),
-  B.screen("DT130c", 2, y, "A: whose plate, and when", "r130whose", "changed", "A photo from 12:40: Mine, ate it then; Mine, now; Not mine, an idea."))
+  B.screen("DT130c", 2, y, "A: whose plate, and when (v2)", "r130whose", "changed", "Three short chips, one on: Ate at 12:40, Eating now, An idea. One button: Read the plate."))
 y = h
 h = rowEnd(
-  B.screen("DT130d", 0, y, "A: not mine, an idea", "r130idea", "changed", "The same read and gates; the buttons are for cooking it, not logging it."),
+  B.screen("DT130d", 0, y, "A: an idea", "r130idea", "changed", "The same read and gates; the buttons are for cooking it, not logging it."),
   B.screen("DT130e", 1, y, "B: Plates to read on Today", "r130later", "changed", "Kept photos wait with their time; a tap reads one."))
 y = h
 board("Stories78.dc.html", "DT130. A photo of a plate from your photos, in the meal camera: whose plate, and when",
-  "26 October 2026 (Milan 12:00). Now: 0.2.108, untouched. Two variants drawn; nothing built.",
+  "26 October 2026 (Milan 12:00; 15:45: A, and the choices as short chips; 16:18: An idea, Build). Now: 0.2.108, untouched. A is picked; DT130c redrawn.",
   B, W, y - 100, "Stories77.dc.html")

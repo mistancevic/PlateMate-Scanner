@@ -236,13 +236,13 @@ export function HomeScreen(p: AppApi) {
       {p.measured?.ready && p.measured.start && !p.measuredSeen && <ReadyCard m={p.measured} formulaKcal={p.formulaKcal} seeGoal={() => { p.seeMeasured(); toBurn(); }} gotIt={p.seeMeasured} />}
       {/* R5: what comes next, the one main action; 0.2.57 (board DS6, L, Milan 10:53 to 11:02): Next is always one card, its
           heading inside, the line inside; before a meal, the meal; nothing planned, its two ways; the day done, tomorrow's first meal */}
-      {/* DT127 (0.2.108, board Stories75): at the table, one tap: a photo of the meal, read onto the Plate with the three gates */}
+      {/* DT127 (0.2.108, board Stories75): at the table, one tap: a photo of the meal, read onto the Plate with the three gates;
+          DT130 (0.2.110): the tap opens the meal camera, with Your photos */}
       {p.ai.on && (
-        <label className="card mp-card" aria-label="Photo of my meal">
+        <button type="button" className="card mp-card" aria-label="Photo of my meal" onClick={p.mealCamera}>
           <span className="mp-card-icon"><Camera size={26} /></span>
           <span className="mp-card-text"><b>Photo of my meal</b><small>At the table, before you eat. One photo, the verdict in seconds.</small></span>
-          <input type="file" accept="image/*" capture="environment" hidden onChange={(e) => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = () => { void p.readMealPhoto(String(r.result)); }; r.readAsDataURL(f); e.target.value = ""; }} />
-        </label>
+        </button>
       )}
       <section className="next-meal">
         {next && nextHeld

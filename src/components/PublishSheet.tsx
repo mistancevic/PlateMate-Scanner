@@ -27,7 +27,7 @@ export type Published = PublicRecipe & { status?: "live" | "down" | "waiting" | 
 // photo, so its photo is not compared.
 export function pubDraftOf(meal: Meal, published: Published | null, cards: Feedback[]) {
   const d: PublishDraft = meal.publish ?? {};
-  const own = recipePhotosOf(meal);
+  const own = recipePhotosOf(meal).filter((x) => !meal.foreignPhotos?.includes(sig(x))); // DT130: never a photo that is not yours
   const photos = [...own, ...cardPhotosOf(meal, cards).slice(0, 8).filter((c) => !own.includes(c))];
   return {
     d, photos, photoAt: own.length ? 0 : Math.min(d.photoAt ?? 0, Math.max(0, photos.length - 1)),
