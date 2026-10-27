@@ -88,12 +88,15 @@ cy = storyCard(B, y, "DT132", "On the edge: a value right at a rule's line", [
   ("Milan, 27 October 13:52 and 14:12", "That is on the edge. Maybe such cases are marked as on the edge of the range, or like between the high end and the low start. Great: draw it."),
   ("Why", "A plate at 51 percent fat fails like a plate at 74, and 50.2 percent read as 50 under More than half. Labels can be off by a fifth and a photo's grams by more, so a point either side of a line is not a verdict."),
   ("The story", "Within 2 points of a line, a rule reads On the edge: amber, a ~, the number and the line, no buttons, with one hint to be clear of it. It passes; the DaaM Good spot waits for a clear pass. The edges: fat 48 to 52 percent (N27); protein from a supplement 48 to 52 percent (N28); carbs before training 8 to 12 percent (N29); before training 570 to 630 kcal; after training 13 to 17 g protein; the plate's size 1.3 to 1.5 portions (C31)."),
-  ("Open", "The four letters have band edges too (0.6, 0.9, 1.5 per 100 kcal). Should a letter at an edge get the same mark? Not drawn."),
+  ("The letters (Milan 14:21: not sure how to solve that)", "My suggestion: the quick line of four letters stays clean, no marks; a mark there crowds it and makes every plate look unsure. The edge shows where you read the numbers: in Per 100 kcal, a letter within 5 percent of a band edge (0.6, 0.9, 1.5 times your day) says so in amber words. The letter itself never changes."),
 ])
 h = rowEnd(cy,
   B.screen("DT132a", 0, y, "Now: 51 percent fails", "r132now", "now", "Salmon, rice, avocado: 51.5 percent fat, a plain fail with its ways."),
   B.screen("DT132b", 1, y, "New: on the edge", "r132edge", "changed", "Amber, ~ Nutrition, on the edge: 51 percent, the line is 50. Passes, with a hint."),
   B.screen("DT132c", 2, y, "As today: well over the line", "r132clear", "now", "74 percent stays a plain fail. The edge is narrow on purpose."))
+y = h
+h = rowEnd(
+  B.screen("DT132d", 0, y, "New: a letter at an edge", "r132letters", "changed", "Salmon and rice: F at 1.45 times your day, the edge is 1.5. Said in Per 100 kcal; the quick line stays F."))
 y = h
 cy = storyCard(B, y, "DT133", "Portions, not lunches: a plate of several meals", [
   ("Milan, 27 October 14:12", "Let's call them portions. Be aware the meal or plate size is three meal portions, of course calculated against their goal. If one meal per day, it may be even below. So we need to take the context into account."),
@@ -107,5 +110,5 @@ h = rowEnd(cy,
   B.screen("DT133c", 2, y, "The context: 2 meals a day", "r133one", "now", "The same plate, 2 meals a day: the meal ahead is 1,375 kcal, about 2 portions."))
 y = h
 board("Stories88.dc.html", "DT132 on the edge, DT133 portions",
-  "27 October 2026 (Milan 13:52 and 14:12). Now: 0.2.112, untouched. Drawn for your approval; nothing built.",
+  "27 October 2026 (Milan 13:52, 14:12 and 14:21). Now: 0.2.112, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories87.dc.html")
