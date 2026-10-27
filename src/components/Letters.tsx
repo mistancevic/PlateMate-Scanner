@@ -41,7 +41,7 @@ export function NumbersTable({ n, rates, extra, weight, day, plan }: { n: Number
         <small className="nt-sub">{word}, the plate and your plan</small>
         <div className="nt-grid nt-plan nt-head"><span /><span>Plate</span><span>Planned</span><span>%</span></div>
         {([["Energy", kcal, plan.kcal, "kcal"], ["Weight", weight, plan.grams, "g"], ["Protein", n.protein ?? 0, plan.protein, "g"]] as const).map(([l, a, b, u]) => (
-          <div key={l} className="nt-grid nt-plan nt-row"><span>{l}</span><span><b>{a === null ? "?" : fmt(a)}</b> {u}</span><span>{b === null ? "" : `${fmt(b)} ${u}`}</span><span>{a !== null && b !== null ? pct(a, b) : ""}</span></div>
+          <div key={l} className="nt-grid nt-plan nt-row"><span>{l}</span><span><b>{a === null ? "?" : fmt(a)}</b> {u}</span><span>{b === null ? "-" : `${fmt(b)} ${u}`}</span><span>{a !== null && b !== null ? pct(a, b) : "-"}</span></div>
         ))}
         <small className="nt-sub">What is in it</small>
       </>)}
