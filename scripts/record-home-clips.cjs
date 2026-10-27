@@ -73,8 +73,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       execFileSync("ffmpeg", ["-y", "-loop", "1", "-i", png, "-t", "2", "-r", "15", "-vf", "scale=720:960,format=yuv420p", feeds[k]], { stdio: "ignore" });
     }
     await b0.close(); }
-  const made = [];
+  const made = [], strokes = [];
+  // CLIPS=shop,label records only those, to try a change; it never writes clips
+  const ONLY = process.env.CLIPS ? process.env.CLIPS.split(",") : null;
+  // a small seeded random (mulberry32), so a clip's hand is the same on every run and different from the other clips'
+  const seeded = (k) => { let a = [...k].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 2654435761) >>> 0, 1779033703); return () => { a = (a + 0x6d2b79f5) >>> 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
   const clip = async (name, run, x = {}) => {
+    if (ONLY && !ONLY.includes(name)) return;
     const dir = path.join(tmp, name); fs.mkdirSync(dir);
     const b = await chromium.launch({ args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream", ...(x.feed && feeds[x.feed] ? [`--use-file-for-fake-video-capture=${feeds[x.feed]}`] : [])] });
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, permissions: ["camera"], timezoneId: "Europe/Berlin", recordVideo: { dir, size: { width: 390, height: 844 } } });
@@ -87,13 +92,37 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-05T08:00:00Z", consentBodyAt: "2026-10-05T08:00:00Z", declaredAt: "2026-10-05T08:00:00Z", aiConfirmedAt: "2026-10-05T08:00:00Z" }));
       if (plan) localStorage.setItem("chefmealan-planned", JSON.stringify(plan));
       localStorage.setItem("seeded", "1"); }, [s, x.plan || null]);
-    // HC1: a ring where every tap lands, a finger for every swipe; counted, so the rule can check them
+    // HC1, HC10 (Milan 27 October 17:14: the taps and the movement looked like one pattern on every clip): a fingertip, as a
+    // phone's "show touches" draws it. It travels to each tap on a slight curve with ease in and out, presses (smaller, blue),
+    // lifts with a ripple; a scroll is a drag with the page moving under the finger, then the page glides on. The finger rests
+    // faint between actions and fades when idle. Everything is counted, so the rules can check it.
     await page.addInitScript(() => {
-      window.__rings = 0; window.__swipes = 0;
-      const put = (x, y, cls) => { const d = document.createElement("div"); d.className = cls; d.style.left = x + "px"; d.style.top = y + "px"; document.body.appendChild(d); setTimeout(() => d.remove(), 900); };
-      addEventListener("DOMContentLoaded", () => { const st = document.createElement("style"); st.textContent = `.hc-ring{position:fixed;z-index:2147483647;width:46px;height:46px;margin:-23px 0 0 -23px;border-radius:50%;background:rgba(46,123,232,.28);border:3px solid rgba(46,123,232,.9);pointer-events:none;animation:hc-ring .8s ease-out forwards}@keyframes hc-ring{0%{transform:scale(.5);opacity:1}70%{opacity:1}100%{transform:scale(1.35);opacity:0}}.hc-swipe{position:fixed;z-index:2147483647;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;background:rgba(46,123,232,.35);border:3px solid rgba(46,123,232,.9);pointer-events:none;animation:hc-swipe .8s ease-in-out forwards}@keyframes hc-swipe{0%{transform:translateY(0);opacity:0}15%{opacity:1}85%{opacity:1}100%{transform:translateY(var(--dy));opacity:0}}`; document.head.appendChild(st); });
-      addEventListener("pointerdown", (e) => { window.__rings++; put(e.clientX, e.clientY, "hc-ring"); }, true);
-      window.__swipe = (x, y, dy) => { window.__swipes++; const d = document.createElement("div"); d.className = "hc-swipe"; d.style.left = x + "px"; d.style.top = y + "px"; d.style.setProperty("--dy", -dy * 0.4 + "px"); document.body.appendChild(d); setTimeout(() => d.remove(), 900); };
+      const W = window; W.__rings = 0; W.__ripples = 0; W.__swipes = 0; W.__travels = 0; W.__synced = [];
+      let f = null, cx = -100, cy = -100, idle = 0;
+      const css = ".hc-f{position:fixed;z-index:2147483647;left:0;top:0;width:42px;height:42px;margin:-21px 0 0 -21px;border-radius:50%;background:rgba(23,39,66,.38);border:2.5px solid rgba(255,255,255,.95);box-shadow:0 0 0 1px rgba(23,39,66,.35),0 4px 12px rgba(0,0,0,.28);pointer-events:none;opacity:0;transition:opacity .3s,transform .11s ease-out,background .11s}.hc-f.on{opacity:.9}.hc-f.down{opacity:1;transform:scale(.8);background:rgba(46,123,232,.75)}.hc-rip{position:fixed;z-index:2147483646;width:38px;height:38px;margin:-19px 0 0 -19px;border-radius:50%;border:3px solid rgba(46,123,232,.85);pointer-events:none;animation:hc-rip .5s ease-out forwards}@keyframes hc-rip{from{transform:scale(.8);opacity:.9}to{transform:scale(2);opacity:0}}";
+      const ensure = () => { if (f) return; const st = document.createElement("style"); st.textContent = css; document.head.appendChild(st); f = document.createElement("div"); f.className = "hc-f"; document.body.appendChild(f); };
+      const at = (x, y) => { cx = x; cy = y; f.style.left = x + "px"; f.style.top = y + "px"; };
+      const wake = () => { clearTimeout(idle); f.classList.add("on"); };
+      const rest = () => { clearTimeout(idle); idle = setTimeout(() => f && f.classList.remove("on"), 1300); };
+      const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+      const frames = (ms, step) => new Promise((done) => { const t0 = performance.now(); const go = (now) => { const t = Math.min(1, (now - t0) / ms); step(t); t < 1 ? requestAnimationFrame(go) : done(); }; requestAnimationFrame(go); });
+      addEventListener("pointerdown", () => { W.__rings++; }, true);
+      W.__finger = {
+        // travel on a quadratic curve; bend is how far the curve leans, in px
+        move: async (x, y, ms, bend, from) => { ensure(); if (from) at(from[0], from[1]); wake(); W.__travels++;
+          const x0 = cx, y0 = cy, dx = x - x0, dy = y - y0, len = Math.hypot(dx, dy) || 1, mx = (x0 + x) / 2 - (dy / len) * bend, my = (y0 + y) / 2 + (dx / len) * bend;
+          await frames(ms, (t) => { const e = ease(t), u = 1 - e; at(u * u * x0 + 2 * u * e * mx + e * e * x, u * u * y0 + 2 * u * e * my + e * e * y); }); },
+        down: () => { ensure(); wake(); f.classList.add("down"); },
+        up: () => { f.classList.remove("down"); W.__ripples++; const r = document.createElement("div"); r.className = "hc-rip"; r.style.left = cx + "px"; r.style.top = cy + "px"; document.body.appendChild(r); setTimeout(() => r.remove(), 600); rest(); },
+        // a drag up by d px over ms, the page moving with the finger, then a glide of g px
+        drag: async (d, ms, g, gms) => { ensure(); wake(); W.__swipes++; f.classList.add("down");
+          let el = document.elementFromPoint(cx, cy); while (el && !(el.scrollHeight > el.clientHeight + 4 && /(auto|scroll)/.test(getComputedStyle(el).overflowY))) el = el.parentElement;
+          const sc = el || document.scrollingElement, top0 = sc.scrollTop, y0 = cy;
+          await frames(ms, (t) => { const e = t; at(cx, y0 - d * e); sc.scrollTop = top0 + d * e; });
+          const moved = sc.scrollTop - top0; f.classList.remove("down"); rest();
+          const top1 = sc.scrollTop; await frames(gms, (t) => { sc.scrollTop = top1 + g * (1 - Math.pow(1 - t, 3)); });
+          W.__synced.push({ finger: d, page: moved, end: sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 2 }); },
+      };
     });
     await require(path.join(ROOT, "tests/flows/adult.cjs"))(page);
     await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
@@ -104,23 +133,42 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const t0 = Date.now();
     await page.goto(U + (x.path || "/plate")); await sleep(1600);
     let from = (Date.now() - t0) / 1000, lastAct = from, taps = 0, swipes = 0;
-    const act = { 
-      // a tap: a real click, so the ring is drawn where it lands
-      tap: async (loc, wait = 900) => { await loc.click(); taps++; lastAct = (Date.now() - t0) / 1000; await sleep(wait); },
-      // a swipe up the screen by dy pixels, drawn as a finger
-      swipe: async (dy, wait = 1200, y = 600) => { await page.mouse.move(200, y); await page.evaluate(([y, dy]) => window.__swipe(200, y, dy), [y, dy]); swipes++; await page.mouse.wheel(0, dy); lastAct = (Date.now() - t0) / 1000; await sleep(wait); },
+    // HC10: this clip's hand. A seeded random per clip: where the thumb comes from, which side it scrolls on, how fast it moves
+    const rnd = seeded(name), hand = { side: 210 + rnd() * 110, pace: 0.85 + rnd() * 0.4, entry: [250 + rnd() * 120, 880] };
+    let first = true, last = hand.entry;
+    const travel = async (x, y) => { const d = Math.hypot(x - last[0], y - last[1]);
+      const ms = Math.round((first ? 480 : 220) + Math.min(320, d * 0.6) * hand.pace), bend = (rnd() - 0.5) * Math.min(80, d * 0.25);
+      await page.evaluate(([x, y, ms, bend, from]) => window.__finger.move(x, y, ms, bend, from), [x, y, ms, bend, first ? hand.entry : null]); first = false; last = [x, y]; };
+    const act = {
+      // a tap: the finger travels there, presses a little off the centre as a thumb does, a real click, lifts
+      tap: async (loc, wait = 900) => { await loc.waitFor({ timeout: 6000 }); const bb = await loc.boundingBox();
+        const x = bb.x + bb.width * (0.5 + (rnd() - 0.5) * Math.min(0.4, 24 / bb.width)), y = bb.y + bb.height * (0.5 + (rnd() - 0.5) * Math.min(0.35, 14 / bb.height));
+        const hit = await loc.evaluate((el, [x, y]) => { const h = document.elementFromPoint(x, y); return Boolean(h && (el === h || el.contains(h))); }, [x, y]);
+        if (!hit) { const info = await page.evaluate(([x, y]) => { const h = document.elementFromPoint(x, y); const sc = document.scrollingElement; return `${h ? h.tagName + "." + h.className + " " + (h.textContent || "").slice(0, 30) : "nothing"}; scrollTop ${sc.scrollTop} of ${sc.scrollHeight}`; }, [x, y]); throw new Error(`tap at ${Math.round(x)},${Math.round(y)} on ${(await loc.textContent().catch(() => "")).slice(0, 30)} lands on ${info}; scroll first`); }
+        await travel(x, y); await sleep(90 + rnd() * 120);
+        await page.evaluate(() => window.__finger.down()); await page.mouse.move(x, y); await page.mouse.down(); await sleep(70 + rnd() * 60); await page.mouse.up(); await page.evaluate(() => window.__finger.up());
+        taps++; lastAct = (Date.now() - t0) / 1000; await sleep(wait); },
+      // a scroll: the finger goes to the scroll side, drags up part of the way with the page under it, and the page glides on
+      swipe: async (dy, wait = 1200) => { const x = hand.side + (rnd() - 0.5) * 30, y = 560 + rnd() * 140;
+        await travel(x, y); await sleep(120 + rnd() * 100);
+        const d = Math.round(Math.min(dy * (0.5 + rnd() * 0.15), 300)), ms = Math.round((340 + rnd() * 160) * hand.pace), gms = Math.round(360 + Math.min(520, (dy - d) * 0.45) + rnd() * 120);
+        await page.evaluate(([d, ms, g, gms]) => window.__finger.drag(d, ms, g, gms), [d, ms, dy - d, gms]); last = [x, y - d];
+        strokes.push(`${Math.round(x)}/${d}/${ms}`); swipes++; lastAct = (Date.now() - t0) / 1000; await sleep(wait); },
       mark: () => { from = (Date.now() - t0) / 1000; },
     };
     let checks = {};
     try { checks = (await run(page, act)) || {}; } catch (e) { rule(false, "run", `${name}: ${e.message.split("\n")[0]}`); }
     await sleep(1700);
-    const drawn = await page.evaluate(() => ({ rings: window.__rings, swipes: window.__swipes })).catch(() => ({ rings: -1, swipes: -1 }));
+    const drawn = await page.evaluate(() => ({ rings: window.__rings, ripples: window.__ripples, swipes: window.__swipes, travels: window.__travels, synced: window.__synced })).catch(() => ({ rings: -1, ripples: -1, swipes: -1, travels: -1, synced: [] }));
     const end = (Date.now() - t0) / 1000;
     const video = page.video(); await ctx.close(); await b.close(); const raw = await video.path();
     const len = end - from;
-    rule(drawn.rings === taps && drawn.swipes === swipes && taps + swipes > 0, "HC1", `${name}: ${taps} taps, ${drawn.rings} rings; ${swipes} swipes, ${drawn.swipes} drawn`);
+    rule(drawn.rings === taps && drawn.ripples === taps && drawn.swipes === swipes && taps + swipes > 0, "HC1", `${name}: ${taps} taps, ${drawn.rings} presses, ${drawn.ripples} lifts; ${swipes} swipes, ${drawn.swipes} drawn`);
+    rule(drawn.travels === taps + swipes, "HC10", `${name}: the finger travelled to every action (${drawn.travels} of ${taps + swipes})`);
+    const slip = drawn.synced.filter((v) => !v.end && Math.abs(v.page - v.finger) > 4);
+    rule(slip.length === 0, "HC10", `${name}: the page moved with the finger on every scroll${slip.length ? ": " + slip.map((v) => `${v.finger} px finger, ${v.page} px page`).join(", ") : ""}`);
     rule(end - lastAct >= 1.5, "HC7", `${name}: the last screen held ${(end - lastAct).toFixed(1)} s`);
-    rule(len >= 6 && len <= 12.5, "HC8", `${name}: ${len.toFixed(1)} s`);
+    rule(len >= 6 && len <= 12, "HC8", `${name}: ${len.toFixed(1)} s`);
     for (const [k, v] of Object.entries(checks)) rule(Boolean(v.ok), k, `${name}: ${v.what}`);
     made.push({ name, raw, from, len });
   };
@@ -139,8 +187,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   const openScan = async (page, a) => { await a.tap(page.getByRole("button", { name: "Scan", exact: true }).first(), 0); await page.locator(".auto-switch").waitFor({ timeout: 4000 }).catch(() => {}); await manual(page, a); await sleep(500); };
   const toMode = async (page, a, m) => { await a.tap(page.locator(".cam-modes button").filter({ hasText: m }), 500); };
   const saveFood = async (page, a) => {
-    await a.tap(page.getByText(/I checked the values/).first(), 600);
-    await a.tap(page.getByRole("button", { name: /Confirm & save food/ }), 2000);
+    await a.tap(page.getByText(/I checked the values/).first(), 450);
+    await a.tap(page.getByRole("button", { name: /Confirm & save food/ }), 1600);
   };
   const onPlate = (page, name) => page.locator(".plate-card").getByText(name).count().then((n) => n > 0).catch(() => false);
   try {
@@ -149,17 +197,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       // the app's scanner reads the code from the camera picture; nothing is typed
       await page.getByText(/Code read/).waitFor({ timeout: 8000 }).catch(() => {});
       const read = await page.getByText(/Code read/).first().textContent().catch(() => "");
-      await sleep(1100);
-      await a.tap(page.getByRole("button", { name: "Use the code only" }), 2400);
-      await a.swipe(520, 1000);
+      await sleep(700);
+      await a.tap(page.getByRole("button", { name: "Use the code only" }), 1800);
+      await a.swipe(1300, 600);
       await saveFood(page, a);
       return { HC2: { ok: read.includes(CODE), what: `the scanner read the code on the pack: ${read.trim()} (pack: ${CODE})` }, HC3: { ok: await onPlate(page, "Fjell Skyr natural"), what: "the food is on the plate" } };
     }, { feed: "barcode" });
     await clip("label", async (page, a) => {
-      await openScan(page, a); await toMode(page, a, "Label"); a.mark(); await sleep(1000);
-      await a.tap(page.locator("#camera-shutter-button"), 900);
-      await a.tap(page.getByRole("button", { name: /^Analyze/ }), 3000);
-      await a.swipe(520, 1400);
+      await openScan(page, a); await toMode(page, a, "Label"); a.mark(); await sleep(400);
+      await a.tap(page.locator("#camera-shutter-button"), 500);
+      await a.tap(page.getByRole("button", { name: /^Analyze/ }), 1300);
+      await a.swipe(1360, 500);
       const energy = await page.locator("input").evaluateAll((xs) => xs.map((x) => x.value)).catch(() => []);
       await saveFood(page, a);
       return { HC3: { ok: energy.includes("66") && await onPlate(page, "Fjell Skyr natural"), what: `the app's table holds the label's 66 kcal, then the food is on the plate` } };
@@ -195,13 +243,15 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       return { HC5: { ok: tiles.length >= 3 && tiles.every(Boolean), what: `every recipe tile shows its photo (${tiles.filter(Boolean).length} of ${tiles.length})` } };
     }, { meals, plan: PLAN, time: "2026-10-20T14:00:00Z", path: "/plan" });
     await clip("shop", async (page, a) => {
-      await sleep(900); await a.tap(page.locator(".plan-shop"), 1400);
-      await a.tap(page.getByRole("dialog", { name: "Shopping lists" }).getByRole("button", { name: /Make shopping list/ }), 1500);
+      await sleep(700); await a.swipe(240, 500); await a.tap(page.locator(".plan-shop"), 1200);
+      await a.tap(page.getByRole("dialog", { name: "Shopping lists" }).getByRole("button", { name: /Make shopping list/ }), 1200);
       const rows = page.locator(".shop-row"); await a.tap(rows.nth(1), 1100); await a.tap(rows.nth(3), 600);
     }, { meals, plan: PLAN, time: "2026-10-20T14:00:00Z", path: "/plan" });
   } catch (e) { rule(false, "run", e.message.split("\n")[0]); }
+  rule(new Set(strokes).size === strokes.length, "HC10", `no two scrolls in the set are the same (${strokes.length} scrolls)`);
   server.kill();
   if (fails.length) { console.log(`\n${fails.length} rule(s) failed; no clip was replaced:\n  ${fails.join("\n  ")}`); process.exit(1); }
+  if (ONLY) { console.log("\nCLIPS set: rules checked, no clip written"); process.exit(0); }
   for (const m of made) encode(m);
-  console.log(`\nall rules passed (HC1 to HC9); ${made.length} clips written`);
+  console.log(`\nall rules passed (HC1 to HC10); ${made.length} clips written`);
 })();
