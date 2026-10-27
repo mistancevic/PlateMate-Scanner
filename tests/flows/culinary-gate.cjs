@@ -43,12 +43,12 @@ const U = "http://127.0.0.1:3262";
   ok(gates.length === 2 && gates[0] === "150 g is 3 bars. One bar is about 50 g." && gates[1] === "150 g is over a portion of peanut butter, 15 to 40 g.", "DT93: red lines under the bar and the peanut butter, none under 10 g of yeast: " + gates.join(" | "));
   // rule 3: the size
   // Changed by story DT129 (0.2.109): the readout keeps the status; about two lunches is the gate card's line
-  ok(/not a lunch yet/.test(await text(".readout")) && /about two lunches/.test(await text(".gate-card")), "DT93: the readout says not a lunch yet; the gate card, about two lunches");
+  ok(/not a lunch yet/.test(await text(".readout")) && /about 2 lunch portions/.test(await text(".gate-card")), "DT93, DT133: the readout says not a lunch yet; the gate card, about 2 lunch portions");
   // rule 2: Chef Mealan's read, once per set of foods
   const gate = page.locator(".gate-card").first();
   // changed by DT110 (0.2.94): a plate of 1,515 kcal for a lunch of 917 is two lunches, so the gate says so and offers Make it two
   // lunches, Shrink it to one lunch, Keep it as it is; Chef Mealan's ideas are never offered for a plate over its meal
-  ok(dishAsked === 1 && /Your plate is already about two lunches/.test(await gate.textContent()) && await gate.getByRole("button", { name: /^Make it a lunch around/ }).count() === 0 && await gate.getByRole("button", { name: "Make it two lunches" }).count() === 1 && await gate.getByRole("button", { name: "Shrink it to one lunch" }).count() === 1 && await gate.getByRole("button", { name: "Keep it as it is" }).count() === 1, "DT93, DT110: a plate of two lunches: the three ways, no ideas");
+  ok(dishAsked === 1 && /Your plate is already about 2 lunch portions/.test(await gate.textContent()) && await gate.getByRole("button", { name: /^Make it a lunch around/ }).count() === 0 && await gate.getByRole("button", { name: "Make it 2 portions" }).count() === 1 && await gate.getByRole("button", { name: "Shrink it to one portion" }).count() === 1 && await gate.getByRole("button", { name: "Keep it as it is" }).count() === 1, "DT93, DT110: a plate of two lunches: the three ways, no ideas");
   await page.locator(".grams input").nth(1).fill("25"); await page.waitForTimeout(600);
   ok(dishAsked === 1, "DT93: changing an amount does not ask Chef Mealan again");
   // Fit in place: the yeast stays at its portion, the line says so, the plate stays on Craft
@@ -80,6 +80,7 @@ const U = "http://127.0.0.1:3262";
   // DT98 (0.2.90): the cooking foods as chips; x takes one out
   await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.cooking = ["ground cinnamon", "lemon zest"]; s.cookingFor = s.items.map((i) => i.food.id); localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
   await page.reload(); await page.waitForTimeout(1500);
+  await page.locator(".pt-cook .pt-chip").first().waitFor({ timeout: 4000 }).catch(() => {});
   ok(await page.locator(".pt-cook .pt-chip").count() === 2, "DT98: For cooking as two chips");
   await page.getByRole("button", { name: "Take out lemon zest" }).click(); await page.waitForTimeout(300);
   ok(JSON.stringify((await st()).cooking) === JSON.stringify(["ground cinnamon"]) && await page.locator(".pt-cook .pt-chip").count() === 1, "DT98: x takes the lemon zest out, the cinnamon stays");

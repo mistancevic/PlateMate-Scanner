@@ -13,7 +13,7 @@ import { ClearField } from "../components/ClearField";
 import { asMine, seenLine, stemOf, type MemberFood } from "../memberFoods";
 import { sameFood } from "../swaps";
 import { oneList, rowLine } from "../oneList";
-import { nutritionGate, dayGate, type GateLine, type GateWay } from "../gates";
+import { nutritionGate, dayGate, sizeOf, type GateLine, type GateWay } from "../gates";
 import { jobOf } from "../foodjob";
 import { WaitSteps, type WaitStep } from "../components/WaitSteps";
 import { aggregate, density, uid, solveIngredient, servingLabel, sizedFor } from "../pilot";
@@ -45,7 +45,7 @@ import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
 import { mealShare, mealNow, routeOf, solveMeal, closedSlots, unloggedMeal, mealRange, type Add } from "../makeMeal";
 import { answersFor, setAnswer } from "../unlogged";
-import { slotsOn, slotAt } from "../slots";
+import { slotsOn, slotAt, windowOf } from "../slots";
 import { lifestyleOf } from "../personal";
 import { dayRecord } from "../record";
 import { dayLog } from "../today";
@@ -462,8 +462,10 @@ export function JourneyScreen(p: AppApi) {
   const dayNums = p.numbersFor(new Date(`${mealDate}T12:00:00`));
   const share = mealSlot && dayNums ? mealShare(daySlots, mealSlot.id, { kcal: dayNums.kcal, protein: dayNums.protein }, mealDate === todayKey ? { kcal: dayRec.kcal, protein: dayRec.protein } : { kcal: 0, protein: 0 }, closed) : null;
   const chefable = p.kind !== "dessert" && momentOf(p.moment).planned && !!share && share.kcal >= 150 && p.filling?.mode !== "eat";
-  // DT93, rule 3: a plate far over its meal (more than 1.4 times, the NEAR rule of 0.2.9) is not that meal yet
-  const tooBig = !!share && share.kcal >= 150 && !state.fromRecipe && (aggregate(state.items).calories ?? 0) > share.kcal * 1.4;
+  // DT93, rule 3 (C31): a plate far over its meal is not that meal yet; DT132 (0.2.113): over 1.5 portions, 1.3 to 1.5 on the edge
+  const sizeNow = sizeOf(aggregate(state.items).calories ?? 0, share?.kcal);
+  const tooBig = !!share && !state.fromRecipe && sizeNow.big;
+  const sizeEdge = !!share && !state.fromRecipe && sizeNow.edge;
   // MS2: a meal whose time has passed and isn't logged: one question, here, when the size matters
   const unlogged = mealDate === todayKey ? unloggedMeal(daySlots, closed, answers, new Date(), mealSlot?.id ?? null) : null;
   const [justSkipped, setJustSkipped] = useState<string | null>(null);
@@ -863,10 +865,13 @@ export function JourneyScreen(p: AppApi) {
   // front; nutrition and your day are arithmetic (src/gates.ts). Each answers for itself; all three green is the sweet spot.
   const gateOn = items.length >= 1 && !imported && !madeBy && !partsMode && (t.calories ?? 0) >= 100;
   const nutri = gateOn ? nutritionGate({ items, kind: p.kind === "dessert" ? "dessert" : p.pick === "snack" || mealWord === "snack" ? "snack" : "meal", beforeTraining: p.moment === "before", mealWord }) : { ok: true as const };
-  const dayLine = gateOn ? dayGate({ items, moment: p.moment, now: new Date(), window: lifestyleOf(p.personal).window, kind: p.kind, mealWord, needsCooking }) : { ok: true as const };
+  const dayLine = gateOn ? dayGate({ items, moment: p.moment, now: new Date(), window: windowOf(lifestyleOf(p.personal)), kind: p.kind, mealWord, needsCooking }) : { ok: true as const };
   const [gateKept, setGateKept] = useState<string>("");
   const culinaryOk = dishNow?.status === "done" ? dishNow.makesIt : null;
-  const sweetSpotOf = (noIngredient: boolean) => gateOn && culinaryOk === true && nutri.ok && dayLine.ok && noIngredient;
+  // DT132: an edge passes, but the sweet spot waits for a clear pass
+  const edgeOf = (g: GateLine) => (g.ok ? (g as GateLine & { edge?: string }).edge ?? null : null);
+  const anyEdge = gateOn && (Boolean(edgeOf(nutri)) || Boolean(edgeOf(dayLine)) || sizeEdge);
+  const sweetSpotOf = (noIngredient: boolean) => gateOn && culinaryOk === true && nutri.ok && dayLine.ok && noIngredient && !anyEdge && !tooBig;
   // the ways out, in the plate's own words
   const addBase = (job: "Protein base" | "Carb base") => {
     const plateFoods = items.map((i) => state.foods.find((x) => x.id === i.food.id) ?? i.food);
@@ -884,7 +889,13 @@ export function JourneyScreen(p: AppApi) {
     if (w === "window") return null;
     return <button key={w} className="pill pill-small" onClick={() => setGateKept(dishSig)}>Keep it as it is</button>;
   };
-  const gateLine = (name: string, g: GateLine) => (
+  const gateLine = (name: string, g: GateLine) => edgeOf(g) ? (
+    <div key={name} className="gate-line-row gate-edge">
+      <b>~ {name}, on the edge</b>
+      <small>{edgeOf(g)}</small>
+      {(g as GateLine & { hint?: string }).hint && <small className="gate-hint">{(g as GateLine & { hint?: string }).hint}</small>}
+    </div>
+  ) : (
     <div key={name} className={`gate-line-row ${g.ok ? "gate-yes" : "gate-no"}`}>
       <b>{g.ok ? "✓" : "✕"} {name}</b>
       {g.ok === false && <small>{g.why}</small>}
@@ -917,12 +928,12 @@ export function JourneyScreen(p: AppApi) {
     if (!share || !bigN) return;
     const name = (state.title && state.title !== "DaaM" ? state.title : "") || autoTitle(items);
     const whole = structuredClone(items).map((i) => ({ ...i, locked: true }));
-    const meal: Meal = { id: uid(), title: name, items: whole, portion: Math.round((t.weight ?? 0) / bigN), savedAt: new Date().toISOString(), kind: p.kind, makes: { n: bigN, unit: mealsWord } };
+    const meal: Meal = { id: uid(), title: name, items: whole, portion: Math.round((t.weight ?? 0) / bigN), savedAt: new Date().toISOString(), kind: p.kind, makes: { n: bigN, unit: "portions" } };
     const one = items.map((i) => ({ ...i, grams: Math.round(i.grams / bigN) }));
     setState((s) => ({ ...s, meals: [meal, ...s.meals], items: one, title: name, portion: null, fromRecipe: meal.id, recipeFoods: whole.filter((i) => !i.optional).map((i) => i.food.id) }));
     setPmode("sized");
     if (mealSlot) { const d = new Date(); d.setDate(d.getDate() + 1); p.fill(ymd(d), mealSlot.id, fromMeal(meal, "mine")); }
-    notify(`${name} makes ${bigN} ${mealsWord}. One is on the plate; ${bigN === 2 ? "the other" : "the next"} is tomorrow's ${mealWord} on Plan.`);
+    notify(`${name} makes ${bigN} portions. One is on the plate; ${bigN === 2 ? "the other" : "the next"} is tomorrow's ${mealWord} on Plan.`);
   };
   // Shrink it to one: every amount scaled into the meal's range, each food within its portion; a counted food on whole pieces
   const shrinkToOne = () => {
@@ -1080,6 +1091,20 @@ export function JourneyScreen(p: AppApi) {
         {/* On the plate (Y1 columns 2 and 2b, 10 October 2026): the plate is a card of its own, with Fit to my target as its action */}
         {inFlow ? <RecipeInFlow flow={recipeIn} put={(f) => void putRead(f)} /> : (
         <section className="card plate-card">
+        {/* DT131 (0.2.113, board Stories87): foods about to land on this plate wait for one answer: add, or a new plate */}
+        {p.plateAsk && items.length > 0 && (() => {
+          const a = p.plateAsk, photo = a.kind === "photo";
+          const add = <button key="add" type="button" className={`pill${photo ? " pill-primary" : ""}`} onClick={() => p.answerPlateAsk("add")}>Add to my plate</button>;
+          const fresh = <button key="new" type="button" className={`pill${photo ? "" : " pill-primary"}`} onClick={() => p.answerPlateAsk("new")}>Start a new plate</button>;
+          return (
+            <section className="pa plate-ask" aria-label="Add to this plate, or start a new one">
+              <div className="pa-top">{a.image && <img src={a.image} alt="the photo" />}<span><b>Your plate already has {items.length} {items.length === 1 ? "food" : "foods"}{state.title && state.title !== "DaaM" ? `: ${state.title}` : ""}.</b><br />{a.what}</span></div>
+              <div className="pa-go">{photo ? [add, fresh] : [fresh, add]}</div>
+              <button type="button" className="link pa-keep" onClick={() => p.answerPlateAsk(null)}>{photo ? "Drop the photo" : "Keep my plate"}</button>
+              <small>Add to my plate: the new foods join yours{photo ? ", marked ~" : ""}, and the plate keeps its name. Start a new plate: only the new foods.</small>
+            </section>
+          );
+        })()}
         {/* DT130 (0.2.110, board Stories78, DT130c): a photo from Your photos asks whose plate, and when, before the read */}
         {p.photoAsk && <PhotoAsk key={p.photoAsk.at + p.photoAsk.image.length} image={p.photoAsk.image} at={p.photoAsk.at} drop={p.dropPhotoAsk}
           mealAt={(d) => { const s = slotAt(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(d)), `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`); return s ? s.name.toLowerCase() : null; }}
@@ -1302,14 +1327,14 @@ export function JourneyScreen(p: AppApi) {
         )}
         {/* DT97 (0.2.90, board Stories62): one place for Chef Mealan above the buttons, there from the second food on, so nothing
             below it moves when his answer comes. His verdict (DT93, rule 2), then Fit's line under it, then the three ways. */}
-        {(dishWanted || (fit && !imported) || (ingredientsOn.length > 0 && !imported) || bigPlate || (gateOn && (!nutri.ok || !dayLine.ok))) && (
+        {(dishWanted || (fit && !imported) || (ingredientsOn.length > 0 && !imported) || bigPlate || (gateOn && (!nutri.ok || !dayLine.ok)) || anyEdge) && (
           <section className="card gate-card" aria-label={`${CHEF_NAME} on this plate`}>
             <b><ChefHat size={16} /> {CHEF_NAME}</b>
             {bigPlate && (<div className="gate-big">
-              <small>Your plate is already about {numWord(bigN)} {mealsWord}: {fmt(t.calories, 0)} kcal of {fmt(mealRange(share!.kcal)[0], 0)} to {fmt(mealRange(share!.kcal)[1], 0)}. Nothing can be added to make it one.</small>
+              <small>Your plate is already about {bigN} {mealWord} portions: {fmt(t.calories, 0)} kcal of {fmt(mealRange(share!.kcal)[0], 0)} to {fmt(mealRange(share!.kcal)[1], 0)}. Nothing can be added to make it one.</small>
               <div className="button-row">
-                <button className="pill pill-small pill-primary" onClick={makeItN}>Make it {numWord(bigN)} {mealsWord}</button>
-                <button className="pill pill-small" onClick={shrinkToOne}>Shrink it to one {mealWord}</button>
+                <button className="pill pill-small pill-primary" onClick={makeItN}>Make it {bigN} portions</button>
+                <button className="pill pill-small" onClick={shrinkToOne}>Shrink it to one portion</button>
                 <button className="pill pill-small" onClick={() => setBigKept(dishSig)}>Keep it as it is</button>
               </div>
             </div>)}
@@ -1339,8 +1364,10 @@ export function JourneyScreen(p: AppApi) {
             </>)}
             {dishNow && dishNow.status === "done" && !dishNow.makesIt && dishKept === dishSig && <div className="gate-line-row gate-yes"><b>✓ Culinary</b><small>Kept as it is.</small></div>}
             {/* DT116: nutrition and your day, each its own line; the sweet spot when all three hold */}
-            {gateOn && !bigPlate && (dishNow?.status === "done" || !nutri.ok || !dayLine.ok) && gateLine("Nutrition", nutri)}
-            {gateOn && !bigPlate && (dishNow?.status === "done" || !nutri.ok || !dayLine.ok) && gateLine("Your day", dayLine)}
+            {gateOn && !bigPlate && (dishNow?.status === "done" || !nutri.ok || !dayLine.ok || anyEdge) && gateLine("Nutrition", nutri)}
+            {gateOn && !bigPlate && (dishNow?.status === "done" || !nutri.ok || !dayLine.ok || anyEdge) && gateLine("Your day", dayLine)}
+            {/* DT132: the plate's size on the edge, 1.3 to 1.5 portions of its meal */}
+            {gateOn && sizeEdge && !bigPlate && share && <div className="gate-line-row gate-edge"><b>~ Size, on the edge</b><small>About {fixed(sizeNow.portions)} {mealWord} portions: {fmt(t.calories, 0)} kcal for a {mealWord} of about {fmt(share.kcal, 0)}, and the line is 1.5.</small><small className="gate-hint">To be clear of it: a little less of one food, or Fit.</small></div>}
             {sweetSpotOf(ingredientsOn.length === 0) && <small className="gate-sweet">DaaM Good spot: a dish, the numbers, and your day, all three.</small>}
             {fit && !imported && <small className="fit-note">{/^Fit /.test(fit.note) ? <><b>Fit</b> {fit.note.slice(4)}</> : fit.note}{fit.id && fit.before !== undefined && fit.before !== Math.round(items.find((i) => i.id === fit.id)?.grams ?? -1) ? <> <button className="link pt-inline" onClick={() => { updateItem(fit.id!, { grams: fit.before! }); setFit(null); }}>Undo</button></> : null}</small>}
             {fitShort && !madeBy && (<>
@@ -1390,8 +1417,11 @@ export function JourneyScreen(p: AppApi) {
             all: <button key="all" className={`pill pill-small ${adv.first === "all" ? "pill-primary" : ""}`} onClick={() => p.ateNow(mealOf(), slot, { photo: state.photo!.image, at })}>Ate it</button>,
             half: <button key="half" className={`pill pill-small ${adv.first === "half" ? "pill-primary" : ""}`} onClick={() => p.ateNow(mealOf(), slot, { photo: state.photo!.image, half: true, at })}>Ate half</button>,
             add: <button key="add" className={`pill pill-small ${adv.first === "add" ? "pill-primary" : ""}`} onClick={() => { document.querySelector<HTMLInputElement>("input.search")?.focus(); }}>Add a food</button>,
+            // DT133: a plate of several portions: Ate one portion, Ate it all
+            portion: <button key="portion" className="pill pill-small pill-primary" onClick={() => p.ateNow(mealOf(), slot, { photo: state.photo!.image, portions: bigN, at })}>Ate one portion</button>,
+            allOf: <button key="allOf" className="pill pill-small" onClick={() => p.ateNow(mealOf(), slot, { photo: state.photo!.image, at })}>Ate it all</button>,
           };
-          const order = adv.first === "half" ? [b.half, b.all, b.add] : adv.first === "add" ? [b.add, b.all, b.half] : [b.all, b.half, b.add];
+          const order = adv.first === "portion" ? [b.portion, b.allOf, b.add] : adv.first === "half" ? [b.half, b.all, b.add] : adv.first === "add" ? [b.add, b.all, b.half] : [b.all, b.half, b.add];
           return (
             <section className="card mp-say" aria-label={`${CHEF_NAME} on your meal`}>
               <small><b>{CHEF_NAME}:</b> {adv.line}</small>

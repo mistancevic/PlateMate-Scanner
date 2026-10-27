@@ -105,8 +105,8 @@ h = rowEnd(cy,
   B.screen("HP2a", 0, y, "Now: the five videos", "hp-now-videos", "now", "What Chef Mealan does for you: five clips from 0.2.51."),
   B.screen("HP2b", 1, y, "New: on a phone", "hp-new", "changed", "One below another: the four ways in, one plate with PD and the letters, recipes for your day, the shopping list."))
 y = h
-h = wide(B, y, "New: on a computer", "hp-new-wide", "changed", "The four ways in one row; one plate with its explanation beside it; recipes and the shopping list side by side.") + 140
+h = wide(B, y, "New: on a computer", "hp-new-wide", "changed", "Redrawn (Milan 14:50: three and one alone, below a mess): the four ways in as one row of four; the plate beside its explanation; recipes and the shopping list side by side, the same height.") + 140
 y = h
 board("Stories90.dc.html", "HP2. The home page: start from anything, one plate, plan, shop",
-  "27 October 2026 (Milan 14:25, 14:27 and 14:37: one below another on a phone). Now: 0.2.112, untouched. Drawn for your approval; nothing built.",
+  "27 October 2026 (Milan 14:25, 14:27, 14:37: one below another on a phone; 14:50: the computer layout fixed). Now: 0.2.112, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories89.dc.html")

@@ -27,7 +27,7 @@ the numbers is shown to the coach first, then recorded with `npm run eval:number
 | Numbers | `number-cases.json`, `number-snapshot.json` | `npm test` (every push), `npm run eval:numbers` | every check holds; numbers as recorded; a case the coach passed stays within 5 % of the coach's calories and 10 g of the coach's protein |
 | Goal chat | `chat-goal-cases.json` | Menu, Evals, goal chat (server running, key set) | answered; no food called good or bad, no guilt, no crash advice; at most three sentences; no grams; under 8 s; the coach labels whether the advice matches About your goal |
 | Model | `plate-questions.jsonl` | `npm run eval:model` (server running, key set) | grounded 100 %, shape 100 %, forbidden 0, relevance ≥ 4, p50 < 5 s |
-| Photo advice (code) | `photo-advice-cases.json` | `npm test` (every push), `npm run eval:advice` | 20 of 20 as the coach's rules say; a case marked open names a decision that waits for the coach |
+| Photo advice (code) | `photo-advice-cases.json` | `npm test` (every push), `npm run eval:advice` | 22 of 22 as the coach's rules say; a case marked open names a decision that waits for the coach |
 | Photo read (model) | `photo-cases.json`, `photos/` (weighed plates, kept off git) | `npm run eval:photo` (server running, key set) | foods found ≥ 90 %, invented ≤ 1 per 10 plates, weighed grams in the read's range ≥ 80 %, plate kcal within 20 % for ≥ 80 % of plates, p50 < 8 s |
 | Human vs judge | `results/*.csv` | `npm run eval:align` (photo runs too: `-- photo-<time>.csv`) | agreement ≥ 8 of 10 |
 
@@ -46,3 +46,5 @@ and whose plate, each with the line the coach's rules expect. The flow is behavi
 meal-camera.cjs, with a stand-in read. First run of the advice: 18 of 20, 2 open (a plate of 3 dinners told to eat half;
 50.2 percent fat shown as 50 percent under More than half). It also found two text faults, fixed the same night: a line
 that went on in lower case after a full stop (About), and kcal over 1,000 without the comma.
+
+27 October (0.2.113): the two open cases decided by Milan (portions, DT133; the edge band, DT132, rule N54); two edge cases added (a21 size 1.4 portions, a22 fat 51 percent). 22 of 22.

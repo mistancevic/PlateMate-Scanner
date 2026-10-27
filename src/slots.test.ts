@@ -21,7 +21,7 @@ test("a changed time wins over the default, by the slot's id", () => {
 });
 test("times round to five minutes and stay in the day", () => {
   assert.equal(toTime(13 * 60 + 47), "13:45"); assert.equal(toTime(24 * 60 + 10), "00:10");
-  assert.deepEqual(defaultTimes(1, null), ["07:30"]);
+  assert.deepEqual(defaultTimes(1, null), ["18:00"], "DT134: one meal a day starts at 18:00");
 });
 test("the training row: a clock time only when set; a part of the day as words; nothing set at the end (board FX, TT2)", () => {
   const training = { work: true, kind: "strength" as const, intensity: "hard" as const, when: "evening" as const, minutes: 60 };
@@ -39,4 +39,12 @@ test("the training row: a clock time only when set; a part of the day as words; 
 test("a meal at 12:50 belongs to the 13:45 lunch; one at 03:00 belongs to nothing", () => {
   const s = slotsOf({ meals: 3, window: null });
   assert.equal(slotAt(s, "12:50")?.id, "lunch"); assert.equal(slotAt(s, "03:00"), null);
+});
+
+test("DT134: one meal a day: one slot, Meal; the window an hour from it; 2 to 5 as before", async () => {
+  const { slotsOf, windowOf } = await import("./slots");
+  assert.deepEqual(slotsOf({ meals: 1, window: null }), [{ id: "meal", name: "Meal", time: "18:00" }]);
+  assert.deepEqual(windowOf({ meals: 1, window: null, slotTimes: { meal: "19:30" } }), { from: "19:30", to: "20:30" });
+  assert.deepEqual(windowOf({ meals: 3, window: { from: "07:00", to: "21:00" } }), { from: "07:00", to: "21:00" });
+  assert.equal(slotsOf({ meals: 2, window: null }).length, 2);
 });

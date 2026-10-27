@@ -3,7 +3,7 @@
 // line of four letters, f | c | fi- | P, and a tap opens the numbers: the plate against the planned meal (Plate, Planned, %),
 // then what is in it (g, kcal, % plate, % day, a Total), read down a column. Per 100 kcal keeps the four sentences.
 import { useState, type ReactNode } from "react";
-import { lettersOf, letterLine, LETTER_ORDER, per100kcal, BANDS_NOTE, FIBRE_PER_1000_KCAL, type Rates, type Numbers } from "../letters";
+import { lettersOf, letterLine, letterEdge, LETTER_ORDER, per100kcal, BANDS_NOTE, FIBRE_PER_1000_KCAL, type Rates, type Numbers } from "../letters";
 
 // the quick line; open and setOpen when the table lives outside the block (the Plate), else the table follows inline
 export function Letters({ n, rates, who, extra, open, setOpen, table }: { n: Numbers; rates: Rates; who: string; extra?: string | null; open?: boolean; setOpen?: (o: boolean) => void; table?: ReactNode }) {
@@ -58,7 +58,7 @@ export function NumbersTable({ n, rates, extra, weight, day, plan }: { n: Number
       <div className={`nt-grid nt-in nt-row nt-total${day ? "" : " nt-noday"}`}><span>Total</span><span>{weight === null ? "" : fmt(weight)}</span><span>{fmt(kcal)}</span><span>100</span>{day && <span>{day.kcal > 0 ? Math.round((kcal / day.kcal) * 100) : ""}</span>}</div>
       <small className="nt-note">Read down a column.{plan ? ` The plate and your plan: the plate against the ${plan.word} you planned, % of the plan.` : ""} % plate: each one's share of the plate's energy.{day ? " % day: against your planned day." : ""}</small>
       <button type="button" className="link nt-more" aria-expanded={sentences} onClick={() => setSentences((x) => !x)}>Per 100 kcal {sentences ? "⌃" : "›"}</button>
-      {sentences && <div className="letters-lines">{LETTER_ORDER.map((m) => <small key={m}>{letterLine(m, per100kcal(n[m], n.calories), rates[m])}</small>)}{extra && <small>{extra}</small>}<small className="muted">{BANDS_NOTE}</small></div>}
+      {sentences && <div className="letters-lines">{LETTER_ORDER.map((m) => { const v = per100kcal(n[m], n.calories), e = letterEdge(v, rates[m]); return <small key={m}>{letterLine(m, v, rates[m])}{e && <> <span className="nt-edge">~ {e}</span></>}</small>; })}{extra && <small>{extra}</small>}<small className="muted">{BANDS_NOTE}</small></div>}
     </section>
   );
 }

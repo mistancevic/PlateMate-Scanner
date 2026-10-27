@@ -3,6 +3,7 @@ import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
 import type { ScannerMode } from "../types";
 
 export type Tab = "home" | "journey" | "plan" | "me" | "clients" | "meal" | "chef" | "foods" | "recipes" | "notes" | "more";
+export type PlateAsk = { kind: "photo" | "recipe" | "slot"; what: string; image?: string; apply: (how: "add" | "new") => void };
 export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "account" | "support" | "about" | "evals" | "metrics" | "costs" | "share";
 // the slot a plate is made for (0.2.2): the date, the slot and its name and time, for the line on the Plate
 // mode: "plan" fills the slot on Put it in; "eat" (from Today) records the meal for the slot on Save
@@ -28,9 +29,12 @@ export interface AppApi {
   peekBarcode: (code: string) => Promise<DbProduct | null>;
   // DT115 (0.2.97): the members' catalogue
   readMealPhoto: (image: string, x?: { at?: string; who?: "ate" | "now" | "idea" }) => Promise<boolean>;
-  ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string }) => void;
+  ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number }) => void;
   // DT130 (0.2.110): Photo of my meal opens the meal camera; a photo from Your photos waits on the Plate for whose and when
   mealCamera: () => void;
+  // DT131 (0.2.113): foods waiting to land on a plate that has foods; null when nothing waits
+  plateAsk: PlateAsk | null;
+  answerPlateAsk: (how: "add" | "new" | null) => void;
   photoAsk: { image: string; at: string } | null;
   dropPhotoAsk: () => void;
   // DT130: An idea kept: in Mine with the photo as its picture, at the top until made once; a slot in the plan when given

@@ -1,5 +1,5 @@
 {
- "about": "Eval 1 for Photo of my meal (DT127, DT130): Chef Mealan's line and first button are written by code from the read plate. Each case is one combination of plate size, the nutrition rules, your day, the dish check and whose plate. The expected line is the coach's rule, not a copy of the output. The read's estimates are the grams give or take a quarter.",
+ "about": "Eval 1 for Photo of my meal (DT127, DT130): Chef Mealan's line and first button are written by code from the read plate. Each case is one combination of plate size, the nutrition rules, your day, the dish check and whose plate. The expected line is the coach's rule, not a copy of the output. The read's estimates are the grams give or take a quarter. Changed 27 October (DT132, DT133): the edge band and portions; a13 and a14 were open and are decided.",
  "foods": {
   "chicken": {
    "name": "Chicken breast, grilled",
@@ -215,8 +215,8 @@
    "culinaryOk": true,
    "who": "eat",
    "expect": {
-    "first": "half",
-    "says": "^Eat half and take the rest home\\. The whole plate is about 1,\\d{3} to 2,\\d{3} kcal, about 2 lunches for your day\\. Half is a lunch\\.$"
+    "first": "portion",
+    "says": "^Be aware: this plate is about 2 portions of your lunch, about 1,\\d{3} to 2,\\d{3} kcal for a lunch of about 900\\. Eat one portion and keep the rest\\.$"
    }
   },
   {
@@ -251,8 +251,8 @@
    "culinaryOk": true,
    "who": "eat",
    "expect": {
-    "first": "half",
-    "says": "^Eat half and take the rest home\\..*about 2 dinners"
+    "first": "portion",
+    "says": "^Be aware: this plate is about 2 portions of your dinner.* Eat one portion and keep the rest\\.$"
    }
   },
   {
@@ -569,10 +569,10 @@
   },
   {
    "id": "a13",
-   "title": "two lunches and fat over half",
+   "title": "two lunches, fat on the edge (50.2 percent)",
    "dimensions": {
     "size": "two meals",
-    "nutrition": "fat over half",
+    "nutrition": "fat on the edge",
     "day": "ok",
     "dish": "ok",
     "who": "eat",
@@ -595,11 +595,10 @@
    "culinaryOk": true,
    "who": "eat",
    "expect": {
-    "first": "half",
-    "says": "^Eat half.*about 2 lunches for your day, and more than half of this lunch's energy is fat",
-    "never": "[Mm]ore than half[^.]*: 50 percent"
-   },
-   "open": "Waiting for Milan (26 October): 50.2 percent fat is shown as 50 percent under More than half."
+    "first": "portion",
+    "says": "^Be aware: this plate is about 2 portions of your lunch",
+    "never": "[Mm]ore than half"
+   }
   },
   {
    "id": "a14",
@@ -633,11 +632,10 @@
    "culinaryOk": true,
    "who": "eat",
    "expect": {
-    "first": "half",
-    "says": "about 3 dinners for your day",
-    "never": "Half is a dinner"
-   },
-   "open": "Waiting for Milan (26 October): a plate of 3 dinners is told to eat half, and half of it is 1.5 dinners."
+    "first": "portion",
+    "says": "^Be aware: this plate is about 3 portions of your dinner.* Eat one portion and keep the rest\\.$",
+    "never": "[Hh]alf"
+   }
   },
   {
    "id": "a15",
@@ -739,7 +737,7 @@
    "culinaryOk": true,
    "who": "idea",
    "expect": {
-    "says": "about 2 lunches for your day\\. Fit it and it is one lunch\\.$",
+    "says": "about 2 portions of your lunch\\. Fit it and it is one portion\\.$",
     "never": "\\bEat\\b|\\bAte\\b"
    }
   },
@@ -849,6 +847,80 @@
    "expect": {
     "first": "all",
     "says": "^Eat it as it is\\..* a full breakfast for your day"
+   }
+  },
+  {
+   "id": "a21",
+   "title": "1.4 lunches: on the size edge, still one",
+   "dimensions": {
+    "size": "size edge 1.3 to 1.5",
+    "nutrition": "ok",
+    "day": "ok",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "chicken",
+     "grams": 300
+    },
+    {
+     "food": "rice",
+     "grams": 450
+    },
+    {
+     "food": "salad",
+     "grams": 150
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "13:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "all",
+    "says": "^Eat it as it is\\.",
+    "never": "portions"
+   }
+  },
+  {
+   "id": "a22",
+   "title": "salmon bowl, fat on the edge (51 percent)",
+   "dimensions": {
+    "size": "one meal",
+    "nutrition": "fat on the edge",
+    "day": "ok",
+    "dish": "ok",
+    "who": "eat",
+    "meal": "lunch"
+   },
+   "plate": [
+    {
+     "food": "salmon",
+     "grams": 200
+    },
+    {
+     "food": "rice",
+     "grams": 80
+    },
+    {
+     "food": "avocado",
+     "grams": 60
+    }
+   ],
+   "meal": "lunch",
+   "mealKcal": 900,
+   "moment": "regular",
+   "time": "13:00",
+   "culinaryOk": true,
+   "who": "eat",
+   "expect": {
+    "first": "all",
+    "says": "^Eat it as it is\\.",
+    "never": "[Mm]ore than half"
    }
   }
  ]

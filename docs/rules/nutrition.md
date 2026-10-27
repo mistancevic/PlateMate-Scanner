@@ -60,6 +60,8 @@ N29. The nutrition gate, carbs before training: for the meal before training, ca
 
 N30. Your day, version 1: the third gate reads the plate against the moment and the time of day. Before training, a meeting or travel: nothing to cook. Before training: under 600 kcal. After training: protein first, 15 g at least (N40 to N42 behind it). Outside the eating window from Lifestyle, a plate of 300 kcal or more sits on tomorrow. The week, budget and where you eat wait for version 2. Code: `dayGate` in src/gates.ts.
 
+N54. On the edge (DT132, 0.2.113, board Stories88; Milan 27 October 13:52 to 14:37). A value within 2 points of a gate's line passes, with an amber note: the number, the line, and one hint to be clear of it. A fail anywhere wins over an edge, and the DaaM Good spot waits for a clear pass. The edges: N27 fat 48 to 52 percent (a fail from 52); N28 supplement protein 48 to 52 percent (a fail from 52); N29 carbs before training 8 to 12 percent (a fail under 8); before training 570 to 630 kcal (a fail over 630); after training 13 to 17 g protein (a fail under 13). The four letters keep their bands; in Per 100 kcal a letter within 5 percent of a band edge says so. Code: `EDGE` in src/gates.ts, `letterEdge` in src/letters.ts.
+
 ## 4. What is counted
 
 N30. Oil taken up in frying: 15 % of the fried food's weight, an estimate, never the whole pot (C46). Code: src/frying.ts.

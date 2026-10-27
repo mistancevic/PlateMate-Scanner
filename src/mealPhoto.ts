@@ -5,8 +5,7 @@
 import type { Food, Ingredient } from "./pilot";
 import { basicOf } from "./foodId";
 import { referenceFood } from "./reference";
-import type { GateLine } from "./gates";
-import { NEAR } from "./makeMeal";
+import { sizeOf, type GateLine } from "./gates";
 
 export type PhotoFood = { name: string; grams: number; low: number; high: number; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber: number | null; confidence: "high" | "medium" | "low" };
 export type PhotoRead = { dish: string; foods: PhotoFood[]; unsure: { name: string; options: [number, number] } | null };
@@ -55,21 +54,22 @@ export function kcalRange(items: Ingredient[]): { low: number; high: number; kca
   return { low: Math.round(items.reduce((n, i) => n + per(i, i.est ? i.est.low : i.grams), 0)), high: Math.round(items.reduce((n, i) => n + per(i, i.est ? i.est.high : i.grams), 0)), kcal: Math.round(items.reduce((n, i) => n + per(i, i.grams), 0)) };
 }
 const r10 = (n: number) => (Math.round(n / 10) * 10).toLocaleString("en-US");
-const plural = (w: string) => (/(ch|sh|s|x)$/.test(w) ? `${w}es` : `${w}s`);
 export const aboutKcal = (x: { low: number; high: number; kcal: number }) => (x.high - x.low < 60 ? `about ${r10(x.kcal)} kcal` : `about ${r10(x.low)} to ${r10(x.high)} kcal`);
 
-// how many meals the plate is (C31): over 1.4 times the meal's energy it is at least two, else 0; the eval runs this same rule
-export const mealsOn = (kcal: number, mealKcal: number | null | undefined): number => (mealKcal && mealKcal >= 150 && kcal > mealKcal * NEAR[1] ? Math.max(2, Math.round(kcal / mealKcal)) : 0);
+// how many portions of the meal the plate is (C31, sizeOf in gates.ts): over 1.5 it is at least two, else 0; the eval runs this same rule
+export const mealsOn = (kcal: number, mealKcal: number | null | undefined): number => { const s = sizeOf(kcal, mealKcal); return s.big ? Math.max(2, Math.round(s.portions)) : 0; };
 
 // Chef Mealan's one line, by code, from what the gates and the size said; the first button is the advice
-export type Advice = { line: string; first: "all" | "half" | "add" };
+export type Advice = { line: string; first: "all" | "half" | "add" | "portion" };
 export function photoAdvice(x: { items: Ingredient[]; protein: number; mealWord: string; mealKcal: number | null; big: number; nutrition: GateLine; day: GateLine; culinaryOk: boolean | null; snackKcal?: number }): Advice {
   const k = kcalRange(x.items), kcal = aboutKcal(k), prot = `${Math.round(x.protein)} g protein`;
   // the gates' lines, read without relying on narrowing (this project builds without strictNullChecks)
   type No = { ok: false; why: string; ways: string[] };
   const n = x.nutrition as GateLine & Partial<No>, d = x.day as GateLine & Partial<No>;
   const nWhy = n.why ?? "", dWhy = d.why ?? "", nWays = n.ways ?? [];
-  if (x.big >= 2) return { line: `Eat half and take the rest home. The whole plate is ${kcal}, about ${x.big} ${plural(x.mealWord)} for your day${n.ok ? "" : ", and " + nWhy.charAt(0).toLowerCase() + nWhy.slice(1).replace(/\.$/, "")}. Half is a ${x.mealWord}.`, first: "half" };
+  // DT133 (0.2.113, board Stories88; Milan 27 October 14:12: let's call them portions): a plate of several meals in portions
+  // of this meal, counted against the plan (the meal's share of what is left of the day), never a fixed number
+  if (x.big >= 2) return { line: `Be aware: this plate is about ${x.big} portions of your ${x.mealWord}, ${kcal} for a ${x.mealWord} of about ${r10(x.mealKcal ?? 0)}.${n.ok ? "" : " " + nWhy} Eat one portion and keep the rest.`, first: "portion" };
   if (x.mealKcal && k.kcal < Math.max(150, x.mealKcal * 0.4)) return { line: `This is a snack, not your ${x.mealWord}: ${kcal} and ${prot}. Eat it, and your ${x.mealWord} is still to come.`, first: "all" };
   if (!n.ok && nWays.includes("protein")) return { line: `${nWhy} Add a protein side and it is your ${x.mealWord}; as it stands it is ${kcal} and ${prot}.`, first: "add" };
   if (!n.ok) return { line: `${nWhy} As it stands it is ${kcal} and ${prot}.`, first: "all" };
@@ -82,7 +82,7 @@ export function photoAdvice(x: { items: Ingredient[]; protein: number; mealWord:
 export function ideaAdvice(x: { items: Ingredient[]; protein: number; mealWord: string; big: number; nutrition: GateLine }): string {
   const k = kcalRange(x.items), kcal = aboutKcal(k), prot = `${Math.round(x.protein)} g protein`;
   const n = x.nutrition as GateLine & { why?: string };
-  if (x.big >= 2) return `As the photo shows it, ${kcal} and ${prot}, about ${x.big} ${plural(x.mealWord)} for your day. Fit it and it is one ${x.mealWord}.`;
+  if (x.big >= 2) return `As the photo shows it, ${kcal} and ${prot}, about ${x.big} portions of your ${x.mealWord}. Fit it and it is one portion.`;
   if (!n.ok && n.why) return `${n.why} As the photo shows it, ${kcal} and ${prot}. Fit it and Chef Mealan sizes it for your ${x.mealWord}.`;
   return `A ${x.mealWord} as the photo shows it: ${kcal} and ${prot}. Fit it and it is sized for your day.`;
 }

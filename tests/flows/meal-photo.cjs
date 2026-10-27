@@ -85,18 +85,18 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   // the photos live in their own store, not in the saved state: the card on Today shows it
   ok(await page.locator(".card").filter({ hasText: "Grilled chicken with rice and salad" }).locator("img").count() >= 1, "DT127: the card on Today carries the photo");
   ok(s3.items.length === 0 && !s3.photo && /Today/.test(await text("header, .topbar, main")), "DT127: the plate is empty and the photo gone; back on Today");
-  // the restaurant plate: eat half
+  // the restaurant plate: one portion (changed by DT133, 0.2.113: portions, not half)
   read = BIG;
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(600);
   ok(await page.locator(".mp-button").count() === 1, "DT127: the Plate has Photo of my meal next to Manual and Scan");
   await snap(".mp-button");
   const big = await text(".mp-say");
-  ok(/^Chef Mealan: Eat half and take the rest home\. The whole plate is about [\d,]+ to [\d,]+ kcal, about 2 (lunches|dinners) for your day/.test(big), "DT127: the big plate: eat half, by code from the size line: " + big);
-  ok((await page.locator(".mp-say .button-row button").allTextContents())[0] === "Ate half", "DT127: Ate half is the first button when it is the advice");
-  await page.getByRole("button", { name: "Ate half" }).click(); await page.waitForTimeout(600);
+  ok(/^Chef Mealan: Be aware: this plate is about 2 portions of your (lunch|dinner), about [\d,]+ to [\d,]+ kcal for a (lunch|dinner) of about [\d,]+\. Eat one portion and keep the rest\./.test(big), "DT133: the big plate in portions, by code from the size line: " + big);
+  ok((await page.locator(".mp-say .button-row button").allTextContents()).slice(0, 2).join() === "Ate one portion,Ate it all", "DT133: Ate one portion first, then Ate it all");
+  await page.getByRole("button", { name: "Ate one portion" }).click(); await page.waitForTimeout(600);
   const s4 = await st();
   const half = s4.feedback.filter((f) => f.meal.title.startsWith("Schnitzel"));
-  ok(half.length === 2 && half.some((f) => f.status === "eaten" && f.meal.items[0].grams === 150) && half.some((f) => f.status === "prepared" && /the other half/.test(f.meal.title)), "DT127: half logged as eaten, the other half kept on Today");
+  ok(half.length === 2 && half.some((f) => f.status === "eaten" && f.meal.items[0].grams === 150) && half.some((f) => f.status === "prepared" && /the other portion$/.test(f.meal.title)), "DT133: one portion logged as eaten, the other portion kept on Today");
   // Not mine clears it
   read = READ;
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(600);

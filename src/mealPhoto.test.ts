@@ -41,7 +41,8 @@ test("DT127: Chef Mealan's line by code: eat it, eat half, a snack, add protein"
   assert.equal(photoAdvice({ items, protein: 60, mealWord: "lunch", mealKcal: 900, big: 0, nutrition: ok, day: ok, culinaryOk: true }).first, "all");
   assert.match(photoAdvice({ items, protein: 60, mealWord: "lunch", mealKcal: 900, big: 0, nutrition: ok, day: ok, culinaryOk: true }).line, /^Eat it as it is\. About .* a full lunch for your day, and nothing on it argues with the dish\.$/);
   const half = photoAdvice({ items, protein: 60, mealWord: "lunch", mealKcal: 900, big: 2, nutrition: { ok: false, why: "More than half of this lunch's energy is fat: 61 percent, 110 g.", ways: ["protein", "snack", "keep"] }, day: ok, culinaryOk: true });
-  assert.equal(half.first, "half"); assert.match(half.line, /^Eat half and take the rest home\..*about 2 lunches for your day, and more than half of this lunch's energy is fat.*Half is a lunch\.$/);
+  // DT133 (0.2.113): portions of the meal, counted against the plan
+  assert.equal(half.first, "portion"); assert.match(half.line, /^Be aware: this plate is about 2 portions of your lunch, about .* kcal for a lunch of about 900\. More than half of this lunch's energy is fat.* Eat one portion and keep the rest\.$/);
   const snack = photoAdvice({ items, protein: 20, mealWord: "lunch", mealKcal: 3000, big: 0, nutrition: ok, day: ok, culinaryOk: null });
   assert.equal(snack.first, "all"); assert.match(snack.line, /^This is a snack, not your lunch/);
   const add = photoAdvice({ items, protein: 10, mealWord: "dinner", mealKcal: 900, big: 0, nutrition: { ok: false, why: "Most of this dinner's protein comes from the powder: 20 of 25 g.", ways: ["protein", "snack", "keep"] }, day: ok, culinaryOk: true });
@@ -53,6 +54,6 @@ test("DT130: an idea's line: what it is as the photo shows it, and what Fit does
   const ok = { ok: true as const };
   const a = ideaAdvice({ items, protein: 60, mealWord: "breakfast", big: 0, nutrition: ok });
   assert.match(a, /^A breakfast as the photo shows it: about .* kcal and 60 g protein\. Fit it and it is sized for your day\.$/);
-  assert.match(ideaAdvice({ items, protein: 60, mealWord: "lunch", big: 2, nutrition: ok }), /about 2 lunches for your day\. Fit it and it is one lunch\.$/);
+  assert.match(ideaAdvice({ items, protein: 60, mealWord: "lunch", big: 2, nutrition: ok }), /about 2 portions of your lunch\. Fit it and it is one portion\.$/);
   assert.doesNotMatch(a, /Eat|Ate/);
 });

@@ -35,3 +35,12 @@ test("DT128: the word under a cell: fat, high · carbs, under · fibre, no value
   assert.equal(letterWord("protein", 6.5, 6.5), "protein, as your day");
   assert.equal(letterWord("carbs", 1, 10.9), "carbs, close to none");
 });
+
+test("DT132: a letter within 5 percent of a band edge says so in words; the letter does not change", async () => {
+  const { letterEdge, letterOf } = await import("./letters");
+  assert.match(letterEdge(4.8, 3.3)!, /^On the edge of high: 1\.45 times your day, the edge is 1\.5\.$/);
+  assert.equal(letterOf("fats", 4.8, 3.3), "F");
+  assert.equal(letterEdge(4.0, 3.3), null);
+  assert.match(letterEdge(2.0, 3.3)!, /close to none/);
+  assert.equal(letterEdge(null, 3.3), null);
+});

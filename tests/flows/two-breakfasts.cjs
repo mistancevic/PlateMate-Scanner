@@ -47,12 +47,12 @@ const U = "http://127.0.0.1:3266";
   // DT110: the plate is two breakfasts; the gate says so and never offers the ideas
   const gate = page.locator(".gate-card").first();
   const gt = await gate.textContent();
-  ok(/Your plate is already about two breakfasts: 1,\d\d\d kcal of [\d,]+ to [\d,]+\. Nothing can be added to make it one\./.test(gt), "DT110: the gate says what the plate is: " + gt.slice(0, 120));
-  ok(await gate.getByRole("button", { name: "Make it two breakfasts" }).count() === 1 && await gate.getByRole("button", { name: "Shrink it to one breakfast" }).count() === 1 && await gate.getByRole("button", { name: "Keep it as it is" }).count() === 1, "DT110: three ways");
+  ok(/Your plate is already about 2 breakfast portions: 1,\d\d\d kcal of [\d,]+ to [\d,]+\. Nothing can be added to make it one\./.test(gt), "DT110: the gate says what the plate is: " + gt.slice(0, 120));
+  ok(await gate.getByRole("button", { name: "Make it 2 portions" }).count() === 1 && await gate.getByRole("button", { name: "Shrink it to one portion" }).count() === 1 && await gate.getByRole("button", { name: "Keep it as it is" }).count() === 1, "DT110: three ways");
   ok(await gate.getByRole("button", { name: /^Make it a breakfast/ }).count() === 0 && mealCalls === 0, "DT110: no Make it a breakfast around, Chef Mealan not asked");
   ok(/not a breakfast yet/.test(await text(".readout")), "C31: the readout says not a breakfast yet");
   // Shrink it to one breakfast: every amount within its portion, the bar on one bar, the apple on one apple
-  await gate.getByRole("button", { name: "Shrink it to one breakfast" }).click(); await page.waitForTimeout(800);
+  await gate.getByRole("button", { name: "Shrink it to one portion" }).click(); await page.waitForTimeout(800);
   let s = await st();
   const kcal = s.items.reduce((k, i) => k + ((i.food.calories ?? 0) * i.grams) / 100, 0);
   ok(kcal < 1100 && s.items.find((i) => i.id === "a").grams === 50 && s.items.find((i) => i.id === "c").grams <= 300, `DT110: shrunk to ${Math.round(kcal)} kcal, the bar one bar (${s.items.find((i) => i.id === "a").grams} g), the quark ${s.items.find((i) => i.id === "c").grams} g`);
@@ -60,11 +60,11 @@ const U = "http://127.0.0.1:3266";
   // back to two breakfasts, then Make it two breakfasts: a recipe that makes 2, one on the plate, the other on Plan tomorrow
   await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.items = s.items.map((i) => ({ ...i, grams: i.id === "a" ? 90 : i.id === "b" ? 60 : i.id === "c" ? 500 : i.id === "d" ? 182 : 100 })); localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
   await page.reload(); await page.waitForTimeout(1800);
-  await page.locator(".gate-card").first().getByRole("button", { name: "Make it two breakfasts" }).click(); await page.waitForTimeout(1000);
+  await page.locator(".gate-card").first().getByRole("button", { name: "Make it 2 portions" }).click(); await page.waitForTimeout(1000);
   s = await st();
   ok(s.meals.length === 1 && s.meals[0].makes?.n === 2 && s.meals[0].items.length === 5 && s.fromRecipe === s.meals[0].id, "DT110: saved as a recipe that makes 2, linked to the plate");
   ok(s.items.find((i) => i.id === "c").grams === 250 && s.items.find((i) => i.id === "a").grams === 45, "DT110: one portion on the plate: 250 g quark, 45 g bar");
-  ok(/makes 2 breakfasts\. One is on the plate; the other is tomorrow's breakfast on Plan\./.test(await text("body")), "DT110: the toast says where the other went");
+  ok(/makes 2 portions\. One is on the plate; the other is tomorrow's breakfast on Plan\./.test(await text("body")), "DT110: the toast says where the other went");
   const planned = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-planned") || localStorage.getItem("chefmealan-plan") || "null"));
   ok(planned !== null || true, "DT110: the plan holds tomorrow's breakfast (checked on Plan below)");
   await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(900);

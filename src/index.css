@@ -2107,6 +2107,9 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .gate-line-row:first-of-type { border-top: 0; }
 .gate-line-row > b { font-size: var(--fs-label); } .gate-yes > b { color: #1b7f4b; } .gate-no > b { color: #b3261e; }
 .gate-line-row small { color: var(--ink); }
+/* DT132 (0.2.113): on the edge, amber: it passes, with the number, the line and one hint */
+.gate-edge { background: #fff4dc; border-radius: var(--r-control); padding: 8px 10px; border-top: 0; margin: 4px 0; } .gate-edge > b { color: #9a5b00; } .gate-edge .gate-hint { color: var(--muted); }
+.nt-edge { color: #9a5b00; font-weight: 700; }
 .gate-sweet { display: block; font-weight: 700; color: #1b7f4b; }
 /* DT128 (0.2.107): four filled cells, the letter, the grams on one line, the word under it */
 .letters-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; width: 100%; }
@@ -2164,6 +2167,7 @@ button.mp-card { width: 100%; text-align: left; font: inherit; color: inherit; }
 .pa-time::-webkit-calendar-picker-indicator { display: none; }
 .pa small { color: var(--muted); font-size: var(--fs-small); line-height: 1.4; }
 .pa-go { display: flex; gap: 12px; align-items: center; } .pa-go .pill { flex: 1; }
+.pa-keep { align-self: flex-start; }
 .mp-idea-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; } .mp-idea-row .pill-primary { grid-column: 1 / -1; }
 .mp-plan { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 .mp-plan .chips-row { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; } .mp-plan .chips-row::-webkit-scrollbar { display: none; }

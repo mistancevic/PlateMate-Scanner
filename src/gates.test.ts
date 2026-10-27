@@ -43,3 +43,30 @@ test("the grams line under the letters", () => {
   assert.equal(gramsLine({ fats: 22.4, carbs: 20.6, fiber: 9 }), "22 g fat · 21 g carbs · 9 g fibre");
   assert.equal(gramsLine({ fats: 22.4, carbs: 20.6, fiber: null }), "22 g fat · 21 g carbs · fibre ?");
 });
+
+// DT132 (0.2.113, board Stories88): on the edge
+const salmon = F("sal", "Salmon, baked", 208, 20, 13, 0, 0), avocado = F("avo", "Avocado", 160, 2, 15, 9, 7);
+test("DT132: fat within 2 points of half passes on the edge, with the number, the line and the fattiest food", () => {
+  const r = nutritionGate({ items: [I(salmon, 200), I(rice, 80), I(avocado, 60)], kind: "meal", beforeTraining: false, mealWord: "lunch" }) as any;
+  assert.equal(r.ok, true);
+  assert.match(r.edge, /^Fat is about half of this lunch's energy: 5[01] percent, and the line is 50\.$/);
+  assert.match(r.hint, /a little less salmon, or a protein side/);
+  const over = nutritionGate({ items: [I(salmon, 200), I(avocado, 150)], kind: "meal", beforeTraining: false, mealWord: "lunch" });
+  assert.equal(over.ok, false, "well over the line stays a fail");
+  assert.equal((nutritionGate({ items: [I(chicken, 180), I(rice, 200)], kind: "meal", beforeTraining: false, mealWord: "lunch" }) as any).edge, undefined, "clear of the line: no note");
+});
+test("DT132: the day's edges: before training 570 to 630 kcal, after training 13 to 17 g protein; a fail wins", () => {
+  const at = new Date(2026, 9, 25, 13, 0);
+  const d = (items: Ingredient[], moment: any) => dayGate({ items, moment, now: at, window: null, kind: "meal", mealWord: "lunch", needsCooking: () => false }) as any;
+  assert.match(d([I(rice, 460)], "before").edge, /^Before training 598 kcal, and the line is 600\./);
+  assert.equal(d([I(rice, 520)], "before").ok, false);
+  assert.match(d([I(chicken, 50), I(rice, 20)], "after").edge, /After training this plate has 16 g protein, and the line is 15\./);
+  assert.equal(d([I(chicken, 30), I(rice, 100)], "after").ok, false);
+});
+test("DT132, C31: the plate's size: over 1.5 portions is not the meal yet; 1.3 to 1.5 on the edge", async () => {
+  const { sizeOf } = await import("./gates");
+  assert.deepEqual([sizeOf(1400, 1000).big, sizeOf(1400, 1000).edge], [false, true]);
+  assert.deepEqual([sizeOf(1550, 1000).big, sizeOf(1550, 1000).edge], [true, false]);
+  assert.deepEqual([sizeOf(1100, 1000).big, sizeOf(1100, 1000).edge], [false, false]);
+  assert.equal(sizeOf(1400, 100).big, false, "no meal size under 150 kcal");
+});

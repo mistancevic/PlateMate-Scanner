@@ -59,4 +59,15 @@ export function letterWord(macro: Macro, value: number | null, rate: number): st
   if (value === null) return `${w}, no value`;
   return `${w}, ${l.endsWith("+") ? "high" : l === CAP[macro] ? "as your day" : l.endsWith("-") ? "close to none" : "under"}`;
 }
+// DT132 (0.2.113, board Stories88; Milan 14:21: not sure how to solve that; the suggestion taken): the quick line of four
+// letters stays clean. Where the numbers are read (Per 100 kcal), a letter within 5 percent of a band edge says so; the letter
+// itself never changes.
+const EDGE_NAME: Record<string, string> = { close: "close to none", plan: "as your day", high: "high" };
+export function letterEdge(value: number | null, rate: number): string | null {
+  if (value === null || !(rate > 0)) return null;
+  const ratio = value / rate;
+  for (const [k, e] of [["close", BAND_EDGES.close], ["plan", BAND_EDGES.plan], ["high", BAND_EDGES.high]] as const)
+    if (Math.abs(ratio - e) / e < 0.05) return `On the edge of ${EDGE_NAME[k]}: ${ratio.toFixed(2)} times your day, the edge is ${e}.`;
+  return null;
+}
 export const BANDS_NOTE = `Capital with a plus: more than your day (from ${BAND_EDGES.high} times its rate). Capital: as your day needs (${BAND_EDGES.plan} to ${BAND_EDGES.high} times). Small: under. Small with a minus: close to none (under ${BAND_EDGES.close} times).`;

@@ -6,8 +6,9 @@ import type { Lifestyle, PlanDay, When } from "./plan";
 export type Slot = { id: string; name: string; time: string };
 export type DayRow = { kind: "slot"; slot: Slot } | { kind: "training"; time: string; label: string; exact: boolean; day: PlanDay };
 
-// the names by how many meals a day: 2 to 5; 4 and 5 hold snacks
+// the names by how many meals a day: 1 to 5; 4 and 5 hold snacks; one meal a day is Meal (DT134, 0.2.113)
 const NAMES: Record<number, string[]> = {
+  1: ["Meal"],
   2: ["Lunch", "Dinner"],
   3: ["Breakfast", "Lunch", "Dinner"],
   4: ["Breakfast", "Lunch", "Snack", "Dinner"],
@@ -21,16 +22,23 @@ export const toTime = (min: number) => { const m = ((Math.round(min / 5) * 5) % 
 // the default times: the window's start and end, or 07:30 to 20:00 when none is set, the rest evenly between
 export function defaultTimes(n: number, window: { from: string; to: string } | null | undefined): string[] {
   const from = toMin(window?.from || "07:30"), to = toMin(window?.to || "20:00");
-  if (n <= 1) return [toTime(from)];
+  if (n <= 1) return ["18:00"]; // DT134: one meal a day starts at 18:00; the person sets their own
   const span = Math.max(60, to - from);
   return Array.from({ length: n }, (_, i) => toTime(from + (span * i) / (n - 1)));
 }
 
 // the slots of a Lifestyle: meals a day (3 when unset), the window, and any times the person changed (slotTimes by id)
 export function slotsOf(l: Pick<Lifestyle, "meals" | "window"> & { slotTimes?: Record<string, string> }): Slot[] {
-  const n = Math.min(5, Math.max(2, l.meals ?? 3));
+  const n = Math.min(5, Math.max(1, l.meals ?? 3));
   const names = NAMES[n], id = ids(names), times = defaultTimes(n, l.window);
   return names.map((name, i) => ({ id: id[i], name, time: l.slotTimes?.[id[i]] ?? times[i] }));
+}
+
+// the eating window the day gate reads: one meal a day eats within an hour from the meal (DT134, 0.2.113, board Stories89);
+// otherwise the window as set
+export function windowOf(l: Pick<Lifestyle, "meals" | "window"> & { slotTimes?: Record<string, string> }): { from: string; to: string } | null {
+  if ((l.meals ?? 3) === 1) { const t = slotsOf(l)[0].time; return { from: t, to: toTime(toMin(t) + 60) }; }
+  return l.window ?? null;
 }
 
 // A day's own times (0.2.8, canvas board CH, CH6): a meal moved for one date from the chat ("Move dinner to after
