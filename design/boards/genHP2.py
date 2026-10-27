@@ -97,16 +97,16 @@ B = Board(); y = 30
 cy = storyCard(B, y, "HP2", "The home page: start from anything, one plate, plan, shop", [
   ("Milan, 27 October 14:25 and 14:27", "Update the home page for visitors: carousel or one below another, input options: barcode, food label, group of labels, plate with meal as the starting point; from there decisions are made and PD is calculated; the macro letters if appropriate; the recipe list for daily selection for the plan; the shopping list. Replace or above the videos: your pick. Clips, not stills."),
   ("Why", "The five videos on the home page were recorded at 0.2.51, before the camera modes, the photo of the meal, the PD block, the letters and the recipes bar. Anna's blind run found PD never defined where it first appears."),
-  ("The story", "One new section in place of the five videos. Start from anything: four ways in, each a short clip with one line (A barcode, A nutrition label, A group of labels, A photo of your meal). Everything lands on one plate: the PD block, with PD and the four letters explained in one line each, and what you decide next. Recipes for your day. Your shopping list. No carousel: on a phone the four ways in sit two by two, the rest one below another; on a computer the four sit in a row."),
+  ("The story", "One new section in place of the five videos. Start from anything: four ways in, each a short clip with one line (A barcode, A nutrition label, A group of labels, A photo of your meal). Everything lands on one plate: the PD block, with PD and the four letters explained in one line each, and what you decide next. Recipes for your day. Your shopping list. No carousel: on a phone everything sits one below another (Milan 14:37); on a computer the four ways in sit in one row."),
   ("Clips", "About 8 seconds each, the real app on test data, no sound, playing when they come into view, the first frame as the poster. The AI's read in a clip is a stand-in, so the section says: recorded on test data. The pack in the clips is invented (Fjell Skyr): no real brand."),
   ("Stays", "The hero with the craving calculator, recipes, coach, Milan, Numbers you can check, the book, the form."),
 ])
 h = rowEnd(cy,
   B.screen("HP2a", 0, y, "Now: the five videos", "hp-now-videos", "now", "What Chef Mealan does for you: five clips from 0.2.51."),
-  B.screen("HP2b", 1, y, "New: on a phone", "hp-new", "changed", "Four ways in two by two, one plate with PD and the letters, recipes for your day, the shopping list."))
+  B.screen("HP2b", 1, y, "New: on a phone", "hp-new", "changed", "One below another: the four ways in, one plate with PD and the letters, recipes for your day, the shopping list."))
 y = h
 h = wide(B, y, "New: on a computer", "hp-new-wide", "changed", "The four ways in one row; one plate with its explanation beside it; recipes and the shopping list side by side.") + 140
 y = h
 board("Stories90.dc.html", "HP2. The home page: start from anything, one plate, plan, shop",
-  "27 October 2026 (Milan 14:25 and 14:27). Now: 0.2.112, untouched. Drawn for your approval; nothing built.",
+  "27 October 2026 (Milan 14:25, 14:27 and 14:37: one below another on a phone). Now: 0.2.112, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories89.dc.html")
