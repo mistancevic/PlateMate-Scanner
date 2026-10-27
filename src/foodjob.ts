@@ -61,6 +61,19 @@ export function todayLine(f: Food, dayKcal: number | null, eatenKcal: number, da
   return `${dayName}: ${so}. ${portion} fits.`;
 }
 
+// 0.2.118 (Milan 27 October 18:23, "Fix Paprika"): a sweet pepper is a vegetable, not the spice. Bell pepper, red, raw and
+// Paprika, rot read as pepper, the spice: a portion of 1 to 5 g, and an ingredient that is never a quick pick. In German and
+// Serbian Paprika is the vegetable; the spice says so (Paprikapulver, smoked paprika, aleva paprika). Pepper flakes, ground
+// pepper and peppercorns stay the spice. One rule, here; mixtip and dishTaste ask it too (C50).
+export const SPICE_PAPRIKA = /paprika ?(powder|pulver)|paprikapulver|\b(smoked|sweet|hot|ground|hungarian|spanish) paprika\b|edelsüß|edelsuess|rosenscharf|geräuchert|\baleva\b|mlevena paprika|dimljena paprika|piment[oó]n/i;
+export function isVegPepper(name: string): boolean {
+  const n = String(name ?? "").toLowerCase();
+  if (/flakes?|flocken|powder|pulver|ground|peppercorn|corns?\b|gemahlen|mleven/.test(n)) return false;
+  if (/paprika|paprike\b/.test(n)) return !SPICE_PAPRIKA.test(n);
+  if (/\bbabur|šiljat|siljat|paprikaschote|\bpeppers\b/.test(n)) return true;
+  return /\b(bell|sweet|pointed|romano|stuffed|roasted|grilled|chil[il]i|hot|jalape[nñ]o|padr[oó]n|banana|cherry|red|green|yellow|orange)\s+pepper\b|\bpepper,\s*(red|green|yellow|orange|sweet|bell)\b/.test(n);
+}
+
 // DT93 (0.2.88, board Stories60; Milan 24 October 13:58): a normal portion of a food, by its name first, else by its job.
 // Code holds these, not the AI. Fit never moves a food past its range, and a food outside it gets a line under it.
 // A counted food (a bar, an egg) goes by its piece: one to three pieces.
@@ -70,6 +83,7 @@ const NAMED: [RegExp, [number, number], string][] = [
   [/\byeast\b|hefe/i, [3, 10], "A dough uses 5 to 10 g."],
   [/\b(baking powder|baking soda|backpulver|natron)\b/i, [2, 10], ""],
   [/\b(salt|salz|pepper|pfeffer)\b/i, [1, 5], ""],
+  [SPICE_PAPRIKA, [1, 5], ""],
   [/\b(protein|whey|casein) ?(powder|pulver)\b|\bwhey\b|\bcasein\b/i, [20, 40], "One scoop is about 30 g."],
   [/peanut ?butter|erdnussmus|nussmus|almond butter|tahini|nutella|spread|aufstrich/i, [15, 40], ""],
   [/\b(honey|honig|jam|marmelade|maple|sirup|syrup|sugar|zucker)\b/i, [5, 30], ""],
@@ -102,12 +116,13 @@ const FIXED = /\byeast\b|hefe|\b(baking powder|baking soda|backpulver|natron|sal
 const up = (g: number, scale: number) => { const x = g * scale; return x < 20 ? Math.round(x) : Math.round(x / 5) * 5; };
 export function portionOf(f: Food, scale = 1): Portion {
   const p = portionOfMeal(f);
-  if (scale <= 1 || FIXED.test(f.name)) return p;
+  if (scale <= 1 || ((FIXED.test(f.name) || SPICE_PAPRIKA.test(f.name)) && !isVegPepper(f.name))) return p;
   return { ...p, max: p.piece ? Math.round(p.max * scale) : up(p.max, scale), scaled: true };
 }
 function portionOfMeal(f: Food): Portion {
   if (f.serving && f.serving.grams > 0) return { min: f.serving.grams, max: f.serving.grams * 3, note: `One ${f.serving.name} is ${Math.round(f.serving.grams)} g.`, piece: f.serving };
   if (/\bbar\b|riegel/i.test(f.name)) return { min: 35, max: 100, note: "One bar is about 50 g.", piece: { grams: 50, name: "bar" } };
+  if (isVegPepper(f.name)) return { min: 50, max: 300, note: "" };
   for (const [re, [min, max], note] of NAMED) if (re.test(f.name)) return { min, max, note };
   const [min, max] = JOB_RANGE[jobOf(f).job];
   return { min, max, note: "" };

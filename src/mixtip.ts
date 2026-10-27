@@ -2,7 +2,7 @@
 // Pure code. The case comes from the number, the partners from the moment and the roles, the amounts from the solver.
 // The model never picks a partner; it may only word the Pro tip below.
 import { aggregate, density, solveIngredient, snapToServing, uid, type Food, type Ingredient } from "./pilot";
-import { jobOf, PORTION, minPortionOf, type Job } from "./foodjob";
+import { jobOf, PORTION, minPortionOf, isVegPepper, type Job } from "./foodjob";
 import { roleOf } from "./swaps";
 import { playbookFor } from "./playbook";
 import type { MomentId } from "./moments";
@@ -133,7 +133,7 @@ export const goesWith = (a: Food, b: Food) => GOES[catOf(a)].includes(catOf(b)) 
 // food is named by them, as the last word (Olive oil, Sugar, Salt), so Sardines in olive oil and Low sugar yogurt stay food.
 const INGREDIENT_ANY = /\b(yeast|hefe|flour|mehl|baking (powder|soda)|backpulver|natron|stock( cubes?)?|bouillon|brühe|vinegar|essig|(corn|potato)?starch|stärke|gelatine?|cocoa powder|kakaopulver|vanilla (extract|sugar)|vanille(zucker|extrakt)|cinnamon|zimt|spices?|gewürz|soy sauce|sojasauce|tomato paste|tomatenmark)\b/i;
 const INGREDIENT_LEAD = /^([\p{L}-]+ ){0,2}(oil|öl|sugar|zucker|salt|salz|pepper|pfeffer|herbs?|kräuter|mustard|senf|ketchup|mayonnaise|mayo|paprika)\s*(,.*)?$/iu;
-export const isIngredient = (f: Pick<Food, "name">) => { const n = String(f.name ?? "").trim(); return INGREDIENT_ANY.test(n) || INGREDIENT_LEAD.test(n); };
+export const isIngredient = (f: Pick<Food, "name">) => { const n = String(f.name ?? "").trim(); return (INGREDIENT_ANY.test(n) || INGREDIENT_LEAD.test(n)) && !isVegPepper(n); };
 // C20 plus C6, for a food offered to a plate: it goes with every food already there, it makes a plate with them, it is no drink
 // and no ingredient. The tip, quick picks and swaps all ask this one question (DT101).
 export function fitsPlate(f: Food, plate: Food[]): boolean {

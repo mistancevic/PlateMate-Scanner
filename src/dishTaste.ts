@@ -6,6 +6,7 @@
 export type Taste = "sweet" | "fruit" | "savoury" | "veg" | "basic" | "unknown";
 export type DishTaste = "sweet" | "savoury" | null;
 
+import { isVegPepper } from "./foodjob";
 const SWEET = /nutella|chocolate|schoko|kakao|cocoa|cacao|\bjam\b|marmelade|konfit|honey|honig|syrup|sirup|sugar|zucker|icing|frosting|glaze|glasur|caramel|karamell|candy|cookie|keks|biscuit|whey|protein ?powder|proteinpulver|casein|sprinkles|marzipan|nougat|ice ?cream|\beis\b|dattel|\bdates?\b/i;
 const SAVOURY = /chicken|hähnchen|huhn|beef|\brind|pork|schwein|\bham\b|schinken|bacon|speck|sausage|wurst|salami|turkey|\bpute|lamb|lamm|steak|fish|fisch|tuna|thunfisch|salmon|lachs|shrimp|garnel|prawn|anchov|sardin|onion|zwiebel|shallot|schalotte|garlic|knoblauch|\bleek|lauch|ketchup|mustard|senf|mayo|soy ?sauce|sojasauce|\bstock\b|brühe|broth|bouillon|parmesan|cheddar|gouda|emmental|mozzarella|feta|halloumi|pasta|nudel|noodle|spaghetti|penne|\brice\b|\breis\b|potato|kartoffel|tortilla|tofu|tempeh|seitan/i;
 const FRUIT = /banana|banane|apple|apfel|berr|beere|fruit|frucht|mango|orange|pear|birne|grape|traube|peach|pfirsich|cherr|kirsch|plum|pflaume|apricot|aprikose|raisin|rosine|lemon|zitrone|lime/i;
@@ -16,7 +17,7 @@ export function tasteOf(name: string): Taste {
   if (SWEET.test(name)) return "sweet";
   if (SAVOURY.test(name)) return "savoury";
   if (FRUIT.test(name)) return "fruit";
-  if (VEG.test(name)) return "veg";
+  if (VEG.test(name) || isVegPepper(name)) return "veg";
   if (BASIC.test(name)) return "basic";
   return "unknown";
 }

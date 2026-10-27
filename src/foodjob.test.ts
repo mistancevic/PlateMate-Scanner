@@ -66,3 +66,22 @@ test("DT135: Add starts in the middle of the meal's range", () => {
   assert.equal(startGrams(f("Penne, dry", 360, 13, 1.5, 72), 3), 200);
   assert.equal(startGrams(f("Penne, dry", 360, 13, 1.5, 72)), 80);
 });
+
+// 0.2.118 (Milan 18:23, "Fix Paprika"), C50: a sweet pepper is a vegetable, the spice stays the spice
+import { isVegPepper } from "./foodjob";
+import { isIngredient } from "./mixtip";
+import { tasteOf } from "./dishTaste";
+test("C50: bell pepper and Paprika, rot are vegetables, 50 to 300 g, no ingredient", () => {
+  for (const n of ["Bell pepper, red, raw", "Paprika, rot, roh", "Paprika", "Paprika, crvena", "Red peppers", "Pepper, green", "Grilled peppers"]) {
+    assert.ok(isVegPepper(n), n); assert.deepEqual([portionOf(f(n, 31, 1, 0.3, 6)).min, portionOf(f(n, 31, 1, 0.3, 6)).max], [50, 300], n);
+    assert.equal(isIngredient({ name: n }), false, n); assert.equal(tasteOf(n), "veg", n);
+  }
+  assert.equal(portionLine(f("Paprika, rot, roh", 31, 1, 0.3, 6), 150), null);
+});
+test("C50: black pepper, smoked paprika, Paprikapulver and pepper flakes stay the spice", () => {
+  for (const n of ["Black pepper", "Pepper", "Smoked paprika", "Paprikapulver edelsüß", "Red pepper flakes", "Aleva paprika"]) {
+    assert.equal(isVegPepper(n), false, n); assert.deepEqual([portionOf(f(n, 280, 14, 13, 30)).min, portionOf(f(n, 280, 14, 13, 30)).max], [1, 5], n);
+  }
+  assert.equal(portionOf(f("Black pepper", 250, 10, 3, 40), 3).max, 5);
+  assert.equal(portionOf(f("Paprika, rot", 31, 1, 0.3, 6), 3).max, 900);
+});
