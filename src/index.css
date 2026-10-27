@@ -1845,6 +1845,23 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .plan-when { display: block; margin-top: 2px; }
 /* R23 (0.2.51, board RS22): the home page's moments, each with its clip */
 .l-moments .l-video { margin: 14px auto 0; }
+/* HP2 (0.2.114): start from anything; mobile first, one below another; on a computer the four ways in a row */
+.l-ways-lead { margin: 6px 0 0; color: var(--ink); line-height: 1.5; }
+.l-ways-grid, .l-two { display: grid; grid-template-columns: 1fr; gap: 26px; margin-top: 18px; }
+.l-one { display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 34px; }
+.l-one-text p { margin: 8px 0 0; color: var(--ink); line-height: 1.5; }
+.l-way h3 { margin: 0; font-size: 18px; } .l-way h2 { margin: 2px 0 0; } .l-way p { margin: 4px 0 0; color: var(--ink); line-height: 1.45; }
+.l-ways .l-video { margin: 12px auto 0; width: 220px; border-width: 6px; border-radius: var(--r-card); }
+.l-two { margin-top: 34px; }
+.l-ways-note { display: block; margin-top: 18px; color: var(--muted); }
+@media (min-width: 760px) {
+  .l-ways-grid { grid-template-columns: repeat(4, 1fr); }
+  .l-ways-grid .l-way p { min-height: 4.4em; }
+  .l-ways-grid .l-video { width: 100%; max-width: 220px; }
+  .l-one { grid-template-columns: 1fr 240px; align-items: center; }
+  .l-two { grid-template-columns: 1fr 1fr; }
+  .l-two .l-way p { min-height: 3em; }
+}
 .l-moments .l-video-all { width: 280px; }
 .l-moments .l-video-one { width: 220px; border-width: 6px; border-radius: var(--r-card); }
 .l-moment { margin-top: 34px; }

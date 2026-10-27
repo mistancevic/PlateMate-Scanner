@@ -80,20 +80,47 @@ export function LandingScreen() {
         </div>
       </section>
 
-      {/* R23 (0.2.51, board RS22): what Chef Mealan does for you, five moments of the day, each with a short clip of the real
-          app recorded on test data; all five joined on top. In place of How it works and Your week. */}
-      <section className="l-steps l-moments">
-        <span className="l-eyebrow">In your day</span>
-        <h2>What Chef Mealan does for you</h2>
-        <DayVideo src="/landing/day-all.mp4" poster="/landing/day-all.webp" big label="All five, a minute and a half: Today, Plan, a craving, a recipe from a link, and how a meal carried you" />
-        {MOMENTS.map((m, k) => (
-          <div className="l-moment" key={m.title}>
-            <span className="l-eyebrow">{m.when}</span>
-            <h3>{m.title}</h3>
-            <p>{m.line}</p>
-            <DayVideo src={`/landing/day-${k + 1}.mp4`} poster={`/landing/day-${k + 1}.webp`} label={`${m.title}: ${m.line}`} />
+      {/* HP2 (0.2.114, board Stories90; Milan 27 October 14:25 to 15:34): in place of the five clips of 0.2.51. Start from anything,
+          everything lands on one plate, recipes for your day, the shopping list. Mobile first: one below another on a phone;
+          on a computer the four ways in sit in a row. Each clip is the real app on test data (scripts/record-home-clips.cjs). */}
+      <section className="l-steps l-ways">
+        <span className="l-eyebrow">Start from anything</span>
+        <h2>What you eat, read in seconds</h2>
+        <p className="l-ways-lead">Scan a barcode, a nutrition label, all sides of a pack, or take a photo of the meal in front of you. Each one lands on your plate.</p>
+        <div className="l-ways-grid">
+          {WAYS.map((w) => (
+            <div className="l-way" key={w.id}>
+              <h3>{w.title}</h3>
+              <p>{w.line}</p>
+              <DayVideo src={`/landing/way-${w.id}.mp4`} poster={`/landing/way-${w.id}.webp`} label={`${w.title}: ${w.line}`} />
+            </div>
+          ))}
+        </div>
+        <div className="l-one">
+          <div className="l-one-text">
+            <span className="l-eyebrow">One plate</span>
+            <h2>Everything lands on one plate</h2>
+            <p><b>PD, protein density:</b> grams of protein per 100 kcal. Your target comes from your goal, your body and your training. The big number says how the plate stands against it.</p>
+            <p><b>F C Fi P:</b> fat, carbs, fibre, protein, in the order of a food label. A capital letter: as your day needs. Small: under. A plus: more than your day. A minus: close to none.</p>
+            <p><b>Then you decide:</b> eat it, eat one portion, add a protein side, or let Chef Mealan fit it to your target.</p>
           </div>
-        ))}
+          <DayVideo src="/landing/way-plate.mp4" poster="/landing/way-plate.webp" label="One plate: PD, the letters and the numbers behind them" />
+        </div>
+        <div className="l-two">
+          <div className="l-way">
+            <span className="l-eyebrow">Plan</span>
+            <h2>Recipes for your day</h2>
+            <p>Yours, your coach's and the members', sorted for what is left of your day. Pick one for a meal of your plan.</p>
+            <DayVideo src="/landing/way-recipes.mp4" poster="/landing/way-recipes.webp" label="Recipes for your day" />
+          </div>
+          <div className="l-way">
+            <span className="l-eyebrow">Shop</span>
+            <h2>Your shopping list</h2>
+            <p>The planned week's foods added up, with the meals they are for. Tick as you shop.</p>
+            <DayVideo src="/landing/way-shop.mp4" poster="/landing/way-shop.webp" label="Your shopping list" />
+          </div>
+        </div>
+        <small className="l-ways-note">Clips of the app on test data. The pack in them is made up.</small>
       </section>
 
       {recipes.length > 0 && (
@@ -176,14 +203,12 @@ export function LandingScreen() {
   );
 }
 
-// R23 (0.2.51, board RS22): the moments and their clips, recorded by a script on a seeded day (recordClips.cjs in the design
-// scratchpad, board RS23). Silent, loops, plays only while on screen; a still frame until then.
-const MOMENTS = [
-  { when: "Every day", title: "Eat by your plan today", line: "Today shows the next meal. One tap logs it as planned, and the day counts against the plan." },
-  { when: "Sunday evening", title: "Plan your week in minutes", line: "Chef Mealan fills the open slots with your meals. Swipe one to swap it, or to skip it." },
-  { when: "When a craving hits", title: "Make what you crave fit", line: "Type chocolate PD 7+. Your DaaM, Dessert as a Meal, comes up, fitted to your target." },
-  { when: "When you find a recipe", title: "Bring it in", line: "Paste a link or a screenshot. The foods, one portion's numbers and the PD are calculated." },
-  { when: "After a meal", title: "Learn what works for you", line: "Thirty minutes after a meal: how did it carry you? Two answers that agree, and Chef Mealan picks with them." },
+// HP2 (0.2.114): the four ways in, each with its clip
+const WAYS = [
+  { id: "barcode", title: "A barcode", line: "The pack's values from the product database, or from the pack's photos." },
+  { id: "label", title: "A nutrition label", line: "Hold the table in the frame. Chef Mealan reads it, you check it." },
+  { id: "group", title: "A group of labels", line: "Every side of a pack in a few photos, read as one food." },
+  { id: "meal", title: "A photo of your meal", line: "Chef Mealan names the foods and estimates the grams. You correct what you know." },
 ];
 export function DayVideo({ src, poster, label, big }: { src: string; poster: string; label: string; big?: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
