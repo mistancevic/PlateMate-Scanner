@@ -83,5 +83,6 @@ test("SH73: both QR codes are counted as QR, and an invite opens the home page w
   assert.deepEqual(SHARE_TARGETS.map((t) => t.url), ["https://chefmealan.com/?from=qr", "https://chefmealan.com/worthy-numbers?from=qr"]);
   assert.equal(inviteUrl("K7Q2MX"), "https://chefmealan.com/?code=K7Q2MX");
   assert.equal(weekStats([], "2026-10-19", { ...X, hp: { ...X.hp, hp_qr: 5 } }).wayIn.qr, 5);
+  assert.equal(weekStats([], "2026-10-19", { ...X, hp: { ...X.hp, hp_ig: 3 } }).wayIn.ig, 3, "0.2.115: visits from Instagram");
   assert.equal(weekStats([], "2026-10-19", X).wayIn.qr, 0);
 });

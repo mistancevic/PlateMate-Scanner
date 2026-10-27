@@ -614,7 +614,7 @@ const EVENT_KINDS = new Set(["app_open", "day_closed", "fit_used", "label_read",
 const EVENT_KEYS = new Set(["way", "how", "went", "ate", "locked", "method", "kind", "moment", "case", "status", "result", "source", "items", "pd", "kcal", "photos", "products",
   "date", "planned", "byPlan", "extras", "swapped", "lived", "proteinPct", "energyPct", "kept"]);
 // BK69 (Milan 21 October 2026): a visit to a book address (chefmealan.com/worthy-numbers) counts per book
-const HIT_KINDS = new Set(["hp_visit", "hp_qr", "hp_calc", "hp_try", "built_visit", ...BOOK_HITS]);  // hp_qr: SH73, chefmealan.com/?from=qr
+const HIT_KINDS = new Set(["hp_visit", "hp_qr", "hp_ig", "hp_calc", "hp_try", "built_visit", ...BOOK_HITS]);  // hp_qr: SH73, chefmealan.com/?from=qr; hp_ig (0.2.115, Milan 27 October 16:43): ?from=ig, the link in Instagram
 const METRICS_SALT = process.env.METRICS_SALT || FB_PROJECT || "local";
 const memberOf = (uid: string) => createHash("sha256").update(`${METRICS_SALT}:${uid}`).digest("hex").slice(0, 16);
 const berlinDay = (t = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit" }).format(t);

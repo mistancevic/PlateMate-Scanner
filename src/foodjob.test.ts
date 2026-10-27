@@ -38,3 +38,8 @@ test("DT96 (0.2.89): Add puts a food on at its normal portion", () => {
   assert.equal(startGrams(f("Olive oil", 884, 0)), 15);
   assert.equal(startGrams(f("Eggs", 155, 13)), 52);
 });
+
+test("0.2.115: a dressed salad is a salad, 50 to 300 g, not a fat source", () => {
+  assert.equal(portionLine(f("Mixed salad, dressed", 60, 1.2, 4.5, 3.5), 90), null);
+  assert.match(portionLine(f("Mixed salad, dressed", 60, 1.2, 4.5, 3.5), 400)!, /over a portion of mixed salad, 50 to 300 g/);
+});

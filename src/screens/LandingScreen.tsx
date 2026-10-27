@@ -22,7 +22,8 @@ export function LandingScreen() {
   useEffect(() => {
     hit("hp_visit");
     // SH73: a visit from Milan's QR code counts as QR too; the ending leaves the address
-    try { const u = new URL(window.location.href); if (u.searchParams.get("from") === "qr") { hit("hp_qr"); u.searchParams.delete("from"); window.history.replaceState(null, "", u.pathname + u.search + u.hash); } } catch {}
+    // 0.2.115 (Milan 16:43): the Instagram link carries ?from=ig and counts the same way
+    try { const u = new URL(window.location.href); const from = u.searchParams.get("from"); if (from === "qr" || from === "ig") { hit(from === "qr" ? "hp_qr" : "hp_ig"); u.searchParams.delete("from"); window.history.replaceState(null, "", u.pathname + u.search + u.hash); } } catch {}
   }, []);
   const toForm = () => { hit("hp_try"); formRef.current?.scrollIntoView({ behavior: "smooth" }); };
   // HP10: the bar at the bottom shows while neither the button under the calculator nor the form is on screen
@@ -120,7 +121,7 @@ export function LandingScreen() {
             <DayVideo src="/landing/way-shop.mp4" poster="/landing/way-shop.webp" label="Your shopping list" />
           </div>
         </div>
-        <small className="l-ways-note">Clips of the app on test data. The pack in them is made up.</small>
+        <small className="l-ways-note">Clips of the app on test data. The packs in them are made up.</small>
       </section>
 
       {recipes.length > 0 && (

@@ -65,6 +65,8 @@ export function todayLine(f: Food, dayKcal: number | null, eatenKcal: number, da
 // Code holds these, not the AI. Fit never moves a food past its range, and a food outside it gets a line under it.
 // A counted food (a bar, an egg) goes by its piece: one to three pieces.
 const NAMED: [RegExp, [number, number], string][] = [
+  // 0.2.115: a salad is a salad by its name, dressed or not; its oil made it read as a fat source (5 to 40 g)
+  [/\b(salad|salat|salata)\b/i, [50, 300], ""],
   [/\byeast\b|hefe/i, [3, 10], "A dough uses 5 to 10 g."],
   [/\b(baking powder|baking soda|backpulver|natron)\b/i, [2, 10], ""],
   [/\b(salt|salz|pepper|pfeffer)\b/i, [1, 5], ""],

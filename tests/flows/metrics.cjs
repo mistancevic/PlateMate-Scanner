@@ -53,7 +53,7 @@ const monday = (d) => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDa
   ok(yc.lived === (yc.proteinPct >= 90 && yc.energyPct >= 90 && yc.energyPct <= 110), `lived by the plan follows the rule: protein ${yc.proteinPct} %, energy ${yc.energyPct} %, lived ${yc.lived}`);
   ok(box.length === 0, "sent within seconds: the outbox is empty (" + box.length + ")");
   // home page counts: one number per day and kind, no cookie
-  await page.evaluate(async () => { for (const k of ["hp_visit", "hp_visit", "hp_calc", "hp_try", "nonsense", "book_worthy_numbers", "book_worthy_numbers__qr", "hp_qr"]) await fetch("/api/hit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k }) }); });
+  await page.evaluate(async () => { for (const k of ["hp_visit", "hp_visit", "hp_calc", "hp_try", "nonsense", "book_worthy_numbers", "book_worthy_numbers__qr", "hp_qr", "hp_ig"]) await fetch("/api/hit", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ k }) }); });
   await page.goto("http://127.0.0.1:3197/built"); await page.waitForTimeout(1200);
   ok((await page.context().cookies()).length === 0, "no cookie is set by the counts");
   const api = (w) => page.evaluate(async (w) => (await fetch(`/api/metrics${w ? `?week=${w}` : ""}`)).json(), w);
@@ -79,7 +79,7 @@ const monday = (d) => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDa
   ok(/This week \d+ \w+ to today( \(counted from \d+ \w+\))?\./.test(t1) && /Compared with \d+ to \d+ \w+/.test(t1) && /Counting began on \d+ \w+\. Today is \d+ \w+\./.test(t1), "MT71: the time frame on top, and since when it counts");
   ok((await page.locator(".mt-when").count()) === 4, "MT71: each card says which days it counts");
   ok(/Home page visits\s*2/.test(t1), "MT71: the way in shows this week's visits so far, 2");
-  ok(/Home page visits 2 QR 1/.test(t1), "SH73: a visit from the chefmealan.com QR code counts as QR under Home page visits");
+  ok(/Home page visits 2 QR 1 · Instagram 1/.test(t1), "SH73, 0.2.115: a visit from the QR code counts as QR, one from Instagram as Instagram, under Home page visits");
   ok(/From Worthy Numbers 1 QR 1/.test(t1), "MT71: the book's visit and its QR code show this week, before a full week is counted");
   ok(/TODAY/.test(t1) && /SINCE \d+ [A-Z]{3}/.test(t1), "M5: next to today, the count since the first day");
   await page.getByRole("tab", { name: "Last week" }).click(); await page.waitForTimeout(1500);
