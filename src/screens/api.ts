@@ -101,6 +101,8 @@ export interface AppApi {
   applyNumbers: (bandId: string, kcal: number, protein: number, method?: string, fats?: number, carbs?: number) => void;
   todayMacros: { kcal: number; protein: number; fats: number; carbs: number } | null;
   // the numbers of any day, for Plan (0.2.1)
+  // DT135 (0.2.116): the open meal's size, in meals of three a day (1 to 3); Add's normal portion grows with it
+  setMealScale?: (x: number) => void;
   numbersFor: (date: Date) => { kcal: number; protein: number; fats: number; carbs: number } | null;
   proteinRange: { min: number; max: number } | null;   // DT75: the person's protein range for a day, in g
   // 0.2.5+r20 (canvas board FX, G1b and G2): apply a goal from a date; today applies now, a later date waits on Goal

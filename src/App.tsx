@@ -1529,6 +1529,8 @@ export default function App() {
     if (opts?.open) { setOpenFoodId(f.id); setTab("foods"); notify(`${f.name} is in your foods.`); return; }
     notify(`${f.name} is in your foods.`);
   }
+  // DT135 (0.2.116): set by the Plate from the open meal; Add puts a food on at that meal's normal portion
+  const mealScaleRef = useRef(1);
   function add(food0: Food) {
     // DT82 (Milan 20:51): a can whose values are per 100 g drained goes on as the drained food, under the can's name; My
     // foods keeps the label as printed
@@ -1541,7 +1543,7 @@ export default function App() {
         // R22 (0.2.50): with Both picked, a food goes into the main or the sweet finish
         // DT82 (Tester 3's tuna, 0.9 cans): a food the pack sells as one piece goes on as one, 1 can, 1 bar, 1 pot
         // DT96 (0.2.89): at its normal portion: 1 bar, 1 can, 1 egg, else the middle of its range (yeast 7 g, peanut butter 25 g, chicken 190 g)
-        { id: uid(), food: { ...food }, grams: startGrams(food), locked: false, ...(plateTaste === "both" ? { part: bothPartOf(food.name) } : {}) },
+        { id: uid(), food: { ...food }, grams: startGrams(food, mealScaleRef.current), locked: false, ...(plateTaste === "both" ? { part: bothPartOf(food.name) } : {}) },
       ],
       portion: null,
     }));
@@ -2114,6 +2116,7 @@ export default function App() {
     },
     // today's four: protein and fat stay, the carbs take the day's difference
     todayMacros: todayNumbers(),
+    setMealScale: (x: number) => { mealScaleRef.current = x; },
     numbersFor: (date: Date) => numbersOfDate(date),
     // DT75: the person's protein range, g per kg times weight, the same every day; null without a profile to calculate it
     proteinRange: (() => { const c = calculate(personalNow, goalNow?.band ?? "maintain", profile.formula ?? null); return c ? { min: c.proteinMin, max: c.proteinMax } : null; })(),

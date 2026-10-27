@@ -99,3 +99,14 @@ test("DT91: the dinner lands in its range; the base stays a normal portion; the 
   assert.ok(!c.ok);
   assert.match((c as { why: string }).why, /^\d+ kcal, under the 840 to 1026 kcal of this meal, even with 250 g bulgur, cooked$/);
 });
+
+// DT135 (0.2.116): one meal a day, 2,400 kcal. At a meal of three a day the bread stops at 150 g and the idea falls short;
+// with the meal's scale the bread and the other foods grow and it lands within 10 %
+test("DT135: an idea for one meal a day grows with the meal", () => {
+  const plate = [{ id: "a", food: CH, grams: 200, locked: false }, { id: "b", food: CO, grams: 150, locked: false }];
+  const adds: Add[] = [{ food: BR, grams: 100, base: true, have: true }, { food: TO, grams: 150, base: false, have: false }, { food: CU, grams: 150, base: false, have: false }, { food: OI, grams: 10, base: false, have: false }];
+  assert.match((solveMeal(plate, adds, 2400, 6.4, () => false, uid) as any).why, /under the 2160 to 2640 kcal of this meal/);
+  const s = solveMeal(plate, adds, 2400, 5, () => false, uid, 3);
+  assert.ok(s.ok, (s as any).why);
+  if (s.ok) assert.ok(s.baseGrams > 150 && s.baseGrams <= 450);
+});

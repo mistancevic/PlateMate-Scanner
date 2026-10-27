@@ -73,7 +73,8 @@ const r5 = (g: number) => Math.round(g / 5) * 5;
 // small amounts (garlic, oil) to the gram, the rest to 5 g
 const rg = (g: number) => (g < 20 ? Math.max(1, Math.round(g)) : r5(g));
 export function mealRange(need: number): [number, number] { return [Math.round(need * (1 - RANGE)), Math.round(need * (1 + RANGE))]; }
-export function solveMeal(plate: Ingredient[], adds: Add[], need: number, target: number | null, allergic: (f: Food) => boolean, uid: () => string): Solved {
+// DT135 (0.2.116): scale is the meal in meals of three a day; the base's most and the others' factor grow with it
+export function solveMeal(plate: Ingredient[], adds: Add[], need: number, target: number | null, allergic: (f: Food) => boolean, uid: () => string, scale = 1): Solved {
   if (!adds.length) return { ok: false, why: "nothing to add" };
   const bad = adds.find((a) => allergic(a.food)); if (bad) return { ok: false, why: `${bad.food.name} clashes with an allergy` };
   if (adds.some((a) => !(Number(a.food.calories) >= 0) || !(Number(a.food.protein) >= 0))) return { ok: false, why: "a food without numbers" };
@@ -85,11 +86,11 @@ export function solveMeal(plate: Ingredient[], adds: Add[], need: number, target
   const kcalOf = (its: { food: Food; grams: number }[]) => aggregate(its as Ingredient[]).calories ?? 0;
   const keptK = kcalOf(kept), othersK = kcalOf(others.map((a) => ({ food: a.food, grams: Math.max(0, a.grams) })));
   // the base: the grams that land the meal on its size, kept in a normal portion
-  const [lo, hi] = baseRange(base.food.name, minPortionOf(base.food));
+  const [lo, hi0] = baseRange(base.food.name, minPortionOf(base.food)), hi = r5(hi0 * Math.max(1, scale));
   const baseGrams = Math.min(hi, Math.max(lo, r5((need - keptK - othersK) / per)));
   // the rest: the other foods together, by what is still missing or too much
   const gap = need - keptK - othersK - baseGrams * per;
-  const f = othersK > 0 && Math.abs(gap) > need * 0.03 ? Math.min(2, Math.max(0.5, 1 + gap / othersK)) : 1;
+  const f = othersK > 0 && Math.abs(gap) > need * 0.03 ? Math.min(2 * Math.max(1, scale), Math.max(0.5, 1 + gap / othersK)) : 1;
   const items: Ingredient[] = [...kept, ...others.map((a) => ({ id: uid(), food: a.food, grams: rg(Math.max(0, a.grams) * f), locked: true })), { id: uid(), food: base.food, grams: baseGrams, locked: false }];
   const t = aggregate(items), pd = density(t.protein, t.calories), kcal = t.calories ?? 0;
   const [min, max] = mealRange(need), bn = base.food.name.toLowerCase();

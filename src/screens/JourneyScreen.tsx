@@ -51,7 +51,7 @@ import { dayRecord } from "../record";
 import { dayLog } from "../today";
 import { ymd } from "../plan";
 import { blockedByAllergy } from "../safety";
-import { minPortionOf, portionOf as portionRange, portionLine, startGrams } from "../foodjob";
+import { minPortionOf, portionOf as portionRange, portionLine, startGrams, mealScale } from "../foodjob";
 import { tasteForChef } from "../kitchens";
 import { CravingSearch } from "../components/CravingSearch";
 import { resizeImageBase64 } from "../utils/image";
@@ -133,7 +133,7 @@ export function JourneyScreen(p: AppApi) {
         setSuggest(null);
         // DT93 (0.2.88): the moved food never goes past its portion; the line under it says what Fit did
         const mvItem = o.items.find((x) => x.id === moverId);
-        const lim = mvItem ? portionRange(mvItem.food) : null;
+        const lim = mvItem ? portionRange(mvItem.food, mealX) : null;
         const want = Math.round(o.grams), got = lim ? Math.min(lim.max, Math.max(lim.min, want)) : want;
         const before = fitBefore?.[moverId] ?? mvItem?.grams ?? 0;
         const next = o.items.map((oi) => ({ ...oi, grams: oi.id === moverId ? got : oi.grams }));
@@ -141,7 +141,7 @@ export function JourneyScreen(p: AppApi) {
         if (mvItem) { const nm = cookName(mvItem.food.name).short.toLowerCase();
           const tt = aggregate(next), pdNext = density(tt.protein, tt.calories);
           const same = Math.round(before) === got;
-          setFit({ id: moverId, note: same && pdNext !== null && pdRef !== null && pdNext >= pdRef ? `Already above your target: ${pdText(pdNext)} against ${pdVal(pdRef)}, so nothing moved.` : got !== want ? `Fit set ${got} g ${nm}, the most for a portion (it asked for ${want} g).` : `Fit set ${got} g ${nm}${before && before !== got ? ` (was ${Math.round(before)} g)` : ""}.`, before: Math.round(before) }); }
+          setFit({ id: moverId, note: same && pdNext !== null && pdRef !== null && pdNext >= pdRef ? `Already above your target: ${pdText(pdNext)} against ${pdVal(pdRef)}, so nothing moved.` : got !== want ? `Fit set ${got} g ${nm}, the most for ${mealX > 1 ? "your meal's portion" : "a portion"} (it asked for ${want} g).` : `Fit set ${got} g ${nm}${before && before !== got ? ` (was ${Math.round(before)} g)` : ""}.`, before: Math.round(before) }); }
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -226,7 +226,7 @@ export function JourneyScreen(p: AppApi) {
     const dish = p.plateTaste ? offerTaste(p.plateTaste, null) : dishTaste(list.map((i) => i.food.name));
     const plate = list.map((i) => state.foods.find((x) => x.id === i.food.id) ?? i.food);
     const rows = state.foods.filter((f) => f.calories !== null && f.protein !== null && fitsPlate(f, plate) && goesInDish(dish, f.name)).map((f) => {
-      const g = startGrams(f); const kcal = (t.calories ?? 0) + (f.calories! * g) / 100, pro = (t.protein ?? 0) + (f.protein! * g) / 100;
+      const g = startGrams(f, mealX); const kcal = (t.calories ?? 0) + (f.calories! * g) / 100, pro = (t.protein ?? 0) + (f.protein! * g) / 100;
       return { f, g, to: density(pro, kcal) ?? 0 };
     }).filter((r) => r.to > cur + 0.3).sort((a, b) => b.to - a.to).slice(0, 3);
     return { cur, gap: pdRef - cur, rows, reaches: rows.some((r) => r.to >= pdRef - 0.05) };
@@ -461,6 +461,9 @@ export function JourneyScreen(p: AppApi) {
   const mealSlot = p.filling ? daySlots.find((x) => x.id === p.filling!.slotId) ?? null : photoMeal && photoMeal.date === mealDate ? photoMeal.slot : unsized ? null : pickSlot ?? mealNow(daySlots, closed, new Date());
   const dayNums = p.numbersFor(new Date(`${mealDate}T12:00:00`));
   const share = mealSlot && dayNums ? mealShare(daySlots, mealSlot.id, { kcal: dayNums.kcal, protein: dayNums.protein }, mealDate === todayKey ? { kcal: dayRec.kcal, protein: dayRec.protein } : { kcal: 0, protein: 0 }, closed) : null;
+  // DT135 (0.2.116): how many times a meal of three a day this meal is, 1 to 3; every food's most grows by it
+  const mealX = mealScale(share?.kcal, dayNums?.kcal);
+  useEffect(() => { p.setMealScale?.(mealX); }, [mealX]);
   const chefable = p.kind !== "dessert" && momentOf(p.moment).planned && !!share && share.kcal >= 150 && p.filling?.mode !== "eat";
   // DT93, rule 3 (C31): a plate far over its meal is not that meal yet; DT132 (0.2.113): over 1.5 portions, 1.3 to 1.5 on the edge
   const sizeNow = sizeOf(aggregate(state.items).calories ?? 0, share?.kcal);
@@ -826,7 +829,7 @@ export function JourneyScreen(p: AppApi) {
         const o = { ...o0, title: cookTitle(o0.title) };
         if (good.length >= 3 || good.some((g) => g.title.toLowerCase() === o.title.toLowerCase())) continue;
         const adds: Add[] = o.adds.map((a) => { const lib = state.foods.find((f) => f.name.toLowerCase() === a.name.toLowerCase()); return { food: lib ?? estimate(a), grams: a.grams, base: a.base, have: !!lib }; });
-        const sol = solveMeal(base, adds, share.kcal, pdRef, (f) => blockedByAllergy(f, p.safety.allergies ?? []), uid);
+        const sol = solveMeal(base, adds, share.kcal, pdRef, (f) => blockedByAllergy(f, p.safety.allergies ?? []), uid, mealX);
         if (sol.ok) good.push({ kitchen: o.kitchen, title: o.title, why: o.why, adds: adds.map((a) => ({ name: a.food.name, grams: sol.items.find((x) => x.food === a.food && !base.some((b) => b.id === x.id))?.grams ?? Math.round(a.grams), have: a.have, base: a.base })), items: sol.items, kcal: sol.kcal, pd: sol.pd, cooking: Array.isArray(o.for_cooking) ? o.for_cooking : [] });
         else failed.push({ title: o.title, why: (sol as { why: string }).why });
       }
@@ -878,7 +881,7 @@ export function JourneyScreen(p: AppApi) {
     const pick = state.foods.filter((f) => f.calories !== null && f.protein !== null && jobOf(f).job === job && fitsPlate(f, plateFoods))
       .sort((a, b) => (job === "Protein base" ? (density(b.protein, b.calories) ?? 0) - (density(a.protein, a.calories) ?? 0) : (b.carbs ?? 0) - (a.carbs ?? 0)))[0];
     if (!pick) { p.openOut("plate"); return; }
-    add(pick); notify(`${fmt(startGrams(pick), 0)} g ${cookName(pick.name).short.toLowerCase()} on the plate.`);
+    add(pick); notify(`${fmt(startGrams(pick, mealX), 0)} g ${cookName(pick.name).short.toLowerCase()} on the plate.`);
   };
   const wayButton = (w: GateWay, k: number) => {
     const primary = k === 0 ? " pill-primary" : "";
@@ -940,7 +943,7 @@ export function JourneyScreen(p: AppApi) {
     if (!share || !(t.calories ?? 0)) return;
     const f = share.kcal / (t.calories ?? 1);
     const next = items.map((i) => {
-      const r = portionRange(i.food), c = countedOf(i);
+      const r = portionRange(i.food, mealX), c = countedOf(i);
       let g = Math.max(r.min, Math.min(r.max, i.grams * f));
       // a counted food on whole pieces, a pack's piece on whole pieces (one bar, not 52 g)
       if (c) { const one = gramsOfOne(c); g = Math.max(one, Math.round(g / one) * one); }
@@ -1252,7 +1255,7 @@ export function JourneyScreen(p: AppApi) {
               </div>
               </SwipeRow>
               {/* DT93 (0.2.88): the portion gate: a food outside its normal portion says so; what Fit did, with Undo */}
-              {!imported && !i.optional && !i.fry && portionLine(i.food, i.grams) && <small className="gate-line">{portionLine(i.food, i.grams)}</small>}
+              {!imported && !i.optional && !i.fry && portionLine(i.food, i.grams, mealX) && <small className="gate-line">{portionLine(i.food, i.grams, mealX)}</small>}
               {sizeOpen === i.id && countedOf(i) && <SizePicker item={i} onGrams={(g, c) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: g, count: c }); }} />}
               {oilRow(i)}
               </Fragment>

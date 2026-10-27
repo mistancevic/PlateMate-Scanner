@@ -100,7 +100,7 @@ export function MetricsScreen() {
           <b className="mt-h">The way in</b>
           <small className="muted mt-when">{when}</small>
           <small className="muted">Home page counts have no cookie and no visitor id; one visit is one page open.</small>
-          {bar("Home page visits", w.visits)}{(w.qr > 0 || w.ig > 0) && <small className="muted mt-way-by">{[w.qr > 0 ? `QR ${w.qr}` : "", w.ig > 0 ? `Instagram ${w.ig}` : ""].filter(Boolean).join(" · ")}</small>}{w.books.map((b) => <Fragment key={b.name}>{bar(`From ${b.name}`, b.n)}{b.by.length > 0 && <small className="muted mt-way-by">{b.by.map((y) => `${y.name} ${y.n}`).join(" · ")}</small>}</Fragment>)}{bar("Calculator used", w.calc)}{bar("Try Chef Mealan", w.tried)}{bar("Asked for access", w.asked)}{bar("Joined with a code", w.joined)}{bar("Active this week", w.active)}
+          {bar("Home page visits", w.visits)}{/* 0.2.116 (Milan 17:00): QR and Instagram always show, 0 included, so the Instagram count is there before the first visit */}<small className="muted mt-way-by">{`QR ${w.qr} · Instagram ${w.ig}`}</small>{w.books.map((b) => <Fragment key={b.name}>{bar(`From ${b.name}`, b.n)}{b.by.length > 0 && <small className="muted mt-way-by">{b.by.map((y) => `${y.name} ${y.n}`).join(" · ")}</small>}</Fragment>)}{bar("Calculator used", w.calc)}{bar("Try Chef Mealan", w.tried)}{bar("Asked for access", w.asked)}{bar("Joined with a code", w.joined)}{bar("Active this week", w.active)}
         </section>
         <section className="card mt-card">
           <b className="mt-h">{view === "last" ? "That week in the app" : "This week in the app"}</b>

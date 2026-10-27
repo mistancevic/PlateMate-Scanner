@@ -87,8 +87,25 @@ const NAMED: [RegExp, [number, number], string][] = [
   [/\b(skyr|quark|yogurt|yoghurt|joghurt|cottage|hüttenkäse)\b/i, [100, 400], ""],
 ];
 const JOB_RANGE: Record<Job, [number, number]> = { "Protein base": [80, 300], "Flavour food": [10, 50], "Carb base": [40, 250], "Fat source": [5, 40], "Volume food": [50, 400], "Drink": [100, 500], "Mixed": [50, 300] };
-export type Portion = { min: number; max: number; note: string; piece?: { grams: number; name: string } };
-export function portionOf(f: Food): Portion {
+export type Portion = { min: number; max: number; note: string; piece?: { grams: number; name: string }; scaled?: boolean };
+// DT135 (0.2.116, board Stories92; Milan 27 October 15:34, Go at 17:00): a food's portion grows with the meal. The ranges
+// above are for a meal of a day of three meals; the most of each food grows by the meal's energy over a third of the day,
+// from 1 to 3 times (one meal a day: 3 times; two: about 1.5). The least stays. Yeast, baking powder, salt and pepper keep
+// theirs: a dough does not grow with the meal. A food counted in pieces keeps its pieces, up to 3 times as many.
+export const MEALS_OF_A_DAY = 3;
+export function mealScale(mealKcal: number | null | undefined, dayKcal: number | null | undefined): number {
+  if (!mealKcal || !dayKcal || dayKcal <= 0) return 1;
+  const s = mealKcal / (dayKcal / MEALS_OF_A_DAY);
+  return Math.min(3, Math.max(1, Math.round(s * 10) / 10));
+}
+const FIXED = /\byeast\b|hefe|\b(baking powder|baking soda|backpulver|natron|salt|salz|pepper|pfeffer)\b/i;
+const up = (g: number, scale: number) => { const x = g * scale; return x < 20 ? Math.round(x) : Math.round(x / 5) * 5; };
+export function portionOf(f: Food, scale = 1): Portion {
+  const p = portionOfMeal(f);
+  if (scale <= 1 || FIXED.test(f.name)) return p;
+  return { ...p, max: p.piece ? Math.round(p.max * scale) : up(p.max, scale), scaled: true };
+}
+function portionOfMeal(f: Food): Portion {
   if (f.serving && f.serving.grams > 0) return { min: f.serving.grams, max: f.serving.grams * 3, note: `One ${f.serving.name} is ${Math.round(f.serving.grams)} g.`, piece: f.serving };
   if (/\bbar\b|riegel/i.test(f.name)) return { min: 35, max: 100, note: "One bar is about 50 g.", piece: { grams: 50, name: "bar" } };
   for (const [re, [min, max], note] of NAMED) if (re.test(f.name)) return { min, max, note };
@@ -96,22 +113,23 @@ export function portionOf(f: Food): Portion {
   return { min, max, note: "" };
 }
 // the line under a food outside its portion: 150 g is 3 bars. One bar is 50 g. / 158 g is over a portion of yeast, 3 to 10 g. A dough uses 5 to 10 g.
-export function portionLine(f: Food, grams: number): string | null {
-  const p = portionOf(f);
+export function portionLine(f: Food, grams: number, scale = 1): string | null {
+  const p = portionOf(f, scale);
   if (grams <= p.max && grams >= p.min) return null;
   const short = f.name.split(",")[0].trim().toLowerCase();
   if (grams > p.max && p.piece) { const n = Math.round(grams / p.piece.grams); return `${Math.round(grams)} g is ${n} ${p.piece.name}${n === 1 ? "" : "s"}. ${p.note}`.trim(); }
-  if (grams > p.max) return `${Math.round(grams)} g is over a portion of ${short}, ${p.min} to ${p.max} g.${p.note ? ` ${p.note}` : ""}`;
+  if (grams > p.max) return `${Math.round(grams)} g is over ${p.scaled ? "your meal's portion" : "a portion"} of ${short}, ${p.min} to ${p.max} g.${p.note && !p.scaled ? ` ${p.note}` : ""}`;
   return `${Math.round(grams)} g is under a portion of ${short}, ${p.min} to ${p.max} g.`;
 }
 // DT96 (0.2.89, board Stories61; Milan 24 October 17:04): Add puts a food on the plate at its normal portion: a piece when the
 // pack prints one (1 bar, 1 can), one M egg or banana when it is counted, else the middle of its range, to 5 g. Before, every
 // Add landed at 150 g (50 g under PD 3), so a bar came as 3 bars and yeast as 150 g.
-export function startGrams(f: Food): number {
+// DT135: for a bigger meal, the middle of the meal's range (one meal a day: pasta 40 to 360 g dry starts at 200 g)
+export function startGrams(f: Food, scale = 1): number {
   if (f.serving && f.serving.grams > 0) return f.serving.grams;
   const k = kindOf(f.name);
   if (k) return gramsOfOne({ kind: k, size: "M" });
-  const p = portionOf(f);
+  const p = portionOf(f, scale);
   if (p.piece) return p.piece.grams;
   const mid = (p.min + p.max) / 2;
   return mid < 20 ? Math.round(mid) : Math.round(mid / 5) * 5;

@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { jobOf, plainLine, todayLine, portionOf, portionLine, startGrams } from "./foodjob";
+import { jobOf, plainLine, todayLine, portionOf, portionLine, startGrams, mealScale } from "./foodjob";
 import type { Food } from "./pilot";
 const f = (name: string, calories: number, protein: number, fats: number, carbs: number, extra: any = {}) => ({ id: name, name, brand: "", basis: "100g", source: "label", notes: "", reviewedAt: "", readyToEat: true, calories, protein, fats, carbs, fiber: 0, ...extra }) as any;
 const nutella = f("Nutella", 539, 6.3, 30.9, 57.5), skyr = f("Skyr, natural", 63, 11, 0.2, 4), rice = f("Rice, cooked", 130, 2.7, 0.3, 28), oil = f("Olive oil", 884, 0, 100, 0), flips = f("Protein Flips Salt & Vinegar", 404, 23, 8.4, 56), cucumber = f("Cucumber", 15, 0.7, 0.1, 3);
@@ -42,4 +42,27 @@ test("DT96 (0.2.89): Add puts a food on at its normal portion", () => {
 test("0.2.115: a dressed salad is a salad, 50 to 300 g, not a fat source", () => {
   assert.equal(portionLine(f("Mixed salad, dressed", 60, 1.2, 4.5, 3.5), 90), null);
   assert.match(portionLine(f("Mixed salad, dressed", 60, 1.2, 4.5, 3.5), 400)!, /over a portion of mixed salad, 50 to 300 g/);
+});
+
+// DT135 (0.2.116, board Stories92): a food's portion grows with the meal
+test("DT135: the meal in meals of three a day, 1 to 3", () => {
+  assert.equal(mealScale(2750, 2750), 3); assert.equal(mealScale(1375, 2750), 1.5); assert.equal(mealScale(900, 2700), 1);
+  assert.equal(mealScale(500, 2700), 1); assert.equal(mealScale(null, 2700), 1); assert.equal(mealScale(4000, 2700), 3);
+});
+test("DT135: one meal a day, pasta up to 900 g cooked and cheese up to 240 g; the least stays", () => {
+  const pasta = f("Pasta, cooked", 150, 5.5, 1, 30), cheese = f("Parmesan", 400, 35, 28, 0);
+  assert.deepEqual([portionOf(pasta, 3).min, portionOf(pasta, 3).max], [100, 900]);
+  assert.equal(portionOf(cheese, 3).max, 240);
+  assert.equal(portionLine(pasta, 1000, 1), "1000 g is over a portion of pasta, 100 to 300 g.");
+  assert.equal(portionLine(pasta, 800, 3), null);
+  assert.equal(portionLine(pasta, 1000, 3), "1000 g is over your meal's portion of pasta, 100 to 900 g.");
+});
+test("DT135: yeast, baking powder, salt and pepper keep their ranges; a bar keeps its pieces", () => {
+  for (const n of ["Dry yeast", "Baking powder", "Salt", "Black pepper"]) assert.equal(portionOf(f(n, 0, 0, 0, 0), 3).max, portionOf(f(n, 0, 0, 0, 0)).max);
+  const bar = f("Protein bar", 380, 30, 12, 35, { serving: { grams: 45, name: "bar" } });
+  assert.equal(portionOf(bar, 3).max, 405); assert.equal(startGrams(bar, 3), 45);
+});
+test("DT135: Add starts in the middle of the meal's range", () => {
+  assert.equal(startGrams(f("Penne, dry", 360, 13, 1.5, 72), 3), 200);
+  assert.equal(startGrams(f("Penne, dry", 360, 13, 1.5, 72)), 80);
 });
