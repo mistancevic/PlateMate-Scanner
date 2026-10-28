@@ -34,7 +34,8 @@ const PORT = "3305", U = `http://127.0.0.1:${PORT}`;
   await page.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "Skyr with oats and cheese.", around: "", better_as: "" }) }));
   await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
   // DT137a, now: Recipes holds two Skyr breakfasts
-  await page.goto(U + "/recipes"); await page.waitForTimeout(1400);
+  await page.goto(U + "/plate"); await page.waitForTimeout(1200);
+  await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(1400);
   await page.evaluate((mark) => { for (const t of document.querySelectorAll(".recipe-tile")) if (/Skyr breakfast/.test(t.textContent)) t.style.cssText += ";" + mark; }, mark);
   await noteAfter(".recipe-tile", "Now (0.2.121): a recipe changed on the Plate is saved as a new recipe with the same name (Put it in tomorrow's breakfast says: Saved to My recipes too). Darinka's breakfast: the first one with egg whites, a second without them. Plan points to the one it was planned from, so it kept PD 6.7 while the Plate showed 7.7.");
   await shot("r137a");
@@ -52,13 +53,16 @@ const PORT = "3305", U = `http://127.0.0.1:${PORT}`;
   }, { mark });
   await noteAfter(".plate-card", "New: a plate that came from a recipe and was changed asks once, at Put it in or at Save after you made it. Three ways, in plain words. A new recipe never takes the same name.");
   await shot("r137b");
-  // DT137c, new: after Update my recipe, one recipe, and Plan follows
-  await page.goto(U + "/recipes"); await page.waitForTimeout(800);
-  await seedWith({ ...seed, meals: [{ ...R0, items: [it("a", SK, 250), it("b", OA, 40), it("x", CH, 30)], portion: 320 }], items: [] });
-  await page.reload(); await page.waitForTimeout(1400);
-  await page.evaluate(({ mark }) => { const t = [...document.querySelectorAll(".recipe-tile")].find((x) => /Skyr breakfast/.test(x.textContent)); if (!t) return; t.style.cssText += ";" + mark;
-    const s = document.createElement("small"); s.style.cssText = "display:block;padding:4px 10px 8px;color:#123a7a;font-weight:700"; s.textContent = "Updated today: egg whites out, cheese in. Plan follows: today's and Friday's breakfast."; t.querySelector(".recipe-tile-body")?.appendChild(s); }, { mark });
-  await noteAfter(".recipe-tile", "New, after Update my recipe: one Skyr breakfast. Plan's days that hold it as planned take the new version (0.2.121), so Plan and the Plate show the same PD. Past days keep what was eaten.");
+  // DT137c, new: after Update my recipe, Plan shows today's breakfast as the recipe is now, the same PD as the Plate
+  const NEW = { ...R0, items: [it("a", SK, 250), it("b", OA, 40), it("x", CH, 30)], portion: 320 };
+  await page.goto(U + "/plate"); await page.waitForTimeout(800);
+  await page.evaluate((pl) => localStorage.setItem("chefmealan-planned", JSON.stringify(pl)), { "2026-10-28": { breakfast: { title: "Skyr breakfast", kcal: 413, protein: 40, source: "mine", mealId: "r1", items: NEW.items, portion: 320 } } });
+  await seedWith({ ...seed, meals: [NEW], items: [] });
+  await page.reload(); await page.waitForTimeout(1200);
+  await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(1400);
+  await page.evaluate(({ mark }) => { const el = [...document.querySelectorAll(".plan-slot-wrap, .plan-slot")].find((x) => /Skyr breakfast/.test(x.textContent)); if (!el) return; el.style.cssText += ";" + mark;
+    const s = document.createElement("small"); s.style.cssText = "display:block;padding:4px 10px 8px;color:#123a7a;font-weight:700"; s.textContent = "Updated from your recipe today: egg whites out, cheese in."; el.appendChild(s); }, { mark });
+  await noteAfter("section.plan-head", "New, after Update my recipe: Plan's breakfast is the recipe as it is now: PD 9.7, the same as on the Plate. Recipes holds one Skyr breakfast, not two. Past days keep what was eaten.");
   await shot("r137c");
   await b.close(); server.kill();
 })();

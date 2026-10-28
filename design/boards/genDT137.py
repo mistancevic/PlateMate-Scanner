@@ -95,11 +95,12 @@ h = rowEnd(cy,
   B.screen("DT137a", 0, y, "Now: two recipes, one name", "r137a", "now", "Skyr breakfast twice; Plan points to the older one."),
   B.screen("DT137b", 1, y, "New: changed from your recipe", "r137b", "changed", "Update my recipe, Save as a new recipe, Only for this day."))
 y = h
-cy = storyCard(B, y, "DT137", "After Update my recipe", [
-  ("One recipe", "The recipe is the plate as you changed it; Plan's days with it follow (rule of 0.2.121), so Plan and the Plate show the same PD."),
+cy = storyCard(B, y, "DT137", "After Update my recipe: Plan shows what the Plate shows", [
+  ("What it shows", "Plan, today, after Update my recipe. Today's breakfast is Skyr breakfast as it is now: 413 kcal, 40 g protein, PD 9.7, the same as the Plate. A line under it says it was updated from your recipe. Recipes holds one Skyr breakfast, not two."),
+  ("Before (bug 7)", "The Plate showed 7.7 while Plan kept 6.7: Plan held the older recipe."),
 ])
 h = rowEnd(cy,
-  B.screen("DT137c", 0, y, "New: one Skyr breakfast", "r137c", "changed", "Updated today; Plan follows."))
+  B.screen("DT137c", 0, y, "New: Plan after Update my recipe", "r137c", "changed", "Breakfast PD 9.7, as on the Plate; updated from your recipe today."))
 y = h
 board("Stories94.dc.html", "DT137. A recipe changed on the Plate",
   "28 October 2026 (Milan 15:32, 16:01; Tester 2). Now: 0.2.121, untouched. Test data: invented foods and amounts. Drawn for your approval; nothing built.",
