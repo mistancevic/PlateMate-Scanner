@@ -49,12 +49,12 @@ const PORT = "3315", U = `http://127.0.0.1:${PORT}`;
   await page.locator(".agenda-row").nth(1).click(); await page.waitForTimeout(500);
   await page.evaluate(({ mark }) => {
     const st = [...document.querySelectorAll(".setting")].find((n) => /^When/.test(n.firstElementChild?.textContent || "")); if (!st) return;
-    for (const c of st.querySelectorAll("button")) { if (/Evening/.test(c.textContent)) { c.classList.remove("on"); c.style.opacity = "0.45"; c.textContent = "Evening · you work then"; } if (/Morning/.test(c.textContent)) c.classList.add("on"); }
+    for (const c of st.querySelectorAll("button")) { if (/Evening/.test(c.textContent)) { c.classList.remove("on"); c.innerHTML = 'Evening <small style="font-weight:400;opacity:.75">· in work hours</small>'; } if (/Morning/.test(c.textContent)) c.classList.add("on"); }
     for (const n of document.querySelectorAll("small, p, div")) if (n.childElementCount === 0 && /From Lifestyle: fixed hours, 9 to 5/.test(n.textContent)) n.textContent = n.textContent.replace("fixed hours, 9 to 5", "your hours, 16:00 to 23:00");
     for (const n of document.querySelectorAll(".agenda-row *")) if (n.childElementCount === 0 && /· evening/.test(n.textContent)) n.textContent = n.textContent.replace("· evening", "· morning");
-    const s = document.createElement("small"); s.style.cssText = "display:block;margin-top:4px"; s.textContent = "Training is suggested outside your work hours, 16:00 to 23:00. You can still pick any time."; st.appendChild(s); st.style.cssText += ";" + mark;
+    const s = document.createElement("small"); s.style.cssText = "display:block;margin-top:4px"; s.textContent = "Chef Mealan suggests training outside your work hours, 16:00 to 23:00. Every time stays open: a break at work can be gym time."; st.appendChild(s); st.style.cssText += ";" + mark;
   }, { mark });
-  await note("^When", "New on Training week and in setup: the time a training day is suggested at keeps out of work. Marko's Tuesday moves to the morning; evening says you work then.");
+  await note("^When", "New on Training week and in setup: a training time Chef Mealan suggests keeps out of work. Marko's Tuesday is suggested in the morning. Evening stays open and only says it is in work hours, because a break at work can be gym time.");
   await shot("r147c");
   await b.close(); server.kill();
 })();

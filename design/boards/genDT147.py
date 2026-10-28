@@ -87,7 +87,8 @@ B = Board(); y = 30
 cy = storyCard(B, y, "DT147", "Your own work hours, and your day around them", [
   ("Tester 3, UX1 (Coach Milan's call, 28 October)", "Marko works Canadian hours from Cyprus. Working hours offers only 9 to 5, 8 to 4 and 7 to 3. None fits him."),
   ("Now, checked in 0.2.127", "Whatever is picked changes nothing. Meal times stay 07:30, 13:45, 20:00. Training stays where it was set. Chef Mealan's chat does not know the work hours. They are only shown in Me."),
-  ("The story", "Working hours keeps the three chips and adds a fourth: My hours, with From and To. Hours past midnight work too. The line says the hours are your time. Then the hours count. Meal times you have not set yourself fit around work. Day work: breakfast before work, lunch at the halfway break, dinner after. Late work, like 16:00 to 23:00: breakfast late morning, the main meal about an hour before work, a small meal at the break. A training time is suggested outside work; a time at work says you work then, and can still be picked. Chef Mealan's chat knows the hours, so its advice fits them."),
+  ("The story", "Working hours keeps the three chips and adds a fourth: My hours, with From and To. Hours past midnight work too. The line says the hours are your time. Then the hours count. Meal times you have not set yourself fit around work. Day work: breakfast before work, lunch at the halfway break, dinner after. Late work, like 16:00 to 23:00: breakfast late morning, the main meal about an hour before work, a small meal at the break. Chef Mealan suggests training outside work. Every time stays open, evening too: a break at work can be gym time. Chef Mealan's chat knows the hours, so its advice fits them."),
+  ("Coach Milan, 28 October 22:02", "Don't disable Evening: a lunch break in Canada may be gym time in Cyprus."),
   ("Always", "Times you set yourself win. Changing work hours never moves a meal time or a training time you set."),
 ])
 h = rowEnd(cy,
@@ -95,7 +96,7 @@ h = rowEnd(cy,
   B.screen("DT147b", 1, y, "New: My hours, meals around them", "r147b", "changed", "From 16:00 To 23:00. Breakfast 10:00, main meal 15:00, small meal 19:30."))
 y = h
 h = rowEnd(y + 10,
-  B.screen("DT147c", 0, y, "New: training outside work", "r147c", "changed", "Tuesday and Thursday move to the morning; evening says you work then."))
+  B.screen("DT147c", 0, y, "New: training outside work", "r147c", "changed", "Suggested in the morning; evening stays open, marked in work hours."))
 y = h
 board("Stories99.dc.html", "DT147. Your own work hours, and your day around them",
   "28 October 2026 (Tester 3, UX1). Now: 0.2.127, untouched. Drawn for your approval; nothing built.",
