@@ -2235,3 +2235,6 @@ button.mp-card { width: 100%; text-align: left; font: inherit; color: inherit; }
 .trip-link { margin: 4px 2px 8px; }
 /* 0.2.120 (Tester 2, Milan 28 October 15:18): a hint never looks like a number you typed */
 input::placeholder { color: #8a93a6; font-style: italic; font-weight: 400; opacity: 1; }
+/* DT137 (0.2.122): changed from your recipe */
+.changed-ask { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
+.changed-ask > small { color: var(--muted, #5b6478); }

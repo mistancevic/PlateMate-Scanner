@@ -44,6 +44,7 @@ import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
 import { inPlaces } from "../places";
+import { sameFoods as sameRecipeFoods, diffLine as recipeDiffLine, newNameFor } from "../recipeDiff";
 import { mealShare, mealNow, routeOf, solveMeal, closedSlots, unloggedMeal, mealRange, type Add } from "../makeMeal";
 import { answersFor, setAnswer } from "../unlogged";
 import { slotsOn, slotAt, windowOf } from "../slots";
@@ -162,6 +163,9 @@ export function JourneyScreen(p: AppApi) {
   const [different, setDifferent] = useState("");
   const [ate, setAte] = useState<"all" | "portion" | "later" | "not">("all");
   const [saveRecipe, setSaveRecipe] = useState(true);
+  // DT137 (0.2.122): at Save after you made a changed recipe: update it, a new one with its own name, or only this time
+  const [recipeChoice, setRecipeChoice] = useState<"update" | "new" | "only" | null>(null);
+  const [newRecipeName, setNewRecipeName] = useState<string | null>(null);
   const addPhoto = (file?: File | null) => { if (!file) return; const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 480).then((d) => setPhotos((x) => [...x, d])).catch(() => {}); r.readAsDataURL(file); };
   // R25 (0.2.53, board RS25): how many of a whole recipe were eaten, starting on one; a big meal is checked once
   const [eatN, setEatN] = useState(1);
@@ -257,8 +261,63 @@ export function JourneyScreen(p: AppApi) {
   // a plate made for a slot (0.2.2): put it in, saved to My recipes once. A recipe with the same name, foods and amounts is
   // the same recipe, so coming back by Fit it on the Plate and putting it in again does not double it.
   const slotName = (f: NonNullable<typeof p.filling>) => `${f.dayName === "today" ? "today's" : `${f.dayName}'s`} ${f.name.toLowerCase()}`;
+  // DT137 (0.2.122, board Stories94; Milan 28 October 16:09 Go): a plate opened from a recipe and changed asks once: Update my
+  // recipe, Save as a new recipe (its own name), or Only for this day. Before, it was saved as a second recipe with the same name
+  const changedBase = (its: typeof items): Meal | null => {
+    if (!its.length || its.some((i) => i.dish)) return null;
+    const id = p.plateRecipeId ?? p.filling?.mealId ?? null;
+    const base = id ? state.meals.find((m) => m.id === id) : undefined;
+    if (!base || sameRecipeFoods(base.items, its) || !base.items.some((b) => its.some((i) => i.food.id === b.food.id))) return null;
+    return base;
+  };
+  const [askChange, setAskChange] = useState<{ its: typeof items; name: string } | null>(null);
+  const finishSlot = (choice: "update" | "new" | "only") => {
+    const f = p.filling, ask = askChange; if (!f || !ask) return;
+    const base = changedBase(ask.its); if (!base) { setAskChange(null); return; }
+    const its = structuredClone(ask.its).map((i) => ({ ...i, locked: false }));
+    const weight = its.reduce((n, i) => n + i.grams, 0), src = base.from === "coach" ? "coach" : "mine";
+    const Slot = slotName(f).charAt(0).toUpperCase() + slotName(f).slice(1);
+    if (choice === "update") {
+      const upd: Meal = { ...base, items: its, portion: weight };
+      setState((s) => ({ ...s, meals: s.meals.map((m) => (m.id === base.id ? upd : m)), items: [], portion: null, title: "" }));
+      p.fill(f.date, f.slotId, fromMeal(upd, src));
+      notify(`${base.title} is updated. ${Slot} and Plan's days with it follow.`);
+    } else if (choice === "new") {
+      const name = ask.name.trim() && ask.name.trim().toLowerCase() !== base.title.toLowerCase() ? ask.name.trim() : newNameFor(base.title, base.items, its, state.meals.map((m) => m.title));
+      const meal = { id: uid(), title: name, items: its, portion: weight, savedAt: new Date().toISOString(), basedOn: { id: base.id, title: base.title } } as Meal;
+      setState((s) => ({ ...s, meals: [structuredClone(meal), ...s.meals], items: [], portion: null, title: "" }));
+      p.fill(f.date, f.slotId, fromMeal(meal, "mine"));
+      notify(`${name} is ${slotName(f)}. ${base.title} stays as it was.`);
+    } else {
+      const t = aggregate(its);
+      p.fill(f.date, f.slotId, { ...fromMeal(base, src), kcal: Math.round(t.calories ?? 0), protein: Math.round(t.protein ?? 0), items: its, portion: weight, note: `Changed for this day: ${recipeDiffLine(base.items, its)}.` });
+      setState((s) => ({ ...s, items: [], portion: null, title: "" }));
+      notify(`${Slot} has your change. ${base.title} stays as it was.`);
+    }
+    setAskChange(null); p.setFilling(null); setStep("in"); setTab("plan");
+  };
+  const ChangedAsk = () => {
+    const base = changedBase(askChange!.its)!, its = askChange!.its, tn = aggregate(its), tw = aggregate(base.items);
+    const pdNow = density(tn.protein, tn.calories), pdWas = density(tw.protein, tw.calories);
+    const daysWith = Object.entries(p.planned).filter(([d, day]) => d >= ymd(new Date()) && Object.values(day).some((m) => m.mealId === base.id)).length;
+    return (
+      <section className="card changed-ask" aria-label="Changed from your recipe">
+        <b>Changed from your recipe {base.title}</b>
+        <small>{recipeDiffLine(base.items, its)}.{pdNow !== null && pdWas !== null ? ` ${pdText(pdNow)}, was ${pdVal(pdWas)}.` : ""}</small>
+        <button type="button" className="pill pill-primary pill-wide" onClick={() => finishSlot("update")}>Update my recipe</button>
+        <small>{base.title} changes{daysWith ? `; Plan's ${daysWith === 1 ? "day" : `${daysWith} days`} with it ${daysWith === 1 ? "follows" : "follow"}` : ""}.</small>
+        <button type="button" className="pill pill-wide" onClick={() => finishSlot("new")}>Save as a new recipe</button>
+        <label className="field"><span>Its name</span><input value={askChange!.name} onChange={(e) => setAskChange({ ...askChange!, name: e.target.value })} /></label>
+        <button type="button" className="pill pill-wide" onClick={() => finishSlot("only")}>Only for {p.filling ? slotName(p.filling) : "this day"}</button>
+        <small>The recipe stays as it is; this day has the change.</small>
+        <button type="button" className="link" onClick={() => setAskChange(null)}>Back to the plate</button>
+      </section>
+    );
+  };
   const putInSlot = (its: typeof items) => {
     const f = p.filling; if (!f) return;
+    const changed = changedBase(its);
+    if (changed) { setAskChange({ its, name: newNameFor(changed.title, changed.items, its, state.meals.map((m) => m.title)) }); return; }
     const title = (p.state.title || "").trim() || autoTitle(its);
     const sameFoods = (m: Meal) => m.items.length === its.length && m.items.every((x, i) => x.food.id === its[i].food.id && Math.round(x.grams) === Math.round(its[i].grams));
     // the recipe this plate came from, with the same foods and amounts: a new name renames it, no copy (Milan, 11 October 2026)
@@ -1499,6 +1558,7 @@ export function JourneyScreen(p: AppApi) {
         </section>)}
         {swapPanel}
         {foodCard}
+        {askChange && changedBase(askChange.its) && ChangedAsk()}
         {helperSheet}
         <p className="label">{q.trim() ? "From all your foods" : "Quick picks"}</p>
         <ClearField value={q} onClear={() => setQ("")} label="Clear the search"><input className="search" aria-label="Search all my foods" placeholder="Search all my foods" value={q} onChange={(e) => setQ(e.target.value)} /></ClearField>
@@ -1617,6 +1677,7 @@ export function JourneyScreen(p: AppApi) {
         }}>Try another mix ({(pick % options.length) + 1} of {options.length})</button>}
         {swapPanel}
         {foodCard}
+        {askChange && changedBase(askChange.its) && ChangedAsk()}
         {helperSheet}
       </>
     );
@@ -1893,6 +1954,8 @@ export function JourneyScreen(p: AppApi) {
   const tryCtx = way && fromRec ? { kind: way.kind, what: wayWhat(way) } : null;
   // a dish changed on the plate, with the whole recipe as changed (0.2.23, IM23b)
   const chgW = way && way.kind === "change" && way.whole && fromRec ? way : null;
+  const changedFrom = !origin && !chgW ? changedBase(items) : null;
+  const suggestedName = changedFrom ? newNameFor(changedFrom.title, changedFrom.items, items, state.meals.map((m) => m.title)) : "";
   return (
     <>
       {Head({ back: "made", title: "Feedback: how was it?", sub: "One tap. It stays yours unless you share it." })}
@@ -1923,7 +1986,19 @@ export function JourneyScreen(p: AppApi) {
       {/* DT94: the name was set in Craft; the field stays only for a plate that has no name yet */}
       {state.title && state.title !== "DaaM" ? <small className="muted fb-name">{state.title} · named in Craft</small> : <label className="field"><span>Name it</span><input value={title} placeholder={plateName} onChange={(e) => setTitle(e.target.value)} /></label>}
       <textarea placeholder="A line for your coach, if you like" value={note} onChange={(e) => setNote(e.target.value)} />
-      {origin ? <p className="small">{origin.title} is in My recipes already. This card points at it.</p> : <section className="card save-recipe">
+      {changedFrom ? (
+        <section className="card save-recipe changed-ask" aria-label="Changed from your recipe">
+          <div className="card-top"><span>Changed from your recipe {changedFrom.title}</span></div>
+          <small>{recipeDiffLine(changedFrom.items, items)}.</small>
+          <div className="reasons">
+            <button className={`choice ${recipeChoice === "update" ? "on" : ""}`} aria-pressed={recipeChoice === "update"} onClick={() => setRecipeChoice("update")}>Update my recipe</button>
+            <button className={`choice ${recipeChoice === "new" ? "on" : ""}`} aria-pressed={recipeChoice === "new"} onClick={() => setRecipeChoice("new")}>Save as a new recipe</button>
+            <button className={`choice ${recipeChoice === "only" || !recipeChoice ? "on" : ""}`} aria-pressed={recipeChoice === "only" || !recipeChoice} onClick={() => setRecipeChoice("only")}>Only this time</button>
+          </div>
+          {recipeChoice === "new" && <label className="field"><span>Its name</span><input value={newRecipeName ?? suggestedName} onChange={(e) => setNewRecipeName(e.target.value)} /></label>}
+          <small>{recipeChoice === "update" ? `${changedFrom.title} changes; Plan's days with it follow.` : recipeChoice === "new" ? `${changedFrom.title} stays as it was.` : `${changedFrom.title} stays as it was; this card keeps what you ate.`}</small>
+        </section>
+      ) : origin ? <p className="small">{origin.title} is in My recipes already. This card points at it.</p> : <section className="card save-recipe">
         <div className="card-top"><span>{chgW ? "Save your changed dish" : "Save in My recipes"}</span></div>
         {chgW && fromRec
           ? <small><b>{title.trim() || plateName}</b>: the whole recipe{fromRec.makes ? `, ${countOf(fromRec.makes.n, fromRec.makes.unit || "portions")}` : ""}, with {chgW.drafted ? "the steps for your change" : "its foods and grams"}. Adapted from {fromRec.title}{fromRec.source?.name ? `, ${fromRec.source.name}` : ""}{fromRec.source?.steps?.length ? "; its original steps come along, for you only" : ""}.</small>
@@ -1953,7 +2028,7 @@ export function JourneyScreen(p: AppApi) {
         </div>
       )}
       <button className="pill pill-primary pill-wide" disabled={good === null || (sharing && !shareWhy)} onClick={() => {
-        const name = title.trim() || plateName;
+        const name = changedFrom && recipeChoice === "new" ? (((newRecipeName ?? suggestedName).trim() && (newRecipeName ?? suggestedName).trim().toLowerCase() !== changedFrom.title.toLowerCase()) ? (newRecipeName ?? suggestedName).trim() : suggestedName) : title.trim() || plateName;
         const src = way?.kind === "change" && fromRec?.source ? { source: { name: fromRec.source.name, ...(fromRec.source.url ? { url: fromRec.source.url } : {}), from: fromRec.source.from, at: fromRec.source.at } } : {};
         // DT89 and DT90 (0.2.87): the steps from How to make it, Chef Mealan's kitchen, and who made it go with the recipe
         // 02:11: a bowl way chosen at Lock (All in one, Topped, Protein first) is the recipe's process too; it was lost at Save
@@ -1994,17 +2069,18 @@ export function JourneyScreen(p: AppApi) {
         const allPhotos = [...photos, ...(plate ? [plate] : [])];
         const coverNow = status === "eaten" && allPhotos.length ? allPhotos[allPhotos.length - 1] : null;
         // a plate that is a recipe as it stands (0.2.3): the card points at that recipe, no second copy
-        const keep = !origin && saveRecipe && status === "eaten";
+        const keep = changedFrom ? recipeChoice === "new" && status === "eaten" : !origin && saveRecipe && status === "eaten";
+        const updateBase = changedFrom && recipeChoice === "update" && status === "eaten" ? changedFrom : null;
         if (triedNow) log("recipe_fit", { way: triedNow.kind, result: triedNow.result });
         // R16 (0.2.44, Milan 21:56, board RS15): the rest of a whole recipe made is not followed: it may go to the family or to
         // work. The recipe goes on Plan for the days you eat it; Today shows it there, and I ate it logs it with its recipe.
         // where you land (0.2.23, IM23c): the recipe the meal made or changed, a recipe made for the first time, or steps drafted now
         const firstTime = !!fromRec && !state.feedback.some((f) => f.status === "eaten" && (f.recipeId === fromRec.id || f.meal?.id === fromRec.id));
         // RP4 (0.2.25, Milan 17:42): every recipe you make ends on its page; a plate that is no recipe ends on Today
-        const landId = keep ? kept.id : (fromRec ?? origin)?.id ?? null;
+        const landId = keep ? kept.id : (fromRec ?? origin ?? updateBase ?? null)?.id ?? null;
         const leftN = wholeN > 1 ? wholeN - eatN : madeWhole && rec?.makes ? Math.max(0, leftK) : 0;
         const landLine = status !== "eaten" ? "" : [`You ate ${wholeN > 1 && rec ? (eatN === wholeN ? `all ${wholeN}` : countOf(eatN, unitOf(rec))) : rec && pmode === "recipe" && !way ? `1 ${oneOf(rec)}` : "your plate"}.`, leftN > 0 ? `${sizedPlate ? leftWords(leftN) : countOf(leftN, unitOf(rec!))} left: to eat ${leftN === 1 ? "it" : "them"} on other days, put the recipe on Plan.` : "", chgKept && fromRec ? `The original, ${fromRec.title}, stays as it was.` : ""].filter(Boolean).join(" ");
-        setState((s) => ({ ...s, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)).map((m) => (m.idea && status === "eaten" && (m.id === origin?.id || m.id === fromRec?.id || m.id === landId) ? { ...m, idea: undefined } : m))
+        setState((s) => ({ ...s, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (updateBase && m.id === updateBase.id ? { ...m, items: structuredClone(keptItems), portion: keptWeight } : m)).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)).map((m) => (m.idea && status === "eaten" && (m.id === origin?.id || m.id === fromRec?.id || m.id === landId) ? { ...m, idea: undefined } : m))
           // DT85 (Milan 23 October 20:58 and 24 October 09:44): the photo taken while making it is the cover of a recipe with no
           // photo of its own yet (no cover, or one Chef Mealan drew); a drawn picture stays behind it. A cover of your own stays.
           .map((m) => (coverNow && m.id === landId && !ownPhotosOf(m).length ? { ...m, ...withRecipePhotos([coverNow, ...recipePhotosOf(m).filter((x) => x !== coverNow)].slice(0, 6)) } : m)), feedback: [{ id: uid(), meal: structuredClone(eatenMeal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, ...(coverNow && landId && !ownPhotosOf(s.meals.find((m) => m.id === landId) ?? {}).length ? { coverAsk: "used" as const } : {}), prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : pickSlot ? { date: todayKey, slotId: pickSlot.id, name: pickSlot.name, time: pickSlot.time } : undefined, ...(p.filling?.mode !== "eat" && !pickSlot && mealSlot ? { which: capName(mealSlot.name) } : {}), createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));
@@ -2021,6 +2097,7 @@ export function JourneyScreen(p: AppApi) {
         setMadeBy(null); setPlateSteps(null); setPlateDraft(""); setOwnSteps(null);
         if (landId) p.landOnRecipe(landId, landLine, keep ? "✓ Saved in Mine" : "✓ Made today");
         else setTab("home");
+        setRecipeChoice(null); setNewRecipeName(null);
         p.setKind("meal"); p.setPick(null); setGood(null); setNote(""); setTitle(""); setPlate(""); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); resetMade(); setStep("in");
       }}>{sharing ? `Save and share with ${p.coachLabel}` : "Save"}</button>
       {p.profile.coachId && !sharing && <button className="pill pill-wide" onClick={() => setSharing(true)}>Share with {p.coachLabel}</button>}

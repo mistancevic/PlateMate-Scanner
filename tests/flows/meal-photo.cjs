@@ -47,10 +47,11 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   // 0.2.110 (DT130): Photo of my meal opens the meal camera; the shutter reads at once
   const snap = async (sel) => { await page.locator(sel).click(); await page.waitForTimeout(1500); await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(2000); };
 
-  // Today: one tap
+  // DT138 (0.2.122): Today has no Photo of my meal; the Plate has it
   await page.goto(U + "/"); await page.waitForTimeout(1500);
-  ok(await page.locator(".mp-card").count() === 1 && /Photo of my meal/.test(await text(".mp-card")), "DT127: Today has Photo of my meal");
-  await snap(".mp-card");
+  ok(await page.locator(".mp-card").count() === 0, "DT138: Today has no Photo of my meal card");
+  await page.goto(U + "/plate"); await page.waitForTimeout(1500);
+  await snap(".mp-button");
   ok(sent.length === 1 && /^data:image\/jpeg;base64,/.test(sent[0].image) && Array.isArray(sent[0].library), "DT127: the photo goes to the read, with your food names");
   ok(/\/plate/.test(page.url()) || await page.locator(".plate-card").count() === 1, "DT127: the read lands on the Plate");
   // the rows as estimates, the photo in the line

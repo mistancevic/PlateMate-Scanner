@@ -238,12 +238,8 @@ export function HomeScreen(p: AppApi) {
           heading inside, the line inside; before a meal, the meal; nothing planned, its two ways; the day done, tomorrow's first meal */}
       {/* DT127 (0.2.108, board Stories75): at the table, one tap: a photo of the meal, read onto the Plate with the three gates;
           DT130 (0.2.110): the tap opens the meal camera, with Your photos */}
-      {p.ai.on && (
-        <button type="button" className="card mp-card" aria-label="Photo of my meal" onClick={p.mealCamera}>
-          <span className="mp-card-icon"><Camera size={26} /></span>
-          <span className="mp-card-text"><b>Photo of my meal</b><small>At the table, before you eat. One photo, the verdict in seconds.</small></span>
-        </button>
-      )}
+      {/* DT138 (0.2.122; Milan 28 October 16:02 and 16:09): Today is about the day and its reports, so the Photo of my meal card
+          is gone from here. Foods are added on the Plate (Photo of my meal is there) and on Foods. */}
       <section className="next-meal">
         {next && nextHeld
           ? <div className="card next-planned" role="button" tabIndex={0} aria-label={`${nextHeld.title}: see the meal`}

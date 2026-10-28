@@ -54,9 +54,9 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   const toPlate = async () => { await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(600); };
   const chips = async () => (await page.locator(".pa-chip").allTextContents()).map((s) => s.replace(/\s+/g, " ").trim());
 
-  // Today: the card opens the meal camera
-  await page.goto(U + "/"); await page.waitForTimeout(1500);
-  await page.locator(".mp-card").click(); await page.waitForTimeout(1800);
+  // the Plate's Photo of my meal opens the meal camera (DT138: no longer on Today)
+  await page.goto(U + "/plate"); await page.waitForTimeout(1500);
+  await page.locator(".mp-button").click(); await page.waitForTimeout(1800);
   const modes = await page.locator(".cam-modes button").allTextContents();
   ok(await page.locator(".camera-ui").count() === 1 && (await text(".cam-title")) === "Photo of my meal", "DT130: Photo of my meal opens the camera, titled Photo of my meal");
   ok(modes.join() === "Barcode,Label,Group,Meal" && await page.locator(".cam-modes button[aria-pressed=true]").textContent() === "Meal", "DT130: Meal is a fourth mode next to Barcode, Label and Group, and it is on: " + modes.join());

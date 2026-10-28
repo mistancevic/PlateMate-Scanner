@@ -1579,6 +1579,8 @@ export default function App() {
     document.addEventListener("focusin", onFocus); document.addEventListener("keydown", onKey); document.addEventListener("pointerdown", onDown, true); document.addEventListener("pointerup", onUp, true);
     return () => { document.removeEventListener("focusin", onFocus); document.removeEventListener("keydown", onKey); document.removeEventListener("pointerdown", onDown, true); document.removeEventListener("pointerup", onUp, true); };
   }, []);
+  // DT137 (0.2.122): the recipe a plate came from is forgotten when the plate is emptied
+  useEffect(() => { if (!state.items.length && plateRecipeId) setPlateRecipeId(null); }, [state.items.length, plateRecipeId]);
   const setPick = (x: string | null) => { setPickState(x); setState((s) => (s.pick === x ? s : { ...s, pick: x })); };
   // DT136 (0.2.120, board Stories93): foods by place. today's places that are on; a food shows when sold everywhere or there
   const todayKeyP = ymd(new Date());
@@ -2078,7 +2080,7 @@ export default function App() {
     api, setImage, setEdit, setGoalsOpen, setAccessOpen, setReviewMeal,
     setFeedback, setAdjustId, adjustId, limits, setLimits, options, pending,
     setPending, barcode, setBarcode, query, setQuery, busy, services, totals,
-    pdRef, rates, dayPd, kind, setKind, plateTaste, setPlateTaste, moment, setMoment: (m: MomentId) => setMomentState(m), pick, setPick, usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
+    pdRef, rates, dayPd, kind, setKind, plateTaste, setPlateTaste, moment, setMoment: (m: MomentId) => setMomentState(m), pick, setPick, plateRecipeId, usual, setUsual: (ids: RhythmId[]) => { setUsual(ids); setUsualState(ids); },
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },

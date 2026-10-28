@@ -1,0 +1,62 @@
+// JOURNEY (0.2.122, board Stories94, DT137; Milan 28 October 15:32 and 16:09 Go; Tester 2's breakfast): a plate opened from a
+// recipe and changed asks once at Put it in: Update my recipe, Save as a new recipe (its own name), or Only for this day.
+// Update: one recipe, the plate's foods, Plan's slot as the recipe is now. Before, a second recipe with the same name.
+const { chromium } = require("playwright");
+const { spawn } = require("node:child_process");
+const fs = require("node:fs"), path = require("node:path");
+const ROOT = path.resolve(__dirname, "../..");
+const seed = JSON.parse(fs.readFileSync(path.join(ROOT, "tests/flows/seed.json"), "utf8"));
+const F2 = (id, name, calories, protein, fats, carbs) => ({ ...seed.foods[0], id, name, brand: "estimate", source: "estimate", calories, protein, carbs, fats, fiber: 0, photo: undefined, photos: undefined, table: undefined, icon: undefined, places: [] });
+const SK = F2("skyr2", "Skyr, natural", 63, 11, 0.2, 4), OA = F2("oats2", "Oats", 372, 13, 7, 59), EW = F2("ew", "Egg whites", 52, 11, 0.2, 0.7);
+const it = (id, food, grams) => ({ id, food, grams, locked: false });
+seed.foods = [...seed.foods, SK, OA, EW]; seed.items = []; seed.feedback = [];
+seed.meals = [{ id: "r1", title: "Skyr breakfast", items: [it("a", SK, 150), it("b", OA, 20), it("c", EW, 100)], portion: 270, savedAt: "2026-10-26T08:00:00Z" }];
+const PORT = "3306", U = `http://127.0.0.1:${PORT}`;
+(async () => {
+  const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
+  for (let i = 0; i < 60; i++) { try { await fetch(U + "/"); break; } catch { await new Promise((r) => setTimeout(r, 500)); } }
+  const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
+  const page = await b.newPage({ viewport: { width: 390, height: 1500 } });
+  const fails = []; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fails.push(m); };
+  const errs = []; page.on("pageerror", (e) => errs.push(e.message));
+  await page.clock.install({ time: new Date(new Date().setHours(6, 30, 0, 0)) });
+  await page.addInitScript((s) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
+    localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "exact" }));
+    localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "same", sex: "female", birthYear: 1985, heightCm: 168, weightKg: 64, plan: Array(7).fill({ work: true, kind: "rest" }), lifestyle: { weekdays: "work", hours: "fixed", move: "sitting", meals: 3 } }));
+    localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z", aiConfirmedAt: "2026-10-06T09:00:00Z" }));
+    localStorage.setItem("seeded", "1"); }, seed);
+  await require("./adult.cjs")(page);
+  await page.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "Skyr with oats.", around: "", better_as: "" }) }));
+  await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
+  const st = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
+  const plan = () => page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-planned") || "{}"));
+  await page.goto(U + "/plan"); await page.clock.resume(); await page.waitForTimeout(1300);
+  await page.getByRole("button", { name: /Breakfast at .*pick a meal/ }).click(); await page.waitForTimeout(400);
+  await page.locator(".pick-sheet").getByRole("button", { name: /^Skyr breakfast/ }).click(); await page.waitForTimeout(500);
+  const bf = page.locator(".plan-slot-wrap").first();
+  await bf.getByText("Skyr breakfast").first().click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /^Make it$/ }).click(); await page.waitForTimeout(1000);
+  const oats = page.getByLabel("Grams of Oats").first();
+  await oats.fill("60"); await oats.press("Enter"); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: "Lock the recipe" }).click(); await page.waitForTimeout(800);
+  await page.locator(".way").first().click(); await page.waitForTimeout(200);
+  await page.getByRole("button", { name: /I'm making it this way|Lock the recipe, this way/ }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /On to How was it|Rate it/ }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: "DaaM good" }).click(); await page.waitForTimeout(300);
+  const ask = page.locator(".changed-ask");
+  const t = ((await ask.innerText().catch(() => "")) || "").replace(/\s+/g, " ");
+  ok(/Changed from your recipe Skyr breakfast/.test(t) && /Oats 20 to 60 g/.test(t), "DT137: Save asks, and says what changed: " + t.slice(0, 140));
+  ok(await ask.getByRole("button", { name: "Update my recipe" }).count() === 1 && await ask.getByRole("button", { name: "Save as a new recipe" }).count() === 1 && await ask.getByRole("button", { name: "Only this time" }).count() === 1, "DT137: three ways");
+  await ask.getByRole("button", { name: "Save as a new recipe" }).click(); await page.waitForTimeout(200);
+  ok(await ask.getByLabel("Its name").inputValue() === "Skyr breakfast, changed", "DT137: a new recipe's name is never the old one: " + await ask.getByLabel("Its name").inputValue());
+  await ask.getByRole("button", { name: "Update my recipe" }).click(); await page.waitForTimeout(200);
+  await page.getByRole("button", { name: /^Save$/ }).click(); await page.waitForTimeout(1200);
+  const s = await st(), meals = s.meals.filter((m) => /Skyr breakfast/.test(m.title));
+  ok(meals.length === 1 && meals[0].id === "r1" && meals[0].items.find((i) => i.food.id === "oats2").grams === 60, "DT137: Update my recipe: one Skyr breakfast, now with 60 g oats: " + meals.map((m) => m.title).join(", "));
+  const day = Object.values(await plan())[0] || {};
+  ok(day.breakfast && day.breakfast.mealId === "r1" && (day.breakfast.items.find((i) => i.food.id === "oats2") || {}).grams === 60, "DT137 with 0.2.121: today's breakfast on Plan is the recipe as it is now");
+  ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));
+  await b.close(); server.kill();
+  console.log(fails.length ? `${fails.length} FAILED` : "all ok");
+  process.exit(fails.length ? 1 : 0);
+})();
