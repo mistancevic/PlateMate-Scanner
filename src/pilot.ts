@@ -75,6 +75,8 @@ export type Food = Nutrition & {
   job?: string;
   tip?: { text: string; pairs: string[]; goalKey: string; at: string };
   icon?: string;
+  // DT136 (0.2.120): where the food is sold, as place ids (limassol, belgrade); empty: sold everywhere. See src/places.ts
+  places?: string[];
 };
 export type Ingredient = {
   keep?: boolean;

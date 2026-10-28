@@ -43,6 +43,7 @@ import { momentOf, orderMoments, REGIONS } from "../moments";
 import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
+import { inPlaces } from "../places";
 import { mealShare, mealNow, routeOf, solveMeal, closedSlots, unloggedMeal, mealRange, type Add } from "../makeMeal";
 import { answersFor, setAnswer } from "../unlogged";
 import { slotsOn, slotAt, windowOf } from "../slots";
@@ -299,7 +300,7 @@ export function JourneyScreen(p: AppApi) {
   const pd = density(t.protein, t.calories);
   const n = STEPS.indexOf(step) + 1;
   const cardItem = items.find((i) => i.id === cardId);
-  const foodCard = cardItem && <FoodCard rates={p.rates} food={state.foods.find((x) => x.id === cardItem.food.id) ?? cardItem.food} addPhoto={(d) => p.addFoodPhoto(cardItem.food.id, d)} toggleFavorite={() => p.toggleFavorite(cardItem.food.id)} insight={{ dayKcal: p.todayKcal, eaten: p.eatenTodayKcal, dayName: p.dayName, goalKey: p.tipGoalKey, requestTip: () => p.requestTip(cardItem.food.id), setJob: (j) => p.setFoodJob(cardItem.food.id, j) }} removePhoto={(i) => p.removeFoodPhoto(cardItem.food.id, i)} setMain={(i) => p.setMainPhoto(cardItem.food.id, i)} target={pdRef} fit={p.fitPd(density(cardItem.food.protein, cardItem.food.calories))} close={() => setCardId(null)} dontHave={() => { setHelper({ missing: cardItem.id }); setCardId(null); }} mix={mixProps(state.foods.find((x) => x.id === cardItem.food.id) ?? cardItem.food)} />;
+  const foodCard = cardItem && <FoodCard rates={p.rates} places={{ set: (x) => p.setFoodPlaces(cardItem.food.id, x), home: p.region }} food={state.foods.find((x) => x.id === cardItem.food.id) ?? cardItem.food} addPhoto={(d) => p.addFoodPhoto(cardItem.food.id, d)} toggleFavorite={() => p.toggleFavorite(cardItem.food.id)} insight={{ dayKcal: p.todayKcal, eaten: p.eatenTodayKcal, dayName: p.dayName, goalKey: p.tipGoalKey, requestTip: () => p.requestTip(cardItem.food.id), setJob: (j) => p.setFoodJob(cardItem.food.id, j) }} removePhoto={(i) => p.removeFoodPhoto(cardItem.food.id, i)} setMain={(i) => p.setMainPhoto(cardItem.food.id, i)} target={pdRef} fit={p.fitPd(density(cardItem.food.protein, cardItem.food.calories))} close={() => setCardId(null)} dontHave={() => { setHelper({ missing: cardItem.id }); setCardId(null); }} mix={mixProps(state.foods.find((x) => x.id === cardItem.food.id) ?? cardItem.food)} />;
   const helperSheet = helper && (
     <PlateHelper tastes={tasteForReq(p.personal.tasteChips, state.preferences)} safety={p.safety} ai={p.ai} onFlag={p.flagFromModel} items={items} library={state.foods} pdRef={pdRef} cap={cap ?? null} missing={helper.missing ? items.find((i) => i.id === helper.missing) ?? null : null} prefill={helper.prefill}
       setError={setError} close={() => setHelper(null)} openTalk={() => { setHelper(null); p.openOut(); }} record={p.recordTalk}
@@ -395,7 +396,7 @@ export function JourneyScreen(p: AppApi) {
     setState((s) => ({ ...s, items: s.items.map((i) => (i.id === suggest.id ? { ...i, grams: suggest.grams } : i)), portion: null }));
     setSuggest(null);
   }
-  const quick = quickPicks(state.foods, state.feedback);
+  const quick = quickPicks(state.foods.filter(p.inPlace), state.feedback);
   // DT115 (0.2.97): the swap list reaches the members' catalogue after your own foods: the same food in another state leads
   // (tuna in water for tuna in olive oil), only foods seen in your market or with a barcode (the same tin everywhere)
   const [swapMf, setSwapMf] = useState<{ id: string; foods: Food[] }>({ id: "", foods: [] });
@@ -555,7 +556,8 @@ export function JourneyScreen(p: AppApi) {
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [q]);
-  const plateList = q.trim() ? oneList({ q: q.trim(), mine: state.foods, members: plateMf.q === q.trim() ? plateMf.foods : [], db: [], region: p.region, uid, basics: 4 }) : null;
+  // DT136 (0.2.120): your place's foods, and members' foods seen where you are
+  const plateList = q.trim() ? oneList({ q: q.trim(), mine: state.foods.filter(p.inPlace), members: (plateMf.q === q.trim() ? plateMf.foods : []).filter((m) => inPlaces(m.seenIn, p.placesActive)), db: [], region: p.region, uid, basics: 4 }) : null;
   const matches = plateList ? plateList.rows.filter((r) => r.kind === "mine").map((r) => r.food).slice(0, 60) : [];
 
   // R22 (0.2.50, board RS21): what is offered follows What is it?, on a plate of your own too; nothing picked, the recipe's taste

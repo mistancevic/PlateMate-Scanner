@@ -1,3 +1,5 @@
+import { placeName } from "../places";
+import { REGIONS } from "../moments";
 import { useRef, useState } from "react";
 import { Camera, ChevronLeft, ChevronRight, Globe, Image as ImageIcon, MessageCircle, Trash2, X } from "lucide-react";
 import { sig } from "../photos";
@@ -14,7 +16,7 @@ import { iconFor } from "../icons";
 import { useBack } from "../back";
 import { realPhotosOf } from "../photos";
 
-export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto, removePhoto, setMain, toggleFavorite, insight, mix, rates }: { rates?: import("../letters").Rates | null; food: Food; setMain?: (index: number) => void; target: number | null; fit: import("../goal").PdBand; close: () => void; review?: () => void; dontHave?: () => void; mix?: { tip: MixTip; momentName: string; take: (m: Mix) => void; ask: () => void }; addPhoto?: (dataUrl: string) => void; removePhoto?: (index: number) => void; toggleFavorite?: () => void; insight?: { dayKcal: number | null; eaten: number; dayName: string; goalKey: string; requestTip: () => Promise<void>; setJob: (job: string | null) => void } }) {
+export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto, removePhoto, setMain, toggleFavorite, insight, mix, rates, places }: { places?: { set: (x: string[]) => void; home: string | null }; rates?: import("../letters").Rates | null; food: Food; setMain?: (index: number) => void; target: number | null; fit: import("../goal").PdBand; close: () => void; review?: () => void; dontHave?: () => void; mix?: { tip: MixTip; momentName: string; take: (m: Mix) => void; ask: () => void }; addPhoto?: (dataUrl: string) => void; removePhoto?: (index: number) => void; toggleFavorite?: () => void; insight?: { dayKcal: number | null; eaten: number; dayName: string; goalKey: string; requestTip: () => Promise<void>; setJob: (job: string | null) => void } }) {
   const job = jobOf(food);
   const [picking, setPicking] = useState(false);
   const [tipState, setTipState] = useState<"idle" | "busy" | "failed">("idle");
@@ -90,6 +92,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
           <div><b>{food.name}</b><small>{food.brand || "no brand"}{food.barcode ? ` · ${food.barcode}` : ""}</small></div>
           {toggleFavorite && <button className={`fav ${food.favorite ? "on" : ""}`} onClick={toggleFavorite} aria-pressed={!!food.favorite} aria-label={food.favorite ? "Remove from favourites" : "Add to favourites"}>{food.favorite ? "★" : "☆"}</button>}
         </div>
+        {places && <SoldIn food={food} set={places.set} home={places.home} />}
         {gallery.length > 1 && (
           <div className="food-gallery" aria-label="Photos of this product">
             {gallery.map((src, i) => <button key={i} className="g-thumb" onClick={() => setViewAt(i)} aria-label={`Photo ${i + 1}${src === all[0] ? ", the main photo" : ""}`}><img src={src} alt="" />{src === all[0] && <span className="g-main" aria-hidden="true">★</span>}{fromDb(src) && <span className="db-globe" aria-hidden="true"><Globe size={12} /></span>}</button>)}
@@ -207,6 +210,24 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
           <button className="link" onClick={(e) => { e.stopPropagation(); setPending(null); }}>Undo</button>
         </div>
       )}
+    </div>
+  );
+}
+
+// DT136 (0.2.120, board Stories93): where the food is sold. A place can go; one can be added; Everywhere clears them
+function SoldIn({ food, set, home }: { food: Food; set: (x: string[]) => void; home: string | null }) {
+  const [adding, setAdding] = useState(false);
+  const list = food.places ?? [];
+  return (
+    <div className="sold-in" aria-label="Sold in">
+      <small className="setting-name">Sold in</small>
+      <div className="chip-row">
+        {list.map((x) => <button type="button" key={x} className="choice on" aria-label={`Not sold in ${placeName(x)}`} onClick={() => set(list.filter((y) => y !== x))}>{placeName(x)} ✕</button>)}
+        {list.length === 0 && <button type="button" className="choice on" aria-pressed="true">Everywhere</button>}
+        <button type="button" className={`choice ${adding ? "on" : ""}`} onClick={() => setAdding(!adding)}>+ A place</button>
+        {list.length > 0 && <button type="button" className="choice" onClick={() => set([])}>Everywhere</button>}
+      </div>
+      {adding && <div className="chip-row">{REGIONS.filter((r) => !list.includes(r.id) && r.id !== "elsewhere").map((r) => <button type="button" key={r.id} className={`choice ${r.id === home ? "home" : ""}`} onClick={() => { set([...list, r.id]); setAdding(false); }}>{r.name}</button>)}</div>}
     </div>
   );
 }

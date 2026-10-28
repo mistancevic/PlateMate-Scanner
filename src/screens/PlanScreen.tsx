@@ -1,4 +1,6 @@
 import { carryReads } from "../carry";
+import { tripOn, placeName, type Trip } from "../places";
+import { REGIONS } from "../moments";
 import { useEffect, useRef, useState, type ReactElement } from "react";
 import { ChevronRight, ChefHat, Pencil, Circle, CircleCheck, CircleSlash, ShoppingBasket } from "lucide-react";
 import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, shopAmount, stateOf, shortMeals, byMeal, replanMeal, followPlan, notCounted, planChanges, updateList, type ShopStore, type SavedList, type ShopLine } from "../shopping";
@@ -121,6 +123,7 @@ export function PlanScreen(p: AppApi) {
           return <button key={ymd(d)} type="button" role="tab" className={`choice ${on ? "on" : ""} ${n ? "has" : ""} ${isT ? "is-today" : ""}`} aria-selected={on} onClick={() => setPicked(ymd(d))}>{isT ? "Today" : DAYS[(d.getDay() + 6) % 7]} {d.getDate()}</button>;
         })}
       </div>
+      <TripCard p={p} />
       {isPast ? <PastDay p={p} date={date} dayKey={key} line={line} slots={slots} numbers={numbers} /> : (<>
       {/* SL2 (Milan 16:03): the day's head and the day as planned are one card at the top: the date, the kind of day and the
           open slots, then the plan against the target. The target is said once, in the numbers. */}
@@ -478,5 +481,37 @@ function PickSheet({ p, slot, slots, day, planned, target, unit, held, close, pu
         {held && <button type="button" className="pill pill-wide" onClick={clear}>Empty this slot</button>}
       </div>
     </div>
+  );
+}
+
+// DT136 (0.2.120, board Stories93): a trip lives on Plan, with its place and its days. Its switch puts the place's foods in
+// your search: on for the trip's days by itself, and yours to turn on earlier or off any time. Home stays on.
+function TripCard({ p }: { p: AppApi }) {
+  const t = p.trip, today = ymd(new Date());
+  const [edit, setEdit] = useState(false);
+  const [draft, setDraft] = useState<Trip>(() => t ?? { place: (REGIONS.find((r) => r.id !== p.region)?.id ?? "belgrade") as Trip["place"], from: today, to: today });
+  const longDay = (k: string) => new Date(`${k}T12:00:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "long" });
+  if (!t && !edit) return <div className="trip-link"><button type="button" className="link" onClick={() => setEdit(true)}>✈ Plan a trip</button></div>;
+  if (edit) return (
+    <section className="card trip-card" aria-label="A trip">
+      <div className="card-top"><span>✈ A trip</span><button type="button" className="link" onClick={() => setEdit(false)}>Cancel</button></div>
+      <small>Where to</small>
+      <div className="moments">{REGIONS.filter((r) => r.id !== p.region).map((r) => <button type="button" key={r.id} className={`choice ${draft.place === r.id ? "on" : ""}`} aria-pressed={draft.place === r.id} onClick={() => setDraft({ ...draft, place: r.id })}>{r.name}</button>)}</div>
+      <div className="field-row" style={{ marginTop: 8 }}>
+        <label className="field"><span>From</span><input type="date" aria-label="Trip from" value={draft.from} onChange={(e) => e.target.value && setDraft({ ...draft, from: e.target.value, to: draft.to < e.target.value ? e.target.value : draft.to })} /></label>
+        <label className="field"><span>To</span><input type="date" aria-label="Trip to" min={draft.from} value={draft.to} onChange={(e) => e.target.value && setDraft({ ...draft, to: e.target.value })} /></label>
+      </div>
+      <button type="button" className="pill pill-small pill-primary" onClick={() => { p.setTrip({ place: draft.place, from: draft.from, to: draft.to }); setEdit(false); p.notify(`Trip to ${placeName(draft.place)}: ${longDay(draft.from)} to ${longDay(draft.to)}.`); }}>Save the trip</button>
+    </section>
+  );
+  const on = tripOn(t, today);
+  return (
+    <section className="card trip-card" aria-label="Your trip">
+      <div className="card-top"><span>✈ Trip to {placeName(t!.place)} · {longDay(t!.from)} to {longDay(t!.to)}</span><span><button type="button" className="link" onClick={() => { setDraft(t!); setEdit(true); }}>Change</button> · <button type="button" className="link link-danger" onClick={() => { p.setTrip(null); p.notify("The trip is off."); }}>End it</button></span></div>
+      <div className="trip-switch">
+        <span><b>{placeName(t!.place)}'s foods in my search</b><small>{t!.on === undefined || t!.on === null ? `On by itself on ${longDay(t!.from)}, off after ${longDay(t!.to)}.` : on ? "On, by you." : "Off, by you."} Foods you add while it is on are tagged {placeName(t!.place)}.</small></span>
+        <button type="button" className={`choice ${on ? "on" : ""}`} aria-pressed={on} aria-label={`${placeName(t!.place)}'s foods in my search: ${on ? "on" : "off"}`} onClick={() => p.setTrip({ ...t!, on: !on })}>{on ? "On" : "Off"}</button>
+      </div>
+    </section>
   );
 }

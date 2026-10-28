@@ -2222,3 +2222,16 @@ button.mp-card { width: 100%; text-align: left; font: inherit; color: inherit; }
 .nt-more { align-self: flex-start; font-size: var(--fs-small); font-weight: 700; margin-top: 4px; }
 .nt .letters-lines { background: var(--tint); }
 .goal-missing { color: #8a4b00; background: #fff4dc; border-radius: 10px; padding: 8px 10px; margin-top: 8px; }
+/* DT136 (0.2.120): foods by place */
+.place-chips { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 6px 0 4px; }
+.place-chips > small { width: 100%; color: var(--muted, #5b6478); }
+.place-away { display: block; margin: 4px 2px 8px; color: var(--muted, #5b6478); }
+.place-rows .place-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--line, #e3e9f5); }
+.place-rows .place-row small { display: block; }
+.place-kept { display: block; margin-top: 4px; font-weight: 700; }
+.trip-card .trip-switch { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 6px; }
+.sold-in { margin: 8px 0; }
+.sold-in .chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.trip-link { margin: 4px 2px 8px; }
+/* 0.2.120 (Tester 2, Milan 28 October 15:18): a hint never looks like a number you typed */
+input::placeholder { color: #8a93a6; font-style: italic; font-weight: 400; opacity: 1; }

@@ -106,7 +106,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
       <label className="dt-field" key={field}>
         <input ref={(el) => { refs.current[key] = el; }} className={`dt-input ${typed ? "typed" : ""} ${warn ? "warn" : ""}`} inputMode="numeric"
           aria-label={`${DAY_TYPES.find((x) => x.id === d)!.name}, ${field === "kcal" ? "kcal" : `${field === "fats" ? "fat" : field} in grams`}`}
-          placeholder={shown ? String(shown) : ""} value={draft[key] ?? (typed ? String(typed) : "")}
+          placeholder={shown ? `≈${shown}` : "enter"} value={draft[key] ?? (typed ? String(typed) : "")}
           onChange={(e) => setDraft((x) => ({ ...x, [key]: e.target.value }))}
           onBlur={(e) => { const n = Number(e.target.value); setOwn(d, { [field]: e.target.value.trim() === "" || !Number.isFinite(n) || n <= 0 ? undefined : Math.round(n) }); setDraft((x) => { const y = { ...x }; delete y[key]; return y; }); }}
           onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} />

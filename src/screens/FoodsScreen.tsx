@@ -7,6 +7,7 @@ import { cookName } from "../cookWords";
 import { Camera, X, Pencil, Plus } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
 import { findReference, referenceFood, localName, otherNames as refOtherNames, synonymsOf } from "../reference";
+import { inPlaces, placeName } from "../places";
 import { BAND_LABEL, BAND_LINE_IDLE, bandHint } from "../goal";
 
 import { duplicatePairs } from "../dedupe";
@@ -43,7 +44,10 @@ export function FoodsScreen(p: AppApi) {
   const pairKey = (a: string, b: string) => [a, b].sort().join("|");
   const pairs = duplicatePairs(state.foods).filter(([a, b]) => !notSame.includes(pairKey(a.id, b.id)));
   const cardFood = state.foods.find((x) => x.id === cardId);
-  const foods = state.foods.map((f) => ({ f, pd: density(f.protein, f.calories) })).map((x) => ({ ...x, b: p.fitDay(x.pd) }));
+  // DT136 (0.2.120, board Stories93): your place's foods and foods sold everywhere; another place's wait behind its chip
+  const [allPlaces, setAllPlaces] = useState(false);
+  const shownHere = (f: Food) => allPlaces || p.inPlace(f);
+  const foods = state.foods.filter(shownHere).map((f) => ({ f, pd: density(f.protein, f.calories) })).map((x) => ({ ...x, b: p.fitDay(x.pd) }));
   // What the box lists, by what was typed: one or two letters match the start of a word, three or more any part of the name,
   // eight to fourteen digits a saved barcode. Your foods first; then foods without a label (two letters on); then the product
   // database (three letters on, or a barcode not in your foods).
@@ -113,7 +117,17 @@ export function FoodsScreen(p: AppApi) {
   ); };
   // DT125: the one list. With nothing typed, your foods (the band chips still filter them); with a word, every source.
   const mineFiltered = foods.filter(({ b }) => filter === "all" || b === filter).map(({ f }) => f);
-  const list = oneList({ q, mine: mineFiltered, members: q ? (mf.q === q ? mf.foods : []) : [], db: q ? dbRows : [], region: p.region, uid });
+  const memberHere = (m: MemberFood) => allPlaces || inPlaces(m.seenIn, p.placesActive);
+  const list = oneList({ q, mine: mineFiltered, members: q ? (mf.q === q ? mf.foods : []).filter(memberHere) : [], db: q ? dbRows : [], region: p.region, uid });
+  // what waits behind another place's chip, for this search: your foods there and members' foods seen only there
+  const away = new Map<string, number>();
+  if (!allPlaces) {
+    const count = (places: string[] | undefined) => { const pl = (places ?? []).find((x) => !inPlaces([x], p.placesActive)); if (pl) away.set(pl, (away.get(pl) ?? 0) + 1); };
+    state.foods.filter((f) => !p.inPlace(f) && (!q || nameHit(f))).forEach((f) => count(f.places));
+    if (q) (mf.q === q ? mf.foods : []).filter((m) => !memberHere(m)).forEach((m) => count(m.seenIn));
+  }
+  const otherOn = p.placesOn.filter((x) => x !== p.region);
+  const placeChips = [...new Set([...otherOn, ...away.keys(), ...(p.trip ? [p.trip.place] : [])])].filter((x) => x !== p.region);
   const [dbOpen, setDbOpen] = useState(false);
   useEffect(() => { setDbOpen(false); }, [q]);
   // Take it: a member's food or a basic food becomes a copy of yours, with its identity; already yours, nothing twice
@@ -143,6 +157,15 @@ export function FoodsScreen(p: AppApi) {
         )}
         <ClearField value={query} onClear={() => setQuery("")} label="Clear the search"><input className="search" aria-label="Find a food" placeholder="A name, or a barcode you saved" value={query} onChange={(e) => setQuery(e.target.value)} /></ClearField>
       </section>
+      {(placeChips.length > 0 || allPlaces) && (
+        <div className="place-chips" role="group" aria-label="Foods from">
+          <small>Foods from</small>
+          {p.region && <button type="button" className="choice on" aria-pressed="true" disabled>{placeName(p.region)}</button>}
+          {placeChips.map((x) => { const on = p.placesActive.has(x); return <button type="button" key={x} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPlaceOn(x, !on, false)}>{placeName(x)}{!on && away.get(x) ? ` · ${away.get(x)}` : ""}</button>; })}
+          <button type="button" className={`choice ${allPlaces ? "on" : ""}`} aria-pressed={allPlaces} onClick={() => setAllPlaces(!allPlaces)}>All places</button>
+        </div>
+      )}
+      {q && away.size > 0 && <small className="place-away">{[...away].map(([x, n]) => `${n} more in ${placeName(x)}`).join(", ")}. Tap {[...away.keys()].map(placeName).join(" or ")} to see them.</small>}
       {pairs.length > 0 && (
         <button className="strip strip-button" onClick={() => setDupOpen(true)}>{pairs.length} possible {pairs.length === 1 ? "duplicate" : "duplicates"} in your foods. Check and merge.</button>
       )}
@@ -212,7 +235,7 @@ export function FoodsScreen(p: AppApi) {
       )}
       </>
       {mfCard && <FoodCard rates={p.rates} food={mfCard} target={p.dayPd} fit={p.fitDay(density(mfCard.protein, mfCard.calories))} close={() => setMfCard(null)} />}
-      {cardFood && <FoodCard rates={p.rates} food={p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood} addPhoto={(d) => p.addFoodPhoto(cardFood.id, d)} removePhoto={(i) => p.removeFoodPhoto(cardFood.id, i)} setMain={(i) => p.setMainPhoto(cardFood.id, i)} toggleFavorite={() => p.toggleFavorite(cardFood.id)} insight={{ dayKcal: p.todayKcal, eaten: p.eatenTodayKcal, dayName: p.dayName, goalKey: p.tipGoalKey, requestTip: () => p.requestTip(cardFood.id), setJob: (j) => p.setFoodJob(cardFood.id, j) }} target={p.dayPd} fit={p.fitDay(density(cardFood.protein, cardFood.calories))} close={() => setCardId(null)} review={() => { setImage(""); setEdit(cardFood); }} mix={(() => { const f = p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood; const tip = p.mixFor(f); return { tip, momentName: momentOf(p.moment).name, take: (m: Mix) => { setCardId(null); p.takeMix(f, m); }, ask: () => { setCardId(null); p.askAboutMix(f, tip); } }; })()} />}
+      {cardFood && <FoodCard rates={p.rates} food={p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood} places={{ set: (x) => p.setFoodPlaces(cardFood.id, x), home: p.region }} addPhoto={(d) => p.addFoodPhoto(cardFood.id, d)} removePhoto={(i) => p.removeFoodPhoto(cardFood.id, i)} setMain={(i) => p.setMainPhoto(cardFood.id, i)} toggleFavorite={() => p.toggleFavorite(cardFood.id)} insight={{ dayKcal: p.todayKcal, eaten: p.eatenTodayKcal, dayName: p.dayName, goalKey: p.tipGoalKey, requestTip: () => p.requestTip(cardFood.id), setJob: (j) => p.setFoodJob(cardFood.id, j) }} target={p.dayPd} fit={p.fitDay(density(cardFood.protein, cardFood.calories))} close={() => setCardId(null)} review={() => { setImage(""); setEdit(cardFood); }} mix={(() => { const f = p.state.foods.find((x) => x.id === cardFood.id) ?? cardFood; const tip = p.mixFor(f); return { tip, momentName: momentOf(p.moment).name, take: (m: Mix) => { setCardId(null); p.takeMix(f, m); }, ask: () => { setCardId(null); p.askAboutMix(f, tip); } }; })()} />}
     </>
   );
 }

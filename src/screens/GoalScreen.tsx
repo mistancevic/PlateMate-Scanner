@@ -202,7 +202,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
                 <div className="moments">{(["female", "male"] as const).map((s) => <button key={s} className={`choice ${d.sex === s ? "on" : ""}`} onClick={() => setPersonalNow({ ...d, sex: d.sex === s ? undefined : s })}>{s === "female" ? "Female" : "Male"}</button>)}</div>
               </div>
               <div className="field-row">
-                <label className="field"><span>Birth year</span><input inputMode="numeric" value={d.birthYear ?? ""} placeholder="1985" onChange={(e) => setD({ ...d, birthYear: num(e.target.value) })} onBlur={() => save(d)} /></label>
+                <label className="field"><span>Birth year</span><input inputMode="numeric" value={d.birthYear ?? ""} placeholder="enter year" onChange={(e) => setD({ ...d, birthYear: num(e.target.value) })} onBlur={() => save(d)} /></label>
                 <HeightField cm={d.heightCm} unit={units().height} onCm={(v) => setD({ ...d, heightCm: v })} onDone={() => save(d)} />
                 <WeightField kg={d.weightKg} unit={units().weight} onKg={(v) => setD({ ...d, weightKg: v })} onDone={() => save(d)} />
               </div>
@@ -286,12 +286,12 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           {mode === "same" ? (
             <>
               <div className="field-row">
-                <label className="field"><span>kcal a day</span><input id="own-kcal" inputMode="numeric" value={own.kcal} onChange={(e) => setOwn({ ...own, kcal: e.target.value })} placeholder="2200" /></label>
-                <label className="field"><span>protein, g</span><input id="own-protein" inputMode="numeric" value={own.protein} onChange={(e) => setOwn({ ...own, protein: e.target.value })} placeholder="140" /></label>
+                <label className="field"><span>kcal a day</span><input id="own-kcal" inputMode="numeric" value={own.kcal} onChange={(e) => setOwn({ ...own, kcal: e.target.value })} placeholder="enter kcal" /></label>
+                <label className="field"><span>protein, g</span><input id="own-protein" inputMode="numeric" value={own.protein} onChange={(e) => setOwn({ ...own, protein: e.target.value })} placeholder="enter protein" /></label>
               </div>
               <div className="field-row">
-                <label className="field"><span>fat, g</span><input id="own-fats" inputMode="numeric" value={own.fats} onChange={(e) => setOwn({ ...own, fats: e.target.value })} placeholder={ownFats !== null ? String(ownFats) : "fills in"} /></label>
-                <label className="field"><span>carbs, g</span><input id="own-carbs" inputMode="numeric" value={own.carbs} onChange={(e) => setOwn({ ...own, carbs: e.target.value })} placeholder={ownCarbs !== null ? String(ownCarbs) : "the rest"} /></label>
+                <label className="field"><span>fat, g</span><input id="own-fats" inputMode="numeric" value={own.fats} onChange={(e) => setOwn({ ...own, fats: e.target.value })} placeholder={ownFats !== null ? `fills in: ${ownFats}` : "fills in"} /></label>
+                <label className="field"><span>carbs, g</span><input id="own-carbs" inputMode="numeric" value={own.carbs} onChange={(e) => setOwn({ ...own, carbs: e.target.value })} placeholder={ownCarbs !== null ? `the rest: ${ownCarbs}` : "the rest"} /></label>
               </div>
               <p className="small">One number for every day. That is {pdText(density(ownProtein, ownKcal))}{ownFats !== null && ownCarbs !== null ? `, ${ownFats} g fat and ${ownCarbs} g carbs` : ""}.</p>
               {analysisSame && <FindingList analysis={analysisSame} open={isOpen} keep={keep} />}

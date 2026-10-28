@@ -1,3 +1,4 @@
+import { countByPlace, samePlace, getStarted } from "../places";
 import { useState, useEffect, type ReactNode } from "react";
 import { QrCode, FlaskConical, ChevronRight, BookOpen, ChevronLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator, Coffee } from "lucide-react";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
@@ -609,18 +610,42 @@ function PlanPanel(p: AppApi) {
 }
 
 function ShopPanel(p: AppApi) {
+  // DT136 (0.2.120, board Stories93 version 3; Milan 28 October 14:51): one list of places. Home is where you live, shop and
+  // cook: always on. Every other place has a switch: on puts its foods in your search, and the first time its starter foods
+  // come with it; off keeps them. Delete unused and Make it home sit with a place that is off and has foods.
+  const [more, setMore] = useState(false);
+  const counts = countByPlace(p.state.foods);
+  const homeN = p.state.foods.filter((f) => !f.places?.length || (p.region ? f.places.some((x) => samePlace(x, p.region!)) : false)).length;
+  const rest = REGIONS.filter((r) => r.id !== p.region);
+  const known = rest.filter((r) => p.placesOn.includes(r.id) || (counts.get(r.id) ?? 0) > 0 || p.trip?.place === r.id);
+  const others = rest.filter((r) => !known.includes(r));
+  const row = (r: (typeof REGIONS)[number]) => {
+    const on = p.placesOn.includes(r.id), n = counts.get(r.id) ?? 0, unused = !on && n ? p.unusedOf(r.id).filter((f) => f.places!.length === 1).length : 0;
+    return (
+      <div className="place-row" key={r.id}>
+        <span>
+          <b>{r.name}</b>
+          <small>{n ? `${n} ${n === 1 ? "food" : "foods"}${on ? "" : ", kept"}` : "About twenty starter foods"}{p.trip?.place === r.id ? " · your trip" : ""}</small>
+          {!on && n > 0 && <small className="place-kept">Your logs and recipes stay. {unused > 0 && <><button type="button" className="link" onClick={() => p.deleteUnused(r.id)}>Delete {unused} unused</button> · </>}<button type="button" className="link" onClick={() => p.makeHome(r.id)}>Make it home</button></small>}
+          {(on || n === 0) && <small><button type="button" className="link" onClick={() => p.makeHome(r.id)}>Make it home</button></small>}
+        </span>
+        <button type="button" className={`choice ${on ? "on" : ""}`} aria-pressed={on} aria-label={`${r.name}: ${on ? "on" : "off"}`} onClick={() => p.setPlaceOn(r.id, !on)}>{on ? "On" : "Off"}</button>
+      </div>
+    );
+  };
   return (
     <>
-    <section className="card">
-      <small>This picks your starter foods, and tells Chef Mealan which shops you can really buy from.</small>
-      <div className="moments" style={{ marginTop: 8 }}>
-        {REGIONS.map((r) => <button key={r.id} className={`choice ${p.region === r.id ? "on" : ""}`} onClick={() => p.setRegion(r.id)}>{r.name}</button>)}
-      </div>
-      <p className="label" style={{ marginTop: 16 }}>Starter foods</p>
-      <small>About twenty common foods from your shops, with checked values, so the plate works from day one{(REGIONS.find((r) => r.id === p.region)?.tags ?? []).includes("cy") ? ", and fifty Cypriot foods with their Greek names" : ""}. Foods you already have are skipped, so you can tap again after changing where you shop.</small>
-      <div className="button-row" style={{ marginTop: 8 }}>
-        <button className="pill pill-small" onClick={p.addStarter}>Add starter foods for {REGIONS.find((r) => r.id === p.region)?.name ?? "my region"}</button>
-      </div>
+    <section className="card place-rows">
+      <small>{p.region ? "Where you live, shop and cook is home: its foods are always in your search. Any other place: its switch puts its foods in your search. The first time, its starter foods come with it." : "Pick home: where you live, shop and cook. Its starter foods come with it, and Chef Mealan knows which shops you can really buy from."}</small>
+      {p.region && (
+        <div className="place-row">
+          <span><b>{REGIONS.find((r) => r.id === p.region)?.name}</b><small>Home · {homeN} foods{(REGIONS.find((r) => r.id === p.region)?.tags ?? []).includes("cy") ? ", fifty Cypriot with their Greek names" : ""}</small>
+            {!getStarted().includes(p.region) && <small><button type="button" className="link" onClick={p.addStarter}>Add its starter foods</button></small>}</span>
+          <small>always on</small>
+        </div>
+      )}
+      {known.map(row)}
+      {more || !p.region ? others.map(row) : others.length > 0 && <div className="place-row"><span><b>{others.length} more places</b><small>{others.map((r) => r.name.replace(/, elsewhere$/, "")).slice(0, 4).join(", ")}…</small></span><button type="button" className="link" onClick={() => setMore(true)}>Show</button></div>}
     </section>
     {/* The kitchens you cook (0.2.9, canvas board CH, CH4): the shops say what you can buy, the kitchens what you like to cook */}
     <p className="label" style={{ marginTop: 14 }}>The kitchens you cook</p>

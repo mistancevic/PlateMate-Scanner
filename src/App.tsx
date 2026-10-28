@@ -92,6 +92,7 @@ import { getSafety, setSafety as storeSafety, aiState, addFlag, goalSignals, all
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
+import { activePlaces, inPlace, inferPlaces, placesOfNew, renameForPlace, usedIds, tripOn, tripOver, getPlacesOn, setPlacesOn, getTrip, setTrip, getStarted, setStarted, MIGRATED, type Trip } from "./places";
 import { Home, CircleUser, Menu, Users, MessageCircle, Globe, CalendarDays } from "lucide-react";
 import {
   aggregate,
@@ -770,6 +771,9 @@ export default function App() {
     [usual, setUsualState] = useState<RhythmId[]>(getUsual),
     [region, setRegionState] = useState<RegionId | null>(getRegion),
     [travelTo, setTravelToState] = useState<RegionId | null>(getTravelTo),
+    // DT136 (0.2.120): the places switched on besides home, and a trip
+    [placesOn, setPlacesOnState] = useState<string[]>(getPlacesOn),
+    [trip, setTripState] = useState<Trip | null>(getTrip),
     [newShared, setNewShared] = useState(0),
     [inbox, setInbox] = useState<InboxItem[]>([]),
     [personal, setPersonalState] = useState<Personal>(getPersonal),
@@ -1529,12 +1533,46 @@ export default function App() {
     if (opts?.open) { setOpenFoodId(f.id); setTab("foods"); notify(`${f.name} is in your foods.`); return; }
     notify(`${f.name} is in your foods.`);
   }
+  // DT136 (0.2.120, board Stories93): foods by place. today's places that are on; a food shows when sold everywhere or there
+  const todayKeyP = ymd(new Date());
+  const placesActive = activePlaces(region, placesOn, trip, todayKeyP);
+  const herePlace: string | null = tripOn(trip, todayKeyP) ? trip!.place : region;
+  function addStarterFor(place: string) {
+    setState((s) => {
+      const have = new Set(s.foods.map((f) => (f.name + "|" + f.brand).toLowerCase()));
+      const tags = new Set(REGIONS.find((r) => r.id === place)?.tags ?? ["*"]);
+      const now = new Date().toISOString();
+      const add = STARTER_FOODS
+        .filter((f) => (STARTER_REGION[f.id] ?? ["*"]).some((t) => tags.has(t)))
+        .filter((f) => !have.has((f.name + "|" + f.brand).toLowerCase())).map((f) => ({ ...f, id: uid(), reviewedAt: now, places: STARTER_REGION[f.id] ? [place] : [] }));
+      const named = new Set(s.foods.flatMap((f) => [f.name, ...(f.aliases ?? [])]).map((n) => n.toLowerCase()));
+      const local = marketFoods(tags).filter((r) => ![r.en, r.de, r.sr, r.cyr, r.el ?? ""].some((n) => n && named.has(n.toLowerCase()))).map((r) => ({ ...referenceFood(r, place, uid), places: [place] }));
+      notify(add.length + local.length ? `${add.length + local.length} starter foods added${local.length ? `, ${local.length} of them local` : ""}.` : "Starter foods are already in your library.");
+      return { ...s, foods: [...s.foods, ...add, ...local] };
+    });
+    const st = getStarted(); if (!st.includes(place)) setStarted([...st, place]);
+  }
+  // every food gets its places once: a food from before by its name, a new food by where you are; a basic food takes the
+  // name of where you are now
+  useEffect(() => {
+    const first = (() => { try { return !localStorage.getItem(MIGRATED); } catch { return false; } })();
+    if (!state.foods.some((f) => f.places === undefined) && !state.foods.some((f) => renameForPlace(f, region) !== f)) { if (first) { try { localStorage.setItem(MIGRATED, "1"); } catch {} } return; }
+    // the place is read from the name the food came with, before it takes the name of where you are
+    setState((s) => ({ ...s, foods: s.foods.map((f) => { const placed = f.places === undefined ? { ...f, places: first ? inferPlaces(f) : placesOfNew(f, herePlace) } : f; return renameForPlace(placed, region); }) }));
+    if (first) { try { localStorage.setItem(MIGRATED, "1"); } catch {} }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.foods, region]);
+  // a trip is over the day after its last day: its place goes off, its foods wait with it
+  useEffect(() => { if (tripOver(trip, todayKeyP)) { setTrip(null); setTripState(null); notify(`Back from ${REGIONS.find((r) => r.id === trip!.place)?.name ?? "your trip"}: its foods are put away. Switch it on in Where I shop to bring them back.`); } }, [trip, todayKeyP]);
   // DT135 (0.2.116): set by the Plate from the open meal; Add puts a food on at that meal's normal portion
   const mealScaleRef = useRef(1);
   function add(food0: Food) {
     // DT82 (Milan 20:51): a can whose values are per 100 g drained goes on as the drained food, under the can's name; My
     // foods keeps the label as printed
-    const food = drainedOf(food0) ?? food0;
+    const food1 = drainedOf(food0) ?? food0;
+    // DT136: a food from another place, put on a plate at home, is sold at home too
+    const food = food1.places?.length && herePlace && !food1.places.includes(herePlace) && !tripOn(trip, todayKeyP) ? { ...food1, places: [...food1.places, herePlace] } : food1;
+    if (food !== food1) setState((s) => ({ ...s, foods: s.foods.map((f) => (f.id === food.id ? { ...f, places: food.places } : f)) }));
     log("food_in", { way: food.barcode ? "barcode" : food.source === "label" ? "label" : food.source === "manual" ? "manual" : "saved", source: food.source });
     setState((s) => ({
       ...s,
@@ -2117,6 +2155,22 @@ export default function App() {
     // today's four: protein and fat stay, the carbs take the day's difference
     todayMacros: todayNumbers(),
     setMealScale: (x: number) => { mealScaleRef.current = x; },
+    // DT136: foods by place
+    placesActive, inPlace: (f: Food) => inPlace(f, placesActive), placesOn, trip, herePlace,
+    setPlaceOn: (place: string, on: boolean, starter = true) => {
+      const next = on ? [...new Set([...placesOn, place])] : placesOn.filter((x) => x !== place);
+      setPlacesOn(next); setPlacesOnState(next);
+      if (on && starter && !getStarted().includes(place)) addStarterFor(place);
+    },
+    makeHome: (place: string) => {
+      const next = placesOn.filter((x) => x !== place); setPlacesOn(next); setPlacesOnState(next);
+      setRegion(place as RegionId); setRegionState(place as RegionId);
+      if (!getStarted().includes(place)) addStarterFor(place);
+    },
+    unusedOf: (place: string) => { const used = usedIds(state, getPlanned()); return state.foods.filter((f) => (f.places ?? []).includes(place) && !used.has(f.id)); },
+    deleteUnused: (place: string) => { const used = usedIds(state, getPlanned()); let n = 0; setState((s) => ({ ...s, foods: s.foods.filter((f) => { const out = (f.places ?? []).includes(place) && (f.places ?? []).length === 1 && !used.has(f.id); if (out) n++; return !out; }) })); notify(`${n} unused ${n === 1 ? "food" : "foods"} deleted.`); },
+    setTrip: (t: Trip | null) => { setTrip(t); setTripState(t); },
+    setFoodPlaces: (id: string, places: string[]) => setState((s) => ({ ...s, foods: s.foods.map((f) => (f.id === id ? { ...f, places } : f)) })),
     numbersFor: (date: Date) => numbersOfDate(date),
     // DT75: the person's protein range, g per kg times weight, the same every day; null without a profile to calculate it
     proteinRange: (() => { const c = calculate(personalNow, goalNow?.band ?? "maintain", profile.formula ?? null); return c ? { min: c.proteinMin, max: c.proteinMax } : null; })(),
@@ -2270,20 +2324,9 @@ export default function App() {
     goal, openGoal: () => setGoalOpen(true), fitPd: (pd: number | null) => fitPd(pd, pdRef),
     // Foods measure every food against the day's target, not the plate's moment (a snack before training aims at PD 3)
     fitDay: (pd: number | null) => fitPd(pd, dayPd),
-    addStarter: () => {
-      setState((s) => {
-        const have = new Set(s.foods.map((f) => (f.name + "|" + f.brand).toLowerCase()));
-        const tags = new Set(REGIONS.find((r) => r.id === (region ?? "elsewhere"))?.tags ?? ["*"]);
-        const add = STARTER_FOODS
-          .filter((f) => (STARTER_REGION[f.id] ?? ["*"]).some((t) => tags.has(t)))
-          .filter((f) => !have.has((f.name + "|" + f.brand).toLowerCase())).map((f) => ({ ...f, id: uid(), reviewedAt: new Date().toISOString() }));
-        // the place's own foods come with them (Limassol: fifty Cypriot foods), each once, under any of its names
-        const named = new Set(s.foods.flatMap((f) => [f.name, ...(f.aliases ?? [])]).map((n) => n.toLowerCase()));
-        const local = marketFoods(tags).filter((r) => ![r.en, r.de, r.sr, r.cyr, r.el ?? ""].some((n) => n && named.has(n.toLowerCase()))).map((r) => referenceFood(r, region, uid));
-        notify(add.length + local.length ? `${add.length + local.length} starter foods added${local.length ? `, ${local.length} of them local` : ""}.` : "Starter foods are already in your library.");
-        return { ...s, foods: [...s.foods, ...add, ...local] };
-      });
-    },
+    // DT136: a place's starter foods come with its switch, the first time. The common ones are sold everywhere; a place's own
+    // (fifty in Limassol) and its own brands are that place's
+    addStarter: () => addStarterFor(region ?? "elsewhere"),
     importAirtable: async () => {
       setBusy("Reading Airtable");
       try {

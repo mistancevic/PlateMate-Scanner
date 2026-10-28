@@ -56,6 +56,9 @@ const U = "http://127.0.0.1:3267";
   ok(sentNote && Object.keys(JSON.parse(sentNote)).length >= 2, "DT115: what was sent is noted, so nothing goes twice");
   // Find a food (changed by DT125, 0.2.104): one list; your tuna first, then the members' tins, your market first, then the basic tuna
   await page.getByLabel("Find a food").fill("tuna"); await page.waitForTimeout(1200);
+  // DT136 (0.2.120): members' foods seen only in other places wait behind their chips; All places shows them all
+  ok(/more in (Belgrade|Cyprus)/.test(await text()) && await page.locator(".place-chips").count() === 1, "DT136: Munich's search says what waits in Belgrade and Cyprus");
+  await page.locator(".place-chips").getByRole("button", { name: "All places" }).click(); await page.waitForTimeout(600);
   const mf = page.locator(".rows .row-member");
   ok(await mf.count() === 4, "DT115, DT125: the four foods the others scanned as rows of the one list: " + await mf.count());
   const names = await mf.locator(".name-link").allTextContents();

@@ -12,7 +12,7 @@ export function WeightField({ kg, unit = METRIC.weight, onKg, onDone, label = "W
   useEffect(() => setT(kgShown(kg, unit)), [unit]);
   return (
     <label className="field"><span>{label}, {unit}</span>
-      <input inputMode="decimal" value={t} placeholder={placeholder ?? (unit === "lb" ? "165" : "75")} onChange={(e) => {
+      <input inputMode="decimal" value={t} placeholder={placeholder ?? (unit === "lb" ? "enter lb" : "enter kg")} onChange={(e) => {
         setT(e.target.value); const v = num(e.target.value);
         onKg(v === undefined ? undefined : unit === "lb" ? Math.round(lbToKg(v) * 100) / 100 : v);
       }} onBlur={onDone} />
@@ -24,10 +24,10 @@ export function HeightField({ cm, unit = METRIC.height, onCm, onDone }: { cm: nu
   const [t, setT] = useState(cmShown(cm, unit));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setT(cmShown(cm, unit)), [unit]);
-  if (unit === "cm") return <label className="field"><span>Height, cm</span><input inputMode="numeric" value={t} placeholder="175" onChange={(e) => { setT(e.target.value); onCm(num(e.target.value)); }} onBlur={onDone} /></label>;
+  if (unit === "cm") return <label className="field"><span>Height, cm</span><input inputMode="numeric" value={t} placeholder="enter cm" onChange={(e) => { setT(e.target.value); onCm(num(e.target.value)); }} onBlur={onDone} /></label>;
   return (
     <label className="field"><span>Height, ft and in</span>
-      <input value={t} placeholder="5 ft 9 in" onChange={(e) => {
+      <input value={t} placeholder="enter ft and in" onChange={(e) => {
         setT(e.target.value);
         if (!e.target.value.trim()) return onCm(undefined);
         const v = parseFtIn(e.target.value); if (v !== null) onCm(v);

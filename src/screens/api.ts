@@ -103,6 +103,18 @@ export interface AppApi {
   // the numbers of any day, for Plan (0.2.1)
   // DT135 (0.2.116): the open meal's size, in meals of three a day (1 to 3); Add's normal portion grows with it
   setMealScale?: (x: number) => void;
+  // DT136 (0.2.120): foods by place (src/places.ts)
+  placesActive: Set<string>;
+  inPlace: (f: Food) => boolean;
+  placesOn: string[];
+  trip: import("../places").Trip | null;
+  herePlace: string | null;
+  setPlaceOn: (place: string, on: boolean, starter?: boolean) => void;
+  makeHome: (place: string) => void;
+  unusedOf: (place: string) => Food[];
+  deleteUnused: (place: string) => void;
+  setTrip: (t: import("../places").Trip | null) => void;
+  setFoodPlaces: (id: string, places: string[]) => void;
   numbersFor: (date: Date) => { kcal: number; protein: number; fats: number; carbs: number } | null;
   proteinRange: { min: number; max: number } | null;   // DT75: the person's protein range for a day, in g
   // 0.2.5+r20 (canvas board FX, G1b and G2): apply a goal from a date; today applies now, a later date waits on Goal
