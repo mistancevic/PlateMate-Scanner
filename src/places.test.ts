@@ -53,3 +53,22 @@ test("0.2.121: a note written while the other side wrote stays; Got it is kept f
   assert.equal(m[0].readAt, "2026-10-28T10:30:00Z");
   assert.equal(unseenFromCoach(m), 1); assert.equal(repliesSince(m, "2026-10-28T10:30:00Z"), 1);
 });
+
+// DT140 (0.2.125): the week is the source; Move to keeps the training as it is
+import { withDay, moveDay } from "./plan";
+test("DT140: a day set as tapped; no training clears it; the work day stays", () => {
+  const week = Array(7).fill(0).map((_, i) => ({ work: i < 5, kind: "rest" as const }));
+  let w = withDay(week as any, 4, { level: "moderate" });
+  assert.equal(w[4].kind, "strength"); assert.equal(w[4].intensity, "moderate"); assert.equal(w[4].when, "evening"); assert.equal(w[4].work, true);
+  w = withDay(w, 4, { level: "moderate", minutes: 55, when: "morning" }); assert.equal(w[4].minutes, 55); assert.equal(w[4].when, "morning");
+  w = withDay(w, 4, { level: null }); assert.equal(w[4].kind, "rest"); assert.equal(w[4].intensity, undefined); assert.equal(w[4].work, true);
+});
+test("DT140: Move to keeps the time; a day with training swaps; work days stay", () => {
+  const week: any[] = Array(7).fill(0).map((_, i) => ({ work: i < 5, kind: "rest" }));
+  week[1] = { work: true, kind: "strength", intensity: "moderate", minutes: 55, when: "evening", at: "18:30" };
+  week[3] = { work: true, kind: "cardio", intensity: "easy", minutes: 40, when: "morning" };
+  const a = moveDay(week, 1, 5);
+  assert.deepEqual([a[5].kind, a[5].at, a[5].work, a[1].kind, a[1].work], ["strength", "18:30", false, "rest", true]);
+  const b = moveDay(week, 1, 3);
+  assert.deepEqual([b[3].kind, b[3].at, b[1].kind, b[1].when], ["strength", "18:30", "cardio", "morning"]);
+});

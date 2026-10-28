@@ -312,3 +312,31 @@ export function usualFrom(l: Lifestyle, plan: Plan | null): RhythmId[] {
   if ((l.where ?? []).includes("Family dinners")) out.add("family-dinners");
   return [...out];
 }
+
+// DT140 (0.2.125, board Stories96 version 2; Anna's DT117; Milan 28 October 17:39 and 17:43 Go): the week is the source. A day
+// is set as it is tapped: how hard (or no training), how long, when; nothing is guessed and the count follows from the days.
+const TRAIN_KEYS = ["kind", "intensity", "when", "minutes", "at", "sport"] as const;
+const restOf = (d: PlanDay): PlanDay => { const { work, study, pe } = d; return { work, kind: "rest", ...(study ? { study } : {}), ...(pe ? { pe } : {}) }; };
+export function withDay(plan: Plan, i: number, x: { level: Intensity | null; minutes?: number; when?: When }): Plan {
+  const next = plan.map((d) => ({ ...d }));
+  const d = next[i];
+  if (x.level === null) { next[i] = restOf(d); return next; }
+  const was = isTraining(d);
+  const kind: Kind = was && d.kind !== "rest" ? d.kind : x.level === "easy" ? "mobility" : "strength";
+  const minutes = x.minutes ?? (was ? d.minutes : undefined) ?? levelMinutes(plan, x.level) ?? START_MIN[x.level];
+  const when = x.when ?? (was ? d.when : undefined) ?? (x.level === "easy" ? "day" : "evening");
+  next[i] = { ...d, kind, intensity: x.level, minutes, when };
+  return next;
+}
+// Move to (Training week): the training goes as it is (what, how hard, how long, when, the start time); each day keeps whether
+// it is a work day. A day that already has training swaps with it.
+export function moveDay(plan: Plan, from: number, to: number): Plan {
+  if (from === to) return plan;
+  const next = plan.map((d) => ({ ...d }));
+  const pick = (d: PlanDay) => Object.fromEntries(TRAIN_KEYS.filter((k) => d[k] !== undefined).map((k) => [k, d[k]])) as Partial<PlanDay>;
+  const a = pick(plan[from]), b = pick(plan[to]);
+  next[to] = { ...restOf(plan[to]), ...a } as PlanDay;
+  next[from] = isTraining(plan[to]) ? ({ ...restOf(plan[from]), ...b } as PlanDay) : restOf(plan[from]);
+  return next;
+}
+export const lengthName = (minutes: number | undefined) => lengthOf(minutes ?? 60).name.replace("–", " to ");

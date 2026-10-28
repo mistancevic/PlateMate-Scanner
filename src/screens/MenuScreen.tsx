@@ -17,7 +17,7 @@ import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayM
 import { CHEF_NAME } from "../components/Mark";
 import { KITCHEN, tasteOf, another, anotherLeft, undo, type Taste } from "../kitchens";
 import { slotsOf, windowOf } from "../slots";
-import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, workHintOf, type Plan, type PlanDay, type Lifestyle } from "../plan";
+import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, workHintOf, type Plan, type PlanDay, type Lifestyle, moveDay, isTraining } from "../plan";
 import { DayEditor } from "../components/DayEditor";
 import { ProteinCard } from "../components/ProteinCard";
 import { DayTable } from "../components/DayTable";
@@ -589,6 +589,14 @@ function PlanPanel(p: AppApi) {
         <small className="week-card-foot">The bar shows how hard the day is{minor ? ", sport at school and after school together" : ""}. Tap a day to set it.</small>
       </section>
       <Seg title={WEEKDAY_NAMES[sel]} why={`Every ${WEEKDAY_NAMES[sel]}. To change one date, open that day on Plan.`}>
+        {/* DT140 (0.2.125, board Stories96): Move to, one tap; the training goes as it is, the start time too; a day with
+            training swaps with it; each day keeps whether it is a work day */}
+        {isTraining(plan[sel]) && (
+          <div className="setting move-to" role="group" aria-label={`Move ${WEEKDAY_NAMES[sel]} to`}>
+            <small className="setting-name">Move {WEEKDAY_NAMES[sel]} to</small>
+            <div className="chip-row">{WEEKDAYS.map((w, i) => i === sel ? null : <button type="button" key={w} className="choice" onClick={() => { save(moveDay(plan, sel, i)); setSel(i); p.notify(`${WEEKDAY_NAMES[sel]}'s training is on ${WEEKDAY_NAMES[i]} now${isTraining(plan[i]) ? `, and ${WEEKDAY_NAMES[i]}'s on ${WEEKDAY_NAMES[sel]}` : ""}.`); }}>{w}</button>)}</div>
+          </div>
+        )}
         <DayEditor minor={minor} weekdays={wkd} peOn={peOn} value={plan[sel]} onChange={(d) => setDay(sel, d)} workHint={workHint} />
         {copying === null ? (
           <button type="button" className="pill pill-wide" onClick={() => setCopying([])}>Copy {WEEKDAY_NAMES[sel]} to other days</button>

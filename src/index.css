@@ -2242,3 +2242,11 @@ input::placeholder { color: #8a93a6; font-style: italic; font-weight: 400; opaci
 .how-calc { display: block; margin: 12px 0 2px; font-weight: 700; }
 .how-calc-line, .coach-later, .pd-said { display: block; margin: 4px 0 8px; }
 .pd-said { color: var(--muted, #5b6478); }
+/* DT140 (0.2.125): the week in setup; Move to on Training week */
+.week-setup .wk-day { border: 1px solid var(--line, #d9e2f2); border-left: 6px solid var(--line, #d9e2f2); border-radius: 12px; margin: 6px 0; background: var(--surface, #fff); }
+.week-setup .wk-day.on { border-left-color: #2e9d6a; }
+.week-setup .wk-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; background: none; border: 0; font: inherit; color: inherit; text-align: left; }
+.week-setup .wk-head span { color: var(--muted, #5b6478); }
+.week-setup .wk-day.on .wk-head span { color: inherit; font-weight: 700; }
+.week-setup .wk-edit { padding: 0 12px 10px; display: flex; flex-direction: column; gap: 6px; }
+.move-to { margin: 8px 0; }
