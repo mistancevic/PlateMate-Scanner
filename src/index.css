@@ -2250,3 +2250,4 @@ input::placeholder { color: #8a93a6; font-style: italic; font-weight: 400; opaci
 .week-setup .wk-day.on .wk-head span { color: inherit; font-weight: 700; }
 .week-setup .wk-edit { padding: 0 12px 10px; display: flex; flex-direction: column; gap: 6px; }
 .move-to { margin: 8px 0; }
+.door-done { margin-top: 12px; }

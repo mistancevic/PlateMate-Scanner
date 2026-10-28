@@ -101,7 +101,8 @@ test("an unanswered door is not a no: the chat waits; none applies is an answer,
   const fresh = { ...EMPTY_SAFETY, adultAt: "2026-10-04T09:00:00Z", consentBodyAt: "2026-10-04T09:00:00Z", consentBy: "self" as const };
   assert.equal(doorAnswered(fresh, now), false);
   assert.equal(aiState(fresh, 1981, true, now).on, false);
-  assert.ok(/Answer the question/.test(aiState(fresh, 1981, true, now).why));
+  // DT141 (0.2.126): the line says what the chat waits for, and the chat offers Answer it now
+  assert.ok(/is any of this true for you\? One tap if none applies/.test(aiState(fresh, 1981, true, now).why));
   const none = { ...fresh, none: true, declaredAt: "2026-10-04T09:30:00Z" };
   assert.equal(doorAnswered(none, now), true);
   assert.equal(aiState(none, 1981, true, now).on, true);

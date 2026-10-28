@@ -8,6 +8,7 @@ import { resizeImageBase64 } from "../utils/image";
 import { log } from "../log";
 import type { AppApi } from "./api";
 import { SafetyNote } from "../components/SafetyNote";
+import { SafetyQuestion } from "../components/SafetyQuestion";
 import { FIXED, takeModelFlag } from "../safety";
 import { slotsOf, slotsOn, withTimeOn, trainingTime, trainingWhen } from "../slots";
 import { tasteForChef } from "../kitchens";
@@ -44,6 +45,7 @@ const asFood = (r: Rec): Food => ({
 export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; turns: Turn[]; setTurns: (f: (t: Turn[]) => Turn[]) => void; tab: Tab; ask?: "fill" | "plate" | "around" | null; clearAsk: () => void }) {
   const { pdRef, setState, setError, state } = p;
   const [text, setText] = useState("");
+  const [doorOpen, setDoorOpen] = useState(false);
   const [chatStage, setChatStage] = useState<"ask" | "match">("ask");
   // The chef in context (0.2.4, canvas S "Chef Mealan, about this screen", H5, H6, H11): the chat opens knowing the screen.
   // One line about where the person is, chips written for that screen; a chip only asks, the button on the answer acts.
@@ -285,7 +287,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
       <div className="head">
         <div className="menu-head"><h2>{CHEF_NAME}</h2><button className="link" onClick={close}>Close</button></div>
         <p>{about} Say what you want, or tap a line below.</p>
-        <SafetyNote safety={p.safety} ai={p.ai} />
+        {doorOpen ? <SafetyQuestion p={p} doneLabel="Back to the chat" onDone={() => setDoorOpen(false)} /> : <SafetyNote safety={p.safety} ai={p.ai} onAnswer={() => setDoorOpen(true)} />}
       </div>
       <div className="chat">
         {turns.length === 0 && (

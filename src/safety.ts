@@ -38,6 +38,8 @@ export const ADULT_ONLY = "Chef Mealan uses AI to read labels and photos and to 
 export type AiState = { on: boolean; why: string; blocked: boolean };
 // The door is answered when something was ticked, a situation or none, within the last year
 export const DOOR_VALID_DAYS = 365;
+// DT141 (0.2.126): what the chat waits for, in one sentence; Answer it now opens the question right there
+export const DOOR_WHY = "One question first, once a year: is any of this true for you? One tap if none applies.";
 export function doorAnswered(safety: Safety, now = new Date()): boolean {
   if (!safety.declaredAt) return false;
   if (!(safety.none || safety.situations.length > 0)) return false;
@@ -47,7 +49,7 @@ export function aiState(safety: Safety, birthYear: number | undefined | null, _h
   if (underAge(birthYear, now)) return { on: false, why: ADULT_ONLY, blocked: true };
   if (!safety.adultAt) return { on: false, why: "Confirm on the welcome screen that you're 18 or older.", blocked: false };
   const confirmed = Boolean(safety.aiConfirmedAt);
-  if (!doorAnswered(safety, now)) return { on: false, why: "Answer the question on your profile first: is any of this true for you? One tap if none applies. Chef Mealan's chat waits for that answer, and asks again once a year.", blocked: false };
+  if (!doorAnswered(safety, now)) return { on: false, why: DOOR_WHY, blocked: false };
   if (safety.situations.includes("eating") && !confirmed) return { on: false, why: FIXED.off, blocked: false };
   return { on: true, why: "", blocked: false };
 }

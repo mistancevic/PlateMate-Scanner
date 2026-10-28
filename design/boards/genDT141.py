@@ -88,15 +88,14 @@ cy = storyCard(B, y, "DT141", "The safety question asked in setup, not found lat
   ("Anna (her DT119)", "The chat said: Answer the question on your profile first, is any of this true for you? No link. The question sat at the bottom of Profile."),
   ("Now, checked in 0.2.125", "Still so. The chat line has no link and shows for any message; the question is only on Profile, after the form and its Save button. Setup's I agree is not followed by it."),
   ("The story", "Right after I agree in setup, the same card as on Profile: Is any of this true for you?, the situations, or None of these applies to me. One tap if none applies; then 1. You. The answer is kept as today, and asked again once a year."),
+  ("Milan, 28 October 18:33", "Are there CTAs at the end of the screen to proceed to the next step? If yes, draw, and build it. Go."),
+  ("The step ends on its button", "In setup the question stands alone after I agree, and ends on one button: Tick one, or None of these applies to me (grey), then Next: 1. You. From the chat it ends on Back to the chat. On Profile it has no button: each tick saves, and the page goes on to Goal as before."),
   ("For an account that has not answered (or a year later)", "The chat's line says what it waits for, in one sentence, with Answer it now. It opens the question; the answer brings you back to the chat. On Profile the question stays where it is, for changes."),
 ])
 h = rowEnd(cy,
-  B.screen("DT141a", 0, y, "Now: the chat waits, no way there", "r141a", "now", "Answer the question on your profile first: no link."),
-  B.screen("DT141b", 1, y, "New: asked in setup", "r141b", "changed", "Right after I agree, before 1. You."))
-y = h
-h = rowEnd(y + 10,
-  B.screen("DT141c", 0, y, "New: Answer it now", "r141c", "changed", "For an account that has not answered: one line, one button."))
+  B.screen("DT141b", 0, y, "Built: asked in setup, ends on Next", "r141b", "changed", "Right after I agree; Next: 1. You once answered."),
+  B.screen("DT141c", 1, y, "Built: Answer it now", "r141c", "changed", "One line, one button; the question ends on Back to the chat."))
 y = h
 board("Stories97.dc.html", "DT141. The safety question asked in setup",
-  "28 October 2026 (Anna's DT119, brought up to 0.2.125). Now: 0.2.125, untouched. Drawn for your approval; nothing built.",
+  "28 October 2026 (Anna's DT119, brought up to 0.2.125). Built in 0.2.126 (Milan 18:33 Go): the screens are the app.",
   B, W, y - 100, "Stories96.dc.html")

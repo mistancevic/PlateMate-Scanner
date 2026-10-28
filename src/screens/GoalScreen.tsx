@@ -1,3 +1,5 @@
+import { SafetyQuestion } from "../components/SafetyQuestion";
+import { doorAnswered } from "../safety";
 import { underAge, ADULT_ONLY } from "../safety";
 import { WeightField, HeightField } from "../components/UnitFields";
 import { units, hText, wText, wIn } from "../units";
@@ -35,6 +37,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   // numbers and Apply appear once you pick. My own numbers and the analysis still read a goal: the one you had, else Maintain
   const [picked, setBand] = useState<string>(p.goal?.band ? suggestBand(p.personal, p.goal.band).id : "");
   const band = picked || suggestBand(p.personal, undefined).id;
+  const [askDoor, setAskDoor] = useState(() => !doorAnswered(p.safety));
   const [howOpen, setHowOpen] = useState(p.goalFocus === "formula" || Boolean(p.calcFormula));
   // the sections are numbered as they show: 1. You only once you agreed
   const nYou = 1, nGoal = consented ? 2 : 1;
@@ -212,6 +215,10 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               </div>
             </section>
           )}
+          {/* DT141 (0.2.126, board Stories97; Anna's DT119; Milan 28 October 18:33 Go): right after I agree, the safety question;
+              the step ends on Next: 1. You, and the rest of setup follows */}
+          {consented && askDoor && <SafetyQuestion p={p} doneLabel={`Next: ${nYou}. You`} onDone={() => { setAskDoor(false); window.setTimeout(() => document.querySelector(".calc-step")?.scrollIntoView({ block: "start" }), 50); }} />}
+          {!(consented && askDoor) && <>
           {consented && <p className="label calc-step">{nYou}. You</p>}
           {consented && !editing && canCalculate(d) ? (
             <section className="card you-card">
@@ -302,6 +309,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
             // 0.2.119 (Tester 2, Milan 28 October 14:59): no Apply and no word why read as a dead end; say what is missing
             <p className="small goal-missing" role="status">{consented && canCalculate(d) && !under && !picked ? "Pick what you are after, and your numbers appear." : !consented ? "To calculate your numbers, tap I agree above, then fill in your body." : under ? "Chef Mealan is for adults: check the birth year above." : `To calculate your numbers, fill in ${missingOf(d).join(", ")} above. Or use My own numbers.`}</p>
           )}
+          </>}
         </div>
       )}
 

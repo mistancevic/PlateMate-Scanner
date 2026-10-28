@@ -31,18 +31,19 @@ const PORT = "3311", U = `http://127.0.0.1:${PORT}`;
   await page.evaluate((mark) => { for (const el of document.querySelectorAll(".talk-overlay *")) if (/Answer the question on your profile first/.test(el.textContent || "") && el.children.length < 3) { el.style.cssText += ";" + mark; break; } }, mark);
   await note(".talk-overlay", "Now (0.2.125): Anna opens the chat. It waits on a question she has never seen, at the bottom of Profile, after the form and its Save button. No link takes her there.", "prepend");
   await shot("r141a", 1500);
-  // DT141b, new: in setup, right after I agree
+  // DT141b, built (0.2.126): in setup, right after I agree; the step ends on Next: 1. You
   await fresh(false); await page.goto(U + "/"); await page.waitForTimeout(1300);
   await page.getByRole("button", { name: /^I agree$/ }).click(); await page.waitForTimeout(500);
-  await page.evaluate(({ door, mark }) => { const anchor = [...document.querySelectorAll(".calc-step")].find((x) => /You$/.test(x.textContent)); if (!anchor) return; const w = document.createElement("div"); w.innerHTML = door; const card = w.firstElementChild; card.style.cssText += ";margin:10px 0;" + mark; anchor.before(card); }, { door, mark });
-  await note(".door", "New: right after I agree, the same question, the same answers: the situations, or None of these applies to me. One tap if none applies. Then 1. You. The chat never waits on it.", "before");
+  await page.locator("#safety-question").getByText("None of these applies to me", { exact: true }).click(); await page.waitForTimeout(400);
+  await page.evaluate((mark) => { const q = document.querySelector("#safety-question"); if (q) q.style.cssText += ";" + mark; const bt = document.querySelector(".door-done"); if (bt) bt.style.cssText += ";" + mark; }, mark);
+  await note("#safety-question", "Built (0.2.126): right after I agree, the question; nothing else of setup until it is answered. A tick saves straight away; the step ends on its button: Tick one, or None of these applies to me, then Next: 1. You.", "before");
   await shot("r141b");
-  // DT141c, new: an older account the chat still waits for: the line is a link to the question
+  // DT141c, built: the chat says what it waits for; Answer it now opens the question, ending on Back to the chat
   await fresh(true); await page.evaluate(() => localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-28T16:00:00Z", source: "profile" })));
   await page.goto(U + "/"); await page.waitForTimeout(1300);
-  await page.locator(".chat-fab").click(); await page.waitForTimeout(1200);
-  await page.evaluate((mark) => { for (const el of document.querySelectorAll(".talk-overlay *")) if (/Answer the question on your profile first/.test(el.textContent || "") && el.children.length < 3) { el.textContent = "One question first, once a year: is any of this true for you? One tap if none applies."; const bt = document.createElement("button"); bt.className = "pill pill-small pill-primary"; bt.style.cssText = "display:block;margin-top:8px"; bt.textContent = "Answer it now"; el.appendChild(bt); el.style.cssText += ";" + mark; break; } }, mark);
-  await note(".talk-overlay", "New, for an account that has not answered yet (or a year later): the line says what it waits for, and Answer it now opens the question. The answer brings you back to the chat.", "prepend");
+  await page.locator(".chat-fab").click(); await page.waitForTimeout(1000);
+  await page.evaluate((mark) => { const n = document.querySelector(".safety-note"); if (n) n.style.cssText += ";" + mark; }, mark);
+  await note(".talk-overlay", "Built: for an account that has not answered (or a year later), one line and Answer it now. The question opens here and ends on Back to the chat.", "prepend");
   await shot("r141c", 1500);
   await b.close(); server.kill();
 })();

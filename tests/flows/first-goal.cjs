@@ -24,7 +24,7 @@ const path = require("node:path");
   const goals = await page.locator(".calc-way .goal-pick .goal-pick-head b").allTextContents();
   ok(goals.join("|") === "Recomposition|Lose fat|Maintain|Build muscle|Performance", "the five goals: " + goals.join(", "));
   ok((await page.locator(".calc-way .goal-pick").first().locator("li").count()) >= 3, "each goal says what happens to your weight and food");
-  await page.getByRole("button", { name: /^I agree$/ }).click(); await page.waitForTimeout(200);
+  await page.getByRole("button", { name: /^I agree$/ }).click(); await page.waitForTimeout(200); await require("./door.cjs")(page);
   await page.getByRole("button", { name: /^Female$/ }).click();
   const inputs = page.locator(".calc-way input");
   // Release A (7 October 2026): Chef Mealan is for adults. A birth year under 18 says so; the journey goes on as an adult.

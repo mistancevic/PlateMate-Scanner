@@ -20,7 +20,7 @@ const path = require("node:path");
     await page.goto("http://127.0.0.1:3191/"); await page.waitForTimeout(900);
     await page.getByRole("button", { name: "Not now" }).click(); await page.waitForTimeout(400);
     await page.getByText(/Set your goal/).click(); await page.waitForTimeout(400);
-    await page.getByRole("button", { name: /^I agree$/ }).click(); await page.waitForTimeout(200);
+    await page.getByRole("button", { name: /^I agree$/ }).click(); await page.waitForTimeout(200); await require("./door.cjs")(page);
     await page.getByRole("button", { name: /^Male$/ }).click();
     const inputs = page.locator(".calc-way input");
     await inputs.nth(0).fill("1981"); await inputs.nth(1).fill("182"); await inputs.nth(2).fill("96"); await inputs.nth(2).blur(); await page.waitForTimeout(200);
