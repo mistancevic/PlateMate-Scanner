@@ -67,7 +67,7 @@ const PORT = "3315", U = `http://127.0.0.1:${PORT}`;
     for (const n of document.querySelectorAll(".agenda-what")) if (/· evening/.test(n.textContent)) n.textContent = n.textContent.replace("· evening", "· morning");
     const box = document.createElement("div"); box.style.cssText = "margin:-2px 0 8px;padding:10px 12px;background:#fff;border-radius:0 0 14px 14px;border:1px solid #d9e2f2;border-top:0;" + mark;
     tue.style.cssText += ";border-radius:14px 14px 0 0;margin-bottom:0";
-    const why = document.createElement("small"); why.className = "muted"; why.style.display = "block"; why.textContent = "Every Tuesday. To change one date, open that day on Plan. Tap Tuesday again to close."; box.appendChild(why);
+    const why = document.createElement("small"); why.className = "muted"; why.style.display = "block"; why.style.marginBottom = "12px"; why.textContent = "Every Tuesday. To change one date, open that day on Plan. Tap Tuesday again to close."; box.appendChild(why);
     while (seg.firstChild) box.appendChild(seg.firstChild);
     tue.after(box); seg.remove(); if (head) head.remove();
     // How hard: three chips, the zones of the one picked
@@ -80,7 +80,17 @@ const PORT = "3315", U = `http://127.0.0.1:${PORT}`;
     if (st) { for (const c of st.querySelectorAll("button")) { if (/Evening/.test(c.textContent)) { c.classList.remove("on"); c.innerHTML = 'Evening <small style="font-weight:400;opacity:.75">· in work hours</small>'; } if (/Morning/.test(c.textContent)) c.classList.add("on"); }
       const s = document.createElement("small"); s.style.cssText = "display:block;margin-top:4px"; s.textContent = "Chef Mealan suggests training outside your work hours, 16:00 to 23:00. Every time stays open: a break at work can be gym time."; st.appendChild(s); st.style.cssText += ";" + mark; }
     for (const n of box.querySelectorAll("small, p, div")) if (n.childElementCount === 0 && /From Lifestyle: fixed hours, 9 to 5/.test(n.textContent)) n.textContent = n.textContent.replace("fixed hours, 9 to 5", "your hours, 16:00 to 23:00");
-    const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New: Tuesday opens right under Tuesday, as in setup. Tap Tuesday again and it closes. Tap Thursday and Thursday opens too; Tuesday stays open until you tap it. How hard is three chips, with the zones of the one picked. Evening stays open, marked in work hours.";
+    // Day off shows at the right end, like Work
+    for (const r of document.querySelectorAll(".agenda-row")) { const sm = r.querySelector("small"); if (sm && !sm.textContent.trim()) { sm.textContent = "Day off"; sm.className = "work"; } }
+    // Your day: say what it is for
+    const yd = [...box.querySelectorAll(".setting")].find((n) => /^Your day/.test(n.firstElementChild?.textContent || ""));
+    if (yd) { yd.firstElementChild.textContent = "Work or day off"; for (const n of yd.querySelectorAll("small")) if (/From Lifestyle/.test(n.textContent)) n.remove();
+      const h = document.createElement("small"); h.className = "setting-hint"; h.style.display = "block"; h.textContent = "Not your training: how the rest of the day goes. A work day counts how you move at work, mostly sitting; your training comes on top. Your work hours, 16:00 to 23:00, keep training suggestions out of work."; yd.appendChild(h); yd.style.cssText += ";" + mark; }
+    // Move and Copy: one line at the bottom
+    const mv = box.querySelector(".move-to"); if (mv) mv.remove();
+    const cp = [...box.querySelectorAll("button")].find((b) => /^Copy Tuesday/.test(b.textContent || ""));
+    if (cp) { const l = document.createElement("div"); l.style.cssText = "display:flex;gap:18px;flex-wrap:wrap;padding:10px 2px 4px;border-top:1px solid #e3e8f2;margin-top:6px;" + mark; l.innerHTML = '<button class="link" style="font-weight:800">Move to another day ›</button><button class="link" style="font-weight:800">Copy to other days ›</button>'; cp.replaceWith(l); }
+    const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New: Tuesday opens right under Tuesday, as in setup. Tap Tuesday again and it closes. Tap Thursday and Thursday opens too; Tuesday stays open until you tap it. How hard is three chips, with the zones of the one picked. Evening stays open, marked in work hours. Your day is now Work or day off, with what it does. Move and Copy are one line at the end; each opens its day chips there. Day off shows on the right, like Work.";
     document.querySelector(".week-card").before(d);
   }, { mark, NOTE });
   await shot("r147d");

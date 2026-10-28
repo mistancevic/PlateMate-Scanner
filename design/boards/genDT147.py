@@ -88,8 +88,8 @@ cy = storyCard(B, y, "DT147", "Your own work hours, and your day around them (ve
   ("Tester 3, UX1 (Coach Milan, 28 October)", "Marko works Canadian hours from Cyprus. Working hours offers only 9 to 5, 8 to 4 and 7 to 3. None fits him. On his iPhone the meal times on the right ran past the card. On Training week, a tapped day opened out of sight."),
   ("Now, checked in 0.2.127", "Whatever is picked changes nothing. Meal times stay 07:30, 13:45, 20:00. Training stays where it was set. Chef Mealan's chat does not know the work hours. Meal times sit two in a row, and Safari gives a time field a minimum width. Training week opens a day below the whole week."),
   ("Lifestyle", "Working hours keeps the three chips and adds a fourth: My hours, with From and To. Hours past midnight work too; the line says the hours are your time. Meal times you have not set yourself fit around work. Day work: breakfast before work, lunch at the halfway break, dinner after. Late work, like 16:00 to 23:00: breakfast late morning, the main meal about an hour before work, a small meal at the break. Chef Mealan's chat knows the hours. Every time is one line: the name left, the time right. How you eat is now What you eat."),
-  ("Training week", "Tap a day and it opens right under itself, as in setup. A second tap on the same day closes it. Tapping another day opens that one too; the first stays open. How hard is three chips, with the zones of the one picked. Chef Mealan suggests training outside work hours. Every time stays open, evening too: a break at work can be gym time."),
-  ("Coach Milan, 28 October 22:02 to 22:39", "Don't disable Evening. What you eat. Times one per line. Open the day in place; close it only on a second tap on the same day."),
+  ("Training week", "Tap a day and it opens right under itself, as in setup. A second tap on the same day closes it. Tapping another day opens that one too; the first stays open. How hard is three chips, with the zones of the one picked. Your day becomes Work or day off, with one line on what it does: not your training, but how the rest of the day goes; a work day counts how you move at work, and training comes on top. Move and Copy are one line at the end of the open day: Move to another day, Copy to other days; each opens its day chips right there. A day without training shows only Copy. Day off shows at the right end of its row, like Work. Chef Mealan suggests training outside work hours. Every time stays open, evening too: a break at work can be gym time."),
+  ("Coach Milan, 28 October 22:02 to 22:39", "Don't disable Evening. What you eat. Times one per line. Open the day in place; close it only on a second tap on the same day. (22:51 to 22:55) Move to takes space for a one time setup: one line with Copy at the bottom. Say what Your day means. Day off on the right, like Work."),
   ("Always", "Times you set yourself win. Changing work hours never moves a meal time or a training time you set."),
 ])
 h = rowEnd(cy,
@@ -98,7 +98,7 @@ h = rowEnd(cy,
 y = h
 h = rowEnd(y + 10,
   B.screen("DT147c", 0, y, "Now: the day opens below the week", "r147c", "now", "Tuesday opens after Sunday, off screen."),
-  B.screen("DT147d", 1, y, "New: the day opens under itself", "r147d", "changed", "Tap again to close. Morning suggested; evening stays open."))
+  B.screen("DT147d", 1, y, "New: the day opens under itself", "r147d", "changed", "Work or day off, Move and Copy in one line, Day off on the right."))
 y = h
 board("Stories99.dc.html", "DT147. Your own work hours, and your day around them",
   "28 October 2026 (Tester 3, UX1), version 2. Now: 0.2.127, untouched. Drawn for your approval; nothing built.",
