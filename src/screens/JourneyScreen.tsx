@@ -459,7 +459,8 @@ export function JourneyScreen(p: AppApi) {
     const s = slotAt(slots, `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`);
     return s ? { date, slot: s } : null;
   })();
-  const mealSlot = p.filling ? daySlots.find((x) => x.id === p.filling!.slotId) ?? null : photoMeal && photoMeal.date === mealDate ? photoMeal.slot : unsized ? null : pickSlot ?? mealNow(daySlots, closed, new Date());
+  // 0.2.121: the meal you picked comes before the photo's time and the clock
+  const mealSlot = p.filling ? daySlots.find((x) => x.id === p.filling!.slotId) ?? null : unsized ? null : pickSlot ?? (photoMeal && photoMeal.date === mealDate ? photoMeal.slot : null) ?? mealNow(daySlots, closed, new Date());
   const dayNums = p.numbersFor(new Date(`${mealDate}T12:00:00`));
   const share = mealSlot && dayNums ? mealShare(daySlots, mealSlot.id, { kcal: dayNums.kcal, protein: dayNums.protein }, mealDate === todayKey ? { kcal: dayRec.kcal, protein: dayRec.protein } : { kcal: 0, protein: 0 }, closed) : null;
   // DT135 (0.2.116): how many times a meal of three a day this meal is, 1 to 3; every food's most grows by it

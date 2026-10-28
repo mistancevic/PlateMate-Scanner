@@ -31,6 +31,17 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(after.findIndex((x) => /saturates/.test(x)) === after.findIndex((x) => /^Fat/.test(x)) + 1, "saturates sits right under fat");
   ok(after.findIndex((x) => /polyols/.test(x)) > after.findIndex((x) => /^Carbohydrate/.test(x)) && after.findIndex((x) => /polyols/.test(x)) < after.findIndex((x) => /^Fibre/.test(x)), "polyols under carbohydrate, before fibre");
   ok(after.some((x) => /Taurin.*added by you/.test(x)), "an extra line is marked as added by you");
+  // 0.2.121 (Tester 2, Milan 15:26 and 15:28): a decimal can be typed in a line like salt, and Enter finishes the field
+  const salt = page.locator(".label-table .lt-row").filter({ hasText: /^Salt/ }).locator("input");
+  await salt.click(); await salt.press("Control+A"); await page.keyboard.type("0,01"); await page.waitForTimeout(100);
+  ok(await salt.inputValue() === "0,01", "0.2.121: salt takes 0,01 as typed, the comma kept: " + await salt.inputValue());
+  ok(await salt.getAttribute("enterkeyhint") === "done", "0.2.121: the field shows a Done key");
+  await page.keyboard.press("Enter"); await page.waitForTimeout(150);
+  ok(await page.evaluate(() => document.activeElement?.tagName !== "INPUT"), "0.2.121: Enter finishes the field");
+  ok(await salt.inputValue() === "0.01", "0.2.121: it counts as 0.01 once the field is left: " + await salt.inputValue());
+  const prot = page.getByLabel("Protein", { exact: true });
+  await prot.click(); await page.locator(".label-table").getByText("Nutrition table", { exact: false }).first().click({ force: true }).catch(() => {}); await page.mouse.click(10, 300); await page.waitForTimeout(150);
+  ok(await page.evaluate(() => document.activeElement?.tagName !== "INPUT"), "0.2.121: a tap outside the field finishes it too");
   await page.getByLabel(/I checked the values/).check();
   await page.getByRole("button", { name: /Confirm & save food/ }).click(); await page.waitForTimeout(500);
   // since 0.1.83 (Milan, 7 October 2026) a new food saved from Foods opens its own card, so there is nothing to tap here

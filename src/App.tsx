@@ -92,6 +92,7 @@ import { getSafety, setSafety as storeSafety, aiState, addFlag, goalSignals, all
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
+import { unseenFromCoach, repliesSince } from "./coachNotes";
 import { activePlaces, inPlace, inferPlaces, placesOfNew, renameForPlace, usedIds, tripOn, tripOver, getPlacesOn, setPlacesOn, getTrip, setTrip, getStarted, setStarted, MIGRATED, type Trip } from "./places";
 import { Home, CircleUser, Menu, Users, MessageCircle, Globe, CalendarDays } from "lucide-react";
 import {
@@ -331,6 +332,7 @@ function LabelCheck({
   });
   // the lines as a label prints them, once, when the review opens: typing stays exactly as typed
   const [rows, setRows] = useState<LabelRow[]>(() => displayRows(food).map((r) => ({ ...r, amount: r.amount === null ? null : tidy(r.amount, r.unit) })));
+  const [rowDraft, setRowDraft] = useState<Record<number, string>>({});
   const [adding, setAdding] = useState(false);
   const [addKey, setAddKey] = useState("saturates");
   const [addName, setAddName] = useState("");
@@ -525,8 +527,11 @@ function LabelCheck({
           return (
             <div className={`lt-row ${r.sub ? "sub" : ""}`} key={r.key + i}>
               <span className="lt-name">{r.name}{r.source === "you" && <em> · added by you</em>}{r.source === "database" && <em> · database</em>}{r.source === "photo" && <em className="from-photo"> · read from the photo</em>}</span>
-              <input inputMode="decimal" aria-label={r.name} value={core ? values[core] : r.amount ?? ""} placeholder="–"
-                onChange={(e) => core ? setValues((v) => ({ ...v, [core]: e.target.value })) : setRows((rs) => rs.map((x, j) => j === i ? { ...x, amount: numberInput(e.target.value) } : x))} />
+              {/* 0.2.121 (Tester 2, Milan 28 October 15:26): a row like salt kept only the number, so "0." became 0 and a decimal
+                  could not be typed. What you type stays as typed and counts when you leave the field */}
+              <input inputMode="decimal" aria-label={r.name} value={core ? values[core] : rowDraft[i] ?? (r.amount ?? "")} placeholder="–"
+                onChange={(e) => core ? setValues((v) => ({ ...v, [core]: e.target.value })) : setRowDraft((d) => ({ ...d, [i]: e.target.value }))}
+                onBlur={(e) => { if (core) return; const t = e.target.value; setRows((rs) => rs.map((x, j) => j === i ? { ...x, amount: numberInput(t) } : x)); setRowDraft((d) => { const n = { ...d }; delete n[i]; return n; }); }} />
               <span className="lt-unit">{r.unit}</span>
               {!core ? <button className="lt-x" aria-label={`Remove ${r.name}`} onClick={() => setRows((rs) => rs.filter((_, j) => j !== i))}>×</button> : <span className="lt-x" />}
             </div>
@@ -765,7 +770,9 @@ export default function App() {
     [moment, setMomentState] = useState<MomentId>("regular"),
     // R11 (0.2.37, board RS8): what the plate is for. null: the meal the clock is in, a guess, off the plan; "exploring" sizes
     // nothing; "snack" is off the plan, unsized; "meal:<slot>" is that meal of today, sized for it and counted by the plan
-    [pick, setPick] = useState<string | null>(null),
+    // 0.2.121 (Tester 2, Milan 28 October 15:30): the meal you pick for the plate is kept with the plate, so a reload or the phone
+    // dropping the tab in the background never turns your breakfast back into the meal of the clock
+    [pick, setPickState] = useState<string | null>(() => state.pick ?? null),
     [kind, setKind] = useState<PlateKind>("meal"),
     [plateTaste, setPlateTaste] = useState<import("./dishTaste").PlateTaste | null>(null),
     [usual, setUsualState] = useState<RhythmId[]>(getUsual),
@@ -1270,13 +1277,36 @@ export default function App() {
     return () => document.removeEventListener("visibilitychange", onShow);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid]);
+  // 0.2.121 (Tester 2, Milan 28 October 15:24): messages arrive while the app is open. Every minute, while it is in front: the
+  // coach's badge is counted again; a client reads the coach's notes, the numbers review and the inbox, and a new note says so
+  const coachSeen = useRef(-1);
+  useEffect(() => {
+    if (!user) return;
+    const tick = async () => {
+      if (document.visibilityState !== "visible") return;
+      if (profile.role === "coach") { void countNewShared(); return; }
+      if (!profile.coachId) return;
+      try {
+        const remote = await loadCloud(user.uid); if (!remote) return;
+        takeCoach(remote);
+        setReview(((remote as any).numbersReview as NumbersReview | undefined) ?? null);
+        void fetchInbox();
+      } catch { /* offline */ }
+    };
+    const t = window.setInterval(tick, 60000);
+    return () => window.clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.uid, profile.role, profile.coachId]);
+  const fromCoach = unseenFromCoach(coachThread.notes) + inbox.length;
+  useEffect(() => { if (coachSeen.current >= 0 && fromCoach > coachSeen.current) notify(`${profile.coachName ? profile.coachName.split(" ")[0] : "Your coach"} sent you something. It is on Today.`); coachSeen.current = fromCoach; /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [fromCoach]);
   // coach: how many cards were shared since I last looked
   const countNewShared = async () => {
     if (!user || profile.role !== "coach") return;
     try {
       const since = localStorage.getItem(`chefmealan-coach-seen-${user.uid}`) || "";
       const rows = await listClients(user.uid);
-      const n = rows.reduce((acc, r) => acc + r.feedback.filter((f: any) => (f.shared?.at || f.createdAt) > since).length, 0);
+      // 0.2.121 (Tester 2, Milan 15:24): the badge also counts replies from clients and numbers waiting for the coach
+      const n = rows.reduce((acc, r) => acc + r.feedback.filter((f: any) => (f.shared?.at || f.createdAt) > since).length + repliesSince(r.notes ?? [], since) + ((r as any).review?.status === "waiting" && ((r as any).review?.at ?? "") > since ? 1 : 0), 0);
       setNewShared(n);
     } catch { /* offline */ }
   };
@@ -1533,6 +1563,23 @@ export default function App() {
     if (opts?.open) { setOpenFoodId(f.id); setTab("foods"); notify(`${f.name} is in your foods.`); return; }
     notify(`${f.name} is in your foods.`);
   }
+  // 0.2.121 (Tester 2, Milan 28 October 15:28): a number field kept the focus, and few keyboards have an Enter key. Every field
+  // shows a Done key (enterkeyhint), Enter finishes it, and a tap outside any field finishes it too; the value counts then.
+  useEffect(() => {
+    const onFocus = (e: FocusEvent) => { const t = e.target; if (t instanceof HTMLInputElement && !t.hasAttribute("enterkeyhint")) t.setAttribute("enterkeyhint", /search/.test(t.className) || t.type === "search" ? "search" : "done"); };
+    const onKey = (e: KeyboardEvent) => { const t = e.target; if (e.key === "Enter" && t instanceof HTMLInputElement && !["button", "submit", "checkbox", "radio"].includes(t.type)) setTimeout(() => { if (document.activeElement === t) t.blur(); }, 0); };
+    let down: { x: number; y: number } | null = null;
+    const onDown = (e: PointerEvent) => { down = { x: e.clientX, y: e.clientY }; };
+    const onUp = (e: PointerEvent) => {
+      const a = document.activeElement, d = down; down = null;
+      if (!(a instanceof HTMLInputElement || a instanceof HTMLTextAreaElement) || !d || Math.hypot(e.clientX - d.x, e.clientY - d.y) > 10) return;
+      if ((e.target as Element | null)?.closest?.("input, textarea, select, label, button, a, [contenteditable], [role=option]")) return;
+      a.blur();
+    };
+    document.addEventListener("focusin", onFocus); document.addEventListener("keydown", onKey); document.addEventListener("pointerdown", onDown, true); document.addEventListener("pointerup", onUp, true);
+    return () => { document.removeEventListener("focusin", onFocus); document.removeEventListener("keydown", onKey); document.removeEventListener("pointerdown", onDown, true); document.removeEventListener("pointerup", onUp, true); };
+  }, []);
+  const setPick = (x: string | null) => { setPickState(x); setState((s) => (s.pick === x ? s : { ...s, pick: x })); };
   // DT136 (0.2.120, board Stories93): foods by place. today's places that are on; a food shows when sold everywhere or there
   const todayKeyP = ymd(new Date());
   const placesActive = activePlaces(region, placesOn, trip, todayKeyP);
@@ -2523,7 +2570,8 @@ export default function App() {
   };
   const NAV: { id: Tab; label: string; icon: ReactNode }[] = [
     // the bar (0.2.0, canvas X0 and H, 11 October 2026): Today eats and counts, Plan decides, Plate makes, Recipes keeps; Me and Foods in the top menu
-    { id: "home", label: "Today", icon: <Home size={20} /> },
+    // 0.2.121: a client sees how many things from the coach wait on Today (notes without Got it, recipes sent)
+    { id: "home", label: "Today", icon: <span className="nav-icon"><Home size={20} />{profile.role !== "coach" && fromCoach > 0 && <span className="badge">{fromCoach}</span>}</span> },
     { id: "plan", label: "Plan", icon: <CalendarDays size={20} /> },
     { id: "journey", label: "Plate", icon: <Utensils size={20} /> },
     { id: "recipes", label: "Recipes", icon: <ChefHat size={20} /> },

@@ -16,7 +16,10 @@ export type PlannedMeal = { title: string; kcal: number; protein: number; source
   amount?: number;
   // DT79: what a batch recipe says it makes, plural (sarmas, bars), and the count picked for the slot or set by hand. Without
   // a unit the recipe was divided by the Plate into portions, and is shopped as its share
-  unit?: string; usual?: number };
+  unit?: string; usual?: number;
+  // 0.2.121 (Tester 2, Milan 28 October 15:32): the recipe's foods and grams when it was planned; a recipe changed since then
+  // updates the slot, on today and later, when the slot still holds the recipe as planned
+  sig?: string };
 export type Planned = Record<string, Record<string, PlannedMeal>>; // by date (ymd), then by slot id
 
 const KEY = "chefmealan-planned";
@@ -24,13 +27,29 @@ export const getPlanned = (): Planned => { try { return JSON.parse(localStorage.
 export const storePlanned = (p: Planned) => { try { localStorage.setItem(KEY, JSON.stringify(p)); } catch {} };
 // R21 (0.2.49, board RS20): a recipe planned before 0.2.49 kept the numbers of the portion saved in grams (649 kcal for a
 // fritter the recipe counts at 650); read again, it counts one of what the recipe makes, as every screen now does
-export function refreshPlanned(p: Planned, meals: Meal[]): Planned {
+export const itemsSig = (items: Ingredient[] | undefined) => (items ?? []).map((i) => `${i.food.id}:${Math.round(i.grams)}`).join("|");
+const localDay = (d = new Date()) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+export function refreshPlanned(p: Planned, meals: Meal[], today = localDay()): Planned {
   const byId = new Map(meals.map((m) => [m.id, m]));
   let changed = false;
   const next: Planned = {};
   for (const [date, day] of Object.entries(p)) {
     next[date] = {};
-    for (const [slot, m] of Object.entries(day)) {
+    for (const [slot, m0] of Object.entries(day)) {
+      let m = m0;
+      // 0.2.121: a recipe edited after it was planned (egg whites out, cheese in): today's and later slots that still hold it as
+      // planned take the recipe as it is now, at the same amount. A slot changed for one day, a past day or a skipped one stay.
+      const rec = m.mealId ? byId.get(m.mealId) : undefined;
+      if (rec && m.items?.length && date >= today && !m.skipped && !m.note) {
+        const sigNow = itemsSig(fromMeal(rec, m.source).items);
+        const asPlanned = m.sig ?? (m.items.some((i) => i.dish) || m.source === "plate" ? null : itemsSig(m.items));
+        if (asPlanned && itemsSig(m.items) === asPlanned && sigNow !== asPlanned) {
+          const f = fromMeal(rec, m.source);
+          if (isBatch(f)) { const c = Math.max(1, Math.round(m.amount ?? m.usual ?? 1)); m = { ...withPieces({ ...f, title: m.title }, c, false), usual: m.usual ?? c, sig: sigNow }; }
+          else { const a = m.amount ?? 1; m = { ...m, ...f, title: m.title, kcal: Math.round(f.kcal * a), protein: Math.round(f.protein * a), amount: m.amount, usual: m.usual, sig: sigNow }; }
+          changed = true;
+        }
+      }
       const r = m.mealId && !m.servings ? byId.get(m.mealId) : undefined;
       if (r && servingsOf(r) > 1) { const f = fromMeal(r, m.source); const a = m.amount ?? 1; next[date][slot] = { ...m, kcal: Math.round(f.kcal * a), protein: Math.round(f.protein * a), servings: f.servings, ...(f.unit ? { unit: f.unit } : {}) }; changed = true; }
       // DT80: a recipe now says what it makes (or makes something else): a planned meal of it takes the new pieces, as many as
@@ -96,7 +115,7 @@ export function fromMeal(m: Meal, source: Source): PlannedMeal {
   const t = aggregate(items);
   const n = b ? b.made : servingsOf(m);
   const ratio = n > 1 ? 1 / n : m.portion && t.weight > 0 ? Math.min(1, m.portion / t.weight) : 1;
-  return { title: m.title, kcal: Math.round((t.calories ?? 0) * ratio), protein: Math.round((t.protein ?? 0) * ratio), source, mealId: m.id, items, portion: m.portion, ...(n > 1 ? { servings: n, ...(m.makes?.unit && m.makes.n > 1 ? { unit: m.makes.unit } : {}) } : {}) };
+  return { title: m.title, kcal: Math.round((t.calories ?? 0) * ratio), protein: Math.round((t.protein ?? 0) * ratio), source, mealId: m.id, items, portion: m.portion, sig: itemsSig(items), ...(n > 1 ? { servings: n, ...(m.makes?.unit && m.makes.n > 1 ? { unit: m.makes.unit } : {}) } : {}) };
 }
 
 // DT79 (Milan 23 October 11:12 and 11:15): a batch recipe is planned in whole pieces of what it makes, 3 sarmas. Chef Mealan

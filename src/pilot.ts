@@ -247,6 +247,8 @@ export type PilotState = {
   feedback: Feedback[];
   preferences: string;
   items: Ingredient[];
+  // 0.2.121: the meal picked for this plate (meal:<slot>, snack, exploring); none: the meal of the clock
+  pick?: string | null;
   title: string;
   portion: number | null;
   // the recipe the plate came from, when it came in from a screenshot or a link (0.2.16, board IM): How was it points at it

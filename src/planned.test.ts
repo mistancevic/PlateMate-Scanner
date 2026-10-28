@@ -208,3 +208,22 @@ test("DT81: Cook it sizes the recipe; a counted batch sets what one piece is", (
   assert.equal(after.servings, 11); assert.equal(after.kcal, Math.round(1000 * food.calories / 100 / 11));
   assert.equal(after.items![0].grams, 1000);
 });
+
+// 0.2.121 (Tester 2, Milan 28 October 15:32): a recipe edited after it was planned
+
+test("0.2.121: an edited recipe updates today's and later slots that hold it as planned; past, changed and skipped stay", () => {
+  const egg = { ...food, id: "w", name: "Egg whites", calories: 52, protein: 11 }, cheese = { ...food, id: "c", name: "Cheese", calories: 350, protein: 25 };
+  const r0 = { id: "r", title: "Breakfast", items: [{ id: "1", food, grams: 200, locked: false }, { id: "2", food: egg, grams: 150, locked: false }], portion: 350, savedAt: "" } as any;
+  const planned0 = fromMeal(r0, "mine");
+  const p = { "2026-10-27": { breakfast: planned0 }, "2026-10-28": { breakfast: planned0 }, "2026-10-29": { breakfast: { ...planned0, note: "changed for this day" } }, "2026-10-30": { breakfast: { ...planned0, skipped: true } } };
+  const r1 = { ...r0, items: [r0.items[0], { id: "3", food: cheese, grams: 30, locked: false }], portion: 230 };
+  const next = refreshPlanned(p as any, [r1], "2026-10-28");
+  assert.equal(next["2026-10-27"].breakfast.kcal, planned0.kcal);
+  assert.equal(next["2026-10-28"].breakfast.kcal, fromMeal(r1, "mine").kcal);
+  assert.equal(next["2026-10-28"].breakfast.items!.some((i: any) => i.food.id === "c"), true);
+  assert.equal(next["2026-10-29"].breakfast.kcal, planned0.kcal);
+  assert.equal(next["2026-10-30"].breakfast.kcal, planned0.kcal);
+  // a slot planned before 0.2.121 has no sig: it is read from its foods
+  const { sig, ...old } = planned0 as any; void sig;
+  assert.equal(refreshPlanned({ "2026-10-28": { breakfast: old } } as any, [r1], "2026-10-28")["2026-10-28"].breakfast.kcal, fromMeal(r1, "mine").kcal);
+});

@@ -42,3 +42,14 @@ test("DT136: a food on a plate, in a recipe, logged or a favourite is used", () 
   const used = usedIds({ items: [{ food: { id: "u1" } }], meals: [], feedback: [{ foods: [{ id: "u2" }] }], foods }, null);
   assert.deepEqual([...used].sort(), ["u1", "u2", "u3"]);
 });
+
+// 0.2.121 (Tester 2, Milan 15:24): the coach's and the client's notes are merged before a write, never lost
+import { mergeNotes, unseenFromCoach, repliesSince } from "./coachNotes";
+test("0.2.121: a note written while the other side wrote stays; Got it is kept from either copy", () => {
+  const a = [{ at: "2026-10-28T10:00:00Z", by: "coach" as const, text: "Nice week" }, { at: "2026-10-28T11:00:00Z", by: "client" as const, text: "Thanks" }];
+  const b = [{ at: "2026-10-28T10:00:00Z", by: "coach" as const, text: "Nice week", readAt: "2026-10-28T10:30:00Z" }, { at: "2026-10-28T11:05:00Z", by: "coach" as const, text: "More protein at lunch" }];
+  const m = mergeNotes(a, b);
+  assert.deepEqual(m.map((n) => n.text), ["Nice week", "Thanks", "More protein at lunch"]);
+  assert.equal(m[0].readAt, "2026-10-28T10:30:00Z");
+  assert.equal(unseenFromCoach(m), 1); assert.equal(repliesSince(m, "2026-10-28T10:30:00Z"), 1);
+});

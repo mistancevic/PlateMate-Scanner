@@ -112,13 +112,22 @@ export async function answerReview(clientUid: string, status: "approved" | "chan
   await updateDoc(doc(db(), "users", clientUid), { numbersReview: { ...prev, status, note: note.trim() || null, by: coachName, at: new Date().toISOString() } });
 }
 // 0.2.6 (canvas board CW): the coach's note, the check-in day, and a goal from a later date, written on the client's account
-export async function sendCoachNote(clientUid: string, notes: import("./coachNotes").CoachNote[]) { await updateDoc(doc(db(), "users", clientUid), { coachNotes: notes }); }
+export async function sendCoachNote(clientUid: string, notes: import("./coachNotes").CoachNote[]) { return writeNotes(clientUid, notes); }
+// 0.2.121: the thread is merged with the account's copy before it is written, so neither side's note is lost
+async function writeNotes(uid: string, notes: import("./coachNotes").CoachNote[]) {
+  const { mergeNotes, notesOf } = await import("./coachNotes");
+  let remote: import("./coachNotes").CoachNote[] = [];
+  try { const d = await getDoc(doc(db(), "users", uid)); remote = notesOf((d.data() as any)?.coachNotes); } catch { /* not readable: write ours */ }
+  const merged = mergeNotes(remote, notes);
+  await updateDoc(doc(db(), "users", uid), { coachNotes: merged });
+  return merged;
+}
 export async function setCheckinDay(clientUid: string, day: number) { await updateDoc(doc(db(), "users", clientUid), { checkinDay: day }); }
 export async function setClientGoalFrom(clientUid: string, coachGoal: { band: string; kcal: number; protein: number; from: string; by: string }) {
   await updateDoc(doc(db(), "users", clientUid), { coachGoal: { ...coachGoal, at: new Date().toISOString() }, coachSetAt: new Date().toISOString() });
 }
 // the client's own answer on the thread: Got it and Reply
-export async function saveOwnNotes(uid: string, notes: import("./coachNotes").CoachNote[]) { await updateDoc(doc(db(), "users", uid), { coachNotes: notes }); }
+export async function saveOwnNotes(uid: string, notes: import("./coachNotes").CoachNote[]) { return writeNotes(uid, notes); }
 export async function setClientGoal(clientUid: string, goal: any, goals: { calories: number; protein: number }, coachName: string) {
   await updateDoc(doc(db(), "users", clientUid), {
     goal: { ...goal, setBy: "coach", coachName, setAt: new Date().toISOString(), source: "coach" },
