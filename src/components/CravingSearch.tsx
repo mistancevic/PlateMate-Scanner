@@ -4,6 +4,9 @@
 // and the app works out every number from the foods. Picking a dish puts it on the plate, as Make it does.
 import { recipeName } from "../recipeDiff";
 import { cookTitle } from "../cookWords";
+import { ThinkingCard } from "./ThinkingCard";
+import { sameFoodName } from "../mixtip";
+import { placeName } from "../places";
 import { carriedLists } from "../carry";
 import { tasteOfWords } from "../craving";
 import { tasteForReq } from "../tasteChips";
@@ -78,18 +81,19 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
     try {
       const res = await fetch("/api/crave", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
         craving, minPd: c.minPd, target, need, kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), region: p.region,
-        library: state.foods.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), avoid: shown, carried: carriedLists(state.meals, state.feedback), tastes: tasteForReq(p.personal.tasteChips, state.preferences) }) });
+        library: state.foods.filter(p.inPlace).slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), place: placeName(p.herePlace ?? p.region ?? "") || null, avoid: shown, carried: carriedLists(state.meals, state.feedback), tastes: tasteForReq(p.personal.tasteChips, state.preferences) }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `${CHEF_NAME} could not answer.`);
       if (data.error) throw new Error(data.message || `${CHEF_NAME} has no idea for that right now.`);
       const items = (data.idea?.items ?? []).map(safeIdeaItem).filter(Boolean).map((i: NonNullable<ReturnType<typeof safeIdeaItem>>) => {
-        const lib = state.foods.find((f) => f.name.toLowerCase() === i.name.toLowerCase());
+        // DT148 (0.2.129): your own food by its name, or by the same name without its other name (Quark, low fat (Magerquark))
+        const lib = state.foods.find((f) => f.name.toLowerCase() === i.name.toLowerCase()) ?? state.foods.filter(p.inPlace).find((f) => sameFoodName(f.name, i.name));
         return { id: uid(), food: lib ?? estimate(i), grams: i.grams, locked: true };
       }).filter((i: { food: Food }) => !validateFood(i.food).length);
       if (items.length < 2) throw new Error(`${CHEF_NAME} has no idea for that right now. Try other words.`);
       if (items.some((i: { food: Food }) => blockedByAllergy(i.food, allergies))) throw new Error(`${CHEF_NAME}'s idea had a food you can't have. Ask again.`);
       const total = items.reduce((n: number, i: { grams: number }) => n + i.grams, 0);
-      const meal: Meal = { id: uid(), title: cookTitle(String(data.idea.title).slice(0, 80)), items, portion: total, savedAt: new Date().toISOString(), steps: [], idea: { at: new Date().toISOString(), craving: craving.slice(0, 80) } };
+      const meal: Meal = { id: uid(), title: cookTitle(String(data.idea.title).slice(0, 80)), items, portion: total, savedAt: new Date().toISOString(), steps: [], idea: { at: new Date().toISOString(), craving: craving.slice(0, 80), how: (Array.isArray(data.idea.how) ? data.idea.how : []).map((x: unknown) => String(x).slice(0, 220)).filter(Boolean).slice(0, 5) } };
       setState((s) => ({ ...s, meals: [meal, ...s.meals] }));
       setShown((l) => [...l, meal.title].slice(-9));
       setIdea({ meal, why: String(data.idea.why ?? "") });
@@ -108,7 +112,7 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
     <div className="crave">
       <input className="search crave-box" aria-label="What are you craving?" placeholder="Crêpes, sarma, chocolate PD 7+…" value={q} onChange={(e) => { setQ(e.target.value); setIdea(null); }} />
       {!active && <small className="muted crave-hint">Finds dishes in your recipes, Coach's, the members' and {CHEF_NAME}'s, and your foods. Add PD 7+ to keep only dishes at PD 7 or more.</small>}
-      {asking && <div className="card crave-ask crave-thinking" role="status"><b>{CHEF_NAME} is making {/^(a|an|the|some)\b/i.test(asking) ? asking : `an idea for ${asking}`}…</b><small className="muted">It takes a few seconds. One idea at a time.</small></div>}
+      {asking && <ThinkingCard className="crave-ask crave-thinking" title={`${CHEF_NAME} is making ${/^(a|an|the|some)\b/i.test(asking) ? asking : `an idea for ${asking}`}`} sub={`From your foods${placeName(p.herePlace ?? p.region ?? "") ? `, sold in ${placeName(p.herePlace ?? p.region ?? "")}` : ""}`} />}
       {active && groups && !idea && !asking && (<>
         {c.minPd !== null && <div className="crave-chips"><button type="button" className="pill pill-small" aria-label={`Remove the filter PD ${c.minPd} and up`} onClick={() => setQ(q.replace(/\bpd\s*(?:of\s*)?(?:>=|≥|>|over|above|at least)?\s*\d{1,2}(?:[.,]\d)?\s*(?:\+|or more|and up|or higher|plus)?/i, "").replace(/\s+/g, " ").trim())}>PD {fmt(c.minPd, 1)} and up ✕</button></div>}
         {groups.groups.map((g) => <div key={g.key}><small className="pick-group crave-group">{g.title}</small><div className="menu-list pick-list">{g.shown.map(row)}</div></div>)}
@@ -134,7 +138,14 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
         <div className="card crave-idea">
           <div className="crave-idea-top"><b>{idea.meal.title}</b>{pdCell(ideaNums)}</div>
           {idea.why && <small className="muted">{idea.why}</small>}
-          <small className="muted">{idea.meal.items.map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(" · ")}. One serving: {fmt(ideaNums.kcal, 0)} kcal · {fmt(ideaNums.protein, 0)} g protein.</small>
+          {/* DT148 (0.2.129, board Stories100 version 2; Coach Milan 28 October 23:10): the idea is to read. Its foods as points with
+              their grams, how to make it, then the Plate, where every change happens */}
+          <div className="crave-read">
+            <b>For one serving</b>
+            <ul className="crave-foods">{idea.meal.items.map((i) => <li key={i.id}>{fmt(i.grams, 0)} g {i.food.name}</li>)}</ul>
+            {(idea.meal.idea?.how ?? []).length > 0 && <><b>How to make it</b><ol className="crave-how">{idea.meal.idea!.how!.map((x, k) => <li key={k}>{x}</li>)}</ol></>}
+          </div>
+          <small className="muted">One serving: {fmt(ideaNums.kcal, 0)} kcal · {fmt(ideaNums.protein, 0)} g protein. To change a food, put it on your plate: swap, remove, add and the amounts are all there.</small>
           <small className="muted">The numbers are from the foods, calculated by the app; a food you don't have is {CHEF_NAME}'s estimate.</small>
           <small className="crave-kept">Kept in My recipes as an idea, not made yet.</small>
           <button type="button" className="pill pill-primary pill-wide" onClick={() => { const m = idea.meal; setIdea(null); setQ(""); p.openOnPlate(m); keepTaste(); }}>Put it on my plate</button>

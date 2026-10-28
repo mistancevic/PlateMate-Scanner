@@ -202,7 +202,7 @@ export function FoodsScreen(p: AppApi) {
               <button className="name-link" onClick={() => setMfCard(r.food)}>{r.names[0]}</button>
               <small>{rowLine(r)}</small>
             </div>
-            <button className="pill pill-small" onClick={() => take(r)}>Take it</button>
+            <button className="pill pill-small" onClick={() => take(r)}><Plus size={14} /> Add</button>
           </div>
         ))}
         {state.foods.length === 0 && !q && <small>No saved foods yet. Scan or type one above.</small>}

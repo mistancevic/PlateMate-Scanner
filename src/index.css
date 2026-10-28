@@ -2269,3 +2269,30 @@ input::placeholder { color: #8a93a6; font-style: italic; font-weight: 400; opaci
 .shop-step .starter-line { margin-top: 6px; }
 .shop-step .starter-line small { display: block; }
 .shop-step .shop-done { margin: 16px 0 24px; }
+
+/* DT148 (0.2.129, board Stories100 version 2): the thinking card moves; the idea to read; + Add a food under the foods; swap groups */
+.thinking-card { display: flex; flex-direction: row; gap: var(--s3); align-items: center; text-align: left; }
+.thinking-hat { position: relative; width: 56px; height: 56px; flex: none; }
+.thinking-hat img { width: 56px; height: 56px; animation: hat-stir 1.6s ease-in-out infinite; transform-origin: 50% 85%; }
+.thinking-steam { position: absolute; right: -6px; top: -4px; display: flex; gap: 3px; }
+.thinking-steam i { width: 6px; height: 6px; border-radius: 50%; background: var(--brand); opacity: 0.2; animation: steam 1.2s ease-in-out infinite; }
+.thinking-steam i:nth-child(2) { animation-delay: 0.2s; } .thinking-steam i:nth-child(3) { animation-delay: 0.4s; }
+.thinking-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.thinking-slow { color: var(--close-text); font-weight: 700; }
+.thinking-bar { position: relative; height: 6px; border-radius: 3px; background: var(--tint); overflow: hidden; margin-top: 6px; }
+.thinking-bar i { position: absolute; top: 0; bottom: 0; width: 38%; border-radius: 3px; background: var(--brand); animation: bar-run 1.4s ease-in-out infinite alternate; }
+@keyframes hat-stir { 0%, 100% { transform: rotate(-8deg) translateY(0); } 50% { transform: rotate(8deg) translateY(-3px); } }
+@keyframes steam { 0%, 100% { opacity: 0.2; transform: translateY(0); } 50% { opacity: 1; transform: translateY(-4px); } }
+@keyframes bar-run { from { left: 0; } to { left: 62%; } }
+@media (prefers-reduced-motion: reduce) { .thinking-hat img, .thinking-steam i, .thinking-bar i { animation: none; } .thinking-steam i { opacity: 0.6; } }
+.crave-read { display: flex; flex-direction: column; gap: 4px; margin: 6px 0; }
+.crave-foods { margin: 0 0 6px 20px; padding: 0; list-style: disc; line-height: 1.6; }
+.crave-how { margin: 0 0 4px 20px; padding: 0; list-style: decimal; line-height: 1.5; }
+.crave-how li { margin-bottom: 4px; }
+.swipe-line { display: block; padding: 6px 2px 0; }
+.add-here-open { display: block; padding: 10px 2px; font-weight: 800; font-size: var(--fs-body); }
+.add-here { border: 1.5px solid var(--line); border-radius: var(--r-control); padding: 10px; margin: 8px 0; display: flex; flex-direction: column; gap: 8px; background: var(--surface); }
+.add-here-top { display: flex; justify-content: space-between; align-items: center; }
+.add-here-top b { color: var(--brand-text); font-size: var(--fs-body); }
+.swap-group { display: block; margin-top: 8px; }
+.swap-more { display: block; margin: 10px 0 4px; font-weight: 800; text-align: left; }

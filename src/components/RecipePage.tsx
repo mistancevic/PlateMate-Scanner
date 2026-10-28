@@ -1,3 +1,4 @@
+import { ThinkingCard } from "./ThinkingCard";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { cookName, weighLine } from "../cookWords";
 import { tempsIn } from "../units";
@@ -388,7 +389,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
             const orig = meal.source?.steps ?? [], own = meal.steps ?? [];
             const now = foodNames(meal.items);
             const diff = diffFoods(now, originalFoods ?? null), stale = own.length ? diffFoods(now, meal.stepsFor) : null;
-            const status = drafting === "working" ? <small className="rq-drafting">Chef Mealan is writing the steps.</small> : drafting ? <small className="rq-drafting">{drafting}</small> : null;
+            const status = drafting === "working" ? <ThinkingCard className="rq-drafting" title="Chef Mealan is writing the steps" /> : drafting ? <small className="rq-drafting">{drafting}</small> : null;
             const by = meal.source?.name ? `As ${meal.source.name} writes them, for the whole recipe.` : "As the original writes them, for the whole recipe.";
             const ownList = (<>
               {stale && <StepsHint tone="warn">These steps were written for the earlier foods. {diffLine(stale)}</StepsHint>}

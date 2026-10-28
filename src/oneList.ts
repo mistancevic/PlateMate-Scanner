@@ -43,8 +43,9 @@ export function rowLine(r: Row): string {
   const f = r.food, pd = density(f.protein, f.calories);
   const nums = `${f.calories === null ? "?" : Math.round(f.calories)} kcal · ${f.protein === null ? "?" : f.protein} g protein per 100 g`;
   if (r.kind === "mine") return [f.brand, nums, r.names.length > 1 ? `also ${r.names.slice(1).join(", ")}` : ""].filter(Boolean).join(" · ");
-  if (r.kind === "member") return [f.brand || (f.barcode ? "" : "no barcode"), nums, `a member's, ${r.seen || "market not set"}`].filter(Boolean).join(" · ");
-  if (r.kind === "basic") return ["basic food", nums, r.names.length > 1 ? r.names.slice(1).join(" · ") : ""].filter(Boolean).join(" · ");
+  // DT148 (0.2.129): one word, + Add; the line says the food joins yours
+  if (r.kind === "member") return [f.brand || (f.barcode ? "" : "no barcode"), nums, `a member's, ${r.seen || "market not set"}; joins your foods`].filter(Boolean).join(" · ");
+  if (r.kind === "basic") return ["basic food; joins your foods", nums, r.names.length > 1 ? r.names.slice(1).join(" · ") : ""].filter(Boolean).join(" · ");
   return [f.brand, r.product.quantity, nums].filter(Boolean).join(" · ");
 }
 export const pdOfRow = (r: Row) => density(r.food.protein, r.food.calories);

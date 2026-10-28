@@ -1,6 +1,6 @@
 // Ranking replacements for one food on a plate. Pure code: the evals run it directly.
 import { solveIngredient, type Ingredient, type Food } from "./pilot";
-export type SwapOption = { f: Food; grams: number | null; fits: boolean };
+export type SwapOption = { f: Food; grams: number | null; fits: boolean; kind?: number };
 export const stem = (name: string) => name.toLowerCase().split(/[\s,(]+/).filter((w) => w.length >= 3)[0] ?? name.toLowerCase();
 // A replacement never is, or contains, the food that's missing.
 export const sameFood = (a: string, b: string) => { const s = stem(b); return a.toLowerCase().includes(s); };
@@ -17,7 +17,10 @@ const ROLES: [Role, RegExp][] = [
 ];
 export const roleOf = (name: string): Role => ROLES.find(([, re]) => re.test(name))?.[0] ?? "other";
 const NEAR: Partial<Record<Role, Role[]>> = { dairy: ["supplement"], supplement: ["dairy"], sweet: ["fruit"], fruit: ["sweet"], nut: ["sweet"] };
-export function rankSwaps(items: Ingredient[], slotId: string, library: Food[], target: number, cap: number | null, missing?: string, rules?: (f: Food, plate: Food[]) => boolean): SwapOption[] {
+// DT148 (0.2.129): with kindOf (C51 in src/mixtip.ts) the list is the same kind first, then your foods before the ones that
+// would join them (basic or members' foods, ids ref: and mf:), then how well each brings the plate to the target; a food that
+// is the one swapped away under another name never shows (sameName, also from the rules module)
+export function rankSwaps(items: Ingredient[], slotId: string, library: Food[], target: number, cap: number | null, missing?: string, rules?: (f: Food, plate: Food[]) => boolean, kindOf?: (gone: Food, f: Food) => number, sameName?: (a: string, b: string) => boolean): SwapOption[] {
   const slot = items.find((i) => i.id === slotId); if (!slot) return [];
   const gone = missing ?? slot.food.name;
   const role = roleOf(slot.food.name);
@@ -29,7 +32,7 @@ export function rankSwaps(items: Ingredient[], slotId: string, library: Food[], 
   const rank = (f: Food) => { if (same(f)) return -1; const r = roleOf(f.name); return r === role ? 0 : NEAR[role]?.includes(r) ? 1 : 2; };
   return library
     .filter((f) => !items.some((i) => i.food.id === f.id))
-    .filter((f) => f.name.trim().toLowerCase() !== gone.trim().toLowerCase())
+    .filter((f) => f.name.trim().toLowerCase() !== gone.trim().toLowerCase() && !(sameName && sameName(f.name, gone)))
     .filter((f) => !(sweetPlate && roleOf(f.name) === "savoury"))
     // DT115 (0.2.96), found on the board: the swap goes through the rules module like every other list (C6 no ingredient, C20
     // who goes with whom, C21 a spread's carrier), judged against the rest of the plate without the food that leaves
@@ -39,8 +42,10 @@ export function rankSwaps(items: Ingredient[], slotId: string, library: Food[], 
       const r = solveIngredient(trial, slotId, target, null);
       const grams = r.ok ? r.grams : null;
       const fits = grams !== null && grams <= (cap ?? Infinity);
-      return { f, grams, fits, rank: rank(f) };
+      return { f, grams, fits, rank: rank(f), kind: kindOf ? kindOf(slot.food, f) : 0, joins: /^(ref|mf):/.test(f.id) ? 1 : 0 };
     })
-    .sort((a, b) => (a.fits !== b.fits ? (a.fits ? -1 : 1) : a.rank !== b.rank ? a.rank - b.rank : (a.grams ?? 1e9) - (b.grams ?? 1e9)))
-    .map(({ f, grams, fits }) => ({ f, grams, fits }));
+    .sort((a, b) => kindOf
+      ? a.kind - b.kind || a.joins - b.joins || (a.fits !== b.fits ? (a.fits ? -1 : 1) : (a.grams ?? 1e9) - (b.grams ?? 1e9))
+      : (a.fits !== b.fits ? (a.fits ? -1 : 1) : a.rank !== b.rank ? a.rank - b.rank : (a.grams ?? 1e9) - (b.grams ?? 1e9)))
+    .map(({ f, grams, fits, kind }) => ({ f, grams, fits, ...(kindOf ? { kind } : {}) }));
 }

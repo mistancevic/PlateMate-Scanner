@@ -1,3 +1,4 @@
+import { ThinkingCard } from "./ThinkingCard";
 import { useState } from "react";
 import { X } from "lucide-react";
 import type { ReadRecipe } from "../recipeIn";
@@ -41,6 +42,7 @@ export function ShotsCard({ shots, reading, slow, add, remove, read, cancel }: {
         {shots.length < MAX_SHOTS && !reading && <label className="in-thumb in-add"><span>+ Add</span><input type="file" accept="image/*" multiple onChange={(e) => { add(e.target.files); e.target.value = ""; }} /></label>}
       </div>
       <button className="pill pill-primary pill-wide" disabled={!shots.length || reading} onClick={read}>{reading ? `${CHEF_NAME} is reading…` : shots.length === 1 ? "Read it" : "Read them"}</button>
+      {reading && <ThinkingCard quietSlow title={`${CHEF_NAME} is reading ${shots.length === 1 ? "the picture" : "the pictures"}`} />}
       {reading && slow && <small className="rq-drafting in-slow" role="status">{SLOW.replace("This page takes", shots.length === 1 ? "This picture takes" : "These pictures take")}</small>}
       <small className="muted">{CHEF_NAME} reads the foods, the amounts and where the recipe came from. The pictures stay with the recipe, for you only.</small>
     </section>
@@ -54,6 +56,7 @@ export function LinkCard({ url, reading, slow, setUrl, read, cancel }: { url: st
       <div className="card-top"><span>A recipe from a link</span><button className="link" onClick={cancel}>Cancel</button></div>
       <input className="search" type="url" inputMode="url" aria-label="Link to a recipe" placeholder="https://…" value={url} onChange={(e) => setUrl(e.target.value)} disabled={reading} />
       <button className="pill pill-primary pill-wide" disabled={!/^https?:\/\/\S+\.\S+/i.test(url.trim()) || reading} onClick={read}>{reading ? `${CHEF_NAME} is reading…` : "Read it"}</button>
+      {reading && <ThinkingCard quietSlow title={`${CHEF_NAME} is reading the recipe`} />}
       {reading && slow && <small className="rq-drafting in-slow" role="status">{SLOW}</small>}
       <small className="muted">A recipe page from a website. Instagram and TikTok links need a login, so they don't open for us: use Screenshot there.</small>
       <small className="muted">The link stays with the recipe, so you can always go back to the original.</small>

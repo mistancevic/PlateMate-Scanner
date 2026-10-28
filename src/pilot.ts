@@ -166,7 +166,7 @@ export type Meal = {
   // what kind of plate this is (Today, 10 October 2026): a meal, or a dessert sized at about a tenth of the day
   kind?: PlateKind;
   // R17 (0.2.45, board RS16): Chef Mealan's idea for a craving, kept until it is made once or removed
-  idea?: { at: string; craving?: string; from?: "photo" };
+  idea?: { at: string; craving?: string; from?: "photo"; how?: string[] };
   // DT130 (0.2.110): photos that are not the person's own (an idea from a friend's plate, a plate online), by fingerprint:
   // the recipe's picture for the person, never offered to members or the public page
   foreignPhotos?: string[];
