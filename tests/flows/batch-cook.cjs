@@ -74,8 +74,9 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   ok(per.length === 2 && per.every(([s, k]) => s === planned + 1 && Math.abs(k - want) <= 1), `a planned sarma is now 1/${planned + 1} of the batch: ${JSON.stringify(per)}, about ${want} kcal`);
   // from scratch: no recipe yet; the foods on the Plate are what you cook, and the save asks what it made
   await nav("Plate");
-  await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300);
+  // changed by DT148 (0.2.129): + Add a food now sits under the foods; the quick picks' Add is the exact name
+  await page.getByRole("button", { name: "Add", exact: true }).first().click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Add", exact: true }).first().click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).first().click(); await page.waitForTimeout(900);
   // 0.2.88 (DT93, DT94): Fit works in place; Lock the recipe goes on
   await page.getByRole("button", { name: /^Lock the recipe$/ }).first().click(); await page.waitForTimeout(600);
@@ -94,8 +95,9 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   ok(fresh && fresh.makes?.n === 10 && fresh.makes.unit === "sarmas", "the new recipe makes 10 sarmas: " + JSON.stringify(fresh && fresh.makes));
   // clearly more than one meal: the save asks, with the Plate's guess in it
   await nav("Plate");
-  await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300);
-  await page.getByRole("button", { name: /Add/ }).first().click(); await page.waitForTimeout(300);
+  // changed by DT148 (0.2.129): + Add a food now sits under the foods; the quick picks' Add is the exact name
+  await page.getByRole("button", { name: "Add", exact: true }).first().click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Add", exact: true }).first().click(); await page.waitForTimeout(300);
   for (const inp of await page.locator('input[aria-label^="Grams of"]').all()) { await inp.fill("900"); }
   await page.waitForTimeout(300);
   // changed by DT110 (0.2.94): a plate this big gets Chef Mealan's two-lunches card with its own Keep it as it is; the step on is Lock the recipe
