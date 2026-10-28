@@ -1,3 +1,4 @@
+// Changed by DT148 (0.2.129, board Stories100 version 2; Coach Milan 28 October 22:51): Take it reads + Add everywhere.
 // JOURNEY INVARIANT (Milan, 5 October 2026): on Foods, finding and adding are two things. Find a food searches only my foods,
 // letters or a saved barcode, and never adds. Add a food is one row, Type, Barcode, Scan; what was typed in Find rides along.
 // The sheet's title is the word tapped, under a small ADD A FOOD line.
@@ -43,14 +44,14 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(/Can't find what you want\?/.test(await page.locator(".end-add").textContent()), "with results, the end card asks in plain words");
   // a food without a label goes straight in
   await page.getByLabel("Find a food").fill("tikvice"); await page.waitForTimeout(900);
-  await page.locator(".rows .row-basic").first().getByRole("button", { name: "Take it" }).click(); await page.waitForTimeout(400);
+  await page.locator(".rows .row-basic").first().getByRole("button", { name: "Add" }).click(); await page.waitForTimeout(400);
   ok((await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).foods.some((f) => /Tikvice/.test(f.name) && f.refId))), "Take it puts a basic food in my foods, with its identity");
   await page.waitForTimeout(500);
   ok(await page.locator(".rows .row-basic").filter({ hasText: /Tikvice/ }).count() === 0, "DT125: the same food is never two rows: the basic row is gone, yours stands");
   // a food without a label saved under the shop's name is found by any of its names, and a chip never hides it in silence
   await page.evaluate(() => localStorage.setItem("chefmealan-region", "munich"));
   await page.getByLabel("Find a food").fill("kupus"); await page.waitForTimeout(900);
-  await page.locator(".rows .row-basic").filter({ hasText: /Weißkohl|Kupus/ }).first().getByRole("button", { name: "Take it" }).click(); await page.waitForTimeout(400);
+  await page.locator(".rows .row-basic").filter({ hasText: /Weißkohl|Kupus/ }).first().getByRole("button", { name: "Add" }).click(); await page.waitForTimeout(400);
   await page.waitForTimeout(400);
   await page.getByLabel("Find a food").fill(""); await page.getByLabel("Find a food").fill("Kupus"); await page.waitForTimeout(900);
   ok((await page.locator(".rows .row").filter({ hasText: /Weißkohl|Kupus|Kiseli/ }).count()) >= 1, "a food saved under its Munich name is found by its Serbian one: " + (await page.locator(".rows .row b").allTextContents()).join(", "));

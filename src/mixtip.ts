@@ -136,6 +136,18 @@ const INGREDIENT_LEAD = /^([\p{L}-]+ ){0,2}(oil|öl|sugar|zucker|salt|salz|peppe
 export const isIngredient = (f: Pick<Food, "name">) => { const n = String(f.name ?? "").trim(); return (INGREDIENT_ANY.test(n) || INGREDIENT_LEAD.test(n)) && !isVegPepper(n); };
 // C20 plus C6, for a food offered to a plate: it goes with every food already there, it makes a plate with them, it is no drink
 // and no ingredient. The tip, quick picks and swaps all ask this one question (DT101).
+// C51 (DT148, 0.2.129, board Stories100 version 2; Tester 3 swapped Quark and got Quark again, then anything by PD): a swap
+// keeps the dish. The same food under another name is no swap (Quark, low fat and Quark, low fat (Magerquark)); the same
+// food in another state leads (tuna in water for tuna in olive oil, DT115); then the same kind of food; other kinds last.
+const KIN: Partial<Record<Cat, string>> = { dairy: "soft", cottage: "soft", sweet: "sweet", spread: "sweet", meat: "meat", bgrain: "bgrain", mgrain: "mgrain", fruit: "fruit", nut: "nut", veg: "veg", fat: "fat", supplement: "supplement", sauce: "sauce" };
+const bare = (n: string) => n.toLowerCase().replace(/\([^)]*\)/g, " ").replace(/[^\p{L}\p{N}%.]+/gu, " ").replace(/\s+%/g, "%").replace(/\s+/g, " ").trim();
+export const sameFoodName = (a: string, b: string): boolean => bare(a) === bare(b);
+export function swapKind(gone: Food, f: Food): 0 | 1 | 2 {
+  const stem = bare(gone.name).split(" ").find((w) => w.length >= 3) ?? bare(gone.name);
+  if (bare(f.name).split(" ").includes(stem)) return 0;
+  const a = KIN[catOf(gone)], b = KIN[catOf(f)];
+  return a && a === b ? 1 : 2;
+}
 export function fitsPlate(f: Food, plate: Food[]): boolean {
   if (catOf(f) === "drink" || isIngredient(f)) return false;
   if (plate.some((p) => p.id === f.id)) return false;

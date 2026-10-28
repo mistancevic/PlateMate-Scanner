@@ -4,7 +4,7 @@
 // A food shows in your search when it is sold everywhere or in a place that is on. Nothing here deletes a food.
 import type { Food } from "./pilot";
 import { REGIONS, type RegionId } from "./moments";
-import { REFERENCE, localName, namesOf } from "./reference";
+import { REFERENCE, localName, namesOf, marketFoods, type RefFood } from "./reference";
 
 export type Trip = { place: RegionId; from: string; to: string; on?: boolean | null };
 
@@ -98,3 +98,12 @@ export const setTrip = (t: Trip | null) => write(TRIPKEY, t);
 export const getStarted = (): string[] => read<string[]>(STARTKEY, []);
 export const setStarted = (v: string[]) => write(STARTKEY, v);
 export const MIGRATED = "chefmealan-places-v1";
+
+// DT148 (0.2.129): the basic foods sold where you are: the table's foods sold everywhere, and each place's own (Cyprus has
+// fifty), with the place they belong to
+export function basicsHere(active: Set<string>): { ref: RefFood; place: string | null }[] {
+  const out: { ref: RefFood; place: string | null }[] = REFERENCE.filter((r) => !r.id.startsWith("cy-")).map((ref) => ({ ref, place: null }));
+  const seen = new Set<string>();
+  for (const a of active) for (const ref of marketFoods(REGIONS.find((r) => r.id === a)?.tags ?? [])) if (!seen.has(ref.id)) { seen.add(ref.id); out.push({ ref, place: a }); }
+  return out;
+}

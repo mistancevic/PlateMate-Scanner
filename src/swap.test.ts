@@ -30,3 +30,30 @@ test("DT83: the change, for one portion", () => {
   const bigger = changeOf(before, [before[0], it(mince, 1000), before[2]], 8)!;
   assert.deepEqual(bigger.moved, ["Beef mince, 15 % fat, raw, 500 g to 1,000 g"]); assert.equal(bigger.big, true, "a fifth more energy per portion turns it amber");
 });
+
+// C51 (DT148, 0.2.129, board Stories100 version 2; Tester 3 swapped Quark and got Quark again, then anything by PD)
+import { swapKind, sameFoodName, fitsPlate as fitsPlate51 } from "./mixtip";
+import { basicsHere } from "./places";
+import { rankSwaps } from "./swaps";
+import { referenceFood } from "./reference";
+test("C51: the same food under another name is no swap; the same kind first, then your foods, then the basic foods sold here", () => {
+  assert.equal(sameFoodName("Quark, low fat", "Quark, low fat (Magerquark)"), true);
+  assert.equal(sameFoodName("Tuna in olive oil", "Tuna in water"), false);
+  const F = (id: string, name: string, calories: number, protein: number, fats = 1, carbs = 4) => ({ id, name, brand: "", basis: "100g", source: "label", notes: "", reviewedAt: "", readyToEat: true, calories, protein, fats, carbs, fiber: 0 }) as any;
+  const quark = F("q", "Quark, low fat", 67, 12, 0.3, 4);
+  assert.equal(swapKind(quark, F("g", "Greek yogurt 2%", 73, 9.9)), 1);
+  assert.equal(swapKind(quark, F("c", "Cottage cheese", 98, 12)), 1);
+  assert.equal(swapKind(quark, F("w", "Whey protein powder", 380, 78)), 2);
+  assert.equal(swapKind(F("t", "Tuna in olive oil", 190, 25, 9, 0), F("t2", "Tuna in water", 110, 25, 1, 0)), 0, "the same food in another state leads (DT115)");
+  const items = [{ id: "a", food: quark, grams: 200, locked: true }, { id: "b", food: F("o", "Oats", 372, 13.5, 7, 59), grams: 30, locked: true }, { id: "c", food: F("s", "Strawberries", 32, 0.7, 0.3, 7.7), grams: 120, locked: true }];
+  let n = 0; const uid = () => "u" + n++;
+  const lib = [F("m", "Quark, low fat (Magerquark)", 67, 12, 0.3, 4), F("w", "Whey protein powder", 380, 78, 5, 6), F("g", "Greek yogurt 2%", 73, 9.9, 1.9, 3.9), F("ic", "Vanilla ice cream", 200, 3.5, 11, 23)];
+  const basics = basicsHere(new Set(["limassol"])).map(({ ref, place }) => ({ ...referenceFood(ref, "limassol", uid), id: `ref:${ref.id}`, places: place ? [place] : [] }));
+  const r = rankSwaps(items as any, "a", [...lib, ...basics], 5.2, 300, undefined, fitsPlate51, swapKind, sameFoodName);
+  assert.ok(!r.some((x) => /Magerquark/.test(x.f.name)), "Quark under another name is left out");
+  assert.equal(r[0].f.name, "Greek yogurt 2%", "yours, of the same kind, first: " + r.slice(0, 3).map((x) => x.f.name).join(", "));
+  const firstOther = r.findIndex((x) => (x.kind ?? 0) > 1), lastSame = r.map((x) => x.kind ?? 0).lastIndexOf(1);
+  assert.ok(firstOther > lastSame, "other kinds come after every food of the same kind");
+  assert.ok(r.some((x) => x.f.id === "ref:cy-yoghurt-sheep" && x.kind === 1), "a Cypriot yoghurt sold in Limassol is offered, as the same kind");
+  assert.ok(r.findIndex((x) => x.f.id.startsWith("ref:")) > r.findIndex((x) => x.f.id === "g"), "your foods before the ones that would join them");
+});

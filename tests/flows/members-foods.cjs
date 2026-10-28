@@ -1,3 +1,4 @@
+// Changed by DT148 (0.2.129, board Stories100 version 2; Coach Milan 28 October 22:51): Take it reads + Add everywhere.
 // Members' foods (0.2.97, canvas Page 2, board Stories68, DT115; Milan 24 October 19:00 and 25 October 01:47 to 02:05): one
 // catalogue of every reviewed scan. Two members on one server (in memory, no Firestore): Tester 2 in Belgrade with tuna in
 // brine, Tester 3 in Cyprus with fresh tuna, and you in Munich with tuna in olive oil. Checked: a reviewed food travels once
@@ -73,7 +74,7 @@ const U = "http://127.0.0.1:3267";
   ok(/seen in Belgrade/.test(mt) && /seen in Cyprus/.test(mt) && /no barcode/.test(mt), "DT115: each says where it was seen; a food without a barcode says so");
   ok(await page.locator(".also-seen").count() === 0 && await page.locator(".members-foods").count() === 0, "DT125: the old groups and the line under your tuna are gone; one list");
   // Take it copies it
-  await mf.filter({ hasText: "Tuna in water" }).getByRole("button", { name: "Take it" }).click(); await page.waitForTimeout(600);
+  await mf.filter({ hasText: "Tuna in water" }).getByRole("button", { name: "Add" }).click(); await page.waitForTimeout(600);
   let s = await st();
   const copy = s.foods.find((f) => f.name === "Tuna in water, drained");
   ok(copy && copy.calories === 99 && copy.barcode === "8004030044005" && copy.source === "Members' foods" && /checked by a member/.test(copy.notes), "DT115: a copy in your foods with the values and the source");
