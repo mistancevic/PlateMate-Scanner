@@ -2461,7 +2461,14 @@ export default function App() {
       pauseAccountWrites(false);
       setError(r.message || "Nothing was deleted. Try again later.");
     },
-    resetGoal: () => { clearGoal(); setState((s) => ({ ...s, goals: { ...s.goals, calories: null, protein: null } })); setGoalState(null); setGoalOpen(true); },
+    // 0.2.119 (Tester 2): Reset left fat and carbs, your own days and a waiting goal, so the old numbers came back. All of it goes
+    resetGoal: () => {
+      clearGoal();
+      setState((s) => ({ ...s, goals: { ...s.goals, calories: null, protein: null, fats: null, carbs: null } }));
+      const { ownDays, nextGoal, kept, ...rest } = getPersonal(); void ownDays; void nextGoal; void kept;
+      storePersonal(rest); setPersonalState(rest);
+      setGoalState(null); setGoalOpen(true);
+    },
     mealanCard: (
       <Mealan
         items={state.items}

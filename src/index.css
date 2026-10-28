@@ -2221,3 +2221,4 @@ button.mp-card { width: 100%; text-align: left; font: inherit; color: inherit; }
 .nt-note { font-size: var(--fs-small); color: var(--muted); line-height: 1.45; border-top: 1px solid var(--line); margin-top: 6px; padding-top: 8px; }
 .nt-more { align-self: flex-start; font-size: var(--fs-small); font-weight: 700; margin-top: 4px; }
 .nt .letters-lines { background: var(--tint); }
+.goal-missing { color: #8a4b00; background: #fff4dc; border-radius: 10px; padding: 8px 10px; margin-top: 8px; }

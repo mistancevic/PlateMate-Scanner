@@ -23,6 +23,8 @@ import { Zones } from "../components/Zones";
 type Way = "calc" | "own";
 const num = (v: string) => (v.trim() === "" ? undefined : Number(v));
 
+// what Calculate for me still needs, in plain words
+const missingOf = (d: Personal): string[] => [!d.birthYear && "your birth year", !d.heightCm && "your height", !d.weightKg && "your weight"].filter(Boolean) as string[];
 export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void; fromMe?: boolean }) {
   const { state, setState, onDone, onLater, fromMe, coach } = p;
   const consented = Boolean(p.safety.consentBodyAt);
@@ -271,7 +273,8 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               <button className="pill pill-primary pill-wide" onClick={() => apply({ source: "profile", kcal: c.kcal, protein: c.protein, fats: c.fats, carbs: c.carbs, method: c.method })}>{saveLabel(null)}</button>
             </>
           ) : (
-            <p className="small muted">{consented ? "Your body, birth year, height and weight, and your numbers appear here." : "Agree above, then fill in your body data."}</p>
+            // 0.2.119 (Tester 2, Milan 28 October 14:59): no Apply and no word why read as a dead end; say what is missing
+            <p className="small goal-missing" role="status">{!consented ? "To calculate your numbers, tap I agree above, then fill in your body." : under ? "Chef Mealan is for adults: check the birth year above." : `To calculate your numbers, fill in ${missingOf(d).join(", ")} above. Or use My own numbers.`}</p>
           )}
         </div>
       )}
@@ -297,6 +300,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
                 settle(analysisSame, `${goalNow.name} · every day the same · ${ownKcal?.toLocaleString("en")} kcal`);
                 apply({ source: "exact", kcal: ownKcal!, protein: ownProtein!, fats: ownFats ?? 0, carbs: ownCarbs ?? 0 });
               }}>{saveLabel(analysisSame)}</button>
+              {!density(ownProtein, ownKcal) && <p className="small goal-missing" role="status">Type kcal and protein above to apply.</p>}
               {p.profile.coachId && !coach && <p className="small muted">Anything kept on purpose goes to {p.coachLabel} to approve.</p>}
             </>
           ) : (
@@ -304,11 +308,20 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               <DayTable rows={ownRows} avg={ownAvg} week={weekOf(d)} own={d.ownDays ?? {}} setOwn={setOwnDay} analysis={analysisEach ?? undefined} open={isOpen} keep={keep} />
               <p className="small muted">Type any of the four. A blank one fills in and says so. Protein and carbs count 4 kcal a gram, fat 9. Chef Mealan checks a day when you leave its fields.</p>
               <ApplyFrom />
-              <button className="pill pill-primary pill-wide" disabled={!o} onClick={() => {
+              <button className="pill pill-primary pill-wide" disabled={!o && !c} onClick={() => {
+                // 0.2.119 (Tester 2): the table showed numbers and Apply stayed grey until a day was typed. Nothing typed: the
+                // calculated rows are applied as your own, so what you saw is what you get
+                if (!o && c) {
+                  const ownDays = Object.fromEntries(DAY_TYPES.map((x) => [x.id, { kcal: c.days[x.id].kcal, protein: c.days[x.id].protein, fats: c.days[x.id].fats, carbs: c.days[x.id].carbs }])) as Personal["ownDays"];
+                  setPersonalNow({ ...d, ownDays });
+                  apply({ source: "exact", kcal: c.kcal, protein: c.protein, fats: c.fats, carbs: c.carbs });
+                  return;
+                }
                 const a = o!.avg;
                 settle(analysisEach, `${goalNow.name} · each day its own · week average ${a.kcal.toLocaleString("en")} kcal`);
                 apply({ source: "exact", kcal: a.kcal, protein: a.protein, fats: a.fats, carbs: a.carbs });
               }}>{saveLabel(analysisEach)}</button>
+              {!o && !c && <p className="small goal-missing" role="status">Type the kcal for at least one day to apply. Or fill in your body under Calculate for me, and the days fill in.</p>}
               {p.profile.coachId && !coach && <p className="small muted">Anything kept on purpose goes to {p.coachLabel} to approve.</p>}
             </>
           )}
