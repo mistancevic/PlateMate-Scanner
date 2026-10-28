@@ -53,7 +53,7 @@ const path = require("node:path");
     // DT139 (0.2.124): no goal is picked for you; the days show once one is
     await page.getByRole("button", { name: /^Maintain/ }).first().click(); await page.waitForTimeout(300);
     await page.getByRole("button", { name: "Each day its own" }).click(); await page.waitForTimeout(300);
-    await page.getByRole("button", { name: /^Apply from today/ }).last().click(); await page.waitForTimeout(500);
+    await page.getByRole("button", { name: /^Apply from today/ }).last().click(); await page.waitForTimeout(500); await require("./shop-step.cjs")(page);
     // the Training week has the same days
     await require("./me.cjs")(page);
     await page.getByText("Training week", { exact: true }).first().click(); await page.waitForTimeout(400);

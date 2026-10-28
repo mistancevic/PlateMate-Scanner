@@ -590,6 +590,16 @@ function ShopPanel(p: AppApi) {
       {known.map(row)}
       {more || !p.region ? others.map(row) : others.length > 0 && <div className="place-row"><span><b>{others.length} more places</b><small>{others.map((r) => r.name.replace(/, elsewhere$/, "")).slice(0, 4).join(", ")}…</small></span><button type="button" className="link" onClick={() => setMore(true)}>Show</button></div>}
     </section>
+    <KitchensAndTools {...p} />
+      <NextLink p={p} to="coach" from="shop" text="Coach" hint="Join a coach with a code, or see yours" />
+    </>
+  );
+}
+
+// The kitchens you cook and what you cook with: on Me, Where I shop and cook, and in setup's step 4 (DT142, 0.2.127)
+export function KitchensAndTools(p: AppApi) {
+  return (
+    <>
     {/* The kitchens you cook (0.2.9, canvas board CH, CH4): the shops say what you can buy, the kitchens what you like to cook */}
     <p className="label" style={{ marginTop: 14 }}>The kitchens you cook</p>
     <section className="card kitchens" style={{ gap: 8 }}>
@@ -624,7 +634,6 @@ function ShopPanel(p: AppApi) {
         {EQUIPMENT.map(([id, name]) => { const has = equipmentOf(p.personal), on = has.includes(id); return <button key={id} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, equipment: on ? has.filter((x) => x !== id) : [...has, id] })}>{name}</button>; })}
       </div>
     </section>
-      <NextLink p={p} to="coach" from="shop" text="Coach" hint="Join a coach with a code, or see yours" />
     </>
   );
 }

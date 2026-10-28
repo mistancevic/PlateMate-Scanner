@@ -2251,3 +2251,8 @@ input::placeholder { color: #8a93a6; font-style: italic; font-weight: 400; opaci
 .week-setup .wk-edit { padding: 0 12px 10px; display: flex; flex-direction: column; gap: 6px; }
 .move-to { margin: 8px 0; }
 .door-done { margin-top: 12px; }
+/* DT142 (0.2.127): setup's step 4 */
+.shop-step .place-pick { display: flex; flex-direction: column; gap: 8px; }
+.shop-step .starter-line { margin-top: 6px; }
+.shop-step .starter-line small { display: block; }
+.shop-step .shop-done { margin: 16px 0 24px; }

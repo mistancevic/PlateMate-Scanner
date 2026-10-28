@@ -1,3 +1,5 @@
+import { KitchensAndTools } from "./MenuScreen";
+import { REGIONS } from "../moments";
 import { SafetyQuestion } from "../components/SafetyQuestion";
 import { doorAnswered } from "../safety";
 import { underAge, ADULT_ONLY } from "../safety";
@@ -7,7 +9,7 @@ import { useState } from "react";
 import { BANDS, PACES, TRAINING_AGES, isBuild, paceForAge, bandOf, goalLabel } from "../goal";
 import { density } from "../pilot";
 import { pdText, pdVal, pdTag } from "../ui";
-import { Mark, APP_NAME } from "../components/Mark";
+import { Mark, APP_NAME, CHEF_NAME } from "../components/Mark";
 import { FormulaCard, fixedOf } from "../components/FormulaCard";
 import { LIFE, DAY_TYPES, STEPS, calculate, canCalculate, macroSplit, suggestBand, dayModeOf, ownDayNumbers, weekOf, workOf, withWork, planOf, lifestyleOf, type Personal, type DayType, type DayMode, type Formula } from "../personal";
 import { INTENSITIES, LENGTHS, lengthOf, planFromCounts, weekdaysOf, usualFrom, WEEKDAY_CHOICES, ymd, withDay, lengthName, isTraining, WEEKDAYS, WEEKDAY_NAMES, WHENS, type Intensity, type Plan } from "../plan";
@@ -38,6 +40,10 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const [picked, setBand] = useState<string>(p.goal?.band ? suggestBand(p.personal, p.goal.band).id : "");
   const band = picked || suggestBand(p.personal, undefined).id;
   const [askDoor, setAskDoor] = useState(() => !doorAnswered(p.safety));
+  // DT142 (0.2.127, board Stories98; Anna's DT123; Milan 28 October 20:46 Go): the first setup (no goal yet) ends on one more
+  // step after Apply: where you live and shop (home, its starter foods), the kitchens you cook and what you cook with
+  const [firstRun] = useState(() => !p.goal);
+  const [shopStep, setShopStep] = useState(false);
   const [howOpen, setHowOpen] = useState(p.goalFocus === "formula" || Boolean(p.calcFormula));
   // the sections are numbered as they show: 1. You only once you agreed
   const nYou = 1, nGoal = consented ? 2 : 1;
@@ -114,9 +120,11 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   // the one way a goal is saved: now, or waiting for its date on Me, Goal
   const apply = (x: { source: "profile" | "exact"; kcal: number; protein: number; fats: number; carbs: number; method?: string }) => {
     p.applyGoal({ band, setBy: by, formula: formula === "auto" ? null : formula, ...(formula === "data" ? { measured: dataFixed } : {}), ...x }, from);
-    if (from <= todayKey) done();
-    else { p.notify(`${goalLabel(band)} starts on ${longDay(from)}.`); onLater(); }
+    // DT142 (0.2.127): the first setup goes on to 4. Where you shop and cook
+    if (firstRun) { setShopStep(true); window.scrollTo(0, 0); return; }
+    finish();
   };
+  const finish = () => { if (from <= todayKey) done(); else { p.notify(`${goalLabel(band)} starts on ${longDay(from)}.`); onLater(); } };
   // on save: open findings count as kept on purpose; what is kept goes to the coach; nothing kept closes a request
   const settle = (a: ReturnType<typeof analyse> | null, summary: string) => {
     const now = new Date().toISOString();
@@ -192,6 +200,25 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   };
   const wk = weekdaysOf(lifestyleOf(d));
 
+  if (shopStep) {
+    const home = REGIONS.find((r) => r.id === p.region);
+    const homeN = p.state.foods.filter(p.inPlace).length;
+    return (
+      <div className="goal-screen shop-step">
+        <p className="label calc-step">{nGoal + 2}. Where you shop and cook</p>
+        <p className="small muted">Home brings its starter foods. The kitchens and what you cook with tell {CHEF_NAME} what to suggest. You can change all of it in Me later.</p>
+        <section className="card place-pick">
+          <b>Where do you live and shop?</b>
+          <div className="moments" role="group" aria-label="Where do you live and shop?">
+            {REGIONS.map((r) => <button type="button" key={r.id} className={`choice ${p.region === r.id ? "on" : ""}`} aria-pressed={p.region === r.id} onClick={() => p.makeHome(r.id)}>{r.name}</button>)}
+          </div>
+          {home && <div className="starter-line"><b>{homeN} foods for {home.name.replace(/, elsewhere$/, "")}</b><small>With its starter foods, ready to search. <button type="button" className="link" onClick={() => { finish(); p.setTab("foods"); }}>See them in Foods ›</button></small></div>}
+        </section>
+        <KitchensAndTools {...p} />
+        <button type="button" className="pill pill-primary pill-wide shop-done" disabled={!p.region} onClick={finish}>{p.region ? "Done: to Today" : "Pick home first"}</button>
+      </div>
+    );
+  }
   return (
     <div className="goal-screen">
       <div className="goal-top">
