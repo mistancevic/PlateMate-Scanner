@@ -1,4 +1,6 @@
 // Changed by DT140 (0.2.125, board Stories96; Anna's DT117): the week is the source, tap a day; Move to on Training week.
+// Changed by DT147 (0.2.128, board Stories99 version 2): a day stays open until tapped again; on Training week it opens under
+// itself, How hard shows the zones of the one picked, and Move is one line at the end of the open day.
 // JOURNEY INVARIANT (Milan, 7 October 2026, canvas boards T1 and T3): Calculate for me asks your everyday first (your work,
 // steps on a usual day, counted on every day), then your training: Light, Moderate and Hard, each with its zones, − and +,
 // and How long as a range from 15 minutes. There is no Rest row: the days left are days without training, and + stops at 7.
@@ -40,7 +42,8 @@ const path = require("node:path");
     const setDay = async (day, level) => { await page.getByRole("button", { name: new RegExp(`^${day}:`) }).click(); await page.waitForTimeout(150); await page.getByRole("group", { name: `${day}, how hard` }).getByRole("button", { name: level, exact: true }).click(); await page.waitForTimeout(150); };
     await setDay("Monday", "Hard"); await setDay("Wednesday", "Moderate"); await setDay("Friday", "Moderate"); await setDay("Sunday", "Light");
     ok(/4 training days/.test(await tally()) && /Mon, Wed, Fri, Sun · 3 without/.test(await tally()), "4 training days, the ones tapped: " + (await tally()));
-    await page.getByRole("button", { name: /^Monday:/ }).click(); await page.waitForTimeout(150);
+    // DT147: Monday is still open; tapping Wednesday, Friday and Sunday closed nothing
+    ok(await page.locator(".week-setup .wk-edit").count() === 4, "the days tapped stay open: " + await page.locator(".week-setup .wk-edit").count());
     ok(await page.getByRole("group", { name: "Monday, how long" }).getByRole("button", { name: "60 to 90 min", pressed: true }).count() === 1, "Hard starts at 60 to 90 min");
     await page.getByRole("group", { name: "Monday, how long" }).getByRole("button", { name: "15 to 30 min" }).click(); await page.waitForTimeout(150);
     await page.getByRole("group", { name: "Monday, when" }).getByRole("button", { name: "Morning" }).click(); await page.waitForTimeout(150);
@@ -66,13 +69,16 @@ const path = require("node:path");
     ok(await ed.getByRole("button", { name: /^No training$/ }).count() === 1 && await ed.getByRole("button", { name: /^Walk$/ }).count() === 0, "No training, and no Walk");
     const hardPick = ed.getByRole("group", { name: "How hard" });
     ok((await hardPick.locator("button").allTextContents()).map((x) => x.split("Zone")[0]).join("|") === "Light|Moderate|Hard", "How hard: Light, Moderate, Hard");
-    ok(/Zone 2/.test(await hardPick.textContent()) && /Zone 5/.test(await hardPick.textContent()), "each with its zones");
+    const zones = await ed.locator(".hard-zones").textContent();
+    ok(/Zone 4/.test(zones) && /Zone 5/.test(zones) && !/Zone 2/.test(zones), "DT147: the zones of the one picked, Hard: " + zones.slice(0, 60));
     const lens = await ed.locator(".setting").filter({ hasText: "How long" }).locator("button").allTextContents();
     ok(lens.join("|") === "15–30 min|30–45 min|45–60 min|60–90 min|90+ min", "How long as ranges: " + lens.join(", "));
     await ed.getByRole("button", { name: /^No training$/ }).click(); await page.waitForTimeout(200);
     ok(/Your work and your steps still count/.test(await ed.textContent()), "No training says the work and the steps still count");
     // DT140: Move to, one tap, keeps the time; each day keeps whether it is a work day
     await page.locator(".agenda-row").nth(2).click(); await page.waitForTimeout(200);
+    ok(await page.locator(".agenda-open").count() === 2, "DT147: Wednesday opens under Wednesday; Monday stays open");
+    await page.getByRole("group", { name: "Wednesday, every week" }).getByRole("button", { name: /Move to another day/ }).click(); await page.waitForTimeout(200);
     await page.getByRole("group", { name: "Move Wednesday to" }).getByRole("button", { name: "Thu" }).click(); await page.waitForTimeout(300);
     p = await saved();
     ok(p.plan[3].intensity === "moderate" && p.plan[3].kind === "strength" && p.plan[3].when === "evening" && p.plan[2].kind === "rest" && p.plan[2].work === p.plan[3].work, "Move Wednesday to Thursday: the training goes as it is; Wednesday rests");

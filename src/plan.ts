@@ -1,3 +1,4 @@
+import { workHoursOf, suggestWhen, type WorkHours } from "./slots";
 // The Training week and Lifestyle, as approved on the canvas on 6 October 2026.
 // Lifestyle is set once: work, recovery, nutrition. The Training week is the usual week, Monday to Sunday, one activity a day.
 // Today reads the plan; a change for one date is kept for that date only and never touches the plan.
@@ -212,7 +213,7 @@ export const dayOfLoad = (t: DayType): PlanDay =>
 
 // Lifestyle. Work sets the day's baseline; the rest is kept and shown now and used by the numbers in a next release.
 export type Hours = "fixed" | "flexible" | "shifts" | "none";
-export type Slot = "9-5" | "8-4" | "7-3";
+export type Slot = "9-5" | "8-4" | "7-3" | "my";
 export type Move = "sitting" | "feet" | "physical";
 export type SchoolHours = "mornings" | "full" | "alternating" | "none";
 export type Commute = "walk" | "bike" | "bus" | "car";
@@ -220,7 +221,9 @@ export type Commute = "walk" | "bike" | "bus" | "car";
 export type Weekdays = "work" | "study" | "both" | "home";
 export type Lifestyle = {
   weekdays?: Weekdays;
-  hours?: Hours; slot?: Slot; move?: Move; travel?: "none" | "sometimes" | "often";
+  hours?: Hours; slot?: Slot; move?: Move;
+  // DT147 (0.2.128): My hours, From and To, your local time; To before From ends the next day
+  workFrom?: string; workTo?: string; travel?: "none" | "sometimes" | "often";
   // study (any adult; school for anyone under 18): hours, the way there, sport as part of the studies
   school?: SchoolHours; commute?: Commute; peWeek?: "1" | "2" | "3" | "none";
   bed?: "early" | "mid" | "late" | "varies"; wake?: "early" | "mid" | "late" | "varies";
@@ -264,11 +267,13 @@ export function dayKindOf(d: PlanDay, l: Lifestyle, minor = false): DayKind {
   const w = weekdaysOf(l);
   return w === "home" ? "off" : w === "study" ? "study" : w === "work" ? "work" : d.study ? "study" : "work";
 }
-export const SLOTS: { id: Slot; name: string }[] = [{ id: "9-5", name: "9 to 5" }, { id: "8-4", name: "8 to 4" }, { id: "7-3", name: "7 to 3" }];
+export const SLOTS: { id: Slot; name: string }[] = [{ id: "9-5", name: "9 to 5" }, { id: "8-4", name: "8 to 4" }, { id: "7-3", name: "7 to 3" }, { id: "my", name: "My hours" }];
 // the line under Your day in the day editor, the same on the Training week and on a date in Plan
 export function workHintOf(l: Lifestyle, minor: boolean): string | undefined {
   const wkd = weekdaysOf(l);
-  return minor ? "Monday to Friday start as school days. Mark a holiday as no school." : wkd === "both" ? "From Lifestyle: work and study. Pick which one each day is." : wkd === "work" && l.hours === "fixed" ? `From Lifestyle: fixed hours${l.slot ? `, ${SLOTS.find((s) => s.id === l.slot)!.name}` : ""}.` : undefined;
+  // DT147 (0.2.128): the work hours, and what they do for training
+  const wh = workHoursOf(l), hrs = wh ? ` Your work hours, ${wh.from} to ${wh.to}, keep training suggestions out of work.` : "";
+  return minor ? "Monday to Friday start as school days. Mark a holiday as no school." : wkd === "both" ? `From Lifestyle: work and study. Pick which one each day is.${hrs}` : hrs.trim() || undefined;
 }
 export const WHERE = ["Cook at home", "Meal prep for days", "Canteen at work", "Restaurants", "Takeaway", "Family dinners"];
 export const WHERE_KID = ["At home", "School lunch", "Lunch packed from home", "Bakery or shop near school", "Takeaway", "Family dinners"];
@@ -317,14 +322,15 @@ export function usualFrom(l: Lifestyle, plan: Plan | null): RhythmId[] {
 // is set as it is tapped: how hard (or no training), how long, when; nothing is guessed and the count follows from the days.
 const TRAIN_KEYS = ["kind", "intensity", "when", "minutes", "at", "sport"] as const;
 const restOf = (d: PlanDay): PlanDay => { const { work, study, pe } = d; return { work, kind: "rest", ...(study ? { study } : {}), ...(pe ? { pe } : {}) }; };
-export function withDay(plan: Plan, i: number, x: { level: Intensity | null; minutes?: number; when?: When }): Plan {
+// DT147 (0.2.128): a new training day is suggested outside the work hours (wh); a part of the day already set stays
+export function withDay(plan: Plan, i: number, x: { level: Intensity | null; minutes?: number; when?: When }, wh: WorkHours | null = null): Plan {
   const next = plan.map((d) => ({ ...d }));
   const d = next[i];
   if (x.level === null) { next[i] = restOf(d); return next; }
   const was = isTraining(d);
   const kind: Kind = was && d.kind !== "rest" ? d.kind : x.level === "easy" ? "mobility" : "strength";
   const minutes = x.minutes ?? (was ? d.minutes : undefined) ?? levelMinutes(plan, x.level) ?? START_MIN[x.level];
-  const when = x.when ?? (was ? d.when : undefined) ?? (x.level === "easy" ? "day" : "evening");
+  const when = x.when ?? (was ? d.when : undefined) ?? suggestWhen(x.level === "easy" ? "day" : "evening", wh);
   next[i] = { ...d, kind, intensity: x.level, minutes, when };
   return next;
 }

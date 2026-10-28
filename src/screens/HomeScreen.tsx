@@ -15,7 +15,7 @@ import { Picture, pictureOfRecipe } from "../components/MealPicture";
 import { PlanRow } from "../components/PlanRow";
 import { showPlanOn } from "./PlanScreen";
 import { KnowCard, ReadyCard } from "../components/Measured";
-import { slotsOf, slotsOn, rowsOf, trainingWhen, toMin } from "../slots";
+import { slotsOf, slotsOn, rowsOf, trainingWhen, toMin, workHoursOf } from "../slots";
 import { closedSlots, WINDOW } from "../makeMeal";
 import { answersFor } from "../unlogged";
 import { dayFor, getDay } from "../personal";
@@ -189,7 +189,7 @@ export function HomeScreen(p: AppApi) {
         {follow && changing && draft && (
           <div className="today-plan">
             <b>Kind of day, today only</b>
-            <DayEditor minor={minor} weekdays={wkd} peOn={peOn} value={draft} onChange={setDraft} />
+            <DayEditor minor={minor} weekdays={wkd} peOn={peOn} value={draft} onChange={setDraft} work={workHoursOf(ls)} />
             <div className="actions">
               <button className="pill pill-primary action-main" onClick={() => { p.setTodayPlan(draft); setChanging(false); }}>Save for today</button>
               <button className="link action-cancel" onClick={() => setChanging(false)}>Cancel</button>

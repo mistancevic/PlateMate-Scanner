@@ -32,7 +32,7 @@ function lifeHint(p: AppApi): string {
   // plain English (7 October 2026): "Work, fixed hours, 9 to 5"
   const wk = weekdaysOf(l);
   const first = WEEKDAY_CHOICES.find((x) => x.id === wk)!.name;
-  const parts = wk === "work" || wk === "both" ? [first, (HOURS.find((h) => h.id === l.hours)?.name ?? "").toLowerCase(), l.hours === "fixed" && l.slot ? SLOTS.find((s) => s.id === l.slot)!.name : ""] : [first];
+  const parts = wk === "work" || wk === "both" ? [first, (HOURS.find((h) => h.id === l.hours)?.name ?? "").toLowerCase(), l.hours === "fixed" && l.slot ? (l.slot === "my" ? (l.workFrom && l.workTo ? `${l.workFrom} to ${l.workTo}` : "") : SLOTS.find((s) => s.id === l.slot)!.name) : ""] : [first];
   return parts.filter(Boolean).join(", ");
 }
 function planHint(p: AppApi): string {

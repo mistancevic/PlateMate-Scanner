@@ -95,7 +95,8 @@ const plan = [
   await t.locator(".day-editor").getByRole("button", { name: "Study day" }).click(); await t.waitForTimeout(200);
   ok(/Study/.test(await t.locator(".agenda-row").nth(2).locator("small").last().textContent()), "the week says Study on that day");
   ok(await t.locator(".agenda-row .load-bar").count() === 7 && await t.locator(".agenda-row").nth(2).locator(".load-bar.load-easy").count() === 1, "the week keeps its colored bars");
-  ok((await t.locator(".agenda-row").nth(5).locator("small").last().textContent()).trim() === "", "a day off has no word on the right");
+  // changed by DT147 (0.2.128, board Stories99; Coach Milan 28 October 22:55): a day off says Day off on the right, like Work
+  ok((await t.locator(".agenda-row").nth(5).locator("small").last().textContent()).trim() === "Day off", "a day off says Day off on the right");
   await t.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-personal")); const i = (new Date().getDay() + 6) % 7; p.plan[i] = { work: true, study: true, kind: "team", intensity: "moderate", when: "evening", minutes: 60 }; localStorage.setItem("chefmealan-personal", JSON.stringify(p)); });
   await t.reload(); await t.waitForTimeout(900);
   // since 0.1.84 a reload opens on the same tab (canvas board C5, approved 7 October 2026), so Today is one tap away

@@ -27,16 +27,70 @@ export function defaultTimes(n: number, window: { from: string; to: string } | n
   return Array.from({ length: n }, (_, i) => toTime(from + (span * i) / (n - 1)));
 }
 
-// the slots of a Lifestyle: meals a day (3 when unset), the window, and any times the person changed (slotTimes by id)
-export function slotsOf(l: Pick<Lifestyle, "meals" | "window"> & { slotTimes?: Record<string, string> }): Slot[] {
+// DT147 (0.2.128, board Stories99 version 2; Tester 3 works Canadian hours from Cyprus; Coach Milan 28 October, Go at 23:13):
+// work hours as a time span. Fixed hours with one of the three common chips, or My hours, From and To; hours past midnight end
+// the next day. Flexible hours, shifts, study and At home have none.
+type WorkLife = Pick<Lifestyle, "weekdays" | "hours" | "slot" | "workFrom" | "workTo">;
+export type WorkHours = { from: string; to: string };
+export const SLOT_HOURS: Record<string, WorkHours> = { "9-5": { from: "09:00", to: "17:00" }, "8-4": { from: "08:00", to: "16:00" }, "7-3": { from: "07:00", to: "15:00" } };
+const isTime = (t?: string) => !!t && /^([01]\d|2[0-3]):[0-5]\d$/.test(t);
+export function workHoursOf(l: WorkLife | null | undefined): WorkHours | null {
+  if (!l) return null;
+  const wk = l.weekdays ?? "work";
+  if ((wk !== "work" && wk !== "both") || l.hours !== "fixed" || !l.slot) return null;
+  if (l.slot === "my") return isTime(l.workFrom) && isTime(l.workTo) && l.workFrom !== l.workTo ? { from: l.workFrom!, to: l.workTo! } : null;
+  return SLOT_HOURS[l.slot] ?? null;
+}
+// the span in minutes from midnight; an end before the start is the next day
+const spanOf = (w: WorkHours) => { const a = toMin(w.from); let b = toMin(w.to); if (b <= a) b += 24 * 60; return { a, b }; };
+// a minute of the day falls in work hours, the night after midnight too
+export const atWork = (min: number, w: WorkHours | null): boolean => { if (!w) return false; const { a, b } = spanOf(w); return (min >= a && min < b) || (min + 24 * 60 >= a && min + 24 * 60 < b); };
+
+// Meal times around work, for the meals the person has not timed. Day work (start 05:00 to 10:59): the usual times stay when
+// the first meal comes before work and the last after it (9 to 5, 8 to 4); else breakfast an hour before work, lunch at the
+// halfway break, dinner an hour and a half after, not before 18:00. Late work (start 11:00 to 19:59): breakfast late morning,
+// the main meal an hour before work, a small meal at the halfway break. Night work, or anything that doesn't fit: the usual times.
+export function workMealTimes(n: number, w: WorkHours | null): string[] | null {
+  if (!w || n < 1 || n > 5) return null;
+  const { a, b } = spanOf(w), len = b - a;
+  if (len < 180 || len > 13 * 60) return null;
+  const mid = a + len / 2;
+  let t: number[];
+  if (a >= 5 * 60 && a < 11 * 60) {
+    const usual = defaultTimes(n, null).map(toMin);
+    if (n > 1 && usual[0] <= a - 30 && usual[n - 1] >= b + 30) return null; // already around work
+    const B = a - 60, D = Math.min(Math.max(b + 90, 18 * 60), 21 * 60 + 30), after = b + 15;
+    t = n === 1 ? [Math.max(b + 60, 18 * 60)] : n === 2 ? [mid, D] : n === 3 ? [B, mid, D] : n === 4 ? [B, mid, after, D] : [B, (B + mid) / 2, mid, after, D];
+  } else if (a >= 11 * 60 && a < 20 * 60) {
+    const B = Math.min(Math.max(a - 360, 8 * 60), 11 * 60), main = a - 60, brk = mid, end = b + 30;
+    const late = end <= 23 * 60 + 55;
+    t = n === 1 ? [main] : n === 2 ? [main, brk] : n === 3 ? [B, main, brk] : n === 4 ? (late ? [B, main, brk, end] : [B, main, (main + brk) / 2, brk]) : [B, (B + main) / 2, main, (main + brk) / 2, brk];
+  } else return null;
+  for (let i = 1; i < t.length; i++) if (t[i] - t[i - 1] < 30) return null;
+  return t.map(toTime);
+}
+// the times the slots start from: an eating window set before; else around work; else 07:30 to 20:00
+export const startTimes = (n: number, l: Partial<WorkLife> & Pick<Lifestyle, "window">): { times: string[]; fromWork: boolean } => {
+  if (!l.window) { const w = workMealTimes(n, workHoursOf(l as WorkLife)); if (w) return { times: w, fromWork: true }; }
+  return { times: defaultTimes(n, l.window), fromWork: false };
+};
+
+// the slots of a Lifestyle: meals a day (3 when unset), the window or the work hours, and any times the person changed
+// (slotTimes by id): a time you set always wins
+export function slotsOf(l: Pick<Lifestyle, "meals" | "window"> & Partial<WorkLife> & { slotTimes?: Record<string, string> }): Slot[] {
   const n = Math.min(5, Math.max(1, l.meals ?? 3));
-  const names = NAMES[n], id = ids(names), times = defaultTimes(n, l.window);
+  const names = NAMES[n], id = ids(names), times = startTimes(n, l).times;
   return names.map((name, i) => ({ id: id[i], name, time: l.slotTimes?.[id[i]] ?? times[i] }));
 }
+// some meal still takes its time from the work hours
+export const timesFromWork = (l: Pick<Lifestyle, "meals" | "window"> & Partial<WorkLife> & { slotTimes?: Record<string, string> }): boolean => {
+  const n = Math.min(5, Math.max(1, l.meals ?? 3));
+  return startTimes(n, l).fromWork && ids(NAMES[n]).some((k) => !l.slotTimes?.[k]);
+};
 
 // the eating window the day gate reads: one meal a day eats within an hour from the meal (DT134, 0.2.113, board Stories89);
 // otherwise the window as set
-export function windowOf(l: Pick<Lifestyle, "meals" | "window"> & { slotTimes?: Record<string, string> }): { from: string; to: string } | null {
+export function windowOf(l: Pick<Lifestyle, "meals" | "window"> & Partial<WorkLife> & { slotTimes?: Record<string, string> }): { from: string; to: string } | null {
   if ((l.meals ?? 3) === 1) { const t = slotsOf(l)[0].time; return { from: t, to: toTime(toMin(t) + 60) }; }
   return l.window ?? null;
 }
@@ -44,7 +98,7 @@ export function windowOf(l: Pick<Lifestyle, "meals" | "window"> & { slotTimes?: 
 // A day's own times (0.2.8, canvas board CH, CH6): a meal moved for one date from the chat ("Move dinner to after
 // training"); the usual times in Lifestyle stay as they are
 export type TimesOn = Record<string, Record<string, string>>;
-export function slotsOn(l: Pick<Lifestyle, "meals" | "window"> & { slotTimes?: Record<string, string> }, timesOn: TimesOn | undefined, date: string): Slot[] {
+export function slotsOn(l: Pick<Lifestyle, "meals" | "window"> & Partial<WorkLife> & { slotTimes?: Record<string, string> }, timesOn: TimesOn | undefined, date: string): Slot[] {
   const own = timesOn?.[date];
   return slotsOf(l).map((s) => (own?.[s.id] ? { ...s, time: own[s.id] } : s));
 }
@@ -66,6 +120,15 @@ const WHEN_PHRASE: Record<When, string> = { morning: "in the morning", day: "dur
 const isClock = (t?: string) => !!t && /^([01]\d|2[0-3]):[0-5]\d$/.test(t);
 // the clock time the person set, or null
 export const trainingTime = (d: PlanDay | null | undefined): string | null => (d && d.kind !== "rest" && isClock(d.at) ? d.at! : null);
+// DT147: a part of the day for training falls in work hours when its usual time does
+export const whenAtWork = (w: When, wh: WorkHours | null): boolean => atWork(toMin(TRAINING_TIME[w]), wh);
+// the part of the day suggested for a new training day: the usual one, else the first outside work (evening, morning, during
+// the day, late night). Nothing is taken away: every part stays open, a break at work can be gym time.
+export function suggestWhen(usual: When, wh: WorkHours | null): When {
+  if (!whenAtWork(usual, wh)) return usual;
+  return (["evening", "morning", "day", "late"] as When[]).find((x) => !whenAtWork(x, wh)) ?? usual;
+}
+export const WORK_WHEN = (wh: WorkHours) => `Chef Mealan suggests training outside your work hours, ${wh.from} to ${wh.to}. Every time stays open: a break at work can be gym time.`;
 // where the row goes and what its time column says
 export function trainingWhen(d: PlanDay | null | undefined): { label: string; sort: string; exact: boolean; phrase: string } | null {
   if (!d || d.kind === "rest") return null;

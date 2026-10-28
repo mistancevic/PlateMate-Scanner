@@ -1,6 +1,6 @@
 import { SafetyQuestion } from "../components/SafetyQuestion";
 import { countByPlace, samePlace, getStarted } from "../places";
-import { useState, useEffect, type ReactNode } from "react";
+import { useState, useEffect, Fragment, type ReactNode } from "react";
 import { QrCode, FlaskConical, ChevronRight, BookOpen, ChevronLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator, Coffee } from "lucide-react";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
@@ -17,7 +17,7 @@ import { RHYTHMS, REGIONS } from "../moments";
 import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, KITCHENS, EQUIPMENT, equipmentOf, type Personal, type DayType } from "../personal";
 import { CHEF_NAME } from "../components/Mark";
 import { KITCHEN, tasteOf, another, anotherLeft, undo, type Taste } from "../kitchens";
-import { slotsOf, windowOf } from "../slots";
+import { slotsOf, windowOf, workHoursOf, timesFromWork, SLOT_HOURS, toMin } from "../slots";
 import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, workHintOf, type Plan, type PlanDay, type Lifestyle, moveDay, isTraining } from "../plan";
 import { DayEditor } from "../components/DayEditor";
 import { ProteinCard } from "../components/ProteinCard";
@@ -434,14 +434,17 @@ function LifestylePanel(p: AppApi) {
         {/* 0.2.1: the slots Plan shows, with their times. M8 (11 October 2026): the times are what I set; the eating window
             follows from them, first meal to last, and is no longer set by hand. A window set before is where the times start. */}
         <Setting name="Meal times" hint="When you eat each meal. Your eating window follows from them.">
-          <div className="field-row slot-times">
-            {slotsOf(l).map((s) => <label key={s.id} className="field field-on"><span>{l.meals === 1 ? "Your meal" : s.name}</span><input type="time" value={s.time} aria-label={`${s.name} time`} onChange={(e) => e.target.value && save({ slotTimes: { ...(l.slotTimes ?? {}), [s.id]: e.target.value } })} /></label>)}
+          {/* DT147 (0.2.128): one line per meal, the name left and the time right, so it never runs past the card on an iPhone */}
+          <div className="time-rows slot-times">
+            {slotsOf(l).map((s) => <label key={s.id} className="time-row"><span>{l.meals === 1 ? "Your meal" : s.name}</span><input type="time" value={s.time} aria-label={`${s.name} time`} onChange={(e) => e.target.value && save({ slotTimes: { ...(l.slotTimes ?? {}), [s.id]: e.target.value } })} /></label>)}
           </div>
+          {(() => { const w = workHoursOf(l); if (!w || !timesFromWork(l)) return null; const late = toMin(w.from) >= 11 * 60;
+            return <small className="setting-hint from-work">From your work hours, {w.from} to {w.to}: {late ? "breakfast late morning, the main meal an hour before work, a small one at the break" : "breakfast before work, lunch at the halfway break, dinner after"}. Change any time and yours stays.</small>; })()}
         </Setting>
         {/* DT134 (0.2.113, board Stories89): one meal a day eats within an hour from the meal, and the meal carries the day */}
         {!minor && l.meals === 1 && (() => { const w = windowOf(l)!; return <p className="window-line">One meal a day at {w.from}. Eating window: {w.from} to {w.to}, an hour from your meal. It carries your whole day: about {fmt(p.state.goals.calories, 0)} kcal and {fmt(p.state.goals.protein, 0)} g protein.</p>; })()}
         {!minor && l.meals !== 1 && (() => { const t = slotsOf(l).map((x) => x.time).sort(); return <p className="window-line">Eating window: {t[0]} to {t[t.length - 1]}. From your first and last meal.</p>; })()}
-        <Setting name="How you eat"><Chips items={asItems(DIETS)} on={l.diet ?? "Everything"} pick={(v) => save({ diet: v })} /></Setting>
+        <Setting name="What you eat"><Chips items={asItems(DIETS)} on={l.diet ?? "Everything"} pick={(v) => save({ diet: v })} /></Setting>
         {age !== null && age >= ALCOHOL_AGE && (
           <Setting name="Alcohol" hint="Alcohol counts as energy, 7 kcal a gram, and slows recovery. Chef Mealan will leave room for it on those days instead of pretending it isn't there.">
             <Chips items={asItems(ALCOHOL)} on={l.alcohol} pick={(v) => save({ alcohol: v })} />
@@ -463,7 +466,15 @@ function LifestylePanel(p: AppApi) {
             <>
               <Setting name="Working hours" hint={l.hours === "fixed" ? "With fixed hours, Monday to Friday are work days in your Training week. You can change any day there." : undefined}>
                 <Options items={HOURS_SHOWN} on={l.hours === "none" ? undefined : l.hours} pick={(v) => save({ hours: v })} />
-                {l.hours === "fixed" && <Chips items={SLOTS} on={l.slot} pick={(v) => save({ slot: v })} />}
+                {l.hours === "fixed" && <Chips items={SLOTS} on={l.slot} pick={(v) => save(v === "my" ? { slot: v, workFrom: l.workFrom ?? SLOT_HOURS[l.slot ?? "9-5"]?.from ?? "09:00", workTo: l.workTo ?? SLOT_HOURS[l.slot ?? "9-5"]?.to ?? "17:00" } : { slot: v })} />}
+                {/* DT147 (0.2.128, Tester 3 works Canadian hours from Cyprus): My hours, From and To, your local time */}
+                {l.hours === "fixed" && l.slot === "my" && (
+                  <div className="time-rows my-hours">
+                    <label className="time-row"><span>From</span><input type="time" value={l.workFrom ?? "09:00"} aria-label="Work from" onChange={(e) => e.target.value && save({ workFrom: e.target.value })} /></label>
+                    <label className="time-row"><span>To</span><input type="time" value={l.workTo ?? "17:00"} aria-label="Work to" onChange={(e) => e.target.value && save({ workTo: e.target.value })} /></label>
+                    <small className="setting-hint">{l.workFrom ?? "09:00"} to {l.workTo ?? "17:00"}{toMin(l.workTo ?? "17:00") <= toMin(l.workFrom ?? "09:00") ? " the next day" : ""}, your time. Meals and training fit around it.</small>
+                  </div>
+                )}
               </Setting>
               <Setting name="At work you are"><Options items={MOVES} on={l.move ?? "sitting"} pick={(v) => save({ move: v })} /></Setting>
               <Setting name="Work travel"><Chips items={[{ id: "none", name: "None" }, { id: "sometimes", name: "Occasionally" }, { id: "often", name: "A lot" }]} on={l.travel} pick={(v) => save({ travel: v as Lifestyle["travel"] })} /></Setting>
@@ -495,15 +506,19 @@ function PlanPanel(p: AppApi) {
   const plan = planOf(p.personal) ?? planFromCounts({ passive: 7, active: 0, easy: 0, hard: 0 });
   const minor = isMinor(p.personal);
   const todayD = new Date(); todayD.setHours(0, 0, 0, 0);
-  const [sel, setSel] = useState(weekdayIndex(todayD));
-  const [copying, setCopying] = useState<number[] | null>(null);
+  // DT147 (0.2.128, board Stories99 version 2; Tester 3 tapped a day and saw nothing: it opened below the whole week): a day
+  // opens right under itself and stays open until it is tapped again; Move and Copy are one line at its end
+  const [open, setOpen] = useState<number[]>([]);
+  const toggle = (i: number) => { setOpen((o) => (o.includes(i) ? o.filter((x) => x !== i) : [...o, i])); setAct(null); };
+  const [act, setAct] = useState<{ day: number; kind: "move" | "copy"; days: number[] } | null>(null);
   const l = lifestyleOf(p.personal);
   const save = (next: Plan) => { p.setPersonal({ ...p.personal, plan: next }); p.setUsual(usualFrom(l, next)); };
   const setDay = (i: number, d: PlanDay) => save(plan.map((x, n) => (n === i ? d : x)));
   const c = p.goal ? calculate(p.personal, p.goal.band ?? "maintain", p.formula) : null;
   // Release B: the word on the right says Work, Study, or nothing on a day off; the bar keeps its colors
   const wkd = weekdaysOf(l), peOn = !!l.peWeek && l.peWeek !== "none";
-  const dayWord = (d: PlanDay) => { if (minor) return d.work ? "School" : "No school"; const k = dayKindOf(d, l); return k === "work" ? "Work" : k === "study" ? "Study" : ""; };
+  const dayWord = (d: PlanDay) => { if (minor) return d.work ? "School" : "No school"; const k = dayKindOf(d, l); return k === "work" ? "Work" : k === "study" ? "Study" : wkd === "home" ? "" : "Day off"; };
+  const wh = workHoursOf(l);
   const workHint = workHintOf(l, minor);
   const counts = countsOf(plan);
   const avg = c ? Math.round(plan.reduce((t, d) => t + c.numbersOf(d).kcal, 0) / 7 / 50) * 50 : null;
@@ -513,40 +528,44 @@ function PlanPanel(p: AppApi) {
       <section className="week-card" aria-label="Your training week">
         <div className="week-card-head"><b>Your usual training week</b>{avg !== null && <small>average {avg.toLocaleString("en")} kcal</small>}</div>
         {plan.map((d, i) => (
-          <button type="button" key={i} className={`agenda-row ${sel === i ? "on" : ""}`} aria-pressed={sel === i} onClick={() => { setSel(i); setCopying(null); }}>
+          <Fragment key={i}>
+          <button type="button" className={`agenda-row ${open.includes(i) ? "on open" : ""}`} aria-expanded={open.includes(i)} onClick={() => toggle(i)}>
             <span className={`load-bar load-${loadOf(d)}`} />
             <b>{WEEKDAYS[i]}</b>
             <span className="agenda-what">{planShort(d)}</span>
             <small className={dayWord(d) ? "work" : ""}>{dayWord(d)}</small>
           </button>
+          {open.includes(i) && (
+            <div className="agenda-open" role="group" aria-label={`${WEEKDAY_NAMES[i]}, every week`}>
+              <small className="muted agenda-open-why">Every {WEEKDAY_NAMES[i]}. To change one date, open that day on Plan. Tap {WEEKDAY_NAMES[i]} again to close.</small>
+              <DayEditor minor={minor} weekdays={wkd} peOn={peOn} value={d} onChange={(x) => setDay(i, x)} workHint={workHint} work={wh} />
+              {/* DT140 (0.2.125) Move to and Copy, since DT147 one line at the end: each opens its day chips right there */}
+              {act?.day === i ? (
+                <div className="setting day-act" role="group" aria-label={`${act.kind === "move" ? "Move" : "Copy"} ${WEEKDAY_NAMES[i]} to`}>
+                  <small className="setting-name">{act.kind === "move" ? `Move ${WEEKDAY_NAMES[i]} to` : `Copy ${WEEKDAY_NAMES[i]} to`}</small>
+                  <div className="chip-row">{WEEKDAYS.map((w, n) => n === i ? null : <button type="button" key={w} className={`choice ${act.days.includes(n) ? "on" : ""}`} aria-pressed={act.days.includes(n)} onClick={() => {
+                    if (act.kind === "move") { save(moveDay(plan, i, n)); setOpen((o) => [...o.filter((x) => x !== i), n]); setAct(null); p.notify(`${WEEKDAY_NAMES[i]}'s training is on ${WEEKDAY_NAMES[n]} now${isTraining(plan[n]) ? `, and ${WEEKDAY_NAMES[n]}'s on ${WEEKDAY_NAMES[i]}` : ""}.`); }
+                    else setAct({ ...act, days: act.days.includes(n) ? act.days.filter((x) => x !== n) : [...act.days, n] });
+                  }}>{w}</button>)}</div>
+                  <div className="actions">
+                    {act.kind === "copy" && <button type="button" className="pill pill-primary action-main" disabled={!act.days.length} onClick={() => { save(plan.map((x, n) => (act.days.includes(n) ? { ...d, work: x.work, study: x.study, pe: x.work && x.study === d.study ? d.pe : false } : x))); setAct(null); }}>Copy to {act.days.length} {act.days.length === 1 ? "day" : "days"}</button>}
+                    <button type="button" className="link action-cancel" onClick={() => setAct(null)}>Cancel</button>
+                  </div>
+                  <small className="setting-hint">{act.kind === "move" ? "The training goes as it is, its time too. A day with training swaps with it." : `Copies the activity; each day keeps its ${minor ? "school day or no school" : "work day, study day or day off"}.`}</small>
+                </div>
+              ) : (
+                <div className="day-act-line">
+                  {isTraining(d) && <button type="button" className="link" onClick={() => setAct({ day: i, kind: "move", days: [] })}>Move to another day ›</button>}
+                  <button type="button" className="link" onClick={() => setAct({ day: i, kind: "copy", days: [] })}>Copy to other days ›</button>
+                </div>
+              )}
+            </div>
+          )}
+          </Fragment>
         ))}
         <div className="load-key">{(["hard", "easy", "active", "passive"] as DayType[]).filter((t) => counts[t]).map((t) => <span key={t}><i className={`load-${t}`} />{LOAD_NAME[t]} {counts[t]}</span>)}</div>
-        <small className="week-card-foot">The bar shows how hard the day is{minor ? ", sport at school and after school together" : ""}. Tap a day to set it.</small>
+        <small className="week-card-foot">The bar shows how hard the day is{minor ? ", sport at school and after school together" : ""}. Tap a day to open it; tap it again to close.</small>
       </section>
-      <Seg title={WEEKDAY_NAMES[sel]} why={`Every ${WEEKDAY_NAMES[sel]}. To change one date, open that day on Plan.`}>
-        {/* DT140 (0.2.125, board Stories96): Move to, one tap; the training goes as it is, the start time too; a day with
-            training swaps with it; each day keeps whether it is a work day */}
-        {isTraining(plan[sel]) && (
-          <div className="setting move-to" role="group" aria-label={`Move ${WEEKDAY_NAMES[sel]} to`}>
-            <small className="setting-name">Move {WEEKDAY_NAMES[sel]} to</small>
-            <div className="chip-row">{WEEKDAYS.map((w, i) => i === sel ? null : <button type="button" key={w} className="choice" onClick={() => { save(moveDay(plan, sel, i)); setSel(i); p.notify(`${WEEKDAY_NAMES[sel]}'s training is on ${WEEKDAY_NAMES[i]} now${isTraining(plan[i]) ? `, and ${WEEKDAY_NAMES[i]}'s on ${WEEKDAY_NAMES[sel]}` : ""}.`); }}>{w}</button>)}</div>
-          </div>
-        )}
-        <DayEditor minor={minor} weekdays={wkd} peOn={peOn} value={plan[sel]} onChange={(d) => setDay(sel, d)} workHint={workHint} />
-        {copying === null ? (
-          <button type="button" className="pill pill-wide" onClick={() => setCopying([])}>Copy {WEEKDAY_NAMES[sel]} to other days</button>
-        ) : (
-          <div className="setting">
-            <small className="setting-name">Copy {WEEKDAY_NAMES[sel]} to</small>
-            <div className="chip-row">{WEEKDAYS.map((w, i) => i === sel ? null : <button type="button" key={w} className={`choice ${copying.includes(i) ? "on" : ""}`} aria-pressed={copying.includes(i)} onClick={() => setCopying(copying.includes(i) ? copying.filter((x) => x !== i) : [...copying, i])}>{w}</button>)}</div>
-            <div className="actions">
-              <button type="button" className="pill pill-primary action-main" disabled={!copying.length} onClick={() => { save(plan.map((x, n) => (copying.includes(n) ? { ...plan[sel], work: x.work, study: x.study, pe: x.work && x.study === plan[sel].study ? plan[sel].pe : false } : x))); setCopying(null); }}>Copy to {copying.length} {copying.length === 1 ? "day" : "days"}</button>
-              <button type="button" className="link action-cancel" onClick={() => setCopying(null)}>Cancel</button>
-            </div>
-            <small className="setting-hint">Copies the activity; each day keeps its {minor ? "school day or no school" : "work day, study day or day off"}.</small>
-          </div>
-        )}
-      </Seg>
       <NextLink p={p} to="shop" from="week" text="Where I shop and cook" hint="Your shops, the kitchens you cook, and what you cook with" />
     </>
   );
