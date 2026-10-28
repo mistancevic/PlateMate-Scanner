@@ -8,7 +8,7 @@ import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeLi
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
 import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
-import { rowsOf, slotsOf, slotsOn, trainingWhen, type Slot } from "../slots";
+import { rowsOf, slotsOf, slotsOn, trainingWhen, type Slot, workHoursOf } from "../slots";
 import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
 import { countOf, countLabel } from "../counted";
@@ -218,7 +218,7 @@ export function PlanScreen(p: AppApi) {
             <div className="card-top"><span>{WEEKDAY[(date.getDay() + 6) % 7]}, {date.getDate()} {MONTHS[date.getMonth()]}: training</span><button type="button" className="link" onClick={() => setEditing(null)}>Close</button></div>
             <p className="small date-sheet-why">This date only. Your Training week stays the same.</p>
             <section className="card seg">
-              <DayEditor minor={minor} weekdays={weekdaysOf(lifestyle)} peOn={!!lifestyle.peWeek && lifestyle.peWeek !== "none"} value={editing} onChange={setEditing} workHint={workHintOf(lifestyle, minor)} />
+              <DayEditor minor={minor} weekdays={weekdaysOf(lifestyle)} peOn={!!lifestyle.peWeek && lifestyle.peWeek !== "none"} value={editing} onChange={setEditing} workHint={workHintOf(lifestyle, minor)} work={workHoursOf(lifestyle)} />
             </section>
             <div className="actions date-sheet-actions">
               <button type="button" className="pill pill-primary action-main" onClick={() => { p.setDated(date, editing); setEditing(null); p.notify(`Changed for ${dayName === "today" ? "today" : `${dayName}, ${date.getDate()} ${MONTHS[date.getMonth()]}`} only.`); }}>Save for this date</button>

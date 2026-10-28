@@ -10,7 +10,7 @@ import type { AppApi } from "./api";
 import { SafetyNote } from "../components/SafetyNote";
 import { SafetyQuestion } from "../components/SafetyQuestion";
 import { FIXED, takeModelFlag } from "../safety";
-import { slotsOf, slotsOn, withTimeOn, trainingTime, trainingWhen } from "../slots";
+import { slotsOf, slotsOn, withTimeOn, trainingTime, trainingWhen, workHoursOf } from "../slots";
 import { tasteForChef } from "../kitchens";
 import { getStore, openList, shortMeals } from "../shopping";
 import { intentOf, wantOf, plateAnswer, planAnswer, leftAnswer, moveOf, swapOk, swapFallback, swapLead, type DaySlot } from "../chatIntent";
@@ -222,6 +222,8 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
           text: msg, image: photo || undefined, history, screen: about,
           target: { pd: pdRef, mealKcal: state.goals.calories ? Math.round(state.goals.calories * (p.kind === "dessert" ? 0.1 : 0.35)) : null },
           kind: p.kind,
+          // DT147 (0.2.128): the work hours, so advice on when to eat and train fits them
+          work: workHoursOf(lifestyle),
           plate: p.tab === "journey" || /\bplate\b/i.test(msg) ? state.items.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein })) : [],
           today: dayRows().map((r) => ({ slot: r.name, time: r.time, meal: r.meal, kcal: r.kcal, state: r.state })),
           left: (() => { const d = p.numbersFor(new Date()); return d ? { kcal: Math.round(d.kcal - rec.kcal), protein: Math.round(d.protein - rec.protein) } : null; })(),

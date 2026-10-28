@@ -1121,7 +1121,20 @@ button.choice, .plan button.choice, .today-plan button.choice { display: inline-
 .plan-day .plan-slot .plan-pick { color: var(--brand-text); }
 .plan-training { background: var(--quiet); } .plan-training .menu-row-text b { font-size: var(--fs-body); color: var(--muted); }
 .plan-links { margin-top: 4px; gap: 8px; }
-.slot-times { grid-template-columns: repeat(2, 1fr); }
+/* DT147 (0.2.128): a time per line, the name left and the time right; never wider than the card (Safari gives a time field a minimum width) */
+.time-rows { display: flex; flex-direction: column; }
+.time-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.time-row > span { font-weight: 700; }
+.time-row input[type="time"] { -webkit-appearance: none; appearance: none; width: auto; min-width: 0; max-width: 132px; flex: none; padding: 8px 12px; border: 1.5px solid var(--brand); border-radius: var(--r-input); background: var(--tint); font: inherit; font-weight: 800; color: var(--navy); }
+.my-hours { margin-top: 8px; }
+.from-work { color: var(--navy); font-weight: 700; }
+.choice .at-work { font-weight: 400; opacity: 0.75; }
+.hard-zones { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; }
+.agenda-row.open { border-bottom-left-radius: 0; border-bottom-right-radius: 0; margin-bottom: 0; }
+.agenda-open { background: var(--surface); border: 1px solid var(--line); border-top: 0; border-radius: 0 0 var(--r-control) var(--r-control); padding: 10px 12px 8px; margin: 0 0 8px; }
+.agenda-open-why { display: block; margin-bottom: 10px; }
+.day-act-line { display: flex; flex-wrap: wrap; gap: 18px; padding: 10px 2px 4px; border-top: 1px solid var(--line); margin-top: 6px; }
+.day-act-line .link { font-weight: 800; }
 /* 0.2.2: a slot with a meal, its mark, the pick sheet */
 .plan-slot-wrap { display: flex; flex-direction: column; }
 .plan-day .plan-slot-sub { font-weight: 600; font-size: var(--fs-small); } .fit-ok { color: var(--top); font-weight: 900; } .fit-under { color: var(--close-text); font-weight: 900; }

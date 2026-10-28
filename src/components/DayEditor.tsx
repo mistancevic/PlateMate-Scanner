@@ -1,5 +1,6 @@
 import { KINDS, INTENSITIES, WHENS, WHENS_KID, MINUTES_KID, LENGTHS, lengthOf, START_MIN, ADULT_KINDS, KID_KINDS, SPORTS, PE, type PlanDay, type Kind, type Weekdays } from "../plan";
 import { Zones } from "./Zones";
+import { suggestWhen, whenAtWork, WORK_WHEN, type WorkHours } from "../slots";
 
 // One day's settings, the same on the Training week, a dated week and Change today's plan.
 // Adults: the kind of day as Lifestyle allows it (Release B: Work day, Study day, Day off; nothing to pick when At home),
@@ -7,11 +8,13 @@ import { Zones } from "./Zones";
 // then one activity after school; a club training or a match asks which sport. A rest day folds the last ones away.
 // Since 7 October 2026 (canvas board T3), for adults: Rest reads No training, Walk is gone (walking is in the steps),
 // How hard is Light, Moderate or Hard with its zones, and How long is a range from 15 minutes.
-export function DayEditor({ value, onChange, workHint, minor = false, weekdays = "work", peOn = false }: { value: PlanDay; onChange: (d: PlanDay) => void; workHint?: string; minor?: boolean; weekdays?: Weekdays; peOn?: boolean }) {
+// DT147 (0.2.128, board Stories99 version 2): Your day reads Work or day off and says what it is for; How hard is three chips
+// with the zones of the one picked; When marks the parts in work hours and a new training day is suggested outside them.
+export function DayEditor({ value, onChange, workHint, minor = false, weekdays = "work", peOn = false, work = null }: { value: PlanDay; onChange: (d: PlanDay) => void; workHint?: string; minor?: boolean; weekdays?: Weekdays; peOn?: boolean; work?: WorkHours | null }) {
   const set = (patch: Partial<PlanDay>) => onChange({ ...value, ...patch });
   const pickKind = (k: Kind) => set(k === "rest"
     ? { kind: k, intensity: undefined, when: undefined, at: undefined, minutes: undefined, sport: undefined }
-    : { kind: k, intensity: value.intensity ?? (k === "match" ? "hard" : "moderate"), minutes: value.minutes ?? (minor ? 90 : START_MIN.moderate), sport: k === "club" || k === "match" ? value.sport ?? "football" : undefined });
+    : { kind: k, intensity: value.intensity ?? (k === "match" ? "hard" : "moderate"), minutes: value.minutes ?? (minor ? 90 : START_MIN.moderate), sport: k === "club" || k === "match" ? value.sport ?? "football" : undefined, ...(!minor && work && !value.when && value.kind === "rest" ? { when: suggestWhen("evening", work) } : {}) });
   const kind = KINDS.find((k) => k.id === value.kind)!;
   // a Walk day saved before still shows, so it can be changed
   const ids = minor ? KID_KINDS : ADULT_KINDS.includes(value.kind) ? ADULT_KINDS : [...ADULT_KINDS, value.kind];
@@ -34,13 +37,13 @@ export function DayEditor({ value, onChange, workHint, minor = false, weekdays =
         </div>
       ) : weekdays !== "home" && (
         <div className="setting">
-          <small className="setting-name">Your day</small>
+          <small className="setting-name">{weekdays === "study" ? "Study or day off" : weekdays === "both" ? "Work, study or day off" : "Work or day off"}</small>
           <div className="chip-row">
             {weekdays !== "study" && <Chip on={value.work && (weekdays === "work" || !value.study)} onClick={() => set({ work: true, study: false, pe: false })}>Work day</Chip>}
             {weekdays !== "work" && <Chip on={value.work && (weekdays === "study" || !!value.study)} onClick={() => set({ work: true, study: true })}>Study day</Chip>}
             <Chip on={!value.work} onClick={() => set({ work: false, study: false, pe: false })}>Day off</Chip>
           </div>
-          {workHint && <small className="setting-hint">{workHint}</small>}
+          <small className="setting-hint day-kind-hint">Not your training: how the rest of the day goes. {weekdays === "study" ? "A study day counts as mostly sitting" : "A work day counts how you move at work"}; your training comes on top.{workHint ? ` ${workHint}` : ""}</small>
         </div>
       )}
       {!minor && peOn && value.work && (weekdays === "study" || (weekdays === "both" && value.study)) && (
@@ -90,16 +93,20 @@ export function DayEditor({ value, onChange, workHint, minor = false, weekdays =
                 <small className="setting-hint">Light means you could chat while doing it. Hard means you couldn't.</small>
               </>
             ) : (
-              <div className="activity-list" role="group" aria-label="How hard">
-                {INTENSITIES.map((x) => <button type="button" key={x.id} className={`activity hard-pick ${(value.intensity ?? "easy") === x.id ? "on" : ""}`} aria-pressed={(value.intensity ?? "easy") === x.id} onClick={() => set({ intensity: x.id })}><b>{x.name}</b><Zones level={x.id} /></button>)}
-              </div>
+              <>
+                <div className="chip-row" role="group" aria-label="How hard">
+                  {INTENSITIES.map((x) => <Chip key={x.id} on={(value.intensity ?? "easy") === x.id} onClick={() => set({ intensity: x.id })}>{x.name}</Chip>)}
+                </div>
+                <div className="hard-zones"><Zones level={value.intensity ?? "easy"} /></div>
+              </>
             )}
           </div>
           <div className="setting">
             <small className="setting-name">When</small>
             <div className="chip-row">
-              {whens.map((x) => <Chip key={x.id} on={value.when === x.id} onClick={() => set({ when: value.when === x.id ? undefined : x.id })}>{x.name}</Chip>)}
+              {whens.map((x) => <Chip key={x.id} on={value.when === x.id} onClick={() => set({ when: value.when === x.id ? undefined : x.id })}>{x.name}{!minor && whenAtWork(x.id, work) && <small className="at-work"> · in work hours</small>}</Chip>)}
             </div>
+            {!minor && work && <small className="setting-hint">{WORK_WHEN(work)}</small>}
           </div>
           {/* 0.2.5+r20 (canvas board FX, TT1): an optional clock time; Plan shows a time only when one is set */}
           <div className="setting starts-at">

@@ -12,6 +12,7 @@ import { pdText, pdVal, pdTag } from "../ui";
 import { Mark, APP_NAME, CHEF_NAME } from "../components/Mark";
 import { FormulaCard, fixedOf } from "../components/FormulaCard";
 import { LIFE, DAY_TYPES, STEPS, calculate, canCalculate, macroSplit, suggestBand, dayModeOf, ownDayNumbers, weekOf, workOf, withWork, planOf, lifestyleOf, type Personal, type DayType, type DayMode, type Formula } from "../personal";
+import { workHoursOf, whenAtWork, WORK_WHEN } from "../slots";
 import { INTENSITIES, LENGTHS, lengthOf, planFromCounts, weekdaysOf, usualFrom, WEEKDAY_CHOICES, ymd, withDay, lengthName, isTraining, WEEKDAYS, WEEKDAY_NAMES, WHENS, type Intensity, type Plan } from "../plan";
 import { DayTable, FindingList } from "../components/DayTable";
 import { analyse, isOpen as openAt, type Finding } from "../analysis";
@@ -159,7 +160,11 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const setPlan = (plan: Plan) => { setPersonalNow({ ...d, plan }); p.setUsual(usualFrom(lifestyleOf(d), plan)); };
   // DT140 (0.2.125, board Stories96 version 2; Anna's DT117; Milan 28 October 17:43 Go): the week is the source. Tap a day, say
   // how hard, how long and when; nothing is guessed and the count follows from the days. The same week as Me, Training week
-  const [openDay, setOpenDay] = useState<number | null>(null);
+  // DT147 (0.2.128, board Stories99 version 2; Coach Milan 28 October 22:39): a day stays open until it is tapped again;
+  // opening another day closes nothing. A new training day is suggested outside the work hours; every part stays open.
+  const [openDays, setOpenDays] = useState<number[]>([]);
+  const toggleDay = (i: number) => setOpenDays((o) => (o.includes(i) ? o.filter((x) => x !== i) : [...o, i]));
+  const wh = workHoursOf(lifestyleOf(d));
   const [zonesOpen, setZonesOpen] = useState(false);
   const whenName = (w?: string) => (WHENS.find((x) => x.id === w)?.name ?? "").toLowerCase();
   const TrainWeek = () => {
@@ -171,21 +176,22 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           const on = isTraining(x), lvl = (x.intensity ?? "easy") as Intensity;
           return (
             <div key={i} className={`wk-day ${on ? "on" : ""}`}>
-              <button type="button" className="wk-head" aria-expanded={openDay === i} aria-label={`${WEEKDAY_NAMES[i]}: ${on ? `${INTENSITIES.find((y) => y.id === lvl)!.name}, ${lengthName(x.minutes)}, ${whenName(x.when)}` : "no training"}`} onClick={() => setOpenDay(openDay === i ? null : i)}>
+              <button type="button" className="wk-head" aria-expanded={openDays.includes(i)} aria-label={`${WEEKDAY_NAMES[i]}: ${on ? `${INTENSITIES.find((y) => y.id === lvl)!.name}, ${lengthName(x.minutes)}, ${whenName(x.when)}` : "no training"}`} onClick={() => toggleDay(i)}>
                 <b>{WEEKDAYS[i]}</b><span>{on ? `${INTENSITIES.find((y) => y.id === lvl)!.name} · ${lengthName(x.minutes)} · ${whenName(x.when)}` : "No training"}</span>
               </button>
-              {openDay === i && (
+              {openDays.includes(i) && (
                 <div className="wk-edit">
                   <small className="setting-name">How hard</small>
                   <div className="chip-row" role="group" aria-label={`${WEEKDAY_NAMES[i]}, how hard`}>
                     <button type="button" className={`choice ${!on ? "on" : ""}`} aria-pressed={!on} onClick={() => setPlan(withDay(planNow, i, { level: null }))}>No training</button>
-                    {INTENSITIES.map((y) => <button type="button" key={y.id} className={`choice ${on && lvl === y.id ? "on" : ""}`} aria-pressed={on && lvl === y.id} onClick={() => setPlan(withDay(planNow, i, { level: y.id }))}>{y.name}</button>)}
+                    {INTENSITIES.map((y) => <button type="button" key={y.id} className={`choice ${on && lvl === y.id ? "on" : ""}`} aria-pressed={on && lvl === y.id} onClick={() => setPlan(withDay(planNow, i, { level: y.id }, wh))}>{y.name}</button>)}
                   </div>
                   {on && <>
                     <small className="setting-name">How long</small>
                     <div className="chip-row" role="group" aria-label={`${WEEKDAY_NAMES[i]}, how long`}>{LENGTHS.map((r) => { const sel = lengthOf(x.minutes ?? 60).id === r.id; return <button type="button" key={r.id} className={`choice ${sel ? "on" : ""}`} aria-pressed={sel} onClick={() => setPlan(withDay(planNow, i, { level: lvl, minutes: r.mid }))}>{r.name.replace("–", " to ")}</button>; })}</div>
                     <small className="setting-name">When</small>
-                    <div className="chip-row" role="group" aria-label={`${WEEKDAY_NAMES[i]}, when`}>{WHENS.filter((w) => ["morning", "day", "evening"].includes(w.id)).map((w) => <button type="button" key={w.id} className={`choice ${x.when === w.id ? "on" : ""}`} aria-pressed={x.when === w.id} onClick={() => setPlan(withDay(planNow, i, { level: lvl, when: w.id }))}>{w.name}</button>)}</div>
+                    <div className="chip-row" role="group" aria-label={`${WEEKDAY_NAMES[i]}, when`}>{WHENS.filter((w) => ["morning", "day", "evening"].includes(w.id)).map((w) => <button type="button" key={w.id} className={`choice ${x.when === w.id ? "on" : ""}`} aria-pressed={x.when === w.id} onClick={() => setPlan(withDay(planNow, i, { level: lvl, when: w.id }))}>{w.name}{whenAtWork(w.id, wh) && <small className="at-work"> · in work hours</small>}</button>)}</div>
+                    {wh && <small className="setting-hint">{WORK_WHEN(wh)}</small>}
                   </>}
                 </div>
               )}

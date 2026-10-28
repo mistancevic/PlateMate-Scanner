@@ -48,3 +48,41 @@ test("DT134: one meal a day: one slot, Meal; the window an hour from it; 2 to 5 
   assert.deepEqual(windowOf({ meals: 3, window: { from: "07:00", to: "21:00" } }), { from: "07:00", to: "21:00" });
   assert.equal(slotsOf({ meals: 2, window: null }).length, 2);
 });
+
+// DT147 (0.2.128, board Stories99 version 2; Tester 3 works Canadian hours from Cyprus): work hours count
+import { workHoursOf, workMealTimes, suggestWhen, whenAtWork, timesFromWork } from "./slots";
+import { withDay } from "./plan";
+test("DT147: work hours from the chips and from My hours; none for flexible, shifts, study or home", () => {
+  assert.deepEqual(workHoursOf({ hours: "fixed", slot: "9-5" }), { from: "09:00", to: "17:00" });
+  assert.deepEqual(workHoursOf({ weekdays: "work", hours: "fixed", slot: "my", workFrom: "16:00", workTo: "23:00" }), { from: "16:00", to: "23:00" });
+  assert.deepEqual(workHoursOf({ hours: "fixed", slot: "my", workFrom: "22:00", workTo: "06:00" }), { from: "22:00", to: "06:00" }, "past midnight");
+  assert.equal(workHoursOf({ hours: "flexible", slot: "9-5" }), null);
+  assert.equal(workHoursOf({ weekdays: "study", hours: "fixed", slot: "9-5" }), null);
+  assert.equal(workHoursOf({ hours: "fixed", slot: "my" }), null, "My hours without From and To");
+});
+test("DT147: meal times around work; the usual ones stay when they already fit", () => {
+  assert.equal(workMealTimes(3, { from: "09:00", to: "17:00" }), null, "9 to 5 keeps 07:30, 13:45, 20:00");
+  assert.equal(workMealTimes(4, { from: "08:00", to: "16:00" }), null, "8 to 4 keeps the usual four");
+  assert.deepEqual(workMealTimes(3, { from: "07:00", to: "15:00" }), ["06:00", "11:00", "18:00"]);
+  assert.deepEqual(workMealTimes(3, { from: "16:00", to: "23:00" }), ["10:00", "15:00", "19:30"], "Tester 3: late morning, an hour before work, the break");
+  assert.deepEqual(workMealTimes(4, { from: "16:00", to: "23:00" }), ["10:00", "15:00", "19:30", "23:30"]);
+  assert.deepEqual(workMealTimes(2, { from: "16:00", to: "23:00" }), ["15:00", "19:30"]);
+  assert.equal(workMealTimes(3, { from: "22:00", to: "06:00" }), null, "night work keeps the usual times");
+  const l = { meals: 3, hours: "fixed" as const, slot: "my" as const, workFrom: "16:00", workTo: "23:00" };
+  assert.deepEqual(slotsOf(l).map((s) => s.time), ["10:00", "15:00", "19:30"]);
+  assert.deepEqual(slotsOf({ ...l, slotTimes: { breakfast: "09:15" } }).map((s) => s.time), ["09:15", "15:00", "19:30"], "a time you set wins");
+  assert.equal(timesFromWork(l), true);
+  assert.equal(timesFromWork({ ...l, slotTimes: { breakfast: "09:15", lunch: "14:00", dinner: "20:00" } }), false, "all set by hand");
+  assert.deepEqual(slotsOf({ ...l, window: { from: "07:00", to: "21:00" } }).map((s) => s.time), ["07:00", "14:00", "21:00"], "an eating window set before stays");
+});
+test("DT147: training is suggested outside work; every part stays open", () => {
+  const w = { from: "16:00", to: "23:00" };
+  assert.equal(whenAtWork("evening", w), true);
+  assert.equal(whenAtWork("morning", w), false);
+  assert.equal(suggestWhen("evening", w), "morning");
+  assert.equal(suggestWhen("evening", { from: "09:00", to: "17:00" }), "evening");
+  assert.equal(suggestWhen("evening", null), "evening");
+  const plan = Array.from({ length: 7 }, () => ({ work: true, kind: "rest" as const }));
+  assert.equal(withDay(plan, 1, { level: "moderate" }, w)[1].when, "morning");
+  assert.equal(withDay(plan, 1, { level: "moderate", when: "evening" }, w)[1].when, "evening", "picked by you, in work hours: kept");
+});
