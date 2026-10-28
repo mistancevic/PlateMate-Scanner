@@ -84,20 +84,22 @@ class Component extends DCLogic {{
 
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
-cy = storyCard(B, y, "DT147", "Your own work hours, and your day around them", [
-  ("Tester 3, UX1 (Coach Milan's call, 28 October)", "Marko works Canadian hours from Cyprus. Working hours offers only 9 to 5, 8 to 4 and 7 to 3. None fits him."),
-  ("Now, checked in 0.2.127", "Whatever is picked changes nothing. Meal times stay 07:30, 13:45, 20:00. Training stays where it was set. Chef Mealan's chat does not know the work hours. They are only shown in Me."),
-  ("The story", "Working hours keeps the three chips and adds a fourth: My hours, with From and To. Hours past midnight work too. The line says the hours are your time. Then the hours count. Meal times you have not set yourself fit around work. Day work: breakfast before work, lunch at the halfway break, dinner after. Late work, like 16:00 to 23:00: breakfast late morning, the main meal about an hour before work, a small meal at the break. Chef Mealan suggests training outside work. Every time stays open, evening too: a break at work can be gym time. Chef Mealan's chat knows the hours, so its advice fits them."),
-  ("Coach Milan, 28 October 22:02", "Don't disable Evening: a lunch break in Canada may be gym time in Cyprus."),
+cy = storyCard(B, y, "DT147", "Your own work hours, and your day around them (version 2)", [
+  ("Tester 3, UX1 (Coach Milan, 28 October)", "Marko works Canadian hours from Cyprus. Working hours offers only 9 to 5, 8 to 4 and 7 to 3. None fits him. On his iPhone the meal times on the right ran past the card. On Training week, a tapped day opened out of sight."),
+  ("Now, checked in 0.2.127", "Whatever is picked changes nothing. Meal times stay 07:30, 13:45, 20:00. Training stays where it was set. Chef Mealan's chat does not know the work hours. Meal times sit two in a row, and Safari gives a time field a minimum width. Training week opens a day below the whole week."),
+  ("Lifestyle", "Working hours keeps the three chips and adds a fourth: My hours, with From and To. Hours past midnight work too; the line says the hours are your time. Meal times you have not set yourself fit around work. Day work: breakfast before work, lunch at the halfway break, dinner after. Late work, like 16:00 to 23:00: breakfast late morning, the main meal about an hour before work, a small meal at the break. Chef Mealan's chat knows the hours. Every time is one line: the name left, the time right. How you eat is now What you eat."),
+  ("Training week", "Tap a day and it opens right under itself, as in setup. A second tap on the same day closes it. Tapping another day opens that one too; the first stays open. How hard is three chips, with the zones of the one picked. Chef Mealan suggests training outside work hours. Every time stays open, evening too: a break at work can be gym time."),
+  ("Coach Milan, 28 October 22:02 to 22:39", "Don't disable Evening. What you eat. Times one per line. Open the day in place; close it only on a second tap on the same day."),
   ("Always", "Times you set yourself win. Changing work hours never moves a meal time or a training time you set."),
 ])
 h = rowEnd(cy,
   B.screen("DT147a", 0, y, "Now: three chips, nothing follows", "r147a", "now", "9 to 5, 8 to 4, 7 to 3. Meal times 07:30, 13:45, 20:00 whatever is picked."),
-  B.screen("DT147b", 1, y, "New: My hours, meals around them", "r147b", "changed", "From 16:00 To 23:00. Breakfast 10:00, main meal 15:00, small meal 19:30."))
+  B.screen("DT147b", 1, y, "New: My hours, meals around them", "r147b", "changed", "From 16:00 To 23:00. Breakfast 10:00, main meal 15:00, small meal 19:30. One line per time."))
 y = h
 h = rowEnd(y + 10,
-  B.screen("DT147c", 0, y, "New: training outside work", "r147c", "changed", "Suggested in the morning; evening stays open, marked in work hours."))
+  B.screen("DT147c", 0, y, "Now: the day opens below the week", "r147c", "now", "Tuesday opens after Sunday, off screen."),
+  B.screen("DT147d", 1, y, "New: the day opens under itself", "r147d", "changed", "Tap again to close. Morning suggested; evening stays open."))
 y = h
 board("Stories99.dc.html", "DT147. Your own work hours, and your day around them",
-  "28 October 2026 (Tester 3, UX1). Now: 0.2.127, untouched. Drawn for your approval; nothing built.",
+  "28 October 2026 (Tester 3, UX1), version 2. Now: 0.2.127, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories98.dc.html")

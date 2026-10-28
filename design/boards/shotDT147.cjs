@@ -8,8 +8,8 @@ const PORT = "3315", U = `http://127.0.0.1:${PORT}`;
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
   for (let i = 0; i < 60; i++) { try { await fetch(U + "/"); break; } catch { await new Promise((r) => setTimeout(r, 500)); } }
-  const b = await chromium.launch();
-  const page = await (await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2 })).newPage();
+  const b = await chromium.launch({ args: ["--lang=en-GB"], env: { ...process.env, LANG: "en_GB.UTF-8", LANGUAGE: "en_GB" } });
+  const page = await (await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, locale: "en-GB" })).newPage();
   await page.clock.setFixedTime(new Date("2026-10-28T21:55:00"));
   const plan = [0, 1, 2, 3, 4, 5, 6].map((i) => ([1, 3].includes(i) ? { work: i < 5, kind: "strength", intensity: "moderate", minutes: 55, when: "evening" } : { work: i < 5, kind: "rest" }));
   await page.addInitScript(([s, plan]) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
@@ -35,26 +35,54 @@ const PORT = "3315", U = `http://127.0.0.1:${PORT}`;
     const wh = [...document.querySelectorAll(".setting")].find((n) => /^Working hours/.test(n.firstElementChild?.textContent || "")); if (!wh) return;
     const chipRows = wh.querySelectorAll(".chips, .chip-row, .moments"); const row = chipRows[chipRows.length - 1];
     if (row) { for (const c of row.querySelectorAll("button")) c.classList.remove("on"); const my = document.createElement("button"); my.className = "choice on"; my.textContent = "My hours"; row.appendChild(my); }
-    const f = document.createElement("div"); f.style.cssText = "margin-top:8px;padding:8px;" + mark;
-    f.innerHTML = '<div class="field-row"><label class="field field-on"><span>From</span><input type="time" value="16:00"></label><label class="field field-on"><span>To</span><input type="time" value="23:00"></label></div><small style="display:block;margin-top:4px">16:00 to 23:00, your time. Meals and training fit around it.</small>';
+    const line = (n, v) => `<div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e3e8f2"><span style="font-weight:700">${n}</span><input type="time" value="${v}" style="width:auto;max-width:132px;min-width:0;padding:8px 12px;border:1.5px solid #2e7be8;border-radius:12px;background:#eaf1fd;font-weight:800;color:#123a7a;-webkit-appearance:none;appearance:none"></div>`;
+    const f = document.createElement("div"); f.style.cssText = "margin-top:8px;padding:4px 8px;" + mark;
+    f.innerHTML = line("From", "16:00") + line("To", "23:00") + '<small style="display:block;margin-top:6px">16:00 to 23:00, your time. Meals and training fit around it.</small>';
     wh.appendChild(f); wh.style.cssText += ";" + mark;
     const mt = [...document.querySelectorAll(".setting")].find((n) => /^Meal times/.test(n.firstElementChild?.textContent || ""));
-    if (mt) { const ins = mt.querySelectorAll("input[type=time]"); const v = ["10:00", "15:00", "19:30"]; ins.forEach((x, i) => { if (v[i]) x.value = v[i]; }); const s = document.createElement("small"); s.style.cssText = "display:block;margin-top:4px;color:#123a7a;font-weight:700"; s.textContent = "From your work hours, 16:00 to 23:00: breakfast late morning, the main meal an hour before work, a small one at the break. Change any time and yours stays."; mt.appendChild(s); mt.style.cssText += ";" + mark; }
+    if (mt) {
+      const grid = mt.querySelector(".slot-times, .field-row");
+      const box = document.createElement("div"); box.innerHTML = line("Breakfast", "10:00") + line("Lunch", "15:00") + line("Dinner", "19:30");
+      if (grid) grid.replaceWith(box);
+      const s = document.createElement("small"); s.style.cssText = "display:block;margin-top:6px;color:#123a7a;font-weight:700"; s.textContent = "From your work hours, 16:00 to 23:00: breakfast late morning, the main meal an hour before work, a small one at the break. Change any time and yours stays."; mt.appendChild(s); mt.style.cssText += ";" + mark; }
     const w = document.querySelector(".window-line"); if (w) w.textContent = "Eating window: 10:00 to 19:30. From your first and last meal.";
+    const he = [...document.querySelectorAll(".setting")].find((n) => /^How you eat/.test(n.firstElementChild?.textContent || ""));
+    if (he) { he.firstElementChild.textContent = "What you eat"; he.style.cssText += ";" + mark; }
   }, { mark });
-  await note("^Meal times", "New: a fourth chip, My hours, with From and To; it works past midnight too. The three common ones stay first. Meal times you have not set yourself fit around work; times you set win.");
+  await note("^Meal times", "New: a fourth chip, My hours, with From and To; it works past midnight too. The three common ones stay first. Meal times you have not set yourself fit around work; times you set win. Every time is one line, the name left and the time right, so it never runs past the card on an iPhone. How you eat is now What you eat.");
   await shot("r147b");
-  // DT147c, new: training is not suggested when you work
+  // DT147c, now: Training week opens the day below the whole week
   await page.goto(U + "/me/training-week"); await page.waitForTimeout(1300);
   await page.locator(".agenda-row").nth(1).click(); await page.waitForTimeout(500);
-  await page.evaluate(({ mark }) => {
-    const st = [...document.querySelectorAll(".setting")].find((n) => /^When/.test(n.firstElementChild?.textContent || "")); if (!st) return;
-    for (const c of st.querySelectorAll("button")) { if (/Evening/.test(c.textContent)) { c.classList.remove("on"); c.innerHTML = 'Evening <small style="font-weight:400;opacity:.75">· in work hours</small>'; } if (/Morning/.test(c.textContent)) c.classList.add("on"); }
-    for (const n of document.querySelectorAll("small, p, div")) if (n.childElementCount === 0 && /From Lifestyle: fixed hours, 9 to 5/.test(n.textContent)) n.textContent = n.textContent.replace("fixed hours, 9 to 5", "your hours, 16:00 to 23:00");
-    for (const n of document.querySelectorAll(".agenda-row *")) if (n.childElementCount === 0 && /· evening/.test(n.textContent)) n.textContent = n.textContent.replace("· evening", "· morning");
-    const s = document.createElement("small"); s.style.cssText = "display:block;margin-top:4px"; s.textContent = "Chef Mealan suggests training outside your work hours, 16:00 to 23:00. Every time stays open: a break at work can be gym time."; st.appendChild(s); st.style.cssText += ";" + mark;
-  }, { mark });
-  await note("^When", "New on Training week and in setup: a training time Chef Mealan suggests keeps out of work. Marko's Tuesday is suggested in the morning. Evening stays open and only says it is in work hours, because a break at work can be gym time.");
+  await page.evaluate((mark) => { const r = document.querySelectorAll(".agenda-row")[1]; if (r) r.style.cssText += ";" + mark; const h = document.querySelector(".seg-head"); if (h) h.style.cssText += ";" + mark; }, mark);
+  await page.evaluate((NOTE) => { const wc = document.querySelector(".week-card"); const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "Now: tap Tuesday and it opens below the whole week, after Sunday. On a phone that is off screen, so the tap seems to do nothing. How hard is three big cards."; wc.after(d); }, NOTE);
   await shot("r147c");
+  // DT147d, new: the day opens right under itself
+  await page.goto(U + "/me/training-week"); await page.waitForTimeout(1300);
+  await page.locator(".agenda-row").nth(1).click(); await page.waitForTimeout(500);
+  await page.evaluate(({ mark, NOTE }) => {
+    const rows = document.querySelectorAll(".agenda-row"), tue = rows[1];
+    const head = document.querySelector(".seg-head"), seg = document.querySelector(".card.seg");
+    if (!tue || !seg) return;
+    for (const n of document.querySelectorAll(".agenda-what")) if (/· evening/.test(n.textContent)) n.textContent = n.textContent.replace("· evening", "· morning");
+    const box = document.createElement("div"); box.style.cssText = "margin:-2px 0 8px;padding:10px 12px;background:#fff;border-radius:0 0 14px 14px;border:1px solid #d9e2f2;border-top:0;" + mark;
+    tue.style.cssText += ";border-radius:14px 14px 0 0;margin-bottom:0";
+    const why = document.createElement("small"); why.className = "muted"; why.style.display = "block"; why.textContent = "Every Tuesday. To change one date, open that day on Plan. Tap Tuesday again to close."; box.appendChild(why);
+    while (seg.firstChild) box.appendChild(seg.firstChild);
+    tue.after(box); seg.remove(); if (head) head.remove();
+    // How hard: three chips, the zones of the one picked
+    const hh = [...box.querySelectorAll(".setting")].find((n) => /^How hard/.test(n.firstElementChild?.textContent || ""));
+    if (hh) { const list = hh.querySelector(".activity-list"); const c = document.createElement("div"); c.className = "chip-row";
+      c.innerHTML = ["Light", "Moderate", "Hard"].map((x) => `<button class="choice ${x === "Moderate" ? "on" : ""}">${x}</button>`).join("");
+      const z = document.createElement("small"); z.className = "setting-hint"; z.innerHTML = "<b>Zone 2</b> easy, you talk in full sentences · <b>Zone 3</b> steady, you talk in short sentences. <span style='color:#2e7be8;font-weight:700'>What the zones are ›</span>";
+      if (list) { list.replaceWith(c); c.after(z); } }
+    const st = [...box.querySelectorAll(".setting")].find((n) => /^When/.test(n.firstElementChild?.textContent || ""));
+    if (st) { for (const c of st.querySelectorAll("button")) { if (/Evening/.test(c.textContent)) { c.classList.remove("on"); c.innerHTML = 'Evening <small style="font-weight:400;opacity:.75">· in work hours</small>'; } if (/Morning/.test(c.textContent)) c.classList.add("on"); }
+      const s = document.createElement("small"); s.style.cssText = "display:block;margin-top:4px"; s.textContent = "Chef Mealan suggests training outside your work hours, 16:00 to 23:00. Every time stays open: a break at work can be gym time."; st.appendChild(s); st.style.cssText += ";" + mark; }
+    for (const n of box.querySelectorAll("small, p, div")) if (n.childElementCount === 0 && /From Lifestyle: fixed hours, 9 to 5/.test(n.textContent)) n.textContent = n.textContent.replace("fixed hours, 9 to 5", "your hours, 16:00 to 23:00");
+    const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New: Tuesday opens right under Tuesday, as in setup. Tap Tuesday again and it closes. Tap Thursday and Thursday opens too; Tuesday stays open until you tap it. How hard is three chips, with the zones of the one picked. Evening stays open, marked in work hours.";
+    document.querySelector(".week-card").before(d);
+  }, { mark, NOTE });
+  await shot("r147d");
   await b.close(); server.kill();
 })();
