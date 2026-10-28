@@ -2,6 +2,7 @@
 // Code looks first, at once and for free: your recipes, Coach's, the members' and Chef Mealan's starters, and your foods; PD 7+
 // is a filter, shown as a chip. Chef Mealan is asked only on a tap; his idea is kept in My recipes as an idea, not made yet,
 // and the app works out every number from the foods. Picking a dish puts it on the plate, as Make it does.
+import { recipeName } from "../recipeDiff";
 import { cookTitle } from "../cookWords";
 import { carriedLists } from "../carry";
 import { tasteOfWords } from "../craving";
@@ -47,7 +48,7 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
   const groups = useMemo(() => {
     if (!active) return null;
     const ok = (m: Meal) => !m.items.some((i) => blockedByAllergy(i.food, allergies));
-    const mine = state.meals.filter((m) => m.from !== "coach" && ok(m) && matchesCraving(c.words, recipeHay(m))).map((m) => { const x = fromMeal(m, "mine"); return rowOf<Ref>(`m:${m.id}`, m.title, x.kcal, x.protein, { kind: "mine", meal: m }); });
+    const mine = state.meals.filter((m) => m.from !== "coach" && ok(m) && matchesCraving(c.words, recipeHay(m))).map((m) => { const x = fromMeal(m, "mine"); return rowOf<Ref>(`m:${m.id}`, recipeName(m, state.meals), x.kcal, x.protein, { kind: "mine", meal: m }); });
     const coach = state.meals.filter((m) => m.from === "coach" && ok(m) && matchesCraving(c.words, recipeHay(m))).map((m) => { const x = fromMeal(m, "coach"); return rowOf<Ref>(`c:${m.id}`, m.title, x.kcal, x.protein, { kind: "coach", meal: m }); });
     const mem = membersFor((members ?? []).filter((r) => !r.mine), { target, kitchens: p.personal.kitchens ?? [], allergies })
       .filter((r) => matchesCraving(c.words, { title: r.title, foods: r.items.map((i) => i.food.name), parts: r.items.map((i) => i.part ?? "") }))

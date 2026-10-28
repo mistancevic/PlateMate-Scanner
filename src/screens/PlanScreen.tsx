@@ -1,3 +1,4 @@
+import { plannedName } from "../recipeDiff";
 import { carryReads } from "../carry";
 import { tripOn, placeName, type Trip } from "../places";
 import { REGIONS } from "../moments";
@@ -165,7 +166,7 @@ export function PlanScreen(p: AppApi) {
             <div key={r.slot.id} className={`plan-slot-wrap ${fit?.state === "under" ? "plan-slot-under" : ""}`}>
               {/* R19 (0.2.47, board RS18): a planned meal is a row you tap to see it, swipe to Swap or Empty; the time is in its line */}
               {m && !m.skipped
-                ? <PlanRow className="plan-slot plan-slot-set" label={`${r.slot.name}, ${r.slot.time}`} title={m.title} photo={pictureOfRecipe(m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null)}
+                ? <PlanRow className="plan-slot plan-slot-set" label={`${r.slot.name}, ${r.slot.time}`} title={plannedName(m, p.state.meals)} photo={pictureOfRecipe(m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null)}
                     ariaLabel={`${r.slot.name} at ${r.slot.time}, ${m.title}`}
                     sub={fit ? <>{SOURCE[m.source]}{amountText(m) ? ` · ${amountText(m)}` : ""} · {fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</> : null}
                     onOpen={() => { const rec = m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null; if (rec) p.openMeal(rec.id, { tab: "plan", slot: { date: key, slotId: r.slot.id, name: r.slot.name, time: r.slot.time } }); else if (m.items?.length) setViewing(r.slot); else setOpen(r.slot); }}
@@ -173,7 +174,7 @@ export function PlanScreen(p: AppApi) {
                 : <button type="button" className={`menu-row plan-slot ${m ? "plan-slot-set" : ""}`} aria-label={m ? `${r.slot.name} at ${r.slot.time}, ${m.title}` : `${r.slot.name} at ${r.slot.time}, pick a meal`} onClick={() => setOpen(r.slot)}>
                     <div className="menu-row-text">
                       <small>{r.slot.name}, {r.slot.time}</small>
-                      {m ? <b>{m.title}</b> : <b className="plan-pick">Pick a meal</b>}
+                      {m ? <b>{plannedName(m, p.state.meals)}</b> : <b className="plan-pick">Pick a meal</b>}
                       {m?.skipped && <small className="plan-slot-sub skipped-mark">Skipped on purpose</small>}
                     </div>
                     <ChevronRight size={18} />
@@ -463,7 +464,7 @@ function PickSheet({ p, slot, slots, day, planned, target, unit, held, close, pu
     const read = m.mealId ? reads.get(m.mealId)?.read : null;
     return (
       <button key={k} type="button" className="menu-row pick-row" onClick={pick}>
-        <div className="menu-row-text"><b>{m.title}</b><small>{isBatch(m) ? `${amountText(m)} · ` : ""}{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein</small>{read && <small className={read === "light" ? "carry-light" : "carry-heavy"}>{read === "light" ? "Light for you" : "Heavy for you"}</small>}</div>
+        <div className="menu-row-text"><b>{plannedName(m, p.state.meals)}</b><small>{isBatch(m) ? `${amountText(m)} · ` : ""}{fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g protein</small>{read && <small className={read === "light" ? "carry-light" : "carry-heavy"}>{read === "light" ? "Light for you" : "Heavy for you"}</small>}</div>
         <div className={`pick-pd ${fit.state}`}><b>{unit === "pct" ? `${pdVal(fit.pd)} %` : `PD ${pdVal(fit.pd)}`}</b><small>{fit.text}</small></div>
       </button>
     );

@@ -30,3 +30,19 @@ export function newNameFor(title: string, before: Ingredient[], after: Ingredien
   for (let n = 2; n < 50; n++) if (!used.has(`${base} ${n}`.toLowerCase())) return `${base} ${n}`;
   return `${base} ${Date.now() % 1000}`;
 }
+
+// DT137 (0.2.123; Milan 28 October 16:39): two recipes with the same name, made before 0.2.122, are told apart by the day they
+// were saved: Skyr breakfast · 26 October. A name used once stays as it is. Two saved the same day add the time.
+export function recipeName(m: { id: string; title: string; savedAt?: string }, meals: { id: string; title: string; savedAt?: string }[]): string {
+  const same = meals.filter((x) => x.id !== m.id && x.title.trim().toLowerCase() === m.title.trim().toLowerCase());
+  if (!same.length || !m.savedAt) return m.title;
+  const d = new Date(m.savedAt); if (isNaN(d.getTime())) return m.title;
+  const day = d.toLocaleDateString("en-GB", { day: "numeric", month: "long" });
+  const sameDay = same.some((x) => x.savedAt && new Date(x.savedAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" }) === day);
+  return `${m.title} · ${day}${sameDay ? `, ${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}` : ""}`;
+}
+// a planned meal by its recipe, when it has one
+export const plannedName = (m: { title: string; mealId?: string }, meals: { id: string; title: string; savedAt?: string }[]): string => {
+  const r = m.mealId ? meals.find((x) => x.id === m.mealId) : undefined;
+  return r && r.title === m.title ? recipeName(r, meals) : m.title;
+};
