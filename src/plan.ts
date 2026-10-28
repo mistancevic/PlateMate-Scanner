@@ -65,7 +65,7 @@ export const ZONES: Record<Intensity, Zone[]> = {
   easy: [{ zone: "Zone 1", feel: "very easy, you breathe calmly", examples: "yoga, mobility, stretching, easy cycling" }],
   moderate: [
     { zone: "Zone 2", feel: "easy, you can talk in full sentences", examples: "easy jog, cycling, swimming, hiking" },
-    { zone: "Zone 3", feel: "steady, you talk in short sentences", examples: "tempo run, spin class, strength training, team practice" },
+    { zone: "Zone 3", feel: "steady, you talk in short sentences", examples: "tempo run, spin class, team practice" },
   ],
   hard: [
     { zone: "Zone 4", feel: "hard, only a few words at a time", examples: "intervals, HIIT, a football match" },

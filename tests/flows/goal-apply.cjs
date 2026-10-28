@@ -45,7 +45,10 @@ const PORT = "3299", U = `http://127.0.0.1:${PORT}`;
   const g = (await ls("platemate-pilot-v1")).goals, p2 = await ls("chefmealan-personal");
   ok(g.calories === null && g.protein === null && g.fats === null && g.carbs === null, "Reset clears all four numbers: " + JSON.stringify(g));
   ok(!p2.ownDays && (await ls("chefmealan-goal")) === null, "Reset clears your own days and the goal");
-  ok(await page.locator("#own-kcal").count() === 0 && await page.getByRole("button", { name: /^Apply from today/ }).count() === 1, "after Reset the goal screen opens on Calculate for me, with Apply");
+  // DT139 (0.2.124): after Reset nothing is picked for you; a goal picked brings the numbers and Apply
+  ok(await page.locator("#own-kcal").count() === 0 && await page.getByRole("button", { name: /^Apply from today/ }).count() === 0 && /Pick what you are after/.test(await page.locator(".goal-missing").first().textContent()), "after Reset the goal screen opens on Calculate for me, no goal picked");
+  await page.getByRole("button", { name: /^Maintain/ }).first().click(); await page.waitForTimeout(300);
+  ok(await page.getByRole("button", { name: /^Apply from today/ }).count() === 1, "a goal picked: Apply");
   // Calculate for me without a height
   await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-personal")); delete p.heightCm; localStorage.setItem("chefmealan-personal", JSON.stringify(p)); });
   await page.reload(); await page.waitForTimeout(1200);

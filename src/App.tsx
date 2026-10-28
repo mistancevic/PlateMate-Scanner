@@ -809,6 +809,7 @@ export default function App() {
     [filling, setFilling] = useState<Filling | null>(null),
     // the recipe the plate came from (a slot or Recipes, Open), so a new name on the Plate renames it at once
     [plateRecipeId, setPlateRecipeId] = useState<string | null>(null),
+    [goalFocus, setGoalFocus] = useState<"formula" | null>(null),
     // after How was it (0.2.23, IM23c): the recipe the meal made or changed opens on Recipes, with one line for today
     [landing, setLanding] = useState<{ id: string; line: string; title?: string; quiet?: boolean; back?: "recipes"; from?: import("./screens/api").MealFrom } | null>(null),
     // R8 (0.2.31): a reload or a saved link on /my-recipes/<id> opens that recipe, once Back is ready
@@ -2370,7 +2371,7 @@ export default function App() {
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
     step, setStep, mixWith,
     clientName, setClientName: (v: string) => { storeClientName(v); setClientNameState(v); },
-    goal, openGoal: () => setGoalOpen(true), fitPd: (pd: number | null) => fitPd(pd, pdRef),
+    goal, openGoal: (focus?: unknown) => { setGoalFocus(focus === "formula" ? "formula" : null); setGoalOpen(true); }, goalFocus, fitPd: (pd: number | null) => fitPd(pd, pdRef),
     // Foods measure every food against the day's target, not the plate's moment (a snack before training aims at PD 3)
     fitDay: (pd: number | null) => fitPd(pd, dayPd),
     // DT136: a place's starter foods come with its switch, the first time. The common ones are sold everywhere; a place's own

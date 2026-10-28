@@ -77,6 +77,8 @@ const personal = (w) => ({ sex: "male", birthYear: 1981, heightCm: 182, weightKg
     ok(fl.left <= 20 && fl.same, "FT0 fixed: the formula text starts at the left, Change on the same line " + JSON.stringify(fl));
     await page.setViewportSize({ width: 390, height: 3000 });
     await go(page, "/me/goal"); await page.getByRole("button", { name: /Change the goal/ }).first().click(); await page.waitForTimeout(800);
+    // DT139 (0.2.124): the formula sits behind How we calculate ›
+    await page.locator(".how-calc").click(); await page.waitForTimeout(300);
     const wide = page.locator(".formula-card .opt-wide");
     ok(await wide.isDisabled() && /Not enough data yet/.test(await wide.textContent()), "FT5: From your data is greyed until day 14");
     await ctx.close(); }

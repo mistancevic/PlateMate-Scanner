@@ -2238,3 +2238,7 @@ input::placeholder { color: #8a93a6; font-style: italic; font-weight: 400; opaci
 /* DT137 (0.2.122): changed from your recipe */
 .changed-ask { display: flex; flex-direction: column; gap: 8px; margin: 10px 0; }
 .changed-ask > small { color: var(--muted, #5b6478); }
+/* DT139 (0.2.124): setup, the first screen */
+.how-calc { display: block; margin: 12px 0 2px; font-weight: 700; }
+.how-calc-line, .coach-later, .pd-said { display: block; margin: 4px 0 8px; }
+.pd-said { color: var(--muted, #5b6478); }

@@ -417,7 +417,7 @@ function GoalPanel(p: AppApi) {
       {canCalculate(p.personal) && !isMinor(p.personal) && (
         <section className="card you-card formula-line">
           <span><b>Formula</b><small>{p.formula ? `${FORMULA_NAME[p.formula]}, set by ${p.coachLabel}` : p.personal.formula ? FORMULA_NAME[p.personal.formula] : `Automatic: ${p.personal.bodyFatPct ? "Katch McArdle" : "Mifflin St Jeor"} now`}{(p.formula ?? p.personal.formula) === "data" && p.personal.measuredUse ? ` · ${p.personal.measuredUse.kcal.toLocaleString("en")} kcal a day to stay the same` : p.formulaKcal ? ` · ${p.formulaKcal.toLocaleString("en")} kcal a day to stay the same` : ""}</small></span>
-          <button className="link" onClick={openGoal}>Change</button>
+          <button className="link" onClick={() => openGoal("formula")}>Change</button>
         </section>
       )}
       {/* the measured burn, next to the formula (0.2.7, board FT, FT3 and FT4) */}

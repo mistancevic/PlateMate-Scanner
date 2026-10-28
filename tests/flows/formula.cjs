@@ -35,7 +35,8 @@ const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0
   // the calculator: 1 You, 2 the formula, 3 the goal, 4 the days
   await page.locator(".formula-line").getByRole("button", { name: "Change" }).click(); await page.waitForTimeout(700);
   const steps = await page.locator(".calc-step, .section-title").allTextContents();
-  ok(steps.join("|").includes("1. You|2. The formula|3. What are you after?|4. Your days"), "the calculator in four steps: " + steps.join(" | "));
+  // DT139 (0.2.124): the formula sits behind How we calculate ›, open when you came from the formula line; three numbered steps
+  ok(steps.join("|").includes("1. You|2. What are you after?|3. Your days") && await page.locator(".how-calc").count() === 1, "the calculator in three steps, the formula behind How we calculate: " + steps.join(" | "));
   ok(/Body fat: not given/.test(await page.locator(".you-card").textContent()), "You shows the body fat, or that it is not given");
   const card = page.locator(".formula-card");
   const opts = await card.locator(".opt-grid .opt").allTextContents();

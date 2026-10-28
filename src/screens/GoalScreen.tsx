@@ -31,7 +31,13 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const [way, setWay] = useState<Way>(p.goal?.source === "exact" || p.goal?.source === "coach" ? "own" : "calc");
   const [d, setD] = useState<Personal>(p.personal);
   const [editing, setEditing] = useState<boolean>(!canCalculate(p.personal));
-  const [band, setBand] = useState<string>(suggestBand(p.personal, p.goal?.band).id);
+  // DT139 (0.2.124, board Stories95; Anna's DT118; Milan 28 October 17:05 Go): on the first setup no goal is picked for you; the
+  // numbers and Apply appear once you pick. My own numbers and the analysis still read a goal: the one you had, else Maintain
+  const [picked, setBand] = useState<string>(p.goal?.band ? suggestBand(p.personal, p.goal.band).id : "");
+  const band = picked || suggestBand(p.personal, undefined).id;
+  const [howOpen, setHowOpen] = useState(p.goalFocus === "formula" || Boolean(p.calcFormula));
+  // the sections are numbered as they show: 1. You only once you agreed
+  const nYou = 1, nGoal = consented ? 2 : 1;
   const [own, setOwn] = useState({ kcal: state.goals.calories ? String(state.goals.calories) : "", protein: state.goals.protein ? String(state.goals.protein) : "", fats: state.goals.fats ? String(state.goals.fats) : "", carbs: state.goals.carbs ? String(state.goals.carbs) : "" });
   const mode: DayMode = dayModeOf(d);
   // Release A: a birth year under 18 is not saved from the goal setup; the setup says why, and the person corrects it in place
@@ -44,7 +50,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   // From your data (0.2.7, board FT, FT5): the measured burn of today, or the one already in use, fixed with Apply from
   const dataFixed = formula === "data" ? (p.personal.formula === "data" && p.personal.measuredUse && !p.calcFormula ? p.personal.measuredUse : fixedOf(p.measured) ?? p.personal.measuredUse ?? null) : null;
   const dF: Personal = (() => { const { formula: _, measuredUse: _m, ...r } = d; void _; void _m; return formula === "auto" ? r : formula === "data" ? (dataFixed ? { ...r, formula, measuredUse: dataFixed } : r) : { ...r, formula }; })();
-  const c = under ? null : calculate(dF, band, p.formula);
+  const c = under || !picked ? null : calculate(dF, band, p.formula);
   // FT5: with From your data, how far the week moves from the formula's
   const dataNote = (() => {
     if (!c || formula !== "data" || !dataFixed) return undefined;
@@ -173,7 +179,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
         {fromMe ? <button className="link" onClick={onLater}>← Me</button> : <span />}
         <button className="link" onClick={onLater}>{fromMe ? "Close" : "Not now"}</button>
       </div>
-      <div className="hero"><Mark size={52} color="var(--brand)" /><h2>{APP_NAME}</h2><p>Your day in four numbers. Every plate is measured against them.</p></div>
+      <div className="hero"><Mark size={52} color="var(--brand)" /><h2>{APP_NAME}</h2><p>Your day in five numbers. Every plate is measured against them.</p></div>
       <div className="ways">
         <button className={`choice ${way === "calc" ? "on" : ""}`} onClick={() => setWay("calc")}>Calculate for me</button>
         <button className={`choice ${way === "own" ? "on" : ""}`} onClick={() => setWay("own")}>My own numbers</button>
@@ -190,7 +196,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               </div>
             </section>
           )}
-          {consented && <p className="label calc-step">1. You</p>}
+          {consented && <p className="label calc-step">{nYou}. You</p>}
           {consented && !editing && canCalculate(d) ? (
             <section className="card you-card">
               <span><b>You</b><small>{[d.sex === "male" ? "Male" : d.sex === "female" ? "Female" : null, d.birthYear, d.heightCm ? hText(d.heightCm) : null, d.weightKg ? wText(d.weightKg, Number.isInteger(wIn(d.weightKg)) ? 0 : 1) : null, LIFE.find((l) => l.id === workOf(d))!.name, STEPS.find((x) => x.id === d.steps)?.name.concat(" steps")].filter(Boolean).join(" · ")}<br />Body fat: {d.bodyFatPct ? `${d.bodyFatPct} %` : "not given"}</small></span>
@@ -207,7 +213,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
                 <WeightField kg={d.weightKg} unit={units().weight} onKg={(v) => setD({ ...d, weightKg: v })} onDone={() => save(d)} />
               </div>
               {under && <p className="small adult-line" role="alert"><b>Chef Mealan is for adults.</b> {ADULT_ONLY} This birth year means you're under 18, so you can't use Chef Mealan yet. If you typed it wrong, correct it here.</p>}
-              <div className="calc-part"><b>Your everyday</b><small>Every day, with or without training.</small></div>
+              <div className="calc-part"><b>Lifestyle</b><small>Every day, with or without training.</small></div>
               {wk === "work" || wk === "both" ? (
                 <div className="field"><span>Your work</span>
                   <div className="activity-list">{LIFE.map((l) => <button key={l.id} className={`activity ${workOf(d) === l.id ? "on" : ""}`} onClick={() => setPersonalNow(withWork(d, l.id))}><b>{l.name}</b><small>{l.hint}</small></button>)}</div>
@@ -227,16 +233,18 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           )}
           {consented && canCalculate(d) && !under && (
             <>
-              <p className="label calc-step">2. The formula</p>
-              <FormulaCard personal={formula === "data" && dataFixed ? { ...d, measuredUse: dataFixed } : d} pinned={p.formula ?? null} coachLabel={p.coachLabel} value={formula} onPick={setFormula} measured={p.measured} />
+              {/* DT139: the formula is automatic; its names and the choice sit behind one line */}
+              <button type="button" className="link how-calc" aria-expanded={howOpen} onClick={() => setHowOpen(!howOpen)}>How we calculate ›</button>
+              {!howOpen && <small className="muted how-calc-line">{formula === "auto" ? "Automatic, from your body and your week." : "Your pick, behind this line."}</small>}
+              {howOpen && <FormulaCard personal={formula === "data" && dataFixed ? { ...d, measuredUse: dataFixed } : d} pinned={p.formula ?? null} coachLabel={p.coachLabel} value={formula} onPick={setFormula} measured={p.measured} />}
             </>
           )}
-          <b className="section-title">3. What are you after?</b>
+          <b className="section-title">{nGoal}. What are you after?</b>
           <p className="small muted">Each goal says what happens to your weight, how much you eat, and what you need to do. You can change it at any time.</p>
           <div className="goal-cards">{BANDS.map((b) => {
             // Build muscle has a pace (canvas board K1): Steady or Faster, started by how long the person has trained
-            const on = band === b.id || (b.id === "gain" && isBuild(band));
-            const pick = () => setBand(b.id !== "gain" ? b.id : isBuild(band) ? band : PACES.find((x) => x.id === (d.trainingAge ? paceForAge(d.trainingAge) : "steady"))!.band);
+            const on = picked === b.id || (b.id === "gain" && isBuild(picked));
+            const pick = () => setBand(b.id !== "gain" ? b.id : isBuild(picked) ? picked : PACES.find((x) => x.id === (d.trainingAge ? paceForAge(d.trainingAge) : "steady"))!.band);
             return (
               <div key={b.id} className={`goal-pick-wrap ${on ? "on" : ""}`}>
                 <button type="button" className={`goal-pick ${on ? "on" : ""}`} aria-pressed={on} onClick={pick}>
@@ -262,19 +270,21 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
           {c && <ProteinCard c={c} />}
           {c ? (
             <>
-              <Days title="4. Your days" />
+              <Days title={`${nGoal + 1}. Your days`} />
               {mode === "same" ? (
                 <section className="card proposal"><Four kcal={c.kcal} protein={c.protein} fats={c.fats} carbs={c.carbs} /><p className="math">{c.math}</p><small>{c.method}.</small></section>
               ) : (
                 <DayTable rows={c.days} avg={{ kcal: c.kcal, protein: c.protein }} week={c.week} weekdays={c.weekdays} note={dataNote} />
               )}
+              <small className="pd-said">PD: grams of protein per 100 kcal, the number that tells a food from a marketing claim.</small>
               {c.note && <small className="notice">{c.note}</small>}
               <ApplyFrom />
               <button className="pill pill-primary pill-wide" onClick={() => apply({ source: "profile", kcal: c.kcal, protein: c.protein, fats: c.fats, carbs: c.carbs, method: c.method })}>{saveLabel(null)}</button>
+              {!p.profile.coachId && !coach && <small className="muted coach-later">A coach can adjust these numbers later.</small>}
             </>
           ) : (
             // 0.2.119 (Tester 2, Milan 28 October 14:59): no Apply and no word why read as a dead end; say what is missing
-            <p className="small goal-missing" role="status">{!consented ? "To calculate your numbers, tap I agree above, then fill in your body." : under ? "Chef Mealan is for adults: check the birth year above." : `To calculate your numbers, fill in ${missingOf(d).join(", ")} above. Or use My own numbers.`}</p>
+            <p className="small goal-missing" role="status">{consented && canCalculate(d) && !under && !picked ? "Pick what you are after, and your numbers appear." : !consented ? "To calculate your numbers, tap I agree above, then fill in your body." : under ? "Chef Mealan is for adults: check the birth year above." : `To calculate your numbers, fill in ${missingOf(d).join(", ")} above. Or use My own numbers.`}</p>
           )}
         </div>
       )}

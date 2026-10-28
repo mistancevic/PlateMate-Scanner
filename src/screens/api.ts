@@ -191,7 +191,9 @@ export interface AppApi {
   mealanCard: ReactNode;
   importRef: RefObject<HTMLInputElement | null>;
   goal: import("../goal").Goal | null;
-  openGoal: () => void;
+  // DT139: "formula" opens the calculator with How we calculate open (from the formula line on Me, Goal)
+  openGoal: (focus?: unknown) => void;
+  goalFocus: "formula" | null;
   // the chat knows the screen (0.2.4); "fill" opens it with the day filled
   openOut: (ask?: "fill" | "plate" | "around") => void;
   // Where does this go (0.2.5): Scan from Today, then the sheet with the saved food

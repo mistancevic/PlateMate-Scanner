@@ -23,8 +23,8 @@ export const STEADY: Band = { id: "gainsteady", name: "Build muscle", range: "PD
   points: ["More food than you burn, about 5 % more.", "Your lifts go up first; your weight follows slowly."] };
 export const ALL_BANDS: Band[] = [...BANDS, STEADY];
 export const PACES: { id: Pace; band: string; name: string; hint: string }[] = [
-  { id: "steady", band: "gainsteady", name: "Steady", hint: "about 5 % more food · weight up 0.25–1 % a month, by how long you've trained · for someone who has trained a while and wants to get stronger" },
-  { id: "faster", band: "gain", name: "Faster", hint: "about 10 % more food · weight up 0.25–0.5 % a week · for someone with muscle to catch up on" },
+  { id: "steady", band: "gainsteady", name: "Steady", hint: "about 5 % more food · weight up about 0.05 to 0.25 % a week, by how long you've trained · for someone who has trained a while and wants to get stronger" },
+  { id: "faster", band: "gain", name: "Faster", hint: "about 10 % more food · weight up 0.25 to 0.5 % a week · for someone with muscle to catch up on" },
 ];
 export const isBuild = (id?: string) => id === "gain" || id === "gainsteady";
 export const paceOf = (id?: string): Pace | null => (id === "gainsteady" ? "steady" : id === "gain" ? "faster" : null);

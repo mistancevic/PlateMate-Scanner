@@ -25,7 +25,7 @@ const path = require("node:path");
     await inputs.nth(0).fill("1981"); await inputs.nth(1).fill("182"); await inputs.nth(2).fill("96"); await inputs.nth(2).blur(); await page.waitForTimeout(200);
     const form = page.locator(".calc-way .form");
     const parts = await form.locator(".calc-part b").allTextContents();
-    ok(parts.join("|") === "Your everyday|Your training", "your everyday first, then your training: " + parts.join(", "));
+    ok(parts.join("|") === "Lifestyle|Your training", "Lifestyle first (DT139: one name), then your training: " + parts.join(", "));
     // your everyday
     ok(await page.getByRole("button", { name: /Mostly sitting/ }).count() === 1, "your work, as before");
     await page.getByRole("group", { name: "Steps on a usual day" }).getByRole("button", { name: "8,000–12,000" }).click(); await page.waitForTimeout(150);
@@ -53,6 +53,8 @@ const path = require("node:path");
     ok(/6 training days/.test(await tally()) && /1 day without training/.test(await tally()), "a − gives a day back, never stuck");
     await page.getByRole("button", { name: "Fewer Hard days" }).click(); await page.getByRole("button", { name: "Fewer Hard days" }).click(); await page.waitForTimeout(200);
     // the numbers count the steps on a day without training
+    // DT139 (0.2.124): no goal is picked for you; the days show once one is
+    await page.getByRole("button", { name: /^Maintain/ }).first().click(); await page.waitForTimeout(300);
     await page.getByRole("button", { name: "Each day its own" }).click(); await page.waitForTimeout(300);
     await page.getByRole("button", { name: /^Apply from today/ }).last().click(); await page.waitForTimeout(500);
     // the Training week has the same days
