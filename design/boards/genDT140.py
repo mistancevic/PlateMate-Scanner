@@ -87,16 +87,17 @@ B = Board(); y = 30
 cy = storyCard(B, y, "DT140", "Training days are asked, never guessed", [
   ("Anna, both runs (her DT117)", "She said three moderate days; the app put them on Monday, Tuesday and Thursday, evening, from a Training week she never saw. Her Friday session showed as a rest day. Moving two days took 7 to 10 taps and lost the time."),
   ("Now, checked in 0.2.124", "Still so. Setup has only + and − per intensity; each + fills the next day in a fixed order (Monday, Thursday, Tuesday, Friday...), always evening, no clock time. On Training week, moving a day means No training on one day and the whole day again on the other: 5 to 7 taps, and When and Starts at are lost."),
-  ("The story, setup", "Under each count, Which days? with seven day chips, Monday first, and When, usually? (Morning, Midday, Evening). The count and the days always agree: a tapped fourth day makes the count 4, a − takes the last day tapped. Training week starts from the days and the time picked here."),
+  ("Milan, 28 October 17:39", "Is it always the same days for three? Can it be Mon, Wed, Fri? Why a count instead of the days of the week directly, so it is counted from the source of the setup?"),
+  ("The story, setup (version 2)", "No count to type and no order the app picks. Your training is the week itself: seven days, Monday first. Tap a day and say how hard (No training, Light, Moderate, Hard), how long and when; the line shows it (Moderate · 45 to 60 min · evening). The count follows from the days: 3 training days, Mon, Wed, Fri. What light, moderate and hard mean sits behind one line, as the zones do today. It is the same week as Me, Training week: set here, changed there."),
   ("The story, Training week", "Under the day you opened: Move Tuesday to, six day chips. One tap moves the day as it is (what, how hard, how long, when, the start time); the old day becomes a day without training. A day that already has training swaps with it."),
 ])
 h = rowEnd(cy,
   B.screen("DT140a", 0, y, "Now: a count, the app picks", "r140a", "now", "Three moderate days: Monday, Thursday, Tuesday, evening."),
-  B.screen("DT140b", 1, y, "New: which days, and when", "r140b", "changed", "Mon, Wed, Fri tapped; Evening; Training week starts from these."))
+  B.screen("DT140b", 1, y, "New: the week is the source", "r140b", "changed", "Tap the days: Mon, Wed, Fri, moderate, evening; the count follows."))
 y = h
 h = rowEnd(y + 10,
   B.screen("DT140c", 0, y, "New: Move to, on Training week", "r140c", "changed", "Tuesday to Friday in one tap, the time kept."))
 y = h
 board("Stories96.dc.html", "DT140. Training days are asked, never guessed",
-  "28 October 2026 (Anna's DT117, brought up to 0.2.124). Now: 0.2.124, untouched. Drawn for your approval; nothing built.",
+  "28 October 2026 (Anna's DT117, brought up to 0.2.124). Version 2 (Milan 17:39): the week, not a count. Now: 0.2.124, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories95.dc.html")

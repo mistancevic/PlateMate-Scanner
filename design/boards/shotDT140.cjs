@@ -28,18 +28,24 @@ const PORT = "3310", U = `http://127.0.0.1:${PORT}`;
   await page.evaluate((mark) => { const t = document.querySelector(".train-week"); if (t) t.style.cssText += ";" + mark; }, mark);
   await note(".train-week", "Now (0.2.124): Anna taps + three times for Moderate. No days, no time: the app puts them on Monday, Thursday and Tuesday, in the evening, on a Training week she never sees. Her Friday class reads as a rest day.");
   await clip("r140a", ".train-week");
-  // DT140b, new: the days and the time, under the count
-  await setup();
+  // DT140b, new (version 2, Milan 28 October 17:39): the week itself is the source; tap a day, say how hard; the count follows
+  await page.goto(U + "/"); await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-personal")); p.plan = Array(7).fill({ work: true, kind: "rest" }); localStorage.setItem("chefmealan-personal", JSON.stringify(p)); }); await page.reload(); await page.waitForTimeout(1500);
+  await page.getByRole("button", { name: "Edit" }).first().click(); await page.waitForTimeout(300);
   await page.evaluate(({ mark }) => {
-    const rows = [...document.querySelectorAll(".train-row")]; const mod = rows.find((r) => /Moderate/.test(r.textContent)); if (!mod) return;
+    const tw = document.querySelector(".train-week"); if (!tw) return;
+    const day = (d, what, on, open) => `<div style="border:1px solid ${on ? "#2e7be8" : "#d9e2f2"};border-left:6px solid ${on ? "#2e9d6a" : "#d9e2f2"};border-radius:12px;padding:10px 12px;margin:6px 0;background:#fff">
+      <div style="display:flex;justify-content:space-between;font-weight:700"><span>${d}</span><span style="color:${on ? "#172742" : "#8a93a6"};font-weight:${on ? 700 : 400}">${what}</span></div>${open || ""}</div>`;
     const chip = (t, on) => `<button class="choice ${on ? "on" : ""}" style="min-width:0;padding:6px 10px">${t}</button>`;
-    const d = document.createElement("div"); d.style.cssText = "margin-top:10px;padding:8px;" + mark;
-    d.innerHTML = '<small class="setting-name">Which days? 3 of 3</small><div class="chip-row" style="gap:6px">' + ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((x) => chip(x, ["Mon", "Wed", "Fri"].includes(x))).join("") + '</div>' +
-      '<small class="setting-name" style="display:block;margin-top:8px">When, usually?</small><div class="chip-row" style="gap:6px">' + chip("Morning") + chip("Midday") + chip("Evening", true) + '</div>' +
-      '<small style="display:block;margin-top:6px;color:#5b6478">Tap a fourth day and the count says 4. Training week starts from these days.</small>';
-    mod.appendChild(d);
+    const fri = `<div style="margin-top:8px"><small class="setting-name">How hard</small><div class="chip-row" style="gap:6px">${chip("No training")}${chip("Light")}${chip("Moderate", true)}${chip("Hard")}</div>
+      <small class="setting-name" style="display:block;margin-top:6px">How long</small><div class="chip-row" style="gap:6px">${chip("30 to 45 min")}${chip("45 to 60 min", true)}${chip("60 to 90 min")}</div>
+      <small class="setting-name" style="display:block;margin-top:6px">When</small><div class="chip-row" style="gap:6px">${chip("Morning")}${chip("Midday")}${chip("Evening", true)}</div></div>`;
+    tw.innerHTML = '<div style="padding:8px;' + mark + '"><small style="display:block;color:#5b6478;margin-bottom:4px">Tap the days you train. Each one says how hard, how long and when.</small>' +
+      day("Mon", "Moderate · 45 to 60 min · evening", true) + day("Tue", "No training", false) + day("Wed", "Moderate · 45 to 60 min · evening", true) + day("Thu", "No training", false) +
+      day("Fri", "Moderate · 45 to 60 min · evening", true, fri) + day("Sat", "No training", false) + day("Sun", "No training", false) +
+      '<div style="display:flex;justify-content:space-between;margin-top:8px;font-weight:700"><span>3 training days</span><small>Mon, Wed, Fri · 4 without</small></div>' +
+      '<small style="display:block;margin-top:4px;color:#5b6478">The same week you see in Me, Training week: one week, set here, changed there.</small></div>';
   }, { mark });
-  await note(".train-week", "New: under each count, the days to tap, Monday first, and when you usually train. The count and the days always agree. Training week starts from what you tapped, so Friday is a training day.");
+  await note(".train-week", "New, version 2: no count to type. The week is the source: tap a day, say how hard, how long and when. The count follows from the days (3 training days: Mon, Wed, Fri). Nothing is guessed; it is the same week as Training week.");
   await clip("r140b", ".train-week");
   // DT140c, new: Training week, Move to keeps the time
   await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-personal")); p.plan = [0, 1, 2, 3, 4, 5, 6].map((i) => ([0, 1, 3].includes(i) ? { work: true, kind: "strength", intensity: "moderate", minutes: 55, when: "evening", at: "18:30" } : { work: true, kind: "rest" })); localStorage.setItem("chefmealan-personal", JSON.stringify(p)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-28T16:00:00Z", source: "profile" })); });
