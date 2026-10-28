@@ -8,6 +8,8 @@ set -euo pipefail
 cd "$(dirname "$0")"; source ./deploy.env; cd ..
 source deploy/live.sh
 gcloud config set project "$PROJECT" --quiet >/dev/null
+# Cloud Shell can drop the sign-in between two commands: say so plainly, before anything changes
+if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/null | grep -q .; then echo "Not signed in to Google Cloud. Run: gcloud auth login   then ./deploy/rollback.sh again. Nothing was changed."; exit 1; fi
 if [ "${1:-}" = "list" ]; then
   NOW=$(live_revision)
   gcloud run revisions list --service "$SERVICE" --project "$PROJECT" --region "$REGION" --format='value(metadata.name,metadata.creationTimestamp)' --limit 8 \

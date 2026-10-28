@@ -5,6 +5,8 @@ set -euo pipefail
 cd "$(dirname "$0")"; source ./deploy.env; cd ..
 source deploy/live.sh
 gcloud config set project "$PROJECT" --quiet >/dev/null
+# Cloud Shell can drop the sign-in between two commands: say so plainly, before anything changes
+if ! gcloud auth list --filter=status:ACTIVE --format="value(account)" 2>/dev/null | grep -q .; then echo "Not signed in to Google Cloud. Run: gcloud auth login   then ./deploy/promote.sh again. Nothing was changed."; exit 1; fi
 REV=$(tag_revision preview)
 if [ -z "$REV" ]; then echo "No preview to promote. Run ./deploy/preview.sh first."; exit 1; fi
 NOW=$(live_revision)
