@@ -84,10 +84,12 @@ class Component extends DCLogic {{
 
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
-cy = storyCard(B, y, "DT148", "Chef Mealan's idea: change its foods, and see it working", [
+cy = storyCard(B, y, "DT148", "Chef Mealan's idea: read it, change it on the Plate, see it working (version 2)", [
   ("Tester 3, UX2 and Bug 1 (Coach Milan, 28 October 21:57)", "Marko asked for a cheesecake from the box on top of the Plate. The idea had Quark, which he doesn't know. He wanted to swap it for a yogurt: no swipe and no add on the idea, and on the plate the swap offered nothing that made sense. He removed it, and then had to scroll to the bottom to add a food. While Chef Mealan worked, only a line of text showed; nothing said it was working."),
   ("Now, checked in 0.2.127", "The idea lists its foods in one grey line. Chef Mealan's instructions name quark and it is never told where you shop. On the plate, Swap lists Quark again first (Magerquark), then any food sorted by PD: skyr, whey, milk, biscuits, fruit, ice cream. It searches only your foods, in every place. + Add is the Quick picks list at the very bottom."),
-  ("The story", "The idea lists each food as a row with Swap, and + Add a food after the last one; a change puts the idea on the plate with it. On the plate, + Add a food sits right under the last food and opens the search there: your foods first, then the basic foods sold where you shop. Swap lists the same kind of food first (soft dairy for quark), then what is sold where you shop, then PD; a basic food sold there shows even when it is not in your foods yet (Take it). The food you swap away never comes back. Chef Mealan is told where you shop and is no longer pointed at quark. While it works, a card that moves: the hat stirs, the seconds count, and after 20 seconds it says it takes longer than usual. The same card for a recipe read and for the method."),
+  ("The story (version 2)", "The idea is to read: its name, PD, one line on why, the foods as points with their grams, and How to make it in three or four short steps, sent in the same answer. Put it on my plate, and every change happens there. On the plate, + Add a food sits right under the last food and opens the search there: your foods first, then the basic foods sold where you shop. One line under the foods says swipe left to swap, right to remove. Swap lists the same kind of food first (soft dairy for quark), then what is sold where you shop, then PD; a basic food sold there shows even when it is not in your foods yet, and joins them when you pick it. The food you swap away never comes back. Chef Mealan is told where you shop and is no longer pointed at quark. While it works, a card that moves: the hat stirs, the seconds count, and after 20 seconds it says it takes longer than usual. The same card for a recipe read and for the method."),
+  ("One word: + Add", "Take it goes from the Plate search and the Foods search. Every food you put on the plate or in your foods is + Add; the line under it says where it comes from (Basic food sold in Limassol; joins your foods)."),
+  ("Coach Milan, 28 October 23:10", "Swap on the idea but no remove. The previous version made more sense: Chef Mealan crafts a recipe, the foods with weights as points, a quick how to make it, and from there to the Plate, where all the functions are."),
   ("Rules", "Swap's order is a culinary rule: it moves to the rules module, with its row in culinary.md section 6."),
 ])
 h = rowEnd(cy,
@@ -100,12 +102,12 @@ h = rowEnd(y + 10,
 y = h
 h = rowEnd(y + 10,
   B.screen("DT148e", 0, y, "New: a wait that moves", "r148e", "changed", "The hat stirs, the seconds count."),
-  B.screen("DT148f", 1, y, "New: the idea's foods as rows", "r148f", "changed", "Swap on each food, + Add a food after the last."))
+  B.screen("DT148f", 1, y, "New: the idea to read", "r148f", "changed", "The foods as points, How to make it, then the Plate."))
 y = h
 h = rowEnd(y + 10,
-  B.screen("DT148g", 0, y, "New: Swap, the same kind first", "r148g", "changed", "Greek yogurt, cottage cheese, Cypriot anari and sheep's yoghurt."),
-  B.screen("DT148h", 1, y, "New: + Add a food under the foods", "r148h", "changed", "The search opens there: yours, then sold in Limassol."))
+  B.screen("DT148g", 0, y, "New: Swap, the same kind first", "r148g", "changed", "Greek yogurt, cottage cheese, then Cypriot anari and sheep's yoghurt."),
+  B.screen("DT148h", 1, y, "New: + Add a food under the foods", "r148h", "changed", "The search opens there, all + Add; swipe line under the foods."))
 y = h
 board("Stories100.dc.html", "DT148. Chef Mealan's idea: change its foods, and see it working",
-  "28 October 2026 (Tester 3, UX2 and Bug 1). Now: 0.2.127, untouched. Drawn for your approval; nothing built.",
+  "28 October 2026 (Tester 3, UX2 and Bug 1), version 2. Now: 0.2.127, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories99.dc.html")

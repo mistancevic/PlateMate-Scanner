@@ -82,17 +82,19 @@ const IDEA = { idea: { title: "Cheesecake cup", why: "Creamy and sweet like chee
   await shot("r148e");
   await page.evaluate(() => document.querySelectorAll(".dt-note").forEach((n) => n.remove()));
   hold = false; await page.waitForTimeout(1500);
-  // f, new: the idea's foods as rows, with Swap and + Add a food
+  // f, new: the idea to read: the foods as points, how to make it, then the Plate
   await page.evaluate((m) => {
     const card = document.querySelector(".crave-idea"); if (!card) return;
     const line = [...card.querySelectorAll("small")].find((n) => /g Quark/.test(n.textContent || "")); if (!line) return;
-    const foods = [["🥣", "Quark, low fat", "200 g", "Chef Mealan's estimate"], ["🌾", "Oats", "30 g", "PD 3.5, yours"], ["🍓", "Strawberries", "120 g", "Chef Mealan's estimate"], ["🍯", "Honey", "10 g", "PD 0.1, yours"]];
-    const box = document.createElement("div"); box.style.cssText = "margin:8px 0;border-top:1px solid #e3e8f2;" + m;
-    box.innerHTML = foods.map(([i, n, g, w]) => `<div style="display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid #e3e8f2"><span style="font-size:22px;width:30px;text-align:center">${i}</span><div style="flex:1"><b style="display:block">${n}</b><small class="muted">${w}</small></div><b>${g}</b><button class="pill pill-small">Swap</button></div>`).join("") + `<button class="link" style="display:block;padding:10px 2px;font-weight:800">+ Add a food</button><small class="muted" style="display:block">Swap or add, and the idea goes on your plate with the change.</small>`;
+    const box = document.createElement("div"); box.style.cssText = "margin:8px 0;padding:6px 8px;" + m;
+    box.innerHTML = `<b style="display:block;margin-bottom:4px">For one serving</b><ul style="margin:0 0 8px 20px;padding:0;line-height:1.6;list-style:disc"><li>200 g Greek yogurt 2%</li><li>30 g Oats</li><li>120 g Strawberries</li><li>10 g Honey</li></ul>
+      <b style="display:block;margin-bottom:4px">How to make it</b><ol style="margin:0 0 6px 20px;padding:0;line-height:1.5;list-style:decimal"><li>Toast the oats in a dry pan for 3 minutes, until they smell nutty. Let them cool.</li><li>Stir the honey into the yogurt.</li><li>Slice the strawberries.</li><li>In a glass: oats, then yogurt, then strawberries on top.</li></ol>
+      <small class="muted">One serving: 326 kcal · 25 g protein. To change a food, put it on your plate: swap, remove, add and amounts are all there.</small>`;
     line.replaceWith(box);
-    const sum = document.createElement("small"); sum.className = "muted"; sum.textContent = "One serving: 314 kcal · 29 g protein."; box.after(sum);
+    const pd = card.querySelector(".pick-pd b"); if (pd) pd.textContent = "7.6";
+    const w = [...card.querySelectorAll("small")].find((n) => /Creamy and sweet/.test(n.textContent || "")); if (w) w.textContent = "Creamy and sweet like cheesecake, with toasted oats for the base.";
   }, mark);
-  await noteBefore(".crave-idea", "New: each food of the idea is a row, with Swap. + Add a food comes after the last one. Quark is now unlikely here: Chef Mealan is told you shop in Limassol and is no longer pointed at quark.");
+  await noteBefore(".crave-idea", "New: the idea is to read. The foods as points with their grams, then How to make it in a few steps, in the same answer. Nothing to edit here: Put it on my plate, and the Plate has swap, remove, add and the amounts. Chef Mealan is told you shop in Limassol and is no longer pointed at quark, so here it picks Greek yogurt.");
   await shot("r148f");
   // g, new: Swap, kitchen sense first
   await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1200);
@@ -101,15 +103,15 @@ const IDEA = { idea: { title: "Cheesecake cup", why: "Creamy and sweet like chee
   await page.evaluate(({ m, NOTE }) => {
     const sh = document.querySelector(".sheet"); if (!sh) return; sh.style.cssText += ";max-height:90dvh;" + m;
     const row = (i, n, w, g, cls, take) => `<div class="row row-food row-button" style="display:flex;align-items:center;gap:10px"><span class="thumb thumb-sm">${i}</span><div class="row-text" style="flex:1"><b>${n}</b><small>${w}</small></div>${take ? '<span class="pill pill-small">Take it</span>' : ""}<span class="pdpill pdpill-${cls}">${g}</span></div>`;
-    sh.innerHTML = `<div class="dt-note" style="${NOTE}">New: the same kind of food first, then what is sold where you shop, then PD. A basic food sold in Limassol shows even when it is not in your foods yet. The same food you swap away is left out. Every line says why.</div>
+    sh.innerHTML = `<div class="dt-note" style="${NOTE}">New: the same kind of food first, then what is sold where you shop, then PD. A basic food sold in Limassol shows even when it is not in your foods yet; tap it and it joins your foods. The same food you swap away is left out. Every line says why.</div>
       <div class="card-top"><span>Swap Quark, low fat for</span><button class="link">Cancel</button></div>
       <p class="small">The same kind of food first, sold where you shop. The grams bring the plate to your PD 5.2.</p>
       <small class="pick-group crave-group" style="display:block;margin-top:8px">Soft dairy, like quark</small>
       <div class="rows">
       ${row("🥛", "Greek yogurt 2%", "Yours · in Limassol shops as Γιαούρτι στραγγιστό · PD 13.6", "72 g", "high")}
       ${row("🧀", "Cottage cheese", "Yours · PD 12.2", "65 g", "high")}
-      ${row("📘", "Anari, fresh whey cheese", "Basic food sold in Limassol, not in your foods yet · PD 6.5", "207 g", "high", true)}
-      ${row("📘", "Sheep's milk yoghurt, Cypriot", "Basic food sold in Limassol · PD 5.2, so it can't lift the plate", "can't reach", "low", true)}
+      ${row("📘", "Anari, fresh whey cheese", "Basic food sold in Limassol; joins your foods · PD 6.5", "207 g", "high")}
+      ${row("📘", "Sheep's milk yoghurt, Cypriot", "Basic food sold in Limassol; joins your foods · PD 5.2, so it can't lift the plate", "can't reach", "low")}
       </div>
       <small class="muted" style="display:block;margin:8px 0">Quark, low fat (Magerquark) is left out: it is the food you swap away.</small>
       <button class="link" style="font-weight:800">Other kinds: whey protein powder, milk and 5 more ›</button>`;
@@ -127,12 +129,13 @@ const IDEA = { idea: { title: "Cheesecake cup", why: "Creamy and sweet like chee
       <input class="search" value="yog" style="margin-top:8px;width:100%" aria-label="Find a food">
       <div class="rows" style="margin-top:6px">
         <div class="row row-food"><span class="thumb thumb-sm">🥛</span><div class="row-text"><b>Greek yogurt 2%</b><small>Yours · PD 13.6</small></div><button class="pill pill-small">+ Add</button></div>
-        <div class="row row-food"><span class="thumb thumb-sm">📘</span><div class="row-text"><b>Sheep's milk yoghurt, Cypriot</b><small>Basic food sold in Limassol · PD 5.2</small></div><button class="pill pill-small">Take it</button></div>
+        <div class="row row-food"><span class="thumb thumb-sm">📘</span><div class="row-text"><b>Sheep's milk yoghurt, Cypriot</b><small>Basic food sold in Limassol; joins your foods · PD 5.2</small></div><button class="pill pill-small">+ Add</button></div>
         <div class="row row-food"><span class="thumb thumb-sm">📘</span><div class="row-text"><b>Talattouri, yoghurt with cucumber and mint</b><small>Basic food sold in Limassol · savoury, held back for this sweet plate</small></div></div>
       </div><small class="muted">Your foods first, then the basic foods sold where you shop. Scan and Manual stay above.</small>`;
-    rows.after(add);
+    const hint = document.createElement("small"); hint.className = "muted"; hint.style.cssText = "display:block;padding:6px 4px 0;" + m; hint.textContent = "Swipe a food left to swap it, right to remove it."; rows.after(hint);
+    hint.after(add);
   }, mark);
-  await noteBefore(".plate-card", "New: after a food is removed, or any time, + Add a food sits right under the last food. A tap opens the search there, with your foods first and the basic foods sold where you shop. No scrolling to Quick picks.");
+  await noteBefore(".plate-card", "New: after a food is removed, or any time, + Add a food sits right under the last food. A tap opens the search there, with your foods first and the basic foods sold where you shop, all with + Add. No scrolling to Quick picks. One line says how to swap and remove.");
   await shot("r148h");
   fs.writeFileSync(R + "/r148-swapnow.json", JSON.stringify(swapNames));
   await b.close(); server.kill();
