@@ -55,18 +55,20 @@ const PORT = "3301", U = `http://127.0.0.1:${PORT}`;
   await noteAfter("section.find", "New: every food knows where it is sold. The search shows your place (Limassol), foods sold everywhere (eggs, oats, chicken breast) and your trip's place while its switch is on. Belgrade's foods are kept, behind their chip, and come back when you pick Belgrade. A basic food takes the name of where you are.");
   await shot("r136b");
 
-  // DT136d, new: Where I shop, your place and the places in your foods
+  // DT136d, new (version 3, Milan 28 October 14:51): one list of places; each place's switch adds its starter foods and puts its foods in your search
   await page.goto(U + "/me/shop"); await page.waitForTimeout(1200);
   await page.evaluate(({ mark }) => {
-    const c = document.querySelector("section.card"); const lab = [...c.querySelectorAll("p.label")].find((x) => /Starter foods/.test(x.textContent));
-    const box = document.createElement("div"); box.style.cssText = "margin-top:16px;" + mark;
-    box.innerHTML = '<p class="label">Places in your foods</p><small>Each food you add is tagged with the place you are in. Your place is always in your search; the others only when you turn them on, or travel there.</small>' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><span><b>Limassol</b><small style="display:block">your place · 62 foods</small></span><small>always on</small></div>' +
-      '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:10px"><span><b>Belgrade</b><small style="display:block">14 foods · 2 from the starter set</small></span><button class="choice">Off</button></div>' +
-      '<small style="display:block;margin-top:10px">Off keeps the foods: your logs and recipes stay as they are. To delete Belgrade\'s foods you never used: <a class="link">Delete 9 unused</a>.</small>';
-    if (lab) lab.before(box);
+    const c = document.querySelector("section.card"); while (c.firstChild) c.firstChild.remove();
+    c.style.cssText += ";" + mark;
+    const row = (name, line, right, extra = "") => `<div style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid #e3e9f5"><span><b>${name}</b><small style="display:block">${line}</small>${extra}</span>${right}</div>`;
+    const on = '<button class="choice on">On</button>', off = '<button class="choice">Off</button>';
+    c.innerHTML = '<small>Where you live, shop and cook is home: its foods are always in your search. Any other place: its switch puts its foods in your search. The first time, its starter foods come with it.</small>' +
+      row("Limassol", "Home · 62 foods: the twenty common ones, fifty Cypriot, yours", '<small>always on</small>') +
+      row("Belgrade", "14 foods · you turned it off", off, '<small style="display:block;margin-top:4px;color:#123a7a;font-weight:700">Kept: your logs and recipes stay. <a class="link">Delete 9 unused</a> · <a class="link">Make it home</a></small>') +
+      row("Munich", "About twenty starter foods", off) + row("Madrid", "About twenty starter foods", off) +
+      row("Germany, Austria, Switzerland, Serbia, Spain, Cyprus, elsewhere", "Seven more places", '<a class="link">Show</a>');
   }, { mark });
-  await noteAfter("section.card", "New, for Marko: Belgrade is a place in his foods, off. Nothing from Belgrade shows in his Limassol search; it is one tap away when he goes there again. Starter foods stay as today, for your place.");
+  await noteAfter("section.card", "New: one list. The place and its starter foods are the same row. Home is on and stays on. Belgrade, for Marko: off, its foods kept. Munich and Madrid: switching one on adds its starter foods the first time. Make it home moves your home.");
   await shot("r136d");
 
   // DT136e, new: a trip on Plan

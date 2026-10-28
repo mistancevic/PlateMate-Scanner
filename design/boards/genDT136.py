@@ -94,14 +94,15 @@ h = rowEnd(cy,
   B.screen("DT136a", 0, y, "Now: Belgrade in a Limassol search", "r136a", "now", "Members' foods seen in Belgrade, and a basic food with its Serbian name."),
   B.screen("DT136b", 1, y, "New: Foods from, by place", "r136b", "changed", "Limassol and everywhere; Belgrade's foods behind their chip."))
 y = h
-cy = storyCard(B, y, "DT136", "Home, and taking a place out", [
-  ("Home", "Where I shop stays one place, and Starter foods stay as today, for that place. New under it: Places in your foods. Your place is always on. Each other place shows its number of foods and a switch."),
-  ("For Marko", "Belgrade is a place in his foods, off. Nothing from Belgrade shows in Limassol. Off keeps the foods, so his logs and recipes stay; Delete 9 unused removes the ones he never touched, if he wants them gone."),
+cy = storyCard(B, y, "DT136", "Home, and taking a place out: one list", [
+  ("Milan, 28 October 14:51", "Add starter foods for Limassol should be part of the city listed, so it can be activated and deactivated. No need to have two places."),
+  ("One list", "Where I shop and cook is one list of places. Home is where you live, shop and cook: always on, its foods always in your search. Every other place has a switch. On puts its foods in your search; the first time, its starter foods come with it. Off takes them out of the search and keeps them. Make it home moves your home; the old home gets a switch."),
+  ("For Marko", "Belgrade: off. Nothing from Belgrade shows in Limassol; his logs and recipes stay. Delete 9 unused removes the ones he never touched, if he wants them gone."),
   ("Foods already in a library", "Read from the name: a basic food named in Serbian came from Belgrade or Serbia; a member's copy says where it was seen; the fifty Cypriot foods are Limassol. A food with no clue is sold everywhere and always shows."),
 ])
 h = rowEnd(cy,
   B.screen("DT136c", 0, y, "Now: one place, add only", "r136c", "now", "Belgrade's foods stay after the move; only Remove on each food takes them out."),
-  B.screen("DT136d", 1, y, "New: Places in your foods", "r136d", "changed", "Limassol always on; Belgrade off, 14 foods kept."))
+  B.screen("DT136d", 1, y, "New: one list of places", "r136d", "changed", "Limassol home, always on; Belgrade off, kept; Munich off, starter foods on the first switch."))
 y = h
 cy = storyCard(B, y, "DT136", "A trip", [
   ("On Plan", "A trip has a place and its days: Belgrade, Mon 3 to Mon 10 November. Its switch, Belgrade's foods in my search, turns on by itself on the first day and off after the last. You can turn it on earlier to plan and shop ahead, or off any time. Home stays on throughout."),
@@ -113,5 +114,5 @@ h = rowEnd(cy,
   B.screen("DT136f", 1, y, "New: Sold in, on the card", "r136f", "changed", "Kajmak, scanned on the trip: Belgrade; add a place or Everywhere."))
 y = h
 board("Stories93.dc.html", "DT136. Foods by place",
-  "27 October 2026 (Milan 18:23 to 20:29; Tester 3). Version 2: home, a trip, a place taken out, a tag per food. Now: 0.2.118, untouched. Drawn for your approval; nothing built.",
+  "27 and 28 October 2026 (Milan 18:23 to 14:51; Tester 3). Version 3: one list of places, each with its starter foods (Milan 28 October 14:51); a trip; a tag per food. Now: 0.2.118, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories92.dc.html")
