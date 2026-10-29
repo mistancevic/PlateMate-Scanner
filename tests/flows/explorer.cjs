@@ -35,7 +35,8 @@ const SHOTS = process.env.SHOTS;
   ok(fi >= 0 && rows[fi + 1] === "ExplorerNot all proteins are equal", "DT151: Explorer, right below Foods: " + rows[fi + 1]);
   await page.getByRole("button", { name: /^Explorer/ }).click(); await page.waitForTimeout(600);
   ok(await text(page.locator(".menu-title")) === "Explorer" && await text(page.locator(".ex-h")) === "Not all proteins are equal", "DT151: the page, Not all proteins are equal");
-  ok(/^Protein is the surname\. Its first names are the amino acids: leucine, lysine, methionine/.test(await text(page.locator(".ex-intro"))), "DT151: protein the surname, the amino acids the first names");
+  // Changed by Milan 12:32 and 12:33: protein is the family, the amino acids its members
+  ok(/^Protein is the family\. Its members are the amino acids: leucine, lysine, methionine/.test(await text(page.locator(".ex-intro"))), "DT151: protein the family, the amino acids its members");
   // the meal: the next by the clock, its protein from the day
   const meals = await page.locator(".ex-chips").first().locator("button").allTextContents();
   ok(meals.join() === "Breakfast,Lunch,Dinner" && await text(page.locator(".ex-chips").first().locator(".choice.on")) === "Lunch", "DT151: the person's meals, the next one picked: " + meals.join());
@@ -48,7 +49,7 @@ const SHOTS = process.env.SHOTS;
   ok(names.length === 8 && names[0] === "Whey protein powder" && names[7] === "Oats, dry", "DT151: eight foods by PD, whey first, oats last: " + names.join(", "));
   const whey = page.locator(".ex-card").first();
   const heads = await whey.locator(".ex-head > b").allTextContents();
-  ok(heads.join("|") === "One portion|Protein for your lunch|Muscle building and repair|The family: nine essential amino acids|Quality|How to use it", "DT151: six sections, each a heading: " + heads.join(" | "));
+  ok(heads.join("|") === "One portion|Protein for your lunch|Muscle building and repair|The family members: nine essential amino acids|Quality|How to use it", "DT151: six sections, each a heading: " + heads.join(" | "));
   ok((await whey.locator(".ex-head > small").count()) === 6, "DT151: every section says its goal under the heading");
   const closes = Math.round(100 * 27 / mealP);
   ok(new RegExp(`^Your lunch needs about ${mealP} g of protein\\. This portion closes ${closes} % of it\\.$`).test(await text(whey.locator(".ex-head > small").nth(1))), "DT151: the portion against the lunch, " + closes + " %");
@@ -59,13 +60,15 @@ const SHOTS = process.env.SHOTS;
   ok(await fam.count() === 9 && await whey.locator(".ex-row.ex-strong", { hasText: /^Leucine3\.30 g$/ }).count() === 1, "DT151: the nine in grams, leucine in bold");
   ok(await whey.locator(".ex-low").count() === 0 && /each with room to spare/.test(await text(whey.locator(".ex-head > small").nth(3))), "DT151: whey covers all nine with room to spare");
   const scores = (await whey.locator(".ex-score").allTextContents()).map((t) => t.replace(/\s+/g, " ").trim());
-  ok(scores.length === 2 && /^PDCAAS1\.00The older score/.test(scores[0]) && /Hertzler 2020, adults$/.test(scores[0]) && /^DIAAS1\.09The newer score/.test(scores[1]), "DT151: PDCAAS and DIAAS, one below another, with their sources");
+  ok(scores.length === 2 && /^PDCAAS1\.00The older score/.test(scores[0]) && /Hertzler 2020, adults$/.test(scores[0]) && /^DIAAS0\.90The newer score.*Hertzler 2020$/.test(scores[1]), "DT151: PDCAAS and DIAAS, one below another, from the one paper read in full (Milan 12:36)");
+  ok(/Scores vary by study: whey from 0\.85 to 1\.09 in the papers we read, so we take them from one\./.test(await text(whey.locator(".ex-head > small").nth(4))), "DT151: Quality says the scores vary by study");
   ok(/^Source: a typical whey label/.test(await text(whey.locator(".ex-card-src"))), "DT151: the source of the numbers on the card");
   // lentils: its lowest; salmon: no score yet
   const len = page.locator(".ex-card", { hasText: "Lentils, boiled" });
   ok(await len.locator(".ex-low").count() === 1 && /^Methionine \+ cysteine · its lowest/.test(await text(len.locator(".ex-low"))), "DT151: lentils, its lowest marked");
   const sal = page.locator(".ex-card", { hasText: "Salmon" });
-  ok((await sal.locator(".ex-score-val").allTextContents()).join() === "none yet,none yet" && /No published figure in our sources/.test(await text(sal)), "DT151: salmon says it has no score yet");
+  ok((await sal.locator(".ex-score-val").allTextContents()).join() === "none yet,none yet" && /No score we could check in a paper yet/.test(await text(sal)), "DT151: salmon says it has no score yet");
+  ok((await page.locator(".ex-card", { hasText: "Chicken breast" }).locator(".ex-score-val").allTextContents()).join() === "none yet,none yet", "DT151: chicken too, until a paper we can read");
   if (SHOTS) { await whey.screenshot({ path: `${SHOTS}/ex-whey.png` }); await len.screenshot({ path: `${SHOTS}/ex-lentils.png` }); }
   // another meal, another sort
   await page.locator(".ex-chips").first().getByRole("radio", { name: "Breakfast" }).click(); await page.waitForTimeout(200);

@@ -49,11 +49,11 @@ function Card({ c, meal, mealP, target }: { c: ExplorerCard; meal: string; mealP
       <Head title="Muscle building and repair" goal={`A meal switches on muscle protein synthesis, how the body builds and repairs muscle, with about ${EAA_MEAL} g of essential amino acids, ${LEUCINE_MEAL} g of them leucine. ${both ? "This portion brings both." : c.eaa >= EAA_MEAL ? `This portion brings the ${EAA_MEAL} g, not yet the leucine.` : "This portion brings part of it."}`} />
       <Row name="Essential amino acids" value={`${c.eaa.toFixed(1)} of ${EAA_MEAL} g`} frac={c.eaa / EAA_MEAL / NEED_AT} need ok={c.eaa >= EAA_MEAL} />
       <Row name="of them, leucine" value={`${c.leucine.toFixed(1)} of ${LEUCINE_MEAL} g`} frac={c.leucine / LEUCINE_MEAL / NEED_AT} need ok={c.leucine >= LEUCINE_MEAL} strong />
-      <Head title="The family: nine essential amino acids" goal={`Nine amino acids your body can't make, so food must bring them. ${c.lowest ? `This portion brings all nine, its lowest only just: ${c.lowest.name.toLowerCase()}.` : "This portion brings all nine, each with room to spare."} Grams, on the same scale for every food.`} />
+      <Head title="The family members: nine essential amino acids" goal={`Nine members of the protein family your body can't make, so food must bring them. ${c.lowest ? `This portion brings all nine, its lowest only just: ${c.lowest.name.toLowerCase()}.` : "This portion brings all nine, each with room to spare."} Grams, on the same scale for every food.`} />
       {NINE.map(({ id, name }) => { const low = c.lowest?.id === id; return <Row key={id} name={`${name}${low ? " · its lowest" : ""}`} value={`${g(c.family[id])} g`} frac={c.family[id] / SCALE_G} strong={id === "leu"} low={low} />; })}
-      <Head title="Quality" goal="Two scores for how well a protein covers the nine, once digested. 1.00 or more means complete." />
+      <Head title="Quality" goal="Two scores for how well a protein covers the nine, once digested. 1.00 or more means complete. Scores vary by study: whey from 0.85 to 1.09 in the papers we read, so we take them from one." />
       {([["PDCAAS", f.pdcaas, "The older score, on many labels. It stops at 1.00."], ["DIAAS", f.diaas, "The newer score, digestion counted. As published."]] as const).map(([n, s, what]) => (
-        <div key={n} className="ex-score"><b className="ex-score-name">{n}</b><b className="ex-score-val">{s ? s.value.toFixed(2) : "none yet"}</b><small>{what}<br /><span className="ex-src">{s ? s.src : "No published figure in our sources."}</span></small></div>
+        <div key={n} className="ex-score"><b className="ex-score-name">{n}</b><b className="ex-score-val">{s ? s.value.toFixed(2) : "none yet"}</b><small>{what}<br /><span className="ex-src">{s ? s.src : "No score we could check in a paper yet."}</span></small></div>
       ))}
       <Head title="How to use it" goal="When and how this food serves you best." />
       <p className="ex-best"><b>Best use:</b> {f.best}</p>
@@ -76,7 +76,7 @@ export function ExplorerScreen(p: AppApi) {
   return (
     <div className="explorer">
       <h2 className="ex-h">Not all proteins are equal</h2>
-      <p className="ex-intro">Protein is the surname. Its first names are the amino acids: leucine, lysine, methionine and six more your body can't make. Each food brings the family in its own mix. Nobody eats one food all day, so each food here is one portion against one meal: how much of the meal it closes, and which of the family it brings.</p>
+      <p className="ex-intro">Protein is the family. Its members are the amino acids: leucine, lysine, methionine and six more your body can't make. Each food brings them in its own mix. Nobody eats one food all day, so each food here is one portion against one meal: how much of the meal it closes, and which members it brings.</p>
       {slots.length > 0 && <div className="moments ex-chips" role="radiogroup" aria-label="Which meal">{slots.map((s) => <button key={s.id} role="radio" aria-checked={s.id === slot?.id} className={`choice ${s.id === slot?.id ? "on" : ""}`} onClick={() => setSlotId(s.id)}>{s.name}</button>)}</div>}
       <small className="ex-meal">{need ? `Your ${meal}: about ${mealP} g of protein, from your ${day!.protein} g a day.` : `Set your goal under Me to see your own meals. Until then, a meal of ${FALLBACK_MEAL} g of protein.`}</small>
       <div className="moments ex-chips" role="radiogroup" aria-label="Order">
@@ -89,7 +89,7 @@ export function ExplorerScreen(p: AppApi) {
         <div><b>The why behind these numbers</b><small>Worthy Numbers, the free book: PD, protein quality and the label, in eleven short pages.</small>
           <a className="pill pill-small pill-primary" href="/worthy-numbers?from=ex">Read the book</a></div>
       </section>
-      <p className="ex-sources">Sources. Amino acids, protein and energy: USDA FoodData Central, the row named on each card; whey from a typical label, with Hamarsland 2017 (BMC Nutrition) for cysteine and tyrosine. Need per gram of protein: WHO, FAO and UNU 2007, adults. {LEUCINE_MEAL} g of leucine and about {EAA_MEAL} g of essential amino acids a meal: the amounts research most often cites for muscle protein synthesis. PDCAAS: Hertzler 2020 (Nutrients 12:3704, Table 2, adult pattern) and Boye 2012 (British Journal of Nutrition). DIAAS as published: Phillips 2017, Rutherfurd 2015, Ertl 2016, Hertzler 2020; these use a young child's needs, so plant foods score lower than they would for an adult. Educational, approximate, not medical advice. Carbs and Fats come next.</p>
+      <p className="ex-sources">Sources. Amino acids, protein and energy: USDA FoodData Central, the row named on each card; whey from a typical label, with Hamarsland 2017 (BMC Nutrition) for cysteine and tyrosine. Need per gram of protein: WHO, FAO and UNU 2007, adults. {LEUCINE_MEAL} g of leucine and about {EAA_MEAL} g of essential amino acids a meal: the amounts research most often cites for muscle protein synthesis. PDCAAS (adult pattern) and DIAAS (as published, a young child's needs, so plant foods score lower than they would for an adult): Hertzler 2020 (Nutrients 12:3704, Table 2). DIAAS varies by study: whey 0.85 in Herreman 2020, 0.90 in Hertzler 2020, 1.09 in Phillips 2017. Egg, chicken and salmon: no score we could check in a paper yet. Educational, approximate, not medical advice. Carbs and Fats come next.</p>
     </div>
   );
 }
