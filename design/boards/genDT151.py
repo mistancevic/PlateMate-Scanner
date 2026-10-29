@@ -8,7 +8,7 @@ SW, GAP, SX = 240, 150, 400
 K = SW / 390
 TT, CH, DH = 44, 24, 92
 TOP = TT + 8 + CH + 8 + DH + 8
-CHIP = {"now": ("#5b6b8a", "#fff", "0.2.113, as it is"), "changed": ("#2e7be8", "#fff", "New, drawn for your approval")}
+CHIP = {"now": ("#5b6b8a", "#fff", "0.2.131, as it is"), "changed": ("#2e7be8", "#fff", "New, drawn for your approval")}
 MARK = ""
 
 def ih(name): return int(Image.open(f"{R}/{name}.png").size[1] / 2 * K)
@@ -38,7 +38,7 @@ def rowEnd(*hs): return max(hs) + 140
 
 LEGEND = ('<div style="display:flex;gap:14px;align-items:center;font-size:13px;font-weight:700;flex-wrap:wrap">'
   + "".join(f'<span style="background:{CHIP[k][0]};color:{CHIP[k][1]};border-radius:999px;padding:2px 10px">{CHIP[k][2]}</span>' for k in ("now", "changed"))
-  + '<span style="color:#172742">Left: the story. Right: the screens, whole, top to bottom. Now: 0.2.108, untouched. New: the same pages with the change drawn in, blue outline and yellow note. Toasts and the round chef button are left out of every screen. Chef Mealan\'s answers are stand-ins written to the prompts in the app: this workspace cannot reach the AI.</span></div>')
+  + '<span style="color:#172742">Left: the story. Right: the screens, whole, top to bottom. Now: 0.2.131, untouched. New: the same pages with the change drawn in, blue outline and yellow note. Toasts and the round chef button are left out of every screen. Chef Mealan\'s answers are stand-ins written to the prompts in the app: this workspace cannot reach the AI.</span></div>')
 
 def board(fname, title, sub, B, W, Hc, after):
     H = min(8000, Hc + 230)
