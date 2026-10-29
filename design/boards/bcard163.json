@@ -1,0 +1,9 @@
+{"_": "USDA rows on getfoodfacts.com, per 100 g, read 29 October 2026: thiamin, riboflavin, niacin, pantothenic acid, B6 (mg); biotin, folate DFE, B12 (µg). Milk Foundation 746772 has total folate 2 µg only.",
+ "salmon": {"b1": 0.34, "b2": 0.14, "b3": 8.04, "b5": 1.48, "b6": 0.65, "b7": null, "fol": 34, "b12": 2.80},
+ "egg": {"b1": 0.040, "b2": 0.46, "b3": 0.075, "b5": 1.53, "b6": 0.17, "b7": null, "fol": 47, "b12": 0.89},
+ "spinach": {"b1": 0.078, "b2": 0.19, "b3": 0.72, "b5": 0.065, "b6": 0.20, "b7": null, "fol": 194, "b12": 0},
+ "lentils": {"b1": 0.17, "b2": 0.073, "b3": 1.06, "b5": 0.64, "b6": 0.18, "b7": null, "fol": 181, "b12": 0},
+ "milk": {"b1": 0.057, "b2": 0.14, "b3": 0.11, "b5": 0.37, "b6": 0.060, "b7": null, "fol": 2, "b12": 0.61},
+ "almonds": {"b1": 0.20, "b2": 1.14, "b3": 3.62, "b5": 0.47, "b6": 0.14, "b7": null, "fol": 44, "b12": 0},
+ "pepper": {"b1": 0.054, "b2": 0.085, "b3": 0.98, "b5": 0.32, "b6": 0.29, "b7": null, "fol": 46, "b12": 0},
+ "beef": {"b1": 0.043, "b2": 0.19, "b3": 6.80, "b5": 0.81, "b6": 0.43, "b7": null, "fol": 8, "b12": 2.80}}
