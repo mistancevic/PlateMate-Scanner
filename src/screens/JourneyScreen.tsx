@@ -1,3 +1,4 @@
+import { plateWhenOf, capFirst, atMeal } from "../plateMode";
 import { ThinkingCard } from "../components/ThinkingCard";
 import { carriedLists } from "../carry";
 import { tasteForReq } from "../tasteChips";
@@ -88,8 +89,17 @@ const STEPS = ["in", "recipe", "make", "made", "after"] as const;
 // (in, recipe, make), Make is making it (made), Feedback is How was it (after).
 const PHASES = ["Craft", "Make", "Feedback"] as const;
 const phaseOf = (n: number) => (n <= 3 ? 0 : n === 4 ? 1 : 2);
-function stepHead({ n, title, sub, nameField, back }: { n: number; title: string; sub?: string; back?: React.ReactNode; nameField?: { value: string; placeholder: string; onChange: (v: string) => void; onCommit?: (v: string) => void } }) {
+function stepHead({ n, title, sub, nameField, back, label }: { n: number; title: string; sub?: string; back?: React.ReactNode; label?: string; nameField?: { value: string; placeholder: string; onChange: (v: string) => void; onCommit?: (v: string) => void } }) {
   const ph = phaseOf(n);
+  // DT149 (0.2.130): planning or adding what you ate has no Make and no Feedback: one label in place of the three phases
+  if (label) return (
+    <div className="step-head">
+      {back}
+      <div className="phase-bar phase-one" aria-label={label}><span className="on"><i />{label.charAt(0).toUpperCase() + label.slice(1)}</span></div>
+      {nameField ? <input className="title-input" aria-label="Name of the meal" value={nameField.value} placeholder={nameField.placeholder} onChange={(e) => nameField.onChange(e.target.value)} onBlur={(e) => nameField.onCommit?.(e.target.value)} /> : title ? <h2>{title}</h2> : null}
+      {sub && <p>{sub}</p>}
+    </div>
+  );
   return (
     <div className="step-head">
       {back}
@@ -264,6 +274,18 @@ export function JourneyScreen(p: AppApi) {
   // a plate made for a slot (0.2.2): put it in, saved to My recipes once. A recipe with the same name, foods and amounts is
   // the same recipe, so coming back by Fit it on the Plate and putting it in again does not double it.
   const slotName = (f: NonNullable<typeof p.filling>) => `${f.dayName === "today" ? "today's" : `${f.dayName}'s`} ${f.name.toLowerCase()}`;
+  // DT149 (0.2.130, board Stories101 version 2): the plate's day decides what it is for: the past adds what you ate, the future
+  // plans, the moment is what you eat (src/plateMode.ts)
+  const plateWhen = plateWhenOf(p.filling);
+  const slotTitle = (f: NonNullable<typeof p.filling>) => capFirst(slotName(f));
+  // a meal of a day gone by: what you ate, counted at that meal's time; nothing to fit, make or rate
+  const addPast = () => {
+    const f = p.filling; if (!f || !items.length) return;
+    const title = (state.title || "").trim() && state.title !== "DaaM" ? state.title.trim() : autoTitle(items);
+    p.logEaten(items, title, { date: f.date, slotId: f.slotId, name: f.name, time: f.time }, atMeal(f.date, f.time), f.mealId);
+    setState((s) => ({ ...s, items: [], portion: null, title: "" }));
+    p.setFilling(null); setStep("in"); setTab("plan"); notify(`${title} is in ${slotName(f)}, eaten.`);
+  };
   // DT137 (0.2.122, board Stories94; Milan 28 October 16:09 Go): a plate opened from a recipe and changed asks once: Update my
   // recipe, Save as a new recipe (its own name), or Only for this day. Before, it was saved as a second recipe with the same name
   const changedBase = (its: typeof items): Meal | null => {
@@ -484,6 +506,8 @@ export function JourneyScreen(p: AppApi) {
   // DT148 (0.2.129, board Stories100 version 2; Tester 3 removed Quark and had to scroll to the bottom to add a food): + Add a
   // food sits right under the last food and opens the search there: your foods first, then the basic foods sold where you shop
   const [addHere, setAddHere] = useState(false);
+  const [otherDay, setOtherDay] = useState<string | null>(null);
+  const [pickDate, setPickDate] = useState(false);
   const [q2, setQ2] = useState("");
   useEffect(() => setSwapMore(false), [swapId]);
   // the same food in another state: the difference per portion, said plainly (95 kcal less per can, the same protein)
@@ -1055,7 +1079,7 @@ export function JourneyScreen(p: AppApi) {
   const [dishKept, setDishKept] = useState<string>("");
   // DT93: after Fit, when the foods cannot reach the target within their portions, three ways out
   const fitShort = !!fit && fit.id !== null && pd !== null && pdRef !== null && pd < pdRef - 0.05 && !imported;
-  function keepAsIs() { setChef(null); if (p.filling?.mode !== "eat" && p.filling) putInSlot(items); else { setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null);
+  function keepAsIs() { setChef(null); if (p.filling && plateWhen === "past") { addPast(); return; } if (p.filling?.mode !== "eat" && p.filling) putInSlot(items); else { setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null);
     // DT94: a plate whose steps are already on the Plate is locked here and goes straight to Make
     if (cooksPlate(items) && plateSteps && plateSteps.sig === plateSig(items)) { setStep("made"); return; }
     setStep("make"); startPlateSteps(); } }
@@ -1079,7 +1103,7 @@ export function JourneyScreen(p: AppApi) {
       })
       .catch((e: any) => setPlateDraft(e?.message || `${CHEF_NAME} could not answer. Try again.`));
   }
-  const Head = ({ title, sub, name, back }: { title: string; sub?: string; name?: boolean; back?: typeof STEPS[number] }) => stepHead({ n, title, sub, back: back ? <Back to={back} /> : undefined, nameField: name ? { value: state.title === "DaaM" ? "" : state.title, placeholder: items.length ? autoTitle(items) : "Name the meal", onChange: (v: string) => setState((s) => ({ ...s, title: v })), onCommit: (v: string) => p.renamePlate(v) } : undefined });
+  const Head = ({ title, sub, name, back }: { title: string; sub?: string; name?: boolean; back?: typeof STEPS[number] }) => stepHead({ n, title, sub, label: p.filling && plateWhen !== "now" ? `${plateWhen === "plan" ? "Planning" : "Adding"} ${slotName(p.filling)}` : undefined, back: back ? <Back to={back} /> : undefined, nameField: name ? { value: state.title === "DaaM" ? "" : state.title, placeholder: items.length ? autoTitle(items) : "Name the meal", onChange: (v: string) => setState((s) => ({ ...s, title: v })), onCommit: (v: string) => p.renamePlate(v) } : undefined });
   // 0.2.54, design system rule E (board DS2): Back sits top left, above the step bar, and says where it goes
   const BACK_TO: Record<string, string> = { in: "the plate", recipe: "the amounts", make: "making it", made: "how it went" };
   const Back = ({ to }: { to: typeof STEPS[number] }) => (
@@ -1124,7 +1148,7 @@ export function JourneyScreen(p: AppApi) {
       <>
         {/* the name as the title: for a slot, or for a recipe opened from Recipes (0.2.3); an empty plate asks what you are craving */}
         {p.filling
-          ? Head({ name: true, title: "", sub: p.filling.mode === "eat" ? "As planned. Change what you like, then Fit to my target or Keep it as it is." : "Name it, or keep the foods' name. Add your foods, fit them to your target, or make them as they are." })
+          ? Head({ name: true, title: "", sub: p.filling.mode === "eat" ? "As planned. Change what you like, then Fit to my target or Keep it as it is." : plateWhen === "past" ? `Adding ${slotName(p.filling)}. Add what you ate, at the amounts you ate.` : plateWhen === "plan" ? `Planning ${slotName(p.filling)}. Add your foods, fit them to your target, then put it in the plan.` : "Name it, or keep the foods' name. Add your foods, fit them to your target, or make them as they are." })
           : madeBy && items.length > 0
             ? Head({ name: true, title: "", sub: `${CHEF_NAME}'s ${madeBy.kitchen} ${mealWord}, around your ${aroundWord(madeBy.from.map((i) => i.food.name))}. Change any amount you like.` })
           : imported && rec
@@ -1143,14 +1167,35 @@ export function JourneyScreen(p: AppApi) {
             A planned meal (0.2.2) says Lunch, 12:30 · By the plan; until then every plate is off the plan. */}
         {/* R11: a tap anywhere on the line opens its section; the pencil (or Done) stays the button for keyboards and readers */}
         <div className="plan-line" onClick={() => setLineOpen((v) => !v)}>
-          <span>{p.filling ? (p.filling.mode === "eat" ? `${p.filling.name}, ${p.filling.time} · By the plan` : `${p.filling.dayName === "today" ? "Today" : p.filling.dayName}'s ${p.filling.name.toLowerCase()}, ${p.filling.time} · By the plan`) + (items.some((i) => i.dish) ? " · A dish" : "") : lineNow}{shownTaste && <b className="plate-taste-line"> · {PLATE_TASTE_LINE[shownTaste]}</b>}</span>
+          <span>{p.filling ? (p.filling.mode === "eat" ? `${p.filling.name}, ${p.filling.time} · By the plan` : `${slotTitle(p.filling)}, ${p.filling.time} · ${plateWhen === "past" ? "Eaten" : plateWhen === "plan" ? "Planning" : "By the plan"}`) + (items.some((i) => i.dish) ? " · A dish" : "") : lineNow}{shownTaste && <b className="plate-taste-line"> · {PLATE_TASTE_LINE[shownTaste]}</b>}</span>
           {lineOpen
             ? <button className="link plan-line-done" onClick={(e) => { e.stopPropagation(); setLineOpen(false); }}>Done</button>
             : <button className="icon plan-line-pen" aria-label="Change what this plate is" aria-expanded={lineOpen} onClick={(e) => { e.stopPropagation(); setLineOpen(true); }}><Pencil size={16} /></button>}
         </div>
         {lineOpen && (<>
         {/* R11 (0.2.37, board RS8): What is it for: Exploring, the day's meals, a snack off the plan; a meal from the Plan keeps its own slot */}
-        {!p.filling && <>
+        {/* DT149 (0.2.130, board Stories101 version 2): Which day?, behind the pencil. Today is the moment; a day before adds
+            what you ate, a day after plans; picking that day's meal makes the plate that meal */}
+        {!p.filling && (() => {
+          const d0 = new Date(); d0.setHours(12, 0, 0, 0);
+          const dayAt = (n: number) => { const d = new Date(d0); d.setDate(d0.getDate() + n); return ymd(d); };
+          const chosen = otherDay ?? ymd(d0);
+          const slotsThere = otherDay ? slotsOn(lifestyleOf(p.personal), p.personal.timesOn, otherDay) : [];
+          const dn = otherDay ? new Date(`${otherDay}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" }) : "";
+          return (<>
+            <p className="label">Which day?</p>
+            <div className="moments which-day" role="radiogroup" aria-label="Which day">
+              {[[-1, "Yesterday"], [0, "Today"], [1, "Tomorrow"]].map(([n, w]) => <button key={w} type="button" className={`choice ${chosen === dayAt(n as number) ? "on" : ""}`} aria-pressed={chosen === dayAt(n as number)} onClick={() => { setOtherDay(n === 0 ? null : dayAt(n as number)); setPickDate(false); }}>{w}</button>)}
+              <button type="button" className={`choice ${pickDate || (otherDay && ![dayAt(-1), dayAt(1)].includes(otherDay)) ? "on" : ""}`} aria-pressed={pickDate} onClick={() => setPickDate(!pickDate)}>Another day</button>
+            </div>
+            {pickDate && <input className="search another-day" type="date" aria-label="Another day" value={otherDay && ![dayAt(-1), dayAt(1)].includes(otherDay) ? otherDay : ""} onChange={(e) => { setOtherDay(e.target.value && e.target.value !== ymd(d0) ? e.target.value : null); }} />}
+            <p className="small which-day-hint">{otherDay ? (otherDay < ymd(d0) ? `${dn}: adds what you ate. Pick the meal.` : `${dn}: plans what you will eat. Pick the meal.`) : "Today is what you eat now. A day before adds what you ate; a day after plans what you will eat."}</p>
+            {otherDay && <div className="moments for-row" role="radiogroup" aria-label={`${dn}, which meal`}>
+              {slotsThere.map((x) => <button key={x.id} type="button" className="choice" onClick={() => { p.setFilling({ date: otherDay, slotId: x.id, name: x.name, time: x.time, dayName: dn }); setOtherDay(null); setPickDate(false); }}>{capName(x.name)}, {x.time}</button>)}
+            </div>}
+          </>);
+        })()}
+        {!p.filling && !otherDay && <>
           <p className="label">What is it for?</p>
           <div className="moments for-row" role="radiogroup" aria-label="What the plate is for">
             <button className={`choice ${forKey === "exploring" ? "on" : ""}`} aria-pressed={forKey === "exploring"} onClick={() => p.setPick("exploring")}>Exploring</button>
@@ -1549,7 +1594,7 @@ export function JourneyScreen(p: AppApi) {
             </section>
           );
         })()}
-        <div className={`ways-out${imported && !way ? " ways-out-col" : ""}`}>
+        <div className={`ways-out${(imported && !way) || (p.filling && plateWhen !== "now") ? " ways-out-col" : ""}`}>
           {imported && rec ? (<>
             {/* PF A6 (0.2.35, Milan 23:11 and 23:21 on 17 October, back after the 0.2.27 revert): Make it as it is is not Chef
                 Mealan's work, so no hat; the two ways are his, so both carry it. Wording and icons only: the ways work as before. */}
@@ -1568,15 +1613,23 @@ export function JourneyScreen(p: AppApi) {
             )}
           </>) : madeBy && items.length > 0 ? (<>
             {/* Chef Mealan's meal is on the plate (CH3): make it, or ask again from the plate as it was */}
-            <button className="pill pill-primary pill-wide" onClick={keepAsIs}><ChefHat size={18} /> Make it</button>
+            <button className="pill pill-primary pill-wide" onClick={keepAsIs}><ChefHat size={18} /> {p.filling && plateWhen === "plan" ? `Put it in ${slotName(p.filling)}` : "Make it"}</button>
             <button className="pill pill-wide" onClick={() => { const m = madeBy; setMadeBy(null); setState((s) => ({ ...s, items: m.from, title: m.title0, portion: null, cooking: undefined, cookingFor: undefined })); void askChef(m.from, m.tried); }}>Other ideas</button>
           </>) : state.photo?.who === "idea" && items.length > 0 ? null /* DT130: an idea's buttons are in Chef Mealan's card above */ : (<>
+          {/* DT149 (0.2.130): a meal of a day gone by is what you ate: no Fit, one button puts it in at the meal's time */}
+          {p.filling && plateWhen === "past" ? (items.length > 0 && <button className="pill pill-primary pill-wide put-in" onClick={addPast}>Put it in {slotName(p.filling)}, eaten</button>)
+          : p.filling && plateWhen === "plan" ? (<>
+            {/* DT149: planning: the one main button puts it in the plan, before Fit and after it */}
+            {items.length > 0 && <button className="pill pill-primary pill-wide put-in" onClick={keepAsIs}>Put it in {slotName(p.filling)}</button>}
+            <button className="pill pill-wide" disabled={items.length < 1} onClick={makeAMeal}><ChefHat size={18} className="hat" /> {fit ? "Fit again" : "Fit to my target"}</button>
+          </>) : (<>
           <button className="pill pill-primary pill-wide" disabled={items.length < 1} onClick={makeAMeal}>
             {/* DT87 (0.2.87, Milan 11:43): Fit to my target, with the chef hat at full size: the AI is behind it */}
             <ChefHat size={18} className="hat" /> {fit ? "Fit again" : "Fit to my target"}
           </button>
           {/* DT94: Lock the recipe ends Craft; for a slot the plate goes in as it stands, as before */}
           {items.length > 0 && <button className="pill pill-wide" onClick={keepAsIs}>{p.filling && p.filling.mode !== "eat" ? (fit ? `Put it in ${slotName(p.filling)}` : "Keep it as it is") : "Lock the recipe"}</button>}
+          </>)}
           </>)}
         </div>
         {!imported && !madeBy && items.length === 0 && <small className="ways-label ways-wait">Add one food first. {CHEF_NAME} builds the {chefable ? mealWord : "meal"} around it.</small>}
@@ -1589,7 +1642,7 @@ export function JourneyScreen(p: AppApi) {
           </section>
         ) : null}
         {imported && share && <p className="small center">{Meal} is about {fmt(share.kcal, 0)} kcal{dayNums ? ` of your ${fmt(dayNums.kcal, 0)}` : ""}{pdRef !== null ? `, at ${pdTag()} ${pdVal(pdRef)} or more` : ""}.</p>}
-        {!imported && !madeBy && chefable && share && items.length > 0 && <p className="small center">{Meal} is about {fmt(share.kcal, 0)} kcal{dayNums ? ` of your ${fmt(dayNums.kcal, 0)}` : ""}{pdRef !== null ? `, at ${pdTag()} ${pdVal(pdRef)} or more` : ""}. {CHEF_NAME} adds what it needs to land your {mealWord} in its range. Keep it as it is {p.filling ? `puts the plate in ${slotName(p.filling)} as it stands` : "takes the plate as it stands"}.</p>}
+        {!imported && !madeBy && chefable && share && items.length > 0 && <p className="small center">{Meal} is about {fmt(share.kcal, 0)} kcal{dayNums ? ` of your ${fmt(dayNums.kcal, 0)}` : ""}{pdRef !== null ? `, at ${pdTag()} ${pdVal(pdRef)} or more` : ""}.{p.filling && plateWhen !== "now" ? "" : <> {CHEF_NAME} adds what it needs to land your {mealWord} in its range. Keep it as it is {p.filling ? `puts the plate in ${slotName(p.filling)} as it stands` : "takes the plate as it stands"}.</>}</p>}
         {!madeBy && chefable && share && items.length > 0 && unlogged && state.photo?.who !== "idea" && (() => {
           const name = unlogged.name.charAt(0).toUpperCase() + unlogged.name.slice(1);
           const ifSkipped = mealSlot && dayNums ? mealShare(daySlots, mealSlot.id, { kcal: dayNums.kcal, protein: dayNums.protein }, { kcal: dayRec.kcal, protein: dayRec.protein }, new Set([...closed, unlogged.id])) : null;
@@ -1605,7 +1658,9 @@ export function JourneyScreen(p: AppApi) {
           const sk = daySlots.find((x) => x.id === justSkipped);
           return sk ? <div className="ms-ask"><small className="ms-q">{sk.name.charAt(0).toUpperCase() + sk.name.slice(1)} skipped today. Its share moved to {mealWord}.</small><button className="link" style={{ alignSelf: "flex-start" }} onClick={() => answer(sk.id, null)}>Undo</button></div> : null;
         })()}
-        {!chefable && p.filling && p.filling.mode !== "eat" && items.length > 0 && <p className="small center">Fit moves one food. Keep it as it is puts the plate in {slotName(p.filling)} as it stands.</p>}
+        {p.filling && plateWhen === "plan" && items.length > 0 && <p className="small center plan-note">Planned, not eaten. On its day it comes up on Today: tap I ate it then, and rate it if you like.</p>}
+        {p.filling && plateWhen === "past" && items.length > 0 && <p className="small center plan-note">Counted on {new Date(`${p.filling.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" })} at {p.filling.time}. Nothing to fit, make or rate: it is what you ate.</p>}
+        {!chefable && p.filling && p.filling.mode !== "eat" && plateWhen === "now" && items.length > 0 && <p className="small center">Fit moves one food. Keep it as it is puts the plate in {slotName(p.filling)} as it stands.</p>}
         {p.filling?.mode === "eat" && items.length > 0 && <p className="small center">Fit sets the amounts. Keep it as it is keeps yours. Save at the end records it as {slotName(p.filling)}.</p>}
         {!imported && !chefable && !p.filling && items.length === 1 && <p className="small center">One product: {CHEF_NAME} looks through your foods for a partner that brings it to your plan.</p>}
         {!imported && !chefable && !p.filling && items.length >= 2 && <p className="small center">Fit calculates the amounts without the AI. Keep it as it is keeps yours.</p>}
@@ -1656,7 +1711,8 @@ export function JourneyScreen(p: AppApi) {
     const over = cap !== null && !!mover && mover.grams > cap;
     const shown = over ? items.map((i) => (i.id === mover!.id ? { ...i, grams: cap! } : i)) : items;
     const ot = aggregate(shown); const opd = density(ot.protein, ot.calories);
-    const dayKcal = p.todayKcal ?? state.goals.calories ?? null;
+    // DT149 (0.2.130): the share of the plate's own day (Friday's for Friday's dinner), not today's
+    const dayKcal = dayNums?.kcal ?? p.todayKcal ?? state.goals.calories ?? null;
     const share = dayKcal ? Math.round(((ot.calories ?? 0) / dayKcal) * 100) : null;
     const tooBig = shown.filter((i) => i.grams > (cap ?? 300));
     const meetingBig = p.moment === "meeting" && share !== null && share > 30;
@@ -1710,14 +1766,15 @@ export function JourneyScreen(p: AppApi) {
           ); })())}
         </div>
         {over && <button className="pill pill-wide" onClick={() => setCap(null)}>Allow more than {cap} g</button>}
-        <button className="pill pill-primary pill-wide" onClick={() => {
+        {/* DT149 (0.2.130): planning has no Make: Put it in is the main button */}
+        {!(p.filling && plateWhen !== "now") && <button className="pill pill-primary pill-wide" onClick={() => {
           log("mix_applied", { grams: mover ? Math.round(over ? cap! : mover.grams) : 0 });
           setState((s) => ({ ...s, items: shown, portion: null, title: s.title || "DaaM" }));
           setMethod(null);
           setStep("make");
-        }}>Make it</button>
+        }}>Make it</button>}
         {p.filling && p.filling.mode !== "eat" ? (<>
-          <button className="pill pill-wide" onClick={() => putInSlot(shown)}>Put it in {slotName(p.filling)}</button>
+          <button className={`pill pill-wide${plateWhen !== "now" ? " pill-primary" : ""}`} onClick={() => putInSlot(shown)}>Put it in {slotName(p.filling)}</button>
           <Tip list={shown} refit />
         </>) : (
         <button className="pill pill-wide" onClick={() => {
@@ -1756,7 +1813,7 @@ export function JourneyScreen(p: AppApi) {
   const wholeN = wholePlate ? madeN ?? cookCount : 0;
   const perOne = wholeN > 1 ? kcalOfItems(items) / wholeN : 0;
   const eatenKcal = wholeN > 1 ? perOne * eatN : kcalOfItems(items);
-  const dayKcal = p.todayKcal ?? state.goals.calories ?? null;
+  const dayKcal = dayNums?.kcal ?? p.todayKcal ?? state.goals.calories ?? null;
   const leftOne = sizedPlate ? mealWord : rec ? oneOf(rec) : "portion", leftMany = sizedPlate ? plural(mealWord) : rec ? unitOf(rec) : "portions";
   const leftWords = (k: number) => `${k} ${k === 1 ? leftOne : leftMany}`;
   const cooksNow = !rec && !((plateRecipe?.steps?.length ?? 0) > 0) && cooksPlate(items);

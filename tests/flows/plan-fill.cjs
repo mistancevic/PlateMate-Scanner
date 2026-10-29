@@ -51,7 +51,8 @@ seed.items = [];
   ok((await page.locator(".day-strip .choice.has").count()) === 1, "the strip marks the day that holds meals");
   // Fit it on the Plate: the Plate opens for this slot, the line says so; Put it in fills the slot and comes back
   await bf.getByRole("button", { name: "Fit it on the Plate" }).click(); await page.waitForTimeout(600);
-  ok(/Monday's breakfast, 07:30 · By the plan/.test(await page.locator(".plan-line").textContent()), "the Plate's line names the slot: " + (await page.locator(".plan-line").textContent()));
+  // changed by DT149 (0.2.130, board Stories101 version 2): a meal of a later day is planning, and the line says so
+  ok(/Monday's breakfast, 07:30 · Planning/.test(await page.locator(".plan-line").textContent()), "the Plate's line names the slot, planning: " + (await page.locator(".plan-line").textContent()));
   // Changed by story DT76 (board DT76): a starter has its foods, so the Plate opens with Sarma's foods, not empty; the first
   // of Chef Mealan's lifters goes on, and the plate is made for the slot
   // DT88 (0.2.87): the plate's rows in a cook's words: Cabbage, weigh it raw
@@ -84,7 +85,8 @@ seed.items = [];
   await page.getByRole("button", { name: "Create a new meal on the Plate" }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: /^Add$/ }).first().click(); await page.waitForTimeout(300);
   await page.locator(".row-food", { hasText: "Leibniz" }).getByRole("button").click(); await page.waitForTimeout(300);
-  ok(await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe)$/ }).count() === 1 && await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).count() === 1, "two ways out: Fit to my target and Make it as it is");
+  // changed by DT149 (0.2.130): planning Monday's lunch, Put it in is the main way out, Fit the other
+  ok(await page.getByRole("button", { name: /^Put it in Monday's lunch$/ }).count() === 1 && await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).count() === 1, "two ways out: Put it in Monday's lunch and Fit to my target");
   // the tip (canvas S, 11 October 2026): the plate is under, three foods from My foods that lift it, with the score each would reach
   const tip = page.locator(".chef-tip");
   ok(await tip.count() === 1 && /Your plate is [\d.]+ under/.test(await tip.textContent()), "the tip says how far under the plate is");
@@ -92,7 +94,7 @@ seed.items = [];
   ok(await tip.locator(".tip-row").count() === 3 && await tip.locator(".tip-row button.pill").filter({ hasText: /Add|Swap|Set/ }).count() === 3, "three foods to add, each with Add");
   const tos = (await tip.locator(".tip-to b").allTextContents()).map(Number);
   ok(tos[0] >= tos[1] && tos[1] >= tos[2], "sorted by the score the plate would reach: " + tos.join(" "));
-  await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe)$/ }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|Put it in Monday's lunch)$/ }).click(); await page.waitForTimeout(600);
   const lunch2 = await page.locator(".plan-slot-wrap").nth(1).textContent();
   ok(/made on the Plate/.test(lunch2) && /under/.test(lunch2), "Lunch holds the plate as it stands, with its gap: " + lunch2.slice(0, 70));
   meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.length);
@@ -119,7 +121,7 @@ seed.items = [];
   await page.locator(".plan-slot-wrap").nth(1).getByRole("button", { name: "Fit it on the Plate" }).click(); await page.waitForTimeout(600);
   await page.locator(".title-input").click(); await page.keyboard.press("Control+A"); await page.keyboard.type("Biscuit lunch", { delay: 30 }); await page.keyboard.press("Enter"); await page.waitForTimeout(200);
   ok(await page.evaluate(() => document.activeElement?.className !== "title-input"), "Go on the keyboard leaves the name field");
-  await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe)$/ }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|Put it in Monday's lunch)$/ }).click(); await page.waitForTimeout(600);
   ok(/Biscuit lunch/.test(await page.locator(".plan-slot-wrap").nth(1).textContent()), "Lunch shows the new name");
   const countAfter = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals);
   ok(countAfter.length === countBefore && countAfter.some((m) => m.title === "Biscuit lunch") && !countAfter.some((m) => m.title === "Nutella & Leibniz Butterkeks"), "the recipe is renamed, not copied");

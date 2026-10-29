@@ -1,3 +1,4 @@
+import { plateWhenOf, atMeal } from "../plateMode";
 import { recipeName } from "../recipeDiff";
 import { portionOf } from "../pilot";
 import { RecipeBar } from "../components/RecipeBar";
@@ -216,6 +217,8 @@ export function RecipesScreen(p: AppApi) {
   const [askShare, setAskShare] = useState(false);
   // R19 (0.2.47, board RS18): a meal opened from Today or Plan: the way back, and the slot it is planned for with its buttons
   const [cameFrom, setCameFrom] = useState<{ id: string; from: MealFrom } | null>(null);
+  // DT149 (0.2.130): the day of the meal the recipe was opened from: the moment, planning, or a day gone by
+  const slotWhen = () => { const sl = cameFrom && openId && cameFrom.id === openId ? cameFrom.from.slot : null; return sl ? plateWhenOf({ date: sl.date, time: sl.time, ...(cameFrom!.from.tab === "home" ? { mode: "eat" as const } : {}) }) : null; };
   useEffect(() => {
     const l = p.landing; if (!l) return;
     if (state.meals.some((m) => m.id === l.id)) { setOpenId(l.id); if (!l.quiet) setLanded(l); setCameFrom(l.from ? { id: l.id, from: l.from } : null); }
@@ -306,7 +309,13 @@ export function RecipesScreen(p: AppApi) {
         top={cameFrom && cameFrom.id === opened.id && cameFrom.from.slot ? <SlotBar p={p} from={cameFrom.from} back={() => { const tab = cameFrom.from.tab; setCameFrom(null); setOpenId(null); p.setTab(tab); }} /> : null}
         backLabel={cameFrom && cameFrom.id === opened.id ? (cameFrom.from.tab === "home" ? "Today" : "Plan") : undefined}
         openOriginal={opened.basedOn && state.meals.some((m) => m.id === opened.basedOn!.id) ? () => { setLanded(null); setOpenId(opened.basedOn!.id); } : null}
-        onMakeIt={() => { setOpenId(null); p.openOnPlate(opened); }} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
+        onMakeIt={() => { const w = slotWhen(); const sl = cameFrom?.from.slot; const m = sl ? p.planned[sl.date]?.[sl.slotId] : undefined;
+          // DT149 (0.2.130): a meal of another day opens on the Plate as that meal: planning, or adding what you ate
+          if (w && w !== "now" && sl) { setOpenId(null); p.fillOnPlate({ date: sl.date, slotId: sl.slotId, name: sl.name, time: sl.time, dayName: new Date(`${sl.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" }), mealId: m?.mealId ?? opened.id }, m?.items ? { id: m.mealId ?? opened.id, title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : opened, m?.title ?? opened.title); return; }
+          setOpenId(null); p.openOnPlate(opened); }}
+        makeAs={(() => { const w = slotWhen(), sl = cameFrom?.from.slot; if (!w || w === "now" || !sl) return null; const d = new Date(`${sl.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" });
+          return w === "plan" ? { label: "Change it on the Plate", hint: `Planned for ${d}'s ${sl.name.toLowerCase()}. Change the foods or amounts for that day; the recipe stays as it is. Make it and I ate it come on ${d}, on Today.` }
+            : { label: "Change it on the Plate", hint: `${d}'s ${sl.name.toLowerCase()} is gone by: change it to what you ate, and it is added at ${sl.time}. The recipe stays as it is.` }; })()} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
         onDelete={<DeleteRecipe key={`del-${opened.id}`} plan={deletePlan(opened, state, published[opened.id] ?? null)} slug={published[opened.id]?.slug ?? null} approver={approver} run={(c) => deleteRecipe(opened, c)} />}
         close={() => { const back = cameFrom && cameFrom.id === opened.id ? cameFrom.from.tab : null; setOpenId(null); setLanded(null); setCameFrom(null); if (back) p.setTab(back); }}
         tryPhoto={testOn ? async (model: string) => {
@@ -387,6 +396,16 @@ function SlotBar({ p, from, back }: { p: AppApi; from: MealFrom; back: () => voi
     </section>
   );
   const day = new Date(`${sl.date}T12:00:00`).toLocaleDateString("en", { weekday: "long" });
+  // DT149 (0.2.130): a meal of a day gone by is what you ate: I ate it adds it at its time
+  if (plateWhenOf({ date: sl.date, time: sl.time }) === "past") return (
+    <section className="card rq-slot" aria-label="A meal gone by">
+      <small className="rq-slot-line">{day}'s {sl.name.toLowerCase()}, {sl.time} · planned, not added</small>
+      <div className="button-row">
+        {m.items?.length ? <button type="button" className="pill pill-small pill-primary" onClick={() => { p.logPlanned(m, sl, atMeal(sl.date, sl.time)); back(); }}><Check size={14} /> I ate it</button> : null}
+        <button type="button" className="pill pill-small" onClick={() => { p.fill(sl.date, sl.slotId, { ...m, skipped: true }); back(); }}>I skipped it</button>
+      </div>
+    </section>
+  );
   return (
     <section className="card rq-slot" aria-label="In the plan">
       <small className="rq-slot-line">{day}'s {sl.name.toLowerCase()}, {sl.time} · in the plan</small>

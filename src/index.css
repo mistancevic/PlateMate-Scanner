@@ -2296,3 +2296,12 @@ input::placeholder { color: #8a93a6; font-style: italic; font-weight: 400; opaci
 .add-here-top b { color: var(--brand-text); font-size: var(--fs-body); }
 .swap-group { display: block; margin-top: 8px; }
 .swap-more { display: block; margin: 10px 0 4px; font-weight: 800; text-align: left; }
+
+/* DT149 (0.2.130, board Stories101 version 2): planning or adding what you ate; Which day?; a day gone by on Plan */
+.phase-bar.phase-one span { font-size: var(--fs-label); }
+.put-in { margin-bottom: 8px; }
+.plan-note { color: var(--muted); }
+input.another-day { margin: 6px 0 2px; max-width: 220px; }
+.past-add { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.past-planned { flex-wrap: wrap; }
+.past-planned .button-row { width: 100%; }
