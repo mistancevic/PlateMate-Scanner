@@ -60,3 +60,16 @@ test("the same food is the same row on both pages", () => {
   assert.equal(page("c").foods[0].per100, pepper.v.c);
   assert.equal(page("d").foods.find((f) => f.name.startsWith("Milk"))!.per100, milk.v.d);
 });
+
+test("DT162: vitamin A counted the EFSA way on the cards, the same number as on its page", () => {
+  const sp = card("spinach"), a = page("a");
+  assert.equal(Math.round(sp.amount.a!), Math.round(memberRows(a, 750).find((r) => r.food.name === "Spinach, raw")!.amount));
+  assert.equal(Math.round(sp.amount.a!), 563);
+});
+
+test("DT162: A, E and K pages with both names, their values and upper limits", () => {
+  assert.deepEqual(["a", "e", "k"].map((id) => [page(id).also, memberDay(page(id), "male").v, memberDay(page(id), "female").v, page(id).ul?.v ?? null]),
+    [["retinol; beta-carotene from plants", 750, 650, 3000], ["tocopherol", 13, 11, 300], ["K1 phylloquinone, K2 menaquinone", 70, 70, null]]);
+  assert.equal(page("a").does.length, 6); assert.equal(page("e").does.length, 1); assert.equal(page("k").does.length, 2);
+  assert.ok(MICRO_MEMBERS.every((m) => m.group === "min" || m.also), "every vitamin has its second name");
+});
