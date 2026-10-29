@@ -1,11 +1,13 @@
 // DT151 (0.2.133, board Stories103 version 11; Coach Milan 29 October 09:41 to 12:04): Explorer, Not all proteins are equal.
-// DT154 (0.2.135, board Stories106; Milan 14:47 to 15:04): Fats, the same template; family chips at the top, Carbs next.
+// DT154 (0.2.135, board Stories106; Milan 14:47 to 15:04): Fats, the same template; family chips at the top.
+// DT155 (0.2.136, board Stories107; Milan 15:30 and 15:41): Carbs, the same template.
 // Every card tells the same story in six sections: a heading, the goal of the section and what this portion does against
 // it, then the details; every measure in one pattern, the name, the bar, the grams. The numbers and their sources: src/explorer.ts.
 import { useMemo, useState } from "react";
 import type { AppApi } from "./api";
 import { EXPLORER_FOODS, NINE, EAA_MEAL, LEUCINE_MEAL, SCALE_G, cardOf, type ExplorerCard } from "../explorer";
 import { FAT_FOODS, FAT_MEMBERS, FAT_SCALE_G, EPA_DHA_DAY, SAT_SHARE, fatCardOf, type FatCard } from "../explorerFats";
+import { CARB_FOODS, CARB_MEMBERS, CARB_SCALE_G, FIBRE_DAY, GI_LOW, GI_HIGH, carbCardOf, type CarbCard } from "../explorerCarbs";
 import { lifestyleOf } from "../personal";
 import { slotsOf } from "../slots";
 import { needOf } from "../planned";
@@ -66,7 +68,7 @@ function Card({ c, meal, mealP, target }: { c: ExplorerCard; meal: string; mealP
   );
 }
 
-type Family = "protein" | "fats";
+type Family = "protein" | "fats" | "carbs";
 // the meal: the person's slots, the next one by the clock; its share of the day
 function useMeal(p: AppApi) {
   const slots = useMemo(() => slotsOf(lifestyleOf(p.personal)), [p.personal]);
@@ -93,13 +95,13 @@ export function ExplorerScreen(p: AppApi) {
   const [family, setFamily] = useState<Family>("protein");
   return (
     <div className="explorer">
-      {/* DT154: the families, Protein first; Carbs comes next */}
+      {/* DT154, DT155: the families, Protein first */}
       <div className="moments ex-chips ex-families" role="radiogroup" aria-label="Which family">
         <button role="radio" aria-checked={family === "protein"} className={`choice ${family === "protein" ? "on" : ""}`} onClick={() => setFamily("protein")}>Protein</button>
         <button role="radio" aria-checked={family === "fats"} className={`choice ${family === "fats" ? "on" : ""}`} onClick={() => setFamily("fats")}>Fats</button>
-        <button className="choice" disabled>Carbs, next</button>
+        <button role="radio" aria-checked={family === "carbs"} className={`choice ${family === "carbs" ? "on" : ""}`} onClick={() => setFamily("carbs")}>Carbs</button>
       </div>
-      {family === "protein" ? <ProteinPage {...p} /> : <FatsPage {...p} />}
+      {family === "protein" ? <ProteinPage {...p} /> : family === "fats" ? <FatsPage {...p} /> : <CarbsPage {...p} />}
     </div>
   );
 }
@@ -121,7 +123,7 @@ function ProteinPage(p: AppApi) {
       </div>
       {cards.map((c) => <Card key={c.food.id} c={c} meal={meal} mealP={mealP} target={p.pdRef} />)}
       <Book line="Worthy Numbers, the free book: PD, protein quality and the label, in eleven short pages." />
-      <p className="ex-sources">Sources. Amino acids, protein and energy: USDA FoodData Central, the row named on each card; whey from a typical label, with Hamarsland 2017 (BMC Nutrition) for cysteine and tyrosine. Need per gram of protein: WHO, FAO and UNU 2007, adults. {LEUCINE_MEAL} g of leucine and about {EAA_MEAL} g of essential amino acids a meal: the amounts research most often cites for muscle protein synthesis. PDCAAS (adult pattern) and DIAAS (as published, a young child's needs, so plant foods score lower than they would for an adult): Hertzler 2020 (Nutrients 12:3704, Table 2). DIAAS varies by study: whey 0.85 in Herreman 2020, 0.90 in Hertzler 2020, 1.09 in Phillips 2017. Egg, chicken and salmon: no score we could check in a paper yet. Educational, approximate, not medical advice. Carbs come next.</p>
+      <p className="ex-sources">Sources. Amino acids, protein and energy: USDA FoodData Central, the row named on each card; whey from a typical label, with Hamarsland 2017 (BMC Nutrition) for cysteine and tyrosine. Need per gram of protein: WHO, FAO and UNU 2007, adults. {LEUCINE_MEAL} g of leucine and about {EAA_MEAL} g of essential amino acids a meal: the amounts research most often cites for muscle protein synthesis. PDCAAS (adult pattern) and DIAAS (as published, a young child's needs, so plant foods score lower than they would for an adult): Hertzler 2020 (Nutrients 12:3704, Table 2). DIAAS varies by study: whey 0.85 in Herreman 2020, 0.90 in Hertzler 2020, 1.09 in Phillips 2017. Egg, chicken and salmon: no score we could check in a paper yet. Educational, approximate, not medical advice.</p>
     </>
   );
 }
@@ -170,7 +172,56 @@ function FatsPage(p: AppApi) {
       </div>
       {cards.map((c) => <FatCardView key={c.food.id} c={c} meal={meal} mealFat={mealFat} target={p.pdRef} />)}
       <Book line="Worthy Numbers, the free book: the numbers on food labels, and which ones help you decide, in eleven short pages." />
-      <p className="ex-sources">Sources. Fats per 100 g: USDA FoodData Central, SR Legacy, the row named on each card. Omega-3 is 18:3 as USDA reports it, plus EPA, DPA and DHA; omega-6 is linoleic acid. Saturated fat under {SAT_SHARE * 100} % of energy: WHO 2023, Saturated fatty acid and trans-fatty acid intake for adults and children. EPA and DHA, {EPA_DHA_DAY} mg a day for adults: EFSA, Dietary Reference Values, summary report 2017. Educational, approximate, not medical advice. Carbs come next.</p>
+      <p className="ex-sources">Sources. Fats per 100 g: USDA FoodData Central, SR Legacy, the row named on each card. Omega-3 is 18:3 as USDA reports it, plus EPA, DPA and DHA; omega-6 is linoleic acid. Saturated fat under {SAT_SHARE * 100} % of energy: WHO 2023, Saturated fatty acid and trans-fatty acid intake for adults and children. EPA and DHA, {EPA_DHA_DAY} mg a day for adults: EFSA, Dietary Reference Values, summary report 2017. Educational, approximate, not medical advice.</p>
+    </>
+  );
+}
+
+function CarbCardView({ c, meal, mealCarb, target }: { c: CarbCard; meal: string; mealCarb: number; target: number | null }) {
+  const f = c.food, fibreOk = c.fibre >= c.fibreMeal;
+  return (
+    <section className="card ex-card" aria-label={f.name}>
+      <div className="ex-title"><span className="ex-icon" aria-hidden="true">{f.icon}</span><b>{f.name}</b><span className={`pdpill pdpill-${target === null || c.pd >= target ? "high" : "low"}`}>PD {c.pd.toFixed(1)}</span></div>
+      <Head title="One portion" goal={`Every number below is for one normal portion. ${f.carb} g of every 100 g is carbohydrate.`} />
+      <Pair name="Portion" value={f.portion.label} />
+      <Pair name="Per 100 g" value={`${f.carb} g carbs, ${f.kcal} kcal`} />
+      <Head title={`Carbs for your ${meal}`} goal={`Your ${meal} has room for about ${mealCarb} g of carbs. This portion brings ${c.closes} % of it.`} />
+      <Row name="Carbs" value={`${c.carb} of ${mealCarb} g`} frac={c.closes / 100 / NEED_AT} need />
+      <Head title="Fibre and sugar" goal={`A day needs at least ${FIBRE_DAY} g of fibre, so about ${c.fibreMeal} g a ${meal}; free sugars stay under 10 % of your energy, and the sugar inside whole fruit doesn't count as free. ${fibreOk ? "This portion covers the fibre." : "This portion brings part of the fibre."}`} />
+      <Row name="Fibre" value={`${c.fibre} of ${c.fibreMeal} g`} frac={c.fibre / c.fibreMeal / NEED_AT} need ok={fibreOk} />
+      <Row name="Sugars" value={`${c.sugar} g`} frac={c.sugar / CARB_SCALE_G} />
+      <Head title="The family members" goal={`Starch, sugars and fibre. This portion is mostly ${c.mostly}. Grams, on the same scale for every food.`} />
+      {CARB_MEMBERS.map(({ id, name }) => <Row key={id} name={name} value={`${g(c.members[id])} g`} frac={c.members[id] / CARB_SCALE_G} strong={id === "fibre"} />)}
+      <Head title="Quality" goal={`How fast the carbs reach your blood. GI: ${GI_LOW} or less is low, ${GI_HIGH} or more is high. GL counts the portion: GI times its carbs without fibre, divided by 100.`} />
+      <div className="ex-score"><b className="ex-score-name">GI</b><b className="ex-score-val">{f.gi}, {c.band}</b><small>Atkinson 2008, Table 1: {f.giRow}</small></div>
+      <div className="ex-score"><b className="ex-score-name">GL</b><b className="ex-score-val">{c.gl}</b><small>For this portion, calculated by the same paper's method</small></div>
+      <Head title="How to use it" goal="When and how this food serves you best." />
+      <p className="ex-best"><b>Best use:</b> {f.best}</p>
+      <p className="ex-line"><b>Pairs with:</b> {f.pair}</p>
+      <small className="ex-src ex-card-src">Source: {f.src}.</small>
+    </section>
+  );
+}
+
+function CarbsPage(p: AppApi) {
+  const { day, share, meal, chips } = useMeal(p);
+  const [sort, setSort] = useState<"gi" | "meal">("gi");
+  // the meal's share of the day's carbs, as the plan shares the day; without a goal, a meal of 80 g and a third of the day
+  const mealCarb = day && share ? Math.round(day.carbs * share) : 80;
+  const cards = CARB_FOODS.map((f) => carbCardOf(f, mealCarb, share ?? 1 / 3)).sort((a, b) => (sort === "gi" ? a.food.gi - b.food.gi : b.carb - a.carb));
+  return (
+    <>
+      <h2 className="ex-h">Not all carbs are equal</h2>
+      <p className="ex-intro">Carbohydrate is the family. Its members are starch, sugars and fibre. Each food brings them in its own mix, and they reach your blood at different speeds. Each food here is one portion against one meal: how much of the meal's carbs it brings, and which members.</p>
+      {chips}
+      <small className="ex-meal">{day && share ? `Your ${meal}: about ${mealCarb} g of carbs, from your ${day.carbs} g a day.` : `Set your goal under Me to see your own meals. Until then, a meal of ${mealCarb} g of carbs.`}</small>
+      <div className="moments ex-chips" role="radiogroup" aria-label="Order">
+        <button role="radio" aria-checked={sort === "gi"} className={`choice ${sort === "gi" ? "on" : ""}`} onClick={() => setSort("gi")}>Lowest GI</button>
+        <button role="radio" aria-checked={sort === "meal"} className={`choice ${sort === "meal" ? "on" : ""}`} onClick={() => setSort("meal")}>Most of the meal</button>
+      </div>
+      {cards.map((c) => <CarbCardView key={c.food.id} c={c} meal={meal} mealCarb={mealCarb} target={p.pdRef} />)}
+      <Book line="Worthy Numbers, the free book: GI and GL, PD and the label, in eleven short pages." />
+      <p className="ex-sources">Sources. Carbs, fibre and sugars per 100 g: USDA FoodData Central, SR Legacy, the row named on each card; starch and other carbs is what remains, calculated. GI: Atkinson, Foster-Powell and Brand-Miller 2008, International Tables of Glycemic Index and Glycemic Load Values, Diabetes Care, Table 1, the mean of several studies; GL calculated by its method. Fibre, at least {FIBRE_DAY} g a day for adults: WHO 2023 carbohydrate guideline and EFSA. Free sugars under 10 % of energy: WHO 2015 sugars guideline. Educational, approximate, not medical advice.</p>
     </>
   );
 }
