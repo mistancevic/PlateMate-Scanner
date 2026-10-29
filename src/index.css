@@ -2313,3 +2313,12 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .steps-old { opacity: 0.55; }
 .gate-holds b { color: var(--close-text); }
 .crave-parts li { margin-bottom: 2px; }
+/* DT153 (0.2.132): a done row is a plain green tick, Undo under it; the chat's head stays at the top */
+.done-tick { display: inline-flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
+.done-tick > b { color: var(--top); font-weight: 900; font-size: var(--fs-body); white-space: nowrap; }
+.done-tick.done-start { align-items: flex-start; }
+.done-tick.done-quiet > b { color: var(--muted); font-weight: 700; }
+.done-undo { font-size: var(--fs-small); text-decoration: underline; padding: 2px 0; }
+.button-row .back-after { margin-left: auto; }
+.bubble-greyed { opacity: .6; }
+.chat-screen .chat-head { position: sticky; top: calc(58px + env(safe-area-inset-top, 0px)); z-index: 25; background: var(--base); margin: 0 -18px; padding: 6px 18px 8px; }
