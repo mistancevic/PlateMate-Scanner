@@ -85,3 +85,30 @@ test("C50: black pepper, smoked paprika, Paprikapulver and pepper flakes stay th
   assert.equal(portionOf(f("Black pepper", 250, 10, 3, 40), 3).max, 5);
   assert.equal(portionOf(f("Paprika, rot", 31, 1, 0.3, 6), 3).max, 900);
 });
+
+// C52 (DT150, 0.2.131): a dish keeps its proportions
+import { fitPart, factorWords } from "./foodjob";
+import { suggestParts } from "./mixtip";
+test("C52: Fit sizes the part with the most protein as a whole; the other parts stay", () => {
+  const F = (id: string, name: string, calories: number, protein: number) => ({ id, name, brand: "", basis: "100g", source: "", notes: "", reviewedAt: "", readyToEat: true, calories, protein, fats: 1, carbs: 1, fiber: 0 }) as any;
+  const it = (id: string, f: any, grams: number, part: string) => ({ id, food: f, grams, part, locked: false });
+  const items = [it("o", F("o", "Oats", 372, 13.5), 80, "Base"), it("b", F("b", "Butter", 741, 0.7), 20, "Base"),
+    it("q", F("q", "Quark, low fat", 67, 12), 100, "Filling"), it("e", F("e", "Eggs", 143, 12.6), 50, "Filling"), it("h", F("h", "Honey", 304, 0.3), 15, "Filling"),
+    it("s", F("s", "Strawberries", 32, 0.7), 80, "Topping")];
+  const r = fitPart(items, 7, 1)!;
+  assert.equal(r.part, "Filling");
+  const g = (id: string) => r.items.find((i) => i.id === id)!.grams;
+  assert.equal(g("o"), 80); assert.equal(g("b"), 20); assert.equal(g("s"), 80);
+  assert.ok(Math.abs(g("q") / g("e") - 2) < 0.15, `quark to egg stays 2 to 1: ${g("q")} to ${g("e")}`);
+  assert.ok(r.factor > 1 && r.factor <= 2, "the filling grows: " + r.factor);
+  assert.equal(fitPart(items.map((i) => ({ ...i, part: undefined })), 7, 1), null, "a plate without parts is not sized this way");
+  assert.equal(factorWords(1.33), "a third more"); assert.equal(factorWords(1.2), "20 % more");
+});
+test("C52: the parts a cooked plate is suggested", () => {
+  const F = (id: string, name: string, x: Record<string, number> = {}) => ({ id, name, brand: "", basis: "100g", source: "", notes: "", reviewedAt: "", readyToEat: false, calories: 100, protein: 5, fats: 1, carbs: 1, fiber: 0, ...x }) as any;
+  const sweet = suggestParts([F("o", "Oats"), F("b", "Butter", { calories: 741, protein: 0.7, fats: 82, carbs: 0.6 }), F("q", "Quark, low fat"), F("e", "Eggs"), F("h", "Honey"), F("s", "Strawberries")]);
+  assert.deepEqual(sweet.map((x) => `${x.part}:${x.ids.join("")}`), ["Base:ob", "Filling:qeh", "Topping:s"]);
+  const sav = suggestParts([F("c", "Chicken breast, raw"), F("p", "Paprika, red"), F("r", "Rice, dry")]);
+  assert.deepEqual(sav.map((x) => x.part), ["Main", "Side"]);
+  assert.deepEqual(suggestParts([F("q", "Quark, low fat"), F("h", "Honey")]), [], "one part only: no suggestion");
+});

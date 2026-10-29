@@ -85,10 +85,14 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `${CHEF_NAME} could not answer.`);
       if (data.error) throw new Error(data.message || `${CHEF_NAME} has no idea for that right now.`);
-      const items = (data.idea?.items ?? []).map(safeIdeaItem).filter(Boolean).map((i: NonNullable<ReturnType<typeof safeIdeaItem>>) => {
+      // DT150 (0.2.131): the idea's parts (base, filling, topping) come with it; a dish of one part has none
+      const raw: any[] = data.idea?.items ?? [];
+      const partOf = (name: string) => { const r = raw.find((x) => String(x?.name ?? "").trim().toLowerCase() === name.toLowerCase()); const pt = typeof r?.part === "string" ? r.part.trim().slice(0, 24) : ""; return pt ? pt.charAt(0).toUpperCase() + pt.slice(1) : undefined; };
+      const items = raw.map(safeIdeaItem).filter(Boolean).map((i: NonNullable<ReturnType<typeof safeIdeaItem>>) => {
         // DT148 (0.2.129): your own food by its name, or by the same name without its other name (Quark, low fat (Magerquark))
         const lib = state.foods.find((f) => f.name.toLowerCase() === i.name.toLowerCase()) ?? state.foods.filter(p.inPlace).find((f) => sameFoodName(f.name, i.name));
-        return { id: uid(), food: lib ?? estimate(i), grams: i.grams, locked: true };
+        const part = partOf(i.name);
+        return { id: uid(), food: lib ?? estimate(i), grams: i.grams, locked: true, ...(part ? { part } : {}) };
       }).filter((i: { food: Food }) => !validateFood(i.food).length);
       if (items.length < 2) throw new Error(`${CHEF_NAME} has no idea for that right now. Try other words.`);
       if (items.some((i: { food: Food }) => blockedByAllergy(i.food, allergies))) throw new Error(`${CHEF_NAME}'s idea had a food you can't have. Ask again.`);
@@ -142,7 +146,10 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
               their grams, how to make it, then the Plate, where every change happens */}
           <div className="crave-read">
             <b>For one serving</b>
-            <ul className="crave-foods">{idea.meal.items.map((i) => <li key={i.id}>{fmt(i.grams, 0)} g {i.food.name}</li>)}</ul>
+            {/* DT150: a dish in parts lists its foods part by part */}
+            {idea.meal.items.some((i) => i.part)
+              ? <ul className="crave-foods crave-parts">{[...new Set(idea.meal.items.map((i) => i.part ?? "Other"))].map((pt) => <li key={pt}><b>{pt}:</b> {idea.meal.items.filter((i) => (i.part ?? "Other") === pt).map((i) => `${fmt(i.grams, 0)} g ${i.food.name}`).join(", ")}</li>)}</ul>
+              : <ul className="crave-foods">{idea.meal.items.map((i) => <li key={i.id}>{fmt(i.grams, 0)} g {i.food.name}</li>)}</ul>}
             {(idea.meal.idea?.how ?? []).length > 0 && <><b>How to make it</b><ol className="crave-how">{idea.meal.idea!.how!.map((x, k) => <li key={k}>{x}</li>)}</ol></>}
           </div>
           <small className="muted">One serving: {fmt(ideaNums.kcal, 0)} kcal · {fmt(ideaNums.protein, 0)} g protein. To change a food, put it on your plate: swap, remove, add and the amounts are all there.</small>

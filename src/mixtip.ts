@@ -148,6 +148,28 @@ export function swapKind(gone: Food, f: Food): 0 | 1 | 2 {
   const a = KIN[catOf(gone)], b = KIN[catOf(f)];
   return a && a === b ? 1 : 2;
 }
+// C52 (DT150, 0.2.131): the parts a cooked plate of your own is suggested, by what each food is. A sweet dish: the base (breakfast
+// grains, fat, nuts), the filling (dairy, eggs, sweet, whey), the topping (fruit). A savoury dish: the main and the side (meal
+// grains). One part only is no suggestion.
+const FAT_NAME = /^(?!.*(peanut|nut|almond)).*\b(butter|ghee|margarine|coconut oil)\b/i;
+// a food that is cooked into a dish with others: an egg, flour, butter, yeast, gelatine (DT150): a plate holding one with two
+// other foods or more is likely one dish, not foods side by side
+const BINDS = /^(?!.*(peanut|nut|almond)).*\b(eggs?|flour|butter|yeast|baking powder|gelatine?|semolina)\b/i;
+export const bindsADish = (f: Food): boolean => BINDS.test(englishName(f)) || BINDS.test(f.name);
+export function suggestParts(foods: Food[]): { part: string; ids: string[] }[] {
+  const egg = (f: Food) => /\begg|\beier?\b|jaj/i.test(englishName(f));
+  const savoury = foods.some((f) => catOf(f) === "meat" && !egg(f));
+  const by = new Map<string, string[]>();
+  const put = (part: string, f: Food) => by.set(part, [...(by.get(part) ?? []), f.id]);
+  for (const f of foods) {
+    const c = catOf(f);
+    if (savoury) put(c === "mgrain" || c === "bgrain" ? "Side" : "Main", f);
+    else put(c === "bgrain" || c === "fat" || c === "nut" || FAT_NAME.test(englishName(f)) ? "Base" : c === "fruit" ? "Topping" : "Filling", f);
+  }
+  const order = savoury ? ["Main", "Side"] : ["Base", "Filling", "Topping"];
+  const out = order.filter((p) => by.has(p)).map((part) => ({ part, ids: by.get(part)! }));
+  return out.length >= 2 ? out : [];
+}
 export function fitsPlate(f: Food, plate: Food[]): boolean {
   if (catOf(f) === "drink" || isIngredient(f)) return false;
   if (plate.some((p) => p.id === f.id)) return false;

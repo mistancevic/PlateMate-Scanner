@@ -2305,3 +2305,11 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .past-add { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
 .past-planned { flex-wrap: wrap; }
 .past-planned .button-row { width: 100%; }
+
+/* DT150 (0.2.131, board Stories102, rule C52): a dish keeps its proportions */
+.one-dish { display: flex; flex-direction: column; gap: 6px; padding: 10px 12px; margin: 8px 0; border: 1.5px solid var(--brand); border-radius: var(--r-control); background: var(--surface); }
+.one-dish-parts { color: var(--ink); }
+.steps-stale { display: block; margin: 6px 0; padding: 6px 8px; border-radius: var(--r-control); background: var(--close-soft); color: var(--close-text); font-weight: 700; }
+.steps-old { opacity: 0.55; }
+.gate-holds b { color: var(--close-text); }
+.crave-parts li { margin-bottom: 2px; }
