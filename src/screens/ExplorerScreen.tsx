@@ -43,16 +43,17 @@ const g = (v: number) => v.toFixed(2);
 // DT156: what a pack of this food could claim, by EU rules: the claims it meets, then each with Yes or No, the rule and its number
 function Claims({ claims }: { claims: Claim[] }) {
   const yes = claims.filter((c) => c.ok).map((c) => c.claim);
+  const health = claims.some((c) => c.health);
   return (
     <>
       <Head title="What a label could say" goal={`By EU rules, a food may only claim these when it meets them per 100 g. ${yes.length ? `This one could say: ${yes.join(", ")}.` : "This one could claim none of them."}`} />
       {claims.map((c) => (
         <div key={c.claim} className={`ex-claim${c.ok ? " ex-claim-ok" : ""}`}>
-          <div><b>{c.claim}</b><b className="ex-claim-yes">{c.ok ? "✓ Yes" : "No"}</b></div>
-          <small>Needs {c.rule}. This food: {c.is}.</small>
+          <div><b>{c.claim}</b><b className="ex-claim-yes">{c.status ?? (c.ok ? "✓ Yes" : "No")}</b></div>
+          <small>{c.health ? "A health claim: oat beta-glucan contributes to normal blood cholesterol. " : ""}Needs {c.rule}. This food: {c.is}.</small>
         </div>
       ))}
-      <small className="ex-src ex-claim-src">{CLAIMS_SOURCE}</small>
+      <small className="ex-src ex-claim-src">{CLAIMS_SOURCE}{health ? " Health claim: Regulation (EU) No 432/2012." : ""}</small>
     </>
   );
 }
@@ -210,8 +211,8 @@ function CarbCardView({ c, meal, mealCarb, target }: { c: CarbCard; meal: string
       <Head title="Fibre and sugar" goal={`A day needs at least ${FIBRE_DAY} g of fibre, so about ${c.fibreMeal} g a ${meal}; free sugars stay under 10 % of your energy, and the sugar inside whole fruit doesn't count as free. ${fibreOk ? "This portion covers the fibre." : "This portion brings part of the fibre."}`} />
       <Row name="Fibre" value={`${c.fibre} of ${c.fibreMeal} g`} frac={c.fibre / c.fibreMeal / NEED_AT} need ok={fibreOk} />
       <Row name="Sugars" value={`${c.sugar} g`} frac={c.sugar / CARB_SCALE_G} />
-      <Head title="The family members" goal={`Starch, sugars and fibre. This portion is mostly ${c.mostly}. Grams, on the same scale for every food.`} />
-      {CARB_MEMBERS.map(({ id, name }) => <Row key={id} name={name} value={`${g(c.members[id])} g`} frac={c.members[id] / CARB_SCALE_G} strong={id === "fibre"} />)}
+      <Head title="The family members" goal={`Starch, sugars and fibre, and fibre comes in two kinds. Soluble fibre forms a gel and slows digestion, so the sugar comes later; insoluble fibre adds bulk and keeps digestion moving. ${!f.split ? "Oats are known for beta-glucan, a soluble fibre; the split for dry oats isn't measured the way the others are." : f.split.noneFound ? "This one: no soluble fibre found, all of it insoluble." : `This one: ${Math.round((c.solubleShare ?? 0) * 100)} % of its fibre is soluble.`} This portion is mostly ${c.mostly}. Grams, on the same scale for every food.`} />
+      {CARB_MEMBERS.map(({ id, name, under }) => { const v = c.members[id]; if (v === null) return id === "soluble" ? <div key={id} className="ex-row ex-under ex-note"><small className="ex-name">of it, soluble and insoluble: no measure we can use for dry oats</small></div> : null; return <Row key={id} name={name} value={`${g(v)} g`} frac={v / CARB_SCALE_G} strong={id === "fibre"} under={under} />; })}
       <Head title="Quality" goal={`How fast the carbs reach your blood. GI: ${GI_LOW} or less is low, ${GI_HIGH} or more is high. GL counts the portion: GI times its carbs without fibre, divided by 100.`} />
       <div className="ex-score"><b className="ex-score-name">GI</b><b className="ex-score-val">{f.gi}, {c.band}</b><small>Atkinson 2008, Table 1: {f.giRow}</small></div>
       <div className="ex-score"><b className="ex-score-name">GL</b><b className="ex-score-val">{c.gl}</b><small>For this portion, calculated by the same paper's method</small></div>
@@ -219,7 +220,7 @@ function CarbCardView({ c, meal, mealCarb, target }: { c: CarbCard; meal: string
       <Head title="How to use it" goal="When and how this food serves you best." />
       <p className="ex-best"><b>Best use:</b> {f.best}</p>
       <p className="ex-line"><b>Pairs with:</b> {f.pair}</p>
-      <small className="ex-src ex-card-src">Source: {f.src}.</small>
+      <small className="ex-src ex-card-src">Source: {f.src}.{f.split && <><br />Soluble and insoluble: the share measured by Li, Andrews and Pehrsson 2002 (USDA), Table 1, {f.split.row}.</>}</small>
     </section>
   );
 }

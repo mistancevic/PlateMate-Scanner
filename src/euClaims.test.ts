@@ -33,3 +33,11 @@ test("DT156: fibre per 100 g or per 100 kcal; low sugars per 100 g", () => {
   assert.deepEqual(yes(carbClaims(by(CARB_FOODS, "pasta"))), ["Low sugars"]);
   assert.deepEqual(yes(carbClaims(by(CARB_FOODS, "banana"))), ["Source of fibre"]);
 });
+
+test("DT157: oats carry the EU health claim for beta-glucan as Not on our table; no other food does", () => {
+  const oats = carbClaims(by(CARB_FOODS, "oats"));
+  const bg = oats.find((c) => c.claim === "Beta-glucan and cholesterol")!;
+  assert.deepEqual([bg.status, bg.ok, bg.health], ["Not on our table", false, true]);
+  for (const f of CARB_FOODS.filter((x) => x.id !== "oats")) assert.ok(!carbClaims(f).some((c) => c.health), f.id);
+  assert.deepEqual(yes(oats), ["Source of fibre", "High fibre", "Low sugars"]);
+});
