@@ -2414,3 +2414,6 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .fat-card { margin-top: 10px; }
 .diet-hint { display: block; margin-top: 8px; }
 .diet-other { display: block; margin-top: 8px; }
+/* DT162 (0.3.4, board Stories114): every vitamin with both its names */
+.explorer .ex-h .ex-also { display: block; margin-top: 2px; font-size: 15px; font-weight: 700; color: var(--muted); }
+.ex-member > b .ex-sub { font-size: 12px; font-weight: 600; }
