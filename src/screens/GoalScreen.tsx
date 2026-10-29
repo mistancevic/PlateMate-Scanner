@@ -1,3 +1,4 @@
+import { CarbsFatStep } from "../components/CarbsFatStep";
 import { KitchensAndTools } from "./MenuScreen";
 import { REGIONS } from "../moments";
 import { SafetyQuestion } from "../components/SafetyQuestion";
@@ -211,7 +212,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
     const homeN = p.state.foods.filter(p.inPlace).length;
     return (
       <div className="goal-screen shop-step">
-        <p className="label calc-step">{nGoal + 2}. Where you shop and cook</p>
+        <p className="label calc-step">{nGoal + 3}. Where you shop and cook</p>
         <p className="small muted">Home brings its starter foods. The kitchens and what you cook with tell {CHEF_NAME} what to suggest. You can change all of it in Me later.</p>
         <section className="card place-pick">
           <b>Where do you live and shop?</b>
@@ -324,9 +325,11 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
             );
           })}</div>
           {c && <ProteinCard c={c} />}
+          {/* DT161 (0.3.3, board Stories113): how the person likes the rest split between carbs and fat */}
+          {c && <CarbsFatStep c={c} d={d} band={band} n={nGoal + 1} set={(cf) => setPersonalNow({ ...d, carbsFat: cf })} />}
           {c ? (
             <>
-              <Days title={`${nGoal + 1}. Your days`} />
+              <Days title={`${nGoal + 2}. Your days`} />
               {mode === "same" ? (
                 <section className="card proposal"><Four kcal={c.kcal} protein={c.protein} fats={c.fats} carbs={c.carbs} /><p className="math">{c.math}</p><small>{c.method}.</small></section>
               ) : (

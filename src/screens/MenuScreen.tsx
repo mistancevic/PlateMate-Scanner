@@ -18,7 +18,7 @@ import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayM
 import { CHEF_NAME } from "../components/Mark";
 import { KITCHEN, tasteOf, another, anotherLeft, undo, type Taste } from "../kitchens";
 import { slotsOf, windowOf, workHoursOf, timesFromWork, SLOT_HOURS, toMin } from "../slots";
-import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, workHintOf, type Plan, type PlanDay, type Lifestyle, moveDay, isTraining } from "../plan";
+import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, DIET_MEANS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, workHintOf, type Plan, type PlanDay, type Lifestyle, moveDay, isTraining } from "../plan";
 import { DayEditor } from "../components/DayEditor";
 import { ProteinCard } from "../components/ProteinCard";
 import { DayTable } from "../components/DayTable";
@@ -449,9 +449,16 @@ function LifestylePanel(p: AppApi) {
         {/* DT134 (0.2.113, board Stories89): one meal a day eats within an hour from the meal, and the meal carries the day */}
         {!minor && l.meals === 1 && (() => { const w = windowOf(l)!; return <p className="window-line">One meal a day at {w.from}. Eating window: {w.from} to {w.to}, an hour from your meal. It carries your whole day: about {fmt(p.state.goals.calories, 0)} kcal and {fmt(p.state.goals.protein, 0)} g protein.</p>; })()}
         {!minor && l.meals !== 1 && (() => { const t = slotsOf(l).map((x) => x.time).sort(); return <p className="window-line">Eating window: {t[0]} to {t[t.length - 1]}. From your first and last meal.</p>; })()}
-        <Setting name="What you eat"><Chips items={asItems(DIETS)} on={l.diet ?? "Everything"} pick={(v) => save({ diet: v })} /></Setting>
+        <Setting name="What you eat">
+          <Chips items={asItems(DIETS)} on={l.diet ?? "Everything"} pick={(v) => save({ diet: v })} />
+          {/* DT161 (0.3.3, board Stories113): what each diet means, Meat only's effect on the numbers, Other in your words */}
+          {l.diet === "Meat only" && <small className="setting-hint diet-hint">{DIET_MEANS["Meat only"]} They bring almost no carbs, so your carbs come close to zero. Very low carb fits your numbers: <button type="button" className="link" onClick={() => p.openGoal()}>set it under Goal ›</button></small>}
+          {l.diet && l.diet !== "Meat only" && DIET_MEANS[l.diet] && <small className="setting-hint diet-hint">{DIET_MEANS[l.diet]}</small>}
+          {l.diet === "Other" && <label className="field diet-other"><span>How you eat, in your words</span><input value={l.dietOther ?? ""} maxLength={120} placeholder="for example Mediterranean, no gluten" onChange={(e) => save({ dietOther: e.target.value })} /></label>}
+          {!minor && <small className="setting-hint">{CHEF_NAME} reads this with every plate and recipe it suggests.</small>}
+        </Setting>
         {age !== null && age >= ALCOHOL_AGE && (
-          <Setting name="Alcohol" hint="Alcohol counts as energy, 7 kcal a gram, and slows recovery. Chef Mealan will leave room for it on those days instead of pretending it isn't there.">
+          <Setting name="Alcohol" hint="Alcohol counts as energy, 7 kcal a gram, and slows recovery. Chef Mealan knows how often you drink: when you mention a drink or an evening out, it counts it and leaves room in the day.">
             <Chips items={asItems(ALCOHOL)} on={l.alcohol} pick={(v) => save({ alcohol: v })} />
           </Setting>
         )}
@@ -634,17 +641,18 @@ export function KitchensAndTools(p: AppApi) {
       {/* What a kitchen means (0.2.10, board CH, CH7): a line, three dishes Chef Mealan would cook you, Another and Undo */}
       {(p.personal.kitchens ?? []).filter((k) => KITCHEN[k]).map((k) => {
         const t = tasteOf(p.personal, k), set = (next: Taste) => p.setPersonal({ ...p.personal, kitchenTaste: { ...(p.personal.kitchenTaste ?? {}), [k]: next } });
-        const last = t.out[t.out.length - 1], more = anotherLeft(t, k);
+        const diet = lifestyleOf(p.personal).diet, fits = DIET_MEANS[diet ?? ""] ? diet! : null;
+        const last = t.out[t.out.length - 1], more = anotherLeft(t, k, diet);
         return (
           <div className="kt" key={k}>
             <small className="kt-name">{k.toUpperCase()}</small>
             <small className="kt-what">{KITCHEN[k].what}</small>
-            <small className="kt-lead">Three dishes {CHEF_NAME} would cook you:</small>
+            <small className="kt-lead">{t.shown.length === 0 ? `No ${k} dish we list fits ${fits}. ${CHEF_NAME} cooks the kitchen your way: tell it in the chat what you cook.` : `${t.shown.length === 3 ? "Three dishes" : t.shown.length === 2 ? "Two dishes" : "One dish"} ${CHEF_NAME} would cook you${fits ? `, all ${fits}` : ""}:`}</small>
             {t.shown.map((d, i) => (
-              <div className={`kt-dish ${last?.with === d ? "kt-new" : ""}`} key={d}><b>{d}</b>{more && <button className="link" aria-label={`Another instead of ${d}`} onClick={() => set(another(t, k, i))}>Another</button>}</div>
+              <div className={`kt-dish ${last?.with === d ? "kt-new" : ""}`} key={d}><b>{d}</b>{more && <button className="link" aria-label={`Another instead of ${d}`} onClick={() => set(another(t, k, i, diet))}>Another</button>}</div>
             ))}
             {t.out.length > 0 && <small className="kt-out">Not for you: {t.out.map((o) => o.dish.toLowerCase()).join(", ")}. <button className="link" onClick={() => set(undo(t))}>Undo</button></small>}
-            {!more && <small className="kt-out">That's every dish we have for this kitchen. Tell {CHEF_NAME} in the chat what you cook.</small>}
+            {!more && t.shown.length > 0 && <small className="kt-out">{fits ? `That's every ${k} dish we have that fits ${fits}. ${CHEF_NAME} cooks the kitchen your way: tell it in the chat what you cook.` : `That's every dish we have for this kitchen. Tell ${CHEF_NAME} in the chat what you cook.`}</small>}
           </div>
         );
       })}

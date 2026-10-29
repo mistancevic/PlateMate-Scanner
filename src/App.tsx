@@ -1,3 +1,4 @@
+import { eatsForReq, installEats, type Eats } from "./eats";
 import { servingsOf } from "./pilot";
 import { wholeOnPlate } from "./counted";
 import { drainedOf, libraryId, packLine } from "./canned";
@@ -1402,6 +1403,10 @@ export default function App() {
   }
   // the goal and profile as they are now, for numbersOfDay when it is given another goal (board FX)
   const goalNow = goal, personalNow = personal;
+  // DT161 (0.3.3): how the person eats goes with every request that asks Chef Mealan for food (src/eats.ts)
+  const eatsRef = useRef<Eats | null>(null);
+  eatsRef.current = eatsForReq(personalNow, goalNow?.band ?? "maintain");
+  useEffect(() => installEats(() => eatsRef.current), []);
   // each day keeps its own target (board FX): today's is written with the day, so a later goal never changes it
   const todayTarget = todayNumbers();
   useEffect(() => {

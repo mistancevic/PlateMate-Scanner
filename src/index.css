@@ -2391,3 +2391,26 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .ex-combine > b { display: block; font-size: var(--fs-small); }
 .ex-combine > small { display: block; line-height: 1.4; }
 .ex-kv .ex-name { width: auto; flex: 1; } .ex-kv .ex-val { flex: 0 0 auto; min-width: 0; }
+/* DT160 (0.3.3, board Stories112): Calculated for you, Your day ranges, the for you mark */
+.ex-for { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 9px; background: var(--tint); color: var(--brand-text); font-size: 10.5px; font-weight: 800; letter-spacing: 0; text-transform: none; vertical-align: 1px; }
+.explorer .ex-calc { margin: 2px 0 10px; padding: 10px 12px; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); font-size: var(--fs-small); line-height: 1.45; }
+.explorer .ex-calc .ex-for { margin-left: 0; }
+.explorer .ex-calc .link { font-weight: 800; white-space: nowrap; }
+.ex-yourday { margin: 6px 0 10px; }
+.ex-range { margin: 8px 0 10px; }
+.ex-range-top { display: flex; align-items: baseline; gap: 6px; }
+.ex-range-top > b { flex: 1; font-size: var(--fs-small); }
+.ex-range-top > small { font-weight: 900; color: var(--ink); white-space: nowrap; }
+.ex-range-bar { position: relative; display: block; height: 10px; margin: 5px 0 3px; border-radius: 5px; background: var(--base, #eef2f9); }
+.ex-range-bar > i { position: absolute; top: 0; bottom: 0; border-radius: 5px; background: #bfe6d6; }
+.ex-week .ex-range-bar > i { background: #c9dbf8; }
+.ex-range-bar > b { position: absolute; top: -4px; bottom: -4px; width: 3px; margin-left: -1.5px; border-radius: 2px; background: var(--top); }
+.ex-range-bar > b.ex-range-off { background: #c2410c; }
+.ex-range-why { display: block; color: var(--muted); font-size: 11.5px; line-height: 1.35; }
+.ex-warn { display: block; margin: 2px 0 8px; padding: 6px 8px; border-radius: 8px; background: #fff1e6; color: #9a3412; font-size: 11.5px; line-height: 1.35; }
+/* DT161 (0.3.3, board Stories113): Carbs and fat in the goal setup; what a diet means; Other in your words */
+.carbs-fat { margin-top: 14px; }
+.carbs-fat .activity.on { border-color: var(--brand); background: var(--base); }
+.fat-card { margin-top: 10px; }
+.diet-hint { display: block; margin-top: 8px; }
+.diet-other { display: block; margin-top: 8px; }

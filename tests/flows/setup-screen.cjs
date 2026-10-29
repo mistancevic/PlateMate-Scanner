@@ -32,7 +32,7 @@ const PORT = "3309", U = `http://127.0.0.1:${PORT}`;
   await page.getByRole("button", { name: /^Maintain/ }).first().click(); await page.waitForTimeout(400);
   t = await main();
   const steps2 = (await page.locator(".calc-step, .section-title").allTextContents()).map((s) => s.trim());
-  ok(steps2.join("|") === "1. You|2. What are you after?|3. Your days", "a goal picked: 3. Your days: " + steps2.join(" | "));
+  ok(steps2.join("|") === "1. You|2. What are you after?|3. Carbs and fat|4. Your days", "a goal picked: 3. Carbs and fat (DT161), 4. Your days: " + steps2.join(" | "));
   ok(/PD: grams of protein per 100 kcal/.test(t) && await page.getByRole("button", { name: /^Apply from today/ }).count() === 1 && /A coach can adjust these numbers later/.test(t), "PD said once; Apply; the coach line");
   await page.locator(".how-calc").click(); await page.waitForTimeout(300);
   ok(/Mifflin St Jeor/.test(await main()), "How we calculate › opens the formula names");

@@ -24,7 +24,7 @@ const PORT = "3314", U = `http://127.0.0.1:${PORT}`;
   await page.getByRole("button", { name: /^Maintain/ }).first().click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^Apply from today/ }).click(); await page.waitForTimeout(700);
   const step = page.locator(".shop-step");
-  ok(await step.count() === 1 && (await step.locator(".calc-step").textContent()).trim() === "4. Where you shop and cook", "after Apply on the first setup: 4. Where you shop and cook");
+  ok(await step.count() === 1 && (await step.locator(".calc-step").textContent()).trim() === "5. Where you shop and cook", "after Apply on the first setup: 5. Where you shop and cook (DT161 added Carbs and fat)");
   const done = step.getByRole("button", { name: /^(Done: to Today|Pick home first)$/ });
   ok(await done.isDisabled() && (await done.textContent()) === "Pick home first", "the step ends on its button: Pick home first, until home is picked");
   ok(await step.getByRole("group", { name: "The kitchens you cook" }).count() === 1 && await step.getByRole("group", { name: "What you cook with" }).count() === 1, "the kitchens and what you cook with, as in Me");
