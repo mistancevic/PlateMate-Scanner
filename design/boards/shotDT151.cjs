@@ -78,17 +78,16 @@ const foodsFor = (mealP) => { const c = MEALC(mealP); return FOODS.map((f) => ({
         <div style="display:flex;align-items:center;gap:10px"><span style="font-size:24px">${f.icon}</span><b style="flex:1;font-size:16px">${f.name}</b><span class="pdpill pdpill-${f.pd >= target ? "high" : "low"}" style="font-weight:900">PD ${f.pd.toFixed(1)}</span></div>
         <small style="display:block;margin:4px 0 8px;color:#5b6b8a">${f.p} g protein · ${f.kcal} kcal per 100 g</small>
         <span style="display:inline-block;padding:3px 9px;border-radius:999px;font-size:12.5px;font-weight:800;background:#eaf1fd;color:#123a7a">One portion: ${f.portion}</span>
-        ${H(`Protein for your ${meal}`, `Your ${meal} needs about ${mealP} g. This portion closes ${f.closes} %.`)}
+        ${H(`Protein for your ${meal}`, `Your ${meal} needs about ${mealP} g of protein. This portion closes ${f.closes} % of it.`)}
         ${R("Protein", `${f.protein} of ${mealP} g`, f.closes / 150, true, f.closes >= 100)}
-        ${H("Muscle repair", "What any meal needs to switch it on, whatever its size.")}
+        ${H("Muscle repair", `A meal switches on muscle repair with about 10 g of essential amino acids, 2.5 g of them leucine. ${f.eaa >= 10 && f.leu >= 2.5 ? "This portion brings both." : f.eaa >= 10 ? "This portion brings the 10 g, not yet the leucine." : "This portion brings part of it."}`)}
         ${R("Essential amino acids", `${f.eaa.toFixed(1)} of 10 g`, f.eaa * 10 / 150, true, f.eaa >= 10)}
         ${R("of them, leucine", `${f.leu.toFixed(1)} of 2.5 g`, f.leu * 40 / 150, true, f.leu >= 2.5, true)}
-        ${H("The family: nine essential amino acids", "Grams in this portion, on the same scale for every food.")}
+        ${H("The family: nine essential amino acids", `Nine amino acids your body can't make, so food must bring them. ${f.lowest[1] < 1.15 ? `This portion brings all nine, its lowest only just: ${N[f.lowest[0]].toLowerCase()}.` : "This portion brings all nine, each with room to spare."} Grams, on the same scale for every food.`)}
         ${Object.entries(N).map(([k, n]) => { const low = f.lowest[0] === k && f.lowest[1] < 1.15; return R(`${n}${low ? " · its lowest" : ""}`, `${g(f.por[k])} g`, f.por[k] / 3.5, false, false, k === "leu", low); }).join("")}
-        <small style="display:block;color:#5b6b8a;font-size:11px;margin-top:4px">${f.lowest[1] < 1.15 ? `Per gram of protein it just covers all nine an adult needs. Its lowest sits at ${Math.round(f.lowest[1] * 100)} % of the need: that is what a partner tops up.` : "Per gram of protein it covers all nine an adult needs, each with room to spare."}</small>
-        ${H("Quality", "Two scores you may know.")}
+        ${H("Quality", "Two scores for how well a protein covers the nine, once digested. 1.00 or more means complete.")}
         ${[["PDCAAS", f.q.pdcaas, f.q.pdSrc, "The older score, on many labels. It stops at 1.00."], ["DIAAS", f.q.diaas, f.q.diSrc, "The newer score, digestion counted. As published."]].map(([n, v, src, what], i) => `<div style="display:flex;gap:10px;align-items:baseline;padding:6px 0;${i ? "border-top:1px solid #eef2f9" : ""}"><b style="width:58px;font-size:12.5px">${n}</b><b style="width:64px;font-size:15px">${v ?? "none yet"}</b><small style="flex:1;font-size:11px;line-height:1.3">${what}<br><i style="font-style:normal;color:#5b6b8a">${src ?? "No published figure in our sources."}</i></small></div>`).join("")}
-        ${H("How to use it")}
+        ${H("How to use it", "When and how this food serves you best.")}
         <small style="display:block;margin-top:6px;padding:6px 8px;border-radius:10px;background:#eaf1fd;color:#123a7a"><b>Best use:</b> ${f.best}</small>
         <small style="display:block;margin-top:6px"><b>Completes it:</b> ${f.pair}</small>
         <small style="display:block;margin-top:6px;color:#123a7a;font-weight:700">For you: ${you(f)}</small>
@@ -109,15 +108,15 @@ const foodsFor = (mealP) => { const c = MEALC(mealP); return FOODS.map((f) => ({
   await page2("pd", "Lunch");
   await page.evaluate((NOTE) => { const h = document.querySelector(".step-head"); const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New (version 4): one portion against one meal. Pick the meal; its protein comes from your own target. Three bars: how much of the meal's protein it closes, leucine against the 2.5 g a meal needs for muscle repair, and the nine essential amino acids against about 10 g a meal. Then the family in grams, its lowest marked, PDCAAS and DIAAS with their sources, and the source of the numbers."; h.before(d); }, NOTE);
   const keepCards = (names, note) => page.evaluate(({ names, note, NOTE }) => { const cards = [...document.querySelectorAll("main section.card:not(.book-card)")]; for (const c of cards) if (!names.some((n) => c.textContent.includes(n))) c.remove(); if (note) { const last = [...document.querySelectorAll("main section.card:not(.book-card)")].pop(); const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = note; last?.after(d); } }, { names, note, NOTE });
-  await keepCards(["Whey protein", "Chicken breast"], "Then six more cards the same way: Greek yogurt, soybeans, salmon, egg, lentils, oats. Next screens: the plant cards and the end of the page.");
+  await keepCards(["Whey protein"], "Then seven more cards the same way: chicken breast, Greek yogurt, soybeans, salmon, egg, lentils, oats. Next screens: the order by meal, the plant cards and the end of the page.");
   await shot("r151c");
   await page2("meal", "Lunch");
   await page.evaluate((NOTE) => { const h = document.querySelector(".step-head"); const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New: Most of the meal puts the food that closes most of your lunch first. Chicken closes most of your lunch. A scoop of whey closes two thirds but brings more leucine than a meal needs: that is why it suits after training. Two eggs close a third and fall short on leucine."; h.before(d); }, NOTE);
   await keepCards(["Chicken breast", "Salmon"], "Then soybeans, whey, Greek yogurt, lentils, egg, oats.");
   await shot("r151d");
   await page2("pd", "Lunch");
-  await keepCards(["Salmon", "Lentils", "Oats"], null);
-  await page.evaluate((NOTE) => { const h = document.querySelector(".step-head"); const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New: salmon has no PDCAAS or DIAAS in our sources yet, and the card says so. Lentils and oats only just cover one of the family per gram: amber, its lowest, and what completes it."; h.before(d); }, NOTE);
+  await keepCards(["Salmon", "Lentils"], "Oats the same way: its lowest is lysine, and dairy completes it.");
+  await page.evaluate((NOTE) => { const h = document.querySelector(".step-head"); const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New: salmon has no PDCAAS or DIAAS in our sources yet, and the card says so. Lentils only just cover methionine and cysteine per gram: amber, its lowest, and rice completes it."; h.before(d); }, NOTE);
   await shot("r151f");
   await page2("pd", "Breakfast");
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
