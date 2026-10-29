@@ -1,0 +1,242 @@
+{
+ "a": [
+  {
+   "name": "Beef liver, pan-fried",
+   "portion": "100 g",
+   "grams": 100,
+   "per100": 7761.0,
+   "preformed": 7728,
+   "form": "retinol",
+   "src": "SR Legacy, FDC 168627"
+  },
+  {
+   "name": "Carrots, raw",
+   "portion": "1 medium, 80 g",
+   "grams": 80,
+   "per100": 1670.6,
+   "preformed": 0,
+   "form": "beta-carotene",
+   "src": "SR Legacy, FDC 170393"
+  },
+  {
+   "name": "Spinach, raw",
+   "portion": "A big handful, 60 g",
+   "grams": 60,
+   "per100": 937.7,
+   "preformed": 0,
+   "form": "beta-carotene",
+   "src": "SR Legacy, FDC 168462"
+  },
+  {
+   "name": "Red pepper, raw",
+   "portion": "1 medium, 120 g",
+   "grams": 120,
+   "per100": 313.2,
+   "preformed": 0,
+   "form": "beta-carotene",
+   "src": "SR Legacy, FDC 170108"
+  },
+  {
+   "name": "Kale, raw",
+   "portion": "A handful, 50 g",
+   "grams": 50,
+   "per100": 481.1,
+   "preformed": 0,
+   "form": "beta-carotene",
+   "src": "SR Legacy, FDC 168421"
+  },
+  {
+   "name": "Egg",
+   "portion": "2 eggs, 100 g",
+   "grams": 100,
+   "per100": 160.8,
+   "preformed": 160,
+   "form": "retinol",
+   "src": "SR Legacy, FDC 171287"
+  },
+  {
+   "name": "Cheddar",
+   "portion": "30 g",
+   "grams": 30,
+   "per100": 344.2,
+   "preformed": 330,
+   "form": "retinol",
+   "src": "SR Legacy, FDC 173414"
+  },
+  {
+   "name": "Salmon, farmed, cooked",
+   "portion": "150 g",
+   "grams": 150,
+   "per100": 69.0,
+   "preformed": 69,
+   "form": "retinol",
+   "src": "SR Legacy, FDC 175168"
+  },
+  {
+   "name": "Butter",
+   "portion": "For one slice of bread, 10 g",
+   "grams": 10,
+   "per100": 697.3,
+   "preformed": 671,
+   "form": "retinol",
+   "src": "SR Legacy, FDC 173410"
+  }
+ ],
+ "e": [
+  {
+   "name": "Sunflower seeds, dry roasted",
+   "portion": "A handful, 30 g",
+   "grams": 30,
+   "per100": 26.1,
+   "src": "SR Legacy, FDC 170563"
+  },
+  {
+   "name": "Almonds",
+   "portion": "A handful, 30 g",
+   "grams": 30,
+   "per100": 25.6,
+   "src": "SR Legacy, FDC 170567"
+  },
+  {
+   "name": "Hazelnuts",
+   "portion": "A handful, 30 g",
+   "grams": 30,
+   "per100": 15.0,
+   "src": "SR Legacy, FDC 170581"
+  },
+  {
+   "name": "Peanut butter",
+   "portion": "2 tablespoons, 32 g",
+   "grams": 32,
+   "per100": 9.1,
+   "src": "SR Legacy, FDC 172470"
+  },
+  {
+   "name": "Rapeseed oil",
+   "portion": "1 tablespoon, 14 g",
+   "grams": 14,
+   "per100": 17.5,
+   "src": "SR Legacy, FDC 172336"
+  },
+  {
+   "name": "Olive oil",
+   "portion": "1 tablespoon, 14 g",
+   "grams": 14,
+   "per100": 14.3,
+   "src": "SR Legacy, FDC 171413"
+  },
+  {
+   "name": "Salmon, farmed, cooked",
+   "portion": "150 g",
+   "grams": 150,
+   "per100": 1.14,
+   "src": "SR Legacy, FDC 175168"
+  },
+  {
+   "name": "Avocado",
+   "portion": "Half, 70 g",
+   "grams": 70,
+   "per100": 2.07,
+   "src": "SR Legacy, FDC 171705"
+  },
+  {
+   "name": "Spinach, raw",
+   "portion": "A big handful, 60 g",
+   "grams": 60,
+   "per100": 2.03,
+   "src": "SR Legacy, FDC 168462"
+  },
+  {
+   "name": "Egg",
+   "portion": "2 eggs, 100 g",
+   "grams": 100,
+   "per100": 1.05,
+   "src": "SR Legacy, FDC 171287"
+  }
+ ],
+ "k": [
+  {
+   "name": "Spinach, raw",
+   "portion": "A big handful, 60 g",
+   "grams": 60,
+   "per100": 483,
+   "form": null,
+   "src": "SR Legacy, FDC 168462"
+  },
+  {
+   "name": "Kale, raw",
+   "portion": "A handful, 50 g",
+   "grams": 50,
+   "per100": 390,
+   "form": null,
+   "src": "SR Legacy, FDC 168421"
+  },
+  {
+   "name": "Broccoli, boiled",
+   "portion": "100 g",
+   "grams": 100,
+   "per100": 141,
+   "form": null,
+   "src": "SR Legacy, FDC 169967"
+  },
+  {
+   "name": "Brussels sprouts, boiled",
+   "portion": "100 g",
+   "grams": 100,
+   "per100": 140,
+   "form": null,
+   "src": "SR Legacy, FDC 169971"
+  },
+  {
+   "name": "Romaine lettuce",
+   "portion": "A bowl, 50 g",
+   "grams": 50,
+   "per100": 103,
+   "form": null,
+   "src": "SR Legacy, FDC 169247"
+  },
+  {
+   "name": "Soybean oil",
+   "portion": "1 tablespoon, 14 g",
+   "grams": 14,
+   "per100": 184,
+   "form": null,
+   "src": "SR Legacy, FDC 171411"
+  },
+  {
+   "name": "Natto",
+   "portion": "50 g",
+   "grams": 50,
+   "per100": 23.1,
+   "form": "K1 only; its K2 is not on the USDA row",
+   "src": "SR Legacy, FDC 172443"
+  },
+  {
+   "name": "Olive oil",
+   "portion": "1 tablespoon, 14 g",
+   "grams": 14,
+   "per100": 60.2,
+   "form": null,
+   "src": "SR Legacy, FDC 171413"
+  },
+  {
+   "name": "Cheddar",
+   "portion": "30 g",
+   "grams": 30,
+   "per100": 2.4,
+   "form": "K1; also 2.6 \u00b5g K2 (MK-4), not counted in EFSA's value",
+   "src": "SR Legacy, FDC 173414"
+  },
+  {
+   "name": "Egg",
+   "portion": "2 eggs, 100 g",
+   "grams": 100,
+   "per100": 0.3,
+   "form": null,
+   "src": "SR Legacy, FDC 171287"
+  }
+ ],
+ "aSrc": "Source: USDA FoodData Central, SR Legacy, FDC 168627; SR Legacy, FDC 170393; SR Legacy, FDC 168462; SR Legacy, FDC 170108; SR Legacy, FDC 168421; SR Legacy, FDC 171287; SR Legacy, FDC 173414; SR Legacy, FDC 175168; SR Legacy, FDC 173410. Vitamin A counted the EFSA way: retinol, plus beta-carotene divided by 6, plus alpha-carotene and beta-cryptoxanthin divided by 12.",
+ "eSrc": "Source: USDA FoodData Central, SR Legacy, FDC 170563; SR Legacy, FDC 170567; SR Legacy, FDC 170581; SR Legacy, FDC 172470; SR Legacy, FDC 172336; SR Legacy, FDC 171413; SR Legacy, FDC 175168; SR Legacy, FDC 171705; SR Legacy, FDC 168462; SR Legacy, FDC 171287. Alpha-tocopherol.",
+ "kSrc": "Source: USDA FoodData Central, SR Legacy, FDC 168462; SR Legacy, FDC 168421; SR Legacy, FDC 169967; SR Legacy, FDC 169971; SR Legacy, FDC 169247; SR Legacy, FDC 171411; SR Legacy, FDC 172443; SR Legacy, FDC 171413; SR Legacy, FDC 173414; SR Legacy, FDC 171287. K1, phylloquinone, as USDA reports it."
+}
