@@ -21,8 +21,9 @@ test("DT151: for an adult every food covers the nine per gram; its lowest is nam
   assert.equal(cardOf(F("whey"), 40).lowest, null);
 });
 
-test("DT151: every food names its source; salmon has no quality score yet", () => {
+test("DT151: every food names its source; the scores come from one paper read in full, the rest say none yet", () => {
   for (const f of EXPLORER_FOODS) assert.ok(f.src.length > 5, f.id);
-  assert.equal(F("salmon").pdcaas, null);
-  assert.equal(F("lentils").pdcaas?.value, 0.8);
+  for (const id of ["salmon", "egg", "chicken"]) assert.deepEqual([F(id).pdcaas, F(id).diaas], [null, null], id);
+  for (const f of EXPLORER_FOODS) for (const s of [f.pdcaas, f.diaas]) if (s) assert.match(s.src, /^Hertzler 2020/, f.id);
+  assert.deepEqual([F("whey").diaas?.value, F("yogurt").diaas?.value, F("soy").diaas?.value, F("lentils").pdcaas?.value, F("oats").diaas?.value], [0.9, 1.08, 0.92, 0.8, 0.44]);
 });

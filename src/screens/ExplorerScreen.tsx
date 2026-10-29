@@ -51,9 +51,9 @@ function Card({ c, meal, mealP, target }: { c: ExplorerCard; meal: string; mealP
       <Row name="of them, leucine" value={`${c.leucine.toFixed(1)} of ${LEUCINE_MEAL} g`} frac={c.leucine / LEUCINE_MEAL / NEED_AT} need ok={c.leucine >= LEUCINE_MEAL} strong />
       <Head title="The family members: nine essential amino acids" goal={`Nine members of the protein family your body can't make, so food must bring them. ${c.lowest ? `This portion brings all nine, its lowest only just: ${c.lowest.name.toLowerCase()}.` : "This portion brings all nine, each with room to spare."} Grams, on the same scale for every food.`} />
       {NINE.map(({ id, name }) => { const low = c.lowest?.id === id; return <Row key={id} name={`${name}${low ? " · its lowest" : ""}`} value={`${g(c.family[id])} g`} frac={c.family[id] / SCALE_G} strong={id === "leu"} low={low} />; })}
-      <Head title="Quality" goal="Two scores for how well a protein covers the nine, once digested. 1.00 or more means complete." />
+      <Head title="Quality" goal="Two scores for how well a protein covers the nine, once digested. 1.00 or more means complete. Scores vary by study: whey from 0.85 to 1.09 in the papers we read, so we take them from one." />
       {([["PDCAAS", f.pdcaas, "The older score, on many labels. It stops at 1.00."], ["DIAAS", f.diaas, "The newer score, digestion counted. As published."]] as const).map(([n, s, what]) => (
-        <div key={n} className="ex-score"><b className="ex-score-name">{n}</b><b className="ex-score-val">{s ? s.value.toFixed(2) : "none yet"}</b><small>{what}<br /><span className="ex-src">{s ? s.src : "No published figure in our sources."}</span></small></div>
+        <div key={n} className="ex-score"><b className="ex-score-name">{n}</b><b className="ex-score-val">{s ? s.value.toFixed(2) : "none yet"}</b><small>{what}<br /><span className="ex-src">{s ? s.src : "No score we could check in a paper yet."}</span></small></div>
       ))}
       <Head title="How to use it" goal="When and how this food serves you best." />
       <p className="ex-best"><b>Best use:</b> {f.best}</p>
@@ -89,7 +89,7 @@ export function ExplorerScreen(p: AppApi) {
         <div><b>The why behind these numbers</b><small>Worthy Numbers, the free book: PD, protein quality and the label, in eleven short pages.</small>
           <a className="pill pill-small pill-primary" href="/worthy-numbers?from=ex">Read the book</a></div>
       </section>
-      <p className="ex-sources">Sources. Amino acids, protein and energy: USDA FoodData Central, the row named on each card; whey from a typical label, with Hamarsland 2017 (BMC Nutrition) for cysteine and tyrosine. Need per gram of protein: WHO, FAO and UNU 2007, adults. {LEUCINE_MEAL} g of leucine and about {EAA_MEAL} g of essential amino acids a meal: the amounts research most often cites for muscle protein synthesis. PDCAAS: Hertzler 2020 (Nutrients 12:3704, Table 2, adult pattern) and Boye 2012 (British Journal of Nutrition). DIAAS as published: Phillips 2017, Rutherfurd 2015, Ertl 2016, Hertzler 2020; these use a young child's needs, so plant foods score lower than they would for an adult. Educational, approximate, not medical advice. Carbs and Fats come next.</p>
+      <p className="ex-sources">Sources. Amino acids, protein and energy: USDA FoodData Central, the row named on each card; whey from a typical label, with Hamarsland 2017 (BMC Nutrition) for cysteine and tyrosine. Need per gram of protein: WHO, FAO and UNU 2007, adults. {LEUCINE_MEAL} g of leucine and about {EAA_MEAL} g of essential amino acids a meal: the amounts research most often cites for muscle protein synthesis. PDCAAS (adult pattern) and DIAAS (as published, a young child's needs, so plant foods score lower than they would for an adult): Hertzler 2020 (Nutrients 12:3704, Table 2). DIAAS varies by study: whey 0.85 in Herreman 2020, 0.90 in Hertzler 2020, 1.09 in Phillips 2017. Egg, chicken and salmon: no score we could check in a paper yet. Educational, approximate, not medical advice. Carbs and Fats come next.</p>
     </div>
   );
 }
