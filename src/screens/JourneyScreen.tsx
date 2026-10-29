@@ -990,8 +990,9 @@ export function JourneyScreen(p: AppApi) {
   }
   // DT93, rule 2: the culinary gate. Chef Mealan reads the plate once it has two foods: do they make the meal it is for?
   // Once per set of foods (the amounts are the app's business); never for a recipe, Chef Mealan's own dinner, or with the AI off.
-  // DT150 (0.2.131, rule C52): a dish cooked together is read again when its amounts move by 25 g or more: proportions count
-  const cookedDish = items.some((i) => needsCooking(i.food.name) || bindsADish(i.food)) && (partsOf(items).length >= 2 || items.length >= 3);
+  // DT150 (0.2.131, rule C52): a dish in parts, cooked together, is read again when its amounts move by 25 g or more: proportions count
+  // only a plate grouped into parts, a dish you said it is: any other plate keeps DT93, one read per set of foods
+  const cookedDish = partsOf(items).length >= 2 && items.some((i) => needsCooking(i.food.name) || bindsADish(i.food));
   const dishSig = items.filter((i) => !i.optional && !i.fry).map((i) => (cookedDish ? `${i.food.id}:${Math.round(i.grams / 25)}` : i.food.id)).sort().join("|");
   const dishWanted = items.length >= 2 && !state.fromRecipe && !madeBy && !imported && chefable && p.ai.on && !partsMode;
   const [dishTry, setDishTry] = useState(0); // DT104: Try again after a failed read
