@@ -19,6 +19,8 @@ import { lifestyleOf, calculate, planOf, splitOf, splitName, lowCarbsOf } from "
 import { bandOf } from "../goal";
 import { planShort, weekdayIndex } from "../plan";
 import { weekNumbers, yourDay, dayList, type YourDay } from "../explorerDay";
+import { lensesOf, goalLines, FOODS_SORTED, type Lenses } from "../explorerFoods";
+import type { FoodRow } from "../foodTable";
 import { slotsOf } from "../slots";
 import { needOf } from "../planned";
 import { pdVal } from "../ui";
@@ -97,7 +99,7 @@ function Card({ c, meal, mealP, target }: { c: ExplorerCard; meal: string; mealP
   );
 }
 
-type Family = "protein" | "fats" | "carbs" | "micros";
+type Family = "protein" | "fats" | "carbs" | "micros" | "foods";
 // the meal: the person's slots, the next one by the clock; its share of the day
 function useMeal(p: AppApi) {
   const slots = useMemo(() => slotsOf(lifestyleOf(p.personal)), [p.personal]);
@@ -179,8 +181,9 @@ export function ExplorerScreen(p: AppApi) {
         <button role="radio" aria-checked={family === "fats"} className={`choice ${family === "fats" ? "on" : ""}`} onClick={() => setFamily("fats")}>Fats</button>
         <button role="radio" aria-checked={family === "carbs"} className={`choice ${family === "carbs" ? "on" : ""}`} onClick={() => setFamily("carbs")}>Carbs</button>
         <button role="radio" aria-checked={family === "micros"} className={`choice ${family === "micros" ? "on" : ""}`} onClick={() => setFamily("micros")}>Micros</button>
+        <button role="radio" aria-checked={family === "foods"} className={`choice ${family === "foods" ? "on" : ""}`} onClick={() => setFamily("foods")}>Foods</button>
       </div>
-      {family === "protein" ? <ProteinPage {...p} /> : family === "fats" ? <FatsPage {...p} /> : family === "carbs" ? <CarbsPage {...p} /> : <MicrosPage {...p} />}
+      {family === "protein" ? <ProteinPage {...p} /> : family === "fats" ? <FatsPage {...p} /> : family === "carbs" ? <CarbsPage {...p} /> : family === "micros" ? <MicrosPage {...p} /> : <FoodsPage p={p} go={(f) => { setFamily(f); window.scrollTo(0, 0); }} />}
     </div>
   );
 }
@@ -333,50 +336,18 @@ function CarbsPage(p: AppApi) {
   );
 }
 
-// DT158: one portion against the day; every member against the label's reference intake, the line at the whole day
-function MicroCardView({ c, target }: { c: MicroCard; target: number | null }) {
-  const f = c.food, above = target !== null && c.pd >= target;
-  const rowOf = (id: MicroId) => { const m = MICRO_MEMBERS.find((x) => x.id === id)!, s = c.share[id], a = c.amount[id];
-    return <Row key={id} name={m.name} sub={m.also} value={s === null || a === null ? "not reported" : `${fmtAmount(a, m.unit)} · ${s} %`} frac={(s ?? 0) / 100 / MICRO_SCALE} need ok={s !== null && s >= 100} />; };
-  const says = c.claims.map((x) => (x.high ? "High in " : "Source of ") + lowerName(x.name));
-  return (
-    <section className="card ex-card" aria-label={f.name}>
-      <div className="ex-title"><span className="ex-icon" aria-hidden="true">{f.icon}</span><b>{f.name}</b><span className={`pdpill pdpill-${above || target === null ? "high" : "low"}`}>PD {c.pd.toFixed(1)}</span></div>
-      <Head title="One portion" goal="Every number below is for one normal portion." />
-      <Pair name="Portion" value={f.portion.label} />
-      <Pair name={f.drink ? "Per 100 ml" : "Per 100 g"} value={`${f.kcal} kcal, ${f.protein} g protein`} />
-      <Head title="For your day" goal={`Vitamins and minerals count per day, not per meal. ${c.top.length ? `This portion brings at least a third of the day's ${c.top.map((id) => lowerName(MICRO_MEMBERS.find((m) => m.id === id)!.name)).join(", ")}.` : "This portion brings less than a third of the day of each."}`} />
-      {c.top.map(rowOf)}
-      <Head title="The family members" goal="Vitamins and minerals. Fat-soluble vitamins are stored and need some fat in the meal; water-soluble ones aren't stored, so you need them more often. Each bar is this portion against the EU reference intake on labels; the line is the whole day." />
-      {MICRO_GROUPS.map((g) => <div key={g.id}><small className="ex-group">{g.name}</small>{MICRO_MEMBERS.filter((m) => m.group === g.id).map((m) => rowOf(m.id))}</div>)}
-      {c.dEfsa !== null && c.dEfsa > 0 && <small className="ex-src ex-dnote">Vitamin D: the label's reference is 5 µg a day; EFSA sets {EFSA_D} µg for adults. Against EFSA, this portion brings {c.dEfsa} %.</small>}
-      <Head title="What a label could say" goal={`By EU rules, a food may say it is a source of a vitamin or mineral with 15 % of the reference per 100 g${f.drink ? " (7.5 % per 100 ml for a drink)" : ""}, and high in it with twice that. ${says.length ? `This one could say: ${says.join(", ")}.` : "This one could claim none of them."}`} />
-      <Head title="How to use it" goal="When and how this food serves you best." />
-      <p className="ex-best"><b>Best use:</b> {f.best}</p>
-      <p className="ex-line"><b>Pairs with:</b> {f.pair}</p>
-      <small className="ex-src ex-card-src">Source: {f.src}.</small>
-    </section>
-  );
-}
 
 function MicrosPage(p: AppApi) {
-  const [view, setView] = useState<"food" | "member">("food");
   const [open, setOpen] = useState<MicroId | null>(null);
   const page = MEMBER_PAGES.find((m) => m.id === open);
   const sex = p.personal?.sex ?? null;
   const kcal = p.numbersFor(new Date())?.kcal ?? null;   // DT163: B1 and B3 follow today's energy
-  const viewChips = (
-    <div className="moments ex-chips" role="radiogroup" aria-label="Start from">
-      <button role="radio" aria-checked={view === "food"} className={`choice ${view === "food" ? "on" : ""}`} onClick={() => { setView("food"); setOpen(null); }}>By food</button>
-      <button role="radio" aria-checked={view === "member"} className={`choice ${view === "member" ? "on" : ""}`} onClick={() => setView("member")}>By member</button>
-    </div>
-  );
-  if (view === "member" && page) return <>{viewChips}<MemberView m={page} sex={sex} kcal={kcal} back={() => { setOpen(null); window.scrollTo(0, 0); }} /></>;
-  if (view === "member") return (
+  if (page) return <MemberView m={page} sex={sex} kcal={kcal} back={() => { setOpen(null); window.scrollTo(0, 0); }} />;
+  // DT164 (0.3.6): Micros opens straight on its members; what a food brings is in Foods
+  return (
     <>
-      {viewChips}
       <h2 className="ex-h">The family members</h2>
-      <p className="ex-intro">Start from a vitamin or mineral: what it is, what it does, how much a day, where to find it, and what to combine it with.</p>
+      <p className="ex-intro">Micronutrients are the family: the vitamins, fat-soluble and water-soluble, and the minerals. Start from one: what it is, what it does, how much a day, where to find it, and what to combine it with. What a food brings is in Foods.</p>
       {MICRO_GROUPS.map((g) => (
         <div key={g.id} className="ex-members">
           <small className="ex-group">{g.name}</small>
@@ -385,17 +356,6 @@ function MicrosPage(p: AppApi) {
               : <div key={m.id} className="menu-row ex-member ex-member-next"><b>{m.name}{m.also && <span className="ex-sub">{m.also}</span>}</b><small>next</small></div>; })}
         </div>
       ))}
-    </>
-  );
-  const cards = MICRO_FOODS.map(microCardOf).sort((a, b) => b.top.length - a.top.length);
-  return (
-    <>
-      {viewChips}
-      <h2 className="ex-h">Not all micros are equal</h2>
-      <p className="ex-intro">Micronutrients are the family. Its members are the vitamins, fat-soluble and water-soluble, and the minerals. You need them in milligrams and micrograms, every day. Each food here is one portion against your day: which members it brings, and how much.</p>
-      <small className="ex-meal">Against the EU reference intakes on labels, the same for every adult.</small>
-      {cards.map((c) => <MicroCardView key={c.food.id} c={c} target={p.pdRef} />)}
-      <p className="ex-sources">Sources. Vitamins and minerals per 100 g: USDA FoodData Central, the row named on each card. Reference intakes: Regulation (EU) No 1169/2011, Annex XIII, Part A. Source of and high in: 15 % of the reference per 100 g, 7.5 % per 100 ml for a drink, and twice that, Regulation (EC) No 1924/2006. Vitamin D for adults, {EFSA_D} µg: EFSA. Educational, approximate, not medical advice.</p>
     </>
   );
 }
@@ -434,6 +394,80 @@ function MemberView({ m, sex, kcal, back }: { m: MemberPage; sex: string | null;
         {m.combine.map((c) => <div key={c.with} className="ex-combine"><b>{c.with}</b><small>{c.why}</small></div>)}</>}
         <Head title="Too much" goal={m.much} />
         <small className="ex-src ex-card-src">Sources. {m.sources} Educational, not medical advice.</small>
+      </section>
+    </>
+  );
+}
+
+// DT164 (0.3.6, board Stories116): Foods, every food once through every lens, against the person's goal
+const IN_FAMILY: Record<"protein" | "fats" | "carbs", string[]> = { protein: EXPLORER_FOODS.map((f) => f.id), fats: FAT_FOODS.map((f) => f.id), carbs: CARB_FOODS.map((f) => f.id) };
+function FoodsPage({ p, go }: { p: AppApi; go: (f: Family) => void }) {
+  const { day, need, share, meal, chips } = useMeal(p);
+  const [sort, setSort] = useState<"az" | "pd">("az");
+  const [open, setOpen] = useState<string | null>(null);
+  const m = { protein: need?.protein && need.protein > 0 ? need.protein : FALLBACK_MEAL, fat: day && share ? Math.round(day.fats * share) : 25, kcal: day && share ? Math.round(day.kcal * share) : 700, carb: day && share ? Math.round(day.carbs * share) : 80, share: share ?? 1 / 3 };
+  const foods = FOODS_SORTED();
+  const pdOf = (f: FoodRow) => Math.round((1000 * f.protein) / f.kcal) / 10;
+  const list = sort === "az" ? foods : [...foods].sort((a, b) => pdOf(b) - pdOf(a));
+  const opened = foods.find((f) => f.id === open);
+  if (opened) return <FoodView l={lensesOf(opened, m)} m={m} meal={meal} chips={chips} p={p} go={go} back={() => { setOpen(null); window.scrollTo(0, 0); }} />;
+  return (
+    <>
+      <h2 className="ex-h">Every food, every lens</h2>
+      <p className="ex-intro">Each food once, through all four families: its protein, its fats, its carbs, its vitamins and minerals, and what one portion does for your goal. Tap a food to open it.</p>
+      <div className="moments ex-chips" role="radiogroup" aria-label="Order">
+        <button role="radio" aria-checked={sort === "az"} className={`choice ${sort === "az" ? "on" : ""}`} onClick={() => setSort("az")}>A to Z</button>
+        <button role="radio" aria-checked={sort === "pd"} className={`choice ${sort === "pd" ? "on" : ""}`} onClick={() => setSort("pd")}>By PD</button>
+      </div>
+      {list.map((f) => (
+        <button key={f.id} className="menu-row ex-food" onClick={() => { setOpen(f.id); window.scrollTo(0, 0); }}>
+          <span className="ex-icon" aria-hidden="true">{f.icon}</span><b>{f.name}<span className="ex-sub">{f.portion.label}</span></b>
+          <span className={`pdpill pdpill-${p.pdRef === null || pdOf(f) >= p.pdRef ? "high" : "low"}`}>PD {pdOf(f).toFixed(1)}</span><span aria-hidden="true">›</span>
+        </button>
+      ))}
+      <p className="ex-sources">Sources. Every food is one row of USDA FoodData Central, named on its page, read in full once; every family uses the same row. Whey: a typical label. Educational, approximate, not medical advice.</p>
+    </>
+  );
+}
+function FoodView({ l, m, meal, chips, p, go, back }: { l: Lenses; m: { protein: number; fat: number; kcal: number; carb: number; share: number }; meal: string; chips: ReactNode; p: AppApi; go: (f: Family) => void; back: () => void }) {
+  const f = l.food, lines = goalLines(l, meal, m, p.pdRef, p.goal?.band ?? "maintain");
+  const above = p.pdRef !== null && l.pd >= p.pdRef;
+  const open = (fam: "protein" | "fats" | "carbs" | "micros", label: string) => (fam === "micros" || IN_FAMILY[fam].includes(f.id) ? <button type="button" className="link ex-open" onClick={() => go(fam)}>Open in {label} ›</button> : null);
+  const lens = (t: string, fam: "protein" | "fats" | "carbs" | "micros", label: string, goal: string) => <div className="ex-head ex-lens"><b>{t}{open(fam, label)}</b><small>{goal}</small></div>;
+  const none = <small className="ex-src ex-dnote">Not on our table: {f.id === "whey" ? "whey has no USDA row; your brand's label has it." : "this row doesn't report it."}</small>;
+  const per100 = [`${f.kcal} kcal`, `${f.protein} g protein`, ...(f.carb !== null ? [`${f.carb} g carbs`] : []), ...(f.fat !== null ? [`${f.fat} g fat`] : [])].join(", ");
+  return (
+    <>
+      <button className="ex-back" onClick={back}>‹ Every food</button>
+      <h2 className="ex-h">{f.name}</h2>
+      {chips}
+      <section className="card ex-card" aria-label={f.name}>
+        <div className="ex-title"><span className="ex-icon" aria-hidden="true">{f.icon}</span><b>{f.name}</b><span className={`pdpill pdpill-${above || p.pdRef === null ? "high" : "low"}`}>PD {l.pd.toFixed(1)}</span></div>
+        <Head title="One portion" goal="Every number below is for one normal portion, from one row for every lens." />
+        <Pair name="Portion" value={f.portion.label} />
+        <div className="ex-row ex-pair"><small className="ex-name">{f.drink ? "Per 100 ml" : "Per 100 g"}</small><small className="ex-val ex-wrap">{per100}</small></div>
+        <div className="ex-head"><b>For your goal<ForYou /></b><small>{`What this portion does for your ${meal} and your day, from the numbers below.`}</small></div>
+        {lines.map((x) => <div key={x.text} className={`ex-goal ex-goal-${x.mark}`}><b aria-hidden="true">{x.mark === "ok" ? "✓" : x.mark === "part" ? "◐" : "·"}</b><small>{x.text}</small></div>)}
+        {lens("Protein", "protein", "Protein", l.protein.eaa === null ? "The amino acids: not on our table for this row." : l.protein.lowest ? `Its lowest member is ${l.protein.lowest.toLowerCase()}, close to the need per gram.` : "All nine essential amino acids, with room to spare.")}
+        <Row name="Protein" value={`${l.protein.g} of ${m.protein} g`} frac={l.protein.closes / 100 / NEED_AT} need ok={l.protein.closes >= 100} />
+        {l.protein.eaa !== null && <Row name="Essential amino acids" value={`${l.protein.eaa} of ${EAA_MEAL} g`} frac={l.protein.eaa / EAA_MEAL / NEED_AT} need ok={l.protein.eaa >= EAA_MEAL} />}
+        {l.protein.leucine !== null && <Row name="of them, leucine" value={`${l.protein.leucine} of ${LEUCINE_MEAL} g`} frac={l.protein.leucine / LEUCINE_MEAL / NEED_AT} need ok={l.protein.leucine >= LEUCINE_MEAL} strong />}
+        {lens("Fats", "fats", "Fats", l.fats ? `Mostly ${l.fats.mostly}${l.fats.g < 1 ? ", and very little" : ""}.` : "")}
+        {l.fats ? <>
+          <Row name="Fat" value={`${l.fats.g} of ${m.fat} g`} frac={l.fats.closes / 100 / NEED_AT} need ok={false} />
+          <Row name="Saturated" value={`${l.fats.sat} of ${l.fats.satMeal} g`} frac={l.fats.sat / l.fats.satMeal / NEED_AT} need over={l.fats.sat > l.fats.satMeal} />
+          {l.fats.epaDha > 0 && <Row name="EPA and DHA" value={`${l.fats.epaDha} of ${EPA_DHA_DAY} mg`} frac={l.fats.epaDha / EPA_DHA_DAY / NEED_AT} need ok={l.fats.epaDha >= EPA_DHA_DAY} />}
+        </> : none}
+        {lens("Carbs", "carbs", "Carbs", l.carbs ? (l.carbs.g < 0.5 ? "None." : l.carbs.gi !== null ? `GI ${l.carbs.gi}, ${l.carbs.band}.` : "GI: not on our table for this food.") : "")}
+        {l.carbs ? <>
+          <Row name="Carbs" value={`${l.carbs.g} of ${m.carb} g`} frac={l.carbs.closes / 100 / NEED_AT} need ok={false} />
+          <Row name="Fibre" value={`${l.carbs.fibre} of ${l.carbs.fibreMeal} g`} frac={l.carbs.fibre / Math.max(0.1, l.carbs.fibreMeal) / NEED_AT} need ok={l.carbs.fibre >= l.carbs.fibreMeal} />
+          <Row name="Sugars" value={`${l.carbs.sugar} g`} frac={l.carbs.sugar / 60} />
+        </> : none}
+        {lens("Vitamins and minerals", "micros", "Micros", l.micros ? "The three it brings most of, against the label's reference for the day." : "")}
+        {l.micros ? l.micros.map((x) => <Row key={x.id} name={x.name} sub={x.also} value={`${fmtAmount(x.amount, x.unit)} · ${x.share} %`} frac={x.share / 100 / MICRO_SCALE} need ok={x.share >= 100} />) : none}
+        <Head title="What a label could say" goal={`By EU rules. ${l.claims.length ? `This one could say: ${l.claims.join(", ")}.` : "This one could claim none of them."}`} />
+        <small className="ex-src ex-card-src">Source: {f.src}.</small>
       </section>
     </>
   );

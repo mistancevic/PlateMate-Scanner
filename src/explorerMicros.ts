@@ -55,32 +55,22 @@ export type MicroFood = {
   v: Record<MicroId, number | null>; src: string; best: string; pair: string;   // per 100 g; null where the row doesn't report it
 };
 
-export const MICRO_FOODS: MicroFood[] = [
-  { id: "salmon", icon: "🐟", name: "Salmon", kcal: 206, protein: 22.1, portion: { label: "150 g, cooked", grams: 150 }, src: "USDA SR Legacy, FDC 175168, salmon, Atlantic, farmed, cooked, dry heat",
-    v: { a: 69, d: 13.1, e: 1.14, k: 0.1, c: 3.7, b12: 2.8, fol: 34, ca: 15, fe: 0.34, mg: 30, k_: 384, zn: 0.43 , b1: 0.34, b2: 0.14, b3: 8.04, b5: 1.48, b6: 0.65, b7: null },
-    best: "Twice a week: one of the few foods with real vitamin D, and more than a day of B12.", pair: "Potatoes or rice, and greens." },
-  { id: "egg", icon: "🥚", name: "Egg", kcal: 143, protein: 12.6, portion: { label: "2 eggs, 100 g", grams: 100 }, src: "USDA SR Legacy, FDC 171287, egg, whole, raw",
-    v: { a: 160.8, d: 2.0, e: 1.05, k: 0.3, c: 0, b12: 0.89, fol: 47, ca: 56, fe: 1.75, mg: 12, k_: 138, zn: 1.29 , b1: 0.04, b2: 0.46, b3: 0.075, b5: 1.53, b6: 0.17, b7: null },
-    best: "A little of almost everything: B12, vitamin A and D, folate. The yolk carries them.", pair: "Spinach or peppers: the vitamin C and K eggs lack." },
-  { id: "spinach", icon: "🥬", name: "Spinach, raw", kcal: 23, protein: 2.86, portion: { label: "A big handful, 60 g", grams: 60 }, src: "USDA SR Legacy, FDC 168462, spinach, raw",
-    v: { a: 937.7, d: 0, e: 2.03, k: 483, c: 28.1, b12: 0, fol: 194, ca: 99, fe: 2.71, mg: 79, k_: 558, zn: 0.53 , b1: 0.078, b2: 0.19, b3: 0.72, b5: 0.065, b6: 0.2, b7: null },
-    best: "Vitamin K for days, folate and vitamin A, for almost no energy. Some fat in the meal helps take up A and K.", pair: "Eggs, salmon or a little olive oil." },
-  { id: "lentils", icon: "🫘", name: "Lentils, boiled", kcal: 116, protein: 9.02, portion: { label: "200 g", grams: 200 }, src: "USDA SR Legacy, FDC 172421, lentils, boiled",
-    v: { a: 0, d: 0, e: 0.11, k: 1.7, c: 1.5, b12: 0, fol: 181, ca: 19, fe: 3.33, mg: 36, k_: 369, zn: 1.27 , b1: 0.17, b2: 0.073, b3: 1.06, b5: 0.64, b6: 0.18, b7: null },
-    best: "Folate for the whole day and plant iron. Vitamin C in the same meal helps take up the iron.", pair: "Red peppers or tomatoes: vitamin C for the iron." },
-  { id: "milk", icon: "🥛", name: "Milk, 1 %", kcal: 43, protein: 3.38, portion: { label: "A glass, 250 ml", grams: 250 }, drink: true, src: "USDA Foundation, FDC 746772, milk, lowfat, 1 %, with added vitamins A and D",
-    v: { a: 58.2, d: 1.06, e: 0.02, k: null, c: null, b12: 0.61, fol: 2, ca: 126, fe: 0, mg: 12, k_: 159, zn: 0.43 , b1: 0.057, b2: 0.14, b3: 0.11, b5: 0.37, b6: 0.06, b7: null },
-    best: "Calcium and B12 in a glass. This row has vitamin D added, as some milk does.", pair: "Oats or a banana." },
-  { id: "almonds", icon: "🥜", name: "Almonds", kcal: 579, protein: 21.1, portion: { label: "A handful, 30 g", grams: 30 }, src: "USDA SR Legacy, FDC 170567, almonds",
-    v: { a: 0, d: 0, e: 25.6, k: 0, c: 0, b12: 0, fol: 44, ca: 269, fe: 3.71, mg: 270, k_: 733, zn: 3.12 , b1: 0.2, b2: 1.14, b3: 3.62, b5: 0.47, b6: 0.14, b7: null },
-    best: "Vitamin E and magnesium: a handful covers about two thirds of a day's vitamin E.", pair: "Yogurt or fruit." },
-  { id: "pepper", icon: "🫑", name: "Red pepper, raw", kcal: 26, protein: 0.99, portion: { label: "1 medium, 120 g", grams: 120 }, src: "USDA SR Legacy, FDC 170108, peppers, sweet, red, raw",
-    v: { a: 313.2, d: 0, e: 1.58, k: 4.9, c: 128, b12: 0, fol: 46, ca: 7, fe: 0.43, mg: 12, k_: 211, zn: 0.25 , b1: 0.054, b2: 0.085, b3: 0.98, b5: 0.32, b6: 0.29, b7: null },
-    best: "Vitamin C for about two days in one pepper. Raw keeps the most.", pair: "Lentils, beans or beef: its vitamin C helps take up their iron." },
-  { id: "beef", icon: "🥩", name: "Beef, lean, cooked", kcal: 230, protein: 28.4, portion: { label: "125 g, cooked", grams: 125 }, src: "USDA SR Legacy, FDC 171794, beef, ground, 90 % lean, pan-browned",
-    v: { a: 3, d: 0, e: 0.12, k: 1.2, c: 0, b12: 2.8, fol: 8, ca: 16, fe: 3.08, mg: 27, k_: 433, zn: 6.84 , b1: 0.043, b2: 0.19, b3: 6.8, b5: 0.81, b6: 0.43, b7: null },
-    best: "More than a day of B12, most of the day's zinc, and iron the body takes up well.", pair: "Peppers and greens." },
+import { rowOf } from "./foodTable";
+const fromTable = (id: string) => { const r = rowOf(id); return { icon: r.icon, name: r.name, kcal: r.kcal, protein: r.protein, portion: r.portion, drink: r.drink, v: r.micro!, src: r.src }; };
+// DT164 (0.3.6): the numbers, name, icon and portion come from the shared food table (src/foodTable.ts); only what this family
+// says about a food is written here
+type Extra = Omit<MicroFood, "icon" | "name" | "kcal" | "protein" | "portion" | "drink" | "v" | "src">;
+const EXTRAS: Extra[] = [
+  { id: "salmon", best: "Twice a week: one of the few foods with real vitamin D, and more than a day of B12.", pair: "Potatoes or rice, and greens." },
+  { id: "egg", best: "A little of almost everything: B12, vitamin A and D, folate. The yolk carries them.", pair: "Spinach or peppers: the vitamin C and K eggs lack." },
+  { id: "spinach", best: "Vitamin K for days, folate and vitamin A, for almost no energy. Some fat in the meal helps take up A and K.", pair: "Eggs, salmon or a little olive oil." },
+  { id: "lentils", best: "Folate for the whole day and plant iron. Vitamin C in the same meal helps take up the iron.", pair: "Red peppers or tomatoes: vitamin C for the iron." },
+  { id: "milk", best: "Calcium and B12 in a glass. This row has vitamin D added, as some milk does.", pair: "Oats or a banana." },
+  { id: "almonds", best: "Vitamin E and magnesium: a handful covers about two thirds of a day's vitamin E.", pair: "Yogurt or fruit." },
+  { id: "pepper", best: "Vitamin C for about two days in one pepper. Raw keeps the most.", pair: "Lentils, beans or beef: its vitamin C helps take up their iron." },
+  { id: "beef", best: "More than a day of B12, most of the day's zinc, and iron the body takes up well.", pair: "Peppers and greens." },
 ];
+export const MICRO_FOODS: MicroFood[] = EXTRAS.map((x) => ({ ...fromTable(x.id), ...x }));
 
 const r = (x: number, d = 0) => Math.round(x * 10 ** d) / 10 ** d;
 // in a sentence: "vitamin K"; vitamin B9 by the name the EU claims and labels use, folate

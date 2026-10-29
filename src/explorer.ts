@@ -39,56 +39,22 @@ export type ExplorerFood = {
   best: string; pair: string;
 };
 
-export const EXPLORER_FOODS: ExplorerFood[] = [
-  { id: "whey", icon: "🥤", name: "Whey protein powder", kcal: 370, protein: 90, portion: { label: "One scoop, 30 g", grams: 30 },
-    aa: { his: 1.70, ile: 6.20, leu: 11.0, lys: 9.50, met: 2.10, cys: 2.26, phe: 3.00, tyr: 2.26, thr: 6.80, trp: 1.70, val: 5.70 },
-    pdcaas: { value: 1.00, src: "Hertzler 2020, adults" }, diaas: { value: 0.90, src: "Hertzler 2020" },
-    src: "a typical whey label; cysteine and tyrosine from Hamarsland 2017 (BMC Nutrition). Your own brand's label replaces it",
-    best: "After training: one scoop in water or milk. Fast to digest and the most leucine per gram, so it starts muscle building quickest. Also lifts a breakfast short of protein.",
-    pair: "Nothing: it is complete." },
-  { id: "chicken", icon: "🍗", name: "Chicken breast", kcal: 120, protein: 22.3, portion: { label: "150 g", grams: 150 },
-    aa: { his: 0.830, ile: 1.096, leu: 1.837, lys: 2.148, met: 0.578, cys: 0.237, phe: 0.889, tyr: 0.800, thr: 0.993, trp: 0.267, val: 1.141 },
-    pdcaas: null, diaas: null,
-    src: "USDA SR Legacy 05062, breast, raw",
-    best: "The anchor of a main meal: 150 g brings most lunches and dinners to their protein. Lean, so the PD stays high whatever goes with it.",
-    pair: "Nothing: it is complete." },
-  { id: "yogurt", icon: "🥣", name: "Greek yogurt, 0 %", kcal: 61, protein: 10.3, portion: { label: "200 g", grams: 200 },
-    aa: { his: 0.29, ile: 0.53, leu: 1.03, lys: 0.83, met: 0.29, cys: 0.083, phe: 0.51, tyr: 0.51, thr: 0.41, trp: 0.13, val: 0.67 },
-    pdcaas: { value: 1.00, src: "Hertzler 2020, milk, adults" }, diaas: { value: 1.08, src: "Hertzler 2020, milk" },
-    src: "USDA Foundation, FDC 330137, Greek yogurt, plain, nonfat",
-    best: "Breakfast or before sleep: its casein digests slowly and feeds amino acids for hours. Lifts oats and fruit to your PD.",
-    pair: "Nothing: it is complete. It lifts oats and fruit." },
-  { id: "salmon", icon: "🐟", name: "Salmon", kcal: 208, protein: 20.4, portion: { label: "150 g", grams: 150 },
-    aa: { his: 0.540, ile: 0.959, leu: 1.610, lys: 1.870, met: 0.621, cys: 0.209, phe: 0.840, tyr: 0.750, thr: 0.861, trp: 0.199, val: 1.100 },
-    pdcaas: null, diaas: null,
-    src: "USDA SR Legacy 15236, Atlantic, farmed, raw",
-    best: "Twice a week as a main meal: protein plus the omega-3 fats. Its own fat lowers the PD, so add vegetables, not more fat.",
-    pair: "Nothing: it is complete. Its fat is the good kind." },
-  { id: "soy", icon: "🫘", name: "Soybeans, boiled", kcal: 172, protein: 18.2, portion: { label: "150 g", grams: 150 },
-    aa: { his: 0.45, ile: 0.81, leu: 1.35, lys: 1.11, met: 0.22, cys: 0.27, phe: 0.87, tyr: 0.63, thr: 0.72, trp: 0.24, val: 0.83 },
-    pdcaas: { value: 1.00, src: "Hertzler 2020, adults" }, diaas: { value: 0.92, src: "Hertzler 2020" },
-    src: "USDA SR Legacy, FDC 174271, soybeans, boiled",
-    best: "The plant anchor: the most complete plant protein, as tofu, edamame or beans. 150 g brings as much protein as a scoop of whey.",
-    pair: "Nothing for its amino acids: complete for an adult. Rice or bread adds the protein to close the meal." },
-  { id: "egg", icon: "🥚", name: "Egg", kcal: 143, protein: 12.6, portion: { label: "2 eggs, 100 g", grams: 100 },
-    aa: { his: 0.31, ile: 0.67, leu: 1.09, lys: 0.91, met: 0.38, cys: 0.27, phe: 0.68, tyr: 0.50, thr: 0.56, trp: 0.17, val: 0.86 },
-    pdcaas: null, diaas: null,
-    src: "USDA SR Legacy, FDC 171287, egg, whole, raw",
-    best: "Breakfast, or to complete a plant meal. Two eggs are a third of a meal's protein, so add a third egg or egg whites, which also raise the PD.",
-    pair: "Nothing: the reference protein. Half its energy is the yolk's fat." },
-  { id: "lentils", icon: "🫘", name: "Lentils, boiled", kcal: 116, protein: 9.02, portion: { label: "200 g", grams: 200 },
-    aa: { his: 0.25, ile: 0.39, leu: 0.65, lys: 0.63, met: 0.077, cys: 0.12, phe: 0.45, tyr: 0.24, thr: 0.32, trp: 0.081, val: 0.45 },
-    pdcaas: { value: 0.80, src: "Hertzler 2020, adults" }, diaas: { value: 0.75, src: "Hertzler 2020" },
-    src: "USDA SR Legacy, FDC 172421, lentils, boiled",
-    best: "A plant lunch with rice: together complete, and the fibre keeps you full for hours. Count it as protein and carb together.",
-    pair: "Rice completes it: rice has the methionine lentils lack, lentils the lysine rice lacks." },
-  { id: "oats", icon: "🌾", name: "Oats, dry", kcal: 379, protein: 13.2, portion: { label: "50 g", grams: 50 },
-    aa: { his: 0.28, ile: 0.50, leu: 0.98, lys: 0.64, met: 0.21, cys: 0.46, phe: 0.67, tyr: 0.40, thr: 0.38, trp: 0.18, val: 0.69 },
-    pdcaas: { value: 0.62, src: "Hertzler 2020, adults" }, diaas: { value: 0.44, src: "Hertzler 2020" },
-    src: "USDA SR Legacy, FDC 173904, oats, regular and quick, dry",
-    best: "A breakfast carb, not a protein: 50 g gives 7 g protein. Cook it in milk or top it with skyr, which brings the lysine and the PD up.",
-    pair: "Milk, skyr or yogurt completes it: dairy has the lysine oats lack." },
+import { rowOf } from "./foodTable";
+const fromTable = (id: string) => { const r = rowOf(id); return { icon: r.icon, name: r.name, kcal: r.kcal, protein: r.protein, portion: r.portion, aa: r.aa!, src: r.src }; };
+// DT164 (0.3.6): the numbers, name, icon and portion come from the shared food table (src/foodTable.ts); only what this family
+// says about a food is written here
+type Extra = Omit<ExplorerFood, "icon" | "name" | "kcal" | "protein" | "portion" | "aa" | "src">;
+const EXTRAS: Extra[] = [
+  { id: "whey", pdcaas: {"value": 1, "src": "Hertzler 2020, adults"}, diaas: {"value": 0.9, "src": "Hertzler 2020"}, best: "After training: one scoop in water or milk. Fast to digest and the most leucine per gram, so it starts muscle building quickest. Also lifts a breakfast short of protein.", pair: "Nothing: it is complete." },
+  { id: "chicken", pdcaas: null, diaas: null, best: "The anchor of a main meal: 150 g brings most lunches and dinners to their protein. Lean, so the PD stays high whatever goes with it.", pair: "Nothing: it is complete." },
+  { id: "yogurt", pdcaas: {"value": 1, "src": "Hertzler 2020, milk, adults"}, diaas: {"value": 1.08, "src": "Hertzler 2020, milk"}, best: "Breakfast or before sleep: its casein digests slowly and feeds amino acids for hours. Lifts oats and fruit to your PD.", pair: "Nothing: it is complete. It lifts oats and fruit." },
+  { id: "salmon", pdcaas: null, diaas: null, best: "Twice a week as a main meal: protein plus the omega-3 fats. Its own fat lowers the PD, so add vegetables, not more fat.", pair: "Nothing: it is complete. Its fat is the good kind." },
+  { id: "soy", pdcaas: {"value": 1, "src": "Hertzler 2020, adults"}, diaas: {"value": 0.92, "src": "Hertzler 2020"}, best: "The plant anchor: the most complete plant protein, as tofu, edamame or beans. 150 g brings as much protein as a scoop of whey.", pair: "Nothing for its amino acids: complete for an adult. Rice or bread adds the protein to close the meal." },
+  { id: "egg", pdcaas: null, diaas: null, best: "Breakfast, or to complete a plant meal. Two eggs are a third of a meal's protein, so add a third egg or egg whites, which also raise the PD.", pair: "Nothing: the reference protein. Half its energy is the yolk's fat." },
+  { id: "lentils", pdcaas: {"value": 0.8, "src": "Hertzler 2020, adults"}, diaas: {"value": 0.75, "src": "Hertzler 2020"}, best: "A plant lunch with rice: together complete, and the fibre keeps you full for hours. Count it as protein and carb together.", pair: "Rice completes it: rice has the methionine lentils lack, lentils the lysine rice lacks." },
+  { id: "oats", pdcaas: {"value": 0.62, "src": "Hertzler 2020, adults"}, diaas: {"value": 0.44, "src": "Hertzler 2020"}, best: "A breakfast carb, not a protein: 50 g gives 7 g protein. Cook it in milk or top it with skyr, which brings the lysine and the PD up.", pair: "Milk, skyr or yogurt completes it: dairy has the lysine oats lack." },
 ];
+export const EXPLORER_FOODS: ExplorerFood[] = EXTRAS.map((x) => ({ ...fromTable(x.id), ...x }));
 
 const nineOf = (a: Record<AA, number>): Record<Nine, number> => ({ his: a.his, ile: a.ile, leu: a.leu, lys: a.lys, saa: a.met + a.cys, aaa: a.phe + a.tyr, thr: a.thr, trp: a.trp, val: a.val });
 const r = (x: number, d: number) => Math.round(x * 10 ** d) / 10 ** d;

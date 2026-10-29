@@ -8,7 +8,8 @@ test("DT154: one portion against one meal: fat, saturated against the meal's sha
   const olive = fatCardOf(F("olive"), 26, 767);
   assert.deepEqual([olive.fat, olive.closes, olive.sat, olive.satMeal, olive.epaDha, olive.mostly], [14, 54, 1.9, 8.5, 0, "monounsaturated"]);
   const salmon = fatCardOf(F("salmon"), 26, 767);
-  assert.deepEqual([salmon.epaDha, salmon.closes], [2940, 77]);
+  // DT164 (0.3.6): salmon is the cooked row, 175168 (was raw 15236: 2940 mg, 77 %)
+  assert.deepEqual([salmon.epaDha, salmon.closes], [3225, 71]);
   const cheddar = fatCardOf(F("cheddar"), 26, 767);
   assert.deepEqual([cheddar.sat, cheddar.mostly, cheddar.unsatToSat], [5.7, "saturated", 0.5]);
   assert.ok(fatCardOf(F("butter"), 10, 300).sat > fatCardOf(F("butter"), 10, 300).satMeal, "a small meal: butter goes over");

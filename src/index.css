@@ -2417,3 +2417,15 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 /* DT162 (0.3.4, board Stories114): every vitamin with both its names */
 .explorer .ex-h .ex-also { display: block; margin-top: 2px; font-size: 15px; font-weight: 700; color: var(--muted); }
 .ex-member > b .ex-sub { font-size: 12px; font-weight: 600; }
+/* DT164 (0.3.6, board Stories116): Foods, every food through every lens */
+.ex-food { display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px 12px; margin: 5px 0; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); font: inherit; color: var(--ink); text-align: left; cursor: pointer; }
+.ex-food > b { flex: 1; font-size: var(--fs-body); }
+.ex-food .ex-sub { font-weight: 500; }
+.ex-food > span[aria-hidden] { color: var(--muted); }
+.ex-wrap { white-space: normal !important; flex: 1; line-height: 1.3; }
+.ex-goal { display: flex; gap: 8px; align-items: flex-start; margin: 6px 0; }
+.ex-goal > b { width: 16px; flex-shrink: 0; color: var(--muted); }
+.ex-goal-ok > b { color: var(--top); }
+.ex-goal > small { line-height: 1.35; }
+.ex-lens > b { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.ex-open { font-size: 11px; letter-spacing: 0; text-transform: none; font-weight: 800; }
