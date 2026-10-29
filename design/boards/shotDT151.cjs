@@ -83,7 +83,7 @@ const foodsFor = (mealP) => { const c = MEALC(mealP); return FOODS.map((f) => ({
 
         ${H(`Protein for your ${meal}`, `Your ${meal} needs about ${mealP} g of protein. This portion closes ${f.closes} % of it.`)}
         ${R("Protein", `${f.protein} of ${mealP} g`, f.closes / 150, true, f.closes >= 100)}
-        ${H("Muscle repair", `A meal switches on muscle repair with about 10 g of essential amino acids, 2.5 g of them leucine. ${f.eaa >= 10 && f.leu >= 2.5 ? "This portion brings both." : f.eaa >= 10 ? "This portion brings the 10 g, not yet the leucine." : "This portion brings part of it."}`)}
+        ${H("Muscle building and repair", `A meal switches on muscle protein synthesis, how the body builds and repairs muscle, with about 10 g of essential amino acids, 2.5 g of them leucine. ${f.eaa >= 10 && f.leu >= 2.5 ? "This portion brings both." : f.eaa >= 10 ? "This portion brings the 10 g, not yet the leucine." : "This portion brings part of it."}`)}
         ${R("Essential amino acids", `${f.eaa.toFixed(1)} of 10 g`, f.eaa * 10 / 150, true, f.eaa >= 10)}
         ${R("of them, leucine", `${f.leu.toFixed(1)} of 2.5 g`, f.leu * 40 / 150, true, f.leu >= 2.5, true)}
         ${H("The family: nine essential amino acids", `Nine amino acids your body can't make, so food must bring them. ${f.lowest[1] < 1.15 ? `This portion brings all nine, its lowest only just: ${N[f.lowest[0]].toLowerCase()}.` : "This portion brings all nine, each with room to spare."} Grams, on the same scale for every food.`)}
