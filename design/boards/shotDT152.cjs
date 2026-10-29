@@ -76,13 +76,13 @@ const R = "/home/claude/boards/rs";
   // DT153b new: a plain tick, Back to the plate primary, the head stays
   await page.evaluate(({ mark }) => {
     document.querySelectorAll(".board-note").forEach((n) => n.remove());
-    for (const d of document.querySelectorAll(".pill-done")) if (/On plate/.test(d.textContent)) { const s = document.createElement("span"); s.textContent = "✓ On the plate"; s.style.cssText = "color:#13916a;font-weight:800;font-size:13.5px;white-space:nowrap;padding:2px 0"; const u = document.createElement("button"); u.className = "link"; u.textContent = "Undo"; u.style.cssText = "margin-left:10px;font-size:13.5px;text-decoration:underline;background:#fff3b0;padding:1px 4px;border-radius:4px"; const w = document.createElement("span"); w.style.cssText = "display:flex;align-items:center"; w.append(s, u); d.replaceWith(w); }
+    for (const d of document.querySelectorAll(".pill-done")) if (/On plate/.test(d.textContent)) { const s = document.createElement("span"); s.textContent = "✓ On the plate"; s.style.cssText = "color:#13916a;font-weight:800;font-size:13.5px;white-space:nowrap;padding:2px 0"; const u = document.createElement("button"); u.className = "link"; u.textContent = "Undo"; u.style.cssText = "margin-top:4px;font-size:13.5px;text-decoration:underline;background:#fff3b0;padding:1px 4px;border-radius:4px"; const w = document.createElement("span"); w.style.cssText = "display:flex;flex-direction:column;align-items:flex-end"; w.append(s, u); d.replaceWith(w); }
     const back = [...document.querySelectorAll(".chat-rows button")].find((x) => /Back to the plate/.test(x.textContent)); if (back) { back.classList.add("pill-primary"); back.style.cssText += ";" + mark; }
     const head = document.querySelector(".chat-screen .menu-head");
     if (head) { const h = head.cloneNode(true); const c = [...h.querySelectorAll("button")].find((x) => /Close/.test(x.textContent)); if (c) c.textContent = "Back to the plate";
       h.style.cssText = "position:fixed;top:0;left:0;right:0;z-index:60;background:var(--base,#f3f6fc);padding:10px 16px;box-shadow:0 2px 10px rgba(23,39,66,.12);" ; h.querySelector("button").style.cssText += ";" + mark; document.body.append(h); }
   }, { mark });
-  await note(".chat-rows", "New: + Add turns into a plain green ✓ On the plate, not a pill, with Undo next to it while the chat is open. Back to the plate under the rows becomes the main button after the first Add. The head stays at the top with Back to the plate, however far you scroll.", "before");
+  await note(".chat-rows", "New: + Add turns into a plain green ✓ On the plate, not a pill, with Undo under it while the chat is open. Back to the plate under the rows becomes the main button after the first Add. The head stays at the top with Back to the plate, however far you scroll.", "before");
   await page.evaluate(() => { document.querySelector(".chips-again")?.scrollIntoView({ block: "end" }); });
   await shot("r153b");
   await b.close(); server.kill();

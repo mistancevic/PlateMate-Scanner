@@ -87,19 +87,19 @@ B = Board(); y = 30
 cy = storyCard(B, y, "DT153", "On plate looks like a button: a plain tick with Undo, and the way back always at hand", [
   ("Coach Milan, 29 October 10:22, from Tester 3 Marko's testing", "There was a list of foods to add to the Plate, and that worked. Then the button turned into On plate or similar, with no action. It says the food is on the Plate, but it looks like a button you could tap to go back to the Plate. To close the chat we need to scroll all the way to the top."),
   ("Coach Milan, 10:32, with Tester 3 Marko's screen", "Here. In the plan was actually the message, but not the button."),
-  ("Coach Milan, 10:38 and 10:39", "Should we add Undo for the case it was added by mistake? Yes. Add."),
+  ("Coach Milan, 10:38 to 10:49", "Should we add Undo for the case it was added by mistake? Yes. Add. Is Undo better under, not on the side? Yes."),
   ("Now, checked in 0.2.131", "After + Add the row shows On plate in a pill, the same shape as a button, and it does nothing. Back to the plate sits under the rows in grey, easy to miss. Close is at the top of the chat and scrolls away with it."),
-  ("The story", "After + Add the row shows a plain green ✓ On the plate: text with a tick, no pill, so it doesn't look tappable. The same for Take it out (✓ Out), Swap (✓ Swapped) and Put them in the plan (✓ In the plan). Next to each tick a small Undo link, plain text, not a pill: ✓ On the plate · Undo takes that food off the plate; ✓ Out · Undo puts it back at its old amount; ✓ Swapped · Undo brings back the meal that was there; ✓ In the plan · Undo empties the slots it filled (the fill only uses open slots, so nothing else changes). Undo shows while the chat is open; when you leave and come back, only the tick, because the plate or plan may have changed since. After the first Add, Back to the plate under the rows becomes the main button. The chat's head stays at the top while you scroll: Chef Mealan and where you came from: Back to the plate, Back to the plan, otherwise Close. After Put them in the plan, Back to the plan sits next to the tick as the main button."),
+  ("The story", "After + Add the row shows a plain green ✓ On the plate: text with a tick, no pill, so it doesn't look tappable. The same for Take it out (✓ Out), Swap (✓ Swapped) and Put them in the plan (✓ In the plan). Under each tick a small Undo link, plain text, not a pill, so the row keeps the width of the + Add button and Undo sits away from Back to the plan: ✓ On the plate · Undo takes that food off the plate; ✓ Out · Undo puts it back at its old amount; ✓ Swapped · Undo brings back the meal that was there; ✓ In the plan · Undo empties the slots it filled (the fill only uses open slots, so nothing else changes). Undo shows while the chat is open; when you leave and come back, only the tick, because the plate or plan may have changed since. After the first Add, Back to the plate under the rows becomes the main button. The chat's head stays at the top while you scroll: Chef Mealan and where you came from: Back to the plate, Back to the plan, otherwise Close. After Put them in the plan, Back to the plan sits next to the tick as the main button."),
   ("Checked in the build", "A walkthrough per Undo: the food off and back, the meal swapped back, the filled slots empty again and the day's numbers as before."),
   ("Not in it", "Taking you back to the Plate by itself after an Add: you may want to add two foods. Undo after you left the chat: that is the Plate's and the Plan's own editing."),
 ])
 h = rowEnd(cy,
   B.screen("DT153a", 0, y, "Now: On plate, a dead pill", "r153a", "now", "Close is far up."),
-  B.screen("DT153b", 1, y, "New: a tick, the way back", "r153b", "changed", "✓ On the plate · Undo; Back to the plate primary and in the head."))
+  B.screen("DT153b", 1, y, "New: a tick, the way back", "r153b", "changed", "✓ On the plate, Undo under it; Back to the plate primary and in the head."))
 y = h
 h = rowEnd(y + 10,
   B.screen("DT153c", 0, y, "Now: In the plan, Marko's screen", "r153c", "now", "A message shaped like a button."),
-  B.screen("DT153d", 1, y, "New: ✓ In the plan, Back to the plan", "r153d", "changed", "✓ In the plan · Undo; the head says Back to the plan."))
+  B.screen("DT153d", 1, y, "New: ✓ In the plan, Back to the plan", "r153d", "changed", "✓ In the plan, Undo under it; Back to the plan on the right."))
 y = h
 board("Stories105.dc.html", "DT153. On plate looks like a button",
   "29 October 2026 (Coach Milan, from Tester 3 Marko's testing). Now: 0.2.131, untouched. Drawn for your approval; nothing built.",
