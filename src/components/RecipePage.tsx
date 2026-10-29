@@ -39,7 +39,7 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount }: {
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, makeAs = null, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount }: {
   // DT81: how many of its pieces the plan takes from today, for Cook it's suggestion
   plannedCount?: number;
   // DT79: what the plan takes of this batch, 8 sarmas: 3 on Monday lunch, 1 left
@@ -55,7 +55,9 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   // 0.2.10 (canvas board CH, CH5): Chef Mealan drafts the steps; none without the AI
   draft?: (() => Promise<{ ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[] } | { ok: false; why: string; cannot?: boolean }>) | null;
   meal: Meal; cards: Feedback[]; foods: Food[]; cook: boolean; state: PubState; pub: Published | null; approver: string; direct: boolean; unpublished?: string[];
-  onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onPublish: (now?: boolean) => void; onDelete: ReactNode; close: () => void;
+  onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void;
+  // DT149 (0.2.130): opened from a meal of another day on Plan, Make it is Change it on the Plate, with its own line
+  makeAs?: { label: string; hint: string } | null; onPublish: (now?: boolean) => void; onDelete: ReactNode; close: () => void;
   // IM23c (0.2.23): one line for today after How was it; the recipe a changed dish was adapted from
   top?: ReactNode; openOriginal?: (() => void) | null;
   // DT84 and DT85: the Made today card, under the photos; and whether the cover is the photo from the meal just made
@@ -437,8 +439,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       ) : (
         <>
           {/* R10: two intentions, two buttons */}
-          <button className="pill pill-wide pill-primary" onClick={() => onMakeIt()}>Make it</button>
-          <small className="muted rq-under">Cook it now: the recipe goes on the Plate, Fit to my target sets today's amounts. The recipe stays as it is.</small>
+          <button className={`pill pill-wide${makeAs ? "" : " pill-primary"}`} onClick={() => onMakeIt()}>{makeAs ? makeAs.label : "Make it"}</button>
+          <small className="muted rq-under">{makeAs ? makeAs.hint : "Cook it now: the recipe goes on the Plate, Fit to my target sets today's amounts. The recipe stays as it is."}</small>
           <button className="pill pill-wide" onClick={startEdit}>Edit recipe</button>
           <small className="muted rq-under">Change the recipe itself: the foods, the grams, the steps.</small>
           {cook && (

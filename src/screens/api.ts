@@ -242,7 +242,8 @@ export interface AppApi {
   fitPd: (pd: number | null) => import("../goal").PdBand;
   rates: import("../letters").Rates | null; // DT108: the day's rates for the four letters, F C Fi P
   // R16 (0.2.44): I ate it on Today, for the next slot's planned meal
-  logPlanned: (m: import("../planned").PlannedMeal, slot: NonNullable<import("../pilot").Feedback["slot"]>) => void;
+  logPlanned: (m: import("../planned").PlannedMeal, slot: NonNullable<import("../pilot").Feedback["slot"]>, at?: string) => void;
+  logEaten: (items: import("../pilot").Ingredient[], title: string, slot: NonNullable<import("../pilot").Feedback["slot"]>, at: string, recipeId?: string) => void;
   fitDay: (pd: number | null) => import("../goal").PdBand;
   clientName: string;
   setClientName: (v: string) => void;

@@ -92,6 +92,7 @@ import { getSafety, setSafety as storeSafety, aiState, addFlag, goalSignals, all
 import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion, setRegion, getTravelTo, setTravelTo, REGIONS, type MomentId, type RhythmId, type RegionId } from "./moments";
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
+import { plateWhenOf } from "./plateMode";
 import { unseenFromCoach, repliesSince } from "./coachNotes";
 import { activePlaces, inPlace, inferPlaces, placesOfNew, renameForPlace, usedIds, tripOn, tripOver, getPlacesOn, setPlacesOn, getTrip, setTrip, getStarted, setStarted, MIGRATED, type Trip } from "./places";
 import { Home, CircleUser, Menu, Users, MessageCircle, Globe, CalendarDays } from "lucide-react";
@@ -2136,11 +2137,17 @@ export default function App() {
       setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status, ...(extra?.left ? { left: extra.left } : {}), ...(extra?.recipeId ? { recipeId: extra.recipeId } : {}), ...(extra?.leftOf ? { leftOf: extra.leftOf } : {}), taste: "", notes: "", photos: extra?.photos?.length ? extra.photos : undefined, photo: extra?.photos?.length ? extra.photos[extra.photos.length - 1] : undefined, prep: extra?.prep, createdAt: new Date().toISOString(), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined } as any, ...s.feedback] }));
       notify(status === "prepared" ? "Kept for later. It's on Today." : "Noted, not counted.");
     },
-    logPlanned: (m: PlannedMeal, slot: NonNullable<Feedback["slot"]>) => {
-      const now = new Date().toISOString(), meal = plannedPortion(m, m.mealId ?? uid(), now);
+    // DT149 (0.2.130): at, a meal of a day gone by, counted at its time
+    logPlanned: (m: PlannedMeal, slot: NonNullable<Feedback["slot"]>, at?: string) => {
+      const now = at ?? new Date().toISOString(), meal = plannedPortion(m, m.mealId ?? uid(), now);
       if (!meal) return;
-      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "eaten", slot, ...(m.mealId ? { recipeId: m.mealId } : {}), taste: "", notes: "", createdAt: now, dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined } as Feedback, ...s.feedback] }));
+      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "eaten", slot, ...(m.mealId ? { recipeId: m.mealId } : {}), taste: "", notes: "", createdAt: now, dayType: !at && dayModeOf(personal) === "each" && day.type ? day.type : undefined } as Feedback, ...s.feedback] }));
       notify("Logged, as planned.");
+    },
+    // DT149 (0.2.130): what you ate at a meal of a day gone by, from the Plate: counted at that meal's time, nothing to rate
+    logEaten: (items: Ingredient[], title: string, slot: NonNullable<Feedback["slot"]>, at: string, recipeId?: string) => {
+      const meal: Meal = { id: uid(), title: title || "Meal", items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: at };
+      setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status: "eaten", slot, ...(recipeId ? { recipeId } : {}), taste: "", notes: "", createdAt: at } as Feedback, ...s.feedback] }));
     },
     settleCard: (id: string, how: "eaten" | "not-used", as?: { slot?: Feedback["slot"]; which?: string }) => {
       // R5 (0.2.42): I ate one says which meal it was: a meal of the day keeps its slot, a snack says so
@@ -2335,7 +2342,9 @@ export default function App() {
     // from the latest state, so several fills in one go (Put them in the plan, 0.2.4) all land
     fill: (date: string, slotId: string, meal: PlannedMeal | null) => setPlannedState((prev) => { const next = withPlanned(prev, date, slotId, meal); storePlanned(next); return next; }),
     // DT131: a meal from Plan onto a plate that has foods asks first
-    fillOnPlate: (f: Filling, meal?: Meal | null, title?: string) => {
+    fillOnPlate: (f0: Filling, meal?: Meal | null, title?: string) => {
+      // DT149 (0.2.130): a meal around its time today is the moment, what you eat now, wherever it was opened from
+      const f: Filling = !f0.mode && plateWhenOf(f0) === "now" ? { ...f0, mode: "eat" } : f0;
       // the plate already is this meal (the same recipe, the same slot): nothing to ask
       const same = (plateRecipeId && plateRecipeId === meal?.id) || (filling && filling.date === f.date && filling.slotId === f.slotId);
       if (state.items.length && meal && !same) {

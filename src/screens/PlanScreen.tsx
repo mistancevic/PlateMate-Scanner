@@ -1,3 +1,4 @@
+import { atMeal } from "../plateMode";
 import { plannedName } from "../recipeDiff";
 import { carryReads } from "../carry";
 import { tripOn, placeName, type Trip } from "../places";
@@ -239,6 +240,7 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
   const rec = dayRecord(slots, p.planned[dayKey], log.logged, dayKey);
   const lived = livedByPlan({ planned: rec.planned, open: rec.open.length, kcal: rec.kcal, protein: rec.protein }, numbers).lived;
   const slotName = (id?: string) => slots.find((s) => s.id === id)?.name;
+  const toAdd = slots.filter((sl) => rec.open.includes(sl) || rec.empty.includes(sl) || rec.skipped.includes(sl));
   return (
     <section className="card plan-day plan-past">
       <div className="plan-day-head">
@@ -265,7 +267,32 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
           })}
           {lived && <small className="past-lived">✓ A day lived by the plan</small>}
         </>
-      ) : <small className="setting-hint past-none">Nothing was logged on this day.</small>}
+      ) : !toAdd.length && <small className="setting-hint past-none">Nothing was logged on this day.</small>}
+      {/* DT149 (0.2.130, board Stories101 version 2; Coach Milan 00:14 "the past is recording what I ate"): each meal of a day gone
+          by can be added. A planned one is one tap, I ate it, at its time; I ate something else and Add what you ate open the
+          Plate for that meal, adding what you ate: no Fit, no steps, no rating */}
+      {toAdd.length > 0 && (
+        <div className="past-add" aria-label="What you ate">
+          <small className="setting-name past-label">{log.logged.length ? "Not added yet" : "What you ate"}</small>
+          {toAdd.map((sl) => {
+            const m = p.planned[dayKey]?.[sl.id], f = { date: dayKey, slotId: sl.id, name: sl.name, time: sl.time, dayName: WEEKDAY[(date.getDay() + 6) % 7] };
+            const slot = { date: dayKey, slotId: sl.id, name: sl.name, time: sl.time };
+            if (m?.skipped) return <div className="past-plate" key={sl.id}><span><small>{sl.name}, {sl.time}</small><b>Skipped</b></span><button type="button" className="link" onClick={() => p.fill(dayKey, sl.id, { ...m, skipped: false })}>Undo</button></div>;
+            if (m) return (
+              <div className="past-plate past-planned" key={sl.id}>
+                <span><small>{sl.name}, {sl.time} · planned</small><b>{m.title}</b></span>
+                <div className="button-row">
+                  <button type="button" className="pill pill-small pill-primary" onClick={() => { p.logPlanned(m, slot, atMeal(dayKey, sl.time)); }}>I ate it</button>
+                  <button type="button" className="pill pill-small" onClick={() => p.fillOnPlate(f, null, "")}>I ate something else</button>
+                  <button type="button" className="pill pill-small" onClick={() => p.fill(dayKey, sl.id, { ...m, skipped: true })}>I skipped it</button>
+                </div>
+              </div>
+            );
+            return <div className="past-plate" key={sl.id}><span><small>{sl.name}, {sl.time}</small><b>Nothing added</b></span><button type="button" className="pill pill-small" onClick={() => p.fillOnPlate(f, null, "")}>Add what you ate</button></div>;
+          })}
+          <small className="muted">A day before today is what you ate: it counts at its meal's time. Nothing to make, no rating asked.</small>
+        </div>
+      )}
     </section>
   );
 }
