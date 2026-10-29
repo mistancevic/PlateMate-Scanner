@@ -8,7 +8,7 @@ SW, GAP, SX = 240, 150, 400
 K = SW / 390
 TT, CH, DH = 44, 24, 92
 TOP = TT + 8 + CH + 8 + DH + 8
-CHIP = {"now": ("#5b6b8a", "#fff", "0.2.131, as it is"), "changed": ("#2e7be8", "#fff", "New, drawn for your approval")}
+CHIP = {"now": ("#5b6b8a", "#fff", "0.3.2, as it is"), "changed": ("#2e7be8", "#fff", "New, drawn for your approval")}
 MARK = ""
 
 def ih(name): return int(Image.open(f"{R}/{name}.png").size[1] / 2 * K)
@@ -38,7 +38,7 @@ def rowEnd(*hs): return max(hs) + 140
 
 LEGEND = ('<div style="display:flex;gap:14px;align-items:center;font-size:13px;font-weight:700;flex-wrap:wrap">'
   + "".join(f'<span style="background:{CHIP[k][0]};color:{CHIP[k][1]};border-radius:999px;padding:2px 10px">{CHIP[k][2]}</span>' for k in ("now", "changed"))
-  + '<span style="color:#172742">Left: the story. Right: the screens, whole, top to bottom. Now: 0.2.131, untouched. New: the same pages with the change drawn in, blue outline and yellow note. Toasts and the round chef button are left out of every screen. Chef Mealan\'s answers are stand-ins written to the prompts in the app: this workspace cannot reach the AI.</span></div>')
+  + '<span style="color:#172742">Left: the story. Right: the screens, whole, top to bottom. Now: 0.3.2, untouched. New: the same pages with the change drawn in, blue outline and yellow note. Toasts and the round chef button are left out of every screen. Chef Mealan\'s answers are stand-ins written to the prompts in the app: this workspace cannot reach the AI.</span></div>')
 
 def board(fname, title, sub, B, W, Hc, after):
     H = min(8000, Hc + 230)
@@ -84,20 +84,20 @@ class Component extends DCLogic {{
 
 W = SX + 4 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
-cy = storyCard(B, y, "DT160", "Explorer: your range for every family, and numbers calculated for you", [
-  ("Coach Milan, 29 October 18:02 and 18:03", "Should we add upper and bottom limits, say ranges for every family against the goal, like what we already have for the protein range. Should we note somewhere in the Explorer that ranges and some numbers are based on selected goals and calculated against personal setup?"),
-  ("Now, checked in 0.3.1", "The Explorer shows a meal's amount, from your day, without saying where it comes from. Ranges exist only for protein, on Plan: of 100 to 135 g protein. Fats and carbs show one number."),
-  ("The story", "A line at the top of the Explorer: Calculated for you. It names your goal and setup (Maintain, 85 kg, 2,300 kcal a day, three meals), says the numbers marked for you change with them, and links to Change them. Each family opens with YOUR DAY, marked for you: the range for your goal, a green band, with your number as a mark in it. Protein: 1.2 to 1.6 g per kg, or 1.6 to 2.2 when you train, the app's own range. Fat: 20 to 35 % of your energy, in grams, and saturated fat under 10 %. Carbs: 45 to 60 % of your energy, fibre at least 25 g, free sugars under 10 %. A meal's amount also carries for you. On a member's page, How much a day becomes a range from your day to the upper limit; with no upper limit, the range has no end."),
-  ("What the numbers show", "For the tester profile (man, 85 kg, no training, Maintain, 2,300 kcal): protein 100 to 135 g, yours 120 g; fat 51 to 89 g, yours 77 g, 30 %; saturated fat under 26 g; carbs 259 to 345 g, yours 282 g, 49 %; free sugars under 58 g. Vitamin D: 15 to 100 µg."),
-  ("The numbers, checked", "Fat 20 to 35 %, carbohydrate 45 to 60 %, fibre 25 g a day: EFSA's press release of 26 March 2010 on its dietary reference values, read today, and the 2017 summary report. Fat 20 to 35 % also in the AND, DC and ACSM joint position 2016, which the app already cites. Saturated fat under 10 %: WHO 2023. Free sugars under 10 %: WHO 2015. Protein per kg: ISSN position stand 2017, as the app already uses. EFSA set no upper limit for sugars. Vitamin D 15 and 100 µg, vitamin C 110 mg for men and 95 mg for women: EFSA."),
-  ("Open", "When your carbs fall outside 45 to 60 %, because protein and fat come first, the mark turns orange and one line says why. Own numbers you typed in are marked yours instead of calculated."),
+cy = storyCard(B, y, "DT160", "Explorer: your range for every family, and numbers calculated for you (version 2)", [
+  ("Coach Milan, 29 October 18:02 to 19:06", "Ranges for every family against the goal, like the protein range. Note that ranges and some numbers are calculated from the goal and personal setup. Is it based on the range from the rest day to the hard training day? It's fine: do it as you suggested and redraw."),
+  ("Now, checked in 0.3.2", "The Explorer shows a meal's amount, from today's numbers, without saying where it comes from. Ranges exist only for protein, on Plan. In the app, protein and fat are the same every day (fat is 30 % of the week's average kcal); carbs take the difference, so they move with the day."),
+  ("The story", "A line at the top of the Explorer: Calculated for you. It names your goal and setup and today's day (a strength day, 2,600 kcal), says the numbers marked for you change with them, and links to Change them. Each family opens with YOUR DAY, marked for you, each range a green band with your number as a mark. Protein: one range, the same every day, 1.6 to 2.2 g per kg when you train, 1.2 to 1.6 when you don't. Fat: 20 to 35 % of your week's average energy, because your fat is set on it and stays the same every day; saturated fat under 10 % of it. Carbs: today's range, 45 to 60 % of today's energy, and under it Your week, from the rest day to your hardest day on the same scale, today marked. When a day falls below 45 %, one orange line says which days and why. Fibre at least 25 g; free sugars under 10 % of today's energy. On a member's page, How much a day becomes a range from your day to the upper limit."),
+  ("What the numbers show", "The tester profile now trains (Maintain, 85 kg, a Training week of three rest days, mobility on Friday, strength on Monday, Tuesday and Thursday), as the app calculates it: protein 135 to 185 g, yours 160 g; fat 56 to 97 g on the week's 2,500 kcal, yours 83 g, 30 %; saturated fat under 28 g. Today, Thursday, a strength day of 2,600 kcal: carbs 293 to 390 g, yours 303 g, 47 %. Your week: 228 g on a rest day to 366 g on Monday. Rest days and Friday come out at 40 to 42 % of the energy, below EFSA's 45 %: protein and fat come first. Free sugars under 65 g today."),
+  ("The numbers, checked", "Fat 20 to 35 %, carbohydrate 45 to 60 %, fibre 25 g a day: EFSA's press release of 26 March 2010 on its dietary reference values, read today, and the 2017 summary report. Fat 20 to 35 % also in the AND, DC and ACSM joint position 2016, which the app already cites. Saturated fat under 10 %: WHO 2023. Free sugars under 10 %: WHO 2015. Protein per kg: ISSN position stand 2017, as the app uses. The day numbers are the app's own calculation for this profile."),
+  ("Open, for the beta testers", "Whether the orange line on rest days helps or worries. Whether Your week reads clearly next to today. Own numbers you typed in: marked yours instead of calculated."),
 ])
 h = rowEnd(cy,
-  B.screen("DT160a", 0, y, "New: Calculated for you, Protein", "r160a", "changed", "The top line; your protein range."),
-  B.screen("DT160b", 1, y, "New: Fats, your day", "r160b", "changed", "20 to 35 % of energy; saturated under 10 %."),
-  B.screen("DT160c", 2, y, "New: Carbs, your day", "r160c", "changed", "45 to 60 %; fibre at least; free sugars under."),
+  B.screen("DT160a", 0, y, "New: Calculated for you, Protein", "r160a", "changed", "The top line; one protein range, every day."),
+  B.screen("DT160b", 1, y, "New: Fats, your day", "r160b", "changed", "On the week\'s average energy, as fat is set."),
+  B.screen("DT160c", 2, y, "New: Carbs, your day", "r160c", "changed", "Today\'s range, your week, and the rest days."),
   B.screen("DT160d", 3, y, "New: Vitamin D, a range", "r160d", "changed", "From your day to the upper limit."))
 y = h
 board("Stories112.dc.html", "DT160. Explorer: your range for every family",
-  "29 October 2026 (Coach Milan, ranges and Calculated for you). Now: 0.3.1, untouched. Drawn for your approval; nothing built.",
+  "29 October 2026 (Coach Milan, ranges and Calculated for you), version 2 at 19:06. Now: 0.3.2, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories111.dc.html")
