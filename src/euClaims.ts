@@ -16,7 +16,8 @@ import type { ExplorerFood } from "./explorer";
 import type { FatFood } from "./explorerFats";
 import type { CarbFood } from "./explorerCarbs";
 
-export type Claim = { claim: string; rule: string; ok: boolean; is: string };
+// status: shown instead of Yes or No (DT157: the oat beta-glucan health claim, Not on our table)
+export type Claim = { claim: string; rule: string; ok: boolean; is: string; status?: string; health?: boolean };
 export const CLAIMS_SOURCE = "Regulation (EC) No 1924/2006, Annex, as the European Commission lists it.";
 const r1 = (x: number) => Math.round(x * 10) / 10;
 
@@ -40,11 +41,18 @@ export function fatClaims(f: Pick<FatFood, "kcal" | "sfa" | "mufa" | "pufa" | "t
   ];
 }
 
-export function carbClaims(f: Pick<CarbFood, "kcal" | "fibre" | "sugar">): Claim[] {
+// DT157 (0.3.1): the EU health claim for oat beta-glucan, as the European Commission's EU Register lists it (Regulation (EU) No
+// 432/2012): "Beta-glucans contribute to the maintenance of normal blood cholesterol levels"; "at least 1 g of beta-glucans from
+// oats ... per quantified portion", and "information shall be given ... that the beneficial effect is obtained with a daily
+// intake of 3 g". Our food table has no beta-glucan figure, so it can't be checked: Not on our table.
+export const BETA_GLUCAN: Claim = { claim: "Beta-glucan and cholesterol", rule: "at least 1 g of beta-glucan from oats per portion, and the label must say the effect comes with 3 g a day", ok: false, is: "no beta-glucan figure on our food table", status: "Not on our table", health: true };
+
+export function carbClaims(f: Pick<CarbFood, "kcal" | "fibre" | "sugar"> & { betaGlucan?: boolean }): Claim[] {
   const per100kcal = (f.fibre * 100) / f.kcal, fib = `${r1(f.fibre)} g, ${r1(per100kcal)} g per 100 kcal`;
   return [
     { claim: "Source of fibre", rule: "at least 3 g per 100 g, or 1.5 g per 100 kcal", ok: f.fibre >= 3 || per100kcal >= 1.5, is: fib },
     { claim: "High fibre", rule: "at least 6 g per 100 g, or 3 g per 100 kcal", ok: f.fibre >= 6 || per100kcal >= 3, is: fib },
     { claim: "Low sugars", rule: "at most 5 g of sugars per 100 g", ok: f.sugar <= 5, is: `${r1(f.sugar)} g` },
+    ...(f.betaGlucan ? [BETA_GLUCAN] : []),
   ];
 }

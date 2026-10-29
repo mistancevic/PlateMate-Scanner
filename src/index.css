@@ -2372,3 +2372,4 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .ex-claim-yes { color: var(--muted); white-space: nowrap; }
 .ex-claim-ok .ex-claim-yes { color: var(--top); }
 .ex-claim-src { display: block; margin-top: 4px; }
+.ex-note .ex-name { width: auto; flex: 1; white-space: normal; color: var(--muted); }

@@ -21,3 +21,12 @@ test("DT155: every food names its USDA row and its row in the GI table; the memb
     assert.ok(Math.abs(c.members.starch + c.members.sugar + c.members.fibre - c.carb) < 0.1, f.id);
   }
 });
+
+test("DT157: fibre in two kinds, the soluble share from Li 2002 applied to the card's fibre; dry oats have none", () => {
+  const len = carbCardOf(F("lentils"), 94, 1 / 3);
+  assert.deepEqual([len.solubleShare, len.members.soluble, len.members.insoluble], [0.08, 1.19, 14.61]);
+  assert.ok(Math.abs((len.members.soluble ?? 0) + (len.members.insoluble ?? 0) - (len.members.fibre ?? 0)) < 0.02);
+  assert.deepEqual([carbCardOf(F("rice"), 94, 1 / 3).members.soluble, carbCardOf(F("rice"), 94, 1 / 3).solubleShare], [0, 0]);
+  assert.deepEqual([carbCardOf(F("oats"), 94, 1 / 3).members.soluble, carbCardOf(F("oats"), 94, 1 / 3).solubleShare], [null, null]);
+  assert.equal(carbCardOf(F("potato"), 94, 1 / 3).solubleShare, 0.48);
+});
