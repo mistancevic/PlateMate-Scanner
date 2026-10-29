@@ -71,13 +71,14 @@ const U = "http://127.0.0.1:3264";
   ok(await bubble.getByRole("button", { name: "Take it out" }).count() === 1 && await bubble.getByRole("button", { name: "+ Add" }).count() === 2 && await bubble.getByRole("button", { name: "Scan it" }).count() === 1, "DT106: Take it out, + Add twice, Scan it");
   const bt = (await bubble.textContent()).replace(/\s+/g, " "); ok(/in your foods · 250 g · PD 17\.9 · the plate reaches/.test(bt) && /not in your foods/.test(bt), "DT106: a row says where the food comes from, its amount and what the plate reaches");
   await bubble.getByRole("button", { name: "Take it out" }).click(); await page.waitForTimeout(400);
-  ok((await st()).items.length === 1 && await bubble.getByText("Out").count() === 1, "DT106: Take it out takes the yeast off the plate");
+  ok((await st()).items.length === 1 && await bubble.getByText("✓ Out").count() === 1, "DT106: Take it out takes the yeast off the plate");
   await bubble.getByRole("button", { name: "+ Add" }).first().click(); await page.waitForTimeout(500);
   const s2 = await st();
-  ok(s2.items.length === 2 && /Quark/.test(s2.items[1].food.name) && s2.items[1].grams > 0 && await bubble.getByText("On plate").count() === 1, "DT106: + Add puts the quark on the plate at its start amount: " + s2.items[1]?.grams + " g");
+  ok(s2.items.length === 2 && /Quark/.test(s2.items[1].food.name) && s2.items[1].grams > 0 && await bubble.getByText("✓ On the plate").count() === 1, "DT106: + Add puts the quark on the plate at its start amount: " + s2.items[1]?.grams + " g");
   // DT107: the chips sit under the answer; a second Ask from the Plate asks again
   ok(await page.locator(".chips-again").count() === 1 && await page.locator(".chips-again").getByRole("button", { name: "Swap a food on my plate" }).count() === 1, "DT107: the chips come back under the answer");
-  await page.locator(".talk-overlay").getByRole("button", { name: "Close" }).first().click(); await page.waitForTimeout(500);
+  // Changed by story DT153 (0.2.132): the head says Back to the plate when the chat came from the Plate
+  await page.locator(".talk-overlay .chat-head").getByRole("button", { name: "Back to the plate" }).click(); await page.waitForTimeout(500);
   // the tip's Ask: the plate goes in as a new question, even with the old turns there
   // the yeast back on the plate: the ingredient line comes back, and its Ask sends a new question even with the old turns there
   await page.getByLabel("Search all my foods").fill("yeast"); await page.waitForTimeout(400);

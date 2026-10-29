@@ -15,6 +15,7 @@ export type LogEvent =
   | "mix_applied"
   | "method_chosen"  // data.method = mixed | topped | base-first
   | "out"            // chat with Mealan; data.picks, data.pd
+  | "out_failed"     // DT152: Chef Mealan did not answer in the chat; data.why = the first words of the reason
   | "pd_unit"        // data.unit = pd | pct
   | "plate_question" // a question at the plate; data.q, data.plate, data.n or data.applied
   | "mix_tip"        // a mix tip shown on a food card; data.food, data.moment, data.case, data.offered

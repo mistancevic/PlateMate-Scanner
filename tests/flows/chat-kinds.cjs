@@ -48,7 +48,13 @@ const planned = { [today]: { breakfast: { title: "Oats, skyr and banana", kcal: 
   await page.locator(".bubble.mealan").last().getByRole("button", { name: "Swap" }).first().click(); await page.waitForTimeout(500);
   const pl = await page.evaluate((d) => JSON.parse(localStorage.getItem("chefmealan-planned"))[d].lunch.title, today);
   ok(pl !== "Sarma with skyr" && rows[0].includes(pl), "2. Swap puts it in the plan: " + pl);
-  ok(await page.locator(".bubble.mealan").last().locator(".pill-done").count() === 1, "2. the swap says Swapped");
+  // Changed by story DT153 (0.2.132, board Stories105): a plain tick, not a pill, with Undo under it while the chat is open
+  const swb = page.locator(".bubble.mealan").last();
+  ok(await swb.locator(".pill-done").count() === 0 && (await swb.locator(".done-tick").textContent()) === "✓ SwappedUndo", "2. the swap says ✓ Swapped, with Undo");
+  await swb.getByRole("button", { name: "Undo" }).click(); await page.waitForTimeout(400);
+  const back = await page.evaluate((d) => JSON.parse(localStorage.getItem("chefmealan-planned"))[d].lunch.title, today);
+  ok(back === "Sarma with skyr" && await swb.getByRole("button", { name: "Swap" }).count() === 2, "DT153: Undo puts sarma back and the two options come back: " + back);
+  await swb.getByRole("button", { name: "Swap" }).first().click(); await page.waitForTimeout(500);
   // 3. a change to the plan: dinner after training, for today only, after a tap
   await send("Move dinner to after training");
   ok((await last()).startsWith("YOUR PLANYour strength session is 19:00 to 20:00. Dinner moves from 20:00 to 20:30. The meal stays the same."), "3. the move, around the training: " + await last());

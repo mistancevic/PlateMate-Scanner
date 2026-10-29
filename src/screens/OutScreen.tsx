@@ -20,6 +20,7 @@ import { STARTERS, fillDay, fromMeal, sumOf, needOf, type FillRow, type PlannedM
 import { dayRecord } from "../record";
 import { dayLog } from "../today";
 import { chatRows, type ChatRow } from "../chatFoods";
+import { failWhy, plateQuestion } from "../chatFail";
 import { ClearField } from "../components/ClearField";
 import { WaitSteps } from "../components/WaitSteps";
 import { cookName } from "../cookWords";
@@ -34,7 +35,9 @@ export type Turn = { role: "you" | "mealan"; text: string; picks?: Ingredient[];
   swap?: { date: string; slotId: string; slotName: string; time: string; options: { meal: PlannedMeal; why: string }[]; done?: string };
   move?: { date: string; slotId: string; from: string; to: string; usual: string; done?: "moved" | "kept" };
   // DT106 (0.2.92): the foods Chef Mealan named, as rows with Add, Take it out or Scan it; done holds what was tapped
-  rows?: ChatRow[]; rowsDone?: Record<string, "added" | "out" | "scan"> };
+  rows?: ChatRow[]; rowsDone?: Record<string, "added" | "out" | "scan">;
+  // DT152 (0.2.132): Chef Mealan didn't answer; the question stays, with Ask again
+  failed?: { text: string; photo?: string; why: string; plate: boolean; retried?: boolean } };
 const TAG: Record<NonNullable<Turn["tag"]>, string> = { plate: "FROM YOUR PLATE", day: "FROM YOUR DAY", plan: "YOUR PLAN", chef: "CHEF MEALAN" };
 
 const asFood = (r: Rec): Food => ({
@@ -42,8 +45,13 @@ const asFood = (r: Rec): Food => ({
   reviewedAt: new Date().toISOString(), readyToEat: true, calories: r.calories, protein: r.protein, fats: r.fats, carbs: r.carbs, fiber: null,
 });
 
+// DT153 (0.2.132): a done row is a plain tick, not a pill; Undo under it while the chat is open
+function Done({ text, undo, start }: { text: string; undo?: () => void; start?: boolean }) {
+  return <span className={`done-tick${start ? " done-start" : ""}`}><b>✓ {text}</b>{undo && <button type="button" className="link done-undo" onClick={undo}>Undo</button>}</span>;
+}
+
 export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; turns: Turn[]; setTurns: (f: (t: Turn[]) => Turn[]) => void; tab: Tab; ask?: "fill" | "plate" | "around" | null; clearAsk: () => void }) {
-  const { pdRef, setState, setError, state } = p;
+  const { pdRef, setState, state } = p;
   const [text, setText] = useState("");
   const [doorOpen, setDoorOpen] = useState(false);
   const [chatStage, setChatStage] = useState<"ask" | "match">("ask");
@@ -101,15 +109,17 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   }));
   const putThemIn = (ti: number) => {
     const turn = p.turns[ti]; if (!turn?.fill) return;
-    for (const r of turn.fill.rows) p.fill(turn.fill.date, r.slot.id, r.meal);
+    const date = turn.fill.date, before = turn.fill.rows.map((r) => [r.slot.id, p.planned[date]?.[r.slot.id] ?? null] as const);
+    for (const r of turn.fill.rows) p.fill(date, r.slot.id, r.meal);
     setTurns((t) => t.map((x, i) => (i === ti && x.fill ? { ...x, fill: { ...x.fill, done: true } } : x)));
+    undoable(`${ti}:fill`, () => { for (const [id, m] of before) p.fill(date, id, m); setTurns((t) => t.map((x, i) => (i === ti && x.fill ? { ...x, fill: { ...x.fill, done: false } } : x))); p.notify(`${before.length === 1 ? "The slot is" : "The slots are"} as before.`); });
     p.notify(`${turn.fill.rows.length === 1 ? "The slot is" : `${turn.fill.rows.length} slots are`} set for ${turn.fill.dayName}.`);
   };
   useEffect(() => { if (p.ask === "fill") { p.clearAsk(); fillNow(); } }, [p.ask]); // eslint-disable-line react-hooks/exhaustive-deps
   // DT93 (0.2.88): Ask Chef Mealan from the Plate: the plate goes in the first question, asked at once
   // DT105 (0.2.92): an ingredient on the plate: ask for a dish around it
-  useEffect(() => { if (p.ask === "around") { p.clearAsk(); void ask(`What dish can I make around what is on my plate, so it makes a ${mealName}? ${state.items.map((i) => `${Math.round(i.grams)} g ${i.food.name}`).join(", ")}.`); } }, [p.ask]); // eslint-disable-line react-hooks/exhaustive-deps
-  useEffect(() => { if (p.ask === "plate") { p.clearAsk(); void ask(`What should I change on my plate so it makes a ${mealName}? ${state.items.map((i) => `${Math.round(i.grams)} g ${i.food.name}`).join(", ")}.`); } }, [p.ask]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (p.ask === "around") { p.clearAsk(); void ask(plateQuestion(`What dish can I make around what is on my plate, so it makes a ${mealName}?`, state.items.map((i) => `${Math.round(i.grams)} g ${i.food.name}`))); } }, [p.ask]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (p.ask === "plate") { p.clearAsk(); void ask(plateQuestion(`What should I change on my plate so it makes a ${mealName}?`, state.items.map((i) => `${Math.round(i.grams)} g ${i.food.name}`))); } }, [p.ask]); // eslint-disable-line react-hooks/exhaustive-deps
   // the mic (0.2.4): the browser's own speech recognition, when it has one; the words land in the field
   const Speech = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
   const [listening, setListening] = useState(false);
@@ -123,14 +133,22 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
     } catch { setListening(false); }
   };
   const [photo, setPhoto] = useState("");
+  const photoNow = photo;
   const { turns, setTurns, close } = p;
   const fileRef = useRef<HTMLInputElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
   const [thinking, setThinking] = useState(false);
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" }); }, [turns, thinking]);
-  const history = turns.slice(-6).map((t) => ({ role: t.role === "you" ? "user" : "assistant", content: t.text }));
+  const history = turns.filter((t) => !t.failed).slice(-6).map((t) => ({ role: t.role === "you" ? "user" : "assistant", content: t.text }));
 
   const say = (...t: Turn[]) => setTurns((x) => [...x, ...t]);
+  // DT153: what each tick can undo, only while the chat is open: the map goes when the chat closes
+  const undos = useRef(new Map<string, () => void>());
+  const [, bump] = useState(0);
+  const undoable = (key: string, fn: () => void) => { undos.current.set(key, fn); bump((n) => n + 1); };
+  const undoOf = (key: string) => { const fn = undos.current.get(key); return fn ? () => { undos.current.delete(key); fn(); bump((n) => n + 1); } : undefined; };
+  // DT153: the head says where you came from
+  const backLabel = p.tab === "journey" ? "Back to the plate" : p.tab === "plan" ? "Back to the plan" : null;
   const usualOf = (id: string) => slotsOf(lifestyle).find((x) => x.id === id)?.time ?? "";
   const trainWhat = (d: { kind?: string } | null) => (d?.kind === "strength" ? "strength session" : d?.kind === "cardio" ? "cardio" : d?.kind === "walk" ? "walk" : "training");
   const dayRows = (): DaySlot[] => slots.map((x) => ({ name: x.name, time: x.time, meal: held[x.id]?.title ?? null, kcal: held[x.id]?.kcal ?? null,
@@ -195,18 +213,22 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   }
   const doSwap = (ti: number, k: number) => {
     const turn = p.turns[ti]; const sw = turn?.swap; if (!sw) return;
-    const o = sw.options[k]; p.fill(sw.date, sw.slotId, o.meal);
+    const o = sw.options[k]; const was = p.planned[sw.date]?.[sw.slotId] ?? null; p.fill(sw.date, sw.slotId, o.meal);
     setTurns((t) => t.map((x, i) => (i === ti && x.swap ? { ...x, swap: { ...x.swap, done: o.meal.title } } : x)));
+    undoable(`${ti}:swap`, () => { p.fill(sw.date, sw.slotId, was); setTurns((t) => t.map((x, i) => (i === ti && x.swap ? { ...x, swap: { ...x.swap, done: undefined } } : x))); p.notify(`${sw.slotName} is as before.`); });
     p.notify(`${sw.slotName} is now ${o.meal.title.toLowerCase()}.`);
   };
   const doMove = (ti: number, yes: boolean) => {
     const turn = p.turns[ti]; const mv = turn?.move; if (!mv) return;
+    const was = p.personal.timesOn;
     if (yes) p.setPersonal({ ...p.personal, timesOn: withTimeOn(p.personal.timesOn, mv.date, mv.slotId, mv.to, mv.usual) });
     setTurns((t) => t.map((x, i) => (i === ti && x.move ? { ...x, move: { ...x.move, done: yes ? "moved" : "kept" } } : x)));
+    undoable(`${ti}:move`, () => { if (yes) p.setPersonal({ ...p.personal, timesOn: was }); setTurns((t) => t.map((x, i) => (i === ti && x.move ? { ...x, move: { ...x.move, done: undefined } } : x))); });
     if (yes) p.notify(`Moved to ${mv.to}, for ${mv.date === ymd(new Date()) ? "today" : "that day"}.`);
   };
-  async function ask(given?: string) {
+  async function ask(given?: string, again?: { ti: number; photo?: string }) {
     const msg = (typeof given === "string" ? given : text).trim();
+    const photo = again ? again.photo ?? "" : photoNow;
     if (!msg && !photo) return;
     if (/^fill (today|monday|tuesday|wednesday|thursday|friday|saturday|sunday)$/i.test(msg)) { setText(""); fillNow(); return; }
     // sorted first (0.2.8, board CH, CH6): the app answers what it knows, and proposes plan changes; only ideas go to the AI
@@ -214,7 +236,10 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
     if (!photo && it.kind !== "ideas") { setText(""); await answerHere(msg, it); return; }
     if (!p.ai.on) { setTurns((t) => [...t, { role: "you", text: msg || "(photo)" }, { role: "mealan", text: p.ai.why || FIXED.off }]); setText(""); setPhoto(""); return; }
     const mine: Turn = { role: "you", text: msg || "(photo)", photo: photo || undefined };
-    setTurns((t) => [...t, mine]); setText(""); setPhoto("");
+    // DT152: Ask again sends the same question; the failed line greys, Asked again
+    if (again) setTurns((t) => t.map((x, i) => (i === again.ti && x.failed ? { ...x, failed: { ...x.failed, retried: true } } : x)));
+    else { setTurns((t) => [...t, mine]); setText(""); setPhoto(""); }
+    const plateSent = p.tab === "journey" || /\bplate\b/i.test(msg);
     setThinking(true); setChatStage("ask");
     try {
       const res = await fetch("/api/out", { method: "POST", headers: { "Content-Type": "application/json" },
@@ -259,13 +284,27 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
       const reply: Turn = { role: "mealan", tag: "chef", text: taken.text + fitNote, picks, pd, kcal, ...(rows.length ? { rows } : {}) };
       setTurns((t) => [...t, reply]);
       log("out", { picks: picks.length, pd });
-    } catch (e: any) { setError(e.message); } finally { setThinking(false); }
+    } catch (e: any) {
+      // DT152 (0.2.132): the failure is his answer, under the question, with Ask again; not the message at the bottom
+      log("out_failed", { why: String(e?.message ?? "").slice(0, 80) });
+      setTurns((t) => [...t, { role: "mealan", text: `I didn't answer this time: ${failWhy(e)} Your question${plateSent && state.items.length ? " and the plate are" : " is"} kept.`, failed: { text: msg, photo: photo || undefined, why: failWhy(e), plate: plateSent } }]);
+    } finally { setThinking(false); }
   }
 
   // DT106: what a row does; the turn remembers it
   function rowDone(i: number, key: string, what: "added" | "out" | "scan") { setTurns((ts) => ts.map((t, k) => (k === i ? { ...t, rowsDone: { ...(t.rowsDone ?? {}), [key]: what } } : t))); }
-  function rowAdd(i: number, r: Extract<ChatRow, { kind: "add" }>) { p.add(r.food); rowDone(i, r.name, "added"); p.notify(`${Math.round(r.grams)} g ${cookName(r.food.name).short.toLowerCase()} on the plate.`); }
-  function rowOut(i: number, r: Extract<ChatRow, { kind: "drop" }>) { setState((s) => ({ ...s, items: s.items.filter((x) => x.id !== r.itemId), portion: null })); rowDone(i, r.name, "out"); }
+  function rowUndone(i: number, key: string) { setTurns((ts) => ts.map((t, k) => { if (k !== i || !t.rowsDone) return t; const d = { ...t.rowsDone }; delete d[key]; return { ...t, rowsDone: d }; })); }
+  function rowAdd(i: number, r: Extract<ChatRow, { kind: "add" }>) {
+    const before = new Set(state.items.map((x) => x.id));
+    p.add(r.food); rowDone(i, r.name, "added"); p.notify(`${Math.round(r.grams)} g ${cookName(r.food.name).short.toLowerCase()} on the plate.`);
+    // DT153: Undo takes off what this tap put on, nothing else
+    undoable(`${i}:row:${r.name}`, () => { setState((s) => { const mine = s.items.filter((x) => !before.has(x.id) && (x.food.id === r.food.id || x.food.name.startsWith(r.food.name))); const drop = mine[mine.length - 1]?.id; return { ...s, items: s.items.filter((x) => x.id !== drop), portion: null }; }); rowUndone(i, r.name); p.notify(`${cookName(r.food.name).short} is off the plate.`); });
+  }
+  function rowOut(i: number, r: Extract<ChatRow, { kind: "drop" }>) {
+    const at = state.items.findIndex((x) => x.id === r.itemId), item = state.items[at];
+    setState((s) => ({ ...s, items: s.items.filter((x) => x.id !== r.itemId), portion: null })); rowDone(i, r.name, "out");
+    if (item) undoable(`${i}:row:${r.name}`, () => { setState((s) => { const items = [...s.items]; items.splice(Math.min(at, items.length), 0, item); return { ...s, items, portion: null }; }); rowUndone(i, r.name); p.notify(`${cookName(item.food.name).short} is back on the plate.`); });
+  }
   function rowScan(i: number, r: Extract<ChatRow, { kind: "scan" }>) { rowDone(i, r.name, "scan"); p.openScan(); }
   function toPlate(t: Turn) {
     if (!t.picks?.length) return;
@@ -286,8 +325,9 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
 
   return (
     <div className="chat-screen">
+      {/* DT153 (0.2.132): the head stays at the top and says where you came from; outside .head, so it can stick */}
+      <div className="menu-head chat-head"><h2>{CHEF_NAME}</h2><button className="link" onClick={close}>{backLabel ?? "Close"}</button></div>
       <div className="head">
-        <div className="menu-head"><h2>{CHEF_NAME}</h2><button className="link" onClick={close}>Close</button></div>
         <p>{about} Say what you want, or tap a line below.</p>
         {doorOpen ? <SafetyQuestion p={p} doneLabel="Back to the chat" onDone={() => setDoorOpen(false)} /> : <SafetyNote safety={p.safety} ai={p.ai} onAnswer={() => setDoorOpen(true)} />}
       </div>
@@ -300,24 +340,30 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
           </div>
         )}
         {turns.map((t, i) => (
-          <div key={i} className={`bubble ${t.role}`}>
+          <div key={i} className={`bubble ${t.role}${t.failed?.retried ? " bubble-greyed" : ""}`}>
             {t.photo && <img src={t.photo} alt="" />}
             {t.plate && <span className="plate-chip">Plate: {t.plate.join(" · ")}</span>}
             {t.tag && <small className={`bubble-tag tag-${t.tag}`}>{TAG[t.tag]}</small>}
             <p>{t.text}</p>
+            {t.failed && (
+              <div className="button-row">
+                {t.failed.retried ? <span className="done-tick done-start done-quiet"><b>Asked again</b></span>
+                  : <><button type="button" className="pill pill-small pill-primary" disabled={thinking} onClick={() => void ask(t.failed!.text, { ti: i, photo: t.failed!.photo })}>Ask again</button>{backLabel && <button type="button" className="pill pill-small" onClick={close}>{backLabel}</button>}</>}
+              </div>
+            )}
             {t.swap && (
               <div className="picks fill-rows">
                 {t.swap.options.filter((o) => !t.swap!.done || o.meal.title === t.swap!.done).map((o, k) => (
                   <div key={o.meal.title} className="fill-row">
                     <div className="fill-text"><small>{t.swap!.slotName}, {t.swap!.time}</small><b>{o.meal.title}</b><small>{fmt(o.meal.kcal, 0)} kcal · {fmt(o.meal.protein, 0)} g · {pdText(density(o.meal.protein, o.meal.kcal))}</small>{o.why && <small className="swap-why">{o.why}</small>}</div>
-                    {t.swap!.done ? <span className="pill pill-small pill-done">Swapped</span> : <button className="pill pill-small" onClick={() => doSwap(i, t.swap!.options.indexOf(o))}>Swap</button>}
+                    {t.swap!.done ? <Done text="Swapped" undo={undoOf(`${i}:swap`)} /> : <button className="pill pill-small" onClick={() => doSwap(i, t.swap!.options.indexOf(o))}>Swap</button>}
                   </div>
                 ))}
               </div>
             )}
             {t.move && (
               <div className="button-row">
-                {t.move.done ? <span className="pill pill-small pill-done">{t.move.done === "moved" ? `Moved to ${t.move.to}` : `Kept at ${t.move.from}`}</span>
+                {t.move.done ? <Done start text={t.move.done === "moved" ? `Moved to ${t.move.to}` : `Kept at ${t.move.from}`} undo={undoOf(`${i}:move`)} />
                   : <><button className="pill pill-small pill-primary" onClick={() => doMove(i, true)}>Move it</button><button className="pill pill-small" onClick={() => doMove(i, false)}>Keep {t.move.from}</button></>}
               </div>
             )}
@@ -331,7 +377,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
                 ))}
                 <div className="button-row">
                   {t.fill.done
-                    ? <span className="pill pill-small pill-done">In the plan</span>
+                    ? <><Done start text="In the plan" undo={undoOf(`${i}:fill`)} />{backLabel === "Back to the plan" && <button className="pill pill-small pill-primary back-after" onClick={close}>Back to the plan</button>}</>
                     : <button className="pill pill-small pill-primary" onClick={() => putThemIn(i)}>Put them in the plan</button>}
                 </div>
               </div>
@@ -341,14 +387,14 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
                 {t.rows.map((r) => { const done = t.rowsDone?.[r.name]; return (
                   <div key={r.kind + r.name} className="tip-row">
                     {r.kind === "add" && <><div className="tip-text"><b>{r.name}</b><small>{r.from === "mine" ? "in your foods" : "basic food"} · {fmt(r.grams, 0)} g · {pdText(density(r.food.protein, r.food.calories))}{r.reaches !== null ? ` · the plate reaches ${pdVal(r.reaches)}` : ""}</small></div>
-                      {done === "added" ? <span className="pill pill-small pill-done">On plate</span> : <button type="button" className="pill pill-small pill-primary" onClick={() => rowAdd(i, r)}>+ Add</button>}</>}
+                      {done === "added" ? <Done text="On the plate" undo={undoOf(`${i}:row:${r.name}`)} /> : <button type="button" className="pill pill-small pill-primary" onClick={() => rowAdd(i, r)}>+ Add</button>}</>}
                     {r.kind === "drop" && <><div className="tip-text"><b>{r.name}</b><small>on the plate · {fmt(r.grams, 0)} g</small></div>
-                      {done === "out" ? <span className="pill pill-small pill-done">Out</span> : <button type="button" className="pill pill-small" onClick={() => rowOut(i, r)}>Take it out</button>}</>}
+                      {done === "out" ? <Done text="Out" undo={undoOf(`${i}:row:${r.name}`)} /> : <button type="button" className="pill pill-small" onClick={() => rowOut(i, r)}>Take it out</button>}</>}
                     {r.kind === "scan" && <><div className="tip-text"><b>{r.name}</b><small>not in your foods</small></div>
                       <button type="button" className="pill pill-small" onClick={() => rowScan(i, r)}>Scan it</button></>}
                   </div>); })}
                 {/* 02:08: a way back to the Plate under the rows, not only Close at the top */}
-                {p.tab === "journey" && <div className="button-row"><button type="button" className="pill pill-small" onClick={close}>Back to the plate</button></div>}
+                {p.tab === "journey" && <div className="button-row"><button type="button" className={`pill pill-small${Object.values(t.rowsDone ?? {}).some((d) => d === "added") ? " pill-primary" : ""}`} onClick={close}>Back to the plate</button></div>}
               </div>
             )}
             {/* 02:08: the photo block (Work on it with Chef Mealan, This is what I had) belongs to a photo; a written answer with rows never shows it */}

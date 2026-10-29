@@ -53,7 +53,8 @@ seed.items = [];
   ok(firstAfter !== firstBefore, `Change swaps the meal: ${firstBefore} to ${firstAfter}`);
   await page.getByRole("button", { name: "Put them in the plan" }).click(); await page.waitForTimeout(500);
   ok(/In the plan/.test(await fill.textContent()), "the button acted and says so");
-  await page.getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(400);
+  // Changed by story DT153 (0.2.132, board Stories105): from the Plan the chat says Back to the plan, in the head and next to the tick
+  await page.locator(".chat-head").getByRole("button", { name: "Back to the plan" }).click(); await page.waitForTimeout(400);
   // Changed by story SL2 (Milan 16:03 to 16:11, board SL2): the open slots are in the day's line in the head card at the top
   ok(/all slots set/.test(await page.locator(".plan-head .plan-day-head small").textContent()), "Plan shows every slot set");
   ok(await page.getByRole("button", { name: /Fill the open slots/ }).count() === 0, "and no Fill button when nothing is open");
