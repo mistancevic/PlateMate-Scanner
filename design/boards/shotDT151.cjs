@@ -5,17 +5,18 @@ const fs = require("node:fs"), path = require("node:path");
 const ROOT = "/home/claude/platemate-scanner";
 const seed = JSON.parse(fs.readFileSync(path.join(ROOT, "tests/flows/seed.json"), "utf8")); seed.items = [];
 const PORT = "3324", U = `http://127.0.0.1:${PORT}`;
-// the design's data.js (Design Explorer: Macros), per 100 g; DIAAS and the limiting amino acid from its quality field. To be checked.
+// DT151 v3 (10:10): numbers checked against USDA FoodData Central; need from WHO/FAO/UNU 2007 (adult, per kg per day). Calculated in /home/claude/boards/eaa151.cjs.
+const CALC = require("/home/claude/boards/eaa151.cjs")(85);
 const FOODS = [
-  { icon: "🥤", name: "Whey protein powder", kcal: 370, p: 90, leu: 11.0, diaas: 1.09, complete: true, short: "", pair: "Nothing: it is complete. Fast, so it suits after training.", serve: "One scoop, 30 g: 27 g protein, 3.3 g leucine." , eaa: {"his": 1.26, "ile": 2.3, "leu": 2.07, "lys": 2.35, "met": 1.46, "phe": 1.33, "thr": 3.29, "trp": 3.15, "val": 1.62}, best: "After training: one scoop in water or milk. Fast to digest, the most leucine per gram, so it starts muscle repair quickest. Also lifts a breakfast short of protein." },
-  { icon: "🍗", name: "Chicken breast", kcal: 120, p: 22.5, leu: 1.7, diaas: 1.10, complete: true, short: "", pair: "Nothing: it is complete.", serve: "150 g: 34 g protein, 2.6 g leucine." , eaa: {"his": 2.15, "ile": 1.72, "leu": 1.28, "lys": 1.89, "met": 1.73, "phe": 1.6, "thr": 1.84, "trp": 1.93, "val": 1.27}, best: "The anchor of a main meal: 150 g brings most lunches and dinners to their protein. Lean, so the PD stays high whatever goes with it." },
-  { icon: "🥣", name: "Greek yogurt, 2 %", kcal: 59, p: 10, leu: 1.0, diaas: 1.14, complete: true, short: "", pair: "Nothing: it is complete. Lifts oats and fruit.", serve: "200 g: 20 g protein, 2.0 g leucine." , eaa: {"his": 1.87, "ile": 2.07, "leu": 1.69, "lys": 1.78, "met": 1.56, "phe": 2.0, "thr": 1.96, "trp": 2.33, "val": 1.74}, best: "Breakfast or before sleep: its casein digests slowly and feeds amino acids for hours. Lifts oats and fruit to your PD." },
-  { icon: "🐟", name: "Salmon", kcal: 208, p: 20, leu: 1.6, diaas: 1.09, complete: true, short: "", pair: "Nothing: it is complete. Its fat is the good kind.", serve: "150 g: 30 g protein, 2.4 g leucine." , eaa: {"his": 1.97, "ile": 1.53, "leu": 1.37, "lys": 2.03, "met": 1.88, "phe": 1.56, "thr": 1.91, "trp": 1.92, "val": 1.32}, best: "Twice a week as a main meal: protein plus the omega-3 fats. Its own fat lowers the PD, so add vegetables, not more fat." },
-  { icon: "🥚", name: "Egg", kcal: 143, p: 12.6, leu: 1.1, diaas: 1.13, complete: true, short: "", pair: "Nothing: the reference protein. Half its energy is the yolk's fat.", serve: "2 eggs, 104 g: 13 g protein, 1.1 g leucine." , eaa: {"his": 1.81, "ile": 1.61, "leu": 1.39, "lys": 1.49, "met": 0.83, "phe": 2.1, "thr": 1.89, "trp": 2.41, "val": 1.28}, best: "The plant anchor: the most complete plant protein, as tofu, edamame or beans. With rice or bread it is complete." },
-  { icon: "🫘", name: "Soybeans, boiled", kcal: 173, p: 16.6, leu: 1.4, diaas: 0.90, complete: true, short: "methionine", pair: "Rice or bread tops up the little methionine it lacks.", serve: "150 g: 25 g protein, 2.0 g leucine." , eaa: {"his": 1.56, "ile": 1.81, "leu": 1.46, "lys": 1.61, "met": 1.94, "phe": 2.16, "thr": 1.92, "trp": 2.21, "val": 1.75}, best: "Breakfast, or to complete a plant meal: the reference protein. Egg whites raise the PD of an omelette." },
-  { icon: "🫘", name: "Lentils, boiled", kcal: 116, p: 9, leu: 0.65, diaas: 0.63, complete: false, short: "methionine", pair: "Rice completes it: rice has the methionine lentils lack, lentils the lysine rice lacks.", serve: "200 g: 18 g protein, 1.3 g leucine." , eaa: {"his": 1.85, "ile": 1.44, "leu": 1.22, "lys": 1.56, "met": 0.56, "phe": 1.96, "thr": 1.55, "trp": 1.48, "val": 1.28}, best: "A plant lunch with rice: together complete, and the fibre keeps you full for hours. Count it as protein and carb together." },
-  { icon: "🌾", name: "Oats, dry", kcal: 389, p: 13, leu: 1.0, diaas: 0.57, complete: false, short: "lysine", pair: "Milk, skyr or yogurt completes it: dairy has the lysine oats lack.", serve: "50 g: 6.5 g protein, 0.5 g leucine." , eaa: {"his": 1.49, "ile": 1.28, "leu": 1.28, "lys": 0.91, "met": 1.01, "phe": 2.06, "thr": 1.44, "trp": 2.31, "val": 1.36}, best: "A breakfast carb, not a protein: cook it in milk or top it with skyr, which brings the lysine oats lack and the PD up." },
-];
+  { k: "whey", icon: "🥤", name: "Whey protein powder", portion: "One scoop, 30 g", pair: "Nothing: it is complete.", best: "After training: one scoop in water or milk. Fast to digest and the most leucine per gram, so it starts muscle repair quickest. Also lifts a breakfast short of protein." },
+  { k: "chicken", icon: "🍗", name: "Chicken breast", portion: "150 g", pair: "Nothing: it is complete.", best: "The anchor of a main meal: 150 g brings most lunches and dinners to their protein. Lean, so the PD stays high whatever goes with it." },
+  { k: "yogurt", icon: "🥣", name: "Greek yogurt, 0 %", portion: "200 g", pair: "Nothing: it is complete. It lifts oats and fruit.", best: "Breakfast or before sleep: its casein digests slowly and feeds amino acids for hours. Lifts oats and fruit to your PD." },
+  { k: "salmon", icon: "🐟", name: "Salmon", portion: "150 g", pair: "Nothing: it is complete. Its fat is the good kind.", best: "Twice a week as a main meal: protein plus the omega-3 fats. Its own fat lowers the PD, so add vegetables, not more fat." },
+  { k: "soy", icon: "🫘", name: "Soybeans, boiled", portion: "150 g", pair: "Complete for an adult. Rice or bread tops up methionine, its lowest.", best: "The plant anchor: the most complete plant protein, as tofu, edamame or beans. 150 g brings as much protein as a scoop of whey." },
+  { k: "egg", icon: "🥚", name: "Egg", portion: "2 eggs, 100 g", pair: "Nothing: the reference protein. Half its energy is the yolk's fat.", best: "Breakfast, or to complete a plant meal. Two eggs are a third of a meal's protein, so add a third egg or egg whites, which also raise the PD." },
+  { k: "lentils", icon: "🫘", name: "Lentils, boiled", portion: "200 g", pair: "Rice completes it: rice has the methionine lentils lack, lentils the lysine rice lacks.", best: "A plant lunch with rice: together complete, and the fibre keeps you full for hours. Count it as protein and carb together." },
+  { k: "oats", icon: "🌾", name: "Oats, dry", portion: "50 g", pair: "Milk, skyr or yogurt completes it: dairy has the lysine oats lack.", best: "A breakfast carb, not a protein: 50 g gives 7 g protein. Cook it in milk or top it with skyr, which brings the lysine and the PD up." },
+].map((f) => ({ ...f, ...CALC[f.k] }));
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: ROOT, env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
   for (let i = 0; i < 60; i++) { try { await fetch(U + "/"); break; } catch { await new Promise((r) => setTimeout(r, 500)); } }
@@ -56,38 +57,37 @@ const FOODS = [
     await page.evaluate(({ FOODS, sort, mark }) => {
       for (const n of document.querySelectorAll("header *, .top *")) if (n.childElementCount === 0 && n.textContent.trim() === "Me") n.textContent = "Explorer";
       const main = document.querySelector("main") ?? document.body; const target = 6.5;
-      const pd = (f) => (100 * f.p) / f.kcal;
-      const list = [...FOODS].sort((a, b) => (sort === "pd" ? pd(b) - pd(a) : b.diaas - a.diaas));
-      const qual = (f) => f.diaas >= 1 ? `Complete, top quality · DIAAS ${f.diaas.toFixed(2)}` : f.complete ? `Complete, a little short of ${f.short} · DIAAS ${f.diaas.toFixed(2)}` : `Incomplete: short of ${f.short} · DIAAS ${f.diaas.toFixed(2)}`;
-      const qc = (f) => f.diaas >= 1 ? "background:#e3f4ea;color:#155c34" : f.complete ? "background:#fff4e0;color:#8a5a00" : "background:#fdecea;color:#a33a2b";
-      const you = (f) => pd(f) >= target ? `Above your PD ${target}: one portion lifts a plate.` : `Below your PD ${target}: it needs a partner richer in protein.`;
+      const pd = (f) => f.pd;
+      const list = [...FOODS].sort((a, b) => (sort === "pd" ? b.pd - a.pd : b.protein - a.protein));
+      const N = { his: "Histidine", ile: "Isoleucine", leu: "Leucine", lys: "Lysine", saa: "Methionine + cysteine", aaa: "Phenylalanine + tyrosine", thr: "Threonine", trp: "Tryptophan", val: "Valine" };
+      const g = (v) => v.toFixed(2);
+      const you = (f) => f.pd >= target ? `Above your PD ${target}: one portion lifts a plate.` : `Below your PD ${target}: it needs a partner richer in protein.`;
       const card = (f) => `<section class="card" style="margin:10px 0;padding:14px 16px">
-        <div style="display:flex;align-items:center;gap:10px"><span style="font-size:24px">${f.icon}</span><b style="flex:1;font-size:16px">${f.name}</b><span class="pdpill pdpill-${pd(f) >= target ? "high" : "low"}" style="font-weight:900">PD ${pd(f).toFixed(1)}</span></div>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font-size:24px">${f.icon}</span><b style="flex:1;font-size:16px">${f.name}</b><span class="pdpill pdpill-${f.pd >= target ? "high" : "low"}" style="font-weight:900">PD ${f.pd.toFixed(1)}</span></div>
         <small style="display:block;margin:4px 0 8px;color:#5b6b8a">${f.p} g protein · ${f.kcal} kcal per 100 g</small>
-        <span style="display:inline-block;padding:3px 9px;border-radius:999px;font-size:12.5px;font-weight:800;${qc(f)}">${qual(f)}</span>
-        <div style="margin-top:10px"><small style="display:block;font-weight:800;margin-bottom:4px">The nine essential amino acids, against what your body needs</small>
-          ${Object.entries({ his: "Histidine", ile: "Isoleucine", leu: "Leucine", lys: "Lysine", met: "Methionine", phe: "Phenylalanine", thr: "Threonine", trp: "Tryptophan", val: "Valine" }).map(([k, n]) => { const v = f.eaa[k], w = Math.min(v, 2) / 2 * 100, c = v >= 1 ? "#13916a" : v >= 0.75 ? "#f6b94a" : "#f0705c";
-            return `<div style="display:flex;align-items:center;gap:6px;margin:2px 0"><small style="width:92px;font-size:11.5px;${k === "leu" ? "font-weight:900" : ""}">${n}</small><span style="position:relative;flex:1;height:8px;border-radius:4px;background:#e8eef9"><i style="position:absolute;left:0;top:0;bottom:0;width:${w}%;border-radius:4px;background:${c}"></i><i style="position:absolute;left:50%;top:-2px;bottom:-2px;width:2px;background:#172742;opacity:.55"></i></span><small style="width:40px;text-align:right;font-size:11.5px;font-weight:800;color:${c}">${Math.round(v * 100)}%</small></div>`; }).join("")}
-          <small style="display:block;color:#5b6b8a;font-size:11px;margin-top:2px">The line is 100 %, what you need per gram of protein. Below it, the food is short of that one.</small></div>
-        <small style="display:block;margin-top:8px"><b>Leucine</b> ${f.leu.toFixed(f.leu < 1 ? 2 : 1)} g per 100 g: the amino acid that switches on muscle repair. ${f.serve}</small>
+        <span style="display:inline-block;padding:3px 9px;border-radius:999px;font-size:12.5px;font-weight:800;background:#eaf1fd;color:#123a7a">${f.portion}: ${f.protein} g protein, ${f.por.leu.toFixed(1)} g leucine</span>
+        <div style="margin-top:10px"><small style="display:block;font-weight:800;margin-bottom:4px">The nine essential amino acids in this portion, against your day</small>
+          ${Object.entries(N).map(([k, n]) => { const pc = f.pct[k], w = Math.min(pc, 150) / 150 * 100, c = pc >= 100 ? "#13916a" : "#5b8def";
+            return `<div style="display:flex;align-items:center;gap:6px;margin:2px 0"><small style="width:96px;font-size:11px;line-height:1.1;${k === "leu" ? "font-weight:900" : ""}">${n}</small><span style="position:relative;flex:1;height:8px;border-radius:4px;background:#e8eef9"><i style="position:absolute;left:0;top:0;bottom:0;width:${w}%;border-radius:4px;background:${c}"></i><i style="position:absolute;left:66.7%;top:-2px;bottom:-2px;width:2px;background:#172742;opacity:.55"></i></span><small style="width:78px;text-align:right;font-size:11px;font-weight:800;color:${pc >= 100 ? "#13916a" : "#172742"}">${g(f.por[k])} of ${g(f.day[k])} g</small></div>`; }).join("")}
+          <small style="display:block;color:#5b6b8a;font-size:11px;margin-top:2px">The line is your whole day, calculated for 85 kg. Green: this portion alone covers the day.</small></div>
         <small style="display:block;margin-top:6px;padding:6px 8px;border-radius:10px;background:#eaf1fd;color:#123a7a"><b>Best use:</b> ${f.best}</small>
         <small style="display:block;margin-top:6px"><b>Completes it:</b> ${f.pair}</small>
         <small style="display:block;margin-top:6px;color:#123a7a;font-weight:700">For you: ${you(f)}</small>
       </section>`;
       main.innerHTML = `<div style="padding:4px 16px 24px">
         <div class="step-head"><h2 style="margin:6px 0 4px;font-size:24px">Not all proteins are equal</h2>
-        <p style="margin:0 0 10px;color:#5b6b8a;line-height:1.45">Protein is the surname. Whey, egg or lentil is the first name, and each behaves differently: how much protein per energy (PD), how complete it is, how much leucine it brings. Eight foods, per 100 g.</p></div>
-        <div class="moments" role="radiogroup" style="${mark};padding:4px"><button class="choice ${sort === "pd" ? "on" : ""}">By PD</button><button class="choice ${sort === "q" ? "on" : ""}">By quality</button></div>
+        <p style="margin:0 0 10px;color:#5b6b8a;line-height:1.45">Protein is the surname. Whey, egg or lentil is the first name, and each behaves differently: how much protein per energy (PD), how complete it is, how much leucine it brings. Eight foods, one portion each, against what your body needs in a day.</p></div>
+        <div class="moments" role="radiogroup" style="${mark};padding:4px"><button class="choice ${sort === "pd" ? "on" : ""}">By PD</button><button class="choice ${sort === "q" ? "on" : ""}">By portion</button></div>
         ${list.map(card).join("")}
-        <small style="display:block;margin-top:12px;color:#5b6b8a">Quality is DIAAS: how well a food's protein covers what your body needs, 1.00 and up is complete. Educational, approximate, not medical advice. Carbs and Fats come next.</small>
+        <small style="display:block;margin-top:12px;color:#5b6b8a">Amino acids: USDA FoodData Central. Your need: WHO, adults, per kg of body weight. Plant protein digests a little less, about 80 to 90 % against about 95 % for animal, so a plant portion gives a little less than its bars. Educational, approximate, not medical advice. Carbs and Fats come next.</small>
       </div>`;
     }, { FOODS, sort, mark });
   };
   await page2("pd");
-  await page.evaluate((NOTE) => { const h = document.querySelector(".step-head"); const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New (version 2): eight protein foods, each with PD, quality, all nine essential amino acids as bars against what your body needs (the short one shows red or amber), leucine, Best use (when and how), what completes it, and one line against your PD target."; h.before(d); }, NOTE);
+  await page.evaluate((NOTE) => { const h = document.querySelector(".step-head"); const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New (version 3): each bar is grams in one portion against your whole day, calculated for your 85 kg. The line is 100 % of the day. Numbers checked against USDA. Then Best use, what completes it, and one line against your PD target."; h.before(d); }, NOTE);
   await shot("r151c");
   await page2("q");
-  await page.evaluate((NOTE) => { const h = document.querySelector(".step-head"); const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New: By quality puts the complete proteins first. The bars show why: soy dips at methionine, lentils further, oats at lysine; rice and dairy fill those gaps."; h.before(d); }, NOTE);
+  await page.evaluate((NOTE) => { const h = document.querySelector(".step-head"); const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New: By portion puts the most protein per portion first. 150 g of soybeans brings as much as a scoop of whey. The lowest bar shows what to pair: lentils lowest in methionine, so rice; oats lowest in lysine, so dairy."; h.before(d); }, NOTE);
   await shot("r151d");
   await b.close(); server.kill();
 })();
