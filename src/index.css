@@ -2322,3 +2322,39 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .button-row .back-after { margin-left: auto; }
 .bubble-greyed { opacity: .6; }
 .chat-screen .chat-head { position: sticky; top: calc(58px + env(safe-area-inset-top, 0px)); z-index: 25; background: var(--base); margin: 0 -18px; padding: 6px 18px 8px; }
+/* DT151 (0.2.133): Explorer, Not all proteins are equal. Each card in sections: a heading, its goal, then the details; one
+   row pattern for every measure: the name, the bar, the grams */
+.explorer .ex-h { margin: 4px 0 6px; font-size: var(--fs-title); }
+.explorer .ex-intro { margin: 0 0 10px; color: var(--muted); line-height: 1.45; }
+.explorer .ex-chips { margin: 6px 0; }
+.explorer .ex-meal { display: block; margin: 2px 0 8px; color: var(--brand-text); font-weight: 700; }
+.ex-card { margin: 12px 0; padding: 14px 16px; }
+.ex-title { display: flex; align-items: center; gap: 10px; }
+.ex-title > b { flex: 1; font-size: var(--fs-card); }
+.ex-icon { font-size: 24px; }
+.ex-head { margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line); }
+.ex-head > b { display: block; font-size: var(--fs-caps); font-weight: 900; letter-spacing: .06em; text-transform: uppercase; color: var(--brand-text); }
+.ex-head > small { display: block; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+.ex-row { display: flex; align-items: center; gap: 8px; margin: 5px 0; }
+.ex-row .ex-name { width: 124px; flex-shrink: 0; line-height: 1.15; }
+.ex-row .ex-val { width: 84px; flex-shrink: 0; text-align: right; font-weight: 900; color: var(--ink); white-space: nowrap; }
+.ex-pair .ex-val { width: auto; flex: 1; }
+.ex-bar { position: relative; flex: 1; height: 8px; border-radius: 4px; background: rgba(var(--ink-rgb), .07); }
+.ex-bar > i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--brand); }
+.ex-bar > i.ex-need { left: 66.7%; width: 2px !important; top: -3px; bottom: -3px; border-radius: 0; background: var(--ink); opacity: .55; }
+.ex-ok .ex-bar > i:first-child { background: var(--top); } .ex-ok .ex-val { color: var(--top); }
+.ex-strong .ex-name, .ex-strong .ex-val { font-weight: 900; color: var(--ink); }
+.ex-low .ex-bar > i:first-child { background: var(--mid); } .ex-low .ex-name { font-weight: 900; color: var(--close-text); }
+.ex-score { display: flex; gap: 10px; align-items: baseline; padding: 6px 0; }
+.ex-score + .ex-score { border-top: 1px solid var(--line); }
+.ex-score-name { width: 60px; flex-shrink: 0; } .ex-score-val { width: 70px; flex-shrink: 0; font-size: var(--fs-card); }
+.ex-score small { flex: 1; line-height: 1.35; }
+.ex-src { color: var(--muted); }
+.ex-best, .ex-line { font-size: var(--fs-small); line-height: 1.45; }
+.ex-best { margin: 8px 0 0; padding: 8px 10px; border-radius: 10px; background: var(--tint); color: var(--brand-text); }
+.ex-line { margin: 8px 0 0; }
+.ex-card-src { display: block; margin-top: 10px; }
+.ex-book { display: flex; gap: 14px; align-items: center; margin: 16px 0; padding: 14px 16px; }
+.ex-book img { width: 72px; border-radius: 6px; box-shadow: var(--shadow-float); }
+.ex-book b { display: block; } .ex-book small { display: block; margin: 4px 0 8px; color: var(--muted); }
+.explorer .ex-sources { color: var(--muted); font-size: var(--fs-small); line-height: 1.45; }
