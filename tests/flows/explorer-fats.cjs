@@ -35,7 +35,7 @@ const SHOTS = process.env.SHOTS;
   const goals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).goals);
   const dayFat = goals.fats ?? Math.round(goals.calories * 0.3 / 9), mealFat = Math.round(dayFat / 3), mealKcal = Math.round(goals.calories / 3);
   const mealLine = await text(page.locator(".ex-meal"));
-  ok(mealLine === `Your lunch: about ${mealFat} g of fat and ${mealKcal.toLocaleString("en-GB")} kcal, from your ${dayFat} g and ${goals.calories.toLocaleString("en-GB")} kcal a day.`, "DT154: the lunch's share of the day's fat and energy: " + mealLine);
+  ok(mealLine === `Your lunch: about ${mealFat} g of fat and ${mealKcal.toLocaleString("en-GB")} kcal, from your ${dayFat} g and ${goals.calories.toLocaleString("en-GB")} kcal a day. for you`, "DT154, DT160 (for you): the lunch's share of the day's fat and energy: " + mealLine);
   const names = await page.locator(".ex-card .ex-title > b").allTextContents();
   ok(names.length === 8 && names[0] === "Almonds" && names[7] === "Cheddar", "DT154: by fat quality, almonds first, cheddar last: " + names.join(", "));
   const olive = page.getByRole("region", { name: "Olive oil", exact: true });

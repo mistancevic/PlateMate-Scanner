@@ -4,16 +4,21 @@
 // DT156 (0.3.0, board Stories108; Milan 16:16 to 16:27): a seventh section on every card, What a label could say, by EU rules.
 // DT158 and DT159 (0.3.2, boards Stories110 and Stories111; Milan 16:16 to 18:22): Micros, against the day; By food or By member,
 // and a member's own page, Vitamin D and Vitamin C first. The numbers and their sources: src/explorerMicros.ts.
+// DT160 (0.3.3, board Stories112 version 2; Milan 19:30 Go): Calculated for you at the top, and Your day on every family: the range
+// for the person's goal with their number in it, marked for you. The calculation: src/explorerDay.ts.
 // Every card tells the same story in six sections: a heading, the goal of the section and what this portion does against
 // it, then the details; every measure in one pattern, the name, the bar, the grams. The numbers and their sources: src/explorer.ts.
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import type { AppApi } from "./api";
 import { EXPLORER_FOODS, NINE, EAA_MEAL, LEUCINE_MEAL, SCALE_G, cardOf, type ExplorerCard } from "../explorer";
 import { FAT_FOODS, FAT_MEMBERS, FAT_SCALE_G, EPA_DHA_DAY, SAT_SHARE, fatCardOf, type FatCard } from "../explorerFats";
 import { proteinClaims, fatClaims, carbClaims, CLAIMS_SOURCE, type Claim } from "../euClaims";
 import { CARB_FOODS, CARB_MEMBERS, CARB_SCALE_G, FIBRE_DAY, GI_LOW, GI_HIGH, carbCardOf, type CarbCard } from "../explorerCarbs";
 import { MICRO_FOODS, MICRO_MEMBERS, MICRO_GROUPS, MICRO_SCALE, EFSA_D, MEMBER_PAGES, CLAIMS_HEALTH_SOURCE, microCardOf, memberDay, memberRows, lowerName, fmtAmount, type MicroCard, type MicroId, type MemberPage } from "../explorerMicros";
-import { lifestyleOf } from "../personal";
+import { lifestyleOf, calculate, planOf, splitOf, splitName, lowCarbsOf } from "../personal";
+import { bandOf } from "../goal";
+import { planShort, weekdayIndex } from "../plan";
+import { weekNumbers, yourDay, dayList, type YourDay } from "../explorerDay";
 import { slotsOf } from "../slots";
 import { needOf } from "../planned";
 import { pdVal } from "../ui";
@@ -115,10 +120,59 @@ function Book({ line }: { line: string }) {
   );
 }
 
+// DT160: the mark on every number that comes from the person's goal and setup
+const ForYou = () => <span className="ex-for">for you</span>;
+// a range as a green band with the person's number as a mark; lo 0 is a ceiling only, hi null a minimum only
+function RangeRow({ name, lo, hi, you, unit, why, scale, label }: { name: string; lo: number; hi: number | null; you?: number; unit: string; why: string; scale: number; label?: string }) {
+  const L = (100 * lo) / scale, W = hi === null ? 100 - L : (100 * (hi - lo)) / scale, inside = you === undefined || (you >= lo && (hi === null || you <= hi));
+  return (
+    <div className="ex-range">
+      <div className="ex-range-top"><b>{name}</b><small>{label ?? `${hi === null ? `at least ${lo}` : lo === 0 ? `under ${hi}` : `${lo} to ${hi}`} ${unit}`}{you !== undefined ? ` · yours ${you} ${unit}` : ""}</small></div>
+      <span className="ex-range-bar" aria-hidden="true"><i style={{ left: `${L}%`, width: `${Math.min(W, 100 - L)}%` }} />{you !== undefined && <b className={inside ? "" : "ex-range-off"} style={{ left: `${Math.min(100, (100 * you) / scale)}%` }} />}</span>
+      <small className="ex-range-why">{why}</small>
+    </div>
+  );
+}
+function WeekRow({ d, scale }: { d: YourDay; scale: number }) {
+  if (!d.span) return null;
+  const L = (100 * d.span.lo) / scale, W = (100 * (d.span.hi - d.span.lo)) / scale;
+  return (
+    <div className="ex-range ex-week">
+      <div className="ex-range-top"><b>Your week</b><small>{d.span.lo} to {d.span.hi} g · today {d.carbs.you} g</small></div>
+      <span className="ex-range-bar" aria-hidden="true"><i style={{ left: `${L}%`, width: `${W}%` }} /><b style={{ left: `${(100 * d.carbs.you) / scale}%` }} /></span>
+      <small className="ex-range-why">Carbs move with the day: {d.span.lo} g on {d.span.loName}, your lightest day, {d.span.hi} g on {d.span.hiName}, your hardest. Protein and fat stay the same.</small>
+    </div>
+  );
+}
+// the numbers of today and this week, as the app has them, and the person's protein range
+function useYourDay(p: AppApi) {
+  const today = useMemo(() => new Date(), []);
+  const n = p.numbersFor(today);
+  const week = useMemo(() => weekNumbers(p.numbersFor, today), [p, today]);
+  const calc = useMemo(() => calculate(p.personal, p.goal?.band ?? "maintain", p.profile.formula ?? null), [p.personal, p.goal, p.profile.formula]);
+  return n ? { n, d: yourDay(n, week, p.goal?.source === "profile" && calc ? calc.kcal : null), week, calc } : null;
+}
+function YourDayCard({ goal, children }: { goal: string; children: ReactNode }) {
+  return <section className="card ex-yourday" aria-label="Your day"><div className="ex-head ex-head-first"><b>Your day<ForYou /></b><small>{goal}</small></div>{children}</section>;
+}
+// DT160: the top line, what the numbers on these pages are calculated from, and where to change it
+function CalcLine(p: AppApi) {
+  const n = p.numbersFor(new Date());
+  if (!n || !p.goal) return <p className="ex-calc"><b>Calculated for you.</b> Ranges and meal amounts here come from your goal. Set it, and they become yours. <button type="button" className="link" onClick={() => p.openGoal()}>Set your goal ›</button></p>;
+  const band = p.goal.band ?? "maintain", l = lifestyleOf(p.personal), meals = l.meals ?? 3;
+  const plan = planOf(p.personal), d = new Date(), key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const day = p.personal.dated?.[key] ?? plan?.[weekdayIndex(d)];
+  const kind = day ? planShort(day).split(" · ")[0].toLowerCase() : null;
+  const split = splitOf(p.personal, band), low = lowCarbsOf(p.personal, band);
+  const setup = [bandOf(band)?.name ?? "your goal", low !== null ? `Very low carb, ${low} g` : splitName(split === "low" ? "balanced" : split), ...(p.personal.weightKg ? [`${p.personal.weightKg} kg`] : []), `${meals === 1 ? "one meal" : `${["", "one", "two", "three", "four", "five"][meals] ?? meals} meals`}`];
+  return <p className="ex-calc"><b>Calculated for you.</b> Ranges and meal amounts here come from your goal and setup: {setup.join(", ")}. Today: {kind ? `${kind}, ` : ""}{n.kcal.toLocaleString("en")} kcal. Numbers marked <ForYou /> change when they change. <button type="button" className="link" onClick={() => p.openGoal()}>Change them ›</button></p>;
+}
+
 export function ExplorerScreen(p: AppApi) {
   const [family, setFamily] = useState<Family>("protein");
   return (
     <div className="explorer">
+      <CalcLine {...p} />
       {/* DT154, DT155: the families, Protein first */}
       <div className="moments ex-chips ex-families" role="radiogroup" aria-label="Which family">
         <button role="radio" aria-checked={family === "protein"} className={`choice ${family === "protein" ? "on" : ""}`} onClick={() => setFamily("protein")}>Protein</button>
@@ -133,6 +187,7 @@ export function ExplorerScreen(p: AppApi) {
 
 function ProteinPage(p: AppApi) {
   const { day, need, meal, chips } = useMeal(p);
+  const yd = useYourDay(p);
   const [sort, setSort] = useState<"pd" | "meal">("pd");
   const mealP = need?.protein && need.protein > 0 ? need.protein : FALLBACK_MEAL;
   const cards = EXPLORER_FOODS.map((f) => cardOf(f, mealP)).sort((a, b) => (sort === "pd" ? b.pd - a.pd : b.protein - a.protein));
@@ -140,8 +195,14 @@ function ProteinPage(p: AppApi) {
     <>
       <h2 className="ex-h">Not all proteins are equal</h2>
       <p className="ex-intro">Protein is the family. Its members are the amino acids: leucine, lysine, methionine and six more your body can't make. Each food brings them in its own mix. Nobody eats one food all day, so each food here is one portion against one meal: how much of the meal it closes, and which members it brings.</p>
+      {yd && p.proteinRange && yd.calc && (
+        <YourDayCard goal="The range for your goal and your body, and where your number sits in it.">
+          <RangeRow name="Protein" lo={p.proteinRange.min} hi={p.proteinRange.max} you={yd.n.protein} unit="g" scale={p.proteinRange.max * 1.3}
+            why={`${yd.calc.proteinLo} to ${yd.calc.proteinHi} g per kg of your ${p.personal.weightKg} kg, ${yd.calc.trains ? "because you train" : "because you don't train regularly yet"}. The same every day. ISSN 2017.`} />
+        </YourDayCard>
+      )}
       {chips}
-      <small className="ex-meal">{need ? `Your ${meal}: about ${mealP} g of protein, from your ${day!.protein} g a day.` : `Set your goal under Me to see your own meals. Until then, a meal of ${FALLBACK_MEAL} g of protein.`}</small>
+      <small className="ex-meal">{need ? <>{`Your ${meal}: about ${mealP} g of protein, from your ${day!.protein} g a day.`} <ForYou /></> : `Set your goal under Me to see your own meals. Until then, a meal of ${FALLBACK_MEAL} g of protein.`}</small>
       <div className="moments ex-chips" role="radiogroup" aria-label="Order">
         <button role="radio" aria-checked={sort === "pd"} className={`choice ${sort === "pd" ? "on" : ""}`} onClick={() => setSort("pd")}>By PD</button>
         <button role="radio" aria-checked={sort === "meal"} className={`choice ${sort === "meal" ? "on" : ""}`} onClick={() => setSort("meal")}>Most of the meal</button>
@@ -182,6 +243,7 @@ function FatCardView({ c, meal, mealFat, target }: { c: FatCard; meal: string; m
 
 function FatsPage(p: AppApi) {
   const { day, share, meal, chips } = useMeal(p);
+  const yd = useYourDay(p), low = lowCarbsOf(p.personal, p.goal?.band ?? "maintain");
   const [sort, setSort] = useState<"quality" | "meal">("quality");
   // the meal's share of the day's fat and energy, as the plan shares them; without a goal, a meal of 25 g and 700 kcal
   const mealFat = day && share ? Math.round(day.fats * share) : 25, mealKcal = day && share ? Math.round(day.kcal * share) : 700;
@@ -190,8 +252,15 @@ function FatsPage(p: AppApi) {
     <>
       <h2 className="ex-h">Not all fats are equal</h2>
       <p className="ex-intro">Fat is the family. Its members are saturated, monounsaturated and polyunsaturated fats, and among the polyunsaturated the omega-6 and omega-3 your body can't make. Each food brings them in its own mix. Each food here is one portion against one meal: how much of the meal's fat it brings, and which members.</p>
+      {yd && p.goal && (
+        <YourDayCard goal={`The range for your goal, and the limit for saturated fat. ${low !== null ? "Your carbs are set, so fat takes the rest of each day." : "Fat stays the same every day, so it is counted on your week."}`}>
+          <RangeRow name="Fat" lo={yd.d.fat.lo} hi={yd.d.fat.hi} you={yd.d.fat.you} unit="g" scale={Math.max(yd.d.fat.hi, yd.d.fat.you) * 1.3}
+            why={`20 to 35 % of your week's average, ${yd.d.avgKcal.toLocaleString("en")} kcal, the same way your fat is set. Yours is ${yd.d.fat.pct} %${low !== null ? " today" : ""}: ${splitName(splitOf(p.personal, p.goal.band ?? "maintain"))}. EFSA, and the AND, DC and ACSM joint position 2016.`} />
+          <RangeRow name="Saturated fat" lo={0} hi={yd.d.satUnder} unit="g" scale={Math.max(yd.d.fat.hi, yd.d.fat.you) * 1.3} why="Under 10 % of your week's average energy. WHO 2023." />
+        </YourDayCard>
+      )}
       {chips}
-      <small className="ex-meal">{day && share ? `Your ${meal}: about ${mealFat} g of fat and ${mealKcal.toLocaleString("en-GB")} kcal, from your ${day.fats} g and ${day.kcal.toLocaleString("en-GB")} kcal a day.` : `Set your goal under Me to see your own meals. Until then, a meal of ${mealFat} g of fat and ${mealKcal} kcal.`}</small>
+      <small className="ex-meal">{day && share ? `Your ${meal}: about ${mealFat} g of fat and ${mealKcal.toLocaleString("en-GB")} kcal, from your ${day.fats} g and ${day.kcal.toLocaleString("en-GB")} kcal a day.` : `Set your goal under Me to see your own meals. Until then, a meal of ${mealFat} g of fat and ${mealKcal} kcal.`}{day && share ? <> <ForYou /></> : null}</small>
       <div className="moments ex-chips" role="radiogroup" aria-label="Order">
         <button role="radio" aria-checked={sort === "quality"} className={`choice ${sort === "quality" ? "on" : ""}`} onClick={() => setSort("quality")}>Best fat quality</button>
         <button role="radio" aria-checked={sort === "meal"} className={`choice ${sort === "meal" ? "on" : ""}`} onClick={() => setSort("meal")}>Most of the meal</button>
@@ -232,6 +301,7 @@ function CarbCardView({ c, meal, mealCarb, target }: { c: CarbCard; meal: string
 
 function CarbsPage(p: AppApi) {
   const { day, share, meal, chips } = useMeal(p);
+  const yd = useYourDay(p);
   const [sort, setSort] = useState<"gi" | "meal">("gi");
   // the meal's share of the day's carbs, as the plan shares the day; without a goal, a meal of 80 g and a third of the day
   const mealCarb = day && share ? Math.round(day.carbs * share) : 80;
@@ -240,8 +310,18 @@ function CarbsPage(p: AppApi) {
     <>
       <h2 className="ex-h">Not all carbs are equal</h2>
       <p className="ex-intro">Carbohydrate is the family. Its members are starch, sugars and fibre. Each food brings them in its own mix, and they reach your blood at different speeds. Each food here is one portion against one meal: how much of the meal's carbs it brings, and which members.</p>
+      {yd && p.goal && (() => { const d = yd.d, sc = Math.max(d.carbs.hi, d.span?.hi ?? 0, d.carbs.you) * 1.3; return (
+        <YourDayCard goal="Today's range, your week from the lightest day to the hardest, the fibre to reach, and the limit for free sugars.">
+          <RangeRow name="Carbohydrate today" lo={d.carbs.lo} hi={d.carbs.hi} you={d.carbs.you} unit="g" scale={sc}
+            why={`45 to 60 % of today's ${yd.n.kcal.toLocaleString("en")} kcal. Yours is ${d.carbs.pct} %: what is left after protein and fat. EFSA.`} />
+          <WeekRow d={d} scale={sc} />
+          {d.below.length > 0 && <small className="ex-warn">{`On ${dayList(d.below, yd.week.length, yd.week.map((w) => w.name))}`} your carbs are below 45 % of the energy, the bottom of EFSA's range{splitOf(p.personal, p.goal.band ?? "maintain") === "balanced" ? ", because protein and fat stay the same every day" : `: that is what ${splitName(splitOf(p.personal, p.goal.band ?? "maintain"))} means`}.</small>}
+          <RangeRow name="Fibre" lo={FIBRE_DAY} hi={null} unit="g" scale={FIBRE_DAY * 2.4} why={`At least ${FIBRE_DAY} g a day. WHO 2023 and EFSA.`} />
+          <RangeRow name="Free sugars" lo={0} hi={d.sugarsUnder} unit="g" scale={sc * 0.3} why="Under 10 % of today's energy. WHO 2015." />
+        </YourDayCard>
+      ); })()}
       {chips}
-      <small className="ex-meal">{day && share ? `Your ${meal}: about ${mealCarb} g of carbs, from your ${day.carbs} g a day.` : `Set your goal under Me to see your own meals. Until then, a meal of ${mealCarb} g of carbs.`}</small>
+      <small className="ex-meal">{day && share ? <>{`Your ${meal}: about ${mealCarb} g of carbs, from your ${day.carbs} g a day.`} <ForYou /></> : `Set your goal under Me to see your own meals. Until then, a meal of ${mealCarb} g of carbs.`}</small>
       <div className="moments ex-chips" role="radiogroup" aria-label="Order">
         <button role="radio" aria-checked={sort === "gi"} className={`choice ${sort === "gi" ? "on" : ""}`} onClick={() => setSort("gi")}>Lowest GI</button>
         <button role="radio" aria-checked={sort === "meal"} className={`choice ${sort === "meal" ? "on" : ""}`} onClick={() => setSort("meal")}>Most of the meal</button>
@@ -333,10 +413,11 @@ function MemberView({ m, sex, back }: { m: MemberPage; sex: string | null; back:
         {m.does.map((d) => <small key={d} className="ex-quote">{d}</small>)}
         <small className="ex-src ex-dnote">{CLAIMS_HEALTH_SOURCE} A food may say these only when it is at least a source of {low}.</small>
         {m.doesMore && <small className="ex-more"><b>More claims, in short.</b> {m.doesMore}</small>}
-        <Head title="How much a day" goal={`Your day comes from EFSA${day.who === "adults" ? "" : `, for ${day.who === "men" ? "a man" : "a woman"}`}; the label's reference is the same for everyone. ${m.ul ? `Above ${m.ul.v} ${m.unit} a day is too much.` : "No upper limit is set."}`} />
-        <div className="ex-row ex-pair ex-kv"><small className="ex-name">Your day<span className="ex-sub">{m.efsa.src}{day.who === "adults" ? "" : day.who === "men" ? `, men (${m.efsa.women} ${m.unit} for women)` : `, women (${m.efsa.men} ${m.unit} for men)`}</span></small><small className="ex-val">{day.v} {m.unit}</small></div>
+        {/* DT160 (0.3.3): How much a day as a range, from your day to the upper limit, marked for you */}
+        <div className="ex-head"><b>How much a day<ForYou /></b><small>{`From your day up to the upper limit. Your day comes from EFSA${day.who === "adults" ? " for an adult" : `, for ${day.who === "men" ? "a man" : "a woman"}`}; the label's reference is the same for everyone.`}</small></div>
+        <RangeRow name="Your range" lo={day.v} hi={m.ul ? m.ul.v : null} unit={m.unit} scale={(m.ul ? m.ul.v : day.v * 2) * 1.3} label={m.ul ? undefined : `from ${day.v} ${m.unit}, no upper limit`}
+          why={`From ${day.v} ${m.unit}, ${m.efsa.src.replace("EFSA, ", "EFSA's ")}${day.who === "adults" ? "" : day.who === "men" ? ` for men (${m.efsa.women} ${m.unit} for women)` : ` for women (${m.efsa.men} ${m.unit} for men)`}, ${m.ul ? `up to ${m.ul.v} ${m.unit}, ${m.ul.note}.` : `with no upper limit: ${m.ulNone}.`}`} />
         <div className="ex-row ex-pair ex-kv"><small className="ex-name">On labels<span className="ex-sub">EU reference intake, Regulation (EU) No 1169/2011</span></small><small className="ex-val">{m.label} {m.unit}</small></div>
-        <div className="ex-row ex-pair ex-kv"><small className="ex-name">Upper limit<span className="ex-sub">{m.ul ? m.ul.note : m.ulNone}</span></small><small className="ex-val">{m.ul ? `${m.ul.v} ${m.unit}` : "none set"}</small></div>
         <Head title="Where to find it" goal={`One normal portion against your day, ${day.v} ${m.unit}. The line is the whole day; green when one portion covers it.`} />
         {rows.map(({ food, amount, share }) => <Row key={food.name} name={food.name} sub={`${food.portion}${food.form ? `, ${food.form}` : ""}`} value={`${fmtAmount(amount, m.unit)} · ${share} %`} frac={share / 100 / MICRO_SCALE} need ok={share >= 100} />)}
         <small className="ex-src ex-dnote">Source: USDA FoodData Central, {m.foods.map((f) => f.src).join("; ")}.</small>

@@ -54,6 +54,9 @@ export type Personal = {
   timesOn?: import("./slots").TimesOn;
   // from 0.2.9 (canvas board CH, CH4): the kitchens the person cooks, which Chef Mealan cooks in first
   kitchens?: string[];
+  // DT161 (0.3.3, board Stories113; Milan 19:11 to 19:30): how the person likes the day split between carbs and fat, picked in
+  // the goal setup; carbs typed only for Very low carb. Protein stays set by the goal.
+  carbsFat?: CarbsFat;
   // from 0.2.10 (canvas board CH, CH7): per kitchen, the three dishes shown and the ones swapped away with Another
   kitchenTaste?: import("./kitchens").Tastes;
   // R22 (0.2.50, board RS21): your taste on Me as chips
@@ -181,9 +184,26 @@ export const canCalculate = (p: Personal) => Boolean(p.birthYear && p.heightCm &
 
 // Energy per day: resting burn (Mifflin–St Jeor, or Katch–McArdle with body fat) × life, plus that day's training, then the goal.
 // Protein follows whether you train, not the goal: 1.6 to 2.2 g per kg with two or more sessions a week (ISSN 2017; Morton et al. 2018),
-// else 1.2 to 1.6 (US Dietary Guidelines 2025–2030). Fat 30 % of the average day, 25 % for Performance (more carbs); carbs the rest.
+// else 1.2 to 1.6 (US Dietary Guidelines 2025–2030). Fat by the Carbs and fat pick (DT161): 30 % of the average day, 25 % for Performance; carbs the rest.
 export const ADJ: Record<string, number> = { fatloss: -0.2, recomp: -0.1, maintain: 0, gain: 0.1, gainsteady: 0.05, performance: 0.05 };
-const FAT_OF: Record<string, number> = { performance: 0.25 };
+// DT161 (0.3.3): Carbs and fat, the person's pick. Balanced is the rule before DT161 (30 %); More carbs 25 %, the share
+// Performance always had, so Performance starts there; More fat 35 %. All three sit inside the 20 to 35 % fat range (EFSA 2010;
+// AND, DC and ACSM 2016). Very low carb: the person types the carbs, fat takes the rest each day; no number of ours.
+export type Split = "balanced" | "carbs" | "fat" | "low";
+export type CarbsFat = { split: Split; carbs?: number };
+export const SPLITS: { id: Split; name: string; hint: string; share: number | null }[] = [
+  { id: "balanced", name: "Balanced", hint: "Fat 30 % of your energy, carbs the rest. Chef Mealan's default.", share: 0.30 },
+  { id: "carbs", name: "More carbs", hint: "Fat 25 %, more room for carbs: hard training and endurance.", share: 0.25 },
+  { id: "fat", name: "More fat", hint: "Fat 35 %, the top of the range, fewer carbs.", share: 0.35 },
+  { id: "low", name: "Very low carb", hint: "You set your carbs; fat takes the rest. Outside the usual ranges.", share: null },
+];
+export const FAT_RANGE = { lo: 0.20, hi: 0.35 }, CARB_RANGE = { lo: 0.45, hi: 0.60 };
+// the pick, else where the goal starts: Performance on More carbs, every other goal Balanced
+export const splitOf = (p: Pick<Personal, "carbsFat">, bandId: string): Split => p.carbsFat?.split ?? (bandId === "performance" ? "carbs" : "balanced");
+export const splitName = (s: Split) => SPLITS.find((x) => x.id === s)!.name;
+// Very low carb counts only once the carbs are typed; until then the day is Balanced
+export const lowCarbsOf = (p: Pick<Personal, "carbsFat">, bandId: string): number | null => (splitOf(p, bandId) === "low" && (p.carbsFat?.carbs ?? 0) > 0 ? p.carbsFat!.carbs! : null);
+export const fatShareOf = (p: Pick<Personal, "carbsFat">, bandId: string): number => SPLITS.find((x) => x.id === splitOf(p, bandId))!.share ?? FAT_SHARE;
 export function suggestBand(p: Personal, current?: string): Band {
   if (current) { const b = ALL_BANDS.find((x) => x.id === current); if (b) return b; }
   const age = ageOf(p);
@@ -329,11 +349,15 @@ export function calculate(p: Personal, bandId: string, pinned?: Formula | null):
   const weekdayKcal = plan ? plan.map(dayKcalHow) : null;
   const nDays = DAY_TYPES.reduce((a, d) => a + (week[d.id] || 0), 0) || 1;
   const avg = weekdayKcal ? r50(weekdayKcal.reduce((a, x) => a + x.kcal, 0) / 7) : r50(DAY_TYPES.reduce((a, d) => a + kcalOf[d.id] * (week[d.id] || 0), 0) / nDays);
-  const fats = Math.round((avg * (FAT_OF[bandId] ?? FAT_SHARE)) / 9);
-  const carbsOf = (k: number) => Math.max(0, Math.round((k - protein * 4 - fats * 9) / 4));
+  // DT161: fat by the person's pick (Balanced 30 %, More carbs 25 %, More fat 35 %), carbs the rest; Very low carb: the typed
+  // carbs every day, fat the rest of each day
+  const lowC = lowCarbsOf(p, bandId);
+  const fats = lowC !== null ? Math.max(0, Math.round((avg - protein * 4 - lowC * 4) / 9)) : Math.round((avg * fatShareOf(p, bandId)) / 9);
+  const carbsOf = (k: number) => (lowC !== null ? lowC : Math.max(0, Math.round((k - protein * 4 - fats * 9) / 4)));
+  const fatsOf = (k: number) => (lowC !== null ? Math.max(0, Math.round((k - protein * 4 - lowC * 4) / 9)) : fats);
   const days = {} as Record<DayType, DayNumbers>;
-  for (const d of DAY_TYPES) days[d.id] = { kcal: kcalOf[d.id], protein, fats, carbs: carbsOf(kcalOf[d.id]), how: how[d.id] };
-  const numbersOf = (d: PlanDay): DayNumbers => { const x = dayKcalHow(d); return { kcal: x.kcal, protein, fats, carbs: carbsOf(x.kcal), how: x.how }; };
+  for (const d of DAY_TYPES) days[d.id] = { kcal: kcalOf[d.id], protein, fats: fatsOf(kcalOf[d.id]), carbs: carbsOf(kcalOf[d.id]), how: how[d.id] };
+  const numbersOf = (d: PlanDay): DayNumbers => { const x = dayKcalHow(d); return { kcal: x.kcal, protein, fats: fatsOf(x.kcal), carbs: carbsOf(x.kcal), how: x.how }; };
   const weekdays = plan ? plan.map((d, i) => ({ name: WEEKDAY_NAMES[i], day: d, ...numbersOf(d) })) : null;
   const method = `${useData ? `From your data, ${p.measuredUse!.kcal.toLocaleString("en")} kcal a day to stay the same, with the days shaped by ` : ""}${minor ? "Schofield (10 to 18 years)" : f === "katch" ? "Katch–McArdle" : f === "schofield" ? `Schofield (${schofieldBand(age)})` : "Mifflin–St Jeor"}, ${life.name} ×${life.factor}, activity per day from the Compendium of Physical Activities${pct ? `, ${pct > 0 ? "+" : ""}${pct} %` : ""}`;
   const math = `Average over your week: ${avg.toLocaleString("en")} kcal. Protein ${lo}–${hi} g per kg${trains ? ", because you train" : ""} × ${Math.round(ref)} kg = ${proteinMin}–${proteinMax} g, target ${protein} g.`;
@@ -353,7 +377,7 @@ export function ownDayNumbers(p: Personal, bandId: string, pinned?: Formula | nu
   const kcalOf = (d: DayType) => own[d]?.kcal && own[d]!.kcal! > 0 ? own[d]!.kcal! : c ? c.days[d].kcal : Math.round(meanK);
   const nDays = DAY_TYPES.reduce((a, d) => a + (week[d.id] || 0), 0) || 1;
   const avgK = r50(DAY_TYPES.reduce((a, d) => a + kcalOf(d.id) * (week[d.id] || 0), 0) / nDays);
-  const fatsAll = Math.round((avgK * (FAT_OF[bandId] ?? FAT_SHARE)) / 9);
+  const fatsAll = Math.round((avgK * fatShareOf(p, bandId)) / 9);
   const days = {} as Record<DayType, DayNumbers & { source: "you" | "calculated" | "average" }>;
   for (const d of DAY_TYPES) {
     const o = own[d.id] ?? {};

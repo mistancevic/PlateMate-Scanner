@@ -35,7 +35,7 @@ const SHOTS = process.env.SHOTS;
   const goals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).goals);
   const dayFat = goals.fats ?? Math.round(goals.calories * 0.3 / 9), dayCarb = goals.carbs ?? Math.max(0, Math.round((goals.calories - goals.protein * 4 - dayFat * 9) / 4)), mealCarb = Math.round(dayCarb / 3);
   const mealLine = await text(page.locator(".ex-meal"));
-  ok(mealLine === `Your lunch: about ${mealCarb} g of carbs, from your ${dayCarb} g a day.`, "DT155: the lunch's share of the day's carbs: " + mealLine);
+  ok(mealLine === `Your lunch: about ${mealCarb} g of carbs, from your ${dayCarb} g a day. for you`, "DT155, DT160 (for you): the lunch's share of the day's carbs: " + mealLine);
   const names = await page.locator(".ex-card .ex-title > b").allTextContents();
   ok(names.length === 8 && names[0] === "Lentils, boiled" && names[7] === "Potatoes, boiled", "DT155: lowest GI first, lentils to potatoes: " + names.join(", "));
   const len = page.getByRole("region", { name: "Lentils, boiled", exact: true });

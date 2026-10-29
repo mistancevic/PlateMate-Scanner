@@ -45,8 +45,8 @@ const SHOTS = process.env.SHOTS;
   const meals = await page.locator(".ex-chips[aria-label=\"Which meal\"]").locator("button").allTextContents();
   ok(meals.join() === "Breakfast,Lunch,Dinner" && await text(page.locator(".ex-chips[aria-label=\"Which meal\"]").locator(".choice.on")) === "Lunch", "DT151: the person's meals, the next one picked: " + meals.join());
   const mealLine = await text(page.locator(".ex-meal"));
-  const m = mealLine.match(/^Your lunch: about (\d+) g of protein, from your (\d+) g a day\.$/);
-  ok(m && Number(m[1]) === Math.round(Number(m[2]) / 3), "DT151: the lunch's protein is a third of the day: " + mealLine);
+  const m = mealLine.match(/^Your lunch: about (\d+) g of protein, from your (\d+) g a day\. for you$/);
+  ok(m && Number(m[1]) === Math.round(Number(m[2]) / 3), "DT151, DT160 (for you): the lunch's protein is a third of the day: " + mealLine);
   const mealP = Number(m?.[1] ?? 40);
   // the cards, by PD
   const names = await page.locator(".ex-card .ex-title > b").allTextContents();

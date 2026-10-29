@@ -228,6 +228,8 @@ export type Lifestyle = {
   school?: SchoolHours; commute?: Commute; peWeek?: "1" | "2" | "3" | "none";
   bed?: "early" | "mid" | "late" | "varies"; wake?: "early" | "mid" | "late" | "varies";
   where?: string[]; meals?: number; window?: { from: string; to: string } | null; diet?: string; alcohol?: string;
+  // DT161: with diet Other, the way of eating in the person's words (at most 120 characters)
+  dietOther?: string;
   // the slots' times when changed by hand (0.2.1), by slot id: breakfast, lunch, snack, snack2, dinner
   slotTimes?: Record<string, string>;
 };
@@ -285,7 +287,14 @@ export const SCHOOL_HOURS: { id: SchoolHours; name: string; hint: string }[] = [
 ];
 export const COMMUTES: { id: Commute; name: string }[] = [{ id: "walk", name: "Walk" }, { id: "bike", name: "Bike" }, { id: "bus", name: "Bus or train" }, { id: "car", name: "Car" }];
 export const PE_WEEK: { id: "1" | "2" | "3" | "none"; name: string }[] = [{ id: "1", name: "Once a week" }, { id: "2", name: "Twice a week" }, { id: "3", name: "Three times or more" }, { id: "none", name: "None" }];
-export const DIETS = ["Everything", "Vegetarian", "Vegan", "Pescatarian", "No pork"];
+// DT161 (0.3.3, board Stories113): Paleo, Meat only and Other, a way of eating in the person's own words. Each fixed diet means
+// the same thing every time (DIET_MEANS); Chef Mealan reads it with every suggestion, and the kitchens' dishes follow it.
+export const DIETS = ["Everything", "Vegetarian", "Vegan", "Pescatarian", "No pork", "Paleo", "Meat only", "Other"];
+export const DIET_MEANS: Record<string, string> = {
+  Vegetarian: "No meat, poultry, fish or seafood.", Vegan: "No food from animals: no meat, fish, eggs, dairy or honey.",
+  Pescatarian: "Fish and seafood, no other meat.", "No pork": "No pork, ham, bacon or pork sausage.",
+  Paleo: "No grains, legumes or dairy.", "Meat only": "Meat, fish and eggs.",
+};
 export const ALCOHOL = ["None", "Occasionally", "On weekends", "A few times a week", "Most days"];
 // Alcohol is asked only from 18, in every country; the age comes from the profile.
 export const ALCOHOL_AGE = 18;

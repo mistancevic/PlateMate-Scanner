@@ -106,7 +106,7 @@ export const CLAIMS_HEALTH_SOURCE = "Regulation (EU) No 432/2012, Annex.";
 
 export const MEMBER_PAGES: MemberPage[] = [
   { id: "d", name: "Vitamin D", unit: "µg", label: 5,
-    efsa: { men: 15, women: 15, kind: "adequate intake, adults", src: "EFSA, adequate intake, adults" },
+    efsa: { men: 15, women: 15, kind: "adequate intake, adults", src: "EFSA, adequate intake for adults" },
     ul: { v: 100, note: "EFSA's upper limit for adults, from food and supplements together" },
     is: "Fat-soluble: the body stores it, and it needs some fat in the meal to be taken up. Two forms: D3 (cholecalciferol) from animal foods and from your skin in sunlight; D2 (ergocalciferol) from mushrooms and yeast. In a review of trials, D3 raised blood levels more than D2 when taken in large single doses, but not with a daily intake (Tripkovic 2012).",
     does: ["contributes to normal absorption/utilisation of calcium and phosphorus", "contributes to normal blood calcium levels", "contributes to the maintenance of normal bones", "contributes to the maintenance of normal muscle function", "contributes to the maintenance of normal teeth", "contributes to the normal function of the immune system", "has a role in the process of cell division"],
@@ -128,7 +128,7 @@ export const MEMBER_PAGES: MemberPage[] = [
     sources: "EU claims: Regulation (EU) No 432/2012. EFSA: dietary reference values for vitamin D (2016), upper limit (2023). D3 and D2: Tripkovic 2012, Am J Clin Nutr. Vitamin K: Kuang 2020, Food Funct; Witham 2020, J Am Soc Nephrol. Foods: USDA FoodData Central." },
   { id: "c", name: "Vitamin C", unit: "mg", label: 80,
     efsa: { men: 110, women: 95, kind: "population reference intake", src: "EFSA, population reference intake" },
-    ul: null, ulNone: "EFSA: not enough data to derive one",
+    ul: null, ulNone: "EFSA found not enough data to derive one",
     is: "Water-soluble: the body doesn't store much of it, so it needs to come often. Heat and long storage destroy part of it, so raw or briefly cooked keeps the most.",
     does: ["increases iron absorption", "contributes to the normal function of the immune system", "contributes to normal collagen formation for the normal function of skin", "contributes to the protection of cells from oxidative stress", "contributes to the reduction of tiredness and fatigue"],
     doesMore: "The same collagen claim for blood vessels, bones, cartilage, gums and teeth. Also energy metabolism, the nervous system, psychological function, the regeneration of vitamin E, and the immune system during and after intense exercise, with 200 mg a day on top of the recommended intake.",
