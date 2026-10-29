@@ -12,10 +12,25 @@ const D = {
   oats:    { kcal: 379, p: 13.2, g: 50,  aa: { his: 0.28, ile: 0.50, leu: 0.98, lys: 0.64, met: 0.21, cys: 0.46, phe: 0.67, tyr: 0.40, thr: 0.38, trp: 0.18, val: 0.69 } },
 };
 const pair = (a) => ({ his: a.his, ile: a.ile, leu: a.leu, lys: a.lys, saa: a.met + a.cys, aaa: a.phe + a.tyr, thr: a.thr, trp: a.trp, val: a.val });
+// v4 (Milan 11:02): against one meal. The meal's protein from the day's target; each amino acid against what that much good
+// protein needs at the WHO 2007 adult pattern, mg per g protein; the meal's protein is your own target, not the WHO minimum. Leucine against 2.5 g a meal, the amount widely cited for muscle repair.
+const PAT = { his: 15, ile: 30, leu: 59, lys: 45, saa: 22, aaa: 38, thr: 23, trp: 6, val: 39 };
+const DIAAS = { whey: 1.09, chicken: 1.10, yogurt: 1.14, salmon: 1.09, soy: 0.90, egg: 1.13, lentils: 0.63, oats: 0.57 };
+module.exports.meal = (mealP) => { const out = {}; for (const [k, f] of Object.entries(D)) { const a = pair(f.aa), por = {}, need = {};
+  for (const n of Object.keys(PAT)) { por[n] = +(a[n] * f.g / 100).toFixed(2); need[n] = +(PAT[n] * mealP / 1000).toFixed(2); }
+  const pct = Object.fromEntries(Object.keys(PAT).map((n) => [n, Math.round(100 * por[n] / need[n])]));
+  const protein = +(f.p * f.g / 100).toFixed(1);
+  // v4c: the nine essential amino acids in the portion, their sum against the ~10 g a meal needs for muscle repair, and per
+  // gram of protein against the WHO need (all eight cover it for an adult; the lowest is named)
+  const nine = ["his", "ile", "leu", "lys", "met", "phe", "thr", "trp", "val"];
+  const eaa = +nine.reduce((t, n) => t + f.aa[n] * f.g / 100, 0).toFixed(1);
+  const perg = Object.fromEntries(Object.keys(PAT).map((n) => [n, +((a[n] * 1000 / f.p) / PAT[n]).toFixed(2)]));
+  const lowest = Object.entries(perg).sort((x, y) => x[1] - y[1])[0];
+  out[k] = { kcal: f.kcal, p: f.p, g: f.g, pd: +(100 * f.p / f.kcal).toFixed(1), protein, closes: Math.round(100 * protein / mealP), mealP, por, need, pct, leu: por.leu, diaas: DIAAS[k], eaa, perg, lowest }; } return out; };
 const out = {};
-module.exports = (kg) => { for (const [k, f] of Object.entries(D)) { const a = pair(f.aa), por = {}, day = {};
+module.exports.day = (kg) => { for (const [k, f] of Object.entries(D)) { const a = pair(f.aa), por = {}, day = {};
   for (const n of Object.keys(NEED)) { por[n] = +(a[n] * f.g / 100).toFixed(2); day[n] = +(NEED[n] * kg / 1000).toFixed(2); }
   const pct = Object.fromEntries(Object.keys(NEED).map((n) => [n, Math.round(100 * por[n] / day[n])]));
   const low = Object.entries(pct).sort((x, y) => x[1] - y[1])[0];
   out[k] = { kcal: f.kcal, p: f.p, g: f.g, pd: +(100 * f.p / f.kcal).toFixed(1), protein: +(f.p * f.g / 100).toFixed(1), por, day, pct, low }; } return out; };
-if (require.main === module) { const r = module.exports(85); for (const [k, v] of Object.entries(r)) console.log(k.padEnd(8), v.g + " g", "prot " + v.protein, "PD " + v.pd, JSON.stringify(v.pct), "low", v.low.join(" ")); console.log("day", JSON.stringify(r.egg.day)); }
+if (require.main === module) { const m = module.exports.meal(60); for (const [k, v] of Object.entries(m)) console.log(k.padEnd(8), v.protein + " g", v.closes + "%", "leu " + v.leu, "eaa " + v.eaa, "lowest " + v.lowest.join(" ")); const r = module.exports.day(85); for (const [k, v] of Object.entries(r)) console.log(k.padEnd(8), v.g + " g", "prot " + v.protein, "PD " + v.pd, JSON.stringify(v.pct), "low", v.low.join(" ")); console.log("day", JSON.stringify(r.egg.day)); }
