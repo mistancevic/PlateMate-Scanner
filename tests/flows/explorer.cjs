@@ -35,11 +35,14 @@ const SHOTS = process.env.SHOTS;
   ok(fi >= 0 && rows[fi + 1] === "ExplorerNot all proteins are equal", "DT151: Explorer, right below Foods: " + rows[fi + 1]);
   await page.getByRole("button", { name: /^Explorer/ }).click(); await page.waitForTimeout(600);
   ok(await text(page.locator(".menu-title")) === "Explorer" && await text(page.locator(".ex-h")) === "Not all proteins are equal", "DT151: the page, Not all proteins are equal");
+  // DT154 (0.2.135): the families at the top, Protein first, Carbs next
+  const fams = (await page.locator(".ex-families button").allTextContents()).join();
+  ok(fams === "Protein,Fats,Carbs, next" && await text(page.locator(".ex-families .choice.on")) === "Protein" && await page.locator(".ex-families button", { hasText: "Carbs" }).isDisabled(), "DT154: Protein, Fats, Carbs next: " + fams);
   // Changed by Milan 12:32 and 12:33: protein is the family, the amino acids its members
   ok(/^Protein is the family\. Its members are the amino acids: leucine, lysine, methionine/.test(await text(page.locator(".ex-intro"))), "DT151: protein the family, the amino acids its members");
   // the meal: the next by the clock, its protein from the day
-  const meals = await page.locator(".ex-chips").first().locator("button").allTextContents();
-  ok(meals.join() === "Breakfast,Lunch,Dinner" && await text(page.locator(".ex-chips").first().locator(".choice.on")) === "Lunch", "DT151: the person's meals, the next one picked: " + meals.join());
+  const meals = await page.locator(".ex-chips[aria-label=\"Which meal\"]").locator("button").allTextContents();
+  ok(meals.join() === "Breakfast,Lunch,Dinner" && await text(page.locator(".ex-chips[aria-label=\"Which meal\"]").locator(".choice.on")) === "Lunch", "DT151: the person's meals, the next one picked: " + meals.join());
   const mealLine = await text(page.locator(".ex-meal"));
   const m = mealLine.match(/^Your lunch: about (\d+) g of protein, from your (\d+) g a day\.$/);
   ok(m && Number(m[1]) === Math.round(Number(m[2]) / 3), "DT151: the lunch's protein is a third of the day: " + mealLine);
@@ -66,12 +69,14 @@ const SHOTS = process.env.SHOTS;
   // lentils: its lowest; salmon: no score yet
   const len = page.locator(".ex-card", { hasText: "Lentils, boiled" });
   ok(await len.locator(".ex-low").count() === 1 && /^Methionine \+ cysteine · its lowest/.test(await text(len.locator(".ex-low"))), "DT151: lentils, its lowest marked");
+  ok(/its lowest, methionine \+ cysteine, falls just short of the need per gram/.test(await text(len.locator(".ex-head > small").nth(3))), "DT154: on the SR row lentils fall just short, and the card says so");
+  ok(/^Source: USDA SR Legacy, FDC 171287, egg, whole, raw\.$/.test(await text(page.locator(".ex-card", { hasText: "Egg" }).locator(".ex-card-src"))), "DT154: the egg from the SR row it names");
   const sal = page.locator(".ex-card", { hasText: "Salmon" });
   ok((await sal.locator(".ex-score-val").allTextContents()).join() === "none yet,none yet" && /No score we could check in a paper yet/.test(await text(sal)), "DT151: salmon says it has no score yet");
   ok((await page.locator(".ex-card", { hasText: "Chicken breast" }).locator(".ex-score-val").allTextContents()).join() === "none yet,none yet", "DT151: chicken too, until a paper we can read");
   if (SHOTS) { await whey.screenshot({ path: `${SHOTS}/ex-whey.png` }); await len.screenshot({ path: `${SHOTS}/ex-lentils.png` }); }
   // another meal, another sort
-  await page.locator(".ex-chips").first().getByRole("radio", { name: "Breakfast" }).click(); await page.waitForTimeout(200);
+  await page.locator(".ex-chips[aria-label=\"Which meal\"]").getByRole("radio", { name: "Breakfast" }).click(); await page.waitForTimeout(200);
   ok(/^Your breakfast: about \d+ g of protein/.test(await text(page.locator(".ex-meal"))) && /^Protein for your breakfast$/i.test(await text(whey.locator(".ex-head > b").nth(1))), "DT151: Breakfast changes the meal on every card");
   await page.getByRole("radio", { name: "Most of the meal" }).click(); await page.waitForTimeout(200);
   const byMeal = await page.locator(".ex-card .ex-title > b").allTextContents();
