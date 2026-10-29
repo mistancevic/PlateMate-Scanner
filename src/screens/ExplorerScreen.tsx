@@ -1,12 +1,14 @@
 // DT151 (0.2.133, board Stories103 version 11; Coach Milan 29 October 09:41 to 12:04): Explorer, Not all proteins are equal.
 // DT154 (0.2.135, board Stories106; Milan 14:47 to 15:04): Fats, the same template; family chips at the top.
 // DT155 (0.2.136, board Stories107; Milan 15:30 and 15:41): Carbs, the same template.
+// DT156 (0.3.0, board Stories108; Milan 16:16 to 16:27): a seventh section on every card, What a label could say, by EU rules.
 // Every card tells the same story in six sections: a heading, the goal of the section and what this portion does against
 // it, then the details; every measure in one pattern, the name, the bar, the grams. The numbers and their sources: src/explorer.ts.
 import { useMemo, useState } from "react";
 import type { AppApi } from "./api";
 import { EXPLORER_FOODS, NINE, EAA_MEAL, LEUCINE_MEAL, SCALE_G, cardOf, type ExplorerCard } from "../explorer";
 import { FAT_FOODS, FAT_MEMBERS, FAT_SCALE_G, EPA_DHA_DAY, SAT_SHARE, fatCardOf, type FatCard } from "../explorerFats";
+import { proteinClaims, fatClaims, carbClaims, CLAIMS_SOURCE, type Claim } from "../euClaims";
 import { CARB_FOODS, CARB_MEMBERS, CARB_SCALE_G, FIBRE_DAY, GI_LOW, GI_HIGH, carbCardOf, type CarbCard } from "../explorerCarbs";
 import { lifestyleOf } from "../personal";
 import { slotsOf } from "../slots";
@@ -38,6 +40,22 @@ function Pair({ name, value }: { name: string; value: string }) {
   return <div className="ex-row ex-pair"><small className="ex-name">{name}</small><small className="ex-val">{value}</small></div>;
 }
 const g = (v: number) => v.toFixed(2);
+// DT156: what a pack of this food could claim, by EU rules: the claims it meets, then each with Yes or No, the rule and its number
+function Claims({ claims }: { claims: Claim[] }) {
+  const yes = claims.filter((c) => c.ok).map((c) => c.claim);
+  return (
+    <>
+      <Head title="What a label could say" goal={`By EU rules, a food may only claim these when it meets them per 100 g. ${yes.length ? `This one could say: ${yes.join(", ")}.` : "This one could claim none of them."}`} />
+      {claims.map((c) => (
+        <div key={c.claim} className={`ex-claim${c.ok ? " ex-claim-ok" : ""}`}>
+          <div><b>{c.claim}</b><b className="ex-claim-yes">{c.ok ? "✓ Yes" : "No"}</b></div>
+          <small>Needs {c.rule}. This food: {c.is}.</small>
+        </div>
+      ))}
+      <small className="ex-src ex-claim-src">{CLAIMS_SOURCE}</small>
+    </>
+  );
+}
 const NEED_AT = 1.5; // the bars of a need run to 150 %, the line sits at 100 %
 
 function Card({ c, meal, mealP, target }: { c: ExplorerCard; meal: string; mealP: number; target: number | null }) {
@@ -60,6 +78,7 @@ function Card({ c, meal, mealP, target }: { c: ExplorerCard; meal: string; mealP
       {([["PDCAAS", f.pdcaas, "The older score, on many labels. It stops at 1.00."], ["DIAAS", f.diaas, "The newer score, digestion counted. As published."]] as const).map(([n, s, what]) => (
         <div key={n} className="ex-score"><b className="ex-score-name">{n}</b><b className="ex-score-val">{s ? s.value.toFixed(2) : "none yet"}</b><small>{what}<br /><span className="ex-src">{s ? s.src : "No score we could check in a paper yet."}</span></small></div>
       ))}
+      <Claims claims={proteinClaims(f)} />
       <Head title="How to use it" goal="When and how this food serves you best." />
       <p className="ex-best"><b>Best use:</b> {f.best}</p>
       <p className="ex-line"><b>Completes it:</b> {f.pair}</p>
@@ -146,6 +165,7 @@ function FatCardView({ c, meal, mealFat, target }: { c: FatCard; meal: string; m
       <Head title="Quality" goal="Two ratios people use to judge a fat, calculated from the food table. Unsaturated to saturated: the higher, the better. Omega-6 to omega-3: the lower, the more omega-3 it brings." />
       <div className="ex-score"><b className="ex-ratio-name">Unsaturated : saturated</b><b className="ex-score-val">{c.unsatToSat} : 1</b></div>
       <div className="ex-score"><b className="ex-ratio-name">Omega-6 : omega-3</b><b className="ex-score-val">{c.omega6To3 === null ? "almost no omega-3" : `${c.omega6To3} : 1`}</b></div>
+      <Claims claims={fatClaims(f)} />
       <Head title="How to use it" goal="When and how this food serves you best." />
       <p className="ex-best"><b>Best use:</b> {f.best}</p>
       <p className="ex-line"><b>Pairs with:</b> {f.pair}</p>
@@ -195,6 +215,7 @@ function CarbCardView({ c, meal, mealCarb, target }: { c: CarbCard; meal: string
       <Head title="Quality" goal={`How fast the carbs reach your blood. GI: ${GI_LOW} or less is low, ${GI_HIGH} or more is high. GL counts the portion: GI times its carbs without fibre, divided by 100.`} />
       <div className="ex-score"><b className="ex-score-name">GI</b><b className="ex-score-val">{f.gi}, {c.band}</b><small>Atkinson 2008, Table 1: {f.giRow}</small></div>
       <div className="ex-score"><b className="ex-score-name">GL</b><b className="ex-score-val">{c.gl}</b><small>For this portion, calculated by the same paper's method</small></div>
+      <Claims claims={carbClaims(f)} />
       <Head title="How to use it" goal="When and how this food serves you best." />
       <p className="ex-best"><b>Best use:</b> {f.best}</p>
       <p className="ex-line"><b>Pairs with:</b> {f.pair}</p>

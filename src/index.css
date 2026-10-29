@@ -2364,3 +2364,11 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .ex-ratio-name { flex: 1; }
 .explorer .ex-families { margin-bottom: 10px; }
 .explorer .choice:disabled { opacity: .5; }
+/* DT156 (0.3.0): what a label could say, by EU rules: one claim a row, Yes or No, the rule under it */
+.ex-claim { padding: 6px 0; }
+.ex-claim + .ex-claim { border-top: 1px solid var(--line); }
+.ex-claim > div { display: flex; justify-content: space-between; gap: 8px; }
+.ex-claim small { display: block; line-height: 1.35; }
+.ex-claim-yes { color: var(--muted); white-space: nowrap; }
+.ex-claim-ok .ex-claim-yes { color: var(--top); }
+.ex-claim-src { display: block; margin-top: 4px; }
