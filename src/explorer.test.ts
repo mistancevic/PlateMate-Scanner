@@ -9,13 +9,14 @@ test("DT151: one portion against one meal: protein, muscle protein synthesis, th
   assert.deepEqual([whey.protein, whey.closes, whey.leucine, whey.eaa, whey.pd], [27, 68, 3.3, 14.3, 24.3]);
   const ch = cardOf(F("chicken"), 40);
   assert.deepEqual([ch.protein, ch.closes, ch.leucine, ch.eaa], [33.5, 84, 2.8, 14.7]);
-  assert.equal(cardOf(F("egg"), 40).closes, 31);
+  assert.equal(cardOf(F("egg"), 40).closes, 32);
   assert.equal(ch.family.leu, 2.76);
 });
 
-test("DT151: for an adult every food covers the nine per gram; its lowest is named only when it is close", () => {
-  for (const f of EXPLORER_FOODS) assert.ok(Object.values(cardOf(f, 40).perGram).every((v) => v >= 1), f.id);
-  assert.deepEqual(cardOf(F("lentils"), 40).lowest, { id: "saa", name: "Methionine + cysteine", cover: 1.01 });
+test("DT151: for an adult every food but lentils covers the nine per gram; its lowest is named only when it is close", () => {
+  for (const f of EXPLORER_FOODS.filter((x) => x.id !== "lentils")) assert.ok(Object.values(cardOf(f, 40).perGram).every((v) => v >= 1), f.id);
+  // DT154 (15:04): on the SR row lentils fall just short on methionine + cysteine
+  assert.deepEqual(cardOf(F("lentils"), 40).lowest, { id: "saa", name: "Methionine + cysteine", cover: 0.99 });
   assert.equal(cardOf(F("oats"), 40).lowest?.id, "lys");
   assert.equal(cardOf(F("soy"), 40).lowest, null);
   assert.equal(cardOf(F("whey"), 40).lowest, null);

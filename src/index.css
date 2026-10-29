@@ -2337,7 +2337,7 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .ex-head > small { display: block; color: var(--muted); margin-top: 2px; line-height: 1.35; }
 .ex-row { display: flex; align-items: center; gap: 8px; margin: 5px 0; }
 .ex-row .ex-name { width: 124px; flex-shrink: 0; line-height: 1.15; }
-.ex-row .ex-val { width: 84px; flex-shrink: 0; text-align: right; font-weight: 900; color: var(--ink); white-space: nowrap; }
+.ex-row .ex-val { min-width: 84px; flex-shrink: 0; text-align: right; font-weight: 900; color: var(--ink); white-space: nowrap; }
 .ex-pair .ex-val { width: auto; flex: 1; }
 .ex-bar { position: relative; flex: 1; height: 8px; border-radius: 4px; background: rgba(var(--ink-rgb), .07); }
 .ex-bar > i { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 4px; background: var(--brand); }
@@ -2358,3 +2358,9 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .ex-book img { width: 72px; border-radius: 6px; box-shadow: var(--shadow-float); }
 .ex-book b { display: block; } .ex-book small { display: block; margin: 4px 0 8px; color: var(--muted); }
 .explorer .ex-sources { color: var(--muted); font-size: var(--fs-small); line-height: 1.45; }
+/* DT154 (0.2.135): Explorer Fats: a limit gone over is red; a member of a member is indented */
+.ex-over .ex-bar > i:first-child { background: var(--low); } .ex-over .ex-val { color: var(--low-text); }
+.ex-under .ex-name { padding-left: 12px; }
+.ex-ratio-name { flex: 1; }
+.explorer .ex-families { margin-bottom: 10px; }
+.explorer .choice:disabled { opacity: .5; }
