@@ -6,8 +6,8 @@ import { MICRO_FOODS, MICRO_MEMBERS, MEMBER_PAGES, NRV, microCardOf, microClaims
 const card = (id: string) => microCardOf(MICRO_FOODS.find((f) => f.id === id)!);
 const page = (id: string) => MEMBER_PAGES.find((m) => m.id === id)!;
 
-test("twelve members, each with a reference intake from Annex XIII", () => {
-  assert.equal(MICRO_MEMBERS.length, 12);
+test("eighteen members (DT163), each with a reference intake from Annex XIII", () => {
+  assert.equal(MICRO_MEMBERS.length, 18);
   for (const m of MICRO_MEMBERS) assert.ok(NRV[m.id] > 0, m.id);
   assert.equal(NRV.d, 5); assert.equal(NRV.c, 80); assert.equal(NRV.fe, 14);
 });
@@ -72,4 +72,15 @@ test("DT162: A, E and K pages with both names, their values and upper limits", (
     [["retinol; beta-carotene from plants", 750, 650, 3000], ["tocopherol", 13, 11, 300], ["K1 phylloquinone, K2 menaquinone", 70, 70, null]]);
   assert.equal(page("a").does.length, 6); assert.equal(page("e").does.length, 1); assert.equal(page("k").does.length, 2);
   assert.ok(MICRO_MEMBERS.every((m) => m.group === "min" || m.also), "every vitamin has its second name");
+});
+
+test("DT163: B1 and B3 follow today's energy, per MJ; without a goal, the label's reference", () => {
+  assert.deepEqual(memberDay(page("b1"), "male", 2600), { v: 1.1, who: "energy" });
+  assert.deepEqual(memberDay(page("b3"), "female", 2600), { v: 17.4, who: "energy" });
+  assert.deepEqual(memberDay(page("b3"), null, null), { v: 16, who: "label" });
+  assert.equal(memberDay(page("b6"), "female").v, 1.6);
+  assert.equal(page("b7").foods.length, 0); assert.ok(page("b7").gap);
+  assert.equal(page("fol").ulFood, false);
+  // B3 counted as niacin equivalents: chicken 13.7 mg niacin + 360 mg tryptophan / 60
+  assert.equal(page("b3").foods.find((f) => f.name.startsWith("Chicken"))!.per100, 19.7);
 });
