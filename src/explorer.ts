@@ -1,6 +1,6 @@
 // DT151 (0.2.133, canvas Page 2, board Stories103 version 11; Coach Milan 29 October 09:41 to 12:04): Explorer, Not all proteins
-// are equal. The MVP for the pitch to new beta testers, a link in the Menu below Foods. Protein is the surname, its first names
-// are the amino acids; each food brings the family in its own mix. Each food is one normal portion against one meal: how much
+// are equal. The MVP for the pitch to new beta testers, a link in the Menu below Foods. Protein is the family, the amino acids
+// its members (Milan 12:32 and 12:33); each food brings them in its own mix. Each food is one normal portion against one meal: how much
 // of the meal's protein it closes, what it brings for muscle protein synthesis, the nine in grams, two quality scores, how to
 // use it, and where every number comes from.
 //
