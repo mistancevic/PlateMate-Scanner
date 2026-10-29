@@ -8,7 +8,7 @@ import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDow
 import { photoAdvice, ideaAdvice, aboutKcal, kcalRange, mealsOn } from "../mealPhoto";
 import { PhotoAsk } from "../components/PhotoAsk";
 import { ConfirmButton } from "../components/Confirm";
-import { fitsPlate, isIngredient, swapKind, sameFoodName, type Mix } from "../mixtip";
+import { fitsPlate, isIngredient, swapKind, sameFoodName, suggestParts, bindsADish, type Mix } from "../mixtip";
 import { lettersOf } from "../letters";
 import { Letters, NumbersTable, type PlanNumbers } from "../components/Letters";
 import { ClearField } from "../components/ClearField";
@@ -57,7 +57,7 @@ import { dayRecord } from "../record";
 import { dayLog } from "../today";
 import { ymd } from "../plan";
 import { blockedByAllergy } from "../safety";
-import { minPortionOf, portionOf as portionRange, portionLine, startGrams, mealScale } from "../foodjob";
+import { minPortionOf, portionOf as portionRange, portionLine, startGrams, mealScale, fitPart, factorWords } from "../foodjob";
 import { tasteForChef } from "../kitchens";
 import { CravingSearch } from "../components/CravingSearch";
 import { resizeImageBase64 } from "../utils/image";
@@ -131,7 +131,9 @@ export function JourneyScreen(p: AppApi) {
   // title0: the name the plate had before Chef Mealan's dinner went on it (DT90: a name you typed stays)
   const [madeBy, setMadeBy] = useState<{ kitchen: string; base: string; from: Ingredient[]; tried: string[]; title0: string } | null>(null);
   // DT89 (0.2.87, board Stories58): the steps for a plate you cook that is no recipe yet, drafted on How to make it, kept at Save
-  const [plateSteps, setPlateSteps] = useState<{ steps: string[]; sig: string } | null>(null);
+  // DT150 (0.2.131): foods, the foods the steps were written for (ids), and its, the plate then: a change of amounts keeps the
+  // steps (they never say an amount, C42); a change of foods makes them out of date
+  const [plateSteps, setPlateSteps] = useState<{ steps: string[]; sig: string; foods?: string; its?: Ingredient[] } | null>(null);
   const [plateDraft, setPlateDraft] = useState<string>("");
   const [ownSteps, setOwnSteps] = useState<string | null>(null);
   // When Mealan produces options, the first one becomes the recipe on screen.
@@ -163,9 +165,10 @@ export function JourneyScreen(p: AppApi) {
   }, [options]);
   const [cap, setCap] = useState<number | null>(300);
   // DT93: what Fit did, under the food it moved, and Undo
-  const [fit, setFit] = useState<{ id: string | null; note: string; before?: number } | null>(null);
+  // DT150 (0.2.131): group, the grams before Fit sized a part as a whole, for Undo
+  const [fit, setFit] = useState<{ id: string | null; note: string; before?: number; group?: Record<string, number> } | null>(null);
   // DT93: the culinary gate: Chef Mealan's read of the plate, once per set of foods
-  const [dish, setDish] = useState<{ sig: string; status: "working" | "done" | "off"; makesIt?: boolean; why?: string; around?: string; betterAs?: string } | null>(null);
+  const [dish, setDish] = useState<{ sig: string; status: "working" | "done" | "off"; makesIt?: boolean; why?: string; around?: string; betterAs?: string; holds?: string } | null>(null);
   const [pick, setPick] = useState(0);
   const [note, setNote] = useState("");
   const [good, setGood] = useState<"daam" | "good" | "no" | null>(null);
@@ -400,6 +403,19 @@ export function JourneyScreen(p: AppApi) {
       if (!partner) { setError("Add a food to your library first, so Chef Mealan has partners to choose from."); return; }
       ready = [{ ...ready[0], locked: true }, { id: uid(), food: { ...partner, readyToEat: true }, grams: 100, locked: false }];
     }
+    // C52 (DT150, 0.2.131, board Stories102): a plate in parts is a dish: Fit sizes a part as a whole and keeps its proportions
+    if (pdRef !== null && partsOf(ready).length >= 2) {
+      const r = fitPart(ready, pdRef, mealX);
+      if (r) {
+        const before = Object.fromEntries(ready.filter((i) => i.part === r.part && !i.locked).map((i) => [i.id, i.grams]));
+        const names = ready.filter((i) => i.part === r.part && !i.locked).map((i) => cookName(i.food.name).short.split(/[,(]/)[0].trim().toLowerCase());
+        const others = partsOf(ready).filter((x) => x !== r.part).map((x) => x.toLowerCase());
+        const and = (xs: string[]) => (xs.length <= 1 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs[xs.length - 1]}`);
+        setState((s) => ({ ...s, items: r.items, portion: null }));
+        setFit({ id: null, group: before, note: r.factor === 1 ? `Fit kept the ${r.part.toLowerCase()} as it is: the plate is where it can be with these parts.` : `Fit sized the ${r.part.toLowerCase()} as a whole, ${factorWords(r.factor)}: ${and(names)} keep their proportions. The ${and(others)} ${others.length === 1 ? "stays" : "stay"}.${!r.reached ? " That is as far as its portions go." : r.whole ? ` Rounded to ${r.whole}.` : ""}` });
+        return;
+      }
+    }
     // DT93: Fit moves the densest free food, within its portion, even one you typed: Fit is the ask to move it
     const mover = moverOf(ready);
     if (mover) setTouched((tk) => { const n = new Set(tk); n.delete(mover.id); return n; });
@@ -507,6 +523,8 @@ export function JourneyScreen(p: AppApi) {
   // food sits right under the last food and opens the search there: your foods first, then the basic foods sold where you shop
   const [addHere, setAddHere] = useState(false);
   const [otherDay, setOtherDay] = useState<string | null>(null);
+  // DT150: No, separate foods, for these foods
+  const [dishNo, setDishNo] = useState("");
   const [pickDate, setPickDate] = useState(false);
   const [q2, setQ2] = useState("");
   useEffect(() => setSwapMore(false), [swapId]);
@@ -647,7 +665,9 @@ export function JourneyScreen(p: AppApi) {
   const plateTasteOf = offerTaste(p.plateTaste, recipeTaste);
   // DT148: the swap list, after the plate's taste is known (it holds back what the dish rejects, C22)
   const swapPool = [...mineHere, ...(swapId && swapMf.id === swapId ? swapMf.foods : []), ...swapBasics].filter((f) => goesInDish(plateTasteOf, f.name));
-  const swapCandidates = !swapId || pdRef === null ? [] : rankSwaps(items, swapId, swapPool, pdRef, cap ?? null, undefined, fitsPlate, swapKind, sameFoodName);
+  // C52: in a dish an egg, flour or butter is cooked into it: who goes with whom reads the other foods
+  const swapInDish = items.some((i) => bindsADish(i.food)) && (partsOf(items).length >= 2 || items.length >= 3);
+  const swapCandidates = !swapId || pdRef === null ? [] : rankSwaps(items, swapId, swapPool, pdRef, cap ?? null, undefined, (f, plate) => fitsPlate(f, swapInDish ? plate.filter((x) => !bindsADish(x)) : plate), swapKind, sameFoodName);
   const swapGone = swapId ? items.find((i) => i.id === swapId) : null;
   // a plate already at its target without the food: any swap keeps it there, at the same amount
   const restAbove = (() => { if (!swapGone || pdRef === null) return false; const t = aggregate(items.filter((i) => i.id !== swapGone.id)); const d = density(t.protein, t.calories); return d !== null && d >= pdRef; })();
@@ -907,7 +927,8 @@ export function JourneyScreen(p: AppApi) {
   };
   // the button: the quick fit when maths does it, Chef Mealan when it cannot (Milan, 15 October 2026, 22:43)
   function makeAMeal() {
-    if (!chefable || !share) return askMealan();
+    // C52 (DT150): a dish in parts is sized by its parts, by code, before any idea replaces it
+    if (!chefable || !share || partsOf(items).length >= 2) return askMealan();
     const t = aggregate(items), pd0 = density(t.protein, t.calories);
     const mover = moverOf(items);
     let fit: { ok: boolean; kcal: number } | null = null;
@@ -969,15 +990,18 @@ export function JourneyScreen(p: AppApi) {
   }
   // DT93, rule 2: the culinary gate. Chef Mealan reads the plate once it has two foods: do they make the meal it is for?
   // Once per set of foods (the amounts are the app's business); never for a recipe, Chef Mealan's own dinner, or with the AI off.
-  const dishSig = items.filter((i) => !i.optional && !i.fry).map((i) => i.food.id).sort().join("|");
+  // DT150 (0.2.131, rule C52): a dish in parts, cooked together, is read again when its amounts move by 25 g or more: proportions count
+  // only a plate grouped into parts, a dish you said it is: any other plate keeps DT93, one read per set of foods
+  const cookedDish = partsOf(items).length >= 2 && items.some((i) => needsCooking(i.food.name) || bindsADish(i.food));
+  const dishSig = items.filter((i) => !i.optional && !i.fry).map((i) => (cookedDish ? `${i.food.id}:${Math.round(i.grams / 25)}` : i.food.id)).sort().join("|");
   const dishWanted = items.length >= 2 && !state.fromRecipe && !madeBy && !imported && chefable && p.ai.on && !partsMode;
   const [dishTry, setDishTry] = useState(0); // DT104: Try again after a failed read
   useEffect(() => {
     if (!dishWanted || (dish && dish.sig === dishSig && dish.status !== "off")) return;
     let gone = false;
     setDish({ sig: dishSig, status: "working" });
-    fetch("/api/dish", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ foods: items.map((i) => ({ name: i.food.name, grams: i.grams })), meal: mealWord, kitchens: p.personal.kitchens ?? [] }) })
-      .then(async (r) => { const d = await r.json().catch(() => ({})); if (gone) return; if (!r.ok) { setDish({ sig: dishSig, status: "off" }); return; } setDish({ sig: dishSig, status: "done", makesIt: !!d.makesIt, why: String(d.why ?? ""), around: String(d.around ?? ""), betterAs: String(d.betterAs ?? "") }); })
+    fetch("/api/dish", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ foods: items.map((i) => ({ name: i.food.name, grams: i.grams, ...(i.part ? { part: i.part } : {}) })), meal: mealWord, kitchens: p.personal.kitchens ?? [], cooked: cookedDish }) })
+      .then(async (r) => { const d = await r.json().catch(() => ({})); if (gone) return; if (!r.ok) { setDish({ sig: dishSig, status: "off" }); return; } setDish({ sig: dishSig, status: "done", makesIt: !!d.makesIt, why: String(d.why ?? ""), around: String(d.around ?? ""), betterAs: String(d.betterAs ?? ""), holds: String(d.holds ?? "") }); })
       .catch(() => { if (!gone) setDish({ sig: dishSig, status: "off" }); });
     return () => { gone = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1081,24 +1105,28 @@ export function JourneyScreen(p: AppApi) {
   const fitShort = !!fit && fit.id !== null && pd !== null && pdRef !== null && pd < pdRef - 0.05 && !imported;
   function keepAsIs() { setChef(null); if (p.filling && plateWhen === "past") { addPast(); return; } if (p.filling?.mode !== "eat" && p.filling) putInSlot(items); else { setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null);
     // DT94: a plate whose steps are already on the Plate is locked here and goes straight to Make
-    if (cooksPlate(items) && plateSteps && plateSteps.sig === plateSig(items)) { setStep("made"); return; }
+    if (cooksPlate(items) && stepsHold(items)) { setStep("made"); return; }
     setStep("make"); startPlateSteps(); } }
   // DT89 (0.2.87, board Stories58): a plate you cook (Chef Mealan's dinner, or a food that goes in raw or dry) gets steps on How
   // to make it, never the ways to eat a bowl. Chef Mealan drafts them once for these foods and amounts; a changed plate, again.
   const plateSig = (its: Ingredient[]) => its.map((i) => `${i.food.id}:${Math.round(i.grams)}`).join("|");
-  const cooksPlate = (its: Ingredient[]) => its.length > 0 && !state.fromRecipe && partsOf(its).length === 0 && (madeBy !== null || its.some((i) => needsCooking(i.food.name)))
+  const foodsSig = (its: Ingredient[]) => its.map((i) => i.food.id).sort().join("|");
+  // the steps still hold for the plate: the same foods, whatever the amounts
+  const stepsHold = (its: Ingredient[]) => !!plateSteps && (plateSteps.sig === plateSig(its) || (!!plateSteps.foods && plateSteps.foods === foodsSig(its)));
+  // DT150 (0.2.131): a cooked plate grouped into parts keeps its steps on the Plate
+  const cooksPlate = (its: Ingredient[]) => its.length > 0 && !state.fromRecipe && !rec && (madeBy !== null || its.some((i) => needsCooking(i.food.name)) || (partsOf(its).length >= 2 && its.some((i) => bindsADish(i.food))))
     && !state.meals.some((m) => !!state.title && m.title === state.title && (m.steps?.length ?? 0) > 0);
   const plateMealNow = (): Meal => ({ id: "plate", title: state.title && state.title !== "DaaM" ? state.title : autoTitle(items), items, portion: aggregate(items).weight ?? 0, savedAt: new Date().toISOString(), ...(state.cooking?.length ? { cooking: state.cooking } : {}) });
   function startPlateSteps(force = false) {
     if (!cooksPlate(items)) return;
     const sig = plateSig(items);
-    if (!force && plateSteps?.sig === sig) return;
+    if (!force && stepsHold(items)) return;
     setPlateSteps(null); setOwnSteps(null);
     if (!p.ai.on) { setPlateDraft(""); return; }
     setPlateDraft("working");
     draftSteps(plateMealNow(), { library: state.foods.map((f) => f.name), equipment: equipmentOf(p.personal), kitchens: p.personal.kitchens ?? [], tastes: tasteForReq(p.personal.tasteChips, state.preferences) })
       .then((d) => {
-        if (d.ok) { setPlateSteps({ steps: d.steps, sig }); setPlateDraft(""); }
+        if (d.ok) { setPlateSteps({ steps: d.steps, sig, foods: foodsSig(items), its: structuredClone(items) }); setPlateDraft(""); }
         else { const f = d as { why: string; cannot?: boolean }; setPlateDraft(f.cannot ? f.why : `${CHEF_NAME}'s draft didn't pass the checks (${f.why}). Try again, or write your own.`); }
       })
       .catch((e: any) => setPlateDraft(e?.message || `${CHEF_NAME} could not answer. Try again.`));
@@ -1422,7 +1450,24 @@ export function JourneyScreen(p: AppApi) {
           const dishes = items.some((i) => i.dish);
           const grouped = !dishes && !partsMode && plateParts.length > 0;
           const noPart = items.filter((i) => !i.part), noPartOpts = opts.filter((o) => !o.part);
+          // C52 (DT150, 0.2.131, board Stories102): a cooked plate of your own with no parts asks once whether it is one dish, with the
+          // parts suggested; grouped, Fit keeps each part's proportions and the steps go part by part
+          const sugg = !dishes && !partsMode && !imported && !rec && plateParts.length === 0 && items.length >= 3 && plateWhen !== "past" && dishNo !== foodsSig(items) && items.some((i) => needsCooking(i.food.name) || bindsADish(i.food)) ? suggestParts(items.map((i) => i.food)) : [];
+          const nameOf = (id: string) => cookName(items.find((i) => i.food.id === id)?.food.name ?? "").short.split(/[,(]/)[0].trim().toLowerCase();
+          const groupIt = () => setState((st) => ({ ...st, items: st.items.map((i) => { const g = sugg.find((x) => x.ids.includes(i.food.id)); return g ? { ...i, part: g.part } : i; }) }));
           return (<>
+            {sugg.length > 0 && (
+              <div className="one-dish" role="group" aria-label="Is this one dish?">
+                <b>Is this one dish?</b>
+                <small>A food here is cooked, so these foods are made together. Grouped into parts, Fit keeps each part's proportions and the steps go part by part.</small>
+                <small className="one-dish-parts">{sugg.map((g, k) => <span key={g.part}>{k ? " · " : ""}<b>{g.part}:</b> {g.ids.map(nameOf).join(", ")}</span>)}</small>
+                <div className="button-row">
+                  <button type="button" className="pill pill-small pill-primary" onClick={() => { groupIt(); log("parts", { how: "suggested" }); }}>Group it like this</button>
+                  <button type="button" className="pill pill-small" onClick={() => { groupIt(); setPartsMode(true); }}>Change the parts</button>
+                  <button type="button" className="pill pill-small" onClick={() => setDishNo(foodsSig(items))}>No, separate foods</button>
+                </div>
+              </div>
+            )}
             {!dishes && (partsMode
               ? <div className="pt-h pt-mode"><span><b>Parts</b><small>Tap a food's part to move it, or New part. Optional keeps it off the plate until added.</small></span><span className="pt-acts">
                   {naming === null ? <button className="link" onClick={() => setNaming("")}>New part</button> : <input className="pt-new" autoFocus aria-label="Name of the new part" placeholder="Sauce" value={naming} onChange={(e) => setNaming(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = naming.trim().slice(0, 30); if (v) setNewParts((l) => [...l, v.charAt(0).toUpperCase() + v.slice(1)]); setNaming(null); } }} onBlur={() => setNaming(null)} />}
@@ -1481,7 +1526,12 @@ export function JourneyScreen(p: AppApi) {
         {!imported && !p.filling && cooksPlate(items) && (
           <section className="card mk-card plate-steps" aria-label="Steps">
             <b>Steps</b>
-            {plateSteps && plateSteps.sig === plateSig(items) ? (<>
+            {/* DT150 (0.2.131, board Stories102): the foods changed after the steps were written: the steps say so and step back */}
+            {plateSteps && !stepsHold(items) && plateSteps.its ? (<>
+              <small className="steps-stale">The steps were written before you changed the foods: {recipeDiffLine(plateSteps.its, items) || "the foods changed"}.</small>
+              <ol className="rp-steps steps-old">{plateSteps.steps.slice(0, 3).map((x, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), plateSteps.its!).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</div></li>)}</ol>
+              <div className="button-row">{p.ai.on && <button className="pill pill-small pill-primary" onClick={() => startPlateSteps(true)}>Redraft for these foods</button>}<button className="link" onClick={() => setPlateSteps({ ...plateSteps, sig: plateSig(items), foods: foodsSig(items), its: structuredClone(items) })}>Keep them</button></div>
+            </>) : stepsHold(items) && plateSteps ? (<>
               <ol className="rp-steps">{plateSteps.steps.slice(0, 3).map((x, k) => <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), items).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</div></li>)}</ol>
               <div className="button-row">{plateSteps.steps.length > 3 && <button className="link" onClick={() => setStep("make")}>Show all {plateSteps.steps.length}</button>}<button className="link" onClick={() => setStep("make")}>Change the steps</button></div>
             </>) : (<>
@@ -1519,6 +1569,8 @@ export function JourneyScreen(p: AppApi) {
               <div className="button-row"><button className="pill pill-small" onClick={() => setDishTry((n) => n + 1)}>Try again</button></div>
             </>)}
             {dishNow && dishNow.status === "done" && dishNow.makesIt && dishNow.why && !bigPlate && <div className="gate-line-row gate-yes"><b>✓ Culinary</b><small>{dishNow.why}</small></div>}
+            {/* DT150 (rule C52): the proportions of a dish cooked together: what fails and how to fix it */}
+            {dishNow && dishNow.status === "done" && dishNow.holds && <div className="gate-line-row gate-holds"><b>The dish won't hold</b><small>{dishNow.holds}</small></div>}
             {dishNow && dishNow.status === "done" && !dishNow.makesIt && dishKept !== dishSig && !bigPlate && (<>
               <div className="gate-line-row gate-no"><b>✕ Culinary</b><small>{dishNow.why}</small></div>
               <div className="button-row">
@@ -1534,7 +1586,7 @@ export function JourneyScreen(p: AppApi) {
             {/* DT132: the plate's size on the edge, 1.3 to 1.5 portions of its meal */}
             {gateOn && sizeEdge && !bigPlate && share && <div className="gate-line-row gate-edge"><b>~ Size, on the edge</b><small>About {fixed(sizeNow.portions)} {mealWord} portions: {fmt(t.calories, 0)} kcal for a {mealWord} of about {fmt(share.kcal, 0)}, and the line is 1.5.</small><small className="gate-hint">To be clear of it: a little less of one food, or Fit.</small></div>}
             {sweetSpotOf(ingredientsOn.length === 0) && <small className="gate-sweet">DaaM Good spot: a dish, the numbers, and your day, all three.</small>}
-            {fit && !imported && <small className="fit-note">{/^Fit /.test(fit.note) ? <><b>Fit</b> {fit.note.slice(4)}</> : fit.note}{fit.id && fit.before !== undefined && fit.before !== Math.round(items.find((i) => i.id === fit.id)?.grams ?? -1) ? <> <button className="link pt-inline" onClick={() => { updateItem(fit.id!, { grams: fit.before! }); setFit(null); }}>Undo</button></> : null}</small>}
+            {fit && !imported && <small className="fit-note">{/^Fit /.test(fit.note) ? <><b>Fit</b> {fit.note.slice(4)}</> : fit.note}{fit.group && Object.entries(fit.group).some(([id, g]) => Math.round(items.find((i) => i.id === id)?.grams ?? -1) !== Math.round(g)) ? <> <button className="link pt-inline" onClick={() => { const g = fit.group!; setState((s) => ({ ...s, items: s.items.map((i) => (g[i.id] !== undefined ? { ...i, grams: g[i.id] } : i)), portion: null })); setFit(null); }}>Undo</button></> : null}{fit.id && fit.before !== undefined && fit.before !== Math.round(items.find((i) => i.id === fit.id)?.grams ?? -1) ? <> <button className="link pt-inline" onClick={() => { updateItem(fit.id!, { grams: fit.before! }); setFit(null); }}>Undo</button></> : null}</small>}
             {fitShort && !madeBy && (<>
               <small>These foods top out at {pdText(pd)} within their portions{share && (t.calories ?? 0) < share.kcal * 0.6 ? `, and ${fmt(t.calories, 0)} kcal is under half a ${mealWord}` : ""}. {CHEF_NAME} can:</small>
               <div className="button-row">

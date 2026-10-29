@@ -149,3 +149,51 @@ export function startGrams(f: Food, scale = 1): number {
   const mid = (p.min + p.max) / 2;
   return mid < 20 ? Math.round(mid) : Math.round(mid / 5) * 5;
 }
+
+// C52 (DT150, 0.2.131, board Stories102; Coach Milan 29 October 00:19 to 00:24, Go at 08:33): a dish keeps its proportions.
+// On a plate in parts (a base, a filling, a topping), Fit sizes the part with the most protein as a whole: every free food in
+// it by the same factor, so a filling keeps its quark to egg; the other parts stay. The factor stays between half and twice,
+// and no food goes past its portion (C12, C49): then the part is as big as it can be, and the line says so.
+type Item = { id: string; food: Food; grams: number; locked?: boolean; part?: string };
+const KIND_WORD: Record<string, string> = { egg: "whole eggs", banana: "whole bananas", apple: "whole apples" };
+const roundG = (g: number) => (g < 20 ? Math.round(g) : Math.round(g / 5) * 5);
+export function fitPart<T extends Item>(items: T[], target: number, scale = 1): { items: T[]; part: string; factor: number; reached: boolean; whole?: string } | null {
+  const parts = [...new Set(items.map((i) => i.part).filter((x): x is string => !!x))];
+  if (parts.length < 2) return null;
+  const pk = (its: T[]) => ({ p: its.reduce((n, i) => n + ((i.food.protein ?? 0) * i.grams) / 100, 0), k: its.reduce((n, i) => n + ((i.food.calories ?? 0) * i.grams) / 100, 0) });
+  // the part that can lift the plate: its free foods have the most protein per energy
+  const cands = parts.map((part) => { const free = items.filter((i) => i.part === part && !i.locked); const x = pk(free); return { part, free, pd: x.k > 0 ? (100 * x.p) / x.k : -1 }; }).filter((c) => c.free.length > 0);
+  if (!cands.length) return null;
+  const all = pk(items), pd0 = all.k > 0 ? (100 * all.p) / all.k : 0;
+  const up = pd0 < target;
+  // to lift the plate, the densest part grows; above the target, the least dense part grows (more food, the same dish)
+  const c = up ? cands.sort((a, b) => b.pd - a.pd)[0] : cands.sort((a, b) => a.pd - b.pd)[0];
+  const g = pk(c.free), rest = { p: all.p - g.p, k: all.k - g.k };
+  const den = g.p - (target * g.k) / 100;
+  let s = Math.abs(den) < 1e-9 ? 1 : ((target * rest.k) / 100 - rest.p) / den;
+  if (!Number.isFinite(s) || s <= 0) s = up ? 2 : 1;
+  let lo = 0.5, hi = 2;
+  for (const i of c.free) { const r = portionOf(i.food, scale); if (i.grams > 0) { hi = Math.min(hi, Math.max(1, r.max / i.grams)); lo = Math.max(lo, Math.min(1, r.min / i.grams)); } }
+  let f = Math.min(hi, Math.max(lo, s));
+  const capped = Math.abs(f - s) >= 0.01;
+  let whole: string | undefined;
+  // an egg is whole: the part grows by what makes its counted food whole pieces, so the proportions hold to the egg
+  const counted = c.free.find((i) => kindOf(i.food.name));
+  if (counted && counted.grams > 0) {
+    const k = kindOf(counted.food.name)!, one = gramsOfOne((counted as { count?: Parameters<typeof gramsOfOne>[0] }).count ?? { kind: k, size: "M" });
+    let n = Math.max(1, Math.round((counted.grams * f) / one));
+    if ((n * one) / counted.grams > hi + 0.01 && n > 1) n -= 1;
+    const f2 = (n * one) / counted.grams;
+    if (Math.abs(f2 - f) >= 0.01) whole = KIND_WORD[k] ?? "pieces";
+    f = f2;
+  }
+  const next = items.map((i) => (c.free.some((x) => x.id === i.id) ? { ...i, grams: i === counted ? Math.round(i.grams * f) : roundG(i.grams * f) } : i));
+  return { items: next, part: c.part, factor: Math.round(f * 100) / 100, reached: !capped, whole };
+}
+// the factor in words: a third more, half as much again, 20 % less
+export function factorWords(f: number): string {
+  const d = Math.round((f - 1) * 100);
+  if (d === 0) return "as it was";
+  const w: Record<number, string> = { 25: "a quarter more", 33: "a third more", 50: "half as much again", 100: "twice as much", [-25]: "a quarter less", [-33]: "a third less", [-50]: "half as much" };
+  return w[d] ?? (d > 0 ? `${d} % more` : `${-d} % less`);
+}
