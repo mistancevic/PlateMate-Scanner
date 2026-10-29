@@ -67,6 +67,7 @@ const PORT = "3317", U = `http://127.0.0.1:${PORT}`;
     if (put && fit) { const row = put.parentElement; const nb = document.createElement("button"); nb.className = "pill pill-primary pill-wide"; nb.textContent = "Put it in Friday's dinner"; nb.style.cssText = "width:100%;margin:8px 0;" + m; row.before(nb); put.remove(); fit.classList.remove("pill-primary"); fit.style.width = "100%";
       const s = document.createElement("small"); s.className = "muted"; s.style.cssText = "display:block;text-align:center;margin:6px 0"; s.textContent = "Planned, not eaten. On Friday it comes up on Today: tap I ate it then, and rate it if you like."; nb.after(s); }
     for (const n of document.querySelectorAll("p, small")) if (/or make them as they are/.test(n.textContent)) n.textContent = "Planning Friday's dinner. Add your foods, fit them to your target, then put it in the plan.";
+    const ln = document.querySelector(".plan-line span"); if (ln) ln.textContent = "Friday's dinner, 20:00 · Planning";
   }, mark);
   await note(".phase-bar", "New: a day after today is planning. No Make and no Feedback: the bar says Planning Friday's dinner, and the one main button is Put it in Friday's dinner, before Fit and after it. Nothing asks for a rating; that comes on Friday, after you eat it.");
   await shot("r149c");
@@ -77,14 +78,14 @@ const PORT = "3317", U = `http://127.0.0.1:${PORT}`;
     const none = card.querySelector(".past-none"); if (none) none.remove();
     const row = (time, name, body) => `<div class="past-plate" style="flex-wrap:wrap;gap:6px"><span><small>${name}, ${time}</small><b style="display:block">${body}</b></span>`;
     const box = document.createElement("div"); box.style.cssText = "display:flex;flex-direction:column;gap:10px;margin-top:8px;padding:8px;" + mark;
-    box.innerHTML = `<small class="setting-name">Record what you ate</small>
-      <div class="past-plate"><span><small>Breakfast, 07:30</small><b style="display:block">Not recorded</b></span><button class="pill pill-small">Record it</button></div>
-      <div class="past-plate"><span><small>Lunch, 13:45</small><b style="display:block">Not recorded</b></span><button class="pill pill-small">Record it</button></div>
+    box.innerHTML = `<small class="setting-name">What you ate</small>
+      <div class="past-plate"><span><small>Breakfast, 07:30</small><b style="display:block">Nothing added</b></span><button class="pill pill-small">Add what you ate</button></div>
+      <div class="past-plate"><span><small>Lunch, 13:45</small><b style="display:block">Nothing added</b></span><button class="pill pill-small">Add what you ate</button></div>
       <div class="past-plate" style="flex-wrap:wrap"><span><small>Dinner, 20:00 · planned</small><b style="display:block">Skyr bowl</b></span><div class="button-row" style="width:100%;margin-top:6px"><button class="pill pill-small pill-primary">I ate it</button><button class="pill pill-small">I ate something else</button><button class="pill pill-small">I skipped it</button></div></div>
-      <small class="muted">A day before today is a record: what you ate counts at its meal's time. Nothing to make, no rating asked; Rate it waits on the meal if you want it.</small>`;
+      <small class="muted">A day before today is what you ate: it counts at its meal's time. Nothing to make, no rating asked; Rate it waits on the meal if you want it.</small>`;
     card.appendChild(box);
   }, { mark });
-  await note(".plan-past", "New: a day before today is recording. Each meal of the day can be recorded; a planned one is one tap, I ate it, at its time. I ate something else and Record it open the Plate to record.");
+  await note(".plan-past", "New: a day before today is what you ate. Each meal of the day can be added; a planned one is one tap, I ate it, at its time. I ate something else and Add what you ate open the Plate.");
   await shot("r149d");
   // e, new: recording on the Plate
   await toPlan(); await day(/30/);
@@ -93,16 +94,16 @@ const PORT = "3317", U = `http://127.0.0.1:${PORT}`;
   for (const n of ["Chicken breast, cooked", "Rice, cooked"]) { await page.getByLabel("Search all my foods").fill(n.split(",")[0]); await page.waitForTimeout(500); await page.locator(".row-food").filter({ hasText: n }).first().getByRole("button", { name: "Add" }).click(); await page.waitForTimeout(500); }
   await page.getByLabel("Search all my foods").fill(""); await page.waitForTimeout(300);
   await page.evaluate((m) => {
-    const bar = document.querySelector(".phase-bar"); if (bar) { bar.innerHTML = '<span class="on" style="flex:1"><i></i>Recording Wednesday\'s dinner</span>'; bar.style.cssText += ";" + m; }
+    const bar = document.querySelector(".phase-bar"); if (bar) { bar.innerHTML = '<span class="on" style="flex:1"><i></i>Adding Wednesday\'s dinner</span>'; bar.style.cssText += ";" + m; }
     const line = document.querySelector(".plan-line span"); if (line) line.textContent = "Wednesday's dinner, 20:00 · Eaten";
     const keep = [...document.querySelectorAll("button")].find((b) => /^Keep it as it is|^Put it in/.test(b.textContent.trim()));
     const fit = [...document.querySelectorAll("button")].find((b) => /Fit to my target/.test(b.textContent.trim()));
     if (keep) { const row = keep.parentElement; const nb = document.createElement("button"); nb.className = "pill pill-primary pill-wide"; nb.textContent = "Put it in Wednesday's dinner, eaten"; nb.style.cssText = "width:100%;margin:8px 0;" + m; row.before(nb); row.remove();
       const s = document.createElement("small"); s.className = "muted"; s.style.cssText = "display:block;text-align:center;margin:6px 0"; s.textContent = "Counted on Wednesday at 20:00. Nothing to fit, make or rate: it is what you ate."; nb.after(s); }
-    for (const n of document.querySelectorAll("p, small")) if (/or make them as they are/.test(n.textContent)) n.textContent = "Recording Wednesday's dinner. Add what you ate, at the amounts you ate.";
+    for (const n of document.querySelectorAll("p, small")) if (/or make them as they are/.test(n.textContent)) n.textContent = "Adding Wednesday's dinner. Add what you ate, at the amounts you ate.";
     for (const n of document.querySelectorAll("small, p")) if (/Fit moves one food|adds what it needs/.test(n.textContent)) n.remove();
   }, mark);
-  await note(".phase-bar", "New: Record it or I ate something else opens the Plate for that meal. The amounts are what you ate, so there is no Fit; one button records it at the meal's time.");
+  await note(".phase-bar", "New: Add what you ate or I ate something else opens the Plate for that meal. The line says Wednesday's dinner, 20:00 · Eaten. The amounts are what you ate, so there is no Fit; one button puts it in at the meal's time.");
   await shot("r149e");
   // f, new: the Plate on its own: What is it for? Another day
   await page.goto(U + "/"); await page.waitForTimeout(800); await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(900);
@@ -113,7 +114,7 @@ const PORT = "3317", U = `http://127.0.0.1:${PORT}`;
     day.innerHTML = `<p class="label">Which day?</p><div class="moments"><button class="choice">Yesterday</button><button class="choice on">Today</button><button class="choice">Tomorrow</button><button class="choice">Another day ›</button></div><small class="small" style="display:block;margin-top:4px">Today is what you eat now. A day before records what you ate; a day after plans what you will eat.</small>`;
     row.previousElementSibling ? row.previousElementSibling.before(day) : row.before(day);
   }, mark);
-  await note(".plan-line", "New: on the Plate itself, Which day? sits above What is it for?. Today stays the moment. Yesterday or another day before records; tomorrow or later plans.");
+  await note(".plan-line", "New: behind the pencil on the Plate's line, Which day? sits above What is it for?. Today stays the moment. Yesterday or another day before adds what you ate; tomorrow or later plans. The line then says the day: Tomorrow's lunch, 13:45 · Planning.");
   await shot("r149f");
   // g, new: a recipe planned for a later day says Change it on the Plate; Make it lives on its day
   await toPlan(); await day(/30/);

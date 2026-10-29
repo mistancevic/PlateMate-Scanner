@@ -87,8 +87,9 @@ B = Board(); y = 30
 cy = storyCard(B, y, "DT149", "The past records, the future plans, the moment is what you eat", [
   ("Tester 3, UX4 (Coach Milan, 29 October 00:10)", "Planning a meal for later, on paper as it were, still went through the steps that prepare it, and a rating. Planning should be planning."),
   ("Coach Milan, 00:14", "The past is recording what I ate. The future is planning what I will eat. In the moment is what I eat."),
+  ("Coach Milan, 00:56 to 00:58", "Record it is not the best wording: Add what you ate. Which day? sits behind the pencil. The Plate takes the date and the day from Plan, not only the meal."),
   ("Now, checked in 0.2.129", "A recipe planned for Friday, opened from Plan, has Make it as its main button: the Plate to cook now, the steps, then How was it? with a rating. A new meal for Friday from Plan has Put it in Friday's dinner, but the bar says Craft, Make, Feedback and Fit again leads. A day before today shows what was logged and nothing else: Nothing was logged on this day, with no way to record what you ate. The Plate on its own only knows today's meals."),
-  ("The story", "The day decides. Today, around the meal's time, is the moment: Craft, Make, Feedback, as now. A day after today, or a meal later today opened from Plan, is planning: the bar says Planning Friday's dinner, no Make and no Feedback, the one main button is Put it in Friday's dinner, before Fit and after it; a recipe's steps are there to read; nothing asks for a rating. On the day, the meal comes up on Today, where Make it and I ate it live, and a rating if you want one. A day before today is recording: on Plan each meal of that day can be recorded; a planned one is one tap, I ate it, at its time; I ate something else or Record it opens the Plate to record, with no Fit (the amounts are what you ate) and one button, Put it in Wednesday's dinner, eaten. A recipe opened from a later day says Change it on the Plate. The Plate on its own asks Which day?: yesterday records, tomorrow plans."),
+  ("The story", "The day decides. Today, around the meal's time, is the moment: Craft, Make, Feedback, as now. A day after today, or a meal later today opened from Plan, is planning: the bar says Planning Friday's dinner, no Make and no Feedback, the one main button is Put it in Friday's dinner, before Fit and after it; a recipe's steps are there to read; nothing asks for a rating. On the day, the meal comes up on Today, where Make it and I ate it live, and a rating if you want one. A day before today is what you ate: on Plan each meal of that day can be added; a planned one is one tap, I ate it, at its time; I ate something else or Add what you ate opens the Plate, Adding Wednesday's dinner, with no Fit (the amounts are what you ate) and one button, Put it in Wednesday's dinner, eaten. A recipe opened from a later day says Change it on the Plate. The Plate on its own asks Which day?, behind the pencil on its line: yesterday adds what you ate, tomorrow plans. The line always says the day and the mode: Friday's dinner, 20:00 · Planning; Wednesday's dinner, 20:00 · Eaten. The Plate takes the date, the meal, its time and that day's numbers from Plan; the share of the day after Fit is counted against that day too (it used today's)."),
 ])
 h = rowEnd(cy,
   B.screen("DT149a", 0, y, "Now: Friday's recipe says Make it", "r149a", "now", "Make it: cook now, the steps, a rating."),
@@ -99,13 +100,13 @@ h = rowEnd(y + 10,
   B.screen("DT149c", 1, y, "New: planning Friday's dinner", "r149c", "changed", "Put it in Friday's dinner; no Make, no rating."))
 y = h
 h = rowEnd(y + 10,
-  B.screen("DT149d", 0, y, "New: recording yesterday", "r149d", "changed", "I ate it, at its time; Record it for the rest."),
-  B.screen("DT149e", 1, y, "New: recording on the Plate", "r149e", "changed", "No Fit; Put it in Wednesday's dinner, eaten."))
+  B.screen("DT149d", 0, y, "New: recording yesterday", "r149d", "changed", "I ate it, at its time; Add what you ate for the rest."),
+  B.screen("DT149e", 1, y, "New: adding what you ate", "r149e", "changed", "No Fit; Put it in Wednesday's dinner, eaten."))
 y = h
 h = rowEnd(y + 10,
   B.screen("DT149f", 0, y, "New: Which day? on the Plate", "r149f", "changed", "Yesterday records, tomorrow plans."),
   B.screen("DT149g", 1, y, "New: Change it on the Plate", "r149g", "changed", "A recipe for Friday is a plan; Make it comes on Friday."))
 y = h
 board("Stories101.dc.html", "DT149. The past records, the future plans, the moment is what you eat",
-  "29 October 2026 (Tester 3, UX4). Now: 0.2.129, untouched. Drawn for your approval; nothing built.",
+  "29 October 2026 (Tester 3, UX4), version 2. Now: 0.2.129, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories100.dc.html")
