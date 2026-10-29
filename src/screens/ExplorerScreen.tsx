@@ -364,13 +364,14 @@ function MicrosPage(p: AppApi) {
   const [open, setOpen] = useState<MicroId | null>(null);
   const page = MEMBER_PAGES.find((m) => m.id === open);
   const sex = p.personal?.sex ?? null;
+  const kcal = p.numbersFor(new Date())?.kcal ?? null;   // DT163: B1 and B3 follow today's energy
   const viewChips = (
     <div className="moments ex-chips" role="radiogroup" aria-label="Start from">
       <button role="radio" aria-checked={view === "food"} className={`choice ${view === "food" ? "on" : ""}`} onClick={() => { setView("food"); setOpen(null); }}>By food</button>
       <button role="radio" aria-checked={view === "member"} className={`choice ${view === "member" ? "on" : ""}`} onClick={() => setView("member")}>By member</button>
     </div>
   );
-  if (view === "member" && page) return <>{viewChips}<MemberView m={page} sex={sex} back={() => { setOpen(null); window.scrollTo(0, 0); }} /></>;
+  if (view === "member" && page) return <>{viewChips}<MemberView m={page} sex={sex} kcal={kcal} back={() => { setOpen(null); window.scrollTo(0, 0); }} /></>;
   if (view === "member") return (
     <>
       {viewChips}
@@ -380,7 +381,7 @@ function MicrosPage(p: AppApi) {
         <div key={g.id} className="ex-members">
           <small className="ex-group">{g.name}</small>
           {MICRO_MEMBERS.filter((m) => m.group === g.id).map((m) => { const mp = MEMBER_PAGES.find((x) => x.id === m.id);
-            return mp ? <button key={m.id} className="menu-row ex-member" onClick={() => { setOpen(m.id); window.scrollTo(0, 0); }}><b>{m.name}{m.also && <span className="ex-sub">{m.also}</span>}</b><small>your day {memberDay(mp, sex).v} {mp.unit}</small><span aria-hidden="true">›</span></button>
+            return mp ? <button key={m.id} className="menu-row ex-member" onClick={() => { setOpen(m.id); window.scrollTo(0, 0); }}><b>{m.name}{m.also && <span className="ex-sub">{m.also}</span>}</b><small>your day {memberDay(mp, sex, kcal).v} {mp.unit}</small><span aria-hidden="true">›</span></button>
               : <div key={m.id} className="menu-row ex-member ex-member-next"><b>{m.name}{m.also && <span className="ex-sub">{m.also}</span>}</b><small>next</small></div>; })}
         </div>
       ))}
@@ -400,33 +401,37 @@ function MicrosPage(p: AppApi) {
 }
 
 // DT162: what counts against the upper limit is the portion's amount, for vitamin A only its retinol (preformed)
-const overUl = (m: MemberPage, f: MemberPage["foods"][number]) => m.ul !== null && ((f.preformed ?? (m.id === "a" ? 0 : f.per100)) * f.grams) / 100 > m.ul.v;
+const overUl = (m: MemberPage, f: MemberPage["foods"][number]) => m.ul !== null && m.ulFood !== false && ((f.preformed ?? (m.id === "a" ? 0 : f.per100)) * f.grams) / 100 > m.ul.v;
 // DT159: a member's own page, the same sections as a card: a heading, what it is for, the details
-function MemberView({ m, sex, back }: { m: MemberPage; sex: string | null; back: () => void }) {
-  const day = memberDay(m, sex), rows = memberRows(m, day.v);
-  const low = m.name.replace("Vitamin", "vitamin");
+function MemberView({ m, sex, kcal, back }: { m: MemberPage; sex: string | null; kcal: number | null; back: () => void }) {
+  const day = memberDay(m, sex, kcal), rows = memberRows(m, day.v);
+  const low = lowerName(m.name), lead = low[0].toUpperCase() + low.slice(1), unit = m.unit;
+  // DT163: what the range says about where the day comes from, by kind: per MJ of today's energy, the label, for a man or a woman
+  const from = day.who === "energy" ? `${m.efsa.src.replace("EFSA, ", "EFSA's ")}: for today's ${kcal!.toLocaleString("en")} kcal, ${(kcal! * 0.004184).toFixed(1)} MJ` : day.who === "label" ? "the EU label's reference: set your goal under Me, and it becomes yours" : `${m.efsa.src.replace("EFSA, ", "EFSA's ")}${day.who === "adults" ? "" : day.who === "men" ? ` for men (${m.efsa.women} ${unit} for women)` : ` for women (${m.efsa.men} ${unit} for men)`}`;
+  const upto = m.ul ? `up to ${m.ul.v} ${unit}, ${m.ul.note}.` : m.ulNone ? `with no upper limit: ${m.ulNone}.` : `${m.much.replace(/\.$/, "")}.`;
   return (
     <>
       <button className="ex-back" onClick={back}>‹ The family members</button>
       <h2 className="ex-h">{m.name}<small className="ex-also">{m.also}</small></h2>
       <section className="card ex-card ex-member-page" aria-label={m.name}>
         <div className="ex-head ex-head-first"><b>What it is</b><small>{m.is}</small></div>
-        <Head title="What it does" goal={`What the EU allows a label to say, word for word. ${m.name} ...`} />
+        <Head title="What it does" goal={`What the EU allows a label to say, word for word. ${lead} ...`} />
         {m.does.map((d) => <small key={d} className="ex-quote">{d}</small>)}
         <small className="ex-src ex-dnote">{CLAIMS_HEALTH_SOURCE} A food may say these only when it is at least a source of {low}.</small>
         {m.doesMore && <small className="ex-more"><b>More claims, in short.</b> {m.doesMore}</small>}
         {/* DT160 (0.3.3): How much a day as a range, from your day to the upper limit, marked for you */}
-        <div className="ex-head"><b>How much a day<ForYou /></b><small>{`From your day up to the upper limit. Your day comes from EFSA${day.who === "adults" ? " for an adult" : `, for ${day.who === "men" ? "a man" : "a woman"}`}; the label's reference is the same for everyone.`}</small></div>
-        <RangeRow name="Your range" lo={day.v} hi={m.ul ? m.ul.v : null} unit={m.unit} scale={(m.ul ? m.ul.v : day.v * 2) * 1.3} label={m.ul ? undefined : `from ${day.v} ${m.unit}, no upper limit`}
-          why={`From ${day.v} ${m.unit}, ${m.efsa.src.replace("EFSA, ", "EFSA's ")}${day.who === "adults" ? "" : day.who === "men" ? ` for men (${m.efsa.women} ${m.unit} for women)` : ` for women (${m.efsa.men} ${m.unit} for men)`}, ${m.ul ? `up to ${m.ul.v} ${m.unit}, ${m.ul.note}.` : `with no upper limit: ${m.ulNone}.`}`} />
-        <div className="ex-row ex-pair ex-kv"><small className="ex-name">On labels<span className="ex-sub">EU reference intake, Regulation (EU) No 1169/2011</span></small><small className="ex-val">{m.label} {m.unit}</small></div>
-        <Head title="Where to find it" goal={`One normal portion against your day, ${day.v} ${m.unit}. The line is the whole day; green when one portion covers it.`} />
-        {rows.map(({ food, amount, share }) => <Row key={food.name} name={food.name} sub={`${food.portion}${food.form ? `, ${food.form}` : ""}`} value={`${fmtAmount(amount, m.unit)} · ${share} %`} frac={share / 100 / MICRO_SCALE} need ok={share >= 100 && !overUl(m, food)} over={overUl(m, food)} />)}
+        <div className="ex-head"><b>How much a day<ForYou /></b><small>{m.efsa.perMJ ? "Set by how much you eat: EFSA gives it per megajoule, so your day follows today's energy." : `From your day up to the upper limit. Your day comes from EFSA${day.who === "adults" ? " for an adult" : `, for ${day.who === "men" ? "a man" : "a woman"}`}; the label's reference is the same for everyone.`}</small></div>
+        <RangeRow name="Your range" lo={day.v} hi={m.ul ? m.ul.v : null} unit={unit} scale={(m.ul ? m.ul.v : day.v * 2) * 1.3} label={m.ul ? undefined : `from ${day.v} ${unit}${m.ulNone ? ", no upper limit" : ""}`}
+          why={`From ${day.v} ${unit}, ${from}, ${upto}`} />
+        <div className="ex-row ex-pair ex-kv"><small className="ex-name">On labels<span className="ex-sub">EU reference intake, Regulation (EU) No 1169/2011</span></small><small className="ex-val">{m.label} {unit.replace(/ (NE|DFE)$/, "")}</small></div>
+        <Head title="Where to find it" goal={m.foods.length ? `One normal portion against your day, ${day.v} ${unit}. The line is the whole day; green when one portion covers it.` : "Not on our food table yet."} />
+        {m.gap && <small className="ex-warn">{m.gap}</small>}
+        {rows.map(({ food, amount, share }) => <Row key={food.name} name={food.name} sub={`${food.portion}${food.form ? `, ${food.form}` : ""}`} value={`${fmtAmount(amount, unit.replace(/ (NE|DFE)$/, ""))} · ${share} %`} frac={share / 100 / MICRO_SCALE} need ok={share >= 100 && !overUl(m, food)} over={overUl(m, food)} />)}
         {/* DT162: a portion with more than the upper limit (for vitamin A, its retinol), said plainly */}
-        {m.foods.some((f) => overUl(m, f)) && <small className="ex-warn">{m.foods.filter((f) => overUl(m, f)).map((f) => f.name).join(", ")}: one portion brings more {m.id === "a" ? "retinol" : lowerName(m.name)} than the upper limit, {m.ul!.v} {m.unit}. Once in a while, not every day.</small>}
-        <small className="ex-src ex-dnote">Source: USDA FoodData Central, {m.foods.map((f) => f.src).join("; ")}.{m.foodsNote ? ` ${m.foodsNote}` : ""}</small>
-        <Head title="Combine it with" goal="What helps your body use it, and why." />
-        {m.combine.map((c) => <div key={c.with} className="ex-combine"><b>{c.with}</b><small>{c.why}</small></div>)}
+        {m.foods.some((f) => overUl(m, f)) && <small className="ex-warn">{m.foods.filter((f) => overUl(m, f)).map((f) => f.name).join(", ")}: one portion brings more {m.id === "a" ? "retinol" : low} than the upper limit, {m.ul!.v} {unit}. Once in a while, not every day.</small>}
+        {m.foods.length > 0 && <small className="ex-src ex-dnote">Source: USDA FoodData Central, {m.foods.map((f) => f.src).join("; ")}.{m.foodsNote ? ` ${m.foodsNote}` : ""}</small>}
+        {m.combine.length > 0 && <><Head title="Combine it with" goal="What helps your body use it, and why." />
+        {m.combine.map((c) => <div key={c.with} className="ex-combine"><b>{c.with}</b><small>{c.why}</small></div>)}</>}
         <Head title="Too much" goal={m.much} />
         <small className="ex-src ex-card-src">Sources. {m.sources} Educational, not medical advice.</small>
       </section>
