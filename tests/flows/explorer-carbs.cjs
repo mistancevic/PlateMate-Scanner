@@ -59,7 +59,7 @@ const SHOTS = process.env.SHOTS;
   ok(/Not on our table/.test(await text(bg)) && /at least 1 g of beta-glucan from oats per portion/.test(await text(bg)) && /Health claim: Regulation \(EU\) No 432\/2012\./.test(await text(oats.locator(".ex-claim-src"))), "DT157: the oat beta-glucan health claim, Not on our table, with its regulation");
   const scoresL = (await len.locator(".ex-score").allTextContents()).map((t) => t.replace(/\s+/g, " ").trim());
   ok(scoresL[0] === "GI32, lowAtkinson 2008, Table 1: Lentils" && scoresL[1] === "GL8For this portion, calculated by the same paper's method", "DT155: GI with its band and its row in the table, GL calculated: " + scoresL.join(" | "));
-  ok(/^Source: USDA SR Legacy, FDC 172421, lentils, boiled\./.test(await text(len.locator(".ex-card-src"))), "DT155: the SR row on the card");
+  ok(/^Source: USDA SR Legacy, FDC 172421, Lentils, mature seeds, cooked, boiled, without salt\./.test(await text(len.locator(".ex-card-src"))), "DT155: the SR row on the card");
   const potato = page.getByRole("region", { name: "Potatoes, boiled", exact: true });
   ok((await potato.locator(".ex-score-val").allTextContents())[0] === "78, high", "DT155: potatoes, high GI");
   const appleClaims = page.getByRole("region", { name: "Apple", exact: true }).locator(".ex-claim", { hasText: "High fibre" });

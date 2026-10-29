@@ -38,7 +38,7 @@ const SHOTS = process.env.SHOTS;
   // DT154 (0.2.135): the families at the top, Protein first, Carbs next
   const fams = (await page.locator(".ex-families button").allTextContents()).join();
   // Changed by story DT155 (0.2.136, board Stories107): Carbs is a family of its own
-  ok(fams === "Protein,Fats,Carbs,Micros" && await text(page.locator(".ex-families .choice.on")) === "Protein", "DT154, DT155, DT158: Protein, Fats, Carbs, Micros, Protein first: " + fams);
+  ok(fams === "Protein,Fats,Carbs,Micros,Foods" && await text(page.locator(".ex-families .choice.on")) === "Protein", "DT154, DT155, DT158: Protein, Fats, Carbs, Micros, Protein first: " + fams);
   // Changed by Milan 12:32 and 12:33: protein is the family, the amino acids its members
   ok(/^Protein is the family\. Its members are the amino acids: leucine, lysine, methionine/.test(await text(page.locator(".ex-intro"))), "DT151: protein the family, the amino acids its members");
   // the meal: the next by the clock, its protein from the day
@@ -75,7 +75,7 @@ const SHOTS = process.env.SHOTS;
   const len = page.locator(".ex-card", { hasText: "Lentils, boiled" });
   ok(await len.locator(".ex-low").count() === 1 && /^Methionine \+ cysteine · its lowest/.test(await text(len.locator(".ex-low"))), "DT151: lentils, its lowest marked");
   ok(/its lowest, methionine \+ cysteine, falls just short of the need per gram/.test(await text(len.locator(".ex-head > small").nth(3))), "DT154: on the SR row lentils fall just short, and the card says so");
-  ok(/^Source: USDA SR Legacy, FDC 171287, egg, whole, raw\.$/.test(await text(page.locator(".ex-card", { hasText: "Egg" }).locator(".ex-card-src"))), "DT154: the egg from the SR row it names");
+  ok(/^Source: USDA SR Legacy, FDC 171287, Egg, whole, raw, fresh\.$/.test(await text(page.locator(".ex-card", { hasText: "Egg" }).locator(".ex-card-src"))), "DT154: the egg from the SR row it names");
   const sal = page.locator(".ex-card", { hasText: "Salmon" });
   ok((await sal.locator(".ex-score-val").allTextContents()).join() === "none yet,none yet" && /No score we could check in a paper yet/.test(await text(sal)), "DT151: salmon says it has no score yet");
   ok((await page.locator(".ex-card", { hasText: "Chicken breast" }).locator(".ex-score-val").allTextContents()).join() === "none yet,none yet", "DT151: chicken too, until a paper we can read");
@@ -85,7 +85,7 @@ const SHOTS = process.env.SHOTS;
   ok(/^Your breakfast: about \d+ g of protein/.test(await text(page.locator(".ex-meal"))) && /^Protein for your breakfast$/i.test(await text(whey.locator(".ex-head > b").nth(1))), "DT151: Breakfast changes the meal on every card");
   await page.getByRole("radio", { name: "Most of the meal" }).click(); await page.waitForTimeout(200);
   const byMeal = await page.locator(".ex-card .ex-title > b").allTextContents();
-  ok(byMeal.slice(0, 4).join() === "Chicken breast,Salmon,Soybeans\, boiled,Whey protein powder" && byMeal[7] === "Oats, dry", "DT151: Most of the meal, chicken first: " + byMeal.join(", "));
+  ok(byMeal.slice(0, 4).join() === "Chicken breast\, roasted,Salmon,Soybeans\, boiled,Whey protein powder" && byMeal[7] === "Oats, dry", "DT151: Most of the meal, chicken first: " + byMeal.join(", "));
   // the book
   const book = page.locator(".ex-book");
   ok(await book.getByRole("link", { name: "Read the book" }).getAttribute("href") === "/worthy-numbers?from=ex" && /The why behind these numbers/.test(await text(book)), "DT151: Worthy Numbers at the end, counted as Explorer");

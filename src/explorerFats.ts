@@ -23,32 +23,22 @@ export type FatFood = {
   portion: { label: string; grams: number }; src: string; best: string; pair: string;
 };
 
-export const FAT_FOODS: FatFood[] = [
-  { id: "olive", icon: "🫒", name: "Olive oil", kcal: 884, protein: 0, fat: 100, sfa: 13.8, mufa: 73.0, pufa: 10.5, trans: null, omega6: 9.76, ala: 0.76, epa: 0, dpa: 0, dha: 0,
-    portion: { label: "1 tablespoon, 14 g", grams: 14 }, src: "USDA SR Legacy 04053, oil, olive, salad or cooking",
-    best: "The everyday fat for cooking and salads. Mostly monounsaturated: swap it in for butter.", pair: "Vegetables, beans and fish: it carries their flavour." },
-  { id: "butter", icon: "🧈", name: "Butter", kcal: 717, protein: 0.85, fat: 81.1, sfa: 51.4, mufa: 21.0, pufa: 3.04, trans: 3.28, omega6: 2.17, ala: 0.32, epa: 0, dpa: 0, dha: 0,
-    portion: { label: "For one slice of bread, 10 g", grams: 10 }, src: "USDA SR Legacy, FDC 173410, butter, salted",
-    best: "For taste, in small amounts. Half of it is saturated fat, so one slice of bread uses a good part of a meal's share.", pair: "Swap it for olive oil when you cook, keep it for taste." },
-  { id: "salmon", icon: "🐟", name: "Salmon", kcal: 208, protein: 20.42, fat: 13.42, sfa: 3.05, mufa: 3.77, pufa: 3.88, trans: 0, omega6: 0.90, ala: 0.14, epa: 0.86, dpa: 0.39, dha: 1.10,
-    portion: { label: "150 g", grams: 150 }, src: "USDA SR Legacy 15236, Atlantic, farmed, raw. A newer USDA row for farmed salmon, Foundation 2684441, has less than half the EPA and DHA",
-    best: "Twice a week as a main meal: the richest source of the omega-3 fats EPA and DHA here. One portion covers more than a week of them. A newer USDA row for farmed salmon has less than half that omega-3: it depends on the feed.", pair: "Vegetables and a whole grain; no extra fat needed." },
-  { id: "walnuts", icon: "🌰", name: "Walnuts", kcal: 654, protein: 15.2, fat: 65.2, sfa: 6.13, mufa: 8.93, pufa: 47.2, trans: null, omega6: 38.1, ala: 9.08, epa: 0, dpa: 0, dha: 0,
-    portion: { label: "A handful, 30 g", grams: 30 }, src: "USDA SR Legacy, FDC 170187, walnuts, English",
-    best: "A snack or on yogurt and oats: the plant omega-3 (ALA), more than any other nut. Count the handful: it is mostly energy.", pair: "Yogurt, oats or salad." },
-  { id: "avocado", icon: "🥑", name: "Avocado", kcal: 160, protein: 2.0, fat: 14.7, sfa: 2.13, mufa: 9.80, pufa: 1.82, trans: 0, omega6: 1.67, ala: 0.13, epa: 0, dpa: 0, dha: 0,
-    portion: { label: "Half, 70 g", grams: 70 }, src: "USDA SR Legacy, FDC 171705, avocados, raw",
-    best: "On bread or in a salad instead of butter or cheese: mostly monounsaturated, with fibre.", pair: "Eggs, beans or wholegrain bread." },
-  { id: "egg", icon: "🥚", name: "Egg", kcal: 143, protein: 12.6, fat: 9.51, sfa: 3.13, mufa: 3.66, pufa: 1.91, trans: 0.038, omega6: 1.53, ala: 0.048, epa: 0, dpa: 0.007, dha: 0.058,
-    portion: { label: "2 eggs, 100 g", grams: 100 }, src: "USDA SR Legacy, FDC 171287, egg, whole, raw",
-    best: "Breakfast protein with a modest amount of fat, about a third of it saturated.", pair: "Vegetables and wholegrain bread." },
-  { id: "cheddar", icon: "🧀", name: "Cheddar", kcal: 403, protein: 22.9, fat: 33.3, sfa: 18.9, mufa: 9.39, pufa: 0.94, trans: 1.13, omega6: 0.79, ala: 0.11, epa: 0.010, dpa: 0.017, dha: 0.001,
-    portion: { label: "30 g", grams: 30 }, src: "USDA SR Legacy, FDC 173414, cheese, cheddar",
-    best: "For taste, grated thin. More than half of its fat is saturated, so 30 g uses a good part of a meal's share.", pair: "A little on vegetables or beans, not as the protein." },
-  { id: "almonds", icon: "🥜", name: "Almonds", kcal: 579, protein: 21.1, fat: 49.9, sfa: 3.80, mufa: 31.6, pufa: 12.3, trans: 0.015, omega6: 12.3, ala: 0.003, epa: 0, dpa: 0, dha: 0,
-    portion: { label: "A handful, 30 g", grams: 30 }, src: "USDA SR Legacy, FDC 170567, almonds",
-    best: "A snack that brings protein too, mostly monounsaturated fat and almost no saturated.", pair: "Fruit, yogurt or oats." },
+import { rowOf } from "./foodTable";
+const fromTable = (id: string) => { const r = rowOf(id); return { icon: r.icon, name: r.name, kcal: r.kcal, protein: r.protein, fat: r.fat!, sfa: r.sfa!, mufa: r.mufa!, pufa: r.pufa!, trans: r.trans, omega6: r.la ?? 0, ala: r.ala ?? 0, epa: r.epa ?? 0, dpa: r.dpa ?? 0, dha: r.dha ?? 0, portion: r.portion, src: r.src }; };
+// DT164 (0.3.6): the numbers, name, icon and portion come from the shared food table (src/foodTable.ts); only what this family
+// says about a food is written here
+type Extra = Omit<FatFood, "icon" | "name" | "kcal" | "protein" | "fat" | "sfa" | "mufa" | "pufa" | "trans" | "omega6" | "ala" | "epa" | "dpa" | "dha" | "portion" | "src">;
+const EXTRAS: Extra[] = [
+  { id: "olive", best: "The everyday fat for cooking and salads. Mostly monounsaturated: swap it in for butter.", pair: "Vegetables, beans and fish: it carries their flavour." },
+  { id: "butter", best: "For taste, in small amounts. Half of it is saturated fat, so one slice of bread uses a good part of a meal's share.", pair: "Swap it for olive oil when you cook, keep it for taste." },
+  { id: "salmon", best: "Twice a week as a main meal: the richest source of the omega-3 fats EPA and DHA here. One portion covers more than a week of them. A newer USDA row for farmed salmon has less than half that omega-3: it depends on the feed.", pair: "Vegetables and a whole grain; no extra fat needed." },
+  { id: "walnuts", best: "A snack or on yogurt and oats: the plant omega-3 (ALA), more than any other nut. Count the handful: it is mostly energy.", pair: "Yogurt, oats or salad." },
+  { id: "avocado", best: "On bread or in a salad instead of butter or cheese: mostly monounsaturated, with fibre.", pair: "Eggs, beans or wholegrain bread." },
+  { id: "egg", best: "Breakfast protein with a modest amount of fat, about a third of it saturated.", pair: "Vegetables and wholegrain bread." },
+  { id: "cheddar", best: "For taste, grated thin. More than half of its fat is saturated, so 30 g uses a good part of a meal's share.", pair: "A little on vegetables or beans, not as the protein." },
+  { id: "almonds", best: "A snack that brings protein too, mostly monounsaturated fat and almost no saturated.", pair: "Fruit, yogurt or oats." },
 ];
+export const FAT_FOODS: FatFood[] = EXTRAS.map((x) => ({ ...fromTable(x.id), ...x }));
 
 export type FatMember = "sfa" | "mufa" | "pufa" | "omega6" | "omega3" | "trans";
 export const FAT_MEMBERS: { id: FatMember; name: string; under?: boolean }[] = [

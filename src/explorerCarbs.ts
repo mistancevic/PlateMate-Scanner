@@ -33,40 +33,22 @@ export type CarbFood = {
   split: FibreSplit | null; betaGlucan?: boolean;
 };
 
-export const CARB_FOODS: CarbFood[] = [
-  { id: "oats", icon: "🌾", name: "Oats, dry", kcal: 379, protein: 13.2, carb: 67.7, fibre: 10.1, sugar: 0.99, portion: { label: "50 g", grams: 50 },
-    split: null, betaGlucan: true,
-    gi: 55, giRow: "Porridge, rolled oats", src: "USDA SR Legacy, FDC 173904, oats, regular and quick, dry",
-    best: "Breakfast: cooked as porridge it is low GI, and 50 g brings more than half a lunch's fibre. Instant oats are high GI (79 in the same table).", pair: "Skyr, milk or yogurt: protein, and the lysine oats lack." },
-  { id: "rice", icon: "🍚", name: "White rice, boiled", kcal: 130, protein: 2.69, carb: 28.2, fibre: 0.4, sugar: 0.05, portion: { label: "150 g cooked", grams: 150 },
-    split: { row: "White rice, long grain, cooked", soluble: 0, insoluble: 0.34, noneFound: true },
-    gi: 73, giRow: "White rice, boiled", src: "USDA SR Legacy, FDC 169757, rice, white, long-grain, cooked",
-    best: "A fast carb: around training it refuels quickly. Almost no fibre, so add vegetables or beans to slow it down.", pair: "Lentils or beans: fibre and protein, and together a complete protein." },
-  { id: "potato", icon: "🥔", name: "Potatoes, boiled", kcal: 86, protein: 1.71, carb: 20.0, fibre: 1.8, sugar: 0.89, portion: { label: "200 g", grams: 200 },
-    split: { row: "Potato, white, boiled, w/o skin", soluble: 0.99, insoluble: 1.06 },
-    gi: 78, giRow: "Potato, boiled", src: "USDA SR Legacy, FDC 170440, potatoes, boiled, flesh",
-    best: "Filling for few calories, but high GI. Eat them with protein and vegetables.", pair: "Fish, eggs or quark, and a salad." },
-  { id: "bread", icon: "🍞", name: "Wholewheat bread", kcal: 252, protein: 12.4, carb: 42.7, fibre: 6.0, sugar: 4.34, portion: { label: "2 slices, 60 g", grams: 60 },
-    split: { row: "Bread, whole wheat, soft", soluble: 1.26, insoluble: 4.76 },
-    gi: 74, giRow: "Whole wheat/whole meal bread", src: "USDA SR Legacy, FDC 172688, bread, whole-wheat",
-    best: "Its GI is high, 74, even as wholewheat. The fibre is the reason to choose it: 2 slices bring almost half a lunch's.", pair: "Eggs, cottage cheese or avocado on top." },
-  { id: "pasta", icon: "🍝", name: "Pasta, cooked", kcal: 158, protein: 5.8, carb: 30.9, fibre: 1.8, sugar: 0.56, portion: { label: "200 g cooked", grams: 200 },
-    split: { row: "Spaghetti, cooked", soluble: 0.54, insoluble: 1.33 },
-    gi: 49, giRow: "Spaghetti, white", src: "USDA SR Legacy, FDC 169737, pasta, cooked",
-    best: "Low GI for a white carb: the dense pasta digests slowly. Count the portion, though: 200 g is two thirds of a lunch's carbs, so its GL is among the highest here.", pair: "A protein sauce: tuna, chicken, lentils." },
-  { id: "lentils", icon: "🫘", name: "Lentils, boiled", kcal: 116, protein: 9.02, carb: 20.1, fibre: 7.9, sugar: 1.8, portion: { label: "200 g", grams: 200 },
-    split: { row: "Lentils, dry, cooked, drained", soluble: 0.44, insoluble: 5.42 },
-    gi: 32, giRow: "Lentils", src: "USDA SR Legacy, FDC 172421, lentils, boiled",
-    best: "The steadiest carb here: lowest GI and the most fibre. 200 g covers a lunch's fibre nearly twice and brings protein too.", pair: "Rice: together a complete protein." },
-  { id: "banana", icon: "🍌", name: "Banana", kcal: 89, protein: 1.09, carb: 22.8, fibre: 2.6, sugar: 12.2, portion: { label: "1 medium, 120 g", grams: 120 },
-    split: { row: "Bananas, raw, ripe", soluble: 0.58, insoluble: 1.21 },
-    gi: 51, giRow: "Banana, raw", src: "USDA SR Legacy, FDC 173944, bananas, raw",
-    best: "Before or after training: quick, easy carbs. Its sugar is in the fruit, not free sugar.", pair: "Yogurt or skyr, or a handful of nuts." },
-  { id: "apple", icon: "🍎", name: "Apple", kcal: 52, protein: 0.26, carb: 13.8, fibre: 2.4, sugar: 10.4, portion: { label: "1 medium, 180 g", grams: 180 },
-    split: { row: "Apple (Red delicious), raw, ripe w/skin", soluble: 0.67, insoluble: 1.54 },
-    gi: 36, giRow: "Apple, raw", src: "USDA SR Legacy, FDC 171688, apples, raw, with skin",
-    best: "A snack with fibre and low GI: whole, with the skin. Juice loses the fibre and counts as free sugar.", pair: "Cheese, nuts or yogurt." },
+import { rowOf } from "./foodTable";
+const fromTable = (id: string) => { const r = rowOf(id); return { icon: r.icon, name: r.name, kcal: r.kcal, protein: r.protein, carb: r.carb!, fibre: r.fibre!, sugar: r.sugar!, portion: r.portion, src: r.src }; };
+// DT164 (0.3.6): the numbers, name, icon and portion come from the shared food table (src/foodTable.ts); only what this family
+// says about a food is written here
+type Extra = Omit<CarbFood, "icon" | "name" | "kcal" | "protein" | "carb" | "fibre" | "sugar" | "portion" | "src">;
+const EXTRAS: Extra[] = [
+  { id: "oats", gi: 55, giRow: "Porridge, rolled oats", split: null, betaGlucan: true, best: "Breakfast: cooked as porridge it is low GI, and 50 g brings more than half a lunch's fibre. Instant oats are high GI (79 in the same table).", pair: "Skyr, milk or yogurt: protein, and the lysine oats lack." },
+  { id: "rice", gi: 73, giRow: "White rice, boiled", split: {"row": "White rice, long grain, cooked", "soluble": 0, "insoluble": 0.34, "noneFound": true}, best: "A fast carb: around training it refuels quickly. Almost no fibre, so add vegetables or beans to slow it down.", pair: "Lentils or beans: fibre and protein, and together a complete protein." },
+  { id: "potato", gi: 78, giRow: "Potato, boiled", split: {"row": "Potato, white, boiled, w/o skin", "soluble": 0.99, "insoluble": 1.06}, best: "Filling for few calories, but high GI. Eat them with protein and vegetables.", pair: "Fish, eggs or quark, and a salad." },
+  { id: "bread", gi: 74, giRow: "Whole wheat/whole meal bread", split: {"row": "Bread, whole wheat, soft", "soluble": 1.26, "insoluble": 4.76}, best: "Its GI is high, 74, even as wholewheat. The fibre is the reason to choose it: 2 slices bring almost half a lunch's.", pair: "Eggs, cottage cheese or avocado on top." },
+  { id: "pasta", gi: 49, giRow: "Spaghetti, white", split: {"row": "Spaghetti, cooked", "soluble": 0.54, "insoluble": 1.33}, best: "Low GI for a white carb: the dense pasta digests slowly. Count the portion, though: 200 g is two thirds of a lunch's carbs, so its GL is among the highest here.", pair: "A protein sauce: tuna, chicken, lentils." },
+  { id: "lentils", gi: 32, giRow: "Lentils", split: {"row": "Lentils, dry, cooked, drained", "soluble": 0.44, "insoluble": 5.42}, best: "The steadiest carb here: lowest GI and the most fibre. 200 g covers a lunch's fibre nearly twice and brings protein too.", pair: "Rice: together a complete protein." },
+  { id: "banana", gi: 51, giRow: "Banana, raw", split: {"row": "Bananas, raw, ripe", "soluble": 0.58, "insoluble": 1.21}, best: "Before or after training: quick, easy carbs. Its sugar is in the fruit, not free sugar.", pair: "Yogurt or skyr, or a handful of nuts." },
+  { id: "apple", gi: 36, giRow: "Apple, raw", split: {"row": "Apple (Red delicious), raw, ripe w/skin", "soluble": 0.67, "insoluble": 1.54}, best: "A snack with fibre and low GI: whole, with the skin. Juice loses the fibre and counts as free sugar.", pair: "Cheese, nuts or yogurt." },
 ];
+export const CARB_FOODS: CarbFood[] = EXTRAS.map((x) => ({ ...fromTable(x.id), ...x }));
 
 export type CarbMember = "starch" | "sugar" | "fibre" | "soluble" | "insoluble";
 export const CARB_MEMBERS: { id: CarbMember; name: string; under?: boolean }[] = [{ id: "starch", name: "Starch and other carbs" }, { id: "sugar", name: "Sugars" }, { id: "fibre", name: "Fibre" },

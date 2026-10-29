@@ -8,9 +8,10 @@ test("DT151: one portion against one meal: protein, muscle protein synthesis, th
   const whey = cardOf(F("whey"), 40);
   assert.deepEqual([whey.protein, whey.closes, whey.leucine, whey.eaa, whey.pd], [27, 68, 3.3, 14.3, 24.3]);
   const ch = cardOf(F("chicken"), 40);
-  assert.deepEqual([ch.protein, ch.closes, ch.leucine, ch.eaa], [33.5, 84, 2.8, 14.7]);
+  // DT164 (0.3.6): chicken is the roasted row, 171477, as eaten (was raw 05062: 33.5 g, 84 %, 2.8 g, 14.7 g)
+  assert.deepEqual([ch.protein, ch.closes, ch.leucine, ch.eaa], [46.5, 116, 3.5, 19.3]);
   assert.equal(cardOf(F("egg"), 40).closes, 32);
-  assert.equal(ch.family.leu, 2.76);
+  assert.equal(ch.family.leu, 3.5);
 });
 
 test("DT151: for an adult every food but lentils covers the nine per gram; its lowest is named only when it is close", () => {
