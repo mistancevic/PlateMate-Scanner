@@ -86,13 +86,18 @@ W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
 cy = storyCard(B, y, "DT153", "On plate looks like a button: a plain tick, and the way back always at hand", [
   ("Coach Milan, 29 October 10:22, from Tester 3 Marko's testing", "There was a list of foods to add to the Plate, and that worked. Then the button turned into On plate or similar, with no action. It says the food is on the Plate, but it looks like a button you could tap to go back to the Plate. To close the chat we need to scroll all the way to the top."),
+  ("Coach Milan, 10:32, with Tester 3 Marko's screen", "Here. In the plan was actually the message, but not the button."),
   ("Now, checked in 0.2.131", "After + Add the row shows On plate in a pill, the same shape as a button, and it does nothing. Back to the plate sits under the rows in grey, easy to miss. Close is at the top of the chat and scrolls away with it."),
-  ("The story", "After + Add the row shows a plain green ✓ On the plate: text with a tick, no pill, so it doesn't look tappable. The same for Take it out (✓ Out) and the plan rows (✓ In the plan, ✓ Swapped). After the first Add, Back to the plate under the rows becomes the main button. The chat's head stays at the top while you scroll: Chef Mealan and, when you came from the Plate, Back to the plate; otherwise Close."),
+  ("The story", "After + Add the row shows a plain green ✓ On the plate: text with a tick, no pill, so it doesn't look tappable. The same for Take it out (✓ Out), Swap (✓ Swapped) and Put them in the plan (✓ In the plan). After the first Add, Back to the plate under the rows becomes the main button. The chat's head stays at the top while you scroll: Chef Mealan and where you came from: Back to the plate, Back to the plan, otherwise Close. After Put them in the plan, Back to the plan sits next to the tick as the main button."),
   ("Not in it", "Taking you back to the Plate by itself after an Add: you may want to add two foods."),
 ])
 h = rowEnd(cy,
   B.screen("DT153a", 0, y, "Now: On plate, a dead pill", "r153a", "now", "Close is far up."),
   B.screen("DT153b", 1, y, "New: a tick, the way back", "r153b", "changed", "✓ On the plate; Back to the plate primary and in the head."))
+y = h
+h = rowEnd(y + 10,
+  B.screen("DT153c", 0, y, "Now: In the plan, Marko's screen", "r153c", "now", "A message shaped like a button."),
+  B.screen("DT153d", 1, y, "New: ✓ In the plan, Back to the plan", "r153d", "changed", "The head says Back to the plan."))
 y = h
 board("Stories105.dc.html", "DT153. On plate looks like a button",
   "29 October 2026 (Coach Milan, from Tester 3 Marko's testing). Now: 0.2.131, untouched. Drawn for your approval; nothing built.",
