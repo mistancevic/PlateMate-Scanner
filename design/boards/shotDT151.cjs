@@ -73,11 +73,14 @@ const foodsFor = (mealP) => { const c = MEALC(mealP); return FOODS.map((f) => ({
       const you = (f) => f.pd >= target ? `Above your PD ${target}: one portion lifts a plate.` : `Below your PD ${target}: it needs a partner richer in protein.`;
       // DT151 v8 (Milan 11:50): one pattern for every measure: the name on the left, the bar, the grams on the right; a line marks the meal's need where there is one
       const R = (label, val, frac, line, ok, bold, low) => `<div style="display:flex;align-items:center;gap:6px;margin:4px 0"><small style="width:118px;font-size:11.5px;line-height:1.15;${bold ? "font-weight:900;color:#172742" : ""}${low ? "font-weight:800;color:#8a5a00" : ""}">${label}</small><span style="position:relative;flex:1;height:8px;border-radius:4px;background:#eef2f9"><i style="position:absolute;left:0;top:0;bottom:0;width:${Math.max(Math.min(frac, 1) * 100, 1.5)}%;border-radius:4px;background:${ok ? "#13916a" : low ? "#f6b94a" : "#5b8def"}"></i>${line ? '<i style="position:absolute;left:66.7%;top:-3px;bottom:-3px;width:2px;background:#172742;opacity:.55"></i>' : ""}</span><small style="width:78px;text-align:right;font-size:11.5px;font-weight:${bold ? 900 : 800};color:${ok ? "#13916a" : "#172742"}">${val}</small></div>`;
+      const KV = (label, val) => `<div style="display:flex;align-items:center;gap:6px;margin:4px 0"><small style="width:118px;font-size:11.5px">${label}</small><small style="flex:1;text-align:right;font-size:11.5px;font-weight:900;color:#172742">${val}</small></div>`;
       const H = (t, sub) => `<div style="margin-top:14px;padding-top:10px;border-top:1px solid #e3e9f4"><b style="display:block;font-size:11.5px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:#123a7a">${t}</b>${sub ? `<small style="display:block;color:#5b6b8a;font-size:11.5px;margin-top:1px">${sub}</small>` : ""}</div>`;
       const card = (f) => `<section class="card" style="margin:10px 0;padding:14px 16px">
         <div style="display:flex;align-items:center;gap:10px"><span style="font-size:24px">${f.icon}</span><b style="flex:1;font-size:16px">${f.name}</b><span class="pdpill pdpill-${f.pd >= target ? "high" : "low"}" style="font-weight:900">PD ${f.pd.toFixed(1)}</span></div>
-        <small style="display:block;margin:4px 0 8px;color:#5b6b8a">${f.p} g protein · ${f.kcal} kcal per 100 g</small>
-        <span style="display:inline-block;padding:3px 9px;border-radius:999px;font-size:12.5px;font-weight:800;background:#eaf1fd;color:#123a7a">One portion: ${f.portion}</span>
+        ${H("One portion", `Every number below is for one normal portion. PD, protein per 100 kcal, is ${f.pd.toFixed(1)}: ${f.pd >= target ? `above your ${target}, so one portion lifts a plate.` : `below your ${target}, so it needs a partner richer in protein.`}`)}
+        ${KV("Portion", f.portion)}
+        ${KV("Per 100 g", `${f.p} g protein, ${f.kcal} kcal`)}
+
         ${H(`Protein for your ${meal}`, `Your ${meal} needs about ${mealP} g of protein. This portion closes ${f.closes} % of it.`)}
         ${R("Protein", `${f.protein} of ${mealP} g`, f.closes / 150, true, f.closes >= 100)}
         ${H("Muscle repair", `A meal switches on muscle repair with about 10 g of essential amino acids, 2.5 g of them leucine. ${f.eaa >= 10 && f.leu >= 2.5 ? "This portion brings both." : f.eaa >= 10 ? "This portion brings the 10 g, not yet the leucine." : "This portion brings part of it."}`)}
@@ -90,7 +93,7 @@ const foodsFor = (mealP) => { const c = MEALC(mealP); return FOODS.map((f) => ({
         ${H("How to use it", "When and how this food serves you best.")}
         <small style="display:block;margin-top:6px;padding:6px 8px;border-radius:10px;background:#eaf1fd;color:#123a7a"><b>Best use:</b> ${f.best}</small>
         <small style="display:block;margin-top:6px"><b>Completes it:</b> ${f.pair}</small>
-        <small style="display:block;margin-top:6px;color:#123a7a;font-weight:700">For you: ${you(f)}</small>
+
         <small style="display:block;margin-top:10px;color:#5b6b8a;font-size:11px">Source: ${f.q.aaSrc}.</small>
       </section>`;
       main.innerHTML = `<div style="padding:4px 16px 24px">
