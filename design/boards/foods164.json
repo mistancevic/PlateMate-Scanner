@@ -1,0 +1,749 @@
+{
+ "whey protein powder": {
+  "name": "Whey protein powder",
+  "icon": "🥤",
+  "fams": {
+   "protein": {
+    "pd": 24.3,
+    "protein": 27,
+    "closes": 51,
+    "eaa": 14.3,
+    "leucine": 3.3,
+    "lowest": null,
+    "claims": [
+     "Source of protein",
+     "High protein"
+    ]
+   }
+  },
+  "rows": {
+   "protein": "a typical whey label; cysteine and tyrosine from Hamarsland 2017 (BMC Nutrition). Your own brand's label replaces it"
+  },
+  "portions": {
+   "protein": "One scoop, 30 g"
+  }
+ },
+ "chicken breast": {
+  "name": "Chicken breast",
+  "icon": "🍗",
+  "fams": {
+   "protein": {
+    "pd": 18.6,
+    "protein": 33.5,
+    "closes": 63,
+    "eaa": 14.7,
+    "leucine": 2.8,
+    "lowest": null,
+    "claims": [
+     "Source of protein",
+     "High protein"
+    ]
+   }
+  },
+  "rows": {
+   "protein": "USDA SR Legacy 05062, breast, raw"
+  },
+  "portions": {
+   "protein": "150 g"
+  }
+ },
+ "greek yogurt": {
+  "name": "Greek yogurt, 0 %",
+  "icon": "🥣",
+  "fams": {
+   "protein": {
+    "pd": 16.9,
+    "protein": 20.6,
+    "closes": 39,
+    "eaa": 9.4,
+    "leucine": 2.1,
+    "lowest": null,
+    "claims": [
+     "Source of protein",
+     "High protein"
+    ]
+   }
+  },
+  "rows": {
+   "protein": "USDA Foundation, FDC 330137, Greek yogurt, plain, nonfat"
+  },
+  "portions": {
+   "protein": "200 g"
+  }
+ },
+ "salmon": {
+  "name": "Salmon",
+  "icon": "🐟",
+  "fams": {
+   "protein": {
+    "pd": 9.8,
+    "protein": 30.6,
+    "closes": 58,
+    "eaa": 12.9,
+    "leucine": 2.4,
+    "lowest": null,
+    "claims": [
+     "Source of protein",
+     "High protein"
+    ]
+   },
+   "fats": {
+    "fat": 20.1,
+    "closes": 72,
+    "sat": 4.6,
+    "satMeal": 9.6,
+    "epaDha": 2940,
+    "mostly": "polyunsaturated",
+    "unsatToSat": 2.5,
+    "claims": [
+     "High unsaturated fat",
+     "Source of omega-3",
+     "High omega-3"
+    ]
+   },
+   "micros": {
+    "pd": 10.7,
+    "top": [
+     "vitamin D 393 %",
+     "vitamin B12 168 %",
+     "niacin 75 %",
+     "vitamin B6 70 %",
+     "thiamine 46 %",
+     "pantothenic acid 37 %"
+    ],
+    "claims": [
+     "High in vitamin D",
+     "High in thiamine",
+     "High in niacin",
+     "Source of pantothenic acid",
+     "High in vitamin B6",
+     "Source of folate",
+     "High in vitamin B12",
+     "Source of potassium"
+    ]
+   }
+  },
+  "rows": {
+   "protein": "USDA SR Legacy 15236, Atlantic, farmed, raw",
+   "fats": "USDA SR Legacy 15236, Atlantic, farmed, raw. A newer USDA row for farmed salmon, Foundation 2684441, has less than half the EPA and DHA",
+   "micros": "USDA SR Legacy, FDC 175168, salmon, Atlantic, farmed, cooked, dry heat"
+  },
+  "portions": {
+   "protein": "150 g",
+   "fats": "150 g",
+   "micros": "150 g, cooked"
+  }
+ },
+ "soybean": {
+  "name": "Soybeans, boiled",
+  "icon": "🫘",
+  "fams": {
+   "protein": {
+    "pd": 10.6,
+    "protein": 27.3,
+    "closes": 52,
+    "eaa": 9.9,
+    "leucine": 2,
+    "lowest": null,
+    "claims": [
+     "Source of protein",
+     "High protein"
+    ]
+   }
+  },
+  "rows": {
+   "protein": "USDA SR Legacy, FDC 174271, soybeans, boiled"
+  },
+  "portions": {
+   "protein": "150 g"
+  }
+ },
+ "egg": {
+  "name": "Egg",
+  "icon": "🥚",
+  "fams": {
+   "protein": {
+    "pd": 8.8,
+    "protein": 12.6,
+    "closes": 24,
+    "eaa": 5.6,
+    "leucine": 1.1,
+    "lowest": null,
+    "claims": [
+     "Source of protein",
+     "High protein"
+    ]
+   },
+   "fats": {
+    "fat": 9.5,
+    "closes": 34,
+    "sat": 3.1,
+    "satMeal": 9.6,
+    "epaDha": 58,
+    "mostly": "monounsaturated",
+    "unsatToSat": 1.8,
+    "claims": [
+     "Source of omega-3"
+    ]
+   },
+   "micros": {
+    "pd": 8.8,
+    "top": [
+     "vitamin D 40 %",
+     "vitamin B12 36 %",
+     "riboflavin 33 %"
+    ],
+    "claims": [
+     "Source of vitamin A",
+     "High in vitamin D",
+     "High in riboflavin",
+     "Source of pantothenic acid",
+     "Source of folate",
+     "High in vitamin B12"
+    ]
+   }
+  },
+  "rows": {
+   "protein": "USDA SR Legacy, FDC 171287, egg, whole, raw",
+   "fats": "USDA SR Legacy, FDC 171287, egg, whole, raw",
+   "micros": "USDA SR Legacy, FDC 171287, egg, whole, raw"
+  },
+  "portions": {
+   "protein": "2 eggs, 100 g",
+   "fats": "2 eggs, 100 g",
+   "micros": "2 eggs, 100 g"
+  }
+ },
+ "lentil": {
+  "name": "Lentils, boiled",
+  "icon": "🫘",
+  "fams": {
+   "protein": {
+    "pd": 7.8,
+    "protein": 18,
+    "closes": 34,
+    "eaa": 6.6,
+    "leucine": 1.3,
+    "lowest": "Methionine + cysteine",
+    "claims": [
+     "Source of protein",
+     "High protein"
+    ]
+   },
+   "carbs": {
+    "carb": 40.2,
+    "closes": 40,
+    "fibre": 15.8,
+    "fibreMeal": 8.3,
+    "sugar": 3.6,
+    "gi": 32,
+    "band": "low",
+    "gl": 8,
+    "mostly": "starch",
+    "claims": [
+     "Source of fibre",
+     "High fibre",
+     "Low sugars"
+    ]
+   },
+   "micros": {
+    "pd": 7.8,
+    "top": [
+     "folate 181 %",
+     "iron 48 %",
+     "potassium 37 %"
+    ],
+    "claims": [
+     "Source of thiamine",
+     "High in folate",
+     "Source of iron",
+     "Source of potassium"
+    ]
+   }
+  },
+  "rows": {
+   "protein": "USDA SR Legacy, FDC 172421, lentils, boiled",
+   "carbs": "USDA SR Legacy, FDC 172421, lentils, boiled",
+   "micros": "USDA SR Legacy, FDC 172421, lentils, boiled"
+  },
+  "portions": {
+   "protein": "200 g",
+   "carbs": "200 g",
+   "micros": "200 g"
+  }
+ },
+ "oat": {
+  "name": "Oats, dry",
+  "icon": "🌾",
+  "fams": {
+   "protein": {
+    "pd": 3.5,
+    "protein": 6.6,
+    "closes": 12,
+    "eaa": 2.3,
+    "leucine": 0.5,
+    "lowest": "Lysine",
+    "claims": [
+     "Source of protein"
+    ]
+   },
+   "carbs": {
+    "carb": 33.9,
+    "closes": 34,
+    "fibre": 5.1,
+    "fibreMeal": 8.3,
+    "sugar": 0.5,
+    "gi": 55,
+    "band": "low",
+    "gl": 16,
+    "mostly": "starch",
+    "claims": [
+     "Source of fibre",
+     "High fibre",
+     "Low sugars"
+    ]
+   }
+  },
+  "rows": {
+   "protein": "USDA SR Legacy, FDC 173904, oats, regular and quick, dry",
+   "carbs": "USDA SR Legacy, FDC 173904, oats, regular and quick, dry"
+  },
+  "portions": {
+   "protein": "50 g",
+   "carbs": "50 g"
+  }
+ },
+ "olive oil": {
+  "name": "Olive oil",
+  "icon": "🫒",
+  "fams": {
+   "fats": {
+    "fat": 14,
+    "closes": 50,
+    "sat": 1.9,
+    "satMeal": 9.6,
+    "epaDha": 0,
+    "mostly": "monounsaturated",
+    "unsatToSat": 6.1,
+    "claims": [
+     "High unsaturated fat"
+    ]
+   }
+  },
+  "rows": {
+   "fats": "USDA SR Legacy 04053, oil, olive, salad or cooking"
+  },
+  "portions": {
+   "fats": "1 tablespoon, 14 g"
+  }
+ },
+ "butter": {
+  "name": "Butter",
+  "icon": "🧈",
+  "fams": {
+   "fats": {
+    "fat": 8.1,
+    "closes": 29,
+    "sat": 5.1,
+    "satMeal": 9.6,
+    "epaDha": 0,
+    "mostly": "saturated",
+    "unsatToSat": 0.5,
+    "claims": []
+   }
+  },
+  "rows": {
+   "fats": "USDA SR Legacy, FDC 173410, butter, salted"
+  },
+  "portions": {
+   "fats": "For one slice of bread, 10 g"
+  }
+ },
+ "walnut": {
+  "name": "Walnuts",
+  "icon": "🌰",
+  "fams": {
+   "fats": {
+    "fat": 19.6,
+    "closes": 70,
+    "sat": 1.8,
+    "satMeal": 9.6,
+    "epaDha": 0,
+    "mostly": "polyunsaturated",
+    "unsatToSat": 9.2,
+    "claims": [
+     "High unsaturated fat",
+     "Source of omega-3",
+     "High omega-3"
+    ]
+   }
+  },
+  "rows": {
+   "fats": "USDA SR Legacy, FDC 170187, walnuts, English"
+  },
+  "portions": {
+   "fats": "A handful, 30 g"
+  }
+ },
+ "avocado": {
+  "name": "Avocado",
+  "icon": "🥑",
+  "fams": {
+   "fats": {
+    "fat": 10.3,
+    "closes": 37,
+    "sat": 1.5,
+    "satMeal": 9.6,
+    "epaDha": 0,
+    "mostly": "monounsaturated",
+    "unsatToSat": 5.5,
+    "claims": [
+     "High unsaturated fat"
+    ]
+   }
+  },
+  "rows": {
+   "fats": "USDA SR Legacy, FDC 171705, avocados, raw"
+  },
+  "portions": {
+   "fats": "Half, 70 g"
+  }
+ },
+ "cheddar": {
+  "name": "Cheddar",
+  "icon": "🧀",
+  "fams": {
+   "fats": {
+    "fat": 10,
+    "closes": 36,
+    "sat": 5.7,
+    "satMeal": 9.6,
+    "epaDha": 3,
+    "mostly": "saturated",
+    "unsatToSat": 0.5,
+    "claims": []
+   }
+  },
+  "rows": {
+   "fats": "USDA SR Legacy, FDC 173414, cheese, cheddar"
+  },
+  "portions": {
+   "fats": "30 g"
+  }
+ },
+ "almond": {
+  "name": "Almonds",
+  "icon": "🥜",
+  "fams": {
+   "fats": {
+    "fat": 15,
+    "closes": 54,
+    "sat": 1.1,
+    "satMeal": 9.6,
+    "epaDha": 0,
+    "mostly": "monounsaturated",
+    "unsatToSat": 11.6,
+    "claims": [
+     "High unsaturated fat"
+    ]
+   },
+   "micros": {
+    "pd": 3.6,
+    "top": [
+     "vitamin E 64 %"
+    ],
+    "claims": [
+     "High in vitamin E",
+     "Source of thiamine",
+     "High in riboflavin",
+     "Source of niacin",
+     "Source of folate",
+     "High in calcium",
+     "Source of iron",
+     "High in magnesium",
+     "High in potassium",
+     "High in zinc"
+    ]
+   }
+  },
+  "rows": {
+   "fats": "USDA SR Legacy, FDC 170567, almonds",
+   "micros": "USDA SR Legacy, FDC 170567, almonds"
+  },
+  "portions": {
+   "fats": "A handful, 30 g",
+   "micros": "A handful, 30 g"
+  }
+ },
+ "white rice": {
+  "name": "White rice, boiled",
+  "icon": "🍚",
+  "fams": {
+   "carbs": {
+    "carb": 42.3,
+    "closes": 42,
+    "fibre": 0.6,
+    "fibreMeal": 8.3,
+    "sugar": 0.1,
+    "gi": 73,
+    "band": "high",
+    "gl": 30,
+    "mostly": "starch",
+    "claims": [
+     "Low sugars"
+    ]
+   }
+  },
+  "rows": {
+   "carbs": "USDA SR Legacy, FDC 169757, rice, white, long-grain, cooked"
+  },
+  "portions": {
+   "carbs": "150 g cooked"
+  }
+ },
+ "potatoe": {
+  "name": "Potatoes, boiled",
+  "icon": "🥔",
+  "fams": {
+   "carbs": {
+    "carb": 40,
+    "closes": 40,
+    "fibre": 3.6,
+    "fibreMeal": 8.3,
+    "sugar": 1.8,
+    "gi": 78,
+    "band": "high",
+    "gl": 28,
+    "mostly": "starch",
+    "claims": [
+     "Source of fibre",
+     "Low sugars"
+    ]
+   }
+  },
+  "rows": {
+   "carbs": "USDA SR Legacy, FDC 170440, potatoes, boiled, flesh"
+  },
+  "portions": {
+   "carbs": "200 g"
+  }
+ },
+ "wholewheat bread": {
+  "name": "Wholewheat bread",
+  "icon": "🍞",
+  "fams": {
+   "carbs": {
+    "carb": 25.6,
+    "closes": 25,
+    "fibre": 3.6,
+    "fibreMeal": 8.3,
+    "sugar": 2.6,
+    "gi": 74,
+    "band": "high",
+    "gl": 16,
+    "mostly": "starch",
+    "claims": [
+     "Source of fibre",
+     "High fibre",
+     "Low sugars"
+    ]
+   }
+  },
+  "rows": {
+   "carbs": "USDA SR Legacy, FDC 172688, bread, whole-wheat"
+  },
+  "portions": {
+   "carbs": "2 slices, 60 g"
+  }
+ },
+ "pasta": {
+  "name": "Pasta, cooked",
+  "icon": "🍝",
+  "fams": {
+   "carbs": {
+    "carb": 61.8,
+    "closes": 61,
+    "fibre": 3.6,
+    "fibreMeal": 8.3,
+    "sugar": 1.1,
+    "gi": 49,
+    "band": "low",
+    "gl": 29,
+    "mostly": "starch",
+    "claims": [
+     "Low sugars"
+    ]
+   }
+  },
+  "rows": {
+   "carbs": "USDA SR Legacy, FDC 169737, pasta, cooked"
+  },
+  "portions": {
+   "carbs": "200 g cooked"
+  }
+ },
+ "banana": {
+  "name": "Banana",
+  "icon": "🍌",
+  "fams": {
+   "carbs": {
+    "carb": 27.4,
+    "closes": 27,
+    "fibre": 3.1,
+    "fibreMeal": 8.3,
+    "sugar": 14.6,
+    "gi": 51,
+    "band": "low",
+    "gl": 12,
+    "mostly": "sugars",
+    "claims": [
+     "Source of fibre"
+    ]
+   }
+  },
+  "rows": {
+   "carbs": "USDA SR Legacy, FDC 173944, bananas, raw"
+  },
+  "portions": {
+   "carbs": "1 medium, 120 g"
+  }
+ },
+ "apple": {
+  "name": "Apple",
+  "icon": "🍎",
+  "fams": {
+   "carbs": {
+    "carb": 24.8,
+    "closes": 25,
+    "fibre": 4.3,
+    "fibreMeal": 8.3,
+    "sugar": 18.7,
+    "gi": 36,
+    "band": "low",
+    "gl": 7,
+    "mostly": "sugars",
+    "claims": [
+     "Source of fibre",
+     "High fibre"
+    ]
+   }
+  },
+  "rows": {
+   "carbs": "USDA SR Legacy, FDC 171688, apples, raw, with skin"
+  },
+  "portions": {
+   "carbs": "1 medium, 180 g"
+  }
+ },
+ "spinach": {
+  "name": "Spinach, raw",
+  "icon": "🥬",
+  "fams": {
+   "micros": {
+    "pd": 12.4,
+    "top": [
+     "vitamin K 386 %",
+     "vitamin A 70 %",
+     "folate 58 %"
+    ],
+    "claims": [
+     "High in vitamin A",
+     "Source of vitamin E",
+     "High in vitamin K",
+     "High in vitamin C",
+     "High in folate",
+     "Source of iron",
+     "Source of magnesium",
+     "Source of potassium"
+    ]
+   }
+  },
+  "rows": {
+   "micros": "USDA SR Legacy, FDC 168462, spinach, raw"
+  },
+  "portions": {
+   "micros": "A big handful, 60 g"
+  }
+ },
+ "milk": {
+  "name": "Milk, 1 %",
+  "icon": "🥛",
+  "fams": {
+   "micros": {
+    "pd": 7.9,
+    "top": [
+     "vitamin B12 61 %",
+     "vitamin D 53 %",
+     "calcium 39 %"
+    ],
+    "claims": [
+     "High in vitamin D",
+     "Source of riboflavin",
+     "High in vitamin B12",
+     "High in calcium",
+     "Source of potassium"
+    ]
+   }
+  },
+  "rows": {
+   "micros": "USDA Foundation, FDC 746772, milk, lowfat, 1 %, with added vitamins A and D"
+  },
+  "portions": {
+   "micros": "A glass, 250 ml"
+  }
+ },
+ "red pepper": {
+  "name": "Red pepper, raw",
+  "icon": "🫑",
+  "fams": {
+   "micros": {
+    "pd": 3.8,
+    "top": [
+     "vitamin C 192 %",
+     "vitamin A 47 %"
+    ],
+    "claims": [
+     "High in vitamin A",
+     "High in vitamin C",
+     "Source of vitamin B6",
+     "Source of folate"
+    ]
+   }
+  },
+  "rows": {
+   "micros": "USDA SR Legacy, FDC 170108, peppers, sweet, red, raw"
+  },
+  "portions": {
+   "micros": "1 medium, 120 g"
+  }
+ },
+ "beef": {
+  "name": "Beef, lean, cooked",
+  "icon": "🥩",
+  "fams": {
+   "micros": {
+    "pd": 12.3,
+    "top": [
+     "vitamin B12 140 %",
+     "zinc 86 %",
+     "niacin 53 %",
+     "vitamin B6 38 %"
+    ],
+    "claims": [
+     "High in niacin",
+     "High in vitamin B6",
+     "High in vitamin B12",
+     "Source of iron",
+     "Source of potassium",
+     "High in zinc"
+    ]
+   }
+  },
+  "rows": {
+   "micros": "USDA SR Legacy, FDC 171794, beef, ground, 90 % lean, pan-browned"
+  },
+  "portions": {
+   "micros": "125 g, cooked"
+  }
+ }
+}
