@@ -84,21 +84,22 @@ class Component extends DCLogic {{
 
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
-cy = storyCard(B, y, "DT151", "Explorer: not all proteins are equal (the MVP for the pitch)", [
+cy = storyCard(B, y, "DT151", "Explorer: not all proteins are equal (the MVP for the pitch, version 2)", [
   ("Coach Milan, 29 October 09:41 to 09:54", "The Explorer from my Claude Design project becomes part of Chef Mealan, built from scratch with the design as design only, on our numbers and goals; its Coach, Goal and profile parts are not needed. For now a super simple version, a link in the Menu below Foods, to show new beta testers. The full Explorer is parked in the backlog."),
+  ("Coach Milan, 10:03", "Add the whole spectrum of essential amino acids and their levels, so we see it. And the purpose: when and how to use it best, a valuable insight that already serves a job."),
   ("Now, checked in 0.2.131", "No Explorer. What makes one protein food different from another lives only in Chef Mealan's lines on a plate and in PD."),
-  ("The story", "Menu: Explorer, below Foods. One page, Not all proteins are equal: protein is the surname, whey, egg or lentil the first name, and each behaves differently. Eight protein foods (whey, chicken breast, Greek yogurt, salmon, soybeans, egg, lentils, oats), per 100 g: protein and kcal, and PD in the app's colours against your target; quality as DIAAS with a plain chip (complete, top quality; complete, a little short of methionine; incomplete, short of lysine); leucine, the amino acid that switches on muscle repair, with a normal portion; what completes it (lentils with rice, oats with dairy); and one line against your own PD target. Two chips sort the list: By PD, By quality. One line at the end says what DIAAS is, that it is educational and approximate, and that Carbs and Fats come next."),
+  ("The story", "Menu: Explorer, below Foods. One page, Not all proteins are equal: protein is the surname, whey, egg or lentil the first name, and each behaves differently. Eight protein foods (whey, chicken breast, Greek yogurt, salmon, soybeans, egg, lentils, oats), per 100 g: protein and kcal, and PD in the app's colours against your target; quality as DIAAS with a plain chip (complete, top quality; complete, a little short of methionine; incomplete, short of lysine); the nine essential amino acids as bars against what the body needs per gram of protein (a line at 100 %; green above it, amber or red for the one it is short of); leucine, the amino acid that switches on muscle repair, with a normal portion; Best use, when and how it serves you best (whey after training, Greek yogurt at breakfast or before sleep, chicken as the anchor of a main meal, lentils with rice for a plant lunch, oats as a breakfast carb with dairy); what completes it (lentils with rice, oats with dairy); and one line against your own PD target. Two chips sort the list: By PD, By quality. One line at the end says what DIAAS is, that it is educational and approximate, and that Carbs and Fats come next."),
   ("Not in it", "3D molecules, the other families, links from the Plate and Foods, anything from the design's Coach, Goal or profiles. A public version for people not signed in."),
-  ("The numbers", "From the design's data.js. Before they go in front of testers, each is checked against a published food table (USDA FoodData Central for protein, energy and amino acids; the FAO 2013 DIAAS values), and the sources go on the page."),
+  ("The numbers", "From the design's data.js. Before they go in front of testers, each is checked against a published food table (USDA FoodData Central for protein, energy and amino acids, with cysteine and tyrosine so methionine and phenylalanine are read as the body uses them; the WHO 2007 amino acid need per gram of protein; the FAO 2013 DIAAS values), and the sources go on the page."),
 ])
 h = rowEnd(cy,
   B.screen("DT151a", 0, y, "Now: no Explorer", "r151a", "now", "Me, Foods, Share, Support, About."),
   B.screen("DT151b", 1, y, "New: Explorer below Foods", "r151b", "changed", "Not all proteins are equal."))
 y = h
 h = rowEnd(y + 10,
-  B.screen("DT151c", 0, y, "New: sorted by PD", "r151c", "changed", "Whey 24.3 to oats 3.3; each with quality, leucine, what completes it, and you."),
-  B.screen("DT151d", 1, y, "New: sorted by quality", "r151d", "changed", "The complete proteins first; lentils and oats with what completes them."))
+  B.screen("DT151c", 0, y, "New: sorted by PD", "r151c", "changed", "Whey 24.3 to oats 3.3; amino acid bars, Best use, what completes it, and you."),
+  B.screen("DT151d", 1, y, "New: sorted by quality", "r151d", "changed", "The bars show why: soy dips at methionine, lentils further, oats at lysine."))
 y = h
 board("Stories103.dc.html", "DT151. Explorer: not all proteins are equal",
-  "29 October 2026 (Coach Milan, the Explorer MVP for the pitch). Now: 0.2.131, untouched. Drawn for your approval; nothing built.",
+  "29 October 2026 (Coach Milan, the Explorer MVP for the pitch), version 2. Now: 0.2.131, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories102.dc.html")
