@@ -53,8 +53,10 @@ const SHOTS = process.env.SHOTS;
   ok(names.length === 8 && names[0] === "Whey protein powder" && names[7] === "Oats, dry", "DT151: eight foods by PD, whey first, oats last: " + names.join(", "));
   const whey = page.locator(".ex-card").first();
   const heads = await whey.locator(".ex-head > b").allTextContents();
-  ok(heads.join("|") === "One portion|Protein for your lunch|Muscle building and repair|The family members: nine essential amino acids|Quality|How to use it", "DT151: six sections, each a heading: " + heads.join(" | "));
-  ok((await whey.locator(".ex-head > small").count()) === 6, "DT151: every section says its goal under the heading");
+  ok(heads.join("|") === "One portion|Protein for your lunch|Muscle building and repair|The family members: nine essential amino acids|Quality|What a label could say|How to use it", "DT151: seven sections (DT156: What a label could say), each a heading: " + heads.join(" | "));
+  // DT156 (0.3.0, board Stories108): what a label could say, by EU rules
+  ok(new RegExp("^By EU rules, a food may only claim these when it meets them per 100 g\\. This one could say: Source\ of\ protein,\ High\ protein\\.$").test(await text(whey.locator(".ex-head > small").nth(5))) && /^Regulation \(EC\) No 1924\/2006, Annex, as the European Commission lists it\.$/.test(await text(whey.locator(".ex-claim-src"))), "DT156: the claims it could carry, and the regulation: Source of protein, High protein");
+  ok((await whey.locator(".ex-head > small").count()) === 7, "DT151, DT156: every section says its goal under the heading");
   const closes = Math.round(100 * 27 / mealP);
   ok(new RegExp(`^Your lunch needs about ${mealP} g of protein\\. This portion closes ${closes} % of it\\.$`).test(await text(whey.locator(".ex-head > small").nth(1))), "DT151: the portion against the lunch, " + closes + " %");
   const rowsW = (await whey.locator(".ex-row").allTextContents()).map((t) => t.replace(/\s+/g, " ").trim());
@@ -67,6 +69,8 @@ const SHOTS = process.env.SHOTS;
   ok(scores.length === 2 && /^PDCAAS1\.00The older score/.test(scores[0]) && /Hertzler 2020, adults$/.test(scores[0]) && /^DIAAS0\.90The newer score.*Hertzler 2020$/.test(scores[1]), "DT151: PDCAAS and DIAAS, one below another, from the one paper read in full (Milan 12:36)");
   ok(/Scores vary by study: whey from 0\.85 to 1\.09 in the papers we read, so we take them from one\./.test(await text(whey.locator(".ex-head > small").nth(4))), "DT151: Quality says the scores vary by study");
   ok(/^Source: a typical whey label/.test(await text(whey.locator(".ex-card-src"))), "DT151: the source of the numbers on the card");
+  const oatsHP = page.getByRole("region", { name: "Oats, dry", exact: true }).locator(".ex-claim", { hasText: "High protein" });
+  ok(/^High proteinNo/.test(await text(oatsHP)) && /that is PD 5\. This food: PD 3\.5\./.test(await text(oatsHP)), "DT156: oats can't say high protein: PD 3.5, the rule is PD 5");
   // lentils: its lowest; salmon: no score yet
   const len = page.locator(".ex-card", { hasText: "Lentils, boiled" });
   ok(await len.locator(".ex-low").count() === 1 && /^Methionine \+ cysteine · its lowest/.test(await text(len.locator(".ex-low"))), "DT151: lentils, its lowest marked");

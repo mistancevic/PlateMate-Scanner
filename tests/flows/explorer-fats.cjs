@@ -40,7 +40,9 @@ const SHOTS = process.env.SHOTS;
   ok(names.length === 8 && names[0] === "Almonds" && names[7] === "Cheddar", "DT154: by fat quality, almonds first, cheddar last: " + names.join(", "));
   const olive = page.getByRole("region", { name: "Olive oil", exact: true });
   const heads = await olive.locator(".ex-head > b").allTextContents();
-  ok(heads.join("|") === "One portion|Fat for your lunch|Heart health|The family members|Quality|How to use it" && await olive.locator(".ex-head > small").count() === 6, "DT154: six sections, each with its goal: " + heads.join(" | "));
+  ok(heads.join("|") === "One portion|Fat for your lunch|Heart health|The family members|Quality|What a label could say|How to use it" && await olive.locator(".ex-head > small").count() === 7, "DT154: seven sections (DT156: What a label could say), each with its goal: " + heads.join(" | "));
+  // DT156 (0.3.0, board Stories108): what a label could say, by EU rules
+  ok(new RegExp("^By EU rules, a food may only claim these when it meets them per 100 g\\. This one could say: High\ unsaturated\ fat\\.$").test(await text(olive.locator(".ex-head > small").nth(5))) && /^Regulation \(EC\) No 1924\/2006, Annex, as the European Commission lists it\.$/.test(await text(olive.locator(".ex-claim-src"))), "DT156: the claims it could carry, and the regulation: High unsaturated fat");
   const satMeal = Math.round(mealKcal * 0.1 / 9 * 10) / 10;
   const rowsO = (await olive.locator(".ex-row").allTextContents()).map((t) => t.replace(/\s+/g, " ").trim());
   ok(rowsO.includes(`Fat14 of ${mealFat} g`) && rowsO.includes(`Saturated fat1.9 of ${satMeal} g`) && rowsO.includes("Omega-3, EPA + DHA0 of 250 mg") && rowsO.includes("Transnot reported"), "DT154: fat, saturated against the meal's share, EPA and DHA against the day; trans not reported for olive oil");
@@ -51,6 +53,9 @@ const SHOTS = process.env.SHOTS;
   const cheddar = page.getByRole("region", { name: "Cheddar", exact: true });
   ok(/This portion is mostly saturated\./.test(await text(cheddar.locator(".ex-head > small").nth(3))) && (await cheddar.locator(".ex-score-val").allTextContents())[0] === "0.5 : 1", "DT154: cheddar mostly saturated, 0.5 to 1");
   ok(/^Source: USDA SR Legacy, FDC 173414, cheese, cheddar\.$/.test(await text(cheddar.locator(".ex-card-src"))), "DT154: the SR row on the card");
+  ok(/This one could claim none of them\./.test(await text(cheddar.locator(".ex-head > small").nth(5))) && await cheddar.locator(".ex-claim-ok").count() === 0, "DT156: cheddar could claim none of them");
+  const wal = page.getByRole("region", { name: "Walnuts", exact: true });
+  ok((await wal.locator(".ex-claim-ok b:first-child").allTextContents()).join() === "High unsaturated fat,Source of omega-3,High omega-3", "DT156: walnuts could say high omega-3");
   // another meal, the other order (a portion over its saturated share turns red: the unit test explorerFats.test.ts)
   await page.locator(".ex-chips[aria-label=\"Which meal\"]").getByRole("radio").first().click(); await page.waitForTimeout(200);
   await page.getByRole("radio", { name: "Most of the meal" }).click(); await page.waitForTimeout(200);
