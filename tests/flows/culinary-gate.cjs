@@ -78,10 +78,14 @@ const U = "http://127.0.0.1:3262";
   await page.reload(); await page.waitForTimeout(1800);
   ok(await page.locator(".gate-line").count() === 0 && /A peanut banana toast with the bar on the side/.test(await text(".gate-card .gate-yes")), "DT93, DT116: a plate that is food: no red lines, Chef Mealan's one line that says what it is");
   // DT98 (0.2.90): the cooking foods as chips; x takes one out
-  await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.cooking = ["ground cinnamon", "lemon zest"]; s.cookingFor = s.items.map((i) => i.food.id); localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
-  await page.reload(); await page.waitForTimeout(1500);
-  // 0.3.0: under a loaded run the chips can come after 4 s (it failed twice in a full run, never alone): wait for both, up to 12 s
-  await page.waitForFunction(() => document.querySelectorAll(".pt-cook .pt-chip").length === 2, null, { timeout: 12000 }).catch(() => {});
+  // 0.3.2: it failed a third time in a full run, never alone. The likely cause is the page saving its own state over ours just
+  // before the reload, so the cooking foods are set and the page reloaded until they are there, at most three times.
+  for (let i = 0; i < 3; i++) {
+    await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.cooking = ["ground cinnamon", "lemon zest"]; s.cookingFor = s.items.map((i) => i.food.id); localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
+    await page.reload(); await page.waitForTimeout(1500);
+    // 0.3.0: under a loaded run the chips can come after 4 s: wait for both, up to 12 s
+    if (await page.waitForFunction(() => document.querySelectorAll(".pt-cook .pt-chip").length === 2, null, { timeout: 12000 }).then(() => true, () => false)) break;
+  }
   ok(await page.locator(".pt-cook .pt-chip").count() === 2, "DT98: For cooking as two chips");
   await page.getByRole("button", { name: "Take out lemon zest" }).click(); await page.waitForTimeout(300);
   ok(JSON.stringify((await st()).cooking) === JSON.stringify(["ground cinnamon"]) && await page.locator(".pt-cook .pt-chip").count() === 1, "DT98: x takes the lemon zest out, the cinnamon stays");

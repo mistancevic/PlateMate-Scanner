@@ -2,6 +2,8 @@
 // DT154 (0.2.135, board Stories106; Milan 14:47 to 15:04): Fats, the same template; family chips at the top.
 // DT155 (0.2.136, board Stories107; Milan 15:30 and 15:41): Carbs, the same template.
 // DT156 (0.3.0, board Stories108; Milan 16:16 to 16:27): a seventh section on every card, What a label could say, by EU rules.
+// DT158 and DT159 (0.3.2, boards Stories110 and Stories111; Milan 16:16 to 18:22): Micros, against the day; By food or By member,
+// and a member's own page, Vitamin D and Vitamin C first. The numbers and their sources: src/explorerMicros.ts.
 // Every card tells the same story in six sections: a heading, the goal of the section and what this portion does against
 // it, then the details; every measure in one pattern, the name, the bar, the grams. The numbers and their sources: src/explorer.ts.
 import { useMemo, useState } from "react";
@@ -10,6 +12,7 @@ import { EXPLORER_FOODS, NINE, EAA_MEAL, LEUCINE_MEAL, SCALE_G, cardOf, type Exp
 import { FAT_FOODS, FAT_MEMBERS, FAT_SCALE_G, EPA_DHA_DAY, SAT_SHARE, fatCardOf, type FatCard } from "../explorerFats";
 import { proteinClaims, fatClaims, carbClaims, CLAIMS_SOURCE, type Claim } from "../euClaims";
 import { CARB_FOODS, CARB_MEMBERS, CARB_SCALE_G, FIBRE_DAY, GI_LOW, GI_HIGH, carbCardOf, type CarbCard } from "../explorerCarbs";
+import { MICRO_FOODS, MICRO_MEMBERS, MICRO_GROUPS, MICRO_SCALE, EFSA_D, MEMBER_PAGES, CLAIMS_HEALTH_SOURCE, microCardOf, memberDay, memberRows, lowerName, fmtAmount, type MicroCard, type MicroId, type MemberPage } from "../explorerMicros";
 import { lifestyleOf } from "../personal";
 import { slotsOf } from "../slots";
 import { needOf } from "../planned";
@@ -27,10 +30,11 @@ function Head({ title, goal }: { title: string; goal: string }) {
 }
 // one pattern for every measure: the name, the bar, the grams; a line where the meal has a need, green when the portion covers it
 // over: a limit gone over (saturated fat), red; under: a member of a member, indented
-function Row({ name, value, frac, need, ok, strong, low, over, under }: { name: string; value: string; frac: number; need?: boolean; ok?: boolean; strong?: boolean; low?: boolean; over?: boolean; under?: boolean }) {
+// sub: a second line under the name (DT159: the portion and the form)
+function Row({ name, value, frac, need, ok, strong, low, over, under, sub }: { name: string; value: string; frac: number; need?: boolean; ok?: boolean; strong?: boolean; low?: boolean; over?: boolean; under?: boolean; sub?: string }) {
   return (
     <div className={`ex-row${strong ? " ex-strong" : ""}${low ? " ex-low" : ""}${ok ? " ex-ok" : ""}${over ? " ex-over" : ""}${under ? " ex-under" : ""}`}>
-      <small className="ex-name">{name}</small>
+      <small className="ex-name">{name}{sub && <span className="ex-sub">{sub}</span>}</small>
       <span className="ex-bar" aria-hidden="true"><i style={{ width: `${Math.max(Math.min(frac, 1) * 100, 1.5)}%` }} />{need && <i className="ex-need" />}</span>
       <small className="ex-val">{value}</small>
     </div>
@@ -88,7 +92,7 @@ function Card({ c, meal, mealP, target }: { c: ExplorerCard; meal: string; mealP
   );
 }
 
-type Family = "protein" | "fats" | "carbs";
+type Family = "protein" | "fats" | "carbs" | "micros";
 // the meal: the person's slots, the next one by the clock; its share of the day
 function useMeal(p: AppApi) {
   const slots = useMemo(() => slotsOf(lifestyleOf(p.personal)), [p.personal]);
@@ -120,8 +124,9 @@ export function ExplorerScreen(p: AppApi) {
         <button role="radio" aria-checked={family === "protein"} className={`choice ${family === "protein" ? "on" : ""}`} onClick={() => setFamily("protein")}>Protein</button>
         <button role="radio" aria-checked={family === "fats"} className={`choice ${family === "fats" ? "on" : ""}`} onClick={() => setFamily("fats")}>Fats</button>
         <button role="radio" aria-checked={family === "carbs"} className={`choice ${family === "carbs" ? "on" : ""}`} onClick={() => setFamily("carbs")}>Carbs</button>
+        <button role="radio" aria-checked={family === "micros"} className={`choice ${family === "micros" ? "on" : ""}`} onClick={() => setFamily("micros")}>Micros</button>
       </div>
-      {family === "protein" ? <ProteinPage {...p} /> : family === "fats" ? <FatsPage {...p} /> : <CarbsPage {...p} />}
+      {family === "protein" ? <ProteinPage {...p} /> : family === "fats" ? <FatsPage {...p} /> : family === "carbs" ? <CarbsPage {...p} /> : <MicrosPage {...p} />}
     </div>
   );
 }
@@ -244,6 +249,102 @@ function CarbsPage(p: AppApi) {
       {cards.map((c) => <CarbCardView key={c.food.id} c={c} meal={meal} mealCarb={mealCarb} target={p.pdRef} />)}
       <Book line="Worthy Numbers, the free book: GI and GL, PD and the label, in eleven short pages." />
       <p className="ex-sources">Sources. Carbs, fibre and sugars per 100 g: USDA FoodData Central, SR Legacy, the row named on each card; starch and other carbs is what remains, calculated. GI: Atkinson, Foster-Powell and Brand-Miller 2008, International Tables of Glycemic Index and Glycemic Load Values, Diabetes Care, Table 1, the mean of several studies; GL calculated by its method. Fibre, at least {FIBRE_DAY} g a day for adults: WHO 2023 carbohydrate guideline and EFSA. Free sugars under 10 % of energy: WHO 2015 sugars guideline. Educational, approximate, not medical advice.</p>
+    </>
+  );
+}
+
+// DT158: one portion against the day; every member against the label's reference intake, the line at the whole day
+function MicroCardView({ c, target }: { c: MicroCard; target: number | null }) {
+  const f = c.food, above = target !== null && c.pd >= target;
+  const rowOf = (id: MicroId) => { const m = MICRO_MEMBERS.find((x) => x.id === id)!, s = c.share[id], a = c.amount[id];
+    return <Row key={id} name={m.name} value={s === null || a === null ? "not reported" : `${fmtAmount(a, m.unit)} · ${s} %`} frac={(s ?? 0) / 100 / MICRO_SCALE} need ok={s !== null && s >= 100} />; };
+  const says = c.claims.map((x) => (x.high ? "High in " : "Source of ") + lowerName(x.name));
+  return (
+    <section className="card ex-card" aria-label={f.name}>
+      <div className="ex-title"><span className="ex-icon" aria-hidden="true">{f.icon}</span><b>{f.name}</b><span className={`pdpill pdpill-${above || target === null ? "high" : "low"}`}>PD {c.pd.toFixed(1)}</span></div>
+      <Head title="One portion" goal="Every number below is for one normal portion." />
+      <Pair name="Portion" value={f.portion.label} />
+      <Pair name={f.drink ? "Per 100 ml" : "Per 100 g"} value={`${f.kcal} kcal, ${f.protein} g protein`} />
+      <Head title="For your day" goal={`Vitamins and minerals count per day, not per meal. ${c.top.length ? `This portion brings at least a third of the day's ${c.top.map((id) => lowerName(MICRO_MEMBERS.find((m) => m.id === id)!.name)).join(", ")}.` : "This portion brings less than a third of the day of each."}`} />
+      {c.top.map(rowOf)}
+      <Head title="The family members" goal="Vitamins and minerals. Fat-soluble vitamins are stored and need some fat in the meal; water-soluble ones aren't stored, so you need them more often. Each bar is this portion against the EU reference intake on labels; the line is the whole day." />
+      {MICRO_GROUPS.map((g) => <div key={g.id}><small className="ex-group">{g.name}</small>{MICRO_MEMBERS.filter((m) => m.group === g.id).map((m) => rowOf(m.id))}</div>)}
+      {c.dEfsa !== null && c.dEfsa > 0 && <small className="ex-src ex-dnote">Vitamin D: the label's reference is 5 µg a day; EFSA sets {EFSA_D} µg for adults. Against EFSA, this portion brings {c.dEfsa} %.</small>}
+      <Head title="What a label could say" goal={`By EU rules, a food may say it is a source of a vitamin or mineral with 15 % of the reference per 100 g${f.drink ? " (7.5 % per 100 ml for a drink)" : ""}, and high in it with twice that. ${says.length ? `This one could say: ${says.join(", ")}.` : "This one could claim none of them."}`} />
+      <Head title="How to use it" goal="When and how this food serves you best." />
+      <p className="ex-best"><b>Best use:</b> {f.best}</p>
+      <p className="ex-line"><b>Pairs with:</b> {f.pair}</p>
+      <small className="ex-src ex-card-src">Source: {f.src}.</small>
+    </section>
+  );
+}
+
+function MicrosPage(p: AppApi) {
+  const [view, setView] = useState<"food" | "member">("food");
+  const [open, setOpen] = useState<MicroId | null>(null);
+  const page = MEMBER_PAGES.find((m) => m.id === open);
+  const sex = p.personal?.sex ?? null;
+  const viewChips = (
+    <div className="moments ex-chips" role="radiogroup" aria-label="Start from">
+      <button role="radio" aria-checked={view === "food"} className={`choice ${view === "food" ? "on" : ""}`} onClick={() => { setView("food"); setOpen(null); }}>By food</button>
+      <button role="radio" aria-checked={view === "member"} className={`choice ${view === "member" ? "on" : ""}`} onClick={() => setView("member")}>By member</button>
+    </div>
+  );
+  if (view === "member" && page) return <>{viewChips}<MemberView m={page} sex={sex} back={() => { setOpen(null); window.scrollTo(0, 0); }} /></>;
+  if (view === "member") return (
+    <>
+      {viewChips}
+      <h2 className="ex-h">The family members</h2>
+      <p className="ex-intro">Start from a vitamin or mineral: what it is, what it does, how much a day, where to find it, and what to combine it with.</p>
+      {MICRO_GROUPS.map((g) => (
+        <div key={g.id} className="ex-members">
+          <small className="ex-group">{g.name}</small>
+          {MICRO_MEMBERS.filter((m) => m.group === g.id).map((m) => { const mp = MEMBER_PAGES.find((x) => x.id === m.id);
+            return mp ? <button key={m.id} className="menu-row ex-member" onClick={() => { setOpen(m.id); window.scrollTo(0, 0); }}><b>{m.name}</b><small>your day {memberDay(mp, sex).v} {mp.unit}</small><span aria-hidden="true">›</span></button>
+              : <div key={m.id} className="menu-row ex-member ex-member-next"><b>{m.name}</b><small>next</small></div>; })}
+        </div>
+      ))}
+    </>
+  );
+  const cards = MICRO_FOODS.map(microCardOf).sort((a, b) => b.top.length - a.top.length);
+  return (
+    <>
+      {viewChips}
+      <h2 className="ex-h">Not all micros are equal</h2>
+      <p className="ex-intro">Micronutrients are the family. Its members are the vitamins, fat-soluble and water-soluble, and the minerals. You need them in milligrams and micrograms, every day. Each food here is one portion against your day: which members it brings, and how much.</p>
+      <small className="ex-meal">Against the EU reference intakes on labels, the same for every adult.</small>
+      {cards.map((c) => <MicroCardView key={c.food.id} c={c} target={p.pdRef} />)}
+      <p className="ex-sources">Sources. Vitamins and minerals per 100 g: USDA FoodData Central, the row named on each card. Reference intakes: Regulation (EU) No 1169/2011, Annex XIII, Part A. Source of and high in: 15 % of the reference per 100 g, 7.5 % per 100 ml for a drink, and twice that, Regulation (EC) No 1924/2006. Vitamin D for adults, {EFSA_D} µg: EFSA. Educational, approximate, not medical advice.</p>
+    </>
+  );
+}
+
+// DT159: a member's own page, the same sections as a card: a heading, what it is for, the details
+function MemberView({ m, sex, back }: { m: MemberPage; sex: string | null; back: () => void }) {
+  const day = memberDay(m, sex), rows = memberRows(m, day.v);
+  const low = m.name.replace("Vitamin", "vitamin");
+  return (
+    <>
+      <button className="ex-back" onClick={back}>‹ The family members</button>
+      <h2 className="ex-h">{m.name}</h2>
+      <section className="card ex-card ex-member-page" aria-label={m.name}>
+        <div className="ex-head ex-head-first"><b>What it is</b><small>{m.is}</small></div>
+        <Head title="What it does" goal={`What the EU allows a label to say, word for word. ${m.name} ...`} />
+        {m.does.map((d) => <small key={d} className="ex-quote">{d}</small>)}
+        <small className="ex-src ex-dnote">{CLAIMS_HEALTH_SOURCE} A food may say these only when it is at least a source of {low}.</small>
+        {m.doesMore && <small className="ex-more"><b>More claims, in short.</b> {m.doesMore}</small>}
+        <Head title="How much a day" goal={`Your day comes from EFSA${day.who === "adults" ? "" : `, for ${day.who === "men" ? "a man" : "a woman"}`}; the label's reference is the same for everyone. ${m.ul ? `Above ${m.ul.v} ${m.unit} a day is too much.` : "No upper limit is set."}`} />
+        <div className="ex-row ex-pair ex-kv"><small className="ex-name">Your day<span className="ex-sub">{m.efsa.src}{day.who === "adults" ? "" : day.who === "men" ? `, men (${m.efsa.women} ${m.unit} for women)` : `, women (${m.efsa.men} ${m.unit} for men)`}</span></small><small className="ex-val">{day.v} {m.unit}</small></div>
+        <div className="ex-row ex-pair ex-kv"><small className="ex-name">On labels<span className="ex-sub">EU reference intake, Regulation (EU) No 1169/2011</span></small><small className="ex-val">{m.label} {m.unit}</small></div>
+        <div className="ex-row ex-pair ex-kv"><small className="ex-name">Upper limit<span className="ex-sub">{m.ul ? m.ul.note : m.ulNone}</span></small><small className="ex-val">{m.ul ? `${m.ul.v} ${m.unit}` : "none set"}</small></div>
+        <Head title="Where to find it" goal={`One normal portion against your day, ${day.v} ${m.unit}. The line is the whole day; green when one portion covers it.`} />
+        {rows.map(({ food, amount, share }) => <Row key={food.name} name={food.name} sub={`${food.portion}${food.form ? `, ${food.form}` : ""}`} value={`${fmtAmount(amount, m.unit)} · ${share} %`} frac={share / 100 / MICRO_SCALE} need ok={share >= 100} />)}
+        <small className="ex-src ex-dnote">Source: USDA FoodData Central, {m.foods.map((f) => f.src).join("; ")}.</small>
+        <Head title="Combine it with" goal="What helps your body use it, and why." />
+        {m.combine.map((c) => <div key={c.with} className="ex-combine"><b>{c.with}</b><small>{c.why}</small></div>)}
+        <Head title="Too much" goal={m.much} />
+        <small className="ex-src ex-card-src">Sources. {m.sources} Educational, not medical advice.</small>
+      </section>
     </>
   );
 }

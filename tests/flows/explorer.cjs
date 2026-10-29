@@ -38,7 +38,7 @@ const SHOTS = process.env.SHOTS;
   // DT154 (0.2.135): the families at the top, Protein first, Carbs next
   const fams = (await page.locator(".ex-families button").allTextContents()).join();
   // Changed by story DT155 (0.2.136, board Stories107): Carbs is a family of its own
-  ok(fams === "Protein,Fats,Carbs" && await text(page.locator(".ex-families .choice.on")) === "Protein", "DT154, DT155: Protein, Fats, Carbs, Protein first: " + fams);
+  ok(fams === "Protein,Fats,Carbs,Micros" && await text(page.locator(".ex-families .choice.on")) === "Protein", "DT154, DT155, DT158: Protein, Fats, Carbs, Micros, Protein first: " + fams);
   // Changed by Milan 12:32 and 12:33: protein is the family, the amino acids its members
   ok(/^Protein is the family\. Its members are the amino acids: leucine, lysine, methionine/.test(await text(page.locator(".ex-intro"))), "DT151: protein the family, the amino acids its members");
   // the meal: the next by the clock, its protein from the day
