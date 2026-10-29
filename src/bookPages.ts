@@ -53,7 +53,7 @@ export function bookOfPath(path: string): string | null {
 }
 // BP70 (Milan 12:29): where a reader came from, by the ending of the link (chefmealan.com/worthy-numbers?from=qr). A fixed
 // list: anything else counts as the plain address. Only the short word is kept, never the link itself.
-export const BOOK_SOURCES: Record<string, string> = { qr: "QR", pdf: "PDF", li: "LinkedIn", ig: "Instagram", wa: "WhatsApp", gh: "GitHub", hp: "Home page" };
+export const BOOK_SOURCES: Record<string, string> = { qr: "QR", pdf: "PDF", li: "LinkedIn", ig: "Instagram", wa: "WhatsApp", gh: "GitHub", hp: "Home page", ex: "Explorer" };  // ex: DT151, Read the book on the Explorer page
 export const sourceOf = (search: string): string | null => { const s = new URLSearchParams(search).get("from"); return s && BOOK_SOURCES[s] ? s : null; };
 // the daily count for a book, book_worthy_numbers, and per source, book_worthy_numbers__qr
 export const bookHit = (slug: string, src?: string | null) => `book_${slug.replace(/-/g, "_")}${src ? `__${src}` : ""}`;
