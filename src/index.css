@@ -2373,3 +2373,21 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .ex-claim-ok .ex-claim-yes { color: var(--top); }
 .ex-claim-src { display: block; margin-top: 4px; }
 .ex-note .ex-name { width: auto; flex: 1; white-space: normal; color: var(--muted); }
+/* DT158 and DT159 (0.3.2): Micros, against the day; By member, a member's own page */
+.ex-sub { display: block; color: var(--muted); font-size: 11px; font-weight: 400; margin-top: 1px; }
+.ex-group { display: block; margin: 10px 0 2px; font-weight: 800; color: var(--brand-text); }
+.ex-dnote { display: block; margin-top: 4px; font-size: 11.5px; line-height: 1.35; }
+.ex-members .ex-group { margin-top: 12px; }
+.ex-member { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 14px; margin: 5px 0; border-radius: 12px; background: var(--surface); border: 1px solid var(--line); font: inherit; color: var(--ink); text-align: left; cursor: pointer; }
+.ex-member > b { flex: 1; font-size: var(--fs-body, 15px); }
+.ex-member > small { color: var(--muted); }
+.ex-member > span { color: var(--muted); }
+.ex-member-next { cursor: default; opacity: .75; }
+.ex-back { display: inline-block; margin: 6px 0 2px; padding: 4px 0; border: 0; background: none; font: inherit; font-weight: 800; color: var(--brand); cursor: pointer; }
+.ex-head-first { margin-top: 0; padding-top: 0; border-top: 0; }
+.ex-quote { display: block; margin: 5px 0; padding-left: 10px; border-left: 3px solid var(--tint); line-height: 1.35; }
+.ex-more { display: block; margin-top: 6px; line-height: 1.4; }
+.ex-combine { padding: 7px 0; border-bottom: 1px solid var(--line); }
+.ex-combine > b { display: block; font-size: var(--fs-small); }
+.ex-combine > small { display: block; line-height: 1.4; }
+.ex-kv .ex-name { width: auto; flex: 1; } .ex-kv .ex-val { flex: 0 0 auto; min-width: 0; }
