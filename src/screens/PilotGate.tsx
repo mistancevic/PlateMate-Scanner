@@ -23,7 +23,8 @@ export function PilotGate(p: AppApi) {
         <p className="small">Leave a line and Milan gets back to you.</p>
         <RequestForm email={p.user?.email} name={p.user?.name} />
       </section>
-      <button className="link" onClick={p.signOut}>Sign out</button>
+      {/* not a member yet: nothing of theirs to save, the phone is cleared (DT168) */}
+      <button className="link" onClick={() => p.signOut(true)}>Sign out</button>
     </div>
   );
 }

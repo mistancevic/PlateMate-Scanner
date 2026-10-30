@@ -454,6 +454,31 @@ app.post("/api/scan", requireUser, requireMember, hourly, async (req, res) => {
     fail(res, error);
   }
 });
+// DT169 (0.3.11): Export my data, the whole of it (GDPR Art. 15 and 20). The phone adds what it holds; the server adds what
+// only it can read: everything under the account, what was shared with members and published, the cook switch, join requests
+// and sign-ups by email, the counted events under the member number, and the photo files themselves.
+app.post("/api/export", requireUser, async (req, res) => {
+  const uid = (req as any).uid as string | undefined;
+  if (!uid || !FB_PROJECT) return res.status(uid ? 200 : 401).json(uid ? { server: null } : { error: "Please sign in." });
+  try {
+    const d = db(), email = String((req as any).email || "").toLowerCase();
+    const docs = async (q: FirebaseFirestore.Query) => (await q.get()).docs.map((x) => ({ id: x.id, ...(x.data() as any) }));
+    const user = d.collection("users").doc(uid), out: Record<string, unknown> = { exportedAt: new Date().toISOString() };
+    out.account = (await user.get()).data() ?? null;
+    // the old photo copies are the person's own to read; the phone adds them (and the photo files), so the answer stays small
+    for (const sub of await user.listCollections()) if (sub.id !== "photos") out[`account_${sub.id}`] = await docs(sub);
+    for (const col of ["member_recipes", "member_recipes_preview", "member_names", "member_names_preview", "covers"]) out[col] = await docs(d.collection(col).where("uid", "==", uid));
+    for (const col of ["public_recipes", "public_recipes_preview"]) out[col] = (await docs(d.collection(col).where("authorUid", "==", uid))).map((r: any) => r);
+    out.cook = (await d.collection("cooks").doc(uid).get()).data() ?? null;
+    if (email) for (const col of ["accessRequests", "invites", "bookSignups"]) out[col] = (await docs(d.collection(col).where("email", "==", email))).map((r: any) => ({ ...r, ipHash: undefined, ua: undefined }));
+    // requests stored before 0.3.11 kept the email as typed
+    if (email) out.accessRequests = [...(out.accessRequests as any[]), ...(await d.collection("accessRequests").limit(2000).get()).docs.filter((x) => String(x.get("email") || "").toLowerCase() === email && x.get("email") !== email).map((x) => ({ id: x.id, ...(x.data() as any), ipHash: undefined, ua: undefined }))];
+    for (const col of ["metrics_events", "metrics_events_preview"]) out[col] = await docs(d.collection(col).where("m", "==", memberOf(uid)));
+    // the photo files by name; the phone downloads them itself (the person reads their own files), so this answer stays small
+    out.photo_files = BUCKET ? (await adminStorage().bucket(BUCKET).getFiles({ prefix: `users/${uid}/` }))[0].map((f) => f.name) : [];
+    res.json({ server: out });
+  } catch (e) { fail(res, e); }
+});
 // Delete my account, the whole of it, with admin rights, in the safe order of src/accountDelete.ts: lock the sign-in
 // first (nothing is deleted if that fails), then photo files, the record with everything under it, access requests and
 // invites by email, and the sign-in last. A data step that fails unlocks the sign-in again, so the person can finish.
@@ -479,12 +504,21 @@ app.post("/api/account/delete", requireUser, async (req, res) => {
         const ev = await d.collection(col).where("m", "==", memberOf(uid)).get();
         for (let i = 0; i < ev.docs.length; i += 400) { const b = d.batch(); ev.docs.slice(i, i + 400).forEach((x) => b.delete(x.ref)); await b.commit(); }
       }
+      // DT169 (0.3.11): the recipes they published on chefmealan.com and the cook switch go with the account too
+      for (const col of ["public_recipes", "public_recipes_preview"]) {
+        const mine = await d.collection(col).where("authorUid", "==", uid).get();
+        for (let i = 0; i < mine.docs.length; i += 400) { const b = d.batch(); mine.docs.slice(i, i + 400).forEach((x) => b.delete(x.ref)); await b.commit(); }
+      }
+      await d.collection("cooks").doc(uid).delete();
       if (!email) { try { email = String((await adminAuth().getUser(uid)).email || "").toLowerCase(); } catch { /* no email, nothing to clean by it */ } }
       if (!email) return;
       for (const col of ["accessRequests", "invites", "bookSignups"]) {
         const snap = await d.collection(col).where("email", "==", email).get();
         const batch = d.batch(); snap.docs.forEach((x) => batch.delete(x.ref)); if (snap.size) await batch.commit();
       }
+      // requests stored before 0.3.11 kept the email as typed: matched in lower case (a small collection)
+      const typed = (await d.collection("accessRequests").limit(2000).get()).docs.filter((x) => String(x.get("email") || "").toLowerCase() === email && x.get("email") !== email);
+      if (typed.length) { const b = d.batch(); typed.forEach((x) => b.delete(x.ref)); await b.commit(); }
     },
     signin: async () => { await adminAuth().deleteUser(uid); },
     log: (line) => console.error(`${line} (uid ${uid})`),
@@ -728,6 +762,10 @@ const metricsOwner = (req: express.Request) => {
   return Boolean(email) && allowed.includes(email);
 };
 app.get("/api/metrics/access", requireUser, (req, res) => res.json({ owner: metricsOwner(req) }));
+// DT169 (0.3.11): join requests and book sign-ups hold names, emails and phone numbers: the owner's account only, not every
+// coach. Without METRICS_EMAILS set, any coach as before, so the owner never loses them on a deploy that lacks the setting.
+const ownerOnly = (req: express.Request) => metricsOwner(req) || !String(process.env.METRICS_EMAILS || "").trim();
+const notOwner = (res: express.Response) => res.status(403).json({ error: "Only the owner's account reads these." });
 // BP70 (Milan 12:29): beta spots left, shown on a book's page. Milan sets the number by hand and lowers it as people join;
 // null means no number is shown. Preview keeps its own number, so testing never changes the live page.
 const memSpots: Record<"live" | "preview", number | null> = { live: null, preview: null };
@@ -1942,7 +1980,8 @@ app.post("/api/access-request", async (req, res) => {
   if (typeof b.website === "string" && b.website.trim()) return ok();
   const elapsed = Number(b.elapsed);
   if (!Number.isFinite(elapsed) || elapsed < 4000 || elapsed > 3 * 3_600_000) return ok();
-  const name = String(b.name ?? "").trim(), email = String(b.email ?? "").trim(), note = String(b.note ?? "").trim();
+  // DT169: the email kept in lower case, so Delete my account finds it whatever case it was typed in
+  const name = String(b.name ?? "").trim(), email = String(b.email ?? "").trim().toLowerCase(), note = String(b.note ?? "").trim();
   if (!name || name.length > 80 || !/^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i.test(email) || note.length > 600) return res.status(400).json({ error: "Please check your name and email." });
   if (/https?:\/\//i.test(name) || (note.match(/https?:\/\//gi) ?? []).length > 1) return ok();
   // HP12: an optional mobile number, for a WhatsApp message or a text about joining; kept as + and digits only
@@ -1965,14 +2004,16 @@ app.post("/api/access-request", async (req, res) => {
     ok();
   } catch (e) { fail(res, e); }
 });
-app.get("/api/access-requests", requireUser, requireMember, requireCoach, async (_req, res) => {
+app.get("/api/access-requests", requireUser, requireMember, requireCoach, async (req, res) => {
   try {
+    if (!ownerOnly(req)) return notOwner(res);
     const snap = await db().collection("accessRequests").orderBy("createdAt", "desc").limit(50).get();
     res.json({ requests: snap.docs.map((d) => ({ id: d.id, ...(d.data() as any), ipHash: undefined, ua: undefined })) });
   } catch (e) { fail(res, e); }
 });
 app.post("/api/access-requests/:id", requireUser, requireMember, requireCoach, async (req, res) => {
   try {
+    if (!ownerOnly(req)) return notOwner(res);
     const status = req.body?.status === "handled" ? "handled" : "new";
     await db().collection("accessRequests").doc(String(req.params.id).slice(0, 80)).update({ status, handledAt: FieldValue.serverTimestamp() });
     res.json({ ok: true });
@@ -2010,8 +2051,9 @@ app.post("/api/book-notify", async (req, res) => {
     ok();
   } catch (e) { fail(res, e); }
 });
-app.get("/api/book-signups", requireUser, requireMember, requireCoach, async (_req, res) => {
+app.get("/api/book-signups", requireUser, requireMember, requireCoach, async (req, res) => {
   try {
+    if (!ownerOnly(req)) return notOwner(res);
     const snap = await db().collection("bookSignups").orderBy("createdAt", "desc").limit(200).get();
     res.json({ signups: snap.docs.map((d) => ({ id: d.id, email: d.data().email, books: d.data().books ?? [], createdAt: d.data().createdAt })) });
   } catch (e) { fail(res, e); }

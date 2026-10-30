@@ -57,7 +57,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
       {page === "privacy" && (
         <article>
           <h1>Privacy notice</h1>
-          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 30 October 2026 (your private part; Your summary, and the parts of it your coach sees)</p>
+          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 30 October 2026 (what goes to Gemini with each request; your private part; Your summary and your coach)</p>
           <h2>1. Who is responsible</h2>
           <p>{OPERATOR.name}, {OPERATOR.city}, {OPERATOR.country}. <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>. No data protection officer is appointed; the pilot is below the thresholds that require one.</p>
           <h2>2. What Chef Mealan keeps, and why</h2>
@@ -78,7 +78,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
           <h2>3. Where it is, and who processes it</h2>
           <ul>
             <li><b>Google Cloud, Frankfurt (EU).</b> The app runs on Cloud Run; your data sits in Firestore and Firebase Authentication, and your photos as image files in Firebase Storage, region europe-west1/europe-west3. Only you can open your photos; your coach sees a plate's photo only when you share that card. Google Ireland Ltd is the processor under its Cloud data processing terms.</li>
-            <li><b>Google Gemini API.</b> When you scan a label, take or pick a photo of a meal, or write to Chef Mealan, the photo or the text is sent to Google's Gemini API to be read, and the answer comes back. For a drawn cover, the recipe's name, foods and amounts are sent, and a picture comes back. Chef Mealan uses the paid Gemini API: under its terms, Google does not use that content to train its models.</li>
+            <li><b>Google Gemini API.</b> When you scan a label, take or pick a photo of a meal, or write to Chef Mealan, the photo or the text is sent to Google's Gemini API to be read, and the answer comes back. For a drawn cover, the recipe's name, foods and amounts are sent, and a picture comes back. So that every suggestion is safe and fits you, the request also carries, with no name, email or account id: your allergies and intolerances and the health situations you ticked (health data, Art. 9(2)(a), on your consent), your goal's numbers, how you eat (your diet, carbs and fat, how often you drink, where you eat, work travel, wake-up and bedtime, your work hours), your taste chips and own words, your kitchens and what you cook with, and, for Chef's review of your plates, the notes on those cards. Chef Mealan uses the paid Gemini API: under its terms, Google does not use that content to train its models.</li>
             <li><b>Open Food Facts.</b> A barcode you scan is looked up there. The barcode is not personal data; nothing else is sent.</li>
             <li>No advertising, no analytics beyond the pilot log above and the visit counts in section 7, no sale or sharing of your data with anyone else.</li>
           </ul>

@@ -62,3 +62,19 @@ test("DT168: the rules: the private part is the person's only; a coach writes on
   const only = /hasOnly\(\[([^\]]+)\]\)/.exec(r)![1];
   for (const k of ["safety", "personal", "region", "goneFoods", "adultAt"]) assert.ok(!only.includes(`'${k}'`), `a coach can't write ${k}`);
 });
+test("DT169: the old photo copies are the owner's only", () => {
+  const r = fs.readFileSync(new URL("../firestore.rules", import.meta.url), "utf8");
+  const photos = /match \/photos\/\{pid\} \{([\s\S]*?)\}/.exec(r)![1];
+  assert.match(photos, /allow read: if request\.auth != null && request\.auth\.uid == uid;/); assert.ok(!/coachOfParent/.test(photos));
+});
+test("DT169: join requests and sign-ups are the owner's only; delete and export reach everything", () => {
+  const s = fs.readFileSync(new URL("../server.ts", import.meta.url), "utf8");
+  for (const route of ['app.get("/api/access-requests"', 'app.post("/api/access-requests/:id"', 'app.get("/api/book-signups"']) {
+    const i = s.indexOf(route); assert.ok(i >= 0 && /if \(!ownerOnly\(req\)\) return notOwner\(res\);/.test(s.slice(i, i + 300)), `${route} is owner-only`);
+  }
+  const del = s.slice(s.indexOf('app.post("/api/account/delete"'), s.indexOf("signin: async"));
+  for (const x of ['"public_recipes", "public_recipes_preview"', 'collection("cooks").doc(uid).delete()', "toLowerCase() === email"]) assert.ok(del.includes(x), `delete reaches ${x}`);
+  assert.match(s, /email = String\(b\.email \?\? ""\)\.trim\(\)\.toLowerCase\(\)/);
+  const ex = s.slice(s.indexOf('app.post("/api/export"'), s.indexOf("// Delete my account, the whole of it"));
+  for (const x of ["listCollections", "member_recipes", "public_recipes", "cooks", "accessRequests", "metrics_events", "photo_files", "sub.id !== \"photos\""]) assert.ok(ex.includes(x), `export has ${x}`);
+});
