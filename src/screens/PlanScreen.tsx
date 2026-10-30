@@ -200,7 +200,7 @@ export function PlanScreen(p: AppApi) {
         })}
         {/* SL2: the day's settings sit with the day, as links, one per line */}
         <div className="plan-card-links">
-          <button type="button" className="link" onClick={() => p.openMenu("life")}>Slots and times ›</button>
+          <button type="button" className="link" onClick={() => { try { sessionStorage.setItem("cm-jump", "meals"); } catch {} p.openMenu("life"); }}>Slots and times ›</button>
           <button type="button" className="link" onClick={() => p.openMenu("week")}>Training week ›</button>
         </div>
       </section>

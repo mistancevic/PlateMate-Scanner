@@ -17,7 +17,7 @@ import { RHYTHMS, REGIONS } from "../moments";
 import { LIFE, DAY_TYPES, calculate, canCalculate, suggestBand, formulaFor, dayModeOf, ownDayNumbers, weekOf, lifeOf, workOf, withWork, planOf, lifestyleOf, ageOf, isMinor, dayFor, KITCHENS, EQUIPMENT, equipmentOf, type Personal, type DayType } from "../personal";
 import { CHEF_NAME } from "../components/Mark";
 import { KITCHEN, tasteOf, another, anotherLeft, undo, type Taste } from "../kitchens";
-import { slotsOf, windowOf, workHoursOf, timesFromWork, SLOT_HOURS, toMin } from "../slots";
+import { slotsOf, windowOf, workHoursOf, timesFromWork, timesFromSleep, sleepWindow, SLOT_HOURS, toMin } from "../slots";
 import { WEEKDAYS, WEEKDAY_NAMES, HOURS, SLOTS, MOVES, WHERE, DIETS, DIET_MEANS, ALCOHOL, ALCOHOL_AGE, LOAD_NAME, planFromCounts, countsOf, loadOf, planShort, planLine, LOAD_DAY, isoWeek, datesOfWeek, WHERE_KID, SCHOOL_HOURS, COMMUTES, PE_WEEK, weekdayIndex, usualFrom, HOURS_SHOWN, STUDY_HOURS, WEEKDAY_CHOICES, weekdaysOf, dayKindOf, workHintOf, type Plan, type PlanDay, type Lifestyle, moveDay, isTraining } from "../plan";
 import { DayEditor } from "../components/DayEditor";
 import { ProteinCard } from "../components/ProteinCard";
@@ -427,43 +427,15 @@ function LifestylePanel(p: AppApi) {
   const age = ageOf(p.personal);
   // under 18: school instead of work, no eating window, no alcohol question; the age comes from the profile
   const minor = isMinor(p.personal);
+  // DT166: from Plan's Slots and times, straight to Meals, now below work and sleep
+  useEffect(() => { let j: string | null = null; try { j = sessionStorage.getItem("cm-jump"); sessionStorage.removeItem("cm-jump"); } catch {}
+    if (j === "meals") { const t = setTimeout(() => document.getElementById("meals")?.closest(".seg")?.previousElementSibling?.scrollIntoView({ block: "start" }), 150); return () => clearTimeout(t); } }, []);
   const wk = weekdaysOf(l);
   const toggle = (v: string) => save({ where: (l.where ?? []).includes(v) ? (l.where ?? []).filter((x) => x !== v) : [...(l.where ?? []), v] });
   const asItems = (xs: string[]) => xs.map((x) => ({ id: x, name: x }));
   return (
     <>
       <p className="small muted page-why">{minor ? "How your life runs in a normal school week. Set it once, and change it when something changes, like a new school year." : "How your life runs most weeks. Set it once; change it when life changes."}</p>
-      <Seg title="Nutrition" why={minor ? "How you usually eat. Chef Mealan suggests from here first." : "How you usually eat and drink. Chef Mealan plans and suggests from here first."}>
-        <Setting name="Where you eat" hint="Pick all that apply."><Chips items={asItems(minor ? WHERE_KID : WHERE)} on={l.where} pick={toggle} multi /></Setting>
-        <Setting name="Meals a day" hint={minor ? "Snacks count as a meal here." : undefined}><Chips items={(minor ? [2, 3, 4, 5] : [1, 2, 3, 4, 5]).map((n) => ({ id: n, name: n === 5 ? "5 or more" : String(n) }))} on={l.meals} pick={(n) => save({ meals: n })} /></Setting>
-        {/* 0.2.1: the slots Plan shows, with their times. M8 (11 October 2026): the times are what I set; the eating window
-            follows from them, first meal to last, and is no longer set by hand. A window set before is where the times start. */}
-        <Setting name="Meal times" hint="When you eat each meal. Your eating window follows from them.">
-          {/* DT147 (0.2.128): one line per meal, the name left and the time right, so it never runs past the card on an iPhone */}
-          <div className="time-rows slot-times">
-            {slotsOf(l).map((s) => <label key={s.id} className="time-row"><span>{l.meals === 1 ? "Your meal" : s.name}</span><input type="time" value={s.time} aria-label={`${s.name} time`} onChange={(e) => e.target.value && save({ slotTimes: { ...(l.slotTimes ?? {}), [s.id]: e.target.value } })} /></label>)}
-          </div>
-          {(() => { const w = workHoursOf(l); if (!w || !timesFromWork(l)) return null; const late = toMin(w.from) >= 11 * 60;
-            return <small className="setting-hint from-work">From your work hours, {w.from} to {w.to}: {late ? "breakfast late morning, the main meal an hour before work, a small one at the break" : "breakfast before work, lunch at the halfway break, dinner after"}. Change any time and yours stays.</small>; })()}
-        </Setting>
-        {/* DT134 (0.2.113, board Stories89): one meal a day eats within an hour from the meal, and the meal carries the day */}
-        {!minor && l.meals === 1 && (() => { const w = windowOf(l)!; return <p className="window-line">One meal a day at {w.from}. Eating window: {w.from} to {w.to}, an hour from your meal. It carries your whole day: about {fmt(p.state.goals.calories, 0)} kcal and {fmt(p.state.goals.protein, 0)} g protein.</p>; })()}
-        {!minor && l.meals !== 1 && (() => { const t = slotsOf(l).map((x) => x.time).sort(); return <p className="window-line">Eating window: {t[0]} to {t[t.length - 1]}. From your first and last meal.</p>; })()}
-        <Setting name="What you eat">
-          <Chips items={asItems(DIETS)} on={l.diet ?? "Everything"} pick={(v) => save({ diet: v })} />
-          {/* DT161 (0.3.3, board Stories113): what each diet means, Meat only's effect on the numbers, Other in your words */}
-          {l.diet === "Meat only" && <small className="setting-hint diet-hint">{DIET_MEANS["Meat only"]} They bring almost no carbs, so your carbs come close to zero. Very low carb fits your numbers: <button type="button" className="link" onClick={() => p.openGoal()}>set it under Goal ›</button></small>}
-          {l.diet && l.diet !== "Meat only" && DIET_MEANS[l.diet] && <small className="setting-hint diet-hint">{DIET_MEANS[l.diet]}</small>}
-          {l.diet === "Other" && <label className="field diet-other"><span>How you eat, in your words</span><input value={l.dietOther ?? ""} maxLength={120} placeholder="for example Mediterranean, no gluten" onChange={(e) => save({ dietOther: e.target.value })} /></label>}
-          {!minor && <small className="setting-hint">{CHEF_NAME} reads this with every plate and recipe it suggests.</small>}
-        </Setting>
-        {age !== null && age >= ALCOHOL_AGE && (
-          <Setting name="Alcohol" hint="Alcohol counts as energy, 7 kcal a gram, and slows recovery. Chef Mealan knows how often you drink: when you mention a drink or an evening out, it counts it and leaves room in the day.">
-            <Chips items={asItems(ALCOHOL)} on={l.alcohol} pick={(v) => save({ alcohol: v })} />
-          </Setting>
-        )}
-      </Seg>
-      <small className="muted page-why">Allergies stay in Profile, with the safety questions.</small>
       {minor ? (
         <Seg title="School" why="How much school moves you on a normal day, before any sport.">
           <Setting name="School hours"><Options items={SCHOOL_HOURS} on={l.school} pick={(v) => save({ school: v })} /></Setting>
@@ -502,10 +474,53 @@ function LifestylePanel(p: AppApi) {
           {wk === "home" && <p className="small muted">Your days are spent at home. Chef Mealan counts every day as a day at home, and your training goes in the Training week.</p>}
         </Seg>
       )}
-      <Seg title="Recovery" why={minor ? "Sleep is when your body grows and turns sport into progress. Most teenagers need 8 to 10 hours." : "Sleep is where training turns into progress. It also decides when a late meal makes sense."}>
-        <Setting name="Bedtime"><Chips items={[{ id: "early", name: "Before 22:00" }, { id: "mid", name: "22:00 to midnight" }, { id: "late", name: "After midnight" }, ...(minor ? [] : [{ id: "varies", name: "Varies with shifts" }])]} on={l.bed} pick={(v) => save({ bed: v as Lifestyle["bed"] })} /></Setting>
-        <Setting name="Wake-up"><Chips items={minor ? [{ id: "early", name: "Before 6" }, { id: "mid", name: "6 to 7" }, { id: "late", name: "After 7" }] : [{ id: "early", name: "Before 6:00" }, { id: "mid", name: "6:00 to 8:00" }, { id: "late", name: "After 8:00" }, { id: "varies", name: "Varies with shifts" }]} on={l.wake} pick={(v) => save({ wake: v as Lifestyle["wake"] })} /></Setting>
+      <Seg title="Recovery" why={minor ? "Sleep is when your body grows and turns sport into progress. Most teenagers need 8 to 10 hours." : "Sleep is where training turns into progress. Your wake-up and bedtime also set your first and last meal, below."}>
+        <Setting name="Wake-up" hint={minor ? undefined : "Sets your first meal, below: an hour and a half after you wake."}><Chips items={minor ? [{ id: "early", name: "Before 6" }, { id: "mid", name: "6 to 7" }, { id: "late", name: "After 7" }] : [{ id: "early", name: "Before 6:00" }, { id: "mid", name: "6:00 to 8:00" }, { id: "late", name: "After 8:00" }, { id: "varies", name: "Varies with shifts" }]} on={l.wake} pick={(v) => save({ wake: v as Lifestyle["wake"] })} /></Setting>
+        <Setting name="Bedtime" hint={minor ? undefined : "Sets your last meal, below: two hours before bed."}><Chips items={[{ id: "early", name: "Before 22:00" }, { id: "mid", name: "22:00 to midnight" }, { id: "late", name: "After midnight" }, ...(minor ? [] : [{ id: "varies", name: "Varies with shifts" }])]} on={l.bed} pick={(v) => save({ bed: v as Lifestyle["bed"] })} /></Setting>
       </Seg>
+      {/* DT166 (0.3.8, board Stories118 version 2; Coach Milan 30 October 08:28): the natural order. Your work, wake-up and bedtime
+          come first and set the meal times; the meal times come after them, and any time you change there stays yours. */}
+      <Seg title="Meals" why={minor ? "How many meals a day, and when." : "When you eat. The times start from your work hours, wake-up and bedtime above; change any time and yours stays."}>
+        <span id="meals" />
+        <Setting name="Meals a day" hint={minor ? "Snacks count as a meal here." : undefined}><Chips items={(minor ? [2, 3, 4, 5] : [1, 2, 3, 4, 5]).map((n) => ({ id: n, name: n === 5 ? "5 or more" : String(n) }))} on={l.meals} pick={(n) => save({ meals: n })} /></Setting>
+        {/* 0.2.1: the slots Plan shows, with their times. M8 (11 October 2026): the times are what I set; the eating window
+            follows from them, first meal to last, and is no longer set by hand. A window set before is where the times start. */}
+        <Setting name="Meal times" hint="When you eat each meal. Your eating window follows from them.">
+          {/* DT147 (0.2.128): one line per meal, the name left and the time right, so it never runs past the card on an iPhone */}
+          <div className="time-rows slot-times">
+            {slotsOf(l).map((s) => <label key={s.id} className="time-row"><span>{l.meals === 1 ? "Your meal" : s.name}</span><input type="time" value={s.time} aria-label={`${s.name} time`} onChange={(e) => e.target.value && save({ slotTimes: { ...(l.slotTimes ?? {}), [s.id]: e.target.value } })} /></label>)}
+            {/* DT166: a time you set yourself stays; when work, wake-up or bedtime would give another, one tap takes it back */}
+            {(() => { const auto = slotsOf({ ...l, slotTimes: undefined }); return slotsOf(l).filter((s) => l.slotTimes?.[s.id] && auto.find((a) => a.id === s.id)!.time !== s.time).map((s) => { const a = auto.find((x) => x.id === s.id)!.time;
+              const { [s.id]: _drop, ...rest } = l.slotTimes ?? {};
+              return <small key={s.id} className="setting-hint own-time">{l.meals === 1 ? "Your meal" : s.name} at {s.time} is your own time. <button type="button" className="link" onClick={() => save({ slotTimes: rest })}>Back to {a}</button></small>; }); })()}
+          </div>
+          {(() => { const w = workHoursOf(l); if (!w || !timesFromWork(l)) return null; const late = toMin(w.from) >= 11 * 60;
+            return <small className="setting-hint from-work">From your work hours, {w.from} to {w.to}: {late ? "breakfast late morning, the main meal an hour before work, a small one at the break" : "breakfast before work, lunch at the halfway break, dinner after"}. Change any time and yours stays.</small>; })()}
+          {/* DT166 (0.3.8, board Stories118): wake-up and bedtime set the first and last meal, the rest evenly between */}
+          {!minor && timesFromSleep(l) && (() => { const sw = sleepWindow(l)!;
+            return <small className="setting-hint from-sleep">From your wake-up and bedtime, above: the first meal at {sw.from}, an hour and a half after you wake; the last at {sw.to}, two hours before bed; the rest evenly between. Change any time and yours stays.</small>; })()}
+        </Setting>
+        {/* DT134 (0.2.113, board Stories89): one meal a day eats within an hour from the meal, and the meal carries the day */}
+        {!minor && l.meals === 1 && (() => { const w = windowOf(l)!; return <p className="window-line">One meal a day at {w.from}. Eating window: {w.from} to {w.to}, an hour from your meal. It carries your whole day: about {fmt(p.state.goals.calories, 0)} kcal and {fmt(p.state.goals.protein, 0)} g protein.</p>; })()}
+        {!minor && l.meals !== 1 && (() => { const t = slotsOf(l).map((x) => x.time).sort(); return <p className="window-line">Eating window: {t[0]} to {t[t.length - 1]}. From your first and last meal.</p>; })()}
+      </Seg>
+      <Seg title="Nutrition" why={minor ? "How you usually eat. Chef Mealan suggests from here first." : "How you usually eat and drink. Chef Mealan plans and suggests from here first."}>
+        <Setting name="Where you eat" hint="Pick all that apply."><Chips items={asItems(minor ? WHERE_KID : WHERE)} on={l.where} pick={toggle} multi /></Setting>
+        <Setting name="What you eat">
+          <Chips items={asItems(DIETS)} on={l.diet ?? "Everything"} pick={(v) => save({ diet: v })} />
+          {/* DT161 (0.3.3, board Stories113): what each diet means, Meat only's effect on the numbers, Other in your words */}
+          {l.diet === "Meat only" && <small className="setting-hint diet-hint">{DIET_MEANS["Meat only"]} They bring almost no carbs, so your carbs come close to zero. Very low carb fits your numbers: <button type="button" className="link" onClick={() => p.openGoal()}>set it under Goal ›</button></small>}
+          {l.diet && l.diet !== "Meat only" && DIET_MEANS[l.diet] && <small className="setting-hint diet-hint">{DIET_MEANS[l.diet]}</small>}
+          {l.diet === "Other" && <label className="field diet-other"><span>How you eat, in your words</span><input value={l.dietOther ?? ""} maxLength={120} placeholder="for example Mediterranean, no gluten" onChange={(e) => save({ dietOther: e.target.value })} /></label>}
+          {!minor && <small className="setting-hint">{CHEF_NAME} reads this with every plate and recipe it suggests.</small>}
+        </Setting>
+        {age !== null && age >= ALCOHOL_AGE && (
+          <Setting name="Alcohol" hint="Alcohol counts as energy, 7 kcal a gram, and slows recovery. Chef Mealan knows how often you drink: when you mention a drink or an evening out, it counts it and leaves room in the day.">
+            <Chips items={asItems(ALCOHOL)} on={l.alcohol} pick={(v) => save({ alcohol: v })} />
+          </Setting>
+        )}
+      </Seg>
+      <small className="muted page-why">Allergies stay in Profile, with the safety questions.</small>
       <NextLink p={p} to="week" from="life" text="Training week" hint={minor ? "What each day of your school week holds" : "What each day of your usual week holds"} />
     </>
   );

@@ -1,0 +1,53 @@
+// DT166 (0.3.8, board Stories118 version 2; Coach Milan 30 October 08:09 to 08:47): wake-up and bedtime set the first and last
+// meal; Lifestyle runs in the order a day runs (Work and study, Recovery, Meals, Nutrition); a time you set stays, with one tap
+// back; Plan's Slots and times opens Lifestyle at Meals.
+const { chromium } = require("playwright");
+const { spawn } = require("node:child_process");
+const path = require("node:path"), fs = require("node:fs");
+const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "utf8"));
+(async () => {
+  const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT: "3269" }, stdio: ["ignore", "pipe", "pipe"] });
+  await new Promise((r) => setTimeout(r, 2500));
+  const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
+  const page = await b.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+  const errs = []; page.on("pageerror", (e) => errs.push(e.message));
+  let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
+  await page.addInitScript((s) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
+    localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-20T16:00:00Z", source: "profile" }));
+    localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "each", week: { passive: 3, active: 1, easy: 2, hard: 1 }, sex: "male", birthYear: 1981, heightCm: 182, weightKg: 85, lifestyle: { weekdays: "work", hours: "flexible", move: "sitting", meals: 3 } }));
+    localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-20T16:00:00Z", consentBodyAt: "2026-10-20T16:00:00Z", declaredAt: "2026-10-20T16:00:00Z", aiConfirmedAt: "2026-10-20T16:00:00Z" }));
+    localStorage.setItem("seeded", "1"); }, seed);
+  await require("./adult.cjs")(page);
+  const times = () => page.locator(".slot-times input").evaluateAll((xs) => xs.map((x) => x.value));
+  const planTimes = async () => (await page.locator(".plan-slot .menu-row-text small:first-child").allTextContents()).map((t) => t.split(", ")[1]);
+  await page.goto("http://127.0.0.1:3269/"); await page.waitForTimeout(900);
+  await page.getByRole("button", { name: /^Plan$/ }).first().click(); await page.waitForTimeout(500);
+  ok((await planTimes()).join(" ") === "07:30 13:45 20:00", "no wake-up or bedtime yet: the usual 07:30 to 20:00");
+  await page.getByRole("button", { name: "Slots and times ›" }).click(); await page.waitForTimeout(700);
+  const heads = await page.locator(".seg-head b").allTextContents();
+  ok(heads.join(",") === "Work and study,Recovery,Meals,Nutrition", "Lifestyle in the order a day runs: " + heads.join(","));
+  const names = await page.locator(".seg").nth(1).locator(".setting-name").allTextContents();
+  ok(names.join(",") === "Wake-up,Bedtime", "Recovery: wake-up before bedtime");
+  const mealsTop = await page.locator(".seg-head", { hasText: "Meals" }).evaluate((el) => el.getBoundingClientRect().top);
+  ok(mealsTop > -5 && mealsTop < 300, "from Plan, Slots and times opens at Meals: " + Math.round(mealsTop));
+  await page.getByRole("button", { name: "Before 6:00" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Before 22:00" }).click(); await page.waitForTimeout(300);
+  ok((await times()).join(" ") === "06:30 12:45 19:00", "wake-up before 6:00 and bed before 22:00: 06:30, 12:45, 19:00");
+  ok(/From your wake-up and bedtime, above: the first meal at 06:30, an hour and a half after you wake; the last at 19:00, two hours before bed/.test(await page.locator(".from-sleep").textContent()), "Meal times says where its times come from");
+  await page.getByRole("button", { name: "After 8:00" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "After midnight" }).click(); await page.waitForTimeout(300);
+  ok((await times()).join(" ") === "09:30 15:45 22:00", "after 8:00 and after midnight: 09:30, 15:45, 22:00");
+  await page.getByRole("button", { name: "Before 6:00" }).click(); await page.waitForTimeout(300);
+  await page.getByRole("button", { name: "Before 22:00" }).click(); await page.waitForTimeout(300);
+  await page.locator(".slot-times input").first().fill("07:00"); await page.waitForTimeout(300);
+  ok((await times()).join(" ") === "07:00 12:45 19:00" && /^Breakfast at 07:00 is your own time\. Back to 06:30$/.test((await page.locator(".own-time").textContent()).trim()), "your own time stays, with a way back");
+  await page.getByRole("button", { name: "After 8:00" }).click(); await page.waitForTimeout(300);
+  ok((await times())[0] === "07:00" && /Back to 09:30/.test(await page.locator(".own-time").textContent()), "a later answer doesn't overwrite it; Back to shows the new time");
+  await page.getByRole("button", { name: "Back to 09:30" }).click(); await page.waitForTimeout(300);
+  ok((await times()).join(" ") === "09:30 14:15 19:00" && await page.locator(".own-time").count() === 0, "Back to: breakfast follows wake-up again");
+  await page.getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(500);
+  ok((await planTimes()).join(" ") === "09:30 14:15 19:00", "Plan follows");
+  ok(errs.length === 0, errs.length ? "page errors: " + errs.join(" | ") : "no page errors");
+  await b.close(); server.kill();
+  process.exit(fail ? 1 : 0);
+})();
