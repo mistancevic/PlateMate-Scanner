@@ -1,7 +1,7 @@
 // DT174 (0.3.16, board Stories121): cook mode, full screen over Make. One big step at a time, read aloud by the phone's own
 // voice, steered by Back, Repeat, Next or by voice (the browser's own speech recognition). The screen stays on. Each step you
 // finish is ticked on Make; closing keeps the ticks. No AI, nothing sent by us: free to run.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Ingredient } from "../pilot";
 import { stepParts, stepText } from "../steps";
 import { tempsIn } from "../units";
@@ -11,13 +11,18 @@ type Timer = { id: number; name: string; ends: number; total: number; rang: bool
 const Speech = () => (typeof window === "undefined" ? null : (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null);
 const canSpeak = () => typeof window !== "undefined" && "speechSynthesis" in window;
 
-export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = null, pics = [] }: {
+// DT177 (0.3.20, board Stories125): a second screen in the same session. remoteStep is a step set on the other screen (applied
+// once per rev); onStep tells the other screen; top is the line that says the kitchen screen is on; pair opens it; look is
+// Chef, look on the kitchen screen: one photo with the step.
+export type CookLink = { remoteStep?: { k: number; rev: number } | null; onStep?: (k: number) => void; top?: ReactNode; pair?: ReactNode; look?: ((k: number) => Promise<string>) | null; closeLabel?: string; doneLabel?: string };
+export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = null, pics = [], link = {} }: {
   title: string; steps: string[]; items: Ingredient[]; ticks: Set<number>;
   onTick: (k: number) => void; onClose: () => void;
   // DT175 (0.3.17): a question to Chef Mealan about this step; null when the AI is off
   ask?: ((question: string, step: number, history: { role: "cook" | "chef"; text: string }[]) => Promise<string>) | null;
   // DT175a (0.3.18): the step pictures, one per step or null; the label sits under the picture, never on it
   pics?: ({ src: string; by: "me" | "ai" } | null)[];
+  link?: CookLink;
 }) {
   const first = Math.max(0, steps.findIndex((_, k) => !ticks.has(k)));
   const [k, setK] = useState(ticks.size >= steps.length ? 0 : first);
@@ -48,6 +53,12 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
     void ask(); document.addEventListener("visibilitychange", back);
     return () => { gone = true; document.removeEventListener("visibilitychange", back); try { lock?.release?.(); } catch { /* already gone */ } };
   }, []);
+  // DT177: the other screen moved: this one follows, once per change, without sending it back
+  const fromOther = useRef(false);
+  useEffect(() => { const r = link.remoteStep; if (!r) return; if (r.k !== live.current.k || live.current.done) { fromOther.current = true; setDone(false); setK(Math.max(0, Math.min(steps.length - 1, r.k))); } }, [link.remoteStep?.rev]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (fromOther.current) { fromOther.current = false; return; } link.onStep?.(k); }, [k]); // eslint-disable-line react-hooks/exhaustive-deps
+  // ticks from the other screen join this one's
+  useEffect(() => { setDoneSet((d) => { let ch = false; const n = new Set(d); ticks.forEach((t) => { if (!n.has(t)) { n.add(t); ch = true; } }); return ch ? n : d; }); }, [ticks]);
   // a step is read aloud when it shows
   useEffect(() => { if (!done) say(`Step ${k + 1}. ${spoken(steps[k], items)}`); }, [k, done, voice]); // eslint-disable-line react-hooks/exhaustive-deps
   // the timers count down; one that ends rings, buzzes and says which
@@ -71,6 +82,8 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   // DT175: a question to Chef Mealan, with the recipe, this step and the amounts cooked; advice only, read aloud
   const askChef = async (question: string) => {
     const at = live.current.k;
+    // DT177: Chef, look, on the kitchen screen: one photo of the pan with this step
+    if (link.look && /^(?:have a |take a )?look(?: at (?:this|it|the pan|the pot|that))?(?: please)?$/.test(question.trim().toLowerCase())) return lookNow();
     if (!ask) { const a = "Chef Mealan can't answer right now. The steps, the commands and the timers still work."; setHeard({ said: question, answer: a, chef: true, step: at }); say(a); return; }
     setHeard({ said: question, answer: "", chef: true, step: at, working: true });
     try {
@@ -81,6 +94,13 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
       const a = e?.message || "Chef Mealan could not answer. Ask again.";
       setHeard({ said: question, answer: a, chef: true, step: at }); say(a);
     }
+  };
+  const lookNow = async () => {
+    if (!link.look) return;
+    const at = live.current.k;
+    setHeard({ said: "Chef, look", answer: "", chef: true, step: at, working: true });
+    try { const a = await link.look(at); setHeard({ said: "Chef, look", answer: a, chef: true, step: at }); say(a); }
+    catch (e: any) { const a = e?.message || "Chef Mealan couldn't look. Try again."; setHeard({ said: "Chef, look", answer: a, chef: true, step: at }); say(a); }
   };
   // what was said
   const hear = (said: string) => {
@@ -125,13 +145,14 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   return (
     <div className="cook-mode" role="dialog" aria-label={`Cooking ${title}`}>
       <div className="cook-top">
-        <button className="pill pill-small" onClick={close}>✕ Close</button>
+        <button className="pill pill-small" style={{ minHeight: 44 }} onClick={close}>{link.closeLabel ?? "✕ Close"}</button>
         <b className="cook-title">{title}</b>
         <small className="cook-count">{done ? "done" : `${k + 1} of ${steps.length}`}</small>
       </div>
       {/* DT175a (0.3.18, board Stories123 v2): the bar is the steps, each a button 44 px high: tap to jump, a tick when done */}
       <div className="cook-steps" role="tablist" aria-label="Steps">{steps.map((_, j) => { const cur = !done && j === k, d = doneSet.has(j); return (
         <button key={j} role="tab" aria-selected={cur} aria-label={`Step ${j + 1}${d ? ", done" : ""}`} className={`cook-step-btn${cur ? " on" : ""}${d ? " done" : ""}`} onClick={() => { setDone(false); go(j); }}>{j + 1}{d && !cur ? " ✓" : ""}</button>); })}</div>
+      {link.top}
       {timers.length > 0 && (
         <div className="cook-timers" aria-label="Timers">
           {timers.map((t) => { const left = (t.ends - now) / 1000; return (
@@ -154,7 +175,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
             <b>Done. Enjoy your meal.</b>
             <small>All {steps.length} steps are ticked. The screen goes back to normal now.</small>
           </section>
-          <button className="pill pill-wide pill-primary" onClick={close}>Back to Make</button>
+          <button className="pill pill-wide pill-primary" onClick={close}>{link.doneLabel ?? "Back to Make"}</button>
           <small className="muted cook-under">On Make: a photo while it is on the counter, how it went, how much you ate, then Rate it.</small>
           <button className="link" onClick={back}>Back to the last step</button>
         </>
@@ -164,7 +185,10 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
             {pics[k] && <><img className="cook-pic" src={pics[k]!.src} alt={`Step ${k + 1}`} /><small className="cook-pic-label">{pics[k]!.by === "ai" ? "Picture drawn by AI, Beta" : "Your photo"}</small></>}
             <small>STEP {k + 1}</small>
             <div className="cook-text">{stepParts(tempsIn(steps[k]), items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}</div>
-            {sec && !running && <button className="pill cook-timer-start" onClick={() => { const a = startTimer(sec, name); say(a); }}>⏱ Start {minutesWords(sec).replace(" minutes", " min").replace(" minute", " min")} timer</button>}
+            {(sec && !running) || link.look ? <div className="cook-step-actions">
+              {sec && !running && <button className="pill cook-timer-start" onClick={() => { const a = startTimer(sec, name); say(a); }}>⏱ Start {minutesWords(sec).replace(" minutes", " min").replace(" minute", " min")} timer</button>}
+              {link.look && <button className="pill cook-look" disabled={!!heard?.working} onClick={() => void lookNow()}>📷 Chef, look</button>}
+            </div> : null}
           </section>
           <div className="cook-buttons">
             <button className="pill" disabled={k === 0} onClick={back}>‹ Back</button>
@@ -179,13 +203,13 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
               {heard.chef && !heard.working && <small className="muted">Read aloud. Nothing on your plate changes.</small>}
             </section>
           )}
-          <form className="cook-card cook-ask-form" onSubmit={(e) => { e.preventDefault(); const q = typed.trim(); if (!q) return; setTyped(""); void askChef(q); }}>
+          {ask && <form className="cook-card cook-ask-form" onSubmit={(e) => { e.preventDefault(); const q = typed.trim(); if (!q) return; setTyped(""); void askChef(q); }}>
             <label htmlFor="cook-ask-field"><b>Ask Chef Mealan about this step</b></label>
             <div className="cook-ask-row">
               <input id="cook-ask-field" className="search" value={typed} onChange={(e) => setTyped(e.target.value)} placeholder={on ? "Or say: Chef, can I use frozen spinach?" : "Can I use frozen spinach?"} maxLength={400} />
               <button type="submit" className="pill pill-primary" disabled={!typed.trim() || !!heard?.working}>Ask</button>
             </div>
-          </form>
+          </form>}
           {hasEars ? (
             <div className="cook-card cook-listen">
               <span className={`cook-dot ${on ? "on" : ""}`} aria-hidden="true" />
@@ -196,6 +220,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
             <small className="muted cook-under">This browser can't listen, so the buttons steer. {canSpeak() ? "Each step can still be read aloud: " : ""}{canSpeak() && <button className="link" onClick={() => choose(on ? "off" : "on")}>{on ? "stop reading aloud" : "read steps aloud"}</button>}</small>
           )}
           <small className="muted cook-under">The screen stays on while you cook.{on ? " Each step is read aloud." : ""}</small>
+          {link.pair}
           <details className="cook-card cook-foods">
             <summary>What's in it</summary>
             <ul>{items.filter((i) => i.grams > 0).map((i) => <li key={i.id}>{stepText(`[[i:${i.id}|${i.food.name.split(",")[0].trim().toLowerCase()}]]`, items)}</li>)}</ul>

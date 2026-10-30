@@ -2516,3 +2516,12 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .sp-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; } .sp-controls .pill { height: 52px; }
 .cook-mode > *, .sp-sheet > * { flex-shrink: 0; }
 .travel-day { display: block; font-size: 13px; font-weight: 700; color: var(--muted); margin: -2px 0 6px; }
+/* DT177 (0.3.20): the second screen */
+.cook-step-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; } .cook-step-actions .pill { min-height: 48px; font-size: 16px; } .cook-step-actions .cook-timer-start { margin-top: 0; }
+.cook-link { display: flex; align-items: center; gap: 8px; background: var(--good-soft); border-radius: 12px; padding: 6px 8px 6px 12px; } .cook-link small { flex: 1; font-weight: 700; color: var(--good-text); } .cook-link .pill { min-height: 44px; }
+.cook-pair { display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; } .cook-pair .pair-code { font: 900 40px/1 ui-monospace, monospace; letter-spacing: .18em; } .cook-pair .qr { width: 168px; height: 168px; }
+.cook-pair .pill, .cook-pair-open { min-height: 44px; }
+.kitchen-join { max-width: 420px; margin: 0 auto; padding: 28px 16px; display: flex; flex-direction: column; gap: 12px; text-align: center; }
+.kitchen-join input { font: 900 32px/1 ui-monospace, monospace; letter-spacing: .2em; text-align: center; height: 64px; text-transform: uppercase; }
+.kitchen-join .pill { min-height: 52px; }
+.kitchen-cam { position: fixed; right: max(12px, env(safe-area-inset-right, 0px)); bottom: max(12px, env(safe-area-inset-bottom, 0px)); width: 96px; height: 72px; border-radius: 10px; object-fit: cover; z-index: 90; border: 2px solid var(--surface); box-shadow: var(--shadow-main); }
