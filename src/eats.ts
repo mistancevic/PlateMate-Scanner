@@ -4,8 +4,9 @@
 // server puts it in every such prompt with one rule (server.ts, eatsNote). Added in one place, so no request is forgotten.
 import { lifestyleOf, splitOf, lowCarbsOf, splitName, type Personal } from "./personal";
 import { DIETS, WHERE } from "./plan";
+import { awayWords } from "./travel";
 
-export type Eats = { what_they_eat?: string; in_their_words?: string; carbs_and_fat?: string; how_often_they_drink?: string; bed?: string; wake?: string; where_they_eat?: string[]; work_travel?: string };
+export type Eats = { what_they_eat?: string; in_their_words?: string; carbs_and_fat?: string; how_often_they_drink?: string; bed?: string; wake?: string; where_they_eat?: string[]; work_travel?: string; away?: string };
 const BED: Record<string, string> = { early: "before 22:00", mid: "22:00 to midnight", late: "after midnight", varies: "varies with shifts" };
 const WAKE: Record<string, string> = { early: "before 6:00", mid: "6:00 to 8:00", late: "after 8:00", varies: "varies with shifts" };
 
@@ -22,6 +23,9 @@ export function eatsForReq(p: Personal, bandId: string): Eats {
   const where = (l.where ?? []).filter((w) => WHERE.includes(w));
   if (where.length) out.where_they_eat = where;
   if (l.travel === "sometimes" || l.travel === "often") out.work_travel = l.travel === "often" ? "a lot" : "occasionally";
+  // DT176 (0.3.19): Travel mode on: the kitchen they have there, and where
+  const away = awayWords(p.travel);
+  if (away) out.away = away;
   return out;
 }
 

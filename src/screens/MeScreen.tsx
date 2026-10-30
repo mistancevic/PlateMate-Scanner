@@ -12,6 +12,8 @@ import { TASTE_CHIPS, toggleChip } from "../tasteChips";
 import { lifestyleOf, planOf } from "../personal";
 import { HOURS, SLOTS, weekdaysOf, WEEKDAY_CHOICES } from "../plan";
 import type { AppApi } from "./api";
+import { TravelCard } from "../components/Travel";
+import { placeName } from "../travel";
 
 // Me: the person's own page. Their goal at a glance and their meals. Settings live in the menu.
 
@@ -61,8 +63,12 @@ export function MeScreen(p: AppApi) {
         </div>
         <div className="button-row"><button className="pill pill-small" onClick={() => p.openMenu("goal")}><Settings size={14} /> Goal and profile</button></div>
         {/* weigh-ins (boards W1, Y1 column 17): moved here from Today on 10 October 2026; with consent for body data, never for someone who declared an eating situation */}
-        {p.safety.consentBodyAt && !weighInsOff(p.safety) && <WeighInLine list={p.personal.weighIns} onSave={(w) => p.setPersonal({ ...p.personal, weighIns: w })} notify={p.notify} />}
+        {p.safety.consentBodyAt && !weighInsOff(p.safety) && (p.travel?.weighPaused
+          ? <div className="weigh-line weigh-paused" role="note"><span><b>Weigh in</b><small>Paused while you travel in {placeName(p.travel.place)}. Your trend keeps your home mornings.</small></span></div>
+          : <WeighInLine list={p.personal.weighIns} onSave={(w) => p.setPersonal({ ...p.personal, weighIns: w })} notify={p.notify} />)}
       </section>
+      {/* DT176 (0.3.19, board Stories124): Travel mode, above the steps */}
+      <TravelCard p={p} />
       <div className="menu-list me-rows">
         {ME_ROWS.map((r) => (
           <button key={r.id} className="menu-row" onClick={() => p.openMenu(r.id, "me" as any)}>
