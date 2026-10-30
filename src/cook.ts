@@ -29,10 +29,14 @@ export const minutesWords = (sec: number) => (sec % 60 === 0 ? `${sec / 60} ${se
 // what was said: a command, or nothing we know (then the screen says what it heard and what it can do)
 export type Command =
   | { kind: "next" } | { kind: "back" } | { kind: "repeat" } | { kind: "stop" } | { kind: "left" }
-  | { kind: "howMuch"; food: string } | { kind: "timer"; seconds: number } | { kind: "none"; said: string };
+  | { kind: "howMuch"; food: string } | { kind: "timer"; seconds: number } | { kind: "none"; said: string }
+  // DT175 (0.3.17): a question for Chef Mealan starts with Chef; everything else stays on the phone
+  | { kind: "ask"; question: string };
 export function parseCommand(said: string): Command {
   const s = said.toLowerCase().replace(/[.,!?]/g, " ").replace(/\s+/g, " ").trim();
   if (!s) return { kind: "none", said };
+  const chef = /^(?:hey |ok |okay )?chef(?: mealan| milan)?[,:]?\s*(.*)$/.exec(s);
+  if (chef) { const q = chef[1].trim(); return q.length >= 3 ? { kind: "ask", question: q } : { kind: "none", said }; }
   const much = /\bhow (?:much|many)(?: of)?(?: the)? (.+)$/.exec(s);
   if (much) return { kind: "howMuch", food: much[1].replace(/\b(do i need|is it|is there|again|please)\b/g, "").trim() };
   if (/\btimer\b|\bset (?:a )?timer\b/.test(s)) {

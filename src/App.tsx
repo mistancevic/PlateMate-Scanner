@@ -2289,6 +2289,26 @@ export default function App() {
         return true;
       } catch (e: any) { setError(e?.message || "The read didn't work. Try again."); return false; } finally { setBusy(""); }
     },
+    // DT175 (0.3.17, board Stories122): Say what you have: the foods named, by voice or typed, land on the Plate as estimates
+    plateFromWords: async (text: string) => {
+      setBusy("Chef Mealan is listing your foods…");
+      try {
+        const d = await api("/api/plate-said", { text, region: region ?? null, library: state.foods.slice(0, 60).map((f) => f.name), meal: moment });
+        const read = cleanRead(d);
+        if (!read) { setError("I didn't catch a food in that. Say the foods you have, for example: eggs, spinach, feta."); return false; }
+        const { items, fresh } = itemsOfRead(read, state.foods, region, uid);
+        const land = (how: "add" | "new") => {
+          if (how === "add") setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items: [...s.items, ...items], portion: null }));
+          else setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo: undefined }));
+          setKind("meal"); setStep("in");
+          notify(`From what you said: ${items.map((i) => i.food.name.split(",")[0].toLowerCase()).join(", ")}. Fit to my target sets the amounts.`);
+        };
+        if (state.items.length) askPlate({ kind: "photo", what: `You said ${items.length} ${items.length === 1 ? "food" : "foods"}: ${items.map((i) => `${i.food.name.split(",")[0].toLowerCase()} ~${Math.round(i.grams)} g`).join(", ")}.`, apply: land });
+        else land("new");
+        log("plate_said", { foods: items.length });
+        return true;
+      } catch (e: any) { setError(e?.message || "That didn't work. Try again."); return false; } finally { setBusy(""); }
+    },
     // the plate eaten now, at the table: whole, or half with the other half kept on Today
     // DT133 (0.2.113): one portion of a plate of several, the rest kept on Today
     ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number }) => {

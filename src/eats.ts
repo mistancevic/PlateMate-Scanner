@@ -26,7 +26,7 @@ export function eatsForReq(p: Personal, bandId: string): Eats {
 }
 
 // the requests that ask Chef Mealan for food or advice about it
-export const EATS_PATHS = ["/api/out", "/api/swap", "/api/short", "/api/meal", "/api/dish", "/api/crave", "/api/steps", "/api/recipe/fit", "/api/plate", "/api/tip", "/api/chef"];
+export const EATS_PATHS = ["/api/out", "/api/swap", "/api/short", "/api/meal", "/api/dish", "/api/crave", "/api/steps", "/api/recipe/fit", "/api/plate", "/api/tip", "/api/chef", "/api/cook-ask"];
 
 // adds `eats` to the JSON body of those requests, once, for the whole app; the current person comes from `get`
 export function installEats(get: () => Eats | null) {

@@ -32,6 +32,8 @@ export interface AppApi {
   ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number }) => void;
   // DT130 (0.2.110): Photo of my meal opens the meal camera; a photo from Your photos waits on the Plate for whose and when
   mealCamera: () => void;
+  // DT175 (0.3.17): the foods you said you have, landed on the Plate as estimates; false when nothing came of it
+  plateFromWords: (text: string) => Promise<boolean>;
   // DT131 (0.2.113): foods waiting to land on a plate that has foods; null when nothing waits
   plateAsk: PlateAsk | null;
   answerPlateAsk: (how: "add" | "new" | null) => void;
