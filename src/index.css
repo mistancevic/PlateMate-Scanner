@@ -2484,3 +2484,25 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .mk-cook { margin: 6px 0 12px; display: flex; flex-direction: column; gap: 6px; } .mk-cook .pill { height: 52px; font-size: 17px; }
 .cook-ask-form { gap: 8px; } .cook-ask-row { display: flex; gap: 8px; } .cook-ask-row input { flex: 1; min-width: 0; height: 44px; margin: 0; } .cook-ask-row .pill { height: 44px; }
 .say-have { gap: 8px; } .say-head { display: flex; align-items: center; gap: 8px; } .say-words { font-size: 19px; line-height: 1.35; } .say-have .search { margin: 0; } .say-buttons .pill { height: 44px; }
+/* DT175a (0.3.18): step buttons, and a step's picture with its label under it */
+.cook-steps { display: flex; gap: 6px; } .cook-step-btn { flex: 1; min-width: 0; height: 44px; border-radius: 12px; font-weight: 800; font-size: 16px; border: 1.5px solid var(--line); background: var(--surface); color: var(--ink); }
+.cook-step-btn.done { background: var(--good-soft); color: var(--good-text); } .cook-step-btn.on { background: var(--brand); border-color: var(--brand); color: #fff; }
+.cook-step.has-pic { min-height: 0; overflow: hidden; } .cook-pic { display: block; width: calc(100% + 28px); max-width: none; margin: -14px -14px 0; aspect-ratio: 4 / 3; object-fit: cover; }
+.cook-pic-label { font-size: 13px !important; color: var(--muted); margin: 4px 0 6px; letter-spacing: 0 !important; }
+.rq-step-pic { flex: none; width: 72px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.rq-step-pic button { width: 72px; height: 72px; border-radius: 10px; overflow: hidden; padding: 0; border: 1px solid var(--line); background: var(--surface); }
+.rq-step-pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rq-step-pic small { font-size: 12px; font-weight: 700; color: var(--muted); }
+.rq-step-pic .add { font-size: 13px; font-weight: 700; color: var(--brand-text); line-height: 1.2; }
+.sp-sheet { position: fixed; inset: 0; z-index: 86; background: var(--base); overflow-y: auto; padding: 14px 16px 28px; display: flex; flex-direction: column; gap: 12px; max-width: 560px; margin: 0 auto; }
+.sp-sheet .pill, .sp-sheet .choice { min-height: 44px; } .sp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sp-sheet img.sp-preview { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 12px; display: block; }
+.sp-checks { background: var(--tint); border-radius: 12px; padding: 10px 12px; } .sp-checks ul { margin: 6px 0 0; padding-left: 18px; line-height: 1.55; font-size: 14px; font-weight: 600; }
+.watch-card { padding: 0; overflow: hidden; } .watch-card .watch-poster { position: relative; display: block; width: 100%; padding: 0; border: 0; background: none; }
+.watch-card .watch-poster img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+.watch-card .watch-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,.95); color: var(--brand); font-size: 26px; display: grid; place-items: center; box-shadow: 0 2px 10px rgba(0,0,0,.25); }
+.watch-card .watch-text { padding: 12px 16px; display: flex; flex-direction: column; gap: 2px; } .watch-card .watch-text small { font-size: 13px; }
+.sp-player .sp-frame { padding: 0; overflow: hidden; } .sp-player .sp-frame img { display: block; width: 100%; aspect-ratio: 1; object-fit: cover; }
+.sp-player .sp-words { padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; } .sp-player .sp-words .cook-text { font-size: 21px; }
+.sp-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; } .sp-controls .pill { height: 52px; }
+.cook-mode > *, .sp-sheet > * { flex-shrink: 0; }

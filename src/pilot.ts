@@ -195,6 +195,12 @@ export type Meal = {
   stepMarks?: StepMark[];
   stepsKitchen?: string;
   shots?: string[];
+  // DT175a (0.3.18, board Stories123): a picture per step, Beta. stepPics are the pictures (files step:<id>:<n>, n the step's
+  // place + 1), stepPicMeta says who made each and the step's words it belongs to; stepPicSigs name them in the saved data.
+  // Owner-only, never shared with members or published.
+  stepPics?: (string | null)[];
+  stepPicMeta?: ({ by: "me" | "ai"; step: string } | null)[];
+  stepPicSigs?: string[];
   // how many the whole recipe makes, as read or guessed (IM3)
   makes?: { n: number; unit: string };
   // DT81 (Milan 23 October 13:26 and 15:11): one recipe, a batch each time you cook it. cook: how many you will make next

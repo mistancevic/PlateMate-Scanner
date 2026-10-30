@@ -11,15 +11,19 @@ type Timer = { id: number; name: string; ends: number; total: number; rang: bool
 const Speech = () => (typeof window === "undefined" ? null : (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null);
 const canSpeak = () => typeof window !== "undefined" && "speechSynthesis" in window;
 
-export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = null }: {
+export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = null, pics = [] }: {
   title: string; steps: string[]; items: Ingredient[]; ticks: Set<number>;
   onTick: (k: number) => void; onClose: () => void;
   // DT175 (0.3.17): a question to Chef Mealan about this step; null when the AI is off
   ask?: ((question: string, step: number, history: { role: "cook" | "chef"; text: string }[]) => Promise<string>) | null;
+  // DT175a (0.3.18): the step pictures, one per step or null; the label sits under the picture, never on it
+  pics?: ({ src: string; by: "me" | "ai" } | null)[];
 }) {
   const first = Math.max(0, steps.findIndex((_, k) => !ticks.has(k)));
   const [k, setK] = useState(ticks.size >= steps.length ? 0 : first);
   const [done, setDone] = useState(false);
+  // DT175a: the steps already finished, to show the ticks on the step buttons (only Next ticks)
+  const [doneSet, setDoneSet] = useState<Set<number>>(() => new Set(ticks));
   const [voice, setVoice] = useState<VoiceChoice>(voiceChoice());
   const [heard, setHeard] = useState<{ said: string; answer: string; chef?: boolean; step?: number; working?: boolean } | null>(null);
   const [typed, setTyped] = useState("");
@@ -56,7 +60,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const go = (to: number) => { setHeard(null); setK(Math.max(0, Math.min(steps.length - 1, to))); };
-  const next = () => { onTick(live.current.k); if (live.current.k >= steps.length - 1) { setDone(true); say("Done. Enjoy your meal."); } else go(live.current.k + 1); };
+  const next = () => { onTick(live.current.k); setDoneSet((d) => new Set(d).add(live.current.k)); if (live.current.k >= steps.length - 1) { setDone(true); say("Done. Enjoy your meal."); } else go(live.current.k + 1); };
   const back = () => { if (live.current.done) { setDone(false); return; } go(live.current.k - 1); };
   const repeat = () => { setHeard(null); say(`Step ${live.current.k + 1}. ${spoken(steps[live.current.k], items)}`); };
   const startTimer = (seconds: number, name: string) => {
@@ -86,6 +90,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
     if (c.kind === "repeat") return repeat();
     if (c.kind === "stop") return close();
     if (c.kind === "ask") return void askChef(c.question);
+    if (c.kind === "goto") { if (c.step > steps.length) { const a = `This recipe has ${steps.length} steps.`; setHeard({ said, answer: a }); say(a); return; } setDone(false); return go(c.step - 1); }
     const answer = c.kind === "left" ? leftLine(at, steps, items)
       : c.kind === "howMuch" ? howMuch(c.food, steps, items)
       : c.kind === "timer" ? startTimer(c.seconds, timerName(steps[at], at))
@@ -124,7 +129,9 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
         <b className="cook-title">{title}</b>
         <small className="cook-count">{done ? "done" : `${k + 1} of ${steps.length}`}</small>
       </div>
-      <div className="cook-bar" aria-hidden="true">{steps.map((_, j) => <span key={j} className={done || j <= k ? "on" : ""} />)}</div>
+      {/* DT175a (0.3.18, board Stories123 v2): the bar is the steps, each a button 44 px high: tap to jump, a tick when done */}
+      <div className="cook-steps" role="tablist" aria-label="Steps">{steps.map((_, j) => { const cur = !done && j === k, d = doneSet.has(j); return (
+        <button key={j} role="tab" aria-selected={cur} aria-label={`Step ${j + 1}${d ? ", done" : ""}`} className={`cook-step-btn${cur ? " on" : ""}${d ? " done" : ""}`} onClick={() => { setDone(false); go(j); }}>{j + 1}{d && !cur ? " ✓" : ""}</button>); })}</div>
       {timers.length > 0 && (
         <div className="cook-timers" aria-label="Timers">
           {timers.map((t) => { const left = (t.ends - now) / 1000; return (
@@ -153,7 +160,8 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
         </>
       ) : (
         <>
-          <section className="cook-card cook-step" aria-live="polite">
+          <section className={`cook-card cook-step${pics[k] ? " has-pic" : ""}`} aria-live="polite">
+            {pics[k] && <><img className="cook-pic" src={pics[k]!.src} alt={`Step ${k + 1}`} /><small className="cook-pic-label">{pics[k]!.by === "ai" ? "Picture drawn by AI, Beta" : "Your photo"}</small></>}
             <small>STEP {k + 1}</small>
             <div className="cook-text">{stepParts(tempsIn(steps[k]), items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}</div>
             {sec && !running && <button className="pill cook-timer-start" onClick={() => { const a = startTimer(sec, name); say(a); }}>⏱ Start {minutesWords(sec).replace(" minutes", " min").replace(" minute", " min")} timer</button>}

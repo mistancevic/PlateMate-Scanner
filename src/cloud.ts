@@ -5,7 +5,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRe
 import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, deleteField, type Firestore } from "firebase/firestore";
 import { splitSave, mergeLoad, coachFieldsOf, dropsOldCopy } from "./privateSplit";
 import { getStorage, ref as fileRef, uploadString, getBytes, deleteObject, listAll } from "firebase/storage";
-import { photoSigsOf, sig } from "./photos";
+import { photoSigsOf, sig, stripStepPics } from "./photos";
 
 // outside the browser build (the tests) there is no env: the cloud is simply off
 const env: Record<string, string | undefined> = (import.meta as any).env ?? {};
@@ -183,6 +183,8 @@ export function stripPhotos<T>(state: T): T {
   // and drawn covers (0.2.11) took a block past Firestore's 1 MB (Milan, 16 October 2026, 19:05). The recipe's record names them.
   (s.meals ?? []).forEach((m: any) => { const ps = photoSigsOf(m); if (ps) m.photoSigs = ps; strip(m); (m.items ?? []).forEach((i: any) => strip(i.food)); });
   // screenshots are files too (0.2.16, board IM): the record names them by fingerprint
+  // DT175a (0.3.18): step pictures are files too
+  (s.meals ?? []).forEach((m: any) => stripStepPics(m));
   (s.meals ?? []).forEach((m: any) => { if (Array.isArray(m.shots)) { if (m.source) m.source.shotSigs = m.shots.map((x: string) => (typeof x === "string" && x.startsWith("data:") ? sig(x) : "")); delete m.shots; } });
   s.feedback = []; // cards live as their own documents, see saveCards
   return s;
