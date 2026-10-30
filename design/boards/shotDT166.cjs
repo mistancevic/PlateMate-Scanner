@@ -39,10 +39,10 @@ async function run(which, life, steps) {
     await dress("Now, 0.3.7: wake-up before 6:00 and bedtime before 22:00 are set under Recovery, but the meals stay at 07:30, 13:45 and 20:00: dinner at 20:00 for someone in bed before 22:00.", [{ sel: ".setting", text: "Meal times" }, { sel: ".setting", text: "Wake-up" }, { sel: ".setting", text: "Bedtime" }]);
     await shot("r166a"); });
   await run("new", early, async ({ shot, dress, toLife, toPlan }) => { await toLife();
-    await dress("New: the same answers move the meals. Breakfast at 06:30, an hour and a half after you wake; the last meal at 19:00, two hours before bed; lunch evenly between. The hint says where the times come from.", [{ sel: ".setting", text: "Meal times" }, { sel: ".setting", text: "Wake-up" }, { sel: ".setting", text: "Bedtime" }]);
+    await dress("New: Lifestyle in the order a day runs. Work and study first, then Recovery, wake-up before bedtime, then Meals, then Nutrition. Wake-up before 6:00 and bed before 22:00 set the meals below them: 06:30, 12:45 and 19:00.", [{ sel: ".seg-head", text: "Recovery" }, { sel: ".seg-head", text: "Meals" }, { sel: ".setting", text: "Meal times" }, { sel: ".setting", text: "Wake-up" }, { sel: ".setting", text: "Bedtime" }]);
     await shot("r166b");
     await toPlan();
-    await dress("New: Plan and Today follow. The day's meals sit at 06:30, 12:45 and 19:00.", [{ sel: ".plan-slot, .slot-row, .plan-row", text: "06:30" }]);
+    await dress("New: Plan and Today follow: 06:30, 12:45 and 19:00. Slots and times opens Lifestyle at Meals.", [{ sel: ".plan-slot, .slot-row, .plan-row", text: "06:30" }]);
     await shot("r166c"); });
   await run("new", { ...LIFE, hours: "flexible", slot: undefined, wake: "late", bed: "late" }, async ({ shot, dress, toLife }) => { await toLife();
     await dress("New: a late riser with flexible hours. Wake-up after 8:00 and bed after midnight: breakfast 09:30, lunch 15:45, the last meal 22:00.", [{ sel: ".setting", text: "Meal times" }]);
@@ -51,6 +51,6 @@ async function run(which, life, steps) {
     await dress("New: the same late riser working 9 to 5. Fixed work hours still come first, as since 0.2.128: lunch at the halfway break, dinner after work. What changes: breakfast is never set before you wake, so 09:00 as work starts, not 08:00.", [{ sel: ".setting", text: "Meal times" }]);
     await shot("r166f"); });
   await run("new", { ...early, slotTimes: { breakfast: "07:00" } }, async ({ shot, dress, toLife }) => { await toLife();
-    await dress("New: a time you set stays. Breakfast set to 07:00 by hand; lunch and the last meal still follow wake-up and bedtime.", [{ sel: ".setting", text: "Meal times" }]);
+    await dress("New: a time you set yourself stays. Breakfast at 07:00 by hand; lunch and the last meal still follow wake-up and bedtime. One tap takes breakfast back to 06:30.", [{ sel: ".setting", text: "Meal times" }, { sel: ".own-time", text: "own time" }]);
     await shot("r166e"); });
 })();

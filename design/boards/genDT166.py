@@ -85,21 +85,22 @@ class Component extends DCLogic {{
 W = SX + 6 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
 cy = storyCard(B, y, "DT166", "Wake-up and bedtime set your meal times", [
-  ("Coach Milan, 30 October", "Asked what is next: wake-up time sets the meal times. DT166. Let's do it. Before, on 29 October: makes no sense that it is there set but no influence."),
+  ("Coach Milan, 30 October", "Asked what is next: wake-up time sets the meal times. DT166. Let's do it. Then, at 08:25: by design almost everything that impacts meal times comes after the meal times are set. At 08:28: one option is to rearrange positions so the sequence is natural towards this outcome. The two rules are ours: ok. Bedtime doesn't stop Chef Mealan suggesting a late meal: no."),
   ("Now, checked in 0.3.7", "Wake-up and Bedtime are asked under Recovery and sent to Chef Mealan, but they move no meal. Without an eating window or fixed work hours, the meals sit at 07:30 to 20:00 for everyone, evenly between. Someone up before 6:00 and in bed before 22:00 gets breakfast at 07:30 and dinner at 20:00."),
   ("The story", "Wake-up sets the first meal: an hour and a half after the start of your wake-up range. Bedtime sets the last: two hours before the start of your bedtime range. The meals between sit evenly, as now. Before 6:00 counts as 5:00, before 22:00 as 21:00. So: before 6:00 gives 06:30, 6:00 to 8:00 gives 07:30, after 8:00 gives 09:30; before 22:00 gives 19:00, 22:00 to midnight gives 20:00, after midnight gives 22:00. The middle answers give today's 07:30 and 20:00, so most people see no change. Varies with shifts: as now."),
-  ("What stays", "A time you set by hand always wins. Fixed work hours still come first, as since 0.2.128, with one change: breakfast is never set before you wake (at most as work starts). An eating window set before still wins. One meal a day stays at 18:00. The Meal times setting says where the times come from; Wake-up and Bedtime say what they set."),
-  ("The numbers", "One and a half hours and two hours are our rule, not a study's: chosen so the middle answers give the times the app has always used. Yours to change, as the coach."),
-  ("Open", "Should bedtime also stop a late meal suggestion from Chef Mealan? Shifts: wake-up and bed by shift, with the shift days."),
+  ("Version 2: the order a day runs", "Lifestyle now runs Work and study, then Recovery (wake-up before bedtime), then Meals (meals a day and meal times), then Nutrition (where you eat, what you eat, alcohol). So the answers that set the meal times come first, and the meal times come after them. A time you change there is yours and stays; a line under it says so, with one tap back to the time your answers give. Plan's Slots and times opens Lifestyle at Meals."),
+  ("What stays", "A time you set by hand always wins. Fixed work hours still come first, as since 0.2.128, with one change: breakfast is never set before you wake (at most as work starts). An eating window set before still wins. One meal a day stays at 18:00. The Meal times setting says where the times come from; Wake-up and Bedtime say what they set below."),
+  ("The numbers", "One and a half hours and two hours are our rule, not a study's: chosen so the middle answers give the times the app has always used. Agreed."),
+  ("Open", "Shifts: wake-up and bed by shift, with the shift days."),
 ])
 h = rowEnd(cy,
   B.screen("DT166a", 0, y, "Now: answers, no effect", "r166a", "now", "Up before 6, bed before 22: meals at 07:30 to 20:00."),
-  B.screen("DT166b", 1, y, "New: the meals follow", "r166b", "changed", "06:30, 12:45, 19:00, and where they come from."),
+  B.screen("DT166b", 1, y, "New: the order a day runs", "r166b", "changed", "Work, sleep, then meals: 06:30, 12:45, 19:00."),
   B.screen("DT166c", 2, y, "New: Plan follows", "r166c", "changed", "The day's meals at the new times."),
   B.screen("DT166d", 3, y, "New: a late riser", "r166d", "changed", "09:30, 15:45, 22:00."),
-  B.screen("DT166e", 4, y, "New: your time stays", "r166e", "changed", "Breakfast 07:00 by hand; the rest follow."),
+  B.screen("DT166e", 4, y, "New: your time stays", "r166e", "changed", "Breakfast 07:00 by hand; one tap back to 06:30."),
   B.screen("DT166f", 5, y, "New: with 9 to 5 work", "r166f", "changed", "Work first; breakfast not before you wake."))
 y = h
 board("Stories118.dc.html", "DT166. Wake-up and bedtime set your meal times",
-  "30 October 2026 (Coach Milan, a setting with no effect). Now: 0.3.7, untouched. Drawn for your approval; nothing built.",
+  "30 October 2026 (Coach Milan, a setting with no effect). Version 2, 08:28: Lifestyle in the order a day runs. Now: 0.3.7, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories117.dc.html")
