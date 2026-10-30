@@ -3,6 +3,8 @@
 // which only the person reads (firestore.rules). The main record, users/{uid}, keeps what the coach needs, with a small
 // coachView the person's own phone writes: the week's numbers, the goal, weigh-ins, and the health situations as which and when.
 // Pure functions here, the reads and writes in cloud.ts; tested in privateSplit.test.ts.
+import { sharedParts } from "./summary";
+import { trendOf, pctTrend, type Trend } from "./weight";
 export const PRIVATE_KEYS = ["state", "personal", "safety", "region", "goneFoods"] as const;
 export type PrivateKey = (typeof PRIVATE_KEYS)[number];
 
@@ -13,6 +15,8 @@ export type CoachView = {
   flags: { situation: string; at: string }[];      // which situation and the day, never the person's words
   consentBy: string | null;
   weightKg: number | null; trainingAge: unknown; weighIns: unknown[];
+  // DT172 (privacy finding 14, option a): without body data shared, the trend in percent, the days weighed, and no kilogram
+  weightTrend?: Trend | null; weighDates?: string[]; weightAt?: string;
 };
 export function coachViewOf(data: Record<string, any>): Partial<CoachView> {
   const out: Partial<CoachView> = {};
@@ -20,8 +24,15 @@ export function coachViewOf(data: Record<string, any>): Partial<CoachView> {
   if (data.personal && typeof data.personal === "object") {
     const p = data.personal;
     out.nextGoal = p.nextGoal ?? null; out.pdUnit = p.pdUnit === "pct" ? "pct" : "pd";
-    out.weightKg = typeof p.weightKg === "number" ? p.weightKg : null; out.trainingAge = p.trainingAge ?? null;
-    out.weighIns = Array.isArray(p.weighIns) ? p.weighIns : [];
+    out.trainingAge = p.trainingAge ?? null;
+    const list = Array.isArray(p.weighIns) ? p.weighIns : [], kg = typeof p.weightKg === "number" ? p.weightKg : null;
+    if (sharedParts(p.coachShare).includes("body")) { out.weightKg = kg; out.weighIns = list; out.weightTrend = null; out.weighDates = []; }
+    else {
+      out.weightKg = null; out.weighIns = []; out.weighDates = list.map((w: any) => String(w.date));
+      const band = data.goal?.band, base = kg ?? (list.length ? list[list.length - 1].kg : null);
+      out.weightTrend = band && base && list.length ? pctTrend(trendOf(list, band, base, p.trainingAge ?? undefined), base) : null;
+      out.weightAt = new Date().toISOString().slice(0, 10);
+    }
   }
   if (data.safety && typeof data.safety === "object") {
     out.flags = Array.isArray(data.safety.flags) ? data.safety.flags.map((f: any) => ({ situation: String(f.situation), at: String(f.at ?? "").slice(0, 10) })) : [];
@@ -77,6 +88,9 @@ export function coachFieldsOf(x: Record<string, any>) {
     weightKg: v ? v.weightKg ?? undefined : x.personal?.weightKg,
     trainingAge: v ? v.trainingAge ?? undefined : x.personal?.trainingAge,
     weighIns: v ? (Array.isArray(v.weighIns) ? v.weighIns : []) : Array.isArray(x.personal?.weighIns) ? x.personal.weighIns : [],
+    weightTrend: v ? (v.weightTrend ?? null) as Trend | null : null,
+    weighDates: v ? (Array.isArray(v.weighDates) ? v.weighDates : []) as string[] : [],
+    weightAt: v ? (v.weightAt ?? null) as string | null : null,
     foods: typeof x.foodsCount === "number" ? x.foodsCount : x.state?.foods?.length ?? 0,
   };
 }

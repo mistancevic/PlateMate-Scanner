@@ -23,7 +23,7 @@ export const SHARE_PARTS: { id: ShareId; name: string; why: string; on: boolean;
   { id: "words", name: "In your own words", why: "What you wrote about your diet or your taste. Off until you switch it on.", on: false },
   { id: "health", name: "Health questions", why: "Which you ticked, and when. Your coach already sees this, never your words.", on: true, health: true, fixed: true },
   { id: "allergies", name: "Allergies and intolerances", why: "Share them if you want your coach to plan around them.", on: false, health: true },
-  { id: "body", name: "Your body data", why: "Sex, birth year, height, weight and body fat, as numbers. Your coach already sees your weigh-ins as a trend. Switching this on is your consent, dated, and you can take it back.", on: false, health: true },
+  { id: "body", name: "Your body data", why: "Sex, birth year, height, weight and body fat, and your weigh-ins in kilograms. Off, your coach sees your weigh-ins only as a trend in percent. Switching this on is your consent, dated, and you can take it back.", on: false, health: true },
 ];
 // what the person chose: a part's id with the date it was switched on; a part not in it follows its default
 export type CoachShare = { on: Partial<Record<ShareId, string>>; off: ShareId[]; savedAt?: string };
