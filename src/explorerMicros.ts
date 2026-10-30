@@ -55,7 +55,7 @@ export type MicroFood = {
   v: Record<MicroId, number | null>; src: string; best: string; pair: string;   // per 100 g; null where the row doesn't report it
 };
 
-import { rowOf } from "./foodTable";
+import { rowOf, FOOD_TABLE } from "./foodTable";
 const fromTable = (id: string) => { const r = rowOf(id); return { icon: r.icon, name: r.name, kcal: r.kcal, protein: r.protein, portion: r.portion, drink: r.drink, v: r.micro!, src: r.src }; };
 // DT164 (0.3.6): the numbers, name, icon and portion come from the shared food table (src/foodTable.ts); only what this family
 // says about a food is written here
@@ -108,7 +108,8 @@ export function microCardOf(f: MicroFood): MicroCard {
 export type MemberFood = { name: string; portion: string; grams: number; per100: number; form?: string; src: string; preformed?: number };
 export type MemberPage = {
   id: MicroId; name: string; also: string; unit: "µg" | "mg" | "mg NE" | "µg DFE"; label: number;
-  efsa: { men: number; women: number; kind: string; src: string; perMJ?: number };   // perMJ: set by energy (B1, B3)
+  efsa: { men: number; women: number; kind: string; src: string; perMJ?: number; young?: { v: number; under: number }; note?: string };   // perMJ: set by energy (B1, B3)
+  // young: a higher value below an age (calcium, 1000 mg to 24); note: said with your day (iron after menopause, zinc and phytate)
   ul: { v: number; note: string } | null; ulNone?: string;
   is: string; does: string[]; doesMore?: string;
   foods: MemberFood[]; foodsNote?: string; gap?: string;   // gap: no food row has it, said instead of foods
@@ -372,10 +373,73 @@ export const MEMBER_PAGES: MemberPage[] = [
     sources: "EU claims: Regulation (EU) No 432/2012. EFSA: dietary reference values for vitamin C (2013), overview of upper limits. Iron over months: Nyakundi 2026, Am J Clin Nutr. Foods: USDA FoodData Central." },
 ];
 
+// DT165 (0.3.7, board Stories117; Coach Milan 29 October 23:24): the five minerals. Sources read 29 October 2026. EU claims:
+// Regulation (EU) No 432/2012, Annex (calcium, iron, magnesium, potassium: legislation.gov.uk; zinc: the OJ L 136 copy on
+// lexploria.com). EFSA: calcium 2015, iron 2015, magnesium 2015, potassium 2016, zinc 2014 (abstracts and press releases); upper
+// limits from EFSA's overview, version 11. Where to find it: the ten foods on our table with the most in one normal portion,
+// from the shared food table, so the numbers are the ones in Foods.
+const srcOf = (src: string) => { const m = /USDA (SR Legacy|Foundation), FDC (\d+)/.exec(src); return m ? `${m[1]}, FDC ${m[2]}` : src; };
+export function tableFoods(id: MicroId, n = 10): MemberFood[] {
+  return FOOD_TABLE.filter((f) => f.micro && f.micro[id] != null).map((f) => ({ name: f.name, portion: f.portion.label, grams: f.portion.grams, per100: f.micro![id]!, src: srcOf(f.src) }))
+    .sort((a, b) => b.per100 * b.grams - a.per100 * a.grams).slice(0, n);
+}
+const TOP_NOTE = "The ten foods on our table with the most in one normal portion.";
+const MINERALS: MemberPage[] = [
+  { id: "ca", name: "Calcium", also: "", unit: "mg", label: 800,
+    efsa: { men: 950, women: 950, kind: "", src: "EFSA, population reference intake for adults from 25", young: { v: 1000, under: 25 } },
+    ul: { v: 2500, note: "EFSA's upper limit for adults, from food and supplements together" },
+    is: "Your bones and teeth hold most of it; it also works in your muscles, your nerves and blood clotting. Milk, yogurt and cheese bring it, and so do sardines eaten with their bones and tofu set with calcium.",
+    does: ["contributes to normal blood clotting", "contributes to normal energy-yielding metabolism", "contributes to normal muscle function", "contributes to normal neurotransmission", "contributes to the normal function of digestive enzymes", "has a role in the process of cell division and specialisation", "is needed for the maintenance of normal bones", "is needed for the maintenance of normal teeth"],
+    foods: tableFoods("ca"), foodsNote: TOP_NOTE,
+    combine: [{ with: "Vitamin D: oily fish, eggs, some sun", why: "Vitamin D contributes to normal absorption and utilisation of calcium: an EU authorised claim." }],
+    much: "EFSA's upper limit for adults is 2500 mg a day, from food and supplements together.",
+    sources: "EU claims: Regulation (EU) No 432/2012. EFSA: dietary reference values for calcium (2015), upper limit for calcium (2012). Foods: USDA FoodData Central." },
+  { id: "fe", name: "Iron", also: "", unit: "mg", label: 14,
+    efsa: { men: 11, women: 16, kind: "", src: "EFSA, population reference intake", note: "For women after menopause, 11 mg, as for men." },
+    ul: null, ulNone: "EFSA found not enough data to derive one, and set a safe level of intake instead, 40 mg a day for adults",
+    is: "Carries oxygen in your blood. Meat, liver and fish bring it, and so do legumes, seeds and greens. From plants, vitamin C in the same meal helps your body take it up.",
+    does: ["contributes to normal cognitive function", "contributes to normal energy-yielding metabolism", "contributes to normal formation of red blood cells and haemoglobin", "contributes to normal oxygen transport in the body", "contributes to the normal function of the immune system", "contributes to the reduction of tiredness and fatigue", "has a role in the process of cell division"],
+    foods: tableFoods("fe"), foodsNote: TOP_NOTE + " Pasta is enriched: iron is added to the flour.",
+    combine: [{ with: "Vitamin C: peppers, citrus, broccoli", why: "Vitamin C increases iron absorption: an EU authorised claim." }, { with: "Vitamin A and riboflavin", why: "Vitamin A contributes to normal iron metabolism, and riboflavin to the normal metabolism of iron: EU authorised claims." }],
+    much: "EFSA found not enough data for an upper limit for iron. It set a safe level of intake instead: 40 mg a day for adults, from all sources.",
+    sources: "EU claims: Regulation (EU) No 432/2012. EFSA: dietary reference values for iron (2015), safe level of intake (2024). Foods: USDA FoodData Central." },
+  { id: "mg", name: "Magnesium", also: "", unit: "mg", label: 375,
+    efsa: { men: 350, women: 300, kind: "", src: "EFSA, adequate intake" },
+    ul: { v: 250, note: "for magnesium salts in supplements, in water or added to foods only" }, ulFood: false,
+    is: "Works in your muscles and nerves, and in getting energy from food. Seeds, nuts, legumes, whole grains and green leaves bring the most.",
+    does: ["contributes to a reduction of tiredness and fatigue", "contributes to electrolyte balance", "contributes to normal energy-yielding metabolism", "contributes to normal functioning of the nervous system", "contributes to normal muscle function", "contributes to normal protein synthesis", "contributes to normal psychological function", "contributes to the maintenance of normal bones", "contributes to the maintenance of normal teeth", "has a role in the process of cell division"],
+    foods: tableFoods("mg"), foodsNote: TOP_NOTE,
+    combine: [],
+    much: "EFSA's upper limit, 250 mg a day, is for magnesium salts in supplements, in water or added to foods. Magnesium that is naturally in food has no limit.",
+    sources: "EU claims: Regulation (EU) No 432/2012. EFSA: dietary reference values for magnesium (2015); the upper limit, from the Scientific Committee on Food (2001), in EFSA's overview of upper limits. Foods: USDA FoodData Central." },
+  { id: "k_", name: "Potassium", also: "", unit: "mg", label: 2000,
+    efsa: { men: 3500, women: 3500, kind: "", src: "EFSA, adequate intake" },
+    ul: null, ulNone: "EFSA found not enough data to derive one",
+    is: "Works with sodium in every cell, in your nerves and muscles. EFSA links low intakes to raised blood pressure and a higher risk of stroke. Legumes, potatoes, fish, meat, fruit and vegetables bring the most.",
+    does: ["contributes to normal functioning of the nervous system", "contributes to normal muscle function", "contributes to the maintenance of normal blood pressure"],
+    foods: tableFoods("k_"), foodsNote: TOP_NOTE,
+    combine: [],
+    much: "EFSA found not enough data to derive an upper limit for potassium.",
+    sources: "EU claims: Regulation (EU) No 432/2012. EFSA: dietary reference values for potassium (2016), overview of upper limits. Foods: USDA FoodData Central." },
+  { id: "zn", name: "Zinc", also: "", unit: "mg", label: 10,
+    efsa: { men: 9.4, women: 7.5, kind: "", src: "EFSA, population reference intake at the lowest phytate intake",
+      note: "EFSA gives four values, by the phytate you eat, 300 to 1200 mg a day: 9.4 to 16.3 mg for men, 7.5 to 12.7 mg for women. Your day here is the lowest: more whole grains, legumes and seeds raise it." },
+    ul: { v: 25, note: "EFSA's upper limit for adults" },
+    is: "Works in your immune system, in your skin, hair and nails, and in making protein and DNA. Meat, liver, seeds, legumes and whole grains bring it.",
+    does: ["contributes to normal acid-base metabolism", "contributes to normal carbohydrate metabolism", "contributes to normal cognitive function", "contributes to normal DNA synthesis", "contributes to normal fertility and reproduction", "contributes to normal macronutrient metabolism", "contributes to normal metabolism of fatty acids", "contributes to normal metabolism of vitamin A", "contributes to normal protein synthesis", "contributes to the maintenance of normal bones", "contributes to the maintenance of normal hair", "contributes to the maintenance of normal nails", "contributes to the maintenance of normal skin", "contributes to the maintenance of normal testosterone levels in the blood", "contributes to the maintenance of normal vision", "contributes to the normal function of the immune system", "contributes to the protection of cells from oxidative stress", "has a role in the process of cell division"],
+    foods: tableFoods("zn"), foodsNote: TOP_NOTE,
+    combine: [{ with: "Less phytate: whole grains, legumes, seeds", why: "Phytate holds zinc back. That is why EFSA's value for your day rises with the phytate you eat." }],
+    much: "EFSA's upper limit for adults is 25 mg a day, from food and supplements together.",
+    sources: "EU claims: Regulation (EU) No 432/2012. EFSA: dietary reference values for zinc (2014); the upper limit, from the Scientific Committee on Food (2002), in EFSA's overview of upper limits. Foods: USDA FoodData Central." },
+];
+MEMBER_PAGES.push(...MINERALS);
+
 // your day: EFSA's value for your sex; a man's when the profile doesn't say
 // kcal: today's energy, for the B vitamins EFSA sets per megajoule (1 kcal = 4.184 kJ); without it, the label's reference
-export function memberDay(m: MemberPage, sex?: string | null, kcal?: number | null): { v: number; who: "men" | "women" | "adults" | "energy" | "label" } {
+// age: years, for calcium's higher value to 24
+export function memberDay(m: MemberPage, sex?: string | null, kcal?: number | null, age?: number | null): { v: number; who: "men" | "women" | "adults" | "energy" | "label" | "young" } {
   if (m.efsa.perMJ) return kcal ? { v: Math.round(m.efsa.perMJ * kcal * 0.004184 * 10) / 10, who: "energy" } : { v: m.label, who: "label" };
+  if (m.efsa.young && age != null && age < m.efsa.young.under) return { v: m.efsa.young.v, who: "young" };
   if (m.efsa.men === m.efsa.women) return { v: m.efsa.men, who: "adults" };
   return sex === "female" ? { v: m.efsa.women, who: "women" } : { v: m.efsa.men, who: "men" };
 }
