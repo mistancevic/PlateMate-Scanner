@@ -84,25 +84,30 @@ class Component extends DCLogic {{
 
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
-cy = storyCard(B, y, "DT174", "Cook mode: one big step at a time, by voice or by tap", [
-  ("Coach Milan, 30 October 15:39 and 16:05", "Voice support to make recipes, on the same phone first. Yes, let's start with new DTs. DT174, draw."),
-  ("What it does", "Start cooking opens the steps one at a time, in big type, read aloud by the phone's own voice. Back, Repeat and Next are big buttons for wet hands. The bar on top shows where you are. The screen stays on until you close it."),
-  ("What you can say", "Next, back, repeat. How much rice: the amount from the recipe, read aloud. Timer 6 minutes: a timer named after its step; several run at once, and the phone rings and says which one ended. What's left: how many steps, and the next one. Stop: leaves cook mode."),
-  ("Where", "On every recipe with steps, under Steps, with the amounts on the page: when Cook it makes a bigger batch, the steps say the bigger amounts. On Plate, under the plate's steps, with the plate's amounts. The end goes back where you started."),
+cy = storyCard(B, y, "DT174", "Cook mode: two doors into Make, one big step at a time", [
+  ("Coach Milan, 30 October 16:05 to 16:31", "DT174, draw. Start cooking and Make it may conflict. The Plate is the editor; the recipe is where we read and decide to make it. Two paths: straight from the recipe when it is exactly how we want to cook it, or through the Plate for a little adjustment first. Both land on the Make step."),
+  ("Two doors on the recipe", "Cook it as written: straight to Make, with the recipe's amounts, nothing to edit. Change it first: today's Make it, the Plate to edit, then Lock the recipe and Make. Edit recipe stays as it is."),
+  ("Start cooking, on Make", "Make already lists the steps to tick. Start cooking sits above them and opens cook mode, full screen: one big step at a time, read aloud by the phone's own voice, big Back, Repeat and Next. Each finished step is ticked on Make; close any time and the ticks stay. The screen stays on."),
+  ("What you can say", "Next, back, repeat. How much rice: the amount you cook, read aloud. Timer 6 minutes: a timer named after its step; several run at once, and the phone rings and says which one ended. What's left. Stop."),
+  ("The end", "Done goes back to Make with every step ticked. A photo, how it went, how much you ate, Rate it: as today."),
   ("Free to run", "The browser's own speech recognition turns the voice into words, and the phone's own voice reads. Nothing goes to Gemini in DT174, so it costs us nothing. Questions to Chef Mealan while cooking come in DT175."),
   ("Privacy", "Voice is asked for once, with where it goes: Google in Chrome, Apple in Safari. No recordings kept. The privacy notice gets one line. Buttons only works the same, and is kept as your answer."),
   ("Limits we test", "Browsers stop listening after a silence, so the app starts listening again. Firefox has no speech recognition: buttons only there. iPhones listen less reliably than Android. Commands are in English, as the app is. A walkthrough with a stand-in voice checks every command; then Testers 1, 2 and 3 cook one recipe each on their own phones."),
 ])
 h = rowEnd(cy,
-  B.screen("DT174a", 0, y, "Now: steps as a list", "r174a", "now", "Small type, scroll with wet hands, the screen sleeps."),
-  B.screen("DT174b", 1, y, "New: Start cooking", "r174b", "changed", "On every recipe with steps, and on Plate."),
-  B.screen("DT174c", 2, y, "New: voice, asked once", "r174c", "changed", "Says where the voice goes. Buttons only works the same."))
+  B.screen("DT174a", 0, y, "Now: one way, Make it", "r174a", "now", "Always through the Plate's editing first."),
+  B.screen("DT174b", 1, y, "New: two doors", "r174b", "changed", "Cook it as written, or Change it first."),
+  B.screen("DT174c", 2, y, "Now: Make, tick the steps", "r174c", "now", "The Plate's middle step, small type."))
 y = h
-h = rowEnd(y + 200,
-  B.screen("DT174d", 0, y, "New: a step, read aloud", "r174d", "changed", "A step that names minutes offers its timer."),
-  B.screen("DT174e", 1, y, "New: timers and how much", "r174e", "changed", "Two timers side by side. How much rice, from the recipe: no AI."),
-  B.screen("DT174f", 2, y, "New: done", "r174f", "changed", "Voice stops, the screen may sleep. Back where you started."))
+h = rowEnd(y,
+  B.screen("DT174d", 0, y, "New: Start cooking on Make", "r174d", "changed", "Both doors land here. Ticks follow cook mode."),
+  B.screen("DT174e", 1, y, "New: voice, asked once", "r174e", "changed", "Says where the voice goes. Buttons only works the same."),
+  B.screen("DT174f", 2, y, "New: a step, read aloud", "r174f", "changed", "A step that names minutes offers its timer."))
 y = h
-board("Stories121.dc.html", "DT174. Cook mode on the same phone",
-  "30 October 2026 (Coach Milan, voice support while cooking, the same phone first). Now: 0.3.15, untouched. Drawn for your approval; nothing built.",
+h = rowEnd(y,
+  B.screen("DT174g", 0, y, "New: timers and how much", "r174g", "changed", "Two timers side by side. How much rice: no AI."),
+  B.screen("DT174h", 1, y, "New: done", "r174h", "changed", "Back to Make, every step ticked."))
+y = h
+board("Stories121.dc.html", "DT174. Cook mode: two doors into Make",
+  "30 October 2026 (Coach Milan, voice while cooking, the same phone first; the recipe to read and decide, the Plate to edit, Make to cook). Version 2. Now: 0.3.15, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories120.dc.html")
