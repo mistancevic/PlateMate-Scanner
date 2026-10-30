@@ -23,7 +23,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   const toMe = async () => { await page.goto(U); await page.waitForTimeout(900); await page.getByRole("button", { name: "Menu" }).first().click(); await page.waitForTimeout(300); await page.getByRole("button", { name: /^Me\b/ }).first().click(); await page.waitForTimeout(500); };
   await toMe();
   const rows = (await page.locator(".me-rows .menu-row b").allTextContents());
-  ok(rows.join(",") === "Profile,Goal,Lifestyle,Training week,Where I shop and cook,My coach,Your summary,Account", "Me: the steps, Your summary, then Account: " + rows.join(","));
+  ok(rows.join(",") === "Profile,Goal,Lifestyle,Training week,Google Calendar,Where I shop and cook,My coach,Your summary,Account", "Me: the steps, Your summary, then Account: " + rows.join(","));
   ok(await page.locator(".taste-card").count() === 0, "Taste no longer sits alone at the bottom of Me");
   await page.locator(".me-rows .menu-row", { hasText: "Lifestyle" }).click(); await page.waitForTimeout(500);
   const names = await page.locator(".seg").last().locator(".setting-name").allTextContents();
