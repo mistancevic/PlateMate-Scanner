@@ -2526,7 +2526,7 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .kitchen-join .pill { min-height: 52px; }
 .kitchen-cam { position: fixed; right: max(12px, env(safe-area-inset-right, 0px)); bottom: max(12px, env(safe-area-inset-bottom, 0px)); width: 96px; height: 72px; border-radius: 10px; object-fit: cover; z-index: 90; border: 2px solid var(--surface); box-shadow: var(--shadow-main); }
 /* DT178 (0.3.21, board Stories126): Google Calendar, Me > Google Calendar and the line on Plan */
-.cal-on { display: flex; align-items: center; gap: 12px; background: #e9f5ef; border-color: #bfe3d2; } .cal-on > span { font-size: 26px; } .cal-on > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; } .cal-on small { font-size: 13px; font-weight: 600; color: #0f6b4e; line-height: 1.45; }
+.cal-on { display: flex; flex-direction: row; align-items: center; gap: 12px; background: #e9f5ef; border-color: #bfe3d2; } .cal-on > span { font-size: 26px; } .cal-on > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; } .cal-on small { font-size: 13px; font-weight: 600; color: #0f6b4e; line-height: 1.45; }
 .cal-kinds { display: flex; flex-direction: column; gap: 2px; }
 .cal-kind { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 6px 0; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; width: 100%; }
 .cal-kind:last-child { border-bottom: 0; } .cal-kind > span:first-child { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; } .cal-kind small { font-size: 12.5px; font-weight: 600; color: var(--muted); } .cal-kind small.cal-why { color: #8a4b00; }

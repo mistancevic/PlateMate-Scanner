@@ -1,7 +1,7 @@
 // DT178 (0.3.21, board Stories126, Coach Milan 31 October 00:08): Chef Mealan's own calendar in Google. Me > Google
 // Calendar: what goes in, what an event says, Connect. On: where and how far ahead, Turn off with remove or keep. Plan says
 // once that the plan is also there; a shopping list can get a day, Shop on. Buttons 44 px or more; labels 12 px or more.
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { AppApi } from "../screens/api";
 import { calendarEvents, CAL_DAYS, CAL_KINDS, kindOn, dishOn, plusDays, type CalKind, type CalSettings, type CalEvent } from "../gcal";
 import { askToken, heldToken, runSync, needsSync, setCalStatus, useCalStatus, dropCalendar, forgetSent, calStatus } from "../calendarSync";
@@ -47,8 +47,9 @@ export function CalendarSync({ p }: { p: AppApi }) {
   const c = calOf(p);
   const [, setTick] = useState(0);
   useEffect(() => { const f = () => setTick((n) => n + 1); window.addEventListener("cm-calendar", f); return () => window.removeEventListener("cm-calendar", f); }, []);
-  const { events, from, to } = eventsFor(p);
-  const sig = useMemo(() => events.map((e) => `${e.id}.${e.h}`).join(","), [events]);
+  // nothing is worked out while the calendar is off
+  const { events, from, to } = c.on ? eventsFor(p) : { events: [] as CalEvent[], from: "", to: "" };
+  const sig = events.map((e) => `${e.id}.${e.h}`).join(",");
   const latest = useRef({ p, events, from, to }); latest.current = { p, events, from, to };
   useEffect(() => {
     if (!c.on) { if (calStatus().state !== "off") setCalStatus({ state: "off" }); return; }
