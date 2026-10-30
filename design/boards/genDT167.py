@@ -82,25 +82,27 @@ class Component extends DCLogic {{
     cj["boards"][fname] = {"x": 0, "y": a["y"] + a["h"] + 120, "w": W, "h": H, "title": title, "page": "page-vd6nie"}
     json.dump(cj, open(f"{D}/canvas.json", "w")); print(fname, W, H, Hc, len(page) // 1024, "KB")
 
-W = SX + 6 * (SW + GAP) - GAP + 70
+W = SX + 7 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
 cy = storyCard(B, y, "DT167", "Your summary: every answer in one place, what it does, shared with your coach part by part", [
   ("Coach Milan, 30 October 08:47 to 09:03", "Should we craft a summary at the end of setting up My profile in Me steps, and suggest a CTA such as go to Plate and craft the first meal, or go to Plan and plan your week? Also, how to be sure all the settings are considered by the code and Chef Mealan? DT167. Draw. Consider it also as material to share with the coach: the coach has the profile in one place as a readable document. If some part must not be shared, for personal preference or GDPR, let me know."),
   ("Now, checked in 0.3.8", "Me is six steps, Profile to My coach, and the last ends with nothing after it. What the person told the app is spread over six pages. Two answers never reach Chef Mealan: Where you eat and Work travel only order the moments. Today the coach sees the goal and numbers, the week, weigh-ins, shared cards, and which health situations were ticked and when, never the words; never the body data."),
-  ("The story", "Your summary is the last row of Me and where the steps end. Every answer once, by step, each with what it does and whether Chef Mealan reads it. At the end: Plan your week, or Craft your first meal on Plate for the next meal by the clock. Then Share with your coach, or Save as PDF."),
+  ("The story", "Your summary is the last row of Me and where the steps end. Every answer once, by step, each with what it does and whether Chef Mealan reads it. At the end: Plan your week, or Craft your first meal on Plate for the next meal by the clock. Then choose what your coach sees, or Save as PDF."),
   ("Behind it: the settings map", "One file in the code lists every setting with its effect: the numbers, the meal times, what Chef Mealan reads, or the order of moments. The summary is built from it. A unit test fails when a setting has no line, one walkthrough per setting changes it and checks the effect, and a test checks that what is marked Chef reads is in every request to Chef Mealan. Where you eat and Work travel are added to what Chef Mealan reads."),
-  ("Sharing with the coach", "Part by part, picked by the person. The coach gets a dated copy under the client, readable on its own, with what wasn't shared said plainly, and can save it as a PDF. Take it back any time: the copy is deleted. Leaving the coach or deleting the account deletes every copy."),
+  ("Coach Milan, 09:14 to 09:15", "The question is how to enable the client to share with their coach when something changes. The coach should have the initial summary, but how to resolve the next updates and changes? That covers the second question too. Redraw DT167."),
+  ("Sharing with the coach, version 2", "Choose once, part by part, what your coach sees; the choice stays. No frozen copy: the coach sees the shared parts as they are today, the same summary the person sees. On top, what changed since the coach last looked, dated; the same list starts the weekly check-in, and the Clients list marks a client with changes. A change to a part not shared never shows, not even that it changed. Switching a part off: the coach stops seeing it at once, its past changes too, and sees only that it stopped. Save as PDF prints the day, for the coach's own notes. Leaving the coach or deleting the account ends it all."),
   ("What stays private unless switched on (GDPR)", "Health data, Art. 9: body data (until now the coach never sees it) and allergies. Off until the person switches them on; switching on is their consent, dated, withdrawable. The health questions stay as today: which and when, never the words. What you eat: a diet can reveal beliefs or health (No pork, Vegan, Other in your words), so off until switched on. Alcohol: off until switched on. The privacy notice gets the summary under The coach link. I am not a lawyer: worth one check."),
-  ("Open", "Taste on Me also has In your own words: free text, so off for the coach until switched on, like Other under What you eat. Should the coach be able to ask for a summary? Should a new copy go to the coach on each check-in, when the person allows it?"),
+  ("Open", "Taste on Me also has In your own words: free text, so off for the coach until switched on, like Other under What you eat."),
 ])
 h = rowEnd(cy,
   B.screen("DT167a", 0, y, "Now: Me ends at Coach", "r167a", "now", "Six steps, nothing after the last."),
   B.screen("DT167b", 1, y, "New: Your summary in Me", "r167b", "changed", "The seventh row, where the steps end."),
   B.screen("DT167c", 2, y, "New: Your summary", "r167c", "changed", "Every answer, what it does, Chef reads."),
   B.screen("DT167d", 3, y, "New: what's next", "r167d", "changed", "Plan your week. Craft your first meal. Share."),
-  B.screen("DT167e", 4, y, "New: share part by part", "r167e", "changed", "Health data off until you switch it on."),
-  B.screen("DT167f", 5, y, "New: the coach reads it", "r167f", "changed", "One dated page; what wasn't shared, said."))
+  B.screen("DT167e", 4, y, "New: what your coach sees", "r167e", "changed", "Choose once; kept up to date. Health data off."),
+  B.screen("DT167f", 5, y, "New: the coach reads it", "r167f", "changed", "As it is today; what changed, on top."),
+  B.screen("DT167g", 6, y, "New: Clients marks changes", "r167g", "changed", "Never ask, never send again."))
 y = h
-board("Stories119.dc.html", "DT167. Your summary, and sharing it with your coach",
-  "30 October 2026 (Coach Milan, the end of the Me steps; a profile the coach can read). Now: 0.3.8, untouched. Drawn for your approval; nothing built.",
+board("Stories119.dc.html", "DT167. Your summary, and what your coach sees",
+  "30 October 2026 (Coach Milan, the end of the Me steps; a profile the coach can read). Version 2, 09:15: shared once, kept up to date, with what changed. Now: 0.3.8, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories118.dc.html")

@@ -41,8 +41,8 @@ const LIFE = { weekdays: "work", hours: "fixed", slot: "9-5", move: "sitting", m
       <button class="menu-row" style="${mark}"><span class="menu-row-text"><b>Plan your week</b><small>Fill your slots with Chef Mealan, from Monday</small></span><span aria-hidden="true">›</span></button>
       <button class="menu-row" style="${mark}"><span class="menu-row-text"><b>Craft your first meal</b><small>On Plate: lunch at 13:15, 53 g protein</small></span><span aria-hidden="true">›</span></button>
     </div>
-    <div class="button-row" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="pill pill-primary" style="${mark}">Share with Coach Milan</button><button class="pill">Save as PDF</button></div>
-    <small class="muted" style="display:block;margin-top:8px">Your summary changes when your answers change. A copy you share is dated and stays as it was.</small>`;
+    <div class="button-row" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap"><button class="pill pill-primary" style="${mark}">Choose what Coach Milan sees</button><button class="pill">Save as PDF</button></div>
+    <small class="muted" style="display:block;margin-top:8px">Your summary changes when your answers change. Your coach sees the parts you share, kept up to date, with what changed.</small>`;
   // a, now: the Me steps end on Coach, with nothing after it
   await toMe();
   await note("Now, 0.3.8: Me is six steps, Profile to My coach. The last step ends there: no summary, no next step. What you told the app is spread over six pages.");
@@ -57,23 +57,31 @@ const LIFE = { weekdays: "work", hours: "fixed", slot: "9-5", move: "sitting", m
   await note("New: Your summary. Every answer once, what it does, and whether Chef Mealan reads it. Built from one settings map in the code: a setting without a line there fails a test, so nothing is forgotten.");
   await shot("r167c");
   await toMe(); await draw("Your summary", SUM_BOTTOM);
-  await note("New: the end of the summary. Two next steps: Plan your week, or Craft your first meal on Plate for the next meal by the clock. Then Share with your coach, or save it as a PDF. Two gaps closed: Where you eat and Work travel now reach Chef Mealan.");
+  await note("New: the end of the summary. Two next steps: Plan your week, or Craft your first meal on Plate for the next meal by the clock. Then choose what your coach sees, or save it as a PDF. Two gaps closed: Where you eat and Work travel now reach Chef Mealan.");
   await shot("r167d");
   // e, the share sheet: part by part, health data off until you switch it on
   const tog = (t, why, on, hd, fixed) => `<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)"><div style="flex:1"><b style="display:block">${t}${hd ? " " + HD : ""}</b><small style="display:block;color:#3d4a63;font-weight:600">${why}</small></div><button class="choice ${on ? "on" : ""}" ${fixed ? 'disabled style="opacity:.7"' : ""}>${fixed ? "Sees it" : on ? "On" : "Off"}</button></div>`;
-  await toMe(); await draw("Share with Coach Milan", `<p class="small muted page-why">Pick what goes. Coach Milan gets a dated copy, readable on its own, and can save it as a PDF. Take it back any time: the copy is deleted.</p>
+  await toMe(); await draw("What Coach Milan sees", `<p class="small muted page-why">Choose once, part by part. Coach Milan sees the parts you switch on as they are today, kept up to date, with what changed and when. Switch a part off any time: your coach stops seeing it at once.</p>
     <section class="card">${tog("Goal and numbers", "Your coach already sees these.", true)}${tog("Your day", "Work, wake-up and bedtime, meal times.", true)}${tog("How you eat", "Meals, where you eat, taste.", true)}${tog("What you eat", "Your diet, and your words if you picked Other. A diet can say something about your beliefs or health: off until you switch it on.", false, false)}${tog("Alcohol", "How often you drink. Off until you switch it on.", false)}${tog("Training week", "Your usual week.", true)}${tog("Where you shop and cook", "Places, kitchens, tools.", true)}</section>
     <section class="card" style="${mark}">${tog("Health questions", "Which you ticked, and when. Your coach already sees this, never your words.", true, true, true)}${tog("Allergies and intolerances", "Share them if you want your coach to plan around them.", false, true)}${tog("Your body data", "Height, weight, body fat, birth year. Until now your coach never sees it, only the numbers it gives. Switching it on is your consent, dated, and you can take it back.", false, true)}</section>
-    <div class="button-row" style="display:flex;gap:8px"><button class="pill pill-primary">Send to Coach Milan</button><button class="pill">Cancel</button></div>
-    <small class="muted" style="display:block;margin-top:8px">Sent copies: none yet. Leaving your coach or deleting your account deletes every copy.</small>`);
-  await note("New: share part by part. Health data is off until you switch it on: your body data, allergies. So are what you eat and alcohol. The health questions stay as today: your coach sees which and when, never your words.");
+    <div class="button-row" style="display:flex;gap:8px"><button class="pill pill-primary">Save</button><button class="pill">Cancel</button></div>
+    <small class="muted" style="display:block;margin-top:8px">A change to a part you don't share never reaches your coach, not even that it changed. Leaving your coach or deleting your account ends it all.</small>`);
+  await note("New: choose once, part by part, what your coach sees; kept up to date after that, nothing to send again. Health data is off until you switch it on: your body data, allergies. So are what you eat and alcohol. The health questions stay as today: which and when, never your words.");
   await shot("r167e");
   // f, what the coach reads
-  await toMe(); await draw("Clients · Tester 1", `<p class="small muted page-why">Profile summary, sent 30 October at 09:40. A copy: it doesn't change when Tester 1 changes an answer. A new copy comes when Tester 1 sends one.</p>
-    ${SUM_TOP.replace(/<p class="small muted page-why">[\s\S]*?<\/p>/, "").replace(/<div class="seg-head"><b>You<\/b>[\s\S]*?<\/section>/, "")}
-    <section class="card" style="${mark}"><b>Not shared</b><small>Body data, allergies, what you eat, alcohol. Tester 1 kept these to themselves.</small></section>
-    <div class="button-row" style="display:flex;gap:8px"><button class="pill pill-primary">Save as PDF</button><button class="pill">Back to Tester 1's week</button></div>`);
-  await note("New, on the coach's side: the summary as one readable page under the client, dated, with what wasn't shared said plainly. Save as PDF for the coach's own notes.");
+  const CH = (d, t) => `<div style="display:flex;gap:10px;padding:7px 0;border-bottom:1px solid var(--line)"><small style="width:70px;font-weight:800;color:var(--muted)">${d}</small><small style="flex:1;font-weight:600">${t}</small></div>`;
+  await toMe(); await draw("Clients · Tester 1", `<p class="small muted page-why">Tester 1's profile, as it is today: the parts Tester 1 shares, kept up to date.</p>
+    <section class="card" style="${mark}"><b>What changed since you last looked</b>${CH("2 Nov", "Wake-up: before 6:00 → 6:00 to 8:00. Meals moved to 07:30, 13:45, 20:00.")}${CH("2 Nov", "Training week: Friday, mobility → strength, moderate.")}${CH("1 Nov", "Stopped sharing: How you eat.")}<small class="muted">Also at the top of this week's check-in.</small></section>
+    ${SUM_TOP.replace(/<p class="small muted page-why">[\s\S]*?<\/p>/, "").replace(/<div class="seg-head"><b>You<\/b>[\s\S]*?<\/section>/, "").replace("Before 6:00 · 22:00 to midnight", "6:00 to 8:00 · 22:00 to midnight").replace("Your meals at 06:30, 13:15 and 20:00.", "Your meals at 07:30, 13:45 and 20:00.")}
+    <section class="card"><b>Not shared</b><small>Body data, allergies, how you eat, what you eat, alcohol. Tester 1 keeps these to themselves.</small></section>
+    <div class="button-row" style="display:flex;gap:8px"><button class="pill pill-primary">Save as PDF, as of today</button><button class="pill">Tester 1's week</button></div>`);
+  await note("New, on the coach's side: the shared parts as they are today, with what changed since the coach last looked, dated, at the top. A part switched off shows only that it was. Save as PDF prints that day.");
   await shot("r167f");
+  await toMe(); await draw("Clients", `<p class="small muted page-why">Your clients, the newest change first.</p>
+    <div class="menu-list"><button class="menu-row" style="${mark}"><span class="menu-row-text"><b>Tester 1</b><small>Profile: 2 changes since you looked · check-in Monday</small></span><span class="ex-for">2 new</span><span aria-hidden="true">›</span></button>
+    <button class="menu-row"><span class="menu-row-text"><b>Tester 2</b><small>Profile up to date · check-in Sunday</small></span><span aria-hidden="true">›</span></button>
+    <button class="menu-row"><span class="menu-row-text"><b>Tester 3</b><small>Shares no profile parts yet · check-in Friday</small></span><span aria-hidden="true">›</span></button></div>`);
+  await note("New: the Clients list marks a client whose shared profile changed since the coach looked. The coach never has to ask; the person never has to send.");
+  await shot("r167g");
   await b.close(); server.kill();
 })();
