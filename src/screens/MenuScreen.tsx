@@ -123,7 +123,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
           <button className="menu-row" onClick={() => setSection("about")}><span className="menu-icon"><Info size={20} /></span><b>About</b><ChevronRight size={18} /></button>
         </div>
         <p className="small"><a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy notice</a> · <a href="/disclaimer">Disclaimer</a></p>
-        {p.user && <div className="button-row" style={{ marginTop: 12 }}><button className="pill pill-small" onClick={p.signOut}>Sign out</button></div>}
+        {p.user && <SignOut p={p} />}
       </>
     );
   const title = ITEMS.find((i) => i.id === section)?.name ?? "";
@@ -250,6 +250,17 @@ function ProfilePanel(p: AppApi) {
 }
 
 const fmtDay = (iso: string) => new Date(iso).toLocaleDateString([], { day: "numeric", month: "long", year: "numeric" });
+// DT168 (0.3.10): sign-out saves everything, then clears the phone. When something can't be saved, it says so and asks
+function SignOut({ p, inline }: { p: AppApi; inline?: boolean }) {
+  const [state, setState] = useState<"idle" | "busy" | "unsaved">("idle");
+  const go = async (force: boolean) => { setState("busy"); const ok = await p.signOut(force); if (!ok) setState("unsaved"); };
+  const btn = state === "unsaved"
+    ? <><button className="pill pill-small danger" onClick={() => go(true)}>Sign out anyway</button><button className="pill pill-small" onClick={() => setState("idle")}>Stay signed in</button></>
+    : <button className="pill pill-small" disabled={state === "busy"} onClick={() => go(false)}>{state === "busy" ? "Saving, then signing out…" : "Sign out"}</button>;
+  const note = state === "unsaved" && <small className="setting-hint sign-out-note">Not everything is saved to your account yet: the connection may be down. Signing out clears this phone, and what isn't saved goes with it. Stay signed in and try again when you're online.</small>;
+  if (inline) return <>{btn}{note}</>;
+  return <div className="button-row" style={{ marginTop: 12, flexWrap: "wrap" }}>{btn}{note}</div>;
+}
 function NextLink({ p, to, from, text, hint }: { p: AppApi; to: MenuSection; from: MenuSection; text: string; hint: string }) {
   return (
     <div className="menu-list" style={{ marginTop: 12 }}>
@@ -783,7 +794,7 @@ function AccountPanel(p: AppApi) {
         {user && <p className="small">Delete removes all of it, photos, cards and recipes included, and the sign-in. Not undoable.{p.deleteSteps ? ` ${p.deleteSteps}…` : ""}</p>}
       </section>
       <div className="button-row">
-        {user && <button className="pill pill-small" onClick={signOut}>Sign out</button>}
+        {user && <SignOut p={p} inline />}
         {user && <ConfirmButton className="pill pill-small danger" label="Delete my account" confirmLabel="Tap again to delete everything" onConfirm={deleteAccount} />}
         {!user && <button className="pill pill-small" onClick={() => { localStorage.removeItem("chefmealan-local-only"); location.reload(); }}>Sign in</button>}
       </div>

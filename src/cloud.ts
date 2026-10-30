@@ -3,7 +3,7 @@ import { notesOf, checkinOf } from "./coachNotes";
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, reauthenticateWithPopup, type User } from "firebase/auth";
 import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, deleteField, type Firestore } from "firebase/firestore";
-import { splitSave, mergeLoad, coachFieldsOf, onPreviewHost } from "./privateSplit";
+import { splitSave, mergeLoad, coachFieldsOf, dropsOldCopy } from "./privateSplit";
 import { getStorage, ref as fileRef, uploadString, getBytes, deleteObject, listAll } from "firebase/storage";
 import { photoSigsOf, sig } from "./photos";
 
@@ -59,8 +59,10 @@ export type CloudDoc = { region?: string | null; days?: unknown; measured?: unkn
 const privateRef = (uid: string) => doc(db(), "users", uid, "private", "main");
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const snap = await getDoc(doc(db(), "users", uid));
-  let priv: Record<string, any> | null = null;
-  try { const p = await getDoc(privateRef(uid)); priv = p.exists() ? (p.data() as any) : null; } catch { /* not there yet */ }
+  // a part that isn't there yet reads as null; a read that fails throws, so the app stays on the phone's copy instead of
+  // taking a record without its private part for an empty account
+  const p = await getDoc(privateRef(uid));
+  const priv: Record<string, any> | null = p.exists() ? (p.data() as any) : null;
   return mergeLoad(snap.exists() ? (snap.data() as any) : null, priv) as CloudDoc | null;
 }
 // While an account is being deleted, this phone writes nothing to it: no save, no card, no photo file. An open app could
@@ -73,7 +75,7 @@ export async function saveCloud(uid: string, data: CloudDoc) {
   // merge, so fields the coach or the console own (role, coach link, coachSetAt) are never wiped by the client's save
   // DT168: the private fields go to the private part and leave the main record in the same write (kept there on the preview,
   // where the live app still reads them until it is promoted)
-  const keepOld = typeof location !== "undefined" && onPreviewHost(location.host);
+  const keepOld = !(typeof location !== "undefined" && dropsOldCopy(location.host));
   const { priv, main, drop } = splitSave(data as any, keepOld);
   const b = writeBatch(db());
   if (priv) b.set(privateRef(uid), priv, { merge: true });
@@ -147,7 +149,8 @@ async function writeNotes(uid: string, notes: import("./coachNotes").CoachNote[]
 }
 export async function setCheckinDay(clientUid: string, day: number) { await updateDoc(doc(db(), "users", clientUid), { checkinDay: day }); }
 export async function setClientGoalFrom(clientUid: string, coachGoal: { band: string; kcal: number; protein: number; from: string; by: string }) {
-  await updateDoc(doc(db(), "users", clientUid), { coachGoal: { ...coachGoal, at: new Date().toISOString() }, coachSetAt: new Date().toISOString() });
+  // a goal from a later date replaces numbers waiting from an earlier one (DT168)
+  await updateDoc(doc(db(), "users", clientUid), { coachGoal: { ...coachGoal, at: new Date().toISOString() }, coachSetAt: new Date().toISOString(), coachGoals: null });
 }
 // the client's own answer on the thread: Got it and Reply
 export async function saveOwnNotes(uid: string, notes: import("./coachNotes").CoachNote[]) { return writeNotes(uid, notes); }
@@ -155,7 +158,7 @@ export async function setClientGoal(clientUid: string, goal: any, goals: { calor
   await updateDoc(doc(db(), "users", clientUid), {
     goal: { ...goal, setBy: "coach", coachName, setAt: new Date().toISOString(), source: "coach" },
     // DT168: the numbers go in coachGoals, the person's phone takes them; state.goals only while live apps still read it there
-    coachGoals: { calories: goals.calories, protein: goals.protein },
+    coachGoals: { calories: goals.calories, protein: goals.protein, at: new Date().toISOString() },
     "state.goals.calories": goals.calories, "state.goals.protein": goals.protein,
     coachSetAt: new Date().toISOString(),
     // a goal from today replaces one waiting for a later date (0.2.6)

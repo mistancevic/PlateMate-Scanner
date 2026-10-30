@@ -9,6 +9,7 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import { isFood, KEYS, numberInput } from "./src/pilot";
 import { aiState, underAge, ADULT_ONLY, EMPTY_SAFETY, FIXED, SITUATIONS, type Safety } from "./src/safety";
+import { mergeLoad } from "./src/privateSplit";
 const app = express();
 // Who is asking: a Firebase ID token from the signed-in app. On when the server knows its Firebase project.
 import { initializeApp as initAdmin, getApps as adminApps } from "firebase-admin/app";
@@ -50,8 +51,8 @@ async function membership(uid: string): Promise<Member> {
   const snap = await db().collection("users").doc(uid).get();
   // DT168 (0.3.10): health answers, allergies and the birth year live in the private part; an account not moved yet still has them here
   const ps = await db().collection("users").doc(uid).collection("private").doc("main").get();
-  const pv = ps.exists ? (ps.data() as any) : {};
-  const x = { ...(snap.exists ? (snap.data() as any) : {}), ...(pv.safety ? { safety: pv.safety } : {}), ...(pv.personal ? { personal: pv.personal } : {}) };
+  // the newer copy wins, as on the phone (src/privateSplit.ts mergeLoad)
+  const x: any = mergeLoad(snap.exists ? (snap.data() as any) : null, ps.exists ? (ps.data() as any) : null) ?? {};
   const role = x.role === "coach" ? "coach" : "client";
   const member = role === "coach" || Boolean(x.coachId);
   const safety: Safety = { ...EMPTY_SAFETY, ...(x.safety && typeof x.safety === "object" ? x.safety : {}), aiConfirmedAt: x.aiConfirmedAt ?? undefined, aiConfirmedBy: x.aiConfirmedBy ?? undefined };

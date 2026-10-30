@@ -44,16 +44,22 @@ export function splitSave(data: Record<string, any>, keepOld: boolean): { priv: 
   return { priv, main, drop: keepOld ? [] : moved };
 }
 
-// One load from the two parts: the private part wins over an old copy left in the main record; a goal the coach set after the
-// person's last save carries its numbers in coachGoals (the coach can no longer write the private part)
+// One load from the two parts. The newer copy wins: the private part normally; the main record when an older app (the live app
+// while a preview runs, or a tab still open on old code) saved there after the private part's last save. A goal the coach set
+// after the person's last save carries its numbers in coachGoals, with the coach's own time (the coach can't write the private part).
+const emptyState = (st: any) => !st || typeof st !== "object" || (!(st.foods?.length) && !(st.meals?.length) && !(st.feedback?.length));
 export function mergeLoad(main: Record<string, any> | null, priv: Record<string, any> | null): Record<string, any> | null {
   if (!main && !priv) return null;
   const out: Record<string, any> = { ...(main ?? {}) };
-  if (priv) for (const k of PRIVATE_KEYS) if (priv[k] !== undefined) out[k] = priv[k];
-  if (priv?.updatedAt && (!out.updatedAt || priv.updatedAt > out.updatedAt)) out.updatedAt = priv.updatedAt;
-  // a coach app from before 0.3.10 writes the numbers into the main record's state.goals
-  const cg = main?.coachGoals ?? (priv ? main?.state?.goals : null);
-  if (cg && main?.coachSetAt && (!priv?.updatedAt || main.coachSetAt > priv.updatedAt) && out.state && typeof out.state === "object") {
+  const mainNewer = Boolean(priv && main?.updatedAt && (!priv.updatedAt || main.updatedAt > priv.updatedAt));
+  if (priv) for (const k of PRIVATE_KEYS) {
+    const useMain = mainNewer && main![k] !== undefined && !(k === "state" && emptyState(main!.state));
+    if (!useMain && priv[k] !== undefined) out[k] = priv[k];
+  }
+  if (priv?.updatedAt && !mainNewer) out.updatedAt = priv.updatedAt;
+  const own = priv?.updatedAt ?? "";
+  const cg = main?.coachGoals && main.coachGoals.at ? main.coachGoals : null;
+  if (cg && cg.at > own && out.state && typeof out.state === "object") {
     out.state = { ...out.state, goals: { ...(out.state.goals ?? {}), ...(typeof cg.calories === "number" ? { calories: cg.calories } : {}), ...(typeof cg.protein === "number" ? { protein: cg.protein } : {}) } };
   }
   return out;
@@ -77,3 +83,6 @@ export function coachFieldsOf(x: Record<string, any>) {
 
 // the preview runs on its own address; there the live app still needs the main record as it was
 export const onPreviewHost = (host: string) => /^preview---/.test(host);
+// the old copy leaves the main record only on the live addresses; anywhere else (the preview, a local run against the real
+// database) it stays, so an app that still reads the main record keeps working
+export const dropsOldCopy = (host: string) => /^(www\.)?chefmealan\.com$/.test(host) && !onPreviewHost(host);

@@ -2513,12 +2513,31 @@ export default function App() {
     user, cloudEnabled, cloudStatus, profile,
     joinCoach: async (code: string) => { if (!user) return; try { const r = await joinCoach(user.uid, code); setProfile((p) => ({ ...p, ...r })); notify(`You're with ${r.coachName} now.`); } catch (e: any) { setError(e.message); } },
     leaveCoach: async () => { if (!user) return; try { await leaveCoach(user.uid); setProfile((p) => ({ ...p, coachId: undefined, coachName: undefined, coachEmail: undefined, coachPhoto: undefined, joinedAt: undefined })); } catch (e: any) { setError(e.message); } },
-    // DT168 (0.3.10): sign-out clears the phone. What changed here is saved to the account first; then nothing of this person
-    // stays on the phone for the next one to sign in
-    signOut: async () => {
-      if (user && cloudLoaded.current) { try { await withTimeout(saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() }), 8000); } catch { /* signed out anyway; the account keeps its last save */ } }
+    // DT168 (0.3.10): sign-out clears the phone, so nothing of this person stays for the next one to sign in. First everything
+    // is saved: the record, the foods, recipes and cards, the photos. If anything isn't, the phone is not cleared unless the
+    // person says so (force), knowing what isn't saved goes with it.
+    signOut: async (force?: boolean) => {
+      if (!force) {
+        const saved = await (async () => {
+          if (!user || !cloudLoaded.current || localMode.current) return false;
+          try { await withTimeout(saveCloud(user.uid, { ...blockOf(stateRef.current), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() }), 10000); } catch { return false; }
+          const wait = async (busy: () => boolean) => { for (let n = 0; n < 150 && busy(); n++) await new Promise((r) => setTimeout(r, 100)); return !busy(); };
+          if (!(await wait(() => recRef.current.running))) return false;
+          await syncRecords(false);
+          if (!(await wait(() => recRef.current.running))) return false;
+          const r = recRef.current;
+          if (r.pulled) { const c = recordChanges(stateRef.current, r.known, new Date().toISOString(), r.pulled); if (c.ups.length || c.dels.length) return false; }
+          await syncFiles();
+          if (!(await wait(() => filesRef.current.running))) return false;
+          const fr = filesRef.current;
+          if (fr.ready) for (const [k, v] of photosOf(stateRef.current)) if (fr.up.get(k) !== sig(v)) return false;
+          return true;
+        })();
+        if (!saved) return false;
+      }
       clearKept(); try { localStorage.clear(); sessionStorage.clear(); await storeClear(); } catch { /* cleared what could be */ }
       await signOutCloud(); cloudLoaded.current = false; location.reload();
+      return true;
     },
     safety, ai,
     declareSafety: (patch, record = false) => { updateSafety((x) => { let next = { ...x, ...patch }; const now = new Date().toISOString(); for (const sid of next.situations) if (!x.situations.includes(sid)) next.flags = [...next.flags, { situation: sid, at: now, source: "door" as const }]; if (record) next = recordDeclaration(next, next.situations, next.allergies, new Date(), Boolean(next.none)); return next; }); },

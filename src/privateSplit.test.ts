@@ -2,7 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import { splitSave, mergeLoad, coachFieldsOf, onPreviewHost, PRIVATE_KEYS } from "./privateSplit";
+import { splitSave, mergeLoad, coachFieldsOf, onPreviewHost, dropsOldCopy, PRIVATE_KEYS } from "./privateSplit";
 
 const save = { state: { goals: { calories: 2500, protein: 160 }, foods: [{ id: "f1" }], preferences: "no coriander" },
   personal: { sex: "male", birthYear: 1981, heightCm: 182, weightKg: 85, bodyFatPct: 18, weighIns: [{ date: "2026-10-29", kg: 85 }], pdUnit: "pd", trainingAge: "3p" },
@@ -24,6 +24,7 @@ test("DT168: on the preview the old copy stays for the live app; nothing is drop
   const { priv, main, drop } = splitSave(save, true);
   assert.ok(priv && drop.length === 0 && (main as any).safety && (main as any).personal);
   assert.ok(onPreviewHost("preview---chefmealan-abc-ey.a.run.app") && !onPreviewHost("chefmealan.com"));
+  assert.deepEqual(["chefmealan.com", "www.chefmealan.com", "preview---chefmealan-abc-ey.a.run.app", "localhost:5173", "127.0.0.1:3197"].map(dropsOldCopy), [true, true, false, false, false], "only the live addresses move the old copy out");
 });
 test("DT168: a save with no private field writes nothing private and drops nothing", () => {
   const r = splitSave({ numbersReview: { status: "waiting" }, updatedAt: "t" }, false);
@@ -34,12 +35,19 @@ test("DT168: the load takes the private part over an old copy; a coach's later g
   const priv = { state: { goals: { calories: 2500, protein: 160 }, foods: [] }, safety: { allergies: ["peanuts"] }, updatedAt: "2026-10-30T12:00:00Z" };
   const m = mergeLoad(old, priv)!;
   assert.deepEqual(m.safety.allergies, ["peanuts"]); assert.equal(m.state.goals.calories, 2500); assert.equal(m.updatedAt, "2026-10-30T12:00:00Z");
-  const coach = mergeLoad({ ...old, coachGoals: { calories: 2200, protein: 180 }, coachSetAt: "2026-10-31T09:00:00Z" }, priv)!;
+  const coach = mergeLoad({ ...old, coachGoals: { calories: 2200, protein: 180, at: "2026-10-31T09:00:00Z" }, coachSetAt: "2026-10-31T09:00:00Z" }, priv)!;
   assert.deepEqual(coach.state.goals, { calories: 2200, protein: 180 });
-  const before = mergeLoad({ ...old, coachGoals: { calories: 2200, protein: 180 }, coachSetAt: "2026-10-29T09:00:00Z" }, priv)!;
+  const later = mergeLoad({ ...old, coachGoals: { calories: 2200, protein: 180, at: "2026-10-29T09:00:00Z" }, coachSetAt: "2026-11-02T09:00:00Z" }, priv)!;
+  assert.equal(later.state.goals.calories, 2500, "a later goal from a date doesn't bring back older numbers");
+  const before = mergeLoad({ ...old, coachGoals: { calories: 2200, protein: 180, at: "2026-10-29T09:00:00Z" }, coachSetAt: "2026-10-29T09:00:00Z" }, priv)!;
   assert.equal(before.state.goals.calories, 2500, "a coach's goal older than the person's last save is already in it");
   assert.equal(mergeLoad(null, null), null);
   assert.equal(mergeLoad(old, null)!.state.goals.calories, 1, "an account not moved yet reads as before");
+  // the live app saved to the main record after the private part's last save: its copy is the newer one and wins
+  const liveNewer = mergeLoad({ state: { goals: { calories: 2600 }, foods: [{ id: "f2" }] }, safety: { allergies: ["sesame"] }, updatedAt: "2026-10-31T08:00:00Z" }, priv)!;
+  assert.deepEqual([liveNewer.state.goals.calories, liveNewer.safety.allergies, liveNewer.updatedAt], [2600, ["sesame"], "2026-10-31T08:00:00Z"]);
+  const liveEmpty = mergeLoad({ state: { goals: {}, foods: [] }, updatedAt: "2026-10-31T08:00:00Z" }, priv)!;
+  assert.equal(liveEmpty.state.goals.calories, 2500, "an empty newer copy never replaces the private part's plates");
 });
 test("DT168: the coach's app reads coachView, and the old fields only for an account not moved yet", () => {
   const { main } = splitSave(save, false);
