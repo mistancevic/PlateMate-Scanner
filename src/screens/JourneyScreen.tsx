@@ -72,6 +72,7 @@ import { CountAmount, SizePicker, isCounted } from "../components/CountAmount";
 import { cookName, cookPhrase, weighLine, aroundWord, needsCooking, rawHint, cookTitle } from "../cookWords";
 import { CookMode } from "../components/CookMode";
 import { stepPicOf } from "../photos";
+import { kitchenName } from "../travel";
 import { SayHave } from "../components/SayHave";
 
 // Make it a meal (0.2.9, canvas board CH, CH1 to CH3): an idea from Chef Mealan, checked and with the app's grams
@@ -1328,6 +1329,8 @@ export function JourneyScreen(p: AppApi) {
           );
         })()}
         <div className="card-top"><span>On the plate</span>{items.length > 0 && <ConfirmButton className="link plate-empty-link" label={<><Trash2 size={14} /> Empty plate</>} confirmLabel="Tap again to empty" onConfirm={emptyPlate} />}</div>
+        {/* DT176 (0.3.19, board Stories124): Travel mode on: the Plate says where it serves you, and what the kitchen there allows */}
+        {p.travel && <small className="travel-plate-note">{placeName(p.travel.place)}, {kitchenName(p.travel.kitchen).toLowerCase()}: {p.travel.kitchen === "hotel" ? "Chef Mealan suggests what you can buy and eat as it is, and what to order." : p.travel.kitchen === "flat" ? "Chef Mealan cooks with a stovetop, a pan and a pot." : "Chef Mealan cooks as at home."} Search finds products sold there.</small>}
         {items.length === 0 && <small className="plate-empty">Nothing on the plate yet.</small>}
         {imported && rec && !way && rec.makes && (
           <div className="in-portion">
@@ -2039,7 +2042,8 @@ export function JourneyScreen(p: AppApi) {
       <>
         {Head({ back: "make", title: `Make: ${(state.title && state.title !== "DaaM" ? state.title : autoTitle(items)).slice(0, 40)}`, sub: madeSteps.length ? "Tick the steps as you go. A photo while it is on the counter, then how it went." : "A photo or two while it's on the counter, then one tap." })}
         {/* DT174 (0.3.16): Start cooking, above the steps: one big step at a time; each finished step is ticked here */}
-        {madeSteps.length > 0 && (
+        {madeSteps.length > 0 && p.travel?.kitchen === "hotel" && <small className="muted travel-plate-note">Travel mode, hotel with no kitchen: Start cooking is off. Tick the steps here if you make it anyway.</small>}
+        {madeSteps.length > 0 && p.travel?.kitchen !== "hotel" && (
           <div className="mk-cook">
             <button className="pill pill-wide pill-primary" onClick={() => setCooking(true)}>{ticks.size > 0 && madeSteps.some((_, k) => !ticks.has(`s${k}`)) ? "Go on cooking" : "Start cooking"}</button>
             <small className="muted">One big step at a time, read aloud. Say next, back or repeat, or tap. Each step you finish is ticked here.</small>

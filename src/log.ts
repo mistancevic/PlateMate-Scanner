@@ -6,6 +6,8 @@ export type LogEvent =
   | "account_delete" // Delete my account: done, data gone, stopped, or no answer
   | "carry"          // How did it carry you?, 30 minutes after a meal: data.how = light | fine | heavy
   | "meal_photo"     // DT127 (0.2.108): a photo of the meal read onto the Plate: data.foods, data.unsure
+  | "travel_on"      // DT176 (0.3.19): Travel mode on: data.place, data.kitchen
+  | "travel_off"     // DT176 (0.3.19): Travel mode off
   | "plate_said"     // DT175 (0.3.17): the foods you said you have, landed on the Plate: data.foods
   | "meal_photo_idea" // DT130 (0.2.110): a plate from a photo kept as an idea in Mine: data.plan (put in a slot too)
   | "made"           // How did making it go?: data.went = as | not, data.ate = all | portion | later | not, data.photos

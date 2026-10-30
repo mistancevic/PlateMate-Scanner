@@ -1,3 +1,4 @@
+import { travelOn, placeName as placeNameOf } from "../travel";
 import { Fragment, useEffect, useState } from "react";
 import { Camera, ChevronRight, Check, Pencil, Plus, Utensils } from "lucide-react";
 import { aggregate, density } from "../pilot";
@@ -450,6 +451,8 @@ export function HomeScreen(p: AppApi) {
           return (
             <section className="card day-card" key={dk} aria-label={head}>
               <p className="card-head">{head}</p>
+              {/* DT176 (0.3.19): a day spent travelling says so */}
+              {(() => { const tr = travelOn(dk, p.personal.trips, p.travel); return tr ? <small className="travel-day">🧳 Travelling · {placeNameOf(tr.place)}</small> : null; })()}
               <button type="button" className="menu-row plan-row-link" onClick={() => { showPlanOn(dk); setTab("plan"); }}>
                 <div className="menu-row-text"><small>{d.dayType ? dayNameAny(d.dayType) : "No kind of day was set"}</small><b>{dRec ? planDayLine({ ...dRec, done: true }, p.numbersFor(d.day)?.kcal ?? null) : loggedLine(d, false)}</b><small>See the day against its plan</small></div><ChevronRight size={18} />
               </button>

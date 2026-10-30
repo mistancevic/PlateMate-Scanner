@@ -1,4 +1,6 @@
 import { eatsForReq, installEats, type Eats } from "./eats";
+import { TravelBanner } from "./components/Travel";
+import { endTravel, daysAway, sinceWords, placeName as travelPlace, kitchenName, type Travel } from "./travel";
 import { servingsOf } from "./pilot";
 import { wholeOnPlate } from "./counted";
 import { drainedOf, libraryId, packLine } from "./canned";
@@ -1603,8 +1605,11 @@ export default function App() {
   const setPick = (x: string | null) => { setPickState(x); setState((s) => (s.pick === x ? s : { ...s, pick: x })); };
   // DT136 (0.2.120, board Stories93): foods by place. today's places that are on; a food shows when sold everywhere or there
   const todayKeyP = ymd(new Date());
-  const placesActive = activePlaces(region, placesOn, trip, todayKeyP);
-  const herePlace: string | null = tripOn(trip, todayKeyP) ? trip!.place : region;
+  // DT176 (0.3.19, board Stories124): Travel mode on: the place you are in is where the app serves you, until you switch it off
+  const travelNow: Travel | null = personal.travel ?? null;
+  const placesActive = (() => { const s = activePlaces(region, placesOn, trip, todayKeyP); if (travelNow) s.add(travelNow.place); return s; })();
+  const herePlace: string | null = travelNow ? travelNow.place : tripOn(trip, todayKeyP) ? trip!.place : region;
+  const shopRegion: RegionId | null = travelNow ? travelNow.place : region;
   function addStarterFor(place: string) {
     setState((s) => {
       const have = new Set(s.foods.map((f) => (f.name + "|" + f.brand).toLowerCase()));
@@ -2103,6 +2108,9 @@ export default function App() {
     region, setRegion: (r: RegionId) => { setRegion(r); setRegionState(r); },
     travelTo, setTravelTo: (r: RegionId | null) => { setTravelTo(r); setTravelToState(r); },
     personal, setPersonal: (x: Personal) => { storePersonal(x); setPersonalState(x); },
+    // DT176 (0.3.19): Travel mode on, or off: off keeps the trip and says welcome back once, on Me
+    travel: travelNow,
+    setTravel: (t: Travel | null) => { const cur = getPersonal(); const next: Personal = t ? { ...cur, travel: t, travelBack: null } : cur.travel ? { ...cur, travel: null, trips: endTravel(cur.travel, cur.trips), travelBack: { place: cur.travel.place, days: daysAway(cur.travel.since) } } : cur; storePersonal(next); setPersonalState(next); log(t ? "travel_on" : "travel_off", t ? { place: t.place, kitchen: t.kitchen } : {}); },
     addFoodPhoto: async (foodId: string, dataUrl: string) => {
       // photos taken on another phone that haven't arrived yet: adding now would take the place of one of them
       const f0 = stateRef.current.foods.find((f) => f.id === foodId) as any;
@@ -2265,16 +2273,16 @@ export default function App() {
     foodsView, setFoodsView, saveFood, setEditFrom,
     // a product picked from the search opens the sheet titled by the button that picked it
     addFromDatabase: (code: string) => { setEditTitle("Add to my foods"); lookup(code); },
-    searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (region ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "cy", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
+    searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (shopRegion ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "cy", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
     // DT127 (0.2.108, board Stories75): a photo of the meal in front of you, read onto the Plate as estimates
     readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea" }) => {
       setBusy("Reading your plate…");
       try {
         const [sent, thumb] = await Promise.all([resizeImageBase64(image, 1280, 1280), thumbnailBase64(image, 640)]);
-        const d = await api("/api/plate-photo", { image: sent, region: region ?? null, library: state.foods.slice(0, 60).map((f) => f.name) });
+        const d = await api("/api/plate-photo", { image: sent, region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name) });
         const read = cleanRead(d);
         if (!read) { setError("Nothing I can read on that plate. Try once more, from above, with the whole plate in."); return false; }
-        const { items, fresh } = itemsOfRead(read, state.foods, region, uid);
+        const { items, fresh } = itemsOfRead(read, state.foods, shopRegion, uid);
         const at = x?.who === "ate" && x.at ? x.at : new Date().toISOString();
         const photo = { image: thumb, at, unsure: read.unsure, ...(x?.who && x.who !== "now" ? { who: x.who } : {}) };
         const land = (how: "add" | "new") => {
@@ -2293,10 +2301,10 @@ export default function App() {
     plateFromWords: async (text: string) => {
       setBusy("Chef Mealan is listing your foods…");
       try {
-        const d = await api("/api/plate-said", { text, region: region ?? null, library: state.foods.slice(0, 60).map((f) => f.name), meal: moment });
+        const d = await api("/api/plate-said", { text, region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name), meal: moment });
         const read = cleanRead(d);
         if (!read) { setError("I didn't catch a food in that. Say the foods you have, for example: eggs, spinach, feta."); return false; }
-        const { items, fresh } = itemsOfRead(read, state.foods, region, uid);
+        const { items, fresh } = itemsOfRead(read, state.foods, shopRegion, uid);
         const land = (how: "add" | "new") => {
           if (how === "add") setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items: [...s.items, ...items], portion: null }));
           else setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo: undefined }));
@@ -2337,7 +2345,7 @@ export default function App() {
       setLanding({ id: m.id, line: slot ? "An idea from a photo, in your plan and in Mine." : "An idea from a photo. It waits at the top of Mine until you make it.", quiet: false }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes");
     },
     // DT115 (0.2.97): the members' catalogue, searched by words; a member's food becomes a copy in your library
-    memberFoods: async (q: string) => { try { const d = await api(`/api/members/foods?q=${encodeURIComponent(q)}&region=${encodeURIComponent(region ?? "")}`); return Array.isArray(d?.foods) ? d.foods : []; } catch { return []; } },
+    memberFoods: async (q: string) => { try { const d = await api(`/api/members/foods?q=${encodeURIComponent(q)}&region=${encodeURIComponent(shopRegion ?? "")}`); return Array.isArray(d?.foods) ? d.foods : []; } catch { return []; } },
     addMemberFood: (m, to = "foods") => {
       const have = state.foods.find((f) => (m.barcode && f.barcode === m.barcode) || (f.name.toLowerCase() === m.name.toLowerCase() && (f.brand ?? "").toLowerCase() === m.brand.toLowerCase()));
       const food = have ?? asMine(m, uid);
@@ -2742,6 +2750,8 @@ export default function App() {
             </button>
           </div>
         )}
+        {/* DT176 (0.3.19): while Travel mode is on, the banner on every tab, with Turn off */}
+        {!talkOpen && !(menuSection === "me" || (!menuSection && tab === "me")) && <TravelBanner p={screenProps} />}
         {/* Chef Mealan opens over a menu page too, and closing it comes back to the page (0.2.7+r2: the button vanished there) */}
         {menuSection && <div style={{ display: talkOpen ? "none" : "contents" }}><MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s, up) => { setMenuFrom(null); setMenuSection(s, up); }} under={menuTrail.length > 1 ? menuTrail[menuTrail.length - 2] : null} close={() => { setMenuFrom(null); setMenuSection(null); }} /></div>}
         {!menuSection && !talkOpen && tab === "home" && <HomeScreen {...screenProps} />}

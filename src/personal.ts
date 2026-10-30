@@ -34,6 +34,10 @@ export type Personal = {
   trainingAge?: TrainingAge;
   // from 7 October 2026: weigh-ins, one per date (canvas boards W0 to W2)
   weighIns?: import("./weight").WeighIn[];
+  // DT176 (0.3.19, board Stories124): Travel mode, on until switched off; the trips it kept; the welcome back, once
+  travel?: import("./travel").Travel | null;
+  trips?: import("./travel").Trip[];
+  travelBack?: { place: import("./moments").RegionId; days: number } | null;
   // Target analysis answers: a finding kept on purpose, with the value it was kept at, so a changed number asks again
   kept?: Record<string, { at: string; sig: string }>;
   dayMode?: DayMode | "follow"; ownDays?: Partial<Record<DayType, OwnDay>>;

@@ -2,6 +2,7 @@
 // One settings map: every answer the person gives, which part of the summary it sits in, what it does, and whether Chef Mealan
 // reads it. The summary is built from it, and the test (summary.test.ts) fails when a field of Personal, Lifestyle or Safety has
 // no line here, so no setting is set with no influence and none is forgotten.
+import { placeName, kitchenName } from "./travel";
 import type { Personal } from "./personal";
 import { lifestyleOf, planOf, splitOf, splitName, lowCarbsOf, STEPS, equipmentOf, EQUIPMENT } from "./personal";
 import type { Safety } from "./safety";
@@ -85,6 +86,10 @@ export const PERSONAL_MAP: { [K in keyof Required<Personal>]: SettingLine } = {
   units: I("The units shown: a display choice."),
   equipment: S("shop", "request", "Steps are written for what you cook with."),
   coachShare: I("Which parts your coach sees: chosen on Your summary."),
+  // DT176 (0.3.19, board Stories124)
+  travel: S("day", "eats", "Travel mode: search and scan read the shelves where you are; Chef Mealan suggests what fits the kitchen you have there; weigh-in can pause."),
+  trips: S("day", null, "The days you were travelling, marked as travel."),
+  travelBack: I("Welcome back, once, after Travel mode."),
 };
 export const SAFETY_MAP: { [K in keyof Required<Safety>]: SettingLine } = {
   consentBodyAt: S("body", null, "Your consent before anything about your body is stored."),
@@ -119,6 +124,7 @@ const chefOf = (l: SettingLine) => "chef" in l && l.chef !== null && l.chef !== 
 const BED_WORDS: Record<string, string> = { early: "before 22:00", mid: "22:00 to midnight", late: "after midnight", varies: "varies with shifts" };
 const WAKE_WORDS: Record<string, string> = { early: "before 6:00", mid: "6:00 to 8:00", late: "after 8:00", varies: "varies with shifts" };
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+const placeOf = (r: string) => placeName(r as any), kitchenOf = (k: string) => kitchenName(k as any);
 const cap = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
 
 export function summaryOf(x: SummaryIn): SummaryPart[] {
@@ -148,6 +154,9 @@ export function summaryOf(x: SummaryIn): SummaryPart[] {
   const slots = slotsOf(l), times = list(slots.map((s) => s.time)), from = startTimes(Math.min(5, Math.max(1, l.meals ?? 3)), l).from, sw = sleepWindow(l);
   push("day", "Your day", "Lifestyle", [
     row("weekdays", LIFESTYLE_MAP.weekdays, "Weekdays", weekdays || "Not set yet", work ? "How much a day without training burns; meal times fit around work." : undefined),
+    // DT176 (0.3.19): Travel mode on, and the trips it kept
+    p.travel ? row("travelNow", PERSONAL_MAP.travel, "Travel mode", `On since ${day(p.travel.since)} · ${placeOf(p.travel.place)} · ${kitchenOf(p.travel.kitchen)}`) : null,
+    p.trips?.length ? row("trips", PERSONAL_MAP.trips, "Trips", p.trips.slice(-3).map((t) => `${placeOf(t.place)}, ${day(t.from + "T12:00:00")} to ${day(t.to + "T12:00:00")}`).join(" · ")) : null,
     l.travel ? row("travel", LIFESTYLE_MAP.travel, "Work travel", ({ none: "None", sometimes: "Occasionally", often: "A lot" } as Record<string, string>)[l.travel] ?? l.travel) : null,
     l.wake || l.bed ? row("sleep", LIFESTYLE_MAP.wake, "Wake-up and bedtime", `${cap(WAKE_WORDS[l.wake ?? ""] ?? "wake-up not set")} · ${BED_WORDS[l.bed ?? ""] ?? "bedtime not set"}`, sw && from === "sleep" ? `Your meals at ${times}.` : from === "work" ? `Your meals fit around work: ${times}.` : "Chef Mealan reads them for when to eat.") : null,
     p.steps ? row("steps", PERSONAL_MAP.steps, "Steps on a usual day", STEPS.find((s) => s.id === p.steps)?.name ?? String(p.steps)) : null,

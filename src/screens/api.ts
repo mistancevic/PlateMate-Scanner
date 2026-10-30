@@ -102,6 +102,9 @@ export interface AppApi {
   dismissRecipe: (item: import("../cloud").InboxItem) => Promise<void>;
   personal: import("../personal").Personal;
   setPersonal: (p: import("../personal").Personal) => void;
+  // DT176 (0.3.19): Travel mode
+  travel: import("../travel").Travel | null;
+  setTravel: (t: import("../travel").Travel | null) => void;
   applyNumbers: (bandId: string, kcal: number, protein: number, method?: string, fats?: number, carbs?: number) => void;
   todayMacros: { kcal: number; protein: number; fats: number; carbs: number } | null;
   // the numbers of any day, for Plan (0.2.1)
