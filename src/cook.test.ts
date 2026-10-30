@@ -46,6 +46,10 @@ test("what is said becomes a command", () => {
   assert.deepEqual(parseCommand("Chef, I only have 120 g chicken. What do I change?"), { kind: "ask", question: "i only have 120 g chicken what do i change" });
   assert.deepEqual(parseCommand("Hey Chef Mealan can I use frozen spinach"), { kind: "ask", question: "can i use frozen spinach" });
   assert.equal(k("chef"), "none", "Chef alone is not a question");
+  assert.deepEqual(parseCommand("go to step 4"), { kind: "goto", step: 4 });
+  assert.deepEqual(parseCommand("Step three"), { kind: "goto", step: 3 });
+  assert.deepEqual(parseCommand("back to step 2"), { kind: "goto", step: 2 });
+  assert.equal(k("next step"), "next");
   assert.equal(k("timer"), "none");
   assert.equal(k("the onions smell lovely"), "none");
 });

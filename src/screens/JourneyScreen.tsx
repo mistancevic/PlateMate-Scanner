@@ -71,6 +71,7 @@ import { countOf as countedOf, gramsOfOne } from "../counted";
 import { CountAmount, SizePicker, isCounted } from "../components/CountAmount";
 import { cookName, cookPhrase, weighLine, aroundWord, needsCooking, rawHint, cookTitle } from "../cookWords";
 import { CookMode } from "../components/CookMode";
+import { stepPicOf } from "../photos";
 import { SayHave } from "../components/SayHave";
 
 // Make it a meal (0.2.9, canvas board CH, CH1 to CH3): an idea from Chef Mealan, checked and with the app's grams
@@ -2053,7 +2054,8 @@ export function JourneyScreen(p: AppApi) {
             const d = await r.json().catch(() => ({}));
             if (!r.ok) throw new Error(d.error || "Chef Mealan could not answer. Ask again.");
             return String(d.reply || "");
-          } : null} />}
+          } : null}
+          pics={(() => { const src = rec?.steps?.length ? rec : plateRecipe?.steps?.length ? plateRecipe : null; return madeSteps.map((t) => stepPicOf(src, t)); })()} />}
         {/* DT94: the locked recipe's steps, to tick as you go; nothing here changes the recipe */}
         {madeSteps.length > 0 && (
           <section className="card mk-card" aria-label="The steps">

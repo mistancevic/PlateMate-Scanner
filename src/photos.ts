@@ -36,6 +36,8 @@ export function photosOf(state: any): Map<string, string> {
   (state?.meals ?? []).forEach(rec("meal"));
   // a recipe's screenshots (0.2.16, board IM, IM6): the cook's own reference, src:<recipeId>:<n>, never a cover
   (state?.meals ?? []).forEach((m: any) => { if (m?.id && Array.isArray(m.shots)) m.shots.forEach((x: unknown, n: number) => { if (isData(x)) out.set(`src:${m.id}:${n + 1}`, x); }); });
+  // DT175a (0.3.18): a recipe's step pictures, step:<recipeId>:<n>, n the step's place + 1
+  (state?.meals ?? []).forEach((m: any) => { if (m?.id && Array.isArray(m.stepPics)) m.stepPics.forEach((x: unknown, n: number) => { if (isData(x)) out.set(`step:${m.id}:${n + 1}`, x); }); });
   const lib = libraryIds(state);
   copiesOf(state).filter((f) => !lib.has(f.id)).forEach(food);
   return out;
@@ -76,6 +78,11 @@ export function photosWanted(state: any): Map<string, string> {
     if (!m?.id || !want || Array.isArray(m.shots)) continue;
     want.forEach((s, n) => { if (s) out.set(`src:${m.id}:${n + 1}`, s); });
   }
+  for (const m of state?.meals ?? []) {
+    const want: string[] | undefined = Array.isArray(m?.stepPicSigs) ? m.stepPicSigs : undefined;
+    if (!m?.id || !want || Array.isArray(m.stepPics)) continue;
+    want.forEach((s, n) => { if (s) out.set(`step:${m.id}:${n + 1}`, s); });
+  }
   return out;
 }
 
@@ -114,7 +121,7 @@ export function withPhotos<T>(state: T, photos: Map<string, string>, accept?: Se
   };
   const food = rec("food"), card = rec("fb"), recipe0 = rec("meal");
   // screenshots come back only as a whole set, each the right one
-  const recipe = (m: any) => {
+  const recipe1 = (m: any) => {
     const r = recipe0(m);
     const want: string[] | undefined = Array.isArray(m?.source?.shotSigs) ? m.source.shotSigs : undefined;
     if (!m?.id || !want || !want.length || Array.isArray(m.shots)) return r;
@@ -122,6 +129,21 @@ export function withPhotos<T>(state: T, photos: Map<string, string>, accept?: Se
     for (let n = 0; n < want.length; n++) { const x = photos.get(`src:${m.id}:${n + 1}`); if (!x || !(accept?.has(`src:${m.id}:${n + 1}`) || sig(x) === want[n])) return r; got.push(x); }
     changed = true;
     return { ...r, shots: got };
+  };
+  // DT175a: step pictures come back only as a whole set too; a place without a picture ("") stays empty
+  const recipe = (m: any) => {
+    const r = recipe1(m);
+    const want: string[] | undefined = Array.isArray(m?.stepPicSigs) ? m.stepPicSigs : undefined;
+    if (!m?.id || !want || !want.some(Boolean) || Array.isArray(m.stepPics)) return r;
+    const got: (string | null)[] = [];
+    for (let n = 0; n < want.length; n++) {
+      if (!want[n]) { got.push(null); continue; }
+      const k = `step:${m.id}:${n + 1}`, x = photos.get(k);
+      if (!x || !(accept?.has(k) || sig(x) === want[n])) return r;
+      got.push(x);
+    }
+    changed = true;
+    return { ...r, stepPics: got };
   };
   const inItems = (items: any[] | undefined) => (items ?? []).map((i: any) => (i?.food ? { ...i, food: food(i.food) } : i));
   const next = {
@@ -179,6 +201,13 @@ export function withoutStored<T>(state: T, stored: Set<string>): T {
     m.source.shotSigs = (m.shots as string[]).map((x) => (isData(x) ? sig(x) : ""));
     delete m.shots;
   });
+  (s.meals ?? []).forEach((m: any) => {
+    if (!m || !m.id || !Array.isArray(m.stepPics)) return;
+    const keys = (m.stepPics as (string | null)[]).map((x, n) => (isData(x) ? `step:${m.id}:${n + 1}` : null)).filter(Boolean) as string[];
+    if (!keys.every((k) => stored.has(k))) return;
+    m.stepPicSigs = stepPicSigsOf(m);
+    delete m.stepPics;
+  });
   return s;
 }
 
@@ -205,6 +234,15 @@ export function isOrphan(key: string, state: any): boolean {
     if (!m) return true;
     if (!Array.isArray(m.shots)) return !Array.isArray(m.source?.shotSigs);
     return m.shots.length < Number(n);
+  }
+  // DT175a: a step picture: gone with the recipe, or its place emptied, or past the end of the list
+  if (kind === "step") {
+    const m = (state?.meals ?? []).find((x: any) => x?.id === id);
+    if (!m) return true;
+    const k = Number(n) - 1;
+    if (Array.isArray(m.stepPics)) return k >= m.stepPics.length || !isData(m.stepPics[k]);
+    if (Array.isArray(m.stepPicSigs)) return k >= m.stepPicSigs.length || !m.stepPicSigs[k];
+    return true;
   }
   if (kind === "fb") {
     const fb = (state?.feedback ?? []).find((f: any) => f?.id === id);
@@ -293,3 +331,34 @@ export const recipePhotosOf = (m: { photo?: string; photos?: string[] } | null |
 export const withRecipePhotos = (list: string[]) => ({ photo: list[0], photos: list.slice(1) });
 // whether a recipe has photos of its own, here or on another phone still to be fetched
 export const recipeHasPhotos = (m: any) => recipePhotosOf(m).length > 0 || (Array.isArray(m?.photoSigs) && m.photoSigs.some(Boolean));
+
+// DT175a (0.3.18, board Stories123): a picture per step, Beta. A picture belongs to the step's words: a step rewritten loses it
+export const stepPicSigsOf = (m: any): string[] | undefined => (Array.isArray(m?.stepPics) ? m.stepPics.map((x: unknown) => (isData(x) ? sig(x) : "")) : undefined);
+export function stripStepPics(m: any) { if (m && Array.isArray(m.stepPics)) { m.stepPicSigs = stepPicSigsOf(m); delete m.stepPics; } }
+export type StepPic = { src: string; by: "me" | "ai" };
+export function stepPicOf(m: { stepPics?: (string | null)[]; stepPicMeta?: ({ by: "me" | "ai"; step: string } | null)[] } | null | undefined, step: string): StepPic | null {
+  if (!m || !Array.isArray(m.stepPics) || !Array.isArray(m.stepPicMeta)) return null;
+  const n = m.stepPicMeta.findIndex((x) => x?.step === step);
+  const src = n >= 0 ? m.stepPics[n] : null;
+  return src && isData(src) ? { src, by: m.stepPicMeta[n]!.by } : null;
+}
+// the patch that sets (or, with null, removes) the picture of the step at place k with these words
+export function setStepPic(m: { stepPics?: (string | null)[]; stepPicMeta?: ({ by: "me" | "ai"; step: string } | null)[]; steps?: string[] }, k: number, pic: StepPic | null) {
+  const len = Math.max(m.steps?.length ?? 0, k + 1);
+  const pics = Array.from({ length: len }, (_, i) => m.stepPics?.[i] ?? null), meta = Array.from({ length: len }, (_, i) => m.stepPicMeta?.[i] ?? null);
+  const step = m.steps?.[k] ?? "";
+  // the same words at another place: that picture moves here
+  for (let i = 0; i < len; i++) if (i !== k && meta[i]?.step === step) { pics[i] = null; meta[i] = null; }
+  pics[k] = pic ? pic.src : null; meta[k] = pic ? { by: pic.by, step } : null;
+  return { stepPics: pics, stepPicMeta: meta };
+}
+// after the steps changed: each picture follows its words to the step's new place; a step rewritten loses its picture
+export function alignStepPics(m: { stepPics?: (string | null)[]; stepPicMeta?: ({ by: "me" | "ai"; step: string } | null)[]; stepPicSigs?: string[] }, steps: string[]) {
+  if (!Array.isArray(m.stepPicMeta) || !m.stepPicMeta.some(Boolean)) return {};
+  if (!Array.isArray(m.stepPics)) return {}; // not on this phone yet: left as they are
+  const pics = steps.map((t) => { const n = m.stepPicMeta!.findIndex((x) => x?.step === t); return n >= 0 ? m.stepPics![n] ?? null : null; });
+  const meta = steps.map((t) => { const x = m.stepPicMeta!.find((y) => y?.step === t); return x ? { by: x.by, step: t } : null; });
+  return { stepPics: pics, stepPicMeta: meta };
+}
+// every step has its picture: Watch the steps can play
+export const allStepPics = (m: any, steps: string[]) => steps.length > 0 && steps.every((t) => !!stepPicOf(m, t));

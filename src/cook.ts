@@ -31,7 +31,9 @@ export type Command =
   | { kind: "next" } | { kind: "back" } | { kind: "repeat" } | { kind: "stop" } | { kind: "left" }
   | { kind: "howMuch"; food: string } | { kind: "timer"; seconds: number } | { kind: "none"; said: string }
   // DT175 (0.3.17): a question for Chef Mealan starts with Chef; everything else stays on the phone
-  | { kind: "ask"; question: string };
+  | { kind: "ask"; question: string }
+  // DT175a (0.3.18): go to step 4
+  | { kind: "goto"; step: number };
 export function parseCommand(said: string): Command {
   const s = said.toLowerCase().replace(/[.,!?]/g, " ").replace(/\s+/g, " ").trim();
   if (!s) return { kind: "none", said };
@@ -39,6 +41,8 @@ export function parseCommand(said: string): Command {
   if (chef) { const q = chef[1].trim(); return q.length >= 3 ? { kind: "ask", question: q } : { kind: "none", said }; }
   const much = /\bhow (?:much|many)(?: of)?(?: the)? (.+)$/.exec(s);
   if (much) return { kind: "howMuch", food: much[1].replace(/\b(do i need|is it|is there|again|please)\b/g, "").trim() };
+  const go = /^(?:(?:go|jump|back|skip) to )?step (\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)$|\b(?:go|jump|back|skip) to step (\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/.exec(s);
+  if (go) { const n = num(go[1] ?? go[2]); if (Number.isFinite(n) && n >= 1) return { kind: "goto", step: Math.round(n) }; }
   if (/\btimer\b|\bset (?:a )?timer\b/.test(s)) {
     const sec = secondsIn(s);
     return sec ? { kind: "timer", seconds: sec } : { kind: "none", said };

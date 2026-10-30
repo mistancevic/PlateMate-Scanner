@@ -2,7 +2,7 @@
 // its own "changed at" time. A phone sends only the records that changed; when it reads the account it takes the newest
 // of each record, one by one, so two changes on two phones are both kept. A deleted record leaves a "deleted" note, so
 // the other phone deletes it too instead of bringing it back. Pure functions here; the account calls are in cloud.ts.
-import { photoSigsOf, samePhotos, sig } from "./photos";
+import { photoSigsOf, samePhotos, sig, stripStepPics } from "./photos";
 import { cleanMealNames, cleanCardNames, cleanFoodNames } from "./entities";
 // R1 (0.2.29): a record from the account with the page's codes in its names reads as letters; the clean copy goes back up
 const cleanNames = (kind: Kind, d: any) => (kind === "foods" ? cleanFoodNames(d) : kind === "recipes" ? cleanMealNames(d) : cleanCardNames(d));
@@ -28,6 +28,7 @@ export function clean(kind: Kind, x: any): any {
   if (kind === "foods") { const ps = photoSigsOf(c); if (ps) c.photoSigs = ps; stripFood(c); }
   if (kind === "recipes") { const ps = photoSigsOf(c); if (ps) c.photoSigs = ps; stripFood(c); (c.items ?? []).forEach((i: any) => stripFood(i?.food));
     // the screenshots are files too (0.2.16, board IM): the record names them by fingerprint
+    stripStepPics(c); // DT175a (0.3.18): step pictures are files too
     if (Array.isArray(c.shots)) { if (c.source) c.source.shotSigs = c.shots.map((x: unknown) => (typeof x === "string" && x.startsWith("data:") ? sig(x) : "")); delete c.shots; } }
   if (kind === "cards") { const ps = photoSigsOf({ photo: c.photo }); if (ps) c.photoSigs = ps; delete c.photo; (c.meal?.items ?? []).forEach((i: any) => stripFood(i?.food)); }
   return c;
