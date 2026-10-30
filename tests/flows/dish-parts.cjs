@@ -126,7 +126,7 @@ const U = "http://127.0.0.1:3211";
   ok(kept && JSON.stringify(kept.items.map((i) => i.part)) === JSON.stringify(["Rice", "Chicken", "Chicken", "Toppings"]) && kept.optional?.[0]?.name === "Sour cream" && kept.optional[0].part === "Toppings" && !s2.optional, "IM18b: the recipe keeps its parts and the optional sour cream; the plate is clear");
   await p2.locator("nav button").filter({ hasText: "Recipes" }).click(); await p2.waitForTimeout(700);
   await p2.getByText("Burrito bowl", { exact: true }).last().click(); await p2.waitForTimeout(900);
-  await p2.getByRole("button", { name: "Make it", exact: true }).click(); await p2.waitForTimeout(1000);
+  await p2.getByRole("button", { name: "Change it first", exact: true }).click(); await p2.waitForTimeout(1000);
   ok(JSON.stringify(await heads(p2)) === JSON.stringify(["Rice", "Chicken", "Toppings"]) && await p2.getByRole("button", { name: "Add Sour cream" }).count() === 1, "IM18b: next time it opens like this");
   ok(errs.length === 0, "no page errors " + errs.join(" | "));
   await b.close(); server.kill();

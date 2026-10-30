@@ -83,7 +83,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await typed();
   await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(1200);
   await page.getByText("Lentil soup").first().click(); await page.waitForTimeout(900);
-  await page.getByRole("button", { name: /^Make it/ }).first().click(); await page.waitForTimeout(900);
+  await page.getByRole("button", { name: /^(Make it|Change it first)/ }).first().click(); await page.waitForTimeout(900);
   const ask2 = await text(".plate-ask");
   ok(/Your plate already has 2 foods: Chicken and rice\.\s?Lentil soup from your recipes has 2 foods\./.test(ask2) && (await page.locator(".plate-ask .pa-go button").allTextContents()).join() === "Start a new plate,Add to my plate" && /Keep my plate/.test(ask2), "DT131: a recipe: Start a new plate first, Add to my plate, Keep my plate: " + ask2.slice(0, 140));
   await page.getByRole("button", { name: "Keep my plate" }).click(); await page.waitForTimeout(400);

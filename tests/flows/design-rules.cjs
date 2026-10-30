@@ -61,7 +61,7 @@ const U = "http://127.0.0.1:3242";
     // ---- A: the recipe page has one filled button, Make it; the Plate's food list adds are outlined ----
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(700);
     await page.locator(".recipe-tile, .recipe-card").filter({ hasText: "Sarma" }).first().click(); await page.waitForTimeout(900);
-    ok(JSON.stringify(await filled(page)) === JSON.stringify(["Make it"]), "A: the recipe page's one filled button is Make it: " + (await filled(page)).join(", "));
+    ok(JSON.stringify(await filled(page)) === JSON.stringify(["Cook it as written"]), "A: the recipe page's one filled button is Cook it as written: " + (await filled(page)).join(", "));
     ok(await page.getByRole("button", { name: "Write my own" }).evaluate((b) => b.classList.contains("pill")), "A, B: Write my own is a button next to the other way, not a link");
     const rb = await page.locator("main button").filter({ hasText: /^\s*Recipes\s*$/ }).first().boundingBox(), hero = await page.locator(".rq-hero").first().boundingBox();
     ok(rb && hero && rb.y < hero.y && rb.x < 60, "E: the recipe page's Back, Recipes, sits top left above the photo");
@@ -73,7 +73,7 @@ const U = "http://127.0.0.1:3242";
     // ---- E: Back on a Plate step, top left above the step bar, and where it goes ----
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(700);
     await page.locator(".recipe-tile, .recipe-card").filter({ hasText: "Sarma" }).first().click(); await page.waitForTimeout(900);
-    await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(1200);
+    await page.getByRole("button", { name: "Change it first", exact: true }).click(); await page.waitForTimeout(1200);
     for (let i = 0; i < 3 && !(await page.locator(".step-head .back-top").count()); i++) { const go = page.getByRole("button", { name: /^(Make it as it is|Keep it as it is|Lock the recipe|Fit to my target)$/ }).first(); if (await go.count()) { await go.click(); await page.waitForTimeout(1000); } }
     const bk = page.locator(".step-head .back-top").first();
     const bt = await bk.boundingBox(), sb = await page.locator(".step-head .phase-bar").first().boundingBox();

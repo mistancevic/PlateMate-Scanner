@@ -59,7 +59,7 @@ const U = "http://127.0.0.1:3238";
     await page.getByRole("dialog").getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(400);
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500);
     await page.locator(".recipe-tile").filter({ hasText: "fritters" }).first().click(); await page.waitForTimeout(700);
-    await page.getByRole("button", { name: "Make it" }).first().click(); await page.waitForTimeout(900);
+    await page.getByRole("button", { name: "Change it first" }).first().click(); await page.waitForTimeout(900);
     const one = page.getByRole("button", { name: /One fritter, as the recipe makes it/ }); if (await one.count()) { await one.click(); await page.waitForTimeout(700); }
     const plate = (await page.locator("main").textContent()) ?? "";
     ok(new RegExp(`One fritter is ${N} kcal`).test(plate), `the Plate: one fritter is ${N} kcal`);
