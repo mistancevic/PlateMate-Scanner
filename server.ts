@@ -473,7 +473,7 @@ app.post("/api/export", requireUser, async (req, res) => {
     if (email) for (const col of ["accessRequests", "invites", "bookSignups"]) out[col] = (await docs(d.collection(col).where("email", "==", email))).map((r: any) => ({ ...r, ipHash: undefined, ua: undefined }));
     // requests stored before 0.3.11 kept the email as typed
     if (email) out.accessRequests = [...(out.accessRequests as any[]), ...(await d.collection("accessRequests").limit(2000).get()).docs.filter((x) => String(x.get("email") || "").toLowerCase() === email && x.get("email") !== email).map((x) => ({ id: x.id, ...(x.data() as any), ipHash: undefined, ua: undefined }))];
-    for (const col of ["metrics_events", "metrics_events_preview"]) out[col] = await docs(d.collection(col).where("m", "==", memberOf(uid)));
+    for (const col of ["metrics_events", "metrics_events_preview"]) out[col] = await docs(d.collection(col).where("m", "in", membersOf(uid)));
     // the photo files by name; the phone downloads them itself (the person reads their own files), so this answer stays small
     out.photo_files = BUCKET ? (await adminStorage().bucket(BUCKET).getFiles({ prefix: `users/${uid}/` }))[0].map((f) => f.name) : [];
     res.json({ server: out });
@@ -501,7 +501,7 @@ app.post("/api/account/delete", requireUser, async (req, res) => {
       }
       // the counted events of this member go with the account (privacy notice section 7)
       for (const col of ["metrics_events", "metrics_events_preview"]) {
-        const ev = await d.collection(col).where("m", "==", memberOf(uid)).get();
+        const ev = await d.collection(col).where("m", "in", membersOf(uid)).get();
         for (let i = 0; i < ev.docs.length; i += 400) { const b = d.batch(); ev.docs.slice(i, i + 400).forEach((x) => b.delete(x.ref)); await b.commit(); }
       }
       // DT169 (0.3.11): the recipes they published on chefmealan.com and the cook switch go with the account too
@@ -681,6 +681,8 @@ const EVENT_KEYS = new Set(["way", "how", "went", "ate", "locked", "method", "ki
 const HIT_KINDS = new Set(["hp_visit", "hp_qr", "hp_ig", "hp_calc", "hp_try", "built_visit", ...BOOK_HITS]);  // hp_qr: SH73, chefmealan.com/?from=qr; hp_ig (0.2.115, Milan 27 October 16:43): ?from=ig, the link in Instagram
 const METRICS_SALT = process.env.METRICS_SALT || FB_PROJECT || "local";
 const memberOf = (uid: string) => createHash("sha256").update(`${METRICS_SALT}:${uid}`).digest("hex").slice(0, 16);
+// DT170: events counted before the secret was set carry the number made the old way; Delete and Export find those too
+const membersOf = (uid: string) => [...new Set([memberOf(uid), createHash("sha256").update(`${FB_PROJECT || "local"}:${uid}`).digest("hex").slice(0, 16)])];
 const berlinDay = (t = new Date()) => new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Berlin", year: "numeric", month: "2-digit", day: "2-digit" }).format(t);
 const metricsName = (req: express.Request, name: string) => (spaceOf(req) === "preview" ? `${name}_preview` : name);
 const memEvents: Record<"live" | "preview", Ev[]> = { live: [], preview: [] };

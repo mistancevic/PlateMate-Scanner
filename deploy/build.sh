@@ -25,4 +25,5 @@ gcloud projects add-iam-policy-binding "${FB_PROJECT_ID:-$PROJECT}" --member "se
 SECRETS="GEMINI_API_KEY=gemini-key:latest"
 gcloud secrets describe airtable-key --project "$PROJECT" >/dev/null 2>&1 && SECRETS="$SECRETS,AIRTABLE_API_KEY=airtable-key:latest"
 # METRICS_EMAILS: who reads the Metrics page (0.2.5+r17), more than one separated by ";"
-ENVS="AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID:-},FIREBASE_PROJECT_ID=$FB_PROJECT_ID,FIRESTORE_DB_ID=$FB_DB_ID,FIREBASE_STORAGE_BUCKET=$BUCKET,METRICS_EMAILS=${METRICS_EMAILS:-}"
+# METRICS_SALT (DT168 finding 11): a secret, so a member number can't be traced back to an account; set once in deploy.env
+ENVS="AIRTABLE_BASE_ID=${AIRTABLE_BASE_ID:-},FIREBASE_PROJECT_ID=$FB_PROJECT_ID,FIRESTORE_DB_ID=$FB_DB_ID,FIREBASE_STORAGE_BUCKET=$BUCKET,METRICS_EMAILS=${METRICS_EMAILS:-},METRICS_SALT=${METRICS_SALT:-}"
