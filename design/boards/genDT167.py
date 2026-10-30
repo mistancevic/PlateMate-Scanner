@@ -82,12 +82,13 @@ class Component extends DCLogic {{
     cj["boards"][fname] = {"x": 0, "y": a["y"] + a["h"] + 120, "w": W, "h": H, "title": title, "page": "page-vd6nie"}
     json.dump(cj, open(f"{D}/canvas.json", "w")); print(fname, W, H, Hc, len(page) // 1024, "KB")
 
-W = SX + 7 * (SW + GAP) - GAP + 70
+W = SX + 8 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
 cy = storyCard(B, y, "DT167", "Your summary: every answer in one place, what it does, shared with your coach part by part", [
   ("Coach Milan, 30 October 08:47 to 09:03", "Should we craft a summary at the end of setting up My profile in Me steps, and suggest a CTA such as go to Plate and craft the first meal, or go to Plan and plan your week? Also, how to be sure all the settings are considered by the code and Chef Mealan? DT167. Draw. Consider it also as material to share with the coach: the coach has the profile in one place as a readable document. If some part must not be shared, for personal preference or GDPR, let me know."),
   ("Now, checked in 0.3.8", "Me is six steps, Profile to My coach, and the last ends with nothing after it. What the person told the app is spread over six pages. Two answers never reach Chef Mealan: Where you eat and Work travel only order the moments. Today the coach sees the goal and numbers, the week, weigh-ins, shared cards, and which health situations were ticked and when, never the words; never the body data."),
   ("The story", "Your summary is the last row of Me and where the steps end. Every answer once, by step, each with what it does and whether Chef Mealan reads it. At the end: Plan your week, or Craft your first meal on Plate for the next meal by the clock. Then choose what your coach sees, or Save as PDF."),
+  ("Coach Milan, 09:53: Taste", "I just saw the taste block is sitting alone here. Taste moves from the bottom of Me, under Account, into Lifestyle, under Nutrition, after What you eat, as it is. Me becomes the steps only, then Account. The summary lists it under How you eat."),
   ("Behind it: the settings map", "One file in the code lists every setting with its effect: the numbers, the meal times, what Chef Mealan reads, or the order of moments. The summary is built from it. A unit test fails when a setting has no line, one walkthrough per setting changes it and checks the effect, and a test checks that what is marked Chef reads is in every request to Chef Mealan. Where you eat and Work travel are added to what Chef Mealan reads."),
   ("Coach Milan, 09:14 to 09:15", "The question is how to enable the client to share with their coach when something changes. The coach should have the initial summary, but how to resolve the next updates and changes? That covers the second question too. Redraw DT167."),
   ("Sharing with the coach, version 2", "Choose once, part by part, what your coach sees; the choice stays. No frozen copy: the coach sees the shared parts as they are today, the same summary the person sees. On top, what changed since the coach last looked, dated; the same list starts the weekly check-in, and the Clients list marks a client with changes. A change to a part not shared never shows, not even that it changed. Switching a part off: the coach stops seeing it at once, its past changes too, and sees only that it stopped. Save as PDF prints the day, for the coach's own notes. Leaving the coach or deleting the account ends it all."),
@@ -101,8 +102,9 @@ h = rowEnd(cy,
   B.screen("DT167d", 3, y, "New: what's next", "r167d", "changed", "Plan your week. Craft your first meal. Share."),
   B.screen("DT167e", 4, y, "New: what your coach sees", "r167e", "changed", "Choose once; kept up to date. Health data off."),
   B.screen("DT167f", 5, y, "New: the coach reads it", "r167f", "changed", "As it is today; what changed, on top."),
-  B.screen("DT167g", 6, y, "New: Clients marks changes", "r167g", "changed", "Never ask, never send again."))
+  B.screen("DT167g", 6, y, "New: Clients marks changes", "r167g", "changed", "Never ask, never send again."),
+  B.screen("DT167h", 7, y, "New: Taste in Lifestyle", "r167h", "changed", "Under Nutrition, after What you eat."))
 y = h
 board("Stories119.dc.html", "DT167. Your summary, and what your coach sees",
-  "30 October 2026 (Coach Milan, the end of the Me steps; a profile the coach can read). Version 2, 09:15: shared once, kept up to date, with what changed. Now: 0.3.8, untouched. Drawn for your approval; nothing built.",
+  "30 October 2026 (Coach Milan, the end of the Me steps; a profile the coach can read). Version 2, 09:15: shared once, kept up to date, with what changed; 09:53: Taste into Lifestyle. Now: 0.3.8, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories118.dc.html")

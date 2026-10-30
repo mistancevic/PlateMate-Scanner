@@ -51,7 +51,8 @@ const LIFE = { weekdays: "work", hours: "fixed", slot: "9-5", move: "sitting", m
   // b, new: a seventh row and the last step's Next
   await toMe();
   await page.evaluate((mark) => { const r = [...document.querySelectorAll(".menu-row")].find((x) => /My coach/.test(x.textContent)); r.insertAdjacentHTML("afterend", `<button class="menu-row" style="${mark}"><span class="menu-row-text"><b>Your summary</b><small>Everything you told Chef Mealan, and what it does. Share it with your coach.</small></span><span aria-hidden="true">›</span></button>`); }, mark);
-  await note("New: Your summary, the last row of Me. Each step's Next leads there in the end: Profile, Goal, Lifestyle, Training week, Where I shop and cook, My coach, Your summary.");
+  await page.evaluate((mark) => { const t = document.querySelector(".taste-card"); if (t) t.remove(); }, mark);
+  await note("New: Your summary, the last row of Me. Taste no longer sits alone under Account: it moves into Lifestyle, under Nutrition. Each step's Next leads there in the end: Profile, Goal, Lifestyle, Training week, Where I shop and cook, My coach, Your summary.");
   await shot("r167b");
   await toMe(); await draw("Your summary", SUM_TOP + SUM_BOTTOM.replace(/<div class="menu-list"[\s\S]*$/, ""));
   await note("New: Your summary. Every answer once, what it does, and whether Chef Mealan reads it. Built from one settings map in the code: a setting without a line there fails a test, so nothing is forgotten.");
@@ -83,5 +84,16 @@ const LIFE = { weekdays: "work", hours: "fixed", slot: "9-5", move: "sitting", m
     <button class="menu-row"><span class="menu-row-text"><b>Tester 3</b><small>Shares no profile parts yet · check-in Friday</small></span><span aria-hidden="true">›</span></button></div>`);
   await note("New: the Clients list marks a client whose shared profile changed since the coach looked. The coach never has to ask; the person never has to send.");
   await shot("r167g");
+  // h: Taste in Lifestyle, under Nutrition, after What you eat
+  await toMe();
+  const taste = await page.evaluate(() => document.querySelector(".taste-card").outerHTML);
+  await page.locator(".menu-row", { hasText: "Lifestyle" }).first().click(); await page.waitForTimeout(600);
+  await page.evaluate(({ taste, mark }) => { const w = [...document.querySelectorAll(".setting")].find((x) => x.querySelector(".setting-name")?.textContent === "What you eat");
+    const d = document.createElement("div"); d.innerHTML = taste; const c = d.firstElementChild; c.classList.remove("card"); c.className = "setting"; c.style.cssText = mark + ";padding:6px";
+    const top = c.querySelector(".card-top"); if (top) top.outerHTML = '<small class="setting-name">Taste</small>'; w.after(c);
+    const nut = [...document.querySelectorAll(".seg-head")].find((x) => /Nutrition/.test(x.textContent)); nut.scrollIntoView(); }, { taste, mark });
+  await page.evaluate(({ NOTE }) => { const nut = [...document.querySelectorAll(".seg-head")].find((x) => /Nutrition/.test(x.textContent)); const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New: Taste in Lifestyle, under Nutrition, after What you eat: I like, Rather not, How I eat, In your own words, as today. Chef Mealan reads it as before; it never changes your numbers."; nut.before(d); }, { NOTE });
+  await page.evaluate(() => { const nut = [...document.querySelectorAll(".seg-head")].find((x) => /Nutrition/.test(x.textContent)); let n = document.querySelector(".page-why"); while (n && n !== nut.previousElementSibling) { const x = n.nextElementSibling; if (!x || x === nut.previousElementSibling) break; n.nextElementSibling.style.display = "none"; n = x; } });
+  await shot("r167h");
   await b.close(); server.kill();
 })();
