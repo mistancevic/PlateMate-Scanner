@@ -65,6 +65,15 @@ export function trendOf(list: WeighIn[] | undefined, band: string, weightKg: num
   else if (change > hi + slack) verdict = flat ? "up" : band === "fatloss" ? "slower" : "faster";
   return { first: Math.round(first * 10) / 10, last: Math.round(last * 10) / 10, change, weeks, count: points.length, expected, verdict, points, averages };
 }
+// DT172 (0.3.14, privacy finding 14, option a; Coach Milan 30 October 15:00): the trend for a coach who isn't shown body data,
+// as a change against the person's weight in percent: the same verdict, worked out from the kilograms on the person's own phone,
+// and no kilogram in it
+export function pctTrend(t: Trend, base: number): Trend {
+  const p = (kg: number) => Math.round(((kg - base) / base) * 1000) / 10, d = (kg: number) => Math.round((kg / base) * 1000) / 10;
+  return { ...t, first: t.first === null ? null : p(t.first), last: t.last === null ? null : p(t.last), change: t.change === null ? null : d(t.change),
+    expected: [d(t.expected[0]), d(t.expected[1])], points: t.points.map((x) => ({ day: x.day, kg: p(x.kg) })), averages: t.averages.map((x) => ({ day: x.day, kg: p(x.kg) })) };
+}
+export const fmtPct = (x: number) => `${x > 0 ? "+" : x < 0 ? "−" : ""}${Math.abs(x).toFixed(1)} %`;
 export const VERDICT_WORDS: Record<Verdict, string> = { "on track": "On track", faster: "Faster than expected", slower: "Slower than expected", up: "Going up", down: "Going down", "too few": "Not enough weigh-ins yet" };
 // what it usually means, and what to try: advice to read, never a change to the numbers
 export function verdictNote(band: string, v: Verdict): string | null {

@@ -70,6 +70,10 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(/Davorka's profile/.test(sp) && /Not shared What you eat, alcohol, in your own words, allergies and intolerances, your body data\. Davorka keeps these to themselves\./.test(sp) && !/Alcohol On weekends/.test(sp) && !/born 1985/.test(sp), "the shared parts below, what wasn't shared said, no private row: " + sp.slice(-260));
   await page.getByRole("button", { name: "‹ Clients" }).click(); await page.waitForTimeout(400);
   ok(!/Profile: \d+ change/.test(await page.locator(".cw-row", { hasText: "Davorka" }).first().textContent()), "looked at: the mark goes");
+  // DT172 (privacy finding 14, option a): Lena shares no body data: her coach sees the trend in percent, no kilogram
+  await page.locator(".cw-row", { hasText: "Lena" }).first().click(); await page.waitForTimeout(600);
+  const lp = (await page.locator("main").innerText()).replace(/\s+/g, " ");
+  ok(/In percent of their weight: they share no body data\./.test(lp) && /Weigh-ins 2 this week|Weigh-ins \d this week/.test(lp) && !/\b6\d\.\d kg\b/.test(lp), "DT172: without body data, weigh-ins in percent and days weighed, no kilogram: " + (lp.match(/Weigh-ins[^.]*\./) || [""])[0]);
   ok(errs.length === 0, errs.length ? "page errors: " + errs.join(" | ") : "no page errors");
   await b.close(); server.kill();
   process.exit(fail ? 1 : 0);

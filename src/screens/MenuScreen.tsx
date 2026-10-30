@@ -729,14 +729,14 @@ function CoachPanel(p: AppApi) {
           <li>The parts of Your summary you share, kept up to date, with what changed. You choose them on Your summary; health data stays off until you switch it on.</li>
           <li>Your week: each day, the meals planned against the meals eaten, with their names, PD and kcal. From the day you joined.</li>
           <li>Your goal and today's numbers, and may set them for you.</li>
-          <li>Your weigh-ins.</li>
+          <li>Your weigh-ins as a trend: up or down, in percent of your weight. Kilograms only when you share your body data.</li>
           <li>The cards you share, with the reason and the photo.</li>
           <li>Which situations you ticked on your profile and when. Never your words.</li>
         </ul>
         <b>What your coach never sees</b>
         <ul className="small">
           <li>Your photos and notes on cards you don't share, your library, your chats with Chef Mealan.</li>
-          <li>Your body data, health answers and allergies. Only the numbers they give, your weigh-ins as a trend, and which situation you ticked and when. They live in a part of your account only you can open.</li>
+          <li>Your body data, health answers and allergies. Only the numbers they give, your weigh-ins as a trend in percent (in kilograms only if you share your body data on Your summary), and which situation you ticked and when. They live in a part of your account only you can open.</li>
         </ul>
         <ConfirmButton className="link link-danger" label="Leave this coach" confirmLabel="Tap again to leave" onConfirm={leaveCoach} />
       </section>

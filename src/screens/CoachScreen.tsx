@@ -15,7 +15,7 @@ import { uid } from "../pilot";
 import { BANDS, PACES, bandOf, goalLabel, goalsForBand, isBuild } from "../goal";
 import { sheetOf } from "../goalGuide";
 import { GoalSheet } from "../components/GoalSheet";
-import { WeightTrend } from "../components/Weight";
+import { WeightTrend, WeightTrendPct } from "../components/Weight";
 import { fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { density } from "../pilot";
 import { MOMENTS } from "../moments";
@@ -163,7 +163,7 @@ export function ClientTail({ row, onSaved, setError, notify, confirmAi, cook, se
           ))}
         </div>
         {(() => { const sh = sheetOf(row.goal, { weightKg: row.weightKg, trainingAge: row.trainingAge, coachLabel: "you", ...(row.review?.status === "approved" ? { approvedBy: "you", approvedAt: row.review.at } : {}) }); return sh ? <GoalSheet sheet={sh} /> : null; })()}
-        {row.goal?.band && !row.flags.some((f) => f.situation === "eating") && <WeightTrend list={row.weighIns} band={row.goal.band} weightKg={row.weightKg} trainingAge={row.trainingAge} coach />}
+        {row.goal?.band && !row.flags.some((f) => f.situation === "eating") && (row.weightKg || !row.weightTrend ? <WeightTrend list={row.weighIns} band={row.goal.band} weightKg={row.weightKg} trainingAge={row.trainingAge} coach /> : <WeightTrendPct t={row.weightTrend} band={row.goal.band} at={row.weightAt ?? null} />)}
         <GoalHistory log={row.goalLog ?? []} />
         <p className="label">Shared with you ({row.feedback.length})</p>
         {row.feedback.length === 0 && <small>Nothing yet.</small>}

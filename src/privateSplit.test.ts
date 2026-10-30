@@ -52,7 +52,7 @@ test("DT168: the load takes the private part over an old copy; a coach's later g
 test("DT168: the coach's app reads coachView, and the old fields only for an account not moved yet", () => {
   const { main } = splitSave(save, false);
   const cf = coachFieldsOf(main);
-  assert.deepEqual([cf.goalsNow, cf.pdUnit, cf.weightKg, cf.consentBy], [{ calories: 2500, protein: 160 }, "pd", 85, "self"]);
+  assert.deepEqual([cf.goalsNow, cf.pdUnit, cf.weightKg, cf.consentBy], [{ calories: 2500, protein: 160 }, "pd", undefined, "self"], "DT172: no kilogram without body data shared");
   assert.equal(coachFieldsOf({ personal: { weightKg: 70 }, safety: { flags: [] } }).weightKg, 70);
 });
 test("DT168: the rules: the private part is the person's only; a coach writes only coach fields", () => {
@@ -77,4 +77,16 @@ test("DT169: join requests and sign-ups are the owner's only; delete and export 
   assert.match(s, /email = String\(b\.email \?\? ""\)\.trim\(\)\.toLowerCase\(\)/);
   const ex = s.slice(s.indexOf('app.post("/api/export"'), s.indexOf("// Delete my account, the whole of it"));
   for (const x of ["listCollections", "member_recipes", "public_recipes", "cooks", "accessRequests", "metrics_events", "photo_files", "sub.id !== \"photos\""]) assert.ok(ex.includes(x), `export has ${x}`);
+});
+test("DT172: without body data shared, the coach's view has the trend in percent and no kilogram", () => {
+  const days = (n: number) => { const d = new Date(); d.setDate(d.getDate() - n); return d.toISOString().slice(0, 10); };
+  const weighIns = [27, 26, 25, 24, 6, 5, 4, 3, 1].map((n, i) => ({ date: days(n), kg: 85 - i * 0.1 }));
+  const data = { ...save, goal: { band: "fatloss" }, personal: { ...save.personal, weightKg: 85, weighIns } };
+  const v = splitSave(data, false).main.coachView as any;
+  assert.equal(v.weightKg, null); assert.deepEqual(v.weighIns, []);
+  assert.ok(!JSON.stringify(v).includes("84.") && !JSON.stringify(v).includes("85"), "no kilogram anywhere: " + JSON.stringify(v).slice(0, 200));
+  assert.equal(v.weighDates.length, 9); assert.ok(v.weightTrend && typeof v.weightTrend.change === "number" && v.weightTrend.change < 0);
+  assert.ok(Math.abs(v.weightTrend.change) < 2, "a change in percent, not kilograms");
+  const shared = splitSave({ ...data, personal: { ...data.personal, coachShare: { on: { body: "2026-10-30T15:00:00Z" }, off: [] } } }, false).main.coachView as any;
+  assert.equal(shared.weightKg, 85); assert.equal(shared.weighIns.length, 9); assert.equal(shared.weightTrend, null);
 });

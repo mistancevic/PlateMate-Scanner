@@ -10,7 +10,7 @@ import { BANDS, PACES, bandOf, goalLabel, goalsForBand, isBuild } from "../goal"
 import { isoWeek, ymd } from "../plan";
 import { pdRange, pdVal } from "../ui";
 import { density } from "../pilot";
-import { trendOf, VERDICT_WORDS, avg7 } from "../weight";
+import { trendOf, VERDICT_WORDS, avg7, fmtPct } from "../weight";
 import { ProfileChanges, SharedProfileCard, newProfileChanges } from "./SummaryPanel";
 
 // The coach's week (0.2.6, canvas board CW, CW1 to CW4 and CW8, Milan 13 and 15 October 2026). Clients puts the clients
@@ -119,7 +119,10 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tail }
   // weigh-ins and DaaM good in the week
   const inWeek = (date: string) => date >= ymd(w.monday) && date <= ymd(w.sunday);
   const weighs = (row.weighIns ?? []).filter((x: any) => inWeek(x.date)).sort((a: any, b: any) => (a.date < b.date ? -1 : 1));
-  const trend = row.goal?.band && row.weightKg ? trendOf(row.weighIns, row.goal.band, row.weightKg, row.trainingAge) : null;
+  // DT172 (privacy finding 14, option a): without shared body data, the trend comes as percent and only the days weighed
+  const pct = !row.weightKg && row.weightTrend ? row.weightTrend : null;
+  const trend = pct ?? (row.goal?.band && row.weightKg ? trendOf(row.weighIns, row.goal.band, row.weightKg, row.trainingAge) : null);
+  const daysWeighed = pct ? (row.weighDates ?? []).filter((d) => inWeek(d)).length : null;
   const a7 = avg7(row.weighIns);
   const daam = row.feedback.filter((f: any) => f.taste === "DaaM good" && inWeek(ymd(new Date(f.createdAt))));
   const day = openDay ? w.days.find((x) => x.key === openDay)?.line ?? null : null;
@@ -176,9 +179,9 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tail }
 
       {!row.flags.some((f) => f.situation === "eating") && (
         <section className="card cw-mini">
-          <div><small>Weigh-ins</small><small>{weighs.length} this week</small></div>
-          {weighs.length ? <b>{weighs.length > 1 ? `${wIn(weighs[0].kg).toFixed(1)} → ${wText(weighs[weighs.length - 1].kg)}` : wText(weighs[0].kg)}{a7 ? ` · 7-day average ${wIn(a7).toFixed(1)}` : ""}</b> : <b>No weigh-ins this week</b>}
-          {trend && <small className="cw-mini-line">{trend.verdict === "too few" ? "Not enough weigh-ins yet for a trend." : `${VERDICT_WORDS[trend.verdict]} for ${goalLabel(row.goal.band)}: ${fmtKg(trend.change!)} in 3 weeks.`}</small>}
+          <div><small>Weigh-ins</small><small>{daysWeighed ?? weighs.length} this week</small></div>
+          {daysWeighed !== null ? <b>{daysWeighed ? `${daysWeighed} ${daysWeighed === 1 ? "morning" : "mornings"} weighed` : "No weigh-ins this week"}</b> : weighs.length ? <b>{weighs.length > 1 ? `${wIn(weighs[0].kg).toFixed(1)} → ${wText(weighs[weighs.length - 1].kg)}` : wText(weighs[0].kg)}{a7 ? ` · 7-day average ${wIn(a7).toFixed(1)}` : ""}</b> : <b>No weigh-ins this week</b>}
+          {trend && <small className="cw-mini-line">{trend.verdict === "too few" ? "Not enough weigh-ins yet for a trend." : `${VERDICT_WORDS[trend.verdict]} for ${goalLabel(row.goal.band)}: ${pct ? fmtPct(trend.change!) : fmtKg(trend.change!)} in 3 weeks.`}</small>}
         </section>
       )}
       {/* the measured burn, as the client sees it (0.2.7, board FT, FT7) */}
