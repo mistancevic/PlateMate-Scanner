@@ -11,15 +11,19 @@ type Timer = { id: number; name: string; ends: number; total: number; rang: bool
 const Speech = () => (typeof window === "undefined" ? null : (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null);
 const canSpeak = () => typeof window !== "undefined" && "speechSynthesis" in window;
 
-export function CookMode({ title, steps, items, ticks, onTick, onClose }: {
+export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = null }: {
   title: string; steps: string[]; items: Ingredient[]; ticks: Set<number>;
   onTick: (k: number) => void; onClose: () => void;
+  // DT175 (0.3.17): a question to Chef Mealan about this step; null when the AI is off
+  ask?: ((question: string, step: number, history: { role: "cook" | "chef"; text: string }[]) => Promise<string>) | null;
 }) {
   const first = Math.max(0, steps.findIndex((_, k) => !ticks.has(k)));
   const [k, setK] = useState(ticks.size >= steps.length ? 0 : first);
   const [done, setDone] = useState(false);
   const [voice, setVoice] = useState<VoiceChoice>(voiceChoice());
-  const [heard, setHeard] = useState<{ said: string; answer: string } | null>(null);
+  const [heard, setHeard] = useState<{ said: string; answer: string; chef?: boolean; step?: number; working?: boolean } | null>(null);
+  const [typed, setTyped] = useState("");
+  const asked = useRef<{ role: "cook" | "chef"; text: string }[]>([]);
   const [timers, setTimers] = useState<Timer[]>([]);
   const [now, setNow] = useState(Date.now());
   const [listenNote, setListenNote] = useState("");
@@ -60,6 +64,20 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose }: {
     setNow(Date.now());
     return `${name} timer, ${minutesWords(seconds)}.`;
   };
+  // DT175: a question to Chef Mealan, with the recipe, this step and the amounts cooked; advice only, read aloud
+  const askChef = async (question: string) => {
+    const at = live.current.k;
+    if (!ask) { const a = "Chef Mealan can't answer right now. The steps, the commands and the timers still work."; setHeard({ said: question, answer: a, chef: true, step: at }); say(a); return; }
+    setHeard({ said: question, answer: "", chef: true, step: at, working: true });
+    try {
+      const a = await ask(question, at, asked.current.slice(-4));
+      asked.current = [...asked.current, { role: "cook" as const, text: question }, { role: "chef" as const, text: a }].slice(-8);
+      setHeard({ said: question, answer: a, chef: true, step: at }); say(a);
+    } catch (e: any) {
+      const a = e?.message || "Chef Mealan could not answer. Ask again.";
+      setHeard({ said: question, answer: a, chef: true, step: at }); say(a);
+    }
+  };
   // what was said
   const hear = (said: string) => {
     const c = parseCommand(said), { k: at } = live.current;
@@ -67,10 +85,11 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose }: {
     if (c.kind === "back") return back();
     if (c.kind === "repeat") return repeat();
     if (c.kind === "stop") return close();
+    if (c.kind === "ask") return void askChef(c.question);
     const answer = c.kind === "left" ? leftLine(at, steps, items)
       : c.kind === "howMuch" ? howMuch(c.food, steps, items)
       : c.kind === "timer" ? startTimer(c.seconds, timerName(steps[at], at))
-      : "I heard you, but that isn't something I can do yet. Say next, back, repeat, how much, timer, what's left or stop.";
+      : "I heard you, but that isn't something I can do yet. Say next, back, repeat, how much, timer, what's left or stop. Start with Chef to ask about the dish.";
     setHeard({ said, answer }); say(answer);
   };
   const hearRef = useRef(hear); hearRef.current = hear;
@@ -146,14 +165,23 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose }: {
           </div>
           {heard && (
             <section className="cook-card cook-heard" aria-live="polite">
-              <small>YOU SAID</small><b>{heard.said}</b>
-              <small>CHEF MEALAN</small><b>{heard.answer}</b>
+              <small>{heard.chef ? "YOU ASKED" : "YOU SAID"}</small><b>{heard.said}</b>
+              <small>{heard.chef ? `CHEF MEALAN, ABOUT STEP ${(heard.step ?? k) + 1}` : "CHEF MEALAN"}</small>
+              <b>{heard.working ? "Chef Mealan is thinking." : heard.answer}</b>
+              {heard.chef && !heard.working && <small className="muted">Read aloud. Nothing on your plate changes.</small>}
             </section>
           )}
+          <form className="cook-card cook-ask-form" onSubmit={(e) => { e.preventDefault(); const q = typed.trim(); if (!q) return; setTyped(""); void askChef(q); }}>
+            <label htmlFor="cook-ask-field"><b>Ask Chef Mealan about this step</b></label>
+            <div className="cook-ask-row">
+              <input id="cook-ask-field" className="search" value={typed} onChange={(e) => setTyped(e.target.value)} placeholder={on ? "Or say: Chef, can I use frozen spinach?" : "Can I use frozen spinach?"} maxLength={400} />
+              <button type="submit" className="pill pill-primary" disabled={!typed.trim() || !!heard?.working}>Ask</button>
+            </div>
+          </form>
           {hasEars ? (
             <div className="cook-card cook-listen">
               <span className={`cook-dot ${on ? "on" : ""}`} aria-hidden="true" />
-              <small>{listenNote || (on ? <>Listening. Say <b>next</b>, <b>back</b>, <b>repeat</b>, <b>how much rice</b>, <b>timer 5 minutes</b>, <b>what's left</b>, <b>stop</b>.</> : "Voice off. The buttons work the same.")}</small>
+              <small>{listenNote || (on ? <>Listening. Say <b>next</b>, <b>back</b>, <b>repeat</b>, <b>how much</b>, <b>timer</b>, <b>what's left</b>, <b>stop</b>. Or ask: start with <b>Chef</b>.</> : "Voice off. The buttons work the same.")}</small>
               <button className="pill pill-small" onClick={() => choose(on ? "off" : "on")}>{on ? "Voice off" : "Voice on"}</button>
             </div>
           ) : (

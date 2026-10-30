@@ -4,7 +4,7 @@ import { carriedLists } from "../carry";
 import { tasteForReq } from "../tasteChips";
 import { useState, useEffect, useRef, Fragment } from "react";
 import { tempsIn } from "../units";
-import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon } from "lucide-react";
+import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon, Mic } from "lucide-react";
 import { photoAdvice, ideaAdvice, aboutKcal, kcalRange, mealsOn } from "../mealPhoto";
 import { PhotoAsk } from "../components/PhotoAsk";
 import { ConfirmButton } from "../components/Confirm";
@@ -71,6 +71,7 @@ import { countOf as countedOf, gramsOfOne } from "../counted";
 import { CountAmount, SizePicker, isCounted } from "../components/CountAmount";
 import { cookName, cookPhrase, weighLine, aroundWord, needsCooking, rawHint, cookTitle } from "../cookWords";
 import { CookMode } from "../components/CookMode";
+import { SayHave } from "../components/SayHave";
 
 // Make it a meal (0.2.9, canvas board CH, CH1 to CH3): an idea from Chef Mealan, checked and with the app's grams
 // DT91 (0.2.88): cooking: the herbs and spices the dish uses, not counted; failed: the ideas that missed the range, with why
@@ -616,6 +617,8 @@ export function JourneyScreen(p: AppApi) {
   const [ticks, setTicks] = useState<Set<string>>(new Set());
   // DT174 (0.3.16): cook mode over Make, full screen
   const [cooking, setCooking] = useState(false);
+  // DT175 (0.3.17): Say what you have, on the Plate
+  const [saying, setSaying] = useState(false);
   const [newParts, setNewParts] = useState<string[]>([]);
   const [naming, setNaming] = useState<string | null>(null);
   const [tried, setTried] = useState<"yes" | "ok" | "no" | null>(null);
@@ -1375,7 +1378,10 @@ export function JourneyScreen(p: AppApi) {
           <button className="pill pill-small" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> Scan</button>
           {/* DT127: a photo of the meal in front of you, read onto the plate as estimates */}
           {p.ai.on && <button type="button" className="pill pill-small mp-button" onClick={p.mealCamera}><Camera size={15} /> Photo of my meal</button>}
+          {/* DT175 (0.3.17, board Stories122): the foods you have, said or typed, landed as estimates */}
+          {p.ai.on && !saying && <button type="button" className="pill pill-small say-button" onClick={() => setSaying(true)}><Mic size={15} /> Say what you have</button>}
         </div>
+        {saying && <SayHave busy={!!p.busy} onCancel={() => setSaying(false)} onDone={(text) => { void p.plateFromWords(text).then((ok) => { if (ok) setSaying(false); }); }} />}
         {/* Start from a recipe (0.2.16, board IM, IM1): only on an empty plate, because a recipe fills the plate */}
         {items.length === 0 && <>
           <small className="ways-label">Start from a recipe</small>
@@ -2040,7 +2046,14 @@ export function JourneyScreen(p: AppApi) {
         )}
         {cooking && madeSteps.length > 0 && <CookMode title={(state.title && state.title !== "DaaM" ? state.title : autoTitle(items))} steps={madeSteps} items={stepItems}
           ticks={new Set(madeSteps.map((_, k) => k).filter((k) => ticks.has(`s${k}`)))}
-          onTick={(k) => setTicks((tk) => { const n = new Set(tk); n.add(`s${k}`); return n; })} onClose={() => setCooking(false)} />}
+          onTick={(k) => setTicks((tk) => { const n = new Set(tk); n.add(`s${k}`); return n; })} onClose={() => setCooking(false)}
+          ask={p.ai.on ? async (question, at, history) => {
+            // DT175 (0.3.17): the question goes with the recipe, this step, the amounts cooked, the kitchen and the tools
+            const r = await fetch("/api/cook-ask", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question, step: at, steps: madeSteps.map((x) => stepText(x, stepItems)), title: state.title || autoTitle(items), items: stepItems.filter((i) => i.grams > 0).map((i) => ({ name: i.food.name, grams: i.grams, protein: i.food.protein, calories: i.food.calories })), equipment: equipmentOf(p.personal), kitchens: p.personal.kitchens ?? [], history }) });
+            const d = await r.json().catch(() => ({}));
+            if (!r.ok) throw new Error(d.error || "Chef Mealan could not answer. Ask again.");
+            return String(d.reply || "");
+          } : null} />}
         {/* DT94: the locked recipe's steps, to tick as you go; nothing here changes the recipe */}
         {madeSteps.length > 0 && (
           <section className="card mk-card" aria-label="The steps">
