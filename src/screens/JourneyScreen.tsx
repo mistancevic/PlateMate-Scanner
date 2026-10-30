@@ -12,7 +12,7 @@ import { fitsPlate, isIngredient, swapKind, sameFoodName, suggestParts, bindsADi
 import { lettersOf } from "../letters";
 import { Letters, NumbersTable, type PlanNumbers } from "../components/Letters";
 import { ClearField } from "../components/ClearField";
-import { asMine, seenLine, stemOf, type MemberFood } from "../memberFoods";
+import { asMine, stemOf, type MemberFood } from "../memberFoods";
 import { sameFood } from "../swaps";
 import { oneList, rowLine } from "../oneList";
 import { nutritionGate, dayGate, sizeOf, type GateLine, type GateWay } from "../gates";
@@ -506,7 +506,7 @@ export function JourneyScreen(p: AppApi) {
     let gone = false;
     p.memberFoods(stemOf(it.food.name)).then((ms) => { if (gone) return;
       const ok = ms.filter((m) => m.barcode || !p.region || (m.seenIn ?? []).includes(p.region)).filter((m) => !state.foods.some((f) => (m.barcode && f.barcode === m.barcode) || f.name.toLowerCase() === m.name.toLowerCase()));
-      setSwapMf({ id: it.id, foods: ok.map((m) => ({ ...asMine(m, uid), id: `mf:${m.key}`, notes: `${(m as MemberFood).brand ? `${m.brand} · ` : ""}a member's food, ${seenLine(m, p.region)}` })) }); });
+      setSwapMf({ id: it.id, foods: ok.map((m) => ({ ...asMine(m, uid), id: `mf:${m.key}`, notes: `${(m as MemberFood).brand ? `${m.brand} · ` : ""}a member's food` })) }); });
     return () => { gone = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [swapId]);

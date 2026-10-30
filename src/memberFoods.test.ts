@@ -20,8 +20,8 @@ test("DT115: the same food in another state from the catalogue, and where it was
   const cat = [M("Tuna in water, drained", { barcode: "2", seenIn: ["munich", "cyprus"] }), M("Chicken breast")];
   assert.equal(alsoSeen(mine, cat)?.name, "Tuna in water, drained");
   assert.equal(alsoSeen(F("y", "Skyr, natural"), cat), null);
-  assert.equal(seenLine(cat[0], "munich"), "seen in Munich");
-  assert.equal(seenLine(cat[0], "belgrade"), "seen in Munich and Cyprus");
+  // DT171 (privacy finding 9, option a): where a food was seen is never shown to other members
+  assert.equal(seenLine(cat[0], "munich"), ""); assert.equal(seenLine(cat[0], "belgrade"), "");
   let n = 0; const copy = asMine(cat[0], () => "u" + ++n);
-  assert.equal(copy.source, "Members' foods"); assert.equal(copy.barcode, "2"); assert.equal(copy.calories, 99); assert.match(copy.notes, /checked by a member on 2026-10-25/);
+  assert.equal(copy.source, "Members' foods"); assert.equal(copy.barcode, "2"); assert.equal(copy.calories, 99); assert.equal(copy.notes, "Members' foods, checked by a member."); assert.ok(!/2026|Munich|Cyprus/.test(copy.notes), "no day, no market");
 });
