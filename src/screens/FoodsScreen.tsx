@@ -104,11 +104,6 @@ export function FoodsScreen(p: AppApi) {
                 <button className="link" onClick={() => add(f)}>Add to meal</button>
                 <button className="link" onClick={() => p.toggleFavorite(f.id)}>{f.favorite ? "★ Favourite" : "☆ Favourite"}</button>
                 <button className="link" onClick={() => { setImage(""); setEdit(f); }}>Review</button>
-                {coach && <button className="link" onClick={async () => {
-                  setBusy("Saving to Airtable");
-                  try { await api("/api/save", { food: f }); notify("Saved to Airtable."); }
-                  catch (e: any) { setError(e.message); } finally { setBusy(""); }
-                }}>Airtable</button>}
                 <ConfirmButton label="Remove" confirmLabel="Tap again to remove" onConfirm={() => setState((s) => ({ ...s, foods: s.foods.filter((x) => x.id !== f.id) }))} />
               </span>
             </div>

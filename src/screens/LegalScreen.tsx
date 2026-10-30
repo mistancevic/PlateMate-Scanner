@@ -57,7 +57,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
       {page === "privacy" && (
         <article>
           <h1>Privacy notice</h1>
-          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 30 October 2026 (what goes to Gemini with each request; your private part; Your summary and your coach)</p>
+          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 30 October 2026 (daily backups kept 30 days; what goes to Gemini with each request; your private part; Your summary and your coach)</p>
           <h2>1. Who is responsible</h2>
           <p>{OPERATOR.name}, {OPERATOR.city}, {OPERATOR.country}. <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>. No data protection officer is appointed; the pilot is below the thresholds that require one.</p>
           <h2>2. What Chef Mealan keeps, and why</h2>
@@ -83,7 +83,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
             <li>No advertising, no analytics beyond the pilot log above and the visit counts in section 7, no sale or sharing of your data with anyone else.</li>
           </ul>
           <h2>4. How long</h2>
-          <p>While your account exists. Delete the account, from Menu, Account, and everything goes: profile, declarations, foods, cards, photos, recipes, the recipes you shared with members, the sign-in. Chef Mealan keeps no separate backup copies. When the photos moved into image files in October 2026, their old copies in the database stayed for 30 days, then were removed.</p>
+          <p>While your account exists. Delete the account, from Menu, Account, and everything goes: profile, declarations, foods, cards, photos, recipes, the recipes you shared with members, the sign-in. Once a day the database is backed up by Google, in the same Frankfurt location, and each backup is deleted after 30 days, so after you delete your account your data leaves the backups within 30 days. A backup is only ever used to restore the app after a failure. When the photos moved into image files in October 2026, their old copies in the database stayed for 30 days, then were removed.</p>
           <h2>5. Your rights</h2>
           <p>Access, rectification, erasure, restriction, portability and objection, Art. 15 to 21. In the app: Menu, Account, Export my data gives you everything as one file; Delete my account removes it. By email: {OPERATOR.email}. You may complain to a supervisory authority; for Bavaria that is the Bayerisches Landesamt für Datenschutzaufsicht (BayLDA), Ansbach.</p>
           <h2>6. Age</h2>
