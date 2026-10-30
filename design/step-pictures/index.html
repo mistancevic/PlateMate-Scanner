@@ -1,0 +1,231 @@
+<title>Step Picture Checks</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a kitchen test sheet. Lessons first, then one station per step: the step as cooked, the prompt to copy, what the picture must show, and the two drawn pictures with their verdicts. */
+:root {
+  --bg: #eef1f2; --paper: #ffffff; --ink: #1c2629; --muted: #5d6b70; --line: #d5dcdf;
+  --accent: #2f6f73; --accent-soft: #dcecec;
+  --pass: #2e7d4f; --pass-soft: #e1f2e7; --fix: #9a5b00; --fix-soft: #fbedd4; --fail: #b3261e; --fail-soft: #fbe3e1;
+  --code: #f4f6f7;
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #121819; --paper: #1b2325; --ink: #e6ecee; --muted: #9aa8ad; --line: #2e3a3d;
+  --accent: #7cc3c6; --accent-soft: #1f3536;
+  --pass: #7fd3a0; --pass-soft: #183326; --fix: #f0be6a; --fix-soft: #3a2c12; --fail: #f2928b; --fail-soft: #3d1c1a;
+  --code: #151c1e; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #121819; --paper: #1b2325; --ink: #e6ecee; --muted: #9aa8ad; --line: #2e3a3d;
+  --accent: #7cc3c6; --accent-soft: #1f3536;
+  --pass: #7fd3a0; --pass-soft: #183326; --fix: #f0be6a; --fix-soft: #3a2c12; --fail: #f2928b; --fail-soft: #3d1c1a;
+  --code: #151c1e; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 16px/1.55 var(--body); padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 56px; }
+.wrap { max-width: 1040px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(30px, 5vw, 44px); font-weight: 800; letter-spacing: -0.01em; }
+h2 { font-size: 24px; font-weight: 800; }
+h3 { font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-family: var(--body); }
+p { margin: 0; max-width: 68ch; }
+header { display: flex; flex-direction: column; gap: 10px; }
+.tag { align-self: flex-start; font: 600 12px/1 var(--body); letter-spacing: 0.08em; text-transform: uppercase; background: var(--accent-soft); color: var(--accent); border-radius: 999px; padding: 6px 10px; }
+.lead { color: var(--muted); font-size: 17px; }
+.lessons { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+.lessons ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; max-width: 76ch; }
+.lessons li::marker { font-family: var(--mono); color: var(--accent); }
+.prompt { position: relative; background: var(--code); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px 14px 16px; font: 14px/1.6 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; }
+.copy { font: 600 13px/1 var(--body); border: 1px solid var(--line); background: var(--paper); color: var(--ink); border-radius: 8px; padding: 8px 12px; cursor: pointer; }
+.copy:hover { border-color: var(--accent); color: var(--accent); }
+.copy:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.row { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.station { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; }
+.station > * { min-width: 0; }
+.left { display: flex; flex-direction: column; gap: 14px; }
+.stepno { font: 600 13px/1 var(--mono); color: var(--accent); letter-spacing: 0.04em; }
+.cooked { font-size: 17px; font-weight: 600; }
+.cooked b { color: var(--accent); }
+.musts { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+.musts li { padding-left: 22px; position: relative; }
+.musts li::before { content: ""; position: absolute; left: 2px; top: 0.45em; width: 10px; height: 10px; border: 2px solid var(--accent); border-radius: 3px; }
+.pics { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; align-content: start; }
+figure { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+figure img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; border: 1px solid var(--line); display: block; }
+figcaption { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
+.who { font: 600 12px/1 var(--mono); color: var(--muted); }
+.v { align-self: flex-start; font: 700 12px/1 var(--body); letter-spacing: 0.06em; text-transform: uppercase; border-radius: 999px; padding: 5px 9px; }
+.v.pass { background: var(--pass-soft); color: var(--pass); }
+.v.fix { background: var(--fix-soft); color: var(--fix); }
+.v.fail { background: var(--fail-soft); color: var(--fail); }
+.rejected { grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 14px; border-top: 1px dashed var(--line); padding-top: 14px; }
+.check { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; display: flex; flex-direction: column; gap: 12px; }
+.check ul { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 6px; }
+.small { font-size: 14px; color: var(--muted); }
+@media (max-width: 760px) {
+  .station { grid-template-columns: 1fr; padding: 16px; }
+  .pics, .rejected { grid-template-columns: 1fr 1fr; gap: 10px; }
+}
+@media (max-width: 420px) { .pics, .rejected { grid-template-columns: 1fr; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <span class="tag">Beta · pictures drawn by AI</span>
+    <h1>Step Picture Checks</h1>
+    <p class="lead">Chicken rice bowl with spinach, drawn twice on 30 October 2026: Gemini with the first prompts, ChatGPT with corrected prompts for steps 1, 4 and 5. Below: what we learned, the prompts to use now, what each picture must show, and the verdict on every picture.</p>
+  </header>
+
+  <section class="lessons" aria-labelledby="l">
+    <h2 id="l">Lessons learned</h2>
+    <ol>
+      <li>One chat per recipe. The model then keeps the same counter, pan, pot and light, and the pictures read as one series.</li>
+      <li>The setup message asks for no picture. Otherwise the model draws one anyway, with foods we never named.</li>
+      <li>Describe the step the way a real cook does it. "Rinse over a bowl" gave water falling onto the counter; nobody rinses rice like that. At the sink, under the tap.</li>
+      <li>Say where every earlier food is now. The rice cooks in the pot from step 1 on; without that line, ChatGPT left it raw in the sieve for three steps.</li>
+      <li>Say the state that matters for safety, in plain words. "Golden on the underside" gave raw-looking chicken; "fully cooked, no pink anywhere" gave cooked chicken.</li>
+      <li>Say amounts as something you can see. 80 g rice is a thin layer, less than half a cup; both models drew far more.</li>
+      <li>Check every picture against its step before it is kept, one by one. About one picture in six was wrong in each set.</li>
+      <li>Label drawn pictures: Beta, drawn by AI. They show the idea of a step; the words and amounts are what count.</li>
+    </ol>
+  </section>
+
+  <section class="check" aria-labelledby="s0">
+    <div class="row"><h2 id="s0">The setup message</h2><button class="copy" data-for="p0" type="button">Copy prompt</button></div>
+    <pre class="prompt" id="p0">I will ask you for 6 photos, one per cooking step of one recipe: chicken rice bowl with spinach. They are one series: the same home kitchen, the same light grey stone counter and sink, the same window light from the left, the same black frying pan, small steel pot with a glass lid, white bowl and wooden board in every photo. Realistic phone photo from above at about 45 degrees. Hands may show, no faces. No text, no logos, no labels. Square. Only the foods I name are in the picture. Each food looks exactly as it is at that step: raw stays raw, cooked is cooked through. Do not draw anything yet. Reply only "Ready".</pre>
+    <div class="rejected" style="grid-template-columns: minmax(0, 220px); border-top: 0; padding-top: 0;">
+      <figure><img src="img/g0.webp" alt="Gemini setup picture with potatoes, onions and garlic on the counter" loading="lazy">
+        <figcaption><span class="who">Gemini · setup, first prompt</span><span class="v fail">Rejected</span><span>Drawn although the message only set the scene. Potatoes and onions are not in the recipe.</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="station" aria-labelledby="s1">
+    <div class="left">
+      <span class="stepno">STEP 1 OF 6</span>
+      <p class="cooked">Rinse <b>80 g rice</b> and bring it to the boil in 200 ml water. Cover and cook on low heat for 12 minutes.</p>
+      <div class="row"><h3>Prompt</h3><button class="copy" data-for="p1" type="button">Copy prompt</button></div>
+      <pre class="prompt" id="p1">Photo 1 of 6: rinsing 80 g dry basmati rice at the sink: the fine sieve held under the running tap, only a thin layer of rice on the bottom of the sieve (80 g is less than half a cup), the water running clear into the sink. The small steel pot with water stands on the counter beside the sink.</pre>
+      <h3>Must show</h3>
+      <ul class="musts"><li>At the sink, under the tap</li><li>A thin layer of rice, under half a cup</li><li>No other foods</li></ul>
+    </div>
+    <div class="pics">
+      <figure><img src="img/g1.webp" alt="Gemini: rice rinsed in a sieve held over a white bowl on the counter" loading="lazy">
+        <figcaption><span class="who">Gemini · first prompt</span><span class="v fix">Fix</span><span>Rinsed over a bowl on the counter, as the first prompt asked. More than 80 g.</span></figcaption></figure>
+      <figure><img src="img/c1.webp" alt="ChatGPT: rice rinsed in a sieve under the tap at the sink" loading="lazy">
+        <figcaption><span class="who">ChatGPT · corrected prompt</span><span class="v fix">Fix amount</span><span>Real: sink, tap, drain. About 200 g of rice, not 80 g.</span></figcaption></figure>
+      <div class="rejected">
+        <figure><img src="img/c1x.webp" alt="ChatGPT: water falling onto a sieve over a bowl on the counter, no tap" loading="lazy">
+          <figcaption><span class="who">ChatGPT · first prompt</span><span class="v fail">Rejected</span><span>Water falls from nowhere onto the counter. No one rinses rice this way.</span></figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="station" aria-labelledby="s2">
+    <div class="left">
+      <span class="stepno">STEP 2 OF 6</span>
+      <p class="cooked">Cut <b>160 g chicken breast</b> into strips. Season with salt and pepper.</p>
+      <div class="row"><h3>Prompt</h3><button class="copy" data-for="p2" type="button">Copy prompt</button></div>
+      <pre class="prompt" id="p2">Photo 2 of 6: 160 g raw chicken breast, pale pink, cut into finger-thick strips on the wooden board, salt and black pepper on top. The rice is cooking: the small steel pot stands on the hob with the glass lid on, steam on the lid. No raw rice anywhere.</pre>
+      <h3>Must show</h3>
+      <ul class="musts"><li>Raw chicken looks raw</li><li>The rice cooks in the pot, lid on</li><li>No raw rice anywhere</li></ul>
+    </div>
+    <div class="pics">
+      <figure><img src="img/g2.webp" alt="Gemini: raw chicken strips seasoned on a bamboo board, the pot steaming" loading="lazy">
+        <figcaption><span class="who">Gemini</span><span class="v pass">Pass</span><span>Raw chicken, seasoned. The pot steams with its lid on.</span></figcaption></figure>
+      <figure><img src="img/c2.webp" alt="ChatGPT: salt sprinkled on raw chicken strips on a wooden board" loading="lazy">
+        <figcaption><span class="who">ChatGPT</span><span class="v pass">Pass</span><span>Raw chicken, seasoned. Pot with lid and steam.</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="station" aria-labelledby="s3">
+    <div class="left">
+      <span class="stepno">STEP 3 OF 6</span>
+      <p class="cooked">Slice <b>6 g garlic</b> thin.</p>
+      <div class="row"><h3>Prompt</h3><button class="copy" data-for="p3" type="button">Copy prompt</button></div>
+      <pre class="prompt" id="p3">Photo 3 of 6: two garlic cloves (6 g) sliced thin on the wooden board, a small knife beside them. The raw seasoned chicken strips wait on a plate. The rice pot cooks on the hob with the lid on. No raw rice anywhere.</pre>
+      <h3>Must show</h3>
+      <ul class="musts"><li>About two cloves, sliced thin</li><li>The rice still cooks in the pot</li><li>No raw rice anywhere</li></ul>
+    </div>
+    <div class="pics">
+      <figure><img src="img/g3.webp" alt="Gemini: garlic cloves sliced on a bamboo board" loading="lazy">
+        <figcaption><span class="who">Gemini</span><span class="v pass">Pass</span><span>Thin slices, about two cloves. Pot cooking.</span></figcaption></figure>
+      <figure><img src="img/c3.webp" alt="ChatGPT: sliced garlic on a board, raw rice still in the sieve behind" loading="lazy">
+        <figcaption><span class="who">ChatGPT</span><span class="v fix">Fix</span><span>The garlic is right. The rice still sits raw in the sieve; it should be cooking since step 1.</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="station" aria-labelledby="s4">
+    <div class="left">
+      <span class="stepno">STEP 4 OF 6</span>
+      <p class="cooked">Heat <b>8 g olive oil</b> in a pan on medium high heat. Fry the chicken 6 minutes, turning once, until no pink is left inside.</p>
+      <div class="row"><h3>Prompt</h3><button class="copy" data-for="p4" type="button">Copy prompt</button></div>
+      <pre class="prompt" id="p4">Photo 4 of 6: the chicken strips frying in the black pan with a little olive oil, already turned once: every strip golden brown on the side facing up. Tongs in hand. The rice pot cooks on the hob with the lid on. No raw rice anywhere.</pre>
+      <h3>Must show</h3>
+      <ul class="musts"><li>Every strip golden on the side facing up</li><li>A little oil, not a pool</li><li>The rice still cooks in the pot</li></ul>
+    </div>
+    <div class="pics">
+      <figure><img src="img/g4.webp" alt="Gemini: chicken strips in a pan, some golden, most still raw" loading="lazy">
+        <figcaption><span class="who">Gemini · first prompt</span><span class="v fix">Fix</span><span>Most strips still look raw, as the first prompt asked ("pale on top"). Reads as uncooked.</span></figcaption></figure>
+      <figure><img src="img/c4.webp" alt="ChatGPT: golden chicken strips frying, raw rice in a sieve beside the hob" loading="lazy">
+        <figcaption><span class="who">ChatGPT · corrected prompt</span><span class="v fix">Fix</span><span>The chicken is right. The rice is still raw in the sieve.</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="station" aria-labelledby="s5">
+    <div class="left">
+      <span class="stepno">STEP 5 OF 6</span>
+      <p class="cooked">Add <b>120 g spinach</b> and the garlic. Stir 2 minutes, until the spinach wilts.</p>
+      <div class="row"><h3>Prompt</h3><button class="copy" data-for="p5" type="button">Copy prompt</button></div>
+      <pre class="prompt" id="p5">Photo 5 of 6: the chicken is fully cooked: every strip golden brown on all sides, white inside, no pink anywhere. A big handful of fresh spinach (120 g) and the garlic slices just added, half of the spinach already wilted. The rice pot on the hob, lid on. No raw rice anywhere.</pre>
+      <h3>Must show</h3>
+      <ul class="musts"><li>No pink chicken anywhere</li><li>Spinach half wilted, garlic in the pan</li><li>The rice still cooks in the pot</li></ul>
+    </div>
+    <div class="pics">
+      <figure><img src="img/g5.webp" alt="Gemini: spinach added to a pan where several chicken strips are still raw" loading="lazy">
+        <figcaption><span class="who">Gemini · first prompt</span><span class="v fail">Fail</span><span>Several strips are raw pink after the frying step. A food safety error.</span></figcaption></figure>
+      <figure><img src="img/c5.webp" alt="ChatGPT: cooked chicken strips with spinach and garlic in the pan" loading="lazy">
+        <figcaption><span class="who">ChatGPT · corrected prompt</span><span class="v fix">Fix</span><span>Chicken cooked through, spinach and garlic in. The rice is still raw in the sieve.</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="station" aria-labelledby="s6">
+    <div class="left">
+      <span class="stepno">STEP 6 OF 6</span>
+      <p class="cooked">Put the rice in a bowl and the chicken and spinach on top.</p>
+      <div class="row"><h3>Prompt</h3><button class="copy" data-for="p6" type="button">Copy prompt</button></div>
+      <pre class="prompt" id="p6">Photo 6 of 6: the finished bowl: cooked, fluffy white rice in the white bowl, the chicken strips and the wilted spinach with garlic on top. The empty pan and the rice pot in the back.</pre>
+      <h3>Must show</h3>
+      <ul class="musts"><li>Cooked rice, chicken and spinach only</li><li>A portion that fits 80 g rice and 160 g chicken</li></ul>
+    </div>
+    <div class="pics">
+      <figure><img src="img/g6.webp" alt="Gemini: the finished bowl of rice, chicken and spinach" loading="lazy">
+        <figcaption><span class="who">Gemini</span><span class="v pass">Pass</span><span>The finished bowl, cooked through.</span></figcaption></figure>
+      <figure><img src="img/c6.webp" alt="ChatGPT: the finished bowl with many golden chicken strips on rice and spinach" loading="lazy">
+        <figcaption><span class="who">ChatGPT</span><span class="v pass">Pass</span><span>Cooked through. The spinach looks more like kale.</span></figcaption></figure>
+    </div>
+  </section>
+
+  <section class="check" aria-labelledby="c">
+    <h2 id="c">Before a picture is kept</h2>
+    <ul>
+      <li>Does it show this step, and only this step?</li>
+      <li>Is every food in the recipe, and every food of the recipe where it should be by now?</li>
+      <li>Is meat raw before cooking and cooked through after it?</li>
+      <li>Do the amounts look like the grams in the step?</li>
+      <li>Would a real cook do it this way?</li>
+      <li>Is it the same kitchen, pan and pot as the other steps?</li>
+    </ul>
+    <p class="small">A picture that fails one question is drawn again with that line added to its prompt. Prices for a drawn picture: about 3 cents each at 1K with gemini-3.1-flash-lite-image, Google's paid price.</p>
+  </section>
+</div>
+
+<script>
+document.querySelectorAll(".copy").forEach((b) => b.addEventListener("click", () => {
+  const el = document.getElementById(b.dataset.for); const text = el.textContent;
+  const done = () => { const t = b.textContent; b.textContent = "Copied"; setTimeout(() => { b.textContent = t; }, 1400); };
+  const select = () => { const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected: copy it"; setTimeout(() => { b.textContent = "Copy prompt"; }, 2000); };
+  try { navigator.clipboard.writeText(text).then(done, select); } catch (e) { select(); }
+}));
+</script>
