@@ -84,3 +84,17 @@ test("DT163: B1 and B3 follow today's energy, per MJ; without a goal, the label'
   // B3 counted as niacin equivalents: chicken 13.7 mg niacin + 360 mg tryptophan / 60
   assert.equal(page("b3").foods.find((f) => f.name.startsWith("Chicken"))!.per100, 19.7);
 });
+
+test("DT165: the five minerals open; their values, limits and foods from the shared table", () => {
+  const ids = ["ca", "fe", "mg", "k_", "zn"];
+  assert.ok(MICRO_MEMBERS.every((m) => MEMBER_PAGES.some((p) => p.id === m.id)), "every member has its page");
+  assert.deepEqual(ids.map((id) => [memberDay(page(id), "male").v, memberDay(page(id), "female").v, page(id).label, page(id).ul?.v ?? null, page(id).does.length]),
+    [[950, 950, 800, 2500, 8], [11, 16, 14, null, 7], [350, 300, 375, 250, 10], [3500, 3500, 2000, null, 3], [9.4, 7.5, 10, 25, 18]]);
+  assert.deepEqual(memberDay(page("ca"), "female", null, 22), { v: 1000, who: "young" });
+  assert.equal(memberDay(page("ca"), "female", null, 45).v, 950);
+  assert.equal(page("mg").ulFood, false);
+  for (const id of ids) assert.equal(page(id).foods.length, 10, id);
+  assert.deepEqual(page("ca").foods.slice(0, 2).map((f) => [f.name, f.per100, f.src]), [["Tofu, firm, set with calcium", 683, "SR Legacy, FDC 172475"], ["Sardines, canned in oil", 382, "SR Legacy, FDC 175139"]]);
+  assert.equal(page("mg").foods[0].name, "Pumpkin seeds");
+  assert.equal(Math.round(memberRows(page("zn"), 9.4)[0].share), 91);   // beef, 125 g: 8.55 mg
+});

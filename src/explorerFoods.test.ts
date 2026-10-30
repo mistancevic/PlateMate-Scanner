@@ -10,8 +10,8 @@ import { lensesOf, goalLines } from "./explorerFoods";
 
 const lunch = { protein: 53, fat: 28, kcal: 867, carb: 101, share: 1 / 3 };
 
-test("24 foods, each once; every family takes its numbers from the same row", () => {
-  assert.equal(FOOD_TABLE.length, 24); assert.equal(new Set(FOOD_TABLE.map((f) => f.id)).size, 24);
+test("30 foods, each once (DT165 added six); every family takes its numbers from the same row", () => {
+  assert.equal(FOOD_TABLE.length, 30); assert.equal(new Set(FOOD_TABLE.map((f) => f.id)).size, 30);
   for (const f of [...EXPLORER_FOODS, ...FAT_FOODS, ...CARB_FOODS, ...MICRO_FOODS]) {
     const r = rowOf(f.id);
     assert.equal(f.kcal, r.kcal, f.id); assert.equal(f.protein, r.protein, f.id); assert.equal(f.src, r.src, f.id); assert.deepEqual(f.portion, r.portion, f.id);
