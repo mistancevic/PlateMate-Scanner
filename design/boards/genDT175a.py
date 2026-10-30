@@ -84,24 +84,25 @@ class Component extends DCLogic {{
 
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
-cy = storyCard(B, y, "DT175a", "Pictures for each step, Beta", [
-  ("Coach Milan, 30 October 18:09 and 18:14", "It is fine. Add it now to the page, and say Beta or some other label. Lessons learned: we craft and check one picture at a time. Add it to DT175, or a new DT like DT175a."),
-  ("On the recipe", "Each step can have one picture, shown small beside the step. An empty step shows + Picture. Tap a picture to change or remove it."),
-  ("Adding one", "From the camera or the gallery: your own photo while cooking, or a picture made in ChatGPT or Gemini with the prompts from the Step Picture Checks page. Who made it is asked: My photo or Drawn by AI. Before it is kept, the checks show: this step only, foods from the recipe and where they should be, meat raw or cooked through, amounts like the grams, a way a real cook would do it."),
-  ("In cook mode", "The picture sits on top of the step. Drawn by AI carries the label Beta · drawn by AI on the picture; your own says Your photo. The words and the amounts of the step stay what counts; the voice reads the words as before."),
-  ("Where they live", "With the recipe, as image files only you can open, like your other photos. Not shared with members in Beta. Delete the recipe or the account, and they go too. Export my data includes them."),
-  ("What it costs", "Nothing to run: no AI is called. Each picture is resized like recipe photos before it is stored. Drawing them inside the app comes later, after the checks prove themselves."),
-  ("Not in DT175a", "Drawing pictures inside the app, an automatic check of a picture, and the animated video. Those wait for your real session photos and the lessons from them."),
+cy = storyCard(B, y, "DT175a", "Pictures for each step, Watch the steps, step buttons", [
+  ("Coach Milan, 30 October 18:09 to 19:23", "Add the pictures with a Beta label; craft and check one picture at a time. Mind the sizes of buttons and where labels sit over photos. Where can the video go? Make the steps on the blue bar clickable, not only back and forth. Redraw DT175a."),
+  ("Sizes and labels", "Labels sit under a picture, never on it. Nothing smaller than 12 px. Every button 44 px high or more, the size Apple recommends for touch."),
+  ("Step buttons", "The 5 px bar in cook mode becomes six numbered buttons. Done steps show a tick, the current one is blue. Tap a number, or say go to step 4, and the step shows and is read aloud. Jumping ahead ticks nothing; only Next ticks."),
+  ("Watch the steps", "On top of the recipe, where you read and decide: the step pictures play one after another, about 5 seconds each, with each step's words and timer under the picture. The numbers jump; Pause; Cook it as written goes straight to Make. Made on the phone from the pictures: no video file, nothing to pay. Shown only when every step has a picture."),
+  ("Pictures for steps", "One per step, small beside it, labelled under it. Added from the camera or the gallery, for example a picture made in ChatGPT or Gemini with the Step Picture Checks prompts. Who made it is asked; the checks show before Keep it. In cook mode the picture sits on top of the step: Picture drawn by AI, Beta, or Your photo."),
+  ("Where they live", "With the recipe, as image files only you can open, like your other photos. Not shared with members in Beta. Deleted with the recipe or the account; in Export my data."),
+  ("Not in DT175a", "Drawing pictures inside the app, an automatic check of a picture, a filmed video. They wait for your real session photos."),
 ])
 h = rowEnd(cy,
-  B.screen("DT175Aa", 0, y, "Now: words only", "r175Aa", "now", "Nothing shows what the pan should look like."),
-  B.screen("DT175Ab", 1, y, "New: a picture per step", "r175Ab", "changed", "Small beside each step; + Picture where none."),
-  B.screen("DT175Ac", 2, y, "New: add, then check", "r175Ac", "changed", "Camera or gallery; who made it; the checks before Keep it."))
+  B.screen("DT175Aa", 0, y, "Now: words, a thin bar", "r175Aa", "now", "A 5 px bar you can't tap."),
+  B.screen("DT175Ab", 1, y, "New: Watch the steps", "r175Ab", "changed", "On top of the recipe; a picture beside each step."),
+  B.screen("DT175Ac", 2, y, "New: the steps playing", "r175Ac", "changed", "Words under the picture; numbers jump; big controls."))
 y = h
 h = rowEnd(y,
-  B.screen("DT175Ad", 0, y, "New: in cook mode, drawn", "r175Ad", "changed", "On top of the step, labelled Beta · drawn by AI."),
-  B.screen("DT175Ae", 1, y, "New: in cook mode, yours", "r175Ae", "changed", "Labelled Your photo."))
+  B.screen("DT175Ad", 0, y, "New: add, then check", "r175Ad", "changed", "Camera or gallery; who made it; the checks; 44 px buttons."),
+  B.screen("DT175Ae", 1, y, "New: step buttons", "r175Ae", "changed", "Tap a number to jump; label under the picture."),
+  B.screen("DT175Af", 2, y, "New: back to step 2", "r175Af", "changed", "Ticks stay; Your photo under the picture."))
 y = h
-board("Stories123.dc.html", "DT175a. Pictures for each step, Beta",
-  "30 October 2026 (Coach Milan, add the step pictures with a Beta label; craft and check one picture at a time). Now: 0.3.16, untouched. Drawn for your approval; nothing built.",
+board("Stories123.dc.html", "DT175a. Pictures for each step, Watch the steps, step buttons",
+  "30 October 2026 (Coach Milan, pictures with a Beta label, where the video goes, steps you can tap). Version 2. Now: 0.3.16, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories122.dc.html")
