@@ -92,7 +92,9 @@ export function shoppingText(list: ShopList, span: string, ticked: Set<string>):
 // the day after the last one ends, so nothing is bought twice. Finishing asks about the foods not ticked: carry them to the
 // next list, or leave them. On this phone only; another phone makes its own.
 // missing: the foods marked Not this time (SL4, named 20:14); they stay on the list and count as not bought
-export type SavedList = { n: number; madeAt: string; from: string; to: string; meals: number; lines: ShopLine[]; without: ShopList["without"]; carried: ShopLine[]; carriedFrom: number | null; ticked: string[]; missing?: string[]; changes?: { date: string; slot: string; from: string; to: string; because?: string[] }[]; counted?: Counted[]; updatedAt?: string; doneAt?: string };
+export type SavedList = { n: number; madeAt: string; from: string; to: string; meals: number; lines: ShopLine[]; without: ShopList["without"]; carried: ShopLine[]; carriedFrom: number | null; ticked: string[]; missing?: string[]; changes?: { date: string; slot: string; from: string; to: string; because?: string[] }[]; counted?: Counted[]; updatedAt?: string; doneAt?: string;
+  // DT178 (0.3.21): the day and time the person shops, "YYYY-MM-DDTHH:MM", for the Chef Mealan calendar
+  shopOn?: string };
 // the planned meals a list was made for (SL7): a meal is counted on one list only
 export type Counted = { date: string; slot: string; title: string };
 export type ShopStore = { lists: SavedList[]; carry: { from: number; lines: ShopLine[] } | null };

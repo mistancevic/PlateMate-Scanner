@@ -1,5 +1,7 @@
 import { eatsForReq, installEats, type Eats } from "./eats";
 import { TravelBanner } from "./components/Travel";
+import { CalendarSync } from "./components/Calendar";
+import { askToken, dropCalendar } from "./calendarSync";
 import { KitchenScreen } from "./screens/KitchenScreen";
 import { endTravel, daysAway, sinceWords, placeName as travelPlace, kitchenName, type Travel } from "./travel";
 import { servingsOf } from "./pilot";
@@ -2599,6 +2601,9 @@ export default function App() {
     // whatever happened to the last step; if nothing was deleted, the phone keeps everything and saving goes on.
     deleteAccount: async () => {
       const clearPhone = async () => { localStorage.clear(); sessionStorage.clear(); await storeClear(); try { await signOutCloud(); } catch {} };
+      // DT178 (0.3.21): the Chef Mealan calendar goes first, while this tap still counts as a tap for Google's window
+      const cal = personal.calendar;
+      if (cal?.id) { try { const t = await askToken(); if (t) await dropCalendar(t, cal.id); } catch { /* the account still goes; the calendar stays in Google */ } }
       pauseAccountWrites(true);
       setDeleteSteps("Removing the photo files, the record, cards, recipes and the sign-in");
       let r: { ok?: boolean; dataGone?: boolean; message?: string; error?: string } | null = null;
@@ -2755,6 +2760,8 @@ export default function App() {
         )}
         {/* DT176 (0.3.19): while Travel mode is on, the banner on every tab, with Turn off */}
         {!talkOpen && !(menuSection === "me" || (!menuSection && tab === "me")) && <TravelBanner p={screenProps} />}
+        {/* DT178 (0.3.21, board Stories126): the plan goes across to the Chef Mealan calendar while a token is held */}
+        <CalendarSync p={screenProps} />
         {/* Chef Mealan opens over a menu page too, and closing it comes back to the page (0.2.7+r2: the button vanished there) */}
         {menuSection && <div style={{ display: talkOpen ? "none" : "contents" }}><MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s, up) => { setMenuFrom(null); setMenuSection(s, up); }} under={menuTrail.length > 1 ? menuTrail[menuTrail.length - 2] : null} close={() => { setMenuFrom(null); setMenuSection(null); }} /></div>}
         {!menuSection && !talkOpen && tab === "home" && <HomeScreen {...screenProps} />}

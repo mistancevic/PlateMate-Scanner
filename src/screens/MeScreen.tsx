@@ -6,7 +6,7 @@ import { WeighInLine } from "../components/Weight";
 import { weighInsOff } from "../weight";
 import { bandOf, goalLabel } from "../goal";
 import type { ReactNode } from "react";
-import { ChevronRight, User, Target, CalendarDays, ShoppingBasket, Users, KeyRound, ClipboardList } from "lucide-react";
+import { ChevronRight, User, Target, CalendarDays, ShoppingBasket, Users, KeyRound, ClipboardList, CalendarClock } from "lucide-react";
 import type { MenuSection } from "./api";
 import { TASTE_CHIPS, toggleChip } from "../tasteChips";
 import { lifestyleOf, planOf } from "../personal";
@@ -23,6 +23,8 @@ const ME_ROWS: { id: MenuSection; name: string; icon: ReactNode; hint: (p: AppAp
   { id: "goal", name: "Goal", icon: <Target size={18} />, hint: (p) => (p.state.goals.calories ? `${Math.round(p.state.goals.calories).toLocaleString("en")} kcal and ${p.state.goals.protein ?? "?"} g protein a day` : "Calculate it, or set it") },
   { id: "life", name: "Lifestyle", icon: <Coffee size={18} />, hint: (p) => lifeHint(p) },
   { id: "week", name: "Training week", icon: <CalendarDays size={18} />, hint: (p) => planHint(p) },
+  // DT178 (0.3.21, board Stories126): Google Calendar, under Training week
+  { id: "calendar", name: "Google Calendar", icon: <CalendarClock size={18} />, hint: (p) => (p.personal.calendar?.on ? "On. Your plan in the calendar Chef Mealan, 14 days ahead" : "Off. Your meals, cooking and training in your own calendar") },
   { id: "shop", name: "Where I shop and cook", icon: <ShoppingBasket size={18} />, hint: () => "Your shops, the kitchens you cook, and what you cook with" },
   { id: "coach", name: "My coach", icon: <Users size={18} />, hint: (p) => (p.profile.coachId ? `${p.coachLabel} sees what you share` : "Join with a code") },
   // DT167 (0.3.9, board Stories119): Your summary, where the steps end

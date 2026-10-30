@@ -6,6 +6,8 @@ export type LogEvent =
   | "account_delete" // Delete my account: done, data gone, stopped, or no answer
   | "carry"          // How did it carry you?, 30 minutes after a meal: data.how = light | fine | heavy
   | "meal_photo"     // DT127 (0.2.108): a photo of the meal read onto the Plate: data.foods, data.unsure
+  | "calendar_on"    // DT178 (0.3.21): Google Calendar connected: data.events
+  | "calendar_off"   // DT178 (0.3.21): Google Calendar off: data.removed
   | "travel_on"      // DT176 (0.3.19): Travel mode on: data.place, data.kitchen
   | "travel_off"     // DT176 (0.3.19): Travel mode off
   | "plate_said"     // DT175 (0.3.17): the foods you said you have, landed on the Plate: data.foods

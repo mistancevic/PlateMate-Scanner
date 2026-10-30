@@ -2525,3 +2525,16 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .kitchen-join input { font: 900 32px/1 ui-monospace, monospace; letter-spacing: .2em; text-align: center; height: 64px; text-transform: uppercase; }
 .kitchen-join .pill { min-height: 52px; }
 .kitchen-cam { position: fixed; right: max(12px, env(safe-area-inset-right, 0px)); bottom: max(12px, env(safe-area-inset-bottom, 0px)); width: 96px; height: 72px; border-radius: 10px; object-fit: cover; z-index: 90; border: 2px solid var(--surface); box-shadow: var(--shadow-main); }
+/* DT178 (0.3.21, board Stories126): Google Calendar, Me > Google Calendar and the line on Plan */
+.cal-on { display: flex; flex-direction: row; align-items: center; gap: 12px; background: #e9f5ef; border-color: #bfe3d2; } .cal-on > span { font-size: 26px; } .cal-on > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; } .cal-on small { font-size: 13px; font-weight: 600; color: #0f6b4e; line-height: 1.45; }
+.cal-kinds { display: flex; flex-direction: column; gap: 2px; }
+.cal-kind { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 6px 0; border: 0; border-bottom: 1px solid var(--line); background: none; text-align: left; font: inherit; color: inherit; cursor: pointer; width: 100%; }
+.cal-kind:last-child { border-bottom: 0; } .cal-kind > span:first-child { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; } .cal-kind small { font-size: 12.5px; font-weight: 600; color: var(--muted); } .cal-kind small.cal-why { color: #8a4b00; }
+.cal-switch { flex: none; width: 50px; height: 30px; border-radius: 15px; background: #c9d2e3; position: relative; transition: background .15s; } .cal-switch > span { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; transition: left .15s; }
+.cal-switch.on { background: var(--brand, #2e7be8); } .cal-switch.on > span { left: 23px; }
+.cal-say { display: block; margin-top: 6px; font-size: 13px; font-weight: 600; line-height: 1.5; }
+.cal-connect { min-height: 52px; margin-top: 14px; } .cal-under { display: block; margin-top: 8px; line-height: 1.5; } .cal-error { color: var(--danger, #b42318); }
+.cal-off { display: flex; flex-direction: column; gap: 8px; } .cal-off .pill { min-height: 48px; } .cal-cancel { min-height: 44px; }
+.cal-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; background: #e9f5ef; border-radius: var(--r-control); padding: 8px 12px; margin: 0 0 12px; } .cal-line > span { font-size: 18px; } .cal-line > small { flex: 1; min-width: 0; font-size: 13px; font-weight: 700; color: #0f6b4e; line-height: 1.4; }
+.cal-line-tap { background: #fff3e0; } .cal-line-tap > small { color: #8a4b00; } .cal-line .pill { min-height: 44px; }
+.cal-shop-on { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; border: 1px solid var(--line); border-radius: var(--r-control); padding: 8px 12px; margin: 8px 0; } .cal-shop-on > span { flex: 1; min-width: 160px; display: flex; flex-direction: column; } .cal-shop-on small { font-size: 12.5px; font-weight: 600; color: var(--muted); } .cal-shop-on input { min-height: 44px; font: inherit; padding: 0 8px; border: 1px solid var(--line); border-radius: 10px; }

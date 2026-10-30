@@ -22,6 +22,7 @@ import { DayEditor } from "../components/DayEditor";
 import { dayLog } from "../today";
 import { dayRecord } from "../record";
 import { livedByPlan } from "../metricsCalc";
+import { CalendarState, ShopOn, calendarNudge } from "../components/Calendar";
 
 // Plan decides (0.2, canvas S "Plan purpose one" and H): the calendar of the day, slot by slot. The slots come from Lifestyle
 // (meals a day, the eating window, the times), the training row from the Training week. 0.2.1 shows the day with its empty
@@ -37,7 +38,8 @@ const addDays = (d: Date, n: number) => { const x = new Date(d); x.setDate(x.get
 const SOURCE: Record<PlannedMeal["source"], string> = { mine: "my recipe", coach: "coach's recipe", starter: "starter", plate: "made on the Plate" };
 
 // the day looked at last, kept while the app is open, so a trip to the Plate comes back to the same day
-let remembered: string | null = null;
+// DT178 (0.3.21): a link from the Chef Mealan calendar, /plan?day=2026-11-02, opens that day
+let remembered: string | null = (() => { try { const d = new URLSearchParams(location.search).get("day"); return location.pathname.replace(/\/$/, "") === "/plan" && d && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d : null; } catch { return null; } })();
 // the day Plan shows, for the chef's context (0.2.4)
 export const planDateShown = () => remembered ?? ymd(new Date());
 // R18 (0.2.46): Today's Check tomorrow and Plan tomorrow open Plan on that day
@@ -110,6 +112,8 @@ export function PlanScreen(p: AppApi) {
   const put = (s: Slot, m: PlannedMeal) => { p.fill(key, s.id, m); setOpen(null); p.notify(`${m.title} is ${dayName === "today" ? "today's" : `${dayName}'s`} ${s.name.toLowerCase()}.`); };
   return (
     <>
+      {/* DT178 (0.3.21, board Stories126): said once, at the top, while the plan is also in Google Calendar */}
+      <CalendarState p={p} plan />
       <div className="week-arrows">
         <button type="button" className="week-arrow" aria-label="Week before" onClick={() => goWeek(-1)}>‹</button>
         <span className="week-arrows-mid">{weekSpan}{offset !== 0 ? <button type="button" className="link week-back" onClick={() => goWeek(0)}>This week</button>
@@ -348,6 +352,8 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
         {shown ? (<>
           <b className="shop-title">Shopping list {shown.n}</b>
           <p className="small shop-why">Made {madeOn(shown.madeAt)}, for {spanOf(shown.from, shown.to)}: {shown.meals} planned {shown.meals === 1 ? "meal" : "meals"}.{shown.doneAt ? ` Finished ${madeOn(shown.doneAt)}.` : ""}</p>
+          {/* DT178 (0.3.21, board Stories126): Shop on puts the list in the Chef Mealan calendar */}
+          {!shown.doneAt && <ShopOn p={p} n={shown.n} value={shown.shopOn} onChange={(v) => { save({ ...store, lists: store.lists.map((l) => (l.n === shown.n ? { ...l, shopOn: v } : l)) }); calendarNudge(); }} />}
           {shown.without.length > 0 && <p className="small shop-without">Not on the list, no foods saved: {shown.without.map((w) => `${w.title} (${WEEKDAY[(dt(w.date).getDay() + 6) % 7]})`).join(", ")}.</p>}
           {!shown.doneAt && <p className="small shop-why">Tap a food once when it is in the basket, twice for not this time.</p>}
           {/* SL7: the plan changed for this list's days since it was made: a new meal needs new shopping, whatever the reason */}
