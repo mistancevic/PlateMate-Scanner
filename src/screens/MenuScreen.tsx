@@ -803,7 +803,7 @@ function AccountPanel(p: AppApi) {
 }
 
 function SupportPanel(p: AppApi) {
-  const { cloudEnabled, coach, setCoach, services, exportData, importRef, setAccessOpen, addStarter, importAirtable, setTab } = p;
+  const { cloudEnabled, coach, setCoach, services, exportData, importRef, setAccessOpen, addStarter, setTab } = p;
   const isCoach = p.profile.role === "coach";
   const n = readLog().length;
   return (
@@ -826,14 +826,13 @@ function SupportPanel(p: AppApi) {
                 </div>
                 <div className="button-row">
                   <button className="pill pill-small" onClick={addStarter}>Add starter foods</button>
-                  <button className="pill pill-small" onClick={importAirtable} disabled={!services?.airtable}>Import from Airtable</button>
                 </div>
                 <div className="button-row">
                   <button className="pill pill-small" onClick={exportData}><Download size={14} /> Backup</button>
                   <button className="pill pill-small" onClick={() => importRef.current?.click()}><Upload size={14} /> Restore</button>
                   <button className="pill pill-small" onClick={() => setTab("recipes")}>Recipes</button>
                 </div>
-                <small>AI label reading: {services?.ai ? "on" : "off"} · Airtable: {services?.airtable ? "on" : "off"}</small>
+                <small>AI label reading: {services?.ai ? "on" : "off"}</small>
               </div>
             )}
           </section>

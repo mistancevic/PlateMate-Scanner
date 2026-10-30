@@ -7,7 +7,7 @@ Data stays in Firestore, europe-west3 (Frankfurt). Address: chefmealan.com.
 1. Gemini key: aistudio.google.com/apikey, "Create API key", pick project `project-fb3c5fab-00d1-4d11-ac7`.
 2. Open Cloud Shell (shell.cloud.google.com), then:
    git clone https://github.com/mistancevic/PlateMate-Scanner.git && cd PlateMate-Scanner
-   cp deploy/deploy.env.example deploy/deploy.env && nano deploy/deploy.env   # fill FB_API_KEY, FB_APP_ID, AIRTABLE_BASE_ID
+   cp deploy/deploy.env.example deploy/deploy.env && nano deploy/deploy.env   # fill FB_API_KEY, FB_APP_ID
    ./deploy/setup.sh
 3. First release: ./deploy/deploy.sh   (prints the run.app address)
 4. Firebase console, Authentication, Settings, Authorized domains: add chefmealan.com and www.chefmealan.com.
@@ -44,3 +44,11 @@ Rules are not rolled back: they only ever match the newer code or grow stricter.
    cd ~/PlateMate-Scanner && git pull && ./deploy/deploy.sh
 The old way, still there for a fix that can't wait: builds and puts it live at once, and remembers what served before,
 so rollback works after it too. Rules are published by the same command (deploy/rules.sh), so they always match the code.
+
+## Daily backup (once)
+
+    ./deploy/backup.sh
+
+A copy of the whole database each day, kept by Google in the database's own location, each copy deleted after 30 days.
+Running it again only shows the schedule. Restore, when ever needed: `gcloud firestore backups list --project "$PROJECT"`, then
+`gcloud firestore databases restore` into a new database, as Google's backup guide describes.

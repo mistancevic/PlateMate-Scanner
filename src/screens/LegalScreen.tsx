@@ -57,7 +57,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
       {page === "privacy" && (
         <article>
           <h1>Privacy notice</h1>
-          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 30 October 2026 (what goes to Gemini with each request; your private part; Your summary and your coach)</p>
+          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 30 October 2026 (daily backups kept 30 days; product search on Open Food Facts; what goes to Gemini with each request; your private part; Your summary and your coach)</p>
           <h2>1. Who is responsible</h2>
           <p>{OPERATOR.name}, {OPERATOR.city}, {OPERATOR.country}. <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>. No data protection officer is appointed; the pilot is below the thresholds that require one.</p>
           <h2>2. What Chef Mealan keeps, and why</h2>
@@ -79,11 +79,11 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
           <ul>
             <li><b>Google Cloud, Frankfurt (EU).</b> The app runs on Cloud Run; your data sits in Firestore and Firebase Authentication, and your photos as image files in Firebase Storage, region europe-west1/europe-west3. Only you can open your photos; your coach sees a plate's photo only when you share that card. Google Ireland Ltd is the processor under its Cloud data processing terms.</li>
             <li><b>Google Gemini API.</b> When you scan a label, take or pick a photo of a meal, or write to Chef Mealan, the photo or the text is sent to Google's Gemini API to be read, and the answer comes back. For a drawn cover, the recipe's name, foods and amounts are sent, and a picture comes back. So that every suggestion is safe and fits you, the request also carries, with no name, email or account id: your allergies and intolerances and the health situations you ticked (health data, Art. 9(2)(a), on your consent), your goal's numbers, how you eat (your diet, carbs and fat, how often you drink, where you eat, work travel, wake-up and bedtime, your work hours), your taste chips and own words, your kitchens and what you cook with, and, for Chef's review of your plates, the notes on those cards. Chef Mealan uses the paid Gemini API: under its terms, Google does not use that content to train its models.</li>
-            <li><b>Open Food Facts.</b> A barcode you scan is looked up there. The barcode is not personal data; nothing else is sent.</li>
+            <li><b>Open Food Facts.</b> A barcode you scan is looked up there, and so are the words you type when you search for a product, with your country so the right shop's products come first. Neither is personal data; nothing else is sent, no name, email or account id.</li>
             <li>No advertising, no analytics beyond the pilot log above and the visit counts in section 7, no sale or sharing of your data with anyone else.</li>
           </ul>
           <h2>4. How long</h2>
-          <p>While your account exists. Delete the account, from Menu, Account, and everything goes: profile, declarations, foods, cards, photos, recipes, the recipes you shared with members, the sign-in. Chef Mealan keeps no separate backup copies. When the photos moved into image files in October 2026, their old copies in the database stayed for 30 days, then were removed.</p>
+          <p>While your account exists. Delete the account, from Menu, Account, and everything goes: profile, declarations, foods, cards, photos, recipes, the recipes you shared with members, the sign-in. Once a day the database is backed up by Google, in the same Frankfurt location, and each backup is deleted after 30 days, so after you delete your account your data leaves the backups within 30 days. A backup is only ever used to restore the app after a failure. When the photos moved into image files in October 2026, their old copies in the database stayed for 30 days, then were removed.</p>
           <h2>5. Your rights</h2>
           <p>Access, rectification, erasure, restriction, portability and objection, Art. 15 to 21. In the app: Menu, Account, Export my data gives you everything as one file; Delete my account removes it. By email: {OPERATOR.email}. You may complain to a supervisory authority; for Bavaria that is the Bayerisches Landesamt für Datenschutzaufsicht (BayLDA), Ansbach.</p>
           <h2>6. Age</h2>

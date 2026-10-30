@@ -169,12 +169,10 @@ const apiKey = process.env.GEMINI_API_KEY;
 const tasteOfReq = (req: express.Request) => (Array.isArray(req.body?.taste) ? req.body.taste.slice(0, 8).map((t: any) => ({ kitchen: String(t.kitchen ?? "").slice(0, 30), cook_toward: (Array.isArray(t.cook_toward) ? t.cook_toward : []).slice(0, 3).map((d: unknown) => String(d).slice(0, 60)), leave_out: (Array.isArray(t.leave_out) ? t.leave_out : []).slice(0, 8).map((d: unknown) => String(d).slice(0, 60)) })) : []);
 const TASTE_RULE = "their_taste: within each kitchen, cook toward the dishes in cook_toward and never offer the ones in leave_out.";
 const VOICE = `Voice: at most two short sentences before any list. Second person, plain words, no jargon. When a value is an estimate, say so. Never scold, never moralise; going off plan is not a failure. No health, medical or weight-loss claims. Never state grams for something the app fits; the app's solver sets amounts.`;
-const baseId = process.env.AIRTABLE_BASE_ID;
-const airtableKey = process.env.AIRTABLE_API_KEY;
 app.get("/api/status", (_req, res) =>
   res.json({
     ai: !!apiKey,
-    airtable: !!(baseId && airtableKey),
+    airtable: false,
     accessRequired: false,
   }),
 );
@@ -1191,66 +1189,8 @@ app.post("/api/chef", requireUser, requireMember, requireAI, async (req, res) =>
     fail(res, error);
   }
 });
-const escapeFormula = (s: string) =>
-  s.replace(/\\/g, "\\\\").replace(/'/g, "\\'");
-app.post("/api/save", requireUser, requireMember, async (req, res) => {
-  try {
-    if (!baseId || !airtableKey)
-      return res
-        .status(503)
-        .json({
-          error:
-            "Airtable is not configured. Your food remains saved on this device.",
-        });
-    const f = req.body?.food;
-    if (!isFood(f))
-      return res
-        .status(400)
-        .json({ error: "Only reviewed food records can be synced." });
-    const formula = f.barcode
-      ? `{Barcode}='${escapeFormula(f.barcode)}'`
-      : `AND({Brand}='${escapeFormula(f.brand)}',{Product Name}='${escapeFormula(f.name)}')`;
-    const base = `https://api.airtable.com/v0/${encodeURIComponent(baseId)}/Scans`;
-    const headers = {
-      Authorization: `Bearer ${airtableKey}`,
-      "Content-Type": "application/json",
-    };
-    const check = await fetch(
-      `${base}?maxRecords=1&filterByFormula=${encodeURIComponent(formula)}`,
-      { headers, signal: AbortSignal.timeout(12000) },
-    );
-    if (!check.ok) throw new Error("Airtable unavailable");
-    const current = await check.json();
-    const existing = current.records?.[0]?.id;
-    const fields: Record<string, unknown> = {
-      "Product Name": f.name,
-      Brand: f.brand,
-      Calories: f.calories,
-      Protein: f.protein,
-      Fats: f.fats,
-      Carbs: f.carbs,
-      Fiber: f.fiber,
-    };
-    if (f.barcode) fields.Barcode = f.barcode;
-    const response = await fetch(base, {
-      method: existing ? "PATCH" : "POST",
-      headers,
-      body: JSON.stringify({
-        records: [{ ...(existing ? { id: existing } : {}), fields }],
-      }),
-      signal: AbortSignal.timeout(12000),
-    });
-    if (!response.ok) throw new Error("Airtable unavailable");
-    res.json({ success: true, updated: !!existing });
-  } catch {
-    res
-      .status(502)
-      .json({
-        error:
-          "Could not sync to Airtable. Check base permissions and Scans field names. The local food is preserved.",
-      });
-  }
-});
+// DT173 (0.3.15, privacy finding 12, option a): the Airtable button and its routes are gone; records outside the app are the daily
+// database backup (deploy/backup.sh)
 
 // "I'm out": read a menu, shelf or plate from a photo or a sentence, estimate values, suggest picks. Amounts are recomputed by the client's solver.
 const outSchema = {
@@ -2176,36 +2116,6 @@ app.post("/api/tip", requireUser, requireMember, requireAI, async (req, res) => 
   } catch (e) { fail(res, e); }
 });
 
-// Foods saved to Airtable, mapped back to the app's shape. Coach-side import.
-app.get("/api/foods", requireUser, requireMember, requireCoach, async (_req, res) => {
-  try {
-    if (!baseId || !airtableKey)
-      return res.status(503).json({ error: "Airtable is not configured." });
-    const headers = { Authorization: `Bearer ${airtableKey}` };
-    const base = `https://api.airtable.com/v0/${encodeURIComponent(baseId)}/Scans`;
-    const out: any[] = [];
-    let offset: string | undefined;
-    for (let i = 0; i < 10; i++) {
-      const url = `${base}?pageSize=100${offset ? `&offset=${encodeURIComponent(offset)}` : ""}`;
-      const r = await fetch(url, { headers, signal: AbortSignal.timeout(12000) });
-      if (!r.ok) throw new Error("Airtable unavailable");
-      const data = await r.json();
-      for (const rec of data.records ?? []) {
-        const f = rec.fields ?? {};
-        if (!f["Product Name"]) continue;
-        out.push({
-          product_name: f["Product Name"], brand: f.Brand ?? "", barcode: f.Barcode ? String(f.Barcode) : undefined,
-          calories: f.Calories ?? null, protein: f.Protein ?? null, fats: f.Fats ?? null, carbs: f.Carbs ?? null, fiber: f.Fiber ?? null,
-        });
-      }
-      offset = data.offset;
-      if (!offset) break;
-    }
-    res.json({ foods: out });
-  } catch {
-    res.status(502).json({ error: "Could not read from Airtable." });
-  }
-});
 app.use("/api", (_req, res) =>
   res.status(404).json({ error: "Unknown API route." }),
 );

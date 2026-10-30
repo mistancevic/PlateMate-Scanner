@@ -237,7 +237,6 @@ export interface AppApi {
   deleteSteps: string;
   confirmClientAi: (clientUid: string, on: boolean) => Promise<void>;
   addStarter: () => void;
-  importAirtable: () => Promise<void>;
   resetGoal: () => void;
   fitPd: (pd: number | null) => import("../goal").PdBand;
   rates: import("../letters").Rates | null; // DT108: the day's rates for the four letters, F C Fi P

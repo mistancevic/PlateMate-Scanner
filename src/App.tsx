@@ -2401,21 +2401,6 @@ export default function App() {
     // DT136: a place's starter foods come with its switch, the first time. The common ones are sold everywhere; a place's own
     // (fifty in Limassol) and its own brands are that place's
     addStarter: () => addStarterFor(region ?? "elsewhere"),
-    importAirtable: async () => {
-      setBusy("Reading Airtable");
-      try {
-        const data = await api("/api/foods");
-        const rows: any[] = data.foods ?? [];
-        setState((s) => {
-          const key = (n: string, b: string, bc?: string) => bc ? `bc:${bc}` : (n + "|" + b).toLowerCase();
-          const have = new Set(s.foods.map((f) => key(f.name, f.brand, f.barcode)));
-          const add = rows.map((r) => candidateFood(r, "airtable")).map((f) => ({ ...f, reviewedAt: new Date().toISOString(), readyToEat: true, icon: iconFor(f.name) }))
-            .filter((f) => !validateFood(f).length && !have.has(key(f.name, f.brand, f.barcode)));
-          notify(add.length ? `${add.length} foods imported from Airtable.` : "Nothing new in Airtable.");
-          return { ...s, foods: [...s.foods, ...add] };
-        });
-      } catch (e: any) { setError(e.message); } finally { setBusy(""); }
-    },
     openOut: (ask?: "fill" | "plate" | "around") => { setTalkAsk(ask ?? null); setTalkOpen(true); },
     scanFromToday: () => { setScanFrom("today"); setMode("label"); setCamera(true); },
     openScan: () => { setTalkOpen(false); setMode("label"); setCamera(true); },
