@@ -10,7 +10,7 @@ import { useEffect, useRef } from "react";
 
 const TAB_PATH: Record<string, string> = { home: "/today", journey: "/plate", plan: "/plan", recipes: "/my-recipes", foods: "/foods" };
 // the pages of the top menu (M6, 11 October 2026): Me and its pages under /me, the rest under /menu; Back goes one page back
-export const MENU_PATH: Record<string, string> = { me: "/me", profile: "/me/profile", goal: "/me/goal", life: "/me/lifestyle", week: "/me/training-week", shop: "/me/shop", coach: "/me/coach", account: "/me/account", list: "/menu", support: "/menu/support", about: "/menu/about", evals: "/menu/evals" };
+export const MENU_PATH: Record<string, string> = { me: "/me", profile: "/me/profile", goal: "/me/goal", life: "/me/lifestyle", week: "/me/training-week", shop: "/me/shop", coach: "/me/coach", summary: "/me/summary", account: "/me/account", list: "/menu", support: "/menu/support", about: "/menu/about", evals: "/menu/evals" };
 // a reload on a menu page opens the pages that lead to it: /me/profile is Me, then Profile
 export function menuTrailOf(path: string): string[] {
   // the Training week lived at /me/weekly-plan until 13 October 2026; a saved link still opens it

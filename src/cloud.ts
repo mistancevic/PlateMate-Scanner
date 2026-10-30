@@ -85,8 +85,17 @@ export async function joinCoach(_uid: string, code: string) {
 }
 export async function leaveCoach(uid: string) {
   await updateDoc(doc(db(), "users", uid), { coachId: null, coachName: null, coachEmail: null, coachPhoto: null, joinedAt: null });
+  // DT167: leaving the coach ends what the coach sees of the profile
+  try { await deleteDoc(doc(db(), "users", uid, "shared", "profile")); } catch { /* none yet */ }
 }
-export type ClientRow = { days: Record<string, import("./dayLines").DayLine>; notes: import("./coachNotes").CoachNote[]; checkinDay: number; nextGoal: import("./personal").NextGoal | null; coachGoal: any; goalsNow: { calories?: number | null; protein?: number | null } | null; uid: string; name: string; review: NumbersReview | null; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: import("./personal").Formula | null; pdUnit: "pd" | "pct"; flags: { situation: string; at: string }[]; birthYear: number | null; aiConfirmedAt: string | null; consentBy: string | null; weightKg?: number; trainingAge?: any; weighIns?: any[]; measured?: (import("./measured").Measured & { formulaKcal: number | null }) | null };
+// DT167 (0.3.9, board Stories119 version 2): what the coach sees of the profile, the shared parts only, kept up to date by the
+// person's own phone with what changed; the coach reads it, the person writes it (firestore.rules, shared)
+export async function loadSharedProfile(uid: string): Promise<import("./summary").SharedProfile | null> {
+  const d = await getDoc(doc(db(), "users", uid, "shared", "profile"));
+  return d.exists() ? (d.data() as any) : null;
+}
+export async function saveSharedProfile(uid: string, sp: import("./summary").SharedProfile) { notPaused(); await setDoc(doc(db(), "users", uid, "shared", "profile"), sp); }
+export type ClientRow = { days: Record<string, import("./dayLines").DayLine>; notes: import("./coachNotes").CoachNote[]; checkinDay: number; nextGoal: import("./personal").NextGoal | null; coachGoal: any; goalsNow: { calories?: number | null; protein?: number | null } | null; uid: string; name: string; review: NumbersReview | null; goal: any; feedback: any[]; foods: number; updatedAt: string; goalLog: any[]; formula: import("./personal").Formula | null; pdUnit: "pd" | "pct"; flags: { situation: string; at: string }[]; birthYear: number | null; aiConfirmedAt: string | null; consentBy: string | null; weightKg?: number; trainingAge?: any; weighIns?: any[]; profileShare?: import("./summary").SharedProfile | null; measured?: (import("./measured").Measured & { formulaKcal: number | null }) | null };
 export async function pinFormula(clientUid: string, formula: import("./personal").Formula | null) { await updateDoc(doc(db(), "users", clientUid), { formula }); }
 export async function listClients(coachUid: string): Promise<ClientRow[]> {
   const q = query(collection(db(), "users"), where("coachId", "==", coachUid));
@@ -95,9 +104,11 @@ export async function listClients(coachUid: string): Promise<ClientRow[]> {
     const x = d.data() as any;
     let feedback: any[] = [];
     try { feedback = await loadSharedCards(d.id); } catch { /* none shared or not allowed */ }
+    let profileShare: import("./summary").SharedProfile | null = null;
+    try { profileShare = await loadSharedProfile(d.id); } catch { /* none shared yet */ }
     // the coach sees situation and date only, never the person's words
     const flags = Array.isArray(x.safety?.flags) ? x.safety.flags.map((f: any) => ({ situation: String(f.situation), at: String(f.at ?? "").slice(0, 10) })) : [];
-    return { days: x.days && typeof x.days === "object" ? x.days : {}, notes: notesOf(x.coachNotes), checkinDay: checkinOf(x.checkinDay), nextGoal: x.personal?.nextGoal ?? null, coachGoal: x.coachGoal ?? null, goalsNow: x.state?.goals ?? null, uid: d.id, name: x.clientName || "unnamed", review: x.numbersReview ?? null, goal: x.goal ?? null, feedback, foods: typeof x.foodsCount === "number" ? x.foodsCount : x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: x.personal?.pdUnit ?? "pd", flags, birthYear: x.personal?.birthYear ?? null, aiConfirmedAt: x.aiConfirmedAt ?? null, consentBy: x.safety?.consentBy ?? null, weightKg: x.personal?.weightKg, trainingAge: x.personal?.trainingAge, weighIns: Array.isArray(x.personal?.weighIns) ? x.personal.weighIns : [], measured: x.measured && typeof x.measured === "object" ? x.measured : null };
+    return { days: x.days && typeof x.days === "object" ? x.days : {}, notes: notesOf(x.coachNotes), checkinDay: checkinOf(x.checkinDay), nextGoal: x.personal?.nextGoal ?? null, coachGoal: x.coachGoal ?? null, goalsNow: x.state?.goals ?? null, uid: d.id, name: x.clientName || "unnamed", review: x.numbersReview ?? null, goal: x.goal ?? null, feedback, foods: typeof x.foodsCount === "number" ? x.foodsCount : x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: x.personal?.pdUnit ?? "pd", flags, birthYear: x.personal?.birthYear ?? null, aiConfirmedAt: x.aiConfirmedAt ?? null, consentBy: x.safety?.consentBy ?? null, weightKg: x.personal?.weightKg, trainingAge: x.personal?.trainingAge, weighIns: Array.isArray(x.personal?.weighIns) ? x.personal.weighIns : [], profileShare, measured: x.measured && typeof x.measured === "object" ? x.measured : null };
   }));
   return rows.sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1));
 }
@@ -224,7 +235,7 @@ export const isEmptyState = (st: any) => !st || ((st.foods?.length ?? 0) === 0 &
 // Each step reports; a step that fails stops the rest so nothing is half gone with the sign-in already removed.
 export async function deleteAccount(onStep?: (s: string) => void) {
   const u = auth().currentUser; if (!u) return;
-  for (const sub of ["photos", "cards", "inbox"]) {
+  for (const sub of ["photos", "cards", "inbox", "shared"]) {
     onStep?.(`Removing ${sub}`);
     const snap = await getDocs(collection(db(), "users", u.uid, sub));
     let batch = writeBatch(db()), n = 0;
@@ -250,7 +261,7 @@ export async function clearClientAi(clientUid: string) { await updateDoc(doc(db(
 export async function exportAccount(uid: string) {
   const main = await loadCloud(uid);
   const read = async (sub: string) => (await getDocs(collection(db(), "users", uid, sub))).docs.map((d) => ({ id: d.id, ...d.data() }));
-  return { account: main, foods: await read("foods"), recipes: await read("recipes"), photos: await read("photos"), cards: await read("cards"), inbox: await read("inbox") };
+  return { account: main, foods: await read("foods"), recipes: await read("recipes"), photos: await read("photos"), cards: await read("cards"), inbox: await read("inbox"), shared: await read("shared") };
 }
 
 // ---- photos as files (storage release 1) ----

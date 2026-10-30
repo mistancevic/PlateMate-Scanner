@@ -3,9 +3,9 @@
 // answer, nor sleep. How the person eats now goes with every request that asks Chef Mealan for food, in fixed words, and the
 // server puts it in every such prompt with one rule (server.ts, eatsNote). Added in one place, so no request is forgotten.
 import { lifestyleOf, splitOf, lowCarbsOf, splitName, type Personal } from "./personal";
-import { DIETS } from "./plan";
+import { DIETS, WHERE } from "./plan";
 
-export type Eats = { what_they_eat?: string; in_their_words?: string; carbs_and_fat?: string; how_often_they_drink?: string; bed?: string; wake?: string };
+export type Eats = { what_they_eat?: string; in_their_words?: string; carbs_and_fat?: string; how_often_they_drink?: string; bed?: string; wake?: string; where_they_eat?: string[]; work_travel?: string };
 const BED: Record<string, string> = { early: "before 22:00", mid: "22:00 to midnight", late: "after midnight", varies: "varies with shifts" };
 const WAKE: Record<string, string> = { early: "before 6:00", mid: "6:00 to 8:00", late: "after 8:00", varies: "varies with shifts" };
 
@@ -18,6 +18,10 @@ export function eatsForReq(p: Personal, bandId: string): Eats {
   if (l.alcohol && l.alcohol !== "None") out.how_often_they_drink = l.alcohol;
   if (l.bed && BED[l.bed]) out.bed = BED[l.bed];
   if (l.wake && WAKE[l.wake]) out.wake = WAKE[l.wake];
+  // DT167 (0.3.9): Where you eat and Work travel reached nothing but the order of moments; now Chef Mealan reads them too
+  const where = (l.where ?? []).filter((w) => WHERE.includes(w));
+  if (where.length) out.where_they_eat = where;
+  if (l.travel === "sometimes" || l.travel === "often") out.work_travel = l.travel === "often" ? "a lot" : "occasionally";
   return out;
 }
 

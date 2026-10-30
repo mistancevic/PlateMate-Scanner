@@ -2429,3 +2429,32 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .ex-goal > small { line-height: 1.35; }
 .ex-lens > b { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
 .ex-open { font-size: 11px; letter-spacing: 0; text-transform: none; font-weight: 800; }
+/* DT167 (0.3.9, board Stories119): Your summary, what your coach sees, the coach's view of a shared profile */
+.sum-row { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.sum-row:last-child { border-bottom: 0; }
+.sum-row > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+.sum-row b { font-size: 15px; overflow-wrap: anywhere; }
+.sum-label { color: var(--muted); font-weight: 700; }
+.sum-does { color: var(--ink); opacity: .8; font-weight: 600; }
+.sum-chef { width: 56px; flex-shrink: 0; text-align: right; font-weight: 700; color: var(--muted); }
+.sum-chef.on { color: #13916a; }
+.sum-tag { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 9px; font-size: 10.5px; font-weight: 800; vertical-align: 1px; }
+.sum-health { background: #fdebd3; color: #8a4b00; }
+.sum-next { margin-top: 14px; }
+.sum-buttons { margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap; }
+.sum-foot { display: block; margin-top: 8px; }
+.sum-h { margin: 6px 2px; }
+.share-row { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.share-row:last-child { border-bottom: 0; }
+.share-row > div { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.share-row small { color: var(--ink); opacity: .8; font-weight: 600; }
+.profile-changes { border-color: var(--brand); }
+.change-row { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--line); }
+.change-at { width: 56px; flex-shrink: 0; font-weight: 800; color: var(--muted); }
+.profile-new { display: block; color: var(--brand-text); font-weight: 800; }
+.shared-profile { margin-top: 14px; }
+@media print {
+  .topbar, nav, .bottom-nav, .tabbar, .menu-head, .sum-next, .sum-buttons, .button-row, .toast, .chef-fab { display: none !important; }
+  body, main { background: #fff !important; }
+  .card { break-inside: avoid; box-shadow: none !important; }
+}

@@ -37,11 +37,13 @@ import { CostsScreen } from "./CostsScreen";
 import { LineChart, Receipt, Microscope } from "lucide-react";
 import { dayLog } from "../today";
 import { aggregate, uid } from "../pilot";
-import { MeScreen } from "./MeScreen";
+import { MeScreen, TasteSetting } from "./MeScreen";
+import { SummaryPanel } from "./SummaryPanel";
+import { ClipboardList } from "lucide-react";
 import { ExplorerScreen } from "./ExplorerScreen";
 
 // the sections that belong to the person: they live under Me, and back from them goes to Me
-const ME_SECTIONS: MenuSection[] = ["profile", "goal", "life", "week", "shop", "coach", "account"];
+const ME_SECTIONS: MenuSection[] = ["profile", "goal", "life", "week", "shop", "coach", "summary", "account"];
 const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "profile", name: "Profile", icon: <User size={20} /> },
   { id: "goal", name: "Goal", icon: <Target size={20} /> },
@@ -49,6 +51,7 @@ const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "week", name: "Training week", icon: <CalendarDays size={20} /> },
   { id: "shop", name: "Where I shop and cook", icon: <ShoppingBasket size={20} /> },
   { id: "coach", name: "Coach", icon: <Users size={20} /> },
+  { id: "summary", name: "Your summary", icon: <ClipboardList size={20} /> },
   { id: "account", name: "Account", icon: <KeyRound size={20} /> },
   { id: "support", name: "Support", icon: <LifeBuoy size={20} /> },
   { id: "about", name: "About", icon: <Info size={20} /> },
@@ -137,6 +140,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       {section === "week" && <PlanPanel {...p} />}
       {section === "shop" && <ShopPanel {...p} />}
       {section === "coach" && <CoachPanel {...p} />}
+      {section === "summary" && <SummaryPanel {...p} />}
       {section === "account" && <AccountPanel {...p} />}
       {section === "support" && <SupportPanel {...p} />}
       {section === "about" && <AboutPanel />}
@@ -514,6 +518,8 @@ function LifestylePanel(p: AppApi) {
           {l.diet === "Other" && <label className="field diet-other"><span>How you eat, in your words</span><input value={l.dietOther ?? ""} maxLength={120} placeholder="for example Mediterranean, no gluten" onChange={(e) => save({ dietOther: e.target.value })} /></label>}
           {!minor && <small className="setting-hint">{CHEF_NAME} reads this with every plate and recipe it suggests.</small>}
         </Setting>
+        {/* DT167 (0.3.9): Taste, moved here from the bottom of Me */}
+        <TasteSetting {...p} />
         {age !== null && age >= ALCOHOL_AGE && (
           <Setting name="Alcohol" hint="Alcohol counts as energy, 7 kcal a gram, and slows recovery. Chef Mealan knows how often you drink: when you mention a drink or an evening out, it counts it and leaves room in the day.">
             <Chips items={asItems(ALCOHOL)} on={l.alcohol} pick={(v) => save({ alcohol: v })} />
@@ -692,7 +698,8 @@ function CoachPanel(p: AppApi) {
   if (profile.role === "coach")
     return <section className="card"><small>You're a coach. Your code, your clients and what they shared are in the Clients tab.</small><div className="button-row" style={{ marginTop: 8 }}><button className="pill pill-small pill-primary" onClick={() => { p.setTab("clients"); }}>Open Clients</button></div></section>;
   if (!cloudEnabled || !user)
-    return <section className="card person"><span className="avatar avatar-coach">{COACH_NAME.slice(0, 1)}</span><div><b>{COACH_NAME}</b><small>sets your target and sees how it went</small></div></section>;
+    return <><section className="card person"><span className="avatar avatar-coach">{COACH_NAME.slice(0, 1)}</span><div><b>{COACH_NAME}</b><small>sets your target and sees how it went</small></div></section>
+      <NextLink p={p} to="summary" from="coach" text="Your summary" hint="Everything you told Chef Mealan, and what it does" /></>;
   return profile.coachId ? (
     <>
       <section className="card person">
@@ -708,6 +715,7 @@ function CoachPanel(p: AppApi) {
       <section className="card">
         <b>What your coach sees</b>
         <ul className="small">
+          <li>The parts of Your summary you share, kept up to date, with what changed. You choose them on Your summary; health data stays off until you switch it on.</li>
           <li>Your week: each day, the meals planned against the meals eaten, with their names, PD and kcal. From the day you joined.</li>
           <li>Your goal and today's numbers, and may set them for you.</li>
           <li>Your weigh-ins.</li>
@@ -721,6 +729,8 @@ function CoachPanel(p: AppApi) {
         </ul>
         <ConfirmButton className="link link-danger" label="Leave this coach" confirmLabel="Tap again to leave" onConfirm={leaveCoach} />
       </section>
+      {/* DT167 (0.3.9): the steps end on Your summary */}
+      <NextLink p={p} to="summary" from="coach" text="Your summary" hint={`Everything you told Chef Mealan, and what ${p.coachLabel} sees`} />
       {p.coachNotes.length > 0 && (
         <>
           <p className="label">Notes from {p.coachLabel}</p>
@@ -731,6 +741,7 @@ function CoachPanel(p: AppApi) {
       )}
     </>
   ) : (
+    <>
     <section className="card">
       <small>Got an invite from your coach? Enter its code. It works with the email it was sent to.</small>
       <div className="button-row" style={{ marginTop: 8 }}>
@@ -738,6 +749,8 @@ function CoachPanel(p: AppApi) {
         <button className="pill pill-small pill-primary" disabled={code.trim().length < 4} onClick={() => joinCoach(code)}>Join</button>
       </div>
     </section>
+    <NextLink p={p} to="summary" from="coach" text="Your summary" hint="Everything you told Chef Mealan, and what it does" />
+    </>
   );
 }
 
