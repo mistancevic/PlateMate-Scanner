@@ -86,3 +86,28 @@ test("DT147: training is suggested outside work; every part stays open", () => {
   assert.equal(withDay(plan, 1, { level: "moderate" }, w)[1].when, "morning");
   assert.equal(withDay(plan, 1, { level: "moderate", when: "evening" }, w)[1].when, "evening", "picked by you, in work hours: kept");
 });
+
+// DT166 (0.3.8, board Stories118): wake-up and bedtime set the first and last meal
+import { sleepWindow, startTimes } from "./slots";
+test("DT166: wake-up and bedtime set the first and last meal; the middle answers keep 07:30 and 20:00", () => {
+  assert.deepEqual(sleepWindow({ wake: "early", bed: "early" }), { from: "06:30", to: "19:00" });
+  assert.deepEqual(sleepWindow({ wake: "mid", bed: "mid" }), { from: "07:30", to: "20:00" });
+  assert.deepEqual(sleepWindow({ wake: "late", bed: "late" }), { from: "09:30", to: "22:00" });
+  assert.equal(sleepWindow({ wake: "varies", bed: "varies" }), null);
+  assert.equal(sleepWindow({}), null);
+  assert.deepEqual(slotsOf({ meals: 3, window: null, wake: "early", bed: "early" }).map((s) => s.time), ["06:30", "12:45", "19:00"]);
+  assert.deepEqual(slotsOf({ meals: 3, window: null, wake: "late", bed: "late" }).map((s) => s.time), ["09:30", "15:45", "22:00"]);
+  assert.deepEqual(slotsOf({ meals: 3, window: null, wake: "mid", bed: "mid" }).map((s) => s.time), ["07:30", "13:45", "20:00"]);
+  assert.equal(startTimes(3, { window: null, wake: "early" }).from, "sleep");
+});
+test("DT166: your own time, an eating window and fixed work hours still come first; one meal stays 18:00", () => {
+  assert.deepEqual(slotsOf({ meals: 3, window: null, wake: "early", bed: "early", slotTimes: { breakfast: "07:00" } }).map((s) => s.time), ["07:00", "12:45", "19:00"]);
+  assert.equal(startTimes(3, { window: { from: "08:00", to: "21:00" }, wake: "early" }).from, "window");
+  assert.deepEqual(slotsOf({ meals: 1, window: null, wake: "early", bed: "early" }).map((s) => s.time), ["18:00"]);
+  // 9 to 5, up after 8:00: work comes first, breakfast not before you wake, at most as work starts
+  assert.deepEqual(slotsOf({ meals: 3, window: null, weekdays: "work", hours: "fixed", slot: "9-5", wake: "late", bed: "late" }).map((s) => s.time), ["09:00", "13:00", "18:30"]);
+  // 9 to 5, up before 6:00: the sleep times already sit around work
+  assert.equal(startTimes(3, { window: null, weekdays: "work", hours: "fixed", slot: "9-5", wake: "early", bed: "early" }).from, "sleep");
+  // work alone, no sleep answers: as since 0.2.128
+  assert.deepEqual(slotsOf({ meals: 3, window: null, weekdays: "work", hours: "fixed", slot: "7-3" }).map((s) => s.time), ["06:00", "11:00", "18:00"]);
+});
