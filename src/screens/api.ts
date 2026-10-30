@@ -4,7 +4,7 @@ import type { ScannerMode } from "../types";
 
 export type Tab = "home" | "journey" | "plan" | "me" | "clients" | "meal" | "chef" | "foods" | "recipes" | "notes" | "more";
 export type PlateAsk = { kind: "photo" | "recipe" | "slot"; what: string; image?: string; apply: (how: "add" | "new") => void };
-export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "summary" | "account" | "support" | "about" | "evals" | "metrics" | "costs" | "share" | "explorer";
+export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "summary" | "account" | "support" | "about" | "evals" | "metrics" | "costs" | "share" | "explorer" | "calendar";
 // the slot a plate is made for (0.2.2): the date, the slot and its name and time, for the line on the Plate
 // mode: "plan" fills the slot on Put it in; "eat" (from Today) records the meal for the slot on Save
 export type Filling = { date: string; slotId: string; name: string; time: string; dayName: string; mealId?: string; mode?: "plan" | "eat" };

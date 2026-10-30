@@ -90,6 +90,8 @@ export const PERSONAL_MAP: { [K in keyof Required<Personal>]: SettingLine } = {
   travel: S("day", "eats", "Travel mode: search and scan read the shelves where you are; Chef Mealan suggests what fits the kitchen you have there; weigh-in can pause."),
   trips: S("day", null, "The days you were travelling, marked as travel."),
   travelBack: I("Welcome back, once, after Travel mode."),
+  // DT178 (0.3.21, board Stories126): a setting for Google, never for the coach or the chef
+  calendar: I("Google Calendar: on or off, and the kinds that go in."),
 };
 export const SAFETY_MAP: { [K in keyof Required<Safety>]: SettingLine } = {
   consentBodyAt: S("body", null, "Your consent before anything about your body is stored."),

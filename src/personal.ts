@@ -37,6 +37,8 @@ export type Personal = {
   // DT176 (0.3.19, board Stories124): Travel mode, on until switched off; the trips it kept; the welcome back, once
   travel?: import("./travel").Travel | null;
   trips?: import("./travel").Trip[];
+  // DT178 (0.3.21, board Stories126): Chef Mealan's own calendar in Google: on or off, its id, the kinds that go in
+  calendar?: import("./gcal").CalSettings;
   travelBack?: { place: import("./moments").RegionId; days: number } | null;
   // Target analysis answers: a finding kept on purpose, with the value it was kept at, so a changed number asks again
   kept?: Record<string, { at: string; sig: string }>;

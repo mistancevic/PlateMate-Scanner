@@ -39,16 +39,18 @@ import { dayLog } from "../today";
 import { aggregate, uid } from "../pilot";
 import { MeScreen, TasteSetting } from "./MeScreen";
 import { SummaryPanel } from "./SummaryPanel";
-import { ClipboardList } from "lucide-react";
+import { ClipboardList, CalendarClock } from "lucide-react";
+import { CalendarPage } from "../components/Calendar";
 import { ExplorerScreen } from "./ExplorerScreen";
 
 // the sections that belong to the person: they live under Me, and back from them goes to Me
-const ME_SECTIONS: MenuSection[] = ["profile", "goal", "life", "week", "shop", "coach", "summary", "account"];
+const ME_SECTIONS: MenuSection[] = ["profile", "goal", "life", "week", "calendar", "shop", "coach", "summary", "account"];
 const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "profile", name: "Profile", icon: <User size={20} /> },
   { id: "goal", name: "Goal", icon: <Target size={20} /> },
   { id: "life", name: "Lifestyle", icon: <Coffee size={20} /> },
   { id: "week", name: "Training week", icon: <CalendarDays size={20} /> },
+  { id: "calendar", name: "Google Calendar", icon: <CalendarClock size={20} /> },
   { id: "shop", name: "Where I shop and cook", icon: <ShoppingBasket size={20} /> },
   { id: "coach", name: "Coach", icon: <Users size={20} /> },
   { id: "summary", name: "Your summary", icon: <ClipboardList size={20} /> },
@@ -141,6 +143,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       {section === "shop" && <ShopPanel {...p} />}
       {section === "coach" && <CoachPanel {...p} />}
       {section === "summary" && <SummaryPanel {...p} />}
+      {section === "calendar" && <CalendarPage p={p} />}
       {section === "account" && <AccountPanel {...p} />}
       {section === "support" && <SupportPanel {...p} />}
       {section === "about" && <AboutPanel />}
