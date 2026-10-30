@@ -139,7 +139,10 @@ export interface AppApi {
   renameMeal: (id: string, title: string) => void;
   renamePlate: (title: string) => void;
   // Recipes, Open (0.2.3): the recipe on the Plate with its name as the title, nothing decided yet
-  openOnPlate: (meal: Meal) => void;
+  openOnPlate: (meal: Meal, opts?: { cook?: boolean }) => void;
+  // DT174 (0.3.16): Cook it as written: the Plate takes the recipe as it is and goes straight to Make
+  cookNow: boolean;
+  clearCookNow: () => void;
   // after How was it (0.2.23, IM23c): open a recipe on Recipes with one line for today
   landing: { id: string; line: string; title?: string; quiet?: boolean; back?: "recipes"; from?: MealFrom } | null;
   // R19 (0.2.47): a meal opened from Today or Plan, with the slot it is planned for

@@ -70,6 +70,7 @@ import { OriginalSteps, StepsHint } from "../components/StepsView";
 import { countOf as countedOf, gramsOfOne } from "../counted";
 import { CountAmount, SizePicker, isCounted } from "../components/CountAmount";
 import { cookName, cookPhrase, weighLine, aroundWord, needsCooking, rawHint, cookTitle } from "../cookWords";
+import { CookMode } from "../components/CookMode";
 
 // Make it a meal (0.2.9, canvas board CH, CH1 to CH3): an idea from Chef Mealan, checked and with the app's grams
 // DT91 (0.2.88): cooking: the herbs and spices the dish uses, not counted; failed: the ideas that missed the range, with why
@@ -613,6 +614,8 @@ export function JourneyScreen(p: AppApi) {
   const [makeAll, setMakeAll] = useState<boolean | null>(null);
   const [mkDraft, setMkDraft] = useState<"" | "working" | string>("");
   const [ticks, setTicks] = useState<Set<string>>(new Set());
+  // DT174 (0.3.16): cook mode over Make, full screen
+  const [cooking, setCooking] = useState(false);
   const [newParts, setNewParts] = useState<string[]>([]);
   const [naming, setNaming] = useState<string | null>(null);
   const [tried, setTried] = useState<"yes" | "ok" | "no" | null>(null);
@@ -1103,6 +1106,15 @@ export function JourneyScreen(p: AppApi) {
   const [dishKept, setDishKept] = useState<string>("");
   // DT93: after Fit, when the foods cannot reach the target within their portions, three ways out
   const fitShort = !!fit && fit.id !== null && pd !== null && pdRef !== null && pd < pdRef - 0.05 && !imported;
+  // DT174 (0.3.16): Cook it as written: once the recipe is on the plate, as it is, straight to Make
+  useEffect(() => {
+    if (!p.cookNow) return;
+    if (step !== "in") { p.clearCookNow(); return; }
+    if (!items.length || state.openRecipe) return;
+    p.clearCookNow(); setChef(null); setMethod(null); setTicks(new Set());
+    setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" }));
+    setStep("made");
+  }, [p.cookNow, step, items.length, state.openRecipe]); // eslint-disable-line react-hooks/exhaustive-deps
   function keepAsIs() { setChef(null); if (p.filling && plateWhen === "past") { addPast(); return; } if (p.filling?.mode !== "eat" && p.filling) putInSlot(items); else { setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null);
     // DT94: a plate whose steps are already on the Plate is locked here and goes straight to Make
     if (cooksPlate(items) && stepsHold(items)) { setStep("made"); return; }
@@ -2013,17 +2025,29 @@ export function JourneyScreen(p: AppApi) {
   if (step === "made") {
     // DT94: the steps of what is being made: the recipe's, the plate's drafted ones, or the way picked for a bowl
     const madeSteps: string[] = (rec?.steps?.length ? rec.steps : plateRecipe?.steps?.length ? plateRecipe.steps : plateSteps?.steps?.length ? plateSteps.steps : (methodsFor(items).find((w) => w.id === method)?.steps ?? []));
+    // DT174: the amounts the steps say: the whole recipe when you make all of it, else your plate
+    const stepItems: Ingredient[] = madeWhole && rec ? rec.items : items;
     const mealNow = () => ({ id: uid(), title: p.state.title || autoTitle(items), items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
     return (
       <>
         {Head({ back: "make", title: `Make: ${(state.title && state.title !== "DaaM" ? state.title : autoTitle(items)).slice(0, 40)}`, sub: madeSteps.length ? "Tick the steps as you go. A photo while it is on the counter, then how it went." : "A photo or two while it's on the counter, then one tap." })}
+        {/* DT174 (0.3.16): Start cooking, above the steps: one big step at a time; each finished step is ticked here */}
+        {madeSteps.length > 0 && (
+          <div className="mk-cook">
+            <button className="pill pill-wide pill-primary" onClick={() => setCooking(true)}>{ticks.size > 0 && madeSteps.some((_, k) => !ticks.has(`s${k}`)) ? "Go on cooking" : "Start cooking"}</button>
+            <small className="muted">One big step at a time, read aloud. Say next, back or repeat, or tap. Each step you finish is ticked here.</small>
+          </div>
+        )}
+        {cooking && madeSteps.length > 0 && <CookMode title={(state.title && state.title !== "DaaM" ? state.title : autoTitle(items))} steps={madeSteps} items={stepItems}
+          ticks={new Set(madeSteps.map((_, k) => k).filter((k) => ticks.has(`s${k}`)))}
+          onTick={(k) => setTicks((tk) => { const n = new Set(tk); n.add(`s${k}`); return n; })} onClose={() => setCooking(false)} />}
         {/* DT94: the locked recipe's steps, to tick as you go; nothing here changes the recipe */}
         {madeSteps.length > 0 && (
           <section className="card mk-card" aria-label="The steps">
             <b>The steps</b>
             {madeSteps.map((x, k) => { const on = ticks.has(`s${k}`); return (
               <button key={k} type="button" className={`mk-check ${on ? "on" : ""}`} aria-pressed={on} onClick={() => setTicks((tk) => { const n = new Set(tk); if (n.has(`s${k}`)) n.delete(`s${k}`); else n.add(`s${k}`); return n; })}>
-                <span className="mk-box">{on ? "✓" : ""}</span><span>{stepParts(tempsIn(x), items).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</span>
+                <span className="mk-box">{on ? "✓" : ""}</span><span>{stepParts(tempsIn(x), stepItems).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</span>
               </button>); })}
           </section>
         )}
@@ -2257,7 +2281,7 @@ export function JourneyScreen(p: AppApi) {
         }
         if (p.filling) p.setFilling(null);
         setWay(null); setTried(null);
-        setMakeAll(null); setTicks(new Set()); setMkDraft(""); setMkDrafted(false);
+        setMakeAll(null); setTicks(new Set()); setCooking(false); setMkDraft(""); setMkDrafted(false);
         setMadeBy(null); setPlateSteps(null); setPlateDraft(""); setOwnSteps(null);
         if (landId) p.landOnRecipe(landId, landLine, keep ? "✓ Saved in Mine" : "✓ Made today");
         else setTab("home");
