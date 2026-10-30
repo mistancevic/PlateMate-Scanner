@@ -465,24 +465,17 @@ app.post("/api/export", requireUser, async (req, res) => {
     const docs = async (q: FirebaseFirestore.Query) => (await q.get()).docs.map((x) => ({ id: x.id, ...(x.data() as any) }));
     const user = d.collection("users").doc(uid), out: Record<string, unknown> = { exportedAt: new Date().toISOString() };
     out.account = (await user.get()).data() ?? null;
-    for (const sub of await user.listCollections()) out[`account_${sub.id}`] = await docs(sub);
+    // the old photo copies are the person's own to read; the phone adds them (and the photo files), so the answer stays small
+    for (const sub of await user.listCollections()) if (sub.id !== "photos") out[`account_${sub.id}`] = await docs(sub);
     for (const col of ["member_recipes", "member_recipes_preview", "member_names", "member_names_preview", "covers"]) out[col] = await docs(d.collection(col).where("uid", "==", uid));
-    for (const col of ["public_recipes", "public_recipes_preview"]) out[col] = (await docs(d.collection(col).where("authorUid", "==", uid))).map((r: any) => ({ ...r, photo: r.photo ? "(a photo, included under photo_files when it is a file)" : null }));
+    for (const col of ["public_recipes", "public_recipes_preview"]) out[col] = (await docs(d.collection(col).where("authorUid", "==", uid))).map((r: any) => r);
     out.cook = (await d.collection("cooks").doc(uid).get()).data() ?? null;
     if (email) for (const col of ["accessRequests", "invites", "bookSignups"]) out[col] = (await docs(d.collection(col).where("email", "==", email))).map((r: any) => ({ ...r, ipHash: undefined, ua: undefined }));
+    // requests stored before 0.3.11 kept the email as typed
+    if (email) out.accessRequests = [...(out.accessRequests as any[]), ...(await d.collection("accessRequests").limit(2000).get()).docs.filter((x) => String(x.get("email") || "").toLowerCase() === email && x.get("email") !== email).map((x) => ({ id: x.id, ...(x.data() as any), ipHash: undefined, ua: undefined }))];
     for (const col of ["metrics_events", "metrics_events_preview"]) out[col] = await docs(d.collection(col).where("m", "==", memberOf(uid)));
-    // the photo files, as data, up to 25 MB; past that, their names (the phone has them too)
-    const files: Record<string, string> = {}, names: string[] = [];
-    if (BUCKET) {
-      let size = 0;
-      const [list] = await adminStorage().bucket(BUCKET).getFiles({ prefix: `users/${uid}/` });
-      for (const f of list) {
-        const n = Number(f.metadata?.size ?? 0);
-        if (size + n > 25 * 1024 * 1024) { names.push(f.name); continue; }
-        const [buf] = await f.download(); size += buf.length; files[f.name] = `data:${f.metadata?.contentType || "image/jpeg"};base64,${buf.toString("base64")}`;
-      }
-    }
-    out.photo_files = files; out.photo_files_not_included = names;
+    // the photo files by name; the phone downloads them itself (the person reads their own files), so this answer stays small
+    out.photo_files = BUCKET ? (await adminStorage().bucket(BUCKET).getFiles({ prefix: `users/${uid}/` }))[0].map((f) => f.name) : [];
     res.json({ server: out });
   } catch (e) { fail(res, e); }
 });

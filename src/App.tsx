@@ -2548,7 +2548,10 @@ export default function App() {
       if (user) { try { cloud = await exportAccount(user.uid); } catch (e: any) { cloud = { error: explainCloudError(e) }; } }
       // DT169 (0.3.11): what only the server reads: shared and published recipes, requests, counted events, the photo files
       if (user) { try { server = (await api("/api/export", {})).server; } catch (e: any) { server = { error: e?.message ?? "not reached" }; } }
-      const data = { exportedAt: new Date().toISOString(), name: clientName, personal: getPersonal(), region: getRegion(), safety: getSafety(), goal: getGoal(), goalLog: getGoalLog(), foods: state.foods, cards: state.feedback, items: state.items, myRecipes: state.meals, recipes: inbox, preferences: state.preferences, account: cloud, fromServer: server };
+      // the photo files themselves, downloaded by this phone, up to about 40 MB; past that, their names
+      let photoFiles: Record<string, string> = {}, notIncluded: string[] = [];
+      if (user) { try { let size = 0; for (const n of await listPhotoFiles(user.uid)) { if (size > 40e6) { notIncluded.push(n); continue; } const d = await downloadPhoto(user.uid, n); size += d.length; photoFiles[n] = d; } } catch (e: any) { notIncluded = [`not reached: ${e?.message ?? "error"}`]; } }
+      const data = { exportedAt: new Date().toISOString(), name: clientName, personal: getPersonal(), region: getRegion(), safety: getSafety(), goal: getGoal(), goalLog: getGoalLog(), foods: state.foods, cards: state.feedback, items: state.items, myRecipes: state.meals, recipes: inbox, preferences: state.preferences, account: cloud, fromServer: server, photoFiles, photoFilesNotIncluded: notIncluded };
       const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: "application/json" }));
       const a = document.createElement("a"); a.href = url; a.download = `chef-mealan-my-data-${new Date().toISOString().slice(0, 10)}.json`; a.click();
       setTimeout(() => URL.revokeObjectURL(url), 1000);

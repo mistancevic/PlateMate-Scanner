@@ -76,5 +76,5 @@ test("DT169: join requests and sign-ups are the owner's only; delete and export 
   for (const x of ['"public_recipes", "public_recipes_preview"', 'collection("cooks").doc(uid).delete()', "toLowerCase() === email"]) assert.ok(del.includes(x), `delete reaches ${x}`);
   assert.match(s, /email = String\(b\.email \?\? ""\)\.trim\(\)\.toLowerCase\(\)/);
   const ex = s.slice(s.indexOf('app.post("/api/export"'), s.indexOf("// Delete my account, the whole of it"));
-  for (const x of ["listCollections", "member_recipes", "public_recipes", "cooks", "accessRequests", "metrics_events", "photo_files"]) assert.ok(ex.includes(x), `export has ${x}`);
+  for (const x of ["listCollections", "member_recipes", "public_recipes", "cooks", "accessRequests", "metrics_events", "photo_files", "sub.id !== \"photos\""]) assert.ok(ex.includes(x), `export has ${x}`);
 });
