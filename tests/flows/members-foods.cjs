@@ -71,13 +71,14 @@ const U = "http://127.0.0.1:3267";
   ok((await page.locator(".rows .row-member").count()) >= 3, "0.2.100: tunjevina finds the tuna of every language");
   await page.getByLabel("Find a food").fill("tuna"); await page.waitForTimeout(1200);
   const mt = (await mf.allTextContents()).join(" ");
-  ok(/seen in Belgrade/.test(mt) && /seen in Cyprus/.test(mt) && /no barcode/.test(mt), "DT115: each says where it was seen; a food without a barcode says so");
+  // Changed by DT171 (0.3.13, privacy finding 9, option a): where and when a member checked a food is no longer shown
+  ok(!/seen in/.test(mt) && !/checked by a member on/.test(mt) && /no barcode/.test(mt), "DT171: no market or day shown; a food without a barcode says so");
   ok(await page.locator(".also-seen").count() === 0 && await page.locator(".members-foods").count() === 0, "DT125: the old groups and the line under your tuna are gone; one list");
   // Take it copies it
   await mf.filter({ hasText: "Tuna in water" }).getByRole("button", { name: "Add" }).click(); await page.waitForTimeout(600);
   let s = await st();
   const copy = s.foods.find((f) => f.name === "Tuna in water, drained");
-  ok(copy && copy.calories === 99 && copy.barcode === "8004030044005" && copy.source === "Members' foods" && /checked by a member/.test(copy.notes), "DT115: a copy in your foods with the values and the source");
+  ok(copy && copy.calories === 99 && copy.barcode === "8004030044005" && copy.source === "Members' foods" && copy.notes === "Members' foods, checked by a member.", "DT115, DT171: a copy in your foods with the values and the source");
   // 0.2.101: the pack's photo from Open Food Facts travels as a link when the server could fetch it; here the workspace cannot reach OFF, so the row shows the icon and the copy has no photo
   ok(!copy.photo || /^https:\/\/images\.openfoodfacts\.org\//.test(copy.photo), "0.2.101: a copy's photo is only ever an Open Food Facts link: " + (copy.photo || "none"));
   ok(await page.locator(".rows .row-member").count() === 3 && await page.locator(".rows .row").filter({ hasText: "Tuna in water, drained" }).count() === 1, "DT125: the copied food is one row, yours, never twice");
@@ -88,7 +89,7 @@ const U = "http://127.0.0.1:3267";
   await page.getByRole("button", { name: /Close/ }).first().click(); await page.waitForTimeout(400);
   // the barcode answers from the catalogue before Open Food Facts
   const prod = await page.evaluate(async () => (await fetch("/api/product/3850102001234")).json());
-  ok(prod.members === true && prod.product_name === "Tuna in brine, drained" && /Members' foods · checked by a member on 2026/.test(prod.source) && prod.calories === 105, "DT115: a barcode a member checked answers from the catalogue: " + prod.source);
+  ok(prod.members === true && prod.product_name === "Tuna in brine, drained" && prod.source === "Members' foods · checked by a member" && prod.updatedAt === undefined && prod.calories === 105, "DT115: a barcode a member checked answers from the catalogue: " + prod.source);
   // the swap list on the Plate: the same tuna in another state leads, with the difference per can
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(900);
   await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); s.foods.push({ ...s.foods.find((f) => f.name === "Tuna in water, drained"), id: "sr-tuna", name: "Tunjevina u maslinovom ulju", brand: "Eva", barcode: undefined, aliases: ["tuna", "thunfisch"] }); localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
@@ -99,7 +100,7 @@ const U = "http://127.0.0.1:3267";
   await require("./swipe.cjs")(page, page.locator(".swipe-fg", { hasText: "Tuna" }).locator(".name-link, .thumb").first(), "left"); await page.waitForTimeout(1500);
   const rows = await page.locator(".sheet .row-button").allTextContents();
   ok(rows.length > 0 && /^\W*Tuna in (water|brine)/.test(rows[0]) && /the same tuna, another state/.test(rows[0]) && /kcal less per can/.test(rows[0]), "DT115: the same tuna in another state leads the swaps, with the difference per can: " + rows[0]?.slice(0, 160));
-  ok(rows.some((r) => /a member's food, seen in Belgrade/.test(r)), "DT115: a member's food in the list says so and where it was seen");
+  ok(rows.some((r) => /a member's food/.test(r)) && !rows.some((r) => /seen in/.test(r)), "DT115, DT171: a member's food in the list says so, not where it was seen");
   ok(!rows.some((r) => /Tuna steak, fresh/.test(r)), "DT115: a food without a barcode seen only in Cyprus is not offered in Munich");
   ok(!rows.some((r) => /yeast/i.test(r)), "0.2.96: no ingredient in the swap list");
   await page.locator(".sheet .row-button", { hasText: "Tuna in brine" }).click(); await page.waitForTimeout(700);

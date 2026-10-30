@@ -641,7 +641,9 @@ app.get("/api/members/foods", requireUser, requireMember, async (req, res) => {
     const hit = all.filter((f) => { const hay = mfSlug(`${f.name} ${f.brand}`); return forms.every((fs) => fs.some((w) => hay.includes(w))); });
     const mine = (f: MemberFood) => (region && f.markets && f.markets[region] ? 0 : 1);
     hit.sort((a, b) => mine(a) - mine(b) || (b.updatedAt > a.updatedAt ? 1 : -1));
-    res.json({ foods: hit.slice(0, 12).map((f) => ({ ...f, seenIn: Object.keys(f.markets ?? {}) })) });
+    // DT171 (privacy finding 9, option a): where and when a food was checked, and by how many, stay on the server; the markets go
+    // only as ids, for search by place, and are never shown
+    res.json({ foods: hit.slice(0, 12).map(({ markets, updatedAt: _u, n: _n, ...f }) => ({ ...f, seenIn: Object.keys(markets ?? {}) })) });
   } catch (error) { fail(res, error); }
 });
 // ---- Recipes you can share (canvas boards R0 to R7, RG0 to RG4) ----
@@ -1061,7 +1063,7 @@ app.get("/api/product/:barcode", requireUser, requireMember, async (req, res) =>
     try {
       const m = (await mfAll(req)).find((f) => f.barcode === barcode);
       if (m) return res.json({ product_name: m.name, brand: m.brand, barcode, calories: m.calories, protein: m.protein, fats: m.fats, carbs: m.carbs, fiber: m.fiber, table: [], serving: m.serving ?? undefined,
-        source: `Members' foods · checked by a member on ${m.updatedAt.slice(0, 10)}`, members: true, seenIn: Object.keys(m.markets ?? {}) });
+        source: "Members' foods · checked by a member", members: true, seenIn: Object.keys(m.markets ?? {}) });
     } catch {}
     const response = await fetch(
       `https://world.openfoodfacts.org/api/v2/product/${barcode}.json?fields=product_name,brands,nutriments,nutrition_data_per,quantity,countries_tags,image_front_url,image_nutrition_url`,

@@ -9,12 +9,9 @@ import { cookName } from "./cookWords";
 export type MemberFood = { key: string; name: string; brand: string; barcode?: string; photo?: string | null; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber: number | null; serving?: { grams: number; name: string } | null; readyToEat?: boolean; source: string; seenIn: string[]; updatedAt: string };
 
 export const marketName = (id: string) => { const n = REGIONS.find((r) => r.id === id)?.name.replace(/, elsewhere$/, "") ?? id; return n === "Elsewhere" ? "elsewhere" : n; };
-export const seenLine = (m: Pick<MemberFood, "seenIn">, mine: string | null | undefined) => {
-  const ids = m.seenIn ?? [];
-  if (!ids.length) return "";
-  if (mine && ids.includes(mine)) return `seen in ${marketName(mine)}`;
-  return `seen in ${ids.slice(0, 2).map(marketName).join(" and ")}`;
-};
+// DT171 (0.3.13, privacy finding 9, option a; Coach Milan 30 October 14:51): other members no longer see where or when a food was
+// checked: with few members, a market and a day can point to one person. Search by market still works; it just isn't shown.
+export const seenLine = (_m: Pick<MemberFood, "seenIn">, _mine: string | null | undefined) => "";
 // which of your foods travel: reviewed, with numbers, not the basic foods table (shared already), not a photo (never)
 export const travels = (f: Food) => Boolean(f.reviewedAt && f.name && f.calories !== null && f.protein !== null && !/reference table/i.test(f.source ?? "") && f.source !== "estimate" && f.source !== "Members' foods" && !/^f-/.test(f.id) && !/typical values/i.test(f.brand ?? ""));
 export const toShare = (f: Food) => ({ name: f.name, brand: f.brand ?? "", barcode: f.barcode, calories: f.calories, protein: f.protein, fats: f.fats, carbs: f.carbs, fiber: f.fiber, serving: f.serving ?? null, readyToEat: f.readyToEat !== false, source: f.source ?? "label" });
@@ -22,7 +19,7 @@ export const toShare = (f: Food) => ({ name: f.name, brand: f.brand ?? "", barco
 // the other languages' words for the food's head word, so a search in any of them finds the copy (0.2.103: Tunjevina found by tuna)
 export const aliasesFor = (name: string): string[] => { const w = stemOf(name); return w.length >= 3 ? synonymsOf(w).slice(0, 8) : []; };
 export const asMine = (m: MemberFood, uid: () => string): Food => ({
-  id: uid(), name: m.name, brand: m.brand, basis: "100g", source: "Members' foods", aliases: aliasesFor(m.name), notes: `Members' foods, checked by a member on ${m.updatedAt.slice(0, 10)}${m.seenIn?.length ? `; ${seenLine(m, null)}` : ""}.`,
+  id: uid(), name: m.name, brand: m.brand, basis: "100g", source: "Members' foods", aliases: aliasesFor(m.name), notes: "Members' foods, checked by a member.",
   reviewedAt: new Date().toISOString(), readyToEat: m.readyToEat !== false, calories: m.calories, protein: m.protein, fats: m.fats, carbs: m.carbs, fiber: m.fiber,
   ...(m.barcode ? { barcode: m.barcode } : {}), ...(m.serving ? { serving: m.serving } : {}),
   // the pack's photo from Open Food Facts travels with the copy (a link, CC BY-SA); a member's own photo never does
