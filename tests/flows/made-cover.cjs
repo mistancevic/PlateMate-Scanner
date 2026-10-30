@@ -25,7 +25,7 @@ seed.meals = [bowl("bowl", "Chicken rice bowl"), bowl("mine", "Rice bowl with a 
   const make = async (title) => {
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(600);
     await page.getByText(title, { exact: true }).last().click(); await page.waitForTimeout(800);
-    await page.getByRole("button", { name: /^Make it$/ }).first().click(); await page.waitForTimeout(900);
+    await page.getByRole("button", { name: /^(Make it|Change it first)$/ }).first().click(); await page.waitForTimeout(900);
     await page.getByRole("button", { name: /^(Keep it as it is|Make it as it is|Lock the recipe)$/ }).first().click(); await page.waitForTimeout(800);
     await page.getByRole("button", { name: /^(I'm making it|Lock the recipe)$/ }).click(); await page.waitForTimeout(500);
     await page.locator("label.plate-photo").filter({ hasText: "Take a photo" }).locator("input").setInputFiles([{ name: "plate.jpg", mimeType: "image/jpeg", buffer: PHOTO }]); await page.waitForTimeout(900);

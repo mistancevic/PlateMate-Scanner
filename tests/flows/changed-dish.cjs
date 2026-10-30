@@ -67,7 +67,7 @@ const U = "http://127.0.0.1:3215";
   // IM23: Change the dish, then How to make it drafts the steps for the changed foods
   await page.getByRole("button", { name: "Change the recipe" }).click(); await page.waitForTimeout(1200);
   ok(sent[0].items.find((i) => i.name === "Cream cheese").part === "Filling", "IM23: the change is asked with the recipe's parts");
-  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /^(Make it( as it is)?|Change it first)$/ }).click(); await page.waitForTimeout(800);
   ok(/No steps yet for your changed dish/.test(await text("main")), "IM23: How to make it is for the changed dish");
   await page.getByRole("button", { name: "Write the steps for my dish" }).first().click(); await page.waitForTimeout(900);
   const ask = sent.find((x) => Array.isArray(x.original));
@@ -111,8 +111,8 @@ const U = "http://127.0.0.1:3215";
   // a recipe you have made before ends on its page too (0.2.25, RP4, Milan 17:42)
   await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500);
   await page.getByText("No-bake cheesecake, more protein", { exact: true }).last().click(); await page.waitForTimeout(700);
-  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(1200);
-  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /^(Make it( as it is)?|Change it first)$/ }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: /^(Make it( as it is)?|Change it first)$/ }).click(); await page.waitForTimeout(800);
   const mk = page.getByRole("button", { name: /Make it from the original|I'm making it|Lock the recipe/ }); if (await mk.count()) { await mk.first().click(); await page.waitForTimeout(500); }
   await page.getByRole("button", { name: /On to How was it\?|Rate it/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Good", exact: true }).first().click();

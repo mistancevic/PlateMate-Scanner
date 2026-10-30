@@ -814,6 +814,8 @@ export default function App() {
     [filling, setFilling] = useState<Filling | null>(null),
     // the recipe the plate came from (a slot or Recipes, Open), so a new name on the Plate renames it at once
     [plateRecipeId, setPlateRecipeId] = useState<string | null>(null),
+    // DT174 (0.3.16): Cook it as written, on its way to the Plate's Make step
+    [cookNow, setCookNow] = useState(false),
     [goalFocus, setGoalFocus] = useState<"formula" | null>(null),
     // after How was it (0.2.23, IM23c): the recipe the meal made or changed opens on Recipes, with one line for today
     [landing, setLanding] = useState<{ id: string; line: string; title?: string; quiet?: boolean; back?: "recipes"; from?: import("./screens/api").MealFrom } | null>(null),
@@ -2073,8 +2075,8 @@ export default function App() {
     pdRef !== null &&
     Math.abs(density(selected.protein, selected.calories)! - pdRef) <= 0.05;
   // a recipe onto the Plate as it always opened; DT131 asks before this when the plate has foods
-  const openOnPlateNow = (meal: Meal) => {
-    setFilling(null); setPlateRecipeId(meal.id);
+  const openOnPlateNow = (meal: Meal, cook = false) => {
+    setFilling(null); setPlateRecipeId(meal.id); setCookNow(cook);
       // R22 fix (0.2.51): a recipe presets What is it? from its foods, a one-portion recipe too (the quark pudding: a DaaM)
     setPlateTaste(presetOf(dishTaste(meal.items.map((i) => i.food.name))));
     // a recipe that came in from a screenshot or a link opens as it did the first time (0.2.19, IM13): the Plate does it
@@ -2332,14 +2334,16 @@ export default function App() {
     openMeal: (id: string, from: import("./screens/api").MealFrom) => { setLanding({ id, line: "", quiet: true, from }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
     openRecipePage: (id: string) => { setLanding({ id, line: "", quiet: true }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes"); },
     // DT131: a recipe onto a plate that has foods asks first; Add puts its foods next to yours, without the recipe's link
-    openOnPlate: (meal: Meal) => {
+    openOnPlate: (meal: Meal, opts?: { cook?: boolean }) => {
+      const cook = !!opts?.cook;
       if (state.items.length && state.fromRecipe !== meal.id && plateRecipeId !== meal.id) {
         const add = asDish(meal);
-        askPlate({ kind: "recipe", what: `${meal.title} from your recipes has ${add.length} ${add.length === 1 ? "food" : "foods"}.`, apply: (how) => (how === "new" ? openOnPlateNow(meal) : setState((s) => ({ ...s, items: [...s.items, ...asDish(meal)], portion: null }))) });
+        askPlate({ kind: "recipe", what: `${meal.title} from your recipes has ${add.length} ${add.length === 1 ? "food" : "foods"}.`, apply: (how) => (how === "new" ? openOnPlateNow(meal, cook) : setState((s) => ({ ...s, items: [...s.items, ...asDish(meal)], portion: null }))) });
         setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey"); return;
       }
-      openOnPlateNow(meal);
+      openOnPlateNow(meal, cook);
     },
+    cookNow, clearCookNow: () => setCookNow(false),
     // a name typed on the Plate (Milan, 11 October 2026): the recipe it came from and the slot it is for take it at once
     renamePlate: (title: string) => {
       const t = title.trim(); if (!t) return;

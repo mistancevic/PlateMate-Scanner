@@ -35,7 +35,7 @@ const PORT = "3306", U = `http://127.0.0.1:${PORT}`;
   await page.locator(".pick-sheet").getByRole("button", { name: /^Skyr breakfast/ }).click(); await page.waitForTimeout(500);
   const bf = page.locator(".plan-slot-wrap").first();
   await bf.getByText("Skyr breakfast").first().click(); await page.waitForTimeout(800);
-  await page.getByRole("button", { name: /^Make it$/ }).click(); await page.waitForTimeout(1000);
+  await page.getByRole("button", { name: /^(Make it|Change it first)$/ }).click(); await page.waitForTimeout(1000);
   const oats = page.getByLabel("Grams of Oats").first();
   await oats.fill("60"); await oats.press("Enter"); await page.waitForTimeout(500);
   await page.getByRole("button", { name: "Lock the recipe" }).click(); await page.waitForTimeout(800);

@@ -53,7 +53,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   // cook it on the Plate, count what it made: one more
   await nav("Recipes");
   await page.getByText("Sarma", { exact: true }).last().click(); await page.waitForTimeout(900);
-  await page.getByRole("button", { name: "Make it" }).first().click(); await page.waitForTimeout(900);
+  await page.getByRole("button", { name: "Change it first" }).first().click(); await page.waitForTimeout(900);
   const plateG = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.reduce((s, i) => s + i.grams, 0));
   ok(Math.abs(plateG - 1060 * planned / 8) <= 2, `the Plate holds the batch for ${planned}: ${Math.round(plateG)} g`);
   await page.getByRole("button", { name: /^Make it( as it is)?$|^Keep it as it is$|^Lock the recipe$/ }).first().click(); await page.waitForTimeout(900);

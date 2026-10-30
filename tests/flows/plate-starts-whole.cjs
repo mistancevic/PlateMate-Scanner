@@ -60,7 +60,7 @@ const U = "http://127.0.0.1:3229";
     // Make it from Recipes starts whole too
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(600);
     await page.locator(".recipe-tile").filter({ hasText: "Homemade apple fritters" }).click(); await page.waitForTimeout(800);
-    await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(1200);
+    await page.getByRole("button", { name: "Change it first", exact: true }).click(); await page.waitForTimeout(1200);
     c = await card();
     ok((await chipOn()).includes("The whole recipe") && /^The whole recipe/.test(c.title), "Make it from Recipes starts with the whole recipe too");
   } catch (e) { ok(false, "walkthrough error: " + e.message.split("\n").slice(0, 3).join(" / ")); }

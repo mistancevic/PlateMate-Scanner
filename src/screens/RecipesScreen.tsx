@@ -313,6 +313,7 @@ export function RecipesScreen(p: AppApi) {
           // DT149 (0.2.130): a meal of another day opens on the Plate as that meal: planning, or adding what you ate
           if (w && w !== "now" && sl) { setOpenId(null); p.fillOnPlate({ date: sl.date, slotId: sl.slotId, name: sl.name, time: sl.time, dayName: new Date(`${sl.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" }), mealId: m?.mealId ?? opened.id }, m?.items ? { id: m.mealId ?? opened.id, title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : opened, m?.title ?? opened.title); return; }
           setOpenId(null); p.openOnPlate(opened); }}
+        onCookIt={() => { setOpenId(null); setLanded(null); p.openOnPlate(opened, { cook: true }); }}
         makeAs={(() => { const w = slotWhen(), sl = cameFrom?.from.slot; if (!w || w === "now" || !sl) return null; const d = new Date(`${sl.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" });
           return w === "plan" ? { label: "Change it on the Plate", hint: `Planned for ${d}'s ${sl.name.toLowerCase()}. Change the foods or amounts for that day; the recipe stays as it is. Make it and I ate it come on ${d}, on Today.` }
             : { label: "Change it on the Plate", hint: `${d}'s ${sl.name.toLowerCase()} is gone by: change it to what you ate, and it is added at ${sl.time}. The recipe stays as it is.` }; })()} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}

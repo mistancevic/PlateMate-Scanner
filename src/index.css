@@ -2458,3 +2458,27 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
   body, main { background: #fff !important; }
   .card { break-inside: avoid; box-shadow: none !important; }
 }
+
+/* DT174 (0.3.16): cook mode, full screen over Make */
+.cook-mode { position: fixed; inset: 0; z-index: 85; overflow-y: auto; background: var(--base); padding: 14px 16px 28px; display: flex; flex-direction: column; gap: 12px; max-width: 560px; margin: 0 auto; }
+.cook-top { display: flex; align-items: center; gap: 8px; }
+.cook-title { flex: 1; text-align: center; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cook-count { font-weight: 800; color: var(--muted); }
+.cook-bar { display: flex; gap: 4px; } .cook-bar span { flex: 1; height: 5px; border-radius: 3px; background: var(--line); } .cook-bar span.on { background: var(--brand); }
+.cook-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-card); padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.cook-card small { line-height: 1.45; font-weight: 600; }
+.cook-ask b { font-size: 17px; }
+.cook-step { min-height: 250px; justify-content: center; }
+.cook-step > small, .cook-heard > small { font-weight: 800; color: var(--muted); letter-spacing: .04em; }
+.cook-text { font-size: 25px; line-height: 1.38; font-weight: 700; color: var(--ink); }
+.cook-timer-start { align-self: flex-start; margin-top: 8px; font-size: 16px; }
+.cook-buttons { display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 8px; } .cook-buttons .pill { height: 58px; font-size: 17px; }
+.cook-timers { display: flex; flex-wrap: wrap; gap: 8px; }
+.cook-timer { border-radius: var(--r-chip); padding: 6px 12px; font-weight: 800; background: var(--good-soft); color: var(--good-text); }
+.cook-timer.rang { background: var(--low-soft); color: var(--low-text); }
+.cook-listen { flex-direction: row; align-items: center; gap: 10px; padding: 10px 12px; } .cook-listen small { flex: 1; }
+.cook-dot { width: 12px; height: 12px; border-radius: 50%; background: var(--muted); flex: none; } .cook-dot.on { background: var(--good-text); }
+.cook-under { display: block; }
+.cook-done { text-align: center; align-items: center; padding: 28px 16px; } .cook-done div { font-size: 40px; } .cook-done b { font-size: 24px; }
+.cook-foods summary { font-weight: 800; cursor: pointer; } .cook-foods ul { margin: 6px 0 0; padding-left: 18px; line-height: 1.6; }
+.mk-cook { margin: 6px 0 12px; display: flex; flex-direction: column; gap: 6px; } .mk-cook .pill { height: 52px; font-size: 17px; }
