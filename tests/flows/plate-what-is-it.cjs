@@ -37,8 +37,10 @@ const U = "http://127.0.0.1:3239";
     // ---- Me: the taste as chips ----
     await page.getByRole("button", { name: "Menu" }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: /^Me\b/ }).first().click(); await page.waitForTimeout(700);
+    // Changed by DT167 (0.3.9, board Stories119): Taste moved from the bottom of Me into Lifestyle, under Nutrition; what it checks is unchanged
+    await page.locator(".me-rows .menu-row", { hasText: "Lifestyle" }).click(); await page.waitForTimeout(500);
     const card = page.locator(".taste-card");
-    ok(await card.getByRole("group", { name: "I like" }).getByRole("button", { name: "Vanilla" }).count() === 1 && await card.getByRole("group", { name: "I like" }).getByRole("button", { name: "Chocolate" }).count() === 1, "Me: I like has Vanilla and Chocolate");
+    ok(await card.getByRole("group", { name: "I like" }).getByRole("button", { name: "Vanilla" }).count() === 1 && await card.getByRole("group", { name: "I like" }).getByRole("button", { name: "Chocolate" }).count() === 1, "Lifestyle: I like has Vanilla and Chocolate");
     for (const [g, c] of [["I like", "Vanilla"], ["I like", "Chocolate"], ["I like", "Spicy"], ["Rather not", "Sour"], ["Rather not", "Spicy"], ["How I eat", "Quick to make"]]) { await card.getByRole("group", { name: g }).getByRole("button", { name: c }).click(); await page.waitForTimeout(150); }
     const chips = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")).tasteChips);
     ok(JSON.stringify(chips) === JSON.stringify({ like: ["Vanilla", "Chocolate"], not: ["Sour", "Spicy"], how: ["Quick to make"] }), "the chips are kept; Spicy rather not clears Spicy liked: " + JSON.stringify(chips));
