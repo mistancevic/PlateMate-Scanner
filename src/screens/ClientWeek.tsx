@@ -11,6 +11,7 @@ import { isoWeek, ymd } from "../plan";
 import { pdRange, pdVal } from "../ui";
 import { density } from "../pilot";
 import { trendOf, VERDICT_WORDS, avg7 } from "../weight";
+import { ProfileChanges, SharedProfileCard, newProfileChanges } from "./SummaryPanel";
 
 // The coach's week (0.2.6, canvas board CW, CW1 to CW4 and CW8, Milan 13 and 15 October 2026). Clients puts the clients
 // whose check-in is today first, each with the week as seven bars. A client opens on a page of their own: the week planned
@@ -67,7 +68,7 @@ export function clientLine(row: ClientRow, today: boolean) {
 export function ClientRowCard({ row, today, open }: { row: ClientRow; today: boolean; open: () => void }) {
   return (
     <button className={`card client-row cw-row ${today ? "cw-today" : ""}`} onClick={open}>
-      <div className="client-head"><span className="avatar">{row.name.slice(0, 1).toUpperCase()}</span><div><b>{first(row.name)}</b><small>{clientLine(row, today)}</small></div></div>
+      <div className="client-head"><span className="avatar">{row.name.slice(0, 1).toUpperCase()}</span><div><b>{first(row.name)}</b><small>{clientLine(row, today)}</small>{newProfileChanges(row) > 0 && <small className="profile-new">Profile: {newProfileChanges(row)} {newProfileChanges(row) === 1 ? "change" : "changes"} since you looked</small>}</div></div>
       {phaseDay(row) && row.measured ? (
         <div style={{ width: "100%" }}>
           <Squares m={row.measured} ends={false} />
@@ -130,6 +131,8 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tail }
       <section className="card person cw-person"><span className="avatar">{row.name.slice(0, 1).toUpperCase()}</span>
         <div><b>{name}</b><small>{[g ? goalLabel(g.id) : "No goal yet", kcalNow ? `${kcalNow.toLocaleString("en")} kcal` : null, proteinNow ? `${proteinNow} g protein` : null, wk ? `week ${wk}` : null].filter(Boolean).join(" · ")}</small><small>Check-in: {DAY_NAMES[row.checkinDay]}</small></div>
       </section>
+      {/* DT167 (0.3.9, board Stories119 version 2): the check-in starts with what changed in the shared profile */}
+      <ProfileChanges uid={row.uid} sp={row.profileShare} />
 
       <section className="card cw-week" aria-label={`${name}'s week`}>
         <div className="cw-week-nav"><button type="button" className="week-arrow" aria-label="Week before" onClick={() => setOffset(offset - 1)}>‹</button><b>Week {w.week}, {span}</b><button type="button" className="week-arrow" aria-label="Week after" disabled={offset >= 0} onClick={() => setOffset(offset + 1)}>›</button></div>
@@ -227,6 +230,7 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tail }
         </div>
         <button className="pill pill-primary pill-wide" disabled={!band} onClick={applyGoal}>Apply from {fromName}</button>
       </section>
+      <SharedProfileCard name={name} sp={row.profileShare} />
       {tail}
     </div>
   );

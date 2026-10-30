@@ -79,6 +79,7 @@ import type { Filling } from "./screens/api";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, withTarget, lifestyleOf, dayFor, type Personal, type DayType, type Day, type NextGoal } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
+import { SharePublisher } from "./screens/SummaryPanel";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, isIngredient, type Mix, type MixTip } from "./mixtip";
 import { ratesOf } from "./letters";
@@ -724,7 +725,7 @@ function GoalsEditor({
   );
 }
 // the pages that belong to Me (M4): the top bar says Me on them, Menu on the rest
-const ME_PAGES: MenuSection[] = ["me", "profile", "goal", "life", "week", "shop", "coach", "account"];
+const ME_PAGES: MenuSection[] = ["me", "profile", "goal", "life", "week", "shop", "coach", "summary", "account"];
 function MenuBack({ open, close, path }: { open: boolean; close: () => void; path?: string }) { useBack(open, close, path); return null; }
 // The app's own address and Back (canvas board C5): mounted only while the app itself shows, never on the home page
 function BackKeeper({ tab, setTab, onReady }: { tab: Tab; setTab: (t: Tab) => void; onReady: () => void }) {
@@ -2656,6 +2657,8 @@ export default function App() {
       <MenuBack open={talkOpen} close={() => setTalkOpen(false)} />
       <BackKeeper tab={tab} setTab={setTab} onReady={() => setBackReady(true)} />
       <Opened />
+      {/* DT167 (0.3.9): what the coach sees of the profile, kept up to date from this phone */}
+      {user && profile.coachId && <SharePublisher {...screenProps} />}
       <header className="topbar">
         <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setFilling(null); setTab("home"); }} aria-label={`${APP_NAME}, Today`}>
           <Mark size={28} color="var(--brand)" />

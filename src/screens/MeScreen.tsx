@@ -6,7 +6,7 @@ import { WeighInLine } from "../components/Weight";
 import { weighInsOff } from "../weight";
 import { bandOf, goalLabel } from "../goal";
 import type { ReactNode } from "react";
-import { ChevronRight, User, Target, CalendarDays, ShoppingBasket, Users, KeyRound } from "lucide-react";
+import { ChevronRight, User, Target, CalendarDays, ShoppingBasket, Users, KeyRound, ClipboardList } from "lucide-react";
 import type { MenuSection } from "./api";
 import { TASTE_CHIPS, toggleChip } from "../tasteChips";
 import { lifestyleOf, planOf } from "../personal";
@@ -23,6 +23,8 @@ const ME_ROWS: { id: MenuSection; name: string; icon: ReactNode; hint: (p: AppAp
   { id: "week", name: "Training week", icon: <CalendarDays size={18} />, hint: (p) => planHint(p) },
   { id: "shop", name: "Where I shop and cook", icon: <ShoppingBasket size={18} />, hint: () => "Your shops, the kitchens you cook, and what you cook with" },
   { id: "coach", name: "My coach", icon: <Users size={18} />, hint: (p) => (p.profile.coachId ? `${p.coachLabel} sees what you share` : "Join with a code") },
+  // DT167 (0.3.9, board Stories119): Your summary, where the steps end
+  { id: "summary", name: "Your summary", icon: <ClipboardList size={18} />, hint: (p) => (p.profile.coachId ? `Everything you told Chef Mealan, and what it does. Choose what ${p.coachLabel} sees.` : "Everything you told Chef Mealan, and what it does") },
   { id: "account", name: "Account", icon: <KeyRound size={18} />, hint: () => "Export my data, delete my account" },
 ];
 // the two speeds: Lifestyle changes when life does, the Training week when the activity does
@@ -68,9 +70,19 @@ export function MeScreen(p: AppApi) {
           </button>
         ))}
       </div>
+    </>
+  );
+}
+
+// DT167 (0.3.9, board Stories119; Coach Milan 09:53: "the taste block is sitting alone here"): Taste moved from the bottom of Me into
+// Lifestyle, under Nutrition, after What you eat, as it was
+export function TasteSetting(p: AppApi) {
+  const { state } = p;
+  return (
+    <>
       {/* R22 (0.2.50, board RS21): chips first, each one fixed meaning; your own words for what no chip says */}
-      <section className="card taste-card" aria-label="Taste is part of the plan">
-        <div className="card-top"><span>Taste is part of the plan</span></div>
+      <div className="setting taste-card" aria-label="Taste is part of the plan">
+        <small className="setting-name">Taste</small>
         <small>Tap what is true for you. Chef Mealan reads it with every idea, every answer about a plate and every set of steps. It never changes your numbers.</small>
         {([["like", "I like"], ["not", "Rather not"], ["how", "How I eat"]] as const).map(([g, title]) => (
           <div key={g} className="taste-group">
@@ -84,7 +96,7 @@ export function MeScreen(p: AppApi) {
         ))}
         <p className="label">In your own words</p>
         <textarea className="taste-words" aria-label="Your taste in your own words" placeholder="Anything the chips don't say" value={state.preferences} onChange={(e) => p.setState((s) => ({ ...s, preferences: e.target.value }))} />
-      </section>
+      </div>
     </>
   );
 }

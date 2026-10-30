@@ -6,6 +6,8 @@ import { slotsOf } from "./slots";
 import { isoWeek, ymd } from "./plan";
 import type { CoachNote } from "./coachNotes";
 import { measure, startOf, daysFromLines, addDays } from "./measured";
+import { summaryOf, sharedParts, sharedRows, nextShared, type SharedProfile } from "./summary";
+import type { Personal } from "./personal";
 
 const FLAG = "chefmealan-coach-demo";
 export function coachDemoOn(): boolean {
@@ -50,8 +52,14 @@ export function demoRows(): ClientRow[] {
   void dStart;
   const lDays = Object.fromEntries([1, 2, 3, 4, 5].map((k) => [addDays(lStart, k - 1), { kcal: 2600, full: k !== 3, logged: true }]));
   const lMeasured = { ...measure({ days: lDays, weighIns: [{ date: addDays(lStart, 4), kg: 64.2 }, { date: addDays(lStart, 5), kg: 64.1 }], today, start: lStart }), formulaKcal: 2450 };
+  // DT167 (0.3.9): Davorka shares her profile; two answers changed two days ago, after the coach's last look
+  const share = sharedParts(undefined);
+  const dP = (wake: "early" | "mid"): Personal => ({ sex: "female", birthYear: 1985, heightCm: 168, weightKg: 78, lifestyle: { weekdays: "work", hours: "fixed", slot: "8-4", move: "sitting", meals: 3, wake, bed: "mid", where: ["Cook at home", "Canteen at work"], diet: "Everything", alcohol: "On weekends" }, tasteChips: { like: ["Creamy", "Fresh herbs"], not: ["Fishy"], how: [] }, kitchens: ["Balkan"] });
+  const dIn = (wake: "early" | "mid") => ({ personal: dP(wake), safety: { situations: [], flags: [], allergies: [], none: true, declaredAt: since.toISOString() }, tasteWords: "", goal: { band: "fatloss", name: "Lose fat", setBy: "Milan", at: since.toISOString() }, avg: { kcal: 2200, protein: 180, fats: 61 }, days: [], protein: null, pdRef: 8.2, burn: 1500, home: "Germany", places: [] });
+  const sp0 = nextShared(null, sharedRows(summaryOf(dIn("mid")), share), share, since)!;
+  const profileShare: SharedProfile = nextShared(sp0, sharedRows(summaryOf(dIn("early")), share), share, new Date(now.getTime() - 2 * 864e5)) ?? sp0;
   return [
-    { ...base, uid: "demo-davorka", measured: dMeasured, name: "Davorka", goal: { band: "fatloss", setBy: "coach", coachName: "Milan", setAt: since.toISOString(), source: "coach" }, goalsNow: { calories: 2200, protein: 180 }, days, feedback: shared, notes, checkinDay: (now.getDay() + 6) % 7, weightKg: 78, weighIns },
+    { ...base, uid: "demo-davorka", measured: dMeasured, profileShare, name: "Davorka", goal: { band: "fatloss", setBy: "coach", coachName: "Milan", setAt: since.toISOString(), source: "coach" }, goalsNow: { calories: 2200, protein: 180 }, days, feedback: shared, notes, checkinDay: (now.getDay() + 6) % 7, weightKg: 78, weighIns },
     { ...base, uid: "demo-lena", measured: lMeasured, name: "Lena", goal: { band: "gainsteady", setBy: "you", setAt: new Date(now.getTime() - 5 * 864e5).toISOString(), source: "profile" }, goalsNow: { calories: 2700, protein: 150 }, days: {}, feedback: [], notes: [], checkinDay: 0, weightKg: 64, weighIns: [] },
   ];
 }

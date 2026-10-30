@@ -65,6 +65,8 @@ export type Personal = {
   units?: import("./units").Units;
   // from 0.2.18 (canvas board IM, IM10): what the person cooks with; none is oven, stovetop and microwave
   equipment?: string[];
+  // DT167 (0.3.9, board Stories119 version 2): what the coach sees of the summary, chosen once, part by part
+  coachShare?: import("./summary").CoachShare;
 };
 // What you cook with (0.2.18, board IM, IM10): oven, stovetop and microwave are on until the person says otherwise
 export const EQUIPMENT: [string, string][] = [["oven", "Oven"], ["stovetop", "Stovetop"], ["microwave", "Microwave"], ["airfryer", "Air fryer"], ["blender", "Blender"], ["thermomix", "Thermomix"], ["scale", "Kitchen scale"]];
