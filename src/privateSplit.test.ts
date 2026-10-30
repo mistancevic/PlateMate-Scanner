@@ -1,0 +1,56 @@
+// DT168 (0.3.10, board Stories120): the record in two parts; the coach's part holds only what the coach needs
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import { splitSave, mergeLoad, coachFieldsOf, onPreviewHost, PRIVATE_KEYS } from "./privateSplit";
+
+const save = { state: { goals: { calories: 2500, protein: 160 }, foods: [{ id: "f1" }], preferences: "no coriander" },
+  personal: { sex: "male", birthYear: 1981, heightCm: 182, weightKg: 85, bodyFatPct: 18, weighIns: [{ date: "2026-10-29", kg: 85 }], pdUnit: "pd", trainingAge: "3p" },
+  safety: { situations: ["diabetes"], allergies: ["peanuts"], flags: [{ situation: "diabetes", at: "2026-10-20T16:00:00Z", source: "door" }], declarations: [{ at: "x", situations: [], allergies: ["peanuts"] }], consentBy: "self" },
+  region: "de", goneFoods: ["f9"], goal: { band: "maintain" }, clientName: "Tester 1", days: {}, updatedAt: "2026-10-30T12:00:00Z" };
+
+test("DT168: private fields leave the main record; the coach's part holds only what the coach needs", () => {
+  const { priv, main, drop } = splitSave(save, false);
+  assert.deepEqual(Object.keys(priv!).sort(), [...PRIVATE_KEYS, "updatedAt"].sort());
+  assert.deepEqual(drop.sort(), [...PRIVATE_KEYS].sort());
+  for (const k of PRIVATE_KEYS) assert.ok(!(k in main), `${k} is not in the main record`);
+  const text = JSON.stringify(main);
+  for (const secret of ["peanuts", "heightCm", "bodyFatPct", "birthYear", "no coriander", "declarations", "\"sex\"", "foods\":[{"]) assert.ok(!text.includes(secret), `the main record doesn't carry ${secret}`);
+  assert.deepEqual((main.coachView as any).flags, [{ situation: "diabetes", at: "2026-10-20" }], "situations as which and when");
+  assert.deepEqual((main.coachView as any).goalsNow, { calories: 2500, protein: 160 });
+  assert.equal(main.clientName, "Tester 1"); assert.ok("goal" in main && "days" in main);
+});
+test("DT168: on the preview the old copy stays for the live app; nothing is dropped", () => {
+  const { priv, main, drop } = splitSave(save, true);
+  assert.ok(priv && drop.length === 0 && (main as any).safety && (main as any).personal);
+  assert.ok(onPreviewHost("preview---chefmealan-abc-ey.a.run.app") && !onPreviewHost("chefmealan.com"));
+});
+test("DT168: a save with no private field writes nothing private and drops nothing", () => {
+  const r = splitSave({ numbersReview: { status: "waiting" }, updatedAt: "t" }, false);
+  assert.equal(r.priv, null); assert.deepEqual(r.drop, []);
+});
+test("DT168: the load takes the private part over an old copy; a coach's later goal brings its numbers", () => {
+  const old = { state: { goals: { calories: 1 } }, safety: { allergies: [] }, goal: { band: "maintain" }, updatedAt: "2026-10-01" };
+  const priv = { state: { goals: { calories: 2500, protein: 160 }, foods: [] }, safety: { allergies: ["peanuts"] }, updatedAt: "2026-10-30T12:00:00Z" };
+  const m = mergeLoad(old, priv)!;
+  assert.deepEqual(m.safety.allergies, ["peanuts"]); assert.equal(m.state.goals.calories, 2500); assert.equal(m.updatedAt, "2026-10-30T12:00:00Z");
+  const coach = mergeLoad({ ...old, coachGoals: { calories: 2200, protein: 180 }, coachSetAt: "2026-10-31T09:00:00Z" }, priv)!;
+  assert.deepEqual(coach.state.goals, { calories: 2200, protein: 180 });
+  const before = mergeLoad({ ...old, coachGoals: { calories: 2200, protein: 180 }, coachSetAt: "2026-10-29T09:00:00Z" }, priv)!;
+  assert.equal(before.state.goals.calories, 2500, "a coach's goal older than the person's last save is already in it");
+  assert.equal(mergeLoad(null, null), null);
+  assert.equal(mergeLoad(old, null)!.state.goals.calories, 1, "an account not moved yet reads as before");
+});
+test("DT168: the coach's app reads coachView, and the old fields only for an account not moved yet", () => {
+  const { main } = splitSave(save, false);
+  const cf = coachFieldsOf(main);
+  assert.deepEqual([cf.goalsNow, cf.pdUnit, cf.weightKg, cf.consentBy], [{ calories: 2500, protein: 160 }, "pd", 85, "self"]);
+  assert.equal(coachFieldsOf({ personal: { weightKg: 70 }, safety: { flags: [] } }).weightKg, 70);
+});
+test("DT168: the rules: the private part is the person's only; a coach writes only coach fields", () => {
+  const r = fs.readFileSync(new URL("../firestore.rules", import.meta.url), "utf8");
+  assert.match(r, /match \/private\/\{pid\} \{\s*allow read, write: if request\.auth != null && request\.auth\.uid == uid;\s*\}/);
+  assert.match(r, /isCoachOf\(\) && roleKept\(\) && coachKept\(\) && coachFieldsOnly\(\)/);
+  const only = /hasOnly\(\[([^\]]+)\]\)/.exec(r)![1];
+  for (const k of ["safety", "personal", "region", "goneFoods", "adultAt"]) assert.ok(!only.includes(`'${k}'`), `a coach can't write ${k}`);
+});

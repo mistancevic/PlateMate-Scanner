@@ -2,7 +2,8 @@
 import { notesOf, checkinOf } from "./coachNotes";
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, reauthenticateWithPopup, type User } from "firebase/auth";
-import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, type Firestore } from "firebase/firestore";
+import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, deleteField, type Firestore } from "firebase/firestore";
+import { splitSave, mergeLoad, coachFieldsOf, onPreviewHost } from "./privateSplit";
 import { getStorage, ref as fileRef, uploadString, getBytes, deleteObject, listAll } from "firebase/storage";
 import { photoSigsOf, sig } from "./photos";
 
@@ -54,9 +55,13 @@ export const signOutCloud = () => signOut(auth());
 // One document per person: the pilot state plus goal and name, and who coaches them.
 // role is set by hand in the Firebase console ("coach"); nobody can sign up as a coach.
 export type CloudDoc = { region?: string | null; days?: unknown; measured?: unknown; coachNotes?: unknown; checkinDay?: number; coachGoal?: unknown; photosMovedAt?: string; photosOldGoneAt?: string; recordsMovedAt?: string; recordsOnly?: boolean; foodsCount?: number; state: unknown; goal: unknown; clientName: string; updatedAt: string; goneFoods?: string[]; personal?: unknown; safety?: unknown; aiConfirmedAt?: string; aiConfirmedBy?: string; goalLog?: unknown[]; formula?: import("./personal").Formula | null; role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string | null; coachPhoto?: string | null; joinedAt?: string | null; coachSetAt?: string };
+// DT168 (0.3.10): the record in two parts (src/privateSplit.ts); the private part only the person reads
+const privateRef = (uid: string) => doc(db(), "users", uid, "private", "main");
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const snap = await getDoc(doc(db(), "users", uid));
-  return snap.exists() ? (snap.data() as CloudDoc) : null;
+  let priv: Record<string, any> | null = null;
+  try { const p = await getDoc(privateRef(uid)); priv = p.exists() ? (p.data() as any) : null; } catch { /* not there yet */ }
+  return mergeLoad(snap.exists() ? (snap.data() as any) : null, priv) as CloudDoc | null;
 }
 // While an account is being deleted, this phone writes nothing to it: no save, no card, no photo file. An open app could
 // otherwise put its old copy back after the record is gone (7 October 2026). A paused write fails, so nothing counts as saved.
@@ -66,7 +71,14 @@ const notPaused = () => { if (paused) throw new Error("Saving is paused while yo
 export async function saveCloud(uid: string, data: CloudDoc) {
   notPaused();
   // merge, so fields the coach or the console own (role, coach link, coachSetAt) are never wiped by the client's save
-  await setDoc(doc(db(), "users", uid), data, { merge: true });
+  // DT168: the private fields go to the private part and leave the main record in the same write (kept there on the preview,
+  // where the live app still reads them until it is promoted)
+  const keepOld = typeof location !== "undefined" && onPreviewHost(location.host);
+  const { priv, main, drop } = splitSave(data as any, keepOld);
+  const b = writeBatch(db());
+  if (priv) b.set(privateRef(uid), priv, { merge: true });
+  b.set(doc(db(), "users", uid), { ...main, ...Object.fromEntries(drop.map((k) => [k, deleteField()])) }, { merge: true });
+  await b.commit();
 }
 // ---- coach and clients ----
 // A short code from the coach's uid; the coach publishes it once under coaches/{code}.
@@ -106,9 +118,9 @@ export async function listClients(coachUid: string): Promise<ClientRow[]> {
     try { feedback = await loadSharedCards(d.id); } catch { /* none shared or not allowed */ }
     let profileShare: import("./summary").SharedProfile | null = null;
     try { profileShare = await loadSharedProfile(d.id); } catch { /* none shared yet */ }
-    // the coach sees situation and date only, never the person's words
-    const flags = Array.isArray(x.safety?.flags) ? x.safety.flags.map((f: any) => ({ situation: String(f.situation), at: String(f.at ?? "").slice(0, 10) })) : [];
-    return { days: x.days && typeof x.days === "object" ? x.days : {}, notes: notesOf(x.coachNotes), checkinDay: checkinOf(x.checkinDay), nextGoal: x.personal?.nextGoal ?? null, coachGoal: x.coachGoal ?? null, goalsNow: x.state?.goals ?? null, uid: d.id, name: x.clientName || "unnamed", review: x.numbersReview ?? null, goal: x.goal ?? null, feedback, foods: typeof x.foodsCount === "number" ? x.foodsCount : x.state?.foods?.length ?? 0, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: x.personal?.pdUnit ?? "pd", flags, birthYear: x.personal?.birthYear ?? null, aiConfirmedAt: x.aiConfirmedAt ?? null, consentBy: x.safety?.consentBy ?? null, weightKg: x.personal?.weightKg, trainingAge: x.personal?.trainingAge, weighIns: Array.isArray(x.personal?.weighIns) ? x.personal.weighIns : [], profileShare, measured: x.measured && typeof x.measured === "object" ? x.measured : null };
+    // the coach sees situation and date only, never the person's words (coachView; DT168)
+    const cf = coachFieldsOf(x);
+    return { days: x.days && typeof x.days === "object" ? x.days : {}, notes: notesOf(x.coachNotes), checkinDay: checkinOf(x.checkinDay), nextGoal: cf.nextGoal as any, coachGoal: x.coachGoal ?? null, goalsNow: cf.goalsNow, uid: d.id, name: x.clientName || "unnamed", review: x.numbersReview ?? null, goal: x.goal ?? null, feedback, foods: cf.foods, updatedAt: x.updatedAt ?? "", goalLog: x.goalLog ?? [], formula: x.formula ?? null, pdUnit: cf.pdUnit, flags: cf.flags, birthYear: null, aiConfirmedAt: x.aiConfirmedAt ?? null, consentBy: cf.consentBy, weightKg: cf.weightKg, trainingAge: cf.trainingAge, weighIns: cf.weighIns, profileShare, measured: x.measured && typeof x.measured === "object" ? x.measured : null };
   }));
   return rows.sort((a, b) => (b.updatedAt > a.updatedAt ? 1 : -1));
 }
@@ -142,6 +154,8 @@ export async function saveOwnNotes(uid: string, notes: import("./coachNotes").Co
 export async function setClientGoal(clientUid: string, goal: any, goals: { calories: number; protein: number }, coachName: string) {
   await updateDoc(doc(db(), "users", clientUid), {
     goal: { ...goal, setBy: "coach", coachName, setAt: new Date().toISOString(), source: "coach" },
+    // DT168: the numbers go in coachGoals, the person's phone takes them; state.goals only while live apps still read it there
+    coachGoals: { calories: goals.calories, protein: goals.protein },
     "state.goals.calories": goals.calories, "state.goals.protein": goals.protein,
     coachSetAt: new Date().toISOString(),
     // a goal from today replaces one waiting for a later date (0.2.6)
@@ -235,7 +249,7 @@ export const isEmptyState = (st: any) => !st || ((st.foods?.length ?? 0) === 0 &
 // Each step reports; a step that fails stops the rest so nothing is half gone with the sign-in already removed.
 export async function deleteAccount(onStep?: (s: string) => void) {
   const u = auth().currentUser; if (!u) return;
-  for (const sub of ["photos", "cards", "inbox", "shared"]) {
+  for (const sub of ["photos", "cards", "inbox", "shared", "private"]) {
     onStep?.(`Removing ${sub}`);
     const snap = await getDocs(collection(db(), "users", u.uid, sub));
     let batch = writeBatch(db()), n = 0;
@@ -261,7 +275,7 @@ export async function clearClientAi(clientUid: string) { await updateDoc(doc(db(
 export async function exportAccount(uid: string) {
   const main = await loadCloud(uid);
   const read = async (sub: string) => (await getDocs(collection(db(), "users", uid, sub))).docs.map((d) => ({ id: d.id, ...d.data() }));
-  return { account: main, foods: await read("foods"), recipes: await read("recipes"), photos: await read("photos"), cards: await read("cards"), inbox: await read("inbox"), shared: await read("shared") };
+  return { account: main, foods: await read("foods"), recipes: await read("recipes"), photos: await read("photos"), cards: await read("cards"), inbox: await read("inbox"), shared: await read("shared"), private: await read("private") };
 }
 
 // ---- photos as files (storage release 1) ----

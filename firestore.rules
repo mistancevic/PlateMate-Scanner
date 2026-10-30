@@ -20,8 +20,16 @@ service cloud.firestore {
       allow delete: if isOwner();
       // the coach's answer on the person's own numbers: the person may ask (waiting) or close, never approve or ask themselves to change
       function reviewOk() { return request.resource.data.get('numbersReview', null) == (existing() ? resource.data.get('numbersReview', null) : null) || request.resource.data.numbersReview.status in ['waiting', 'closed']; }
-      allow update: if (isOwner() && roleKept() && coachLinkOk() && aiKept() && reviewOk()) || (isCoachOf() && roleKept() && coachKept());
+      // DT168 (0.3.10): a coach writes only the coach's fields; state only while coach apps from before 0.3.10 still write the
+      // goal's numbers there (the person's next save takes them out of the main record)
+      function coachFieldsOnly() { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['coachNotes', 'checkinDay', 'coachGoal', 'coachSetAt', 'coachGoals', 'goal', 'state', 'numbersReview', 'formula', 'aiConfirmedAt', 'aiConfirmedBy']); }
+      allow update: if (isOwner() && roleKept() && coachLinkOk() && aiKept() && reviewOk()) || (isCoachOf() && roleKept() && coachKept() && coachFieldsOnly());
       function coachOfParent() { return request.auth != null && get(/databases/$(database)/documents/users/$(uid)).data.get('coachId', '') == request.auth.uid; }
+      // DT168 (0.3.10): the private part (library and plates, body data, health answers, allergies, declarations, where you
+      // shop): the person only. The coach never reads it; our server reads it for the safety checks.
+      match /private/{pid} {
+        allow read, write: if request.auth != null && request.auth.uid == uid;
+      }
       // Photos: the owner reads and writes; the coach of that person reads.
       match /photos/{pid} {
         allow read: if request.auth != null && (request.auth.uid == uid || coachOfParent());

@@ -725,7 +725,7 @@ function CoachPanel(p: AppApi) {
         <b>What your coach never sees</b>
         <ul className="small">
           <li>Your photos and notes on cards you don't share, your library, your chats with Chef Mealan.</li>
-          <li>Your body data. Only the numbers it gives.</li>
+          <li>Your body data, health answers and allergies. Only the numbers they give, your weigh-ins as a trend, and which situation you ticked and when. They live in a part of your account only you can open.</li>
         </ul>
         <ConfirmButton className="link link-danger" label="Leave this coach" confirmLabel="Tap again to leave" onConfirm={leaveCoach} />
       </section>

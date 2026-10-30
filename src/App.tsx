@@ -52,6 +52,8 @@ import { recipeSig } from "./carry";
 import { bothPartOf, dishTaste, presetOf } from "./dishTaste";
 import { installBack, pushTab, startTab, tabOfPath, useBack, pathOfTab, MENU_PATH, menuTrailOf, recipeIdOfPath } from "./back";
 import { clearKept } from "./kept";
+// DT168: which account this phone's data belongs to
+const PHONE_OWNER = "chefmealan-phone-owner";
 import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
 import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted, realPhotosOf, isDrawn, recipePhotosOf, withRecipePhotos, recipeHasPhotos } from "./photos";
 import { needsCover, cardHasPhoto } from "./covers";
@@ -1146,6 +1148,13 @@ export default function App() {
     if (!user || cloudLoaded.current) return;
     let stale = false;
     (async () => {
+      // DT168 (0.3.10): the phone's data belongs to the account that put it there. Another account signing in on this phone
+      // starts from a cleared phone, so nothing of the last person is saved into theirs
+      try {
+        const owner = localStorage.getItem(PHONE_OWNER);
+        if (owner && owner !== user.uid) { localStorage.clear(); sessionStorage.clear(); await storeClear(); localStorage.setItem(PHONE_OWNER, user.uid); location.reload(); return; }
+        if (!owner) localStorage.setItem(PHONE_OWNER, user.uid);
+      } catch { /* no storage: nothing to carry over either */ }
       try {
         const remote = await withTimeout(loadCloud(user.uid), 20000);
         if (stale) return;
@@ -2504,7 +2513,13 @@ export default function App() {
     user, cloudEnabled, cloudStatus, profile,
     joinCoach: async (code: string) => { if (!user) return; try { const r = await joinCoach(user.uid, code); setProfile((p) => ({ ...p, ...r })); notify(`You're with ${r.coachName} now.`); } catch (e: any) { setError(e.message); } },
     leaveCoach: async () => { if (!user) return; try { await leaveCoach(user.uid); setProfile((p) => ({ ...p, coachId: undefined, coachName: undefined, coachEmail: undefined, coachPhoto: undefined, joinedAt: undefined })); } catch (e: any) { setError(e.message); } },
-    signOut: async () => { clearKept(); await signOutCloud(); cloudLoaded.current = false; },
+    // DT168 (0.3.10): sign-out clears the phone. What changed here is saved to the account first; then nothing of this person
+    // stays on the phone for the next one to sign in
+    signOut: async () => {
+      if (user && cloudLoaded.current) { try { await withTimeout(saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() }), 8000); } catch { /* signed out anyway; the account keeps its last save */ } }
+      clearKept(); try { localStorage.clear(); sessionStorage.clear(); await storeClear(); } catch { /* cleared what could be */ }
+      await signOutCloud(); cloudLoaded.current = false; location.reload();
+    },
     safety, ai,
     declareSafety: (patch, record = false) => { updateSafety((x) => { let next = { ...x, ...patch }; const now = new Date().toISOString(); for (const sid of next.situations) if (!x.situations.includes(sid)) next.flags = [...next.flags, { situation: sid, at: now, source: "door" as const }]; if (record) next = recordDeclaration(next, next.situations, next.allergies, new Date(), Boolean(next.none)); return next; }); },
     flagFromModel: (situation) => { updateSafety((x) => addFlag(x, situation, "model")); log("safety_flag", { situation, source: "model" }); },
