@@ -226,7 +226,7 @@ export interface AppApi {
   profile: { role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string; coachPhoto?: string; joinedAt?: string; coachSetAt?: string; formula?: import("../personal").Formula | null };
   joinCoach: (code: string) => Promise<void>;
   leaveCoach: () => Promise<void>;
-  signOut: () => Promise<void>;
+  signOut: (force?: boolean) => Promise<boolean>;
   deleteAccount: () => Promise<void>;
   // safety rules: the person's declarations, the AI switch, what the coach can confirm
   safety: import("../safety").Safety;

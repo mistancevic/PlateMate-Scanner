@@ -9,6 +9,7 @@ import { createServer as createViteServer } from "vite";
 import { GoogleGenAI } from "@google/genai";
 import { isFood, KEYS, numberInput } from "./src/pilot";
 import { aiState, underAge, ADULT_ONLY, EMPTY_SAFETY, FIXED, SITUATIONS, type Safety } from "./src/safety";
+import { mergeLoad } from "./src/privateSplit";
 const app = express();
 // Who is asking: a Firebase ID token from the signed-in app. On when the server knows its Firebase project.
 import { initializeApp as initAdmin, getApps as adminApps } from "firebase-admin/app";
@@ -48,7 +49,10 @@ async function membership(uid: string): Promise<Member> {
   const hit = members.get(uid);
   if (hit && Date.now() - hit.at < 60_000) return hit.m;
   const snap = await db().collection("users").doc(uid).get();
-  const x = snap.exists ? (snap.data() as any) : {};
+  // DT168 (0.3.10): health answers, allergies and the birth year live in the private part; an account not moved yet still has them here
+  const ps = await db().collection("users").doc(uid).collection("private").doc("main").get();
+  // the newer copy wins, as on the phone (src/privateSplit.ts mergeLoad)
+  const x: any = mergeLoad(snap.exists ? (snap.data() as any) : null, ps.exists ? (ps.data() as any) : null) ?? {};
   const role = x.role === "coach" ? "coach" : "client";
   const member = role === "coach" || Boolean(x.coachId);
   const safety: Safety = { ...EMPTY_SAFETY, ...(x.safety && typeof x.safety === "object" ? x.safety : {}), aiConfirmedAt: x.aiConfirmedAt ?? undefined, aiConfirmedBy: x.aiConfirmedBy ?? undefined };
@@ -798,12 +802,12 @@ app.get("/api/metrics", requireUser, async (req, res) => {
       const at = (day: string) => { const noon = new Date(`${day}T12:00:00Z`); const h = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Europe/Berlin", hour: "2-digit", hour12: false }).format(noon)); return new Date(Date.parse(`${day}T00:00:00Z`) - (h - 12) * 3_600_000); };
       asked = async (f, t) => (await db().collection("accessRequests").where("createdAt", ">=", at(f)).where("createdAt", "<", at(addDays(t, 1))).count().get()).data().count;
       joined = async (f, t) => (await db().collection("users").where("joinedAt", ">=", `${f}T00:00`).where("joinedAt", "<", `${addDays(t, 1)}T00:00`).count().get()).data().count;
-      const users = await db().collection("users").select("safety", "aiConfirmedAt").limit(1000).get();
+      const users = await db().collection("users").select("safety", "coachView", "aiConfirmedAt").limit(1000).get();
       flags = async (f, t) => {
         let total = 0, answered = 0;
         for (const u of users.docs) {
           const x = u.data() as any, conf = x.aiConfirmedAt ? Date.parse(x.aiConfirmedAt) : NaN;
-          for (const fl of (x.safety?.flags ?? []) as { at: string }[]) {
+          for (const fl of (x.coachView?.flags ?? x.safety?.flags ?? []) as { at: string }[]) {
             const day = berlinDay(new Date(fl.at)); if (day < f || day > t) continue;
             total++; const a = Date.parse(fl.at); if (conf >= a && conf - a <= 86_400_000) answered++;
           }
