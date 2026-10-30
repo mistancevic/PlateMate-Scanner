@@ -1,5 +1,6 @@
 import { eatsForReq, installEats, type Eats } from "./eats";
 import { TravelBanner } from "./components/Travel";
+import { KitchenScreen } from "./screens/KitchenScreen";
 import { endTravel, daysAway, sinceWords, placeName as travelPlace, kitchenName, type Travel } from "./travel";
 import { servingsOf } from "./pilot";
 import { wholeOnPlate } from "./counted";
@@ -2679,6 +2680,8 @@ export default function App() {
     } : null;
     return pagePath === "/recipes" ? <RecipesPage member={isMember} /> : <RecipePage slug={pagePath.split("/")[2]} member={tools} />;
   }
+  // DT177 (0.3.20, board Stories125): the kitchen screen, chefmealan.com/cook: no sign-in, a code joins it to a cooking phone
+  if (/^\/cook\/?$/.test(window.location.pathname)) return <KitchenScreen />;
   // /built, How Chef Mealan is built (board B): public, signed in or not
   if (/^\/built\/?$/.test(window.location.pathname)) return <BuiltScreen />;
   // BP70: a book's page, chefmealan.com/worthy-numbers: public, signed in or not

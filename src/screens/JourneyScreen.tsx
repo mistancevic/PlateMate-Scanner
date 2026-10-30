@@ -70,7 +70,7 @@ import { OriginalSteps, StepsHint } from "../components/StepsView";
 import { countOf as countedOf, gramsOfOne } from "../counted";
 import { CountAmount, SizePicker, isCounted } from "../components/CountAmount";
 import { cookName, cookPhrase, weighLine, aroundWord, needsCooking, rawHint, cookTitle } from "../cookWords";
-import { CookMode } from "../components/CookMode";
+import { PairedCookMode } from "../components/CookPair";
 import { stepPicOf } from "../photos";
 import { kitchenName } from "../travel";
 import { SayHave } from "../components/SayHave";
@@ -2049,7 +2049,7 @@ export function JourneyScreen(p: AppApi) {
             <small className="muted">One big step at a time, read aloud. Say next, back or repeat, or tap. Each step you finish is ticked here.</small>
           </div>
         )}
-        {cooking && madeSteps.length > 0 && <CookMode title={(state.title && state.title !== "DaaM" ? state.title : autoTitle(items))} steps={madeSteps} items={stepItems}
+        {cooking && madeSteps.length > 0 && <PairedCookMode notify={p.notify} title={(state.title && state.title !== "DaaM" ? state.title : autoTitle(items))} steps={madeSteps} items={stepItems}
           ticks={new Set(madeSteps.map((_, k) => k).filter((k) => ticks.has(`s${k}`)))}
           onTick={(k) => setTicks((tk) => { const n = new Set(tk); n.add(`s${k}`); return n; })} onClose={() => setCooking(false)}
           ask={p.ai.on ? async (question, at, history) => {
