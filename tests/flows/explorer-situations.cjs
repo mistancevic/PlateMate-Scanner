@@ -1,3 +1,4 @@
+// 0.3.33: A late evening after work (DT190) and A day off training (DT193) open from Situations.
 // 0.3.29: The gut, The liver, The brain (DT185 to DT187): all eight families have a page.
 // 0.3.28: Muscle and Bone (DT183, DT184), read at the month.
 // 0.3.27: Hormones' other four members, Hunger hormones, Cortisol, Testosterone, Oestrogen, each with Your case at its horizon.
@@ -155,6 +156,21 @@ const SHOTS = process.env.SHOTS;
   bp = await text(page.locator(".explorer"));
   ok(/The fat store/.test(await text(page.locator(".ex-h"))) && /Your case: this week/.test(bp) && /days by the plan/.test(bp), "The fat store: your case reads the week by the plan");
   if (process.env.SHOT) { await page.screenshot({ path: process.env.SHOT + "-fat.png", fullPage: true }); }
+  // 0.3.33: A day off training and A late evening after work open from the list
+  await parts.getByRole("radio", { name: "Situations" }).click(); await page.waitForTimeout(400);
+  const sstates = await page.locator(".ex-map .menu-row .ex-state").allTextContents();
+  ok(sstates.join(",") === "›,›,later,later,›,›", "Situations: sleep, late, rest and fat burning have pages: " + sstates.join(","));
+  await page.locator(".ex-map .menu-row").filter({ hasText: "A day off training" }).click(); await page.waitForTimeout(600);
+  let sp = await text(page.locator(".explorer"));
+  ok(/Building goes on from yesterday/.test(sp) && /Schoenfeld and Aragon 2018/.test(sp) && /Your case: today/.test(sp) && /Strength 1 day a week/.test(sp), "A day off training: the page, the case from the training week");
+  await page.getByRole("button", { name: "‹ Situations" }).click(); await page.waitForTimeout(300);
+  await page.locator(".ex-map .menu-row").filter({ hasText: "A late evening after work" }).click(); await page.waitForTimeout(600);
+  sp = await text(page.locator(".explorer"));
+  ok(/A late, heavy dinner and the night/.test(sp) && /Crispim et al\. 2011/.test(sp) && /Your case: today/.test(sp) && /Dinner later than usual on 2 evenings|Dinner at its usual time/.test(sp), "A late evening: the page, the case from this week's dinners");
+  ok(/No calendar read|Nothing in the calendar/.test(sp), "without a calendar the case says so");
+  const lt = await page.locator(".ex-tap").evaluateAll((xs) => xs.map((x) => Math.round(x.getBoundingClientRect().height)));
+  ok(lt.length >= 2 && lt.every((h) => h >= 44), "the taps 44 px or more: " + lt.join(","));
+  await page.getByRole("button", { name: "‹ Situations" }).click(); await page.waitForTimeout(300);
   // the situation Fat burning, and its links back into The body
   await parts.getByRole("radio", { name: "Situations" }).click(); await page.waitForTimeout(400);
   await page.locator(".ex-map .menu-row").filter({ hasText: "Fat burning" }).click(); await page.waitForTimeout(600);

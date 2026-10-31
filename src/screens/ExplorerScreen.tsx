@@ -25,7 +25,7 @@ import type { FoodRow } from "../foodTable";
 import { slotsOf } from "../slots";
 import { needOf } from "../planned";
 import { pdVal } from "../ui";
-import { ExplorerSearch, useExplorerIndex, BodyMap, BodyFamily, SituationsList, SleepPage, FatburnPage, PART_NAME } from "./ExplorerSituations";
+import { ExplorerSearch, useExplorerIndex, BodyMap, BodyFamily, SituationsList, SleepPage, FatburnPage, DaySituationPage, PART_NAME } from "./ExplorerSituations";
 import { SITUATIONS, type Part, type BodyId, type SituationId, type Hit } from "../explorerBody";
 
 const FALLBACK_MEAL = 30;
@@ -194,7 +194,7 @@ export function ExplorerScreen(p: AppApi) {
         {(["nutrients", "body", "situations"] as Part[]).map((x) => <button key={x} role="radio" aria-checked={part === x} className={`choice ${part === x ? "on" : ""}`} onClick={() => pick(x)}>{PART_NAME[x]}</button>)}
       </div>
       {part === "body" ? (body ? <BodyFamily p={p} id={body} member={member} setMember={setMember} back={() => { setBody(null); setMember(null); }} /> : <BodyMap open={setBody} />)
-        : part === "situations" ? (situation === "sleep" ? <SleepPage p={p} back={() => setSituation(null)} /> : situation === "fatburn" ? <FatburnPage p={p} back={() => setSituation(null)} /> : situation ? <BodyLaterSituation id={situation} back={() => setSituation(null)} /> : <SituationsList open={setSituation} />)
+        : part === "situations" ? (situation === "sleep" ? <SleepPage p={p} back={() => setSituation(null)} /> : situation === "fatburn" ? <FatburnPage p={p} back={() => setSituation(null)} /> : situation === "late" || situation === "rest" ? <DaySituationPage p={p} id={situation} back={() => setSituation(null)} /> : situation ? <BodyLaterSituation id={situation} back={() => setSituation(null)} /> : <SituationsList open={setSituation} />)
         : <>
       <CalcLine {...p} />
       {/* DT154, DT155: the families, Protein first */}

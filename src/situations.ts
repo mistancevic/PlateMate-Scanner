@@ -412,3 +412,61 @@ export function brainCase(x: HormoneIn, today = new Date()): Case {
     { k: "5", title: "The goal: the week", body: "Lunch every day; nothing after dinner; the ticks." },
   ], taps, trend: skipped >= 2 && late >= 2 ? `Your trend: ${skipped} skipped lunches, ${late} late snacks. Your goal needs the ticks. The gap is lunch, not the evening.` : null };
 }
+
+// ---- 0.3.33: A late evening after work (day, from the calendar's busy blocks) and A day off training (day, from the training week) ----
+import { blocksOn, clock } from "./busy";
+import { workHoursOf } from "./slots";
+export type LateIn = { personal: Personal; feedback: Feedback[]; planned: Planned; busy: { s: number; e: number }[] | null };
+export function lateCase(x: LateIn, today = new Date()): Case {
+  const l = lifestyleOf(x.personal), key = ymd(today), slots = slotsOn(l, x.personal.timesOn, key), usual = slotsOf(l);
+  const last = slots[slots.length - 1], usualLast = usual[usual.length - 1], snack = slots.find((s) => /snack/i.test(s.name));
+  const blocks = x.busy ? blocksOn(key, x.busy) : [];
+  const dinnerMin = last ? toMin(last.time) : 20 * 60;
+  const into = blocks.find((b) => b.to > dinnerMin - 30 && b.from < dinnerMin + 60) ?? null;
+  const lateBlock = into && into.to > dinnerMin ? into : null;
+  const held = x.planned[key]?.[last?.id ?? ""];
+  // this week: dinners eaten after the usual time plus 30 minutes, late snacks
+  const days6 = Array.from({ length: 6 }, (_, i) => plusDays(key, -(6 - i)));
+  const evenings = days6.map((d) => eveningOf(x.feedback, d));
+  const lateDinners = evenings.filter((e) => e.dinner && usualLast && toMin(e.dinner) >= toMin(usualLast.time) + 30).length;
+  const lateNights = evenings.filter((e) => e.late > 0).length;
+  const wh = workHoursOf(l); const work = wh ? `Work ${wh.from} to ${wh.to}` : "Work hours";
+  const to = lateBlock ? clock(Math.min(lateBlock.to + 15, 23 * 60 + 30)) : null;
+  const taps: Tap[] = [
+    snack ? { id: "snack", label: `A snack at ${snack.time} today`, where: "On Plan, this date only" } : { id: "snack", label: "A snack slot in the afternoon", where: "In Lifestyle, meals a day; then a planned snack on busy days" },
+    { id: "protein", label: "A quick dinner instead, 20 minutes", where: "Chef Mealan's ideas, sized to what is left" },
+    ...(to && last ? [{ id: "dinner" as const, label: `Dinner at ${to}, this date only`, where: `On Plan; Back to ${usualLast?.time ?? last.time} stays under it` }] : []),
+  ];
+  return { parts: [
+    { k: "1", title: "Before: your usual", body: `${usualLast ? `${usualLast.name} at ${usualLast.time}.` : ""} ${work} from Lifestyle${x.busy ? ", meetings from the calendar" : ""}.` },
+    { k: "2", title: "The path here: this week", body: `${lateDinners ? `Dinner later than usual on ${lateDinners} ${lateDinners === 1 ? "evening" : "evenings"}.` : "Dinner at its usual time this week."} ${lateNights ? `Something after 21:30 on ${lateNights} ${lateNights === 1 ? "evening" : "evenings"}.` : "Nothing after 21:30."}` },
+    { k: "3", title: "Now", body: `${lateBlock ? `Busy until ${clock(lateBlock.to)} today, from the calendar.` : x.busy ? "Nothing in the calendar runs into dinner today." : "No calendar read; Plan's busy times are off."} ${held ? `Dinner planned: ${held.title}.` : "Nothing planned for dinner yet."}` },
+    { k: "4", title: "The path on", body: "" },
+    { k: "5", title: "The goal: the day", body: "The day inside the range; bed at the usual time." },
+  ], taps, trend: lateDinners >= 2 ? `Your trend: dinner later than usual on ${lateDinners} of six evenings this week. Carried on, the week's nights get short. The gap closes with the ${snack ? snack.time : "afternoon"} snack on busy days.` : null };
+}
+export type RestIn = Omit<HormoneIn, "numbersFor"> & { numbersFor: GlucoseIn["numbersFor"] };
+export function restCase(x: RestIn, today = new Date()): Case {
+  const key = ymd(today), yKey = plusDays(key, -1), tKey = plusDays(key, 1);
+  const of = (d: string) => { const dt = new Date(`${d}T12:00:00`); return dayFor(x.personal, dt)?.day ?? getDay(x.personal, dt).plan ?? null; };
+  const y = of(yKey), tm = of(tKey), n = x.numbersFor(today);
+  const week = x.personal.plan ?? [], strengthDays = week.filter((d) => d && d.kind !== "rest" && KINDS_STRENGTH.test(d.kind)).length;
+  const l = lifestyleOf(x.personal), slots = slotsOn(l, x.personal.timesOn, key), held = x.planned[key] ?? {};
+  const plannedWords = slots.map((s) => `${held[s.id] ? held[s.id].title : "nothing"} at ${s.name.toLowerCase()}`).join(", ");
+  // protein on the 7-day average
+  const days = Array.from({ length: 7 }, (_, i) => plusDays(key, -(7 - i))); let total = 0, logged = 0;
+  for (const d of days) { const log = dayLog(x.feedback, new Date(`${d}T12:00:00`)); if (log.logged.length) { total += log.protein; logged++; } }
+  const avg = logged ? Math.round(total / logged) : null;
+  const taps: Tap[] = [
+    { id: "protein", label: "Protein at every meal today", where: "Ask Chef Mealan for the plates; your numbers unchanged" },
+    { id: "easy", label: "A 30 minute walk", where: "Where it fits your day" },
+    ...(tm && tm.kind !== "rest" ? [{ id: "dinner" as const, label: "Tomorrow's session: carbs before and after", where: "On Plan" }] : []),
+  ];
+  return { parts: [
+    { k: "1", title: "Before: your usual", body: `${strengthDays ? `Strength ${strengthDays} ${strengthDays === 1 ? "day" : "days"} a week.` : "No strength day in the week yet."} A rest day's numbers: ${n ? `${Math.round(n.kcal).toLocaleString("en")} kcal, carbs ${Math.round(n.carbs)} g` : "from your plan"}.` },
+    { k: "2", title: "The path here", body: `Yesterday: ${y && y.kind !== "rest" ? `${planLine({ ...y, when: undefined })}${y.intensity ? `, ${y.intensity}` : ""}` : "a rest day"}. ${avg !== null ? `Protein ${avg} g on the ${logged}-day average.` : "No plates ticked this week yet."}` },
+    { k: "3", title: "Now", body: `A rest day. Planned: ${plannedWords}. ${tm && tm.kind !== "rest" ? `Tomorrow: ${planLine({ ...tm, when: undefined })}.` : "Tomorrow: a rest day too."}` },
+    { k: "4", title: "The path on", body: "" },
+    { k: "5", title: "The goal: the day", body: "The rest day's numbers, protein in the range, the walk." },
+  ], taps, trend: null };
+}
