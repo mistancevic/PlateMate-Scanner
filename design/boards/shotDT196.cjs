@@ -42,9 +42,9 @@ const PORT = "3393", U = `http://127.0.0.1:${PORT}`;
 
   // b: new: two more paragraphs in section 4
   await section4();
-  await after4(P("<b>An account nobody uses.</b> When you have not opened Chef Mealan for 12 months, we send one email to the address you signed in with. If you do not open the app within a month after it, the account and everything in it is deleted, the way Delete my account does it. Open the app once and the clock starts again.")
-    + P("<b>Sign in again.</b> When you have not opened the app on a phone for 30 days, that phone asks you to sign in again before it shows anything. Nothing is lost: your data is in your account. If a different person signs in on that phone, the phone is cleared first."));
-  await note("New: two paragraphs in section 4. The numbers are the ones agreed on 30 October: 12 months and a month's notice; 30 days on a phone.");
+  await after4(P("<b>An account nobody uses.</b> When you have not opened Chef Mealan for 12 months, the account and everything in it is deleted, the way Delete my account does it. No email before it. Open the app once and the 12 months start again.")
+    + P("<b>Signed out after 30 days.</b> When a phone has not opened the app for 30 days, the app signs you out on that phone and clears it. Nothing is lost: your data is in your account, and it is back when you sign in."));
+  await note("New: two paragraphs in section 4. 12 months without opening the app, then deleted, no email (Milan 22:01). 30 days without opening the app on a phone, then signed out.");
   await shot("r196b");
 
   // c: new: the sign in again screen, drawn on the goal-screen shell
@@ -53,36 +53,13 @@ const PORT = "3393", U = `http://127.0.0.1:${PORT}`;
     const main = document.querySelector("main") || document.body;
     for (const c of main.children) c.style.display = "none";
     main.insertAdjacentHTML("beforeend", `<div class="goal-screen" style="${mark}">
-      <div class="hero"><h2>Welcome back, Lena</h2><p>It has been more than 30 days since this phone opened Chef Mealan. Sign in again, so we know it is you.</p></div>
-      <section class="card"><b>Nothing is lost</b><p class="small">Your foods, plates, recipes and plan are in your account. They are back the moment you sign in.</p>
-        <button class="pill pill-primary" style="min-height:44px;width:100%;margin-top:8px">Sign in with Google</button></section>
-      <section class="card"><b>Not your phone?</b><p class="small">If someone else signs in here, this phone is cleared first, and nothing of yours is shown to them.</p></section>
+      <div class="hero"><h2>Signed out</h2><p>This phone did not open Chef Mealan for 30 days, so the app signed you out. Your data is in your account.</p></div>
+      <section class="card"><button class="pill pill-primary" style="min-height:44px;width:100%">Sign in with Google</button></section>
     </div>`);
     window.scrollTo(0, 0);
   }, { mark });
-  await page.evaluate(({ NOTE }) => { const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New: the phone asks once, before anything shows. The sign-in is the same Google sign-in as on day one. The app notes the day it was last opened, on the phone, and checks it at start."; document.querySelector(".goal-screen").before(d); }, { NOTE });
+  await page.evaluate(({ NOTE }) => { const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New: the app signs out on that phone, the way Sign out does since 0.3.10: it saves what is not saved, clears the phone, shows the usual sign-in with one line on why. The day the app was last opened is kept on the phone and checked at start."; document.querySelector(".goal-screen").before(d); }, { NOTE });
   await shot("r196c");
-
-  // d: new: the email after 12 months, drawn as it would read
-  await page.goto(U + "/privacy"); await page.waitForTimeout(800);
-  await page.evaluate(({ mark }) => {
-    const main = document.querySelector("main") || document.body;
-    for (const c of main.children) c.style.display = "none";
-    main.insertAdjacentHTML("beforeend", `<div class="goal-screen"><section class="card" style="${mark}">
-      <small style="display:block;color:var(--muted)">From: Chef Mealan &lt;hello@chefmealan.com&gt;</small>
-      <small style="display:block;color:var(--muted)">To: lena@…</small>
-      <b style="display:block;margin-top:8px">Your Chef Mealan account</b>
-      <p style="line-height:1.5">Hi Lena,</p>
-      <p style="line-height:1.5">You have not opened Chef Mealan since 5 November 2025. We do not keep accounts nobody uses.</p>
-      <p style="line-height:1.5">Open the app once before 5 December 2026 and your account stays, with everything in it.</p>
-      <p style="line-height:1.5">If you do nothing, your account and all its data are deleted on 5 December 2026. This is the same as Delete my account in the app: profile, foods, plates, photos, recipes, the sign-in.</p>
-      <p style="line-height:1.5">Want it gone now? Open the app, Menu, Account, Delete my account.</p>
-      <p style="line-height:1.5">Coach Milan<br>chefmealan.com</p>
-    </section></div>`);
-    window.scrollTo(0, 0);
-  }, { mark });
-  await page.evaluate(({ NOTE }) => { const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = "New: the one email, sent once, a month before. Plain words, the two dates, no link to tap (a link in an email about deleting an account looks like phishing). No second email. The deletion itself is the server's Delete my account."; document.querySelector(".goal-screen").before(d); }, { NOTE });
-  await shot("r196d");
 
   await b.close(); server.kill();
 })();

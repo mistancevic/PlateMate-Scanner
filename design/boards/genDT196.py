@@ -87,22 +87,18 @@ class Component extends DCLogic {{
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
 cy = storyCard(B, y, "DT196", "The privacy leftovers: what is left on the tracker", [
-  ("Coach Milan, 31 October 21:41", "The tracker (claude.ai/artifact/BsHzpZSNwMWhtRWFjmpB3Y) has every high and medium finding fixed and live. Five small ones are open. All five in one release."),
-  ("f15, an account nobody uses", "12 months without opening the app: one email to the sign-in address. A month later, if the app was still not opened, the account is deleted the way Delete my account does it. Agreed 30 October 13:24. Once a day the server looks at the last sign-in Google keeps for each account; no new field on the person."),
-  ("The email needs a sender", "The server sends no email today. To decide: an address on chefmealan.com through Google Workspace (an app password in deploy.env), or a mail service with a free tier (Resend). Drawn: Google Workspace. One email, no link to tap."),
-  ("f16, a phone that changed hands", "30 days without opening the app on a phone: that phone asks for the sign-in again before it shows anything. Agreed 30 October 13:24. The day it was last opened is kept on the phone. A different person signing in clears the phone first, as since 0.3.10."),
+  ("Coach Milan, 31 October 21:41 to 22:01", "The tracker (claude.ai/artifact/BsHzpZSNwMWhtRWFjmpB3Y) has every high and medium finding fixed and live. Five small ones are open. All five in one release. No email: the notice says it, that is enough."),
+  ("f15, an account nobody uses", "12 months without opening the app: the account is deleted the way Delete my account does it. No email before it; who does not use it is not interested (Milan 22:01). Once a day the server reads the last sign-in Google keeps for each account; no new field on the person. The notice says it in section 4."),
+  ("Why 12 and not 6", "A person who stops over the winter and comes back in spring still has their foods and recipes. 12 keeps that. If you want 6, it is one number."),
+  ("f16, a phone that changed hands", "30 days without opening the app on a phone: the app signs out on that phone, the way Sign out does since 0.3.10: saves what is not saved, clears the phone. The usual sign-in screen follows, with one line on why. The day the app was last opened is kept on the phone and checked at start."),
   ("Silent fixes, nothing to see", "f03: state comes off the coach's write list in the rules (the coach apps that needed it are gone). f10: the public recipe pages stop serving the coach's send-back note, the rating and the internal ids. f13: the server logs drop the food name and the account id; a coach's view of an unshared plate photo is no longer cached by the browser."),
-  ("The notice", "Section 4, How long, gets two paragraphs: the 12 months and the 30 days, in the words on the screen to the right."),
-  ("Not in this board", "f17, sharing to the members' catalogue only when switched on: parked for review with more testers. A second email. A countdown in the app."),
+  ("Not in this board", "An email before the deletion. A countdown in the app. f17, sharing to the members' catalogue only when switched on: parked for review with more testers."),
 ])
 h = rowEnd(cy,
   B.screen("DT196a", 0, y, "Now: section 4, while your account exists", "r196a", "now", "Nothing about an account nobody uses, nothing about a phone."),
-  B.screen("DT196b", 1, y, "New: two paragraphs in section 4", "r196b", "changed", "12 months and a month's notice; 30 days on a phone."),
-  B.screen("DT196c", 2, y, "New: sign in again after 30 days", "r196c", "changed", "Before anything shows. Nothing is lost."))
-y = h
-h = rowEnd(
-  B.screen("DT196d", 0, y, "New: the one email, a month before", "r196d", "changed", "The two dates, no link to tap."))
+  B.screen("DT196b", 1, y, "New: two paragraphs in section 4", "r196b", "changed", "12 months, then deleted, no email. 30 days on a phone, then signed out."),
+  B.screen("DT196c", 2, y, "New: signed out after 30 days", "r196c", "changed", "The usual sign-in, one line on why."))
 y = h
 board("Stories145.dc.html", "DT196. The privacy leftovers",
-  "31 October 2026 (Coach Milan 21:41: privacy first, redraw). Now: 0.3.36, untouched. Drawn for your approval; nothing built. The silent fixes f03, f10 and f13 have no screen.",
+  "31 October 2026 (Coach Milan 21:41 privacy first, redraw; 22:01 no email, sign out after 30 days). Version 2. Now: 0.3.36, untouched. Drawn for your approval; nothing built. The silent fixes f03, f10 and f13 have no screen.",
   B, W, y - 100, "Stories144.dc.html")
