@@ -111,5 +111,5 @@ y = h
 h = rowEnd(B.screen("DT188j", 0, y, "New: the roles, and Admin for the superadmin", "r188j", "changed", "Four roles; the kitchen screen is a session."))
 y = h
 board("Stories137.dc.html", "DT188. Roles and navigation",
-  "31 October 2026 (Coach Milan 12:56 to 13:00, 15:52 Draw, 16:08 the bar and the title). Now: 0.3.29, untouched. Drawn for your approval; nothing built.",
+  "31 October 2026 (Coach Milan 12:56 to 13:00, 15:52 Draw, 16:08 the bar and the title, 16:19 the name and the icons). Now: 0.3.29, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories136.dc.html")
