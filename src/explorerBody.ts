@@ -10,12 +10,12 @@ export type BodyFamily = { id: BodyId; name: string; hint: string; horizon: "mea
 // the eight families (DT182, Stories131): the pages come one or two per version; until then each row says later
 export const BODY_FAMILIES: BodyFamily[] = [
   { id: "muscle", name: "Muscle", hint: "Built by protein and strength training; the sink for carbs after a session.", horizon: "month", state: "later" },
-  { id: "fat", name: "The fat store", hint: "The fat you carry, against the fat you eat. Burned, used over the day, stored; ketones.", horizon: "day", state: "later" },
-  { id: "glycogen", name: "Glycogen", hint: "The carb store, muscle and liver, about a day's worth. Only what was used gets refilled.", horizon: "day", state: "later" },
+  { id: "fat", name: "The fat store", hint: "The fat you carry, against the fat you eat. Burned, used over the day, stored; ketones.", horizon: "day", state: "page" },
+  { id: "glycogen", name: "Glycogen", hint: "The carb store, muscle and liver, about a day's worth. Only what was used gets refilled.", horizon: "day", state: "page" },
   { id: "bone", name: "Bone", hint: "Calcium and vitamin D from Micros, strength training, oestrogen for everyone.", horizon: "month", state: "later" },
   { id: "gut", name: "The gut", hint: "Starts in the mouth. Digestion, the microbiome, fibre and variety, the fullness messengers.", horizon: "day", state: "later" },
   { id: "liver", name: "The liver", hint: "Makes glucose and ketones, clears alcohol, holds the small glycogen store.", horizon: "day", state: "later" },
-  { id: "hormones", name: "Hormones", hint: "The messengers: glucose and insulin, hunger, cortisol, testosterone, oestrogen.", horizon: "day", state: "later" },
+  { id: "hormones", name: "Hormones", hint: "The messengers: glucose and insulin, hunger, cortisol, testosterone, oestrogen.", horizon: "day", state: "page" },
   { id: "brain", name: "The brain", hint: "Dopamine, serotonin, adrenaline, endorphins: wanting, mood, stress, the feeling after a session.", horizon: "day", state: "later" },
 ];
 
@@ -27,7 +27,7 @@ export const SITUATIONS: Situation[] = [
   { id: "party", name: "A party or a dinner out", hint: "Later", horizon: "day", state: "later" },
   { id: "away", name: "A day away, no kitchen", hint: "Later", horizon: "day", state: "later" },
   { id: "rest", name: "A day off training", hint: "Later", horizon: "day", state: "later" },
-  { id: "fatburn", name: "Fat burning: what is true when", hint: "Later", horizon: "week", state: "later" },
+  { id: "fatburn", name: "Fat burning: what is true when", hint: "A walk before breakfast, a hard session, a low-carb day: each claim placed. Your week against the goal.", horizon: "week", state: "page" },
 ];
 
 export type Line = { title: string; text: string; src?: string };
@@ -83,6 +83,12 @@ export function buildIndex(extra: { nutrients: { family: string; name: string; m
   }
   for (const b of BODY_FAMILIES) out.push({ part: "body", kind: "family", title: b.name, hint: b.state === "page" ? b.hint : `${b.hint} Its page comes later.`, go: { part: "body", body: b.id } });
   for (const s of SITUATIONS) out.push({ part: "situations", kind: "situation", title: s.name, hint: s.state === "page" ? s.hint : "Its page comes later.", go: { part: "situations", situation: s.id } });
+  for (const pg of Object.values(BODY_PAGES)) {
+    out.push({ part: "body", kind: "page", title: pg.name, hint: pg.intro.slice(0, 90) + "…", go: { part: "body", body: pg.family, member: pg.key } });
+    for (const s of pg.sections) for (const l of s.lines) out.push({ part: "body", kind: "line", title: l.title, hint: `${pg.name}: ${l.text.slice(0, 90)}${l.text.length > 90 ? "…" : ""}`, go: { part: "body", body: pg.family, member: pg.key } });
+    for (const w of pg.when) out.push({ part: "body", kind: "line", title: w.when, hint: `${pg.name}, ${w.verdict.toLowerCase()}: ${w.what}`, go: { part: "body", body: pg.family, member: pg.key } });
+  }
+  for (const m of HORMONE_MEMBERS) if (!m.page) out.push({ part: "body", kind: "member", title: m.name, hint: `${m.hint} Its page comes later.`, go: { part: "body", body: "hormones" } });
   for (const pg of Object.values(SITUATION_PAGES)) {
     if (!pg) continue;
     for (const l of [...pg.effects, ...pg.causes, pg.loop]) out.push({ part: "situations", kind: "line", title: l.title, hint: `${pg.name}: ${l.text.slice(0, 90)}${l.text.length > 90 ? "…" : ""}`, go: { part: "situations", situation: pg.id } });
@@ -97,3 +103,124 @@ export function searchIndex(index: Hit[], q: string): Hit[] {
   const score = (h: Hit) => { const t = norm(h.title), s = norm(h.hint); let n = 0; for (const w of words) { if (t.includes(w)) n += 3; else if (s.includes(w)) n += 1; else return 0; } return n + (t.startsWith(words[0]) ? 2 : 0); };
   return index.map((h) => ({ h, n: score(h) })).filter((x) => x.n > 0).sort((a, b) => b.n - a.n).slice(0, 12).map((x) => x.h);
 }
+
+// ---- The body: the first pages (0.3.26; DT181 Stories130, DT182 Stories131). The papers, read on 31 October 2026 (PubMed):
+// Ludwig 2002, JAMA 287:2414, doi 10.1001/jama.287.18.2414 (the glycaemic index, a review)
+// Atkinson, Foster-Powell and Brand-Miller 2008, Diabetes Care 31:2281 (the GI tables, already on the Carbs page)
+// Richter and Hargreaves 2013, Physiol Rev 93:993, doi 10.1152/physrev.00038.2012 (contracting muscle takes up glucose; training raises GLUT4)
+// Spiegel, Leproult and Van Cauter 1999, Lancet 354:1435, doi 10.1016/S0140-6736(99)01376-8 (6 nights of 4 h: glucose tolerance lower, evening cortisol up)
+// Jensen, Rustad, Kolnes and Lai 2011, Front Physiol 2:112, doi 10.3389/fphys.2011.00112 (glycogen about 500 g in muscle, about 100 g in the liver; refilled after exercise)
+// Nilsson and Hultman 1973, Scand J Clin Lab Invest 32:325, doi 10.3109/00365517309084355 (liver glycogen falls with starvation and a carb-poor diet, refilled by carbs)
+// Burke, Hawley, Wong and Jeukendrup 2011, J Sports Sci 29 Suppl 1:S17, doi 10.1080/02640414.2011.585473 (carbohydrate availability, refuelling between sessions)
+// Venables, Achten and Jeukendrup 2005, J Appl Physiol 98:160, doi 10.1152/japplphysiol.00662.2003 (300 people: fat oxidation peaks at about 48 % of VO2max, about 62 % of max heart rate)
+// Hall et al. 2012, Am J Clin Nutr 95:989, doi 10.3945/ajcn.112.036350 (energy balance and its components, a consensus statement)
+// Hellerstein 1999, Eur J Clin Nutr 53 Suppl 1:S53, doi 10.1038/sj.ejcn.1600744 (carbs become fat in the liver only when carb energy exceeds total energy expenditure)
+// Cahill 2006, Annu Rev Nutr 26:1, doi 10.1146/annurev.nutr.26.061505.111258 (fuel metabolism in starvation: ketones feed the brain)
+// Schoenfeld et al. 2014, J Int Soc Sports Nutr 11:54, doi 10.1186/s12970-014-0054-7 (20 women, 4 weeks: fasted and fed cardio lost the same fat)
+export type BodyPage = { key: string; family: BodyId; name: string; horizon: string; intro: string; sections: { title: string; lines: Line[] }[]; when: WhenRow[]; line: string; chips: string[]; sources: string };
+export const BODY_PAGES: Record<string, BodyPage> = {
+  glucose: {
+    key: "glucose", family: "hormones", name: "Glucose and insulin", horizon: "meal",
+    intro: "After a meal, glucose rises in the blood and insulin carries it into muscle and fat. Both rise and fall again. That is the curve, and anyone with a sensor can watch it. Read at the meal. What food, training and sleep do to it, for anyone. Never a test, a condition or a treatment: for any of those, your doctor.",
+    sections: [
+      { title: "What it does", lines: [
+        { title: "After a meal, glucose rises, insulin answers", text: "Carbs raise it most, protein some, fat and fibre little. In two to three hours both are back where they were. A high curve now and then is normal; a plate that keeps the curve low and long is the one that keeps you full.", src: "Ludwig 2002, JAMA, the glycaemic index review" },
+        { title: "How fast depends on the food, not only how much", text: "White bread and a baked potato raise glucose fast (GI about 70 and above); lentils and most fruit slowly (GI under 55). The Carbs page has the table.", src: "Atkinson, Foster-Powell and Brand-Miller 2008, Diabetes Care, International Tables of GI" },
+        { title: "Protein and fibre in the same meal slow the rise", text: "The same carbs with protein and fibre on the plate give a lower, longer curve. That is the plate the app builds anyway: protein first, fibre with it.", src: "Ludwig 2002, JAMA" },
+      ] },
+      { title: "What moves it", lines: [
+        { title: "Training", text: "Working muscle takes up glucose during a session and for hours after, with little insulin needed, and training raises the muscle's capacity for it. The meal after training is the one where carbs land best.", src: "Richter and Hargreaves 2013, Physiological Reviews" },
+        { title: "Short nights", text: "Six nights of four hours in bed lowered glucose tolerance in healthy young men: the same meal, a higher curve. One short night moves it the same way for that day.", src: "Spiegel, Leproult and Van Cauter 1999, The Lancet" },
+        { title: "Meal size", text: "A big meal is a big curve; the same food in two meals is two smaller curves. The eating window from Lifestyle is where this is set.", src: "Ludwig 2002, JAMA" },
+        { title: "Glucose and glycogen", text: "Glucose is what moves in the blood, held in a narrow range. Glycogen is the store, in muscle and liver, about a day's worth. A meal fills the liver; work empties the muscle; only what was used gets refilled. Its own page is under The body." },
+      ] },
+    ],
+    when: [
+      { verdict: "Helps", when: "Morning, before work", what: "Carbs with protein and fibre: a slow curve, steady until lunch." },
+      { verdict: "Helps", when: "Before and after training", what: "The one place where fast carbs land best: the muscle takes them up with little insulin." },
+      { verdict: "Helps", when: "A hard day for the body", what: "A hard session, a long walk, a day on your feet: muscle glycogen is used, and a carb dinner refills it. The carbs in your day's range, not a heavy meal; no big meal within an hour of bed." },
+      { verdict: "Watch", when: "A hard day for the head", what: "Nothing to refill: the brain runs on the liver's small store, and any meal tops that up. A carb dinner is fine and may help you fall asleep, but it counts like any other carbs in the day." },
+      { verdict: "Hurts", when: "A quiet day, a late evening", what: "No work for the carbs to do. The curve lands as a late snack, and a second one follows the first." },
+      { verdict: "Watch", when: "After a short night", what: "The curve is higher for the same food that day. Protein first, carbs with it." },
+    ],
+    line: "This page explains the curve after a meal, in anyone. It does not read your numbers, does not say what a number means for you, and does not name a condition. If you have been told to watch your glucose, your doctor's plan comes first; Chef Mealan follows the numbers you give it.",
+    chips: ["Why am I sleepy after lunch?", "Which carbs before training?", "Is fruit sugar different?"],
+    sources: "Ludwig 2002, JAMA 287:2414; Atkinson, Foster-Powell and Brand-Miller 2008, Diabetes Care 31:2281; Richter and Hargreaves 2013, Physiol Rev 93:993; Spiegel, Leproult and Van Cauter 1999, Lancet 354:1435. Educational, approximate, not medical advice.",
+  },
+  glycogen: {
+    key: "glycogen", family: "glycogen", name: "Glycogen", horizon: "day",
+    intro: "Glucose is what moves in the blood, held in a narrow range all day. Glycogen is the store: about 500 g in muscle, about 100 g in the liver, a day's worth. Read at the day. What food, training and sleep do to it, for anyone. Never a test, a condition or a treatment: for any of those, your doctor.",
+    sections: [
+      { title: "What it does", lines: [
+        { title: "Two stores, two jobs", text: "The liver's store keeps blood glucose steady between meals and overnight; any meal refills it. Muscle's store is for the muscle only: it is used when muscle works, and refilled by carbs after. Muscle holds about 500 g, the liver about 100 g.", src: "Jensen, Rustad, Kolnes and Lai 2011, Frontiers in Physiology" },
+        { title: "Overnight and on a carb-poor day", text: "The liver's store runs down over a night and a day without carbs, and carbs refill it. That is why the first meal after a short night matters most on the Glucose page.", src: "Nilsson and Hultman 1973, Scandinavian Journal of Clinical and Laboratory Investigation" },
+        { title: "Only what was used gets refilled", text: "A hard session or a long day on your feet empties muscle glycogen; the next carbs put it back, fastest in the hours after. A full store takes nothing more: what is over goes to the day's total.", src: "Burke, Hawley, Wong and Jeukendrup 2011, Journal of Sports Sciences; Jensen et al. 2011" },
+      ] },
+    ],
+    when: [
+      { verdict: "Helps", when: "The meal after a hard session", what: "The store is open; carbs land there first. The biggest carb meal of a training day goes here." },
+      { verdict: "Helps", when: "The evening after a day on your feet", what: "Muscle was used; a carb dinner refills it. The carbs in your day's range, not a heavy meal." },
+      { verdict: "Watch", when: "A hard day for the head", what: "Nothing to refill in the muscle; the liver's store is topped up by any meal. Carbs count like any others that day." },
+      { verdict: "Watch", when: "Two rest days in a row", what: "The store is full. Carbs are still fine inside the range; they just have no special job." },
+    ],
+    line: "What the store does in anyone. No test, no condition, no supplement. What is refilled is glycogen, never glucose, and only what was used; a heavy meal helps nothing.",
+    chips: ["How much do I eat after training?", "Are carbs at night bad?", "What is a rest day's dinner?"],
+    sources: "Jensen, Rustad, Kolnes and Lai 2011, Front Physiol 2:112; Nilsson and Hultman 1973, Scand J Clin Lab Invest 32:325; Burke, Hawley, Wong and Jeukendrup 2011, J Sports Sci 29 Suppl 1:S17. Educational, approximate, not medical advice.",
+  },
+  fat: {
+    key: "fat", family: "fat", name: "The fat store", horizon: "day",
+    intro: "The fat you eat is fuel and building material. The fat you carry is the store. They are not the same thing, and the one does not become the other by itself. Read at the day. What food, training and sleep do to it, for anyone. Never a test, a condition or a treatment: for any of those, your doctor.",
+    sections: [
+      { title: "Five words, and what each one means", lines: [
+        { title: "In circulation", text: "Fatty acids in the blood are fuel on its way, from the last meal or from the store. Highest a few hours after a meal and during easy work.", src: "Hall et al. 2012, American Journal of Clinical Nutrition, energy balance" },
+        { title: "Burned, or oxidised", text: "Muscle burns fat all the time: most in easy work, at about 48 % of your top effort or about 62 % of your top heart rate in 300 people, least in a hard session, where carbs take over. A session burns less fat than the day around it.", src: "Venables, Achten and Jeukendrup 2005, Journal of Applied Physiology" },
+        { title: "Used over the day", text: "The honest number. What the store gave up is the day's total out against the day's total in, not what one session did.", src: "Hall et al. 2012, American Journal of Clinical Nutrition" },
+        { title: "Stored", text: "What is over the day's total goes to the store, from carbs, fat or protein alike. Fat gets there with the least work; carbs are turned into fat only when carb energy is more than the whole day burns.", src: "Hellerstein 1999, European Journal of Clinical Nutrition" },
+        { title: "Ketones", text: "The liver makes them when carbs are low for a day or more; the brain can run on them. Normal in a fast or a low-carb day. Not a sign of fat loss by itself.", src: "Cahill 2006, Annual Review of Nutrition" },
+      ] },
+    ],
+    when: [
+      { verdict: "Helps", when: "Easy work: a walk, a slow ride", what: "The most fat burned per minute, and it adds up over hours. The reason steps are in your day." },
+      { verdict: "Watch", when: "A hard session", what: "Carbs do the work; fat is burned later, in the hours after. The session still counts, through the day's total." },
+      { verdict: "Watch", when: "The hours after a big meal", what: "Storage for a few hours is normal; it is what a meal is for. The day decides, not the meal." },
+      { verdict: "Hurts", when: "Counting what a session burned", what: "The number on a watch is the session, not the day. The day's range on Goal is the number that moves the store." },
+    ],
+    line: "What the store does in anyone. No body fat reading, no target, no fat burner, no ketone strip. Your weigh-ins and the trend on Goal are the app's view of this, and only you choose to share them.",
+    chips: ["Does my walk burn fat?", "Is a low-carb day better?", "Why is the scale flat this week?"],
+    sources: "Hall et al. 2012, Am J Clin Nutr 95:989; Venables, Achten and Jeukendrup 2005, J Appl Physiol 98:160; Hellerstein 1999, Eur J Clin Nutr 53 Suppl 1:S53; Cahill 2006, Annu Rev Nutr 26:1. Educational, approximate, not medical advice.",
+  },
+};
+// the Hormones family: its members, the first with a page
+export const HORMONE_MEMBERS: { key: string; name: string; hint: string; page?: string }[] = [
+  { key: "glucose", name: "Glucose and insulin", hint: "The curve after a meal, and the hormone that answers it. Read per meal.", page: "glucose" },
+  { key: "hunger", name: "Hunger hormones", hint: "Leptin says full, ghrelin says hungry. Read per day." },
+  { key: "cortisol", name: "Cortisol", hint: "The morning hormone. Read per day." },
+  { key: "testosterone", name: "Testosterone", hint: "Muscle, drive and recovery, in everyone. Read per month." },
+  { key: "oestrogen", name: "Oestrogen", hint: "Bone, where fat sits, recovery, in everyone. Read per month." },
+];
+// the second situation page (DT182): fat burning, what is true when
+export const FATBURN_PAGE: SituationPage = {
+  id: "fatburn", name: "Fat burning: what is true when",
+  intro: "A week situation. The claims people repeat, each one true in one situation and not in another. The body pages explain the words; this page says when. Food, training and the day's total only. Never a condition: for anything about your health, your doctor.",
+  effects: [
+    { title: "A walk before breakfast", text: "More fat is burned during the walk than after a meal; that is true. Over four weeks, women who trained fasted and women who ate first lost the same fat on the same diet. Do it if you like it, not for the number.", src: "Schoenfeld et al. 2014, Journal of the International Society of Sports Nutrition" },
+    { title: "A long easy walk or ride", text: "The most fat burned per minute, for hours. The steps in your day are this.", src: "Venables, Achten and Jeukendrup 2005, Journal of Applied Physiology" },
+    { title: "A hard session", text: "Carbs do the work during it; fat is burned in the hours after. The session counts through the day's total and the muscle it builds.", src: "Venables, Achten and Jeukendrup 2005" },
+  ],
+  causes: [
+    { title: "The hours after a big meal", text: "Storage for a few hours is what a meal is for. Nothing is lost; the day decides.", src: "Hall et al. 2012, American Journal of Clinical Nutrition" },
+    { title: "A low-carb day", text: "Ketones appear after a day or more. Normal, and not fat loss by itself: the day's total still decides.", src: "Cahill 2006, Annual Review of Nutrition" },
+    { title: "A cut that is too deep", text: "Below the range on Goal, the body saves energy and drops muscle with the fat. Lose fat, faster, is the lowest the app goes." },
+  ],
+  loop: { title: "The honest number", text: "What the store gave up this week is the week's total out against the week's total in. Your weigh-ins, on the 7-day average, are the app's view of it." },
+  when: [
+    { verdict: "Helps", when: "A walk after lunch, most days", what: "Easy work that adds up. On Plan as a row, like a meal." },
+    { verdict: "Helps", when: "Protein at every meal, the strength days kept", what: "The fat goes, the muscle stays." },
+    { verdict: "Watch", when: "The scale, day to day", what: "Water moves a kilo in a day. The 7-day average on Goal is the line to read." },
+    { verdict: "Hurts", when: "A harder cut when the week was flat", what: "The range on Goal is the guard. A flat week is a week to look at the record, not the range." },
+  ],
+  line: "No body fat reading, no target below your range, no fat burner, no ketone strip. The weigh-ins and the trend on Goal are the app's view, shared only by your choice.",
+  chips: ["Does my walk burn fat?", "Is a low-carb day better?", "Why is the scale flat this week?"],
+  sources: "Schoenfeld et al. 2014, J Int Soc Sports Nutr 11:54; Venables, Achten and Jeukendrup 2005, J Appl Physiol 98:160; Hall et al. 2012, Am J Clin Nutr 95:989; Cahill 2006, Annu Rev Nutr 26:1. Educational, approximate, not medical advice.",
+};
+SITUATION_PAGES.fatburn = FATBURN_PAGE;
