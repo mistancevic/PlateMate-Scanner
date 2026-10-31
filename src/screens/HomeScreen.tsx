@@ -10,7 +10,7 @@ import { planLine, schoolLine, studyLine, loadOf, LOAD_DAY, weekdaysOf, dayKindO
 import { DayEditor } from "../components/DayEditor";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { X } from "lucide-react";
-import { unreadNote, REASONS, suggestTitle } from "../coachNotes";
+import { unreadNote, REASONS, suggestTitle, waitingWords, cardWhen } from "../coachNotes";
 import { needOf } from "../planned";
 import { withTimeOn } from "../slots";
 import type { AppApi, Filling } from "./api";
@@ -211,8 +211,9 @@ export function HomeScreen(p: AppApi) {
         {/* 0.2.57 (board DS6, I, Milan 10:21 to 10:46): no day part. The day header has the date; Maintain › opens Goal; one set
             of numbers every day has nothing to say here. Where training and rest days differ, the kind of day stays, without the date. */}
       </section>
-      {p.profile.role === "coach" && p.newShared > 0 && (
-        <button className="strip strip-button" onClick={() => setTab("clients")}>{p.newShared} new {p.newShared === 1 ? "card" : "cards"} shared with you. Open Clients.</button>
+      {/* DT189 (0.3.31): the strip in words instead of a number on an icon; it opens Clients on the list */}
+      {p.isCoach && p.waiting.length > 0 && (
+        <button className="strip strip-button" onClick={() => { p.setCoachView("clients"); setTab("clients"); }}>{waitingWords(p.waiting)}</button>
       )}
       {/* the coach's note, once (0.2.6, canvas board CW, CW5): Got it keeps it in My coach; Change the numbers opens Goal */}
       {(() => {
@@ -220,11 +221,12 @@ export function HomeScreen(p: AppApi) {
         if (!n) return null;
         const who = n.name ? `Coach ${n.name}` : p.coachLabel;
         const at = new Date(n.at);
-        if (n.suggest) return <SuggestCard key={n.at} p={p} n={n} who={who} />;
+        if (n.suggest && (n.suggest.kind === "snack" || n.suggest.kind === "page")) return <SuggestCard key={n.at} p={p} n={n} who={who} />;
+        const answer = n.suggest?.kind === "answer" ? n.suggest.card : null;
         return (
           <section className="coach-note coach-week-note" aria-label={`A note from ${who}`}>
             <small>{who}, {at.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}, {at.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</small>
-            <b>{n.verdict === "change" ? `${who} asks you to change your numbers` : "Your week: approved ✓"}</b>
+            <b>{answer ? `On your ${answer.title}, ${cardWhen(answer.at)}` : n.verdict === "change" ? `${who} asks you to change your numbers` : "Your week: approved ✓"}</b>
             {n.text && <span className="coach-note-text">{n.text}</span>}
             <div className="button-row">
               {n.verdict === "change"

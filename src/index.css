@@ -2585,3 +2585,16 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .cv-suggest select.search { min-height: 44px; }
 .suggest-reasons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
 .suggest-reasons .choice { min-height: 44px; }
+
+/* DT189 (0.3.31): Waiting for you, the answer under a shared card */
+.waiting { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.waiting .menu-row { min-height: 44px; }
+.card-answer { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 6px; }
+.ca-given { display: flex; flex-direction: column; gap: 2px; }
+.ca-given .coach-note-text { font-weight: 600; }
+.ca-title { font-size: 14px; }
+.ca-form { display: flex; flex-direction: column; gap: 8px; }
+.ca-form textarea.search { min-height: 44px; font: inherit; resize: vertical; }
+.ca-row { display: flex; gap: 8px; flex-wrap: wrap; }
+.ca-row .pill { min-height: 44px; }
+.ca-again { min-height: 44px; align-self: flex-start; }
