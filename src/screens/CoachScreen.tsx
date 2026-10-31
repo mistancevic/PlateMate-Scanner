@@ -74,7 +74,7 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
     },
   };
   if (open) return (
-    <ClientPage row={open} coachName={coachName} ops={ops} back={() => setOpenId(null)} notify={notify} setError={setError}
+    <ClientPage row={open} coachName={coachName} ops={ops} back={() => setOpenId(null)} notify={notify} setError={setError} waitingCount={p.waiting.length}
       tail={<ClientTail row={open} onSaved={refresh} setError={setError} notify={notify} confirmAi={p.confirmClientAi} sendNote={(notes) => ops.sendNote(open, notes)} coachName={coachName} focusCard={p.focusCard} onAnswered={() => p.recountWaiting()}
         cook={cooks.has(open.uid)} setCook={(on) => setCook(open.uid, on).then(() => notify(on ? `${open.name.split(" ")[0]} is a cook: they can send you recipes to publish.` : `${open.name.split(" ")[0]} is no longer a cook.`)).catch((e) => setError(e.message))} />} />
   );
