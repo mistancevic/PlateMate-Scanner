@@ -136,7 +136,7 @@ const personal = (w) => ({ sex: "male", birthYear: 1981, heightCm: 182, weightKg
       localStorage.setItem("chefmealan-personal", JSON.stringify({ sex: "male", birthYear: 1981, heightCm: 182, weightKg: 95, plan: Array(7).fill({ work: true, kind: "rest" }), lifestyle: { meals: 3 } }));
       localStorage.setItem("seeded", "1"); }, seed);
     await require(path.join(ROOT, "tests/flows/adult.cjs"))(page);
-    await go(page, "/today?coachdemo"); await page.getByRole("button", { name: /^Clients$/ }).first().click(); await page.waitForTimeout(900);
+    await go(page, "/today?coachdemo"); await page.getByRole("radio", { name: "My clients" }).click(); await page.waitForTimeout(900);
     const lena = page.locator(".cw-row").filter({ hasText: "Lena" });
     const lt = await lena.textContent();
     ok(/first two weeks, day 6 of 14/.test(lt) && /4 full days · 2 weigh-ins · ready 23 Oct/.test(lt) && await lena.locator(".ft-sq").count() === 14 && await lena.locator(".cw-bar").count() === 0, "FT6: Lena in her first two weeks: squares, not bars");
