@@ -472,3 +472,56 @@ export const BRAIN_PAGE: BodyPage = {
 };
 BODY_PAGES.gut = GUT_PAGE; BODY_PAGES.liver = LIVER_PAGE; BODY_PAGES.brain = BRAIN_PAGE;
 for (const b of BODY_FAMILIES) if (b.id === "gut" || b.id === "liver" || b.id === "brain") b.state = "page";
+
+// ---- 0.3.33 (DT190 A late evening after work, Stories139; DT193 A day off training, Stories142; Milan 31 October 19:41 Go for the batch).
+// The papers were read on PubMed earlier today (Crispim 2011, Afaghi 2007, Weigle 2005, Schoenfeld and Aragon 2018, Jensen 2011); no new paper on these two pages.
+export const LATE_PAGE: SituationPage = {
+  id: "late", name: "A late evening after work",
+  intro: "A day situation. Work ran late, dinner is late, and the evening is short. What a late dinner does, what the afternoon before it did, and your case from the calendar and the plan. Never a condition: with evenings that stay late every week, the week is the question, on Plan.",
+  effects: [
+    { title: "A late, heavy dinner and the night", text: "Eating close to bedtime goes with poorer sleep in healthy people; a carb meal four hours before bed brought sleep on faster in one study. So: a late dinner is fine, a heavy late dinner is not, and no carbs at night is not the answer.", src: "Crispim et al. 2011, Journal of Clinical Sleep Medicine; Afaghi, O'Connor and Chow 2007, American Journal of Clinical Nutrition" },
+    { title: "The same numbers", text: "Today's target is today's target. A dinner at 21:30 counts the same as at 20:00; what changes is sleep, not the sum." },
+    { title: "The calendar already asks", text: "A busy block that runs into dinner shows on Plan with Move it, a quick dinner, Cook ahead the day before, or Keep it. This page reads the same block." },
+  ],
+  causes: [
+    { title: "The long afternoon", text: "No food from lunch to 21:00 is the hunger that makes the late dinner big. A planned snack at 16:00 is the lever; the dinner then comes to its usual size.", src: "Weigle et al. 2005, American Journal of Clinical Nutrition, on protein and fullness" },
+    { title: "Dinner skipped, then the fridge at 23:00", text: "The loop from the sleep page: a late snack, a short night, more hunger the next day." },
+  ],
+  loop: { title: "A loop", text: "One late evening is a day. Two or three a week push every night later; the week's meal times are then the question, and Plan has them." },
+  when: [
+    { verdict: "Helps", when: "A planned snack at 16:00", what: "Protein and fibre; the dinner stays its usual size." },
+    { verdict: "Helps", when: "A quick dinner, 20 minutes", what: "Chef Mealan's quick ideas, sized to what is left of the day." },
+    { verdict: "Helps", when: "Cooked ahead the day before", what: "Warm it up; Plan already offers it when the calendar says busy." },
+    { verdict: "Watch", when: "Dinner after 21:30", what: "Fine as a meal, lighter than usual, done an hour before bed." },
+    { verdict: "Hurts", when: "Skipping dinner, then the fridge at 23:00", what: "The loop from the sleep page: a late snack, a short night, more hunger." },
+  ],
+  line: "A late evening is a day situation, never a condition. Nothing here reads your work hours beyond what Lifestyle and your calendar say.",
+  chips: ["What can I cook in 20 minutes?", "Is it bad to eat at 22:00?", "What do I take to work tomorrow?"],
+  sources: "Crispim et al. 2011, J Clin Sleep Med 7:659; Afaghi, O'Connor and Chow 2007, Am J Clin Nutr 85:426; Weigle et al. 2005, Am J Clin Nutr 82:41. Educational, approximate, not medical advice.",
+};
+export const REST_PAGE: SituationPage = {
+  id: "rest", name: "A day off training",
+  intro: "A day situation. A rest day: the carbs have no job, the protein still has one, and the hunger is not what the numbers say. What a rest day is for, and your case from the training week. The numbers already move with a rest day; this page explains why and changes nothing.",
+  effects: [
+    { title: "Building goes on from yesterday", text: "Muscle protein building runs for about a day after a session, so the rest day's protein is the session's protein. Protein stays; carbs can come down.", src: "Schoenfeld and Aragon 2018, Journal of the International Society of Sports Nutrition; the Muscle page" },
+    { title: "The carbs' job is gone", text: "No session, no muscle glycogen to refill. Carbs inside the range, with no special job; the liver's store is refilled by the first meal, as every day.", src: "Jensen et al. 2011, Journal of Biomedicine and Biotechnology; the Glycogen page" },
+    { title: "A walk is not training", text: "Easy movement on a rest day keeps the habit and the steps; it does not need the carbs a session does." },
+  ],
+  causes: [
+    { title: "Hunger does not know it is a rest day", text: "Appetite follows the days before, not the day itself; a rest day after a hard week is hungry. Protein and fibre on every plate, as always.", src: "Weigle et al. 2005, American Journal of Clinical Nutrition; the Hunger hormones page" },
+    { title: "A rest day eaten like a training day", text: "The bigger carb meal with no session to use it. The day's numbers already say less; the plate follows them." },
+  ],
+  loop: { title: "Tomorrow", text: "The next session's carbs go before and after it, not into the rest day. Plan reads the training week for that." },
+  when: [
+    { verdict: "Helps", when: "Protein at every meal", what: "Yesterday's session is still building." },
+    { verdict: "Helps", when: "A walk", what: "The habit and the steps, without a session's carbs." },
+    { verdict: "Watch", when: "Carbs", what: "Inside the range, the lower end; the day's numbers already move with a rest day." },
+    { verdict: "Watch", when: "Hunger after a hard week", what: "Real, and the plan's. Fibre and volume; nothing after dinner." },
+    { verdict: "Hurts", when: "A rest day eaten like a training day", what: "The bigger carb meal with no session to use it." },
+  ],
+  line: "A rest day is a day situation. The numbers already move with the training week; this page explains why, it does not change them.",
+  chips: ["Do I eat less on a rest day?", "Do I lose muscle on a rest day?", "Should I walk?"],
+  sources: "Schoenfeld and Aragon 2018, J Int Soc Sports Nutr 15:10; Jensen et al. 2011, J Biomed Biotechnol 2011:960363; Weigle et al. 2005, Am J Clin Nutr 82:41. Educational, approximate, not medical advice.",
+};
+SITUATION_PAGES.late = LATE_PAGE; SITUATION_PAGES.rest = REST_PAGE;
+for (const s of SITUATIONS) { if (s.id === "late") { s.state = "page"; s.hint = "Work ran late, dinner is late. What a late dinner does, and your case from the calendar."; } if (s.id === "rest") { s.state = "page"; s.hint = "The carbs have no job, the protein still has one. Your case from the training week."; } }

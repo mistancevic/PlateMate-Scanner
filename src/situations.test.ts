@@ -267,3 +267,28 @@ test("0.3.31: the waiting list: a shared card until answered or opened, a reply,
   assert.equal(unread2([reaction]), null);
   assert.equal(unread2([answer])?.at, answer.at);
 });
+
+// 0.3.33 (DT190, DT193): A late evening after work, A day off training
+import { lateCase, restCase } from "./situations";
+import { LATE_PAGE, REST_PAGE } from "./explorerBody";
+test("0.3.33: the two situation pages exist; the late case reads the calendar's block into dinner; the rest case reads the training week", () => {
+  assert.equal(SITUATION_PAGES.late, LATE_PAGE); assert.equal(SITUATION_PAGES.rest, REST_PAGE);
+  assert.ok(SITUATIONS.find((s) => s.id === "late")!.state === "page" && SITUATIONS.find((s) => s.id === "rest")!.state === "page");
+  assert.ok(!/save room|absorbs|hungry choice/.test(JSON.stringify([LATE_PAGE, REST_PAGE])), "plain words");
+  const fb = [eaten("2026-10-30", "20:50", "Bowl", "dinner"), eaten("2026-10-31", "21:10", "Bowl", "dinner"), eaten("2026-11-01", "20:00", "Bowl", "dinner")];
+  // a block from 18:00 to 21:00 on Monday 2 November (busy list in milliseconds, as calendarSync keeps it)
+  const s = new Date("2026-11-02T18:00:00").getTime(), e = new Date("2026-11-02T21:00:00").getTime();
+  const c = lateCase({ personal, feedback: fb, planned: {}, busy: [{ s, e }] }, monday);
+  assert.match(c.parts[1].body, /Dinner later than usual on 2 evenings/);
+  assert.match(c.parts[2].body, /Busy until 21:00 today, from the calendar/);
+  assert.ok(c.taps.some((t) => /Dinner at 21:15, this date only/.test(t.label)) && c.taps.some((t) => /quick dinner/.test(t.label)));
+  assert.match(c.trend ?? "", /dinner later than usual on 2 of six evenings/);
+  const none = lateCase({ personal, feedback: [], planned: {}, busy: null }, monday);
+  assert.match(none.parts[2].body, /No calendar read/);
+  assert.equal(none.trend, null);
+  const r = restCase({ personal, feedback: [], planned: {}, band: "maintain", numbersFor: () => ({ kcal: 2350, protein: 150, fats: 80, carbs: 240 }), pdRef: null }, new Date("2026-11-03T08:00:00"));
+  assert.match(r.parts[0].body, /Strength 1 day a week. A rest day's numbers: 2,350 kcal, carbs 240 g/);
+  assert.match(r.parts[1].body, /Yesterday: .*hard/);
+  assert.match(r.parts[2].body, /A rest day\. Planned: nothing at breakfast/);
+  assert.ok(r.taps.some((t) => t.id === "easy") && r.taps.some((t) => t.id === "protein"));
+});

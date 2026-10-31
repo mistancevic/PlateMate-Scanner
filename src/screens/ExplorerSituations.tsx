@@ -7,10 +7,13 @@
 import { useEffect, useMemo, useState } from "react";
 import type { AppApi } from "./api";
 import { BODY_FAMILIES, SITUATIONS, SITUATION_PAGES, BODY_PAGES, HORMONE_MEMBERS, buildIndex, searchIndex, type Part, type BodyId, type SituationId, type Hit, type Line, type WhenRow, type BodyPage as BodyPageData } from "../explorerBody";
-import { sleepCase, noteOpen, easyDay, glucoseCase, glycogenCase, fatCase, hormoneCase, muscleCase, boneCase, gutCase, liverCase, brainCase, type Case, type Tap } from "../situations";
+import { sleepCase, noteOpen, easyDay, glucoseCase, glycogenCase, fatCase, hormoneCase, muscleCase, boneCase, gutCase, liverCase, brainCase, lateCase, restCase, type Case, type Tap } from "../situations";
+import { useBusy } from "../calendarSync";
 import { setChefContext } from "../chefContext";
 import { dayFor, getDay } from "../personal";
 import { showPlanOn } from "./PlanScreen";
+import { slotsOf, withTimeOn } from "../slots";
+import { lifestyleOf } from "../personal";
 import { EXPLORER_FOODS } from "../explorer";
 import { FAT_FOODS, FAT_MEMBERS } from "../explorerFats";
 import { CARB_FOODS, CARB_MEMBERS } from "../explorerCarbs";
@@ -87,7 +90,9 @@ function TapList({ p, taps, kind }: { p: AppApi; taps: Tap[]; kind: string }) {
   const today = new Date();
   const run = (t: Tap) => {
     if (t.where.startsWith("Nothing to change") || t.where.startsWith("It already")) { p.notify("Nothing to change here."); return; }
-    if (t.id === "protein") p.openOut({ q: kind === "fat" ? "Protein at every meal this week, with my strength days kept: what does each meal look like on my numbers?" : `${t.label}: what do I put on the plate, on my numbers?` });
+    if (t.id === "protein") p.openOut({ q: kind === "fat" ? "Protein at every meal this week, with my strength days kept: what does each meal look like on my numbers?" : /quick dinner/i.test(t.label) ? "A quick dinner tonight, 20 minutes, sized to what is left of my day on my numbers. What do I cook?" : `${t.label}: what do I put on the plate, on my numbers?` });
+    else if (t.id === "dinner" && /^Dinner at (\d\d:\d\d), this date only/.test(t.label)) { const to = t.label.match(/(\d\d:\d\d)/)![1]; const slots = slotsOf(lifestyleOf(p.personal)); const last = slots[slots.length - 1]; if (last) { p.setPersonal({ ...p.personal, timesOn: withTimeOn(p.personal.timesOn, today.toISOString().slice(0, 10), last.id, to, last.time) }); p.notify(`${last.name} is at ${to} today. Back to ${last.time} is under it on Plan.`); } }
+    else if (t.id === "snack" && /^A snack at (\d\d:\d\d) today/.test(t.label)) { showPlanOn(today.toISOString().slice(0, 10)); p.setTab("plan"); }
     else if (t.id === "dinner") { showPlanOn(today.toISOString().slice(0, 10)); p.setTab("plan"); }
     else if (t.id === "easy") p.openOut({ q: /fifteen/i.test(t.label) ? "Where does a fifteen minute walk after lunch fit in my day, and what does it do for the afternoon?" : "Where does a 30 minute walk fit in my day, most days of the week, and what does it do for my goal?" });
     else if (t.id === "snack") p.openOut({ q: `${t.label}: how do I do that on my plate, on my numbers?` });
@@ -132,6 +137,33 @@ export function BodyPage({ p, page, back, backLabel }: { p: AppApi; page: BodyPa
         <div className="moments ex-chipq">{page.chips.map((q) => <button key={q} type="button" className="choice" onClick={() => p.openOut({ q })}>{q}</button>)}</div>
       </section>
       <p className="ex-sources">{page.line} Sources: {page.sources}</p>
+    </>
+  );
+}
+// 0.3.33 (DT190, DT193): the day situations with the common shape: what it does, what causes it, when, your case, the chips
+export function DaySituationPage({ p, id, back }: { p: AppApi; id: "late" | "rest"; back: () => void }) {
+  const pg = SITUATION_PAGES[id]!;
+  const today = useMemo(() => new Date(), []);
+  const busy = useBusy();
+  useEffect(() => { setChefContext({ about: `On Explorer, Situations, ${pg.name}.`, chips: pg.chips }); return () => setChefContext(null); }, [pg]);
+  const c = useMemo<Case>(() => id === "late"
+    ? lateCase({ personal: p.personal, feedback: p.state.feedback, planned: p.planned, busy: p.personal.calendar?.on && p.personal.calendar.busy && busy ? busy.list : null }, today)
+    : restCase({ personal: p.personal, feedback: p.state.feedback, planned: p.planned, band: p.goal?.band ?? "maintain", goalSetAt: p.goal?.setAt, numbersFor: p.numbersFor, pdRef: p.pdRef }, today), [id, p, busy, today]);
+  return (
+    <>
+      <button type="button" className="link ex-back" onClick={back}>‹ Situations</button>
+      <h3 className="ex-h">{pg.name}</h3>
+      <p className="ex-intro">{pg.intro}</p>
+      <Lines title={id === "late" ? "What it does to the evening" : "What a rest day does"} lines={pg.effects} />
+      <Lines title={id === "late" ? "What causes it" : "What to watch"} lines={[...pg.causes, pg.loop]} />
+      <When rows={pg.when} />
+      <CaseCard p={p} title="Your case: today" c={c} kind={id} />
+      <section className="card">
+        <b>Ask Chef Mealan</b>
+        <small className="muted">The round button on this page starts with these.</small>
+        <div className="moments ex-chipq">{pg.chips.map((q) => <button key={q} type="button" className="choice" onClick={() => p.openOut({ q })}>{q}</button>)}</div>
+      </section>
+      <p className="ex-sources">{pg.line} Sources: {pg.sources}</p>
     </>
   );
 }
