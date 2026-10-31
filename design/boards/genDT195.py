@@ -86,27 +86,28 @@ class Component extends DCLogic {{
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
 cy = storyCard(B, y, "DT195", "A reaction on every claim in Explorer", [
-  ("Coach Milan, 31 October 20:37 to 20:49", "The better we know the person, the better we coach. The market and the socials are a mess on nutrition; Explorer is claims with papers. So: a one-tap reaction on every claim, and where the person thinks different, their own line, not chips. The opinion is input for Chef Mealan when needed, with or without a coach. A coach who disagrees coaches from a note; a coach who doubts a source sends it to Milan."),
-  ("For everyone", "Under every line: Agree, I think different, Show me the source. Agree is a tick, counted; nothing else stored for it. I think different opens one line, free text. The line goes into the person's record (the private part), with Chef Mealan's requests as context the way the eating habits go (DT161), and to the coach if there is one, as a note at the check-in. Show me the source opens the paper under the line: who, where, how many, what it found, when it was read again."),
-  ("The boundary", "An opinion changes what Chef Mealan says, not what the plan does. The numbers, the ranges and the gates stay with the evidence; Chef Mealan meets the opinion with the paper and the plan. A reaction is to the claim, not a statement about the person."),
-  ("For a coach", "A note under a line for that coach's own clients: the client sees the claim, the source, then the note. The claim is never hidden or rewritten per coach: one Explorer for everyone. Check this source sends one line to the superadmin."),
-  ("For Milan", "Metrics: Agree and I think different per line, no names, the most doubted first. Admin: the sources coaches asked to check, with Keep and answer, or Change the line; a changed line says on the page that it changed and why."),
-  ("How it is built", "A reaction is a small record per person and line: {line id, agree | differ, text?, at}, in the private part; the counts are a server tally with no names. The coach's note is a note on the coach's own record keyed by line id, read by their clients' app. Check this source is a row in a new Admin collection. Nothing new goes to Gemini beyond the person's own lines, listed in the privacy notice as the notes are."),
-  ("Not in this board", "Reactions on the Nutrients tables (foods and numbers are not claims). Replies between clients. A visitor without an account reacting."),
-  ("To decide", "Reactions on the Nutrients pages too, on the How to use it lines only (drawn: no, The body and Situations first)? Does Agree show a count to the person (drawn: no, counts are Milan's)? The visitor: no reactions without an account (drawn: no)?"),
+  ("Coach Milan, 31 October 20:37 to 21:04", "One small icon at the end of each line, nothing else. It opens a small sheet: Agree, I think different, The source. After Agree the icon goes and the line gets a thin blue edge; after I think different, an amber edge; never red."),
+  ("I think different", "One line, the person's own words, no chips. It goes into the private part of the record, to Chef Mealan as context (like the eating habits since DT161), and to the coach if there is one. Chef Mealan meets it with the paper and the plan; the plan does not move."),
+  ("The source", "The paper under the line: who, where, what it found, when it was read again. A paper is one study; the page says what it found, not more."),
+  ("The coach", "Two more rows in the sheet: Note for my clients (under the line, for that coach's clients only; the claim is never hidden or rewritten) and Check this source (one line to Milan)."),
+  ("Milan", "Metrics: Agree and I think different per line, no names, most doubted first. Admin: the sources coaches asked to check, Keep and answer or Change the line; a changed line says so on the page."),
+  ("The visitor", "Sees the icon. The tap asks to sign in, so the reaction is kept and the app goes on from there."),
+  ("Not in this board", "The icon on the Nutrients tables. Replies between clients. A count shown to the person."),
 ])
 h = rowEnd(cy,
   B.screen("DT195a", 0, y, "Now: a claim with its paper, nothing to say to it", "r195a", "now", "No agree, no doubt, no way to the paper."),
-  B.screen("DT195b", 1, y, "New: Agree, I think different, Show me the source", "r195b", "changed", "Under every line; one tap each."),
-  B.screen("DT195c", 2, y, "New: I think different, one line", "r195c", "changed", "Free text; to the record, Chef Mealan, the coach."))
+  B.screen("DT195b", 1, y, "New: one icon; blue after Agree, amber after I think different", "r195b", "changed", "Nothing else on the line."),
+  B.screen("DT195c", 2, y, "New: the sheet", "r195c", "changed", "Agree, I think different, The source."))
 y = h
 h = rowEnd(
-  B.screen("DT195d", 0, y, "New: Show me the source", "r195d", "changed", "The paper under the line."),
-  B.screen("DT195e", 1, y, "New: the coach's note; Check this source", "r195e", "changed", "For their clients; to the superadmin."),
-  B.screen("DT195f", 2, y, "New: Chef Mealan has the line", "r195f", "changed", "Meets the opinion with the paper and the plan."))
+  B.screen("DT195d", 0, y, "New: I think different, one line", "r195d", "changed", "To Chef Mealan and the coach."),
+  B.screen("DT195e", 1, y, "New: The source", "r195e", "changed", "The paper under the line."),
+  B.screen("DT195f", 2, y, "New: the coach's note; the coach's sheet", "r195f", "changed", "Note for my clients; Check this source."))
 y = h
-h = rowEnd(B.screen("DT195g", 0, y, "New: Metrics and Admin for Milan", "r195g", "changed", "Counts per line; sources to check."))
+h = rowEnd(
+  B.screen("DT195g", 0, y, "New: Chef Mealan has the line", "r195g", "changed", "The plan does not move."),
+  B.screen("DT195h", 1, y, "New: Metrics and Admin for Milan", "r195h", "changed", "Counts per line; sources to check."))
 y = h
 board("Stories144.dc.html", "DT195. A reaction on every claim in Explorer",
-  "31 October 2026 (Coach Milan 20:37 to 20:49, draw then confirm or take further). Now: 0.3.35, untouched. Drawn for your approval; nothing built.",
+  "31 October 2026 (Coach Milan 20:37 to 21:04: one icon, not buttons; blue and amber edges). Now: 0.3.35, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories143.dc.html")
