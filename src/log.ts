@@ -8,6 +8,7 @@ export type LogEvent =
   | "meal_photo"     // DT127 (0.2.108): a photo of the meal read onto the Plate: data.foods, data.unsure
   | "calendar_on"    // DT178 (0.3.21): Google Calendar connected: data.events
   | "calendar_off"   // DT178 (0.3.21): Google Calendar off: data.removed
+  | "calendar_busy"  // DT179 (0.3.23): Read when I'm busy on or off: data.on
   | "travel_on"      // DT176 (0.3.19): Travel mode on: data.place, data.kitchen
   | "travel_off"     // DT176 (0.3.19): Travel mode off
   | "plate_said"     // DT175 (0.3.17): the foods you said you have, landed on the Plate: data.foods

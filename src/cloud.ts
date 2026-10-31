@@ -53,16 +53,16 @@ export async function signIn() {
 export const signOutCloud = () => signOut(auth());
 // DT178 (0.3.21): a Google token for one right, the Chef Mealan calendar (calendar.app.created). Asked for with a tap, in
 // Google's own window; Google gives it for about an hour. Nothing of it is sent to our server.
-export async function calendarToken(scope: string): Promise<{ token: string; until: number } | null> {
+export async function calendarToken(scopes: string[]): Promise<{ token: string; until: number; scopes: string[] } | null> {
   if (!cloudEnabled) return null;
   const u = auth().currentUser;
   if (!u) return null;
   const provider = new GoogleAuthProvider();
-  provider.addScope(scope);
+  for (const s of scopes) provider.addScope(s);
   if (u.email) provider.setCustomParameters({ login_hint: u.email });
   const r = await reauthenticateWithPopup(u, provider);
   const token = GoogleAuthProvider.credentialFromResult(r)?.accessToken;
-  return token ? { token, until: Date.now() + 55 * 60 * 1000 } : null;
+  return token ? { token, until: Date.now() + 55 * 60 * 1000, scopes } : null;
 }
 
 // One document per person: the pilot state plus goal and name, and who coaches them.

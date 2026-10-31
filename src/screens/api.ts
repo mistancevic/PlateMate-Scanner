@@ -203,7 +203,7 @@ export interface AppApi {
   openGoal: (focus?: unknown) => void;
   goalFocus: "formula" | null;
   // the chat knows the screen (0.2.4); "fill" opens it with the day filled
-  openOut: (ask?: "fill" | "plate" | "around") => void;
+  openOut: (ask?: "fill" | "plate" | "around" | { q: string }) => void;
   // Where does this go (0.2.5): Scan from Today, then the sheet with the saved food
   scanFromToday: () => void;
   openScan: () => void; // DT106: Scan it from a chat row
