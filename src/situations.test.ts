@@ -71,7 +71,7 @@ test("0.3.26: the three body pages and the fat burning situation exist, with sou
   assert.ok(HORMONE_MEMBERS.find((m) => m.page === "glucose") && HORMONE_MEMBERS.some((m) => /testosterone/i.test(m.name)) && HORMONE_MEMBERS.some((m) => /oestrogen/i.test(m.name)));
   assert.equal(SITUATION_PAGES.fatburn, FATBURN_PAGE);
   assert.ok(FATBURN_PAGE.when.length >= 3 && FATBURN_PAGE.effects.length >= 3);
-  assert.deepEqual(BODY_FAMILIES.filter((b) => b.state === "page").map((b) => b.id), ["muscle", "fat", "glycogen", "bone", "hormones"]);
+  assert.deepEqual(BODY_FAMILIES.filter((b) => b.state === "page").map((b) => b.id), ["muscle", "fat", "glycogen", "bone", "gut", "liver", "hormones", "brain"]);
   assert.equal(SITUATIONS.find((s) => s.id === "fatburn")!.state, "page");
 });
 
@@ -187,4 +187,46 @@ test("0.3.28: the muscle case finds the meal below the per-meal dose; the bone c
   assert.match(b.parts[0].body, /Calcium 950 mg a day/);
   assert.match(b.parts[1].body, /about 1 portion a day/);
   assert.ok(b.taps.some((t) => /One more calcium portion/.test(t.label)) && b.taps.some((t) => /Vitamin D in the dark months/.test(t.label)));
+});
+
+// 0.3.29: The gut, The liver, The brain: every family has a page
+import { gutCase, liverCase, brainCase } from "./situations";
+import { GUT_PAGE, LIVER_PAGE, BRAIN_PAGE } from "./explorerBody";
+test("0.3.29: all eight families open a page; the papers' numbers are on the lines", () => {
+  assert.ok(BODY_FAMILIES.every((b) => b.state === "page"));
+  assert.equal(BODY_PAGES.gut, GUT_PAGE); assert.equal(BODY_PAGES.liver, LIVER_PAGE); assert.equal(BODY_PAGES.brain, BRAIN_PAGE);
+  assert.match(GUT_PAGE.sections[0].lines[3].text, /more than 30 different plants/);
+  assert.match(LIVER_PAGE.sections[0].lines[2].text, /fat burning fell 73 %/);
+  assert.match(BRAIN_PAGE.sections[0].lines[3].text, /10 runners after two hours/);
+  assert.ok(!/depression|anxiety|ADHD/.test(JSON.stringify(BRAIN_PAGE)), "the brain page names no condition");
+  const idx = buildIndex({ nutrients: [] });
+  assert.ok(searchIndex(idx, "mouthwash").some((h) => h.go.body === "gut"));
+  assert.ok(searchIndex(idx, "dopamine").some((h) => h.go.body === "brain"));
+  assert.ok(searchIndex(idx, "ketone").some((h) => h.go.body === "liver"));
+});
+test("0.3.29: the gut, liver and brain cases read the week's plates", () => {
+  const p = { ...personal, weightKg: 85 } as unknown as Personal;
+  const withFibre = (f: Feedback, fiber: number) => ({ ...f, meal: { ...f.meal, items: f.meal.items.map((i) => ({ ...i, food: { ...i.food, fiber } })) } }) as Feedback;
+  const fb: Feedback[] = [];
+  for (const d of ["2026-10-29", "2026-10-30", "2026-10-31", "2026-11-01"]) {
+    fb.push(withFibre(eaten(d, "08:00", "Oats and apple", "breakfast", ["Oats", "Apple"]), 4));
+    if (d !== "2026-10-31" && d !== "2026-11-01") fb.push(withFibre(eaten(d, "13:00", "Rice and spinach", "lunch", ["Rice, white", "Spinach"]), 2));
+    fb.push(withFibre(eaten(d, "20:00", "Chicken and tomato", "dinner", ["Chicken breast", "Tomato"]), 1));
+  }
+  fb.push(eaten("2026-10-31", "22:30", "Chocolate"), eaten("2026-11-01", "22:30", "Chocolate"), eaten("2026-11-01", "20:10", "Beer", "", ["Beer, lager"]));
+  const x = { personal: p, feedback: fb, planned: {}, band: "maintain", numbersFor: () => ({ kcal: 2400, protein: 150 }), pdRef: null };
+  const g = gutCase(x, monday);
+  assert.match(g.parts[1].body, /Fibre \d+ g a day on the 4-day average/);
+  assert.match(g.parts[1].body, /different plants on the plates/);
+  assert.ok(g.taps.some((t) => /Beans or lentils/.test(t.label)));
+  assert.match(g.trend ?? "", /one legume meal a day/);
+  const li = liverCase(x, monday);
+  assert.match(li.parts[1].body, /A drink on 1 day, counted as energy; yesterday was one of them/);
+  assert.match(li.parts[2].body, /The store is low after last night/);
+  assert.ok(li.taps.some((t) => /Water with tonight's dinner/.test(t.label)));
+  const b = brainCase(x, monday);
+  assert.match(b.parts[1].body, /2 lunches skipped/);
+  assert.match(b.parts[1].body, /2 evenings, 2 of them after a skipped lunch/);
+  assert.match(b.parts[2].body, /a cue, not a weakness/);
+  assert.match(b.trend ?? "", /The gap is lunch, not the evening/);
 });

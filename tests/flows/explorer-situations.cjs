@@ -1,3 +1,4 @@
+// 0.3.29: The gut, The liver, The brain (DT185 to DT187): all eight families have a page.
 // 0.3.28: Muscle and Bone (DT183, DT184), read at the month.
 // 0.3.27: Hormones' other four members, Hunger hormones, Cortisol, Testosterone, Oestrogen, each with Your case at its horizon.
 // 0.3.26 (DT181 v2, DT183 to DT186): The body's first pages, Glucose and insulin, Glycogen, The fat store, and the situation
@@ -57,7 +58,7 @@ const SHOTS = process.env.SHOTS;
   const fams = await page.locator(".ex-map .menu-row b").allTextContents();
   ok(fams.join(",") === "Muscle,The fat store,Glycogen,Bone,The gut,The liver,Hormones,The brain", "The body: the map of eight families: " + fams.join(","));
   await page.locator(".ex-map .menu-row").filter({ hasText: "The gut" }).click(); await page.waitForTimeout(300);
-  ok(await text(page.locator(".ex-h")) === "The gut" && /comes in a later version/.test(await text(page.locator(".explorer"))), "a family without a page yet says so");
+  ok(await text(page.locator(".ex-h")) === "The gut" && /starts in the mouth/.test(await text(page.locator(".explorer"))), "a family opens its page (0.3.29: every family has one)");
   await page.getByRole("button", { name: "‹ The body" }).click(); await page.waitForTimeout(300);
   ok(await page.locator(".ex-map").count() === 1, "back to the map");
   // Situations: the list and the page
@@ -93,7 +94,17 @@ const SHOTS = process.env.SHOTS;
   await page.getByRole("button", { name: /^Explorer/ }).click(); await page.waitForTimeout(800);
   await parts.getByRole("radio", { name: "The body" }).click(); await page.waitForTimeout(400);
   const states = await page.locator(".ex-map .menu-row .ex-state").allTextContents();
-  ok(states.join(",") === "›,›,›,›,later,later,›,later", "the map: muscle, the fat store, glycogen, bone and hormones have pages: " + states.join(","));
+  ok(states.join(",") === "›,›,›,›,›,›,›,›", "the map: all eight families have pages: " + states.join(","));
+  // 0.3.29: The gut, The liver, The brain
+  for (const [name, need, caseTitle, caseNeed] of [["The gut", /more than 30 different plants/, /Your case: this week/, /different plants on the plates|No plates ticked/], ["The liver", /fat burning fell 73 %/, /Your case: today/, /A drink on|No drink on the record/], ["The brain", /10 runners after two hours/, /Your case: this week/, /Ticks on Today/]]) {
+    await page.locator(".ex-map .menu-row").filter({ hasText: name }).first().click(); await page.waitForTimeout(500);
+    const hp = await text(page.locator(".explorer"));
+    ok(await text(page.locator(".ex-h")) === name && need.test(hp) && caseTitle.test(hp) && caseNeed.test(hp) && /your doctor|a doctor or a therapist/.test(hp), `${name}: the page, its paper's number, the case, the wellness line`);
+    if (name === "The brain") { ok(!/depression|anxiety|ADHD/i.test(hp), "The brain names no condition"); if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT + "-brain.png", fullPage: true }); }
+    const hh = await page.locator(".ex-tap").evaluateAll((xs) => xs.map((x) => Math.round(x.getBoundingClientRect().height)));
+    ok(hh.length >= 1 && hh.every((h) => h >= 44), `${name}: taps 44 px or more: ` + hh.join(","));
+    await page.getByRole("button", { name: "‹ The body" }).click(); await page.waitForTimeout(300);
+  }
   // 0.3.28: Muscle and Bone
   await page.locator(".ex-map .menu-row").filter({ hasText: "Muscle" }).first().click(); await page.waitForTimeout(500);
   let mp = await text(page.locator(".explorer"));
