@@ -1,5 +1,6 @@
 import { carryReads } from "../carry";
 import { useEffect, useRef, useState } from "react";
+import { useChefContext } from "../chefContext";
 import { Camera, Send } from "lucide-react";
 import { aggregate, density, solveIngredient, uid, type Ingredient, type Food } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
@@ -72,7 +73,9 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   const plateT = aggregate(state.items); const platePd = density(plateT.protein, plateT.calories);
   // DT93: the meal the plate is for, by the clock: for the chips and the first question from the Plate
   const mealName = (() => { const m = new Date().getHours() * 60 + new Date().getMinutes(); const sl = slots.find((x) => { const [h, mi] = x.time.split(":").map(Number); return h * 60 + mi + 90 >= m; }) ?? slots[slots.length - 1]; return (sl?.name ?? "meal").toLowerCase(); })();
-  const about = p.tab === "plan"
+  // DT180 (0.3.25): a page of its own, such as an Explorer situation, can say where the person is and which chips to start with
+  const ctx = useChefContext();
+  const about = ctx ? ctx.about : p.tab === "plan"
     ? `About ${dayName === "today" ? "today" : dayName}: ${open.length ? `${open.length} ${open.length === 1 ? "slot" : "slots"} open` : "every slot set"}${tWhen ? `, ${tWhen.phrase}` : ""}${numbers ? `, ${fmt(numbers.kcal, 0)} kcal and ${numbers.protein} g to place` : ""}.`
     : p.tab === "home"
       ? (rec.planned ? `${rec.open.length} of ${rec.planned} ${rec.planned === 1 ? "slot" : "slots"} to come${rec.extras.length ? `, ${rec.extras.length} extra so far` : ""}.` : "Nothing planned for today yet.")
@@ -82,7 +85,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   // the next planned meal still to come today (0.2.8: a chip only offers what the chat can do)
   const eatenIds = new Set(rec.eaten.map((f) => f.slot!.slotId)), skippedIds = new Set(rec.skipped.map((x) => x.id));
   const nextHeld = slots.find((x) => held[x.id] && !eatenIds.has(x.id) && !skippedIds.has(x.id));
-  const chips: string[] = p.tab === "plan"
+  const chips: string[] = ctx ? ctx.chips : p.tab === "plan"
     ? [...(open.length ? [`Fill ${dayName === "today" ? "today" : dayName}`] : []), "Make it a vegetarian day", "Lunch from what I have at home", "Something quick for dinner"]
     : p.tab === "home"
       ? [nextHeld ? `Swap ${nextHeld.name.toLowerCase()} for something lighter` : "What is planned today?", "What's left today?", ...(trainingTime(training) && slots.length ? [`Move ${slots[slots.length - 1].name.toLowerCase()} to after training`] : []), "I'm out, what do I take?"]

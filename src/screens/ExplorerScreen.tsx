@@ -24,6 +24,8 @@ import type { FoodRow } from "../foodTable";
 import { slotsOf } from "../slots";
 import { needOf } from "../planned";
 import { pdVal } from "../ui";
+import { ExplorerSearch, useExplorerIndex, BodyMap, BodyLater, SituationsList, SleepPage, PART_NAME } from "./ExplorerSituations";
+import { SITUATIONS, type Part, type BodyId, type SituationId, type Hit } from "../explorerBody";
 
 const FALLBACK_MEAL = 30;
 // the slot of the next meal by the clock, as the chat picks it
@@ -100,6 +102,7 @@ function Card({ c, meal, mealP, target }: { c: ExplorerCard; meal: string; mealP
 }
 
 type Family = "protein" | "fats" | "carbs" | "micros" | "foods";
+const SITUATIONS_BY = Object.fromEntries(SITUATIONS.map((s) => [s.id, s])) as Record<SituationId, (typeof SITUATIONS)[number]>;
 // the meal: the person's slots, the next one by the clock; its share of the day
 function useMeal(p: AppApi) {
   const slots = useMemo(() => slotsOf(lifestyleOf(p.personal)), [p.personal]);
@@ -172,8 +175,22 @@ function CalcLine(p: AppApi) {
 
 export function ExplorerScreen(p: AppApi) {
   const [family, setFamily] = useState<Family>("protein");
+  // DT180 to DT187 (0.3.25): three parts, one search bar; The body's map and the first situation page
+  const [part, setPart] = useState<Part>("nutrients");
+  const [body, setBody] = useState<BodyId | null>(null);
+  const [situation, setSituation] = useState<SituationId | null>(null);
+  const index = useExplorerIndex();
+  const go = (h: Hit) => { setPart(h.go.part); setBody(h.go.body ?? null); setSituation(h.go.situation ?? null); if (h.go.family) setFamily(h.go.family as Family); window.scrollTo(0, 0); };
+  const pick = (x: Part) => { setPart(x); setBody(null); setSituation(null); window.scrollTo(0, 0); };
   return (
     <div className="explorer">
+      <ExplorerSearch index={index} go={go} />
+      <div className="moments ex-chips ex-parts" role="radiogroup" aria-label="Which part">
+        {(["nutrients", "body", "situations"] as Part[]).map((x) => <button key={x} role="radio" aria-checked={part === x} className={`choice ${part === x ? "on" : ""}`} onClick={() => pick(x)}>{PART_NAME[x]}</button>)}
+      </div>
+      {part === "body" ? (body ? <BodyLater id={body} back={() => setBody(null)} /> : <BodyMap open={setBody} />)
+        : part === "situations" ? (situation === "sleep" ? <SleepPage p={p} back={() => setSituation(null)} /> : situation ? <BodyLaterSituation id={situation} back={() => setSituation(null)} /> : <SituationsList open={setSituation} />)
+        : <>
       <CalcLine {...p} />
       {/* DT154, DT155: the families, Protein first */}
       <div className="moments ex-chips ex-families" role="radiogroup" aria-label="Which family">
@@ -184,8 +201,13 @@ export function ExplorerScreen(p: AppApi) {
         <button role="radio" aria-checked={family === "foods"} className={`choice ${family === "foods" ? "on" : ""}`} onClick={() => setFamily("foods")}>Foods</button>
       </div>
       {family === "protein" ? <ProteinPage {...p} /> : family === "fats" ? <FatsPage {...p} /> : family === "carbs" ? <CarbsPage {...p} /> : family === "micros" ? <MicrosPage {...p} /> : <FoodsPage p={p} go={(f) => { setFamily(f); window.scrollTo(0, 0); }} />}
+      </>}
     </div>
   );
+}
+function BodyLaterSituation({ id, back }: { id: SituationId; back: () => void }) {
+  const s = SITUATIONS_BY[id];
+  return (<><button type="button" className="link ex-back" onClick={back}>‹ Situations</button><h3 className="ex-h">{s.name}</h3><p className="small muted">Its page comes in a later version, drawn and agreed first. Until then, the round button answers questions about it from the same wellness line.</p></>);
 }
 
 function ProteinPage(p: AppApi) {
