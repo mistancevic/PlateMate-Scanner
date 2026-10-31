@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { calendarEvents, eventId, at, syncCalendar, kindOn, type CalInput, type Fetch } from "./gcal";
+import { calendarEvents, eventId, at, syncCalendar, kindOn, setRetryWait, CAL_AT_ONCE, type CalInput, type Fetch } from "./gcal";
+setRetryWait(async () => {});
 import type { PlanDay } from "./plan";
 
 const slots = [{ id: "s1", name: "Breakfast", time: "06:30" }, { id: "s2", name: "Lunch", time: "13:15" }, { id: "s3", name: "Dinner", time: "20:00" }];
@@ -108,4 +109,29 @@ test("DT178: a calendar removed in Google is made again", async () => {
   g.cals.delete(r.id);
   const r2 = await syncCalendar(g.f, "t", r.id, calendarEvents(base()), "2026-11-02", "2026-11-03", "Europe/Berlin");
   assert.equal(r2.created, true); assert.notEqual(r2.id, r.id);
+});
+
+test("0.3.22: the new calendar's id is handed over before any event is written", async () => {
+  const g = fakeGoogle(); let seen = -1;
+  const f: Fetch = async (u, i) => { const r = await g.f(u, i); return r; };
+  await syncCalendar(f, "t", undefined, calendarEvents(base()), "2026-11-02", "2026-11-03", "Europe/Berlin", { onCreated: () => { seen = g.calls.filter((c) => c.startsWith("POST") && c.endsWith("/events")).length; } });
+  assert.equal(seen, 0);
+});
+
+test("0.3.22: events go a few at a time, never more than the limit, with progress", async () => {
+  const g = fakeGoogle(); let now = 0, most = 0; const prog: number[] = [];
+  const f: Fetch = async (u, i) => { now++; most = Math.max(most, now); await new Promise((r) => setTimeout(r, 5)); try { return await g.f(u, i); } finally { now--; } };
+  const ev = calendarEvents(base());
+  const r = await syncCalendar(f, "t", undefined, ev, "2026-11-02", "2026-11-03", "Europe/Berlin", { onProgress: (d) => prog.push(d) });
+  assert.equal(r.made, ev.length);
+  assert.ok(most > 1 && most <= CAL_AT_ONCE, `at once: ${most}`);
+  assert.equal(prog[0], 0); assert.equal(prog.at(-1), ev.length);
+});
+
+test("0.3.22: Google asking to slow down is waited out, then the call goes through", async () => {
+  const g = fakeGoogle(); let slowed = 0;
+  const f: Fetch = async (u, i) => { if ((i?.method || "GET") === "POST" && u.endsWith("/events") && slowed < 2) { slowed++; return new Response(JSON.stringify({ error: { message: "Rate Limit Exceeded" } }), { status: 403 }); } return g.f(u, i); };
+  const ev = calendarEvents(base());
+  const r = await syncCalendar(f, "t", undefined, ev, "2026-11-02", "2026-11-03", "Europe/Berlin");
+  assert.equal(slowed, 2); assert.equal(r.made, ev.length);
 });

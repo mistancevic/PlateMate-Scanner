@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { AppApi } from "../screens/api";
 import { calendarEvents, CAL_DAYS, CAL_KINDS, kindOn, dishOn, plusDays, type CalKind, type CalSettings, type CalEvent } from "../gcal";
 import { askToken, heldToken, runSync, needsSync, setCalStatus, useCalStatus, dropCalendar, forgetSent, calStatus } from "../calendarSync";
-import { lifestyleOf, dayFor, getDay } from "../personal";
+import { lifestyleOf, dayFor, getDay, getPersonal } from "../personal";
 import { slotsOn } from "../slots";
 import { ymd } from "../plan";
 import { weighInsOff } from "../weight";
@@ -17,6 +17,8 @@ const KIND_NAME: Record<CalKind, string> = { meals: "Meals", cooking: "Cooking",
 const KIND_WHY: Partial<Record<CalKind, string>> = { weigh: "Off at first: a shared calendar would show it.", checkin: "Off at first, for the same reason." };
 export const timeZoneHere = () => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch { return "UTC"; } };
 const calOf = (p: AppApi): CalSettings => p.personal.calendar ?? { on: false };
+// 0.3.22: a calendar Google just made is kept at once, on the freshest settings, so leaving the page never loses it
+const keepId = (p: AppApi, extra: Partial<CalSettings> = {}) => (id: string) => { const now = getPersonal(); p.setPersonal({ ...now, calendar: { ...(now.calendar ?? { on: false }), ...extra, id } }); };
 
 // the events for the next 14 days, from what the app already knows
 export function eventsFor(p: AppApi, now = new Date()): { events: CalEvent[]; from: string; to: string } {
@@ -58,8 +60,8 @@ export function CalendarSync({ p }: { p: AppApi }) {
     if (!token) { setCalStatus({ state: "tap" }); return; }
     const t = setTimeout(async () => {
       const { p: q, events: ev, from: f, to: tt } = latest.current;
-      const id = await runSync(token, calOf(q).id, ev, f, tt, timeZoneHere());
-      if (id && id !== calOf(q).id) q.setPersonal({ ...q.personal, calendar: { ...calOf(q), id } });
+      const id = await runSync(token, calOf(q).id, ev, f, tt, timeZoneHere(), keepId(q));
+      if (id && id !== getPersonal().calendar?.id) keepId(q)(id);
     }, 1500);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -73,9 +75,9 @@ export async function updateNow(p: AppApi): Promise<boolean> {
   try { token = await askToken(); } catch { token = null; }
   if (!token) { p.notify("Google Calendar was not updated. Try again."); return false; }
   const { events, from, to } = eventsFor(p);
-  const id = await runSync(token, calOf(p).id, events, from, to, timeZoneHere());
+  const id = await runSync(token, calOf(p).id, events, from, to, timeZoneHere(), keepId(p));
   if (!id) return false;
-  if (id !== calOf(p).id) p.setPersonal({ ...p.personal, calendar: { ...calOf(p), id } });
+  if (id !== getPersonal().calendar?.id) keepId(p)(id);
   return true;
 }
 
@@ -106,9 +108,9 @@ export function CalendarPage({ p }: { p: AppApi }) {
       try { token = await askToken(); } catch { token = null; }
       if (!token) { p.notify("Google Calendar was not connected."); return; }
       const { events, from, to } = eventsFor({ ...p, personal: { ...p.personal, calendar: { ...c, on: true } } });
-      const id = await runSync(token, c.id, events, from, to, timeZoneHere());
+      const id = await runSync(token, c.id, events, from, to, timeZoneHere(), keepId(p, { on: true, since: new Date().toISOString() }));
       if (!id) return;
-      p.setPersonal({ ...p.personal, calendar: { ...c, on: true, id, since: new Date().toISOString() } });
+      keepId(p, { on: true, since: getPersonal().calendar?.since ?? new Date().toISOString() })(id);
       log("calendar_on", { events: events.length });
       p.notify("Your plan is in Google Calendar, in the calendar Chef Mealan.");
     } finally { setBusy(false); }
@@ -152,7 +154,7 @@ export function CalendarPage({ p }: { p: AppApi }) {
         <small className="cal-say">The name, the time, and a link that opens that day on Plan. Never kcal, protein, your goal or anything about your health. Calendars get shared with family and colleagues, so the numbers stay in the app.</small>
       </section>
       {!c.on && (<>
-        <button type="button" className="pill pill-wide pill-primary cal-connect" disabled={busy || !canConnect} onClick={connect}>{busy ? "Connecting…" : "Connect Google Calendar"}</button>
+        <button type="button" className="pill pill-wide pill-primary cal-connect" disabled={busy || !canConnect} onClick={connect}>{busy ? (st.state === "busy" && st.total ? `Writing ${st.done ?? 0} of ${st.total}…` : "Connecting…") : "Connect Google Calendar"}</button>
         {!canConnect && <small className="muted">Sign in with Google first.</small>}
         <small className="muted cal-under">Google asks you once for one right: to create the Chef Mealan calendar and manage the events in it. Nothing else. You can take it back in your Google account at any time.</small>
         {st.state === "error" && <p className="small cal-error" role="alert">{st.message}</p>}
@@ -182,7 +184,7 @@ export function CalendarState({ p, plan }: { p: AppApi; plan?: boolean }) {
   return (
     <div className={`cal-line ${tap ? "cal-line-tap" : ""}`} role="status" aria-label="Google Calendar">
       <span aria-hidden="true">📅</span>
-      <small>{st.state === "busy" ? "Bringing Google Calendar up to date…" : st.state === "error" ? `Google Calendar: ${st.message}` : tap ? `Google Calendar is waiting for your plan. One tap brings the next ${CAL_DAYS} days up to date.`
+      <small>{st.state === "busy" ? (st.total ? `Writing to Google Calendar: ${st.done ?? 0} of ${st.total}.` : "Bringing Google Calendar up to date…") : st.state === "error" ? `Google Calendar: ${st.message}` : tap ? `Google Calendar is waiting for your plan. One tap brings the next ${CAL_DAYS} days up to date.`
         : plan ? `Also in your Google Calendar, ${CAL_DAYS} days ahead. A time you change here changes there.` : `Up to date${st.at ? `, ${st.at}` : ""}.`}</small>
       {tap && <button type="button" className="pill pill-small" disabled={busy} onClick={async () => { setBusy(true); try { await updateNow(p); } finally { setBusy(false); } }}>Update Google Calendar</button>}
     </div>

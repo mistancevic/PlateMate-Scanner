@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { CAL_SCOPE, syncCalendar, removeCalendar, type CalEvent, type Fetch } from "./gcal";
 import { calendarToken } from "./cloud";
 
-export type CalStatus = { state: "off" | "tap" | "busy" | "done" | "error"; at?: string; message?: string; n?: number };
+export type CalStatus = { state: "off" | "tap" | "busy" | "done" | "error"; at?: string; message?: string; n?: number; done?: number; total?: number };
 const TKEY = "chefmealan-cal-token", SKEY = "chefmealan-cal-synced";
 let status: CalStatus = { state: "off" };
 const subs = new Set<(s: CalStatus) => void>();
@@ -45,17 +45,18 @@ export const needsSync = (id: string | undefined, events: CalEvent[]) => !id || 
 const nowTime = () => { const d = new Date(); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
 let running: Promise<string | null> | null = null;
 // brings the calendar up to date; answers the calendar's id (a new one when it was made), or null when it could not
-export async function runSync(token: string, id: string | undefined, events: CalEvent[], from: string, to: string, timeZone: string, f: Fetch = (u, i) => fetch(u, i)): Promise<string | null> {
+export async function runSync(token: string, id: string | undefined, events: CalEvent[], from: string, to: string, timeZone: string, onCreated?: (id: string) => void, f: Fetch = (u, i) => fetch(u, i)): Promise<string | null> {
   if (running) await running.catch(() => null);
   running = (async () => {
     setCalStatus({ ...status, state: "busy" });
     try {
-      const r = await syncCalendar(f, token, id, events, from, to, timeZone);
+      const r = await syncCalendar(f, token, id, events, from, to, timeZone, { onCreated, onProgress: (done, total) => setCalStatus({ state: "busy", done, total }) });
       markSent(sigOf(r.id, events));
       setCalStatus({ state: "done", at: nowTime(), n: events.length });
       return r.id;
     } catch (e: any) {
       if (e?.status === 401) { dropToken(); setCalStatus({ state: "tap" }); return null; }
+      if (e?.name === "TimeoutError" || e?.name === "AbortError") { setCalStatus({ state: "error", message: "Google Calendar did not answer in time. Try again." }); return null; }
       setCalStatus({ state: "error", message: e?.message || "Google Calendar did not answer." });
       return null;
     }
