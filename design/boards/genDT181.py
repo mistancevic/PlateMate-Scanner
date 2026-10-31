@@ -1,4 +1,4 @@
-# Board DT181 (Stories130): Explorer, Hormones, version 1 for the brainstorm. Milan 31 October 11:54. Panels from shotDT181.cjs.
+# Board DT181 (Stories130), version 2: Explorer, Hormones; glucose said, when it helps and when it hurts. Milan 31 October 11:54. Panels from shotDT181.cjs.
 import base64, io, json, math, os, re
 from PIL import Image
 S = os.environ.get("BOARDS_DIR", os.path.dirname(os.path.abspath(__file__)))
@@ -85,27 +85,27 @@ class Component extends DCLogic {{
 
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
-cy = storyCard(B, y, "DT181", "Explorer, Hormones: version 1, for the brainstorm", [
-  ("Coach Milan, 31 October 10:50 and 11:54", "Hormones, insulin, blood sugar, testosterone and the like are much discussed. Drawn before a brainstorm, so this is version 1: a shape to talk about."),
-  ("Where", "A third part of Explorer, Hormones. Four members in version 1: Insulin, Hunger hormones, Cortisol, Testosterone. Oestrogen and the cycle, thyroid and growth hormone wait for their own wellness line."),
-  ("The shape, as DT180", "Each page: what it does, what moves it (food, training, sleep), one line each with its paper; then your case in the five parts at the member's own horizon: insulin per meal, hunger and cortisol per day, testosterone per month. The chat chips. Nothing changes unless you tap."),
-  ("The wellness line", "What happens in anyone. No page reads a blood value, says a level is low or high, names a condition (insulin resistance, diabetes, low T) or a treatment, or names a supplement or a booster. Someone told to watch their blood sugar follows their doctor's plan; the app follows the numbers given to it."),
-  ("Insulin, per meal", "Rises after every meal, that is its job. How fast depends on the food (GI, our Carbs table), slower with protein and fibre on the plate, best after training; a short night and meal size move it. Your case reads the Plate's letters P, C and Fi, the GI, the training week."),
-  ("Testosterone, per month", "Four levers with evidence: sleep (a week of 5 hours, 10 to 15 % lower, Leproult 2011), strength training, body fat, eating far too little. Your case reads the sleep habit, the training week, the weigh-ins, against the check-in."),
-  ("Hunger hormones and cortisol, per day", "Two short nights: leptin down, ghrelin up, hunger up a quarter (Spiegel 2004). Protein keeps you full (Weigle 2005). The case points to the situation page, A bad night's sleep, which has the taps. Cortisol in short, same shape."),
-  ("Sources to check before a build", "Ludwig 2002; Atkinson 2008; Richter and Hargreaves 2013; Spiegel 1999 and 2004; Weigle 2005; Leproult 1997 and 2011; Kraemer 2005; Camacho 2013; Loucks 2004; Lovallo 2005. Each number kept only if the paper says it."),
-  ("To decide in the brainstorm", "The four members, or fewer. Whether blood sugar is said at all, or only insulin. Whether Testosterone is on the page for every member, or only when the profile says male. The word Hormones in the chip, or The body."),
+cy = storyCard(B, y, "DT181", "Explorer, Hormones: glucose said, when it helps and when it hurts", [
+  ("Coach Milan, 31 October 10:50 to 12:07", "Hormones, insulin, glucose and testosterone are much discussed. Version 2 after your two decisions: glucose is said by name, as anyone with a sensor watches it; every page says in which situation a thing is good and in which it is not."),
+  ("Where", "A third part of Explorer, Hormones. Four members: Glucose and insulin (per meal), Hunger hormones and Cortisol (per day), Testosterone (per month). Oestrogen and the cycle, thyroid and growth hormone wait for their own wellness line."),
+  ("The shape", "Each page: what it does, what moves it, one line each with its paper. Then When it helps, when it hurts: situation, Helps or Hurts or Watch, what to do with the plate. Then your case in the five parts at the member's horizon, with trend against trajectory. The chat chips. Nothing changes unless you tap."),
+  ("Glucose and insulin", "The curve after a meal. Helps: the morning with protein and fibre; before and after training; a carb dinner after a hard day, body or head, it refills glycogen. Hurts: a quiet day's late evening. Watch: after a short night. The evidence on carbs at night is mixed, and the page says so: a heavy late meal hurts sleep (Crispim 2011), carbs four hours before bed helped sleep onset (Afaghi 2007). Never no carbs at night."),
+  ("Your case at the meal and the day", "Reads the Plate's letters P, C and Fi, the GI from our Carbs table, the training week and the kind of day. On a hard training day the tap is the bigger carb meal after the session; on a quiet Monday, fibre on the canteen plate."),
+  ("Testosterone, Hunger hormones, Cortisol", "The four levers with their papers, then helps and hurts: the hour after a session is normal, chasing it is not; hunger before a planned meal is right, hunger at 22:30 after a short night is the loop, and the case points to the situation page. Cortisol: right in the morning, wrong in the evening."),
+  ("The wellness line", "What happens in anyone. The page explains the curve; it does not read your numbers, does not say what a number means for you, names no condition, no treatment, no supplement, no booster. Someone told to watch their glucose follows their doctor's plan; the app follows the numbers given to it."),
+  ("Sources to check before a build", "Ludwig 2002; Atkinson 2008; Richter and Hargreaves 2013; Spiegel 1999 and 2004; Weigle 2005; Leproult 1997 and 2011; Kraemer 2005; Camacho 2013; Loucks 2004; Lovallo 2005; Crispim 2011; Afaghi 2007. Each number kept only if the paper says it."),
+  ("Still to decide", "Testosterone for every profile or only when the profile says male. The chip's word: Hormones, or The body."),
 ])
 h = rowEnd(cy,
   B.screen("DT181a", 0, y, "Now: no hormone page", "r181a", "now", "Nutrients and Situations; hormones elsewhere, as claims."),
-  B.screen("DT181b", 1, y, "New: Hormones, four members", "r181b", "changed", "Each at its own horizon."),
-  B.screen("DT181c", 2, y, "New: Insulin, theory", "r181c", "changed", "What it does, what moves it, the wellness line."))
+  B.screen("DT181b", 1, y, "New: Hormones, four members", "r181b", "changed", "Glucose said; each at its own horizon."),
+  B.screen("DT181c", 2, y, "New: Glucose and insulin", "r181c", "changed", "The curve; when it helps, when it hurts; carbs at night."))
 y = h
 h = rowEnd(y,
-  B.screen("DT181d", 0, y, "New: Insulin, your case at the meal", "r181d", "changed", "The Plate's letters, the GI, the training week."),
-  B.screen("DT181e", 1, y, "New: Testosterone, per month", "r181e", "changed", "Four levers; no level, no supplement."),
-  B.screen("DT181f", 2, y, "New: Hunger hormones, per day", "r181f", "changed", "Points to the situation page; cortisol in short."))
+  B.screen("DT181d", 0, y, "New: your case at the meal", "r181d", "changed", "A hard day: the carb dinner is the helping case."),
+  B.screen("DT181e", 1, y, "New: Testosterone, per month", "r181e", "changed", "Four levers; the hour is normal, chasing it is not."),
+  B.screen("DT181f", 2, y, "New: Hunger hormones, per day", "r181f", "changed", "Hunger that is right, hunger that is the loop."))
 y = h
-board("Stories130.dc.html", "DT181. Explorer, Hormones: version 1, for the brainstorm",
-  "31 October 2026 (Coach Milan, Explorer brainstorm: hormones and insulin, kept on the wellness line). Now: 0.3.24, untouched. Drawn for the brainstorm; nothing built.",
+board("Stories130.dc.html", "DT181. Explorer, Hormones: glucose said, when it helps and when it hurts (version 2)",
+  "31 October 2026 (Coach Milan, Explorer brainstorm: hormones and glucose, the same food in different situations). Now: 0.3.24, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories129.dc.html")
