@@ -2565,3 +2565,23 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .ex-trend { margin-top: 10px; background: #eef1f6; border-radius: 12px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; } .ex-trend b { font-size: 14px; } .ex-trend small { font-size: 13px; font-weight: 600; line-height: 1.45; }
 .ex-up { background: #fff3e0; border-color: #f3d2a6; gap: 6px; } .ex-up small { font-size: 13px; font-weight: 600; line-height: 1.45; } .ex-up .pill { min-height: 44px; align-self: flex-start; }
 .ex-chipq { margin-top: 8px; } .ex-chipq .choice { min-height: 44px; }
+
+/* DT188 (0.3.30): the coach's switch, My clients' pages, the client's suggestion card */
+.coach-switch { margin: 0 0 10px; }
+.coach-switch .choice { flex: 1; min-height: 44px; }
+.cv-head { margin: 4px 0 10px; }
+.cv-head .link { min-height: 44px; display: inline-flex; align-items: center; }
+.cv-name { margin: 0; font-size: 20px; }
+.cv-pick, .cv-days, .cv-suggest { display: flex; flex-direction: column; gap: 6px; }
+.cv-day { display: flex; flex-direction: column; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.cv-day:last-of-type { border-bottom: 0; }
+.cv-day b { font-size: 14px; }
+.cv-day small { font-weight: 600; line-height: 1.45; margin-top: 2px; }
+.cv-note { margin-top: 4px; }
+.cv-row { display: flex; flex-direction: column; gap: 8px; padding: 10px 0; border-top: 1px solid var(--line); }
+.cv-fields { display: flex; gap: 8px; }
+.cv-fields .search { min-height: 44px; }
+.cv-time { flex: 0 0 110px; }
+.cv-suggest select.search { min-height: 44px; }
+.suggest-reasons { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.suggest-reasons .choice { min-height: 44px; }

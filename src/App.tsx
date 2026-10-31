@@ -26,6 +26,7 @@ import {
   ArrowRight,
   ScanBarcode,
   Leaf,
+  Microscope,
 } from "lucide-react";
 import { CameraView } from "./components/CameraView";
 import { resizeImageBase64, thumbnailBase64 } from "./utils/image";
@@ -80,12 +81,18 @@ import { measure, startOf, daysFromLines, type Measured } from "./measured";
 import { weighInsOff } from "./weight";
 import { fixedOf } from "./components/FormulaCard";
 import { coachDemoOn } from "./coachDemo";
+// DT188 (0.3.30): the console may say "superadmin"; in the app that is a coach with Admin in the menu
+const roleOf = (r: unknown): "coach" | undefined => (r === "coach" || r === "superadmin" ? "coach" : undefined);
+const isAdminRole = (r: unknown) => r === "superadmin";
 import { getCoachLocal, setCoachLocal, notesOf, checkinOf, type CoachLocal, type CoachNote } from "./coachNotes";
 import { getPlanned, refreshPlanned, storePlanned, withPlanned, plannedPortion, fromMeal, type Planned, type PlannedMeal } from "./planned";
 import type { Filling } from "./screens/api";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, withTarget, lifestyleOf, dayFor, type Personal, type DayType, type Day, type NextGoal } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
+import { ExplorerScreen } from "./screens/ExplorerScreen";
+import { ClientView, CoachSwitch } from "./screens/ClientView";
+import { setExplorerTarget } from "./explorerTarget";
 import { SharePublisher } from "./screens/SummaryPanel";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
 import { mixTip, mixLabel, catOf, plateOk, isIngredient, type Mix, type MixTip } from "./mixtip";
@@ -753,9 +760,12 @@ function BackKeeper({ tab, setTab, onReady }: { tab: Tab; setTab: (t: Tab) => vo
 }
 export default function App() {
   const [state, setState] = useState<PilotState>(load),
+    // DT188 (0.3.30, board Stories137): the coach's two views, My day and My clients, switched at the top of Today; the chosen client
+    [coachView, setCoachViewState] = useState<"day" | "clients">(() => { try { return localStorage.getItem("chefmealan-coach-view") === "clients" ? "clients" : "day"; } catch { return "day"; } }),
+    [coachClient, setCoachClient] = useState<string | null>(null),
     [tab, setTab] = useState<Tab>(() => {
       // a reload keeps the screen; Clients only for a coach (Milan, 11 October 2026: a reload on Clients opened Today)
-      const tabs = ["home", "journey", "plan", "meal", "chef", "recipes", "foods", "clients"] as Tab[];
+      const tabs = ["home", "journey", "plan", "meal", "chef", "recipes", "foods", "clients", "explorer"] as Tab[];
       if (typeof location !== "undefined" && menuTrailOf(location.pathname).length) return "home";
       const fromPath = typeof location !== "undefined" ? tabOfPath(location.pathname, tabs) : null;
       const h = (typeof location !== "undefined" ? location.hash : "").replace("#", "");
@@ -773,7 +783,7 @@ export default function App() {
     [localOnly, setLocalOnly] = useState<boolean>(() => localStorage.getItem("chefmealan-local-only") === "1"),
     cloudLoaded = useRef(false),
     [cloudStatus, setCloudStatus] = useState<{ ok: boolean; text: string; at?: string }>({ ok: true, text: "" }),
-    [profile, setProfile] = useState<{ role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string; coachPhoto?: string; joinedAt?: string; coachSetAt?: string; formula?: import("./personal").Formula | null }>(() => (coachDemoOn() ? { role: "coach" } : {})),
+    [profile, setProfile] = useState<{ role?: "coach"; admin?: boolean; coachId?: string; coachName?: string; coachEmail?: string; coachPhoto?: string; joinedAt?: string; coachSetAt?: string; formula?: import("./personal").Formula | null }>(() => (coachDemoOn() ? { role: "coach", admin: true } : {})),
     // the log is kept collapsed from 0.2.5+r20 (board FX, G3): the first open cleans the old one
     [goalLog, setGoalLogState] = useState<GoalEntry[]>(() => { setGoalLog(getGoalLog()); return getGoalLog(); }),
     nextSource = useRef<GoalSource | null>(null),
@@ -1167,7 +1177,7 @@ export default function App() {
         if (stale) return;
         if (remote) setReview(((remote as any).numbersReview as NumbersReview | undefined) ?? null);
         remoteMeta.current = { photosMovedAt: remote?.photosMovedAt, photosOldGoneAt: remote?.photosOldGoneAt, recordsMovedAt: remote?.recordsMovedAt };
-        if (remote) setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
+        if (remote) setProfile({ role: roleOf(remote.role), admin: isAdminRole(remote.role), coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
         if (remote) takeCoach(remote);
         if (remote && Array.isArray(remote.goalLog)) { const merged = [...new Map([...(remote.goalLog as GoalEntry[]), ...getGoalLog()].map((e) => [e.at, e])).values()].sort((x, y) => (x.at > y.at ? 1 : -1)); setGoalLog(merged); setGoalLogState(merged); }
         // foods that left the library on any device stay gone
@@ -1352,7 +1362,7 @@ export default function App() {
       try {
         const remote = await loadCloud(user.uid);
         if (!remote) return;
-        setProfile({ role: remote.role, coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
+        setProfile({ role: roleOf(remote.role), admin: isAdminRole(remote.role), coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
         takeCoach(remote);
         if (remote.coachSetAt && remote.coachSetAt !== profile.coachSetAt && remote.goal && !remote.coachGoal) {
           try { localStorage.setItem("chefmealan-goal", JSON.stringify(remote.goal)); } catch {}
@@ -1484,7 +1494,8 @@ export default function App() {
     storePersonal(next); setPersonalState(next);
   }
   // a reload on Clients stays there; once the account is known and is not a coach's, Today instead
-  useEffect(() => { if ((profileReady || (authReady && !user)) && tab === "clients" && profile.role !== "coach") setTab("home"); }, [profileReady, authReady, user, profile.role, tab]);
+  useEffect(() => { if ((profileReady || (authReady && !user)) && tab === "clients" && profile.role !== "coach" && !coachDemoOn()) setTab("home"); }, [profileReady, authReady, user, profile.role, tab]);
+  useEffect(() => { if (tab === "clients" && coachView !== "clients" && (profile.role === "coach" || coachDemoOn())) { setCoachViewState("clients"); try { localStorage.setItem("chefmealan-coach-view", "clients"); } catch {} } /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [tab]);
   // numbers calculated from the profile follow the profile; before the first paint, so Today never shows ? and then jumps (T5)
   useLayoutEffect(() => {
     if (goal?.source !== "profile" || !goal.band) return;
@@ -2261,6 +2272,11 @@ export default function App() {
     proteinRange: (() => { const c = calculate(personalNow, goalNow?.band ?? "maintain", profile.formula ?? null); return c ? { min: c.proteinMin, max: c.proteinMax } : null; })(),
     coachNotes: coachThread.notes, checkinDay: coachThread.checkinDay,
     gotNote: (at: string) => saveNotes(coachThread.notes.map((n) => (n.at === at ? { ...n, readAt: new Date().toISOString() } : n))),
+    answerSuggest: (at, choice, reason) => saveNotes(coachThread.notes.map((n) => (n.at === at ? { ...n, readAt: new Date().toISOString(), answer: { at: new Date().toISOString(), choice, ...(reason ? { reason } : {}) } } : n))),
+    coachView, setCoachView: (v) => { setCoachViewState(v); try { localStorage.setItem("chefmealan-coach-view", v); } catch {} if (v === "day" && tab === "clients") setTab("home"); },
+    coachClient, setCoachClient,
+    isCoach: profile.role === "coach" || coachDemoOn(),
+    goExplorer: (t) => { setExplorerTarget(t); setMenuSection(null); setTalkOpen(false); setTab("explorer"); },
     replyToCoach: (text: string, read?: string) => saveNotes([...coachThread.notes.map((n) => (n.at === read ? { ...n, readAt: new Date().toISOString() } : n)), { at: new Date().toISOString(), by: "client", text }]),
     measured, formulaKcal, calcFormula,
     measuredSeen: !!measured?.start && measuredSeen === measured.start,
@@ -2272,7 +2288,7 @@ export default function App() {
       storePersonal(next); setPersonalState(next);
     },
     cancelNextGoal: () => { const { nextGoal, ...rest } = getPersonal(); void nextGoal; storePersonal(rest); setPersonalState(rest); },
-    openMenu: (s?: MenuSection, from?: MenuSection) => { setMenuFrom(from ?? null); setMenuSection(s ?? "list"); },
+    openMenu: (s?: MenuSection, from?: MenuSection) => { if (s === "explorer") { setMenuSection(null); setTalkOpen(false); setTab("explorer"); return; } setMenuFrom(from ?? null); setMenuSection(s ?? "list"); },
     foodsView, setFoodsView, saveFood, setEditFrom,
     // a product picked from the search opens the sheet titled by the button that picked it
     addFromDatabase: (code: string) => { setEditTitle("Add to my foods"); lookup(code); },
@@ -2653,10 +2669,15 @@ export default function App() {
     // 0.2.121: a client sees how many things from the coach wait on Today (notes without Got it, recipes sent)
     { id: "home", label: "Today", icon: <span className="nav-icon"><Home size={20} />{profile.role !== "coach" && fromCoach > 0 && <span className="badge">{fromCoach}</span>}</span> },
     { id: "plan", label: "Plan", icon: <CalendarDays size={20} /> },
-    { id: "journey", label: "Plate", icon: <Utensils size={20} /> },
+    // DT188 (0.3.30, Milan 16:08): the bar keeps its order on both of the coach's views; only the centre changes, Plate becomes Clients
+    ...((profile.role === "coach" || coachDemoOn()) && coachView === "clients"
+      ? [{ id: "clients" as Tab, label: "Clients", icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }]
+      : [{ id: "journey" as Tab, label: "Plate", icon: <Utensils size={20} /> }]),
     { id: "recipes", label: "Recipes", icon: <ChefHat size={20} /> },
-    ...(profile.role === "coach" ? [{ id: "clients" as Tab, label: "Clients", icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }] : []),
+    // DT188: Explorer is the fifth tab, for everyone; Foods and Me stay in the menu
+    { id: "explorer", label: "Explorer", icon: <Microscope size={20} /> },
   ];
+  const clientsView = (profile.role === "coach" || coachDemoOn()) && coachView === "clients";
   const TITLES: Record<Tab, string> = {
     home: "Today",
     journey: "Plate",
@@ -2669,6 +2690,7 @@ export default function App() {
     foods: "Foods",
     notes: "Recipes",
     more: "More",
+    explorer: "Explorer",
   };
   if (!authReady) return <Starting onLocal={null} />;
   // the legal pages are public: /impressum, /privacy, /disclaimer, /about, signed in or not
@@ -2727,7 +2749,7 @@ export default function App() {
         <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setFilling(null); setTab("home"); }} aria-label={`${APP_NAME}, Today`}>
           <Mark size={28} color="var(--brand)" />
         </button>
-        <h1>{menuSection ? (ME_PAGES.includes(menuSection) ? "Me" : "Menu") : TITLES[tab]}</h1>
+        <h1>{menuSection ? (ME_PAGES.includes(menuSection) ? "Me" : "Menu") : clientsView && ["home", "plan", "recipes", "clients"].includes(tab) ? "My clients" : TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
           {menuSection === "goal" ? `${pdText(dayPd)} today` : <>{goal?.band ? goalLabel(goal.band).split(" · ")[0] : `${fmt(state.goals.calories, 0)} kcal, ${fmt(state.goals.protein)} g`} · {pdText(dayPd)} today</>}
         </button>}
@@ -2764,8 +2786,12 @@ export default function App() {
         <CalendarSync p={screenProps} />
         {/* Chef Mealan opens over a menu page too, and closing it comes back to the page (0.2.7+r2: the button vanished there) */}
         {menuSection && <div style={{ display: talkOpen ? "none" : "contents" }}><MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s, up) => { setMenuFrom(null); setMenuSection(s, up); }} under={menuTrail.length > 1 ? menuTrail[menuTrail.length - 2] : null} close={() => { setMenuFrom(null); setMenuSection(null); }} /></div>}
-        {!menuSection && !talkOpen && tab === "home" && <HomeScreen {...screenProps} />}
+        {/* DT188: the coach's switch at the top of Today, on both views; in My clients, Today, Plan and Recipes show the chosen client's */}
+        {!menuSection && !talkOpen && screenProps.isCoach && (tab === "home" || (clientsView && tab === "clients")) && <CoachSwitch p={screenProps} />}
+        {!menuSection && !talkOpen && clientsView && (tab === "home" || tab === "plan" || tab === "recipes") && <ClientView p={screenProps} tab={tab} />}
+        {!menuSection && !talkOpen && !clientsView && tab === "home" && <HomeScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "journey" && <JourneyScreen {...screenProps} />}
+        {!menuSection && !talkOpen && tab === "explorer" && <div className="explorer-tab"><ExplorerScreen {...screenProps} /></div>}
         {talkOpen && <div className="talk-overlay"><OutScreen {...screenProps} tab={tab} ask={talkAsk} clearAsk={() => setTalkAsk(null)} turns={talkTurns} setTurns={(f) => setTalkTurns(f)} close={() => setTalkOpen(false)} toPlate={() => { setTalkOpen(false); setMenuSection(null); setStep("in"); setTab("journey"); }} /></div>}
         {!talkOpen && (
           <button className="chat-fab" aria-label="Chef Mealan" onClick={() => {
@@ -2779,8 +2805,8 @@ export default function App() {
         {!menuSection && !talkOpen && tab === "meal" && <MealScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "chef" && <ChefScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "foods" && <FoodsScreen {...screenProps} />}
-        {!menuSection && !talkOpen && tab === "recipes" && <RecipesScreen {...screenProps} />}
-        {!menuSection && !talkOpen && tab === "plan" && <PlanScreen {...screenProps} />}
+        {!menuSection && !talkOpen && !clientsView && tab === "recipes" && <RecipesScreen {...screenProps} />}
+        {!menuSection && !talkOpen && !clientsView && tab === "plan" && <PlanScreen {...screenProps} />}
         <input
           ref={importRef}
           type="file"

@@ -230,3 +230,17 @@ test("0.3.29: the gut, liver and brain cases read the week's plates", () => {
   assert.match(b.parts[2].body, /a cue, not a weakness/);
   assert.match(b.trend ?? "", /The gap is lunch, not the evening/);
 });
+
+// 0.3.30 (DT188): suggestions on the coach's thread
+import { mergeNotes, answerWords, suggestTitle, REASONS } from "./coachNotes";
+test("0.3.30: a suggestion is a note with a suggest part; the answer survives a merge; the words for the coach", () => {
+  const s = { at: "2026-11-02T10:00:00Z", by: "coach" as const, name: "Milan", text: "Skyr and a fruit", suggest: { kind: "snack" as const, time: "16:00" } };
+  const answered = { ...s, readAt: "2026-11-02T11:00:00Z", answer: { at: "2026-11-02T11:00:00Z", choice: "later" as const, reason: "Not this week" } };
+  const merged = mergeNotes([s], [answered]);
+  assert.equal(merged.length, 1); assert.equal(merged[0].answer?.reason, "Not this week");
+  assert.equal(answerWords(s), "waiting"); assert.equal(answerWords(answered), "not now: not this week");
+  assert.equal(answerWords({ ...s, answer: { at: "x", choice: "accept" } }), "accepted");
+  assert.equal(suggestTitle(s.suggest, s.text), "A planned snack at 16:00: Skyr and a fruit");
+  assert.equal(suggestTitle({ kind: "page", page: { part: "body", id: "gut", member: "gut", name: "The body: The gut" } }, "x"), "A page: The body: The gut");
+  assert.equal(REASONS.length, 4);
+});

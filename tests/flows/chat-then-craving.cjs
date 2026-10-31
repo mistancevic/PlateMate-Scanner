@@ -17,7 +17,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   const fab = async () => { await page.locator(".chat-fab").click(); await page.waitForTimeout(400); };
   const h2 = async () => (await page.locator("h2").first().textContent()).trim();
   const expect = (label, got, want) => { const ok = got === want; console.log(ok ? "ok  " : "FAIL", label, "->", got); if (!ok) process.exitCode = 1; };
-  expect("bottom bar has four tabs", String(await page.locator("nav button").count()), "4");
+  expect("bottom bar has five tabs (DT188: Explorer fifth)", String(await page.locator("nav button").count()), "5");
   await fab(); expect("Mealan from Today is the conversation", await page.locator(".talk-overlay h2").textContent(), "Chef Mealan");
   expect("no floating button while talking", String(await page.locator(".chat-fab").count()), "0");
   await page.locator(".talk-overlay").getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(300);

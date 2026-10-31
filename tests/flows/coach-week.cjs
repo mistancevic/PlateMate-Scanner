@@ -44,7 +44,9 @@ const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0
   ok(await page.locator(".coach-week-note").count() === 0 && await page.evaluate(() => !!JSON.parse(localStorage.getItem("chefmealan-coach")).notes[0].readAt), "Got it: the note leaves Today and is marked read");
   // CW1: Clients, the example clients
   await page.goto("http://127.0.0.1:3197/today?coachdemo"); await page.waitForTimeout(1000);
-  await page.getByRole("button", { name: /^Clients$/ }).first().click(); await page.waitForTimeout(800);
+  // DT188 (0.3.30): the coach's two views; My clients puts Clients at the centre of the bar
+  await page.getByRole("radio", { name: "My clients" }).click(); await page.waitForTimeout(800);
+  ok((await page.locator(".bottom-nav button > span:last-child").allTextContents()).join(",") === "Today,Plan,Clients,Recipes,Explorer", "the coach's bar in My clients: Plate becomes Clients");
   ok(/Check-ins today/.test(await page.locator("main").textContent()), "Clients starts with Check-ins today");
   const row = page.locator(".cw-row").first();
   ok(await row.locator(".cw-bar").count() === 7 && /lived by the plan/.test(await row.textContent()) && /check-in today/.test(await row.textContent()), "a client row: seven bars and the days lived by the plan");

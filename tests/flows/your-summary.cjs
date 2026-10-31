@@ -60,7 +60,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(/sees 8 of 11 parts, kept up to date/.test(await page.locator(".sum-foot").textContent()), "the summary says how much the coach sees");
   // the coach's side (example clients, ?coachdemo): what changed on the row and at the top of the page, the shared parts below
   await page.goto(U + "today?coachdemo"); await page.waitForTimeout(1000);
-  await page.getByRole("button", { name: /^Clients$/ }).first().click(); await page.waitForTimeout(800);
+  await page.getByRole("radio", { name: "My clients" }).click(); await page.waitForTimeout(800);
   const dav = page.locator(".cw-row", { hasText: "Davorka" }).first();
   ok(/Profile: 2 changes since you looked/.test(await dav.textContent()), "Clients marks a client whose shared profile changed");
   await dav.click(); await page.waitForTimeout(600);

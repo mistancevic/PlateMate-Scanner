@@ -10,7 +10,9 @@ import { planLine, schoolLine, studyLine, loadOf, LOAD_DAY, weekdaysOf, dayKindO
 import { DayEditor } from "../components/DayEditor";
 import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { X } from "lucide-react";
-import { unreadNote } from "../coachNotes";
+import { unreadNote, REASONS, suggestTitle } from "../coachNotes";
+import { needOf } from "../planned";
+import { withTimeOn } from "../slots";
 import type { AppApi, Filling } from "./api";
 import { Picture, pictureOfRecipe } from "../components/MealPicture";
 import { PlanRow } from "../components/PlanRow";
@@ -218,6 +220,7 @@ export function HomeScreen(p: AppApi) {
         if (!n) return null;
         const who = n.name ? `Coach ${n.name}` : p.coachLabel;
         const at = new Date(n.at);
+        if (n.suggest) return <SuggestCard key={n.at} p={p} n={n} who={who} />;
         return (
           <section className="coach-note coach-week-note" aria-label={`A note from ${who}`}>
             <small>{who}, {at.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}, {at.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })}</small>
@@ -510,5 +513,56 @@ function CoverAsk({ f, recipe, p }: { f: Feedback; recipe: Meal | null; p: AppAp
         <button className="link" onClick={() => p.setCoverAsk(f.id, "later")}>Not now</button>
       </div>
     </div>
+  );
+}
+
+// DT188 (0.3.30, board Stories137, Milan 16:26): a coach's suggestion is a card with Accept and Not now. Accept does only what
+// the client could have done alone: a planned snack on Plan for this week (the Lifestyle default stays the client's own), or
+// an Explorer page opened. Not now carries a reason, cheap to give: one of four chips, or a line; a plain Not now goes too.
+function SuggestCard({ p, n, who }: { p: AppApi; n: import("../coachNotes").CoachNote; who: string }) {
+  const [later, setLater] = useState(false);
+  const [line, setLine] = useState("");
+  const s = n.suggest!;
+  const slots = slotsOf(lifestyleOf(p.personal));
+  const snackSlot = slots.find((x) => /snack/i.test(x.name)) ?? null;
+  const accept = () => {
+    if (s.kind === "page" && s.page) { p.answerSuggest(n.at, "accept"); p.goExplorer({ part: s.page.part, id: s.page.id, member: s.page.member }); return; }
+    if (s.kind === "snack") {
+      if (!snackSlot) { p.notify("Add a snack to your meals a day in Lifestyle first; then the suggestion lands on Plan."); p.openMenu("life"); return; }
+      const today = ymd(new Date());
+      let timesOn = p.personal.timesOn;
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(`${today}T12:00:00`); d.setDate(d.getDate() + i); const key = ymd(d);
+        if (p.planned[key]?.[snackSlot.id] && !p.planned[key][snackSlot.id].skipped) continue;
+        const need = needOf(slots, snackSlot, p.numbersFor(d));
+        p.fill(key, snackSlot.id, { title: n.text, kcal: need?.kcal ?? 200, protein: need?.protein ?? 15, source: "coach" });
+        if (s.time && s.time !== snackSlot.time) timesOn = withTimeOn(timesOn, key, snackSlot.id, s.time, snackSlot.time);
+      }
+      if (timesOn !== p.personal.timesOn) p.setPersonal({ ...p.personal, timesOn });
+      p.answerSuggest(n.at, "accept"); p.notify(`${n.text} is on Plan${s.time ? ` at ${s.time}` : ""} this week. Your numbers do not change.`);
+    }
+  };
+  const notNow = (reason?: string) => { p.answerSuggest(n.at, "later", reason); p.notify(`Told ${who}: not now${reason ? `, ${reason.charAt(0).toLowerCase()}${reason.slice(1)}` : ""}.`); };
+  return (
+    <section className="coach-note coach-week-note suggest-card" aria-label={`A suggestion from ${who}`}>
+      <small>{who} suggests. Nothing changes until you tap.</small>
+      <b>{suggestTitle(s, n.text)}</b>
+      <span className="coach-note-text">{s.kind === "snack" ? `Lands on Plan${s.time ? ` at ${s.time}` : ""} for this week. Your numbers do not change.` : "Opens the page in Explorer, with your case."}</span>
+      {!later ? (
+        <div className="button-row">
+          <button className="pill pill-small pill-primary" onClick={accept}>{s.kind === "page" ? "Open" : "Accept"}</button>
+          <button className="pill pill-small" onClick={() => setLater(true)}>Not now</button>
+        </div>
+      ) : (
+        <div>
+          <small>Why? One tap is enough; a line is extra.</small>
+          <div className="suggest-reasons">{REASONS.map((r) => <button key={r} type="button" className="choice" onClick={() => notNow(r)}>{r}</button>)}</div>
+          <div className="button-row" style={{ marginTop: 8 }}>
+            <input className="search" aria-label="A line for your coach" placeholder="Or a line" value={line} onChange={(e) => setLine(e.target.value)} />
+            <button className="pill pill-small" onClick={() => notNow(line.trim() || undefined)}>Send</button>
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
