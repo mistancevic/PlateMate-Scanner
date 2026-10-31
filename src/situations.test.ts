@@ -60,3 +60,59 @@ test("Explorer search: a food, a member, a situation, a line, a claim; the title
   assert.equal(searchIndex(index, "x").length, 0);
   assert.ok(searchIndex(index, "a bad night").length <= 12);
 });
+
+// 0.3.26 (DT181 v2, DT183 to DT186 the body's first pages): glucose, glycogen, the fat store, fat burning
+import { glucoseCase, glycogenCase, fatCase } from "./situations";
+import { BODY_PAGES, HORMONE_MEMBERS, FATBURN_PAGE, SITUATION_PAGES, BODY_FAMILIES, SITUATIONS } from "./explorerBody";
+
+test("0.3.26: the three body pages and the fat burning situation exist, with sources and the when rows", () => {
+  for (const k of ["glucose", "glycogen", "fat"]) { const pg = BODY_PAGES[k]; assert.ok(pg && pg.sections.length >= 1 && pg.when.length >= 3 && /Educational/.test(pg.sources) && pg.chips.length === 3, k); }
+  assert.equal(BODY_PAGES.glucose.family, "hormones");
+  assert.ok(HORMONE_MEMBERS.find((m) => m.page === "glucose") && HORMONE_MEMBERS.some((m) => /testosterone/i.test(m.name)) && HORMONE_MEMBERS.some((m) => /oestrogen/i.test(m.name)));
+  assert.equal(SITUATION_PAGES.fatburn, FATBURN_PAGE);
+  assert.ok(FATBURN_PAGE.when.length >= 3 && FATBURN_PAGE.effects.length >= 3);
+  assert.deepEqual(BODY_FAMILIES.filter((b) => b.state === "page").map((b) => b.id), ["fat", "glycogen", "hormones"]);
+  assert.equal(SITUATIONS.find((s) => s.id === "fatburn")!.state, "page");
+});
+
+test("0.3.26: the search finds the body pages' lines and opens the member", () => {
+  const idx = buildIndex({ nutrients: [] });
+  const hit = searchIndex(idx, "insulin")[0];
+  assert.ok(hit && hit.part === "body" && hit.go.body === "hormones" && hit.go.member === "glucose", JSON.stringify(hit));
+  const gly = searchIndex(idx, "glycogen").find((h) => h.kind === "page" || h.kind === "family");
+  assert.ok(gly && gly.go.body === "glycogen");
+  assert.ok(searchIndex(idx, "ketone").some((h) => h.go.body === "fat" || h.go.situation === "fatburn"));
+});
+
+const numbers = () => ({ kcal: 2400, protein: 150, fats: 80, carbs: 270 });
+test("0.3.26: glucose case: the next meal by the clock, its letters and GI, the hard day's carbs after the session", () => {
+  const planned = { "2026-11-02": { lunch: { id: "x", title: "Rice bowl", items: [{ id: "r", grams: 300, locked: false, food: { id: "r", name: "Rice, white, cooked", calories: 130, protein: 2.7, carbs: 28, fats: 0.3 } as any }], portion: 300, savedAt: "" } } } as any;
+  const c = glucoseCase({ personal, feedback: [], planned, numbersFor: numbers, pdRef: null, giOf: (n) => (/rice/i.test(n) ? 73 : null) }, new Date("2026-11-02T11:30:00"));
+  assert.equal(c.parts.length, 5);
+  assert.match(c.parts[0].body, /3 meals a day, lunch at/);
+  assert.match(c.parts[2].body, /Rice bowl, planned/);
+  assert.match(c.parts[2].body, /Rice GI about 73/);
+  assert.match(c.parts[2].body, /hard training day/);
+  assert.ok(c.taps.some((t) => t.id === "protein") && c.taps.some((t) => t.id === "dinner"), JSON.stringify(c.taps));
+  assert.equal(c.trend, null);
+});
+
+test("0.3.26: glycogen case: rest day, training day, tomorrow", () => {
+  const rest = glycogenCase(personal, new Date("2026-11-03T08:00:00"));
+  assert.match(rest.parts[0].body, /A training day, hard/);
+  assert.match(rest.parts[2].body, /A rest day/);
+  const train = glycogenCase(personal, monday);
+  assert.match(train.parts[2].body, /Muscle glycogen will be used/);
+  assert.ok(train.taps.some((t) => t.id === "dinner" && /after the session/.test(t.label)));
+  assert.ok(train.taps.some((t) => /Tomorrow, a rest day/.test(t.label)));
+});
+
+test("0.3.26: fat case: the goal, the week by the plan, the trend against what the goal expects", () => {
+  const p = { ...personal, weightKg: 85, trainingAge: "some", weighIns: [{ date: "2026-10-05", kg: 86.0 }, { date: "2026-10-12", kg: 85.6 }, { date: "2026-10-19", kg: 85.3 }, { date: "2026-10-26", kg: 85.0 }, { date: "2026-11-02", kg: 84.8 }] } as unknown as Personal;
+  const c = fatCase({ personal: p, feedback: [], planned: {}, band: "lose", goalSetAt: "2026-10-05T10:00:00Z", numbersFor: numbers }, monday);
+  assert.match(c.parts[0].title, /set 5 October/);
+  assert.match(c.parts[1].body, /of 7 days by the plan/);
+  assert.match(c.parts[2].body, /Trend: (down|too few)/);
+  assert.ok(c.taps.some((t) => t.id === "easy") && c.taps.some((t) => t.id === "protein"));
+  assert.ok(c.parts[4].body.includes("six of seven days by the plan"));
+});

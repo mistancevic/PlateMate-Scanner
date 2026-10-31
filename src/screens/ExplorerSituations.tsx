@@ -6,8 +6,8 @@
 // Buttons 44 px or more; labels 12 px or more.
 import { useEffect, useMemo, useState } from "react";
 import type { AppApi } from "./api";
-import { BODY_FAMILIES, SITUATIONS, SITUATION_PAGES, buildIndex, searchIndex, type Part, type BodyId, type SituationId, type Hit, type Line, type WhenRow } from "../explorerBody";
-import { sleepCase, noteOpen, easyDay } from "../situations";
+import { BODY_FAMILIES, SITUATIONS, SITUATION_PAGES, BODY_PAGES, HORMONE_MEMBERS, buildIndex, searchIndex, type Part, type BodyId, type SituationId, type Hit, type Line, type WhenRow, type BodyPage as BodyPageData } from "../explorerBody";
+import { sleepCase, noteOpen, easyDay, glucoseCase, glycogenCase, fatCase, type Case, type Tap } from "../situations";
 import { setChefContext } from "../chefContext";
 import { dayFor, getDay } from "../personal";
 import { showPlanOn } from "./PlanScreen";
@@ -15,6 +15,7 @@ import { EXPLORER_FOODS } from "../explorer";
 import { FAT_FOODS, FAT_MEMBERS } from "../explorerFats";
 import { CARB_FOODS, CARB_MEMBERS } from "../explorerCarbs";
 import { MICRO_FOODS, MICRO_MEMBERS } from "../explorerMicros";
+import { CARB_FOODS as CARB_FOODS_ALL } from "../explorerCarbs";
 
 export const PART_NAME: Record<Part, string> = { nutrients: "Nutrients", body: "The body", situations: "Situations" };
 
@@ -60,6 +61,103 @@ export function BodyMap({ open }: { open: (id: BodyId) => void }) {
         ))}
       </div>
       <small className="muted ex-line-note">The wellness line for every family: what happens in anyone; no test read, no level, no condition, no treatment, no supplement. The brain's line is the strictest: mood, cravings, habit and sleep, never a mental condition or a medication.</small>
+    </>
+  );
+}
+// 0.3.26: a family with a page opens it; Hormones lists its members first; the rest say later
+export function BodyFamily({ p, id, member, setMember, back }: { p: AppApi; id: BodyId; member: string | null; setMember: (m: string | null) => void; back: () => void }) {
+  const b = BODY_FAMILIES.find((x) => x.id === id)!;
+  if (id === "hormones" && !member) return (
+    <>
+      <button type="button" className="link ex-back" onClick={back}>‹ The body</button>
+      <h3 className="ex-h">Hormones</h3>
+      <p className="ex-intro">Hormones are the body's messengers. Food, training and sleep move them, in everyone. Glucose is said by name, as anyone with a sensor watches it. No page reads your numbers, names a condition or sells a supplement.</p>
+      <div className="menu-list ex-map">{HORMONE_MEMBERS.map((m) => (
+        <button key={m.key} type="button" className={`menu-row ${m.page ? "" : "ex-later"}`} onClick={() => m.page && setMember(m.page)}>
+          <span className="menu-row-text"><b>{m.name}</b><small>{m.hint}</small></span><small className="ex-state">{m.page ? "›" : "later"}</small>
+        </button>))}</div>
+      <small className="muted ex-line-note">Every member is on every profile: everyone has all of them. The cycle, thyroid and growth hormone wait for their own line.</small>
+    </>
+  );
+  const key = member ?? (BODY_PAGES[id] ? id : null);
+  if (key && BODY_PAGES[key]) return <BodyPage p={p} page={BODY_PAGES[key]} back={id === "hormones" ? () => setMember(null) : back} backLabel={id === "hormones" ? "‹ Hormones" : "‹ The body"} />;
+  return <BodyLater id={id} back={back} />;
+}
+function TapList({ p, taps, kind }: { p: AppApi; taps: Tap[]; kind: string }) {
+  const today = new Date();
+  const run = (t: Tap) => {
+    if (t.where.startsWith("Nothing to change") || t.where.startsWith("It already")) { p.notify("Nothing to change here."); return; }
+    if (t.id === "protein") p.openOut({ q: kind === "fat" ? "Protein at every meal this week, with my strength days kept: what does each meal look like on my numbers?" : `${t.label}: what do I put on the plate, on my numbers?` });
+    else if (t.id === "dinner") { showPlanOn(today.toISOString().slice(0, 10)); p.setTab("plan"); }
+    else if (t.id === "easy") p.openOut({ q: "Where does a 30 minute walk fit in my day, most days of the week, and what does it do for my goal?" });
+    else if (t.id === "snack") p.openOut({ q: `${t.label}: how do I do that on my plate, on my numbers?` });
+  };
+  return <div className="ex-taps">{taps.map((t) => <button key={t.label} type="button" className="pill ex-tap" onClick={() => run(t)}><b>{t.label}</b><small>{t.where}</small></button>)}</div>;
+}
+export function CaseCard({ p, title, c, kind }: { p: AppApi; title: string; c: Case; kind: string }) {
+  return (
+    <section className="card ex-case" aria-label={title}>
+      <b>{title}</b>
+      <small className="muted">Read from your settings, your plan and your plates. Nothing is changed unless you tap.</small>
+      <Parts parts={c.parts.slice(0, 3)} />
+      <div className="ex-part"><span className="ex-part-n" aria-hidden="true">4</span><div><b>{c.parts[3].title}</b>{c.parts[3].body && <small>{c.parts[3].body}</small>}<TapList p={p} taps={c.taps} kind={kind} /></div></div>
+      <Parts parts={c.parts.slice(4)} />
+      {c.trend && <div className="ex-trend"><b>Trend against trajectory</b><small>{c.trend}</small></div>}
+    </section>
+  );
+}
+export function BodyPage({ p, page, back, backLabel }: { p: AppApi; page: BodyPageData; back: () => void; backLabel: string }) {
+  const today = useMemo(() => new Date(), []);
+  useEffect(() => { setChefContext({ about: `On Explorer, The body, ${page.name}.`, chips: page.chips }); return () => setChefContext(null); }, [page]);
+  const c = useMemo<Case>(() => page.key === "glucose"
+    ? glucoseCase({ personal: p.personal, feedback: p.state.feedback, planned: p.planned, numbersFor: p.numbersFor, pdRef: p.pdRef, giOf: (name) => CARB_FOODS_ALL.find((f) => name.toLowerCase().startsWith(f.name.split(",")[0].toLowerCase()))?.gi ?? null }, today)
+    : page.key === "glycogen" ? glycogenCase(p.personal, today)
+    : fatCase({ personal: p.personal, feedback: p.state.feedback, planned: p.planned, band: p.goal?.band ?? "maintain", goalSetAt: p.goal?.setAt, numbersFor: p.numbersFor }, today), [page.key, p, today]);
+  const title = page.key === "glucose" ? "Your case: the next meal" : page.key === "glycogen" ? "Your case: today" : "Your case: this week";
+  return (
+    <>
+      <button type="button" className="link ex-back" onClick={back}>{backLabel}</button>
+      <h3 className="ex-h">{page.name}</h3>
+      <p className="ex-intro">{page.intro}</p>
+      {page.sections.map((s) => <Lines key={s.title} title={s.title} lines={s.lines} />)}
+      <When rows={page.when} />
+      <CaseCard p={p} title={title} c={c} kind={page.key} />
+      <section className="card">
+        <b>Ask Chef Mealan</b>
+        <small className="muted">The round button on this page starts with these.</small>
+        <div className="moments ex-chipq">{page.chips.map((q) => <button key={q} type="button" className="choice" onClick={() => p.openOut({ q })}>{q}</button>)}</div>
+      </section>
+      <p className="ex-sources">{page.line} Sources: {page.sources}</p>
+    </>
+  );
+}
+export function FatburnPage({ p, back }: { p: AppApi; back: () => void }) {
+  const pg = SITUATION_PAGES.fatburn!;
+  const today = useMemo(() => new Date(), []);
+  useEffect(() => { setChefContext({ about: "On Explorer, Situations, Fat burning: what is true when.", chips: pg.chips }); return () => setChefContext(null); }, [pg.chips]);
+  const c = useMemo(() => fatCase({ personal: p.personal, feedback: p.state.feedback, planned: p.planned, band: p.goal?.band ?? "maintain", goalSetAt: p.goal?.setAt, numbersFor: p.numbersFor }, today), [p, today]);
+  return (
+    <>
+      <button type="button" className="link ex-back" onClick={back}>‹ Situations</button>
+      <h3 className="ex-h">{pg.name}</h3>
+      <p className="ex-intro">{pg.intro}</p>
+      <Lines title="What is true during a session" lines={pg.effects} />
+      <Lines title="What is true over the day" lines={[...pg.causes, pg.loop]} />
+      <When rows={pg.when} />
+      <CaseCard p={p} title="Your case: this week" c={c} kind="fat" />
+      <section className="card">
+        <b>Ask Chef Mealan</b>
+        <small className="muted">The round button on this page starts with these.</small>
+        <div className="moments ex-chipq">{pg.chips.map((q) => <button key={q} type="button" className="choice" onClick={() => p.openOut({ q })}>{q}</button>)}</div>
+      </section>
+      <section className="card">
+        <b>The pages this one reads</b>
+        <div className="menu-list ex-map">
+          <button type="button" className="menu-row" onClick={() => p.openExplorer?.("body", "fat")}><span className="menu-row-text"><b>The body: The fat store</b><small>The five words</small></span><small className="ex-state">›</small></button>
+          <button type="button" className="menu-row" onClick={() => p.openExplorer?.("body", "glycogen")}><span className="menu-row-text"><b>The body: Glycogen</b><small>Why carbs after a session</small></span><small className="ex-state">›</small></button>
+        </div>
+      </section>
+      <p className="ex-sources">{pg.line} Sources: {pg.sources}</p>
     </>
   );
 }

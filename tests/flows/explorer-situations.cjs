@@ -1,4 +1,5 @@
-// DT180 to DT187 (0.3.25, boards Stories129 to Stories136; Coach Milan 31 October 13:12 "Let's code Explorer"): three parts, one
+// 0.3.26 (DT181 v2, DT183 to DT186): The body's first pages, Glucose and insulin, Glycogen, The fat store, and the situation
+// Fat burning. DT180 to DT187 (0.3.25, boards Stories129 to Stories136; Coach Milan 31 October 13:12 "Let's code Explorer"): three parts, one
 // search bar, The body's map, the Situations list, and the first situation page, A bad night's sleep, with Your case in five parts.
 // (The head of this file follows explorer.cjs.) Earlier: DT151 Explorer, Not
 // all proteins are equal, in the Menu below Foods. Each food is one portion against one meal: the meal's protein from the day
@@ -84,6 +85,49 @@ const SHOTS = process.env.SHOTS;
   await page.locator(".ex-chipq .choice").first().click(); await page.waitForTimeout(800);
   const chat = await text(page.locator("body"));
   ok(/Why am I hungrier today\?/.test(chat), "a chip asks Chef Mealan the question");
+  // 0.3.26: The body's first pages: Hormones lists its members, Glucose and insulin opens with Your case
+  await page.goto(U + "/"); await page.waitForTimeout(1000);
+  await page.getByRole("button", { name: "Menu" }).first().click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: /^Explorer/ }).click(); await page.waitForTimeout(800);
+  await parts.getByRole("radio", { name: "The body" }).click(); await page.waitForTimeout(400);
+  const states = await page.locator(".ex-map .menu-row .ex-state").allTextContents();
+  ok(states.join(",") === "later,›,›,later,later,later,›,later", "the map: the fat store, glycogen and hormones have pages: " + states.join(","));
+  await page.locator(".ex-map .menu-row").filter({ hasText: "Hormones" }).click(); await page.waitForTimeout(400);
+  const members = await page.locator(".ex-map .menu-row b").allTextContents();
+  ok(await text(page.locator(".ex-h")) === "Hormones" && members.length === 5 && /Glucose and insulin/.test(members[0]) && members.some((m) => /Testosterone/.test(m)) && members.some((m) => /Oestrogen/.test(m)), "Hormones: five members, glucose first: " + members.join(" | "));
+  await page.locator(".ex-map .menu-row").first().click(); await page.waitForTimeout(600);
+  let bp = await text(page.locator(".explorer"));
+  ok(/Glucose and insulin/.test(await text(page.locator(".ex-h"))) && /When it helps, when it hurts/.test(bp) && /Source:/.test(bp), "Glucose and insulin: the page with its sources");
+  ok(/Your case: the next meal/.test(bp) && /3 meals a day/.test(bp) && /Your carbs today/.test(bp), "your case reads the next meal from the clock and the plan");
+  ok(/A training day: the meal after the session/.test(bp), "today's training was made easy above: the meal after the session is where carbs land");
+  if (process.env.SHOT) { await page.screenshot({ path: process.env.SHOT + "-glucose.png", fullPage: true }); }
+  const bt = await page.locator(".ex-tap").evaluateAll((xs) => xs.map((x) => Math.round(x.getBoundingClientRect().height)));
+  ok(bt.length >= 1 && bt.every((h) => h >= 44), "the taps 44 px or more: " + bt.join(","));
+  await page.getByRole("button", { name: "‹ Hormones" }).click(); await page.waitForTimeout(300);
+  ok(await text(page.locator(".ex-h")) === "Hormones", "back to the family");
+  await page.getByRole("button", { name: "‹ The body" }).click(); await page.waitForTimeout(300);
+  // Glycogen and The fat store open straight from the map
+  await page.locator(".ex-map .menu-row").filter({ hasText: "Glycogen" }).first().click(); await page.waitForTimeout(500);
+  bp = await text(page.locator(".explorer"));
+  ok(/Only what was used gets refilled/.test(bp) && /Your case: today/.test(bp) && /Muscle glycogen will be used/.test(bp), "Glycogen: only what was used gets refilled; today is a training day");
+  await page.getByRole("button", { name: "‹ The body" }).click(); await page.waitForTimeout(300);
+  await page.locator(".ex-map .menu-row").filter({ hasText: "The fat store" }).click(); await page.waitForTimeout(500);
+  bp = await text(page.locator(".explorer"));
+  ok(/The fat store/.test(await text(page.locator(".ex-h"))) && /Your case: this week/.test(bp) && /days by the plan/.test(bp), "The fat store: your case reads the week by the plan");
+  if (process.env.SHOT) { await page.screenshot({ path: process.env.SHOT + "-fat.png", fullPage: true }); }
+  // the situation Fat burning, and its links back into The body
+  await parts.getByRole("radio", { name: "Situations" }).click(); await page.waitForTimeout(400);
+  await page.locator(".ex-map .menu-row").filter({ hasText: "Fat burning" }).click(); await page.waitForTimeout(600);
+  bp = await text(page.locator(".explorer"));
+  ok(/Fat burning: what is true when/.test(await text(page.locator(".ex-h"))) && /What is true during a session/.test(bp) && /What is true over the day/.test(bp) && /Your case: this week/.test(bp), "Fat burning: the session, the day, your case");
+  await page.locator(".menu-row").filter({ hasText: "The body: Glycogen" }).click(); await page.waitForTimeout(500);
+  ok(await text(page.locator(".ex-h")) === "Glycogen" && (await parts.getByRole("radio", { name: "The body" }).getAttribute("aria-checked")) === "true", "a situation page opens a body page, and the part follows");
+  // search reaches a body line
+  await field.fill("insulin"); await page.waitForTimeout(300);
+  const bh = await page.locator(".ex-hit b").allTextContents();
+  ok(bh.length > 0 && (await page.locator(".ex-hit-part").first().textContent()) === "The body", "search: insulin finds The body: " + bh.slice(0, 3).join(" | "));
+  await page.locator(".ex-hit").first().click(); await page.waitForTimeout(500);
+  ok(/Glucose and insulin/.test(await text(page.locator(".ex-h"))), "the hit opens Glucose and insulin");
   ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));
   await b.close(); server.kill();
   console.log(fails.length ? `${fails.length} failed` : "all ok"); process.exit(fails.length ? 1 : 0);

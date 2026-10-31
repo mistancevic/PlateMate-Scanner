@@ -24,7 +24,7 @@ import type { FoodRow } from "../foodTable";
 import { slotsOf } from "../slots";
 import { needOf } from "../planned";
 import { pdVal } from "../ui";
-import { ExplorerSearch, useExplorerIndex, BodyMap, BodyLater, SituationsList, SleepPage, PART_NAME } from "./ExplorerSituations";
+import { ExplorerSearch, useExplorerIndex, BodyMap, BodyFamily, SituationsList, SleepPage, FatburnPage, PART_NAME } from "./ExplorerSituations";
 import { SITUATIONS, type Part, type BodyId, type SituationId, type Hit } from "../explorerBody";
 
 const FALLBACK_MEAL = 30;
@@ -179,17 +179,20 @@ export function ExplorerScreen(p: AppApi) {
   const [part, setPart] = useState<Part>("nutrients");
   const [body, setBody] = useState<BodyId | null>(null);
   const [situation, setSituation] = useState<SituationId | null>(null);
+  const [member, setMember] = useState<string | null>(null);
   const index = useExplorerIndex();
-  const go = (h: Hit) => { setPart(h.go.part); setBody(h.go.body ?? null); setSituation(h.go.situation ?? null); if (h.go.family) setFamily(h.go.family as Family); window.scrollTo(0, 0); };
-  const pick = (x: Part) => { setPart(x); setBody(null); setSituation(null); window.scrollTo(0, 0); };
+  const go = (h: Hit) => { setPart(h.go.part); setBody(h.go.body ?? null); setMember(h.go.part === "body" ? h.go.member ?? null : null); setSituation(h.go.situation ?? null); if (h.go.family) setFamily(h.go.family as Family); window.scrollTo(0, 0); };
+  const pick = (x: Part) => { setPart(x); setBody(null); setMember(null); setSituation(null); window.scrollTo(0, 0); };
+  // a page can open another part of Explorer (the links between parts)
+  p.openExplorer = (x, id) => { setPart(x); setBody(x === "body" ? (id as BodyId) : null); setMember(null); setSituation(x === "situations" ? (id as SituationId) : null); window.scrollTo(0, 0); };
   return (
     <div className="explorer">
       <ExplorerSearch index={index} go={go} />
       <div className="moments ex-chips ex-parts" role="radiogroup" aria-label="Which part">
         {(["nutrients", "body", "situations"] as Part[]).map((x) => <button key={x} role="radio" aria-checked={part === x} className={`choice ${part === x ? "on" : ""}`} onClick={() => pick(x)}>{PART_NAME[x]}</button>)}
       </div>
-      {part === "body" ? (body ? <BodyLater id={body} back={() => setBody(null)} /> : <BodyMap open={setBody} />)
-        : part === "situations" ? (situation === "sleep" ? <SleepPage p={p} back={() => setSituation(null)} /> : situation ? <BodyLaterSituation id={situation} back={() => setSituation(null)} /> : <SituationsList open={setSituation} />)
+      {part === "body" ? (body ? <BodyFamily p={p} id={body} member={member} setMember={setMember} back={() => { setBody(null); setMember(null); }} /> : <BodyMap open={setBody} />)
+        : part === "situations" ? (situation === "sleep" ? <SleepPage p={p} back={() => setSituation(null)} /> : situation === "fatburn" ? <FatburnPage p={p} back={() => setSituation(null)} /> : situation ? <BodyLaterSituation id={situation} back={() => setSituation(null)} /> : <SituationsList open={setSituation} />)
         : <>
       <CalcLine {...p} />
       {/* DT154, DT155: the families, Protein first */}

@@ -204,6 +204,8 @@ export interface AppApi {
   goalFocus: "formula" | null;
   // the chat knows the screen (0.2.4); "fill" opens it with the day filled
   openOut: (ask?: "fill" | "plate" | "around" | { q: string }) => void;
+  // 0.3.26: set by the Explorer screen while it is open, so its pages can open one another
+  openExplorer?: (part: "nutrients" | "body" | "situations", id?: string) => void;
   // Where does this go (0.2.5): Scan from Today, then the sheet with the saved food
   scanFromToday: () => void;
   openScan: () => void; // DT106: Scan it from a chat row
