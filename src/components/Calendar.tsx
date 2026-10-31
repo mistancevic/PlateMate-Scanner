@@ -36,7 +36,9 @@ export function eventsFor(p: AppApi, now = new Date()): { events: CalEvent[]; fr
     noKitchen: () => p.travel?.kitchen === "hotel",
     checkIn: ci ? { date: ci, name: p.profile.coachId ? `Check-in with ${p.coachLabel}` : "Goal check-in" } : null,
     shopping: getStore().lists.filter((x) => !x.doneAt && x.shopOn).map((x) => ({ n: x.n, at: x.shopOn! })),
-    origin: typeof location !== "undefined" ? location.origin : "https://chefmealan.com",
+    // 0.3.22 (Coach Milan 01:17: the events linked to the preview): the link is always chefmealan.com; only this computer's
+    // walkthroughs keep their own address
+    origin: typeof location !== "undefined" && /^(127\.0\.0\.1|localhost)$/.test(location.hostname) ? location.origin : "https://chefmealan.com",
     timeZone: timeZoneHere(),
   });
   return { events, from, to: days[days.length - 1] };
