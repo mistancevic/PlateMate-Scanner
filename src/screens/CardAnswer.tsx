@@ -26,6 +26,7 @@ export function CardAnswer({ row, card, coachName, send, notify, setError, onDon
       <textarea className="search" rows={2} aria-label={`Answer on ${cardRef.title}`} placeholder="One line about this meal" value={text} onChange={(e) => setText(e.target.value)} />
       <div className="ca-row">
         <button type="button" className="pill pill-small pill-primary" disabled={busy || !text.trim()} onClick={answer}>Send the answer</button>
+        {given.length > 0 && <button type="button" className="pill pill-small" disabled={busy} onClick={() => { setAgain(false); setText(""); }}>Cancel</button>}
         {!given.length && <><button type="button" className="pill pill-small" disabled={busy} onClick={() => react("good")}>Good 👍</button><button type="button" className="pill pill-small" disabled={busy} onClick={() => react("seen")}>Seen</button></>}
       </div>
       <small className="muted">An answer lands on {name}'s Today with the meal quoted, with Got it. Good or Seen lands on the card only.</small>

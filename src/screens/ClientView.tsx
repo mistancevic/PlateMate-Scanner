@@ -62,7 +62,7 @@ export function ClientView({ p, tab }: { p: AppApi; tab: Tab }) {
   const name = first(row.name);
   const head = (what: string) => (
     <div className="cv-head">
-      <button type="button" className="link" onClick={() => { p.setCoachClient(null); p.setTab("clients"); }}>‹ Clients</button>
+      <button type="button" className="link" onClick={() => { p.setCoachClient(null); p.setTab("clients"); }}>‹ Clients{p.waiting.length ? ` · ${p.waiting.length} waiting` : ""}</button>
       <h3 className="cv-name">{row.name}</h3>
       <small className="muted">{what}. What {name} sees, as {name} sees it.</small>
     </div>

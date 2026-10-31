@@ -108,7 +108,12 @@ const PORT = "3340", U = `http://127.0.0.1:${PORT}`;
   ok(await page.locator(".card-answer").count() >= 1, "the row opens the client's page with Answer under the shared cards");
   const ca = page.locator(".client-card").filter({ has: page.locator(".card-answer") }).first();
   await ca.locator("textarea").fill("Yes. The skyr is the protein; keep it on the side."); await ca.getByRole("button", { name: "Send the answer" }).click(); await page.waitForTimeout(600);
-  ok(/You answered/.test(await text(ca)) && /Answer again/.test(await text(ca)), "Send: the card shows the answer and Answer again");
+  ok(/You answered/.test(await text(ca)) && /Answer again/.test(await text(ca)) && await ca.locator("textarea").count() === 0, "Send: the card shows the answer and Answer again; the field folds");
+  await ca.getByRole("button", { name: "Answer again" }).click(); await page.waitForTimeout(200);
+  ok(await ca.locator("textarea").count() === 1 && await ca.getByRole("button", { name: "Cancel" }).count() === 1, "Answer again opens the field with Cancel");
+  await ca.getByRole("button", { name: "Cancel" }).click(); await page.waitForTimeout(200);
+  ok(await ca.locator("textarea").count() === 0, "Cancel folds it");
+  ok(/‹ Clients · \d+ waiting/.test(await text(page.locator(".cw-back"))), "0.3.32: the way back says what waits one level up: " + await text(page.locator(".cw-back")));
   const second = page.locator(".client-card").filter({ has: page.locator(".card-answer") }).nth(1);
   if (await second.count()) { await second.getByRole("button", { name: "Good 👍" }).click(); await page.waitForTimeout(500); ok(/Good 👍,/.test(await text(second)), "Good: a reaction on the card only"); }
   await page.getByRole("button", { name: "‹ Clients" }).click(); await page.waitForTimeout(600);

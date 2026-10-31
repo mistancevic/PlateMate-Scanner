@@ -83,7 +83,7 @@ const TONE: Record<string, string> = { lived: "cw-green", plan: "cw-green", chan
 const MARK: Record<SlotMark, [string, string]> = { plan: ["By the plan", "cw-green"], swapped: ["Swapped", "cw-amber"], skipped: ["Skipped on purpose", "cw-ink"], missed: ["Not eaten", "cw-amber"], open: ["Still to come", "cw-grey"] };
 const kcalText = (n: number) => `${Math.round(n).toLocaleString("en")} kcal`;
 
-export function ClientPage({ row, coachName, ops, back, notify, setError, tail }: { row: ClientRow; coachName: string; ops: CoachOps; back: () => void; notify: (m: string) => void; setError: (m: string) => void; tail: ReactNode }) {
+export function ClientPage({ row, coachName, ops, back, notify, setError, tail, waitingCount = 0 }: { row: ClientRow; coachName: string; ops: CoachOps; back: () => void; notify: (m: string) => void; setError: (m: string) => void; tail: ReactNode; waitingCount?: number }) {
   const name = first(row.name);
   const [offset, setOffset] = useState(0);
   const [openDay, setOpenDay] = useState<string | null>(null);
@@ -130,7 +130,8 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tail }
   const notesShown = [...row.notes].reverse();
   return (
     <div className="client-page">
-      <div className="menu-head cw-back"><button className="link" onClick={back}>‹ Clients</button><span /></div>
+      {/* DT189 (0.3.32, Milan 18:39): the badge is visible from here, so the way back says what waits one level up */}
+      <div className="menu-head cw-back"><button className="link" onClick={back}>‹ Clients{waitingCount > 0 ? ` · ${waitingCount} waiting` : ""}</button><span /></div>
       <section className="card person cw-person"><span className="avatar">{row.name.slice(0, 1).toUpperCase()}</span>
         <div><b>{name}</b><small>{[g ? goalLabel(g.id) : "No goal yet", kcalNow ? `${kcalNow.toLocaleString("en")} kcal` : null, proteinNow ? `${proteinNow} g protein` : null, wk ? `week ${wk}` : null].filter(Boolean).join(" · ")}</small><small>Check-in: {DAY_NAMES[row.checkinDay]}</small></div>
       </section>
