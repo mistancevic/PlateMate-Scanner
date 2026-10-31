@@ -77,6 +77,10 @@ export function CalendarSync({ p }: { p: AppApi }) {
   // DT179: moves read in Google come here; the clock ticks once a minute so the calendar is looked at again
   useEffect(() => { onMoves((m) => applyMoves(latest.current.p, m)); const i = setInterval(() => setTick((n) => n + 1), 60 * 1000); return () => clearInterval(i); }, []);
   const due = c.on && lookDue();
+  // 0.3.24 (Coach Milan 09:46 and 09:57: Failed to fetch after switching to another app while the calendar was being read):
+  // a phone pauses a page in the background and its calls fail; back in front, a failed sync goes again by itself
+  const [kick, setKick] = useState(0);
+  useEffect(() => { const f = () => { if (document.visibilityState === "visible" && calStatus().state === "error") setKick((n) => n + 1); }; document.addEventListener("visibilitychange", f); return () => document.removeEventListener("visibilitychange", f); }, []);
   // DT179: busy times, read while a token with that right is held; kept and moved for gone dates drop off
   useEffect(() => {
     if (!c.on || !c.busy) return;
@@ -93,7 +97,7 @@ export function CalendarSync({ p }: { p: AppApi }) {
   useEffect(() => {
     if (!c.on) { if (calStatus().state !== "off") setCalStatus({ state: "off" }); return; }
     const token = heldToken();
-    if (!needsSync(c.id, events) && !(token && due)) { if (calStatus().state === "off" || calStatus().state === "tap") setCalStatus({ state: "done" }); return; }
+    if (!needsSync(c.id, events) && !(token && due)) { if (["off", "tap", "error"].includes(calStatus().state)) setCalStatus({ state: "done" }); return; }
     if (!token) { setCalStatus({ state: "tap" }); return; }
     const t = setTimeout(async () => {
       const { p: q, events: ev, from: f, to: tt } = latest.current;
@@ -102,7 +106,7 @@ export function CalendarSync({ p }: { p: AppApi }) {
     }, 1500);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [c.on, c.id, sig, due]);
+  }, [c.on, c.id, sig, due, kick]);
   return null;
 }
 

@@ -20,9 +20,10 @@ const PORT = "3198", B = `http://127.0.0.1:${PORT}`;
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
   const errs = [];
   // the stand-in Google Calendar
-  const cals = new Map(); let n = 0; const auths = new Set(); let inFlight = 0, most = 0, slowMs = 60;
+  const cals = new Map(); let n = 0; const auths = new Set(); let inFlight = 0, most = 0, slowMs = 60, failNext = false;
   const google = async (route) => {
     const req = route.request(), u = new URL(req.url()), m = req.method(), body = req.postData() ? JSON.parse(req.postData()) : null;
+    if (failNext && m !== "OPTIONS") return route.abort("failed");
     auths.add(req.headers()["authorization"]);
     const send = (status, j) => route.fulfill({ status, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: status === 204 ? "" : JSON.stringify(j) });
     if (m === "OPTIONS") return route.fulfill({ status: 204, headers: { "access-control-allow-origin": "*", "access-control-allow-headers": "authorization,content-type", "access-control-allow-methods": "GET,POST,PUT,DELETE" } });
@@ -129,6 +130,15 @@ const PORT = "3198", B = `http://127.0.0.1:${PORT}`;
     await page.evaluate(() => { window.__cmCalendarToken = "test-token"; });
     await up.click(); await page.waitForTimeout(1500);
     ok(!live().some((e) => e.start.dateTime === "2026-11-02T17:30:00") && /Also in your Google Calendar/.test(await page.locator(".cal-line").textContent()), "one tap: training taken out, the line is back");
+    // 0.3.24: a sync that never reaches Google, even after trying again, says so; back in front, it goes again by itself
+    await page.evaluate(() => sessionStorage.removeItem("no-token"));
+    await me(); await page.locator(".menu-row").filter({ hasText: "Google Calendar" }).click(); await page.waitForTimeout(1500);
+    failNext = true;
+    await page.getByRole("switch", { name: /^Training/ }).click(); await page.waitForTimeout(10000);
+    ok(/could not be reached\. Tap Update to go on where it stopped/.test(await page.locator(".cal-line").textContent()), "never reached Google: said in plain words");
+    failNext = false;
+    await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange"))); await page.waitForTimeout(2500);
+    ok(live().some((e) => e.start.dateTime === "2026-11-02T17:30:00") && await page.locator(".cal-line").count() === 0, "back in front: it goes again by itself and is done");
     // Turn off: remove the calendar (a new hour: the token is back)
     await page.evaluate(() => sessionStorage.removeItem("no-token"));
     await me(); await page.locator(".menu-row").filter({ hasText: "Google Calendar" }).click(); await page.waitForTimeout(500);
@@ -137,7 +147,7 @@ const PORT = "3198", B = `http://127.0.0.1:${PORT}`;
     await page.getByRole("button", { name: "Remove the Chef Mealan calendar" }).click(); await page.waitForTimeout(1200);
     const p2 = await personal();
     ok(cals.size === 0 && p2.calendar.on === false && !p2.calendar.id, "removed from Google; off");
-    ok(p2.calendar.kinds && p2.calendar.kinds.training === false, "the kinds you chose are kept for next time");
+    ok(p2.calendar.kinds && p2.calendar.kinds.training === true && p2.calendar.kinds.weigh === false, "the kinds you chose are kept for next time");
     await me();
     ok(/Off\./.test(await page.locator(".menu-row").filter({ hasText: "Google Calendar" }).textContent()), "Me says off again");
     await page.goto(B + "/privacy"); await page.waitForTimeout(700);

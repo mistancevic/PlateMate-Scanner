@@ -165,3 +165,17 @@ test("DT179: cooked ahead: the cooking sits on the day before", () => {
   assert.ok(names.includes("2026-11-01T19:30 Cook ahead for Monday · Chicken rice bowl"), names.join(" | "));
   assert.ok(!names.some((n) => n.startsWith("2026-11-02T19:30 Cook dinner")));
 });
+
+test("0.3.24: a call that never reaches Google, or a busy Google, is tried again", async () => {
+  const g = fakeGoogle(); let lost = 0, busy = 0;
+  const f: Fetch = async (u, i) => {
+    if ((i?.method || "GET") === "POST" && u.endsWith("/events")) {
+      if (lost < 2) { lost++; throw new TypeError("Failed to fetch"); }
+      if (busy < 1) { busy++; return new Response(JSON.stringify({ error: { message: "Backend Error" } }), { status: 503 }); }
+    }
+    return g.f(u, i);
+  };
+  const ev = calendarEvents(base());
+  const r = await syncCalendar(f, "t", undefined, ev, "2026-11-02", "2026-11-03", "Europe/Berlin");
+  assert.equal(lost, 2); assert.equal(busy, 1); assert.equal(r.made, ev.length);
+});

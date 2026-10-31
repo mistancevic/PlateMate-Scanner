@@ -65,6 +65,8 @@ export async function runSync(token: string, id: string | undefined, events: Cal
     } catch (e: any) {
       if (e?.status === 401) { dropToken(); setCalStatus({ state: "tap" }); return null; }
       if (e?.name === "TimeoutError" || e?.name === "AbortError") { setCalStatus({ state: "error", message: "Google Calendar did not answer in time. Try again." }); return null; }
+      // 0.3.24: the phone could not reach Google, even after trying again: plain words, and the tap goes on where it stopped
+      if (e?.name === "TypeError") { setCalStatus({ state: "error", message: "Google Calendar could not be reached. Tap Update to go on where it stopped." }); return null; }
       setCalStatus({ state: "error", message: e?.message || "Google Calendar did not answer." });
       return null;
     }

@@ -114,17 +114,21 @@ async function call(f: Fetch, token: string, method: string, path: string, body?
   for (let n = 0; ; n++) {
     // 0.3.22: no call waits longer than 20 seconds
     const signal = typeof AbortSignal !== "undefined" && "timeout" in AbortSignal ? AbortSignal.timeout(20000) : undefined;
-    const r = await f(`${API}${path}`, { method, signal, headers: { Authorization: `Bearer ${token}`, ...(body ? { "Content-Type": "application/json" } : {}) }, body: body ? JSON.stringify(body) : undefined });
+    // 0.3.24 (Coach Milan 09:46, "Failed to fetch" on a phone): a call that never reaches Google, or a busy Google (500 to
+    // 503), is tried again like a call Google asks to slow down
+    let r: Response;
+    try { r = await f(`${API}${path}`, { method, signal, headers: { Authorization: `Bearer ${token}`, ...(body ? { "Content-Type": "application/json" } : {}) }, body: body ? JSON.stringify(body) : undefined }); }
+    catch (e: any) { if (e?.name === "TypeError" && n < 3) { await retryWait(n); continue; } throw e; }
     if (r.status === 204) return null;
     const j = await r.json().catch(() => null);
-    const slow = r.status === 429 || (r.status === 403 && /rate|quota/i.test(JSON.stringify(j?.error ?? "")));
+    const slow = r.status === 429 || r.status >= 500 || (r.status === 403 && /rate|quota/i.test(JSON.stringify(j?.error ?? "")));
     if (slow && n < 3) { await retryWait(n); continue; }
     if (!r.ok) throw new CalError(r.status, j?.error?.message || `Google Calendar answered ${r.status}`);
     return j;
   }
 }
 // a few at a time: 100 events one by one took about a minute on a phone (Coach Milan, 31 October 01:04)
-export const CAL_AT_ONCE = 6;
+export const CAL_AT_ONCE = 4;
 async function pool<T>(items: T[], n: number, run: (x: T) => Promise<void>) {
   let i = 0;
   await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) { const x = items[i++]; await run(x); } }));
