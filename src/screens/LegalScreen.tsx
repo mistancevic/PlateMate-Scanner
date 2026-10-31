@@ -57,7 +57,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
       {page === "privacy" && (
         <article>
           <h1>Privacy notice</h1>
-          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 31 October 2026 (Google Calendar and busy times; a second screen while cooking; Travel mode; voice in cook mode; step pictures; daily backups kept 30 days; product search on Open Food Facts; what goes to Gemini with each request; your private part; Your summary and your coach)</p>
+          <p className="small muted">GDPR Articles 13 and 14 · Datenschutzerklärung · Last updated 31 October 2026 (accounts nobody uses; signed out after 30 days; Google Calendar and busy times; a second screen while cooking; Travel mode; voice in cook mode; step pictures; daily backups kept 30 days; product search on Open Food Facts; what goes to Gemini with each request; your private part; Your summary and your coach)</p>
           <h2>1. Who is responsible</h2>
           <p>{OPERATOR.name}, {OPERATOR.city}, {OPERATOR.country}. <a href={`mailto:${OPERATOR.email}`}>{OPERATOR.email}</a>. No data protection officer is appointed; the pilot is below the thresholds that require one.</p>
           <h2>2. What Chef Mealan keeps, and why</h2>
@@ -88,6 +88,8 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
           </ul>
           <h2>4. How long</h2>
           <p>While your account exists. Delete the account, from Menu, Account, and everything goes: profile, declarations, foods, cards, photos, recipes, the recipes you shared with members, the sign-in. Once a day the database is backed up by Google, in the same Frankfurt location, and each backup is deleted after 30 days, so after you delete your account your data leaves the backups within 30 days. A backup is only ever used to restore the app after a failure. When the photos moved into image files in October 2026, their old copies in the database stayed for 30 days, then were removed.</p>
+          <p><b>An account nobody uses.</b> When you have not opened Chef Mealan for 12 months, the account and everything in it is deleted, the way Delete my account does it. No email before it. Open the app once and the 12 months start again. The last time you opened the app is the last time Google's sign-in saw your account.</p>
+          <p><b>Signed out after 30 days.</b> When a phone has not opened the app for 30 days, the app signs you out on that phone and clears it. Nothing is lost: your data is in your account, and it is back when you sign in.</p>
           <h2>5. Your rights</h2>
           <p>Access, rectification, erasure, restriction, portability and objection, Art. 15 to 21. In the app: Menu, Account, Export my data gives you everything as one file; Delete my account removes it. By email: {OPERATOR.email}. You may complain to a supervisory authority; for Bavaria that is the Bayerisches Landesamt für Datenschutzaufsicht (BayLDA), Ansbach.</p>
           <h2>6. Age</h2>

@@ -4,6 +4,7 @@ import { CalendarSync } from "./components/Calendar";
 import { askToken, dropCalendar } from "./calendarSync";
 import { KitchenScreen } from "./screens/KitchenScreen";
 import { endTravel, daysAway, sinceWords, placeName as travelPlace, kitchenName, type Travel } from "./travel";
+import { idleOut, lastOpen, markOpen, setIdleOut } from "./idle";
 import { servingsOf } from "./pilot";
 import { wholeOnPlate } from "./counted";
 import { drainedOf, libraryId, packLine } from "./canned";
@@ -899,6 +900,7 @@ export default function App() {
     fromCloud = useRef(false),
     // opened with the phone's copy while the account was still loading (slow network): edits made then count as newer
     localMode = useRef(false),
+    idleRef = useRef(false),
     prevFoodIds = useRef<string[]>(state.foods.map((f) => f.id));
   // ---- photos as files (storage release 1, canvas P0 to P2) ----
   // The phone keeps photos in its own photo store; the saved data carries none once they are safely there.
@@ -2125,6 +2127,16 @@ export default function App() {
   };
   // DT131 (0.2.113): foods about to land on a plate that has foods wait for one answer; on an empty plate they land at once
   const askPlate = (x: import("./screens/api").PlateAsk) => { if (!state.items.length) { x.apply("new"); return; } setPlateAsk(x); };
+  // DT196 (0.3.37): a phone that has not opened the app for 30 days signs out, the usual way (saves first, clears the phone);
+  // when the save cannot finish (offline) it stays signed in and tries at the next start. Every start marks the day.
+  const idleRef2 = useRef(false);
+  useEffect(() => {
+    if (!cloudEnabled || !user || !profileReady || !cloudLoaded.current || localMode.current || idleRef2.current) return;
+    idleRef2.current = true;
+    if (idleOut(lastOpen(), new Date())) { idleRef.current = true; void screenProps.signOut().then((out) => { if (!out) idleRef.current = false; }); }
+    else markOpen();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.uid, profileReady]);
   const screenProps: AppApi = {
     state, setState, setCamera, setMode, blank, add, updateItem,
     saveMeal, mix, personalize, lookup, exportData, notify, setError, setBusy,
@@ -2586,6 +2598,7 @@ export default function App() {
         if (!saved) return false;
       }
       clearKept(); try { localStorage.clear(); sessionStorage.clear(); await storeClear(); } catch { /* cleared what could be */ }
+      if (idleRef.current) setIdleOut();   // DT196: the sign-in page says why, once
       await signOutCloud(); cloudLoaded.current = false; location.reload();
       return true;
     },

@@ -180,6 +180,7 @@ app.get("/api/status", (_req, res) =>
   }),
 );
 const requests = new Map<string, { count: number; until: number }>();
+app.use("/api", (req, _res, next) => { if (spaceOf(req) === "live") void sweepIdleAccounts(); next(); });
 app.use("/api", (req, res, next) => {
   // DT177 (0.3.20): a cooking session's two screens read and move it every 2 seconds, often from one home address; those
   // reads carry the session's code and token or the owner's sign-in, and are not counted here (joining still is)
@@ -490,9 +491,14 @@ app.post("/api/export", requireUser, async (req, res) => {
 app.post("/api/account/delete", requireUser, async (req, res) => {
   const uid = (req as any).uid as string | undefined;
   if (!uid) return res.status(401).json({ error: "Please sign in." });
+  const r = await deleteAccountOf(uid, String((req as any).email || "").toLowerCase());
+  return res.status(r.ok ? 200 : 500).json(r);
+});
+// the whole deletion for one account; Delete my account and the idle sweep (DT196) both use it
+async function deleteAccountOf(uid: string, emailIn: string) {
   const d = db();
-  let email = String((req as any).email || "").toLowerCase();
-  const r = await deleteAccountSteps({
+  let email = emailIn;
+  return deleteAccountSteps({
     lock: async () => { await adminAuth().updateUser(uid, { disabled: true }); await adminAuth().revokeRefreshTokens(uid); },
     unlock: async () => { await adminAuth().updateUser(uid, { disabled: false }); },
     files: async () => { if (BUCKET) await adminStorage().bucket(BUCKET).deleteFiles({ prefix: `users/${uid}/` }); },
@@ -525,10 +531,46 @@ app.post("/api/account/delete", requireUser, async (req, res) => {
       if (typed.length) { const b = d.batch(); typed.forEach((x) => b.delete(x.ref)); await b.commit(); }
     },
     signin: async () => { await adminAuth().deleteUser(uid); },
-    log: (line) => console.error(`${line} (uid ${uid})`),
+    log: (line) => console.error(line),   // DT196 (tracker f13): no account id in the logs
   });
-  return res.status(r.ok ? 200 : 500).json(r);
-});
+}
+// DT196 (0.3.37, board Stories145, tracker f15; Coach Milan 31 October 22:01): an account nobody opened for 12 months is deleted
+// the way Delete my account does it, no email before it; the notice says so in section 4. Once a day, from the live space,
+// started by the first request of the day: the last time Google's sign-in saw the account (sign-in or token refresh, which
+// the open app does every hour) is the last time the app was opened. The owner's accounts (METRICS_EMAILS) are never swept.
+export const IDLE_ACCOUNT_DAYS = 365;
+export const lastSeenOf = (u: { metadata: { lastSignInTime?: string | null; lastRefreshTime?: string | null; creationTime?: string | null } }): number =>
+  Math.max(...[u.metadata.lastSignInTime, u.metadata.lastRefreshTime, u.metadata.creationTime].map((t) => (t ? Date.parse(t) : 0)));
+export const idleAccount = (u: { metadata: { lastSignInTime?: string | null; lastRefreshTime?: string | null; creationTime?: string | null }; disabled?: boolean }, now: number): boolean =>
+  !u.disabled && lastSeenOf(u) > 0 && now - lastSeenOf(u) >= IDLE_ACCOUNT_DAYS * 86400000;
+let sweeping = false;
+async function sweepIdleAccounts(): Promise<void> {
+  if (sweeping || !FB_PROJECT) return;
+  sweeping = true;
+  try {
+    const d = db(), ref = d.collection("housekeeping").doc("idle"), now = Date.now();
+    const mine = await d.runTransaction(async (t) => {
+      const cur = await t.get(ref); const last = Number(cur.get("lastRun") || 0);
+      if (now - last < 23 * 3600000) return false;
+      t.set(ref, { lastRun: now }, { merge: true }); return true;
+    });
+    if (!mine) return;
+    const keep = new Set(String(process.env.METRICS_EMAILS || "").toLowerCase().split(/[;,]/).map((x) => x.trim()).filter(Boolean));
+    let gone = 0, seen = 0, token: string | undefined;
+    do {
+      const page = await adminAuth().listUsers(1000, token); token = page.pageToken;
+      for (const u of page.users) {
+        seen++;
+        if (!idleAccount(u, now) || keep.has(String(u.email || "").toLowerCase())) continue;
+        const r = await deleteAccountOf(u.uid, String(u.email || "").toLowerCase());
+        if (r.ok) gone++;
+      }
+    } while (token);
+    await ref.set({ lastRun: now, seen, gone }, { merge: true });
+    if (gone) console.error(`[idle] ${gone} of ${seen} accounts not opened for ${IDLE_ACCOUNT_DAYS} days were deleted`);
+  } catch (e: any) { console.warn(`[idle] sweep stopped: ${String(e?.message || e).slice(0, 160)}`); }
+  finally { sweeping = false; }
+}
 // A shared plate's photo for the client's coach (storage release 1). Photo files are the owner's only; the coach gets one
 // through here, after the server checks that this coach is the client's coach and that the card is shared.
 app.get("/api/client-photo/:client/:card", requireUser, requireMember, requireCoach, async (req, res) => {
@@ -540,7 +582,7 @@ app.get("/api/client-photo/:client/:card", requireUser, requireMember, requireCo
     if (!user.exists || user.get("coachId") !== coach) return res.status(403).json({ error: "Not your client." });
     const c = await d.collection("users").doc(client).collection("cards").doc(card).get();
     if (!c.exists || c.get("shared") !== true) return res.status(403).json({ error: "This card is not shared." });
-    res.setHeader("Cache-Control", "private, max-age=3600");
+    res.setHeader("Cache-Control", "no-store");   // DT196 (tracker f13): unshared means gone from the coach's browser too
     if (BUCKET) {
       const f = adminStorage().bucket(BUCKET).file(`users/${client}/photos/fb~${card}.jpg`);
       const [there] = await f.exists();
@@ -674,6 +716,9 @@ async function allRecipes(req: express.Request, limit: number): Promise<any[]> {
 }
 const listRecipes = async (req: express.Request, limit: number) => (await allRecipes(req, 200)).filter((r) => !r.status || r.status === "live").slice(0, limit);
 const withoutPhoto = (r: any): PublicRecipe => { const { photo, authorUid, pending, waitingFor, ...rest } = r; return { ...rest, hasPhoto: Boolean(photo) } as PublicRecipe; };
+// DT196 (0.3.37, tracker f10): the public pages never serve the coach's send-back note, the review status or the cook's own
+// recipe id; the cook's list (/api/recipes/mine) keeps them
+const forPublic = (r: any): PublicRecipe => { const { note, status, mealId, ...rest } = withoutPhoto(r) as any; return rest as PublicRecipe; };
 
 // ---- The counter (0.2.5+r17, canvas board M; the metrics doc; privacy notice section 7) ----
 // App events arrive stripped (no free text, no food names, no health situation) and are kept under a member number made
@@ -893,7 +938,7 @@ app.get("/api/recipes", async (req, res) => {
   try {
     const n = Math.max(1, Math.min(24, Number(req.query.limit) || 24));
     res.setHeader("Cache-Control", "no-cache");
-    res.json({ recipes: (await listRecipes(req, n)).map((r) => forVisitor(withoutPhoto(r))) });
+    res.json({ recipes: (await listRecipes(req, n)).map((r) => forVisitor(forPublic(r))) });
   } catch (e) { fail(res, e); }
 });
 app.get("/api/recipes/:slug", async (req, res) => {
@@ -902,7 +947,7 @@ app.get("/api/recipes/:slug", async (req, res) => {
     if (!r || r.status === "waiting" || r.status === "back") return res.status(404).json({ error: "This recipe isn't published, or its address changed." });
     res.setHeader("Cache-Control", "no-cache");
     if (isDown(r)) return res.status(410).json({ takenDown: true, title: r.title });
-    res.json({ recipe: forVisitor(withoutPhoto(r)) });
+    res.json({ recipe: forVisitor(forPublic(r)) });
   } catch (e) { fail(res, e); }
 });
 app.get("/r/:slug/photo.jpg", async (req, res) => {
@@ -2264,7 +2309,7 @@ app.post("/api/tip", requireUser, requireMember, requireAI, async (req, res) => 
       // still breaking: the playbook writes the tip itself, plainly
       const lead = !pb.alone.ok ? `${pb.alone.reason.charAt(0).toUpperCase()}${pb.alone.reason.slice(1)}.` : pb.afterTraining.ok ? `${pb.afterTraining.reason.charAt(0).toUpperCase()}${pb.afterTraining.reason.slice(1)}.` : "";
       const second = !pb.beforeTraining.ok ? ` ${pb.beforeTraining.reason.charAt(0).toUpperCase()}${pb.beforeTraining.reason.slice(1)}.` : pb.caveats[0] ? ` ${pb.caveats[0].charAt(0).toUpperCase()}${pb.caveats[0].slice(1)}.` : "";
-      console.warn(`[tip] playbook wrote the tip for ${String(food.name).slice(0, 40)}: model broke ${broke.join("; ")}`);
+      console.warn(`[tip] playbook wrote the tip: model broke ${broke.join("; ")}`);   // DT196 (tracker f13): no food name in the logs
       return res.json({ tip: (lead + second).trim(), pairs: [], by: "playbook" });
     }
     res.json({ ...out, by: "mealan" });

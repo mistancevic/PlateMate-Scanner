@@ -20,9 +20,9 @@ service cloud.firestore {
       allow delete: if isOwner();
       // the coach's answer on the person's own numbers: the person may ask (waiting) or close, never approve or ask themselves to change
       function reviewOk() { return request.resource.data.get('numbersReview', null) == (existing() ? resource.data.get('numbersReview', null) : null) || request.resource.data.numbersReview.status in ['waiting', 'closed']; }
-      // DT168 (0.3.10): a coach writes only the coach's fields; state only while coach apps from before 0.3.10 still write the
-      // goal's numbers there (the person's next save takes them out of the main record)
-      function coachFieldsOnly() { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['coachNotes', 'checkinDay', 'coachGoal', 'coachSetAt', 'coachGoals', 'goal', 'state', 'numbersReview', 'formula', 'aiConfirmedAt', 'aiConfirmedBy']); }
+      // DT168 (0.3.10): a coach writes only the coach's fields. DT196 (0.3.37, tracker f03): state came off the list; the coach
+      // apps from before 0.3.10 that wrote the goal's numbers there are gone
+      function coachFieldsOnly() { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['coachNotes', 'checkinDay', 'coachGoal', 'coachSetAt', 'coachGoals', 'goal', 'numbersReview', 'formula', 'aiConfirmedAt', 'aiConfirmedBy']); }
       allow update: if (isOwner() && roleKept() && coachLinkOk() && aiKept() && reviewOk()) || (isCoachOf() && roleKept() && coachKept() && coachFieldsOnly());
       function coachOfParent() { return request.auth != null && get(/databases/$(database)/documents/users/$(uid)).data.get('coachId', '') == request.auth.uid; }
       // DT168 (0.3.10): the private part (library and plates, body data, health answers, allergies, declarations, where you
