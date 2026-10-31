@@ -28,7 +28,7 @@
 // MJ of today's energy; B3 in niacin equivalents (niacin + tryptophan/60); USDA's rows report no biotin. One row per food across both pages: the red pepper and
 // the milk are the same rows as on the Micros cards.
 
-export type MicroId = "a" | "d" | "e" | "k" | "c" | "b1" | "b2" | "b3" | "b5" | "b6" | "b7" | "b12" | "fol" | "ca" | "fe" | "mg" | "k_" | "zn";
+export type MicroId = "a" | "d" | "e" | "k" | "c" | "b1" | "b2" | "b3" | "b5" | "b6" | "b7" | "b12" | "fol" | "ca" | "fe" | "mg" | "k_" | "zn" | "se" | "i";
 export type MicroGroup = "fat" | "water" | "min";
 export const MICRO_GROUPS: { id: MicroGroup; name: string }[] = [{ id: "fat", name: "Vitamins, fat-soluble" }, { id: "water", name: "Vitamins, water-soluble" }, { id: "min", name: "Minerals" }];
 // DT162 (0.3.4, board Stories114; Milan 21:21 "We need to write both versions of the name"): every vitamin with its second name
@@ -40,9 +40,11 @@ export const MICRO_MEMBERS: { id: MicroId; name: string; also?: string; unit: "�
   { id: "b5", name: "Vitamin B5", also: "pantothenic acid", unit: "mg", group: "water" }, { id: "b6", name: "Vitamin B6", also: "pyridoxine", unit: "mg", group: "water" }, { id: "b7", name: "Vitamin B7", also: "biotin", unit: "µg", group: "water" },
   { id: "fol", name: "Vitamin B9", also: "folate", unit: "µg", group: "water" }, { id: "b12", name: "Vitamin B12", also: "cobalamin", unit: "µg", group: "water" },
   { id: "ca", name: "Calcium", unit: "mg", group: "min" }, { id: "fe", name: "Iron", unit: "mg", group: "min" }, { id: "mg", name: "Magnesium", unit: "mg", group: "min" }, { id: "k_", name: "Potassium", unit: "mg", group: "min" }, { id: "zn", name: "Zinc", unit: "mg", group: "min" },
+  // DT191 (0.3.36): selenium and iodine, promised on the Thyroid page
+  { id: "se", name: "Selenium", unit: "µg", group: "min" }, { id: "i", name: "Iodine", unit: "µg", group: "min" },
 ];
 // Regulation (EU) No 1169/2011, Annex XIII, Part A (folate as folic acid)
-export const NRV: Record<MicroId, number> = { a: 800, d: 5, e: 12, k: 75, c: 80, b1: 1.1, b2: 1.4, b3: 16, b5: 6, b6: 1.4, b7: 50, b12: 2.5, fol: 200, ca: 800, fe: 14, mg: 375, k_: 2000, zn: 10 };
+export const NRV: Record<MicroId, number> = { a: 800, d: 5, e: 12, k: 75, c: 80, b1: 1.1, b2: 1.4, b3: 16, b5: 6, b6: 1.4, b7: 50, b12: 2.5, fol: 200, ca: 800, fe: 14, mg: 375, k_: 2000, zn: 10, se: 55, i: 150 };
 export const EFSA_D = 15;          // µg a day, adults
 export const TOP_SHARE = 33;       // For your day: the members this portion brings at least a third of the day of
 export const MICRO_SCALE = 1.5;    // the bars run to 150 % of the day, the line at the whole day
@@ -76,7 +78,7 @@ const r = (x: number, d = 0) => Math.round(x * 10 ** d) / 10 ** d;
 // in a sentence: "vitamin K"; vitamin B9 by the name the EU claims and labels use, folate
 // the B vitamins by the names EU labels and claims use (Regulation (EU) No 1169/2011, Annex XIII)
 const LABEL_NAME: Record<string, string> = { "Vitamin B1": "thiamine", "Vitamin B2": "riboflavin", "Vitamin B3": "niacin", "Vitamin B5": "pantothenic acid", "Vitamin B7": "biotin", "Vitamin B9": "folate" };
-export const lowerName = (n: string) => (LABEL_NAME[n] ? LABEL_NAME[n] : n.replace(/^Vitamin /, "vitamin ").replace(/^(Folate|Calcium|Iron|Magnesium|Potassium|Zinc)$/, (x) => x.toLowerCase()));
+export const lowerName = (n: string) => (LABEL_NAME[n] ? LABEL_NAME[n] : n.replace(/^Vitamin /, "vitamin ").replace(/^(Folate|Calcium|Iron|Magnesium|Potassium|Zinc|Selenium|Iodine)$/, (x) => x.toLowerCase()));
 export const fmtAmount = (v: number, unit: string) => `${v < 10 ? v.toFixed(1) : Math.round(v)} ${unit}`;
 
 export type MicroClaim = { id: MicroId; name: string; high: boolean };
@@ -431,6 +433,28 @@ const MINERALS: MemberPage[] = [
     combine: [{ with: "Less phytate: whole grains, legumes, seeds", why: "Phytate holds zinc back. That is why EFSA's value for your day rises with the phytate you eat." }],
     much: "EFSA's upper limit for adults is 25 mg a day, from food and supplements together.",
     sources: "EU claims: Regulation (EU) No 432/2012. EFSA: dietary reference values for zinc (2014); the upper limit, from the Scientific Committee on Food (2002), in EFSA's overview of upper limits. Foods: USDA FoodData Central." },
+  // DT191 (0.3.36; Coach Milan 31 October "Proceed with Explorer coding"): selenium and iodine. EU claims: Regulation (EU) No 432/2012.
+  // EFSA: selenium adequate intake 70 µg (2014), upper limit 255 µg (2023); iodine adequate intake 150 µg (2014), upper limit
+  // 600 µg (Scientific Committee on Food 2002, in EFSA's overview). Selenium per food: USDA SR25 (2013), nutrient 317, the same
+  // USDA items as our rows (design/boards/selenium_sr25.json carries the NDB numbers). Iodine: USDA carries no iodine for our rows.
+  { id: "se", name: "Selenium", also: "", unit: "µg", label: 55,
+    efsa: { men: 70, women: 70, kind: "", src: "EFSA, adequate intake (2014)" },
+    ul: { v: 255, note: "EFSA's upper limit for adults (2023), from food and supplements together" },
+    is: "Works in the enzymes that switch thyroid hormone on, and in the enzymes that protect your cells. Fish, meat, eggs, bread and pasta bring it. Brazil nuts bring a lot: two cover the day.",
+    does: ["contributes to normal spermatogenesis", "contributes to the maintenance of normal hair", "contributes to the maintenance of normal nails", "contributes to the normal function of the immune system", "contributes to normal thyroid function", "contributes to the protection of cells from oxidative stress"],
+    foods: tableFoods("se"), foodsNote: TOP_NOTE + " The selenium numbers are USDA SR25 readings of the same foods.",
+    combine: [{ with: "Iodine: fish, dairy, eggs, iodised salt", why: "Iodine builds thyroid hormone, selenium switches it on. Both are EU authorised claims for normal thyroid function." }],
+    much: "EFSA's upper limit for adults is 255 µg a day, from food and supplements together. Brazil nuts vary a lot: a handful a day can pass it.",
+    sources: "EU claims: Regulation (EU) No 432/2012. EFSA: dietary reference values for selenium (2014); upper limit for selenium (2023). Foods: USDA SR25, nutrient 317." },
+  { id: "i", name: "Iodine", also: "", unit: "µg", label: 150,
+    efsa: { men: 150, women: 150, kind: "", src: "EFSA, adequate intake (2014)" },
+    ul: { v: 600, note: "the Scientific Committee on Food's upper limit for adults (2002), in EFSA's overview" },
+    is: "Your thyroid is built from it: thyroid hormone carries iodine. Fish, dairy, eggs and iodised salt bring it. How much a food has depends on the soil and the feed, so the numbers vary by country.",
+    does: ["contributes to normal cognitive function", "contributes to normal energy-yielding metabolism", "contributes to normal functioning of the nervous system", "contributes to the maintenance of normal skin", "contributes to the normal production of thyroid hormones and normal thyroid function"],
+    foods: [], gap: "Our USDA rows carry no iodine numbers, so the foods are named, not counted: fish, dairy, eggs, iodised salt.",
+    combine: [{ with: "Selenium: fish, meat, eggs, Brazil nuts", why: "Iodine builds thyroid hormone, selenium switches it on. Both are EU authorised claims for normal thyroid function." }],
+    much: "The upper limit for adults is 600 µg a day. Food rarely gets there; seaweed and supplements can.",
+    sources: "EU claims: Regulation (EU) No 432/2012. EFSA: dietary reference values for iodine (2014); the upper limit, from the Scientific Committee on Food (2002), in EFSA's overview of upper limits." },
 ];
 MEMBER_PAGES.push(...MINERALS);
 
