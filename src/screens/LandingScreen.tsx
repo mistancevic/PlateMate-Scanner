@@ -1,6 +1,7 @@
 import { BOOKS } from "../bookPages";
 import { useEffect, useRef, useState } from "react";
 import { tabOfPath } from "../back";
+import { takeIdleOut, IDLE_LINE } from "../idle";
 import { RecipeCard } from "./RecipePages";
 import type { PublicRecipe } from "../recipes";
 import { Check } from "lucide-react";
@@ -13,6 +14,7 @@ import { hit } from "../metrics";
 // The front door of chefmealan.com: what it is, how it works, request a code, or sign in with one.
 export function LandingScreen() {
   const formRef = useRef<HTMLDivElement>(null);
+  const [idle] = useState(() => takeIdleOut());   // DT196: signed out after 30 days, said once
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
   // signed out on an app address (chefmealan.com/foods): the home page sits at chefmealan.com
@@ -50,6 +52,13 @@ export function LandingScreen() {
         <div className="l-brand"><Mark size={30} color="var(--brand)" /><b>{APP_NAME}</b></div>
         <span className="l-topnav"><a className="l-recipes" href="/recipes">Recipes</a><button className="pill pill-small l-signin" disabled={busy} onClick={go}>Sign in</button></span>
       </header>
+      {idle && (
+        <section className="sh-arrived">
+          <b>Signed out</b>
+          <span>{IDLE_LINE}</span>
+          <button className="pill pill-primary" disabled={busy} onClick={go}>Sign in</button>
+        </section>
+      )}
       {/* SH73: someone who scanned a coach's QR code sees their code and the one step left */}
       {pendingCode() && (
         <section className="sh-arrived">

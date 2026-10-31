@@ -56,6 +56,11 @@ const dl = process.argv[2] || null;
     await page.locator(".rq-pub").getByRole("button", { name: "Continue" }).click(); await page.waitForTimeout(400);
     await sheet.getByRole("button", { name: /^Send to / }).click(); await page.waitForTimeout(1200);
     ok((await asCoach("/api/waiting/high-protein-crepes", { action: "live" })).status === 200 && (await api("/api/recipes/high-protein-crepes")).status === 200, "sent again; the coach makes it live");
+    // DT196 (0.3.37, tracker f10): the public page never carries the coach's note, the review status or the cook's recipe id
+    // (read from node with another address, so the two reads do not count against the page's 30 a minute)
+    { const read = async (u) => (await fetch(B + u, { headers: { "X-Forwarded-For": "10.9.9.9" } })).json();
+      const pub = (await read("/api/recipes/high-protein-crepes")).recipe; const list = (await read("/api/recipes")).recipes.find((r) => r.slug === "high-protein-crepes");
+      ok(!("note" in pub) && !("status" in pub) && !("mealId" in pub) && !("authorUid" in pub) && list && !("note" in list) && !("mealId" in list) && typeof pub.rating !== "undefined", "DT196: the public recipe has no note, status, recipe id or author id: " + Object.keys(pub).join(",")); }
     await sheet.getByRole("button", { name: "Close" }).click(); await page.reload(); await page.waitForTimeout(900); await myRecipes();
     ok(/Live/.test(await row.locator(".tile-state").textContent()), "My recipes: Live");
     // a change to a live recipe waits; the page stays as it was
@@ -78,6 +83,10 @@ const dl = process.argv[2] || null;
     await asCoach("/api/cooks", { uid: "local-client", on: false });
     const again = await page.evaluate(async () => (await fetch("/api/recipes", { method: "POST", headers: { "Content-Type": "application/json", "x-local-as": "client" }, body: JSON.stringify({ recipe: { title: "Oats", items: [{ name: "Oats", grams: 50 }], steps: [] } }) })).status);
     ok(again === 403, "once the coach switches Cook off, nothing more can be sent");
+    // DT196 (0.3.37, tracker f15 and f16): the notice says what happens to an account nobody uses and to a phone left 30 days
+    await page.goto(B + "/privacy"); await page.waitForTimeout(700);
+    { const t = await page.locator("main, body").first().textContent();
+      ok(/An account nobody uses\. When you have not opened Chef Mealan for 12 months, the account and everything in it is deleted/.test(t) && /Signed out after 30 days\./.test(t), "DT196: section 4 says 12 months and 30 days"); }
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   } catch (e) { ok(false, "walkthrough error: " + e.message); }
   await b.close(); server.kill();
