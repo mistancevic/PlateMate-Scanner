@@ -87,7 +87,7 @@ B = Board(); y = 30
 cy = storyCard(B, y, "DT188", "Roles and navigation", [
   ("Coach Milan, 31 October 12:56 to 13:00", "Explorer grew into a third of the app and deserves its place on the bottom bar. The coach is not a different person: one account, two views, switched at the top. The coach coaches and suggests, never touches a client's plan directly; a suggestion lands with the client as a tap to accept. Roles: superadmin, coach, client (with or without a coach as a state), visitor. The kitchen screen is a session, not a role."),
   ("The bar, for everyone", "Today, Plan, Plate, Recipes, Explorer. Explorer leaves the menu; Foods and Me stay in it. Five tabs at 44 px or more fit a 390 px phone with labels at 12 px. The Clients tab goes."),
-  ("The coach's two views", "My day: the app as everyone has it, with the same five tabs. My clients: the bar becomes Clients, then the chosen client's Today, Plan and Recipes, read-only and exactly as the client sees them, and Explorer to send a page. The switch is at the top of Today only, remembered until switched back."),
+  ("The coach's two views (Milan 16:08)", "My day: the app as everyone has it, with the same five tabs. My clients: the bar keeps its order and only the centre changes, Plate becomes Clients: Today, Plan, Clients, Recipes, Explorer. Today, Plan and Recipes show the chosen client's, read-only and exactly as the client sees them; Explorer sends a page. The title stays My clients on every screen of the view, with the client's name under it. The switch is at the top of Today only, remembered until switched back."),
   ("Suggest, never touch", "From a client's screen the coach can suggest a planned snack, a page from Explorer, a note (as today, with Got it), a recipe (as today). A suggestion is a card on the client's Today with Accept and Not now. Accept does only what the client could have done alone. The coach sees the answer; the badge on Today counts suggestions as it counts notes. Nothing on a client's plan, goal or numbers is ever written by the coach; the coach's goal from a date stays a suggestion the client confirms."),
   ("Roles", "Superadmin (Milan): everything a coach has, plus Admin in the menu: people and roles, coach links, kitchen sessions, the privacy tracker. Coach: set in the console as today; My day and My clients. Client: the app; with a coach is a state on the client, started with the coach code, ended by either side. Visitor: not signed in; Explorer, Foods and Recipes to read, nothing saved, Sign in on every write. Kitchen screen: a session of a client's account on a second device, as built."),
   ("Not in this board", "Any change to what a client's screens show. New coach actions beyond the four. A coach with more than one coach above. Pricing. The four situations still marked later."),
@@ -104,12 +104,12 @@ h = rowEnd(
   B.screen("DT188f", 2, y, "New: the coach's switch, My day", "r188f", "changed", "One account, two views; the Clients tab goes."))
 y = h
 h = rowEnd(
-  B.screen("DT188g", 0, y, "New: My clients, the bar becomes the client's screens", "r188g", "changed", "Clients, Today, Plan, Recipes, Explorer; read-only."),
-  B.screen("DT188h", 1, y, "New: a client's Today, read-only, with Suggest", "r188h", "changed", "Four things to suggest; nothing touched."),
+  B.screen("DT188g", 0, y, "New: My clients, the centre tab swapped", "r188g", "changed", "Today, Plan, Clients, Recipes, Explorer; read-only."),
+  B.screen("DT188h", 1, y, "New: a client's Today under My clients, with Suggest", "r188h", "changed", "The title stays; the name under it. Four things to suggest."),
   B.screen("DT188i", 2, y, "New: the client's Today, a suggestion as a tap", "r188i", "changed", "Accept or Not now; the coach sees which."))
 y = h
 h = rowEnd(B.screen("DT188j", 0, y, "New: the roles, and Admin for the superadmin", "r188j", "changed", "Four roles; the kitchen screen is a session."))
 y = h
 board("Stories137.dc.html", "DT188. Roles and navigation",
-  "31 October 2026 (Coach Milan 12:56 to 13:00, 15:52 Draw). Now: 0.3.29, untouched. Drawn for your approval; nothing built.",
+  "31 October 2026 (Coach Milan 12:56 to 13:00, 15:52 Draw, 16:08 the bar and the title). Now: 0.3.29, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories136.dc.html")
