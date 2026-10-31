@@ -71,7 +71,7 @@ test("0.3.26: the three body pages and the fat burning situation exist, with sou
   assert.ok(HORMONE_MEMBERS.find((m) => m.page === "glucose") && HORMONE_MEMBERS.some((m) => /testosterone/i.test(m.name)) && HORMONE_MEMBERS.some((m) => /oestrogen/i.test(m.name)));
   assert.equal(SITUATION_PAGES.fatburn, FATBURN_PAGE);
   assert.ok(FATBURN_PAGE.when.length >= 3 && FATBURN_PAGE.effects.length >= 3);
-  assert.deepEqual(BODY_FAMILIES.filter((b) => b.state === "page").map((b) => b.id), ["fat", "glycogen", "hormones"]);
+  assert.deepEqual(BODY_FAMILIES.filter((b) => b.state === "page").map((b) => b.id), ["muscle", "fat", "glycogen", "bone", "hormones"]);
   assert.equal(SITUATIONS.find((s) => s.id === "fatburn")!.state, "page");
 });
 
@@ -153,4 +153,38 @@ test("0.3.27: the expected change in words, never a minus sign", () => {
   assert.equal(expectedWords([-0.5, 0.5]), "within 0.5 kg either way");
   assert.equal(expectedWords([-2, -1]), "down 1 to 2 kg");
   assert.equal(expectedWords([0.5, 1]), "up 0.5 to 1 kg");
+});
+
+// 0.3.28: Muscle and Bone
+import { muscleCase, boneCase } from "./situations";
+import { MUSCLE_PAGE, BONE_PAGE } from "./explorerBody";
+test("0.3.28: Muscle and Bone pages exist with their papers; the families open a page", () => {
+  assert.equal(BODY_PAGES.muscle, MUSCLE_PAGE); assert.equal(BODY_PAGES.bone, BONE_PAGE);
+  assert.match(MUSCLE_PAGE.sections[0].lines[0].text, /0\.4 g of protein per kg/);
+  assert.match(MUSCLE_PAGE.sections[0].lines[3].text, /8 % smaller, 23 % weaker/);
+  assert.match(BONE_PAGE.sections[0].lines[1].text, /2\.9 %/);
+  assert.ok(BODY_FAMILIES.find((b) => b.id === "muscle")!.state === "page" && BODY_FAMILIES.find((b) => b.id === "bone")!.state === "page");
+  const idx = buildIndex({ nutrients: [] });
+  assert.ok(searchIndex(idx, "leucine").some((h) => h.go.body === "muscle"));
+  assert.ok(searchIndex(idx, "calcium").some((h) => h.go.body === "bone"));
+});
+test("0.3.28: the muscle case finds the meal below the per-meal dose; the bone case counts calcium portions", () => {
+  const p = { ...personal, weightKg: 85, sex: "male", birthYear: 1981 } as unknown as Personal;
+  const food = (n: string, protein: number) => eaten("2026-11-01", "08:00", n, "breakfast", [n]);
+  const fb: Feedback[] = [];
+  for (const d of ["2026-10-30", "2026-10-31", "2026-11-01"]) {
+    fb.push({ ...eaten(d, "08:00", "Oats", "breakfast", ["Oats"]), meal: { ...eaten(d, "08:00", "Oats", "breakfast", ["Oats"]).meal, items: [{ id: "o", grams: 100, locked: false, food: { id: "o", name: "Oats", calories: 370, protein: 13, carbs: 60, fats: 7 } as any }] } } as Feedback);
+    fb.push({ ...eaten(d, "13:00", "Chicken", "lunch", ["Chicken"]), meal: { ...eaten(d, "13:00", "Chicken", "lunch", ["Chicken"]).meal, items: [{ id: "c", grams: 200, locked: false, food: { id: "c", name: "Chicken breast", calories: 165, protein: 31, carbs: 0, fats: 3.6 } as any }, { id: "y", grams: 150, locked: false, food: { id: "y", name: "Skyr, plain", calories: 60, protein: 11, carbs: 4, fats: 0.2 } as any }] } } as Feedback);
+  }
+  void food;
+  const x = { personal: p, feedback: fb, planned: {}, band: "maintain", numbersFor: () => ({ kcal: 2400, protein: 150 }), pdRef: null };
+  const m = muscleCase(x, monday);
+  assert.match(m.parts[0].body, /about 34 g a meal/);
+  assert.match(m.parts[2].body, /Breakfast is the meal below 34 g/);
+  assert.ok(m.taps.some((t) => /Breakfast to 34 g of protein/.test(t.label)));
+  assert.match(m.trend ?? "", /below the range by 58 g/);
+  const b = boneCase(x, monday);
+  assert.match(b.parts[0].body, /Calcium 950 mg a day/);
+  assert.match(b.parts[1].body, /about 1 portion a day/);
+  assert.ok(b.taps.some((t) => /One more calcium portion/.test(t.label)) && b.taps.some((t) => /Vitamin D in the dark months/.test(t.label)));
 });

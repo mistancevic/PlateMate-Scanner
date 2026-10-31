@@ -184,7 +184,7 @@ export function ExplorerScreen(p: AppApi) {
   const go = (h: Hit) => { setPart(h.go.part); setBody(h.go.body ?? null); setMember(h.go.part === "body" ? h.go.member ?? null : null); setSituation(h.go.situation ?? null); if (h.go.family) setFamily(h.go.family as Family); window.scrollTo(0, 0); };
   const pick = (x: Part) => { setPart(x); setBody(null); setMember(null); setSituation(null); window.scrollTo(0, 0); };
   // a page can open another part of Explorer (the links between parts)
-  p.openExplorer = (x, id) => { setPart(x); setBody(x === "body" ? (id as BodyId) : null); setMember(null); setSituation(x === "situations" ? (id as SituationId) : null); window.scrollTo(0, 0); };
+  p.openExplorer = (x, id) => { setPart(x); setBody(x === "body" ? (id as BodyId) : null); setMember(null); setSituation(x === "situations" ? (id as SituationId) : null); if (x === "nutrients" && id) setFamily(id as Family); window.scrollTo(0, 0); };
   return (
     <div className="explorer">
       <ExplorerSearch index={index} go={go} />
