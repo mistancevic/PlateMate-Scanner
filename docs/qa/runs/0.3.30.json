@@ -1,14 +1,14 @@
 {
  "version": "0.3.30",
- "commit": "b11454f",
- "at": "2026-10-31T15:54:00.906Z",
- "minutes": 12,
+ "commit": "f4aed71",
+ "at": "2026-10-31T16:08:48.345Z",
+ "minutes": 11,
  "flows": [
   {
    "file": "age-gate.cjs",
    "about": "JOURNEY INVARIANT (Milan, 7 October 2026, approved on the canvas, boards R1 and R2): Chef Mealan is for adults. After the sign-in, the welcome says what Chef Mealan does and that AI can be wrong, and asks for one tap: \"I'm 18 or older\". Nothing else opens and nothing reaches the AI before the tap; the tap is kept with its date and leads to the profile setup. A birth year under 18 stops at \"Chef Mealan is for adults\", gives the reason (the AI), and offers to correct the year.",
    "pass": true,
-   "seconds": 9,
+   "seconds": 7,
    "checks": [
     {
      "ok": true,
@@ -36,7 +36,7 @@
     },
     {
      "ok": true,
-     "text": "the tap is kept with its date: 2026-10-31T15:42:02.862Z"
+     "text": "the tap is kept with its date: 2026-10-31T15:57:31.192Z"
     },
     {
      "ok": true,
@@ -64,7 +64,7 @@
    "file": "ai-label-and-try.cjs",
    "about": "The AI label and the realistic photo test (0.2.13, Milan 16 October 2026, 18:43). A drawn cover published on chefmealan.com says Picture made with AI, on the page and in the list; a photo the cook marks as made with AI says so too; a page published before the label shows the label as a change to publish. The owner can try a realistic photo on the preview (here, with the test switch on); nothing is kept unless Use as cover. About sits at the bottom of the Menu.",
    "pass": true,
-   "seconds": 23,
+   "seconds": 19,
    "checks": [
     {
      "ok": true,
@@ -124,7 +124,7 @@
    "file": "back-and-photos.cjs",
    "about": "JOURNEY INVARIANT (Milan, 7 October 2026, canvas boards C4 and C5): in a food's photos you move to the next one without closing: the arrows, a photo below, or the arrow keys, and it says 2 of 3; tapping the photo doesn't close it. Back closes only what is on top: the photo, then the card, then the tab you came from; the address follows the tab, so a reload opens on the same tab. A food added today is marked New on the list. With one photo, tapping it closes it; Add a photo lets you take one or choose one from the phone (Milan, 7 and 8 October 2026): Take a photo and Choose a photo on a phone, where Android's photo picker has no camera; on a computer, one Add a photo. Never rewrite these lines to fit a change.",
    "pass": true,
-   "seconds": 18,
+   "seconds": 17,
    "checks": [
     {
      "ok": true,
@@ -204,7 +204,7 @@
    "file": "bar-and-yeast.cjs",
    "about": "Bar and yeast, the read fails, the chat answers (0.2.92, canvas Page 2, boards Stories64 and Stories65, DT104 to DT108; Milan 24 October 21:55 to 22:22, testing 0.2.91 on the preview). Checked: a failed read says so with Try again (DT104); the yeast is caught by code before any read, with Take the yeast out and Ask Chef Mealan for a dish around it (DT105); foods he names in a chat answer become rows with + Add, Take it out and Scan it, through the rules (DT106); Ask Chef Mealan from the Plate always sends the plate as a new question and the chips sit under every answer (DT107); the four letters F C Fi P on the readout, the rows and the food card (DT108). Chef Mealan's answers are stand-ins (no AI).",
    "pass": true,
-   "seconds": 17,
+   "seconds": 13,
    "checks": [
     {
      "ok": true,
@@ -408,7 +408,7 @@
    "file": "batch-pieces.cjs",
    "about": "A batch recipe in whole pieces (DT79, Milan 23 October 11:12 and 11:15, board DT79). Sarma makes 8. Planned for lunch, Chef Mealan picks the sarmas closest to what the slot has left; − and + change it by one; a second day takes its own; the recipe page says what the plan takes of the batch; the shopping list buys the whole batch, and each meal its share.",
    "pass": true,
-   "seconds": 11,
+   "seconds": 12,
    "checks": [
     {
      "ok": true,
@@ -496,7 +496,7 @@
    "file": "built.cjs",
    "about": "/built and the scroll fix (0.2.5+r9, canvas board B, 12 October 2026): How Chef Mealan is built opens for anyone; the blueprint answers a tap and walks a craving; the Worth Building loops (B8: PlateMate, Chef Mealan's six cards, loop 3 with the preview step); the books with the cover, the notify box inside its frame on a phone; the product role first. Every tab and Plate step opens at the top.",
    "pass": true,
-   "seconds": 9,
+   "seconds": 8,
    "checks": [
     {
      "ok": true,
@@ -760,7 +760,7 @@
    "file": "busy-times.cjs",
    "about": "DT179 and DT179a (0.3.23, boards Stories127 and Stories128; Coach Milan 31 October 09:07 Go): from your calendar to the app, and which meals go in. Read when I'm busy, off at first: busy times only, kept on the phone. Plan shows a busy block and asks where it meets the day: a meal in a meeting, a late evening, a full day, training. A meal moved in Google comes back. Which meals: every slot, or only the planned ones. Google is a stand-in: an in-memory calendar with busy times.",
    "pass": true,
-   "seconds": 43,
+   "seconds": 41,
    "checks": [
     {
      "ok": true,
@@ -892,14 +892,14 @@
    "file": "camera-auto.cjs",
    "about": "",
    "pass": true,
-   "seconds": 13,
+   "seconds": 12,
    "checks": []
   },
   {
    "file": "camera-every-mode.cjs",
    "about": "0.1.84: the camera's modes read Barcode, Label, Group (canvas board C2, approved by Milan 7 October 2026); only the locators changed JOURNEY INVARIANT: several photos in every mode. The mode decides how a picture is read, never how many can be taken. Label: two shots stage, nothing is sent until Analyze 2. Barcode: the code is read, the camera stays open, a photo stages, Analyze sends the code plus the photo; Use the code only sends the code alone. Never rewrite these lines to fit a change.",
    "pass": true,
-   "seconds": 27,
+   "seconds": 24,
    "checks": [
     {
      "ok": true,
@@ -955,7 +955,7 @@
    "file": "camera-group.cjs",
    "about": "0.1.84: the camera's modes read Barcode, Label, Group (canvas board C2, approved by Milan 7 October 2026); only the locators changed",
    "pass": true,
-   "seconds": 19,
+   "seconds": 17,
    "checks": [
     {
      "ok": true,
@@ -975,11 +975,11 @@
    "file": "can-on-plate.cjs",
    "about": "JOURNEY INVARIANT (DT82, Milan 23 October 2026, 19:37 to 20:00, after Tester 3's call): what you scan on the Plate lands on the plate, and stays in My foods, as decided in 0.2.25 (RP5); a code for a food you already have puts that food on the plate. A food the pack sells as one piece goes on as one: 1 pot, 1 can, never 0.9 cans. My foods keeps the label as printed (Milan 20:51): 1 can, 160 g. On the Plate a can in oil with values per 100 g drained is a bundle: the can on top, as the label names it, and under it two foods, the drained tuna at 120 g with the label's values, and the oil you pour off, outside the numbers until set: None, A spoon, All. Both go when the can goes, and Fit never moves the oil. Never rewrite these lines to fit a change.",
    "pass": true,
-   "seconds": 30,
+   "seconds": 29,
    "checks": [
     {
      "ok": true,
-     "text": "+ Add puts one pot on the plate, 200 g: [{\"name\":\"Protein pudding\",\"grams\":200,\"locked\":false,\"from\":null,\"id\":\"4258b3fe-9994-4540-b5cd-0bfbee8f3a27\"}]"
+     "text": "+ Add puts one pot on the plate, 200 g: [{\"name\":\"Protein pudding\",\"grams\":200,\"locked\":false,\"from\":null,\"id\":\"f076f4ba-f67d-4c09-bf0b-8bad9fdf1142\"}]"
     },
     {
      "ok": true,
@@ -991,7 +991,7 @@
     },
     {
      "ok": true,
-     "text": "a code you have puts the food on the plate, one pot: [{\"name\":\"Protein pudding\",\"grams\":200,\"locked\":false,\"from\":null,\"id\":\"7767d050-2ae5-48a9-85dc-65f49c85ebc4\"}]"
+     "text": "a code you have puts the food on the plate, one pot: [{\"name\":\"Protein pudding\",\"grams\":200,\"locked\":false,\"from\":null,\"id\":\"5763be3d-6336-48ae-80bb-af35c1af92a7\"}]"
     },
     {
      "ok": true,
@@ -1007,7 +1007,7 @@
     },
     {
      "ok": true,
-     "text": "Scan on the Plate puts the can on the plate, 120 g drained: [{\"name\":\"Thunfisch, drained\",\"grams\":120,\"locked\":false,\"from\":null,\"id\":\"4a7e6443-cae2-4fc3-839d-ed5d56933d18\"}]"
+     "text": "Scan on the Plate puts the can on the plate, 120 g drained: [{\"name\":\"Thunfisch, drained\",\"grams\":120,\"locked\":false,\"from\":null,\"id\":\"368d9059-df1f-40b5-9aba-5f8fc0aaf2a9\"}]"
     },
     {
      "ok": true,
@@ -1039,7 +1039,7 @@
     },
     {
      "ok": true,
-     "text": "A spoon puts 10 g of olive oil on, held with the can: {\"name\":\"Olive oil from the can\",\"grams\":10,\"locked\":true,\"from\":\"4a7e6443-cae2-4fc3-839d-ed5d56933d18\",\"id\":\"2f8bb54e-4935-4703-a848-d826a860d2a3\"}"
+     "text": "A spoon puts 10 g of olive oil on, held with the can: {\"name\":\"Olive oil from the can\",\"grams\":10,\"locked\":true,\"from\":\"368d9059-df1f-40b5-9aba-5f8fc0aaf2a9\",\"id\":\"e31459df-10a4-47b4-8b23-ee91443c2305\"}"
     },
     {
      "ok": true,
@@ -1079,7 +1079,7 @@
    "file": "carry-answers.cjs",
    "about": "JOURNEY INVARIANT (Milan, 19 October 2026, 07:25 to 18:39, story R20 on canvas board RS19): How did it carry you? is asked on the meal's own card, 30 minutes after, its three answers the card's full width; the answer stays on the card, with Change. Each answer keeps its moment (the meal, a training or rest day, before or after training). The meal's page shows every answer with its moment and the meals not answered yet. Two answers that agree, and more than the other way, make Chef Mealan's read (Light for you, Heavy for you); Fine is neither; the last 5 count; answers from before the foods changed are shown, marked, and stop counting. Pick a meal shows the read; Chef Mealan's ideas get the lists. Never rewrite these lines to fit a change.",
    "pass": true,
-   "seconds": 12,
+   "seconds": 11,
    "checks": [
     {
      "ok": true,
@@ -1295,7 +1295,7 @@
    "file": "chat-fails.cjs",
    "about": "DT152 (0.2.132, canvas Page 2, board Stories104; Coach Milan 29 October 10:22 and 10:55 \"Go\", from Tester 3 Marko's testing): when Chef Mealan doesn't answer, the chat says so as his answer, right under the question: the reason in one line, and Your question and the plate are kept. Ask again sends the same question; Back to the plate when the chat came from the Plate. The app's message at the bottom is not used for it. After Ask again the failed line greys, with Asked again. Chef Mealan's answers are stand-ins (no AI).",
    "pass": true,
-   "seconds": 9,
+   "seconds": 10,
    "checks": [
     {
      "ok": true,
@@ -1414,12 +1414,12 @@
   {
    "file": "chat-then-craving.cjs",
    "about": "One chef, one door: the floating Mealan is the conversation anywhere, and it's about the plate when there's food on it.",
-   "pass": false,
-   "seconds": 9,
+   "pass": true,
+   "seconds": 10,
    "checks": [
     {
-     "ok": false,
-     "text": "bottom bar has four tabs -> 5"
+     "ok": true,
+     "text": "bottom bar has five tabs (DT188: Explorer fifth) -> 5"
     },
     {
      "ok": true,
@@ -1603,7 +1603,7 @@
    "file": "chef-dinner.cjs",
    "about": "A dinner with Chef Mealan, from an empty Plate to the saved recipe (0.2.87, canvas Page 2, board Stories58, DT87 to DT90; Milan 24 October 11:37 to 12:12: making a recipe together with Chef Mealan is broken). 18:30, Maintain at 2,800 kcal, kitchens Balkan, Italian and Mediterranean, one food added: chicken breast, cooked, 150 g. No AI in the walkthroughs: Chef Mealan's two answers are fixed stand-ins written to the prompts. Checked: Fit to my target with the hat, the line on an empty plate, a cook's words, How to make it with steps at the plate's amounts, As the steps say, and a recipe that keeps its steps, says who made it and has its kitchen. Then the name: a dish from another recipe, named by you, is saved as a recipe of its own. DT91 (0.2.88, board Stories59): the dinner lands in its range (840 to 1,026 kcal), the penne stays a normal portion (110 g dry at most) and the other foods grow with it, the potato dinner fits, the bulgur bowl that cannot is shown with why, the herbs come as For cooking, not counted, and the cooked chicken says about how much that is raw.",
    "pass": true,
-   "seconds": 18,
+   "seconds": 17,
    "checks": [
     {
      "ok": true,
@@ -1991,7 +1991,7 @@
    "file": "cook-mode.cjs",
    "about": "DT174 (0.3.16, board Stories121; Coach Milan 30 October 16:39 Go): two doors on a recipe, Cook it as written straight to Make and Change it first through the Plate; Start cooking on Make opens cook mode: one big step, read aloud, steered by voice or by tap; timers from the step; how much from the amounts cooked; every finished step ticked on Make; voice asked once. The browser's speech is stood in for: a stand-in recognition hears what the walkthrough says, a stand-in voice records.",
    "pass": true,
-   "seconds": 59,
+   "seconds": 60,
    "checks": [
     {
      "ok": true,
@@ -2479,7 +2479,7 @@
    "file": "culinary-gate.cjs",
    "about": "The culinary gate and the three phases (0.2.88, canvas Page 2, board Stories60, DT93 and DT94; Milan 24 October 13:47 to 14:09, his first real test of 0.2.87). His plate: a protein bar, active dry yeast and peanut butter, 150 g each, the yeast set to 10 g; Maintain at 2,750 kcal, PD 6.5, lunch by the clock. Chef Mealan's read of the plate is a stand-in (no AI). Checked: the red portion lines, the readout saying it is not a lunch yet, Chef Mealan's gate card with its three ways, Fit in place (the yeast stays at its portion, the blue line says what Fit did, Undo), the three ways when the foods top out, the phase bar, Lock the recipe, the Make screen with the steps to tick, and Feedback without Name it.",
    "pass": true,
-   "seconds": 20,
+   "seconds": 21,
    "checks": [
     {
      "ok": true,
@@ -2587,7 +2587,7 @@
    "file": "cyprus.cjs",
    "about": "Cyprus and Limassol (0.2.58 and 0.2.59, Milan 14:58 and 15:19, for Tester 3; 0.2.120 one list of places, DT136). Tester 3's library had twenty starter foods picked for Munich. He picks Limassol, taps Add starter foods for Limassol, and gets the fifty Cypriot foods with their Greek names; a second tap adds nothing. Foods finds a Cypriot food in Greek.",
    "pass": true,
-   "seconds": 7,
+   "seconds": 8,
    "checks": [
     {
      "ok": true,
@@ -2667,7 +2667,7 @@
    "file": "day-adds-up.cjs",
    "about": "The day adds up (DT74, board DT74, Milan 22 October 2026: Anna's first run). A brand-new person, no recipes of her own, only Chef Mealan's starters: a woman of 63 kg who lifts three times a week and wants to build muscle. Tomorrow is planned slot by slot. Checked across the whole day, not one screen: each slot shows what is left once the others are planned; \"fits\" only where a meal fits, \"close\" where it lands around the target, its size named; a full day well off its kcal says so, and Fit the portions brings it within a tenth; Back to the usual portions undoes it; every target names its day, and the same day's target is the same number on Plan and in the top bar. Changed by story DT75 (Milan 22 October 23:54 to 23:58, board DT75, Anna's second run): the day's kcal is a range, a tenth either side (2,100: 1,900 to 2,300); off says how far from its edge; Fit the portions lands inside it in quarters and says so; protein shows the person's range, and above it a quiet line; the slot line gives the PD of what is left, and the picker judges against it, with no size mark. Changed by story DT76 (Milan 23 October 07:17, board DT76): a starter is its foods in grams; a fitted one opens with the grams to weigh at its portions, eggs counted, and the shopping list for the day has its foods.",
    "pass": true,
-   "seconds": 12,
+   "seconds": 13,
    "checks": [
     {
      "ok": true,
@@ -2759,7 +2759,7 @@
    "file": "design-rules.cjs",
    "about": "JOURNEY INVARIANT (Milan, 20 October 2026, 07:06 to 07:30, boards DS1 and DS2): the design system's button rules. A: one filled, wide button per screen, the main step; every other action is outlined. B: a card's buttons share one row under everything else in the card, the card's full width. C: an answer is a chip, never a button. D: Today has no wide button; a next meal with nothing planned is a card with Pick a meal and Make it on the Plate. E: Back sits top left, above the step bar, and says where it goes. Never rewrite these lines to fit a change. Added by stories DS4 G and DS5 H (Milan 08:49 to 09:30, boards DS4 and DS5): a page's title comes first, under Back: a recipe's name before its photo. On /built a choice is chips, and a link inside a sentence is underlined.",
    "pass": true,
-   "seconds": 27,
+   "seconds": 28,
    "checks": [
     {
      "ok": true,
@@ -2851,7 +2851,7 @@
    "file": "dish-first.cjs",
    "about": "JOURNEY INVARIANT (Milan, 18 October 2026, 21:08 to 22:11, story R16 on canvas board RS15): see the dish and its PD first; nothing breaks the layout. Reading a recipe shows the dish's picture on top (the page's own photo from a link, your first screenshot from screenshots), for you only, never published; then where it came from; then the PD block, the same as on the Plate, in place of a small line. On the recipe page the PD block sits under Where it came from. The Nutrition table has one set of columns for the whole card: every number sits under its heading and none leaves the card. Never rewrite these lines to fit a change.",
    "pass": true,
-   "seconds": 11,
+   "seconds": 12,
    "checks": [
     {
      "ok": true,
@@ -2899,7 +2899,7 @@
    "file": "dish-parts.cjs",
    "about": "Dishes in parts, and optional foods inside them (0.2.19, canvas boards IM, IM15 to IM18; Milan 17 October 2026, 11:08 to 11:26). A protein cheesecake from Instagram, read by Chef Mealan (faked here: no AI key), in three parts with an optional chocolate in the topping: the plate in parts (IM15), Leave it out and Put it back (IM16b), Change one part (IM16), + Add inside a part, the steps part by part (IM17). Then a bowl of your own put into parts on the plate, kept with its parts (IM18, IM18b). Changed by story R21 (Milan 22:27, board RS20): one slice is the recipe divided by what it makes, from the exact grams, so the kcal read one lower (284, 175, 301). Everything else is unchanged.",
    "pass": true,
-   "seconds": 24,
+   "seconds": 25,
    "checks": [
     {
      "ok": true,
@@ -3063,7 +3063,7 @@
    "file": "dont-have-it.cjs",
    "about": "Help inside the plate: \"Don't have it\" offers swaps from your foods; one tap changes exactly one food; closing changes nothing.",
    "pass": true,
-   "seconds": 12,
+   "seconds": 13,
    "checks": [
     {
      "ok": true,
@@ -3087,7 +3087,7 @@
    "file": "duplicates-merge.cjs",
    "about": "0.1.84: the camera's modes read Barcode, Label, Group (canvas board C2, approved by Milan 7 October 2026); only the locators changed",
    "pass": true,
-   "seconds": 72,
+   "seconds": 73,
    "checks": []
   },
   {
@@ -3133,7 +3133,7 @@
    "file": "evals-page.cjs",
    "about": "The evals page: open it from the menu, run the code scenarios, see output and checks, label one.",
    "pass": true,
-   "seconds": 8,
+   "seconds": 7,
    "checks": [
     {
      "ok": true,
@@ -3173,7 +3173,7 @@
    "file": "explorer-carbs.cjs",
    "about": "DT155 (0.2.136, canvas Page 2, board Stories107; Coach Milan 29 October 15:30 and 15:41 \"Go\"): Explorer, Carbs, the same template as Protein and Fats. Carbohydrate the family, its members starch, sugars and fibre; one portion against one meal (the meal's share of the day's carbs); fibre against the meal's share of 25 g a day, green when covered; sugars; the members in grams, fibre in bold; GI with its band from Atkinson 2008 Table 1 and its row; GL calculated by the paper's method; the USDA SR row on every card; the sources at the end. Sorts: Lowest GI, Most of the meal.",
    "pass": true,
-   "seconds": 5,
+   "seconds": 6,
    "checks": [
     {
      "ok": true,
@@ -3509,7 +3509,7 @@
    "file": "explorer-situations.cjs",
    "about": "0.3.29: The gut, The liver, The brain (DT185 to DT187): all eight families have a page. 0.3.28: Muscle and Bone (DT183, DT184), read at the month. 0.3.27: Hormones' other four members, Hunger hormones, Cortisol, Testosterone, Oestrogen, each with Your case at its horizon. 0.3.26 (DT181 v2, DT183 to DT186): The body's first pages, Glucose and insulin, Glycogen, The fat store, and the situation Fat burning. DT180 to DT187 (0.3.25, boards Stories129 to Stories136; Coach Milan 31 October 13:12 \"Let's code Explorer\"): three parts, one search bar, The body's map, the Situations list, and the first situation page, A bad night's sleep, with Your case in five parts. (The head of this file follows explorer.cjs.) Earlier: DT151 Explorer, Not all proteins are equal, in the Menu below Foods. Each food is one portion against one meal: the meal's protein from the day (120 g a day, three meals: 40 g a lunch), Closes N %, muscle building and repair (about 10 g of essential amino acids, 2.5 g of them leucine), the family of nine in grams with leucine in bold and its lowest marked only when it is close, PDCAAS and DIAAS with their sources, How to use it, the source of the numbers; Worthy Numbers at the end, counted as Explorer.",
    "pass": true,
-   "seconds": 28,
+   "seconds": 27,
    "checks": [
     {
      "ok": true,
@@ -3749,7 +3749,7 @@
    "file": "explorer.cjs",
    "about": "DT151 (0.2.133, canvas Page 2, board Stories103 version 11; Coach Milan 29 October 09:41 to 12:04 \"Build it\"): Explorer, Not all proteins are equal, in the Menu below Foods. Each food is one portion against one meal: the meal's protein from the day (120 g a day, three meals: 40 g a lunch), Closes N %, muscle building and repair (about 10 g of essential amino acids, 2.5 g of them leucine), the family of nine in grams with leucine in bold and its lowest marked only when it is close, PDCAAS and DIAAS with their sources, How to use it, the source of the numbers; Worthy Numbers at the end, counted as Explorer.",
    "pass": true,
-   "seconds": 5,
+   "seconds": 4,
    "checks": [
     {
      "ok": true,
@@ -4029,7 +4029,7 @@
    "file": "first-goal.cjs",
    "about": "JOURNEY INVARIANT (Milan, 6 October 2026, approved on the canvas): the first screen has a way out, Not now, and saves nothing until Set my day. Two ways in: Calculate for me, My own numbers. Five goals. Life once, training per day. Every day the same, or each day its own as one table: kcal, protein, fat, carbs per day, How on each row, the week's average under it.",
    "pass": true,
-   "seconds": 12,
+   "seconds": 13,
    "checks": [
     {
      "ok": true,
@@ -4104,8 +4104,8 @@
   {
    "file": "first-two-weeks.cjs",
    "about": "The first two weeks and the measured burn (0.2.7, canvas board FT): Today, Me, Goal, the calculator and the coach, from real meals and weigh-ins, with the clock on day 6 (Thursday 15 October) and day 14 (Friday 23 October). The example person of the board: male, 1981, 182 cm, 95 kg, the first goal on Saturday 10 October.",
-   "pass": false,
-   "seconds": 51,
+   "pass": true,
+   "seconds": 23,
    "checks": [
     {
      "ok": true,
@@ -4194,6 +4194,18 @@
     {
      "ok": true,
      "text": "eating declared: no measured burn on Goal"
+    },
+    {
+     "ok": true,
+     "text": "FT6: Lena in her first two weeks: squares, not bars"
+    },
+    {
+     "ok": true,
+     "text": "FT7: Davorka's burn on her page, with the gap line"
+    },
+    {
+     "ok": true,
+     "text": "FT7: From Davorka's data as a formula pin"
     }
    ]
   },
@@ -4585,7 +4597,7 @@
    "file": "google-calendar.cjs",
    "about": "DT178 (0.3.21, board Stories126; Coach Milan 31 October 00:08 Go): Chef Mealan's own calendar in Google. Me > Google Calendar, off at first: what goes in (Weigh in and Check-in off), what an event says, Connect. On: the calendar Chef Mealan is made and the next 14 days go in, names and times and a link, no numbers. A change goes across within seconds; Plan says so once; a shopping list gets Shop on; without a token one tap updates; a calendar link opens that day on Plan; Turn off removes the calendar or keeps it. Google is a stand-in here: an in-memory calendar answering the same API.",
    "pass": true,
-   "seconds": 57,
+   "seconds": 56,
    "checks": [
     {
      "ok": true,
@@ -4817,7 +4829,7 @@
    "file": "how-you-eat.cjs",
    "about": "DT160 and DT161 (0.3.3, canvas Page 2, boards Stories112 version 2 and Stories113; Coach Milan 29 October 19:30 \"Both DT160 and 161 can go. Double check the impact from profile setup. Makes no sense that it is there set but no influence. Also, take into account selected kitchen dishes\"). The goal setup has 3. Carbs and fat: Balanced by default, More fat moves fat to 35 % and the day table with it, Very low carb takes typed carbs and fat the rest; the Explorer says Calculated for you, names the pick, and opens each family with Your day; What you eat has Paleo, Meat only and Other; the kitchens' dishes follow the diet; every request that asks Chef Mealan for food carries how the person eats.",
    "pass": true,
-   "seconds": 22,
+   "seconds": 21,
    "checks": [
     {
      "ok": true,
@@ -4909,7 +4921,7 @@
    "file": "idea-and-swap.cjs",
    "about": "JOURNEY (0.2.129, DT148, board Stories100 version 2; Tester 3, UX2 and Bug 1; Coach Milan 28 October 23:10 and 23:39 Go): Marko asked for a cheesecake from the box on top of the Plate. While Chef Mealan works, a card that moves and counts the seconds. The idea is to read: its foods as points with grams, How to make it, then Put it on my plate; nothing to edit on the card. Chef Mealan is told where you shop. On the Plate, one line says swipe left to swap, right to remove; + Add a food sits right under the last food and opens the search there. Swap (rule C51) lists the same kind first, your foods before the basic foods sold where you shop, never the food swapped away under another name; other kinds wait behind one line. One word: + Add.",
    "pass": true,
-   "seconds": 25,
+   "seconds": 23,
    "checks": [
     {
      "ok": true,
@@ -5005,7 +5017,7 @@
    "file": "kitchens-and-steps.cjs",
    "about": "What a kitchen means, and recipe steps drafted by Chef Mealan (0.2.10, canvas board CH, CH5, CH7 and CH7b; Milan, 16 October 2026). Chef Mealan's answers are fixed here (no AI in the walkthroughs); what is checked is the app's part: the kitchen line and its three dishes, Another and Undo, the taste kept and sent to Chef Mealan, and for the steps, the checks on the draft, the one retry with the reason, and the steps kept with the recipe's own amounts.",
    "pass": true,
-   "seconds": 11,
+   "seconds": 10,
    "checks": [
     {
      "ok": true,
@@ -5089,7 +5101,7 @@
    "file": "label-table.cjs",
    "about": "The full nutrition table: add lines in the review, see them on the card in order.",
    "pass": true,
-   "seconds": 40,
+   "seconds": 39,
    "checks": [
     {
      "ok": true,
@@ -5577,7 +5589,7 @@
    "file": "meal-photo.cjs",
    "about": "JOURNEY (0.2.108, board Stories75, DT127; Milan 25 October 14:26 to 16:29): a photo of the meal in front of you. One tap on Today or the Plate, the read lands on the Plate as estimates (~, a range, a tap to correct), the photo stays on it (small in the line, large with the foods over it), the three gates read it, Chef Mealan's line says what to do by code, and the buttons log it now: Ate it, Ate half (the other half kept on Today), Not mine. A food read from the photo gets no ingredient line (the olive oil in the dressing). The read is a stand-in (no AI here).",
    "pass": true,
-   "seconds": 21,
+   "seconds": 22,
    "checks": [
     {
      "ok": true,
@@ -5709,7 +5721,7 @@
    "file": "meal-size.cjs",
    "about": "How big the next meal is (0.2.12, canvas board MS, MS1 to MS2b; Milan 16 October 2026, 17:59 to 18:08). Milan's day: 2,800 kcal, meals at 07:30, 13:45 and 20:00. At 17:30, after the Šopska plate at 13:10 logged off the plan, with nothing logged at breakfast. MS1: that plate closes lunch, so dinner is about 936 kcal (it was 624). MS2: the plate asks once about breakfast; I skipped it gives dinner what is left, about 1,873 kcal; Undo puts it back; I had it keeps 936.",
    "pass": true,
-   "seconds": 9,
+   "seconds": 8,
    "checks": [
     {
      "ok": true,
@@ -5921,7 +5933,7 @@
    "file": "members-names.cjs",
    "about": "JOURNEY (0.2.61, board MB; Milan 16:46 to 17:11): one name per cook in Members, checked by the server; a cook's kitchen; the Recipes tab and the cook in the address, so a reload keeps them; sharing with your name asks for it once.",
    "pass": true,
-   "seconds": 63,
+   "seconds": 62,
    "checks": [
     {
      "ok": true,
@@ -5981,7 +5993,7 @@
    "file": "metrics.cjs",
    "about": "The counter and the Metrics page (0.2.5+r17, canvas board M, M1 to M4, Milan 13 October 2026). Today opened sends app_open once a day; the days before today are closed against the plan (planned, by the plan, swapped, lived by the plan) and reach the server stripped; home page counts are one number per day; Metrics shows in the menu for the account the server names (here, without accounts, the local one) with the North Star, the KPIs and the way in; the privacy notice carries the two lines.",
    "pass": true,
-   "seconds": 22,
+   "seconds": 23,
    "checks": [
     {
      "ok": true,
@@ -5993,7 +6005,7 @@
     },
     {
      "ok": true,
-     "text": "yesterday: 2 planned, 2 by the plan, 1 swapped ({\"t\":\"2026-10-31T15:48:04.320Z\",\"hour\":16,\"event\":\"day_closed\",\"date\":\"2026-10-30\",\"planned\":2,\"byPlan\":2,\"extras\":0,\"swapped\":1,\"lived\":false,\"proteinPct\":51,\"energyPct\":35})"
+     "text": "yesterday: 2 planned, 2 by the plan, 1 swapped ({\"t\":\"2026-10-31T16:03:25.480Z\",\"hour\":17,\"event\":\"day_closed\",\"date\":\"2026-10-30\",\"planned\":2,\"byPlan\":2,\"extras\":0,\"swapped\":1,\"lived\":false,\"proteinPct\":51,\"energyPct\":35})"
     },
     {
      "ok": true,
@@ -6109,7 +6121,7 @@
    "file": "mix-tip.cjs",
    "about": "Mix it: a food that doesn't fit on its own shows partners by moment; one tap makes the plate; Not quite opens the helper with the tip.",
    "pass": true,
-   "seconds": 59,
+   "seconds": 58,
    "checks": [
     {
      "ok": true,
@@ -6517,7 +6529,7 @@
     },
     {
      "ok": true,
-     "text": "About: Opened in 0.3 s · saved data 59 KB · 197 photos"
+     "text": "About: Opened in 0.2 s · saved data 59 KB · 197 photos"
     },
     {
      "ok": true,
@@ -6609,7 +6621,7 @@
    "file": "plan-fill.cjs",
    "about": "Plan, 0.2.2 (canvas S \"Plan purpose one\", H7): filling a slot by hand. Tap a slot, the sheet with My recipes, Coach's The day picked is next week's Monday, never today, so the lines say Monday's whatever day the run falls on (12 October 2026: a run on a Monday read Today's). recipes and Chef Mealan's starters with their PD marks, a meal in the slot with fits or the amber gap, Fit it on the Plate with the slot on the plan line, Put it in the slot from the Plate, the day as planned adding up, emptying a slot. Changed by story R19 (Milan 06:04 to 06:41, board RS18): a tap on a planned meal opens the meal; Pick a meal opens with a swipe to the left (Swap). An open slot still opens Pick a meal on a tap. Changed by story DT74 (Milan 22 October 2026, board DT74): a meal around the target says close, not fits; fits is kept for a meal within 0.2 of it. The marks are fits, close or under. DT76: the starter's numbers come from its foods (647 and 56).",
    "pass": true,
-   "seconds": 38,
+   "seconds": 37,
    "checks": [
     {
      "ok": true,
@@ -6929,7 +6941,7 @@
    "file": "plate-numbers.cjs",
    "about": "JOURNEY (0.2.109, board Stories86, DT129; Milan 26 October 13:09 to 15:06): the PD block reads at a glance, the numbers on a tap. The heading is the meal by name; beside PD the status and Energy, Weight, Protein with the plate's numbers, right aligned; under the number the four letters on one line. A tap opens Against your planned day: the plate against the meal planned in this slot (Plate, Planned, %), then what is in it (g, kcal, % plate, % day, a Total). No meal planned: no first part.",
    "pass": true,
-   "seconds": 8,
+   "seconds": 7,
    "checks": [
     {
      "ok": true,
@@ -7117,7 +7129,7 @@
    "file": "plate-what-is-it.cjs",
    "about": "JOURNEY INVARIANT (Milan, 19 October 2026, 22:27 to 23:15, story R22 on canvas board RS21): What is it? on the Plate, in place of Meal or Dessert: Savoury, Sweet, a DaaM (Dessert as a Meal) or Both. Each is a full meal; a small thing is a Snack. Picked, the line says it, and what is offered follows it on a plate of your own too: Savoury holds sweet foods back, a DaaM savoury ones, Both nothing, and Both puts a main and a sweet finish on the plate as two parts. Nothing picked, everything is offered. Sweet or DaaM in a craving sets it. On Me, the taste is chips (Vanilla and Chocolate among them) and your own words; Chef Mealan gets the chips in their fixed words. Never rewrite these lines to fit a change.",
    "pass": true,
-   "seconds": 21,
+   "seconds": 20,
    "checks": [
     {
      "ok": true,
@@ -7213,7 +7225,7 @@
    "file": "quick-picks.cjs",
    "about": "Quick picks on the plate: eight at most, a favourite goes first, search reaches everything, All foods opens Foods.",
    "pass": true,
-   "seconds": 10,
+   "seconds": 11,
    "checks": [
     {
      "ok": true,
@@ -7433,7 +7445,7 @@
    "file": "recipe-centre.cjs",
    "about": "The recipe page at the centre (0.2.25, canvas board RP, RP1 to RP5b; Milan 17 October 2026, 17:42 to 18:23). A recipe from a link: the original is the steps, numbered, headings in bold, the page's signs read as letters; a line says the original works with your foods; Chef Mealan's way on a tap, then a toggle. PD sits above the table, as on the Plate; each column says its weight. How to make it says what you make and what you eat. A changed dish: the line says what differs. Every recipe made ends on its page; a plate that is no recipe ends on Today. Today has no camera; Manual, then Scan.",
    "pass": true,
-   "seconds": 28,
+   "seconds": 27,
    "checks": [
     {
      "ok": true,
@@ -7553,7 +7565,7 @@
    "file": "recipe-cook.cjs",
    "about": "JOURNEY INVARIANT (Milan, 8 October 2026, canvas boards RG0, RG1, RG3 and RG5): Cook is a permission, not a role. A client publishes only when their coach made them a cook, and what they send waits for their coach: the coach sees the page, then makes it live or sends it back with a note the cook sees. Changes to a cook's live recipe wait the same way, and the live page stays as it was until then. The cook can take their own recipe down. Never rewrite these lines to fit a change.",
    "pass": true,
-   "seconds": 20,
+   "seconds": 21,
    "checks": [
     {
      "ok": true,
@@ -8085,7 +8097,7 @@
    "file": "recipe-photos.cjs",
    "about": "The recipe's page (0.2.5+r11, canvas board S3, R7 to R11, Milan 12 October 2026). R7: a tile is one tap, no buttons, the cover and where the recipe is. R8: the recipe's page, photos first: × deletes after Sure?, Add adds, the plate photos from the times it was made are offered. R9: ‹ › move the picked photo; first place is the cover. R10: Make it (the recipe on the Plate, unchanged) and Edit recipe. R11: edit mode, grams, × a food, Add a food, steps, Save changes or Cancel. A long name never makes the page wider than the phone. A live recipe whose page has a photo and the app none takes the page's photo once as its cover, and a removed cover never comes back from the page.",
    "pass": true,
-   "seconds": 19,
+   "seconds": 18,
    "checks": [
     {
      "ok": true,
@@ -8205,7 +8217,7 @@
    "file": "recipe-publish.cjs",
    "about": "JOURNEY INVARIANT (Milan, 7 October 2026, canvas boards R0 to R7): a coach publishes a recipe from the app: a photo, two lines, how many it makes, the steps, who sees it; the checks say high protein only at 20 % of the energy. The page at /r/<name> shows the photo, the numbers for one serving, PD, the goals it fits, the ingredients and steps, the nutrition; a visitor gets Try Chef Mealan where a member gets their amounts. /recipes lists it; a shared link previews the recipe. The Instagram images come from the same numbers. Never rewrite these lines to fit a change. R12 (0.2.5+r13): Published band, the button sleeps until a change, Changes not published yet. Changed with Milan, 8 October 2026 (boards RG0 to RG4 and RF4): what is typed in the sheet is kept with the recipe as a draft, never public; See the page shows the page before anything goes live; everyone sees a recipe (no Who sees it); the steps stay with the recipe in the app; the page says From <first name>'s kitchen; only goals it truly fits get a tick; protein with one decimal. Unpublish takes it down: the link says This recipe was taken down and shows the others, the list leaves it out, and Publish again brings it back on the same link. Never rewrite these lines to fit a change.",
    "pass": true,
-   "seconds": 59,
+   "seconds": 58,
    "checks": [
     {
      "ok": true,
@@ -8445,7 +8457,7 @@
    "file": "recipes-add.cjs",
    "about": "JOURNEY INVARIANT (Milan, 18 October 2026, 19:45 to 19:58, story R6 on canvas board RS14): a recipe can be added on Recipes, with the same block as the Plate (Screenshot and Link). The read shows the Nutrition table after the foods, on both screens, with what the recipe says once, at the top. On Recipes it ends with Save in My recipes, which opens the recipe's page in Recipes and puts nothing on the Plate. Never rewrite these lines to fit a change.",
    "pass": true,
-   "seconds": 9,
+   "seconds": 8,
    "checks": [
     {
      "ok": true,
@@ -8589,7 +8601,7 @@
    "file": "safety-setup.cjs",
    "about": "JOURNEY (0.2.126, board Stories97, DT141; Anna's DT119; Milan 28 October 18:33 Go): the safety question is asked in setup, right after I agree, and the step ends on its button, Next: 1. You. A chat that waits for it says so in one line, and Answer it now opens the question right there, ending on Back to the chat.",
    "pass": true,
-   "seconds": 12,
+   "seconds": 11,
    "checks": [
     {
      "ok": true,
@@ -8797,7 +8809,7 @@
    "file": "same-protein.cjs",
    "about": "Today and Me show the same protein (0.2.5+r18): with a quick goal and each day its own, Today worked the day out from the profile (180 g) while Me showed the goal (105 g). A goal not calculated from the profile keeps its protein and fat on every day; the day's energy moves with the training. Checked for the three ways a goal is set.",
    "pass": true,
-   "seconds": 11,
+   "seconds": 10,
    "checks": [
     {
      "ok": true,
@@ -8881,7 +8893,7 @@
     },
     {
      "ok": true,
-     "text": "a 4-letter code: FBAB"
+     "text": "a 4-letter code: XB8K"
     },
     {
      "ok": true,
@@ -8969,7 +8981,7 @@
    "file": "setup-screen.cjs",
    "about": "JOURNEY (0.2.124, board Stories95, DT139; Anna's blind runs, her DT118; Milan 28 October 17:05 Go): the first screen. The formula is automatic, behind How we calculate ›; sections numbered as they show; five numbers and PD said once; no goal picked for you; Lifestyle, one name; a coach can adjust these numbers later; both paces in % a week.",
    "pass": true,
-   "seconds": 5,
+   "seconds": 4,
    "checks": [
     {
      "ok": true,
@@ -9017,7 +9029,7 @@
    "file": "setup-shop.cjs",
    "about": "JOURNEY (0.2.127, board Stories98, DT142; Anna's DT123; Milan 28 October 20:46 Go): the first setup ends on one more step, 4. Where you shop and cook: home in one tap brings its starter foods, with See them in Foods; the kitchens and what you cook with, as in Me; Done: to Today, which says Pick home first until home is picked. Changing the goal later skips it.",
    "pass": true,
-   "seconds": 9,
+   "seconds": 8,
    "checks": [
     {
      "ok": true,
@@ -9069,7 +9081,7 @@
    "checks": [
     {
      "ok": true,
-     "text": "a code in the address is kept, cleaned, and leaves the address: http://127.0.0.1:3411/today"
+     "text": "a code in the address is kept, cleaned, and leaves the address: http://127.0.0.1:3431/today"
     },
     {
      "ok": true,
@@ -9525,7 +9537,7 @@
    "file": "three-gates.cjs",
    "about": "The three gates (0.2.98, canvas Page 2, boards G3 and Stories69, DT116; Milan 25 October 01:24 to 10:52): culinary, nutrition, your day, each a line in Chef Mealan's card, the sweet spot when all three hold. Checked: a shake with biscuits and peanut butter as a lunch fails nutrition (most protein from the powder) while PD fits; Add a protein base puts one on; chicken and rice at 23:10 fail your day (the eating window); a plain lunch at 13:00 is the DaaM Good spot; the grams line under the letters. Chef Mealan's read is a stand-in (no AI).",
    "pass": true,
-   "seconds": 11,
+   "seconds": 12,
    "checks": [
     {
      "ok": true,
@@ -9585,7 +9597,7 @@
    "file": "today-against-plan.cjs",
    "about": "JOURNEY INVARIANT (Milan, 18 October 2026, 17:23 to 19:00, story R5 on canvas board RS13): Today is the day against the plan. On top, today against your goal: PD, kcal and protein eaten of the target (fat and carbs say at least when a food has no value). Under it, by time and importance: what comes next, with its one main action (the next meal, or Plan tomorrow when the day's meals are done); the batch as a way to eat it, where I ate one asks which meal it is; the plan; today's meals newest first, each with which meal it was, its numbers and its recipe, no foods. Never rewrite these lines to fit a change. Changed by story R16 (Milan 21:56 to 22:11, board RS15): Today follows the plan and the calendar, not what is left of a batch. No batch block; a planned meal shows in what comes next, with its picture, and I ate it logs it in one tap. Changed by story DS rule D (Milan 07:06 to 07:30, boards DS1 and DS2): Today has no wide button. A next meal with nothing planned is a card with Pick a meal and Make it on the Plate; late in the day the Tomorrow card opens tomorrow's plan. Changed by story DS4 F (Milan 08:33 to 08:58, board DS4): fat and carbs no longer say at least inside the number. A plus on the number, and one note under the numbers names the foods with no value; a food in your foods opens there. Changed by story DS6 J and L (Milan 10:21 to 11:26, board DS6): the note says why the plus, in a full sentence; Log a meal sits in Today's meals, not in Next.",
    "pass": true,
-   "seconds": 16,
+   "seconds": 17,
    "checks": [
     {
      "ok": true,
@@ -9865,7 +9877,7 @@
    "file": "today.cjs",
    "about": "Today: the plan, what was logged, a card kept for later, the last days.",
    "pass": true,
-   "seconds": 13,
+   "seconds": 12,
    "checks": [
     {
      "ok": true,
@@ -10253,7 +10265,7 @@
    "file": "wake-meals.cjs",
    "about": "DT166 (0.3.8, board Stories118 version 2; Coach Milan 30 October 08:09 to 08:47): wake-up and bedtime set the first and last meal; Lifestyle runs in the order a day runs (Work and study, Recovery, Meals, Nutrition); a time you set stays, with one tap back; Plan's Slots and times opens Lifestyle at Meals.",
    "pass": true,
-   "seconds": 10,
+   "seconds": 11,
    "checks": [
     {
      "ok": true,
@@ -10309,7 +10321,7 @@
    "file": "week-and-school.cjs",
    "about": "JOURNEY INVARIANT (Milan, 6 October 2026, as approved on the canvas): Plan has real weeks with dates; a change belongs to its date only, the Training week stays; earlier weeks can be browsed, and a past day shows what was eaten (canvas board TW, 13 October 2026). Release A (Milan, 7 October 2026): Chef Mealan is for adults. A birth year under 18 stops at \"Chef Mealan is for adults\", with the reason (the AI) and a way to correct the year. Release B (Milan, 7 October 2026, canvas B0 to B3): any adult can work, study, or both, or be at home. Lifestyle asks what fills the weekdays first, and only the questions that fit follow. A day is a Work day, a Study day or a Day off; the week keeps its colors, and Today says \"Study day\" on a study day.",
    "pass": true,
-   "seconds": 21,
+   "seconds": 20,
    "checks": [
     {
      "ok": true,
@@ -10752,8 +10764,8 @@
   {
    "file": "your-summary.cjs",
    "about": "DT167 (0.3.9, board Stories119 versions 1 and 2; Coach Milan 30 October 08:47 to 09:59): Your summary, the last row of Me and where the steps end; Taste in Lifestyle; Plan your week and Craft your first meal; what the coach sees, part by part, health data off until switched on; on the coach's side, the shared profile with what changed since the coach last looked.",
-   "pass": false,
-   "seconds": 47,
+   "pass": true,
+   "seconds": 20,
    "checks": [
     {
      "ok": true,
@@ -10801,7 +10813,7 @@
     },
     {
      "ok": true,
-     "text": "Craft your first meal opens Plate: http://127.0.0.1:3423/plate"
+     "text": "Craft your first meal opens Plate: http://127.0.0.1:3413/plate"
     },
     {
      "ok": true,
@@ -10817,11 +10829,35 @@
     },
     {
      "ok": true,
-     "text": "saved: body data switched on with its date, your consent: {\"on\":{\"goal\":\"2026-10-31T15:53:29.283Z\",\"day\":\"2026-10-31T15:53:29.283Z\",\"eat\":\"2026-10-31T15:53:29.283Z\",\"week\":\"2026-10-31T15:53:29.283Z\",\"shop\":\"2026-10-31T"
+     "text": "saved: body data switched on with its date, your consent: {\"on\":{\"goal\":\"2026-10-31T16:08:44.011Z\",\"day\":\"2026-10-31T16:08:44.011Z\",\"eat\":\"2026-10-31T16:08:44.011Z\",\"week\":\"2026-10-31T16:08:44.011Z\",\"shop\":\"2026-10-31T"
     },
     {
      "ok": true,
      "text": "the summary says how much the coach sees"
+    },
+    {
+     "ok": true,
+     "text": "Clients marks a client whose shared profile changed"
+    },
+    {
+     "ok": true,
+     "text": "the client's page starts with what changed: What changed since you last looked 29 Oct Wake-up and bedtime: 6:00 to 8:00 · 22:00 to midnight → Before 6:00 · 22:00 to midnight. 29 Oct Meals: 3 a day, 07:30, 13:45 and 20:00 → 3 a day, 06:30, 13:15"
+    },
+    {
+     "ok": true,
+     "text": "the shared parts below, what wasn't shared said, no private row:  of these, answered 14 October Chef Mealan helps with everything. Asked again once a year. ✓ Chef reads Not shared What you eat, alcohol, in your own words, allergies and intolerances, your body data. Davorka keeps these to themselves. Save as PDF, as of today"
+    },
+    {
+     "ok": true,
+     "text": "looked at: the mark goes"
+    },
+    {
+     "ok": true,
+     "text": "DT172: without body data, weigh-ins in percent and days weighed, no kilogram: Weigh-ins 2 this week 2 mornings weighed Not enough weigh-ins yet for a trend."
+    },
+    {
+     "ok": true,
+     "text": "no page errors"
     }
    ]
   }
