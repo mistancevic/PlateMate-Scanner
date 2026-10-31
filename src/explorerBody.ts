@@ -617,8 +617,8 @@ export const THYROID_PAGE: BodyPage = {
   sections: [
     { title: "What moves it", lines: [
       { title: "A long, deep cut", text: "After weight loss the body turns its spend down and hunger up, in lean and heavy people alike; the active thyroid hormone is one of the dials, and it fell in the same study that found the 30 kcal line. That is the cold hands and the tiredness on a deep cut; the fix is the range, not a supplement.", src: "Rosenbaum and Leibel 2010, International Journal of Obesity, review; Loucks and Thuma 2003" },
-      { title: "Iodine", text: "The thyroid is built from it: fish, dairy, eggs, iodised salt. EFSA's day is 150 µg. Iodine joins the Micros page as a member once ten foods are read from a source; until then the foods are named here.", src: "EFSA 2014, iodine" },
-      { title: "Selenium", text: "The enzymes that switch the hormone on need it: two Brazil nuts, fish, eggs. EFSA's day is 70 µg. Selenium joins Micros with iodine.", src: "EFSA 2014, selenium" },
+      { title: "Iodine", text: "The thyroid is built from it: fish, dairy, eggs, iodised salt. EFSA's day is 150 µg. Iodine is a member of the Micros page; our USDA rows carry no iodine numbers, so the foods are named there, not counted.", src: "EFSA 2014, iodine" },
+      { title: "Selenium", text: "The enzymes that switch the hormone on need it: two Brazil nuts, fish, eggs. EFSA's day is 70 µg. Selenium is a member of the Micros page, with the foods counted.", src: "EFSA 2014, selenium" },
       { title: "Sleep", text: "The rate follows the night. A week of short nights moved testosterone, not cortisol; the thyroid's morning rise is part of the same clock. The sleep page's levers.", src: "Leproult and Van Cauter 2011, JAMA; the sleep page" },
     ] },
   ],

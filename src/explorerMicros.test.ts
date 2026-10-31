@@ -7,7 +7,7 @@ const card = (id: string) => microCardOf(MICRO_FOODS.find((f) => f.id === id)!);
 const page = (id: string) => MEMBER_PAGES.find((m) => m.id === id)!;
 
 test("eighteen members (DT163), each with a reference intake from Annex XIII", () => {
-  assert.equal(MICRO_MEMBERS.length, 18);
+  assert.equal(MICRO_MEMBERS.length, 20);
   for (const m of MICRO_MEMBERS) assert.ok(NRV[m.id] > 0, m.id);
   assert.equal(NRV.d, 5); assert.equal(NRV.c, 80); assert.equal(NRV.fe, 14);
 });

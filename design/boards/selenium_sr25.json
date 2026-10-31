@@ -1,0 +1,147 @@
+{
+ "chicken": {
+  "name": "Chicken, broilers or fryers, breast, meat only, cooked, roasted",
+  "ndb": "05064",
+  "se": 27.6
+ },
+ "yogurt": {
+  "name": "Yogurt, Greek, plain, nonfat",
+  "ndb": null,
+  "se": null
+ },
+ "soy": {
+  "name": "Soybeans, mature cooked, boiled, without salt",
+  "ndb": "16109",
+  "se": 7.3
+ },
+ "egg": {
+  "name": "Egg, whole, raw, fresh",
+  "ndb": "01123",
+  "se": 30.7
+ },
+ "oats": {
+  "name": "Cereals, oats, regular and quick, not fortified, dry",
+  "ndb": "08120",
+  "se": 28.9
+ },
+ "olive": {
+  "name": "Oil, olive, salad or cooking",
+  "ndb": "04053",
+  "se": 0.0
+ },
+ "butter": {
+  "name": "Butter, salted",
+  "ndb": "01001",
+  "se": 1.0
+ },
+ "walnuts": {
+  "name": "Nuts, walnuts, english",
+  "ndb": "12155",
+  "se": 4.9
+ },
+ "avocado": {
+  "name": "Avocados, raw, all commercial varieties",
+  "ndb": "09037",
+  "se": 0.4
+ },
+ "cheddar": {
+  "name": "Cheese, cheddar (Includes foods for USDA's Food Distribution Program)",
+  "ndb": "01009",
+  "se": 13.9
+ },
+ "almonds": {
+  "name": "Nuts, almonds",
+  "ndb": "12061",
+  "se": 2.5
+ },
+ "rice": {
+  "name": "Rice, white, long-grain, regular, raw, enriched",
+  "ndb": "20445",
+  "se": 7.5
+ },
+ "potato": {
+  "name": "Potatoes, boiled, cooked without skin, flesh, without salt",
+  "ndb": "11367",
+  "se": 0.3
+ },
+ "bread": {
+  "name": "Bread, whole-wheat, commercially prepared",
+  "ndb": "18075",
+  "se": 40.3
+ },
+ "pasta": {
+  "name": "Pasta, cooked, enriched, without added salt",
+  "ndb": "20121",
+  "se": 26.4
+ },
+ "banana": {
+  "name": "Bananas, raw",
+  "ndb": "09040",
+  "se": 1.0
+ },
+ "apple": {
+  "name": "Apples, raw, with skin (Includes foods for USDA's Food Distribution Program)",
+  "ndb": "09003",
+  "se": 0.0
+ },
+ "spinach": {
+  "name": "Spinach, raw",
+  "ndb": "11457",
+  "se": 1.0
+ },
+ "milk": {
+  "name": "Milk, lowfat, fluid, 1% milkfat, with added vitamin A and vitamin D",
+  "ndb": "01082",
+  "se": 3.3
+ },
+ "pepper": {
+  "name": "Peppers, sweet, red, raw",
+  "ndb": "11821",
+  "se": 0.1
+ },
+ "beef": {
+  "name": "Beef, ground, 90% lean meat / 10% fat, crumbles, cooked, pan-browned",
+  "ndb": "23565",
+  "se": 21.3
+ },
+ "salmon": {
+  "name": "Fish, salmon, Atlantic, farmed, cooked, dry heat",
+  "ndb": "15237",
+  "se": 41.4
+ },
+ "lentils": {
+  "name": "Lentils, mature seeds, cooked, boiled, without salt",
+  "ndb": "16070",
+  "se": 2.8
+ },
+ "chickpeas": {
+  "name": "Chickpeas (garbanzo beans, bengal gram), mature seeds, cooked, boiled, without salt",
+  "ndb": "16057",
+  "se": 3.7
+ },
+ "sardines": {
+  "name": "Fish, sardine, Atlantic, canned in oil, drained solids with bone",
+  "ndb": "15088",
+  "se": 52.7
+ },
+ "pumpkin": {
+  "name": "Seeds, pumpkin and squash seed kernels, dried",
+  "ndb": "12014",
+  "se": 9.4
+ },
+ "tofu": {
+  "name": "Tofu, raw, firm, prepared with calcium sulfate",
+  "ndb": "16426",
+  "se": 17.4
+ },
+ "kale": {
+  "name": "Kale, raw",
+  "ndb": "11233",
+  "se": 0.9
+ },
+ "liver": {
+  "name": "Beef, variety meats and by-products, liver, cooked, pan-fried",
+  "ndb": "13327",
+  "se": 32.8
+ }
+}
