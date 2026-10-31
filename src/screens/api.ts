@@ -202,6 +202,12 @@ export interface AppApi {
   openMenu: (s?: MenuSection, from?: MenuSection) => void;
   newShared: number;
   markSharedSeen: () => void;
+  // DT189 (0.3.31): Waiting for you, the coach's list; the badge on Clients is its count
+  waiting: import("../coachNotes").Waiting[];
+  waitingSeen: (key: string) => void;
+  recountWaiting: () => void;
+  focusCard: string | null;
+  setFocusCard: (id: string | null) => void;
   setTravelTo: (r: import("../moments").RegionId | null) => void;
   matched: boolean;
   mealanCard: ReactNode;

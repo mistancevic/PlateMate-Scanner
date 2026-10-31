@@ -7,7 +7,8 @@ import { dayLog, loggedLine, daysAgo, dayLabel } from "../today";
 import { dayNameAny, type Formula } from "../personal";
 import { listClients, setClientGoal, setClientGoalFrom, sendCoachNote, setCheckinDay, sendRecipe, pinFormula, type ClientRow } from "../cloud";
 import { ClientPage, ClientRowCard, coachNumbers, todayIndex, type CoachOps } from "./ClientWeek";
-import { DAY_NAMES } from "../coachNotes";
+import { DAY_NAMES, type CoachNote } from "../coachNotes";
+import { CardAnswer } from "./CardAnswer";
 import { isoWeek, ymd } from "../plan";
 import { SITUATIONS } from "../safety";
 import { GoalHistory } from "./MenuScreen";
@@ -41,7 +42,8 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
     try { setRows(await listClients(user.uid)); }
     catch (e: any) { setError(e.message || "Could not load clients."); }
   }
-  useEffect(() => { refresh(); p.markSharedSeen(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
+  // DT189: opening Clients no longer clears the badge; a row leaves Waiting for you only when handled
+  useEffect(() => { refresh(); p.recountWaiting(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
   // clients who are cooks (board RG5): one switch on the client's page
   const [cookList, setCookList] = useKept<string[]>(`cooks-${user?.uid ?? "local"}`, []);
   const cooks = new Set(cookList);
@@ -57,7 +59,7 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
   // what the coach writes on a client's account; on the local demo the rows change on this phone only
   const patch = (uid: string, change: Partial<ClientRow>) => setRows(rows.map((r) => (r.uid === uid ? { ...r, ...change } : r)));
   const ops: CoachOps = {
-    sendNote: async (row, notes) => { if (!p.demo) await sendCoachNote(row.uid, notes); patch(row.uid, { notes }); },
+    sendNote: async (row, notes) => { if (!p.demo) await sendCoachNote(row.uid, notes); patch(row.uid, { notes }); p.recountWaiting(); },
     setCheckin: async (row, day) => { if (!p.demo) await setCheckinDay(row.uid, day); patch(row.uid, { checkinDay: day }); },
     setGoal: async (row, band, from) => {
       const nums = coachNumbers(band), today = ymd(new Date());
@@ -73,15 +75,29 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
   };
   if (open) return (
     <ClientPage row={open} coachName={coachName} ops={ops} back={() => setOpenId(null)} notify={notify} setError={setError}
-      tail={<ClientTail row={open} onSaved={refresh} setError={setError} notify={notify} confirmAi={p.confirmClientAi}
+      tail={<ClientTail row={open} onSaved={refresh} setError={setError} notify={notify} confirmAi={p.confirmClientAi} sendNote={(notes) => ops.sendNote(open, notes)} coachName={coachName} focusCard={p.focusCard} onAnswered={() => p.recountWaiting()}
         cook={cooks.has(open.uid)} setCook={(on) => setCook(open.uid, on).then(() => notify(on ? `${open.name.split(" ")[0]} is a cook: they can send you recipes to publish.` : `${open.name.split(" ")[0]} is no longer a cook.`)).catch((e) => setError(e.message))} />} />
   );
   const ti = todayIndex();
   const due = rows.filter((r) => r.checkinDay === ti);
+  // DT189 (0.3.31, Milan 17:42): Waiting for you at the top, one row per thing; tap opens it where it is answered
+  const openWaiting = (w: import("../coachNotes").Waiting) => {
+    if (w.kind === "card" || w.kind === "reply") p.waitingSeen(w.key);
+    p.setFocusCard(w.cardId ?? null); setOpenId(w.uid);
+  };
   const weekKey = ymd(isoWeek(new Date()).monday);
   const toSend = due.filter((r) => !r.notes.some((n) => n.by === "coach" && n.week === weekKey)).length;
   return (
     <>
+      {p.waiting.length > 0 && (
+        <section className="card waiting" aria-label="Waiting for you">
+          <b>Waiting for you ({p.waiting.length})</b>
+          <small className="muted">Everything a client sent or asked, newest first. Tap one to answer; it leaves the list when answered. The badge on Clients counts this list.</small>
+          {p.waiting.slice(0, 12).map((w) => (
+            <button key={w.key} type="button" className="menu-row" onClick={() => openWaiting(w)}><span className="menu-row-text"><b>{w.name} · {w.what}</b><small>{w.when}</small></span><span aria-hidden="true">›</span></button>
+          ))}
+        </section>
+      )}
       {due.length > 0 && (
         <>
           <div className="approve-head"><p className="label">Check-ins today, {DAY_NAMES[ti]}</p><span className="approve-count">{toSend ? `${toSend} to send` : "all sent"}</span></div>
@@ -111,7 +127,9 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
 
 // The rest of the client's page, under the week (0.2.6): the cook switch, safety, the formula, the goal sheet, the weight
 // trend, the goal history and the shared cards. The goal is set above, in the goal section (CW8).
-export function ClientTail({ row, onSaved, setError, notify, confirmAi, cook, setCook }: { row: ClientRow; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void; confirmAi?: (uid: string, on: boolean) => Promise<void>; cook?: boolean; setCook?: (on: boolean) => void }) {
+export function ClientTail({ row, onSaved, setError, notify, confirmAi, cook, setCook, sendNote, coachName, focusCard, onAnswered }: { row: ClientRow; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void; confirmAi?: (uid: string, on: boolean) => Promise<void>; cook?: boolean; setCook?: (on: boolean) => void; sendNote?: (notes: CoachNote[]) => Promise<void>; coachName?: string; focusCard?: string | null; onAnswered?: () => void }) {
+  // DT189: a card opened from Waiting for you scrolls into view
+  useEffect(() => { if (!focusCard) return; const t = setTimeout(() => document.getElementById(`card-${focusCard}`)?.scrollIntoView({ block: "start", behavior: "smooth" }), 300); return () => clearTimeout(t); }, [focusCard]);
   const [formula, setFormula] = useState<import("../personal").Formula | null>(row.formula ?? null);
   const [photos, setPhotos] = useState<Map<string, string>>(new Map());
   // a shared plate's photo comes through our server, which checks that the card is shared with this coach (storage release 1)
@@ -172,7 +190,7 @@ export function ClientTail({ row, onSaved, setError, notify, confirmAi, cook, se
           const items: any[] = f.meal?.items ?? [];
           const photo = photos.get(`fb:${f.id}`);
           return (
-            <section className="card client-card" key={f.id}>
+            <section className="card client-card" key={f.id} id={`card-${f.id}`}>
               <div className="client-card-top">
                 <div>
                   <b>{f.taste}{f.shared?.reason ? <span className="reason-tag"> · {({ look: "look at this", ok: "was this OK?", help: "help me next time" } as any)[f.shared.reason]}</span> : null}</b>
@@ -186,6 +204,7 @@ export function ClientTail({ row, onSaved, setError, notify, confirmAi, cook, se
                 {items.length > 0 && <small>{pdText(pdOf(items))} · {kcalOf(items)} kcal</small>}
               </div>
               {f.notes && <p className="client-note">“{f.notes}”</p>}
+              {sendNote && <CardAnswer row={row} card={f} coachName={coachName ?? "Coach"} send={sendNote} notify={notify} setError={setError} onDone={onAnswered} />}
             </section>
           );
         })}

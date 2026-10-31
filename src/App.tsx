@@ -73,7 +73,8 @@ import { takeCodeFromUrl } from "./pendingCode";
 takeCodeFromUrl();  // SH73: chefmealan.com/?code=AB12CD from a coach's QR code
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveOwnNotes, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalLabel, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
-import { setTodayChange, dayOfLoad, ymd, planLine as planLineOf, type PlanDay } from "./plan";
+import { setTodayChange, dayOfLoad, ymd, isoWeek, planLine as planLineOf, type PlanDay } from "./plan";
+import { todayIndex } from "./screens/ClientWeek";
 import { slotsOf, slotsOn } from "./slots";
 import { dayLog } from "./today";
 import { dayLineOf, type DayLine } from "./dayLines";
@@ -109,7 +110,8 @@ import { momentTarget, momentOf, momentKcalShare, getUsual, setUsual, getRegion,
 import { JourneyScreen } from "./screens/JourneyScreen";
 import { MeScreen } from "./screens/MeScreen";
 import { plateWhenOf } from "./plateMode";
-import { unseenFromCoach, repliesSince } from "./coachNotes";
+import { unseenFromCoach } from "./coachNotes";
+import { waitingFor, seenWaiting, markWaitingSeen } from "./coachNotes";
 import { activePlaces, inPlace, inferPlaces, placesOfNew, renameForPlace, usedIds, tripOn, tripOver, getPlacesOn, setPlacesOn, getTrip, setTrip, getStarted, setStarted, MIGRATED, type Trip } from "./places";
 import { Home, CircleUser, Menu, Users, MessageCircle, Globe, CalendarDays } from "lucide-react";
 import {
@@ -1330,14 +1332,25 @@ export default function App() {
   const fromCoach = unseenFromCoach(coachThread.notes) + inbox.length;
   useEffect(() => { if (coachSeen.current >= 0 && fromCoach > coachSeen.current) notify(`${profile.coachName ? profile.coachName.split(" ")[0] : "Your coach"} sent you something. It is on Today.`); coachSeen.current = fromCoach; /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [fromCoach]);
   // coach: how many cards were shared since I last looked
+  // DT189 (0.3.31, board Stories138, Milan 17:42): the badge used to clear the moment Clients opened, so the count vanished
+  // before anything was reached. Now the badge is the Waiting for you list's count, and a row leaves it only when handled.
+  const [waiting, setWaiting] = useState<import("./coachNotes").Waiting[]>([]);
+  const [focusCard, setFocusCard] = useState<string | null>(null);
+  const recountWaiting = async () => {
+    const rows = coachDemoOn() ? (await import("./coachDemo")).demoRows() : user && profile.role === "coach" ? await listClients(user.uid).catch(() => null) : null;
+    if (!rows) { setWaiting([]); return; }
+    const seen = seenWaiting(user?.uid ?? "local");
+    const list = waitingFor(rows.map((r) => ({ uid: r.uid, name: r.name, notes: r.notes ?? [], feedback: r.feedback ?? [], review: (r as any).review ?? null, checkinDay: r.checkinDay })), seen, todayIndex(), ymd(isoWeek(new Date()).monday));
+    setWaiting(list); setNewShared(list.length);
+  };
   const countNewShared = async () => {
+    void recountWaiting();
     if (!user || profile.role !== "coach") return;
     try {
       const since = localStorage.getItem(`chefmealan-coach-seen-${user.uid}`) || "";
       const rows = await listClients(user.uid);
       // 0.2.121 (Tester 2, Milan 15:24): the badge also counts replies from clients and numbers waiting for the coach
-      const n = rows.reduce((acc, r) => acc + r.feedback.filter((f: any) => (f.shared?.at || f.createdAt) > since).length + repliesSince(r.notes ?? [], since) + ((r as any).review?.status === "waiting" && ((r as any).review?.at ?? "") > since ? 1 : 0), 0);
-      setNewShared(n);
+      void since; void rows; // the count is the waiting list's (DT189)
     } catch { /* offline */ }
   };
   useEffect(() => { countNewShared(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid, profile.role]);
@@ -2441,7 +2454,8 @@ export default function App() {
       setInbox((x) => x.filter((i) => i.id !== item.id));
     },
     dismissRecipe: async (item: InboxItem) => { if (user) { try { await clearInboxItem(user.uid, item.id); } catch {} } setInbox((x) => x.filter((i) => i.id !== item.id)); },
-    newShared, markSharedSeen: () => { if (user) { try { localStorage.setItem(`chefmealan-coach-seen-${user.uid}`, new Date().toISOString()); } catch {} } setNewShared(0); },
+    newShared, markSharedSeen: () => { if (user) { try { localStorage.setItem(`chefmealan-coach-seen-${user.uid}`, new Date().toISOString()); } catch {} } },
+    waiting, waitingSeen: (key) => { markWaitingSeen(user?.uid ?? "local", key); void recountWaiting(); }, recountWaiting: () => { void recountWaiting(); }, focusCard, setFocusCard,
     matched, importRef, filter, setFilter,
     coach, setCoach: (v: boolean) => { setCoach(v); setCoachState(v); },
     step, setStep, mixWith,

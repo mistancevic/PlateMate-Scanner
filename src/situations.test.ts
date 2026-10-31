@@ -244,3 +244,26 @@ test("0.3.30: a suggestion is a note with a suggest part; the answer survives a 
   assert.equal(suggestTitle({ kind: "page", page: { part: "body", id: "gut", member: "gut", name: "The body: The gut" } }, "x"), "A page: The body: The gut");
   assert.equal(REASONS.length, 4);
 });
+
+// 0.3.31 (DT189): Waiting for you, an answer and a reaction on a card
+import { waitingFor, waitingWords, onCard, unreadNote as unread2 } from "./coachNotes";
+test("0.3.31: the waiting list: a shared card until answered or opened, a reply, numbers to approve, a check-in due; the words", () => {
+  const card = { id: "c1", createdAt: "2026-11-03T13:00:00", meal: { title: "Sarma with skyr" }, shared: { reason: "ok", at: "2026-11-03T13:05:00" } };
+  const coachNote = { at: "2026-11-02T09:00:00", by: "coach" as const, name: "Milan", week: "2026-11-02", verdict: "approved" as const, text: "Good week" };
+  const reply = { at: "2026-11-02T18:02:00", by: "client" as const, text: "Thanks" };
+  const rows = [{ uid: "u1", name: "Tester 1", notes: [coachNote, reply], feedback: [card], review: { status: "waiting", at: "2026-11-01T10:00:00" }, checkinDay: 3 }];
+  const list = waitingFor(rows, new Set(), 3, "2026-11-02");
+  assert.deepEqual(list.map((w) => w.kind), ["card", "reply", "review"]);
+  assert.ok(list.find((w) => w.kind === "card")!.what === "was this OK? Sarma with skyr");
+  assert.ok(list.find((w) => w.kind === "checkin") === undefined, "the week's note was sent, so no check-in row");
+  assert.match(waitingWords(list), /^3 things wait on Clients: a card shared, a reply, numbers to approve\. Open Clients ›$/);
+  // an answer takes the card off the list; a reaction too; a seen key takes the reply off
+  const answer = { at: "2026-11-03T14:00:00", by: "coach" as const, name: "Milan", text: "Yes.", suggest: { kind: "answer" as const, card: { id: "c1", title: "Sarma with skyr", at: card.createdAt } } };
+  const l2 = waitingFor([{ ...rows[0], notes: [coachNote, reply, answer] }], new Set(["reply|u1|2026-11-02T18:02:00"]), 4, "2026-11-02");
+  assert.deepEqual(l2.map((w) => w.kind), ["review"]);
+  assert.equal(onCard([coachNote, reply, answer], "c1").length, 1);
+  // a reaction is born read: never the unread note on Today
+  const reaction = { at: "2026-11-03T14:00:00", by: "coach" as const, text: "Good 👍", readAt: "2026-11-03T14:00:00", suggest: { kind: "reaction" as const, reaction: "good" as const, card: answer.suggest.card } };
+  assert.equal(unread2([reaction]), null);
+  assert.equal(unread2([answer])?.at, answer.at);
+});

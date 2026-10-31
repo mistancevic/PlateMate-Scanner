@@ -753,7 +753,7 @@ function CoachPanel(p: AppApi) {
         <>
           <p className="label">Notes from {p.coachLabel}</p>
           <section className="card days">{[...p.coachNotes].reverse().slice(0, 20).map((n) => (
-            <div className="history-row" key={n.at}><div><b>{new Date(n.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}</b><small>{n.by === "client" ? "Your reply" : n.verdict === "change" ? "Asked you to change your numbers" : "Approved your week"}</small></div><div className="history-num"><small>“{n.text}”</small></div></div>
+            <div className="history-row" key={n.at}><div><b>{new Date(n.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}</b><small>{n.by === "client" ? "Your reply" : n.suggest?.kind === "answer" ? `On your ${n.suggest.card?.title ?? "meal"}` : n.suggest?.kind === "reaction" ? `On your ${n.suggest.card?.title ?? "meal"}` : n.suggest ? "A suggestion" : n.verdict === "change" ? "Asked you to change your numbers" : "Approved your week"}</small></div><div className="history-num"><small>“{n.text}”</small></div></div>
           ))}</section>
         </>
       )}

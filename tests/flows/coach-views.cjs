@@ -1,3 +1,5 @@
+// DT189 (0.3.31, board Stories138): Waiting for you at the top of Clients, the badge as its count, the strip in words on My
+// day; Answer and Good or Seen under a shared card; the answer on the client's Today quoting the meal.
 // DT188 (0.3.30, board Stories137; Coach Milan 31 October 12:56 to 13:00, 16:08, 16:26 Go): roles and navigation. Explorer is
 // the fifth tab for everyone and leaves the menu. The coach is one account with two views, My day and My clients, switched at
 // the top of Today; in My clients the bar keeps its order and Plate becomes Clients; Today, Plan and Recipes show the chosen
@@ -61,6 +63,12 @@ const PORT = "3340", U = `http://127.0.0.1:${PORT}`;
   ok(personal.lifestyle.meals === 4 && Object.values(personal.timesOn ?? {}).every((d) => d.snack === "16:00"), "the time is on each date; the Lifestyle default is untouched");
   thread = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-coach")).notes);
   ok(thread[0].answer?.choice === "accept" && await page.locator(".suggest-card").count() === 0, "accepted: the card goes; the answer is on the thread");
+  // 3b. DT189: an answer on a card lands on Today quoting the meal, with Got it
+  await page.evaluate(() => { const c = JSON.parse(localStorage.getItem("chefmealan-coach")); c.notes.push({ at: new Date().toISOString(), by: "coach", name: "Milan", text: "Yes. Keep the skyr on the side.", suggest: { kind: "answer", card: { id: "x1", title: "Sarma with skyr", at: "2026-11-03T13:00:00" } } }); localStorage.setItem("chefmealan-coach", JSON.stringify(c)); });
+  await page.goto(U + "/"); await page.waitForTimeout(1200);
+  const an = page.locator(".coach-week-note").first();
+  ok(/On your Sarma with skyr, Tuesday 13:00/.test(await text(an)) && /Keep the skyr on the side/.test(await text(an)) && await an.getByRole("button", { name: "Got it" }).count() === 1, "the answer on Today quotes the meal and its time, with Got it");
+  await an.getByRole("button", { name: "Got it" }).click(); await page.waitForTimeout(400);
   // 4. the coach: the switch at the top of Today; My clients swaps the centre of the bar; the chosen client's Today with Suggest
   await page.goto(U + "/today?coachdemo"); await page.waitForTimeout(1200);
   const sw = page.getByRole("radiogroup", { name: "Which view" });
@@ -82,6 +90,30 @@ const PORT = "3340", U = `http://127.0.0.1:${PORT}`;
   await page.locator(".bottom-nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(400);
   await sw.getByRole("radio", { name: "My day" }).click(); await page.waitForTimeout(600);
   ok(await bar() === "Today,Plan,Plate,Recipes,Explorer" && await page.locator(".cv-head").count() === 0 && await text(page.locator("header h1")) === "Today", "My day again: Plate is back, the coach's own Today");
+  // 6. DT189 (0.3.31): Waiting for you at the top of Clients; the badge is its count; a tap opens the card; Answer and Good under the card
+  await page.goto(U + "/today?coachdemo"); await page.waitForTimeout(1200);
+  await page.evaluate(() => { for (const k of Object.keys(localStorage)) if (/chefmealan-waiting-seen/.test(k)) localStorage.removeItem(k); });
+  await page.goto(U + "/today?coachdemo"); await page.waitForTimeout(1200);
+  const strip = page.locator(".strip-button").filter({ hasText: /wait on Clients/ });
+  ok(await strip.count() === 1 && /things wait on Clients: .*cards shared/.test(await text(strip)), "My day: the strip in words: " + await text(strip));
+  await strip.click(); await page.waitForTimeout(800);
+  const wl = page.getByRole("region", { name: "Waiting for you" }).or(page.locator(".waiting"));
+  const nWait = await page.locator(".waiting .menu-row").count();
+  ok(await wl.count() >= 1 && nWait >= 2 && /Waiting for you \(\d+\)/.test(await text(page.locator(".waiting b").first())), "Clients opens with Waiting for you, one row per thing: " + nWait);
+  const badge = await page.locator(".bottom-nav .badge").first().textContent();
+  ok(/Waiting for you \(/.test(await text(page.locator(".waiting b").first())) && (await text(page.locator(".waiting b").first())).includes(`(${badge})`), "the badge on Clients is the list's count: " + badge);
+  const firstRow = page.locator(".waiting .menu-row").first();
+  const rowText = await text(firstRow);
+  await firstRow.click(); await page.waitForTimeout(900);
+  ok(await page.locator(".card-answer").count() >= 1, "the row opens the client's page with Answer under the shared cards");
+  const ca = page.locator(".client-card").filter({ has: page.locator(".card-answer") }).first();
+  await ca.locator("textarea").fill("Yes. The skyr is the protein; keep it on the side."); await ca.getByRole("button", { name: "Send the answer" }).click(); await page.waitForTimeout(600);
+  ok(/You answered/.test(await text(ca)) && /Answer again/.test(await text(ca)), "Send: the card shows the answer and Answer again");
+  const second = page.locator(".client-card").filter({ has: page.locator(".card-answer") }).nth(1);
+  if (await second.count()) { await second.getByRole("button", { name: "Good 👍" }).click(); await page.waitForTimeout(500); ok(/Good 👍,/.test(await text(second)), "Good: a reaction on the card only"); }
+  await page.getByRole("button", { name: "‹ Clients" }).click(); await page.waitForTimeout(600);
+  const nAfter = await page.locator(".waiting .menu-row").count();
+  ok(nAfter < nWait, `answered rows left the list: ${nWait} then ${nAfter} (opened: ${rowText.slice(0, 40)})`);
   // 5. the superadmin: Admin in the menu (the example coach is one)
   await page.getByRole("button", { name: "Menu" }).first().click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: /^Admin/ }).click(); await page.waitForTimeout(400);

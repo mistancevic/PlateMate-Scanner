@@ -13,6 +13,7 @@ import { ymd } from "../plan";
 import { wordsOf } from "../dayLines";
 import { answerWords, suggestTitle, type CoachNote, type Suggest } from "../coachNotes";
 import { BODY_PAGES, SITUATION_PAGES } from "../explorerBody";
+import { CardAnswer } from "./CardAnswer";
 
 const first = (name: string) => name.split(" ")[0];
 const longDay = (k: string) => new Date(`${k}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "");
@@ -90,7 +91,8 @@ export function ClientView({ p, tab }: { p: AppApi; tab: Tab }) {
       <section className="card cv-days" aria-label={`${name}'s shared cards`}>
         <b>Shared with you</b>
         {cards.length === 0 && <small className="muted">{name} has not shared a card yet. A card is shared from its own page, with a line to you.</small>}
-        {cards.map((f: any) => <div key={f.id ?? f.createdAt} className="cv-day"><b>{f.meal?.title ?? "A meal"}</b><small>{longDay(ymd(new Date(f.createdAt)))}{f.notes ? ` · “${f.notes}”` : ""}</small></div>)}
+        {cards.map((f: any) => <div key={f.id ?? f.createdAt} className="cv-day" id={`card-${f.id}`}><b>{f.meal?.title ?? "A meal"}</b><small>{longDay(ymd(new Date(f.createdAt)))}{f.shared?.reason ? ` · ${({ look: "look at this", ok: "was this OK?", help: "help me next time" } as Record<string, string>)[f.shared.reason]}` : ""}{f.notes ? ` · “${f.notes}”` : ""}</small>
+          <CardAnswer row={row} card={f} coachName={coachName} send={async (notes) => { if (!demo) await sendCoachNote(row.uid, notes); patchNotes(notes); p.recountWaiting(); }} notify={p.notify} setError={p.setError} /></div>)}
         <small className="muted cv-note">To send {name} one of your recipes: open it on your Recipes, My day, and tap Send.</small>
       </section>
     </>
@@ -104,7 +106,7 @@ function ClientToday({ p, row, head, suggest, today }: { p: AppApi; row: ClientR
   const [time, setTime] = useState("16:00");
   const [pageIx, setPageIx] = useState(-1);
   const [busy, setBusy] = useState(false);
-  const waiting = useMemo(() => [...row.notes].reverse().filter((n) => n.by === "coach" && n.suggest).slice(0, 6), [row.notes]);
+  const waiting = useMemo(() => [...row.notes].reverse().filter((n) => n.by === "coach" && n.suggest && (n.suggest.kind === "snack" || n.suggest.kind === "page")).slice(0, 6), [row.notes]);
   const send = async (s: Suggest, text: string) => { setBusy(true); try { await suggest(s, text); setSnack(""); setPageIx(-1); } finally { setBusy(false); } };
   return (
     <>
