@@ -813,7 +813,7 @@ export default function App() {
     [scanFrom, setScanFrom] = useState<"today" | null>(null),
     [where, setWhere] = useState<Food | null>(null),
     // what the chat opened for (0.2.4): "fill" shows the day filled at once
-    [talkAsk, setTalkAsk] = useState<"fill" | "plate" | "around" | null>(null),
+    [talkAsk, setTalkAsk] = useState<"fill" | "plate" | "around" | { q: string } | null>(null),
     // the slots' meals (0.2.2) and the slot a plate is being made for
     [planned, setPlannedState] = useState<Planned>(() => refreshPlanned(getPlanned(), state.meals)),
     [filling, setFilling] = useState<Filling | null>(null),
@@ -2436,7 +2436,7 @@ export default function App() {
     // DT136: a place's starter foods come with its switch, the first time. The common ones are sold everywhere; a place's own
     // (fifty in Limassol) and its own brands are that place's
     addStarter: () => addStarterFor(region ?? "elsewhere"),
-    openOut: (ask?: "fill" | "plate" | "around") => { setTalkAsk(ask ?? null); setTalkOpen(true); },
+    openOut: (ask?: "fill" | "plate" | "around" | { q: string }) => { setTalkAsk(ask ?? null); setTalkOpen(true); },
     scanFromToday: () => { setScanFrom("today"); setMode("label"); setCamera(true); },
     openScan: () => { setTalkOpen(false); setMode("label"); setCamera(true); },
     where, setWhere,

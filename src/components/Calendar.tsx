@@ -3,10 +3,11 @@
 // once that the plan is also there; a shopping list can get a day, Shop on. Buttons 44 px or more; labels 12 px or more.
 import { useEffect, useRef, useState } from "react";
 import type { AppApi } from "../screens/api";
-import { calendarEvents, CAL_DAYS, CAL_KINDS, kindOn, dishOn, plusDays, type CalKind, type CalSettings, type CalEvent } from "../gcal";
-import { askToken, heldToken, runSync, needsSync, setCalStatus, useCalStatus, dropCalendar, forgetSent, calStatus } from "../calendarSync";
+import { calendarEvents, CAL_DAYS, CAL_KINDS, CAL_SCOPE, BUSY_SCOPE, kindOn, dishOn, plusDays, type CalKind, type CalSettings, type CalEvent, type CalMove } from "../gcal";
+import { askToken, heldToken, runSync, needsSync, setCalStatus, useCalStatus, dropCalendar, forgetSent, calStatus, lookDue, onMoves, readBusy, busyStale, forgetBusy, useBusy } from "../calendarSync";
 import { lifestyleOf, dayFor, getDay, getPersonal } from "../personal";
-import { slotsOn } from "../slots";
+import { slotsOn, slotsOf, withTimeOn } from "../slots";
+import { pruneCal } from "../busy";
 import { ymd } from "../plan";
 import { weighInsOff } from "../weight";
 import { nextCheckIn } from "../goalGuide";
@@ -18,6 +19,24 @@ const KIND_WHY: Partial<Record<CalKind, string>> = { weigh: "Off at first: a sha
 export const timeZoneHere = () => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch { return "UTC"; } };
 const calOf = (p: AppApi): CalSettings => p.personal.calendar ?? { on: false };
 // 0.3.22: a calendar Google just made is kept at once, on the freshest settings, so leaving the page never loses it
+// DT179: the rights a token needs: busy times too when Read when I'm busy is on
+export const scopesOf = (c: CalSettings | null | undefined) => (c?.busy ? [CAL_SCOPE, BUSY_SCOPE] : [CAL_SCOPE]);
+// DT179: a meal moved in Google Calendar on the same date takes that time here, as a time set for that date
+export function applyMoves(p: AppApi, moves: CalMove[]) {
+  const now = getPersonal(), l = lifestyleOf(now), usual = slotsOf(l);
+  let timesOn = now.timesOn, moved = { ...(now.calendar?.moved ?? {}) };
+  const words: string[] = [];
+  for (const m of moves) {
+    const s = usual.find((x) => x.id === m.slotId); if (!s) continue;
+    timesOn = withTimeOn(timesOn, m.date, m.slotId, m.to, s.time);
+    const k = `${m.date}|${m.slotId}`;
+    if (m.to === s.time) delete moved[k]; else moved[k] = moved[k] ?? m.from;
+    words.push(`${s.name} on ${new Date(`${m.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" })} at ${m.to}`);
+  }
+  if (!words.length) return;
+  p.setPersonal({ ...now, timesOn, calendar: { ...(now.calendar ?? { on: true }), moved } });
+  p.notify(`From Google Calendar: ${words.join(", ")}.`);
+}
 const keepId = (p: AppApi, extra: Partial<CalSettings> = {}) => (id: string) => { const now = getPersonal(); p.setPersonal({ ...now, calendar: { ...(now.calendar ?? { on: false }), ...extra, id } }); };
 
 // the events for the next 14 days, from what the app already knows
@@ -55,10 +74,26 @@ export function CalendarSync({ p }: { p: AppApi }) {
   const { events, from, to } = c.on ? eventsFor(p) : { events: [] as CalEvent[], from: "", to: "" };
   const sig = events.map((e) => `${e.id}.${e.h}`).join(",");
   const latest = useRef({ p, events, from, to }); latest.current = { p, events, from, to };
+  // DT179: moves read in Google come here; the clock ticks once a minute so the calendar is looked at again
+  useEffect(() => { onMoves((m) => applyMoves(latest.current.p, m)); const i = setInterval(() => setTick((n) => n + 1), 60 * 1000); return () => clearInterval(i); }, []);
+  const due = c.on && lookDue();
+  // DT179: busy times, read while a token with that right is held; kept and moved for gone dates drop off
+  useEffect(() => {
+    if (!c.on || !c.busy) return;
+    const token = heldToken(scopesOf(c));
+    if (token && busyStale(from, to)) void readBusy(token, from, to, timeZoneHere());
+  });
+  useEffect(() => {
+    if (!c.on) return;
+    const today = ymd(new Date()), pr = pruneCal(c, today);
+    if ((pr.kept?.length ?? 0) !== (c.kept?.length ?? 0) || Object.keys(pr.moved ?? {}).length !== Object.keys(c.moved ?? {}).length || Object.keys(pr.ahead ?? {}).length !== Object.keys(c.ahead ?? {}).length)
+      p.setPersonal({ ...getPersonal(), calendar: { ...(getPersonal().calendar ?? c), kept: pr.kept, moved: pr.moved, ahead: pr.ahead } });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [c.on, from]);
   useEffect(() => {
     if (!c.on) { if (calStatus().state !== "off") setCalStatus({ state: "off" }); return; }
-    if (!needsSync(c.id, events)) { if (calStatus().state === "off" || calStatus().state === "tap") setCalStatus({ state: "done" }); return; }
     const token = heldToken();
+    if (!needsSync(c.id, events) && !(token && due)) { if (calStatus().state === "off" || calStatus().state === "tap") setCalStatus({ state: "done" }); return; }
     if (!token) { setCalStatus({ state: "tap" }); return; }
     const t = setTimeout(async () => {
       const { p: q, events: ev, from: f, to: tt } = latest.current;
@@ -67,16 +102,17 @@ export function CalendarSync({ p }: { p: AppApi }) {
     }, 1500);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [c.on, c.id, sig]);
+  }, [c.on, c.id, sig, due]);
   return null;
 }
 
 // the one tap that brings the calendar up to date when the hour is over
 export async function updateNow(p: AppApi): Promise<boolean> {
   let token: string | null = null;
-  try { token = await askToken(); } catch { token = null; }
+  try { token = await askToken(scopesOf(calOf(p))); } catch { token = null; }
   if (!token) { p.notify("Google Calendar was not updated. Try again."); return false; }
   const { events, from, to } = eventsFor(p);
+  if (calOf(p).busy) void readBusy(token, from, to, timeZoneHere());
   const id = await runSync(token, calOf(p).id, events, from, to, timeZoneHere(), keepId(p));
   if (!id) return false;
   if (id !== getPersonal().calendar?.id) keepId(p)(id);
@@ -97,10 +133,26 @@ export function CalendarPage({ p }: { p: AppApi }) {
     const ex = k === "meals" ? "Breakfast, lunch, dinner at your times" : k === "cooking" ? "Cook dinner, 30 minutes before, when the planned meal has steps"
       : k === "training" ? "Your training days, at their time" : k === "shopping" ? "A shopping list, on the day you pick with Shop on"
       : k === "weigh" ? "Weigh in, before breakfast" : p.profile.coachId ? `Check-in with ${p.coachLabel}, every 4 weeks` : "Goal check-in, every 4 weeks";
-    return (
-      <button key={k} type="button" role="switch" aria-checked={on} className="cal-kind" onClick={() => set({ kinds: { ...c.kinds, [k]: !on } })}>
+    const row = (
+      <button key={k} type="button" role="switch" aria-checked={on} className={`cal-kind ${k === "meals" && on ? "cal-kind-open" : ""}`} onClick={() => set({ kinds: { ...c.kinds, [k]: !on } })}>
         <span><b>{k === "checkin" && p.profile.coachId ? `Check-in with ${p.coachLabel}` : KIND_NAME[k]}</b><small>{ex}</small>{KIND_WHY[k] && <small className="cal-why">{KIND_WHY[k]}</small>}</span><Switch on={on} />
       </button>
+    );
+    // DT179a (0.3.23, board Stories128): which meals go in, every slot or only the planned ones
+    if (k !== "meals" || !on) return row;
+    const only = c.meals === "planned";
+    return (
+      <div key={k}>
+        {row}
+        <div className="cal-which">
+          <small className="setting-name">Which meals</small>
+          <div className="moments" role="radiogroup" aria-label="Which meals">
+            <button type="button" role="radio" aria-checked={!only} className={`choice ${!only ? "on" : ""}`} onClick={() => set({ meals: "all" })}>Every meal slot</button>
+            <button type="button" role="radio" aria-checked={only} className={`choice ${only ? "on" : ""}`} onClick={() => set({ meals: "planned" })}>Only meals I planned</button>
+          </div>
+          {only && <small className="muted">A slot with a meal on Plan goes in; an open slot stays out. Plan a meal, and it shows within seconds.</small>}
+        </div>
+      </div>
     );
   });
   const connect = async () => {
@@ -143,6 +195,7 @@ export function CalendarPage({ p }: { p: AppApi }) {
       )}
       {c.on && <CalendarState p={p} />}
       {c.on && <p className="small muted">When you change a time, a slot or a meal here, it changes in Google Calendar within seconds. Google lets the app write for about an hour after a tap; after that, one tap on Update Google Calendar brings the next {CAL_DAYS} days up to date.</p>}
+      {c.on && <BusyCard p={p} />}
       <section className="card cal-kinds" aria-label="What goes in">
         <b>What goes in</b>
         <small className="muted">Each kind is on or off. Change it any time.</small>
@@ -177,12 +230,47 @@ export function CalendarPage({ p }: { p: AppApi }) {
   );
 }
 
+// DT179 (0.3.23, board Stories127): from your calendar to the app, Read when I'm busy
+function BusyCard({ p }: { p: AppApi }) {
+  const c = calOf(p);
+  const b = useBusy();
+  const [asking, setAsking] = useState(false);
+  const toggle = async () => {
+    if (c.busy) { p.setPersonal({ ...getPersonal(), calendar: { ...(getPersonal().calendar ?? c), busy: false } }); forgetBusy(); log("calendar_busy", { on: false }); return; }
+    setAsking(true);
+    try {
+      let token: string | null = null;
+      try { token = await askToken([CAL_SCOPE, BUSY_SCOPE]); } catch { token = null; }
+      if (!token) { p.notify("Google did not give the busy times. Nothing changed."); return; }
+      p.setPersonal({ ...getPersonal(), calendar: { ...(getPersonal().calendar ?? c), busy: true } });
+      const from = ymd(new Date()), to = plusDays(from, CAL_DAYS - 1);
+      await readBusy(token, from, to, timeZoneHere());
+      log("calendar_busy", { on: true });
+      p.notify("Plan now shows when you are busy, and asks where a busy time meets a meal or training.");
+    } finally { setAsking(false); }
+  };
+  return (
+    <section className="card cal-busy" aria-label="From your calendar to the app">
+      <b>From your calendar to the app</b>
+      <button type="button" role="switch" aria-checked={Boolean(c.busy)} className="cal-kind" disabled={asking} onClick={toggle}>
+        <span><b>Read when I'm busy</b><small>Busy and free times only. Never the titles, the people or the places of your events.</small></span><Switch on={Boolean(c.busy)} />
+      </button>
+      <small className="cal-say">With it, Plan suggests: a meal moved out of a meeting, a quick dinner after a late evening, a meal to carry on a full day, and asks when training sits in a busy block. It suggests; your times change only when you tap.</small>
+      <small className="muted cal-under">{c.busy ? "On. " : ""}Turning it on asks Google once more, for one more right: see when you are busy. Busy times stay on your phone: not on our server, not with your coach, not with Chef Mealan's AI.</small>
+      {c.busy && b?.error && <p className="small cal-error" role="alert">{b.error}</p>}
+      <small className="muted cal-under">A Chef Mealan meal you move in Google Calendar, on the same day, takes that time here too.</small>
+    </section>
+  );
+}
+
 // the state line with its one button, on the Calendar page and on Plan
 export function CalendarState({ p, plan }: { p: AppApi; plan?: boolean }) {
   const st = useCalStatus();
   const [busy, setBusy] = useState(false);
   if (!p.personal.calendar?.on) return null;
   const tap = st.state === "tap" || st.state === "error";
+  // 0.3.23 (Coach Milan 09:00): on the Calendar page the On card says the time once; this line only speaks when there is more
+  if (!plan && !tap && st.state !== "busy") return null;
   return (
     <div className={`cal-line ${tap ? "cal-line-tap" : ""}`} role="status" aria-label="Google Calendar">
       <span aria-hidden="true">📅</span>

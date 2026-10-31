@@ -135,3 +135,33 @@ test("0.3.22: Google asking to slow down is waited out, then the call goes throu
   const r = await syncCalendar(f, "t", undefined, ev, "2026-11-02", "2026-11-03", "Europe/Berlin");
   assert.equal(slowed, 2); assert.equal(r.made, ev.length);
 });
+
+test("DT179a: Only meals I planned: an open slot stays out; cooking and training as before", async () => {
+  const names = calendarEvents(base({ settings: { on: true, meals: "planned" } })).map((e) => e.summary);
+  assert.ok(names.includes("Dinner · Chicken rice bowl") && names.includes("Cook dinner · Chicken rice bowl"));
+  assert.ok(!names.includes("Breakfast") && !names.includes("Lunch"));
+  assert.ok(names.some((n) => /Strength/.test(n)));
+});
+
+test("DT179: a meal moved in Google on the same date is read back, and not written over", async () => {
+  const g = fakeGoogle();
+  const r = await syncCalendar(g.f, "t", undefined, calendarEvents(base()), "2026-11-02", "2026-11-03", "Europe/Berlin");
+  const id = eventId("2026-11-02|meal|s3"), ev = g.cals.get(r.id)!.get(id);
+  assert.equal(ev.extendedProperties.private.k, "2026-11-02|meal|s3"); assert.equal(ev.extendedProperties.private.s, "2026-11-02T20:00");
+  const local = new Date("2026-11-02T21:00:00");
+  ev.start = { dateTime: local.toISOString() }; ev.end = { dateTime: new Date(local.getTime() + 30 * 6e4).toISOString() };
+  const r2 = await syncCalendar(g.f, "t", r.id, calendarEvents(base()), "2026-11-02", "2026-11-03", "Europe/Berlin");
+  assert.deepEqual(r2.moves, [{ date: "2026-11-02", slotId: "s3", from: "20:00", to: "21:00" }]);
+  assert.equal(g.cals.get(r.id)!.get(id).start.dateTime, local.toISOString(), "left as moved");
+  // to another date: not taken
+  ev.start = { dateTime: new Date("2026-11-03T20:00:00").toISOString() };
+  const r3 = await syncCalendar(g.f, "t", r.id, calendarEvents(base()), "2026-11-02", "2026-11-03", "Europe/Berlin");
+  assert.equal(r3.moves.length, 0);
+});
+
+test("DT179: cooked ahead: the cooking sits on the day before", () => {
+  const ev = calendarEvents(base({ days: ["2026-11-01", "2026-11-02"], settings: { on: true, ahead: { "2026-11-02|s3": "2026-11-01" } } }));
+  const names = ev.map((e) => `${(e.start.dateTime ?? "").slice(0, 16)} ${e.summary}`);
+  assert.ok(names.includes("2026-11-01T19:30 Cook ahead for Monday · Chicken rice bowl"), names.join(" | "));
+  assert.ok(!names.some((n) => n.startsWith("2026-11-02T19:30 Cook dinner")));
+});

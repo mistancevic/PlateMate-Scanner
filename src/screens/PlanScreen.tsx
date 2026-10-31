@@ -3,13 +3,13 @@ import { plannedName } from "../recipeDiff";
 import { carryReads } from "../carry";
 import { tripOn, placeName, type Trip } from "../places";
 import { REGIONS } from "../moments";
-import { useEffect, useRef, useState, type ReactElement } from "react";
+import { Fragment, useEffect, useRef, useState, type ReactElement } from "react";
 import { ChevronRight, ChefHat, Pencil, Circle, CircleCheck, CircleSlash, ShoppingBasket } from "lucide-react";
 import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, shopAmount, stateOf, shortMeals, byMeal, replanMeal, followPlan, notCounted, planChanges, updateList, type ShopStore, type SavedList, type ShopLine } from "../shopping";
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
 import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
-import { rowsOf, slotsOf, slotsOn, trainingWhen, type Slot, workHoursOf } from "../slots";
+import { rowsOf, slotsOf, slotsOn, trainingWhen, type Slot, type DayRow, workHoursOf } from "../slots";
 import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
 import { countOf, countLabel } from "../counted";
@@ -23,6 +23,7 @@ import { dayLog } from "../today";
 import { dayRecord } from "../record";
 import { livedByPlan } from "../metricsCalc";
 import { CalendarState, ShopOn, calendarNudge } from "../components/Calendar";
+import { useDayBusy, busyBefore, busyAfter, AskCard, SlotNotes } from "../components/BusyAsk";
 
 // Plan decides (0.2, canvas S "Plan purpose one" and H): the calendar of the day, slot by slot. The slots come from Lifestyle
 // (meals a day, the eating window, the times), the training row from the Training week. 0.2.1 shows the day with its empty
@@ -74,6 +75,11 @@ export function PlanScreen(p: AppApi) {
   const slots = slotsOn(lifestyle, p.personal.timesOn, key);
   const training = dayFor(p.personal, date)?.day ?? getDay(p.personal, date).plan ?? null;
   const rows = rowsOf(slots, training);
+  // DT179 (0.3.23, board Stories127): busy times from the calendar, and what Plan asks where they meet the day
+  const isPastDay = key < ymd(today);
+  const dayBusy = useDayBusy(p, key, slots, training, isPastDay);
+  const asksFor = (r: DayRow) => dayBusy.asks.filter((a) => (r.kind === "training" ? a.kind === "training" : a.kind !== "training" && a.slotId === r.slot.id));
+  const cookedOf = (slotId: string) => { const m = p.planned[key]?.[slotId]; return Boolean(m?.mealId && p.state.meals.find((x) => x.id === m.mealId)?.steps?.length); };
   // R19: arriving from a Swap on Today, Pick a meal opens for that slot, once
   useEffect(() => { if (pickOnArrival) { const sl = slots.find((x) => x.id === pickOnArrival); pickOnArrival = null; if (sl) setOpen(sl); } // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -156,7 +162,7 @@ export function PlanScreen(p: AppApi) {
         {fitted && <button type="button" className="link plan-usual" onClick={usualDay}>Back to the usual portions</button>}
       </section>
       <section className="card plan-day">
-        {rows.map((r) => {
+        {rows.map((r, ri) => <Fragment key={r.kind === "training" ? "training" : r.slot.id}>{busyBefore(rows, dayBusy.blocks, ri)}{((r: DayRow) => {
           if (r.kind === "training") return (
             <button type="button" key="training" className="menu-row plan-training" aria-label={`Training at ${r.time}, ${planLine(r.day)}. Change it for this date`} onClick={() => setEditing(r.day)}>
               <span className={`plan-time${r.exact ? "" : " plan-time-word"}`}>{r.exact ? r.label : r.label === "No time set" ? <>No time<br />set</> : r.label}</span>
@@ -199,9 +205,12 @@ export function PlanScreen(p: AppApi) {
                   <button type="button" className="pill pill-small" onClick={() => p.openOut()}>Ask {CHEF_NAME}</button>
                 </div>
               )}
+              {/* DT179: a time of its own for this date, moved in Google, or cooked ahead */}
+              <SlotNotes p={p} date={key} slot={r.slot} />
             </div>
           );
-        })}
+        })(r)}{asksFor(r).map((a) => <AskCard key={a.kind} p={p} date={key} a={a} training={training} cooked={a.kind !== "training" && cookedOf(a.slotId)} title={a.kind !== "training" ? p.planned[key]?.[a.slotId]?.title : undefined} />)}</Fragment>)}
+        {busyAfter(rows, dayBusy.blocks)}
         {/* SL2: the day's settings sit with the day, as links, one per line */}
         <div className="plan-card-links">
           <button type="button" className="link" onClick={() => { try { sessionStorage.setItem("cm-jump", "meals"); } catch {} p.openMenu("life"); }}>Slots and times ›</button>

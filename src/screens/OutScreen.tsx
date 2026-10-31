@@ -50,7 +50,7 @@ function Done({ text, undo, start }: { text: string; undo?: () => void; start?: 
   return <span className={`done-tick${start ? " done-start" : ""}`}><b>✓ {text}</b>{undo && <button type="button" className="link done-undo" onClick={undo}>Undo</button>}</span>;
 }
 
-export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; turns: Turn[]; setTurns: (f: (t: Turn[]) => Turn[]) => void; tab: Tab; ask?: "fill" | "plate" | "around" | null; clearAsk: () => void }) {
+export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; turns: Turn[]; setTurns: (f: (t: Turn[]) => Turn[]) => void; tab: Tab; ask?: "fill" | "plate" | "around" | { q: string } | null; clearAsk: () => void }) {
   const { pdRef, setState, state } = p;
   const [text, setText] = useState("");
   const [doorOpen, setDoorOpen] = useState(false);
@@ -116,6 +116,8 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
     p.notify(`${turn.fill.rows.length === 1 ? "The slot is" : `${turn.fill.rows.length} slots are`} set for ${turn.fill.dayName}.`);
   };
   useEffect(() => { if (p.ask === "fill") { p.clearAsk(); fillNow(); } }, [p.ask]); // eslint-disable-line react-hooks/exhaustive-deps
+  // DT179 (0.3.23): a question asked from Plan (a quick dinner after a late evening, a meal to carry on a full day)
+  useEffect(() => { if (p.ask && typeof p.ask === "object") { const q = p.ask.q; p.clearAsk(); void ask(q); } }, [p.ask]); // eslint-disable-line react-hooks/exhaustive-deps
   // DT93 (0.2.88): Ask Chef Mealan from the Plate: the plate goes in the first question, asked at once
   // DT105 (0.2.92): an ingredient on the plate: ask for a dish around it
   useEffect(() => { if (p.ask === "around") { p.clearAsk(); void ask(plateQuestion(`What dish can I make around what is on my plate, so it makes a ${mealName}?`, state.items.map((i) => `${Math.round(i.grams)} g ${i.food.name}`))); } }, [p.ask]); // eslint-disable-line react-hooks/exhaustive-deps
