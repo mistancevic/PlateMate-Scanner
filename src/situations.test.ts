@@ -292,3 +292,28 @@ test("0.3.33: the two situation pages exist; the late case reads the calendar's 
   assert.match(r.parts[2].body, /A rest day\. Planned: nothing at breakfast/);
   assert.ok(r.taps.some((t) => t.id === "easy") && r.taps.some((t) => t.id === "protein"));
 });
+
+// 0.3.34 (DT191, DT192): A party or a dinner out, A day away, no kitchen
+import { partyCase, awayCase } from "./situations";
+import { PARTY_PAGE, AWAY_PAGE } from "./explorerBody";
+test("0.3.34: the two pages exist in plain words; the party case reads the week and the calendar's evening; the away case reads the day out and Travel mode", () => {
+  assert.equal(SITUATION_PAGES.party, PARTY_PAGE); assert.equal(SITUATION_PAGES.away, AWAY_PAGE);
+  assert.ok(SITUATIONS.every((s) => s.state === "page"), "all six situations have pages");
+  assert.ok(!/save room|absorbs|hungry choice|making up/.test(JSON.stringify([PARTY_PAGE, AWAY_PAGE])), "plain words");
+  assert.match(PARTY_PAGE.effects[0].src ?? "", /American Journal of Clinical Nutrition/);
+  const p = { ...personal, weightKg: 85 } as unknown as Personal;
+  const s = new Date("2026-11-02T19:00:00").getTime(), e = new Date("2026-11-02T23:00:00").getTime();
+  const fb = [eaten("2026-10-30", "20:10", "Beer", "", ["Beer, lager"])];
+  const c = partyCase({ personal: p, feedback: fb, planned: {}, band: "maintain", numbersFor: () => ({ kcal: 2400, protein: 150 }), pdRef: null, busy: [{ s, e }] }, monday);
+  assert.match(c.parts[0].body, /Maintain\. \d of 7 days by the plan this week so far\. Lunch at/);
+  assert.match(c.parts[1].body, /A drink on 1 evening this week/);
+  assert.match(c.parts[2].body, /Tonight: out from 19:00 to 23:00, from the calendar/);
+  assert.ok(c.taps.some((t) => t.id === "scan") && c.taps.some((t) => /Tomorrow as usual/.test(t.label)));
+  assert.equal(c.trend, null, "one evening has no trend line");
+  const o = new Date("2026-11-02T08:00:00").getTime(), oe = new Date("2026-11-02T19:00:00").getTime();
+  const a = awayCase({ personal: p, planned: {}, busy: [{ s: o, e: oe }], travel: null }, monday);
+  assert.match(a.parts[1].body, /Out from 08:00 to 19:00 today, from the calendar\. Travel mode off/);
+  assert.ok(a.taps.some((t) => /Travel mode on for today/.test(t.label)) && a.taps.some((t) => /snack to carry/i.test(t.label)));
+  const a2 = awayCase({ personal: p, planned: {}, busy: null, travel: { place: "Serbia", since: "2026-11-01" } }, monday);
+  assert.match(a2.parts[1].body, /No calendar read.*Travel mode on, Serbia/);
+});

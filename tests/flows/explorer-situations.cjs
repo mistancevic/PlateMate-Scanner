@@ -1,3 +1,4 @@
+// 0.3.34: A party or a dinner out (DT191) and A day away, no kitchen (DT192): all six situations have pages.
 // 0.3.33: A late evening after work (DT190) and A day off training (DT193) open from Situations.
 // 0.3.29: The gut, The liver, The brain (DT185 to DT187): all eight families have a page.
 // 0.3.28: Muscle and Bone (DT183, DT184), read at the month.
@@ -159,7 +160,21 @@ const SHOTS = process.env.SHOTS;
   // 0.3.33: A day off training and A late evening after work open from the list
   await parts.getByRole("radio", { name: "Situations" }).click(); await page.waitForTimeout(400);
   const sstates = await page.locator(".ex-map .menu-row .ex-state").allTextContents();
-  ok(sstates.join(",") === "›,›,later,later,›,›", "Situations: sleep, late, rest and fat burning have pages: " + sstates.join(","));
+  ok(sstates.join(",") === "›,›,›,›,›,›", "Situations: all six have pages: " + sstates.join(","));
+  // 0.3.34: A party or a dinner out, A day away
+  await page.locator(".ex-map .menu-row").filter({ hasText: "A party or a dinner out" }).click(); await page.waitForTimeout(600);
+  let pp = await text(page.locator(".explorer"));
+  ok(/One meal does not move the trend/.test(pp) && /American Journal of Clinical Nutrition, the energy balance consensus/.test(pp) && /Your case: today, against the week/.test(pp) && /days by the plan this week so far/.test(pp), "A party: the page, the case against the week");
+  ok(await page.locator(".ex-tap").filter({ hasText: "Log the evening as one meal" }).count() === 1, "the tap to log the evening as a photo of the plate");
+  await page.getByRole("button", { name: "‹ Situations" }).click(); await page.waitForTimeout(300);
+  await page.locator(".ex-map .menu-row").filter({ hasText: "A day away, no kitchen" }).click(); await page.waitForTimeout(600);
+  pp = await text(page.locator(".explorer"));
+  ok(/Bought food is low on fibre/.test(pp) && /Travel mode off/.test(pp) && /No calendar read/.test(pp), "A day away: the page, the case says Travel mode off and no calendar");
+  await page.locator(".ex-tap").filter({ hasText: "Travel mode on for today" }).click(); await page.waitForTimeout(600);
+  ok(/Travel mode/.test(await text(page.locator("main"))) && await text(page.locator("header h1")) === "Me", "the travel tap opens Me, where Travel mode is");
+  await page.getByRole("button", { name: "Close" }).first().click(); await page.waitForTimeout(400);
+  await page.locator(".bottom-nav button").filter({ hasText: "Explorer" }).click(); await page.waitForTimeout(600);
+  await parts.getByRole("radio", { name: "Situations" }).click(); await page.waitForTimeout(400);
   await page.locator(".ex-map .menu-row").filter({ hasText: "A day off training" }).click(); await page.waitForTimeout(600);
   let sp = await text(page.locator(".explorer"));
   ok(/Building goes on from yesterday/.test(sp) && /Schoenfeld and Aragon 2018/.test(sp) && /Your case: today/.test(sp) && /Strength 1 day a week/.test(sp), "A day off training: the page, the case from the training week");
