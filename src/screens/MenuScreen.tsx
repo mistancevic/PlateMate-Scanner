@@ -34,7 +34,7 @@ import { EvalsScreen } from "./EvalsScreen";
 import { MetricsScreen } from "./MetricsScreen";
 import { ShareScreen } from "./ShareScreen";
 import { CostsScreen } from "./CostsScreen";
-import { LineChart, Receipt, Microscope } from "lucide-react";
+import { LineChart, Receipt, Microscope, ShieldCheck } from "lucide-react";
 import { dayLog } from "../today";
 import { aggregate, uid } from "../pilot";
 import { MeScreen, TasteSetting } from "./MeScreen";
@@ -42,6 +42,7 @@ import { SummaryPanel } from "./SummaryPanel";
 import { ClipboardList, CalendarClock } from "lucide-react";
 import { CalendarPage } from "../components/Calendar";
 import { ExplorerScreen } from "./ExplorerScreen";
+import { AdminPanel } from "./AdminPanel";
 
 // the sections that belong to the person: they live under Me, and back from them goes to Me
 const ME_SECTIONS: MenuSection[] = ["profile", "goal", "life", "week", "calendar", "shop", "coach", "summary", "account"];
@@ -62,6 +63,7 @@ const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "costs", name: "Running costs", icon: <Receipt size={20} /> },
   { id: "share", name: "Share Chef Mealan", icon: <QrCode size={20} /> },
   { id: "explorer", name: "Explorer", icon: <Microscope size={20} /> },
+  { id: "admin", name: "Admin", icon: <ShieldCheck size={20} /> },
 ];
 // Metrics in the menu only for the account the server names (0.2.5+r17, board M, M1); kept so the row shows at once
 const OWNER = "chefmealan-metrics-owner";
@@ -110,8 +112,9 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
           <button className="menu-row" onClick={() => setSection("me")}><span className="menu-icon"><User size={20} /></span><b>Me</b><ChevronRight size={18} /></button>
           {/* Foods lives here from 0.2.0 (X0): the library, reached day to day from the Plate's search and Quick picks */}
           <button className="menu-row" onClick={() => p.setTab("foods")}><span className="menu-icon"><BookOpen size={20} /></span><b>Foods</b><ChevronRight size={18} /></button>
-          {/* DT151 (0.2.133, board Stories103): Explorer, right below Foods */}
-          <button className="menu-row" onClick={() => setSection("explorer")}><span className="menu-icon"><Microscope size={20} /></span><span className="menu-row-text"><b>Explorer</b><small>Not all proteins are equal</small></span><ChevronRight size={18} /></button>
+          {/* DT151 Explorer lived here; DT188 (0.3.30) put it on the bar as the fifth tab */}
+          {/* DT188: Admin for the superadmin only: people and roles, coach links, the privacy tracker, the walkthroughs */}
+          {p.profile.admin && <button className="menu-row" onClick={() => setSection("admin")}><span className="menu-icon"><ShieldCheck size={20} /></span><span className="menu-row-text"><b>Admin</b><small>Superadmin only</small></span><ChevronRight size={18} /></button>}
           {/* SH73 (Milan 21 October 21:10): a QR code to share chefmealan.com or the book, and for a coach a code to join, shown as a QR code */}
           <ShareRow open={() => setSection("share")} />
           {[{ id: "support" as MenuSection, name: "Support", icon: <LifeBuoy size={20} /> }, ...(p.profile.role === "coach" || !p.cloudEnabled ? [{ id: "evals" as MenuSection, name: "Evals", icon: <FlaskConical size={20} /> }] : [])].map((it) => (
@@ -152,6 +155,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       {section === "costs" && <CostsScreen />}
       {section === "share" && <ShareGuard {...p} />}
       {section === "explorer" && <ExplorerScreen {...p} />}
+      {section === "admin" && <AdminPanel {...p} />}
     </>
   );
 }

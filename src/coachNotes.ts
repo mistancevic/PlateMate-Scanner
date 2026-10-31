@@ -1,7 +1,15 @@
 // The coach's note and the check-in day (0.2.6, canvas board CW, CW4 to CW6). One thread per client in the client's own
 // account: the coach's weekly note (Approve the week or Change the numbers, one line), and the client's replies.
 // The client sees a new note on Today once; Got it keeps it in My coach.
-export type CoachNote = { at: string; by: "coach" | "client"; name?: string; week?: string; verdict?: "approved" | "change"; text: string; readAt?: string };
+export type CoachNote = { at: string; by: "coach" | "client"; name?: string; week?: string; verdict?: "approved" | "change"; text: string; readAt?: string; suggest?: Suggest; answer?: Answer };
+// DT188 (0.3.30, board Stories137, Milan 16:26 Go): the coach suggests, never touches. A suggestion is a note with a suggest
+// part; it lands on the client's Today as a card with Accept and Not now. Accept does only what the client could have done
+// alone. Not now carries a reason, cheap to give: one of four chips, or a line; a plain Not now goes through too.
+export type Suggest = { kind: "snack" | "page"; time?: string; page?: { part: "nutrients" | "body" | "situations"; id: string; member?: string; name: string } };
+export type Answer = { at: string; choice: "accept" | "later"; reason?: string };
+export const REASONS = ["Not this week", "Don't like it", "Too much for me", "Ask me at the check-in"];
+export const answerWords = (n: CoachNote) => !n.answer ? "waiting" : n.answer.choice === "accept" ? "accepted" : `not now${n.answer.reason ? `: ${n.answer.reason.charAt(0).toLowerCase()}${n.answer.reason.slice(1)}` : ""}`;
+export const suggestTitle = (s: Suggest, text: string) => s.kind === "snack" ? `A planned snack${s.time ? ` at ${s.time}` : ""}: ${text}` : `A page: ${s.page?.name ?? text}`;
 export const CHECKIN_DEFAULT = 4; // Friday, Monday first
 export const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 export const checkinOf = (x: unknown) => (typeof x === "number" && x >= 0 && x <= 6 ? x : CHECKIN_DEFAULT);
@@ -11,7 +19,7 @@ export const notesOf = (x: unknown): CoachNote[] => (Array.isArray(x) ? x.filter
 // when and who; a Got it (readAt) is kept from either copy
 export function mergeNotes(a: CoachNote[], b: CoachNote[]): CoachNote[] {
   const m = new Map<string, CoachNote>();
-  for (const n of [...a, ...b]) { const k = `${n.at}|${n.by}`; const had = m.get(k); m.set(k, had ? { ...had, ...n, readAt: had.readAt ?? n.readAt } : n); }
+  for (const n of [...a, ...b]) { const k = `${n.at}|${n.by}`; const had = m.get(k); m.set(k, had ? { ...had, ...n, readAt: had.readAt ?? n.readAt, answer: had.answer ?? n.answer } : n); }
   return [...m.values()].sort((x, y) => (x.at < y.at ? -1 : x.at > y.at ? 1 : 0));
 }
 // how many notes from the coach the client has not seen (no Got it yet), and replies from the client newer than a time

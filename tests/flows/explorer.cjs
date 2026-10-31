@@ -29,12 +29,13 @@ const SHOTS = process.env.SHOTS;
   const text = async (loc) => ((await loc.textContent()) ?? "").replace(/\s+/g, " ").trim();
   await page.goto(U + "/"); await page.waitForTimeout(1200);
   await page.getByRole("button", { name: "Menu" }).first().click(); await page.waitForTimeout(400);
-  // the row below Foods
+  // DT188 (0.3.30): Explorer left the menu for the bar, the fifth tab; Foods stays in the menu
   const rows = (await page.locator(".menu-list .menu-row").allTextContents()).map((t) => t.replace(/\s+/g, " ").trim());
-  const fi = rows.findIndex((r) => /^Foods/.test(r));
-  ok(fi >= 0 && rows[fi + 1] === "ExplorerNot all proteins are equal", "DT151: Explorer, right below Foods: " + rows[fi + 1]);
-  await page.getByRole("button", { name: /^Explorer/ }).click(); await page.waitForTimeout(600);
-  ok(await text(page.locator(".menu-title")) === "Explorer" && await text(page.locator(".ex-h")) === "Not all proteins are equal", "DT151: the page, Not all proteins are equal");
+  ok(rows.some((r) => /^Foods/.test(r)) && !rows.some((r) => /^Explorer/.test(r)), "DT188: Foods in the menu, Explorer not: " + rows.join(" | "));
+  await page.getByRole("button", { name: "Close" }).first().click(); await page.waitForTimeout(300);
+  ok((await page.locator(".bottom-nav button > span:last-child").allTextContents()).join(",") === "Today,Plan,Plate,Recipes,Explorer", "DT188: the bar, Explorer fifth");
+  await page.locator(".bottom-nav button").filter({ hasText: "Explorer" }).click(); await page.waitForTimeout(600);
+  ok(await text(page.locator("header h1")) === "Explorer" && await text(page.locator(".ex-h")) === "Not all proteins are equal", "DT151: the page, Not all proteins are equal");
   // DT154 (0.2.135): the families at the top, Protein first, Carbs next
   const fams = (await page.locator(".ex-families button").allTextContents()).join();
   // Changed by story DT155 (0.2.136, board Stories107): Carbs is a family of its own

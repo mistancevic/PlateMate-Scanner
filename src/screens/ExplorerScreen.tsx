@@ -10,6 +10,7 @@
 // it, then the details; every measure in one pattern, the name, the bar, the grams. The numbers and their sources: src/explorer.ts.
 import { useMemo, useState, type ReactNode } from "react";
 import type { AppApi } from "./api";
+import { takeExplorerTarget } from "../explorerTarget";
 import { EXPLORER_FOODS, NINE, EAA_MEAL, LEUCINE_MEAL, SCALE_G, cardOf, type ExplorerCard } from "../explorer";
 import { FAT_FOODS, FAT_MEMBERS, FAT_SCALE_G, EPA_DHA_DAY, SAT_SHARE, fatCardOf, type FatCard } from "../explorerFats";
 import { proteinClaims, fatClaims, carbClaims, CLAIMS_SOURCE, type Claim } from "../euClaims";
@@ -174,12 +175,13 @@ function CalcLine(p: AppApi) {
 }
 
 export function ExplorerScreen(p: AppApi) {
-  const [family, setFamily] = useState<Family>("protein");
+  const target = useMemo(() => takeExplorerTarget(), []);
+  const [family, setFamily] = useState<Family>(target?.part === "nutrients" && target.id ? (target.id as Family) : "protein");
   // DT180 to DT187 (0.3.25): three parts, one search bar; The body's map and the first situation page
-  const [part, setPart] = useState<Part>("nutrients");
-  const [body, setBody] = useState<BodyId | null>(null);
-  const [situation, setSituation] = useState<SituationId | null>(null);
-  const [member, setMember] = useState<string | null>(null);
+  const [part, setPart] = useState<Part>(target?.part ?? "nutrients");
+  const [body, setBody] = useState<BodyId | null>(target?.part === "body" ? (target.id as BodyId) ?? null : null);
+  const [situation, setSituation] = useState<SituationId | null>(target?.part === "situations" ? (target.id as SituationId) ?? null : null);
+  const [member, setMember] = useState<string | null>(target?.part === "body" ? target.member ?? null : null);
   const index = useExplorerIndex();
   const go = (h: Hit) => { setPart(h.go.part); setBody(h.go.body ?? null); setMember(h.go.part === "body" ? h.go.member ?? null : null); setSituation(h.go.situation ?? null); if (h.go.family) setFamily(h.go.family as Family); window.scrollTo(0, 0); };
   const pick = (x: Part) => { setPart(x); setBody(null); setMember(null); setSituation(null); window.scrollTo(0, 0); };

@@ -2,9 +2,9 @@ import type { Dispatch, SetStateAction, ReactNode, RefObject } from "react";
 import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
 import type { ScannerMode } from "../types";
 
-export type Tab = "home" | "journey" | "plan" | "me" | "clients" | "meal" | "chef" | "foods" | "recipes" | "notes" | "more";
+export type Tab = "home" | "journey" | "plan" | "me" | "clients" | "meal" | "chef" | "foods" | "recipes" | "notes" | "more" | "explorer";
 export type PlateAsk = { kind: "photo" | "recipe" | "slot"; what: string; image?: string; apply: (how: "add" | "new") => void };
-export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "summary" | "account" | "support" | "about" | "evals" | "metrics" | "costs" | "share" | "explorer" | "calendar";
+export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "summary" | "account" | "support" | "about" | "evals" | "metrics" | "costs" | "share" | "explorer" | "calendar" | "admin";
 // the slot a plate is made for (0.2.2): the date, the slot and its name and time, for the line on the Plate
 // mode: "plan" fills the slot on Put it in; "eat" (from Today) records the meal for the slot on Save
 export type Filling = { date: string; slotId: string; name: string; time: string; dayName: string; mealId?: string; mode?: "plan" | "eat" };
@@ -138,6 +138,14 @@ export interface AppApi {
   coachNotes: import("../coachNotes").CoachNote[];
   checkinDay: number;
   gotNote: (at: string) => void;
+  // DT188 (0.3.30): the client answers a suggestion; the coach's two views and the client chosen in My clients
+  answerSuggest: (at: string, choice: "accept" | "later", reason?: string) => void;
+  coachView: "day" | "clients";
+  setCoachView: (v: "day" | "clients") => void;
+  coachClient: string | null;
+  setCoachClient: (uid: string | null) => void;
+  isCoach: boolean;
+  goExplorer: (t: import("../explorerTarget").ExplorerTarget) => void;
   replyToCoach: (text: string, read?: string) => void;
   // the slots' meals (0.2.2)
   planned: import("../planned").Planned;
@@ -233,7 +241,7 @@ export interface AppApi {
   user: import("../cloud").CloudUser | null;
   cloudEnabled: boolean;
   cloudStatus: { ok: boolean; text: string; at?: string };
-  profile: { role?: "coach"; coachId?: string; coachName?: string; coachEmail?: string; coachPhoto?: string; joinedAt?: string; coachSetAt?: string; formula?: import("../personal").Formula | null };
+  profile: { role?: "coach"; admin?: boolean; coachId?: string; coachName?: string; coachEmail?: string; coachPhoto?: string; joinedAt?: string; coachSetAt?: string; formula?: import("../personal").Formula | null };
   joinCoach: (code: string) => Promise<void>;
   leaveCoach: () => Promise<void>;
   signOut: (force?: boolean) => Promise<boolean>;

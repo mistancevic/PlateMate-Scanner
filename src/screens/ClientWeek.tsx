@@ -5,7 +5,7 @@ import { shortDate } from "../measured";
 import { useState, type ReactNode } from "react";
 import type { ClientRow } from "../cloud";
 import { wordsOf, type DayLine, type SlotMark } from "../dayLines";
-import { DAY_NAMES, type CoachNote } from "../coachNotes";
+import { DAY_NAMES, suggestTitle, answerWords, type CoachNote } from "../coachNotes";
 import { BANDS, PACES, bandOf, goalLabel, goalsForBand, isBuild } from "../goal";
 import { isoWeek, ymd } from "../plan";
 import { pdRange, pdVal } from "../ui";
@@ -208,7 +208,7 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tail }
         <>
           <p className="label">Notes</p>
           <section className="card days">{notesShown.slice(0, 12).map((n) => (
-            <div className="history-row" key={n.at}><div><b>{new Date(n.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}</b><small>{n.by === "client" ? `${name} replied` : n.verdict === "change" ? "Asked to change the numbers" : "Approved the week"}{n.by === "coach" && n.readAt ? " · read" : ""}</small></div><div className="history-num"><small>“{n.text}”</small></div></div>
+            <div className="history-row" key={n.at}><div><b>{new Date(n.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}</b><small>{n.by === "client" ? `${name} replied` : n.suggest ? `Suggested: ${suggestTitle(n.suggest, n.text)} · ${answerWords(n)}` : n.verdict === "change" ? "Asked to change the numbers" : "Approved the week"}{n.by === "coach" && n.readAt && !n.suggest ? " · read" : ""}</small></div><div className="history-num"><small>“{n.text}”</small></div></div>
           ))}</section>
         </>
       )}

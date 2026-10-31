@@ -32,7 +32,8 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
   const [keptRows, keepRows] = useKept<ClientRow[]>(`clients-${user?.uid ?? "local"}`, []);
   const [rows, setRowsState] = useState<ClientRow[]>(p.demo ?? keptRows);
   const setRows = (next: ClientRow[]) => { setRowsState(next); if (!p.demo) keepRows(next.map((r) => ({ ...r, feedback: r.feedback.map(({ photo, photos, ...f }: any) => f) }))); };
-  const [openId, setOpenId] = useState<string | null>(null);
+  // DT188 (0.3.30): the chosen client is kept by the app, so My clients' Today, Plan and Recipes show the same one
+  const openId = p.coachClient, setOpenId = p.setCoachClient;
   const open = rows.find((r) => r.uid === openId) ?? null;
   const coachName = user?.name?.split(" ")[0] || (p.demo ? "Milan" : "Coach");
   async function refresh() {
