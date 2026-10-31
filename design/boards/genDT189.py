@@ -85,21 +85,25 @@ class Component extends DCLogic {{
 
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
-cy = storyCard(B, y, "DT189", "An answer on a shared card", [
+cy = storyCard(B, y, "DT189", "Waiting for you, and an answer on a shared card", [
+  ("Coach Milan, 31 October 17:42", "The number on the Clients icon said something waited, but not what or where; what clients send sits at the bottom of a client's page, almost invisible. New: Clients opens with Waiting for you at the top, one row per thing, newest first: a card shared with a question, a reply to a note, numbers to approve, a check-in due today, a recipe sent to publish. Tap opens it where it is answered; answered, it leaves the list. The badge on Clients is this list's count. On My day a strip says it in words: 4 things wait on Clients: a question on a meal, a reply, numbers to approve, a check-in today."),
   ("Coach Milan, 31 October 17:25", "A client shares a card with “was this OK?”. Today the coach has nothing on the card to answer with; the only way is the week's note at the top of the client's page, not tied to the card. The client gets a note and has to guess which meal it is about."),
   ("New: Answer under the card", "On the client's page, under every shared card: Answer, one line and Send. For “was this OK?”, “look at this”, “help me next time”, and a card with no question too. Sent, the card shows the answer, read or not, the client's reply under it, and Answer again."),
   ("On the client's Today", "The answer lands once, as the week's note does: Coach Milan, the time, then On your Sarma with skyr, Tuesday 13:00, then the line. Got it keeps it in My coach; Reply goes back to the coach. The badge on Today counts it like a note."),
   ("How it is built", "A note on the same thread as the week's notes and DT188's suggestions: kind answer, with the card's id, title and time. mergeNotes keeps it. The coach writes coachNotes as today; the client answers Got it and Reply as today. Nothing new in the rules, nothing new in the privacy tracker. The client's card keeps its own page; the answer is shown there too, under the line the client wrote."),
   ("Not in this board", "An answer from the card's own page on the client's side. Photos in the answer. Answers from Chef Mealan."),
-  ("To decide", "Does Answer also sit on the shared card in My clients, Recipes tab (drawn: on the client's page under Clients, where the cards are today)? Does an unanswered “was this OK?” older than two days show on Clients as waiting (drawn: no)?"),
+  ("To decide", "Does Waiting for you also list a card shared without a question, as look at this does (drawn: yes, every shared card until opened)? Does Answer also sit on the shared card in My clients, Recipes tab (drawn: on the client's page under Clients, where the cards are today)? Does an unanswered “was this OK?” older than two days show on Clients as waiting (drawn: no)?"),
 ])
 h = rowEnd(cy,
   B.screen("DT189a", 0, y, "Now: a shared card, nothing to answer with", "r189a", "now", "The question is on the card; the answer has no place."),
   B.screen("DT189b", 1, y, "New: Answer under the card", "r189b", "changed", "One line and Send, tied to the card."),
   B.screen("DT189c", 2, y, "New: the answer on the client's Today", "r189c", "changed", "Quoting the meal and its time; Got it, Reply."))
 y = h
-h = rowEnd(B.screen("DT189d", 0, y, "New: the card after the answer", "r189d", "changed", "Answered, read, the reply, Answer again."))
+h = rowEnd(
+  B.screen("DT189d", 0, y, "New: the card after the answer", "r189d", "changed", "Answered, read, the reply, Answer again."),
+  B.screen("DT189e", 1, y, "New: Clients opens with Waiting for you", "r189e", "changed", "One row per thing; tap opens it; the badge counts the list."),
+  B.screen("DT189f", 2, y, "New: on My day, the strip in words", "r189f", "changed", "Instead of a number on an icon."))
 y = h
-board("Stories138.dc.html", "DT189. An answer on a shared card",
-  "31 October 2026 (Coach Milan 17:25 Draw). Now: 0.3.30, untouched. Drawn for your approval; nothing built.",
+board("Stories138.dc.html", "DT189. Waiting for you, and an answer on a shared card",
+  "31 October 2026 (Coach Milan 17:25 Draw, 17:42 the list). Now: 0.3.30, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories137.dc.html")
