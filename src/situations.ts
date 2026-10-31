@@ -340,3 +340,75 @@ export function boneCase(x: HormoneIn, today = new Date()): Case {
     { k: "5", title: "The goal: the check-in", body: "Calcium in your day, the strength days kept, weight inside the range." },
   ], taps, trend: null };
 }
+
+// ---- 0.3.29: The gut (week), The liver (day), The brain (week) ----
+const PLANT = /\b(apple|banana|berr|orange|pear|grape|kiwi|mango|melon|peach|plum|cherry|lemon|avocado|tomato|spinach|kale|broccoli|cabbage|carrot|pepper|onion|garlic|leek|courgette|zucchini|cucumber|lettuce|salad|rocket|beet|potato|sweet potato|pumpkin|squash|mushroom|pea|bean|lentil|chickpea|hummus|tofu|soy|oat|rice|quinoa|barley|bulgur|wholewheat|wholemeal|rye|bread|pasta|nut|almond|walnut|seed|olive|herb|basil|parsley|corn|aubergine|eggplant|cauliflower|asparagus|fennel|celery|fig|date|raisin|apricot)/i;
+const FRUIT = /\b(apple|banana|berr|orange|pear|grape|kiwi|mango|melon|peach|plum|cherry|fig|apricot|clementine|mandarin|pineapple|fruit)/i;
+export function gutCase(x: HormoneIn, today = new Date()): Case {
+  const key = ymd(today), days = Array.from({ length: 7 }, (_, i) => plusDays(key, -(7 - i)));
+  const plants = new Set<string>(); let fibreSum = 0, fibreDays = 0, lowDays = 0, logged = 0;
+  for (const d of days) {
+    const log = dayLog(x.feedback, new Date(`${d}T12:00:00`)); if (!log.logged.length) continue; logged++;
+    let fi = 0, known = false;
+    for (const f of log.logged) { const a = aggregate(f.meal.items); if (a.fiber !== null && !Number.isNaN(a.fiber)) { fi += a.fiber; known = true; } for (const i of f.meal.items) if (PLANT.test(i.food.name)) plants.add(i.food.name.split(",")[0].toLowerCase()); }
+    if (known) { fibreSum += fi; fibreDays++; if (fi < 25) lowDays++; }
+  }
+  const avg = fibreDays ? Math.round(fibreSum / fibreDays) : null;
+  const taps: Tap[] = [
+    { id: "protein", label: avg !== null && avg < 25 ? "Beans or lentils in one meal a day" : "Keep the fibre where it is", where: avg !== null && avg < 25 ? "The Plate's Fi letter into the range" : "It already does what this page says" },
+    { id: "snack", label: plants.size < 20 ? `${Math.max(10, 20 - plants.size)} different plants this week` : "Twenty plants again this week", where: "A small target for the shopping list; ask Chef Mealan for the plate" },
+  ];
+  return { parts: [
+    { k: "1", title: "Before: your usual", body: `Fibre 25 g a day, your day. Plants: the more different ones a week, the better; 20 is a good week.` },
+    { k: "2", title: "The path here: the last 7 days", body: logged ? `${avg !== null ? `Fibre ${avg} g a day on the ${fibreDays}-day average.` : "Fibre unknown on the plates ticked."} ${plants.size} different plants on the plates${plants.size ? `: ${Array.from(plants).slice(0, 6).join(", ")}${plants.size > 6 ? " and more" : ""}` : ""}.` : "No plates ticked this week yet. What you tick on Today fills this in." },
+    { k: "3", title: "Now", body: `${avg !== null ? (lowDays ? `Fi low on ${lowDays} of ${fibreDays} days.` : "Fi in the range every day.") : ""} ${plants.size < 20 ? "Fewer different plants than a good week needs." : "Variety is in place."}`.trim() },
+    { k: "4", title: "The path on", body: "" },
+    { k: "5", title: "The goal: the week", body: "Fi in the range every day; 20 different plants a week." },
+  ], taps, trend: avg !== null && avg < 25 && logged >= 3 ? `Your trend: ${avg} g of fibre a day${plants.size < 10 ? `, the same ${plants.size} plants` : ""}. Your goal needs 25 g and variety. The gap is one legume meal a day.` : null };
+}
+export function liverCase(x: HormoneIn, today = new Date()): Case {
+  const l = lifestyleOf(x.personal), key = ymd(today), slots = slotsOf(l), first = slots[0];
+  const days6 = Array.from({ length: 6 }, (_, i) => plusDays(key, -(6 - i)));
+  const evenings = days6.map((d) => ({ d, ...eveningOf(x.feedback, d) }));
+  const drinkDays = evenings.filter((e) => e.drink), yesterday = evenings[evenings.length - 1];
+  let fruit = 0, logged = 0;
+  for (const d of days6) { const log = dayLog(x.feedback, new Date(`${d}T12:00:00`)); if (log.logged.length) logged++; for (const f of log.logged) for (const i of f.meal.items) if (FRUIT.test(i.food.name)) fruit++; }
+  const fruitDay = logged ? Math.round((fruit / logged) * 10) / 10 : null;
+  const tr = dayFor(x.personal, today)?.day ?? getDay(x.personal, today).plan ?? null, kind = kindOfDay(tr);
+  const taps: Tap[] = [
+    { id: "protein", label: `${first?.name ?? "Breakfast"} with protein and slow carbs`, where: "On the Plate; ask Chef Mealan for it" },
+    ...(yesterday.drink || drinkDays.length >= 2 ? [{ id: "plan" as const, label: "Water with tonight's dinner", where: "A line on Today" }] : []),
+    ...(fruitDay !== null && fruitDay < 2 ? [{ id: "snack" as const, label: "A whole fruit with the afternoon snack", where: "Two or three a day is the Carbs page's range" }] : []),
+  ];
+  return { parts: [
+    { k: "1", title: "Before: your usual", body: `${first ? `${first.name} at ${first.time}.` : "No first meal set yet."} ${fruitDay !== null ? `Fruit: about ${fruitDay} a day on the plates.` : ""}`.trim() },
+    { k: "2", title: "The path here: this week", body: drinkDays.length ? `A drink on ${drinkDays.length} ${drinkDays.length === 1 ? "day" : "days"}, counted as energy${yesterday.drink ? "; yesterday was one of them" : ""}.` : "No drink on the record this week." },
+    { k: "3", title: "Now", body: `${yesterday.drink ? "The store is low after last night; " : "The store refills with the first meal; "}${kind === "rest" ? "a rest day, carbs inside the range." : "a training day: the liver's store is the brain's, the muscle's is refilled after the session."}` },
+    { k: "4", title: "The path on", body: "" },
+    { k: "5", title: "The goal: the day", body: "The day inside the range; the night at the usual time." },
+  ], taps, trend: null };
+}
+export function brainCase(x: HormoneIn, today = new Date()): Case {
+  const l = lifestyleOf(x.personal), key = ymd(today), slots = slotsOf(l);
+  const lunch = slots.find((s) => /lunch/i.test(s.name)), last = slots[slots.length - 1];
+  const days = Array.from({ length: 7 }, (_, i) => plusDays(key, -(7 - i)));
+  let ticked = 0, skipped = 0, lateAfterSkip = 0, late = 0;
+  for (const d of days) {
+    const log = dayLog(x.feedback, new Date(`${d}T12:00:00`)); const ev = eveningOf(x.feedback, d);
+    if (log.logged.length) ticked++;
+    const hadLunch = log.logged.some((f) => /lunch/i.test(f.which ?? f.moment ?? ""));
+    if (log.logged.length && lunch && !hadLunch) { skipped++; if (ev.late) lateAfterSkip++; }
+    if (ev.late) late++;
+  }
+  const taps: Tap[] = [
+    { id: "dinner", label: skipped ? "Lunch planned on busy days, even a small one" : "Lunch kept every day", where: skipped ? "On Plan; the calendar's busy times already ask" : "It already does what this page says" },
+    { id: "easy", label: "A walk after lunch, fifteen minutes", where: "Ask Chef Mealan where it fits; on Plan as a row" },
+  ];
+  return { parts: [
+    { k: "1", title: "Before: your usual", body: `${lunch ? `Lunch at ${lunch.time}, ` : ""}${last ? `${last.name.toLowerCase()} at ${last.time}.` : ""} Ticks on Today: ${ticked} of the last 7 days.` },
+    { k: "2", title: "The path here: this week", body: [skipped ? `${skipped} ${skipped === 1 ? "lunch" : "lunches"} skipped.` : "Lunch on every ticked day.", late ? `Something eaten after 21:30 on ${late} ${late === 1 ? "evening" : "evenings"}${lateAfterSkip ? `, ${lateAfterSkip} of them after a skipped lunch` : ""}.` : "Nothing after 21:30."].join(" ") },
+    { k: "3", title: "Now", body: lateAfterSkip ? "The pattern is a cue, not a weakness: no lunch, a long afternoon, a sweet evening." : late ? "A late snack is a cue, often after a short night. The afternoon snack and dinner at the usual time take it away." : "The cues are quiet this week. The ticks are the dose." },
+    { k: "4", title: "The path on", body: "" },
+    { k: "5", title: "The goal: the week", body: "Lunch every day; nothing after dinner; the ticks." },
+  ], taps, trend: skipped >= 2 && late >= 2 ? `Your trend: ${skipped} skipped lunches, ${late} late snacks. Your goal needs the ticks. The gap is lunch, not the evening.` : null };
+}

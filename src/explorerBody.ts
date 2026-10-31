@@ -72,7 +72,7 @@ export const SLEEP_PAGE: SituationPage = {
 export const SITUATION_PAGES: Partial<Record<SituationId, SituationPage>> = { sleep: SLEEP_PAGE };
 
 // ---- search (Milan 13:12: Explorer grew, one bar finds a nutrient, a food, a family, a situation, a claim, a line) ----
-export type Hit = { part: Part; kind: "page" | "family" | "member" | "food" | "situation" | "line"; title: string; hint: string; go: { part: Part; family?: string; body?: BodyId; situation?: SituationId; member?: string } };
+export type Hit = { part: Part; kind: "page" | "family" | "member" | "food" | "situation" | "line"; title: string; hint: string; more?: string; go: { part: Part; family?: string; body?: BodyId; situation?: SituationId; member?: string } };
 const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 export function buildIndex(extra: { nutrients: { family: string; name: string; members: string[]; foods: string[]; hint: string }[] }): Hit[] {
   const out: Hit[] = [];
@@ -85,7 +85,8 @@ export function buildIndex(extra: { nutrients: { family: string; name: string; m
   for (const s of SITUATIONS) out.push({ part: "situations", kind: "situation", title: s.name, hint: s.state === "page" ? s.hint : "Its page comes later.", go: { part: "situations", situation: s.id } });
   for (const pg of Object.values(BODY_PAGES)) {
     out.push({ part: "body", kind: "page", title: pg.name, hint: pg.intro.slice(0, 90) + "…", go: { part: "body", body: pg.family, member: pg.key } });
-    for (const s of pg.sections) for (const l of s.lines) out.push({ part: "body", kind: "line", title: l.title, hint: `${pg.name}: ${l.text.slice(0, 90)}${l.text.length > 90 ? "…" : ""}`, go: { part: "body", body: pg.family, member: pg.key } });
+    for (const s of pg.sections) for (const l of s.lines) out.push({ part: "body", kind: "line", title: l.title, hint: `${pg.name}: ${l.text.slice(0, 90)}${l.text.length > 90 ? "…" : ""}`, more: l.text, go: { part: "body", body: pg.family, member: pg.key } });
+    for (const q of pg.chips) out.push({ part: "body", kind: "line", title: q, hint: `A question on ${pg.name}`, go: { part: "body", body: pg.family, member: pg.key } });
     for (const w of pg.when) out.push({ part: "body", kind: "line", title: w.when, hint: `${pg.name}, ${w.verdict.toLowerCase()}: ${w.what}`, go: { part: "body", body: pg.family, member: pg.key } });
   }
   for (const m of HORMONE_MEMBERS) if (!m.page) out.push({ part: "body", kind: "member", title: m.name, hint: `${m.hint} Its page comes later.`, go: { part: "body", body: "hormones" } });
@@ -101,7 +102,7 @@ export function buildIndex(extra: { nutrients: { family: string; name: string; m
 export function searchIndex(index: Hit[], q: string): Hit[] {
   const words = norm(q).split(/\s+/).filter((w) => w.length >= 2);
   if (!words.length) return [];
-  const score = (h: Hit) => { const t = norm(h.title), s = norm(h.hint); let n = 0; for (const w of words) { if (t.includes(w)) n += 3; else if (s.includes(w)) n += 1; else return 0; } return n + (t.startsWith(words[0]) ? 2 : 0) + (h.kind === "line" || h.kind === "food" ? 0 : 3); };
+  const score = (h: Hit) => { const t = norm(h.title), s = norm(h.hint), m = h.more ? norm(h.more) : ""; let n = 0; for (const w of words) { if (t.includes(w)) n += 3; else if (s.includes(w)) n += 1; else if (m.includes(w)) n += 1; else return 0; } return n + (t.startsWith(words[0]) ? 2 : 0) + (h.kind === "line" || h.kind === "food" ? 0 : 3); };
   return index.map((h) => ({ h, n: score(h) })).filter((x) => x.n > 0).sort((a, b) => b.n - a.n).slice(0, 12).map((x) => x.h);
 }
 
@@ -383,3 +384,91 @@ export const BONE_PAGE: BodyPage = {
 };
 BODY_PAGES.muscle = MUSCLE_PAGE; BODY_PAGES.bone = BONE_PAGE;
 for (const b of BODY_FAMILIES) if (b.id === "muscle" || b.id === "bone") b.state = "page";
+
+// ---- 0.3.29 (DT185 The gut, Stories134; DT186 The liver, Stories135; DT187 The brain, Stories136; Milan 15:20 "Go. Dt185 to dt187"). The papers, read again on 31 October 2026 (PubMed):
+// Bertino, Beauchamp and Engelman 1982, Am J Clin Nutr 36:1134, doi 10.1093/ajcn/36.6.1134 (five months of less salt: the preferred level of salt in soup and crackers fell; the board's two weeks dropped)
+// Govoni, Jansson, Weitzberg and Lundberg 2008, Nitric Oxide 19:333, doi 10.1016/j.niox.2008.08.003 (7 people: an antibacterial mouthwash abolished the mouth's conversion of nitrate to nitrite and cut the rise in the blood)
+// McDonald et al. 2018, mSystems 3:e00031-18, doi 10.1128/mSystems.00031-18 (American Gut, over 10,000 people: the number of different plants a week went with a more varied microbiome; more than 30 against 10 or fewer)
+// Valdes, Walter, Segal and Spector 2018, BMJ 361:k2179, doi 10.1136/bmj.k2179 (review: short-chain fatty acids from fibre; the gut and serotonin)
+// Batterham et al. 2006, Cell Metab 4:223, doi 10.1016/j.cmet.2006.08.001 (protein released the most PYY and the most fullness, in people of normal weight and above)
+// Ludwig 2002 (see above). Nilsson and Hultman 1973, Jensen 2011, Cahill 2006, Hellerstein 1999, Ebrahim 2013 (see above)
+// Siler, Neese and Hellerstein 1999, Am J Clin Nutr 70:928, doi 10.1093/ajcn/70.5.928 (8 men, 24 g of alcohol: whole-body fat burning down 73 %, fat release from the store down 53 %, for the hours after)
+// Tappy and Lê 2010, Physiol Rev 90:23, doi 10.1152/physrev.00019.2009 (review: fructose is handled by the liver; the amounts in fruit are small, in sweet drinks large)
+// Berridge and Robinson 2016, Am Psychol 71:670, doi 10.1037/amp0000059 (wanting and liking are different systems; dopamine is wanting, on the cue)
+// Greer, Goldstein and Walker 2013 (see above). Wurtman and Wurtman 1995, Obes Res 3 Suppl 4:477S, doi 10.1002/j.1550-8528.1995.tb00215.x (a carb meal lets more tryptophan into the brain, serotonin follows)
+// Adam and Epel 2007, Physiol Behav 91:449, doi 10.1016/j.physbeh.2007.04.011 (review: stress raises the wanting for dense food through the reward system)
+// Boecker et al. 2008, Cereb Cortex 18:2523, doi 10.1093/cercor/bhn013 (10 runners, two hours of running: mood up, the brain's own opioids released; the board's "a walk" is not in the paper)
+// Benton 2010, Clin Nutr 29:288, doi 10.1016/j.clnu.2009.12.001 (review: no support in human studies for sugar being physically addictive)
+export const GUT_PAGE: BodyPage = {
+  key: "gut", family: "gut", name: "The gut", horizon: "day",
+  intro: "The gut starts in the mouth and ends with what lives in the large bowel. It decides how fast a meal arrives, how full it leaves you, and it makes a good part of the body's serotonin. Read at the day, your case at the week. What the gut does in anyone. No stool test, no microbiome test, no probiotic named, no condition: with a gut that keeps hurting, your doctor.",
+  sections: [
+    { title: "What it is, what moves it", lines: [
+      { title: "The mouth", text: "Digestion starts here: chewing, and the first enzyme for starch. Taste adapts: after months of less salt, the level of salt people liked best in soup and crackers had fallen. Less sugar goes the same way.", src: "Bertino, Beauchamp and Engelman 1982, American Journal of Clinical Nutrition" },
+      { title: "The oral bacteria", text: "They turn the nitrate in leafy greens and beetroot into nitrite, the step before nitric oxide, which widens the vessels. An antibacterial mouthwash before the greens stopped that step in 7 people, and the rise in the blood went with it.", src: "Govoni, Jansson, Weitzberg and Lundberg 2008, Nitric Oxide" },
+      { title: "How fast a meal arrives", text: "Fat, protein and fibre slow the stomach; a liquid meal is gone in an hour. The Fi letter on the Plate is this lever.", src: "Ludwig 2002, JAMA" },
+      { title: "The microbiome", text: "Fed by fibre and by variety. In over 10,000 people, those eating more than 30 different plants a week had a more varied microbiome than those eating 10 or fewer. A week of the same three foods, and antibiotics, make it poorer.", src: "McDonald et al. 2018, mSystems, the American Gut Project" },
+      { title: "What it makes", text: "Short-chain fatty acids from fibre, which feed the gut wall and reach the brain; and a large share of the body's serotonin, which The brain reads.", src: "Valdes, Walter, Segal and Spector 2018, BMJ, review" },
+      { title: "The fullness messengers", text: "The gut answers a meal with its own hormones, GLP-1 and PYY among them; protein raised PYY and fullness most, in people of normal weight and above. The hormone is named here because everyone has heard of it; the drugs are a doctor's subject.", src: "Batterham et al. 2006, Cell Metabolism" },
+    ] },
+  ],
+  when: [
+    { verdict: "Helps", when: "The first week of more fibre", what: "Add it over a week, with water. The first days bloat; the second week does not." },
+    { verdict: "Helps", when: "A plate with variety", what: "Five plants on a plate feed more than one. The Plate's ideas can lean that way." },
+    { verdict: "Watch", when: "A bloated evening", what: "Usually the meal, not the gut: too fast, too big, too late, or fizzy. The next day's plan is the fix." },
+    { verdict: "Watch", when: "A trip with new food", what: "New water, new bread, new bacteria. Fibre you know, and time." },
+    { verdict: "Hurts", when: "The week after antibiotics", what: "The microbiome is thin; fibre and fermented foods bring it back faster. Nothing else is sold here." },
+  ],
+  line: "What the gut does in anyone. No stool test, no microbiome test, no probiotic named, no condition: with a gut that keeps hurting, your doctor.",
+  chips: ["Why am I bloated tonight?", "What counts as a plant?", "Does mouthwash matter?"],
+  sources: "Bertino, Beauchamp and Engelman 1982, Am J Clin Nutr 36:1134; Govoni et al. 2008, Nitric Oxide 19:333; Ludwig 2002, JAMA 287:2414; McDonald et al. 2018, mSystems 3:e00031-18; Valdes et al. 2018, BMJ 361:k2179; Batterham et al. 2006, Cell Metab 4:223. Educational, approximate, not medical advice.",
+};
+export const LIVER_PAGE: BodyPage = {
+  key: "liver", family: "liver", name: "The liver", horizon: "day",
+  intro: "The liver keeps blood glucose steady, holds the small glycogen store, makes ketones when carbs are low, and clears alcohol. It does the body's chemistry between meals. Read at the day. What the liver does in anyone. No liver value, no condition, no detox, no cleanse. For anything about liver health: your doctor.",
+  sections: [
+    { title: "What it is, what moves it", lines: [
+      { title: "Between meals and overnight", text: "It lets out glucose from its store, about 100 g, and makes new glucose from protein, so the brain never runs short. A night and a morning without food run the store down; breakfast refills it.", src: "Nilsson and Hultman 1973, Scandinavian Journal of Clinical and Laboratory Investigation; Jensen et al. 2011" },
+      { title: "Ketones", text: "When carbs are low for a day or more, it turns fat into ketones for the brain. Normal in a fast or a low-carb day; the brain runs on them within days.", src: "Cahill 2006, Annual Review of Nutrition" },
+      { title: "Alcohol", text: "The body burns the alcohol first. After 24 g, about two drinks, whole-body fat burning fell 73 % and the fat store's release 53 % for the hours after, in 8 men. The second half of the night's sleep breaks too. The app counts a drink as energy, 7 kcal a gram.", src: "Siler, Neese and Hellerstein 1999, American Journal of Clinical Nutrition; Ebrahim et al. 2013" },
+      { title: "Fructose", text: "Fruit sugar is handled by the liver. In fruit, with its fibre and water, the amount is small; in sweet drinks it is not, and it arrives all at once.", src: "Tappy and Lê 2010, Physiological Reviews" },
+      { title: "Fat made in the liver", text: "New fat is made from carbs only when carb energy is above the day's whole spend, for a long time, in anyone. Eating to the range, the pathway is quiet.", src: "Hellerstein 1999, European Journal of Clinical Nutrition" },
+    ] },
+  ],
+  when: [
+    { verdict: "Helps", when: "Breakfast after a short night", what: "The store is low; a meal with protein and slow carbs refills it and steadies the morning." },
+    { verdict: "Helps", when: "Fruit, whole", what: "Fibre and water keep the fructose small. Two or three a day is the Carbs page's range." },
+    { verdict: "Watch", when: "A low-carb day", what: "Ketones by evening; normal. The day's total still decides." },
+    { verdict: "Watch", when: "A drink with dinner", what: "Counted as energy; fat burning pauses while it clears; the sleep page says the rest. Water with it." },
+    { verdict: "Hurts", when: "Sweet drinks", what: "The fructose arrives all at once with nothing to slow it. The one thing the Carbs page says to swap." },
+  ],
+  line: "What the liver does in anyone. No liver value, no condition, no detox, no cleanse: the liver clears what it clears on its own. For anything about liver health: your doctor.",
+  chips: ["Is fruit sugar different?", "What does one drink do?", "Do I need a detox?"],
+  sources: "Nilsson and Hultman 1973, Scand J Clin Lab Invest 32:325; Jensen et al. 2011, J Biomed Biotechnol 2011:960363; Cahill 2006, Annu Rev Nutr 26:1; Siler, Neese and Hellerstein 1999, Am J Clin Nutr 70:928; Ebrahim et al. 2013, Alcohol Clin Exp Res 37:539; Tappy and Lê 2010, Physiol Rev 90:23; Hellerstein 1999, Eur J Clin Nutr 53 Suppl 1:S53. Educational, approximate, not medical advice.",
+};
+export const BRAIN_PAGE: BodyPage = {
+  key: "brain", family: "brain", name: "The brain", horizon: "day",
+  intro: "The brain's messengers decide the part of eating the numbers never show: wanting, mood, stress, and the feeling after a session. Food, sleep and training move them, in everyone. Read at the day, your case at the week. The strictest line in Explorer: the page says mood, cravings, habit and sleep, never a mental condition or a medication, and nothing on it reads how you feel. When a low mood stays, the line is the same as for sleep: a doctor or a therapist.",
+  sections: [
+    { title: "What it is, what moves it", lines: [
+      { title: "Dopamine: wanting, not liking", text: "Wanting and liking are two systems. Dopamine is the wanting, and it rises on the cue before the reward: the open fridge, the smell, the ad. After a short night the wanting for dense food is louder. It is also what makes a habit stick: the tick on Today is a small dose.", src: "Berridge and Robinson 2016, American Psychologist; Greer, Goldstein and Walker 2013, Nature Communications" },
+      { title: "Serotonin: mood, fullness, sleep", text: "Most of it is made in the gut. A carb meal lets more tryptophan into the brain, and serotonin follows; that is why a carb dinner calms. Melatonin is made from it at night.", src: "Wurtman and Wurtman 1995, Obesity Research" },
+      { title: "Adrenaline and cortisol: the stress pair", text: "Right in the morning and in a hard session; wrong at 23:00. Stress eating is a mechanism, not a weakness: the pair raises the wanting for dense food through the same reward system.", src: "Adam and Epel 2007, Physiology and Behavior, review" },
+      { title: "Endorphins: the feeling after", text: "In 10 runners after two hours of running, mood was up and the brain's own opioids had been released. A session is the dose with evidence; the feeling after is why training sits on Plan as a row like a meal.", src: "Boecker et al. 2008, Cerebral Cortex" },
+      { title: "What the claims get wrong", text: "Sugar is not a drug: human studies give no support for sugar being physically addictive. Cravings fade when the cue goes, not when the will grows. Moving the cue is the whole trick.", src: "Benton 2010, Clinical Nutrition, review" },
+    ] },
+  ],
+  when: [
+    { verdict: "Helps", when: "The first weeks of a plan", what: "Every tick is a small dose. Plan small, tick often; the habit comes from the ticks, not the size." },
+    { verdict: "Helps", when: "A walk after lunch", what: "A steadier afternoon, and the cue for the sweet drawer gone. Fifteen minutes is enough to notice." },
+    { verdict: "Helps", when: "A carb dinner on a hard day", what: "Serotonin and the slide into sleep. Protein with it keeps you full." },
+    { verdict: "Watch", when: "A craving at 22:00", what: "Dopamine on a cue, often after a short night. The planned snack in the afternoon and dinner at the usual time take the cue away; so does a boring fridge." },
+    { verdict: "Watch", when: "The third week of a plan", what: "The new wears off here. Change one thing on the plate, keep the ticks." },
+    { verdict: "Hurts", when: "A stressful day with a skipped lunch", what: "The pair plus hunger is the evening that goes wrong. Lunch is the fix, not the evening." },
+  ],
+  line: "The strictest line in Explorer. The page says mood, cravings, habit and sleep; never a mental condition or a medication; nothing on it reads how you feel. When a low mood stays, the line is the same as for sleep: a doctor or a therapist.",
+  chips: ["Why do I crave sweets at night?", "Does a walk really help my mood?", "How do I make the plan stick?"],
+  sources: "Berridge and Robinson 2016, Am Psychol 71:670; Greer, Goldstein and Walker 2013, Nat Commun 4:2259; Wurtman and Wurtman 1995, Obes Res 3 Suppl 4:477S; Adam and Epel 2007, Physiol Behav 91:449; Boecker et al. 2008, Cereb Cortex 18:2523; Benton 2010, Clin Nutr 29:288. Educational, approximate, not medical advice.",
+};
+BODY_PAGES.gut = GUT_PAGE; BODY_PAGES.liver = LIVER_PAGE; BODY_PAGES.brain = BRAIN_PAGE;
+for (const b of BODY_FAMILIES) if (b.id === "gut" || b.id === "liver" || b.id === "brain") b.state = "page";
