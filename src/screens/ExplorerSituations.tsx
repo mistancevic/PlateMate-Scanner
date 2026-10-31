@@ -80,7 +80,7 @@ export function BodyFamily({ p, id, member, setMember, back }: { p: AppApi; id: 
         <button key={m.key} type="button" className={`menu-row ${m.page ? "" : "ex-later"}`} onClick={() => m.page && setMember(m.page)}>
           <span className="menu-row-text"><b>{m.name}</b><small>{m.hint}</small></span><small className="ex-state">{m.page ? "›" : "later"}</small>
         </button>))}</div>
-      <small className="muted ex-line-note">Every member is on every profile: everyone has all of them. The cycle, thyroid and growth hormone wait for their own page.</small>
+      <small className="muted ex-line-note">Every member is on every profile: everyone has all of them. All eight members have a page (0.3.35).</small>
     </>
   );
   const key = member ?? (BODY_PAGES[id] ? id : null);
@@ -99,7 +99,7 @@ function TapList({ p, taps, kind }: { p: AppApi; taps: Tap[]; kind: string }) {
     else if (t.id === "snack") p.openOut({ q: `${t.label}: how do I do that on my plate, on my numbers?` });
     else if (t.id === "sleep") p.openExplorer?.("situations", "sleep");
     else if (t.id === "scan") p.openScan();
-    else if (t.id === "plan") { if (/vitamin d/i.test(t.label)) p.openExplorer?.("nutrients", "micros"); else if (/^Travel mode on/.test(t.label)) { p.openMenu("me"); p.notify("Travel mode is on Me: pick where you are, and the plan follows you."); } else p.setTab(/coffee|water/i.test(t.label) ? "home" : "plan"); }
+    else if (t.id === "plan") { if (/vitamin d/i.test(t.label)) p.openExplorer?.("nutrients", "micros"); else if (/^Travel mode on/.test(t.label)) { p.openMenu("me"); p.notify("Travel mode is on Me: pick where you are, and the plan follows you."); } else if (/7-day average/.test(t.label)) p.openMenu("goal"); else p.setTab(/coffee|water/i.test(t.label) ? "home" : "plan"); }
   };
   return <div className="ex-taps">{taps.map((t) => <button key={t.label} type="button" className="pill ex-tap" onClick={() => run(t)}><b>{t.label}</b><small>{t.where}</small></button>)}</div>;
 }

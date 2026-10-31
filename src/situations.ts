@@ -223,6 +223,7 @@ export function fatCase(x: FatIn, today = new Date()): Case {
 export type HormoneIn = FatIn & { pdRef: number | null };
 const KINDS_STRENGTH = /strength|hiit|team|club|match/;
 export function hormoneCase(key: string, x: HormoneIn, today = new Date()): Case {
+  if (key === "cycle" || key === "thyroid" || key === "gh") return hormoneCase2(key, x, today);
   const l = lifestyleOf(x.personal), key7 = ymd(today), slots = slotsOf(l), last = slots[slots.length - 1], snack = slots.find((s) => /snack/i.test(s.name));
   const days6 = Array.from({ length: 6 }, (_, i) => plusDays(key7, -(6 - i)));
   const evenings = days6.map((d) => eveningOf(x.feedback, d));
@@ -517,4 +518,61 @@ export function awayCase(x: AwayIn, today = new Date()): Case {
     { k: "4", title: "The path on", body: "" },
     { k: "5", title: "The goal: the day", body: "The day inside the range; Fi back in range with dinner." },
   ], taps, trend: null };
+}
+
+// ---- 0.3.35 (DT194): The cycle (month, from weigh-ins and plates only), Thyroid (month, from the cut's length), Growth hormone (day, from the night and the session) ----
+function hormoneCase2(key: "cycle" | "thyroid" | "gh", x: HormoneIn, today = new Date()): Case {
+  const l = lifestyleOf(x.personal), key7 = ymd(today), slots = slotsOf(l), last = slots[slots.length - 1], snack = slots.find((s) => /snack/i.test(s.name));
+  const n = x.numbersFor(today);
+  const days6 = Array.from({ length: 6 }, (_, i) => plusDays(key7, -(6 - i)));
+  const lateNights = days6.map((d) => eveningOf(x.feedback, d)).filter((e) => e.late > 0).length;
+  const bed = l.bed ? BED_WORDS[l.bed] : null, wake = l.wake ? WAKE_WORDS[l.wake] : null;
+  const usualNight = bed || wake ? `Bed ${bed ?? "at your usual time"}, up ${wake ?? "at your usual time"}.` : "No bedtime set in Lifestyle yet.";
+  const a7 = avg7(x.personal.weighIns, today);
+  const cut30 = plusDays(key7, -30);
+  const month = (x.personal.weighIns ?? []).filter((w) => w.date >= cut30).map((w) => w.kg);
+  const lo = month.length ? Math.min(...month) : null, hi = month.length ? Math.max(...month) : null;
+  const dinnerTap: Tap = { id: "sleep", label: `Dinner at ${last?.time ?? "the usual time"} all week, bed at the usual time`, where: "See A bad night's sleep in Situations" };
+  if (key === "cycle") {
+    const swing = lo !== null && hi !== null ? hi - lo : null;
+    return { parts: [
+      { k: "1", title: "Before: your usual", body: `${month.length ? `Weigh-ins ${month.length} mornings in the last 30 days.` : "No weigh-ins yet."} Protein ${n ? `${Math.round(n.protein)} g a day` : "in your range"}.` },
+      { k: "2", title: "The path here", body: `${a7 !== null ? `The 7-day average ${a7.toFixed(1)} kg; single mornings between ${lo!.toFixed(1)} and ${hi!.toFixed(1)}.` : "No 7-day average yet."} ${lateNights ? `Something after 21:30 on ${lateNights} ${lateNights === 1 ? "evening" : "evenings"} this week.` : "Nothing after 21:30 this week."}` },
+      { k: "3", title: "Now", body: `${swing !== null ? (swing <= 2.5 ? "The daily swings are inside what water does." : "The swings are wider than water alone; the trend on Goal reads the weeks.") : "The scale has nothing to say yet."} ${lateNights >= 2 ? "The late evenings are the thing to read." : "The evenings are quiet."}` },
+      { k: "4", title: "The path on", body: "" },
+      { k: "5", title: "The goal: the check-in", body: "The trend over weeks; the usual nights; the strength days kept." },
+    ], taps: [
+      { id: "protein", label: "Protein and fibre at every meal", where: "Ask Chef Mealan for the plates" },
+      snack ? { id: "snack", label: `A planned snack at ${snack.time}`, where: "On Plan, instead of 22:30" } : { id: "snack", label: "A snack slot in the afternoon", where: "In Lifestyle, meals a day" },
+      { id: "plan", label: "Read the 7-day average, not the morning", where: "On Goal" },
+    ], trend: null };
+  }
+  if (key === "thyroid") {
+    const cutting = x.band === "fatloss";
+    const weeks = x.goalSetAt ? Math.floor((today.getTime() - new Date(x.goalSetAt).getTime()) / (7 * 864e5)) : null;
+    const tr = x.personal.weightKg ? trendOf(x.personal.weighIns, x.band, x.personal.weightKg, x.personal.trainingAge, today) : null;
+    return { parts: [
+      { k: "1", title: "Before: your goal", body: `${goalLabel(x.band)}${cutting && weeks !== null ? `, for ${weeks} ${weeks === 1 ? "week" : "weeks"}` : ""}. ${usualNight}` },
+      { k: "2", title: "The path here", body: cutting ? `The cut is inside the range by design; the check-in reads its length. ${tr && tr.change !== null ? `Trend: ${tr.change > 0 ? "up" : "down"} ${Math.abs(tr.change).toFixed(1)} kg over ${tr.weeks} ${tr.weeks === 1 ? "week" : "weeks"}.` : ""}` : "No cut, so food is not the lever this month." },
+      { k: "3", title: "Now", body: cutting && weeks !== null && weeks >= 8 ? `${weeks} weeks of a cut. Cold, tired, the scale stuck: that is the body turning the rate down. Two weeks at the range, then on.` : cutting ? "A cut inside the range: the rate holds." : "Food is at the spend; the rate is where it should be. Fish, eggs and dairy carry the iodine and selenium." },
+      { k: "4", title: "The path on", body: "" },
+      { k: "5", title: "The goal: the check-in", body: `${goalLabel(x.band)}, the strength days kept, the usual nights.` },
+    ], taps: [
+      ...(cutting && weeks !== null && weeks >= 8 ? [{ id: "protein" as const, label: "Two weeks at the range, then the cut again", where: "On Goal: Maintain for two weeks; ask Chef Mealan for the plates" }] : [{ id: "protein" as const, label: "Eat to the range", where: "Ask Chef Mealan for the plates; your numbers unchanged" }]),
+      { id: "snack", label: "Fish twice a week, eggs, dairy", where: "Iodine and selenium from food; Chef Mealan's ideas lean that way" },
+      ...(lateNights >= 2 ? [dinnerTap] : []),
+    ], trend: null };
+  }
+  const tr = dayFor(x.personal, today)?.day ?? getDay(x.personal, today).plan ?? null;
+  const strengthToday = Boolean(tr && tr.kind !== "rest" && KINDS_STRENGTH.test(tr.kind));
+  return { parts: [
+    { k: "1", title: "Before: your usual", body: `${usualNight} ${(x.personal.plan ?? []).filter((d) => d && d.kind !== "rest" && KINDS_STRENGTH.test(d.kind)).length ? "Strength days in the week." : "No strength day in the week yet."}` },
+    { k: "2", title: "The path here: this week", body: lateNights ? `Something after 21:30 on ${lateNights} ${lateNights === 1 ? "evening" : "evenings"}: the first deep sleep came later on those nights.` : "Nothing after 21:30 this week: the first deep sleep came on time." },
+    { k: "3", title: "Now", body: strengthToday ? `A strength session today: the rise after it is normal and useful. Tonight at ${l.bed ? BED_BY[l.bed] : "the usual time"}, the first deep sleep does the rest.` : `No session today. Tonight at ${l.bed ? BED_BY[l.bed] : "the usual time"} is the lever.` },
+    { k: "4", title: "The path on", body: "" },
+    { k: "5", title: "The goal: the day", body: "Bed at the usual time; the strength days kept." },
+  ], taps: [
+    { id: "sleep", label: `Bed by ${l.bed ? BED_BY[l.bed] : "the usual time"} tonight`, where: "See A bad night's sleep in Situations" },
+    { id: "dinner", label: strengthToday ? "Keep today's session" : "The next strength day on Plan", where: "On Plan" },
+  ], trend: null };
 }

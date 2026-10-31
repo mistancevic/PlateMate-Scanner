@@ -578,3 +578,84 @@ export const AWAY_PAGE: SituationPage = {
 };
 SITUATION_PAGES.party = PARTY_PAGE; SITUATION_PAGES.away = AWAY_PAGE;
 for (const s of SITUATIONS) { if (s.id === "party") { s.state = "page"; s.hint = "One big meal, some drinks. What one evening does and does not do, against the week."; } if (s.id === "away") { s.state = "page"; s.hint = "Bought food all day. The letters, the photo of the plate, the snack to carry, Travel mode."; } }
+
+// ---- 0.3.35 (DT194 Hormones: The cycle, Thyroid, Growth hormone, Stories143; Milan 19:41 Go for the batch). The papers, read on PubMed 31 October 2026:
+// Davidsen, Vistisen and Astrup 2007, Int J Obes 31:1777, doi 10.1038/sj.ijo.0803699 (review: in the luteal phase energy intake and spend are higher, cravings for carb and fat foods more frequent; no kcal figure)
+// Baker and Driver 2007, Sleep Med 8:613, doi 10.1016/j.sleep.2006.09.011 (review: temperature higher in the luteal phase; sleep quality lowest around the period; the timing of sleep stable)
+// McNulty et al. 2020, Sports Med 50:1813, doi 10.1007/s40279-020-01319-3 (78 studies: a trivial effect of the phase on performance, slightly lower in the first days; evidence quality low; a personal approach)
+// Loucks and Thuma 2003 (see above). EFSA 2015 iron (the Micros page). EFSA 2014 iodine 150 µg and selenium 70 µg a day.
+// Rosenbaum and Leibel 2010, Int J Obes 34 Suppl 1:S47, doi 10.1038/ijo.2010.184 (review: after weight loss the body turns its spend down and hunger up, leptin at the centre, in lean and obese alike)
+// Van Cauter, Leproult and Plat 2000, JAMA 284:861, doi 10.1001/jama.284.7.861 (149 men 16 to 83: growth hormone tied to deep sleep; deep sleep 19 % of the night at 16 to 25, 3 % by 36 to 50, and growth hormone fell with it)
+// Kraemer and Ratamess 2005 (see above). Ho et al. 1988, J Clin Invest 81:968, doi 10.1172/JCI113450 (6 men, a five-day fast: growth hormone pulses from about 6 to 10 a day, the total about three times)
+export const CYCLE_PAGE: BodyPage = {
+  key: "cycle", family: "hormones", name: "The cycle", horizon: "month",
+  intro: "For everyone who has one. What changes over the month in anyone: appetite, water, temperature, iron; and what does not: training. The app does not ask which day of the cycle it is and does not store it. Read at the month. A cycle that changes, pain, or any question about it is for your doctor. No supplement, no test.",
+  sections: [
+    { title: "What changes over the month", lines: [
+      { title: "Appetite in the second half", text: "In the two weeks before the period, energy intake and the body's spend are both higher, and cravings for carb and fat foods come more often. The hunger is real and the plan's: protein and fibre, nothing after dinner.", src: "Davidsen, Vistisen and Astrup 2007, International Journal of Obesity, review" },
+      { title: "Water, and the scale", text: "Weight swings of a kilogram or two across the month are water, not fat. The 7-day average on Goal smooths most of it; the trend over weeks is the number to read." },
+      { title: "Temperature and sleep", text: "Body temperature is higher in the second half, and sleep quality is lowest around the period, while the timing of sleep stays the same. The sleep page's levers are the same.", src: "Baker and Driver 2007, Sleep Medicine, review" },
+      { title: "Training", text: "Across 78 studies, the phase of the cycle made a trivial difference to performance, slightly lower in the first days; the evidence is thin. Train as planned; move a session by how you feel, not by the calendar.", src: "McNulty et al. 2020, Sports Medicine, meta-analysis" },
+      { title: "Iron", text: "The period is iron lost. EFSA's day for iron is higher before menopause, and the Micros page already says so, with the foods.", src: "EFSA 2015, iron; the Micros page" },
+      { title: "Enough food", text: "The signal that drives the cycle broke below 30 kcal per kg of lean mass a day left after training, in 29 women within five days. Your range on Goal keeps that line.", src: "Loucks and Thuma 2003, Journal of Clinical Endocrinology and Metabolism" },
+    ] },
+  ],
+  when: [
+    { verdict: "Helps", when: "The two weeks before: protein and fibre", what: "The hunger is real; the plate holds it." },
+    { verdict: "Helps", when: "Training as planned", what: "The phase makes a trivial difference; how you slept makes more." },
+    { verdict: "Watch", when: "The scale in the second half", what: "A kilogram of water. Read the 7-day average and the weeks." },
+    { verdict: "Watch", when: "A deep cut", what: "Weeks of too little food below the line stop the cycle before anyone notices. The range on Goal is the guard." },
+    { verdict: "Hurts", when: "Skipping meals when hungry", what: "The evening gets bigger; the loop from the sleep page." },
+  ],
+  line: "The strictest line after The brain. The app does not ask which day of the cycle it is and does not store it; the page explains what changes in anyone. A cycle that changes, pain, or any question about it is for your doctor. No supplement, no test.",
+  chips: ["Why am I hungrier some weeks?", "Why does the scale jump?", "Should I train on my period?"],
+  sources: "Davidsen, Vistisen and Astrup 2007, Int J Obes 31:1777; Baker and Driver 2007, Sleep Med 8:613; McNulty et al. 2020, Sports Med 50:1813; EFSA 2015, iron; Loucks and Thuma 2003, J Clin Endocrinol Metab 88:297. Educational, approximate, not medical advice.",
+};
+export const THYROID_PAGE: BodyPage = {
+  key: "thyroid", family: "hormones", name: "Thyroid", horizon: "month",
+  intro: "The rate of the whole body. What moves it in anyone: a long deep cut, iodine and selenium from food, sleep. Read at the month. No test, no level, no booster, ever. A thyroid that worries you is a blood test with your doctor.",
+  sections: [
+    { title: "What moves it", lines: [
+      { title: "A long, deep cut", text: "After weight loss the body turns its spend down and hunger up, in lean and heavy people alike; the active thyroid hormone is one of the dials, and it fell in the same study that found the 30 kcal line. That is the cold hands and the tiredness on a deep cut; the fix is the range, not a supplement.", src: "Rosenbaum and Leibel 2010, International Journal of Obesity, review; Loucks and Thuma 2003" },
+      { title: "Iodine", text: "The thyroid is built from it: fish, dairy, eggs, iodised salt. EFSA's day is 150 µg. Iodine joins the Micros page as a member once ten foods are read from a source; until then the foods are named here.", src: "EFSA 2014, iodine" },
+      { title: "Selenium", text: "The enzymes that switch the hormone on need it: two Brazil nuts, fish, eggs. EFSA's day is 70 µg. Selenium joins Micros with iodine.", src: "EFSA 2014, selenium" },
+      { title: "Sleep", text: "The rate follows the night. A week of short nights moved testosterone, not cortisol; the thyroid's morning rise is part of the same clock. The sleep page's levers.", src: "Leproult and Van Cauter 2011, JAMA; the sleep page" },
+    ] },
+  ],
+  when: [
+    { verdict: "Helps", when: "Eating to the range", what: "The rate stays up; the cut still works." },
+    { verdict: "Helps", when: "Fish twice a week, eggs, dairy", what: "Iodine and selenium from food; nothing else is sold here." },
+    { verdict: "Watch", when: "Weeks of a deep cut", what: "Cold, tired, the scale stuck: the body turned the rate down. Up to the range for two weeks." },
+    { verdict: "Hurts", when: "A booster", what: "Nothing sold as a thyroid booster has evidence for a healthy thyroid. A thyroid that worries you is a blood test with your doctor." },
+  ],
+  line: "No test, no level, no condition. The page says what a deep cut and food do in anyone. Anything about a thyroid condition or a medication is for your doctor.",
+  chips: ["Why am I cold on a cut?", "Which foods have iodine?", "Is my rate slower now?"],
+  sources: "Rosenbaum and Leibel 2010, Int J Obes 34 Suppl 1:S47; Loucks and Thuma 2003, J Clin Endocrinol Metab 88:297; EFSA 2014, iodine and selenium; Leproult and Van Cauter 2011, JAMA 305:2173. Educational, approximate, not medical advice.",
+};
+export const GH_PAGE: BodyPage = {
+  key: "gh", family: "hormones", name: "Growth hormone", horizon: "day",
+  intro: "Released in deep sleep and after a hard session, in everyone. What moves it, and what the claims get wrong. Read at the day. No level, no test, no booster. Growth hormone as a treatment is a doctor's subject and never on this page.",
+  sections: [
+    { title: "What moves it", lines: [
+      { title: "Deep sleep", text: "Growth hormone comes with deep sleep, which falls mostly in the first part of the night. In 149 men, deep sleep went from 19 % of the night in the twenties to 3 % by midlife, and growth hormone fell with it. A late night cuts the window; a short night cuts it most.", src: "Van Cauter, Leproult and Plat 2000, JAMA" },
+      { title: "A hard session", text: "Rises for 15 to 30 minutes after a session with big muscles, high volume, short rests, with testosterone and cortisol. The training does the lasting work, not the hour.", src: "Kraemer and Ratamess 2005, Sports Medicine" },
+      { title: "Not eating", text: "In 6 men, a five-day fast took the pulses from about 6 to 10 a day and the total to about three times. That is the body keeping its muscle while it does not eat, not building it. A meal before bed does not block the night's release in a meaningful way.", src: "Ho et al. 1988, Journal of Clinical Investigation" },
+      { title: "What the claims get wrong", text: "Amino acid boosters, sprays and peptides sold for growth hormone do nothing lasting in healthy people; sleep and a strength session do what can be done.", src: "Kraemer and Ratamess 2005, review" },
+    ] },
+  ],
+  when: [
+    { verdict: "Helps", when: "Bed at the usual time", what: "The first deep sleep is the window." },
+    { verdict: "Helps", when: "A strength session", what: "The rise after it is normal and useful." },
+    { verdict: "Watch", when: "A protein meal before bed", what: "Fine, and the Muscle page says why; it does not block the night." },
+    { verdict: "Hurts", when: "A booster", what: "Nothing sold for it has evidence in healthy people." },
+  ],
+  line: "No level, no test, no booster. Growth hormone as a treatment is a doctor's subject and never on this page; any question about your own level is for your doctor.",
+  chips: ["Does sleep really matter for it?", "Does fasting raise it?", "Do boosters work?"],
+  sources: "Van Cauter, Leproult and Plat 2000, JAMA 284:861; Kraemer and Ratamess 2005, Sports Med 35:339; Ho et al. 1988, J Clin Invest 81:968. Educational, approximate, not medical advice.",
+};
+BODY_PAGES.cycle = CYCLE_PAGE; BODY_PAGES.thyroid = THYROID_PAGE; BODY_PAGES.gh = GH_PAGE;
+HORMONE_MEMBERS.push(
+  { key: "cycle", name: "The cycle", hint: "For everyone who has one. What changes over the month; no day asked or stored. Read per month.", page: "cycle" },
+  { key: "thyroid", name: "Thyroid", hint: "The rate of the whole body. A deep cut, iodine, selenium, sleep. Read per month.", page: "thyroid" },
+  { key: "gh", name: "Growth hormone", hint: "Deep sleep and a hard session. Read per day.", page: "gh" },
+);

@@ -317,3 +317,26 @@ test("0.3.34: the two pages exist in plain words; the party case reads the week 
   const a2 = awayCase({ personal: p, planned: {}, busy: null, travel: { place: "Serbia", since: "2026-11-01" } }, monday);
   assert.match(a2.parts[1].body, /No calendar read.*Travel mode on, Serbia/);
 });
+
+// 0.3.35 (DT194): The cycle, Thyroid, Growth hormone
+import { CYCLE_PAGE, THYROID_PAGE, GH_PAGE } from "./explorerBody";
+test("0.3.35: Hormones has eight members with pages; the cycle names no day and no condition; the cases read weigh-ins, the cut's length, the night", () => {
+  assert.equal(HORMONE_MEMBERS.length, 8); assert.ok(HORMONE_MEMBERS.every((m) => m.page));
+  assert.equal(BODY_PAGES.cycle, CYCLE_PAGE); assert.equal(BODY_PAGES.thyroid, THYROID_PAGE); assert.equal(BODY_PAGES.gh, GH_PAGE);
+  assert.ok(!/few hundred kcal|half a degree|sparing muscle|beat the hunger/.test(JSON.stringify([CYCLE_PAGE, THYROID_PAGE, GH_PAGE])), "plain words, and only what the papers say");
+  assert.match(CYCLE_PAGE.sections[0].lines[3].text, /78 studies/);
+  assert.match(GH_PAGE.sections[0].lines[0].text, /19 % of the night/);
+  const p = { ...personal, weightKg: 68, weighIns: [{ date: "2026-10-05", kg: 68.9 }, { date: "2026-10-15", kg: 67.1 }, { date: "2026-10-28", kg: 67.8 }, { date: "2026-11-01", kg: 67.9 }] } as unknown as Personal;
+  const x = { personal: p, feedback: [], planned: {}, band: "maintain", numbersFor: () => ({ kcal: 2000, protein: 120 }), pdRef: null };
+  const c = hormoneCase("cycle", x, monday);
+  assert.match(c.parts[1].body, /single mornings between 67\.1 and 68\.9/);
+  assert.match(c.parts[2].body, /inside what water does/);
+  assert.ok(c.taps.some((t) => /7-day average/.test(t.label)));
+  const t = hormoneCase("thyroid", { ...x, band: "fatloss", goalSetAt: "2026-08-24T10:00:00Z" }, monday);
+  assert.match(t.parts[0].body, /Lose fat, for 9 weeks/);
+  assert.match(t.parts[2].body, /9 weeks of a cut/);
+  assert.ok(t.taps.some((tp) => /Two weeks at the range/.test(tp.label)));
+  const g = hormoneCase("gh", x, monday);
+  assert.match(g.parts[2].body, /A strength session today/);
+  assert.ok(g.taps.some((tp) => tp.id === "sleep" && /Bed by 23:00/.test(tp.label)));
+});
