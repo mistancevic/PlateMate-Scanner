@@ -7,7 +7,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { AppApi } from "./api";
 import { BODY_FAMILIES, SITUATIONS, SITUATION_PAGES, BODY_PAGES, HORMONE_MEMBERS, buildIndex, searchIndex, type Part, type BodyId, type SituationId, type Hit, type Line, type WhenRow, type BodyPage as BodyPageData } from "../explorerBody";
-import { sleepCase, noteOpen, easyDay, glucoseCase, glycogenCase, fatCase, hormoneCase, type Case, type Tap } from "../situations";
+import { sleepCase, noteOpen, easyDay, glucoseCase, glycogenCase, fatCase, hormoneCase, muscleCase, boneCase, type Case, type Tap } from "../situations";
 import { setChefContext } from "../chefContext";
 import { dayFor, getDay } from "../personal";
 import { showPlanOn } from "./PlanScreen";
@@ -92,7 +92,7 @@ function TapList({ p, taps, kind }: { p: AppApi; taps: Tap[]; kind: string }) {
     else if (t.id === "easy") p.openOut({ q: "Where does a 30 minute walk fit in my day, most days of the week, and what does it do for my goal?" });
     else if (t.id === "snack") p.openOut({ q: `${t.label}: how do I do that on my plate, on my numbers?` });
     else if (t.id === "sleep") p.openExplorer?.("situations", "sleep");
-    else if (t.id === "plan") p.setTab(/coffee/i.test(t.label) ? "home" : "plan");
+    else if (t.id === "plan") { if (/vitamin d/i.test(t.label)) p.openExplorer?.("nutrients", "micros"); else p.setTab(/coffee/i.test(t.label) ? "home" : "plan"); }
   };
   return <div className="ex-taps">{taps.map((t) => <button key={t.label} type="button" className="pill ex-tap" onClick={() => run(t)}><b>{t.label}</b><small>{t.where}</small></button>)}</div>;
 }
@@ -114,6 +114,7 @@ export function BodyPage({ p, page, back, backLabel }: { p: AppApi; page: BodyPa
   const c = useMemo<Case>(() => page.key === "glucose"
     ? glucoseCase({ personal: p.personal, feedback: p.state.feedback, planned: p.planned, numbersFor: p.numbersFor, pdRef: p.pdRef, giOf: (name) => CARB_FOODS_ALL.find((f) => name.toLowerCase().startsWith(f.name.split(",")[0].toLowerCase()))?.gi ?? null }, today)
     : page.key === "glycogen" ? glycogenCase(p.personal, today)
+    : page.key === "muscle" || page.key === "bone" ? (page.key === "muscle" ? muscleCase : boneCase)({ personal: p.personal, feedback: p.state.feedback, planned: p.planned, band: p.goal?.band ?? "maintain", goalSetAt: p.goal?.setAt, numbersFor: p.numbersFor, pdRef: p.pdRef }, today)
     : page.family === "hormones" ? hormoneCase(page.key, { personal: p.personal, feedback: p.state.feedback, planned: p.planned, band: p.goal?.band ?? "maintain", goalSetAt: p.goal?.setAt, numbersFor: p.numbersFor, pdRef: p.pdRef }, today)
     : fatCase({ personal: p.personal, feedback: p.state.feedback, planned: p.planned, band: p.goal?.band ?? "maintain", goalSetAt: p.goal?.setAt, numbersFor: p.numbersFor }, today), [page.key, p, today]);
   const title = page.key === "glucose" ? "Your case: the next meal" : page.key === "fat" ? "Your case: this week" : page.horizon === "month" ? "Your case: this month" : "Your case: today";

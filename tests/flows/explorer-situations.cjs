@@ -1,3 +1,4 @@
+// 0.3.28: Muscle and Bone (DT183, DT184), read at the month.
 // 0.3.27: Hormones' other four members, Hunger hormones, Cortisol, Testosterone, Oestrogen, each with Your case at its horizon.
 // 0.3.26 (DT181 v2, DT183 to DT186): The body's first pages, Glucose and insulin, Glycogen, The fat store, and the situation
 // Fat burning. DT180 to DT187 (0.3.25, boards Stories129 to Stories136; Coach Milan 31 October 13:12 "Let's code Explorer"): three parts, one
@@ -92,7 +93,20 @@ const SHOTS = process.env.SHOTS;
   await page.getByRole("button", { name: /^Explorer/ }).click(); await page.waitForTimeout(800);
   await parts.getByRole("radio", { name: "The body" }).click(); await page.waitForTimeout(400);
   const states = await page.locator(".ex-map .menu-row .ex-state").allTextContents();
-  ok(states.join(",") === "later,›,›,later,later,later,›,later", "the map: the fat store, glycogen and hormones have pages: " + states.join(","));
+  ok(states.join(",") === "›,›,›,›,later,later,›,later", "the map: muscle, the fat store, glycogen, bone and hormones have pages: " + states.join(","));
+  // 0.3.28: Muscle and Bone
+  await page.locator(".ex-map .menu-row").filter({ hasText: "Muscle" }).first().click(); await page.waitForTimeout(500);
+  let mp = await text(page.locator(".explorer"));
+  ok(await text(page.locator(".ex-h")) === "Muscle" && /0\.4 g of protein per kg/.test(mp) && /Schoenfeld and Aragon 2018/.test(mp) && /8 % smaller, 23 % weaker/.test(mp), "Muscle: the page with its papers");
+  ok(/Your case: this month/.test(mp) && /about 34 g a meal/.test(mp) && /Strength 1 day a week/.test(mp) && /Keep the strength day/.test(mp), "Muscle: your case reads the weight, the training week and the plates");
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT + "-muscle.png", fullPage: true });
+  await page.getByRole("button", { name: "‹ The body" }).click(); await page.waitForTimeout(300);
+  await page.locator(".ex-map .menu-row").filter({ hasText: "Bone" }).first().click(); await page.waitForTimeout(500);
+  mp = await text(page.locator(".explorer"));
+  ok(await text(page.locator(".ex-h")) === "Bone" && /2\.9 %/.test(mp) && /LIFTMOR/.test(mp) && /Calcium 950 mg a day/.test(mp) && /Vitamin D in the dark months/.test(mp), "Bone: the page, EFSA's day for calcium, the dark months' tap");
+  await page.locator(".ex-tap").filter({ hasText: "Vitamin D in the dark months" }).click(); await page.waitForTimeout(500);
+  ok((await parts.getByRole("radio", { name: "Nutrients" }).getAttribute("aria-checked")) === "true" && /Micros/.test(await text(page.locator(".explorer"))), "the tap opens Micros under Nutrients");
+  await parts.getByRole("radio", { name: "The body" }).click(); await page.waitForTimeout(400);
   await page.locator(".ex-map .menu-row").filter({ hasText: "Hormones" }).click(); await page.waitForTimeout(400);
   const members = await page.locator(".ex-map .menu-row b").allTextContents();
   ok(await text(page.locator(".ex-h")) === "Hormones" && members.length === 5 && /Glucose and insulin/.test(members[0]) && members.some((m) => /Testosterone/.test(m)) && members.some((m) => /Oestrogen/.test(m)), "Hormones: five members, glucose first: " + members.join(" | "));

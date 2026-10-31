@@ -325,3 +325,61 @@ export const HORMONE_PAGES: Record<string, BodyPage> = {
   },
 };
 for (const k of Object.keys(HORMONE_PAGES)) { BODY_PAGES[k] = HORMONE_PAGES[k]; const m = HORMONE_MEMBERS.find((x) => x.key === k); if (m) m.page = k; }
+
+// ---- 0.3.28 (DT183 Muscle, Stories132; DT184 Bone, Stories133; Milan 14:47 "Go. Dt183 and 184"). The papers, read again on 31 October 2026 (PubMed):
+// Schoenfeld and Aragon 2018, J Int Soc Sports Nutr 15:10, doi 10.1186/s12970-018-0215-1 (review: about 0.4 g of protein per kg per meal, over at least four meals, to reach 1.6 g per kg a day; up to 0.55 g per kg per meal)
+// Devries et al. 2018, J Nutr 148:1088, doi 10.1093/jn/nxy091 (22 women around 69: 10 g of milk protein with 3 g of leucine built as much as 25 g of whey with the same leucine)
+// Schoenfeld, Ogborn and Krieger 2017, J Sports Sci 35:1073, doi 10.1080/02640414.2016.1210197 (meta-analysis, 15 studies: each weekly set adds about 0.37 % of muscle gain; higher volumes 3.9 % more than lower)
+// Wall et al. 2013, J Clin Endocrinol Metab 98:4872, doi 10.1210/jc.2013-2098 (12 young men, one leg in a cast 14 days: 8 % smaller, 23 % weaker, the muscle's answer to a 20 g protein meal 31 % lower)
+// Bauer et al. 2013, J Am Med Dir Assoc 14:542, doi 10.1016/j.jamda.2013.05.021 (PROT-AGE: over 65, at least 1.0 to 1.2 g per kg a day, 1.2 or more when active)
+// Watson et al. 2018, J Bone Miner Res 33:211, doi 10.1002/jbmr.3284 (LIFTMOR: 101 women around 65, twice a week 30 minutes of heavy lifting and jumps for 8 months: spine bone up 2.9 % against down 1.2 % with light home exercise; one minor event)
+// Rizzoli et al. 2018, Osteoporos Int 29:1933, doi 10.1007/s00198-018-4534-5 (ESCEO consensus: protein above the minimum goes with stronger bone and slower loss, when calcium is enough; no harm from protein's acid load; too little protein the bigger problem in older people)
+// Weaver et al. 2016, Osteoporos Int 27:1281, doi 10.1007/s00198-015-3440-3 (NOF statement: lifestyle decides 20 to 40 % of the peak; calcium and physical activity the best evidence, the years around puberty the critical ones)
+// Loucks and Thuma 2003 (see above). EFSA calcium 2015 (950 mg a day from 25, 1000 mg under 25) and vitamin D 2016 (15 µg a day): the Micros pages.
+export const MUSCLE_PAGE: BodyPage = {
+  key: "muscle", family: "muscle", name: "Muscle", horizon: "month",
+  intro: "Muscle is built and taken apart all day. Protein and strength training tip the balance to building; doing without either tips it the other way. Read at the month. What muscle does in anyone. No body composition reading, no supplement beyond food, no booster. For anything about a muscle that hurts or weakens: your doctor.",
+  sections: [
+    { title: "What it is, what moves it", lines: [
+      { title: "Protein, per meal", text: "Building runs for a few hours after a meal with about 0.4 g of protein per kg of body weight, about 30 g for most people. More in one meal adds a little, not a lot. Four such meals a day reach 1.6 g per kg; that is the shape of the day the app builds.", src: "Schoenfeld and Aragon 2018, Journal of the International Society of Sports Nutrition, review" },
+      { title: "Leucine", text: "The amino acid that starts the building. In 22 women around 69, 10 g of milk protein carrying 3 g of leucine built as much as 25 g of whey with the same leucine. A chicken breast, a scoop of whey, a big bowl of lentils with grains each bring about that much. The Protein page shows it per food.", src: "Devries et al. 2018, Journal of Nutrition" },
+      { title: "Strength training", text: "The signal that sends the protein to muscle. Sets close to hard, two or more times a week per muscle. In 15 studies each weekly set added about 0.4 % of gain; the higher volumes gained about 4 % more than the lower.", src: "Schoenfeld, Ogborn and Krieger 2017, Journal of Sports Sciences, meta-analysis" },
+      { title: "Doing without", text: "One leg in a cast for 14 days: 8 % smaller, 23 % weaker, and the muscle's answer to a protein meal 31 % lower, in 12 young men. A holiday is not a cast, but the direction is the same: protein and walking slow it, the first session back turns it.", src: "Wall et al. 2013, Journal of Clinical Endocrinology and Metabolism" },
+      { title: "Age", text: "Over 65 the same protein builds less, so the need goes up: at least 1.0 to 1.2 g per kg a day, and 1.2 or more when active. Your protein range on Goal already rises with your year of birth.", src: "Bauer et al. 2013, JAMDA, the PROT-AGE study group" },
+    ] },
+  ],
+  when: [
+    { verdict: "Helps", when: "The meal after a session", what: "Building runs highest for about a day after training; every protein meal in that day counts, not only the first hour." },
+    { verdict: "Helps", when: "Protein before bed", what: "A protein meal or a glass of skyr before sleep builds overnight, when the gap between meals is longest." },
+    { verdict: "Helps", when: "A fat loss phase", what: "Protein at the top of your range and the strength days kept: the fat goes, the muscle stays." },
+    { verdict: "Watch", when: "A rest day", what: "Building goes on from yesterday's session; protein stays, carbs can come down." },
+    { verdict: "Hurts", when: "Two weeks of nothing", what: "Holiday, illness, a busy month. Walking and protein keep most of it; the first week back is easy on purpose." },
+  ],
+  line: "What muscle does in anyone. No body composition reading, no supplement beyond food, no booster. Whey and skyr are foods on the Protein page; nothing else is sold here.",
+  chips: ["How much protein in one meal?", "Do I lose muscle on a cut?", "Is one strength day enough?"],
+  sources: "Schoenfeld and Aragon 2018, J Int Soc Sports Nutr 15:10; Devries et al. 2018, J Nutr 148:1088; Schoenfeld, Ogborn and Krieger 2017, J Sports Sci 35:1073; Wall et al. 2013, J Clin Endocrinol Metab 98:4872; Bauer et al. 2013, J Am Med Dir Assoc 14:542. Educational, approximate, not medical advice.",
+};
+export const BONE_PAGE: BodyPage = {
+  key: "bone", family: "bone", name: "Bone", horizon: "month",
+  intro: "Bone is rebuilt all life long, slowly. Calcium and vitamin D are the material, strength and impact are the signal, protein is a third of it by weight, and the hormones for everyone keep the balance. Read at the month. No bone density reading, no condition named. For anything about bone health: your doctor.",
+  sections: [
+    { title: "What it is, what moves it", lines: [
+      { title: "Calcium and vitamin D", text: "The material, and the key that lets it in. The Micros pages have your day for both, with EFSA's values by age (calcium 950 mg from 25, 1000 mg before; vitamin D 15 µg), and the ten foods with the most in a portion.", src: "EFSA 2015 and 2016 dietary reference values; the Micros pages" },
+      { title: "Strength and impact", text: "Bone grows where it is loaded. In 101 women around 65, twice a week 30 minutes of heavy lifting and small jumps for eight months put spine bone up 2.9 %, against down 1.2 % with light exercise at home, with one minor event. Swimming and cycling are good for everything else and do little here.", src: "Watson et al. 2018, Journal of Bone and Mineral Research, the LIFTMOR trial" },
+      { title: "Protein", text: "Bone is a third protein by weight. Protein above the minimum goes with stronger bone and slower loss, when calcium is enough; too little protein is the bigger problem in older people. The protein range on Goal covers it.", src: "Rizzoli et al. 2018, Osteoporosis International, the ESCEO consensus" },
+      { title: "Eating too little for too long", text: "A long, deep cut lowers the hormones that protect bone, in everyone; in women the signal broke below 30 kcal per kg of lean mass a day left after training. Lose fat is as low as the app goes, and the check-in watches the length.", src: "Loucks and Thuma 2003, Journal of Clinical Endocrinology and Metabolism" },
+      { title: "Time", text: "Lifestyle decides 20 to 40 % of the peak, and the years around puberty build most of it: calcium and activity have the best evidence there. After the peak, what is kept decides the rest.", src: "Weaver et al. 2016, Osteoporosis International, the NOF statement" },
+    ] },
+  ],
+  when: [
+    { verdict: "Helps", when: "A strength day", what: "The load is the signal. Two days a week with the big movements is the dose." },
+    { verdict: "Helps", when: "The meal after, with dairy or greens", what: "Calcium with the protein that bone also needs." },
+    { verdict: "Watch", when: "A week in a hotel", what: "Walking and stairs keep the signal; the steps in Lifestyle are the thing to watch." },
+    { verdict: "Hurts", when: "Months of a deep cut", what: "The hormones go down and the bone with them, before anyone notices. The range on Goal is the guard." },
+  ],
+  line: "What bone does in anyone. No bone density reading, no condition named, no supplement beyond the Micros pages' foods and vitamin D in the dark months, which EFSA itself names. For anything about bone health: your doctor.",
+  chips: ["Which foods have the most calcium?", "Does running count for bone?", "Is cycling enough?"],
+  sources: "EFSA 2015 (calcium) and 2016 (vitamin D) dietary reference values; Watson et al. 2018, J Bone Miner Res 33:211; Rizzoli et al. 2018, Osteoporos Int 29:1933; Loucks and Thuma 2003, J Clin Endocrinol Metab 88:297; Weaver et al. 2016, Osteoporos Int 27:1281. Educational, approximate, not medical advice.",
+};
+BODY_PAGES.muscle = MUSCLE_PAGE; BODY_PAGES.bone = BONE_PAGE;
+for (const b of BODY_FAMILIES) if (b.id === "muscle" || b.id === "bone") b.state = "page";

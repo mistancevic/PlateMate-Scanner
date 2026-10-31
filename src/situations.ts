@@ -283,3 +283,60 @@ export function hormoneCase(key: string, x: HormoneIn, today = new Date()): Case
     { k: "5", title: "The goal: the check-in", body: `${goalName}${trend ? `, ${expectedWords(trend.expected)}` : ""}, the strength days kept, the usual nights.` },
   ], taps, trend: trend && trend.change !== null && trend.verdict !== "too few" && cutting ? `Your trend: ${change}. Your goal expects ${expectedWords(trend.expected)}. ${trend.verdict === "faster" ? "Faster than the goal expects: eat to the range, the cut is deep enough for the axis too." : "The food is inside the range; the sleep and the strength days are the levers left."}` : null };
 }
+
+// ---- 0.3.28: Muscle and Bone, read at the month ----
+import { tableFoods, memberDay, MEMBER_PAGES, EFSA_D } from "./explorerMicros";
+import { ageOf } from "./personal";
+// the ten foods on the Micros calcium table, plus the dairy words a plate usually carries
+const CA_FOODS = () => [...tableFoods("ca", 10).map((f) => f.name.split(",")[0].toLowerCase()), "skyr", "yogurt", "yoghurt", "quark", "cheese", "mozzarella", "feta", "parmesan", "cottage", "milk", "kefir"];
+export function muscleCase(x: HormoneIn, today = new Date()): Case {
+  const l = lifestyleOf(x.personal), key = ymd(today), w = x.personal.weightKg ?? 0, n = x.numbersFor(today);
+  const perMeal = w ? Math.min(Math.round(w * 0.4), 40) : 30;
+  const days = Array.from({ length: 7 }, (_, i) => plusDays(key, -(7 - i)));
+  // protein a day on the 7-day average, and the meal slot that runs lowest
+  const bySlot: Record<string, number[]> = {}; let total = 0, logged = 0;
+  for (const d of days) { const log = dayLog(x.feedback, new Date(`${d}T12:00:00`)); if (log.logged.length) { total += log.protein; logged++; } for (const f of log.logged) { const nm = (f.which || f.moment || "other meals").toLowerCase(); (bySlot[nm] ??= []).push(aggregate(f.meal.items).protein ?? 0); } }
+  const avg = logged ? Math.round(total / logged) : null;
+  const slotAvg = Object.entries(bySlot).map(([s, v]) => ({ s, p: Math.round(v.reduce((a, b) => a + b, 0) / v.length) })).sort((a, b) => a.p - b.p);
+  const low = slotAvg.find((s) => s.p < perMeal) ?? null;
+  const week = x.personal.plan ?? [], strengthDays = week.filter((d) => d && d.kind !== "rest" && KINDS_STRENGTH.test(d.kind)).length;
+  const trend = w ? trendOf(x.personal.weighIns, x.band, w, x.personal.trainingAge, today) : null;
+  const change = trend && trend.change !== null ? `${trend.change > 0 ? "up" : "down"} ${Math.abs(trend.change).toFixed(1)} kg over ${trend.weeks} ${trend.weeks === 1 ? "week" : "weeks"}` : "too few weigh-ins for a trend yet";
+  const range = n ? `${Math.round(n.protein)} g a day` : "your range";
+  const taps: Tap[] = [
+    low ? { id: "protein", label: `${low.s.charAt(0).toUpperCase() + low.s.slice(1)} to ${perMeal} g of protein`, where: "On the Plate; Chef Mealan's ideas lean that way" } : { id: "protein", label: `Every meal at ${perMeal} g or more`, where: avg !== null ? "It already does what this page says" : "Ask Chef Mealan for the plate; your numbers unchanged" },
+    strengthDays ? { id: "dinner", label: `Keep the ${strengthDays === 1 ? "strength day" : `${strengthDays} strength days`} this week`, where: "On Plan" } : { id: "dinner", label: "A strength day in the week", where: "On Plan, the training week; two is the dose" },
+  ];
+  const since = x.goalSetAt ? new Date(x.goalSetAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" }) : null;
+  return { parts: [
+    { k: "1", title: `Before: your goal${since ? `, set ${since}` : ""}`, body: `${goalLabel(x.band)}. Protein ${range}, about ${perMeal} g a meal. ${strengthDays ? `Strength ${strengthDays} ${strengthDays === 1 ? "day" : "days"} a week.` : "No strength day set yet."}${w ? ` ${w} kg, trend ${change}.` : ""}` },
+    { k: "2", title: "The path here: the last 7 days", body: avg !== null ? `Protein ${avg} g a day on the ${logged}-day average. ${slotAvg.length ? slotAvg.map((s) => `${s.s} ${s.p} g`).join(", ") + "." : ""}` : "No plates ticked this week yet. What you tick on Today fills this in." },
+    { k: "3", title: "Now", body: low ? `${low.s.charAt(0).toUpperCase() + low.s.slice(1)} is the meal below ${perMeal} g. ${strengthDays ? "The strength days are in place." : "Strength training is the lever not in place yet."}` : `Every meal reaches ${perMeal} g${avg !== null ? "" : ", once the plates are ticked"}. ${strengthDays ? "The strength days are in place." : "Strength training is the lever not in place yet."}` },
+    { k: "4", title: "The path on", body: "" },
+    { k: "5", title: "The goal: the check-in", body: `Protein inside the range every day, ${strengthDays || 2} ${strengthDays === 1 ? "session" : "sessions"} a week, weight ${trend ? expectedWords(trend.expected) : "inside the range"}.` },
+  ], taps, trend: avg !== null && n && avg < n.protein * 0.9 ? `Your trend: ${avg} g a day, below the range by ${low && n.protein - avg <= perMeal ? "one meal" : `${Math.round(n.protein - avg)} g`}. Your goal needs ${Math.round(n.protein)} g or more. The gap ${low && n.protein - avg <= perMeal ? `is ${low.s}` : "is a bigger protein share on every plate"}.` : null };
+}
+export function boneCase(x: HormoneIn, today = new Date()): Case {
+  const key = ymd(today), age = ageOf(x.personal), caPage = MEMBER_PAGES.find((m) => m.id === "ca")!;
+  const n = x.numbersFor(today), caDay = memberDay(caPage, x.personal.sex, n?.kcal, age).v;
+  const days = Array.from({ length: 7 }, (_, i) => plusDays(key, -(7 - i)));
+  const ca = CA_FOODS(); let portions = 0, logged = 0;
+  for (const d of days) { const log = dayLog(x.feedback, new Date(`${d}T12:00:00`)); if (log.logged.length) logged++; for (const f of log.logged) for (const i of f.meal.items) if (ca.some((c) => i.food.name.toLowerCase().includes(c))) portions++; }
+  const perDay = logged ? Math.round((portions / logged) * 10) / 10 : null;
+  const week = x.personal.plan ?? [], strengthDays = week.filter((d) => d && d.kind !== "rest" && KINDS_STRENGTH.test(d.kind)).length;
+  const steps = STEPS.find((s) => s.id === x.personal.steps);
+  const month = today.getMonth(), dark = month >= 9 || month <= 2;
+  const cutting = x.band === "fatloss";
+  const taps: Tap[] = [
+    { id: "protein", label: perDay !== null && perDay < 2 ? "One more calcium portion a day" : "Calcium in the meal after training", where: "Skyr, sardines, tofu set with calcium: the Micros page's list" },
+    strengthDays ? { id: "dinner", label: `Keep the ${strengthDays === 1 ? "strength day" : `${strengthDays} strength days`} this week`, where: "On Plan" } : { id: "dinner", label: "A strength day in the week", where: "On Plan; two a week is the dose" },
+    ...(dark ? [{ id: "plan" as const, label: "Vitamin D in the dark months", where: "EFSA's own note on the Micros page; your doctor for a dose" }] : []),
+  ];
+  return { parts: [
+    { k: "1", title: "Before: your day", body: `Calcium ${caDay} mg a day, your day from EFSA. Vitamin D ${EFSA_D} µg. ${strengthDays ? `Strength ${strengthDays} ${strengthDays === 1 ? "day" : "days"} a week.` : "No strength day set yet."}${steps ? ` Steps: ${steps.name}.` : ""}` },
+    { k: "2", title: "The path here: the last 7 days", body: perDay !== null ? `Calcium foods on the plates: about ${perDay} ${perDay === 1 ? "portion" : "portions"} a day, from the ten on the Micros list.${dark ? " The dark months: food brings little vitamin D." : ""}` : "No plates ticked this week yet. What you tick on Today fills this in." },
+    { k: "3", title: "Now", body: `${strengthDays >= 2 ? "The signal is in place." : strengthDays === 1 ? "One strength day; two is the dose." : "The signal is the lever not in place yet."}${perDay !== null && perDay < 2 ? " Calcium short by about a portion a day." : ""}${cutting ? " A fat loss phase: inside the range, and the check-in reads the length." : ""}` },
+    { k: "4", title: "The path on", body: "" },
+    { k: "5", title: "The goal: the check-in", body: "Calcium in your day, the strength days kept, weight inside the range." },
+  ], taps, trend: null };
+}
