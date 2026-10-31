@@ -7,7 +7,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { AppApi } from "./api";
 import { BODY_FAMILIES, SITUATIONS, SITUATION_PAGES, BODY_PAGES, HORMONE_MEMBERS, buildIndex, searchIndex, type Part, type BodyId, type SituationId, type Hit, type Line, type WhenRow, type BodyPage as BodyPageData } from "../explorerBody";
-import { sleepCase, noteOpen, easyDay, glucoseCase, glycogenCase, fatCase, type Case, type Tap } from "../situations";
+import { sleepCase, noteOpen, easyDay, glucoseCase, glycogenCase, fatCase, hormoneCase, type Case, type Tap } from "../situations";
 import { setChefContext } from "../chefContext";
 import { dayFor, getDay } from "../personal";
 import { showPlanOn } from "./PlanScreen";
@@ -76,7 +76,7 @@ export function BodyFamily({ p, id, member, setMember, back }: { p: AppApi; id: 
         <button key={m.key} type="button" className={`menu-row ${m.page ? "" : "ex-later"}`} onClick={() => m.page && setMember(m.page)}>
           <span className="menu-row-text"><b>{m.name}</b><small>{m.hint}</small></span><small className="ex-state">{m.page ? "›" : "later"}</small>
         </button>))}</div>
-      <small className="muted ex-line-note">Every member is on every profile: everyone has all of them. The cycle, thyroid and growth hormone wait for their own line.</small>
+      <small className="muted ex-line-note">Every member is on every profile: everyone has all of them. The cycle, thyroid and growth hormone wait for their own page.</small>
     </>
   );
   const key = member ?? (BODY_PAGES[id] ? id : null);
@@ -91,6 +91,8 @@ function TapList({ p, taps, kind }: { p: AppApi; taps: Tap[]; kind: string }) {
     else if (t.id === "dinner") { showPlanOn(today.toISOString().slice(0, 10)); p.setTab("plan"); }
     else if (t.id === "easy") p.openOut({ q: "Where does a 30 minute walk fit in my day, most days of the week, and what does it do for my goal?" });
     else if (t.id === "snack") p.openOut({ q: `${t.label}: how do I do that on my plate, on my numbers?` });
+    else if (t.id === "sleep") p.openExplorer?.("situations", "sleep");
+    else if (t.id === "plan") p.setTab(/coffee/i.test(t.label) ? "home" : "plan");
   };
   return <div className="ex-taps">{taps.map((t) => <button key={t.label} type="button" className="pill ex-tap" onClick={() => run(t)}><b>{t.label}</b><small>{t.where}</small></button>)}</div>;
 }
@@ -112,8 +114,9 @@ export function BodyPage({ p, page, back, backLabel }: { p: AppApi; page: BodyPa
   const c = useMemo<Case>(() => page.key === "glucose"
     ? glucoseCase({ personal: p.personal, feedback: p.state.feedback, planned: p.planned, numbersFor: p.numbersFor, pdRef: p.pdRef, giOf: (name) => CARB_FOODS_ALL.find((f) => name.toLowerCase().startsWith(f.name.split(",")[0].toLowerCase()))?.gi ?? null }, today)
     : page.key === "glycogen" ? glycogenCase(p.personal, today)
+    : page.family === "hormones" ? hormoneCase(page.key, { personal: p.personal, feedback: p.state.feedback, planned: p.planned, band: p.goal?.band ?? "maintain", goalSetAt: p.goal?.setAt, numbersFor: p.numbersFor, pdRef: p.pdRef }, today)
     : fatCase({ personal: p.personal, feedback: p.state.feedback, planned: p.planned, band: p.goal?.band ?? "maintain", goalSetAt: p.goal?.setAt, numbersFor: p.numbersFor }, today), [page.key, p, today]);
-  const title = page.key === "glucose" ? "Your case: the next meal" : page.key === "glycogen" ? "Your case: today" : "Your case: this week";
+  const title = page.key === "glucose" ? "Your case: the next meal" : page.key === "fat" ? "Your case: this week" : page.horizon === "month" ? "Your case: this month" : "Your case: today";
   return (
     <>
       <button type="button" className="link ex-back" onClick={back}>{backLabel}</button>

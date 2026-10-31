@@ -1,3 +1,4 @@
+// 0.3.27: Hormones' other four members, Hunger hormones, Cortisol, Testosterone, Oestrogen, each with Your case at its horizon.
 // 0.3.26 (DT181 v2, DT183 to DT186): The body's first pages, Glucose and insulin, Glycogen, The fat store, and the situation
 // Fat burning. DT180 to DT187 (0.3.25, boards Stories129 to Stories136; Coach Milan 31 October 13:12 "Let's code Explorer"): three parts, one
 // search bar, The body's map, the Situations list, and the first situation page, A bad night's sleep, with Your case in five parts.
@@ -48,7 +49,7 @@ const SHOTS = process.env.SHOTS;
   await field.fill("coffee"); await page.waitForTimeout(300);
   const hits = await page.locator(".ex-hit b").allTextContents();
   ok(hits.includes("Coffee after 14:00"), "search: coffee finds the sleep page's line: " + hits.join(" | "));
-  await page.locator(".ex-hit").filter({ hasText: "Coffee after 14:00" }).first().click(); await page.waitForTimeout(500);
+  await page.locator(".ex-hit").filter({ hasText: "A bad night's sleep: " }).first().click(); await page.waitForTimeout(500);
   ok(await text(page.locator(".ex-h")) === "A bad night's sleep" && (await parts.getByRole("radio", { name: "Situations" }).getAttribute("aria-checked")) === "true", "a hit opens its page, and the part follows");
   // The body: the map
   await parts.getByRole("radio", { name: "The body" }).click(); await page.waitForTimeout(400);
@@ -95,6 +96,20 @@ const SHOTS = process.env.SHOTS;
   await page.locator(".ex-map .menu-row").filter({ hasText: "Hormones" }).click(); await page.waitForTimeout(400);
   const members = await page.locator(".ex-map .menu-row b").allTextContents();
   ok(await text(page.locator(".ex-h")) === "Hormones" && members.length === 5 && /Glucose and insulin/.test(members[0]) && members.some((m) => /Testosterone/.test(m)) && members.some((m) => /Oestrogen/.test(m)), "Hormones: five members, glucose first: " + members.join(" | "));
+  // 0.3.27: every member has a page
+  const mstates = await page.locator(".ex-map .menu-row .ex-state").allTextContents();
+  ok(mstates.every((s) => s === "›"), "Hormones: all five members open a page: " + mstates.join(","));
+  for (const [name, need, caseTitle] of [["Hunger hormones", /18 % lower and ghrelin 28 % higher/, /Your case: today/], ["Cortisol", /37 % higher/, /Your case: today/], ["Testosterone", /10 to 15 %/, /Your case: this month/], ["Oestrogen", /30 kcal per kg of lean mass/, /Your case: this month/]]) {
+    await page.locator(".ex-map .menu-row").filter({ hasText: name }).first().click(); await page.waitForTimeout(500);
+    const hp = await text(page.locator(".explorer"));
+    ok(await text(page.locator(".ex-h")) === name && need.test(hp) && caseTitle.test(hp) && /When it helps, when it hurts/.test(hp) && /your doctor/.test(hp), `${name}: the page, its paper's number, the case at its horizon, the wellness line`);
+    if (name === "Hunger hormones") ok(/after 21:30 on 2 of six evenings/.test(hp), "Hunger: the case reads this week's late snacks");
+    if (name === "Cortisol") ok(/Coffee after 14:00 on 1 of six days/.test(hp) && /Coffee before 14:00 only/.test(hp), "Cortisol: the case reads this week's coffee, and the tap");
+    if (name === "Testosterone") { ok(/Strength 1 day a week/.test(hp) && /Keep the strength day/.test(hp), "Testosterone: the case reads the training week"); if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT + "-testosterone.png", fullPage: true }); }
+    const hh = await page.locator(".ex-tap").evaluateAll((xs) => xs.map((x) => Math.round(x.getBoundingClientRect().height)));
+    ok(hh.length >= 1 && hh.every((h) => h >= 44), `${name}: taps 44 px or more: ` + hh.join(","));
+    await page.getByRole("button", { name: "‹ Hormones" }).click(); await page.waitForTimeout(300);
+  }
   await page.locator(".ex-map .menu-row").first().click(); await page.waitForTimeout(600);
   let bp = await text(page.locator(".explorer"));
   ok(/Glucose and insulin/.test(await text(page.locator(".ex-h"))) && /When it helps, when it hurts/.test(bp) && /Source:/.test(bp), "Glucose and insulin: the page with its sources");

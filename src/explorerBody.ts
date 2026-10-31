@@ -96,11 +96,12 @@ export function buildIndex(extra: { nutrients: { family: string; name: string; m
   }
   return out;
 }
-// the words typed, each one found in the title or the hint; the title match first, then the hint; at most 12
+// the words typed, each one found in the title or the hint; the title match first, then the hint; a page, family, member or
+// situation before a line that starts with the same word (0.3.27: "sleep" finds the situation before Testosterone's Sleep line); at most 12
 export function searchIndex(index: Hit[], q: string): Hit[] {
   const words = norm(q).split(/\s+/).filter((w) => w.length >= 2);
   if (!words.length) return [];
-  const score = (h: Hit) => { const t = norm(h.title), s = norm(h.hint); let n = 0; for (const w of words) { if (t.includes(w)) n += 3; else if (s.includes(w)) n += 1; else return 0; } return n + (t.startsWith(words[0]) ? 2 : 0); };
+  const score = (h: Hit) => { const t = norm(h.title), s = norm(h.hint); let n = 0; for (const w of words) { if (t.includes(w)) n += 3; else if (s.includes(w)) n += 1; else return 0; } return n + (t.startsWith(words[0]) ? 2 : 0) + (h.kind === "line" || h.kind === "food" ? 0 : 3); };
   return index.map((h) => ({ h, n: score(h) })).filter((x) => x.n > 0).sort((a, b) => b.n - a.n).slice(0, 12).map((x) => x.h);
 }
 
@@ -224,3 +225,103 @@ export const FATBURN_PAGE: SituationPage = {
   sources: "Schoenfeld et al. 2014, J Int Soc Sports Nutr 11:54; Venables, Achten and Jeukendrup 2005, J Appl Physiol 98:160; Hall et al. 2012, Am J Clin Nutr 95:989; Cahill 2006, Annu Rev Nutr 26:1. Educational, approximate, not medical advice.",
 };
 SITUATION_PAGES.fatburn = FATBURN_PAGE;
+
+// ---- 0.3.27 (DT181 v2, Stories130; Milan 14:18 "Next release. Go"): Hormones' other four members. The papers, read again on 31 October 2026 (PubMed):
+// Spiegel, Tasali, Penev and Van Cauter 2004, Ann Intern Med 141:846, doi 10.7326/0003-4819-141-11-200412070-00008 (12 men, two nights of 4 h: leptin 18 % down, ghrelin 28 % up, hunger 24 % up, for calorie-dense, high-carb food)
+// Weigle et al. 2005, Am J Clin Nutr 82:41, doi 10.1093/ajcn.82.1.41 (19 people, protein 15 to 30 % of energy, carbs unchanged: 441 kcal a day less eaten on their own, 4.9 kg over 12 weeks; leptin fell and ghrelin rose, hunger still down)
+// Leproult, Copinschi, Buxton and Van Cauter 1997, Sleep 20:865 (evening cortisol 37 % higher after a night cut to 4 h, 45 % after no sleep; the evening fall at least an hour later)
+// Lovallo et al. 2005, Psychosom Med 67:734, doi 10.1097/01.psy.0000181270.20036.06 (96 people; 250 mg caffeine raised cortisol; with 300 to 600 mg a day the morning response went, the afternoon one stayed, back to normal by the evening)
+// Leproult and Van Cauter 2011, JAMA 305:2173, doi 10.1001/jama.2011.710 (10 young men, a week of 5 h in bed: daytime testosterone 10 to 15 % lower; ageing is 1 to 2 % a year; cortisol unchanged)
+// Kraemer and Ratamess 2005, Sports Med 35:339, doi 10.2165/00007256-200535040-00004 (review: testosterone, growth hormone and cortisol up for 15 to 30 minutes after a session with big muscles, high volume, short rests; resting levels often unchanged while strength and muscle grow)
+// Camacho et al. 2013, Eur J Endocrinol 168:445, doi 10.1530/EJE-12-0890 (EMAS: 2,395 men aged 40 to 79 over 4.4 years: weight loss went with testosterone up, weight gain with testosterone down; a change in physical activity did not move it)
+// Loucks and Thuma 2003, J Clin Endocrinol Metab 88:297, doi 10.1210/jc.2002-020369 (29 women, 5 days: the cycle's signal held at 30 kcal per kg of lean mass a day left after training, and broke below it)
+// Finkelstein et al. 2013, N Engl J Med 369:1011, doi 10.1056/NEJMoa1206168 (400 healthy men 20 to 50, 16 weeks: testosterone keeps muscle and strength; the oestrogen made from it is what keeps body fat from rising; both carry desire)
+export const HORMONE_PAGES: Record<string, BodyPage> = {
+  hunger: {
+    key: "hunger", family: "hormones", name: "Hunger hormones", horizon: "day",
+    intro: "Leptin tells the brain there is enough; ghrelin says eat. Both are normal, all day, in everyone. Sleep, protein and meal size move them. Read at the day. Never a test, a condition or a treatment: for any of those, your doctor.",
+    sections: [
+      { title: "What moves them", lines: [
+        { title: "Two short nights", text: "After two nights of four hours in bed, leptin was 18 % lower and ghrelin 28 % higher in 12 healthy men. Hunger rose by about a quarter, most of all for calorie-dense, high-carb food.", src: "Spiegel, Tasali, Penev and Van Cauter 2004, Annals of Internal Medicine" },
+        { title: "Protein in the meal", text: "Protein raised from 15 to 30 % of the day's energy, carbs unchanged: 19 people ate about 440 kcal a day less without being told to, over 12 weeks. Ghrelin rose and leptin fell as weight came off, and hunger still stayed down.", src: "Weigle et al. 2005, American Journal of Clinical Nutrition" },
+        { title: "Fullness arrives late", text: "The signal from the gut takes time to reach the brain. Fibre and volume on the plate, and a meal eaten at a table, give it time to arrive before the plate is empty. The Plate's Fi letter is that lever." },
+        { title: "A fat loss phase", text: "As weight falls, ghrelin rises and leptin falls, in everyone. That is why a cut gets harder, not weaker will. Protein at every meal and fibre hold it; your protein range is set for that.", src: "Weigle et al. 2005" },
+      ] },
+    ],
+    when: [
+      { verdict: "Helps", when: "Hunger before a planned meal", what: "That is ghrelin doing its job. The meal is on Plan; eat it." },
+      { verdict: "Hurts", when: "Hunger at 22:30 after a short night", what: "Ghrelin up, leptin down, and the brain prefers sweet. A planned snack in the afternoon and dinner at the usual time take it away." },
+      { verdict: "Watch", when: "A fat loss phase", what: "Hunger rises as weight falls. Protein at every meal and fibre keep it in check; the cut stays inside your range." },
+      { verdict: "Helps", when: "Protein first on the plate", what: "The fullest plate for the same energy. That is the plate the app builds anyway." },
+    ],
+    line: "This page explains hunger in anyone. No page reads a level, names a condition, or names a drug that acts on these messengers. Appetite that worries you is a question for your doctor.",
+    chips: ["Why am I hungry at night?", "Which foods keep me full?", "Is hunger on a cut normal?"],
+    sources: "Spiegel, Tasali, Penev and Van Cauter 2004, Ann Intern Med 141:846; Weigle et al. 2005, Am J Clin Nutr 82:41. Educational, approximate, not medical advice.",
+  },
+  cortisol: {
+    key: "cortisol", family: "hormones", name: "Cortisol", horizon: "day",
+    intro: "The morning hormone: high at waking, so you get up; low at night, so you sleep. It rises for an hour around a hard session, and that is normal. Read at the day. Stress as a feeling is not measured here. Never a test, a condition or a treatment: for any of those, your doctor.",
+    sections: [
+      { title: "What moves it", lines: [
+        { title: "A short night", text: "After a night cut to four hours, the next evening's cortisol was 37 % higher; after no sleep, 45 %. The evening fall came at least an hour later. The morning was unchanged.", src: "Leproult, Copinschi, Buxton and Van Cauter 1997, Sleep" },
+        { title: "Caffeine", text: "A 250 mg dose, about one large coffee, raised cortisol in 96 people. With daily caffeine the morning response faded, but the afternoon dose still raised it, and it was back to normal by the evening.", src: "Lovallo et al. 2005, Psychosomatic Medicine" },
+        { title: "A hard session", text: "Cortisol rises with testosterone and growth hormone for 15 to 30 minutes after a session with big muscles and short rests. That is part of the training, not a cost.", src: "Kraemer and Ratamess 2005, Sports Medicine, review" },
+        { title: "A week of short nights", text: "A week of five hours in bed did not raise daytime cortisol in young men; it lowered testosterone instead. One short night moves the evening; a week moves other things.", src: "Leproult and Van Cauter 2011, JAMA" },
+      ] },
+    ],
+    when: [
+      { verdict: "Helps", when: "The morning", what: "High at waking is the design. Breakfast with protein and carbs, and the day starts." },
+      { verdict: "Helps", when: "The hour of a session", what: "The rise is the session doing its work. Eat after, and it settles." },
+      { verdict: "Hurts", when: "Coffee after 14:00", what: "The afternoon dose keeps it up into the evening; the same coffee at 9:00 does little." },
+      { verdict: "Hurts", when: "A short night, the next evening", what: "Higher and later. Dinner at the usual time and bed at the usual time bring the next night back." },
+      { verdict: "Watch", when: "A hard session late", what: "Fine most evenings; one ending within an hour of bed can push sleep later. Keep it is always open." },
+    ],
+    line: "This page explains the daily curve in anyone. No page reads a level, names a condition, or names stress as a diagnosis. A feeling of stress that stays is a question for your doctor.",
+    chips: ["Is coffee after lunch a problem?", "Why am I wired at night?", "Does training late hurt sleep?"],
+    sources: "Leproult, Copinschi, Buxton and Van Cauter 1997, Sleep 20:865; Lovallo et al. 2005, Psychosom Med 67:734; Kraemer and Ratamess 2005, Sports Med 35:339; Leproult and Van Cauter 2011, JAMA 305:2173. Educational, approximate, not medical advice.",
+  },
+  testosterone: {
+    key: "testosterone", family: "hormones", name: "Testosterone", horizon: "month",
+    intro: "Testosterone builds muscle, strength, drive and recovery, in everyone; men have more of it, women have it too. Four levers move it: sleep, strength training, body fat, enough food. Read at the month. No level, no supplement, no booster, ever. If you want your level known, that is a blood test with your doctor.",
+    sections: [
+      { title: "What moves it", lines: [
+        { title: "Sleep", text: "A week of five hours in bed cut daytime testosterone by 10 to 15 % in healthy young men. The usual fall with age is 1 to 2 % a year, so one week of short nights is like ten years, and it comes back with the nights.", src: "Leproult and Van Cauter 2011, JAMA" },
+        { title: "Strength training", text: "A session with big movements, high volume and short rests raises it for 15 to 30 minutes. The long-term gain comes from the training itself: resting levels often do not change while strength and muscle grow.", src: "Kraemer and Ratamess 2005, Sports Medicine, review" },
+        { title: "Body fat", text: "In 2,395 men aged 40 to 79 followed for four years, losing weight went with testosterone up, and gaining with testosterone down. A change in physical activity alone did not move it. Your weigh-ins and the trend on Goal are the app's view of this.", src: "Camacho et al. 2013, European Journal of Endocrinology, the EMAS study" },
+        { title: "Eating far too little", text: "A long, deep cut turns the whole axis down, in everyone. In women the signal broke below 30 kcal per kg of lean mass a day left after training. Your range on Goal is set so that does not happen; Lose fat is the lowest the app goes.", src: "Loucks and Thuma 2003, Journal of Clinical Endocrinology and Metabolism" },
+        { title: "What it does, and what oestrogen does", text: "In 400 healthy men, testosterone kept muscle and strength; the oestrogen made from it kept body fat from rising; both carried desire. The two are one system, in everyone.", src: "Finkelstein et al. 2013, New England Journal of Medicine" },
+      ] },
+    ],
+    when: [
+      { verdict: "Helps", when: "The hour after a strength session", what: "The rise is normal and useful. Eat, then sleep on it." },
+      { verdict: "Hurts", when: "Chasing the hour", what: "Longer sessions and supplements to keep it up do nothing lasting; the training itself does." },
+      { verdict: "Hurts", when: "A week of short nights", what: "The one lever that moves fastest, both ways." },
+      { verdict: "Watch", when: "A fat loss phase", what: "Losing fat helps in the long run; a cut too deep or too long does the opposite. Your range on Goal keeps it inside." },
+    ],
+    line: "No page says your level, low or high. No supplement is named, and no booster: the four levers above are the ones with evidence. If you want your level known, that is a blood test with your doctor.",
+    chips: ["Does my training raise it?", "How much does sleep matter?", "Is a cut bad for it?"],
+    sources: "Leproult and Van Cauter 2011, JAMA 305:2173; Kraemer and Ratamess 2005, Sports Med 35:339; Camacho et al. 2013, Eur J Endocrinol 168:445; Loucks and Thuma 2003, J Clin Endocrinol Metab 88:297; Finkelstein et al. 2013, N Engl J Med 369:1011. Educational, approximate, not medical advice.",
+  },
+  oestrogen: {
+    key: "oestrogen", family: "hormones", name: "Oestrogen", horizon: "month",
+    intro: "Oestrogen is in everyone: women make most of it in the ovaries; men make theirs from testosterone. It keeps bone, says where fat sits, and carries recovery and desire. The same levers as testosterone: sleep, training, body fat, enough food. Read at the month. The cycle gets its own page later. Never a test, a condition or a treatment: for any of those, your doctor.",
+    sections: [
+      { title: "What moves it", lines: [
+        { title: "Made from testosterone, in men too", text: "In 400 healthy men, the oestrogen made from testosterone was what kept body fat from rising; testosterone itself kept muscle and strength. Lower one and the other follows.", src: "Finkelstein et al. 2013, New England Journal of Medicine" },
+        { title: "Enough food after training", text: "In 29 women, the signal that drives the cycle held at 30 kcal per kg of lean mass a day left over after training, and broke below it within five days. Not body fat: the energy left after the session. Your range on Goal keeps that line.", src: "Loucks and Thuma 2003, Journal of Clinical Endocrinology and Metabolism" },
+        { title: "Body fat, both ways", text: "Fat tissue makes some oestrogen in everyone. Too little fat and too little food lower it; too much shifts the balance the other way. The middle of your range on Goal is where it sits best." },
+        { title: "Bone", text: "Oestrogen is the hormone that holds bone, in men and women. Strength training, calcium and vitamin D from Micros, and enough food are the levers the app has. Its own page is under Bone." },
+      ] },
+    ],
+    when: [
+      { verdict: "Helps", when: "Eating enough on training days", what: "The energy left after the session is what the signal reads. Carbs after training count twice: glycogen and this." },
+      { verdict: "Hurts", when: "A deep cut with hard training", what: "The fastest way to push the energy left below the line. Lose fat with the training kept easy, or keep the food up." },
+      { verdict: "Watch", when: "A long cut", what: "Weeks matter more than days. The check-in on Goal is where the length is read." },
+      { verdict: "Helps", when: "Strength training, twice a week", what: "For bone and for the whole axis, in everyone." },
+    ],
+    line: "No page reads a level, names a condition, or names a treatment. A cycle that changes, or any question about it, is for your doctor. The cycle's page, when it comes, keeps the same line.",
+    chips: ["Do men have oestrogen?", "Is my cut too deep?", "What does it do for bone?"],
+    sources: "Finkelstein et al. 2013, N Engl J Med 369:1011; Loucks and Thuma 2003, J Clin Endocrinol Metab 88:297. Educational, approximate, not medical advice.",
+  },
+};
+for (const k of Object.keys(HORMONE_PAGES)) { BODY_PAGES[k] = HORMONE_PAGES[k]; const m = HORMONE_MEMBERS.find((x) => x.key === k); if (m) m.page = k; }
