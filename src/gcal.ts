@@ -90,12 +90,27 @@ export function calendarEvents(x: CalInput): CalEvent[] {
 export type Fetch = (url: string, init?: RequestInit) => Promise<Response>;
 const API = "https://www.googleapis.com/calendar/v3";
 export class CalError extends Error { constructor(public status: number, msg: string) { super(msg); } }
+// 0.3.22: Google asks to slow down (429, or 403 with a rate reason): wait and try again, up to 3 times
+export let retryWait = (n: number) => new Promise<void>((ok) => setTimeout(ok, 1000 * 2 ** n));
+export const setRetryWait = (w: (n: number) => Promise<void>) => { retryWait = w; };
 async function call(f: Fetch, token: string, method: string, path: string, body?: unknown): Promise<any> {
-  const r = await f(`${API}${path}`, { method, headers: { Authorization: `Bearer ${token}`, ...(body ? { "Content-Type": "application/json" } : {}) }, body: body ? JSON.stringify(body) : undefined });
-  if (r.status === 204) return null;
-  const j = await r.json().catch(() => null);
-  if (!r.ok) throw new CalError(r.status, j?.error?.message || `Google Calendar answered ${r.status}`);
-  return j;
+  for (let n = 0; ; n++) {
+    // 0.3.22: no call waits longer than 20 seconds
+    const signal = typeof AbortSignal !== "undefined" && "timeout" in AbortSignal ? AbortSignal.timeout(20000) : undefined;
+    const r = await f(`${API}${path}`, { method, signal, headers: { Authorization: `Bearer ${token}`, ...(body ? { "Content-Type": "application/json" } : {}) }, body: body ? JSON.stringify(body) : undefined });
+    if (r.status === 204) return null;
+    const j = await r.json().catch(() => null);
+    const slow = r.status === 429 || (r.status === 403 && /rate|quota/i.test(JSON.stringify(j?.error ?? "")));
+    if (slow && n < 3) { await retryWait(n); continue; }
+    if (!r.ok) throw new CalError(r.status, j?.error?.message || `Google Calendar answered ${r.status}`);
+    return j;
+  }
+}
+// a few at a time: 100 events one by one took about a minute on a phone (Coach Milan, 31 October 01:04)
+export const CAL_AT_ONCE = 6;
+async function pool<T>(items: T[], n: number, run: (x: T) => Promise<void>) {
+  let i = 0;
+  await Promise.all(Array.from({ length: Math.min(n, items.length) }, async () => { while (i < items.length) { const x = items[i++]; await run(x); } }));
 }
 export const makeCalendar = async (f: Fetch, token: string, timeZone: string): Promise<string> => (await call(f, token, "POST", "/calendars", { summary: CAL_NAME, description: "Your meals, cooking and training from Chef Mealan. Names and times only.", timeZone })).id;
 export const removeCalendar = (f: Fetch, token: string, id: string) => call(f, token, "DELETE", `/calendars/${encodeURIComponent(id)}`).catch((e) => { if (!(e instanceof CalError && (e.status === 404 || e.status === 410))) throw e; });
@@ -106,9 +121,11 @@ export type SyncResult = { id: string; made: number; changed: number; removed: n
 // Brings the calendar to the events asked for, between from and to: new ones in, changed ones updated, ours that are no longer
 // planned taken out. Events someone added to the calendar by hand (without our mark) stay. A calendar removed in Google is
 // made again.
-export async function syncCalendar(f: Fetch, token: string, id: string | undefined, events: CalEvent[], from: string, to: string, timeZone: string): Promise<SyncResult> {
+export type SyncHooks = { onCreated?: (id: string) => void; onProgress?: (done: number, total: number) => void };
+export async function syncCalendar(f: Fetch, token: string, id: string | undefined, events: CalEvent[], from: string, to: string, timeZone: string, hooks: SyncHooks = {}): Promise<SyncResult> {
   let created = false;
-  if (!id) { id = await makeCalendar(f, token, timeZone); created = true; }
+  // 0.3.22: the new calendar's id is kept at once, before any event is written, so leaving the page never loses it
+  if (!id) { id = await makeCalendar(f, token, timeZone); created = true; hooks.onCreated?.(id); }
   const cal = `/calendars/${encodeURIComponent(id)}/events`;
   const have = new Map<string, { h?: string; cm?: boolean }>();
   try {
@@ -120,20 +137,25 @@ export async function syncCalendar(f: Fetch, token: string, id: string | undefin
       page = r?.nextPageToken;
     } while (page);
   } catch (e) {
-    if (e instanceof CalError && (e.status === 404 || e.status === 410) && !created) return syncCalendar(f, token, undefined, events, from, to, timeZone);
+    if (e instanceof CalError && (e.status === 404 || e.status === 410) && !created) return syncCalendar(f, token, undefined, events, from, to, timeZone, hooks);
     throw e;
   }
-  let made = 0, changed = 0, removed = 0;
+  let made = 0, changed = 0, removed = 0, done = 0;
   const want = new Set(events.map((e) => e.id));
+  type Job = () => Promise<void>;
+  const jobs: Job[] = [];
   for (const e of events) {
     const h = have.get(e.id);
-    if (!h) {
+    if (!h) jobs.push(async () => {
       try { await call(f, token, "POST", cal, body(e)); }
       // the id was used before (an event taken out earlier keeps its id): bring it back
       catch (err) { if (err instanceof CalError && err.status === 409) await call(f, token, "PUT", `${cal}/${e.id}`, body(e)); else throw err; }
       made++;
-    } else if (h.h !== e.h) { await call(f, token, "PUT", `${cal}/${e.id}`, body(e)); changed++; }
+    });
+    else if (h.h !== e.h) jobs.push(async () => { await call(f, token, "PUT", `${cal}/${e.id}`, body(e)); changed++; });
   }
-  for (const [eid, h] of have) if (h.cm && !want.has(eid)) { await call(f, token, "DELETE", `${cal}/${eid}`).catch((e) => { if (!(e instanceof CalError && (e.status === 404 || e.status === 410))) throw e; }); removed++; }
+  for (const [eid, h] of have) if (h.cm && !want.has(eid)) jobs.push(async () => { await call(f, token, "DELETE", `${cal}/${eid}`).catch((e) => { if (!(e instanceof CalError && (e.status === 404 || e.status === 410))) throw e; }); removed++; });
+  if (jobs.length) hooks.onProgress?.(0, jobs.length);
+  await pool(jobs, CAL_AT_ONCE, async (j) => { await j(); hooks.onProgress?.(++done, jobs.length); });
   return { id, made, changed, removed, created };
 }

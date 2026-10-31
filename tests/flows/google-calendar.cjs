@@ -20,7 +20,7 @@ const PORT = "3198", B = `http://127.0.0.1:${PORT}`;
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
   const errs = [];
   // the stand-in Google Calendar
-  const cals = new Map(); let n = 0; const auths = new Set();
+  const cals = new Map(); let n = 0; const auths = new Set(); let inFlight = 0, most = 0, slowMs = 60;
   const google = async (route) => {
     const req = route.request(), u = new URL(req.url()), m = req.method(), body = req.postData() ? JSON.parse(req.postData()) : null;
     auths.add(req.headers()["authorization"]);
@@ -32,6 +32,8 @@ const PORT = "3198", B = `http://127.0.0.1:${PORT}`;
     if (m === "DELETE" && parts.length === 5) { cals.delete(parts[4]); return send(204); }
     const eid = parts[6];
     if (m === "GET") return send(200, { items: [...cal.events.values()].filter((e) => e.status !== "cancelled") });
+    // 0.3.22: Google on a phone, slow: each new event takes a while; the most at once is counted
+    if (m === "POST") { inFlight++; most = Math.max(most, inFlight); await new Promise((r) => setTimeout(r, slowMs)); inFlight--; }
     if (m === "POST") { if (cal.events.has(body.id)) return send(409, { error: { message: "exists" } }); cal.events.set(body.id, body); return send(200, body); }
     if (m === "PUT") { cal.events.set(eid, body); return send(200, body); }
     if (m === "DELETE") { const e = cal.events.get(eid); if (!e) return send(404, {}); e.status = "cancelled"; return send(204); }
@@ -70,7 +72,14 @@ const PORT = "3198", B = `http://127.0.0.1:${PORT}`;
     ok(/Never kcal, protein, your goal/.test(await page.locator("main").textContent()), "what an event says");
     const hs = await page.locator(".cal-kind, .cal-connect").evaluateAll((bs) => bs.map((x) => Math.round(x.getBoundingClientRect().height)));
     ok(hs.every((h) => h >= 44), "every control 44 px or more: " + hs.join(","));
-    await page.getByRole("button", { name: "Connect Google Calendar" }).click(); await page.waitForTimeout(1500);
+    await page.getByRole("button", { name: "Connect Google Calendar" }).click(); await page.waitForTimeout(500);
+    // 0.3.22 (Coach Milan 31 October 01:04: a minute on Connecting, then he left the page and Connect was back)
+    ok(/Writing to Google Calendar: \d+ of \d+/.test(await page.locator(".cal-line").textContent()), "while writing, the page says how far: " + await page.locator(".cal-line").textContent());
+    ok((await personal()).calendar?.on === true && /^cal1@/.test((await personal()).calendar?.id), "the calendar is noted as soon as Google makes it");
+    await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(3000);
+    ok(most > 1 && most <= 6, "events are written a few at a time: " + most);
+    slowMs = 0;
+    await me(); await page.locator(".menu-row").filter({ hasText: "Google Calendar" }).click(); await page.waitForTimeout(800);
     const p1 = await personal();
     ok(p1.calendar && p1.calendar.on === true && /^cal1@/.test(p1.calendar.id), "on, with the calendar's id kept");
     ok([...cals.values()][0]?.summary === "Chef Mealan", "a calendar of its own, called Chef Mealan");
