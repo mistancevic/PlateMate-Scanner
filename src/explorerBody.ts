@@ -525,3 +525,56 @@ export const REST_PAGE: SituationPage = {
 };
 SITUATION_PAGES.late = LATE_PAGE; SITUATION_PAGES.rest = REST_PAGE;
 for (const s of SITUATIONS) { if (s.id === "late") { s.state = "page"; s.hint = "Work ran late, dinner is late. What a late dinner does, and your case from the calendar."; } if (s.id === "rest") { s.state = "page"; s.hint = "The carbs have no job, the protein still has one. Your case from the training week."; } }
+
+// ---- 0.3.34 (DT191 A party or a dinner out, Stories140; DT192 A day away, no kitchen, Stories141). Papers read on PubMed today:
+// Hall et al. 2012, Am J Clin Nutr 95:989 (the board said Lancet; the paper is in Am J Clin Nutr); Siler 1999; Ebrahim 2013; Weigle 2005; Jensen 2011; Ludwig 2002.
+export const PARTY_PAGE: SituationPage = {
+  id: "party", name: "A party or a dinner out",
+  intro: "A day situation, read against the week. One big meal, some drinks, a late night. What one evening does and does not do, and your case against the week. Drinks are counted as energy, never judged; a drinking habit that worries you is a question for your doctor.",
+  effects: [
+    { title: "One meal does not move the trend", text: "A 1,200 kcal dinner is a day over the range, not a week. Fat is stored only from energy over the week's spend; the scale the next morning shows water and the meal itself, not fat.", src: "Hall et al. 2012, American Journal of Clinical Nutrition, the energy balance consensus; The fat store page" },
+    { title: "The drinks", text: "The body burns the alcohol first: after about two drinks, fat burning fell 73 % for the hours after in 8 men. A drink is 7 kcal a gram and counts as energy; the second half of the night's sleep breaks.", src: "Siler, Neese and Hellerstein 1999, American Journal of Clinical Nutrition; Ebrahim et al. 2013" },
+    { title: "The morning after", text: "Breakfast as usual. The day's target is the day's target; the week carries one evening, and a skipped breakfast adds a second day over the range.", src: "Jensen et al. 2011; The liver page" },
+  ],
+  causes: [
+    { title: "The day before the evening", text: "A lunch with protein and fibre and the usual snack keep the evening's hunger normal. A lunch skipped before a dinner out is the meal that goes wrong.", src: "Weigle et al. 2005, American Journal of Clinical Nutrition; the Hunger hormones page" },
+    { title: "Water between drinks", text: "Counts the drinks for you; the night is better." },
+  ],
+  loop: { title: "The week", text: "Six of seven days by the plan is the week's goal. One evening out is inside that; the second and third are what move the trend." },
+  when: [
+    { verdict: "Helps", when: "Lunch with protein and fibre", what: "The evening's hunger stays normal; the plate at the party stays a plate." },
+    { verdict: "Helps", when: "Water between drinks", what: "Counts the drinks for you; the night is better." },
+    { verdict: "Helps", when: "Breakfast as usual the next day", what: "The week carries one evening; a skipped breakfast adds a second day over the range." },
+    { verdict: "Watch", when: "The scale the next morning", what: "Water and the meal; not fat. The 7-day average is the number to read." },
+    { verdict: "Hurts", when: "Lunch skipped before a dinner out", what: "The evening gets bigger, not smaller." },
+  ],
+  line: "A party is a day situation. Drinks are counted as energy, never judged; a drinking habit that worries you is a question for your doctor.",
+  chips: ["How many kcal in a dinner out?", "Does one evening undo the week?", "What do I eat tomorrow?"],
+  sources: "Hall et al. 2012, Am J Clin Nutr 95:989; Siler, Neese and Hellerstein 1999, Am J Clin Nutr 70:928; Ebrahim et al. 2013, Alcohol Clin Exp Res 37:539; Weigle et al. 2005, Am J Clin Nutr 82:41; Jensen et al. 2011, J Biomed Biotechnol 2011:960363. Educational, approximate, not medical advice.",
+};
+export const AWAY_PAGE: SituationPage = {
+  id: "away", name: "A day away, no kitchen",
+  intro: "A day situation. Travel, a client's office, a whole day out. Bought food all day, the Fi letter low, no scale. What helps, mostly doors the app already has, and your case from the calendar and Travel mode. Where you are comes from Travel mode and the calendar only when you switch them on.",
+  effects: [
+    { title: "Bought food is low on fibre and high on fat", text: "A sandwich, a canteen plate, a station snack: the Fi letter runs low and F runs high for the day. The day's numbers hold; the letters tell where.", src: "The Plate's letters; Ludwig 2002, JAMA, on fibre and fullness" },
+    { title: "A photo of the plate", text: "A plate at the table read as estimates, the three gates, one line what to do. The closest the app gets to a kitchen on a day out." },
+    { title: "Travel mode", text: "Where you are, the foods of the place, the shops near. The plan follows you; the numbers stay yours. On Me." },
+  ],
+  causes: [
+    { title: "Nothing until the evening", text: "The long afternoon again; the station shop at 19:00 is what hunger picks. A snack to carry is the lever.", src: "Weigle et al. 2005; the Hunger hormones page" },
+    { title: "A snack to carry", text: "The calendar already asks when a block runs from morning to evening: a snack to take along. Nuts and a fruit, skyr, a boiled egg: protein and fibre that travel." },
+  ],
+  loop: { title: "The Fi letter", text: "Low all day on bought food. A salad or beans with one meal brings it back; dinner at home does the rest." },
+  when: [
+    { verdict: "Helps", when: "A snack to carry", what: "Packed the evening before; Plan asks for it when the calendar says out all day." },
+    { verdict: "Helps", when: "A photo of every bought plate", what: "Read as estimates; the day adds up anyway." },
+    { verdict: "Helps", when: "Travel mode on", what: "The foods of the place and the shops near, for a day or a week." },
+    { verdict: "Watch", when: "The Fi letter", what: "Low all day on bought food. A salad or beans with one meal brings it back." },
+    { verdict: "Hurts", when: "Nothing until the evening", what: "The long afternoon again; the station shop at 19:00 is what hunger picks." },
+  ],
+  line: "A day away is a day situation. Where you are comes from Travel mode and the calendar only when you switch them on; nothing reads your location otherwise.",
+  chips: ["What do I take along?", "What is a good canteen plate?", "How do I count a sandwich?"],
+  sources: "Ludwig 2002, JAMA 287:2414; Weigle et al. 2005, Am J Clin Nutr 82:41; the app's own pages: the letters (DT108), the photo of the plate (DT127), Travel mode (DT176), the snack to carry (DT179). Educational, approximate, not medical advice.",
+};
+SITUATION_PAGES.party = PARTY_PAGE; SITUATION_PAGES.away = AWAY_PAGE;
+for (const s of SITUATIONS) { if (s.id === "party") { s.state = "page"; s.hint = "One big meal, some drinks. What one evening does and does not do, against the week."; } if (s.id === "away") { s.state = "page"; s.hint = "Bought food all day. The letters, the photo of the plate, the snack to carry, Travel mode."; } }

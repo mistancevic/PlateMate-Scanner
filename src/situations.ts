@@ -19,7 +19,7 @@ const clockOf = (iso: string) => { const d = new Date(iso); return `${pad(d.getH
 const COFFEE = /coffee|espresso|kaffee|cappuccino|latte|americano|cold brew|energy drink|cola\b/i;
 const ALCOHOL = /\bbeer\b|\bwine\b|\bbier\b|\bwein\b|rakija|whisky|vodka|gin\b|prosecco|cocktail|spritz/i;
 
-export type Tap = { id: "protein" | "snack" | "easy" | "dinner" | "sleep" | "plan"; label: string; where: string };
+export type Tap = { id: "protein" | "snack" | "easy" | "dinner" | "sleep" | "plan" | "scan"; label: string; where: string };
 export type SleepCase = {
   parts: { k: string; title: string; body: string }[];
   taps: Tap[];
@@ -468,5 +468,53 @@ export function restCase(x: RestIn, today = new Date()): Case {
     { k: "3", title: "Now", body: `A rest day. Planned: ${plannedWords}. ${tm && tm.kind !== "rest" ? `Tomorrow: ${planLine({ ...tm, when: undefined })}.` : "Tomorrow: a rest day too."}` },
     { k: "4", title: "The path on", body: "" },
     { k: "5", title: "The goal: the day", body: "The rest day's numbers, protein in the range, the walk." },
+  ], taps, trend: null };
+}
+
+// ---- 0.3.34: A party or a dinner out (day, against the week) and A day away, no kitchen (day, from the calendar and Travel mode) ----
+export type PartyIn = FatIn & { busy: { s: number; e: number }[] | null; pdRef: number | null };
+export function partyCase(x: PartyIn, today = new Date()): Case {
+  const l = lifestyleOf(x.personal), key = ymd(today), slots = slotsOn(l, x.personal.timesOn, key);
+  const w = x.personal.weightKg ?? 0, tr = w ? trendOf(x.personal.weighIns, x.band, w, x.personal.trainingAge, today) : null, a7 = avg7(x.personal.weighIns, today);
+  const days = Array.from({ length: 7 }, (_, i) => plusDays(key, -(7 - i)));
+  const lived = days.filter((d) => { const dt = new Date(`${d}T12:00:00`); const sl = slotsOn(l, x.personal.timesOn, d); const rec = dayRecord(sl, x.planned[d], dayLog(x.feedback, dt).logged, d); return livedByPlan({ planned: rec.planned, open: rec.open.length, kcal: rec.kcal, protein: rec.protein }, x.numbersFor(dt)).lived; }).length;
+  const drinkDays = days.filter((d) => eveningOf(x.feedback, d).drink).length;
+  const blocks = x.busy ? blocksOn(key, x.busy) : [];
+  const evening = blocks.find((b) => b.from >= 17 * 60 && b.to - b.from >= 90) ?? null;
+  const lunch = slots.find((s) => /lunch/i.test(s.name)), held = lunch ? x.planned[key]?.[lunch.id] : undefined;
+  const n = x.numbersFor(today); const rates = ratesOf(n as any, x.pdRef); const le = held?.items ? lettersFor(held.items, rates) : null;
+  const change = tr && tr.change !== null ? `${tr.change > 0 ? "up" : "down"} ${Math.abs(tr.change).toFixed(1)} kg over ${tr.weeks} ${tr.weeks === 1 ? "week" : "weeks"}` : "too few weigh-ins for a trend yet";
+  const taps: Tap[] = [
+    held ? { id: "protein", label: le && le.p === "P" && !le.fi.endsWith("-") && le.fi !== "fi" ? "Keep lunch as planned" : "Lunch with protein and fibre", where: le && le.p === "P" && !le.fi.endsWith("-") && le.fi !== "fi" ? "It already does what this page says" : "Ask Chef Mealan for the plate; your numbers unchanged" } : { id: "protein", label: "Lunch with protein and fibre", where: "Ask Chef Mealan for the plate; your numbers unchanged" },
+    { id: "scan", label: "Log the evening as one meal", where: "A photo of the plate at the table; the three gates read it" },
+    { id: "dinner", label: "Tomorrow as usual", where: "Breakfast on Plan, as every day" },
+  ];
+  return { parts: [
+    { k: "1", title: "Before: your usual", body: `${goalLabel(x.band)}. ${lived} of 7 days by the plan this week so far.${lunch ? ` Lunch at ${lunch.time}.` : ""}` },
+    { k: "2", title: "The path here", body: `${a7 !== null ? `The 7-day average ${a7.toFixed(1)} kg, trend ${change}.` : `Trend: ${change}.`}${drinkDays ? ` A drink on ${drinkDays} ${drinkDays === 1 ? "evening" : "evenings"} this week.` : ""}` },
+    { k: "3", title: "Now", body: `${evening ? `Tonight: out from ${clock(evening.from)} to ${clock(evening.to)}, from the calendar.` : "Tonight: the evening you opened this page for."} ${held ? `Lunch planned: ${held.title}${le ? `, ${le.text}` : ""}.` : "Nothing planned for lunch yet."}` },
+    { k: "4", title: "The path on", body: "" },
+    { k: "5", title: "The goal: the week", body: `Six of seven days by the plan${tr ? `; ${expectedWords(tr.expected)}` : ""}. One evening is inside that.` },
+  ], taps, trend: null };
+}
+export type AwayIn = { personal: Personal; planned: Planned; busy: { s: number; e: number }[] | null; travel: { place: string; since: string } | null };
+export function awayCase(x: AwayIn, today = new Date()): Case {
+  const l = lifestyleOf(x.personal), key = ymd(today), slots = slotsOn(l, x.personal.timesOn, key);
+  const blocks = x.busy ? blocksOn(key, x.busy) : [];
+  const out = blocks.find((b) => b.to - b.from >= 6 * 60) ?? null;
+  const lunch = slots.find((s) => /lunch/i.test(s.name)), snack = slots.find((s) => /snack/i.test(s.name)), last = slots[slots.length - 1];
+  const held = x.planned[key] ?? {};
+  const where = (l.where ?? []).join(", ");
+  const taps: Tap[] = [
+    { id: "protein", label: "A snack to carry", where: "Chef Mealan's ideas for the bag" },
+    { id: "scan", label: "Lunch as a photo of the plate", where: "At the table, the three gates read it" },
+    x.travel ? { id: "plan", label: `Travel mode is on, ${x.travel.place}`, where: "Nothing to change here" } : { id: "plan", label: "Travel mode on for today", where: "On Me: pick where you are; the plan follows you" },
+  ];
+  return { parts: [
+    { k: "1", title: "Before: your usual", body: `${l.meals ?? 3} meals a day${where ? `, ${where.toLowerCase()}` : ""}, from Lifestyle.` },
+    { k: "2", title: "The path here", body: `${out ? `Out from ${clock(out.from)} to ${clock(out.to)} today, from the calendar.` : x.busy ? "No block in the calendar runs the whole day; this page is for the day you opened it on." : "No calendar read; the day away is the one you opened this page on."} Travel mode ${x.travel ? `on, ${x.travel.place}` : "off"}.` },
+    { k: "3", title: "Now", body: `${lunch ? (held[lunch.id] ? `Lunch planned: ${held[lunch.id].title}.` : "Nothing planned for lunch;") : ""}${snack ? ` the snack slot ${held[snack.id] ? `holds ${held[snack.id].title}` : "empty"}.` : " no snack slot in the day."}${last ? ` ${last.name} at home at ${last.time}${held[last.id] ? ", planned" : ""}.` : ""}` },
+    { k: "4", title: "The path on", body: "" },
+    { k: "5", title: "The goal: the day", body: "The day inside the range; Fi back in range with dinner." },
   ], taps, trend: null };
 }
