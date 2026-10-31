@@ -116,3 +116,41 @@ test("0.3.26: fat case: the goal, the week by the plan, the trend against what t
   assert.ok(c.taps.some((t) => t.id === "easy") && c.taps.some((t) => t.id === "protein"));
   assert.ok(c.parts[4].body.includes("six of seven days by the plan"));
 });
+
+// 0.3.27: Hormones' other four
+import { hormoneCase } from "./situations";
+import { HORMONE_PAGES } from "./explorerBody";
+test("0.3.27: the four hormone pages exist, with their papers, and every member has a page", () => {
+  for (const k of ["hunger", "cortisol", "testosterone", "oestrogen"]) { const pg = HORMONE_PAGES[k]; assert.ok(pg && pg.family === "hormones" && pg.when.length >= 4 && pg.chips.length === 3 && /Educational/.test(pg.sources), k); assert.equal(BODY_PAGES[k], pg); }
+  assert.ok(HORMONE_MEMBERS.every((m) => m.page));
+  assert.match(HORMONE_PAGES.testosterone.sections[0].lines[0].text, /10 to 15 %/);
+  assert.match(HORMONE_PAGES.hunger.sections[0].lines[0].text, /18 % lower and ghrelin 28 % higher/);
+  assert.match(HORMONE_PAGES.cortisol.sections[0].lines[0].text, /37 % higher/);
+  const idx = buildIndex({ nutrients: [] });
+  const hit = searchIndex(idx, "ghrelin")[0];
+  assert.ok(hit && hit.go.body === "hormones" && hit.go.member === "hunger", JSON.stringify(hit));
+});
+test("0.3.27: the hormone cases read the week's evenings, the training week and the goal", () => {
+  const fb = [eaten("2026-10-31", "22:30", "Chocolate"), eaten("2026-11-01", "22:30", "Chocolate"), eaten("2026-11-01", "16:30", "Coffee", "", ["Coffee, black"]), eaten("2026-10-30", "16:30", "Coffee", "", ["Coffee, black"]), eaten("2026-10-29", "15:30", "Coffee", "", ["Coffee, black"])];
+  const x = { personal: { ...personal, weightKg: 85 } as Personal, feedback: fb, planned: {}, band: "fatloss", numbersFor: () => ({ kcal: 2000, protein: 150 }), pdRef: null };
+  const h = hormoneCase("hunger", x, monday);
+  assert.match(h.parts[1].body, /after 21:30 on 2 of six evenings/);
+  assert.match(h.parts[2].body, /ghrelin rises/);
+  assert.ok(h.taps.some((t) => t.id === "protein") && h.taps.some((t) => t.id === "sleep"));
+  const c = hormoneCase("cortisol", x, monday);
+  assert.match(c.parts[1].body, /Coffee after 14:00 on 3 of six days/);
+  assert.ok(c.taps.some((t) => t.id === "plan" && /Coffee before 14:00/.test(t.label)));
+  assert.match(c.trend ?? "", /last coffee before 14:00/);
+  const t = hormoneCase("testosterone", x, monday);
+  assert.match(t.parts[0].body, /Strength 1 day a week/);
+  assert.ok(t.taps.some((tp) => /Keep the strength day/.test(tp.label)) && t.taps.some((tp) => tp.id === "sleep"));
+  const o = hormoneCase("oestrogen", x, monday);
+  assert.match(o.parts[2].body, /energy left after training/);
+  assert.match(o.parts[4].title, /check-in/);
+});
+import { expectedWords } from "./situations";
+test("0.3.27: the expected change in words, never a minus sign", () => {
+  assert.equal(expectedWords([-0.5, 0.5]), "within 0.5 kg either way");
+  assert.equal(expectedWords([-2, -1]), "down 1 to 2 kg");
+  assert.equal(expectedWords([0.5, 1]), "up 0.5 to 1 kg");
+});

@@ -19,7 +19,7 @@ const clockOf = (iso: string) => { const d = new Date(iso); return `${pad(d.getH
 const COFFEE = /coffee|espresso|kaffee|cappuccino|latte|americano|cold brew|energy drink|cola\b/i;
 const ALCOHOL = /\bbeer\b|\bwine\b|\bbier\b|\bwein\b|rakija|whisky|vodka|gin\b|prosecco|cocktail|spritz/i;
 
-export type Tap = { id: "protein" | "snack" | "easy" | "dinner"; label: string; where: string };
+export type Tap = { id: "protein" | "snack" | "easy" | "dinner" | "sleep" | "plan"; label: string; where: string };
 export type SleepCase = {
   parts: { k: string; title: string; body: string }[];
   taps: Tap[];
@@ -184,6 +184,8 @@ export function glycogenCase(personal: Personal, today = new Date()): Case {
   };
 }
 
+// the goal's expected change in words, never a minus sign: down 1.0 to 2.0 kg, up 0.5 to 1.0 kg, within 0.5 kg either way
+export const expectedWords = (e: [number, number]) => e[0] < 0 && e[1] > 0 ? `within ${Math.max(-e[0], e[1])} kg either way` : e[1] <= 0 ? `down ${Math.abs(e[1])} to ${Math.abs(e[0])} kg` : `up ${e[0]} to ${e[1]} kg`;
 export type FatIn = { personal: Personal; feedback: Feedback[]; planned: Planned; band: string; goalSetAt?: string; numbersFor: (d: Date) => { kcal: number; protein: number } | null };
 export function fatCase(x: FatIn, today = new Date()): Case {
   const l = lifestyleOf(x.personal), key = ymd(today);
@@ -198,7 +200,7 @@ export function fatCase(x: FatIn, today = new Date()): Case {
   const goalName = goalLabel(x.band);
   const since = x.goalSetAt ? new Date(x.goalSetAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" }) : null;
   const change = tr && tr.change !== null ? `${tr.change > 0 ? "up" : "down"} ${Math.abs(tr.change).toFixed(1)} kg over ${tr.weeks} ${tr.weeks === 1 ? "week" : "weeks"}` : "too few weigh-ins for a trend yet";
-  const expected = tr ? `${tr.expected[0]} to ${tr.expected[1]} kg` : null;
+  const expected = tr ? expectedWords(tr.expected) : null;
   const taps: Tap[] = [
     { id: "easy", label: "A 30 minute walk after lunch, most days", where: "Easy work that adds up; ask Chef Mealan where it fits your day" },
     ...(over >= 2 ? [{ id: "dinner" as const, label: `Dinner inside the range on the ${over} long days`, where: "Chef Mealan's quick dinners, cooked ahead" }] : []),
@@ -215,4 +217,69 @@ export function fatCase(x: FatIn, today = new Date()): Case {
     taps,
     trend: tr && tr.change !== null && tr.verdict !== "too few" ? `Your trend: ${change}. Your goal needs ${expected}. ${tr.verdict === "on track" ? "They point the same way: nothing to change." : tr.verdict === "slower" || (x.band !== "maintain" && tr.verdict === "up") ? "The gap is a walk a day and the days over the range, not a harder cut." : tr.verdict === "faster" ? "Faster than the goal expects: eat to the range, the cut is deep enough." : "Read the record on Goal with your coach."}` : null,
   };
+}
+
+// ---- 0.3.27: the cases for Hormones' other four: Hunger hormones and Cortisol (per day), Testosterone and Oestrogen (per month) ----
+export type HormoneIn = FatIn & { pdRef: number | null };
+const KINDS_STRENGTH = /strength|hiit|team|club|match/;
+export function hormoneCase(key: string, x: HormoneIn, today = new Date()): Case {
+  const l = lifestyleOf(x.personal), key7 = ymd(today), slots = slotsOf(l), last = slots[slots.length - 1], snack = slots.find((s) => /snack/i.test(s.name));
+  const days6 = Array.from({ length: 6 }, (_, i) => plusDays(key7, -(6 - i)));
+  const evenings = days6.map((d) => eveningOf(x.feedback, d));
+  const lateNights = evenings.filter((e) => e.late > 0).length, coffeeDays = evenings.filter((e) => e.coffeeLate).length, drinkDays = evenings.filter((e) => e.drink).length;
+  const bed = l.bed ? BED_WORDS[l.bed] : null, wake = l.wake ? WAKE_WORDS[l.wake] : null;
+  const usualNight = bed || wake ? `Bed ${bed ?? "at your usual time"}, up ${wake ?? "at your usual time"}.` : "No bedtime set in Lifestyle yet.";
+  const tr = dayFor(x.personal, today)?.day ?? getDay(x.personal, today).plan ?? null, tw = trainingWhen(tr);
+  const hardLate = Boolean(tr && tr.kind !== "rest" && tr.intensity === "hard" && tr.at && toMin(tr.at) >= 19 * 60);
+  const week = x.personal.plan ?? [];
+  const strengthDays = week.filter((d) => d && d.kind !== "rest" && KINDS_STRENGTH.test(d.kind)).length, trainingDays = week.filter((d) => d && d.kind !== "rest").length;
+  const w = x.personal.weightKg ?? 0, trend = w ? trendOf(x.personal.weighIns, x.band, w, x.personal.trainingAge, today) : null;
+  const change = trend && trend.change !== null ? `${trend.change > 0 ? "up" : "down"} ${Math.abs(trend.change).toFixed(1)} kg over ${trend.weeks} ${trend.weeks === 1 ? "week" : "weeks"}` : "too few weigh-ins for a trend yet";
+  const cutting = x.band === "fatloss", goalName = goalLabel(x.band);
+  const n = x.numbersFor(today);
+  const since = x.goalSetAt ? new Date(x.goalSetAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" }) : null;
+  const dinnerTap: Tap = { id: "sleep", label: `Dinner at ${last?.time ?? "the usual time"} all week, bed at the usual time`, where: "See A bad night's sleep in Situations" };
+  if (key === "hunger") {
+    const taps: Tap[] = [
+      { id: "protein", label: "Protein at every meal, fibre with it", where: `Ask Chef Mealan for the plate; ${n ? `${Math.round(n.protein)} g a day` : "your range"} unchanged` },
+      snack ? { id: "snack", label: `The planned snack at ${snack.time}`, where: "On Plan, instead of a craving at 22:30" } : { id: "snack", label: "A snack slot in the afternoon", where: "In Lifestyle, meals a day; then a planned snack instead of a craving" },
+      ...(lateNights >= 2 ? [dinnerTap] : []),
+    ];
+    return { parts: [
+      { k: "1", title: "Before: your usual", body: `${l.meals ?? 3} meals a day${last ? `, ${last.name.toLowerCase()} at ${last.time}` : ""}. ${usualNight}${n ? ` Protein ${Math.round(n.protein)} g a day.` : ""}` },
+      { k: "2", title: "The path here: this week", body: [lateNights ? `Something eaten after 21:30 on ${lateNights} of six evenings.` : "Nothing eaten after 21:30 this week.", drinkDays ? `A drink on ${drinkDays} ${drinkDays === 1 ? "day" : "days"}.` : ""].filter(Boolean).join(" ") },
+      { k: "3", title: "Now", body: cutting ? `${goalName}: as weight comes off, ghrelin rises. That is the plan working, not the plan failing. Trend: ${change}.` : `${goalName}. Hunger before a planned meal is right; hunger late in the evening is the loop.` },
+      { k: "4", title: "The path on", body: "" },
+      { k: "5", title: "The goal: the day", body: "Hungry before meals, full after them, nothing after dinner. Your numbers do not change." },
+    ], taps, trend: lateNights >= 3 ? `Your trend: a late snack on ${lateNights} of six evenings. Carried on, that is the loop: a late snack, a short night, more hunger. The gap closes with the planned snack and dinner at ${last?.time ?? "the usual time"}.` : null };
+  }
+  if (key === "cortisol") {
+    const taps: Tap[] = [
+      ...(coffeeDays ? [{ id: "plan" as const, label: "Coffee before 14:00 only, this week", where: "Today shows what was ticked and when" }] : []),
+      ...(hardLate ? [{ id: "easy" as const, label: "Tonight's hard session easy, or earlier", where: "On Plan, this date only; Keep it stays open" }] : []),
+      ...(lateNights >= 2 ? [dinnerTap] : []),
+    ];
+    return { parts: [
+      { k: "1", title: "Before: your usual", body: `${usualNight} ${tr && tr.kind !== "rest" ? `Training today: ${planLine({ ...tr, when: undefined })}${tw ? `, ${tw.phrase.replace(/^training /, "")}` : ""}.` : "No training today."}` },
+      { k: "2", title: "The path here: this week", body: [coffeeDays ? `Coffee after 14:00 on ${coffeeDays} of six days.` : "No coffee after 14:00 on the record this week.", lateNights ? `Something eaten after 21:30 on ${lateNights} ${lateNights === 1 ? "evening" : "evenings"}.` : ""].filter(Boolean).join(" ") },
+      { k: "3", title: "Now", body: hardLate ? `A hard session at ${tr!.at} tonight: the rise around it is normal; ending within an hour of bed can push sleep later.` : "The curve today: high this morning, low tonight, if the afternoon stays free of caffeine and the evening of a heavy meal." },
+      { k: "4", title: "The path on", body: "" },
+      { k: "5", title: "The goal: the day", body: "Up in the morning, down at night. The morning coffee stays." },
+    ], taps: taps.length ? taps : [{ id: "plan", label: "Nothing to change today", where: "The curve runs as designed" }], trend: coffeeDays >= 3 ? `Your trend: coffee after 14:00 on ${coffeeDays} of six days. Carried on, the evenings stay high. The gap closes with the last coffee before 14:00.` : null };
+  }
+  // testosterone and oestrogen: read at the month
+  const levers = [strengthDays ? `Strength ${strengthDays} ${strengthDays === 1 ? "day" : "days"} a week.` : trainingDays ? `Training ${trainingDays} days a week, no strength day yet.` : "No training day set yet.", `${usualNight}`, w ? `Weight trend: ${change}.` : "No weigh-ins yet."].join(" ");
+  const taps: Tap[] = [
+    strengthDays ? { id: "dinner", label: `Keep the ${strengthDays === 1 ? "strength day" : `${strengthDays} strength days`} this week`, where: "On Plan" } : { id: "dinner", label: "A strength day in the week", where: "On Plan, the training week" },
+    ...(lateNights >= 2 || coffeeDays >= 2 ? [dinnerTap] : []),
+    ...(cutting ? [{ id: "protein" as const, label: "Protein at every meal, the cut inside the range", where: "The fat goes, the muscle and the axis stay" }] : []),
+  ];
+  const oe = key === "oestrogen";
+  return { parts: [
+    { k: "1", title: `Before: your goal${since ? `, set ${since}` : ""}`, body: `${goalName}. ${levers}` },
+    { k: "2", title: "The path here: this week", body: [lateNights ? `Something eaten after 21:30 on ${lateNights} of six evenings.` : "", coffeeDays ? `Coffee after 14:00 on ${coffeeDays} ${coffeeDays === 1 ? "day" : "days"}.` : "", drinkDays ? `A drink on ${drinkDays} ${drinkDays === 1 ? "day" : "days"}.` : ""].filter(Boolean).join(" ") || "Nothing on the record points at the levers this week." },
+    { k: "3", title: "Now", body: `${cutting ? `${goalName}: the cut is inside the range, so the axis holds; ${oe ? "the energy left after training is what the signal reads" : "losing fat helps in the long run"}.` : `${goalName}: no cut, so food is not the lever this month.`} ${lateNights >= 2 ? "Sleep is the lever that moved this week." : strengthDays ? "The levers are in place." : "Strength training is the lever not in place yet."}` },
+    { k: "4", title: "The path on", body: "" },
+    { k: "5", title: "The goal: the check-in", body: `${goalName}${trend ? `, ${expectedWords(trend.expected)}` : ""}, the strength days kept, the usual nights.` },
+  ], taps, trend: trend && trend.change !== null && trend.verdict !== "too few" && cutting ? `Your trend: ${change}. Your goal expects ${expectedWords(trend.expected)}. ${trend.verdict === "faster" ? "Faster than the goal expects: eat to the range, the cut is deep enough for the axis too." : "The food is inside the range; the sleep and the strength days are the levers left."}` : null };
 }
