@@ -102,11 +102,16 @@ cy = storyCard(B, y, "DT208", "Finishing the setup, with everything open", [
   ("Next", "Next: Goal still goes on. Under it, what is still missing for your numbers, and a link to that field."),
   ("Me", "Each of the five steps says Done or To do; a step to do says what is missing instead of its usual line."),
   ("Today", "One card, Finish setting up: 2 of 5 done, with each step, a tick or what is missing, and one button to the next one. It replaces the strip Set your goal and goes away by itself when all five are done."),
+  ("Version 2: All set (Coach Milan 21:17 to 21:19)", "When the fifth step gets its tick, the card turns into All set: 5 of 5 done, with one line and the five ticks, and a close button (×, 44 px). It stays until the person closes it; nothing disappears by itself. Closed, it never comes back, except when a value the numbers need goes missing later: then a small card shows only that step, 1 of 5 to do, and turns into All set again when fixed."),
   ("Saving", "As in 0.3.48: each change is kept on the phone at once, and the account gets one write a second after the changes stop."),
 ])
 h = rowEnd(cy,
   B.screen("DT208a", 0, y, "Now: Today for a new person", "r208a", "now", "One strip, Set your goal."),
   B.screen("DT208b", 1, y, "New: Today", "r208b", "changed", "Finish setting up: 2 of 5 done."))
+y = h
+h = rowEnd(B.screen("DT208g", 0, y, "New: All set", "r208g", "changed", "Five ticks and ×; it stays until closed."),
+  B.screen("DT208h", 1, y, "New: after ×", "r208h", "changed", "Gone, and it stays gone."),
+  B.screen("DT208i", 2, y, "New: one value missing again", "r208i", "changed", "1 of 5 to do: only that step."))
 y = h
 h = rowEnd(B.screen("DT208c", 0, y, "Now: Me", "r208c", "now", "The steps look the same, done or not."),
   B.screen("DT208d", 1, y, "New: Me", "r208d", "changed", "Done or To do, and what is missing."))
@@ -115,5 +120,5 @@ h = rowEnd(B.screen("DT208e", 0, y, "Now: Profile, the height empty", "r208e", "
   B.screen("DT208f", 1, y, "New: Profile", "r208f", "changed", "Height: needed for your numbers; Next says it too."))
 y = h
 board("Stories155.dc.html", "DT208. Finishing the setup, with everything open",
-  "1 November 2026 (Coach Milan 20:51 and 21:07). Now: 0.3.48, untouched. Drawn for your approval; nothing built.",
+  "1 November 2026 (Coach Milan 20:51, 21:07 and 21:17 to 21:19). Version 2: All set with its close button, and the card coming back for one missing step. Now: 0.3.48, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories154.dc.html")

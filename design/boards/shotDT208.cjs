@@ -48,6 +48,28 @@ const mark = "outline:3px solid #2e7be8;outline-offset:3px;border-radius:10px", 
     }, { v, mark, NOTE, STEPS });
     await shot(p, `r208${v === "now" ? "a" : "b"}`); await p.context().close();
   }
+  // version 2 (Coach Milan 21:17 to 21:19): All set, closed by the person; and the card coming back for one step
+  for (const v of ["allset", "closed", "back"]) {
+    const p = await fresh(); await p.go("/today");
+    await p.evaluate(({ v, mark, NOTE, STEPS }) => {
+      const strip = [...document.querySelectorAll(".strip-button")].find((x) => /Set your goal/.test(x.textContent));
+      const note = (el, t) => { const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = t; el.before(d); };
+      const tick = (ok) => `<span style="width:22px;height:22px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;font-weight:900;${ok ? "background:#1f9d55;color:#fff" : "border:2px solid #9aa7bd;color:#9aa7bd"}">${ok ? "✓" : ""}</span>`;
+      const x = `<button aria-label="Close" style="position:absolute;right:6px;top:6px;width:44px;height:44px;border:0;background:none;font-size:24px;line-height:1;color:#3d4a63;cursor:pointer">×</button>`;
+      const card = document.createElement("section"); card.className = "card"; card.style.cssText = mark + ";padding:14px 16px;margin:10px 0;position:relative";
+      if (v === "allset") card.innerHTML = `${x}<b style="display:block;font-size:17px;padding-right:40px">All set: 5 of 5 done</b>
+        <small style="display:block;margin:4px 0 8px;color:#3d4a63">Your numbers and your plan are yours now.</small>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">${STEPS.map(([n]) => `<span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;font-weight:800">${tick(true)}${n}</span>`).join("")}</div>`;
+      if (v === "back") card.innerHTML = `<b style="display:block;font-size:17px">1 of 5 to do</b>
+        <small style="display:block;margin:4px 0 8px;color:#3d4a63">Your numbers need this again.</small>
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px solid var(--line)">${tick(false)}<span style="flex:1"><b style="font-size:15px">Profile</b><small style="display:block;color:#5b6b8a">Height missing</small></span></div>
+        <button class="pill pill-primary pill-wide" style="margin-top:10px;min-height:48px">Continue: Profile, the height</button>`;
+      if (v === "closed") { if (strip) { note(strip.nextElementSibling || strip, "New, after the person tapped ×: the card is gone and stays gone. The strip Set your goal is gone too, since the goal is set; Today is as usual."); strip.remove(); } return; }
+      if (strip) strip.replaceWith(card); else document.querySelector("main").prepend(card);
+      note(card, v === "allset" ? "New: when the fifth step gets its tick, the card turns into All set, with one line and the five ticks. It stays until the person taps × (44 px); nothing disappears by itself." : "New: closed cards never come back, with one exception: a value the numbers need goes missing later (here, the height was cleared). Then a small card shows only that step. Fixed, it turns into All set again, with its ×.");
+    }, { v, mark, NOTE, STEPS });
+    await shot(p, `r208${v === "allset" ? "g" : v === "closed" ? "h" : "i"}`); await p.context().close();
+  }
   // b. Me
   for (const v of ["now", "new"]) {
     const p = await fresh(); await p.go("/me");
