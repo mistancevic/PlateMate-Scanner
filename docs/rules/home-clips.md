@@ -43,3 +43,7 @@ HC11. The app as it is (Coach Milan, 1 November 11:40: Explorer must show in eve
 Wherever a clip shows the app's bar, the bar has all five tabs, Explorer among them: Today, Plan, Plate, Recipes, Explorer. Clips
 are recorded again whenever the bar changes. Check: at the end of each clip, the bar's tabs are read; a bar without Explorer stops
 the run.
+
+HC12. The poster says what the clip is about (Coach Milan, 1 November 11:57: the shopping list's picture showed Plan). The still
+shown before a clip plays is its last settled screen, before the fade, not its first frame. Check: the poster is taken 1.1 seconds
+before the end.

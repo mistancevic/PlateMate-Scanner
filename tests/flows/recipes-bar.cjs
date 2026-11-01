@@ -76,7 +76,7 @@ const PORT = 3268, U = `http://127.0.0.1:${PORT}`;
   await page.getByLabel("Clear the search").click(); await page.waitForTimeout(300);
   // Made by
   await page.getByRole("button", { name: /^Made by/ }).click(); await page.waitForTimeout(200);
-  ok((await lines(page)).join(",") === "All10,Me4, one shared without your name,Your coach1,All members5,Darinka1,Nina1,Marko1,A member without a name2", "DT126c: Made by: all, me, the coach, the cooks with counts, a member without a name: " + (await lines(page)).join(","));
+  ok((await lines(page)).join(",") === "All10,Me4, one shared without your name,Your coach1,All members5,Darinka1,Marko1,Nina1,A member without a name2", "DT126c: Made by: all, me, the coach, the cooks with counts, a member without a name: " + (await lines(page)).join(","));
   await page.locator(".rb-line").filter({ hasText: "A member without a name" }).click(); await page.waitForTimeout(300);
   ok((await titles(page)).sort().join() === "Overnight oats with skyr,Tuna salata" && /Made by: a member without a name/.test(await count(page)), "DT126c: A member without a name shows the two unnamed");
   await page.getByRole("button", { name: /^Made by/ }).click(); await page.locator(".rb-line").filter({ hasText: "Your coach" }).click(); await page.waitForTimeout(300);

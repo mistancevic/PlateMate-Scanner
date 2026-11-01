@@ -2,7 +2,7 @@
 // test data. Start from anything: a barcode, a nutrition label, a group of labels, a photo of the meal; one plate; recipes for
 // your day; the shopping list. The AI's answers are stand-ins (page.route) and the pack is invented (Fjell Skyr): no real brand.
 // Run after npm run build: node scripts/record-home-clips.cjs. Writes public/landing/way-*.mp4, .webm and .webp, only when every
-// rule in docs/rules/home-clips.md passes (HC1 to HC11); a failed rule stops the run and lists what failed.
+// rule in docs/rules/home-clips.md passes (HC1 to HC12); a failed rule stops the run and lists what failed.
 const { chromium } = require("playwright");
 const { spawn, execFileSync } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path"), os = require("node:os");
@@ -182,7 +182,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     const cut = ["-y", "-ss", from.toFixed(2), "-i", raw, "-t", t.toFixed(2), "-an", "-vf", vf];
     execFileSync("ffmpeg", [...cut, "-c:v", "libx264", "-preset", "veryfast", "-crf", "28", "-pix_fmt", "yuv420p", "-movflags", "+faststart", `${base}.mp4`], { stdio: "ignore" });
     execFileSync("ffmpeg", [...cut, "-c:v", "libvpx-vp9", "-crf", "40", "-b:v", "0", "-deadline", "good", "-cpu-used", "4", `${base}.webm`], { stdio: "ignore" });
-    execFileSync("ffmpeg", ["-y", "-ss", "0.6", "-i", `${base}.mp4`, "-frames:v", "1", "-c:v", "libwebp", "-quality", "70", `${base}.webp`], { stdio: "ignore" });
+    // HC12 (Coach Milan, 1 November 11:57): the poster is the clip's last settled screen, what the clip is about, before
+    // the fade; the first frame was Plan for both the recipes and the shopping list
+    execFileSync("ffmpeg", ["-y", "-sseof", "-1.1", "-i", `${base}.mp4`, "-frames:v", "1", "-c:v", "libwebp", "-quality", "70", `${base}.webp`], { stdio: "ignore" });
     console.log("clip", name, `${len.toFixed(1)} s`);
   };
   // every click goes through a.tap, so every ring is counted (HC1)
@@ -256,5 +258,5 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   if (fails.length) { console.log(`\n${fails.length} rule(s) failed; no clip was replaced:\n  ${fails.join("\n  ")}`); process.exit(1); }
   if (ONLY) { console.log("\nCLIPS set: rules checked, no clip written"); process.exit(0); }
   for (const m of made) encode(m);
-  console.log(`\nall rules passed (HC1 to HC11); ${made.length} clips written`);
+  console.log(`\nall rules passed (HC1 to HC12); ${made.length} clips written`);
 })();

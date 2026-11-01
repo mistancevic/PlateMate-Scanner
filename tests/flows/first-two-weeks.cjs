@@ -144,7 +144,7 @@ const personal = (w) => ({ sex: "male", birthYear: 1981, heightCm: 182, weightKg
     await page.setViewportSize({ width: 390, height: 4600 });
     await page.locator(".cw-row").first().click(); await page.waitForTimeout(700); await hide(page);
     const cb = await page.locator(".ft-burn").textContent();
-    ok(/DAVORKA'S BURN, MEASURED · LAST 14 DAYS/.test(cb) && /The formula says 2,000/.test(cb) && /Nina ate/.test(cb) && /more than the formula/.test(cb) && /To use it, pick From Nina's data under Formula/.test(cb), "FT7: Nina's burn on her page, with the gap line");
+    ok(/NINA'S BURN, MEASURED · LAST 14 DAYS/.test(cb) && /The formula says 2,000/.test(cb) && /Nina ate/.test(cb) && /more than the formula/.test(cb) && /To use it, pick From Nina's data under Formula/.test(cb), "FT7: Nina's burn on her page, with the gap line");
     const pin = page.getByRole("button", { name: "From Nina's data" });
     ok(await pin.count() === 1, "FT7: From Nina's data as a formula pin");
     await page.evaluate(() => { const b = [...document.querySelectorAll("button")].find((x) => x.textContent.trim() === "From Nina's data"); b.parentElement.id = "fgrp"; });
