@@ -76,5 +76,17 @@ const mark = "outline:3px solid #2e7be8;outline-offset:3px;border-radius:10px", 
   await six(p, dayBar, clientsBtn, "Clients");
   await note(p, "New: a client's page holds everything about the client, with tabs inside it: Today and Week (read-only, with Suggest), Shared (the cards they sent you, each with Answer), Goal (numbers, weigh-ins, check-in day). Back goes to Clients.");
   await shot(p, "r210f"); await p.context().close();
+  // g. version 2 (Coach Milan 23:46): a person's bar, not a coach: five tabs, the same icons and labels, nothing squeezed
+  { const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, locale: "en-GB" }); p = await ctx.newPage();
+    await p.addInitScript((s) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
+      localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-20T16:00:00Z", source: "profile" })); localStorage.setItem("chefmealan-region", "munich");
+      localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "same", sex: "female", birthYear: 1990, heightCm: 168, weightKg: 64, kitchens: ["Balkan"], plan: Array(7).fill({ work: true, kind: "rest" }), lifestyle: { weekdays: "work", hours: "fixed", move: "sitting", meals: 3 } }));
+      localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-10-06T09:00:00Z", consentBodyAt: "2026-10-06T09:00:00Z", declaredAt: "2026-10-06T09:00:00Z", aiConfirmedAt: "2026-10-06T09:00:00Z" }));
+      localStorage.setItem("seeded", "1"); }, seed);
+    await require("/home/claude/platemate-scanner/tests/flows/adult.cjs")(p);
+    await p.goto(U + "/today"); await p.waitForTimeout(1400);
+    await p.evaluate((mark) => { const n = document.querySelector(".bottom-nav"); n.style.cssText += ";" + mark; }, mark);
+    await note(p, "New, for a person who is not a coach: the bar as it is now, five tabs, Today, Plan, Plate, Recipes, Explorer, each with room to spare. The same icons, labels and order as the coach's bar; only the coach's has Clients added at the right.");
+    await shot(p, "r210g"); await p.context().close(); }
   await b.close();
 })();

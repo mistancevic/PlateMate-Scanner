@@ -101,11 +101,13 @@ cy = storyCard(B, y, "DT210", "Clients, the coach's sixth tab", [
   ("No more switch", "The My day and My clients switch at the top of Today goes, and no tab changes meaning: Today, Plan, Plate and Recipes are always the coach's own."),
   ("Six tabs for a coach", "Today, Plan, Plate, Recipes, Explorer, and Clients at the right, with the count of what waits for you: cards shared, replies, check-ins, numbers to approve. On a phone 390 px wide each tab is 65 px, 60 px on a small phone, well above 44. Clients keep their five tabs; nothing moves for them."),
   ("Clients", "The same page as now: Waiting for you, check-ins today, to approve, the clients with the week's dots, then codes and sign-ups."),
+  ("Version 2: a person's bar (Coach Milan 23:46)", "Someone who is not a coach keeps the bar as it is now: five tabs, Today, Plan, Plate, Recipes, Explorer, each with room to spare, nothing squeezed. The same icons, labels and order as the coach's; the coach's bar only adds Clients at the right."),
   ("A client's page", "Everything about the client in one place, with tabs inside it: Today and Week (read-only, with Suggest), Shared (the cards the client sent you, each with Answer), Goal (numbers, weigh-ins, check-in day). Back goes to Clients."),
 ])
 h = rowEnd(cy,
   B.screen("DT210a", 0, y, "Now: Today for a coach", "r210a", "now", "The switch My day, My clients."),
-  B.screen("DT210b", 1, y, "New: Today for a coach", "r210b", "changed", "No switch; six tabs, Clients with its count."))
+  B.screen("DT210b", 1, y, "New: Today for a coach", "r210b", "changed", "No switch; six tabs, Clients with its count."),
+  B.screen("DT210g", 2, y, "New: Today for a person", "r210g", "changed", "Five tabs, as now; the coach's bar minus Clients."))
 y = h
 h = rowEnd(B.screen("DT210c", 0, y, "Now: Clients", "r210c", "now", "Only in My clients."),
   B.screen("DT210d", 1, y, "New: Clients, the sixth tab", "r210d", "changed", "The same page, its own tab."))
@@ -114,5 +116,5 @@ h = rowEnd(B.screen("DT210e", 0, y, "Now: the picked client's Today", "r210e", "
   B.screen("DT210f", 1, y, "New: a client's page", "r210f", "changed", "Tabs inside: Today, Week, Shared, Goal."))
 y = h
 board("Stories157.dc.html", "DT210. Clients, the coach's sixth tab",
-  "1 November 2026 (Coach Milan 23:28 to 23:34). Now: 0.3.49, untouched. Drawn for your approval; nothing built.",
+  "1 November 2026 (Coach Milan 23:28 to 23:46). Version 2: a person's bar. Now: 0.3.49, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories156.dc.html")
