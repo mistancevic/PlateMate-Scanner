@@ -2679,8 +2679,8 @@ html:has(.l-photo) { overflow-x: hidden; }
 .coach-static { margin-top: 26px; }
 .travel-kitchens .choice { white-space: normal; width: 100%; box-sizing: border-box; max-width: 100%; } .travel-kitchens .choice b, .travel-kitchens .choice small { white-space: normal; overflow-wrap: anywhere; text-align: left; }
 
-/* DT208 (0.3.49): the row under the goal; To do on Me */
-.setup-line { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; min-height: 44px; margin: 6px 0; padding: 0 10px; border: 0; border-radius: 10px; background: #fff1e6; font: inherit; font-size: 14px; font-weight: 800; color: #a4471f; text-align: left; cursor: pointer; }
-.setup-done { display: block; margin: 4px 0 8px; font-size: 14px; font-weight: 700; color: var(--muted); }
-.me-todo { font-size: 13px; font-weight: 900; color: #a4471f; white-space: nowrap; margin-left: 6px; }
-.field-need { display: block; margin: 4px 0 6px; color: #a4471f; font-weight: 800; }
+/* DT208 (0.3.49): the row under the goal; To do on Me. The design system's warning colours, sizes and weights (foundations) */
+.setup-line { display: flex; align-items: center; justify-content: space-between; gap: 6px; width: 100%; min-height: 44px; margin: 6px 0; padding: 0 10px; border: 0; border-radius: 10px; background: var(--close-soft); font: inherit; font-size: var(--fs-label); font-weight: 900; color: var(--close-text); text-align: left; cursor: pointer; }
+.setup-done { display: block; margin: 4px 0 8px; font-size: var(--fs-label); font-weight: 700; color: var(--muted); }
+.me-todo { font-size: var(--fs-label); font-weight: 900; color: var(--close-text); white-space: nowrap; margin-left: 6px; }
+.field-need { display: block; margin: 4px 0 6px; color: var(--close-text); font-weight: 900; }
