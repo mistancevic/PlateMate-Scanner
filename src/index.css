@@ -302,7 +302,12 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .name-field input { margin-top: 4px; padding: 9px 12px; font-size: var(--fs-card); font-weight: 700; }
 .avatar-coach { background: var(--brand); color: var(--surface); }
 
-.toast { position: fixed; left: 14px; right: 14px; bottom: calc(96px + env(safe-area-inset-bottom, 0px)); z-index: 45; box-shadow: var(--shadow-float); margin: 0; }
+/* DT146 (0.3.38, board Stories146; Anna): toasts show at the top, under the title bar, where the next tap rarely is; before,
+   at the bottom, they sat over the button she was about to tap */
+.toast { position: fixed; left: 14px; right: 14px; top: calc(62px + env(safe-area-inset-top, 0px)); z-index: 45; box-shadow: var(--shadow-float); margin: 0; }
+/* DT144: each day's PD in the day table; the planned day's range under Plan's kcal */
+.dt-day .dt-pd { display: block; font-size: var(--fs-small); color: var(--brand-text); margin-top: 2px; white-space: nowrap; }
+.plan-row .plan-band { display: block; font-weight: 600; margin-top: 2px; }
 
 .ways { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
 .ways .pill-small { padding: 0 12px; }
