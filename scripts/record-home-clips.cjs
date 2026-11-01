@@ -30,7 +30,9 @@ const ean13 = (code, x0, y0, m, h) => {
   return [...bits].map((b, k) => (b === "1" ? `<rect x="${x0 + k * m}" y="${y0}" width="${m}" height="${h}" fill="#111"/>` : "")).join("");
 };
 // HC6: made-up packs only. The back of a skyr cup, the barcode where the camera's barcode frame is
-const BARCODE = svg(`<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960"><rect width="720" height="960" fill="#cdbb9f"/><rect x="150" y="150" width="420" height="640" rx="30" fill="#f7f5ef" stroke="#d8d2c4" stroke-width="4"/><rect x="150" y="190" width="420" height="90" fill="#2e5d8f"/><text x="360" y="252" font-family="Georgia" font-size="50" fill="#fff" text-anchor="middle">Fjell</text><text x="360" y="320" font-family="Arial" font-weight="700" font-size="26" fill="#2e5d8f" text-anchor="middle">SKYR natural · 450 g</text><rect x="196" y="352" width="328" height="170" fill="#fff"/>${ean13(CODE, 210, 362, 3, 130)}<text x="360" y="515" font-family="monospace" font-size="24" text-anchor="middle">${CODE[0]} ${CODE.slice(1, 7)} ${CODE.slice(7)}</text><text x="360" y="600" font-family="Arial" font-size="20" fill="#555" text-anchor="middle">Keep refrigerated. Best before: see lid.</text></svg>`);
+// HP3 (Coach Milan, 1 November 12:31): the tub is a picture made with AI for an invented brand, Fjell; the real EAN-13
+// the app's scanner reads is drawn into its empty white label by design/home-clips/pack.py
+const BARCODE = photo("pack-barcode.jpg");
 const LABEL_ROWS = [["Energy", "276 kJ / 66 kcal"], ["Fat", "0.3 g"], ["of which saturates", "0.2 g"], ["Carbohydrate", "3.8 g"], ["of which sugars", "3.8 g"], ["Protein", "11.6 g"], ["Salt", "0.1 g"]];
 const LABEL = svg(`<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960"><rect width="720" height="960" fill="#e9e2d0"/><rect x="190" y="230" width="340" height="470" fill="#fff" stroke="#222" stroke-width="3"/><text x="206" y="272" font-family="Arial" font-weight="700" font-size="24">Nutrition declaration</text><text x="206" y="302" font-family="Arial" font-size="19">per 100 g</text>${LABEL_ROWS.map(([a, b], i) => `<line x1="206" x2="514" y1="${320 + i * 52}" y2="${320 + i * 52}" stroke="#222" stroke-width="1.5"/><text x="206" y="${354 + i * 52}" font-family="Arial" font-size="19">${a}</text><text x="514" y="${354 + i * 52}" font-family="Arial" font-size="19" text-anchor="end">${b}</text>`).join("")}</svg>`);
 // HC4: three packs in one picture
@@ -45,16 +47,18 @@ const GROUP_READ = { entities: [
   { ...SKYR },
   { product_name: "Kornfeld Oats", brand: "Kornfeld", calories: 372, protein: 13.5, fats: 7, carbs: 58.7, fiber: 10 },
   { product_name: "Nusshof Peanut butter", brand: "Nusshof", calories: 588, protein: 25, fats: 50, carbs: 20, fiber: 6 }] };
-const READ = { dish: "Grilled chicken with rice and salad", foods: [
-  { name: "Chicken breast, grilled", grams: 180, low: 140, high: 240, calories: 165, protein: 31, fats: 3.6, carbs: 0, fiber: 0, confidence: "medium" },
-  { name: "Rice, cooked", grams: 150, low: 120, high: 200, calories: 130, protein: 2.7, fats: 0.3, carbs: 28, fiber: 0.4, confidence: "medium" },
-  { name: "Mixed salad, dressed", grams: 90, low: 60, high: 120, calories: 60, protein: 1.2, fats: 4.5, carbs: 3.5, fiber: 1.5, confidence: "medium" }], unsure: null };
+// HP3 (Coach Milan, 1 November 12:31): the meal is Milan's real dinner of 31 October, salmon, potatoes and broccoli
+const READ = { dish: "Salmon with potatoes and broccoli", foods: [
+  { name: "Salmon, oven baked", grams: 230, low: 180, high: 280, calories: 206, protein: 22.1, fats: 12.4, carbs: 0, fiber: 0, confidence: "medium" },
+  { name: "Baby potatoes, with herbs", grams: 220, low: 170, high: 270, calories: 98, protein: 2, fats: 1.5, carbs: 19, fiber: 1.8, confidence: "medium" },
+  { name: "Broccoli, cooked", grams: 260, low: 200, high: 320, calories: 35, protein: 2.4, fats: 0.4, carbs: 7.2, fiber: 3.3, confidence: "medium" }], unsure: null };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 (async () => {
   const fails = []; const rule = (ok, id, what) => { console.log(`${ok ? "ok  " : "FAIL"} ${id} ${what}`); if (!ok) fails.push(`${id} ${what}`); };
   // HC5 before anything: the photos must be there
   rule(Boolean(MEAL), "HC5", `the meal photo: ${path.relative(ROOT, path.join(ASSETS, "meal.jpg"))}`);
+  rule(Boolean(BARCODE), "HC5", "the pack photo: design/home-clips/pack-barcode.jpg");
   for (const [id, f] of [["m1", "recipe-crepes.jpg"], ["m2", "recipe-pudding.jpg"], ["m3", "recipe-sarma.jpg"]]) rule(Boolean(RECIPE_PHOTOS[id]), "HC5", `a recipe photo: design/home-clips/${f}`);
   // HC9: the page says what the clips are
   rule(/Clips of the app on test data/.test(fs.readFileSync(path.join(ROOT, "src/screens/LandingScreen.tsx"), "utf8")), "HC9", "the section says the clips are the app on test data");
@@ -66,7 +70,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   { const b0 = await chromium.launch(); const pg = await b0.newPage({ viewport: { width: 720, height: 960 } });
     for (const [k, src] of [["barcode", BARCODE], ["label", LABEL], ["group", GROUP], ["meal", MEAL]]) {
       if (!src) continue;
-      const fit = k === "meal" ? `<img src="${src}" style="position:absolute;inset:0;width:720px;height:960px;object-fit:cover;filter:blur(18px) brightness(.8)"><img src="${src}" style="position:absolute;left:20px;top:237px;width:680px">` : `<img src="${src}" style="width:720px;height:960px;object-fit:cover">`;
+      // HP3: every picture is a camera view now, the meal too (before, a cover photo sat on a blurred copy of itself)
+      const fit = `<img src="${src}" style="width:720px;height:960px;object-fit:cover">`;
       await pg.setContent(`<body style="margin:0;position:relative;width:720px;height:960px;overflow:hidden">${fit}</body>`); await sleep(400);
       const png = path.join(tmp, `${k}.png`); await pg.screenshot({ path: png });
       feeds[k] = path.join(tmp, `${k}.y4m`);
@@ -126,7 +131,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     });
     await require(path.join(ROOT, "tests/flows/adult.cjs"))(page);
     await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
-    await page.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "Grilled chicken with rice and salad: a plain lunch plate.", around: "", better_as: "" }) }));
+    await page.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "Salmon with potatoes and broccoli: a plain dinner plate.", around: "", better_as: "" }) }));
     await page.route("**/api/product/**", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(SKYR) }));
     await page.route("**/api/scan", (r) => { const group = r.request().postDataJSON()?.mode === "group"; r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(group ? GROUP_READ : LABEL_READ) }); });
     await page.route("**/api/plate-photo", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(READ) }));
@@ -231,13 +236,13 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await a.swipe(650, 1500); await a.swipe(450, 1200);
     }, { feed: "meal" });
     const Fx = (id, name, calories, protein, fats, carbs, fiber) => ({ ...seed.foods[0], id, name, brand: "estimate", source: "estimate", calories, protein, carbs, fats, fiber, photo: undefined, photos: undefined, table: undefined });
-    const CH = Fx("chk", "Chicken breast, grilled", 165, 31, 3.6, 0, 0), RI = Fx("rice", "Rice, cooked", 130, 2.7, 0.3, 28, 0.4), SA = Fx("sal", "Mixed salad, dressed", 60, 1.2, 4.5, 3.5, 1.5);
+    const CH = Fx("sal", "Salmon, oven baked", 206, 22.1, 12.4, 0, 0), RI = Fx("pot", "Baby potatoes, with herbs", 98, 2, 1.5, 19, 1.8), SA = Fx("bro", "Broccoli, cooked", 35, 2.4, 0.4, 7.2, 3.3);
     await clip("plate", async (page, a) => {
       await sleep(1200);
       await a.tap(page.locator(".letters-row").first(), 1600);
       await a.swipe(380, 1400);
       await a.tap(page.locator(".nt").getByRole("button", { name: /Per 100 kcal/ }), 600);
-    }, { state: { foods: [...seed.foods, CH, RI, SA], title: "Grilled chicken with rice and salad", items: [{ id: "a", food: CH, grams: 180, locked: false }, { id: "b", food: RI, grams: 150, locked: false }, { id: "c", food: SA, grams: 90, locked: false }] } });
+    }, { state: { foods: [...seed.foods, CH, RI, SA], title: "Salmon with potatoes and broccoli", items: [{ id: "a", food: CH, grams: 230, locked: false }, { id: "b", food: RI, grams: 220, locked: false }, { id: "c", food: SA, grams: 260, locked: false }] } });
     const withPhoto = (m) => (RECIPE_PHOTOS[m.id] ? { ...m, photo: RECIPE_PHOTOS[m.id] } : m);
     const meals = [crepes, sarma, pudding].map(withPhoto);
     const PLAN = {}; ["20", "21", "22", "23", "24", "25", "26"].forEach((d, i) => { PLAN[`2026-10-${d}`] = { breakfast: planned(crepes, "mine"), lunch: i % 2 ? planned(sarma, "mine") : planned(pudding, "coach") }; });
