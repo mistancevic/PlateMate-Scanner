@@ -239,6 +239,8 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
   padding: 8px 12px calc(10px + env(safe-area-inset-bottom, 0px));
   background: var(--surface); border-top: 1px solid var(--line);
 }
+/* DT210 (0.3.50): a coach's bar has six tabs, Clients the sixth; at 390 px each is about 61 px */
+.bottom-nav.six { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 2px; padding-left: 6px; padding-right: 6px; }
 .bottom-nav button { height: 50px; border-radius: var(--r-control); font-size: var(--fs-small); font-weight: 700; color: var(--muted); }
 .bottom-nav button.active { background: var(--tint); color: var(--brand-text); }
 
@@ -257,6 +259,7 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
   main { max-width: 720px; padding-left: 130px; padding-bottom: 40px; }
   .topbar { padding-left: 130px; }
   .bottom-nav { top: 0; right: auto; width: 106px; grid-template-columns: 1fr; grid-auto-rows: min-content; align-content: center; gap: 8px; padding: 14px 12px; border-top: 0; border-right: 1px solid var(--line); }
+  .bottom-nav.six { grid-template-columns: 1fr; gap: 8px; padding: 14px 12px; }
 }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 
@@ -2684,3 +2687,6 @@ html:has(.l-photo) { overflow-x: hidden; }
 .setup-done { display: block; margin: 4px 0 8px; font-size: var(--fs-label); font-weight: 700; color: var(--muted); }
 .me-todo { font-size: var(--fs-label); font-weight: 900; color: var(--close-text); white-space: nowrap; margin-left: 6px; }
 .field-need { display: block; margin: 4px 0 6px; color: var(--close-text); font-weight: 900; }
+/* DT210 (0.3.50): the tabs inside a client's page */
+.cp-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; } .cp-tabs .choice { min-height: 44px; }
+.sum-buttons { margin: 6px 0 12px; } .sum-plate { min-height: 44px; text-align: left; }

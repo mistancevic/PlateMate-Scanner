@@ -76,7 +76,7 @@ const monday = (d) => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDa
   const t1 = (await page.locator(".mt").innerText()).replace(/\s+/g, " ");
   ok(/Days lived by the plan/.test(t1) && /The five KPIs/.test(t1) && /The way in/.test(t1), "MT71: the whole page shows from the first day of counting: " + t1.slice(0, 80));
   // 23 October 2026: counting began three days ago; from Thursday on that is after Monday, and the line says counted from it
-  ok(/This week \d+ \w+ to today( \(counted from \d+ \w+\))?\./.test(t1) && /Compared with \d+ to \d+ \w+/.test(t1) && /Counting began on \d+ \w+\. Today is \d+ \w+\./.test(t1), "MT71: the time frame on top, and since when it counts");
+  ok(/This week \d+ \w+ to today( \(counted from \d+ \w+\))?\./.test(t1) && /Compared with \d+( \w+)? to \d+ \w+/.test(t1) && /Counting began on \d+ \w+\. Today is \d+ \w+\./.test(t1), "MT71: the time frame on top, and since when it counts");
   ok((await page.locator(".mt-when").count()) === 4, "MT71: each card says which days it counts");
   ok(/Home page visits\s*2/.test(t1), "MT71: the way in shows this week's visits so far, 2");
   ok(/Home page visits 2 QR 1 · Instagram 1/.test(t1), "SH73, 0.2.115: a visit from the QR code counts as QR, one from Instagram as Instagram, under Home page visits");
@@ -86,7 +86,7 @@ const monday = (d) => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDa
   await page.getByRole("tab", { name: "Last week" }).click(); await page.waitForTimeout(1500);
   const t2 = (await page.locator(".mt").innerText()).replace(/\s+/g, " ");
   ok(await page.locator(".mt > section").first().evaluate((e) => e.classList.contains("mt-today")), "DT207a: on top in Last week too");
-  ok(/Last week \d+ to \d+ \w+/.test(t2) && !/to today/.test(t2), "MT71: Last week names its own days");
+  ok(/Last week \d+( \w+)? to \d+ \w+/.test(t2) && !/to today/.test(t2), "MT71: Last week names its own days");
   await page.getByRole("tab", { name: "4 weeks" }).click(); await page.waitForTimeout(1500);
   const t3 = (await page.locator(".mt").innerText()).replace(/\s+/g, " ");
   ok(/The last 4 weeks \d+ \w+ to \d+ \w+, one row per week/.test(t3) && /not counted yet/.test(t3), "MT71: 4 weeks says its days, and a week before the first day says not counted yet");

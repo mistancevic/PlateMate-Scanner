@@ -28,9 +28,10 @@ const ME_ROWS: { id: MenuSection; name: string; icon: ReactNode; hint: (p: AppAp
   // DT178 (0.3.21, board Stories126): Google Calendar, under Training week
   { id: "calendar", name: "Google Calendar", icon: <CalendarClock size={18} />, hint: (p) => (p.personal.calendar?.on ? "On. Your plan in the calendar Chef Mealan, 14 days ahead" : "Off. Your meals, cooking and training in your own calendar") },
   { id: "shop", name: "Where I shop and cook", icon: <ShoppingBasket size={18} />, hint: () => "Your shops, the kitchens you cook, and what you cook with" },
-  { id: "coach", name: "My coach", icon: <Users size={18} />, hint: (p) => (p.profile.coachId ? `${p.coachLabel} sees what you share` : "Join with a code") },
   // DT167 (0.3.9, board Stories119): Your summary, where the steps end
   { id: "summary", name: "Your summary", icon: <ClipboardList size={18} />, hint: (p) => (p.profile.coachId ? `Everything you told Chef Mealan, and what it does. Choose what ${p.coachLabel} sees.` : "Everything you told Chef Mealan, and what it does") },
+  // DT209 (0.3.50, board Stories156): My coach is its own row under Your summary, not a setup step; a coach account has none
+  { id: "coach", name: "My coach", icon: <Users size={18} />, hint: (p) => (p.profile.coachId ? `${p.coachLabel} sees what you share` : "Join with a code") },
   { id: "account", name: "Account", icon: <KeyRound size={18} />, hint: () => "Export my data, delete my account" },
 ];
 // the two speeds: Lifestyle changes when life does, the Training week when the activity does
@@ -77,7 +78,7 @@ export function MeScreen(p: AppApi) {
       {/* DT176 (0.3.19, board Stories124): Travel mode, above the steps */}
       <TravelCard p={p} />
       <div className="menu-list me-rows">
-        {ME_ROWS.map((r) => {
+        {ME_ROWS.filter((r) => !(r.id === "coach" && (p.profile.role === "coach" || p.isCoach))).map((r) => {
           // DT208: a step still to set says To do and what is missing; a step done shows its usual line, no tag
           const miss = stepMissing(missing, r.id as SetupStep);
           const hint = !miss.length ? r.hint(p) : r.id === "profile" ? `${miss.map((x) => x.label).join(", ").replace(/^./, (c) => c.toUpperCase())} missing` : "Not set yet";
