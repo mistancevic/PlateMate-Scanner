@@ -42,7 +42,7 @@ export function LandingScreen() {
   const toMain = () => (full ? toWait() : toForm());
   const mainLabel = full ? "Join the waiting list" : "Join the beta, free";
   const spotsLine = spots === null ? null : full ? "This round of the beta is full." : `${spots} ${spots === 1 ? "spot" : "spots"} left in this round`;
-  // HP10: the bar at the bottom shows while neither the button under the calculator nor the form is on screen
+  // HP10: the bar at the bottom shows while neither the button on the first screen (HP5 1d) nor the form is on screen
   const ctaRef = useRef<HTMLDivElement>(null);
   // positions on every scroll, so a fast fling past the button still shows the bar
   const [sticky, setSticky] = useState(false);
@@ -83,32 +83,35 @@ export function LandingScreen() {
         </section>
       )}
 
-      {/* the top (board HP, HP5, 12 October 2026): who it is for, the promise, the calculator already answered, then the
-          one way in, Try Chef Mealan; whoever has a code uses Sign in in the top bar */}
-      <section className="l-hero">
-        <div className="l-hero-text">
+      {/* HP5 1d (0.3.46, board Stories149; Coach Milan 1 November 15:38 to 16:52 Go): the button on the first screen, over a slow
+          carousel of Milan's own cooking. The words, the button, the spots left and the commitment stay still; the photo changes by
+          itself every 5.5 seconds with a crossfade; dots show which, and a tap on a dot shows that dish. Reduce motion: the first
+          photo only. Only the first photo loads with the page, the others after. Each photo has its own focus, so the plate sits
+          in the middle of what shows (the curry moved up, Milan 16:43). */}
+      <section className="l-photo" aria-label="The start">
+        <HeroPhotos />
+        <div className="l-photo-words">
           <span className="l-kicker">For people with a nutrition plan</span>
           <h1>Live your nutrition plan, day by day.</h1>
-          <p>Chef Mealan plans your meals with you. When the day surprises you or a craving comes, Chef Mealan finds the meal that still fits your numbers. You don't need a food diary, and you don't need to feel guilty.</p>
-          <p className="l-try-lead">Try the calculator: pick what you crave, and see which food makes the craving fit your plan.</p>
-          {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
-        </div>
-        <div>
-          <TryIt />
-          {/* HP68 (Milan 23:53): the sign-up box picks up where the calculator stops, at its one target */}
-          <div className="l-cta-block l-cta-hook" ref={ctaRef}>
-            <b className="l-cta-head">Your own target, at every meal</b>
-            <p>This calculator uses one target, PD {DEMO_GOAL.pd}. Your own target comes from your goal, your body and your training. Chef Mealan calculates it for you, then plans each meal to reach it with the foods in your kitchen.</p>
+          <p className="l-photo-lead">Chef Mealan plans your meals with you, and finds the meal that still fits when the day surprises you.</p>
+          {err && <p className="l-photo-err">{err}</p>}
+          <div className="l-photo-cta" ref={ctaRef}>
             <button className="pill pill-primary l-cta-big" onClick={toMain}>{mainLabel}</button>
             <div className="l-beta">
               {spotsLine && <p className={`l-spots ${full ? "full" : ""}`}>{spotsLine}</p>}
               {full
                 ? <p>Join the waiting list, and we write to you once, when Chef Mealan opens to everyone.</p>
-                : <><p>Beta testers use Chef Mealan most days for four weeks, and tell us what breaks. Free while it is in beta.</p>
-                    <p><button type="button" className="link" onClick={toWait}>Not ready to test? Join the waiting list ›</button></p></>}
+                : <p>Use it most days for four weeks, and tell us what breaks. <button type="button" className="link" onClick={toWait}>Or join the waiting list</button></p>}
             </div>
           </div>
+          <p className="l-photo-own">Milan's own cooking, at home.</p>
         </div>
+      </section>
+
+      {/* the calculator, right under the photo, with its line (board HP, 12 October 2026) */}
+      <section className="l-hero l-calc">
+        <p className="l-try-lead">Try the calculator: pick what you crave, and see which food makes the craving fit your plan.</p>
+        <TryIt />
       </section>
 
       {/* HP2 (0.2.114, board Stories90; Milan 27 October 14:25 to 15:34): in place of the five clips of 0.2.51. Start from anything,
@@ -342,6 +345,62 @@ export function DayVideo({ src, poster, label, big }: { src: string; poster: str
     </figure>
   );
 }
+// HP5 1d: Milan's own cooking behind the words. Phone and computer get their own size of each photo and their own focus.
+const HERO_PHOTOS = [
+  { k: "curry", name: "Curry with rice", phone: ["40% 100%", "auto 126%"], desk: ["62% 70%", "cover"] },
+  { k: "meatballs", name: "Meatballs in the pan" },
+  { k: "quesadilla", name: "Quesadilla" },
+  { k: "waffle", name: "Waffle" },
+  { k: "squares", name: "Chocolate squares" },
+] as { k: string; name: string; phone?: string[]; desk?: string[] }[];
+export const HERO_EVERY_MS = 5500;
+function HeroPhotos() {
+  const [still] = useState(() => { try { return window.matchMedia("(prefers-reduced-motion: reduce)").matches; } catch { return false; } });
+  const [at, setAt] = useState(0);
+  const [loaded, setLoaded] = useState<Set<number>>(() => new Set([0]));
+  const [turn, setTurn] = useState(0);   // a tap on a dot starts the wait again
+  // the other photos load after the page, in the size this screen uses
+  useEffect(() => {
+    if (still) return;
+    const t = setTimeout(() => {
+      const big = window.matchMedia("(min-width: 760px)").matches;
+      HERO_PHOTOS.forEach((p, i) => { if (i === 0) return; const im = new Image(); im.onload = () => setLoaded((s) => new Set(s).add(i)); im.src = `/landing/hero/${p.k}-${big ? "l" : "m"}.webp`; });
+    }, 1500);
+    return () => clearTimeout(t);
+  }, [still]);
+  useEffect(() => {
+    if (still || loaded.size < 2) return;
+    const t = setInterval(() => {
+      if (document.hidden) return;
+      setAt((a) => { for (let n = 1; n <= HERO_PHOTOS.length; n++) { const j = (a + n) % HERO_PHOTOS.length; if (loaded.has(j)) return j; } return a; });
+    }, HERO_EVERY_MS);
+    return () => clearInterval(t);
+  }, [still, loaded, turn]);
+  const shown = still ? HERO_PHOTOS.slice(0, 1) : HERO_PHOTOS;
+  return (
+    <>
+      {shown.map((p, i) => {
+        const on = loaded.has(i);
+        const style = {
+          "--img-m": on ? `url(/landing/hero/${p.k}-m.webp)` : "none", "--img-l": on ? `url(/landing/hero/${p.k}-l.webp)` : "none",
+          "--pos-p": (p.phone ?? ["center"])[0], "--size-p": (p.phone ?? ["", "cover"])[1],
+          "--pos-d": (p.desk ?? ["center"])[0], "--size-d": (p.desk ?? ["", "cover"])[1],
+        } as React.CSSProperties;
+        return <div key={p.k} className={`l-photo-pic ${i === at ? "on" : ""}`} style={style} data-photo={p.k} aria-hidden="true" />;
+      })}
+      <div className="l-photo-fade" aria-hidden="true" />
+      {!still && (
+        <div className="l-photo-dots" role="group" aria-label="Photos">
+          {HERO_PHOTOS.map((p, i) => (
+            <button key={p.k} type="button" aria-label={`${p.name}, photo ${i + 1} of ${HERO_PHOTOS.length}`} aria-pressed={i === at}
+              onClick={() => { setAt(i); setTurn((n) => n + 1); }}><span /></button>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
 function TryIt() {
   // the calculator used: counted once per visit, at the first pick or step
   const counted = useRef(false);
