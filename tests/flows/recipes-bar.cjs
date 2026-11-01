@@ -22,7 +22,7 @@ const SHARED = [
   R("s1", "Protein first", "Marko", "Mediterranean", [it("Chicken breast, raw", 600, 120, 22.5, 2.6, 0), it("Rice, cooked", 400, 130, 2.7, 0.3, 28), it("Greek yoghurt", 200, 59, 10, 0.4, 3.6)], ["Grill.", "Serve."], "2026-10-23T18:00:00Z", 2),
   R("s2", "Tuna salata", "", null, [it("Tunina v oljčnem olju", 160, 190, 25, 10, 0), it("Greek yoghurt", 200, 59, 10, 0.4, 3.6), it("Apple", 150, 52, 0.3, 0.2, 14), it("Red onion", 57, 40, 1.1, 0.1, 9)], ["Drain.", "Mix."], "2026-10-23T19:30:00Z", 1),
   R("s3", "Sarma", "Darinka", "Balkan", [it("Beef mince, raw", 500, 215, 18.6, 15, 0), it("Rice, raw", 200, 360, 6.6, 0.6, 79), it("Sauerkraut leaves", 600, 19, 0.9, 0.1, 4)], ["Roll.", "Simmer two hours."], "2026-10-22T12:00:00Z", 3),
-  R("s4", "Davorka's chicken stir fry", "Davorka", "Asian", [it("Chicken breast, raw", 400, 120, 22.5, 2.6, 0), it("Rice, cooked", 400, 130, 2.7, 0.3, 28)], ["Fry hot and fast."], "2026-10-21T12:00:00Z", 0),
+  R("s4", "Nina's chicken stir fry", "Nina", "Asian", [it("Chicken breast, raw", 400, 120, 22.5, 2.6, 0), it("Rice, cooked", 400, 130, 2.7, 0.3, 28)], ["Fry hot and fast."], "2026-10-21T12:00:00Z", 0),
   R("s5", "Overnight oats with skyr", "", null, [it("Oats", 60, 372, 13.5, 7, 58.7), it("Skyr, natural", 200, 63, 11, 0.2, 4)], ["Mix and leave overnight."], "2026-10-20T12:00:00Z", 4),
 ];
 const PORT = 3268, U = `http://127.0.0.1:${PORT}`;
@@ -76,7 +76,7 @@ const PORT = 3268, U = `http://127.0.0.1:${PORT}`;
   await page.getByLabel("Clear the search").click(); await page.waitForTimeout(300);
   // Made by
   await page.getByRole("button", { name: /^Made by/ }).click(); await page.waitForTimeout(200);
-  ok((await lines(page)).join(",") === "All10,Me4, one shared without your name,Your coach1,All members5,Darinka1,Davorka1,Marko1,A member without a name2", "DT126c: Made by: all, me, the coach, the cooks with counts, a member without a name: " + (await lines(page)).join(","));
+  ok((await lines(page)).join(",") === "All10,Me4, one shared without your name,Your coach1,All members5,Darinka1,Marko1,Nina1,A member without a name2", "DT126c: Made by: all, me, the coach, the cooks with counts, a member without a name: " + (await lines(page)).join(","));
   await page.locator(".rb-line").filter({ hasText: "A member without a name" }).click(); await page.waitForTimeout(300);
   ok((await titles(page)).sort().join() === "Overnight oats with skyr,Tuna salata" && /Made by: a member without a name/.test(await count(page)), "DT126c: A member without a name shows the two unnamed");
   await page.getByRole("button", { name: /^Made by/ }).click(); await page.locator(".rb-line").filter({ hasText: "Your coach" }).click(); await page.waitForTimeout(300);
@@ -87,7 +87,7 @@ const PORT = 3268, U = `http://127.0.0.1:${PORT}`;
   ok((await titles(page)).filter((t) => t === "Sarma").length === 1 && /9 of 10 recipes · Fits my day/.test(await count(page)), "DT126: Fits my day drops Darinka's sarma, PD 5.9 under your 6.5; your own sarma stays: " + await count(page));
   await page.getByRole("button", { name: "No cooking" }).click(); await page.waitForTimeout(300);
   const nc = await titles(page);
-  ok(!nc.includes("Protein first") && !nc.includes("Davorka's chicken stir fry") && nc.includes("Tuna salata") && /Fits my day · No cooking/.test(await count(page)), "DT126: No cooking stacks on it, and the line names both: " + await count(page));
+  ok(!nc.includes("Protein first") && !nc.includes("Nina's chicken stir fry") && nc.includes("Tuna salata") && /Fits my day · No cooking/.test(await count(page)), "DT126: No cooking stacks on it, and the line names both: " + await count(page));
   await page.getByRole("button", { name: "Clear all" }).click(); await page.waitForTimeout(300);
   ok((await titles(page)).length === 5 && /10 recipes/.test(await count(page)), "DT126: Clear all brings the idle list back");
   // the sort, inside the members' group

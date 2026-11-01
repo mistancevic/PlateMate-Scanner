@@ -87,7 +87,7 @@ const toast = { title: "Toast with peanut butter", kitchen: null, steps: [], ite
 
   // CO2: Members, at your portion; another member's recipes, one with your declared allergy
   const as = (who, body) => api("/api/members", { method: "POST", headers: { "Content-Type": "application/json", "x-local-as": who }, body: JSON.stringify(body) });
-  await as("davorka", { recipe: stir, cover: pic, coverKind: "drawn", named: true, name: "Davorka Bokic" });
+  await as("nina", { recipe: stir, cover: pic, coverKind: "drawn", named: true, name: "Nina Bokic" });
   await as("member", { recipe: salmon, cover: pic, coverKind: "photo", named: false });
   await as("member", { recipe: toast, cover: null, coverKind: "drawn", named: false });
   // Changed by story DT126c (0.2.106, board Stories74): no tabs; Made by: members is the members' part of the one list
@@ -103,7 +103,7 @@ const toast = { title: "Toast with peanut butter", kitchen: null, steps: [], ite
   const stirTile = (await tiles.filter({ hasText: "stir-fry" }).textContent()).replace(/\s+/g, " ");
   const tileKcal = Number((stirTile.match(/· ([\d,]+) kcal/) || [])[1]?.replace(",", ""));
   // the foods are rounded to 5 g each, so the portion lands near the meal's size, not on it
-  ok(/Balkan · shared by Davorka/.test(stirTile) && /Your dinner: [\d,]+ g · [\d,]+ kcal · PD 9\.2/.test(stirTile) && Math.abs(tileKcal - need) <= need * 0.05, "CO2: Davorka's stir-fry at your dinner, within 5 % of its size: " + stirTile);
+  ok(/Balkan · shared by Nina/.test(stirTile) && /Your dinner: [\d,]+ g · [\d,]+ kcal · PD 9\.2/.test(stirTile) && Math.abs(tileKcal - need) <= need * 0.05, "CO2: Nina's stir-fry at your dinner, within 5 % of its size: " + stirTile);
   ok(/under your 6\.4/.test(await tiles.filter({ hasText: "Salmon" }).textContent()) && /Photo by a member/.test(await tiles.filter({ hasText: "Salmon" }).textContent()), "CO2: the salmon is marked under your target, with a member's photo");
   // DT126c: a recipe of yours shared with members is one row, under Made by me, with its state
   ok(await tiles.filter({ hasText: "rye bread" }).count() === 0, "CO2: your own shared recipe is not repeated under members");

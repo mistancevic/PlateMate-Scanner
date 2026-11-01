@@ -61,15 +61,15 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   // the coach's side (example clients, ?coachdemo): what changed on the row and at the top of the page, the shared parts below
   await page.goto(U + "today?coachdemo"); await page.waitForTimeout(1000);
   await page.getByRole("radio", { name: "My clients" }).click(); await page.waitForTimeout(800);
-  const dav = page.locator(".cw-row", { hasText: "Davorka" }).first();
+  const dav = page.locator(".cw-row", { hasText: "Nina" }).first();
   ok(/Profile: 2 changes since you looked/.test(await dav.textContent()), "Clients marks a client whose shared profile changed");
   await dav.click(); await page.waitForTimeout(600);
   const ch = (await page.locator(".profile-changes").innerText()).replace(/\s+/g, " ");
   ok(/What changed since you last looked \d+ \w+ Wake-up and bedtime: 6:00 to 8:00 · 22:00 to midnight → Before 6:00 · 22:00 to midnight\. \d+ \w+ Meals: 3 a day, .* → 3 a day, 06:30/.test(ch), "the client's page starts with what changed: " + ch.slice(0, 200));
   const sp = (await page.locator(".shared-profile").innerText()).replace(/\s+/g, " ");
-  ok(/Davorka's profile/.test(sp) && /Not shared What you eat, alcohol, in your own words, allergies and intolerances, your body data\. Davorka keeps these to themselves\./.test(sp) && !/Alcohol On weekends/.test(sp) && !/born 1985/.test(sp), "the shared parts below, what wasn't shared said, no private row: " + sp.slice(-260));
+  ok(/Nina's profile/.test(sp) && /Not shared What you eat, alcohol, in your own words, allergies and intolerances, your body data\. Nina keeps these to themselves\./.test(sp) && !/Alcohol On weekends/.test(sp) && !/born 1985/.test(sp), "the shared parts below, what wasn't shared said, no private row: " + sp.slice(-260));
   await page.getByRole("button", { name: "‹ Clients" }).click(); await page.waitForTimeout(400);
-  ok(!/Profile: \d+ change/.test(await page.locator(".cw-row", { hasText: "Davorka" }).first().textContent()), "looked at: the mark goes");
+  ok(!/Profile: \d+ change/.test(await page.locator(".cw-row", { hasText: "Nina" }).first().textContent()), "looked at: the mark goes");
   // DT172 (privacy finding 14, option a): Lena shares no body data: her coach sees the trend in percent, no kilogram
   await page.locator(".cw-row", { hasText: "Lena" }).first().click(); await page.waitForTimeout(600);
   const lp = (await page.locator("main").innerText()).replace(/\s+/g, " ");
