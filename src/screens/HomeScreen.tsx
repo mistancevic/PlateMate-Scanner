@@ -1,4 +1,5 @@
 import { travelOn, placeName as placeNameOf } from "../travel";
+import { SetupRow } from "../components/SetupRow";
 import { Fragment, useEffect, useState } from "react";
 import { Camera, ChevronRight, Check, Pencil, Plus, Utensils } from "lucide-react";
 import { aggregate, density } from "../pilot";
@@ -166,13 +167,13 @@ export function HomeScreen(p: AppApi) {
           <small>{clientName ? `${clientName}'s goal` : "My goal"}{byCoach ? `, set by ${setBy}` : ""}</small>
           <button className="plan-goal-name" onClick={() => p.openMenu("goal")} aria-label="Open my goal">{bandName || "My goal"} <ChevronRight size={22} /></button>
         </div>
-        <small className="day-against"><b>Today so far, against your goal</b></small>
+        {/* DT208 (0.3.49): one row under the goal, in place of Today so far, against your goal */}
+        <SetupRow p={p} done="Profile and plan fully set. Target today:" />
         <div className="plan-row">
-          <div><b>{dayT.kcal > 0 ? pdVal(density(dayT.protein, dayT.kcal)) : "0"}</b><small>{pdTag()} today, target {pdVal(p.dayPd)}</small></div>
+          <div><b>{dayT.kcal > 0 ? pdVal(density(dayT.protein, dayT.kcal)) : "0"}</b><small>{pdTag() === "PD" ? `of PD ${pdVal(p.dayPd)}` : `of ${pdVal(p.dayPd)} ${pdTag()}`}</small></div>
           <div><b>{fmt(dayT.kcal, 0)}</b><small>of {fmt(kT, 0)} kcal{!follow ? "" : p.day.source === "assumed" ? ", week's average" : " today"}</small></div>
           <div><b>{fmt(dayT.protein, 0)}</b><small>of {fmt(pT, 0)} g protein</small></div>
         </div>
-        {!p.goal && <button className="strip strip-button" onClick={p.openGoal}>Set your goal: your day in four numbers, every plate measured against them.</button>}
         {p.todayMacros && (
           <div className="plan-macros">
             <div><b>{fmt(dayT.fats, 0)}{dayT.gap ? "+" : ""}</b><small>of {p.todayMacros.fats} g fat</small></div>

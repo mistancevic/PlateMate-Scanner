@@ -16,8 +16,9 @@ const path = require("node:path");
   // the way out
   ok(await page.getByRole("button", { name: "Not now" }).count() === 1, "the first screen has Not now");
   await page.getByRole("button", { name: "Not now" }).click(); await page.waitForTimeout(500);
-  ok((await page.evaluate(() => localStorage.getItem("chefmealan-goal"))) === null && /Set your goal/.test(await page.locator("main").textContent()), "Not now saves nothing; Today offers Set your goal");
-  await page.getByText(/Set your goal/).click(); await page.waitForTimeout(400);
+  // DT208 (0.3.49): Today says what is still to set, in one row under the goal
+  ok((await page.evaluate(() => localStorage.getItem("chefmealan-goal"))) === null && /^To set: .*goal/.test((await page.locator(".setup-line").textContent()).trim()), "Not now saves nothing; Today says To set, the goal among them");
+  await require("./goal-open.cjs")(page);
   // Calculate for me
   ok(await page.getByRole("button", { name: "Calculate for me" }).count() === 1 && await page.getByText("Work it out for me").count() === 0, "Calculate for me, not Work it out");
   // the five goals as cards, Recomposition first (approved 6 October 2026, canvas board G1); each explains itself
@@ -46,6 +47,8 @@ const path = require("node:path");
   await page.getByRole("button", { name: /^Apply from today/ }).click(); await page.waitForTimeout(600); await require("./shop-step.cjs")(page);
   const g = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).goals);
   ok(g.calories > 0 && g.protein > 0 && g.fats > 0 && g.carbs > 0, "the average is saved with all four: " + JSON.stringify(g));
+  // DT208: the calculator was opened from My goal; Today is one tap away
+  if (await page.locator("section.plan .plan-row").count() === 0) { const c = page.getByRole("button", { name: /^Close$/ }); if (await c.count()) { await c.first().click(); await page.waitForTimeout(500); } await page.locator("nav button").filter({ hasText: "Today" }).first().click(); await page.waitForTimeout(800); }
   // Today: pick the day, the numbers follow it
   // R5 (Milan 17:23 to 19:00, board RS13): the goal card shows today against it; the target is the "of N kcal" under the eaten kcal
   const avgK = (await page.locator(".plan-row div").nth(1).locator("small").textContent()).match(/of ([\d,]+) kcal/)[1];
