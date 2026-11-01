@@ -65,6 +65,18 @@ export function MetricsScreen() {
   const bar = (label: string, n: number) => <div className="mt-way"><span>{label}</span><i><em style={{ width: `${Math.max(n ? 2 : 0, Math.round((n / max) * 100))}%` }} /></i><b>{n}</b></div>;
   return (
     <div className="mt">
+      {/* DT207a (0.3.48; Coach Milan 1 November 19:42): today and since the first day on top, above the weeks, whichever week is open */}
+      {started && data.today && (
+        <section className="card mt-card mt-today">
+          <b className="mt-h">Today, and since the first day</b>
+          {/* next to today, the count since the first day (board M, M5) */}
+          <div className="mt-grid3"><span /><small>TODAY</small><small>{`SINCE ${DAY(started).toUpperCase().replace(/ (\w{3})\w*$/, " $1")}`}</small>
+            <span>Home page visits</span><b>{data.today.visits}</b><b className="muted">{data.sinceTotals?.visits ?? data.today.visits}</b>
+            <span>Members who opened Today</span><b>{data.today.opened}</b><b className="muted">{data.sinceTotals?.opened ?? data.today.opened}</b>
+            <span>Meals eaten and saved</span><b>{data.today.eaten}</b><b className="muted">{data.sinceTotals?.eaten ?? data.today.eaten}</b>
+          </div>
+        </section>
+      )}
       {tabs}
       <section className="card mt-card mt-frame">
         <b className="mt-h">{view === "week" ? "This week" : view === "last" ? "Last week" : "The last 4 weeks"}</b>
@@ -118,17 +130,6 @@ export function MetricsScreen() {
             ["Kept in Mine from Members", s.members?.keep ?? 0, l.members?.keep ?? 0], ["Shared with members", s.members?.share ?? 0, l.members?.share ?? 0]]
             .map(([a, n, m]) => <div className="mt-row" key={String(a)}><span>{a}</span><b>{n}</b><small>{m}</small></div>)}
         </section>
-        {view === "week" && started && (
-          <section className="card mt-card">
-            <b className="mt-h">Today, and since the first day</b>
-            {/* next to today, the count since the first day (board M, M5) */}
-            <div className="mt-grid3"><span /><small>TODAY</small><small>{`SINCE ${DAY(started).toUpperCase().replace(/ (\w{3})\w*$/, " $1")}`}</small>
-              <span>Home page visits</span><b>{data.today.visits}</b><b className="muted">{data.sinceTotals?.visits ?? data.today.visits}</b>
-              <span>Members who opened Today</span><b>{data.today.opened}</b><b className="muted">{data.sinceTotals?.opened ?? data.today.opened}</b>
-              <span>Meals eaten and saved</span><b>{data.today.eaten}</b><b className="muted">{data.sinceTotals?.eaten ?? data.today.eaten}</b>
-            </div>
-          </section>
-        )}
       </>)}
     </div>
   );

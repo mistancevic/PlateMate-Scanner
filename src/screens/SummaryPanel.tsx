@@ -60,8 +60,8 @@ export function SummaryPanel(p: AppApi) {
       <p className="small muted page-why">Everything you told Chef Mealan, in one place, and what each answer does. ✓ Chef reads: Chef Mealan reads it with every plate, idea and answer. Change any part from its step.</p>
       <SummaryParts parts={parts} open={(s) => p.openMenu(s, "summary")} />
       <div className="menu-list sum-next">
-        <button className="menu-row" onClick={() => p.setTab("plan")}><span className="menu-row-text"><b>Plan your week</b><small>Fill your slots with Chef Mealan</small></span><span aria-hidden="true">›</span></button>
-        <button className="menu-row" onClick={() => p.setTab("journey")}><span className="menu-row-text"><b>Craft your first meal</b><small>{next ? `On Plate: ${next.name.toLowerCase()} at ${next.time}` : "On Plate, for your next meal"}</small></span><span aria-hidden="true">›</span></button>
+        <button className="menu-row" onClick={() => p.tabFromPage("plan")}><span className="menu-row-text"><b>Plan your week</b><small>Fill your slots with Chef Mealan</small></span><span aria-hidden="true">›</span></button>
+        <button className="menu-row" onClick={() => p.tabFromPage("journey")}><span className="menu-row-text"><b>Craft your first meal</b><small>{next ? `On Plate: ${next.name.toLowerCase()} at ${next.time}` : "On Plate, for your next meal"}</small></span><span aria-hidden="true">›</span></button>
       </div>
       <div className="button-row sum-buttons">
         {coach && <button className="pill pill-primary" onClick={() => { setSharing(true); window.scrollTo(0, 0); }}>Choose what {coach} sees</button>}

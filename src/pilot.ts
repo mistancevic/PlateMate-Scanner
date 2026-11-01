@@ -275,6 +275,8 @@ export type PilotState = {
   recipeFoods?: string[];
   // a recipe that came in, opened from Recipes (0.2.19, IM13): the plate puts it on as the first time, then clears this
   openRecipe?: string;
+  // DT206 (0.3.48): when the first food went on this plate; a food added hours later asks first
+  plateAt?: string;
   // DT127 (0.2.108): the photo of the meal the plate was read from, when it was taken, and the one question the read was unsure about
   photo?: { image: string; at: string; unsure?: { name: string; options: [number, number] } | null;
     // DT130 (0.2.110): a photo from Your photos says whose plate and when: ate (logged at the photo's time), idea (nothing logged)

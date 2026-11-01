@@ -253,3 +253,7 @@ export function mixTip(food: Food, moment: MomentId, target: number | null, libr
 }
 
 export const mixLabel = (m: Mix) => { const first = m.items[0]; const n = first?.food.serving ? `${Math.round(first.grams / first.food.serving.grams)} ${first.food.serving.name}${Math.round(first.grams / first.food.serving.grams) === 1 ? "" : "s"} ` : ""; return `${n}with ${m.partners.map((p) => p.name).join(" + ")}`; };
+
+// DT206 (0.3.48; Coach Milan 1 November 19:42, a lunch built around an alcohol-free beer): a drink goes with a meal. It counts
+// in the meal; Chef Mealan never builds the meal around it, and a recipe keeps it out unless you say so.
+export const isDrink = (f: Food): boolean => catOf(f) === "drink";

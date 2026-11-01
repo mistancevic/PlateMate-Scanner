@@ -6,7 +6,7 @@ import { kindOf, gramsOfOne } from "./counted";
 export const JOBS = ["Protein base", "Flavour food", "Carb base", "Fat source", "Volume food", "Drink", "Mixed"] as const;
 export type Job = (typeof JOBS)[number];
 const SPREAD = /nutella|spread|aufstrich|creme|crème|butter|peanut ?butter|erdnussmus|nussmus|honig|honey|jam|marmelade|konfit/i;
-const DRINK = /drink|juice|saft|milk\b|milch\b|cola|soda|tea\b|tee\b|coffee|kaffee|smoothie|shake|wasser|water|bier|beer|wein|wine/i;
+const DRINK = /drink|juice|saft|milk\b|milch\b|cola|soda|tea\b|tee\b|coffee|kaffee|smoothie|shake|wasser|water|bier|beer|wein|wine|alkoholfrei|alcohol-free|pils\b|lager\b|radler|kombucha|lemonade|limonade|sprite|fanta|energy drink/i;
 export function jobOf(f: Food): { job: Job; note: string; taste: "sweet" | "savoury" | null; mine: boolean } {
   // DT125 (0.2.104): the job comes from what the food is, by its English name, never from a name in another language
   // (Thunfisch in Wasser read as a Drink because of Wasser)

@@ -1,6 +1,7 @@
 import { SafetyQuestion } from "../components/SafetyQuestion";
 import { countByPlace, samePlace, getStarted } from "../places";
-import { useState, useEffect, Fragment, type ReactNode } from "react";
+import { useState, useEffect, useRef, Fragment, type ReactNode } from "react";
+import { profileOdd } from "../profileOdd";
 import { QrCode, FlaskConical, ChevronRight, BookOpen, ChevronLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator, Coffee } from "lucide-react";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
@@ -164,8 +165,20 @@ function ProfilePanel(p: AppApi) {
   const [name, setName] = useState(p.clientName);
   const [d, setD] = useState<Personal>(p.personal);
   const num = (v: string) => (v.trim() === "" ? undefined : Number(v.replace(",", ".")) || undefined);
-  const dirty = name.trim() !== p.clientName || JSON.stringify(d) !== JSON.stringify(p.personal);
   const consented = Boolean(p.safety.consentBodyAt);
+  // DT205 (0.3.48, board Stories152; Coach Milan 1 November 19:42): no Save button in the middle of the page. A choice is kept
+  // the moment it is tapped, a typed number a moment after typing stops and when you leave the field or the page. A number
+  // that cannot be right (a birth year of two digits while typing) waits, and the line under the card says which.
+  const odd = profileOdd(d);
+  const latest = useRef({ name, d, p }); latest.current = { name, d, p };
+  const keep = () => {
+    const { name: n, d: x, p: q } = latest.current;
+    if (!q.safety.consentBodyAt || profileOdd(x)) return;
+    if (n.trim() !== q.clientName) q.setClientName(n.trim());
+    if (JSON.stringify(x) !== JSON.stringify(q.personal)) { if (x.pdUnit !== q.personal.pdUnit) log("pd_unit", { unit: x.pdUnit ?? "pd" }); q.setPersonal(x); }
+  };
+  useEffect(() => { const t = setTimeout(keep, 700); return () => clearTimeout(t); }, [name, d]);
+  useEffect(() => () => keep(), []);
   return (
     <>
       <p className="small">All of this is optional. It's used only to calculate your numbers, and kept on this phone and in your account, nowhere else.</p>
@@ -242,16 +255,10 @@ function ProfilePanel(p: AppApi) {
             return <small className="pd-unit-day">Your day: {Math.round(pro)} g of protein in {Math.round(kcal).toLocaleString("en")} kcal. That is PD {pd.toFixed(1)}, or {Math.round(pd * 4)} % ({Math.round(pro * 4).toLocaleString("en")} of {Math.round(kcal).toLocaleString("en")} kcal).</small>;
           })()}
         </div>
-        <button className="pill pill-primary pill-wide" disabled={!dirty || !consented} onClick={() => { p.setClientName(name.trim()); p.setPersonal(d); if (d.pdUnit !== p.personal.pdUnit) log("pd_unit", { unit: d.pdUnit ?? "pd" }); p.notify("Profile saved."); }}>Save</button>
+        <small className={`muted saved-line ${odd ? "odd" : ""}`} role="status">{!consented ? "" : odd ? `Not kept yet: ${odd}.` : "Kept as you go. Nothing to save."}</small>
       </section>
       <SafetyQuestion p={p} />
-      <div className="menu-list" style={{ marginTop: 12 }}>
-        <button className="menu-row" onClick={() => { if (dirty) { p.setClientName(name.trim()); p.setPersonal(d); p.notify("Profile saved."); } p.openMenu("goal", "profile"); }}>
-          <span className="menu-icon"><Calculator size={20} /></span>
-          <span className="menu-row-text"><b>{dirty ? "Save and go to Goal" : "Goal"}</b><small>{canCalculate(d) ? "Calculate your daily numbers from this profile" : "Your goal and daily numbers"}</small></span>
-          <ChevronRight size={18} />
-        </button>
-      </div>
+      <NextLink p={p} to="goal" from="profile" text="Goal" hint={canCalculate(d) ? "Calculate your daily numbers from this profile" : "Your goal and daily numbers"} before={keep} />
     </>
   );
 }
@@ -268,14 +275,13 @@ function SignOut({ p, inline }: { p: AppApi; inline?: boolean }) {
   if (inline) return <>{btn}{note}</>;
   return <div className="button-row" style={{ marginTop: 12, flexWrap: "wrap" }}>{btn}{note}</div>;
 }
-function NextLink({ p, to, from, text, hint }: { p: AppApi; to: MenuSection; from: MenuSection; text: string; hint: string }) {
+// DT205 (0.3.48; Coach Milan 1 November 19:42 "Goal as the cta is not prominent"): the next step is the main button at the end
+// of each step, the same everywhere, with its line under it
+function NextLink({ p, to, from, text, hint, before }: { p: AppApi; to: MenuSection; from: MenuSection; text: string; hint: string; before?: () => void }) {
   return (
-    <div className="menu-list" style={{ marginTop: 12 }}>
-      <button className="menu-row" onClick={() => p.openMenu(to, from)}>
-        <span className="menu-icon">{ITEMS.find((i) => i.id === to)?.icon}</span>
-        <span className="menu-row-text"><b>Next: {text}</b><small>{hint}</small></span>
-        <ChevronRight size={18} />
-      </button>
+    <div className="next-step">
+      <button className="pill pill-primary pill-wide" onClick={() => { before?.(); p.openMenu(to, from); }}>Next: {text} <ChevronRight size={18} /></button>
+      <small className="muted">{hint}</small>
     </div>
   );
 }

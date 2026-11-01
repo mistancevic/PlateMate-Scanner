@@ -31,7 +31,11 @@ const PORT = "3319", U = `http://127.0.0.1:${PORT}`;
     ok(/Join the beta, free/.test(cta) && /12 spots left in this round/.test(cta) && /Use it most days for four weeks, and tell us what breaks/.test(cta) && /Or join the waiting list/.test(cta) && /Milan's own cooking, at home\./.test(cta), "the beta box on the photo: the button, 12 spots, the commitment, the waiting list link, whose cooking");
     const fold = await page.evaluate(() => ({ b: document.querySelector(".l-photo-cta .l-cta-big").getBoundingClientRect().bottom, own: document.querySelector(".l-photo-own").getBoundingClientRect().bottom, sw: document.documentElement.scrollWidth }));
     ok(fold.own <= 844 && fold.sw === 390, "the button and its lines on the first screen, no sideways scroll: " + JSON.stringify(fold));
-    ok(/^Try the calculator/.test(await txt(".l-calc .l-try-lead")) && (await page.locator(".l-calc .l-try-box").count()) === 1, "the calculator right under the photo, with its line");
+    // HP6 (0.3.48): the calculator in the shape of the other sections
+    const tc = async (sel) => ((await page.locator(sel).first().textContent()) || "").trim();
+    ok((await tc(".l-calc .l-eyebrow")) === "Try it here" && (await tc(".l-calc h2")) === "Make your craving fit your plan" && /^Pick what you crave and a food you have at home/.test(await tc(".l-calc-text p")) && (await page.locator(".l-calc .l-try-box").count()) === 1, "the calculator under the photo: Try it here, the title, one line");
+    const gap = await page.evaluate(() => { const l = document.querySelector(".l-photo .l-beta .link").getBoundingClientRect(), p = document.querySelector(".l-photo .l-beta .link").closest("p"); const lh = parseFloat(getComputedStyle(p).lineHeight); return { tap: Math.round(l.height), lines: Math.round(p.getBoundingClientRect().height / lh) , h: Math.round(p.getBoundingClientRect().height), lh }; });
+    ok(gap.tap >= 44 && gap.h <= gap.lines * gap.lh + 2, "the waiting-list link is 44 px to tap and keeps the line height: " + JSON.stringify(gap));
     // five photos, the first loads with the page; dots; a tap on a dot shows that dish
     ok((await page.locator(".l-photo-pic").count()) === 5 && (await page.locator(".l-photo-pic.on").getAttribute("data-photo")) === "curry", "five photos, the curry first");
     ok(heroAsked.filter((u) => /curry-m\.webp/.test(u)).length >= 1 && heroAsked.length >= 1, "the curry loads with the page: " + heroAsked.join(", "));
