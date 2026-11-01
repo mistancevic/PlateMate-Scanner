@@ -355,3 +355,6 @@ export function moveDay(plan: Plan, from: number, to: number): Plan {
   return next;
 }
 export const lengthName = (minutes: number | undefined) => lengthOf(minutes ?? 60).name.replace("–", " to ");
+// DT146 (0.3.38, board Stories146; Anna): a length picked as a range is said as that range (55 is the middle of 45 to 60);
+// a length typed as minutes stays as typed
+export const minutesWords = (minutes: number) => (LENGTHS.some((r) => r.mid === minutes) ? lengthName(minutes) : `${minutes} min`);

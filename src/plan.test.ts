@@ -138,3 +138,11 @@ test("your work in the goal setup writes the Lifestyle the numbers read", async 
   assert.equal(workOf(q), "feet"); assert.equal(q.lifestyle!.move, "feet"); assert.equal(q.lifestyle!.hours, "flexible", "hours stay");
   assert.equal(workOf(withWork(q, "shift")), "shift");
 });
+
+// DT146 (0.3.38): a length picked as a range is said as that range
+import { minutesWords } from "./plan";
+test("a training length picked as a range stays a range", () => {
+  assert.equal(minutesWords(55), "45 to 60 min");
+  assert.equal(minutesWords(25), "15 to 30 min");
+  assert.equal(minutesWords(50), "50 min");
+});

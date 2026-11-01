@@ -45,7 +45,8 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
         {weekdays.map((w) => (
           <div className="dt-row" key={w.name}>
             <div className="dt-cells">
-              <span className="dt-day"><b><i className={`load-dot load-${loadOf(w.day)}`} />{w.name}</b><small>{planShort(w.day)}</small></span>
+              {/* DT144 (0.3.38, board Stories146): each day's PD, the number Today shows on that day */}
+              <span className="dt-day"><b><i className={`load-dot load-${loadOf(w.day)}`} />{w.name}</b><small>{planShort(w.day)}</small><b className="dt-pd">PD {(density(w.protein, w.kcal) ?? 0).toFixed(1)}</b></span>
               <b className="dt-num">{w.kcal.toLocaleString("en")}</b>
               <span className="dt-num">{w.protein}</span>
               <span className="dt-num muted">{w.fats}</span>

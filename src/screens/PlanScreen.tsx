@@ -8,7 +8,7 @@ import { ChevronRight, ChefHat, Pencil, Circle, CircleCheck, CircleSlash, Shoppi
 import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeList, tickIn, finishList, notTicked, listText, shopAmount, stateOf, shortMeals, byMeal, replanMeal, followPlan, notCounted, planChanges, updateList, type ShopStore, type SavedList, type ShopLine } from "../shopping";
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
-import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, type PlanDay } from "../plan";
+import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, minutesWords, type PlanDay } from "../plan";
 import { rowsOf, slotsOf, slotsOn, trainingWhen, type Slot, type DayRow, workHoursOf } from "../slots";
 import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
@@ -148,7 +148,8 @@ export function PlanScreen(p: AppApi) {
         </div>
         <div className="plan-row">
           <div><b>{sum.n ? pdVal(sum.pd) : "—"}</b><small>{target !== null ? `of ${pdText(target)}, ${dayPoss} target` : pdTag()}</small></div>
-          <div><b>{fmt(sum.kcal, 0)}</b><small>{band ? `of ${fmt(band.lo, 0)} to ${fmt(band.hi, 0)} kcal` : "kcal"}</small></div>
+          {/* DT144 (0.3.38, board Stories146): the kcal says its target and its day, as Today does; the range in words under it */}
+          <div><b>{fmt(sum.kcal, 0)}</b><small>{numbers ? `of ${fmt(numbers.kcal, 0)} kcal ${isToday ? "today" : `on ${WEEKDAY[(date.getDay() + 6) % 7]}`}` : band ? `of ${fmt(band.lo, 0)} to ${fmt(band.hi, 0)} kcal` : "kcal"}</small>{numbers && band && <small className="plan-band">a planned day fits from {fmt(band.lo, 0)} to {fmt(band.hi, 0)}</small>}</div>
           <div><b>{fmt(sum.protein, 0)}</b><small>{pr ? `of ${pr.min} to ${pr.max} g protein` : numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></div>
         </div>
         {off && numbers && (
@@ -166,7 +167,7 @@ export function PlanScreen(p: AppApi) {
           if (r.kind === "training") return (
             <button type="button" key="training" className="menu-row plan-training" aria-label={`Training at ${r.time}, ${planLine(r.day)}. Change it for this date`} onClick={() => setEditing(r.day)}>
               <span className={`plan-time${r.exact ? "" : " plan-time-word"}`}>{r.exact ? r.label : r.label === "No time set" ? <>No time<br />set</> : r.label}</span>
-              <div className="menu-row-text"><small>{changed ? "Changed for this date" : "From my Training week"}</small><b>{planLine({ ...r.day, when: undefined })}{r.day.minutes ? `, ${r.day.minutes} min` : ""}</b>{!r.exact && r.label === "No time set" && <span className="link plan-set-time">Set a time</span>}</div>
+              <div className="menu-row-text"><small>{changed ? "Changed for this date" : "From my Training week"}</small><b>{planLine({ ...r.day, when: undefined })}{r.day.minutes ? `, ${minutesWords(r.day.minutes)}` : ""}</b>{!r.exact && r.label === "No time set" && <span className="link plan-set-time">Set a time</span>}</div>
               <Pencil size={18} />
             </button>
           );

@@ -121,7 +121,14 @@ export function HomeScreen(p: AppApi) {
   // the day went by the plan only when no slot of today is still to come (still open, as Next counts it)
   const emptyAhead = rec.empty.filter((s) => openSlots.includes(s));
   const dayDone = rec.done && emptyAhead.length === 0;
-  const past = [1, 2].map((n) => dayLog(state.feedback, daysAgo(n)));
+  // DT143 (0.3.38, board Stories146; Anna's blind runs): Earlier starts on the person's first day: the welcome tap, the
+  // first goal, the first meal logged or the first day planned, whichever came first; nothing before it
+  const firstDay = [p.safety.adultAt, p.goal?.setAt, ...p.goalLog.map((g) => g.at)].filter((x): x is string => !!x).map((x) => ymd(new Date(x)))
+    .concat(state.feedback.map((f) => ymd(new Date(f.createdAt))), Object.keys(p.planned)).sort()[0] ?? null;
+  const past = [1, 2].map((n) => dayLog(state.feedback, daysAgo(n))).filter((d) => !firstDay || ymd(d.day) >= firstDay);
+  // DT143: while today is empty (nothing planned, nothing eaten, nothing kept), one card with its three ways
+  const emptyDay = !!next && !hasPlanToday && today.logged.length === 0 && kept.length === 0;
+  const isFirstDay = !!firstDay && firstDay >= key;
   // 0.2.57 (board DS6, L): what is left, inside the Next card; once the day is done, tomorrow's first planned meal
   const leftLine = next
     ? (left > 150 ? `About ${fmt(left, 0)} kcal and ${fmt(pLeft, 0)} g protein left for today.` : `You are at your day's kcal. A light ${next.name.toLowerCase()} keeps you there.`)
@@ -263,6 +270,16 @@ export function HomeScreen(p: AppApi) {
                   : <button type="button" className="pill pill-small pill-primary" onClick={makeNext}>Make it on the Plate</button>}
               </div>
             </div>
+          : next && emptyDay
+            ? <div className="card next-planned next-open next-empty">
+                <p className="label next-head">{isFirstDay ? "Your first day" : "Today"}</p>
+                <div className="next-planned-text"><b>Nothing planned or eaten yet today</b><small>{next.name} is next, at {next.time}. About {fmt(left, 0)} kcal and {fmt(pLeft, 0)} g protein for the whole day.</small></div>
+                <div className="button-row next-planned-acts">
+                  <button type="button" className="pill pill-small pill-primary" onClick={() => swapOn(key, next.id)}>Pick a meal for {next.name.toLowerCase()}</button>
+                  <button type="button" className="pill pill-small" onClick={() => { showPlanOn(key); setTab("plan"); }}>Plan the day</button>
+                  <button type="button" className="pill pill-small" onClick={logMeal}>Log what you ate</button>
+                </div>
+              </div>
           : next
             // 0.2.54, design system rule D (board DS2): Today has no wide button. A next meal with nothing planned is a card, with its two ways
             ? <div className="card next-planned next-open">
@@ -320,7 +337,7 @@ export function HomeScreen(p: AppApi) {
         </>
       )}
       {inbox}
-      <section className="card cooking">
+      {!emptyDay && <section className="card cooking">
         <p className="card-head">What's in the plan</p>
         {!hasPlanToday && (
           <button className="menu-row plan-row-link" onClick={() => setTab("plan")}>
@@ -371,9 +388,9 @@ export function HomeScreen(p: AppApi) {
             <div className="menu-row-text"><small>{rec.empty.map((x) => x.name).join(", ")}</small><b>Pick a meal</b><small>{rec.empty.length === 1 ? "One slot open" : `${rec.empty.length} slots open`} · Go to Plan</small></div><ChevronRight size={18} />
           </button>
         )}
-      </section>
+      </section>}
       {/* 0.2.57 (board DS6, K): no record box; the plan card's row says how the day went, Today's meals says the extras */}
-      <section className="card meals-card" aria-label="Today's meals">
+      {!emptyDay && <section className="card meals-card" aria-label="Today's meals">
       <p className="card-head">Today's meals</p>
       <p className="small logged-line">{hasPlanToday ? planDayLine({ ...rec, done: dayDone }, p.todayKcal) : loggedLine(today, true)}</p>
       {newest.map((f) => {
@@ -416,7 +433,7 @@ export function HomeScreen(p: AppApi) {
         ];
       })}
       <div className="button-row meals-acts"><button type="button" className="pill pill-small" onClick={logMeal}><Plus size={14} /> Log a meal</button></div>
-      </section>
+      </section>}
       {/* R5: Getting to know you is about logging; R24: it stays with today */}
       {p.measured?.phase && <KnowCard m={p.measured} openGoal={toBurn} />}
       {/* R18: tomorrow, the same card; its rows and its button open Plan on tomorrow; R24: under its own band */}
@@ -447,7 +464,8 @@ export function HomeScreen(p: AppApi) {
       </section>
       {/* 0.2.57 (board DS7, N, Milan 11:26): Earlier keeps its name; two day cards, the same component, each with its exact day;
           the row opens that day in Plan, its meals against its plan; older days are in Plan */}
-      <DayBand day="Earlier" date="the last two days" />
+      {past.length > 0 && <>
+      <DayBand day="Earlier" date={past.length === 1 ? "yesterday" : "the last two days"} />
       <div className="days" aria-label="The last two days">
         {past.map((d) => {
           const dk = ymd(d.day), dHeld = p.planned[dk];
@@ -465,7 +483,7 @@ export function HomeScreen(p: AppApi) {
           );
         })}
         <p className="older-link"><button type="button" className="link" onClick={() => setTab("plan")}>Older days are in Plan ›</button></p>
-      </div>
+      </div></>}
     </>
   );
 }
