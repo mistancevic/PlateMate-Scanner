@@ -3,6 +3,7 @@ import { Check } from "lucide-react";
 import { hit } from "../metrics";
 import { Mark, APP_NAME } from "../components/Mark";
 import { DayVideo } from "./LandingScreen";
+import { VERSION_LINE } from "../version";
 
 // /built, How Chef Mealan is built (canvas board B, B1 to B7, 12 October 2026): the build story for hiring managers,
 // linked from the home page and the footer. Public, signed in or not. The home page stays for people with a plan.
@@ -294,7 +295,7 @@ export function BuiltScreen() {
 
       <footer className="l-foot">
         <span><a href="/">Home</a> · <a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a></span>
-        <span><a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a> · © 2026 Milan Stancevic</span>
+        <span><a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a> · © 2026 Milan Stancevic · {VERSION_LINE}</span>
       </footer>
     </div>
   );
