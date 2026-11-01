@@ -96,29 +96,24 @@ class Component extends DCLogic {{
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
 cy = storyCard(B, y, "DT208", "Finishing the setup, with everything open", [
-  ("Coach Milan, 20:51 and 21:07", "Forms have no validation: people move on without finishing a step. Everything stays open, with a reminder on Today until the steps are done."),
-  ("What each step needs", "Profile: female or male, birth year, height, weight, and the health questions answered. Goal: set. Lifestyle: set. Training week: set. Where I shop and cook: a place. Name, body fat, the coach and Google Calendar stay optional."),
-  ("On the field", "A field the next step needs says so in one line when you leave it empty or wrong: Height: needed for your numbers. A number that cannot be right yet waits, as in 0.3.48."),
-  ("Next", "Next: Goal still goes on. Under it, what is still missing for your numbers, and a link to that field."),
-  ("Me", "Each of the five steps says Done or To do; a step to do says what is missing instead of its usual line."),
-  ("Today", "One card, Finish setting up: 2 of 5 done, with each step, a tick or what is missing, and one button to the next one. It replaces the strip Set your goal and goes away by itself when all five are done."),
-  ("Version 2: All set (Coach Milan 21:17 to 21:19)", "When the fifth step gets its tick, the card turns into All set: 5 of 5 done, with one line and the five ticks, and a close button (×, 44 px). It stays until the person closes it; nothing disappears by itself. Closed, it never comes back, except when a value the numbers need goes missing later: then a small card shows only that step, 1 of 5 to do, and turns into All set again when fixed."),
+  ("Coach Milan, 20:51 to 21:27", "Forms have no validation: people move on without finishing a step. Everything stays open. No extra block and no count: the reminder lives in something that is always there, and says All set when nothing is missing."),
+  ("What is needed", "Profile: female or male, birth year, height, weight, the health questions answered. Goal, Lifestyle and the Training week set. Where I shop and cook: a place. Name, body fat, the coach and Google Calendar stay optional. A new step later just adds its name to the line."),
+  ("Today", "The goal card at the top gets one line under its numbers. Something missing: To set: height, goal, training week, by name, in orange; a tap opens the first one. Nothing missing: All set, in quiet grey, always there as information, nothing to close. It replaces the strip Set your goal."),
+  ("Me", "The goal card on Me has the same line, above Goal and profile. A step still to set says To do and what is missing; a step done shows its usual line, no tag."),
+  ("On the field", "A field the next step needs says so in one line when you leave it empty or wrong: Height: needed for your numbers. Next: Goal still goes on; under it, what is still missing and a link to that field."),
   ("Saving", "As in 0.3.48: each change is kept on the phone at once, and the account gets one write a second after the changes stop."),
 ])
 h = rowEnd(cy,
   B.screen("DT208a", 0, y, "Now: Today for a new person", "r208a", "now", "One strip, Set your goal."),
-  B.screen("DT208b", 1, y, "New: Today", "r208b", "changed", "Finish setting up: 2 of 5 done."))
-y = h
-h = rowEnd(B.screen("DT208g", 0, y, "New: All set", "r208g", "changed", "Five ticks and ×; it stays until closed."),
-  B.screen("DT208h", 1, y, "New: after ×", "r208h", "changed", "Gone, and it stays gone."),
-  B.screen("DT208i", 2, y, "New: one value missing again", "r208i", "changed", "1 of 5 to do: only that step."))
+  B.screen("DT208b", 1, y, "New: Today, something missing", "r208b", "changed", "To set: height, goal, training week."),
+  B.screen("DT208g", 2, y, "New: Today, nothing missing", "r208g", "changed", "All set, quietly. The numbers show ? only because this drawing has no goal."))
 y = h
 h = rowEnd(B.screen("DT208c", 0, y, "Now: Me", "r208c", "now", "The steps look the same, done or not."),
-  B.screen("DT208d", 1, y, "New: Me", "r208d", "changed", "Done or To do, and what is missing."))
+  B.screen("DT208d", 1, y, "New: Me", "r208d", "changed", "The same line; To do on the steps still to set."))
 y = h
 h = rowEnd(B.screen("DT208e", 0, y, "Now: Profile, the height empty", "r208e", "now", "Nothing says so."),
   B.screen("DT208f", 1, y, "New: Profile", "r208f", "changed", "Height: needed for your numbers; Next says it too."))
 y = h
 board("Stories155.dc.html", "DT208. Finishing the setup, with everything open",
-  "1 November 2026 (Coach Milan 20:51, 21:07 and 21:17 to 21:19). Version 2: All set with its close button, and the card coming back for one missing step. Now: 0.3.48, untouched. Drawn for your approval; nothing built.",
+  "1 November 2026 (Coach Milan 20:51 to 21:27). Version 3: no extra block, no count; one line in the goal card, To set or All set. Now: 0.3.48, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories154.dc.html")
