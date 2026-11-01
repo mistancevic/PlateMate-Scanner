@@ -35,7 +35,7 @@ const STILL = { cook: img(`${R}/hp3-cook.png`), situation: img(`${R}/hp3-situati
     // Start from anything: two ways, not four
     const ways = [...document.querySelectorAll(".l-way")].slice(0, 4); ways[1].style.display = "none"; ways[2].style.display = "none";
     ways[0].querySelector("h3").textContent = "A barcode or a label"; ways[0].querySelector("p").textContent = "The pack's values, or the label read from a photo, every side if you need. You check it.";
-    note(document.querySelector(".l-ways-grid"), "New: two clips, not four. The barcode and the labels become one. Every clip is recorded again on today's app: the bar shows all five tabs, Explorer among them (rule HC11). Each clip's picture is its last screen, what the clip is about (rule HC12). Every picture of the app sits in the middle, in the same phone frame.");
+    note(document.querySelector(".l-ways-grid"), "New: two clips, not four. The barcode and the labels become one. Every clip is recorded again on today's app: the bar shows all five tabs, Explorer among them (rule HC11). Each clip's picture is what the clip is about: the camera with the tub or your plate here, the last screen for the others (rule HC12). The tub and the plate are Milan's photos. Every picture of the app sits in the middle, in the same phone frame.");
     // after Plan and Shop: Cook it, Your day as it goes, Explorer
     const steps = document.querySelector(".l-ways");
     steps.insertAdjacentHTML("afterend",
