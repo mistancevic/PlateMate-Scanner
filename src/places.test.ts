@@ -36,6 +36,11 @@ test("DT136: a basic food takes the name of where you are; the old name stays as
   assert.equal(g.name, "Chicken breast, raw"); assert.ok(g.aliases!.includes("Pileća prsa, sirova"));
   const own = F({ name: "My chicken", refId: "chicken-breast-raw" });
   assert.equal(renameForPlace(own, "limassol"), own);
+  // DT204 (0.3.47): the app's language wherever you shop; Tester 2's Spanać becomes Spinach, raw, and keeps Spanać as another name
+  const sp = renameForPlace(F({ name: "Spanać", refId: "spinach" }), "belgrade");
+  assert.equal(sp.name, "Spinach, raw"); assert.ok(sp.aliases!.includes("Spanać"));
+  const de = renameForPlace(F({ name: "Weißkohl, roh", refId: "cabbage" }), "munich");
+  assert.equal(de.name, "Cabbage, raw");
 });
 test("DT136: a food on a plate, in a recipe, logged or a favourite is used", () => {
   const foods = [F({ id: "u1" }), F({ id: "u2" }), F({ id: "u3", favorite: true }), F({ id: "u4" })];

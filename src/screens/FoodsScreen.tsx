@@ -6,7 +6,7 @@ import { identityOf, identityTwins } from "../foodId";
 import { cookName } from "../cookWords";
 import { Camera, X, Pencil, Plus } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
-import { findReference, referenceFood, localName, otherNames as refOtherNames, synonymsOf } from "../reference";
+import { findReference, referenceFood, localName, otherNames as refOtherNames, synonymsOf, shelfName } from "../reference";
 import { inPlaces, placeName } from "../places";
 import { BAND_LABEL, BAND_LINE_IDLE, bandHint } from "../goal";
 
@@ -99,6 +99,7 @@ export function FoodsScreen(p: AppApi) {
             <span className="thumb">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
             <div className="row-text">
               <span className="name-line"><button className="name-link" onClick={() => setCardId(f.id)}>{f.favorite && <span className="fav-mark">★ </span>}{f.name}</button>{isToday((f as any).addedAt) && <span className="new-mark">New</span>}</span>
+              {(() => { const sh = shelfName(f, p.region); return sh ? <small className="shelf-name">In shops in {sh.country}: {sh.name}</small> : null; })()}
               <small>{jobOf(f).job}{f.brand ? ` by ${f.brand}` : ""}. Per 100 g: {fmt(f.calories, 0)} kcal and {fmt(f.protein)} g protein.{names.length > 1 ? ` Also ${names.slice(1).join(", ")}.` : ""}</small>
               <span className="row-links">
                 <button className="link" onClick={() => add(f)}>Add to meal</button>

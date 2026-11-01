@@ -257,22 +257,45 @@ export function findReference(query: string, limit = 6, wordStartOnly = false): 
   // ties keep the table's order: the plain form is listed before the cooked one, so "egg, whole" comes before "egg, boiled"
   return REFERENCE.map((r, i) => ({ r, s: score(r), i })).filter((x) => x.s > 0).sort((a, b) => b.s - a.s || a.i - b.i).slice(0, limit).map((x) => x.r);
 }
-// the local name for where the person shops: Serbia gets the Serbian name, German-speaking shops the German, else English
-export function localName(r: RefFood, region: string | null | undefined): string {
-  if (!region) return r.en;
-  if (/belgrade|serbia|novi|nis|srb/i.test(region)) return r.sr;
-  if (/munich|berlin|vienna|zurich|germany|austria|switzerland|de|at|ch/i.test(region)) return r.de;
-  return r.en;
+// DT204 (0.3.47, board Stories151; Coach Milan 1 November 18:10): a food takes the app's language as its name, English for
+// now, wherever the person shops; the name on the shop shelf of their market stays with it (marketName) and shows under it.
+// When the app speaks Serbian, the two swap. Until 0.3.46 Serbia got the Serbian name and German-speaking shops the German
+// (DT136), and a photo's foods came back half in English. The region is kept for that day.
+export function localName(r: RefFood, _region?: string | null): string { return r.en; }
+// the country of a market, for the line under a food: In shops in Serbia
+export function marketCountry(region: string | null | undefined): string | null {
+  if (!region) return null;
+  if (/^(belgrade|serbia)$/.test(region)) return "Serbia";
+  if (/^(munich|germany)$/.test(region)) return "Germany";
+  if (region === "austria") return "Austria";
+  if (region === "switzerland") return "Switzerland";
+  if (/^(limassol|cyprus)$/.test(region)) return "Cyprus";
+  return null;
+}
+// the name on the shop shelf in that market, when it is not the name the app shows
+export function marketName(r: RefFood, region: string | null | undefined): string | null {
+  const c = marketCountry(region);
+  const n = c === "Serbia" ? r.sr : c === "Germany" || c === "Austria" || c === "Switzerland" ? r.de : c === "Cyprus" ? (r.el ?? EL[r.id] ?? null) : null;
+  return n && n !== localName(r, region) ? n : null;
 }
 // a market's own foods, added with the starter foods for that place: Cyprus has fifty
 export function marketFoods(tags: Iterable<string>): RefFood[] {
   const t = new Set(tags);
   return t.has("cy") ? REFERENCE.filter((r) => r.id.startsWith("cy-")) : [];
 }
-// the two names shown under the local one: the Greek a Cypriot shop prints comes first, then English, Serbian, German
+// the two names shown under the app's one: the market's first (the Greek a Cypriot shop prints, the Serbian in Belgrade), then
+// the others
 export function otherNames(r: RefFood, region: string | null | undefined): string[] {
   const here = localName(r, region);
-  return [...new Set([r.el, r.en, r.sr, r.de].filter((x): x is string => !!x && x !== here))].slice(0, 2);
+  return [...new Set([marketName(r, region), r.el ?? EL[r.id], r.en, r.sr, r.de].filter((x): x is string => !!x && x !== here))].slice(0, 2);
+}
+// DT204: the line under a food of the table: Spanać. Foods and the food's card know the food by its id (a packed product or
+// an estimate that shares a name gets no line); the shopping list has the name only, and asks by name.
+export function shelfName(f: { refId?: string; name: string }, region: string | null | undefined, byName = false): { country: string; name: string } | null {
+  const r = f.refId ? REFERENCE.find((x) => x.id === f.refId) : byName ? REFERENCE.find((x) => x.en === f.name) : null;
+  if (!r) return null;
+  const n = marketName(r, region), c = marketCountry(region);
+  return n && c && n !== f.name ? { country: c, name: n } : null;
 }
 // a reference food as a library food, values per 100 g, carbohydrate without fibre
 export function referenceFood(r: RefFood, region: string | null | undefined, uid: () => string): Food {

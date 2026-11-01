@@ -1,3 +1,4 @@
+import { shelfName } from "../reference";
 import { atMeal } from "../plateMode";
 import { plannedName } from "../recipeDiff";
 import { carryReads } from "../carry";
@@ -348,7 +349,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
     return (
       <button key={x.key} type="button" className={`menu-row shop-row ${st === "got" ? "got" : st === "missing" ? "missing" : ""}`} aria-label={`${x.name}, ${shopAmount(x.name, grams)}${st === "got" ? ", in the basket" : st === "missing" ? ", not this time" : ""}`} disabled={!live} onClick={() => save(tickIn(store, l.n, x.key))}>
         {st === "got" ? <CircleCheck size={20} /> : st === "missing" ? <CircleSlash size={20} /> : <Circle size={20} />}
-        <div className="menu-row-text"><b>{x.name}</b>{note && <small>{x.added ? "Added · " : ""}{x.cooked ? `${x.cooked.toLocaleString("en")} g cooked · ` : ""}{x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? `${x.brand} · ` : ""}{forWhat(x)}</small>}{st === "missing" && <small className="shop-missing-note">Not this time</small>}</div>
+        <div className="menu-row-text"><b>{x.name}</b>{(() => { const sh = shelfName({ name: x.name }, p.region, true); return sh ? <small className="shelf-name">{sh.name}</small> : null; })()}{note && <small>{x.added ? "Added · " : ""}{x.cooked ? `${x.cooked.toLocaleString("en")} g cooked · ` : ""}{x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? `${x.brand} · ` : ""}{forWhat(x)}</small>}{st === "missing" && <small className="shop-missing-note">Not this time</small>}</div>
         <b className="shop-grams">{shopAmount(x.name, grams)}</b>
       </button>
     );
