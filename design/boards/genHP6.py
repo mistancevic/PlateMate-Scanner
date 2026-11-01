@@ -8,7 +8,7 @@ SW, GAP, SX = 240, 150, 400
 K = SW / 390
 TT, CH, DH = 44, 24, 92
 TOP = TT + 8 + CH + 8 + DH + 8
-CHIP = {"now": ("#5b6b8a", "#fff", "0.3.46, as it is"), "changed": ("#2e7be8", "#fff", "New, drawn for your approval")}
+CHIP = {"now": ("#5b6b8a", "#fff", "0.3.47, as it is"), "changed": ("#2e7be8", "#fff", "New, drawn for your approval")}
 MARK = ""
 
 def ih(name): return int(Image.open(f"{R}/{name}.png").size[1] / 2 * K)
@@ -48,7 +48,7 @@ def rowEnd(*hs): return max(hs) + 140
 
 LEGEND = ('<div style="display:flex;gap:14px;align-items:center;font-size:13px;font-weight:700;flex-wrap:wrap">'
   + "".join(f'<span style="background:{CHIP[k][0]};color:{CHIP[k][1]};border-radius:999px;padding:2px 10px">{CHIP[k][2]}</span>' for k in ("now", "changed"))
-  + '<span style="color:#172742">Left: the story. Right: the screens, whole, top to bottom. Now: 0.3.46, untouched. New: the same pages with the change drawn in, blue outline and yellow note. Toasts and the round chef button are left out of every screen.</span></div>')
+  + '<span style="color:#172742">Left: the story. Right: the screens, whole, top to bottom. Now: 0.3.47, untouched. New: the same pages with the change drawn in, blue outline and yellow note. Toasts and the round chef button are left out of every screen.</span></div>')
 
 def board(fname, title, sub, B, W, Hc, after):
     H = min(8000, Hc + 230)
@@ -100,6 +100,7 @@ cy = storyCard(B, y, "HP6", "The calculator section, in the same shape as the ot
   ("The pattern", "Every other section has a small label, a title, a few short lines, and a clip beside it. The calculator section has one bold line and the calculator."),
   ("New", "Label: Try it here. Title: Make your craving fit your plan. One line: Pick what you crave and a food you have at home. See how much of it makes the plate fit. The calculator takes the place of the clip: beside the words on a computer, under them on a phone."),
   ("Other titles to pick from", "Eat what you crave, and still fit your plan. Or: Your craving, made to fit."),
+  ("Version 2 (Coach Milan 19:24 and 19:42)", "The gap under Join the beta, free. The link Or join the waiting list is 44 px tall, so it is easy to tap. Where the sentence wraps, that height pushes the two lines apart. New: the link keeps its 44 px for the finger, around it, and the lines sit at their normal distance. Drawn on a phone 412 px wide, as yours."),
   ("Not changed", "The calculator itself, its foods and its answers. The photo above it."),
 ])
 h = rowEnd(cy,
@@ -107,8 +108,11 @@ h = rowEnd(cy,
   B.screen("HP6b", 1, y, "New: the calculator on a phone", "hp6p-new", "changed", "Label, title, one line, then the calculator."),
   B.screen("HP6c", 2, y, "For comparison: the Cook section", "hp6p-ref", "now", "The pattern the other sections follow."))
 y = h
+h = rowEnd(B.screen("HP6f", 0, y, "Now: the gap under the button", "hp6gap-now", "now", "Use it most days... then a wide gap before Or join the waiting list."),
+  B.screen("HP6g", 1, y, "New: the lines at their normal distance", "hp6gap-new", "changed", "The link keeps its 44 px for the finger."))
+y = h
 y = B.wide("HP6d", y, "Now: the calculator on a computer", "hp6d-now", "now", "The bold line above the calculator.") + 140
 y = B.wide("HP6e", y, "New: the calculator on a computer", "hp6d-new", "changed", "The words at the left, the calculator at the right.") + 140
 board("Stories150.dc.html", "HP6. The calculator section, in the same shape as the others",
-  "1 November 2026 (Coach Milan 17:37 and 17:48). Now: 0.3.46, untouched. Drawn for your approval; nothing built.",
+  "1 November 2026 (Coach Milan 17:37, 17:48, 19:24 and 19:42). Version 2: the gap under the button added. Now: 0.3.47, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories149.dc.html")
