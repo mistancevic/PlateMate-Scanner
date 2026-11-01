@@ -2625,3 +2625,4 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .waitlist .wait-row:last-child { border-bottom: 0; }
 .waitlist .wait-row span { display: flex; flex-direction: column; min-width: 0; } .waitlist .wait-row a { overflow-wrap: anywhere; }
 .waitlist .wait-row .link { min-height: 44px; flex: none; }
+.l-list-lead { margin: 10px 0 0; font-weight: 700; }

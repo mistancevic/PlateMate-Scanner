@@ -35,6 +35,9 @@ const PORT = "3319", U = `http://127.0.0.1:${PORT}`;
       const r = await fetch(U + `/landing/way-${v}.mp4`, { method: "HEAD" });
       ok(vids.includes(`/landing/way-${v}.mp4`) && r.ok, `the ${v} clip is on the page and served`);
     }
+    // Coach Milan 14:06: the situations section is Explorer, and says so
+    const eyebrows = await page.locator(".l-new .l-eyebrow").allTextContents();
+    ok(eyebrows.join("|") === "Cook|Explorer · Situations|Explorer · The body and nutrients", "the new sections' labels: " + eyebrows.join(", "));
     ok(/Papers read again/.test(await txt(".l-built")) && /Nothing kept for nothing/.test(await txt(".l-built")), "two more trust lines");
     // Coaches scrolls to the coach section; Get a coach code opens the beta form as a coach
     await page.getByRole("button", { name: "Coaches", exact: true }).click(); await page.waitForTimeout(2500);
