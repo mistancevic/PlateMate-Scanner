@@ -43,9 +43,11 @@ const mark = "outline:3px solid #2e7be8;outline-offset:3px;border-radius:10px", 
       if (v === "now") { if (strip) { strip.style.cssText += ";" + mark; note(card, "Now: after the first screen (Not now), a new person sees one strip, Set your goal. Nothing says the height is missing or the training week is not set."); } return; }
       if (strip) strip.remove();
       if (v === "allset") for (const b of card.querySelectorAll(".plan-row b")) b.textContent = b.textContent === "0" ? b.textContent : b.textContent;
-      const head = card.querySelector(".plan-goal-name") || card.querySelector(".plan-row"); head.insertAdjacentHTML("afterend", html);
-      const line = card.querySelector(".setup-line"); line.style.outline = "3px solid #2e7be8"; line.style.outlineOffset = "3px";
-      note(card, v === "missing" ? "New: no extra block. Right under My goal, one line: what is still to set, by name, no count. A tap opens the first one, here the height in Profile. It replaces the strip Set your goal." : "New: when nothing is missing the same line says Profile and plan fully set, quietly, and stays as information: nothing to close, nothing that comes and goes. If something goes missing later, the line names it again.");
+      // version 5 (Coach Milan 21:39): one row with the line under My goal, not two; it takes the place of Today so far, against your goal
+      const sub = [...card.querySelectorAll("*")].find((e) => e.children.length === 0 && /^Today so far, against your goal/.test(e.textContent.trim()));
+      if (sub) { if (v === "allset") { sub.textContent = "✓ Profile and plan fully set"; sub.style.cssText += ";outline:3px solid #2e7be8;outline-offset:3px;border-radius:6px"; }
+        else { sub.insertAdjacentHTML("afterend", html); sub.remove(); const line = card.querySelector(".setup-line"); line.style.outline = "3px solid #2e7be8"; line.style.outlineOffset = "3px"; } }
+      note(card, v === "missing" ? "New: no extra block. Right under My goal, one row: what is still to set, by name, no count, in place of the line Today so far, against your goal. A tap opens the first one, here the height in Profile. It replaces the strip Set your goal." : "New: when nothing is missing the row under My goal says Profile and plan fully set, in place of Today so far, against your goal: the numbers under it already say today, target and of. One row, nothing to close. If something goes missing later, the row names it again.");
     }, { v, mark, NOTE, html: v === "now" ? "" : LINE(v) });
     await shot(p, `r208${v === "now" ? "a" : v === "missing" ? "b" : "g"}`); await p.context().close();
   }
