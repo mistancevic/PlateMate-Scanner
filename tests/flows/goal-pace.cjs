@@ -16,7 +16,7 @@ const path = require("node:path");
     await require("./adult.cjs")(page);
     await page.goto("http://127.0.0.1:3195/"); await page.waitForTimeout(900);
     await page.getByRole("button", { name: "Not now" }).click(); await page.waitForTimeout(400);
-    await page.getByText(/Set your goal/).click(); await page.waitForTimeout(400);
+    await require("./goal-open.cjs")(page);
     await page.getByRole("button", { name: /^I agree$/ }).click(); await page.waitForTimeout(200); await require("./door.cjs")(page);
     await page.getByRole("button", { name: /^Male$/ }).click();
     const inputs = page.locator(".calc-way input");

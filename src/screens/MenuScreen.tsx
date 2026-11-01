@@ -2,6 +2,7 @@ import { SafetyQuestion } from "../components/SafetyQuestion";
 import { countByPlace, samePlace, getStarted } from "../places";
 import { useState, useEffect, useRef, Fragment, type ReactNode } from "react";
 import { profileOdd } from "../profileOdd";
+import { setupMissing, takeFocus } from "../setup";
 import { QrCode, FlaskConical, ChevronRight, BookOpen, ChevronLeft, Download, Upload, SlidersHorizontal, RotateCcw, Target, User, CalendarDays, ShoppingBasket, Users, KeyRound, LifeBuoy, Info, Calculator, Coffee } from "lucide-react";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
@@ -179,6 +180,12 @@ function ProfilePanel(p: AppApi) {
   };
   useEffect(() => { const t = setTimeout(keep, 700); return () => clearTimeout(t); }, [name, d]);
   useEffect(() => () => keep(), []);
+  // DT208 (0.3.49, board Stories155): what the numbers still need from this page, read from what is typed now
+  const needNow = setupMissing({ personal: d, safety: p.safety, goal: true, region: "x" }).filter((x) => x.step === "profile");
+  const [left, setLeft] = useState(false);
+  const focusField = (f?: string) => { if (!f) return; const el = document.getElementById(`pf-${f}`); if (!el) return; el.scrollIntoView({ block: "center", behavior: "smooth" }); el.querySelector<HTMLElement>("input, button")?.focus({ preventScroll: true }); };
+  // a row on Today or Me sends you to a field
+  useEffect(() => { const f = takeFocus(); if (f) window.setTimeout(() => focusField(f), 350); }, []);
   return (
     <>
       <p className="small">All of this is optional. It's used only to calculate your numbers, and kept on this phone and in your account, nowhere else.</p>
@@ -203,16 +210,18 @@ function ProfilePanel(p: AppApi) {
       )}
       <section className={`card form ${consented ? "" : "shut"}`} aria-disabled={!consented}>
         <label className="field"><span>Name</span><input value={name} placeholder="Your name" onChange={(e) => setName(e.target.value)} /></label>
-        <div className="field"><span>Your body</span>
+        <div className="field" id="pf-sex"><span>Your body</span>
           <div className="moments">
             {(["female", "male"] as const).map((s) => <button key={s} className={`choice ${d.sex === s ? "on" : ""}`} onClick={() => setD({ ...d, sex: d.sex === s ? undefined : s })}>{s === "female" ? "Female" : "Male"}</button>)}
           </div>
         </div>
-        <div className="field-row">
-          <label className="field"><span>Birth year</span><input inputMode="numeric" value={d.birthYear ?? ""} placeholder="enter year" onChange={(e) => setD({ ...d, birthYear: num(e.target.value) })} /></label>
-          <HeightField cm={d.heightCm} unit={cleanUnits(d.units).height} onCm={(v) => setD((x) => ({ ...x, heightCm: v }))} />
-          <WeightField kg={d.weightKg} unit={cleanUnits(d.units).weight} onKg={(v) => setD((x) => ({ ...x, weightKg: v }))} />
+        <div className="field-row" onBlur={() => setLeft(true)}>
+          <label className="field" id="pf-birthYear"><span>Birth year</span><input inputMode="numeric" value={d.birthYear ?? ""} placeholder="enter year" onChange={(e) => setD({ ...d, birthYear: num(e.target.value) })} /></label>
+          <HeightField id="pf-height" cm={d.heightCm} unit={cleanUnits(d.units).height} onCm={(v) => setD((x) => ({ ...x, heightCm: v }))} />
+          <WeightField id="pf-weight" kg={d.weightKg} unit={cleanUnits(d.units).weight} onKg={(v) => setD((x) => ({ ...x, weightKg: v }))} />
         </div>
+        {/* DT208 (0.3.49): a field the numbers need says so when you leave it empty */}
+        {left && needNow.filter((x) => ["birthYear", "height", "weight"].includes(x.field ?? "")).map((x) => <small key={x.label} className="field-need">{x.label.replace(/^./, (c) => c.toUpperCase())}: needed for your numbers.</small>)}
         <label className="field"><span>Body fat %, if you know it</span><input inputMode="decimal" value={d.bodyFatPct ?? ""} placeholder="from a scale or a scan" onChange={(e) => setD({ ...d, bodyFatPct: num(e.target.value) })} /></label>
         <div className="field"><span>Your work</span>
           <div className="activity-list">
@@ -257,8 +266,10 @@ function ProfilePanel(p: AppApi) {
         </div>
         <small className={`muted saved-line ${odd ? "odd" : ""}`} role="status">{!consented ? "" : odd ? `Not kept yet: ${odd}.` : "Kept as you go. Nothing to save."}</small>
       </section>
-      <SafetyQuestion p={p} />
+      <div id="pf-health"><SafetyQuestion p={p} /></div>
       <NextLink p={p} to="goal" from="profile" text="Goal" hint={canCalculate(d) ? "Calculate your daily numbers from this profile" : "Your goal and daily numbers"} before={keep} />
+      {/* DT208: Next goes on; under it, what is still missing, the whole line a link to that field */}
+      {needNow.length > 0 && <button type="button" className="setup-line" onClick={() => focusField(needNow[0].field)}><span>Still needed for your numbers: {needNow.map((x) => x.label).join(", ")}</span><ChevronRight size={18} aria-hidden="true" /></button>}
     </>
   );
 }

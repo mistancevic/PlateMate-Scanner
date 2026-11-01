@@ -1,4 +1,6 @@
 import { Settings , Coffee } from "lucide-react";
+import { SetupRow } from "../components/SetupRow";
+import { setupMissing, stepMissing, type SetupStep } from "../setup";
 import { fmt, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { density } from "../pilot";
 import { COACH_NAME } from "../components/Mark";
@@ -53,10 +55,13 @@ export function MeScreen(p: AppApi) {
   const coachName = profile.coachName || COACH_NAME;
   const bandName = goal?.band ? goalLabel(goal.band) : null;
   const setBy = goal?.setBy === "coach" ? (goal.coachName || coachName) : "you";
+  const missing = setupMissing({ personal: p.personal, safety: p.safety, goal: p.goal, region: p.region });
   return (
     <>
       <section className="plan">
         <div className="plan-top"><span>{clientName ? `${clientName}'s goal` : "My goal"}{bandName ? `: ${bandName}` : ""}</span><span>{goal?.setBy === "coach" ? `set by ${setBy}` : ""}</span></div>
+        {/* DT208 (0.3.49): the same row as on Today */}
+        <SetupRow p={p} done="Profile and plan fully set" />
         <div className="plan-row">
           {/* the three numbers of the same day, the average one (11 October 2026: the PD was today's, the kcal and protein the average's) */}
           <div><b>{pdVal(density(state.goals.protein, state.goals.calories))}</b><small>{pdTag()}, average day</small></div>
@@ -72,11 +77,15 @@ export function MeScreen(p: AppApi) {
       {/* DT176 (0.3.19, board Stories124): Travel mode, above the steps */}
       <TravelCard p={p} />
       <div className="menu-list me-rows">
-        {ME_ROWS.map((r) => (
+        {ME_ROWS.map((r) => {
+          // DT208: a step still to set says To do and what is missing; a step done shows its usual line, no tag
+          const miss = stepMissing(missing, r.id as SetupStep);
+          const hint = !miss.length ? r.hint(p) : r.id === "profile" ? `${miss.map((x) => x.label).join(", ").replace(/^./, (c) => c.toUpperCase())} missing` : "Not set yet";
+          return (
           <button key={r.id} className="menu-row" onClick={() => p.openMenu(r.id, "me" as any)}>
-            <span className="menu-icon">{r.icon}</span><span className="menu-row-text"><b>{r.name}</b><small>{r.hint(p)}</small></span><ChevronRight size={18} />
+            <span className="menu-icon">{r.icon}</span><span className="menu-row-text"><b>{r.name}</b><small>{hint}</small></span>{miss.length > 0 && <span className="me-todo">To do</span>}<ChevronRight size={18} />
           </button>
-        ))}
+        ); })}
       </div>
     </>
   );
