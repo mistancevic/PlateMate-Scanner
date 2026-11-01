@@ -24,7 +24,10 @@ const IMG = Object.fromEntries(["curry", "meatballs", "quesadilla", "squares", "
     if (v.startsWith("1d")) {
       const order = ["curry", "meatballs", "quesadilla", "waffle", "squares"], k = Number(v.split("-")[1]) - 1;
       const dots = order.map((_, i) => `<span style="width:${i === k ? 22 : 8}px;height:8px;border-radius:999px;background:${i === k ? "#fff" : "rgba(255,255,255,.55)"}"></span>`).join("");
-      return `<section class="hp5" style="position:relative;height:${H};min-height:${desk ? 560 : 640}px;margin:0 calc(50% - 50vw);background:#172742 url(${IMG[order[k]]}) center/cover;${mark}">
+      // Coach Milan 16:43: each photo has its own focus, so the plate sits in the middle of what shows; the curry moves up
+      const FOCUS = { curry: desk ? ["62% 70%", "cover"] : ["40% 100%", "auto 126%"] };
+      const [pos, size] = (FOCUS[order[k]] || ["center", "cover"]);
+      return `<section class="hp5" style="position:relative;height:${H};min-height:${desk ? 560 : 640}px;margin:0 calc(50% - 50vw);background:#172742 url(${IMG[order[k]]}) ${pos}/${size} no-repeat;${mark}">
       <div style="position:absolute;inset:0;background:${desk ? "linear-gradient(90deg,rgba(15,24,42,.86) 0%,rgba(15,24,42,.55) 42%,rgba(15,24,42,0) 70%)" : "linear-gradient(0deg,rgba(15,24,42,.9) 0%,rgba(15,24,42,.65) 45%,rgba(15,24,42,0) 72%)"}"></div>
       <div style="position:absolute;${desk ? "left:max(32px,calc(50vw - 560px));top:50%;transform:translateY(-50%);max-width:560px" : "left:16px;right:16px;bottom:22px"}">${words(true)}</div>
       <div style="position:absolute;${desk ? "right:32px;bottom:22px" : "right:16px;top:14px"};display:flex;gap:6px;align-items:center">${dots}</div></section>`;
