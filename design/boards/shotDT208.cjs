@@ -32,7 +32,7 @@ const mark = "outline:3px solid #2e7be8;outline-offset:3px;border-radius:10px", 
   const STEPS = [["Profile", false, "Height missing"], ["Goal", false, "Not set yet"], ["Lifestyle", true, ""], ["Training week", false, "Not set yet"], ["Where I shop and cook", true, ""]];
   // a. Today (version 3, Coach Milan 21:26: no extra block, no count; one line in the goal card that is always there)
   const LINE = (v) => v === "allset"
-    ? `<button class="setup-line" style="display:flex;align-items:center;gap:6px;width:100%;min-height:44px;margin-top:6px;padding:0;border:0;background:none;font:inherit;font-size:14px;font-weight:700;color:#5b6b8a;text-align:left">✓ All set</button>`
+    ? `<button class="setup-line" style="display:flex;align-items:center;gap:6px;width:100%;min-height:44px;margin-top:6px;padding:0;border:0;background:none;font:inherit;font-size:14px;font-weight:700;color:#5b6b8a;text-align:left">✓ Profile and plan fully set</button>`
     : `<button class="setup-line" style="display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;min-height:44px;margin-top:6px;padding:0 10px;border:0;border-radius:10px;background:#fff1e6;font:inherit;font-size:14px;font-weight:800;color:#a4471f;text-align:left">To set: height, goal, training week <span aria-hidden="true">›</span></button>`;
   for (const v of ["now", "missing", "allset"]) {
     const p = await fresh(); await p.go("/today");
@@ -43,9 +43,9 @@ const mark = "outline:3px solid #2e7be8;outline-offset:3px;border-radius:10px", 
       if (v === "now") { if (strip) { strip.style.cssText += ";" + mark; note(card, "Now: after the first screen (Not now), a new person sees one strip, Set your goal. Nothing says the height is missing or the training week is not set."); } return; }
       if (strip) strip.remove();
       if (v === "allset") for (const b of card.querySelectorAll(".plan-row b")) b.textContent = b.textContent === "0" ? b.textContent : b.textContent;
-      const row = card.querySelector(".plan-row"); row.insertAdjacentHTML("afterend", html);
+      const head = card.querySelector(".plan-goal-name") || card.querySelector(".plan-row"); head.insertAdjacentHTML("afterend", html);
       const line = card.querySelector(".setup-line"); line.style.outline = "3px solid #2e7be8"; line.style.outlineOffset = "3px";
-      note(card, v === "missing" ? "New: no extra block. The goal card, always on Today, gets one line under its numbers: what is still to set, by name, no count. A tap opens the first one, here the height in Profile. It replaces the strip Set your goal." : "New: when nothing is missing the same line says All set, quietly, and stays as information: nothing to close, nothing that comes and goes. If something goes missing later, the line names it again.");
+      note(card, v === "missing" ? "New: no extra block. Right under My goal, one line: what is still to set, by name, no count. A tap opens the first one, here the height in Profile. It replaces the strip Set your goal." : "New: when nothing is missing the same line says Profile and plan fully set, quietly, and stays as information: nothing to close, nothing that comes and goes. If something goes missing later, the line names it again.");
     }, { v, mark, NOTE, html: v === "now" ? "" : LINE(v) });
     await shot(p, `r208${v === "now" ? "a" : v === "missing" ? "b" : "g"}`); await p.context().close();
   }
@@ -65,8 +65,8 @@ const mark = "outline:3px solid #2e7be8;outline-offset:3px;border-radius:10px", 
         tag.textContent = "To do"; row.lastElementChild.before(tag);
         if (s[2]) row.querySelector("small").textContent = s[2];
       }
-      const gc = document.querySelector(".plan"); const br = gc?.querySelector(".button-row");
-      br?.insertAdjacentHTML("beforebegin", `<button style="display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;margin:6px 0;padding:0 10px;border:0;border-radius:10px;background:#fff1e6;font:inherit;font-size:14px;font-weight:800;color:#a4471f;outline:3px solid #2e7be8;outline-offset:3px">To set: height, goal, training week <span aria-hidden="true">›</span></button>`);
+      const gc = document.querySelector(".plan"); const br = gc?.querySelector(".plan-top");
+      br?.insertAdjacentHTML("afterend", `<button style="display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;margin:6px 0;padding:0 10px;border:0;border-radius:10px;background:#fff1e6;font:inherit;font-size:14px;font-weight:800;color:#a4471f;outline:3px solid #2e7be8;outline-offset:3px">To set: height, goal, training week <span aria-hidden="true">›</span></button>`);
       note("New: the goal card on Me has the same line. Below, a step still to set says To do and what is missing; a step done shows its usual line, no tag, so the page stays calm.");
     }, { v, mark, NOTE, STEPS });
     await shot(p, `r208${v === "now" ? "c" : "d"}`); await p.context().close();
@@ -82,9 +82,9 @@ const mark = "outline:3px solid #2e7be8;outline-offset:3px;border-radius:10px", 
       if (v === "now") { note(document.querySelector(".form"), "Now (0.3.48): the height is empty and nothing says so. Next: Goal goes on, and Goal cannot calculate without it."); return; }
       const msg = document.createElement("small"); msg.style.cssText = "display:block;color:#a4471f;font-weight:800;margin-top:4px"; msg.textContent = "Height: needed for your numbers."; h?.parentElement.after(msg);
       const line = document.createElement("div"); line.style.cssText = "display:flex;gap:8px;align-items:center;margin-top:6px;font-size:14px;font-weight:800;color:#a4471f";
-      line.innerHTML = `Still needed for your numbers: height. <button class="link" style="min-height:44px">Go to the height</button>`;
+      line.innerHTML = `<button style="display:flex;align-items:center;justify-content:space-between;width:100%;min-height:44px;padding:0 10px;border:0;border-radius:10px;background:#fff1e6;font:inherit;font-size:14px;font-weight:800;color:#a4471f;text-align:left">Still needed for your numbers: height <span aria-hidden="true">›</span></button>`;
       next?.appendChild(line);
-      note(document.querySelector(".form"), "New: a field the next step needs says so when you leave it empty or wrong. Next: Goal still goes on; under it, what is still missing, and a link to that field. Name and body fat stay optional.");
+      note(document.querySelector(".form"), "New: a field the next step needs says so when you leave it empty or wrong. Next: Goal still goes on; under it one line, the whole line a link to the field: Still needed for your numbers: height. Name and body fat stay optional.");
     }, { v, mark, NOTE });
     await shot(p, `r208${v === "now" ? "e" : "f"}`); await p.context().close();
   }
