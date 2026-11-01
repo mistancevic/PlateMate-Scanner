@@ -18,11 +18,13 @@ const R = "/home/claude/boards/rs", U = "http://127.0.0.1:3396";
         if (v === "now") note("Now: one bold line, then the calculator. No label, no title, so it does not look like the other sections.", sec.firstElementChild);
         if (v === "new") {
           const box = sec.querySelector(".l-try-box"); const lead = sec.querySelector(".l-try-lead"); lead.remove();
-          const one = document.createElement("div"); one.className = "l-one"; one.style.cssText = "margin-top:0;" + mark + (desk ? ";grid-template-columns:1fr 560px;align-items:start;column-gap:48px" : "");
+          const one = document.createElement("div"); one.className = "l-one"; one.style.cssText = "margin-top:0;" + mark + (desk ? ";display:block" : "");
           one.innerHTML = `<div class="l-one-text"><span class="l-eyebrow">Try it here</span><h2>Make your craving fit your plan</h2><p>Pick what you crave and a food you have at home. See how much of it makes the plate fit.</p></div>`;
           box.before(one); one.appendChild(box);
-          sec.style.maxWidth = desk ? "1000px" : ""; 
-          note("New: the same shape as the other sections. A small label, Try it here. The title is the hook. One short line says what to do. The calculator takes the place of the clip: beside the words on a computer, under them on a phone.", one);
+          // Coach Milan 19:51: mobile first; on a computer the words run the whole width, the calculator centred under them
+          sec.style.maxWidth = desk ? "1000px" : "";
+          if (desk) { box.style.maxWidth = "620px"; box.style.margin = "18px auto 0"; const t = one.querySelector(".l-one-text p"); t.style.maxWidth = "none"; }
+          note("New: the same shape as the other sections. A small label, Try it here. The title is the hook. One short line says what to do. The calculator takes the place of the clip. Mobile first: on a computer too the words run the whole width and the calculator sits centred under them (Coach Milan 19:51).", one);
         }
         const r = sec.getBoundingClientRect(); return { y: r.top + scrollY - 140, h: Math.min(r.height + 180, desk ? 1250 : 1500) };
       }, { v, mark, NOTE, desk });

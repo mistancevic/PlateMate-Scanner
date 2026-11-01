@@ -98,9 +98,10 @@ B = Board(); y = 30
 cy = storyCard(B, y, "HP6", "The calculator section, in the same shape as the others", [
   ("Coach Milan, 1 November 17:37", "Make the title more prominent, as a hook. This is the only section on the home page that does not follow the same pattern as the others."),
   ("The pattern", "Every other section has a small label, a title, a few short lines, and a clip beside it. The calculator section has one bold line and the calculator."),
-  ("New", "Label: Try it here. Title: Make your craving fit your plan. One line: Pick what you crave and a food you have at home. See how much of it makes the plate fit. The calculator takes the place of the clip: beside the words on a computer, under them on a phone."),
+  ("New", "Label: Try it here. Title: Make your craving fit your plan. One line: Pick what you crave and a food you have at home. See how much of it makes the plate fit. The calculator takes the place of the clip, under the words."),
   ("Other titles to pick from", "Eat what you crave, and still fit your plan. Or: Your craving, made to fit."),
   ("Version 2 (Coach Milan 19:24 and 19:42)", "The gap under Join the beta, free. The link Or join the waiting list is 44 px tall, so it is easy to tap. Where the sentence wraps, that height pushes the two lines apart. New: the link keeps its 44 px for the finger, around it, and the lines sit at their normal distance. Drawn on a phone 412 px wide, as yours."),
+  ("Version 3 (Coach Milan 19:51)", "Mobile first on a computer too: the label, the title and the line run the whole width; the calculator sits centred under them, 620 px wide."),
   ("Not changed", "The calculator itself, its foods and its answers. The photo above it."),
 ])
 h = rowEnd(cy,
@@ -112,7 +113,7 @@ h = rowEnd(B.screen("HP6f", 0, y, "Now: the gap under the button", "hp6gap-now",
   B.screen("HP6g", 1, y, "New: the lines at their normal distance", "hp6gap-new", "changed", "The link keeps its 44 px for the finger."))
 y = h
 y = B.wide("HP6d", y, "Now: the calculator on a computer", "hp6d-now", "now", "The bold line above the calculator.") + 140
-y = B.wide("HP6e", y, "New: the calculator on a computer", "hp6d-new", "changed", "The words at the left, the calculator at the right.") + 140
+y = B.wide("HP6e", y, "New: the calculator on a computer", "hp6d-new", "changed", "The words the whole width, the calculator centred under them.") + 140
 board("Stories150.dc.html", "HP6. The calculator section, in the same shape as the others",
-  "1 November 2026 (Coach Milan 17:37, 17:48, 19:24 and 19:42). Version 2: the gap under the button added. Now: 0.3.47, untouched. Drawn for your approval; nothing built.",
+  "1 November 2026 (Coach Milan 17:37, 17:48, 19:24, 19:42 and 19:51). Version 3: on a computer the words run the whole width and the calculator sits centred under them; version 2 added the gap under the button. Now: 0.3.47, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories149.dc.html")
