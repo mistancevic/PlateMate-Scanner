@@ -16,7 +16,7 @@ let n = 0; const uid = () => "u" + ++n;
 test("DT106: foods named in an answer become rows: mine first, then the basic foods, through the rules", () => {
   const rows = chatRows(["low-fat quark", "an apple", "Greek yogurt", "chicken breast", "dried cranberries"], ["active dry yeast"], [bar, yeast, quark, greek, chicken], plate, "DE", uid);
   const kinds = rows.map((r) => `${r.kind}:${r.name}`);
-  assert.deepEqual(kinds, ["drop:Active dry yeast", "add:Quark, low fat (Magerquark)", "add:Apfel", "add:Greek yogurt 2%", "scan:dried cranberries"]);
+  assert.deepEqual(kinds, ["drop:Active dry yeast", "add:Quark, low fat (Magerquark)", "add:Apple", "add:Greek yogurt 2%", "scan:dried cranberries"]);
   const q = rows[1] as any; assert.equal(q.from, "mine"); assert.equal(q.grams > 0, true); assert.equal(q.reaches! > 5, true);
   const a = rows[2] as any; assert.equal(a.from, "basic"); assert.equal(a.food.calories, 52);
 });

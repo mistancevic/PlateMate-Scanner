@@ -1658,9 +1658,13 @@ export default function App() {
   // name of where you are now
   useEffect(() => {
     const first = (() => { try { return !localStorage.getItem(MIGRATED); } catch { return false; } })();
-    if (!state.foods.some((f) => f.places === undefined) && !state.foods.some((f) => renameForPlace(f, region) !== f)) { if (first) { try { localStorage.setItem(MIGRATED, "1"); } catch {} } return; }
+    // DT204 (0.3.47): the foods on the plate and in your recipes take the same name as in your foods
+    const renamed = (its: Ingredient[]) => its.map((i) => { const f = renameForPlace(i.food, region); return f === i.food ? i : { ...i, food: f }; });
+    const itemsDue = (its: Ingredient[] | undefined) => (its ?? []).some((i) => renameForPlace(i.food, region) !== i.food);
+    if (!state.foods.some((f) => f.places === undefined) && !state.foods.some((f) => renameForPlace(f, region) !== f) && !itemsDue(state.items) && !state.meals.some((m) => itemsDue(m.items))) { if (first) { try { localStorage.setItem(MIGRATED, "1"); } catch {} } return; }
     // the place is read from the name the food came with, before it takes the name of where you are
-    setState((s) => ({ ...s, foods: s.foods.map((f) => { const placed = f.places === undefined ? { ...f, places: first ? inferPlaces(f) : placesOfNew(f, herePlace) } : f; return renameForPlace(placed, region); }) }));
+    setState((s) => ({ ...s, foods: s.foods.map((f) => { const placed = f.places === undefined ? { ...f, places: first ? inferPlaces(f) : placesOfNew(f, herePlace) } : f; return renameForPlace(placed, region); }),
+      items: itemsDue(s.items) ? renamed(s.items) : s.items, meals: s.meals.some((m) => itemsDue(m.items)) ? s.meals.map((m) => (itemsDue(m.items) ? { ...m, items: renamed(m.items) } : m)) : s.meals }));
     if (first) { try { localStorage.setItem(MIGRATED, "1"); } catch {} }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.foods, region]);

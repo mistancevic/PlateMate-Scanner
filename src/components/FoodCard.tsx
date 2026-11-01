@@ -1,4 +1,5 @@
 import { placeName } from "../places";
+import { shelfName } from "../reference";
 import { REGIONS } from "../moments";
 import { useRef, useState } from "react";
 import { Camera, ChevronLeft, ChevronRight, Globe, Image as ImageIcon, MessageCircle, Trash2, X } from "lucide-react";
@@ -89,7 +90,7 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         <div className="card-top"><span>Nutrition per 100 g</span><button className="link" onClick={close}>Close</button></div>
         <div className="foodcard-head">
           <button className="thumb thumb-button" onClick={() => gallery[0] && setViewAt(0)} aria-label="See the photo">{food.photo ? <img src={food.photo} alt="" /> : (food.icon || iconFor(food.name))}</button>
-          <div><b>{food.name}</b><small>{food.brand || "no brand"}{food.barcode ? ` · ${food.barcode}` : ""}</small></div>
+          <div><b>{food.name}</b>{(() => { const sh = places ? shelfName(food, places.home) : null; return sh ? <small className="shelf-name">In shops in {sh.country}: {sh.name}</small> : null; })()}<small>{food.brand || "no brand"}{food.barcode ? ` · ${food.barcode}` : ""}</small></div>
           {toggleFavorite && <button className={`fav ${food.favorite ? "on" : ""}`} onClick={toggleFavorite} aria-pressed={!!food.favorite} aria-label={food.favorite ? "Remove from favourites" : "Add to favourites"}>{food.favorite ? "★" : "☆"}</button>}
         </div>
         {places && <SoldIn food={food} set={places.set} home={places.home} />}

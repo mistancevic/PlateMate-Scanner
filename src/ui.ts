@@ -1,7 +1,10 @@
+// DT204 (0.3.47): one decimal point while the app is in English, whatever the phone's language (a phone in Serbian showed
+// 5,1 under your 8,2 next to PD 8.2); the decimal comma comes with the app's languages (DT203)
+export const NUM_LOCALE = "en-GB";
 export const fmt = (n: number | null, d = 1) =>
-  n === null ? "?" : n.toLocaleString(undefined, { maximumFractionDigits: d });
+  n === null ? "?" : n.toLocaleString(NUM_LOCALE, { maximumFractionDigits: d });
 export const fixed = (n: number | null, d = 1) =>
-  n === null ? "?" : n.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d });
+  n === null ? "?" : n.toLocaleString(NUM_LOCALE, { minimumFractionDigits: d, maximumFractionDigits: d });
 
 // Protein density shown as PD (g protein per 100 kcal) or as the share of calories from protein (PD × 4).
 let PD_UNIT: "pd" | "pct" = (() => { try { return (JSON.parse(localStorage.getItem("chefmealan-personal") || "{}").pdUnit as "pd" | "pct") || "pd"; } catch { return "pd"; } })();

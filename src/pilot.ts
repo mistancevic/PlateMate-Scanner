@@ -80,6 +80,8 @@ export type Food = Nutrition & {
 };
 export type Ingredient = {
   keep?: boolean;
+  // DT204 (0.3.47): read from a photo of the meal, a part of the dish on it: no portion line under it
+  fromPhoto?: boolean;
   id: string;
   food: Food;
   grams: number;

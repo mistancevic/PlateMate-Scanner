@@ -1445,7 +1445,8 @@ export function JourneyScreen(p: AppApi) {
               </div>
               </SwipeRow>
               {/* DT93 (0.2.88): the portion gate: a food outside its normal portion says so; what Fit did, with Undo */}
-              {!imported && !i.optional && !i.fry && portionLine(i.food, i.grams, mealX) && <small className="gate-line">{portionLine(i.food, i.grams, mealX)}</small>}
+              {/* DT204: the parts of a dish read from a photo get no portion line; the photo's check of the whole plate stays */}
+              {!imported && !i.optional && !i.fry && !i.fromPhoto && portionLine(i.food, i.grams, mealX) && <small className="gate-line">{portionLine(i.food, i.grams, mealX)}</small>}
               {sizeOpen === i.id && countedOf(i) && <SizePicker item={i} onGrams={(g, c) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: g, count: c }); }} />}
               {oilRow(i)}
               </Fragment>

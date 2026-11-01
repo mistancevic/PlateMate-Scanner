@@ -2664,3 +2664,6 @@ html:has(.l-photo) { overflow-x: hidden; }
 /* the calculator under the photo, one column */
 .l-hero.l-calc { display: block; max-width: 620px; margin: 0 auto; padding-top: 22px; }
 .l-calc .l-try-lead { margin: 0 0 12px !important; max-width: none; }
+
+/* DT204 (0.3.47): the name on the shop shelf of the market, under the app's name */
+.shelf-name { display: block; font-weight: 800; color: var(--brand-text); }

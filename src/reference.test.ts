@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { REFERENCE, findReference, referenceFood, localName, otherNames } from "./reference";
+import { REFERENCE, findReference, referenceFood, localName, otherNames, marketName, shelfName } from "./reference";
 
 test("the table has the basics, each with four names and the carbohydrate convention", () => {
   assert.ok(REFERENCE.length >= 120, `${REFERENCE.length} foods`);
@@ -25,12 +25,15 @@ test("tikvice finds the courgette, in Latin and Cyrillic, with or without the ho
 test("a reference food becomes a library food in the local name, carbohydrate without fibre, source named", () => {
   const r = REFERENCE.find((x) => x.id === "courgette")!;
   const f = referenceFood(r, "belgrade", () => "f1");
-  assert.equal(f.name, "Tikvice, sveže");
+  assert.equal(f.name, "Courgette (zucchini), raw", "DT204: the app's language, English, in Belgrade too");
+  assert.ok(f.aliases!.includes("Tikvice, sveže"));
   assert.equal(f.calories, 17); assert.equal(f.protein, 1.2); assert.equal(f.fiber, 1.0);
   assert.equal(f.carbs, 2.1, "3.1 total minus 1.0 fibre");
   assert.ok(/Reference table: USDA/.test(f.notes ?? ""));
-  assert.equal(localName(r, "munich"), "Zucchini, roh");
+  assert.equal(localName(r, "munich"), "Courgette (zucchini), raw");
   assert.equal(localName(r, null), "Courgette (zucchini), raw");
+  // DT204: the name on the shop shelf stays with it
+  assert.equal(marketName(r, "belgrade"), "Tikvice, sveže"); assert.equal(marketName(r, "munich"), "Zucchini, roh"); assert.equal(marketName(r, "madrid"), null); assert.equal(marketName(r, null), null);
 });
 
 test("a reference food is a valid library food, and a stored state with one is readable", async () => {
@@ -45,11 +48,11 @@ test("a reference food is a valid library food, and a stored state with one is r
   assert.equal(parseState(JSON.stringify(broken)).foods[0].basis, "100g");
 });
 
-test("a food saved under its Munich name carries its other names, so Kupus finds Weißkohl", () => {
+test("a food saved in Munich carries its other names, so Kupus and Weißkohl find it (DT204: its name is English)", () => {
   const r = REFERENCE.find((x) => x.id === "cabbage")!;
   const f = referenceFood(r, "munich", () => "f2");
-  assert.equal(f.name, "Weißkohl, roh");
-  assert.ok(f.aliases!.includes("Kupus") && f.aliases!.includes("Купус") && f.aliases!.includes("Cabbage, raw"));
+  assert.equal(f.name, "Cabbage, raw");
+  assert.ok(f.aliases!.includes("Kupus") && f.aliases!.includes("Купус") && f.aliases!.includes("Weißkohl, roh"));
   assert.ok(/Also: .*Kupus/.test(f.notes), "older saves keep the names in the notes too");
 });
 
@@ -75,7 +78,7 @@ test("a Cypriot food in Limassol keeps its English name and shows the Greek one 
   const f = referenceFood(r, "limassol", () => "f3");
   assert.ok(f.aliases!.includes("Κουπέπια") && f.aliases!.includes("Kupepija, sarma od vinovog lista"));
   assert.ok(/typical home recipe, an estimate/.test(f.notes));
-  assert.equal(otherNames(REFERENCE.find((x) => x.id === "courgette")!, "munich").join(" · "), "Courgette (zucchini), raw · Tikvice, sveže");
+  assert.equal(otherNames(REFERENCE.find((x) => x.id === "courgette")!, "munich").join(" · "), "Zucchini, roh · Tikvice, sveže", "the market's name first");
 });
 
 test("Limassol's starter foods bring the fifty Cypriot ones; Munich's bring none", async () => {
@@ -83,4 +86,15 @@ test("Limassol's starter foods bring the fifty Cypriot ones; Munich's bring none
   assert.equal(marketFoods(["*", "cy", "limassol"]).length, 50);
   assert.equal(marketFoods(["*", "cy"]).length, 50);
   assert.equal(marketFoods(["*", "de", "munich"]).length, 0);
+});
+
+test("DT204: the line under a food: the name on the shop shelf of the market, by its id or its English name", () => {
+  assert.deepEqual(shelfName({ refId: "spinach", name: "Spinach, raw" }, "belgrade"), { country: "Serbia", name: "Spanać" });
+  assert.deepEqual(shelfName({ name: "Spinach, raw" }, "serbia", true), { country: "Serbia", name: "Spanać" }, "the shopping list has the name only");
+  assert.equal(shelfName({ name: "Peanut butter" }, "belgrade"), null, "a food of yours without the table's id gets no line on Foods");
+  assert.deepEqual(shelfName({ refId: "spinach", name: "Spinach, raw" }, "munich"), { country: "Germany", name: "Spinat, roh" });
+  assert.equal(shelfName({ refId: "spinach", name: "Spinach, raw" }, "madrid"), null, "no names for Spain in the table");
+  assert.equal(shelfName({ refId: "spinach", name: "Spanać" }, "belgrade"), null, "a food still named for the market needs no line");
+  assert.equal(shelfName({ name: "Tunjevina" }, "belgrade"), null, "a name you typed is not the table's");
+  assert.deepEqual(shelfName({ refId: "cy-koupepia", name: "Koupepia, vine leaves stuffed with mince and rice" }, "limassol"), { country: "Cyprus", name: "Κουπέπια" });
 });

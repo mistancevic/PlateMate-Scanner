@@ -44,7 +44,7 @@ export function foodOfRead(f: PhotoFood, library: Food[], region: string | null 
 }
 export function itemsOfRead(read: PhotoRead, library: Food[], region: string | null | undefined, uid: () => string): { items: Ingredient[]; fresh: Food[] } {
   const fresh: Food[] = []; const lib = [...library];
-  const items = read.foods.map((f) => { const { food, fresh: isNew } = foodOfRead(f, lib, region, uid); if (isNew) { fresh.push(food); lib.push(food); } return { id: uid(), food, grams: f.grams, locked: false, est: { low: f.low, high: f.high } } as Ingredient; });
+  const items = read.foods.map((f) => { const { food, fresh: isNew } = foodOfRead(f, lib, region, uid); if (isNew) { fresh.push(food); lib.push(food); } return { id: uid(), food, grams: f.grams, locked: false, est: { low: f.low, high: f.high }, fromPhoto: true } as Ingredient; });
   return { items, fresh };
 }
 
