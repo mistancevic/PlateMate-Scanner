@@ -189,7 +189,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     execFileSync("ffmpeg", [...cut, "-c:v", "libvpx-vp9", "-crf", "40", "-b:v", "0", "-deadline", "good", "-cpu-used", "4", `${base}.webm`], { stdio: "ignore" });
     // HC12 (Coach Milan, 1 November 11:57): the poster is the clip's last settled screen, what the clip is about, before
     // the fade; the first frame was Plan for both the recipes and the shopping list
-    execFileSync("ffmpeg", ["-y", "-sseof", "-1.1", "-i", `${base}.mp4`, "-frames:v", "1", "-c:v", "libwebp", "-quality", "70", `${base}.webp`], { stdio: "ignore" });
+    // for the four ways in, what the clip is about is the camera with the pack or the plate in it, not the Plate after
+    const at = { barcode: 0.8, label: 1.6, group: 1.6, meal: 0.9 }[name];
+    execFileSync("ffmpeg", ["-y", ...(at ? ["-ss", String(at)] : ["-sseof", "-1.1"]), "-i", `${base}.mp4`, "-frames:v", "1", "-c:v", "libwebp", "-quality", "70", `${base}.webp`], { stdio: "ignore" });
     console.log("clip", name, `${len.toFixed(1)} s`);
   };
   // every click goes through a.tap, so every ring is counted (HC1)
