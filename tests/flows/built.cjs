@@ -43,7 +43,7 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
     const inside = await page.evaluate(() => { const n = document.querySelector(".bt-notify").getBoundingClientRect(), bt = document.querySelector(".bt-notify .bt-btn").getBoundingClientRect(); return bt.right <= n.right && bt.left >= n.left && document.documentElement.scrollWidth <= innerWidth; });
     ok(inside, `${tag}: B6, Notify me sits inside its box, and the page has no sideways scroll`);
     ok(await page.locator(".bt-notify .bt-btn").isDisabled(), `${tag}: Notify me waits for an email`);
-    ok(/Product builder by day\. Fitness and nutrition coach after hours\./.test(await page.locator(".bt-role").textContent()), `${tag}: B1, Who builds opens with the product role`);
+    ok(/Product and recipe builder, and the maker of Chef Mealan\./.test(await page.locator(".bt-role").textContent()), `${tag}: B1, Who builds opens with the line from the book cover (Milan 1 November 14:35)`);
     ok(errs.length === 0, `${tag}: no page errors ${errs.join(" | ")}`);
     await page.close();
   }

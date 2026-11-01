@@ -230,7 +230,8 @@ export function LandingScreen() {
         <h2>Milan Stancevic</h2>
         <div className="l-split">
           <div>
-            <p className="l-role">Product builder by day.<br />Fitness and nutrition coach after hours.</p>
+            {/* Coach Milan 1 November 14:35: the line from the book's cover */}
+            <p className="l-role">Product and recipe builder, and the maker of Chef Mealan.</p>
             <p>Milan is a senior product manager with about 20 years in software and the founder of several startups. He designs and builds Chef Mealan with AI, from the first sketch to every release.</p>
             <p>After hours, Milan is a certified fitness and nutrition coach in Munich, known to his clients as Coach Milan. He cooks every day for himself and his family, and tries every recipe and every number on himself first.</p>
             <p>Author of <a href="/built#books">Worth Building</a> and <a href="/worthy-numbers?from=hp">Worthy Numbers</a>. Worth Eating comes next.</p>
@@ -268,10 +269,21 @@ export function LandingScreen() {
         </div>
       </section>
 
+      {/* Coach Milan 1 November 14:35: who it is for, written new; the line about doctors is the disclaimer, on its own */}
       <section className="l-who">
         <span className="l-eyebrow">Who it's for</span>
-        <h2>For adults with a nutrition plan</h2>
-        <p>Chef Mealan is for adults. Chef Mealan is not a doctor. If a medical condition decides what you eat, if you're pregnant or have diabetes, or if eating is difficult for you, Chef Mealan doesn't give advice, and tells you who to talk to instead.</p>
+        <h2>For people who eat by a plan, and the coaches who make it</h2>
+        <ul className="l-list">
+          <li>You have a nutrition plan, from a coach or your own, and want to live it day by day.</li>
+          <li>You train and want your own numbers at every meal, without a food diary.</li>
+          <li>You coach, and want to see your clients' real days and suggest, not chase.</li>
+        </ul>
+        <p>Chef Mealan is for adults, 18 and over.</p>
+      </section>
+      <section className="l-who l-disclaimer">
+        <span className="l-eyebrow">Disclaimer</span>
+        <h2>Chef Mealan is not a doctor</h2>
+        <p>If a medical condition decides what you eat, if you're pregnant or have diabetes, or if eating is difficult for you, Chef Mealan doesn't give advice, and tells you who to talk to instead. <a href="/disclaimer">The full disclaimer ›</a></p>
       </section>
 
       {/* HP3: two forms. The beta asks for commitment and gives a code; the waiting list asks only for an email, for the paying

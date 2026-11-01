@@ -284,7 +284,7 @@ export function BuiltScreen() {
       <Notify />
 
       <h2>Who builds Chef Mealan</h2>
-      <p className="bt-sub"><b className="bt-role">Product builder by day. Fitness and nutrition coach after hours.</b> Milan Stancevic, based in Munich.</p>
+      <p className="bt-sub"><b className="bt-role">Product and recipe builder, and the maker of Chef Mealan.</b> Milan Stancevic, based in Munich.</p>
       <div className="bt-cards bt-roles">
         <div><small>Product</small><b>Senior product manager</b><p>About 20 years in B2B and B2B2C software. Designs and builds Chef Mealan with AI, from the first sketch to every release.</p></div>
         <div><small>Founder</small><b>Startups and agencies</b><p>Founded several startups and agencies. One of the startups, an event planner app, was acquired.</p></div>
