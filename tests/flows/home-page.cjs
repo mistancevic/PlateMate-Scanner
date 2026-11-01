@@ -2,6 +2,7 @@
 // bar on one line (Chef Mealan, Coaches, Sign in on a phone); the beta box with the spots left from the number set under
 // Clients, the commitment and the waiting list one link away; two ways in; Cook it, Your day, Explorer, the coach section with
 // Get a coach code; two more trust lines; the beta form and the waiting list, separate; at 0 spots the waiting list comes first.
+// HP5 1d (0.3.46): the first screen is the photo carousel with the button on it; the calculator under it.
 // Local runs have no sign-in, so ?home shows the home page.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
@@ -17,14 +18,28 @@ const PORT = "3319", U = `http://127.0.0.1:${PORT}`;
   const txt = async (sel) => ((await page.locator(sel).first().innerText()) || "").replace(/\s+/g, " ");
   try {
     await fetch(U + "/api/beta/spots", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ spots: 12 }) });
-    await page.goto(U + "/?home"); await page.waitForTimeout(1500);
+    const heroAsked = []; page.on("request", (r) => { if (r.url().includes("/landing/hero/")) heroAsked.push(r.url().split("/").pop()); });
+    await page.goto(U + "/?home"); await page.waitForTimeout(900);
+    ok(heroAsked.length === 1 && heroAsked[0] === "curry-m.webp", "only the first photo loads with the page: " + heroAsked.join(", "));
+    await page.waitForTimeout(1200);
     // the top bar, one line
     const top = await page.locator(".l-top").boundingBox();
     const navs = await page.locator(".l-topnav > *").evaluateAll((els) => els.filter((e) => getComputedStyle(e).display !== "none").map((e) => e.textContent.trim()));
     ok(navs.join("|") === "Coaches|Sign in" && top.height < 70, "the top bar on a phone: Coaches, Sign in, one line: " + navs.join(", ") + ", " + Math.round(top.height) + " px");
-    // the beta box
-    const cta = await txt(".l-cta-hook");
-    ok(/Join the beta, free/.test(cta) && /12 spots left in this round/.test(cta) && /most days for four weeks, and tell us what breaks/.test(cta) && /Not ready to test\? Join the waiting list/.test(cta), "the beta box: the button, 12 spots, the commitment, the waiting list link");
+    // HP5 1d (0.3.46): the beta box on the first screen, over the photo carousel
+    const cta = await txt(".l-photo");
+    ok(/Join the beta, free/.test(cta) && /12 spots left in this round/.test(cta) && /Use it most days for four weeks, and tell us what breaks/.test(cta) && /Or join the waiting list/.test(cta) && /Milan's own cooking, at home\./.test(cta), "the beta box on the photo: the button, 12 spots, the commitment, the waiting list link, whose cooking");
+    const fold = await page.evaluate(() => ({ b: document.querySelector(".l-photo-cta .l-cta-big").getBoundingClientRect().bottom, own: document.querySelector(".l-photo-own").getBoundingClientRect().bottom, sw: document.documentElement.scrollWidth }));
+    ok(fold.own <= 844 && fold.sw === 390, "the button and its lines on the first screen, no sideways scroll: " + JSON.stringify(fold));
+    ok(/^Try the calculator/.test(await txt(".l-calc .l-try-lead")) && (await page.locator(".l-calc .l-try-box").count()) === 1, "the calculator right under the photo, with its line");
+    // five photos, the first loads with the page; dots; a tap on a dot shows that dish
+    ok((await page.locator(".l-photo-pic").count()) === 5 && (await page.locator(".l-photo-pic.on").getAttribute("data-photo")) === "curry", "five photos, the curry first");
+    ok(heroAsked.filter((u) => /curry-m\.webp/.test(u)).length >= 1 && heroAsked.length >= 1, "the curry loads with the page: " + heroAsked.join(", "));
+    await page.locator(".l-photo-dots button").nth(2).click(); await page.waitForTimeout(400);
+    ok((await page.locator(".l-photo-pic.on").getAttribute("data-photo")) === "quesadilla" && (await page.locator(".l-photo-dots button").nth(2).getAttribute("aria-pressed")) === "true", "a tap on the third dot shows the quesadilla");
+    ok(heroAsked.some((u) => /meatballs-m\.webp/.test(u)), "the other photos load after the page");
+    await page.waitForTimeout(6200);
+    ok((await page.locator(".l-photo-pic.on").getAttribute("data-photo")) === "waffle", "the carousel moves on by itself");
     // two ways in; the new sections
     const ways = await page.locator(".l-ways-grid .l-way h3").allTextContents();
     ok(ways.join("|") === "A barcode or a label|A photo of your meal", "two ways in: " + ways.join(", "));
@@ -65,9 +80,21 @@ const PORT = "3319", U = `http://127.0.0.1:${PORT}`;
     // spots at 0: the waiting list comes first and is the main button
     await fetch(U + "/api/beta/spots", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ spots: 0 }) });
     await page.goto(U + "/?home"); await page.waitForTimeout(1500);
-    ok((await page.locator(".l-cta-hook .l-cta-big").textContent()) === "Join the waiting list" && /This round of the beta is full/.test(await txt(".l-cta-hook")), "0 spots: the main button is the waiting list");
+    ok((await page.locator(".l-photo-cta .l-cta-big").textContent()) === "Join the waiting list" && /This round of the beta is full/.test(await txt(".l-photo-cta")), "0 spots: the main button is the waiting list");
     const forms = await page.locator("section.l-request h2").allTextContents();
     ok(forms.join("|") === "The waiting list|The next beta round", "0 spots: the waiting list first, then the next beta round: " + forms.join(", "));
+    // a phone set to reduce motion: the first photo only, no dots, nothing else loads
+    const still = await b.newPage({ viewport: { width: 390, height: 844 }, reducedMotion: "reduce" });
+    const stillAsked = []; still.on("request", (r) => { if (r.url().includes("/landing/hero/")) stillAsked.push(r.url().split("/").pop()); });
+    await still.goto(U + "/?home"); await still.waitForTimeout(2500);
+    ok((await still.locator(".l-photo-pic").count()) === 1 && (await still.locator(".l-photo-dots").count()) === 0 && stillAsked.join() === "curry-m.webp", "reduce motion: the curry only, no dots: " + stillAsked.join(", "));
+    // a computer: the large photos, the words at the left
+    const desk = await b.newPage({ viewport: { width: 1366, height: 820 } });
+    const deskAsked = []; desk.on("request", (r) => { if (r.url().includes("/landing/hero/")) deskAsked.push(r.url().split("/").pop()); });
+    await desk.goto(U + "/?home"); await desk.waitForTimeout(1200);
+    const dw = await desk.evaluate(() => ({ w: document.querySelector(".l-photo").getBoundingClientRect().width, x: document.querySelector(".l-photo-words").getBoundingClientRect().x, b: document.querySelector(".l-photo-cta .l-cta-big").getBoundingClientRect().bottom }));
+    ok(deskAsked.join() === "curry-l.webp" && dw.w === 1366 && dw.x < 400 && dw.b < 820, "a computer: the large curry, full width, the words at the left, the button on the first screen: " + deskAsked.join(", ") + " " + JSON.stringify(dw));
+    await still.close(); await desk.close();
     await fetch(U + "/api/beta/spots", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ spots: null }) });
   } catch (e) { ok(false, "walkthrough error: " + e.message); }
   ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));

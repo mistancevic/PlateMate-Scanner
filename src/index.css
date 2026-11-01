@@ -2627,3 +2627,40 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .waitlist .wait-row .link { min-height: 44px; flex: none; }
 .l-list-lead { margin: 10px 0 0; font-weight: 700; }
 .l-who .l-list + p { margin-top: 12px; }
+
+/* HP5 1d (0.3.46, board Stories149): the first screen is a photo of Milan's own cooking, a slow carousel, with the words,
+   the button, the spots left and the commitment on it. Full width; on a phone the words sit at the bottom on a dark fade,
+   on a computer at the left. */
+html:has(.l-photo) { overflow-x: hidden; }
+.l-photo { position: relative; margin: 0 calc(50% - 50vw); height: calc(100svh - 76px); min-height: 600px; max-height: 980px; background: #172742; overflow: hidden; color: #fff; }
+.l-photo-pic { position: absolute; inset: 0; opacity: 0; transition: opacity 1.4s ease; background-image: var(--img-m); background-position: var(--pos-p); background-size: var(--size-p); background-repeat: no-repeat; }
+.l-photo-pic.on { opacity: 1; }
+.l-photo-fade { position: absolute; inset: 0; background: linear-gradient(0deg, rgba(15, 24, 42, 0.9) 0%, rgba(15, 24, 42, 0.65) 45%, rgba(15, 24, 42, 0) 72%); }
+.l-photo-words { position: absolute; left: 16px; right: 16px; bottom: 20px; }
+.l-photo .l-kicker { background: none; padding: 0; color: #fff; opacity: 0.9; }
+.l-photo h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.04; letter-spacing: -0.5px; margin: 8px 0 10px; color: #fff; max-width: 13ch; }
+.l-photo p { margin: 0; line-height: 1.45; }
+.l-photo-lead { font-size: 17px; color: rgba(255, 255, 255, 0.94); max-width: 34ch; margin-bottom: 16px !important; }
+.l-photo-err { color: #ffd2cc; font-weight: 800; margin-bottom: 10px !important; }
+.l-photo .l-cta-big { width: auto; min-width: 240px; height: 54px; padding: 0 26px; font-size: 18px; }
+.l-photo .l-beta { margin-top: 8px; }
+.l-photo .l-beta p { margin: 4px 0 0; font-size: 14px; color: rgba(255, 255, 255, 0.88); }
+.l-photo .l-spots { font-size: 16px !important; color: #8ff0b5 !important; } .l-photo .l-spots.full { color: #ffd2a8 !important; }
+.l-photo .l-beta .link { color: #fff; text-decoration: underline; font-weight: 800; min-height: 44px; font-size: 14px; padding: 0 2px; }
+.l-photo-own { margin-top: 2px !important; font-size: 12px; color: rgba(255, 255, 255, 0.72); }
+.l-photo-dots { position: absolute; right: 6px; top: 4px; display: flex; }
+.l-photo-dots button { width: 30px; height: 44px; padding: 0; border: 0; background: none; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.l-photo-dots button span { width: 8px; height: 8px; border-radius: 999px; background: rgba(255, 255, 255, 0.6); box-shadow: 0 0 0 1px rgba(15, 24, 42, 0.25); transition: width 0.3s ease; }
+.l-photo-dots button[aria-pressed="true"] span { width: 22px; background: #fff; }
+.l-photo-dots button:focus-visible { outline: 2px solid #fff; outline-offset: -6px; border-radius: 8px; }
+@media (min-width: 760px) {
+  .l-photo { height: 78vh; min-height: 560px; }
+  .l-photo-pic { background-image: var(--img-l); background-position: var(--pos-d); background-size: var(--size-d); }
+  .l-photo-fade { background: linear-gradient(90deg, rgba(15, 24, 42, 0.86) 0%, rgba(15, 24, 42, 0.55) 42%, rgba(15, 24, 42, 0) 70%); }
+  .l-photo-words { left: max(20px, calc(50vw - 500px)); right: auto; bottom: auto; top: 50%; transform: translateY(-50%); max-width: 560px; }
+  .l-photo-dots { top: auto; right: 24px; bottom: 12px; }
+}
+@media (prefers-reduced-motion: reduce) { .l-photo-pic { transition: none; } }
+/* the calculator under the photo, one column */
+.l-hero.l-calc { display: block; max-width: 620px; margin: 0 auto; padding-top: 22px; }
+.l-calc .l-try-lead { margin: 0 0 12px !important; max-width: none; }
