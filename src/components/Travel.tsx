@@ -59,7 +59,7 @@ export function TravelCard({ p }: { p: AppApi }) {
         <button type="button" className={`choice ${weighPaused ? "on" : ""}`} aria-pressed={weighPaused} onClick={() => setWeighPaused(!weighPaused)}>{weighPaused ? "Yes" : "No"}</button></div>}
       <small className="muted">Your numbers and your training week stay the same; where the food comes from changes.</small>
       <button className="pill pill-wide pill-primary" disabled={!kitchen} onClick={() => { if (!kitchen) return; p.setTravel({ place, kitchen, since: new Date().toISOString(), weighPaused: Boolean(p.safety.consentBodyAt) && weighPaused }); setOpen(false); p.notify(`Travel mode is on: ${placeName(place)}, ${kitchenName(kitchen).toLowerCase()}.`); }}>Turn travel mode on</button>
-      {!kitchen && <small className="muted">Pick what you have there first.</small>}
+      {!kitchen && <small className="muted">Pick where you stay first.</small>}
     </section>
   );
 }
