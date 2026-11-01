@@ -17,11 +17,14 @@ const STILL = { cook: img(`${R}/hp3-cook.png`), situation: img(`${R}/hp3-situati
   await page.goto(U + "/"); await page.waitForTimeout(2500);
   await page.evaluate(({ mark, NOTE, STILL }) => {
     const note = (el, t, where = "beforebegin") => el.insertAdjacentHTML(where, `<div style="${NOTE}">${t}</div>`);
-    const fig = (src, cap) => `<figure style="margin:14px 0 0;text-align:center"><img src="${src}" alt="" style="width:78%;max-width:300px;border-radius:22px;border:1px solid #d1dcf0;box-shadow:0 6px 24px rgba(23,39,66,.12)"><figcaption style="font-size:13px;color:#5b6b8a;margin-top:6px">${cap}</figcaption></figure>`;
+    // the stills sit in the same phone frame as the clips, centred
+    const fig = (src, cap) => `<figure style="margin:14px auto 0;text-align:center"><span style="display:block;width:220px;margin:0 auto;border:6px solid var(--ink);border-radius:var(--r-card);overflow:hidden;box-shadow:var(--shadow-float);background:var(--base)"><img src="${src}" alt="" style="display:block;width:100%;height:auto"></span><figcaption style="font-size:13px;color:#5b6b8a;margin-top:6px">${cap}</figcaption></figure>`;
     const sec = (cls, kicker, h, body, still, cap) => `<section class="l-week ${cls}" style="${mark}"><span class="l-kicker">${kicker}</span><h2>${h}</h2>${body}${still ? fig(still, cap) : ""}</section>`;
     const P = (t) => `<p>${t}</p>`, UL = (xs) => `<ul style="margin:8px 0 0;padding-left:20px;line-height:1.5">${xs.map((x) => `<li>${x}</li>`).join("")}</ul>`;
     // the top bar: For coaches
-    const nav = document.querySelector(".l-topnav"); nav.insertAdjacentHTML("afterbegin", `<a href="#coaches" style="${mark};outline-offset:2px;padding:0 4px;margin-right:6px;font-weight:700">For coaches</a>`);
+    const nav = document.querySelector(".l-topnav"); nav.querySelector(".l-recipes").style.display = "none"; document.querySelector(".l-brand b").style.whiteSpace = "nowrap";
+    nav.insertAdjacentHTML("afterbegin", `<a href="#coaches" style="${mark};outline-offset:2px;padding:0 6px;margin-right:8px;font-weight:700;white-space:nowrap">Coaches</a>`);
+    note(document.querySelector(".l-hero"), "New: the top bar on one line: Chef Mealan, Coaches, Sign in. Coaches scrolls to the coach section further down; nothing else. Recipes leaves the top bar on a phone (four did not fit: the brand broke into two lines); the recipes section keeps All recipes, and a computer keeps Recipes in the bar.", "beforebegin");
     // the hero box: beta, spots, commitment, waiting list
     const cta = document.querySelector(".l-cta-hook");
     const btn = cta.querySelector("button"); btn.textContent = "Join the beta, free";
@@ -32,7 +35,7 @@ const STILL = { cook: img(`${R}/hp3-cook.png`), situation: img(`${R}/hp3-situati
     // Start from anything: two ways, not four
     const ways = [...document.querySelectorAll(".l-way")].slice(0, 4); ways[1].style.display = "none"; ways[2].style.display = "none";
     ways[0].querySelector("h3").textContent = "A barcode or a label"; ways[0].querySelector("p").textContent = "The pack's values, or the label read from a photo, every side if you need. You check it.";
-    note(document.querySelector(".l-ways-grid"), "New: two clips, not four. The barcode and the labels become one.");
+    note(document.querySelector(".l-ways-grid"), "New: two clips, not four. The barcode and the labels become one. Every clip is recorded again on today's app: the bar shows all five tabs, Explorer among them (rule HC11). Each clip's picture is its last screen, what the clip is about (rule HC12). Every picture of the app sits in the middle, in the same phone frame.");
     // after Plan and Shop: Cook it, Your day as it goes, Explorer
     const steps = document.querySelector(".l-ways");
     steps.insertAdjacentHTML("afterend",
@@ -54,7 +57,7 @@ const STILL = { cook: img(`${R}/hp3-cook.png`), situation: img(`${R}/hp3-situati
       ${fig(STILL.coach, "My clients: Waiting for you at the top")}
       <p style="margin-top:14px"><button class="pill pill-primary" style="min-height:44px">Get a coach code</button></p>
       <small class="muted">Coaches in the beta: free, the same four weeks, and your clients join with your code.</small>`;
-    note(coach, "New: the coach gets a section of their own, with the For coaches link in the top bar and its own button. The stills are the app as it is today; the names are made up.");
+    note(coach, "New: the coach gets a section of their own, with the Coaches link in the top bar and its own button. The stills are the app as it is today, Explorer on the bar; the names are made up.");
     // trust: two lines more
     const built = document.querySelector(".l-built .l-grid");
     built.insertAdjacentHTML("beforeend", `<div style="${mark}"><b>Papers read again</b><p>Every number Explorer credits to a study is checked against the study itself before each release.</p></div><div style="${mark}"><b>Nothing kept for nothing</b><p>An account nobody opens for 12 months is deleted, with everything in it.</p></div>`);

@@ -88,18 +88,18 @@ W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
 cy = storyCard(B, y, "HP3", "The home page, for individuals and coaches", [
   ("Coach Milan, 1 November 10:48 to 11:23", "The page targets coaches and individuals. Beta testers get free access, spots are limited, and testing asks for commitment. Real users will pay; they form a waiting list, separate from the beta."),
-  ("The top", "The promise and the crave calculator stay. The top bar gets For coaches. The box under the calculator: Join the beta, free; the spots left, from the number you set under Coach; the commitment: use it most days for four weeks, and tell us what breaks; a link to the waiting list."),
+  ("The top", "The promise and the crave calculator stay. The top bar on one line: Chef Mealan, Coaches, Sign in (Milan 11:57: For coaches broke into two lines). Coaches scrolls to the coach section. Recipes leaves the bar on a phone; the recipes section keeps All recipes. The box under the calculator: Join the beta, free; the spots left, from the number you set under Coach; the commitment: use it most days for four weeks, and tell us what breaks; a link to the waiting list."),
   ("For the individual", "The day in order. Start from anything: two clips, not four. One plate. Plan and shop. New: Cook it, hands free. New: Your day as it really goes (situations, calendar, Travel mode). New: Explorer, know why, not only what."),
-  ("For the coach", "A section of its own, at For coaches: one account, two views; suggest, the client accepts; answer or react on shared meals; Waiting for you; the client decides what you see. Its own button: Get a coach code."),
+  ("For the coach", "A section of its own, at Coaches: one account, two views; suggest, the client accepts; answer or react on shared meals; Waiting for you; the client decides what you see. Its own button: Get a coach code."),
   ("Trust", "Two lines more: papers read again before each release; an account nobody opens for 12 months is deleted."),
   ("Two forms", "Join the beta, free: as today, with the spots and the commitment. The waiting list: email, Which fits you?, a tick to be written to when it opens. When the spots reach 0, the waiting list becomes the main button. The book page's round-is-full line points to it."),
-  ("The stills", "The new sections show the app as it is in 0.3.38, with made-up names. Clips come after this board is approved, recorded by rules HC1 to HC10."),
+  ("The app's pictures", "Coach Milan 11:40: Explorer shows in every new design, and the app's pictures sit in the middle. Every clip is recorded again on today's app, so the bar has all five tabs; a new rule, HC11, stops the recording when Explorer is missing. Each clip's picture is now its last screen, what the clip is about (HC12): the shopping list showed Plan before. The new sections show stills of today's app in the same phone frame as the clips, centred, with made-up names. They become clips after this board is approved."),
   ("Not in this board", "Prices. The launch email and its double opt-in (an EU mail tool, at launch). The rulebook (DT197)."),
 ])
 h = rowEnd(cy,
   B.screen("HP3a", 0, y, "Now: the home page, top half", "hp3a1", "now", "For people with a plan. One button, Try Chef Mealan."),
   B.screen("HP3b", 1, y, "Now: the home page, bottom half", "hp3a2", "now", "The coach has one paragraph. One form."),
-  B.screen("HP3c", 2, y, "New: the top, the beta box, Start from anything", "hp3b1", "changed", "For coaches in the top bar; spots, commitment, waiting list link; two clips."))
+  B.screen("HP3c", 2, y, "New: the top, the beta box, Start from anything", "hp3b1", "changed", "Coaches in the top bar, one line; spots, commitment, waiting list link; two clips."))
 y = h
 h = rowEnd(
   B.screen("HP3d", 0, y, "New: one plate, plan, shop, Cook it", "hp3b2", "changed", "Cook it, hands free, is new."),
@@ -107,5 +107,5 @@ h = rowEnd(
   B.screen("HP3f", 2, y, "New: Milan, trust, the book, two forms", "hp3b4", "changed", "Beta and waiting list, separate."))
 y = h
 board("Stories147.dc.html", "HP3. The home page, for individuals and coaches",
-  "1 November 2026 (Coach Milan 10:48 to 11:23: coaches and individuals; beta free with commitment, spots limited; the waiting list separate). Read each column top to bottom: the page is cut into parts. Now: 0.3.38, untouched. Drawn for your approval; nothing built.",
+  "1 November 2026 (Coach Milan 10:48 to 11:23: coaches and individuals; beta free with commitment, spots limited; the waiting list separate. 11:40: Explorer on every bar, pictures centred; 11:57: the top bar on one line, each clip's picture its last screen). Version 3. Read each column top to bottom: the page is cut into parts. Now: 0.3.38, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories146.dc.html")

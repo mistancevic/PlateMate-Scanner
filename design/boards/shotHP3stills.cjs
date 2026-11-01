@@ -2,7 +2,7 @@
 const { chromium } = require("/home/claude/platemate-scanner/node_modules/playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
-const ROOT = "/home/claude/platemate-scanner", R = "/home/claude/boards/rs";
+const ROOT = "/home/claude/pm194", R = "/home/claude/boards/rs";
 const seed = JSON.parse(fs.readFileSync(path.join(ROOT, "tests/flows/seed.json"), "utf8"));
 const food = (id, name, calories, protein, carbs, fats, fiber) => ({ ...seed.foods[0], id, name, brand: "", calories, protein, carbs, fats, fiber, photo: undefined, photos: undefined, icon: "🍽️" });
 const items = [[160, food("c", "Chicken breast, raw", 120, 22.5, 0, 2.6, 0)], [80, food("r", "Basmati rice, dry", 356, 8.5, 78, 0.9, 1.3)], [120, food("s", "Spinach, fresh", 23, 2.9, 3.6, 0.4, 2.2)], [8, food("o", "Olive oil", 884, 0, 0, 100, 0)], [6, food("g", "Garlic", 149, 6.4, 33, 0.5, 2.1)]].map(([g, f]) => ({ id: f.id, grams: g, locked: false, food: f }));
@@ -57,7 +57,6 @@ const PORT = "3397", U = `http://127.0.0.1:${PORT}`;
   page = await open();
   await page.goto(U + "/today?coachdemo"); await page.waitForTimeout(1200);
   await page.getByRole("radio", { name: "My clients" }).click(); await page.waitForTimeout(900);
-  await page.evaluate(() => { const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) n.nodeValue = n.nodeValue.replace(/Davorka/g, "Lena"); });
   await clean(page); await page.screenshot({ path: `${R}/hp3-coach.png` }); console.log("hp3-coach");
   const first = page.locator(".client-row, .cl-row, .menu-row").first();
   await b.close(); server.kill();
