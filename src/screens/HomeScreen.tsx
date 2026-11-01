@@ -121,9 +121,10 @@ export function HomeScreen(p: AppApi) {
   // the day went by the plan only when no slot of today is still to come (still open, as Next counts it)
   const emptyAhead = rec.empty.filter((s) => openSlots.includes(s));
   const dayDone = rec.done && emptyAhead.length === 0;
-  // DT143 (0.3.38, board Stories146; Anna's blind runs): Earlier starts on the person's first day: the first goal, the
-  // first meal logged or the first day planned, whichever came first; nothing before it
-  const firstDay = [...p.goalLog.map((g) => g.at.slice(0, 10)), ...state.feedback.map((f) => ymd(new Date(f.createdAt))), ...Object.keys(p.planned)].sort()[0] ?? null;
+  // DT143 (0.3.38, board Stories146; Anna's blind runs): Earlier starts on the person's first day: the welcome tap, the
+  // first goal, the first meal logged or the first day planned, whichever came first; nothing before it
+  const firstDay = [p.safety.adultAt, p.goal?.setAt, ...p.goalLog.map((g) => g.at)].filter((x): x is string => !!x).map((x) => ymd(new Date(x)))
+    .concat(state.feedback.map((f) => ymd(new Date(f.createdAt))), Object.keys(p.planned)).sort()[0] ?? null;
   const past = [1, 2].map((n) => dayLog(state.feedback, daysAgo(n))).filter((d) => !firstDay || ymd(d.day) >= firstDay);
   // DT143: while today is empty (nothing planned, nothing eaten, nothing kept), one card with its three ways
   const emptyDay = !!next && !hasPlanToday && today.logged.length === 0 && kept.length === 0;

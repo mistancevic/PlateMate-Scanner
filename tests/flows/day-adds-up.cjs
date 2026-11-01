@@ -45,7 +45,7 @@ seed.meals = []; seed.items = []; seed.feedback = [];
   await page.waitForTimeout(300);
   const dayName = (await txt(".plan-day-head b")).split(",")[0].trim();
   ok(new RegExp(`of PD [\\d.]+, ${dayName}'s target`).test(await txt(".plan-head .plan-row")), `the day planned names its own target: ${dayName}'s`);
-  const range = (await txt(".plan-head .plan-row")).match(/of ([\d,]+) to ([\d,]+) kcal/);
+  const range = (await txt(".plan-head .plan-row")).match(/fits from (\d{1,3}(?:,\d{3})*) to (\d{1,3}(?:,\d{3})*)/);
   const lo = num(range[1]), hi = num(range[2]);
 
   await page.getByRole("button", { name: /Breakfast at .*pick a meal/ }).click(); await page.waitForTimeout(400);
@@ -77,7 +77,7 @@ seed.meals = []; seed.items = []; seed.feedback = [];
   await page.locator(".pick-sheet").getByRole("button", { name: /Omelette with bread/ }).click(); await page.waitForTimeout(400);
 
   // the whole day: the three starters added up (DT76: about 1,360 kcal) against the day's range, under it
-  const sumKcal = () => txt(".plan-head .plan-row").then((t) => num(t.match(/([\d,]+)\s*of [\d,]+ to [\d,]+ kcal/)[1]));
+  const sumKcal = () => txt(".plan-head .plan-row").then((t) => num(t.match(/([\d,]+)\s*of [\d,]+ kcal/)[1]));
   ok(/all slots set/.test(await txt(".plan-head .plan-day-head small")) && await sumKcal() === usual, `all slots set, ${usual} kcal planned`);
   const off = await txt(".plan-off");
   ok(new RegExp(`${(lo - usual).toLocaleString("en")} kcal under ${dayName}'s range of ${lo.toLocaleString("en")} to ${hi.toLocaleString("en")} kcal`).test(off) && /Add a snack, or make the portions bigger/.test(off), "the day says it is under its range, by how much: " + off.slice(0, 90));

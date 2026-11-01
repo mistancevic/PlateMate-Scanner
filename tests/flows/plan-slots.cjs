@@ -36,7 +36,7 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(/From my Training week/.test(await page.locator(".plan-training").textContent()) && /Strength, hard, 60 min/.test(await page.locator(".plan-training").textContent()), "the training row reads the Training week");
   // Changed by story SL2 (board SL2): the target is said once, in the head card's numbers; the line has the kind of day
   // Changed by story DT75 (board DT75): the day's kcal is a range, of 1,900 to 2,300 kcal; its middle is the day's target
-  const dayKcal = async () => { const m = (await page.locator(".plan-head .plan-row small").nth(1).textContent()).match(/of ([\d,]+) to ([\d,]+) kcal/); return String((Number(m[1].replace(/,/g, "")) + Number(m[2].replace(/,/g, ""))) / 2); };
+  const dayKcal = async () => { const m = (await page.locator(".plan-head .plan-row .plan-band").textContent()).match(/fits from ([\d,]+) to ([\d,]+)/); return String((Number(m[1].replace(/,/g, "")) + Number(m[2].replace(/,/g, ""))) / 2); };
   const line = await page.locator(".plan-day-head small").textContent();
   ok(/^training in the evening · \d slots? open$/.test(line) && /^[\d,]+$/.test(await dayKcal()), "the day's line: " + line);
   // a clock time set for this date places the row and the line says it
