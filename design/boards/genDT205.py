@@ -103,7 +103,7 @@ def go(fname, rid, title, sub, parts, rows, after):
         y = rowEnd(*(hs + ([cy] if first else []))); first = False
     board(fname, f"{rid}. {title}", sub, B, W, y - 100, after)
 
-SUB = "1 November 2026 (Coach Milan 19:42 findings, 19:54 Go before drawing). Built in 0.3.48 and drawn from the build: now is 0.3.47, new is 0.3.48."
+SUB = "1 November 2026 (Coach Milan 19:42 findings, 19:54 Go before drawing). Built in 0.3.48 and drawn from the builds. Version 2 (20:51): the Now screens are 0.3.47 again; version 1 had taken them from 0.3.48 by mistake."
 go("Stories152.dc.html", "DT205", "Profile kept as you go, and Next as the main button", SUB, [
   ("Coach Milan, 19:42", "Save is in the middle of the scroll, so people think that is the end, while the next section follows. Save has nothing to save, since everything is saved when it is selected. Goal as the call to action is not prominent."),
   ("New", "No Save button. A choice is kept when you tap it; a typed number a moment after you stop typing, and when you leave the page. A number that cannot be right yet (a birth year of two digits) waits, and the line under the card says which. The line otherwise says Kept as you go. Nothing to save."),

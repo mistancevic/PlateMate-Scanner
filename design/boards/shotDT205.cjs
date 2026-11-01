@@ -46,9 +46,10 @@ const mark = "outline:3px solid #2e7be8;outline-offset:3px;border-radius:10px", 
     // DT207b Shopping lists
     { const p = await fresh(); await p.goto(U + "/plan"); await p.waitForTimeout(1500);
       await p.locator(".plan-shop").click(); await p.waitForTimeout(600);
-      if (tag === "now") { await markEl(p, ".shop-earlier"); await note(p, ".shop-sheet .card-top", "Now: no list open, so the sheet opens on the form for list 2. The earlier list sits under it, out of sight on a phone. The button on Plan says Make a shopping list.", "after"); }
+      if (tag === "now") { await markEl(p, ".shop-earlier"); await note(p, ".shop-sheet .card-top", "Now: no list open, so the sheet opens on the form for list 2. The earlier list sits under the form, and the button on Plan says Make a shopping list, so nothing says a past list is there.", "after"); }
       else { await markEl(p, ".shop-earlier"); await markEl(p, ".shop-new"); await note(p, ".shop-sheet .card-top", "New: the button on Plan says Shopping lists. The earlier lists come first; New shopping list is its own button and opens the form.", "after"); }
-      await p.waitForTimeout(300); await p.evaluate(() => { for (const t of document.querySelectorAll(".toast")) t.style.display = "none"; }); await p.locator(".shop-sheet").screenshot({ path: `${R}/r207${tag === "now" ? "a" : "b"}.png` }); console.log("shot sheet", tag); await p.context().close(); }
+      await p.waitForTimeout(300); await p.evaluate(() => { for (const t of document.querySelectorAll(".toast")) t.style.display = "none"; }); const bx = await p.evaluate(() => { const sh = document.querySelector(".shop-sheet"); const r = sh.getBoundingClientRect(); let bot = r.top; for (const c of sh.querySelectorAll("*")) { const q = c.getBoundingClientRect(); if (q.height && q.bottom > bot) bot = q.bottom; } return { x: r.left, y: r.top, width: r.width, height: Math.min(bot + 16, window.innerHeight) - r.top }; });
+      await p.screenshot({ path: `${R}/r207${tag === "now" ? "a" : "b"}.png`, clip: bx }); console.log("shot sheet", tag); await p.context().close(); }
     // DT207d Travel mode
     { const p = await fresh(); await p.goto(U + "/me"); await p.waitForTimeout(1500);
       await p.locator(".travel-card").getByRole("button", { name: "Turn on" }).click(); await p.waitForTimeout(500);
