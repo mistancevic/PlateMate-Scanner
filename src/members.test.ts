@@ -9,7 +9,7 @@ const stir = { title: "Chicken and broccoli stir-fry with rice", kitchen: "Chine
 const salmon = { title: "Salmon", kitchen: "Mediterranean", sharedAt: "2026-10-16T11:00:00Z", steps: [], items: [{ id: "a", grams: 180, food: f("Salmon", 208, 20) }, { id: "b", grams: 300, food: f("Potatoes", 77, 2) }, { id: "c", grams: 10, food: f("Olive oil", 884, 0) }] };
 const pb = { title: "Toast with peanut butter", kitchen: null, sharedAt: "2026-10-16T12:00:00Z", steps: [], items: [{ id: "a", grams: 60, food: f("Peanut butter", 588, 25) }] };
 
-test("CO3: Davorka's stir-fry at an 850 kcal dinner: 700 g of the 1,360 g it makes (the drawing said 705: the foods to 5 g each add up to 700), PD 9.2", () => {
+test("CO3: Nina's stir-fry at an 850 kcal dinner: 700 g of the 1,360 g it makes (the drawing said 705: the foods to 5 g each add up to 700), PD 9.2", () => {
   const p = portionOf(stir, 850);
   assert.equal(p.total, 1360); assert.equal(p.grams, 700); assert.equal(Math.round(p.pd! * 10) / 10, 9.2);
   assert.deepEqual(p.items.map((i) => i.grams), [205, 205, 260, 20, 10]);

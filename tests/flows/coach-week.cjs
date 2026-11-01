@@ -50,7 +50,7 @@ const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0
   ok(/Check-ins today/.test(await page.locator("main").textContent()), "Clients starts with Check-ins today");
   const row = page.locator(".cw-row").first();
   ok(await row.locator(".cw-bar").count() === 7 && /lived by the plan/.test(await row.textContent()) && /check-in today/.test(await row.textContent()), "a client row: seven bars and the days lived by the plan");
-  // CW2: Davorka's page
+  // CW2: Nina's page
   await row.click(); await page.waitForTimeout(500);
   ok(await page.getByRole("button", { name: "‹ Clients" }).count() === 1 && /Planned against eaten/.test(await page.locator(".cw-week").textContent()), "the client opens on a page of her own, with the week");
   ok(/Today so far/.test(await page.locator(".cw-week").textContent()), "today says so far");

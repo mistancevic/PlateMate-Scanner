@@ -38,3 +38,8 @@ then the page glides on; never a jump. Nothing is tapped that is not on screen: 
 own hand (where the thumb comes in, the side it scrolls on, its pace), from a seed per clip. Check: the finger travelled to every
 action; on every scroll the page moved with the finger; a tap whose point is covered or off screen stops the run; no two scrolls
 in the set are the same.
+
+HC11. The app as it is (Coach Milan, 1 November 11:40: Explorer must show in every new design, so it is never lost in a build).
+Wherever a clip shows the app's bar, the bar has all five tabs, Explorer among them: Today, Plan, Plate, Recipes, Explorer. Clips
+are recorded again whenever the bar changes. Check: at the end of each clip, the bar's tabs are read; a bar without Explorer stops
+the run.

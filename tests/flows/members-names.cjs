@@ -20,7 +20,7 @@ const it = (name, grams, calories, protein, fats, carbs) => ({ id: name.slice(0,
 const R = {
   souvla: { title: "Chicken souvlaki with talattouri", kitchen: "Mediterranean", steps: ["Grill the chicken.", "Serve with talattouri and pitta."], items: [it("Chicken breast, raw", 600, 120, 22.5, 2.6, 0), it("Talattouri", 300, 90, 4, 6, 4.7), it("Pitta bread", 240, 275, 9.1, 1.2, 53.5)] },
   koupepia: { title: "Koupepia, Tester3's mother's way", kitchen: "Mediterranean", steps: ["Roll the vine leaves.", "Simmer 45 minutes."], items: [it("Beef mince, raw", 500, 215, 18.6, 15, 0), it("Rice, raw", 200, 360, 6.6, 0.6, 79), it("Vine leaves", 150, 93, 5.6, 2.1, 6.3)] },
-  stir: { title: "Davorka's chicken stir fry", kitchen: "Asian", steps: ["Fry hot and fast."], items: [it("Chicken breast, raw", 400, 120, 22.5, 2.6, 0), it("Rice, cooked", 400, 130, 2.7, 0.3, 28)] },
+  stir: { title: "Nina's chicken stir fry", kitchen: "Asian", steps: ["Fry hot and fast."], items: [it("Chicken breast, raw", 400, 120, 22.5, 2.6, 0), it("Rice, cooked", 400, 130, 2.7, 0.3, 28)] },
   oats: { title: "Overnight oats with skyr", kitchen: null, steps: ["Mix and leave overnight."], items: [it("Oats", 60, 372, 13.5, 7, 58.7), it("Skyr, natural", 200, 63, 11, 0.2, 4)] },
 };
 (async () => {
@@ -48,10 +48,10 @@ const R = {
   ok((await call("/api/members/name?check=Mi"))[1].ok === false && (await call("/api/members/name", null, { name: "Mi lan" }))[0] === 400, "MB: too short or with a space is refused");
   await call("/api/members", "testerthree", { recipe: R.souvla, cover: null, coverKind: "drawn", named: true });
   await call("/api/members", "testerthree", { recipe: R.koupepia, cover: null, coverKind: "drawn", named: true });
-  await call("/api/members", "davorka", { recipe: R.stir, cover: null, coverKind: "drawn", named: true, name: "Davorka Bokic" });
+  await call("/api/members", "nina", { recipe: R.stir, cover: null, coverKind: "drawn", named: true, name: "Nina Bokic" });
   await call("/api/members", "member", { recipe: R.oats, cover: null, coverKind: "drawn", named: false });
   const list = (await call("/api/members"))[1].recipes;
-  ok(list.find((r) => r.title === R.stir.title).name === "Davorka" && list.find((r) => r.title === R.oats.title).name === "" && !JSON.stringify(list).includes("local-"), "MB: an earlier first name share gets that name; no name stays no name; who holds it never leaves the server");
+  ok(list.find((r) => r.title === R.stir.title).name === "Nina" && list.find((r) => r.title === R.oats.title).name === "" && !JSON.stringify(list).includes("local-"), "MB: an earlier first name share gets that name; no name stays no name; who holds it never leaves the server");
   // the tab and the cook in the address
   // Changed by story DT126c (0.2.106, board Stories74): no tabs. Made by is a drop-down in the bar, one line per member with
   // a count, most recipes first, then the recipes shared without a name; the pick is in the address as made=
@@ -60,7 +60,7 @@ const R = {
   await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(900);
   await page.getByRole("button", { name: /^Made by/ }).click(); await page.waitForTimeout(300);
   const cooks = (await page.locator(".rb-line").allTextContents()).map((x) => x.replace(/\s+/g, " ").trim());
-  ok(cooks.join(",") === "All7,Me2,Your coach1,All members4,Tester32,Davorka1,A member without a name1", "MB: Made by: all, me, the cooks with their counts, the unnamed: " + cooks.join(","));
+  ok(cooks.join(",") === "All7,Me2,Your coach1,All members4,Tester32,Nina1,A member without a name1", "MB: Made by: all, me, the cooks with their counts, the unnamed: " + cooks.join(","));
   await page.locator(".rb-line").filter({ hasText: "Tester3" }).click(); await page.waitForTimeout(500);
   ok(/\/my-recipes\?made=Tester3$/.test(page.url()) && /2 of 7 recipes · Made by: Tester3/.test(await page.locator(".rb-count").textContent()) && await page.locator(".recipe-tile").count() === 2, "MB: Tester3's recipes, his two, in the address, and the line says 2 of 7: " + page.url());
   await page.reload(); await page.waitForTimeout(1500);

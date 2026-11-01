@@ -2,7 +2,7 @@
 // test data. Start from anything: a barcode, a nutrition label, a group of labels, a photo of the meal; one plate; recipes for
 // your day; the shopping list. The AI's answers are stand-ins (page.route) and the pack is invented (Fjell Skyr): no real brand.
 // Run after npm run build: node scripts/record-home-clips.cjs. Writes public/landing/way-*.mp4, .webm and .webp, only when every
-// rule in docs/rules/home-clips.md passes (HC1 to HC9); a failed rule stops the run and lists what failed.
+// rule in docs/rules/home-clips.md passes (HC1 to HC11); a failed rule stops the run and lists what failed.
 const { chromium } = require("playwright");
 const { spawn, execFileSync } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path"), os = require("node:os");
@@ -159,6 +159,9 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     let checks = {};
     try { checks = (await run(page, act)) || {}; } catch (e) { rule(false, "run", `${name}: ${e.message.split("\n")[0]}`); }
     await sleep(1700);
+    // HC11 (Coach Milan, 1 November 11:40): the app's bar, where the clip shows it, has all five tabs with Explorer
+    const bar = await page.evaluate(() => { const n = document.querySelector(".bottom-nav"); if (!n || getComputedStyle(n).display === "none") return null; return [...n.querySelectorAll("button")].map((x) => x.textContent.trim()); }).catch(() => null);
+    rule(bar === null || (bar.length === 5 && bar.some((t) => /Explorer/.test(t))), "HC11", `${name}: the bar ${bar ? bar.join(", ") : "is not on screen"}`);
     const drawn = await page.evaluate(() => ({ rings: window.__rings, ripples: window.__ripples, swipes: window.__swipes, travels: window.__travels, synced: window.__synced })).catch(() => ({ rings: -1, ripples: -1, swipes: -1, travels: -1, synced: [] }));
     const end = (Date.now() - t0) / 1000;
     const video = page.video(); await ctx.close(); await b.close(); const raw = await video.path();
@@ -253,5 +256,5 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   if (fails.length) { console.log(`\n${fails.length} rule(s) failed; no clip was replaced:\n  ${fails.join("\n  ")}`); process.exit(1); }
   if (ONLY) { console.log("\nCLIPS set: rules checked, no clip written"); process.exit(0); }
   for (const m of made) encode(m);
-  console.log(`\nall rules passed (HC1 to HC10); ${made.length} clips written`);
+  console.log(`\nall rules passed (HC1 to HC11); ${made.length} clips written`);
 })();
