@@ -35,6 +35,9 @@ const PORT = "3319", U = `http://127.0.0.1:${PORT}`;
       const r = await fetch(U + `/landing/way-${v}.mp4`, { method: "HEAD" });
       ok(vids.includes(`/landing/way-${v}.mp4`) && r.ok, `the ${v} clip is on the page and served`);
     }
+    // Coach Milan 14:35: who it is for, new; the disclaimer on its own; the line from the book cover
+    ok(h2.includes("For people who eat by a plan, and the coaches who make it") && h2.includes("Chef Mealan is not a doctor") && !h2.includes("For adults with a nutrition plan"), "who it is for, and the disclaimer, separate");
+    ok(/^Product and recipe builder, and the maker of Chef Mealan\.$/.test((await page.locator(".l-behind .l-role").textContent()).trim()), "Milan's line from the book cover");
     // Coach Milan 14:06: the situations section is Explorer, and says so
     const eyebrows = await page.locator(".l-new .l-eyebrow").allTextContents();
     ok(eyebrows.join("|") === "Cook|Explorer · Situations|Explorer · The body and nutrients", "the new sections' labels: " + eyebrows.join(", "));
