@@ -65,5 +65,21 @@ const mark = "outline:3px solid #2e7be8;outline-offset:3px;border-radius:10px", 
     await p.screenshot({ path: `${R}/r209${v === "now" ? "e" : v === "new" ? "f" : "g"}.png`, fullPage: true, clip: { x: 0, y: Math.max(0, y), width: 390, height: 900 } }); console.log("shot me", v);
     await p.context().close();
   }
+  // h, i. version 2 (Coach Milan 22:44 and 22:55): the end of Your summary moves people on
+  for (const v of ["now", "new"]) {
+    p = await fresh(); await p.goto(U + "/me/summary"); await p.waitForTimeout(1500);
+    await p.evaluate(({ v, mark, NOTE }) => {
+      const next = document.querySelector(".sum-next"), btns = document.querySelector(".sum-buttons");
+      const note = (el, t, where = "before") => { const d = document.createElement("div"); d.style.cssText = NOTE; d.textContent = t; el[where](d); };
+      if (v === "now") { next.style.cssText += ";" + mark; btns.style.cssText += ";" + mark; note(next, "Now: the page ends on two plain rows, Plan your week and Craft your first meal, then Save as PDF. Nothing says which way is on."); return; }
+      const top = document.querySelector(".page-why"); btns.style.cssText += ";" + mark + ";margin:8px 0 12px"; for (const x of btns.querySelectorAll(".pill")) { x.classList.remove("pill-primary"); x.classList.add("pill-small"); } top.after(btns);
+      note(btns, "New: Save as PDF (and Choose what your coach sees, with a coach) at the top, small: they are about the summary itself.");
+      const end = document.createElement("div"); end.className = "next-step"; end.style.cssText = mark + ";margin-top:16px;display:flex;flex-direction:column;gap:6px";
+      end.innerHTML = `<button class="pill pill-primary pill-wide" style="min-height:52px;font-size:17px;font-weight:900">Next: Plan your week ›</button><small class="muted">Fill your slots with Chef Mealan</small><button class="link" style="min-height:44px;text-align:left">Or craft your first meal on the Plate ›</button>`;
+      next.replaceWith(end);
+      note(end, "New: the page ends on one main button, Next: Plan your week, like every step's Next, with Or craft your first meal on the Plate as a line under it. Back from Plan or the Plate comes back here, as in 0.3.48.");
+    }, { v, mark, NOTE });
+    await shot(p, `r209${v === "now" ? "h" : "i"}`); await p.context().close();
+  }
   await b.close();
 })();
