@@ -2,7 +2,7 @@
 // test data. Start from anything: a barcode, a nutrition label, a group of labels, a photo of the meal; one plate; recipes for
 // your day; the shopping list. The AI's answers are stand-ins (page.route) and the pack is invented (Fjell Skyr): no real brand.
 // Run after npm run build: node scripts/record-home-clips.cjs. Writes public/landing/way-*.mp4, .webm and .webp, only when every
-// rule in docs/rules/home-clips.md passes (HC1 to HC12); a failed rule stops the run and lists what failed.
+// rule in docs/rules/home-clips.md passes (HC1 to HC13); a failed rule stops the run and lists what failed.
 const { chromium } = require("playwright");
 const { spawn, execFileSync } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path"), os = require("node:os");
@@ -112,6 +112,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
       const frames = (ms, step) => new Promise((done) => { const t0 = performance.now(); const go = (now) => { const t = Math.min(1, (now - t0) / ms); step(t); t < 1 ? requestAnimationFrame(go) : done(); }; requestAnimationFrame(go); });
       addEventListener("pointerdown", () => { W.__rings++; }, true);
+      // HC13 (Coach Milan, 1 November 14:06: hands free must look hands free): a voice command shows as a bubble with the words
+      // said, at the bottom, while the app answers it; nothing is tapped
+      W.__said = 0;
+      W.__voice = (text) => { const st = document.getElementById("hc-v-css") || Object.assign(document.head.appendChild(document.createElement("style")), { id: "hc-v-css", textContent: ".hc-v{position:fixed;z-index:2147483647;left:50%;bottom:118px;transform:translate(-50%,8px);background:#172742;color:#fff;font:800 20px Nunito,system-ui,sans-serif;padding:10px 18px 10px 14px;border-radius:999px;box-shadow:0 6px 18px rgba(0,0,0,.3);display:flex;gap:10px;align-items:center;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap}.hc-v.on{opacity:1;transform:translate(-50%,0)}.hc-v i{width:12px;height:12px;border-radius:50%;background:#3ddc84;box-shadow:0 0 0 6px rgba(61,220,132,.25)}" });
+        void st; W.__said++; const v = document.createElement("div"); v.className = "hc-v"; v.innerHTML = "<i></i>\u201C" + text + "\u201D"; document.body.appendChild(v);
+        requestAnimationFrame(() => v.classList.add("on")); setTimeout(() => v.classList.remove("on"), 1050); setTimeout(() => v.remove(), 1400); };
       W.__finger = {
         // travel on a quadratic curve; bend is how far the curve leans, in px
         move: async (x, y, ms, bend, from) => { ensure(); if (from) at(from[0], from[1]); wake(); W.__travels++;
@@ -140,7 +146,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await page.goto(U + (x.path || "/plate")); await sleep(1600);
     // HP3: steps to reach the clip's first screen, before it starts; clicked without a pointer, so no finger is drawn
     if (x.setup) { const click = async (loc, wait = 600) => { await loc.waitFor({ timeout: 6000 }); await loc.evaluate((el) => el.click()); await sleep(wait); }; await x.setup(page, click); await sleep(500); }
-    let from = (Date.now() - t0) / 1000, lastAct = from, taps = 0, swipes = 0;
+    let from = (Date.now() - t0) / 1000, lastAct = from, taps = 0, swipes = 0, says = 0;
     // HC10: this clip's hand. A seeded random per clip: where the thumb comes from, which side it scrolls on, how fast it moves
     const rnd = seeded(name), hand = { side: 210 + rnd() * 110, pace: 0.85 + rnd() * 0.4, entry: [250 + rnd() * 120, 880] };
     let first = true, last = hand.entry;
@@ -162,6 +168,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
         const d = Math.round(Math.min(dy * (0.5 + rnd() * 0.15), 300)), ms = Math.round((340 + rnd() * 160) * hand.pace), gms = Math.round(360 + Math.min(520, (dy - d) * 0.45) + rnd() * 120);
         await page.evaluate(([d, ms, g, gms]) => window.__finger.drag(d, ms, g, gms), [d, ms, dy - d, gms]); last = [x, y - d];
         strokes.push(`${Math.round(x)}/${d}/${ms}`); swipes++; lastAct = (Date.now() - t0) / 1000; await sleep(wait); },
+      // a voice command: the bubble shows the words, then the app hears them through the browser's recognition
+      say: async (text, wait = 1200) => { says++; await page.evaluate((t) => window.__voice(t), text); await sleep(380);
+        const heard = await page.evaluate((t) => window.__hear(t.toLowerCase()), text); if (!heard) rule(false, "HC13", `${name}: the app was not listening for "${text}"`);
+        lastAct = (Date.now() - t0) / 1000; await sleep(wait); },
       mark: () => { from = (Date.now() - t0) / 1000; },
     };
     let checks = {};
@@ -170,6 +180,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     // HC11 (Coach Milan, 1 November 11:40): the app's bar, where the clip shows it, has all five tabs with Explorer
     const bar = await page.evaluate(() => { const n = document.querySelector(".bottom-nav"); if (!n || getComputedStyle(n).display === "none") return null; return [...n.querySelectorAll("button")].map((x) => x.textContent.trim()); }).catch(() => null);
     rule(bar === null || (bar.length === 5 && bar.some((t) => /Explorer/.test(t))), "HC11", `${name}: the bar ${bar ? bar.join(", ") : "is not on screen"}`);
+    const saidDrawn = await page.evaluate(() => window.__said || 0).catch(() => -1);
+    if (says) rule(saidDrawn === says, "HC13", `${name}: ${says} voice commands, ${saidDrawn} bubbles`);
     const drawn = await page.evaluate(() => ({ rings: window.__rings, ripples: window.__ripples, swipes: window.__swipes, travels: window.__travels, synced: window.__synced })).catch(() => ({ rings: -1, ripples: -1, swipes: -1, travels: -1, synced: [] }));
     const end = (Date.now() - t0) / 1000;
     const video = page.video(); await ctx.close(); await b.close(); const raw = await video.path();
@@ -270,13 +282,17 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       "Heat [[i:o|olive oil]] in a pan on medium high heat. Fry the chicken 6 minutes, turning once, until no pink is left inside.", "Add [[i:s|spinach]] and the garlic. Stir 2 minutes, until the spinach wilts.", "Put the rice in a bowl and the chicken and spinach on top."] };
     // the browser's voice is stood in for: nothing is read aloud in a recording
     const voice = () => { const synth = { speak: () => {}, cancel: () => {}, getVoices: () => [] }; Object.defineProperty(window, "speechSynthesis", { value: synth, configurable: true }); window.SpeechSynthesisUtterance = function (t) { this.text = t; };
-      Object.defineProperty(navigator, "wakeLock", { value: { request: async () => ({ release: async () => {} }) }, configurable: true }); window.SpeechRecognition = function () { this.start = () => {}; this.stop = () => {}; }; };
+      Object.defineProperty(navigator, "wakeLock", { value: { request: async () => ({ release: async () => {} }) }, configurable: true }); window.__recs = [];
+      window.SpeechRecognition = function () { const me = this; window.__recs.push(me); me.start = () => { me.on = true; }; me.stop = () => { me.on = false; }; };
+      window.__hear = (text) => { const r = window.__recs.filter((x) => x.on).at(-1); if (!r || !r.onresult) return false; r.onresult({ results: [{ 0: { transcript: text }, isFinal: true, length: 1 }] }); return true; }; };
     await clip("cook", async (page, a) => {
       const cm = page.locator(".cook-mode");
-      await a.tap(cm.getByRole("button", { name: "Turn voice on" }), 1100);
-      for (let k = 0; k < 3; k++) await a.tap(cm.getByRole("button", { name: /^Next/ }).first(), 900);
-      await a.tap(cm.getByRole("button", { name: /Start 6 min timer/ }), 900);
-      return { HP3: { ok: /4 of 6/.test(await cm.textContent()), what: "cook mode on step 4 of 6, the timer started" } };
+      // one tap to turn the voice on; then only words (Coach Milan 14:06)
+      await a.tap(cm.getByRole("button", { name: "Turn voice on" }), 900);
+      await a.say("Next", 1000); await a.say("Next", 1000); await a.say("Repeat", 1100); await a.say("Next", 1100);
+      await a.say("Timer 6 minutes", 1200);
+      const t = await cm.textContent();
+      return { HC13: { ok: /4 of 6/.test(t) && /6:00|5:5\d/.test(t), what: "by voice: step 4 of 6, its 6 minute timer running" } };
     }, { meals: [bowl], init: voice, path: "/", time: "2026-10-30T18:40:00", setup: async (page, click) => {
       await click(page.locator("nav button").filter({ hasText: "Recipes" }), 700);
       await click(page.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }), 700);
@@ -308,5 +324,5 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
   if (fails.length) { console.log(`\n${fails.length} rule(s) failed; no clip was replaced:\n  ${fails.join("\n  ")}`); process.exit(1); }
   if (ONLY) { console.log("\nCLIPS set: rules checked, no clip written"); process.exit(0); }
   for (const m of made) encode(m);
-  console.log(`\nall rules passed (HC1 to HC12); ${made.length} clips written`);
+  console.log(`\nall rules passed (HC1 to HC13); ${made.length} clips written`);
 })();

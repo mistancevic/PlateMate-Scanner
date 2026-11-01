@@ -48,3 +48,7 @@ HC12. The poster says what the clip is about (Coach Milan, 1 November 11:57: the
 shown before a clip plays is what the clip is about: for the four ways in, the camera with the pack or the plate in it; for
 Explorer, The body's families; for the coach, Waiting for you; for the others, the last settled screen before the fade. Never the first frame. Check: the poster is taken at a set second for the
 four ways in, and 1.1 seconds before the end for the others.
+
+HC13. Hands free looks hands free (Coach Milan, 1 November 14:06: the cook clip moved on taps). A voice command shows as a
+bubble at the bottom with the words said, and the app moves because it heard them, through the browser's speech recognition
+(stood in for in a recording), never because of a tap. Check: every command drew its bubble; the app was listening for each one.

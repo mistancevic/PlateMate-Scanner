@@ -172,9 +172,11 @@ export function LandingScreen() {
         </div>
         <div className="l-one">
           <div className="l-one-text">
-            <span className="l-eyebrow">Your day</span>
+            {/* Coach Milan 1 November 14:06: the clip is Explorer, so the label says so */}
+            <span className="l-eyebrow">Explorer · Situations</span>
             <h2>Your day as it really goes</h2>
-            <p>A late evening at work, a party, a day away, a bad night's sleep. Chef Mealan has a page for each, and reads it against your own plan.</p>
+            <p>A late evening at work, a party, a day away, a bad night's sleep. In Explorer, each has a page of its own, read against your own plan.</p>
+            <p className="l-list-lead">And in your plan:</p>
             <ul className="l-list">
               <li>Busy times from your Google Calendar: a meal in a meeting asks before or after.</li>
               <li>Travel mode: the shops and the kitchen of the place you are in.</li>
@@ -185,7 +187,7 @@ export function LandingScreen() {
         </div>
         <div className="l-one">
           <div className="l-one-text">
-            <span className="l-eyebrow">Explorer</span>
+            <span className="l-eyebrow">Explorer · The body and nutrients</span>
             <h2>Know why, not only what</h2>
             <p>The body, the situations and the nutrients in one place. Every line has its paper. Every page says when a thing helps and when it hurts, then reads your own days.</p>
             <p>No condition, no test reading, no supplement. If a condition decides what you eat, your doctor does.</p>
