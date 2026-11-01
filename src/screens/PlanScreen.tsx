@@ -460,7 +460,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
           <small className="pick-group">Earlier lists</small>
           <div className="menu-list shop-earlier">{store.lists.filter((l) => l.doneAt).map((l) => (
             <button key={l.n} type="button" className="menu-row" onClick={() => setReading(l.n)}>
-              <div className="menu-row-text"><b>Shopping list {l.n}</b><small>{spanOf(l.from, l.to)} · {l.lines.length + l.carried.length} foods · finished {madeOn(l.doneAt!)}</small></div><ChevronRight size={18} />
+              <div className="menu-row-text"><b>Shopping list {l.n}</b><small>{spanOf(l.from, l.to)} · {l.lines.length + l.carried.length} {l.lines.length + l.carried.length === 1 ? "food" : "foods"} · finished {madeOn(l.doneAt!)}</small></div><ChevronRight size={18} />
             </button>))}</div>
         </>)}
         {reading === null && !shown && !making && store.lists.some((l) => l.doneAt) && <button type="button" className="pill pill-wide pill-primary shop-new" onClick={() => setMaking(true)}>New shopping list</button>}

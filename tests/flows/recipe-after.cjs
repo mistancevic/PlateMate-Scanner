@@ -124,7 +124,8 @@ const U = "http://127.0.0.1:3210";
   t = (await units.textContent()).replace(/\s+/g, " ");
   ok(/95 kg is 209\.4 lb, on weigh-ins and your goal\./.test(t) && /182 cm is 6 ft 0 in\./.test(t) && /Food amounts stay in grams/.test(t), "UN2: 95 kg is 209.4 lb; 182 cm is 6 ft 0 in; food stays in grams");
   ok(await page.getByLabel("Height, ft and in").inputValue() === "6 ft 0 in" && await page.getByLabel("Weight, lb").inputValue() === "209.4", "UN2: the profile asks in ft and in, and lb");
-  await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(400);
+  // DT205 (0.3.48): kept as you go, no Save
+  await page.waitForTimeout(1200);
   const pers = await page.evaluate(() => JSON.parse(localStorage.getItem("chefmealan-personal")));
   ok(pers.weightKg === 95 && pers.heightCm === 182 && pers.units?.temp === "f" && pers.units?.weight === "lb", "UN2: the account still keeps 95 kg and 182 cm");
   await page.goto(U + "/me"); await page.waitForTimeout(900);
