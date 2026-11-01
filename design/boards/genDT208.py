@@ -96,9 +96,9 @@ class Component extends DCLogic {{
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
 cy = storyCard(B, y, "DT208", "Finishing the setup, with everything open", [
-  ("Coach Milan, 20:51 to 21:39", "Forms have no validation: people move on without finishing a step. Everything stays open. No extra block and no count: the reminder lives in something that is always there, and says Profile and plan fully set when nothing is missing."),
+  ("Coach Milan, 20:51 to 21:46", "Forms have no validation: people move on without finishing a step. Everything stays open. No extra block and no count: the reminder lives in something that is always there, and says Profile and plan fully set when nothing is missing."),
   ("What is needed", "Profile: female or male, birth year, height, weight, the health questions answered. Goal, Lifestyle and the Training week set. Where I shop and cook: a place. Name, body fat, the coach and Google Calendar stay optional. A new step later just adds its name to the line."),
-  ("Today", "One row right under My goal, in place of the line Today so far, against your goal (the numbers under it already say today and target; Coach Milan 21:39: one row, not two). Something missing: To set: height, goal, training week, by name, in orange; a tap opens the first one. Nothing missing: Profile and plan fully set, in quiet grey, always there as information, nothing to close. It replaces the strip Set your goal."),
+  ("Today", "One row right under My goal, in place of the line Today so far, against your goal (the numbers under it already say today and target; Coach Milan 21:39: one row, not two). Something missing: To set: height, goal, training week, by name, in orange; a tap opens the first one. Nothing missing: Profile and plan fully set. Target today:, in quiet grey, leading into the numbers; always there as information, nothing to close. The PD number says of PD 5.3, like of 2,550 kcal (Coach Milan 21:46). It replaces the strip Set your goal."),
   ("Me", "The goal card on Me has the same line, right under My goal. A step still to set says To do and what is missing; a step done shows its usual line, no tag."),
   ("On the field", "A field the next step needs says so in one line when you leave it empty or wrong: Height: needed for your numbers. Next: Goal still goes on; under it one line, the whole line a link to the field: Still needed for your numbers: height. One row, no separate link to wrap (Coach Milan 21:35)."),
   ("Saving", "As in 0.3.48: each change is kept on the phone at once, and the account gets one write a second after the changes stop."),
@@ -106,7 +106,7 @@ cy = storyCard(B, y, "DT208", "Finishing the setup, with everything open", [
 h = rowEnd(cy,
   B.screen("DT208a", 0, y, "Now: Today for a new person", "r208a", "now", "One strip, Set your goal."),
   B.screen("DT208b", 1, y, "New: Today, something missing", "r208b", "changed", "To set: height, goal, training week."),
-  B.screen("DT208g", 2, y, "New: Today, nothing missing", "r208g", "changed", "Profile and plan fully set, quietly. The numbers show ? only because this drawing has no goal."))
+  B.screen("DT208g", 2, y, "New: Today, nothing missing", "r208g", "changed", "Profile and plan fully set. Target today:, then the five numbers; of PD 5.3."))
 y = h
 h = rowEnd(B.screen("DT208c", 0, y, "Now: Me", "r208c", "now", "The steps look the same, done or not."),
   B.screen("DT208d", 1, y, "New: Me", "r208d", "changed", "The same line; To do on the steps still to set."))
@@ -115,5 +115,5 @@ h = rowEnd(B.screen("DT208e", 0, y, "Now: Profile, the height empty", "r208e", "
   B.screen("DT208f", 1, y, "New: Profile", "r208f", "changed", "Height: needed for your numbers; Next says it too."))
 y = h
 board("Stories155.dc.html", "DT208. Finishing the setup, with everything open",
-  "1 November 2026 (Coach Milan 20:51 to 21:39). Version 5: one row under My goal in place of Today so far, against your goal: To set, or Profile and plan fully set; on Profile one line that is the link. Now: 0.3.48, untouched. Drawn for your approval; nothing built.",
+  "1 November 2026 (Coach Milan 20:51 to 21:46). Version 6: one row under the goal in place of Today so far, against your goal: To set, or Profile and plan fully set. Target today:; the PD number says of PD; the five numbers as on a phone with a goal. Now: 0.3.48, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories154.dc.html")

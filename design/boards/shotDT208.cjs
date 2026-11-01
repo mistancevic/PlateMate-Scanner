@@ -9,16 +9,18 @@ seed.meals = []; seed.feedback = []; seed.items = [];
 const mark = "outline:3px solid #2e7be8;outline-offset:3px;border-radius:10px", NOTE = `${mark};background:#fff8d6;padding:8px 10px;margin:10px 0;font-size:14px;line-height:1.45;color:#172742`;
 (async () => {
   const b = await chromium.launch({ args: ["--lang=en-GB"] });
-  const fresh = async () => {
+  const fresh = async (full = false) => {
     const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, locale: "en-GB" });
     const p = await ctx.newPage();
     await p.clock.setFixedTime(new Date("2026-11-02T09:10:00"));
-    await p.addInitScript((s) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
+    await p.addInitScript(([s, full]) => { if (localStorage.getItem("seeded")) return; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
       localStorage.removeItem("chefmealan-goal");
+      if (full) { localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-11-01T08:00:00Z", source: "profile" })); localStorage.setItem("chefmealan-client-name", "Milan"); }
       localStorage.setItem("chefmealan-region", "munich");
       localStorage.setItem("chefmealan-personal", JSON.stringify({ dayMode: "same", sex: "female", birthYear: 1990, weightKg: 68, kitchens: ["Balkan"], lifestyle: { weekdays: "work", hours: "fixed", move: "sitting", meals: 3 } }));
       localStorage.setItem("chefmealan-safety", JSON.stringify({ situations: [], flags: [], allergies: [], none: true, adultAt: "2026-11-01T09:00:00Z", consentBodyAt: "2026-11-01T09:00:00Z", declaredAt: "2026-11-01T09:00:00Z", aiConfirmedAt: "2026-11-01T09:00:00Z" }));
-      localStorage.setItem("seeded", "1"); }, seed);
+      localStorage.setItem("seeded", "1"); }, [seed, full]);
+    if (full) await p.addInitScript(() => { const x = JSON.parse(localStorage.getItem("chefmealan-personal")); if (!x.heightCm) { x.sex = "male"; x.birthYear = 1981; x.heightCm = 182; x.weightKg = 95; x.plan = Array(7).fill(0).map((_, i) => ({ work: i < 5, kind: i % 2 ? "rest" : "strength" })); localStorage.setItem("chefmealan-personal", JSON.stringify(x)); } });
     await require("/home/claude/platemate-scanner/tests/flows/adult.cjs")(p);
     p.go = async (path) => { await p.goto(U + "/today"); await p.waitForTimeout(1500); const nn = p.getByRole("button", { name: "Not now" }); if (await nn.count()) { await nn.first().click(); await p.waitForTimeout(600); }
       if (path === "/today") return;
@@ -35,7 +37,7 @@ const mark = "outline:3px solid #2e7be8;outline-offset:3px;border-radius:10px", 
     ? `<button class="setup-line" style="display:flex;align-items:center;gap:6px;width:100%;min-height:44px;margin-top:6px;padding:0;border:0;background:none;font:inherit;font-size:14px;font-weight:700;color:#5b6b8a;text-align:left">✓ Profile and plan fully set</button>`
     : `<button class="setup-line" style="display:flex;align-items:center;justify-content:space-between;gap:6px;width:100%;min-height:44px;margin-top:6px;padding:0 10px;border:0;border-radius:10px;background:#fff1e6;font:inherit;font-size:14px;font-weight:800;color:#a4471f;text-align:left">To set: height, goal, training week <span aria-hidden="true">›</span></button>`;
   for (const v of ["now", "missing", "allset"]) {
-    const p = await fresh(); await p.go("/today");
+    const p = await fresh(v === "allset"); await p.go("/today");
     await p.evaluate(({ v, mark, NOTE, html }) => {
       const strip = [...document.querySelectorAll(".strip-button")].find((x) => /Set your goal/.test(x.textContent));
       const card = document.querySelector(".plan");
@@ -45,9 +47,11 @@ const mark = "outline:3px solid #2e7be8;outline-offset:3px;border-radius:10px", 
       if (v === "allset") for (const b of card.querySelectorAll(".plan-row b")) b.textContent = b.textContent === "0" ? b.textContent : b.textContent;
       // version 5 (Coach Milan 21:39): one row with the line under My goal, not two; it takes the place of Today so far, against your goal
       const sub = [...card.querySelectorAll("*")].find((e) => e.children.length === 0 && /^Today so far, against your goal/.test(e.textContent.trim()));
-      if (sub) { if (v === "allset") { sub.textContent = "✓ Profile and plan fully set"; sub.style.cssText += ";outline:3px solid #2e7be8;outline-offset:3px;border-radius:6px"; }
+      if (sub) { if (v === "allset") { sub.textContent = "✓ Profile and plan fully set. Target today:"; sub.style.cssText += ";outline:3px solid #2e7be8;outline-offset:3px;border-radius:6px"; }
         else { sub.insertAdjacentHTML("afterend", html); sub.remove(); const line = card.querySelector(".setup-line"); line.style.outline = "3px solid #2e7be8"; line.style.outlineOffset = "3px"; } }
-      note(card, v === "missing" ? "New: no extra block. Right under My goal, one row: what is still to set, by name, no count, in place of the line Today so far, against your goal. A tap opens the first one, here the height in Profile. It replaces the strip Set your goal." : "New: when nothing is missing the row under My goal says Profile and plan fully set, in place of Today so far, against your goal: the numbers under it already say today, target and of. One row, nothing to close. If something goes missing later, the row names it again.");
+      // version 6 (Coach Milan 21:46): the PD number says of PD 6.5, like the others; Target today is said once, above them
+      for (const e of card.querySelectorAll("small")) if (/^PD today, target/.test(e.textContent.trim())) { e.textContent = e.textContent.replace(/^PD today, target\s*/, "of PD "); e.style.outline = "3px solid #2e7be8"; e.style.outlineOffset = "2px"; e.style.borderRadius = "4px"; }
+      note(card, v === "missing" ? "New: no extra block. Right under My goal, one row: what is still to set, by name, no count, in place of the line Today so far, against your goal. A tap opens the first one, here the height in Profile. It replaces the strip Set your goal." : "New: when nothing is missing the row under the goal says Profile and plan fully set. Target today:, in place of Today so far, against your goal, and leads into the numbers. The PD number says of PD 5.3, like of 2,550 kcal, so today and target are said once. All five numbers, fat and carbs included, as on your phone. One row, nothing to close; if something goes missing later, the row names it again.");
     }, { v, mark, NOTE, html: v === "now" ? "" : LINE(v) });
     await shot(p, `r208${v === "now" ? "a" : v === "missing" ? "b" : "g"}`); await p.context().close();
   }
