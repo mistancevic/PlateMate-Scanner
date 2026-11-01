@@ -678,7 +678,8 @@ function ShopPanel(p: AppApi) {
       {more || !p.region ? others.map(row) : others.length > 0 && <div className="place-row"><span><b>{others.length} more places</b><small>{others.map((r) => r.name.replace(/, elsewhere$/, "")).slice(0, 4).join(", ")}…</small></span><button type="button" className="link" onClick={() => setMore(true)}>Show</button></div>}
     </section>
     <KitchensAndTools {...p} />
-      <NextLink p={p} to="coach" from="shop" text="Coach" hint="Join a coach with a code, or see yours" />
+      {/* DT209 (0.3.50, board Stories156; Coach Milan 1 November 22:33 to 23:52 Go): the setup steps end on Your summary; My coach is no step */}
+      <NextLink p={p} to="summary" from="shop" text="Your summary" hint="Everything you told Chef Mealan, and what it does" />
     </>
   );
 }
@@ -734,7 +735,7 @@ function CoachPanel(p: AppApi) {
     return <section className="card"><small>You're a coach. Your code, your clients and what they shared are in the Clients tab.</small><div className="button-row" style={{ marginTop: 8 }}><button className="pill pill-small pill-primary" onClick={() => { p.setTab("clients"); }}>Open Clients</button></div></section>;
   if (!cloudEnabled || !user)
     return <><section className="card person"><span className="avatar avatar-coach">{COACH_NAME.slice(0, 1)}</span><div><b>{COACH_NAME}</b><small>sets your target and sees how it went</small></div></section>
-      <NextLink p={p} to="summary" from="coach" text="Your summary" hint="Everything you told Chef Mealan, and what it does" /></>;
+      </>;
   return profile.coachId ? (
     <>
       <section className="card person">
@@ -764,8 +765,6 @@ function CoachPanel(p: AppApi) {
         </ul>
         <ConfirmButton className="link link-danger" label="Leave this coach" confirmLabel="Tap again to leave" onConfirm={leaveCoach} />
       </section>
-      {/* DT167 (0.3.9): the steps end on Your summary */}
-      <NextLink p={p} to="summary" from="coach" text="Your summary" hint={`Everything you told Chef Mealan, and what ${p.coachLabel} sees`} />
       {p.coachNotes.length > 0 && (
         <>
           <p className="label">Notes from {p.coachLabel}</p>
@@ -784,7 +783,6 @@ function CoachPanel(p: AppApi) {
         <button className="pill pill-small pill-primary" disabled={code.trim().length < 4} onClick={() => joinCoach(code)}>Join</button>
       </div>
     </section>
-    <NextLink p={p} to="summary" from="coach" text="Your summary" hint="Everything you told Chef Mealan, and what it does" />
     </>
   );
 }

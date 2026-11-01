@@ -44,9 +44,9 @@ const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0
   ok(await page.locator(".coach-week-note").count() === 0 && await page.evaluate(() => !!JSON.parse(localStorage.getItem("chefmealan-coach")).notes[0].readAt), "Got it: the note leaves Today and is marked read");
   // CW1: Clients, the example clients
   await page.goto("http://127.0.0.1:3197/today?coachdemo"); await page.waitForTimeout(1000);
-  // DT188 (0.3.30): the coach's two views; My clients puts Clients at the centre of the bar
-  await page.getByRole("radio", { name: "My clients" }).click(); await page.waitForTimeout(800);
-  ok((await page.locator(".bottom-nav button > span:last-child").allTextContents()).join(",") === "Today,Plan,Clients,Recipes,Explorer", "the coach's bar in My clients: Plate becomes Clients");
+  // DT210 (0.3.50): Clients is the coach's sixth tab
+  ok((await page.locator(".bottom-nav button > span:last-child").allTextContents()).join(",") === "Today,Plan,Plate,Recipes,Explorer,Clients", "the coach's bar: six tabs, Clients the sixth");
+  await page.locator(".bottom-nav button").filter({ hasText: "Clients" }).click(); await page.waitForTimeout(800);
   ok(/Check-ins today/.test(await page.locator("main").textContent()), "Clients starts with Check-ins today");
   const row = page.locator(".cw-row").first();
   ok(await row.locator(".cw-bar").count() === 7 && /lived by the plan/.test(await row.textContent()) && /check-in today/.test(await row.textContent()), "a client row: seven bars and the days lived by the plan");
@@ -67,7 +67,8 @@ const ymd = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0
   ok(/Good week\. Wednesday happens\./.test(await page.locator("main").textContent()) && /Approved the week/.test(await page.locator("main").textContent()), "the note is sent and listed");
   await page.getByRole("group", { name: "Check-in day" }).getByRole("button", { name: "Mon" }).click(); await page.waitForTimeout(200);
   ok(/Check-in: Monday/.test(await page.locator(".cw-person").textContent()), "the check-in day changes");
-  // CW8: a goal from a date
+  // CW8: a goal from a date (DT210: on the client page's Goal tab)
+  await page.locator(".cp-tabs [role=tab]").filter({ hasText: "Goal" }).click(); await page.waitForTimeout(300);
   await page.locator(".cw-goal").getByRole("button", { name: /^Maintain/ }).click();
   await page.locator(".cw-goal").getByRole("group", { name: "Apply from" }).locator(".choice").nth(2).click(); await page.waitForTimeout(200);
   const apply = page.locator(".cw-goal").getByRole("button", { name: /^Apply from/ });

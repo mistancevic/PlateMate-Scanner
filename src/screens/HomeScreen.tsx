@@ -221,7 +221,7 @@ export function HomeScreen(p: AppApi) {
       </section>
       {/* DT189 (0.3.31): the strip in words instead of a number on an icon; it opens Clients on the list */}
       {p.isCoach && p.waiting.length > 0 && (
-        <button className="strip strip-button" onClick={() => { p.setCoachView("clients"); setTab("clients"); }}>{waitingWords(p.waiting)}</button>
+        <button className="strip strip-button" onClick={() => setTab("clients")}>{waitingWords(p.waiting)}</button>
       )}
       {/* the coach's note, once (0.2.6, canvas board CW, CW5): Got it keeps it in My coach; Change the numbers opens Goal */}
       {(() => {

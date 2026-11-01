@@ -93,7 +93,6 @@ import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, get
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
 import { ExplorerScreen } from "./screens/ExplorerScreen";
-import { ClientView, CoachSwitch } from "./screens/ClientView";
 import { setExplorerTarget } from "./explorerTarget";
 import { SharePublisher } from "./screens/SummaryPanel";
 import { STARTER_FOODS, STARTER_REGION } from "./starter";
@@ -1510,7 +1509,7 @@ export default function App() {
   }
   // a reload on Clients stays there; once the account is known and is not a coach's, Today instead
   useEffect(() => { if ((profileReady || (authReady && !user)) && tab === "clients" && profile.role !== "coach" && !coachDemoOn()) setTab("home"); }, [profileReady, authReady, user, profile.role, tab]);
-  useEffect(() => { if (tab === "clients" && coachView !== "clients" && (profile.role === "coach" || coachDemoOn())) { setCoachViewState("clients"); try { localStorage.setItem("chefmealan-coach-view", "clients"); } catch {} } /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [tab]);
+  // DT210 (0.3.50): Clients is a tab of its own; no view to switch
   // numbers calculated from the profile follow the profile; before the first paint, so Today never shows ? and then jumps (T5)
   useLayoutEffect(() => {
     if (goal?.source !== "profile" || !goal.band) return;
@@ -2726,15 +2725,16 @@ export default function App() {
     // 0.2.121: a client sees how many things from the coach wait on Today (notes without Got it, recipes sent)
     { id: "home", label: "Today", icon: <span className="nav-icon"><Home size={20} />{profile.role !== "coach" && fromCoach > 0 && <span className="badge">{fromCoach}</span>}</span> },
     { id: "plan", label: "Plan", icon: <CalendarDays size={20} /> },
-    // DT188 (0.3.30, Milan 16:08): the bar keeps its order on both of the coach's views; only the centre changes, Plate becomes Clients
-    ...((profile.role === "coach" || coachDemoOn()) && coachView === "clients"
-      ? [{ id: "clients" as Tab, label: "Clients", icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }]
-      : [{ id: "journey" as Tab, label: "Plate", icon: <Utensils size={20} /> }]),
+    { id: "journey" as Tab, label: "Plate", icon: <Utensils size={20} /> },
     { id: "recipes", label: "Recipes", icon: <ChefHat size={20} /> },
     // DT188: Explorer is the fifth tab, for everyone; Foods and Me stay in the menu
     { id: "explorer", label: "Explorer", icon: <Microscope size={20} /> },
+    // DT210 (0.3.50, board Stories157; Coach Milan 1 November 23:28 to 23:52 Go): a coach's sixth tab, Clients, at the right,
+    // with the count of what waits; Today, Plan, Plate and Recipes are always the coach's own. Clients keep five tabs.
+    ...(profile.role === "coach" || coachDemoOn() ? [{ id: "clients" as Tab, label: "Clients", icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }] : []),
   ];
-  const clientsView = (profile.role === "coach" || coachDemoOn()) && coachView === "clients";
+  // DT210: no more My day and My clients; a client is seen on their page in Clients
+  const clientsView = false;
   const TITLES: Record<Tab, string> = {
     home: "Today",
     journey: "Plate",
@@ -2808,7 +2808,7 @@ export default function App() {
         <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setFilling(null); setTab("home"); }} aria-label={`${APP_NAME}, Today`}>
           <Mark size={28} color="var(--brand)" />
         </button>
-        <h1>{menuSection ? (ME_PAGES.includes(menuSection) ? "Me" : "Menu") : clientsView && ["home", "plan", "recipes", "clients"].includes(tab) ? "My clients" : TITLES[tab]}</h1>
+        <h1>{menuSection ? (ME_PAGES.includes(menuSection) ? "Me" : "Menu") : TITLES[tab]}</h1>
         {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
           {menuSection === "goal" ? `${pdText(dayPd)} today` : <>{goal?.band ? goalLabel(goal.band).split(" · ")[0] : `${fmt(state.goals.calories, 0)} kcal, ${fmt(state.goals.protein)} g`} · {pdText(dayPd)} today</>}
         </button>}
@@ -2845,9 +2845,6 @@ export default function App() {
         <CalendarSync p={screenProps} />
         {/* Chef Mealan opens over a menu page too, and closing it comes back to the page (0.2.7+r2: the button vanished there) */}
         {menuSection && <div style={{ display: talkOpen ? "none" : "contents" }}><MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s, up) => { setMenuFrom(null); setMenuSection(s, up); }} under={menuTrail.length > 1 ? menuTrail[menuTrail.length - 2] : null} close={() => { setMenuFrom(null); setMenuSection(null); }} /></div>}
-        {/* DT188: the coach's switch at the top of Today, on both views; in My clients, Today, Plan and Recipes show the chosen client's */}
-        {!menuSection && !talkOpen && screenProps.isCoach && (tab === "home" || (clientsView && tab === "clients")) && <CoachSwitch p={screenProps} />}
-        {!menuSection && !talkOpen && clientsView && (tab === "home" || tab === "plan" || tab === "recipes") && <ClientView p={screenProps} tab={tab} />}
         {!menuSection && !talkOpen && !clientsView && tab === "home" && <HomeScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "journey" && <JourneyScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "explorer" && <div className="explorer-tab"><ExplorerScreen {...screenProps} /></div>}
@@ -2887,7 +2884,7 @@ export default function App() {
           }}
         />
       </main>
-      <nav className="bottom-nav" aria-label="Screens">
+      <nav className={`bottom-nav${NAV.length > 5 ? " six" : ""}`} aria-label="Screens">
         {NAV.map((n) => (
           <button
             key={n.id}

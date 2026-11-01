@@ -23,15 +23,15 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   const toMe = async () => { await page.goto(U); await page.waitForTimeout(900); await page.getByRole("button", { name: "Menu" }).first().click(); await page.waitForTimeout(300); await page.getByRole("button", { name: /^Me\b/ }).first().click(); await page.waitForTimeout(500); };
   await toMe();
   const rows = (await page.locator(".me-rows .menu-row b").allTextContents());
-  ok(rows.join(",") === "Profile,Goal,Lifestyle,Training week,Google Calendar,Where I shop and cook,My coach,Your summary,Account", "Me: the steps, Your summary, then Account: " + rows.join(","));
+  ok(rows.join(",") === "Profile,Goal,Lifestyle,Training week,Google Calendar,Where I shop and cook,Your summary,My coach,Account", "DT209: the steps, Your summary, My coach, then Account: " + rows.join(","));
   ok(await page.locator(".taste-card").count() === 0, "Taste no longer sits alone at the bottom of Me");
   await page.locator(".me-rows .menu-row", { hasText: "Lifestyle" }).click(); await page.waitForTimeout(500);
   const names = await page.locator(".seg").last().locator(".setting-name").allTextContents();
   ok(names.slice(0, 4).join(",") === "Where you eat,What you eat,Taste,Alcohol" && await page.locator(".taste-card .choice.on", { hasText: "Creamy" }).count() === 1, "Taste in Lifestyle, under Nutrition, after What you eat: " + names.join(","));
   // the steps end on Your summary
-  await toMe(); await page.locator(".me-rows .menu-row", { hasText: "My coach" }).click(); await page.waitForTimeout(400);
+  await toMe(); await page.locator(".me-rows .menu-row", { hasText: "Where I shop and cook" }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: /Next: Your summary/ }).click(); await page.waitForTimeout(500);
-  ok(await page.locator(".menu-title").textContent() === "Your summary", "My coach's Next leads to Your summary");
+  ok(await page.locator(".menu-title").textContent() === "Your summary", "DT209: Where I shop and cook's Next leads to Your summary");
   const heads = await page.locator(".summary .seg-head b").allTextContents();
   ok(heads.join(",") === "You,Goal and numbers,Your day,How you eat,Training week,Where you shop and cook,Health questions", "every part, by step: " + heads.join(","));
   const text = (k) => page.locator(".sum-row", { hasText: k }).first().innerText().then((t) => t.replace(/\s+/g, " ").trim());
@@ -40,9 +40,9 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(/Where you eat Cook at home · Canteen at work .* ✓ Chef reads/.test(await text("Where you eat")) && /✓ Chef reads/.test(await text("Work travel")), "Where you eat and Work travel: Chef Mealan reads them now");
   ok(/Taste, in your own words no coriander/.test(await text("Taste, in your own words")), "taste in your own words, in the summary");
   // the next steps
-  ok(await page.getByRole("button", { name: /Plan your week/ }).count() === 1 && await page.getByRole("button", { name: /Craft your first meal/ }).count() === 1 && await page.getByRole("button", { name: "Save as PDF" }).count() === 1, "Plan your week, Craft your first meal, Save as PDF");
+  ok(await page.getByRole("button", { name: /Plan your week/ }).count() === 1 && await page.getByRole("button", { name: /Or craft your first meal on the Plate/ }).count() === 1 && /pill-primary/.test(await page.getByRole("button", { name: /^Next: Plan your week/ }).getAttribute("class")) && await page.evaluate(() => { const b = document.querySelector(".sum-buttons"), n = document.querySelector(".sum-next"); return Boolean(b.compareDocumentPosition(n) & Node.DOCUMENT_POSITION_FOLLOWING); }) && await page.getByRole("button", { name: "Save as PDF" }).count() === 1, "Plan your week, Craft your first meal, Save as PDF");
   ok(await page.getByRole("button", { name: /^Choose what/ }).count() === 0, "without a coach, nothing to choose for one");
-  await page.getByRole("button", { name: /Craft your first meal/ }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /Or craft your first meal/ }).click(); await page.waitForTimeout(600);
   ok(/\/plate|\/journey|plate/i.test(page.url()) || await page.locator(".menu-title").count() === 0, "Craft your first meal opens Plate: " + page.url());
   await toMe(); await page.locator(".me-rows .menu-row", { hasText: "Your summary" }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: /Plan your week/ }).click(); await page.waitForTimeout(600);
@@ -60,19 +60,22 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   ok(/sees 8 of 11 parts, kept up to date/.test(await page.locator(".sum-foot").textContent()), "the summary says how much the coach sees");
   // the coach's side (example clients, ?coachdemo): what changed on the row and at the top of the page, the shared parts below
   await page.goto(U + "today?coachdemo"); await page.waitForTimeout(1000);
-  await page.getByRole("radio", { name: "My clients" }).click(); await page.waitForTimeout(800);
+  await page.locator(".bottom-nav button").filter({ hasText: "Clients" }).click(); await page.waitForTimeout(800);
   const dav = page.locator(".cw-row", { hasText: "Nina" }).first();
   ok(/Profile: 2 changes since you looked/.test(await dav.textContent()), "Clients marks a client whose shared profile changed");
   await dav.click(); await page.waitForTimeout(600);
   const ch = (await page.locator(".profile-changes").innerText()).replace(/\s+/g, " ");
   ok(/What changed since you last looked \d+ \w+ Wake-up and bedtime: 6:00 to 8:00 · 22:00 to midnight → Before 6:00 · 22:00 to midnight\. \d+ \w+ Meals: 3 a day, .* → 3 a day, 06:30/.test(ch), "the client's page starts with what changed: " + ch.slice(0, 200));
+  await page.locator(".cp-tabs [role=tab]").filter({ hasText: "Goal" }).click(); await page.waitForTimeout(300);
   const sp = (await page.locator(".shared-profile").innerText()).replace(/\s+/g, " ");
   ok(/Nina's profile/.test(sp) && /Not shared What you eat, alcohol, in your own words, allergies and intolerances, your body data\. Nina keeps these to themselves\./.test(sp) && !/Alcohol On weekends/.test(sp) && !/born 1985/.test(sp), "the shared parts below, what wasn't shared said, no private row: " + sp.slice(-260));
   await page.getByRole("button", { name: "‹ Clients" }).click(); await page.waitForTimeout(400);
   ok(!/Profile: \d+ change/.test(await page.locator(".cw-row", { hasText: "Nina" }).first().textContent()), "looked at: the mark goes");
   // DT172 (privacy finding 14, option a): Lena shares no body data: her coach sees the trend in percent, no kilogram
   await page.locator(".cw-row", { hasText: "Lena" }).first().click(); await page.waitForTimeout(600);
-  const lp = (await page.locator("main").innerText()).replace(/\s+/g, " ");
+  let lp = (await page.locator("main").innerText()).replace(/\s+/g, " ");
+  await page.locator(".cp-tabs [role=tab]").filter({ hasText: "Goal" }).click(); await page.waitForTimeout(300);
+  lp += " " + (await page.locator("main").innerText()).replace(/\s+/g, " ");
   ok(/In percent of their weight: they share no body data\./.test(lp) && /Weigh-ins 2 this week|Weigh-ins \d this week/.test(lp) && !/\b6\d\.\d kg\b/.test(lp), "DT172: without body data, weigh-ins in percent and days weighed, no kilogram: " + (lp.match(/Weigh-ins[^.]*\./) || [""])[0]);
   ok(errs.length === 0, errs.length ? "page errors: " + errs.join(" | ") : "no page errors");
   await b.close(); server.kill();

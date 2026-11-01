@@ -58,14 +58,17 @@ export function SummaryPanel(p: AppApi) {
   return (
     <div className="summary">
       <p className="small muted page-why">Everything you told Chef Mealan, in one place, and what each answer does. ✓ Chef reads: Chef Mealan reads it with every plate, idea and answer. Change any part from its step.</p>
-      <SummaryParts parts={parts} open={(s) => p.openMenu(s, "summary")} />
-      <div className="menu-list sum-next">
-        <button className="menu-row" onClick={() => p.tabFromPage("plan")}><span className="menu-row-text"><b>Plan your week</b><small>Fill your slots with Chef Mealan</small></span><span aria-hidden="true">›</span></button>
-        <button className="menu-row" onClick={() => p.tabFromPage("journey")}><span className="menu-row-text"><b>Craft your first meal</b><small>{next ? `On Plate: ${next.name.toLowerCase()} at ${next.time}` : "On Plate, for your next meal"}</small></span><span aria-hidden="true">›</span></button>
-      </div>
+      {/* DT209 version 2 (0.3.50, board Stories156; Coach Milan 22:44 to 23:52 Go): Save as PDF and what your coach sees are about
+          the summary itself, so they sit at the top, small; the page ends on the way on, Next: Plan your week */}
       <div className="button-row sum-buttons">
-        {coach && <button className="pill pill-primary" onClick={() => { setSharing(true); window.scrollTo(0, 0); }}>Choose what {coach} sees</button>}
-        <button className="pill" onClick={() => window.print()}>Save as PDF</button>
+        {coach && <button className="pill pill-small" onClick={() => { setSharing(true); window.scrollTo(0, 0); }}>Choose what {coach} sees</button>}
+        <button className="pill pill-small" onClick={() => window.print()}>Save as PDF</button>
+      </div>
+      <SummaryParts parts={parts} open={(s) => p.openMenu(s, "summary")} />
+      <div className="next-step sum-next">
+        <button className="pill pill-primary pill-wide" onClick={() => p.tabFromPage("plan")}>Next: Plan your week ›</button>
+        <small className="muted">Fill your slots with Chef Mealan</small>
+        <button type="button" className="link sum-plate" onClick={() => p.tabFromPage("journey")}>Or craft your first meal on the Plate{next ? `, ${next.name.toLowerCase()} at ${next.time}` : ""} ›</button>
       </div>
       <small className="muted sum-foot">{coach ? `${coach} sees ${shared.length === SHARE_PARTS.length ? "every part" : `${shared.length} of ${SHARE_PARTS.length} parts`}, kept up to date, with what changed. Your summary changes when your answers change.` : "Your summary changes when your answers change. With a coach, you choose what your coach sees, part by part."}</small>
     </div>

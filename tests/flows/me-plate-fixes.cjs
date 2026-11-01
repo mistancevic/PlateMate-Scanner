@@ -63,7 +63,7 @@ const list1 = { n: 1, madeAt: "2026-10-20T10:00:00Z", from: "2026-10-20", to: "2
     ok(url() === "/me/goal", "Next: Goal opens Goal: " + url());
     // DT207e: Your summary, Plan your week, Back
     await page.goto(U + "/me/summary"); await page.waitForTimeout(1500);
-    await page.locator(".sum-next .menu-row").filter({ hasText: "Plan your week" }).click(); await page.waitForTimeout(900);
+    await page.locator(".sum-next button").filter({ hasText: "Plan your week" }).click(); await page.waitForTimeout(900);
     ok(url() === "/plan", "Plan your week opens Plan: " + url());
     await page.goBack(); await page.waitForTimeout(900);
     ok(url() === "/me/summary" && /Your summary/.test(await page.locator(".menu-title").textContent().catch(() => "")), "DT207e: Back from Plan comes back to Your summary: " + url());

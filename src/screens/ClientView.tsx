@@ -99,7 +99,7 @@ export function ClientView({ p, tab }: { p: AppApi; tab: Tab }) {
   );
 }
 
-function ClientToday({ p, row, head, suggest, today }: { p: AppApi; row: ClientRow; head: React.ReactNode; suggest: (s: Suggest, text: string) => Promise<void>; today: string }) {
+export function ClientToday({ p, row, head, suggest, today }: { p: AppApi; row: ClientRow; head: React.ReactNode; suggest: (s: Suggest, text: string) => Promise<void>; today: string }) {
   const name = first(row.name);
   const l = row.days[today] ?? null;
   const [snack, setSnack] = useState("");

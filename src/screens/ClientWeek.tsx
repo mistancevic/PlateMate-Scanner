@@ -83,7 +83,12 @@ const TONE: Record<string, string> = { lived: "cw-green", plan: "cw-green", chan
 const MARK: Record<SlotMark, [string, string]> = { plan: ["By the plan", "cw-green"], swapped: ["Swapped", "cw-amber"], skipped: ["Skipped on purpose", "cw-ink"], missed: ["Not eaten", "cw-amber"], open: ["Still to come", "cw-grey"] };
 const kcalText = (n: number) => `${Math.round(n).toLocaleString("en")} kcal`;
 
-export function ClientPage({ row, coachName, ops, back, notify, setError, tail, waitingCount = 0 }: { row: ClientRow; coachName: string; ops: CoachOps; back: () => void; notify: (m: string) => void; setError: (m: string) => void; tail: ReactNode; waitingCount?: number }) {
+// DT210 (0.3.50, board Stories157; Coach Milan 1 November 23:28 to 23:52 Go): a client's page holds everything about the
+// client, with tabs inside it: Today and Week (read-only, with Suggest), Shared (the cards the client sent, each with Answer),
+// Goal (numbers, weigh-ins, the formula). It opens on Week, or on Shared when a shared card sent you here.
+export type ClientPart = "today" | "week" | "shared" | "goal";
+export function ClientPage({ row, coachName, ops, back, notify, setError, tailFor, today, startOn = "week", waitingCount = 0 }: { row: ClientRow; coachName: string; ops: CoachOps; back: () => void; notify: (m: string) => void; setError: (m: string) => void; tailFor: (part: "goal" | "shared") => ReactNode; today: ReactNode; startOn?: ClientPart; waitingCount?: number }) {
+  const [part, setPart] = useState<ClientPart>(startOn);
   const name = first(row.name);
   const [offset, setOffset] = useState(0);
   const [openDay, setOpenDay] = useState<string | null>(null);
@@ -135,6 +140,14 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tail, 
       <section className="card person cw-person"><span className="avatar">{row.name.slice(0, 1).toUpperCase()}</span>
         <div><b>{name}</b><small>{[g ? goalLabel(g.id) : "No goal yet", kcalNow ? `${kcalNow.toLocaleString("en")} kcal` : null, proteinNow ? `${proteinNow} g protein` : null, wk ? `week ${wk}` : null].filter(Boolean).join(" · ")}</small><small>Check-in: {DAY_NAMES[row.checkinDay]}</small></div>
       </section>
+      <div className="cp-tabs" role="tablist" aria-label={`${name}'s page`}>
+        {([["today", "Today"], ["week", "Week"], ["shared", `Shared${row.feedback.length ? ` (${row.feedback.length})` : ""}`], ["goal", "Goal"]] as [ClientPart, string][]).map(([k, l]) => (
+          <button key={k} type="button" role="tab" aria-selected={part === k} className={`choice ${part === k ? "on" : ""}`} onClick={() => setPart(k)}>{l}</button>
+        ))}
+      </div>
+      {part === "today" && today}
+      {part === "shared" && tailFor("shared")}
+      {part === "week" && (<>
       {/* DT167 (0.3.9, board Stories119 version 2): the check-in starts with what changed in the shared profile */}
       <ProfileChanges uid={row.uid} sp={row.profileShare} />
 
@@ -214,6 +227,8 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tail, 
         </>
       )}
 
+      </>)}
+      {part === "goal" && (<>
       <p className="label">{name}'s goal</p>
       <section className="card you-card"><span><b>{g ? goalLabel(g.id) : "No goal yet"}</b><small>{[row.goal?.setAt ? `Since ${new Date(row.goal.setAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}` : null, row.goal?.setBy === "coach" ? "set by you" : row.goal ? `set by ${name}` : null, kcalNow ? `${kcalNow.toLocaleString("en")} kcal` : null, proteinNow ? `${proteinNow} g protein` : null].filter(Boolean).join(" · ")}</small>{row.nextGoal && <small className="cw-next">Next: {goalLabel(row.nextGoal.band)}, from {longDay(row.nextGoal.from)}{row.nextGoal.setBy === "coach" ? ", set by you" : ""}</small>}</span></section>
       <section className="card cw-goal">
@@ -235,7 +250,8 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tail, 
         <button className="pill pill-primary pill-wide" disabled={!band} onClick={applyGoal}>Apply from {fromName}</button>
       </section>
       <SharedProfileCard name={name} sp={row.profileShare} />
-      {tail}
+      {tailFor("goal")}
+      </>)}
     </div>
   );
 }

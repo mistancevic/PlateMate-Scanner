@@ -69,27 +69,34 @@ const PORT = "3340", U = `http://127.0.0.1:${PORT}`;
   const an = page.locator(".coach-week-note").first();
   ok(/On your Sarma with skyr, Tuesday 13:00/.test(await text(an)) && /Keep the skyr on the side/.test(await text(an)) && await an.getByRole("button", { name: "Got it" }).count() === 1, "the answer on Today quotes the meal and its time, with Got it");
   await an.getByRole("button", { name: "Got it" }).click(); await page.waitForTimeout(400);
-  // 4. the coach: the switch at the top of Today; My clients swaps the centre of the bar; the chosen client's Today with Suggest
+  // 4. DT210 (0.3.50, board Stories157): no switch; the coach's bar has six tabs, Clients the sixth; a client's page has tabs
   await page.goto(U + "/today?coachdemo"); await page.waitForTimeout(1200);
-  const sw = page.getByRole("radiogroup", { name: "Which view" });
-  ok(await sw.count() === 1 && (await sw.getByRole("radio", { name: "My day" }).getAttribute("aria-checked")) === "true" && await bar() === "Today,Plan,Plate,Recipes,Explorer", "the coach: My day, the same bar as everyone");
-  await sw.getByRole("radio", { name: "My clients" }).click(); await page.waitForTimeout(800);
-  ok(await bar() === "Today,Plan,Clients,Recipes,Explorer" && await text(page.locator("header h1")) === "My clients", "My clients: Plate becomes Clients; the title is My clients");
+  ok(await page.getByRole("radiogroup", { name: "Which view" }).count() === 0 && await bar() === "Today,Plan,Plate,Recipes,Explorer,Clients", "the coach: no switch, six tabs, Clients the sixth: " + await bar());
+  const ws = await page.locator(".bottom-nav button").evaluateAll((xs) => xs.map((x) => Math.round(x.getBoundingClientRect().width)));
+  ok(ws.length === 6 && ws.every((w) => w >= 44), "six tabs, each 44 px or more wide: " + ws.join(","));
+  await page.locator(".bottom-nav button").filter({ hasText: "Clients" }).click(); await page.waitForTimeout(800);
+  ok(await text(page.locator("header h1")) === "Clients", "Clients, its own tab");
   await page.locator(".cw-row").first().click(); await page.waitForTimeout(600);
-  const clientName = await text(page.locator(".cw-person b"));
-  await page.locator(".bottom-nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(600);
-  ok(await text(page.locator("header h1")) === "My clients" && await text(page.locator(".cv-name")) === clientName && /Today, read-only/.test(await text(page.locator(".cv-head"))), "the client's Today: title My clients, the name under it, read-only");
-  ok(await page.locator(".cv-suggest").count() === 1 && /A planned snack/.test(await text(page.locator(".cv-suggest"))) && /A page from Explorer/.test(await text(page.locator(".cv-suggest"))), "Suggest: a planned snack, a page from Explorer");
+  const tabs = await page.locator(".cp-tabs [role=tab]").allTextContents();
+  ok(tabs.map((t) => t.replace(/ \(\d+\)$/, "")).join(",") === "Today,Week,Shared,Goal" && (await page.locator(".cp-tabs [aria-selected=true]").textContent()) === "Week" && /Planned against eaten/.test(await text(page.locator(".cw-week"))), "a client's page: Today, Week, Shared, Goal; it opens on Week");
+  await page.locator(".cp-tabs [role=tab]").filter({ hasText: "Today" }).click(); await page.waitForTimeout(400);
+  ok(await page.locator(".cv-suggest").count() === 1 && /A planned snack/.test(await text(page.locator(".cv-suggest"))) && /A page from Explorer/.test(await text(page.locator(".cv-suggest"))), "Today: Suggest, a planned snack, a page from Explorer");
   await page.getByLabel("The snack").fill("Cottage cheese and a pear"); await page.getByRole("button", { name: "Suggest the snack" }).click(); await page.waitForTimeout(500);
   ok(/Cottage cheese and a pear/.test(await text(page.locator("main"))) && /waiting/.test(await text(page.locator("main"))), "the suggestion is listed as waiting");
-  await page.locator(".bottom-nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(500);
-  ok(/Plan, read-only/.test(await text(page.locator(".cv-head"))) && /never on the plan itself/.test(await text(page.locator("main"))), "the client's Plan, read-only");
-  await page.locator(".bottom-nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500);
-  ok(/Recipes, read-only/.test(await text(page.locator(".cv-head"))), "the client's Recipes, read-only");
-  // back to My day: Plate is back, Today is the coach's own
-  await page.locator(".bottom-nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(400);
-  await sw.getByRole("radio", { name: "My day" }).click(); await page.waitForTimeout(600);
-  ok(await bar() === "Today,Plan,Plate,Recipes,Explorer" && await page.locator(".cv-head").count() === 0 && await text(page.locator("header h1")) === "Today", "My day again: Plate is back, the coach's own Today");
+  await page.locator(".cp-tabs [role=tab]").filter({ hasText: "Shared" }).click(); await page.waitForTimeout(400);
+  ok(/Shared with you/.test(await text(page.locator("main"))) && await page.locator(".cw-week").count() === 0, "Shared: the cards the client sent");
+  await page.locator(".cp-tabs [role=tab]").filter({ hasText: "Goal" }).click(); await page.waitForTimeout(400);
+  ok(/A new goal for/.test(await text(page.locator("main"))) && await page.locator(".formula-row").count() === 1, "Goal: the goal, the formula");
+  // Recipes and Today are the coach's own
+  await page.locator(".bottom-nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(600);
+  ok(await page.locator(".cv-head").count() === 0 && await text(page.locator("header h1")) === "Recipes", "Recipes is the coach's own");
+  await page.locator(".bottom-nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(500);
+  ok(await page.locator(".cv-head").count() === 0 && await text(page.locator("header h1")) === "Today", "Today is the coach's own");
+  // DT209 (0.3.50): a coach account has no My coach row in Me
+  await require("./me.cjs")(page);
+  const meRows = await page.locator(".me-rows .menu-row b").allTextContents();
+  ok(!meRows.includes("My coach") && meRows.indexOf("Your summary") === meRows.indexOf("Where I shop and cook") + 1, "Me for a coach: no My coach; Your summary after Where I shop and cook: " + meRows.join(","));
+  await page.getByRole("button", { name: /^Close$/ }).first().click().catch(() => {}); await page.waitForTimeout(300);
   // 6. DT189 (0.3.31): Waiting for you at the top of Clients; the badge is its count; a tap opens the card; Answer and Good under the card
   await page.goto(U + "/today?coachdemo"); await page.waitForTimeout(1200);
   await page.evaluate(() => { for (const k of Object.keys(localStorage)) if (/chefmealan-waiting-seen/.test(k)) localStorage.removeItem(k); });
@@ -102,7 +109,8 @@ const PORT = "3340", U = `http://127.0.0.1:${PORT}`;
   ok(await wl.count() >= 1 && nWait >= 2 && /Waiting for you \(\d+\)/.test(await text(page.locator(".waiting b").first())), "Clients opens with Waiting for you, one row per thing: " + nWait);
   const badge = await page.locator(".bottom-nav .badge").first().textContent();
   ok(/Waiting for you \(/.test(await text(page.locator(".waiting b").first())) && (await text(page.locator(".waiting b").first())).includes(`(${badge})`), "the badge on Clients is the list's count: " + badge);
-  const firstRow = page.locator(".waiting .menu-row").first();
+  // a shared card's row (on a client's check-in day a check-in row comes first, and opens the Week)
+  const firstRow = page.locator(".waiting .menu-row").filter({ hasText: /shared with you/ }).first();
   const rowText = await text(firstRow);
   await firstRow.click(); await page.waitForTimeout(900);
   ok(await page.locator(".card-answer").count() >= 1, "the row opens the client's page with Answer under the shared cards");

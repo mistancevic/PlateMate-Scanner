@@ -22,6 +22,7 @@ import { density } from "../pilot";
 import { MOMENTS } from "../moments";
 import type { AppApi } from "./api";
 import { RecipeView } from "./RecipePages";
+import { ClientToday } from "./ClientView";
 import { bylineOf, type PublicRecipe } from "../recipes";
 import { useBack } from "../back";
 
@@ -74,8 +75,10 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
     },
   };
   if (open) return (
-    <ClientPage row={open} coachName={coachName} ops={ops} back={() => setOpenId(null)} notify={notify} setError={setError} waitingCount={p.waiting.length}
-      tail={<ClientTail row={open} onSaved={refresh} setError={setError} notify={notify} confirmAi={p.confirmClientAi} sendNote={(notes) => ops.sendNote(open, notes)} coachName={coachName} focusCard={p.focusCard} onAnswered={() => p.recountWaiting()}
+    <ClientPage key={open.uid} row={open} coachName={coachName} ops={ops} back={() => setOpenId(null)} notify={notify} setError={setError} waitingCount={p.waiting.length}
+      startOn={p.focusCard && open.feedback.some((f: any) => f.id === p.focusCard) ? "shared" : "week"}
+      today={<ClientToday p={p} row={open} head={null} today={ymd(new Date())} suggest={async (s, text) => { const note = { at: new Date().toISOString(), by: "coach" as const, name: coachName, text, suggest: s }; try { await ops.sendNote(open, [...open.notes, note]); notify(`Suggested. ${open.name.split(" ")[0]} sees it on Today as a tap.`); } catch (e: any) { setError(e.message || "The suggestion didn't send. Try again."); } }} />}
+      tailFor={(part) => <ClientTail part={part} row={open} onSaved={refresh} setError={setError} notify={notify} confirmAi={p.confirmClientAi} sendNote={(notes) => ops.sendNote(open, notes)} coachName={coachName} focusCard={p.focusCard} onAnswered={() => p.recountWaiting()}
         cook={cooks.has(open.uid)} setCook={(on) => setCook(open.uid, on).then(() => notify(on ? `${open.name.split(" ")[0]} is a cook: they can send you recipes to publish.` : `${open.name.split(" ")[0]} is no longer a cook.`)).catch((e) => setError(e.message))} />} />
   );
   const ti = todayIndex();
@@ -131,7 +134,7 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
 
 // The rest of the client's page, under the week (0.2.6): the cook switch, safety, the formula, the goal sheet, the weight
 // trend, the goal history and the shared cards. The goal is set above, in the goal section (CW8).
-export function ClientTail({ row, onSaved, setError, notify, confirmAi, cook, setCook, sendNote, coachName, focusCard, onAnswered }: { row: ClientRow; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void; confirmAi?: (uid: string, on: boolean) => Promise<void>; cook?: boolean; setCook?: (on: boolean) => void; sendNote?: (notes: CoachNote[]) => Promise<void>; coachName?: string; focusCard?: string | null; onAnswered?: () => void }) {
+export function ClientTail({ part, row, onSaved, setError, notify, confirmAi, cook, setCook, sendNote, coachName, focusCard, onAnswered }: { part?: "goal" | "shared"; row: ClientRow; onSaved: () => void; setError: (m: string) => void; notify: (m: string) => void; confirmAi?: (uid: string, on: boolean) => Promise<void>; cook?: boolean; setCook?: (on: boolean) => void; sendNote?: (notes: CoachNote[]) => Promise<void>; coachName?: string; focusCard?: string | null; onAnswered?: () => void }) {
   // DT189: a card opened from Waiting for you scrolls into view
   useEffect(() => { if (!focusCard) return; const t = setTimeout(() => document.getElementById(`card-${focusCard}`)?.scrollIntoView({ block: "start", behavior: "smooth" }), 300); return () => clearTimeout(t); }, [focusCard]);
   const [formula, setFormula] = useState<import("../personal").Formula | null>(row.formula ?? null);
@@ -155,6 +158,8 @@ export function ClientTail({ row, onSaved, setError, notify, confirmAi, cook, se
   const kcalOf = (items: any[]) => Math.round(items.reduce((n, i) => n + (i.food.calories ?? 0) * i.grams / 100, 0));
   return (
     <div className="client-tail">
+        {/* DT210 (0.3.50): the client's page shows this in two of its tabs, Goal and Shared */}
+        {part !== "shared" && <>
         {setCook && (
           <label className="cook-switch">
             <span><b>Cook</b><small>Can send you recipes to publish. You see each one first.</small></span>
@@ -188,6 +193,8 @@ export function ClientTail({ row, onSaved, setError, notify, confirmAi, cook, se
         {(() => { const sh = sheetOf(row.goal, { weightKg: row.weightKg, trainingAge: row.trainingAge, coachLabel: "you", ...(row.review?.status === "approved" ? { approvedBy: "you", approvedAt: row.review.at } : {}) }); return sh ? <GoalSheet sheet={sh} /> : null; })()}
         {row.goal?.band && !row.flags.some((f) => f.situation === "eating") && (row.weightKg || !row.weightTrend ? <WeightTrend list={row.weighIns} band={row.goal.band} weightKg={row.weightKg} trainingAge={row.trainingAge} coach /> : <WeightTrendPct t={row.weightTrend} band={row.goal.band} at={row.weightAt ?? null} />)}
         <GoalHistory log={row.goalLog ?? []} />
+        </>}
+        {part !== "goal" && <>
         <p className="label">Shared with you ({row.feedback.length})</p>
         {row.feedback.length === 0 && <small>Nothing yet.</small>}
         {row.feedback.slice(0, 30).map((f: any) => {
@@ -212,6 +219,7 @@ export function ClientTail({ row, onSaved, setError, notify, confirmAi, cook, se
             </section>
           );
         })}
+        </>}
     </div>
   );
 }
