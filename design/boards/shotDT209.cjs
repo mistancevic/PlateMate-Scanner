@@ -28,14 +28,14 @@ const mark = "outline:3px solid #2e7be8;outline-offset:3px;border-radius:10px", 
   await p.locator(".coach-switch, [role=radiogroup]").getByRole("radio", { name: "My clients" }).first().click(); await p.waitForTimeout(800);
   const barMine = await p.evaluate(() => document.querySelector(".bottom-nav").innerHTML);
   await p.locator(".bottom-nav button").filter({ hasText: "Recipes" }).click(); await p.waitForTimeout(800);
-  await note(p, "main > *:first-child", "Now: on Clients, then Recipes in the bar, with no client picked: a page that sends you back to Clients. Today and Plan say the same.");
+  await note(p, "main > *:first-child", "Now: on Clients, tap Recipes in the bar with no client picked: a page that sends you back to Clients. Today and Plan say the same.");
   await shot(p, "r209a", 844); await p.context().close();
   // b. new: your own recipes, in both views
   p = await fresh(); await p.goto(U + "/today?coachdemo"); await p.waitForTimeout(1300);
   await p.locator(".bottom-nav button").filter({ hasText: "Recipes" }).click(); await p.waitForTimeout(1200);
   await p.evaluate(({ html, mark }) => { const n = document.querySelector(".bottom-nav"); const bs = [...n.querySelectorAll("button")]; const act = bs.find((x) => /Recipes/.test(x.textContent)).className, idle = bs.find((x) => /Today/.test(x.textContent)).className;
     n.innerHTML = html; for (const btn of n.querySelectorAll("button")) { const on = /Recipes/.test(btn.textContent); btn.className = on ? act : idle; if (on) btn.style.cssText += ";" + mark; } }, { html: barMine, mark });
-  await note(p, "main > *:first-child", "New: Recipes is always your own, in My day and in My clients: the recipes you write and share with clients. Today and Plan still follow the client you pick on Clients; a client's own recipes are on that client's page in Clients.");
+  await note(p, "main > *:first-child", "New: on Clients, tap Recipes in the bar: your own recipes, the same as from Plate. Today and Plan still follow the client you pick on Clients; a client's shared cards stay on that client's page in Clients.");
   await shot(p, "r209b", 844); await p.context().close();
   // c, d. Where I shop and cook: its Next
   for (const v of ["now", "new"]) {

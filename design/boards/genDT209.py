@@ -96,16 +96,16 @@ class Component extends DCLogic {{
 W = SX + 3 * (SW + GAP) - GAP + 70
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
-cy = storyCard(B, y, "DT209", "Your own recipes as a coach; the setup ends on Your summary", [
+cy = storyCard(B, y, "DT209", "Recipes is always your own; the setup ends on Your summary", [
   ("Coach Milan, 22:33 to 22:44", "On Clients I tapped Recipes in the bar and got Pick a client on Clients. In Me, Where I shop and cook leads to My coach, which makes no sense: it should be the summary. A coach does not have a coach, in the app's sense."),
-  ("1. Recipes is always yours", "My clients is the coach's second view, switched at the top of Today; its bar is Today, Plan, Clients, Recipes, Explorer. Today, Recipes there shows the picked client's shared cards, or Pick a client on Clients when none is picked. New: Recipes in the bar is always your own, in both views: the recipes you write and Send to clients. Today and Plan still follow the client you pick. A client's shared cards stay on that client's page in Clients, with Answer, as now."),
+  ("1. Recipes is always yours", "On Clients, the bar is Today, Plan, Clients, Recipes, Explorer. Now, tapping Recipes there shows the picked client's shared cards, or Pick a client on Clients when none is picked. New: Recipes in the bar is always your own, wherever you tap it: the recipes you write and Send to clients. Today and Plan still follow the client you pick. A client's shared cards stay on that client's page in Clients, with Answer, as now."),
   ("2. The setup ends on Your summary", "Where I shop and cook leads to Next: Your summary."),
   ("3. My coach, its own row", "For a person: My coach moves out of the steps to its own row under Your summary: your coach and what they see, or join with a code. For a coach account: no My coach row; your clients are one tap away, the switch at the top of Today and Clients in the bar."),
   ("Version 2: the end of Your summary (Coach Milan 22:44 and 22:55)", "The page ends on one main button, Next: Plan your week, like every step's Next, with Or craft your first meal on the Plate as a line under it. Save as PDF, and Choose what your coach sees with a coach, move to the top, small: they are about the summary itself."),
 ])
 h = rowEnd(cy,
-  B.screen("DT209a", 0, y, "Now: My clients, Recipes, no client", "r209a", "now", "Pick a client on Clients."),
-  B.screen("DT209b", 1, y, "New: Recipes in My clients", "r209b", "changed", "Your own recipes, as in My day."))
+  B.screen("DT209a", 0, y, "Now: on Clients, tap Recipes in the bar", "r209a", "now", "Pick a client on Clients."),
+  B.screen("DT209b", 1, y, "New: on Clients, tap Recipes in the bar", "r209b", "changed", "Your own recipes, the same as from Plate."))
 y = h
 h = rowEnd(B.screen("DT209c", 0, y, "Now: the end of Where I shop and cook", "r209c", "now", "Next: Coach."),
   B.screen("DT209d", 1, y, "New: the end of Where I shop and cook", "r209d", "changed", "Next: Your summary."))
@@ -117,6 +117,6 @@ y = h
 h = rowEnd(B.screen("DT209h", 0, y, "Now: the end of Your summary", "r209h", "now", "Two plain rows and Save as PDF."),
   B.screen("DT209i", 1, y, "New: Your summary", "r209i", "changed", "Save as PDF on top; Next: Plan your week at the end."))
 y = h
-board("Stories156.dc.html", "DT209. Your own recipes as a coach; the setup ends on Your summary",
-  "1 November 2026 (Coach Milan 22:33 to 22:55). Version 2: the end of Your summary. Now: 0.3.49, untouched. Drawn for your approval; nothing built.",
+board("Stories156.dc.html", "DT209. Recipes is always your own; the setup ends on Your summary",
+  "1 November 2026 (Coach Milan 22:33 to 23:19). Version 3: clearer titles for Recipes. Version 2: the end of Your summary. Now: 0.3.49, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories155.dc.html")
