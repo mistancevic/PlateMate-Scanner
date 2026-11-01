@@ -87,6 +87,8 @@ const dl = process.argv[2] || null;
     await page.goto(B + "/privacy"); await page.waitForTimeout(700);
     { const t = await page.locator("main, body").first().textContent();
       ok(/An account nobody uses\. When you have not opened Chef Mealan for 12 months, the account and everything in it is deleted/.test(t) && /Signed out after 30 days\./.test(t), "DT196: section 4 says 12 months and 30 days"); }
+    // Coach Milan, 1 November 12:49: the public pages say the app's version at the bottom
+    ok(new RegExp(`Version ${require("../../package.json").version.replace(/\./g, "\\.")}`).test(await page.locator("footer").first().textContent()), "the page's footer says the app's version: " + await page.locator("footer").first().textContent());
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join("; ") : ""));
   } catch (e) { ok(false, "walkthrough error: " + e.message); }
   await b.close(); server.kill();

@@ -10,6 +10,7 @@ import { Mark, APP_NAME } from "../components/Mark";
 import { signIn } from "../cloud";
 import { pendingCode } from "../pendingCode";
 import { hit } from "../metrics";
+import { VERSION_LINE } from "../version";
 
 // The front door of chefmealan.com: what it is, how it works, request a code, or sign in with one.
 export function LandingScreen() {
@@ -207,7 +208,7 @@ export function LandingScreen() {
       <div className={`l-sticky ${sticky ? "on" : ""}`} aria-hidden={!sticky}><button className="pill pill-primary" tabIndex={sticky ? 0 : -1} onClick={toForm}>Try Chef Mealan</button></div>
       <footer className="l-foot">
         <span><a href="/about">Who's behind it</a> · <a href="/built">How Chef Mealan is built</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a></span>
-        <span><a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a> · © 2026 Milan Stancevic</span>
+        <span><a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a> · © 2026 Milan Stancevic · {VERSION_LINE}</span>
       </footer>
     </div>
   );

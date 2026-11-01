@@ -3,6 +3,7 @@ import { hit } from "../metrics";
 import { Mark, APP_NAME } from "../components/Mark";
 import { BOOKS, bookHit, sourceOf } from "../bookPages";
 import { RequestForm } from "./LandingScreen";
+import { VERSION_LINE } from "../version";
 
 // BP70 (Milan 21 October 2026, 10:49 and 10:52): a book's own page at chefmealan.com/<slug>, the same for everyone. The book,
 // what is inside, the download (a placeholder while the book is in its last edit), then the way into Chef Mealan: the code
@@ -86,7 +87,7 @@ export function BookScreen({ slug, signedIn }: { slug: string; signedIn: boolean
 
       <footer className="l-foot">
         <span><a href="/">Home</a> · <a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a></span>
-        <span><a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a> · © 2026 Milan Stancevic</span>
+        <span><a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a> · © 2026 Milan Stancevic · {VERSION_LINE}</span>
       </footer>
     </div>
   );

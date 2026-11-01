@@ -1,4 +1,5 @@
 import { Mark, APP_NAME } from "../components/Mark";
+import { VERSION_LINE } from "../version";
 
 // The pages the law asks for, readable without signing in: /impressum, /privacy, /disclaimer, /about.
 // Not legal advice; a lawyer's half hour before anyone beyond friends joins. The street address waits for an address service.
@@ -112,7 +113,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
           <p><b>Your coach.</b> What a coach sets or sends is the coach's; the app carries it.</p>
         </article>
       )}
-      <footer className="l-foot"><span>© 2026 {OPERATOR.name} · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a> · <a href="/about">Who's behind it</a></span></footer>
+      <footer className="l-foot"><span>© 2026 {OPERATOR.name} · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a> · <a href="/about">Who's behind it</a> · {VERSION_LINE}</span></footer>
     </div>
   );
 }
