@@ -233,7 +233,9 @@ export function LandingScreen() {
             {/* Coach Milan 1 November 14:35: the line from the book's cover */}
             <p className="l-role">Product and recipe builder, and the maker of Chef Mealan.</p>
             <p>Milan is a senior product manager with about 20 years in software and the founder of several startups. He designs and builds Chef Mealan with AI, from the first sketch to every release.</p>
-            <p>After hours, Milan is a certified fitness and nutrition coach in Munich, known to his clients as Coach Milan. He cooks every day for himself and his family, and tries every recipe and every number on himself first.</p>
+            {/* Coach Milan 1 November 15:03: the recipe builder and cook, as on the book's cover; the coaching certificate belongs on
+                the personal page, not here */}
+            <p>Milan cooks every day for himself and his family, in Munich, and builds his own recipes: weighed, tried, and kept only when the numbers and the taste both work. Every recipe and every number in Chef Mealan is tried on himself first.</p>
             <p>Author of <a href="/built#books">Worth Building</a> and <a href="/worthy-numbers?from=hp">Worthy Numbers</a>. Worth Eating comes next.</p>
             <p className="l-behind-links"><a href="/built">How Chef Mealan is built ›</a><a href="/about">More about Milan ›</a></p>
           </div>

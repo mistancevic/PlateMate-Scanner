@@ -224,7 +224,7 @@ export function BuiltScreen() {
       </header>
       <span className="bt-eyebrow">How Chef Mealan is built</span>
       <h1>A product built with AI, one release at a time</h1>
-      <p className="bt-lead">Chef Mealan helps people live their nutrition plan. Milan Stancevic, a senior product manager and founder with about 20 years in software, designs and builds Chef Mealan with AI: the product decisions, the design, the code reviews and the tests. After hours, Milan is a certified fitness and nutrition coach.</p>
+      <p className="bt-lead">Chef Mealan helps people live their nutrition plan. Milan Stancevic, a senior product manager and founder with about 20 years in software, designs and builds Chef Mealan with AI: the product decisions, the design, the code reviews and the tests. He cooks every day for himself and his family, and tries every recipe and every number in Chef Mealan on himself first.</p>
       <div className="bt-facts">
         <span>Live since<small>30 September 2026</small></span>
         <span>Version 0.2<small>6 releases and {FIX_ROUNDS} fix rounds since 11 October</small></span>
