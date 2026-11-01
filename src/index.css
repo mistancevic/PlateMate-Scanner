@@ -1874,7 +1874,7 @@ button.ct-small { background: none; border: none; padding: 2px 0 0; font: inheri
 .l-two { margin-top: 34px; }
 .l-ways-note { display: block; margin-top: 18px; color: var(--muted); }
 @media (min-width: 760px) {
-  .l-ways-grid { grid-template-columns: repeat(4, 1fr); }
+  .l-ways-grid { grid-template-columns: repeat(2, 1fr); }
   .l-ways-grid .l-way p { min-height: 4.4em; }
   .l-ways-grid .l-video { width: 100%; max-width: 220px; }
   .l-one { grid-template-columns: 1fr 240px; align-items: center; }
@@ -2603,3 +2603,25 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .ca-row { display: flex; gap: 8px; flex-wrap: wrap; }
 .ca-row .pill { min-height: 44px; }
 .ca-again { min-height: 44px; align-self: flex-start; }
+
+/* HP3 (0.3.42, board Stories147): the home page for individuals and coaches */
+.l-brand b { white-space: nowrap; }
+.l-topnav .l-coaches { font-weight: 900; color: var(--brand-text); white-space: nowrap; min-height: 44px; padding: 0; }
+@media (max-width: 759px) { .l-topnav .l-recipes { display: none; } }
+.l-beta { margin-top: 12px; }
+.l-beta p { margin: 6px 0 0; line-height: 1.45; }
+.l-spots { font-weight: 900; color: var(--good-text); } .l-spots.full { color: var(--low-text); }
+.l-beta .link { min-height: 44px; padding: 0; text-align: left; }
+.l-list { margin: 10px 0 0; padding-left: 20px; line-height: 1.5; color: var(--ink); list-style: disc; }
+.l-list li { margin-top: 4px; }
+.l-new .l-one:first-child { margin-top: 0; }
+.l-coach .l-video { margin: 16px auto 0; width: 220px; border-width: 6px; border-radius: var(--r-card); }
+.l-coach-act { margin: 16px 0 6px; text-align: center; } .l-coach-act .pill { min-height: 44px; }
+.l-consent { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0; font-size: 14px; line-height: 1.45; }
+.l-consent input { width: 22px; height: 22px; flex: none; margin-top: 1px; }
+.l-wait { margin-top: 20px; }
+.l-new .l-video, .l-one .l-video { margin-left: auto; margin-right: auto; }
+.waitlist .wait-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.waitlist .wait-row:last-child { border-bottom: 0; }
+.waitlist .wait-row span { display: flex; flex-direction: column; min-width: 0; } .waitlist .wait-row a { overflow-wrap: anywhere; }
+.waitlist .wait-row .link { min-height: 44px; flex: none; }

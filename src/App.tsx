@@ -2742,6 +2742,8 @@ export default function App() {
   { const book = bookOfPath(window.location.pathname); if (book) return <BookScreen slug={book} signedIn={!cloudEnabled || Boolean(user)} />; }
   { const legal = legalPageFromPath(window.location.pathname); if (legal) return <LegalScreen page={legal} back={() => { window.history.replaceState(null, "", "/"); window.location.reload(); }} />; }
   if (cloudEnabled && !user) return <LandingScreen />;
+  // HP3 (0.3.42): local runs have no sign-in; ?home shows the home page there, so a walkthrough can check it (never on the site)
+  if (!cloudEnabled && new URLSearchParams(window.location.search).has("home")) return <LandingScreen />;
   if (cloudEnabled && user && !profileReady) return <Starting onLocal={() => { localMode.current = true; setProfileReady(true); }} />;
   // Release A: Chef Mealan is for adults. Nothing opens, and nothing reaches the AI, before the welcome tap (canvas R1).
   if (!safety.adultAt) {

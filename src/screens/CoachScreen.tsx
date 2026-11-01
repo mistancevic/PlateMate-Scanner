@@ -117,6 +117,7 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
       {!p.demo && <WaitingRecipes notify={notify} setError={setError} />}
       {!p.demo && <Invites {...p} />}
       {!p.demo && <AccessRequests {...p} />}
+      {!p.demo && <WaitingList {...p} />}
       {!p.demo && <BookSignups {...p} />}
       <p className="label">Clients ({rows.length})</p>
       {rows.length === 0 && <div className="strip">No clients yet. Share the code.</div>}
@@ -282,6 +283,30 @@ export function AccessRequests(p: AppApi) {
           )}
         </section>
       ))}
+    </>
+  );
+}
+
+// HP3 (0.3.42): the waiting list from the home page, for the paying users at launch. One row per email, with which fits;
+// Remove when someone asks to leave (they write to hello@).
+const WHO_NAME: Record<string, string> = { client: "has a coach", coach: "a coach", self: "trains on their own" };
+export function WaitingList(p: AppApi) {
+  const [list, setList] = useKept<any[] | null>(`waitlist-${p.user?.uid ?? "local"}`, null);
+  const load = () => fetch("/api/waitlist").then((r) => r.json()).then((d) => setList(d.waiting ?? [])).catch(() => setList([]));
+  useEffect(() => { load(); }, []);
+  if (!list || list.length === 0) return null;
+  const coaches = list.filter((x) => x.who === "coach").length;
+  return (
+    <>
+      <p className="label">Waiting list: {list.length}{coaches ? `, ${coaches} ${coaches === 1 ? "coach" : "coaches"}` : ""}</p>
+      <section className="card waitlist">
+        {list.slice(0, 100).map((x) => (
+          <div className="wait-row" key={x.id}>
+            <span><a href={`mailto:${x.email}`}>{x.email}</a><small>{[WHO_NAME[x.who], x.createdAt ? new Date(x.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : ""].filter(Boolean).join(" · ")}</small></span>
+            <button type="button" className="link" onClick={async () => { await fetch(`/api/waitlist/${x.id}`, { method: "DELETE" }); p.notify(`${x.email} left the waiting list.`); load(); }}>Remove</button>
+          </div>
+        ))}
+      </section>
     </>
   );
 }
@@ -454,7 +479,7 @@ function BetaSpots() {
   if (!owner) return null;
   return (
     <section className="card beta-spots">
-      <div className="card-top"><span>Beta spots left</span><small>{spots === null ? "not shown" : "shown on the book page"}</small></div>
+      <div className="card-top"><span>Beta spots left</span><small>{spots === null ? "not shown" : "shown on the home page and the book page"}</small></div>
       <span className="rp-step">
         <button type="button" aria-label="One spot less" disabled={spots === null || spots === 0} onClick={() => save((spots ?? 0) - 1)}>−</button>
         <b>{spots === null ? "–" : spots}</b>

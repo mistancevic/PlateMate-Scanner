@@ -46,5 +46,5 @@ the run.
 
 HC12. The poster says what the clip is about (Coach Milan, 1 November 11:57: the shopping list's picture showed Plan). The still
 shown before a clip plays is what the clip is about: for the four ways in, the camera with the pack or the plate in it; for
-the others, the last settled screen before the fade. Never the first frame. Check: the poster is taken at a set second for the
+Explorer, The body's families; for the coach, Waiting for you; for the others, the last settled screen before the fade. Never the first frame. Check: the poster is taken at a set second for the
 four ways in, and 1.1 seconds before the end for the others.

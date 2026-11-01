@@ -77,7 +77,7 @@ export function BookScreen({ slug, signedIn }: { slug: string; signedIn: boolean
         <div className="l-request bk-join">
           <h2>Get your personal code</h2>
           <p className="l-book-line">Chef Mealan is free while it is in beta, and spots are limited. Leave your name and email, and you get your code within a day.</p>
-          {spots !== null && <p className={`bk-spots ${spots === 0 ? "full" : ""}`}>{spots === 0 ? "This round is full. Leave your name and email, and you’re first in line for the next round." : `${spots} ${spots === 1 ? "spot" : "spots"} left in this round.`}</p>}
+          {spots !== null && <p className={`bk-spots ${spots === 0 ? "full" : ""}`}>{spots === 0 ? <>This round is full. Leave your name and email for the next round, or <a href="/#wait">join the waiting list</a> for when Chef Mealan opens to everyone.</> : `${spots} ${spots === 1 ? "spot" : "spots"} left in this round.`}</p>}
           <RequestForm from={slug} src={src ?? undefined} />
         </div>
       )}
