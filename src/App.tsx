@@ -1668,11 +1668,31 @@ export default function App() {
     if (first) { try { localStorage.setItem(MIGRATED, "1"); } catch {} }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.foods, region]);
+  // DT206: the plate's start, kept with it; a plate from before 0.3.48 takes its photo's time, else now
+  useEffect(() => {
+    if (state.items.length && !state.plateAt) setState((s) => ({ ...s, plateAt: s.photo?.at ?? new Date().toISOString() }));
+    else if (!state.items.length && state.plateAt) setState((s) => ({ ...s, plateAt: undefined }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.items.length]);
   // a trip is over the day after its last day: its place goes off, its foods wait with it
   useEffect(() => { if (tripOver(trip, todayKeyP)) { setTrip(null); setTripState(null); notify(`Back from ${REGIONS.find((r) => r.id === trip!.place)?.name ?? "your trip"}: its foods are put away. Switch it on in Where I shop to bring them back.`); } }, [trip, todayKeyP]);
   // DT135 (0.2.116): set by the Plate from the open meal; Add puts a food on at that meal's normal portion
   const mealScaleRef = useRef(1);
-  function add(food0: Food) {
+  // DT206 (0.3.48; Coach Milan 1 November 19:42: a photo's plate from 13:11 still waited at 19:40, and a scanned beer joined
+  // it without a word): a plate started more than three hours ago, or on another day, asks before a food joins it
+  const plateSince = (): Date | null => { const t = [state.plateAt, state.photo?.at].filter(Boolean).map((x) => new Date(x!).getTime()).filter((x) => !Number.isNaN(x)); return t.length ? new Date(Math.min(...t)) : null; };
+  const plateOld = () => { const at = plateSince(); if (!at || !state.items.length) return false; const now = new Date(); return now.getTime() - at.getTime() > 3 * 3600000 || ymd(now) !== ymd(at); };
+  function add(food0: Food, asked = false) {
+    if (!asked && plateOld()) {
+      const at = plateSince()!, hm = `${String(at.getHours()).padStart(2, "0")}:${String(at.getMinutes()).padStart(2, "0")}`;
+      const when = ymd(at) === ymd(new Date()) ? hm : `${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][at.getDay()]} ${hm}`;
+      askPlate({ kind: "food", what: `${food0.name} would join a plate from ${when}.`, apply: (how) => {
+        if (how === "new") setState((s) => ({ ...s, items: [], portion: null, title: "", fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo: undefined, plateAt: undefined }));
+        add(food0, true);
+      } });
+      setTab("journey");
+      return;
+    }
     // DT82 (Milan 20:51): a can whose values are per 100 g drained goes on as the drained food, under the can's name; My
     // foods keeps the label as printed
     const food1 = drainedOf(food0) ?? food0;
@@ -2141,6 +2161,9 @@ export default function App() {
     else markOpen();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid, profileReady]);
+  const backToPage = useRef<{ section: MenuSection; from: MenuSection | null; tab: Tab } | null>(null);
+  // a tab tapped in the bar, or any other move, forgets the page to come back to
+  useEffect(() => { if (backToPage.current && tab !== backToPage.current.tab) backToPage.current = null; }, [tab]);
   const screenProps: AppApi = {
     state, setState, setCamera, setMode, blank, add, updateItem,
     saveMeal, mix, personalize, lookup, exportData, notify, setError, setBusy,
@@ -2451,6 +2474,9 @@ export default function App() {
     },
     // a link that changes the tab leaves any open panel or chat behind, or it would land under them and look dead
     setTab: (t: Tab) => { setMenuSection(null); setMenuFrom(null); setTalkOpen(false); if (t !== "journey") setFilling(null); setTab(t); },
+    // DT207e (0.3.48; Coach Milan 1 November 19:42: Your summary, Plan your week, then Back lands somewhere else): the page is
+    // remembered, and Back from the tab opens it again
+    tabFromPage: (t: Tab) => { backToPage.current = menuSection ? { section: menuSection, from: menuFrom, tab: t } : null; setMenuSection(null); setMenuFrom(null); setTalkOpen(false); if (t !== "journey") setFilling(null); setTab(t); },
     inbox,
     takeRecipe: async (item: InboxItem, how: "make" | "keep") => {
       // foods she doesn't have come along; then the recipe goes to the plate or to her recipes
@@ -2774,7 +2800,7 @@ export default function App() {
       {/* the layers before the tab keeper: a menu row that changes the tab (Foods, 0.2.0) drops its layer first, and the tab's address is pushed once that step back has settled */}
       {backReady && menuTrail.map((m, i) => <MenuBack key={`${i}-${m}`} open path={MENU_PATH[m]} close={() => { setMenuFrom(null); setMenuTrail((t) => t.slice(0, i)); }} />)}
       <MenuBack open={talkOpen} close={() => setTalkOpen(false)} />
-      <BackKeeper tab={tab} setTab={setTab} onReady={() => setBackReady(true)} />
+      <BackKeeper tab={tab} setTab={(t) => { const r = backToPage.current; backToPage.current = null; setTab(t); if (r) screenProps.openMenu(r.section, r.from ?? undefined); }} onReady={() => setBackReady(true)} />
       <Opened />
       {/* DT167 (0.3.9): what the coach sees of the profile, kept up to date from this phone */}
       {user && profile.coachId && <SharePublisher {...screenProps} />}

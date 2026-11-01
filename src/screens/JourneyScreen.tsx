@@ -8,7 +8,7 @@ import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDow
 import { photoAdvice, ideaAdvice, aboutKcal, kcalRange, mealsOn } from "../mealPhoto";
 import { PhotoAsk } from "../components/PhotoAsk";
 import { ConfirmButton } from "../components/Confirm";
-import { fitsPlate, isIngredient, swapKind, sameFoodName, suggestParts, bindsADish, type Mix } from "../mixtip";
+import { fitsPlate, isIngredient, swapKind, sameFoodName, suggestParts, bindsADish, isDrink, type Mix } from "../mixtip";
 import { lettersOf } from "../letters";
 import { Letters, NumbersTable, type PlanNumbers } from "../components/Letters";
 import { ClearField } from "../components/ClearField";
@@ -183,6 +183,7 @@ export function JourneyScreen(p: AppApi) {
   const [different, setDifferent] = useState("");
   const [ate, setAte] = useState<"all" | "portion" | "later" | "not">("all");
   const [saveRecipe, setSaveRecipe] = useState(true);
+  const [drinkIn, setDrinkIn] = useState(false);   // DT206
   // DT137 (0.2.122): at Save after you made a changed recipe: update it, a new one with its own name, or only this time
   const [recipeChoice, setRecipeChoice] = useState<"update" | "new" | "only" | null>(null);
   const [newRecipeName, setNewRecipeName] = useState<string | null>(null);
@@ -194,7 +195,7 @@ export function JourneyScreen(p: AppApi) {
   const [madeN, setMadeN] = useState<number | null>(null), [keepMade, setKeepMade] = useState(false);
   // null: not touched, so the Plate's own guess stands (about 3 of your meals: 3 portions); "": one plate
   const [newMakesN, setNewMakesN] = useState<string | null>(null), [newMakesUnit, setNewMakesUnit] = useState(""), [makesOpen, setMakesOpen] = useState(false);
-  const resetMade = () => { setPhotos([]); setWent("as"); setDifferent(""); setAte("all"); setSaveRecipe(true); setEatN(1); setBigAsk(false); setMadeN(null); setKeepMade(false); setNewMakesN(null); setNewMakesUnit(""); setMakesOpen(false); };
+  const resetMade = () => { setPhotos([]); setWent("as"); setDifferent(""); setAte("all"); setSaveRecipe(true); setDrinkIn(false); setEatN(1); setBigAsk(false); setMadeN(null); setKeepMade(false); setNewMakesN(null); setNewMakesUnit(""); setMakesOpen(false); };
   const [method, setMethod] = useState<string | null>(null);
   // after Add in the tip at the recipe step, Mealan refits with the new food on the plate
   const [refit, setRefit] = useState(false);
@@ -569,7 +570,9 @@ export function JourneyScreen(p: AppApi) {
   // DT135 (0.2.116): how many times a meal of three a day this meal is, 1 to 3; every food's most grows by it
   const mealX = mealScale(share?.kcal, dayNums?.kcal);
   useEffect(() => { p.setMealScale?.(mealX); }, [mealX]);
-  const chefable = p.kind !== "dessert" && momentOf(p.moment).planned && !!share && share.kcal >= 150 && p.filling?.mode !== "eat";
+  // DT206: a plate of drinks only is no meal to build around
+  const onlyDrinks = items.length > 0 && items.every((i) => isDrink(i.food));
+  const chefable = p.kind !== "dessert" && momentOf(p.moment).planned && !!share && share.kcal >= 150 && p.filling?.mode !== "eat" && !onlyDrinks;
   // DT93, rule 3 (C31): a plate far over its meal is not that meal yet; DT132 (0.2.113): over 1.5 portions, 1.3 to 1.5 on the edge
   const sizeNow = sizeOf(aggregate(state.items).calories ?? 0, share?.kcal);
   const tooBig = !!share && !state.fromRecipe && sizeNow.big;
@@ -966,7 +969,7 @@ export function JourneyScreen(p: AppApi) {
     if (failedIn.length) stage("again", "read", "ask", "check"); else { setChefStage({ at: "read", done: [] }); window.setTimeout(() => setChefStage((c) => (c.at === "read" ? { at: "ask", done: ["read"] } : c)), 400); }
     try {
       const res = await fetch("/api/meal", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({
-        plate: base.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein })), meal: mealWord, need: share.kcal, target: pdRef,
+        plate: base.map((i) => ({ name: i.food.name, grams: i.grams, calories: i.food.calories, protein: i.food.protein, ...(isDrink(i.food) ? { drink: true } : {}) })), meal: mealWord, need: share.kcal, target: pdRef,
         kitchens: p.personal.kitchens ?? [], taste: tasteForChef(p.personal), library: state.foods.slice(0, 40).map((f) => ({ name: f.name, calories: f.calories, protein: f.protein })), region: p.region, avoid: [...avoid, ...kept.map((k) => k.title)], failed: failedIn, carried: carriedLists(state.meals, state.feedback), tastes: tasteForReq(p.personal.tasteChips, state.preferences), what: shownTaste }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || `${CHEF_NAME} could not answer.`);
@@ -1164,7 +1167,7 @@ export function JourneyScreen(p: AppApi) {
     const chip = (a: MealOption["adds"][number]) => <span key={a.name} className={`mm-add ${a.have ? "have" : ""}`}>+ {cookPhrase(a.name, a.grams)}</span>;
     return (
       <>
-        {stepHead({ n: 2, title: `A ${mealWord} around your ${aroundWord(items.map((i) => i.food.name))}`, sub: lead, back: <button className="link back back-top" onClick={() => setChef(null)}><ChevronLeft size={16} /> Back to the plate</button> })}
+        {stepHead({ n: 2, title: `A ${mealWord} around your ${aroundWord(items.filter((i) => !isDrink(i.food)).map((i) => i.food.name))}`, sub: lead, back: <button className="link back back-top" onClick={() => setChef(null)}><ChevronLeft size={16} /> Back to the plate</button> })}
         <small className="mm-stays">On the plate: {items.map((i) => cookPhrase(i.food.name, i.grams)).join(", ")}. {items.length === 1 ? "It stays." : "They stay."}</small>
         {chef.status === "working" && <div className="mm-working"><WaitSteps steps={chefSteps()} at={chefStage.at} done={chefStage.done} /></div>}
         {opts.map((o) => (
@@ -1195,7 +1198,7 @@ export function JourneyScreen(p: AppApi) {
         {p.filling
           ? Head({ name: true, title: "", sub: p.filling.mode === "eat" ? "As planned. Change what you like, then Fit to my target or Keep it as it is." : plateWhen === "past" ? `Adding ${slotName(p.filling)}. Add what you ate, at the amounts you ate.` : plateWhen === "plan" ? `Planning ${slotName(p.filling)}. Add your foods, fit them to your target, then put it in the plan.` : "Name it, or keep the foods' name. Add your foods, fit them to your target, or make them as they are." })
           : madeBy && items.length > 0
-            ? Head({ name: true, title: "", sub: `${CHEF_NAME}'s ${madeBy.kitchen} ${mealWord}, around your ${aroundWord(madeBy.from.map((i) => i.food.name))}. Change any amount you like.` })
+            ? Head({ name: true, title: "", sub: `${CHEF_NAME}'s ${madeBy.kitchen} ${mealWord}, around your ${aroundWord(madeBy.from.filter((i) => !isDrink(i.food)).map((i) => i.food.name))}. Change any amount you like.` })
           : imported && rec
             ? Head({ name: true, title: "", sub: way?.kind === "change" ? `Your ${rec.title}, changed. Still sized for your ${mealWord}.`
               : way?.kind === "side" ? `Your ${rec.title} as it is, ${Math.round((kcalOfItems(way.options[way.pick].dish) / Math.max(1, kcalOfItems(rec.items) / (rec.makes?.n ?? 1))) * 100)}% of one ${oneOf(rec)}, and ${way.options[way.pick].name} ${sideWord(way.options[way.pick].kind)}. The ${oneOf(rec)} is not changed.`
@@ -2215,6 +2218,15 @@ export function JourneyScreen(p: AppApi) {
           <button className={`choice ${saveRecipe ? "on" : ""}`} onClick={() => setSaveRecipe(true)}>Yes, save it</button>
           <button className={`choice ${!saveRecipe ? "on" : ""}`} onClick={() => setSaveRecipe(false)}>Not this one</button>
         </div>
+        {/* DT206 (0.3.48): a drink on the plate is asked about before it goes into the recipe */}
+        {saveRecipe && !chgW && items.some((i) => isDrink(i.food)) && (() => { const d = items.filter((i) => isDrink(i.food)).map((i) => i.food.name).join(" and "); return (
+          <div className="rq-drink" role="group" aria-label="The drink and the recipe">
+            <small>{d} is a drink. It counts in the meal you ate. In the recipe?</small>
+            <div className="reasons">
+              <button type="button" className={`choice ${!drinkIn ? "on" : ""}`} aria-pressed={!drinkIn} onClick={() => setDrinkIn(false)}>Leave it out</button>
+              <button type="button" className={`choice ${drinkIn ? "on" : ""}`} aria-pressed={drinkIn} onClick={() => setDrinkIn(true)}>Keep it in</button>
+            </div>
+          </div>); })()}
         {/* DT81 (Milan 23 October 15:53 and 15:55): a recipe made from scratch gets its number here. The Plate compares its
             foods with one of your meals: about one meal says nothing and stays one plate; clearly more asks, with its guess */}
         {saveRecipe && !chgW && !fromRec && (plateBig || makesOpen || ate === "portion" ? (
@@ -2242,11 +2254,12 @@ export function JourneyScreen(p: AppApi) {
         // 02:11: a bowl way chosen at Lock (All in one, Topped, Protein first) is the recipe's process too; it was lost at Save
         const wayNow = method ? methodsFor(items).find((w) => w.id === method) : undefined;
         const ps = cooksPlate(items) && plateSteps?.steps.length ? { steps: plateSteps.steps, stepsFor: foodNames(items) } : wayNow ? { steps: wayNow.steps, stepsFor: foodNames(items), way: wayNow.name } : {};
-        const chefMade = madeBy ? { ...(state.cooking?.length ? { cooking: state.cooking } : {}), kitchen: madeBy.kitchen, byChef: { kitchen: madeBy.kitchen, meal: mealWord, around: aroundWord(madeBy.from.map((i) => i.food.name)), at: new Date().toISOString() } } : {};
+        const chefMade = madeBy ? { ...(state.cooking?.length ? { cooking: state.cooking } : {}), kitchen: madeBy.kitchen, byChef: { kitchen: madeBy.kitchen, meal: mealWord, around: aroundWord(madeBy.from.filter((i) => !isDrink(i.food)).map((i) => i.food.name)), at: new Date().toISOString() } } : {};
         const meal: Meal = { id: origin?.id ?? uid(), title: name, items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString(), kind: p.kind, ...src, ...adaptedFrom, ...ps, ...chefMade };
         // the recipe kept (0.2.19, IM18b): its parts on its foods; optional foods, added or not, in its optional list
         const keptOpt = [...(state.optional ?? []), ...items.filter((i) => i.optional).map(itemToOpt)].map((o) => ({ name: o.name, written: o.written ?? "", ...(o.note ? { note: o.note } : {}), grams: o.grams, food: leanFood(o.food), ...(o.part ? { part: o.part } : {}) }));
-        const keptItems = structuredClone(items.filter((i) => !i.optional));
+        // DT206: a drink stays out of the recipe unless you keep it in; the meal you ate still counts it
+        const keptItems = structuredClone(items.filter((i) => !i.optional && (drinkIn || !isDrink(i.food))));
         // a changed dish is kept as the whole recipe it is now (0.2.23, IM23b): the recipe's size, its steps, adapted from the original
         const chgKept: Meal | null = chgW && fromRec ? (() => {
           // the same ids: the drafted steps name the foods by them

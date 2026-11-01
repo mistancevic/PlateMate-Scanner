@@ -60,6 +60,8 @@ export function PlanScreen(p: AppApi) {
   const [viewing, setViewing] = useState<Slot | null>(null);
   // SL3: the button names the open list; it is read again when the sheet closes
   const shopOpen = shopping ? null : openList(getStore());
+  // DT207b: with earlier lists kept, the button says Shopping lists, so a past list is one tap away
+  const shopEarlier = !shopping && getStore().lists.some((l) => l.doneAt);
   const stripRef = useRef<HTMLDivElement>(null);
   // the picked day stays in view
   useEffect(() => { try { stripRef.current?.querySelector<HTMLElement>(".choice.on")?.scrollIntoView({ inline: "center", block: "nearest" }); } catch {} }, [picked]);
@@ -221,7 +223,7 @@ export function PlanScreen(p: AppApi) {
       </section>
       {openCount > 0 && <button type="button" className="pill pill-tall pill-primary plan-fill" onClick={() => p.openOut("fill")}><ChefHat size={18} /> Fill the open slots with {CHEF_NAME}</button>}
       </>)}
-      <button type="button" className="pill pill-wide plan-shop" onClick={() => setShopping(true)}><ShoppingBasket size={18} /> {shopOpen ? `Shopping list ${shopOpen.n}, open` : "Make a shopping list"}</button>
+      <button type="button" className="pill pill-wide plan-shop" onClick={() => setShopping(true)}><ShoppingBasket size={18} /> {shopOpen ? `Shopping list ${shopOpen.n}, open` : shopEarlier ? "Shopping lists" : "Make a shopping list"}</button>
       {shopping && <ShopSheet p={p} close={() => setShopping(false)} showDay={(d) => { setShopping(false); const n = Math.floor((isoWeek(new Date(`${d}T12:00:00`)).monday.getTime() - thisMonday.getTime()) / (7 * 864e5)); setOffsetState(n === 1 ? 0 : n); setPicked(d); }} />}
       {viewing && held[viewing.id]?.items?.length ? <MealSheet p={p} slot={viewing} m={held[viewing.id]} dayName={dayName} target={target} unit={unit}
         close={() => setViewing(null)} swap={() => { setOpen(viewing); setViewing(null); }}
@@ -334,6 +336,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
   const preview = shoppingList(notCounted(store, p.planned, days), days, cookOf);
   const nextN = store.lists.reduce((m, x) => Math.max(m, x.n), 0) + 1;
   const shown = reading !== null ? store.lists.find((l) => l.n === reading) ?? null : open;
+  const [making, setMaking] = useState(false);
   // SL4: what each food is for, and the list meal by meal; a tap goes to buy, in the basket, not this time
   const [by, setBy] = useState<"food" | "meal">("food");
   const slotName = (date: string, slot: string) => slotsOn(lifestyleOf(p.personal), p.personal.timesOn, date).find((x) => x.id === slot)?.name ?? slot.charAt(0).toUpperCase() + slot.slice(1);
@@ -355,7 +358,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
     );
   };
   const copy = async (l: SavedList) => { try { await navigator.clipboard.writeText(listText(l, spanOf(l.from, l.to))); p.notify("The list is copied. Paste it in a message or a note."); } catch { p.notify("Copying didn't work on this phone."); } };
-  const finish = (l: SavedList, carry: boolean) => { save(finishList(store, l.n, carry, new Date().toISOString())); setAsking(false); p.notify(`Shopping list ${l.n} is finished.${carry ? " What wasn't ticked waits for the next list." : ""}`); };
+  const finish = (l: SavedList, carry: boolean) => { save(finishList(store, l.n, carry, new Date().toISOString())); setAsking(false); setMaking(carry); p.notify(`Shopping list ${l.n} is finished.${carry ? " What wasn't ticked waits for the next list." : ""}`); };
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet date-sheet shop-sheet" role="dialog" aria-label="Shopping lists" onClick={(e) => e.stopPropagation()}>
@@ -441,6 +444,9 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
             <div className="button-row"><button type="button" className="pill pill-small" onClick={() => copy(shown)}>Copy the list</button></div>
             <button type="button" className="pill pill-wide pill-primary shop-finish" onClick={() => (notTicked(shown).length ? setAsking(true) : finish(shown, false))}>Finish the list</button>
           </>))}
+        </>) : !making && store.lists.some((l) => l.doneAt) ? (<>
+          {/* DT207b (0.3.48; Coach Milan 1 November 19:42 "how do I review a shopping list from the past if I don't create a new
+              one?"): with no list open, the earlier lists come first and a new list is its own button */}
         </>) : (<>
           <b className="shop-title">Shopping list {nextN}</b>
           <p className="small shop-why">Which days is it for? It starts {start === today ? "today" : `${dayWord(start)} ${MONTHS[dt(start).getMonth()]}`}{store.lists.some((l) => l.to >= start) ? ", with the planned meals no list has counted yet" : start === today ? "" : store.lists.length ? ", the day after your last list" : ", the first day with meals planned"}.</p>
@@ -457,6 +463,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
               <div className="menu-row-text"><b>Shopping list {l.n}</b><small>{spanOf(l.from, l.to)} · {l.lines.length + l.carried.length} foods · finished {madeOn(l.doneAt!)}</small></div><ChevronRight size={18} />
             </button>))}</div>
         </>)}
+        {reading === null && !shown && !making && store.lists.some((l) => l.doneAt) && <button type="button" className="pill pill-wide pill-primary shop-new" onClick={() => setMaking(true)}>New shopping list</button>}
       </div>
     </div>
   );

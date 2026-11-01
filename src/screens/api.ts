@@ -3,7 +3,7 @@ import type { Food, Ingredient, Meal, PilotState, Feedback } from "../pilot";
 import type { ScannerMode } from "../types";
 
 export type Tab = "home" | "journey" | "plan" | "me" | "clients" | "meal" | "chef" | "foods" | "recipes" | "notes" | "more" | "explorer";
-export type PlateAsk = { kind: "photo" | "recipe" | "slot"; what: string; image?: string; apply: (how: "add" | "new") => void };
+export type PlateAsk = { kind: "photo" | "recipe" | "slot" | "food"; what: string; image?: string; apply: (how: "add" | "new") => void };
 export type MenuSection = "list" | "me" | "profile" | "goal" | "life" | "week" | "shop" | "coach" | "summary" | "account" | "support" | "about" | "evals" | "metrics" | "costs" | "share" | "explorer" | "calendar" | "admin";
 // the slot a plate is made for (0.2.2): the date, the slot and its name and time, for the line on the Plate
 // mode: "plan" fills the slot on Put it in; "eat" (from Today) records the meal for the slot on Save
@@ -14,6 +14,8 @@ export interface AppApi {
   state: PilotState;
   setState: Dispatch<SetStateAction<PilotState>>;
   setTab: (t: Tab) => void;
+  // DT207e (0.3.48): a tab opened by a link on a page of Me; Back from it comes back to that page
+  tabFromPage: (t: Tab) => void;
   foodsView: "foods" | "recipes";
   setFoodsView: (v: "foods" | "recipes") => void;
   setCamera: (v: boolean) => void;

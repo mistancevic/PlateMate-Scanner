@@ -51,8 +51,9 @@ export function TravelCard({ p }: { p: AppApi }) {
       <small className="muted">Products in your search come from this country's shelves.</small>
       <div className="moments" role="radiogroup" aria-label="Where are you">{away.map((r) => (
         <button key={r.id} type="button" role="radio" aria-checked={place === r.id} className={`choice ${place === r.id ? "on" : ""}`} onClick={() => setPlace(r.id)}>{r.name}</button>))}</div>
-      <b>What do you have there?</b>
-      <div className="travel-kitchens" role="radiogroup" aria-label="What do you have there">{KITCHENS.map((k) => (
+      {/* DT207d (0.3.48; Coach Milan 1 November 19:42): the question said plainly, and the three choices wrap on a phone */}
+      <b>Where do you stay?</b>
+      <div className="travel-kitchens" role="radiogroup" aria-label="Where do you stay">{KITCHENS.map((k) => (
         <button key={k.id} type="button" role="radio" aria-checked={kitchen === k.id} className={`choice ${kitchen === k.id ? "on" : ""}`} onClick={() => setKitchen(k.id)}><b>{k.name}</b><small>{k.hint}</small></button>))}</div>
       {p.safety.consentBodyAt && <div className="travel-toggle"><span><b>Pause weigh-in</b><small>A hotel scale is a different scale: your trend keeps your home mornings only.</small></span>
         <button type="button" className={`choice ${weighPaused ? "on" : ""}`} aria-pressed={weighPaused} onClick={() => setWeighPaused(!weighPaused)}>{weighPaused ? "Yes" : "No"}</button></div>}

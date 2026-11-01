@@ -2662,8 +2662,19 @@ html:has(.l-photo) { overflow-x: hidden; }
 }
 @media (prefers-reduced-motion: reduce) { .l-photo-pic { transition: none; } }
 /* the calculator under the photo, one column */
-.l-hero.l-calc { display: block; max-width: 620px; margin: 0 auto; padding-top: 22px; }
-.l-calc .l-try-lead { margin: 0 0 12px !important; max-width: none; }
+.l-hero.l-calc { display: block; padding-top: 26px; }
+.l-calc-text p { margin: 8px 0 0; max-width: none; }
+.l-calc .l-try-box { max-width: 620px; margin: 18px auto 0; }
+/* HP6 version 2: the waiting-list link keeps its 44 px for the finger around it, so a wrapped sentence keeps its line height */
+.l-photo .l-beta .link { display: inline; min-height: 0; padding: 12px 2px; margin: -12px 0; }
 
 /* DT204 (0.3.47): the name on the shop shelf of the market, under the app's name */
 .shelf-name { display: block; font-weight: 800; color: var(--brand-text); }
+
+/* DT205 (0.3.48): the next step is the main button at the end of a step; the profile is kept as you go */
+.next-step { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+.next-step .pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 52px; font-size: 17px; font-weight: 900; }
+.saved-line { display: block; margin-top: 10px; } .saved-line.odd { color: var(--low-text); font-weight: 800; }
+.shop-new { margin-top: 14px; }
+.coach-static { margin-top: 26px; }
+.travel-kitchens .choice { white-space: normal; width: 100%; box-sizing: border-box; max-width: 100%; } .travel-kitchens .choice b, .travel-kitchens .choice small { white-space: normal; overflow-wrap: anywhere; text-align: left; }

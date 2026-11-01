@@ -114,14 +114,17 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
           </>
         );
       })()}
+      {/* DT207c (0.3.48; Coach Milan 1 November 19:42): what is going on with the clients first, the week's dots and progress;
+          the codes and sign-ups below, under one label */}
+      <p className="label">Clients ({rows.length})</p>
+      {rows.length === 0 && <div className="strip">No clients yet. Share the code.</div>}
+      {rows.map((r) => <ClientRowCard key={r.uid} row={r} today={false} open={() => setOpenId(r.uid)} />)}
       {!p.demo && <WaitingRecipes notify={notify} setError={setError} />}
+      {!p.demo && <p className="label coach-static">Codes and sign-ups</p>}
       {!p.demo && <Invites {...p} />}
       {!p.demo && <AccessRequests {...p} />}
       {!p.demo && <WaitingList {...p} />}
       {!p.demo && <BookSignups {...p} />}
-      <p className="label">Clients ({rows.length})</p>
-      {rows.length === 0 && <div className="strip">No clients yet. Share the code.</div>}
-      {rows.map((r) => <ClientRowCard key={r.uid} row={r} today={false} open={() => setOpenId(r.uid)} />)}
     </>
   );
 }

@@ -82,8 +82,10 @@ const monday = (d) => { const x = new Date(d); x.setDate(x.getDate() - ((x.getDa
   ok(/Home page visits 2 QR 1 · Instagram 1/.test(t1), "SH73, 0.2.115: a visit from the QR code counts as QR, one from Instagram as Instagram, under Home page visits");
   ok(/From Worthy Numbers 1 QR 1/.test(t1), "MT71: the book's visit and its QR code show this week, before a full week is counted");
   ok(/TODAY/.test(t1) && /SINCE \d+ [A-Z]{3}/.test(t1), "M5: next to today, the count since the first day");
+  ok(await page.locator(".mt > section").first().evaluate((e) => e.classList.contains("mt-today")), "DT207a (0.3.48): today and since the first day on top");
   await page.getByRole("tab", { name: "Last week" }).click(); await page.waitForTimeout(1500);
   const t2 = (await page.locator(".mt").innerText()).replace(/\s+/g, " ");
+  ok(await page.locator(".mt > section").first().evaluate((e) => e.classList.contains("mt-today")), "DT207a: on top in Last week too");
   ok(/Last week \d+ to \d+ \w+/.test(t2) && !/to today/.test(t2), "MT71: Last week names its own days");
   await page.getByRole("tab", { name: "4 weeks" }).click(); await page.waitForTimeout(1500);
   const t3 = (await page.locator(".mt").innerText()).replace(/\s+/g, " ");

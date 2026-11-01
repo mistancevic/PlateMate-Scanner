@@ -61,6 +61,8 @@ const PORT = "3197", B = `http://127.0.0.1:${PORT}`;
     await tc.getByRole("button", { name: "Turn on" }).click(); await page.waitForTimeout(300);
     ok(await page.getByRole("radio", { name: "Munich" }).count() === 0 && await page.getByRole("radio", { name: "Belgrade" }).count() === 1, "where: every place but home");
     ok(await page.getByRole("button", { name: "Turn travel mode on" }).isDisabled(), "Turn on waits for what you have there");
+    // DT207d (0.3.48): the question in plain words, and nothing runs off the side of the phone
+    ok(/Where do you stay\?/.test(await page.locator(".travel-setup").textContent()) && await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth) && await page.locator(".travel-kitchens .choice").evaluateAll((bs) => bs.every((b) => b.scrollWidth <= b.clientWidth + 1 && b.getBoundingClientRect().right <= window.innerWidth)), "Where do you stay? and the three choices fit the phone");
     await page.getByRole("radio", { name: "Belgrade" }).click(); await page.getByRole("radio", { name: /Hotel, no kitchen/ }).click();
     const hs = await page.locator(".travel-setup .choice, .travel-setup .pill").evaluateAll((bs) => bs.map((b) => Math.round(b.getBoundingClientRect().height)));
     ok(hs.every((h) => h >= 44), "every button 44 px or more: " + hs.join(","));

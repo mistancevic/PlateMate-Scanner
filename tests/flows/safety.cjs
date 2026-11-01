@@ -88,7 +88,9 @@ seed.items = [];
   await require("./me.cjs")(page);
   await page.locator(".me-rows .menu-row").filter({ hasText: /^Profile/ }).first().click(); await page.waitForTimeout(400);
   await page.evaluate(() => window.scrollTo(0, 2000)); await page.waitForTimeout(100);
-  await page.locator(".menu-row").filter({ hasText: /Goal/ }).last().click(); await page.waitForTimeout(400);
+  // DT205 (0.3.48): no Save in the middle; the way on is the main button Next: Goal
+  ok(await page.getByRole("button", { name: "Save", exact: true }).count() === 0 && /Kept as you go/.test(await page.locator(".saved-line").textContent()), "Profile: no Save button, kept as you go");
+  await page.getByRole("button", { name: /^Next: Goal/ }).click(); await page.waitForTimeout(400);
   ok((await page.evaluate(() => window.scrollY)) < 40, "Goal opens at the top: scrollY " + (await page.evaluate(() => window.scrollY)));
   ok(await page.getByRole("button", { name: /Next: Lifestyle/ }).count() === 1, "Goal leads to Lifestyle");
   await page.getByRole("button", { name: /Next: Lifestyle/ }).click(); await page.waitForTimeout(300);
