@@ -5,7 +5,7 @@ const { chromium } = require("/home/claude/platemate-scanner/node_modules/playwr
 const fs = require("node:fs");
 const R = "/home/claude/boards/rs", U = "http://127.0.0.1:3396", P = "/home/claude/photos/hp5";
 const ph = (k) => "data:image/jpeg;base64," + fs.readFileSync(`${P}/${k}.jpg`).toString("base64");
-const IMG = Object.fromEntries(["curry", "meatballs", "quesadilla", "squares"].map((k) => [k, ph(k)]));
+const IMG = Object.fromEntries(["curry", "meatballs", "quesadilla", "squares", "waffle"].map((k) => [k, ph(k)]));
 (async () => {
   const b = await chromium.launch({ args: ["--lang=en-GB"] });
   const mark = "outline:3px solid #2e7be8;outline-offset:-3px", NOTE = "outline:3px solid #2e7be8;outline-offset:2px;border-radius:12px;background:#fff8d6;padding:8px 10px;font-size:14px;line-height:1.45;color:#172742;font-weight:500";
@@ -21,6 +21,14 @@ const IMG = Object.fromEntries(["curry", "meatballs", "quesadilla", "squares"].m
     if (v === "1a") return `<section class="hp5" style="position:relative;height:${H};min-height:${desk ? 560 : 640}px;margin:0 calc(50% - 50vw);background:#172742 url(${IMG.curry}) center/cover;${mark}">
       <div style="position:absolute;inset:0;background:${desk ? "linear-gradient(90deg,rgba(15,24,42,.86) 0%,rgba(15,24,42,.55) 42%,rgba(15,24,42,0) 70%)" : "linear-gradient(0deg,rgba(15,24,42,.9) 0%,rgba(15,24,42,.65) 45%,rgba(15,24,42,0) 72%)"}"></div>
       <div style="position:absolute;${desk ? "left:max(32px,calc(50vw - 560px));top:50%;transform:translateY(-50%);max-width:560px" : "left:16px;right:16px;bottom:22px"}">${words(true)}</div></section>`;
+    if (v.startsWith("1d")) {
+      const order = ["curry", "meatballs", "quesadilla", "waffle", "squares"], k = Number(v.split("-")[1]) - 1;
+      const dots = order.map((_, i) => `<span style="width:${i === k ? 22 : 8}px;height:8px;border-radius:999px;background:${i === k ? "#fff" : "rgba(255,255,255,.55)"}"></span>`).join("");
+      return `<section class="hp5" style="position:relative;height:${H};min-height:${desk ? 560 : 640}px;margin:0 calc(50% - 50vw);background:#172742 url(${IMG[order[k]]}) center/cover;${mark}">
+      <div style="position:absolute;inset:0;background:${desk ? "linear-gradient(90deg,rgba(15,24,42,.86) 0%,rgba(15,24,42,.55) 42%,rgba(15,24,42,0) 70%)" : "linear-gradient(0deg,rgba(15,24,42,.9) 0%,rgba(15,24,42,.65) 45%,rgba(15,24,42,0) 72%)"}"></div>
+      <div style="position:absolute;${desk ? "left:max(32px,calc(50vw - 560px));top:50%;transform:translateY(-50%);max-width:560px" : "left:16px;right:16px;bottom:22px"}">${words(true)}</div>
+      <div style="position:absolute;${desk ? "right:32px;bottom:22px" : "right:16px;top:14px"};display:flex;gap:6px;align-items:center">${dots}</div></section>`;
+    }
     if (v === "1b") {
       const tiles = (desk ? ["curry", "meatballs", "quesadilla", "squares"] : ["curry", "meatballs", "quesadilla", "squares"]).map((k) => `<div style="background:url(${IMG[k]}) center/cover"></div>`).join("");
       return `<section class="hp5" style="position:relative;height:${H};min-height:${desk ? 560 : 640}px;margin:0 calc(50% - 50vw);display:grid;grid-template-columns:${desk ? "repeat(4,1fr)" : "1fr 1fr"};grid-template-rows:${desk ? "1fr" : "1fr 1fr"};gap:3px;background:#fff;${mark}">${tiles}
@@ -34,12 +42,15 @@ const IMG = Object.fromEntries(["curry", "meatballs", "quesadilla", "squares"].m
     now: "Now: the button is about one screen down, under the calculator; no photo.",
     "1a": "1a: one of your photos, full width: the curry with rice. The words and the button on a dark fade, white text. The calculator follows right under it.",
     "1b": "1b: a strip of four of your dishes: curry, meatballs, quesadilla, the chocolate squares. Four across on a computer, two by two on a phone. Your real week, at a glance.",
+    "1d-1": "1d, photo 1 of 5: 1a's look, the photo changing by itself every 5 to 6 seconds with a slow crossfade: curry, meatballs, quesadilla, waffle, chocolate squares. The words and the button stay still. The dots show which; a tap on a dot shows that dish.",
+    "1d-2": "1d, photo 2 of 5: the meatballs. The same words, the same place.",
+    "1d-4": "1d, photo 4 of 5: the waffle. A phone set to reduce motion sees the first photo only.",
     "1c": "1c: one photo, the meatballs pan, full width, and the words and button on a white card over it. No fade; the photo shows whole around the card.",
   };
   for (const [desk, vw, vh, tag] of [[false, 390, 844, "p"], [true, 1366, 820, "d"]]) {
     const page = await (await b.newContext({ viewport: { width: vw, height: vh }, deviceScaleFactor: desk ? 1.5 : 2, locale: "en-GB" })).newPage();
-    for (const v of ["now", "1a", "1b", "1c"]) {
-      if (desk && v === "now") continue;
+    for (const v of (process.env.ONLY ? process.env.ONLY.split(",") : ["now", "1a", "1b", "1c", "1d-1", "1d-2", "1d-4"])) {
+      if (desk && (v === "now" || v === "1d-4")) continue;
       await page.goto(U + "/"); await page.waitForTimeout(2200);
       await page.evaluate(({ v, html, note, NOTE, desk }) => {
         for (const x of document.querySelectorAll(".l-sticky")) x.style.display = "none";

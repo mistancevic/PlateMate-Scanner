@@ -101,7 +101,8 @@ cy = storyCard(B, y, "HP5", "The button on the first screen, over your own food"
   ("1a. One photo", "The curry with rice, full width. The words and the button on a dark fade, in white."),
   ("1b. A strip of four", "Curry, meatballs, quesadilla, the chocolate squares: four across on a computer, two by two on a phone. Your real week, at a glance."),
   ("1c. One photo with a card", "The meatballs pan, full width; the words and the button on a white card over it. No fade."),
-  ("The same in all three", "The button, the spots left and the commitment are on the first screen. The paragraph is shorter, to fit over a photo. A small line says it is your own cooking, at home. The calculator follows right under the photo, with its line Try the calculator."),
+  ("1d. 1a, as a carousel (Milan 16:38)", "1a's look, with the photo changing by itself every 5 to 6 seconds, a slow crossfade through five of your dishes: curry, meatballs, quesadilla, waffle, chocolate squares. The words and the button stay still. Small dots show which; a tap on a dot shows that dish; no arrows. A phone set to reduce motion sees the first photo only. Only the first photo loads with the page; the others after."),
+  ("The same in all four", "The button, the spots left and the commitment are on the first screen. The paragraph is shorter, to fit over a photo. A small line says it is your own cooking, at home. The calculator follows right under the photo, with its line Try the calculator."),
   ("The photos", "Your photos are portrait phone shots, 1500 px wide. Full width on a computer, one photo (1a, 1c) is zoomed in and a little soft; four side by side (1b) keep their own shape and stay sharp. On a phone all three look sharp."),
   ("Not in this board", "Which other photos to use in the strip; any of the nine can go in."),
 ])
@@ -110,11 +111,17 @@ h = rowEnd(cy,
   B.screen("HP5b", 1, y, "1a on a phone", "hp5p-1a", "changed", "The curry, words on a fade."),
   B.screen("HP5c", 2, y, "1b on a phone", "hp5p-1b", "changed", "Four dishes, two by two."))
 y = h
-h = rowEnd(B.screen("HP5d", 0, y, "1c on a phone", "hp5p-1c", "changed", "The meatballs, words on a card."))
+h = rowEnd(B.screen("HP5d", 0, y, "1c on a phone", "hp5p-1c", "changed", "The meatballs, words on a card."),
+  B.screen("HP5h", 1, y, "1d on a phone, photo 1 of 5", "hp5p-1d-1", "changed", "The curry; the dots top right."),
+  B.screen("HP5i", 2, y, "1d on a phone, photo 2 of 5", "hp5p-1d-2", "changed", "The meatballs, a few seconds later."))
+y = h
+h = rowEnd(B.screen("HP5j", 0, y, "1d on a phone, photo 4 of 5", "hp5p-1d-4", "changed", "The waffle."))
 y = h
 y = B.wide("HP5e", y, "1a on a computer", "hp5d-1a", "changed", "One photo, full width: zoomed in.") + 140
 y = B.wide("HP5f", y, "1b on a computer", "hp5d-1b", "changed", "Four across, each sharp.") + 140
 y = B.wide("HP5g", y, "1c on a computer", "hp5d-1c", "changed", "One photo with the card.") + 140
+y = B.wide("HP5k", y, "1d on a computer, photo 1 of 5", "hp5d-1d-1", "changed", "The curry; the dots bottom right.") + 140
+y = B.wide("HP5l", y, "1d on a computer, photo 2 of 5", "hp5d-1d-2", "changed", "The meatballs: zoomed in, like 1a.") + 140
 board("Stories149.dc.html", "HP5. The button on the first screen, over your own food",
-  "1 November 2026 (Coach Milan 15:38 and 15:48). Three versions of your own photo: pick 1a, 1b or 1c. Now: 0.3.45, untouched. Drawn for your approval; nothing built.",
+  "1 November 2026 (Coach Milan 15:38, 15:48 and 16:38). Version 2: 1d added, 1a as a carousel. Pick 1a, 1b, 1c or 1d. Now: 0.3.45, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories148.dc.html")
