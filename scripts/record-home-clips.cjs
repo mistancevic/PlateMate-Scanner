@@ -129,6 +129,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
           W.__synced.push({ finger: d, page: moved, end: sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 2 }); },
       };
     });
+    if (x.init) await page.addInitScript(x.init);
     await require(path.join(ROOT, "tests/flows/adult.cjs"))(page);
     await page.route("**/api/cover", (r) => r.fulfill({ status: 503, contentType: "application/json", body: "{}" }));
     await page.route("**/api/dish", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({ makesIt: true, why: "Salmon with potatoes and broccoli: a plain dinner plate.", around: "", better_as: "" }) }));
@@ -137,6 +138,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     await page.route("**/api/plate-photo", (r) => r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(READ) }));
     const t0 = Date.now();
     await page.goto(U + (x.path || "/plate")); await sleep(1600);
+    // HP3: steps to reach the clip's first screen, before it starts; clicked without a pointer, so no finger is drawn
+    if (x.setup) { const click = async (loc, wait = 600) => { await loc.waitFor({ timeout: 6000 }); await loc.evaluate((el) => el.click()); await sleep(wait); }; await x.setup(page, click); await sleep(500); }
     let from = (Date.now() - t0) / 1000, lastAct = from, taps = 0, swipes = 0;
     // HC10: this clip's hand. A seeded random per clip: where the thumb comes from, which side it scrolls on, how fast it moves
     const rnd = seeded(name), hand = { side: 210 + rnd() * 110, pace: 0.85 + rnd() * 0.4, entry: [250 + rnd() * 120, 880] };
@@ -190,7 +193,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     // HC12 (Coach Milan, 1 November 11:57): the poster is the clip's last settled screen, what the clip is about, before
     // the fade; the first frame was Plan for both the recipes and the shopping list
     // for the four ways in, what the clip is about is the camera with the pack or the plate in it, not the Plate after
-    const at = { barcode: 0.8, label: 1.6, group: 1.6, meal: 0.9 }[name];
+    const at = { barcode: 0.8, label: 1.6, group: 1.6, meal: 0.9, coach: 0.8, explorer: 2.0 }[name];
     execFileSync("ffmpeg", ["-y", ...(at ? ["-ss", String(at)] : ["-sseof", "-1.1"]), "-i", `${base}.mp4`, "-frames:v", "1", "-c:v", "libwebp", "-quality", "70", `${base}.webp`], { stdio: "ignore" });
     console.log("clip", name, `${len.toFixed(1)} s`);
   };
@@ -259,7 +262,47 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await a.tap(page.getByRole("dialog", { name: "Shopping lists" }).getByRole("button", { name: /Make shopping list/ }), 1200);
       const rows = page.locator(".shop-row"); await a.tap(rows.nth(1), 1100); await a.tap(rows.nth(3), 600);
     }, { meals, plan: PLAN, time: "2026-10-20T14:00:00Z", path: "/plan" });
-  } catch (e) { rule(false, "run", e.message.split("\n")[0]); }
+    // HP3 (0.3.42, board Stories147; Coach Milan 1 November 13:24 Go): four more clips, for Cook it, Your day, Explorer and the coach
+    const Fc = (id, name, calories, protein, carbs, fats, fiber) => ({ ...seed.foods[0], id, name, brand: "", calories, protein, carbs, fats, fiber, photo: undefined, photos: undefined, icon: "🍽️" });
+    const bowlItems = [[160, Fc("c", "Chicken breast, raw", 120, 22.5, 0, 2.6, 0)], [80, Fc("r", "Basmati rice, dry", 356, 8.5, 78, 0.9, 1.3)], [120, Fc("s", "Spinach, fresh", 23, 2.9, 3.6, 0.4, 2.2)], [8, Fc("o", "Olive oil", 884, 0, 0, 100, 0)], [6, Fc("g", "Garlic", 149, 6.4, 33, 0.5, 2.1)]].map(([g, f]) => ({ id: f.id, grams: g, locked: false, food: f }));
+    const bowl = { id: "m-bowl", title: "Chicken rice bowl", items: bowlItems, portion: 374, savedAt: "2026-10-27T10:00:00Z", stepsFor: bowlItems.map((i) => i.food.name), steps: [
+      "Rinse [[i:r|rice]] and bring it to the boil in 200 ml water. Cover and cook on low heat for 12 minutes.", "Cut [[i:c|chicken]] into strips. Season with salt and pepper.", "Slice [[i:g|garlic]] thin.",
+      "Heat [[i:o|olive oil]] in a pan on medium high heat. Fry the chicken 6 minutes, turning once, until no pink is left inside.", "Add [[i:s|spinach]] and the garlic. Stir 2 minutes, until the spinach wilts.", "Put the rice in a bowl and the chicken and spinach on top."] };
+    // the browser's voice is stood in for: nothing is read aloud in a recording
+    const voice = () => { const synth = { speak: () => {}, cancel: () => {}, getVoices: () => [] }; Object.defineProperty(window, "speechSynthesis", { value: synth, configurable: true }); window.SpeechSynthesisUtterance = function (t) { this.text = t; };
+      Object.defineProperty(navigator, "wakeLock", { value: { request: async () => ({ release: async () => {} }) }, configurable: true }); window.SpeechRecognition = function () { this.start = () => {}; this.stop = () => {}; }; };
+    await clip("cook", async (page, a) => {
+      const cm = page.locator(".cook-mode");
+      await a.tap(cm.getByRole("button", { name: "Turn voice on" }), 1100);
+      for (let k = 0; k < 3; k++) await a.tap(cm.getByRole("button", { name: /^Next/ }).first(), 900);
+      await a.tap(cm.getByRole("button", { name: /Start 6 min timer/ }), 900);
+      return { HP3: { ok: /4 of 6/.test(await cm.textContent()), what: "cook mode on step 4 of 6, the timer started" } };
+    }, { meals: [bowl], init: voice, path: "/", time: "2026-10-30T18:40:00", setup: async (page, click) => {
+      await click(page.locator("nav button").filter({ hasText: "Recipes" }), 700);
+      await click(page.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }), 700);
+      await click(page.getByRole("button", { name: "Cook it as written", exact: true }), 1200);
+      await click(page.getByRole("button", { name: "Start cooking", exact: true }), 700); } });
+    await clip("situation", async (page, a) => {
+      await a.tap(page.locator(".ex-map .menu-row").filter({ hasText: "A late evening" }).first(), 1300);
+      await a.swipe(520, 1500); await a.swipe(560, 1400);
+      return { HP3: { ok: /A late evening after work/.test(await page.locator(".explorer").textContent()), what: "the situation page, A late evening after work" } };
+    }, { path: "/", setup: async (page, click) => {
+      await click(page.locator(".bottom-nav button").filter({ hasText: "Explorer" }), 700);
+      await click(page.locator(".ex-parts").getByRole("radio", { name: "Situations" }), 600); } });
+    await clip("explorer", async (page, a) => {
+      await a.tap(page.locator(".ex-parts").getByRole("radio", { name: "The body" }), 1100);
+      await a.swipe(300, 1100);
+      await a.tap(page.locator(".ex-map .menu-row").filter({ hasText: "Glycogen" }).first(), 1300);
+      await a.swipe(480, 1300);
+      return { HP3: { ok: /Glycogen/.test(await page.locator(".explorer").textContent()), what: "The body, then the Glycogen page" } };
+    }, { path: "/", setup: async (page, click) => { await click(page.locator(".bottom-nav button").filter({ hasText: "Explorer" }), 700); } });
+    await clip("coach", async (page, a) => {
+      await sleep(900);
+      await a.tap(page.locator("section.waiting button.menu-row").filter({ hasText: /look at this/ }).first(), 1600);
+      await a.swipe(380, 1300); await a.swipe(360, 600);
+      return { HP3: { ok: !/Davorka/.test(await page.locator("main").textContent()), what: "made-up names only" } };
+    }, { path: "/today?coachdemo", setup: async (page, click) => { await click(page.getByRole("radio", { name: "My clients" }), 900); } });
+  } catch (e) { rule(false, "run", (e.stack || e.message).split("\n").slice(0, 3).join(" | ")); }
   rule(new Set(strokes).size === strokes.length, "HC10", `no two scrolls in the set are the same (${strokes.length} scrolls)`);
   server.kill();
   if (fails.length) { console.log(`\n${fails.length} rule(s) failed; no clip was replaced:\n  ${fails.join("\n  ")}`); process.exit(1); }

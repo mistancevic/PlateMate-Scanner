@@ -29,6 +29,19 @@ export function LandingScreen() {
     try { const u = new URL(window.location.href); const from = u.searchParams.get("from"); if (from === "qr" || from === "ig") { hit(from === "qr" ? "hp_qr" : "hp_ig"); u.searchParams.delete("from"); window.history.replaceState(null, "", u.pathname + u.search + u.hash); } } catch {}
   }, []);
   const toForm = () => { hit("hp_try"); formRef.current?.scrollIntoView({ behavior: "smooth" }); };
+  // HP3 (0.3.42, board Stories147; Coach Milan 1 November 10:48 to 13:24): the beta, free, with a commitment and the spots left
+  // (the number set under Clients, as on the book page); the waiting list for the paying users at launch, separate; a coach
+  // section of its own, reached from Coaches in the top bar. When the spots reach 0, the waiting list is the main button.
+  const waitRef = useRef<HTMLDivElement>(null), coachRef = useRef<HTMLElement>(null);
+  const [spots, setSpots] = useState<number | null>(null);
+  useEffect(() => { fetch("/api/beta/spots").then((r) => r.json()).then((d) => setSpots(Number.isInteger(d?.spots) ? d.spots : null)).catch(() => {}); }, []);
+  const full = spots === 0;
+  const [askAs, setAskAs] = useState<"coach" | null>(null);
+  const toWait = () => { waitRef.current?.scrollIntoView({ behavior: "smooth" }); };
+  const toCoaches = () => coachRef.current?.scrollIntoView({ behavior: "smooth" });
+  const toMain = () => (full ? toWait() : toForm());
+  const mainLabel = full ? "Join the waiting list" : "Join the beta, free";
+  const spotsLine = spots === null ? null : full ? "This round of the beta is full." : `${spots} ${spots === 1 ? "spot" : "spots"} left in this round`;
   // HP10: the bar at the bottom shows while neither the button under the calculator nor the form is on screen
   const ctaRef = useRef<HTMLDivElement>(null);
   // positions on every scroll, so a fast fling past the button still shows the bar
@@ -36,7 +49,8 @@ export function LandingScreen() {
   useEffect(() => {
     const check = () => {
       const c = ctaRef.current?.getBoundingClientRect(), f = formRef.current?.getBoundingClientRect();
-      const past = Boolean(c && c.bottom < 0), atForm = Boolean(f && f.top < window.innerHeight && f.bottom > 0);
+      const w = waitRef.current?.getBoundingClientRect();
+      const past = Boolean(c && c.bottom < 0), atForm = Boolean((f && f.top < window.innerHeight && f.bottom > 0) || (w && w.top < window.innerHeight && w.bottom > 0));
       setSticky(past && !atForm);
     };
     check(); window.addEventListener("scroll", check, { passive: true }); window.addEventListener("resize", check);
@@ -51,7 +65,7 @@ export function LandingScreen() {
     <div className="landing">
       <header className="l-top">
         <div className="l-brand"><Mark size={30} color="var(--brand)" /><b>{APP_NAME}</b></div>
-        <span className="l-topnav"><a className="l-recipes" href="/recipes">Recipes</a><button className="pill pill-small l-signin" disabled={busy} onClick={go}>Sign in</button></span>
+        <span className="l-topnav"><button type="button" className="link l-coaches" onClick={toCoaches}>Coaches</button><a className="l-recipes" href="/recipes">Recipes</a><button className="pill pill-small l-signin" disabled={busy} onClick={go}>Sign in</button></span>
       </header>
       {idle && (
         <section className="sh-arrived">
@@ -85,8 +99,14 @@ export function LandingScreen() {
           <div className="l-cta-block l-cta-hook" ref={ctaRef}>
             <b className="l-cta-head">Your own target, at every meal</b>
             <p>This calculator uses one target, PD {DEMO_GOAL.pd}. Your own target comes from your goal, your body and your training. Chef Mealan calculates it for you, then plans each meal to reach it with the foods in your kitchen.</p>
-            <button className="pill pill-primary l-cta-big" onClick={toForm}>Try Chef Mealan</button>
-            <small>Chef Mealan is being tested by a small group. Leave your name and email, and Coach Milan will send you a personal code.</small>
+            <button className="pill pill-primary l-cta-big" onClick={toMain}>{mainLabel}</button>
+            <div className="l-beta">
+              {spotsLine && <p className={`l-spots ${full ? "full" : ""}`}>{spotsLine}</p>}
+              {full
+                ? <p>Join the waiting list, and we write to you once, when Chef Mealan opens to everyone.</p>
+                : <><p>Beta testers use Chef Mealan most days for four weeks, and tell us what breaks. Free while it is in beta.</p>
+                    <p><button type="button" className="link" onClick={toWait}>Not ready to test? Join the waiting list ›</button></p></>}
+            </div>
           </div>
         </div>
       </section>
@@ -97,7 +117,7 @@ export function LandingScreen() {
       <section className="l-steps l-ways">
         <span className="l-eyebrow">Start from anything</span>
         <h2>What you eat, read in seconds</h2>
-        <p className="l-ways-lead">Scan a barcode, a nutrition label, all sides of a pack, or take a photo of the meal in front of you. Each one lands on your plate.</p>
+        <p className="l-ways-lead">Scan a barcode or a nutrition label, or take a photo of the meal in front of you. Each one lands on your plate.</p>
         <div className="l-ways-grid">
           {WAYS.map((w) => (
             <div className="l-way" key={w.id}>
@@ -134,6 +154,47 @@ export function LandingScreen() {
         <small className="l-ways-note">Clips of the app on test data. The packs in them are made up.</small>
       </section>
 
+      {/* HP3: cook it, the day as it goes, Explorer; each with a clip of the app as it is */}
+      <section className="l-steps l-new">
+        <div className="l-one">
+          <div className="l-one-text">
+            <span className="l-eyebrow">Cook</span>
+            <h2>Cook it, hands free</h2>
+            <ul className="l-list">
+              <li>One big step at a time, read aloud.</li>
+              <li>Say next, back, repeat, or start a timer.</li>
+              <li>Ask Chef in the middle: how much is left, what if the pan is too hot.</li>
+              <li>Pictures under the steps, yours or drawn.</li>
+              <li>A second phone or a tablet on the counter shows the steps.</li>
+            </ul>
+          </div>
+          <DayVideo src="/landing/way-cook.mp4" poster="/landing/way-cook.webp" label="Cook mode: one step at a time, read aloud" />
+        </div>
+        <div className="l-one">
+          <div className="l-one-text">
+            <span className="l-eyebrow">Your day</span>
+            <h2>Your day as it really goes</h2>
+            <p>A late evening at work, a party, a day away, a bad night's sleep. Chef Mealan has a page for each, and reads it against your own plan.</p>
+            <ul className="l-list">
+              <li>Busy times from your Google Calendar: a meal in a meeting asks before or after.</li>
+              <li>Travel mode: the shops and the kitchen of the place you are in.</li>
+              <li>A day off training: what changes, and what stays.</li>
+            </ul>
+          </div>
+          <DayVideo src="/landing/way-situation.mp4" poster="/landing/way-situation.webp" label="A late evening after work, in Explorer" />
+        </div>
+        <div className="l-one">
+          <div className="l-one-text">
+            <span className="l-eyebrow">Explorer</span>
+            <h2>Know why, not only what</h2>
+            <p>The body, the situations and the nutrients in one place. Every line has its paper. Every page says when a thing helps and when it hurts, then reads your own days.</p>
+            <p>No condition, no test reading, no supplement. If a condition decides what you eat, your doctor does.</p>
+          </div>
+          <DayVideo src="/landing/way-explorer.mp4" poster="/landing/way-explorer.webp" label="Explorer: the body, its eight families" />
+        </div>
+        <small className="l-ways-note">Clips of the app on test data. The names in them are made up.</small>
+      </section>
+
       {recipes.length > 0 && (
         <section className="l-kitchen">
           <span className="l-eyebrow">From the kitchen</span>
@@ -144,10 +205,20 @@ export function LandingScreen() {
         </section>
       )}
 
-      <section className="l-coach">
-        <span className="l-eyebrow">With your coach</span>
-        <h2>Your coach sees the same numbers as you</h2>
-        <p>You set your goal together with your coach. If one of your numbers looks wrong, for example too little food on a training day, Chef Mealan shows a note to you and to your coach. Your coach can then approve the number or suggest a change.</p>
+      {/* HP3: the coach's section, reached from Coaches in the top bar; its button opens the beta form as a coach */}
+      <section className="l-coach" id="coaches" ref={coachRef}>
+        <span className="l-eyebrow">For coaches</span>
+        <h2>Coach your clients' real days</h2>
+        <p>One account, two views: your own day, and your clients. Each client's day shows as they see it: the plan, the meals, the cards they share.</p>
+        <ul className="l-list">
+          <li>Suggest a snack or an Explorer page. The client accepts with one tap. You never change their plan.</li>
+          <li>Answer a shared meal in one line, or react with Good or Seen.</li>
+          <li>Waiting for you: what needs your answer, at the top.</li>
+          <li>The client decides what you see. Body data stays off until they switch it on.</li>
+        </ul>
+        <DayVideo src="/landing/way-coach.mp4" poster="/landing/way-coach.webp" label="My clients: Waiting for you at the top" />
+        <p className="l-coach-act"><button className="pill pill-primary" onClick={() => { setAskAs("coach"); full ? toWait() : toForm(); }}>{full ? "Join the waiting list" : "Get a coach code"}</button></p>
+        <small className="muted">Coaches in the beta: free, the same four weeks, and your clients join with your code.</small>
       </section>
 
       {/* who's behind Chef Mealan (board B, HP11, 12 October 2026): the product role first, so nobody reads Milan as a
@@ -176,6 +247,8 @@ export function LandingScreen() {
           <div><b>A calculator does the math</b><p>Your daily numbers and the grams on each plate come from published formulas. You can open any number and see how Chef Mealan got to it.</p></div>
           <div><b>AI reads, a calculator decides</b><p>Chef Mealan uses AI to read labels, menus and shop shelves, and to answer you in the chat. The numbers themselves come from a calculator, not from the AI. When the AI has to guess a number from a photo, the app marks that number as an estimate.</p></div>
           <div><b>Your data stays in the EU</b><p>Your data is stored in Frankfurt, in your account. You can download all of it, or delete all of it, at any time.</p></div>
+          <div><b>Papers read again</b><p>Every number Explorer credits to a study is checked against the study itself before each release.</p></div>
+          <div><b>Nothing kept for nothing</b><p>An account nobody opens for 12 months is deleted, with everything in it.</p></div>
         </div>
       </section>
 
@@ -199,13 +272,29 @@ export function LandingScreen() {
         <p>Chef Mealan is for adults. Chef Mealan is not a doctor. If a medical condition decides what you eat, if you're pregnant or have diabetes, or if eating is difficult for you, Chef Mealan doesn't give advice, and tells you who to talk to instead.</p>
       </section>
 
-      <section className="l-request" ref={formRef}>
-        <h2>Try Chef Mealan</h2>
-        <p>Chef Mealan is being tested by a small group right now. Most people join with a code from their coach. If you don't have a code, leave your name and email, and Coach Milan will send you a personal code.</p>
-        <RequestForm />
-      </section>
+      {/* HP3: two forms. The beta asks for commitment and gives a code; the waiting list asks only for an email, for the paying
+          users at launch. When the spots reach 0 the waiting list comes first and the beta form waits for the next round. */}
+      {(() => {
+        const beta = (
+          <section className="l-request" ref={formRef} key="beta">
+            <h2>{full ? "The next beta round" : "Join the beta, free"}</h2>
+            {full
+              ? <p>This round is full. Leave your name and email, and Coach Milan writes to you when the next round starts.</p>
+              : <p>{spotsLine && <b className="l-spots">{spotsLine}. </b>}Use Chef Mealan most days for four weeks, and tell us what breaks. Most people join with a code from their coach. If you don't have one, leave your name and email, and Coach Milan sends you a personal code.</p>}
+            <RequestForm who={askAs ?? undefined} />
+          </section>
+        );
+        const wait = (
+          <section className="l-request l-wait" id="wait" ref={waitRef} key="wait">
+            <h2>The waiting list</h2>
+            <p>For when Chef Mealan opens to everyone. No testing, no code now. We write to you once, when it opens.</p>
+            <WaitForm who={askAs ?? undefined} />
+          </section>
+        );
+        return full ? [wait, beta] : [beta, wait];
+      })()}
 
-      <div className={`l-sticky ${sticky ? "on" : ""}`} aria-hidden={!sticky}><button className="pill pill-primary" tabIndex={sticky ? 0 : -1} onClick={toForm}>Try Chef Mealan</button></div>
+      <div className={`l-sticky ${sticky ? "on" : ""}`} aria-hidden={!sticky}><button className="pill pill-primary" tabIndex={sticky ? 0 : -1} onClick={toMain}>{mainLabel}</button></div>
       <footer className="l-foot">
         <span><a href="/about">Who's behind it</a> · <a href="/built">How Chef Mealan is built</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a></span>
         <span><a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a> · © 2026 Milan Stancevic · {VERSION_LINE}</span>
@@ -216,9 +305,8 @@ export function LandingScreen() {
 
 // HP2 (0.2.114): the four ways in, each with its clip
 const WAYS = [
-  { id: "barcode", title: "A barcode", line: "The pack's values from the product database, or from the pack's photos." },
-  { id: "label", title: "A nutrition label", line: "Hold the table in the frame. Chef Mealan reads it, you check it." },
-  { id: "group", title: "A group of labels", line: "Every side of a pack in a few photos, read as one food." },
+  // HP3 (Coach Milan 1 November): two ways in, not four; the barcode and the labels are one, the group of packs leaves the page
+  { id: "barcode", title: "A barcode or a label", line: "The pack's values, or the label read from a photo, every side if you need. You check it." },
   { id: "meal", title: "A photo of your meal", line: "Chef Mealan names the foods and estimates the grams. You correct what you know." },
 ];
 export function DayVideo({ src, poster, label, big }: { src: string; poster: string; label: string; big?: boolean }) {
@@ -305,13 +393,49 @@ function TryIt() {
   );
 }
 
-export function RequestForm({ email: presetEmail, name: presetName, from, src }: { email?: string; name?: string; from?: string; src?: string }) {
+// HP3 (0.3.42): the waiting list's form. An email, which fits, and the tick that lets us write to you once, when it opens.
+const WHO_CHOICES = [["client", "I have a coach"], ["coach", "I am a coach"], ["self", "I train on my own"]] as const;
+export function WaitForm({ who: presetWho }: { who?: "client" | "coach" | "self" }) {
+  const started = useRef(Date.now());
+  const [email, setEmail] = useState("");
+  const [who, setWho] = useState<"client" | "coach" | "self" | "">(presetWho ?? "");
+  useEffect(() => { if (presetWho) setWho(presetWho); }, [presetWho]);
+  const [consent, setConsent] = useState(false);
+  const [trap, setTrap] = useState("");
+  const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
+  const [err, setErr] = useState("");
+  async function send() {
+    setErr(""); setState("sending");
+    try {
+      const r = await fetch("/api/waitlist", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, who, consent, website: trap, elapsed: Date.now() - started.current }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || "Couldn't send. Please write to hello@chefmealan.com.");
+      setState("sent");
+    } catch (e: any) { setErr(e.message); setState("idle"); }
+  }
+  if (state === "sent") return <div className="l-sent"><Check size={22} /> You're on the waiting list. We write to {email} once, when Chef Mealan opens.</div>;
+  return (
+    <div className="l-form">
+      <input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} autoComplete="email" aria-label="Email for the waiting list" />
+      <div className="setting"><small className="setting-name">Which fits you?</small>
+        <div className="chip-row">{WHO_CHOICES.map(([k, l]) => <button key={k} type="button" className={`choice ${who === k ? "on" : ""}`} aria-pressed={who === k} onClick={() => setWho(k)}>{l}</button>)}</div>
+      </div>
+      <label className="l-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} /> <span>Write to me when Chef Mealan opens. I can leave the list at any time by writing to hello@chefmealan.com.</span></label>
+      <input className="l-trap" tabIndex={-1} autoComplete="off" aria-hidden="true" value={trap} onChange={(e) => setTrap(e.target.value)} name="website" />
+      <button className="pill pill-primary pill-wide" disabled={state === "sending" || !email.includes("@") || !consent} onClick={send}>{state === "sending" ? "Sending…" : "Join the waiting list"}</button>
+      {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
+    </div>
+  );
+}
+export function RequestForm({ email: presetEmail, name: presetName, from, src, who: presetWho }: { email?: string; name?: string; from?: string; src?: string; who?: "client" | "coach" | "self" }) {
   const started = useRef(Date.now());
   const [name, setName] = useState(presetName ?? "");
   const [email, setEmail] = useState(presetEmail ?? "");
   const [note, setNote] = useState("");
   const [phone, setPhone] = useState("");
-  const [who, setWho] = useState<"client" | "coach" | "self" | "">("");
+  const [who, setWho] = useState<"client" | "coach" | "self" | "">(presetWho ?? "");
+  // HP3: Get a coach code opens the form with I am a coach picked
+  useEffect(() => { if (presetWho) setWho(presetWho); }, [presetWho]);
   const [trap, setTrap] = useState("");
   const [state, setState] = useState<"idle" | "sending" | "sent">("idle");
   const [err, setErr] = useState("");

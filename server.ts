@@ -475,7 +475,7 @@ app.post("/api/export", requireUser, async (req, res) => {
     for (const col of ["member_recipes", "member_recipes_preview", "member_names", "member_names_preview", "covers"]) out[col] = await docs(d.collection(col).where("uid", "==", uid));
     for (const col of ["public_recipes", "public_recipes_preview"]) out[col] = (await docs(d.collection(col).where("authorUid", "==", uid))).map((r: any) => r);
     out.cook = (await d.collection("cooks").doc(uid).get()).data() ?? null;
-    if (email) for (const col of ["accessRequests", "invites", "bookSignups"]) out[col] = (await docs(d.collection(col).where("email", "==", email))).map((r: any) => ({ ...r, ipHash: undefined, ua: undefined }));
+    if (email) for (const col of ["accessRequests", "invites", "bookSignups", "waitlist"]) out[col] = (await docs(d.collection(col).where("email", "==", email))).map((r: any) => ({ ...r, ipHash: undefined, ua: undefined }));
     // requests stored before 0.3.11 kept the email as typed
     if (email) out.accessRequests = [...(out.accessRequests as any[]), ...(await d.collection("accessRequests").limit(2000).get()).docs.filter((x) => String(x.get("email") || "").toLowerCase() === email && x.get("email") !== email).map((x) => ({ id: x.id, ...(x.data() as any), ipHash: undefined, ua: undefined }))];
     for (const col of ["metrics_events", "metrics_events_preview"]) out[col] = await docs(d.collection(col).where("m", "in", membersOf(uid)));
@@ -522,7 +522,7 @@ async function deleteAccountOf(uid: string, emailIn: string) {
       await d.collection("cooks").doc(uid).delete();
       if (!email) { try { email = String((await adminAuth().getUser(uid)).email || "").toLowerCase(); } catch { /* no email, nothing to clean by it */ } }
       if (!email) return;
-      for (const col of ["accessRequests", "invites", "bookSignups"]) {
+      for (const col of ["accessRequests", "invites", "bookSignups", "waitlist"]) {
         const snap = await d.collection(col).where("email", "==", email).get();
         const batch = d.batch(); snap.docs.forEach((x) => batch.delete(x.ref)); if (snap.size) await batch.commit();
       }
@@ -2193,6 +2193,53 @@ app.post("/api/book-notify", async (req, res) => {
     const id = createHash("sha256").update(email).digest("hex").slice(0, 32);
     await db().collection("bookSignups").doc(id).set({ email, books: FieldValue.arrayUnion(...books), createdAt: new Date().toISOString() }, { merge: true });
     ok();
+  } catch (e) { fail(res, e); }
+});
+// HP3 (0.3.42, board Stories147; Coach Milan 1 November 11:05): the waiting list, for the paying users at launch, separate from
+// the beta. An email, which fits (I have a coach, I am a coach, I train on my own) and the tick to be written to once, when
+// Chef Mealan opens. One record per email. No code, no access. Without a database (local runs) it is kept in memory.
+const WHO = ["client", "coach", "self"];
+const waitPerIp = new Map<string, number[]>();
+let waitPerDay = { day: "", n: 0 };
+const memWait: { id: string; email: string; who: string; createdAt: string }[] = [];
+app.post("/api/waitlist", async (req, res) => {
+  const b = req.body ?? {};
+  const ok = () => res.json({ ok: true });
+  if (typeof b.website === "string" && b.website.trim()) return ok();
+  const elapsed = Number(b.elapsed);
+  if (!Number.isFinite(elapsed) || elapsed < 3000 || elapsed > 3 * 3_600_000) return ok();
+  const email = String(b.email ?? "").trim().toLowerCase();
+  if (!/^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,24}$/i.test(email)) return res.status(400).json({ error: "Please check your email." });
+  if (b.consent !== true) return res.status(400).json({ error: "Tick the box, so we may write to you when it opens." });
+  const who = WHO.includes(b.who) ? b.who : "";
+  const ip = String(req.ip || "unknown"), now = Date.now();
+  const times = (waitPerIp.get(ip) ?? []).filter((t) => now - t < 3_600_000);
+  if (times.length >= 3) return res.status(429).json({ error: "Thanks, we already have your email." });
+  const day = new Date().toISOString().slice(0, 10);
+  if (waitPerDay.day !== day) waitPerDay = { day, n: 0 };
+  if (waitPerDay.n >= 200) return res.status(429).json({ error: "Lots of sign-ups today. Please write to hello@chefmealan.com." });
+  waitPerIp.set(ip, [...times, now]); waitPerDay.n++;
+  const id = createHash("sha256").update(email).digest("hex").slice(0, 32), createdAt = new Date().toISOString();
+  if (!FB_PROJECT) { const i = memWait.findIndex((x) => x.id === id); const rec = { id, email, who, createdAt }; if (i >= 0) memWait[i] = rec; else memWait.unshift(rec); return ok(); }
+  try { await db().collection("waitlist").doc(id).set({ email, who, consent: true, createdAt }, { merge: true }); ok(); }
+  catch (e) { fail(res, e); }
+});
+app.get("/api/waitlist", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    if (!ownerOnly(req)) return notOwner(res);
+    if (!FB_PROJECT) return res.json({ waiting: memWait });
+    const snap = await db().collection("waitlist").orderBy("createdAt", "desc").limit(500).get();
+    res.json({ waiting: snap.docs.map((d) => ({ id: d.id, email: d.data().email, who: d.data().who ?? "", createdAt: d.data().createdAt })) });
+  } catch (e) { fail(res, e); }
+});
+// someone asks to leave the list (by email to hello@): Milan removes them
+app.delete("/api/waitlist/:id", requireUser, requireMember, requireCoach, async (req, res) => {
+  try {
+    if (!ownerOnly(req)) return notOwner(res);
+    const id = String(req.params.id);
+    if (!/^[a-f0-9]{32}$/.test(id)) return res.status(400).json({ error: "Not on the list." });
+    if (!FB_PROJECT) { const i = memWait.findIndex((x) => x.id === id); if (i >= 0) memWait.splice(i, 1); return res.json({ ok: true }); }
+    await db().collection("waitlist").doc(id).delete(); res.json({ ok: true });
   } catch (e) { fail(res, e); }
 });
 app.get("/api/book-signups", requireUser, requireMember, requireCoach, async (req, res) => {
