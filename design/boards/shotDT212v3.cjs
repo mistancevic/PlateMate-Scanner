@@ -1,4 +1,5 @@
-// Board DT212 version 3 (Coach Milan 2 November 12:09): every question the Plate asks is Chef Mealan's line, the chat's bubble.
+// Board DT212 version 4 (Coach Milan 2 November 12:45): the photo inside Chef Mealan's bubble; the bubble the block's full width.
+// Version 3 (Coach Milan 2 November 12:09): every question the Plate asks is Chef Mealan's line, the chat's bubble.
 // Earlier: Boards DT211 and DT212 version 2 (Coach Milan 2 November 10:41 to 10:55): one Start cooking, the step picture slot, the plate
 // question inside its box, Save for later, and the answers to the five gaps. Earlier: DT211 and DT212 (Coach Milan 2 November 00:44 to 00:47). DT211: cooking with voice you can find; Start cooking on the
 // recipe. DT212: a plate that ends; one question at a time on the Plate. Now: 0.3.50 as it runs (main dist on 3387). New: the
@@ -59,8 +60,8 @@ const OLD = { items: [{ id: "a", food: CH, grams: 170, locked: false }, { id: "b
   const QBOX = (mark, img, title, sub, buttons, small) => { const svg = (document.querySelector("header svg")?.outerHTML || "").replace(/width="\d+"/, 'width="18"').replace(/height="\d+"/, 'height="18"');
     const q = /Did you eat it\?/.test(buttons) ? " Did you eat it?" : "";
     return `<section style="${mark};padding:6px;margin:12px 0;display:flex;flex-direction:column;gap:10px">
-      <div style="display:flex;gap:10px;align-items:flex-end"><img src="${img}" style="width:64px;height:64px;object-fit:cover;border-radius:10px;flex:none">
-      <div class="bubble mealan" style="display:block;max-width:100%"><span class="bubble-tag tag-chef" style="display:flex;align-items:center;gap:6px"><span style="display:inline-flex;width:18px;height:18px">${svg}</span>CHEF MEALAN</span><p style="font-weight:700">${title} ${sub}${q}</p></div></div>
+      <div class="bubble mealan" style="display:block;width:100%;max-width:100%;box-sizing:border-box"><span class="bubble-tag tag-chef" style="display:flex;align-items:center;gap:6px"><span style="display:inline-flex;width:18px;height:18px">${svg}</span>CHEF MEALAN</span>
+      <div style="display:flex;gap:10px;align-items:flex-start;margin-top:6px"><img src="${img}" style="width:64px;height:64px;object-fit:cover;border-radius:10px;flex:none"><p style="font-weight:700;margin:0">${title} ${sub}${q}</p></div></div>
       ${buttons.replace('<span style="font-size:15px">Did you eat it?</span>', "")}<small class="muted" style="font-size:13px;line-height:1.45">${small}</small></section>`; };
   const solo = (main) => { for (const el of [...main.children]) el.style.display = "none"; };
   // b: the Plate opens with yesterday's plate
@@ -72,7 +73,7 @@ const OLD = { items: [{ id: "a", food: CH, grams: 170, locked: false }, { id: "b
        <div style="display:flex;gap:18px"><button class="link" style="min-height:44px">Keep working on it</button><button class="link" style="min-height:44px">Clear it</button></div>`,
       "Ate it saves it to yesterday, to the meal it was set for, at the photo's time. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate."));
   }, { mark, img: waffle, QB: QBOX.toString() });
-  await note(p, "New, version 3: the Plate opens on one question, asked by Chef Mealan, when the plate is from an earlier meal (over 3 hours, or another day). Save for later added (Coach Milan 10:55): an unfinished plate is kept to continue. Every button sits inside the box, one under the other on a phone.");
+  await note(p, "New, version 4: the Plate opens on one question, asked by Chef Mealan, when the plate is from an earlier meal (over 3 hours, or another day). Save for later added (Coach Milan 10:55): an unfinished plate is kept to continue. Every button sits inside the box, one under the other on a phone.");
   await shot(p, "r212b3"); await p.context().close();
   // h: the Plate after Save for later: the saved plate waits at the top of an empty Plate
   p = await fresh();
@@ -93,7 +94,7 @@ const OLD = { items: [{ id: "a", food: CH, grams: 170, locked: false }, { id: "b
        <div style="display:flex;gap:18px"><button class="link" style="min-height:44px">Clear it</button><button class="link" style="min-height:44px">Cancel</button></div>`,
       "Whichever you pick, Protein Pancake then starts on its own plate. Cancel goes back to the recipe."));
   }, { mark, img: waffle, QB: QBOX.toString() });
-  await note(p, "New, version 3: Start cooking with a plate from earlier, Chef Mealan asks. The same question with Save for later, then cooking starts on its own plate. Start cooking never adds to a plate.");
+  await note(p, "New, version 4: Start cooking with a plate from earlier, Chef Mealan asks. The same question with Save for later, then cooking starts on its own plate. Start cooking never adds to a plate.");
   await shot(p, "r212c3"); await p.context().close();
   // g: Start cooking with a fresh plate (under 3 hours)
   const NOW = { ...OLD, plateAt: new Date(Date.now() - 20 * 60000).toISOString(), photo: { image: waffle, at: new Date(Date.now() - 20 * 60000).toISOString() } };
@@ -105,7 +106,7 @@ const OLD = { items: [{ id: "a", food: CH, grams: 170, locked: false }, { id: "b
        <button class="link" style="min-height:44px;align-self:flex-start">Cancel</button>`,
       "Save my plate for later keeps it to finish another time; it waits at the top of the Plate. Clear my plate empties it. Cancel goes back to the recipe."));
   }, { mark, img: waffle, QB: QBOX.toString() });
-  await note(p, "New, version 3: Start cooking with a plate of now, Chef Mealan asks. No Add to my plate: a recipe cooked as written is its own plate. Save it for later, or clear it.");
+  await note(p, "New, version 4: Start cooking with a plate of now, Chef Mealan asks. No Add to my plate: a recipe cooked as written is its own plate. Save it for later, or clear it.");
   await shot(p, "r212g3"); await p.context().close();
   // f: now and new at 360 px, the recipe question on a plate of now: the buttons
   p = await fresh(NOW, 360); await toRecipe(p);
@@ -116,9 +117,9 @@ const OLD = { items: [{ id: "a", food: CH, grams: 170, locked: false }, { id: "b
   await p.evaluate((mark) => { document.querySelector(".bnote")?.remove(); const go = document.querySelector(".pa-go"); if (go) { go.style.cssText += ";flex-direction:column;align-items:stretch;" + mark; for (const b of go.querySelectorAll("button")) b.style.cssText += ";width:100%;min-height:44px"; } }, mark);
   await p.evaluate(() => { const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) if (n.textContent.trim() === "Feedback") n.textContent = n.textContent.replace("Feedback", "Eat"); });
   await p.evaluate(() => { const top = document.querySelector(".plate-ask .pa-top span"); const svg = (document.querySelector("header svg")?.outerHTML || "").replace(/width="\d+"/, 'width="18"').replace(/height="\d+"/, 'height="18"');
-    if (top) top.outerHTML = `<div class="bubble mealan" style="display:block;max-width:100%"><span class="bubble-tag tag-chef" style="display:flex;align-items:center;gap:6px"><span style="display:inline-flex;width:18px;height:18px">${svg}</span>CHEF MEALAN</span><p style="font-weight:700">Your plate already has 3 foods. Protein Pancake from your recipes has 7. Start a new plate with it, or add it to yours?</p></div>`;
+    if (top) top.outerHTML = `<div class="bubble mealan" style="display:block;width:100%;max-width:100%;box-sizing:border-box"><span class="bubble-tag tag-chef" style="display:flex;align-items:center;gap:6px"><span style="display:inline-flex;width:18px;height:18px">${svg}</span>CHEF MEALAN</span><p style="font-weight:700">Your plate already has 3 foods. Protein Pancake from your recipes has 7. Start a new plate with it, or add it to yours?</p></div>`;
     const pa = document.querySelector(".plate-ask"); if (pa) { pa.style.background = "transparent"; pa.style.border = "0"; } });
-  await note(p, "New, version 3: every Plate question is Chef Mealan's line; its buttons stay inside, one under the other on a phone. The question shows alone: the foods wait behind it.");
+  await note(p, "New, version 4: every Plate question is Chef Mealan's line; its buttons stay inside, one under the other on a phone. The question shows alone: the foods wait behind it.");
   await p.evaluate(() => { const main = document.querySelector("main"); let n = document.querySelector(".plate-ask"); while (n && n !== main) { let s = n.nextElementSibling; while (s) { s.style.display = "none"; s = s.nextElementSibling; } n = n.parentElement; } });
   await shot(p, "r212f3", false); await p.context().close();
   await b.close();

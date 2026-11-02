@@ -73,7 +73,7 @@ const OLD = { items: [{ id: "a", food: CH, grams: 170, locked: false }, { id: "b
   const pic = waffle;
   // Chef Mealan's line: the chat's bubble, with his mark and name
   const chefLine = () => (text) => { const svg = document.querySelector("header svg")?.outerHTML || "";
-    const d = document.createElement("div"); d.className = "bubble mealan"; d.style.cssText = "display:block;max-width:92%;margin:12px 0 8px";
+    const d = document.createElement("div"); d.className = "bubble mealan"; d.style.cssText = "display:block;width:100%;max-width:100%;box-sizing:border-box;margin:12px 0 8px";
     d.innerHTML = `<span class="bubble-tag tag-chef" style="display:flex;align-items:center;gap:6px"><span style="display:inline-flex;width:18px;height:18px">${svg.replace(/width="\d+"/, 'width="18"').replace(/height="\d+"/, 'height="18"')}</span>CHEF MEALAN</span><p style="font-weight:700">${text}</p>`; return d; };
   const tabs = () => { const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) if (n.textContent.trim() === "Feedback") n.textContent = n.textContent.replace("Feedback", "Eat"); };
   const grab = () => { const ls = [...document.querySelectorAll("main p.label")]; const at = (re) => ls.find((x) => re.test(x.textContent));

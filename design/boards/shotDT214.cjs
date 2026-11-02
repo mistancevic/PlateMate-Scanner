@@ -1,4 +1,5 @@
-// Board DT214 (Coach Milan 2 November 12:17 to 12:30): the cook. Cooking is its own thing beside the Plate, from Start cooking
+// Board DT214 version 2 (Coach Milan 2 November 12:45): the strip under the page's title, under My goal on Today; nothing above a
+// title; Chef Mealan's bubble the full width of its block. Version 1: Board DT214 (Coach Milan 2 November 12:17 to 12:30): the cook. Cooking is its own thing beside the Plate, from Start cooking
 // to how the meal carried you; a strip on every tab while it runs. Earlier: Board DT211 version 8 (Coach Milan 2 November 12:03 to 12:09): Photo is the one word; photos are added on the steps in Make;
 // the recipe shows them; leaving Make or Eat and coming back goes on where you left off. Eat first on the board.
 // Earlier: DT211 version 7 (Coach Milan 2 November 11:38 to 11:41): one conversation between the cook and the chef. The steps are
@@ -74,7 +75,7 @@ const OLD = { items: [{ id: "a", food: CH, grams: 170, locked: false }, { id: "b
   const pic = waffle;
   // Chef Mealan's line: the chat's bubble, with his mark and name
   const chefLine = () => (text) => { const svg = document.querySelector("header svg")?.outerHTML || "";
-    const d = document.createElement("div"); d.className = "bubble mealan"; d.style.cssText = "display:block;max-width:92%;margin:12px 0 8px";
+    const d = document.createElement("div"); d.className = "bubble mealan"; d.style.cssText = "display:block;width:100%;max-width:100%;box-sizing:border-box;margin:12px 0 8px";
     d.innerHTML = `<span class="bubble-tag tag-chef" style="display:flex;align-items:center;gap:6px"><span style="display:inline-flex;width:18px;height:18px">${svg.replace(/width="\d+"/, 'width="18"').replace(/height="\d+"/, 'height="18"')}</span>CHEF MEALAN</span><p style="font-weight:700">${text}</p>`; return d; };
   const tabs = () => { const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n; while ((n = w.nextNode())) if (n.textContent.trim() === "Feedback") n.textContent = n.textContent.replace("Feedback", "Eat"); };
   const grab = () => { const ls = [...document.querySelectorAll("main p.label")]; const at = (re) => ls.find((x) => re.test(x.textContent));
@@ -121,7 +122,11 @@ const OLD = { items: [{ id: "a", food: CH, grams: 170, locked: false }, { id: "b
     const d = document.createElement("div"); d.className = "cook-strip";
     d.style.cssText = "display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 12px;margin:8px 0 10px;background:#dce9fd;border:1.5px solid #2e7be8;border-radius:14px;color:#123a7a;font-size:15px";
     d.innerHTML = `<span style="display:inline-flex;width:20px;height:20px;flex:none">${svg}</span><span style="flex:1;line-height:1.3">${html}</span><b style="flex:none;color:#1f5fc7">Go on ›</b>`;
-    const main = document.querySelector("main"); main.prepend(d); return d; };
+    // never above the page's title (Coach Milan 12:45): on Today under the My goal block, on the Plate under the title and its line
+    const goal = [...document.querySelectorAll("main section, main .card, main div")].filter((x) => /^\s*MY GOAL/i.test(x.innerText || "") && x.getBoundingClientRect().height < 320).sort((a, b) => a.getBoundingClientRect().height - b.getBoundingClientRect().height).pop();
+    const crave = [...document.querySelectorAll("main h1, main h2")].find((x) => /What are you craving/.test(x.textContent));
+    if (goal) goal.after(d); else if (crave) (crave.nextElementSibling || crave).after(d); else document.querySelector("main").prepend(d);
+    return d; };
   const run = (p, f, arg) => p.evaluate(({ src, cl, st, tb, arg, pic }) => { const chefLine = eval(cl)(); const strip = eval(st)(); eval(tb)();
     const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n; const swap = [[/^No picture yet\.$/, "No photo yet."], [/^Draw a picture$/, "Let Chef Mealan draw one"], [/Chef Mealan's pictures today/, (t) => t.replace("Chef Mealan's pictures today", "Chef Mealan's drawings today")]];
     while ((n = w.nextNode())) for (const [re, to] of swap) if (re.test(n.textContent.trim())) n.textContent = typeof to === "function" ? to(n.textContent) : to;
@@ -129,7 +134,7 @@ const OLD = { items: [{ id: "a", food: CH, grams: 170, locked: false }, { id: "b
   // a. Today, while cooking
   let p = await fresh();
   await run(p, (a) => { strip("<b>Cooking now</b> · Protein Pancake · step 3 of 5"); });
-  await note(p, "New: while a cook runs, a strip sits under the header on every tab: Cooking now, the dish, the step. Go on brings you back to the same step, with every tick, photo and answer kept.");
+  await note(p, "New, version 2: while a cook runs, a strip sits on every tab, never above the page\u2019s title; on Today under My goal: Cooking now, the dish, the step. Go on brings you back to the same step, with every tick, photo and answer kept.");
   await shot(p, "r214a"); await p.context().close();
   // b. the Plate stays free: a scan in the middle of cooking asks where the food goes
   p = await fresh();
