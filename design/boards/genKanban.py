@@ -4,7 +4,7 @@ import json, os, html
 D = os.environ.get("CANVAS_DIR", "/home/claude/canvas/project")
 bl = json.load(open("/home/claude/platemate-scanner/docs/backlog.json"))
 E = bl["epics"]; T = bl["tickets"]; V = bl["versions"]
-COL = {"home": "#d35400", "setup": "#2e7be8", "plate": "#1e8e5a", "cook": "#8e44ad", "coach": "#123a7a", "explorer": "#c0392b", "trust": "#5b6b8a", "lang": "#b7950b", "ops": "#16a085"}
+COL = {"home": "#d35400", "setup": "#2e7be8", "plate": "#1e8e5a", "cook": "#8e44ad", "coach": "#123a7a", "explorer": "#c0392b", "trust": "#5b6b8a", "lang": "#b7950b", "ops": "#16a085", "chef": "#a04000"}
 CW, G, PAD = 268, 18, 18
 cols = [("todo", "To do", "Now, Next and Later, one below the other."), ("progress", "In progress", "Branch open, tests running."), ("done", "Done", f"Merged. The last {len(V)} versions, newest first.")]
 LEGEND = ('<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:#172742;margin-top:8px;padding:8px 10px;background:#f4f7fc;border-radius:10px">'

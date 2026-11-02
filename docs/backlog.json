@@ -36,6 +36,10 @@
     "ops": {
       "name": "Measuring and releases",
       "why": "Metrics, evals, walkthroughs and the releases page: how we know the app works and what shipped."
+    },
+    "chef": {
+      "name": "Chef Mealan's voice",
+      "why": "One conversation between the cook and the chef: every question in his own line, written as a script that voice can read later."
     }
   },
   "versions": [
@@ -58,11 +62,18 @@
     },
     {
       "id": "DT211",
-      "title": "Cooking you can find",
+      "title": "Cook and chef, one conversation: Craft, Make, Eat",
       "epic": "cook",
       "state": "now",
       "board": 158,
       "why": "Milan could not find the voice or the second phone; Start cooking moves onto the recipe."
+    },
+    {
+      "id": "DT213",
+      "title": "Chef Mealan's script: every question he asks, as his lines",
+      "epic": "chef",
+      "state": "next",
+      "why": "Milan 2 November 12:09: bubbles wherever Chef Mealan asks, a script that voice follows later. An inventory of every question in the app, then one design."
     },
     {
       "id": "DT202",
