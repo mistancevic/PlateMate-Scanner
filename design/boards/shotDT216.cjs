@@ -66,27 +66,24 @@ seed.meals = [{ id: "m-cr", title: "Vanilla protein crepes", items: crepes, port
   await p.evaluate((mark) => { const t = document.querySelector(".cook-text"); if (t) t.style.cssText += ";" + mark; }, mark);
   await note(p, "Now (0.3.55): cook mode reads step 2 in one go: six foods, about 15 seconds of reading before you can do anything.", ".cook-mode");
   await shot(p, "r217a", false);
-  // 4. New: the same step as moves
-  await p.evaluate(({ mark }) => { document.querySelector(".bnote")?.remove();
-    const sm = document.querySelector(".cook-card small"); if (sm) { sm.textContent = "STEP 2 · 3 OF 7"; }
-    const t = document.querySelector(".cook-text"); if (t) { t.innerHTML = 'Add <b class="st-amt">35 g wheat flour</b>.'; t.style.cssText = t.style.cssText.replace(/outline[^;]*;?/g, ""); }
+  // 4. New, version 2 (Coach Milan 16:35): the whole step stays on top, to follow along; under it the moves, read one at a time
+  const MOVES = ["Add 2 eggs, 104 g.", "Add 100 g milk.", "Add 35 g wheat flour.", "Add 180 g quark.", "Add 1 banana, 81 g.", "Add 15 g chocolate chips.", "Stir until it's one colour."];
+  const movesOn = (at, mark, MOVES) => { document.querySelector(".bnote")?.remove(); document.querySelector(".mv-list")?.remove();
+    const t = document.querySelector(".cook-text"); if (t) { t.style.cssText = t.style.cssText.replace(/outline[^;]*;?/g, "") + ";font-size:19px;line-height:1.4;font-weight:700"; }
     const card = document.querySelector(".cook-card");
-    const dots = document.createElement("div"); dots.style.cssText = "display:flex;gap:6px;margin-top:14px;" + mark;
-    dots.innerHTML = [0, 1, 2, 3, 4, 5, 6].map((k) => `<span style="width:12px;height:12px;border-radius:50%;background:${k < 2 ? "#2e7be8" : k === 2 ? "#123a7a" : "#d1dcf0"}"></span>`).join("");
-    card.appendChild(dots);
-    const nx = document.createElement("small"); nx.style.cssText = "display:block;margin-top:10px;font-size:14px;color:#5b6b8a;font-weight:700"; nx.textContent = "Next: add 180 g quark."; card.appendChild(nx);
-    const c = document.querySelector(".cook-count"); if (c) { c.textContent = "2 of 2"; }
-    const nb = [...document.querySelectorAll(".cook-mode button")].find((x) => /Next|Done/.test(x.textContent)); if (nb) nb.textContent = "Next ›"; }, { mark });
-  await note(p, "New (DT217): cook mode reads a step one move at a time: one food, or one action. Next goes to the next move; the dots show the moves in this step; the number buttons stay the written steps.", ".cook-mode");
+    const box = document.createElement("div"); box.className = "mv-list"; box.style.cssText = "margin-top:14px;padding-top:12px;border-top:1px solid #d1dcf0;" + mark;
+    box.innerHTML = `<small style="display:block;font-size:12px;font-weight:900;letter-spacing:.05em;color:#5b6b8a;margin-bottom:6px">READ ALOUD, ONE AT A TIME · ${at + 1} OF ${MOVES.length}</small>` + MOVES.map((m, k) => k < at
+      ? `<div style="display:flex;gap:8px;align-items:center;padding:5px 0;color:#5b6b8a;font-size:15px"><span style="width:20px;color:#1e8e5a;font-weight:900">✓</span>${m}</div>`
+      : k === at ? `<div style="display:flex;gap:8px;align-items:center;padding:8px 10px;margin:2px -10px;background:#dae6fb;border-radius:10px;color:#123a7a;font-size:20px;font-weight:900"><span style="width:20px">▶</span>${m}</div>`
+      : `<div style="display:flex;gap:8px;align-items:center;padding:5px 0;color:#172742;font-size:15px"><span style="width:20px"></span>${m}</div>`).join("");
+    card.appendChild(box);
+    const nb = [...document.querySelectorAll(".cook-mode button")].find((x) => /Next|Done/.test(x.textContent)); if (nb) nb.textContent = at === MOVES.length - 1 ? "Done ✓" : "Next ›"; };
+  await p.evaluate(({ src, mark, MOVES }) => eval(src)(2, mark, MOVES), { src: movesOn.toString(), mark, MOVES });
+  await note(p, "New (DT217 v2): the whole step stays on top, to follow along. Under it the moves, read aloud one at a time: done ones ticked, this one large. Next and Back go move by move; the number buttons stay the written steps.", ".cook-mode");
   await shot(p, "r217b", false);
-  // 5. New: the action that ends the step
-  await p.evaluate(() => { document.querySelector(".bnote")?.remove();
-    const sm = document.querySelector(".cook-card small"); if (sm) sm.textContent = "STEP 2 · 7 OF 7";
-    const t = document.querySelector(".cook-text"); if (t) t.textContent = "Stir until it's one colour.";
-    const dots = [...document.querySelectorAll(".cook-card span")].filter((x) => x.style.borderRadius === "50%"); dots.forEach((d, k) => { d.style.background = k < 6 ? "#2e7be8" : "#123a7a"; });
-    const nx = [...document.querySelectorAll(".cook-card small")].find((x) => /^Next:/.test(x.textContent)); if (nx) nx.textContent = "Next ticks step 2.";
-    const nb = [...document.querySelectorAll(".cook-mode button")].find((x) => /Next|Done/.test(x.textContent)); if (nb) nb.textContent = "Done ✓"; });
-  await note(p, "New (DT217): the last move of a step is its action, with its timer when it names minutes. Next on it ticks the step on Make, as today.", ".cook-mode");
+  // 5. New: the step's action
+  await p.evaluate(({ src, mark, MOVES }) => eval(src)(6, mark, MOVES), { src: movesOn.toString(), mark, MOVES });
+  await note(p, "New (DT217 v2): the last move is the step's action, with its timer when it names minutes. Next on it ticks the step on Make, as today.", ".cook-mode");
   await shot(p, "r217c", false); await p.context().close();
   await b.close();
 })();

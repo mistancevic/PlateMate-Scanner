@@ -106,7 +106,8 @@ cy = storyCard(B, y, "DT216", "Cooked plates get cooking steps", [
 cy2 = storyCard(B, cy + 30, "DT217", "Cooking move by move", [
   ("Coach Milan, 16:09", "A different process for voice: the recipe stays as it is, cooking goes food by food, step by step."),
   ("New: moves", "The recipe keeps its steps as written, to read and decide. Cook mode reads a step one move at a time: one food, or one action. Step 2 of the crêpes as they are now: Add 2 eggs, 104 g. Add 100 g milk. Add 35 g wheat flour. Add 180 g quark. Add 1 banana, 81 g. Add 15 g chocolate chips. Stir until it's one colour."),
-  ("On the screen", "STEP 2 · 3 OF 7, the move in big letters, a dot per move, Next: and the next move under it. The number buttons stay the written steps. Next, Back and Repeat work on moves; go to step 3 jumps to a written step."),
+  ("Version 2, 16:35", "The whole step stays on top, to follow along. Under it the moves, read aloud one at a time."),
+  ("On the screen", "STEP 2 and its whole text. Under it READ ALOUD, ONE AT A TIME · 3 OF 7 and the list of moves: done ones ticked, this one large on blue, the rest plain. The number buttons stay the written steps. Next, Back and Repeat work on moves; go to step 3 jumps to a written step."),
   ("Timers and ticks", "A timer belongs to the move that names the minutes. The last move of a step is its action; Next on it ticks the step on Make, as today. A step's photo stays on top through its moves."),
   ("Who makes the moves", "Chef Mealan drafts them with the steps, once per recipe, kept with it and checked like steps (one food a move, every food in, the amounts from the recipe): a fraction of a cent once, then cooking costs nothing. A recipe without moves gets them in code: each food it names becomes Add, then its own words as the action."),
   ("Voice", "One short line at a time: Next, Back and Stop cut in sooner, and a paid voice (VO1) costs less per cook."),
@@ -116,9 +117,9 @@ h1 = B.screen("DT216a", 0, yy, "Now: How to make it, your crêpes", "r216a", "no
 h2 = B.screen("DT216b", 1, yy, "New: a cooked plate", "r216b", "changed", "Chef Mealan's steps, one or two foods at a time, at your amounts.")
 h3 = B.screen("DT217a", 2, yy, "Now: cooking step 2", "r217a", "now", "Six foods read in one go before you can do anything.")
 y = rowEnd(h1, h2, h3)
-h1 = B.screen("DT217b", 0, y, "New: one move at a time", "r217b", "changed", "STEP 2 · 3 OF 7: Add 35 g wheat flour. The dots; Next: add 180 g quark.")
+h1 = B.screen("DT217b", 0, y, "New: one move at a time", "r217b", "changed", "The whole step on top; under it the moves, this one large: Add 35 g wheat flour.")
 h2 = B.screen("DT217c", 1, y, "New: the step's action", "r217c", "changed", "The last move is the action; Next on it ticks step 2.")
 y = rowEnd(h1, h2, cy2)
-board("Stories163.dc.html", "DT216 and DT217. Cooked plates, and cooking move by move",
-  "2 November 2026 (Coach Milan 15:54 to 16:13). Drawn for your approval; nothing built. Now: 0.3.55, untouched.",
+board("Stories163.dc.html", "DT216 and DT217. Cooked plates, and cooking move by move (v2)",
+  "2 November 2026 (Coach Milan 15:54 to 16:35). Version 2: the whole step stays on top, the moves under it. Drawn for your approval; nothing built. Now: 0.3.55, untouched.",
   B, W, y - 100, "Stories162.dc.html")
