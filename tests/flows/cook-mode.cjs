@@ -35,7 +35,9 @@ const PORT = "3194", B = `http://127.0.0.1:${PORT}`;
       // the stand-in voice: what is read aloud is kept
       window.__spoken = [];
       // the stand-in voice says when it has finished, as a phone does (0.3.54: nothing is heard while it speaks)
-      const synth = { speak: (u) => { window.__spoken.push(u.text); queueMicrotask(() => u.onend && u.onend()); }, cancel: () => {}, getVoices: () => [] };
+      // __holdVoice: the voice keeps reading until something stops it (0.3.55, cut in)
+      window.__cancels = 0;
+      const synth = { speak: (u) => { window.__spoken.push(u.text); if (!window.__holdVoice) queueMicrotask(() => u.onend && u.onend()); }, cancel: () => { window.__cancels++; }, getVoices: () => [] };
       Object.defineProperty(window, "speechSynthesis", { value: synth, configurable: true });
       window.SpeechSynthesisUtterance = function (t) { this.text = t; };
       // the stand-in screen lock
@@ -86,6 +88,17 @@ const PORT = "3194", B = `http://127.0.0.1:${PORT}`;
     const told = await page.evaluate(() => window.__spoken.length);
     await say("Cut 160 grams chicken into strips. Season with salt and pepper.");
     ok(/2 of 6/.test(await cm.locator(".cook-count").textContent()) && (await page.evaluate(() => window.__spoken.length)) === told, "its own words heard back: nothing said, nothing done, no circle");
+    // 0.3.55 (Coach Milan 14:47): while it reads, a command cuts in; its own words still do nothing
+    await page.evaluate(() => { window.__holdVoice = true; window.__cancels = 0; });
+    await cm.getByRole("button", { name: /Repeat/ }).click(); await page.waitForTimeout(250);
+    const told2 = await page.evaluate(() => window.__spoken.length);
+    await say("Cut 160 grams chicken into strips.");
+    ok(/2 of 6/.test(await cm.locator(".cook-count").textContent()) && (await page.evaluate(() => window.__spoken.length)) === told2, "while it reads, its own words do nothing");
+    await say("next");
+    ok(/3 of 6/.test(await cm.locator(".cook-count").textContent()) && (await page.evaluate(() => window.__cancels)) >= 1, "next cuts in: the reading stops, step 3");
+    await page.evaluate(() => { window.__holdVoice = false; });
+    await say("back");
+    ok(/2 of 6/.test(await cm.locator(".cook-count").textContent()), "back cuts in too: step 2");
     await say("How much rice?");
     ok(/80 g rice\. In step 1\.|80 g basmati rice\. In step 1\./.test(await cm.locator(".cook-heard").textContent()), "how much rice: the amount cooked, and its step");
     await say("back");

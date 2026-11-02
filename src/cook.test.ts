@@ -79,3 +79,17 @@ test("0.3.54: the phone's own words heard back are not a command; the cook's are
   assert.equal(echo("next", "Step 1. Put 25 grams vanilla whey protein powder in a bowl."), false);
   assert.equal(echo("next", help), false, "next right after the help line is the cook's");
 });
+
+// 0.3.55 (Coach Milan 14:47): a command cuts in while the phone reads
+import { cutsIn } from "./cook";
+test("0.3.55: next, back, stop cut in while a step is read; the phone's own help line does not", () => {
+  const step = "Step 1. Put 25 grams vanilla whey protein powder in a bowl.";
+  const help = "I heard you, but that isn't something I can do yet. Say next, back, repeat, how much, timer, what's left or stop. Start with Chef to ask about the dish.";
+  assert.equal(cutsIn("next", step), true);
+  assert.equal(cutsIn("go back", step), true);
+  assert.equal(cutsIn("stop", step), true);
+  assert.equal(cutsIn("go to step 2", step), true);
+  assert.equal(cutsIn("next", help), false);
+  assert.equal(cutsIn("whey protein powder", step), false);
+  assert.equal(cutsIn("how much whey", step), false);
+});

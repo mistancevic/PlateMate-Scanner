@@ -88,6 +88,19 @@ export function setVoiceChoice(v: "on" | "off") { try { localStorage.setItem(VOI
 // circle while his own words were lost. While the phone speaks nothing is taken; just after, words that are the phone's own
 // line are dropped. A short command of the cook's (next, back) stays a command.
 const wordsOf = (t: string) => t.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(Boolean);
+// the heard words are mostly words of what the phone just said
+function ownWords(heard: string, spoken: string): boolean {
+  const h = wordsOf(heard), s = new Set(wordsOf(spoken));
+  if (!h.length || !s.size) return false;
+  return h.filter((w) => s.has(w)).length / h.length >= 0.7;
+}
+// 0.3.55 (Coach Milan 14:47, cut in): while the phone reads, a command of the cook's stops it: next, back, repeat, stop, what's
+// left, go to step N. Taken only when its words are not the sentence being read (the help line says next and back itself).
+export function cutsIn(heard: string, spoken: string): boolean {
+  const k = parseCommand(heard).kind;
+  if (!(k === "next" || k === "back" || k === "repeat" || k === "stop" || k === "left" || k === "goto")) return false;
+  return !ownWords(heard, spoken);
+}
 export function isEcho(heard: string, spoken: string): boolean {
   const h = wordsOf(heard), s = new Set(wordsOf(spoken));
   if (!h.length || !s.size) return false;
