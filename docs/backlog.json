@@ -1,0 +1,44 @@
+{
+  "about": "One entry per ticket. The Kanban on the canvas (page Kanban) and the handover read this file. States: later (one line, an idea), next (brainstormed, Milan's answer in, no board), now (board drawn and approved, waits for Go), progress (branch open), done (merged, with its version). Milan says the word; Claude moves the card.",
+  "epics": {
+    "home": { "name": "Home page", "why": "The pitch to new beta testers and to a hiring manager reading the PM: what Chef Mealan is, who is behind it, try it here." },
+    "setup": { "name": "Setup", "why": "Profile, goal, lifestyle, training week, shop: nothing locked, every change kept, what is missing said in one row." },
+    "plate": { "name": "Plate", "why": "The editor of a meal: one question at a time, a plate that ends, Chef Mealan's checks said once." },
+    "cook": { "name": "Recipes and cooking", "why": "Recipes for reading and deciding; cooking one step at a time, read aloud, a second phone on the counter." },
+    "coach": { "name": "Coach", "why": "A coach's clients in one tab, each client's page with everything about them; the person keeps their five tabs." },
+    "explorer": { "name": "Explorer", "why": "Nutrition explained with the app's own letters, one page per topic, wellness language, never a health claim." },
+    "trust": { "name": "Trust and privacy", "why": "Age, consent, the privacy tracker, the disclaimer, the rulebook: what the app may say and keep." },
+    "lang": { "name": "Languages", "why": "English first; Serbian and German next; food names already carry the local name by region." },
+    "ops": { "name": "Measuring and releases", "why": "Metrics, evals, walkthroughs and the releases page: how we know the app works and what shipped." }
+  },
+  "versions": ["0.3.50", "0.3.49", "0.3.48", "0.3.47", "0.3.46", "0.3.45", "0.3.44"],
+  "tickets": [
+    { "id": "DT212", "title": "A plate that ends", "epic": "plate", "state": "now", "board": 159, "why": "The Plate kept adding foods and resolved nothing; a plate from an earlier meal asks Did you eat it, alone." },
+    { "id": "DT211", "title": "Cooking you can find", "epic": "cook", "state": "now", "board": 158, "why": "Milan could not find the voice or the second phone; Start cooking moves onto the recipe." },
+
+    { "id": "DT202", "title": "A mark on each recipe: From the kitchen, or On paper", "epic": "home", "state": "next", "why": "\"Every recipe is tried on himself first\" says too much. Agreed in brainstorm, parked by Milan, not drawn." },
+    { "id": "DT203", "title": "Languages: Serbian and German after English", "epic": "lang", "state": "next", "why": "Brainstormed. Open: who reviews German, Latin or Cyrillic for Serbian, AI answers first or screens first." },
+
+    { "id": "DT197", "title": "The rulebook: what the app may say", "epic": "trust", "state": "later" },
+    { "id": "DT195", "title": "A reaction on every claim in Explorer", "epic": "explorer", "state": "later", "board": 143, "why": "Drawn, parked by Milan." },
+    { "id": "f17", "title": "Privacy tracker, the last small finding", "epic": "trust", "state": "later", "why": "Parked with DT196." },
+    { "id": "EX2", "title": "Explorer: Carbs, Fats, Micros", "epic": "explorer", "state": "later" },
+    { "id": "EX3", "title": "Explorer: hormones, insulin, blood sugar, kept on the wellness line", "epic": "explorer", "state": "later" },
+    { "id": "EV1", "title": "Photo evals: about 20 weighed plates from Milan and Tester 3", "epic": "ops", "state": "later" },
+    { "id": "OP1", "title": "Publish the walkthroughs page again (last 0.3.44)", "epic": "ops", "state": "later" },
+    { "id": "OP2", "title": "Public Releases page on chefmealan.com, from Done", "epic": "ops", "state": "later", "why": "Milan 2 November: wanted, late." },
+    { "id": "R1", "title": "Two old recipes with the same name show their date", "epic": "cook", "state": "later" },
+
+    { "id": "DT210", "title": "Clients, the coach's sixth tab; a client's page with tabs", "epic": "coach", "state": "done", "board": 157, "version": "0.3.50" },
+    { "id": "DT209", "title": "Setup ends on Your summary; My coach its own row; the summary's end", "epic": "setup", "state": "done", "board": 156, "version": "0.3.50" },
+    { "id": "DT208", "title": "One row under the goal: To set, or Profile and plan fully set", "epic": "setup", "state": "done", "board": 155, "version": "0.3.49" },
+    { "id": "HP6", "title": "The calculator section, Try it here", "epic": "home", "state": "done", "board": 150, "version": "0.3.48" },
+    { "id": "DT205", "title": "Profile kept as you go", "epic": "setup", "state": "done", "board": 152, "version": "0.3.48" },
+    { "id": "DT206", "title": "An older plate asks; a drink is a drink with the meal", "epic": "plate", "state": "done", "board": 153, "version": "0.3.48" },
+    { "id": "DT207", "title": "Five small fixes: Metrics, shopping lists, Clients, Travel, summary links", "epic": "plate", "state": "done", "board": 154, "version": "0.3.48" },
+    { "id": "DT204", "title": "Food names in one language, the local name in shops", "epic": "lang", "state": "done", "board": 151, "version": "0.3.47" },
+    { "id": "HP5", "title": "The button over a carousel of Milan's own cooking", "epic": "home", "state": "done", "board": 149, "version": "0.3.46" },
+    { "id": "HP4b", "title": "Milan as recipe builder and cook", "epic": "home", "state": "done", "version": "0.3.45" },
+    { "id": "HP4", "title": "Who it's for, the disclaimer, Milan's line", "epic": "home", "state": "done", "version": "0.3.44" }
+  ]
+}
