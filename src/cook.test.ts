@@ -67,3 +67,15 @@ test("what is left, and the step as it is read aloud", () => {
   assert.equal(clock(220), "3:40");
   assert.equal(minutesWords(360), "6 minutes");
 });
+
+// 0.3.54 (Coach Milan 2 November 14:20): the phone heard its own voice and talked to itself in a circle
+import { isEcho as echo } from "./cook";
+test("0.3.54: the phone's own words heard back are not a command; the cook's are", () => {
+  const help = "I heard you, but that isn't something I can do yet. Say next, back, repeat, how much, timer, what's left or stop. Start with Chef to ask about the dish.";
+  assert.equal(echo("repeat how much timer once left or stop start with Chef to ask about the dish", help), true);
+  assert.equal(echo("recipe", "Timer once left or stop start with chef to ask about the dish is not in this recipe."), true);
+  assert.equal(echo("how much rice", "Step 2. Cut 160 grams chicken into strips."), false);
+  assert.equal(echo("timer 6 minutes", "Step 4. Heat 8 grams olive oil in a pan. Fry the chicken 6 minutes."), false);
+  assert.equal(echo("next", "Step 1. Put 25 grams vanilla whey protein powder in a bowl."), false);
+  assert.equal(echo("next", help), false, "next right after the help line is the cook's");
+});

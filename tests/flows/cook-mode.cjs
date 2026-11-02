@@ -34,7 +34,8 @@ const PORT = "3194", B = `http://127.0.0.1:${PORT}`;
       if (!sessionStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); sessionStorage.setItem("seeded", "1"); }
       // the stand-in voice: what is read aloud is kept
       window.__spoken = [];
-      const synth = { speak: (u) => window.__spoken.push(u.text), cancel: () => {}, getVoices: () => [] };
+      // the stand-in voice says when it has finished, as a phone does (0.3.54: nothing is heard while it speaks)
+      const synth = { speak: (u) => { window.__spoken.push(u.text); queueMicrotask(() => u.onend && u.onend()); }, cancel: () => {}, getVoices: () => [] };
       Object.defineProperty(window, "speechSynthesis", { value: synth, configurable: true });
       window.SpeechSynthesisUtterance = function (t) { this.text = t; };
       // the stand-in screen lock
@@ -81,6 +82,10 @@ const PORT = "3194", B = `http://127.0.0.1:${PORT}`;
     ok(await cm.locator(".cook-ask").count() === 0 && /Listening/.test(await cm.locator(".cook-listen").textContent()), "the ask goes, and the screen says it is listening");
     await say("next");
     ok(/2 of 6/.test(await cm.locator(".cook-count").textContent()) && /^Step 2\. Cut 160 grams chicken/.test(await page.evaluate(() => window.__spoken.at(-1))), "next: step 2, read aloud");
+    // 0.3.54 (Coach Milan 14:20): the microphone hears the phone read step 2; its own words are not a command, so no answer and no circle
+    const told = await page.evaluate(() => window.__spoken.length);
+    await say("Cut 160 grams chicken into strips. Season with salt and pepper.");
+    ok(/2 of 6/.test(await cm.locator(".cook-count").textContent()) && (await page.evaluate(() => window.__spoken.length)) === told, "its own words heard back: nothing said, nothing done, no circle");
     await say("How much rice?");
     ok(/80 g rice\. In step 1\.|80 g basmati rice\. In step 1\./.test(await cm.locator(".cook-heard").textContent()), "how much rice: the amount cooked, and its step");
     await say("back");

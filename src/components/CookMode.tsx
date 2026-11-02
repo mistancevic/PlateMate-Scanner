@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Ingredient } from "../pilot";
 import { stepParts, stepText } from "../steps";
 import { tempsIn } from "../units";
-import { secondsIn, timerName, parseCommand, howMuch, leftLine, spoken, clock, minutesWords, voiceChoice, setVoiceChoice, type VoiceChoice } from "../cook";
+import { secondsIn, timerName, parseCommand, howMuch, leftLine, spoken, clock, minutesWords, voiceChoice, setVoiceChoice, isEcho, type VoiceChoice } from "../cook";
 
 type Timer = { id: number; name: string; ends: number; total: number; rang: boolean };
 const Speech = () => (typeof window === "undefined" ? null : (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null);
@@ -41,9 +41,24 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   // the newest values, for the speech callbacks
   const live = useRef({ k, done, on, steps, items }); live.current = { k, done, on, steps, items };
 
+  // 0.3.54: what the phone is saying, so the microphone does not take its own voice for the cook's (see isEcho in cook.ts)
+  const voiceOut = useRef<{ speaking: boolean; tail: boolean; text: string; timers: number[] }>({ speaking: false, tail: false, text: "", timers: [] });
+  const endSpeak = (u?: unknown) => {
+    const v = voiceOut.current; if (u && (u as any) !== (voiceOut as any).lastU) return;
+    v.speaking = false; v.tail = true;
+    v.timers.forEach((t) => clearTimeout(t)); v.timers = [window.setTimeout(() => { v.tail = false; }, 2500)];
+  };
   const say = (text: string) => {
     if (!live.current.on || !canSpeak()) return;
-    try { const u = new SpeechSynthesisUtterance(text); u.lang = "en-GB"; u.rate = 0.95; window.speechSynthesis.cancel(); window.speechSynthesis.speak(u); } catch { /* the phone has no voice: the screen says it */ }
+    try {
+      const u = new SpeechSynthesisUtterance(text); u.lang = "en-GB"; u.rate = 0.95;
+      const v = voiceOut.current; v.speaking = true; v.tail = false; v.text = text; (voiceOut as any).lastU = u;
+      v.timers.forEach((t) => clearTimeout(t));
+      // a phone that never says it finished: the words' own length, then the tail
+      v.timers = [window.setTimeout(() => endSpeak(u), 1500 + text.split(/\s+/).length * 450)];
+      u.onend = () => endSpeak(u); u.onerror = () => endSpeak(u);
+      window.speechSynthesis.cancel(); window.speechSynthesis.speak(u);
+    } catch { /* the phone has no voice: the screen says it */ }
   };
   // the screen stays on while cooking; asked again when the page comes back
   useEffect(() => {
@@ -127,7 +142,13 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
       if (stopped) return;
       try {
         r = new S(); r.lang = "en-GB"; r.continuous = true; r.interimResults = false;
-        r.onresult = (e: any) => { const last = e.results[e.results.length - 1]; if (last?.isFinal !== false) hearRef.current(String(last[0].transcript || "")); };
+        r.onresult = (e: any) => {
+          const last = e.results[e.results.length - 1]; if (last?.isFinal === false) return;
+          const said = String(last[0].transcript || ""), v = voiceOut.current;
+          // 0.3.54: nothing while the phone speaks; just after, its own words are not the cook's
+          if (v.speaking || (v.tail && isEcho(said, v.text))) return;
+          hearRef.current(said);
+        };
         r.onerror = (e: any) => { if (e?.error === "not-allowed" || e?.error === "service-not-allowed") { stopped = true; setListenNote("The microphone is blocked for this site. Allow it in the browser's settings, or use the buttons."); } };
         r.onend = () => { if (!stopped) setTimeout(start, 300); };
         r.start(); setListenNote("");

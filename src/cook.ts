@@ -82,3 +82,18 @@ export const VOICE_KEY = "chefmealan-cook-voice";
 export type VoiceChoice = "on" | "off" | null;
 export function voiceChoice(): VoiceChoice { try { const v = localStorage.getItem(VOICE_KEY); return v === "on" || v === "off" ? v : null; } catch { return null; } }
 export function setVoiceChoice(v: "on" | "off") { try { localStorage.setItem(VOICE_KEY, v); } catch { /* private mode: asked again next time */ } }
+
+// 0.3.54 (Coach Milan 2 November 14:20, on the preview): the microphone heard the phone's own voice. It read its answer aloud,
+// heard part of it ("recipe", "repeat how much timer ... about the dish") as a command, answered that, and went round in a
+// circle while his own words were lost. While the phone speaks nothing is taken; just after, words that are the phone's own
+// line are dropped. A short command of the cook's (next, back) stays a command.
+const wordsOf = (t: string) => t.toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(Boolean);
+export function isEcho(heard: string, spoken: string): boolean {
+  const h = wordsOf(heard), s = new Set(wordsOf(spoken));
+  if (!h.length || !s.size) return false;
+  // one or two words that are a plain command (next, back, repeat, stop, what's left) are the cook's, even right after the help line
+  const k = parseCommand(heard).kind;
+  if (h.length <= 2 && (k === "next" || k === "back" || k === "repeat" || k === "stop" || k === "left")) return false;
+  const inIt = h.filter((w) => s.has(w)).length;
+  return inIt / h.length >= 0.7;
+}
