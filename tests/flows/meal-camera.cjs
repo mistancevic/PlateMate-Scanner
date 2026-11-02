@@ -83,7 +83,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   ok(sent.length === 1, "DT130: nothing is read before Read the plate");
   ok(/A photo from 12:20 today\.\s?Whose plate, and when\?/.test(await text(".pa-top")), "DT130: the photo's own time, from the photo: " + await text(".pa-top"));
   const c1 = await chips();
-  ok(c1.length === 3 && /^✓\s?Ate at$/.test(c1[0]) && c1[1] === "Eating now" && c1[2] === "Exploring" && await page.locator(".pa-time").inputValue() === "12:20", "DT130: three short chips, Ate at 12:20 on (45 minutes ago): " + c1.join(" | "));
+  ok(c1.length === 3 && /^✓\s?Ate at 12:20$/.test(c1[0]) && c1[1] === "Eating now" && c1[2] === "Exploring" && await page.locator(".pa-time").inputValue() === "12:20", "DT130: three short chips, Ate at 12:20 on (45 minutes ago): " + c1.join(" | "));
   ok(await page.locator(".pa-chip.on").count() === 1 && await page.locator(".pa-chip[aria-checked=true]").count() === 1, "DT130: one chip on");
   const line1 = await text(".pa small");
   ok(/^Logged at 12:20, as lunch\. Tap the time to change it\.$/.test(line1), "DT130: the line says what the chip on does: " + line1);

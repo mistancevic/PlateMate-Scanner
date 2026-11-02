@@ -78,6 +78,15 @@ const READ = { dish: "Schnitzel with roasted potatoes", foods: [
     await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); await page.locator(".cam-analyze").click(); await page.waitForTimeout(2200);
     const s2 = await st();
     ok(s2.photo?.who === "idea" && s2.pick === "exploring" && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1, "Exploring first: the camera's photo is Exploring, with the idea's buttons");
+    // ---- 0.3.65: Exploring in the pencil box on a meal of the plan too ----
+    await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(400);
+    await page.locator("nav button").filter({ hasText: "Plan" }).click(); await page.waitForTimeout(900);
+    await page.getByRole("tab").filter({ hasText: /28/ }).first().click(); await page.waitForTimeout(600);
+    await page.locator(".past-add .past-plate").filter({ hasText: "Lunch" }).getByRole("button", { name: "Add what you ate" }).click(); await page.waitForTimeout(1000);
+    await page.locator(".plan-line-pen").click(); await page.waitForTimeout(300);
+    ok(await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Exploring" }).count() === 1, "0.3.65: on Adding Wednesday's lunch the pencil box has Exploring");
+    await page.getByRole("radiogroup", { name: "What the plate is for" }).getByRole("button", { name: "Exploring" }).click(); await page.waitForTimeout(500);
+    ok(!/Adding Wednesday's lunch/.test(await text(".step-head")) && (await st()).pick === "exploring" && /Exploring/.test(await text(".plan-line")), "0.3.65: Exploring leaves Wednesday's lunch");
     await ctx.close();
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);
   } catch (e) { ok(false, "walkthrough crashed: " + (e && e.message)); }
