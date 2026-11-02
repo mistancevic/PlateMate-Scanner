@@ -97,7 +97,7 @@ const STEPS = ["in", "recipe", "make", "made", "after"] as const;
 // DT211 v8 (0.3.53, board Stories158): the third step is Eat, everywhere
 const PHASES = ["Craft", "Make", "Eat"] as const;
 const phaseOf = (n: number) => (n <= 3 ? 0 : n === 4 ? 1 : 2);
-function stepHead({ n, title, sub, nameField, back, label }: { n: number; title: string; sub?: string; back?: React.ReactNode; label?: string; nameField?: { value: string; placeholder: string; onChange: (v: string) => void; onCommit?: (v: string) => void } }) {
+function stepHead({ n, title, sub, nameField, back, label, bare }: { n: number; title: string; sub?: string; back?: React.ReactNode; label?: string; bare?: boolean; nameField?: { value: string; placeholder: string; onChange: (v: string) => void; onCommit?: (v: string) => void } }) {
   const ph = phaseOf(n);
   // DT149 (0.2.130): planning or adding what you ate has no Make and no Feedback: one label in place of the three phases
   if (label) return (
@@ -111,7 +111,8 @@ function stepHead({ n, title, sub, nameField, back, label }: { n: number; title:
   return (
     <div className="step-head">
       {back}
-      <div className="phase-bar" aria-label={`Phase ${ph + 1} of 3, ${PHASES[ph]}`}>{PHASES.map((x, i) => <span key={x} className={i <= ph ? "on" : ""}><i />{x}</span>)}</div>
+      {/* DT224 (0.3.60, board Stories165): an empty Plate is the start screen; Craft, Make, Eat once it holds something */}
+      {!bare && <div className="phase-bar" aria-label={`Phase ${ph + 1} of 3, ${PHASES[ph]}`}>{PHASES.map((x, i) => <span key={x} className={i <= ph ? "on" : ""}><i />{x}</span>)}</div>}
       {nameField ? <input className="title-input" aria-label="Name of the meal" value={nameField.value} placeholder={nameField.placeholder} onChange={(e) => nameField.onChange(e.target.value)} onBlur={(e) => nameField.onCommit?.(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" /> : <h2>{title}</h2>}
       {sub && <p>{sub}</p>}
     </div>
@@ -1176,7 +1177,7 @@ export function JourneyScreen(p: AppApi) {
       })
       .catch((e: any) => setPlateDraft(e?.message || `${CHEF_NAME} could not answer. Try again.`));
   }
-  const Head = ({ title, sub, name, back }: { title: string; sub?: string; name?: boolean; back?: typeof STEPS[number] }) => stepHead({ n, title, sub, label: p.filling && plateWhen !== "now" ? `${plateWhen === "plan" ? "Planning" : "Adding"} ${slotName(p.filling)}` : undefined, back: back ? <Back to={back} /> : undefined, nameField: name ? { value: state.title === "DaaM" ? "" : state.title, placeholder: items.length ? autoTitle(items) : "Name the meal", onChange: (v: string) => setState((s) => ({ ...s, title: v })), onCommit: (v: string) => p.renamePlate(v) } : undefined });
+  const Head = ({ title, sub, name, back }: { title: string; sub?: string; name?: boolean; back?: typeof STEPS[number] }) => stepHead({ n, title, sub, bare: step === "in" && items.length === 0 && !state.photo && !state.fromRecipe && !p.filling, label: p.filling && plateWhen !== "now" ? `${plateWhen === "plan" ? "Planning" : "Adding"} ${slotName(p.filling)}` : undefined, back: back ? <Back to={back} /> : undefined, nameField: name ? { value: state.title === "DaaM" ? "" : state.title, placeholder: items.length ? autoTitle(items) : "Name the meal", onChange: (v: string) => setState((s) => ({ ...s, title: v })), onCommit: (v: string) => p.renamePlate(v) } : undefined });
   // 0.2.54, design system rule E (board DS2): Back sits top left, above the step bar, and says where it goes
   // DT211 v8 (0.3.53): Eat goes back to making it
   const BACK_TO: Record<string, string> = { in: "the plate", recipe: "the amounts", make: "making it", made: "making it" };
@@ -1213,14 +1214,15 @@ export function JourneyScreen(p: AppApi) {
   const [resumeAsk, setResumeAsk] = useState(() => !!state.cook?.inView && cookStarted(state.cook) && step === "made");
   // DT212 v4 (board Stories159): Read the photo again asks first
   const [readAgain, setReadAgain] = useState(false);
-  const stepPhotoFile = (k: number, file?: File | null) => {
+  // DT223 (0.3.60): from cook mode the photo is the recipe's step picture, taken again or not (keep)
+  const stepPhotoFile = (k: number, file?: File | null, keep = false) => {
     if (!file) return;
     const r = new FileReader();
     r.onload = () => thumbnailBase64(String(r.result), 480).then((d) => {
       setStepPhotos((x) => ({ ...x, [String(k)]: d }));
       // DT211 v8 (gap 6): the step's photo on the recipe too, when the step has none yet; else it stays with the cook
       const m = cookRecipe, words = m?.steps?.[k];
-      if (m && words !== undefined && !stepPicOf(m, words)) setState((st) => ({ ...st, meals: st.meals.map((x) => (x.id === m.id ? { ...x, ...setStepPic(x, k, { src: d, by: "me" }) } : x)) }));
+      if (m && words !== undefined && (keep || !stepPicOf(m, words))) setState((st) => ({ ...st, meals: st.meals.map((x) => (x.id === m.id ? { ...x, ...setStepPic(x, k, { src: d, by: "me" }) } : x)) }));
     }).catch(() => {});
     r.readAsDataURL(file);
   };
@@ -2243,7 +2245,15 @@ export function JourneyScreen(p: AppApi) {
             if (!r.ok) throw new Error(d.error || "Chef Mealan could not answer. Ask again.");
             return String(d.reply || "");
           } : null}
-          pics={(() => { const src = rec?.steps?.length ? rec : plateRecipe?.steps?.length ? plateRecipe : null; return madeSteps.map((t) => stepPicOf(src, t)); })()} />}
+          pics={(() => { const src = rec?.steps?.length ? rec : plateRecipe?.steps?.length ? plateRecipe : null; return madeSteps.map((t, k) => (stepPhotos[String(k)] ? { src: stepPhotos[String(k)], by: "me" as const } : stepPicOf(src, t))); })()}
+          link={{
+            // DT222 (0.3.60, board Stories165): done leads to Eat: the meal's photo, then Cooked. Next: Eat
+            since: state.cook?.startedAt,
+            mealPhoto: { src: plate, take: (file) => { const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 480).then(setPlate).catch(() => {}); r.readAsDataURL(file); } },
+            eat: () => { setCooking(false); log("made", { went, photos: Object.keys(stepPhotos).length + (plate ? 1 : 0), from: "cook" }); setStep("after"); },
+            // DT223 (0.3.60): a photo of this step, kept with the recipe when there is one
+            stepPhoto: { take: (k, file) => stepPhotoFile(k, file, true), kept: !!(cookRecipe && cookRecipe.steps?.length) },
+          }} />}
         {/* DT211 v8 (0.3.53, board Stories158): each step has + Photo beside its tick, so the photos are taken where they happen */}
         {madeSteps.length > 0 && (
           <section className="card mk-card" aria-label="The steps">

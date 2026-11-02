@@ -48,7 +48,9 @@ export function PairedCookMode(x: Parameters<typeof CookMode>[0] & { notify: (m:
     return () => { stop = true; clearInterval(id); };
   }, [code, joined]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => () => { const c = codeRef.current; if (c) void post("/api/cook/update", { code: c, end: true }).catch(() => {}); }, []);
+  // DT222, DT223 (0.3.60): what the screen that opened cook mode passes (Eat, the photos) stays with it
   const link: CookLink = {
+    ...cook.link,
     remoteStep: remote,
     onStep: (k) => { setAt(k); const c = codeRef.current; if (c && joined) void post("/api/cook/update", { code: c, step: k }).then((d) => { seen.current = Math.max(seen.current, d.session.rev); }).catch(() => {}); },
     top: code && joined ? <div className="cook-link" role="status"><small>Also on the kitchen screen · step {at + 1} of {cook.steps.length}</small><button className="pill pill-small" onClick={() => end()}>End</button></div> : null,
