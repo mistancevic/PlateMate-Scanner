@@ -4,6 +4,8 @@
 //   node scripts/run-flows.cjs today plan  only the names given
 //   node scripts/run-flows.cjs --count    how many walkthroughs there are
 //   LANES=3 node scripts/run-flows.cjs    more lanes
+// Every walkthrough also ends with the save check (rule S1, docs/rules/storage.md): what its phone would send to the account,
+// built by the app's own code, holds nothing the account refuses.
 // Every full run also writes tests/flows-report.json (not in git) and docs/qa/runs/<version>.json (in git): each walkthrough, what it covers (its opening comment), every
 // check it made with ok or FAIL, and the time; scripts/flows-page.cjs turns it into the Walkthroughs page (Milan, 22 October).
 const fs = require("node:fs"), path = require("node:path"), { spawn } = require("node:child_process");
@@ -23,7 +25,8 @@ const run = (file, port) => new Promise((resolve) => {
   let body = src; for (const p of ports) body = body.split(p).join(String(port));
   const tmp = path.join(DIR, `_lane-${port}-${file}`); fs.writeFileSync(tmp, body);
   const t = Date.now(); let out = "";
-  const ch = spawn(process.execPath, [tmp], { env: process.env, cwd: path.resolve(__dirname, "..") });
+  // S1 (2 November 2026): every walkthrough ends with the save check, scripts/save-check.cjs
+  const ch = spawn(process.execPath, ["--import", "tsx", "--require", path.resolve(__dirname, "save-check.cjs"), tmp], { env: process.env, cwd: path.resolve(__dirname, "..") });
   ch.stdout.on("data", (d) => (out += d)); ch.stderr.on("data", (d) => (out += d));
   const kill = setTimeout(() => { out += "\nFAIL timed out after 6 minutes"; ch.kill("SIGKILL"); }, 6 * 60_000);
   ch.on("close", (code) => {
