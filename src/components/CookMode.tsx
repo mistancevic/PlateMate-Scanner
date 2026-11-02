@@ -18,7 +18,7 @@ export type CookLink = { remoteStep?: { k: number; rev: number } | null; onStep?
 export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = null, pics = [], link = {}, moves }: {
   title: string; steps: string[]; items: Ingredient[]; ticks: Set<number>;
   // DT217 (0.3.56): the moves of each step as Chef Mealan drafted them; a step without them gets them in code (movesFor)
-  moves?: (string[] | null | undefined)[];
+  moves?: import("../pilot").StepMoves;
   onTick: (k: number) => void; onClose: () => void;
   // DT175 (0.3.17): a question to Chef Mealan about this step; null when the AI is off
   ask?: ((question: string, step: number, history: { role: "cook" | "chef"; text: string }[]) => Promise<string>) | null;
@@ -31,7 +31,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   const [done, setDone] = useState(false);
   // DT217 v2 (0.3.56, board Stories163): the move in this step being read; the whole step stays on screen above the moves
   const [m, setM] = useState(0);
-  const movesOf = (j: number) => movesFor(steps[j] ?? "", moves?.[j]);
+  const movesOf = (j: number) => movesFor(steps[j] ?? "", moves?.[j]?.m);
   // DT175a: the steps already finished, to show the ticks on the step buttons (only Next ticks)
   const [doneSet, setDoneSet] = useState<Set<number>>(() => new Set(ticks));
   const [voice, setVoice] = useState<VoiceChoice>(voiceChoice());

@@ -87,7 +87,7 @@ type ChefState = { status: "working" } | { status: "done"; options: MealOption[]
 type SideOpt = { name: string; kind: SideKind; note: string; food: Food; grams: number; dish: Ingredient[]; yours: boolean };
 // part and before (0.2.19, IM16): a change inside one part, and the plate before it, for Back to the original
 // a change keeps the whole recipe as changed (0.2.23, IM23): its foods at the recipe's own size, and the steps drafted for it
-type Drafted = { steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[]; moves?: (string[] | null)[] };
+type Drafted = { steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[]; moves?: import("../pilot").StepMoves };
 type Way = { kind: "change"; title: string; notes: string[]; part?: string; before?: Ingredient[]; whole?: Ingredient[]; drafted?: Drafted } | { kind: "side"; options: SideOpt[]; pick: number };
 const readFile = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 
@@ -143,7 +143,7 @@ export function JourneyScreen(p: AppApi) {
   // DT89 (0.2.87, board Stories58): the steps for a plate you cook that is no recipe yet, drafted on How to make it, kept at Save
   // DT150 (0.2.131): foods, the foods the steps were written for (ids), and its, the plate then: a change of amounts keeps the
   // steps (they never say an amount, C42); a change of foods makes them out of date
-  const [plateSteps, setPlateSteps] = useState<{ steps: string[]; sig: string; foods?: string; its?: Ingredient[]; moves?: (string[] | null)[] } | null>(() => (ui0.plateSteps as any) ?? null);
+  const [plateSteps, setPlateSteps] = useState<{ steps: string[]; sig: string; foods?: string; its?: Ingredient[]; moves?: import("../pilot").StepMoves } | null>(() => (ui0.plateSteps as any) ?? null);
   const [plateDraft, setPlateDraft] = useState<string>("");
   const [ownSteps, setOwnSteps] = useState<string | null>(null);
   // When Mealan produces options, the first one becomes the recipe on screen.
@@ -2169,13 +2169,13 @@ export function JourneyScreen(p: AppApi) {
     // DT94: the steps of what is being made: the recipe's, the plate's drafted ones, or the way picked for a bowl
     const madeSteps0: string[] = (rec?.steps?.length ? rec.steps : plateRecipe?.steps?.length ? plateRecipe.steps : plateSteps?.steps?.length ? plateSteps.steps : (methodsFor(items).find((w) => w.id === method)?.steps ?? []));
     // DT217 (0.3.56): the moves cook mode reads, as drafted with these steps; a step without them gets them in code
-    const madeMoves0: (string[] | null)[] | undefined = rec?.steps?.length ? rec.moves : plateRecipe?.steps?.length ? plateRecipe.moves : plateSteps?.steps?.length ? plateSteps.moves : undefined;
+    const madeMoves0: import("../pilot").StepMoves | undefined = rec?.steps?.length ? rec.moves : plateRecipe?.steps?.length ? plateRecipe.moves : plateSteps?.steps?.length ? plateSteps.moves : undefined;
     // DT174: the amounts the steps say: the whole recipe when you make all of it, else your plate
     const stepItems: Ingredient[] = madeWhole && rec ? rec.items : items;
     // DT214 v2: a food used in the dish in place of another takes its place in the steps; the recipe stays as it is
     const follow = (t: string) => (plateRecipe ? t.replace(TOKEN, (all, id: string) => { const it = stepItems.find((x) => x.id === id), was = plateRecipe.items.find((x) => x.id === id); return it && was && it.food.id !== was.food.id ? `[[i:${id}|${it.food.name.split(",")[0].trim().toLowerCase()}]]` : all; }) : t);
     const madeSteps = madeSteps0.map(follow);
-    const madeMoves = madeMoves0?.map((m) => (m ? m.map(follow) : m));
+    const madeMoves = madeMoves0?.map((x) => ({ m: (x?.m ?? []).map(follow) }));
     const dishName = (state.title && state.title !== "DaaM" ? state.title : autoTitle(items)).slice(0, 40);
     const tick = (k: number) => setTicks((tk) => { const n = new Set(tk); if (n.has(`s${k}`)) n.delete(`s${k}`); else n.add(`s${k}`); return n; });
     return (

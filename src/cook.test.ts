@@ -112,7 +112,7 @@ test("DT217: Chef Mealan's moves are checked; a step that fails gets them in cod
   const items = [{ id: "a", food: { name: "Eggs" } }, { id: "b", food: { name: "Milk" } }] as any;
   const tok = (i: any) => `[[i:${i.id}|${i.food.name.toLowerCase()}]]`;
   const r = movesFromDraft([["Crack {1} into a bowl.", "Pour in {2}.", "Whisk until smooth."], ["Heat a pan."]], ["Whisk {1} and {2} in a bowl.", "Heat a pan."], items, tok);
-  assert.deepEqual(r, [["Crack [[i:a|eggs]] into a bowl.", "Pour in [[i:b|milk]].", "Whisk until smooth."], ["Heat a pan."]]);
+  assert.deepEqual(r, [{ m: ["Crack [[i:a|eggs]] into a bowl.", "Pour in [[i:b|milk]].", "Whisk until smooth."] }, { m: ["Heat a pan."] }]);
   assert.deepEqual(movesFromDraft([["Add {1} and {2}."]], ["Whisk {1} and {2}."], items, tok), undefined, "two foods in one move");
   assert.deepEqual(movesFromDraft([["Add {1}."]], ["Whisk {1} and {2}."], items, tok), undefined, "a food left out");
   assert.deepEqual(movesFromDraft([["Add 100 g {1}.", "Add {2}."]], ["Whisk {1} and {2}."], items, tok), undefined, "an amount typed");

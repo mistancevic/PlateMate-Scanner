@@ -4,6 +4,7 @@
 // the other phone deletes it too instead of bringing it back. Pure functions here; the account calls are in cloud.ts.
 import { photoSigsOf, samePhotos, sig, stripStepPics } from "./photos";
 import { cleanMealNames, cleanCardNames, cleanFoodNames } from "./entities";
+import { fixMoves } from "./pilot";
 // R1 (0.2.29): a record from the account with the page's codes in its names reads as letters; the clean copy goes back up
 const cleanNames = (kind: Kind, d: any) => (kind === "foods" ? cleanFoodNames(d) : kind === "recipes" ? cleanMealNames(d) : cleanCardNames(d));
 export type Kind = "foods" | "recipes" | "cards";
@@ -24,6 +25,7 @@ const stripFood = (f: any) => { if (f && typeof f === "object") { if (Array.isAr
 export function clean(kind: Kind, x: any): any {
   const c = JSON.parse(JSON.stringify(x ?? null));
   if (!c) return c;
+  fixMoves(c); // 0.3.57: never a list inside a list in the account
   // which photos it has travels with it (the photos themselves are files), so another phone fetches the right ones
   if (kind === "foods") { const ps = photoSigsOf(c); if (ps) c.photoSigs = ps; stripFood(c); }
   if (kind === "recipes") { const ps = photoSigsOf(c); if (ps) c.photoSigs = ps; stripFood(c); (c.items ?? []).forEach((i: any) => stripFood(i?.food));
