@@ -80,7 +80,7 @@ const U = "http://127.0.0.1:3215";
   ok(!(await st()).meals.find((m) => m.id === orig.id).steps?.length, "IM23: the original recipe is not touched by the draft");
 
   // IM23b: Save keeps the changed dish as a whole recipe
-  await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|Lock it and cook ›)$/ }).click(); await page.waitForTimeout(500);
+  await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|Lock it and cook ›|Make it ›)$/ }).click(); await page.waitForTimeout(500);
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(500);
   t = await text("main");
   ok(/Save your changed dish/.test(t) && /No-bake cheesecake, more protein: the whole recipe, 10 slices, with the steps for your change\. Adapted from No-bake cheesecake, Sally's Baking Addiction; its original steps come along, for you only\./.test(t), "IM23b: Save your changed dish says what is kept");

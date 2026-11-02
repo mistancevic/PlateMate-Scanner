@@ -52,7 +52,7 @@ const PORT = "3345", B = `http://127.0.0.1:${PORT}`;
     await page.getByRole("button", { name: "Keep my steps" }).click(); await page.waitForTimeout(400);
     ok(/Your recipe had the bowl steps from an earlier save\. Lock it and cook keeps these new steps with it\./.test(await main()), "the line says the recipe had the bowl steps, and Lock it and cook keeps the new ones (DT220)");
     ok(await page.locator(".mk-steps-for").textContent() === "Make reads these steps aloud, one at a time, and you tick them as you go. Lock it and cook keeps them with the recipe." && await page.getByRole("button", { name: "Lock the recipe", exact: true }).count() === 0, "DT220: one line says what the steps are for; the button says what comes next");
-    await page.getByRole("button", { name: "Lock it and cook ›", exact: true }).click(); await page.waitForTimeout(900);
+    await page.getByRole("button", { name: "Lock it and cook ›", "Make it ›", exact: true }).click(); await page.waitForTimeout(900);
     let r = (await store(page)).meals.find((m) => m.id === "m-cr");
     ok(r.steps.length === 3 && /Whisk 104 g eggs/.test(r.steps[0]) && !r.way, "Lock it and cook keeps the new steps with the recipe; the bowl way is gone");
     // ---- DT217 v2: the whole step on top, the moves under it ----
