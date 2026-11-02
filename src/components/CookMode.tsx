@@ -5,6 +5,8 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Ingredient } from "../pilot";
 import { stepParts, stepText } from "../steps";
 import { tempsIn } from "../units";
+import { utterance, voiceSettings } from "../voiceSettings";
+import { VoiceSettingsPanel } from "./VoiceSettings";
 import { secondsIn, timerName, parseCommand, howMuch, leftLine, spoken, clock, minutesWords, voiceChoice, setVoiceChoice, isEcho, cutsIn, movesFor, SAY_AGAIN, canSayLine, type VoiceChoice } from "../cook";
 
 // DT222: how many steps and, when the cook's start is known, how long it took
@@ -44,6 +46,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   // DT175a: the steps already finished, to show the ticks on the step buttons (only Next ticks)
   const [doneSet, setDoneSet] = useState<Set<number>>(() => new Set(ticks));
   const [voice, setVoice] = useState<VoiceChoice>(voiceChoice());
+  const [voicePage, setVoicePage] = useState(false);
   const [heard, setHeard] = useState<{ said: string; answer: string; chef?: boolean; step?: number; working?: boolean; hint?: string } | null>(null);
   const [typed, setTyped] = useState("");
   const asked = useRef<{ role: "cook" | "chef"; text: string }[]>([]);
@@ -65,7 +68,8 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   const say = (text: string) => {
     if (!live.current.on || !canSpeak()) return;
     try {
-      const u = new SpeechSynthesisUtterance(text); u.lang = "en-GB"; u.rate = 0.95;
+      // DT215 v3 (0.3.66): the voice and the speed from Settings, Voice while cooking
+      const u = utterance(text);
       const v = voiceOut.current; v.speaking = true; v.tail = false; v.text = text; (voiceOut as any).lastU = u;
       v.timers.forEach((t) => clearTimeout(t));
       // a phone that never says it finished: the words' own length, then the tail
@@ -169,7 +173,8 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
           const said = String(last[0].transcript || ""), v = voiceOut.current;
           // 0.3.54: nothing while the phone speaks; just after, its own words are not the cook's
           // 0.3.55: a command of the cook's cuts in while the phone reads: the reading stops, the command is done
-          if (v.speaking) { if (!cutsIn(said, v.text)) return; try { window.speechSynthesis.cancel(); } catch { /* nothing to stop */ } v.speaking = false; v.tail = true; hearRef.current(said); return; }
+          // DT215 v3: Cut in off in Settings: the phone finishes the sentence first
+          if (v.speaking) { if (!voiceSettings().cutIn || !cutsIn(said, v.text)) return; try { window.speechSynthesis.cancel(); } catch { /* nothing to stop */ } v.speaking = false; v.tail = true; hearRef.current(said); return; }
           if (v.tail && isEcho(said, v.text)) return;
           hearRef.current(said);
         };
@@ -188,6 +193,12 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   const sec = done ? null : secondsIn(mvs.length > 1 ? mvNow : steps[k]);
   const name = done ? "" : timerName(steps[k], k);
   const running = timers.some((t) => !t.rang && t.name === name);
+  if (voicePage) return (
+    <div className="cook-mode" role="dialog" aria-label="Voice while cooking">
+      <div className="cook-top"><button className="pill pill-small" style={{ minHeight: 44 }} onClick={() => setVoicePage(false)}>‹ Back to cooking</button><b className="cook-title">Voice while cooking</b><small className="cook-count">{k + 1} of {steps.length}</small></div>
+      <VoiceSettingsPanel onChange={(o) => setVoice(o ? "on" : "off")} />
+    </div>
+  );
   return (
     <div className="cook-mode" role="dialog" aria-label={`Cooking ${title}`}>
       <div className="cook-top">
@@ -289,9 +300,11 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
               <span className={`cook-dot ${on ? "on" : ""}`} aria-hidden="true" />
               <small>{listenNote || (on ? <>Listening. Say <b>next</b>, <b>back</b>, <b>repeat</b>, <b>how much</b>, <b>timer</b>, <b>what's left</b>, <b>stop</b>. Or ask: start with <b>Chef</b>.</> : "Voice off. The buttons work the same.")}</small>
               <button className="pill pill-small" onClick={() => choose(on ? "off" : "on")}>{on ? "Voice off" : "Voice on"}</button>
+              {/* DT215 v3 (0.3.66, board Stories162b): Voice › opens Voice while cooking; cooking waits where it was */}
+              <button className="link cook-voice-link" onClick={() => setVoicePage(true)}>Voice ›</button>
             </div>
           ) : (
-            <small className="muted cook-under">This browser can't listen, so the buttons steer. {canSpeak() ? "Each step can still be read aloud: " : ""}{canSpeak() && <button className="link" onClick={() => choose(on ? "off" : "on")}>{on ? "stop reading aloud" : "read steps aloud"}</button>}</small>
+            <><small className="muted cook-under">This browser can't listen, so the buttons steer. {canSpeak() ? "Each step can still be read aloud: " : ""}{canSpeak() && <button className="link" onClick={() => choose(on ? "off" : "on")}>{on ? "stop reading aloud" : "read steps aloud"}</button>}</small>{canSpeak() && <button className="link cook-voice-link" onClick={() => setVoicePage(true)}>Voice ›</button>}</>
           )}
           <small className="muted cook-under">The screen stays on while you cook.{on ? " Each step is read aloud." : ""}</small>
           {link.pair}

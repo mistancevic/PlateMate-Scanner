@@ -2852,3 +2852,11 @@ html:has(.l-photo) { overflow-x: hidden; }
 .pa-time-wrap { position: relative; display: inline-flex; align-items: center; min-height: 32px; }
 .pa-time-text { font-weight: 700; border-bottom: 1.5px dashed currentColor; font-variant-numeric: tabular-nums; }
 .pa-time-wrap .pa-time { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; border: 0; cursor: pointer; }
+/* DT215 v3 (0.3.66): Settings and Voice while cooking */
+.voice-settings { display: flex; flex-direction: column; gap: 10px; } .vs-card { display: flex; flex-direction: column; gap: 8px; padding: 14px 16px; } .vs-card > b { font-size: 16px; } .vs-card small { font-size: 13px; }
+.vs-card .choice { min-height: 44px; }
+.vs-voice { display: flex; align-items: center; gap: 8px; padding-top: 8px; border-top: 1px solid var(--line); } .vs-voice .choice { flex: 1; justify-content: flex-start; text-align: left; } .vs-voice .pill { min-height: 44px; flex: none; }
+.vs-all { align-self: flex-start; min-height: 44px; } .vs-later { opacity: .7; }
+.vs-switch { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; } .vs-switch input { width: 24px; height: 24px; accent-color: var(--brand); }
+.settings-soon { opacity: .6; cursor: default; } .me-todo.soon { background: var(--tint); color: var(--muted); }
+.cook-voice-link { min-height: 44px; flex: none; }

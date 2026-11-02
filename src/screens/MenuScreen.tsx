@@ -36,7 +36,7 @@ import { EvalsScreen } from "./EvalsScreen";
 import { MetricsScreen } from "./MetricsScreen";
 import { ShareScreen } from "./ShareScreen";
 import { CostsScreen } from "./CostsScreen";
-import { LineChart, Receipt, Microscope, ShieldCheck } from "lucide-react";
+import { LineChart, Receipt, Microscope, ShieldCheck, Settings } from "lucide-react";
 import { dayLog } from "../today";
 import { aggregate, uid } from "../pilot";
 import { MeScreen, TasteSetting } from "./MeScreen";
@@ -45,6 +45,7 @@ import { ClipboardList, CalendarClock } from "lucide-react";
 import { CalendarPage } from "../components/Calendar";
 import { ExplorerScreen } from "./ExplorerScreen";
 import { AdminPanel } from "./AdminPanel";
+import { SettingsList, VoiceSettingsPanel } from "../components/VoiceSettings";
 
 // the sections that belong to the person: they live under Me, and back from them goes to Me
 const ME_SECTIONS: MenuSection[] = ["profile", "goal", "life", "week", "calendar", "shop", "coach", "summary", "account"];
@@ -66,6 +67,9 @@ const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "share", name: "Share Chef Mealan", icon: <QrCode size={20} /> },
   { id: "explorer", name: "Explorer", icon: <Microscope size={20} /> },
   { id: "admin", name: "Admin", icon: <ShieldCheck size={20} /> },
+  // DT215 v3 (0.3.66, board Stories162b): Settings, how the app works for you; Voice while cooking its first page
+  { id: "settings", name: "Settings", icon: <Settings size={20} /> },
+  { id: "voice", name: "Voice while cooking", icon: <Settings size={20} /> },
 ];
 // Metrics in the menu only for the account the server names (0.2.5+r17, board M, M1); kept so the row shows at once
 const OWNER = "chefmealan-metrics-owner";
@@ -114,6 +118,8 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
           <button className="menu-row" onClick={() => setSection("me")}><span className="menu-icon"><User size={20} /></span><b>Me</b><ChevronRight size={18} /></button>
           {/* Foods lives here from 0.2.0 (X0): the library, reached day to day from the Plate's search and Quick picks */}
           <button className="menu-row" onClick={() => p.setTab("foods")}><span className="menu-icon"><BookOpen size={20} /></span><b>Foods</b><ChevronRight size={18} /></button>
+          {/* DT215 v3 (0.3.66, board Stories162b; Coach Milan 23:22 to 23:37): Settings, how the app works, not who you are */}
+          <button className="menu-row" onClick={() => setSection("settings")}><span className="menu-icon"><Settings size={20} /></span><span className="menu-row-text"><b>Settings</b><small>Voice while cooking · Language and Units coming soon</small></span><ChevronRight size={18} /></button>
           {/* DT151 Explorer lived here; DT188 (0.3.30) put it on the bar as the fifth tab */}
           {/* DT188: Admin for the superadmin only: people and roles, coach links, the privacy tracker, the walkthroughs */}
           {p.profile.admin && <button className="menu-row" onClick={() => setSection("admin")}><span className="menu-icon"><ShieldCheck size={20} /></span><span className="menu-row-text"><b>Admin</b><small>Superadmin only</small></span><ChevronRight size={18} /></button>}
@@ -158,6 +164,8 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       {section === "share" && <ShareGuard {...p} />}
       {section === "explorer" && <ExplorerScreen {...p} />}
       {section === "admin" && <AdminPanel {...p} />}
+      {section === "settings" && <><p className="small">How the app works for you, on this phone.</p><SettingsList open={(id) => setSection(id)} /></>}
+      {section === "voice" && <><p className="small">How Chef Mealan reads to you while you cook. Your phone's own voices: free, nothing leaves the phone.</p><VoiceSettingsPanel /></>}
     </>
   );
 }
