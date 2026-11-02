@@ -195,6 +195,8 @@ export type Meal = {
   stated?: { kcal: number; protein: number; fats: number | null; carbs: number | null };
   // how each of Chef Mealan's steps relates to the original (0.2.18, IM9, IM10b); cleared when the steps are edited
   stepMarks?: StepMark[];
+  // DT217 (0.3.56): each step read aloud one move at a time, as Chef Mealan drafted them with the steps (null: in code)
+  moves?: (string[] | null)[];
   stepsKitchen?: string;
   shots?: string[];
   // DT175a (0.3.18, board Stories123): a picture per step, Beta. stepPics are the pictures (files step:<id>:<n>, n the step's

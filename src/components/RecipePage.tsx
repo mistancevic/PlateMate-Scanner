@@ -56,7 +56,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   // 0.2.13: a realistic photo to try against the drawing; the owner only, on the preview
   tryPhoto?: ((model: string) => Promise<string>) | null;
   // 0.2.10 (canvas board CH, CH5): Chef Mealan drafts the steps; none without the AI
-  draft?: (() => Promise<{ ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[] } | { ok: false; why: string; cannot?: boolean }>) | null;
+  draft?: (() => Promise<{ ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[]; moves?: (string[] | null)[] } | { ok: false; why: string; cannot?: boolean }>) | null;
   meal: Meal; cards: Feedback[]; foods: Food[]; cook: boolean; state: PubState; pub: Published | null; approver: string; direct: boolean; unpublished?: string[];
   onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onCookIt?: (() => void) | null;
   // DT149 (0.2.130): opened from a meal of another day on Plan, Make it is Change it on the Plate, with its own line
@@ -152,7 +152,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
     const same = JSON.stringify(steps) === JSON.stringify(meal.steps ?? []);
     const n = Math.round(Number(edit.makesN) || 0), typed = edit.makesUnit.trim().toLowerCase() || "portions", unit = /s$/.test(typed) ? typed : `${typed}s`;
     const makes = n >= 2 && n <= 100 ? { n, unit } : undefined;
-    onPatch({ items: kept, makes, portion: makes ? Math.round(total / makes.n) : total, steps, optional: edit.optional.length ? edit.optional : undefined, ...(same ? {} : { stepMarks: undefined, stepsKitchen: undefined, stepParts: undefined, ...alignStepPics(meal, steps) }) });
+    onPatch({ items: kept, makes, portion: makes ? Math.round(total / makes.n) : total, steps, optional: edit.optional.length ? edit.optional : undefined, ...(same ? {} : { stepMarks: undefined, stepsKitchen: undefined, stepParts: undefined, moves: undefined, ...alignStepPics(meal, steps) }) });
     setEdit(null); setFind(null); resetSwap();
   };
   // DT83: every change to the foods can be taken back, one at a time
@@ -191,14 +191,14 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const matches = find === null ? [] : foods.filter((f) => !items.some((i) => i.food.id === f.id) && (!find.trim() || f.name.toLowerCase().includes(find.trim().toLowerCase()))).slice(0, 8);
   const live = state === "live" && pub;
   // ---- the steps, drafted by Chef Mealan (CH5): shown to read, kept only with Keep these steps ----
-  const [drafted, setDrafted] = useState<{ steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[] } | null>(null);
+  const [drafted, setDrafted] = useState<{ steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[]; moves?: (string[] | null)[] } | null>(null);
   const [drafting, setDrafting] = useState<"" | "working" | string>("");
   // RP1c (0.2.25): Chef Mealan's steps or the original, when both are there
   const [stepView, setStepView] = useState<"own" | "orig">("own");
   const askDraft = async () => {
     if (!draft) return;
     setDrafting("working");
-    try { const d = await draft(); if (d.ok) { setDrafted({ steps: d.steps, marks: d.marks, kitchen: d.kitchen, parts: d.parts }); setDrafting(""); } else if ((d as { cannot?: boolean }).cannot) setDrafting((d as { why: string }).why); else setDrafting(`Chef Mealan's draft didn't pass the checks (${(d as { why: string }).why}). Try again, or write your own.`); }
+    try { const d = await draft(); if (d.ok) { setDrafted({ steps: d.steps, marks: d.marks, kitchen: d.kitchen, parts: d.parts, moves: d.moves }); setDrafting(""); } else if ((d as { cannot?: boolean }).cannot) setDrafting((d as { why: string }).why); else setDrafting(`Chef Mealan's draft didn't pass the checks (${(d as { why: string }).why}). Try again, or write your own.`); }
     catch (e: any) { setDrafting(e?.message || "Chef Mealan could not answer. Try again."); }
   };
   return (
@@ -402,7 +402,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
               <small className="rq-drafted">{drafted.marks ? (drafted.kitchen || `${CHEF_NAME}'s steps, from the original, for your amounts and your kitchen. Each says how it relates to the original.`) : "Drafted by Chef Mealan from your foods and amounts. Read it, change any word."}</small>
               {drafted.marks && drafted.kitchen && <small className="muted">Each step says how it relates to the original.</small>}
               <ol className="rp-steps">{drafted.steps.map((x, k) => [partHead(drafted.parts, k), <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}<Mark m={drafted.marks?.[k]} /></div></li>])}</ol>
-              <div className="button-row"><button className="pill pill-small pill-primary" onClick={() => { onPatch({ steps: drafted.steps, stepMarks: drafted.marks, stepsKitchen: drafted.kitchen, stepParts: drafted.parts, stepsFor: foodNames(meal.items) }); setDrafted(null); }}>Keep these steps</button><button className="pill pill-small" onClick={askDraft}>Draft again</button><button className="link" onClick={() => { setDrafted(null); startEdit(); }}>Write my own</button></div>
+              <div className="button-row"><button className="pill pill-small pill-primary" onClick={() => { onPatch({ steps: drafted.steps, stepMarks: drafted.marks, stepsKitchen: drafted.kitchen, stepParts: drafted.parts, moves: drafted.moves, stepsFor: foodNames(meal.items) }); setDrafted(null); }}>Keep these steps</button><button className="pill pill-small" onClick={askDraft}>Draft again</button><button className="link" onClick={() => { setDrafted(null); startEdit(); }}>Write my own</button></div>
             </>)
           : (() => {
             // RP1 to RP1c (0.2.25): the original is the steps; Chef Mealan's on demand, with a line for the case

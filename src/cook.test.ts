@@ -93,3 +93,34 @@ test("0.3.55: next, back, stop cut in while a step is read; the phone's own help
   assert.equal(cutsIn("whey protein powder", step), false);
   assert.equal(cutsIn("how much whey", step), false);
 });
+
+// DT217 v2 (0.3.56): moves
+import { movesFor, movesFromDraft } from "./cook";
+test("DT217: a step with several foods is read one food at a time, then its action", () => {
+  assert.deepEqual(movesFor("Add 104 g Eggs and 100 g Milk 1.5% and 35 g Wheat flour, white and 15 g chocolate chips and stir until it's one colour."),
+    ["Add 104 g Eggs.", "Add 100 g Milk 1.5%.", "Add 35 g Wheat flour, white.", "Add 15 g chocolate chips.", "Stir until it's one colour."]);
+  assert.deepEqual(movesFor("Whisk [[i:a|oat flour]], [[i:b|whey]] and [[i:c|baking powder]] in a bowl."),
+    ["Add [[i:a|oat flour]].", "Add [[i:b|whey]].", "Add [[i:c|baking powder]].", "Whisk them in a bowl."]);
+  assert.deepEqual(movesFor("Add [[i:a|the egg]], [[i:b|egg whites]] and [[i:c|milk]]. Whisk to a thick batter. Rest it 5 minutes."),
+    ["Add [[i:a|the egg]].", "Add [[i:b|egg whites]].", "Add [[i:c|milk]].", "Whisk to a thick batter.", "Rest it 5 minutes."]);
+  assert.deepEqual(movesFor("Heat a pan on medium heat. Pour in [[i:a|batter]]."), ["Heat a pan on medium heat. Pour in [[i:a|batter]]."]);
+  assert.deepEqual(movesFor("Fry [[i:c|chicken]], then add [[i:s|spinach]] and stir 2 minutes."), ["Fry [[i:c|chicken]], then add [[i:s|spinach]] and stir 2 minutes."], "two foods, no list: one action");
+  assert.deepEqual(movesFor("Whisk 104 g eggs and 100 g milk and 35 g flour until smooth."), ["Add 104 g eggs.", "Add 100 g milk.", "Add 35 g flour.", "Whisk them until smooth."]);
+  assert.deepEqual(movesFor("Anything", ["One.", "Two."]), ["One.", "Two."]);
+});
+test("DT217: Chef Mealan's moves are checked; a step that fails gets them in code", () => {
+  const items = [{ id: "a", food: { name: "Eggs" } }, { id: "b", food: { name: "Milk" } }] as any;
+  const tok = (i: any) => `[[i:${i.id}|${i.food.name.toLowerCase()}]]`;
+  const r = movesFromDraft([["Crack {1} into a bowl.", "Pour in {2}.", "Whisk until smooth."], ["Heat a pan."]], ["Whisk {1} and {2} in a bowl.", "Heat a pan."], items, tok);
+  assert.deepEqual(r, [["Crack [[i:a|eggs]] into a bowl.", "Pour in [[i:b|milk]].", "Whisk until smooth."], ["Heat a pan."]]);
+  assert.deepEqual(movesFromDraft([["Add {1} and {2}."]], ["Whisk {1} and {2}."], items, tok), undefined, "two foods in one move");
+  assert.deepEqual(movesFromDraft([["Add {1}."]], ["Whisk {1} and {2}."], items, tok), undefined, "a food left out");
+  assert.deepEqual(movesFromDraft([["Add 100 g {1}.", "Add {2}."]], ["Whisk {1} and {2}."], items, tok), undefined, "an amount typed");
+});
+
+// DT216 (0.3.56, rule C40): a food you cook
+import { cookedFood } from "./cookWords";
+test("DT216: flour and a raw egg make a plate cooked; ready foods do not", () => {
+  for (const n of ["Eggs", "Egg whites", "Wheat flour, white", "Oat flour", "Chicken breast, raw", "Basmati rice, dry"]) assert.equal(cookedFood(n), true, n);
+  for (const n of ["Skyr, natural", "Banana", "Quark, low fat (Magerquark)", "Eggs, hard boiled", "Egg pasta", "Oats", "vanilla whey protein powder", "chocolate chips"]) assert.equal(cookedFood(n), false, n);
+});

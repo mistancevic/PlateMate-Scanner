@@ -110,3 +110,65 @@ export function isEcho(heard: string, spoken: string): boolean {
   const inIt = h.filter((w) => s.has(w)).length;
   return inIt / h.length >= 0.7;
 }
+
+// DT217 v2 (0.3.56, board Stories163; Coach Milan 2 November 16:09 to 16:38, Go): cook mode reads a step one move at a time,
+// one food or one action, while the whole step stays on screen. Moves Chef Mealan drafted with the steps are used as they
+// are; a step without them gets them here, in code: each food the step names becomes Add, then the step's own action. A step
+// with one food or none is one move, the step itself.
+const T = () => new RegExp(TOKEN.source, "g");
+const sentences = (s: string) => s.split(/(?<=[.!?])\s+(?=[A-Z])/).map((x) => x.trim()).filter(Boolean);
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const end = (s: string) => (/[.!?]$/.test(s) ? s : `${s}.`);
+export function movesFor(step: string, drafted?: string[] | null): string[] {
+  if (drafted && drafted.length) return drafted;
+  // foods written as a list (a, b and c) are added one at a time; the sentence then says what to do with "them"
+  const LIST = new RegExp(`${TOKEN.source}(?:\\s*(?:,\\s*and|,|and)\\s*${TOKEN.source})+`, "g");
+  if ([...step.matchAll(T())].length >= 2) {
+    const out: string[] = [];
+    let split = false;
+    for (const sen of sentences(step)) {
+      const lists = [...sen.matchAll(LIST)];
+      if (!lists.length) { out.push(sen); continue; }
+      split = true;
+      for (const l of lists) for (const t of l[0].matchAll(T())) out.push(`Add ${t[0]}.`);
+      const rest = sen.replace(LIST, "them").trim();
+      if (!/^(add|put|place|tip)\s+them\s*[.!]?$/i.test(rest)) out.push(end(cap(rest.replace(/^(add|put|place|tip)\s+them\s+and\s+/i, ""))));
+    }
+    return split ? out : [step];
+  }
+  // a step written in words with its amounts (the bowl steps kept before 0.3.56): Add 104 g Eggs and 100 g Milk ... and stir
+  const AMT = /(?:^|,\s*|\s+and\s+)(?=\d+(?:[.,]\d+)?\s?(?:g|ml|kg)\b)/;
+  const TAIL = /^(.*?)(?:\s+and\s+(?=[a-z])|\s+(?=(?:until|in a|in the|into|on top|over|with|for|then)\b))(.*)$/;
+  const out: string[] = [];
+  let split = false;
+  for (const sen of sentences(step)) {
+    const head = sen.match(/^(.*?)(\d+(?:[.,]\d+)?\s?(?:g|ml|kg)\b.*)$/);
+    const parts = head ? head[2].split(AMT).map((x) => x.trim()).filter(Boolean) : [];
+    if (parts.length < 2) { out.push(sen); continue; }
+    split = true;
+    const verb = head![1].trim() || "Add", adds = /^(add|put|place|tip)$/i.test(verb);
+    const last = parts[parts.length - 1].replace(/[.!]$/, "");
+    const t = last.match(TAIL), andTail = !!t && /\s+and\s+$/.test(last.slice(0, last.length - t[2].length));
+    const items = [...parts.slice(0, -1), t ? t[1] : last];
+    items.forEach((it, k) => out.push(end(adds && k === 0 ? `${cap(verb)} ${it}` : `Add ${it}`)));
+    if (!adds) out.push(end(`${cap(verb)} them${t && !andTail ? ` ${t[2]}` : ""}`));
+    if (t && (andTail || adds)) out.push(end(cap(t[2])));
+  }
+  return split ? out : [step];
+}
+// the moves Chef Mealan drafted, checked: one food at most in a move, every food of the step in one of its moves, no other
+// food, no amount typed; {n} become the recipe's food chips. A step that fails gets its moves in code (null).
+export function movesFromDraft(moves: unknown, draftSteps: string[], items: Ingredient[], token: (i: Ingredient) => string): (string[] | null)[] | undefined {
+  if (!Array.isArray(moves)) return undefined;
+  const out = draftSteps.map((st, k) => {
+    const mv = moves[k];
+    if (!Array.isArray(mv) || !mv.length || mv.length > 12) return null;
+    const ms = mv.map((x) => String(x ?? "").replace(/\s+/g, " ").trim()).filter(Boolean);
+    const want = new Set([...st.matchAll(/\{(\d+)\}/g)].map((m) => m[1]));
+    const got: string[] = [];
+    for (const m of ms) { const ns = [...m.matchAll(/\{(\d+)\}/g)].map((x) => x[1]); if (ns.length > 1) return null; got.push(...ns); if (/\b\d+\s?(g|grams?|kg|ml)\b/i.test(m.replace(/\{\d+\}/g, " "))) return null; }
+    if (got.some((n) => !want.has(n)) || [...want].some((n) => !got.includes(n))) return null;
+    return ms.map((m) => m.replace(/\{(\d+)\}/g, (_, n: string) => token(items[Number(n) - 1])));
+  });
+  return out.some(Boolean) ? out : undefined;
+}

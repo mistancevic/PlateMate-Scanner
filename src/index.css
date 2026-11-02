@@ -2789,3 +2789,13 @@ html:has(.l-photo) { overflow-x: hidden; }
 .mp-again-link { min-height: 44px; margin: 4px 0 0; align-self: flex-start; display: block; }
 .mp-again { display: flex; flex-direction: column; gap: 6px; margin: 6px 0; }
 .mp-again small { font-size: 13px; }
+.mk-bowl-note { display: block; font-size: 13px; line-height: 1.45; margin: 0 0 8px; }
+/* DT217 v2 (0.3.56, board Stories163): the whole step on top, its moves under it, read aloud one at a time */
+.cook-card .cook-text.cook-text-whole { font-size: 19px; line-height: 1.4; font-weight: 700; }
+.cook-moves { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); display: flex; flex-direction: column; }
+.cook-moves .cook-moves-head { display: block; font-size: 12px; font-weight: 900; letter-spacing: .05em; color: var(--muted); margin-bottom: 6px; }
+.cook-move { display: flex; gap: 8px; align-items: center; padding: 5px 0; font-size: 15px; color: var(--ink); line-height: 1.35; }
+.cook-move > span:first-child { width: 20px; flex: none; }
+.cook-move.done { color: var(--muted); }
+.cook-move.done > span:first-child { color: var(--top); font-weight: 900; }
+.cook-move.on { padding: 8px 10px; margin: 2px -10px; background: var(--tint); border-radius: 10px; color: var(--navy); font-size: 20px; font-weight: 900; }

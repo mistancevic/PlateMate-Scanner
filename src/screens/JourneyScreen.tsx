@@ -69,7 +69,7 @@ import { foodNames, originalFoodsOf, diffFoods, diffLine } from "../stepsState";
 import { OriginalSteps, StepsHint } from "../components/StepsView";
 import { countOf as countedOf, gramsOfOne } from "../counted";
 import { CountAmount, SizePicker, isCounted } from "../components/CountAmount";
-import { cookName, cookPhrase, weighLine, aroundWord, needsCooking, rawHint, cookTitle } from "../cookWords";
+import { cookName, cookPhrase, weighLine, aroundWord, needsCooking, cookedFood, rawHint, cookTitle } from "../cookWords";
 import { PairedCookMode } from "../components/CookPair";
 import { stepPicOf, setStepPic } from "../photos";
 import { kitchenName } from "../travel";
@@ -87,7 +87,7 @@ type ChefState = { status: "working" } | { status: "done"; options: MealOption[]
 type SideOpt = { name: string; kind: SideKind; note: string; food: Food; grams: number; dish: Ingredient[]; yours: boolean };
 // part and before (0.2.19, IM16): a change inside one part, and the plate before it, for Back to the original
 // a change keeps the whole recipe as changed (0.2.23, IM23): its foods at the recipe's own size, and the steps drafted for it
-type Drafted = { steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[] };
+type Drafted = { steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[]; moves?: (string[] | null)[] };
 type Way = { kind: "change"; title: string; notes: string[]; part?: string; before?: Ingredient[]; whole?: Ingredient[]; drafted?: Drafted } | { kind: "side"; options: SideOpt[]; pick: number };
 const readFile = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 
@@ -143,7 +143,7 @@ export function JourneyScreen(p: AppApi) {
   // DT89 (0.2.87, board Stories58): the steps for a plate you cook that is no recipe yet, drafted on How to make it, kept at Save
   // DT150 (0.2.131): foods, the foods the steps were written for (ids), and its, the plate then: a change of amounts keeps the
   // steps (they never say an amount, C42); a change of foods makes them out of date
-  const [plateSteps, setPlateSteps] = useState<{ steps: string[]; sig: string; foods?: string; its?: Ingredient[] } | null>(() => (ui0.plateSteps as any) ?? null);
+  const [plateSteps, setPlateSteps] = useState<{ steps: string[]; sig: string; foods?: string; its?: Ingredient[]; moves?: (string[] | null)[] } | null>(() => (ui0.plateSteps as any) ?? null);
   const [plateDraft, setPlateDraft] = useState<string>("");
   const [ownSteps, setOwnSteps] = useState<string | null>(null);
   // When Mealan produces options, the first one becomes the recipe on screen.
@@ -1144,8 +1144,11 @@ export function JourneyScreen(p: AppApi) {
   // the steps still hold for the plate: the same foods, whatever the amounts
   const stepsHold = (its: Ingredient[]) => !!plateSteps && (plateSteps.sig === plateSig(its) || (!!plateSteps.foods && plateSteps.foods === foodsSig(its)));
   // DT150 (0.2.131): a cooked plate grouped into parts keeps its steps on the Plate
-  const cooksPlate = (its: Ingredient[]) => its.length > 0 && !state.fromRecipe && !rec && (madeBy !== null || its.some((i) => needsCooking(i.food.name)) || (partsOf(its).length >= 2 && its.some((i) => bindsADish(i.food))))
-    && !state.meals.some((m) => !!state.title && m.title === state.title && (m.steps?.length ?? 0) > 0);
+  const cookedFoods = (its: Ingredient[]) => its.length > 0 && !state.fromRecipe && !rec && (madeBy !== null || its.some((i) => cookedFood(i.food.name)) || (partsOf(its).length >= 2 && its.some((i) => bindsADish(i.food))));
+  // DT216 (0.3.56): a recipe of yours that kept the bowl steps (its way) from an earlier save, now on a plate you cook
+  const bowlKeptOn = (its: Ingredient[]) => cookedFoods(its) && state.meals.some((m) => !!state.title && m.title === state.title && !!m.way && (m.steps?.length ?? 0) > 0);
+  const cooksPlate = (its: Ingredient[]) => cookedFoods(its)
+    && (!state.meals.some((m) => !!state.title && m.title === state.title && (m.steps?.length ?? 0) > 0) || bowlKeptOn(its));
   const plateMealNow = (): Meal => ({ id: "plate", title: state.title && state.title !== "DaaM" ? state.title : autoTitle(items), items, portion: aggregate(items).weight ?? 0, savedAt: new Date().toISOString(), ...(state.cooking?.length ? { cooking: state.cooking } : {}) });
   function startPlateSteps(force = false) {
     if (!cooksPlate(items)) return;
@@ -1156,7 +1159,7 @@ export function JourneyScreen(p: AppApi) {
     setPlateDraft("working");
     draftSteps(plateMealNow(), { library: state.foods.map((f) => f.name), equipment: equipmentOf(p.personal), kitchens: p.personal.kitchens ?? [], tastes: tasteForReq(p.personal.tasteChips, state.preferences) })
       .then((d) => {
-        if (d.ok) { setPlateSteps({ steps: d.steps, sig, foods: foodsSig(items), its: structuredClone(items) }); setPlateDraft(""); }
+        if (d.ok) { setPlateSteps({ steps: d.steps, sig, foods: foodsSig(items), its: structuredClone(items), ...(d.moves ? { moves: d.moves } : {}) }); setPlateDraft(""); }
         else { const f = d as { why: string; cannot?: boolean }; setPlateDraft(f.cannot ? f.why : `${CHEF_NAME}'s draft didn't pass the checks (${f.why}). Try again, or write your own.`); }
       })
       .catch((e: any) => setPlateDraft(e?.message || `${CHEF_NAME} could not answer. Try again.`));
@@ -2011,7 +2014,10 @@ export function JourneyScreen(p: AppApi) {
   const dayKcal = dayNums?.kcal ?? p.todayKcal ?? state.goals.calories ?? null;
   const leftOne = sizedPlate ? mealWord : rec ? oneOf(rec) : "portion", leftMany = sizedPlate ? plural(mealWord) : rec ? unitOf(rec) : "portions";
   const leftWords = (k: number) => `${k} ${k === 1 ? leftOne : leftMany}`;
-  const cooksNow = !rec && !((plateRecipe?.steps?.length ?? 0) > 0) && cooksPlate(items);
+  // DT216 (0.3.56): a recipe of yours that kept the bowl steps (its way) from an earlier save, now on a plate you cook: it gets
+  // Chef Mealan's steps; Lock the recipe keeps them with it
+  const bowlKept = !rec && !!plateRecipe?.way && (plateRecipe?.steps?.length ?? 0) > 0 && bowlKeptOn(items);
+  const cooksNow = !rec && (!((plateRecipe?.steps?.length ?? 0) > 0) || bowlKept) && cooksPlate(items);
   if (step === "make" && (rec || (plateRecipe?.steps?.length ?? 0) > 0 || partsOf(items).length > 0 || cooksNow)) {
     // a changed dish (0.2.23, IM23): the steps are for the dish on the plate, the whole recipe as changed; kept with it at Save
     const chg = way && way.kind === "change" && way.whole && rec ? way : null;
@@ -2039,8 +2045,8 @@ export function JourneyScreen(p: AppApi) {
       try {
         const d = await draftSteps(recipe, { library: state.foods.map((f) => f.name), equipment: equipmentOf(p.personal), kitchens: p.personal.kitchens ?? [], tastes: tasteForReq(p.personal.tasteChips, state.preferences), ...(chg && rec ? { changed: changesOf(rec.items, chg.whole!, chg.notes) } : {}) });
         if (d.ok) {
-          if (chg) setWay({ ...chg, drafted: { steps: d.steps, marks: d.marks, kitchen: d.kitchen, parts: d.parts } });
-          else setState((s) => ({ ...s, meals: s.meals.map((m) => (m.id === recipe.id ? { ...m, steps: d.steps, stepMarks: d.marks, stepsKitchen: d.kitchen, stepParts: d.parts, stepsFor: foodNames(m.items) } : m)) }));
+          if (chg) setWay({ ...chg, drafted: { steps: d.steps, marks: d.marks, kitchen: d.kitchen, parts: d.parts, moves: d.moves } });
+          else setState((s) => ({ ...s, meals: s.meals.map((m) => (m.id === recipe.id ? { ...m, steps: d.steps, stepMarks: d.marks, stepsKitchen: d.kitchen, stepParts: d.parts, moves: d.moves, stepsFor: foodNames(m.items) } : m)) }));
           setMkDraft(""); setMkDrafted(true);
         }
         else { const f = d as { why: string; cannot?: boolean }; setMkDraft(f.cannot ? f.why : `${CHEF_NAME}'s draft didn't pass the checks (${f.why}). Try again, or make it from the original.`); }
@@ -2122,8 +2128,14 @@ export function JourneyScreen(p: AppApi) {
             {mkDraft && mkDraft !== "working" && <small className="rq-drafting">{mkDraft}</small>}
           </section>
         )}
+        {/* DT216: the recipe had the bowl steps; Lock the recipe keeps the new ones with it */}
+        {bowlKept && steps.length > 0 && <small className="muted mk-bowl-note">Your recipe had the bowl steps from an earlier save. Lock the recipe keeps these new steps with it.</small>}
         {/* DT94: Lock the recipe ends Craft; from here the recipe does not change */}
-        <button className="pill pill-primary pill-wide" onClick={() => { log("method_chosen", { method: madeWhole ? "whole" : "plate" }); setStep("made"); }}>Lock the recipe</button>
+        <button className="pill pill-primary pill-wide" onClick={() => {
+          log("method_chosen", { method: madeWhole ? "whole" : "plate" });
+          if (bowlKept && plateRecipe && plateSteps?.steps.length) { const id = plateRecipe.id, st = plateSteps.steps, mv = plateSteps.moves; setState((s0) => ({ ...s0, meals: s0.meals.map((m) => (m.id === id ? { ...m, steps: st, stepsFor: foodNames(m.items), way: undefined, stepMarks: undefined, stepsKitchen: undefined, stepParts: undefined, moves: mv } : m)) })); }
+          setStep("made");
+        }}>Lock the recipe</button>
         {madeWhole && leftK > 0 && <small className="muted center" style={{ display: "block", marginTop: 6 }}>To eat the rest on other days, put the recipe on Plan.</small>}
       </>
     );
@@ -2156,10 +2168,14 @@ export function JourneyScreen(p: AppApi) {
   if (step === "made") {
     // DT94: the steps of what is being made: the recipe's, the plate's drafted ones, or the way picked for a bowl
     const madeSteps0: string[] = (rec?.steps?.length ? rec.steps : plateRecipe?.steps?.length ? plateRecipe.steps : plateSteps?.steps?.length ? plateSteps.steps : (methodsFor(items).find((w) => w.id === method)?.steps ?? []));
+    // DT217 (0.3.56): the moves cook mode reads, as drafted with these steps; a step without them gets them in code
+    const madeMoves0: (string[] | null)[] | undefined = rec?.steps?.length ? rec.moves : plateRecipe?.steps?.length ? plateRecipe.moves : plateSteps?.steps?.length ? plateSteps.moves : undefined;
     // DT174: the amounts the steps say: the whole recipe when you make all of it, else your plate
     const stepItems: Ingredient[] = madeWhole && rec ? rec.items : items;
     // DT214 v2: a food used in the dish in place of another takes its place in the steps; the recipe stays as it is
-    const madeSteps = plateRecipe ? madeSteps0.map((t) => t.replace(TOKEN, (all, id: string) => { const it = stepItems.find((x) => x.id === id), was = plateRecipe.items.find((x) => x.id === id); return it && was && it.food.id !== was.food.id ? `[[i:${id}|${it.food.name.split(",")[0].trim().toLowerCase()}]]` : all; })) : madeSteps0;
+    const follow = (t: string) => (plateRecipe ? t.replace(TOKEN, (all, id: string) => { const it = stepItems.find((x) => x.id === id), was = plateRecipe.items.find((x) => x.id === id); return it && was && it.food.id !== was.food.id ? `[[i:${id}|${it.food.name.split(",")[0].trim().toLowerCase()}]]` : all; }) : t);
+    const madeSteps = madeSteps0.map(follow);
+    const madeMoves = madeMoves0?.map((m) => (m ? m.map(follow) : m));
     const dishName = (state.title && state.title !== "DaaM" ? state.title : autoTitle(items)).slice(0, 40);
     const tick = (k: number) => setTicks((tk) => { const n = new Set(tk); if (n.has(`s${k}`)) n.delete(`s${k}`); else n.add(`s${k}`); return n; });
     return (
@@ -2192,7 +2208,7 @@ export function JourneyScreen(p: AppApi) {
             <small className="muted">One big step at a time, read aloud. Say next, back or repeat, or tap. Each step you finish is ticked here.</small>
           </div>
         )}
-        {cooking && madeSteps.length > 0 && <PairedCookMode notify={p.notify} title={(state.title && state.title !== "DaaM" ? state.title : autoTitle(items))} steps={madeSteps} items={stepItems}
+        {cooking && madeSteps.length > 0 && <PairedCookMode notify={p.notify} title={(state.title && state.title !== "DaaM" ? state.title : autoTitle(items))} steps={madeSteps} moves={madeMoves} items={stepItems}
           ticks={new Set(madeSteps.map((_, k) => k).filter((k) => ticks.has(`s${k}`)))}
           onTick={(k) => setTicks((tk) => { const n = new Set(tk); n.add(`s${k}`); return n; })} onClose={() => setCooking(false)}
           ask={p.ai.on ? async (question, at, history) => {
@@ -2289,7 +2305,7 @@ export function JourneyScreen(p: AppApi) {
         // DT89 and DT90 (0.2.87): the steps from How to make it, Chef Mealan's kitchen, and who made it go with the recipe
         // 02:11: a bowl way chosen at Lock (All in one, Topped, Protein first) is the recipe's process too; it was lost at Save
         const wayNow = method ? methodsFor(items).find((w) => w.id === method) : undefined;
-        const ps = cooksPlate(items) && plateSteps?.steps.length ? { steps: plateSteps.steps, stepsFor: foodNames(items) } : wayNow ? { steps: wayNow.steps, stepsFor: foodNames(items), way: wayNow.name } : {};
+        const ps = cooksPlate(items) && plateSteps?.steps.length ? { steps: plateSteps.steps, stepsFor: foodNames(items), ...(plateSteps.moves ? { moves: plateSteps.moves } : {}) } : wayNow ? { steps: wayNow.steps, stepsFor: foodNames(items), way: wayNow.name } : {};
         const chefMade = madeBy ? { ...(state.cooking?.length ? { cooking: state.cooking } : {}), kitchen: madeBy.kitchen, byChef: { kitchen: madeBy.kitchen, meal: mealWord, around: aroundWord(madeBy.from.filter((i) => !isDrink(i.food)).map((i) => i.food.name)), at: new Date().toISOString() } } : {};
         const meal: Meal = { id: origin?.id ?? uid(), title: name, items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString(), kind: p.kind, ...src, ...adaptedFrom, ...ps, ...chefMade };
         // the recipe kept (0.2.19, IM18b): its parts on its foods; optional foods, added or not, in its optional list
@@ -2304,7 +2320,7 @@ export function JourneyScreen(p: AppApi) {
           const src = fromRec.source ? { source: { name: fromRec.source.name, ...(fromRec.source.url ? { url: fromRec.source.url } : {}), from: fromRec.source.from, at: fromRec.source.at, ...(fromRec.source.steps?.length ? { steps: fromRec.source.steps } : {}), foods: originalFoodsOf(fromRec, state.meals) ?? foodNames(fromRec.items) } } : {};
           return { id: meal.id, title: name, items: whole, portion: Math.round(whole.reduce((k, i) => k + i.grams, 0) / n), savedAt: meal.savedAt, kind: p.kind, ...src, basedOn: { id: fromRec.id, title: fromRec.title },
             ...(fromRec.makes ? { makes: fromRec.makes } : {}), ...(fromRec.optional?.length ? { optional: fromRec.optional } : {}),
-            steps: d?.steps ?? [], ...(d?.steps?.length ? { stepsFor: foodNames(whole) } : {}), ...(d?.marks ? { stepMarks: d.marks } : {}), ...(d?.kitchen ? { stepsKitchen: d.kitchen } : {}), ...(d?.parts ? { stepParts: d.parts } : {}) };
+            steps: d?.steps ?? [], ...(d?.steps?.length ? { stepsFor: foodNames(whole) } : {}), ...(d?.marks ? { stepMarks: d.marks } : {}), ...(d?.moves ? { moves: d.moves } : {}), ...(d?.kitchen ? { stepsKitchen: d.kitchen } : {}), ...(d?.parts ? { stepParts: d.parts } : {}) };
         })() : null;
         // R25: the card counts what was eaten, a number of the recipe's pieces; the recipe is kept whole
         // the portion is the sum of the very grams kept, never a hair above them: a stored meal heavier than its foods is not read back
