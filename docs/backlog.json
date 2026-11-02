@@ -406,9 +406,10 @@
       "id": "DT215",
       "title": "Voice settings in Settings (Menu): read aloud, the phone's voices with a sample, speed, cut in",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": "162b",
-      "why": "Milan 2 November: different voices, other voice settings. 22:33 draw it, between DT214 and DT216. Waits for his Go. 23:22: not on Me, in app settings (v2)."
+      "why": "Milan 2 November: different voices, other voice settings. 22:33 draw it, between DT214 and DT216. Waits for his Go. 23:22: not on Me, in app settings (v2). Go at 23:37.",
+      "version": "0.3.66"
     },
     {
       "id": "FX1",
