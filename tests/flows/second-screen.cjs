@@ -54,8 +54,8 @@ const PORT = "3198", B = `http://127.0.0.1:${PORT}`;
     const A = await open(true), K = await open(true), C = await open(true);
     const page = A.page, kp = K.page;
     await page.goto(B + "/"); await page.waitForTimeout(900); await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500); await page.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }).click(); await page.waitForTimeout(500);
-    await page.getByRole("button", { name: "Cook it as written", exact: true }).click(); await page.waitForTimeout(1200);
-    await page.getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(400);
+    // DT211 v8 (0.3.53): Start cooking in the recipe's Steps block opens cook mode
+    await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(1200);
     const cm = page.locator(".cook-mode");
     await cm.getByRole("button", { name: "Buttons only" }).click().catch(() => {});
     ok(await cm.getByRole("button", { name: /Use another screen/ }).count() === 1, "cook mode offers Use another screen");

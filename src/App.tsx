@@ -763,7 +763,9 @@ function BackKeeper({ tab, setTab, onReady }: { tab: Tab; setTab: (t: Tab) => vo
   return null;
 }
 export default function App() {
-  const [state, setState] = useState<PilotState>(load),
+  // DT214 v2 (0.3.53): the app opened again in the middle of a cook starts on the free Plate; the strip says where the cook
+  // stands and Go on brings Chef Mealan's question
+  const [state, setState] = useState<PilotState>(() => cooking.swapOut(load())),
     // DT188 (0.3.30, board Stories137): the coach's two views, My day and My clients, switched at the top of Today; the chosen client
     [coachView, setCoachViewState] = useState<"day" | "clients">(() => { try { return localStorage.getItem("chefmealan-coach-view") === "clients" ? "clients" : "day"; } catch { return "day"; } }),
     [coachClient, setCoachClient] = useState<string | null>(null),

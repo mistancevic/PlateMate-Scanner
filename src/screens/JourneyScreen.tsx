@@ -1131,7 +1131,7 @@ export function JourneyScreen(p: AppApi) {
     if (!items.length || state.openRecipe) return;
     p.clearCookNow(); setChef(null); setMethod(null); setTicks(new Set());
     setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" }));
-    setStep("made"); setCooking(true);
+    setStep("made"); if (p.travel?.kitchen !== "hotel") setCooking(true);
   }, [p.cookNow, step, items.length, state.openRecipe]); // eslint-disable-line react-hooks/exhaustive-deps
   function keepAsIs() { setChef(null); if (p.filling && plateWhen === "past") { addPast(); return; } if (p.filling?.mode !== "eat" && p.filling) putInSlot(items); else { setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null);
     // DT94: a plate whose steps are already on the Plate is locked here and goes straight to Make

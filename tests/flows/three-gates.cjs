@@ -66,7 +66,7 @@ const U = "http://127.0.0.1:3268";
   ok(lines.some((l) => /^✕ Nutrition.*More than half of this lunch's energy is fat: \d\d percent, \d+ g\./.test(l)), "N27: fat over half the lunch's energy: " + (lines.find((l) => /Nutrition/.test(l)) || "").slice(0, 110));
   // Your day: chicken and rice at 23:10, outside the window
   await page.clock.setFixedTime(new Date("2026-10-25T23:10:00"));
-  await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); const f = (id) => s.foods.find((x) => x.id === id); s.items = [{ id: "a", food: f("chicken"), grams: 180, locked: false }, { id: "b", food: f("rice"), grams: 200, locked: false }]; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
+  await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); const f = (id) => s.foods.find((x) => x.id === id); s.items = [{ id: "a", food: f("chicken"), grams: 180, locked: false }, { id: "b", food: f("rice"), grams: 200, locked: false }]; delete s.plateAt; /* DT212 v4: a plate of now, not one from hours ago */ localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); });
   await page.reload(); await page.waitForTimeout(1800);
   lines = await page.locator(".gate-card .gate-line-row").allTextContents();
   ok(lines.some((l) => /^✓ Nutrition/.test(l)) && lines.some((l) => /^✕ Your day.*23:10, and your eating window is 08:00 to 21:00\. A full plate now sits on tomorrow\./.test(l)), "Your day: a full plate outside the window: " + (lines.find((l) => /Your day/.test(l)) || "").slice(0, 120));

@@ -20,6 +20,9 @@ const STEPS = [
 seed.items = []; seed.feedback = [];
 const lent = [[300, food("l", "Red lentils, dry", 352, 24.6, 63, 1.1, 10.7)], [1000, food("w", "Vegetable stock", 5, 0.2, 0.7, 0.1, 0)]].map(([g, f]) => ({ id: f.id, grams: g, locked: false, food: f }));
 seed.meals = [{ id: "m-soup", title: "Lentil soup for four", items: lent, portion: 1300, makes: { n: 4, unit: "portions" }, steps: ["Rinse [[i:l|lentils]].", "Simmer them in [[i:w|stock]] for 25 minutes."], stepsFor: lent.map((i) => i.food.name), savedAt: "2026-10-27T10:00:00Z" }, { id: "m-bowl", title: "Chicken rice bowl", items, portion: 374, steps: STEPS, stepsFor: items.map((i) => i.food.name), savedAt: "2026-10-28T10:00:00Z" }];
+// six step photos kept before 0.3.53 (since then they come from cooking): step 1 and 3 to 6 drawn by AI, step 2 yours
+const PIC = "data:image/jpeg;base64," + fs.readFileSync(path.resolve(__dirname, "front.jpg")).toString("base64");
+{ const m = seed.meals.find((x) => x.id === "m-bowl"); m.stepPics = STEPS.map(() => PIC); m.stepPicMeta = STEPS.map((t, k) => ({ by: k === 1 ? "me" : "ai", step: t })); }
 const PORT = "3196", B = `http://127.0.0.1:${PORT}`;
 (async () => {
   const server = spawn(process.execPath, ["dist/server.cjs"], { cwd: path.resolve(__dirname, "../.."), env: { ...process.env, NODE_ENV: "production", PORT, GEMINI_API_KEY: "" }, stdio: "ignore" });
@@ -57,26 +60,19 @@ const PORT = "3196", B = `http://127.0.0.1:${PORT}`;
     const say = async (t) => { const r = await page.evaluate((t) => window.__say(t), t); await page.waitForTimeout(300); return r; };
     const toRecipe = async () => { await page.goto(B + "/"); await page.waitForTimeout(900); await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500); await page.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }).click(); await page.waitForTimeout(500); };
     await toRecipe();
-    ok(await page.locator(".rq-steps .rq-step-pic").count() === 6 && await page.getByRole("button", { name: /^Add a picture to step/ }).count() === 6, "each step has a place for a picture");
-    ok(await page.locator(".watch-card").count() === 0, "no Watch the steps until every step has a picture");
-    const addPic = async (k, who) => {
-      await page.getByRole("button", { name: `Add a picture to step ${k}` }).click(); await page.waitForTimeout(300);
-      const sh = page.locator(".sp-sheet");
-      await sh.locator('input[type=file]:not([capture])').setInputFiles(JPG); await page.waitForTimeout(700);
-      return sh;
-    };
-    let sh = await addPic(1);
-    ok(/Picture for step 1/.test(await sh.textContent()) && /Rinse 80 g rice/.test(await sh.textContent()), "the sheet names the step");
-    ok(await sh.locator("img.sp-preview").count() === 1 && /Before you keep it/.test(await sh.textContent()) && /Meat raw before cooking, cooked through after it/.test(await sh.textContent()), "the picture, and the checks before it is kept");
-    ok(await sh.getByRole("button", { name: "Keep it" }).isDisabled(), "Keep it waits for who made it");
-    await sh.getByRole("button", { name: "Drawn by AI" }).click(); await sh.getByRole("button", { name: "Keep it" }).click(); await page.waitForTimeout(500);
-    ok(await page.locator(".sp-sheet").count() === 0 && await page.locator(".rq-step-pic img").count() === 1 && /AI · Beta/.test(await page.locator(".rq-step-pic").first().textContent()), "kept: the thumbnail beside step 1, AI · Beta under it");
+    // DT211 v8 (0.3.53, board Stories158): photos for the steps come from cooking (+ Photo on a step in Make); the recipe has no
+    // + slots, it shows the photos, and a tap changes or removes one. The six here were kept before 0.3.53.
+    ok(await page.locator(".rq-step-pic img").count() === 6 && await page.getByRole("button", { name: /^Add a picture to step/ }).count() === 0, "the recipe shows the step photos; no + slots");
+    ok(/AI · Beta/.test(await page.locator(".rq-step-pic").first().textContent()) && /Yours/.test(await page.locator(".rq-step-pic").nth(1).textContent()), "AI · Beta under step 1, Yours under step 2");
+    await page.getByRole("button", { name: "Change or remove the photo of step 1" }).click(); await page.waitForTimeout(400);
+    const sh = page.locator(".sp-sheet");
+    ok(/Picture for step 1/.test(await sh.textContent()) && /Rinse 80 g rice/.test(await sh.textContent()), "a tap opens the sheet, named for the step");
+    ok(await sh.locator("img.sp-preview").count() === 1 && /Before you keep it/.test(await sh.textContent()) && await sh.getByRole("button", { name: "Remove this picture" }).count() === 1, "the picture, the checks, and Remove");
     const sizes = await page.evaluate(() => [...document.querySelectorAll(".rq-step-pic button, .sp-sheet .pill")].map((b) => Math.round(b.getBoundingClientRect().height)));
     ok(sizes.every((h) => h >= 44), "every picture button is 44 px or more: " + sizes.join(","));
+    await sh.getByRole("button", { name: "✕ Close" }).click(); await page.waitForTimeout(300);
     const small = await page.evaluate(() => Math.min(...[...document.querySelectorAll(".rq-step-pic small")].map((x) => parseFloat(getComputedStyle(x).fontSize))));
     ok(small >= 12, "labels 12 px or more: " + small);
-    for (let k = 2; k <= 6; k++) { sh = await addPic(k); await sh.getByRole("button", { name: k === 2 ? "My photo" : "Drawn by AI" }).click(); await sh.getByRole("button", { name: "Keep it" }).click(); await page.waitForTimeout(400); }
-    ok(await page.locator(".rq-step-pic img").count() === 6 && /Yours/.test(await page.locator(".rq-step-pic").nth(1).textContent()), "six pictures; step 2 says Yours");
     if (process.env.SHOTS) await page.screenshot({ path: process.env.SHOTS + "/sp-recipe.png", fullPage: true });
     ok(await page.locator(".watch-card").count() === 1 && /6 steps, about 30 seconds · pictures drawn by AI, Beta/.test(await page.locator(".watch-card").textContent()), "Watch the steps appears, on the recipe");
     // the pictures are files: a reload brings them back from the photo store, and the saved data holds fingerprints
@@ -96,11 +92,10 @@ const PORT = "3196", B = `http://127.0.0.1:${PORT}`;
     ok(/STEP 5 OF 6/.test(await pl.textContent()), "a number jumps to its step");
     await pl.getByRole("button", { name: /Pause/ }).click(); await page.clock.runFor(8000); await page.waitForTimeout(200);
     ok(/STEP 5 OF 6/.test(await pl.textContent()), "Pause holds the step");
-    await pl.getByRole("button", { name: "Cook it as written" }).click(); await page.waitForTimeout(1200);
-    if (await page.getByRole("button", { name: "Start a new plate" }).count()) { await page.getByRole("button", { name: "Start a new plate" }).click(); await page.waitForTimeout(1200); }
-    ok(/Make: Chicken rice bowl/.test(await page.locator("h2").first().textContent().catch(() => "")), "Cook it as written from the player goes straight to Make");
+    await pl.getByRole("button", { name: "Start cooking" }).click(); await page.waitForTimeout(1200);
+    if (await page.getByRole("button", { name: "Clear my plate" }).count()) { await page.getByRole("button", { name: "Clear my plate" }).click(); await page.waitForTimeout(1200); }
+    ok(/Make: Chicken rice bowl/.test(await page.locator("h2").first().textContent().catch(() => "")), "Start cooking from the player goes straight to Make, cook mode open");
     // cook mode: the picture on top, step buttons
-    await page.getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(400);
     const cm = page.locator(".cook-mode");
     await cm.getByRole("button", { name: "Turn voice on" }).click(); await page.waitForTimeout(200);
     ok(await cm.locator("img.cook-pic").count() === 1 && /Picture drawn by AI, Beta/.test(await cm.locator(".cook-pic-label").textContent()), "cook mode: the step's picture on top, its label under it");
@@ -118,7 +113,7 @@ const PORT = "3196", B = `http://127.0.0.1:${PORT}`;
     await cm.getByRole("button", { name: "✕ Close" }).click(); await page.waitForTimeout(300);
     // removing a picture: Watch the steps goes
     await toRecipe();
-    await page.getByRole("button", { name: "Change the picture of step 3" }).click(); await page.waitForTimeout(300);
+    await page.getByRole("button", { name: "Change or remove the photo of step 3" }).click(); await page.waitForTimeout(300);
     await page.locator(".sp-sheet").getByRole("button", { name: "Remove this picture" }).click(); await page.waitForTimeout(400);
     ok(await page.locator(".rq-step-pic img").count() === 5 && await page.locator(".watch-card").count() === 0, "a picture removed: five left, Watch the steps waits for the sixth");
     // a step rewritten loses its picture; the others follow their words
@@ -126,7 +121,7 @@ const PORT = "3196", B = `http://127.0.0.1:${PORT}`;
     const f1 = page.getByRole("textbox", { name: "Step 1", exact: true });
     await f1.click(); await page.keyboard.press("End"); await page.keyboard.type(" Drain well."); await page.waitForTimeout(200);
     await page.getByRole("button", { name: "Save changes" }).click(); await page.waitForTimeout(600);
-    ok(await page.locator(".rq-step-pic img").count() === 4 && await page.getByRole("button", { name: "Add a picture to step 1" }).count() === 1 && await page.getByRole("button", { name: "Add a picture to step 3" }).count() === 1, "step 1 rewritten: its picture goes; the other four stay with their steps");
+    ok(await page.locator(".rq-step-pic img").count() === 4 && await page.getByRole("button", { name: "Change or remove the photo of step 1" }).count() === 0 && await page.getByRole("button", { name: "Change or remove the photo of step 3" }).count() === 0, "step 1 rewritten: its picture goes; the other four stay with their steps");
     ok(errs.length === 0, "no page errors" + (errs.length ? ": " + errs.join(" | ") : ""));
   } catch (e) { console.log("FAIL " + e.message); fail++; }
   await b.close(); server.kill();

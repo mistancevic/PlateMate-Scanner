@@ -66,8 +66,8 @@ const PORT = "3195", B = `http://127.0.0.1:${PORT}`;
     const say = async (t) => { const r = await page.evaluate((t) => window.__say(t), t); await page.waitForTimeout(300); return r; };
     const toRecipe = async () => { await page.goto(B + "/"); await page.waitForTimeout(900); await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500); await page.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }).click(); await page.waitForTimeout(500); };
     await toRecipe();
-    await page.getByRole("button", { name: "Cook it as written", exact: true }).click(); await page.waitForTimeout(1200);
-    await page.getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(500);
+    // DT211 v8 (0.3.53): Start cooking in the recipe's Steps block opens cook mode
+    await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(1200);
     const cm = page.locator(".cook-mode");
     await cm.getByRole("button", { name: "Turn voice on" }).click(); await page.waitForTimeout(300);
     await say("next"); await say("next"); await say("next");

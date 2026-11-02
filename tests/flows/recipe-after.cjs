@@ -64,10 +64,10 @@ const U = "http://127.0.0.1:3210";
   ok(await page.locator(".rq-steps .rp-orig li").count() > 0 && !/Original steps, from/.test(await text(".rq-source")), "RP1 (was IM9b): the original is the steps, no longer folded under Where it came from");
   ok(/Preheat oven to 175 °C\./.test(await text(".rq-steps .rp-orig")), "UN: the original's 350 degrees Fahrenheit shows as 175 °C (the account starts metric)");
   t = await text(".rq-nopic");
-  ok(/No picture yet\./.test(t) && /Chef Mealan's pictures today: 3 of 10\. Your own photo is always better\./.test(t), "IM11: No picture yet, with the day's count: 3 of 10");
+  ok(/No photo yet\./.test(t) && /Chef Mealan's drawings today: 3 of 10\. Your own photo is always better\./.test(t), "IM11: No picture yet, with the day's count: 3 of 10");
   ok(coverCalls === 1, "IM11: nothing tried again on its own");
   drawNow = true;
-  await page.getByRole("button", { name: "Draw a picture" }).click(); await page.waitForTimeout(1200);
+  await page.getByRole("button", { name: "Let Chef Mealan draw one" }).click(); await page.waitForTimeout(1200);
   s = await st();
   ok(coverCalls === 2 && s.meals[0].cover?.state === "drawn" && await page.locator(".rq-nopic").count() === 0 && await page.locator(".rq-hero img").count() === 1, "IM11: Draw a picture is one tap; the picture is the cover");
 

@@ -43,6 +43,8 @@ const U = "http://127.0.0.1:3241";
     await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1200);
     await page.getByRole("button", { name: /^Make it( as it is)?$/ }).first().click(); await page.waitForTimeout(900);
     await page.getByRole("button", { name: /^I'm making it|^Lock the recipe/ }).first().click(); await page.waitForTimeout(700);
+    // DT211 v8 (0.3.53): how many you ate is asked on Eat
+    await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(500);
   };
   try {
     await page.goto(U + "/"); await page.waitForTimeout(900);
@@ -56,7 +58,6 @@ const U = "http://127.0.0.1:3241";
     await count.getByRole("button", { name: "One more" }).click(); await page.waitForTimeout(200);
     const two = Math.round((whole * 2) / 12).toLocaleString("en");
     ok((await count.locator("b").textContent()) === "2" && (await count.textContent()).includes(`${two} kcal`), `+ makes it 2, with their kcal: ${two}`);
-    await page.getByRole("button", { name: /^(On to How was it\?|Rate it)$/ }).click(); await page.waitForTimeout(500);
     await page.getByRole("button", { name: "DaaM good" }).click();
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(900);
     const c1 = await cards();
@@ -69,14 +70,15 @@ const U = "http://127.0.0.1:3241";
     // ---- All 12: asked once ----
     await toMade();
     await page.getByRole("button", { name: "All 12" }).click(); await page.waitForTimeout(200);
-    await page.getByRole("button", { name: /^(On to How was it\?|Rate it)$/ }).click(); await page.waitForTimeout(400);
+    await page.getByRole("button", { name: "DaaM good" }).click();
+    await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(400);
     const ask = page.getByRole("alertdialog", { name: "A big meal" });
     ok(await ask.count() === 1 && new RegExp(`${whole.toLocaleString("en")} kcal in one meal\\?`).test(await ask.textContent()) && /more than your whole day/.test(await ask.textContent()), "All 12: asked once, " + (await ask.textContent()).slice(0, 90));
     await ask.getByRole("button", { name: "How many I ate" }).click(); await page.waitForTimeout(300);
     ok(await ask.count() === 0 && await page.getByRole("group", { name: "How many did you eat?" }).count() === 1, "How many I ate goes back to the count");
-    await page.getByRole("button", { name: /^(On to How was it\?|Rate it)$/ }).click(); await page.waitForTimeout(400);
-    await page.getByRole("alertdialog", { name: "A big meal" }).getByRole("button", { name: "Yes, all 12" }).click(); await page.waitForTimeout(400);
-    ok(await page.getByRole("button", { name: "DaaM good" }).count() === 1, "Yes, all 12 goes on: nothing is blocked");
+    await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(400);
+    await page.getByRole("alertdialog", { name: "A big meal" }).getByRole("button", { name: "Yes, all 12" }).click(); await page.waitForTimeout(900);
+    ok((await cards()).length === 2, "Yes, all 12 saves it: nothing is blocked");
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);
   } catch (e) { ok(false, "ran to the end: " + e.message.split("\n")[0]); }
   finally { await b.close(); server.kill(); }

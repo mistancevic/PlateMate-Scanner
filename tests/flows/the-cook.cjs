@@ -53,7 +53,7 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     ok(await page.getByRole("button", { name: "Cook it as written" }).count() === 0, "Cook it as written is gone; Change it first stays");
     ok(await page.getByRole("button", { name: "Change it first" }).count() === 1, "Change it first is there");
     ok(/Photos for the steps come from cooking/.test(await steps.textContent()) && await steps.locator(".rq-step-pic").count() === 0, "no + slots on the recipe; photos come from cooking");
-    ok(/No photo yet\./.test(await page.locator("main").textContent()), "Photo is the one word: No photo yet.");
+    ok(!/No picture yet|Draw a picture|\+ Picture/.test(await page.locator("main").textContent()), "Photo is the one word: no Picture on the recipe");
     await toRecipe(page, "Skyr bowl");
     const grey = page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true });
     ok(await grey.isDisabled() && /It opens once the steps are here/.test(await page.locator(".rq-steps").textContent()), "no steps: Start cooking is grey, with why");
@@ -73,7 +73,7 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     ok(await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).count() === 1 && await page.getByRole("button", { name: "Rate it" }).count() === 0, "Make ends on Cooked. Next: Eat");
     let st = await store(page);
     ok(st.cook && st.cook.inView && st.cook.ui.ticks.length === 2 && Object.keys(st.cook.ui.stepPhotos).length === 1 && st.cook.recipeId === "m-bowl", "the cook keeps the ticks and the photo from the first tap");
-    ok(!!st.meals.find((m) => m.id === "m-bowl").stepPics?.[1], "the step photo is the recipe's step photo, the step had none");
+    ok(st.meals.find((m) => m.id === "m-bowl").stepPicMeta?.[1]?.by === "me", "the step photo is the recipe's step photo, the step had none");
     // ---- 3. leave: the Plate is free, the strip says where it stands ----
     await nav(page, "Today"); await page.waitForTimeout(700);
     ok(/Cooking now · Chicken rice bowl · step 3 of 4/.test(await page.locator(".cook-strip").textContent()), "Today: Cooking now, the dish, the step");
@@ -100,7 +100,9 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     await page.getByRole("button", { name: "Go on cooking" }).click(); await page.waitForTimeout(500);
     await page.locator(".cook-mode button").filter({ hasText: "Close" }).first().click(); await page.waitForTimeout(300);
     await page.reload(); await page.waitForTimeout(1200);
+    if (process.env.DEBUG) { const x = await store(page); console.log("DEBUG", page.url(), JSON.stringify(x.cook && { inView: x.cook.inView, step: x.cook.ui.step, ticks: x.cook.ui.ticks }), (await main()).slice(0, 300)); }
     await page.locator(".cook-strip").first().click().catch(() => {}); await page.waitForTimeout(800);
+    if (process.env.DEBUG) console.log("DEBUG2", (await main()).slice(0, 300));
     ok(await page.locator(".mk-check.on").count() === 2, "the app closed and opened again: nothing lost");
     await page.getByRole("button", { name: "Go on cooking" }).click().catch(() => {}); await page.waitForTimeout(400);
     await page.locator(".cook-mode button").filter({ hasText: "Close" }).first().click().catch(() => {}); await page.waitForTimeout(300);

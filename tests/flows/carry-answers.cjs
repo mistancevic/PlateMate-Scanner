@@ -57,7 +57,7 @@ const U = "http://127.0.0.1:3237";
     const crepesCard = page.locator(".log-card").filter({ has: page.locator(".card-top", { hasText: "crêpes" }) }).first();
     ok(await page.locator(".carry-card").count() === 0, "no second card for the question");
     const q = sarmaCard.locator(".carry-in");
-    ok(/How did it carry you\?/.test(await q.textContent()) && await q.getByRole("button").count() === 3, "Sarma's card asks How did it carry you?, with three answers");
+    ok(/About 30 minutes on: how did it carry you\?/.test(await q.textContent()) && await q.getByRole("button").count() === 3, "Sarma's card asks How did it carry you?, with three answers");
     const cb = await sarmaCard.boundingBox(), qb = await q.boundingBox(), pb = await sarmaCard.locator(".log-photo, .meal-thumb, img, .recipe-tile-blank").first().boundingBox();
     const rowTops = await q.getByRole("button").evaluateAll((bs) => bs.map((x) => Math.round(x.getBoundingClientRect().top)));
     ok(pb && qb.x <= pb.x + 1 && qb.width > cb.width - 60 && new Set(rowTops).size === 1, "the answers take the card's full width, under the photo, in one row");

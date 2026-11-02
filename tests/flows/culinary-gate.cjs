@@ -37,7 +37,7 @@ const U = "http://127.0.0.1:3262";
   const st = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   await page.goto(U + "/plate"); await page.waitForTimeout(1800);
   // DT94: the phase bar
-  ok(JSON.stringify(await page.locator(".phase-bar span").allTextContents()) === JSON.stringify(["Craft", "Make", "Feedback"]) && await page.locator(".phase-bar span.on").count() === 1, "DT94: three phases, Craft on");
+  ok(JSON.stringify(await page.locator(".phase-bar span").allTextContents()) === JSON.stringify(["Craft", "Make", "Eat"]) && await page.locator(".phase-bar span.on").count() === 1, "DT94: three phases, Craft on");
   // DT93, rule 1: the portion lines
   const gates = await page.locator(".gate-line").allTextContents();
   ok(gates.length === 2 && gates[0] === "150 g is 3 bars. One bar is about 50 g." && gates[1] === "150 g is over a portion of peanut butter, 15 to 40 g.", "DT93: red lines under the bar and the peanut butter, none under 10 g of yeast: " + gates.join(" | "));
@@ -95,11 +95,11 @@ const U = "http://127.0.0.1:3262";
   await page.locator(".way").first().click(); await page.getByRole("button", { name: "Lock the recipe, this way" }).click(); await page.waitForTimeout(900);
   ok(await page.locator(".phase-bar span.on").count() === 2 && /^Make: Peanut banana toast/.test(await text("h2")), "DT94: Make, with the recipe's name");
   const ticks = page.locator(".mk-check");
-  ok(await ticks.count() >= 2 && /Tick the steps as you go/.test(await text()), "DT94: the steps to tick on the Make screen: " + await ticks.count());
+  ok(await ticks.count() >= 2 && /Tick the steps as you go, add photos to them/.test(await text()), "DT94: the steps to tick on the Make screen: " + await ticks.count());
   await ticks.first().click(); ok(await page.locator(".mk-check.on").count() === 1, "DT94: a step ticked");
-  ok(await page.getByRole("button", { name: "Rate it" }).count() === 1 && await page.getByRole("button", { name: /On to/ }).count() === 0, "DT99: the button on Make is Rate it");
-  await page.getByRole("button", { name: "Rate it" }).click(); await page.waitForTimeout(800);
-  ok(await page.locator(".phase-bar span.on").count() === 3 && /Feedback: how was it\?/.test(await text("h2")) && /Peanut banana toast · named in Craft/.test(await text()) && await page.getByLabel("Name it").count() === 0, "DT94: Feedback, the name from Craft, no Name it");
+  ok(await page.getByRole("button", { name: /^Cooked\. Next: Eat/ }).count() === 1 && await page.getByRole("button", { name: /On to|Rate it/ }).count() === 0, "DT211 v8: the button on Make is Cooked. Next: Eat");
+  await page.getByRole("button", { name: /^Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(800);
+  ok(await page.locator(".phase-bar span.on").count() === 3 && /Eat: how was it\?/.test(await text("h2")) && /Peanut banana toast · named in Craft/.test(await text()) && await page.getByLabel("Name it").count() === 0, "DT94: Feedback, the name from Craft, no Name it");
   await page.getByRole("button", { name: "DaaM good" }).click(); await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1200);
   ok((await st()).meals[0]?.title === "Peanut banana toast", "DT94: saved under the name from Craft");
   // 0.2.96 (Milan 02:11): the bowl way chosen at Lock is saved as the recipe's steps, with the way's name
