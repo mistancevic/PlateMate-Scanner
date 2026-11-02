@@ -1038,7 +1038,9 @@ export function JourneyScreen(p: AppApi) {
   // front; nutrition and your day are arithmetic (src/gates.ts). Each answers for itself; all three green is the sweet spot.
   const gateOn = items.length >= 1 && !imported && !madeBy && !partsMode && (t.calories ?? 0) >= 100;
   const nutri = gateOn ? nutritionGate({ items, kind: p.kind === "dessert" ? "dessert" : p.pick === "snack" || mealWord === "snack" ? "snack" : "meal", beforeTraining: p.moment === "before", mealWord }) : { ok: true as const };
-  const dayLine = gateOn ? dayGate({ items, moment: p.moment, now: new Date(), window: windowOf(lifestyleOf(p.personal)), kind: p.kind, mealWord, needsCooking }) : { ok: true as const };
+  // 0.3.62: Exploring (the pencil block, or an Exploring photo) eats nothing now: no eating-window check
+  const exploringNow = p.pick === "exploring" || state.photo?.who === "idea";
+  const dayLine = gateOn && !exploringNow ? dayGate({ items, moment: p.moment, now: new Date(), window: windowOf(lifestyleOf(p.personal)), kind: p.kind, mealWord, needsCooking }) : { ok: true as const };
   const [gateKept, setGateKept] = useState<string>("");
   const culinaryOk = dishNow?.status === "done" ? dishNow.makesIt : null;
   // DT132: an edge passes, but the sweet spot waits for a clear pass
@@ -1425,7 +1427,7 @@ export function JourneyScreen(p: AppApi) {
         <section className="card plate-card">
         {/* DT131: the question about foods landing on this plate shows alone now, above (DT212 v4, gap 5) */}
         {/* DT130 (0.2.110, board Stories78, DT130c): a photo from Your photos asks whose plate, and when, before the read */}
-        {p.photoAsk && <PhotoAsk key={p.photoAsk.at + p.photoAsk.image.length} image={p.photoAsk.image} at={p.photoAsk.at} drop={p.dropPhotoAsk}
+        {p.photoAsk && <PhotoAsk key={p.photoAsk.at + p.photoAsk.image.length} image={p.photoAsk.image} at={p.photoAsk.at} drop={p.dropPhotoAsk} exploring={p.pick === "exploring"}
           mealAt={(d) => { const s = slotAt(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(d)), `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`); return s ? s.name.toLowerCase() : null; }}
           read={(x) => { void p.readMealPhoto(p.photoAsk!.image, x); }} />}
         {/* DT219 (0.3.58, board Stories164): a read that found no foods; the Plate stays as it was */}
@@ -1444,7 +1446,7 @@ export function JourneyScreen(p: AppApi) {
           <div className="mp-big">
             <div className="mp-big-img"><img src={state.photo.image} alt="your meal" />
               <div className="mp-tags">{items.map((i) => <span key={i.id}>{i.food.name.split(",")[0]} {i.est ? "~" : ""}{Math.round(i.grams)} g</span>)}</div></div>
-            <div className="mp-big-row"><small className="muted">{state.photo.who === "idea" ? "An idea from a photo" : `${photoTime(state.photo.at)} · ${state.photo.who === "ate" ? "from your photos" : "at the table"}`}</small>
+            <div className="mp-big-row"><small className="muted">{state.photo.who === "idea" ? "Exploring a photo" : `${photoTime(state.photo.at)} · ${state.photo.who === "ate" ? "from your photos" : "at the table"}`}</small>
               <button type="button" className="link mp-retake" onClick={p.mealCamera}>Retake</button>
               <button type="button" className="link" onClick={() => setPhotoBig(false)}>Close</button></div>
           </div>
@@ -1452,7 +1454,7 @@ export function JourneyScreen(p: AppApi) {
           <button type="button" className="mp-line" onClick={() => setPhotoBig(true)} aria-label="Your photo, tap to see it large">
             <img src={state.photo.image} alt="" />
             {state.photo.who === "idea"
-              ? <span><b>An idea from a photo.</b> {items.length} {items.length === 1 ? "food" : "foods"} read, amounts estimated (~). Not logged: it is not your plate.</span>
+              ? <span><b>Exploring a photo.</b> {items.length} {items.length === 1 ? "food" : "foods"} read, amounts estimated (~). Not logged: it is not your meal.</span>
               : <span><b>Your photo, {photoTime(state.photo.at)}.</b> {items.length} {items.length === 1 ? "food" : "foods"} read, amounts estimated (~). Tap the photo to see it large; tap an amount to correct it.</span>}
           </button>
         ))}
@@ -1754,7 +1756,7 @@ export function JourneyScreen(p: AppApi) {
             {dishNow && dishNow.status === "done" && !dishNow.makesIt && dishKept === dishSig && <div className="gate-line-row gate-yes"><b>✓ Culinary</b><small>Kept as it is.</small></div>}
             {/* DT116: nutrition and your day, each its own line; the sweet spot when all three hold */}
             {gateOn && !bigPlate && (dishNow?.status === "done" || !nutri.ok || !dayLine.ok || anyEdge) && gateLine("Nutrition", nutri)}
-            {gateOn && !bigPlate && (dishNow?.status === "done" || !nutri.ok || !dayLine.ok || anyEdge) && gateLine("Your day", dayLine)}
+            {gateOn && !bigPlate && !exploringNow && (dishNow?.status === "done" || !nutri.ok || !dayLine.ok || anyEdge) && gateLine("Your day", dayLine)}
             {/* DT132: the plate's size on the edge, 1.3 to 1.5 portions of its meal */}
             {gateOn && sizeEdge && !bigPlate && share && <div className="gate-line-row gate-edge"><b>~ Size, on the edge</b><small>About {fixed(sizeNow.portions)} {mealWord} portions: {fmt(t.calories, 0)} kcal for a {mealWord} of about {fmt(share.kcal, 0)}, and the line is 1.5.</small><small className="gate-hint">To be clear of it: a little less of one food, or Fit.</small></div>}
             {sweetSpotOf(ingredientsOn.length === 0) && <small className="gate-sweet">DaaM Good spot: a dish, the numbers, and your day, all three.</small>}
@@ -1770,7 +1772,7 @@ export function JourneyScreen(p: AppApi) {
           </section>
         )}
         {/* DT127: under the gates, one line what to do with the plate in front of you, by code, and the buttons, the advice first */}
-        {state.photo && state.photo.who === "idea" && items.length > 0 && !p.filling && (() => {
+        {state.photo && state.photo.who === "idea" && items.length > 0 && (() => {
           // DT130 (0.2.110, board Stories78, DT130d): an idea: the same read and gates; the buttons are for cooking it, not logging it
           const line = ideaAdvice({ items, protein: t.protein ?? 0, mealWord, big: bigN, nutrition: nutri });
           const mealOf = (): Meal => ({ id: uid(), title: state.title && state.title !== "DaaM" ? state.title : autoTitle(items), items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
@@ -1780,7 +1782,7 @@ export function JourneyScreen(p: AppApi) {
           const sl = slots.find((s) => s.id === ideaPlan?.slotId) ?? slots.find((s) => s.id === mealSlot?.id) ?? slots[0];
           return (
             <section className="card mp-say" aria-label={`${CHEF_NAME} on the idea`}>
-              <small><b>{CHEF_NAME}:</b> {line}</small>
+              <small><b>{CHEF_NAME}:</b> {line}{p.exploreLeft ? ` Exploring, so ${p.exploreLeft} stays as it was.` : ""}</small>
               <div className="mp-idea-row">
                 <button className="pill pill-small pill-primary" onClick={makeAMeal}><ChefHat size={16} className="hat" /> {fit ? "Fit again" : `Fit it to my ${mealWord}`}</button>
                 <button className="pill pill-small" onClick={() => p.saveIdea(mealOf(), state.photo!.image)}>Save as an idea</button>

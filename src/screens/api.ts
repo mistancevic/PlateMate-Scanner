@@ -43,6 +43,8 @@ export interface AppApi {
   dropPhotoAsk: () => void;
   // DT219 (0.3.58, board Stories164): a read that found no foods; the Plate stays as it was and Chef Mealan says so
   photoNoFoods: boolean;
+  // 0.3.62: the meal an Exploring photo left (Sunday's dinner), or null
+  exploreLeft: string | null;
   dropNoFoods: () => void;
   // DT218 (0.3.58): the meal card whose last question Go on opened
   carryNow: { id: string; at: number } | null;

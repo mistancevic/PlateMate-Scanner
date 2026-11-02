@@ -48,7 +48,9 @@ export const hhmm = (d: Date) => `${String(d.getHours()).padStart(2, "0")}:${Str
 
 // which chip starts on: a photo from the last half hour is the meal in front of you; earlier today or yesterday, a meal you
 // ate then; older than that, an idea. A tap changes it.
-export function startWho(at: Date, now: Date): Who {
+export function startWho(at: Date, now: Date, exploring = false): Who {
+  // 0.3.62: with the pencil block on Exploring, Exploring starts on
+  if (exploring) return "idea";
   const mins = (now.getTime() - at.getTime()) / 60000;
   if (mins >= -5 && mins <= 30) return "now";
   const y = new Date(now); y.setDate(y.getDate() - 1);
@@ -64,11 +66,12 @@ export function photoFrom(at: Date, now: Date): string {
 }
 
 // the chip's words: short (Milan 15:45)
-export function chipWord(who: Who, time: string): string { return who === "ate" ? `Ate at ${time}` : who === "now" ? "Eating now" : "An idea"; }
+// 0.3.62 (Coach Milan 20:55): the third chip is Exploring, the pencil block's word: no meal of yours, nothing logged
+export function chipWord(who: Who, time: string): string { return who === "ate" ? `Ate at ${time}` : who === "now" ? "Eating now" : "Exploring"; }
 
 // the line under the chips: what the one that is on does
 export function whoLine(who: Who, time: string, meal: string | null): string {
-  if (who === "idea") return "Not logged. Chef Mealan reads it as an idea to cook.";
+  if (who === "idea") return "Not your meal, not logged. Chef Mealan reads it: cook it, keep it as an idea, or plan it.";
   if (who === "now") return `As from the camera: the plate in front of you${meal ? `, as ${meal}` : ""}.`;
   return `Logged at ${time}${meal ? `, as ${meal}` : ""}. Tap the time to change it.`;
 }

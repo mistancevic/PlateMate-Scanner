@@ -39,9 +39,10 @@ test("DT130: the words: short chips, the line under them says what the chip on d
   assert.equal(photoFrom(new Date(2026, 9, 26, 12, 40), now), "A photo from 12:40 today.");
   assert.equal(photoFrom(new Date(2026, 9, 25, 19, 10), now), "A photo from yesterday, 19:10.");
   assert.match(photoFrom(new Date(2026, 9, 20, 19, 10), now), /^A photo from Tuesday 20 October, 19:10\.$/);
-  assert.deepEqual(["ate", "now", "idea"].map((w) => chipWord(w as any, "12:40")), ["Ate at 12:40", "Eating now", "An idea"]);
+  assert.deepEqual(["ate", "now", "idea"].map((w) => chipWord(w as any, "12:40")), ["Ate at 12:40", "Eating now", "Exploring"]);
   assert.equal(whoLine("ate", "12:40", "lunch"), "Logged at 12:40, as lunch. Tap the time to change it.");
-  assert.equal(whoLine("idea", "12:40", null), "Not logged. Chef Mealan reads it as an idea to cook.");
+  assert.equal(whoLine("idea", "12:40", null), "Not your meal, not logged. Chef Mealan reads it: cook it, keep it as an idea, or plan it.");
+  assert.equal(startWho(new Date("2026-11-02T12:30:00"), new Date("2026-11-02T12:35:00"), true), "idea", "0.3.62: the pencil block on Exploring starts on Exploring");
   const t = atTime(new Date(2026, 9, 25, 19, 10), "20:05");
   assert.deepEqual([t.getDate(), t.getHours(), t.getMinutes()], [25, 20, 5]);
 });
