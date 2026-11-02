@@ -43,13 +43,13 @@
     }
   },
   "versions": [
+    "0.3.56",
+    "0.3.55",
+    "0.3.54",
     "0.3.53",
     "0.3.52",
     "0.3.51",
-    "0.3.50",
-    "0.3.49",
-    "0.3.48",
-    "0.3.47"
+    "0.3.50"
   ],
   "tickets": [
     {
@@ -83,17 +83,19 @@
       "id": "DT216",
       "title": "Cooked plates get cooking steps, never the bowl pattern",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": 163,
-      "why": "Milan 15:54: his crêpes got the bowl steps (step 2 held six foods). Flour, raw egg, raw meat or fish, or a batter make a plate cooked. Board drawn, waits for his look."
+      "why": "Milan 15:54: his crêpes got the bowl steps (step 2 held six foods). Flour, raw egg, raw meat or fish, or a batter make a plate cooked. Board drawn, waits for his look.",
+      "version": "0.3.56"
     },
     {
       "id": "DT217",
       "title": "Cooking move by move: one food or one action at a time",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": 163,
-      "why": "Milan 16:09: the recipe stays as written; cook mode reads moves, drafted once per recipe by Chef Mealan, in code as the fallback. Board drawn, waits for his look."
+      "why": "Milan 16:09: the recipe stays as written; cook mode reads moves, drafted once per recipe by Chef Mealan, in code as the fallback. Board drawn, waits for his look.",
+      "version": "0.3.56"
     },
     {
       "id": "DT213",
