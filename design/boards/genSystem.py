@@ -9,6 +9,12 @@ def box(title, lines, color, w=300):
             f'<b style="font-size:15px;color:{color}">{html.escape(title)}</b>' + "".join(f'<div style="font-size:12.5px;line-height:1.45;color:#172742;margin-top:4px">{l}</div>' for l in lines) + "</div>")
 def arrow(t): return f'<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;width:70px;font-size:11px;color:#5b6b8a;text-align:center;line-height:1.3"><span style="font-size:22px;color:#172742">→</span>{t}</div>'
 
+LEGEND = ('<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:#172742;margin-top:8px;padding:8px 10px;background:#f4f7fc;border-radius:10px">'
+  '<b style="color:#5b6b8a">CODES</b>'
+  '<span><b>P1 to P11</b> a person\'s happy paths</span><span><b>C1 to C7</b> a coach\'s happy paths</span>'
+  '<span><b>DT</b> a design ticket (Draw, then Go)</span><span><b>HP</b> a home page ticket</span>'
+  '<span><b>EX</b> Explorer, <b>EV</b> evals, <b>OP</b> operations, <b>R</b> recipes, <b>f</b> a privacy finding</span>'
+  '<span><b>Stories N</b> the board on Page 2</span><span><b>v0.3.50</b> the version it shipped in</span></div>')
 # ---- part 1: the system map
 phone = box("The phone: chefmealan.com", [
   "A web app (React, TypeScript, Vite) installed from the browser. Works offline for the plate and the numbers.",
@@ -47,6 +53,36 @@ grid = (f'<div style="display:grid;grid-template-columns:330px 70px 330px 70px 3
         f'{people}{arrow("uses")}{phone}{arrow("HTTPS, JSON")}{server}{arrow("key on the server only")}{gemini}'
         f'<div></div><div></div><div></div><div></div>{firebase}<div></div>{others}'
         f'<div></div><div></div>{quality}<div></div><div></div><div></div><div></div></div>')
+
+def arch():
+    # the technical graph: boxes and arrows, drawn as SVG
+    def rect(x,y,w,h,c,t,sub=""):
+        return (f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="12" fill="#fff" stroke="{c}" stroke-width="2.5"/>'
+                f'<text x="{x+w/2}" y="{y+26}" text-anchor="middle" font-size="15" font-weight="800" fill="{c}">{t}</text>'
+                + "".join(f'<text x="{x+w/2}" y="{y+46+i*16}" text-anchor="middle" font-size="12" fill="#3d4a63">{l}</text>' for i,l in enumerate(sub)))
+    def ar(x1,y1,x2,y2,t="",both=False):
+        m=' marker-start="url(#a0)"' if both else ''
+        mid=f'<text x="{(x1+x2)/2}" y="{(y1+y2)/2-6}" text-anchor="middle" font-size="11" fill="#5b6b8a">{t}</text>' if t else ""
+        return f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#172742" stroke-width="2" marker-end="url(#a1)"{m}/>{mid}'
+    g = ['<defs><marker id="a1" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#172742"/></marker><marker id="a0" markerWidth="10" markerHeight="10" refX="1" refY="5" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#172742"/></marker></defs>']
+    g.append(rect(20,80,230,150,"#d35400","People",["a person, a coach, the owner","Testers 1 to 3 on preview","Claude builds and tests"]))
+    g.append(rect(330,60,300,190,"#2e7be8","Phone: chefmealan.com (PWA)",["React, TypeScript, Vite","state in localStorage, offline first","the calculator and the letters: code","camera: label, barcode, Photo of my meal","speech: the browser's own voice and ears","Explorer, Today, Plan, Plate, Recipes, Clients","public pages: home, /recipes, /r/slug, /built"]))
+    g.append(rect(360,370,240,80,"#2e7be8","Kitchen screen",["a second phone, /cook, 4-letter code"]))
+    g.append(rect(720,60,320,190,"#172742","Server: Cloud Run, Frankfurt",["Express, one process, 70 routes","serves the app and the public pages","the coach's rules in code (docs/rules)","every AI call, with its schema and fallbacks","events and the AI bill per call (Metrics)","cook sessions, invites, waiting list","deploy: preview.sh, promote, rollback"]))
+    g.append(rect(1130,60,300,120,"#8e44ad","Gemini (Google AI)",["gemini-3.8-flash, 3.5-flash-lite, 3.6-flash","photo read, label table, chat, checks,","recipe read, steps, swap, tip, cover, judge"]))
+    g.append(rect(1130,220,300,110,"#1e8e5a","Firebase (Google)",["Auth: sign in with Google","Firestore: accounts, links, cards, metrics","Storage: photos as files, Frankfurt"]))
+    g.append(rect(1130,370,300,80,"#5b6b8a","Open Food Facts · Google Calendar",["barcodes and search · training and busy times"]))
+    g.append(rect(720,370,320,80,"#16a085","GitHub: the repo",["code, boards, rules, qa runs, evals; CI: unit tests"]))
+    g.append(ar(250,155,330,155,"uses"))
+    g.append(ar(630,150,720,150,"HTTPS, JSON",True))
+    g.append(ar(1040,110,1130,110,"key on the server",True))
+    g.append(ar(1040,275,1130,275,"admin SDK",True))
+    g.append(ar(1040,230,1130,400,"fetch"))
+    g.append(ar(480,250,480,370,"polls every 2 s",True))
+    g.append(ar(880,250,880,370,"git push, deploy"))
+    g.append('<polyline points="480,60 480,22 1280,22 1280,220" fill="none" stroke="#172742" stroke-width="2" marker-end="url(#a1)" marker-start="url(#a0)"/><text x="880" y="16" text-anchor="middle" font-size="11" fill="#5b6b8a">sign in with Google, the account\'s copy of the phone\'s data, photos (Firebase SDK)</text>')
+    return f'<svg width="1450" height="470" viewBox="0 0 1450 470" style="display:block;margin-top:8px;font-family:Nunito,ui-sans-serif,system-ui,sans-serif">{"".join(g)}</svg>'
+
 # ---- part 2: the paths, step by step
 P = [
  ("P1 Get in", [("human","reads the home page, tries the calculator"),("code","the calculator, the letters"),("human","joins the beta, signs in with Google"),("code","Firebase Auth"),("human","I'm 18 or older, consent, profile, goal"),("rules","what each step needs; the row To set"),("code","PD target, protein a day, the window")]),
@@ -89,14 +125,17 @@ page = f'''<!doctype html>
 <div style="width:{W}px;box-sizing:border-box;padding:18px;background:#fff;color:#172742;font-family:'Nunito',ui-sans-serif,system-ui,sans-serif;font-size:15px">
 <b style="font-size:22px;font-weight:900">Chef Mealan: the system, and who does what on every path</b>
 <div style="font-size:14px;color:#3d4a63;font-weight:600;line-height:1.45;margin-top:4px">As of 0.3.50. Top: the parts and what runs where. Below: the 18 happy paths step by step, each step tagged with what does it. Code is deterministic and tested by unit tests and walkthroughs. Rules are the coach's rules written as code, tested the same way and by the rule evals. LLM is a Gemini call, tested by evals with a human label and a judge. Human is where a person or the coach decides.</div>
-<div style="font-size:12px;font-weight:900;color:#5b6b8a;letter-spacing:.05em;margin:18px 0 8px">THE SYSTEM</div>
+{LEGEND}
+<div style="font-size:12px;font-weight:900;color:#5b6b8a;letter-spacing:.05em;margin:18px 0 8px">THE TECHNICAL GRAPH</div>
+{arch()}
+<div style="font-size:12px;font-weight:900;color:#5b6b8a;letter-spacing:.05em;margin:18px 0 8px">THE PARTS, IN WORDS</div>
 {grid}
 <div style="font-size:12px;font-weight:900;color:#5b6b8a;letter-spacing:.05em;margin:22px 0 8px">THE PATHS, STEP BY STEP &nbsp; {legend}</div>
 <div style="column-count:2;column-gap:14px">{"".join(pathCard(*p) for p in P)}</div>
 <div style="font-size:12.5px;color:#3d4a63;line-height:1.45;margin-top:12px"><b>Reading it:</b> an LLM chip is where an eval belongs and where a person can still correct the answer on the screen; a Rules chip is a line in docs/rules with a case; a Code chip is a walkthrough. A path with no LLM chip (P2, P8, P10, C2, C3, C6) works with the AI off and costs nothing to run.</div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":{W},"height":2400}}}}'>
+<script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":{W},"height":2900}}}}'>
 class Component extends DCLogic {{
   renderVals() {{
     return {{}};

@@ -7,6 +7,12 @@ E = bl["epics"]; T = bl["tickets"]; V = bl["versions"]
 COL = {"home": "#d35400", "setup": "#2e7be8", "plate": "#1e8e5a", "cook": "#8e44ad", "coach": "#123a7a", "explorer": "#c0392b", "trust": "#5b6b8a", "lang": "#b7950b", "ops": "#16a085"}
 CW, G, PAD = 268, 18, 18
 cols = [("todo", "To do", "Now, Next and Later, one below the other."), ("progress", "In progress", "Branch open, tests running."), ("done", "Done", f"Merged. The last {len(V)} versions, newest first.")]
+LEGEND = ('<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:#172742;margin-top:8px;padding:8px 10px;background:#f4f7fc;border-radius:10px">'
+  '<b style="color:#5b6b8a">CODES</b>'
+  '<span><b>P1 to P11</b> a person\'s happy paths</span><span><b>C1 to C7</b> a coach\'s happy paths</span>'
+  '<span><b>DT</b> a design ticket (Draw, then Go)</span><span><b>HP</b> a home page ticket</span>'
+  '<span><b>EX</b> Explorer, <b>EV</b> evals, <b>OP</b> operations, <b>R</b> recipes, <b>f</b> a privacy finding</span>'
+  '<span><b>Stories N</b> the board on Page 2</span><span><b>v0.3.50</b> the version it shipped in</span></div>')
 def chip(e): return f'<span style="display:inline-block;background:{COL[e]};color:#fff;border-radius:999px;padding:1px 8px;font-size:11.5px;font-weight:800">{html.escape(E[e]["name"])}</span>'
 def card(t):
     meta = []
@@ -54,6 +60,7 @@ page = f'''<!doctype html>
 <div style="width:{W}px;box-sizing:border-box;padding:{PAD}px;background:#fff;color:#172742;font-family:'Nunito',ui-sans-serif,system-ui,sans-serif;font-size:15px">
 <b style="font-size:22px;font-weight:900">Chef Mealan Kanban</b>
 <div style="font-size:14px;color:#3d4a63;font-weight:600;line-height:1.45;margin-top:4px">Drawn from docs/backlog.json in the repo. A card moves right only when its step is done: an idea, then your answer, then a board, then Go, then a version. Say the word and the card moves. Done shows the last {len(V)} versions.</div>
+{LEGEND}
 <div style="font-size:12px;font-weight:900;color:#5b6b8a;letter-spacing:.05em;margin-top:16px">EPICS, AND WHY</div>
 <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px">{epics}</div>
 <div style="display:flex;gap:{G}px;align-items:flex-start;margin-top:18px">{"".join(column(*c) for c in cols)}</div>

@@ -41,6 +41,12 @@ def col(title, sub, rows):
     return (f'<div style="width:560px;flex:none;background:#eef3fb;border-radius:14px;padding:10px">'
             f'<div style="background:#172742;color:#fff;border-radius:10px;padding:7px 10px"><b style="font-size:15px">{title}</b> <span style="opacity:.8;font-size:13px">{len(rows)}</span><div style="font-size:11.5px;opacity:.9;line-height:1.35;margin-top:2px">{sub}</div></div>'
             f'<div style="margin-top:10px">{"".join(card(*r) for r in rows)}</div></div>')
+LEGEND = ('<div style="display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:#172742;margin-top:8px;padding:8px 10px;background:#f4f7fc;border-radius:10px">'
+  '<b style="color:#5b6b8a">CODES</b>'
+  '<span><b>P1 to P11</b> a person\'s happy paths</span><span><b>C1 to C7</b> a coach\'s happy paths</span>'
+  '<span><b>DT</b> a design ticket (Draw, then Go)</span><span><b>HP</b> a home page ticket</span>'
+  '<span><b>EX</b> Explorer, <b>EV</b> evals, <b>OP</b> operations, <b>R</b> recipes, <b>f</b> a privacy finding</span>'
+  '<span><b>Stories N</b> the board on Page 2</span><span><b>v0.3.50</b> the version it shipped in</span></div>')
 W = 18 * 2 + 560 * 2 + 18
 page = f'''<!doctype html>
 <html lang="en">
@@ -58,6 +64,7 @@ page = f'''<!doctype html>
 <div style="width:{W}px;box-sizing:border-box;padding:18px;background:#fff;color:#172742;font-family:'Nunito',ui-sans-serif,system-ui,sans-serif;font-size:15px">
 <b style="font-size:22px;font-weight:900">Happy paths: the jobs people and coaches want done</b>
 <div style="font-size:14px;color:#3d4a63;font-weight:600;line-height:1.45;margin-top:4px">One card per job, in the order a person meets it. Under each, the walkthroughs in tests/flows that guard it (green: exists; red: not yet). What no walkthrough can reach is checked on the phone. A card on the Kanban names the path it serves. The old list in tests/flows/paths.cjs (PA1 to PA8, 7 October) is behind this one.</div>
+{LEGEND}
 <div style="display:flex;gap:18px;align-items:flex-start;margin-top:18px">{col("A person", "Someone who eats, cooks and trains; a member of a coach, or on their own.", PERSON)}{col("A coach", "Coach Milan, and coaches after him: clients first, their own day too.", COACH)}</div>
 </div>
 </x-dc>
