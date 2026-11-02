@@ -38,7 +38,8 @@ const PORT = "3196", B = `http://127.0.0.1:${PORT}`;
       if (!sessionStorage.getItem("seeded")) { localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); sessionStorage.setItem("seeded", "1"); }
       // the stand-in voice: what is read aloud is kept
       window.__spoken = [];
-      const synth = { speak: (u) => window.__spoken.push(u.text), cancel: () => {}, getVoices: () => [] };
+      // the stand-in voice says when it has finished, as a phone does (0.3.54: nothing is heard while it speaks)
+      const synth = { speak: (u) => { window.__spoken.push(u.text); queueMicrotask(() => u.onend && u.onend()); }, cancel: () => {}, getVoices: () => [] };
       Object.defineProperty(window, "speechSynthesis", { value: synth, configurable: true });
       window.SpeechSynthesisUtterance = function (t) { this.text = t; };
       // the stand-in screen lock
