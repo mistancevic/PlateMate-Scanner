@@ -173,6 +173,8 @@ export function stripWords(c: Cook, now = new Date()): { lead: string; rest: str
   }
   return null;
 }
+// DT227 (0.3.61): how many of the cook's steps are ticked
+export const stepsTicked = (c: Cook) => { const n = c.steps ?? 0; return (c.ui.ticks ?? []).filter((x) => /^s\d+$/.test(x) && Number(x.slice(1)) < n).length; };
 // Coming back in the middle: You were cooking Protein Pancake: 3 of 5 steps ticked, 2 photos. Go on where you left off?
 export function resumeLine(c: Cook): string {
   const n = c.steps ?? 0, t = (c.ui.ticks ?? []).filter((x) => /^s\d+$/.test(x) && Number(x.slice(1)) < n).length;

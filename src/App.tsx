@@ -8,6 +8,7 @@ import { idleOut, lastOpen, markOpen, setIdleOut } from "./idle";
 import { servingsOf } from "./pilot";
 import * as cooking from "./cooking";
 import { CookStrip } from "./components/CookStrip";
+import { startMark, startWait } from "./startTimes";
 import { wholeOnPlate } from "./counted";
 import { drainedOf, libraryId, packLine } from "./canned";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, useMemo } from "react";
@@ -1177,7 +1178,7 @@ export default function App() {
     document.addEventListener("visibilitychange", hide);
     return () => { autoFlush(null); clearInterval(t); document.removeEventListener("visibilitychange", hide); };
   }, [user?.uid]);
-  useEffect(() => watchUser((u) => { setUser(u); setAuthReady(true); if (!u) { cloudLoaded.current = false; recRef.current.uid = ""; setProfileReady(false); filesRef.current.uid = ""; filesRef.current.ready = false; setFilesFor(""); } }), []);
+  useEffect(() => watchUser((u) => { startMark(u ? "Signed in" : "Not signed in"); setUser(u); setAuthReady(true); if (!u) { cloudLoaded.current = false; recRef.current.uid = ""; setProfileReady(false); filesRef.current.uid = ""; filesRef.current.ready = false; setFilesFor(""); } }), []);
   useEffect(() => {
     if (!user || cloudLoaded.current) return;
     let stale = false;
@@ -1190,7 +1191,9 @@ export default function App() {
         if (!owner) localStorage.setItem(PHONE_OWNER, user.uid);
       } catch { /* no storage: nothing to carry over either */ }
       try {
+        startWait("account");
         const remote = await withTimeout(loadCloud(user.uid), 20000);
+        startMark("account");
         if (stale) return;
         if (remote) setReview(((remote as any).numbersReview as NumbersReview | undefined) ?? null);
         remoteMeta.current = { photosMovedAt: remote?.photosMovedAt, photosOldGoneAt: remote?.photosOldGoneAt, recordsMovedAt: remote?.recordsMovedAt };
@@ -1206,8 +1209,13 @@ export default function App() {
         if (phoneIsNewer) {
           const kept = { ...state, foods: state.foods.filter((f) => !gone.has(f.id)) };
           if (kept.foods.length !== state.foods.length) setState(kept);
-          await saveCloud(user.uid, { ...blockOf(kept), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() });
-          setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() });
+          // 0.3.61 (Coach Milan 20:24): the app opens once the account is read; the phone's newer copy goes up in the background
+          // (it used to wait for the account to confirm the save, with no time limit, and the first opening after a release hung)
+          const up = () => saveCloud(user.uid, { ...blockOf(kept), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() });
+          setCloudStatus({ ok: true, text: "This phone has newer changes; saving them to your account", at: new Date().toISOString() });
+          void up().then(() => setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() }))
+            .catch(() => window.setTimeout(() => void up().then(() => setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() }))
+              .catch((e) => setCloudStatus({ ok: false, text: `Not saved yet: ${explainCloudError(e)}` })), 30000));
         } else if (remote && !(isEmptyState(remote.state) && !isEmptyState(state))) {
           // a real account copy replaces the phone; photos are merged back from the phone by id
           try {
@@ -1246,8 +1254,11 @@ export default function App() {
           }
           setCloudStatus({ ok: true, text: "Loaded from your account", at: new Date().toISOString() });
         } else {
-          await saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() });
-          setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
+          // 0.3.61: a new account gets this phone's copy in the background too; the app does not wait for it
+          setCloudStatus({ ok: true, text: "Saving to your account", at: new Date().toISOString() });
+          void saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() })
+            .then(() => setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() }))
+            .catch((e) => setCloudStatus({ ok: false, text: `Not saved yet: ${explainCloudError(e)}` }));
         }
       } catch (e: any) {
         if (stale) return;

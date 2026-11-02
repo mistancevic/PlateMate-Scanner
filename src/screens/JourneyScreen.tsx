@@ -1335,11 +1335,12 @@ export function JourneyScreen(p: AppApi) {
       </section>)
     : null;
   // DT212 v4: plates and cooks saved for later wait under the title, with Continue; swipe left to remove
-  const laterBlock = step === "in" && (state.later ?? []).length > 0 ? (
+  // DT227 (0.3.61, board Stories167): only on the Plate's start screen, the empty What are you craving?
+  const laterBlock = step === "in" && (state.later ?? []).length > 0 && items.length === 0 && !state.photo && !state.fromRecipe && !p.filling ? (
     <section className="card later-card" aria-label="Saved for later">
       <b>Saved for later</b>
       <div className="later-list">{state.later!.map((x) => <LaterRow key={x.id} x={x} onContinue={() => p.continueLater(x.id)} onRemove={() => p.removeLater(x.id)} />)}</div>
-      <small>Continue puts it back on the Plate. A saved plate stays 7 days; Remove is on its own row when you swipe it left.</small>
+      <small>Continue puts it back on the Plate. It stays 7 days.</small>
     </section>) : null;
   if (step === "in" && inQuestion) return (<>{inHead}<CookStrip p={p} />{inQuestion}</>);
   if (step === "in")
@@ -2483,7 +2484,12 @@ export function JourneyScreen(p: AppApi) {
       )}
       {/* DT94: the name was set in Craft; the field stays only for a plate that has no name yet */}
       {state.title && state.title !== "DaaM" ? <small className="muted fb-name">{state.title} · named in Craft</small> : <label className="field"><span>Name it</span><input value={title} placeholder={plateName} onChange={(e) => setTitle(e.target.value)} /></label>}
-      <textarea placeholder="A line for your coach, if you like" value={note} onChange={(e) => setNote(e.target.value)} />
+      {/* DT225 v2 (0.3.61, board Stories166): your words, kept on the recipe, only for you */}
+      <div className="eat-words">
+        <ChefLine text="Anything you want to remember about it?" />
+        <textarea aria-label="Anything you want to remember about it?" placeholder="I felt so energized" value={note} onChange={(e) => setNote(e.target.value)} />
+        <small className="muted">Kept on the recipe, only for you. Your coach sees it when you share the meal.</small>
+      </div>
       {changedFrom ? (
         <section className="card save-recipe changed-ask" aria-label="Changed from your recipe">
           <div className="card-top"><span>Changed from your recipe {changedFrom.title}</span></div>
@@ -2547,6 +2553,7 @@ export function JourneyScreen(p: AppApi) {
 function LaterRow({ x, onContinue, onRemove }: { x: Later; onContinue: () => void; onRemove: () => void }) {
   const r = laterRow(x);
   const [open, setOpen] = useState(false);
+  const [armed, setArmed] = useState(false);
   const from = useRef<number | null>(null);
   const at = new Date(x.kind === "cook" ? x.cook!.startedAt : x.plate?.plateAt ?? x.plate?.photo?.at ?? x.at);
   const sub = x.kind === "cook" ? `cooking, ${whenWords(at)}` : `${whenWords(at)} · ${r.foods} ${r.foods === 1 ? "food" : "foods"}`;
@@ -2556,7 +2563,10 @@ function LaterRow({ x, onContinue, onRemove }: { x: Later; onContinue: () => voi
       <div className="lr-front" style={{ transform: open ? "translateX(-104px)" : undefined }}>
         {r.photo ? <img src={r.photo} alt="" /> : null}
         <span className="lr-words">{r.title}<br /><small className="muted">{sub}</small></span>
-        <button type="button" className="pill" onClick={onContinue}>Continue</button>
+        {/* DT227 (0.3.61, board Stories167): Remove in sight: a ✕, then Tap again to remove or Keep */}
+        {armed
+          ? <><button type="button" className="pill lr-arm" onClick={onRemove}>Tap again to remove</button><button type="button" className="link lr-keep" onClick={() => setArmed(false)}>Keep</button></>
+          : <><button type="button" className="pill" onClick={onContinue}>Continue</button><button type="button" className="lr-x" aria-label={`Remove ${r.title}`} onClick={() => setArmed(true)}>✕</button></>}
       </div>
     </div>
   );

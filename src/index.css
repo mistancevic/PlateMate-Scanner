@@ -2820,3 +2820,18 @@ html:has(.l-photo) { overflow-x: hidden; }
 /* DT223 (0.3.60): add a photo of this step */
 .cook-add-pic { position: relative; align-self: flex-start; min-height: 44px; margin-top: 6px; display: inline-flex; align-items: center; cursor: pointer; }
 .cook-pic-label { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+/* DT225 v2 (0.3.61): every time you ate it, at the end of the recipe */
+.rq-eats { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; margin: 16px 0 12px; } .rq-eats > b { font-size: 17px; } .rq-eats > small { font-size: 13px; }
+.re-row { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; border-top: 1px solid var(--line); }
+.re-row img, .re-none { width: 52px; height: 52px; border-radius: 10px; object-fit: cover; flex: none; } .re-none { background: var(--tint); display: inline-flex; align-items: center; justify-content: center; font-size: 22px; }
+.re-words { display: flex; flex-direction: column; gap: 2px; font-size: 14px; line-height: 1.4; } .re-words i { color: var(--ink); }
+.re-more { align-self: flex-start; min-height: 44px; }
+/* DT225 v2: on Eat, your words */
+.eat-words { display: flex; flex-direction: column; gap: 6px; } .eat-words small { font-size: 13px; }
+/* DT227 (0.3.61): Remove in sight on Saved for later */
+.lr-x { flex: none; width: 44px; height: 44px; border: 0; background: none; font-size: 18px; color: var(--muted); border-radius: 12px; cursor: pointer; }
+.lr-arm { color: var(--bad-text, #c0392b); border-color: #e8b4ad; min-height: 44px; } .lr-keep { min-height: 44px; min-width: 44px; }
+/* DT227 (0.3.61): the recipe points to its draft on the Plate */
+.rq-saved { display: flex; align-items: center; gap: 10px; padding: 12px 14px; margin: 12px 0; } .rq-saved > span { flex: 1; display: flex; flex-direction: column; gap: 2px; font-size: 14px; line-height: 1.4; } .rq-saved small { font-size: 13px; } .rq-saved .pill { min-height: 44px; }
+/* 0.3.61: the opening's steps and their times, on the slow screen */
+.starting-steps { display: block; font-size: 13px; font-variant-numeric: tabular-nums; margin: -4px 0 8px; }

@@ -1,5 +1,5 @@
 import { StepPicShown, StepPicSheet, StepPlayer } from "./StepPics";
-import { YourCooks, cookPhotosFor } from "./YourCooks";
+import { YourCooks, EatLog, cookPhotosFor } from "./YourCooks";
 import { stepPicOf, setStepPic, alignStepPics, allStepPics } from "../photos";
 import { ThinkingCard } from "./ThinkingCard";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -42,7 +42,9 @@ export type PubState = "draft" | "live" | "waiting" | "back" | "down" | null;
 const read = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const uid = () => Math.random().toString(36).slice(2, 10);
 
-export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onCookIt = null, makeAs = null, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount }: {
+export function RecipePage({ meal, cards, foods, cook, state, pub, approver, direct, unpublished = [], onPatch, onRename, onMakeIt, onCookIt = null, makeAs = null, onPublish, onDelete, close, draft, membersPanel, tryPhoto, picture, top, landing, coverToday, openOriginal, originalFoods, pdRef, fitPd, rates, backLabel, plannedLine, plannedCount, saved = null }: {
+  // DT227 (0.3.61, board Stories167): a draft of this recipe saved for later on the Plate
+  saved?: { sub: string; go: () => void } | null;
   // DT81: how many of its pieces the plan takes from today, for Cook it's suggestion
   plannedCount?: number;
   // DT79: what the plan takes of this batch, 8 sarmas: 3 on Monday lunch, 1 left
@@ -394,6 +396,13 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {!edit && <CarryBlock meal={meal} cards={cards} />}
       {/* DT214 v2 (0.3.53, board Stories162): a recipe collects its cooks */}
       {!edit && <YourCooks meal={meal} cards={cards} />}
+      {/* DT227 (0.3.61, board Stories167): the recipe points to its draft; the draft stays on the Plate */}
+      {!edit && saved && (
+        <section className="card rq-saved" aria-label="Saved for later on the Plate">
+          <span><b>Saved for later on the Plate</b><small className="muted">{saved.sub}</small></span>
+          <button type="button" className="pill" onClick={saved.go}>Continue ›</button>
+        </section>
+      )}
       <section className={`card rq-steps ${edit ? "editing" : ""}`}>
         <b>Steps</b>
         {edit
@@ -479,6 +488,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           </>)}
           <button className="pill pill-wide" onClick={startEdit}>Edit recipe</button>
           <small className="muted rq-under">Change the recipe itself: the foods, the grams, the steps.</small>
+          {/* DT225 v2 (0.3.61, board Stories166): the log of every time you ate it, under the buttons: a log, not an action */}
+          {!edit && <EatLog meal={meal} cards={cards} />}
           {cook && (
             <section className="card rq-pub">
               <div className="card-top"><b>On chefmealan.com</b>{state && <small className={`pub-state ${state}`}>{state === "live" ? "Live" : state === "down" ? "Taken down" : state === "waiting" ? `Waiting for ${approver}` : state === "back" ? "Sent back" : "Draft"}</small>}</div>
