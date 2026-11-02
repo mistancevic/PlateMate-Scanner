@@ -312,25 +312,43 @@
       "id": "DT222",
       "title": "Cook mode's done screen leads to Eat: the meal photo, then Cooked. Next: Eat ›",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": 165,
-      "why": "Milan 18:30: the done screen is a wall, not motivation for the next step. Board drawn, waits for his Go."
+      "why": "Milan 18:30: the done screen is a wall, not motivation for the next step. Go at 19:26.",
+      "version": "0.3.60"
     },
     {
       "id": "DT223",
       "title": "Add a photo of this step in cook mode, kept with the recipe",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": 165,
-      "why": "Milan 18:30, 19:00: photo of each step alongside the steps; start with option 1. Option 2 (Chef Mealan draws them) later. Board drawn, waits for his Go."
+      "why": "Milan 18:30, 19:00: photo of each step alongside the steps; start with option 1. Option 2 (Chef Mealan draws them) later. Go at 19:26.",
+      "version": "0.3.60"
     },
     {
       "id": "DT224",
       "title": "The empty Plate starts with What are you craving?; Craft, Make, Eat once it holds something",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": 165,
-      "why": "Milan 18:30: the three-step bar only once we know what we are crafting. Board drawn, waits for his Go."
+      "why": "Milan 18:30: the three-step bar only once we know what we are crafting. Go at 19:26.",
+      "version": "0.3.60"
+    },
+    {
+      "id": "DT225",
+      "title": "Every time you ate it, on the recipe: when, how much, taste, carried you, your words",
+      "epic": "cook",
+      "state": "next",
+      "board": 166,
+      "why": "Milan 19:15: log each time a recipe was eaten on its page, only for him. 19:26 yes to draw 1 and 2. Board drawn, waits for his Go."
+    },
+    {
+      "id": "DT226",
+      "title": "Share how a recipe went with members: totals first, then one row by choice",
+      "epic": "cook",
+      "state": "later",
+      "why": "Milan 19:15: maybe share so others see the feedback. Later, when there are members."
     }
   ]
 }
