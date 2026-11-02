@@ -81,7 +81,7 @@ def arch():
     # server ↔ gemini
     g += [line("1040,120 1130,120"), tri(1040,120,"l"), tri(1130,120,"r"), lab(1085,110,"the key")]
     # server ↔ firebase
-    g += [line("1040,275 1130,275"), tri(1040,275,"l"), tri(1130,275,"r"), lab(1085,267,"admin SDK")]
+    g += [line("1040,245 1130,245"), tri(1040,245,"l"), tri(1130,245,"r"), lab(1085,237,"admin SDK")]
     # server → open food facts, around the right of github
     g += [line("1000,260 1000,352 1090,352 1090,410 1130,410"), tri(1130,410,"r"), lab(1008,310,"fetch","start")]
     # phone ↔ kitchen
@@ -89,7 +89,7 @@ def arch():
     # server → github
     g += [line("880,260 880,370"), tri(880,370,"d"), lab(890,320,"git push, deploy","start")]
     # phone ↔ firebase, over the top and down the right side, outside Gemini
-    g += [line("480,60 480,22 1460,22 1460,275 1430,275"), tri(480,60,"d"), tri(1430,275,"l"), lab(970,16,"sign in with Google, the account's copy of the phone's data, photos (Firebase SDK)")]
+    g += [line("480,60 480,22 1460,22 1460,300 1430,300"), tri(480,60,"d"), tri(1430,300,"l"), lab(970,16,"sign in with Google, the account's copy of the phone's data, photos (Firebase SDK)")]
     svg = f'<svg width="1480" height="470" viewBox="0 0 1480 470" style="position:absolute;left:0;top:0;font-family:Nunito,ui-sans-serif,system-ui,sans-serif">{"".join(g)}</svg>'
     return f'<div style="position:relative;width:1480px;height:470px;margin-top:8px;font-family:Nunito,ui-sans-serif,system-ui,sans-serif">{svg}{boxes}</div>'
 

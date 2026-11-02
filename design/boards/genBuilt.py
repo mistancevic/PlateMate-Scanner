@@ -33,7 +33,7 @@ h1{font-size:40px;line-height:1.1;margin:6px 0 14px;font-weight:900}h2{font-size
 .facts{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}.fact{background:#fff;border:1.5px solid #d1dcf0;border-radius:12px;padding:10px 14px;min-width:150px}.fact b{display:block;font-size:22px;color:#123a7a}.fact span{font-size:13px;color:#3d4a63}
 .card{background:#fff;border:1.5px solid #d1dcf0;border-radius:14px;padding:16px 18px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.chip{display:inline-block;border-left:4px solid;background:#f4f7fc;border-radius:6px;padding:3px 8px;font-size:13px;margin:3px 4px 0 0}.chip b{font-size:11px}
+.chip{display:block;width:fit-content;border-left:4px solid;background:#f4f7fc;border-radius:6px;padding:3px 8px;font-size:13px;margin:3px 4px 0 0}.chip b{font-size:11px}
 .tag{display:inline-block;color:#fff;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:800;margin-right:6px}
 .step{display:flex;gap:12px;align-items:flex-start;margin-top:10px}.step .n{width:34px;height:34px;border-radius:50%;background:#123a7a;color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center;flex:none}
 .pill{display:inline-block;background:#2e7be8;color:#fff;border-radius:999px;padding:10px 18px;font-weight:800;text-decoration:none;min-height:44px}
@@ -43,7 +43,7 @@ table{width:100%;border-collapse:collapse;font-size:14px}td,th{padding:8px 6px;b
 .thumbs{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.thumbs img{width:100%;border-radius:10px;border:1.5px solid #d1dcf0;display:block}.thumbs small{display:block;font-size:12.5px;color:#3d4a63;margin-top:4px}
 .loop{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.loop span{background:#fff;border:1.5px solid #d1dcf0;border-radius:10px;padding:8px 12px;font-weight:700;font-size:14px}.loop i{font-style:normal;color:#5b6b8a}
 .graph svg{max-width:100%;height:auto}
-@media (max-width:700px){h1{font-size:32px}.grid3,.grid2,.thumbs{grid-template-columns:1fr}.fact{min-width:46%}main{padding:16px 16px 48px}}
+@media (max-width:700px){h1{font-size:32px}.graph>div{transform:scale(0.236)!important;margin-bottom:-359px!important}.grid3,.grid2,.thumbs{grid-template-columns:1fr}.fact{min-width:46%}main{padding:16px 16px 48px}}
 """
 TAGS = {"Code": "#2e7be8", "Rules": "#1e8e5a", "LLM": "#8e44ad", "Human": "#d35400"}
 def chip(k, t): return f'<span class="chip" style="border-color:{TAGS[k]}"><b style="color:{TAGS[k]}">{k}</b> {t}</span>'
@@ -53,20 +53,20 @@ page = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name
 <div class="top"><b>Chef Mealan</b><a href="#">Home</a></div>
 <main>
 <div class="eyebrow">How Chef Mealan is built</div>
-<h1>One product manager, one AI, fifty releases in October</h1>
-<p class="lead">Chef Mealan helps people live their nutrition plan: at the shelf, at home, with a coach. Milan Stancevic, a senior product manager with 20 years in B2B software, builds it with Claude as the engineer. Every decision is drawn before it is coded, every release is tested before it is promoted, and every AI answer is checked by a human before it counts.</p>
+<h1>One product manager, one AI, three beta testers</h1>
+<p class="lead">Chef Mealan helps people live their nutrition plan: at the shelf, at home, with a coach. Milan Stancevic, a senior product manager with 20 years in B2B software and a certified coach, builds it with Claude as the engineer and tests it with three beta testers, one of them a coach. Every decision is drawn before it is coded, every release is tested before it is promoted, and every AI answer is checked by a human before it counts.</p>
 <div class="facts">
-<div class="fact"><b>0.3.50</b><span>live, 2 November 2026</span></div>
-<div class="fact"><b>50 releases</b><span>in October, one a day</span></div>
+<div class="fact"><b>0.3.50</b><span>live since 30 September 2026</span></div>
+<div class="fact"><b>229 releases</b><span>since 2 October, about one a day</span></div>
 <div class="fact"><b>531 · 148</b><span>unit tests · browser walkthroughs</span></div>
 <div class="fact"><b>90 eval cases</b><span>7 sets, human labels and a judge</span></div>
-<div class="fact"><b>3 testers</b><span>on the preview, one coach</span></div>
+<div class="fact"><b>3 beta testers</b><span>one of them a coach; more are joining</span></div>
 </div>
-<a class="pill" href="#">Try it: the calculator on the home page</a> &nbsp; <a class="pill ghost" href="#">See it work, 90 seconds</a>
+<div style="display:flex;gap:12px;flex-wrap:wrap"><a class="pill" href="#">Try it: the calculator on the home page</a><a class="pill ghost" href="#">See it work, 90 seconds</a></div>
 
 <h2>The system</h2>
 <p class="sub">What runs where. The phone does the arithmetic and keeps the data; the server holds the rules and the key; the model reads and talks; a human checks.</p>
-<div class="card graph">{genSystem.arch().replace('width="1450" height="470"', 'width="960" height="311"')}</div>
+<div class="card graph" style="overflow:hidden;padding:8px"><div style="width:1480px;height:470px;transform:scale(0.648);transform-origin:0 0;margin-bottom:-165px">{genSystem.arch()}</div></div>
 <div style="margin-top:10px">{"".join(f'<span class="tag" style="background:{c}">{k}</span>' for k, c in TAGS.items())}<span style="font-size:13px;color:#5b6b8a">Code is deterministic and tested. Rules are the coach's rules written as code. LLM is a Gemini call, checked by evals. Human is a person or the coach: acting, or checking what the machine produced.</span></div>
 
 <h2>One path, end to end: Photo of my meal</h2>
@@ -76,7 +76,7 @@ page = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name
 
 <h2>How a change is made</h2>
 <p class="sub">The same five steps for every change, big or small. No code before the drawing is approved.</p>
-<div class="loop"><span>Brainstorm</span><i>→</i><span>Draw: a board, now and new</span><i>→</i><span>Go: code on a branch</span><i>→</i><span>531 tests, 148 walkthroughs</span><i>→</i><span>Preview, then promote</span></div>
+<div class="loop"><span>Brainstorm</span><i>→</i><span>Draw: a board, now and new</span><i>→</i><span>Go: code on a branch</span><i>→</i><span>531 tests, 148 walkthroughs</span><i>→</i><span>Preview, then promote to production</span></div>
 <div class="thumbs" style="margin-top:14px">
 <div><img src="{b159}" alt=""><small><b>A board.</b> The Plate kept adding foods and resolved nothing. Now and new, screen by screen, drawn before a line of code.</small></div>
 <div><img src="{b158}" alt=""><small><b>Another.</b> Cooking by voice existed and nobody found it. The fix is one button in the right place.</small></div>
@@ -105,7 +105,7 @@ page = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name
 <div class="card"><b>Coach</b><p style="font-size:14px;margin:4px 0 0">Certified fitness and nutrition coach. Every rule in the app is one he gives his clients; every number is tried on himself first.</p></div>
 <div class="card"><b>Author</b><p style="font-size:14px;margin:4px 0 0">The Worth series: Worth Building, Worth Eating, Worth Living. How to decide what is worth the effort.</p></div>
 </div>
-<p style="margin-top:14px"><a class="pill ghost" href="#">Milan on LinkedIn</a> &nbsp; <span style="font-size:14px;color:#3d4a63">The code, the boards and the test runs are shown on request.</span></p>
+<div style="margin-top:14px;display:flex;gap:12px;flex-wrap:wrap;align-items:center"><a class="pill" href="#">Talk to Milan about building with AI</a><a class="pill ghost" href="#">Connect on LinkedIn</a></div><p style="font-size:14px;color:#3d4a63;margin-top:10px">The code, the boards and the test runs are shown on request.</p>
 <div class="foot">Home · Who's behind it · Impressum · Privacy · Disclaimer · hello@chefmealan.com · © 2026 Milan Stancevic · Version 0.3.50</div>
 </main></body></html>'''
 open(f"{S}/built-new.html", "w").write(page)
@@ -120,9 +120,9 @@ subprocess.run(["node", f"{S}/sbn.cjs"], check=True)
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
 cy = storyCard(B, y, "BP1", "/built, for a hiring manager with two minutes", [
-  ("Coach Milan, 07:01 and 07:35", "A public page that shows the work to recruiters and hiring managers, so the repo can go private. Draw the new /built."),
+  ("Coach Milan, 07:01 to 08:06", "A public page that shows the work to recruiters and hiring managers, so the repo can go private. Draw the new /built. Version 2: no month in the title (it goes stale); three beta testers, one a coach, more joining; buttons apart; path steps one below the other; promote to production; a stronger call than Milan on LinkedIn; the graph as on the System board."),
   ("What is wrong today", "The page says Version 0.2, 283 unit tests and 82 walkthroughs; it is 0.3.50, 531 and 148. The blueprint is the July system. The loops end at version 0.2. It is long, and the proof of how the work runs is in the repo, not on the page."),
-  ("The new page, top to bottom", "1. One line and five facts: version, releases, tests, evals, testers; two buttons, try it and see it work. 2. The system: the technical graph from the System board, with the four tags. 3. One path end to end, Photo of my meal, step by step with who does what. 4. How a change is made: the five steps and three boards as pictures. 5. How we know it works: the table and the loop, with what is open. 6. The decisions in four loops, folded. 7. Who builds it, LinkedIn, code on request."),
+  ("The new page, top to bottom", "1. One line and five facts: version and live since, releases, tests, evals, beta testers; two buttons, try it and see it work. 2. The system: the technical graph from the System board, with the four tags. 3. One path end to end, Photo of my meal, step by step with who does what. 4. How a change is made: the five steps and three boards as pictures. 5. How we know it works: the table and the loop, with what is open. 6. The decisions in four loops, folded. 7. Who builds it, LinkedIn, code on request."),
   ("Where the numbers come from", "BUILT_FACTS in the code, counted at build time, never typed: the version, the unit tests, the walkthroughs, the eval cases, the releases this month."),
   ("Stays", "The 90-second clip, Who builds, the books, the loops (folded). Goes: the July blueprint with its click-through."),
 ])
@@ -142,5 +142,5 @@ y = h
 h = rowEnd(B.screen("BP1c", 0, y, "New: /built on a phone", "built-new-m", "changed", "The same page, one column."))
 y = h
 board("Stories160.dc.html", "BP1. /built, for a hiring manager with two minutes",
-  "2 November 2026 (Coach Milan 07:01 to 07:35). Now: 0.3.50, untouched. Drawn for your approval; nothing built.",
+  "2 November 2026 (Coach Milan 07:01 to 08:06). Version 2. Now: 0.3.50, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories159.dc.html")
