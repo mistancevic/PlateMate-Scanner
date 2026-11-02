@@ -111,7 +111,8 @@ const PORT = "3194", B = `http://127.0.0.1:${PORT}`;
     await page.clock.runFor(5 * 60 * 1000 + 2000); await page.waitForTimeout(400);
     ok(/done/.test(await cm.locator(".cook-timer").nth(1).textContent()) && (await page.evaluate(() => window.__spoken)).some((x) => /timer is done/.test(x)), "a timer that ends shows done and says which");
     await say("the onions smell lovely");
-    ok(/isn't something I can do yet/.test(await cm.locator(".cook-heard").textContent()), "something else said: what it heard, and what it can do");
+    { const spokenNow = await page.evaluate(() => window.__spoken);
+    ok(/Sorry, say that again\?/.test(await cm.locator(".cook-heard").textContent()) && spokenNow[spokenNow.length - 1] === "Sorry, say that again?" && /^You can say: next, back, repeat, how much \w+, timer 5 minutes, what's left, stop\. Start with Chef to ask about the dish\.$/.test(await cm.locator(".cook-can-say").textContent()), "DT221: something else said: the phone says only Sorry, say that again?; the words you can say stay on the screen, not read aloud"); }
     // close keeps the ticks
     await say("next"); await say("next");
     ok(/3 of 6/.test(await cm.locator(".cook-count").textContent()), "two steps on");

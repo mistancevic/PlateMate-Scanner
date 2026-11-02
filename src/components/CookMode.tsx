@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Ingredient } from "../pilot";
 import { stepParts, stepText } from "../steps";
 import { tempsIn } from "../units";
-import { secondsIn, timerName, parseCommand, howMuch, leftLine, spoken, clock, minutesWords, voiceChoice, setVoiceChoice, isEcho, cutsIn, movesFor, type VoiceChoice } from "../cook";
+import { secondsIn, timerName, parseCommand, howMuch, leftLine, spoken, clock, minutesWords, voiceChoice, setVoiceChoice, isEcho, cutsIn, movesFor, SAY_AGAIN, canSayLine, type VoiceChoice } from "../cook";
 
 type Timer = { id: number; name: string; ends: number; total: number; rang: boolean };
 const Speech = () => (typeof window === "undefined" ? null : (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null);
@@ -35,7 +35,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   // DT175a: the steps already finished, to show the ticks on the step buttons (only Next ticks)
   const [doneSet, setDoneSet] = useState<Set<number>>(() => new Set(ticks));
   const [voice, setVoice] = useState<VoiceChoice>(voiceChoice());
-  const [heard, setHeard] = useState<{ said: string; answer: string; chef?: boolean; step?: number; working?: boolean } | null>(null);
+  const [heard, setHeard] = useState<{ said: string; answer: string; chef?: boolean; step?: number; working?: boolean; hint?: string } | null>(null);
   const [typed, setTyped] = useState("");
   const asked = useRef<{ role: "cook" | "chef"; text: string }[]>([]);
   const [timers, setTimers] = useState<Timer[]>([]);
@@ -140,7 +140,9 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
     const answer = c.kind === "left" ? leftLine(at, steps, items)
       : c.kind === "howMuch" ? howMuch(c.food, steps, items)
       : c.kind === "timer" ? startTimer(c.seconds, timerName(steps[at], at))
-      : "I heard you, but that isn't something I can do yet. Say next, back, repeat, how much, timer, what's left or stop. Start with Chef to ask about the dish.";
+      : null;
+    // DT221 (0.3.58): not caught: the phone says one short line; what can be said stays on the screen, not read aloud
+    if (answer === null) { setHeard({ said, answer: SAY_AGAIN, hint: canSayLine(steps[at] ?? "", items) }); say(SAY_AGAIN); return; }
     setHeard({ said, answer }); say(answer);
   };
   const hearRef = useRef(hear); hearRef.current = hear;
@@ -247,6 +249,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
               <small>{heard.chef ? `CHEF MEALAN, ABOUT STEP ${(heard.step ?? k) + 1}` : "CHEF MEALAN"}</small>
               <b>{heard.working ? "Chef Mealan is thinking." : heard.answer}</b>
               {heard.chef && !heard.working && <small className="muted">Read aloud. Nothing on your plate changes.</small>}
+              {heard.hint && <small className="muted cook-can-say">{heard.hint}</small>}
             </section>
           )}
           {ask && <form className="cook-card cook-ask-form" onSubmit={(e) => { e.preventDefault(); const q = typed.trim(); if (!q) return; setTyped(""); void askChef(q); }}>

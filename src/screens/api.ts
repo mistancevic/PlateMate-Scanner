@@ -41,6 +41,11 @@ export interface AppApi {
   answerPlateAsk: (how: "add" | "new" | null) => void;
   photoAsk: { image: string; at: string } | null;
   dropPhotoAsk: () => void;
+  // DT219 (0.3.58, board Stories164): a read that found no foods; the Plate stays as it was and Chef Mealan says so
+  photoNoFoods: boolean;
+  dropNoFoods: () => void;
+  // DT218 (0.3.58): the meal card whose last question Go on opened
+  carryNow: { id: string; at: number } | null;
   // DT130: An idea kept: in Mine with the photo as its picture, at the top until made once; a slot in the plan when given
   saveIdea: (meal: Meal, photo: string | null, slot?: { date: string; slotId: string } | null) => void;
   memberFoods: (q: string) => Promise<import("../memberFoods").MemberFood[]>;

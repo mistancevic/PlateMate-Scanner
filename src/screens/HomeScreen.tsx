@@ -45,6 +45,13 @@ export function HomeScreen(p: AppApi) {
   const [now, setNow] = useState(Date.now());
   useEffect(() => { const t = setInterval(() => setNow(Date.now()), 60_000); return () => clearInterval(t); }, []);
   const carryDue = (f: { createdAt: string; carry?: unknown; status: string }) => f.status === "eaten" && !f.carry && now - new Date(f.createdAt).getTime() >= 30 * 60_000;
+  const carryLeft = (f: { createdAt: string }) => Math.max(1, Math.ceil((new Date(f.createdAt).getTime() + 30 * 60_000 - now) / 60_000));
+  // DT218 (0.3.58): Go on scrolls to the meal's card with the question
+  useEffect(() => {
+    if (!p.carryNow) return;
+    const t = window.setTimeout(() => document.querySelector(`[data-carry="${p.carryNow!.id}"]`)?.scrollIntoView({ behavior: "smooth", block: "center" }), 120);
+    return () => clearTimeout(t);
+  }, [p.carryNow]);
   const { state, setTab, setStep, pdRef, setCamera, setMode, clientName, goal } = p;
   const bandName = goal?.band ? goalLabel(goal.band) : null;
   const byCoach = goal?.setBy === "coach";
@@ -424,10 +431,11 @@ export function HomeScreen(p: AppApi) {
             <CoverAsk f={f} recipe={r} p={p} />
             {/* R20 (0.2.48, board RS19): the question on the meal's own card, full width under the photo and the numbers; the
                 answer stays on it, with Change for a wrong tap */}
-            {(carryDue(f) || changingCarry === f.id)
-              ? <div className="carry-in" aria-label={`How did ${f.meal.title} carry you?`}>
+            {(carryDue(f) || changingCarry === f.id || (p.carryNow?.id === f.id && !f.carry))
+              ? <div className="carry-in" data-carry={f.id} aria-label={`How did ${f.meal.title} carry you?`}>
                   {/* DT211 v8 (0.3.53): the last question of the conversation, as Chef Mealan's line */}
-                  <ChefLine className="carry-q" text="About 30 minutes on: how did it carry you?" />
+                  {/* DT218 (0.3.58): opened early by Go on, it says when he would have asked */}
+                  <ChefLine className="carry-q" text={carryDue(f) || f.carry ? "About 30 minutes on: how did it carry you?" : `How did it carry you? Answer now, or in ${carryLeft(f)} ${carryLeft(f) === 1 ? "minute" : "minutes"}, when I ask.`} />
                   <div className="carry-acts">
                     {(["light", "fine", "heavy"] as const).map((k) => (
                       <button key={k} type="button" className={`choice${f.carry?.how === k ? " on" : ""}`} onClick={() => { p.setCarry(f.id, k, carryMoment(f)); setChangingCarry(null); }}>{CARRY_WORDS[k]}</button>

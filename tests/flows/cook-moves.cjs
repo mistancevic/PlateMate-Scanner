@@ -42,17 +42,19 @@ const PORT = "3345", B = `http://127.0.0.1:${PORT}`;
     // ---- DT216: the crêpes, a recipe that kept the bowl steps ----
     let { ctx, page } = await open({ items: structuredClone(crepes), title: "Protein crepes", plateAt: "2026-11-02T11:50:00" });
     const main = () => page.locator("main").textContent();
-    await page.getByRole("button", { name: /^(Lock the recipe|Keep it as it is)$/ }).first().click(); await page.waitForTimeout(900);
+    ok(await page.getByRole("button", { name: "How to make it ›", exact: true }).count() === 1 && await page.getByRole("button", { name: "Lock the recipe", exact: true }).count() === 0, "DT220: the Plate's white button says where it goes: How to make it ›");
+    await page.getByRole("button", { name: "How to make it ›", exact: true }).click(); await page.waitForTimeout(900);
     ok(/How to make it/.test(await page.locator("h2").first().textContent()) && !/How do you want to eat it/.test(await main()), "flour and eggs: How to make it, never the bowl ways");
     if (process.env.DEBUG) console.log("DEBUG", (await main()).slice(0, 900));
     ok(!/stir until it's one colour/.test(await main()) && await page.getByRole("button", { name: "Write my own" }).count() === 1, "the bowl steps the recipe kept are not shown; Write my own is offered (the AI is off here)");
     await page.getByRole("button", { name: "Write my own" }).click(); await page.waitForTimeout(200);
     await page.getByLabel("Your steps, one per line").fill("Whisk 104 g eggs and 100 g milk and 35 g flour until smooth.\nHeat a pan and cook thin crêpes, 2 minutes a side.\nSpread 180 g quark and 81 g banana on top and roll them up.");
     await page.getByRole("button", { name: "Keep my steps" }).click(); await page.waitForTimeout(400);
-    ok(/Your recipe had the bowl steps from an earlier save\. Lock the recipe keeps these new steps with it\./.test(await main()), "the line says the recipe had the bowl steps, and Lock keeps the new ones");
-    await page.getByRole("button", { name: "Lock the recipe", exact: true }).click(); await page.waitForTimeout(900);
+    ok(/Your recipe had the bowl steps from an earlier save\. Lock it and cook keeps these new steps with it\./.test(await main()), "the line says the recipe had the bowl steps, and Lock it and cook keeps the new ones (DT220)");
+    ok(await page.locator(".mk-steps-for").textContent() === "Make reads these steps aloud, one at a time, and you tick them as you go. Lock it and cook keeps them with the recipe." && await page.getByRole("button", { name: "Lock the recipe", exact: true }).count() === 0, "DT220: one line says what the steps are for; the button says what comes next");
+    await page.getByRole("button", { name: "Lock it and cook ›", exact: true }).click(); await page.waitForTimeout(900);
     let r = (await store(page)).meals.find((m) => m.id === "m-cr");
-    ok(r.steps.length === 3 && /Whisk 104 g eggs/.test(r.steps[0]) && !r.way, "Lock the recipe keeps the new steps with the recipe; the bowl way is gone");
+    ok(r.steps.length === 3 && /Whisk 104 g eggs/.test(r.steps[0]) && !r.way, "Lock it and cook keeps the new steps with the recipe; the bowl way is gone");
     // ---- DT217 v2: the whole step on top, the moves under it ----
     await page.getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(600);
     const cm = page.locator(".cook-mode");

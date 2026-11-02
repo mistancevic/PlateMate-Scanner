@@ -117,6 +117,15 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     ok(st.cook && st.cook.stage === "carry" && st.cook.cardId === st.feedback[0].id && st.feedback[0].photoSteps?.[0] === 1, "eaten: the cook waits for the last question; the card keeps the step's photo with its step");
     await nav(page, "Today"); await page.waitForTimeout(600);
     ok(/Eaten 12:\d\d · Chicken rice bowl · Chef Mealan asks how it carried you in \d+ min/.test(await page.locator(".cook-strip").textContent()), "the strip says when Chef Mealan asks");
+    // ---- DT218 (0.3.58, board Stories164): Go on opens the question on the meal's card at once; a ✕ on the strip; none on Explorer ----
+    await nav(page, "Plan"); await page.waitForTimeout(500);
+    const xb = await page.locator(".cook-strip .cs-end").boundingBox();
+    ok(xb && xb.width >= 44 && xb.height >= 44, "DT218: after eating the strip has a ✕, 44 px");
+    await page.locator(".cook-strip .cs-main").click(); await page.waitForTimeout(900);
+    ok(/Today/.test(await page.locator("h1, .app-title, header").first().textContent()) && /How did it carry you\? Answer now, or in \d+ minutes, when I ask\./.test(await page.locator(".carry-in").first().textContent()), "DT218: Go on lands on Today with the question open on the meal's card");
+    await nav(page, "Explorer"); await page.waitForTimeout(500);
+    ok(await page.locator(".cook-strip").count() === 0, "no strip on Explorer (Coach Milan 18:30)");
+    await nav(page, "Today"); await page.waitForTimeout(500);
     // ---- 7. 30 minutes on ----
     await page.clock.fastForward("31:00"); await page.reload(); await page.waitForTimeout(1200);
     ok(/About 30 minutes on: how did it carry you\?/.test(await page.locator(".carry-in").first().textContent()), "30 minutes on: his line on the meal's card");

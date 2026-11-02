@@ -173,3 +173,15 @@ export function movesFromDraft(moves: unknown, draftSteps: string[], items: Ingr
   // 0.3.57: kept as { m } per step, an empty m where the step gets its moves in code (no list inside a list)
   return out.some(Boolean) ? out.map((x) => ({ m: x ?? [] })) : undefined;
 }
+
+// DT221 (0.3.58, board Stories164; Coach Milan 2 November 17:58): when cook mode doesn't catch what was said, the phone says
+// only this. The words the cook can say stay on the screen, small, never read aloud (canSayLine).
+export const SAY_AGAIN = "Sorry, say that again?";
+export function canSayLine(step: string, items: Ingredient[]): string {
+  const low = (s: string) => s.toLowerCase();
+  const word = (i: Ingredient) => low(i.food.name.split(/[ ,(]/)[0] ?? "");
+  const food = /\[\[i:[^|\]]+\|([^\]]+)\]\]/.exec(step)?.[1]
+    ?? items.map(word).find((w) => w.length > 2 && low(step).includes(w))
+    ?? (items[0] ? word(items[0]) : "");
+  return `You can say: next, back, repeat, ${food ? `how much ${low(food)}` : "how much and a food"}, timer 5 minutes, what's left, stop. Start with Chef to ask about the dish.`;
+}

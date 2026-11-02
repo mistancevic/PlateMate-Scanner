@@ -852,6 +852,10 @@ export default function App() {
     [camera, setCamera] = useState(false),
     // DT130 (0.2.110): a photo picked from Your photos in the meal camera, waiting on the Plate for whose plate and when
     [photoAsk, setPhotoAsk] = useState<{ image: string; at: string } | null>(null),
+    // DT219 (0.3.58): the last photo read found no foods; nothing landed on the Plate
+    [photoNoFoods, setPhotoNoFoods] = useState(false),
+    // DT218 (0.3.58): Go on after eating opens the last question on this meal's card, before the 30 minutes are up
+    [carryNow, setCarryNow] = useState<{ id: string; at: number } | null>(null),
     // DT131 (0.2.113, board Stories87; Milan 27 October 13:52): foods about to land on a plate that has foods wait for one answer
     [plateAsk, setPlateAsk] = useState<import("./screens/api").PlateAsk | null>(null),
     // DT212 v4 and DT214 v2 (0.3.53): Start cooking on a plate with foods asks first; a food scanned while cooking asks where it goes
@@ -2374,8 +2378,16 @@ export default function App() {
         const [sent, thumb] = await Promise.all([resizeImageBase64(image, 1280, 1280), thumbnailBase64(image, 640)]);
         const d = await api("/api/plate-photo", { image: sent, region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name) });
         const read = cleanRead(d);
-        if (!read) { setError("Nothing I can read on that plate. Try once more, from above, with the whole plate in."); return false; }
-        const { items, fresh } = itemsOfRead(read, state.foods, shopRegion, uid);
+        const { items, fresh } = read ? itemsOfRead(read, state.foods, shopRegion, uid) : { items: [], fresh: [] };
+        // DT219 (0.3.58, board Stories164; Coach Milan 2 November 17:53): a read with no foods leaves the Plate as it was, the photo
+        // not kept; Chef Mealan says so on the Plate, with Take it again and Add the foods myself
+        if (!read || !items.length) {
+          setPhotoAsk(null); setPhotoNoFoods(true); setKind("meal"); setStep("in");
+          setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
+          log("meal_photo", { foods: 0, again: Boolean(x?.replace) });
+          return true;
+        }
+        setPhotoNoFoods(false);
         // DT212 v4 (0.3.53): Read the photo again keeps the photo's time and replaces the foods, after it asked
         const at = (x?.who === "ate" || x?.replace) && x.at ? x.at : new Date().toISOString();
         const photo = { image: thumb, at, unsure: read.unsure, ...(x?.who && x.who !== "now" ? { who: x.who } : {}) };
@@ -2431,6 +2443,8 @@ export default function App() {
     // DT130 (0.2.110, board Stories78, A): Photo of my meal opens the same camera as Scan, in Meal mode
     mealCamera: () => { setTalkOpen(false); setMode("meal"); setCamera(true); },
     photoAsk, dropPhotoAsk: () => setPhotoAsk(null),
+    photoNoFoods, dropNoFoods: () => setPhotoNoFoods(false),
+    carryNow,
     plateAsk, answerPlateAsk: (how: "add" | "new" | null) => { const x = plateAsk; setPlateAsk(null); if (x && how) x.apply(how); },
     saveIdea: (meal: Meal, photo: string | null, slot?: { date: string; slotId: string } | null) => {
       const m: Meal = { ...meal, items: meal.items.map((i) => ({ ...i, est: undefined })), steps: meal.steps ?? [], idea: { at: new Date().toISOString(), from: "photo" }, ...(photo ? { ...withRecipePhotos([photo]), foreignPhotos: [sig(photo)] } : {}) };
@@ -2483,7 +2497,8 @@ export default function App() {
       const c = state.cook; if (!c) return;
       setMenuSection(null); setMenuFrom(null); setTalkOpen(false);
       // after eating, the cook waits on Today for its last question
-      if (c.stage === "carry" || c.stage === "later") { setTab("home"); return; }
+      // DT218 (0.3.58, board Stories164): Go on opens the question on the meal's card and scrolls to it
+      if (c.stage === "carry" || c.stage === "later") { if (c.stage === "carry" && c.cardId) setCarryNow({ id: c.cardId, at: Date.now() }); setTab("home"); return; }
       setState((s) => cooking.swapIn(s)); setPlateKey((k) => k + 1);
       setStep(c.ui.step ?? (c.stage === "eat" ? "after" : "made")); setTab("journey");
     },
@@ -2497,7 +2512,7 @@ export default function App() {
       setState((s) => { const c = s.cook; if (!c) return s; const base = c.inView ? cooking.withSnap(s, c.free) : s; return { ...base, cook: { ...c, stage: "later", eatenAt: new Date().toISOString(), inView: false, plate: {}, free: undefined } }; });
       setPlateKey((k) => k + 1);
     },
-    endCook: () => { setState((s) => cooking.closeCook(s)); setPlateKey((k) => k + 1); },
+    endCook: () => { setState((s) => cooking.closeCook(s)); setPlateKey((k) => k + 1); setCarryNow(null); },
     setCookSteps: (n: number) => setState((s) => (s.cook && s.cook.steps !== n ? { ...s, cook: { ...s.cook, steps: n } } : s)),
     // DT212 v4: Save for later, Continue, swipe to remove; Keep working on it
     savePlate: () => { setPlateAsk(null); setState((s) => cooking.savePlate(s)); setPlateKey((k) => k + 1); notify("Saved for later, at the top of the Plate."); },
@@ -2936,7 +2951,7 @@ export default function App() {
         {menuSection && <div style={{ display: talkOpen ? "none" : "contents" }}><MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s, up) => { setMenuFrom(null); setMenuSection(s, up); }} under={menuTrail.length > 1 ? menuTrail[menuTrail.length - 2] : null} close={() => { setMenuFrom(null); setMenuSection(null); }} /></div>}
         {!menuSection && !talkOpen && !clientsView && tab === "home" && <HomeScreen {...screenProps} />}
         {!menuSection && !talkOpen && tab === "journey" && <JourneyScreen key={plateKey} {...screenProps} />}
-        {!menuSection && !talkOpen && tab === "explorer" && <div className="explorer-tab"><CookStrip p={screenProps} /><ExplorerScreen {...screenProps} /></div>}
+        {!menuSection && !talkOpen && tab === "explorer" && <div className="explorer-tab">{/* 0.3.58 (Coach Milan 2 November 18:30): no cook strip on Explorer */}<ExplorerScreen {...screenProps} /></div>}
         {talkOpen && <div className="talk-overlay"><OutScreen {...screenProps} tab={tab} ask={talkAsk} clearAsk={() => setTalkAsk(null)} turns={talkTurns} setTurns={(f) => setTalkTurns(f)} close={() => setTalkOpen(false)} toPlate={() => { setTalkOpen(false); setMenuSection(null); setStep("in"); setTab("journey"); }} /></div>}
         {!talkOpen && (
           <button className="chat-fab" aria-label="Chef Mealan" onClick={() => {
