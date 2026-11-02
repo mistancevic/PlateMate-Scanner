@@ -64,7 +64,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
     marks: [{ kind: "same", why: "" }, { kind: "adapted", why: "320 °F in the original" }, { kind: "same", why: "" }, { kind: "added", why: "how long to chill it" }], parts: ["Base", "Filling", "Filling", "Topping"] }) }));
   await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
   let t = await text(page, "main");
-  ok(/How to make it/.test(t) && !/How do you want to eat it/.test(t), "IM19: after Make it, a recipe gets How to make it");
+  ok(/How to make (?!it ›)/.test(t) && !/How do you want to eat it/.test(t), "IM19: after Make it, a recipe gets How to make it");
   ok(await page.locator('[aria-label="What you make"] .choice.on').textContent() === "The whole recipe" && /You eat 1 slice/.test(t) && /7 slices are left\. To eat them on other days, put the recipe on Plan\./.test(t), "IM19: it makes 8, so the whole cake is made; you eat 1 slice; R16: the other 7 go on Plan, not Today");
   ok(/The recipe's own steps/.test(t) && await page.locator(".mk-card .rp-orig li").count() > 0 && /Preheat|Crush the biscuits/.test(await text(page, ".mk-card .rp-orig")) && /The original works with your foods as they are/.test(t), "RP1 (was IM19b): the original is the steps, and a line says it works; no steps yet: the original open below, for you only");
   ok(await page.getByRole("button", { name: "Chef Mealan's way" }).count() === 1 && await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).count() === 1, "RP1: Chef Mealan's way on a tap; I'm making it");
@@ -108,7 +108,7 @@ const cookie = { recipe: { title: "Choc chip cookie", source: "@christopherkaiyu
   await p5.goto(U + "/plate"); await p5.waitForTimeout(1300);
   await p5.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).click(); await p5.waitForTimeout(800);
   const checks = await p5.locator(".mk-check").allTextContents();
-  ok(/How to make it/.test(await text(p5, "main")) && checks.length === 4 && /Rice: 180 g Basmati rice, cooked/.test(checks[0]) && /Put it together/.test(checks[3]), `IM19c: your bowl in parts as a checklist (${checks.join(" | ")})`);
+  ok(/How to make (?!it ›)/.test(await text(p5, "main")) && checks.length === 4 && /Rice: 180 g Basmati rice, cooked/.test(checks[0]) && /Put it together/.test(checks[3]), `IM19c: your bowl in parts as a checklist (${checks.join(" | ")})`);
   await p5.locator(".mk-check").first().click(); await p5.waitForTimeout(150);
   ok(await p5.locator(".mk-check.on").count() === 1, "IM19c: tick a part as you go");
   await p5.close();

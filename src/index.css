@@ -2846,3 +2846,5 @@ html:has(.l-photo) { overflow-x: hidden; }
 .mp-help .button-row .pill { min-height: 44px; }
 .mp-which-opts { flex-wrap: wrap; } .mp-which-opts .choice, .mp-which-opts .link { min-height: 44px; }
 .pa-note { display: flex; flex-direction: column; gap: 6px; font-size: 14px; font-weight: 700; margin: 6px 0; } .pa-note input { min-height: 44px; }
+/* 0.3.64: the strip's ✕ while cooking: Save for later, or End it */
+.cook-strip-ask { flex-wrap: wrap; padding: 6px 8px 6px 12px; } .cook-strip-ask .cs-words { flex: 1 1 100%; } .cook-strip-ask .pill, .cook-strip-ask .link { min-height: 44px; } .cook-strip-ask .cs-end-it { color: var(--bad-text, #c0392b); }

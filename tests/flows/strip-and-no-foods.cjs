@@ -44,6 +44,24 @@ const cook = { id: "c-1", startedAt: "2026-11-02T11:20:00", title: "Vanilla prot
     let st = await store(page);
     ok(!st.cook && st.feedback.length === 1 && st.feedback[0].id === "fb-1" && !st.feedback[0].carry && await page.locator(".cook-strip").count() === 0, "✕: the cook ends without the last answer; the meal's card stays");
     await ctx.close();
+    // ---- 0.3.64 (Coach Milan 22:39): while cooking, the strip's ✕ asks: Save for later, or End it ----
+    const cooking = { ...cook, stage: "make", cardId: undefined, eatenAt: undefined, plate: { items: [{ id: "i9", grams: 150, locked: false, food: skyr }], title: "Vanilla protein crepes" }, ui: { ticks: ["s0"] } };
+    ({ ctx, page } = await open({ ...seed, cook: cooking }));
+    ok(/Cooking now · Vanilla protein crepes/.test(await page.locator(".cook-strip").textContent()) && await page.locator(".cook-strip .cs-end").count() === 1, "while cooking: the strip has a ✕");
+    await page.locator(".cook-strip .cs-end").click(); await page.waitForTimeout(200);
+    ok(await page.getByRole("button", { name: "Save for later" }).count() === 1 && await page.getByRole("button", { name: "End it" }).count() === 1 && await page.getByRole("button", { name: "Keep" }).count() === 1, "✕ asks: Save for later, End it, or Keep");
+    await page.getByRole("button", { name: "Keep" }).click(); await page.waitForTimeout(200);
+    ok(/Cooking now/.test(await page.locator(".cook-strip").textContent()), "Keep: the strip as it was");
+    await page.locator(".cook-strip .cs-end").click(); await page.getByRole("button", { name: "Save for later" }).click(); await page.waitForTimeout(500);
+    st = await store(page);
+    ok(!st.cook && st.later?.length === 1 && st.later[0].cook?.title === "Vanilla protein crepes" && await page.locator(".cook-strip").count() === 0, "Save for later: the cook waits in Saved for later; the strip goes");
+    await ctx.close();
+    ({ ctx, page } = await open({ ...seed, cook: cooking }));
+    await page.locator(".cook-strip .cs-end").click(); await page.getByRole("button", { name: "End it" }).click(); await page.waitForTimeout(200);
+    await page.getByRole("button", { name: "Tap again to end" }).click(); await page.waitForTimeout(500);
+    st = await store(page);
+    ok(!st.cook && !(st.later ?? []).length && st.feedback.length === 0 && await page.locator(".cook-strip").count() === 0, "End it, tapped again: the cook ends; nothing logged, nothing saved");
+    await ctx.close();
     // ---- DT219: a read with no foods leaves the Plate as it was ----
     ({ ctx, page } = await open({ ...seed, items: [{ id: "i-s", grams: 150, locked: false, food: skyr }] }, "/plate"));
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
