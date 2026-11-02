@@ -1,7 +1,7 @@
 // DT174 (0.3.16, board Stories121; Coach Milan 30 October 16:39 Go): cook mode. One big step at a time, read aloud, steered by
 // voice or by tap. Everything here runs on the phone: the browser's own speech recognition and the phone's own voice. Nothing
 // goes to Gemini. This file is the part without a screen: what a step's timer is, what was said, how much of a food.
-import type { Ingredient } from "./pilot";
+import type { Ingredient, StepMoves } from "./pilot";
 import { TOKEN, stepText, shortName } from "./steps";
 
 // a timer from the step's own words: "for 12 minutes", "6 to 8 minutes" (the first, to check early), "1 hour", "30 seconds"
@@ -158,7 +158,7 @@ export function movesFor(step: string, drafted?: string[] | null): string[] {
 }
 // the moves Chef Mealan drafted, checked: one food at most in a move, every food of the step in one of its moves, no other
 // food, no amount typed; {n} become the recipe's food chips. A step that fails gets its moves in code (null).
-export function movesFromDraft(moves: unknown, draftSteps: string[], items: Ingredient[], token: (i: Ingredient) => string): (string[] | null)[] | undefined {
+export function movesFromDraft(moves: unknown, draftSteps: string[], items: Ingredient[], token: (i: Ingredient) => string): StepMoves | undefined {
   if (!Array.isArray(moves)) return undefined;
   const out = draftSteps.map((st, k) => {
     const mv = moves[k];
@@ -170,5 +170,6 @@ export function movesFromDraft(moves: unknown, draftSteps: string[], items: Ingr
     if (got.some((n) => !want.has(n)) || [...want].some((n) => !got.includes(n))) return null;
     return ms.map((m) => m.replace(/\{(\d+)\}/g, (_, n: string) => token(items[Number(n) - 1])));
   });
-  return out.some(Boolean) ? out : undefined;
+  // 0.3.57: kept as { m } per step, an empty m where the step gets its moves in code (no list inside a list)
+  return out.some(Boolean) ? out.map((x) => ({ m: x ?? [] })) : undefined;
 }

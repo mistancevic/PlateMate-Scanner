@@ -4,7 +4,7 @@ import type { Meal, StepMark } from "./pilot";
 import { fromDraft, tokenOf } from "./steps";
 import { movesFromDraft } from "./cook";
 
-export type Drafted = { ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[]; moves?: (string[] | null)[] } | { ok: false; why: string; cannot?: boolean };
+export type Drafted = { ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[]; moves?: import("./pilot").StepMoves } | { ok: false; why: string; cannot?: boolean };
 // changed: a dish changed on the plate (0.2.23, IM23), how its foods differ from the original, so the marks say "your change"
 export async function draftSteps(meal: Meal, o: { library: string[]; equipment: string[]; kitchens: string[]; changed?: string[]; tastes?: ReturnType<typeof import("./tasteChips").tasteForReq> }): Promise<Drafted> {
   const items = meal.items.filter((i) => i.grams > 0);

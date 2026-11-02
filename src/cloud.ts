@@ -1,4 +1,5 @@
 // Sign in with Google and keep each person's data under their own account. Off entirely when not configured.
+import { fixMoves } from "./pilot";
 import { notesOf, checkinOf } from "./coachNotes";
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, reauthenticateWithPopup, type User } from "firebase/auth";
@@ -189,6 +190,7 @@ export function explainCloudError(e: any): string {
 // Photos stay on the phone for now; everything else goes to the account. Keeps the document small.
 export function stripPhotos<T>(state: T): T {
   const s: any = structuredClone(state);
+  fixMoves(s); // 0.3.57: the account's database refuses a list inside a list
   const strip = (f: any) => { if (f && typeof f === "object") { if (Array.isArray(f.photos)) f.photoCount = f.photos.length; else if (f.photo) f.photoCount = 0; delete f.photo; delete f.photos; } return f; };
   (s.foods ?? []).forEach(strip);
   (s.items ?? []).forEach((i: any) => strip(i.food));

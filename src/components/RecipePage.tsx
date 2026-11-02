@@ -56,7 +56,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   // 0.2.13: a realistic photo to try against the drawing; the owner only, on the preview
   tryPhoto?: ((model: string) => Promise<string>) | null;
   // 0.2.10 (canvas board CH, CH5): Chef Mealan drafts the steps; none without the AI
-  draft?: (() => Promise<{ ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[]; moves?: (string[] | null)[] } | { ok: false; why: string; cannot?: boolean }>) | null;
+  draft?: (() => Promise<{ ok: true; steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[]; moves?: import("../pilot").StepMoves } | { ok: false; why: string; cannot?: boolean }>) | null;
   meal: Meal; cards: Feedback[]; foods: Food[]; cook: boolean; state: PubState; pub: Published | null; approver: string; direct: boolean; unpublished?: string[];
   onPatch: (patch: Partial<Meal>) => void; onRename: (title: string) => void; onMakeIt: () => void; onCookIt?: (() => void) | null;
   // DT149 (0.2.130): opened from a meal of another day on Plan, Make it is Change it on the Plate, with its own line
@@ -191,7 +191,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   const matches = find === null ? [] : foods.filter((f) => !items.some((i) => i.food.id === f.id) && (!find.trim() || f.name.toLowerCase().includes(find.trim().toLowerCase()))).slice(0, 8);
   const live = state === "live" && pub;
   // ---- the steps, drafted by Chef Mealan (CH5): shown to read, kept only with Keep these steps ----
-  const [drafted, setDrafted] = useState<{ steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[]; moves?: (string[] | null)[] } | null>(null);
+  const [drafted, setDrafted] = useState<{ steps: string[]; marks?: StepMark[]; kitchen?: string; parts?: string[]; moves?: import("../pilot").StepMoves } | null>(null);
   const [drafting, setDrafting] = useState<"" | "working" | string>("");
   // RP1c (0.2.25): Chef Mealan's steps or the original, when both are there
   const [stepView, setStepView] = useState<"own" | "orig">("own");

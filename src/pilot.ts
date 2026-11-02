@@ -195,8 +195,9 @@ export type Meal = {
   stated?: { kcal: number; protein: number; fats: number | null; carbs: number | null };
   // how each of Chef Mealan's steps relates to the original (0.2.18, IM9, IM10b); cleared when the steps are edited
   stepMarks?: StepMark[];
-  // DT217 (0.3.56): each step read aloud one move at a time, as Chef Mealan drafted them with the steps (null: in code)
-  moves?: (string[] | null)[];
+  // DT217 (0.3.56): each step read aloud one move at a time, as Chef Mealan drafted them with the steps (an empty m: in code).
+  // 0.3.57: a list of objects, never a list of lists: the account's database refuses arrays inside arrays (Coach Milan 17:50)
+  moves?: StepMoves;
   stepsKitchen?: string;
   shots?: string[];
   // DT175a (0.3.18, board Stories123): a picture per step, Beta. stepPics are the pictures (files step:<id>:<n>, n the step's
@@ -532,8 +533,22 @@ function isMeal(m: any): m is Meal {
 // Known gaps from older builds are filled before the state is judged. A food without a basis was written by v0.1.34
 // (the reference table); it is per 100 g by construction. One missing field must never make a person's whole record unreadable.
 export const TYPICAL = "typical values, check your pack";
+export type StepMoves = { m: string[] }[];
+// 0.3.57 (Coach Milan 17:50, "Nested arrays are not supported"): moves saved by 0.3.56 as lists inside a list become
+// { m: [...] }, wherever they sit (recipes, the meals on cards, the cook, plates saved for later)
+export function fixMoves(x: any): any {
+  if (Array.isArray(x)) { x.forEach(fixMoves); return x; }
+  if (!x || typeof x !== "object") return x;
+  for (const k of Object.keys(x)) {
+    const v = x[k];
+    if (k === "moves" && Array.isArray(v) && v.some((a) => Array.isArray(a) || a === null)) x[k] = v.map((a) => (Array.isArray(a) ? { m: a.map(String) } : a && typeof a === "object" && Array.isArray(a.m) ? a : { m: [] }));
+    else if (v && typeof v === "object") fixMoves(v);
+  }
+  return x;
+}
 export function repairState(v: any): any {
   if (!v || typeof v !== "object") return v;
+  fixMoves(v);
   // plain English pass (7 October 2026): the starter foods' brand line, also in foods saved before
   const fixFood = (f: any) => { if (f && f.brand === "generic, check your package") f.brand = TYPICAL; if (f && typeof f === "object" && f.basis === undefined) f.basis = "100g"; if (f && typeof f.source !== "string") f.source = f?.source ?? "Manual entry"; return f; };
   const fixItems = (items: any) => { if (Array.isArray(items)) for (const i of items) if (i && i.food) fixFood(i.food); };
