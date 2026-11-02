@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Ingredient } from "../pilot";
 import { stepParts, stepText } from "../steps";
 import { tempsIn } from "../units";
-import { secondsIn, timerName, parseCommand, howMuch, leftLine, spoken, clock, minutesWords, voiceChoice, setVoiceChoice, isEcho, type VoiceChoice } from "../cook";
+import { secondsIn, timerName, parseCommand, howMuch, leftLine, spoken, clock, minutesWords, voiceChoice, setVoiceChoice, isEcho, cutsIn, type VoiceChoice } from "../cook";
 
 type Timer = { id: number; name: string; ends: number; total: number; rang: boolean };
 const Speech = () => (typeof window === "undefined" ? null : (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null);
@@ -146,7 +146,9 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
           const last = e.results[e.results.length - 1]; if (last?.isFinal === false) return;
           const said = String(last[0].transcript || ""), v = voiceOut.current;
           // 0.3.54: nothing while the phone speaks; just after, its own words are not the cook's
-          if (v.speaking || (v.tail && isEcho(said, v.text))) return;
+          // 0.3.55: a command of the cook's cuts in while the phone reads: the reading stops, the command is done
+          if (v.speaking) { if (!cutsIn(said, v.text)) return; try { window.speechSynthesis.cancel(); } catch { /* nothing to stop */ } v.speaking = false; v.tail = true; hearRef.current(said); return; }
+          if (v.tail && isEcho(said, v.text)) return;
           hearRef.current(said);
         };
         r.onerror = (e: any) => { if (e?.error === "not-allowed" || e?.error === "service-not-allowed") { stopped = true; setListenNote("The microphone is blocked for this site. Allow it in the browser's settings, or use the buttons."); } };
