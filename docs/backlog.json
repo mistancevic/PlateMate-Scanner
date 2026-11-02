@@ -58,7 +58,7 @@
       "epic": "plate",
       "state": "now",
       "board": 159,
-      "why": "The Plate kept adding foods and resolved nothing; a plate from an earlier meal asks Did you eat it, alone."
+      "why": "The Plate kept adding foods and resolved nothing; a plate from an earlier meal asks Did you eat it, alone. Quick wins first: the parts that hold either way ship before DT214."
     },
     {
       "id": "DT211",
@@ -66,7 +66,15 @@
       "epic": "cook",
       "state": "now",
       "board": 158,
-      "why": "Milan could not find the voice or the second phone; Start cooking moves onto the recipe."
+      "why": "Milan could not find the voice or the second phone; Start cooking moves onto the recipe. Quick wins first: the parts that hold either way ship before DT214."
+    },
+    {
+      "id": "DT214",
+      "title": "The cook: one cooking, from start to how it carried you",
+      "epic": "cook",
+      "state": "next",
+      "board": 162,
+      "why": "Milan 2 November 12:17 to 12:30: cooking gets interrupted; disconnect it from the Plate, keep it until the last answer. Board drawn, waits for your look."
     },
     {
       "id": "DT213",
