@@ -426,6 +426,14 @@
       "state": "done",
       "version": "0.3.65",
       "why": "Milan 22:44 to 22:53, Go."
+    },
+    {
+      "id": "DT230",
+      "title": "Craft on paper, then Prep, Make, Eat: no bar on the Plate, Prepare it ›, the photo large with its own buttons",
+      "epic": "cook",
+      "state": "next",
+      "board": 169,
+      "why": "Milan 23:44 to 00:05. Waits for his Go."
     }
   ]
 }
