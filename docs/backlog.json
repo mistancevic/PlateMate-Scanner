@@ -101,6 +101,13 @@
       "why": "Brainstormed. Open: who reviews German, Latin or Cyrillic for Serbian, AI answers first or screens first."
     },
     {
+      "id": "VO1",
+      "title": "AI voices from Google, and talking both ways while cooking",
+      "epic": "cook",
+      "state": "later",
+      "why": "Milan 2 November 14:41: the phone's voice must finish before he can speak. Google's Live API listens and talks at once and can be cut off; AI voices sound natural. Prices checked 14:45, waits for a brainstorm."
+    },
+    {
       "id": "DT197",
       "title": "The rulebook: what the app may say",
       "epic": "trust",
