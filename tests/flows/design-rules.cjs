@@ -4,7 +4,7 @@
 // button; a next meal with nothing planned is a card with Pick a meal and Make it on the Plate. E: Back sits top left,
 // above the step bar, and says where it goes. Never rewrite these lines to fit a change.
 // Added by stories DS4 G and DS5 H (Milan 08:49 to 09:30, boards DS4 and DS5): a page's title comes first, under Back: a
-// recipe's name before its photo. On /built a choice is chips, and a link inside a sentence is underlined.
+// recipe's name before its photo. On /built a link inside a sentence is underlined, and each part has one filled button.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -102,11 +102,10 @@ const U = "http://127.0.0.1:3242";
     // ---- H: /built: a choice is chips; a link in a sentence is underlined; one filled button at the books ----
     const p4 = await b.newPage({ viewport: { width: 390, height: 844 } });
     await p4.goto(U + "/built"); await p4.waitForTimeout(1500);
-    const modes = await p4.locator(".bt-modes button").evaluateAll((bs) => bs.map((x) => getComputedStyle(x).backgroundColor));
-    ok(modes.length === 2 && !modes.some((c) => /rgb\(46, 123, 232\)/.test(c)), "H: The parts or Follow a craving: two chips, neither filled");
     ok(await p4.locator(".bt-sub a").first().evaluate((a) => getComputedStyle(a).textDecorationLine === "underline"), "H: a link inside a sentence is underlined");
+    // BP1 (0.3.51): one filled button per part of the page: Try it at the top, Notify me at the books, Email Milan at the end
     const btns = await p4.locator(".bt-btn").evaluateAll((bs) => bs.map((x) => [x.textContent.trim(), /rgb\(46, 123, 232\)/.test(getComputedStyle(x).backgroundColor)]));
-    ok(JSON.stringify(btns.filter((x) => x[1]).map((x) => x[0])) === JSON.stringify(["Notify me"]), "H: Notify me is the one filled button: " + JSON.stringify(btns));
+    ok(JSON.stringify(btns.filter((x) => x[1]).map((x) => x[0])) === JSON.stringify(["Try it: the calculator on the home page", "Notify me", "Email Milan"]), "H: one filled button per part: " + JSON.stringify(btns));
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);
   } catch (e) { ok(false, "ran to the end: " + e.message.split("\n")[0]); }
   finally { await b.close(); server.kill(); }

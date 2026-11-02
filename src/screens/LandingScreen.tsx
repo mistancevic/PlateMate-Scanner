@@ -111,7 +111,7 @@ export function LandingScreen() {
       {/* HP6 (0.3.48, board Stories150 version 3; Coach Milan 1 November 17:37 to 19:54 Go): the calculator in the shape of the
           other sections, a label, the title as the hook, one line; mobile first, the words the whole width and the calculator
           centred under them on a computer too */}
-      <section className="l-hero l-calc">
+      <section className="l-hero l-calc" id="try">
         <div className="l-calc-text">
           <span className="l-eyebrow">Try it here</span>
           <h2>Make your craving fit your plan</h2>
