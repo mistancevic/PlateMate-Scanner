@@ -24,8 +24,8 @@ process.on("unhandledRejection", (e) => { console.log("FAIL " + (e && e.message 
     // the two buttons stand apart; See it work opens the video in place
     const [t1, t2] = await page.locator(".bt-actions").first().locator(".bt-btn").evaluateAll((bs) => bs.map((x) => x.getBoundingClientRect()));
     ok(t1 && t2 && (t2.top >= t1.bottom + 8 || t2.left >= t1.right + 8) && t1.height >= 44 && t2.height >= 44, `${tag}: BP1, the two buttons have room between them, 44 px tall`);
-    await page.getByRole("button", { name: "See it work, 90 seconds" }).click();
-    ok(await page.locator(".bt-video video").count() === 1, `${tag}: BP1, See it work opens the minute and a half in place`);
+    await page.getByRole("button", { name: "See it work", exact: true }).click();
+    ok(await page.locator(".bt-video video").count() === 1 && /see-it-work\.mp4/.test(await page.locator(".bt-video video").evaluate((v) => v.currentSrc || v.querySelector("source")?.src || v.src)), `${tag}: BP1 v5, See it work (no timing in the label) opens the new video in place`);
     // the system: every box holds its words; on a phone the parts stand in a column with the server's four neighbours
     const over = await page.evaluate(() => [...document.querySelectorAll(".bt-gnode")].filter((n) => n.scrollHeight > n.clientHeight + 1 || n.scrollWidth > n.clientWidth + 1).length);
     ok(over === 0 && await page.locator(".bt-gnode").count() >= 8, `${tag}: BP1, the system's eight parts each hold their words (${over} overflow)`);

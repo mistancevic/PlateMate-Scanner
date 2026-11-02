@@ -6,7 +6,7 @@
 const { chromium } = require("playwright");
 const { spawn, execFileSync } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path"), os = require("node:os");
-const ROOT = path.resolve(__dirname, ".."), OUT = path.join(ROOT, "public/landing");
+const ROOT = path.resolve(__dirname, ".."), OUT = process.env.CLIPS_OUT || path.join(ROOT, "public/landing");
 const PORT = "3296", U = `http://127.0.0.1:${PORT}`;
 const seed = JSON.parse(fs.readFileSync(path.join(ROOT, "tests/flows/seed.json"), "utf8"));
 const Fd = (re) => seed.foods.find((f) => re.test(f.name));
@@ -79,7 +79,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     }
     await b0.close(); }
   const made = [], strokes = [];
-  // CLIPS=shop,label records only those, to try a change; it never writes clips
+  // CLIPS=shop,label records only those, to try a change; it never writes clips into public/landing. With CLIPS_OUT=<dir> it
+  // writes them there (scripts/record-built-video.cjs does this for the /built video, BP1 0.3.52)
   const ONLY = process.env.CLIPS ? process.env.CLIPS.split(",") : null;
   // a small seeded random (mulberry32), so a clip's hand is the same on every run and different from the other clips'
   const seeded = (k) => { let a = [...k].reduce((h, c) => Math.imul(h ^ c.charCodeAt(0), 2654435761) >>> 0, 1779033703); return () => { a = (a + 0x6d2b79f5) >>> 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; };
@@ -177,9 +178,10 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     let checks = {};
     try { checks = (await run(page, act)) || {}; } catch (e) { rule(false, "run", `${name}: ${e.message.split("\n")[0]}`); }
     await sleep(1700);
-    // HC11 (Coach Milan, 1 November 11:40): the app's bar, where the clip shows it, has all five tabs with Explorer
+    // HC11 (Coach Milan, 1 November 11:40): the app's bar, where the clip shows it, has all five tabs with Explorer; a coach's
+    // bar has six, Clients the sixth (DT210, 0.3.50)
     const bar = await page.evaluate(() => { const n = document.querySelector(".bottom-nav"); if (!n || getComputedStyle(n).display === "none") return null; return [...n.querySelectorAll("button")].map((x) => x.textContent.trim()); }).catch(() => null);
-    rule(bar === null || (bar.length === 5 && bar.some((t) => /Explorer/.test(t))), "HC11", `${name}: the bar ${bar ? bar.join(", ") : "is not on screen"}`);
+    rule(bar === null || ((bar.length === 5 || (bar.length === 6 && bar.some((t) => /Clients/.test(t)))) && bar.some((t) => /Explorer/.test(t))), "HC11", `${name}: the bar ${bar ? bar.join(", ") : "is not on screen"}`);
     const saidDrawn = await page.evaluate(() => window.__said || 0).catch(() => -1);
     if (says) rule(saidDrawn === says, "HC13", `${name}: ${says} voice commands, ${saidDrawn} bubbles`);
     const drawn = await page.evaluate(() => ({ rings: window.__rings, ripples: window.__ripples, swipes: window.__swipes, travels: window.__travels, synced: window.__synced })).catch(() => ({ rings: -1, ripples: -1, swipes: -1, travels: -1, synced: [] }));
@@ -317,12 +319,12 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
       await a.tap(page.locator("section.waiting button.menu-row").filter({ hasText: /look at this/ }).first(), 1600);
       await a.swipe(380, 1300); await a.swipe(360, 600);
       return { HP3: { ok: !/Davorka/.test(await page.locator("main").textContent()), what: "made-up names only" } };
-    }, { path: "/today?coachdemo", setup: async (page, click) => { await click(page.getByRole("radio", { name: "My clients" }), 900); } });
+    }, { path: "/today?coachdemo", setup: async (page, click) => { await click(page.locator(".bottom-nav button").filter({ hasText: "Clients" }), 900); } });
   } catch (e) { rule(false, "run", (e.stack || e.message).split("\n").slice(0, 3).join(" | ")); }
   rule(new Set(strokes).size === strokes.length, "HC10", `no two scrolls in the set are the same (${strokes.length} scrolls)`);
   server.kill();
   if (fails.length) { console.log(`\n${fails.length} rule(s) failed; no clip was replaced:\n  ${fails.join("\n  ")}`); process.exit(1); }
-  if (ONLY) { console.log("\nCLIPS set: rules checked, no clip written"); process.exit(0); }
+  if (ONLY && !process.env.CLIPS_OUT) { console.log("\nCLIPS set: rules checked, no clip written"); process.exit(0); }
   for (const m of made) encode(m);
   console.log(`\nall rules passed (HC1 to HC13); ${made.length} clips written`);
 })();
