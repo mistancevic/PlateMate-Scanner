@@ -57,7 +57,7 @@ const open = async (state, at = "2026-10-18T12:20:00") => {
     await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
     await page.locator(".in-portion").getByRole("button", { name: "One slice, as the recipe makes it" }).click(); await page.waitForTimeout(500);
     await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
-    await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|Lock it and cook ›|Make it ›)$/ }).click(); await page.waitForTimeout(400);
+    await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "DaaM good" }).click();
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(700);

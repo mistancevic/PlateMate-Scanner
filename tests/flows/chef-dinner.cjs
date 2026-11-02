@@ -90,7 +90,7 @@ const STEPS = { steps: [
   const steps = await page.locator(".rp-steps li").allTextContents();
   ok(steps.length === 4 && /cook \d+ g penne for 11 minutes/.test(steps[0]) && /150 g chicken breast/.test(steps[2]), "DT89: four steps, at the plate's amounts: " + steps[0]);
   ok(/Chef Mealan's steps for your dinner, at your amounts\./.test(await text(page, ".step-head")), "DT89: the head says whose steps and for what");
-  await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|Lock it and cook ›|Make it ›)$/ }).click(); await page.waitForTimeout(700);
+  await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).click(); await page.waitForTimeout(700);
   // DT90: As the steps say; Save keeps the steps, the kitchen and who made it
   ok(await page.getByRole("button", { name: /^\W*As the steps say$/ }).count() === 1 && !/as the recipe says/i.test(await text(page)), "DT90: How did it go? says As the steps say");
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(700);
@@ -112,8 +112,8 @@ const STEPS = { steps: [
   await p2.goto(U + "/plate"); await p2.waitForTimeout(1300);
   // DT94 (0.2.88): the name is set in Craft, on the Plate
   await p2.locator(".title-input").fill("Yeast fritters"); await p2.locator(".title-input").blur(); await p2.waitForTimeout(300);
-  await p2.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|Lock it and cook ›|Make it ›)$/ }).click(); await p2.waitForTimeout(900);
-  for (const name of ["Continue", "Make it this way ›", "Lock the recipe", "How to make it ›", "Lock it and cook ›", "Make it ›", "I'm making it this way", "I'm making it"]) { const bt = p2.getByRole("button", { name, exact: true }); if (await bt.count() && await bt.first().isEnabled()) { await bt.first().click(); await p2.waitForTimeout(600); break; } }
+  await p2.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).click(); await p2.waitForTimeout(900);
+  for (const name of ["Continue", "Make it this way ›", "Lock the recipe", "How to make it ›", "How to eat it ›", "Lock it and cook ›", "Make it ›", "I'm making it this way", "I'm making it"]) { const bt = p2.getByRole("button", { name, exact: true }); if (await bt.count() && await bt.first().isEnabled()) { await bt.first().click(); await p2.waitForTimeout(600); break; } }
   if (await p2.locator(".way").count()) { await p2.locator(".way").first().click(); await p2.getByRole("button", { name: /I'm making it this way|Make it this way ›/ }).click(); await p2.waitForTimeout(600); }
   await p2.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await p2.waitForTimeout(600);
   await p2.getByRole("button", { name: "Good", exact: true }).click();

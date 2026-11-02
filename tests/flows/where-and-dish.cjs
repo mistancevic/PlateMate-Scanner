@@ -44,7 +44,7 @@ seed.items = [];
   ok(/2 of 8/.test(await page.locator(".dish-portions").textContent()) && kcal2 > kcal1 * 1.8, `two portions double the plate: ${kcal1} to ${kcal2} kcal`);
   await page.getByRole("button", { name: "One portion less" }).click(); await page.waitForTimeout(300);
   // eaten as it stands: the card points at the recipe, no copy
-  await click(/^(Keep it as it is|Lock the recipe|How to make it ›|Lock it and cook ›|Make it ›)$/);
+  await click(/^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/);
   if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); await click(/I'm making it this way|Make it this way ›/i); } else await click(/^Continue$/);
   await click(/Cooked\. Next: Eat/);
   ok(/Sarma is in My recipes already/.test(await page.locator("main").textContent()), "the after step says the recipe exists");

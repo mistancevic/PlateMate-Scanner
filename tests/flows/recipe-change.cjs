@@ -38,7 +38,7 @@ const PORT = "3306", U = `http://127.0.0.1:${PORT}`;
   await page.getByRole("button", { name: /^(Make it|Change it first)$/ }).click(); await page.waitForTimeout(1000);
   const oats = page.getByLabel("Grams of Oats").first();
   await oats.fill("60"); await oats.press("Enter"); await page.waitForTimeout(500);
-  await page.getByRole("button", { name: /Lock the recipe|How to make it ›|Lock it and cook ›/ }).click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›/ }).click(); await page.waitForTimeout(800);
   await page.locator(".way").first().click(); await page.waitForTimeout(200);
   await page.getByRole("button", { name: /I'm making it this way|Make it this way ›/ }).click(); await page.waitForTimeout(600);
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(600);

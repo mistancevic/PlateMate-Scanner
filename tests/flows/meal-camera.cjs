@@ -110,7 +110,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   const ib = (await page.locator(".mp-say .mp-idea-row button").allTextContents()).map((x) => x.trim());
   ok(ib.length === 3 && /^Fit it to my (lunch|dinner|meal)$/.test(ib[0]) && ib[1] === "Save as an idea" && ib[2] === "Put it in my plan" && (await page.locator(".mp-say .pill-primary").textContent()).trim() === ib[0], "DT130: the buttons are for cooking it, Fit first; no Ate it: " + ib.join(" | "));
   const say = await text(".mp-say small");
-  ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 0 && await page.getByRole("button", { name: /Lock the recipe|How to make it ›|Lock it and cook ›/ }).count() === 0, "DT130: an idea's buttons are only in Chef Mealan's card: no second Fit, no Lock");
+  ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 0 && await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›/ }).count() === 0, "DT130: an idea's buttons are only in Chef Mealan's card: no second Fit, no Lock");
   ok(/^Chef Mealan: A (lunch|dinner|meal) as the photo shows it: about [\d,]+ to [\d,]+ kcal and \d+ g protein\. Fit it and it is sized for your day\.$/.test(say), "DT130: Chef Mealan's line for an idea, by code: " + say);
   // Put it in my plan: a day and a meal, in chips; the idea goes to Mine and to the slot
   await page.getByRole("button", { name: "Put it in my plan" }).click(); await page.waitForTimeout(300);

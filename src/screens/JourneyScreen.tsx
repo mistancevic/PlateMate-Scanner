@@ -1854,7 +1854,7 @@ export function JourneyScreen(p: AppApi) {
             <ChefHat size={18} className="hat" /> {fit ? "Fit again" : "Fit to my target"}
           </button>
           {/* DT94: Lock the recipe ends Craft; for a slot the plate goes in as it stands, as before */}
-          {items.length > 0 && <button className="pill pill-wide" onClick={keepAsIs}>{p.filling && p.filling.mode !== "eat" ? (fit ? `Put it in ${slotName(p.filling)}` : "Keep it as it is") : cooksPlate(items) && stepsHold(items) ? "Lock it and cook ›" /* 0.3.62: straight to Make, as under the steps */ : goesToHowToMake(items) ? "How to make it ›" : "Lock the recipe"}</button>}
+          {items.length > 0 && <button className="pill pill-wide" onClick={keepAsIs}>{p.filling && p.filling.mode !== "eat" ? (fit ? `Put it in ${slotName(p.filling)}` : "Keep it as it is") : cooksPlate(items) && stepsHold(items) ? "Lock it and cook ›" /* 0.3.62: straight to Make, as under the steps */ : goesToHowToMake(items) ? "How to make it ›" : "How to eat it ›" /* 0.3.62 (Coach Milan 21:27, ok): a bowl opens How do you want to eat it? */}</button>}
           </>)}
           </>)}
         </div>

@@ -49,7 +49,7 @@ seed.items = [];
   await step("ask", () => click(/^(Fit to my target|Make it an? \w+)$/i));
   await shot("2-recipe");
   // 0.2.88 (DT93, DT94): Fit works in place on the Plate; Lock the recipe goes on
-  await step("lock it", () => click(/^(?:Lock the recipe|How to make it ›|Lock it and cook ›|Make it ›)$/i));
+  await step("lock it", () => click(/^(?:Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/i));
   await step("pick way", async () => { await page.locator(".way").first().click(); await page.waitForTimeout(200); });
   await step("making", () => click(/I'm making it this way|Make it this way ›/i));
   // JOURNEY INVARIANT (M1 activity 6, 10 October 2026): after the steps, How did making it go? asks for photos, how it went and how much was eaten, then on to How was it?
