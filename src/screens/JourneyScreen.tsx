@@ -692,7 +692,10 @@ export function JourneyScreen(p: AppApi) {
   const swapCandidates = !swapId || pdRef === null ? [] : rankSwaps(items, swapId, swapPool, pdRef, cap ?? null, undefined, (f, plate) => fitsPlate(f, swapInDish ? plate.filter((x) => !bindsADish(x)) : plate), swapKind, sameFoodName);
   const swapGone = swapId ? items.find((i) => i.id === swapId) : null;
   // a plate already at its target without the food: any swap keeps it there, at the same amount
-  const restAbove = (() => { if (!swapGone || pdRef === null) return false; const t = aggregate(items.filter((i) => i.id !== swapGone.id)); const d = density(t.protein, t.calories); return d !== null && d >= pdRef; })();
+  // 0.3.65 (Coach Milan 22:50, Go): a food read from a photo, or a plate that is not sized (Exploring, a meal you ate), swaps at
+  // the same grams: the swap fixes what the food is; there is nothing to reach
+  const swapKeeps = !!swapGone && (!!swapGone.est || p.pick === "exploring" || state.photo?.who === "idea" || (!!p.filling && plateWhen === "past"));
+  const restAbove = (() => { if (swapKeeps) return true; if (!swapGone || pdRef === null) return false; const t = aggregate(items.filter((i) => i.id !== swapGone.id)); const d = density(t.protein, t.calories); return d !== null && d >= pdRef; })();
   const swapPick = (f: Food, grams: number | null, fits: boolean) => {
     const joins = /^(ref|mf):/.test(f.id), mine = joins ? { ...f, id: uid(), reviewedAt: new Date().toISOString() } : f;
     if (joins) setState((s) => ({ ...s, foods: [mine, ...s.foods] }));
@@ -1386,6 +1389,15 @@ export function JourneyScreen(p: AppApi) {
             </div>}
           </>);
         })()}
+        {/* 0.3.65 (Coach Milan 22:53, Go): Exploring is there on a meal of the plan too; it leaves that meal, which stays as it was */}
+        {p.filling && <>
+          <p className="label">What is it for?</p>
+          <div className="moments for-row" role="radiogroup" aria-label="What the plate is for">
+            <button className="choice on" aria-pressed={true}>{capName(slotName(p.filling))}</button>
+            <button className="choice" aria-pressed={false} onClick={() => { const left = slotName(p.filling!); p.setFilling(null); p.setPick("exploring"); p.notify(`Exploring: ${left} stays as it was.`); }}>Exploring</button>
+          </div>
+          <p className="small for-hint">Exploring leaves {slotName(p.filling)}: it stays as it was, and nothing is logged.</p>
+        </>}
         {!p.filling && !otherDay && <>
           <p className="label">What is it for?</p>
           <div className="moments for-row" role="radiogroup" aria-label="What the plate is for">
@@ -2595,6 +2607,8 @@ function LaterRow({ x, onContinue, onRemove }: { x: Later; onContinue: () => voi
 // first is the plate's), ＋ Photo for the inside, another side or the menu, and a line in the person's words, typed or said.
 // Read it again sends them all; the new read replaces the foods and the corrections, as Read the photo again did.
 function HelpRead({ photo, read }: { photo: NonNullable<import("../pilot").PilotState["photo"]>; read: (more: string[], note: string) => void }) {
+  // 0.3.65 (Coach Milan 22:53, Go): after a read it folds into one link and opens on a tap
+  const [open, setOpen] = useState(false);
   const [more, setMore] = useState<string[]>(() => photo.more ?? []);
   const [note, setNote] = useState(() => photo.note ?? "");
   const [hearing, setHearing] = useState(false);
@@ -2603,6 +2617,7 @@ function HelpRead({ photo, read }: { photo: NonNullable<import("../pilot").Pilot
   const listen = () => { if (!S || hearing) return; try { const r = new S(); r.lang = "en-GB"; r.interimResults = false; r.onresult = (e: any) => { const t = String(e.results?.[0]?.[0]?.transcript ?? "").trim(); if (t) setNote((n) => (n ? `${n} ${t}` : t).slice(0, 200)); }; r.onend = () => setHearing(false); r.onerror = () => setHearing(false); setHearing(true); r.start(); } catch { setHearing(false); } };
   const n = 1 + more.length, words = note.trim();
   const label = `Read it again${n > 1 ? ` with ${n} photos` : ""}${words ? (n > 1 ? " and this" : " with this") : ""}`;
+  if (!open) return <button type="button" className="link mp-again-link" onClick={() => setOpen(true)}>Wrong foods? Help Chef Mealan read it ›</button>;
   return (
     <section className="mp-help" aria-label="Help Chef Mealan read it">
       <b>Help Chef Mealan read it</b>

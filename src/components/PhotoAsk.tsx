@@ -21,7 +21,8 @@ export function PhotoAsk({ image, at, mealAt, read, drop, exploring = false }: {
           <div key={w} role="radio" tabIndex={0} aria-checked={who === w} className={`pa-chip${who === w ? " on" : ""}`} onClick={() => setWho(w)}
             onKeyDown={(e) => { if ((e.key === "Enter" || e.key === " ") && e.target === e.currentTarget) { e.preventDefault(); setWho(w); } }}>
             {who === w && <span aria-hidden="true">✓</span>}
-            {w === "ate" ? <>Ate at <input className="pa-time" type="time" value={time} aria-label="The time you ate it" onClick={() => setWho("ate")} onChange={(e) => e.target.value && setTime(e.target.value)} /></> : chipWord(w, time)}
+            {/* 0.3.65 (Coach Milan 22:44): the time as text, 24 hours, as the line under says it; a tap opens the phone's time picker */}
+            {w === "ate" ? <>Ate at <span className="pa-time-wrap"><span className="pa-time-text" aria-hidden="true">{time}</span><input className="pa-time" type="time" value={time} aria-label="The time you ate it" onClick={(e) => { setWho("ate"); try { (e.currentTarget as any).showPicker?.(); } catch { /* the field opens its own picker */ } }} onChange={(e) => e.target.value && setTime(e.target.value)} /></span></> : chipWord(w, time)}
           </div>
         ))}
       </div>

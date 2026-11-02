@@ -26,6 +26,7 @@ const READ = { dish: "Pork schnitzel with roasted potatoes", foods: [
   const b = await chromium.launch({ ...(process.env.CHROME ? { executablePath: process.env.CHROME } : {}), args: ["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"] });
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
   const errs = [], sent = [];
+  const swipe = require("./swipe.cjs");
   const open = async (s, at = "/") => {
     const ctx = await b.newContext({ viewport: { width: 390, height: 1400 }, deviceScaleFactor: 1, permissions: ["camera"] });
     const page = await ctx.newPage(); page.on("pageerror", (e) => errs.push(e.message));
@@ -47,6 +48,15 @@ const READ = { dish: "Pork schnitzel with roasted potatoes", foods: [
     let { ctx, page } = await open({ ...seed, items, title: "Breaded fish with roasted potatoes", photo: { image: pic, at: "2026-11-02T11:50:00" } }, "/plate");
     await page.unroute("**/api/plate-photo");
     await page.route("**/api/plate-photo", (r) => { sent.push(r.request().postDataJSON()); r.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(READ) }); });
+    // 0.3.65: after a read the help folds into one link
+    ok(await page.locator(".mp-help").count() === 0 && (await page.locator(".mp-again-link").textContent()).trim() === "Wrong foods? Help Chef Mealan read it ›", "0.3.65: folded into one link after a read");
+    // 0.3.65: swapping a food read from a photo keeps its grams: no can't reach
+    await swipe(page, page.locator(".swipe-fg", { hasText: "Fish fillet" }).locator(".thumb"), "left"); await page.waitForTimeout(200);
+    await page.locator(".swipe-act, .swipe-bg button, button").filter({ hasText: /^Swap$/ }).first().click().catch(() => {}); await page.waitForTimeout(400);
+    const pills = await page.locator(".sheet .pdpill").allTextContents();
+    ok(pills.length > 0 && pills.every((x) => x.trim() === "180 g"), "0.3.65: the swap list keeps 180 g for each food, no can't reach: " + pills.slice(0, 4).join(", "));
+    await page.locator(".sheet").getByRole("button", { name: "Cancel" }).click().catch(() => {}); await page.waitForTimeout(200);
+    await page.locator(".mp-again-link").click(); await page.waitForTimeout(200);
     const help = page.locator(".mp-help");
     ok(/Help Chef Mealan read it/.test(await help.textContent()) && await help.locator(".mp-help-photos img").count() === 1 && /＋ Photo/.test(await help.textContent()) && (await help.locator(".pill-primary").textContent()).trim() === "Read it again", "under the photo: Help Chef Mealan read it, the photo, ＋ Photo, Read it again");
     await help.locator(".mp-help-add input").setInputFiles(path.join(ROOT, "tests/flows/plate.jpg")); await page.waitForTimeout(800);
