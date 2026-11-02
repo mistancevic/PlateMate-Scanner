@@ -4,9 +4,9 @@
 import { useState } from "react";
 import { WHO_ORDER, atTime, chipWord, hhmm, photoFrom, startWho, whoLine, type Who } from "../photoAsk";
 
-export function PhotoAsk({ image, at, mealAt, read, drop }: { image: string; at: string; mealAt: (d: Date) => string | null; read: (x: { at: string; who: Who }) => void; drop: () => void }) {
+export function PhotoAsk({ image, at, mealAt, read, drop, exploring = false }: { image: string; at: string; mealAt: (d: Date) => string | null; read: (x: { at: string; who: Who }) => void; drop: () => void; exploring?: boolean }) {
   const taken = new Date(at), now = new Date();
-  const [who, setWho] = useState<Who>(() => startWho(taken, now));
+  const [who, setWho] = useState<Who>(() => startWho(taken, now, exploring));
   const [time, setTime] = useState(() => hhmm(taken));
   const when = who === "ate" ? atTime(taken, time) : now;
   const meal = who === "idea" ? null : mealAt(when);

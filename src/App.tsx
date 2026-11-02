@@ -155,6 +155,8 @@ const STORE = "platemate-pilot-v1";
 
 let unreadableBackup: string | null = null;
 // a request that does not answer in time ends with "timeout" instead of waiting forever
+// 0.3.62: a meal of the plan by its day: today's lunch, Sunday's dinner
+const fillingName = (f: { dayName: string; name: string }) => `${f.dayName === "today" ? "today's" : `${f.dayName}'s`} ${f.name.toLowerCase()}`;
 const withTimeout = <T,>(p: Promise<T>, ms: number) => new Promise<T>((res, rej) => { const t = setTimeout(() => rej(new Error("timeout")), ms); p.then((v) => { clearTimeout(t); res(v); }, (e) => { clearTimeout(t); rej(e); }); });
 // names say who is who: Coach Milan, Chef Mealan, Client Tester 1
 const firstName = (n?: string | null) => (n ?? "").trim().split(/\s+/)[0] || "";
@@ -855,6 +857,8 @@ export default function App() {
     [photoAsk, setPhotoAsk] = useState<{ image: string; at: string } | null>(null),
     // DT219 (0.3.58): the last photo read found no foods; nothing landed on the Plate
     [photoNoFoods, setPhotoNoFoods] = useState(false),
+    // 0.3.62: the meal an Exploring photo left, for Chef Mealan's line (Sunday's dinner stays as it was)
+    [exploreLeft, setExploreLeft] = useState<string | null>(null),
     // DT218 (0.3.58): Go on after eating opens the last question on this meal's card, before the 30 minutes are up
     [carryNow, setCarryNow] = useState<{ id: string; at: number } | null>(null),
     // DT131 (0.2.113, board Stories87; Milan 27 October 13:52): foods about to land on a plate that has foods wait for one answer
@@ -2401,8 +2405,13 @@ export default function App() {
         setPhotoNoFoods(false);
         // DT212 v4 (0.3.53): Read the photo again keeps the photo's time and replaces the foods, after it asked
         const at = (x?.who === "ate" || x?.replace) && x.at ? x.at : new Date().toISOString();
-        const photo = { image: thumb, at, unsure: read.unsure, ...(x?.who && x.who !== "now" ? { who: x.who } : {}) };
+        // 0.3.62 (Coach Milan 20:21 to 20:55): Exploring in the pencil block makes a camera photo Exploring too
+        const who = x?.who ?? (pick === "exploring" ? "idea" : undefined);
+        const photo = { image: thumb, at, unsure: read.unsure, ...(who && who !== "now" ? { who } : {}) };
         const land = (how: "add" | "new") => {
+          // 0.3.62: an Exploring photo is no meal of yours: the plate leaves the meal it was for (a past dinner, a planned lunch,
+          // the clock's guess) and the pencil block says Exploring; that meal stays as it was, and Chef Mealan says so
+          if (who === "idea") { if (filling) { setExploreLeft(fillingName(filling)); setFilling(null); } else setExploreLeft(null); setPick("exploring"); } else setExploreLeft(null);
           if (how === "add") setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items: [...s.items, ...items], portion: null, photo }));
           else setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo }));
           setKind("meal"); setStep("in");
@@ -2454,7 +2463,7 @@ export default function App() {
     // DT130 (0.2.110, board Stories78, A): Photo of my meal opens the same camera as Scan, in Meal mode
     mealCamera: () => { setTalkOpen(false); setMode("meal"); setCamera(true); },
     photoAsk, dropPhotoAsk: () => setPhotoAsk(null),
-    photoNoFoods, dropNoFoods: () => setPhotoNoFoods(false),
+    photoNoFoods, dropNoFoods: () => setPhotoNoFoods(false), exploreLeft,
     carryNow,
     plateAsk, answerPlateAsk: (how: "add" | "new" | null) => { const x = plateAsk; setPlateAsk(null); if (x && how) x.apply(how); },
     saveIdea: (meal: Meal, photo: string | null, slot?: { date: string; slotId: string } | null) => {

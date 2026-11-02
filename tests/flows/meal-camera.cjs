@@ -78,7 +78,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   ok(sent.length === 1, "DT130: nothing is read before Read the plate");
   ok(/A photo from 12:20 today\.\s?Whose plate, and when\?/.test(await text(".pa-top")), "DT130: the photo's own time, from the photo: " + await text(".pa-top"));
   const c1 = await chips();
-  ok(c1.length === 3 && /^✓\s?Ate at$/.test(c1[0]) && c1[1] === "Eating now" && c1[2] === "An idea" && await page.locator(".pa-time").inputValue() === "12:20", "DT130: three short chips, Ate at 12:20 on (45 minutes ago): " + c1.join(" | "));
+  ok(c1.length === 3 && /^✓\s?Ate at$/.test(c1[0]) && c1[1] === "Eating now" && c1[2] === "Exploring" && await page.locator(".pa-time").inputValue() === "12:20", "DT130: three short chips, Ate at 12:20 on (45 minutes ago): " + c1.join(" | "));
   ok(await page.locator(".pa-chip.on").count() === 1 && await page.locator(".pa-chip[aria-checked=true]").count() === 1, "DT130: one chip on");
   const line1 = await text(".pa small");
   ok(/^Logged at 12:20, as lunch\. Tap the time to change it\.$/.test(line1), "DT130: the line says what the chip on does: " + line1);
@@ -102,16 +102,16 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
   await pick("2026:10:24 19:10:00");
   ok(/A photo from yesterday, 19:10\./.test(await text(".pa-top")) && /^Logged at 19:10, as dinner/.test(await text(".pa small")), "DT130: a photo from yesterday: Ate at 19:10, as dinner: " + await text(".pa small"));
-  await page.locator(".pa-chip").filter({ hasText: "An idea" }).click(); await page.waitForTimeout(200);
-  ok(await text(".pa small") === "Not logged. Chef Mealan reads it as an idea to cook.", "DT130: An idea: not logged, read as an idea to cook");
+  await page.locator(".pa-chip").filter({ hasText: "Exploring" }).click(); await page.waitForTimeout(200);
+  ok(await text(".pa small") === "Not your meal, not logged. Chef Mealan reads it: cook it, keep it as an idea, or plan it.", "0.3.62: Exploring (was An idea): not your meal, not logged");
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
   const s4 = await st();
-  ok(sent.length === 3 && s4.photo.who === "idea" && /An idea from a photo\. 3 foods read, amounts estimated \(~\)\. Not logged/.test(await text(".mp-line")), "DT130: the read lands as an idea, said in the photo line");
+  ok(sent.length === 3 && s4.photo.who === "idea" && /Exploring a photo\. 3 foods read, amounts estimated \(~\)\. Not logged/.test(await text(".mp-line")) && (await st()).pick === "exploring", "0.3.62: the read lands as Exploring, said in the photo line; the pencil block is on Exploring");
   const ib = (await page.locator(".mp-say .mp-idea-row button").allTextContents()).map((x) => x.trim());
-  ok(ib.length === 3 && /^Fit it to my (lunch|dinner)$/.test(ib[0]) && ib[1] === "Save as an idea" && ib[2] === "Put it in my plan" && (await page.locator(".mp-say .pill-primary").textContent()).trim() === ib[0], "DT130: the buttons are for cooking it, Fit first; no Ate it: " + ib.join(" | "));
+  ok(ib.length === 3 && /^Fit it to my (lunch|dinner|meal)$/.test(ib[0]) && ib[1] === "Save as an idea" && ib[2] === "Put it in my plan" && (await page.locator(".mp-say .pill-primary").textContent()).trim() === ib[0], "DT130: the buttons are for cooking it, Fit first; no Ate it: " + ib.join(" | "));
   const say = await text(".mp-say small");
-  ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 0 && await page.getByRole("button", { name: /Lock the recipe|How to make it ›|Lock it and cook ›/ }).count() === 0, "DT130: an idea's buttons are only in Chef Mealan's card: no second Fit, no Lock");
-  ok(/^Chef Mealan: A (lunch|dinner) as the photo shows it: about [\d,]+ to [\d,]+ kcal and \d+ g protein\. Fit it and it is sized for your day\.$/.test(say), "DT130: Chef Mealan's line for an idea, by code: " + say);
+  ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 0 && await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›/ }).count() === 0, "DT130: an idea's buttons are only in Chef Mealan's card: no second Fit, no Lock");
+  ok(/^Chef Mealan: A (lunch|dinner|meal) as the photo shows it: about [\d,]+ to [\d,]+ kcal and \d+ g protein\. Fit it and it is sized for your day\.$/.test(say), "DT130: Chef Mealan's line for an idea, by code: " + say);
   // Put it in my plan: a day and a meal, in chips; the idea goes to Mine and to the slot
   await page.getByRole("button", { name: "Put it in my plan" }).click(); await page.waitForTimeout(300);
   const days = await page.locator(".mp-plan .chips-row").first().locator("button").allTextContents();
@@ -130,7 +130,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await toPlate();
   await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
   await pick("2026:10:19 20:00:00");
-  ok(/^✓\s?An idea$/.test((await chips())[2]) && /A photo from Monday 19 October, 20:00\./.test(await text(".pa-top")), "DT130: a photo from last week starts on An idea");
+  ok(/^✓\s?Exploring$/.test((await chips())[2]) && /A photo from Monday 19 October, 20:00\./.test(await text(".pa-top")), "DT130: a photo from last week starts on An idea");
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
   await page.getByRole("button", { name: "Save as an idea" }).click(); await page.waitForTimeout(1200);
   const s6 = await st();

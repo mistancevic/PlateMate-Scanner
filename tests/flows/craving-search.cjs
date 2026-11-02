@@ -106,8 +106,8 @@ const U = "http://127.0.0.1:3234";
     await p2.locator("nav button").filter({ hasText: "Plate" }).click(); await p2.waitForTimeout(500);
     await p2.getByLabel("What are you craving?").fill("tiramisu"); await p2.waitForTimeout(400);
     await p2.locator(".crave .pick-row").filter({ hasText: "Protein tiramisu" }).click(); await p2.waitForTimeout(800);
-    await p2.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|Lock it and cook ›)$/ }).first().click(); await p2.waitForTimeout(500);
-    if (await p2.locator(".way").count()) { await p2.locator(".way").first().click(); await p2.waitForTimeout(200); await p2.getByRole("button", { name: /I'm making it this way|Lock the recipe, this way/i }).click(); }
+    await p2.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).first().click(); await p2.waitForTimeout(500);
+    if (await p2.locator(".way").count()) { await p2.locator(".way").first().click(); await p2.waitForTimeout(200); await p2.getByRole("button", { name: /I'm making it this way|Make it this way ›/i }).click(); }
     else await p2.getByRole("button", { name: /^Continue$/ }).click();
     await p2.waitForTimeout(400);
     await p2.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await p2.waitForTimeout(300);

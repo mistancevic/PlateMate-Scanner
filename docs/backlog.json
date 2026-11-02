@@ -367,6 +367,30 @@
       "state": "done",
       "version": "0.3.61",
       "why": "Milan 20:24: the slow opening after almost every deploy. Go at 20:34."
+    },
+    {
+      "id": "EX1",
+      "title": "Exploring, not An idea: a photo that is not your meal leaves the meal and logs nothing",
+      "epic": "cook",
+      "state": "done",
+      "version": "0.3.62",
+      "why": "Milan 20:16 to 20:55: a friend's dinner read while adding Sunday's dinner was stuck. Go at 20:55."
+    },
+    {
+      "id": "BN1",
+      "title": "The last Lock buttons say what comes next: Make it this way ›, Lock it and cook ›, How to eat it ›",
+      "epic": "cook",
+      "state": "done",
+      "version": "0.3.62",
+      "why": "Milan 21:00 and 21:27, yes."
+    },
+    {
+      "id": "DT228",
+      "title": "Help the photo read: your words with the photo, Chef Mealan asks what a food is, more than one photo",
+      "epic": "cook",
+      "state": "next",
+      "board": 168,
+      "why": "Milan 19:50, 21:00 draw 1 and 2; 21:31 add more photos of a meal (v2). Waits for his Go."
     }
   ]
 }

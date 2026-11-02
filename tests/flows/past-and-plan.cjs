@@ -72,7 +72,7 @@ const PORT = "3322", U = `http://127.0.0.1:${PORT}`;
     await page.locator(".past-add .past-plate").filter({ hasText: "Lunch" }).getByRole("button", { name: "Add what you ate" }).click(); await page.waitForTimeout(1000);
     ok(/^Adding Wednesday's lunch$/.test((await bar()).trim()) && /Wednesday's lunch, 13:45 · Eaten/.test(await page.locator(".plan-line").textContent()), "Adding Wednesday's lunch; the line says Eaten");
     await addTwo();
-    ok(await page.getByRole("button", { name: /Fit to my target/ }).count() === 0 && await page.getByRole("button", { name: /^Make it$|Lock the recipe|How to make it ›|Lock it and cook ›/ }).count() === 0, "no Fit, no Make: it is what you ate");
+    ok(await page.getByRole("button", { name: /Fit to my target/ }).count() === 0 && await page.getByRole("button", { name: /^Make it$|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›/ }).count() === 0, "no Fit, no Make: it is what you ate");
     await page.getByRole("button", { name: "Put it in Wednesday's lunch, eaten" }).click(); await page.waitForTimeout(800);
     fb = (await st()).feedback;
     const lunch = fb.find((f) => f.slot?.slotId === "lunch"), la = new Date(lunch?.createdAt);
