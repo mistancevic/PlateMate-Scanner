@@ -55,33 +55,62 @@ grid = (f'<div style="display:grid;grid-template-columns:330px 70px 330px 70px 3
         f'<div></div><div></div>{quality}<div></div><div></div><div></div><div></div></div>')
 
 def arch():
-    # the technical graph: boxes and arrows, drawn as SVG
-    def rect(x,y,w,h,c,t,sub=""):
-        return (f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="12" fill="#fff" stroke="{c}" stroke-width="2.5"/>'
-                f'<text x="{x+w/2}" y="{y+26}" text-anchor="middle" font-size="15" font-weight="800" fill="{c}">{t}</text>'
-                + "".join(f'<text x="{x+w/2}" y="{y+46+i*16}" text-anchor="middle" font-size="12" fill="#3d4a63">{l}</text>' for i,l in enumerate(sub)))
-    def ar(x1,y1,x2,y2,t="",both=False):
-        m=' marker-start="url(#a0)"' if both else ''
-        mid=(f'<rect x="{(x1+x2)/2-len(t)*3.3}" y="{(y1+y2)/2-24 if y1==y2 else (y1+y2)/2-8}" width="{len(t)*6.6}" height="15" fill="#fff"/><text x="{(x1+x2)/2}" y="{(y1+y2)/2-12 if y1==y2 else (y1+y2)/2+4}" text-anchor="middle" font-size="11" fill="#5b6b8a">{t}</text>') if t else ""
-        return f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="#172742" stroke-width="2" marker-end="url(#a1)"{m}/>{mid}'
-    g = ['<defs><marker id="a1" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#172742"/></marker><marker id="a0" markerWidth="10" markerHeight="10" refX="1" refY="5" orient="auto"><path d="M10,0 L0,5 L10,10 z" fill="#172742"/></marker></defs>']
-    g.append(rect(20,80,230,150,"#d35400","People",["a person, a coach, the owner","Testers 1 to 3 on preview","Claude builds and tests"]))
-    g.append(rect(330,60,300,190,"#2e7be8","Phone: chefmealan.com (PWA)",["React, TypeScript, Vite","state in localStorage, offline first","the calculator and the letters: code","camera: label, barcode, Photo of my meal","speech: the browser's own voice and ears","Explorer, Today, Plan, Plate, Recipes, Clients","public pages: home, /recipes, /r/slug, /built"]))
-    g.append(rect(360,370,240,80,"#2e7be8","Kitchen screen",["a second phone, /cook, 4-letter code"]))
-    g.append(rect(720,60,320,190,"#172742","Server: Cloud Run, Frankfurt",["Express, one process, 70 routes","serves the app and the public pages","the coach's rules in code (docs/rules)","every AI call, with its schema and fallbacks","events and the AI bill per call (Metrics)","cook sessions, invites, waiting list","deploy: preview.sh, promote, rollback"]))
-    g.append(rect(1130,60,300,120,"#8e44ad","Gemini (Google AI)",["gemini-3.8-flash, 3.5-flash-lite, 3.6-flash","photo read, label table, chat, checks,","recipe read, steps, swap, tip, cover, judge"]))
-    g.append(rect(1130,220,300,110,"#1e8e5a","Firebase (Google)",["Auth: sign in with Google","Firestore: accounts, links, cards, metrics","Storage: photos as files, Frankfurt"]))
-    g.append(rect(1130,370,300,80,"#5b6b8a","Open Food Facts · Google Calendar",["barcodes and search · training and busy times"]))
-    g.append(rect(720,370,320,80,"#16a085","GitHub: the repo",["code, boards, rules, qa runs, evals; CI: unit tests"]))
-    g.append(ar(250,155,330,155,"uses"))
-    g.append(ar(630,150,720,150,"HTTPS, JSON",True))
-    g.append(ar(1040,110,1130,110,"key on the server",True))
-    g.append(ar(1040,275,1130,275,"admin SDK",True))
-    g.append('<polyline points="1000,250 1000,352 1090,352 1090,410 1130,410" fill="none" stroke="#172742" stroke-width="2" marker-end="url(#a1)"/><text x="1008" y="310" font-size="11" fill="#5b6b8a">fetch</text>')
-    g.append(ar(480,250,480,370,"",True)); g.append('<text x="490" y="315" font-size="11" fill="#5b6b8a">polls every 2 s</text>')
-    g.append(ar(880,250,880,370,"")); g.append('<text x="890" y="315" font-size="11" fill="#5b6b8a">git push, deploy</text>')
-    g.append('<polyline points="480,60 480,22 1280,22 1280,220" fill="none" stroke="#172742" stroke-width="2" marker-end="url(#a1)" marker-start="url(#a0)"/><text x="880" y="16" text-anchor="middle" font-size="11" fill="#5b6b8a">sign in with Google, the account\'s copy of the phone\'s data, photos (Firebase SDK)</text>')
-    return f'<svg width="1450" height="470" viewBox="0 0 1450 470" style="display:block;margin-top:8px;font-family:Nunito,ui-sans-serif,system-ui,sans-serif">{"".join(g)}</svg>'
+    # the technical graph: HTML boxes (text wraps, never crosses a border) over an SVG of plain lines and triangles
+    BOX = [
+      ("people",20,80,230,150,"#d35400","People",["a person, a coach, the owner","Testers 1 to 3 on preview","Claude builds and tests"]),
+      ("phone",330,60,300,200,"#2e7be8","Phone: chefmealan.com (PWA)",["React, TypeScript, Vite","state in localStorage, offline first","the calculator and the letters: code","camera: label, barcode, Photo of my meal","speech: the browser's own voice and ears","public pages: home, /recipes, /r/slug, /built"]),
+      ("kitchen",360,370,240,80,"#2e7be8","Kitchen screen",["a second phone, /cook, 4-letter code"]),
+      ("server",720,60,320,200,"#172742","Server: Cloud Run, Frankfurt",["Express, one process, 70 routes","serves the app and the public pages","the coach's rules in code (docs/rules)","every AI call, with its schema and fallbacks","events and the AI bill per call (Metrics)","deploy: preview.sh, promote, rollback"]),
+      ("gemini",1130,60,300,120,"#8e44ad","Gemini (Google AI)",["gemini-3.8-flash; 3.5-flash-lite, 3.6-flash","photo read, label table, chat, checks, recipe read,","steps, swap, tip, cover, judge"]),
+      ("firebase",1130,220,300,110,"#1e8e5a","Firebase (Google)",["Auth: sign in with Google","Firestore: accounts, links, cards, metrics","Storage: photos as files, Frankfurt"]),
+      ("other",1130,370,300,80,"#5b6b8a","Open Food Facts · Google Calendar",["barcodes and search · training and busy times"]),
+      ("github",720,370,320,80,"#16a085","GitHub: the repo",["code, boards, rules, qa runs, evals; CI: unit tests"]),
+    ]
+    boxes = "".join(f'<div style="position:absolute;left:{x}px;top:{y}px;width:{w}px;height:{h}px;box-sizing:border-box;border:2.5px solid {c};border-radius:12px;background:#fff;padding:8px 10px;overflow:hidden;text-align:center">'
+                    f'<b style="display:block;font-size:14px;color:{c};line-height:1.25">{t}</b>' + "".join(f'<div style="font-size:11.5px;line-height:1.35;color:#3d4a63">{l}</div>' for l in sub) + '</div>' for _, x, y, w, h, c, t, sub in BOX)
+    g = []
+    def tri(x, y, d):  # a triangle pointing in direction d at the tip (x, y)
+        pts = {"r": f"{x},{y} {x-10},{y-5} {x-10},{y+5}", "l": f"{x},{y} {x+10},{y-5} {x+10},{y+5}", "d": f"{x},{y} {x-5},{y-10} {x+5},{y-10}", "u": f"{x},{y} {x-5},{y+10} {x+5},{y+10}"}[d]
+        return f'<polygon points="{pts}" fill="#172742"/>'
+    def line(pts): return f'<polyline points="{pts}" fill="none" stroke="#172742" stroke-width="2"/>'
+    def lab(x, y, t, anchor="middle"): return f'<text x="{x}" y="{y}" text-anchor="{anchor}" font-size="11" fill="#5b6b8a">{t}</text>'
+    # people → phone
+    g += [line("250,155 330,155"), tri(330,155,"r"), lab(290,148,"uses")]
+    # phone ↔ server
+    g += [line("630,160 720,160"), tri(630,160,"l"), tri(720,160,"r"), lab(675,152,"HTTPS, JSON")]
+    # server ↔ gemini
+    g += [line("1040,120 1130,120"), tri(1040,120,"l"), tri(1130,120,"r"), lab(1085,110,"the key")]
+    # server ↔ firebase
+    g += [line("1040,275 1130,275"), tri(1040,275,"l"), tri(1130,275,"r"), lab(1085,267,"admin SDK")]
+    # server → open food facts, around the right of github
+    g += [line("1000,260 1000,352 1090,352 1090,410 1130,410"), tri(1130,410,"r"), lab(1008,310,"fetch","start")]
+    # phone ↔ kitchen
+    g += [line("480,260 480,370"), tri(480,260,"u"), tri(480,370,"d"), lab(490,320,"polls every 2 s","start")]
+    # server → github
+    g += [line("880,260 880,370"), tri(880,370,"d"), lab(890,320,"git push, deploy","start")]
+    # phone ↔ firebase, over the top and down the right side, outside Gemini
+    g += [line("480,60 480,22 1460,22 1460,275 1430,275"), tri(480,60,"d"), tri(1430,275,"l"), lab(970,16,"sign in with Google, the account's copy of the phone's data, photos (Firebase SDK)")]
+    svg = f'<svg width="1480" height="470" viewBox="0 0 1480 470" style="position:absolute;left:0;top:0;font-family:Nunito,ui-sans-serif,system-ui,sans-serif">{"".join(g)}</svg>'
+    return f'<div style="position:relative;width:1480px;height:470px;margin-top:8px;font-family:Nunito,ui-sans-serif,system-ui,sans-serif">{svg}{boxes}</div>'
+
+WORDS = [
+  ("Unit test", "One function, one input, one expected number. Fast, runs on every push.", "src/*.test.ts, npm test, 531"),
+  ("Walkthrough", "A browser drives the real app through one story and checks each screen. Deterministic.", "tests/flows/*.cjs, 148"),
+  ("Happy path", "A job a person wants done, end to end. Not a test; a list of walkthroughs that together prove the job.", "paths.cjs, the Paths board"),
+  ("Harness", "The machinery that runs tests and reports: lanes, a server per lane, the run file, the walkthroughs page.", "scripts/run-flows.cjs, docs/qa/runs"),
+  ("Eval", "A check on something with no single right answer: an AI reply, a photo read, a swap. Cases, a bar, a human label, a judge, their agreement.", "evals/, 90 cases in 7 sets"),
+  ("Golden set", "Eval cases the coach passed by hand; the answer must stay within them.", "number-cases.json, swap-golden.json"),
+  ("Judge", "A second model grading the first's answer, trusted only where it agrees with the coach.", "eval:align, bar 8 of 10"),
+  ("Foundations", "The design rules checked as a test: colours, sizes, weights, 44 px.", "foundations.cjs, design-rules.cjs"),
+  ("Smoke test", "Build and open the main pages, nothing more.", "test:ui"),
+  ("Rules", "The coach's rules, numbered, each with the code that holds it. 39 nutrition, 40 culinary.", "docs/rules/nutrition.md, culinary.md"),
+  ("Safety rules", "Adults only (two checks). A declared allergy blocks the food everywhere. A declared situation gets a fixed answer, written once and approved, never improvised. No health claims in any prompt. The three gates: culinary, nutrition, your day.", "rules N1, N50 to N53, C25; src/safety.ts, gates.ts; walkthroughs safety, three-gates, age-gate"),
+  ("Loop", "Fail, name the pattern, fix the prompt or the code, add it as a case, run again.", "evals/README.md, step 5"),
+  ("Pilot log, outcome measures", "What testers did: accepted, completed, DaaM good. Read per identity × goal, never averaged.", "Metrics, the log"),
+]
+def words():
+    rows = "".join(f'<tr><td style="padding:6px 8px;border-bottom:1px solid #e6edf8;font-weight:800;white-space:nowrap;vertical-align:top">{html.escape(w)}</td><td style="padding:6px 8px;border-bottom:1px solid #e6edf8;vertical-align:top">{html.escape(d)}</td><td style="padding:6px 8px;border-bottom:1px solid #e6edf8;vertical-align:top;color:#1f5fc7;font-family:ui-monospace,monospace;font-size:12px">{html.escape(h)}</td></tr>' for w, d, h in WORDS)
+    return f'<table style="width:100%;border-collapse:collapse;font-size:13px;color:#172742;background:#fff;border:1.5px solid #d1dcf0;border-radius:12px"><tr><th style="text-align:left;padding:6px 8px;font-size:11.5px;color:#5b6b8a">WORD</th><th style="text-align:left;padding:6px 8px;font-size:11.5px;color:#5b6b8a">WHAT IT IS</th><th style="text-align:left;padding:6px 8px;font-size:11.5px;color:#5b6b8a">WHERE IN THE REPO</th></tr>{rows}</table>'
 
 # ---- part 2: the paths, step by step
 P = [
@@ -128,6 +157,8 @@ page = f'''<!doctype html>
 {LEGEND}
 <div style="font-size:12px;font-weight:900;color:#5b6b8a;letter-spacing:.05em;margin:18px 0 8px">THE TECHNICAL GRAPH</div>
 {arch()}
+<div style="font-size:12px;font-weight:900;color:#5b6b8a;letter-spacing:.05em;margin:18px 0 8px">THE WORDS, AND WHERE EACH LIVES IN THE REPO</div>
+{words()}
 <div style="font-size:12px;font-weight:900;color:#5b6b8a;letter-spacing:.05em;margin:18px 0 8px">THE PARTS, IN WORDS</div>
 {grid}
 <div style="font-size:12px;font-weight:900;color:#5b6b8a;letter-spacing:.05em;margin:22px 0 8px">THE PATHS, STEP BY STEP &nbsp; {legend}</div>
@@ -135,7 +166,7 @@ page = f'''<!doctype html>
 <div style="font-size:12.5px;color:#3d4a63;line-height:1.45;margin-top:12px"><b>Reading it:</b> an LLM chip is where an eval belongs, and a red chip that says checks should follow it, the human in the loop; a Rules chip is a line in docs/rules with a case; a Code chip is a walkthrough. A path with no LLM chip (P2, P8, P10, C2, C3, C6) works with the AI off and costs nothing to run.</div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":{W},"height":2900}}}}'>
+<script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":{W},"height":3400}}}}'>
 class Component extends DCLogic {{
   renderVals() {{
     return {{}};
