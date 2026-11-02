@@ -2,7 +2,7 @@
 # every happy path step by step with what does it: Code, Rules, LLM or Human. Drawn from server.ts and src as of 0.3.50.
 import os, html
 D = os.environ.get("CANVAS_DIR", "/home/claude/canvas/project")
-TAG = {"code": ("#2e7be8", "Code"), "rules": ("#1e8e5a", "Rules"), "llm": ("#8e44ad", "LLM"), "human": ("#d35400", "User"), "loop": ("#c0392b", "In the loop")}
+TAG = {"code": ("#2e7be8", "Code"), "rules": ("#1e8e5a", "Rules"), "llm": ("#8e44ad", "LLM"), "human": ("#d35400", "Client"), "coach": ("#d35400", "Coach"), "owner": ("#d35400", "Owner")}
 def chip(k, t): return f'<span style="display:inline-block;border-left:4px solid {TAG[k][0]};background:#f4f7fc;border-radius:6px;padding:3px 8px;font-size:12.5px;line-height:1.3;color:#172742;margin:3px 4px 0 0"><b style="color:{TAG[k][0]};font-size:11px">{TAG[k][1]}</b> {html.escape(t)}</span>'
 def box(title, lines, color, w=300):
     return (f'<div style="width:{w}px;box-sizing:border-box;border:2px solid {color};border-radius:12px;padding:10px 12px;background:#fff">'
@@ -77,7 +77,7 @@ def arch():
     g.append(ar(630,150,720,150,"HTTPS, JSON",True))
     g.append(ar(1040,110,1130,110,"key on the server",True))
     g.append(ar(1040,275,1130,275,"admin SDK",True))
-    g.append('<polyline points="1040,235 1090,235 1090,410 1130,410" fill="none" stroke="#172742" stroke-width="2" marker-end="url(#a1)"/><text x="1098" y="360" font-size="11" fill="#5b6b8a">fetch</text>')
+    g.append('<polyline points="1000,250 1000,352 1090,352 1090,410 1130,410" fill="none" stroke="#172742" stroke-width="2" marker-end="url(#a1)"/><text x="1008" y="310" font-size="11" fill="#5b6b8a">fetch</text>')
     g.append(ar(480,250,480,370,"",True)); g.append('<text x="490" y="315" font-size="11" fill="#5b6b8a">polls every 2 s</text>')
     g.append(ar(880,250,880,370,"")); g.append('<text x="890" y="315" font-size="11" fill="#5b6b8a">git push, deploy</text>')
     g.append('<polyline points="480,60 480,22 1280,22 1280,220" fill="none" stroke="#172742" stroke-width="2" marker-end="url(#a1)" marker-start="url(#a0)"/><text x="880" y="16" text-anchor="middle" font-size="11" fill="#5b6b8a">sign in with Google, the account\'s copy of the phone\'s data, photos (Firebase SDK)</text>')
@@ -87,27 +87,27 @@ def arch():
 P = [
  ("P1 Get in", [("human","reads the home page, tries the calculator"),("code","the calculator, the letters"),("human","joins the beta, signs in with Google"),("code","Firebase Auth"),("human","I'm 18 or older, consent, profile, goal"),("rules","what each step needs; the row To set"),("code","PD target, protein a day, the window")]),
  ("P2 Know my numbers", [("code","formula from sex, age, height, weight, goal, lifestyle"),("rules","the coach's bands and paces"),("human","picks the goal, changes it later"),("code","Today and Your summary show them")]),
- ("P3 Decide at the shelf", [("human","points the camera at a label or barcode"),("code","Open Food Facts for a barcode"),("llm","reads the label's table from the photo"),("code","PD, letters, the fit against today"),("rules","what fits the moment, Mix it"),("loop","reads the table the model read; corrects it"),("human","one tap to a plate")]),
+ ("P3 Decide at the shelf", [("human","points the camera at a label or barcode"),("code","Open Food Facts for a barcode"),("llm","reads the label's table from the photo"),("code","PD, letters, the fit against today"),("rules","what fits the moment, Mix it"),("human","checks the table the model read, corrects it"),("human","one tap to a plate")]),
  ("P4 Make a craving fit", [("human","foods onto the Plate, amounts"),("code","the numbers as you type"),("code","Fit to my target sizes the plate"),("rules","a dish keeps its proportions; portions; the plate asks one thing (DT212)"),("llm","Chef Mealan's checks: culinary, nutrition, your day"),("human","Make it, Ate it")]),
- ("P5 Photo of my meal", [("human","takes the photo"),("llm","foods read, grams estimated"),("code","names in one language, numbers"),("rules","the checks on the plate"),("loop","corrects an amount, Read it again (DT212)"),("human","Ate it"),("code","saved to the day; the eval case if weighed")]),
- ("P6 Keep and cook a recipe", [("human","saves from the Plate, or a screenshot or link"),("llm","reads the recipe from the picture or page"),("code","nutrition per serving, the makes"),("llm","drafts the steps at your amounts"),("loop","checks the drafted steps"),("human","Start cooking (DT211)"),("code","read aloud and listening: the browser's own voice, no AI"),("llm","Chef, a question about this step"),("code","the kitchen screen session")]),
+ ("P5 Photo of my meal", [("human","takes the photo"),("llm","foods read, grams estimated"),("code","names in one language, numbers"),("rules","the checks on the plate"),("human","checks the read: corrects an amount, Read it again (DT212)"),("human","Ate it"),("code","saved to the day; the eval case if weighed")]),
+ ("P6 Keep and cook a recipe", [("human","saves from the Plate, or a screenshot or link"),("llm","reads the recipe from the picture or page"),("code","nutrition per serving, the makes"),("llm","drafts the steps at your amounts"),("human","checks the drafted steps"),("human","Start cooking (DT211)"),("code","read aloud and listening: the browser's own voice, no AI"),("llm","Chef, a question about this step"),("code","the kitchen screen session")]),
  ("P7 Live the day", [("code","the plan, the slots, today against it"),("rules","meals a day, the window, training days"),("human","fills slots, quick picks, says what happened"),("llm","Chef Mealan's lines in your context"),("code","the day adds up")]),
  ("P8 Shop and travel", [("code","the shopping list from the week"),("human","ticks, carries on; sets where I stay"),("rules","travel mode: what a hotel kitchen allows")]),
  ("P9 Out, or missing something", [("human","I don't have it; a question"),("code","what I have, from my foods"),("llm","the helper and the chat"),("rules","no food called good or bad, no grams in chat"),("human","a craving after the chat")]),
  ("P10 Learn why", [("code","Explorer pages, written by hand, no AI"),("rules","the wellness line: food and training, never a condition"),("human","reads, reacts (DT195, later)")]),
  ("P11 Share with my coach, or leave", [("human","chooses what the coach sees, sends a card"),("code","Firestore link coach and client"),("human","the coach's note comes back"),("human","export, delete my account"),("code","full deletion, photos included")]),
- ("C1 Get clients in", [("human","the coach makes a code"),("code","invites, sign-ups"),("human","the client joins")]),
- ("C2 See what waits", [("code","the count on the Clients tab (DT210)"),("human","opens Clients")]),
- ("C3 Read one client", [("code","Today, Week, Shared, Goal from the client's shared data"),("human","reads"),("loop","decides what to suggest")]),
- ("C4 Answer and suggest", [("human","answers a card, a note, a suggestion"),("loop","approves the client's numbers"),("code","to the client's phone"),("human","makes a client a cook")]),
- ("C5 Publish for members", [("human","a cook sends a recipe"),("llm","the cover picture, if asked"),("loop","the coach approves or sends it back"),("code","the live page /r/slug, members' names")]),
- ("C6 Run my own day", [("code","the coach's own five tabs, always their own"),("human","the same as a person")]),
- ("C7 Know it works", [("code","unit tests, walkthroughs, foundations, the runs"),("rules","photo advice and numbers evals"),("llm","model evals: chat, plate questions, photo read; the judge"),("loop","the coach labels pass or fail; agreement with the judge"),("code","Metrics, Running costs")]),
+ ("C1 Get clients in", [("coach","makes a code"),("code","invites, sign-ups"),("human","the client joins")]),
+ ("C2 See what waits", [("code","the count on the Clients tab (DT210)"),("coach","opens Clients")]),
+ ("C3 Read one client", [("code","Today, Week, Shared, Goal from the client's shared data"),("coach","reads"),("coach","decides what to suggest")]),
+ ("C4 Answer and suggest", [("coach","answers a card, a note, a suggestion"),("coach","checks and approves the client's numbers"),("code","to the client's phone"),("coach","makes a client a cook")]),
+ ("C5 Publish for members", [("human","a cook sends a recipe"),("llm","the cover picture, if asked"),("coach","checks the recipe: approves or sends it back"),("code","the live page /r/slug, members' names")]),
+ ("C6 Run my own day", [("code","the coach's own five tabs, always their own"),("coach","the same as a person")]),
+ ("C7 Know it works", [("code","unit tests, walkthroughs, foundations, the runs"),("rules","photo advice and numbers evals"),("llm","model evals: chat, plate questions, photo read; the judge"),("owner","labels pass or fail; agreement with the judge"),("owner","reads Metrics, Running costs")]),
 ]
 def pathCard(name, steps):
     return (f'<div style="border:1.5px solid #d1dcf0;border-radius:10px;padding:9px 11px;background:#fff;break-inside:avoid;margin-bottom:8px">'
             f'<b style="font-size:14px;color:#123a7a">{html.escape(name)}</b><div style="margin-top:2px">{"".join(chip(k, t) for k, t in steps)}</div></div>')
-legend = "".join(f'<span style="display:inline-block;background:{c};color:#fff;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:800;margin-right:8px">{n}</span>' for c, n in TAG.values())
+legend = "".join(f'<span style="display:inline-block;background:{c};color:#fff;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:800;margin-right:8px">{n}</span>' for c, n in TAG.values()) + '<span style="font-size:12px;color:#5b6b8a;font-weight:700">red = a human, by role</span>'
 W = 18 * 2 + 4 * 330 + 3 * 70
 page = f'''<!doctype html>
 <html lang="en">
@@ -124,7 +124,7 @@ page = f'''<!doctype html>
 </helmet>
 <div style="width:{W}px;box-sizing:border-box;padding:18px;background:#fff;color:#172742;font-family:'Nunito',ui-sans-serif,system-ui,sans-serif;font-size:15px">
 <b style="font-size:22px;font-weight:900">Chef Mealan: the system, and who does what on every path</b>
-<div style="font-size:14px;color:#3d4a63;font-weight:600;line-height:1.45;margin-top:4px">As of 0.3.50. Top: the parts and what runs where. Below: the 18 happy paths step by step, each step tagged with what does it. Code is deterministic and tested by unit tests and walkthroughs. Rules are the coach's rules written as code, tested the same way and by the rule evals. LLM is a Gemini call, tested by evals with a human label and a judge. User is a person or coach acting for themselves. In the loop is a human checking, correcting or approving what code or the model produced: the human in the loop.</div>
+<div style="font-size:14px;color:#3d4a63;font-weight:600;line-height:1.45;margin-top:4px">As of 0.3.50. Top: the parts and what runs where. Below: the 18 happy paths step by step, each step tagged with what does it. Code is deterministic and tested by unit tests and walkthroughs. Rules are the coach's rules written as code, tested the same way and by the rule evals. LLM is a Gemini call, tested by evals with a human label and a judge. Human is red, by role: Client, Coach, Owner. A human step that says checks, corrects or approves is a human in the loop: a person checking what code or the model produced before it counts.</div>
 {LEGEND}
 <div style="font-size:12px;font-weight:900;color:#5b6b8a;letter-spacing:.05em;margin:18px 0 8px">THE TECHNICAL GRAPH</div>
 {arch()}
@@ -132,7 +132,7 @@ page = f'''<!doctype html>
 {grid}
 <div style="font-size:12px;font-weight:900;color:#5b6b8a;letter-spacing:.05em;margin:22px 0 8px">THE PATHS, STEP BY STEP &nbsp; {legend}</div>
 <div style="column-count:2;column-gap:14px">{"".join(pathCard(*p) for p in P)}</div>
-<div style="font-size:12.5px;color:#3d4a63;line-height:1.45;margin-top:12px"><b>Reading it:</b> an LLM chip is where an eval belongs, and an In the loop chip should follow it: the human who can still correct the answer; a Rules chip is a line in docs/rules with a case; a Code chip is a walkthrough. A path with no LLM chip (P2, P8, P10, C2, C3, C6) works with the AI off and costs nothing to run.</div>
+<div style="font-size:12.5px;color:#3d4a63;line-height:1.45;margin-top:12px"><b>Reading it:</b> an LLM chip is where an eval belongs, and a red chip that says checks should follow it, the human in the loop; a Rules chip is a line in docs/rules with a case; a Code chip is a walkthrough. A path with no LLM chip (P2, P8, P10, C2, C3, C6) works with the AI off and costs nothing to run.</div>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":{W},"height":2900}}}}'>
