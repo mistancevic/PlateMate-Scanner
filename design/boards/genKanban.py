@@ -6,7 +6,7 @@ bl = json.load(open("/home/claude/platemate-scanner/docs/backlog.json"))
 E = bl["epics"]; T = bl["tickets"]; V = bl["versions"]
 COL = {"home": "#d35400", "setup": "#2e7be8", "plate": "#1e8e5a", "cook": "#8e44ad", "coach": "#123a7a", "explorer": "#c0392b", "trust": "#5b6b8a", "lang": "#b7950b", "ops": "#16a085"}
 CW, G, PAD = 268, 18, 18
-cols = [("later", "Later", "One line. An idea, not yet talked through."), ("next", "Next", "Brainstormed, your answer is in. No board yet."), ("now", "Now", "Board drawn and approved. Waits for Go."), ("progress", "In progress", "Branch open, tests running."), ("done", "Done", f"Merged. The last {len(V)} versions, newest first.")]
+cols = [("todo", "To do", "Now, Next and Later, one below the other."), ("progress", "In progress", "Branch open, tests running."), ("done", "Done", f"Merged. The last {len(V)} versions, newest first.")]
 def chip(e): return f'<span style="display:inline-block;background:{COL[e]};color:#fff;border-radius:999px;padding:1px 8px;font-size:11.5px;font-weight:800">{html.escape(E[e]["name"])}</span>'
 def card(t):
     meta = []
@@ -20,18 +20,24 @@ def card(t):
 def column(key, name, sub):
     rows = [t for t in T if t["state"] == key]
     body = ""
-    if key == "done":
+    if key == "todo":
+        rows = [t for t in T if t["state"] in ("now", "next", "later")]
+        for k, n, d in [("now", "Now", "Board drawn and approved. Waits for Go."), ("next", "Next", "Brainstormed, your answer is in. No board yet."), ("later", "Later", "One line. An idea, not yet talked through.")]:
+            vs = [t for t in rows if t["state"] == k]
+            body += (f'<div style="margin:6px 0 8px;padding:6px 8px;border-radius:8px;background:{"#2e7be8" if k == "now" else "#d1dcf0"};color:{"#fff" if k == "now" else "#172742"}"><b style="font-size:13.5px">{n}</b> <span style="font-size:12px;opacity:.85">{len(vs)}</span><div style="font-size:11.5px;line-height:1.35;opacity:.9">{d}</div></div>'
+                     + ("".join(card(t) for t in vs) or '<div style="font-size:13px;color:#8a97b0;padding:4px 2px 10px">Nothing here.</div>'))
+    elif key == "done":
         for v in V:
             vs = [t for t in rows if t.get("version") == v]
             body += f'<div style="font-size:12px;font-weight:900;color:#5b6b8a;letter-spacing:.04em;margin:6px 0 6px">{v} · {len(vs)}</div>' + "".join(card(t) for t in vs)
     else:
         body = "".join(card(t) for t in rows) or '<div style="font-size:13px;color:#8a97b0;padding:8px 2px">Nothing here.</div>'
-    hd = "#172742" if key != "now" else "#2e7be8"
+    hd = "#172742"
     return (f'<div style="width:{CW}px;flex:none;background:#eef3fb;border-radius:14px;padding:10px">'
             f'<div style="background:{hd};color:#fff;border-radius:10px;padding:7px 10px"><b style="font-size:15px">{name}</b> <span style="opacity:.8;font-size:13px">{len(rows)}</span><div style="font-size:11.5px;opacity:.9;line-height:1.35;margin-top:2px">{sub}</div></div>'
             f'<div style="margin-top:10px">{body}</div></div>')
 epics = "".join(f'<div style="width:{CW}px;flex:none;border:1.5px solid {COL[k]};border-radius:10px;padding:8px 10px;background:#fff"><div>{chip(k)}</div><div style="font-size:12.5px;line-height:1.4;color:#172742;margin-top:5px">{html.escape(e["why"])}</div></div>' for k, e in E.items())
-W = PAD * 2 + 5 * CW + 4 * G
+W = PAD * 2 + 3 * CW + 2 * G
 page = f'''<!doctype html>
 <html lang="en">
 <head>
