@@ -5,7 +5,7 @@ import { tasteForReq } from "../tasteChips";
 import { useState, useEffect, useRef, Fragment } from "react";
 import { tempsIn } from "../units";
 import { Camera, Pencil, Plus, Trash2, ChevronLeft, ChefHat, ThumbsUp, ThumbsDown, Image as ImageIcon, Link as LinkIcon, Mic } from "lucide-react";
-import { photoAdvice, ideaAdvice, aboutKcal, kcalRange, mealsOn } from "../mealPhoto";
+import { photoAdvice, ideaAdvice, aboutKcal, kcalRange, mealsOn, foodOfRead } from "../mealPhoto";
 import { PhotoAsk } from "../components/PhotoAsk";
 import { ConfirmButton } from "../components/Confirm";
 import { fitsPlate, isIngredient, swapKind, sameFoodName, suggestParts, bindsADish, isDrink, type Mix } from "../mixtip";
@@ -1459,12 +1459,28 @@ export function JourneyScreen(p: AppApi) {
           </button>
         ))}
         {/* DT212 v4 (0.3.53, gap 4): Read the photo again, after it asks: the new read replaces the foods and your corrections */}
-        {state.photo && !photoBig && p.ai.on && (readAgain ? (
-          <div className="mp-again" role="group" aria-label="Read the photo again">
-            <small>The new read replaces the foods, and your corrections.</small>
-            <div className="button-row"><button type="button" className="pill pill-small pill-primary" onClick={() => { const ph = state.photo!; setReadAgain(false); void p.readMealPhoto(ph.image, { at: ph.at, who: ph.who ?? "now", replace: true }); }}>Replace</button><button type="button" className="link" onClick={() => setReadAgain(false)}>Cancel</button></div>
-          </div>
-        ) : <button type="button" className="link mp-again-link" onClick={() => setReadAgain(true)}>Wrong foods? Read the photo again ›</button>)}
+        {/* DT212 v4 (0.3.53, gap 4): Read the photo again; DT228 v2 (0.3.63, board Stories168): more photos and your words go with it */}
+        {state.photo && !photoBig && p.ai.on && <HelpRead key={state.photo.at + state.photo.image.length} photo={state.photo}
+          read={(more, note) => { const ph = state.photo!; void p.readMealPhoto(ph.image, { at: ph.at, who: ph.who ?? "now", replace: true, more, note }); }} />}
+        {/* DT228 v2: a food whose kind the read could not tell: Chef Mealan asks once; a tap changes the food, its grams stay */}
+        {state.photo?.which && items.some((i) => i.food.name.toLowerCase() === state.photo!.which!.name.toLowerCase()) && (() => {
+          const w = state.photo!.which!, it = items.find((i) => i.food.name.toLowerCase() === w.name.toLowerCase())!;
+          const pick = (o: typeof w.options[number] | null) => {
+            if (!o || o.name.toLowerCase() === it.food.name.toLowerCase()) { setState((st) => ({ ...st, photo: st.photo ? { ...st.photo, which: null } : st.photo })); return; }
+            const { food, fresh } = foodOfRead({ name: o.name, grams: it.grams, low: it.est?.low ?? it.grams, high: it.est?.high ?? it.grams, calories: o.calories, protein: o.protein, fats: o.fats, carbs: o.carbs, fiber: o.fiber, confidence: "medium" }, state.foods, p.region, uid);
+            setState((st) => ({ ...st, foods: fresh && !st.foods.some((f) => f.id === food.id) ? [...st.foods, food] : st.foods, items: st.items.map((x) => (x.id === it.id ? { ...x, food } : x)), portion: null, photo: st.photo ? { ...st.photo, which: null } : st.photo }));
+          };
+          return (
+            <div className="mp-ask mp-which" role="group" aria-label="One thing the read cannot tell: what the food is">
+              <small><b>One thing I cannot tell from the photo:</b> {w.question}</small>
+              <div className="button-row mp-which-opts">
+                {w.options.map((o) => <button key={o.name} type="button" className={`choice${o.name.toLowerCase() === it.food.name.toLowerCase() ? " on" : ""}`} onClick={() => pick(o)}>{o.name.split(",")[0]}</button>)}
+                <button type="button" className="link" onClick={() => pick(null)}>Skip</button>
+              </div>
+              <small className="muted">A tap changes the food; its grams stay.</small>
+            </div>
+          );
+        })()}
         {state.photo?.unsure && items.some((i) => i.food.name.toLowerCase() === state.photo!.unsure!.name.toLowerCase() && i.est) && (() => {
           const u = state.photo!.unsure!, it = items.find((i) => i.food.name.toLowerCase() === u.name.toLowerCase())!;
           const pick = (g: number | null) => { if (g !== null) updateItem(it.id, { grams: g, est: undefined }); setState((st) => ({ ...st, photo: st.photo ? { ...st.photo, unsure: null } : st.photo })); };
@@ -2571,5 +2587,35 @@ function LaterRow({ x, onContinue, onRemove }: { x: Later; onContinue: () => voi
           : <><button type="button" className="pill" onClick={onContinue}>Continue</button><button type="button" className="lr-x" aria-label={`Remove ${r.title}`} onClick={() => setArmed(true)}>✕</button></>}
       </div>
     </div>
+  );
+}
+
+// DT228 v2 (0.3.63, board Stories168; Coach Milan 2 November 19:50 to 22:00): help Chef Mealan read the meal. The photos (the
+// first is the plate's), ＋ Photo for the inside, another side or the menu, and a line in the person's words, typed or said.
+// Read it again sends them all; the new read replaces the foods and the corrections, as Read the photo again did.
+function HelpRead({ photo, read }: { photo: NonNullable<import("../pilot").PilotState["photo"]>; read: (more: string[], note: string) => void }) {
+  const [more, setMore] = useState<string[]>(() => photo.more ?? []);
+  const [note, setNote] = useState(() => photo.note ?? "");
+  const [hearing, setHearing] = useState(false);
+  const S = typeof window !== "undefined" ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition) : null;
+  const add = (file?: File | null) => { if (!file) return; const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 640).then((d) => setMore((m) => (m.length < 3 ? [...m, d] : m))).catch(() => {}); r.readAsDataURL(file); };
+  const listen = () => { if (!S || hearing) return; try { const r = new S(); r.lang = "en-GB"; r.interimResults = false; r.onresult = (e: any) => { const t = String(e.results?.[0]?.[0]?.transcript ?? "").trim(); if (t) setNote((n) => (n ? `${n} ${t}` : t).slice(0, 200)); }; r.onend = () => setHearing(false); r.onerror = () => setHearing(false); setHearing(true); r.start(); } catch { setHearing(false); } };
+  const n = 1 + more.length, words = note.trim();
+  const label = `Read it again${n > 1 ? ` with ${n} photos` : ""}${words ? (n > 1 ? " and this" : " with this") : ""}`;
+  return (
+    <section className="mp-help" aria-label="Help Chef Mealan read it">
+      <b>Help Chef Mealan read it</b>
+      <div className="mp-help-photos">
+        <img src={photo.image} alt="the photo of the plate" />
+        {more.map((m, i) => <button key={i} type="button" className="mp-help-more" aria-label={`Remove photo ${i + 2}`} onClick={() => setMore((x) => x.filter((_, j) => j !== i))}><img src={m} alt="" /><span aria-hidden="true">✕</span></button>)}
+        {more.length < 3 && <label className="pill pill-small mp-help-add">＋ Photo<input type="file" accept="image/*" capture="environment" onChange={(e) => { add(e.target.files?.[0]); e.target.value = ""; }} /></label>}
+      </div>
+      <label className="mp-help-note"><span>Tell Chef Mealan what it is</span><input className="search" value={note} maxLength={200} placeholder="pork schnitzel, breaded, Augustiner" onChange={(e) => setNote(e.target.value)} /></label>
+      <div className="button-row">
+        <button type="button" className="pill pill-small pill-primary" onClick={() => read(more, words)}>{label}</button>
+        {S && <button type="button" className="pill pill-small" aria-pressed={hearing} onClick={listen}>{hearing ? "Listening…" : "🎤 Say it"}</button>}
+      </div>
+      <small className="muted">The photos and your words go together. Your corrections are replaced by the new read.</small>
+    </section>
   );
 }

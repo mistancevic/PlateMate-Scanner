@@ -285,7 +285,9 @@ export type PilotState = {
   // DT127 (0.2.108): the photo of the meal the plate was read from, when it was taken, and the one question the read was unsure about
   photo?: { image: string; at: string; unsure?: { name: string; options: [number, number] } | null;
     // DT130 (0.2.110): a photo from Your photos says whose plate and when: ate (logged at the photo's time), idea (nothing logged)
-    who?: "ate" | "now" | "idea" };
+    who?: "ate" | "now" | "idea";
+    // DT228 v2 (0.3.63): the other photos of the meal (thumbnails, at most 3), the person's words, and the kind the read could not tell
+    more?: string[]; note?: string; which?: import("./mealPhoto").Which | null };
   // DT212 (0.3.53): a plate from an earlier meal you chose to keep working on is not asked about again (its plateAt)
   plateAsked?: string;
   // DT214 (0.3.53, board Stories162): the cook that runs, and the plates and cooks saved for later (see cooking.ts)

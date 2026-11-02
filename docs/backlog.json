@@ -388,17 +388,19 @@
       "id": "DT228",
       "title": "Help the photo read: more photos of a meal, your words with them, Chef Mealan asks what a food is",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": 168,
-      "why": "Milan 19:50, 21:00 draw 1 and 2; 21:31 add more photos of a meal (v2). Waits for his Go."
+      "why": "Milan 19:50, 21:00 draw 1 and 2; 21:31 add more photos of a meal (v2). Go at 22:00.",
+      "version": "0.3.63"
     },
     {
       "id": "DT229",
       "title": "The shutter's steady ring: green, 8 px, outside the shutter, on a dark track",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": 168,
-      "why": "Milan 21:31: the blue ring is barely visible. Waits for his Go."
+      "why": "Milan 21:31: the blue ring is barely visible. Go at 22:00.",
+      "version": "0.3.63"
     }
   ]
 }

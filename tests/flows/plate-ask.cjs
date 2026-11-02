@@ -55,7 +55,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
 
   const typed = async () => { await page.evaluate(() => { const s = JSON.parse(localStorage.getItem("platemate-pilot-v1")); const f = (re) => s.foods.find((x) => re.test(x.name));
     s.items = [{ id: "c1", food: f(/^Chicken breast, cooked/i) || s.foods[0], grams: 180, locked: false }, { id: "c2", food: f(/^Rice/) || s.foods[1], grams: 150, locked: false }]; s.title = "Chicken and rice"; s.photo = undefined; localStorage.setItem("platemate-pilot-v1", JSON.stringify(s)); }); await page.reload(); await page.waitForTimeout(1500); };
-  const shoot = async () => { await page.locator(".mp-button").click(); await page.waitForTimeout(1500); await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(2000); };
+  const shoot = async () => { await page.locator(".mp-button").click(); await page.waitForTimeout(1500); await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); if (await page.locator(".cam-analyze").count()) await page.locator(".cam-analyze").click(); await page.waitForTimeout(2000); };
   await page.goto(U + "/plate"); await page.waitForTimeout(1500);
   await typed();
   ok((await st()).items.length === 2, "the plate holds chicken and rice, typed in");

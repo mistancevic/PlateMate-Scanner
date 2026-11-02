@@ -45,7 +45,7 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   const text = async (sel = "main") => (await page.locator(sel).first().textContent()).replace(/\s+/g, " ");
   const st = () => page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")));
   // 0.2.110 (DT130): Photo of my meal opens the meal camera; the shutter reads at once
-  const snap = async (sel) => { await page.locator(sel).click(); await page.waitForTimeout(1500); await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(2000); };
+  const snap = async (sel) => { await page.locator(sel).click(); await page.waitForTimeout(1500); await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); if (await page.locator(".cam-analyze").count()) await page.locator(".cam-analyze").click(); await page.waitForTimeout(2000); };
 
   // DT138 (0.2.122): Today has no Photo of my meal; the Plate has it
   await page.goto(U + "/"); await page.waitForTimeout(1500);

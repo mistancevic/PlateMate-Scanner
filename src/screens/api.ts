@@ -30,7 +30,7 @@ export interface AppApi {
   searchDatabase: (q: string) => Promise<DbProduct[]>;
   peekBarcode: (code: string) => Promise<DbProduct | null>;
   // DT115 (0.2.97): the members' catalogue
-  readMealPhoto: (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean }) => Promise<boolean>;
+  readMealPhoto: (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string }) => Promise<boolean>;
   ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean }) => void;
   // DT130 (0.2.110): Photo of my meal opens the meal camera; a photo from Your photos waits on the Plate for whose and when
   mealCamera: () => void;
