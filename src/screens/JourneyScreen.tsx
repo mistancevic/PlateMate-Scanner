@@ -2099,7 +2099,8 @@ export function JourneyScreen(p: AppApi) {
     const parts = partsOf(items);
     return (
       <>
-        {Head({ back: "in", title: "How to make it", sub: cooksNow ? (steps.length ? `${CHEF_NAME}'s steps for your ${mealWord}, at your amounts. They go with the recipe when you save.` : plateDraft === "working" ? `${CHEF_NAME} is writing the steps for your amounts.` : "Steps for your amounts.") : chg ? (steps.length ? `${CHEF_NAME}'s steps for your changed dish, from the original.` : "No steps yet for your changed dish.") : steps.length ? `${CHEF_NAME}'s steps${recipe?.stepParts?.some(Boolean) ? ", part by part," : ""} for what you make.` : origSteps.length ? "The recipe's own steps." : rec ? "No steps yet for this recipe." : "Your dish, part by part. Tick each as you go." })}
+        {/* 0.3.64 (Coach Milan 22:39): the title says the dish, as Make does */}
+        {Head({ back: "in", title: `How to make ${recipe?.title && recipe.title !== "DaaM" ? recipe.title : state.title && state.title !== "DaaM" ? state.title : autoTitle(items)}`, sub: cooksNow ? (steps.length ? `${CHEF_NAME}'s steps for your ${mealWord}, at your amounts. They go with the recipe when you save.` : plateDraft === "working" ? `${CHEF_NAME} is writing the steps for your amounts.` : "Steps for your amounts.") : chg ? (steps.length ? `${CHEF_NAME}'s steps for your changed dish, from the original.` : "No steps yet for your changed dish.") : steps.length ? `${CHEF_NAME}'s steps${recipe?.stepParts?.some(Boolean) ? ", part by part," : ""} for what you make.` : origSteps.length ? "The recipe's own steps." : rec ? "No steps yet for this recipe." : "Your dish, part by part. Tick each as you go." })}
         {/* IM19, IM20: what you make, and what you eat */}
         {rec?.makes && n >= 2 && (
           <section className="card mk-card" aria-label="What you make">

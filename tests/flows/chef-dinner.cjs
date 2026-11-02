@@ -85,7 +85,7 @@ const STEPS = { steps: [
   // DT89: How to make it, with Chef Mealan's steps at the plate's amounts
   await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(1300);
   let t = await text(page);
-  ok(/How to make it/.test(t) && !/How do you want to eat it/.test(t), "DT89: a dinner you cook gets How to make it, not the bowl ways");
+  ok(/How to make (?!it ›)/.test(t) && !/How do you want to eat it/.test(t), "DT89: a dinner you cook gets How to make it, not the bowl ways");
   ok(asked && asked.items.length === 5 && asked.items[4].name === "Penne, dry" && JSON.stringify(asked.cooking) === JSON.stringify(["dried oregano", "salt and pepper"]), "DT89, DT91: Chef Mealan was asked for the steps of the five foods, with the herbs");
   const steps = await page.locator(".rp-steps li").allTextContents();
   ok(steps.length === 4 && /cook \d+ g penne for 11 minutes/.test(steps[0]) && /150 g chicken breast/.test(steps[2]), "DT89: four steps, at the plate's amounts: " + steps[0]);
