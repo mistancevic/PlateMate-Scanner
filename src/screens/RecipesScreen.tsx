@@ -1,3 +1,4 @@
+import { CookStrip } from "../components/CookStrip";
 import { plateWhenOf, atMeal } from "../plateMode";
 import { recipeName } from "../recipeDiff";
 import { portionOf } from "../pilot";
@@ -196,7 +197,7 @@ export function RecipesScreen(p: AppApi) {
     return (
       <button type="button" className="card recipe-tile" key={m.id} onClick={() => setOpenId(m.id)} aria-label={`Open ${m.title}`}>
         {photo
-          ? (coverIsDrawn(m) && own[0] === photo ? <span className="recipe-tile-cover"><img src={photo} alt="" /><span className="tile-drawn">Picture by {CHEF_NAME}</span></span> : <img src={photo} alt="" />)
+          ? (coverIsDrawn(m) && own[0] === photo ? <span className="recipe-tile-cover"><img src={photo} alt="" /><span className="tile-drawn">Drawn by {CHEF_NAME}</span></span> : <img src={photo} alt="" />)
           : <div className="recipe-tile-blank"><span><Utensils size={28} />{m.cover?.state === "tomorrow" && <small>Picture tomorrow</small>}</span></div>}
         <div className="recipe-tile-body">
           <div className="card-top"><b className="tile-name">{recipeName(m, p.state.meals)}</b><ChevronRight size={20} className="tile-go" /></div>
@@ -335,6 +336,8 @@ export function RecipesScreen(p: AppApi) {
   );
   return (
     <>
+      {/* DT214 v2 (0.3.53): while a cook runs, the strip at the top of Recipes (the list has no title above it) */}
+      <CookStrip p={p} />
       {deleted && (
         <section className="card dl-done" role="status">
           <div className="card-top"><b>{deleted.title} is deleted.</b><button className="link" onClick={() => setDeleted(null)}>OK</button></div>

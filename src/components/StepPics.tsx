@@ -14,6 +14,16 @@ const readFile = (f: File) => new Promise<string>((res, rej) => { const r = new 
 const words = (step: string, items: Ingredient[]) => stepParts(tempsIn(step), items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>));
 export const picLabel = (p: StepPic) => (p.by === "ai" ? "Picture drawn by AI, Beta" : "Your photo");
 
+// DT211 v8 (0.3.53, board Stories158): on the recipe a step shows its photo, from cooking; no + slot. A tap changes or removes it
+export function StepPicShown({ pic, k, onOpen }: { pic: StepPic | null; k: number; onOpen: () => void }) {
+  if (!pic) return null;
+  return (
+    <div className="rq-step-pic">
+      <button type="button" onClick={onOpen} aria-label={`Change or remove the photo of step ${k + 1}`}><img src={pic.src} alt="" /></button>
+      <small>{pic.by === "ai" ? "AI · Beta" : "Yours"}</small>
+    </div>
+  );
+}
 // the picture beside a step on the recipe, or the place to add one
 export function StepPicSlot({ pic, k, onOpen }: { pic: StepPic | null; k: number; onOpen: () => void }) {
   return (
@@ -27,8 +37,8 @@ export function StepPicSlot({ pic, k, onOpen }: { pic: StepPic | null; k: number
 }
 
 // adding or changing a step's picture: camera or gallery, who made it, the checks, then Keep it
-export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose }: {
-  k: number; step: string; items: Ingredient[]; pic: StepPic | null;
+export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose, fromCooks = [] }: {
+  k: number; step: string; items: Ingredient[]; pic: StepPic | null; fromCooks?: string[];
   onKeep: (p: StepPic) => void; onRemove: () => void; onClose: () => void;
 }) {
   const [src, setSrc] = useState<string | null>(pic?.src ?? null);
@@ -51,6 +61,11 @@ export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose }:
       </div>
       <input ref={cam} type="file" accept="image/*" capture="environment" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; void take(f); }} />
       <input ref={gal} type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; void take(f); }} />
+      {/* DT211 v8 (0.3.53): the photos taken on this step while cooking it; one can be the step's photo */}
+      {fromCooks.length > 0 && <>
+        <b>From your cooks</b>
+        <div className="sp-cooks">{fromCooks.slice(0, 8).map((x, i) => <button key={i} type="button" className={`publish-photo${src === x ? " on" : ""}`} aria-label={`Photo ${i + 1} from your cooks`} onClick={() => { setSrc(x); setBy("me"); }}><img src={x} alt="" /></button>)}</div>
+      </>}
       {err && <small className="error">{err}</small>}
       {src && <>
         <img className="sp-preview" src={src} alt={`The picture for step ${k + 1}`} />
@@ -126,7 +141,7 @@ export function StepPlayer({ title, steps, items, pics, onClose, onCook }: {
         <button className="pill pill-primary" onClick={() => { if (!playing && k >= steps.length - 1 && t >= PER) { go(0); setPlaying(true); } else setPlaying(!playing); }}>{playing ? "❚❚ Pause" : k >= steps.length - 1 && t >= PER ? "↻ Again" : "▶ Play"}</button>
         <button className="pill" disabled={k >= steps.length - 1} onClick={() => go(k + 1)}>Step {Math.min(steps.length, k + 2)} ›</button>
       </div>
-      {onCook && <button className="pill pill-wide" style={{ height: 52 }} onClick={onCook}>Cook it as written</button>}
+      {onCook && <button className="pill pill-wide" style={{ height: 52 }} onClick={onCook}>Start cooking</button>}
       <small className="muted cook-under">Made on your phone from the step pictures: no video file.</small>
     </div>
   );

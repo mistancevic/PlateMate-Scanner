@@ -30,8 +30,8 @@ export interface AppApi {
   searchDatabase: (q: string) => Promise<DbProduct[]>;
   peekBarcode: (code: string) => Promise<DbProduct | null>;
   // DT115 (0.2.97): the members' catalogue
-  readMealPhoto: (image: string, x?: { at?: string; who?: "ate" | "now" | "idea" }) => Promise<boolean>;
-  ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number }) => void;
+  readMealPhoto: (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean }) => Promise<boolean>;
+  ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean }) => void;
   // DT130 (0.2.110): Photo of my meal opens the meal camera; a photo from Your photos waits on the Plate for whose and when
   mealCamera: () => void;
   // DT175 (0.3.17): the foods you said you have, landed on the Plate as estimates; false when nothing came of it
@@ -157,6 +157,27 @@ export interface AppApi {
   openOnPlate: (meal: Meal, opts?: { cook?: boolean }) => void;
   // DT174 (0.3.16): Cook it as written: the Plate takes the recipe as it is and goes straight to Make
   cookNow: boolean;
+  // DT214 (0.3.53, board Stories162): the cook. startCook makes the plate as it is the cook's; goOnCook brings you back to where
+  // you left it; the rest end it one way or another. See cooking.ts.
+  startCook: (x: { title: string; recipeId?: string; stage?: "make" | "eat"; steps?: number }) => void;
+  goOnCook: () => void;
+  saveCookForLater: () => void;
+  cookEaten: (cardId: string) => void;
+  cookLater: () => void;
+  endCook: () => void;
+  setCookSteps: (n: number) => void;
+  // DT212 v4 (board Stories159): Save for later, Continue, swipe to remove; Keep working on it; Clear it
+  savePlate: () => void;
+  continueLater: (id: string) => void;
+  removeLater: (id: string) => void;
+  keepWorking: () => void;
+  // DT212 v4: Start cooking with foods on the Plate asks first (cookAsk); a food scanned while cooking asks (pendingFood)
+  cookAsk: { meal: Meal } | null;
+  answerCookAsk: (how: "ate" | "save" | "clear" | null) => void;
+  pendingFood: Food | null;
+  answerPendingFood: (how: "use" | "keep") => void;
+  useInCook: Food | null;
+  doneUseInCook: () => void;
   clearCookNow: () => void;
   // after How was it (0.2.23, IM23c): open a recipe on Recipes with one line for today
   landing: { id: string; line: string; title?: string; quiet?: boolean; back?: "recipes"; from?: MealFrom } | null;

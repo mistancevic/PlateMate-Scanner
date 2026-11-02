@@ -20,14 +20,14 @@ import { jobOf } from "../foodjob";
 import { WaitSteps, type WaitStep } from "../components/WaitSteps";
 import { aggregate, density, uid, solveIngredient, servingLabel, sizedFor } from "../pilot";
 import { fromMeal, plannedPortion } from "../planned";
-import type { Meal, Food, Ingredient, PlateOpt, StepMark } from "../pilot";
+import type { Meal, Food, Ingredient, PlateOpt, StepMark, Feedback } from "../pilot";
 import { canOil, isDrained, libraryId, oilChoices, oilFood } from "../canned";
 import { ownPhotosOf } from "../covers";
 import { recipePhotosOf, withRecipePhotos } from "../photos";
 import { pairItems, partsOf, optAt, optToItem, itemToOpt, canLeaveOut, leanFood } from "../parts";
 import { draftSteps } from "../draftSteps";
 import { equipmentOf } from "../personal";
-import { stepParts, stepText } from "../steps";
+import { stepParts, stepText, TOKEN } from "../steps";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { CHEF_NAME, COACH_NAME } from "../components/Mark";
 import { log } from "../log";
@@ -71,9 +71,12 @@ import { countOf as countedOf, gramsOfOne } from "../counted";
 import { CountAmount, SizePicker, isCounted } from "../components/CountAmount";
 import { cookName, cookPhrase, weighLine, aroundWord, needsCooking, rawHint, cookTitle } from "../cookWords";
 import { PairedCookMode } from "../components/CookPair";
-import { stepPicOf } from "../photos";
+import { stepPicOf, setStepPic } from "../photos";
 import { kitchenName } from "../travel";
 import { SayHave } from "../components/SayHave";
+import { type CookUi, type Later, resumeLine, cookStarted, plateSince, plateOldOf, whenWords, agoWords, dayWord, foodsLine, laterRow } from "../cooking";
+import { ChefLine } from "../components/ChefLine";
+import { CookStrip } from "../components/CookStrip";
 
 // Make it a meal (0.2.9, canvas board CH, CH1 to CH3): an idea from Chef Mealan, checked and with the app's grams
 // DT91 (0.2.88): cooking: the herbs and spices the dish uses, not counted; failed: the ideas that missed the range, with why
@@ -91,7 +94,8 @@ const readFile = (f: File) => new Promise<string>((res, rej) => { const r = new 
 const STEPS = ["in", "recipe", "make", "made", "after"] as const;
 // DT94 (0.2.88, board Stories60; Milan 24 October 13:58): three phases in place of five steps. Craft is the Plate and the steps
 // (in, recipe, make), Make is making it (made), Feedback is How was it (after).
-const PHASES = ["Craft", "Make", "Feedback"] as const;
+// DT211 v8 (0.3.53, board Stories158): the third step is Eat, everywhere
+const PHASES = ["Craft", "Make", "Eat"] as const;
 const phaseOf = (n: number) => (n <= 3 ? 0 : n === 4 ? 1 : 2);
 function stepHead({ n, title, sub, nameField, back, label }: { n: number; title: string; sub?: string; back?: React.ReactNode; label?: string; nameField?: { value: string; placeholder: string; onChange: (v: string) => void; onCommit?: (v: string) => void } }) {
   const ph = phaseOf(n);
@@ -127,17 +131,19 @@ const BIG_MEAL = 2000;
 export function JourneyScreen(p: AppApi) {
   const { state, setState, setTab, step, setStep, setCamera, setMode, blank, updateItem,
     setAdjustId, mixWith, options, pdRef, saveMeal, notify, setError, setFeedback, add } = p;
+  // DT214 (0.3.53): what Make and Eat collected lives with the cook, so leaving the Plate or closing the app loses nothing
+  const ui0: CookUi = state.cook?.inView ? state.cook.ui ?? {} : {};
   const [q, setQ] = useState("");
   // the amounts before Fit: a mover that comes back unchanged means the plate was already above the target (0.2.7+r2)
   const [fitBefore, setFitBefore] = useState<Record<string, number> | null>(null);
   const [lineOpen, setLineOpen] = useState(false);
   const [chef, setChef] = useState<ChefState | null>(null);
   // title0: the name the plate had before Chef Mealan's dinner went on it (DT90: a name you typed stays)
-  const [madeBy, setMadeBy] = useState<{ kitchen: string; base: string; from: Ingredient[]; tried: string[]; title0: string } | null>(null);
+  const [madeBy, setMadeBy] = useState<{ kitchen: string; base: string; from: Ingredient[]; tried: string[]; title0: string } | null>(() => (ui0.madeBy as any) ?? null);
   // DT89 (0.2.87, board Stories58): the steps for a plate you cook that is no recipe yet, drafted on How to make it, kept at Save
   // DT150 (0.2.131): foods, the foods the steps were written for (ids), and its, the plate then: a change of amounts keeps the
   // steps (they never say an amount, C42); a change of foods makes them out of date
-  const [plateSteps, setPlateSteps] = useState<{ steps: string[]; sig: string; foods?: string; its?: Ingredient[] } | null>(null);
+  const [plateSteps, setPlateSteps] = useState<{ steps: string[]; sig: string; foods?: string; its?: Ingredient[] } | null>(() => (ui0.plateSteps as any) ?? null);
   const [plateDraft, setPlateDraft] = useState<string>("");
   const [ownSteps, setOwnSteps] = useState<string | null>(null);
   // When Mealan produces options, the first one becomes the recipe on screen.
@@ -174,14 +180,17 @@ export function JourneyScreen(p: AppApi) {
   // DT93: the culinary gate: Chef Mealan's read of the plate, once per set of foods
   const [dish, setDish] = useState<{ sig: string; status: "working" | "done" | "off"; makesIt?: boolean; why?: string; around?: string; betterAs?: string; holds?: string } | null>(null);
   const [pick, setPick] = useState(0);
-  const [note, setNote] = useState("");
-  const [good, setGood] = useState<"daam" | "good" | "no" | null>(null);
-  const [plate, setPlate] = useState<string>("");
+  const [note, setNote] = useState(() => ui0.note ?? "");
+  const [good, setGood] = useState<"daam" | "good" | "no" | null>(() => ui0.good ?? null);
+  // DT211 v8: the final photo, The meal, the final look, taken on Make; Eat shows it
+  const [plate, setPlate] = useState<string>(() => ui0.final ?? "");
+  // DT211 v8: a photo on each step, by its place
+  const [stepPhotos, setStepPhotos] = useState<Record<string, string>>(() => ui0.stepPhotos ?? {});
   // How did making it go? (Y1 column 9, 10 October 2026): photos while it's on the counter, how it went, how much was eaten
   const [photos, setPhotos] = useState<string[]>([]);
-  const [went, setWent] = useState<"as" | "not">("as");
-  const [different, setDifferent] = useState("");
-  const [ate, setAte] = useState<"all" | "portion" | "later" | "not">("all");
+  const [went, setWent] = useState<"as" | "not">(() => ui0.went ?? "as");
+  const [different, setDifferent] = useState(() => ui0.different ?? "");
+  const [ate, setAte] = useState<"all" | "portion" | "later" | "not">(() => ui0.ate ?? "all");
   const [saveRecipe, setSaveRecipe] = useState(true);
   const [drinkIn, setDrinkIn] = useState(false);   // DT206
   // DT137 (0.2.122): at Save after you made a changed recipe: update it, a new one with its own name, or only this time
@@ -189,18 +198,18 @@ export function JourneyScreen(p: AppApi) {
   const [newRecipeName, setNewRecipeName] = useState<string | null>(null);
   const addPhoto = (file?: File | null) => { if (!file) return; const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 480).then((d) => setPhotos((x) => [...x, d])).catch(() => {}); r.readAsDataURL(file); };
   // R25 (0.2.53, board RS25): how many of a whole recipe were eaten, starting on one; a big meal is checked once
-  const [eatN, setEatN] = useState(1);
+  const [eatN, setEatN] = useState(() => ui0.eatN ?? 1);
   const [bigAsk, setBigAsk] = useState(false);
   // DT81: how many the batch made, counted after cooking (null: as cooked); a new recipe's number, asked when it is saved
-  const [madeN, setMadeN] = useState<number | null>(null), [keepMade, setKeepMade] = useState(false);
+  const [madeN, setMadeN] = useState<number | null>(() => ui0.madeN ?? null), [keepMade, setKeepMade] = useState(() => ui0.keepMade ?? false);
   // null: not touched, so the Plate's own guess stands (about 3 of your meals: 3 portions); "": one plate
   const [newMakesN, setNewMakesN] = useState<string | null>(null), [newMakesUnit, setNewMakesUnit] = useState(""), [makesOpen, setMakesOpen] = useState(false);
-  const resetMade = () => { setPhotos([]); setWent("as"); setDifferent(""); setAte("all"); setSaveRecipe(true); setDrinkIn(false); setEatN(1); setBigAsk(false); setMadeN(null); setKeepMade(false); setNewMakesN(null); setNewMakesUnit(""); setMakesOpen(false); };
-  const [method, setMethod] = useState<string | null>(null);
+  const resetMade = () => { setPhotos([]); setStepPhotos({}); setWent("as"); setDifferent(""); setAte("all"); setSaveRecipe(true); setDrinkIn(false); setEatN(1); setBigAsk(false); setMadeN(null); setKeepMade(false); setNewMakesN(null); setNewMakesUnit(""); setMakesOpen(false); };
+  const [method, setMethod] = useState<string | null>(() => ui0.method ?? null);
   // after Add in the tip at the recipe step, Mealan refits with the new food on the plate
   const [refit, setRefit] = useState(false);
   useEffect(() => { if (refit) { setRefit(false); askMealan(); } }, [state.items.length]); // eslint-disable-line react-hooks/exhaustive-deps
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(() => ui0.title ?? "");
   // A dish as one row (0.2.5, canvas S "A dish from the plan"): the recipe's items show as one row, n of its portions, the
   // ingredients folded under it. The portion is the lever; the solver never moves a dish item. Anything added next to it is the side.
   type Group = { kind: "item"; item: Ingredient } | { kind: "dish"; id: string; title: string; of: number; n: number; items: Ingredient[] };
@@ -608,8 +617,8 @@ export function JourneyScreen(p: AppApi) {
   const recipeIn = useRecipeIn({ kitchens: p.personal.kitchens ?? [], region: p.region, onError: (m) => setError(m), pdRef, fitPd: p.fitPd });
   const { inFlow, setInFlow } = recipeIn;
   // R15 (0.2.41, board RS12): "whole" is the recipe as mapped, where a recipe starts on the plate
-  const [pmode, setPmode] = useState<"whole" | "sized" | "recipe">("sized");
-  const [way, setWay] = useState<Way | null>(null);
+  const [pmode, setPmode] = useState<"whole" | "sized" | "recipe">(() => ui0.pmode ?? "sized");
+  const [way, setWay] = useState<Way | null>(() => (ui0.way as Way) ?? null);
   const [wayBusy, setWayBusy] = useState<string | null>(null);
   // R10 (0.2.36): the wait for Change the recipe: the slow line, and what stops it (Stop, or the minute)
   const [waySlow, setWaySlow] = useState(false);
@@ -617,16 +626,17 @@ export function JourneyScreen(p: AppApi) {
   // Parts on the plate (0.2.19, IM18): each food gets a part and can be optional; new parts wait here until a food has one
   const [partsMode, setPartsMode] = useState(false);
   // How to make it (0.2.20, boards IM19, IM19b, IM19c, IM20): what you make, the draft on this step, the checklist ticks
-  const [makeAll, setMakeAll] = useState<boolean | null>(null);
+  const [makeAll, setMakeAll] = useState<boolean | null>(() => ui0.makeAll ?? null);
   const [mkDraft, setMkDraft] = useState<"" | "working" | string>("");
-  const [ticks, setTicks] = useState<Set<string>>(new Set());
+  const [ticks, setTicks] = useState<Set<string>>(() => new Set(ui0.ticks ?? []));
   // DT174 (0.3.16): cook mode over Make, full screen
-  const [cooking, setCooking] = useState(false);
+  // DT211 v8 (0.3.53): Start cooking on the recipe opens cook mode straight away (ui.open, once)
+  const [cooking, setCooking] = useState(() => !!(ui0 as { open?: boolean }).open);
   // DT175 (0.3.17): Say what you have, on the Plate
   const [saying, setSaying] = useState(false);
   const [newParts, setNewParts] = useState<string[]>([]);
   const [naming, setNaming] = useState<string | null>(null);
-  const [tried, setTried] = useState<"yes" | "ok" | "no" | null>(null);
+  const [tried, setTried] = useState<"yes" | "ok" | "no" | null>(() => ui0.tried ?? null);
   // steps drafted on How to make it in this meal: the recipe page opens after How was it (0.2.23, IM23c)
   const [mkDrafted, setMkDrafted] = useState(false);
   // CT4, CT5 (0.2.24): the size of a counted food, open under its row
@@ -1121,7 +1131,7 @@ export function JourneyScreen(p: AppApi) {
     if (!items.length || state.openRecipe) return;
     p.clearCookNow(); setChef(null); setMethod(null); setTicks(new Set());
     setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" }));
-    setStep("made");
+    setStep("made"); setCooking(true);
   }, [p.cookNow, step, items.length, state.openRecipe]); // eslint-disable-line react-hooks/exhaustive-deps
   function keepAsIs() { setChef(null); if (p.filling && plateWhen === "past") { addPast(); return; } if (p.filling?.mode !== "eat" && p.filling) putInSlot(items); else { setState((s) => ({ ...s, portion: null, title: s.title || "DaaM" })); setMethod(null);
     // DT94: a plate whose steps are already on the Plate is locked here and goes straight to Make
@@ -1153,11 +1163,52 @@ export function JourneyScreen(p: AppApi) {
   }
   const Head = ({ title, sub, name, back }: { title: string; sub?: string; name?: boolean; back?: typeof STEPS[number] }) => stepHead({ n, title, sub, label: p.filling && plateWhen !== "now" ? `${plateWhen === "plan" ? "Planning" : "Adding"} ${slotName(p.filling)}` : undefined, back: back ? <Back to={back} /> : undefined, nameField: name ? { value: state.title === "DaaM" ? "" : state.title, placeholder: items.length ? autoTitle(items) : "Name the meal", onChange: (v: string) => setState((s) => ({ ...s, title: v })), onCommit: (v: string) => p.renamePlate(v) } : undefined });
   // 0.2.54, design system rule E (board DS2): Back sits top left, above the step bar, and says where it goes
-  const BACK_TO: Record<string, string> = { in: "the plate", recipe: "the amounts", make: "making it", made: "how it went" };
+  // DT211 v8 (0.3.53): Eat goes back to making it
+  const BACK_TO: Record<string, string> = { in: "the plate", recipe: "the amounts", make: "making it", made: "making it" };
   const Back = ({ to }: { to: typeof STEPS[number] }) => (
     <button className="link back back-top" onClick={() => setStep(to)}><ChevronLeft size={16} /> Back to {BACK_TO[to] ?? "the last step"}</button>
   );
 
+  // ---- DT214 v2 (0.3.53, board Stories162): the cook. It starts when Make (or Eat) opens, keeps every tick, photo and answer
+  // as you go, and says where it stands on every tab. ----
+  const inCook = !!state.cook?.inView;
+  const noMake = !!p.filling && plateWhen !== "now";
+  // the recipe being cooked: the one that came in, or the one the plate is (its name)
+  const cookRecipe = rec ?? state.meals.find((m) => (p.filling?.mealId ? m.id === p.filling.mealId : !!state.title && m.title === state.title) && m.items.length > 0);
+  const stepsOfCook = (() => {
+    const pr = cookRecipe;
+    return (rec?.steps?.length ? rec.steps : pr?.steps?.length ? pr.steps : plateSteps?.steps?.length ? plateSteps.steps : (methodsFor(items).find((w) => w.id === method)?.steps ?? [])).length;
+  })();
+  useEffect(() => {
+    if ((step !== "made" && step !== "after") || inCook || noMake || !items.length) return;
+    p.startCook({ title: (state.title && state.title !== "DaaM" ? state.title : autoTitle(items)).slice(0, 60), ...(cookRecipe ? { recipeId: cookRecipe.id } : {}), stage: step === "after" ? "eat" : "make", steps: stepsOfCook });
+  }, [step, inCook]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!inCook) return;
+    const ui: CookUi = { step, ticks: [...ticks], stepPhotos, ...(plate ? { final: plate } : {}), went, different, ate, eatN, madeN, keepMade, good, note, title, method, pmode, makeAll, way, plateSteps, madeBy, tried };
+    setState((s) => {
+      const c = s.cook; if (!c?.inView) return s;
+      const stage = c.stage === "make" || c.stage === "eat" ? (step === "after" ? "eat" : "make") : c.stage;
+      const name = s.title && s.title !== "DaaM" ? s.title.slice(0, 60) : c.title, n = stepsOfCook || c.steps;
+      if (stage === c.stage && n === c.steps && name === c.title && JSON.stringify(c.ui) === JSON.stringify(ui)) return s;
+      return { ...s, cook: { ...c, ui, stage, title: name, ...(n ? { steps: n } : {}) } };
+    });
+  }, [inCook, step, ticks, stepPhotos, plate, went, different, ate, eatN, madeN, keepMade, good, note, title, method, pmode, makeAll, way, plateSteps, madeBy, tried, stepsOfCook]); // eslint-disable-line react-hooks/exhaustive-deps
+  // coming back to Make in the middle of a cook, Chef Mealan asks before anything else
+  const [resumeAsk, setResumeAsk] = useState(() => !!state.cook?.inView && cookStarted(state.cook) && step === "made");
+  // DT212 v4 (board Stories159): Read the photo again asks first
+  const [readAgain, setReadAgain] = useState(false);
+  const stepPhotoFile = (k: number, file?: File | null) => {
+    if (!file) return;
+    const r = new FileReader();
+    r.onload = () => thumbnailBase64(String(r.result), 480).then((d) => {
+      setStepPhotos((x) => ({ ...x, [String(k)]: d }));
+      // DT211 v8 (gap 6): the step's photo on the recipe too, when the step has none yet; else it stays with the cook
+      const m = cookRecipe, words = m?.steps?.[k];
+      if (m && words !== undefined && !stepPicOf(m, words)) setState((st) => ({ ...st, meals: st.meals.map((x) => (x.id === m.id ? { ...x, ...setStepPic(x, k, { src: d, by: "me" }) } : x)) }));
+    }).catch(() => {});
+    r.readAsDataURL(file);
+  };
   if (step === "in" && chef) {
     const t = aggregate(items), pd0 = density(t.protein, t.calories), kit = (p.personal.kitchens ?? []).length > 0;
     const opts = chef.status === "done" ? chef.options : [];
@@ -1191,11 +1242,8 @@ export function JourneyScreen(p: AppApi) {
       </>
     );
   }
-  if (step === "in")
-    return (
-      <>
-        {/* the name as the title: for a slot, or for a recipe opened from Recipes (0.2.3); an empty plate asks what you are craving */}
-        {p.filling
+  // the Plate's title: the name, for a slot or a recipe; an empty plate asks what you are craving
+  const inHead = step === "in" ? (p.filling
           ? Head({ name: true, title: "", sub: p.filling.mode === "eat" ? "As planned. Change what you like, then Fit to my target or Keep it as it is." : plateWhen === "past" ? `Adding ${slotName(p.filling)}. Add what you ate, at the amounts you ate.` : plateWhen === "plan" ? `Planning ${slotName(p.filling)}. Add your foods, fit them to your target, then put it in the plan.` : "Name it, or keep the foods' name. Add your foods, fit them to your target, or make them as they are." })
           : madeBy && items.length > 0
             ? Head({ name: true, title: "", sub: `${CHEF_NAME}'s ${madeBy.kitchen} ${mealWord}, around your ${aroundWord(madeBy.from.filter((i) => !isDrink(i.food)).map((i) => i.food.name))}. Change any amount you like.` })
@@ -1208,7 +1256,82 @@ export function JourneyScreen(p: AppApi) {
           : state.title && state.title !== "DaaM" && items.length > 0
             ? Head({ name: true, title: "", sub: "From My recipes. Change what you like, then Fit to my target or Keep it as it is." })
             : items.length > 0 ? Head({ name: true, title: "", sub: `Name it, or keep the foods' name.` })
-            : Head({ title: "What are you craving?", sub: `Add your foods. ${CHEF_NAME} sets the amounts.` })}
+            : Head({ title: "What are you craving?", sub: `Add your foods. ${CHEF_NAME} sets the amounts.` })) : null;
+  // ---- DT212 v4 and DT214 v2 (0.3.53): every question on the Plate is Chef Mealan's line and shows alone; the foods wait ----
+  const since = plateSince(state);
+  const plateIsOld = plateOldOf(state);
+  const slotFor = (d: Date): Feedback["slot"] | null => {
+    const date = ymd(d), hm = `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+    if (pickSlot) return { date, slotId: pickSlot.id, name: pickSlot.name, time: pickSlot.time };
+    const sl = slotAt(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, date), hm);
+    return sl ? { date, slotId: sl.id, name: sl.name, time: sl.time } : null;
+  };
+  const plateMeal = (): Meal => ({ id: uid(), title: state.title && state.title !== "DaaM" ? state.title : autoTitle(items), items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
+  // Ate it: the plate to the meal it was set for, at the photo's time (or when it was started)
+  const ateEarlier = (stay: boolean) => { const at = state.photo?.at ?? since?.toISOString(); const d = at ? new Date(at) : new Date(); p.ateNow(plateMeal(), slotFor(d), { photo: state.photo?.image ?? null, at, stay }); };
+  const clearPlate = () => { emptyPlate(); setState((s) => ({ ...s, title: "", plateAsked: undefined })); };
+  const plateWords = since ? `${state.title && state.title !== "DaaM" ? state.title : foodsLine(items)}${state.photo ? ", from your photo" : ""}` : "";
+  const dayOf = since ? dayWord(new Date(state.photo?.at ?? since.toISOString())) : "";
+  const inQuestion = step !== "in" ? null
+    // a food scanned while a cook runs
+    : p.pendingFood && state.cook ? (() => { const f = p.pendingFood!, pdf = density(f.protein, f.calories); return (
+      <section className="chef-ask" aria-label="Use it in the dish you are cooking, or keep it in your foods">
+        <div className="ca-food">{f.photo ? <img src={f.photo} alt="" /> : <span className="ca-food-icon" aria-hidden="true">{f.icon ?? "🍽"}</span>}<span><b>{f.name}</b><br /><small className="muted">just scanned{pdf !== null ? ` · ${pdText(pdf)}` : ""}</small></span></div>
+        <ChefLine text={`You are cooking ${state.cook!.title}. Shall I use this ${f.name.split(",")[0].trim().toLowerCase()} in it, or keep it in your foods?`} />
+        <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => p.answerPendingFood("use")}>Use it in {state.cook!.title}</button><button type="button" className="pill" onClick={() => p.answerPendingFood("keep")}>Keep it in my foods</button></div>
+        <small>Use it: {CHEF_NAME} asks what it replaces or adds, and the steps follow. Keep it: it waits in Foods; the cook goes on as it was.</small>
+      </section>); })()
+    // Start cooking with foods on the Plate
+    : p.cookAsk && items.length > 0 ? (() => { const m = p.cookAsk!.meal; return plateIsOld && since ? (
+      <section className="chef-ask" aria-label="Before you cook: your plate from earlier">
+        <ChefLine image={state.photo?.image} text={`Before you cook: your plate from ${whenWords(since)}. ${plateWords}. Did you eat it?`} />
+        <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => { ateEarlier(true); p.answerCookAsk("ate"); }}>Ate it</button><button type="button" className="pill" onClick={() => p.answerCookAsk("save")}>Save for later</button></div>
+        <div className="ca-links"><button type="button" className="link" onClick={() => p.answerCookAsk("clear")}>Clear it</button><button type="button" className="link" onClick={() => p.answerCookAsk(null)}>Cancel</button></div>
+        <small>Whichever you pick, {m.title} then starts on its own plate. Cancel goes back to the recipe.</small>
+      </section>) : (
+      <section className="chef-ask" aria-label="Before you cook: your plate">
+        <ChefLine image={state.photo?.image} text={`Your plate has ${items.length} ${items.length === 1 ? "food" : "foods"}, from ${since ? agoWords(since) : "now"}. ${m.title} starts on its own plate. Shall I save yours for later, or clear it?`} />
+        <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => p.answerCookAsk("save")}>Save my plate for later</button><button type="button" className="pill" onClick={() => p.answerCookAsk("clear")}>Clear my plate</button></div>
+        <div className="ca-links"><button type="button" className="link" onClick={() => p.answerCookAsk(null)}>Cancel</button></div>
+        <small>Save my plate for later keeps it to finish another time; it waits at the top of the Plate. Clear my plate empties it. Cancel goes back to the recipe.</small>
+      </section>); })()
+    // foods about to land on a plate that has foods (DT131): add, or a new plate
+    : p.plateAsk && items.length > 0 ? (() => {
+      const a = p.plateAsk!, photo = a.kind === "photo";
+      const add = <button key="add" type="button" className={`pill${photo ? " pill-primary" : ""}`} onClick={() => p.answerPlateAsk("add")}>Add to my plate</button>;
+      const fresh = <button key="new" type="button" className={`pill${photo ? "" : " pill-primary"}`} onClick={() => p.answerPlateAsk("new")}>Start a new plate</button>;
+      return (
+        <section className="chef-ask pa plate-ask" aria-label="Add to this plate, or start a new one">
+          <ChefLine image={a.image} text={`Your plate already has ${items.length} ${items.length === 1 ? "food" : "foods"}${state.title && state.title !== "DaaM" ? `: ${state.title}` : ""}. ${a.what} ${photo ? "Add them to yours, or start a new plate with them?" : "Start a new plate with it, or add it to yours?"}`} />
+          <div className="ca-go pa-go">{photo ? [add, fresh] : [fresh, add]}</div>
+          <div className="ca-links"><button type="button" className="link pa-keep" onClick={() => p.answerPlateAsk(null)}>{photo ? "Drop the photo" : "Keep my plate"}</button></div>
+          <small>Add to my plate: the new foods join yours{photo ? ", marked ~" : ""}, and the plate keeps its name. Start a new plate: only the new foods.</small>
+        </section>
+      ); })()
+    // a plate from an earlier meal: Did you eat it?
+    : plateIsOld && since && !p.filling && !inCook ? (
+      <section className="chef-ask" aria-label="Your plate from earlier">
+        <ChefLine image={state.photo?.image} text={`Your plate from ${whenWords(since)}. ${plateWords}. Did you eat it?`} />
+        <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => ateEarlier(false)}>Ate it</button><button type="button" className="pill" onClick={p.savePlate}>Save for later</button></div>
+        <div className="ca-links"><button type="button" className="link" onClick={p.keepWorking}>Keep working on it</button><button type="button" className="link" onClick={clearPlate}>Clear it</button></div>
+        <small>Ate it saves it to {dayOf}, to the meal it was set for, at {state.photo ? "the photo's time" : "the time it was started"}. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.</small>
+      </section>)
+    : null;
+  // DT212 v4: plates and cooks saved for later wait under the title, with Continue; swipe left to remove
+  const laterBlock = step === "in" && (state.later ?? []).length > 0 ? (
+    <section className="card later-card" aria-label="Saved for later">
+      <b>Saved for later</b>
+      <div className="later-list">{state.later!.map((x) => <LaterRow key={x.id} x={x} onContinue={() => p.continueLater(x.id)} onRemove={() => p.removeLater(x.id)} />)}</div>
+      <small>Continue puts it back on the Plate. A saved plate stays 7 days; Remove is on its own row when you swipe it left.</small>
+    </section>) : null;
+  if (step === "in" && inQuestion) return (<>{inHead}<CookStrip p={p} />{inQuestion}</>);
+  if (step === "in")
+    return (
+      <>
+        {/* the name as the title: for a slot, or for a recipe opened from Recipes (0.2.3); an empty plate asks what you are craving */}
+        {inHead}
+        <CookStrip p={p} />
+        {laterBlock}
         {/* R17 (0.2.45, board RS16): an empty plate asks what you crave, and finds it */}
         {!p.filling && !imported && items.length === 0 && !inFlow && <CravingSearch p={p} need={mealNeed} target={pdRef} onFood={add} />}
         {/* the plan line (0.2.0, canvas S): one line says what the plate is; the kind and the moment sit behind its pencil, never asked first.
@@ -1282,20 +1405,7 @@ export function JourneyScreen(p: AppApi) {
         {/* On the plate (Y1 columns 2 and 2b, 10 October 2026): the plate is a card of its own, with Fit to my target as its action */}
         {inFlow ? <RecipeInFlow flow={recipeIn} put={(f) => void putRead(f)} /> : (
         <section className="card plate-card">
-        {/* DT131 (0.2.113, board Stories87): foods about to land on this plate wait for one answer: add, or a new plate */}
-        {p.plateAsk && items.length > 0 && (() => {
-          const a = p.plateAsk, photo = a.kind === "photo";
-          const add = <button key="add" type="button" className={`pill${photo ? " pill-primary" : ""}`} onClick={() => p.answerPlateAsk("add")}>Add to my plate</button>;
-          const fresh = <button key="new" type="button" className={`pill${photo ? "" : " pill-primary"}`} onClick={() => p.answerPlateAsk("new")}>Start a new plate</button>;
-          return (
-            <section className="pa plate-ask" aria-label="Add to this plate, or start a new one">
-              <div className="pa-top">{a.image && <img src={a.image} alt="the photo" />}<span><b>Your plate already has {items.length} {items.length === 1 ? "food" : "foods"}{state.title && state.title !== "DaaM" ? `: ${state.title}` : ""}.</b><br />{a.what}</span></div>
-              <div className="pa-go">{photo ? [add, fresh] : [fresh, add]}</div>
-              <button type="button" className="link pa-keep" onClick={() => p.answerPlateAsk(null)}>{photo ? "Drop the photo" : "Keep my plate"}</button>
-              <small>Add to my plate: the new foods join yours{photo ? ", marked ~" : ""}, and the plate keeps its name. Start a new plate: only the new foods.</small>
-            </section>
-          );
-        })()}
+        {/* DT131: the question about foods landing on this plate shows alone now, above (DT212 v4, gap 5) */}
         {/* DT130 (0.2.110, board Stories78, DT130c): a photo from Your photos asks whose plate, and when, before the read */}
         {p.photoAsk && <PhotoAsk key={p.photoAsk.at + p.photoAsk.image.length} image={p.photoAsk.image} at={p.photoAsk.at} drop={p.dropPhotoAsk}
           mealAt={(d) => { const s = slotAt(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(d)), `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`); return s ? s.name.toLowerCase() : null; }}
@@ -1317,6 +1427,13 @@ export function JourneyScreen(p: AppApi) {
               : <span><b>Your photo, {photoTime(state.photo.at)}.</b> {items.length} {items.length === 1 ? "food" : "foods"} read, amounts estimated (~). Tap the photo to see it large; tap an amount to correct it.</span>}
           </button>
         ))}
+        {/* DT212 v4 (0.3.53, gap 4): Read the photo again, after it asks: the new read replaces the foods and your corrections */}
+        {state.photo && !photoBig && p.ai.on && (readAgain ? (
+          <div className="mp-again" role="group" aria-label="Read the photo again">
+            <small>The new read replaces the foods, and your corrections.</small>
+            <div className="button-row"><button type="button" className="pill pill-small pill-primary" onClick={() => { const ph = state.photo!; setReadAgain(false); void p.readMealPhoto(ph.image, { at: ph.at, who: ph.who ?? "now", replace: true }); }}>Replace</button><button type="button" className="link" onClick={() => setReadAgain(false)}>Cancel</button></div>
+          </div>
+        ) : <button type="button" className="link mp-again-link" onClick={() => setReadAgain(true)}>Wrong foods? Read the photo again ›</button>)}
         {state.photo?.unsure && items.some((i) => i.food.name.toLowerCase() === state.photo!.unsure!.name.toLowerCase() && i.est) && (() => {
           const u = state.photo!.unsure!, it = items.find((i) => i.food.name.toLowerCase() === u.name.toLowerCase())!;
           const pick = (g: number | null) => { if (g !== null) updateItem(it.id, { grams: g, est: undefined }); setState((st) => ({ ...st, photo: st.photo ? { ...st.photo, unsure: null } : st.photo })); };
@@ -2038,16 +2155,38 @@ export function JourneyScreen(p: AppApi) {
 
   if (step === "made") {
     // DT94: the steps of what is being made: the recipe's, the plate's drafted ones, or the way picked for a bowl
-    const madeSteps: string[] = (rec?.steps?.length ? rec.steps : plateRecipe?.steps?.length ? plateRecipe.steps : plateSteps?.steps?.length ? plateSteps.steps : (methodsFor(items).find((w) => w.id === method)?.steps ?? []));
+    const madeSteps0: string[] = (rec?.steps?.length ? rec.steps : plateRecipe?.steps?.length ? plateRecipe.steps : plateSteps?.steps?.length ? plateSteps.steps : (methodsFor(items).find((w) => w.id === method)?.steps ?? []));
     // DT174: the amounts the steps say: the whole recipe when you make all of it, else your plate
     const stepItems: Ingredient[] = madeWhole && rec ? rec.items : items;
-    const mealNow = () => ({ id: uid(), title: p.state.title || autoTitle(items), items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
+    // DT214 v2: a food used in the dish in place of another takes its place in the steps; the recipe stays as it is
+    const madeSteps = plateRecipe ? madeSteps0.map((t) => t.replace(TOKEN, (all, id: string) => { const it = stepItems.find((x) => x.id === id), was = plateRecipe.items.find((x) => x.id === id); return it && was && it.food.id !== was.food.id ? `[[i:${id}|${it.food.name.split(",")[0].trim().toLowerCase()}]]` : all; })) : madeSteps0;
+    const dishName = (state.title && state.title !== "DaaM" ? state.title : autoTitle(items)).slice(0, 40);
+    const tick = (k: number) => setTicks((tk) => { const n = new Set(tk); if (n.has(`s${k}`)) n.delete(`s${k}`); else n.add(`s${k}`); return n; });
     return (
       <>
-        {Head({ back: "make", title: `Make: ${(state.title && state.title !== "DaaM" ? state.title : autoTitle(items)).slice(0, 40)}`, sub: madeSteps.length ? "Tick the steps as you go. A photo while it is on the counter, then how it went." : "A photo or two while it's on the counter, then one tap." })}
+        {Head({ back: "make", title: `Make: ${dishName}`, sub: madeSteps.length ? "Tick the steps as you go, add photos to them, and tell Chef Mealan how the cooking went." : "A photo or two while it's on the counter, then one tap." })}
+        {/* DT214 v2 (0.3.53): a food scanned while cooking, used in the dish: what it replaces, or Add it */}
+        {p.useInCook && (() => { const f = p.useInCook!, short = f.name.split(",")[0].trim(); return (
+          <section className="chef-ask" aria-label={`Use ${short} in ${dishName}`}>
+            <ChefLine text={`${short}: what does it replace in ${dishName}, or does it add to it?`} />
+            <div className="ca-go">
+              {items.filter((i) => !i.optional).map((i) => <button key={i.id} type="button" className="pill" onClick={() => { setState((st) => ({ ...st, items: st.items.map((x) => (x.id === i.id ? { ...x, food: f, est: undefined } : x)), portion: null })); p.doneUseInCook(); }}>In place of {i.food.name.split(",")[0].trim().toLowerCase()}</button>)}
+              <button type="button" className="pill pill-primary" onClick={() => { add(f); p.doneUseInCook(); }}>Add it</button>
+            </div>
+            <div className="ca-links"><button type="button" className="link" onClick={p.doneUseInCook}>Cancel</button></div>
+            <small>In place of a food: it takes that food's amount and its place in the steps. Add it: it joins the dish.</small>
+          </section>); })()}
+        {/* DT211 v8 (0.3.53): coming back in the middle, Chef Mealan asks first */}
+        {resumeAsk && state.cook && (
+          <section className="chef-ask" aria-label="Go on where you left off">
+            <ChefLine text={resumeLine(state.cook)} />
+            <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => { setResumeAsk(false); if (madeSteps.length && p.travel?.kitchen !== "hotel") setCooking(true); }}>Go on cooking</button></div>
+            <div className="ca-links"><button type="button" className="link" onClick={() => p.saveCookForLater()}>Save for later</button><button type="button" className="link" onClick={() => { setResumeAsk(false); setTicks(new Set()); setStepPhotos({}); setPlate(""); setWent("as"); setDifferent(""); }}>Start over</button></div>
+          </section>
+        )}
         {/* DT174 (0.3.16): Start cooking, above the steps: one big step at a time; each finished step is ticked here */}
         {madeSteps.length > 0 && p.travel?.kitchen === "hotel" && <small className="muted travel-plate-note">Travel mode, hotel with no kitchen: Start cooking is off. Tick the steps here if you make it anyway.</small>}
-        {madeSteps.length > 0 && p.travel?.kitchen !== "hotel" && (
+        {madeSteps.length > 0 && p.travel?.kitchen !== "hotel" && !resumeAsk && (
           <div className="mk-cook">
             <button className="pill pill-wide pill-primary" onClick={() => setCooking(true)}>{ticks.size > 0 && madeSteps.some((_, k) => !ticks.has(`s${k}`)) ? "Go on cooking" : "Start cooking"}</button>
             <small className="muted">One big step at a time, read aloud. Say next, back or repeat, or tap. Each step you finish is ticked here.</small>
@@ -2064,86 +2203,49 @@ export function JourneyScreen(p: AppApi) {
             return String(d.reply || "");
           } : null}
           pics={(() => { const src = rec?.steps?.length ? rec : plateRecipe?.steps?.length ? plateRecipe : null; return madeSteps.map((t) => stepPicOf(src, t)); })()} />}
-        {/* DT94: the locked recipe's steps, to tick as you go; nothing here changes the recipe */}
+        {/* DT211 v8 (0.3.53, board Stories158): each step has + Photo beside its tick, so the photos are taken where they happen */}
         {madeSteps.length > 0 && (
           <section className="card mk-card" aria-label="The steps">
-            <b>The steps</b>
-            {madeSteps.map((x, k) => { const on = ticks.has(`s${k}`); return (
-              <button key={k} type="button" className={`mk-check ${on ? "on" : ""}`} aria-pressed={on} onClick={() => setTicks((tk) => { const n = new Set(tk); if (n.has(`s${k}`)) n.delete(`s${k}`); else n.add(`s${k}`); return n; })}>
-                <span className="mk-box">{on ? "✓" : ""}</span><span>{stepParts(tempsIn(x), stepItems).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</span>
-              </button>); })}
+            <b>Tick each step when it is done</b>
+            {madeSteps.map((x, k) => { const on = ticks.has(`s${k}`), ph = stepPhotos[String(k)]; return (
+              <div key={k} className="mk-row">
+                <button type="button" className={`mk-check ${on ? "on" : ""}`} aria-pressed={on} onClick={() => tick(k)}>
+                  <span className="mk-box">{on ? "✓" : ""}</span><span>{stepParts(tempsIn(x), stepItems).map((pt, j) => ("text" in pt ? pt.text : <b key={j} className="st-amt">{pt.label}</b>))}</span>
+                </button>
+                <label className={`mk-photo${ph ? "" : " empty"}`} aria-label={ph ? `Change the photo of step ${k + 1}` : `Add a photo to step ${k + 1}`}>
+                  {ph ? <img src={ph} alt="" /> : <><b>＋</b><span>Photo</span></>}
+                  <input type="file" accept="image/*" capture="environment" onChange={(e) => { stepPhotoFile(k, e.target.files?.[0]); e.target.value = ""; }} />
+                </label>
+              </div>); })}
           </section>
         )}
-        <p className="label">Photos of the meal</p>
-        <div className="meal-photos">
-          {photos.map((ph, i) => <img key={i} src={ph} alt="" onClick={() => setPhotos((x) => x.filter((_, k) => k !== i))} />)}
-          <label className="plate-photo small"><span>Take a photo</span><input type="file" accept="image/*" capture="environment" onChange={(e) => { addPhoto(e.target.files?.[0]); e.target.value = ""; }} /></label>
-          <label className="plate-photo small"><span>My gallery</span><input type="file" accept="image/*" multiple onChange={(e) => { Array.from(e.target.files ?? []).forEach((f) => addPhoto(f)); e.target.value = ""; }} /></label>
+        {/* DT211 v8: The meal, the final look: one photo when it is on the plate; Eat shows it */}
+        <div className="mk-final">
+          <p className="label">The meal, the final look</p>
+          <small className="muted">One photo when it is on the plate. Eat shows it too.</small>
+          <label className="plate-photo">
+            {plate ? <img src={plate} alt="your meal" /> : <span>Add a photo of the meal</span>}
+            <input type="file" accept="image/*" capture="environment" onChange={(e) => {
+              const file = e.target.files?.[0]; e.target.value = ""; if (!file) return;
+              const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 480).then(setPlate).catch(() => {}); r.readAsDataURL(file);
+            }} />
+          </label>
         </div>
-        <p className="label">How did it go?</p>
-        <div className="reasons">
-          {/* DT90 (0.2.87): a plate that is no recipe was made by its steps */}
-          <button className={`choice ${went === "as" ? "on" : ""}`} onClick={() => setWent("as")}>{rec ? "All as the recipe says" : "As the steps say"}</button>
-          <button className={`choice ${went === "not" ? "on" : ""}`} onClick={() => setWent("not")}>{rec ? "Not as the recipe says" : "Not as the steps say"}</button>
+        {/* DT211 v8: How did the cooking go?, Chef Mealan's line */}
+        <div className="cook-q">
+          <ChefLine text="How did the cooking go?" />
+          <div className="reasons">
+            {/* DT90 (0.2.87): a plate that is no recipe was made by its steps */}
+            <button className={`choice ${went === "as" ? "on" : ""}`} onClick={() => setWent("as")}>{rec ? "All as the recipe says" : "As the steps say"}</button>
+            <button className={`choice ${went === "not" ? "on" : ""}`} onClick={() => setWent("not")}>{rec ? "Not as the recipe says" : "Not as the steps say"}</button>
+          </div>
+          {went === "not" && <textarea placeholder="What was different" value={different} onChange={(e) => setDifferent(e.target.value)} />}
+          {went === "not" && <button className="link" onClick={() => p.openOut()}>Help me with making it</button>}
         </div>
-        {went === "not" && <textarea placeholder="What was different" value={different} onChange={(e) => setDifferent(e.target.value)} />}
-        {went === "not" && <button className="link" onClick={() => p.openOut()}>Help me with making it</button>}
-        {/* R25 (0.2.53, board RS25): a whole recipe that makes several is counted, starting on one, never logged whole by
-            accident; the rest is said, not followed (R16) */}
-        {wholeN > 1 && rec ? <>
-          {/* DT81: count what the batch really made; one of them is then that share of what was cooked */}
-          <div className="eat-count made-count" role="group" aria-label="How many it made">
-            <small className="muted">Counted them? It made</small>
-            <button type="button" className="pill pill-small" aria-label="It made one less" disabled={wholeN <= 2} onClick={() => { setMadeN(wholeN - 1); setEatN((k) => Math.min(k, wholeN - 1)); }}>−</button>
-            <b aria-live="polite">{wholeN}</b><span>{unitOf(rec)}</span>
-            <button type="button" className="pill pill-small" aria-label="It made one more" onClick={() => setMadeN(wholeN + 1)}>+</button>
-          </div>
-          {wholeN !== cookCount && cookCount === rec.makes!.n && <button type="button" className={`choice ${keepMade ? "on" : ""}`} aria-pressed={keepMade} onClick={() => setKeepMade(!keepMade)}>It always makes {wholeN}: make {wholeN} the recipe's number</button>}
-          <p className="label">You made {countOf(wholeN, unitOf(rec))}. How many did you eat?</p>
-          <div className="eat-count" role="group" aria-label="How many did you eat?">
-            <button type="button" className="pill pill-small" aria-label="One less" disabled={ate !== "all" || eatN <= 1} onClick={() => { setEatN((k) => Math.max(1, k - 1)); setBigAsk(false); }}>−</button>
-            <b aria-live="polite">{ate === "all" ? eatN : 0}</b><span>{ate === "all" && eatN === 1 ? oneOf(rec) : unitOf(rec)}</span>
-            <button type="button" className="pill pill-small" aria-label="One more" disabled={ate !== "all" || eatN >= wholeN} onClick={() => { setEatN((k) => Math.min(wholeN, k + 1)); setBigAsk(false); }}>+</button>
-            {ate === "all" && <small className="muted">{fmt(perOne * eatN, 0)} kcal · {pdText(density(aggregate(items).protein, aggregate(items).calories))}</small>}
-          </div>
-          {ate === "all" && wholeN - eatN > 0 && <small className="eat-left">{countOf(wholeN - eatN, unitOf(rec))} left: to eat {wholeN - eatN === 1 ? "it" : "them"} on other days, put the recipe on Plan.</small>}
-          <div className="reasons">
-            <button className={`choice ${ate === "all" && eatN === wholeN ? "on" : ""}`} onClick={() => { setAte("all"); setEatN(wholeN); setBigAsk(false); }}>All {wholeN}</button>
-            {([["later", "Later today"], ["not", "Not after all"]] as const).map(([k, l]) => (
-              <button key={k} className={`choice ${ate === k ? "on" : ""}`} onClick={() => { setAte(ate === k ? "all" : k); setBigAsk(false); }}>{l}</button>
-            ))}
-          </div>
-        </> : <>
-          <p className="label">How much did you eat?</p>
-          <div className="reasons">
-            {([["all", "All of it"], ["portion", "A portion"], ["later", "Later today"], ["not", "Not after all"]] as const).map(([k, l]) => (
-              <button key={k} className={`choice ${ate === k ? "on" : ""}`} onClick={() => { setAte(k); setBigAsk(false); }}>{l}</button>
-            ))}
-          </div>
-        </>}
-        {/* R25: a meal over 2,000 kcal, or over the whole day, is asked once; nothing is blocked */}
-        {bigAsk && (
-          <section className="card big-ask" role="alertdialog" aria-label="A big meal">
-            <b>{fmt(eatenKcal, 0)} kcal in one meal?</b>
-            <small>{dayKcal && eatenKcal > dayKcal ? `That is more than your whole day, ${fmt(dayKcal, 0)} kcal.` : "That is a lot for one meal."} {wholeN > 1 && rec ? `If you ate ${eatN === wholeN ? `all ${wholeN}` : countOf(eatN, unitOf(rec))}, log it; if not, say how many.` : "If you ate all of it, log it; if not, change the amounts."}</small>
-            <div className="button-row">
-              <button type="button" className="pill pill-small" onClick={() => { setBigAsk(false); log("made", { went, ate, photos: photos.length }); setStep("after"); }}>{wholeN > 1 && eatN === wholeN ? `Yes, all ${wholeN}` : "Yes, I ate it"}</button>
-              <button type="button" className="pill pill-small pill-primary" onClick={() => { setBigAsk(false); if (!(wholeN > 1)) setStep("in"); }}>{wholeN > 1 ? "How many I ate" : "Change the amounts"}</button>
-            </div>
-          </section>
-        )}
-        {!bigAsk && <button className="pill pill-primary pill-wide" onClick={() => {
-          if (ate === "later" || ate === "not") {
-            log("made", { went, ate, photos: photos.length });
-            // the card goes to Today without a rating: kept for later, or not eaten after all
-            p.keepForLater({ ...mealNow() }, { photos, prep: { went, different: different || undefined }, status: ate === "later" ? "prepared" : "not-used" });
-            resetMade(); setStep("in");
-            return;
-          }
-          if (ate === "all" && (eatenKcal > BIG_MEAL || (dayKcal !== null && eatenKcal > dayKcal))) { setBigAsk(true); return; }
-          log("made", { went, ate, photos: photos.length });
-          setStep("after");
-        }}>Rate it</button>}
+        <div className="next-step">
+          <button className="pill pill-primary pill-wide" onClick={() => { log("made", { went, photos: Object.keys(stepPhotos).length + (plate ? 1 : 0) }); setStep("after"); }}>Cooked. Next: Eat ›</button>
+          <small className="muted">How much you ate, and how it tasted.</small>
+        </div>
       </>
     );
   }
@@ -2167,24 +2269,158 @@ export function JourneyScreen(p: AppApi) {
   const chgW = way && way.kind === "change" && way.whole && fromRec ? way : null;
   const changedFrom = !origin && !chgW ? changedBase(items) : null;
   const suggestedName = changedFrom ? newNameFor(changedFrom.title, changedFrom.items, items, state.meals.map((m) => m.title)) : "";
+  // DT211 v8 (0.3.53): how much you ate is asked on Eat now. Later today keeps the cook open and its card waits on Today;
+  // Not after all closes it
+  const cookMeal = () => ({ id: uid(), title: p.state.title || autoTitle(items), items: structuredClone(items), portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() });
+  const cookPhotos = [...Object.keys(stepPhotos).map(Number).sort((x, y) => x - y).map((k) => ({ k, src: stepPhotos[String(k)] })), ...(plate ? [{ k: null as number | null, src: plate }] : [])];
+  const eatLater = ate === "later" || ate === "not";
+  const saveEat = (bigOk = false) => {
+    if (eatLater) {
+      log("made", { went, ate, photos: cookPhotos.length });
+      p.keepForLater({ ...cookMeal() }, { photos: cookPhotos.map((x) => x.src), prep: { went, different: different || undefined }, status: ate === "later" ? "prepared" : "not-used" });
+      if (ate === "later") p.cookLater(); else p.endCook();
+      resetMade(); setPlate(""); setTicks(new Set()); setStep("in");
+      return;
+    }
+    if (!bigOk && ate === "all" && (eatenKcal > BIG_MEAL || (dayKcal !== null && eatenKcal > dayKcal))) { setBigAsk(true); return; }
+    log("made", { went, ate, photos: cookPhotos.length });
+        const name = changedFrom && recipeChoice === "new" ? (((newRecipeName ?? suggestedName).trim() && (newRecipeName ?? suggestedName).trim().toLowerCase() !== changedFrom.title.toLowerCase()) ? (newRecipeName ?? suggestedName).trim() : suggestedName) : title.trim() || plateName;
+        const src = way?.kind === "change" && fromRec?.source ? { source: { name: fromRec.source.name, ...(fromRec.source.url ? { url: fromRec.source.url } : {}), from: fromRec.source.from, at: fromRec.source.at } } : {};
+        // DT89 and DT90 (0.2.87): the steps from How to make it, Chef Mealan's kitchen, and who made it go with the recipe
+        // 02:11: a bowl way chosen at Lock (All in one, Topped, Protein first) is the recipe's process too; it was lost at Save
+        const wayNow = method ? methodsFor(items).find((w) => w.id === method) : undefined;
+        const ps = cooksPlate(items) && plateSteps?.steps.length ? { steps: plateSteps.steps, stepsFor: foodNames(items) } : wayNow ? { steps: wayNow.steps, stepsFor: foodNames(items), way: wayNow.name } : {};
+        const chefMade = madeBy ? { ...(state.cooking?.length ? { cooking: state.cooking } : {}), kitchen: madeBy.kitchen, byChef: { kitchen: madeBy.kitchen, meal: mealWord, around: aroundWord(madeBy.from.filter((i) => !isDrink(i.food)).map((i) => i.food.name)), at: new Date().toISOString() } } : {};
+        const meal: Meal = { id: origin?.id ?? uid(), title: name, items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString(), kind: p.kind, ...src, ...adaptedFrom, ...ps, ...chefMade };
+        // the recipe kept (0.2.19, IM18b): its parts on its foods; optional foods, added or not, in its optional list
+        const keptOpt = [...(state.optional ?? []), ...items.filter((i) => i.optional).map(itemToOpt)].map((o) => ({ name: o.name, written: o.written ?? "", ...(o.note ? { note: o.note } : {}), grams: o.grams, food: leanFood(o.food), ...(o.part ? { part: o.part } : {}) }));
+        // DT206: a drink stays out of the recipe unless you keep it in; the meal you ate still counts it
+        const keptItems = structuredClone(items.filter((i) => !i.optional && (drinkIn || !isDrink(i.food))));
+        // a changed dish is kept as the whole recipe it is now (0.2.23, IM23b): the recipe's size, its steps, adapted from the original
+        const chgKept: Meal | null = chgW && fromRec ? (() => {
+          // the same ids: the drafted steps name the foods by them
+          const whole = chgW.whole!.map((i) => ({ ...structuredClone(i), locked: false, dish: undefined, optional: undefined }));
+          const n = fromRec.makes?.n ?? 1, d = chgW.drafted;
+          const src = fromRec.source ? { source: { name: fromRec.source.name, ...(fromRec.source.url ? { url: fromRec.source.url } : {}), from: fromRec.source.from, at: fromRec.source.at, ...(fromRec.source.steps?.length ? { steps: fromRec.source.steps } : {}), foods: originalFoodsOf(fromRec, state.meals) ?? foodNames(fromRec.items) } } : {};
+          return { id: meal.id, title: name, items: whole, portion: Math.round(whole.reduce((k, i) => k + i.grams, 0) / n), savedAt: meal.savedAt, kind: p.kind, ...src, basedOn: { id: fromRec.id, title: fromRec.title },
+            ...(fromRec.makes ? { makes: fromRec.makes } : {}), ...(fromRec.optional?.length ? { optional: fromRec.optional } : {}),
+            steps: d?.steps ?? [], ...(d?.steps?.length ? { stepsFor: foodNames(whole) } : {}), ...(d?.marks ? { stepMarks: d.marks } : {}), ...(d?.kitchen ? { stepsKitchen: d.kitchen } : {}), ...(d?.parts ? { stepParts: d.parts } : {}) };
+        })() : null;
+        // R25: the card counts what was eaten, a number of the recipe's pieces; the recipe is kept whole
+        // the portion is the sum of the very grams kept, never a hair above them: a stored meal heavier than its foods is not read back
+        // DT81: a batch from scratch: you ate one of what it makes now; the rest goes on Plan
+        const scratchN = !chgW && !fromRec && saveRecipe && ate === "portion" ? Math.round(Number(makesShown) || 0) : 0;
+        const eatenItems = wholeN > 1 && eatN < wholeN ? meal.items.map((i) => ({ ...i, grams: (i.grams * eatN) / wholeN })) : scratchN >= 2 && scratchN <= 100 ? meal.items.map((i) => ({ ...i, grams: i.grams / scratchN })) : null;
+        const eatenMeal: Meal = eatenItems ? { ...meal, items: eatenItems, portion: eatenItems.reduce((n, i) => n + i.grams, 0) } : meal;
+        // DT81: a recipe from scratch keeps what it made, when said: It makes 10 sarmas
+        const mk = Math.round(Number(makesShown) || 0), mkTyped = newMakesUnit.trim().toLowerCase() || "portions";
+        const newMakes = !chgKept && !fromRec && mk >= 2 && mk <= 100 ? { n: mk, unit: /s$/.test(mkTyped) ? mkTyped : `${mkTyped}s` } : null;
+        const keptWeight = keptItems.reduce((n, i) => n + i.grams, 0);
+        const kept: Meal = chgKept ?? { ...meal, items: keptItems, portion: newMakes ? Math.round(keptWeight / newMakes.n) : keptWeight, ...(newMakes ? { makes: newMakes } : {}), ...(keptOpt.length ? { optional: keptOpt } : {}) };
+        const triedNow = tryCtx && tried ? { kind: tryCtx.kind, what: tryCtx.what, result: tried } : undefined;
+        const status = good === "no" ? "not-used" : "eaten";
+        const taste = TASTE[good!];
+        log("feedback", { status, taste, shared: sharing ? shareWhy : null });
+        setFeedback({ status, taste, notes: note });
+        const shared = sharing && shareWhy ? { reason: shareWhy, at: new Date().toISOString() } : undefined;
+        const allPhotos = [...photos, ...cookPhotos.map((x) => x.src)];
+        const photoSteps = [...photos.map(() => null), ...cookPhotos.map((x) => x.k)];
+        const cardId = uid();
+        const coverNow = status === "eaten" && allPhotos.length ? allPhotos[allPhotos.length - 1] : null;
+        // a plate that is a recipe as it stands (0.2.3): the card points at that recipe, no second copy
+        const keep = changedFrom ? recipeChoice === "new" && status === "eaten" : !origin && saveRecipe && status === "eaten";
+        const updateBase = changedFrom && recipeChoice === "update" && status === "eaten" ? changedFrom : null;
+        if (triedNow) log("recipe_fit", { way: triedNow.kind, result: triedNow.result });
+        // R16 (0.2.44, Milan 21:56, board RS15): the rest of a whole recipe made is not followed: it may go to the family or to
+        // work. The recipe goes on Plan for the days you eat it; Today shows it there, and I ate it logs it with its recipe.
+        // where you land (0.2.23, IM23c): the recipe the meal made or changed, a recipe made for the first time, or steps drafted now
+        const firstTime = !!fromRec && !state.feedback.some((f) => f.status === "eaten" && (f.recipeId === fromRec.id || f.meal?.id === fromRec.id));
+        // RP4 (0.2.25, Milan 17:42): every recipe you make ends on its page; a plate that is no recipe ends on Today
+        const landId = keep ? kept.id : (fromRec ?? origin ?? updateBase ?? null)?.id ?? null;
+        const leftN = wholeN > 1 ? wholeN - eatN : madeWhole && rec?.makes ? Math.max(0, leftK) : 0;
+        const landLine = status !== "eaten" ? "" : [`You ate ${wholeN > 1 && rec ? (eatN === wholeN ? `all ${wholeN}` : countOf(eatN, unitOf(rec))) : rec && pmode === "recipe" && !way ? `1 ${oneOf(rec)}` : "your plate"}.`, leftN > 0 ? `${sizedPlate ? leftWords(leftN) : countOf(leftN, unitOf(rec!))} left: to eat ${leftN === 1 ? "it" : "them"} on other days, put the recipe on Plan.` : "", chgKept && fromRec ? `The original, ${fromRec.title}, stays as it was.` : ""].filter(Boolean).join(" ");
+        setState((s) => ({ ...s, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (updateBase && m.id === updateBase.id ? { ...m, items: structuredClone(keptItems), portion: keptWeight } : m)).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)).map((m) => (m.idea && status === "eaten" && (m.id === origin?.id || m.id === fromRec?.id || m.id === landId) ? { ...m, idea: undefined } : m))
+          // DT85 (Milan 23 October 20:58 and 24 October 09:44): the photo taken while making it is the cover of a recipe with no
+          // photo of its own yet (no cover, or one Chef Mealan drew); a drawn picture stays behind it. A cover of your own stays.
+          .map((m) => (coverNow && m.id === landId && !ownPhotosOf(m).length ? { ...m, ...withRecipePhotos([coverNow, ...recipePhotosOf(m).filter((x) => x !== coverNow)].slice(0, 6)) } : m)), feedback: [{ id: cardId, meal: structuredClone(eatenMeal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, ...(cookPhotos.length ? { photoSteps } : {}), ...(coverNow && landId && !ownPhotosOf(s.meals.find((m) => m.id === landId) ?? {}).length ? { coverAsk: "used" as const } : {}), prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : pickSlot ? { date: todayKey, slotId: pickSlot.id, name: pickSlot.name, time: pickSlot.time } : undefined, ...(p.filling?.mode !== "eat" && !pickSlot && mealSlot ? { which: capName(mealSlot.name) } : {}), createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));
+        // DT81: the batch just made, counted: Plan's pieces of it are its share; or it always makes this many, the recipe's number
+        if (status === "eaten" && wholeN > 1 && rec?.makes) {
+          const made = wholeN, cooked = cookCount, recId = rec.id;
+          setState((s) => ({ ...s, meals: s.meals.map((m) => m.id !== recId ? m
+            : keepMade ? { ...m, makes: { ...m.makes!, n: made }, portion: Math.round(m.items.reduce((k, i) => k + i.grams, 0) / made), batch: undefined, cook: undefined }
+            : { ...m, batch: { cooked, made, at: new Date().toISOString() }, cook: undefined }) }));
+        }
+        // DT214 v2: the cook waits for its last question, How did it carry you; not eaten after all, it closes
+        if (status === "eaten") p.cookEaten(cardId); else p.endCook();
+        if (p.filling) p.setFilling(null);
+        setWay(null); setTried(null);
+        setMakeAll(null); setTicks(new Set()); setCooking(false); setMkDraft(""); setMkDrafted(false);
+        setMadeBy(null); setPlateSteps(null); setPlateDraft(""); setOwnSteps(null);
+        if (landId) p.landOnRecipe(landId, landLine, keep ? "✓ Saved in Mine" : "✓ Made today");
+        else setTab("home");
+        setRecipeChoice(null); setNewRecipeName(null);
+        p.setKind("meal"); p.setPick(null); setGood(null); setNote(""); setTitle(""); setPlate(""); setStepPhotos({}); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); resetMade(); setStep("in");
+  };
   return (
     <>
-      {Head({ back: "made", title: "Feedback: how was it?", sub: "One tap. It stays yours unless you share it." })}
-      <div className="choices three">
-        <button className={`choice ${good === "daam" ? "on" : ""}`} onClick={() => setGood("daam")}><span className="double-thumbs" aria-hidden="true"><ThumbsUp size={22} /><ThumbsUp size={22} /></span><span>DaaM good</span></button>
-        <button className={`choice ${good === "good" ? "on" : ""}`} onClick={() => setGood("good")}><ThumbsUp size={22} /><span>Good</span></button>
-        <button className={`choice ${good === "no" ? "on" : ""}`} onClick={() => setGood("no")}><ThumbsDown size={24} /><span>Not really</span></button>
+      {Head({ back: "made", title: "Eat: how was it?", sub: "How much you ate and how it tasted. It stays yours unless you share it." })}
+      {/* DT211 v8 (0.3.53, board Stories158): the final photo comes along from Make; Chef Mealan asks, in his lines */}
+      {plate && <div className="eat-final"><img src={plate} alt="your meal" /><small className="muted">Your meal, from Make.</small></div>}
+      <div className="cook-q">
+        <ChefLine text="Enjoy it. How much did you eat?" />
+      {/* R25 (0.2.53, board RS25): a whole recipe that makes several is counted, starting on one, never logged whole by
+          accident; the rest is said, not followed (R16) */}
+      {wholeN > 1 && rec ? <>
+        {/* DT81: count what the batch really made; one of them is then that share of what was cooked */}
+        <div className="eat-count made-count" role="group" aria-label="How many it made">
+          <small className="muted">Counted them? It made</small>
+          <button type="button" className="pill pill-small" aria-label="It made one less" disabled={wholeN <= 2} onClick={() => { setMadeN(wholeN - 1); setEatN((k) => Math.min(k, wholeN - 1)); }}>−</button>
+          <b aria-live="polite">{wholeN}</b><span>{unitOf(rec)}</span>
+          <button type="button" className="pill pill-small" aria-label="It made one more" onClick={() => setMadeN(wholeN + 1)}>+</button>
+        </div>
+        {wholeN !== cookCount && cookCount === rec.makes!.n && <button type="button" className={`choice ${keepMade ? "on" : ""}`} aria-pressed={keepMade} onClick={() => setKeepMade(!keepMade)}>It always makes {wholeN}: make {wholeN} the recipe's number</button>}
+        <p className="label">You made {countOf(wholeN, unitOf(rec))}. How many did you eat?</p>
+        <div className="eat-count" role="group" aria-label="How many did you eat?">
+          <button type="button" className="pill pill-small" aria-label="One less" disabled={ate !== "all" || eatN <= 1} onClick={() => { setEatN((k) => Math.max(1, k - 1)); setBigAsk(false); }}>−</button>
+          <b aria-live="polite">{ate === "all" ? eatN : 0}</b><span>{ate === "all" && eatN === 1 ? oneOf(rec) : unitOf(rec)}</span>
+          <button type="button" className="pill pill-small" aria-label="One more" disabled={ate !== "all" || eatN >= wholeN} onClick={() => { setEatN((k) => Math.min(wholeN, k + 1)); setBigAsk(false); }}>+</button>
+          {ate === "all" && <small className="muted">{fmt(perOne * eatN, 0)} kcal · {pdText(density(aggregate(items).protein, aggregate(items).calories))}</small>}
+        </div>
+        {ate === "all" && wholeN - eatN > 0 && <small className="eat-left">{countOf(wholeN - eatN, unitOf(rec))} left: to eat {wholeN - eatN === 1 ? "it" : "them"} on other days, put the recipe on Plan.</small>}
+        <div className="reasons">
+          <button className={`choice ${ate === "all" && eatN === wholeN ? "on" : ""}`} onClick={() => { setAte("all"); setEatN(wholeN); setBigAsk(false); }}>All {wholeN}</button>
+          {([["later", "Later today"], ["not", "Not after all"]] as const).map(([k, l]) => (
+            <button key={k} className={`choice ${ate === k ? "on" : ""}`} onClick={() => { setAte(ate === k ? "all" : k); setBigAsk(false); }}>{l}</button>
+          ))}
+        </div>
+      </> : <>
+        <div className="reasons">
+          {([["all", "All of it"], ["portion", "A portion"], ["later", "Later today"], ["not", "Not after all"]] as const).map(([k, l]) => (
+            <button key={k} className={`choice ${ate === k ? "on" : ""}`} onClick={() => { setAte(k); setBigAsk(false); }}>{l}</button>
+          ))}
+        </div>
+      </>}
+      {/* R25: a meal over 2,000 kcal, or over the whole day, is asked once; nothing is blocked */}
+      {bigAsk && (
+        <section className="card big-ask" role="alertdialog" aria-label="A big meal">
+          <b>{fmt(eatenKcal, 0)} kcal in one meal?</b>
+          <small>{dayKcal && eatenKcal > dayKcal ? `That is more than your whole day, ${fmt(dayKcal, 0)} kcal.` : "That is a lot for one meal."} {wholeN > 1 && rec ? `If you ate ${eatN === wholeN ? `all ${wholeN}` : countOf(eatN, unitOf(rec))}, log it; if not, say how many.` : "If you ate all of it, log it; if not, change the amounts."}</small>
+          <div className="button-row">
+            <button type="button" className="pill pill-small" onClick={() => { setBigAsk(false); saveEat(true); }}>{wholeN > 1 && eatN === wholeN ? `Yes, all ${wholeN}` : "Yes, I ate it"}</button>
+            <button type="button" className="pill pill-small pill-primary" onClick={() => { setBigAsk(false); if (!(wholeN > 1)) setStep("in"); }}>{wholeN > 1 ? "How many I ate" : "Change the amounts"}</button>
+          </div>
+        </section>
+      )}
       </div>
-      <div className="meal-photos">
-        {photos.map((ph, i) => <img key={i} src={ph} alt="" />)}
-      <label className={`plate-photo ${photos.length ? "small" : ""}`}>
-        {plate ? <img src={plate} alt="your plate" /> : <span>{photos.length ? "Photo of the plate" : "Add a photo of the plate"}</span>}
-        <input type="file" accept="image/*" capture="environment" onChange={(e) => {
-          const file = e.target.files?.[0]; if (!file) return;
-          const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 480).then(setPlate).catch(() => {}); r.readAsDataURL(file);
-        }} />
-      </label>
-      </div>
+      {!eatLater && <div className="cook-q">
+        <ChefLine text="And how did it taste?" />
+        <div className="choices three">
+          <button className={`choice ${good === "daam" ? "on" : ""}`} onClick={() => setGood("daam")}><span className="double-thumbs" aria-hidden="true"><ThumbsUp size={22} /><ThumbsUp size={22} /></span><span>DaaM good</span></button>
+          <button className={`choice ${good === "good" ? "on" : ""}`} onClick={() => setGood("good")}><ThumbsUp size={22} /><span>Good</span></button>
+          <button className={`choice ${good === "no" ? "on" : ""}`} onClick={() => setGood("no")}><ThumbsDown size={24} /><span>Not really</span></button>
+        </div>
+      </div>}
+      {!eatLater && <>
       {tryCtx && (
         <section className="card save-recipe">
           <div className="card-top"><span>{tryCtx.kind === "change" ? "Did the swap work?" : "Did the side work?"}</span></div>
@@ -2247,82 +2483,30 @@ export function JourneyScreen(p: AppApi) {
           ))}
         </div>
       )}
-      <button className="pill pill-primary pill-wide" disabled={good === null || (sharing && !shareWhy)} onClick={() => {
-        const name = changedFrom && recipeChoice === "new" ? (((newRecipeName ?? suggestedName).trim() && (newRecipeName ?? suggestedName).trim().toLowerCase() !== changedFrom.title.toLowerCase()) ? (newRecipeName ?? suggestedName).trim() : suggestedName) : title.trim() || plateName;
-        const src = way?.kind === "change" && fromRec?.source ? { source: { name: fromRec.source.name, ...(fromRec.source.url ? { url: fromRec.source.url } : {}), from: fromRec.source.from, at: fromRec.source.at } } : {};
-        // DT89 and DT90 (0.2.87): the steps from How to make it, Chef Mealan's kitchen, and who made it go with the recipe
-        // 02:11: a bowl way chosen at Lock (All in one, Topped, Protein first) is the recipe's process too; it was lost at Save
-        const wayNow = method ? methodsFor(items).find((w) => w.id === method) : undefined;
-        const ps = cooksPlate(items) && plateSteps?.steps.length ? { steps: plateSteps.steps, stepsFor: foodNames(items) } : wayNow ? { steps: wayNow.steps, stepsFor: foodNames(items), way: wayNow.name } : {};
-        const chefMade = madeBy ? { ...(state.cooking?.length ? { cooking: state.cooking } : {}), kitchen: madeBy.kitchen, byChef: { kitchen: madeBy.kitchen, meal: mealWord, around: aroundWord(madeBy.from.filter((i) => !isDrink(i.food)).map((i) => i.food.name)), at: new Date().toISOString() } } : {};
-        const meal: Meal = { id: origin?.id ?? uid(), title: name, items: structuredClone(items), portion: t.weight, savedAt: new Date().toISOString(), kind: p.kind, ...src, ...adaptedFrom, ...ps, ...chefMade };
-        // the recipe kept (0.2.19, IM18b): its parts on its foods; optional foods, added or not, in its optional list
-        const keptOpt = [...(state.optional ?? []), ...items.filter((i) => i.optional).map(itemToOpt)].map((o) => ({ name: o.name, written: o.written ?? "", ...(o.note ? { note: o.note } : {}), grams: o.grams, food: leanFood(o.food), ...(o.part ? { part: o.part } : {}) }));
-        // DT206: a drink stays out of the recipe unless you keep it in; the meal you ate still counts it
-        const keptItems = structuredClone(items.filter((i) => !i.optional && (drinkIn || !isDrink(i.food))));
-        // a changed dish is kept as the whole recipe it is now (0.2.23, IM23b): the recipe's size, its steps, adapted from the original
-        const chgKept: Meal | null = chgW && fromRec ? (() => {
-          // the same ids: the drafted steps name the foods by them
-          const whole = chgW.whole!.map((i) => ({ ...structuredClone(i), locked: false, dish: undefined, optional: undefined }));
-          const n = fromRec.makes?.n ?? 1, d = chgW.drafted;
-          const src = fromRec.source ? { source: { name: fromRec.source.name, ...(fromRec.source.url ? { url: fromRec.source.url } : {}), from: fromRec.source.from, at: fromRec.source.at, ...(fromRec.source.steps?.length ? { steps: fromRec.source.steps } : {}), foods: originalFoodsOf(fromRec, state.meals) ?? foodNames(fromRec.items) } } : {};
-          return { id: meal.id, title: name, items: whole, portion: Math.round(whole.reduce((k, i) => k + i.grams, 0) / n), savedAt: meal.savedAt, kind: p.kind, ...src, basedOn: { id: fromRec.id, title: fromRec.title },
-            ...(fromRec.makes ? { makes: fromRec.makes } : {}), ...(fromRec.optional?.length ? { optional: fromRec.optional } : {}),
-            steps: d?.steps ?? [], ...(d?.steps?.length ? { stepsFor: foodNames(whole) } : {}), ...(d?.marks ? { stepMarks: d.marks } : {}), ...(d?.kitchen ? { stepsKitchen: d.kitchen } : {}), ...(d?.parts ? { stepParts: d.parts } : {}) };
-        })() : null;
-        // R25: the card counts what was eaten, a number of the recipe's pieces; the recipe is kept whole
-        // the portion is the sum of the very grams kept, never a hair above them: a stored meal heavier than its foods is not read back
-        // DT81: a batch from scratch: you ate one of what it makes now; the rest goes on Plan
-        const scratchN = !chgW && !fromRec && saveRecipe && ate === "portion" ? Math.round(Number(makesShown) || 0) : 0;
-        const eatenItems = wholeN > 1 && eatN < wholeN ? meal.items.map((i) => ({ ...i, grams: (i.grams * eatN) / wholeN })) : scratchN >= 2 && scratchN <= 100 ? meal.items.map((i) => ({ ...i, grams: i.grams / scratchN })) : null;
-        const eatenMeal: Meal = eatenItems ? { ...meal, items: eatenItems, portion: eatenItems.reduce((n, i) => n + i.grams, 0) } : meal;
-        // DT81: a recipe from scratch keeps what it made, when said: It makes 10 sarmas
-        const mk = Math.round(Number(makesShown) || 0), mkTyped = newMakesUnit.trim().toLowerCase() || "portions";
-        const newMakes = !chgKept && !fromRec && mk >= 2 && mk <= 100 ? { n: mk, unit: /s$/.test(mkTyped) ? mkTyped : `${mkTyped}s` } : null;
-        const keptWeight = keptItems.reduce((n, i) => n + i.grams, 0);
-        const kept: Meal = chgKept ?? { ...meal, items: keptItems, portion: newMakes ? Math.round(keptWeight / newMakes.n) : keptWeight, ...(newMakes ? { makes: newMakes } : {}), ...(keptOpt.length ? { optional: keptOpt } : {}) };
-        const triedNow = tryCtx && tried ? { kind: tryCtx.kind, what: tryCtx.what, result: tried } : undefined;
-        const status = good === "no" ? "not-used" : "eaten";
-        const taste = TASTE[good!];
-        log("feedback", { status, taste, shared: sharing ? shareWhy : null });
-        setFeedback({ status, taste, notes: note });
-        const shared = sharing && shareWhy ? { reason: shareWhy, at: new Date().toISOString() } : undefined;
-        const allPhotos = [...photos, ...(plate ? [plate] : [])];
-        const coverNow = status === "eaten" && allPhotos.length ? allPhotos[allPhotos.length - 1] : null;
-        // a plate that is a recipe as it stands (0.2.3): the card points at that recipe, no second copy
-        const keep = changedFrom ? recipeChoice === "new" && status === "eaten" : !origin && saveRecipe && status === "eaten";
-        const updateBase = changedFrom && recipeChoice === "update" && status === "eaten" ? changedFrom : null;
-        if (triedNow) log("recipe_fit", { way: triedNow.kind, result: triedNow.result });
-        // R16 (0.2.44, Milan 21:56, board RS15): the rest of a whole recipe made is not followed: it may go to the family or to
-        // work. The recipe goes on Plan for the days you eat it; Today shows it there, and I ate it logs it with its recipe.
-        // where you land (0.2.23, IM23c): the recipe the meal made or changed, a recipe made for the first time, or steps drafted now
-        const firstTime = !!fromRec && !state.feedback.some((f) => f.status === "eaten" && (f.recipeId === fromRec.id || f.meal?.id === fromRec.id));
-        // RP4 (0.2.25, Milan 17:42): every recipe you make ends on its page; a plate that is no recipe ends on Today
-        const landId = keep ? kept.id : (fromRec ?? origin ?? updateBase ?? null)?.id ?? null;
-        const leftN = wholeN > 1 ? wholeN - eatN : madeWhole && rec?.makes ? Math.max(0, leftK) : 0;
-        const landLine = status !== "eaten" ? "" : [`You ate ${wholeN > 1 && rec ? (eatN === wholeN ? `all ${wholeN}` : countOf(eatN, unitOf(rec))) : rec && pmode === "recipe" && !way ? `1 ${oneOf(rec)}` : "your plate"}.`, leftN > 0 ? `${sizedPlate ? leftWords(leftN) : countOf(leftN, unitOf(rec!))} left: to eat ${leftN === 1 ? "it" : "them"} on other days, put the recipe on Plan.` : "", chgKept && fromRec ? `The original, ${fromRec.title}, stays as it was.` : ""].filter(Boolean).join(" ");
-        setState((s) => ({ ...s, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, meals: (keep ? [structuredClone(kept), ...s.meals] : s.meals).map((m) => (updateBase && m.id === updateBase.id ? { ...m, items: structuredClone(keptItems), portion: keptWeight } : m)).map((m) => (triedNow && fromRec && m.id === fromRec.id ? { ...m, tried: [...(m.tried ?? []).filter((x) => !(x.kind === triedNow.kind && x.what === triedNow.what)), { ...triedNow, at: new Date().toISOString() }] } : m)).map((m) => (m.idea && status === "eaten" && (m.id === origin?.id || m.id === fromRec?.id || m.id === landId) ? { ...m, idea: undefined } : m))
-          // DT85 (Milan 23 October 20:58 and 24 October 09:44): the photo taken while making it is the cover of a recipe with no
-          // photo of its own yet (no cover, or one Chef Mealan drew); a drawn picture stays behind it. A cover of your own stays.
-          .map((m) => (coverNow && m.id === landId && !ownPhotosOf(m).length ? { ...m, ...withRecipePhotos([coverNow, ...recipePhotosOf(m).filter((x) => x !== coverNow)].slice(0, 6)) } : m)), feedback: [{ id: uid(), meal: structuredClone(eatenMeal), status, taste, notes: note, ...(triedNow ? { tried: triedNow } : {}), photo: allPhotos[allPhotos.length - 1] || undefined, photos: allPhotos.length ? allPhotos : undefined, ...(coverNow && landId && !ownPhotosOf(s.meals.find((m) => m.id === landId) ?? {}).length ? { coverAsk: "used" as const } : {}), prep: { went, different: different || undefined }, ate: ate === "portion" ? "portion" : "all", recipeId: keep || origin ? meal.id : undefined, shared, moment: p.moment, dayType: p.personal.dayMode === "follow" ? p.dayType : undefined, slot: p.filling?.mode === "eat" ? { date: p.filling.date, slotId: p.filling.slotId, name: p.filling.name, time: p.filling.time } : pickSlot ? { date: todayKey, slotId: pickSlot.id, name: pickSlot.name, time: pickSlot.time } : undefined, ...(p.filling?.mode !== "eat" && !pickSlot && mealSlot ? { which: capName(mealSlot.name) } : {}), createdAt: new Date().toISOString() }, ...s.feedback], items: [], portion: null, title: "" }));
-        // DT81: the batch just made, counted: Plan's pieces of it are its share; or it always makes this many, the recipe's number
-        if (status === "eaten" && wholeN > 1 && rec?.makes) {
-          const made = wholeN, cooked = cookCount, recId = rec.id;
-          setState((s) => ({ ...s, meals: s.meals.map((m) => m.id !== recId ? m
-            : keepMade ? { ...m, makes: { ...m.makes!, n: made }, portion: Math.round(m.items.reduce((k, i) => k + i.grams, 0) / made), batch: undefined, cook: undefined }
-            : { ...m, batch: { cooked, made, at: new Date().toISOString() }, cook: undefined }) }));
-        }
-        if (p.filling) p.setFilling(null);
-        setWay(null); setTried(null);
-        setMakeAll(null); setTicks(new Set()); setCooking(false); setMkDraft(""); setMkDrafted(false);
-        setMadeBy(null); setPlateSteps(null); setPlateDraft(""); setOwnSteps(null);
-        if (landId) p.landOnRecipe(landId, landLine, keep ? "✓ Saved in Mine" : "✓ Made today");
-        else setTab("home");
-        setRecipeChoice(null); setNewRecipeName(null);
-        p.setKind("meal"); p.setPick(null); setGood(null); setNote(""); setTitle(""); setPlate(""); setTouched(new Set()); setSuggest(null); setSharing(false); setShareWhy(null); resetMade(); setStep("in");
-      }}>{sharing ? `Save and share with ${p.coachLabel}` : "Save"}</button>
+      </>}
+      {!bigAsk && <button className="pill pill-primary pill-wide" disabled={!eatLater && (good === null || (sharing && !shareWhy))} onClick={() => saveEat()}>{sharing && !eatLater ? `Save and share with ${p.coachLabel}` : "Save"}</button>}
+
       {p.profile.coachId && !sharing && <button className="pill pill-wide" onClick={() => setSharing(true)}>Share with {p.coachLabel}</button>}
       {sharing && <button className="link" onClick={() => { setSharing(false); setShareWhy(null); }}>Keep it private</button>}
     </>
+  );
+}
+
+// DT212 v4 (0.3.53, board Stories159): a plate or a cook saved for later. Continue puts it back; swipe it left and Remove shows
+function LaterRow({ x, onContinue, onRemove }: { x: Later; onContinue: () => void; onRemove: () => void }) {
+  const r = laterRow(x);
+  const [open, setOpen] = useState(false);
+  const from = useRef<number | null>(null);
+  const at = new Date(x.kind === "cook" ? x.cook!.startedAt : x.plate?.plateAt ?? x.plate?.photo?.at ?? x.at);
+  const sub = x.kind === "cook" ? `cooking, ${whenWords(at)}` : `${whenWords(at)} · ${r.foods} ${r.foods === 1 ? "food" : "foods"}`;
+  return (
+    <div className="later-row" onPointerDown={(e) => { from.current = e.clientX; }} onPointerUp={(e) => { if (from.current === null) return; const dx = e.clientX - from.current; from.current = null; if (dx < -40) setOpen(true); else if (dx > 40) setOpen(false); }}>
+      {open && <div className="lr-remove"><button type="button" className="pill" onClick={onRemove}>Remove</button></div>}
+      <div className="lr-front" style={{ transform: open ? "translateX(-104px)" : undefined }}>
+        {r.photo ? <img src={r.photo} alt="" /> : null}
+        <span className="lr-words">{r.title}<br /><small className="muted">{sub}</small></span>
+        <button type="button" className="pill" onClick={onContinue}>Continue</button>
+      </div>
+    </div>
   );
 }

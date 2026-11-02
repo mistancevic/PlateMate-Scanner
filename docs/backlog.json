@@ -56,7 +56,7 @@
       "id": "DT212",
       "title": "A plate that ends",
       "epic": "plate",
-      "state": "now",
+      "state": "progress",
       "board": 159,
       "why": "The Plate kept adding foods and resolved nothing; a plate from an earlier meal asks Did you eat it, alone. Quick wins first: the parts that hold either way ship before DT214."
     },
@@ -64,7 +64,7 @@
       "id": "DT211",
       "title": "Cook and chef, one conversation: Craft, Make, Eat",
       "epic": "cook",
-      "state": "now",
+      "state": "progress",
       "board": 158,
       "why": "Milan could not find the voice or the second phone; Start cooking moves onto the recipe. Quick wins first: the parts that hold either way ship before DT214."
     },
@@ -72,9 +72,9 @@
       "id": "DT214",
       "title": "The cook: one cooking, from start to how it carried you",
       "epic": "cook",
-      "state": "next",
+      "state": "progress",
       "board": 162,
-      "why": "Milan 2 November 12:17 to 12:30: cooking gets interrupted; disconnect it from the Plate, keep it until the last answer. Board drawn, waits for your look."
+      "why": "Milan 2 November 12:17 to 12:54: cooking gets interrupted; disconnect it from the Plate, keep it until the last answer. All as proposed, Go: built with DT211 v9 and DT212 v4 as one version for the preview."
     },
     {
       "id": "DT213",

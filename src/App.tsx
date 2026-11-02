@@ -6,6 +6,8 @@ import { KitchenScreen } from "./screens/KitchenScreen";
 import { endTravel, daysAway, sinceWords, placeName as travelPlace, kitchenName, type Travel } from "./travel";
 import { idleOut, lastOpen, markOpen, setIdleOut } from "./idle";
 import { servingsOf } from "./pilot";
+import * as cooking from "./cooking";
+import { CookStrip } from "./components/CookStrip";
 import { wholeOnPlate } from "./counted";
 import { drainedOf, libraryId, packLine } from "./canned";
 import { useEffect, useLayoutEffect, useRef, useState, type ReactNode, useMemo } from "react";
@@ -850,6 +852,12 @@ export default function App() {
     [photoAsk, setPhotoAsk] = useState<{ image: string; at: string } | null>(null),
     // DT131 (0.2.113, board Stories87; Milan 27 October 13:52): foods about to land on a plate that has foods wait for one answer
     [plateAsk, setPlateAsk] = useState<import("./screens/api").PlateAsk | null>(null),
+    // DT212 v4 and DT214 v2 (0.3.53): Start cooking on a plate with foods asks first; a food scanned while cooking asks where it goes
+    [cookAsk, setCookAsk] = useState<{ meal: Meal } | null>(null),
+    [pendingFood, setPendingFood] = useState<Food | null>(null),
+    [useInCook, setUseInCook] = useState<Food | null>(null),
+    // the Plate opens fresh when you go into a cook or come out of one: what Make and Eat show comes from the cook
+    [plateKey, setPlateKey] = useState(0),
     [mode, setMode] = useState<ScannerMode>("label"),
     [busy, setBusy] = useState(""),
     [message, setMessage] = useState(""),
@@ -1667,6 +1675,13 @@ export default function App() {
     if (first) { try { localStorage.setItem(MIGRATED, "1"); } catch {} }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.foods, region]);
+  // DT214 v2 (0.3.53): leaving the Plate tab in the middle of a cook takes the cook's plate with it; the Plate is free again
+  useEffect(() => {
+    if (tab !== "journey" && state.cook?.inView) { setState((s) => cooking.swapOut(s)); setStep("in"); setPlateKey((k) => k + 1); }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+  // saved plates and cooks go after 7 days; a cook eaten on an earlier day closes, its card keeps everything
+  useEffect(() => { setState((s) => cooking.tidyCooks(s)); }, [todayKeyP]); // eslint-disable-line react-hooks/exhaustive-deps
   // DT206: the plate's start, kept with it; a plate from before 0.3.48 takes its photo's time, else now
   useEffect(() => {
     if (state.items.length && !state.plateAt) setState((s) => ({ ...s, plateAt: s.photo?.at ?? new Date().toISOString() }));
@@ -1680,8 +1695,14 @@ export default function App() {
   // DT206 (0.3.48; Coach Milan 1 November 19:42: a photo's plate from 13:11 still waited at 19:40, and a scanned beer joined
   // it without a word): a plate started more than three hours ago, or on another day, asks before a food joins it
   const plateSince = (): Date | null => { const t = [state.plateAt, state.photo?.at].filter(Boolean).map((x) => new Date(x!).getTime()).filter((x) => !Number.isNaN(x)); return t.length ? new Date(Math.min(...t)) : null; };
-  const plateOld = () => { const at = plateSince(); if (!at || !state.items.length) return false; const now = new Date(); return now.getTime() - at.getTime() > 3 * 3600000 || ymd(now) !== ymd(at); };
+  const plateOld = () => cooking.plateOldOf(state);
   function add(food0: Food, asked = false) {
+    // DT214 v2 (0.3.53, board Stories162): while a cook runs, the Plate is free; a food that would go on it asks first: use it in
+    // the dish you are cooking, or keep it in your foods
+    if (!asked && state.cook?.stage === "make" && !state.cook.inView) {
+      setPendingFood(food0); setStep("in"); setMenuSection(null); setTalkOpen(false); setTab("journey");
+      return;
+    }
     if (!asked && plateOld()) {
       const at = plateSince()!, hm = `${String(at.getHours()).padStart(2, "0")}:${String(at.getMinutes()).padStart(2, "0")}`;
       const when = ymd(at) === ymd(new Date()) ? hm : `${["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][at.getDay()]} ${hm}`;
@@ -2345,7 +2366,7 @@ export default function App() {
     addFromDatabase: (code: string) => { setEditTitle("Add to my foods"); lookup(code); },
     searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (shopRegion ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "cy", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
     // DT127 (0.2.108, board Stories75): a photo of the meal in front of you, read onto the Plate as estimates
-    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea" }) => {
+    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean }) => {
       setBusy("Reading your plate…");
       try {
         const [sent, thumb] = await Promise.all([resizeImageBase64(image, 1280, 1280), thumbnailBase64(image, 640)]);
@@ -2353,7 +2374,8 @@ export default function App() {
         const read = cleanRead(d);
         if (!read) { setError("Nothing I can read on that plate. Try once more, from above, with the whole plate in."); return false; }
         const { items, fresh } = itemsOfRead(read, state.foods, shopRegion, uid);
-        const at = x?.who === "ate" && x.at ? x.at : new Date().toISOString();
+        // DT212 v4 (0.3.53): Read the photo again keeps the photo's time and replaces the foods, after it asked
+        const at = (x?.who === "ate" || x?.replace) && x.at ? x.at : new Date().toISOString();
         const photo = { image: thumb, at, unsure: read.unsure, ...(x?.who && x.who !== "now" ? { who: x.who } : {}) };
         const land = (how: "add" | "new") => {
           if (how === "add") setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items: [...s.items, ...items], portion: null, photo }));
@@ -2361,6 +2383,7 @@ export default function App() {
           setKind("meal"); setStep("in");
         };
         setPhotoAsk(null);
+        if (x?.replace) { land("new"); setTab("journey"); log("meal_photo", { foods: items.length, again: true }); return true; }
         askPlate({ kind: "photo", what: `The photo read ${items.length} ${items.length === 1 ? "food" : "foods"}: ${items.map((i) => `${i.food.name.split(",")[0].toLowerCase()} ~${Math.round(i.grams)} g`).join(", ")}.`, image: thumb, apply: land });
         setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
         log("meal_photo", { foods: items.length, unsure: Boolean(read.unsure), who: x?.who ?? "camera" });
@@ -2389,7 +2412,7 @@ export default function App() {
     },
     // the plate eaten now, at the table: whole, or half with the other half kept on Today
     // DT133 (0.2.113): one portion of a plate of several, the rest kept on Today
-    ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number }) => {
+    ateNow: (meal: Meal, slot: Feedback["slot"] | null, x: { photo?: string | null; half?: boolean; at?: string; portions?: number; stay?: boolean }) => {
       const now = x.at ?? new Date().toISOString();
       const n = x.portions && x.portions >= 2 ? x.portions : x.half ? 2 : 1;
       const part = (m: Meal, k: number): Meal => ({ ...m, id: uid(), items: m.items.map((i) => ({ ...i, grams: Math.round((i.grams * k) / n), est: undefined })), portion: Math.round(((m.portion ?? 0) * k) / n) });
@@ -2399,6 +2422,7 @@ export default function App() {
           ...(n > 1 ? [{ id: uid(), meal: structuredClone({ ...part(meal, n - 1), title: x.portions ? `${meal.title}, the other ${n - 1 === 1 ? "portion" : `${n - 1} portions`}` : `${meal.title}, the other half` }), status: "prepared" as const, taste: "", notes: "", createdAt: now, ...(x.photo ? { photo: x.photo } : {}) } as Feedback] : []),
           ...s.feedback],
         items: [], portion: null, title: "", photo: undefined }));
+      if (x.stay) { notify(`Logged at ${new Date(now).toTimeString().slice(0, 5)}. It's on Today.`); return; }
       setStep("in"); setTab("home");
       notify(x.portions ? `One portion logged. The other ${n - 1 === 1 ? "portion is" : `${n - 1} portions are`} on Today.` : x.half ? "Half logged. The other half is on Today." : x.at ? `Logged at ${new Date(x.at).toTimeString().slice(0, 5)}. It's on Today.` : "Logged. It's on Today.");
     },
@@ -2434,14 +2458,76 @@ export default function App() {
     // DT131: a recipe onto a plate that has foods asks first; Add puts its foods next to yours, without the recipe's link
     openOnPlate: (meal: Meal, opts?: { cook?: boolean }) => {
       const cook = !!opts?.cook;
+      // DT212 v4 (0.3.53, board Stories159): Start cooking never adds to a plate. With foods on the Plate, Chef Mealan asks first:
+      // a plate from earlier, Did you eat it?; a plate of now, save it for later or clear it. Then the recipe on its own plate.
+      if (cook && state.items.length && !state.cook?.inView) {
+        setPlateAsk(null); setCookAsk({ meal }); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey"); return;
+      }
       if (state.items.length && state.fromRecipe !== meal.id && plateRecipeId !== meal.id) {
         const add = asDish(meal);
-        askPlate({ kind: "recipe", what: `${meal.title} from your recipes has ${add.length} ${add.length === 1 ? "food" : "foods"}.`, apply: (how) => (how === "new" ? openOnPlateNow(meal, cook) : setState((s) => ({ ...s, items: [...s.items, ...asDish(meal)], portion: null }))) });
+        askPlate({ kind: "recipe", what: `${meal.title} from your recipes has ${add.length}.`, apply: (how) => (how === "new" ? openOnPlateNow(meal, cook) : setState((s) => ({ ...s, items: [...s.items, ...asDish(meal)], portion: null }))) });
         setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey"); return;
       }
       openOnPlateNow(meal, cook);
     },
     cookNow, clearCookNow: () => setCookNow(false),
+    // DT214 v2 (0.3.53, board Stories162): the cook
+    startCook: (x) => {
+      const old = state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat") ? state.cook.title : null;
+      setState((s) => cooking.startCook(s, x));
+      if (old) notify(`${old} is saved for later, at the top of the Plate.`);
+    },
+    goOnCook: () => {
+      const c = state.cook; if (!c) return;
+      setMenuSection(null); setMenuFrom(null); setTalkOpen(false);
+      // after eating, the cook waits on Today for its last question
+      if (c.stage === "carry" || c.stage === "later") { setTab("home"); return; }
+      setState((s) => cooking.swapIn(s)); setPlateKey((k) => k + 1);
+      setStep(c.ui.step ?? (c.stage === "eat" ? "after" : "made")); setTab("journey");
+    },
+    saveCookForLater: () => { setState((s) => cooking.saveCookForLater(s)); setPlateKey((k) => k + 1); setStep("in"); notify("Saved for later, at the top of the Plate."); },
+    cookEaten: (cardId: string) => {
+      const now = new Date().toISOString();
+      setState((s) => { const c = s.cook; if (!c) return s; const base = c.inView ? cooking.withSnap(s, c.free) : s; return { ...base, cook: { ...c, stage: "carry", cardId, eatenAt: now, inView: false, plate: {}, free: undefined } }; });
+      setPlateKey((k) => k + 1);
+    },
+    cookLater: () => {
+      setState((s) => { const c = s.cook; if (!c) return s; const base = c.inView ? cooking.withSnap(s, c.free) : s; return { ...base, cook: { ...c, stage: "later", eatenAt: new Date().toISOString(), inView: false, plate: {}, free: undefined } }; });
+      setPlateKey((k) => k + 1);
+    },
+    endCook: () => { setState((s) => cooking.closeCook(s)); setPlateKey((k) => k + 1); },
+    setCookSteps: (n: number) => setState((s) => (s.cook && s.cook.steps !== n ? { ...s, cook: { ...s.cook, steps: n } } : s)),
+    // DT212 v4: Save for later, Continue, swipe to remove; Keep working on it
+    savePlate: () => { setPlateAsk(null); setState((s) => cooking.savePlate(s)); setPlateKey((k) => k + 1); notify("Saved for later, at the top of the Plate."); },
+    continueLater: (id: string) => {
+      const it = (state.later ?? []).find((x) => x.id === id); if (!it) return;
+      // a plate on the Plate already waits in its place, so nothing is lost
+      const swap = it.kind === "plate" && state.items.length > 0 && !state.cook?.inView;
+      setState((s) => cooking.continueLater(swap ? cooking.savePlate(s) : s, id));
+      setPlateKey((k) => k + 1);
+      if (it.kind === "cook") setStep(it.cook!.ui.step ?? (it.cook!.stage === "eat" ? "after" : "made")); else setStep("in");
+      if (swap) notify("Your plate is saved for later, at the top of the Plate.");
+    },
+    removeLater: (id: string) => setState((s) => cooking.removeLater(s, id)),
+    keepWorking: () => setState((s) => { const at = cooking.plateSince(s); return at ? { ...s, plateAsked: at.toISOString() } : s; }),
+    cookAsk, answerCookAsk: (how) => {
+      const x = cookAsk; setCookAsk(null);
+      if (!x) return;
+      if (!how) { setLanding({ id: x.meal.id, line: "", quiet: true }); setTab("recipes"); return; }
+      if (how === "save") setState((s) => cooking.savePlate(s));
+      else if (how === "clear") setState((s) => cooking.withSnap(s, cooking.EMPTY_PLATE));
+      // "ate": the plate was logged by Ate it already
+      setPlateKey((k) => k + 1);
+      openOnPlateNow(x.meal, true);
+    },
+    pendingFood, answerPendingFood: (how) => {
+      const f = pendingFood; setPendingFood(null);
+      if (!f) return;
+      if (!state.foods.some((x) => x.id === f.id)) setState((s) => ({ ...s, foods: [f, ...s.foods] }));
+      if (how === "keep") { notify(`${f.name} is in your foods.`); return; }
+      setUseInCook(f); screenProps.goOnCook(); setStep("made");
+    },
+    useInCook, doneUseInCook: () => setUseInCook(null),
     // a name typed on the Plate (Milan, 11 October 2026): the recipe it came from and the slot it is for take it at once
     renamePlate: (title: string) => {
       const t = title.trim(); if (!t) return;
@@ -2595,7 +2681,8 @@ export default function App() {
       if (!f?.carry) log("carry", { how });
       const r = f ? state.meals.find((m) => m.id === f.recipeId) ?? state.meals.find((m) => m.id === f.meal?.id || m.title === f.meal?.title) : null;
       const sig = r ? recipeSig(r) : undefined;
-      setState((s) => ({ ...s, feedback: s.feedback.map((x) => (x.id === id ? { ...x, carry: { how, at: new Date().toISOString(), ...(moment ? { moment } : {}), ...(sig ? { sig } : {}) } } : x)) }));
+      // DT214 v2 (0.3.53): the answer closes the cook: the strip goes, the card keeps it all
+      setState((s) => ({ ...s, ...(s.cook?.cardId === id ? { cook: undefined } : {}), feedback: s.feedback.map((x) => (x.id === id ? { ...x, carry: { how, at: new Date().toISOString(), ...(moment ? { moment } : {}), ...(sig ? { sig } : {}) } } : x)) }));
     },
     shareCard: (id: string, reason: "look" | "ok" | "help") => {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, shared: { reason, at: new Date().toISOString() } } : f)) }));
@@ -2846,8 +2933,8 @@ export default function App() {
         {/* Chef Mealan opens over a menu page too, and closing it comes back to the page (0.2.7+r2: the button vanished there) */}
         {menuSection && <div style={{ display: talkOpen ? "none" : "contents" }}><MenuScreen {...screenProps} section={menuSection} from={menuFrom} setSection={(s, up) => { setMenuFrom(null); setMenuSection(s, up); }} under={menuTrail.length > 1 ? menuTrail[menuTrail.length - 2] : null} close={() => { setMenuFrom(null); setMenuSection(null); }} /></div>}
         {!menuSection && !talkOpen && !clientsView && tab === "home" && <HomeScreen {...screenProps} />}
-        {!menuSection && !talkOpen && tab === "journey" && <JourneyScreen {...screenProps} />}
-        {!menuSection && !talkOpen && tab === "explorer" && <div className="explorer-tab"><ExplorerScreen {...screenProps} /></div>}
+        {!menuSection && !talkOpen && tab === "journey" && <JourneyScreen key={plateKey} {...screenProps} />}
+        {!menuSection && !talkOpen && tab === "explorer" && <div className="explorer-tab"><CookStrip p={screenProps} /><ExplorerScreen {...screenProps} /></div>}
         {talkOpen && <div className="talk-overlay"><OutScreen {...screenProps} tab={tab} ask={talkAsk} clearAsk={() => setTalkAsk(null)} turns={talkTurns} setTurns={(f) => setTalkTurns(f)} close={() => setTalkOpen(false)} toPlate={() => { setTalkOpen(false); setMenuSection(null); setStep("in"); setTab("journey"); }} /></div>}
         {!talkOpen && (
           <button className="chat-fab" aria-label="Chef Mealan" onClick={() => {

@@ -1,4 +1,5 @@
-import { StepPicSlot, StepPicSheet, StepPlayer } from "./StepPics";
+import { StepPicShown, StepPicSheet, StepPlayer } from "./StepPics";
+import { YourCooks, cookPhotosFor } from "./YourCooks";
 import { stepPicOf, setStepPic, alignStepPics, allStepPics } from "../photos";
 import { ThinkingCard } from "./ThinkingCard";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -217,9 +218,9 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {top}
       {/* R8: the photos first */}
       {drawn
-        ? <figure className="rq-hero"><img src={list[0]} alt={`Picture of ${meal.title} by ${CHEF_NAME}`} /><span className="rq-drawn">Picture by {CHEF_NAME}</span></figure>
+        ? <figure className="rq-hero"><img src={list[0]} alt={`Picture of ${meal.title} by ${CHEF_NAME}`} /><span className="rq-drawn">Drawn by {CHEF_NAME}</span></figure>
         : list.length > 0
-        ? <figure className="rq-hero"><img src={list[sel]} alt={sel === 0 ? `The cover of ${meal.title}` : `Photo ${sel + 1} of ${meal.title}`} />{sel === 0 && <span className="rph-cover">Cover</span>}{isDrawnPhoto(meal, list[sel]) && <span className="rq-drawn">Picture by {CHEF_NAME}</span>}</figure>
+        ? <figure className="rq-hero"><img src={list[sel]} alt={sel === 0 ? `The cover of ${meal.title}` : `Photo ${sel + 1} of ${meal.title}`} />{sel === 0 && <span className="rph-cover">Cover</span>}{isDrawnPhoto(meal, list[sel]) && <span className="rq-drawn">Drawn by {CHEF_NAME}</span>}</figure>
         : <button className="rq-hero rq-hero-empty" onClick={() => fileRef.current?.click()}><Camera size={26} /><span>Add a photo</span></button>}
       {drawn && (<>
         <small className="muted rq-hint">{CHEF_NAME} drew it from your foods and amounts when you kept the dish, so you find it at a glance. Your own photo replaces it.</small>
@@ -246,13 +247,13 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {picture && list.length === 0 && !drawn && (() => {
         const c = picture.count, out = c ? c.used >= c.limit : false;
         return (
-          <section className="card rq-nopic" aria-label="No picture yet">
-            <b>No picture yet.</b>
+          <section className="card rq-nopic" aria-label="No photo yet">
+            <b>No photo yet.</b>
             <div className="button-row">
-              <button className="pill pill-small" disabled={out || picture.drawing} onClick={picture.draw}>{picture.drawing ? `${CHEF_NAME} is drawing…` : "Draw a picture"}</button>
+              <button className="pill pill-small" disabled={out || picture.drawing} onClick={picture.draw}>{picture.drawing ? `${CHEF_NAME} is drawing…` : `Let ${CHEF_NAME} draw one`}</button>
               <button className={`pill pill-small ${out ? "pill-primary" : ""}`} disabled={busy} onClick={() => fileRef.current?.click()}>Add my photo</button>
             </div>
-            <small className="muted">{c ? `${CHEF_NAME}'s pictures today: ${c.used} of ${c.limit}. ${out ? "Draw one tomorrow, or add your own photo now." : "Your own photo is always better."}` : "Your own photo is always better."}</small>
+            <small className="muted">{c ? `${CHEF_NAME}'s drawings today: ${c.used} of ${c.limit}. ${out ? "Draw one tomorrow, or add your own photo now." : "Your own photo is always better."}` : "Your own photo is always better."}</small>
           </section>
         );
       })()}
@@ -391,6 +392,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       )}
       {!edit && <NutritionCard tableOnly items={items} serves={serves} one={oneWord} all={meal.makes?.unit ?? "portions"} stated={meal.stated ?? null} pdRef={pdRef ?? null} fitPd={fitPd} />}
       {!edit && <CarryBlock meal={meal} cards={cards} />}
+      {/* DT214 v2 (0.3.53, board Stories162): a recipe collects its cooks */}
+      {!edit && <YourCooks meal={meal} cards={cards} />}
       <section className={`card rq-steps ${edit ? "editing" : ""}`}>
         <b>Steps</b>
         {edit
@@ -413,9 +416,9 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
               {stale && draft && <div className="button-row"><button className="pill pill-small pill-primary" disabled={drafting === "working"} onClick={askDraft}>Write them again</button></div>}
               {meal.stepMarks && <small className="muted">{meal.stepsKitchen || `${CHEF_NAME}'s steps, from the original, for your amounts and your kitchen. Each says how it relates to the original.`}</small>}
               <ol className="rp-steps">{own.map((x, k) => [partHead(meal.stepParts, k), <li key={k}><span>{k + 1}</span><div className="rp-step-text">{stepParts(tempsIn(x), meal.items).map((p, j) => ("text" in p ? p.text : <b key={j} className={`st-amt${p.gone ? " gone" : ""}`}>{p.label}</b>))}<Mark m={meal.stepMarks?.[k]} /></div>
-                {/* DT175a (0.3.18): a picture per step, Beta */}
-                <StepPicSlot pic={stepPicOf(meal, x)} k={k} onOpen={() => setPicAt(k)} /></li>])}</ol>
-              <small className="muted">Pictures for the steps, Beta: tap + Picture to add one, or a picture to change it.</small>
+                {/* DT211 v8 (0.3.53): the step's photo comes from cooking; no + slot here, a tap changes or removes it */}
+                <StepPicShown pic={stepPicOf(meal, x)} k={k} onOpen={() => setPicAt(k)} /></li>])}</ol>
+              <small className="muted">Photos for the steps come from cooking: + Photo on a step in Make. Tap a photo to change or remove it.</small>
             </>);
             if (own.length && orig.length) return (<>
               <div className="segments rq-steps-seg" role="tablist" aria-label="Which steps">
@@ -446,6 +449,13 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
               <div className="button-row"><button className="pill pill-small" disabled={drafting === "working"} onClick={askDraft}>Draft the steps with {CHEF_NAME}</button><button className="pill pill-small" onClick={startEdit}>Write my own</button></div>
             </>) : <small className="muted">No steps yet. Edit recipe adds them.</small>;
           })()}
+        {/* DT211 v8 (0.3.53, board Stories158): one Start cooking, at the end of the Steps block, after you have read them; grey,
+            with why, while there are no steps */}
+        {!edit && !drafted && !makeAs && onCookIt && (() => { const n = meal.steps?.length ?? 0; return (
+          <div className="rq-start">
+            <button className={`pill pill-wide${n ? " pill-primary" : ""}`} disabled={!n} onClick={() => onCookIt()}>Start cooking</button>
+            <small className="muted">{n ? `${n} ${n === 1 ? "step" : "steps"}, read aloud. Say next, back or repeat. A second phone can show them.` : `Start cooking reads the steps aloud, one at a time. It opens once the steps are here: drafted by ${CHEF_NAME} or written by you.`}</small>
+          </div>); })()}
       </section>
       {edit ? (
         <>
@@ -459,9 +469,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           {/* R10: two intentions, two buttons */}
           {/* DT174 (0.3.16, board Stories121; Milan 30 October 16:21 to 16:31): the recipe is for reading and deciding, the Plate
               is the editor. Two doors into the Plate's Make step: as written, or through the Plate's changes first */}
+          {/* DT211 v8 (0.3.53): Cook it as written gave way to Start cooking, in the Steps block */}
           {!makeAs && onCookIt ? (<>
-            <button className="pill pill-wide pill-primary" onClick={() => onCookIt()}>Cook it as written</button>
-            <small className="muted rq-under">Straight to Make, with the recipe as it is: the steps, Start cooking, then how it went.</small>
             <button className="pill pill-wide" onClick={() => onMakeIt()}>Change it first</button>
             <small className="muted rq-under">On the Plate: change foods, or Fit to my target sets today's amounts. Then Make. The recipe stays as it is.</small>
           </>) : (<>
@@ -492,7 +501,7 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
           {onDelete}
         </>
       )}
-      {picAt !== null && meal.steps?.[picAt] !== undefined && <StepPicSheet k={picAt} step={meal.steps[picAt]} items={meal.items} pic={stepPicOf(meal, meal.steps[picAt])}
+      {picAt !== null && meal.steps?.[picAt] !== undefined && <StepPicSheet k={picAt} step={meal.steps[picAt]} items={meal.items} pic={stepPicOf(meal, meal.steps[picAt])} fromCooks={cookPhotosFor(meal, cards, picAt)}
         onKeep={(pic) => { onPatch(setStepPic(meal, picAt, pic)); setPicAt(null); }} onRemove={() => { onPatch(setStepPic(meal, picAt, null)); setPicAt(null); }} onClose={() => setPicAt(null)} />}
       {watching && meal.steps && allStepPics(meal, meal.steps) && <StepPlayer title={meal.title} steps={meal.steps} items={meal.items} pics={meal.steps.map((t) => stepPicOf(meal, t)!)} onClose={() => setWatching(false)} onCook={onCookIt ? () => { setWatching(false); onCookIt(); } : null} />}
     </div>
