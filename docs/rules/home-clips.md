@@ -40,7 +40,8 @@ action; on every scroll the page moved with the finger; a tap whose point is cov
 in the set are the same.
 
 HC11. The app as it is (Coach Milan, 1 November 11:40: Explorer must show in every new design, so it is never lost in a build).
-Wherever a clip shows the app's bar, the bar has all five tabs, Explorer among them: Today, Plan, Plate, Recipes, Explorer. Clips
+Wherever a clip shows the app's bar, the bar has all five tabs, Explorer among them: Today, Plan, Plate, Recipes, Explorer; a
+coach's bar has six, Clients the sixth (DT210, 0.3.50). Clips
 are recorded again whenever the bar changes. Check: at the end of each clip, the bar's tabs are read; a bar without Explorer stops
 the run.
 

@@ -218,10 +218,11 @@ export function BuiltScreen() {
       </div>
       <div className="bt-actions">
         <a className="bt-btn" href="/#try">Try it: the calculator on the home page</a>
-        <button type="button" className="bt-btn bt-btn-line" aria-expanded={video} onClick={() => setVideo((v) => !v)}>{video ? "Close the video" : "See it work, 90 seconds"}</button>
+        <button type="button" className="bt-btn bt-btn-line" aria-expanded={video} onClick={() => setVideo((v) => !v)}>{video ? "Close the video" : "See it work"}</button>
       </div>
-      {/* R23 (0.2.51, board RS22): the app at work, the same minute and a half as on the home page */}
-      {video && <div className="l-moments bt-video"><DayVideo src="/landing/day-all.mp4" poster="/landing/day-all.webp" big label="All five, a minute and a half: Today, Plan, a craving, a recipe from a link, and how a meal carried you" /></div>}
+      {/* BP1 v5 rows 7 and 8 (0.3.52): seven home page clips recorded again on the app as it is, joined by
+          scripts/record-built-video.cjs: the Plate, Recipes, Cook mode, a coach's clients, Explorer, Scan a label, Photo of my meal */}
+      {video && <div className="l-moments bt-video"><DayVideo src="/built/see-it-work.mp4" poster="/built/see-it-work.webp" big label="The app at work: the Plate, recipes, cook mode, a coach's clients, Explorer, a label scanned and a photo of a meal" /></div>}
 
       <h2>The system</h2>
       <p className="bt-sub">What runs where. The phone does the arithmetic and keeps the data; the server holds the rules and the key; the model reads and talks; a human checks.</p>
