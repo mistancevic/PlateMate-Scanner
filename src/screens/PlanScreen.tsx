@@ -1,4 +1,3 @@
-import { CookStrip } from "../components/CookStrip";
 import { shelfName } from "../reference";
 import { atMeal } from "../plateMode";
 import { plannedName } from "../recipeDiff";
@@ -139,8 +138,7 @@ export function PlanScreen(p: AppApi) {
           return <button key={ymd(d)} type="button" role="tab" className={`choice ${on ? "on" : ""} ${n ? "has" : ""} ${isT ? "is-today" : ""}`} aria-selected={on} onClick={() => setPicked(ymd(d))}>{isT ? "Today" : DAYS[(d.getDay() + 6) % 7]} {d.getDate()}</button>;
         })}
       </div>
-      {/* DT214 v2 (0.3.53): while a cook runs, the strip under the week and its days */}
-      <CookStrip p={p} />
+      {/* 0.3.59 (Coach Milan 2 November 19:00): no cook strip on Plan; it stays on Today and the Plate */}
       <TripCard p={p} />
       {isPast ? <PastDay p={p} date={date} dayKey={key} line={line} slots={slots} numbers={numbers} /> : (<>
       {/* SL2 (Milan 16:03): the day's head and the day as planned are one card at the top: the date, the kind of day and the
