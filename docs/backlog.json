@@ -339,9 +339,10 @@
       "id": "DT225",
       "title": "Every time you ate it, on the recipe: when, how much, taste, carried you, your words",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": 166,
-      "why": "Milan 19:15: log each time a recipe was eaten on its page, only for him. 19:26 yes to draw 1 and 2. 20:02: the log under the buttons (v2). Waits for his Go."
+      "why": "Milan 19:15: log each time a recipe was eaten on its page, only for him. 19:26 yes to draw 1 and 2. 20:02: the log under the buttons (v2). Go at 20:34.",
+      "version": "0.3.61"
     },
     {
       "id": "DT226",
@@ -354,9 +355,18 @@
       "id": "DT227",
       "title": "Saved for later: Remove in sight, only on the Plate's start, the recipe points to its draft",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": 167,
-      "why": "Milan 19:45: a draft on the Plate with only Continue; no remove. 20:02: draw it. Waits for his Go."
+      "why": "Milan 19:45: a draft on the Plate with only Continue; no remove. 20:02: draw it. Go at 20:34.",
+      "version": "0.3.61"
+    },
+    {
+      "id": "LD1",
+      "title": "The app opens once the account is read; the phone's newer copy saves in the background; the slow screen says which step",
+      "epic": "cook",
+      "state": "done",
+      "version": "0.3.61",
+      "why": "Milan 20:24: the slow opening after almost every deploy. Go at 20:34."
     }
   ]
 }

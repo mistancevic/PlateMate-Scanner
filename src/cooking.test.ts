@@ -87,3 +87,20 @@ test("DT212: a plate from an earlier meal; Keep working on it is not asked again
   assert.equal(c.plateOldOf({ ...s, plateAt: new Date("2026-11-02T00:22:00").toISOString() }, now), false);
   assert.equal(c.agoWords(new Date("2026-11-02T00:22:00"), now), "20 minutes ago");
 });
+
+// DT225 v2 (0.3.61): a row of every time you ate it
+import { eatRow } from "./components/YourCooks";
+test("DT225: the row says when and how, how much in the recipe's words, the taste, how it carried you, your words", () => {
+  const sarma: any = { id: "s", title: "Sarma", items: [it("m", "Beef mince", 600), it("r", "Rice", 200), it("c", "Cabbage", 400)], portion: 1200, savedAt: "", makes: { n: 12, unit: "sarmas" } };
+  const card: any = { id: "f", meal: { ...sarma, items: [it("m", "Beef mince", 200), it("r", "Rice", 67), it("c", "Cabbage", 133)] }, status: "eaten", taste: "DaaM good", notes: "I felt so energized. ", createdAt: new Date("2026-11-02T12:40:00").toISOString(), carry: { how: "light", at: "" }, prep: { went: "as" } };
+  const r = eatRow(sarma, card, new Date("2026-11-02T20:00:00"));
+  assert.equal(r.when, "Today, 12:40 · cooked");
+  assert.equal(r.amount, "4 sarmas");
+  assert.equal(r.carry, "light and awake");
+  assert.equal(r.words, "I felt so energized.");
+  const bowl: any = { id: "b", title: "Bowl", items: [it("a", "Oats", 300), it("b", "Skyr", 240)], portion: 540, savedAt: "" };
+  const half: any = { id: "g", meal: { ...bowl, title: "Bowl, the other half", items: [it("a", "Oats", 150), it("b", "Skyr", 120)] }, status: "eaten", taste: "Good", notes: "", createdAt: new Date("2026-10-29T08:10:00").toISOString() };
+  const h = eatRow(bowl, half, new Date("2026-11-02T20:00:00"));
+  assert.equal(h.amount, "Half a portion, 270 g");
+  assert.match(h.when, /^Thursday,? 29 October, 08:10 · the rest of a batch$/);
+});

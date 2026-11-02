@@ -56,9 +56,18 @@ import { foodNames, originalFoodsOf, diffFoods } from "../stepsState";
 import { useRecipeIn, RecipeInFlow, StartWays, mealFromRead } from "../components/RecipeInBlock";
 import { log } from "../log";
 import type { InFlow } from "../components/RecipeIn";
+import { whenWords, stepsTicked } from "../cooking";
 
 export function RecipesScreen(p: AppApi) {
   const { state, setState, setTab } = p;
+  // DT227 (0.3.61, board Stories167): a draft of this recipe saved for later on the Plate; Continue opens it there
+  const savedOf = (id: string) => {
+    const x = (state.later ?? []).find((l) => (l.kind === "cook" ? l.cook?.recipeId === id : l.plate?.fromRecipe === id));
+    if (!x) return null;
+    const at = new Date(x.kind === "cook" ? x.cook!.startedAt : x.plate?.plateAt ?? x.at), n = x.kind === "cook" ? x.cook!.steps ?? 0 : 0;
+    const sub = x.kind === "cook" ? `Cooking, ${whenWords(at)}${n ? ` · ${stepsTicked(x.cook!)} of ${n} steps ticked` : ""}` : `A plate, ${whenWords(at)}`;
+    return { sub, go: () => { p.continueLater(x.id); setTab("journey"); } };
+  };
   // R6 (0.2.43, Milan 19:45 to 19:58, board RS14): add a recipe here, the same block as the Plate; it saves to My recipes
   const recipeIn = useRecipeIn({ kitchens: p.personal.kitchens ?? [], region: p.region, onError: (m) => p.notify(m), pdRef: p.pdRef, fitPd: p.fitPd });
   async function saveRead(f: Extract<InFlow, { kind: "read" }>) {
@@ -286,7 +295,7 @@ export function RecipesScreen(p: AppApi) {
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
-      <RecipePage key={opened.id} meal={opened} plannedLine={batchLine(opened, p.planned)} plannedCount={plannedCountOf(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
+      <RecipePage key={opened.id} meal={opened} saved={savedOf(opened.id)} plannedLine={batchLine(opened, p.planned)} plannedCount={plannedCountOf(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
         pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
         landing={landed && landed.id === opened.id ? (() => {

@@ -115,6 +115,9 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     const lines = await page.locator(".chef-line").allTextContents();
     ok(lines.some((x) => /Enjoy it\. How much did you eat\?/.test(x)) && lines.some((x) => /And how did it taste\?/.test(x)), "Chef Mealan asks how much, then how it tasted");
     await page.getByRole("button", { name: "DaaM good" }).click();
+    // DT225 v2 (0.3.61, board Stories166): Chef Mealan asks for your words; they go on the recipe, only for you
+    ok(lines.length >= 2 && (await page.locator(".eat-words .chef-line").textContent()).includes("Anything you want to remember about it?") && /Kept on the recipe, only for you\. Your coach sees it when you share the meal\./.test(await page.locator(".eat-words").textContent()), "DT225: Eat asks for your words, kept on the recipe, only for you");
+    await page.getByLabel("Anything you want to remember about it?").fill("I felt so energized.");
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(1000);
     st = await store(page);
     ok(st.cook && st.cook.stage === "carry" && st.cook.cardId === st.feedback[0].id && st.feedback[0].photoSteps?.[0] === 1, "eaten: the cook waits for the last question; the card keeps the step's photo with its step");
@@ -138,6 +141,10 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     ok(!st.cook && st.feedback[0].carry?.how === "light" && await page.locator(".cook-strip").count() === 0, "answered: the strip goes, the card keeps it all");
     await toRecipe(page);
     ok(/Your cooks/.test(await main()) && /As the steps say: 1 of 1/.test(await page.locator(".rq-cooks").textContent()), "the recipe collects its cooks");
+    // DT225 v2: every time you ate it, at the end of the recipe, under its buttons
+    const log = page.locator(".rq-eats"), logText = (await log.textContent()).replace(/\s+/g, " ");
+    const editY = (await page.getByRole("button", { name: "Edit recipe" }).boundingBox()).y, logY = (await log.boundingBox()).y;
+    ok(/Every time you ate it/.test(logText) && /Only you see this\./.test(logText) && /Today, 12:\d\d · cooked/.test(logText) && /DaaM good/.test(logText) && /carried you: light and awake/.test(logText) && /“I felt so energized\.”/.test(logText) && logY > editY, "DT225: the row of this meal, under Edit recipe: " + logText.slice(0, 200));
     await ctx.close();
     // ---- 8. a plate from yesterday asks, alone; Save for later; Continue ----
     const PLATE = { items: [{ id: "a", food: items[0].food, grams: 170, locked: false }, { id: "b", food: peas, grams: 150, locked: false }, { id: "c", food: items[1].food, grams: 80, locked: false }], title: "", plateAt: "2026-11-01T13:11:00" };
@@ -149,6 +156,12 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     await page.getByRole("button", { name: "Save for later" }).click(); await page.waitForTimeout(700);
     ok(/Saved for later/.test(await page.locator(".later-card").textContent()) && /yesterday, 13:11 · 3 foods/.test(await page.locator(".later-card").textContent()), "it waits at the top of the Plate, with Continue");
     ok(await page.locator(".plate-card").count() === 1 && (await store(page)).items.length === 0, "the Plate is free");
+    // DT227 (0.3.61, board Stories167): Remove in sight, with one more tap
+    ok(/Continue puts it back on the Plate\. It stays 7 days\./.test(await page.locator(".later-card").textContent()) && await page.locator(".later-card .lr-x").count() === 1, "DT227: a ✕ on the row; the hint about swiping is gone");
+    await page.locator(".later-card .lr-x").click(); await page.waitForTimeout(200);
+    ok(await page.getByRole("button", { name: "Tap again to remove" }).count() === 1 && await page.getByRole("button", { name: "Keep" }).count() === 1, "DT227: ✕ asks once more: Tap again to remove, or Keep");
+    await page.getByRole("button", { name: "Keep" }).click(); await page.waitForTimeout(200);
+    ok(await page.getByRole("button", { name: "Continue" }).count() === 1 && ((await store(page)).later ?? []).length === 1, "DT227: Keep keeps it");
     await page.getByRole("button", { name: "Continue" }).click(); await page.waitForTimeout(700);
     st = await store(page);
     ok(st.items.length === 3 && !(st.later ?? []).length, "Continue puts it back");
@@ -164,6 +177,17 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     await page.getByRole("button", { name: "Save my plate for later" }).click(); await page.waitForTimeout(1200);
     st = await store(page);
     ok(st.cook && st.cook.inView && st.items.length === 4 && st.later?.length === 1 && await page.locator(".cook-mode").count() === 1, "the recipe on its own plate, cooking; your plate waits for later");
+    await page.locator(".cook-mode button").filter({ hasText: "Close" }).first().click(); await page.waitForTimeout(300);
+    await page.getByRole("button", { name: /Back to the plate|‹/ }).first().click().catch(() => {}); await page.waitForTimeout(500);
+    ok(await page.locator(".later-card").count() === 0, "DT227: Saved for later stays off a Plate that is being worked on");
+    await ctx.close();
+    // ---- DT227: a recipe with a draft on the Plate points to it ----
+    ({ ctx, page } = await open({ later: [{ id: "l-1", at: "2026-11-02T11:20:00", kind: "cook", cook: { id: "c-1", startedAt: "2026-11-02T11:00:00", title: "Chicken rice bowl", recipeId: "m-bowl", stage: "make", plate: { items, title: "Chicken rice bowl", fromRecipe: "m-bowl" }, ui: { ticks: ["s0"] }, steps: 4 } }] }));
+    await toRecipe(page);
+    ok(/Saved for later on the Plate/.test(await page.locator(".rq-saved").textContent()) && /Cooking, today, 11:00 · 1 of 4 steps ticked/.test(await page.locator(".rq-saved").textContent()), "DT227: the recipe says its draft waits on the Plate");
+    await page.locator(".rq-saved").getByRole("button", { name: "Continue ›" }).click(); await page.waitForTimeout(900);
+    st = await store(page);
+    ok(st.cook?.recipeId === "m-bowl" && !(st.later ?? []).length, "DT227: Continue opens the draft on the Plate");
     await ctx.close();
     // ---- 10. the plate's question at 360 px: the buttons inside, one under the other ----
     ({ ctx, page } = await open({ ...PLATE, plateAt: "2026-11-02T11:40:00" }));
