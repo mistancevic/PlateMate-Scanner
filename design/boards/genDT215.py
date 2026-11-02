@@ -108,16 +108,19 @@ c = storyCard(B, y, "DT215", "Voice settings", [
   ("Coach Milan, 2 November", "Can we have different voices? Any other setting for the voice? Draw it now, between DT214 and DT216."),
   ("Now", "Cook mode asks once: Cook hands free? Turn voice on, or Buttons only. Then Voice off in the listening card. The phone picks its own voice and speed; next, back and stop always cut in."),
   ("Version 2, 23:22", "Not on Me: Me is who you are. Voice is how the app works, so it goes in Settings."),
-  ("New: Settings in the Menu", "A Settings row in the Menu, under Foods: How the app works for you: Voice while cooking. Settings is for this phone and how the app behaves; more can join it later (units, language)."),
-  ("New: Voice while cooking, in Settings", "Read aloud: On or Off. Voice: the voices on this phone, English first, each with ▶ Sample that reads one step; Show all for the rest. Speed: Slower, Normal, Faster. Cut in: Next, back and stop cut in while I read, on or off (off: the sentence is finished first). Chef Mealan's own voice: later (VO1)."),
-  ("New: in cook mode", "Voice › next to Voice off opens Settings at Voice while cooking; cooking waits where it was."),
+  ("Version 3, 23:32", "Subpages, so other settings get their own place; the ones not built yet show, marked Coming soon."),
+  ("New: Settings in the Menu", "A Settings row under Foods: Voice while cooking · Language and Units coming soon. It opens Settings, a list of rows like Me: Voice while cooking, its line saying what is set; Language (English; Serbian and German are coming) and Units (grams and millilitres; ounces and cups are coming), each marked Coming soon, not tappable yet."),
+  ("New: the Voice while cooking page", "Read aloud: On or Off. Voice: the voices on this phone, English first, each with ▶ Sample that reads one step; Show all for the rest. Speed: Slower, Normal, Faster. Cut in: Next, back and stop cut in while I read, on or off (off: the sentence is finished first). Chef Mealan's own voice: later (VO1)."),
+  ("New: in cook mode", "Voice › next to Voice off opens Voice while cooking straight away; Back returns to cooking."),
   ("Cost", "None: the phone's own voices, nothing leaves the phone. The voices differ by phone: an iPhone has Daniel and Serena, an Android phone Google's."),
 ])
 h1 = B.screen("DT215a", 0, y, "Now: the Menu", "r215e", "now", "No place for how the app works.")
 h2 = B.screen("DT215b", 1, y, "New: Settings", "r215f", "changed", "Under Foods: how the app works for you.")
-h3 = B.screen("DT215c", 2, y, "New: Voice while cooking", "r215c", "changed", "Read aloud, the voice with a sample, speed, cut in.")
-h4 = B.screen("DT215d", 3, y, "New: from cook mode", "r215d", "changed", "Voice › next to Voice off.")
+h3 = B.screen("DT215g", 2, y, "New: Settings, a list", "r215g", "changed", "Voice while cooking; Language and Units, Coming soon.")
+h4 = B.screen("DT215c", 3, y, "New: Voice while cooking", "r215c", "changed", "Read aloud, the voice with a sample, speed, cut in.")
 y = rowEnd(c, h1, h2, h3, h4)
-board("Stories162b.dc.html", "DT215. Voice settings (v2, in Settings)",
-  "2 November 2026 (Coach Milan, proposed in the morning; 22:33 draw it; 23:22 not on Me). Version 2: Settings in the Menu. Drawn for your approval; nothing built. Now: 0.3.63.",
+h1 = B.screen("DT215d", 0, y, "New: from cook mode", "r215d", "changed", "Voice › next to Voice off.")
+y = rowEnd(h1)
+board("Stories162b.dc.html", "DT215. Settings, with Voice while cooking (v3)",
+  "2 November 2026 (Coach Milan, proposed in the morning; 22:33 draw it; 23:22 not on Me; 23:32 subpages). Version 3: Settings as a list of subpages, Language and Units coming soon. Drawn for your approval; nothing built. Now: 0.3.65.",
   B, W, y - 100, "Stories162.dc.html")

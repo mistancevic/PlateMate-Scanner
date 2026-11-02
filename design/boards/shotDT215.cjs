@@ -46,15 +46,25 @@ seed.feedback = [];
   await note(p, "Now (0.3.65): the Menu has Me (your profile), Foods, Support, About. No place for how the app itself behaves.", ".menu-list");
   await shot(p, "r215e");
   await p.evaluate((mark) => { document.querySelector(".bnote")?.remove(); const list = document.querySelector(".menu-list"); const rows = [...list.querySelectorAll(".menu-row")]; const foods = rows.find((r) => /Foods/.test(r.textContent));
-    const row = foods.cloneNode(true); row.style.cssText += ";" + mark; row.querySelector(".menu-icon").textContent = "⚙️"; row.querySelector("b").outerHTML = `<span class="menu-row-text"><b>Settings</b><small>How the app works for you: Voice while cooking</small></span>`; foods.after(row); }, mark);
+    const row = foods.cloneNode(true); row.style.cssText += ";" + mark; row.querySelector(".menu-icon").textContent = "⚙️"; row.querySelector("b").outerHTML = `<span class="menu-row-text"><b>Settings</b><small>Voice while cooking · Language and Units coming soon</small></span>`; foods.after(row); }, mark);
   await note(p, "New: Settings in the Menu, under Foods: how the app works, not who you are. Voice is its first part.", ".menu-list");
   await shot(p, "r215f");
+  // ---- the Settings list: Voice while cooking, and rows coming soon ----
+  await p.evaluate((mark) => {
+    const m = document.querySelector("main"); for (const ch of m.children) ch.style.display = "none";
+    const row = (icon, name, line, soon) => `<button class="menu-row" style="${soon ? "opacity:.6;" : mark}"><span class="menu-icon">${icon}</span><span class="menu-row-text"><b>${name}</b><small>${line}</small></span>${soon ? `<span class="me-todo" style="background:var(--tint);color:var(--muted)">Coming soon</span>` : `<span aria-hidden="true">›</span>`}</button>`;
+    m.insertAdjacentHTML("beforeend", `<div id="settings-list"><div class="step-head"><button class="link back-top" style="min-height:44px">‹ Back to Menu</button><h2 style="margin:4px 0">Settings</h2><p>How the app works for you, on this phone.</p></div>
+      <div class="menu-list me-rows">${row("🔊", "Voice while cooking", "Read aloud · Daniel, English (UK) · normal speed · cut in on", false)}${row("🌐", "Language", "English. Serbian and German are coming.", true)}${row("⚖️", "Units", "Grams and millilitres. Ounces and cups are coming.", true)}</div></div>`);
+    window.scrollTo(0, 0);
+  }, mark);
+  await shot(p, "r215g");
+  await p.evaluate(() => document.querySelector("#settings-list")?.remove());
   // ---- the Voice page ----
   await p.evaluate((mark) => {
     const m = document.querySelector("main");
     const voices = [["Daniel", "English (UK)", true], ["Serena", "English (UK)", false], ["Samantha", "English (US)", false], ["Google UK", "English (UK)", false], ["Google Deutsch", "German", false]];
     const row = ([n, l, on]) => `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)"><button class="choice${on ? " on" : ""}" style="flex:1;min-height:44px;justify-content:flex-start;text-align:left"><b>${n}</b>&nbsp;<small class="muted">${l}</small></button><button class="pill pill-small" style="min-height:44px;min-width:44px">▶ Sample</button></div>`;
-    for (const ch of m.children) ch.style.display = "none"; m.insertAdjacentHTML("beforeend", `<div class="step-head"><button class="link back-top" style="min-height:44px">‹ Back to Menu</button><h2 style="margin:4px 0">Settings</h2><p>How the app works for you, on this phone.</p><p class="label" style="margin-top:14px">Voice while cooking</p><p class="small">How Chef Mealan reads to you while you cook. Your phone's own voices: free, nothing leaves the phone.</p></div>
+    for (const ch of m.children) ch.style.display = "none"; m.insertAdjacentHTML("beforeend", `<div class="step-head"><button class="link back-top" style="min-height:44px">‹ Back to Settings</button><h2 style="margin:4px 0">Voice while cooking</h2><p>How Chef Mealan reads to you while you cook. Your phone's own voices: free, nothing leaves the phone.</p></div>
     <section class="card" style="${mark};padding:14px;margin:10px 0;display:flex;flex-direction:column;gap:8px"><b>Read aloud</b><div class="button-row"><button class="choice on" style="min-height:44px">On</button><button class="choice" style="min-height:44px">Off</button></div><small class="muted" style="font-size:13px">Off: the steps stay on the screen and the buttons steer. Cook mode asks once, as now, if this is not set.</small></section>
     <section class="card" style="${mark};padding:14px;margin:10px 0;display:flex;flex-direction:column;gap:4px"><b>Voice</b><small class="muted" style="font-size:13px">The voices on this phone, English first. ▶ Sample reads one step.</small>${voices.map(row).join("")}<button class="link" style="align-self:flex-start;min-height:44px">Show all 34 voices ›</button></section>
     <section class="card" style="${mark};padding:14px;margin:10px 0;display:flex;flex-direction:column;gap:8px"><b>Speed</b><div class="button-row"><button class="choice" style="min-height:44px">Slower</button><button class="choice on" style="min-height:44px">Normal</button><button class="choice" style="min-height:44px">Faster</button></div></section>
@@ -71,7 +81,7 @@ seed.feedback = [];
   await p.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await p.waitForTimeout(1200);
   await p.evaluate((mark) => { const l = document.querySelector(".cook-listen"); if (!l) return; const off = [...l.querySelectorAll("button")].find((b) => /Voice off/.test(b.textContent));
     (off || l).insertAdjacentHTML("afterend", `<button class="link" style="${mark};min-height:44px;margin-left:8px">Voice ›</button>`); l.scrollIntoView({ block: "center" }); }, mark);
-  await note(p, "New: in cook mode, next to Voice off, Voice › opens Settings at Voice while cooking; cooking waits where it was.", ".cook-mode");
+  await note(p, "New: in cook mode, next to Voice off, Voice › opens Voice while cooking straight away; cooking waits where it was.", ".cook-mode");
   await shot(p, "r215d", false);
   await p.context().close();
   await b.close();
