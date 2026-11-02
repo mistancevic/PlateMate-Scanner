@@ -40,26 +40,26 @@ seed.feedback = [];
 
 
 
-  // ---- Me: now, and with the Voice row ----
-  let p = await fresh({ items: [], title: "" }, "/me");
-  if (!(await p.locator(".me-rows").count())) { await p.locator("header button").last().click(); await p.waitForTimeout(500); await p.getByRole("button", { name: /^Me\b/ }).first().click().catch(() => {}); await p.waitForTimeout(800); }
-  await note(p, "Now (0.3.63): no place for the voice. Cook mode's Voice on or off is the only setting, and only inside cook mode.");
-  await cut(p, "r215a", ".me-rows", 1100);
-  await p.evaluate((mark) => { document.querySelector(".bnote")?.remove(); const rows = document.querySelector(".me-rows"); const first = rows.querySelector(".menu-row");
-    const row = first.cloneNode(true); row.style.cssText += ";" + mark; row.querySelector(".menu-icon").textContent = "🔊"; row.querySelector(".menu-row-text b").textContent = "Voice"; row.querySelector(".menu-row-text small").textContent = "Read aloud · Daniel, English (UK) · normal speed · next, back and stop cut in"; row.querySelector(".me-todo")?.remove(); rows.appendChild(row); }, mark);
-  await note(p, "New: a Voice row on Me, its line says what is set.");
-  await cut(p, "r215b", ".me-rows", 1100);
+  // ---- the Menu: now, and with Settings ----
+  let p = await fresh({ items: [], title: "" }, "/today");
+  await p.locator("header button").last().click(); await p.waitForTimeout(700);
+  await note(p, "Now (0.3.65): the Menu has Me (your profile), Foods, Support, About. No place for how the app itself behaves.", ".menu-list");
+  await shot(p, "r215e");
+  await p.evaluate((mark) => { document.querySelector(".bnote")?.remove(); const list = document.querySelector(".menu-list"); const rows = [...list.querySelectorAll(".menu-row")]; const foods = rows.find((r) => /Foods/.test(r.textContent));
+    const row = foods.cloneNode(true); row.style.cssText += ";" + mark; row.querySelector(".menu-icon").textContent = "⚙️"; row.querySelector("b").outerHTML = `<span class="menu-row-text"><b>Settings</b><small>How the app works for you: Voice while cooking</small></span>`; foods.after(row); }, mark);
+  await note(p, "New: Settings in the Menu, under Foods: how the app works, not who you are. Voice is its first part.", ".menu-list");
+  await shot(p, "r215f");
   // ---- the Voice page ----
   await p.evaluate((mark) => {
     const m = document.querySelector("main");
     const voices = [["Daniel", "English (UK)", true], ["Serena", "English (UK)", false], ["Samantha", "English (US)", false], ["Google UK", "English (UK)", false], ["Google Deutsch", "German", false]];
     const row = ([n, l, on]) => `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)"><button class="choice${on ? " on" : ""}" style="flex:1;min-height:44px;justify-content:flex-start;text-align:left"><b>${n}</b>&nbsp;<small class="muted">${l}</small></button><button class="pill pill-small" style="min-height:44px;min-width:44px">▶ Sample</button></div>`;
-    m.innerHTML = `<div class="step-head"><button class="link back-top" style="min-height:44px">‹ Back to Me</button><h2 style="margin:4px 0">Voice</h2><p>How Chef Mealan reads to you while you cook. Your phone's own voices: free, nothing leaves the phone.</p></div>
+    for (const ch of m.children) ch.style.display = "none"; m.insertAdjacentHTML("beforeend", `<div class="step-head"><button class="link back-top" style="min-height:44px">‹ Back to Menu</button><h2 style="margin:4px 0">Settings</h2><p>How the app works for you, on this phone.</p><p class="label" style="margin-top:14px">Voice while cooking</p><p class="small">How Chef Mealan reads to you while you cook. Your phone's own voices: free, nothing leaves the phone.</p></div>
     <section class="card" style="${mark};padding:14px;margin:10px 0;display:flex;flex-direction:column;gap:8px"><b>Read aloud</b><div class="button-row"><button class="choice on" style="min-height:44px">On</button><button class="choice" style="min-height:44px">Off</button></div><small class="muted" style="font-size:13px">Off: the steps stay on the screen and the buttons steer. Cook mode asks once, as now, if this is not set.</small></section>
     <section class="card" style="${mark};padding:14px;margin:10px 0;display:flex;flex-direction:column;gap:4px"><b>Voice</b><small class="muted" style="font-size:13px">The voices on this phone, English first. ▶ Sample reads one step.</small>${voices.map(row).join("")}<button class="link" style="align-self:flex-start;min-height:44px">Show all 34 voices ›</button></section>
     <section class="card" style="${mark};padding:14px;margin:10px 0;display:flex;flex-direction:column;gap:8px"><b>Speed</b><div class="button-row"><button class="choice" style="min-height:44px">Slower</button><button class="choice on" style="min-height:44px">Normal</button><button class="choice" style="min-height:44px">Faster</button></div></section>
     <section class="card" style="${mark};padding:14px;margin:10px 0;display:flex;flex-direction:column;gap:8px"><b>Cut in</b><label style="display:flex;align-items:center;gap:10px;min-height:44px"><span style="width:44px;height:26px;border-radius:13px;background:#2e7be8;position:relative;display:inline-block"><span style="position:absolute;right:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff"></span></span><span>Next, back and stop cut in while I read</span></label><small class="muted" style="font-size:13px">On: say next and the reading stops and moves on. Off: I finish the sentence first.</small></section>
-    <section class="card" style="padding:14px;margin:10px 0;display:flex;flex-direction:column;gap:4px;opacity:.7"><b>Chef Mealan's own voice</b><small class="muted" style="font-size:13px">Later (VO1): an AI voice that talks both ways. Not yet.</small></section>`;
+    <section class="card" style="padding:14px;margin:10px 0;display:flex;flex-direction:column;gap:4px;opacity:.7"><b>Chef Mealan's own voice</b><small class="muted" style="font-size:13px">Later (VO1): an AI voice that talks both ways. Not yet.</small></section>`);
     window.scrollTo(0, 0);
   }, mark);
   await shot(p, "r215c");
@@ -71,7 +71,7 @@ seed.feedback = [];
   await p.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await p.waitForTimeout(1200);
   await p.evaluate((mark) => { const l = document.querySelector(".cook-listen"); if (!l) return; const off = [...l.querySelectorAll("button")].find((b) => /Voice off/.test(b.textContent));
     (off || l).insertAdjacentHTML("afterend", `<button class="link" style="${mark};min-height:44px;margin-left:8px">Voice ›</button>`); l.scrollIntoView({ block: "center" }); }, mark);
-  await note(p, "New: in cook mode, next to Voice off, Voice › opens the same settings; cooking waits where it was.", ".cook-mode");
+  await note(p, "New: in cook mode, next to Voice off, Voice › opens Settings at Voice while cooking; cooking waits where it was.", ".cook-mode");
   await shot(p, "r215d", false);
   await p.context().close();
   await b.close();
