@@ -123,8 +123,8 @@ const PORT = "3194", B = `http://127.0.0.1:${PORT}`;
     ok(/3 of 6/.test(await cm.locator(".cook-count").textContent()) && await cm.locator(".cook-ask").count() === 0, "it goes on at step 3, and voice is not asked again");
     for (let i = 0; i < 4; i++) { await cm.getByRole("button", { name: /^(Next ›|Done ✓)$/ }).click(); await page.waitForTimeout(200); }
     ok(/Done\. Enjoy your meal\./.test(await cm.textContent()), "the last step's Done: done");
-    await cm.getByRole("button", { name: "Back to Make" }).click(); await page.waitForTimeout(400);
-    ok(await page.locator(".cook-mode").count() === 0 && await page.locator(".mk-check.on").count() === 6, "Back to Make: every step ticked");
+    await cm.getByRole("button", { name: "Make: step photos and notes ›" }).click(); await page.waitForTimeout(400);
+    ok(await page.locator(".cook-mode").count() === 0 && await page.locator(".mk-check.on").count() === 6, "DT222: Make: step photos and notes, a small link: every step ticked");
     ok(await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).count() > 0, "the rest of Make is as before: Cooked. Next: Eat");
     // a recipe that makes 4: as written means the whole pot, so the steps say the whole recipe's amounts
     await page.goto(B + "/"); await page.waitForTimeout(900); await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500); await page.locator(".recipe-tile").filter({ hasText: "Lentil soup" }).click(); await page.waitForTimeout(500);

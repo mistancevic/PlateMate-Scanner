@@ -2809,3 +2809,14 @@ html:has(.l-photo) { overflow-x: hidden; }
 .cook-strip { padding: 0 4px 0 0; }
 .cook-strip .cs-main { flex: 1; display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 6px 4px 6px 12px; background: none; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .cook-strip .cs-end { flex: none; width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; border-radius: 12px; font-size: 18px; color: var(--muted); cursor: pointer; }
+/* DT222 (0.3.60): done leads to Eat: the meal's photo, big, then Cooked. Next: Eat; Make is a small link */
+.cook-meal-take { position: relative; min-height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; border-style: dashed; font-size: 18px; cursor: pointer; }
+.cook-meal-take > span { font-size: 30px; } .cook-meal-take small { font-size: 13px; font-weight: 600; color: var(--muted); }
+.cook-meal-take input, .cook-meal-again input, .cook-add-pic input, .cook-pic-again input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
+.cook-meal-shot { display: flex; flex-direction: column; align-items: center; gap: 2px; } .cook-meal-shot img { display: block; width: 100%; max-height: 260px; object-fit: cover; border-radius: 16px; }
+.cook-meal-again, .cook-pic-again { position: relative; display: inline-flex; align-items: center; min-height: 44px; cursor: pointer; }
+.cook-to-eat { min-height: 52px; }
+.cook-done-links { display: flex; justify-content: space-between; gap: 8px; } .cook-done-links .link { min-height: 44px; }
+/* DT223 (0.3.60): add a photo of this step */
+.cook-add-pic { position: relative; align-self: flex-start; min-height: 44px; margin-top: 6px; display: inline-flex; align-items: center; cursor: pointer; }
+.cook-pic-label { display: flex; justify-content: space-between; align-items: center; gap: 8px; }

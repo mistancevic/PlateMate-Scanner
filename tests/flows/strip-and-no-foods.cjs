@@ -1,7 +1,8 @@
 // DT218 and DT219 (0.3.58, board Stories164; Coach Milan 2 November 17:53, Go 18:19). After eating, the strip has a ✕ that ends
 // the cook without the last answer; the meal's card keeps everything. A photo read that finds no foods leaves the Plate as it
 // was, the photo not kept: Chef Mealan says so, with Take it again and Add the foods myself. Empty plate shows whenever the
-// Plate has foods or a photo. The read is a stand-in (no AI here).
+// Plate has foods or a photo. DT224 (0.3.60, board Stories165): an empty Plate starts with What are you craving?, and Craft,
+// Make, Eat appears once it holds a food, a recipe or a photo. The read is a stand-in (no AI here).
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const fs = require("node:fs"), path = require("node:path");
@@ -57,9 +58,16 @@ const cook = { id: "c-1", startedAt: "2026-11-02T11:20:00", title: "Vanilla prot
     await page.locator(".mp-none").getByRole("button", { name: "Add the foods myself" }).click(); await page.waitForTimeout(600);
     ok(await page.locator(".mp-none").count() === 0 && await page.evaluate(() => document.activeElement?.getAttribute("aria-label")) === "Search all my foods", "Add the foods myself: the line goes, the food search is ready");
     await ctx.close();
+    // ---- DT224 (0.3.60, board Stories165): an empty Plate starts with What are you craving?; Craft, Make, Eat once it holds something ----
+    ({ ctx, page } = await open({ ...seed, items: [] }, "/plate"));
+    ok(await page.locator(".phase-bar").count() === 0 && /What are you craving\?/.test(await page.locator("h2").first().textContent()), "DT224: an empty Plate: What are you craving?, no Craft, Make, Eat");
+    await page.getByLabel("Search all my foods").fill("skyr"); await page.waitForTimeout(400);
+    await page.locator(".rows .row-food", { hasText: "Skyr" }).first().getByRole("button", { name: "Add" }).click(); await page.waitForTimeout(600);
+    ok(JSON.stringify(await page.locator(".phase-bar span").allTextContents()) === JSON.stringify(["Craft", "Make", "Eat"]), "DT224: a food on the Plate: Craft, Make, Eat appears");
+    await ctx.close();
     // ---- DT219: Empty plate whenever the Plate has a photo ----
     ({ ctx, page } = await open({ ...seed, items: [], photo: { image: "data:image/jpeg;base64,/9j/4AAQ", at: "2026-11-02T11:50:00" } }, "/plate"));
-    ok(await page.locator(".plate-empty-link").count() === 1, "a photo and no foods: Empty plate is there");
+    ok(await page.locator(".plate-empty-link").count() === 1 && await page.locator(".phase-bar").count() === 1, "a photo and no foods: Empty plate is there; the Plate holds something, so Craft, Make, Eat shows");
     await page.locator(".plate-empty-link").click(); await page.locator(".plate-empty-link").click(); await page.waitForTimeout(500);
     st = await store(page);
     ok(!st.photo && await page.locator(".mp-line").count() === 0, "Empty plate takes the photo away");

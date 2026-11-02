@@ -7,6 +7,11 @@ import { stepParts, stepText } from "../steps";
 import { tempsIn } from "../units";
 import { secondsIn, timerName, parseCommand, howMuch, leftLine, spoken, clock, minutesWords, voiceChoice, setVoiceChoice, isEcho, cutsIn, movesFor, SAY_AGAIN, canSayLine, type VoiceChoice } from "../cook";
 
+// DT222: how many steps and, when the cook's start is known, how long it took
+export function tookLine(n: number, since?: string, now = Date.now()): string {
+  const min = since ? Math.round((now - Date.parse(since)) / 60000) : NaN;
+  return `${n} ${n === 1 ? "step" : "steps"}${Number.isFinite(min) && min >= 1 && min <= 600 ? `, ${min} ${min === 1 ? "minute" : "minutes"}` : ""}.`;
+}
 type Timer = { id: number; name: string; ends: number; total: number; rang: boolean };
 const Speech = () => (typeof window === "undefined" ? null : (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null);
 const canSpeak = () => typeof window !== "undefined" && "speechSynthesis" in window;
@@ -14,7 +19,11 @@ const canSpeak = () => typeof window !== "undefined" && "speechSynthesis" in win
 // DT177 (0.3.20, board Stories125): a second screen in the same session. remoteStep is a step set on the other screen (applied
 // once per rev); onStep tells the other screen; top is the line that says the kitchen screen is on; pair opens it; look is
 // Chef, look on the kitchen screen: one photo with the step.
-export type CookLink = { remoteStep?: { k: number; rev: number } | null; onStep?: (k: number) => void; top?: ReactNode; pair?: ReactNode; look?: ((k: number) => Promise<string>) | null; closeLabel?: string; doneLabel?: string };
+export type CookLink = { remoteStep?: { k: number; rev: number } | null; onStep?: (k: number) => void; top?: ReactNode; pair?: ReactNode; look?: ((k: number) => Promise<string>) | null; closeLabel?: string; doneLabel?: string;
+  // DT222 (0.3.60, board Stories165): done leads to Eat: the meal's photo, then Cooked. Next: Eat; since is when the cook began
+  eat?: () => void; mealPhoto?: { src: string; take: (file: File) => void }; since?: string;
+  // DT223 (0.3.60): a photo of this step while cooking; kept says it goes with the recipe
+  stepPhoto?: { take: (k: number, file: File) => void; kept: boolean } };
 export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = null, pics = [], link = {}, moves }: {
   title: string; steps: string[]; items: Ingredient[]; ticks: Set<number>;
   // DT217 (0.3.56): the moves of each step as Chef Mealan drafted them; a step without them gets them in code (movesFor)
@@ -210,18 +219,34 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
           <section className="cook-card cook-done">
             <div aria-hidden="true">🍽️</div>
             <b>Done. Enjoy your meal.</b>
-            <small>All {steps.length} steps are ticked. The screen goes back to normal now.</small>
+            {link.eat
+              ? <small>{tookLine(steps.length, link.since)} Now a photo of your plate, then eat.</small>
+              : <small>All {steps.length} steps are ticked. The screen goes back to normal now.</small>}
           </section>
-          <button className="pill pill-wide pill-primary" onClick={close}>{link.doneLabel ?? "Back to Make"}</button>
-          <small className="muted cook-under">On Make: add photos to the steps and of the meal, say how the cooking went, then Cooked. Next: Eat.</small>
-          <button className="link" onClick={back}>Back to the last step</button>
+          {link.eat ? (<>
+            {/* DT222 (0.3.60, board Stories165): the next step is the meal's photo, then Eat; Make is a small link */}
+            {link.mealPhoto && (link.mealPhoto.src
+              ? <div className="cook-meal-shot"><img src={link.mealPhoto.src} alt="your meal" />
+                  <label className="link cook-meal-again">Take it again<input type="file" accept="image/*" capture="environment" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) link.mealPhoto!.take(f); }} /></label></div>
+              : <label className="pill pill-wide cook-meal-take"><span aria-hidden="true">📷</span>Photo of your meal<small>It goes on the meal's card and the recipe</small>
+                  <input type="file" accept="image/*" capture="environment" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) link.mealPhoto!.take(f); }} /></label>)}
+            <button className="pill pill-wide pill-primary cook-to-eat" onClick={() => link.eat!()}>Cooked. Next: Eat ›</button>
+            <div className="cook-done-links"><button className="link" onClick={back}>‹ Last step</button><button className="link" onClick={close}>Make: step photos and notes ›</button></div>
+          </>) : (<>
+            <button className="pill pill-wide pill-primary" onClick={close}>{link.doneLabel ?? "Back to Make"}</button>
+            <button className="link" onClick={back}>Back to the last step</button>
+          </>)}
         </>
       ) : (
         <>
           <section className={`cook-card cook-step${pics[k] ? " has-pic" : ""}`} aria-live="polite">
-            {pics[k] && <><img className="cook-pic" src={pics[k]!.src} alt={`Step ${k + 1}`} /><small className="cook-pic-label">{pics[k]!.by === "ai" ? "Picture drawn by AI, Beta" : "Your photo"}</small></>}
+            {pics[k] && <><img className="cook-pic" src={pics[k]!.src} alt={`Step ${k + 1}`} /><small className="cook-pic-label">{pics[k]!.by === "ai" ? "Picture drawn by AI, Beta" : link.stepPhoto?.kept ? "Your photo · kept with the recipe" : "Your photo"}
+              {/* DT223 (0.3.60): your photo of the step can be taken again */}
+              {pics[k]!.by === "me" && link.stepPhoto && <label className="link cook-pic-again">Take it again<input type="file" accept="image/*" capture="environment" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) link.stepPhoto!.take(k, f); }} /></label>}</small></>}
             <small>STEP {k + 1}</small>
             <div className={`cook-text${mvs.length > 1 ? " cook-text-whole" : ""}`}>{stepParts(tempsIn(steps[k]), items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}</div>
+            {/* DT223 (0.3.60, board Stories165): a step without a picture: a small button to add your photo of it */}
+            {!pics[k] && link.stepPhoto && <label className="pill pill-small cook-add-pic">📷 Add a photo of this step<input type="file" accept="image/*" capture="environment" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (f) link.stepPhoto!.take(k, f); }} /></label>}
             {/* DT217 v2: under the whole step, its moves, read aloud one at a time: done ones ticked, this one large */}
             {mvs.length > 1 && (
               <div className="cook-moves" aria-label={`Move ${m + 1} of ${mvs.length}`}>
