@@ -57,6 +57,13 @@ for i, (k, t) in enumerate([("plate", "1. The Plate: PD, the letters, the number
     img, h = poster(f"/home/claude/platemate-scanner/public/landing/way-{k}.webp", 190)
     B.html.append(f'<div style="position:absolute;left:{x + i * 210}px;top:{y}px;width:190px">{chip(chr(0x2192) if False else "New", "#2e7be8")}<div style="margin-top:8px">{img}</div><div style="font-size:12.5px;color:#172742;margin-top:6px;font-weight:700">{t}</div></div>')
 y += h + 120
+# 8 (Coach Milan 09:35 Go; the build stopped here to ask): the five clips are 10 to 12 seconds each, not 18, so 54 seconds
+B.html.append(f'<div style="position:absolute;left:{X0}px;top:{y}px;width:{2*CW+G}px"><div style="background:#172742;color:#fff;border-radius:10px;padding:7px 10px;font-size:14px;font-weight:800"><span style="background:#c0392b;border-radius:6px;padding:1px 6px;margin-right:6px">8</span>Found at Go, 09:35: the five clips make 54 seconds, not 90</div>'
+              f'<div style="font-size:13.5px;line-height:1.5;color:#172742;margin-top:8px;padding:10px 12px;background:#fff8d6;border-radius:8px;outline:3px solid #2e7be8;outline-offset:2px"><b>Your call before anything is built.</b> Row 7 drew about 18 seconds per clip. The clips run 9.9 to 11.9 seconds (the home page rule HC8 keeps a clip between 6 and 12). Five of them make 54 seconds, so the button\'s 90 seconds would be wrong. The coach clip also has to be recorded again with the Clients tab, since the switch it taps is gone.<br><br>'
+              '<b>A.</b> The five clips as they are, 54 seconds. The button reads See it work, one minute.<br>'
+              '<b>B.</b> Seven clips: the five, plus Scan a label and Photo of my meal (the path the page walks through), about 75 seconds. The button reads See it work, 75 seconds.<br>'
+              '<b>C.</b> Build the page now with the video of 24 October and its 90 seconds; the new video comes as its own release after.</div></div>')
+y += 260
 W = X0 + 2 * CW + G + 40
 board("Stories161.dc.html", "BP1 v5. /built: what 0.3.51 changed without approval, for your call",
   "2 November 2026 (Coach Milan 09:15 to 09:23). 0.3.51 is rolled back; /built on production is the 0.3.50 page. Left: approved version 4. Right: built without approval. Nothing is built until you decide.",
