@@ -75,7 +75,7 @@ const PORT = "3195", B = `http://127.0.0.1:${PORT}`;
     ok(/4 of 6/.test(await cm.locator(".cook-count").textContent()), "on step 4");
     // a question without Chef stays on the phone
     await say("I only have 120 g chicken");
-    ok(asked === null && /isn't something I can do yet/.test(await cm.locator(".cook-heard").textContent()) && /Start with Chef/.test(await cm.locator(".cook-heard").textContent()), "said without Chef: nothing sent; the screen says to start with Chef");
+    ok(asked === null && /Sorry, say that again\?/.test(await cm.locator(".cook-heard").textContent()) && /Start with Chef/.test(await cm.locator(".cook-can-say").textContent()), "said without Chef: nothing sent; the screen says to start with Chef (DT221: small, under Sorry, say that again?)");
     // Chef, ... goes to Chef Mealan with the recipe, the step and the amounts cooked
     await say("Chef, I only have 120 g chicken. What do I change?"); await page.waitForTimeout(400);
     ok(asked !== null, "Chef, ...: the question is sent");

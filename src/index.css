@@ -2799,3 +2799,13 @@ html:has(.l-photo) { overflow-x: hidden; }
 .cook-move.done { color: var(--muted); }
 .cook-move.done > span:first-child { color: var(--top); font-weight: 900; }
 .cook-move.on { padding: 8px 10px; margin: 2px -10px; background: var(--tint); border-radius: 10px; color: var(--navy); font-size: 20px; font-weight: 900; }
+/* DT221 (0.3.58): what the cook can say, small and plain under Sorry, say that again? */
+.cook-heard > small.cook-can-say { font-weight: 600; font-size: 13px; letter-spacing: 0; line-height: 1.45; margin-top: 6px; }
+/* DT219 (0.3.58): no foods found on the photo: Chef Mealan's line, Take it again, Add the foods myself */
+.mp-none { display: flex; flex-direction: column; gap: 10px; margin: 0 0 12px; }
+.mp-none-go { display: flex; flex-direction: column; gap: 8px; } .mp-none-go .pill { min-height: 44px; }
+.mp-none small { font-size: 13px; }
+/* DT218 (0.3.58): the strip holds Go on and, after eating, the ✕ that ends the cook */
+.cook-strip { padding: 0 4px 0 0; }
+.cook-strip .cs-main { flex: 1; display: flex; align-items: center; gap: 10px; min-height: 46px; padding: 6px 4px 6px 12px; background: none; border: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.cook-strip .cs-end { flex: none; width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center; background: none; border: 0; border-radius: 12px; font-size: 18px; color: var(--muted); cursor: pointer; }

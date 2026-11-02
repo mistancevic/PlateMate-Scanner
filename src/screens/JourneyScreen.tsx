@@ -747,6 +747,11 @@ export function JourneyScreen(p: AppApi) {
     setState((s) => ({ ...s, items: s.items.map((i) => (ids.has(i.id) ? { ...i, part: to } : i)), emptyParts: (s.emptyParts ?? []).filter((x) => x.part !== to) }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
+  // DT219 (0.3.58): the no-foods line goes once a food lands on the Plate
+  const itemsSeen = useRef(items.length);
+  useEffect(() => { if (items.length > itemsSeen.current && p.photoNoFoods) p.dropNoFoods(); itemsSeen.current = items.length;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items.length]);
   const addToPart = (part: string) => {
     setAddTo(part); notify(`Pick a food below. It goes into ${part}.`);
     const box = document.querySelector<HTMLInputElement>('input[aria-label="Search all my foods"]'); box?.scrollIntoView({ behavior: "smooth", block: "center" }); box?.focus({ preventScroll: true });
@@ -1149,6 +1154,13 @@ export function JourneyScreen(p: AppApi) {
   const bowlKeptOn = (its: Ingredient[]) => cookedFoods(its) && state.meals.some((m) => !!state.title && m.title === state.title && !!m.way && (m.steps?.length ?? 0) > 0);
   const cooksPlate = (its: Ingredient[]) => cookedFoods(its)
     && (!state.meals.some((m) => !!state.title && m.title === state.title && (m.steps?.length ?? 0) > 0) || bowlKeptOn(its));
+  // DT220 (0.3.58, board Stories164; Coach Milan 2 November 17:53): the Plate's white button says where it goes. It opens How to
+  // make it when keepAsIs lands there (the same test as step "make" below); a bowl's ways and a plate with its steps keep their name.
+  const goesToHowToMake = (its: Ingredient[]) => {
+    if (cooksPlate(its) && stepsHold(its)) return false;
+    const pr = rec ?? state.meals.find((m) => (p.filling?.mealId ? m.id === p.filling.mealId : !!state.title && m.title === state.title) && m.items.length > 0);
+    return !!rec || (pr?.steps?.length ?? 0) > 0 || partsOf(its).length > 0 || cooksPlate(its);
+  };
   const plateMealNow = (): Meal => ({ id: "plate", title: state.title && state.title !== "DaaM" ? state.title : autoTitle(items), items, portion: aggregate(items).weight ?? 0, savedAt: new Date().toISOString(), ...(state.cooking?.length ? { cooking: state.cooking } : {}) });
   function startPlateSteps(force = false) {
     if (!cooksPlate(items)) return;
@@ -1413,6 +1425,17 @@ export function JourneyScreen(p: AppApi) {
         {p.photoAsk && <PhotoAsk key={p.photoAsk.at + p.photoAsk.image.length} image={p.photoAsk.image} at={p.photoAsk.at} drop={p.dropPhotoAsk}
           mealAt={(d) => { const s = slotAt(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, ymd(d)), `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`); return s ? s.name.toLowerCase() : null; }}
           read={(x) => { void p.readMealPhoto(p.photoAsk!.image, x); }} />}
+        {/* DT219 (0.3.58, board Stories164): a read that found no foods; the Plate stays as it was */}
+        {p.photoNoFoods && (
+          <section className="mp-none" aria-label="No foods found on the photo">
+            <ChefLine text="I could not find foods on this photo. Take it again, from above with the whole plate in, or add the foods yourself." />
+            <div className="mp-none-go">
+              <button type="button" className="pill pill-primary" onClick={() => { p.dropNoFoods(); p.mealCamera(); }}>Take it again</button>
+              <button type="button" className="pill" onClick={() => { p.dropNoFoods(); const box = document.querySelector<HTMLInputElement>('input[aria-label="Search all my foods"]'); box?.scrollIntoView({ behavior: "smooth", block: "center" }); box?.focus({ preventScroll: true }); }}>Add the foods myself</button>
+            </div>
+            <small className="muted">Your plate stays as it was; the photo is not kept.</small>
+          </section>
+        )}
         {/* DT127 (0.2.108, board Stories75): the photo the plate was read from stays on it; a tap opens it large with the foods over it */}
         {state.photo && (photoBig ? (
           <div className="mp-big">
@@ -1451,7 +1474,7 @@ export function JourneyScreen(p: AppApi) {
             </div>
           );
         })()}
-        <div className="card-top"><span>On the plate</span>{items.length > 0 && <ConfirmButton className="link plate-empty-link" label={<><Trash2 size={14} /> Empty plate</>} confirmLabel="Tap again to empty" onConfirm={emptyPlate} />}</div>
+        <div className="card-top"><span>On the plate</span>{/* DT219 (0.3.58): Empty plate whenever the Plate has foods or a photo */}{(items.length > 0 || !!state.photo) && <ConfirmButton className="link plate-empty-link" label={<><Trash2 size={14} /> Empty plate</>} confirmLabel="Tap again to empty" onConfirm={emptyPlate} />}</div>
         {/* DT176 (0.3.19, board Stories124): Travel mode on: the Plate says where it serves you, and what the kitchen there allows */}
         {p.travel && <small className="travel-plate-note">{placeName(p.travel.place)}, {kitchenName(p.travel.kitchen).toLowerCase()}: {p.travel.kitchen === "hotel" ? "Chef Mealan suggests what you can buy and eat as it is, and what to order." : p.travel.kitchen === "flat" ? "Chef Mealan cooks with a stovetop, a pan and a pot." : "Chef Mealan cooks as at home."} Search finds products sold there.</small>}
         {items.length === 0 && <small className="plate-empty">Nothing on the plate yet.</small>}
@@ -1826,7 +1849,7 @@ export function JourneyScreen(p: AppApi) {
             <ChefHat size={18} className="hat" /> {fit ? "Fit again" : "Fit to my target"}
           </button>
           {/* DT94: Lock the recipe ends Craft; for a slot the plate goes in as it stands, as before */}
-          {items.length > 0 && <button className="pill pill-wide" onClick={keepAsIs}>{p.filling && p.filling.mode !== "eat" ? (fit ? `Put it in ${slotName(p.filling)}` : "Keep it as it is") : "Lock the recipe"}</button>}
+          {items.length > 0 && <button className="pill pill-wide" onClick={keepAsIs}>{p.filling && p.filling.mode !== "eat" ? (fit ? `Put it in ${slotName(p.filling)}` : "Keep it as it is") : goesToHowToMake(items) ? "How to make it ›" : "Lock the recipe"}</button>}
           </>)}
           </>)}
         </div>
@@ -2129,13 +2152,15 @@ export function JourneyScreen(p: AppApi) {
           </section>
         )}
         {/* DT216: the recipe had the bowl steps; Lock the recipe keeps the new ones with it */}
-        {bowlKept && steps.length > 0 && <small className="muted mk-bowl-note">Your recipe had the bowl steps from an earlier save. Lock the recipe keeps these new steps with it.</small>}
+        {bowlKept && steps.length > 0 && <small className="muted mk-bowl-note">Your recipe had the bowl steps from an earlier save. Lock it and cook keeps these new steps with it.</small>}
+        {/* DT220 (0.3.58): what the steps are for, and a button that says what comes next */}
+        {steps.length > 0 && <small className="muted mk-steps-for">Make reads these steps aloud, one at a time, and you tick them as you go. Lock it and cook keeps them with the recipe.</small>}
         {/* DT94: Lock the recipe ends Craft; from here the recipe does not change */}
         <button className="pill pill-primary pill-wide" onClick={() => {
           log("method_chosen", { method: madeWhole ? "whole" : "plate" });
           if (bowlKept && plateRecipe && plateSteps?.steps.length) { const id = plateRecipe.id, st = plateSteps.steps, mv = plateSteps.moves; setState((s0) => ({ ...s0, meals: s0.meals.map((m) => (m.id === id ? { ...m, steps: st, stepsFor: foodNames(m.items), way: undefined, stepMarks: undefined, stepsKitchen: undefined, stepParts: undefined, moves: mv } : m)) })); }
           setStep("made");
-        }}>Lock the recipe</button>
+        }}>Lock it and cook ›</button>
         {madeWhole && leftK > 0 && <small className="muted center" style={{ display: "block", marginTop: 6 }}>To eat the rest on other days, put the recipe on Plan.</small>}
       </>
     );

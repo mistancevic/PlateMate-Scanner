@@ -124,3 +124,14 @@ test("DT216: flour and a raw egg make a plate cooked; ready foods do not", () =>
   for (const n of ["Eggs", "Egg whites", "Wheat flour, white", "Oat flour", "Chicken breast, raw", "Basmati rice, dry"]) assert.equal(cookedFood(n), true, n);
   for (const n of ["Skyr, natural", "Banana", "Quark, low fat (Magerquark)", "Eggs, hard boiled", "Egg pasta", "Oats", "vanilla whey protein powder", "chocolate chips"]) assert.equal(cookedFood(n), false, n);
 });
+
+// DT221 (0.3.58, board Stories164; Coach Milan 17:58): not caught, the phone says one short line; the words stay on screen
+import { canSayLine, SAY_AGAIN } from "./cook";
+test("DT221: Sorry, say that again?; the words you can say name a food of this step", () => {
+  const food = (id: string, name: string) => ({ id, grams: 100, locked: false, food: { id, name } }) as any;
+  const items = [food("r", "Basmati rice, dry"), food("c", "Chicken breast, raw")];
+  assert.equal(SAY_AGAIN, "Sorry, say that again?");
+  assert.equal(canSayLine("Fry [[i:c|chicken]] 6 minutes.", items), "You can say: next, back, repeat, how much chicken, timer 5 minutes, what's left, stop. Start with Chef to ask about the dish.");
+  assert.match(canSayLine("Cook the basmati 12 minutes.", items), /how much basmati,/);
+  assert.match(canSayLine("Serve.", []), /how much and a food,/);
+});

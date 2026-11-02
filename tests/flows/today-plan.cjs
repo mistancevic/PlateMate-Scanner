@@ -27,9 +27,9 @@ seed.items = [];
   const click = async (re) => { await page.getByRole("button", { name: re }).first().click({ timeout: 5000 }); await page.waitForTimeout(400); };
   // through the Plate's steps after Make it as it is: a way when there are several foods, Continue for one, then photos, rating, Save
   const cook = async () => {
-    await click(/^(Keep it as it is|Lock the recipe)$/);
+    await click(/^(Keep it as it is|Lock the recipe|How to make it ›|Lock it and cook ›)$/);
     if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); await click(/I'm making it this way|Lock the recipe, this way/i); }
-    else await click(/^(Continue|Lock the recipe)$/);
+    else await click(/^(Continue|Lock the recipe|How to make it ›|Lock it and cook ›)$/);
     await click(/Cooked\. Next: Eat/);
     await click(/DaaM good/i);
     await click(/^Save$/);

@@ -12,11 +12,16 @@ export function CookStrip({ p }: { p: AppApi }) {
   if (!c || c.inView) return null;
   const w = stripWords(c);
   if (!w) return null;
+  // DT218 (0.3.58, board Stories164; Coach Milan 2 November 17:53): after eating, Go on asks on the meal's card, and a ✕ ends
+  // the cook without the last answer; the card keeps everything else
   return (
-    <button type="button" className="cook-strip" onClick={() => p.goOnCook()} aria-label={`${w.lead}: ${w.rest}. Go on`}>
-      <Mark size={16} color="var(--brand)" />
-      <span className="cs-words"><b>{w.lead}</b> · {w.rest}</span>
-      <b className="cs-go">Go on ›</b>
-    </button>
+    <div className="cook-strip">
+      <button type="button" className="cs-main" onClick={() => p.goOnCook()} aria-label={`${w.lead}: ${w.rest}. Go on`}>
+        <Mark size={16} color="var(--brand)" />
+        <span className="cs-words"><b>{w.lead}</b> · {w.rest}</span>
+        <b className="cs-go">Go on ›</b>
+      </button>
+      {c.stage === "carry" && <button type="button" className="cs-end" aria-label="End the cook" onClick={() => p.endCook()}>✕</button>}
+    </div>
   );
 }

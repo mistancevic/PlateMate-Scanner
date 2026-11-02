@@ -75,7 +75,7 @@ const U = "http://127.0.0.1:3242";
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(700);
     await page.locator(".recipe-tile, .recipe-card").filter({ hasText: "Sarma" }).first().click(); await page.waitForTimeout(900);
     await page.getByRole("button", { name: "Change it first", exact: true }).click(); await page.waitForTimeout(1200);
-    for (let i = 0; i < 3 && !(await page.locator(".step-head .back-top").count()); i++) { const go = page.getByRole("button", { name: /^(Make it as it is|Keep it as it is|Lock the recipe|Fit to my target)$/ }).first(); if (await go.count()) { await go.click(); await page.waitForTimeout(1000); } }
+    for (let i = 0; i < 3 && !(await page.locator(".step-head .back-top").count()); i++) { const go = page.getByRole("button", { name: /^(Make it as it is|Keep it as it is|Lock the recipe|How to make it ›|Lock it and cook ›|Fit to my target)$/ }).first(); if (await go.count()) { await go.click(); await page.waitForTimeout(1000); } }
     const bk = page.locator(".step-head .back-top").first();
     const bt = await bk.boundingBox(), sb = await page.locator(".step-head .phase-bar").first().boundingBox();
     ok(bt && sb && bt.y < sb.y && bt.x < 60 && /^Back to /.test((await bk.textContent()).trim()), "E: Back sits top left, above the step bar: " + (await bk.textContent()).trim());
