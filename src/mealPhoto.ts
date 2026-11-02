@@ -8,7 +8,9 @@ import { referenceFood } from "./reference";
 import { sizeOf, type GateLine } from "./gates";
 
 export type PhotoFood = { name: string; grams: number; low: number; high: number; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber: number | null; confidence: "high" | "medium" | "low" };
-export type PhotoRead = { dish: string; foods: PhotoFood[]; unsure: { name: string; options: [number, number] } | null };
+// DT228 v2 (0.3.63): a food whose kind the read cannot tell, with two to four kinds it could be and Chef Mealan's question
+export type Which = { name: string; question: string; options: { name: string; calories: number; protein: number; fats: number | null; carbs: number | null; fiber: number | null }[] };
+export type PhotoRead = { dish: string; foods: PhotoFood[]; unsure: { name: string; options: [number, number] } | null; which?: Which | null };
 export type Estimate = { low: number; high: number };
 
 // what the server returns, checked: names, numbers, at most eight foods, grams in sense
@@ -24,7 +26,19 @@ export function cleanRead(d: any): PhotoRead | null {
   const u = d.unsure && typeof d.unsure === "object" ? d.unsure : null;
   const a = num(u?.options?.[0], 1), b = num(u?.options?.[1], 1);
   const unsure = u && typeof u.name === "string" && a !== null && b !== null && a !== b && foods.some((f) => f.name.toLowerCase() === String(u.name).toLowerCase()) ? { name: String(u.name).slice(0, 60), options: [Math.min(a, b), Math.max(a, b)] as [number, number] } : null;
-  return { dish: String(d.dish ?? "").trim().slice(0, 60), foods, unsure };
+  return { dish: String(d.dish ?? "").trim().slice(0, 60), foods, unsure, which: whichOf(d.which, foods, num) };
+}
+// DT228 v2: the question about a food's kind, checked: it names a food of the read; two to four kinds, each with its values
+function whichOf(w: any, foods: PhotoFood[], num: (x: unknown, lo?: number, hi?: number) => number | null): Which | null {
+  if (!w || typeof w !== "object" || typeof w.name !== "string") return null;
+  const name = w.name.trim().slice(0, 60);
+  if (!foods.some((f) => f.name.toLowerCase() === name.toLowerCase())) return null;
+  const seen = new Set<string>();
+  const options = (Array.isArray(w.options) ? w.options : []).map((o: any) => ({ name: String(o?.name ?? "").trim().slice(0, 60), calories: num(o?.calories, 0, 900), protein: num(o?.protein, 0, 100), fats: num(o?.fats, 0, 100), carbs: num(o?.carbs, 0, 100), fiber: num(o?.fiber, 0, 60) }))
+    .filter((o: any) => o.name && o.calories !== null && o.protein !== null && !seen.has(o.name.toLowerCase()) && seen.add(o.name.toLowerCase())).slice(0, 4);
+  if (options.length < 2) return null;
+  const q = typeof w.question === "string" ? w.question.replace(/\s+/g, " ").trim().slice(0, 140) : "";
+  return { name, question: q || `What is the ${name.split(",")[0].toLowerCase()}?`, options };
 }
 
 // a food of the read as a food of yours: the table's food when the name is a basic food (its values win), else an estimate

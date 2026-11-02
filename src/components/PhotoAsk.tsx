@@ -4,10 +4,12 @@
 import { useState } from "react";
 import { WHO_ORDER, atTime, chipWord, hhmm, photoFrom, startWho, whoLine, type Who } from "../photoAsk";
 
-export function PhotoAsk({ image, at, mealAt, read, drop, exploring = false }: { image: string; at: string; mealAt: (d: Date) => string | null; read: (x: { at: string; who: Who }) => void; drop: () => void; exploring?: boolean }) {
+export function PhotoAsk({ image, at, mealAt, read, drop, exploring = false }: { image: string; at: string; mealAt: (d: Date) => string | null; read: (x: { at: string; who: Who; note?: string }) => void; drop: () => void; exploring?: boolean }) {
   const taken = new Date(at), now = new Date();
   const [who, setWho] = useState<Who>(() => startWho(taken, now, exploring));
   const [time, setTime] = useState(() => hhmm(taken));
+  // DT228 v2 (0.3.63, board Stories168): the person's words go with the photo; empty is fine
+  const [note, setNote] = useState("");
   const when = who === "ate" ? atTime(taken, time) : now;
   const meal = who === "idea" ? null : mealAt(when);
   return (
@@ -24,8 +26,9 @@ export function PhotoAsk({ image, at, mealAt, read, drop, exploring = false }: {
         ))}
       </div>
       <small>{whoLine(who, time, meal)}</small>
+      <label className="pa-note"><span>Tell Chef Mealan what it is, if you like</span><input className="search" value={note} placeholder="pork schnitzel, breaded, Augustiner" onChange={(e) => setNote(e.target.value)} maxLength={200} /></label>
       <div className="pa-go">
-        <button type="button" className="pill pill-primary" onClick={() => read({ at: atTime(taken, time).toISOString(), who })}>Read the plate</button>
+        <button type="button" className="pill pill-primary" onClick={() => read({ at: atTime(taken, time).toISOString(), who, ...(note.trim() ? { note: note.trim() } : {}) })}>Read the plate</button>
         <button type="button" className="link" onClick={drop}>Drop the photo</button>
       </div>
     </section>

@@ -2387,11 +2387,14 @@ export default function App() {
     addFromDatabase: (code: string) => { setEditTitle("Add to my foods"); lookup(code); },
     searchDatabase: async (q: string) => { try { const tags = REGIONS.find((r) => r.id === (shopRegion ?? ""))?.tags ?? []; const cc = ["rs", "de", "at", "ch", "hr", "ba", "si", "hu", "it", "fr", "es", "cy", "gb", "us"].find((c) => tags.includes(c)) ?? ""; const d = await api(`/api/search?q=${encodeURIComponent(q)}&cc=${cc}`); return Array.isArray(d?.products) ? d.products : []; } catch { return []; } },
     // DT127 (0.2.108, board Stories75): a photo of the meal in front of you, read onto the Plate as estimates
-    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean }) => {
-      setBusy("Reading your plate…");
+    readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string }) => {
+      const more0 = (x?.more ?? []).slice(0, 3), note = (x?.note ?? "").replace(/\s+/g, " ").trim().slice(0, 200);
+      setBusy(more0.length ? `Reading your ${more0.length + 1} photos…` : "Reading your plate…");
       try {
-        const [sent, thumb] = await Promise.all([resizeImageBase64(image, 1280, 1280), thumbnailBase64(image, 640)]);
-        const d = await api("/api/plate-photo", { image: sent, region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name) });
+        // DT228 v2 (0.3.63, board Stories168): the other photos of the meal and the person's words go with the photo, in one read
+        const [sent, thumb, moreSent, moreThumbs] = await Promise.all([resizeImageBase64(image, 1280, 1280), thumbnailBase64(image, 640),
+          Promise.all(more0.map((m) => resizeImageBase64(m, 1280, 1280))), Promise.all(more0.map((m) => thumbnailBase64(m, 480)))]);
+        const d = await api("/api/plate-photo", { image: sent, ...(moreSent.length ? { more: moreSent } : {}), ...(note ? { note } : {}), region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name) });
         const read = cleanRead(d);
         const { items, fresh } = read ? itemsOfRead(read, state.foods, shopRegion, uid) : { items: [], fresh: [] };
         // DT219 (0.3.58, board Stories164; Coach Milan 2 November 17:53): a read with no foods leaves the Plate as it was, the photo
@@ -2407,7 +2410,7 @@ export default function App() {
         const at = (x?.who === "ate" || x?.replace) && x.at ? x.at : new Date().toISOString();
         // 0.3.62 (Coach Milan 20:21 to 20:55): Exploring in the pencil block makes a camera photo Exploring too
         const who = x?.who ?? (pick === "exploring" ? "idea" : undefined);
-        const photo = { image: thumb, at, unsure: read.unsure, ...(who && who !== "now" ? { who } : {}) };
+        const photo = { image: thumb, at, unsure: read.unsure, ...(who && who !== "now" ? { who } : {}), ...(moreThumbs.length ? { more: moreThumbs } : {}), ...(note ? { note } : {}), which: read.which ?? null };
         const land = (how: "add" | "new") => {
           // 0.3.62: an Exploring photo is no meal of yours: the plate leaves the meal it was for (a past dinner, a planned lunch,
           // the clock's guess) and the pencil block says Exploring; that meal stays as it was, and Chef Mealan says so
@@ -3028,9 +3031,9 @@ export default function App() {
             onModeChange={setMode}
             onCapture={(x) => scan(x)}
             meal={screenProps.ai.on}
-            onMeal={(image, at) => {
+            onMeal={(image, at, more) => {
               setCamera(false);
-              if (!at) { void screenProps.readMealPhoto(image); return; }
+              if (!at) { void screenProps.readMealPhoto(image, more?.length ? { more } : undefined); return; }
               // from Your photos: whose plate and when, asked on the Plate before the read
               setPhotoAsk({ image, at }); setStep("in"); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
             }}

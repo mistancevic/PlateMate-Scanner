@@ -62,10 +62,15 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   ok(modes.join() === "Barcode,Label,Group,Meal" && await page.locator(".cam-modes button[aria-pressed=true]").textContent() === "Meal", "DT130: Meal is a fourth mode next to Barcode, Label and Group, and it is on: " + modes.join());
   ok(/The whole plate, from above/.test(await text(".cam-say")) && await page.locator(".meal-frame").count() === 1, "DT130: the round frame and the hint");
   ok(await page.locator(".auto-switch").count() === 0 && /Tap to take it/.test(await text(".cam-panel")) && await page.locator(".cam-gallery").count() === 1, "DT130: no auto shot; Tap to take it; Your photos bottom left");
-  // the shutter: read at once, as before
-  await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(2200);
+  // DT228 v2 (0.3.63, board Stories168): the shutter stages the photo; a second one joins it; Read 2 photos reads them together
+  ok(/The whole plate, from above\. Then the inside, another side, or the menu/.test(await text(".cam-say")), "DT228: the hint asks for the inside, another side or the menu too");
+  await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(500);
+  ok(sent.length === 0 && /1 photo of this meal/.test(await text(".cam-staged")) && (await page.locator(".cam-analyze").textContent()).trim() === "Read it", "DT228: the shutter stages it: 1 photo of this meal, Read it");
+  await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(500);
+  ok(/2 photos of this meal/.test(await text(".cam-staged")) && (await page.locator(".cam-analyze").textContent()).trim() === "Read 2 photos" && /The shutter adds a photo/.test(await text(".cam-panel")), "DT228: a second photo joins: Read 2 photos");
+  await page.locator(".cam-analyze").click(); await page.waitForTimeout(2200);
   const s1 = await st();
-  ok(sent.length === 1 && /^data:image\/jpeg;base64,/.test(sent[0].image) && await page.locator(".camera-ui").count() === 0, "DT130: the shutter takes the photo and reads it at once; the camera closes");
+  ok(sent.length === 1 && /^data:image\/jpeg;base64,/.test(sent[0].image) && Array.isArray(sent[0].more) && sent[0].more.length === 1 && s1.photo?.more?.length === 1 && await page.locator(".camera-ui").count() === 0, "DT228: both photos go in one read; the camera closes");
   ok(s1.items.length === 3 && s1.photo && !s1.photo.who && /Your photo, 13:05\./.test(await text(".mp-line")), "DT130: from the camera it is the plate in front of you, as in 0.2.108");
   await page.locator(".mp-say").getByRole("button", { name: "Not mine" }).click(); await page.waitForTimeout(400);
 

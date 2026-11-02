@@ -31,7 +31,8 @@ interface CameraViewProps {
   // DT130 (0.2.110, board Stories78, A): Meal, a fourth mode, when the AI is on: one photo of the whole plate, read at once;
   // a photo from Your photos comes with its time, for whose plate and when
   meal?: boolean;
-  onMeal?: (image: string, takenAt: string | null) => void;
+  // DT228 v2 (0.3.63): more photos of the same meal, staged like a pack's sides, read together
+  onMeal?: (image: string, takenAt: string | null, more?: string[]) => void;
 }
 
 export function CameraView({
@@ -157,6 +158,7 @@ export function CameraView({
     const images = [...stagedGroupImages]; setStagedGroupImages([]);
     if (scannerMode === "group") processGroupScan(images);
     else if (scannerMode === "barcode" && codeRead) { const c = codeRead; setCodeRead(null); onBarcodeWithPhotos(c, images); }
+    else if (scannerMode === "meal") onMeal?.(images[0], null, images.slice(1, 4));
     else onCapture(images);
   };
 
@@ -240,7 +242,8 @@ export function CameraView({
     const image = captureImageFromVideo();
     if (!image) return;
     if (scannerMode === "barcode" && !codeRead) { await processBarcodeFallback(image); return; }
-    if (scannerMode === "meal") { onMeal?.(image, null); return; }
+    // DT228 v2 (0.3.63): in Meal the shutter stages the photo too; Read reads them together (at most 4)
+    if (scannerMode === "meal") { setStagedGroupImages((prev) => (prev.length < 4 ? [...prev, image] : prev)); return; }
     stage(image);
   };
 
@@ -252,6 +255,8 @@ export function CameraView({
       setToastMessage("Choose an image smaller than 15 MB.");
       return;
     }
+    // DT228 v2: with photos of this meal staged, one from Your photos joins them
+    if (scannerMode === "meal" && stagedGroupImages.length > 0) { const r = new FileReader(); r.onload = () => { if (r.result) setStagedGroupImages((prev) => (prev.length < 4 ? [...prev, String(r.result)] : prev)); }; r.readAsDataURL(file); return; }
     if (scannerMode === "meal") {
       // the photo's own time: the camera's EXIF when it has one, else the file's time
       void file.arrayBuffer().then((buf) => {
@@ -297,7 +302,7 @@ export function CameraView({
           <span className="cam-say" role="status">
             {scannerMode === "barcode"
               ? codeRead ? "Now photos of the pack's front and back, or use the code only" : typing ? "Paused while you type the code" : "Hold the barcode inside the frame"
-              : scannerMode === "group" ? "The whole product, one side per photo" : scannerMode === "meal" ? "The whole plate, from above" : "Hold the nutrition table inside the frame"}
+              : scannerMode === "group" ? "The whole product, one side per photo" : scannerMode === "meal" ? "The whole plate, from above. Then the inside, another side, or the menu" : "Hold the nutrition table inside the frame"}
           </span>
         )}
         {targetMissingItemName && <span className="cam-say cam-missing">Scanning for: {targetMissingItemName}</span>}
@@ -337,7 +342,7 @@ export function CameraView({
       <div className="cam-panel">
         {stagedGroupImages.length > 0 && (
           <div className="cam-staged">
-            <b>{stagedGroupImages.length} {stagedGroupImages.length === 1 ? "photo" : "photos"} ready</b>
+            <b>{stagedGroupImages.length} {stagedGroupImages.length === 1 ? "photo" : "photos"} {scannerMode === "meal" ? "of this meal" : "ready"}</b>
             <div className="cam-thumbs" aria-label="Staged photos">
               {stagedGroupImages.map((src, i) => (
                 <button key={i} onClick={() => setStagedGroupImages((v) => v.filter((_, j) => j !== i))} aria-label={`Remove staged photo ${i + 1}`}>
@@ -373,21 +378,23 @@ export function CameraView({
             <button id="camera-shutter-button" onClick={handleShutterClick} className="cam-shutter" title={scannerMode === "group" ? "Take a photo of one side" : scannerMode === "meal" ? "Take the photo of your meal" : "Take a photo"}>
               <span />
               {auto && scannerMode !== "meal" && (scannerMode !== "barcode" || codeRead) && (
-                <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none" viewBox="0 0 80 80" aria-hidden="true">
-                  <circle cx="40" cy="40" r="37" fill="none" stroke="var(--brand)" strokeWidth="5" strokeLinecap="round" strokeDasharray={2 * Math.PI * 37} strokeDashoffset={(1 - steady) * 2 * Math.PI * 37} style={{ transition: "stroke-dashoffset 120ms linear" }} />
+                // DT229 (0.3.63, board Stories168; Coach Milan 21:31): the steady ring outside the shutter, 8 px, bright green on a dark track
+                <svg className="cam-steady -rotate-90 pointer-events-none" viewBox="0 0 104 104" aria-hidden="true">
+                  <circle cx="52" cy="52" r="48" fill="none" stroke="rgba(0,0,0,.45)" strokeWidth="8" />
+                  <circle cx="52" cy="52" r="48" fill="none" stroke="#34c759" strokeWidth="8" strokeLinecap="round" strokeDasharray={2 * Math.PI * 48} strokeDashoffset={(1 - steady) * 2 * Math.PI * 48} style={{ transition: "stroke-dashoffset 120ms linear" }} />
                 </svg>
               )}
             </button>
           ) : <span className="cam-shutter-gap" />}
           <span className="cam-analyze-slot">
             {stagedGroupImages.length > 0 && (
-              <button onClick={analyze} className="cam-analyze" aria-label={`Analyze ${stagedGroupImages.length} photo${stagedGroupImages.length === 1 ? "" : "s"}`}>
-                Analyze {stagedGroupImages.length}
+              <button onClick={analyze} className="cam-analyze" aria-label={scannerMode === "meal" ? (stagedGroupImages.length === 1 ? "Read it" : `Read ${stagedGroupImages.length} photos`) : `Analyze ${stagedGroupImages.length} photo${stagedGroupImages.length === 1 ? "" : "s"}`}>
+                {scannerMode === "meal" ? (stagedGroupImages.length === 1 ? "Read it" : `Read ${stagedGroupImages.length} photos`) : `Analyze ${stagedGroupImages.length}`}
               </button>
             )}
           </span>
         </div>
-        {!cameraError && scannerMode === "meal" && <small className="cam-small auto-note">Tap to take it. Or pick one from Your photos.</small>}
+        {!cameraError && scannerMode === "meal" && <small className="cam-small auto-note">{stagedGroupImages.length ? "The shutter adds a photo. Read them when you have what you want." : "Tap to take it. Or pick one from Your photos."}</small>}
         {!cameraError && scannerMode !== "meal" && (scannerMode !== "barcode" || codeRead) && (
           <button className="auto-switch" onClick={() => setAutoMode(!auto)} aria-pressed={auto}>
             {auto ? "Auto shot: hold still · tap for manual" : "Manual shot: tap to take · tap for auto"}

@@ -75,7 +75,7 @@ const READ = { dish: "Schnitzel with roasted potatoes", foods: [
     await page.locator(".plan-line").click(); await page.waitForTimeout(300);
     await page.getByRole("button", { name: "Exploring", exact: true }).click(); await page.waitForTimeout(300);
     await page.locator(".mp-button").click(); await page.waitForTimeout(1500);
-    await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(2200);
+    await page.locator("#camera-shutter-button").click(); await page.waitForTimeout(400); await page.locator(".cam-analyze").click(); await page.waitForTimeout(2200);
     const s2 = await st();
     ok(s2.photo?.who === "idea" && s2.pick === "exploring" && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1, "Exploring first: the camera's photo is Exploring, with the idea's buttons");
     await ctx.close();
