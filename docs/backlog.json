@@ -268,33 +268,45 @@
       "id": "DT218",
       "title": "After eating: Go on asks on the meal's card; ✕ ends the cook",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": 164,
-      "why": "Milan 17:53: the blue strip could not be resolved; Go on landed on Today with nothing to do. Board drawn, waits for his Go."
+      "why": "Milan 17:53: the blue strip could not be resolved; Go on landed on Today with nothing to do. Go at 18:19.",
+      "version": "0.3.58"
     },
     {
       "id": "DT219",
       "title": "A photo with no foods leaves the Plate as it was; Empty plate whenever there is a photo",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": 164,
-      "why": "Milan 17:53: the Plate was stuck with a photo of 0 foods. Board drawn, waits for his Go."
+      "why": "Milan 17:53: the Plate was stuck with a photo of 0 foods. Go at 18:19.",
+      "version": "0.3.58"
     },
     {
       "id": "DT220",
       "title": "Two Lock buttons get their own names: How to make it ›, Lock it and cook ›",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": 164,
-      "why": "Milan 17:53: he did not know what the steps were for; both buttons said Lock the recipe. Board drawn, waits for his Go."
+      "why": "Milan 17:53: he did not know what the steps were for; both buttons said Lock the recipe. Go at 18:19.",
+      "version": "0.3.58"
     },
     {
       "id": "DT221",
       "title": "Not understood in cook mode: say only Sorry, say that again?",
       "epic": "cook",
-      "state": "next",
+      "state": "done",
       "board": 164,
-      "why": "Milan 17:58: the not-understood line read every command word aloud. Board drawn, waits for his Go."
+      "why": "Milan 17:58: the not-understood line read every command word aloud. Go at 18:19.",
+      "version": "0.3.58"
+    },
+    {
+      "id": "S1",
+      "title": "The save check: every walkthrough checks what its phone would send to the account",
+      "epic": "cook",
+      "state": "done",
+      "version": "0.3.58",
+      "why": "Milan 18:01: would tests catch the nested-arrays error? Go at 18:19. Rule S1 in docs/rules/storage.md, src/saveShape.ts, scripts/save-check.cjs."
     }
   ]
 }
