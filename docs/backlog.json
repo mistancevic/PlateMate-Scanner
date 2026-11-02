@@ -409,6 +409,22 @@
       "state": "next",
       "board": "162b",
       "why": "Milan 2 November: different voices, other voice settings. 22:33 draw it, between DT214 and DT216. Waits for his Go."
+    },
+    {
+      "id": "FX1",
+      "title": "The cook strip's ✕ at every stage; How to make names the dish",
+      "epic": "cook",
+      "state": "done",
+      "version": "0.3.64",
+      "why": "Milan 22:39, Go."
+    },
+    {
+      "id": "FX2",
+      "title": "Exploring on a planned meal; Help read folds; swap keeps grams on a photo; the time chip in 24 hours",
+      "epic": "cook",
+      "state": "done",
+      "version": "0.3.65",
+      "why": "Milan 22:44 to 22:53, Go."
     }
   ]
 }
