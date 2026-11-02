@@ -56,8 +56,8 @@ page = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name
 <h1>One product manager, one AI, three beta testers</h1>
 <p class="lead">Chef Mealan helps people live their nutrition plan: at the shelf, at home, with a coach. Milan Stancevic, a senior product manager with 20 years in B2B software and a certified coach, builds it with Claude as the engineer and tests it with three beta testers, one of them a coach. Every decision is drawn before it is coded, every release is tested before it is promoted, and every AI answer is checked by a human before it counts.</p>
 <div class="facts">
-<div class="fact"><b>0.3.50</b><span>live since 30 September 2026</span></div>
-<div class="fact"><b>229 releases</b><span>since 2 October, about one a day</span></div>
+<div class="fact"><b>Live</b><span>since 30 September 2026, version 0.3.50 today</span></div>
+<div class="fact"><b>229 releases</b><span>since 2 October, about seven a day</span></div>
 <div class="fact"><b>531 · 148</b><span>unit tests · browser walkthroughs</span></div>
 <div class="fact"><b>90 eval cases</b><span>7 sets, human labels and a judge</span></div>
 <div class="fact"><b>3 beta testers</b><span>one of them a coach; more are joining</span></div>
@@ -67,7 +67,7 @@ page = f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name
 <h2>The system</h2>
 <p class="sub">What runs where. The phone does the arithmetic and keeps the data; the server holds the rules and the key; the model reads and talks; a human checks.</p>
 <div class="card graph" style="overflow:hidden;padding:8px"><div style="width:1480px;height:470px;transform:scale(0.648);transform-origin:0 0;margin-bottom:-165px">{genSystem.arch()}</div></div>
-<div style="margin-top:10px">{"".join(f'<span class="tag" style="background:{c}">{k}</span>' for k, c in TAGS.items())}<span style="font-size:13px;color:#5b6b8a">Code is deterministic and tested. Rules are the coach's rules written as code. LLM is a Gemini call, checked by evals. Human is a person or the coach: acting, or checking what the machine produced.</span></div>
+<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:nowrap">{"".join(f'<span class="tag" style="background:{c};margin:0">{k}</span>' for k, c in TAGS.items())}</div><p style="font-size:13px;color:#5b6b8a;margin:8px 0 0">Code is deterministic and tested. Rules are the coach's rules written as code. LLM is a Gemini call, checked by evals. Human is a person or the coach: acting, or checking what the machine produced.</p>
 
 <h2>One path, end to end: Photo of my meal</h2>
 <p class="sub">Eighteen such paths are drawn, eleven for a person and seven for a coach. This is the one with the most AI in it.</p>
@@ -120,7 +120,7 @@ subprocess.run(["node", f"{S}/sbn.cjs"], check=True)
 W = SX + 3 * (SW + GAP) - GAP + 70
 B = Board(); y = 30
 cy = storyCard(B, y, "BP1", "/built, for a hiring manager with two minutes", [
-  ("Coach Milan, 07:01 to 08:06", "A public page that shows the work to recruiters and hiring managers, so the repo can go private. Draw the new /built. Version 2: no month in the title (it goes stale); three beta testers, one a coach, more joining; buttons apart; path steps one below the other; promote to production; a stronger call than Milan on LinkedIn; the graph as on the System board."),
+  ("Coach Milan, 07:01 to 08:20", "A public page that shows the work to recruiters and hiring managers, so the repo can go private. Draw the new /built. Version 3 (08:20): Live since 30 September as the first fact, the version under it, for a cold reader; 229 releases is about seven a day; the four tags in one row, the words under them. Version 2: no month in the title (it goes stale); three beta testers, one a coach, more joining; buttons apart; path steps one below the other; promote to production; a stronger call than Milan on LinkedIn; the graph as on the System board."),
   ("What is wrong today", "The page says Version 0.2, 283 unit tests and 82 walkthroughs; it is 0.3.50, 531 and 148. The blueprint is the July system. The loops end at version 0.2. It is long, and the proof of how the work runs is in the repo, not on the page."),
   ("The new page, top to bottom", "1. One line and five facts: version and live since, releases, tests, evals, beta testers; two buttons, try it and see it work. 2. The system: the technical graph from the System board, with the four tags. 3. One path end to end, Photo of my meal, step by step with who does what. 4. How a change is made: the five steps and three boards as pictures. 5. How we know it works: the table and the loop, with what is open. 6. The decisions in four loops, folded. 7. Who builds it, LinkedIn, code on request."),
   ("Where the numbers come from", "BUILT_FACTS in the code, counted at build time, never typed: the version, the unit tests, the walkthroughs, the eval cases, the releases this month."),
@@ -142,5 +142,5 @@ y = h
 h = rowEnd(B.screen("BP1c", 0, y, "New: /built on a phone", "built-new-m", "changed", "The same page, one column."))
 y = h
 board("Stories160.dc.html", "BP1. /built, for a hiring manager with two minutes",
-  "2 November 2026 (Coach Milan 07:01 to 08:06). Version 2. Now: 0.3.50, untouched. Drawn for your approval; nothing built.",
+  "2 November 2026 (Coach Milan 07:01 to 08:20). Version 3. Now: 0.3.50, untouched. Drawn for your approval; nothing built.",
   B, W, y - 100, "Stories159.dc.html")
