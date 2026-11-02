@@ -401,6 +401,14 @@
       "board": 168,
       "why": "Milan 21:31: the blue ring is barely visible. Go at 22:00.",
       "version": "0.3.63"
+    },
+    {
+      "id": "DT215",
+      "title": "Voice settings: a Voice row on Me; read aloud, the phone's voices with a sample, speed, cut in",
+      "epic": "cook",
+      "state": "next",
+      "board": "162b",
+      "why": "Milan 2 November: different voices, other voice settings. 22:33 draw it, between DT214 and DT216. Waits for his Go."
     }
   ]
 }
