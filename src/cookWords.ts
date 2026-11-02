@@ -49,6 +49,17 @@ export function needsCooking(name: string): boolean {
   return MEAT.test(short) || PASTA.test(short) || GRAIN.test(short) || /\b(potato(es)?|eggs?|lentils?|beans?|chickpeas?)\b/i.test(short);
 }
 
+// DT216 (0.3.56, board Stories163, rule C40): a food that makes the plate a cooked dish: one that needs cooking by its name
+// (raw, dry, uncooked), flour (a batter or a dough: flour with egg or milk is that too), or a raw egg. Coach Milan's crêpes of
+// 2 November (eggs, milk, wheat flour, whey, quark, banana) got the bowl steps because none of their names said raw.
+export function cookedFood(name: string): boolean {
+  if (needsCooking(name)) return true;
+  const n = String(name ?? "").toLowerCase();
+  if (/\b(flour|mehl|brašno|брашно)\b/.test(n)) return true;
+  if (/\b(eggs?|egg whites?|egg yolks?|jaja|jaje|eier|ei)\b/.test(n) && !/\b(boiled|hard|soft|scrambled|fried|poached|omelett?e?|cooked|powder|pasta|noodles?|salad|mayo|mayonnaise)\b/.test(n)) return true;
+  return false;
+}
+
 // DT91, rule 4: a cooked food on the plate, said as what you would weigh before cooking. Meat, poultry and fish lose about a
 // quarter of their weight (cooked is 75 % of raw); pasta takes up water to about 2.4 times its dry weight, rice and grains
 // about 2.5 times. Rounded to 5 g. Only for these: for anything else no line is shown.

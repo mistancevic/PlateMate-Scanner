@@ -86,7 +86,7 @@ C36. A side Chef Mealan names goes with the dish by the same rules as every offe
 
 ## 5. How it is cooked
 
-C40. A plate with a food you cook gets steps, never the bowl ways. The bowl ways (All in one, Topped, Protein first) are for ready foods only, such as skyr with fruit. Code: `needsCooking`, the Plate.
+C40. A plate with a food you cook gets steps, never the bowl ways. A food you cook: one whose name says raw, dry or uncooked, flour (a batter or a dough), or a raw egg (DT216). The bowl ways (All in one, Topped, Protein first) are for ready foods only, such as skyr with fruit. A recipe that kept bowl steps from an earlier save gets Chef Mealan's steps the next time it is made on the Plate; Lock the recipe keeps them. Code: `cookedFood` and `needsCooking` in src/cookWords.ts, the Plate.
 
 C41. Chef Mealan writes the method: three to eight steps, in the order a cook works, what to prepare first, the heat, the time, how to tell it is done, how to serve. Heat in °C, time in minutes. One or two short sentences per step, second person. Chef Mealan: /api/steps in server.ts.
 
@@ -157,3 +157,4 @@ A row that names a rule the code does not call is a gap and goes to section 7. C
 - 27 October, evening: C50, a sweet pepper is a vegetable (0.2.118). The walkthrough is tests/flows/paprika.cjs.
 - 28 October, night: C51, a swap keeps the dish: the same kind first, sold where you shop, never the same food under another name; + Add a food under the foods; the idea to read, then the Plate (0.2.129, DT148). The walkthrough is tests/flows/idea-and-swap.cjs.
 - 29 October: C52, a dish keeps its proportions: Fit sizes a part as a whole, Is this one dish?, the steps say when they are out of date, the culinary gate reads a cooked dish with its amounts (0.2.131, DT150). The walkthrough is tests/flows/dish-proportions.cjs.
+- 2 November: C40 reads flour and a raw egg as foods you cook; a cooked plate never gets the bowl steps, a recipe that kept them gets new ones (0.3.56, DT216). Cook mode reads a step one move at a time (DT217). The walkthrough is tests/flows/cook-moves.cjs.

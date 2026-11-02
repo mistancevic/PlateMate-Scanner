@@ -7,7 +7,7 @@ const fs = require("node:fs"), path = require("node:path");
 const ROOT = path.resolve(__dirname, "../..");
 const seed = JSON.parse(fs.readFileSync(path.join(ROOT, "tests/flows/seed.json"), "utf8"));
 const F2 = (id, name, calories, protein, fats, carbs) => ({ ...seed.foods[0], id, name, brand: "estimate", source: "estimate", calories, protein, carbs, fats, fiber: 0, photo: undefined, photos: undefined, table: undefined, icon: undefined, places: [] });
-const SK = F2("skyr2", "Skyr, natural", 63, 11, 0.2, 4), OA = F2("oats2", "Oats", 372, 13, 7, 59), EW = F2("ew", "Egg whites", 52, 11, 0.2, 0.7);
+const SK = F2("skyr2", "Skyr, natural", 63, 11, 0.2, 4), OA = F2("oats2", "Oats", 372, 13, 7, 59), EW = F2("ew", "Blueberries", 57, 0.7, 0.3, 14); // 0.3.56 (DT216): egg whites would make it a cooked plate, with no bowl ways
 const it = (id, food, grams) => ({ id, food, grams, locked: false });
 seed.foods = [...seed.foods, SK, OA, EW]; seed.items = []; seed.feedback = [];
 seed.meals = [{ id: "r1", title: "Skyr breakfast", items: [it("a", SK, 150), it("b", OA, 20), it("c", EW, 100)], portion: 270, savedAt: "2026-10-26T08:00:00Z" }];

@@ -5,7 +5,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Ingredient } from "../pilot";
 import { stepParts, stepText } from "../steps";
 import { tempsIn } from "../units";
-import { secondsIn, timerName, parseCommand, howMuch, leftLine, spoken, clock, minutesWords, voiceChoice, setVoiceChoice, isEcho, cutsIn, type VoiceChoice } from "../cook";
+import { secondsIn, timerName, parseCommand, howMuch, leftLine, spoken, clock, minutesWords, voiceChoice, setVoiceChoice, isEcho, cutsIn, movesFor, type VoiceChoice } from "../cook";
 
 type Timer = { id: number; name: string; ends: number; total: number; rang: boolean };
 const Speech = () => (typeof window === "undefined" ? null : (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition || null);
@@ -15,8 +15,10 @@ const canSpeak = () => typeof window !== "undefined" && "speechSynthesis" in win
 // once per rev); onStep tells the other screen; top is the line that says the kitchen screen is on; pair opens it; look is
 // Chef, look on the kitchen screen: one photo with the step.
 export type CookLink = { remoteStep?: { k: number; rev: number } | null; onStep?: (k: number) => void; top?: ReactNode; pair?: ReactNode; look?: ((k: number) => Promise<string>) | null; closeLabel?: string; doneLabel?: string };
-export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = null, pics = [], link = {} }: {
+export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = null, pics = [], link = {}, moves }: {
   title: string; steps: string[]; items: Ingredient[]; ticks: Set<number>;
+  // DT217 (0.3.56): the moves of each step as Chef Mealan drafted them; a step without them gets them in code (movesFor)
+  moves?: (string[] | null | undefined)[];
   onTick: (k: number) => void; onClose: () => void;
   // DT175 (0.3.17): a question to Chef Mealan about this step; null when the AI is off
   ask?: ((question: string, step: number, history: { role: "cook" | "chef"; text: string }[]) => Promise<string>) | null;
@@ -27,6 +29,9 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   const first = Math.max(0, steps.findIndex((_, k) => !ticks.has(k)));
   const [k, setK] = useState(ticks.size >= steps.length ? 0 : first);
   const [done, setDone] = useState(false);
+  // DT217 v2 (0.3.56, board Stories163): the move in this step being read; the whole step stays on screen above the moves
+  const [m, setM] = useState(0);
+  const movesOf = (j: number) => movesFor(steps[j] ?? "", moves?.[j]);
   // DT175a: the steps already finished, to show the ticks on the step buttons (only Next ticks)
   const [doneSet, setDoneSet] = useState<Set<number>>(() => new Set(ticks));
   const [voice, setVoice] = useState<VoiceChoice>(voiceChoice());
@@ -39,7 +44,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   const hasEars = !!Speech();
   const on = voice === "on";
   // the newest values, for the speech callbacks
-  const live = useRef({ k, done, on, steps, items }); live.current = { k, done, on, steps, items };
+  const live = useRef({ k, m, done, on, steps, items }); live.current = { k, m, done, on, steps, items };
 
   // 0.3.54: what the phone is saying, so the microphone does not take its own voice for the cook's (see isEcho in cook.ts)
   const voiceOut = useRef<{ speaking: boolean; tail: boolean; text: string; timers: number[] }>({ speaking: false, tail: false, text: "", timers: [] });
@@ -70,12 +75,13 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   }, []);
   // DT177: the other screen moved: this one follows, once per change, without sending it back
   const fromOther = useRef(false);
-  useEffect(() => { const r = link.remoteStep; if (!r) return; if (r.k !== live.current.k || live.current.done) { fromOther.current = true; setDone(false); setK(Math.max(0, Math.min(steps.length - 1, r.k))); } }, [link.remoteStep?.rev]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { const r = link.remoteStep; if (!r) return; if (r.k !== live.current.k || live.current.done) { fromOther.current = true; setDone(false); setK(Math.max(0, Math.min(steps.length - 1, r.k))); setM(0); } }, [link.remoteStep?.rev]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (fromOther.current) { fromOther.current = false; return; } link.onStep?.(k); }, [k]); // eslint-disable-line react-hooks/exhaustive-deps
   // ticks from the other screen join this one's
   useEffect(() => { setDoneSet((d) => { let ch = false; const n = new Set(d); ticks.forEach((t) => { if (!n.has(t)) { n.add(t); ch = true; } }); return ch ? n : d; }); }, [ticks]);
-  // a step is read aloud when it shows
-  useEffect(() => { if (!done) say(`Step ${k + 1}. ${spoken(steps[k], items)}`); }, [k, done, voice]); // eslint-disable-line react-hooks/exhaustive-deps
+  // a step is read aloud when it shows; with moves, one move at a time, the first with the step's number (DT217)
+  const sayMove = (j: number, mi: number) => { const mv = movesOf(j); say(`${mi === 0 ? `Step ${j + 1}. ` : ""}${spoken(mv[Math.min(mi, mv.length - 1)], items)}`); };
+  useEffect(() => { if (!done) sayMove(k, m); }, [k, m, done, voice]); // eslint-disable-line react-hooks/exhaustive-deps
   // the timers count down; one that ends rings, buzzes and says which
   useEffect(() => { if (!timers.length) return; const t = setInterval(() => setNow(Date.now()), 500); return () => clearInterval(t); }, [timers.length]);
   useEffect(() => {
@@ -85,10 +91,15 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
     for (const t of due) { ring(); say(`The ${t.name.toLowerCase()} timer is done.`); }
   }, [now]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const go = (to: number) => { setHeard(null); setK(Math.max(0, Math.min(steps.length - 1, to))); };
-  const next = () => { onTick(live.current.k); setDoneSet((d) => new Set(d).add(live.current.k)); if (live.current.k >= steps.length - 1) { setDone(true); say("Done. Enjoy your meal."); } else go(live.current.k + 1); };
-  const back = () => { if (live.current.done) { setDone(false); return; } go(live.current.k - 1); };
-  const repeat = () => { setHeard(null); say(`Step ${live.current.k + 1}. ${spoken(steps[live.current.k], items)}`); };
+  const go = (to: number, mi = 0) => { setHeard(null); const j = Math.max(0, Math.min(steps.length - 1, to)); setK(j); setM(Math.max(0, Math.min(movesOf(j).length - 1, mi))); };
+  // DT217: Next and Back go move by move; Next on a step's last move ticks the step, as before
+  const next = () => {
+    const { k: at, m: mi } = live.current;
+    if (mi < movesOf(at).length - 1) { setHeard(null); setM(mi + 1); return; }
+    onTick(at); setDoneSet((d) => new Set(d).add(at)); if (at >= steps.length - 1) { setDone(true); say("Done. Enjoy your meal."); } else go(at + 1);
+  };
+  const back = () => { const { k: at, m: mi } = live.current; if (live.current.done) { setDone(false); return; } if (mi > 0) { setHeard(null); setM(mi - 1); return; } if (at > 0) go(at - 1, movesOf(at - 1).length - 1); };
+  const repeat = () => { setHeard(null); sayMove(live.current.k, live.current.m); };
   const startTimer = (seconds: number, name: string) => {
     setTimers((ts) => [...ts, { id: Date.now() + Math.random(), name, ends: Date.now() + seconds * 1000, total: seconds, rang: false }]);
     setNow(Date.now());
@@ -162,7 +173,8 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   const close = () => { try { window.speechSynthesis?.cancel(); } catch { /* nothing to stop */ } onClose(); };
   const choose = (v: "on" | "off") => { setVoiceChoice(v); setVoice(v); };
 
-  const sec = done ? null : secondsIn(steps[k]);
+  const mvs = done ? [] : movesOf(k), mvNow = mvs[Math.min(m, mvs.length - 1)] ?? steps[k];
+  const sec = done ? null : secondsIn(mvs.length > 1 ? mvNow : steps[k]);
   const name = done ? "" : timerName(steps[k], k);
   const running = timers.some((t) => !t.rang && t.name === name);
   return (
@@ -199,7 +211,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
             <small>All {steps.length} steps are ticked. The screen goes back to normal now.</small>
           </section>
           <button className="pill pill-wide pill-primary" onClick={close}>{link.doneLabel ?? "Back to Make"}</button>
-          <small className="muted cook-under">On Make: a photo while it is on the counter, how it went, how much you ate, then Rate it.</small>
+          <small className="muted cook-under">On Make: add photos to the steps and of the meal, say how the cooking went, then Cooked. Next: Eat.</small>
           <button className="link" onClick={back}>Back to the last step</button>
         </>
       ) : (
@@ -207,16 +219,27 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
           <section className={`cook-card cook-step${pics[k] ? " has-pic" : ""}`} aria-live="polite">
             {pics[k] && <><img className="cook-pic" src={pics[k]!.src} alt={`Step ${k + 1}`} /><small className="cook-pic-label">{pics[k]!.by === "ai" ? "Picture drawn by AI, Beta" : "Your photo"}</small></>}
             <small>STEP {k + 1}</small>
-            <div className="cook-text">{stepParts(tempsIn(steps[k]), items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}</div>
+            <div className={`cook-text${mvs.length > 1 ? " cook-text-whole" : ""}`}>{stepParts(tempsIn(steps[k]), items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>))}</div>
+            {/* DT217 v2: under the whole step, its moves, read aloud one at a time: done ones ticked, this one large */}
+            {mvs.length > 1 && (
+              <div className="cook-moves" aria-label={`Move ${m + 1} of ${mvs.length}`}>
+                <small className="cook-moves-head">READ ALOUD, ONE AT A TIME · {m + 1} OF {mvs.length}</small>
+                {mvs.map((x, j) => (
+                  <div key={j} className={`cook-move${j < m ? " done" : j === m ? " on" : ""}`} aria-current={j === m ? "step" : undefined}>
+                    <span aria-hidden="true">{j < m ? "✓" : j === m ? "▶" : ""}</span>
+                    <span>{stepParts(tempsIn(x), items).map((p, i) => ("text" in p ? p.text : <b key={i} className="st-amt">{p.label}</b>))}</span>
+                  </div>))}
+              </div>
+            )}
             {(sec && !running) || link.look ? <div className="cook-step-actions">
               {sec && !running && <button className="pill cook-timer-start" onClick={() => { const a = startTimer(sec, name); say(a); }}>⏱ Start {minutesWords(sec).replace(" minutes", " min").replace(" minute", " min")} timer</button>}
               {link.look && <button className="pill cook-look" disabled={!!heard?.working} onClick={() => void lookNow()}>📷 Chef, look</button>}
             </div> : null}
           </section>
           <div className="cook-buttons">
-            <button className="pill" disabled={k === 0} onClick={back}>‹ Back</button>
+            <button className="pill" disabled={k === 0 && m === 0} onClick={back}>‹ Back</button>
             <button className="pill" onClick={repeat}>↻ Repeat</button>
-            <button className="pill pill-primary" onClick={next}>{k === steps.length - 1 ? "Done ✓" : "Next ›"}</button>
+            <button className="pill pill-primary" onClick={next}>{k === steps.length - 1 && m >= mvs.length - 1 ? "Done ✓" : "Next ›"}</button>
           </div>
           {heard && (
             <section className="cook-card cook-heard" aria-live="polite">
