@@ -1,4 +1,3 @@
-import { CookStrip } from "../components/CookStrip";
 import { plateWhenOf, atMeal } from "../plateMode";
 import { recipeName } from "../recipeDiff";
 import { portionOf } from "../pilot";
@@ -336,8 +335,7 @@ export function RecipesScreen(p: AppApi) {
   );
   return (
     <>
-      {/* DT214 v2 (0.3.53): while a cook runs, the strip at the top of Recipes (the list has no title above it) */}
-      <CookStrip p={p} />
+      {/* 0.3.59 (Coach Milan 2 November 19:00): no cook strip on Recipes; it stays on Today and the Plate */}
       {deleted && (
         <section className="card dl-done" role="status">
           <div className="card-top"><b>{deleted.title} is deleted.</b><button className="link" onClick={() => setDeleted(null)}>OK</button></div>

@@ -307,6 +307,30 @@
       "state": "done",
       "version": "0.3.58",
       "why": "Milan 18:01: would tests catch the nested-arrays error? Go at 18:19. Rule S1 in docs/rules/storage.md, src/saveShape.ts, scripts/save-check.cjs."
+    },
+    {
+      "id": "DT222",
+      "title": "Cook mode's done screen leads to Eat: the meal photo, then Cooked. Next: Eat ›",
+      "epic": "cook",
+      "state": "next",
+      "board": 165,
+      "why": "Milan 18:30: the done screen is a wall, not motivation for the next step. Board drawn, waits for his Go."
+    },
+    {
+      "id": "DT223",
+      "title": "Add a photo of this step in cook mode, kept with the recipe",
+      "epic": "cook",
+      "state": "next",
+      "board": 165,
+      "why": "Milan 18:30, 19:00: photo of each step alongside the steps; start with option 1. Option 2 (Chef Mealan draws them) later. Board drawn, waits for his Go."
+    },
+    {
+      "id": "DT224",
+      "title": "The empty Plate starts with What are you craving?; Craft, Make, Eat once it holds something",
+      "epic": "cook",
+      "state": "next",
+      "board": 165,
+      "why": "Milan 18:30: the three-step bar only once we know what we are crafting. Board drawn, waits for his Go."
     }
   ]
 }

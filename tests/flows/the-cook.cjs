@@ -93,7 +93,10 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     ok(/120 g skyr/.test(await page.locator(".mk-card").textContent()), "the steps follow: the skyr in the spinach's place");
     // ---- 5. coming back: Chef Mealan asks to go on ----
     await nav(page, "Recipes"); await page.waitForTimeout(500);
-    ok(await page.locator(".cook-strip").count() === 1, "the strip on Recipes too");
+    ok(await page.locator(".cook-strip").count() === 0, "no strip on Recipes (Coach Milan 19:00: Today and the Plate only)");
+    await nav(page, "Plan"); await page.waitForTimeout(500);
+    ok(await page.locator(".cook-strip").count() === 0, "no strip on Plan either");
+    await nav(page, "Today"); await page.waitForTimeout(500);
     await page.locator(".cook-strip").click(); await page.waitForTimeout(900);
     ok(/You were cooking Chicken rice bowl: 2 of 4 steps ticked, 1 photo\. Go on where you left off\?/.test(await main()), "Go on: Chef Mealan picks up where you left off");
     ok(await page.locator(".mk-check.on").count() === 2 && await page.locator(".mk-photo img").count() === 1, "the ticks and the photo are all there");
@@ -118,7 +121,7 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     await nav(page, "Today"); await page.waitForTimeout(600);
     ok(/Eaten 12:\d\d · Chicken rice bowl · Chef Mealan asks how it carried you in \d+ min/.test(await page.locator(".cook-strip").textContent()), "the strip says when Chef Mealan asks");
     // ---- DT218 (0.3.58, board Stories164): Go on opens the question on the meal's card at once; a ✕ on the strip; none on Explorer ----
-    await nav(page, "Plan"); await page.waitForTimeout(500);
+    await nav(page, "Plate"); await page.waitForTimeout(500);
     const xb = await page.locator(".cook-strip .cs-end").boundingBox();
     ok(xb && xb.width >= 44 && xb.height >= 44, "DT218: after eating the strip has a ✕, 44 px");
     await page.locator(".cook-strip .cs-main").click(); await page.waitForTimeout(900);
