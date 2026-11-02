@@ -39,13 +39,13 @@
     }
   },
   "versions": [
+    "0.3.52",
+    "0.3.51",
     "0.3.50",
     "0.3.49",
     "0.3.48",
     "0.3.47",
-    "0.3.46",
-    "0.3.45",
-    "0.3.44"
+    "0.3.46"
   ],
   "tickets": [
     {
@@ -140,9 +140,10 @@
       "id": "BP1",
       "title": "/built for a hiring manager with two minutes",
       "epic": "home",
-      "state": "now",
+      "state": "done",
       "board": 161,
-      "why": "0.3.51 built six changes you never approved; rolled back 09:23. Version 5 shows each beside version 4 for your call, and a new video."
+      "why": "Version 5 as approved: the 0.3.51 changes decided one by one, and a new See it work video from seven clips.",
+      "version": "0.3.52"
     },
     {
       "id": "DT210",
@@ -215,20 +216,6 @@
       "state": "done",
       "board": 149,
       "version": "0.3.46"
-    },
-    {
-      "id": "HP4b",
-      "title": "Milan as recipe builder and cook",
-      "epic": "home",
-      "state": "done",
-      "version": "0.3.45"
-    },
-    {
-      "id": "HP4",
-      "title": "Who it's for, the disclaimer, Milan's line",
-      "epic": "home",
-      "state": "done",
-      "version": "0.3.44"
     }
   ]
 }
