@@ -341,7 +341,7 @@
       "epic": "cook",
       "state": "next",
       "board": 166,
-      "why": "Milan 19:15: log each time a recipe was eaten on its page, only for him. 19:26 yes to draw 1 and 2. Board drawn, waits for his Go."
+      "why": "Milan 19:15: log each time a recipe was eaten on its page, only for him. 19:26 yes to draw 1 and 2. 20:02: the log under the buttons (v2). Waits for his Go."
     },
     {
       "id": "DT226",
@@ -349,6 +349,14 @@
       "epic": "cook",
       "state": "later",
       "why": "Milan 19:15: maybe share so others see the feedback. Later, when there are members."
+    },
+    {
+      "id": "DT227",
+      "title": "Saved for later: Remove in sight, only on the Plate's start, the recipe points to its draft",
+      "epic": "cook",
+      "state": "next",
+      "board": 167,
+      "why": "Milan 19:45: a draft on the Plate with only Continue; no remove. 20:02: draw it. Waits for his Go."
     }
   ]
 }

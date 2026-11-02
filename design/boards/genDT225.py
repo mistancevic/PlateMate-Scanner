@@ -103,16 +103,17 @@ B = Board(); y = 30
 c = storyCard(B, y, "DT225", "Every time you ate it, on the recipe", [
   ("Coach Milan, 19:15 and 19:26", "Log the date and the feedback when I ate a meal from the recipe: today 4 sarmas, good, I felt so energized. On the recipe's page, only I see it. Draw 1 and 2; sharing later."),
   ("Now", "The recipe sums up your cooks: how many times, the last date, photos, tasted, carried you. Not each time, not how much, not your words. Eat's last field is a line for your coach."),
-  ("New: on the recipe", "Under Your cooks: Every time you ate it. Only you see this. One row each time, newest first: the photo, the day and time and how (cooked, from the fridge, from a batch), how much in the recipe's own words (4 sarmas, 1 portion, 540 g), the taste, how it carried you, and your words. Three rows, then All ›."),
+  ("New: on the recipe", "At the end of the recipe, under its buttons: Every time you ate it. Only you see this. One row each time, newest first: the photo, the day and time and how (cooked, from the fridge, from a batch), how much in the recipe's own words (4 sarmas, 1 portion, 540 g), the taste, how it carried you, and your words. Three rows, then All ›."),
   ("Every time, not only cooked", "A meal of this recipe logged on Today, leftovers from the fridge, a portion from a batch: each is a row. One record, two views: the meal's card on Today and the row here. Nothing is typed twice."),
   ("New: on Eat", "Chef Mealan asks: Anything you want to remember about it? Your words go on the recipe's row. The line under says: Kept on the recipe, only for you. Your coach sees it when you share the meal."),
+  ("Version 2, 20:02", "The log goes at the end of the recipe, under Start cooking, Change it first and Edit recipe: it is a log, not an action. Your cooks, the summary, stays where it is."),
   ("Later (Kanban)", "Sharing with members: first the totals on a shared recipe (11 members ate it, mostly DaaM good, mostly light), then one row at a time, by your choice."),
 ])
 h1 = B.screen("DT225a", 0, y, "Now: the recipe page", "r225a", "now", "Your cooks: a summary. No rows, no amounts, no words.")
-h2 = B.screen("DT225b", 1, y, "New: every time you ate it", "r225b", "changed", "Rows under Your cooks: when, how much, taste, carried you, your words.")
+h2 = B.screen("DT225b", 1, y, "New: the log, under the buttons", "r225e", "changed", "Version 2: after Start cooking, Change it first and Edit recipe: when, how much, taste, carried you, your words.")
 h3 = B.screen("DT225c", 2, y, "Now: Eat", "r225c", "now", "The last field: a line for your coach, if you like.")
 h4 = B.screen("DT225d", 3, y, "New: Eat", "r225d", "changed", "Chef Mealan asks for your words; they go on the recipe, only for you.")
 y = rowEnd(c, h1, h2, h3, h4)
-board("Stories166.dc.html", "DT225. Every time you ate it, on the recipe",
-  "2 November 2026 (Coach Milan 19:15 to 19:26). Drawn for your approval; nothing built. Now: 0.3.59, untouched.",
+board("Stories166.dc.html", "DT225. Every time you ate it, on the recipe (v2)",
+  "2 November 2026 (Coach Milan 19:15 to 20:02). Version 2: the log under the buttons. Drawn for your approval; nothing built. Now: 0.3.59, untouched.",
   B, W, y - 100, "Stories165.dc.html")
