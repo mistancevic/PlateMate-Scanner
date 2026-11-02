@@ -1,4 +1,4 @@
-// DT174 (0.3.16, board Stories121; Coach Milan 30 October 16:39 Go): two doors on a recipe, Cook it as written straight to
+// DT211 v8 (0.3.53): Start cooking in the recipe's Steps block opens cook mode. Earlier: DT174 (0.3.16, board Stories121; Coach Milan 30 October 16:39 Go): two doors on a recipe, Cook it as written straight to
 // Make and Change it first through the Plate; Start cooking on Make opens cook mode: one big step, read aloud, steered by voice
 // or by tap; timers from the step; how much from the amounts cooked; every finished step ticked on Make; voice asked once.
 // The browser's speech is stood in for: a stand-in recognition hears what the walkthrough says, a stand-in voice records.
@@ -55,21 +55,21 @@ const PORT = "3194", B = `http://127.0.0.1:${PORT}`;
     const say = async (t) => { const r = await page.evaluate((t) => window.__say(t), t); await page.waitForTimeout(250); return r; };
     const toRecipe = async () => { await page.goto(B + "/"); await page.waitForTimeout(900); await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500); await page.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }).click(); await page.waitForTimeout(500); };
     await toRecipe();
-    ok(await page.getByRole("button", { name: "Cook it as written", exact: true }).count() === 1 && await page.getByRole("button", { name: "Change it first", exact: true }).count() === 1, "the recipe has two doors: Cook it as written and Change it first");
+    // DT211 v8 (0.3.53): Cook it as written gave way to Start cooking, at the end of the Steps block; it opens cook mode
+    ok(await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).count() === 1 && await page.getByRole("button", { name: "Change it first", exact: true }).count() === 1 && await page.getByRole("button", { name: "Cook it as written" }).count() === 0, "the recipe has Start cooking in its Steps block, and Change it first");
     ok(await page.getByRole("button", { name: "Make it", exact: true }).count() === 0, "Make it is now Change it first");
     // Change it first: the Plate, to edit
     await page.getByRole("button", { name: "Change it first", exact: true }).click(); await page.waitForTimeout(1000);
     ok(await page.getByRole("button", { name: "Fit to my target" }).count() > 0 && !/Make: /.test(await page.locator("h2").first().textContent().catch(() => "")), "Change it first opens the Plate to edit");
-    // Cook it as written: straight to Make
+    // Start cooking: straight to Make, cook mode open
     await toRecipe();
-    await page.getByRole("button", { name: "Cook it as written", exact: true }).click(); await page.waitForTimeout(1000);
-    // the plate still holds the foods from Change it first: the Plate asks first, as for any recipe
-    ok(await page.getByRole("button", { name: "Start a new plate" }).count() === 1, "a plate with foods on it asks first");
-    await page.getByRole("button", { name: "Start a new plate" }).click(); await page.waitForTimeout(1200);
-    ok(/Make: Chicken rice bowl/.test(await page.locator("h2").first().textContent().catch(() => "")), "Cook it as written goes straight to Make");
+    await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(1000);
+    // the plate still holds the foods from Change it first: Chef Mealan asks first; Start cooking never adds to a plate (DT212 v4)
+    ok(await page.getByRole("button", { name: "Clear my plate" }).count() === 1, "a plate with foods on it asks first");
+    await page.getByRole("button", { name: "Clear my plate" }).click(); await page.waitForTimeout(1200);
+    ok(/Make: Chicken rice bowl/.test(await page.locator("h2").first().textContent().catch(() => "")), "Start cooking goes straight to Make");
     ok(await page.locator(".mk-check").count() === 6, "Make lists the recipe's 6 steps to tick");
     ok(/160 g chicken/.test(await page.locator(".mk-check").nth(1).textContent()), "with the recipe's amounts");
-    await page.getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(500);
     const cm = page.locator(".cook-mode");
     ok(await cm.count() === 1 && /1 of 6/.test(await cm.locator(".cook-count").textContent()), "Start cooking opens cook mode on step 1 of 6");
     ok(await page.evaluate(() => window.__locks) >= 1, "cook mode asks the phone to keep the screen on");
@@ -106,20 +106,17 @@ const PORT = "3194", B = `http://127.0.0.1:${PORT}`;
     ok(/Done\. Enjoy your meal\./.test(await cm.textContent()), "the last step's Done: done");
     await cm.getByRole("button", { name: "Back to Make" }).click(); await page.waitForTimeout(400);
     ok(await page.locator(".cook-mode").count() === 0 && await page.locator(".mk-check.on").count() === 6, "Back to Make: every step ticked");
-    ok(await page.getByRole("button", { name: "Rate it" }).count() > 0, "the rest of Make is as before");
+    ok(await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).count() > 0, "the rest of Make is as before: Cooked. Next: Eat");
     // a recipe that makes 4: as written means the whole pot, so the steps say the whole recipe's amounts
     await page.goto(B + "/"); await page.waitForTimeout(900); await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500); await page.locator(".recipe-tile").filter({ hasText: "Lentil soup" }).click(); await page.waitForTimeout(500);
-    await page.getByRole("button", { name: "Cook it as written", exact: true }).click(); await page.waitForTimeout(900);
-    if (await page.getByRole("button", { name: "Start a new plate" }).count()) { await page.getByRole("button", { name: "Start a new plate" }).click(); await page.waitForTimeout(1200); }
+    await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(1200);
     ok(/Make: Lentil soup/.test(await page.locator("h2").first().textContent().catch(() => "")) && /300 g lentils/.test(await page.locator(".mk-check").first().textContent()), "a recipe that makes 4, as written: the whole pot's amounts on Make");
-    await page.getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(400);
     ok(/300 g lentils/.test(await cm.locator(".cook-text").textContent()), "and in cook mode");
     await say("stop");
     // a browser that can't listen: buttons steer, the voice can still read
     const two = await open(false); const p2 = two.page;
     await p2.goto(B + "/"); await p2.waitForTimeout(900); await p2.locator("nav button").filter({ hasText: "Recipes" }).click(); await p2.waitForTimeout(500); await p2.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }).click(); await p2.waitForTimeout(500);
-    await p2.getByRole("button", { name: "Cook it as written", exact: true }).click(); await p2.waitForTimeout(1200);
-    await p2.getByRole("button", { name: "Start cooking", exact: true }).click(); await p2.waitForTimeout(400);
+    await p2.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await p2.waitForTimeout(1200);
     const c2 = p2.locator(".cook-mode");
     ok(await c2.locator(".cook-ask").count() === 0 && /This browser can't listen/.test(await c2.textContent()), "no speech recognition: no ask, the buttons steer");
     await c2.getByRole("button", { name: "Next ›" }).click(); await p2.waitForTimeout(200);

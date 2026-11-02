@@ -73,6 +73,8 @@ export function photoAdvice(x: { items: Ingredient[]; protein: number; mealWord:
   if (x.mealKcal && k.kcal < Math.max(150, x.mealKcal * 0.4)) return { line: `This is a snack, not your ${x.mealWord}: ${kcal} and ${prot}. Eat it, and your ${x.mealWord} is still to come.`, first: "all" };
   if (!n.ok && nWays.includes("protein")) return { line: `${nWhy} Add a protein side and it is your ${x.mealWord}; as it stands it is ${kcal} and ${prot}.`, first: "add" };
   if (!n.ok) return { line: `${nWhy} As it stands it is ${kcal} and ${prot}.`, first: "all" };
+  // DT212 v4 (0.3.53): the eating window is said once, by Chef Mealan's checks above (Your day); the card only asks
+  if (!d.ok && /eating window/i.test(dWhy)) return { line: `Did you eat it? ${kcal.charAt(0).toUpperCase() + kcal.slice(1)} and ${prot}.`, first: "all" };
   if (!d.ok) return { line: `${dWhy} ${kcal.charAt(0).toUpperCase() + kcal.slice(1)} and ${prot}.`, first: "all" };
   return { line: `Eat it as it is. ${kcal.charAt(0).toUpperCase() + kcal.slice(1)} and ${prot}, a full ${x.mealWord} for your day${x.culinaryOk === false ? "" : x.culinaryOk ? ", and nothing on it argues with the dish" : ""}.`, first: "all" };
 }

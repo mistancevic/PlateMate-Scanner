@@ -41,7 +41,7 @@ const PORT = "3306", U = `http://127.0.0.1:${PORT}`;
   await page.getByRole("button", { name: "Lock the recipe" }).click(); await page.waitForTimeout(800);
   await page.locator(".way").first().click(); await page.waitForTimeout(200);
   await page.getByRole("button", { name: /I'm making it this way|Lock the recipe, this way/ }).click(); await page.waitForTimeout(600);
-  await page.getByRole("button", { name: /On to How was it|Rate it/ }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(600);
   await page.getByRole("button", { name: "DaaM good" }).click(); await page.waitForTimeout(300);
   const ask = page.locator(".changed-ask");
   const t = ((await ask.innerText().catch(() => "")) || "").replace(/\s+/g, " ");

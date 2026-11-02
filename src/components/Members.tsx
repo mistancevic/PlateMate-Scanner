@@ -43,7 +43,7 @@ export function aheadOf(p: AppApi): Ahead | null {
 }
 export const cooksOf = (list: SharedRecipe[]) => { const n = new Map<string, number>(); for (const r of list) if (r.name && !r.mine) n.set(r.name, (n.get(r.name) ?? 0) + 1); return [...n.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map((x) => x[0]); };
 const byLine = (r: SharedRecipe) => [r.kitchen, r.mine ? (r.name ? "shared by you" : "shared by you, without your name") : r.name ? `shared by ${r.name}` : "shared by a member", r.made ? `made ${r.made === 1 ? "once" : `${r.made} times`}` : ""].filter(Boolean).join(" · ");
-const tag = (r: SharedRecipe) => (r.coverKind === "photo" ? (r.name ? `Photo by ${r.name}` : r.mine ? "Your photo" : "Photo by a member") : `Picture by ${CHEF_NAME}`);
+const tag = (r: SharedRecipe) => (r.coverKind === "photo" ? (r.name ? `Photo by ${r.name}` : r.mine ? "Your photo" : "Photo by a member") : `Drawn by ${CHEF_NAME}`);
 
 // the members' list is kept for a minute in the tab (RecipesScreen.loadMembers); a change of yours forgets it
 export const MEMBERS_CACHE = "chefmealan-members-list";
@@ -185,7 +185,7 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
           <small className="mb-sub">The cover members see</small>
           <div className="mb-covers">{photos.map((x) => {
             const d = isDrawnPhoto(meal, x), on = sig(x) === pick;
-            return <button key={sig(x)} className={`mb-cover ${on ? "on" : ""}`} onClick={() => setPick(sig(x))} aria-pressed={on}><img src={x} alt="" /><small>{on ? "✓ " : ""}{d ? `Picture by ${CHEF_NAME}` : "Your photo"}</small></button>;
+            return <button key={sig(x)} className={`mb-cover ${on ? "on" : ""}`} onClick={() => setPick(sig(x))} aria-pressed={on}><img src={x} alt="" /><small>{on ? "✓ " : ""}{d ? `Drawn by ${CHEF_NAME}` : "Your photo"}</small></button>;
           })}</div>
           {pick !== (shared.coverSig ?? null) && <div className="button-row"><button className="pill pill-small" disabled={busy} onClick={changeCover}>Change the cover</button></div>}
         </>)}
@@ -198,7 +198,7 @@ export function SharePanel({ meal, p, made, onPatch }: { meal: Meal; p: AppApi; 
           <small className="mb-sub">The cover members see</small>
           <div className="mb-covers">{photos.map((x) => {
             const d = isDrawnPhoto(meal, x), on = sig(x) === pick;
-            return <button key={sig(x)} className={`mb-cover ${on ? "on" : ""}`} onClick={() => setPick(sig(x))} aria-pressed={on}><img src={x} alt="" /><small>{on ? "✓ " : ""}{d ? `Picture by ${CHEF_NAME}` : "Your photo"}</small></button>;
+            return <button key={sig(x)} className={`mb-cover ${on ? "on" : ""}`} onClick={() => setPick(sig(x))} aria-pressed={on}><img src={x} alt="" /><small>{on ? "✓ " : ""}{d ? `Drawn by ${CHEF_NAME}` : "Your photo"}</small></button>;
           })}</div>
           <small className="muted">Your plate photos stay yours unless you pick one here.</small>
         </>)}

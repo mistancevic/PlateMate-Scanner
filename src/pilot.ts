@@ -240,6 +240,8 @@ export type Feedback = {
   photos?: string[];
   prep?: { went: "as" | "not"; different?: string };
   ate?: "all" | "portion";
+  // DT211 (0.3.53): which step each of the photos was taken on in Make (null: the final photo), by the step's place
+  photoSteps?: (number | null)[];
   // how the meal carried the person, asked on Today 30 minutes after (M1 activity 8, 10 October 2026)
   // R20 (0.2.48, board RS19): the moment it was eaten in, and the recipe's foods as they were (recipeSig), so an answer from
   // before a change stops counting
@@ -281,6 +283,11 @@ export type PilotState = {
   photo?: { image: string; at: string; unsure?: { name: string; options: [number, number] } | null;
     // DT130 (0.2.110): a photo from Your photos says whose plate and when: ate (logged at the photo's time), idea (nothing logged)
     who?: "ate" | "now" | "idea" };
+  // DT212 (0.3.53): a plate from an earlier meal you chose to keep working on is not asked about again (its plateAt)
+  plateAsked?: string;
+  // DT214 (0.3.53, board Stories162): the cook that runs, and the plates and cooks saved for later (see cooking.ts)
+  cook?: import("./cooking").Cook;
+  later?: import("./cooking").Later[];
 };
 export const EMPTY: Nutrition = {
   calories: null,

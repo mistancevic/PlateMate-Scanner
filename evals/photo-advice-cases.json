@@ -489,8 +489,9 @@
    "who": "eat",
    "expect": {
     "first": "all",
-    "says": "^22:30, and your eating window is 07:00 to 21:00\\. A full plate now sits on tomorrow\\. About ",
-    "never": "Eat it as it is"
+    "says": "^Did you eat it\\? About [\\d,]+ to [\\d,]+ kcal and \\d+ g protein\\.$",
+    "never": "Eat it as it is|eating window",
+    "why": "DT212 v4 (0.3.53): the eating window is said once, in Chef Mealan's checks (Your day); the card under it only asks Did you eat it"
    }
   },
   {

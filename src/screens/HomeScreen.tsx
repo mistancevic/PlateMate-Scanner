@@ -1,3 +1,5 @@
+import { ChefLine } from "../components/ChefLine";
+import { CookStrip } from "../components/CookStrip";
 import { travelOn, placeName as placeNameOf } from "../travel";
 import { SetupRow } from "../components/SetupRow";
 import { Fragment, useEffect, useState } from "react";
@@ -219,6 +221,8 @@ export function HomeScreen(p: AppApi) {
         {/* 0.2.57 (board DS6, I, Milan 10:21 to 10:46): no day part. The day header has the date; Maintain › opens Goal; one set
             of numbers every day has nothing to say here. Where training and rest days differ, the kind of day stays, without the date. */}
       </section>
+      {/* DT214 v2 (0.3.53, board Stories162): while a cook runs, the strip under the My goal block */}
+      <CookStrip p={p} />
       {/* DT189 (0.3.31): the strip in words instead of a number on an icon; it opens Clients on the list */}
       {p.isCoach && p.waiting.length > 0 && (
         <button className="strip strip-button" onClick={() => setTab("clients")}>{waitingWords(p.waiting)}</button>
@@ -422,12 +426,14 @@ export function HomeScreen(p: AppApi) {
                 answer stays on it, with Change for a wrong tap */}
             {(carryDue(f) || changingCarry === f.id)
               ? <div className="carry-in" aria-label={`How did ${f.meal.title} carry you?`}>
-                  <small className="carry-q">How did it carry you?</small>
+                  {/* DT211 v8 (0.3.53): the last question of the conversation, as Chef Mealan's line */}
+                  <ChefLine className="carry-q" text="About 30 minutes on: how did it carry you?" />
                   <div className="carry-acts">
                     {(["light", "fine", "heavy"] as const).map((k) => (
                       <button key={k} type="button" className={`choice${f.carry?.how === k ? " on" : ""}`} onClick={() => { p.setCarry(f.id, k, carryMoment(f)); setChangingCarry(null); }}>{CARRY_WORDS[k]}</button>
                     ))}
                   </div>
+                  {p.state.cook?.cardId === f.id && <small className="muted carry-closes">Your answer closes the cook: the strip goes, the card keeps it all.</small>}
                 </div>
               : f.carry && <small className="carry-in carry-done">Carried you: <b>{CARRY_WORDS[f.carry.how]}</b> · <button type="button" className="link in-inline" onClick={() => setChangingCarry(f.id)}>Change</button></small>}
           </div>,

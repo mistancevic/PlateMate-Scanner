@@ -46,7 +46,7 @@ seed.items = [];
   // eaten as it stands: the card points at the recipe, no copy
   await click(/^(Keep it as it is|Lock the recipe)$/);
   if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); await click(/I'm making it this way|Lock the recipe, this way/i); } else await click(/^Continue$/);
-  await click(/On to How was it|Rate it/i);
+  await click(/Cooked\. Next: Eat/);
   ok(/Sarma is in My recipes already/.test(await page.locator("main").textContent()), "the after step says the recipe exists");
   await click(/DaaM good/i); await click(/^Save$/); await page.waitForTimeout(600);
   const meals = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).meals.map((m) => m.title));

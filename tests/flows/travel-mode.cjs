@@ -84,8 +84,8 @@ const PORT = "3197", B = `http://127.0.0.1:${PORT}`;
     ok(sent && sent.eats && sent.eats.away === "a hotel with no kitchen, in Belgrade", "Chef Mealan is told: a hotel with no kitchen, in Belgrade");
     // a hotel: no Start cooking on Make
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500); await page.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }).click(); await page.waitForTimeout(500);
-    await page.getByRole("button", { name: "Cook it as written", exact: true }).click(); await page.waitForTimeout(1200);
-    if (await page.getByRole("button", { name: "Start a new plate" }).count()) { await page.getByRole("button", { name: "Start a new plate" }).click(); await page.waitForTimeout(1200); }
+    await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(1200);
+    if (await page.getByRole("button", { name: "Clear my plate" }).count()) { await page.getByRole("button", { name: "Clear my plate" }).click(); await page.waitForTimeout(1200); }
     ok(await page.getByRole("button", { name: "Start cooking", exact: true }).count() === 0 && /Start cooking is off/.test(await page.textContent("body")) && await page.locator(".mk-check").count() === 6, "a hotel: Start cooking is off; the steps stay to tick");
     // three days on: since Wednesday, yesterday marked travelling
     await page.evaluate(() => { const p = JSON.parse(localStorage.getItem("chefmealan-personal")); p.travel.since = "2026-10-27T08:00:00.000Z"; localStorage.setItem("chefmealan-personal", JSON.stringify(p)); });

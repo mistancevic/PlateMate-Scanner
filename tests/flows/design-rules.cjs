@@ -61,7 +61,8 @@ const U = "http://127.0.0.1:3242";
     // ---- A: the recipe page has one filled button, Make it; the Plate's food list adds are outlined ----
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(700);
     await page.locator(".recipe-tile, .recipe-card").filter({ hasText: "Sarma" }).first().click(); await page.waitForTimeout(900);
-    ok(JSON.stringify(await filled(page)) === JSON.stringify(["Cook it as written"]), "A: the recipe page's one filled button is Cook it as written: " + (await filled(page)).join(", "));
+    // DT211 v8 (0.3.53): the one filled button is Start cooking, in the Steps block; grey while the recipe has no steps
+    ok((await filled(page)).length === 0 && await page.locator(".rq-start button").isDisabled(), "A: Sarma has no steps yet: Start cooking is grey, nothing else is filled: " + (await filled(page)).join(", "));
     ok(await page.getByRole("button", { name: "Write my own" }).evaluate((b) => b.classList.contains("pill")), "A, B: Write my own is a button next to the other way, not a link");
     const rb = await page.locator("main button").filter({ hasText: /^\s*Recipes\s*$/ }).first().boundingBox(), hero = await page.locator(".rq-hero").first().boundingBox();
     ok(rb && hero && rb.y < hero.y && rb.x < 60, "E: the recipe page's Back, Recipes, sits top left above the photo");

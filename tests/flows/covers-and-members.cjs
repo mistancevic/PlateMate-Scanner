@@ -61,15 +61,15 @@ const toast = { title: "Toast with peanut butter", kitchen: null, steps: [], ite
   await page.reload(); await page.waitForTimeout(1500);
   ok(asked.length === 3, "CO1: drawn once: nothing is asked again after a reload");
   await recipes();
-  ok(/Picture by Chef Mealan/.test(await page.locator(".recipe-tile").filter({ hasText: "Šopska" }).textContent()), "CO1: the tile says Picture by Chef Mealan");
+  ok(/Drawn by Chef Mealan/.test(await page.locator(".recipe-tile").filter({ hasText: "Šopska" }).textContent()), "CO1: the tile says Drawn by Chef Mealan");
   ok(/Picture tomorrow/.test(await page.locator(".recipe-tile").filter({ hasText: "Tuna salad" }).textContent()), "CO1: the waiting recipe's tile says Picture tomorrow");
   await page.locator(".recipe-tile").filter({ hasText: "Šopska" }).click(); await page.waitForTimeout(500);
-  ok(await page.locator(".rq-drawn").filter({ hasText: "Picture by Chef Mealan" }).count() === 1 && await page.getByRole("button", { name: "Add my photo" }).count() === 1 && !(await page.locator(".rq-thumbs").isVisible()), "CO1: the page shows the drawn cover, labelled, with Add my photo");
+  ok(await page.locator(".rq-drawn").filter({ hasText: "Drawn by Chef Mealan" }).count() === 1 && await page.getByRole("button", { name: "Add my photo" }).count() === 1 && !(await page.locator(".rq-thumbs").isVisible()), "CO1: the page shows the drawn cover, labelled, with Add my photo");
   ok(/drew it from your foods and amounts/.test(await page.locator(".rq-hint").textContent()), "CO1: the line says how it was drawn");
 
   // CO4: For members, on a recipe of yours
   const panel = page.locator(".mb-share");
-  ok(/Not shared/.test(await panel.textContent()) && await panel.locator(".mb-cover").count() === 1 && /Picture by Chef Mealan/.test(await panel.locator(".mb-cover.on").textContent()), "CO4: Not shared; the cover members see is the drawn picture");
+  ok(/Not shared/.test(await panel.textContent()) && await panel.locator(".mb-cover").count() === 1 && /Drawn by Chef Mealan/.test(await panel.locator(".mb-cover.on").textContent()), "CO4: Not shared; the cover members see is the drawn picture");
   ok(!(await panel.getByRole("switch").isChecked()) && /Off: members see it as a member's/.test(await panel.textContent()), "CO4: Show my first name is off until switched on");
   await panel.getByRole("button", { name: "Balkan" }).click();
   await panel.getByRole("button", { name: "Share with members" }).click(); await page.waitForTimeout(800);

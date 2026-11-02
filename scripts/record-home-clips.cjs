@@ -298,8 +298,8 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
     }, { meals: [bowl], init: voice, path: "/", time: "2026-10-30T18:40:00", setup: async (page, click) => {
       await click(page.locator("nav button").filter({ hasText: "Recipes" }), 700);
       await click(page.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }), 700);
-      await click(page.getByRole("button", { name: "Cook it as written", exact: true }), 1200);
-      await click(page.getByRole("button", { name: "Start cooking", exact: true }), 700); } });
+      // DT211 v8 (0.3.53): Start cooking sits in the recipe's Steps block and opens cook mode straight away
+      await click(page.getByRole("button", { name: "Start cooking", exact: true }), 1500); } });
     await clip("situation", async (page, a) => {
       await a.tap(page.locator(".ex-map .menu-row").filter({ hasText: "A late evening" }).first(), 1300);
       await a.swipe(520, 1500); await a.swipe(560, 1400);
