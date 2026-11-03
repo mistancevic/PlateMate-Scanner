@@ -1,4 +1,5 @@
 import { ChefLine } from "../components/ChefLine";
+import { say } from "../chefScript";
 import { CookStrip } from "../components/CookStrip";
 import { travelOn, placeName as placeNameOf } from "../travel";
 import { SetupRow } from "../components/SetupRow";
@@ -218,7 +219,7 @@ export function HomeScreen(p: AppApi) {
         )}
         {follow && !planned && (
           <div className="today-plan">
-            <b>What kind of day is it?</b>
+            <ChefLine text={say("whatDay")} />
             <div className="day-row">
               {DAY_TYPES.map((d) => <button key={d.id} className={`choice ${p.day.type === d.id ? "on" : ""}`} onClick={() => p.setDayType(d.id)}>{d.name}</button>)}
             </div>
@@ -329,7 +330,7 @@ export function HomeScreen(p: AppApi) {
                 <small>{many ? `Each one ${f.leftOf ?? "portion"}: ` : ""}{fmt(a.kcal, 0)} kcal · {fmt(a.protein, 0)} g protein{r && <> · <button className="link in-inline" onClick={() => p.openRecipePage(r.id)}>Open the recipe ›</button></>}</small>
                 {asking === f.id && (
                   <div className="which-meal">
-                    <small className="muted"><b>Which meal is it?</b></small>
+                    <ChefLine text={say("whichMeal")} />
                     <div className="moments" role="radiogroup" aria-label="Which meal is it?">
                       {openSlots.map((sl) => <button key={sl.id} className={`choice ${asWhich === sl.id ? "on" : ""}`} aria-pressed={asWhich === sl.id} onClick={() => setAsWhich(sl.id)}>{sl.name}, {sl.time}</button>)}
                       <button className={`choice ${asWhich === "snack" ? "on" : ""}`} aria-pressed={asWhich === "snack"} onClick={() => setAsWhich("snack")}>Snack</button>
@@ -435,7 +436,7 @@ export function HomeScreen(p: AppApi) {
               ? <div className="carry-in" data-carry={f.id} aria-label={`How did ${f.meal.title} carry you?`}>
                   {/* DT211 v8 (0.3.53): the last question of the conversation, as Chef Mealan's line */}
                   {/* DT218 (0.3.58): opened early by Go on, it says when he would have asked */}
-                  <ChefLine className="carry-q" text={carryDue(f) || f.carry ? "About 30 minutes on: how did it carry you?" : `How did it carry you? Answer now, or in ${carryLeft(f)} ${carryLeft(f) === 1 ? "minute" : "minutes"}, when I ask.`} />
+                  <ChefLine className="carry-q" text={carryDue(f) || f.carry ? say("carryLater") : say("carryNow", carryLeft(f))} />
                   <div className="carry-acts">
                     {(["light", "fine", "heavy"] as const).map((k) => (
                       <button key={k} type="button" className={`choice${f.carry?.how === k ? " on" : ""}`} onClick={() => { p.setCarry(f.id, k, carryMoment(f)); setChangingCarry(null); }}>{CARRY_WORDS[k]}</button>

@@ -3,6 +3,7 @@
 // kept on the phone and in the account from its first tap. One cook runs at a time; another waits in Saved for later.
 // DT212 v4 (board Stories159): a plate can be saved for later too; both wait in the same block on the Plate for 7 days.
 // Pure functions here, so the walkthroughs and the unit tests read the same rules.
+import { say } from "./chefScript";
 import type { PilotState } from "./pilot";
 
 // what the Plate holds: the foods and everything that belongs to them
@@ -180,7 +181,7 @@ export function resumeLine(c: Cook): string {
   const n = c.steps ?? 0, t = (c.ui.ticks ?? []).filter((x) => /^s\d+$/.test(x) && Number(x.slice(1)) < n).length;
   const ph = Object.keys(c.ui.stepPhotos ?? {}).length + (c.ui.final ? 1 : 0);
   const parts = [n ? `${t} of ${n} steps ticked` : "", ph ? `${ph} ${ph === 1 ? "photo" : "photos"}` : ""].filter(Boolean);
-  return `You were cooking ${c.title}${parts.length ? `: ${parts.join(", ")}` : ""}. Go on where you left off?`;
+  return say("resume", c.title, parts.join(", "));
 }
 // something to resume: a tick, a photo or an answer
 export const cookStarted = (c: Cook | undefined) => !!c && ((c.ui.ticks?.length ?? 0) > 0 || Object.keys(c.ui.stepPhotos ?? {}).length > 0 || !!c.ui.final || c.ui.went === "not" || c.stage === "eat");

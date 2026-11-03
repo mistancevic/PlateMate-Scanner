@@ -2,6 +2,8 @@
 // the camera or the gallery (a photo while cooking, or one made in ChatGPT or Gemini with the Step Picture Checks prompts);
 // who made it is asked, and the checks show before it is kept. Watch the steps plays them, made on the phone from the
 // pictures: no video file. Labels sit under a picture, never on it; nothing under 12 px; every button 44 px or more.
+import { ChefLine } from "./ChefLine";
+import { say } from "../chefScript";
 import { useEffect, useRef, useState } from "react";
 import type { Ingredient } from "../pilot";
 import { stepParts } from "../steps";
@@ -69,7 +71,7 @@ export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose, f
       {err && <small className="error">{err}</small>}
       {src && <>
         <img className="sp-preview" src={src} alt={`The picture for step ${k + 1}`} />
-        <b>Who made it?</b>
+        <ChefLine text={say("whoMadePhoto")} />
         <div className="sp-grid">
           <button className={`choice ${by === "me" ? "on" : ""}`} aria-pressed={by === "me"} onClick={() => setBy("me")}>My photo</button>
           <button className={`choice ${by === "ai" ? "on" : ""}`} aria-pressed={by === "ai"} onClick={() => setBy("ai")}>Drawn by AI</button>

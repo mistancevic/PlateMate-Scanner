@@ -101,9 +101,10 @@
       "id": "DT213",
       "title": "Chef Mealan's script: every question he asks, as his lines",
       "epic": "chef",
-      "state": "now",
-      "why": "Milan 2 November 12:09: bubbles wherever Chef Mealan asks, a script that voice follows later. An inventory of every question in the app, then one design. Board drawn 3 November (Draw 18:03); waits for his Go.",
-      "board": 172
+      "state": "done",
+      "why": "Milan 2 November 12:09: bubbles wherever Chef Mealan asks, a script that voice follows later. An inventory of every question in the app, then one design. Board drawn 3 November (Draw 18:03); Go at 18:21.",
+      "board": 172,
+      "version": "0.3.74"
     },
     {
       "id": "DT202",
@@ -507,9 +508,10 @@
       "id": "DT233",
       "title": "Deploy in Dev data: Preview, Promote, Rollback, each opening GitHub, with the version it touches",
       "epic": "ops",
-      "state": "now",
+      "state": "done",
       "board": 173,
-      "why": "Milan 17:46: lines for the deployments on GitHub. Draw 18:03; board drawn, waits for his Go."
+      "why": "Milan 17:46: lines for the deployments on GitHub. Draw 18:03; board drawn, Go at 18:21.",
+      "version": "0.3.74"
     }
   ]
 }

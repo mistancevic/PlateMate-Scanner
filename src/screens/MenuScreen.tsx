@@ -903,7 +903,42 @@ function DevData({ missing }: { missing: number }) {
       ["Photos named, not on this phone", String(missing)]])}
     {missing > 0 && <p className="small">Chef Mealan fetches them from your account, a few seconds after the app opens. A number that stays means the account does not have them: retake the photo, or empty the plate it was on.</p>}
     {block("The app", [["Version", (import.meta.env.VITE_VERSION as string | undefined) || "0"], ["Commit", (import.meta.env.VITE_COMMIT as string | undefined) || "preview"]])}
+    <DeployBlock />
   </>);
+}
+// DT233 (0.3.74, board Stories173; Coach Milan 3 November 17:46 to 18:21, Go): Deploy, last in Dev data. Each row opens its page on
+// GitHub, where Run workflow starts it; nothing deploys from the app. The versions: main from GitHub, the preview and
+// chefmealan.com from their own /api/version.
+const GH = "https://github.com/mistancevic/PlateMate-Scanner/actions/workflows";
+export const DEPLOY_SOURCES = {
+  main: "https://raw.githubusercontent.com/mistancevic/PlateMate-Scanner/main/package.json",
+  preview: "https://preview---chefmealan-eovxlu2pqq-ew.a.run.app/api/version",
+  live: "https://chefmealan.com/api/version",
+};
+function DeployBlock() {
+  const [v, setV] = useState<{ main?: string | null; preview?: string | null; live?: string | null }>({});
+  useEffect(() => {
+    let on = true;
+    const get = (k: keyof typeof DEPLOY_SOURCES) => fetch(DEPLOY_SOURCES[k], { cache: "no-store" }).then((r) => (r.ok ? r.json() : null)).then((d) => (d && typeof d.version === "string" ? d.version : null)).catch(() => null)
+      .then((x) => { if (on) setV((o) => ({ ...o, [k]: x })); });
+    void get("main"); void get("preview"); void get("live");
+    return () => { on = false; };
+  }, []);
+  const ver = (x: string | null | undefined) => (x === undefined ? "…" : x ?? "not known");
+  const row = (name: string, href: string, line: string, warn = false) => (
+    <a key={name} className="menu-row deploy-row" href={href} target="_blank" rel="noopener noreferrer">
+      <span className="menu-row-text"><b>{name}</b><small className={warn ? "deploy-warn" : ""}>{line}</small></span><span aria-hidden="true">↗</span>
+    </a>
+  );
+  return (
+    <section className="card dev-block deploy-block" aria-label="Deploy">
+      <b>Deploy</b>
+      {row("Preview", `${GH}/preview.yml`, `Builds main, ${ver(v.main)}, and puts it on the preview link`)}
+      {row("Promote", `${GH}/promote.yml`, `Puts the preview, ${ver(v.preview)}, live on chefmealan.com. Live now: ${ver(v.live)}`)}
+      {row("Rollback", `${GH}/rollback.yml`, "Emergency only: chefmealan.com goes back to what was live before the last promote", true)}
+      <small className="muted">Each opens its page on GitHub; Run workflow there starts it. Nothing deploys from the app.</small>
+    </section>
+  );
 }
 
 function AboutPanel() {

@@ -1,6 +1,8 @@
 // DT130 (0.2.110, board Stories78, DT130c v2; Milan 26 October 15:45: chips, not buttons, and short; 16:18: An idea). A photo
 // picked from Your photos waits on the Plate with one question before the read: whose plate, and when. Three chips, one on;
 // a tap picks another and nothing else happens. The line under them says what the one that is on does. Read the plate reads.
+import { ChefLine } from "./ChefLine";
+import { say } from "../chefScript";
 import { useState } from "react";
 import { WHO_ORDER, atTime, chipWord, hhmm, photoFrom, startWho, whoLine, type Who } from "../photoAsk";
 
@@ -14,7 +16,8 @@ export function PhotoAsk({ image, at, mealAt, read, drop, exploring = false }: {
   const meal = who === "idea" ? null : mealAt(when);
   return (
     <section className="pa" aria-label="Whose plate, and when">
-      <div className="pa-top"><img src={image} alt="the photo you picked" /><span><b>{photoFrom(taken, now)}</b><br />Whose plate, and when?</span></div>
+      {/* DT213 (0.3.74): Chef Mealan asks, with the photo */}
+      <ChefLine className="pa-top" image={image} text={say("photoWhose", photoFrom(taken, now))} />
       <div className="pa-chips" role="radiogroup" aria-label="Whose plate, and when">
         {WHO_ORDER.map((w) => (
           // a chip holds the time field, and a field cannot sit inside a button: the chips are radios by role

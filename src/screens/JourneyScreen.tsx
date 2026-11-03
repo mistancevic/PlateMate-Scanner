@@ -1,4 +1,5 @@
 import { plateWhenOf, capFirst, atMeal } from "../plateMode";
+import { say } from "../chefScript";
 import { ThinkingCard } from "../components/ThinkingCard";
 import { carriedLists } from "../carry";
 import { tasteForReq } from "../tasteChips";
@@ -1308,20 +1309,20 @@ export function JourneyScreen(p: AppApi) {
     : p.pendingFood && state.cook ? (() => { const f = p.pendingFood!, pdf = density(f.protein, f.calories); return (
       <section className="chef-ask" aria-label="Use it in the dish you are cooking, put it on the Plate, or keep it in your foods">
         <div className="ca-food">{f.photo ? <img src={f.photo} alt="" /> : <span className="ca-food-icon" aria-hidden="true">{f.icon ?? "🍽"}</span>}<span><b>{f.name}</b><br /><small className="muted">just scanned{pdf !== null ? ` · ${pdText(pdf)}` : ""}</small></span></div>
-        <ChefLine text={`You are cooking ${state.cook!.title}. Shall I use this ${f.name.split(",")[0].trim().toLowerCase()} in it, put it on the Plate, or keep it in your foods?`} />
+        <ChefLine text={say("scanWhileCooking", state.cook!.title, f.name.split(",")[0].trim().toLowerCase())} />
         <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => p.answerPendingFood("use")}>Use it in {state.cook!.title}</button><button type="button" className="pill" onClick={() => p.answerPendingFood("plate")}>Put it on the Plate</button><button type="button" className="pill" onClick={() => p.answerPendingFood("keep")}>Keep it in my foods</button></div>
         <small>Use it: {CHEF_NAME} asks what it replaces or adds, and the steps follow. On the Plate: it joins the meal you are putting together; the cook goes on as it was. Keep it: it waits in Foods.</small>
       </section>); })()
     // Start cooking with foods on the Plate
     : p.cookAsk && items.length > 0 ? (() => { const m = p.cookAsk!.meal; return plateIsOld && since ? (
       <section className="chef-ask" aria-label="Before you cook: your plate from earlier">
-        <ChefLine image={state.photo?.image} text={`Before you cook: your plate from ${whenWords(since)}. ${plateWords}. Did you eat it?`} />
+        <ChefLine image={state.photo?.image} text={say("plateOldBeforeCook", whenWords(since), plateWords)} />
         <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => { ateEarlier(true); p.answerCookAsk("ate"); }}>Ate it</button><button type="button" className="pill" onClick={() => p.answerCookAsk("save")}>Save for later</button></div>
         <div className="ca-links"><button type="button" className="link" onClick={() => p.answerCookAsk("clear")}>Clear it</button><button type="button" className="link" onClick={() => p.answerCookAsk(null)}>Cancel</button></div>
         <small>Whichever you pick, {m.title} then starts on its own plate. Cancel goes back to the recipe.</small>
       </section>) : (
       <section className="chef-ask" aria-label="Before you cook: your plate">
-        <ChefLine image={state.photo?.image} text={`Your plate has ${items.length} ${items.length === 1 ? "food" : "foods"}, from ${since ? agoWords(since) : "now"}. ${m.title} starts on its own plate. Shall I save yours for later, or clear it?`} />
+        <ChefLine image={state.photo?.image} text={say("plateSaveOrClear", items.length, since ? agoWords(since) : "now", m.title)} />
         <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => p.answerCookAsk("save")}>Save my plate for later</button><button type="button" className="pill" onClick={() => p.answerCookAsk("clear")}>Clear my plate</button></div>
         <div className="ca-links"><button type="button" className="link" onClick={() => p.answerCookAsk(null)}>Cancel</button></div>
         <small>Save my plate for later keeps it to finish another time; it waits at the top of the Plate. Clear my plate empties it. Cancel goes back to the recipe.</small>
@@ -1333,7 +1334,7 @@ export function JourneyScreen(p: AppApi) {
       const fresh = <button key="new" type="button" className={`pill${photo ? "" : " pill-primary"}`} onClick={() => p.answerPlateAsk("new")}>Start a new plate</button>;
       return (
         <section className="chef-ask pa plate-ask" aria-label="Add to this plate, or start a new one">
-          <ChefLine image={a.image} text={`Your plate already has ${items.length} ${items.length === 1 ? "food" : "foods"}${state.title && state.title !== "DaaM" ? `: ${state.title}` : ""}. ${a.what} ${photo ? "Add them to yours, or start a new plate with them?" : "Start a new plate with it, or add it to yours?"}`} />
+          <ChefLine image={a.image} text={say("plateAddOrNew", items.length, state.title && state.title !== "DaaM" ? state.title : "", a.what, photo)} />
           <div className="ca-go pa-go">{photo ? [add, fresh] : [fresh, add]}</div>
           <div className="ca-links"><button type="button" className="link pa-keep" onClick={() => p.answerPlateAsk(null)}>{photo ? "Drop the photo" : "Keep my plate"}</button></div>
           <small>Add to my plate: the new foods join yours{photo ? ", marked ~" : ""}, and the plate keeps its name. Start a new plate: only the new foods.</small>
@@ -1342,7 +1343,7 @@ export function JourneyScreen(p: AppApi) {
     // a plate from an earlier meal: Did you eat it?
     : plateIsOld && since && !p.filling && !inCook ? (
       <section className="chef-ask" aria-label="Your plate from earlier">
-        <ChefLine image={state.photo?.image} text={`Your plate from ${whenWords(since)}. ${plateWords}. Did you eat it?`} />
+        <ChefLine image={state.photo?.image} text={say("plateOldAte", whenWords(since), plateWords)} />
         <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => ateEarlier(false)}>Ate it</button><button type="button" className="pill" onClick={p.savePlate}>Save for later</button></div>
         <div className="ca-links"><button type="button" className="link" onClick={p.keepWorking}>Keep working on it</button><button type="button" className="link" onClick={clearPlate}>Clear it</button></div>
         <small>Ate it saves it to {dayOf}, to the meal it was set for, at {state.photo ? "the photo's time" : "the time it was started"}. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.</small>
@@ -1424,7 +1425,7 @@ export function JourneyScreen(p: AppApi) {
           ))}
         </div>
         <p className="small taste-hint">{tasteHint}</p>
-        <p className="label">What kind of moment?</p>
+        <ChefLine text={say("whatMoment")} />
         <div className="moments">
           {orderMoments(p.usual).map((m) => (
             <button key={m.id} className={`choice ${p.moment === m.id ? "on" : ""} ${m.planned ? "" : "pill-unplanned"}`} onClick={() => p.setMoment(m.id)}>{m.name}</button>
@@ -1454,7 +1455,7 @@ export function JourneyScreen(p: AppApi) {
         {/* DT219 (0.3.58, board Stories164): a read that found no foods; the Plate stays as it was */}
         {p.photoNoFoods && (
           <section className="mp-none" aria-label="No foods found on the photo">
-            <ChefLine text="I could not find foods on this photo. Take it again, from above with the whole plate in, or add the foods yourself." />
+            <ChefLine text={say("photoNoFoods")} />
             <div className="mp-none-go">
               <button type="button" className="pill pill-primary" onClick={() => { p.dropNoFoods(); p.mealCamera(); }}>Take it again</button>
               <button type="button" className="pill" onClick={() => { p.dropNoFoods(); const box = document.querySelector<HTMLInputElement>('input[aria-label="Search all my foods"]'); box?.scrollIntoView({ behavior: "smooth", block: "center" }); box?.focus({ preventScroll: true }); }}>Add the foods myself</button>
@@ -1673,8 +1674,8 @@ export function JourneyScreen(p: AppApi) {
           return (<>
             {sugg.length > 0 && (
               <div className="one-dish" role="group" aria-label="Is this one dish?">
-                <b>Is this one dish?</b>
-                <small>A food here is cooked, so these foods are made together. Grouped into parts, Fit keeps each part's proportions and the steps go part by part.</small>
+                {/* DT213 (0.3.74): his question, his reason inside it */}
+                <ChefLine text={say("oneDish")} />
                 <small className="one-dish-parts">{sugg.map((g, k) => <span key={g.part}>{k ? " · " : ""}<b>{g.part}:</b> {g.ids.map(nameOf).join(", ")}</span>)}</small>
                 <div className="button-row">
                   <button type="button" className="pill pill-small pill-primary" onClick={() => { groupIt(); log("parts", { how: "suggested" }); }}>Group it like this</button>
@@ -2256,7 +2257,7 @@ export function JourneyScreen(p: AppApi) {
         {/* DT214 v2 (0.3.53): a food scanned while cooking, used in the dish: what it replaces, or Add it */}
         {p.useInCook && (() => { const f = p.useInCook!, short = f.name.split(",")[0].trim(); return (
           <section className="chef-ask" aria-label={`Use ${short} in ${dishName}`}>
-            <ChefLine text={`${short}: what does it replace in ${dishName}, or does it add to it?`} />
+            <ChefLine text={say("useInCook", short, dishName)} />
             <div className="ca-go">
               {items.filter((i) => !i.optional).map((i) => <button key={i.id} type="button" className="pill" onClick={() => { setState((st) => ({ ...st, items: st.items.map((x) => (x.id === i.id ? { ...x, food: f, est: undefined } : x)), portion: null })); p.doneUseInCook(); }}>In place of {i.food.name.split(",")[0].trim().toLowerCase()}</button>)}
               <button type="button" className="pill pill-primary" onClick={() => { add(f); p.doneUseInCook(); }}>Add it</button>
@@ -2329,7 +2330,7 @@ export function JourneyScreen(p: AppApi) {
         </div>
         {/* DT211 v8: How did the cooking go?, Chef Mealan's line */}
         <div className="cook-q">
-          <ChefLine text="How did the cooking go?" />
+          <ChefLine text={say("howCooking")} />
           <div className="reasons">
             {/* DT90 (0.2.87): a plate that is no recipe was made by its steps */}
             <button className={`choice ${went === "as" ? "on" : ""}`} onClick={() => setWent("as")}>{rec ? "All as the recipe says" : "As the steps say"}</button>
@@ -2463,7 +2464,7 @@ export function JourneyScreen(p: AppApi) {
       {/* DT211 v8 (0.3.53, board Stories158): the final photo comes along from Make; Chef Mealan asks, in his lines */}
       {plate && <div className="eat-final"><img src={plate} alt="your meal" /><small className="muted">Your meal, from Make.</small></div>}
       <div className="cook-q">
-        <ChefLine text="Enjoy it. How much did you eat?" />
+        <ChefLine text={say("howMuchAte")} />
       {/* R25 (0.2.53, board RS25): a whole recipe that makes several is counted, starting on one, never logged whole by
           accident; the rest is said, not followed (R16) */}
       {wholeN > 1 && rec ? <>
@@ -2475,7 +2476,7 @@ export function JourneyScreen(p: AppApi) {
           <button type="button" className="pill pill-small" aria-label="It made one more" onClick={() => setMadeN(wholeN + 1)}>+</button>
         </div>
         {wholeN !== cookCount && cookCount === rec.makes!.n && <button type="button" className={`choice ${keepMade ? "on" : ""}`} aria-pressed={keepMade} onClick={() => setKeepMade(!keepMade)}>It always makes {wholeN}: make {wholeN} the recipe's number</button>}
-        <p className="label">You made {countOf(wholeN, unitOf(rec))}. How many did you eat?</p>
+        <ChefLine text={say("howManyAte", countOf(wholeN, unitOf(rec)))} />
         <div className="eat-count" role="group" aria-label="How many did you eat?">
           <button type="button" className="pill pill-small" aria-label="One less" disabled={ate !== "all" || eatN <= 1} onClick={() => { setEatN((k) => Math.max(1, k - 1)); setBigAsk(false); }}>−</button>
           <b aria-live="polite">{ate === "all" ? eatN : 0}</b><span>{ate === "all" && eatN === 1 ? oneOf(rec) : unitOf(rec)}</span>
@@ -2509,7 +2510,7 @@ export function JourneyScreen(p: AppApi) {
       )}
       </div>
       {!eatLater && <div className="cook-q">
-        <ChefLine text="And how did it taste?" />
+        <ChefLine text={say("howTaste")} />
         <div className="choices three">
           <button className={`choice ${good === "daam" ? "on" : ""}`} onClick={() => setGood("daam")}><span className="double-thumbs" aria-hidden="true"><ThumbsUp size={22} /><ThumbsUp size={22} /></span><span>DaaM good</span></button>
           <button className={`choice ${good === "good" ? "on" : ""}`} onClick={() => setGood("good")}><ThumbsUp size={22} /><span>Good</span></button>
@@ -2519,7 +2520,7 @@ export function JourneyScreen(p: AppApi) {
       {!eatLater && <>
       {tryCtx && (
         <section className="card save-recipe">
-          <div className="card-top"><span>{tryCtx.kind === "change" ? "Did the swap work?" : "Did the side work?"}</span></div>
+          <ChefLine text={say("didTryWork", tryCtx.kind === "change" ? "change" : "side")} />
           <small>{tryCtx.what}. Your answer stays with the recipe, so next time it says how it went.</small>
           <div className="reasons">
             {([["yes", "It worked"], ["ok", "It was OK"], ["no", "It didn't work"]] as const).map(([k, l]) => <button key={k} className={`choice ${tried === k ? "on" : ""}`} onClick={() => setTried(k)}>{l}</button>)}
@@ -2530,7 +2531,7 @@ export function JourneyScreen(p: AppApi) {
       {state.title && state.title !== "DaaM" ? <small className="muted fb-name">{state.title} · named in Craft</small> : <label className="field"><span>Name it</span><input value={title} placeholder={plateName} onChange={(e) => setTitle(e.target.value)} /></label>}
       {/* DT225 v2 (0.3.61, board Stories166): your words, kept on the recipe, only for you */}
       <div className="eat-words">
-        <ChefLine text="Anything you want to remember about it?" />
+        <ChefLine text={say("remember")} />
         <textarea aria-label="Anything you want to remember about it?" placeholder="I felt so energized" value={note} onChange={(e) => setNote(e.target.value)} />
         <small className="muted">Kept on the recipe, only for you. Your coach sees it when you share the meal.</small>
       </div>

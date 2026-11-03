@@ -32,7 +32,7 @@ seed.items = []; seed.meals = []; seed.feedback = []; seed.goals = { ...seed.goa
     const chips = await page.locator(".for-row .choice").allTextContents();
     ok(chips.join("|") === "Exploring|Breakfast|Lunch|Dinner|Snack", "the whole line opens What is it for: " + chips.join(", "));
     ok(/Lunch/.test(await page.locator(".for-row .choice.on").textContent()) && /by the clock: a guess/.test(await page.locator(".for-hint").textContent()), "Lunch is the guess, and the hint says so");
-    ok(await page.locator("p.label").filter({ hasText: "What kind of moment?" }).count() === 1 && await page.locator("p.label").filter({ hasText: "When is this for?" }).count() === 0, "the moment's question reads What kind of moment?");
+    ok(await page.locator(".chef-line").filter({ hasText: "What kind of moment?" }).count() === 1 && await page.locator("p.label").filter({ hasText: "When is this for?" }).count() === 0, "the moment's question reads What kind of moment?, in Chef Mealan's line (DT213)");
     ok(await page.locator(".plan-line-done").count() === 1, "Done stands where the pencil was");
     await page.locator(".for-row .choice").filter({ hasText: "Exploring" }).click(); await page.waitForTimeout(300);
     ok(/^Exploring · not sized for a meal/.test(await line()) && !/Make it a/.test(await page.locator("main").textContent()), "Exploring: the line says so, and nothing offers to make it a meal");
