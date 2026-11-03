@@ -1,0 +1,40 @@
+# Rollback, from GitHub (Coach Milan 3 November 2026, Go 14:20): chefmealan.com serves again what was live before the last
+# promote, as ./deploy/rollback.sh does in Cloud Shell. Both read what was live before from Google Cloud, so a promote from one and
+# a rollback from the other agree. For an emergency: the promoted release is broken for everyone. The log lists the last releases
+# first; to go to one of them, run again with its name in "to".
+name: Rollback
+on:
+  workflow_dispatch:
+    inputs:
+      to:
+        description: "Leave empty: back to what was live before the last promote. Or a revision name from the list in an earlier run's log."
+        required: false
+        default: ""
+concurrency: { group: deploy, cancel-in-progress: false }
+jobs:
+  rollback:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # GitHub signs in to Google Cloud with a short-lived token, no key (keys are blocked by the organization's policy)
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: projects/384791096823/locations/global/workloadIdentityPools/github/providers/github
+          service_account: github-deploy@project-fb3c5fab-00d1-4d11-ac7.iam.gserviceaccount.com
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Settings from the project
+        env:
+          FB_API_KEY_SECRET: ${{ secrets.FB_API_KEY }}
+          FB_APP_ID_SECRET: ${{ secrets.FB_APP_ID }}
+        run: ./deploy/ci-env.sh
+      - name: The last releases
+        run: ./deploy/rollback.sh list
+      - name: Rollback
+        env:
+          TO: ${{ inputs.to }}
+        run: ./deploy/rollback.sh ${TO:+"$TO"}

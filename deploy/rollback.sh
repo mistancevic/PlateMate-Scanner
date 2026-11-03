@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# One command back: chefmealan.com serves the release that was live before the last deploy or promote.
+# One command back: chefmealan.com serves the release that was live before the last deploy or promote, from Cloud Shell or
+# GitHub alike (what was live before is kept in Google Cloud since 3 November 2026).
 # ./deploy/rollback.sh                 back to the one before
 # ./deploy/rollback.sh list            the last releases, newest first
 # ./deploy/rollback.sh <revision>      back to that one, from the list
@@ -17,10 +18,11 @@ if [ "${1:-}" = "list" ]; then
   exit 0
 fi
 TARGET="${1:-}"
+[ -z "$TARGET" ] && TARGET=$(get_last_live)
 [ -z "$TARGET" ] && [ -f deploy/.last-live ] && TARGET=$(cat deploy/.last-live)
 if [ -z "$TARGET" ]; then echo "Nothing remembered to go back to. Pick one from: ./deploy/rollback.sh list"; exit 1; fi
 NOW=$(live_revision)
 if [ "$TARGET" = "$NOW" ]; then echo "That release is already live ($(commit_of "$NOW"))."; exit 0; fi
 gcloud run services update-traffic "$SERVICE" --project "$PROJECT" --region "$REGION" --to-revisions "$TARGET=100" --quiet >/dev/null
-echo "$NOW" > deploy/.last-live
+set_last_live "$NOW"
 echo "Live again: $(commit_of "$TARGET") ($TARGET). Before the rollback: $(commit_of "$NOW"); ./deploy/rollback.sh brings it back."
