@@ -28,3 +28,8 @@ test("the script's lines read as he says them: one question, numbers filled in",
   assert.equal(say("busyLate", "18:30", "Dinner", "19:00", 30, "dinner", null), "Busy until 18:30. Dinner at 19:00 leaves 30 minutes to cook. A quick dinner?");
   for (const k of Object.keys(CHEF) as (keyof typeof CHEF)[]) assert.ok(k.length > 2);
 });
+
+test("a line built on words that end a sentence keeps one full stop", () => {
+  assert.equal(say("photoWhose", "A photo from yesterday, 19:20."), "A photo from yesterday, 19:20. Whose plate is it, and when?");
+  assert.equal(say("photoWhose", "A photo from today, 12:05"), "A photo from today, 12:05. Whose plate is it, and when?");
+});

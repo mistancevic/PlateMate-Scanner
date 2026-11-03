@@ -4,7 +4,7 @@
 const n = (k: number, one: string, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
 export const CHEF = {
   // ---- the Plate ----
-  photoWhose: (from: string) => `${from}. Whose plate is it, and when?`,
+  photoWhose: (from: string) => `${from.replace(/\.$/, "")}. Whose plate is it, and when?`,
   photoNoFoods: () => "I could not find foods on this photo. Take it again, from above with the whole plate in, or add the foods yourself.",
   oneDish: () => "A food here is cooked, so these foods are made together. Is this one dish? Grouped into parts, Fit keeps each part's proportions and the steps go part by part.",
   whatMoment: () => "What kind of moment?",
