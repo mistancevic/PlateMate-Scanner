@@ -932,7 +932,8 @@ export default function App() {
     // and nothing can roll back that far; once the records moved, the block holds only the plate and settings
     const moved = remoteMeta.current.recordsMovedAt;
     const slim = Boolean(moved);
-    const b = stripPhotos(st);
+    // 0.3.71: a loose photo is named only once its file is in the account (filesRef: what this phone sent or fetched)
+    const b = stripPhotos(st, (k) => filesRef.current.up.has(k));
     return { state: slim ? { ...b, foods: [], meals: [] } : b, recordsOnly: slim, foodsCount: st.foods.length };
   };
   // Storage release 2: read the account's records, take the newest of each, then send what changed here.
@@ -984,7 +985,7 @@ export default function App() {
     if (!cloudEnabled || !fr.uid || !fr.ready) return;
     if (fr.running) { fr.again = true; return; }
     fr.running = true;
-    let sent = 0;
+    let sent = 0, looseSent = 0;
     try {
       do {
         fr.again = false;
@@ -992,6 +993,7 @@ export default function App() {
         for (const [k, v] of now) {
           if (fr.up.get(k) === sig(v)) continue;
           await uploadPhoto(fr.uid, fileOf(k), v); fr.up.set(k, sig(v)); saveUp(); sent++;
+          if (k.startsWith("loose:")) looseSent++;
         }
         for (const k of [...fr.up.keys()]) {
           if (now.has(k) || !isOrphan(k, st)) continue;
@@ -999,6 +1001,8 @@ export default function App() {
         }
       } while (fr.again);
       if (sent) setCloudStatus({ ok: true, text: `Saved to your account, with ${sent} photo${sent === 1 ? "" : "s"}`, at: new Date().toISOString() });
+      // 0.3.71: a loose photo's file is up: the next save names it in the account's copy in place of the photo
+      if (looseSent) setFilesTick((t) => t + 1);
     } catch (e) {
       setCloudStatus({ ok: true, text: `Saved to your account. Photos: ${explainCloudError(e)}`, at: new Date().toISOString() });
     } finally { fr.running = false; }
@@ -1563,6 +1567,7 @@ export default function App() {
   // every change goes to the account, three seconds after it settles (0.3.67: was one; Coach Milan 3 November 07:55), and
   // straight away when the app goes to the back, so nothing waits. Only the part that changed is written (saveCloud).
   const pendingSave = useRef<(() => void) | null>(null);
+  const [filesTick, setFilesTick] = useState(0);
   useEffect(() => {
     const flush = () => { if (document.visibilityState === "hidden") { const f = pendingSave.current; pendingSave.current = null; f?.(); } };
     const onHide = () => { const f = pendingSave.current; pendingSave.current = null; f?.(); };
@@ -1587,7 +1592,7 @@ export default function App() {
     const t = window.setTimeout(run, 3000);
     pendingSave.current = run;
     return () => { window.clearTimeout(t); if (pendingSave.current === run) pendingSave.current = null; };
-  }, [state, goal, clientName, personal, goalLog, safety, user, planned]);
+  }, [state, goal, clientName, personal, goalLog, safety, user, planned, filesTick]);
   async function api(url: string, body?: unknown) {
     const res = await fetch(url, {
       method: body === undefined ? "GET" : "POST",
