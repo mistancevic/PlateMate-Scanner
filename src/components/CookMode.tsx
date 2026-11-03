@@ -1,6 +1,7 @@
 // DT174 (0.3.16, board Stories121): cook mode, full screen over Make. One big step at a time, read aloud by the phone's own
 // voice, steered by Back, Repeat, Next or by voice (the browser's own speech recognition). The screen stays on. Each step you
 // finish is ticked on Make; closing keeps the ticks. No AI, nothing sent by us: free to run.
+import { getLang, speechLang } from "../lang";
 import { ChefLine } from "./ChefLine";
 import { say as chefSay } from "../chefScript";
 import { useEffect, useRef, useState, type ReactNode } from "react";
@@ -67,11 +68,11 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
     v.speaking = false; v.tail = true;
     v.timers.forEach((t) => clearTimeout(t)); v.timers = [window.setTimeout(() => { v.tail = false; }, 2500)];
   };
-  const say = (text: string) => {
+  const say = (text: string, lang?: string) => {
     if (!live.current.on || !canSpeak()) return;
     try {
-      // DT215 v3 (0.3.66): the voice and the speed from Settings, Voice while cooking
-      const u = utterance(text);
+      // DT215 v3 (0.3.66): the voice and the speed from Settings, Voice while cooking; DT203: Chef Mealan's answers in his language
+      const u = utterance(text, undefined, lang);
       const v = voiceOut.current; v.speaking = true; v.tail = false; v.text = text; (voiceOut as any).lastU = u;
       v.timers.forEach((t) => clearTimeout(t));
       // a phone that never says it finished: the words' own length, then the tail
@@ -130,7 +131,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
     try {
       const a = await ask(question, at, asked.current.slice(-4));
       asked.current = [...asked.current, { role: "cook" as const, text: question }, { role: "chef" as const, text: a }].slice(-8);
-      setHeard({ said: question, answer: a, chef: true, step: at }); say(a);
+      setHeard({ said: question, answer: a, chef: true, step: at }); say(a, speechLang(getLang()));
     } catch (e: any) {
       const a = e?.message || "Chef Mealan could not answer. Ask again.";
       setHeard({ said: question, answer: a, chef: true, step: at }); say(a);
@@ -169,7 +170,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
     const start = () => {
       if (stopped) return;
       try {
-        r = new S(); r.lang = "en-GB"; r.continuous = true; r.interimResults = false;
+        r = new S(); r.lang = speechLang(getLang()); r.continuous = true; r.interimResults = false;
         r.onresult = (e: any) => {
           const last = e.results[e.results.length - 1]; if (last?.isFinal === false) return;
           const said = String(last[0].transcript || ""), v = voiceOut.current;

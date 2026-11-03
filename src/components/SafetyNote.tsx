@@ -1,6 +1,6 @@
 // What Mealan says before any AI answer: the fixed response for each declared situation, or that the chat is off.
 // Written once, never improvised; the model is told not to repeat it.
-import { FIXED, SITUATIONS, DOOR_WHY, type AiState, type Safety } from "../safety";
+import { FIXED, fixedLine, SITUATIONS, DOOR_WHY, type AiState, type Safety } from "../safety";
 
 export function SafetyNote({ safety, ai, onAnswer }: { safety: Safety; ai: AiState; onAnswer?: () => void }) {
   // DT141 (0.2.126): when the chat waits for the question, the line says so and Answer it now opens it, here
@@ -10,7 +10,7 @@ export function SafetyNote({ safety, ai, onAnswer }: { safety: Safety; ai: AiSta
   return (
     <div className="safety-note">
       <b>Chef Mealan, as a chef only.</b>
-      {safety.situations.map((id) => <p key={id}><small>{SITUATIONS.find((x) => x.id === id)?.label}.</small> {FIXED[id]}</p>)}
+      {safety.situations.map((id) => <p key={id}><small>{SITUATIONS.find((x) => x.id === id)?.label}.</small> {fixedLine(id)}</p>)}
     </div>
   );
 }

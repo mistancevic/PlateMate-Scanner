@@ -2865,6 +2865,9 @@ html:has(.l-photo) { overflow-x: hidden; }
 .vs-all { align-self: flex-start; min-height: 44px; } .vs-later { opacity: .7; }
 .vs-switch { display: flex; align-items: center; gap: 10px; min-height: 44px; font-size: 14px; } .vs-switch input { width: 24px; height: 24px; accent-color: var(--brand); }
 .settings-soon { opacity: .6; cursor: default; } .me-todo.soon { background: var(--tint); color: var(--muted); }
+/* DT203 (0.3.76): the Language page */
+.lang-row { min-height: 56px; text-align: left; } .lang-row .menu-row-text { flex: 1; } .lang-row.on { border-color: var(--accent, currentColor); }
+.lang-note { display: block; margin-top: 10px; line-height: 1.45; }
 .cook-voice-link { min-height: 44px; flex: none; }
 
 /* DT231 (0.3.70): Dev data, one number a line */

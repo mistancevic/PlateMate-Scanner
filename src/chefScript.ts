@@ -1,6 +1,8 @@
 // DT213 (0.3.74, board Stories172; Coach Milan 2 November 12:03 to 12:17, Go 3 November 18:21): Chef Mealan's script. Every line
 // he says, by name, in one place: the screen shows it in his bubble (ChefLine) and voice (VO1) will read the same words. The
 // numbers and names are filled in by code. src/chefScript.test.ts checks that no ChefLine is written anywhere but here.
+import { getLang, srCount } from "./lang";
+import srLines from "./i18n/sr-Latn.json" with { type: "json" };
 const n = (k: number, one: string, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
 export const CHEF = {
   // ---- the Plate ----
@@ -37,7 +39,46 @@ export const CHEF = {
   busyTraining: (time: string, block: string, day: string) => `Training at ${time} is in a busy block, ${block}. Move it for ${day}?`,
 } as const;
 export type ChefLineName = keyof typeof CHEF;
-// one of his lines, by name: say("howCooking"), say("carryNow", 12)
+// DT203 (0.3.76): his lines in Srpski (latinica), in src/i18n/sr-Latn.json, written in Coach Milan's table. A line goes into the
+// app only once he ticked it; until then it stays English. Slots in braces ({dish}) take the values below, in his order.
+// A line whose slots are English words made elsewhere (a day name, "yesterday", a calendar block) waits for the screens.
+type SrSlots = (...a: any[]) => Record<string, string>;
+export const SR_SLOTS: Partial<Record<ChefLineName, SrSlots>> = {
+  scanWhileCooking: (dish: string, food: string) => ({ dish, food }),
+  useInCook: (food: string, dish: string) => ({ food, dish }),
+  carryNow: (min: number) => ({ minutes: srCount(min, "minut", "minuta", "minuta") }),
+  didTryWork: (kind: "change" | "side") => ({ kind }),
+};
+// the slots each line takes, by name: the Serbian line names each of them once or more, and no other (the release check, the table)
+export const SR_ALLOWED: Partial<Record<ChefLineName, string[]>> = {
+  photoWhose: ["from"], plateOldAte: ["when", "plate"], plateOldBeforeCook: ["when", "plate"], plateSaveOrClear: ["foods", "ago", "dish"],
+  plateAddOrNew: ["foods", "title", "what"], scanWhileCooking: ["dish", "food"], useInCook: ["food", "dish"], resume: ["dish", "done"],
+  howManyAte: ["made"], carryNow: ["minutes"], busyMeal: ["meal", "time", "block", "day"], busyLate: ["until", "meal", "time", "free", "quick"],
+  busyCarry: ["block", "meal"], busyTraining: ["time", "block", "day"],
+};
+export const slotsOf = (t: string) => [...new Set([...t.matchAll(/\{(\w+)\}/g)].map((m) => m[1]))].sort();
+// a slot the line misses, or one it names that the app does not fill; empty when the line fits
+export function slotProblems(k: string, t: string): string[] {
+  const want = [...(SR_ALLOWED[k as ChefLineName] ?? [])].sort(), have = slotsOf(t);
+  const two = k === "didTryWork" && t.split("|").length !== 2 ? ["Two lines are needed, split by |"] : [];
+  return [...two, ...want.filter((x) => !have.includes(x)).map((x) => `{${x}} is missing`), ...have.filter((x) => !want.includes(x)).map((x) => `{${x}} is not a slot here`)];
+}
+// the lines that wait for the screens: their slots are English words made outside the script
+export const SR_LATER: ChefLineName[] = ["photoWhose", "plateOldAte", "plateOldBeforeCook", "plateSaveOrClear", "plateAddOrNew", "busyMeal", "busyLate", "busyCarry", "busyTraining", "resume", "howManyAte"];
+type SrLine = { text: string; checked: boolean };
+const SR = (srLines as unknown as { chef: Record<string, SrLine> }).chef;
+export function fill(t: string, v: Record<string, string>) { return t.replace(/\{(\w+)\}/g, (m, k) => (k in v ? v[k] : m)); }
+// a Serbian line, when it is ticked and every slot it names is filled; else null (the English one is used)
+export function srLine(k: ChefLineName, a: unknown[]): string | null {
+  const l = SR[k];
+  if (!l || !l.checked || SR_LATER.includes(k)) return null;
+  const v = SR_SLOTS[k] ? SR_SLOTS[k]!(...a) : {};
+  if (k === "didTryWork") return fill(l.text.split("|")[a[0] === "change" ? 0 : 1] ?? l.text, v);
+  const out = fill(l.text, v);
+  return /\{\w+\}/.test(out) ? null : out;
+}
+// one of his lines, by name: say("howCooking"), say("carryNow", 12); in the language he speaks on this phone
 export function say<K extends ChefLineName>(k: K, ...a: Parameters<(typeof CHEF)[K]>): string {
+  if (getLang() === "sr-Latn") { const sr = srLine(k, a); if (sr) return sr; }
   return (CHEF[k] as (...x: unknown[]) => string)(...a);
 }
