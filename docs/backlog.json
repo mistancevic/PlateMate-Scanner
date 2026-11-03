@@ -493,6 +493,14 @@
       "state": "done",
       "version": "0.3.72",
       "why": "Milan 16:37: after role superadmin, Read the plate said closed pilot. Fixed on the spot, as the cause was mine."
+    },
+    {
+      "id": "FX8",
+      "title": "Where the data sits, in the privacy notice, landing and Built page: Belgium, photos in Frankfurt",
+      "epic": "trust",
+      "state": "done",
+      "version": "0.3.73",
+      "why": "The console said europe-west1 (Milan 16:08); the preview's log said database europe-west1, photo files europe-west3, server europe-west1. Go at 16:32."
     }
   ]
 }

@@ -260,7 +260,7 @@ export function LandingScreen() {
         <div className="l-grid l-grid-3">
           <div><b>A calculator does the math</b><p>Your daily numbers and the grams on each plate come from published formulas. You can open any number and see how Chef Mealan got to it.</p></div>
           <div><b>AI reads, a calculator decides</b><p>Chef Mealan uses AI to read labels, menus and shop shelves, and to answer you in the chat. The numbers themselves come from a calculator, not from the AI. When the AI has to guess a number from a photo, the app marks that number as an estimate.</p></div>
-          <div><b>Your data stays in the EU</b><p>Your data is stored in Frankfurt, in your account. You can download all of it, or delete all of it, at any time.</p></div>
+          <div><b>Your data stays in the EU</b><p>Your data is stored in the EU, in Belgium and Frankfurt, in your account. You can download all of it, or delete all of it, at any time.</p></div>
           <div><b>Papers read again</b><p>Every number Explorer credits to a study is checked against the study itself before each release.</p></div>
           <div><b>Nothing kept for nothing</b><p>An account nobody opens for 12 months is deleted, with everything in it.</p></div>
         </div>

@@ -15,7 +15,7 @@ const cfg = {
   authDomain: env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: env.VITE_FIREBASE_PROJECT_ID,
   appId: env.VITE_FIREBASE_APP_ID,
-  // photos as files (storage release 1): the project's default bucket, in Frankfurt, unless told otherwise
+  // photos as files (storage release 1): the project's default bucket, in Frankfurt (europe-west3), unless told otherwise; the database is in Belgium (europe-west1)
   storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || (env.VITE_FIREBASE_PROJECT_ID ? `${env.VITE_FIREBASE_PROJECT_ID}.firebasestorage.app` : undefined),
 };
 export const cloudEnabled = Boolean(cfg.apiKey && cfg.projectId && cfg.appId && cfg.authDomain);
