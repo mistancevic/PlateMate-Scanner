@@ -52,7 +52,7 @@ const answer = { options: [
   // Changed by story DT129 (0.2.109): the heading is the meal by name; the kcal sit in the Energy row
   ok(/^Lunch/.test(ro) && /10\.1/.test(ro) && /Energy ?927 ?kcal/.test(ro), "CH3: Lunch, PD 10.1, Energy 927 kcal: " + ro);
   ok(/Chef Mealan's Balkan lunch, around your foods\. Change any amount you like\./.test(await page.locator(".step-head").textContent()), "CH3, DT88 (0.2.87): the line says whose lunch it is, around your foods");
-  ok(await page.getByRole("button", { name: "Make it" }).count() === 1 && await page.getByRole("button", { name: "Other ideas" }).count() === 1, "CH3: Make it, or Other ideas");
+  ok(await page.getByRole("button", { name: "Prepare it ›" }).count() === 1 && await page.getByRole("button", { name: "Other ideas" }).count() === 1, "CH3, DT230: Prepare it ›, or Other ideas");
   await page.getByRole("button", { name: "Other ideas" }).click(); await page.waitForTimeout(900);
   ok(calls === 2 && asked.plate.length === 2 && asked.avoid.includes("Šopska plate with bread"), "Other ideas: from the plate as it was, and not the same ideas again");
   await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await page.waitForTimeout(600);
