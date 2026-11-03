@@ -75,7 +75,7 @@ import { bookOfPath } from "./bookPages";
 import { PilotGate } from "./screens/PilotGate";
 import { takeCodeFromUrl } from "./pendingCode";
 takeCodeFromUrl();  // SH73: chefmealan.com/?code=AB12CD from a coach's QR code
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveOwnNotes, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, forgetSaved, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveOwnNotes, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalLabel, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { setTodayChange, dayOfLoad, ymd, isoWeek, planLine as planLineOf, type PlanDay } from "./plan";
 import { todayIndex } from "./screens/ClientWeek";
@@ -928,8 +928,10 @@ export default function App() {
   // also live as records; the block keeps them 30 days after the move, so a rollback loses nothing, then holds only the
   // plate and settings ("recordsOnly"). The coach reads the number of foods from foodsCount.
   const blockOf = (st: PilotState) => {
+    // 0.3.68 (Coach Milan 3 November 10:15): the 30 days' backup ended early. It was most of every save (457 KB in About),
+    // and nothing can roll back that far; once the records moved, the block holds only the plate and settings
     const moved = remoteMeta.current.recordsMovedAt;
-    const slim = Boolean(moved && Date.now() - Date.parse(moved) > 30 * 86_400_000);
+    const slim = Boolean(moved);
     const b = stripPhotos(st);
     return { state: slim ? { ...b, foods: [], meals: [] } : b, recordsOnly: slim, foodsCount: st.foods.length };
   };
@@ -1197,6 +1199,7 @@ export default function App() {
       try {
         startWait("account");
         const remote = await withTimeout(loadCloud(user.uid), 20000);
+        forgetSaved(user.uid); // 0.3.67: what this phone wrote before no longer says what the account holds
         startMark("account");
         if (stale) return;
         if (remote) setReview(((remote as any).numbersReview as NumbersReview | undefined) ?? null);
@@ -1220,7 +1223,8 @@ export default function App() {
           void up().then(() => setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() }))
             .catch(() => window.setTimeout(() => void up().then(() => setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() }))
               .catch((e) => setCloudStatus({ ok: false, text: `Not saved yet: ${explainCloudError(e)}` })), 30000));
-        } else if (remote && !(isEmptyState(remote.state) && !isEmptyState(state))) {
+        } else if (remote && !(isEmptyState(remote.state) && !remote.recordsOnly && !isEmptyState(state))) {
+          // (0.3.68) a block that holds only the plate and settings (recordsOnly) is a real account copy, never an empty one
           // a real account copy replaces the phone; photos are merged back from the phone by id
           try {
             const incoming = parseState(JSON.stringify(remote.state));

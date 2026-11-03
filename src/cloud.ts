@@ -4,7 +4,7 @@ import { notesOf, checkinOf } from "./coachNotes";
 import { initializeApp, type FirebaseApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, deleteUser, reauthenticateWithPopup, type User } from "firebase/auth";
 import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, deleteField, type Firestore } from "firebase/firestore";
-import { splitSave, mergeLoad, coachFieldsOf, dropsOldCopy } from "./privateSplit";
+import { splitSave, mergeLoad, coachFieldsOf } from "./privateSplit";
 import { getStorage, ref as fileRef, uploadString, getBytes, deleteObject, listAll } from "firebase/storage";
 import { looseOut, photoSigsOf, sig, stripStepPics } from "./photos";
 
@@ -72,7 +72,6 @@ export type CloudDoc = { region?: string | null; days?: unknown; measured?: unkn
 // DT168 (0.3.10): the record in two parts (src/privateSplit.ts); the private part only the person reads
 const privateRef = (uid: string) => doc(db(), "users", uid, "private", "main");
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
-  forgetSaved(uid); // what was written before this read no longer says what the account holds
   const snap = await getDoc(doc(db(), "users", uid));
   // a part that isn't there yet reads as null; a read that fails throws, so the app stays on the phone's copy instead of
   // taking a record without its private part for an empty account
@@ -90,7 +89,10 @@ export async function saveCloud(uid: string, data: CloudDoc, opts?: { onlyChange
   // merge, so fields the coach or the console own (role, coach link, coachSetAt) are never wiped by the client's save
   // DT168: the private fields go to the private part and leave the main record in the same write (kept there on the preview,
   // where the live app still reads them until it is promoted)
-  const keepOld = !(typeof location !== "undefined" && dropsOldCopy(location.host));
+  // 0.3.68 (Coach Milan 3 November 10:15): the private fields leave the main record everywhere. The preview kept a second copy
+  // there while the live app could not read the private part (before 0.3.10); the live app reads it since, so the copy only
+  // doubled every save
+  const keepOld = false;
   const { priv, main, drop } = splitSave(data as any, keepOld);
   // 0.3.67 (Coach Milan 3 November 07:55): the autosave writes only the part that changed since this phone last wrote it,
   // and nothing when neither did. Every other save (the phone's newer copy, signing out) writes both.

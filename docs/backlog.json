@@ -436,6 +436,14 @@
       "why": "Milan 07:52: the free daily writes of the account were passed (41,427 of 40,000). Go at 07:55."
     },
     {
+      "id": "FX4",
+      "title": "The account copy without the 30 days' backup of foods and recipes, and without the preview's second copy",
+      "epic": "cook",
+      "state": "done",
+      "version": "0.3.68",
+      "why": "Milan 10:13: About said 457 KB for one save. Go at 10:15."
+    },
+    {
       "id": "DT230",
       "title": "Craft on paper, then Prep, Make, Eat: no bar on the Plate, Prepare it ›, the photo large with its own buttons",
       "epic": "cook",
