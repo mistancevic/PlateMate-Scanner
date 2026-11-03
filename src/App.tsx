@@ -1730,10 +1730,10 @@ export default function App() {
   // it without a word): a plate started more than three hours ago, or on another day, asks before a food joins it
   const plateSince = (): Date | null => { const t = [state.plateAt, state.photo?.at].filter(Boolean).map((x) => new Date(x!).getTime()).filter((x) => !Number.isNaN(x)); return t.length ? new Date(Math.min(...t)) : null; };
   const plateOld = () => cooking.plateOldOf(state);
-  function add(food0: Food, asked = false) {
+  function add(food0: Food, asked = false, notForCook = false) {
     // DT214 v2 (0.3.53, board Stories162): while a cook runs, the Plate is free; a food that would go on it asks first: use it in
     // the dish you are cooking, or keep it in your foods
-    if (!asked && state.cook?.stage === "make" && !state.cook.inView) {
+    if (!asked && !notForCook && state.cook?.stage === "make" && !state.cook.inView) {
       setPendingFood(food0); setStep("in"); setMenuSection(null); setTalkOpen(false); setTab("journey");
       return;
     }
@@ -2578,6 +2578,8 @@ export default function App() {
       if (!f) return;
       if (!state.foods.some((x) => x.id === f.id)) setState((s) => ({ ...s, foods: [f, ...s.foods] }));
       if (how === "keep") { notify(`${f.name} is in your foods.`); return; }
+      // 0.3.69 (Coach Milan 3 November 13:31, Go 13:34): the Plate is free while a cook runs; the food joins it, asked about an old plate as ever
+      if (how === "plate") { add(f, false, true); return; }
       setUseInCook(f); screenProps.goOnCook(); setStep("made");
     },
     useInCook, doneUseInCook: () => setUseInCook(null),

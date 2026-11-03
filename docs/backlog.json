@@ -444,6 +444,14 @@
       "why": "Milan 10:13: About said 457 KB for one save. Go at 10:15. Reads: Go at 10:32."
     },
     {
+      "id": "FX5",
+      "title": "A food scanned while cooking: Put it on the Plate; Make shows only steps written for its foods",
+      "epic": "cook",
+      "state": "done",
+      "version": "0.3.69",
+      "why": "Milan 13:31 to 13:33: no way to the Plate, and Make for Protein Pancake read a salad's steps. Go at 13:34."
+    },
+    {
       "id": "DT230",
       "title": "Craft on paper, then Prep, Make, Eat: no bar on the Plate, Prepare it ›, the photo large with its own buttons",
       "epic": "cook",

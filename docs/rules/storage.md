@@ -33,8 +33,18 @@ the autosave wrote the whole copy a second after every change, with the plate's 
 - 0.3.68 (Coach Milan 10:15, after About showed 457 KB): once the records moved, the copy holds only the plate and settings,
   with no 30 days' backup of the foods and recipes; and the private part lives only in the private record, on the preview too.
 
+## S3. The live app reads what the preview writes (Coach Milan, 3 November 2026, 13:24)
+
+The preview and chefmealan.com share one account. 0.3.67 wrote the plate's photo as a name (pf:<id>) on the preview; production,
+still 0.3.52, read the name and showed an empty frame.
+
+- A change to what goes into the account (a new shape, a field moved, a photo made a file) says, in its release note to Coach
+  Milan, whether the live version reads it. If it doesn't, the release says so before the preview is run, and the promote
+  follows the same day.
+
 ## Changelog
 
 - 2 November 2026: S1 written; the save check added in 0.3.58.
 - 3 November 2026: S2 written; loose photos, the only-changed save and the size check in 0.3.67.
 - 3 November 2026: 0.3.68, the backup ended early and the preview's second copy dropped.
+- 3 November 2026: S3 written, after the plate photo showed empty on production.

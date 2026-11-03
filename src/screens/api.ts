@@ -182,7 +182,7 @@ export interface AppApi {
   cookAsk: { meal: Meal } | null;
   answerCookAsk: (how: "ate" | "save" | "clear" | null) => void;
   pendingFood: Food | null;
-  answerPendingFood: (how: "use" | "keep") => void;
+  answerPendingFood: (how: "use" | "plate" | "keep") => void;
   useInCook: Food | null;
   doneUseInCook: () => void;
   clearCookNow: () => void;
