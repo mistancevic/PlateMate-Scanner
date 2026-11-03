@@ -47,6 +47,8 @@ Promise.all(Array.from({ length: LANES }, (_, i) => lane(i))).then(() => {
     const commit = require("node:child_process").execSync("git rev-parse --short HEAD", { cwd: path.resolve(__dirname, "..") }).toString().trim();
     // the run is kept in the repo, one file per version (docs/qa/runs), so the Walkthroughs page shows the history
     const rep = JSON.stringify({ version: pkg.version, commit, at: new Date().toISOString(), minutes: Math.round((Date.now() - t0) / 60000), flows: report.sort((a, b) => a.file.localeCompare(b.file)) }, null, 1);
+    // a rerun of a few (MERGE=1) replaces their entries in this version's full run, so the record keeps every walkthrough
+    if (args.length && process.env.MERGE === "1") { for (const p of ["../tests/flows-report.json", `../docs/qa/runs/${pkg.version}.json`]) { const fp = path.resolve(__dirname, p); try { const old = JSON.parse(fs.readFileSync(fp, "utf8")); if (old.version !== pkg.version) continue; for (const r of report) { const i = old.flows.findIndex((x) => x.file === r.file); if (i >= 0) old.flows[i] = { ...r, rerun: old.flows[i].rerun || "Passed on a rerun alone." }; } fs.writeFileSync(fp, JSON.stringify(old, null, 1)); } catch { /* no full run yet */ } } }
     if (!args.length) { fs.writeFileSync(path.resolve(__dirname, "../tests/flows-report.json"), rep); fs.mkdirSync(path.resolve(__dirname, "../docs/qa/runs"), { recursive: true }); fs.writeFileSync(path.resolve(__dirname, `../docs/qa/runs/${pkg.version}.json`), rep); }
   } catch {}
   console.log(`\n${pick.length - failed.length} of ${pick.length} walkthroughs passed in ${Math.round((Date.now() - t0) / 60000)} min${failed.length ? ": failed " + failed.join(", ") : ""}`);
