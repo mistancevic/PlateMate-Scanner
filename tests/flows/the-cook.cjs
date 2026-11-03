@@ -86,7 +86,7 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     // ---- 4. a food while cooking asks where it goes ----
     await page.locator("main input").first().fill("Skyr"); await page.waitForTimeout(700);
     await page.locator("main button").filter({ hasText: /^Skyr, natural/ }).first().click(); await page.waitForTimeout(700);
-    ok(/You are cooking Chicken rice bowl\. Shall I use this skyr in it, or keep it in your foods\?/.test(await main()), "Chef Mealan asks: use it in the dish, or keep it in your foods");
+    ok(/You are cooking Chicken rice bowl\. Shall I use this skyr in it, put it on the Plate, or keep it in your foods\?/.test(await main()), "Chef Mealan asks: use it in the dish, put it on the Plate, or keep it in your foods");
     await page.getByRole("button", { name: "Use it in Chicken rice bowl" }).click(); await page.waitForTimeout(900);
     ok(/what does it replace in Chicken rice bowl, or does it add to it\?/.test(await main()), "Use it: what it replaces, or Add it");
     await page.getByRole("button", { name: "In place of spinach" }).click(); await page.waitForTimeout(500);
