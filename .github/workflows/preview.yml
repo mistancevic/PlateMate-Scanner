@@ -1,7 +1,8 @@
 # The preview, from GitHub (Coach Milan 3 November 2026, 09:19: Cloud Shell's weekly hours were used up and the Chromebook is
 # away). The same ./deploy/preview.sh as in Cloud Shell, run as the github-deploy account, on main only.
 # On a phone: GitHub, the repo, Actions, Preview, Run workflow. Promote is its own workflow, a separate step.
-# The one secret: GCP_SA_KEY, the github-deploy account's key. deploy.env comes from deploy/ci-env.sh.
+# No secret: the run signs in as github-deploy through the pool github (Workload Identity Federation), which trusts only
+# runs from the GitHub account mistancevic. deploy.env comes from deploy/ci-env.sh.
 name: Preview
 on:
   workflow_dispatch: {}
@@ -11,11 +12,16 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # GitHub signs in to Google Cloud with a short-lived token, no key (keys are blocked by the organization's policy)
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: projects/384791096823/locations/global/workloadIdentityPools/github/providers/github
+          service_account: github-deploy@project-fb3c5fab-00d1-4d11-ac7.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v2
       - name: Settings from the project
         env:

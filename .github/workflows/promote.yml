@@ -11,11 +11,16 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    # GitHub signs in to Google Cloud with a short-lived token, no key (keys are blocked by the organization's policy)
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - uses: actions/checkout@v4
       - uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          workload_identity_provider: projects/384791096823/locations/global/workloadIdentityPools/github/providers/github
+          service_account: github-deploy@project-fb3c5fab-00d1-4d11-ac7.iam.gserviceaccount.com
       - uses: google-github-actions/setup-gcloud@v2
       - name: Settings from the project
         env:
