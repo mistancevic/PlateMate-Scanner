@@ -79,6 +79,15 @@ export async function loadCloud(uid: string): Promise<CloudDoc | null> {
   const priv: Record<string, any> | null = p.exists() ? (p.data() as any) : null;
   return mergeLoad(snap.exists() ? (snap.data() as any) : null, priv) as CloudDoc | null;
 }
+// 0.3.68 (Coach Milan 3 November 10:32, Go): the main record alone, for the checks while the app is open (the coach's notes,
+// goal and role). A goal the coach set travels as coachGoals; it reads as the state's goals, as a full load gives it.
+export async function loadMain(uid: string): Promise<CloudDoc | null> {
+  const snap = await getDoc(doc(db(), "users", uid));
+  if (!snap.exists()) return null;
+  const m = snap.data() as any, cg = m.coachGoals;
+  const goals = { ...(m.state?.goals ?? {}), ...(cg && typeof cg.calories === "number" ? { calories: cg.calories } : {}), ...(cg && typeof cg.protein === "number" ? { protein: cg.protein } : {}) };
+  return { ...m, state: { goals } } as CloudDoc;
+}
 // While an account is being deleted, this phone writes nothing to it: no save, no card, no photo file. An open app could
 // otherwise put its old copy back after the record is gone (7 October 2026). A paused write fails, so nothing counts as saved.
 let paused = false;
