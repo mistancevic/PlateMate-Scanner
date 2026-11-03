@@ -1,0 +1,26 @@
+# Promote, from GitHub (Coach Milan 3 November 2026): the preview becomes what everyone gets on chefmealan.com, as
+# ./deploy/promote.sh does in Cloud Shell. Run it only after the preview looks right. The log names the revision that served
+# before it ("Before it"); going back from GitHub is not set up yet, Cloud Shell's ./deploy/rollback.sh or the Cloud Run
+# console (Revisions, Manage traffic) does it.
+name: Promote
+on:
+  workflow_dispatch: {}
+concurrency: { group: deploy, cancel-in-progress: false }
+jobs:
+  promote:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+      - uses: google-github-actions/setup-gcloud@v2
+      - name: Settings from the project
+        env:
+          FB_API_KEY_SECRET: ${{ secrets.FB_API_KEY }}
+          FB_APP_ID_SECRET: ${{ secrets.FB_APP_ID }}
+        run: ./deploy/ci-env.sh
+      - name: Promote
+        run: ./deploy/promote.sh

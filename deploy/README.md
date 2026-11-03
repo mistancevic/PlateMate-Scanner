@@ -26,6 +26,14 @@ Data stays in Firestore, europe-west3 (Frankfurt). Address: chefmealan.com.
 Only main is ever deployed. No branch is checked out or previewed in Cloud Shell. The preview command and the promote
 are given as separate steps, never in one block: a pasted second line runs on its own when the first one ends.
 
+## From a phone, without Cloud Shell (3 November 2026)
+Cloud Shell gives 50 hours a week, and an open tab counts. When it is used up, or no computer is at hand:
+GitHub, the repo, Actions, "Preview", Run workflow (main). Then, once the preview looks right, Actions, "Promote", Run workflow.
+They run the same preview.sh and promote.sh as the account github-deploy, with its key as the repo secret GCP_SA_KEY;
+deploy/ci-env.sh builds deploy.env from the project. Roles of github-deploy: Cloud Build Editor, Cloud Run Admin, Service
+Account User, Storage Admin, Viewer, Firebase Rules Admin, Firebase Authentication Admin, Service Usage Consumer.
+Going back after a promote from GitHub: Cloud Run console, chefmealan, Revisions, Manage traffic (the log names the one before).
+
 ## Every release, the careful way (from 7 October 2026)
    cd ~/PlateMate-Scanner && git checkout main && git pull && ./deploy/preview.sh
 Builds the new commit and puts it on its own preview link; chefmealan.com keeps serving the release before. The preview
