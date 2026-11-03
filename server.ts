@@ -10,6 +10,8 @@ import { GoogleGenAI } from "@google/genai";
 import { isFood, KEYS, numberInput } from "./src/pilot";
 import { aiState, underAge, ADULT_ONLY, EMPTY_SAFETY, FIXED, SITUATIONS, type Safety } from "./src/safety";
 import { mergeLoad } from "./src/privateSplit";
+// the roles that count as a coach: coach, and superadmin (who has everything a coach has)
+const coachRole = (r: unknown) => r === "coach" || r === "superadmin";
 const app = express();
 // Who is asking: a Firebase ID token from the signed-in app. On when the server knows its Firebase project.
 import { initializeApp as initAdmin, getApps as adminApps } from "firebase-admin/app";
@@ -53,7 +55,8 @@ async function membership(uid: string): Promise<Member> {
   const ps = await db().collection("users").doc(uid).collection("private").doc("main").get();
   // the newer copy wins, as on the phone (src/privateSplit.ts mergeLoad)
   const x: any = mergeLoad(snap.exists ? (snap.data() as any) : null, ps.exists ? (ps.data() as any) : null) ?? {};
-  const role = x.role === "coach" ? "coach" : "client";
+  // 0.3.72 (Coach Milan 3 November 16:37: superadmin was blocked as a client): superadmin is a coach, as in the app (App.tsx roleOf)
+  const role = coachRole(x.role) ? "coach" : "client";
   const member = role === "coach" || Boolean(x.coachId);
   const safety: Safety = { ...EMPTY_SAFETY, ...(x.safety && typeof x.safety === "object" ? x.safety : {}), aiConfirmedAt: x.aiConfirmedAt ?? undefined, aiConfirmedBy: x.aiConfirmedBy ?? undefined };
   const m: Member = { member, role, safety, birthYear: x.personal?.birthYear ?? null, hasCoach: Boolean(x.coachId) };
@@ -973,7 +976,7 @@ async function whoIs(req: express.Request): Promise<Who> {
   const uid = (req as any).uid as string;
   const snap = await db().collection("users").doc(uid).get();
   const x = snap.exists ? (snap.data() as any) : {};
-  return { uid, role: x.role === "coach" ? "coach" : "client", coachId: x.coachId || null };
+  return { uid, role: coachRole(x.role) ? "coach" : "client", coachId: x.coachId || null };
 }
 async function isCook(w: Who): Promise<boolean> {
   if (w.role === "coach") return true;

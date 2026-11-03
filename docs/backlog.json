@@ -485,6 +485,14 @@
       "why": "Milan 15:56: switch between owner, superadmin and user. Draw: Go at 15:59. Board drawn 3 November; Go at 16:32.",
       "board": 171,
       "version": "0.3.72"
+    },
+    {
+      "id": "FX7",
+      "title": "The server counts superadmin as a coach (it blocked Chef Mealan as a client without a coach)",
+      "epic": "ops",
+      "state": "done",
+      "version": "0.3.72",
+      "why": "Milan 16:37: after role superadmin, Read the plate said closed pilot. Fixed on the spot, as the cause was mine."
     }
   ]
 }
