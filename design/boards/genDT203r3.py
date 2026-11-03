@@ -121,5 +121,5 @@ h6 = B.screen("DT203k", 1, y, "New: a Plate question", "r203k", "changed", "His 
 h7 = B.screen("DT203l", 2, y, "New: your table, the Plate's section", "r203l", "changed", "Screen words to edit and tick. Two forms for he and she. Lines are examples.")
 y = rowEnd(h5, h6, h7)
 board("Stories176.dc.html", "DT203. Release 3: the Plate in Srpski",
-  "3 November 2026 (Coach Milan 23:45 to 23:47, Draw; 23:56 the table in blue, no green). Drawn for your approval; nothing built. Now: 0.3.76. The Serbian words on these screens are drafts by Claude, to be checked in your table.",
+  "3 November 2026 (Coach Milan 23:45 to 23:47, Draw; 23:56 the table in blue, no green; 4 November 00:00 the table in Nunito). Drawn for your approval; nothing built. Now: 0.3.76. The Serbian words on these screens are drafts by Claude, to be checked in your table.",
   B, W, y - 100, "Stories175.dc.html")
