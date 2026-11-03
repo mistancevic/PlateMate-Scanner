@@ -1,6 +1,8 @@
 // DT174 (0.3.16, board Stories121): cook mode, full screen over Make. One big step at a time, read aloud by the phone's own
 // voice, steered by Back, Repeat, Next or by voice (the browser's own speech recognition). The screen stays on. Each step you
 // finish is ticked on Make; closing keeps the ticks. No AI, nothing sent by us: free to run.
+import { ChefLine } from "./ChefLine";
+import { say as chefSay } from "../chefScript";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Ingredient } from "../pilot";
 import { stepParts, stepText } from "../steps";
@@ -220,7 +222,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
       )}
       {voice === null && hasEars && !done && (
         <section className="cook-card cook-ask">
-          <b>Cook hands free?</b>
+          <ChefLine text={chefSay("handsFree")} />
           <small>Your phone listens while you cook, so you can say next, back, repeat or how much. Your browser turns your voice into words: Google does it in Chrome, Apple in Safari. Chef Mealan keeps no recordings and sends nothing to its own AI.</small>
           <div className="button-row"><button className="pill pill-primary" onClick={() => choose("on")}>Turn voice on</button><button className="pill" onClick={() => choose("off")}>Buttons only</button></div>
         </section>

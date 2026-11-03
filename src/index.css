@@ -2876,3 +2876,8 @@ html:has(.l-photo) { overflow-x: hidden; }
 .dev-views { display: flex; gap: 8px; margin: 10px 0; }
 .dev-views .choice { flex: 1; min-height: 44px; }
 .ref.view-as { font-weight: 800; color: var(--brand); min-height: 44px; padding: 0 10px; border-radius: 999px; background: var(--brand-soft, #e7efff); }
+
+/* DT233 (0.3.74): Deploy in Dev data */
+.deploy-block .deploy-row { text-decoration: none; color: inherit; display: flex; align-items: center; gap: 10px; min-height: 56px; padding: 10px 0; border-top: 1px solid var(--line); }
+.deploy-block .deploy-row .menu-row-text { flex: 1; }
+.deploy-warn { color: var(--danger, #b3261e); }

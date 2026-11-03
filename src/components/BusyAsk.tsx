@@ -2,6 +2,8 @@
 // more. Where it meets the plan, Plan asks once, under the meal or the training: one tap changes this date only; Keep it
 // leaves it and the question goes. A meal at its own time for a date says so, with Back to the usual time; one moved in
 // Google Calendar says that too. Buttons 44 px or more; labels 12 px or more.
+import { ChefLine } from "./ChefLine";
+import { say } from "../chefScript";
 import type { ReactNode } from "react";
 import type { AppApi } from "../screens/api";
 import type { Slot, DayRow } from "../slots";
@@ -54,21 +56,21 @@ export function AskCard({ p, date, a, training, cooked, title }: { p: AppApi; da
   const btn = (label: string, run: () => void, primary = false) => <button key={label} type="button" className={`pill pill-small ${primary ? "pill-primary" : ""}`} onClick={run}>{label}</button>;
   let text = "", buttons: ReactNode[] = [];
   if (a.kind === "meal") {
-    text = `${a.name} at ${a.time} is in a busy block, ${blockWords(a.block)}. Move it for ${WD(date)}?`;
+    text = say("busyMeal", a.name, a.time, blockWords(a.block), WD(date));
     buttons = [a.before && btn(a.before, () => moveTo(a.slotId, a.before!, a.name), true), a.after && btn(a.after, () => moveTo(a.slotId, a.after!, a.name), !a.before), btn(`Keep ${a.time}`, keep)].filter(Boolean) as ReactNode[];
   } else if (a.kind === "late") {
     const prev = dayBefore(date);
-    text = `Busy until ${clock(a.block.to)}. ${a.name} at ${a.time} leaves ${a.free ? `${a.free} minutes` : "no time"} to cook. A quick ${lower(a.name)}${cooked ? `, or cook on ${WD(prev)} and warm it up` : ""}?`;
+    text = say("busyLate", clock(a.block.to), a.name, a.time, a.free ?? 0, lower(a.name), cooked ? WD(prev) : null);
     buttons = [
       btn(`Quick ${lower(a.name)} ideas`, () => p.openOut({ q: `A quick ${lower(a.name)} for ${WD(date)}: I am busy until ${clock(a.block.to)} and eat at ${a.time}, so I have about ${a.free} minutes to cook.` }), true),
       cooked && btn(`Cook ahead on ${WD(prev)}`, () => { const now = getPersonal(); p.setPersonal({ ...now, calendar: { ...(now.calendar ?? c), ahead: { ...(now.calendar?.ahead ?? {}), [`${date}|${a.slotId}`]: prev }, kept: [...(now.calendar?.kept ?? []), askKey(date, a)] } }); calendarNudge(); p.notify(`${title ?? a.name} is cooked on ${WD(prev)}, for ${WD(date)}.`); }),
       btn("Keep it", keep),
     ].filter(Boolean) as ReactNode[];
   } else if (a.kind === "carry") {
-    text = `Booked from ${blockWords(a.block)}. Take ${lower(a.name)} along?`;
+    text = say("busyCarry", blockWords(a.block), lower(a.name));
     buttons = [btn(`${a.name} to carry`, () => p.openOut({ q: `A ${lower(a.name)} to take along on ${WD(date)}: I am out from ${blockWords(a.block)}. Something I can make the evening before and carry.` }), true), btn("Keep it", keep)];
   } else {
-    text = `Training at ${a.time} is in a busy block, ${blockWords(a.block)}. Move it for ${WD(date)}?`;
+    text = say("busyTraining", a.time, blockWords(a.block), WD(date));
     const d = new Date(`${date}T12:00:00`);
     buttons = [
       a.move && btn(`Move to ${a.move}`, () => { if (training) { p.setDated(d, { ...training, at: a.move! }); p.notify(`Training is at ${a.move} on ${WD(date)}, this date only.`); } }, true),
@@ -78,7 +80,8 @@ export function AskCard({ p, date, a, training, cooked, title }: { p: AppApi; da
   }
   return (
     <div className="busy-ask" role="group" aria-label="From your calendar">
-      <small>{text}</small>
+      {/* DT213 (0.3.74): the calendar's questions are Chef Mealan's */}
+      <ChefLine text={text} />
       <div className="busy-ask-buttons">{buttons}</div>
     </div>
   );

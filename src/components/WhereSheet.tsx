@@ -1,4 +1,6 @@
 import { ChefHat, ChevronRight } from "lucide-react";
+import { ChefLine } from "./ChefLine";
+import { say } from "../chefScript";
 import { aggregate, density, uid, type Food, type Ingredient } from "../pilot";
 import { fmt, pdVal, pdText } from "../ui";
 import { CHEF_NAME } from "../components/Mark";
@@ -47,7 +49,8 @@ export function WhereSheet(p: AppApi & { food: Food; close: () => void }) {
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet where-sheet" role="dialog" aria-label="Where does this go?" onClick={(e) => e.stopPropagation()}>
         <div className="where-food"><b>{food.name}{food.brand ? `, ${food.brand}` : ""}</b><small>{pdText(foodPd)} · {fmt(food.calories, 0)} kcal and {fmt(food.protein)} g protein per 100 g · saved in My foods</small></div>
-        <div className="card-top"><span>Where does this go?</span><button type="button" className="link" onClick={close}>Close</button></div>
+        <div className="card-top"><span /><button type="button" className="link" onClick={close}>Close</button></div>
+        <ChefLine text={say("whereGoes")} />
         <div className="menu-list where-list">
           <button type="button" className="menu-row where-row" onClick={() => { close(); p.add(food); }}>
             <div className="menu-row-text"><b>On the plate now</b><small>I eat it now</small></div><ChevronRight size={18} />

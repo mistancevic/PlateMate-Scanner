@@ -175,6 +175,10 @@ const apiKey = process.env.GEMINI_API_KEY;
 const tasteOfReq = (req: express.Request) => (Array.isArray(req.body?.taste) ? req.body.taste.slice(0, 8).map((t: any) => ({ kitchen: String(t.kitchen ?? "").slice(0, 30), cook_toward: (Array.isArray(t.cook_toward) ? t.cook_toward : []).slice(0, 3).map((d: unknown) => String(d).slice(0, 60)), leave_out: (Array.isArray(t.leave_out) ? t.leave_out : []).slice(0, 8).map((d: unknown) => String(d).slice(0, 60)) })) : []);
 const TASTE_RULE = "their_taste: within each kitchen, cook toward the dishes in cook_toward and never offer the ones in leave_out.";
 const VOICE = `Voice: at most two short sentences before any list. Second person, plain words, no jargon. When a value is an estimate, say so. Never scold, never moralise; going off plan is not a failure. No health, medical or weight-loss claims. Never state grams for something the app fits; the app's solver sets amounts.`;
+// DT233 (0.3.74, board Stories173): the version this server runs, for Deploy in Dev data. Readable from the preview and from
+// chefmealan.com alike (a version number is no secret), so the owner's phone on one can see the other's.
+const SERVER_VERSION = (() => { try { return JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8")).version as string; } catch { return null; } })();
+app.get("/api/version", (_req, res) => { res.set("Access-Control-Allow-Origin", "*"); res.set("Cache-Control", "no-store"); res.json({ version: SERVER_VERSION }); });
 app.get("/api/status", (_req, res) =>
   res.json({
     ai: !!apiKey,
