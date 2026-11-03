@@ -22,9 +22,9 @@ const GW = 1040, GH = 480;
 const GN: GNode[] = [
   { k: "people", x: 0, y: 105, w: 160, h: 140, c: "human", t: "People", lines: ["A person, a coach, the owner", "3 beta testers", "Claude builds and tests"] },
   { k: "phone", x: 200, y: 60, w: 240, h: 220, c: "brand", t: "The phone: chefmealan.com", lines: ["An app in the browser, no store", "Data on the phone first, works offline", "The calculator: code, no server", "Camera: labels, barcodes, meal photos", "Voice: the browser's own"] },
-  { k: "server", x: 490, y: 60, w: 240, h: 220, c: "ink", t: "The server: Cloud Run, Frankfurt", lines: ["The coach's rules in code", "Every AI call, with checks and fallbacks", "Counts use and the AI bill", "Preview, then production; one-line rollback"] },
+  { k: "server", x: 490, y: 60, w: 240, h: 220, c: "ink", t: "The server: Cloud Run, Belgium", lines: ["The coach's rules in code", "Every AI call, with checks and fallbacks", "Counts use and the AI bill", "Preview, then production; one-line rollback"] },
   { k: "gemini", x: 800, y: 40, w: 200, h: 120, c: "ai", t: "Gemini (Google AI)", lines: ["Reads photos and labels", "Talks in the chat, drafts steps"] },
-  { k: "firebase", x: 800, y: 190, w: 200, h: 120, c: "fb", t: "Firebase (Google)", lines: ["Sign-in with Google", "The account's copy, photos", "in Frankfurt"] },
+  { k: "firebase", x: 800, y: 190, w: 200, h: 120, c: "fb", t: "Firebase (Google)", lines: ["Sign-in with Google", "The account's copy in Belgium", "photos in Frankfurt"] },
   { k: "other", x: 800, y: 370, w: 200, h: 100, c: "muted", t: "Open Food Facts, Google Calendar", lines: ["Barcodes; training and busy times"] },
   { k: "kitchen", x: 220, y: 370, w: 200, h: 90, c: "brand", t: "Kitchen screen", lines: ["A second phone on the counter"] },
   { k: "github", x: 500, y: 370, w: 220, h: 90, c: "muted", t: "GitHub", lines: ["Code, boards, rules, test runs"] },

@@ -1,7 +1,7 @@
 # Chef Mealan in production
 
 Runs on Cloud Run in `project-fb3c5fab-00d1-4d11-ac7`, region europe-west1, with our own Gemini key.
-Data stays in Firestore, europe-west3 (Frankfurt). Address: chefmealan.com.
+Data stays in Firestore, europe-west1 (Belgium); photo files in Firebase Storage, europe-west3 (Frankfurt). Address: chefmealan.com.
 
 ## Once
 1. Gemini key: aistudio.google.com/apikey, "Create API key", pick project `project-fb3c5fab-00d1-4d11-ac7`.
