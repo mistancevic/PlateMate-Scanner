@@ -428,6 +428,14 @@
       "why": "Milan 22:44 to 22:53, Go."
     },
     {
+      "id": "FX3",
+      "title": "Fewer account writes: the plate's and the cook's photos as files, only what changed, a save 3 s after a change and on leaving, the size in About",
+      "epic": "cook",
+      "state": "done",
+      "version": "0.3.67",
+      "why": "Milan 07:52: the free daily writes of the account were passed (41,427 of 40,000). Go at 07:55."
+    },
+    {
       "id": "DT230",
       "title": "Craft on paper, then Prep, Make, Eat: no bar on the Plate, Prepare it ›, the photo large with its own buttons",
       "epic": "cook",

@@ -17,6 +17,21 @@ test saw it, because no walkthrough has an account.
   the app does, so the save check sees it, before the branch is merged. A list of lists becomes a list of maps, as moves did
   in 0.3.57: `[{ m: [...] }]`.
 
+## S2. The account's copy stays small (Coach Milan, 3 November 2026, 07:55)
+
+The account is charged per write, 1 KB a unit, and the free amount is 40,000 units a day. On 2 November the app passed it:
+the autosave wrote the whole copy a second after every change, with the plate's and the cook's photos inside as text.
+
+- A photo never rides as text. Foods, recipes and cards have their own photo files; every other photo (the plate's photo
+  and its other photos, the cook's step and meal photos, the plates saved for later) is a loose file, `loose:<id>`, and the
+  copy holds `pf:<id>` in its place (`src/photos.ts`). The phone that took it keeps it; another phone fetches the file.
+- The autosave writes only the part that changed since this phone last wrote it, and nothing when neither changed. It
+  runs 3 seconds after a change settles, and at once when the app goes to the back.
+- The check: S1's save check also fails on a photo as text (2 KB or more) anywhere in a write, and on the account's copy
+  (the main record or its private part, as it stays once the records moved) past 50 KB.
+- Menu, About shows the size of the last save and today's saves from this phone.
+
 ## Changelog
 
 - 2 November 2026: S1 written; the save check added in 0.3.58.
+- 3 November 2026: S2 written; loose photos, the only-changed save and the size check in 0.3.67.

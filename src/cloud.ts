@@ -6,7 +6,7 @@ import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRe
 import { getFirestore, initializeFirestore, doc, getDoc, setDoc, deleteDoc, updateDoc, collection, query, where, getDocs, writeBatch, deleteField, type Firestore } from "firebase/firestore";
 import { splitSave, mergeLoad, coachFieldsOf, dropsOldCopy } from "./privateSplit";
 import { getStorage, ref as fileRef, uploadString, getBytes, deleteObject, listAll } from "firebase/storage";
-import { photoSigsOf, sig, stripStepPics } from "./photos";
+import { looseOut, photoSigsOf, sig, stripStepPics } from "./photos";
 
 // outside the browser build (the tests) there is no env: the cloud is simply off
 const env: Record<string, string | undefined> = (import.meta as any).env ?? {};
@@ -72,6 +72,7 @@ export type CloudDoc = { region?: string | null; days?: unknown; measured?: unkn
 // DT168 (0.3.10): the record in two parts (src/privateSplit.ts); the private part only the person reads
 const privateRef = (uid: string) => doc(db(), "users", uid, "private", "main");
 export async function loadCloud(uid: string): Promise<CloudDoc | null> {
+  forgetSaved(uid); // what was written before this read no longer says what the account holds
   const snap = await getDoc(doc(db(), "users", uid));
   // a part that isn't there yet reads as null; a read that fails throws, so the app stays on the phone's copy instead of
   // taking a record without its private part for an empty account
@@ -84,17 +85,52 @@ export async function loadCloud(uid: string): Promise<CloudDoc | null> {
 let paused = false;
 export const pauseAccountWrites = (on: boolean) => { paused = on; };
 const notPaused = () => { if (paused) throw new Error("Saving is paused while your account is deleted."); };
-export async function saveCloud(uid: string, data: CloudDoc) {
+export async function saveCloud(uid: string, data: CloudDoc, opts?: { onlyChanged?: boolean }) {
   notPaused();
   // merge, so fields the coach or the console own (role, coach link, coachSetAt) are never wiped by the client's save
   // DT168: the private fields go to the private part and leave the main record in the same write (kept there on the preview,
   // where the live app still reads them until it is promoted)
   const keepOld = !(typeof location !== "undefined" && dropsOldCopy(location.host));
   const { priv, main, drop } = splitSave(data as any, keepOld);
+  // 0.3.67 (Coach Milan 3 November 07:55): the autosave writes only the part that changed since this phone last wrote it,
+  // and nothing when neither did. Every other save (the phone's newer copy, signing out) writes both.
+  const sigMain = partSig({ ...main, drop }), sigPriv = priv ? partSig(priv) : "";
+  const last = saved.get(uid);
+  const doMain = !opts?.onlyChanged || last?.main !== sigMain, doPriv = Boolean(priv) && (!opts?.onlyChanged || last?.priv !== sigPriv);
+  if (!doMain && !doPriv) { noteSave(0, true); return; }
   const b = writeBatch(db());
-  if (priv) b.set(privateRef(uid), priv, { merge: true });
-  b.set(doc(db(), "users", uid), { ...main, ...Object.fromEntries(drop.map((k) => [k, deleteField()])) }, { merge: true });
+  if (priv && doPriv) b.set(privateRef(uid), priv, { merge: true });
+  // a part not written keeps its older time, so the part written is the newer copy and loads first (mergeLoad)
+  if (doMain) b.set(doc(db(), "users", uid), { ...main, ...Object.fromEntries(drop.map((k) => [k, deleteField()])) }, { merge: true });
   await b.commit();
+  saved.set(uid, { main: sigMain, priv: sigPriv });
+  noteSave((doMain ? bytesOf(main) : 0) + (priv && doPriv ? bytesOf(priv) : 0), false);
+}
+// what this phone last wrote to each account, as text without the time of the save
+const saved = new Map<string, { main: string; priv: string }>();
+export const forgetSaved = (uid?: string) => { if (uid) saved.delete(uid); else saved.clear(); };
+const partSig = (x: Record<string, unknown>) => { const { updatedAt: _u, coachView, ...rest } = x as any; const { weightAt: _w, ...cv } = coachView ?? {}; return JSON.stringify(coachView ? { ...rest, cv } : rest); };
+export const bytesOf = (x: unknown) => new TextEncoder().encode(JSON.stringify(x) ?? "").length;
+// Menu, About: the size of the last save and today's saves on this phone, so the account's writes can be seen
+const SAVE_STATS = "chefmealan-save-stats";
+type SaveStats = { day: string; saves: number; kb: number; skipped: number; lastKb: number | null; lastAt: string | null };
+export function saveStats(): SaveStats {
+  const day = new Date().toISOString().slice(0, 10);
+  try { const x = JSON.parse(localStorage.getItem(SAVE_STATS) ?? "null"); if (x && x.day === day) return x; } catch { /* none yet */ }
+  return { day, saves: 0, kb: 0, skipped: 0, lastKb: null, lastAt: null };
+}
+function noteSave(bytes: number, skipped: boolean) {
+  try {
+    const x = saveStats();
+    if (skipped) x.skipped++; else { x.saves++; x.kb = Math.round((x.kb + bytes / 1024) * 10) / 10; x.lastKb = Math.round(bytes / 102.4) / 10; x.lastAt = new Date().toISOString(); }
+    localStorage.setItem(SAVE_STATS, JSON.stringify(x));
+  } catch { /* the line is a help, nothing more */ }
+}
+export function saveLine(): string {
+  const x = saveStats();
+  if (!x.saves && !x.skipped) return "No save to your account from this phone today yet.";
+  const at = x.lastAt ? new Date(x.lastAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+  return `Last save to your account: ${x.lastKb ?? 0} KB${at ? `, ${at}` : ""}. Today on this phone: ${x.saves} save${x.saves === 1 ? "" : "s"}, ${Math.round(x.kb)} KB; ${x.skipped} with nothing new, not sent.`;
 }
 // ---- coach and clients ----
 // A short code from the coach's uid; the coach publishes it once under coaches/{code}.
@@ -205,7 +241,9 @@ export function stripPhotos<T>(state: T): T {
   (s.meals ?? []).forEach((m: any) => stripStepPics(m));
   (s.meals ?? []).forEach((m: any) => { if (Array.isArray(m.shots)) { if (m.source) m.source.shotSigs = m.shots.map((x: string) => (typeof x === "string" && x.startsWith("data:") ? sig(x) : "")); delete m.shots; } });
   s.feedback = []; // cards live as their own documents, see saveCards
-  return s;
+  // 0.3.67 (Coach Milan 3 November 07:55): the plate's photos, the cook's and the plates saved for later are files too;
+  // the copy names each one (pf:<id>), see photos.ts
+  return looseOut(s);
 }
 // ---- records (storage release 2, 7 October 2026) ----
 // Each food and recipe is its own document under users/{uid}/foods and users/{uid}/recipes: { data, at } or, once

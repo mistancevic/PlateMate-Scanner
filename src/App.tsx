@@ -65,7 +65,7 @@ import { clearKept } from "./kept";
 // DT168: which account this phone's data belongs to
 const PHONE_OWNER = "chefmealan-phone-owner";
 import { RecipePage, RecipesPage, type MemberTools } from "./screens/RecipePages";
-import { photosOf, withPhotos, withoutStored, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted, realPhotosOf, isDrawn, recipePhotosOf, withRecipePhotos, recipeHasPhotos } from "./photos";
+import { photosOf, withPhotos, withoutStored, looseIn, loosePhotosOf, sig, fileOf, keyOf, isPreview, isOrphan, storeOk, storeAll, storePut, storeDel, storeClear, photosWanted, realPhotosOf, isDrawn, recipePhotosOf, withRecipePhotos, recipeHasPhotos } from "./photos";
 import { needsCover, cardHasPhoto } from "./covers";
 import { itemsOf as itemsOfShared, type SharedRecipe } from "./members";
 import { LegalScreen, legalPageFromPath } from "./screens/LegalScreen";
@@ -1042,7 +1042,7 @@ export default function App() {
         const st = stateRef.current, known = photoRef.current.known;
         const want = photosWanted(st);
         const need = new Map<string, string>();
-        for (const [k, s] of want) if (known.get(k) !== s) need.set(k, s);
+        for (const [k, s] of want) if (s === "#" ? !known.has(k) : known.get(k) !== s) need.set(k, s);
         if (listNow) {
           const names = await listPhotoFiles(uid);
           if (filesRef.current.uid !== uid) return;
@@ -1237,7 +1237,8 @@ export default function App() {
             incoming.feedback = [...byId.values()].sort((x, y) => (y.createdAt > x.createdAt ? 1 : -1)).map((f) => ({ ...f, photo: f.photo ?? localFb.get(f.id), photos: f.photos ?? localFbMore.get(f.id) }));
             void fillFromAccount(user.uid);
             fromCloud.current = true;
-            setState(incoming);
+            // 0.3.67: the plate's and the cook's photos this phone holds come back in place of the account's names for them
+            setState(looseIn(incoming, loosePhotosOf(state)));
             // the photo store fills any photo the account copy left out
             void photoRef.current.busy.then(() => storeAll()).then(mergePhotos).catch(() => {});
           } catch { /* keep local if the cloud copy is unreadable */ }
@@ -1559,11 +1560,21 @@ export default function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [goal, state.goals.calories, state.goals.protein]);
-  // every change goes to the account, a second after it settles
+  // every change goes to the account, three seconds after it settles (0.3.67: was one; Coach Milan 3 November 07:55), and
+  // straight away when the app goes to the back, so nothing waits. Only the part that changed is written (saveCloud).
+  const pendingSave = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    const flush = () => { if (document.visibilityState === "hidden") { const f = pendingSave.current; pendingSave.current = null; f?.(); } };
+    const onHide = () => { const f = pendingSave.current; pendingSave.current = null; f?.(); };
+    document.addEventListener("visibilitychange", flush);
+    window.addEventListener("pagehide", onHide);
+    return () => { document.removeEventListener("visibilitychange", flush); window.removeEventListener("pagehide", onHide); };
+  }, []);
   useEffect(() => {
     if (!user || !cloudLoaded.current) return;
-    const t = setTimeout(() => {
-      saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() })
+    const run = () => {
+      window.clearTimeout(t); pendingSave.current = null;
+      saveCloud(user.uid, { ...blockOf(stateRef.current), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() }, { onlyChanged: true })
         .then(async () => {
           setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
           // foods, recipes and cards: only the records that changed (storage release 2)
@@ -1572,8 +1583,10 @@ export default function App() {
           void syncFiles();
         })
         .catch((e) => setCloudStatus({ ok: false, text: `Not saved: ${explainCloudError(e)}` }));
-    }, 1000);
-    return () => clearTimeout(t);
+    };
+    const t = window.setTimeout(run, 3000);
+    pendingSave.current = run;
+    return () => { window.clearTimeout(t); if (pendingSave.current === run) pendingSave.current = null; };
   }, [state, goal, clientName, personal, goalLog, safety, user, planned]);
   async function api(url: string, body?: unknown) {
     const res = await fetch(url, {
