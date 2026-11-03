@@ -103,6 +103,8 @@ export function RecipeView({ r, member, photoSrc, top }: { r: Loaded; member: Me
       {top ?? <Top right={member ? <a className="rp-link" href="/today">Open the app</a> : <a className="rp-link" href="/recipes">All recipes</a>} />}
       {src && <figure className="rp-hero"><img src={src} alt={r.title} />{r.rating === "daam" && <Daam />}{r.photoAi && <span className="rp-ai">Picture made with AI</span>}</figure>}
       <h1 className="rp-title">{r.title}</h1>
+      {/* DT202 (0.3.75): From the kitchen, or On paper */}
+      <span className={`rp-mark ${r.cooked ? "cooked" : ""}`}>{r.cooked ? "From the kitchen" : "On paper"}</span>
       {r.lines && <p className="rp-lines">{r.lines}</p>}
       <small className="rp-meta">{[bylineOf(r.author), `${r.makes} ${plural(r.makes, r.servingName)}`, r.minutes ? `${r.minutes} minutes` : ""].filter(Boolean).join(" · ")}</small>
       {r.adaptedFrom && <small className="rp-meta">Adapted from {r.adaptedFrom}</small>}
@@ -221,6 +223,7 @@ export function RecipeCard({ r }: { r: PublicRecipe }) {
       {r.hasPhoto && <span className="rp-rphoto"><img src={`/r/${r.slug}/photo.jpg`} alt="" loading="lazy" />{r.rating === "daam" && <Daam />}{r.photoAi && <span className="rp-ai">Picture made with AI</span>}</span>}
       <span className="rp-rtext">
         <b>{r.title}</b>
+        <span className={`rp-mark ${r.cooked ? "cooked" : ""}`}>{r.cooked ? "From the kitchen" : "On paper"}</span>
         <span>One {r.servingName}: {r.perServing.kcal} kcal · {g1(r.perServing.protein)} protein · PD {r.pd}</span>
         <small>{[bylineOf(r.author), fitsTicked(r).length ? `Fits best: ${fitsTicked(r).map((f) => f.name).join(", ")}` : "", r.minutes ? `${r.minutes} min` : ""].filter(Boolean).join(" · ")}</small>
       </span>

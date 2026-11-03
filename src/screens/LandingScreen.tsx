@@ -60,7 +60,7 @@ export function LandingScreen() {
   useEffect(() => { if (location.hash === "#ask") setTimeout(toForm, 300); }, []);
   // the three newest public recipes (canvas board R7); the section stays hidden while there are none
   const [recipes, setRecipes] = useState<PublicRecipe[]>([]);
-  useEffect(() => { fetch("/api/recipes?limit=3").then((r) => r.json()).then((d) => setRecipes(d.recipes ?? [])).catch(() => {}); }, []);
+  useEffect(() => { fetch("/api/recipes?limit=3&cooked=1").then((r) => r.json()).then((d) => setRecipes(d.recipes ?? [])).catch(() => {}); }, []);
   return (
     <div className="landing">
       <header className="l-top">
@@ -210,7 +210,7 @@ export function LandingScreen() {
         <section className="l-kitchen">
           <span className="l-eyebrow">From the kitchen</span>
           <h2>Recipes with the numbers calculated</h2>
-          <p>Coach Milan cooks the recipes, weighs them, and puts the numbers next to the photo. In the app, Chef Mealan calculates how much of each food fits your goal.</p>
+          <p>Recipes Coach Milan has cooked and weighed, the numbers next to the photo. In the app, Chef Mealan calculates how much of each food fits your goal.</p>
           <div className="rp-grid">{recipes.map((r) => <RecipeCard key={r.slug} r={r} />)}</div>
           <a className="l-all" href="/recipes">All recipes →</a>
         </section>
@@ -244,7 +244,7 @@ export function LandingScreen() {
             <p>Milan is a senior product manager with about 20 years in software and the founder of several startups. He designs and builds Chef Mealan with AI, from the first sketch to every release.</p>
             {/* Coach Milan 1 November 15:03: the recipe builder and cook, as on the book's cover; the coaching certificate belongs on
                 the personal page, not here */}
-            <p>Milan cooks every day for himself and his family, in Munich, and builds his own recipes: weighed, tried, and kept only when the numbers and the taste both work. Every recipe and every number in Chef Mealan is tried on himself first.</p>
+            <p>Milan cooks every day for himself and his family, in Munich, and builds his own recipes, weighed. The ones he has cooked are marked From the kitchen; the numbers come from labels and food tables.</p>
             <p>Author of <a href="/built#books">Worth Building</a> and <a href="/worthy-numbers?from=hp">Worthy Numbers</a>. Worth Eating comes next.</p>
             <p className="l-behind-links"><a href="/built">How Chef Mealan is built ›</a><a href="/about">More about Milan ›</a></p>
           </div>

@@ -945,7 +945,9 @@ app.get("/api/recipes", async (req, res) => {
   try {
     const n = Math.max(1, Math.min(24, Number(req.query.limit) || 24));
     res.setHeader("Cache-Control", "no-cache");
-    res.json({ recipes: (await listRecipes(req, n)).map((r) => forVisitor(forPublic(r))) });
+    // DT202 (0.3.75): the home page's From the kitchen asks for cooked ones only (?cooked=1)
+    const all = (await listRecipes(req, req.query.cooked ? 24 : n)).filter((r) => !req.query.cooked || r.cooked === true).slice(0, n);
+    res.json({ recipes: all.map((r) => forVisitor(forPublic(r))) });
   } catch (e) { fail(res, e); }
 });
 app.get("/api/recipes/:slug", async (req, res) => {
@@ -1013,6 +1015,8 @@ app.post("/api/recipes", requireUser, requireMember, async (req, res) => {
     const now = new Date().toISOString();
     const { status: _s, downAt: _d, pending: _p, waitingFor: _w, note: _n, ...clean } = r as any;
     { const a = typeof clean.adaptedFrom === "string" ? clean.adaptedFrom.replace(/\s+/g, " ").trim().slice(0, 80) : ""; if (a) clean.adaptedFrom = a; else delete clean.adaptedFrom; }
+    // DT202 (0.3.75): I cooked this, a yes or no; anything else is not kept
+    if (typeof clean.cooked === "boolean") clean.cooked = clean.cooked === true; else delete clean.cooked;
     // a food's part, as a heading over the foods (0.2.19, IM15 to IM18): a short name or nothing
     clean.items = clean.items.map((i: any) => { const { part, ...rest } = i ?? {}; return cleanPart(part) ? { ...rest, part: cleanPart(part) } : rest; });
     const fresh = { ...clean, slug, authorUid: w.uid, publishedAt: old?.publishedAt ?? now, updatedAt: now, photo: photo ?? old?.photo ?? null };

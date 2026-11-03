@@ -35,7 +35,7 @@ export function LegalScreen({ page, back }: { page: LegalPage; back: () => void 
           {/* board B, 12 October 2026: the product role first, then the coaching after hours */}
           <p><b>Chef Mealan is built and run by {OPERATOR.name} in Munich. Product and recipe builder, and the maker of Chef Mealan.</b></p>
           <p>Milan is a senior product manager with about 20 years in B2B and B2B2C software, and the founder of several startups and agencies. One of the startups, an event planner app, was acquired. He designs and builds Chef Mealan with AI, from the first sketch to every release.</p>
-          <p>After hours, Milan is a certified fitness and nutrition coach, known to his clients as Coach Milan. He cooks every day for himself and his family, and tries every recipe and every number on himself first.</p>
+          <p>After hours, Milan is a certified fitness and nutrition coach, known to his clients as Coach Milan. He cooks every day for himself and his family. The recipes he has cooked are marked From the kitchen; the numbers come from labels and food tables.</p>
           <p>In Chef Mealan, a calculator calculates the numbers, the AI reads labels and talks, and you and your coach decide. Chef Mealan is being tested by a small group right now; most people join with a code from their coach.</p>
           <p>Milan is also the author of Worth Building, a product playbook.</p>
           <div className="about-links"><a href="/built">How Chef Mealan is built</a><a href="/built#books">Worth Building</a><a href="https://www.linkedin.com/in/milanstancevic" target="_blank" rel="noreferrer">Milan on LinkedIn</a></div>

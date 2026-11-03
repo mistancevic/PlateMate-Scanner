@@ -1,4 +1,5 @@
 import { StepPicShown, StepPicSheet, StepPlayer } from "./StepPics";
+import { kitchenMark, markWord, markLine } from "../recipeMark";
 import { YourCooks, EatLog, cookPhotosFor } from "./YourCooks";
 import { stepPicOf, setStepPic, alignStepPics, allStepPics } from "../photos";
 import { ThinkingCard } from "./ThinkingCard";
@@ -212,6 +213,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {naming !== null
         ? <input className="title-input rq-name-input" aria-label="Name of the recipe" autoFocus value={naming} onChange={(e) => setNaming(e.target.value)} onBlur={saveName} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done" maxLength={80} />
         : <button type="button" className="rq-name" aria-label={`Rename ${meal.title}`} onClick={() => setNaming(meal.title)}>{meal.title}</button>}
+      {/* DT202 (0.3.75, board Stories174): From the kitchen, or On paper, and what it means */}
+      {(() => { const k = kitchenMark(meal, cards); return <div className={`rq-mark ${k.cooked ? "cooked" : "paper"}`}><span className="tile-mark-chip">{markWord(k)}</span><small>{markLine(k)}</small></div>; })()}
       {/* DT90 (0.2.87, board Stories58): Chef Mealan's dinner says who made it, around which food, and when */}
       {meal.byChef && <small className="rq-label rq-bychef">{CHEF_NAME}'s {meal.byChef.kitchen} {meal.byChef.meal}, around your {meal.byChef.around}. Made on {new Date(meal.byChef.at).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.</small>}
       {/* DT81 (Milan 23 October 12:48 to 15:11): what the whole recipe makes is its label, under the name */}

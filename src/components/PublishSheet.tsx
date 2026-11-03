@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { kitchenMark } from "../recipeMark";
 import { Check, Copy, Download, Image as ImageIcon, X } from "lucide-react";
 import type { Feedback, Meal, PubContent, PublishDraft } from "../pilot";
 import { keptName } from "../pubNames";
@@ -106,6 +107,9 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
     [meal.id]);
   const photos = [...own, ...candidates.filter((c) => !own.includes(c))];
   const [photoAt, setPhotoAt] = useState(own.length ? 0 : init.photoAt);
+  // DT202 (0.3.75, board Stories174): I cooked this. The page says From the kitchen; off, it says On paper. It starts as the
+  // page has it, or on when the recipe has a cook of its own
+  const [cooked, setCooked] = useState<boolean>(() => (published && typeof (published as any).cooked === "boolean" ? (published as any).cooked : kitchenMark(meal, cards).cooked));
   const [title, setTitle] = useState(init.title);
   const [lines, setLines] = useState(init.lines);
   const [makes, setMakes] = useState(init.makes);
@@ -155,7 +159,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
       // the page gets the steps as they read, with the amounts written in (R13c)
       steps: steps.split("\n").map((x) => stepText(x, meal.items)).filter(Boolean).slice(0, 30), rating, who: "everyone",
       per100: nums.per100, perServing: nums.perServing, all: nums.all, pd: nums.pd, proteinShare: nums.proteinShare, fits: fitsOf(nums.pd),
-      hasPhoto: photos.length > 0, photoAi: chosenAi, ...(meal.source?.name ? { adaptedFrom: meal.source.name.slice(0, 80) } : {}), author, publishedAt: published?.publishedAt ?? now, updatedAt: now, mealId: meal.id,
+      hasPhoto: photos.length > 0, photoAi: chosenAi, cooked, ...(meal.source?.name ? { adaptedFrom: meal.source.name.slice(0, 80) } : {}), author, publishedAt: published?.publishedAt ?? now, updatedAt: now, mealId: meal.id,
     };
   };
   const photoNow = async () => (photos[photoAt] ? await resizeImageBase64(photos[photoAt], 1080, 1080).catch(() => photos[photoAt]) : null);
@@ -172,6 +176,9 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
         setSent(contentNow); setSentAt(at); setJustPublished(true); sentRef.current = { sent: contentNow, sentAt: at };
         onMeal({ publish: { title, lines, makes, servingName, minutes, names, nameIds: meal.items.map((i) => i.food.id), photoAt, savedAt: at, sent: contentNow, sentAt: at } });
       }
+      // DT202: I cooked this marks the recipe in the app too, from today; switched off, the mark you set goes (a cook of its own stays)
+      if (cooked && !meal.cookedAt) onMeal({ cookedAt: new Date().toISOString() });
+      if (!cooked && meal.cookedAt) onMeal({ cookedAt: undefined });
       setDone(saved); onDone(saved); setPreviewing(false);
     } catch (e: any) { setErr(e.message); } finally { setBusy(""); }
   };
@@ -265,6 +272,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
           <span className={rating ? "ok" : "plain"}>{rating === "daam" ? "✓ Your rating: DaaM good" : rating === "good" ? "✓ Your rating: Good" : "No rating yet: rate it on the Plate to show DaaM good"}</span>
           {claim && <span className="no">{claim}</span>}
         </div>
+        <label className="pub-cooked"><input type="checkbox" checked={cooked} onChange={(e) => setCooked(e.target.checked)} /><span><b>I cooked this</b><small>The page says From the kitchen. Off, it says On paper: calculated, not cooked yet.</small></span></label>
         <small className="muted">{bylineOf(author)}</small>
         {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
         <div className="ways publish-ways">
