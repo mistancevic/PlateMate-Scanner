@@ -110,15 +110,17 @@
       "id": "DT202",
       "title": "A mark on each recipe: From the kitchen, or On paper",
       "epic": "home",
-      "state": "next",
-      "why": "\"Every recipe is tried on himself first\" says too much. Agreed in brainstorm, parked by Milan, not drawn."
+      "state": "now",
+      "why": "\"Every recipe is tried on himself first\" says too much. Agreed in brainstorm, parked by Milan, not drawn. Answers 3 November 19:24 (All good). Board drawn; waits for his Go.",
+      "board": 174
     },
     {
       "id": "DT203",
       "title": "Languages: Serbian and German after English",
       "epic": "lang",
-      "state": "next",
-      "why": "Brainstormed. Open: who reviews German, Latin or Cyrillic for Serbian, AI answers first or screens first."
+      "state": "now",
+      "why": "Brainstormed. Open: who reviews German, Latin or Cyrillic for Serbian, AI answers first or screens first. 19:24: Serbian Latin, Chef Mealan first, screens English for a while. Board drawn; waits for his Go.",
+      "board": 175
     },
     {
       "id": "VO1",
