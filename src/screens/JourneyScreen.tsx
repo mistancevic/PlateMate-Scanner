@@ -1170,11 +1170,6 @@ export function JourneyScreen(p: AppApi) {
     const pr = rec ?? state.meals.find((m) => (p.filling?.mealId ? m.id === p.filling.mealId : !!state.title && m.title === state.title) && m.items.length > 0);
     return !!rec || (pr?.steps?.length ?? 0) > 0 || partsOf(its).length > 0 || cooksPlate(its);
   };
-  // 0.3.69: Make opened on a plate you cook with no steps written for its foods (a cook taken up again, a food used in it) goes to
-  // How to make it, where Chef Mealan writes them for this plate, as from the Plate
-  useEffect(() => {
-    if (step === "made" && cooksPlate(items) && !heldSteps && !bowlKeptOn(items) && !p.useInCook && plateDraft !== "working") { setStep("make"); startPlateSteps(); }
-  }, [step, heldSteps, items, p.useInCook]); // eslint-disable-line react-hooks/exhaustive-deps
   const plateMealNow = (): Meal => ({ id: "plate", title: state.title && state.title !== "DaaM" ? state.title : autoTitle(items), items, portion: aggregate(items).weight ?? 0, savedAt: new Date().toISOString(), ...(state.cooking?.length ? { cooking: state.cooking } : {}) });
   function startPlateSteps(force = false) {
     if (!cooksPlate(items)) return;

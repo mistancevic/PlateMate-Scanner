@@ -65,7 +65,8 @@ const PORT = "3395", U = `http://127.0.0.1:${PORT}`;
     await page.getByRole("button", { name: /Add it/ }).first().click().catch(() => {}); await page.waitForTimeout(900);
     const t2 = await main(page);
     ok(!/Dice|cucumber|Slice chicken/i.test(t2), "after the answer, still none of them");
-    ok(/How to make/i.test(t2) || /Write my own|write your own/i.test(t2), "with no steps for its foods, Make goes to How to make it, where they are written for this plate");
+    // after the answer the dish is back in Craft: its Steps block offers to write them for these foods, none of the old ones show
+    ok(/Write my own/.test(t2) && /Craft/.test(t2), "Craft for the dish: write the steps for these foods");
     await ctx.close();
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.slice(0, 2).join(" | ") : ""}`);
   } catch (e) { ok(false, "walkthrough error: " + e.message); }
