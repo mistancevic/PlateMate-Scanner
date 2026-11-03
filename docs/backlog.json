@@ -455,9 +455,17 @@
       "id": "DT230",
       "title": "Craft on paper, then Prep, Make, Eat: no bar on the Plate, Prepare it ›, the photo large with its own buttons",
       "epic": "cook",
-      "state": "next",
+      "state": "progress",
       "board": 169,
-      "why": "Milan 23:44 to 00:05. Waits for his Go."
+      "why": "Milan 23:44 to 00:05. Waits for his Go. Go at 14:20."
+    },
+    {
+      "id": "DT231",
+      "title": "Dev data in Settings, only for you: the phone's numbers and the account's saves leave About",
+      "epic": "home",
+      "state": "now",
+      "board": 170,
+      "why": "Milan 10:32 and 10:44. Board drawn 3 November; waits for his Go."
     }
   ]
 }
