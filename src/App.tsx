@@ -95,6 +95,7 @@ import type { Filling } from "./screens/api";
 import { getPersonal, setPersonal as storePersonal, calculate, canCalculate, getDay, withDated, DAY_TYPES, macroSplit, dayModeOf, ownDayNumbers, dayName as dayNameOf, withTarget, lifestyleOf, dayFor, type Personal, type DayType, type Day, type NextGoal } from "./personal";
 import { MenuScreen } from "./screens/MenuScreen";
 import { ClientsScreen } from "./screens/ClientsScreen";
+import { useViewAs, shownProfile, setViewAs, viewWord } from "./viewAs";
 import { ExplorerScreen } from "./screens/ExplorerScreen";
 import { setExplorerTarget } from "./explorerTarget";
 import { SharePublisher } from "./screens/SummaryPanel";
@@ -1110,6 +1111,9 @@ export default function App() {
   }, [state.foods.length]);
   // DT115 (0.2.97): every reviewed food of yours goes to the members' catalogue once (no photo, no name); a food changed after
   // a new review goes again. Kept in a small list of what was sent, so nothing is sent twice.
+  // DT232 (0.3.72): what this phone shows the account as (View the app as, in Dev data); the account's own role drives the rest
+  const view = useViewAs();
+  const shownProf = shownProfile(profile, view);
   const shareOn = cloudEnabled ? Boolean(user && profileReady && (profile.role === "coach" || profile.coachId)) : true;
   useEffect(() => {
     if (!shareOn) return;
@@ -1542,7 +1546,7 @@ export default function App() {
     storePersonal(next); setPersonalState(next);
   }
   // a reload on Clients stays there; once the account is known and is not a coach's, Today instead
-  useEffect(() => { if ((profileReady || (authReady && !user)) && tab === "clients" && profile.role !== "coach" && !coachDemoOn()) setTab("home"); }, [profileReady, authReady, user, profile.role, tab]);
+  useEffect(() => { if ((profileReady || (authReady && !user)) && tab === "clients" && shownProf.role !== "coach" && !(coachDemoOn() && view !== "user")) setTab("home"); }, [profileReady, authReady, user, profile.role, view, tab]);
   // DT210 (0.3.50): Clients is a tab of its own; no view to switch
   // numbers calculated from the profile follow the profile; before the first paint, so Today never shows ? and then jumps (T5)
   useLayoutEffect(() => {
@@ -2386,7 +2390,7 @@ export default function App() {
     answerSuggest: (at, choice, reason) => saveNotes(coachThread.notes.map((n) => (n.at === at ? { ...n, readAt: new Date().toISOString(), answer: { at: new Date().toISOString(), choice, ...(reason ? { reason } : {}) } } : n))),
     coachView, setCoachView: (v) => { setCoachViewState(v); try { localStorage.setItem("chefmealan-coach-view", v); } catch {} if (v === "day" && tab === "clients") setTab("home"); },
     coachClient, setCoachClient,
-    isCoach: profile.role === "coach" || coachDemoOn(),
+    isCoach: shownProf.role === "coach" || (coachDemoOn() && view !== "user"),
     goExplorer: (t) => { setExplorerTarget(t); setMenuSection(null); setTalkOpen(false); setTab("explorer"); },
     replyToCoach: (text: string, read?: string) => saveNotes([...coachThread.notes.map((n) => (n.at === read ? { ...n, readAt: new Date().toISOString() } : n)), { at: new Date().toISOString(), by: "client", text }]),
     measured, formulaKcal, calcFormula,
@@ -2748,7 +2752,7 @@ export default function App() {
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, shared: { reason, at: new Date().toISOString() } } : f)) }));
       notify(`Shared with ${coachLabel(profile.coachName)}.`);
     },
-    user, cloudEnabled, cloudStatus, profile,
+    user, cloudEnabled, cloudStatus, profile: shownProf,
     joinCoach: async (code: string) => { if (!user) return; try { const r = await joinCoach(user.uid, code); setProfile((p) => ({ ...p, ...r })); notify(`You're with ${r.coachName} now.`); } catch (e: any) { setError(e.message); } },
     leaveCoach: async () => { if (!user) return; try { await leaveCoach(user.uid); setProfile((p) => ({ ...p, coachId: undefined, coachName: undefined, coachEmail: undefined, coachPhoto: undefined, joinedAt: undefined })); } catch (e: any) { setError(e.message); } },
     // DT168 (0.3.10): sign-out clears the phone, so nothing of this person stays for the next one to sign in. First everything
@@ -2870,7 +2874,7 @@ export default function App() {
   const NAV: { id: Tab; label: string; icon: ReactNode }[] = [
     // the bar (0.2.0, canvas X0 and H, 11 October 2026): Today eats and counts, Plan decides, Plate makes, Recipes keeps; Me and Foods in the top menu
     // 0.2.121: a client sees how many things from the coach wait on Today (notes without Got it, recipes sent)
-    { id: "home", label: "Today", icon: <span className="nav-icon"><Home size={20} />{profile.role !== "coach" && fromCoach > 0 && <span className="badge">{fromCoach}</span>}</span> },
+    { id: "home", label: "Today", icon: <span className="nav-icon"><Home size={20} />{shownProf.role !== "coach" && fromCoach > 0 && <span className="badge">{fromCoach}</span>}</span> },
     { id: "plan", label: "Plan", icon: <CalendarDays size={20} /> },
     { id: "journey" as Tab, label: "Plate", icon: <Utensils size={20} /> },
     { id: "recipes", label: "Recipes", icon: <ChefHat size={20} /> },
@@ -2878,7 +2882,7 @@ export default function App() {
     { id: "explorer", label: "Explorer", icon: <Microscope size={20} /> },
     // DT210 (0.3.50, board Stories157; Coach Milan 1 November 23:28 to 23:52 Go): a coach's sixth tab, Clients, at the right,
     // with the count of what waits; Today, Plan, Plate and Recipes are always the coach's own. Clients keep five tabs.
-    ...(profile.role === "coach" || coachDemoOn() ? [{ id: "clients" as Tab, label: "Clients", icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }] : []),
+    ...(shownProf.role === "coach" || (coachDemoOn() && view !== "user") ? [{ id: "clients" as Tab, label: "Clients", icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }] : []),
   ];
   // DT210: no more My day and My clients; a client is seen on their page in Clients
   const clientsView = false;
@@ -2956,7 +2960,9 @@ export default function App() {
           <Mark size={28} color="var(--brand)" />
         </button>
         <h1>{menuSection ? (ME_PAGES.includes(menuSection) ? "Me" : "Menu") : TITLES[tab]}</h1>
-        {tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
+        {/* DT232 (0.3.72): while the app is viewed as Coach or User, the header says so and leads back, on every page */}
+        {view !== "me" ? <button className="ref view-as" onClick={() => setViewAs("me")}>As {viewWord(view)} · Back to me</button>
+        : tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
           {menuSection === "goal" ? `${pdText(dayPd)} today` : <>{goal?.band ? goalLabel(goal.band).split(" · ")[0] : `${fmt(state.goals.calories, 0)} kcal, ${fmt(state.goals.protein)} g`} · {pdText(dayPd)} today</>}
         </button>}
         <button className="icon menu-button" aria-label="Menu" onClick={() => setMenuSection(menuSection ? null : "list")}><Menu size={22} /></button>

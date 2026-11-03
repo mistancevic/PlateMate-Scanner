@@ -33,6 +33,7 @@ import type { AppApi, MenuSection } from "./api";
 import { openStats, savedDataKb } from "../openStats";
 import { saveStats } from "../cloud";
 import { looseWanted } from "../photos";
+import { useViewAs, setViewAs, viewWord } from "../viewAs";
 import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
 import { MetricsScreen } from "./MetricsScreen";
@@ -102,11 +103,13 @@ const askOwner = () => {
 };
 export function useMetricsOwner(on: boolean) {
   const [owner, setOwner] = useState(() => { try { return localStorage.getItem(OWNER) === "1"; } catch { return false; } });
+  const view = useViewAs();
   useEffect(() => {
     if (!on) return;
     askOwner().then((o) => { if (o === null) return; setOwner(o); try { localStorage.setItem(OWNER, o ? "1" : "0"); } catch { /* shows next time */ } });
   }, [on]);
-  return owner;
+  // DT232 (0.3.72): viewed as Coach or User, the owner's pages hide on this phone
+  return owner && view === "me";
 }
 
 export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: MenuSection, up?: boolean) => void; close: () => void; from: MenuSection | null; under?: MenuSection | null }) {
@@ -888,6 +891,12 @@ function DevData({ missing }: { missing: number }) {
   );
   return (<>
     <p className="small">Only you see this. Measured on this phone, each time the app opens; the saves are this phone's, today.</p>
+    {/* DT232 (0.3.72, board Stories171): View the app as, first */}
+    <section className="card dev-block" aria-label="View the app as">
+      <b>View the app as</b>
+      <div className="dev-views">{(["me", "coach", "user"] as const).map((v) => <button key={v} type="button" className={`choice ${v === "me" ? "on" : ""}`} aria-pressed={v === "me"} onClick={() => setViewAs(v)}>{viewWord(v)}</button>)}</div>
+      <small className="muted">Me: everything your account has. Coach: Clients, no owner pages. User: no Clients, no Share, Evals, Metrics, Running costs, Admin or Dev data. Only this phone, only what shows: your data and your rights stay as they are. The header leads back.</small>
+    </section>
     {block("This phone", [["Opened in", openStats.ms !== null ? `${(openStats.ms / 1000).toFixed(1)} s` : "not measured yet"], ["Data kept on the phone", `${savedDataKb()} KB`], ["Photos on the phone", String(openStats.photos)]])}
     {block("Saves to your account", [["Last save", x.lastKb !== null ? `${x.lastKb} KB${at ? `, ${at}` : ""}` : "none today"], ["Today", `${x.saves} save${x.saves === 1 ? "" : "s"}, ${Math.round(x.kb)} KB`], ["Nothing new, not sent", String(x.skipped)],
       // 0.3.71: photos the account's copy names that this phone does not hold; one that stays here is not in the account either

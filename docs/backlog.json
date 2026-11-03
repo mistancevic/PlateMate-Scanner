@@ -481,9 +481,10 @@
       "id": "DT232",
       "title": "View the app as: Me, Coach, User, in Dev data, for the owner",
       "epic": "ops",
-      "state": "now",
-      "why": "Milan 15:56: switch between owner, superadmin and user. Draw: Go at 15:59. Board drawn 3 November; waits for his Go.",
-      "board": 171
+      "state": "done",
+      "why": "Milan 15:56: switch between owner, superadmin and user. Draw: Go at 15:59. Board drawn 3 November; Go at 16:32.",
+      "board": 171,
+      "version": "0.3.72"
     }
   ]
 }
