@@ -49,3 +49,13 @@ test("a loose photo's file goes only when nothing names it", () => {
   st.photo = undefined;
   assert.equal(isOrphan("loose:" + looseId(pic(2)), { ...st }), true);
 });
+
+test("0.3.71: a photo is named only once its file is in the account; until then it stays in the copy", () => {
+  const up = new Set<string>(["loose:" + looseId(pic(1))]);
+  const out: any = stripPhotos(state(), (k) => up.has(k));
+  assert.equal(out.photo.image, "pf:" + looseId(pic(1)), "its file is up: named");
+  assert.equal(out.photo.more[0], pic(2), "its file is not up yet: the photo itself stays");
+  assert.equal(out.cook.ui.final, pic(5));
+  const again: any = stripPhotos(out, () => false);
+  assert.equal(again.photo.image, "pf:" + looseId(pic(1)), "a name stays a name");
+});

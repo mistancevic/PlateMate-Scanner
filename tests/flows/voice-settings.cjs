@@ -40,7 +40,7 @@ const PORT = "3394", B = `http://127.0.0.1:${PORT}`;
     const row = page.locator(".menu-row", { hasText: "Settings" });
     ok(/Voice while cooking · Language and Units coming soon/.test(await row.textContent()), "the Menu has Settings under Foods, its line says what is in it");
     await row.click(); await page.waitForTimeout(400);
-    ok(await page.locator(".settings-rows .menu-row").count() === 3 && (await page.locator(".settings-soon").allTextContents()).every((x) => /Coming soon/.test(x)) && /Read aloud · the phone's voice · normal speed · cut in on/.test(await page.locator(".settings-rows .menu-row").first().textContent()), "Settings: Voice while cooking with its line; Language and Units Coming soon");
+    ok(await page.locator(".settings-rows .menu-row").filter({ hasNotText: "Dev data" }).count() === 3 && (await page.locator(".settings-soon").allTextContents()).every((x) => /Coming soon/.test(x)) && /Read aloud · the phone's voice · normal speed · cut in on/.test(await page.locator(".settings-rows .menu-row").first().textContent()), "Settings: Voice while cooking with its line; Language and Units Coming soon");
     await page.locator(".settings-rows .menu-row", { hasText: "Voice while cooking" }).click(); await page.waitForTimeout(400);
     const names = (await page.locator(".vs-voice .choice b").allTextContents());
     ok(names.length === 5 && names[0] === "Daniel" && !names.includes("Anna") && /Show all 7 voices/.test(await page.locator(".vs-all").textContent()), "the phone's voices, English first, five then Show all: " + names.join(", "));

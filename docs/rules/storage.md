@@ -29,7 +29,10 @@ the autosave wrote the whole copy a second after every change, with the plate's 
   runs 3 seconds after a change settles, and at once when the app goes to the back.
 - The check: S1's save check also fails on a photo as text (2 KB or more) anywhere in a write, and on the account's copy
   (the main record or its private part, as it stays once the records moved) past 50 KB.
-- Settings, Dev data (the admin only, DT231 in 0.3.70; About until then) shows the size of the last save and today's saves from this phone.
+- 0.3.71 (Coach Milan 15:52: a photo read the day before showed empty everywhere): a photo is named in the copy only once its
+  file is confirmed in the account (sent or fetched by this phone); until then it stays in the copy as before. Dev data says how many
+  photos the copy names that this phone does not hold.
+- Settings, Dev data (the owner only, DT231 in 0.3.70; About until then) shows the size of the last save and today's saves from this phone.
 - 0.3.68 (Coach Milan 10:15, after About showed 457 KB): once the records moved, the copy holds only the plate and settings,
   with no 30 days' backup of the foods and recipes; and the private part lives only in the private record, on the preview too.
 

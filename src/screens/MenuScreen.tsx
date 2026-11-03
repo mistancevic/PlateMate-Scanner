@@ -32,6 +32,7 @@ import { analyse, isOpen as openAt } from "../analysis";
 import type { AppApi, MenuSection } from "./api";
 import { openStats, savedDataKb } from "../openStats";
 import { saveStats } from "../cloud";
+import { looseWanted } from "../photos";
 import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
 import { MetricsScreen } from "./MetricsScreen";
@@ -166,8 +167,8 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       {section === "share" && <ShareGuard {...p} />}
       {section === "explorer" && <ExplorerScreen {...p} />}
       {section === "admin" && <AdminPanel {...p} />}
-      {section === "settings" && <><p className="small">How the app works for you, on this phone.</p><SettingsList open={(id) => setSection(id)} dev={p.profile.admin} /></>}
-      {section === "dev" && p.profile.admin && <DevData />}
+      {section === "settings" && <><p className="small">How the app works for you, on this phone.</p><DevSettings p={p} open={(id) => setSection(id)} /></>}
+      {section === "dev" && <DevGuard p={p} />}
       {section === "voice" && <><p className="small">How Chef Mealan reads to you while you cook. Your phone's own voices: free, nothing leaves the phone.</p><VoiceSettingsPanel /></>}
     </>
   );
@@ -875,8 +876,11 @@ function SupportPanel(p: AppApi) {
   );
 }
 
-// DT231 (0.3.70, board Stories170): what this phone measured and wrote to the account, for the admin only; About keeps the version
-function DevData() {
+// 0.3.71 (Coach Milan 3 November 15:49 to 15:59, Go): Dev data for the account Metrics shows for (the owner), not the superadmin role
+function DevSettings({ p, open }: { p: AppApi; open: (id: "voice" | "dev") => void }) { return <SettingsList open={open} dev={useMetricsOwner(true)} />; }
+function DevGuard({ p }: { p: AppApi }) { return useMetricsOwner(true) ? <DevData missing={looseWanted(p.state).length} /> : null; }
+// DT231 (0.3.70, board Stories170): what this phone measured and wrote to the account, for the owner only; About keeps the version
+function DevData({ missing }: { missing: number }) {
   const x = saveStats();
   const at = x.lastAt ? new Date(x.lastAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
   const block = (title: string, rows: [string, string][]) => (
@@ -885,7 +889,10 @@ function DevData() {
   return (<>
     <p className="small">Only you see this. Measured on this phone, each time the app opens; the saves are this phone's, today.</p>
     {block("This phone", [["Opened in", openStats.ms !== null ? `${(openStats.ms / 1000).toFixed(1)} s` : "not measured yet"], ["Data kept on the phone", `${savedDataKb()} KB`], ["Photos on the phone", String(openStats.photos)]])}
-    {block("Saves to your account", [["Last save", x.lastKb !== null ? `${x.lastKb} KB${at ? `, ${at}` : ""}` : "none today"], ["Today", `${x.saves} save${x.saves === 1 ? "" : "s"}, ${Math.round(x.kb)} KB`], ["Nothing new, not sent", String(x.skipped)]])}
+    {block("Saves to your account", [["Last save", x.lastKb !== null ? `${x.lastKb} KB${at ? `, ${at}` : ""}` : "none today"], ["Today", `${x.saves} save${x.saves === 1 ? "" : "s"}, ${Math.round(x.kb)} KB`], ["Nothing new, not sent", String(x.skipped)],
+      // 0.3.71: photos the account's copy names that this phone does not hold; one that stays here is not in the account either
+      ["Photos named, not on this phone", String(missing)]])}
+    {missing > 0 && <p className="small">Chef Mealan fetches them from your account, a few seconds after the app opens. A number that stays means the account does not have them: retake the photo, or empty the plate it was on.</p>}
     {block("The app", [["Version", (import.meta.env.VITE_VERSION as string | undefined) || "0"], ["Commit", (import.meta.env.VITE_COMMIT as string | undefined) || "preview"]])}
   </>);
 }

@@ -468,6 +468,21 @@
       "board": 170,
       "why": "Milan 10:32 and 10:44. Board drawn 3 November; Go at 14:38.",
       "version": "0.3.70"
+    },
+    {
+      "id": "FX6",
+      "title": "A photo named in the account only once its file is there; Photos named, not on this phone in Dev data; Dev data for the owner",
+      "epic": "ops",
+      "state": "done",
+      "version": "0.3.71",
+      "why": "Milan 15:48 to 15:52: Dev data did not show (superadmin check), and a photo read on 2 November showed empty everywhere. Go at 15:59."
+    },
+    {
+      "id": "DT232",
+      "title": "View the app as: Me, Coach, User, in Dev data, for the owner",
+      "epic": "ops",
+      "state": "next",
+      "why": "Milan 15:56: switch between owner, superadmin and user. Draw: Go at 15:59."
     }
   ]
 }

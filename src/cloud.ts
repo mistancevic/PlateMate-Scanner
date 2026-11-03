@@ -229,7 +229,7 @@ export function explainCloudError(e: any): string {
   return msg || "unknown error";
 }
 // Photos stay on the phone for now; everything else goes to the account. Keeps the document small.
-export function stripPhotos<T>(state: T): T {
+export function stripPhotos<T>(state: T, fileUp?: (key: string) => boolean): T {
   const s: any = structuredClone(state);
   fixMoves(s); // 0.3.57: the account's database refuses a list inside a list
   const strip = (f: any) => { if (f && typeof f === "object") { if (Array.isArray(f.photos)) f.photoCount = f.photos.length; else if (f.photo) f.photoCount = 0; delete f.photo; delete f.photos; } return f; };
@@ -248,7 +248,7 @@ export function stripPhotos<T>(state: T): T {
   s.feedback = []; // cards live as their own documents, see saveCards
   // 0.3.67 (Coach Milan 3 November 07:55): the plate's photos, the cook's and the plates saved for later are files too;
   // the copy names each one (pf:<id>), see photos.ts
-  return looseOut(s);
+  return looseOut(s, fileUp);
 }
 // ---- records (storage release 2, 7 October 2026) ----
 // Each food and recipe is its own document under users/{uid}/foods and users/{uid}/recipes: { data, at } or, once

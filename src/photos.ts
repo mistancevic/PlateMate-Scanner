@@ -414,7 +414,9 @@ export function looseIdsOf(state: any): Set<string> {
   return s;
 }
 // the account's copy: each loose photo as its reference
-export const looseOut = <T,>(state: T): T => mapLoose(state, (v) => (isLooseRef(v) ? v : LOOSE_REF + looseId(v)));
+// 0.3.71 (Coach Milan 3 November 15:52: a photo read on 2 November was named in the account, its file never sent): with has, only
+// a photo whose file the account confirmed is named; the others stay in the copy as they are until their file is up
+export const looseOut = <T,>(state: T, has?: (key: string) => boolean): T => mapLoose(state, (v) => (isLooseRef(v) ? v : has && !has(`loose:${looseId(v)}`) ? v : LOOSE_REF + looseId(v)));
 // back from the account: each reference this phone holds the photo for (by key loose:<id>) becomes the photo again
 export const looseIn = <T,>(state: T, photos: Map<string, string>): T => (photos.size ? mapLoose(state, (v) => (isLooseRef(v) ? photos.get(`loose:${v.slice(LOOSE_REF.length)}`) ?? v : v)) : state);
 // the photos a state holds, by key
