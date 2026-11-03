@@ -14,8 +14,8 @@ const report = () => {
   const { saveCheck } = require("../src/saveShape.ts");
   let writes = 0; const problems = new Set();
   for (const d of dumps.values()) { const r = saveCheck(d); writes += r.writes; r.problems.forEach((x) => problems.add(x)); }
-  if (problems.size) for (const x of [...problems].slice(0, 5)) console.log("FAIL save check: the account would refuse " + x);
-  else console.log(`ok   save check: ${writes} account writes from ${dumps.size} phone ${dumps.size === 1 ? "state" : "states"}, nothing the account refuses`);
+  if (problems.size) for (const x of [...problems].slice(0, 5)) console.log("FAIL save check (rule S1): " + x);
+  else console.log(`ok   save check: ${writes} account writes from ${dumps.size} phone ${dumps.size === 1 ? "state" : "states"}, nothing the account refuses, no photo as text, the account's copy under 50 KB`);
   dumps.clear();
 };
 const wrapCtx = (ctx) => { if (ctx.__sc) return ctx; ctx.__sc = 1; const close = ctx.close.bind(ctx); ctx.close = async (...a) => { await grab(ctx); return close(...a); }; return ctx; };

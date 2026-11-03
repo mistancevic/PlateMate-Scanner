@@ -15,6 +15,8 @@ import { getRegion } from "./moments";
 export const PILOT_KEY = "platemate-pilot-v1";
 // Firestore's own limits (firebase.google.com/docs/firestore/quotas): 1 MiB per document less the name, 20 levels deep
 const MAX_BYTES = 1_048_487, MAX_DEPTH = 20;
+// 0.3.67: our own limits, for what the account is charged by (1 KB a write unit): a photo as text, and the account's copy past 50 KB
+export const PHOTO_TEXT = 2048, ACCOUNT_MAX_KB = 50;
 
 export function shapeProblems(x: unknown, where = ""): string[] {
   const out: string[] = [];
@@ -31,6 +33,8 @@ export function shapeProblems(x: unknown, where = ""): string[] {
         walk(v[k], `${path}.${k}`, depth + 1, false);
       }
     } else if (typeof v === "number" && !Number.isFinite(v)) out.push(`${where}${path}: ${v} is not a number the account keeps`);
+    // 0.3.67 (Coach Milan 3 November 07:55): a photo never rides as text; it is a file, and the copy names it
+    else if (typeof v === "string" && v.startsWith("data:image") && v.length >= PHOTO_TEXT) out.push(`${where}${path}: a photo as text, ${Math.round(v.length / 1024)} KB`);
   };
   walk(x, "", 0, false);
   const bytes = new TextEncoder().encode(JSON.stringify(x) ?? "").length;
@@ -39,14 +43,16 @@ export function shapeProblems(x: unknown, where = ""): string[] {
 }
 
 // Every document a phone with this storage would write: the account's block (main and private part) and each record.
-export function accountWritesOf(store: Record<string, string>): { where: string; data: unknown }[] {
+// slim: the block as it is 30 days after the records moved (blockOf in App.tsx), the copy that stays
+export function accountWritesOf(store: Record<string, string>, slim = false): { where: string; data: unknown }[] {
   const raw = store[PILOT_KEY];
   if (!raw) return [];
   const g = globalThis as any, had = g.localStorage;
   g.localStorage = { getItem: (k: string) => (k in store ? store[k] : null), setItem() {}, removeItem() {}, key: () => null, length: 0, clear() {} };
   try {
     const state = repairState(JSON.parse(raw));
-    const block = { state: stripPhotos(state), recordsOnly: false, foodsCount: state.foods?.length ?? 0, goal: getGoal(), personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), updatedAt: "2026-01-01T00:00:00Z" };
+    const b = stripPhotos(state);
+    const block = { state: slim ? { ...b, foods: [], meals: [] } : b, recordsOnly: slim, foodsCount: state.foods?.length ?? 0, goal: getGoal(), personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), updatedAt: "2026-01-01T00:00:00Z" };
     const out: { where: string; data: unknown }[] = [];
     for (const keepOld of [true, false]) {
       const { priv, main } = splitSave(block, keepOld);
@@ -61,5 +67,6 @@ export function accountWritesOf(store: Record<string, string>): { where: string;
 
 export function saveCheck(store: Record<string, string>): { writes: number; problems: string[] } {
   const ws = accountWritesOf(store);
-  return { writes: ws.length, problems: ws.flatMap((w) => shapeProblems(w.data, w.where)) };
+  const big = accountWritesOf(store, true).filter((w) => /^users\/\{uid\}(\/private)?( \(preview\))?$/.test(w.where)).map((w) => ({ w, kb: new TextEncoder().encode(JSON.stringify(w.data) ?? "").length / 1024 })).filter((x) => x.kb > ACCOUNT_MAX_KB);
+  return { writes: ws.length, problems: [...ws.flatMap((w) => shapeProblems(w.data, w.where)), ...big.map((x) => `${x.w.where}: ${Math.round(x.kb)} KB, past the ${ACCOUNT_MAX_KB} KB the account's copy may hold`)] };
 }

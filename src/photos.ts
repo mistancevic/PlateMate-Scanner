@@ -40,6 +40,8 @@ export function photosOf(state: any): Map<string, string> {
   (state?.meals ?? []).forEach((m: any) => { if (m?.id && Array.isArray(m.stepPics)) m.stepPics.forEach((x: unknown, n: number) => { if (isData(x)) out.set(`step:${m.id}:${n + 1}`, x); }); });
   const lib = libraryIds(state);
   copiesOf(state).filter((f) => !lib.has(f.id)).forEach(food);
+  // 0.3.67: the plate's photos, the cook's and the plates saved for later, loose:<id>
+  for (const [k, v] of loosePhotosOf(state)) out.set(k, v);
   return out;
 }
 
@@ -83,6 +85,8 @@ export function photosWanted(state: any): Map<string, string> {
     if (!m?.id || !want || Array.isArray(m.stepPics)) continue;
     want.forEach((s, n) => { if (s) out.set(`step:${m.id}:${n + 1}`, s); });
   }
+  // 0.3.67: a loose photo's key names the photo itself, so any copy under it is the right one ("#")
+  for (const k of looseWanted(state)) out.set(k, "#");
   return out;
 }
 
@@ -156,7 +160,8 @@ export function withPhotos<T>(state: T, photos: Map<string, string>, accept?: Se
     items: inItems(s.items),
     meals: (s.meals ?? []).map((m: any) => ({ ...recipe(m), items: inItems(m.items) })),
   };
-  return changed ? next : state;
+  // 0.3.67: loose photos come back where the state names them
+  return looseIn(changed ? next : state, photos);
 }
 // Whether this phone's photos of a food or card are the ones the account's copy names (or the account names none)
 export const samePhotos = (local: any, remote: any) => !Array.isArray(remote?.photoSigs) || !loaded(local) || same(photoSigsOf(local), remote.photoSigs);
@@ -221,6 +226,8 @@ export const keyOf = (file: string) => file.replace(/\.jpg$/, "").replace(/~/g, 
 // A food that left the library keeps its photos while a plate, a meal or a card still shows it.
 export function isOrphan(key: string, state: any): boolean {
   const [kind, id, n] = key.split(":");
+  // 0.3.67: a loose photo goes when nothing in the state names it any more
+  if (kind === "loose") return !looseIdsOf(state).has(id);
   // a recipe's photo: gone with the recipe, with a cover removed, or past the end of its list
   if (kind === "meal") {
     const m = (state?.meals ?? []).find((x: any) => x?.id === id);
@@ -362,3 +369,55 @@ export function alignStepPics(m: { stepPics?: (string | null)[]; stepPicMeta?: (
 }
 // every step has its picture: Watch the steps can play
 export const allStepPics = (m: any, steps: string[]) => steps.length > 0 && steps.every((t) => !!stepPicOf(m, t));
+
+// ---- loose photos (0.3.67, Coach Milan 3 November 07:55, Go; the account's free daily writes were passed) ----
+// Photos that live outside the foods, recipes and cards: the plate's photo and its other photos (photo.image, photo.more),
+// the cook's step and meal photos, and the plates and cooks saved for later. They used to ride as text in the account's copy,
+// so every save wrote them again. Now each is a file, loose:<id> (the id from the photo itself), and the account's copy holds
+// pf:<id> in its place. The phone that took it keeps the photo; another phone fetches the file.
+export const LOOSE_MIN = 2048, LOOSE_REF = "pf:";
+const HANDLED = new Set(["foods", "items", "meals", "feedback"]);
+const idCache = new Map<string, string>();
+export function looseId(data: string): string {
+  const hit = idCache.get(data);
+  if (hit) return hit;
+  let a = 0x811c9dc5, b = 5381;
+  for (let i = 0; i < data.length; i++) { const c = data.charCodeAt(i); a = Math.imul(a ^ c, 0x01000193); b = (Math.imul(b, 33) + c) | 0; }
+  const id = `${data.length.toString(36)}${(a >>> 0).toString(36)}${(b >>> 0).toString(36)}`;
+  if (idCache.size > 64) idCache.clear();
+  idCache.set(data, id);
+  return id;
+}
+export const isLoose = (x: unknown): x is string => isData(x) && x.startsWith("data:image") && x.length >= LOOSE_MIN;
+export const isLooseRef = (x: unknown): x is string => typeof x === "string" && x.startsWith(LOOSE_REF) && x.length < 64;
+// Every loose photo or reference in the state, outside the foods, recipes and cards (which have their own keys) and outside
+// any food (a food's photos come from the library). f returns what takes the value's place; the state is never changed:
+// the result shares every branch that did not change, and is the state itself when nothing did.
+export function mapLoose<T>(state: T, f: (v: string) => string): T {
+  const walk = (v: any, key: string, top: boolean): any => {
+    if (typeof v === "string") return isLoose(v) || isLooseRef(v) ? f(v) : v;
+    if (!v || typeof v !== "object" || key === "food") return v;
+    if (Array.isArray(v)) { let ch = false; const out = v.map((x) => { const y = walk(x, "", false); if (y !== x) ch = true; return y; }); return ch ? out : v; }
+    let ch = false; const out: any = {};
+    for (const k of Object.keys(v)) { const x = v[k]; const y = top && HANDLED.has(k) ? x : walk(x, k, false); if (y !== x) ch = true; out[k] = y; }
+    return ch ? out : v;
+  };
+  return walk(state, "", true);
+}
+export function eachLoose(state: unknown, f: (v: string) => void) { mapLoose(state, (v) => { f(v); return v; }); }
+// the ids a state holds, as photos or as references; one walk per state
+const idsOf = new WeakMap<object, Set<string>>();
+export function looseIdsOf(state: any): Set<string> {
+  if (!state || typeof state !== "object") return new Set();
+  let s = idsOf.get(state);
+  if (!s) { const out = new Set<string>(); eachLoose(state, (v) => out.add(isLooseRef(v) ? v.slice(LOOSE_REF.length) : looseId(v))); idsOf.set(state, (s = out)); }
+  return s;
+}
+// the account's copy: each loose photo as its reference
+export const looseOut = <T,>(state: T): T => mapLoose(state, (v) => (isLooseRef(v) ? v : LOOSE_REF + looseId(v)));
+// back from the account: each reference this phone holds the photo for (by key loose:<id>) becomes the photo again
+export const looseIn = <T,>(state: T, photos: Map<string, string>): T => (photos.size ? mapLoose(state, (v) => (isLooseRef(v) ? photos.get(`loose:${v.slice(LOOSE_REF.length)}`) ?? v : v)) : state);
+// the photos a state holds, by key
+export function loosePhotosOf(state: unknown): Map<string, string> { const out = new Map<string, string>(); eachLoose(state, (v) => { if (!isLooseRef(v)) out.set(`loose:${looseId(v)}`, v); }); return out; }
+// the references a state holds without the photo
+export function looseWanted(state: unknown): string[] { const out: string[] = []; eachLoose(state, (v) => { if (isLooseRef(v)) out.push(`loose:${v.slice(LOOSE_REF.length)}`); }); return out; }
