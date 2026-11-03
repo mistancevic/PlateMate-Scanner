@@ -56,8 +56,8 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   await page.getByRole("button", { name: "Change it first" }).first().click(); await page.waitForTimeout(900);
   const plateG = await page.evaluate(() => JSON.parse(localStorage.getItem("platemate-pilot-v1")).items.reduce((s, i) => s + i.grams, 0));
   ok(Math.abs(plateG - 1060 * planned / 8) <= 2, `the Plate holds the batch for ${planned}: ${Math.round(plateG)} g`);
-  await page.getByRole("button", { name: /^Make it( as it is)?$|^Keep it as it is$|^(?:Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).first().click(); await page.waitForTimeout(900);
-  await page.getByRole("button", { name: /^I'm making it|^(?:Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)/ }).first().click(); await page.waitForTimeout(700);
+  await page.getByRole("button", { name: /^Make it( as it is)?$|^Keep it as it is$|^(?:Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).first().click(); await page.waitForTimeout(900);
+  await page.getByRole("button", { name: /^I'm making it|^(?:Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)/ }).first().click(); await page.waitForTimeout(700);
   // DT211 v8 (0.3.53): how many it made and how many you ate are asked on Eat
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(500);
   const made = page.getByRole("group", { name: "How many it made" });
@@ -80,7 +80,7 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   await page.getByRole("button", { name: "Add", exact: true }).first().click(); await page.waitForTimeout(300);
   await page.getByRole("button", { name: /^(Fit to my target|Make it an? \w+)$/ }).first().click(); await page.waitForTimeout(900);
   // 0.2.88 (DT93, DT94): Fit works in place; Lock the recipe goes on
-  await page.getByRole("button", { name: /^(?:Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).first().click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /^(?:Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).first().click(); await page.waitForTimeout(600);
   await page.locator(".way").first().click(); await page.waitForTimeout(200);
   await page.getByRole("button", { name: /I'm making it this way|Make it this way ›/ }).click(); await page.waitForTimeout(600);
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(400);
@@ -102,9 +102,9 @@ seed.meals = [{ id: "sarma", title: "Sarma", savedAt: "2026-10-01T08:00:00Z", ma
   for (const inp of await page.locator('input[aria-label^="Grams of"]').all()) { await inp.fill("900"); }
   await page.waitForTimeout(300);
   // changed by DT110 (0.2.94): a plate this big gets Chef Mealan's two-lunches card with its own Keep it as it is; the step on is Lock the recipe
-  await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›/ }).first().click(); await page.waitForTimeout(800);
+  await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›/ }).first().click(); await page.waitForTimeout(800);
   if (await page.locator(".way").count()) { await page.locator(".way").first().click(); await page.waitForTimeout(200); }
-  await page.getByRole("button", { name: /I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it this way ›|Make it ›/ }).first().click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it this way ›|Make it ›/ }).first().click(); await page.waitForTimeout(600);
   // a big plate eaten all at once is asked about (R25); you ate a portion of it
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "A portion" }).click(); await page.waitForTimeout(200);

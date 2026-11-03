@@ -42,8 +42,8 @@ const PORT = "3345", B = `http://127.0.0.1:${PORT}`;
     // ---- DT216: the crêpes, a recipe that kept the bowl steps ----
     let { ctx, page } = await open({ items: structuredClone(crepes), title: "Protein crepes", plateAt: "2026-11-02T11:50:00" });
     const main = () => page.locator("main").textContent();
-    ok(await page.getByRole("button", { name: "How to make it ›", exact: true }).count() === 1 && await page.getByRole("button", { name: "Lock the recipe", exact: true }).count() === 0, "DT220: the Plate's white button says where it goes: How to make it ›");
-    await page.getByRole("button", { name: "How to make it ›", exact: true }).click(); await page.waitForTimeout(900);
+    ok(await page.getByRole("button", { name: "Prepare it ›", exact: true }).count() === 1 && await page.getByRole("button", { name: "Lock the recipe", exact: true }).count() === 0, "DT230: the Plate says Prepare it ›; Plate's white button says where it goes: How to make it ›");
+    await page.getByRole("button", { name: "Prepare it ›", exact: true }).click(); await page.waitForTimeout(900);
     ok(/^How to make Protein crepes$/.test((await page.locator("h2").first().textContent()).trim()) && !/How do you want to eat it/.test(await main()), "flour and eggs: How to make it, never the bowl ways; the title says the dish (0.3.64)");
     if (process.env.DEBUG) console.log("DEBUG", (await main()).slice(0, 900));
     ok(!/stir until it's one colour/.test(await main()) && await page.getByRole("button", { name: "Write my own" }).count() === 1, "the bowl steps the recipe kept are not shown; Write my own is offered (the AI is off here)");

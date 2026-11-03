@@ -83,14 +83,14 @@ const STEPS = { steps: [
   ok(/Penne/.test(await text(page, ".plate-card")) && /weigh it dry/.test(await text(page, ".plate-card")), "DT88: Penne, weigh it dry");
   ok(/For cooking, not counted: ?dried oregano ✕salt and pepper ✕/.test(await text(page, ".plate-card")), "DT91, DT98: under the foods, for cooking, not counted, as chips");
   // DT89: How to make it, with Chef Mealan's steps at the plate's amounts
-  await page.getByRole("button", { name: "Make it", exact: true }).click(); await page.waitForTimeout(1300);
+  await page.getByRole("button", { name: "Prepare it ›", exact: true }).click(); await page.waitForTimeout(1300);
   let t = await text(page);
   ok(/How to make (?!it ›)/.test(t) && !/How do you want to eat it/.test(t), "DT89: a dinner you cook gets How to make it, not the bowl ways");
   ok(asked && asked.items.length === 5 && asked.items[4].name === "Penne, dry" && JSON.stringify(asked.cooking) === JSON.stringify(["dried oregano", "salt and pepper"]), "DT89, DT91: Chef Mealan was asked for the steps of the five foods, with the herbs");
   const steps = await page.locator(".rp-steps li").allTextContents();
   ok(steps.length === 4 && /cook \d+ g penne for 11 minutes/.test(steps[0]) && /150 g chicken breast/.test(steps[2]), "DT89: four steps, at the plate's amounts: " + steps[0]);
   ok(/Chef Mealan's steps for your dinner, at your amounts\./.test(await text(page, ".step-head")), "DT89: the head says whose steps and for what");
-  await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).click(); await page.waitForTimeout(700);
+  await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await page.waitForTimeout(700);
   // DT90: As the steps say; Save keeps the steps, the kitchen and who made it
   ok(await page.getByRole("button", { name: /^\W*As the steps say$/ }).count() === 1 && !/as the recipe says/i.test(await text(page)), "DT90: How did it go? says As the steps say");
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(700);
@@ -112,8 +112,8 @@ const STEPS = { steps: [
   await p2.goto(U + "/plate"); await p2.waitForTimeout(1300);
   // DT94 (0.2.88): the name is set in Craft, on the Plate
   await p2.locator(".title-input").fill("Yeast fritters"); await p2.locator(".title-input").blur(); await p2.waitForTimeout(300);
-  await p2.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).click(); await p2.waitForTimeout(900);
-  for (const name of ["Continue", "Make it this way ›", "Lock the recipe", "How to make it ›", "How to eat it ›", "Lock it and cook ›", "Make it ›", "I'm making it this way", "I'm making it"]) { const bt = p2.getByRole("button", { name, exact: true }); if (await bt.count() && await bt.first().isEnabled()) { await bt.first().click(); await p2.waitForTimeout(600); break; } }
+  await p2.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await p2.waitForTimeout(900);
+  for (const name of ["Continue", "Make it this way ›", "Lock the recipe", "How to make it ›", "How to eat it ›", "Lock it and cook ›", "Prepare it ›", "Make it ›", "I'm making it this way", "I'm making it"]) { const bt = p2.getByRole("button", { name, exact: true }); if (await bt.count() && await bt.first().isEnabled()) { await bt.first().click(); await p2.waitForTimeout(600); break; } }
   if (await p2.locator(".way").count()) { await p2.locator(".way").first().click(); await p2.getByRole("button", { name: /I'm making it this way|Make it this way ›/ }).click(); await p2.waitForTimeout(600); }
   await p2.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await p2.waitForTimeout(600);
   await p2.getByRole("button", { name: "Good", exact: true }).click();

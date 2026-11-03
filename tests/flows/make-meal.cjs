@@ -33,7 +33,7 @@ const answer = { options: [
   await page.route("**/api/meal", async (route) => { calls++; asked = JSON.parse(route.request().postData() || "{}"); await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(answer) }); });
   // CH1: the plate says what it is for and what it aims at
   await page.goto(U + "/plate"); await page.waitForTimeout(1300);
-  ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 1 && await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).count() === 1, "CH1, DT87 (0.2.87): Fit to my target, and Keep it as it is");
+  ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 1 && await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).count() === 1, "CH1, DT87 (0.2.87): Fit to my target, and Keep it as it is");
   ok(/Lunch is about 933 kcal of your 2,800, at PD 6\.4 or more\. Chef Mealan adds what it needs to land your lunch in its range\./.test(await page.locator(".plate-card").textContent()), "CH1: lunch is about 933 kcal: what is left of the day over the three meals to come");
   // CH2: PD above the target, half a lunch: maths cannot make it a meal, so Chef Mealan
   await page.getByRole("button", { name: "Fit to my target" }).click(); await page.waitForTimeout(900);
@@ -52,10 +52,10 @@ const answer = { options: [
   // Changed by story DT129 (0.2.109): the heading is the meal by name; the kcal sit in the Energy row
   ok(/^Lunch/.test(ro) && /10\.1/.test(ro) && /Energy ?927 ?kcal/.test(ro), "CH3: Lunch, PD 10.1, Energy 927 kcal: " + ro);
   ok(/Chef Mealan's Balkan lunch, around your foods\. Change any amount you like\./.test(await page.locator(".step-head").textContent()), "CH3, DT88 (0.2.87): the line says whose lunch it is, around your foods");
-  ok(await page.getByRole("button", { name: "Make it" }).count() === 1 && await page.getByRole("button", { name: "Other ideas" }).count() === 1, "CH3: Make it, or Other ideas");
+  ok(await page.getByRole("button", { name: "Prepare it ›" }).count() === 1 && await page.getByRole("button", { name: "Other ideas" }).count() === 1, "CH3, DT230: Prepare it ›, or Other ideas");
   await page.getByRole("button", { name: "Other ideas" }).click(); await page.waitForTimeout(900);
   ok(calls === 2 && asked.plate.length === 2 && asked.avoid.includes("Šopska plate with bread"), "Other ideas: from the plate as it was, and not the same ideas again");
-  await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await page.waitForTimeout(600);
   ok(await page.locator(".mm-card").count() === 0, "Keep it as it is closes the ideas");
   // CH4: the kitchens you cook
   await page.goto(U + "/me/shop"); await page.waitForTimeout(1100);

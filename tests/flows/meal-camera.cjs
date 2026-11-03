@@ -71,7 +71,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await page.locator(".cam-analyze").click(); await page.waitForTimeout(2200);
   const s1 = await st();
   ok(sent.length === 1 && /^data:image\/jpeg;base64,/.test(sent[0].image) && Array.isArray(sent[0].more) && sent[0].more.length === 1 && s1.photo?.more?.length === 1 && await page.locator(".camera-ui").count() === 0, "DT228: both photos go in one read; the camera closes");
-  ok(s1.items.length === 3 && s1.photo && !s1.photo.who && /Your photo, 13:05\./.test(await text(".mp-line")), "DT130: from the camera it is the plate in front of you, as in 0.2.108");
+  ok(s1.items.length === 3 && s1.photo && !s1.photo.who && /Your photo, 13:05\./.test(await text(".mp-big-say")), "DT130: from the camera it is the plate in front of you, as in 0.2.108");
   await page.locator(".mp-say").getByRole("button", { name: "Not mine" }).click(); await page.waitForTimeout(400);
 
   // the Plate: Photo of my meal opens the same camera; a photo from Your photos asks first
@@ -96,7 +96,7 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
   const s2 = await st();
   ok(sent.length === 2 && s2.photo.who === "ate" && new Date(s2.photo.at).getHours() === 12 && new Date(s2.photo.at).getMinutes() === 30 && await page.locator(".pa").count() === 0, "DT130: Read the plate reads; the plate keeps the time picked and who");
-  ok(/Your photo, 12:30\./.test(await text(".mp-line")), "DT130: the photo line says the photo's time");
+  ok(/Your photo, 12:30\./.test(await text(".mp-big-say")), "DT130: the photo line says the photo's time");
   await page.locator(".mp-say").getByRole("button", { name: "Ate it", exact: true }).click(); await page.waitForTimeout(700);
   const s3 = await st();
   const eaten = s3.feedback.find((f) => f.status === "eaten");
@@ -111,11 +111,11 @@ const READ = { dish: "Grilled chicken with rice and salad", foods: [
   ok(await text(".pa small") === "Not your meal, not logged. Chef Mealan reads it: cook it, keep it as an idea, or plan it.", "0.3.62: Exploring (was An idea): not your meal, not logged");
   await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
   const s4 = await st();
-  ok(sent.length === 3 && s4.photo.who === "idea" && /Exploring a photo\. 3 foods read, amounts estimated \(~\)\. Not logged/.test(await text(".mp-line")) && (await st()).pick === "exploring", "0.3.62: the read lands as Exploring, said in the photo line; the pencil block is on Exploring");
+  ok(sent.length === 3 && s4.photo.who === "idea" && /Exploring a photo\. 3 foods read, amounts estimated \(~\)\. Not logged/.test(await text(".mp-big-say")) && (await st()).pick === "exploring", "0.3.62: the read lands as Exploring, said in the photo line; the pencil block is on Exploring");
   const ib = (await page.locator(".mp-say .mp-idea-row button").allTextContents()).map((x) => x.trim());
   ok(ib.length === 3 && /^Fit it to my (lunch|dinner|meal)$/.test(ib[0]) && ib[1] === "Save as an idea" && ib[2] === "Put it in my plan" && (await page.locator(".mp-say .pill-primary").textContent()).trim() === ib[0], "DT130: the buttons are for cooking it, Fit first; no Ate it: " + ib.join(" | "));
   const say = await text(".mp-say small");
-  ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 0 && await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›/ }).count() === 0, "DT130: an idea's buttons are only in Chef Mealan's card: no second Fit, no Lock");
+  ok(await page.getByRole("button", { name: "Fit to my target" }).count() === 0 && await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›/ }).count() === 0, "DT130: an idea's buttons are only in Chef Mealan's card: no second Fit, no Lock");
   ok(/^Chef Mealan: A (lunch|dinner|meal) as the photo shows it: about [\d,]+ to [\d,]+ kcal and \d+ g protein\. Fit it and it is sized for your day\.$/.test(say), "DT130: Chef Mealan's line for an idea, by code: " + say);
   // Put it in my plan: a day and a meal, in chips; the idea goes to Mine and to the slot
   await page.getByRole("button", { name: "Put it in my plan" }).click(); await page.waitForTimeout(300);

@@ -122,7 +122,7 @@ const saved = new Map<string, { main: string; priv: string }>();
 export const forgetSaved = (uid?: string) => { if (uid) saved.delete(uid); else saved.clear(); };
 const partSig = (x: Record<string, unknown>) => { const { updatedAt: _u, coachView, ...rest } = x as any; const { weightAt: _w, ...cv } = coachView ?? {}; return JSON.stringify(coachView ? { ...rest, cv } : rest); };
 export const bytesOf = (x: unknown) => new TextEncoder().encode(JSON.stringify(x) ?? "").length;
-// Menu, About: the size of the last save and today's saves on this phone, so the account's writes can be seen
+// Settings, Dev data (DT231, for the admin): the size of the last save and today's saves on this phone, so the account's writes can be seen
 const SAVE_STATS = "chefmealan-save-stats";
 type SaveStats = { day: string; saves: number; kb: number; skipped: number; lastKb: number | null; lastAt: string | null };
 export function saveStats(): SaveStats {
@@ -136,12 +136,6 @@ function noteSave(bytes: number, skipped: boolean) {
     if (skipped) x.skipped++; else { x.saves++; x.kb = Math.round((x.kb + bytes / 1024) * 10) / 10; x.lastKb = Math.round(bytes / 102.4) / 10; x.lastAt = new Date().toISOString(); }
     localStorage.setItem(SAVE_STATS, JSON.stringify(x));
   } catch { /* the line is a help, nothing more */ }
-}
-export function saveLine(): string {
-  const x = saveStats();
-  if (!x.saves && !x.skipped) return "No save to your account from this phone today yet.";
-  const at = x.lastAt ? new Date(x.lastAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
-  return `Last save to your account: ${x.lastKb ?? 0} KB${at ? `, ${at}` : ""}. Today on this phone: ${x.saves} save${x.saves === 1 ? "" : "s"}, ${Math.round(x.kb)} KB; ${x.skipped} with nothing new, not sent.`;
 }
 // ---- coach and clients ----
 // A short code from the coach's uid; the coach publishes it once under coaches/{code}.

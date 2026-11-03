@@ -115,9 +115,9 @@ const U = "http://127.0.0.1:3211";
   await p2.getByRole("button", { name: "Done" }).click(); await p2.waitForTimeout(400);
   ok(JSON.stringify(await heads(p2)) === JSON.stringify(["Rice", "Chicken", "Toppings"]) && /1 food, 1 optional/.test(await text(p2, '.plate-card [aria-label="Part: Toppings"]')) && await p2.getByRole("button", { name: "Add Sour cream" }).count() === 1, `IM18b: your bowl in its parts, the sour cream optional in Toppings (${await heads(p2)})`);
   // Keep it as it is, made, saved in My recipes with its parts
-  await p2.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).click(); await p2.waitForTimeout(600);
+  await p2.getByRole("button", { name: /^(Keep it as it is|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await p2.waitForTimeout(600);
   if (await p2.locator(".way").count()) await p2.locator(".way").first().click();
-  await p2.getByRole("button", { name: /I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it this way ›|Make it ›|Continue/ }).click(); await p2.waitForTimeout(400);
+  await p2.getByRole("button", { name: /I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it this way ›|Make it ›|Continue/ }).click(); await p2.waitForTimeout(400);
   await p2.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await p2.waitForTimeout(400);
   await p2.getByRole("button", { name: "DaaM good" }).click();
   await p2.getByRole("button", { name: "Save", exact: true }).click(); await p2.waitForTimeout(600);

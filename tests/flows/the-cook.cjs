@@ -63,7 +63,7 @@ const PORT = "3344", B = `http://127.0.0.1:${PORT}`;
     ok(await page.locator(".cook-mode").count() === 1, "Start cooking opens cook mode, the steps read aloud");
     await page.locator(".cook-mode button").filter({ hasText: "Close" }).first().click(); await page.waitForTimeout(400);
     const main = () => page.locator("main").textContent();
-    ok(/Craft.*Make.*Eat/.test(await page.locator(".phase-bar").textContent()), "the steps are Craft, Make, Eat");
+    ok(/Prep.*Make.*Eat/.test(await page.locator(".phase-bar").textContent()), "the steps are Prep, Make, Eat (DT230)");
     ok(/Tick each step when it is done/.test(await main()), "the steps block says what the ticks are for");
     ok(await page.locator(".mk-photo").count() === 4, "each step has + Photo beside its tick");
     await page.locator(".mk-check").nth(0).click(); await page.locator(".mk-check").nth(1).click();

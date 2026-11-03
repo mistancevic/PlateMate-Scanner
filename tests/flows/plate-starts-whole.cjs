@@ -54,7 +54,7 @@ const U = "http://127.0.0.1:3229";
     const nutmeg = await page.locator(".plate-card .row").filter({ hasText: "Ground nutmeg" }).locator("input[type=number]").inputValue();
     ok(nutmeg === "0.1", "a tiny amount keeps its tenth of a gram: nutmeg " + nutmeg + " g");
     await page.locator(".in-portion").getByRole("button", { name: "The whole recipe" }).click(); await page.waitForTimeout(500);
-    await page.getByRole("button", { name: /^Make it( as it is)?$/ }).first().click(); await page.waitForTimeout(900);
+    await page.getByRole("button", { name: /^Prepare it( as it is)? ›$/ }).first().click(); await page.waitForTimeout(900);
     const mk = await text(".mk-card");
     ok(await page.locator(".mk-card").getByRole("button", { name: "Just your plate" }).count() === 0 && /You make the whole recipe/.test(mk) && /You eat the whole recipe/.test(mk) && /nothing is left/.test(mk), "the whole recipe on the plate: How to make it makes all of it and asks nothing: " + mk.slice(0, 200));
     // Make it from Recipes starts whole too

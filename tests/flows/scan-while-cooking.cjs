@@ -66,7 +66,7 @@ const PORT = "3395", U = `http://127.0.0.1:${PORT}`;
     const t2 = await main(page);
     ok(!/Dice|cucumber|Slice chicken/i.test(t2), "after the answer, still none of them");
     // after the answer the dish is back in Craft: its Steps block offers to write them for these foods, none of the old ones show
-    ok(/Write my own/.test(t2) && /Craft/.test(t2), "Craft for the dish: write the steps for these foods");
+    ok(/Write my own/.test(t2) && await page.locator(".phase-bar").count() === 0, "the dish back on the Plate (Craft, no bar): write the steps for these foods");
     await ctx.close();
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.slice(0, 2).join(" | ") : ""}`);
   } catch (e) { ok(false, "walkthrough error: " + e.message); }

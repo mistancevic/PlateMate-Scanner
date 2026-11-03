@@ -64,7 +64,7 @@ const U = "http://127.0.0.1:3265";
   await page.locator(".rows .row-food", { hasText: "Rice, cooked" }).first().getByRole("button", { name: "Add" }).click(); await page.waitForTimeout(800);
   await page.getByLabel("Search all my foods").fill("");
   ok(await page.getByRole("button", { name: "Just your plate" }).count() === 0 && await page.locator("h2", { hasText: /^How to make / }).count() === 0, "DT109: no whole-recipe choice on a plate that is no recipe (DT220: the button How to make it › may name the page it opens)");
-  await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›/ }).click(); await page.waitForTimeout(1000);
+  await page.getByRole("button", { name: /Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›/ }).click(); await page.waitForTimeout(1000);
   ok(!/Whisk the warm milk/.test(await text()) && !/12 fritters|fritters are left/.test(await text()), "DT109: Lock the recipe never shows the fritters' steps: " + (await text()).slice(0, 120));
   ok(errs.length === 0, "no page errors " + errs.join(" | "));
   await b.close(); server.kill();
