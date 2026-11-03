@@ -67,7 +67,7 @@ export function VoiceSettingsPanel({ onChange }: { onChange?: (on: boolean, s: V
 }
 
 // Settings: how the app works for you, on this phone. A list like Me; the parts not built yet show, marked Coming soon.
-export function SettingsList({ open }: { open: (id: "voice") => void }) {
+export function SettingsList({ open, dev }: { open: (id: "voice" | "dev") => void; dev?: boolean }) {
   const voices = usePhoneVoices();
   const on = voiceChoice() !== "off";
   return (
@@ -81,6 +81,10 @@ export function SettingsList({ open }: { open: (id: "voice") => void }) {
       <div className="menu-row settings-soon" aria-disabled="true">
         <span className="menu-icon" aria-hidden="true">⚖️</span><span className="menu-row-text"><b>Units</b><small>Grams and millilitres. Ounces and cups are coming.</small></span><span className="me-todo soon">Coming soon</span>
       </div>
+      {/* DT231 (0.3.70, board Stories170; Coach Milan 3 November 10:32 to 14:38): Dev data, last, only for the admin */}
+      {dev && <button type="button" className="menu-row" onClick={() => open("dev")}>
+        <span className="menu-icon" aria-hidden="true">🛠️</span><span className="menu-row-text"><b>Dev data</b><small>Only you see this. Opening, storage, account saves, version</small></span><span aria-hidden="true">›</span>
+      </button>}
     </div>
   );
 }

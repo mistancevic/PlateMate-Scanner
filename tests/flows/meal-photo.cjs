@@ -58,7 +58,8 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   const s1 = await st();
   ok(s1.items.length === 4 && s1.items.every((i) => i.est && i.est.low <= i.grams && i.grams <= i.est.high) && s1.title === "Grilled chicken with rice and salad", "DT127: four rows at the read's grams, each an estimate with its range; the dish is the title");
   ok(s1.items.some((i) => /salad/i.test(i.food.name) && i.food.source === "estimate" && i.food.calories === 60) && s1.foods.some((f) => /salad/i.test(f.name)), "DT127: the dressed salad is an estimate with the read's values, added to your foods");
-  ok(await page.locator(".mp-line img").count() === 1 && /Your photo, 13:05\. 4 foods read, amounts estimated/.test(await text(".mp-line")), "DT127: the photo small in the line on top, with the time");
+  ok(await page.locator(".mp-big img").count() === 1 && /Your photo, 13:05\. 4 foods read, amounts estimated/.test(await text(".mp-big-say")), "DT230: the photo large on top, with the time");
+  ok(await page.getByRole("button", { name: "📷 Retake" }).count() === 1 && await page.locator(".mp-add-photo").count() === 1, "DT230: under the photo its own buttons, Retake and ＋ Photo");
   ok(await page.locator(".plate-card .mp-est").count() === 4, "DT127: a ~ before each estimated amount");
   // no ingredient line for the oil read from the photo
   ok(await page.locator(".gate-card").count() === 1 && !/Olive oil is an ingredient/.test(await text(".gate-card")), "DT127: the olive oil read from the photo gets no ingredient line (C6 note)");
@@ -69,10 +70,9 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   ok(s2.items.find((i) => /chicken/i.test(i.food.name)).grams === 350 && !s2.items.find((i) => /chicken/i.test(i.food.name)).est && !s2.photo.unsure && await page.locator(".mp-ask").count() === 0, "DT127: the answer sets the amount, drops its estimate and closes the question");
   ok(await page.locator(".plate-card .mp-est").count() === 3, "DT127: the corrected row has no ~");
   // the photo large, with the foods over it
-  await page.locator(".mp-line").click(); await page.waitForTimeout(300);
   const tags = await page.locator(".mp-tags span").allTextContents();
   ok(await page.locator(".mp-big img").count() === 1 && tags.length === 4 && tags.some((t) => /^Chicken breast 350 g$/.test(t)) && tags.some((t) => /^Rice ~150 g$/.test(t)), "DT127: the photo large, each food named over it at its amount: " + tags.join(" | "));
-  await page.getByRole("button", { name: "Close" }).click(); await page.waitForTimeout(200);
+
   // Chef Mealan's line and the buttons
   const say = await text(".mp-say");
   ok(/^Chef Mealan: Eat it as it is\. About [\d,]+( to [\d,]+)? kcal and \d+ g protein, a full lunch for your day/.test(say), "DT127: the line by code: eat it as it is, the energy as a range, the protein: " + say);

@@ -125,9 +125,9 @@ const U = "http://127.0.0.1:3209";
   ok(/fits your plan/.test(await page.locator(".plate-card .readout").textContent()) && /The pizza is not changed/.test(await page.locator(".step-head").textContent()), "IM5b: at the target, the pizza as the recipe makes it");
 
   // Make it, then Did it work?
-  await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(600);
+  await page.getByRole("button", { name: /^Prepare it( as it is)? ›$/ }).click(); await page.waitForTimeout(600);
   if (await page.locator(".way").count()) await page.locator(".way").first().click();
-  await page.getByRole("button", { name: /I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it this way ›|Make it ›|Continue/ }).click(); await page.waitForTimeout(400);
+  await page.getByRole("button", { name: /I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it this way ›|Make it ›|Continue/ }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(400);
   t = await page.locator("main").textContent().then((x) => x.replace(/\s+/g, " "));
   ok(/Did the side work\?/.test(t) && /Greek yogurt on the side/.test(t) && /Margherita pizza is in My recipes already/.test(t), "After: Did the side work?, and the card points at the recipe, no second copy");

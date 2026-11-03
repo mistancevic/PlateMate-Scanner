@@ -49,7 +49,7 @@ const U = "http://127.0.0.1:3227";
     // R15 (Milan 15:55 to 16:16, board RS12): the plate now starts with the whole recipe; this journey picks the portion it had.
     await page.locator(".in-portion").getByRole("button", { name: "One fritter, as the recipe makes it" }).click(); await page.waitForTimeout(500);
     ok(/An estimate: taken up in frying/.test(await text(".plate-card .row:has-text('Vegetable oil')")), "the plate counts what is taken up, an estimate");
-    await page.getByRole("button", { name: /^Make it( as it is)?$/ }).first().click(); await page.waitForTimeout(900);
+    await page.getByRole("button", { name: /^Prepare it( as it is)? ›$/ }).first().click(); await page.waitForTimeout(900);
     const whole = page.locator(".mk-card").getByRole("button", { name: "The whole recipe" }); if (!(await whole.getAttribute("aria-pressed") === "true")) { await whole.click(); await page.waitForTimeout(300); }
     await page.getByRole("button", { name: "Chef Mealan's way" }).click(); await page.waitForTimeout(1200);
     const oilAsked = (asked?.items ?? []).find((i) => /oil/i.test(i.name));

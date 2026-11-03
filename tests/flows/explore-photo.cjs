@@ -65,7 +65,7 @@ const READ = { dish: "Schnitzel with roasted potatoes", foods: [
     await page.getByRole("button", { name: "Read the plate" }).click(); await page.waitForTimeout(1800);
     const s1 = await st();
     ok(s1.photo?.who === "idea" && s1.pick === "exploring" && !/Adding Wednesday's lunch/.test(await text(".step-head")) && /Exploring/.test(await text(".plan-line")), "the plate leaves Wednesday's lunch; the pencil block says Exploring");
-    ok(/Exploring a photo\. 2 foods read/.test(await text(".mp-line")), "the photo line says Exploring");
+    ok(/Exploring a photo\. 2 foods read/.test(await text(".mp-big-say")), "the photo line says Exploring");
     const say = await text(".mp-say");
     ok(/Exploring, so wednesday's lunch stays as it was\./i.test(say) && await page.locator(".mp-say").getByRole("button", { name: "Save as an idea" }).count() === 1 && await page.locator(".mp-say").getByRole("button", { name: "Put it in my plan" }).count() === 1, "Chef Mealan says the lunch stays as it was; the idea's buttons show: " + say.slice(0, 160));
     ok(!/Your day/.test(await text()) && !/eating window/.test(await text()), "no eating-window check while exploring");

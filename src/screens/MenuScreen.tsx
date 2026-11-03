@@ -30,8 +30,8 @@ import { FORMULA_NAME } from "../components/FormulaCard";
 import { BurnCard } from "../components/Measured";
 import { analyse, isOpen as openAt } from "../analysis";
 import type { AppApi, MenuSection } from "./api";
-import { openLine } from "../openStats";
-import { saveLine } from "../cloud";
+import { openStats, savedDataKb } from "../openStats";
+import { saveStats } from "../cloud";
 import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, type SituationId } from "../safety";
 import { EvalsScreen } from "./EvalsScreen";
 import { MetricsScreen } from "./MetricsScreen";
@@ -71,6 +71,7 @@ const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   // DT215 v3 (0.3.66, board Stories162b): Settings, how the app works for you; Voice while cooking its first page
   { id: "settings", name: "Settings", icon: <Settings size={20} /> },
   { id: "voice", name: "Voice while cooking", icon: <Settings size={20} /> },
+  { id: "dev", name: "Dev data", icon: <Settings size={20} /> },
 ];
 // Metrics in the menu only for the account the server names (0.2.5+r17, board M, M1); kept so the row shows at once
 const OWNER = "chefmealan-metrics-owner";
@@ -165,7 +166,8 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       {section === "share" && <ShareGuard {...p} />}
       {section === "explorer" && <ExplorerScreen {...p} />}
       {section === "admin" && <AdminPanel {...p} />}
-      {section === "settings" && <><p className="small">How the app works for you, on this phone.</p><SettingsList open={(id) => setSection(id)} /></>}
+      {section === "settings" && <><p className="small">How the app works for you, on this phone.</p><SettingsList open={(id) => setSection(id)} dev={p.profile.admin} /></>}
+      {section === "dev" && p.profile.admin && <DevData />}
       {section === "voice" && <><p className="small">How Chef Mealan reads to you while you cook. Your phone's own voices: free, nothing leaves the phone.</p><VoiceSettingsPanel /></>}
     </>
   );
@@ -873,6 +875,21 @@ function SupportPanel(p: AppApi) {
   );
 }
 
+// DT231 (0.3.70, board Stories170): what this phone measured and wrote to the account, for the admin only; About keeps the version
+function DevData() {
+  const x = saveStats();
+  const at = x.lastAt ? new Date(x.lastAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+  const block = (title: string, rows: [string, string][]) => (
+    <section className="card dev-block"><b>{title}</b>{rows.map(([k, v]) => <div key={k} className="dev-row"><span>{k}</span><b>{v}</b></div>)}</section>
+  );
+  return (<>
+    <p className="small">Only you see this. Measured on this phone, each time the app opens; the saves are this phone's, today.</p>
+    {block("This phone", [["Opened in", openStats.ms !== null ? `${(openStats.ms / 1000).toFixed(1)} s` : "not measured yet"], ["Data kept on the phone", `${savedDataKb()} KB`], ["Photos on the phone", String(openStats.photos)]])}
+    {block("Saves to your account", [["Last save", x.lastKb !== null ? `${x.lastKb} KB${at ? `, ${at}` : ""}` : "none today"], ["Today", `${x.saves} save${x.saves === 1 ? "" : "s"}, ${Math.round(x.kb)} KB`], ["Nothing new, not sent", String(x.skipped)]])}
+    {block("The app", [["Version", (import.meta.env.VITE_VERSION as string | undefined) || "0"], ["Commit", (import.meta.env.VITE_COMMIT as string | undefined) || "preview"]])}
+  </>);
+}
+
 function AboutPanel() {
   return (
     <section className="card">
@@ -882,10 +899,7 @@ function AboutPanel() {
       <p className="small">hello@chefmealan.com</p>
       <p className="small"><a href="/about">Who's behind it</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy notice</a> · <a href="/disclaimer">Disclaimer</a></p>
       <p className="small">Version {(import.meta.env.VITE_VERSION as string | undefined) || "0"} · {(import.meta.env.VITE_COMMIT as string | undefined) || "preview"}</p>
-      <p className="small open-line">{openLine()}</p>
-      {/* 0.3.67 (Coach Milan 3 November 07:55): what this phone writes to the account */}
-      <p className="small save-line">{saveLine()}</p>
-      <small className="muted">Measured on this phone, each time the app opens.</small>
+
     </section>
   );
 }

@@ -1,7 +1,8 @@
 // JOURNEY INVARIANT (Milan, 7 October 2026, approved on the canvas, boards P0 to P2): photos are files.
 // The phone keeps photos in its own photo store, never inside the saved data, so a library full of photos still saves.
 // On the first open after the release the photos in the saved data move into the store; on the next open every preview shows.
-// Menu, About says how long the app took to open, how big the saved data is, and how many photos the store holds.
+// Menu, About said how long the app took to open, how big the saved data is, and how many photos the store holds; since DT231
+// (0.3.70) that is Settings, Dev data, for the admin only.
 const { chromium } = require("playwright");
 const { spawn } = require("node:child_process");
 const path = require("node:path"), fs = require("node:fs");
@@ -45,8 +46,8 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   // Menu, About: the number to compare
   await page.locator(".menu-button").click(); await page.waitForTimeout(300);
   await page.getByText("About", { exact: true }).first().click(); await page.waitForTimeout(300);
-  const line = await page.locator(".open-line").textContent();
-  ok(/Opened in \d+\.\d s · saved data \d+ KB · \d+ photos/.test(line), "About: " + line);
+  // DT231 (0.3.70): the measured numbers left About for Settings, Dev data, which only the admin account sees
+  ok(await page.locator(".open-line").count() === 0 && /Version /.test(await page.locator("main").textContent()), "About: the version, no measured numbers (they are in Dev data, for the admin)");
   console.log(errs.length ? "FAIL page errors: " + errs.join("; ") : "ok   no page errors"); if (errs.length) fail++;
   await b.close(); server.kill(); process.exitCode = fail ? 1 : 0;
 })();

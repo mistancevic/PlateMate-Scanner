@@ -48,7 +48,7 @@ const U = "http://127.0.0.1:3228";
     await page.locator(".in-portion").getByRole("button", { name: "Sized for your lunch" }).click(); await page.waitForTimeout(500);
     const onPlate = await page.locator(".plate-card .row").filter({ hasText: "All-purpose flour" }).locator("input[type=number]").evaluateAll((xs) => xs.map((x) => Number(x.value)));
     ok(onPlate.length === 2 && onPlate[0] > onPlate[1], "the plate lists both flours, the dough's and the dusting's: " + JSON.stringify(onPlate));
-    await page.getByRole("button", { name: /^Make it( as it is)?$/ }).first().click(); await page.waitForTimeout(900);
+    await page.getByRole("button", { name: /^Prepare it( as it is)? ›$/ }).first().click(); await page.waitForTimeout(900);
     await page.getByRole("button", { name: "Chef Mealan's way" }).click(); await page.waitForTimeout(1200);
     await page.locator(".mk-card").getByRole("button", { name: "The whole recipe" }).click(); await page.waitForTimeout(300);
     ok(await flourIn(/Mix /) === "563 g all-purpose flour" && await flourIn(/Dust with/) === "31 g all-purpose flour", "the whole recipe: 563 g in the dough, 31 g for dusting");

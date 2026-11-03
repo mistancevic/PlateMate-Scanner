@@ -95,12 +95,16 @@ const STEPS = ["in", "recipe", "make", "made", "after"] as const;
 // DT94 (0.2.88, board Stories60; Milan 24 October 13:58): three phases in place of five steps. Craft is the Plate and the steps
 // (in, recipe, make), Make is making it (made), Feedback is How was it (after).
 // DT211 v8 (0.3.53, board Stories158): the third step is Eat, everywhere
-const PHASES = ["Craft", "Make", "Eat"] as const;
+// DT230 (0.3.70, board Stories169; Coach Milan 2 and 3 November 23:44 to 00:05, Go 3 November 14:20): the Plate is Craft on
+// paper, a step of its own, with no bar; Prepare it › starts the three steps: Prep (how to make it, or how to eat it), Make, Eat
+const PHASES = ["Prep", "Make", "Eat"] as const;
 const phaseOf = (n: number) => (n <= 3 ? 0 : n === 4 ? 1 : 2);
 function stepHead({ n, title, sub, nameField, back, label, bare }: { n: number; title: string; sub?: string; back?: React.ReactNode; label?: string; bare?: boolean; nameField?: { value: string; placeholder: string; onChange: (v: string) => void; onCommit?: (v: string) => void } }) {
   const ph = phaseOf(n);
+  // DT230: no bar on the Plate (in) nor on what Fit makes of it (recipe): the bar starts with Prep
+  if (n <= 2) bare = true;
   // DT149 (0.2.130): planning or adding what you ate has no Make and no Feedback: one label in place of the three phases
-  if (label) return (
+  if (label && !bare) return (
     <div className="step-head">
       {back}
       <div className="phase-bar phase-one" aria-label={label}><span className="on"><i />{label.charAt(0).toUpperCase() + label.slice(1)}</span></div>
@@ -467,7 +471,7 @@ export function JourneyScreen(p: AppApi) {
     p.setPick(null); p.setPlateTaste(null);
     setMadeBy(null); setChef(null); setWay(null);
     setState((s) => ({ ...s, items: [], portion: null, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo: undefined }));
-    setPartsMode(false); setStep("in"); setPhotoBig(false);
+    setPartsMode(false); setStep("in"); setPhotoBig(true);
   }
   // DT82: None takes the can's oil off; A spoon or All puts it on, after the can, locked, so Fit never moves it
   const setCanOil = (can: Ingredient, grams: number) => setState((s) => {
@@ -1093,7 +1097,9 @@ export function JourneyScreen(p: AppApi) {
     return { word: mealWord, kcal: Math.round(m.kcal), grams: null, protein: Math.round(m.protein) };
   })();
   // DT127: the meal photo, small in the line or large with the foods over it
-  const [photoBig, setPhotoBig] = useState(false);
+  // DT230 (0.3.70): a photo plate opens with the photo large, its own buttons under it
+  const [photoBig, setPhotoBig] = useState(true);
+  const [morePhoto, setMorePhoto] = useState<{ file: File; at: number } | null>(null);
   // DT130: Put it in my plan, for an idea: the day and the meal picked in two rows of chips
   const [ideaPlan, setIdeaPlan] = useState<{ date: string; slotId: string } | null>(null);
   const photoTime = (iso: string) => { const d = new Date(iso); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; };
@@ -1461,9 +1467,13 @@ export function JourneyScreen(p: AppApi) {
           <div className="mp-big">
             <div className="mp-big-img"><img src={state.photo.image} alt="your meal" />
               <div className="mp-tags">{items.map((i) => <span key={i.id}>{i.food.name.split(",")[0]} {i.est ? "~" : ""}{Math.round(i.grams)} g</span>)}</div></div>
-            <div className="mp-big-row"><small className="muted">{state.photo.who === "idea" ? "Exploring a photo" : `${photoTime(state.photo.at)} · ${state.photo.who === "ate" ? "from your photos" : "at the table"}`}</small>
-              <button type="button" className="link mp-retake" onClick={p.mealCamera}>Retake</button>
-              <button type="button" className="link" onClick={() => setPhotoBig(false)}>Close</button></div>
+            <div className="mp-big-row"><small className="muted mp-big-say">{state.photo.who === "idea"
+                ? `Exploring a photo. ${items.length} ${items.length === 1 ? "food" : "foods"} read, amounts estimated (~). Not logged: it is not your meal.`
+                : `Your photo, ${photoTime(state.photo.at)}. ${items.length} ${items.length === 1 ? "food" : "foods"} read, amounts estimated (~). Tap an amount to correct it.`}</small>
+              <span className="mp-big-go">
+                <button type="button" className="pill pill-small mp-retake" onClick={p.mealCamera}>📷 Retake</button>
+                {p.ai.on && <label className="pill pill-small mp-add-photo">＋ Photo<input type="file" accept="image/*" capture="environment" onChange={(e) => { const f = e.target.files?.[0]; if (f) setMorePhoto({ file: f, at: Date.now() }); e.target.value = ""; }} /></label>}
+              </span></div>
           </div>
         ) : (
           <button type="button" className="mp-line" onClick={() => setPhotoBig(true)} aria-label="Your photo, tap to see it large">
@@ -1475,7 +1485,7 @@ export function JourneyScreen(p: AppApi) {
         ))}
         {/* DT212 v4 (0.3.53, gap 4): Read the photo again, after it asks: the new read replaces the foods and your corrections */}
         {/* DT212 v4 (0.3.53, gap 4): Read the photo again; DT228 v2 (0.3.63, board Stories168): more photos and your words go with it */}
-        {state.photo && !photoBig && p.ai.on && <HelpRead key={state.photo.at + state.photo.image.length} photo={state.photo}
+        {state.photo && p.ai.on && <HelpRead key={state.photo.at + state.photo.image.length} photo={state.photo} incoming={morePhoto}
           read={(more, note) => { const ph = state.photo!; void p.readMealPhoto(ph.image, { at: ph.at, who: ph.who ?? "now", replace: true, more, note }); }} />}
         {/* DT228 v2: a food whose kind the read could not tell: Chef Mealan asks once; a tap changes the food, its grams stay */}
         {state.photo?.which && items.some((i) => i.food.name.toLowerCase() === state.photo!.which!.name.toLowerCase()) && (() => {
@@ -1855,7 +1865,7 @@ export function JourneyScreen(p: AppApi) {
           {imported && rec ? (<>
             {/* PF A6 (0.2.35, Milan 23:11 and 23:21 on 17 October, back after the 0.2.27 revert): Make it as it is is not Chef
                 Mealan's work, so no hat; the two ways are his, so both carry it. Wording and icons only: the ways work as before. */}
-            <button className="pill pill-primary pill-wide" onClick={keepAsIs}>{!way && pd !== null && pdRef !== null && pd < pdRef - 0.05 ? "Make it as it is" : "Make it"}</button>
+            <button className="pill pill-primary pill-wide" onClick={keepAsIs}>{!way && pd !== null && pdRef !== null && pd < pdRef - 0.05 ? "Prepare it as it is ›" : "Prepare it ›"}</button>
             {way && <button className="pill pill-wide" onClick={backToOriginal}>Back to the original</button>}
             {!way && pd !== null && pdRef !== null && pd < pdRef - 0.05 && p.ai.on && (
               <div className="in-ways">
@@ -1870,7 +1880,7 @@ export function JourneyScreen(p: AppApi) {
             )}
           </>) : madeBy && items.length > 0 ? (<>
             {/* Chef Mealan's meal is on the plate (CH3): make it, or ask again from the plate as it was */}
-            <button className="pill pill-primary pill-wide" onClick={keepAsIs}><ChefHat size={18} /> {p.filling && plateWhen === "plan" ? `Put it in ${slotName(p.filling)}` : "Make it"}</button>
+            <button className="pill pill-primary pill-wide" onClick={keepAsIs}><ChefHat size={18} /> {p.filling && plateWhen === "plan" ? `Put it in ${slotName(p.filling)}` : "Prepare it ›"}</button>
             <button className="pill pill-wide" onClick={() => { const m = madeBy; setMadeBy(null); setState((s) => ({ ...s, items: m.from, title: m.title0, portion: null, cooking: undefined, cookingFor: undefined })); void askChef(m.from, m.tried); }}>Other ideas</button>
           </>) : state.photo?.who === "idea" && items.length > 0 ? null /* DT130: an idea's buttons are in Chef Mealan's card above */ : (<>
           {/* DT149 (0.2.130): a meal of a day gone by is what you ate: no Fit, one button puts it in at the meal's time */}
@@ -1885,7 +1895,7 @@ export function JourneyScreen(p: AppApi) {
             <ChefHat size={18} className="hat" /> {fit ? "Fit again" : "Fit to my target"}
           </button>
           {/* DT94: Lock the recipe ends Craft; for a slot the plate goes in as it stands, as before */}
-          {items.length > 0 && <button className="pill pill-wide" onClick={keepAsIs}>{p.filling && p.filling.mode !== "eat" ? (fit ? `Put it in ${slotName(p.filling)}` : "Keep it as it is") : cooksPlate(items) && stepsHold(items) ? "Lock it and cook ›" /* 0.3.62: straight to Make, as under the steps */ : goesToHowToMake(items) ? "How to make it ›" : "How to eat it ›" /* 0.3.62 (Coach Milan 21:27, ok): a bowl opens How do you want to eat it? */}</button>}
+          {items.length > 0 && <button className="pill pill-wide" onClick={keepAsIs}>{p.filling && p.filling.mode !== "eat" ? (fit ? `Put it in ${slotName(p.filling)}` : "Keep it as it is") : "Prepare it ›" /* DT230 (0.3.70): one door out of the Plate; it opens How to make it, How do you want to eat it, or Make when the steps are set */ /* 0.3.62 (Coach Milan 21:27, ok): a bowl opens How do you want to eat it? */}</button>}
           </>)}
           </>)}
         </div>
@@ -2609,7 +2619,7 @@ function LaterRow({ x, onContinue, onRemove }: { x: Later; onContinue: () => voi
 // DT228 v2 (0.3.63, board Stories168; Coach Milan 2 November 19:50 to 22:00): help Chef Mealan read the meal. The photos (the
 // first is the plate's), ＋ Photo for the inside, another side or the menu, and a line in the person's words, typed or said.
 // Read it again sends them all; the new read replaces the foods and the corrections, as Read the photo again did.
-function HelpRead({ photo, read }: { photo: NonNullable<import("../pilot").PilotState["photo"]>; read: (more: string[], note: string) => void }) {
+function HelpRead({ photo, read, incoming }: { photo: NonNullable<import("../pilot").PilotState["photo"]>; read: (more: string[], note: string) => void; incoming?: { file: File; at: number } | null }) {
   // 0.3.65 (Coach Milan 22:53, Go): after a read it folds into one link and opens on a tap
   const [open, setOpen] = useState(false);
   const [more, setMore] = useState<string[]>(() => photo.more ?? []);
@@ -2618,6 +2628,8 @@ function HelpRead({ photo, read }: { photo: NonNullable<import("../pilot").Pilot
   const S = typeof window !== "undefined" ? ((window as any).SpeechRecognition || (window as any).webkitSpeechRecognition) : null;
   const add = (file?: File | null) => { if (!file) return; const r = new FileReader(); r.onload = () => thumbnailBase64(String(r.result), 640).then((d) => setMore((m) => (m.length < 3 ? [...m, d] : m))).catch(() => {}); r.readAsDataURL(file); };
   const listen = () => { if (!S || hearing) return; try { const r = new S(); r.lang = "en-GB"; r.interimResults = false; r.onresult = (e: any) => { const t = String(e.results?.[0]?.[0]?.transcript ?? "").trim(); if (t) setNote((n) => (n ? `${n} ${t}` : t).slice(0, 200)); }; r.onend = () => setHearing(false); r.onerror = () => setHearing(false); setHearing(true); r.start(); } catch { setHearing(false); } };
+  // DT230: ＋ Photo under the large photo opens this with that photo in it
+  useEffect(() => { if (incoming) { setOpen(true); add(incoming.file); } }, [incoming?.at]); // eslint-disable-line react-hooks/exhaustive-deps
   const n = 1 + more.length, words = note.trim();
   const label = `Read it again${n > 1 ? ` with ${n} photos` : ""}${words ? (n > 1 ? " and this" : " with this") : ""}`;
   if (!open) return <button type="button" className="link mp-again-link" onClick={() => setOpen(true)}>Wrong foods? Help Chef Mealan read it ›</button>;

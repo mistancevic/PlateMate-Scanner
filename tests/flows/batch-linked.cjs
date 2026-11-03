@@ -51,8 +51,8 @@ const U = "http://127.0.0.1:3225";
     await page.getByRole("button", { name: "Put it on my plate" }).click(); await page.waitForTimeout(1300);
     // R15 (Milan 15:55 to 16:16, board RS12): the plate now starts with the whole recipe; this journey picks the portion it had.
     await page.locator(".in-portion").getByRole("button", { name: "One slice, as the recipe makes it" }).click(); await page.waitForTimeout(500);
-    await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
-    await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).click(); await page.waitForTimeout(400);
+    await page.getByRole("button", { name: /^Prepare it( as it is)? ›$/ }).click(); await page.waitForTimeout(800);
+    await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "DaaM good" }).click();
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(700);

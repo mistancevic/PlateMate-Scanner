@@ -56,14 +56,14 @@ const U = "http://127.0.0.1:3226";
     const N = Math.round(whole / plate);
     ok(N >= 3, `the whole recipe is about ${N} of your lunches (${Math.round(whole)} kcal, a lunch ${Math.round(plate)} kcal)`);
     // How to make it: the whole recipe, in your lunches
-    await page.getByRole("button", { name: /^Make it( as it is)?$/ }).click(); await page.waitForTimeout(800);
+    await page.getByRole("button", { name: /^Prepare it( as it is)? ›$/ }).click(); await page.waitForTimeout(800);
     await page.locator(".mk-card").getByRole("button", { name: "The whole recipe" }).click(); await page.waitForTimeout(300);
     const mk = await text(".mk-card");
     ok(new RegExp(`You make the whole recipe, about ${N} of your lunches`).test(mk) && /You eat one lunch/.test(mk) && !/3 bowls/.test(mk), "You make the whole recipe, about N of your lunches; you eat one lunch: " + mk.slice(0, 160));
     // R16 (Milan 21:56 to 22:11, board RS15): the rest is counted in lunches and goes on Plan, not to Keep for later
     ok(new RegExp(`${N - 1} lunches are left\\. To eat them on other days, put the recipe on Plan\\.`).test(mk), "the rest is counted in lunches; to eat them on other days, Plan");
     ok(/To eat the rest on other days, put the recipe on Plan\./.test(await text("main")) && !/Keep for later when you save/.test(await text("main")), "the bottom line points to Plan");
-    await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Make it ›)$/ }).click(); await page.waitForTimeout(400);
+    await page.getByRole("button", { name: /^(I'm making it|Lock the recipe|How to make it ›|How to eat it ›|Lock it and cook ›|Prepare it ›|Make it ›)$/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: /Cooked\. Next: Eat/ }).click(); await page.waitForTimeout(400);
     await page.getByRole("button", { name: "DaaM good" }).click();
     await page.getByRole("button", { name: "Save", exact: true }).click(); await page.waitForTimeout(800);
