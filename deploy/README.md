@@ -33,7 +33,9 @@ They run the same preview.sh and promote.sh as the account github-deploy, signed
 Identity Federation pool "github" (provider "github", condition: assertion.repository_owner == 'mistancevic');
 deploy/ci-env.sh builds deploy.env from the project. Roles of github-deploy: Cloud Build Editor, Cloud Run Admin, Service
 Account User, Storage Admin, Viewer, Firebase Rules Admin, Firebase Authentication Admin, Service Usage Consumer.
-Going back after a promote from GitHub: Cloud Run console, chefmealan, Revisions, Manage traffic (the log names the one before).
+Going back after a bad promote: Actions, "Rollback", Run workflow (leave "to" empty for what was live before the promote; its log
+lists the last releases, and a name from that list in "to" goes to that one). What was live before is kept in Google Cloud
+(gs://<project>_cloudbuild/deploy/last-live), so Cloud Shell's ./deploy/rollback.sh and GitHub agree.
 
 ## Every release, the careful way (from 7 October 2026)
    cd ~/PlateMate-Scanner && git checkout main && git pull && ./deploy/preview.sh

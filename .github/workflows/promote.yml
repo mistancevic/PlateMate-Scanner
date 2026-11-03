@@ -1,7 +1,6 @@
 # Promote, from GitHub (Coach Milan 3 November 2026): the preview becomes what everyone gets on chefmealan.com, as
 # ./deploy/promote.sh does in Cloud Shell. Run it only after the preview looks right. The log names the revision that served
-# before it ("Before it"); going back from GitHub is not set up yet, Cloud Shell's ./deploy/rollback.sh or the Cloud Run
-# console (Revisions, Manage traffic) does it.
+# before it ("Before it"); the Rollback workflow, or Cloud Shell's ./deploy/rollback.sh, goes back to it.
 name: Promote
 on:
   workflow_dispatch: {}
