@@ -29,5 +29,9 @@ fi
 "$(dirname "$0")/cors.sh" || true
 # Rules go out with the preview too: new records need their rules, and rules only ever add what newer code needs
 "$(dirname "$0")/rules.sh" || echo "Rules not published: check the message above."
+# where the data sits, as Google says it (3 November 2026: the privacy notice said Frankfurt; the console said europe-west1)
+DBLOC=$(gcloud firestore databases describe --database="$FB_DB_ID" --project "$PROJECT" --format='value(locationId)' 2>/dev/null || true)
+PHLOC=$(gcloud storage buckets describe "gs://${STORAGE_BUCKET:-$FB_PROJECT_ID.firebasestorage.app}" --format='value(location)' 2>/dev/null || true)
+echo "Where the data sits: database ${DBLOC:-unknown}, photo files ${PHLOC:-unknown}, server $REGION"
 echo "Preview: $URL  (commit $TAG, version $VERSION)"
 echo "chefmealan.com still serves $(commit_of "$(live_revision)"). When the preview looks right: ./deploy/promote.sh"

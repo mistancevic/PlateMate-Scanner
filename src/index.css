@@ -2871,3 +2871,8 @@ html:has(.l-photo) { overflow-x: hidden; }
 .dev-block { margin-top: 12px; }
 .dev-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: 15px; }
 .dev-row b { text-align: right; }
+
+/* DT232 (0.3.72): View the app as */
+.dev-views { display: flex; gap: 8px; margin: 10px 0; }
+.dev-views .choice { flex: 1; min-height: 44px; }
+.ref.view-as { font-weight: 800; color: var(--brand); min-height: 44px; padding: 0 10px; border-radius: 999px; background: var(--brand-soft, #e7efff); }
