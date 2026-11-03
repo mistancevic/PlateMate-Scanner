@@ -75,7 +75,7 @@ import { bookOfPath } from "./bookPages";
 import { PilotGate } from "./screens/PilotGate";
 import { takeCodeFromUrl } from "./pendingCode";
 takeCodeFromUrl();  // SH73: chefmealan.com/?code=AB12CD from a coach's QR code
-import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveOwnNotes, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
+import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, forgetSaved, loadMain, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveOwnNotes, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
 import { getGoal, clearGoal, saveGoal, bandOf, goalLabel, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { setTodayChange, dayOfLoad, ymd, isoWeek, planLine as planLineOf, type PlanDay } from "./plan";
 import { todayIndex } from "./screens/ClientWeek";
@@ -928,8 +928,10 @@ export default function App() {
   // also live as records; the block keeps them 30 days after the move, so a rollback loses nothing, then holds only the
   // plate and settings ("recordsOnly"). The coach reads the number of foods from foodsCount.
   const blockOf = (st: PilotState) => {
+    // 0.3.68 (Coach Milan 3 November 10:15): the 30 days' backup ended early. It was most of every save (457 KB in About),
+    // and nothing can roll back that far; once the records moved, the block holds only the plate and settings
     const moved = remoteMeta.current.recordsMovedAt;
-    const slim = Boolean(moved && Date.now() - Date.parse(moved) > 30 * 86_400_000);
+    const slim = Boolean(moved);
     const b = stripPhotos(st);
     return { state: slim ? { ...b, foods: [], meals: [] } : b, recordsOnly: slim, foodsCount: st.foods.length };
   };
@@ -1197,6 +1199,7 @@ export default function App() {
       try {
         startWait("account");
         const remote = await withTimeout(loadCloud(user.uid), 20000);
+        forgetSaved(user.uid); // 0.3.67: what this phone wrote before no longer says what the account holds
         startMark("account");
         if (stale) return;
         if (remote) setReview(((remote as any).numbersReview as NumbersReview | undefined) ?? null);
@@ -1220,7 +1223,8 @@ export default function App() {
           void up().then(() => setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() }))
             .catch(() => window.setTimeout(() => void up().then(() => setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() }))
               .catch((e) => setCloudStatus({ ok: false, text: `Not saved yet: ${explainCloudError(e)}` })), 30000));
-        } else if (remote && !(isEmptyState(remote.state) && !isEmptyState(state))) {
+        } else if (remote && !(isEmptyState(remote.state) && !remote.recordsOnly && !isEmptyState(state))) {
+          // (0.3.68) a block that holds only the plate and settings (recordsOnly) is a real account copy, never an empty one
           // a real account copy replaces the phone; photos are merged back from the phone by id
           try {
             const incoming = parseState(JSON.stringify(remote.state));
@@ -1350,7 +1354,8 @@ export default function App() {
       if (profile.role === "coach") { void countNewShared(); return; }
       if (!profile.coachId) return;
       try {
-        const remote = await loadCloud(user.uid); if (!remote) return;
+        // 0.3.68: the coach's notes and goal live in the main record; the private part is not read each minute
+        const remote = await loadMain(user.uid); if (!remote) return;
         takeCoach(remote);
         setReview(((remote as any).numbersReview as NumbersReview | undefined) ?? null);
         void fetchInbox();
@@ -1375,14 +1380,9 @@ export default function App() {
     setWaiting(list); setNewShared(list.length);
   };
   const countNewShared = async () => {
+    // the count is the waiting list's (DT189). 0.3.68 (Coach Milan 3 November 10:32, Go): the second reading of every client,
+    // their cards and profile, each minute, is gone; nothing used it
     void recountWaiting();
-    if (!user || profile.role !== "coach") return;
-    try {
-      const since = localStorage.getItem(`chefmealan-coach-seen-${user.uid}`) || "";
-      const rows = await listClients(user.uid);
-      // 0.2.121 (Tester 2, Milan 15:24): the badge also counts replies from clients and numbers waiting for the coach
-      void since; void rows; // the count is the waiting list's (DT189)
-    } catch { /* offline */ }
   };
   useEffect(() => { countNewShared(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid, profile.role]);
   useEffect(() => {
@@ -1404,7 +1404,7 @@ export default function App() {
     const onShow = async () => {
       if (document.visibilityState !== "visible") return;
       try {
-        const remote = await loadCloud(user.uid);
+        const remote = await loadMain(user.uid); // 0.3.68: the main record is all this needs
         if (!remote) return;
         setProfile({ role: roleOf(remote.role), admin: isAdminRole(remote.role), coachId: remote.coachId, coachName: remote.coachName, coachEmail: remote.coachEmail ?? undefined, coachPhoto: remote.coachPhoto ?? undefined, joinedAt: remote.joinedAt ?? undefined, coachSetAt: remote.coachSetAt, formula: remote.formula ?? null });
         takeCoach(remote);

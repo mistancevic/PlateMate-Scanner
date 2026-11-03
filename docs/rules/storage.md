@@ -30,8 +30,11 @@ the autosave wrote the whole copy a second after every change, with the plate's 
 - The check: S1's save check also fails on a photo as text (2 KB or more) anywhere in a write, and on the account's copy
   (the main record or its private part, as it stays once the records moved) past 50 KB.
 - Menu, About shows the size of the last save and today's saves from this phone.
+- 0.3.68 (Coach Milan 10:15, after About showed 457 KB): once the records moved, the copy holds only the plate and settings,
+  with no 30 days' backup of the foods and recipes; and the private part lives only in the private record, on the preview too.
 
 ## Changelog
 
 - 2 November 2026: S1 written; the save check added in 0.3.58.
 - 3 November 2026: S2 written; loose photos, the only-changed save and the size check in 0.3.67.
+- 3 November 2026: 0.3.68, the backup ended early and the preview's second copy dropped.
