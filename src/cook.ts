@@ -41,6 +41,15 @@ export function parseCommand(said: string): Command {
   if (chef) { const q = chef[1].trim(); return q.length >= 3 ? { kind: "ask", question: q } : { kind: "none", said }; }
   const much = /\bhow (?:much|many)(?: of)?(?: the)? (.+)$/.exec(s);
   if (much) return { kind: "howMuch", food: much[1].replace(/\b(do i need|is it|is there|again|please)\b/g, "").trim() };
+  // DT203 (0.3.76): Srpski. Koliko (how much), dalje (next), nazad (back), ponovi (repeat), stani (stop); Chef, kuvaru for a question
+  const kuvar = /^(?:hej )?(?:kuvaru|chef)[,:]?\s*(.*)$/.exec(s);
+  if (kuvar && /^kuvaru/.test(s.replace(/^hej /, ""))) { const q = kuvar[1].trim(); return q.length >= 3 ? { kind: "ask", question: q } : { kind: "none", said }; }
+  const koliko = /\bkoliko(?: je| ima| treba)?(?: mi)? (.+)$/.exec(s);
+  if (koliko) return { kind: "howMuch", food: koliko[1].replace(/\b(treba|je|ima|još|molim)\b/g, "").trim() };
+  if (/\b(stani|stop|kraj|završi|zavrsi|izađi|izadji)\b/.test(s)) return { kind: "stop" };
+  if (/\b(ponovi|opet|još jednom|jos jednom|molim\?)\b/.test(s)) return { kind: "repeat" };
+  if (/\b(nazad|prethodni|vrati)\b/.test(s)) return { kind: "back" };
+  if (/\b(dalje|sledeći|sledeci|sledeće|sledece|gotovo|nastavi)\b/.test(s)) return { kind: "next" };
   const go = /^(?:(?:go|jump|back|skip) to )?step (\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)$|\b(?:go|jump|back|skip) to step (\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/.exec(s);
   if (go) { const n = num(go[1] ?? go[2]); if (Number.isFinite(n) && n >= 1) return { kind: "goto", step: Math.round(n) }; }
   if (/\btimer\b|\bset (?:a )?timer\b/.test(s)) {

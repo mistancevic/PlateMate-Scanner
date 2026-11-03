@@ -1,4 +1,5 @@
 import { SafetyQuestion } from "../components/SafetyQuestion";
+import { LanguagePanel } from "../components/LanguagePanel";
 import { countByPlace, samePlace, getStarted } from "../places";
 import { useState, useEffect, useRef, Fragment, type ReactNode } from "react";
 import { profileOdd } from "../profileOdd";
@@ -74,6 +75,8 @@ const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
   { id: "settings", name: "Settings", icon: <Settings size={20} /> },
   { id: "voice", name: "Voice while cooking", icon: <Settings size={20} /> },
   { id: "dev", name: "Dev data", icon: <Settings size={20} /> },
+  // DT203 (0.3.76, board Stories175 v2): the language Chef Mealan speaks
+  { id: "language", name: "Language", icon: <Settings size={20} /> },
 ];
 // Metrics in the menu only for the account the server names (0.2.5+r17, board M, M1); kept so the row shows at once
 const OWNER = "chefmealan-metrics-owner";
@@ -172,6 +175,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       {section === "admin" && <AdminPanel {...p} />}
       {section === "settings" && <><p className="small">How the app works for you, on this phone.</p><DevSettings p={p} open={(id) => setSection(id)} /></>}
       {section === "dev" && <DevGuard p={p} />}
+      {section === "language" && <LanguagePanel />}
       {section === "voice" && <><p className="small">How Chef Mealan reads to you while you cook. Your phone's own voices: free, nothing leaves the phone.</p><VoiceSettingsPanel /></>}
     </>
   );
@@ -880,7 +884,7 @@ function SupportPanel(p: AppApi) {
 }
 
 // 0.3.71 (Coach Milan 3 November 15:49 to 15:59, Go): Dev data for the account Metrics shows for (the owner), not the superadmin role
-function DevSettings({ p, open }: { p: AppApi; open: (id: "voice" | "dev") => void }) { return <SettingsList open={open} dev={useMetricsOwner(true)} />; }
+function DevSettings({ p, open }: { p: AppApi; open: (id: "voice" | "dev" | "language") => void }) { return <SettingsList open={open} dev={useMetricsOwner(true)} />; }
 function DevGuard({ p }: { p: AppApi }) { return useMetricsOwner(true) ? <DevData missing={looseWanted(p.state).length} /> : null; }
 // DT231 (0.3.70, board Stories170): what this phone measured and wrote to the account, for the owner only; About keeps the version
 function DevData({ missing }: { missing: number }) {

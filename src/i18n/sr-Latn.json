@@ -1,0 +1,143 @@
+{
+  "about": "DT203 (0.3.76): Chef Mealan in Srpski (latinica). Drafted by Claude, checked by Coach Milan in his table; a line goes into the app only when checked is true. Slots in braces stay; they can move anywhere in the sentence. didTryWork holds two lines: the swap, then the side, split by |.",
+  "chef": {
+    "photoWhose": {
+      "text": "{from}. Čiji je ovo tanjir, i kada?",
+      "checked": false
+    },
+    "photoNoFoods": {
+      "text": "Ne vidim namirnice na ovoj fotografiji. Slikaj ponovo, odozgo, ceo tanjir, ili sam dodaj namirnice.",
+      "checked": false
+    },
+    "oneDish": {
+      "text": "Jedna od ovih namirnica je kuvana, pa se spremaju zajedno. Da li je ovo jedno jelo? Kad ih podeliš na delove, Fit čuva odnos svakog dela, a koraci idu deo po deo.",
+      "checked": false
+    },
+    "whatMoment": {
+      "text": "Kakav je ovo trenutak?",
+      "checked": false
+    },
+    "plateOldAte": {
+      "text": "Tvoj tanjir od {when}. {plate}. Da li si to pojeo?",
+      "checked": false
+    },
+    "plateOldBeforeCook": {
+      "text": "Pre nego što počneš da kuvaš: tvoj tanjir od {when}. {plate}. Da li si to pojeo?",
+      "checked": false
+    },
+    "plateSaveOrClear": {
+      "text": "Na tvom tanjiru je {foods}, od {ago}. {dish} počinje na svom tanjiru. Da sačuvam tvoj za kasnije, ili da ga ispraznim?",
+      "checked": false
+    },
+    "plateAddOrNew": {
+      "text": "Na tvom tanjiru već je {foods}{title}. {what} Da počneš nov tanjir s tim, ili da ga dodaš svom?",
+      "checked": false
+    },
+    "whereGoes": {
+      "text": "Gde ovo ide?",
+      "checked": false
+    },
+    "scanWhileCooking": {
+      "text": "Kuvaš {dish}. Da li da iskoristim {food} u tome, da ga stavim na tanjir, ili da ga sačuvam u tvojim namirnicama?",
+      "checked": false
+    },
+    "useInCook": {
+      "text": "{food}: šta to menja u jelu {dish}, ili se dodaje?",
+      "checked": false
+    },
+    "handsFree": {
+      "text": "Da kuvaš bez dodirivanja telefona?",
+      "checked": false
+    },
+    "whoMadePhoto": {
+      "text": "Ko je ovo spremio?",
+      "checked": false
+    },
+    "howCooking": {
+      "text": "Kako je prošlo kuvanje?",
+      "checked": false
+    },
+    "resume": {
+      "text": "Kuvanje: {dish}{done}. Da nastaviš gde si stao?",
+      "checked": false
+    },
+    "howMuchAte": {
+      "text": "Prijatno. Koliko si pojeo?",
+      "checked": false
+    },
+    "howManyAte": {
+      "text": "Napravio si {made}. Koliko si pojeo?",
+      "checked": false
+    },
+    "howTaste": {
+      "text": "A kakav je bio ukus?",
+      "checked": false
+    },
+    "didTryWork": {
+      "text": "Da li je zamena uspela?|Da li je prilog uspeo?",
+      "checked": false
+    },
+    "remember": {
+      "text": "Nešto što želiš da zapamtiš o ovome?",
+      "checked": false
+    },
+    "carryLater": {
+      "text": "Prošlo je oko 30 minuta: koliko te je ovo držalo sitim?",
+      "checked": false
+    },
+    "carryNow": {
+      "text": "Koliko te je ovo držalo sitim? Odgovori sada, ili za {minutes}, kad te pitam.",
+      "checked": false
+    },
+    "whichMeal": {
+      "text": "Koji je ovo obrok?",
+      "checked": false
+    },
+    "whatDay": {
+      "text": "Kakav je danas dan?",
+      "checked": false
+    },
+    "busyMeal": {
+      "text": "{meal} u {time} pada u zauzet blok, {block}. Da ga pomerim za {day}?",
+      "checked": false
+    },
+    "busyLate": {
+      "text": "Zauzet si do {until}. {meal} u {time} ostavlja {free} za kuvanje. Nešto brzo za {quick}?",
+      "checked": false
+    },
+    "busyCarry": {
+      "text": "Zauzet od {block}. Da poneseš {meal}?",
+      "checked": false
+    },
+    "busyTraining": {
+      "text": "Trening u {time} pada u zauzet blok, {block}. Da ga pomerim za {day}?",
+      "checked": false
+    }
+  },
+  "safety": {
+    "eating": {
+      "text": "Ja sam kuvar, pa ovo nije nešto o čemu treba da savetujem. Pravi sagovornik je lekar ili terapeut koji radi s ishranom. Tvoj trener vidi da si mi to rekao, ali ne i šta si napisao. I dalje ti pomažem s namirnicama, tanjirima i količinama. Brojevi su tu da te informišu, nikad da te osuđuju.",
+      "checked": false
+    },
+    "pregnancy": {
+      "text": "Ja sam kuvar, a trudnoća i dojenje menjaju ono što ti telu treba. Tvoje ciljeve treba da odredi babica ili lekar. Donesi mi njihove brojeve i uklopiću tvoju hranu u njih. Neću predlagati da jedeš manje nego što trošiš, a tvoji tanjiri ostaju kakvi jesu.",
+      "checked": false
+    },
+    "diabetes": {
+      "text": "Ja sam kuvar. Kod dijabetesa ili insulina, vreme obroka i ugljene hidrate određuje tvoj lekar. Na svakom tanjiru pokazujem ugljene hidrate i šećere, i uklapam tvoju hranu u brojeve koje ti lekar odredi. Ne dajem savete o dozama ni o vremenu.",
+      "checked": false
+    },
+    "allergies": {
+      "text": "Zapisano. Neću predlagati ništa što sadrži ono što si naveo, i proveravam naziv i deklaraciju svake namirnice. Provera deklaracije i dalje pokazuje šta svako pakovanje sadrži, pa možeš i sam da proveriš.",
+      "checked": false
+    },
+    "medication": {
+      "text": "Ja sam kuvar, a neki lekovi menjaju kako hrana deluje u telu. Tvoj lekar ili farmaceut zna šta treba izbegavati. Reci mi koje namirnice, i izbaciću ih iz svakog predloga.",
+      "checked": false
+    },
+    "off": {
+      "text": "Razgovor sa Chef Mealanom je isključen za tvoj nalog dok ga tvoj trener ne potvrdi. Tanjiri, brojevi i tvoje namirnice rade kao i obično.",
+      "checked": false
+    }
+  }
+}

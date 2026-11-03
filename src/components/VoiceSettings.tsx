@@ -1,5 +1,6 @@
 // DT215 v3 (0.3.66, board Stories162b): Voice while cooking. Read aloud on or off, the phone's voices with a sample, the speed,
 // cut in. In Settings, and over cook mode from its Voice › link.
+import { useLang, langLine } from "../lang";
 import { useEffect, useState } from "react";
 import { voiceChoice, setVoiceChoice } from "../cook";
 import { voiceSettings, setVoiceSettings, sortVoices, langWords, phoneVoices, utterance, voiceLine, SAMPLE, type VoiceSettings as VS, type PhoneVoice, type Speed } from "../voiceSettings";
@@ -67,17 +68,19 @@ export function VoiceSettingsPanel({ onChange }: { onChange?: (on: boolean, s: V
 }
 
 // Settings: how the app works for you, on this phone. A list like Me; the parts not built yet show, marked Coming soon.
-export function SettingsList({ open, dev }: { open: (id: "voice" | "dev") => void; dev?: boolean }) {
+export function SettingsList({ open, dev }: { open: (id: "voice" | "dev" | "language") => void; dev?: boolean }) {
   const voices = usePhoneVoices();
   const on = voiceChoice() !== "off";
+  const lang = useLang();
   return (
     <div className="menu-list me-rows settings-rows">
       <button type="button" className="menu-row" onClick={() => open("voice")}>
         <span className="menu-icon" aria-hidden="true">🔊</span><span className="menu-row-text"><b>Voice while cooking</b><small>{voiceLine(on, voiceSettings(), voices)}</small></span><span aria-hidden="true">›</span>
       </button>
-      <div className="menu-row settings-soon" aria-disabled="true">
-        <span className="menu-icon" aria-hidden="true">🌐</span><span className="menu-row-text"><b>Language</b><small>English. Serbian and German are coming.</small></span><span className="me-todo soon">Coming soon</span>
-      </div>
+      {/* DT203 (0.3.76, board Stories175 v2): Language opens; its line says what is in Serbian so far */}
+      <button type="button" className="menu-row" onClick={() => open("language")}>
+        <span className="menu-icon" aria-hidden="true">🌐</span><span className="menu-row-text"><b>Language</b><small>{langLine(lang)}</small></span><span aria-hidden="true">›</span>
+      </button>
       <div className="menu-row settings-soon" aria-disabled="true">
         <span className="menu-icon" aria-hidden="true">⚖️</span><span className="menu-row-text"><b>Units</b><small>Grams and millilitres. Ounces and cups are coming.</small></span><span className="me-todo soon">Coming soon</span>
       </div>

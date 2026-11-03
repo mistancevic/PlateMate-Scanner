@@ -3,7 +3,7 @@
 // the answer and saves straight away. In setup and from the chat it ends on one button: Next, or Back to the chat.
 import { useState } from "react";
 import type { AppApi } from "../screens/api";
-import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, DOOR_WHY, type SituationId } from "../safety";
+import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, fixedLine, DOOR_WHY, type SituationId } from "../safety";
 
 const fmtDay = (iso: string) => new Date(iso).toLocaleDateString([], { day: "numeric", month: "long", year: "numeric" });
 export function SafetyQuestion({ p, onDone, doneLabel = "Next" }: { p: AppApi; onDone?: () => void; doneLabel?: string }) {
@@ -60,7 +60,7 @@ export function SafetyQuestion({ p, onDone, doneLabel = "Next" }: { p: AppApi; o
       <p className={`small ${answered ? "muted" : "notice"}`}>{answered ? `Answered${p.safety.declaredAt ? " on " + fmtDay(p.safety.declaredAt) : ""}. Each tick is saved straight away, and you can change it any time.` : "Tick one, or none. A tick saves by itself."}</p>
       {p.safety.situations.length > 0 && (
         <div className="fixed-lines">
-          {p.safety.situations.map((id) => <p className="small" key={id}><b>{SITUATIONS.find((x) => x.id === id)?.label}:</b> {FIXED[id]}</p>)}
+          {p.safety.situations.map((id) => <p className="small" key={id}><b>{SITUATIONS.find((x) => x.id === id)?.label}:</b> {fixedLine(id)}</p>)}
         </div>
       )}
       {!p.ai.on && <p className="small notice">{p.ai.why === DOOR_WHY ? "Answer the question to open Chef Mealan's chat: one tap if none applies. It asks again once a year." : p.ai.why}</p>}

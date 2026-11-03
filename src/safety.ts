@@ -1,5 +1,7 @@
 // Safety rules, version 1 (4 October 2026). Code decides; the model is told; nothing here is improvised.
 // Mealan is a chef. For people who need more than a chef it steps back, names a professional, and keeps the plate working.
+import { getLang } from "./lang";
+import srLines from "./i18n/sr-Latn.json" with { type: "json" };
 import type { Food } from "./pilot";
 
 export type SituationId = "eating" | "pregnancy" | "diabetes" | "allergies" | "medication";
@@ -63,6 +65,11 @@ export const FIXED: Record<SituationId | "off", string> = {
   medication: "I'm a chef, and some medication changes how food works in your body. Your doctor or pharmacist knows what to avoid. Tell me which foods, and I'll keep them out of every suggestion.",
   off: "Chef Mealan's chat is off for your account until your coach confirms it. Plates, numbers and your foods keep working as usual.",
 };
+// DT203 (0.3.76): the same lines in Srpski (latinica), from Coach Milan's table; only a line he checked is used, else the English
+export function fixedLine(id: SituationId | "off"): string {
+  if (getLang() === "sr-Latn") { const l = (srLines as any).safety?.[id]; if (l && l.checked && typeof l.text === "string") return l.text; }
+  return FIXED[id];
+}
 export const PROFESSIONAL: Record<SituationId, string> = { eating: "a doctor or a therapist who works with eating", pregnancy: "your midwife or doctor", diabetes: "your doctor or diabetes nurse", allergies: "your doctor or an allergist", medication: "your doctor or pharmacist" };
 
 // ---- allergens. A declared allergy or intolerance matches the food's name, its label lines and its notes, in the languages the pilot sees.

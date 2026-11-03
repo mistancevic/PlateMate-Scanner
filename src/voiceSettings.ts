@@ -32,9 +32,16 @@ export function voiceLine(on: boolean, s: VoiceSettings, voices: PhoneVoice[]): 
 export function phoneVoices(): PhoneVoice[] {
   try { return (window.speechSynthesis?.getVoices?.() ?? []).map((v) => ({ uri: v.voiceURI, name: v.name, lang: v.lang })); } catch { return []; }
 }
-export function utterance(text: string, s: VoiceSettings = voiceSettings()): SpeechSynthesisUtterance {
-  const u = new SpeechSynthesisUtterance(text); u.lang = "en-GB"; u.rate = RATE[s.speed];
-  try { const v = s.voice ? window.speechSynthesis.getVoices().find((x) => x.voiceURI === s.voice) : null; if (v) { u.voice = v; u.lang = v.lang; } } catch { /* the phone's default voice */ }
+export function utterance(text: string, s: VoiceSettings = voiceSettings(), lang = "en-GB"): SpeechSynthesisUtterance {
+  const u = new SpeechSynthesisUtterance(text); u.lang = lang; u.rate = RATE[s.speed];
+  try {
+    const all = window.speechSynthesis.getVoices();
+    const v = s.voice ? all.find((x) => x.voiceURI === s.voice) : null;
+    // DT203 (0.3.76): a line in another language takes a voice of that language (Serbian, else Croatian or Bosnian, which read it)
+    const same = (x: SpeechSynthesisVoice) => x.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase());
+    const other = lang.startsWith("sr") ? all.find((x) => /^(sr|hr|bs)/i.test(x.lang)) : null;
+    if (v && same(v)) { u.voice = v; u.lang = v.lang; } else if (other) { u.voice = other; u.lang = other.lang; }
+  } catch { /* the phone's default voice */ }
   return u;
 }
 export const SAMPLE = "Step 1. Put 2 eggs in a bowl and whisk them until smooth.";

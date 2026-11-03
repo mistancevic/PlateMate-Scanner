@@ -1,4 +1,5 @@
 import { eatsForReq, installEats, type Eats } from "./eats";
+import { useLang } from "./lang";
 import { TravelBanner } from "./components/Travel";
 import { CalendarSync } from "./components/Calendar";
 import { askToken, dropCalendar } from "./calendarSync";
@@ -767,6 +768,8 @@ function BackKeeper({ tab, setTab, onReady }: { tab: Tab; setTab: (t: Tab) => vo
   return null;
 }
 export default function App() {
+  // DT203 (0.3.76): a new language shows at once; Chef Mealan's lines are read while drawing
+  useLang();
   // DT214 v2 (0.3.53): the app opened again in the middle of a cook starts on the free Plate; the strip says where the cook
   // stands and Go on brings Chef Mealan's question
   const [state, setState] = useState<PilotState>(() => cooking.swapOut(load())),
