@@ -110,9 +110,10 @@
       "id": "DT202",
       "title": "A mark on each recipe: From the kitchen, or On paper",
       "epic": "home",
-      "state": "now",
-      "why": "\"Every recipe is tried on himself first\" says too much. Agreed in brainstorm, parked by Milan, not drawn. Answers 3 November 19:24 (All good). Board drawn; waits for his Go.",
-      "board": 174
+      "state": "done",
+      "why": "\"Every recipe is tried on himself first\" says too much. Agreed in brainstorm, parked by Milan, not drawn. Answers 3 November 19:24 (All good). Board drawn; Go at 19:39.",
+      "board": 174,
+      "version": "0.3.75"
     },
     {
       "id": "DT203",

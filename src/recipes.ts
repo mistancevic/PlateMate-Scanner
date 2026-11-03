@@ -16,6 +16,8 @@ export type PublicRecipe = {
   photoAi?: boolean;
   // where it came from, as text (0.2.16, board IM, IM6): the page says Adapted from
   adaptedFrom?: string;
+  // DT202 (0.3.75): I cooked this, set when publishing: From the kitchen; off or never set: On paper
+  cooked?: boolean;
 };
 
 // The preview (Cloud Run tag "preview", addresses preview---…) has its own recipes, apart from chefmealan.com (Milan, 8 October 2026)
