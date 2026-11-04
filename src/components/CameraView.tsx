@@ -1,4 +1,5 @@
 import { BrowserMultiFormatReader } from "@zxing/library";
+import { w, wn } from "../words";
 import { useEffect, useRef, useState, ChangeEvent } from "react";
 import {
   X,
@@ -101,8 +102,8 @@ export function CameraView({
         if (mounted) {
           setCameraError(
             err.name === "NotAllowedError"
-              ? "Camera access denied. Please allow permissions or upload from gallery."
-              : "Could not start camera. Please upload an image.",
+              ? w("camera.cameraAccessDeniedPleaseAllow")
+              : w("camera.couldNotStartCameraPlease"),
           );
         }
       }
@@ -171,7 +172,7 @@ export function CameraView({
       setCodeRead(result.getText());
     } catch {
       setToastMessage(
-        "No barcode found. Try a sharper photo, or enter the number in Saved foods.",
+        w("camera.noBarcode"),
       );
       setTimeout(() => setToastMessage(null), 4500);
     } finally {
@@ -224,7 +225,7 @@ export function CameraView({
         let code = "";
         if (native) { const r = await native.detect(v); code = r?.[0]?.rawValue ?? ""; }
         else {
-          const w = Math.min(1280, v.videoWidth); grab.width = w; grab.height = Math.round((v.videoHeight / v.videoWidth) * w);
+          const gw = Math.min(1280, v.videoWidth); grab.width = gw; grab.height = Math.round((v.videoHeight / v.videoWidth) * gw);
           grab.getContext("2d")?.drawImage(v, 0, 0, grab.width, grab.height);
           try { code = (await reader!.decodeFromImageUrl(grab.toDataURL("image/jpeg", 0.85))).getText(); } catch { code = ""; }
         }
@@ -252,7 +253,7 @@ export function CameraView({
     e.target.value = "";
     if (!file) return;
     if (file.size > 15_000_000) {
-      setToastMessage("Choose an image smaller than 15 MB.");
+      setToastMessage(w("camera.tooBig"));
       return;
     }
     // DT228 v2: with photos of this meal staged, one from Your photos joins them
@@ -286,14 +287,14 @@ export function CameraView({
           everything to tap in one dark panel at the bottom, so it reads on any kitchen */}
       <div className="cam-top">
         <div className="cam-row">
-          <button onClick={onCancel} aria-label="Close camera" className="cam-round"><X className="w-5 h-5" /></button>
-          <b className="cam-title" aria-label={scannerMode === "meal" ? "Photo of my meal" : `${addTo === "plate" ? "Add to plate" : "Add a food"}: Scan`}>{scannerMode === "meal" ? "Photo of my meal" : addTo === "plate" ? "Scan for your plate" : "Scan a food"}</b>
-          <button onClick={onOpenCart} aria-label="Your plate" className="cam-round relative">
+          <button onClick={onCancel} aria-label={w("camera.closeCamera")} className="cam-round"><X className="w-5 h-5" /></button>
+          <b className="cam-title" aria-label={scannerMode === "meal" ? w("camera.photoOfMyMeal") : (addTo === "plate" ? w("camera.addToPlateScan") : w("camera.addAFoodScan"))}>{scannerMode === "meal" ? w("camera.photoOfMyMeal") : addTo === "plate" ? w("camera.scanForYourPlate") : w("camera.scanAFood")}</b>
+          <button onClick={onOpenCart} aria-label={w("camera.yourPlate")} className="cam-round relative">
             <ShoppingBag className="w-5 h-5" />
             {cartCount > 0 && <span className="cam-badge">{cartCount}</span>}
           </button>
         </div>
-        <div className="cam-modes" role="group" aria-label="What to scan">
+        <div className="cam-modes" role="group" aria-label={w("camera.whatToScan")}>
           {([["barcode", "Barcode"], ["label", "Label"], ["group", "Group"], ...(meal ? [["meal", "Meal"]] as const : [])] as const).map(([m, name]) => (
             <button key={m} aria-pressed={scannerMode === m} className={scannerMode === m ? "bg-white on" : ""} onClick={() => { if (m !== "barcode") setCodeRead(null); onModeChange(m); }}>{name}</button>
           ))}
@@ -301,8 +302,8 @@ export function CameraView({
         {error ? <span className="cam-say cam-error">{error}</span> : (
           <span className="cam-say" role="status">
             {scannerMode === "barcode"
-              ? codeRead ? "Now photos of the pack's front and back, or use the code only" : typing ? "Paused while you type the code" : "Hold the barcode inside the frame"
-              : scannerMode === "group" ? "The whole product, one side per photo" : scannerMode === "meal" ? "The whole plate, from above. Then the inside, another side, or the menu" : "Hold the nutrition table inside the frame"}
+              ? codeRead ? w("camera.nowPhotosOfThePack") : typing ? w("camera.pausedWhileYouTypeThe") : w("camera.holdTheBarcodeInsideThe")
+              : scannerMode === "group" ? w("camera.theWholeProductOneSide") : scannerMode === "meal" ? w("camera.theWholePlateFromAbove") : w("camera.holdTheNutritionTableInside")}
           </span>
         )}
         {targetMissingItemName && <span className="cam-say cam-missing">Scanning for: {targetMissingItemName}</span>}
@@ -334,7 +335,7 @@ export function CameraView({
           <Camera className="w-16 h-16 text-neutral-400 mb-4" />
           <p className="text-white font-semibold mb-6 leading-relaxed max-w-[280px]">{cameraError}</p>
           <button onClick={() => fileInputRef.current?.click()} className="px-6 py-4 bg-white text-[var(--ink)] rounded-2xl font-black flex items-center gap-3">
-            <ImageIcon className="w-5 h-5" /> Choose from your photos
+            <ImageIcon className="w-5 h-5" /> {w("camera.chooseFromYourPhotos")}
           </button>
         </div>
       )}
@@ -343,10 +344,10 @@ export function CameraView({
         {stagedGroupImages.length > 0 && (
           <div className="cam-staged">
             <b>{stagedGroupImages.length} {stagedGroupImages.length === 1 ? "photo" : "photos"} {scannerMode === "meal" ? "of this meal" : "ready"}</b>
-            <div className="cam-thumbs" aria-label="Staged photos">
+            <div className="cam-thumbs" aria-label={w("camera.stagedPhotos")}>
               {stagedGroupImages.map((src, i) => (
-                <button key={i} onClick={() => setStagedGroupImages((v) => v.filter((_, j) => j !== i))} aria-label={`Remove staged photo ${i + 1}`}>
-                  <img src={src} alt={`Staged angle ${i + 1}`} />
+                <button key={i} onClick={() => setStagedGroupImages((v) => v.filter((_, j) => j !== i))} aria-label={w("camera.removeStaged", { n: i + 1 })}>
+                  <img src={src} alt={w("camera.stagedAngle", { n: i + 1 })} />
                   <span aria-hidden="true"><X className="w-3 h-3" /></span>
                 </button>
               ))}
@@ -356,26 +357,26 @@ export function CameraView({
         {scannerMode === "barcode" && codeRead && (
           <div className="typed-barcode code-read">
             <span>Code read: {codeRead}</span>
-            <button type="button" onClick={() => { const c = codeRead; setCodeRead(null); setStagedGroupImages([]); onBarcode(c); }}>Use the code only</button>
+            <button type="button" onClick={() => { const c = codeRead; setCodeRead(null); setStagedGroupImages([]); onBarcode(c); }}>{w("camera.useTheCodeOnly")}</button>
           </div>
         )}
         {scannerMode === "barcode" && !codeRead && (
           <>
-            <small className="cam-small">Or type the barcode</small>
+            <small className="cam-small">{w("camera.orTypeTheBarcode")}</small>
             <form className="typed-barcode" onSubmit={(e) => { e.preventDefault(); const v = typedCode.trim(); if (/^\d{8,14}$/.test(v)) { typedRef.current = true; setTypingFocus(false); setCodeRead(v); setTypedCode(""); } }}>
-              <input value={typedCode} onChange={(e) => setTypedCode(e.target.value)} onFocus={() => setTypingFocus(true)} onBlur={() => setTypingFocus(false)} inputMode="numeric" placeholder="Barcode numbers" aria-label="Type the barcode" enterKeyHint="go" />
-              <button type="submit" disabled={!/^\d{8,14}$/.test(typedCode.trim())}>Look up</button>
+              <input value={typedCode} onChange={(e) => setTypedCode(e.target.value)} onFocus={() => setTypingFocus(true)} onBlur={() => setTypingFocus(false)} inputMode="numeric" placeholder={w("camera.barcodeNumbers")} aria-label={w("camera.typeTheBarcode")} enterKeyHint="go" />
+              <button type="submit" disabled={!/^\d{8,14}$/.test(typedCode.trim())}>{w("camera.lookUp")}</button>
             </form>
-            {!cameraError && typing && <small className="cam-small auto-note">Leave the field empty and the camera reads again.</small>}
+            {!cameraError && typing && <small className="cam-small auto-note">{w("camera.leaveTheFieldEmptyAnd")}</small>}
           </>
         )}
         <div className="cam-controls">
-          <button onClick={() => fileInputRef.current?.click()} className="cam-gallery" aria-label="Your photos">
+          <button onClick={() => fileInputRef.current?.click()} className="cam-gallery" aria-label={w("camera.yourPhotos")}>
             <span className="cam-round"><ImageIcon className="w-5 h-5" /></span>
-            <small>Your photos</small>
+            <small>{w("camera.yourPhotos")}</small>
           </button>
           {!cameraError ? (
-            <button id="camera-shutter-button" onClick={handleShutterClick} className="cam-shutter" title={scannerMode === "group" ? "Take a photo of one side" : scannerMode === "meal" ? "Take the photo of your meal" : "Take a photo"}>
+            <button id="camera-shutter-button" onClick={handleShutterClick} className="cam-shutter" title={scannerMode === "group" ? w("camera.takeAPhotoOfOne") : scannerMode === "meal" ? w("camera.takeThePhotoOfYour") : w("camera.takeAPhoto")}>
               <span />
               {auto && scannerMode !== "meal" && (scannerMode !== "barcode" || codeRead) && (
                 // DT229 (0.3.63, board Stories168; Coach Milan 21:31): the steady ring outside the shutter, 8 px, bright green on a dark track
@@ -388,16 +389,16 @@ export function CameraView({
           ) : <span className="cam-shutter-gap" />}
           <span className="cam-analyze-slot">
             {stagedGroupImages.length > 0 && (
-              <button onClick={analyze} className="cam-analyze" aria-label={scannerMode === "meal" ? (stagedGroupImages.length === 1 ? "Read it" : `Read ${stagedGroupImages.length} photos`) : `Analyze ${stagedGroupImages.length} photo${stagedGroupImages.length === 1 ? "" : "s"}`}>
-                {scannerMode === "meal" ? (stagedGroupImages.length === 1 ? "Read it" : `Read ${stagedGroupImages.length} photos`) : `Analyze ${stagedGroupImages.length}`}
+              <button onClick={analyze} className="cam-analyze" aria-label={scannerMode === "meal" ? (stagedGroupImages.length === 1 ? w("camera.readIt") : wn("camera.readPhotos", stagedGroupImages.length)) : wn("camera.analyzePhotos", stagedGroupImages.length)}>
+                {scannerMode === "meal" ? (stagedGroupImages.length === 1 ? w("camera.readIt") : wn("camera.readPhotos", stagedGroupImages.length)) : w("camera.analyzeN", { n: stagedGroupImages.length })}
               </button>
             )}
           </span>
         </div>
-        {!cameraError && scannerMode === "meal" && <small className="cam-small auto-note">{stagedGroupImages.length ? "The shutter adds a photo. Read them when you have what you want." : "Tap to take it. Or pick one from Your photos."}</small>}
+        {!cameraError && scannerMode === "meal" && <small className="cam-small auto-note">{stagedGroupImages.length ? w("camera.theShutterAddsAPhoto") : w("camera.tapToTakeItOr")}</small>}
         {!cameraError && scannerMode !== "meal" && (scannerMode !== "barcode" || codeRead) && (
           <button className="auto-switch" onClick={() => setAutoMode(!auto)} aria-pressed={auto}>
-            {auto ? "Auto shot: hold still · tap for manual" : "Manual shot: tap to take · tap for auto"}
+            {auto ? w("camera.autoShotHoldStillTap") : w("camera.manualShotTapToTake")}
           </button>
         )}
       </div>

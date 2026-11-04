@@ -1,4 +1,6 @@
 import { fitsPlate } from "../mixtip";
+import { w } from "../words";
+import { foodV } from "../reference";
 import { ClearField } from "./ClearField";
 import { useEffect, useRef, useState } from "react";
 import { Send, Replace, Plus, Scale, Check } from "lucide-react";
@@ -72,13 +74,13 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
         target: { pd: pdRef }, tastes,
       }) });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Chef Mealan could not answer.");
+      if (!res.ok) throw new Error(data.error || w("helper.chefMealanCouldNotAnswer"));
       const taken = takeModelFlag(data.reply || ""); if (taken.flag) onFlag(taken.flag);
       // a declared allergy: a suggestion that trips it never shows, whatever the model said
       const safe = (data.suggestions ?? []).filter((x: any) => !allergyHits({ name: String(x.food ?? ""), brand: "", notes: String(x.why ?? ""), table: [] } as any, safety.allergies).length);
       setReply(taken.text); setSugs(safe);
       record?.(question, data.reply || "", items.map((i) => i.food.name));
-      if (!(data.suggestions ?? []).length) setReply((r) => r || "Couldn't work this one out. Try asking it another way.");
+      if (!(data.suggestions ?? []).length) setReply((r) => r || w("helper.couldnTWorkThisOne"));
       log("plate_question", { q: question, plate: items.map((i) => i.food.name), n: (data.suggestions ?? []).length, ms: data.ms });
     } catch (e: any) { setError(e.message); } finally { setBusy(false); }
   }
@@ -87,33 +89,33 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet helper" onClick={(e) => e.stopPropagation()}>
-        <div className="card-top"><span>{missing ? `Chef Mealan, instead of ${missing.food.name}` : "Chef Mealan, about this plate"}</span><button className="link" onClick={close}>Close</button></div>
+        <div className="card-top"><span>{missing ? w("helper.insteadOf", { food: foodV(missing.food) }) : w("helper.chefMealanAboutThisPlate")}</span><button className="link" onClick={close}>{w("helper.close")}</button></div>
         <SafetyNote safety={safety} ai={ai} />
         {codeSwaps.length > 0 && (
           <>
-            <p className="label">From your foods</p>
+            <p className="label">{w("helper.fromYourFoods")}</p>
             {codeSwaps.map(({ f, grams }) => (
               <div className="suggestion" key={f.id}>
                 <div><b>{f.name}</b><small>{fmt(grams, 0)} g brings the plate to your target · {pdText(density(f.protein, f.calories))}</small></div>
-                <button className="pill pill-small" onClick={() => takeCode(f)}><Replace size={14} /> Swap</button>
+                <button className="pill pill-small" onClick={() => takeCode(f)}><Replace size={14} /> {w("helper.swap")}</button>
               </div>
             ))}
           </>
         )}
         {!missing && (
           <div className="moments chips-start">
-            {["What goes with this?", "Better match for my target?", "Make it crunchier", "Less sweet", "Cheaper option"].map((c) => (
+            {[w("helper.whatGoesWithThis"), w("helper.betterMatchForMyTarget"), w("helper.makeItCrunchier"), w("helper.lessSweet"), w("helper.cheaperOption")].map((c) => (
               <button key={c} className="pill pill-small" onClick={() => ask(c)}>{c}</button>
             ))}
           </div>
         )}
         <div className="chat-input">
-          <ClearField value={q} onClear={() => setQ("")} label="Clear the question"><input value={q} placeholder="What goes with this? What instead of…?" onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} enterKeyHint="send" /></ClearField>
-          <button className="icon" aria-label="Ask" onClick={() => ask()} disabled={busy}><Send size={20} /></button>
+          <ClearField value={q} onClear={() => setQ("")} label={w("helper.clearTheQuestion")}><input value={q} placeholder={w("helper.whatGoesWithThisWhat")} onChange={(e) => setQ(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} enterKeyHint="send" /></ClearField>
+          <button className="icon" aria-label={w("helper.ask")} onClick={() => ask()} disabled={busy}><Send size={20} /></button>
         </div>
         {busy && <div className="bubble mealan thinking"><span /><span /><span /></div>}
         {reply && <p className="helper-reply">{reply}</p>}
-        {openTalk && <button className="link" onClick={openTalk}>Something else? Talk to Chef Mealan</button>}
+        {openTalk && <button className="link" onClick={openTalk}>{w("helper.somethingElseTalkToChef")}</button>}
         {sugs.map((s, k) => (
           <div className="suggestion" key={k}>
             <div>
@@ -121,13 +123,13 @@ export function PlateHelper({ items, library, pdRef, cap, missing, prefill, appl
               <small>{s.why}{!s.known && s.action !== "amount" ? " · values are an estimate" : ""}</small>
             </div>
             {taken.has(k)
-              ? <span className="pill pill-small taken"><Check size={14} /> On the plate</span>
+              ? <span className="pill pill-small taken"><Check size={14} /> {w("helper.onThePlate")}</span>
               : <button className="pill pill-small" onClick={() => { setTaken((t) => new Set(t).add(k)); take(s); }}>
-                  {s.action === "swap" ? <><Replace size={14} /> Swap</> : s.action === "add" ? <><Plus size={14} /> Add</> : <><Scale size={14} /> Set</>}
+                  {s.action === "swap" ? <><Replace size={14} /> {w("helper.swap")}</> : s.action === "add" ? <><Plus size={14} /> {w("helper.add")}</> : <><Scale size={14} /> {w("helper.set")}</>}
                 </button>}
           </div>
         ))}
-        {taken.size > 0 && <button className="primary wide" onClick={close}><Check size={16} /> Done, back to the plate</button>}
+        {taken.size > 0 && <button className="primary wide" onClick={close}><Check size={16} /> {w("helper.doneBackToThePlate")}</button>}
       </div>
     </div>
   );

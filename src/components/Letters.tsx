@@ -2,6 +2,7 @@
 // into cells. DT129 (0.2.109, board Stories86; Milan 26 October 13:09 to 15:06): back to the first scanner's quick read, one
 // line of four letters, f | c | fi- | P, and a tap opens the numbers: the plate against the planned meal (Plate, Planned, %),
 // then what is in it (g, kcal, % plate, % day, a Total), read down a column. Per 100 kcal keeps the four sentences.
+import { w } from "../words";
 import { useState, type ReactNode } from "react";
 import { lettersOf, letterLine, letterEdge, LETTER_ORDER, per100kcal, BANDS_NOTE, FIBRE_PER_1000_KCAL, type Rates, type Numbers } from "../letters";
 
@@ -35,17 +36,17 @@ export function NumbersTable({ n, rates, extra, weight, day, plan }: { n: Number
   const dayOf = (m: (typeof LETTER_ORDER)[number]) => (!day ? 0 : m === "fiber" ? (FIBRE_PER_1000_KCAL * day.kcal) / 1000 : day[m]);
   const word = plan ? plan.word.charAt(0).toUpperCase() + plan.word.slice(1) : "";
   return (
-    <section className="nt" aria-label="The numbers">
-      <b className="nt-title">{day ? "Against your planned day" : "The numbers"}</b>
+    <section className="nt" aria-label={w("letters.theNumbers")}>
+      <b className="nt-title">{day ? w("letters.againstYourPlannedDay") : w("letters.theNumbers")}</b>
       {plan && (<>
         <small className="nt-sub">{word}, the plate and your plan</small>
-        <div className="nt-grid nt-plan nt-head"><span /><span>Plate</span><span>Planned</span><span>%</span></div>
-        {([["Energy", kcal, plan.kcal, "kcal"], ["Weight", weight, plan.grams, "g"], ["Protein", n.protein ?? 0, plan.protein, "g"]] as const).map(([l, a, b, u]) => (
+        <div className="nt-grid nt-plan nt-head"><span /><span>{w("letters.plate")}</span><span>{w("letters.planned")}</span><span>%</span></div>
+        {([["Energy", kcal, plan.kcal, w("letters.kcal")], ["Weight", weight, plan.grams, "g"], ["Protein", n.protein ?? 0, plan.protein, "g"]] as const).map(([l, a, b, u]) => (
           <div key={l} className="nt-grid nt-plan nt-row"><span>{l}</span><span><b>{a === null ? "?" : fmt(a)}</b> {u}</span><span>{b === null ? "-" : `${fmt(b)} ${u}`}</span><span>{a !== null && b !== null ? pct(a, b) : "-"}</span></div>
         ))}
-        <small className="nt-sub">What is in it</small>
+        <small className="nt-sub">{w("letters.whatIsInIt")}</small>
       </>)}
-      <div className={`nt-grid nt-in nt-head${day ? "" : " nt-noday"}`}><span /><span>g</span><span>kcal</span><span>% plate</span>{day && <span>% day</span>}</div>
+      <div className={`nt-grid nt-in nt-head${day ? "" : " nt-noday"}`}><span /><span>g</span><span>{w("letters.kcal")}</span><span>% plate</span>{day && <span>% day</span>}</div>
       {LETTER_ORDER.map((m) => {
         const g = n[m];
         return (
@@ -55,7 +56,7 @@ export function NumbersTable({ n, rates, extra, weight, day, plan }: { n: Number
           </div>
         );
       })}
-      <div className={`nt-grid nt-in nt-row nt-total${day ? "" : " nt-noday"}`}><span>Total</span><span>{weight === null ? "" : fmt(weight)}</span><span>{fmt(kcal)}</span><span>100</span>{day && <span>{day.kcal > 0 ? Math.round((kcal / day.kcal) * 100) : ""}</span>}</div>
+      <div className={`nt-grid nt-in nt-row nt-total${day ? "" : " nt-noday"}`}><span>{w("letters.total")}</span><span>{weight === null ? "" : fmt(weight)}</span><span>{fmt(kcal)}</span><span>100</span>{day && <span>{day.kcal > 0 ? Math.round((kcal / day.kcal) * 100) : ""}</span>}</div>
       <small className="nt-note">Read down a column.{plan ? ` The plate and your plan: the plate against the ${plan.word} you planned, % of the plan.` : ""} % plate: each one's share of the plate's energy.{day ? " % day: against your planned day." : ""}</small>
       <button type="button" className="link nt-more" aria-expanded={sentences} onClick={() => setSentences((x) => !x)}>Per 100 kcal {sentences ? "⌃" : "›"}</button>
       {sentences && <div className="letters-lines">{LETTER_ORDER.map((m) => { const v = per100kcal(n[m], n.calories), e = letterEdge(v, rates[m]); return <small key={m}>{letterLine(m, v, rates[m])}{e && <> <span className="nt-edge">~ {e}</span></>}</small>; })}{extra && <small>{extra}</small>}<small className="muted">{BANDS_NOTE}</small></div>}

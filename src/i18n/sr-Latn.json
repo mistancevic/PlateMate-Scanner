@@ -3840,6 +3840,882 @@
     "make.helpMeNextTime": {
       "text": "Pomozi mi sledeći put",
       "checked": false
+    },
+    "foods.new": {
+      "text": "Novo",
+      "checked": false
+    },
+    "foods.addToMeal": {
+      "text": "Dodaj u obrok",
+      "checked": false
+    },
+    "foods.review": {
+      "text": "Pregledaj",
+      "checked": false
+    },
+    "foods.findAFood": {
+      "text": "Nađi namirnicu",
+      "checked": false
+    },
+    "foods.add": {
+      "text": "Dodaj",
+      "checked": false
+    },
+    "foods.type": {
+      "text": "Upiši",
+      "checked": false
+    },
+    "foods.scan": {
+      "text": "Skeniraj",
+      "checked": false
+    },
+    "foods.foodsFrom": {
+      "text": "Namirnice iz",
+      "checked": false
+    },
+    "foods.allPlaces": {
+      "text": "Sva mesta",
+      "checked": false
+    },
+    "foods.productsSeenReviewOrEnter": {
+      "text": "Viđeni proizvodi. Pregledaj ili unesi svaki.",
+      "checked": false
+    },
+    "foods.enterLabel": {
+      "text": "Unesi deklaraciju",
+      "checked": false
+    },
+    "foods.showAll": {
+      "text": "Prikaži sve",
+      "checked": false
+    },
+    "foods.noSavedFoodsYetScan": {
+      "text": "Još nema sačuvanih namirnica. Skeniraj ili upiši jednu gore.",
+      "checked": false
+    },
+    "foods.moreFromTheProductDatabase": {
+      "text": "Još iz baze proizvoda ›",
+      "checked": false
+    },
+    "foods.inTheProductDatabase": {
+      "text": "U bazi proizvoda",
+      "checked": false
+    },
+    "foods.addToMyFoods": {
+      "text": "Dodaj u moje namirnice",
+      "checked": false
+    },
+    "foods.noFoodsYetScanType": {
+      "text": "Još nema namirnica. Skeniraj, upiši naziv ili",
+      "checked": false
+    },
+    "foods.addTwentyStarterFoods": {
+      "text": "dodaj dvadeset osnovnih namirnica",
+      "checked": false
+    },
+    "foods.possibleDuplicates": {
+      "text": "Mogući duplikati",
+      "checked": false
+    },
+    "foods.close": {
+      "text": "Zatvori",
+      "checked": false
+    },
+    "foods.sameBarcodeOrTheSame": {
+      "text": "Isti bar kod, ili iste vrednosti na 100 g i sličan naziv. Izaberi naziv koji ostaje; fotografije obe ostaju.",
+      "checked": false
+    },
+    "foods.merge": {
+      "text": "Spoji",
+      "checked": false
+    },
+    "foods.notTheSame": {
+      "text": "Nisu iste",
+      "checked": false
+    },
+    "foods.remove": {
+      "text": "Ukloni",
+      "checked": false
+    },
+    "foods.tapAgainToRemove": {
+      "text": "Dodirni ponovo da ukloniš",
+      "checked": false
+    },
+    "foods.addAFood": {
+      "text": "Dodaj namirnicu",
+      "checked": false
+    },
+    "foods.addAFoodTypeOr": {
+      "text": "Dodaj namirnicu: upiši ili skeniraj",
+      "checked": false
+    },
+    "foods.clearTheSearch": {
+      "text": "Obriši pretragu",
+      "checked": false
+    },
+    "foods.aNameOrABarcode": {
+      "text": "Naziv ili bar kod koji si sačuvao|Naziv ili bar kod koji si sačuvala",
+      "checked": false
+    },
+    "foods.addItYourself": {
+      "text": "Dodaj sam|Dodaj sama",
+      "checked": false
+    },
+    "foods.yourFoods": {
+      "text": "Tvoje namirnice",
+      "checked": false
+    },
+    "foods.canTFindWhatYou": {
+      "text": "Ne nalaziš ono što tražiš?",
+      "checked": false
+    },
+    "foods.keepThisName": {
+      "text": "Zadrži ovaj naziv",
+      "checked": false
+    },
+    "foodcard.nutritionPerG": {
+      "text": "Nutritivne vrednosti na 100 g",
+      "checked": false
+    },
+    "foodcard.close": {
+      "text": "Zatvori",
+      "checked": false
+    },
+    "foodcard.creditOpenFoodFactsCc": {
+      "text": "Izvor: Open Food Facts, CC BY-SA",
+      "checked": false
+    },
+    "foodcard.startWithTheFrontOf": {
+      "text": "Počni od prednje strane pakovanja: ona postaje slika namirnice.",
+      "checked": false
+    },
+    "foodcard.takeAPhoto": {
+      "text": "Fotografiši",
+      "checked": false
+    },
+    "foodcard.uploadAPhoto": {
+      "text": "Otpremi fotografiju",
+      "checked": false
+    },
+    "foodcard.yourLabel": {
+      "text": "tvoja deklaracija",
+      "checked": false
+    },
+    "foodcard.useChefMealanSLabel": {
+      "text": "Koristi deklaraciju od Chef Mealana",
+      "checked": false
+    },
+    "foodcard.proteinDensity": {
+      "text": "Gustina proteina",
+      "checked": false
+    },
+    "foodcard.mixIt": {
+      "text": "Kombinuj",
+      "checked": false
+    },
+    "foodcard.nothingInYourFoodsOr": {
+      "text": "Ništa u tvojim namirnicama ni u osnovnom skupu ne stiže do cilja uz ovu.",
+      "checked": false
+    },
+    "foodcard.notQuiteTellChefMealan": {
+      "text": "Nije baš to? Reci Chef Mealanu",
+      "checked": false
+    },
+    "foodcard.proTip": {
+      "text": "Savet",
+      "checked": false
+    },
+    "foodcard.noTipJustNow": {
+      "text": "Trenutno nema saveta.",
+      "checked": false
+    },
+    "foodcard.tryAgain": {
+      "text": "Pokušaj ponovo",
+      "checked": false
+    },
+    "foodcard.donTHaveItFind": {
+      "text": "Nemaš je? Nađi nešto drugo",
+      "checked": false
+    },
+    "foodcard.reviewTheLabel": {
+      "text": "Pregledaj deklaraciju",
+      "checked": false
+    },
+    "foodcard.photoRemoved": {
+      "text": "Fotografija je uklonjena.",
+      "checked": false
+    },
+    "foodcard.undo": {
+      "text": "Vrati",
+      "checked": false
+    },
+    "foodcard.soldIn": {
+      "text": "Prodaje se u",
+      "checked": false
+    },
+    "foodcard.everywhere": {
+      "text": "Svuda",
+      "checked": false
+    },
+    "foodcard.seeThePhoto": {
+      "text": "Pogledaj fotografiju",
+      "checked": false
+    },
+    "foodcard.photosOfThisProduct": {
+      "text": "Fotografije ovog proizvoda",
+      "checked": false
+    },
+    "foodcard.addAPhoto": {
+      "text": "Dodaj fotografiju",
+      "checked": false
+    },
+    "foodcard.whatThisFoodIs": {
+      "text": "Šta je ova namirnica",
+      "checked": false
+    },
+    "foodcard.nutritionTablePerG": {
+      "text": "Tabela nutritivnih vrednosti na 100 g",
+      "checked": false
+    },
+    "foodcard.photo": {
+      "text": "Fotografija",
+      "checked": false
+    },
+    "foodcard.closeThePhoto": {
+      "text": "Zatvori fotografiju",
+      "checked": false
+    },
+    "foodcard.previousPhoto": {
+      "text": "Prethodna fotografija",
+      "checked": false
+    },
+    "foodcard.nextPhoto": {
+      "text": "Sledeća fotografija",
+      "checked": false
+    },
+    "foodcard.removeFromFavourites": {
+      "text": "Ukloni iz omiljenih",
+      "checked": false
+    },
+    "foodcard.addToFavourites": {
+      "text": "Dodaj u omiljene",
+      "checked": false
+    },
+    "foodcard.readyToEatAsIt": {
+      "text": "Spremno za jelo takvo kakvo je.",
+      "checked": false
+    },
+    "foodcard.needsPreparationBeforeEating": {
+      "text": "Treba je pripremiti pre jela.",
+      "checked": false
+    },
+    "foodcard.tapAgainToRemove": {
+      "text": "Dodirni ponovo da ukloniš",
+      "checked": false
+    },
+    "foodcard.swipeOrTapAPhoto": {
+      "text": "Povuci ili dodirni fotografiju ispod",
+      "checked": false
+    },
+    "foodcard.tapThePhotoToClose": {
+      "text": "Dodirni fotografiju da je zatvoriš",
+      "checked": false
+    },
+    "foodcard.writingTip": {
+      "text": "Chef Mealan piše savet za tvoj cilj…",
+      "checked": false
+    },
+    "foodcard.photoMain": {
+      "text": "Fotografija {n}, glavna",
+      "checked": false
+    },
+    "foodcard.photoN": {
+      "text": "Fotografija {n}",
+      "checked": false
+    },
+    "foodcard.photoOf": {
+      "text": "Fotografija {n} od {of}",
+      "checked": false
+    },
+    "foodcard.showPhoto": {
+      "text": "Prikaži fotografiju {n}",
+      "checked": false
+    },
+    "camera.chooseFromYourPhotos": {
+      "text": "Izaberi iz svojih fotografija",
+      "checked": false
+    },
+    "camera.useTheCodeOnly": {
+      "text": "Samo bar kod",
+      "checked": false
+    },
+    "camera.orTypeTheBarcode": {
+      "text": "Ili upiši bar kod",
+      "checked": false
+    },
+    "camera.lookUp": {
+      "text": "Potraži",
+      "checked": false
+    },
+    "camera.leaveTheFieldEmptyAnd": {
+      "text": "Ostavi polje prazno i kamera ponovo čita.",
+      "checked": false
+    },
+    "camera.yourPhotos": {
+      "text": "Tvoje fotografije",
+      "checked": false
+    },
+    "camera.closeCamera": {
+      "text": "Zatvori kameru",
+      "checked": false
+    },
+    "camera.yourPlate": {
+      "text": "Tvoj tanjir",
+      "checked": false
+    },
+    "camera.whatToScan": {
+      "text": "Šta skeniraš",
+      "checked": false
+    },
+    "camera.stagedPhotos": {
+      "text": "Spremne fotografije",
+      "checked": false
+    },
+    "camera.barcodeNumbers": {
+      "text": "Brojevi bar koda",
+      "checked": false
+    },
+    "camera.typeTheBarcode": {
+      "text": "Upiši bar kod",
+      "checked": false
+    },
+    "camera.cameraAccessDeniedPleaseAllow": {
+      "text": "Pristup kameri je odbijen. Dozvoli ga ili otpremi iz galerije.",
+      "checked": false
+    },
+    "camera.couldNotStartCameraPlease": {
+      "text": "Kamera nije mogla da se pokrene. Otpremi sliku.",
+      "checked": false
+    },
+    "camera.photoOfMyMeal": {
+      "text": "Fotografija mog obroka",
+      "checked": false
+    },
+    "camera.scanForYourPlate": {
+      "text": "Skeniraj za svoj tanjir",
+      "checked": false
+    },
+    "camera.scanAFood": {
+      "text": "Skeniraj namirnicu",
+      "checked": false
+    },
+    "camera.nowPhotosOfThePack": {
+      "text": "Sada fotografije prednje i zadnje strane pakovanja, ili samo bar kod",
+      "checked": false
+    },
+    "camera.pausedWhileYouTypeThe": {
+      "text": "Pauzirano dok upisuješ bar kod",
+      "checked": false
+    },
+    "camera.holdTheBarcodeInsideThe": {
+      "text": "Drži bar kod unutar okvira",
+      "checked": false
+    },
+    "camera.theWholeProductOneSide": {
+      "text": "Ceo proizvod, jedna strana po fotografiji",
+      "checked": false
+    },
+    "camera.theWholePlateFromAbove": {
+      "text": "Ceo tanjir, odozgo. Zatim unutrašnjost, druga strana ili jelovnik",
+      "checked": false
+    },
+    "camera.holdTheNutritionTableInside": {
+      "text": "Drži tabelu nutritivnih vrednosti unutar okvira",
+      "checked": false
+    },
+    "camera.takeAPhotoOfOne": {
+      "text": "Fotografiši jednu stranu",
+      "checked": false
+    },
+    "camera.takeThePhotoOfYour": {
+      "text": "Fotografiši svoj obrok",
+      "checked": false
+    },
+    "camera.takeAPhoto": {
+      "text": "Fotografiši",
+      "checked": false
+    },
+    "camera.readIt": {
+      "text": "Pročitaj",
+      "checked": false
+    },
+    "camera.theShutterAddsAPhoto": {
+      "text": "Okidač dodaje fotografiju. Pročitaj ih kad imaš ono što želiš.",
+      "checked": false
+    },
+    "camera.tapToTakeItOr": {
+      "text": "Dodirni da fotografišeš. Ili izaberi jednu iz svojih fotografija.",
+      "checked": false
+    },
+    "camera.autoShotHoldStillTap": {
+      "text": "Automatski snimak: drži mirno · dodirni za ručni",
+      "checked": false
+    },
+    "camera.manualShotTapToTake": {
+      "text": "Ručni snimak: dodirni da snimiš · dodirni za automatski",
+      "checked": false
+    },
+    "camera.addToPlateScan": {
+      "text": "Dodaj na tanjir: skeniraj",
+      "checked": false
+    },
+    "camera.addAFoodScan": {
+      "text": "Dodaj namirnicu: skeniraj",
+      "checked": false
+    },
+    "camera.noBarcode": {
+      "text": "Bar kod nije pronađen. Probaj oštriju fotografiju ili unesi broj u sačuvanim namirnicama.",
+      "checked": false
+    },
+    "camera.tooBig": {
+      "text": "Izaberi sliku manju od 15 MB.",
+      "checked": false
+    },
+    "camera.removeStaged": {
+      "text": "Ukloni spremnu fotografiju {n}",
+      "checked": false
+    },
+    "camera.stagedAngle": {
+      "text": "Spremna strana {n}",
+      "checked": false
+    },
+    "camera.readPhotos": {
+      "text": "Pročitaj {n} fotografiju|Pročitaj {n} fotografije|Pročitaj {n} fotografija",
+      "checked": false
+    },
+    "camera.analyzePhotos": {
+      "text": "Analiziraj {n} fotografiju|Analiziraj {n} fotografije|Analiziraj {n} fotografija",
+      "checked": false
+    },
+    "camera.analyzeN": {
+      "text": "Analiziraj {n}",
+      "checked": false
+    },
+    "photocam.takeAgain": {
+      "text": "Ponovo",
+      "checked": false
+    },
+    "photocam.useThisPhoto": {
+      "text": "Koristi ovu fotografiju",
+      "checked": false
+    },
+    "photocam.closeTheCamera": {
+      "text": "Zatvori kameru",
+      "checked": false
+    },
+    "photocam.switchCamera": {
+      "text": "Promeni kameru",
+      "checked": false
+    },
+    "photocam.takeThePhoto": {
+      "text": "Fotografiši",
+      "checked": false
+    },
+    "photocam.theCameraIsnTAllowed": {
+      "text": "Kamera nije dozvoljena za Chef Mealana. Dozvoli je u pregledaču ili koristi Otpremi fotografiju.",
+      "checked": false
+    },
+    "photocam.theCameraCouldNotStart": {
+      "text": "Kamera nije mogla da se pokrene. Koristi Otpremi fotografiju.",
+      "checked": false
+    },
+    "photocam.holdThePackInFront": {
+      "text": "Drži pakovanje ispred kamere",
+      "checked": false
+    },
+    "photocam.yourPhoto": {
+      "text": "Tvoja fotografija",
+      "checked": false
+    },
+    "photoask.ateAt": {
+      "text": "Pojedeno u",
+      "checked": false
+    },
+    "photoask.tellChefMealanWhatIt": {
+      "text": "Reci Chef Mealanu šta je to, ako želiš",
+      "checked": false
+    },
+    "photoask.readThePlate": {
+      "text": "Pročitaj tanjir",
+      "checked": false
+    },
+    "photoask.dropThePhoto": {
+      "text": "Odbaci fotografiju",
+      "checked": false
+    },
+    "photoask.whosePlateAndWhen": {
+      "text": "Čiji tanjir, i kada",
+      "checked": false
+    },
+    "photoask.theTimeYouAteIt": {
+      "text": "Vreme kada si jeo|Vreme kada si jela",
+      "checked": false
+    },
+    "count.size": {
+      "text": "Veličina",
+      "checked": false
+    },
+    "count.weighedIt": {
+      "text": "Izmereno?",
+      "checked": false
+    },
+    "count.eachEggWithoutTheShell": {
+      "text": "Svako jaje bez ljuske. Uklopi u moj cilj menja jaja jedno po jedno.",
+      "checked": false
+    },
+    "count.peeledBananasVaryMoreThan": {
+      "text": "Oljuštena. Banane se razlikuju više od jaja, pa je veličina okvirna.",
+      "checked": false
+    },
+    "sayhave.done": {
+      "text": "Gotovo",
+      "checked": false
+    },
+    "sayhave.cancel": {
+      "text": "Otkaži",
+      "checked": false
+    },
+    "sayhave.whatYouSayGoesTo": {
+      "text": "Ono što kažeš ide Chef Mealanu kao reči, da imenuje namirnice i njihove uobičajene vrednosti. Ništa se ne snima.",
+      "checked": false
+    },
+    "sayhave.sayWhatYouHave": {
+      "text": "Reci šta imaš",
+      "checked": false
+    },
+    "sayhave.notListening": {
+      "text": "Ne slušam",
+      "checked": false
+    },
+    "sayhave.typeWhatYouHave": {
+      "text": "Upiši šta imaš",
+      "checked": false
+    },
+    "sayhave.sayTheFoodsYouHave": {
+      "text": "Reci namirnice koje imaš, bilo kojim redom. Količine ako ih znaš: dva jajeta, pola luka. Dodirni Gotovo kad završiš.",
+      "checked": false
+    },
+    "sayhave.theFoodsYouHaveIn": {
+      "text": "Namirnice koje imaš, bilo kojim redom, sa količinama ako ih znaš.",
+      "checked": false
+    },
+    "sayhave.orTypeHere": {
+      "text": "Ili upiši ovde",
+      "checked": false
+    },
+    "sayhave.micBlocked": {
+      "text": "Mikrofon je blokiran za ovaj sajt. Upiši namirnice.",
+      "checked": false
+    },
+    "where.close": {
+      "text": "Zatvori",
+      "checked": false
+    },
+    "where.onThePlateNow": {
+      "text": "Sada na tanjiru",
+      "checked": false
+    },
+    "where.iEatItNow": {
+      "text": "Jedem sada",
+      "checked": false
+    },
+    "where.aNewMealWithIt": {
+      "text": "Nov obrok sa njom",
+      "checked": false
+    },
+    "where.theSlotIsEmptyBuild": {
+      "text": "termin je prazan; složi ga na Tanjiru",
+      "checked": false
+    },
+    "where.justKeepItInMy": {
+      "text": "Samo je zadrži u Mojim namirnicama",
+      "checked": false
+    },
+    "where.nothingPlannedYet": {
+      "text": "još ništa nije planirano",
+      "checked": false
+    },
+    "where.whereDoesThisGo": {
+      "text": "Gde ovo ide?",
+      "checked": false
+    },
+    "meal.thisMeal": {
+      "text": "Ovaj obrok",
+      "checked": false
+    },
+    "meal.gProteinPerKcal": {
+      "text": "g proteina na 100 kcal",
+      "checked": false
+    },
+    "meal.kcal": {
+      "text": "kcal",
+      "checked": false
+    },
+    "meal.gProtein": {
+      "text": "g proteina",
+      "checked": false
+    },
+    "meal.ofDay": {
+      "text": "dana",
+      "checked": false
+    },
+    "meal.nothingOnThePlateYet": {
+      "text": "Još ništa na tanjiru",
+      "checked": false
+    },
+    "meal.addAFoodToSee": {
+      "text": "dodaj namirnicu da vidiš broj",
+      "checked": false
+    },
+    "meal.lockAll": {
+      "text": "Zaključaj sve",
+      "checked": false
+    },
+    "meal.findAMix": {
+      "text": "Nađi kombinaciju",
+      "checked": false
+    },
+    "meal.save": {
+      "text": "Sačuvaj",
+      "checked": false
+    },
+    "meal.addAFood": {
+      "text": "Dodaj namirnicu",
+      "checked": false
+    },
+    "meal.gOfIt": {
+      "text": "g od toga",
+      "checked": false
+    },
+    "meal.fatCarbsAndFibre": {
+      "text": "Masti, ugljeni hidrati i vlakna",
+      "checked": false
+    },
+    "meal.coralDotAmountStaysFixed": {
+      "text": "Koralna tačka: količina ostaje ista. Siv krug: Chef je može promeniti.",
+      "checked": false
+    },
+    "meal.mealName": {
+      "text": "Naziv obroka",
+      "checked": false
+    },
+    "meal.nameThisMeal": {
+      "text": "Daj ime ovom obroku",
+      "checked": false
+    },
+    "meal.scanALabel": {
+      "text": "Skeniraj deklaraciju",
+      "checked": false
+    },
+    "meal.enterAFoodManually": {
+      "text": "Unesi namirnicu ručno",
+      "checked": false
+    },
+    "meal.gramsOf": {
+      "text": "Grami: {food}",
+      "checked": false
+    },
+    "meal.remove": {
+      "text": "Ukloni: {food}",
+      "checked": false
+    },
+    "craving.yourFoods": {
+      "text": "Tvoje namirnice",
+      "checked": false
+    },
+    "craving.add": {
+      "text": "Dodaj",
+      "checked": false
+    },
+    "craving.nothingFound": {
+      "text": "Ništa nije pronađeno",
+      "checked": false
+    },
+    "craving.tapADishAndIt": {
+      "text": "Dodirni jelo i ono ide na tanjir.",
+      "checked": false
+    },
+    "craving.forOneServing": {
+      "text": "Za jednu porciju",
+      "checked": false
+    },
+    "craving.howToMakeIt": {
+      "text": "Kako se pravi",
+      "checked": false
+    },
+    "craving.keptInMyRecipesAs": {
+      "text": "Sačuvano u Mojim receptima kao ideja, još nije napravljeno.",
+      "checked": false
+    },
+    "craving.putItOnMyPlate": {
+      "text": "Stavi na moj tanjir",
+      "checked": false
+    },
+    "craving.yourRecipes": {
+      "text": "Tvoji recepti",
+      "checked": false
+    },
+    "craving.coachSRecipes": {
+      "text": "Recepti trenera",
+      "checked": false
+    },
+    "craving.membersRecipes": {
+      "text": "Recepti članova",
+      "checked": false
+    },
+    "craving.anotherIdea": {
+      "text": "Druga ideja",
+      "checked": false
+    },
+    "craving.addFood": {
+      "text": "Dodaj: {food}",
+      "checked": false
+    },
+    "craving.thinking": {
+      "text": "Chef Mealan razmišlja…",
+      "checked": false
+    },
+    "craving.askForOne": {
+      "text": "Pitaj Chef Mealana za jedno",
+      "checked": false
+    },
+    "craving.askForAnother": {
+      "text": "Pitaj Chef Mealana za drugo",
+      "checked": false
+    },
+    "craving.removePdFilter": {
+      "text": "Ukloni filter PD {pd} i više",
+      "checked": false
+    },
+    "craving.starters": {
+      "text": "Osnovna jela od Chef Mealana",
+      "checked": false
+    },
+    "helper.close": {
+      "text": "Zatvori",
+      "checked": false
+    },
+    "helper.fromYourFoods": {
+      "text": "Iz tvojih namirnica",
+      "checked": false
+    },
+    "helper.swap": {
+      "text": "Zameni",
+      "checked": false
+    },
+    "helper.somethingElseTalkToChef": {
+      "text": "Nešto drugo? Razgovaraj sa Chef Mealanom",
+      "checked": false
+    },
+    "helper.onThePlate": {
+      "text": "Na tanjiru",
+      "checked": false
+    },
+    "helper.add": {
+      "text": "Dodaj",
+      "checked": false
+    },
+    "helper.set": {
+      "text": "Postavi",
+      "checked": false
+    },
+    "helper.doneBackToThePlate": {
+      "text": "Gotovo, nazad na tanjir",
+      "checked": false
+    },
+    "helper.clearTheQuestion": {
+      "text": "Obriši pitanje",
+      "checked": false
+    },
+    "helper.whatGoesWithThisWhat": {
+      "text": "Šta ide uz ovo? Šta umesto…?",
+      "checked": false
+    },
+    "helper.ask": {
+      "text": "Pitaj",
+      "checked": false
+    },
+    "helper.chefMealanCouldNotAnswer": {
+      "text": "Chef Mealan nije mogao da odgovori.",
+      "checked": false
+    },
+    "helper.couldnTWorkThisOne": {
+      "text": "Nisam uspeo ovo da rešim. Pitaj na drugi način.",
+      "checked": false
+    },
+    "helper.chefMealanAboutThisPlate": {
+      "text": "Chef Mealan, o ovom tanjiru",
+      "checked": false
+    },
+    "helper.whatGoesWithThis": {
+      "text": "Šta ide uz ovo?",
+      "checked": false
+    },
+    "helper.betterMatchForMyTarget": {
+      "text": "Bolje za moj cilj?",
+      "checked": false
+    },
+    "helper.makeItCrunchier": {
+      "text": "Da bude hrskavije",
+      "checked": false
+    },
+    "helper.lessSweet": {
+      "text": "Manje slatko",
+      "checked": false
+    },
+    "helper.cheaperOption": {
+      "text": "Jeftinije",
+      "checked": false
+    },
+    "helper.insteadOf": {
+      "text": "Chef Mealan, umesto: {food}",
+      "checked": false
+    },
+    "letters.plate": {
+      "text": "Tanjir",
+      "checked": false
+    },
+    "letters.planned": {
+      "text": "Planirano",
+      "checked": false
+    },
+    "letters.whatIsInIt": {
+      "text": "Šta je u njemu",
+      "checked": false
+    },
+    "letters.kcal": {
+      "text": "kcal",
+      "checked": false
+    },
+    "letters.total": {
+      "text": "Ukupno",
+      "checked": false
+    },
+    "letters.theNumbers": {
+      "text": "Brojevi",
+      "checked": false
+    },
+    "letters.againstYourPlannedDay": {
+      "text": "Prema tvom planiranom danu",
+      "checked": false
+    },
+    "foods.dismiss": {
+      "text": "Odbaci: {name}",
+      "checked": false
+    },
+    "foods.nothingFoundFor": {
+      "text": "Ništa nije pronađeno za „{q}“.",
+      "checked": false
     }
   }
 }
