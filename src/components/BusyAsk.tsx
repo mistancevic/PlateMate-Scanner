@@ -2,6 +2,7 @@
 // more. Where it meets the plan, Plan asks once, under the meal or the training: one tap changes this date only; Keep it
 // leaves it and the question goes. A meal at its own time for a date says so, with Back to the usual time; one moved in
 // Google Calendar says that too. Buttons 44 px or more; labels 12 px or more.
+import { w } from "../words";
 import { ChefLine } from "./ChefLine";
 import { say } from "../chefScript";
 import type { ReactNode } from "react";
@@ -30,7 +31,7 @@ export function useDayBusy(p: AppApi, date: string, slots: Slot[], training: Pla
 export function BusyRow({ b }: { b: Block }) {
   return (
     <div className="busy-row" role="note" aria-label={`Busy in your calendar, ${blockWords(b)}`}>
-      <small className="busy-time">{clock(b.from)}<br />to {clock(b.to)}</small><small>Busy in your calendar</small>
+      <small className="busy-time">{clock(b.from)}<br />to {clock(b.to)}</small><small>{w("busy.busyInYourCalendar")}</small>
     </div>
   );
 }
@@ -79,7 +80,7 @@ export function AskCard({ p, date, a, training, cooked, title }: { p: AppApi; da
     ].filter(Boolean) as ReactNode[];
   }
   return (
-    <div className="busy-ask" role="group" aria-label="From your calendar">
+    <div className="busy-ask" role="group" aria-label={w("busy.fromYourCalendar")}>
       {/* DT213 (0.3.74): the calendar's questions are Chef Mealan's */}
       <ChefLine text={text} />
       <div className="busy-ask-buttons">{buttons}</div>
@@ -101,7 +102,7 @@ export function SlotNotes({ p, date, slot }: { p: AppApi; date: string; slot: Sl
   return (
     <div className="slot-notes">
       {own && usual && own !== usual && <div><small>{from ? `Moved in Google Calendar, from ${from}` : `At ${own} on this date only`}</small><button type="button" className="link" onClick={back}>Back to {usual}</button></div>}
-      {ahead && <div><small>Cooked ahead on {WD(ahead)}</small><button type="button" className="link" onClick={notAhead}>Cook it on the day</button></div>}
+      {ahead && <div><small>Cooked ahead on {WD(ahead)}</small><button type="button" className="link" onClick={notAhead}>{w("busy.cookItOnTheDay")}</button></div>}
     </div>
   );
 }

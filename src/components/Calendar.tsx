@@ -1,6 +1,7 @@
 // DT178 (0.3.21, board Stories126, Coach Milan 31 October 00:08): Chef Mealan's own calendar in Google. Me > Google
 // Calendar: what goes in, what an event says, Connect. On: where and how far ahead, Turn off with remove or keep. Plan says
 // once that the plan is also there; a shopping list can get a day, Shop on. Buttons 44 px or more; labels 12 px or more.
+import { w } from "../words";
 import { useEffect, useRef, useState } from "react";
 import type { AppApi } from "../screens/api";
 import { calendarEvents, CAL_DAYS, CAL_KINDS, CAL_SCOPE, BUSY_SCOPE, kindOn, dishOn, plusDays, type CalKind, type CalSettings, type CalEvent, type CalMove } from "../gcal";
@@ -53,7 +54,7 @@ export function eventsFor(p: AppApi, now = new Date()): { events: CalEvent[]; fr
     settings: c,
     weigh: Boolean(p.safety.consentBodyAt) && !weighInsOff(p.safety) && !p.travel?.weighPaused,
     noKitchen: () => p.travel?.kitchen === "hotel",
-    checkIn: ci ? { date: ci, name: p.profile.coachId ? `Check-in with ${p.coachLabel}` : "Goal check-in" } : null,
+    checkIn: ci ? { date: ci, name: p.profile.coachId ? `Check-in with ${p.coachLabel}` : w("calendar.goalCheckIn") } : null,
     shopping: getStore().lists.filter((x) => !x.doneAt && x.shopOn).map((x) => ({ n: x.n, at: x.shopOn! })),
     // 0.3.22 (Coach Milan 01:17: the events linked to the preview): the link is always chefmealan.com; only this computer's
     // walkthroughs keep their own address
@@ -134,9 +135,9 @@ export function CalendarPage({ p }: { p: AppApi }) {
   const canConnect = p.cloudEnabled ? Boolean(p.user) : typeof location !== "undefined" && /^(127\.0\.0\.1|localhost)$/.test(location.hostname);
   const kinds = CAL_KINDS.map((k) => {
     const on = kindOn(c, k);
-    const ex = k === "meals" ? "Breakfast, lunch, dinner at your times" : k === "cooking" ? "Cook dinner, 30 minutes before, when the planned meal has steps"
-      : k === "training" ? "Your training days, at their time" : k === "shopping" ? "A shopping list, on the day you pick with Shop on"
-      : k === "weigh" ? "Weigh in, before breakfast" : p.profile.coachId ? `Check-in with ${p.coachLabel}, every 4 weeks` : "Goal check-in, every 4 weeks";
+    const ex = k === "meals" ? w("calendar.breakfastLunchDinnerAtYour") : k === "cooking" ? w("calendar.cookDinnerMinutesBeforeWhen")
+      : k === "training" ? w("calendar.yourTrainingDaysAtTheir") : k === "shopping" ? "A shopping list, on the day you pick with Shop on"
+      : k === "weigh" ? w("calendar.weighInBeforeBreakfast") : p.profile.coachId ? `Check-in with ${p.coachLabel}, every 4 weeks` : w("calendar.goalCheckInEveryWeeks");
     const row = (
       <button key={k} type="button" role="switch" aria-checked={on} className={`cal-kind ${k === "meals" && on ? "cal-kind-open" : ""}`} onClick={() => set({ kinds: { ...c.kinds, [k]: !on } })}>
         <span><b>{k === "checkin" && p.profile.coachId ? `Check-in with ${p.coachLabel}` : KIND_NAME[k]}</b><small>{ex}</small>{KIND_WHY[k] && <small className="cal-why">{KIND_WHY[k]}</small>}</span><Switch on={on} />
@@ -149,12 +150,12 @@ export function CalendarPage({ p }: { p: AppApi }) {
       <div key={k}>
         {row}
         <div className="cal-which">
-          <small className="setting-name">Which meals</small>
-          <div className="moments" role="radiogroup" aria-label="Which meals">
-            <button type="button" role="radio" aria-checked={!only} className={`choice ${!only ? "on" : ""}`} onClick={() => set({ meals: "all" })}>Every meal slot</button>
-            <button type="button" role="radio" aria-checked={only} className={`choice ${only ? "on" : ""}`} onClick={() => set({ meals: "planned" })}>Only meals I planned</button>
+          <small className="setting-name">{w("calendar.whichMeals")}</small>
+          <div className="moments" role="radiogroup" aria-label={w("calendar.whichMeals")}>
+            <button type="button" role="radio" aria-checked={!only} className={`choice ${!only ? "on" : ""}`} onClick={() => set({ meals: "all" })}>{w("calendar.everyMealSlot")}</button>
+            <button type="button" role="radio" aria-checked={only} className={`choice ${only ? "on" : ""}`} onClick={() => set({ meals: "planned" })}>{w("calendar.onlyMealsIPlanned")}</button>
           </div>
-          {only && <small className="muted">A slot with a meal on Plan goes in; an open slot stays out. Plan a meal, and it shows within seconds.</small>}
+          {only && <small className="muted">{w("calendar.aSlotWithAMeal")}</small>}
         </div>
       </div>
     );
@@ -185,49 +186,49 @@ export function CalendarPage({ p }: { p: AppApi }) {
       } else p.setPersonal({ ...p.personal, calendar: { ...c, on: false } });
       forgetSent(); setCalStatus({ state: "off" }); setEnding(false);
       log("calendar_off", { removed: remove });
-      p.notify(remove ? "Chef Mealan stopped writing, and the calendar is removed from Google." : "Chef Mealan stopped writing. The calendar stays in Google as it is.");
+      p.notify(remove ? w("calendar.chefMealanStoppedWritingAnd") : w("calendar.chefMealanStoppedWritingThe"));
     } finally { setBusy(false); }
   };
   return (
     <>
-      <p className="small muted page-why">Chef Mealan writes your plan into a calendar of its own, called Chef Mealan, in your Google Calendar. It never reads or changes your other events.</p>
+      <p className="small muted page-why">{w("calendar.chefMealanWritesYourPlan")}</p>
       {c.on && (
-        <section className="card cal-on" aria-label="Google Calendar is on">
+        <section className="card cal-on" aria-label={w("calendar.googleCalendarIsOn")}>
           <span aria-hidden="true">📅</span>
-          <div><b>On</b><small>The Chef Mealan calendar in your Google account{p.user?.email ? `, ${p.user.email}` : ""}. The next {CAL_DAYS} days are in it.{st.state === "done" && st.at ? ` Updated ${st.at}.` : ""}</small></div>
+          <div><b>{w("calendar.on")}</b><small>The Chef Mealan calendar in your Google account{p.user?.email ? `, ${p.user.email}` : ""}. The next {CAL_DAYS} days are in it.{st.state === "done" && st.at ? ` Updated ${st.at}.` : ""}</small></div>
         </section>
       )}
       {c.on && <CalendarState p={p} />}
       {c.on && <p className="small muted">When you change a time, a slot or a meal here, it changes in Google Calendar within seconds. Google lets the app write for about an hour after a tap; after that, one tap on Update Google Calendar brings the next {CAL_DAYS} days up to date.</p>}
       {c.on && <BusyCard p={p} />}
-      <section className="card cal-kinds" aria-label="What goes in">
-        <b>What goes in</b>
-        <small className="muted">Each kind is on or off. Change it any time.</small>
+      <section className="card cal-kinds" aria-label={w("calendar.whatGoesIn")}>
+        <b>{w("calendar.whatGoesIn")}</b>
+        <small className="muted">{w("calendar.eachKindIsOnOr")}</small>
         {kinds}
         <button type="button" role="switch" aria-checked={dishOn(c)} className="cal-kind" onClick={() => set({ dish: !dishOn(c) })}>
-          <span><b>The dish's name</b><small>Lunch · Chicken rice bowl, or just Lunch</small></span><Switch on={dishOn(c)} />
+          <span><b>{w("calendar.theDishSName")}</b><small>Lunch · Chicken rice bowl, or just Lunch</small></span><Switch on={dishOn(c)} />
         </button>
       </section>
       <section className="card">
-        <b>What an event says</b>
-        <small className="cal-say">The name, the time, and a link that opens that day on Plan. Never kcal, protein, your goal or anything about your health. Calendars get shared with family and colleagues, so the numbers stay in the app.</small>
+        <b>{w("calendar.whatAnEventSays")}</b>
+        <small className="cal-say">{w("calendar.theNameTheTimeAnd")}</small>
       </section>
       {!c.on && (<>
-        <button type="button" className="pill pill-wide pill-primary cal-connect" disabled={busy || !canConnect} onClick={connect}>{busy ? (st.state === "busy" && st.total ? `Writing ${st.done ?? 0} of ${st.total}…` : "Connecting…") : "Connect Google Calendar"}</button>
-        {!canConnect && <small className="muted">Sign in with Google first.</small>}
-        <small className="muted cal-under">Google asks you once for one right: to create the Chef Mealan calendar and manage the events in it. Nothing else. You can take it back in your Google account at any time.</small>
+        <button type="button" className="pill pill-wide pill-primary cal-connect" disabled={busy || !canConnect} onClick={connect}>{busy ? (st.state === "busy" && st.total ? `Writing ${st.done ?? 0} of ${st.total}…` : "Connecting…") : w("calendar.connectGoogleCalendar")}</button>
+        {!canConnect && <small className="muted">{w("calendar.signInWithGoogleFirst")}</small>}
+        <small className="muted cal-under">{w("calendar.googleAsksYouOnceFor")}</small>
         {st.state === "error" && <p className="small cal-error" role="alert">{st.message}</p>}
       </>)}
       {c.on && (
-        <section className="card cal-off" aria-label="Turn off">
-          <b>Turn off</b>
-          {!ending ? <button type="button" className="pill pill-wide" disabled={busy} onClick={() => setEnding(true)}>Turn off</button> : (<>
-            <small className="muted">Chef Mealan stops writing. What about the calendar?</small>
-            <button type="button" className="pill pill-wide" disabled={busy} onClick={() => turnOff(true)}>Remove the Chef Mealan calendar</button>
-            <button type="button" className="pill pill-wide" disabled={busy} onClick={() => turnOff(false)}>Keep it as it is</button>
-            <button type="button" className="link cal-cancel" onClick={() => setEnding(false)}>Cancel</button>
+        <section className="card cal-off" aria-label={w("calendar.turnOff")}>
+          <b>{w("calendar.turnOff")}</b>
+          {!ending ? <button type="button" className="pill pill-wide" disabled={busy} onClick={() => setEnding(true)}>{w("calendar.turnOff")}</button> : (<>
+            <small className="muted">{w("calendar.chefMealanStopsWritingWhat")}</small>
+            <button type="button" className="pill pill-wide" disabled={busy} onClick={() => turnOff(true)}>{w("calendar.removeTheChefMealanCalendar")}</button>
+            <button type="button" className="pill pill-wide" disabled={busy} onClick={() => turnOff(false)}>{w("calendar.keepItAsItIs")}</button>
+            <button type="button" className="link cal-cancel" onClick={() => setEnding(false)}>{w("calendar.cancel")}</button>
           </>)}
-          <small className="muted">Deleting your account also removes the Chef Mealan calendar.</small>
+          <small className="muted">{w("calendar.deletingYourAccountAlsoRemoves")}</small>
         </section>
       )}
     </>
@@ -254,15 +255,15 @@ function BusyCard({ p }: { p: AppApi }) {
     } finally { setAsking(false); }
   };
   return (
-    <section className="card cal-busy" aria-label="From your calendar to the app">
-      <b>From your calendar to the app</b>
+    <section className="card cal-busy" aria-label={w("calendar.fromYourCalendarToThe")}>
+      <b>{w("calendar.fromYourCalendarToThe")}</b>
       <button type="button" role="switch" aria-checked={Boolean(c.busy)} className="cal-kind" disabled={asking} onClick={toggle}>
-        <span><b>Read when I'm busy</b><small>Busy and free times only. Never the titles, the people or the places of your events.</small></span><Switch on={Boolean(c.busy)} />
+        <span><b>{w("calendar.readWhenIMBusy")}</b><small>{w("calendar.busyAndFreeTimesOnly")}</small></span><Switch on={Boolean(c.busy)} />
       </button>
-      <small className="cal-say">With it, Plan suggests: a meal moved out of a meeting, a quick dinner after a late evening, a meal to carry on a full day, and asks when training sits in a busy block. It suggests; your times change only when you tap.</small>
-      <small className="muted cal-under">{c.busy ? "On. " : ""}Turning it on asks Google once more, for one more right: see when you are busy. Busy times stay on your phone: not on our server, not with your coach, not with Chef Mealan's AI.</small>
+      <small className="cal-say">{w("calendar.withItPlanSuggestsA")}</small>
+      <small className="muted cal-under">{c.busy ? w("calendar.on2") : ""}Turning it on asks Google once more, for one more right: see when you are busy. Busy times stay on your phone: not on our server, not with your coach, not with Chef Mealan's AI.</small>
       {c.busy && b?.error && <p className="small cal-error" role="alert">{b.error}</p>}
-      <small className="muted cal-under">A Chef Mealan meal you move in Google Calendar, on the same day, takes that time here too.</small>
+      <small className="muted cal-under">{w("calendar.aChefMealanMealYou")}</small>
     </section>
   );
 }
@@ -276,11 +277,11 @@ export function CalendarState({ p, plan }: { p: AppApi; plan?: boolean }) {
   // 0.3.23 (Coach Milan 09:00): on the Calendar page the On card says the time once; this line only speaks when there is more
   if (!plan && !tap && st.state !== "busy") return null;
   return (
-    <div className={`cal-line ${tap ? "cal-line-tap" : ""}`} role="status" aria-label="Google Calendar">
+    <div className={`cal-line ${tap ? "cal-line-tap" : ""}`} role="status" aria-label={w("calendar.googleCalendar")}>
       <span aria-hidden="true">📅</span>
-      <small>{st.state === "busy" ? (st.total ? `Writing to Google Calendar: ${st.done ?? 0} of ${st.total}.` : "Bringing Google Calendar up to date…") : st.state === "error" ? `Google Calendar: ${st.message}` : tap ? `Google Calendar is waiting for your plan. One tap brings the next ${CAL_DAYS} days up to date.`
+      <small>{st.state === "busy" ? (st.total ? `Writing to Google Calendar: ${st.done ?? 0} of ${st.total}.` : w("calendar.bringingGoogleCalendarUpTo")) : st.state === "error" ? `Google Calendar: ${st.message}` : tap ? `Google Calendar is waiting for your plan. One tap brings the next ${CAL_DAYS} days up to date.`
         : plan ? `Also in your Google Calendar, ${CAL_DAYS} days ahead. A time you change here changes there.` : `Up to date${st.at ? `, ${st.at}` : ""}.`}</small>
-      {tap && <button type="button" className="pill pill-small" disabled={busy} onClick={async () => { setBusy(true); try { await updateNow(p); } finally { setBusy(false); } }}>Update Google Calendar</button>}
+      {tap && <button type="button" className="pill pill-small" disabled={busy} onClick={async () => { setBusy(true); try { await updateNow(p); } finally { setBusy(false); } }}>{w("calendar.updateGoogleCalendar")}</button>}
     </div>
   );
 }
@@ -291,7 +292,7 @@ export function ShopOn({ p, n, value, onChange }: { p: AppApi; n: number; value?
   if (!c?.on || !kindOn(c, "shopping")) return null;
   return (
     <label className="cal-shop-on">
-      <span><b>Shop on</b><small>Optional. Puts Shopping list {n} in your calendar.</small></span>
+      <span><b>{w("calendar.shopOn")}</b><small>Optional. Puts Shopping list {n} in your calendar.</small></span>
       <input type="datetime-local" aria-label={`Shop on, shopping list ${n}`} value={value ?? ""} onChange={(e) => onChange(e.target.value ? e.target.value.slice(0, 16) : undefined)} />
     </label>
   );
