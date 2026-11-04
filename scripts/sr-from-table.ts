@@ -7,12 +7,23 @@ import { join } from "node:path";
 import { slotProblems } from "../src/chefScript";
 import { screenProblems } from "../src/words";
 const dir = process.argv[2];
-if (!dir) { console.error("usage: npx tsx scripts/sr-from-table.ts <dir with lines/*.json>"); process.exit(2); }
+if (!dir) { console.error("usage: npx tsx scripts/sr-from-table.ts <dir with lines/*.json> [<dir with packs/*.json>]"); process.exit(2); }
 const file = new URL("../src/i18n/sr-Latn.json", import.meta.url);
 const sr = JSON.parse(readFileSync(file, "utf8"));
 const bad: string[] = []; let ticked = 0, n = 0;
-for (const f of readdirSync(dir).filter((x) => x.endsWith(".json"))) {
-  const raw = JSON.parse(readFileSync(join(dir, f), "utf8")); const d = raw.data ?? raw;
+// 0.3.81: lines also come packed, many to a document (collection "packs", one per area); a line's own document wins.
+// Give the folders of both: npx tsx scripts/sr-from-table.ts <out_dir>/lines <out_dir>/packs
+const own = new Map<string, any>(), packed = new Map<string, any>();
+for (const dir of process.argv.slice(2)) {
+  let files: string[] = []; try { files = readdirSync(dir).filter((x) => x.endsWith(".json")); } catch { continue; }
+  for (const f of files) {
+    const raw = JSON.parse(readFileSync(join(dir, f), "utf8")); const d = raw.data ?? raw;
+    if (Array.isArray(d?.rows)) for (const r of d.rows) packed.set(r.id ?? `${r.kind}.${r.key}`, r);
+    else if (d && typeof d.key === "string") own.set(raw.id ?? `${d.kind}.${d.key}`, d);
+  }
+}
+for (const [id, r] of own) packed.set(id, r);
+for (const d of packed.values()) {
   if (!d || typeof d.key !== "string" || typeof d.sr !== "string") continue; // not a line
   // DT203 release 2 (0.3.77): the screens' words too, by key
   const part = d.kind === "safety" ? sr.safety : d.kind === "screen" ? sr.screens : sr.chef;
