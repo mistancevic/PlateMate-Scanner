@@ -150,7 +150,7 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
       {part === "shared" && tailFor("shared")}
       {part === "week" && (<>
       {/* DT167 (0.3.9, board Stories119 version 2): the check-in starts with what changed in the shared profile */}
-      <ProfileChanges uid={row.uid} sp={row.profileShare} />
+      <ProfileChanges uid={row.uid} sp={row.profileShare} name={name} />
 
       <section className="card cw-week" aria-label={`${name}'s week`}>
         <div className="cw-week-nav"><button type="button" className="week-arrow" aria-label={w("clientweek.weekBefore")} onClick={() => setOffset(offset - 1)}>‹</button><b>Week {wq.week}, {span}</b><button type="button" className="week-arrow" aria-label={w("clientweek.weekAfter")} disabled={offset >= 0} onClick={() => setOffset(offset + 1)}>›</button></div>

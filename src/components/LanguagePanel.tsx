@@ -8,7 +8,7 @@ const CHOICES: { id: Lang; name: string; line: string }[] = [
   { id: "sr-Latn", get name() { return w("langpanel.srpskiLatinica"); }, get line() { return w("langpanel.chefMealanHisQuestionsHis"); } },
 ];
 
-export function LanguagePanel() {
+export function LanguagePanel({ hasCoach = false }: { hasCoach?: boolean }) {
   const lang = useLang();
   return (
     <>
@@ -22,6 +22,8 @@ export function LanguagePanel() {
           <span className="menu-row-text"><b>{w("langpanel.deutsch")}</b><small>{w("langpanel.afterSerbianOnceAGerman")}</small></span><span className="me-todo soon">{w("langpanel.comingSoon")}</span>
         </div>
       </div>
+      {/* DT237 v2 (0.3.88): the coach reads the summary in the coach's own language, whatever is picked here */}
+      {hasCoach && <p className="small lang-coach">{w("langpanel.coachReads")}</p>}
       <small className="muted lang-note">{w("langpanel.thePrivacyNoticeAndThe")}</small>
     </>
   );
