@@ -4,11 +4,12 @@
 // way, make the read; Fine counts as neither; only the last 5 count; answers from before the recipe's foods changed stay
 // shown, marked, and stop counting.
 import type { Feedback, Meal } from "./pilot";
+import { w } from "./words";
 
 export type CarryHow = "light" | "fine" | "heavy";
 export type CarryMoment = { meal: string; day?: "training" | "rest"; training?: "before" | "after" };
 export type Carry = { how: CarryHow; at: string; moment?: CarryMoment; sig?: string };
-export const CARRY_WORDS: Record<CarryHow, string> = { light: "Light and awake", fine: "Fine", heavy: "Heavy, tired" };
+export const CARRY_WORDS: Record<CarryHow, string> = { get light() { return w("carry.light"); }, get fine() { return w("carry.fine"); }, get heavy() { return w("carry.heavy"); } };
 export const CARRY_COUNTED = 5;
 
 // the recipe's foods and grams, short: a change of a food or an amount gives another

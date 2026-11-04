@@ -7,7 +7,7 @@ import { density } from "../pilot";
 import { COACH_NAME } from "../components/Mark";
 import { WeighInLine } from "../components/Weight";
 import { weighInsOff } from "../weight";
-import { bandOf, goalLabel } from "../goal";
+import { bandOf, goalName } from "../goal";
 import type { ReactNode } from "react";
 import { ChevronRight, User, Target, CalendarDays, ShoppingBasket, Users, KeyRound, ClipboardList, CalendarClock } from "lucide-react";
 import type { MenuSection } from "./api";
@@ -55,7 +55,7 @@ function planHint(p: AppApi): string {
 export function MeScreen(p: AppApi) {
   const { state, goal, profile, clientName } = p;
   const coachName = profile.coachName || COACH_NAME;
-  const bandName = goal?.band ? goalLabel(goal.band) : null;
+  const bandName = goal?.band ? goalName(goal.band) : null;
   const setBy = goal?.setBy === "coach" ? (goal.coachName || coachName) : "you";
   const missing = setupMissing({ personal: p.personal, safety: p.safety, goal: p.goal, region: p.region });
   return (

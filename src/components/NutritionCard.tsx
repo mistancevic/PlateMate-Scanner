@@ -1,6 +1,6 @@
 // IM21, IM21b (0.2.21), RP2 (0.2.25): the Nutrition table, worked out by code from the foods and their grams. Shared by the
 // recipe page and, since R6 (0.2.43, board RS14), the read card on the Plate and on Recipes.
-import { dec } from "../words";
+import { dec, w } from "../words";
 import { aggregate } from "../pilot";
 import { Letters, NumbersTable } from "./Letters";
 import type { Ingredient, Meal } from "../pilot";
@@ -22,7 +22,7 @@ export function NutritionCard({ items, serves, one, all, stated, pdRef, fitPd, r
   const grams = items.filter((i) => i.grams > 0).reduce((k, i) => k + i.grams, 0);
   const prot = n.rows.find((r) => r.key === "protein");
   const pd1 = n.pd === null ? null : Math.round(n.pd * 10) / 10;
-  const w = (g: number) => <span className="nt-w">{fmt(g, 0)} g</span>;
+  const gw = (g: number) => <span className="nt-w">{fmt(g, 0)} g</span>;
   return (<>
     {/* R6 (0.2.43): on the read card the table stands alone; the card has its own PD line */}
     {!tableOnly && <section className={`readout readout-fit-${fitPd ? fitPd(n.pd) : "plan"} rq-readout`} aria-label="Protein density">
@@ -33,12 +33,12 @@ export function NutritionCard({ items, serves, one, all, stated, pdRef, fitPd, r
           <small>{energy === null ? "?" : fmt(many ? energy : n.rows[0].all ?? 0, 0)} kcal · {fmt((many ? prot?.serving : prot?.all) ?? 0, 1)} g protein · {fmt(grams / (many ? serves : 1), 0)} g</small></div>
       </div>
       {/* DT113 (0.2.94): the four letters, the same for one portion or all of it (they are rates) */}
-      {rates && (() => { const t = aggregate(items); return t.calories ? <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={rates} who="this recipe" table={<NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={rates} weight={t.weight ?? null} day={null} plan={null} />} /> : null; })()}
+      {rates && (() => { const t = aggregate(items); return t.calories ? <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={rates} who={w("letters.thisRecipe")} table={<NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={rates} weight={t.weight ?? null} day={null} plan={null} />} /> : null; })()}
     </section>}
     {/* editing: the readout follows as you type; the table comes back with Save */}
     {!readoutOnly && <section className="card nt-card" aria-label="Nutrition">
       <b>Nutrition</b>
-      <div className={`nt-row nt-th ${many ? "" : "nt-two"}`}><span />{many && <b>1 {one.toUpperCase()}{w(grams / serves)}</b>}<small>{many ? `ALL ${serves % 1 === 0 ? serves : fmt(serves, 1)}` : "ALL"}{w(grams)}</small><small>100 G</small></div>
+      <div className={`nt-row nt-th ${many ? "" : "nt-two"}`}><span />{many && <b>1 {one.toUpperCase()}{gw(grams / serves)}</b>}<small>{many ? `ALL ${serves % 1 === 0 ? serves : fmt(serves, 1)}` : "ALL"}{gw(grams)}</small><small>100 G</small></div>
       {n.rows.map((r) => (
         <div className={`nt-row ${r.sub ? "nt-sub" : ""} ${many ? "" : "nt-two"}`} key={r.key}>
           <span>{r.label}</span>

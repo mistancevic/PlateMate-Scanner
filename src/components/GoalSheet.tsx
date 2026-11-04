@@ -1,6 +1,6 @@
 import { GUIDE_PARTS, guideOf, type Sheet } from "../goalGuide";
 import { w } from "../words";
-import { goalLabel } from "../goal";
+import { goalName } from "../goal";
 
 // The goal sheet (canvas board K2, 7 October 2026): the same card for the person on Me › Goal and for the coach on the
 // client's page. What to eat, what weight to expect, how it's counted, what counts as progress, the next check-in.
@@ -23,7 +23,7 @@ export function GoalGuide({ id }: { id: string }) {
   if (!g) return null;
   return (
     <section className="card guide" aria-label={w("goalsheet.aboutYourGoal")}>
-      <b>{goalLabel(id)}</b>
+      <b>{goalName(id)}</b>
       {GUIDE_PARTS.map((x) => <div key={x.key}><small className="setting-name">{x.name}</small><p>{g[x.key]}</p></div>)}
     </section>
   );

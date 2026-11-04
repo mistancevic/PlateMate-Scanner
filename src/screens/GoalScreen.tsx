@@ -8,7 +8,7 @@ import { underAge, ADULT_ONLY } from "../safety";
 import { WeightField, HeightField } from "../components/UnitFields";
 import { units, hText, wText, wIn } from "../units";
 import { useState } from "react";
-import { BANDS, PACES, TRAINING_AGES, isBuild, paceForAge, bandOf, goalLabel } from "../goal";
+import { BANDS, PACES, TRAINING_AGES, isBuild, paceForAge, bandOf, goalName } from "../goal";
 import { density } from "../pilot";
 import { pdText, pdVal, pdTag } from "../ui";
 import { Mark, APP_NAME, CHEF_NAME } from "../components/Mark";
@@ -127,7 +127,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
     if (firstRun) { setShopStep(true); window.scrollTo(0, 0); return; }
     finish();
   };
-  const finish = () => { if (from <= todayKey) done(); else { p.notify(`${goalLabel(band)} starts on ${longDay(from)}.`); onLater(); } };
+  const finish = () => { if (from <= todayKey) done(); else { p.notify(`${goalName(band)} starts on ${longDay(from)}.`); onLater(); } };
   // on save: open findings count as kept on purpose; what is kept goes to the coach; nothing kept closes a request
   const settle = (a: ReturnType<typeof analyse> | null, summary: string) => {
     const now = new Date().toISOString();

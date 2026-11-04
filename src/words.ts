@@ -88,3 +88,13 @@ export const dec = (n: number, d = 1) => { const s = n.toFixed(d); return sep() 
 // a whole number with the thousands mark: 2,450 · 2.450
 export const numText = (n: number) => n.toLocaleString(numLocale(), { maximumFractionDigits: 0 });
 const numIn = (l: Lang, n: number) => n.toLocaleString(l === "sr-Latn" ? "sr-Latn-RS" : "en-GB", { maximumFractionDigits: 0 });
+
+// ---- dates (DT203 phase 9, 0.3.86): in the line's language. The phone's calendar (Intl) writes the day and month names, so a
+// date needs no tick: sreda, 4. novembar · Wednesday, November 4. English keeps the form a screen already used (en or en-GB).
+export const dateIn = (l: Lang, d: Date, o: Intl.DateTimeFormatOptions, en: string | string[] = "en-GB") => d.toLocaleDateString(l === "sr-Latn" ? "sr-Latn-RS" : en, o);
+export const dateV = (d: Date, o: Intl.DateTimeFormatOptions, en: string | string[] = "en-GB"): Val => (l) => dateIn(l, d, o, en);
+export const dateText = (d: Date, o: Intl.DateTimeFormatOptions, en: string | string[] = "en-GB") => dateIn(getLang(), d, o, en);
+// a value that has words only in English (a coach's title, a day name made in code): Serbian gets its own, or the line stays English
+export const enOnly = (t: string): Val => (l) => (l === "en" ? t : null);
+// where a screen used the phone's own locale ([]): English keeps it, Srpski is Latin Serbian (the phone's sr-RS would be Cyrillic)
+export const phoneLoc = (): string | string[] => (getLang() === "sr-Latn" ? "sr-Latn-RS" : []);

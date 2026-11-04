@@ -79,7 +79,7 @@ import { PilotGate } from "./screens/PilotGate";
 import { takeCodeFromUrl } from "./pendingCode";
 takeCodeFromUrl();  // SH73: chefmealan.com/?code=AB12CD from a coach's QR code
 import { cloudEnabled, watchUser, loadCloud, saveCloud, signOutCloud, confirmClientAi, askReview, closeReview, answerReview, type NumbersReview, type ReviewFinding, clearClientAi, exportAccount, explainCloudError, stripPhotos, isEmptyState, forgetSaved, loadMain, joinCoach, leaveCoach, loadPhotos, uploadPhoto, deletePhotoFile, listPhotoFiles, downloadPhoto, markPhotosMoved, dropOldPhotoCopies, pauseAccountWrites, saveOwnNotes, saveCards, loadRecords, saveRecords, markRecordsMoved, loadCards, listClients, loadInbox, clearInboxItem, type CloudUser, type InboxItem } from "./cloud";
-import { getGoal, clearGoal, saveGoal, bandOf, goalLabel, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
+import { getGoal, clearGoal, saveGoal, bandOf, goalName, goalsForBand, fit as fitPd, getGoalLog, setGoalLog, type GoalEntry, type GoalSource } from "./goal";
 import { setTodayChange, dayOfLoad, ymd, isoWeek, planLine as planLineOf, type PlanDay } from "./plan";
 import { todayIndex } from "./screens/ClientWeek";
 import { slotsOf, slotsOn } from "./slots";
@@ -1561,7 +1561,7 @@ export default function App() {
     nextSource.current = "profile";
     saveGoal({ ...goal, method: r.method, setAt: new Date().toISOString() }); setGoalState(getGoal());
     setState((s) => ({ ...s, goals: { ...s.goals, calories: r.kcal, protein: r.protein } }));
-    notify(`Your numbers changed with your profile. An average day is now ${r.kcal.toLocaleString(numLocale())} kcal and ${r.protein} g protein.`);
+    notify(w("app.numbersChanged", { kcal: r.kcal.toLocaleString(numLocale()), protein: r.protein }));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [personal, profile.formula]);
   // a goal band with missing numbers heals itself from the band, before the first paint (T5)
@@ -2916,7 +2916,7 @@ export default function App() {
       takeMix: (f, m) => { screenProps.takeMix(f, m); goApp("journey"); },
       putAlone: (f, g) => { setState((s) => ({ ...s, items: [...s.items, { id: uid(), food: f, grams: g, locked: false }], portion: null })); setStep("in"); goApp("journey"); notify(`${f.name} is on your plate.`); },
       addRecipe: (m) => { setState((s) => ({ ...s, meals: [m, ...s.meals] })); goApp("recipes"); notify(`${m.title} is in your recipes.`); },
-      momentName: momentOf(moment).name, goalName: goal ? goalLabel(goal.band) : w("app.yourGoal"),
+      momentName: momentOf(moment).name, goalName: goal ? goalName(goal.band) : w("app.yourGoal"),
       mealKcal: todayKcal === null ? null : Math.round(todayKcal * momentKcalShare(moment)),
     } : null;
     return pagePath === "/recipes" ? <RecipesPage member={isMember} /> : <RecipePage slug={pagePath.split("/")[2]} member={tools} />;
@@ -2962,14 +2962,14 @@ export default function App() {
       {/* DT167 (0.3.9): what the coach sees of the profile, kept up to date from this phone */}
       {user && profile.coachId && <SharePublisher {...screenProps} />}
       <header className="topbar">
-        <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setFilling(null); setTab("home"); }} aria-label={`${APP_NAME}, Today`}>
+        <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setFilling(null); setTab("home"); }} aria-label={w("app.brandToday")}>
           <Mark size={28} color="var(--brand)" />
         </button>
         <h1>{menuSection ? (ME_PAGES.includes(menuSection) ? w("menu.me") : w("app.menu")) : TITLES[tab]}</h1>
         {/* DT232 (0.3.72): while the app is viewed as Coach or User, the header says so and leads back, on every page */}
         {view !== "me" ? <button className="ref view-as" onClick={() => setViewAs("me")}>As {viewWord(view)} · Back to me</button>
         : tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label={w("app.editDailyReference")}>
-          {menuSection === "goal" ? `${pdText(dayPd)} today` : <>{goal?.band ? goalLabel(goal.band).split(" · ")[0] : `${fmt(state.goals.calories, 0)} kcal, ${fmt(state.goals.protein)} g`} · {pdText(dayPd)} today</>}
+          {menuSection === "goal" ? w("app.pdToday", { pd: pdText(dayPd) }) : <>{goal?.band ? goalName(goal.band).split(" · ")[0] : w("app.kcalG", { kcal: fmt(state.goals.calories, 0), g: fmt(state.goals.protein) })} · {w("app.pdToday", { pd: pdText(dayPd) })}</>}
         </button>}
         <button className="icon menu-button" aria-label={w("app.menu")} onClick={() => setMenuSection(menuSection ? null : "list")}><Menu size={22} /></button>
       </header>

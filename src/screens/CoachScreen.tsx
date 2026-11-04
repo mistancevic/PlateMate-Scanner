@@ -1,5 +1,5 @@
 import { BOOK_PAGES, BOOK_SOURCES } from "../bookPages";
-import { w } from "../words";
+import { w, numLocale, phoneLoc } from "../words";
 import { waLink } from "../phone";
 import { useEffect, useState } from "react";
 import { useKept } from "../kept";
@@ -206,7 +206,7 @@ export function ClientTail({ part, row, onSaved, setError, notify, confirmAi, co
               <div className="client-card-top">
                 <div>
                   <b>{f.taste}{f.shared?.reason ? <span className="reason-tag"> · {({ look: "look at this", ok: "was this OK?", help: "help me next time" } as any)[f.shared.reason]}</span> : null}</b>
-                  <small>{f.moment && f.moment !== "regular" ? `${MOMENTS.find((m) => m.id === f.moment)?.name} · ` : ""}{new Date(f.createdAt).toLocaleString([], { weekday: "short", hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" })}</small>
+                  <small>{f.moment && f.moment !== "regular" ? `${MOMENTS.find((m) => m.id === f.moment)?.name} · ` : ""}{new Date(f.createdAt).toLocaleString(phoneLoc(), { weekday: "short", hour: "2-digit", minute: "2-digit", day: "numeric", month: "short" })}</small>
                 </div>
                 {photo && <img className="client-photo" src={photo} alt="" />}
               </div>
@@ -445,7 +445,7 @@ export function WaitingRecipes({ notify, setError }: { notify: (m: string) => vo
       {list.map((r) => (
         <div className="card waiting-recipe" key={r.slug}>
           <div className="pub-head"><b>{r.title}</b><span className="pub-state waiting">{r.change ? "Changes" : "New"}</span></div>
-          <small className="muted">{bylineOf(r.author)} · sent {new Date(r.sentAt).toLocaleDateString()} {new Date(r.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small>
+          <small className="muted">{bylineOf(r.author)} · sent {new Date(r.sentAt).toLocaleDateString(phoneLoc())} {new Date(r.sentAt).toLocaleTimeString(phoneLoc(), { hour: "2-digit", minute: "2-digit" })}</small>
           <div className="publish-ways">
             <button className="pill" onClick={() => { setViewing(r); setSeen((x) => new Set(x).add(r.slug)); }}>{w("coach.seeThePage")}</button>
             <button className="pill pill-primary" disabled={!seen.has(r.slug)} onClick={() => answer(r, "live")}>{w("coach.makeItLive")}</button>

@@ -1,4 +1,4 @@
-import { numLocale, w } from "../words";
+import { numLocale, w, wnIn } from "../words";
 import { useState } from "react";
 import { KCAL_PER_KG, NEED_FULL, NEED_WEIGH, SKIP_DAYS, WINDOW, gapOf, kgText, longDate, shortDate, spanOf, type Measured, type MeasuredFixed } from "../measured";
 
@@ -10,7 +10,7 @@ export function Squares({ m, ends = true }: { m: Measured; ends?: boolean }) {
   if (!m.squares.length) return null;
   return (
     <>
-      <div className="ft-squares" role="img" aria-label={`${m.fullDays} full days and ${m.squares.filter((s) => s.weighed).length} weigh-ins in the first two weeks`}>
+      <div className="ft-squares" role="img" aria-label={w("measured.squaresAria", { full: m.fullDays, weighed: m.squares.filter((s) => s.weighed).length })}>
         {m.squares.map((s) => <span key={s.date} className={`ft-sq ${s.state} ${s.weighed ? "weighed" : ""}`}><span /><i /></span>)}
       </div>
       {ends && <div className="ft-ends"><span>{shortDate(m.squares[0].date)}</span><span>{shortDate(m.squares[WINDOW - 1].date)}</span></div>}
@@ -25,13 +25,13 @@ export function KnowCard({ m, openGoal }: { m: Measured; openGoal: () => void })
   return (
     <section className="card ft-card ft-know">
       {/* R21 (0.2.49, board RS20): past day 14 the count is over the last 14 days, and the card says so */}
-      <small className="ft-caps">GETTING TO KNOW YOU · {m.day! > WINDOW ? "THE LAST 14 DAYS" : `DAY ${m.day} OF ${WINDOW}`}</small>
+      <small className="ft-caps">{m.day! > WINDOW ? w("measured.knowLast14") : w("measured.knowDay", { day: m.day!, of: WINDOW })}</small>
       <b className="ft-ask">{w("measured.logEveryMealAndWeigh")}</b>
       <Squares m={m} />
       <Legend />
       <small className="ft-text">{m.day! < WINDOW
-        ? `On day 14, Chef Mealan calculates what your body really burns, from what you ate and how your weight moved. ${m.fullDays} full ${m.fullDays === 1 ? "day" : "days"} and ${weighed} ${weighed === 1 ? w("measured.weighIn") : "weigh-ins"} so far.`
-        : `Not enough data yet: ${m.fullDays} of ${NEED_FULL} full days and ${m.weighIns} of ${NEED_WEIGH} weigh-ins in the last 14 days. It goes on until it is ready.`}</small>
+        ? w("measured.onDay14", { full: (l) => wnIn(l, "measured.fullDaysN", m.fullDays), weighed: (l) => wnIn(l, "measured.weighInsN", weighed) })
+        : w("measured.notEnough", { full: m.fullDays, needFull: NEED_FULL, weighed: m.weighIns, needWeigh: NEED_WEIGH })}</small>
       <button className="link" style={{ alignSelf: "flex-start" }} onClick={openGoal}>{w("measured.howItWorks")}</button>
     </section>
   );
@@ -67,25 +67,25 @@ function Scale({ lo, kcal, hi, formula }: { lo: number; kcal: number; hi: number
   );
 }
 const Bar = ({ label, have, need }: { label: string; have: number; need: number }) => (
-  <div className="ft-bar"><div><span>{label}</span><span>{have} of {need} needed</span></div><i><em style={{ width: `${Math.min(100, (have / need) * 100)}%` }} /></i></div>
+  <div className="ft-bar"><div><span>{label}</span><span>{w("measured.ofNeeded", { have, need })}</span></div><i><em style={{ width: `${Math.min(100, (have / need) * 100)}%` }} /></i></div>
 );
 
 // FT3 and FT4 on Me, Goal; FT7 on the coach's page of a client (name given)
 export function BurnCard({ m, formulaKcal, name, inUse, onUse }: { m: Measured; formulaKcal: number | null; name?: string; inUse?: MeasuredFixed | null; onUse?: () => void }) {
   const [how, setHow] = useState(false);
   const coach = !!name;
-  const whose = coach ? `${name!.toUpperCase()}'S` : "YOUR";
+  const whose = coach ? name!.toUpperCase() : "";
   const fromStart = !!m.start && m.from === m.start;
   if (!m.ready) {
     return (
       <section className="card ft-card ft-burn ft-wait">
-        <small className="ft-caps">{whose} BURN, MEASURED{m.day ? (m.day > WINDOW ? " · THE LAST 14 DAYS" : ` · DAY ${m.day} OF ${WINDOW}`) : ""}</small>
+        <small className="ft-caps">{coach ? w("measured.burnOf", { who: whose }) : w("measured.burnYour")}{m.day ? (m.day > WINDOW ? w("measured.capsLast14") : w("measured.capsDay", { day: m.day, of: WINDOW })) : ""}</small>
         <b style={{ fontSize: 16 }}>{w("measured.notEnoughDataYet")}</b>
         <Squares m={m} />
         <Bar label={w("measured.fullDays")} have={m.fullDays} need={NEED_FULL} />
-        <Bar label={fromStart ? `Weigh-ins from day ${SKIP_DAYS + 1}` : "Weigh-ins"} have={m.weighIns} need={NEED_WEIGH} />
-        <small className="ft-text">A full day: every planned meal eaten, swapped or skipped on purpose, and anything extra logged. Weigh in in the morning, before breakfast.{fromStart ? ` The first ${SKIP_DAYS} days' weigh-ins don't count: early changes are mostly water.` : ""}</small>
-        <small className="ft-strong">{m.readyOn ? `Ready on ${longDate(m.readyOn)} at the earliest.` : w("measured.itGoesOnWithThe")}</small>
+        <Bar label={fromStart ? w("measured.weighFrom", { day: SKIP_DAYS + 1 }) : w("measured.weighIns")} have={m.weighIns} need={NEED_WEIGH} />
+        <small className="ft-text">{w("measured.fullDayIs")}{fromStart ? w("measured.firstDaysWater", { n: SKIP_DAYS }) : ""}</small>
+        <small className="ft-strong">{m.readyOn ? w("measured.readyOn", { date: longDate(m.readyOn) }) : w("measured.itGoesOnWithThe")}</small>
       </section>
     );
   }
@@ -94,7 +94,7 @@ export function BurnCard({ m, formulaKcal, name, inUse, onUse }: { m: Measured; 
   const weight = change === 0 ? "the same over 14 days" : `${change < 0 ? "down" : "up"} ${kgText(change)} in 14 days`;
   return (
     <section className="card ft-card ft-burn">
-      <small className="ft-caps">{whose} BURN, MEASURED · {coach ? "LAST 14 DAYS" : spanOf(m.from, m.to).toUpperCase()}</small>
+      <small className="ft-caps">{coach ? w("measured.burnOf", { who: whose }) : w("measured.burnYour")} · {coach ? w("measured.last14Caps") : spanOf(m.from, m.to).toUpperCase()}</small>
       <div className="ft-big"><b>{n(m.kcal!)}</b><b>{w("measured.kcalADay")}</b></div>
       <small className="ft-text">Somewhere between {n(m.lo!)} and {n(m.hi!)}.{formulaKcal ? ` The formula says ${n(formulaKcal)}.` : ""}</small>
       {!coach && <Scale lo={m.lo!} kcal={m.kcal!} hi={m.hi!} formula={formulaKcal} />}

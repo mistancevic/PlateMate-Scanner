@@ -2,6 +2,7 @@
 // outside, and the record line once every slot is eaten. A meal eaten for a slot counts as by the plan; a meal without a
 // slot counts as extra. Information for the person and, on Friday, their coach.
 import { aggregate, density, type Feedback } from "./pilot";
+import { w, numText } from "./words";
 import type { PlannedMeal } from "./planned";
 import type { Slot } from "./slots";
 
@@ -35,10 +36,10 @@ export function dayRecord(slots: Slot[], held: Record<string, PlannedMeal> | und
 // "1 of 3 by the plan so far, 1 extra · 1,420 of 2,200 kcal"
 export function planLine(r: DayRecord, dayKcal: number | null): string {
   const of = r.planned || r.slots.length;
-  const parts = [`${r.byPlan} of ${of} by the plan${r.done ? "" : " so far"}`];
-  if (r.extras.length) parts.push(`${r.extras.length} extra`);
-  const kcal = Math.round(r.kcal).toLocaleString("en");
-  return `${parts.join(", ")} · ${dayKcal ? `${kcal} of ${Math.round(dayKcal).toLocaleString("en")} kcal` : `${kcal} kcal`}`;
+  const parts = [w(r.done ? "rec.byPlan" : "rec.byPlanSoFar", { n: r.byPlan, of })];
+  if (r.extras.length) parts.push(w("rec.extra", { n: r.extras.length }));
+  const kcal = numText(Math.round(r.kcal));
+  return `${parts.join(", ")} · ${dayKcal ? w("rec.kcalOf", { kcal, of: numText(Math.round(dayKcal)) }) : `${kcal} kcal`}`;
 }
 
 // the record's sentence: "3 of 3 by the plan, 1 extra (the cake, 250 kcal)."

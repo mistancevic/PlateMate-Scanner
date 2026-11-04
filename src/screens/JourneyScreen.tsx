@@ -49,7 +49,7 @@ import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
 import { inPlaces, basicsHere, placeName } from "../places";
-import { referenceFood, foodName } from "../reference";
+import { referenceFood, foodName, foodV } from "../reference";
 import { identityOf, basicOf } from "../foodId";
 import { sameFoods as sameRecipeFoods, diffLine as recipeDiffLine, newNameFor } from "../recipeDiff";
 import { mealShare, mealNow, routeOf, solveMeal, closedSlots, unloggedMeal, mealRange, type Add } from "../makeMeal";
@@ -249,7 +249,7 @@ export function JourneyScreen(p: AppApi) {
             <button type="button" className="link" onClick={() => removeDish(g.id)}>{w("make.takeItOffThePlate")}</button>
           </details>
         </div>
-        <div className="dish-portions" aria-label={`${g.n} of ${g.of} portions`}>
+        <div className="dish-portions" aria-label={w("plate.nOfPortions", { n: g.n, of: g.of })}>
           <button type="button" className="icon" aria-label={w("make.onePortionLess")} onClick={() => setPortions(g.id, g.n - 1)}>−</button>
           <b>{g.n} of {g.of}</b>
           <button type="button" className="icon" aria-label={w("make.onePortionMore")} onClick={() => setPortions(g.id, g.n + 1)}>+</button>
@@ -299,6 +299,8 @@ export function JourneyScreen(p: AppApi) {
   // a plate made for a slot (0.2.2): put it in, saved to My recipes once. A recipe with the same name, foods and amounts is
   // the same recipe, so coming back by Fit it on the Plate and putting it in again does not double it.
   const slotName = (f: NonNullable<typeof p.filling>) => `${f.dayName === "today" ? "today's" : `${f.dayName}'s`} ${f.name.toLowerCase()}`;
+  // DT203 phase 9: the slot in a line's own language: today's lunch · ručak danas · ručak, četvrtak
+  const slotV = (f: NonNullable<typeof p.filling>): Val => (l) => { if (l === "en") return slotName(f); const m = (mealV(f.name, true) as (x: typeof l) => string | null)(l); if (m === null) return null; return f.dayName === "today" ? `${m} ${wIn(l, "plate.todayLow") ?? ""}`.trim() : `${m}, ${new Date(`${f.date}T12:00:00`).toLocaleDateString("sr-Latn-RS", { weekday: "long" })}`; };
   // DT149 (0.2.130, board Stories101 version 2): the plate's day decides what it is for: the past adds what you ate, the future
   // plans, the moment is what you eat (src/plateMode.ts)
   const plateWhen = plateWhenOf(p.filling);
@@ -605,6 +607,7 @@ export function JourneyScreen(p: AppApi) {
     setJustSkipped(a === "skipped" ? slotId : null);
   };
   const mealWord = (mealSlot?.name ?? "meal").toLowerCase();
+  const mealW = mealV(mealWord, true), MealW = mealV(mealWord);
   const Meal = mealWord.charAt(0).toUpperCase() + mealWord.slice(1);
   // R11 (0.2.37): the line says what the plate is for; the section's chips and their hint
   const capName = (n: string) => n.charAt(0).toUpperCase() + n.slice(1);
@@ -1564,11 +1567,11 @@ export function JourneyScreen(p: AppApi) {
             <div className="readout-mid">
               <b>{pdVal(pd)}</b>
               {/* DT93, rule 3: a plate far over the meal says so, instead of going to the maths */}
-              <div><span>{tooBig ? `not a ${mealWord} yet` : pd !== null && pdRef !== null ? (pd >= pdRef - 0.05 ? w("plate.fitsPlan") : w("plate.underYour", { gap: fixed(pdRef - pd), target: fixed(pdRef) })) : w("plate.noTarget")}</span><small className="rd-rows"><span>{w("plate.energy")}</span><b>{fmt(t.calories, 0)}</b> <span>kcal</span><span>{w("plate.weight")}</span><b>{fmt(t.weight, 0)}</b> <span>g</span><span>{w("plate.protein")}</span><b>{fmt(t.protein, 0)}</b> <span>g</span></small></div>
+              <div><span>{tooBig ? w("plate.notYet", { meal: mealW }) : pd !== null && pdRef !== null ? (pd >= pdRef - 0.05 ? w("plate.fitsPlan") : w("plate.underYour", { gap: fixed(pdRef - pd), target: fixed(pdRef) })) : w("plate.noTarget")}</span><small className="rd-rows"><span>{w("plate.energy")}</span><b>{fmt(t.calories, 0)}</b> <span>kcal</span><span>{w("plate.weight")}</span><b>{fmt(t.weight, 0)}</b> <span>g</span><span>{w("plate.protein")}</span><b>{fmt(t.protein, 0)}</b> <span>g</span></small></div>
             </div>
             {/* DT108 (0.2.92): four letters read the plate against your day, F C Fi P */}
             {/* DT116 (0.2.98) and 0.2.99: the letters with their grams, one block; sugars, saturates and salt in the tap */}
-            {p.rates ? <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} who="the plate" extra={extrasText(items)} open={numbersOpen} setOpen={setNumbersOpen} /> : extras(items)}
+            {p.rates ? <Letters n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} who={w("letters.thePlate")} extra={extrasText(items)} open={numbersOpen} setOpen={setNumbersOpen} /> : extras(items)}
           </section>
         )}
         {items.length > 0 && numbersOpen && p.rates && <NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} extra={extrasText(items)} weight={t.weight ?? null} day={dayNums} plan={planNow} />}
@@ -1632,7 +1635,7 @@ export function JourneyScreen(p: AppApi) {
                 : i.locked ? <b className="row-num">{fmt(i.grams, 0)} g{servingLabel(i.food, i.grams) ? <small> = {servingLabel(i.food, i.grams)}</small> : null}</b> : (
                   <label className="grams">
                     {i.est && <span className="mp-est" aria-label="estimated">~</span>}
-                    <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : Math.round(i.grams * 10) / 10}
+                    <input aria-label={w("meal.gramsOf", { food: foodV(i.food) })} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : Math.round(i.grams * 10) / 10}
                       onChange={(e) => { setTouched((t) => new Set(t).add(i.id)); updateItem(i.id, { grams: Math.max(0, Number(e.target.value) || 0) }); }}
                       onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done"
                       onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ block: "center", behavior: "smooth" }), 250)} />
@@ -1766,9 +1769,9 @@ export function JourneyScreen(p: AppApi) {
           <section className="card gate-card" aria-label={`${CHEF_NAME} on this plate`}>
             <b><ChefHat size={16} /> {CHEF_NAME}</b>
             {bigPlate && (<div className="gate-big">
-              <small>Your plate is already about {bigN} {mealWord} portions: {fmt(t.calories, 0)} kcal of {fmt(mealRange(share!.kcal)[0], 0)} to {fmt(mealRange(share!.kcal)[1], 0)}. Nothing can be added to make it one.</small>
+              <small>{w("plate.alreadyAbout", { n: bigN, meal: mealW, kcal: fmt(t.calories, 0), lo: fmt(mealRange(share!.kcal)[0], 0), hi: fmt(mealRange(share!.kcal)[1], 0) })}</small>
               <div className="button-row">
-                <button className="pill pill-small pill-primary" onClick={makeItN}>Make it {bigN} portions</button>
+                <button className="pill pill-small pill-primary" onClick={makeItN}>{wn("plate.makeItN", bigN)}</button>
                 <button className="pill pill-small" onClick={shrinkToOne}>{w("make.shrinkItToOnePortion")}</button>
                 <button className="pill pill-small" onClick={() => setBigKept(dishSig)}>{w("make.keepItAsItIs")}</button>
               </div>
@@ -1785,7 +1788,7 @@ export function JourneyScreen(p: AppApi) {
             {dishWanted && (!dishNow || dishNow.status === "working") && <small className="gate-wait">{w("make.readingYourPlate")}</small>}
             {/* DT104 (0.2.92): a failed read says so, with Try again; before, it showed nothing and the plate looked checked */}
             {dishNow && dishNow.status === "off" && (<>
-              <small>{CHEF_NAME} could not read your plate.</small>
+              <small>{w("plate.couldNotRead")}</small>
               <div className="button-row"><button className="pill pill-small" onClick={() => setDishTry((n) => n + 1)}>{w("make.tryAgain")}</button></div>
             </>)}
             {dishNow && dishNow.status === "done" && dishNow.makesIt && dishNow.why && !bigPlate && <div className="gate-line-row gate-yes"><b>✓ Culinary</b><small>{dishNow.why}</small></div>}
@@ -1913,16 +1916,16 @@ export function JourneyScreen(p: AppApi) {
               : <><small className="muted">{rec.source?.from === "link" ? w("make.asThePageWritesThem") : w("make.asTheRecipeWritesThem")}, for the whole recipe.</small><OriginalSteps steps={rec.source!.steps!} /></>}
           </section>
         ) : null}
-        {imported && share && <p className="small center">{Meal} is about {fmt(share.kcal, 0)} kcal{dayNums ? ` of your ${fmt(dayNums.kcal, 0)}` : ""}{pdRef !== null ? `, at ${pdTag()} ${pdVal(pdRef)} or more` : ""}.</p>}
-        {!imported && !madeBy && chefable && share && items.length > 0 && <p className="small center">{Meal} is about {fmt(share.kcal, 0)} kcal{dayNums ? ` of your ${fmt(dayNums.kcal, 0)}` : ""}{pdRef !== null ? `, at ${pdTag()} ${pdVal(pdRef)} or more` : ""}.{p.filling && plateWhen !== "now" ? "" : <> {CHEF_NAME} adds what it needs to land your {mealWord} in its range. Keep it as it is {p.filling ? `puts the plate in ${slotName(p.filling)} as it stands` : "takes the plate as it stands"}.</>}</p>}
+        {imported && share && <p className="small center">{w("plate.mealAbout", { meal: MealW, kcal: fmt(share.kcal, 0) })}{dayNums ? w("plate.ofYour", { kcal: fmt(dayNums.kcal, 0) }) : ""}{pdRef !== null ? w("plate.atPd", { tag: pdTag(), pd: pdVal(pdRef) }) : ""}.</p>}
+        {!imported && !madeBy && chefable && share && items.length > 0 && <p className="small center">{w("plate.mealAbout", { meal: MealW, kcal: fmt(share.kcal, 0) })}{dayNums ? w("plate.ofYour", { kcal: fmt(dayNums.kcal, 0) }) : ""}{pdRef !== null ? w("plate.atPd", { tag: pdTag(), pd: pdVal(pdRef) }) : ""}.{p.filling && plateWhen !== "now" ? "" : <> {w("plate.chefAdds", { meal: mealW })} {p.filling ? w("plate.keepPuts", { slot: slotV(p.filling) }) : w("plate.keepTakes")}</>}</p>}
         {!madeBy && chefable && share && items.length > 0 && unlogged && state.photo?.who !== "idea" && (() => {
           const name = unlogged.name.charAt(0).toUpperCase() + unlogged.name.slice(1);
           const ifSkipped = mealSlot && dayNums ? mealShare(daySlots, mealSlot.id, { kcal: dayNums.kcal, protein: dayNums.protein }, { kcal: dayRec.kcal, protein: dayRec.protein }, new Set([...closed, unlogged.id])) : null;
           return (
             <div className="ms-ask">
-              <small className="ms-q">{name} isn't logged today. Did you have it?</small>
+              <small className="ms-q">{w("plate.notLogged", { meal: mealV(unlogged.name) })}</small>
               <div className="button-row"><button className="pill pill-small" onClick={() => answer(unlogged.id, "had")}>{w("make.iHadIt")}</button><button className="pill pill-small" onClick={() => answer(unlogged.id, "skipped")}>{w("make.iSkippedIt")}</button></div>
-              <small className="muted">I had it: {mealWord} stays about {fmt(share.kcal, 0)} kcal. I skipped it: {unlogged.name.toLowerCase()}'s share moves to {mealWord}{ifSkipped ? `, about ${fmt(ifSkipped.kcal, 0)} kcal` : ""}.</small>
+              <small className="muted">{ifSkipped ? w("plate.hadSkippedAbout", { meal: mealW, kcal: fmt(share.kcal, 0), other: mealV(unlogged.name, true), kcal2: fmt(ifSkipped.kcal, 0) }) : w("plate.hadSkipped", { meal: mealW, kcal: fmt(share.kcal, 0), other: mealV(unlogged.name, true) })}</small>
             </div>
           );
         })()}
@@ -2026,7 +2029,7 @@ export function JourneyScreen(p: AppApi) {
               {isCounted(i) ? <CountAmount item={i} editable={!i.locked} onGrams={(g) => edit(i.id, g)} /> : i.locked ? <b className="row-num">{fmt(i.grams, 0)} g</b> : (
                 <label className="grams">
                   {i.est && <span className="mp-est" aria-label="estimated">~</span>}
-                  <input aria-label={`Grams of ${i.food.name}`} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : Math.round(i.grams * 10) / 10}
+                  <input aria-label={w("meal.gramsOf", { food: foodV(i.food) })} type="number" min="0" inputMode="decimal" value={i.grams === 0 ? "" : Math.round(i.grams * 10) / 10}
                     onChange={(e) => edit(i.id, Math.max(0, Number(e.target.value) || 0))}
                     onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} enterKeyHint="done"
                     onFocus={(e) => setTimeout(() => e.target.scrollIntoView({ block: "center", behavior: "smooth" }), 250)} />

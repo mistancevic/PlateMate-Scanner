@@ -1,7 +1,8 @@
 import { useRef, useState, type ReactNode } from "react";
+import { w } from "../words";
 // Swipe right to remove, swipe left to swap. Shows the action behind the row while dragging. Works with a finger or a mouse.
 // R19 (0.2.47): the words can be the row's own (Skip, Empty); a drag never counts as a tap on the row.
-export function SwipeRow({ children, onRemove, onSwap, removeLabel = "Remove", swapLabel = "Swap" }: { children: ReactNode; onRemove: () => void; onSwap: () => void; removeLabel?: string; swapLabel?: string }) {
+export function SwipeRow({ children, onRemove, onSwap, removeLabel = w("swipe.remove"), swapLabel = w("swipe.swap") }: { children: ReactNode; onRemove: () => void; onSwap: () => void; removeLabel?: string; swapLabel?: string }) {
   const [dx, setDx] = useState(0);
   const start = useRef<{ x: number; y: number } | null>(null);
   const dragging = useRef(false);

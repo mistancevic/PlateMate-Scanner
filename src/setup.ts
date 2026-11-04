@@ -3,23 +3,24 @@
 // or Profile and plan fully set. Name, body fat, the coach and Google Calendar are optional and never listed.
 import type { Personal } from "./personal";
 import { planOf } from "./personal";
+import { w } from "./words";
 import type { Safety } from "./safety";
 export type SetupStep = "profile" | "goal" | "life" | "week" | "shop";
 export type Missing = { step: SetupStep; label: string; field?: "sex" | "birthYear" | "height" | "weight" | "health" };
 export function setupMissing(x: { personal: Personal; safety: Safety; goal: unknown; region: string | null | undefined }): Missing[] {
   const p = x.personal, out: Missing[] = [];
-  if (!p.sex) out.push({ step: "profile", label: "female or male", field: "sex" });
-  if (!p.birthYear) out.push({ step: "profile", label: "birth year", field: "birthYear" });
-  if (!p.heightCm) out.push({ step: "profile", label: "height", field: "height" });
-  if (!p.weightKg) out.push({ step: "profile", label: "weight", field: "weight" });
-  if (!x.safety.declaredAt) out.push({ step: "profile", label: "health questions", field: "health" });
-  if (!x.goal) out.push({ step: "goal", label: "goal" });
-  if (!p.lifestyle) out.push({ step: "life", label: "lifestyle" });
-  if (!planOf(p)) out.push({ step: "week", label: "training week" });
-  if (!x.region) out.push({ step: "shop", label: "where you shop" });
+  if (!p.sex) out.push({ step: "profile", get label() { return w("setup.sex"); }, field: "sex" });
+  if (!p.birthYear) out.push({ step: "profile", get label() { return w("setup.birthYear"); }, field: "birthYear" });
+  if (!p.heightCm) out.push({ step: "profile", get label() { return w("setup.height"); }, field: "height" });
+  if (!p.weightKg) out.push({ step: "profile", get label() { return w("setup.weight"); }, field: "weight" });
+  if (!x.safety.declaredAt) out.push({ step: "profile", get label() { return w("setup.health"); }, field: "health" });
+  if (!x.goal) out.push({ step: "goal", get label() { return w("setup.goal"); } });
+  if (!p.lifestyle) out.push({ step: "life", get label() { return w("setup.life"); } });
+  if (!planOf(p)) out.push({ step: "week", get label() { return w("setup.week"); } });
+  if (!x.region) out.push({ step: "shop", get label() { return w("setup.shop"); } });
   return out;
 }
-export const toSetLine = (m: Missing[]) => `To set: ${m.map((x) => x.label).join(", ")}`;
+export const toSetLine = (m: Missing[]) => w("setup.toSet", { what: m.map((x) => x.label).join(", ") });
 // what a step still needs, for its To do on Me
 export const stepMissing = (m: Missing[], step: SetupStep) => m.filter((x) => x.step === step);
 // the field Profile opens on, when a row sends you there
