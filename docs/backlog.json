@@ -120,7 +120,7 @@
       "title": "Languages: Serbian and German after English",
       "epic": "lang",
       "state": "now",
-      "why": "Brainstormed. Open: who reviews German, Latin or Cyrillic for Serbian, AI answers first or screens first. 19:24: Serbian Latin, Chef Mealan first, screens English for a while. Board v2 with the table; Go at 19:39. Release 1 in 0.3.76: Settings, Language; his lines and safety lines in Serbian once ticked in the table; his AI answers in Serbian; cook mode hears dalje, nazad, ponovi, koliko. Board Stories176 (release 3, the Plate in Srpski) approved 4 November 00:00; release 2 Go 00:04, in phases (04:38). Phase 1 in 0.3.77: words.ts and en.json, the Plate's words, the bar, numbers by language, he|she and counts, three plate lines of Chef Mealan, the guard test. Next: Milan ticks the Plate in his table; then phase 2, Today.",
+      "why": "Brainstormed. Open: who reviews German, Latin or Cyrillic for Serbian, AI answers first or screens first. 19:24: Serbian Latin, Chef Mealan first, screens English for a while. Board v2 with the table; Go at 19:39. Release 1 in 0.3.76: Settings, Language; his lines and safety lines in Serbian once ticked in the table; his AI answers in Serbian; cook mode hears dalje, nazad, ponovi, koliko. Board Stories176 (release 3, the Plate in Srpski) approved 4 November 00:00; release 2 Go 00:04, in phases (04:38). Phase 1 in 0.3.77: words.ts and en.json, the Plate's words, the bar, numbers by language, he|she and counts, three plate lines of Chef Mealan, the guard test. Next: Milan ticks the Plate in his table; then phase 2, Today. Phase 2 in 0.3.78: Today. 8 phases (Plate, Today, Plan, Recipes, Cooking, Foods, Me and setup, Clients and the rest). Translating in context is DT234; the page's language for screen readers goes with each phase (DT235).",
       "board": 175
     },
     {
@@ -515,6 +515,20 @@
       "board": 173,
       "why": "Milan 17:46: lines for the deployments on GitHub. Draw 18:03; board drawn, Go at 18:21.",
       "version": "0.3.74"
+    },
+    {
+      "id": "DT234",
+      "title": "Translating in context: drafts on the preview, from the table to the page, pictures, a change log, edit in place, live lines",
+      "epic": "lang",
+      "state": "later",
+      "why": "Coach Milan 4 November 05:17 to 06:09, brainstorm. A ladder of six steps, each of value alone, each an upgrade of the one before; the last, live lines from the database with draft and live, is the best final version. Notes in docs/i18n/editing-ladder.md. Built after the 8 phases of DT203 release 2, unless Milan starts step A earlier."
+    },
+    {
+      "id": "DT235",
+      "title": "Accessibility: WCAG 2.2 AA, checked area by area",
+      "epic": "trust",
+      "state": "next",
+      "why": "Coach Milan 4 November 06:01 to 06:09. Not checked yet: contrast, colour alone (PD verdict, letters), screen readers in practice, large text, photo descriptions, the page's language (lang sr for Srpski, English parts marked). Plan: axe in the walkthroughs on every release, a manual pass with VoiceOver and TalkBack on the Plate, Today and cooking, fixes area by area. Whether the European Accessibility Act applies is a question for a lawyer."
     }
   ]
 }
