@@ -1,4 +1,4 @@
-import { numLocale } from "../words";
+import { numLocale, w } from "../words";
 import { useRef, useState } from "react";
 import { DAY_TYPES, type DayNumbers, type DayType, type OwnDay, type Week } from "../personal";
 import { density } from "../pilot";
@@ -11,10 +11,10 @@ import { loadOf, planShort, type PlanDay } from "../plan";
 type Row = DayNumbers & { source?: "you" | "calculated" | "average" };
 type Field = "kcal" | "protein" | "fats" | "carbs";
 // the resting burn's source, from the formula the calculation names (canvas board TW, F1)
-const restSource = (line = "") => (/Schofield/.test(line) ? "Schofield 1985 (FAO/WHO/UNU)" : /Katch/.test(line) ? "Katch and McArdle" : "Mifflin et al. 1990");
+const restSource = (line = "") => (/Schofield/.test(line) ? w("daytable.schofieldFaoWhoUnu") : /Katch/.test(line) ? w("daytable.katchAndMcardle") : w("daytable.mifflinEtAl"));
 // From your data (0.2.7, board FT, FT5): the days' line about the measured burn names the 14 days as the source
 const dataSource = (how: string[] = []) => { const m = how.join(" ").match(/measured burn, [\d,]+ kcal a day \((\d+ \w+) to (\d+ \w+)\)/); return m ? `your own 14 days, ${m[1]} to ${m[2]}` : null; };
-const LABEL: Record<Field, string> = { kcal: "kcal", protein: "protein g", fats: "fat g", carbs: "carbs g" };
+const LABEL: Record<Field, string> = { get kcal() { return w("daytable.kcal"); }, protein: "protein g", fats: "fat g", carbs: "carbs g" };
 
 export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, weekdays, note }: {
   note?: string;
@@ -37,24 +37,24 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
   const trainingDays = 7 - (week.passive || 0);
   const avgLine = <p className="dt-avg">Your week averages {avg.kcal.toLocaleString(numLocale())} kcal at PD {(density(avg.protein, avg.kcal) ?? 0).toFixed(1)}{mix ? `, with ${trainingDays} training ${trainingDays === 1 ? "day" : "days"} and ${7 - trainingDays} without` : ""}.{note ? ` ${note}` : ""}</p>;
   const howBlock = (d: string, r: Row) => how === d && <div className="dt-how">{r.how.map((l, i) => <p key={i} className={i === r.how.length - 1 ? "dt-sum" : ""}>{l}</p>)}</div>;
-  const howLink = (d: string) => <button type="button" className="link" aria-expanded={how === d} onClick={() => setHow(how === d ? null : d)}>{how === d ? "Hide" : "How ›"}</button>;
+  const howLink = (d: string) => <button type="button" className="link" aria-expanded={how === d} onClick={() => setHow(how === d ? null : d)}>{how === d ? "Hide" : w("daytable.how")}</button>;
 
   if (!setOwn && weekdays) {
     return (
-      <div className="day-table" aria-label="Your days">
-        <div className="dt-head"><span>Day</span><span>kcal</span><span>protein</span><span>fat</span><span>carbs</span></div>
-        {weekdays.map((w) => (
-          <div className="dt-row" key={w.name}>
+      <div className="day-table" aria-label={w("daytable.yourDays")}>
+        <div className="dt-head"><span>{w("daytable.day")}</span><span>{w("daytable.kcal")}</span><span>{w("daytable.protein")}</span><span>{w("daytable.fat")}</span><span>{w("daytable.carbs")}</span></div>
+        {weekdays.map((wd) => (
+          <div className="dt-row" key={wd.name}>
             <div className="dt-cells">
               {/* DT144 (0.3.38, board Stories146): each day's PD, the number Today shows on that day */}
-              <span className="dt-day"><b><i className={`load-dot load-${loadOf(w.day)}`} />{w.name}</b><small>{planShort(w.day)}</small><b className="dt-pd">PD {(density(w.protein, w.kcal) ?? 0).toFixed(1)}</b></span>
-              <b className="dt-num">{w.kcal.toLocaleString(numLocale())}</b>
-              <span className="dt-num">{w.protein}</span>
-              <span className="dt-num muted">{w.fats}</span>
-              <span className="dt-num muted">{w.carbs}</span>
+              <span className="dt-day"><b><i className={`load-dot load-${loadOf(wd.day)}`} />{wd.name}</b><small>{planShort(wd.day)}</small><b className="dt-pd">PD {(density(wd.protein, wd.kcal) ?? 0).toFixed(1)}</b></span>
+              <b className="dt-num">{wd.kcal.toLocaleString(numLocale())}</b>
+              <span className="dt-num">{wd.protein}</span>
+              <span className="dt-num muted">{wd.fats}</span>
+              <span className="dt-num muted">{wd.carbs}</span>
             </div>
-            <div className="dt-src">{howLink(w.name)}</div>
-            {howBlock(w.name, w)}
+            <div className="dt-src">{howLink(wd.name)}</div>
+            {howBlock(wd.name, wd)}
           </div>
         ))}
         {avgLine}
@@ -64,8 +64,8 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
   }
   if (!setOwn) {
     return (
-      <div className="day-table" aria-label="Your days">
-        <div className="dt-head"><span>Day</span><span>kcal</span><span>protein</span><span>fat</span><span>carbs</span></div>
+      <div className="day-table" aria-label={w("daytable.yourDays")}>
+        <div className="dt-head"><span>{w("daytable.day")}</span><span>{w("daytable.kcal")}</span><span>{w("daytable.protein")}</span><span>{w("daytable.fat")}</span><span>{w("daytable.carbs")}</span></div>
         {DAY_TYPES.map((d) => {
           const r = rows[d.id];
           return (
@@ -77,7 +77,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
                 <span className="dt-num muted">{r.fats}</span>
                 <span className="dt-num muted">{r.carbs}</span>
               </div>
-              <div className="dt-src">{r.source === "you" ? <small>Set by you</small> : howLink(d.id)}</div>
+              <div className="dt-src">{r.source === "you" ? <small>{w("daytable.setByYou")}</small> : howLink(d.id)}</div>
               {howBlock(d.id, r)}
             </div>
           );
@@ -97,8 +97,8 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
       <span>{f.body}</span>
       <small>{f.source}</small>
       <div className="finding-acts">
-        <button type="button" className="pill pill-small" onClick={() => keep?.(f)}>Keep, on purpose</button>
-        <button type="button" className="pill pill-small pill-primary" onClick={() => focus(f)}>Change it</button>
+        <button type="button" className="pill pill-small" onClick={() => keep?.(f)}>{w("daytable.keepOnPurpose")}</button>
+        <button type="button" className="pill pill-small pill-primary" onClick={() => focus(f)}>{w("daytable.changeIt")}</button>
       </div>
     </div>
   ) : <p className="finding-kept" key={f.id}>Kept on purpose: {f.title.toLowerCase()}</p>;
@@ -107,7 +107,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
     return (
       <label className="dt-field" key={field}>
         <input ref={(el) => { refs.current[key] = el; }} className={`dt-input ${typed ? "typed" : ""} ${warn ? "warn" : ""}`} inputMode="numeric"
-          aria-label={`${DAY_TYPES.find((x) => x.id === d)!.name}, ${field === "kcal" ? "kcal" : `${field === "fats" ? "fat" : field} in grams`}`}
+          aria-label={`${DAY_TYPES.find((x) => x.id === d)!.name}, ${field === "kcal" ? w("daytable.kcal") : `${field === "fats" ? w("daytable.fat") : field} in grams`}`}
           placeholder={shown ? `≈${shown}` : "enter"} value={draft[key] ?? (typed ? String(typed) : "")}
           onChange={(e) => setDraft((x) => ({ ...x, [key]: e.target.value }))}
           onBlur={(e) => { const n = Number(e.target.value); setOwn(d, { [field]: e.target.value.trim() === "" || !Number.isFinite(n) || n <= 0 ? undefined : Math.round(n) }); setDraft((x) => { const y = { ...x }; delete y[key]; return y; }); }}
@@ -117,13 +117,13 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
     );
   };
   return (
-    <div className="day-blocks" aria-label="Your days">
+    <div className="day-blocks" aria-label={w("daytable.yourDays")}>
       {DAY_TYPES.map((d) => {
         const r = rows[d.id], o = own?.[d.id] ?? {};
         const typedAll = (["kcal", "protein", "fats", "carbs"] as Field[]).every((f) => (o[f] ?? 0) > 0);
         const sum = typedAll ? addsUp(r) : null;
         const fills = [!o.protein && "protein from your other days", !o.fats && "fat 30 % of the average day", !o.carbs && "carbs the rest"].filter(Boolean) as string[];
-        const filled = o.kcal && fills.length ? (fills.length === 2 && !o.fats && !o.carbs ? "Fat and carbs filled: fat 30 % of the average day, carbs the rest" : `Filled: ${fills.join(", ")}`) : null;
+        const filled = o.kcal && fills.length ? (fills.length === 2 && !o.fats && !o.carbs ? w("daytable.fatAndCarbsFilledFat") : `Filled: ${fills.join(", ")}`) : null;
         const dayFindings = findings.filter((f) => f.day === d.id);
         const edge = dayFindings.some(isOpen) || sum !== null;
         return (
@@ -132,8 +132,8 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
             <div className="dt-fields">{(["kcal", "protein", "fats", "carbs"] as Field[]).map((f) => input(d.id, f, r[f], sum !== null))}</div>
             <div className="dt-src">
               {sum !== null ? <small className="warn">These come to {sum.toLocaleString(numLocale())}, not {r.kcal.toLocaleString(numLocale())}: {Math.abs(sum - r.kcal)} kcal apart</small>
-                : o.kcal ? <small>{filled ?? "Set by you"}</small>
-                : <><small>{r.source === "calculated" ? "Calculated, nothing typed" : "Nothing typed: the average of the days you typed"}</small>{howLink(d.id)}</>}
+                : o.kcal ? <small>{filled ?? w("daytable.setByYou")}</small>
+                : <><small>{r.source === "calculated" ? w("daytable.calculatedNothingTyped") : w("daytable.nothingTypedTheAverageOf")}</small>{howLink(d.id)}</>}
             </div>
             {howBlock(d.id, r)}
             {dayFindings.map(card)}
@@ -157,8 +157,8 @@ export function FindingList({ analysis, open, keep }: { analysis: Analysis; open
         <div className="finding" key={f.id} role="note">
           <b>{f.title}</b><span>{f.body}</span><small>{f.source}</small>
           <div className="finding-acts">
-            <button type="button" className="pill pill-small" onClick={() => keep(f)}>Keep, on purpose</button>
-            <button type="button" className="pill pill-small pill-primary" onClick={() => { const el = document.getElementById(`own-${f.field}`) as HTMLInputElement | null; el?.focus(); el?.select(); }}>Change it</button>
+            <button type="button" className="pill pill-small" onClick={() => keep(f)}>{w("daytable.keepOnPurpose")}</button>
+            <button type="button" className="pill pill-small pill-primary" onClick={() => { const el = document.getElementById(`own-${f.field}`) as HTMLInputElement | null; el?.focus(); el?.select(); }}>{w("daytable.changeIt")}</button>
           </div>
         </div>
       ) : <p className="finding-kept" key={f.id}>Kept on purpose: {f.title.toLowerCase()}</p>)}

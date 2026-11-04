@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { w } from "../words";
 import { kgToLb, lbToKg, ftIn, parseFtIn, METRIC, type Units } from "../units";
 
 // Body weight and height asked in the units chosen (0.2.18, board UN, UN2); the account keeps kg and cm.
@@ -24,9 +25,9 @@ export function HeightField({ cm, unit = METRIC.height, onCm, onDone, id }: { id
   const [t, setT] = useState(cmShown(cm, unit));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setT(cmShown(cm, unit)), [unit]);
-  if (unit === "cm") return <label className="field" id={id}><span>Height, cm</span><input inputMode="numeric" value={t} placeholder="enter cm" onChange={(e) => { setT(e.target.value); onCm(num(e.target.value)); }} onBlur={onDone} /></label>;
+  if (unit === "cm") return <label className="field" id={id}><span>{w("units.heightCm")}</span><input inputMode="numeric" value={t} placeholder="enter cm" onChange={(e) => { setT(e.target.value); onCm(num(e.target.value)); }} onBlur={onDone} /></label>;
   return (
-    <label className="field" id={id}><span>Height, ft and in</span>
+    <label className="field" id={id}><span>{w("units.heightFtAndIn")}</span>
       <input value={t} placeholder="enter ft and in" onChange={(e) => {
         setT(e.target.value);
         if (!e.target.value.trim()) return onCm(undefined);

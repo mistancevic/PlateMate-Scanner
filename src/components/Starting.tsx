@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { w } from "../words";
 import { Mark, APP_NAME } from "./Mark";
 import { startLine } from "../startTimes";
 
@@ -15,14 +16,14 @@ export function Starting({ onLocal }: { onLocal: (() => void) | null }) {
       <main className="starting" aria-live="polite">
         <Mark size={64} color="var(--brand)" />
         <b>{APP_NAME}</b>
-        <p>{onLocal ? "Opening your account…" : "Checking your sign-in…"}</p>
+        <p>{onLocal ? w("starting.openingYourAccount") : w("starting.checkingYourSignIn")}</p>
         {slow && (
           <div className="starting-slow">
-            <p>This is taking longer than usual. The connection may be slow.</p>
+            <p>{w("starting.thisIsTakingLongerThan")}</p>
             {startLine() && <small className="muted starting-steps">{startLine()}</small>}
-            {onLocal && <button className="pill pill-primary action-main" onClick={onLocal}>Open with what's on this phone</button>}
-            <button className="link" onClick={() => location.reload()}>Try again</button>
-            {onLocal && <small>Chef Mealan keeps trying your account in the background, and nothing you change on this phone is lost.</small>}
+            {onLocal && <button className="pill pill-primary action-main" onClick={onLocal}>{w("starting.openWithWhatSOn")}</button>}
+            <button className="link" onClick={() => location.reload()}>{w("starting.tryAgain")}</button>
+            {onLocal && <small>{w("starting.chefMealanKeepsTryingYour")}</small>}
           </div>
         )}
       </main>

@@ -1,4 +1,5 @@
 import { ConfirmButton } from "./Confirm";
+import { w } from "../words";
 import { APP_NAME } from "./Mark";
 import { ADULT_ONLY } from "../safety";
 
@@ -9,18 +10,18 @@ export function Welcome({ name, onConfirm, onSignOut }: { name: string; onConfir
     <div className="app-shell">
       <main className="gate">
         <b className="gate-brand">{APP_NAME}</b>
-        <h1>{name ? `Welcome, ${name}` : "Welcome"}</h1>
-        <p className="gate-lead">Eat what you crave. Chef Mealan tells you how much.</p>
+        <h1>{name ? w("welcome.welcomeName", { name }) : w("welcome.welcome")}</h1>
+        <p className="gate-lead">{w("welcome.eatWhatYouCraveChef")}</p>
         <ul className="gate-list">
-          <li><b>Scan a label or a plate,</b> and Chef Mealan reads it.</li>
-          <li><b>Pick what you want to eat,</b> and get the amounts that fit your goal.</li>
-          <li><b>Ask Chef Mealan</b> for inspiration and recipes that fit your planned day and your cravings.</li>
+          <li><b>{w("welcome.scanALabel")}</b> {w("welcome.andChefMealanReadsIt")}</li>
+          <li><b>{w("welcome.pickWhat")}</b> {w("welcome.andGetTheAmountsThat")}</li>
+          <li><b>{w("welcome.askChefMealan")}</b> {w("welcome.forInspirationAndRecipesThat")}</li>
         </ul>
-        <p>Chef Mealan uses AI to read labels and photos, and to answer you in the chat. AI can get things wrong, so take a second look at what it reads and says. Your numbers come from a calculator, not from the AI.</p>
-        <p>That AI is for adults, so Chef Mealan is too.</p>
+        <p>{w("welcome.chefMealanUsesAiTo")}</p>
+        <p>{w("welcome.thatAiIsForAdults")}</p>
         <div className="actions gate-actions">
-          <button className="pill pill-primary action-main" onClick={onConfirm}>I'm 18 or older, let's start</button>
-          {onSignOut && <button className="link action-cancel" onClick={onSignOut}>Not yet 18? Sign out</button>}
+          <button className="pill pill-primary action-main" onClick={onConfirm}>{w("welcome.iMOrOlderLet")}</button>
+          {onSignOut && <button className="link action-cancel" onClick={onSignOut}>{w("welcome.notYetSignOut")}</button>}
         </div>
       </main>
     </div>
@@ -32,13 +33,13 @@ export function AdultOnly({ onCorrect, onDelete }: { onCorrect: () => void; onDe
   return (
     <main className="gate">
       <b className="gate-brand">{APP_NAME}</b>
-      <h1>Chef Mealan is for adults</h1>
+      <h1>{w("welcome.chefMealanIsForAdults")}</h1>
       <p>{ADULT_ONLY}</p>
-      <p>Your birth year means you're under 18, so you can't use Chef Mealan yet.</p>
-      <p>If you typed the year wrong, correct it and carry on.</p>
+      <p>{w("welcome.yourBirthYearMeansYou")}</p>
+      <p>{w("welcome.ifYouTypedTheYear")}</p>
       <div className="actions gate-actions">
-        <button className="pill pill-primary action-main" onClick={onCorrect}>Correct my birth year</button>
-        {onDelete && <ConfirmButton className="link action-cancel" label="Delete my account" confirmLabel="Tap again to delete everything" onConfirm={onDelete} />}
+        <button className="pill pill-primary action-main" onClick={onCorrect}>{w("welcome.correctMyBirthYear")}</button>
+        {onDelete && <ConfirmButton className="link action-cancel" label={w("welcome.deleteMyAccount")} confirmLabel={w("welcome.tapAgainToDeleteEverything")} onConfirm={onDelete} />}
       </div>
     </main>
   );

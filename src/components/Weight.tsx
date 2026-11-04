@@ -1,4 +1,4 @@
-import { dec } from "../words";
+import { dec, w } from "../words";
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
 import { avg7, isWeight, trendOf, verdictNote, withWeighIn, withoutWeighIn, VERDICT_WORDS, fmtKg, type WeighIn , fmtPct } from "../weight";
@@ -20,20 +20,20 @@ export function WeighInLine({ list, onSave, notify }: { list: WeighIn[] | undefi
     if (!isWeight(kg)) return;
     const next = withWeighIn(list, kg, new Date(), wUnit() === "lb");
     onSave(next); setOpen(false); setV("");
-    notify(`Saved. Your 7-day average is ${wText(avg7(next)!)}.`);
+    notify(w("weight.savedAvg", { avg: wText(avg7(next)!) }));
   };
   if (!open) return (
     <button className="weigh-line" onClick={() => { setV(last ? wIn(last.kg).toFixed(1) : ""); setOpen(true); }}>
-      <span><b>Weigh in</b><small>{last ? `last: ${wText(last.kg)}, ${last.date === today() ? "today" : dayName(last.date)}${avg ? ` · 7-day average ${wText(avg)}` : ""}` : "Any morning, before breakfast."}</small></span>
+      <span><b>{w("weight.weighIn")}</b><small>{last ? `last: ${wText(last.kg)}, ${last.date === today() ? w("weight.today") : dayName(last.date)}${avg ? ` · 7-day average ${wText(avg)}` : ""}` : w("weight.anyMorningBeforeBreakfast")}</small></span>
       <Plus size={20} />
     </button>
   );
   return (
-    <div className="weigh-entry" role="group" aria-label="Weigh in">
-      <div className="weigh-entry-top"><b>Weigh in</b><button className="link" onClick={() => setOpen(false)}>Cancel</button></div>
+    <div className="weigh-entry" role="group" aria-label={w("weight.weighIn")}>
+      <div className="weigh-entry-top"><b>{w("weight.weighIn")}</b><button className="link" onClick={() => setOpen(false)}>{w("weight.cancel")}</button></div>
       <label className="weigh-input"><input inputMode="decimal" autoFocus aria-label={`Your weight, ${wUnit()}`} value={v} placeholder={wUnit() === "lb" ? "165.0" : "75.0"} onChange={(e) => setV(e.target.value)} onKeyDown={(e) => e.key === "Enter" && save()} /><span>{wUnit()}</span></label>
       <small>Today, {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}</small>
-      <button className="pill pill-primary pill-wide" disabled={!isWeight(wFrom(Number(v.replace(",", "."))))} onClick={save}>Save</button>
+      <button className="pill pill-primary pill-wide" disabled={!isWeight(wFrom(Number(v.replace(",", "."))))} onClick={save}>{w("weight.save")}</button>
     </div>
   );
 }
@@ -50,13 +50,13 @@ function Chart({ t, unit = "" }: { t: ReturnType<typeof trendOf>; unit?: string 
   const y = (v: number) => 8 + ((hi - v) * (H - 30)) / (hi - lo || 1);
   const ticks = [lo, (lo + hi) / 2, hi].map((v) => Math.round(v * 10) / 10);
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label="Your weight over the last 4 weeks">
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" role="img" aria-label={w("weight.yourWeightOverTheLast")}>
       {ticks.map((v) => <g key={v}><line x1={pad} x2={W - 8} y1={y(v)} y2={y(v)} stroke="var(--line)" /><text x={2} y={y(v) + 4} fontSize={10} fill="var(--muted)">{v}{unit}</text></g>)}
       {t.averages.length > 0 && <polygon points={`${x(6)},${y(a0)} ${x(27)},${y(band[1])} ${x(27)},${y(band[0])}`} fill="var(--brand)" opacity={0.16} />}
       {t.points.map((p) => <circle key={p.day} cx={x(p.day)} cy={y(p.kg)} r={2.6} fill="var(--muted)" />)}
       {t.averages.length > 1 && <polyline fill="none" stroke="var(--brand)" strokeWidth={2.5} points={t.averages.map((a) => `${x(a.day)},${y(a.kg)}`).join(" ")} />}
       <text x={pad} y={H - 6} fontSize={10} fill="var(--muted)">4 weeks ago</text>
-      <text x={W - 8} y={H - 6} fontSize={10} fill="var(--muted)" textAnchor="end">today</text>
+      <text x={W - 8} y={H - 6} fontSize={10} fill="var(--muted)" textAnchor="end">{w("weight.today")}</text>
     </svg>
   );
 }
@@ -64,19 +64,19 @@ function Chart({ t, unit = "" }: { t: ReturnType<typeof trendOf>; unit?: string 
 // Me › Goal and the coach's client page: the last 4 weeks (canvas board W2)
 export function WeightTrend({ list, band, weightKg, trainingAge, onUpdateWeight, onRemove, coach = false }: { list: WeighIn[] | undefined; band: string; weightKg?: number; trainingAge?: string; onUpdateWeight?: (kg: number) => void; onRemove?: (date: string) => void; coach?: boolean }) {
   const [showAll, setShowAll] = useState(false);
-  if (!list?.length) return coach ? null : <section className="card weight-trend"><b>The last 4 weeks</b><small className="muted">Weigh in on Me a few mornings a week, and the trend shows here: your 7-day average against what {goalLabel(band) || "your goal"} expects.</small></section>;
+  if (!list?.length) return coach ? null : <section className="card weight-trend"><b>{w("weight.theLastWeeks")}</b><small className="muted">Weigh in on Me a few mornings a week, and the trend shows here: your 7-day average against what {goalLabel(band) || "your goal"} expects.</small></section>;
   const t = trendOf(list, band, weightKg ?? list[list.length - 1].kg, trainingAge);
   const note = verdictNote(band, t.verdict);
   const avg = avg7(list);
   const tone = t.verdict === "on track" ? "ok" : t.verdict === "too few" ? "quiet" : "warn";
   return (
-    <section className="card weight-trend" aria-label="The last 4 weeks">
-      <b>The last 4 weeks</b>
+    <section className="card weight-trend" aria-label={w("weight.theLastWeeks")}>
+      <b>{w("weight.theLastWeeks")}</b>
       <Chart t={t} />
-      <div className="trend-legend"><span><i className="sw-dot" />{coach ? "weigh-ins" : "your weigh-ins"}</span><span><i className="sw-line" />7-day average</span><span><i className="sw-band" />expected for {goalLabel(band)}</span></div>
+      <div className="trend-legend"><span><i className="sw-dot" />{coach ? w("weight.weighIns") : "your weigh-ins"}</span><span><i className="sw-line" />7-day average</span><span><i className="sw-band" />expected for {goalLabel(band)}</span></div>
       {t.first !== null && t.last !== null && <div className="sheet-row"><small>7-day average</small><b>{dec(wIn(t.first), 1)} → {wText(t.last)}</b></div>}
-      {t.change !== null && <div className="sheet-row"><small>Change</small><b>{fmtKg(t.change)} in 3 weeks</b></div>}
-      <div className="sheet-row"><small>Expected</small><b>{fmtKg(t.expected[0]).replace(` ${wUnit()}`, "")} to {fmtKg(t.expected[1])}</b></div>
+      {t.change !== null && <div className="sheet-row"><small>{w("weight.change")}</small><b>{fmtKg(t.change)} in 3 weeks</b></div>}
+      <div className="sheet-row"><small>{w("weight.expected")}</small><b>{fmtKg(t.expected[0]).replace(` ${wUnit()}`, "")} to {fmtKg(t.expected[1])}</b></div>
       <span className={`trend-chip ${tone}`}>{VERDICT_WORDS[t.verdict]}</span>
       <small className="muted">{t.count} weigh-in{t.count === 1 ? "" : "s"} in 4 weeks.</small>
       {note && <p className="trend-note">{note}{coach ? "" : " Your coach sees the same."}</p>}
@@ -85,8 +85,8 @@ export function WeightTrend({ list, band, weightKg, trainingAge, onUpdateWeight,
       )}
       {!coach && onRemove && (
         <>
-          <button className="link" aria-expanded={showAll} onClick={() => setShowAll((s) => !s)}>{showAll ? "Hide weigh-ins" : "Your weigh-ins"}</button>
-          {showAll && <ul className="weigh-list">{[...list].reverse().slice(0, 28).map((w) => <li key={w.date}><span>{new Date(`${w.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}</span><b>{wText(w.kg)}</b><ConfirmButton className="link" label={<X size={14} />} ariaLabel={`Remove the weigh-in of ${w.date}`} confirmLabel="Remove" onConfirm={() => onRemove(w.date)} /></li>)}</ul>}
+          <button className="link" aria-expanded={showAll} onClick={() => setShowAll((s) => !s)}>{showAll ? w("weight.hideWeighIns") : w("weight.yourWeighIns")}</button>
+          {showAll && <ul className="weigh-list">{[...list].reverse().slice(0, 28).map((wi) => <li key={wi.date}><span>{new Date(`${wi.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short" })}</span><b>{wText(wi.kg)}</b><ConfirmButton className="link" label={<X size={14} />} ariaLabel={`Remove the weigh-in of ${wi.date}`} confirmLabel={w("weight.remove")} onConfirm={() => onRemove(wi.date)} /></li>)}</ul>}
         </>
       )}
     </section>
@@ -98,12 +98,12 @@ export function WeightTrendPct({ t, band, at }: { t: ReturnType<typeof trendOf>;
   const note = verdictNote(band, t.verdict);
   const tone = t.verdict === "on track" ? "ok" : t.verdict === "too few" ? "quiet" : "warn";
   return (
-    <section className="card weight-trend" aria-label="The last 4 weeks">
-      <b>The last 4 weeks</b>
+    <section className="card weight-trend" aria-label={w("weight.theLastWeeks")}>
+      <b>{w("weight.theLastWeeks")}</b>
       <Chart t={t} unit=" %" />
-      <div className="trend-legend"><span><i className="sw-dot" />weigh-ins</span><span><i className="sw-line" />7-day average</span><span><i className="sw-band" />expected for {goalLabel(band)}</span></div>
-      {t.change !== null && <div className="sheet-row"><small>Change</small><b>{fmtPct(t.change)} in 3 weeks</b></div>}
-      <div className="sheet-row"><small>Expected</small><b>{fmtPct(t.expected[0]).replace(" %", "")} to {fmtPct(t.expected[1])}</b></div>
+      <div className="trend-legend"><span><i className="sw-dot" />{w("weight.weighIns")}</span><span><i className="sw-line" />7-day average</span><span><i className="sw-band" />expected for {goalLabel(band)}</span></div>
+      {t.change !== null && <div className="sheet-row"><small>{w("weight.change")}</small><b>{fmtPct(t.change)} in 3 weeks</b></div>}
+      <div className="sheet-row"><small>{w("weight.expected")}</small><b>{fmtPct(t.expected[0]).replace(" %", "")} to {fmtPct(t.expected[1])}</b></div>
       <span className={`trend-chip ${tone}`}>{VERDICT_WORDS[t.verdict]}</span>
       <small className="muted">{t.count} weigh-in{t.count === 1 ? "" : "s"} in 4 weeks{at ? `, as of ${new Date(`${at}T12:00:00`).toLocaleDateString("en-GB", { day: "numeric", month: "short" })}` : ""}. In percent of their weight: they share no body data.</small>
       {note && <p className="trend-note">{note}</p>}
