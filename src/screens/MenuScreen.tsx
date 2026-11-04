@@ -177,7 +177,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
       {section === "admin" && <AdminPanel {...p} />}
       {section === "settings" && <><p className="small">{w("menu.howTheAppWorksFor")}</p><DevSettings p={p} open={(id) => setSection(id)} /></>}
       {section === "dev" && <DevGuard p={p} />}
-      {section === "language" && <LanguagePanel />}
+      {section === "language" && <LanguagePanel hasCoach={!!p.profile.coachId} />}
       {section === "voice" && <><p className="small">{w("menu.howChefMealanReadsTo")}</p><VoiceSettingsPanel /></>}
     </>
   );

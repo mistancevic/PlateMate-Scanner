@@ -8007,1834 +8007,2766 @@
     },
     "today.srcMine": {
       "text": "moj recept",
-      "checked": false
+      "checked": true
     },
     "today.srcCoach": {
       "text": "trenerov recept",
-      "checked": false
+      "checked": true
     },
     "today.srcStarter": {
       "text": "osnovno jelo",
-      "checked": false
+      "checked": true
     },
     "today.srcPlate": {
       "text": "napravljeno na Tanjiru",
-      "checked": false
+      "checked": true
     },
     "today.kcalLeftSnack": {
       "text": "Za danas je ostalo {kcal} kcal, ako želiš užinu.",
-      "checked": false
+      "checked": true
     },
     "today.kcalOver": {
       "text": "Danas {kcal} kcal preko.",
-      "checked": false
+      "checked": true
     },
     "today.sentRecipe": {
       "text": "Recept od: {coach}",
-      "checked": false
+      "checked": true
     },
     "today.recipe": {
       "text": "Recept",
-      "checked": false
+      "checked": true
     },
     "today.headToday": {
       "text": "Danas",
-      "checked": false
+      "checked": true
     },
     "today.headTomorrow": {
       "text": "Sutra",
-      "checked": false
+      "checked": true
     },
     "today.headEarlier": {
       "text": "Ranije",
-      "checked": false
+      "checked": true
     },
     "today.yesterdayLow": {
       "text": "juče",
-      "checked": false
+      "checked": true
     },
     "today.lastTwoDays": {
       "text": "poslednja dva dana",
-      "checked": false
+      "checked": true
     },
     "today.clientGoal": {
       "text": "Cilj: {name}",
-      "checked": false
+      "checked": true
     },
     "today.setByCoach": {
       "text": ", postavio trener {coach}",
-      "checked": false
+      "checked": true
     },
     "today.fullySetTarget": {
       "text": "Profil i plan su potpuno postavljeni. Cilj za danas:",
-      "checked": false
+      "checked": true
     },
     "today.ofTag": {
       "text": "od {v} {tag}",
-      "checked": false
+      "checked": true
     },
     "today.ofKcal": {
       "text": "od {kcal} kcal",
-      "checked": false
+      "checked": true
     },
     "today.ofKcalWeek": {
-      "text": "od {kcal} kcal, prosek nedelje",
-      "checked": false
+      "text": "od {kcal} kcal, prosek sedmice",
+      "checked": true
     },
     "today.ofKcalToday": {
       "text": "od {kcal} kcal danas",
-      "checked": false
+      "checked": true
     },
     "today.ofProtein": {
       "text": "od {g} g proteina",
-      "checked": false
+      "checked": true
     },
     "today.ofFat": {
       "text": "od {g} g masti",
-      "checked": false
+      "checked": true
     },
     "today.ofCarbs": {
       "text": "od {g} g ugljenih hidrata",
-      "checked": false
+      "checked": true
     },
     "today.asksOne": {
       "text": "{coach}: promeni jedan broj",
-      "checked": false
+      "checked": true
     },
     "today.asksAll": {
       "text": "{coach}: promeni svoje brojeve",
-      "checked": false
+      "checked": true
     },
     "today.nextAt": {
       "text": "Sledeći obrok: {meal}, u {time}. Oko {kcal} kcal i {protein} g proteina za ceo dan.",
-      "checked": false
+      "checked": true
     },
     "today.pickFor": {
       "text": "Izaberi obrok: {meal}",
-      "checked": false
+      "checked": true
     },
     "today.plannedOf": {
       "text": "{n} od {of} planirano · Plan, {day}",
-      "checked": false
+      "checked": true
     },
     "today.nothingSoFar": {
       "text": "Još ništa nije planirano · Postavi obroke: {day}",
-      "checked": false
+      "checked": true
     },
     "today.skip": {
       "text": "Preskoči",
-      "checked": false
+      "checked": true
     },
     "today.coachName": {
       "text": "Trener {name}",
-      "checked": false
+      "checked": true
     },
     "today.noteFrom": {
       "text": "Poruka: {who}",
-      "checked": false
+      "checked": true
     },
     "today.onYour": {
       "text": "O tvom obroku {title}, {when}",
-      "checked": false
+      "checked": true
     },
     "today.sentTo": {
       "text": "Poslato: {who}.",
-      "checked": false
+      "checked": true
     },
     "today.slotTomorrow": {
       "text": "{meal} sutra: {title}",
-      "checked": false
+      "checked": true
     },
     "today.swapTomorrow": {
       "text": "Zameni sutra: {meal}",
-      "checked": false
+      "checked": true
     },
     "today.skipTomorrow": {
       "text": "Preskoči sutra: {meal}",
-      "checked": false
+      "checked": true
     },
     "today.setMealsWait": {
       "text": "Postavi obroke za: {day}, i čekaju ovde.",
-      "checked": false
+      "checked": true
     },
     "today.nLeft": {
       "text": "ostalo {n}",
-      "checked": false
+      "checked": true
     },
     "today.eachOne": {
       "text": "Svaki komad, {what}: ",
-      "checked": false
+      "checked": true
     },
     "today.portion": {
       "text": "porcija",
-      "checked": false
+      "checked": true
     },
     "today.kcalProtein": {
       "text": "{kcal} kcal · {protein} g proteina",
-      "checked": false
+      "checked": true
     },
     "today.countsAs": {
       "text": "Računa se kao: {meal}.",
-      "checked": false
+      "checked": true
     },
     "today.iAteOne": {
       "text": "Pojeo sam jedan|Pojela sam jedan",
-      "checked": false
+      "checked": true
     },
     "today.remove": {
       "text": "Ukloni",
-      "checked": false
+      "checked": true
     },
     "today.wentMostly": {
       "text": "Danas je uglavnom išlo po planu",
-      "checked": false
+      "checked": true
     },
     "today.wentByPlan": {
       "text": "Danas je išlo po planu",
-      "checked": false
+      "checked": true
     },
     "today.slotAt": {
       "text": "{meal} u {time}: {title}",
-      "checked": false
+      "checked": true
     },
     "today.swapMeal": {
       "text": "Zameni: {meal}",
-      "checked": false
+      "checked": true
     },
     "today.skipOnPurpose": {
       "text": "Namerno preskoči: {meal}",
-      "checked": false
+      "checked": true
     },
     "today.didYouHaveIt": {
       "text": "{meal}, {time}: da li si jeo?|{meal}, {time}: da li si jela?",
-      "checked": false
+      "checked": true
     },
     "today.timePassed": {
       "text": "{time} je prošlo. Da li si jeo?|{time} je prošlo. Da li si jela?",
-      "checked": false
+      "checked": true
     },
     "today.fatCarbs": {
       "text": " · {fat} g masti · {carbs} g ugljenih hidrata",
-      "checked": false
+      "checked": true
     },
     "today.offPlan": {
       "text": "Van plana",
-      "checked": false
+      "checked": true
     },
     "today.offPlanLean": {
       "text": "Van plana · sledeći obrok sa više proteina",
-      "checked": false
+      "checked": true
     },
     "today.howCarry": {
       "text": "Kako te je nosio obrok {title}?",
-      "checked": false
+      "checked": true
     },
     "today.carriedYou": {
       "text": "Nosio te je:",
-      "checked": false
+      "checked": true
     },
     "today.pickAMealLow": {
       "text": "izaberi obrok",
-      "checked": false
+      "checked": true
     },
     "today.whyPlus": {
       "text": "Zašto +:",
-      "checked": false
+      "checked": true
     },
     "today.whatFat": {
       "text": "masti",
-      "checked": false
+      "checked": true
     },
     "today.whatCarbs": {
       "text": "ugljeni hidrati",
-      "checked": false
+      "checked": true
     },
     "today.plusOne": {
       "text": "nema vrednost za: {what}. Zato je zbir niži od pravog.",
-      "checked": false
+      "checked": true
     },
     "today.plusMany": {
       "text": "nemaju vrednost za: {what}. Zato je zbir niži od pravog.",
-      "checked": false
+      "checked": true
     },
     "today.plusOneBoth": {
       "text": "nema vrednost za masti ili ugljene hidrate. Zato je zbir niži od pravog.",
-      "checked": false
+      "checked": true
     },
     "today.plusManyBoth": {
       "text": "nemaju vrednost za masti ili ugljene hidrate. Zato je zbir niži od pravog.",
-      "checked": false
+      "checked": true
     },
     "today.seeMeal": {
       "text": "{title}: pogledaj obrok",
-      "checked": false
+      "checked": true
     },
     "today.addSnackFirst": {
       "text": "Prvo dodaj užinu u obroke dnevno u Načinu života; onda predlog ide u Plan.",
-      "checked": false
+      "checked": true
     },
     "today.onPlanAt": {
       "text": "{what} je u Planu u {time} ove nedelje. Tvoji brojevi se ne menjaju.",
-      "checked": false
+      "checked": true
     },
     "today.onPlan": {
       "text": "{what} je u Planu ove nedelje. Tvoji brojevi se ne menjaju.",
-      "checked": false
+      "checked": true
     },
     "today.toldNotNow": {
       "text": "Javljeno: {who}, ne sada.",
-      "checked": false
+      "checked": true
     },
     "today.toldReason": {
       "text": "Javljeno: {who}, ne sada, {reason}.",
-      "checked": false
+      "checked": true
     },
     "today.suggestionFrom": {
       "text": "Predlog: {who}",
-      "checked": false
+      "checked": true
     },
     "today.landsAt": {
       "text": "Ide u Plan u {time} za ovu nedelju. Tvoji brojevi se ne menjaju.",
-      "checked": false
+      "checked": true
     },
     "today.lands": {
       "text": "Ide u Plan za ovu nedelju. Tvoji brojevi se ne menjaju.",
-      "checked": false
+      "checked": true
     },
     "today.open": {
       "text": "Otvori",
-      "checked": false
+      "checked": true
     },
     "today.accept": {
       "text": "Prihvati",
-      "checked": false
+      "checked": true
     },
     "plan.kind.rest": {
       "text": "Odmor",
-      "checked": false
+      "checked": true
     },
     "plan.kindHint.rest": {
       "text": "ništa planirano",
-      "checked": false
+      "checked": true
     },
     "plan.kind.strength": {
       "text": "Snaga",
-      "checked": false
+      "checked": true
     },
     "plan.kindHint.strength": {
       "text": "tegovi, sprave, sopstvena težina",
-      "checked": false
+      "checked": true
     },
     "plan.kind.cardio": {
       "text": "Kardio",
-      "checked": false
+      "checked": true
     },
     "plan.kindHint.cardio": {
       "text": "trčanje, vožnja bicikla, plivanje",
-      "checked": false
+      "checked": true
     },
     "plan.kind.hiit": {
       "text": "HIIT",
-      "checked": false
+      "checked": true
     },
     "plan.kindHint.hiit": {
       "text": "kratki teški intervali",
-      "checked": false
+      "checked": true
     },
     "plan.kind.mobility": {
       "text": "Mobilnost",
-      "checked": false
+      "checked": true
     },
     "plan.kindHint.mobility": {
       "text": "zglobovi i obim pokreta",
-      "checked": false
+      "checked": true
     },
     "plan.kind.stretching": {
       "text": "Istezanje",
-      "checked": false
+      "checked": true
     },
     "plan.kindHint.stretching": {
       "text": "polako i lagano",
-      "checked": false
+      "checked": true
     },
     "plan.kind.yoga": {
       "text": "Joga",
-      "checked": false
+      "checked": true
     },
     "plan.kindHint.yoga": {
       "text": "bilo koji stil",
-      "checked": false
+      "checked": true
     },
     "plan.kind.walk": {
       "text": "Šetnja",
-      "checked": false
+      "checked": true
     },
     "plan.kindHint.walk": {
       "text": "prava šetnja, ne put do posla",
-      "checked": false
+      "checked": true
     },
     "plan.kind.team": {
       "text": "Timski sport",
-      "checked": false
+      "checked": true
     },
     "plan.kindHint.team": {
       "text": "fudbal, košarka, tenis",
-      "checked": false
+      "checked": true
     },
     "plan.kind.club": {
       "text": "Trening u klubu",
-      "checked": false
+      "checked": true
     },
     "plan.kindHint.club": {
       "text": "trening sa tvojim klubom",
-      "checked": false
+      "checked": true
     },
     "plan.kind.match": {
       "text": "Utakmica",
-      "checked": false
+      "checked": true
     },
     "plan.kindHint.match": {
       "text": "utakmica sa tvojim klubom",
-      "checked": false
+      "checked": true
     },
     "plan.kind.dance": {
       "text": "Ples",
-      "checked": false
+      "checked": true
     },
     "plan.kindHint.dance": {
       "text": "bilo koji stil",
-      "checked": false
+      "checked": true
     },
     "plan.sport.football": {
       "text": "Fudbal",
-      "checked": false
+      "checked": true
     },
     "plan.sport.basketball": {
       "text": "Košarka",
-      "checked": false
+      "checked": true
     },
     "plan.sport.swimming": {
       "text": "Plivanje",
-      "checked": false
+      "checked": true
     },
     "plan.sport.handball": {
       "text": "Rukomet",
-      "checked": false
+      "checked": true
     },
     "plan.sport.volleyball": {
       "text": "Odbojka",
-      "checked": false
+      "checked": true
     },
     "plan.sport.tennis": {
       "text": "Tenis",
-      "checked": false
+      "checked": true
     },
     "plan.sport.other": {
       "text": "Drugo",
-      "checked": false
+      "checked": true
     },
     "plan.int.easy": {
       "text": "Lako",
-      "checked": false
+      "checked": true
     },
     "plan.int.moderate": {
       "text": "Umereno",
-      "checked": false
+      "checked": true
     },
     "plan.int.hard": {
       "text": "Jako",
-      "checked": false
+      "checked": true
     },
     "plan.intLow.hard": {
       "text": "jako",
-      "checked": false
+      "checked": true
     },
     "plan.intLow.moderate": {
       "text": "umereno",
-      "checked": false
+      "checked": true
     },
     "plan.intLow.easy": {
       "text": "lako",
-      "checked": false
+      "checked": true
     },
     "plan.when.morning": {
       "text": "Ujutru",
-      "checked": false
+      "checked": true
     },
     "plan.when.day": {
       "text": "Tokom dana",
-      "checked": false
+      "checked": true
     },
     "plan.when.evening": {
       "text": "Uveče",
-      "checked": false
+      "checked": true
     },
     "plan.when.late": {
       "text": "Kasno noću",
-      "checked": false
+      "checked": true
     },
     "plan.when.afterschool": {
       "text": "Odmah posle škole",
-      "checked": false
+      "checked": true
     },
     "plan.when.lateafternoon": {
       "text": "Kasno popodne",
-      "checked": false
+      "checked": true
     },
     "plan.load.passive": {
       "text": "Bez treninga",
-      "checked": false
+      "checked": true
     },
     "plan.day.passive": {
       "text": "Dan odmora.",
-      "checked": false
+      "checked": true
     },
     "plan.day.active": {
       "text": "Lak dan.",
-      "checked": false
+      "checked": true
     },
     "plan.day.easy": {
       "text": "Umeren dan.",
-      "checked": false
+      "checked": true
     },
     "plan.day.hard": {
       "text": "Težak dan.",
-      "checked": false
+      "checked": true
     },
     "plan.whenIn.morning": {
       "text": "ujutru",
-      "checked": false
+      "checked": true
     },
     "plan.whenIn.day": {
       "text": "tokom dana",
-      "checked": false
+      "checked": true
     },
     "plan.whenIn.evening": {
       "text": "uveče",
-      "checked": false
+      "checked": true
     },
     "plan.whenIn.late": {
       "text": "kasno noću",
-      "checked": false
+      "checked": true
     },
     "plan.whenIn.afterschool": {
       "text": "odmah posle škole",
-      "checked": false
+      "checked": true
     },
     "plan.whenIn.lateafternoon": {
       "text": "kasno popodne",
-      "checked": false
+      "checked": true
     },
     "plan.sportTraining": {
       "text": "{sport}, trening",
-      "checked": false
+      "checked": true
     },
     "plan.sportMatch": {
       "text": "{sport}, utakmica",
-      "checked": false
+      "checked": true
     },
     "plan.peThen": {
       "text": "{pe}, pa {act}",
-      "checked": false
+      "checked": true
     },
     "plan.peClass": {
       "text": "Sport na času",
-      "checked": false
+      "checked": true
     },
     "plan.peSchool": {
       "text": "Sport u školi",
-      "checked": false
+      "checked": true
     },
     "plan.study": {
       "text": "Dan učenja",
-      "checked": false
+      "checked": true
     },
     "plan.studyPe": {
       "text": "Dan učenja sa sportom na času",
-      "checked": false
+      "checked": true
     },
     "plan.then": {
       "text": ", pa {act}",
-      "checked": false
+      "checked": true
     },
     "plan.noSchool": {
       "text": "Nema škole.",
-      "checked": false
+      "checked": true
     },
     "plan.noSchoolNothing": {
       "text": "Nema škole, i ništa nije planirano",
-      "checked": false
+      "checked": true
     },
     "plan.school": {
       "text": "Škola",
-      "checked": false
+      "checked": true
     },
     "plan.schoolPe": {
       "text": "Škola sa sportom u školi",
-      "checked": false
+      "checked": true
     },
     "setup.sex": {
       "text": "žensko ili muško",
-      "checked": false
+      "checked": true
     },
     "setup.birthYear": {
       "text": "godina rođenja",
-      "checked": false
+      "checked": true
     },
     "setup.height": {
       "text": "visina",
-      "checked": false
+      "checked": true
     },
     "setup.weight": {
       "text": "težina",
-      "checked": false
+      "checked": true
     },
     "setup.health": {
       "text": "zdravstvena pitanja",
-      "checked": false
+      "checked": true
     },
     "setup.goal": {
       "text": "cilj",
-      "checked": false
+      "checked": true
     },
     "setup.life": {
       "text": "način života",
-      "checked": false
+      "checked": true
     },
     "setup.week": {
       "text": "nedelja treninga",
-      "checked": false
+      "checked": true
     },
     "setup.shop": {
       "text": "gde kupuješ",
-      "checked": false
+      "checked": true
     },
     "setup.toSet": {
       "text": "Za podešavanje: {what}",
-      "checked": false
+      "checked": true
     },
     "log.nothingToday": {
       "text": "Danas još ništa nije upisano.",
-      "checked": false
+      "checked": true
     },
     "log.nothingThatDay": {
       "text": "Tog dana ništa nije upisano.",
-      "checked": false
+      "checked": true
     },
     "log.mealsSoFar": {
       "text": "{n} obrok upisan, zasad {kcal} kcal i {protein} g proteina.|{n} obroka upisana, zasad {kcal} kcal i {protein} g proteina.|{n} obroka upisano, zasad {kcal} kcal i {protein} g proteina.",
-      "checked": false
+      "checked": true
     },
     "log.meals": {
       "text": "{n} obrok upisan, {kcal} kcal i {protein} g proteina.|{n} obroka upisana, {kcal} kcal i {protein} g proteina.|{n} obroka upisano, {kcal} kcal i {protein} g proteina.",
-      "checked": false
+      "checked": true
     },
     "rec.byPlan": {
       "text": "{n} od {of} po planu",
-      "checked": false
+      "checked": true
     },
     "rec.byPlanSoFar": {
       "text": "zasad {n} od {of} po planu",
-      "checked": false
+      "checked": true
     },
     "rec.extra": {
       "text": "{n} van plana",
-      "checked": false
+      "checked": true
     },
     "rec.kcalOf": {
       "text": "{kcal} od {of} kcal",
-      "checked": false
+      "checked": true
     },
     "carry.light": {
       "text": "Lako i budno",
-      "checked": false
+      "checked": true
     },
     "carry.fine": {
       "text": "Dobro",
-      "checked": false
+      "checked": true
     },
     "carry.heavy": {
       "text": "Teško, umorno",
-      "checked": false
+      "checked": true
     },
     "measured.knowLast14": {
       "text": "UPOZNAJEMO TE · POSLEDNJIH 14 DANA",
-      "checked": false
+      "checked": true
     },
     "measured.knowDay": {
       "text": "UPOZNAJEMO TE · DAN {day} OD {of}",
-      "checked": false
+      "checked": true
     },
     "measured.onDay14": {
       "text": "Dana 14, Chef Mealan izračuna koliko tvoje telo zaista troši, iz onoga što si jeo i kako se menjala težina. Do sada: {full} i {weighed}.|Dana 14, Chef Mealan izračuna koliko tvoje telo zaista troši, iz onoga što si jela i kako se menjala težina. Do sada: {full} i {weighed}.",
-      "checked": false
+      "checked": true
     },
     "measured.notEnough": {
       "text": "Još nema dovoljno podataka: {full} od {needFull} punih dana i {weighed} od {needWeigh} merenja u poslednjih 14 dana. Nastavlja se dok ne bude spremno.",
-      "checked": false
+      "checked": true
     },
     "measured.ofNeeded": {
       "text": "{have} od {need} potrebnih",
-      "checked": false
+      "checked": true
     },
     "measured.burnYour": {
       "text": "TVOJA POTROŠNJA, IZMERENA",
-      "checked": false
+      "checked": true
     },
     "measured.burnOf": {
       "text": "POTROŠNJA, IZMERENA: {who}",
-      "checked": false
+      "checked": true
     },
     "measured.capsLast14": {
       "text": " · POSLEDNJIH 14 DANA",
-      "checked": false
+      "checked": true
     },
     "measured.capsDay": {
       "text": " · DAN {day} OD {of}",
-      "checked": false
+      "checked": true
     },
     "measured.weighFrom": {
       "text": "Merenja od dana {day}",
-      "checked": false
+      "checked": true
     },
     "measured.weighIns": {
       "text": "Merenja",
-      "checked": false
+      "checked": true
     },
     "measured.fullDayIs": {
       "text": "Pun dan: svaki planirani obrok pojeden, zamenjen ili namerno preskočen, i sve van plana upisano. Meri se ujutru, pre doručka.",
-      "checked": false
+      "checked": true
     },
     "measured.firstDaysWater": {
       "text": " Merenja prvih {n} dana se ne računaju: rane promene su uglavnom voda.",
-      "checked": false
+      "checked": true
     },
     "measured.readyOn": {
       "text": "Spremno najranije: {date}.",
-      "checked": false
+      "checked": true
     },
     "goal.band.recomp": {
       "text": "Rekompozicija",
-      "checked": false
+      "checked": true
     },
     "goal.band.fatloss": {
       "text": "Gubitak masti",
-      "checked": false
+      "checked": true
     },
     "goal.band.maintain": {
       "text": "Održavanje",
-      "checked": false
+      "checked": true
     },
     "goal.band.gain": {
       "text": "Izgradnja mišića",
-      "checked": false
+      "checked": true
     },
     "goal.band.performance": {
       "text": "Performanse",
-      "checked": false
+      "checked": true
     },
     "goal.pace.steady": {
       "text": "Postepeno",
-      "checked": false
+      "checked": true
     },
     "goal.pace.faster": {
       "text": "Brže",
-      "checked": false
+      "checked": true
     },
     "app.pdToday": {
       "text": "{pd} danas",
-      "checked": false
+      "checked": true
     },
     "app.kcalG": {
       "text": "{kcal} kcal, {g} g",
-      "checked": false
+      "checked": true
     },
     "app.numbersChanged": {
       "text": "Tvoji brojevi su se promenili sa profilom. Prosečan dan je sada {kcal} kcal i {protein} g proteina.",
-      "checked": false
+      "checked": true
     },
     "plate.todayLow": {
       "text": "danas",
-      "checked": false
+      "checked": true
     },
     "plate.notYet": {
       "text": "još nije za: {meal}",
-      "checked": false
+      "checked": true
     },
     "plate.alreadyAbout": {
       "text": "Tvoj tanjir je već oko {n} porcija za: {meal}. {kcal} kcal od {lo} do {hi}. Ništa se ne može dodati da bude jedna.",
-      "checked": false
+      "checked": true
     },
     "plate.makeItN": {
       "text": "Napravi {n} porciju|Napravi {n} porcije|Napravi {n} porcija",
-      "checked": false
+      "checked": true
     },
     "plate.couldNotRead": {
       "text": "Chef Mealan nije mogao da pročita tvoj tanjir.",
-      "checked": false
+      "checked": true
     },
     "plate.mealAbout": {
       "text": "{meal}: oko {kcal} kcal",
-      "checked": false
+      "checked": true
     },
     "plate.ofYour": {
       "text": " od tvojih {kcal}",
-      "checked": false
+      "checked": true
     },
     "plate.atPd": {
       "text": ", uz {tag} {pd} ili više",
-      "checked": false
+      "checked": true
     },
     "plate.chefAdds": {
       "text": "Chef Mealan dodaje šta treba da {meal} bude u svom opsegu.",
-      "checked": false
+      "checked": true
     },
     "plate.keepPuts": {
       "text": "Ostavi kako jeste stavlja tanjir u {slot} kakav jeste.",
-      "checked": false
+      "checked": true
     },
     "plate.keepTakes": {
       "text": "Ostavi kako jeste uzima tanjir kakav jeste.",
-      "checked": false
+      "checked": true
     },
     "plate.notLogged": {
       "text": "{meal}: danas nije upisano. Da li si jeo?|{meal}: danas nije upisano. Da li si jela?",
-      "checked": false
+      "checked": true
     },
     "plate.hadSkipped": {
       "text": "Pojeo sam: {meal} ostaje oko {kcal} kcal. Preskočio sam: deo za {other} prelazi na {meal}.|Pojela sam: {meal} ostaje oko {kcal} kcal. Preskočila sam: deo za {other} prelazi na {meal}.",
-      "checked": false
+      "checked": true
     },
     "plate.hadSkippedAbout": {
       "text": "Pojeo sam: {meal} ostaje oko {kcal} kcal. Preskočio sam: deo za {other} prelazi na {meal}, oko {kcal2} kcal.|Pojela sam: {meal} ostaje oko {kcal} kcal. Preskočila sam: deo za {other} prelazi na {meal}, oko {kcal2} kcal.",
-      "checked": false
+      "checked": true
     },
     "plate.nOfPortions": {
       "text": "{n} od {of} porcija",
-      "checked": false
+      "checked": true
     },
     "cook.weighRaw": {
       "text": "meri sirovo",
-      "checked": false
+      "checked": true
     },
     "cook.weighDrained": {
       "text": "meri oceđeno",
-      "checked": false
+      "checked": true
     },
     "cook.weighDry": {
       "text": "meri suvo",
-      "checked": false
+      "checked": true
     },
     "cook.weighCooked": {
       "text": "meri kuvano",
-      "checked": false
+      "checked": true
     },
     "plate.overPortion": {
       "text": "{grams} g je preko porcije. {food}: {min} do {max} g.",
-      "checked": false
+      "checked": true
     },
     "plate.overMealPortion": {
       "text": "{grams} g je preko porcije za tvoj obrok. {food}: {min} do {max} g.",
-      "checked": false
+      "checked": true
     },
     "letters.ariaOpen": {
       "text": "Četiri slova, {who}: {ls}. Otvori brojeve",
-      "checked": false
+      "checked": true
     },
     "letters.ariaClose": {
       "text": "Četiri slova, {who}: {ls}. Zatvori brojeve",
-      "checked": false
+      "checked": true
     },
     "letters.thePlate": {
       "text": "tanjir",
-      "checked": false
+      "checked": true
     },
     "letters.thisRecipe": {
       "text": "ovaj recept",
-      "checked": false
+      "checked": true
     },
     "measured.squaresAria": {
       "text": "Punih dana: {full}, merenja: {weighed}, u prve dve nedelje",
-      "checked": false
+      "checked": true
     },
     "swipe.remove": {
       "text": "Ukloni",
-      "checked": false
+      "checked": true
     },
     "swipe.swap": {
       "text": "Zameni",
-      "checked": false
+      "checked": true
     },
     "app.brandToday": {
       "text": "Chef Mealan, Danas",
-      "checked": false
+      "checked": true
     },
     "measured.last14Caps": {
       "text": "POSLEDNJIH 14 DANA",
-      "checked": false
+      "checked": true
     },
     "measured.fullDaysN": {
       "text": "{n} pun dan|{n} puna dana|{n} punih dana",
-      "checked": false
+      "checked": true
     },
     "measured.weighInsN": {
       "text": "{n} merenje|{n} merenja|{n} merenja",
-      "checked": false
+      "checked": true
     },
     "plan.weekSpan": {
       "text": "Nedelja {n}, {span}",
-      "checked": false
+      "checked": true
     },
     "plan.todayLow": {
       "text": "danas",
-      "checked": false
+      "checked": true
     },
     "plan.kcalProtein": {
       "text": "{kcal} kcal · {protein} g proteina",
-      "checked": false
+      "checked": true
     },
     "plan.restDay": {
       "text": "dan odmora",
-      "checked": false
+      "checked": true
     },
     "plan.insideRange": {
       "text": "{day}: u opsegu, {kcal} kcal.",
-      "checked": false
+      "checked": true
     },
     "plan.fittedTo": {
       "text": "Porcije uklopljene za: {day}. {kcal} kcal, najbliže što ovi obroci mogu.",
-      "checked": false
+      "checked": true
     },
     "plan.backUsual": {
       "text": "Nazad na uobičajene porcije.",
-      "checked": false
+      "checked": true
     },
     "plan.isSlot": {
       "text": "{title}: {meal}, {day}.",
-      "checked": false
+      "checked": true
     },
     "plan.slotsOpen": {
       "text": "{n} slobodan termin|{n} slobodna termina|{n} slobodnih termina",
-      "checked": false
+      "checked": true
     },
     "plan.allSet": {
       "text": "svi termini postavljeni",
-      "checked": false
+      "checked": true
     },
     "plan.ofTarget": {
       "text": "od {pd}, cilj za: {day}",
-      "checked": false
+      "checked": true
     },
     "plan.ofKcalToday": {
       "text": "od {kcal} kcal danas",
-      "checked": false
+      "checked": true
     },
     "plan.ofKcalOn": {
       "text": "od {kcal} kcal, {day}",
-      "checked": false
+      "checked": true
     },
     "plan.ofRange": {
       "text": "od {lo} do {hi} kcal",
-      "checked": false
+      "checked": true
     },
     "plan.dayFits": {
       "text": "planirani dan je u opsegu od {lo} do {hi}",
-      "checked": false
+      "checked": true
     },
     "plan.ofProteinRange": {
       "text": "od {lo} do {hi} g proteina",
-      "checked": false
+      "checked": true
     },
     "plan.ofProtein": {
       "text": "od {g} g proteina",
-      "checked": false
+      "checked": true
     },
     "plan.gProtein": {
       "text": "g proteina",
-      "checked": false
+      "checked": true
     },
     "plan.kcalUnder": {
       "text": "{kcal} kcal ispod",
-      "checked": false
+      "checked": true
     },
     "plan.kcalOver": {
       "text": "{kcal} kcal preko",
-      "checked": false
+      "checked": true
     },
     "plan.rangeOf": {
       "text": "opsega za: {day}, od {lo} do {hi} kcal.",
-      "checked": false
+      "checked": true
     },
     "plan.fitTo": {
       "text": "Uklopi porcije za: {day}",
-      "checked": false
+      "checked": true
     },
     "plan.trainingAt": {
       "text": "Trening u {time}, {what}. Promeni za ovaj datum",
-      "checked": false
+      "checked": true
     },
     "plan.slotAt": {
       "text": "{meal} u {time}: {title}",
-      "checked": false
+      "checked": true
     },
     "plan.empty": {
       "text": "Isprazni",
-      "checked": false
+      "checked": true
     },
     "plan.swapMeal": {
       "text": "Zameni: {meal}",
-      "checked": false
+      "checked": true
     },
     "plan.emptyMeal": {
       "text": "Isprazni: {meal}",
-      "checked": false
+      "checked": true
     },
     "plan.pickAMealLow": {
       "text": "izaberi obrok",
-      "checked": false
+      "checked": true
     },
     "plan.howMany": {
       "text": "{title}: koliko",
-      "checked": false
+      "checked": true
     },
     "plan.oneLess": {
       "text": "{unit} manje",
-      "checked": false
+      "checked": true
     },
     "plan.oneMore": {
       "text": "{unit} više",
-      "checked": false
+      "checked": true
     },
     "plan.ofMakes": {
       "text": "od {n} koliko pravi",
-      "checked": false
+      "checked": true
     },
     "plan.askChef": {
       "text": "Pitaj Chef Mealana",
-      "checked": false
+      "checked": true
     },
     "plan.inMyRecipes": {
       "text": "{title} je u Mojim receptima.",
-      "checked": false
+      "checked": true
     },
     "plan.dateTraining": {
       "text": "{date}: trening",
-      "checked": false
+      "checked": true
     },
     "plan.changedToday": {
       "text": "Promenjeno samo za danas.",
-      "checked": false
+      "checked": true
     },
     "plan.changedFor": {
       "text": "Promenjeno samo za: {date}.",
-      "checked": false
+      "checked": true
     },
     "plan.backUsualDay": {
       "text": "Nazad na uobičajeni dan: {day}",
-      "checked": false
+      "checked": true
     },
     "plan.ofKcal": {
       "text": "od {kcal} kcal",
-      "checked": false
+      "checked": true
     },
     "plan.kcalProteinG": {
       "text": "{kcal} kcal · {protein} g proteina",
-      "checked": false
+      "checked": true
     },
     "shop.nMeals": {
       "text": "{n} obrok|{n} obroka|{n} obroka",
-      "checked": false
+      "checked": true
     },
     "shop.inBasket": {
       "text": ", u korpi",
-      "checked": false
+      "checked": true
     },
     "shop.notThisTimeLow": {
       "text": ", ne ovaj put",
-      "checked": false
+      "checked": true
     },
     "shop.gCooked": {
       "text": "{g} g kuvano · ",
-      "checked": false
+      "checked": true
     },
     "shop.copied": {
       "text": "Lista je kopirana. Nalepi je u poruku ili belešku.",
-      "checked": false
+      "checked": true
     },
     "shop.copyFailed": {
       "text": "Kopiranje nije uspelo na ovom telefonu.",
-      "checked": false
+      "checked": true
     },
     "shop.finished": {
       "text": "Lista za kupovinu {n} je završena.",
-      "checked": false
+      "checked": true
     },
     "shop.finishedCarry": {
       "text": "Lista za kupovinu {n} je završena. Ono što nije označeno čeka sledeću listu.",
-      "checked": false
+      "checked": true
     },
     "shop.listN": {
       "text": "Lista za kupovinu {n}",
-      "checked": false
+      "checked": true
     },
     "shop.made": {
       "text": "Napravljena {on}, za {span}: {n} planirani obrok.|Napravljena {on}, za {span}: {n} planirana obroka.|Napravljena {on}, za {span}: {n} planiranih obroka.",
-      "checked": false
+      "checked": true
     },
     "shop.finishedOn": {
       "text": " Završena {on}.",
-      "checked": false
+      "checked": true
     },
     "shop.notOnList": {
       "text": "Nije na listi, nema sačuvanih namirnica: {what}.",
-      "checked": false
+      "checked": true
     },
     "shop.new": {
       "text": "{title}, novo",
-      "checked": false
+      "checked": true
     },
     "shop.inPlaceOf": {
       "text": "{title}, umesto: {was}",
-      "checked": false
+      "checked": true
     },
     "shop.noLonger": {
       "text": "{title}, više nije planirano",
-      "checked": false
+      "checked": true
     },
     "shop.updated": {
       "text": "Lista za kupovinu {list} je ažurirana: {n} obrok promenjen u planu.|Lista za kupovinu {list} je ažurirana: {n} obroka promenjena u planu.|Lista za kupovinu {list} je ažurirana: {n} obroka promenjeno u planu.",
-      "checked": false
+      "checked": true
     },
     "shop.updatedOn": {
       "text": "Ažurirana {on} da prati plan.",
-      "checked": false
+      "checked": true
     },
     "shop.nowIs": {
       "text": "{day}, {meal}: sada {to}",
-      "checked": false
+      "checked": true
     },
     "shop.inPlace": {
       "text": ", umesto: {from}",
-      "checked": false
+      "checked": true
     },
     "shop.because": {
       "text": ", jer si za {what} označio Ne ovaj put|, jer si za {what} označila Ne ovaj put",
-      "checked": false
+      "checked": true
     },
     "shop.pickedIdeas": {
       "text": ". Izabrano iz ideja Chef Mealana. Samo za ovaj dan.",
-      "checked": false
+      "checked": true
     },
     "shop.shortNow": {
       "text": "Ne ovaj put: {foods}. Fali sada: {meals}.",
-      "checked": false
+      "checked": true
     },
     "shop.labelNow": {
       "text": "{label}: sada {title}.",
-      "checked": false
+      "checked": true
     },
     "shop.addedOne": {
       "text": " Na listi: {what}.",
-      "checked": false
+      "checked": true
     },
     "shop.addedMany": {
       "text": " Na listi: {what}.",
-      "checked": false
+      "checked": true
     },
     "shop.fromList": {
       "text": "Sa liste {n}",
-      "checked": false
+      "checked": true
     },
     "shop.short": {
       "text": "Fali: {what}",
-      "checked": false
+      "checked": true
     },
     "shop.noFoods": {
       "text": "{title}: nema sačuvanih namirnica.",
-      "checked": false
+      "checked": true
     },
     "shop.notTicked": {
       "text": "{n} namirnica nije označena. Prenesi je na sledeću listu?|{n} namirnice nisu označene. Prenesi ih na sledeću listu?|{n} namirnica nije označeno. Prenesi ih na sledeću listu?",
-      "checked": false
+      "checked": true
     },
     "shop.carryIt": {
       "text": "Prenesi je",
-      "checked": false
+      "checked": true
     },
     "shop.carryThem": {
       "text": "Prenesi ih",
-      "checked": false
+      "checked": true
     },
     "shop.leaveIt": {
       "text": "Ostavi je",
-      "checked": false
+      "checked": true
     },
     "shop.leaveThem": {
       "text": "Ostavi ih",
-      "checked": false
+      "checked": true
     },
     "shop.whichDays": {
       "text": "Za koje dane? Počinje: {start}",
-      "checked": false
+      "checked": true
     },
     "shop.notCounted": {
       "text": ", sa planiranim obrocima koje još nijedna lista nije uzela",
-      "checked": false
+      "checked": true
     },
     "shop.dayAfter": {
       "text": ", dan posle tvoje poslednje liste",
-      "checked": false
+      "checked": true
     },
     "shop.firstDay": {
       "text": ", prvi dan sa planiranim obrocima",
-      "checked": false
+      "checked": true
     },
     "shop.nDays": {
       "text": "{n} dan|{n} dana|{n} dana",
-      "checked": false
+      "checked": true
     },
     "shop.plannedMeals": {
       "text": "{n} planirani obrok|{n} planirana obroka|{n} planiranih obroka",
-      "checked": false
+      "checked": true
     },
     "shop.nFoods": {
       "text": "{n} namirnica|{n} namirnice|{n} namirnica",
-      "checked": false
+      "checked": true
     },
     "shop.plusFrom": {
       "text": ", plus {n} sa liste {list}",
-      "checked": false
+      "checked": true
     },
     "shop.makeN": {
       "text": "Napravi listu za kupovinu {n}",
-      "checked": false
+      "checked": true
     },
     "shop.finishedLow": {
       "text": "završena {on}",
-      "checked": false
+      "checked": true
     },
     "job.protein": {
       "text": "Proteinska osnova",
-      "checked": false
+      "checked": true
     },
     "job.flavour": {
       "text": "Za ukus",
-      "checked": false
+      "checked": true
     },
     "job.carb": {
       "text": "Osnova od ugljenih hidrata",
-      "checked": false
+      "checked": true
     },
     "job.fat": {
       "text": "Izvor masti",
-      "checked": false
+      "checked": true
     },
     "job.volume": {
       "text": "Za zapreminu",
-      "checked": false
+      "checked": true
     },
     "job.drink": {
       "text": "Piće",
-      "checked": false
+      "checked": true
     },
     "job.mixed": {
       "text": "Mešano",
-      "checked": false
+      "checked": true
     },
     "job.spread": {
       "text": "namaz",
-      "checked": false
+      "checked": true
     },
     "job.typical": {
       "text": "tipične vrednosti, proveri pakovanje",
-      "checked": false
+      "checked": true
     },
     "foods.jobBy": {
       "text": "{job}, {brand}",
-      "checked": false
+      "checked": true
     },
     "foods.per100": {
       "text": "Na 100 g: {kcal} kcal i {protein} g proteina.",
-      "checked": false
+      "checked": true
     },
     "foods.also": {
       "text": " Takođe: {names}.",
-      "checked": false
+      "checked": true
     },
     "opt.moves.sitting.name": {
       "text": "Uglavnom sedenje",
-      "checked": false
+      "checked": true
     },
     "opt.moves.sitting.hint": {
       "text": "za stolom, vožnja",
-      "checked": false
+      "checked": true
     },
     "opt.moves.feet.name": {
       "text": "Na nogama",
-      "checked": false
+      "checked": true
     },
     "opt.moves.feet.hint": {
       "text": "prodavnica, nega, nastava",
-      "checked": false
+      "checked": true
     },
     "opt.moves.physical.name": {
       "text": "Fizički posao",
-      "checked": false
+      "checked": true
     },
     "opt.moves.physical.hint": {
       "text": "gradnja, poljoprivreda, nošenje",
-      "checked": false
+      "checked": true
     },
     "opt.hours.fixed.name": {
       "text": "Fiksno radno vreme",
-      "checked": false
+      "checked": true
     },
     "opt.hours.fixed.hint": {
       "text": "isto vreme svaki dan",
-      "checked": false
+      "checked": true
     },
     "opt.hours.flexible.name": {
       "text": "Fleksibilno radno vreme",
-      "checked": false
+      "checked": true
     },
     "opt.hours.flexible.hint": {
       "text": "ti biraš kada",
-      "checked": false
+      "checked": true
     },
     "opt.hours.shifts.name": {
       "text": "Smene",
-      "checked": false
+      "checked": true
     },
     "opt.hours.shifts.hint": {
       "text": "rana, kasna, noćna ili rotacija",
-      "checked": false
+      "checked": true
     },
     "opt.hours.none.name": {
       "text": "Bez fiksnog posla",
-      "checked": false
+      "checked": true
     },
     "opt.hours.none.hint": {
       "text": "kuća, studije, penzija",
-      "checked": false
+      "checked": true
     },
     "opt.weekday_choices.work.name": {
       "text": "Posao",
-      "checked": false
+      "checked": true
     },
     "opt.weekday_choices.work.hint": {
       "text": "posao, na licu mesta ili od kuće",
-      "checked": false
+      "checked": true
     },
     "opt.weekday_choices.study.name": {
       "text": "Učenje",
-      "checked": false
+      "checked": true
     },
     "opt.weekday_choices.study.hint": {
       "text": "fakultet, škola, kurs",
-      "checked": false
+      "checked": true
     },
     "opt.weekday_choices.both.name": {
       "text": "Posao i učenje",
-      "checked": false
+      "checked": true
     },
     "opt.weekday_choices.both.hint": {
       "text": "zanat, posao uz studije",
-      "checked": false
+      "checked": true
     },
     "opt.weekday_choices.home.name": {
       "text": "Kod kuće",
-      "checked": false
+      "checked": true
     },
     "opt.weekday_choices.home.hint": {
       "text": "kuća i porodica, penzija, između poslova",
-      "checked": false
+      "checked": true
     },
     "opt.study_hours.mornings.name": {
       "text": "Pre podne",
-      "checked": false
+      "checked": true
     },
     "opt.study_hours.mornings.hint": {
       "text": "završava oko ručka",
-      "checked": false
+      "checked": true
     },
     "opt.study_hours.full.name": {
       "text": "Ceo dan",
-      "checked": false
+      "checked": true
     },
     "opt.study_hours.full.hint": {
       "text": "do popodneva",
-      "checked": false
+      "checked": true
     },
     "opt.study_hours.alternating.name": {
       "text": "Menja se svake nedelje",
-      "checked": false
+      "checked": true
     },
     "opt.study_hours.alternating.hint": {
       "text": "pre podne, pa po podne",
-      "checked": false
+      "checked": true
     },
     "opt.school_hours.mornings.name": {
       "text": "Pre podne",
-      "checked": false
+      "checked": true
     },
     "opt.school_hours.mornings.hint": {
       "text": "škola završava oko ručka",
-      "checked": false
+      "checked": true
     },
     "opt.school_hours.full.name": {
       "text": "Ceo dan",
-      "checked": false
+      "checked": true
     },
     "opt.school_hours.full.hint": {
       "text": "škola do popodneva",
-      "checked": false
+      "checked": true
     },
     "opt.school_hours.alternating.name": {
       "text": "Menja se svake nedelje",
-      "checked": false
+      "checked": true
     },
     "opt.school_hours.alternating.hint": {
       "text": "jedne nedelje pre podne, sledeće po podne",
-      "checked": false
+      "checked": true
     },
     "opt.school_hours.none.name": {
       "text": "Nije u školi",
-      "checked": false
+      "checked": true
     },
     "opt.school_hours.none.hint": {
       "text": "raspust, pauza, škola kod kuće",
-      "checked": false
+      "checked": true
     },
     "opt.commutes.walk.name": {
       "text": "Peške",
-      "checked": false
+      "checked": true
     },
     "opt.commutes.bike.name": {
       "text": "Bicikl",
-      "checked": false
+      "checked": true
     },
     "opt.commutes.bus.name": {
       "text": "Autobus ili voz",
-      "checked": false
+      "checked": true
     },
     "opt.commutes.car.name": {
       "text": "Auto",
-      "checked": false
+      "checked": true
     },
     "opt.pe_week.1.name": {
       "text": "Jednom nedeljno",
-      "checked": false
+      "checked": true
     },
     "opt.pe_week.2.name": {
       "text": "Dvaput nedeljno",
-      "checked": false
+      "checked": true
     },
     "opt.pe_week.3.name": {
       "text": "Tri puta ili više",
-      "checked": false
+      "checked": true
     },
     "opt.pe_week.none.name": {
       "text": "Nijednom",
-      "checked": false
+      "checked": true
     },
     "opt.slots.95.name": {
       "text": "9 do 5",
-      "checked": false
+      "checked": true
     },
     "opt.slots.84.name": {
       "text": "8 do 4",
-      "checked": false
+      "checked": true
     },
     "opt.slots.73.name": {
       "text": "7 do 3",
-      "checked": false
+      "checked": true
     },
     "opt.slots.my.name": {
       "text": "Moje radno vreme",
-      "checked": false
+      "checked": true
     },
     "opt.life.desk.name": {
       "text": "Uglavnom sedenje",
-      "checked": false
+      "checked": true
     },
     "opt.life.desk.hint": {
       "text": "posao za stolom, 9 do 5",
-      "checked": false
+      "checked": true
     },
     "opt.life.shift.name": {
       "text": "Stojim i hodam deo dana",
-      "checked": false
+      "checked": true
     },
     "opt.life.shift.hint": {
       "text": "rad u smenama, recepcija, laboratorija",
-      "checked": false
+      "checked": true
     },
     "opt.life.feet.name": {
       "text": "Na nogama većinu dana",
-      "checked": false
+      "checked": true
     },
     "opt.life.feet.hint": {
       "text": "prodavnica, nega, nastava",
-      "checked": false
+      "checked": true
     },
     "opt.life.physical.name": {
       "text": "Težak fizički posao",
-      "checked": false
+      "checked": true
     },
     "opt.life.physical.hint": {
       "text": "gradnja, poljoprivreda, nošenje",
-      "checked": false
+      "checked": true
     },
     "opt.w.cookAtHome": {
       "text": "Kuvam kod kuće",
-      "checked": false
+      "checked": true
     },
     "opt.w.mealPrepForDays": {
       "text": "Kuvam unapred za više dana",
-      "checked": false
+      "checked": true
     },
     "opt.w.canteenAtWork": {
       "text": "Menza na poslu",
-      "checked": false
+      "checked": true
     },
     "opt.w.restaurants": {
       "text": "Restorani",
-      "checked": false
+      "checked": true
     },
     "opt.w.takeaway": {
       "text": "Hrana za poneti",
-      "checked": false
+      "checked": true
     },
     "opt.w.familyDinners": {
       "text": "Porodične večere",
-      "checked": false
+      "checked": true
     },
     "opt.w.atHome": {
       "text": "Kod kuće",
-      "checked": false
+      "checked": true
     },
     "opt.w.schoolLunch": {
       "text": "Ručak u školi",
-      "checked": false
+      "checked": true
     },
     "opt.w.lunchPackedFromHome": {
       "text": "Ručak spakovan od kuće",
-      "checked": false
+      "checked": true
     },
     "opt.w.bakeryOrShopNearSchool": {
       "text": "Pekara ili prodavnica kod škole",
-      "checked": false
+      "checked": true
     },
     "opt.w.everything": {
       "text": "Sve",
-      "checked": false
+      "checked": true
     },
     "opt.w.vegetarian": {
       "text": "Vegetarijanski",
-      "checked": false
+      "checked": true
     },
     "opt.w.vegan": {
       "text": "Veganski",
-      "checked": false
+      "checked": true
     },
     "opt.w.pescatarian": {
       "text": "Peskatarijanski",
-      "checked": false
+      "checked": true
     },
     "opt.w.noPork": {
       "text": "Bez svinjetine",
-      "checked": false
+      "checked": true
     },
     "opt.w.paleo": {
       "text": "Paleo",
-      "checked": false
+      "checked": true
     },
     "opt.w.meatOnly": {
       "text": "Samo meso",
-      "checked": false
+      "checked": true
     },
     "opt.w.other": {
       "text": "Drugo",
-      "checked": false
+      "checked": true
     },
     "opt.w.none": {
       "text": "Ništa",
-      "checked": false
+      "checked": true
     },
     "opt.w.occasionally": {
       "text": "Povremeno",
-      "checked": false
+      "checked": true
     },
     "opt.w.onWeekends": {
       "text": "Vikendom",
-      "checked": false
+      "checked": true
     },
     "opt.w.aFewTimesAWeek": {
       "text": "Nekoliko puta nedeljno",
-      "checked": false
+      "checked": true
     },
     "opt.w.mostDays": {
       "text": "Većinu dana",
-      "checked": false
+      "checked": true
     },
     "opt.w.noMeatPoultryFishOr": {
       "text": "Bez mesa, živine, ribe i morskih plodova.",
-      "checked": false
+      "checked": true
     },
     "opt.w.noFoodFromAnimalsNo": {
       "text": "Bez hrane životinjskog porekla: bez mesa, ribe, jaja, mlečnih proizvoda i meda.",
-      "checked": false
+      "checked": true
     },
     "opt.w.fishAndSeafoodNoOther": {
       "text": "Riba i morski plodovi, bez drugog mesa.",
-      "checked": false
+      "checked": true
     },
     "opt.w.noPorkHamBaconOr": {
       "text": "Bez svinjetine, šunke, slanine i svinjskih kobasica.",
-      "checked": false
+      "checked": true
     },
     "opt.w.noGrainsLegumesOrDairy": {
       "text": "Bez žitarica, mahunarki i mlečnih proizvoda.",
-      "checked": false
+      "checked": true
     },
     "opt.w.meatFishAndEggs": {
       "text": "Meso, riba i jaja.",
-      "checked": false
+      "checked": true
     },
     "opt.w.creamy": {
       "text": "Kremasto",
-      "checked": false
+      "checked": true
     },
     "opt.w.crunchy": {
       "text": "Hrskavo",
-      "checked": false
+      "checked": true
     },
     "opt.w.chocolate": {
       "text": "Čokolada",
-      "checked": false
+      "checked": true
     },
     "opt.w.vanilla": {
       "text": "Vanila",
-      "checked": false
+      "checked": true
     },
     "opt.w.fruity": {
       "text": "Voćno",
-      "checked": false
+      "checked": true
     },
     "opt.w.spicy": {
       "text": "Ljuto",
-      "checked": false
+      "checked": true
     },
     "opt.w.freshHerbs": {
       "text": "Sveže začinsko bilje",
-      "checked": false
+      "checked": true
     },
     "opt.w.sour": {
       "text": "Kiselo",
-      "checked": false
+      "checked": true
     },
     "opt.w.verySweet": {
       "text": "Veoma slatko",
-      "checked": false
+      "checked": true
     },
     "opt.w.bitter": {
       "text": "Gorko",
-      "checked": false
+      "checked": true
     },
     "opt.w.fishy": {
       "text": "Ukus ribe",
-      "checked": false
+      "checked": true
     },
     "opt.w.smallPortions": {
       "text": "Male porcije",
-      "checked": false
+      "checked": true
     },
     "opt.w.bigPlatesMoreVolume": {
       "text": "Veliki tanjiri, više zapremine",
-      "checked": false
+      "checked": true
     },
     "opt.w.quickToMake": {
       "text": "Brzo za pripremu",
-      "checked": false
+      "checked": true
     },
     "me2.goal": {
       "text": "Cilj",
-      "checked": false
+      "checked": true
     },
     "me2.lifestyle": {
       "text": "Način života",
-      "checked": false
+      "checked": true
     },
     "life.whySchool": {
       "text": "Koliko se krećeš u školi običnog dana, pre sporta.",
-      "checked": false
+      "checked": true
     },
     "life.schoolHours": {
       "text": "Vreme u školi",
-      "checked": false
+      "checked": true
     },
     "life.toSchool": {
       "text": "Kako ideš do škole",
-      "checked": false
+      "checked": true
     },
     "life.toSchoolHint": {
       "text": "Hodanje ili vožnja bicikla tamo i nazad računa se kao lagana aktivnost svakog školskog dana.",
-      "checked": false
+      "checked": true
     },
     "life.peSchool": {
       "text": "Sport u školi",
-      "checked": false
+      "checked": true
     },
     "life.peHint": {
       "text": "Dane biraš u Nedelji treninga.",
-      "checked": false
+      "checked": true
     },
     "life.whyWeek": {
       "text": "Koliko te kreću radni dani, pre treninga.",
-      "checked": false
+      "checked": true
     },
     "life.weekdays": {
       "text": "Tvoji radni dani",
-      "checked": false
+      "checked": true
     },
     "life.workingHours": {
       "text": "Radno vreme",
-      "checked": false
+      "checked": true
     },
     "life.atWork": {
       "text": "Na poslu si",
-      "checked": false
+      "checked": true
     },
     "life.workTravel": {
       "text": "Putovanja zbog posla",
-      "checked": false
+      "checked": true
     },
     "life.studyHours": {
       "text": "Vreme učenja",
-      "checked": false
+      "checked": true
     },
     "life.getThere": {
       "text": "Kako stižeš tamo",
-      "checked": false
+      "checked": true
     },
     "life.getThereHint": {
       "text": "Hodanje ili vožnja bicikla tamo i nazad računa se kao lagana aktivnost svakog dana učenja.",
-      "checked": false
+      "checked": true
     },
     "life.peStudy": {
       "text": "Sport kao deo studija",
-      "checked": false
+      "checked": true
     },
     "life.peStudyHint": {
       "text": "Za smerove sa sportom, kao sportsko odeljenje. Dane biraš u Nedelji treninga.",
-      "checked": false
+      "checked": true
     },
     "life.wake": {
       "text": "Buđenje",
-      "checked": false
+      "checked": true
     },
     "life.bed": {
       "text": "Odlazak na spavanje",
-      "checked": false
+      "checked": true
     },
     "life.mealsADay": {
       "text": "Obroka dnevno",
-      "checked": false
+      "checked": true
     },
     "life.mealTimes": {
       "text": "Vreme obroka",
-      "checked": false
+      "checked": true
     },
     "life.mealTimesHint": {
       "text": "Kada jedeš svaki obrok. Iz toga sledi tvoj vremenski okvir za jelo.",
-      "checked": false
+      "checked": true
     },
     "life.whereEat": {
       "text": "Gde jedeš",
-      "checked": false
+      "checked": true
     },
     "life.pickAll": {
       "text": "Izaberi sve što važi.",
-      "checked": false
+      "checked": true
     },
     "life.whatEat": {
       "text": "Šta jedeš",
-      "checked": false
+      "checked": true
     },
     "life.alcohol": {
       "text": "Alkohol",
-      "checked": false
+      "checked": true
     },
     "life.alcoholHint": {
       "text": "Alkohol se računa kao energija, 7 kcal po gramu, i usporava oporavak. Chef Mealan zna koliko često piješ: kad pomeneš piće ili izlazak, uračuna ga i ostavi mesta u danu.",
-      "checked": false
+      "checked": true
     },
     "plan.unitPortion": {
       "text": "Jedna porcija",
-      "checked": false
+      "checked": true
     },
     "plan.fillOpen": {
       "text": "Neka Chef Mealan popuni slobodne obroke",
-      "checked": false
+      "checked": true
     },
     "foods.inYourFoods": {
       "text": "{n} u tvojim namirnicama",
-      "checked": false
+      "checked": true
     },
     "goal.bandIdle": {
       "text": "Dodirni jednu da vidiš koji PD pokriva.",
-      "checked": false
+      "checked": true
     },
     "me.pdAverageDay": {
       "text": "{pd}, prosečan dan",
-      "checked": false
+      "checked": true
     },
     "me.goalHint": {
       "text": "{kcal} kcal prosečnog dana, {protein} g proteina svaki dan",
-      "checked": false
+      "checked": true
     },
     "me.rowProfile": {
       "text": "Profil",
-      "checked": false
+      "checked": true
     },
     "me.rowAccount": {
       "text": "Nalog",
-      "checked": false
+      "checked": true
     },
     "menu.rowCoach": {
       "text": "Trener",
-      "checked": false
+      "checked": true
     },
     "menu.rowSupport": {
       "text": "Podrška",
-      "checked": false
+      "checked": true
     },
     "life.fiveOrMore": {
       "text": "5 ili više",
-      "checked": false
+      "checked": true
     },
     "life.slotTime": {
       "text": "{meal}: vreme",
-      "checked": false
+      "checked": true
     },
     "life.windowOne": {
       "text": "Jedan obrok dnevno, u {from}. Prozor za jelo: od {from} do {to}, sat od tvog obroka. On nosi ceo tvoj dan: oko {kcal} kcal i {protein} g proteina.",
-      "checked": false
+      "checked": true
     },
     "life.window": {
       "text": "Prozor za jelo: od {from} do {to}. Od prvog do poslednjeg obroka.",
-      "checked": false
+      "checked": true
     },
     "life.readsThis": {
       "text": "Chef Mealan ovo čita uz svaki tanjir i recept koji predloži.",
-      "checked": false
+      "checked": true
     },
     "week.barFoot": {
       "text": "Traka pokazuje koliko je dan težak. Dodirni dan da ga otvoriš; dodirni ga ponovo da ga zatvoriš.",
-      "checked": false
+      "checked": true
     },
     "week.barFootSchool": {
       "text": "Traka pokazuje koliko je dan težak, sport u školi i posle škole zajedno. Dodirni dan da ga otvoriš; dodirni ga ponovo da ga zatvoriš.",
+      "checked": true
+    },
+    "sumdo.life.weekdays": {
+      "text": "Koliko te radni dani pokreću, pre bilo kakvog treninga.",
+      "checked": false
+    },
+    "sumdo.life.hours": {
+      "text": "Sa fiksnim radnim vremenom, ponedeljak do petak su radni dani; obroci se uklapaju oko posla.",
+      "checked": false
+    },
+    "sumdo.life.slot": {
+      "text": "Tvoje radno vreme: obroci se uklapaju oko njega, i Chef Mealan planira oko posla.",
+      "checked": false
+    },
+    "sumdo.life.move": {
+      "text": "Koliko troši dan bez treninga.",
+      "checked": false
+    },
+    "sumdo.life.workFrom": {
+      "text": "Moje radno vreme: obroci se uklapaju oko njega.",
+      "checked": false
+    },
+    "sumdo.life.workTo": {
+      "text": "Moje radno vreme: obroci se uklapaju oko njega.",
+      "checked": false
+    },
+    "sumdo.life.travel": {
+      "text": "Chef Mealan zna da su neki tvoji dani van kuće.",
+      "checked": false
+    },
+    "sumdo.life.school": {
+      "text": "Vreme učenja: koliko te radni dani pokreću.",
+      "checked": false
+    },
+    "sumdo.life.commute": {
+      "text": "Pešačenje ili vožnja bicikla tamo i nazad računa se kao lagana aktivnost.",
+      "checked": false
+    },
+    "sumdo.life.peWeek": {
+      "text": "Sport u okviru studija, u dane iz tvoje sedmice treninga.",
+      "checked": false
+    },
+    "sumdo.life.bed": {
+      "text": "Određuje poslednji obrok, dva sata pre spavanja.",
+      "checked": false
+    },
+    "sumdo.life.wake": {
+      "text": "Određuje prvi obrok, sat i po posle buđenja.",
+      "checked": false
+    },
+    "sumdo.life.where": {
+      "text": "Chef Mealan zna gde ti se dešavaju obroci: ručak u menzi, priprema unapred, jelo napolju.",
+      "checked": false
+    },
+    "sumdo.life.meals": {
+      "text": "Tvoja mesta na Planu i na Danas.",
+      "checked": false
+    },
+    "sumdo.life.window": {
+      "text": "Ranije podešen prozor za jelo: odakle kreću vremena obroka.",
+      "checked": false
+    },
+    "sumdo.life.diet": {
+      "text": "Chef Mealan nikad ne nudi namirnicu koju tvoja ishrana izostavlja; jela iz kuhinja je prate.",
+      "checked": false
+    },
+    "sumdo.life.alcohol": {
+      "text": "Kad pomeneš piće, računa se kao energija i ostavlja mesta u danu.",
+      "checked": false
+    },
+    "sumdo.life.dietOther": {
+      "text": "Uz Drugo, kako jedeš, tvojim rečima.",
+      "checked": false
+    },
+    "sumdo.life.slotTimes": {
+      "text": "Vremena obroka koja si sam podesio.|Vremena obroka koja si sama podesila.",
+      "checked": false
+    },
+    "sumdo.personal.sex": {
+      "text": "Tvoja potrošnja u mirovanju: formule se razlikuju.",
+      "checked": false
+    },
+    "sumdo.personal.birthYear": {
+      "text": "Tvoja potrošnja u mirovanju, i da imaš 18 ili više godina.",
+      "checked": false
+    },
+    "sumdo.personal.heightCm": {
+      "text": "Tvoja potrošnja u mirovanju.",
+      "checked": false
+    },
+    "sumdo.personal.weightKg": {
+      "text": "Tvoja potrošnja u mirovanju i tvoj raspon proteina.",
+      "checked": false
+    },
+    "sumdo.personal.bodyFatPct": {
+      "text": "Sa procentom masti, formula koja računa čistu masu.",
+      "checked": false
+    },
+    "sumdo.personal.week": {
+      "text": "Koliko dana svake vrste ima tvoja sedmica.",
+      "checked": false
+    },
+    "sumdo.personal.easyMin": {
+      "text": "Koliko traje lagan trening.",
+      "checked": false
+    },
+    "sumdo.personal.hardMin": {
+      "text": "Koliko traje težak trening.",
+      "checked": false
+    },
+    "sumdo.personal.steps": {
+      "text": "Tvoji koraci u običan dan, računaju se svakog dana.",
+      "checked": false
+    },
+    "sumdo.personal.trainingAge": {
+      "text": "Koliko dugo treniraš: tempo za Izgradnju mišića i kakav trend težine da očekuješ.",
+      "checked": false
+    },
+    "sumdo.personal.weighIns": {
+      "text": "Tvoj trend u odnosu na ono što cilj očekuje.",
+      "checked": false
+    },
+    "sumdo.personal.dayMode": {
+      "text": "Svaki dan svoje brojeve, ili svaki dan iste.",
+      "checked": false
+    },
+    "sumdo.personal.ownDays": {
+      "text": "Brojevi za vrstu dana, podešeni ručno.",
+      "checked": false
+    },
+    "sumdo.personal.plan": {
+      "text": "Tvoja uobičajena sedmica: trening svakog dana, njegovi brojevi, red treninga na Planu.",
+      "checked": false
+    },
+    "sumdo.personal.dated": {
+      "text": "Promena za jedan datum; uobičajena sedmica ostaje.",
+      "checked": false
+    },
+    "sumdo.personal.formula": {
+      "text": "Formula za potrošnju u mirovanju koju si izabrao.|Formula za potrošnju u mirovanju koju si izabrala.",
+      "checked": false
+    },
+    "sumdo.personal.nextGoal": {
+      "text": "Cilj od kasnijeg datuma.",
+      "checked": false
+    },
+    "sumdo.personal.measuredUse": {
+      "text": "Tvoja izmerena potrošnja, u upotrebi sa Iz tvojih podataka.",
+      "checked": false
+    },
+    "sumdo.personal.timesOn": {
+      "text": "Obrok pomeren za jedan datum.",
+      "checked": false
+    },
+    "sumdo.personal.kitchens": {
+      "text": "Chef Mealan prvo kuva u ovim kuhinjama.",
+      "checked": false
+    },
+    "sumdo.personal.carbsFat": {
+      "text": "Kako se tvoj dan deli na ugljene hidrate i masti.",
+      "checked": false
+    },
+    "sumdo.personal.kitchenTaste": {
+      "text": "Po kuhinji, jela ka kojima Chef Mealan kuva i ona koja izostavlja.",
+      "checked": false
+    },
+    "sumdo.personal.tasteChips": {
+      "text": "Ideje idu po tvom ukusu. Nikad ne menja tvoje brojeve.",
+      "checked": false
+    },
+    "sumdo.personal.equipment": {
+      "text": "Koraci su napisani za ono čime kuvaš.",
+      "checked": false
+    },
+    "sumdo.personal.travel": {
+      "text": "Režim putovanja: pretraga i skeniranje čitaju police tamo gde si; Chef Mealan predlaže ono što odgovara kuhinji koju tamo imaš; merenje može da pauzira.",
+      "checked": false
+    },
+    "sumdo.personal.trips": {
+      "text": "Dani kad si putovao, označeni kao putovanje.|Dani kad si putovala, označeni kao putovanje.",
+      "checked": false
+    },
+    "sumdo.safety.consentBodyAt": {
+      "text": "Tvoja saglasnost pre nego što se bilo šta o tvom telu sačuva.",
+      "checked": false
+    },
+    "sumdo.safety.adultAt": {
+      "text": "Da imaš 18 ili više godina: AI koji Chef Mealan koristi je za odrasle.",
+      "checked": false
+    },
+    "sumdo.safety.situations": {
+      "text": "Chef Mealan se povlači gde treba, i kaže s kim da razgovaraš.",
+      "checked": false
+    },
+    "sumdo.safety.flags": {
+      "text": "Svaka označena situacija, sa datumom; tvoj trener vidi koja i kada.",
+      "checked": false
+    },
+    "sumdo.safety.allergies": {
+      "text": "Namirnica koju navedeš nikad se ne predlaže.",
+      "checked": false
+    },
+    "sumdo.safety.declaredAt": {
+      "text": "Kada si poslednji put odgovorio: pita se ponovo jednom godišnje.|Kada si poslednji put odgovorila: pita se ponovo jednom godišnje.",
+      "checked": false
+    },
+    "sumdo.safety.none": {
+      "text": "Ništa od ovoga, označeno namerno.",
+      "checked": false
+    },
+    "share.goal.name": {
+      "text": "Cilj i brojevi",
+      "checked": false
+    },
+    "share.goal.why": {
+      "text": "Tvoj cilj i tvoji dnevni brojevi. Tvoj trener ih već vidi.",
+      "checked": false
+    },
+    "share.day.name": {
+      "text": "Tvoj dan",
+      "checked": false
+    },
+    "share.day.why": {
+      "text": "Posao, buđenje i spavanje, vremena obroka.",
+      "checked": false
+    },
+    "share.eat.name": {
+      "text": "Kako jedeš",
+      "checked": false
+    },
+    "share.eat.why": {
+      "text": "Obroci dnevno, gde jedeš, tvoji čipovi ukusa.",
+      "checked": false
+    },
+    "share.week.name": {
+      "text": "Sedmica treninga",
+      "checked": false
+    },
+    "share.week.why": {
+      "text": "Tvoja uobičajena sedmica.",
+      "checked": false
+    },
+    "share.shop.name": {
+      "text": "Gde kupuješ i kuvaš",
+      "checked": false
+    },
+    "share.shop.why": {
+      "text": "Mesta, kuhinje, čime kuvaš.",
+      "checked": false
+    },
+    "share.diet.name": {
+      "text": "Šta jedeš",
+      "checked": false
+    },
+    "share.diet.why": {
+      "text": "Tvoja ishrana. Ishrana može reći nešto o tvojim uverenjima ili zdravlju: isključeno dok ne uključiš.",
+      "checked": false
+    },
+    "share.alcohol.name": {
+      "text": "Alkohol",
+      "checked": false
+    },
+    "share.alcohol.why": {
+      "text": "Koliko često piješ. Isključeno dok ne uključiš.",
+      "checked": false
+    },
+    "share.words.name": {
+      "text": "Tvojim rečima",
+      "checked": false
+    },
+    "share.words.why": {
+      "text": "Ono što je napisano o tvojoj ishrani ili ukusu. Isključeno dok ne uključiš.",
+      "checked": false
+    },
+    "share.health.name": {
+      "text": "Zdravstvena pitanja",
+      "checked": false
+    },
+    "share.health.why": {
+      "text": "Šta je označeno, i kada. Tvoj trener ovo već vidi, nikad tvoje reči.",
+      "checked": false
+    },
+    "share.allergies.name": {
+      "text": "Alergije i netolerancije",
+      "checked": false
+    },
+    "share.allergies.why": {
+      "text": "Podeli ih ako želiš da trener planira oko njih.",
+      "checked": false
+    },
+    "share.body.name": {
+      "text": "Tvoji telesni podaci",
+      "checked": false
+    },
+    "share.body.why": {
+      "text": "Pol, godište, visina, težina i procenat masti, i tvoja merenja u kilogramima. Isključeno, tvoj trener vidi merenja samo kao trend u procentima. Uključivanje je tvoja saglasnost, sa datumom, i možeš je povući.",
+      "checked": false
+    },
+    "sum.listAnd": {
+      "text": "{a} i {b}",
+      "checked": false
+    },
+    "sum.bed.early": {
+      "text": "pre 22:00",
+      "checked": false
+    },
+    "sum.bed.mid": {
+      "text": "22:00 do ponoći",
+      "checked": false
+    },
+    "sum.bed.late": {
+      "text": "posle ponoći",
+      "checked": false
+    },
+    "sum.bed.varies": {
+      "text": "menja se sa smenama",
+      "checked": false
+    },
+    "sum.bed.none": {
+      "text": "spavanje nije podešeno",
+      "checked": false
+    },
+    "sum.wake.early": {
+      "text": "pre 6:00",
+      "checked": false
+    },
+    "sum.wake.mid": {
+      "text": "6:00 do 8:00",
+      "checked": false
+    },
+    "sum.wake.late": {
+      "text": "posle 8:00",
+      "checked": false
+    },
+    "sum.wake.varies": {
+      "text": "menja se sa smenama",
+      "checked": false
+    },
+    "sum.wake.none": {
+      "text": "buđenje nije podešeno",
+      "checked": false
+    },
+    "sum.male": {
+      "text": "Muško",
+      "checked": false
+    },
+    "sum.female": {
+      "text": "Žensko",
+      "checked": false
+    },
+    "sum.born": {
+      "text": "godište {year}",
+      "checked": false
+    },
+    "sum.bodyFat": {
+      "text": "{n} % telesne masti",
+      "checked": false
+    },
+    "sum.you": {
+      "text": "Ti",
+      "checked": false
+    },
+    "sum.body": {
+      "text": "Telo",
+      "checked": false
+    },
+    "sum.bodyDoesBurn": {
+      "text": "Tvoja potrošnja u mirovanju, oko {kcal} kcal, i tvoj raspon proteina.",
+      "checked": false
+    },
+    "sum.bodyDoes": {
+      "text": "Tvoja potrošnja u mirovanju i tvoj raspon proteina.",
+      "checked": false
+    },
+    "sum.weighIns": {
+      "text": "Merenja",
+      "checked": false
+    },
+    "sum.weighInsValue": {
+      "text": "{n}, poslednje {date}",
+      "checked": false
+    },
+    "sum.goalByYouOn": {
+      "text": "{goal}, tvoj izbor, {date}",
+      "checked": false
+    },
+    "sum.goalByYou": {
+      "text": "{goal}, tvoj izbor",
+      "checked": false
+    },
+    "sum.goalByOn": {
+      "text": "{goal}, izbor: {who}, {date}",
+      "checked": false
+    },
+    "sum.goalBy": {
+      "text": "{goal}, izbor: {who}",
+      "checked": false
+    },
+    "sum.goal": {
+      "text": "Cilj",
+      "checked": false
+    },
+    "sum.goalDoes": {
+      "text": "Tvoji brojevi na Danas, Planu i Tanjiru prate ga.",
+      "checked": false
+    },
+    "sum.avg": {
+      "text": "Prosečan dan",
+      "checked": false
+    },
+    "sum.avgValue": {
+      "text": "{kcal} kcal · {protein} g proteina · {fat} g masti",
+      "checked": false
+    },
+    "sum.kcalByDay": {
+      "text": "{lo} do {hi} kcal po danu.",
+      "checked": false
+    },
+    "sum.proteinRange": {
+      "text": "Proteini {min} do {max} g: {lo} do {hi} g po kg.",
+      "checked": false
+    },
+    "sum.carbsFat": {
+      "text": "Ugljeni hidrati i masti",
+      "checked": false
+    },
+    "sum.lowCarbs": {
+      "text": "{split}, {g} g ugljenih hidrata dnevno",
+      "checked": false
+    },
+    "sum.carbsMove": {
+      "text": "Ugljeni hidrati se menjaju sa treningom: {lo} do {hi} g.",
+      "checked": false
+    },
+    "sum.pd": {
+      "text": "PD cilj",
+      "checked": false
+    },
+    "sum.pdValue": {
+      "text": "{pd} prosečnog dana",
+      "checked": false
+    },
+    "sum.pdDoes": {
+      "text": "Svaki tanjir i namirnica mere se prema cilju tog dana.",
+      "checked": false
+    },
+    "sum.trainingFor": {
+      "text": "Treniraš",
+      "checked": false
+    },
+    "sum.fromTo": {
+      "text": "{from} do {to}",
+      "checked": false
+    },
+    "sum.weekdays": {
+      "text": "Radni dani",
+      "checked": false
+    },
+    "sum.weekdaysWorkDoes": {
+      "text": "Koliko troši dan bez treninga; obroci se uklapaju oko posla.",
+      "checked": false
+    },
+    "sum.travelMode": {
+      "text": "Režim putovanja",
+      "checked": false
+    },
+    "sum.travelOn": {
+      "text": "Uključen od: {date} · {place} · {kitchen}",
+      "checked": false
+    },
+    "sum.trips": {
+      "text": "Putovanja",
+      "checked": false
+    },
+    "sum.trip": {
+      "text": "{place}, {from} do {to}",
+      "checked": false
+    },
+    "sum.workTravel": {
+      "text": "Poslovna putovanja",
+      "checked": false
+    },
+    "sum.sleep": {
+      "text": "Buđenje i spavanje",
+      "checked": false
+    },
+    "sum.mealsAt": {
+      "text": "Tvoji obroci u {times}.",
+      "checked": false
+    },
+    "sum.mealsAroundWork": {
+      "text": "Tvoji obroci se uklapaju oko posla: {times}.",
+      "checked": false
+    },
+    "sum.sleepDoes": {
+      "text": "Chef Mealan iz njih čita kada da jedeš.",
+      "checked": false
+    },
+    "sum.steps": {
+      "text": "Koraci u običan dan",
+      "checked": false
+    },
+    "sum.iLike": {
+      "text": "volim {what}",
+      "checked": false
+    },
+    "sum.ratherNot": {
+      "text": "radije ne {what}",
+      "checked": false
+    },
+    "sum.meals": {
+      "text": "Obroci",
+      "checked": false
+    },
+    "sum.mealsValue": {
+      "text": "{n} dnevno, {times}",
+      "checked": false
+    },
+    "sum.slotsOwn": {
+      "text": "Tvoja mesta na Planu i na Danas; {n} vreme je tvoje.|Tvoja mesta na Planu i na Danas; {n} vremena su tvoja.|Tvoja mesta na Planu i na Danas; {n} vremena su tvoja.",
+      "checked": false
+    },
+    "sum.where": {
+      "text": "Gde jedeš",
+      "checked": false
+    },
+    "sum.diet": {
+      "text": "Šta jedeš",
+      "checked": false
+    },
+    "sum.dietEverything": {
+      "text": "Svaka namirnica i jelo mogu biti predloženi.",
+      "checked": false
+    },
+    "sum.inYourWords": {
+      "text": "Tvojim rečima",
+      "checked": false
+    },
+    "sum.alcohol": {
+      "text": "Alkohol",
+      "checked": false
+    },
+    "sum.alcoholNone": {
+      "text": "Chef Mealan nikad ne predlaže piće.",
+      "checked": false
+    },
+    "sum.taste": {
+      "text": "Ukus",
+      "checked": false
+    },
+    "sum.tasteWords": {
+      "text": "Ukus, tvojim rečima",
+      "checked": false
+    },
+    "sum.tasteWordsDoes": {
+      "text": "Čita se kao dodatak, nikad iznad čipa, tvojih alergija ili tvojih brojeva.",
+      "checked": false
+    },
+    "sum.usualWeek": {
+      "text": "Tvoja uobičajena sedmica",
+      "checked": false
+    },
+    "sum.noTrainingYet": {
+      "text": "Još nema dana treninga",
+      "checked": false
+    },
+    "sum.trainDays": {
+      "text": "{n} dan treninga i {m} bez. Ugljeni hidrati rastu i padaju s njima.|{n} dana treninga i {m} bez. Ugljeni hidrati rastu i padaju s njima.|{n} dana treninga i {m} bez. Ugljeni hidrati rastu i padaju s njima.",
+      "checked": false
+    },
+    "sum.whereShop": {
+      "text": "Gde kupuješ",
+      "checked": false
+    },
+    "sum.whereShopDoes": {
+      "text": "Namirnice u tvojoj pretrazi, i šta ti Chef Mealan predlaže da kupiš.",
+      "checked": false
+    },
+    "sum.kitchens": {
+      "text": "Kuhinje",
+      "checked": false
+    },
+    "sum.equipment": {
+      "text": "Čime kuvaš",
+      "checked": false
+    },
+    "sum.situations": {
+      "text": "Da li se nešto od ovoga odnosi na tebe?",
+      "checked": false
+    },
+    "sum.answered": {
+      "text": "{what}, odgovoreno {date}",
+      "checked": false
+    },
+    "sum.noneOfThese": {
+      "text": "Ništa od ovoga",
+      "checked": false
+    },
+    "sum.notAnswered": {
+      "text": "Bez odgovora",
+      "checked": false
+    },
+    "sum.notAnsweredYet": {
+      "text": "Još bez odgovora",
+      "checked": false
+    },
+    "sum.helpsWithAll": {
+      "text": "Chef Mealan pomaže u svemu. Pita se ponovo jednom godišnje.",
+      "checked": false
+    },
+    "sum.askedBeforeChat": {
+      "text": "Pita se pre nego što se otvori razgovor.",
+      "checked": false
+    },
+    "sum.allergies": {
+      "text": "Alergije i netolerancije",
+      "checked": false
+    },
+    "opt.w.aLot": {
+      "text": "Mnogo",
+      "checked": false
+    },
+    "opt.w.munich": {
+      "text": "Minhen",
+      "checked": false
+    },
+    "opt.w.germanyElsewhere": {
+      "text": "Nemačka, drugde",
+      "checked": false
+    },
+    "opt.w.austria": {
+      "text": "Austrija",
+      "checked": false
+    },
+    "opt.w.switzerland": {
+      "text": "Švajcarska",
+      "checked": false
+    },
+    "opt.w.belgrade": {
+      "text": "Beograd",
+      "checked": false
+    },
+    "opt.w.serbiaElsewhere": {
+      "text": "Srbija, drugde",
+      "checked": false
+    },
+    "opt.w.madrid": {
+      "text": "Madrid",
+      "checked": false
+    },
+    "opt.w.spainElsewhere": {
+      "text": "Španija, drugde",
+      "checked": false
+    },
+    "opt.w.limassol": {
+      "text": "Limasol",
+      "checked": false
+    },
+    "opt.w.cyprusElsewhere": {
+      "text": "Kipar, drugde",
+      "checked": false
+    },
+    "opt.w.elsewhere": {
+      "text": "Drugde",
+      "checked": false
+    },
+    "opt.w.balkan": {
+      "text": "Balkanska",
+      "checked": false
+    },
+    "opt.w.italian": {
+      "text": "Italijanska",
+      "checked": false
+    },
+    "opt.w.mediterranean": {
+      "text": "Mediteranska",
+      "checked": false
+    },
+    "opt.w.german": {
+      "text": "Nemačka",
+      "checked": false
+    },
+    "opt.w.french": {
+      "text": "Francuska",
+      "checked": false
+    },
+    "opt.w.spanish": {
+      "text": "Španska",
+      "checked": false
+    },
+    "opt.w.greek": {
+      "text": "Grčka",
+      "checked": false
+    },
+    "opt.w.turkish": {
+      "text": "Turska",
+      "checked": false
+    },
+    "opt.w.middleEastern": {
+      "text": "Bliskoistočna",
+      "checked": false
+    },
+    "opt.w.indian": {
+      "text": "Indijska",
+      "checked": false
+    },
+    "opt.w.thai": {
+      "text": "Tajlandska",
+      "checked": false
+    },
+    "opt.w.chinese": {
+      "text": "Kineska",
+      "checked": false
+    },
+    "opt.w.japanese": {
+      "text": "Japanska",
+      "checked": false
+    },
+    "opt.w.korean": {
+      "text": "Korejska",
+      "checked": false
+    },
+    "opt.w.mexican": {
+      "text": "Meksička",
+      "checked": false
+    },
+    "opt.w.american": {
+      "text": "Američka",
+      "checked": false
+    },
+    "opt.w.oven": {
+      "text": "Rerna",
+      "checked": false
+    },
+    "opt.w.stovetop": {
+      "text": "Ringla",
+      "checked": false
+    },
+    "opt.w.microwave": {
+      "text": "Mikrotalasna",
+      "checked": false
+    },
+    "opt.w.airFryer": {
+      "text": "Frajer na vazduh",
+      "checked": false
+    },
+    "opt.w.blender": {
+      "text": "Blender",
+      "checked": false
+    },
+    "opt.w.thermomix": {
+      "text": "Thermomix",
+      "checked": false
+    },
+    "opt.w.kitchenScale": {
+      "text": "Kuhinjska vaga",
+      "checked": false
+    },
+    "opt.w.under5000": {
+      "text": "Ispod 5.000",
+      "checked": false
+    },
+    "opt.w.n50008000": {
+      "text": "5.000–8.000",
+      "checked": false
+    },
+    "opt.w.n800012000": {
+      "text": "8.000–12.000",
+      "checked": false
+    },
+    "opt.w.n12000": {
+      "text": "12.000+",
+      "checked": false
+    },
+    "opt.w.balanced": {
+      "text": "Uravnoteženo",
+      "checked": false
+    },
+    "opt.w.moreCarbs": {
+      "text": "Više ugljenih hidrata",
+      "checked": false
+    },
+    "opt.w.moreFat": {
+      "text": "Više masti",
+      "checked": false
+    },
+    "opt.w.veryLowCarb": {
+      "text": "Vrlo malo ugljenih hidrata",
+      "checked": false
+    },
+    "opt.w.under1Year": {
+      "text": "Manje od 1 godine",
+      "checked": false
+    },
+    "opt.w.n1To3Years": {
+      "text": "1 do 3 godine",
+      "checked": false
+    },
+    "opt.w.over3Years": {
+      "text": "Više od 3 godine",
+      "checked": false
+    },
+    "opt.w.aDifficultRelationshipWithEating": {
+      "text": "Težak odnos prema hrani",
+      "checked": false
+    },
+    "opt.w.pregnantOrBreastfeeding": {
+      "text": "Trudnoća ili dojenje",
+      "checked": false
+    },
+    "opt.w.diabetesOrInsulin": {
+      "text": "Dijabetes ili insulin",
+      "checked": false
+    },
+    "opt.w.allergiesOrIntolerances": {
+      "text": "Alergije ili netolerancije",
+      "checked": false
+    },
+    "opt.w.medicationThatAffectsFood": {
+      "text": "Lekovi koji utiču na hranu",
+      "checked": false
+    },
+    "summary.startedSharing": {
+      "text": "Počelo deljenje: {part}.",
+      "checked": false
+    },
+    "summary.stoppedSharing": {
+      "text": "Prestalo deljenje: {part}.",
+      "checked": false
+    },
+    "summary.healthData": {
+      "text": "zdravstveni podaci",
+      "checked": false
+    },
+    "summary.chefReads": {
+      "text": "✓ Chef čita",
+      "checked": false
+    },
+    "summary.fromPage": {
+      "text": "Iz odeljka {from}.",
+      "checked": false
+    },
+    "summary.chooseWhat": {
+      "text": "Izaberi šta {coach} vidi",
+      "checked": false
+    },
+    "summary.orCraftAt": {
+      "text": "Ili napravi prvi obrok na Tanjiru, {meal} u {time} ›",
+      "checked": false
+    },
+    "summary.orCraft": {
+      "text": "Ili napravi prvi obrok na Tanjiru ›",
+      "checked": false
+    },
+    "summary.footAll": {
+      "text": "{coach} vidi svaki deo, uvek ažuran, sa onim što se promenilo. Tvoj pregled se menja kad se menjaju tvoji odgovori.",
+      "checked": false
+    },
+    "summary.footSome": {
+      "text": "{coach} vidi {n} od {m} delova, uvek ažurno, sa onim što se promenilo. Tvoj pregled se menja kad se menjaju tvoji odgovori.",
+      "checked": false
+    },
+    "summary.ariaSees": {
+      "text": "{part}: tvoj trener to vidi",
+      "checked": false
+    },
+    "summary.ariaOn": {
+      "text": "{part}: uključeno",
+      "checked": false
+    },
+    "summary.ariaOff": {
+      "text": "{part}: isključeno",
+      "checked": false
+    },
+    "summary.on": {
+      "text": "Uključeno",
+      "checked": false
+    },
+    "summary.off": {
+      "text": "Isključeno",
+      "checked": false
+    },
+    "summary.whatCoachSees": {
+      "text": "Šta {coach} vidi",
+      "checked": false
+    },
+    "summary.chooseOnce": {
+      "text": "Izaberi jednom, deo po deo. {coach} vidi delove koje uključiš, onakve kakvi su danas, uvek ažurne, sa onim što se promenilo i kada. Isključi deo kad god hoćeš: tvoj trener odmah prestaje da ga vidi.",
+      "checked": false
+    },
+    "summary.langToSr": {
+      "text": "{name}: aplikacija je sada na srpskom. Profil vidiš na svom jeziku, srpskom.",
+      "checked": false
+    },
+    "summary.langToEn": {
+      "text": "{name}: aplikacija je sada na engleskom. Profil vidiš na svom jeziku, srpskom.",
+      "checked": false
+    },
+    "summary.cardTitle": {
+      "text": "Profil: {name}",
+      "checked": false
+    },
+    "summary.cardNone": {
+      "text": "{name} još ne deli nijedan deo profila.",
+      "checked": false
+    },
+    "summary.cardAsToday": {
+      "text": "Kako je danas: delovi koje {name} deli, uvek ažurni. Poslednja promena {date}.",
+      "checked": false
+    },
+    "summary.notSharedLine": {
+      "text": "{list}. {name} ovo zadržava za sebe.",
+      "checked": false
+    },
+    "summary.seeInSr": {
+      "text": "Vidi na srpskom, kao {name}",
+      "checked": false
+    },
+    "summary.seeInEn": {
+      "text": "Vidi na engleskom, kao {name}",
+      "checked": false
+    },
+    "summary.backToEn": {
+      "text": "Nazad na engleski",
+      "checked": false
+    },
+    "summary.backToSr": {
+      "text": "Nazad na srpski",
+      "checked": false
+    },
+    "langpanel.coachReads": {
+      "text": "Tvoj trener čita tvoj pregled na svom jeziku, onom koji je izabran u njegovoj aplikaciji.",
       "checked": false
     }
   }

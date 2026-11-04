@@ -1,6 +1,7 @@
 // The coach's week on this phone only (0.2.6): without accounts (local runs and the walkthroughs) Clients can open with two
 // example clients, so the coach's pages can be seen and tested. Off on the live app: it needs accounts there.
 import { cloudEnabled, type ClientRow } from "./cloud";
+import { inLang } from "./lang";
 import { dayLineOf, type DayLine } from "./dayLines";
 import { slotsOf } from "./slots";
 import { isoWeek, ymd } from "./plan";
@@ -58,8 +59,11 @@ export function demoRows(): ClientRow[] {
   const share = sharedParts(undefined);
   const dP = (wake: "early" | "mid"): Personal => ({ sex: "female", birthYear: 1985, heightCm: 168, weightKg: 78, lifestyle: { weekdays: "work", hours: "fixed", slot: "8-4", move: "sitting", meals: 3, wake, bed: "mid", where: ["Cook at home", "Canteen at work"], diet: "Everything", alcohol: "On weekends" }, tasteChips: { like: ["Creamy", "Fresh herbs"], not: ["Fishy"], how: [] }, kitchens: ["Balkan"] });
   const dIn = (wake: "early" | "mid") => ({ personal: dP(wake), safety: { situations: [], flags: [], allergies: [], none: true, declaredAt: since.toISOString() }, tasteWords: "", goal: { band: "fatloss", name: "Lose fat", setBy: "Milan", at: since.toISOString() }, avg: { kcal: 2200, protein: 180, fats: 61 }, days: [], protein: null, pdRef: 8.2, burn: 1500, home: "Germany", places: [] });
-  const sp0 = nextShared(null, sharedRows(summaryOf(dIn("mid")), share), share, since)!;
-  const profileShare: SharedProfile = nextShared(sp0, sharedRows(summaryOf(dIn("early")), share), share, new Date(now.getTime() - 2 * 864e5)) ?? sp0;
+  // DT237 v2 (0.3.88): Nina's app is in Srpski, so her copy comes in both languages and her card has the button
+  const both = (wake: "early" | "mid") => ({ en: inLang("en", () => sharedRows(summaryOf(dIn(wake)), share)), sr: inLang("sr-Latn", () => sharedRows(summaryOf(dIn(wake)), share)) });
+  const m0 = both("mid"), m1 = both("early");
+  const sp0 = nextShared(null, m0.en, share, since, { rowsSr: m0.sr, lang: "sr-Latn" })!;
+  const profileShare: SharedProfile = nextShared(sp0, m1.en, share, new Date(now.getTime() - 2 * 864e5), { rowsSr: m1.sr, lang: "sr-Latn" }) ?? sp0;
   return [
     { ...base, uid: "demo-nina", measured: dMeasured, profileShare, name: "Nina", goal: { band: "fatloss", setBy: "coach", coachName: "Milan", setAt: since.toISOString(), source: "coach" }, goalsNow: { calories: 2200, protein: 180 }, days, feedback: shared, notes, checkinDay: (now.getDay() + 6) % 7, weightKg: 78, weighIns },
     { ...base, uid: "demo-lena", measured: lMeasured, name: "Lena", goal: { band: "gainsteady", setBy: "you", setAt: new Date(now.getTime() - 5 * 864e5).toISOString(), source: "profile" }, goalsNow: { calories: 2700, protein: 150 }, days: {}, feedback: [], notes: [], checkinDay: 0, weightKg: undefined, weighIns: [],

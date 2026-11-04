@@ -4,9 +4,13 @@ import { useSyncExternalStore } from "react";
 export type Lang = "en" | "sr-Latn";
 const KEY = "chefmealan-lang";
 const subs = new Set<() => void>();
-export function getLang(): Lang { try { return localStorage.getItem(KEY) === "sr-Latn" ? "sr-Latn" : "en"; } catch { return "en"; } }
+// DT237 (0.3.88): for a moment, words in another language than the phone's: the coach's copy of Your summary is made in both
+let forced: Lang | null = null;
+export function inLang<T>(l: Lang, f: () => T): T { const was = forced; forced = l; try { return f(); } finally { forced = was; } }
+const stored = (): Lang => { try { return localStorage.getItem(KEY) === "sr-Latn" ? "sr-Latn" : "en"; } catch { return "en"; } };
+export function getLang(): Lang { return forced ?? stored(); }
 export function setLang(l: Lang) { try { if (l === "en") localStorage.removeItem(KEY); else localStorage.setItem(KEY, l); } catch { /* none kept */ } subs.forEach((f) => f()); }
-export function useLang(): Lang { return useSyncExternalStore((f) => { subs.add(f); return () => { subs.delete(f); }; }, getLang, () => "en"); }
+export function useLang(): Lang { return useSyncExternalStore((f) => { subs.add(f); return () => { subs.delete(f); }; }, stored, () => "en"); }
 export const LANG_NAMES: Record<Lang, string> = { en: "English", "sr-Latn": "Srpski (latinica)" };
 // the phone's voice and its listening for a language
 export const speechLang = (l: Lang) => (l === "sr-Latn" ? "sr-RS" : "en-GB");

@@ -69,6 +69,15 @@ const seed = JSON.parse(fs.readFileSync(path.resolve(__dirname, "seed.json"), "u
   await page.locator(".cp-tabs [role=tab]").filter({ hasText: "Goal" }).click(); await page.waitForTimeout(300);
   const sp = (await page.locator(".shared-profile").innerText()).replace(/\s+/g, " ");
   ok(/Nina's profile/.test(sp) && /Not shared What you eat, alcohol, in your own words, allergies and intolerances, your body data\. Nina keeps these to themselves\./.test(sp) && !/Alcohol On weekends/.test(sp) && !/born 1985/.test(sp), "the shared parts below, what wasn't shared said, no private row: " + sp.slice(-260));
+  // DT237 v2 (0.3.88): Nina's app is in Srpski; her card stays in the coach's English, with one button to see it as she does
+  const cardHeads = async () => (await page.locator(".shared-profile .seg-head b").allTextContents()).join(",");
+  const theirs = page.locator(".sum-theirs button");
+  const tb = await theirs.boundingBox();
+  ok(await theirs.textContent() === "See it in Srpski, as Nina does" && tb && tb.height >= 44 && /^Goal and numbers,/.test(await cardHeads()), "DT237: the card in the coach's language, one button for Nina's, 44 px: " + (await cardHeads()).slice(0, 60));
+  await theirs.click(); await page.waitForTimeout(250);
+  ok(await theirs.textContent() === "Back to English" && /^Cilj i brojevi,Tvoj dan,/.test(await cardHeads()) && /Nina's profile/.test(await page.locator(".shared-profile .label").textContent()), "DT237: a tap shows her rows in Srpski, the rest stays English: " + (await cardHeads()).slice(0, 60));
+  await theirs.click(); await page.waitForTimeout(250);
+  ok(await theirs.textContent() === "See it in Srpski, as Nina does" && /^Goal and numbers,/.test(await cardHeads()), "DT237: Back to English puts it back");
   await page.getByRole("button", { name: "‹ Clients" }).click(); await page.waitForTimeout(400);
   ok(!/Profile: \d+ change/.test(await page.locator(".cw-row", { hasText: "Nina" }).first().textContent()), "looked at: the mark goes");
   // DT172 (privacy finding 14, option a): Lena shares no body data: her coach sees the trend in percent, no kilogram
