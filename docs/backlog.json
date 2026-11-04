@@ -120,7 +120,7 @@
       "title": "Languages: Serbian and German after English",
       "epic": "lang",
       "state": "now",
-      "why": "Brainstormed. Open: who reviews German, Latin or Cyrillic for Serbian, AI answers first or screens first. 19:24: Serbian Latin, Chef Mealan first, screens English for a while. Board v2 with the table; Go at 19:39. Release 1 in 0.3.76: Settings, Language; his lines and safety lines in Serbian once ticked in the table; his AI answers in Serbian; cook mode hears dalje, nazad, ponovi, koliko. Next: release 2, the screens.",
+      "why": "Brainstormed. Open: who reviews German, Latin or Cyrillic for Serbian, AI answers first or screens first. 19:24: Serbian Latin, Chef Mealan first, screens English for a while. Board v2 with the table; Go at 19:39. Release 1 in 0.3.76: Settings, Language; his lines and safety lines in Serbian once ticked in the table; his AI answers in Serbian; cook mode hears dalje, nazad, ponovi, koliko. Board Stories176 (release 3, the Plate in Srpski) approved 4 November 00:00; release 2 Go 00:04, in phases (04:38). Phase 1 in 0.3.77: words.ts and en.json, the Plate's words, the bar, numbers by language, he|she and counts, three plate lines of Chef Mealan, the guard test. Next: Milan ticks the Plate in his table; then phase 2, Today.",
       "board": 175
     },
     {

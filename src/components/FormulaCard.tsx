@@ -1,3 +1,4 @@
+import { numLocale } from "../words";
 import { useState } from "react";
 import { calculate, canCalculate, isMinor, restingBurn, schofieldBand, ageOf, type Formula, type Personal } from "../personal";
 import { longDate, spanOf, type Measured, type MeasuredFixed } from "../measured";
@@ -14,7 +15,7 @@ export function FormulaCard({ personal: d, pinned, coachLabel, value, onPick, me
   if (!canCalculate(d) || isMinor(d)) return null;
   const on: Formula | "auto" = pinned ?? value;
   const n = (f: Formula) => restingBurn(d, f);
-  const kcal = (x: number | null) => (x === null ? null : `${x.toLocaleString("en")} kcal at rest`);
+  const kcal = (x: number | null) => (x === null ? null : `${x.toLocaleString(numLocale())} kcal at rest`);
   const age = ageOf(d)!;
   const pick = (f: Formula | "auto") => { if (!pinned) onPick(f); };
   const opts: { id: Formula | "auto"; name: string; num: string; hint: string; off?: boolean }[] = [
@@ -47,7 +48,7 @@ export function FormulaCard({ personal: d, pinned, coachLabel, value, onPick, me
         {measured && (
           <button type="button" className={`opt opt-wide ${on === "data" ? "on" : ""}`} aria-pressed={on === "data"} disabled={!fixed || !!pinned} onClick={() => pick("data")}>
             <b>From your data</b>
-            {fixed ? <><small className="opt-num">{fixed.kcal.toLocaleString("en")} kcal a day, all in</small><small>What you ate and how your weight moved, {spanOf(fixed.from, fixed.to)}.</small></>
+            {fixed ? <><small className="opt-num">{fixed.kcal.toLocaleString(numLocale())} kcal a day, all in</small><small>What you ate and how your weight moved, {spanOf(fixed.from, fixed.to)}.</small></>
               : <><small className="opt-num">Not enough data yet</small><small>{measured.readyOn ? `Ready on ${longDate(measured.readyOn)} at the earliest.` : "Needs 10 full days and 7 weigh-ins in 14 days."}</small></>}
           </button>
         )}

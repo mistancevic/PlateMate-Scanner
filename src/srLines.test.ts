@@ -23,7 +23,7 @@ test("each Serbian line names exactly the slots the app fills", () => {
 });
 
 test("the slots the app fills match the slots each line is allowed", () => {
-  const dummy: Record<string, unknown[]> = { scanWhileCooking: ["a", "b"], useInCook: ["a", "b"], carryNow: [5], didTryWork: ["side"] };
+  const dummy: Record<string, unknown[]> = { scanWhileCooking: ["a", "b"], useInCook: ["a", "b"], carryNow: [5], didTryWork: ["side"], plateOldAte: [new Date(), () => "x"], plateOldBeforeCook: [new Date(), () => "x"], plateSaveOrClear: [2, new Date(), "x"] };
   for (const [k, f] of Object.entries(SR_SLOTS)) {
     if (k === "didTryWork") continue; // a choice of two lines, not a slot
     assert.deepEqual(Object.keys(f!(...dummy[k])).sort(), [...(SR_ALLOWED[k as keyof typeof CHEF] ?? [])].sort(), k);
@@ -85,4 +85,43 @@ test("a ticked line shows in Serbian when Srpski is chosen; its slots filled", a
   } finally {
     setLang("en"); Object.assign(sr.chef.useInCook, keep.u); Object.assign(sr.chef.whatMoment, keep.w); Object.assign(sr.safety.eating, keep.e);
   }
+});
+
+test("screens: every English line has its Serbian draft, and each draft fits its slots and forms", async () => {
+  const en = (await import("./i18n/en.json", { with: { type: "json" } })).default as Record<string, unknown>;
+  const { screenProblems } = await import("./words");
+  const scr = (srLines as unknown as { screens: Record<string, { text: string; checked: boolean }> }).screens;
+  assert.deepEqual(Object.keys(scr).sort(), Object.keys(en).sort());
+  for (const [k, l] of Object.entries(scr)) assert.deepEqual(screenProblems(k, l.text), [], `${k}: ${l.text}`);
+});
+
+test("screens: a ticked line shows in Srpski; a value without its Serbian keeps the line English; numbers follow", async () => {
+  const store: Record<string, string> = {};
+  (globalThis as any).localStorage = { getItem: (k: string) => store[k] ?? null, setItem: (k: string, v: string) => { store[k] = v; }, removeItem: (k: string) => { delete store[k]; } };
+  const { setLang } = await import("./lang");
+  const { w, wn, dec, mealV } = await import("./words");
+  const { agoIn } = await import("./cooking");
+  const scr = (srLines as unknown as { screens: Record<string, { text: string; checked: boolean }> }).screens;
+  const keep = JSON.parse(JSON.stringify(scr));
+  try {
+    assert.equal(w("plate.ateIt"), "Ate it");
+    setLang("sr-Latn");
+    assert.equal(w("plate.ateIt"), "Ate it", "unticked: English");
+    assert.equal(dec(5.53, 1), "5,5");
+    scr["plate.ateIt"].checked = true; scr["plate.seeAll"].checked = true; scr["plate.byClock"].checked = true;
+    assert.equal(w("plate.ateIt"), "Pojeo sam");
+    store["chefmealan-personal"] = JSON.stringify({ sex: "female" });
+    assert.equal(w("plate.ateIt"), "Pojela sam", "she: the second form");
+    assert.equal(wn("plate.seeAll", 3), "Pogledaj sve 3 namirnice");
+    assert.equal(wn("plate.seeAll", 20), "Pogledaj svih 20 namirnica");
+    assert.equal(w("plate.byClock", { meal: mealV("Dinner"), time: "20:00" }), "Dinner, 20:00 by the clock", "the meal's word not ticked: the line stays English");
+    scr["meal.dinner"].checked = true;
+    assert.equal(w("plate.byClock", { meal: mealV("Dinner"), time: "20:00" }), "Večera, 20:00 po satu");
+    scr["ago.hours"].checked = true;
+    assert.equal(agoIn("sr-Latn", new Date(Date.now() - 3 * 3600000)), "pre 3 sata");
+    assert.equal(agoIn("sr-Latn", new Date(Date.now() - 5 * 3600000)), "pre 5 sati");
+  } finally {
+    setLang("en"); delete store["chefmealan-personal"]; for (const k of Object.keys(scr)) Object.assign(scr[k], keep[k]);
+  }
+  assert.equal(dec(5.53, 1), "5.5", "English: a point");
 });

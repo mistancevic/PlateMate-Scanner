@@ -3,6 +3,9 @@
 // kept on the phone and in the account from its first tap. One cook runs at a time; another waits in Saved for later.
 // DT212 v4 (board Stories159): a plate can be saved for later too; both wait in the same block on the Plate for 7 days.
 // Pure functions here, so the walkthroughs and the unit tests read the same rules.
+import { wIn, wnIn } from "./words";
+import { foodNameIn } from "./reference";
+import type { Lang } from "./lang";
 import { say } from "./chefScript";
 import type { PilotState } from "./pilot";
 
@@ -207,22 +210,28 @@ export function plateOldOf(s: Pick<PilotState, "plateAt" | "photo" | "items" | "
 }
 const hm = (d: Date) => `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 // yesterday, 13:11 · today, 09:40 · Friday, 13:11 · 24 October, 13:11
-export function dayWord(d: Date, now = new Date()): string {
+// DT203 release 2 (0.3.77): each in a given language; null when a word of it has no ticked Serbian yet (the line stays English).
+// Day and month names come from the phone's calendar (Intl), in the language's own form.
+export function dayIn(l: Lang, d: Date, now = new Date()): string | null {
   const a = new Date(d); a.setHours(12, 0, 0, 0); const b = new Date(now); b.setHours(12, 0, 0, 0);
-  const n = Math.round((b.getTime() - a.getTime()) / 86400000);
-  return n === 0 ? "today" : n === 1 ? "yesterday" : n > 1 && n < 7 ? d.toLocaleDateString("en-GB", { weekday: "long" }) : d.toLocaleDateString("en-GB", { day: "numeric", month: "long" });
+  const n = Math.round((b.getTime() - a.getTime()) / 86400000), loc = l === "sr-Latn" ? "sr-Latn-RS" : "en-GB";
+  return n === 0 ? wIn(l, "day.today") : n === 1 ? wIn(l, "day.yesterday") : n > 1 && n < 7 ? d.toLocaleDateString(loc, { weekday: "long" }) : d.toLocaleDateString(loc, { day: "numeric", month: "long" });
 }
-export const whenWords = (d: Date, now = new Date()) => `${dayWord(d, now)}, ${hm(d)}`;
+export const dayWord = (d: Date, now = new Date()): string => dayIn("en", d, now)!;
+export const whenIn = (l: Lang, d: Date, now = new Date()): string | null => { const x = dayIn(l, d, now); return x === null ? null : `${x}, ${hm(d)}`; };
+export const whenWords = (d: Date, now = new Date()) => whenIn("en", d, now)!;
 // 20 minutes ago · an hour ago · 2 hours ago
-export function agoWords(d: Date, now = new Date()): string {
+export function agoIn(l: Lang, d: Date, now = new Date()): string | null {
   const m = Math.max(0, Math.round((now.getTime() - d.getTime()) / 60000));
-  if (m < 2) return "a minute ago";
-  if (m < 60) return `${m} minutes ago`;
+  if (m < 2) return wIn(l, "ago.minute");
+  if (m < 60) return wnIn(l, "ago.minutes", m);
   const h = Math.round(m / 60);
-  return h === 1 ? "an hour ago" : `${h} hours ago`;
+  return h === 1 ? wIn(l, "ago.hour") : wnIn(l, "ago.hours", h);
 }
+export const agoWords = (d: Date, now = new Date()): string => agoIn("en", d, now)!;
 // Chicken breast, peas and rice: the first name as it is, the others in small letters, each without what follows its comma
-export function foodsLine(items: { food: { name: string } }[]): string {
-  const n = items.map((i, k) => { const x = i.food.name.split(",")[0].trim(); return k === 0 ? x : x.charAt(0).toLowerCase() + x.slice(1); });
-  return n.length > 1 ? `${n.slice(0, -1).join(", ")} and ${n[n.length - 1]}` : n[0] ?? "";
+export function foodsLineIn(l: Lang, items: { food: { name: string; refId?: string } }[]): string | null {
+  const n = items.map((i, k) => { const x = foodNameIn(l, i.food).split(",")[0].trim(); return k === 0 ? x : x.charAt(0).toLowerCase() + x.slice(1); });
+  return n.length > 1 ? wIn(l, "list.and", { rest: n.slice(0, -1).join(", "), last: n[n.length - 1] }) : n[0] ?? "";
 }
+export const foodsLine = (items: { food: { name: string; refId?: string } }[]): string => foodsLineIn("en", items)!;

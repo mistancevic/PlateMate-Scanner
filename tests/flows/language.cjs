@@ -49,7 +49,14 @@ const PORT = "3396", U = `http://127.0.0.1:${PORT}`;
     else ok(false, "back on Settings");
     await page.reload(); await page.waitForTimeout(800);
     ok(await page.evaluate(() => localStorage.getItem("chefmealan-lang")) === "sr-Latn", "still Srpski after opening again");
-    await page.evaluate(() => { localStorage.removeItem("chefmealan-lang"); });
+    // DT203 release 2 (0.3.77): numbers follow the language at once; a word shows in Srpski only once Coach Milan ticked it
+    await page.goto(U + "/plate"); await page.waitForTimeout(1200);
+    const head = await page.locator("header").first().textContent();
+    ok(/PD \d+,\d/.test(head), "in Srpski the header's PD has a decimal comma: " + head.replace(/\s+/g, " ").slice(0, 80));
+    const main = await page.locator("main").textContent();
+    ok(/On the plate/.test(main) && !/Na tanjiru/.test(main), "a line not ticked yet stays English");
+    await page.evaluate(() => { localStorage.removeItem("chefmealan-lang"); }); await page.reload(); await page.waitForTimeout(800);
+    ok(/PD \d+\.\d/.test(await page.locator("header").first().textContent()), "English again: a decimal point");
     await ctx.close();
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.slice(0, 2).join(" | ") : ""}`);
   } catch (e) { ok(false, "walkthrough error: " + e.message); }

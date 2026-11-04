@@ -1,6 +1,7 @@
 // The mix tip: a scanned food that doesn't fit the plate on its own, and what to mix it with.
 // Pure code. The case comes from the number, the partners from the moment and the roles, the amounts from the solver.
 // The model never picks a partner; it may only word the Pro tip below.
+import { dec } from "./words";
 import { aggregate, density, solveIngredient, snapToServing, uid, type Food, type Ingredient } from "./pilot";
 import { jobOf, PORTION, minPortionOf, isVegPepper, type Job } from "./foodjob";
 import { roleOf } from "./swaps";
@@ -248,7 +249,7 @@ export function mixTip(food: Food, moment: MomentId, target: number | null, libr
   }
   // fill the remaining slots with other single partners, so the person sees an alternative
   for (const f of firsts.slice(1)) { if (mixes.length >= ask.partners) break; push([f]); }
-  const why = c === "under" ? `PD ${density(food.protein, food.calories)!.toFixed(1)} is under your ${target.toFixed(1)}: it needs a protein base` : `PD ${density(food.protein, food.calories)!.toFixed(1)} is far over your ${target.toFixed(1)}: alone it is not a meal`;
+  const why = c === "under" ? `PD ${dec(density(food.protein, food.calories)!, 1)} is under your ${dec(target, 1)}: it needs a protein base` : `PD ${density(food.protein, food.calories)!.toFixed(1)} is far over your ${target.toFixed(1)}: alone it is not a meal`;
   return { case: c, mixes, why };
 }
 

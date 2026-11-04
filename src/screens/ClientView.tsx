@@ -3,6 +3,7 @@
 // Today, Plan and Recipes then show the chosen client's, read-only and as the client sees them, and the coach can only
 // suggest: a planned snack, a page from Explorer, a note or a recipe. The title stays My clients; the name sits under it.
 // The switch is at the top of Today, remembered until switched back. Buttons 44 px or more; labels 12 px or more.
+import { numLocale } from "../words";
 import { useMemo, useState } from "react";
 import type { AppApi, Tab } from "./api";
 import type { ClientRow } from "../cloud";
@@ -113,7 +114,7 @@ export function ClientToday({ p, row, head, suggest, today }: { p: AppApi; row: 
       {head}
       <section className="card cv-days" aria-label={`${name}'s day`}>
         <b>{longDay(today)}</b>
-        {l ? <small className="muted">{Math.round(l.kcal).toLocaleString("en")}{l.target ? ` of ${l.target.kcal.toLocaleString("en")} kcal · protein ${l.protein} of ${l.target.protein} g` : " kcal"}</small> : <small className="muted">Nothing from {name} today yet.</small>}
+        {l ? <small className="muted">{Math.round(l.kcal).toLocaleString(numLocale())}{l.target ? ` of ${l.target.kcal.toLocaleString(numLocale())} kcal · protein ${l.protein} of ${l.target.protein} g` : " kcal"}</small> : <small className="muted">Nothing from {name} today yet.</small>}
         {l?.slots.map((s) => <div key={s.name} className="cv-day"><b>{s.name} {s.time}</b><small>{s.eaten ?? s.planned ?? "Nothing planned"}{s.eaten ? " · eaten" : s.planned ? " · planned" : ""}{s.mark !== "open" && s.mark !== "plan" ? ` · ${MARK[s.mark]}` : ""}</small></div>)}
         {l?.training && <small className="muted cv-note">Training: {l.training}</small>}
       </section>

@@ -1,5 +1,6 @@
 // What is in the slots (0.2.2, canvas S "Plan purpose one" and H7): a meal per slot per date, with its numbers, so the day
 // adds up before anything is cooked. A meal comes from My recipes, Coach's recipes, Chef Mealan's starters, or the Plate.
+import { dec } from "./words";
 import { aggregate, density, servingsOf, sizedFor, type Ingredient, type Meal } from "./pilot";
 import type { Slot } from "./slots";
 import { REFERENCE, referenceFood } from "./reference";
@@ -202,7 +203,7 @@ export function fitOf(meal: { kcal: number; protein: number }, target: number | 
   const gap = target - pd;
   if (gap <= 0.2) return { pd, state: "fits", gap: 0, text: "fits" };
   if (gap <= 1) return { pd, state: "close", gap, text: "close" };
-  const g = unit === "pct" ? `${Math.round(gap * 4)} %` : gap.toFixed(1);
+  const g = unit === "pct" ? `${Math.round(gap * 4)} %` : dec(gap, 1);
   return { pd, state: "under", gap, text: `${g} under` };
 }
 
@@ -304,7 +305,7 @@ export const amountText = (m: PlannedMeal) => {
   if (isBatch(m)) { const c = m.amount ?? 1, u = m.unit ?? "portions"; return `${c} ${c === 1 ? oneWord(u) : u}`; }
   if (!m.amount || m.amount === 1) return null;
   const whole = Math.floor(m.amount), part = FRACTION[Math.round((m.amount - whole) * 4) / 4];
-  if (part === undefined) return `${m.amount.toFixed(2).replace(/0$/, "")} portions`;
+  if (part === undefined) return `${dec(m.amount, 2).replace(/0$/, "")} portions`;
   return `${whole || ""}${part} ${m.amount <= 1 ? "portion" : "portions"}`;
 };
 

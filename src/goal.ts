@@ -1,3 +1,4 @@
+import { dec } from "./words";
 import { collapseLog } from "./goalHistory";
 import { macroSplit } from "./personal";
 // The goal a person sets once. A band from the goal bands (G1 to G6), or their own calories and protein.
@@ -73,7 +74,7 @@ export const fit = (pd: number | null, target: number | null): PdBand => {
 };
 // the range a band covers for a target, for the chip's title
 export const bandRange = (b: PdBand, t: number) => {
-  const f = (x: number) => (Math.round(x * 10) / 10).toFixed(1);
+  const f = (x: number) => dec(Math.round(x * 10) / 10, 1);
   return b === "below" ? `under ${f(t * 0.6)}` : b === "close" ? `${f(t * 0.6)} to ${f(t * 0.9)}` : b === "plan" ? `${f(t * 0.9)} to ${f(t * 1.5)}` : b === "high" ? `${f(t * 1.5)} to ${f(t * 2.5)}` : `${f(t * 2.5)} and up`;
 };
 
@@ -81,5 +82,5 @@ export const bandRange = (b: PdBand, t: number) => {
 export const BAND_LINE_IDLE = "Tap one to see which PD it covers.";
 export function bandHint(b: PdBand, t: number | null): string {
   if (!t) return BAND_LINE_IDLE;
-  return `${BAND_LABEL[b]}: PD ${bandRange(b, t)} · your target ${t.toFixed(1)}`;
+  return `${BAND_LABEL[b]}: PD ${bandRange(b, t)} · your target ${dec(t, 1)}`;
 }

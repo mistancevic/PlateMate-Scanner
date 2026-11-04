@@ -1,5 +1,6 @@
 // IM21, IM21b (0.2.21), RP2 (0.2.25): the Nutrition table, worked out by code from the foods and their grams. Shared by the
 // recipe page and, since R6 (0.2.43, board RS14), the read card on the Plate and on Recipes.
+import { dec } from "../words";
 import { aggregate } from "../pilot";
 import { Letters, NumbersTable } from "./Letters";
 import type { Ingredient, Meal } from "../pilot";
@@ -27,7 +28,7 @@ export function NutritionCard({ items, serves, one, all, stated, pdRef, fitPd, r
     {!tableOnly && <section className={`readout readout-fit-${fitPd ? fitPd(n.pd) : "plan"} rq-readout`} aria-label="Protein density">
       <div className="readout-top"><span>{many ? `One ${one}` : "All of it"}</span><span>PD</span></div>
       <div className="readout-mid">
-        <b>{pd1 === null ? "?" : pd1.toFixed(1)}</b>
+        <b>{pd1 === null ? "?" : dec(pd1, 1)}</b>
         <div><span>{pd1 === null || pdRef === null ? "no target set" : n.pd! >= pdRef ? "fits your plan" : `${(Math.round((pdRef - n.pd!) * 10) / 10).toFixed(1)} under your ${pdRef.toFixed(1)}`}</span>
           <small>{energy === null ? "?" : fmt(many ? energy : n.rows[0].all ?? 0, 0)} kcal · {fmt((many ? prot?.serving : prot?.all) ?? 0, 1)} g protein · {fmt(grams / (many ? serves : 1), 0)} g</small></div>
       </div>

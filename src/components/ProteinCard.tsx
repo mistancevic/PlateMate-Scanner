@@ -1,3 +1,4 @@
+import { dec } from "../words";
 import { useState } from "react";
 import type { Calc } from "../personal";
 
@@ -7,7 +8,7 @@ export function ProteinCard({ c, open: startOpen = false }: { c: Calc; open?: bo
   const [open, setOpen] = useState(startOpen);
   const span = c.proteinMax - c.proteinMin;
   const at = span > 0 ? Math.min(100, Math.max(0, ((c.protein - c.proteinMin) / span) * 100)) : 50;
-  const kg = (x: number) => x.toFixed(1).replace(/\.0$/, "");
+  const kg = (x: number) => dec(x, 1).replace(/[.,]0$/, "");
   return (
     <section className="card protein-card">
       <div className="protein-top"><b>{c.protein} g</b><span>of protein a day</span></div>

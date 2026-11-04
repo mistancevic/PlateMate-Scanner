@@ -1,3 +1,4 @@
+import { dec } from "../words";
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
 import { avg7, isWeight, trendOf, verdictNote, withWeighIn, withoutWeighIn, VERDICT_WORDS, fmtKg, type WeighIn , fmtPct } from "../weight";
@@ -73,7 +74,7 @@ export function WeightTrend({ list, band, weightKg, trainingAge, onUpdateWeight,
       <b>The last 4 weeks</b>
       <Chart t={t} />
       <div className="trend-legend"><span><i className="sw-dot" />{coach ? "weigh-ins" : "your weigh-ins"}</span><span><i className="sw-line" />7-day average</span><span><i className="sw-band" />expected for {goalLabel(band)}</span></div>
-      {t.first !== null && t.last !== null && <div className="sheet-row"><small>7-day average</small><b>{wIn(t.first).toFixed(1)} → {wText(t.last)}</b></div>}
+      {t.first !== null && t.last !== null && <div className="sheet-row"><small>7-day average</small><b>{dec(wIn(t.first), 1)} → {wText(t.last)}</b></div>}
       {t.change !== null && <div className="sheet-row"><small>Change</small><b>{fmtKg(t.change)} in 3 weeks</b></div>}
       <div className="sheet-row"><small>Expected</small><b>{fmtKg(t.expected[0]).replace(` ${wUnit()}`, "")} to {fmtKg(t.expected[1])}</b></div>
       <span className={`trend-chip ${tone}`}>{VERDICT_WORDS[t.verdict]}</span>

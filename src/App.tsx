@@ -1,3 +1,5 @@
+import { numLocale } from "./words";
+import { w } from "./words";
 import { eatsForReq, installEats, type Eats } from "./eats";
 import { useLang } from "./lang";
 import { TravelBanner } from "./components/Travel";
@@ -1559,7 +1561,7 @@ export default function App() {
     nextSource.current = "profile";
     saveGoal({ ...goal, method: r.method, setAt: new Date().toISOString() }); setGoalState(getGoal());
     setState((s) => ({ ...s, goals: { ...s.goals, calories: r.kcal, protein: r.protein } }));
-    notify(`Your numbers changed with your profile. An average day is now ${r.kcal.toLocaleString("en")} kcal and ${r.protein} g protein.`);
+    notify(`Your numbers changed with your profile. An average day is now ${r.kcal.toLocaleString(numLocale())} kcal and ${r.protein} g protein.`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [personal, profile.formula]);
   // a goal band with missing numbers heals itself from the band, before the first paint (T5)
@@ -2877,21 +2879,21 @@ export default function App() {
   const NAV: { id: Tab; label: string; icon: ReactNode }[] = [
     // the bar (0.2.0, canvas X0 and H, 11 October 2026): Today eats and counts, Plan decides, Plate makes, Recipes keeps; Me and Foods in the top menu
     // 0.2.121: a client sees how many things from the coach wait on Today (notes without Got it, recipes sent)
-    { id: "home", label: "Today", icon: <span className="nav-icon"><Home size={20} />{shownProf.role !== "coach" && fromCoach > 0 && <span className="badge">{fromCoach}</span>}</span> },
-    { id: "plan", label: "Plan", icon: <CalendarDays size={20} /> },
-    { id: "journey" as Tab, label: "Plate", icon: <Utensils size={20} /> },
-    { id: "recipes", label: "Recipes", icon: <ChefHat size={20} /> },
+    { id: "home", label: w("tab.today"), icon: <span className="nav-icon"><Home size={20} />{shownProf.role !== "coach" && fromCoach > 0 && <span className="badge">{fromCoach}</span>}</span> },
+    { id: "plan", label: w("tab.plan"), icon: <CalendarDays size={20} /> },
+    { id: "journey" as Tab, label: w("tab.plate"), icon: <Utensils size={20} /> },
+    { id: "recipes", label: w("tab.recipes"), icon: <ChefHat size={20} /> },
     // DT188: Explorer is the fifth tab, for everyone; Foods and Me stay in the menu
-    { id: "explorer", label: "Explorer", icon: <Microscope size={20} /> },
+    { id: "explorer", label: w("tab.explorer"), icon: <Microscope size={20} /> },
     // DT210 (0.3.50, board Stories157; Coach Milan 1 November 23:28 to 23:52 Go): a coach's sixth tab, Clients, at the right,
     // with the count of what waits; Today, Plan, Plate and Recipes are always the coach's own. Clients keep five tabs.
-    ...(shownProf.role === "coach" || (coachDemoOn() && view !== "user") ? [{ id: "clients" as Tab, label: "Clients", icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }] : []),
+    ...(shownProf.role === "coach" || (coachDemoOn() && view !== "user") ? [{ id: "clients" as Tab, label: w("tab.clients"), icon: <span className="nav-icon"><Users size={20} />{newShared > 0 && <span className="badge">{newShared}</span>}</span> }] : []),
   ];
   // DT210: no more My day and My clients; a client is seen on their page in Clients
   const clientsView = false;
   const TITLES: Record<Tab, string> = {
     home: "Today",
-    journey: "Plate",
+    journey: w("tab.plate"),
     plan: "Plan",
     recipes: "Recipes",
     me: "Me",

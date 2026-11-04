@@ -5,6 +5,7 @@
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { slotProblems } from "../src/chefScript";
+import { screenProblems } from "../src/words";
 const dir = process.argv[2];
 if (!dir) { console.error("usage: npx tsx scripts/sr-from-table.ts <dir with lines/*.json>"); process.exit(2); }
 const file = new URL("../src/i18n/sr-Latn.json", import.meta.url);
@@ -13,9 +14,10 @@ const bad: string[] = []; let ticked = 0, n = 0;
 for (const f of readdirSync(dir).filter((x) => x.endsWith(".json"))) {
   const raw = JSON.parse(readFileSync(join(dir, f), "utf8")); const d = raw.data ?? raw;
   if (!d || typeof d.key !== "string" || typeof d.sr !== "string") continue; // not a line
-  const part = d.kind === "safety" ? sr.safety : sr.chef;
+  // DT203 release 2 (0.3.77): the screens' words too, by key
+  const part = d.kind === "safety" ? sr.safety : d.kind === "screen" ? sr.screens : sr.chef;
   if (!part || !(d.key in part)) { bad.push(`${d.kind}.${d.key}: not in the app's file`); continue; }
-  const p = d.kind === "chef" ? slotProblems(d.key, d.sr) : [];
+  const p = d.kind === "chef" ? slotProblems(d.key, d.sr) : d.kind === "screen" ? screenProblems(d.key, d.sr) : [];
   if (d.checked && p.length) bad.push(`${d.key}: ${p.join("; ")}`);
   part[d.key] = { text: d.sr, checked: !!d.checked && !p.length }; n++; if (d.checked && !p.length) ticked++;
 }
