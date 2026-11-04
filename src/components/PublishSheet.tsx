@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { w } from "../words";
 import { kitchenMark } from "../recipeMark";
 import { Check, Copy, Download, Image as ImageIcon, X } from "lucide-react";
 import type { Feedback, Meal, PubContent, PublishDraft } from "../pilot";
@@ -169,7 +170,7 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
     try {
       const res = await fetch("/api/recipes", { method: "POST", headers: { "Content-Type": "application/json", ...localAs(client) }, body: JSON.stringify({ recipe: r, photo: await photoNow() }) });
       const d = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(d.error || "Publishing didn't work. Try again.");
+      if (!res.ok) throw new Error(d.error || w("publish.publishingDidnTWorkTry"));
       const saved: Published = d.status === "waiting" ? (live ? { ...live, waiting: true, note: "" } : { ...r, slug: d.slug || r.slug, status: "waiting", note: "" }) : { ...r, slug: d.slug || r.slug, status: "live" };
       if (saved.status === "live") {
         const at = new Date().toISOString();
@@ -209,84 +210,84 @@ export function PublishSheet({ meal, cards, author, published, close, onDone, on
   };
 
   const state = waits ? "waiting" : live ? "live" : done?.status === "down" ? "down" : done?.status === "back" ? "back" : "draft";
-  const go = busy || (waits ? `Waiting for ${approver}` : asleep ? (direct ? "Published, no changes" : "No changes to send") : !direct ? `Send to ${approver}` : live ? "Publish the changes" : state === "down" ? "Publish again" : "Publish");
+  const go = busy || (waits ? `Waiting for ${approver}` : asleep ? (direct ? w("publish.publishedNoChanges") : w("publish.noChangesToSend")) : !direct ? `Send to ${approver}` : live ? w("publish.publishTheChanges") : state === "down" ? w("publish.publishAgain") : "Publish");
   const preview = previewing ? recipe() : null;
   return (
     <div className="sheet-backdrop" onClick={close}>
-      <div className="sheet publish-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label="Publish this recipe">
-        <div className="card-top"><span>{meal.title}</span><button className="link" onClick={close}>Close</button></div>
-        <div className="pub-head"><h2>{live ? "Published" : "Publish this recipe"}</h2><span className={`pub-state ${state}`}>{state === "live" ? "Live" : state === "down" ? "Taken down" : state === "waiting" ? `Waiting for ${approver}` : state === "back" ? "Sent back" : "Draft"}</span></div>
+      <div className="sheet publish-sheet" onClick={(e) => e.stopPropagation()} role="dialog" aria-label={w("publish.publishThisRecipe")}>
+        <div className="card-top"><span>{meal.title}</span><button className="link" onClick={close}>{w("publish.close")}</button></div>
+        <div className="pub-head"><h2>{live ? "Published" : w("publish.publishThisRecipe")}</h2><span className={`pub-state ${state}`}>{state === "live" ? "Live" : state === "down" ? w("publish.takenDown") : state === "waiting" ? `Waiting for ${approver}` : state === "back" ? w("publish.sentBack") : "Draft"}</span></div>
         {waits && <p className="small muted">{approver.charAt(0).toUpperCase() + approver.slice(1)} sees the page first and makes it live, or sends it back with a note.{live ? " The live page stays as it is until then." : ""}</p>}
         {!waits && done?.note && <p className="small pub-note">{approver.charAt(0).toUpperCase() + approver.slice(1)}: “{done.note}”</p>}
-        {!live && !waits && <p className="small muted">{state === "down" ? "The link says this recipe was taken down. Publish again brings it back on the same link." : "Saved as you type, only here. Close it any time and come back."}</p>}
+        {!live && !waits && <p className="small muted">{state === "down" ? w("publish.theLinkSaysThisRecipe") : w("publish.savedAsYouTypeOnly")}</p>}
         {live && !waits && justPublished && !changes.length && (
-          <div className="pub-band done" role="status"><b>✓ Published</b><span>Anyone with the link sees the page now.</span><a className="pill pill-small pill-primary" href={`/r/${live.slug}`} target="_blank" rel="noreferrer">See live page</a></div>
+          <div className="pub-band done" role="status"><b>✓ Published</b><span>{w("publish.anyoneWithTheLinkSees")}</span><a className="pill pill-small pill-primary" href={`/r/${live.slug}`} target="_blank" rel="noreferrer">{w("publish.seeLivePage")}</a></div>
         )}
         {changes.length > 0 && (
-          <div className="pub-band changed" role="status"><b>Changes not published yet</b><span>{timeOf(sentAt ?? live?.updatedAt ?? live?.publishedAt) ? `The live page shows the version from ${timeOf(sentAt ?? live?.updatedAt ?? live?.publishedAt)}. ` : "The live page shows the version before. "}Changed: {changes.join(", ")}.</span></div>
+          <div className="pub-band changed" role="status"><b>{w("publish.changesNotPublishedYet")}</b><span>{timeOf(sentAt ?? live?.updatedAt ?? live?.publishedAt) ? `The live page shows the version from ${timeOf(sentAt ?? live?.updatedAt ?? live?.publishedAt)}. ` : w("publish.theLivePageShowsThe")}Changed: {changes.join(", ")}.</span></div>
         )}
         {live && (
           <div className="publish-done">
             <a className="publish-link" href={`/r/${live.slug}`} target="_blank" rel="noreferrer">{link.replace(/^https?:\/\//, "")}</a>
             <div className="ways">
-              <button className="pill pill-small" onClick={async () => { try { await navigator.clipboard.writeText(link); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* the link is there to copy by hand */ } }}>{copied ? <><Check size={15} /> Copied</> : <><Copy size={15} /> Copy link</>}</button>
-              <button className="pill pill-small pill-primary" onClick={images} disabled={Boolean(busy)}><Download size={15} /> The Instagram images</button>
+              <button className="pill pill-small" onClick={async () => { try { await navigator.clipboard.writeText(link); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* the link is there to copy by hand */ } }}>{copied ? <><Check size={15} /> {w("publish.copied")}</> : <><Copy size={15} /> {w("publish.copyLink")}</>}</button>
+              <button className="pill pill-small pill-primary" onClick={images} disabled={Boolean(busy)}><Download size={15} /> {w("publish.theInstagramImages")}</button>
             </div>
-            <small className="muted">Four images for a carousel, and the numbers as a reel's last frame. Change anything below, See the page, then {direct ? "Publish the changes" : `send the changes to ${approver}`}.</small>
+            <small className="muted">Four images for a carousel, and the numbers as a reel's last frame. Change anything below, See the page, then {direct ? w("publish.publishTheChanges") : `send the changes to ${approver}`}.</small>
           </div>
         )}
         <div className="setting-block">
-          <b className="field-label">Photo</b>
+          <b className="field-label">{w("publish.photo")}</b>
           <div className="publish-photos">
             {photos.map((src, i) => <button key={i} className={`publish-photo ${photoAt === i ? "on" : ""}`} onClick={() => setPhotoAt(i)} aria-label={`Photo ${i + 1}${photoAt === i ? ", the one shown" : ""}`}><img src={src} alt="" /></button>)}
-            <button className="publish-photo add" onClick={() => fileRef.current?.click()} aria-label="Upload a photo"><ImageIcon size={20} /></button>
+            <button className="publish-photo add" onClick={() => fileRef.current?.click()} aria-label={w("publish.uploadAPhoto")}><ImageIcon size={20} /></button>
             <input ref={fileRef} type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; if (!f) return; const r = new FileReader(); r.onload = async () => { const raw = String(r.result); const data = await resizeImageBase64(raw, 1080, 1080).catch(() => raw); const list = own.includes(data) ? own : [...own, data].slice(0, MAX_RECIPE_PHOTOS); onMeal(withRecipePhotos(list)); setPhotoAt(Math.max(0, list.indexOf(data))); }; r.readAsDataURL(f); }} />
           </div>
           {chosen && (
             <label className="pub-ai"><input type="checkbox" checked={chosenAi} disabled={chosenDrawn} onChange={(e) => { const s = sig(chosen); const list = (meal.aiSigs ?? []).filter((x) => x !== s); onMeal({ aiSigs: e.target.checked ? [...list, s] : list }); }} />
               <span>Made with AI{chosenDrawn ? `: drawn by ${CHEF_NAME}` : ""}. The page and the images say Picture made with AI.</span></label>
           )}
-          <small className="muted">{photos.length ? "The recipe's photos, the cover first, then the plate photos from its cards. The one with the blue frame leads, on the page and on the images. An uploaded photo is kept with the recipe." : "Upload a photo of the plate; the photo is kept with the recipe. Without one the page shows no photo."}</small>
+          <small className="muted">{photos.length ? w("publish.theRecipeSPhotosThe") : w("publish.uploadAPhotoOfThe")}</small>
         </div>
-        <label className="field-label">Name<input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} /></label>
-        <label className="field-label">Two lines about it<textarea value={lines} onChange={(e) => setLines(e.target.value)} maxLength={240} placeholder="Thin, soft, and they roll without breaking." /></label>
+        <label className="field-label">{w("publish.name")}<input value={title} onChange={(e) => setTitle(e.target.value)} maxLength={80} /></label>
+        <label className="field-label">{w("publish.twoLinesAboutIt")}<textarea value={lines} onChange={(e) => setLines(e.target.value)} maxLength={240} placeholder={w("publish.thinSoftAndTheyRoll")} /></label>
         <div className="two-fields">
-          <label className="field-label">Makes<span className="makes"><input inputMode="numeric" value={makes} onChange={(e) => setMakes(e.target.value.replace(/[^\d]/g, ""))} /><input value={servingName} onChange={(e) => setServingName(e.target.value)} placeholder="crepe" aria-label="What one serving is called" /></span></label>
-          <label className="field-label">Time, minutes<input inputMode="numeric" value={minutes} onChange={(e) => setMinutes(e.target.value.replace(/[^\d]/g, ""))} placeholder="35" /></label>
+          <label className="field-label">{w("publish.makes")}<span className="makes"><input inputMode="numeric" value={makes} onChange={(e) => setMakes(e.target.value.replace(/[^\d]/g, ""))} /><input value={servingName} onChange={(e) => setServingName(e.target.value)} placeholder="crepe" aria-label={w("publish.whatOneServingIsCalled")} /></span></label>
+          <label className="field-label">{w("publish.timeMinutes")}<input inputMode="numeric" value={minutes} onChange={(e) => setMinutes(e.target.value.replace(/[^\d]/g, ""))} placeholder="35" /></label>
         </div>
         <div className="setting-block">
-          <b className="field-label">The foods, as the page names them</b>
-          <small className="muted">Chef Mealan left out the brands; change a name if you like. It changes only the page.</small>
+          <b className="field-label">{w("publish.theFoodsAsThePage")}</b>
+          <small className="muted">{w("publish.chefMealanLeftOutThe")}</small>
           {meal.items.map((i, k) => i.grams > 0 && (
             <div className="publish-item" key={k}><input value={names[k] ?? ""} onChange={(e) => setNames((xs) => xs.map((x, j) => (j === k ? e.target.value : x)))} aria-label={`Name of food ${k + 1}`} /><span>{amountOf(i.grams)}</span></div>
           ))}
         </div>
         <div className="setting-block">
-          <b className="field-label">Steps</b>
+          <b className="field-label">{w("publish.steps")}</b>
           <StepsEditor steps={steps.split("\n")} items={meal.items} onChange={(a) => setSteps(a.join("\n"))} />
-          <small className="muted">The steps stay with the recipe in the app too.</small>
+          <small className="muted">{w("publish.theStepsStayWithThe")}</small>
         </div>
         <div className="publish-checks">
-          {nums ? <span className={nums.proteinShare >= 20 ? "ok" : "plain"}>{nums.proteinShare >= 20 ? "✓ High protein: " : "Protein: "}{nums.proteinShare} % of the energy is protein</span> : <span className="no">Some foods have no energy or protein value: add them before publishing</span>}
+          {nums ? <span className={nums.proteinShare >= 20 ? "ok" : "plain"}>{nums.proteinShare >= 20 ? "✓ High protein: " : w("publish.protein")}{nums.proteinShare} % of the energy is protein</span> : <span className="no">{w("publish.someFoodsHaveNoEnergy")}</span>}
           {nums && <span className="ok">✓ One {servingName || "serving"}: {nums.perServing.kcal} kcal · {nums.perServing.protein} g protein · PD {nums.pd}</span>}
-          <span className={rating ? "ok" : "plain"}>{rating === "daam" ? "✓ Your rating: DaaM good" : rating === "good" ? "✓ Your rating: Good" : "No rating yet: rate it on the Plate to show DaaM good"}</span>
+          <span className={rating ? "ok" : "plain"}>{rating === "daam" ? "✓ Your rating: DaaM good" : rating === "good" ? "✓ Your rating: Good" : w("publish.noRatingYetRateIt")}</span>
           {claim && <span className="no">{claim}</span>}
         </div>
-        <label className="pub-cooked"><input type="checkbox" checked={cooked} onChange={(e) => setCooked(e.target.checked)} /><span><b>I cooked this</b><small>The page says From the kitchen. Off, it says On paper: calculated, not cooked yet.</small></span></label>
+        <label className="pub-cooked"><input type="checkbox" checked={cooked} onChange={(e) => setCooked(e.target.checked)} /><span><b>{w("publish.iCookedThis")}</b><small>{w("publish.thePageSaysFromThe")}</small></span></label>
         <small className="muted">{bylineOf(author)}</small>
         {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
         <div className="ways publish-ways">
-          <button className="pill pill-wide" onClick={() => setPreviewing(true)} disabled={!nums || !title.trim()}>See the page</button>
+          <button className="pill pill-wide" onClick={() => setPreviewing(true)} disabled={!nums || !title.trim()}>{w("publish.seeThePage")}</button>
           <button className="pill pill-wide pill-primary" onClick={publish} disabled={!nums || Boolean(claim) || Boolean(busy) || !title.trim() || waits || asleep}>{go}</button>
         </div>
-        {live && <button className="pill pill-wide" onClick={unpublish} disabled={Boolean(busy)}><X size={15} /> Unpublish</button>}
+        {live && <button className="pill pill-wide" onClick={unpublish} disabled={Boolean(busy)}><X size={15} /> {w("publish.unpublish")}</button>}
       </div>
       {preview && (
-        <div className="rp-preview" role="dialog" aria-label="See the page" onClick={(e) => e.stopPropagation()}>
+        <div className="rp-preview" role="dialog" aria-label={w("publish.seeThePage")} onClick={(e) => e.stopPropagation()}>
           <RecipeView r={preview} member={null} photoSrc={photos[photoAt] ?? null} top={
             <div className="rp-preview-bar" style={{ margin: "-14px -18px 0" }}>
-              <b>Preview: only you see this. {live ? "The live page changes when you publish." : "Nothing is live yet."}{!direct ? ` ${approver.charAt(0).toUpperCase() + approver.slice(1)} sees it before it goes live.` : ""}</b>
-              <div className="ways"><button className="pill" onClick={() => setPreviewing(false)}>Back to the sheet</button><button className="pill pill-primary" onClick={publish} disabled={Boolean(claim) || Boolean(busy) || waits || asleep}>{go}</button></div>
+              <b>Preview: only you see this. {live ? w("publish.theLivePageChangesWhen") : w("publish.nothingIsLiveYet")}{!direct ? ` ${approver.charAt(0).toUpperCase() + approver.slice(1)} sees it before it goes live.` : ""}</b>
+              <div className="ways"><button className="pill" onClick={() => setPreviewing(false)}>{w("publish.backToTheSheet")}</button><button className="pill pill-primary" onClick={publish} disabled={Boolean(claim) || Boolean(busy) || waits || asleep}>{go}</button></div>
             </div>} />
         </div>
       )}

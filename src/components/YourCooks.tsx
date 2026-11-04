@@ -1,10 +1,11 @@
 // DT214 v2 (0.3.53, board Stories162): a recipe collects its cooks. Each time you cook it, the meal's card keeps the photos and
 // the answers: how often it went as the steps said, how it tasted, how it carried you.
+import { w } from "../words";
 import { useState } from "react";
 import type { Feedback, Meal } from "../pilot";
 import { cardsOfRecipe } from "../carry";
 import { CARRY_WORDS } from "../carry";
-const TASTES = ["DaaM good", "Good", "Not really"];
+const TASTES = ["DaaM good", "Good", w("yourcooks.notReally")];
 export const cooksOf = (meal: Meal, cards: Feedback[]) => cardsOfRecipe(meal, cards).filter((f) => f.status === "eaten").sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
 // the photos taken on step k while cooking this recipe, newest first
 export function cookPhotosFor(meal: Meal, cards: Feedback[], k: number): string[] {
@@ -22,8 +23,8 @@ export function YourCooks({ meal, cards }: { meal: Meal; cards: Feedback[] }) {
   const carried = cs.filter((f) => f.carry);
   const top = (["light", "fine", "heavy"] as const).map((h) => [h, carried.filter((f) => f.carry!.how === h).length] as const).sort((a, b) => b[1] - a[1])[0];
   return (
-    <section className="card rq-cooks" aria-label="Your cooks">
-      <b>Your cooks</b>
+    <section className="card rq-cooks" aria-label={w("yourcooks.yourCooks")}>
+      <b>{w("yourcooks.yourCooks")}</b>
       <small className="muted">{n === 1 ? "Once" : `${n} times`}, the last on {last}</small>
       {photos.length > 0 && <div className="rc-photos">{photos.map((x, i) => <img key={i} src={x} alt="" />)}</div>}
       <div className="rc-lines">
@@ -31,7 +32,7 @@ export function YourCooks({ meal, cards }: { meal: Meal; cards: Feedback[] }) {
         {tastes.length > 0 && <div>Tasted: <b>{tastes.map(([t, k]) => `${t} ${k}`).join(", ")}</b></div>}
         {carried.length > 0 && top && top[1] > 0 && <div>Carried you: <b>{CARRY_WORDS[top[0]].toLowerCase()} {top[1]} of {carried.length}</b></div>}
       </div>
-      <small className="muted">Each time you cook it, the cook keeps the photos and the answers. The best photo of a step can become the step's photo here.</small>
+      <small className="muted">{w("yourcooks.eachTimeYouCookIt")}</small>
     </section>
   );
 }
@@ -62,9 +63,9 @@ export function EatLog({ meal, cards }: { meal: Meal; cards: Feedback[] }) {
   if (!all.length) return null;
   const rows = open ? all : all.slice(0, 3);
   return (
-    <section className="card rq-eats" aria-label="Every time you ate it">
-      <b>Every time you ate it</b>
-      <small className="muted">Only you see this. Your coach sees a meal you share.</small>
+    <section className="card rq-eats" aria-label={w("yourcooks.everyTimeYouAteIt")}>
+      <b>{w("yourcooks.everyTimeYouAteIt")}</b>
+      <small className="muted">{w("yourcooks.onlyYouSeeThisYour")}</small>
       {rows.map((f) => { const r = eatRow(meal, f); return (
         <div key={f.id} className="re-row">
           {r.photo ? <img src={r.photo} alt="" /> : <span className="re-none" aria-hidden="true">🍽️</span>}

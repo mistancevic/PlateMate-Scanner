@@ -1596,6 +1596,1074 @@
     "calendar.bringingGoogleCalendarUpTo": {
       "text": "Ažuriram Google kalendar…",
       "checked": false
+    },
+    "recipes.pictureTomorrow": {
+      "text": "Slika sutra",
+      "checked": false
+    },
+    "recipes.recipes": {
+      "text": "Recepti",
+      "checked": false
+    },
+    "recipes.cancel": {
+      "text": "Otkaži",
+      "checked": false
+    },
+    "recipes.ok": {
+      "text": "U redu",
+      "checked": false
+    },
+    "recipes.addARecipe": {
+      "text": "Dodaj recept",
+      "checked": false
+    },
+    "recipes.fromALinkOrScreenshots": {
+      "text": "Sa linka ili snimaka ekrana, kao na Tanjiru. Ide u Moje recepte; ništa ne ide na Tanjir.",
+      "checked": false
+    },
+    "recipes.nothingHereYetAddOne": {
+      "text": "Ovde još nema ničega. Dodaj jedan gore, ili napravi prvi na Tanjiru.",
+      "checked": false
+    },
+    "recipes.makeMyFirstRecipe": {
+      "text": "Napravi moj prvi recept",
+      "checked": false
+    },
+    "recipes.nothingSharedYetARecipe": {
+      "text": "Još ništa nije podeljeno. Tvoj recept može biti prvi: otvori ga, pa Podeli sa članovima.",
+      "checked": false
+    },
+    "recipes.nothingMatchesClearAFilter": {
+      "text": "Ništa ne odgovara. Ukloni filter ili pretragu.",
+      "checked": false
+    },
+    "recipes.iAteIt": {
+      "text": "Pojeo sam|Pojela sam",
+      "checked": false
+    },
+    "recipes.changeItOnThePlate": {
+      "text": "Promeni ga na Tanjiru",
+      "checked": false
+    },
+    "recipes.swapIt": {
+      "text": "Zameni ga",
+      "checked": false
+    },
+    "recipes.skipItToday": {
+      "text": "Preskoči ga danas",
+      "checked": false
+    },
+    "recipes.iSkippedIt": {
+      "text": "Preskočio sam|Preskočila sam",
+      "checked": false
+    },
+    "recipes.emptyTheSlot": {
+      "text": "Isprazni obrok",
+      "checked": false
+    },
+    "recipes.inTodaySPlan": {
+      "text": "U današnjem planu",
+      "checked": false
+    },
+    "recipes.aMealGoneBy": {
+      "text": "Obrok koji je prošao",
+      "checked": false
+    },
+    "recipes.inThePlan": {
+      "text": "U planu",
+      "checked": false
+    },
+    "recipes.makeItPutsItOn": {
+      "text": "Napravi ga stavlja ga na Tanjir kad želiš da ga kuvaš.",
+      "checked": false
+    },
+    "recipes.membersDidnTLoadTry": {
+      "text": "Članovi se nisu učitali. Pokušaj ponovo.",
+      "checked": false
+    },
+    "recipes.anIdeaFromAPhoto": {
+      "text": "Ideja sa slike, još nije napravljena",
+      "checked": false
+    },
+    "recipes.liveOnChefmealanCom": {
+      "text": "Objavljeno na chefmealan.com",
+      "checked": false
+    },
+    "recipes.takenDown": {
+      "text": "Skinuto",
+      "checked": false
+    },
+    "recipes.lookAtThis": {
+      "text": "Pogledaj ovo",
+      "checked": false
+    },
+    "recipes.wasThisOk": {
+      "text": "Da li je ovo bilo u redu?",
+      "checked": false
+    },
+    "recipes.helpMeNextTime": {
+      "text": "Pomozi mi sledeći put",
+      "checked": false
+    },
+    "recipes.twentyTestsTodayMoreTomorrow": {
+      "text": "Danas dvadeset proba. Sutra još.",
+      "checked": false
+    },
+    "recipes.noPictureCameBackTry": {
+      "text": "Slika nije stigla. Pokušaj ponovo.",
+      "checked": false
+    },
+    "recipe.editingTheRecipe": {
+      "text": "Uređivanje recepta",
+      "checked": false
+    },
+    "recipe.cover": {
+      "text": "Naslovna",
+      "checked": false
+    },
+    "recipe.addAPhoto": {
+      "text": "Dodaj sliku",
+      "checked": false
+    },
+    "recipe.addMyPhoto": {
+      "text": "Dodaj moju sliku",
+      "checked": false
+    },
+    "recipe.add": {
+      "text": "Dodaj",
+      "checked": false
+    },
+    "recipe.noPhotoYet": {
+      "text": "Još nema slike.",
+      "checked": false
+    },
+    "recipe.yourPhotoFromTodayIs": {
+      "text": "Tvoja današnja slika je naslovna. Kad deliš sa članovima, biraš koju sliku vide.",
+      "checked": false
+    },
+    "recipe.changeTheCover": {
+      "text": "Promeni naslovnu",
+      "checked": false
+    },
+    "recipe.watchTheSteps": {
+      "text": "Pogledaj korake",
+      "checked": false
+    },
+    "recipe.cookIt": {
+      "text": "Skuvaj ga",
+      "checked": false
+    },
+    "recipe.foods": {
+      "text": "Namirnice",
+      "checked": false
+    },
+    "recipe.theWholeRecipeMakes": {
+      "text": "Ceo recept daje",
+      "checked": false
+    },
+    "recipe.cookedAsWrittenPlanCounts": {
+      "text": "Skuvano kako piše. Plan ga računa u ovim komadima, i svaki obrok uzima koliko mu treba. Prazno: Tanjir ga deli po težini.",
+      "checked": false
+    },
+    "recipe.undo": {
+      "text": "Poništi",
+      "checked": false
+    },
+    "recipe.partsAndOptionalFoods": {
+      "text": "Delovi i namirnice po izboru",
+      "checked": false
+    },
+    "recipe.partsGiveAFoodIts": {
+      "text": "Delovi: daj namirnici njen deo, ili je stavi po izboru. Namirnice po izboru ne ulaze u brojeve.",
+      "checked": false
+    },
+    "recipe.newPart": {
+      "text": "Nov deo",
+      "checked": false
+    },
+    "recipe.swap": {
+      "text": "Zameni",
+      "checked": false
+    },
+    "recipe.noAFoodOfIts": {
+      "text": "Ne, posebna namirnica",
+      "checked": false
+    },
+    "recipe.cancel": {
+      "text": "Otkaži",
+      "checked": false
+    },
+    "recipe.addAFood": {
+      "text": "Dodaj namirnicu",
+      "checked": false
+    },
+    "recipe.noFoodWithThatName": {
+      "text": "Nema namirnice s tim imenom. Namirnice dolaze iz Namirnica u meniju, ili skeniranjem na Tanjiru.",
+      "checked": false
+    },
+    "recipe.closeTheSearch": {
+      "text": "Zatvori pretragu",
+      "checked": false
+    },
+    "recipe.optionalNotInTheNumbers": {
+      "text": "Po izboru, ne ulazi u brojeve",
+      "checked": false
+    },
+    "recipe.theRecipeSNumbersLeave": {
+      "text": "Brojevi recepta ih izostavljaju, a i naši. Napravi ga, i dodaj bilo koju od njih na tanjir.",
+      "checked": false
+    },
+    "recipe.savedForLaterOnThe": {
+      "text": "Sačuvano za kasnije na Tanjiru",
+      "checked": false
+    },
+    "recipe.continue": {
+      "text": "Nastavi ›",
+      "checked": false
+    },
+    "recipe.steps": {
+      "text": "Koraci",
+      "checked": false
+    },
+    "recipe.eachStepSaysHowIt": {
+      "text": "Svaki korak kaže kako se odnosi na original.",
+      "checked": false
+    },
+    "recipe.keepTheseSteps": {
+      "text": "Zadrži ove korake",
+      "checked": false
+    },
+    "recipe.draftAgain": {
+      "text": "Napiši ponovo",
+      "checked": false
+    },
+    "recipe.writeMyOwn": {
+      "text": "Napiši svoje",
+      "checked": false
+    },
+    "recipe.writeThemAgain": {
+      "text": "Napiši ih ponovo",
+      "checked": false
+    },
+    "recipe.original": {
+      "text": "Original",
+      "checked": false
+    },
+    "recipe.writeTheStepsForMy": {
+      "text": "Napiši korake za moje jelo",
+      "checked": false
+    },
+    "recipe.theOriginalWorksWithYour": {
+      "text": "Original radi s tvojim namirnicama kakve jesu.",
+      "checked": false
+    },
+    "recipe.noStepsYet": {
+      "text": "Još nema koraka.",
+      "checked": false
+    },
+    "recipe.noStepsYetEditRecipe": {
+      "text": "Još nema koraka. Uredi recept ih dodaje.",
+      "checked": false
+    },
+    "recipe.startCooking": {
+      "text": "Počni da kuvaš",
+      "checked": false
+    },
+    "recipe.saveChanges": {
+      "text": "Sačuvaj izmene",
+      "checked": false
+    },
+    "recipe.liveOnChefmealanComThe": {
+      "text": "Objavljeno na chefmealan.com: objavljena strana se menja samo sa Promeni objavljenu stranu.",
+      "checked": false
+    },
+    "recipe.changeItFirst": {
+      "text": "Prvo ga promeni",
+      "checked": false
+    },
+    "recipe.onThePlateChangeFoods": {
+      "text": "Na Tanjiru: promeni namirnice, ili Uklopi u moj cilj postavlja današnje količine. Onda Napravi. Recept ostaje kakav jeste.",
+      "checked": false
+    },
+    "recipe.editRecipe": {
+      "text": "Uredi recept",
+      "checked": false
+    },
+    "recipe.changeTheRecipeItselfThe": {
+      "text": "Promeni sam recept: namirnice, grame, korake.",
+      "checked": false
+    },
+    "recipe.onChefmealanCom": {
+      "text": "Na chefmealan.com",
+      "checked": false
+    },
+    "recipe.changesNotPublishedYet": {
+      "text": "Izmene još nisu objavljene",
+      "checked": false
+    },
+    "recipe.seeLivePage": {
+      "text": "Pogledaj objavljenu stranu",
+      "checked": false
+    },
+    "recipe.tryARealisticPhoto": {
+      "text": "Probaj realnu sliku",
+      "checked": false
+    },
+    "recipe.useAsCover": {
+      "text": "Koristi kao naslovnu",
+      "checked": false
+    },
+    "recipe.discard": {
+      "text": "Odbaci",
+      "checked": false
+    },
+    "recipe.whereItCameFrom": {
+      "text": "Odakle je",
+      "checked": false
+    },
+    "recipe.adaptedFrom": {
+      "text": "Prilagođeno od",
+      "checked": false
+    },
+    "recipe.openTheOriginal": {
+      "text": "Otvori original",
+      "checked": false
+    },
+    "recipe.yourScreenshotsForYouOnly": {
+      "text": "Tvoji snimci ekrana, samo za tebe. Nikad naslovna, nikad podeljeni sa članovima, nikad objavljeni.",
+      "checked": false
+    },
+    "recipe.yourScreenshotsAreLoading": {
+      "text": "Tvoji snimci ekrana se učitavaju.",
+      "checked": false
+    },
+    "recipe.nameOfTheRecipe": {
+      "text": "Ime recepta",
+      "checked": false
+    },
+    "recipe.sure": {
+      "text": "Sigurno?",
+      "checked": false
+    },
+    "recipe.moveThePhotoEarlier": {
+      "text": "Pomeri sliku napred",
+      "checked": false
+    },
+    "recipe.moveThePhotoLater": {
+      "text": "Pomeri sliku nazad",
+      "checked": false
+    },
+    "recipe.noPhotoYet2": {
+      "text": "Još nema slike",
+      "checked": false
+    },
+    "recipe.removeIt": {
+      "text": "Ukloni je",
+      "checked": false
+    },
+    "recipe.sureRemoveIt": {
+      "text": "Sigurno? Ukloni je",
+      "checked": false
+    },
+    "recipe.whatTheRecipeMakes": {
+      "text": "Šta recept daje",
+      "checked": false
+    },
+    "recipe.howManyItMakes": {
+      "text": "Koliko daje",
+      "checked": false
+    },
+    "recipe.ofWhat": {
+      "text": "Čega",
+      "checked": false
+    },
+    "recipe.whatChanged": {
+      "text": "Šta se promenilo",
+      "checked": false
+    },
+    "recipe.nameOfTheNewPart": {
+      "text": "Ime novog dela",
+      "checked": false
+    },
+    "recipe.searchMyFoods": {
+      "text": "Pretraži moje namirnice",
+      "checked": false
+    },
+    "recipe.chefMealanIsWritingThe": {
+      "text": "Chef Mealan piše korake",
+      "checked": false
+    },
+    "recipe.whichSteps": {
+      "text": "Koji koraci",
+      "checked": false
+    },
+    "recipe.linkToTheOriginal": {
+      "text": "Link ka originalu",
+      "checked": false
+    },
+    "recipe.chefMealanCouldNotAnswer": {
+      "text": "Chef Mealan nije mogao da odgovori. Pokušaj ponovo.",
+      "checked": false
+    },
+    "recipe.drawOneTomorrowOrAdd": {
+      "text": "Nacrtaj jednu sutra, ili dodaj svoju sliku sada.",
+      "checked": false
+    },
+    "recipe.yourOwnPhotoIsAlways": {
+      "text": "Tvoja slika je uvek bolja.",
+      "checked": false
+    },
+    "recipe.thisPhotoIsTheCover": {
+      "text": "Ova slika je naslovna. × je briše.",
+      "checked": false
+    },
+    "recipe.theFirstPhotoIsThe": {
+      "text": "Prva slika je naslovna. Dodirni sliku da je pomeriš sa ‹ ›; × je briše.",
+      "checked": false
+    },
+    "recipe.asTheRecipeMakesIt": {
+      "text": "Kako ga recept daje.",
+      "checked": false
+    },
+    "recipe.theSameEnergy": {
+      "text": "Ista energija",
+      "checked": false
+    },
+    "recipe.theSameWeight": {
+      "text": "Ista težina",
+      "checked": false
+    },
+    "recipe.oneOfTheTwoHas": {
+      "text": "Jedna od dve nema energiju na deklaraciji, pa se može poklopiti samo težina.",
+      "checked": false
+    },
+    "recipe.theSameFoodRawOr": {
+      "text": "Ista namirnica, sirova ili kuvana: ista energija čuva recept kakav je bio.",
+      "checked": false
+    },
+    "recipe.draftedByChefMealanFrom": {
+      "text": "Chef Mealan je ovo napisao iz tvojih namirnica i količina. Pročitaj, promeni bilo koju reč.",
+      "checked": false
+    },
+    "recipe.asTheOriginalWritesThem": {
+      "text": "Kako ih original piše, za ceo recept.",
+      "checked": false
+    },
+    "recipe.theNumbersAboveFollowAs": {
+      "text": "Brojevi gore prate dok kucaš.",
+      "checked": false
+    },
+    "recipe.makeIt": {
+      "text": "Napravi ga",
+      "checked": false
+    },
+    "recipe.cookItNowTheRecipe": {
+      "text": "Skuvaj ga sada: recept ide na Tanjir, Uklopi u moj cilj postavlja današnje količine. Recept ostaje kakav jeste.",
+      "checked": false
+    },
+    "recipe.takenDown": {
+      "text": "Skinuto",
+      "checked": false
+    },
+    "recipe.sentBack": {
+      "text": "Vraćeno",
+      "checked": false
+    },
+    "recipe.theLinkSaysThisRecipe": {
+      "text": "Link kaže da je ovaj recept skinut.",
+      "checked": false
+    },
+    "recipe.notOnTheSiteYet": {
+      "text": "Još nije na sajtu. Objava receptu daje njegovu stranu i link.",
+      "checked": false
+    },
+    "recipe.publishTheChanges": {
+      "text": "Objavi izmene",
+      "checked": false
+    },
+    "recipe.changeLivePage": {
+      "text": "Promeni objavljenu stranu",
+      "checked": false
+    },
+    "recipe.seeWhatYouSent": {
+      "text": "Pogledaj šta si poslao|Pogledaj šta si poslala",
+      "checked": false
+    },
+    "recipe.publishAgain": {
+      "text": "Objavi ponovo",
+      "checked": false
+    },
+    "recipe.whereItCameFromIsn": {
+      "text": "Još se ne zna odakle je",
+      "checked": false
+    },
+    "recipe.addIt": {
+      "text": "Dodaj ga",
+      "checked": false
+    },
+    "recipe.asTheOriginal": {
+      "text": "Kao u originalu",
+      "checked": false
+    },
+    "publish.close": {
+      "text": "Zatvori",
+      "checked": false
+    },
+    "publish.anyoneWithTheLinkSees": {
+      "text": "Svako s linkom sada vidi stranu.",
+      "checked": false
+    },
+    "publish.seeLivePage": {
+      "text": "Pogledaj objavljenu stranu",
+      "checked": false
+    },
+    "publish.changesNotPublishedYet": {
+      "text": "Izmene još nisu objavljene",
+      "checked": false
+    },
+    "publish.copied": {
+      "text": "Kopirano",
+      "checked": false
+    },
+    "publish.copyLink": {
+      "text": "Kopiraj link",
+      "checked": false
+    },
+    "publish.theInstagramImages": {
+      "text": "Slike za Instagram",
+      "checked": false
+    },
+    "publish.photo": {
+      "text": "Slika",
+      "checked": false
+    },
+    "publish.name": {
+      "text": "Ime",
+      "checked": false
+    },
+    "publish.twoLinesAboutIt": {
+      "text": "Dva reda o njemu",
+      "checked": false
+    },
+    "publish.makes": {
+      "text": "Daje",
+      "checked": false
+    },
+    "publish.timeMinutes": {
+      "text": "Vreme, minuta",
+      "checked": false
+    },
+    "publish.theFoodsAsThePage": {
+      "text": "Namirnice, kako ih strana zove",
+      "checked": false
+    },
+    "publish.chefMealanLeftOutThe": {
+      "text": "Chef Mealan je izostavio brendove; promeni ime ako želiš. Menja se samo strana.",
+      "checked": false
+    },
+    "publish.steps": {
+      "text": "Koraci",
+      "checked": false
+    },
+    "publish.theStepsStayWithThe": {
+      "text": "Koraci ostaju i uz recept u aplikaciji.",
+      "checked": false
+    },
+    "publish.someFoodsHaveNoEnergy": {
+      "text": "Neke namirnice nemaju energiju ili proteine: dodaj ih pre objave",
+      "checked": false
+    },
+    "publish.iCookedThis": {
+      "text": "Skuvao sam ovo|Skuvala sam ovo",
+      "checked": false
+    },
+    "publish.thePageSaysFromThe": {
+      "text": "Strana kaže Iz kuhinje. Isključeno, kaže Na papiru: izračunato, još nije skuvano.",
+      "checked": false
+    },
+    "publish.seeThePage": {
+      "text": "Pogledaj stranu",
+      "checked": false
+    },
+    "publish.unpublish": {
+      "text": "Skini objavu",
+      "checked": false
+    },
+    "publish.backToTheSheet": {
+      "text": "Nazad na list",
+      "checked": false
+    },
+    "publish.publishThisRecipe": {
+      "text": "Objavi ovaj recept",
+      "checked": false
+    },
+    "publish.uploadAPhoto": {
+      "text": "Otpremi sliku",
+      "checked": false
+    },
+    "publish.thinSoftAndTheyRoll": {
+      "text": "Tanke, mekane, i uvijaju se bez pucanja.",
+      "checked": false
+    },
+    "publish.whatOneServingIsCalled": {
+      "text": "Kako se zove jedna porcija",
+      "checked": false
+    },
+    "publish.publishingDidnTWorkTry": {
+      "text": "Objava nije uspela. Pokušaj ponovo.",
+      "checked": false
+    },
+    "publish.publishedNoChanges": {
+      "text": "Objavljeno, bez izmena",
+      "checked": false
+    },
+    "publish.noChangesToSend": {
+      "text": "Nema izmena za slanje",
+      "checked": false
+    },
+    "publish.publishTheChanges": {
+      "text": "Objavi izmene",
+      "checked": false
+    },
+    "publish.publishAgain": {
+      "text": "Objavi ponovo",
+      "checked": false
+    },
+    "publish.takenDown": {
+      "text": "Skinuto",
+      "checked": false
+    },
+    "publish.sentBack": {
+      "text": "Vraćeno",
+      "checked": false
+    },
+    "publish.theLinkSaysThisRecipe": {
+      "text": "Link kaže da je ovaj recept skinut. Objavi ponovo ga vraća na isti link.",
+      "checked": false
+    },
+    "publish.savedAsYouTypeOnly": {
+      "text": "Čuva se dok kucaš, samo ovde. Zatvori bilo kada i vrati se.",
+      "checked": false
+    },
+    "publish.theLivePageShowsThe": {
+      "text": "Objavljena strana pokazuje prethodnu verziju. ",
+      "checked": false
+    },
+    "publish.theRecipeSPhotosThe": {
+      "text": "Slike recepta, prvo naslovna, pa slike tanjira sa njegovih kartica. Ona sa plavim okvirom je prva, na strani i na slikama. Otpremljena slika se čuva uz recept.",
+      "checked": false
+    },
+    "publish.uploadAPhotoOfThe": {
+      "text": "Otpremi sliku tanjira; slika se čuva uz recept. Bez nje strana nema sliku.",
+      "checked": false
+    },
+    "publish.protein": {
+      "text": "Proteini: ",
+      "checked": false
+    },
+    "publish.noRatingYetRateIt": {
+      "text": "Još nema ocene: oceni ga na Tanjiru da pokažeš DaaM good",
+      "checked": false
+    },
+    "publish.theLivePageChangesWhen": {
+      "text": "Objavljena strana se menja kad objaviš.",
+      "checked": false
+    },
+    "publish.nothingIsLiveYet": {
+      "text": "Još ništa nije objavljeno.",
+      "checked": false
+    },
+    "members.members": {
+      "text": "Članovi",
+      "checked": false
+    },
+    "members.kcal": {
+      "text": "kcal",
+      "checked": false
+    },
+    "members.gProtein": {
+      "text": "g proteina",
+      "checked": false
+    },
+    "members.proteinDensity": {
+      "text": "gustina proteina",
+      "checked": false
+    },
+    "members.steps": {
+      "text": "Koraci",
+      "checked": false
+    },
+    "members.makeIt": {
+      "text": "Napravi ga",
+      "checked": false
+    },
+    "members.keepInMine": {
+      "text": "Zadrži kod mene",
+      "checked": false
+    },
+    "members.forMembers": {
+      "text": "Za članove",
+      "checked": false
+    },
+    "members.theCoverMembersSee": {
+      "text": "Naslovna koju članovi vide",
+      "checked": false
+    },
+    "members.changeTheCover": {
+      "text": "Promeni naslovnu",
+      "checked": false
+    },
+    "members.takeItBack": {
+      "text": "Povuci ga",
+      "checked": false
+    },
+    "members.takeItBackRemovesIt": {
+      "text": "Povuci ga uklanja ga iz Članova; članovi koji su sačuvali kopiju zadržavaju svoju.",
+      "checked": false
+    },
+    "members.membersSeeTheCoverThe": {
+      "text": "Članovi vide naslovnu, namirnice, količine i korake, izračunate za njihov dan. Nikad tvoje beleške ili ocene.",
+      "checked": false
+    },
+    "members.yourPlatePhotosStayYours": {
+      "text": "Slike tvojih tanjira ostaju tvoje osim ako ovde ne izabereš neku.",
+      "checked": false
+    },
+    "members.itsKitchen": {
+      "text": "Njegova kuhinja",
+      "checked": false
+    },
+    "members.showMyName": {
+      "text": "Prikaži moje ime",
+      "checked": false
+    },
+    "members.yourNameInMembers": {
+      "text": "Tvoje ime u Članovima",
+      "checked": false
+    },
+    "members.shareWithMembers": {
+      "text": "Podeli sa članovima",
+      "checked": false
+    },
+    "members.takeItDownOwner": {
+      "text": "Skini ga (vlasnik)",
+      "checked": false
+    },
+    "members.sureItGoesForEvery": {
+      "text": "Sigurno? Nestaje za svakog člana",
+      "checked": false
+    },
+    "members.yourPhoto": {
+      "text": "Tvoja slika",
+      "checked": false
+    },
+    "members.photoByAMember": {
+      "text": "Slika jednog člana",
+      "checked": false
+    },
+    "members.membersRecipesEachAsThe": {
+      "text": "Recepti članova, svaki kao ceo recept: tvoj dan je isplaniran do kraja. Napravi ga stavlja tvoju porciju na Tanjir.",
+      "checked": false
+    },
+    "members.membersRecipesSetYourGoal": {
+      "text": "Recepti članova. Postavi cilj i svaki recept pokazuje tvoju porciju.",
+      "checked": false
+    },
+    "members.foodsForYourPortion": {
+      "text": "Namirnice za tvoju porciju",
+      "checked": false
+    },
+    "members.theMember": {
+      "text": "Član",
+      "checked": false
+    },
+    "members.theMemberS": {
+      "text": "Članov",
+      "checked": false
+    },
+    "members.thatNameDidnTWork": {
+      "text": "To ime nije prošlo. Probaj drugo.",
+      "checked": false
+    },
+    "members.sharingDidnTWorkTry": {
+      "text": "Deljenje nije uspelo. Pokušaj ponovo.",
+      "checked": false
+    },
+    "members.notShared": {
+      "text": "Nije podeljeno",
+      "checked": false
+    },
+    "members.oneNamePerMemberSo": {
+      "text": "Jedno ime po članu, da članovi nađu sve tvoje recepte pod njim.",
+      "checked": false
+    },
+    "steppics.takeAPhoto": {
+      "text": "Slikaj",
+      "checked": false
+    },
+    "steppics.fromMyGallery": {
+      "text": "Iz moje galerije",
+      "checked": false
+    },
+    "steppics.fromYourCooks": {
+      "text": "Iz tvojih kuvanja",
+      "checked": false
+    },
+    "steppics.myPhoto": {
+      "text": "Moja slika",
+      "checked": false
+    },
+    "steppics.drawnByAi": {
+      "text": "Nacrtao AI",
+      "checked": false
+    },
+    "steppics.beforeYouKeepIt": {
+      "text": "Pre nego što je zadržiš",
+      "checked": false
+    },
+    "steppics.itShowsThisStepAnd": {
+      "text": "Pokazuje ovaj korak, i samo ovaj korak",
+      "checked": false
+    },
+    "steppics.everyFoodIsFromThe": {
+      "text": "Svaka namirnica je iz recepta, i tamo gde treba da bude do sada",
+      "checked": false
+    },
+    "steppics.meatRawBeforeCookingCooked": {
+      "text": "Meso sirovo pre kuvanja, pečeno do kraja posle",
+      "checked": false
+    },
+    "steppics.theAmountsLookLikeThe": {
+      "text": "Količine izgledaju kao gramovi",
+      "checked": false
+    },
+    "steppics.aRealCookWouldDo": {
+      "text": "Pravi kuvar bi to uradio ovako",
+      "checked": false
+    },
+    "steppics.keepIt": {
+      "text": "Zadrži je",
+      "checked": false
+    },
+    "steppics.chooseAnother": {
+      "text": "Izaberi drugu",
+      "checked": false
+    },
+    "steppics.sayWhoMadeItFirst": {
+      "text": "Prvo reci ko ju je napravio.",
+      "checked": false
+    },
+    "steppics.drawnByAiSaysSo": {
+      "text": "Nacrtao AI to piše ispod slike, u kuvanju i u Pogledaj korake. Reči i količine koraka ostaju ono što važi.",
+      "checked": false
+    },
+    "steppics.removeThisPicture": {
+      "text": "Ukloni ovu sliku",
+      "checked": false
+    },
+    "steppics.yourPicturesStayWithYour": {
+      "text": "Tvoje slike ostaju uz tvoj recept, samo ti ih otvaraš. U Beti se ne dele sa članovima.",
+      "checked": false
+    },
+    "steppics.startCooking": {
+      "text": "Počni da kuvaš",
+      "checked": false
+    },
+    "steppics.madeOnYourPhoneFrom": {
+      "text": "Napravljeno na tvom telefonu od slika koraka: nema video fajla.",
+      "checked": false
+    },
+    "steppics.steps": {
+      "text": "Koraci",
+      "checked": false
+    },
+    "steppics.pictureDrawnByAiBeta": {
+      "text": "Sliku nacrtao AI, Beta",
+      "checked": false
+    },
+    "steppics.yourPhoto": {
+      "text": "Tvoja slika",
+      "checked": false
+    },
+    "delrecipe.deleteRecipe": {
+      "text": "Obriši recept",
+      "checked": false
+    },
+    "delrecipe.goesWithIt": {
+      "text": "IDE SA NJIM",
+      "checked": false
+    },
+    "delrecipe.seenByOthers": {
+      "text": "VIDE DRUGI",
+      "checked": false
+    },
+    "delrecipe.stays": {
+      "text": "OSTAJE",
+      "checked": false
+    },
+    "delrecipe.cancel": {
+      "text": "Otkaži",
+      "checked": false
+    },
+    "delrecipe.takeItBackFromMembers": {
+      "text": "Povuci ga iz Članova",
+      "checked": false
+    },
+    "delrecipe.takeTheLivePageDown": {
+      "text": "Skini objavljenu stranu",
+      "checked": false
+    },
+    "delrecipe.itCouldnTBeDeleted": {
+      "text": "Nije moglo da se obriše. Pokušaj ponovo.",
+      "checked": false
+    },
+    "delrecipe.yourScreenshot": {
+      "text": "Tvoj snimak ekrana",
+      "checked": false
+    },
+    "delrecipe.itsPhoto": {
+      "text": "Njegova slika",
+      "checked": false
+    },
+    "delrecipe.yourMeal": {
+      "text": "Tvoj obrok",
+      "checked": false
+    },
+    "delrecipe.theFoodItUses": {
+      "text": "Namirnica koju koristi",
+      "checked": false
+    },
+    "recipein.aRecipeFromScreenshots": {
+      "text": "Recept sa snimaka ekrana",
+      "checked": false
+    },
+    "recipein.cancel": {
+      "text": "Otkaži",
+      "checked": false
+    },
+    "recipein.aRecipeFromALink": {
+      "text": "Recept sa linka",
+      "checked": false
+    },
+    "recipein.aRecipePageFromA": {
+      "text": "Strana s receptom sa sajta. Linkovi sa Instagrama i TikToka traže prijavu, pa nam se ne otvaraju: tamo koristi Snimak ekrana.",
+      "checked": false
+    },
+    "recipein.theLinkStaysWithThe": {
+      "text": "Link ostaje uz recept, pa se uvek možeš vratiti na original.",
+      "checked": false
+    },
+    "recipein.makes": {
+      "text": "Daje",
+      "checked": false
+    },
+    "recipein.guessed": {
+      "text": "procenjeno",
+      "checked": false
+    },
+    "recipein.steps": {
+      "text": "Koraci",
+      "checked": false
+    },
+    "recipein.notRightReadItAgain": {
+      "text": "Nije dobro? Pročitaj ponovo",
+      "checked": false
+    },
+    "recipein.linkToARecipe": {
+      "text": "Link ka receptu",
+      "checked": false
+    },
+    "recipein.whereItCameFrom": {
+      "text": "Odakle je",
+      "checked": false
+    },
+    "recipein.oneLess": {
+      "text": "Jedan manje",
+      "checked": false
+    },
+    "recipein.oneMore": {
+      "text": "Jedan više",
+      "checked": false
+    },
+    "recipein.readIt": {
+      "text": "Pročitaj ga",
+      "checked": false
+    },
+    "recipein.readThem": {
+      "text": "Pročitaj ih",
+      "checked": false
+    },
+    "recipein.leaveItOut": {
+      "text": "Izostavi",
+      "checked": false
+    },
+    "recipein.addIt": {
+      "text": "Dodaj",
+      "checked": false
+    },
+    "recipein.asThePageWritesThem": {
+      "text": "Kako ih strana piše",
+      "checked": false
+    },
+    "recipein.asTheRecipeWritesThem": {
+      "text": "Kako ih recept piše",
+      "checked": false
+    },
+    "recipein.putItOnMyPlate": {
+      "text": "Stavi na moj tanjir",
+      "checked": false
+    },
+    "recipein.thisLinkDidnTOpen": {
+      "text": "Ovaj link nam se nije otvorio.",
+      "checked": false
+    },
+    "recipein.noRecipeOnThisPage": {
+      "text": "Na ovoj strani nema recepta.",
+      "checked": false
+    },
+    "recipein.thisDoesnTLookLike": {
+      "text": "Ovo ne liči na recept.",
+      "checked": false
+    },
+    "recipein.thatDidnTWork": {
+      "text": "Nije uspelo.",
+      "checked": false
+    },
+    "recipein.useScreenshot": {
+      "text": "Koristi Snimak ekrana",
+      "checked": false
+    },
+    "recipein.tryAScreenshot": {
+      "text": "Probaj snimak ekrana",
+      "checked": false
+    },
+    "recipein.chooseOtherPictures": {
+      "text": "Izaberi druge slike",
+      "checked": false
+    },
+    "recipein.tryAgain": {
+      "text": "Pokušaj ponovo",
+      "checked": false
+    },
+    "yourcooks.yourCooks": {
+      "text": "Tvoja kuvanja",
+      "checked": false
+    },
+    "yourcooks.eachTimeYouCookIt": {
+      "text": "Svaki put kad ga kuvaš, kuvanje čuva slike i odgovore. Najbolja slika koraka ovde može postati slika tog koraka.",
+      "checked": false
+    },
+    "yourcooks.everyTimeYouAteIt": {
+      "text": "Svaki put kad si ga jeo|Svaki put kad si ga jela",
+      "checked": false
+    },
+    "yourcooks.onlyYouSeeThisYour": {
+      "text": "Ovo vidiš samo ti. Tvoj trener vidi obrok koji podeliš.",
+      "checked": false
+    },
+    "yourcooks.notReally": {
+      "text": "Ne baš",
+      "checked": false
     }
   }
 }
