@@ -70,9 +70,10 @@ test("a ticked line shows in Serbian when Srpski is chosen; its slots filled", a
   (globalThis as any).localStorage = { getItem: (k: string) => store[k] ?? null, setItem: (k: string, v: string) => { store[k] = v; }, removeItem: (k: string) => { delete store[k]; } };
   const { setLang } = await import("./lang");
   const { fixedLine } = await import("./safety");
-  const keep = { u: { ...sr.chef.useInCook }, w: { ...sr.chef.whatMoment }, e: { ...sr.safety.eating } };
+  const keep = { u: { ...sr.chef.useInCook }, w: { ...sr.chef.whatMoment }, e: { ...sr.safety.eating }, d: { ...sr.safety.diabetes } };
   try {
     sr.chef.useInCook.checked = true; sr.chef.whatMoment.checked = true; sr.safety.eating.checked = true;
+    sr.safety.diabetes.checked = false; // 0.3.81: Milan ticks lines in the table; the test sets its own ticks
     assert.equal(say("useInCook", "Jaje", "palačinke"), CHEF.useInCook("Jaje", "palačinke"), "English while English is chosen");
     setLang("sr-Latn");
     assert.equal(say("useInCook", "Jaje", "palačinke"), fill(sr.chef.useInCook.text, { food: "Jaje", dish: "palačinke" }));
@@ -83,7 +84,7 @@ test("a ticked line shows in Serbian when Srpski is chosen; its slots filled", a
     assert.equal(say("photoWhose", "Read from the photo."), CHEF.photoWhose("Read from the photo."), "a line waiting for the screens stays English even ticked");
     sr.chef.photoWhose.checked = false;
   } finally {
-    setLang("en"); Object.assign(sr.chef.useInCook, keep.u); Object.assign(sr.chef.whatMoment, keep.w); Object.assign(sr.safety.eating, keep.e);
+    setLang("en"); Object.assign(sr.chef.useInCook, keep.u); Object.assign(sr.chef.whatMoment, keep.w); Object.assign(sr.safety.eating, keep.e); Object.assign(sr.safety.diabetes, keep.d);
   }
 });
 
@@ -104,6 +105,8 @@ test("screens: a ticked line shows in Srpski; a value without its Serbian keeps 
   const scr = (srLines as unknown as { screens: Record<string, { text: string; checked: boolean }> }).screens;
   const keep = JSON.parse(JSON.stringify(scr));
   try {
+    // 0.3.81: the test sets its own ticks; Milan's are in the file
+    for (const k of ["plate.ateIt", "meal.dinner", "ago.hours"]) scr[k].checked = false;
     assert.equal(w("plate.ateIt"), "Ate it");
     setLang("sr-Latn");
     assert.equal(w("plate.ateIt"), "Ate it", "unticked: English");

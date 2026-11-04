@@ -54,7 +54,10 @@ const PORT = "3396", U = `http://127.0.0.1:${PORT}`;
     const head = await page.locator("header").first().textContent();
     ok(/PD \d+,\d/.test(head), "in Srpski the header's PD has a decimal comma: " + head.replace(/\s+/g, " ").slice(0, 80));
     const main = await page.locator("main").textContent();
-    ok(/On the plate/.test(main) && !/Na tanjiru/.test(main), "a line not ticked yet stays English");
+    // 0.3.81: Coach Milan ticks lines in the table, so the check follows the app's file: ticked shows in Srpski, not ticked stays English
+    const onPlate = JSON.parse(fs.readFileSync(path.join(__dirname, "../../src/i18n/sr-Latn.json"), "utf8")).screens["plate.onThePlate"];
+    if (onPlate.checked) ok(/Na tanjiru/.test(main) && !/On the plate/.test(main), "a ticked line shows in Srpski: Na tanjiru");
+    else ok(/On the plate/.test(main) && !/Na tanjiru/.test(main), "a line not ticked yet stays English");
     await page.evaluate(() => { localStorage.removeItem("chefmealan-lang"); }); await page.reload(); await page.waitForTimeout(800);
     ok(/PD \d+\.\d/.test(await page.locator("header").first().textContent()), "English again: a decimal point");
     await ctx.close();

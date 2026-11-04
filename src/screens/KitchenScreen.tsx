@@ -2,13 +2,14 @@
 // phone joins this screen to its session, once. It shows the recipe and the steps, nothing about the person, and forgets all
 // of it when the session ends. Chef, look takes one photo of the pan (the camera here, or the phone's camera app) and sends it
 // with the step; the photo is not kept.
+import { w } from "../words";
 import { useEffect, useRef, useState } from "react";
 import type { Ingredient } from "../pilot";
 import { CookMode } from "../components/CookMode";
 import { resizeImageBase64 } from "../utils/image";
 
 type Pub = { code: string; title: string; steps: string[]; items: Ingredient[]; step: number; by: "owner" | "kitchen"; ticks: number[]; joined: boolean; ended: boolean; rev: number };
-const post = async (url: string, body: unknown) => { const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || "That didn't work. Try again."); return d; };
+const post = async (url: string, body: unknown) => { const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }); const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || w("kitchen.thatDidnTWorkTry")); return d; };
 const readFile = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 
 export function KitchenScreen() {
@@ -26,7 +27,7 @@ export function KitchenScreen() {
   const join = async (c: string) => {
     setBusy(true); setErr("");
     try { const d = await post("/api/cook/join", { code: c }); setToken(d.token); setS(d.session); seen.current = d.session.rev; setRemote({ k: d.session.step, rev: d.session.rev }); try { history.replaceState(null, "", "/cook"); } catch { /* fine */ } }
-    catch (e: any) { setErr(e?.message || "That didn't work. Try again."); } finally { setBusy(false); }
+    catch (e: any) { setErr(e?.message || w("kitchen.thatDidnTWorkTry")); } finally { setBusy(false); }
   };
   useEffect(() => { if (first.length === 4) void join(first); }, []); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
@@ -68,16 +69,16 @@ export function KitchenScreen() {
     <div className="kitchen-join">
       <b style={{ fontSize: 22 }}>Chef Mealan · Kitchen screen</b>
       {ended ? <>
-        <p>The session ended. This screen kept nothing.</p>
-        <small className="muted">To cook with it again: on the cooking phone, in cook mode, tap Use another screen.</small>
-        <button className="pill pill-wide" onClick={() => { setEnded(false); setCode(""); }}>Join another</button>
+        <p>{w("kitchen.theSessionEndedThisScreen")}</p>
+        <small className="muted">{w("kitchen.toCookWithItAgain")}</small>
+        <button className="pill pill-wide" onClick={() => { setEnded(false); setCode(""); }}>{w("kitchen.joinAnother")}</button>
       </> : <>
-        <small className="muted">Type the code from the phone that is cooking. It is in cook mode, under Use another screen.</small>
-        <label htmlFor="kitchen-code" className="sr-only">Code</label>
+        <small className="muted">{w("kitchen.typeTheCodeFromThe")}</small>
+        <label htmlFor="kitchen-code" className="sr-only">{w("kitchen.code")}</label>
         <input id="kitchen-code" className="search" value={code} autoComplete="off" autoCapitalize="characters" maxLength={4} onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 4))} placeholder="7K4P" />
-        <button className="pill pill-primary pill-wide" disabled={busy || code.length !== 4} onClick={() => void join(code)}>Join</button>
+        <button className="pill pill-primary pill-wide" disabled={busy || code.length !== 4} onClick={() => void join(code)}>{w("kitchen.join")}</button>
         {err && <small className="error" role="alert">{err}</small>}
-        <small className="muted">This screen shows the recipe and the steps of the phone that is cooking. Never that person's numbers, goal or profile. It forgets everything when the session ends.</small>
+        <small className="muted">{w("kitchen.thisScreenShowsTheRecipe")}</small>
       </>}
     </div>
   );
