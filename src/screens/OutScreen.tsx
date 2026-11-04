@@ -1,4 +1,5 @@
 import { carryReads } from "../carry";
+import { w, wn } from "../words";
 import { useEffect, useRef, useState } from "react";
 import { useChefContext } from "../chefContext";
 import { Camera, Send } from "lucide-react";
@@ -48,7 +49,7 @@ const asFood = (r: Rec): Food => ({
 
 // DT153 (0.2.132): a done row is a plain tick, not a pill; Undo under it while the chat is open
 function Done({ text, undo, start }: { text: string; undo?: () => void; start?: boolean }) {
-  return <span className={`done-tick${start ? " done-start" : ""}`}><b>✓ {text}</b>{undo && <button type="button" className="link done-undo" onClick={undo}>Undo</button>}</span>;
+  return <span className={`done-tick${start ? " done-start" : ""}`}><b>✓ {text}</b>{undo && <button type="button" className="link done-undo" onClick={undo}>{w("out.undo")}</button>}</span>;
 }
 
 export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; turns: Turn[]; setTurns: (f: (t: Turn[]) => Turn[]) => void; tab: Tab; ask?: "fill" | "plate" | "around" | { q: string } | null; clearAsk: () => void }) {
@@ -78,20 +79,20 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   const about = ctx ? ctx.about : p.tab === "plan"
     ? `About ${dayName === "today" ? "today" : dayName}: ${open.length ? `${open.length} ${open.length === 1 ? "slot" : "slots"} open` : "every slot set"}${tWhen ? `, ${tWhen.phrase}` : ""}${numbers ? `, ${fmt(numbers.kcal, 0)} kcal and ${numbers.protein} g to place` : ""}.`
     : p.tab === "home"
-      ? (rec.planned ? `${rec.open.length} of ${rec.planned} ${rec.planned === 1 ? "slot" : "slots"} to come${rec.extras.length ? `, ${rec.extras.length} extra so far` : ""}.` : "Nothing planned for today yet.")
+      ? (rec.planned ? `${rec.open.length} of ${rec.planned} ${rec.planned === 1 ? "slot" : "slots"} to come${rec.extras.length ? `, ${rec.extras.length} extra so far` : ""}.` : w("out.nothingPlannedForTodayYet"))
       : p.tab === "journey"
-        ? (state.items.length ? `On the plate: ${state.items.map((i) => i.food.name).join(", ")}, ${pdText(platePd)}${pdRef !== null ? ` against your ${pdVal(pdRef)}` : ""}.` : "The plate is empty.")
-        : "Out, missing something, or after an idea.";
+        ? (state.items.length ? `On the plate: ${state.items.map((i) => i.food.name).join(", ")}, ${pdText(platePd)}${pdRef !== null ? ` against your ${pdVal(pdRef)}` : ""}.` : w("out.thePlateIsEmpty"))
+        : w("out.outMissingSomethingOrAfter");
   // the next planned meal still to come today (0.2.8: a chip only offers what the chat can do)
   const eatenIds = new Set(rec.eaten.map((f) => f.slot!.slotId)), skippedIds = new Set(rec.skipped.map((x) => x.id));
   const nextHeld = slots.find((x) => held[x.id] && !eatenIds.has(x.id) && !skippedIds.has(x.id));
   const chips: string[] = ctx ? ctx.chips : p.tab === "plan"
-    ? [...(open.length ? [`Fill ${dayName === "today" ? "today" : dayName}`] : []), "Make it a vegetarian day", "Lunch from what I have at home", "Something quick for dinner"]
+    ? [...(open.length ? [`Fill ${dayName === "today" ? "today" : dayName}`] : []), w("out.makeItAVegetarianDay"), w("out.lunchFromWhatIHave"), w("out.somethingQuickForDinner")]
     : p.tab === "home"
-      ? [nextHeld ? `Swap ${nextHeld.name.toLowerCase()} for something lighter` : "What is planned today?", "What's left today?", ...(trainingTime(training) && slots.length ? [`Move ${slots[slots.length - 1].name.toLowerCase()} to after training`] : []), "I'm out, what do I take?"]
+      ? [nextHeld ? `Swap ${nextHeld.name.toLowerCase()} for something lighter` : w("out.whatIsPlannedToday"), w("out.whatSLeftToday"), ...(trainingTime(training) && slots.length ? [`Move ${slots[slots.length - 1].name.toLowerCase()} to after training`] : []), "I'm out, what do I take?"]
       : p.tab === "journey"
-        ? [...(state.items.length ? ["Swap a food on my plate", `Make my plate a ${mealName}`, "Make my plate a snack"] : []), "What goes with this?", "Better match for my target?", "I'm out, what do I take?"]
-        : ["No idea, inspire me", "I'm out, what do I take?", "Hotel breakfast buffet", "Plan food for a trip", "Italian tonight, I want dessert"];
+        ? [...(state.items.length ? ["Swap a food on my plate", `Make my plate a ${mealName}`, w("out.makeMyPlateASnack")] : []), w("out.whatGoesWithThis"), w("out.betterMatchForMyTarget"), "I'm out, what do I take?"]
+        : ["No idea, inspire me", "I'm out, what do I take?", w("out.hotelBreakfastBuffet"), w("out.planFoodForATrip"), w("out.italianTonightIWantDessert")];
   // Fill a day: from My recipes and the starters, the same picking as the tip; a turn with the rows and one button that acts
   const choices: PlannedMeal[] = [...state.meals.map((m) => fromMeal(m, m.from === "coach" ? "coach" : "mine")), ...STARTERS];
   const target = numbers ? density(numbers.protein, numbers.kcal) : pdRef;
@@ -102,7 +103,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
     const heldSum = sumOf(held);
     const text = rows.length
       ? `${dayName === "today" ? "Today" : dayName}, filled: ${rows.map((r) => `${r.slot.name} ${r.meal.title}`).join(", ")}. The day lands at ${fmt(sum.kcal + heldSum.kcal, 0)} kcal and ${fmt(sum.protein + heldSum.protein, 0)} g protein${numbers ? ` of ${fmt(numbers.kcal, 0)} and ${numbers.protein}` : ""}. Change one, or put them in.${rows.some((r) => r.why) ? ` ${rows.map((r) => r.why).filter(Boolean).join(" ")}` : ""}`
-      : "Every slot is set already.";
+      : w("out.everySlotIsSetAlready");
     setTurns((t) => [...t, { role: "you", text: `Fill ${dayName === "today" ? "today" : dayName}` }, { role: "mealan", text, fill: rows.length ? { date: planDate, dayName, rows } : undefined }]);
   };
   const changeOne = (ti: number, slotId: string) => setTurns((t) => t.map((turn, i) => {
@@ -115,8 +116,8 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
     const date = turn.fill.date, before = turn.fill.rows.map((r) => [r.slot.id, p.planned[date]?.[r.slot.id] ?? null] as const);
     for (const r of turn.fill.rows) p.fill(date, r.slot.id, r.meal);
     setTurns((t) => t.map((x, i) => (i === ti && x.fill ? { ...x, fill: { ...x.fill, done: true } } : x)));
-    undoable(`${ti}:fill`, () => { for (const [id, m] of before) p.fill(date, id, m); setTurns((t) => t.map((x, i) => (i === ti && x.fill ? { ...x, fill: { ...x.fill, done: false } } : x))); p.notify(`${before.length === 1 ? "The slot is" : "The slots are"} as before.`); });
-    p.notify(`${turn.fill.rows.length === 1 ? "The slot is" : `${turn.fill.rows.length} slots are`} set for ${turn.fill.dayName}.`);
+    undoable(`${ti}:fill`, () => { for (const [id, m] of before) p.fill(date, id, m); setTurns((t) => t.map((x, i) => (i === ti && x.fill ? { ...x, fill: { ...x.fill, done: false } } : x))); p.notify((before.length === 1 ? w("out.slotAsBefore") : w("out.slotsAsBefore"))); });
+    p.notify(wn("out.slotsSetFor", turn.fill.rows.length, { day: (l) => (l === "en" ? turn.fill.dayName : null) }));
   };
   useEffect(() => { if (p.ask === "fill") { p.clearAsk(); fillNow(); } }, [p.ask]); // eslint-disable-line react-hooks/exhaustive-deps
   // DT179 (0.3.23): a question asked from Plan (a quick dinner after a late evening, a meal to carry on a full day)
@@ -153,7 +154,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
   const undoable = (key: string, fn: () => void) => { undos.current.set(key, fn); bump((n) => n + 1); };
   const undoOf = (key: string) => { const fn = undos.current.get(key); return fn ? () => { undos.current.delete(key); fn(); bump((n) => n + 1); } : undefined; };
   // DT153: the head says where you came from
-  const backLabel = p.tab === "journey" ? "Back to the plate" : p.tab === "plan" ? "Back to the plan" : null;
+  const backLabel = p.tab === "journey" ? w("out.backToThePlate") : p.tab === "plan" ? w("out.backToThePlan") : null;
   const usualOf = (id: string) => slotsOf(lifestyle).find((x) => x.id === id)?.time ?? "";
   const trainWhat = (d: { kind?: string } | null) => (d?.kind === "strength" ? "strength session" : d?.kind === "cardio" ? "cardio" : d?.kind === "walk" ? "walk" : "training");
   const dayRows = (): DaySlot[] => slots.map((x) => ({ name: x.name, time: x.time, meal: held[x.id]?.title ?? null, kcal: held[x.id]?.kcal ?? null,
@@ -211,7 +212,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
       } catch { /* the app's own picks below */ }
       // the app's own picks fill what Chef Mealan's ideas did not (failed the checks, or no answer)
       if (options.length < 2) for (const c of swapFallback(choices.map((x) => x.meal).filter((m) => !options.some((o) => o.meal.title === m.title)), now, want, tgt, 2 - options.length))
-        options.push({ meal: c, why: c.source === "starter" ? "One of Chef Mealan's starters." : "From your recipes." });
+        options.push({ meal: c, why: c.source === "starter" ? w("out.oneOfChefMealanS") : w("out.fromYourRecipes") });
       setThinking(false);
       say({ role: "mealan", tag: "chef", text: swapLead(slot.name, now, want, options.length), swap: options.length ? { date: planDate, slotId: slot.id, slotName: slot.name, time: slot.time, options } : undefined });
     }
@@ -264,7 +265,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
           short: (() => { const l = openList(getStore()); return l ? shortMeals(l).map((m) => ({ day: m.date, slot: m.slot, meal: m.title, not_this_time: m.foods })) : []; })(),
         }) });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Chef Mealan could not answer.");
+      if (!res.ok) throw new Error(data.error || w("out.chefMealanCouldNotAnswer"));
       const recs: Rec[] = data.recognised ?? [];
       // build the plate from Mealan's picks, then let the solver, not the model, settle the numbers
       let picks: Ingredient[] = (data.picks ?? []).map((pk: { name: string; grams: number }) => {
@@ -352,8 +353,8 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
             <p>{t.text}</p>
             {t.failed && (
               <div className="button-row">
-                {t.failed.retried ? <span className="done-tick done-start done-quiet"><b>Asked again</b></span>
-                  : <><button type="button" className="pill pill-small pill-primary" disabled={thinking} onClick={() => void ask(t.failed!.text, { ti: i, photo: t.failed!.photo })}>Ask again</button>{backLabel && <button type="button" className="pill pill-small" onClick={close}>{backLabel}</button>}</>}
+                {t.failed.retried ? <span className="done-tick done-start done-quiet"><b>{w("out.askedAgain")}</b></span>
+                  : <><button type="button" className="pill pill-small pill-primary" disabled={thinking} onClick={() => void ask(t.failed!.text, { ti: i, photo: t.failed!.photo })}>{w("out.askAgain")}</button>{backLabel && <button type="button" className="pill pill-small" onClick={close}>{backLabel}</button>}</>}
               </div>
             )}
             {t.swap && (
@@ -361,7 +362,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
                 {t.swap.options.filter((o) => !t.swap!.done || o.meal.title === t.swap!.done).map((o, k) => (
                   <div key={o.meal.title} className="fill-row">
                     <div className="fill-text"><small>{t.swap!.slotName}, {t.swap!.time}</small><b>{o.meal.title}</b><small>{fmt(o.meal.kcal, 0)} kcal · {fmt(o.meal.protein, 0)} g · {pdText(density(o.meal.protein, o.meal.kcal))}</small>{o.why && <small className="swap-why">{o.why}</small>}</div>
-                    {t.swap!.done ? <Done text="Swapped" undo={undoOf(`${i}:swap`)} /> : <button className="pill pill-small" onClick={() => doSwap(i, t.swap!.options.indexOf(o))}>Swap</button>}
+                    {t.swap!.done ? <Done text="Swapped" undo={undoOf(`${i}:swap`)} /> : <button className="pill pill-small" onClick={() => doSwap(i, t.swap!.options.indexOf(o))}>{w("out.swap")}</button>}
                   </div>
                 ))}
               </div>
@@ -369,7 +370,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
             {t.move && (
               <div className="button-row">
                 {t.move.done ? <Done start text={t.move.done === "moved" ? `Moved to ${t.move.to}` : `Kept at ${t.move.from}`} undo={undoOf(`${i}:move`)} />
-                  : <><button className="pill pill-small pill-primary" onClick={() => doMove(i, true)}>Move it</button><button className="pill pill-small" onClick={() => doMove(i, false)}>Keep {t.move.from}</button></>}
+                  : <><button className="pill pill-small pill-primary" onClick={() => doMove(i, true)}>{w("out.moveIt")}</button><button className="pill pill-small" onClick={() => doMove(i, false)}>Keep {t.move.from}</button></>}
               </div>
             )}
             {t.fill && (
@@ -377,13 +378,13 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
                 {t.fill.rows.map((r) => (
                   <div key={r.slot.id} className="fill-row">
                     <div className="fill-text"><small>{r.slot.name}, {r.slot.time}</small><b>{r.meal.title}</b><small>{fmt(r.meal.kcal, 0)} kcal · {fmt(r.meal.protein, 0)} g · {pdText(density(r.meal.protein, r.meal.kcal))}</small></div>
-                    {!t.fill!.done && r.alternatives.length > 0 && <button className="pill pill-small" onClick={() => changeOne(i, r.slot.id)}>Change</button>}
+                    {!t.fill!.done && r.alternatives.length > 0 && <button className="pill pill-small" onClick={() => changeOne(i, r.slot.id)}>{w("out.change")}</button>}
                   </div>
                 ))}
                 <div className="button-row">
                   {t.fill.done
-                    ? <><Done start text="In the plan" undo={undoOf(`${i}:fill`)} />{backLabel === "Back to the plan" && <button className="pill pill-small pill-primary back-after" onClick={close}>Back to the plan</button>}</>
-                    : <button className="pill pill-small pill-primary" onClick={() => putThemIn(i)}>Put them in the plan</button>}
+                    ? <><Done start text="In the plan" undo={undoOf(`${i}:fill`)} />{backLabel === "Back to the plan" && <button className="pill pill-small pill-primary back-after" onClick={close}>{w("out.backToThePlan")}</button>}</>
+                    : <button className="pill pill-small pill-primary" onClick={() => putThemIn(i)}>{w("out.putThemInThePlan")}</button>}
                 </div>
               </div>
             )}
@@ -394,12 +395,12 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
                     {r.kind === "add" && <><div className="tip-text"><b>{r.name}</b><small>{r.from === "mine" ? "in your foods" : "basic food"} · {fmt(r.grams, 0)} g · {pdText(density(r.food.protein, r.food.calories))}{r.reaches !== null ? ` · the plate reaches ${pdVal(r.reaches)}` : ""}</small></div>
                       {done === "added" ? <Done text="On the plate" undo={undoOf(`${i}:row:${r.name}`)} /> : <button type="button" className="pill pill-small pill-primary" onClick={() => rowAdd(i, r)}>+ Add</button>}</>}
                     {r.kind === "drop" && <><div className="tip-text"><b>{r.name}</b><small>on the plate · {fmt(r.grams, 0)} g</small></div>
-                      {done === "out" ? <Done text="Out" undo={undoOf(`${i}:row:${r.name}`)} /> : <button type="button" className="pill pill-small" onClick={() => rowOut(i, r)}>Take it out</button>}</>}
-                    {r.kind === "scan" && <><div className="tip-text"><b>{r.name}</b><small>not in your foods</small></div>
-                      <button type="button" className="pill pill-small" onClick={() => rowScan(i, r)}>Scan it</button></>}
+                      {done === "out" ? <Done text="Out" undo={undoOf(`${i}:row:${r.name}`)} /> : <button type="button" className="pill pill-small" onClick={() => rowOut(i, r)}>{w("out.takeItOut")}</button>}</>}
+                    {r.kind === "scan" && <><div className="tip-text"><b>{r.name}</b><small>{w("out.notInYourFoods")}</small></div>
+                      <button type="button" className="pill pill-small" onClick={() => rowScan(i, r)}>{w("out.scanIt")}</button></>}
                   </div>); })}
                 {/* 02:08: a way back to the Plate under the rows, not only Close at the top */}
-                {p.tab === "journey" && <div className="button-row"><button type="button" className={`pill pill-small${Object.values(t.rowsDone ?? {}).some((d) => d === "added") ? " pill-primary" : ""}`} onClick={close}>Back to the plate</button></div>}
+                {p.tab === "journey" && <div className="button-row"><button type="button" className={`pill pill-small${Object.values(t.rowsDone ?? {}).some((d) => d === "added") ? " pill-primary" : ""}`} onClick={close}>{w("out.backToThePlate")}</button></div>}
               </div>
             )}
             {/* 02:08: the photo block (Work on it with Chef Mealan, This is what I had) belongs to a photo; a written answer with rows never shows it */}
@@ -409,7 +410,7 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
                 <div className="picks-total">{pdText(t.pd ?? null)}{pdRef !== null ? ` · target ${pdVal(pdRef)}` : ""} · {fmt(t.kcal ?? null, 0)} kcal</div>
                 <div className="button-row">
                   <button className="pill pill-small pill-primary" onClick={() => toPlate(t)}>Work on it with {CHEF_NAME}</button>
-                  <button className="pill pill-small" onClick={() => keep(t)}>This is what I had</button>
+                  <button className="pill pill-small" onClick={() => keep(t)}>{w("out.thisIsWhatIHad")}</button>
                 </div>
               </div>
             )}
@@ -424,16 +425,16 @@ export function OutScreen(p: AppApi & { toPlate: () => void; close: () => void; 
           </div>
         )}
         {/* DT111 (0.2.94): the wait shows its steps, collapsed, above the field */}
-        {thinking && <WaitSteps steps={[{ key: "ask", text: `Asked ${CHEF_NAME}` }, { key: "match", text: "Matching the foods he names to yours" }]} at={chatStage} done={chatStage === "match" ? ["ask"] : []} />}
+        {thinking && <WaitSteps steps={[{ key: "ask", text: `Asked ${CHEF_NAME}` }, { key: "match", text: w("out.matchingTheFoodsHeNames") }]} at={chatStage} done={chatStage === "match" ? ["ask"] : []} />}
         <div ref={endRef} />
       </div>
       <div className="chat-bottom">
-      {photo && <div className="strip">Photo attached. <button className="link" onClick={() => setPhoto("")}>Remove</button></div>}
+      {photo && <div className="strip">{w("out.photoAttached")} <button className="link" onClick={() => setPhoto("")}>{w("out.remove")}</button></div>}
       <div className="chat-input">
-        <button className="icon" aria-label="Add a photo" onClick={() => fileRef.current?.click()}><Camera size={20} /></button>
-        <ClearField value={text} onClear={() => setText("")} label="Clear the question"><input value={text} placeholder="Or ask in your words" onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} enterKeyHint="send" /></ClearField>
-        {Speech && <button className={`icon ${listening ? "listening" : ""}`} aria-label={listening ? "Listening" : "Say it"} onClick={listen}><Mic size={20} /></button>}
-        <button className="icon" aria-label="Send" onClick={() => ask()}><Send size={20} /></button>
+        <button className="icon" aria-label={w("out.addAPhoto")} onClick={() => fileRef.current?.click()}><Camera size={20} /></button>
+        <ClearField value={text} onClear={() => setText("")} label={w("out.clearTheQuestion")}><input value={text} placeholder={w("out.orAskInYourWords")} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") ask(); }} enterKeyHint="send" /></ClearField>
+        {Speech && <button className={`icon ${listening ? "listening" : ""}`} aria-label={listening ? "Listening" : w("out.sayIt")} onClick={listen}><Mic size={20} /></button>}
+        <button className="icon" aria-label={w("out.send")} onClick={() => ask()}><Send size={20} /></button>
         <input ref={fileRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => {
           const f = e.target.files?.[0]; if (!f) return;
           const r = new FileReader(); r.onload = () => resizeImageBase64(String(r.result), 1024, 1024).then(setPhoto).catch(() => {}); r.readAsDataURL(f); e.target.value = "";

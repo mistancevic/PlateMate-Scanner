@@ -3,7 +3,7 @@
 // Today, Plan and Recipes then show the chosen client's, read-only and as the client sees them, and the coach can only
 // suggest: a planned snack, a page from Explorer, a note or a recipe. The title stays My clients; the name sits under it.
 // The switch is at the top of Today, remembered until switched back. Buttons 44 px or more; labels 12 px or more.
-import { numLocale } from "../words";
+import { numLocale, w } from "../words";
 import { useMemo, useState } from "react";
 import type { AppApi, Tab } from "./api";
 import type { ClientRow } from "../cloud";
@@ -23,9 +23,9 @@ const MARK: Record<string, string> = { plan: "by the plan", swapped: "swapped", 
 
 export function CoachSwitch({ p }: { p: AppApi }) {
   return (
-    <div className="moments coach-switch" role="radiogroup" aria-label="Which view">
-      <button type="button" role="radio" aria-checked={p.coachView === "day"} className={`choice ${p.coachView === "day" ? "on" : ""}`} onClick={() => p.setCoachView("day")}>My day</button>
-      <button type="button" role="radio" aria-checked={p.coachView === "clients"} className={`choice ${p.coachView === "clients" ? "on" : ""}`} onClick={() => { p.setCoachView("clients"); p.setTab("clients"); }}>My clients</button>
+    <div className="moments coach-switch" role="radiogroup" aria-label={w("client.whichView")}>
+      <button type="button" role="radio" aria-checked={p.coachView === "day"} className={`choice ${p.coachView === "day" ? "on" : ""}`} onClick={() => p.setCoachView("day")}>{w("client.myDay")}</button>
+      <button type="button" role="radio" aria-checked={p.coachView === "clients"} className={`choice ${p.coachView === "clients" ? "on" : ""}`} onClick={() => { p.setCoachView("clients"); p.setTab("clients"); }}>{w("client.myClients")}</button>
     </div>
   );
 }
@@ -51,13 +51,13 @@ export function ClientView({ p, tab }: { p: AppApi; tab: Tab }) {
     const note: CoachNote = { at: new Date().toISOString(), by: "coach", name: coachName, text, suggest: s };
     const notes = [...row.notes, note];
     try { if (!demo) await sendCoachNote(row.uid, notes); patchNotes(notes); p.notify(`Suggested. ${first(row.name)} sees it on Today as a tap.`); }
-    catch (e: any) { p.setError(e.message || "The suggestion didn't send. Try again."); }
+    catch (e: any) { p.setError(e.message || w("client.theSuggestionDidnTSend")); }
   };
   if (!row) return (
-    <section className="card cv-pick" aria-label="No client chosen">
-      <b>Pick a client on Clients</b>
-      <small className="muted">Then Today, Plan and Recipes show that client's, read-only, as the client sees them.</small>
-      <button type="button" className="pill pill-small pill-primary" onClick={() => p.setTab("clients")}>Open Clients ›</button>
+    <section className="card cv-pick" aria-label={w("client.noClientChosen")}>
+      <b>{w("client.pickAClientOnClients")}</b>
+      <small className="muted">{w("client.thenTodayPlanAndRecipes")}</small>
+      <button type="button" className="pill pill-small pill-primary" onClick={() => p.setTab("clients")}>{w("client.openClients")}</button>
     </section>
   );
   const name = first(row.name);
@@ -75,9 +75,9 @@ export function ClientView({ p, tab }: { p: AppApi; tab: Tab }) {
       <>
         {head("Plan, read-only")}
         <section className="card cv-days" aria-label={`${name}'s plan`}>
-          <b>Yesterday, today and the days on</b>
-          {days.map((d) => { const l = row.days[d]; const w = l ? wordsOf(l) : null; return (
-            <div key={d} className="cv-day"><b>{d === today ? "Today" : longDay(d)}</b><small>{w ? `${w.status}${w.detail ? ` · ${w.detail}` : ""}` : "Nothing planned or eaten"}{l?.training ? ` · ${l.training}` : ""}</small></div>
+          <b>{w("client.yesterdayTodayAndTheDays")}</b>
+          {days.map((d) => { const l = row.days[d]; const wq = l ? wordsOf(l) : null; return (
+            <div key={d} className="cv-day"><b>{d === today ? "Today" : longDay(d)}</b><small>{wq ? `${wq.status}${wq.detail ? ` · ${wq.detail}` : ""}` : w("client.nothingPlannedOrEaten")}{l?.training ? ` · ${l.training}` : ""}</small></div>
           ); })}
           <small className="muted cv-note">The plan is {name}'s. A change you want lands as a suggestion on Today, never on the plan itself.</small>
         </section>
@@ -90,7 +90,7 @@ export function ClientView({ p, tab }: { p: AppApi; tab: Tab }) {
     <>
       {head("Recipes, read-only")}
       <section className="card cv-days" aria-label={`${name}'s shared cards`}>
-        <b>Shared with you</b>
+        <b>{w("client.sharedWithYou")}</b>
         {cards.length === 0 && <small className="muted">{name} has not shared a card yet. A card is shared from its own page, with a line to you.</small>}
         {cards.map((f: any) => <div key={f.id ?? f.createdAt} className="cv-day" id={`card-${f.id}`}><b>{f.meal?.title ?? "A meal"}</b><small>{longDay(ymd(new Date(f.createdAt)))}{f.shared?.reason ? ` · ${({ look: "look at this", ok: "was this OK?", help: "help me next time" } as Record<string, string>)[f.shared.reason]}` : ""}{f.notes ? ` · “${f.notes}”` : ""}</small>
           <CardAnswer row={row} card={f} coachName={coachName} send={async (notes) => { if (!demo) await sendCoachNote(row.uid, notes); patchNotes(notes); p.recountWaiting(); }} notify={p.notify} setError={p.setError} /></div>)}
@@ -115,31 +115,31 @@ export function ClientToday({ p, row, head, suggest, today }: { p: AppApi; row: 
       <section className="card cv-days" aria-label={`${name}'s day`}>
         <b>{longDay(today)}</b>
         {l ? <small className="muted">{Math.round(l.kcal).toLocaleString(numLocale())}{l.target ? ` of ${l.target.kcal.toLocaleString(numLocale())} kcal · protein ${l.protein} of ${l.target.protein} g` : " kcal"}</small> : <small className="muted">Nothing from {name} today yet.</small>}
-        {l?.slots.map((s) => <div key={s.name} className="cv-day"><b>{s.name} {s.time}</b><small>{s.eaten ?? s.planned ?? "Nothing planned"}{s.eaten ? " · eaten" : s.planned ? " · planned" : ""}{s.mark !== "open" && s.mark !== "plan" ? ` · ${MARK[s.mark]}` : ""}</small></div>)}
+        {l?.slots.map((s) => <div key={s.name} className="cv-day"><b>{s.name} {s.time}</b><small>{s.eaten ?? s.planned ?? w("client.nothingPlanned")}{s.eaten ? " · eaten" : s.planned ? " · planned" : ""}{s.mark !== "open" && s.mark !== "plan" ? ` · ${MARK[s.mark]}` : ""}</small></div>)}
         {l?.training && <small className="muted cv-note">Training: {l.training}</small>}
       </section>
-      <section className="card cv-suggest" aria-label="Suggest">
-        <b>Suggest</b>
+      <section className="card cv-suggest" aria-label={w("client.suggest")}>
+        <b>{w("client.suggest")}</b>
         <small className="muted">A suggestion lands on {name}'s Today as a tap. Nothing changes until {name} accepts. {name} can also say Not now, with a reason, and you see which.</small>
         <div className="cv-row">
-          <b>A planned snack</b>
-          <div className="cv-fields"><input className="search" aria-label="The snack" placeholder="Skyr and a fruit" value={snack} onChange={(e) => setSnack(e.target.value)} /><input className="search cv-time" aria-label="At what time" type="time" value={time} onChange={(e) => setTime(e.target.value)} /></div>
-          <button type="button" className="pill pill-small pill-primary" disabled={busy || !snack.trim()} onClick={() => send({ kind: "snack", time }, snack.trim())}>Suggest the snack</button>
+          <b>{w("client.aPlannedSnack")}</b>
+          <div className="cv-fields"><input className="search" aria-label={w("client.theSnack")} placeholder={w("client.skyrAndAFruit")} value={snack} onChange={(e) => setSnack(e.target.value)} /><input className="search cv-time" aria-label={w("client.atWhatTime")} type="time" value={time} onChange={(e) => setTime(e.target.value)} /></div>
+          <button type="button" className="pill pill-small pill-primary" disabled={busy || !snack.trim()} onClick={() => send({ kind: "snack", time }, snack.trim())}>{w("client.suggestTheSnack")}</button>
           <small className="muted">Lands on {name}'s Plan at {time} for this week when accepted; the Lifestyle default stays {name}'s own.</small>
         </div>
         <div className="cv-row">
-          <b>A page from Explorer</b>
-          <select className="search" aria-label="Which page" value={pageIx} onChange={(e) => setPageIx(Number(e.target.value))}>
-            <option value={-1}>Pick a page</option>
+          <b>{w("client.aPageFromExplorer")}</b>
+          <select className="search" aria-label={w("client.whichPage")} value={pageIx} onChange={(e) => setPageIx(Number(e.target.value))}>
+            <option value={-1}>{w("client.pickAPage")}</option>
             {PAGES.map((pg, i) => <option key={pg!.name} value={i}>{pg!.name}</option>)}
           </select>
-          <button type="button" className="pill pill-small pill-primary" disabled={busy || pageIx < 0} onClick={() => send({ kind: "page", page: PAGES[pageIx]! }, PAGES[pageIx]!.name)}>Suggest the page</button>
+          <button type="button" className="pill pill-small pill-primary" disabled={busy || pageIx < 0} onClick={() => send({ kind: "page", page: PAGES[pageIx]! }, PAGES[pageIx]!.name)}>{w("client.suggestThePage")}</button>
         </div>
         <small className="muted cv-note">A note and a recipe go as today: the note on Clients, {name}'s page; a recipe from your Recipes with Send.</small>
       </section>
       {waiting.length > 0 && (
-        <section className="card cv-days" aria-label="Suggested">
-          <b>Suggested</b>
+        <section className="card cv-days" aria-label={w("client.suggested")}>
+          <b>{w("client.suggested")}</b>
           {waiting.map((n) => <div key={n.at} className="cv-day"><b>{suggestTitle(n.suggest!, n.text)}</b><small>{longDay(ymd(new Date(n.at)))} · {answerWords(n)}</small></div>)}
         </section>
       )}

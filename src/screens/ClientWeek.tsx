@@ -1,4 +1,4 @@
-import { numLocale } from "../words";
+import { numLocale, w } from "../words";
 import { BurnCard, Squares } from "../components/Measured";
 import { fmtKg } from "../weight";
 import { wIn, wText } from "../units";
@@ -46,16 +46,16 @@ export function weekOf(row: ClientRow, offset = 0) {
 const livedText = (n: number) => `${n} ${n === 1 ? "day" : "days"} lived by the plan`;
 // the week as seven bars: green lived by the plan, amber changed, open today, grey to come or nothing planned
 export function WeekBars({ row }: { row: ClientRow }) {
-  const w = weekOf(row);
+  const wq = weekOf(row);
   return (
     <div className="cw-bars-row">
-      <span className="cw-bars" aria-label="This week, a bar a day">
-        {w.days.map((x) => {
+      <span className="cw-bars" aria-label={w("clientweek.thisWeekABarA")}>
+        {wq.days.map((x) => {
           const tone = x.today ? "open" : x.line?.lived ? "lived" : x.past && x.line?.planned ? "changed" : "none";
           return <i key={x.key} title={DAY_NAMES[x.i]} className={`cw-bar ${tone}`} />;
         })}
       </span>
-      <small className={w.lived ? "cw-lived" : "cw-muted"}>{livedText(w.lived)}</small>
+      <small className={wq.lived ? "cw-lived" : "cw-muted"}>{livedText(wq.lived)}</small>
     </div>
   );
 }
@@ -64,7 +64,7 @@ const weekNo = (row: ClientRow) => { const at = row.goal?.setAt ? Date.parse(row
 export const phaseDay = (row: ClientRow) => { const m = row.measured; if (!m?.phase || !m.start) return null; const d = Math.floor((Date.parse(`${ymd(new Date())}T12:00:00`) - Date.parse(`${m.start}T12:00:00`)) / DAY) + 1; return d >= 1 && d <= 28 ? d : null; };
 export function clientLine(row: ClientRow, today: boolean) {
   const wk = weekNo(row), pd = phaseDay(row);
-  return [row.goal?.band ? goalLabel(row.goal.band) : "No goal yet", pd ? (pd <= 14 ? `first two weeks, day ${pd} of 14` : `day ${pd}, not measured yet`) : wk ? `week ${wk}` : null, today ? "check-in today" : `check-in ${DAY_NAMES[row.checkinDay]}`].filter(Boolean).join(" · ");
+  return [row.goal?.band ? goalLabel(row.goal.band) : w("clientweek.noGoalYet"), pd ? (pd <= 14 ? `first two weeks, day ${pd} of 14` : `day ${pd}, not measured yet`) : wk ? `week ${wk}` : null, today ? "check-in today" : `check-in ${DAY_NAMES[row.checkinDay]}`].filter(Boolean).join(" · ");
 }
 export function ClientRowCard({ row, today, open }: { row: ClientRow; today: boolean; open: () => void }) {
   return (
@@ -93,11 +93,11 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
   const name = first(row.name);
   const [offset, setOffset] = useState(0);
   const [openDay, setOpenDay] = useState<string | null>(null);
-  const w = weekOf(row, offset);
+  const wq = weekOf(row, offset);
   const g = row.goal?.band ? bandOf(row.goal.band) : null;
   const kcalNow = row.goalsNow?.calories ?? null, proteinNow = row.goalsNow?.protein ?? null;
   const wk = weekNo(row);
-  const span = `${w.monday.getDate()}${w.monday.getMonth() === w.sunday.getMonth() ? "" : ` ${MONTHS[w.monday.getMonth()]}`} to ${w.sunday.getDate()} ${MONTHS[w.sunday.getMonth()]}`;
+  const span = `${wq.monday.getDate()}${wq.monday.getMonth() === wq.sunday.getMonth() ? "" : ` ${MONTHS[wq.monday.getMonth()]}`} to ${wq.sunday.getDate()} ${MONTHS[wq.sunday.getMonth()]}`;
   // the note (CW4)
   const [verdict, setVerdict] = useState<"approved" | "change">("approved");
   const [text, setText] = useState("");
@@ -105,9 +105,9 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
   const send = async () => {
     setSending(true);
     try {
-      const note: CoachNote = { at: new Date().toISOString(), by: "coach", name: coachName, week: ymd(w.monday), verdict, text: text.trim() };
+      const note: CoachNote = { at: new Date().toISOString(), by: "coach", name: coachName, week: ymd(wq.monday), verdict, text: text.trim() };
       await ops.sendNote(row, [...row.notes, note]); setText(""); notify(`Sent. ${name} sees it on Today.`);
-    } catch (e: any) { setError(e.message || "The note didn't send. Try again."); } finally { setSending(false); }
+    } catch (e: any) { setError(e.message || w("clientweek.theNoteDidnTSend")); } finally { setSending(false); }
   };
   // a new goal from a date (CW8)
   const [band, setBand] = useState<string>("");
@@ -120,10 +120,10 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
   const fromName = from === todayKey ? "today" : from === tomorrow ? "tomorrow" : longDay(from);
   const applyGoal = async () => {
     try { await ops.setGoal(row, band, from); notify(from === todayKey ? `${name}'s goal is now ${goalLabel(band)}.` : `${goalLabel(band)} starts for ${name} on ${longDay(from)}.`); setBand(""); }
-    catch (e: any) { setError(e.message || "The goal didn't save. Try again."); }
+    catch (e: any) { setError(e.message || w("clientweek.theGoalDidnTSave")); }
   };
   // weigh-ins and DaaM good in the week
-  const inWeek = (date: string) => date >= ymd(w.monday) && date <= ymd(w.sunday);
+  const inWeek = (date: string) => date >= ymd(wq.monday) && date <= ymd(wq.sunday);
   const weighs = (row.weighIns ?? []).filter((x: any) => inWeek(x.date)).sort((a: any, b: any) => (a.date < b.date ? -1 : 1));
   // DT172 (privacy finding 14, option a): without shared body data, the trend comes as percent and only the days weighed
   const pct = !row.weightKg && row.weightTrend ? row.weightTrend : null;
@@ -131,15 +131,15 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
   const daysWeighed = pct ? (row.weighDates ?? []).filter((d) => inWeek(d)).length : null;
   const a7 = avg7(row.weighIns);
   const daam = row.feedback.filter((f: any) => f.taste === "DaaM good" && inWeek(ymd(new Date(f.createdAt))));
-  const day = openDay ? w.days.find((x) => x.key === openDay)?.line ?? null : null;
-  const futureDays = w.days.filter((x) => !x.past && !x.today);
+  const day = openDay ? wq.days.find((x) => x.key === openDay)?.line ?? null : null;
+  const futureDays = wq.days.filter((x) => !x.past && !x.today);
   const notesShown = [...row.notes].reverse();
   return (
     <div className="client-page">
       {/* DT189 (0.3.32, Milan 18:39): the badge is visible from here, so the way back says what waits one level up */}
       <div className="menu-head cw-back"><button className="link" onClick={back}>‹ Clients{waitingCount > 0 ? ` · ${waitingCount} waiting` : ""}</button><span /></div>
       <section className="card person cw-person"><span className="avatar">{row.name.slice(0, 1).toUpperCase()}</span>
-        <div><b>{name}</b><small>{[g ? goalLabel(g.id) : "No goal yet", kcalNow ? `${kcalNow.toLocaleString(numLocale())} kcal` : null, proteinNow ? `${proteinNow} g protein` : null, wk ? `week ${wk}` : null].filter(Boolean).join(" · ")}</small><small>Check-in: {DAY_NAMES[row.checkinDay]}</small></div>
+        <div><b>{name}</b><small>{[g ? goalLabel(g.id) : w("clientweek.noGoalYet"), kcalNow ? `${kcalNow.toLocaleString(numLocale())} kcal` : null, proteinNow ? `${proteinNow} g protein` : null, wk ? `week ${wk}` : null].filter(Boolean).join(" · ")}</small><small>Check-in: {DAY_NAMES[row.checkinDay]}</small></div>
       </section>
       <div className="cp-tabs" role="tablist" aria-label={`${name}'s page`}>
         {([["today", "Today"], ["week", "Week"], ["shared", `Shared${row.feedback.length ? ` (${row.feedback.length})` : ""}`], ["goal", "Goal"]] as [ClientPart, string][]).map(([k, l]) => (
@@ -153,11 +153,11 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
       <ProfileChanges uid={row.uid} sp={row.profileShare} />
 
       <section className="card cw-week" aria-label={`${name}'s week`}>
-        <div className="cw-week-nav"><button type="button" className="week-arrow" aria-label="Week before" onClick={() => setOffset(offset - 1)}>‹</button><b>Week {w.week}, {span}</b><button type="button" className="week-arrow" aria-label="Week after" disabled={offset >= 0} onClick={() => setOffset(offset + 1)}>›</button></div>
-        <div className="cw-week-head"><b>Planned against eaten</b><small className={w.lived ? "cw-lived" : "cw-muted"}>{livedText(w.lived)}</small></div>
-        {w.days.filter((x) => x.past || x.today).map((x) => {
+        <div className="cw-week-nav"><button type="button" className="week-arrow" aria-label={w("clientweek.weekBefore")} onClick={() => setOffset(offset - 1)}>‹</button><b>Week {wq.week}, {span}</b><button type="button" className="week-arrow" aria-label={w("clientweek.weekAfter")} disabled={offset >= 0} onClick={() => setOffset(offset + 1)}>›</button></div>
+        <div className="cw-week-head"><b>{w("clientweek.plannedAgainstEaten")}</b><small className={wq.lived ? "cw-lived" : "cw-muted"}>{livedText(wq.lived)}</small></div>
+        {wq.days.filter((x) => x.past || x.today).map((x) => {
           const l = x.line;
-          const words = l ? wordsOf(l) : { status: "Nothing planned or eaten", tone: "none" as const, detail: "" };
+          const words = l ? wordsOf(l) : { status: w("clientweek.nothingPlannedOrEaten"), tone: "none" as const, detail: "" };
           const pd = l && l.kcal ? density(l.protein, l.kcal) : null;
           return (
             <button type="button" key={x.key} className="cw-day" disabled={!l} onClick={() => setOpenDay(x.key)} aria-label={`${DAY_NAMES[x.i]}: ${words.status}`}>
@@ -168,14 +168,14 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
           );
         })}
         {futureDays.length > 0 && <small className="cw-week-foot">{futureDays.some((x) => x.line?.planned) ? futureDays.filter((x) => x.line?.planned).map((x) => `${DAY_NAMES[x.i]}: ${x.line!.planned} planned`).join(" · ") : `${futureDays.map((x) => DAY_NAMES[x.i]).join(", ")}: nothing planned yet.`}</small>}
-        {w.days.every((x) => !x.line) && <small className="cw-week-foot">Nothing from {name} this week yet. The week fills in when {name} opens Chef Mealan.</small>}
+        {wq.days.every((x) => !x.line) && <small className="cw-week-foot">Nothing from {name} this week yet. The week fills in when {name} opens Chef Mealan.</small>}
       </section>
 
       {day && (
         <div className="sheet-backdrop" onClick={() => setOpenDay(null)}>
           <div className="sheet cw-day-sheet" role="dialog" aria-label={longDay(day.date)} onClick={(e) => e.stopPropagation()}>
-            <div className="card-top"><span>{longDay(day.date).replace(/^(\w+) /, "$1, ")}</span><button className="link" onClick={() => setOpenDay(null)}>Close</button></div>
-            <div className="past-nums"><span><b>{Math.round(day.kcal).toLocaleString(numLocale())}</b><small>{day.target ? `of ${day.target.kcal.toLocaleString(numLocale())} kcal` : "kcal"}</small></span><span><b>{day.protein}</b><small>{day.target ? `of ${day.target.protein} g protein` : "g protein"}</small></span><span><b>{day.kcal ? pdVal(density(day.protein, day.kcal)) : "–"}</b><small>PD that day</small></span></div>
+            <div className="card-top"><span>{longDay(day.date).replace(/^(\w+) /, "$1, ")}</span><button className="link" onClick={() => setOpenDay(null)}>{w("clientweek.close")}</button></div>
+            <div className="past-nums"><span><b>{Math.round(day.kcal).toLocaleString(numLocale())}</b><small>{day.target ? `of ${day.target.kcal.toLocaleString(numLocale())} kcal` : "kcal"}</small></span><span><b>{day.protein}</b><small>{day.target ? `of ${day.target.protein} g protein` : "g protein"}</small></span><span><b>{day.kcal ? pdVal(density(day.protein, day.kcal)) : "–"}</b><small>{w("clientweek.pdThatDay")}</small></span></div>
             {day.slots.map((s) => {
               const [word, cls] = MARK[s.mark];
               const shared = s.eaten ? row.feedback.find((f: any) => f.notes && f.meal?.title === s.eaten && ymd(new Date(f.createdAt)) === day.date) : null;
@@ -194,36 +194,36 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
 
       {!row.flags.some((f) => f.situation === "eating") && (
         <section className="card cw-mini">
-          <div><small>Weigh-ins</small><small>{daysWeighed ?? weighs.length} this week</small></div>
-          {daysWeighed !== null ? <b>{daysWeighed ? `${daysWeighed} ${daysWeighed === 1 ? "morning" : "mornings"} weighed` : "No weigh-ins this week"}</b> : weighs.length ? <b>{weighs.length > 1 ? `${wIn(weighs[0].kg).toFixed(1)} → ${wText(weighs[weighs.length - 1].kg)}` : wText(weighs[0].kg)}{a7 ? ` · 7-day average ${wIn(a7).toFixed(1)}` : ""}</b> : <b>No weigh-ins this week</b>}
-          {trend && <small className="cw-mini-line">{trend.verdict === "too few" ? "Not enough weigh-ins yet for a trend." : `${VERDICT_WORDS[trend.verdict]} for ${goalLabel(row.goal.band)}: ${pct ? fmtPct(trend.change!) : fmtKg(trend.change!)} in 3 weeks.`}</small>}
+          <div><small>{w("clientweek.weighIns")}</small><small>{daysWeighed ?? weighs.length} this week</small></div>
+          {daysWeighed !== null ? <b>{daysWeighed ? `${daysWeighed} ${daysWeighed === 1 ? "morning" : "mornings"} weighed` : w("clientweek.noWeighInsThisWeek")}</b> : weighs.length ? <b>{weighs.length > 1 ? `${wIn(weighs[0].kg).toFixed(1)} → ${wText(weighs[weighs.length - 1].kg)}` : wText(weighs[0].kg)}{a7 ? ` · 7-day average ${wIn(a7).toFixed(1)}` : ""}</b> : <b>{w("clientweek.noWeighInsThisWeek")}</b>}
+          {trend && <small className="cw-mini-line">{trend.verdict === "too few" ? w("clientweek.notEnoughWeighInsYet") : `${VERDICT_WORDS[trend.verdict]} for ${goalLabel(row.goal.band)}: ${pct ? fmtPct(trend.change!) : fmtKg(trend.change!)} in 3 weeks.`}</small>}
         </section>
       )}
       {/* the measured burn, as the client sees it (0.2.7, board FT, FT7) */}
       {row.measured && !row.flags.some((f) => f.situation === "eating") && <BurnCard m={row.measured} formulaKcal={row.measured.formulaKcal} name={name} />}
       <section className="card cw-mini">
-        <div><small>DaaM good this week</small><small>{daam.length} {daam.length === 1 ? "meal" : "meals"}</small></div>
+        <div><small>{w("clientweek.daamGoodThisWeek")}</small><small>{daam.length} {daam.length === 1 ? "meal" : "meals"}</small></div>
         <small className="cw-mini-strong">{daam.length ? daam.map((f: any) => f.meal?.title).join(" · ") : `None shared this week. ${name} marks a meal DaaM good on its card.`}</small>
       </section>
 
       <section className="card cw-note">
         <b>Your note for {DAY_NAMES[row.checkinDay]}</b>
-        <div className="chip-row"><button type="button" className={`choice ${verdict === "approved" ? "on" : ""}`} aria-pressed={verdict === "approved"} onClick={() => setVerdict("approved")}>Approve the week</button><button type="button" className={`choice ${verdict === "change" ? "on" : ""}`} aria-pressed={verdict === "change"} onClick={() => setVerdict("change")}>Change the numbers</button></div>
-        <textarea rows={3} aria-label="Your note" value={text} onChange={(e) => setText(e.target.value)} placeholder={`One line for ${name}`} />
-        <button className="pill pill-primary pill-wide" disabled={sending || !text.trim()} onClick={send}>Send the note</button>
+        <div className="chip-row"><button type="button" className={`choice ${verdict === "approved" ? "on" : ""}`} aria-pressed={verdict === "approved"} onClick={() => setVerdict("approved")}>{w("clientweek.approveTheWeek")}</button><button type="button" className={`choice ${verdict === "change" ? "on" : ""}`} aria-pressed={verdict === "change"} onClick={() => setVerdict("change")}>{w("clientweek.changeTheNumbers")}</button></div>
+        <textarea rows={3} aria-label={w("clientweek.yourNote")} value={text} onChange={(e) => setText(e.target.value)} placeholder={`One line for ${name}`} />
+        <button className="pill pill-primary pill-wide" disabled={sending || !text.trim()} onClick={send}>{w("clientweek.sendTheNote")}</button>
         <small className="setting-hint">{name} sees it on Today, once, and keeps it in My coach.</small>
       </section>
       <section className="card seg cw-checkin">
-        <div className="setting"><small className="setting-name">Check-in day</small>
-          <div className="chip-row" role="group" aria-label="Check-in day">{SHORT.map((d, i) => <button type="button" key={d} className={`choice ${row.checkinDay === i ? "on" : ""}`} aria-pressed={row.checkinDay === i} onClick={() => ops.setCheckin(row, i).then(() => notify(`${name}'s check-in: ${DAY_NAMES[i]}.`)).catch((e) => setError(e.message))}>{d}</button>)}</div>
+        <div className="setting"><small className="setting-name">{w("clientweek.checkInDay")}</small>
+          <div className="chip-row" role="group" aria-label={w("clientweek.checkInDay")}>{SHORT.map((d, i) => <button type="button" key={d} className={`choice ${row.checkinDay === i ? "on" : ""}`} aria-pressed={row.checkinDay === i} onClick={() => ops.setCheckin(row, i).then(() => notify(`${name}'s check-in: ${DAY_NAMES[i]}.`)).catch((e) => setError(e.message))}>{d}</button>)}</div>
           <small className="setting-hint">{name}'s week shows in Check-ins today on this day. Friday unless you change it.</small>
         </div>
       </section>
       {notesShown.length > 0 && (
         <>
-          <p className="label">Notes</p>
+          <p className="label">{w("clientweek.notes")}</p>
           <section className="card days">{notesShown.slice(0, 12).map((n) => (
-            <div className="history-row" key={n.at}><div><b>{new Date(n.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}</b><small>{n.by === "client" ? `${name} replied` : n.suggest?.kind === "answer" ? `Answered on ${n.suggest.card?.title ?? "a meal"}${n.readAt ? " · read" : ""}` : n.suggest?.kind === "reaction" ? suggestTitle(n.suggest, n.text) : n.suggest ? `Suggested: ${suggestTitle(n.suggest, n.text)} · ${answerWords(n)}` : n.verdict === "change" ? "Asked to change the numbers" : "Approved the week"}{n.by === "coach" && n.readAt && !n.suggest ? " · read" : ""}</small></div><div className="history-num"><small>“{n.text}”</small></div></div>
+            <div className="history-row" key={n.at}><div><b>{new Date(n.at).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}</b><small>{n.by === "client" ? `${name} replied` : n.suggest?.kind === "answer" ? `Answered on ${n.suggest.card?.title ?? "a meal"}${n.readAt ? " · read" : ""}` : n.suggest?.kind === "reaction" ? suggestTitle(n.suggest, n.text) : n.suggest ? `Suggested: ${suggestTitle(n.suggest, n.text)} · ${answerWords(n)}` : n.verdict === "change" ? w("clientweek.askedToChangeTheNumbers") : w("clientweek.approvedTheWeek")}{n.by === "coach" && n.readAt && !n.suggest ? " · read" : ""}</small></div><div className="history-num"><small>“{n.text}”</small></div></div>
           ))}</section>
         </>
       )}
@@ -231,21 +231,21 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
       </>)}
       {part === "goal" && (<>
       <p className="label">{name}'s goal</p>
-      <section className="card you-card"><span><b>{g ? goalLabel(g.id) : "No goal yet"}</b><small>{[row.goal?.setAt ? `Since ${new Date(row.goal.setAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}` : null, row.goal?.setBy === "coach" ? "set by you" : row.goal ? `set by ${name}` : null, kcalNow ? `${kcalNow.toLocaleString(numLocale())} kcal` : null, proteinNow ? `${proteinNow} g protein` : null].filter(Boolean).join(" · ")}</small>{row.nextGoal && <small className="cw-next">Next: {goalLabel(row.nextGoal.band)}, from {longDay(row.nextGoal.from)}{row.nextGoal.setBy === "coach" ? ", set by you" : ""}</small>}</span></section>
+      <section className="card you-card"><span><b>{g ? goalLabel(g.id) : w("clientweek.noGoalYet")}</b><small>{[row.goal?.setAt ? `Since ${new Date(row.goal.setAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}` : null, row.goal?.setBy === "coach" ? "set by you" : row.goal ? `set by ${name}` : null, kcalNow ? `${kcalNow.toLocaleString(numLocale())} kcal` : null, proteinNow ? `${proteinNow} g protein` : null].filter(Boolean).join(" · ")}</small>{row.nextGoal && <small className="cw-next">Next: {goalLabel(row.nextGoal.band)}, from {longDay(row.nextGoal.from)}{row.nextGoal.setBy === "coach" ? ", set by you" : ""}</small>}</span></section>
       <section className="card cw-goal">
         <b>A new goal for {name}</b>
         <div className="bands compact">{BANDS.map((b) => {
           const on = band === b.id || (b.id === "gain" && isBuild(band));
           return <button key={b.id} type="button" className={`band-card ${on ? "on" : ""}`} aria-pressed={on} onClick={() => setBand(b.id === "gain" ? (isBuild(band) ? band : "gainsteady") : b.id)}><b>{on ? "✓ " : ""}{b.name}</b><span>{pdRange(b.range)} · {b.kcal[0].toLocaleString(numLocale())} to {b.kcal[1].toLocaleString(numLocale())} kcal · {b.protein[0]} to {b.protein[1]} g</span></button>;
         })}</div>
-        {isBuild(band) && <div className="chip-row" role="group" aria-label="Pace">{PACES.map((x) => <button key={x.id} type="button" className={`choice ${band === x.band ? "on" : ""}`} aria-pressed={band === x.band} onClick={() => setBand(x.band)}>{x.name}</button>)}</div>}
-        <div className="apply-from" role="group" aria-label="Apply from">
-          <small className="setting-name">Apply from</small>
+        {isBuild(band) && <div className="chip-row" role="group" aria-label={w("clientweek.pace")}>{PACES.map((x) => <button key={x.id} type="button" className={`choice ${band === x.band ? "on" : ""}`} aria-pressed={band === x.band} onClick={() => setBand(x.band)}>{x.name}</button>)}</div>}
+        <div className="apply-from" role="group" aria-label={w("clientweek.applyFrom")}>
+          <small className="setting-name">{w("clientweek.applyFrom")}</small>
           <div className="chip-row">
             {[[todayKey, "Today"], [tomorrow, "Tomorrow"], [nextMonday, longDay(nextMonday)]].map(([k, l]) => <button type="button" key={k} className={`choice ${from === k && !picking ? "on" : ""}`} aria-pressed={from === k && !picking} onClick={() => { setPicking(false); setFrom(k); }}>{l}</button>)}
-            <button type="button" className={`choice ${picking ? "on" : ""}`} aria-pressed={picking} onClick={() => setPicking(true)}>Pick a date</button>
+            <button type="button" className={`choice ${picking ? "on" : ""}`} aria-pressed={picking} onClick={() => setPicking(true)}>{w("clientweek.pickADate")}</button>
           </div>
-          {picking && <input type="date" aria-label="Start date" min={tomorrow} value={from > todayKey ? from : ""} onChange={(e) => e.target.value && e.target.value > todayKey && setFrom(e.target.value)} />}
+          {picking && <input type="date" aria-label={w("clientweek.startDate")} min={tomorrow} value={from > todayKey ? from : ""} onChange={(e) => e.target.value && e.target.value > todayKey && setFrom(e.target.value)} />}
           <small className="setting-hint">{name}'s days before then keep the goal they had.</small>
         </div>
         <button className="pill pill-primary pill-wide" disabled={!band} onClick={applyGoal}>Apply from {fromName}</button>

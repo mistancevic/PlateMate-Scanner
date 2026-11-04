@@ -2,6 +2,7 @@
 // search, Made by and Kitchen as drop-downs (tens of members and ten kitchens are a wall of chips, so one line each with
 // counts), Moment, three chips that stack, a sort, and a line that says what is shown of what. No tabs: Recipes is one list
 // under this bar, and who made a recipe is a filter like any other.
+import { w } from "../words";
 import { useState } from "react";
 import { ClearField } from "./ClearField";
 import { EMPTY, MOMENTS, SORTS, countLine, isIdle, madeByLabel, type Filters, type Line, type Sort } from "../recipeFilter";
@@ -26,26 +27,26 @@ export function RecipeBar({ f, set, sort, setSort, kitchens, madeBy, shown, tota
   const momentLabel = f.moment ? MOMENTS.find((m) => m.id === f.moment)!.label : null;
   const momentLines = MOMENTS.map((m) => ({ key: m.id, label: m.label, count: "" }));
   return (
-    <section className="card rb" aria-label="Find a recipe">
-      <ClearField value={f.q} onClear={() => set({ ...f, q: "" })} label="Clear the search">
-        <input className="search rb-search" aria-label="Search recipes" placeholder="Search recipes, the foods in them, who made them" value={f.q} onChange={(e) => set({ ...f, q: e.target.value })} />
+    <section className="card rb" aria-label={w("recipebar.findARecipe")}>
+      <ClearField value={f.q} onClear={() => set({ ...f, q: "" })} label={w("recipebar.clearTheSearch")}>
+        <input className="search rb-search" aria-label={w("recipebar.searchRecipes")} placeholder={w("recipebar.searchRecipesTheFoodsIn")} value={f.q} onChange={(e) => set({ ...f, q: e.target.value })} />
       </ClearField>
-      <div className="rb-chips" role="group" aria-label="Filters">
-        {drop("madeBy", "Made by", madeByLabel(f.madeBy, coachLabel), madeBy, f.madeBy)}
+      <div className="rb-chips" role="group" aria-label={w("recipebar.filters")}>
+        {drop("madeBy", w("recipebar.madeBy"), madeByLabel(f.madeBy, coachLabel), madeBy, f.madeBy)}
         {drop("kitchen", "Kitchen", f.kitchen, kitchens, f.kitchen)}
         {drop("moment", "Moment", momentLabel, momentLines, f.moment)}
-        {chip(f.day, "Fits my day", () => set({ ...f, day: !f.day }))}
-        {chip(f.nocook, "No cooking", () => set({ ...f, nocook: !f.nocook }))}
-        {chip(f.withMine, "With my foods", () => set({ ...f, withMine: !f.withMine }))}
+        {chip(f.day, w("recipebar.fitsMyDay"), () => set({ ...f, day: !f.day }))}
+        {chip(f.nocook, w("recipebar.noCooking"), () => set({ ...f, nocook: !f.nocook }))}
+        {chip(f.withMine, w("recipebar.withMyFoods"), () => set({ ...f, withMine: !f.withMine }))}
       </div>
-      {sheet("madeBy", "Made by", madeBy, f.madeBy, (k) => set({ ...f, madeBy: k }), "All", String(total))}
-      {sheet("kitchen", "Kitchen", kitchens, f.kitchen, (k) => set({ ...f, kitchen: k }), "All kitchens", String(total))}
-      {sheet("moment", "Moment", momentLines, f.moment, (k) => set({ ...f, moment: k as Filters["moment"] }), "Any moment", "")}
-      <div className="rb-sort" role="group" aria-label="Sort">
-        <b>Sort</b>
+      {sheet("madeBy", w("recipebar.madeBy"), madeBy, f.madeBy, (k) => set({ ...f, madeBy: k }), "All", String(total))}
+      {sheet("kitchen", "Kitchen", kitchens, f.kitchen, (k) => set({ ...f, kitchen: k }), w("recipebar.allKitchens"), String(total))}
+      {sheet("moment", "Moment", momentLines, f.moment, (k) => set({ ...f, moment: k as Filters["moment"] }), w("recipebar.anyMoment"), "")}
+      <div className="rb-sort" role="group" aria-label={w("recipebar.sort")}>
+        <b>{w("recipebar.sort")}</b>
         {SORTS.map((s) => <button type="button" key={s.id} className={`link rb-sort-link ${sort === s.id ? "on" : ""}`} aria-pressed={sort === s.id} onClick={() => setSort(s.id)}>{s.label}</button>)}
       </div>
-      <small className="muted rb-count">{countLine(shown, total, f, coachLabel)}{!isIdle(f) ? <> · <button type="button" className="link" onClick={() => set(EMPTY)}>Clear all</button></> : null}</small>
+      <small className="muted rb-count">{countLine(shown, total, f, coachLabel)}{!isIdle(f) ? <> · <button type="button" className="link" onClick={() => set(EMPTY)}>{w("recipebar.clearAll")}</button></> : null}</small>
     </section>
   );
 }

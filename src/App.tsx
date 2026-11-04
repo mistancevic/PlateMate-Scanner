@@ -164,7 +164,7 @@ const fillingName = (f: { dayName: string; name: string }) => `${f.dayName === "
 const withTimeout = <T,>(p: Promise<T>, ms: number) => new Promise<T>((res, rej) => { const t = setTimeout(() => rej(new Error("timeout")), ms); p.then((v) => { clearTimeout(t); res(v); }, (e) => { clearTimeout(t); rej(e); }); });
 // names say who is who: Coach Milan, Chef Mealan, Client Tester 1
 const firstName = (n?: string | null) => (n ?? "").trim().split(/\s+/)[0] || "";
-const coachLabel = (n?: string | null) => (firstName(n) ? `Coach ${firstName(n)}` : "Your coach");
+const coachLabel = (n?: string | null) => (firstName(n) ? `Coach ${firstName(n)}` : w("app.yourCoach"));
 // when the phone's copy last changed by a person's hand, and which foods left the library (merged away, removed)
 const STATE_AT = "chefmealan-state-at", GONE = "chefmealan-gone-foods";
 // Storage release 2: what this phone last sent or took, per record (see records.ts)
@@ -213,7 +213,7 @@ function Modal({
       >
         <header>
           <div className="modal-titles">{eyebrow && <small className="eyebrow-line">{eyebrow}</small>}<h2>{title}</h2></div>
-          <button className="icon" aria-label="Close dialog" onClick={close}>
+          <button className="icon" aria-label={w("app.closeDialog")} onClick={close}>
             <X size={20} />
           </button>
         </header>
@@ -240,7 +240,7 @@ function Mealan({
   return (
     <section className="mealan-card">
       <div className="eyebrow">MEALAN · SELECTED PORTION</div>
-      <h2>{title || "My meal"}</h2>
+      <h2>{title || w("app.myMeal")}</h2>
       <div className="headline-metrics">
         <span>
           <b>{fmt(pd, 2)}</b> PD
@@ -265,17 +265,17 @@ function Mealan({
       </div>
       {!valid && (
         <p className="notice">
-          Choose a portion greater than zero and no larger than this recipe.
+          {w("app.chooseAPortionGreaterThan")}
         </p>
       )}
       <p className="small">
         {portion === null
-          ? "Whole recipe selected."
+          ? w("app.wholeRecipeSelected")
           : `Whole recipe: ${fmt(total.weight)} g. Portion assumes ingredients are evenly mixed.`}{" "}
         Missing data is shown as ?.
       </p>
       <details>
-        <summary>How to read this</summary>
+        <summary>{w("app.howToReadThis")}</summary>
         <p>
           PD is grams of protein per 100 kcal. PD {fmt(pd, 2)} describes
           concentration, not the total amount you eat. Percentages show this
@@ -380,11 +380,11 @@ function LabelCheck({
   // the title is the word the person tapped: Type, Barcode, Scan; the small line above says where the food goes
   const kind = (() => {
     const src = food.source || "";
-    const where = addTo === "plate" ? "Add to plate" : "Add a food";
-    if (titleAs) return { eyebrow: "Find a food", title: titleAs, line: "Check what the database says against the pack, then save." };
-    if (/barcode|product database|open food facts/i.test(src)) return { eyebrow: where, title: "Barcode", line: "Check what the database says against the pack, then save." };
-    if (/photo|label/i.test(src)) return { eyebrow: where, title: "Scan", line: "Check what was read against the pack, then save." };
-    return { eyebrow: where, title: "Manual", line: "Name the food, fill the values as on the pack, save." };
+    const where = addTo === "plate" ? w("app.addToPlate") : w("app.addAFood");
+    if (titleAs) return { eyebrow: w("app.findAFood"), title: titleAs, line: w("app.checkWhatTheDatabaseSays") };
+    if (/barcode|product database|open food facts/i.test(src)) return { eyebrow: where, title: "Barcode", line: w("app.checkWhatTheDatabaseSays") };
+    if (/photo|label/i.test(src)) return { eyebrow: where, title: "Scan", line: w("app.checkWhatWasReadAgainst") };
+    return { eyebrow: where, title: "Manual", line: w("app.nameTheFoodFillThe") };
   })();
   const [refOpen, setRefOpen] = useState(() => Boolean(food.name) && /manual/i.test(food.source || ""));
   const [code, setCode] = useState(food.barcode ?? "");
@@ -408,7 +408,7 @@ function LabelCheck({
   function submit() {
     const f = {
       ...food,
-      ...(refPicked ? { source: "Reference table" } : {}),
+      ...(refPicked ? { source: w("app.referenceTable") } : {}),
       ...(/^\d{8,14}$/.test(code.trim()) ? { barcode: code.trim() } : {}),
       name: name.trim(),
       brand: brand.trim(),
@@ -461,7 +461,7 @@ function LabelCheck({
       <p className="small muted sheet-line">{kind.line}{fromSearch ? <> From your search: <b>{fromSearch}</b>.</> : null}</p>
       {dbPhotos && dbPhotos.length > 0 && (
         <div className="db-photos">
-          <div className="db-strip" aria-label="Photos from Open Food Facts">
+          <div className="db-strip" aria-label={w("app.photosFromOpenFoodFacts")}>
             {dbPhotos.map((src, i) => (
               <button key={i} className={`db-photo ${keepDb[i] ? "on" : ""}`} aria-pressed={keepDb[i]} aria-label={`${keepDb[i] ? "Leave out" : "Keep"} database photo ${i + 1}`} onClick={() => setKeepDb((k) => k.map((x, j) => (j === i ? !x : x)))}>
                 <img src={src} alt="" />
@@ -470,16 +470,16 @@ function LabelCheck({
               </button>
             ))}
           </div>
-          <small>Ticked photos stay with the food. Tap one to leave it out.</small>
-          <small className="credit"><Globe size={13} /> Credit: Open Food Facts, CC BY-SA</small>
+          <small>{w("app.tickedPhotosStayWithThe")}</small>
+          <small className="credit"><Globe size={13} /> {w("app.creditOpenFoodFactsCc")}</small>
         </div>
       )}
       {images && images.length > 1 ? (
-        <div className="label-previews" aria-label="Your photos of this product">
+        <div className="label-previews" aria-label={w("app.yourPhotosOfThisProduct")}>
           {images.map((src, i) => (
             <div className="preview-wrap" key={i}>
               <img className="label-preview" src={src} alt={`Photo ${i + 1} of ${images.length}`} />
-              <button className={`star ${mainIdx === i ? "on" : ""}`} aria-label={mainIdx === i ? "Main photo" : "Make this the main photo"} onClick={() => setMainIdx(i)}>{mainIdx === i ? "★ Main photo" : "☆ Make main"}</button>
+              <button className={`star ${mainIdx === i ? "on" : ""}`} aria-label={mainIdx === i ? w("app.mainPhoto") : w("app.makeThisTheMainPhoto")} onClick={() => setMainIdx(i)}>{mainIdx === i ? "★ Main photo" : "☆ Make main"}</button>
             </div>
           ))}
         </div>
@@ -489,26 +489,26 @@ function LabelCheck({
       {images && images.length > 1 && <p className="small center">{images.length} photos · swipe to see each</p>}
       {liveMatch && (
         <section className="match">
-          <b>Looks like a food you already have</b>
+          <b>{w("app.looksLikeAFoodYou")}</b>
           <small>{liveMatch.food.name}{liveMatch.food.brand ? `, ${liveMatch.food.brand}` : ""} · {liveMatch.reason === "barcode" ? "same barcode" : "same values per 100 g"}</small>
           <div className="moments" style={{ marginTop: 8 }}>
-            <button className={`choice ${choice === "update" ? "on" : ""}`} onClick={() => setChoice("update")}>Update that one</button>
-            <button className={`choice ${choice === "both" ? "on" : ""}`} onClick={() => setChoice("both")}>Keep both</button>
-            <button className="pill pill-small" onClick={close}>Cancel</button>
+            <button className={`choice ${choice === "update" ? "on" : ""}`} onClick={() => setChoice("update")}>{w("app.updateThatOne")}</button>
+            <button className={`choice ${choice === "both" ? "on" : ""}`} onClick={() => setChoice("both")}>{w("app.keepBoth")}</button>
+            <button className="pill pill-small" onClick={close}>{w("app.cancel")}</button>
           </div>
-          {choice === "update" && <small>It keeps its name. Missing values, brand or barcode are filled in, and these photos join its gallery.</small>}
+          {choice === "update" && <small>{w("app.itKeepsItsNameMissing")}</small>}
         </section>
       )}
       <p className="small">
         Source: {food.source}. Check the actual package. All values below must
-        be <strong>per 100 g</strong>, with carbohydrate excluding fibre.
+        be <strong>{w("app.perG")}</strong>, with carbohydrate excluding fibre.
       </p>
       <label>
-        Product name
+        {w("app.productName")}
         <input value={name} onChange={(e) => { setName(e.target.value); setRefOpen(true); }} onFocus={() => setRefOpen(true)} autoComplete="off" />
       </label>
       {refOpen && food.source !== "Reference table" && !food.barcode && findReference(name).length > 0 && (
-        <div className="ref-suggest" role="listbox" aria-label="From the reference table">
+        <div className="ref-suggest" role="listbox" aria-label={w("app.fromTheReferenceTable")}>
           <small className="muted">No label needed. From the reference table, per 100 g:</small>
           {findReference(name).map((r) => (
             <button key={r.id} type="button" role="option" className="ref-row" onClick={() => {
@@ -522,33 +522,33 @@ function LabelCheck({
           ))}
         </div>
       )}
-      {refPicked && <p className="small muted">Values from the reference table. Check the tick below and save.</p>}
+      {refPicked && <p className="small muted">{w("app.valuesFromTheReferenceTable")}</p>}
       <label>
-        Brand
+        {w("app.brand")}
         <input value={brand} onChange={(e) => setBrand(e.target.value)} />
       </label>
       {kind.title === "Manual" && onLookup && (
         <label className="barcode-field">
-          Barcode number, if the pack has one
+          {w("app.barcodeNumberIfThePack")}
           <div className="barcode-row">
             <input inputMode="numeric" placeholder="8 to 14 digits, under the bars" value={code} onChange={(e) => setCode(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && /^\d{8,14}$/.test(code.trim())) onLookup(code.trim()); }} />
-            <button type="button" className="pill pill-small" disabled={!/^\d{8,14}$/.test(code.trim())} onClick={() => onLookup(code.trim())}>Look up</button>
+            <button type="button" className="pill pill-small" disabled={!/^\d{8,14}$/.test(code.trim())} onClick={() => onLookup(code.trim())}>{w("app.lookUp")}</button>
           </div>
-          <small className="muted">Look up fills the table from the product database when the pack is known. Or fill it in below.</small>
+          <small className="muted">{w("app.lookUpFillsTheTable")}</small>
         </label>
       )}
       <div className="serving-field">
-        <span className="label">Serving, if the pack prints one</span>
+        <span className="label">{w("app.servingIfThePackPrints")}</span>
         <div className="serving-row">
           <span>1</span>
-          <input aria-label="Serving name" placeholder="bar, piece, pot" value={servingName} onChange={(e) => setServingName(e.target.value)} />
-          <input aria-label="Serving grams" type="number" inputMode="decimal" min="0" placeholder="45" value={servingGrams} onChange={(e) => setServingGrams(e.target.value)} />
+          <input aria-label={w("app.servingName")} placeholder="bar, piece, pot" value={servingName} onChange={(e) => setServingName(e.target.value)} />
+          <input aria-label={w("app.servingGrams")} type="number" inputMode="decimal" min="0" placeholder="45" value={servingGrams} onChange={(e) => setServingGrams(e.target.value)} />
           <span>g</span>
         </div>
-        <small className="muted">A counted food: what Chef Mealan moves then comes in whole servings, 1 bar, 2 bars, never 1.3.</small>
+        <small className="muted">{w("app.aCountedFoodWhatChef")}</small>
         {packLine({ pack: food.pack, name: name || food.name }) && <small className="pack-line">{packLine({ pack: food.pack, name: name || food.name })}</small>}
       </div>
-      <p className="label">Nutrition table, per 100 g, as on the pack</p>
+      <p className="label">{w("app.nutritionTablePerGAs")}</p>
       <div className="label-table">
         {rows.map((r, i) => {
           const core = knownOf(r.key)?.core;
@@ -582,8 +582,8 @@ function LabelCheck({
         const beforeText = fit.before.fits && fit.before.grams !== null ? `fast energy, nothing to add: ${count(fit.before.grams)} gives about ${Math.round((snapToServing(d, fit.before.grams) * (d.carbs ?? 0)) / 100)} g carbs for a ${dayName(day?.type ?? "passive")}` : fit.before.reason;
         const afterText = fit.after.fits && fit.after.grams !== null ? `suits after training: ${count(fit.after.grams)} gives about ${Math.round((snapToServing(d, fit.after.grams) * (d.protein ?? 0)) / 100)} g protein, your ${fit.after.floor} g` : fit.after.reason;
         return (
-          <section className="fit-lines" aria-label="How it fits">
-            <p className="label">How it fits</p>
+          <section className="fit-lines" aria-label={w("app.howItFits")}>
+            <p className="label">{w("app.howItFits")}</p>
             <p className="fit-pd"><b>{pdText(pd)}</b><small>{fmt(d.protein)} g protein per {fmt(d.calories, 0)} kcal{sv ? ` · 1 ${sv.name} is ${sv.grams} g, ${Math.round((sv.grams * (d.calories ?? 0)) / 100)} kcal and ${Math.round((sv.grams * (d.protein ?? 0)) / 100 * 10) / 10} g protein` : ""}</small></p>
             <p className={`fit-line ${ownClass}`}><b>On its own:</b> {ownText}.</p>
             <p className={`fit-line ${fit.before.fits ? "ok" : pb.beforeTraining.ok ? "mid" : "no"}`} title={SOURCES.preCarb}><b>Before training:</b> {cap(beforeText)}.</p>
@@ -596,21 +596,21 @@ function LabelCheck({
       })()}
       {adding ? (
         <div className="lt-add">
-          <select value={addKey} onChange={(e) => setAddKey(e.target.value)} aria-label="Which line">
+          <select value={addKey} onChange={(e) => setAddKey(e.target.value)} aria-label={w("app.whichLine")}>
             {KNOWN.filter((k) => !k.core && !rows.some((r) => r.key === k.key)).map((k) => <option key={k.key} value={k.key}>{k.name}</option>)}
             <option value="other">Other…</option>
           </select>
-          {addKey === "other" && <input placeholder="Name, as printed" value={addName} onChange={(e) => setAddName(e.target.value)} />}
+          {addKey === "other" && <input placeholder={w("app.nameAsPrinted")} value={addName} onChange={(e) => setAddName(e.target.value)} />}
           <div className="lt-add-row">
-            <input inputMode="decimal" placeholder="Amount" value={addAmount} onChange={(e) => setAddAmount(e.target.value)} />
-            <select value={addUnit} onChange={(e) => setAddUnit(e.target.value as Unit)} aria-label="Unit">{["g", "mg", "µg", "kcal", "kJ", "%"].map((u) => <option key={u}>{u}</option>)}</select>
+            <input inputMode="decimal" placeholder={w("app.amount")} value={addAmount} onChange={(e) => setAddAmount(e.target.value)} />
+            <select value={addUnit} onChange={(e) => setAddUnit(e.target.value as Unit)} aria-label={w("app.unit")}>{["g", "mg", "µg", "kcal", "kJ", "%"].map((u) => <option key={u}>{u}</option>)}</select>
             <button className="pill pill-small pill-primary" disabled={addKey === "other" && !addName.trim()} onClick={() => {
               const k = knownOf(addKey);
               const row: LabelRow = { key: k ? k.key : "other:" + addName.trim().toLowerCase(), name: k ? k.name : addName.trim(), amount: numberInput(addAmount), unit: addUnit, sub: k?.sub ?? false, source: "you" };
               setRows((rs) => sortEuropean([...rs, row]).sort((x, y) => { const ix = rs.indexOf(x), iy = rs.indexOf(y); return ix >= 0 && iy >= 0 ? ix - iy : 0; }));
               setAdding(false); setAddName(""); setAddAmount("");
-            }}>Add</button>
-            <button className="link" onClick={() => setAdding(false)}>Cancel</button>
+            }}>{w("app.add")}</button>
+            <button className="link" onClick={() => setAdding(false)}>{w("app.cancel")}</button>
           </div>
         </div>
       ) : (
@@ -621,7 +621,7 @@ function LabelCheck({
         <textarea
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="E.g. fibre not declared; as sold; contains milk. Do not enter client identifiers."
+          placeholder={w("app.eGFibreNotDeclared")}
         />
       </label>
       <label className="check">
@@ -650,27 +650,27 @@ function LabelCheck({
         </p>
       ))}
       <button className="primary wide" onClick={submit}>
-        <Check size={17} /> Confirm & save food
+        <Check size={17} /> {w("app.confirmSaveFood")}
       </button>
       {mixFor && onMix && (() => {
         const d = draft();
         if (d.calories === null || d.protein === null) return null;
         const tip = mixFor(d);
         noteTip(tip, d);
-        if (tip.case === "fits") return <p className="small center mix-fits">Fits your plate as it stands.</p>;
+        if (tip.case === "fits") return <p className="small center mix-fits">{w("app.fitsYourPlateAsIt")}</p>;
         if (tip.case === "unknown") return null;
         return (
           <section className="mix-tip">
-            <div className="mix-head"><span className="pro-badge">Mix it</span><small>{momentName}: {tip.why}</small></div>
-            {tip.mixes.length === 0 && <p className="muted">Nothing in your foods or the starter set gets there with this one.</p>}
+            <div className="mix-head"><span className="pro-badge">{w("app.mixIt")}</span><small>{momentName}: {tip.why}</small></div>
+            {tip.mixes.length === 0 && <p className="muted">{w("app.nothingInYourFoodsOr")}</p>}
             {tip.mixes.map((m) => (
               <button key={m.id} className="mix-chip" onClick={() => { pendingMix.current = m; submit(); }}>
                 <b>{mixLabel(m)}</b>
                 <small>{pdText(m.pd)} · {m.kcal} kcal · {m.kind}{m.cooking ? " · cooking" : ""}{m.fromStarter.length ? " · from the starter set" : ""}</small>
               </button>
             ))}
-            <p className="small">A tap saves the food and puts the mix on the plate.</p>
-            {onAsk && <button className="link" onClick={() => askNow(tip)}><MessageCircle size={14} /> Not quite? Tell Chef Mealan</button>}
+            <p className="small">{w("app.aTapSavesTheFood")}</p>
+            {onAsk && <button className="link" onClick={() => askNow(tip)}><MessageCircle size={14} /> {w("app.notQuiteTellChefMealan")}</button>}
             {askError && <p className="notice">{askError}</p>}
           </section>
         );
@@ -695,7 +695,7 @@ function GoalsEditor({
   );
   const [error, setError] = useState("");
   return (
-    <Modal title="Your daily reference" close={close}>
+    <Modal title={w("app.yourDailyReference")} close={close}>
       <p>
         Enter your existing plan or targets agreed with your coach. Blank fields
         stay unknown. These are daily amounts, not one meal's targets.
@@ -707,7 +707,7 @@ function GoalsEditor({
             <input
               inputMode="decimal"
               value={values[k]}
-              placeholder="Not set"
+              placeholder={w("app.notSet")}
               onChange={(e) => setValues({ ...values, [k]: e.target.value })}
             />
           </label>
@@ -744,7 +744,7 @@ function GoalsEditor({
           );
         }}
       >
-        Save daily reference
+        {w("app.saveDailyReference")}
       </button>
     </Modal>
   );
@@ -1111,7 +1111,7 @@ export default function App() {
       }
       return { ...s, foods, items };
     });
-    notify(`${twins.length === 1 ? "Two entries of the same food" : `${twins.length + 1} entries of the same foods`} folded into one.`);
+    notify(`${twins.length === 1 ? w("app.twoEntriesOfTheSame") : `${twins.length + 1} entries of the same foods`} folded into one.`);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.foods.length]);
   // DT115 (0.2.97): every reviewed food of yours goes to the members' catalogue once (no photo, no name); a food changed after
@@ -1232,9 +1232,9 @@ export default function App() {
           // 0.3.61 (Coach Milan 20:24): the app opens once the account is read; the phone's newer copy goes up in the background
           // (it used to wait for the account to confirm the save, with no time limit, and the first opening after a release hung)
           const up = () => saveCloud(user.uid, { ...blockOf(kept), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: [...gone], days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() });
-          setCloudStatus({ ok: true, text: "This phone has newer changes; saving them to your account", at: new Date().toISOString() });
-          void up().then(() => setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() }))
-            .catch(() => window.setTimeout(() => void up().then(() => setCloudStatus({ ok: true, text: "This phone had newer changes; saved to your account", at: new Date().toISOString() }))
+          setCloudStatus({ ok: true, text: w("app.thisPhoneHasNewerChanges"), at: new Date().toISOString() });
+          void up().then(() => setCloudStatus({ ok: true, text: w("app.thisPhoneHadNewerChanges"), at: new Date().toISOString() }))
+            .catch(() => window.setTimeout(() => void up().then(() => setCloudStatus({ ok: true, text: w("app.thisPhoneHadNewerChanges"), at: new Date().toISOString() }))
               .catch((e) => setCloudStatus({ ok: false, text: `Not saved yet: ${explainCloudError(e)}` })), 30000));
         } else if (remote && !(isEmptyState(remote.state) && !remote.recordsOnly && !isEmptyState(state))) {
           // (0.3.68) a block that holds only the plate and settings (recordsOnly) is a real account copy, never an empty one
@@ -1274,12 +1274,12 @@ export default function App() {
             const merged: Safety = { ...base, adultAt: base.adultAt ?? local.adultAt ?? remoteS?.adultAt, aiConfirmedAt: remote.aiConfirmedAt ?? undefined, aiConfirmedBy: remote.aiConfirmedBy ?? undefined };
             storeSafety(merged); setSafetyState(merged);
           }
-          setCloudStatus({ ok: true, text: "Loaded from your account", at: new Date().toISOString() });
+          setCloudStatus({ ok: true, text: w("app.loadedFromYourAccount"), at: new Date().toISOString() });
         } else {
           // 0.3.61: a new account gets this phone's copy in the background too; the app does not wait for it
-          setCloudStatus({ ok: true, text: "Saving to your account", at: new Date().toISOString() });
+          setCloudStatus({ ok: true, text: w("app.savingToYourAccount"), at: new Date().toISOString() });
           void saveCloud(user.uid, { ...blockOf(state), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() })
-            .then(() => setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() }))
+            .then(() => setCloudStatus({ ok: true, text: w("app.savedToYourAccount"), at: new Date().toISOString() }))
             .catch((e) => setCloudStatus({ ok: false, text: `Not saved yet: ${explainCloudError(e)}` }));
         }
       } catch (e: any) {
@@ -1379,7 +1379,7 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.uid, profile.role, profile.coachId]);
   const fromCoach = unseenFromCoach(coachThread.notes) + inbox.length;
-  useEffect(() => { if (coachSeen.current >= 0 && fromCoach > coachSeen.current) notify(`${profile.coachName ? profile.coachName.split(" ")[0] : "Your coach"} sent you something. It is on Today.`); coachSeen.current = fromCoach; /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [fromCoach]);
+  useEffect(() => { if (coachSeen.current >= 0 && fromCoach > coachSeen.current) notify(`${profile.coachName ? profile.coachName.split(" ")[0] : w("app.yourCoach")} sent you something. It is on Today.`); coachSeen.current = fromCoach; /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [fromCoach]);
   // coach: how many cards were shared since I last looked
   // DT189 (0.3.31, board Stories138, Milan 17:42): the badge used to clear the moment Clients opened, so the count vanished
   // before anything was reached. Now the badge is the Waiting for you list's count, and a row leaves it only when handled.
@@ -1426,7 +1426,7 @@ export default function App() {
           setGoalState(getGoal());
           const g = (remote.state as any)?.goals;
           if (g) setState((s) => ({ ...s, goals: { ...s.goals, calories: g.calories ?? s.goals.calories, protein: g.protein ?? s.goals.protein } }));
-          notify(`${remote.coachName || "Your coach"} set your goal.`);
+          notify(`${remote.coachName || w("app.yourCoach")} set your goal.`);
         }
       } catch { /* offline, ignore */ }
     };
@@ -1477,8 +1477,8 @@ export default function App() {
     try { localStorage.setItem("chefmealan-coachgoal-at", cg.at); } catch {}
     const m = macroSplit(cg.kcal, cg.protein);
     const x = { band: cg.band, source: "coach" as const, setBy: "coach" as const, kcal: cg.kcal, protein: cg.protein, fats: m.fats, carbs: m.carbs };
-    if (cg.from > ymd(new Date())) { const next: Personal = { ...getPersonal(), nextGoal: { ...x, from: cg.from, at: cg.at } }; storePersonal(next); setPersonalState(next); notify(`${remote.coachName || "Your coach"} set your next goal, from ${new Date(`${cg.from}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}.`); }
-    else { applyGoalNow(x); notify(`${remote.coachName || "Your coach"} set your goal.`); }
+    if (cg.from > ymd(new Date())) { const next: Personal = { ...getPersonal(), nextGoal: { ...x, from: cg.from, at: cg.at } }; storePersonal(next); setPersonalState(next); notify(`${remote.coachName || w("app.yourCoach")} set your next goal, from ${new Date(`${cg.from}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).replace(",", "")}.`); }
+    else { applyGoalNow(x); notify(`${remote.coachName || w("app.yourCoach")} set your goal.`); }
   }
   // Got it and Reply on the coach's note (CW5): on this phone at once, then in the account
   function saveNotes(notes: CoachNote[]) {
@@ -1590,7 +1590,7 @@ export default function App() {
       window.clearTimeout(t); pendingSave.current = null;
       saveCloud(user.uid, { ...blockOf(stateRef.current), goal: getGoal(), clientName, personal: getPersonal(), region: getRegion(), goalLog: getGoalLog(), safety: getSafety(), goneFoods: getGone(), days: daysOut(), measured: measuredOut(), updatedAt: new Date().toISOString() }, { onlyChanged: true })
         .then(async () => {
-          setCloudStatus({ ok: true, text: "Saved to your account", at: new Date().toISOString() });
+          setCloudStatus({ ok: true, text: w("app.savedToYourAccount"), at: new Date().toISOString() });
           // foods, recipes and cards: only the records that changed (storage release 2)
           void syncRecords(false);
           // photos go up as files, by the photo sync: see syncFiles
@@ -1611,8 +1611,8 @@ export default function App() {
     });
     const data = await res
       .json()
-      .catch(() => ({ error: "The server returned an unreadable response." }));
-    if (!res.ok) throw new Error(data.error || "Request failed.");
+      .catch(() => ({ error: w("app.theServerReturnedAnUnreadable") }));
+    if (!res.ok) throw new Error(data.error || w("app.requestFailed"));
     return data;
   }
   useEffect(() => {
@@ -1704,7 +1704,7 @@ export default function App() {
         .filter((f) => !have.has((f.name + "|" + f.brand).toLowerCase())).map((f) => ({ ...f, id: uid(), reviewedAt: now, places: STARTER_REGION[f.id] ? [place] : [] }));
       const named = new Set(s.foods.flatMap((f) => [f.name, ...(f.aliases ?? [])]).map((n) => n.toLowerCase()));
       const local = marketFoods(tags).filter((r) => ![r.en, r.de, r.sr, r.cyr, r.el ?? ""].some((n) => n && named.has(n.toLowerCase()))).map((r) => ({ ...referenceFood(r, place, uid), places: [place] }));
-      notify(add.length + local.length ? `${add.length + local.length} starter foods added${local.length ? `, ${local.length} of them local` : ""}.` : "Starter foods are already in your library.");
+      notify(add.length + local.length ? `${add.length + local.length} starter foods added${local.length ? `, ${local.length} of them local` : ""}.` : w("app.starterFoodsAreAlreadyIn"));
       return { ...s, foods: [...s.foods, ...add, ...local] };
     });
     const st = getStarted(); if (!st.includes(place)) setStarted([...st, place]);
@@ -1781,14 +1781,14 @@ export default function App() {
     }));
     setStep("in");
     setTab("journey");
-    notify(food.serving ? `Added: 1 ${food.serving.name}, ${fmt(food.serving.grams, 0)} g. Set the amount you actually have.` : "Added. Set the amount you actually have.");
+    notify(food.serving ? `Added: 1 ${food.serving.name}, ${fmt(food.serving.grams, 0)} g. Set the amount you actually have.` : w("app.addedSetTheAmountYou"));
   }
   // the photo that shows the front goes first: it becomes the main photo and the card's picture
   const frontFirst = (images: string[], front: number) => { const i = Number(front) - 1; return i > 0 && i < images.length ? [images[i], ...images.filter((_, j) => j !== i)] : images; };
   async function scan(raw: string | string[], group = false, barcode?: string) {
     const run = ++runRef.current;
     setDbPhotos([]);
-    setBusy(group ? "Identifying products…" : "Reading label…");
+    setBusy(group ? w("app.identifyingProducts") : w("app.readingLabel"));
     setError("");
     setCamera(false);
     try {
@@ -1822,7 +1822,7 @@ export default function App() {
         } else {
           setPending(entities.map((x: any) => ({ name: x.product_name || "Unknown item", brand: x.brand || "", values: read(x) ? x : undefined })));
           setTab("foods");
-          notify(entities.some(read) ? "Products found. Review the ones with values read, enter the others." : "Products found. Enter each label, or photograph its nutrition table.");
+          notify(entities.some(read) ? w("app.productsFoundReviewTheOnes") : w("app.productsFoundEnterEachLabel"));
         }
       } else {
         if (!data.success)
@@ -1838,7 +1838,7 @@ export default function App() {
     } catch (e: any) {
       if (run === runRef.current)
         setError(
-          e.message || "Scan failed. Your saved foods and meal are unchanged.",
+          e.message || w("app.scanFailedYourSavedFoods"),
         );
     } finally {
       if (run === runRef.current) setBusy("");
@@ -1955,7 +1955,7 @@ export default function App() {
     }
     const meal: Meal = {
       id: uid(),
-      title: state.title || "My meal",
+      title: state.title || w("app.myMeal"),
       items: structuredClone(state.items),
       portion: p,
       savedAt: new Date().toISOString(),
@@ -2267,7 +2267,7 @@ export default function App() {
     openFood: (id: string) => { setMenuSection(null); setOpenFoodId(id); setTab("foods"); },
     setFoodJob: (foodId: string, job: string | null) => {
       setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, job: job || undefined } : x)) }));
-      notify(job ? `Labelled ${job.toLowerCase()}.` : "Back to Chef Mealan's label.");
+      notify(job ? `Labelled ${job.toLowerCase()}.` : w("app.backToChefMealanS"));
     },
     eatenTodayKcal: (() => {
       const today = new Date().toDateString();
@@ -2294,7 +2294,7 @@ export default function App() {
       // a prepared card: it shows on Today until it's eaten or dropped; not eaten after all is a note, not counted
       const status = extra?.status ?? "prepared";
       setState((s) => ({ ...s, feedback: [{ id: uid(), meal, status, ...(extra?.left ? { left: extra.left } : {}), ...(extra?.recipeId ? { recipeId: extra.recipeId } : {}), ...(extra?.leftOf ? { leftOf: extra.leftOf } : {}), taste: "", notes: "", photos: extra?.photos?.length ? extra.photos : undefined, photo: extra?.photos?.length ? extra.photos[extra.photos.length - 1] : undefined, prep: extra?.prep, createdAt: new Date().toISOString(), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined } as any, ...s.feedback] }));
-      notify(status === "prepared" ? "Kept for later. It's on Today." : "Noted, not counted.");
+      notify(status === "prepared" ? w("app.keptForLaterItS") : w("app.notedNotCounted"));
     },
     // DT149 (0.2.130): at, a meal of a day gone by, counted at its time
     logPlanned: (m: PlannedMeal, slot: NonNullable<Feedback["slot"]>, at?: string) => {
@@ -2319,12 +2319,12 @@ export default function App() {
         notify(`Logged. ${(card.left ?? 1) - 1} left.`); return;
       }
       setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === id ? { ...f, status: how, left: undefined, createdAt: how === "eaten" ? new Date().toISOString() : f.createdAt, taste: how === "eaten" ? f.taste || "Good" : f.taste, ...asMeal } : f)) }));
-      notify(how === "eaten" ? "Logged." : "Dropped for today.");
+      notify(how === "eaten" ? w("app.logged") : w("app.droppedForToday"));
     },
     toggleFavorite: (foodId: string) => {
       const f = state.foods.find((x) => x.id === foodId);
       setState((s) => ({ ...s, foods: s.foods.map((x) => (x.id === foodId ? { ...x, favorite: !x.favorite } : x)) }));
-      notify(f?.favorite ? "Removed from favourites." : "Added to favourites: it shows first on the plate.");
+      notify(f?.favorite ? w("app.removedFromFavourites") : w("app.addedToFavouritesItShows"));
     },
     removeFoodPhoto: (foodId: string, index: number) => {
       const f0 = state.foods.find((f) => f.id === foodId);
@@ -2416,7 +2416,7 @@ export default function App() {
     // DT127 (0.2.108, board Stories75): a photo of the meal in front of you, read onto the Plate as estimates
     readMealPhoto: async (image: string, x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string }) => {
       const more0 = (x?.more ?? []).slice(0, 3), note = (x?.note ?? "").replace(/\s+/g, " ").trim().slice(0, 200);
-      setBusy(more0.length ? `Reading your ${more0.length + 1} photos…` : "Reading your plate…");
+      setBusy(more0.length ? `Reading your ${more0.length + 1} photos…` : w("app.readingYourPlate"));
       try {
         // DT228 v2 (0.3.63, board Stories168): the other photos of the meal and the person's words go with the photo, in one read
         const [sent, thumb, moreSent, moreThumbs] = await Promise.all([resizeImageBase64(image, 1280, 1280), thumbnailBase64(image, 640),
@@ -2452,7 +2452,7 @@ export default function App() {
         setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey");
         log("meal_photo", { foods: items.length, unsure: Boolean(read.unsure), who: x?.who ?? "camera" });
         return true;
-      } catch (e: any) { setError(e?.message || "The read didn't work. Try again."); return false; } finally { setBusy(""); }
+      } catch (e: any) { setError(e?.message || w("app.theReadDidnTWork")); return false; } finally { setBusy(""); }
     },
     // DT175 (0.3.17, board Stories122): Say what you have: the foods named, by voice or typed, land on the Plate as estimates
     plateFromWords: async (text: string) => {
@@ -2472,7 +2472,7 @@ export default function App() {
         else land("new");
         log("plate_said", { foods: items.length });
         return true;
-      } catch (e: any) { setError(e?.message || "That didn't work. Try again."); return false; } finally { setBusy(""); }
+      } catch (e: any) { setError(e?.message || w("app.thatDidnTWorkTry")); return false; } finally { setBusy(""); }
     },
     // the plate eaten now, at the table: whole, or half with the other half kept on Today
     // DT133 (0.2.113): one portion of a plate of several, the rest kept on Today
@@ -2488,7 +2488,7 @@ export default function App() {
         items: [], portion: null, title: "", photo: undefined }));
       if (x.stay) { notify(`Logged at ${new Date(now).toTimeString().slice(0, 5)}. It's on Today.`); return; }
       setStep("in"); setTab("home");
-      notify(x.portions ? `One portion logged. The other ${n - 1 === 1 ? "portion is" : `${n - 1} portions are`} on Today.` : x.half ? "Half logged. The other half is on Today." : x.at ? `Logged at ${new Date(x.at).toTimeString().slice(0, 5)}. It's on Today.` : "Logged. It's on Today.");
+      notify(x.portions ? `One portion logged. The other ${n - 1 === 1 ? "portion is" : `${n - 1} portions are`} on Today.` : x.half ? w("app.halfLoggedTheOtherHalf") : x.at ? `Logged at ${new Date(x.at).toTimeString().slice(0, 5)}. It's on Today.` : w("app.loggedItSOnToday"));
     },
     // DT130 (0.2.110, board Stories78, A): Photo of my meal opens the same camera as Scan, in Meal mode
     mealCamera: () => { setTalkOpen(false); setMode("meal"); setCamera(true); },
@@ -2502,7 +2502,7 @@ export default function App() {
       if (slot) setPlannedState((prev) => { const next = withPlanned(prev, slot.date, slot.slotId, fromMeal(m, "mine")); storePlanned(next); return next; });
       log("meal_photo_idea", { plan: Boolean(slot) });
       setStep("in");
-      setLanding({ id: m.id, line: slot ? "An idea from a photo, in your plan and in Mine." : "An idea from a photo. It waits at the top of Mine until you make it.", quiet: false }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes");
+      setLanding({ id: m.id, line: slot ? w("app.anIdeaFromAPhoto") : w("app.anIdeaFromAPhoto2"), quiet: false }); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("recipes");
     },
     // DT115 (0.2.97): the members' catalogue, searched by words; a member's food becomes a copy in your library
     memberFoods: async (q: string) => { try { const d = await api(`/api/members/foods?q=${encodeURIComponent(q)}&region=${encodeURIComponent(shopRegion ?? "")}`); return Array.isArray(d?.foods) ? d.foods : []; } catch { return []; } },
@@ -2639,13 +2639,13 @@ export default function App() {
         const newFoods = (item.meal.items as Ingredient[]).map((i) => i.food).filter((f) => !have.has((f.name + "|" + f.brand).toLowerCase())).map((f) => ({ ...f, id: uid(), icon: f.icon || iconFor(f.name), reviewedAt: new Date().toISOString() }));
         const foods = [...s.foods, ...newFoods];
         const items = (item.meal.items as Ingredient[]).map((i) => { const lib = foods.find((f) => (f.name + "|" + f.brand).toLowerCase() === (i.food.name + "|" + i.food.brand).toLowerCase()); return { id: uid(), food: lib ?? i.food, grams: i.grams, locked: true }; });
-        const meal = { id: uid(), title: item.meal.title || "From your coach", items, portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString(), from: "coach" as const };
+        const meal = { id: uid(), title: item.meal.title || w("app.fromYourCoach"), items, portion: items.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString(), from: "coach" as const };
         return how === "make"
           ? { ...s, foods, items, portion: null, title: meal.title }
           : { ...s, foods, meals: [meal, ...s.meals], feedback: [{ id: uid(), meal, status: "prepared" as const, taste: "", notes: "", createdAt: new Date().toISOString() } as any, ...s.feedback] };
       });
       if (how === "make") { setStep("recipe"); setTab("journey"); }
-      notify(how === "make" ? "On your plate. Fit to my target sets the amounts." : "Kept in your recipes.");
+      notify(how === "make" ? w("app.onYourPlateFitTo") : w("app.keptInYourRecipes"));
       if (user) { try { await clearInboxItem(user.uid, item.id); } catch {} }
       setInbox((x) => x.filter((i) => i.id !== item.id));
     },
@@ -2817,12 +2817,12 @@ export default function App() {
       } catch (e: any) { setError(explainCloudError(e)); }
     },
     answerClientReview: async (clientUid: string, status: "approved" | "change", note: string, prev: NumbersReview) => {
-      try { await answerReview(clientUid, status, note, coachLabel(user?.name), prev); notify(status === "approved" ? "Approved." : "Sent with your note."); } catch (e: any) { setError(explainCloudError(e)); }
+      try { await answerReview(clientUid, status, note, coachLabel(user?.name), prev); notify(status === "approved" ? w("app.approved") : w("app.sentWithYourNote")); } catch (e: any) { setError(explainCloudError(e)); }
     },
     confirmClientAi: async (clientUid: string, on: boolean) => {
       if (!user) return;
       if (on) await confirmClientAi(clientUid, user.uid); else await clearClientAi(clientUid);
-      notify(on ? "Chef Mealan's chat is on for this client." : "Chef Mealan's chat is off for this client.");
+      notify(on ? w("app.chefMealanSChatIs") : w("app.chefMealanSChatIs2"));
     },
     // Delete my account (7 October 2026): the server runs the steps in a safe order and says which were done. From the
     // first tap this phone writes nothing to the account. Once the record is gone the phone is cleared and signed out,
@@ -2844,7 +2844,7 @@ export default function App() {
         // no answer: the delete may or may not have run; the phone's copy goes, so it can't come back, and the account decides
         log("account_delete", { result: "unknown" });
         await clearPhone();
-        setError(r?.error ? `${r.error} Nothing on this phone is kept; sign in again to check.` : "The delete didn't answer. Sign in again: if your data is still there, tap Delete my account again.");
+        setError(r?.error ? `${r.error} Nothing on this phone is kept; sign in again to check.` : w("app.theDeleteDidnTAnswer"));
         setTimeout(() => location.reload(), 5000);
         return;
       }
@@ -2852,12 +2852,12 @@ export default function App() {
       if (r.ok) { await clearPhone(); location.reload(); return; }
       if (r.dataGone) {
         await clearPhone();
-        setError(r.message || "Your data is deleted.");
+        setError(r.message || w("app.yourDataIsDeleted"));
         setTimeout(() => location.reload(), 6000);
         return;
       }
       pauseAccountWrites(false);
-      setError(r.message || "Nothing was deleted. Try again later.");
+      setError(r.message || w("app.nothingWasDeletedTryAgain"));
     },
     // 0.2.119 (Tester 2): Reset left fat and carbs, your own days and a waiting goal, so the old numbers came back. All of it goes
     resetGoal: () => {
@@ -2915,7 +2915,7 @@ export default function App() {
       takeMix: (f, m) => { screenProps.takeMix(f, m); goApp("journey"); },
       putAlone: (f, g) => { setState((s) => ({ ...s, items: [...s.items, { id: uid(), food: f, grams: g, locked: false }], portion: null })); setStep("in"); goApp("journey"); notify(`${f.name} is on your plate.`); },
       addRecipe: (m) => { setState((s) => ({ ...s, meals: [m, ...s.meals] })); goApp("recipes"); notify(`${m.title} is in your recipes.`); },
-      momentName: momentOf(moment).name, goalName: goal ? goalLabel(goal.band) : "Your goal",
+      momentName: momentOf(moment).name, goalName: goal ? goalLabel(goal.band) : w("app.yourGoal"),
       mealKcal: todayKcal === null ? null : Math.round(todayKcal * momentKcalShare(moment)),
     } : null;
     return pagePath === "/recipes" ? <RecipesPage member={isMember} /> : <RecipePage slug={pagePath.split("/")[2]} member={tools} />;
@@ -2964,13 +2964,13 @@ export default function App() {
         <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setFilling(null); setTab("home"); }} aria-label={`${APP_NAME}, Today`}>
           <Mark size={28} color="var(--brand)" />
         </button>
-        <h1>{menuSection ? (ME_PAGES.includes(menuSection) ? "Me" : "Menu") : TITLES[tab]}</h1>
+        <h1>{menuSection ? (ME_PAGES.includes(menuSection) ? "Me" : w("app.menu")) : TITLES[tab]}</h1>
         {/* DT232 (0.3.72): while the app is viewed as Coach or User, the header says so and leads back, on every page */}
         {view !== "me" ? <button className="ref view-as" onClick={() => setViewAs("me")}>As {viewWord(view)} · Back to me</button>
-        : tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label="Edit daily reference">
+        : tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label={w("app.editDailyReference")}>
           {menuSection === "goal" ? `${pdText(dayPd)} today` : <>{goal?.band ? goalLabel(goal.band).split(" · ")[0] : `${fmt(state.goals.calories, 0)} kcal, ${fmt(state.goals.protein)} g`} · {pdText(dayPd)} today</>}
         </button>}
-        <button className="icon menu-button" aria-label="Menu" onClick={() => setMenuSection(menuSection ? null : "list")}><Menu size={22} /></button>
+        <button className="icon menu-button" aria-label={w("app.menu")} onClick={() => setMenuSection(menuSection ? null : "list")}><Menu size={22} /></button>
       </header>
       <main>
         {error && (
@@ -2978,7 +2978,7 @@ export default function App() {
             {error}
             <button
               className="icon"
-              aria-label="Dismiss error"
+              aria-label={w("app.dismissError")}
               onClick={() => setError("")}
             >
               <X size={16} />
@@ -2990,7 +2990,7 @@ export default function App() {
             {message}
             <button
               className="icon"
-              aria-label="Dismiss message"
+              aria-label={w("app.dismissMessage")}
               onClick={() => setMessage("")}
             >
               <X size={16} />
@@ -3008,7 +3008,7 @@ export default function App() {
         {!menuSection && !talkOpen && tab === "explorer" && <div className="explorer-tab">{/* 0.3.58 (Coach Milan 2 November 18:30): no cook strip on Explorer */}<ExplorerScreen {...screenProps} /></div>}
         {talkOpen && <div className="talk-overlay"><OutScreen {...screenProps} tab={tab} ask={talkAsk} clearAsk={() => setTalkAsk(null)} turns={talkTurns} setTurns={(f) => setTalkTurns(f)} close={() => setTalkOpen(false)} toPlate={() => { setTalkOpen(false); setMenuSection(null); setStep("in"); setTab("journey"); }} /></div>}
         {!talkOpen && (
-          <button className="chat-fab" aria-label="Chef Mealan" onClick={() => {
+          <button className="chat-fab" aria-label={w("app.chefMealan")} onClick={() => {
             // one door: on a plate with food it answers about the plate; anywhere else it's the conversation
             if (!menuSection && tab === "journey" && (step === "in" || step === "recipe") && state.items.length > 0) setMealanAsk((n) => n + 1);
             else setTalkOpen(true);
@@ -3042,7 +3042,7 @@ export default function App() {
           }}
         />
       </main>
-      <nav className={`bottom-nav${NAV.length > 5 ? " six" : ""}`} aria-label="Screens">
+      <nav className={`bottom-nav${NAV.length > 5 ? " six" : ""}`} aria-label={w("app.screens")}>
         {NAV.map((n) => (
           <button
             key={n.id}
@@ -3122,13 +3122,13 @@ export default function App() {
         />
       )}
       {accessOpen && (
-        <Modal title="Pilot server access" close={() => setAccessOpen(false)}>
+        <Modal title={w("app.pilotServerAccess")} close={() => setAccessOpen(false)}>
           <p>
             Use the access key provided by the person hosting this pilot. It is
             kept for this browser session.
           </p>
           <label>
-            Access key
+            {w("app.accessKey")}
             <input
               type="password"
               value={access}
@@ -3143,7 +3143,7 @@ export default function App() {
               notify("Access key saved for this session. Retry your request.");
             }}
           >
-            Save access key
+            {w("app.saveAccessKey")}
           </button>
         </Modal>
       )}
@@ -3153,7 +3153,7 @@ export default function App() {
           close={() => setReviewMeal(null)}
         >
           <label>
-            What happened?
+            {w("app.whatHappened")}
             <select
               value={feedback.status}
               onChange={(e) =>
@@ -3163,23 +3163,23 @@ export default function App() {
                 })
               }
             >
-              <option value="prepared">Prepared</option>
-              <option value="eaten">Eaten</option>
-              <option value="not-used">Not used</option>
+              <option value="prepared">{w("app.prepared")}</option>
+              <option value="eaten">{w("app.eaten")}</option>
+              <option value="not-used">{w("app.notUsed")}</option>
             </select>
           </label>
           <label>
-            Taste
+            {w("app.taste")}
             <textarea
               value={feedback.taste}
               onChange={(e) =>
                 setFeedback({ ...feedback, taste: e.target.value })
               }
-              placeholder="Too sour? Just right? What would you change?"
+              placeholder={w("app.tooSourJustRightWhat")}
             />
           </label>
           <label>
-            Portion & practical notes
+            {w("app.portionPracticalNotes")}
             <textarea
               value={feedback.notes}
               onChange={(e) =>
@@ -3207,7 +3207,7 @@ export default function App() {
               notify("Feedback saved with this recipe snapshot.");
             }}
           >
-            Save feedback
+            {w("app.saveFeedback")}
           </button>
         </Modal>
       )}
@@ -3222,7 +3222,7 @@ export default function App() {
               setBusy("");
             }}
           >
-            Dismiss
+            {w("app.dismiss")}
           </button>
         </div>
       )}

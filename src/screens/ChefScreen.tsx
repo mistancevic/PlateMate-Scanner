@@ -1,4 +1,5 @@
 import { Sparkles } from "lucide-react";
+import { w } from "../words";
 import { aggregate } from "../pilot";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { log } from "../log";
@@ -14,16 +15,16 @@ export function ChefScreen(p: AppApi) {
     return (
       <>
         <section className="readout readout-empty">
-          <div className="readout-mid"><b>{pdVal(pdRef)}</b><div><span>your target</span><small>g protein per 100 kcal</small></div></div>
+          <div className="readout-mid"><b>{pdVal(pdRef)}</b><div><span>{w("chef.yourTarget")}</span><small>{w("chef.gProteinPerKcal")}</small></div></div>
         </section>
-        <div className="strip">The Chef needs a meal first. Add foods, lock what you want to keep, then come back.</div>
-        <button className="pill pill-primary pill-wide" onClick={() => setTab("meal")}>Go to Meal</button>
+        <div className="strip">{w("chef.theChefNeedsAMeal")}</div>
+        <button className="pill pill-primary pill-wide" onClick={() => setTab("meal")}>{w("chef.goToMeal")}</button>
       </>
     );
   return (
     <>
       <section className="readout">
-        <div className="readout-top"><span>Target</span><span>{pdTag()}</span></div>
+        <div className="readout-top"><span>{w("chef.target")}</span><span>{pdTag()}</span></div>
         <div className="readout-mid">
           <b>{pdVal(pdRef)}</b>
           <div>
@@ -33,16 +34,16 @@ export function ChefScreen(p: AppApi) {
         </div>
       </section>
       <label className="field">
-        <span>Ingredient the Chef may change</span>
+        <span>{w("chef.ingredientTheChefMayChange")}</span>
         <select value={adjustId} onChange={(e) => setAdjustId(e.target.value)}>
-          <option value="">Choose an unlocked food</option>
+          <option value="">{w("chef.chooseAnUnlockedFood")}</option>
           {free.map((i) => <option key={i.id} value={i.id}>{i.food.name}</option>)}
         </select>
       </label>
       <div className="fields three">
-        <label className="field"><span>max g</span><input inputMode="decimal" placeholder="–" value={limits.maxWeight} onChange={(e) => setLimits({ ...limits, maxWeight: e.target.value })} /></label>
-        <label className="field"><span>min protein g</span><input inputMode="decimal" placeholder="–" value={limits.minProtein} onChange={(e) => setLimits({ ...limits, minProtein: e.target.value })} /></label>
-        <label className="field"><span>max kcal</span><input inputMode="decimal" placeholder="–" value={limits.maxKcal} onChange={(e) => setLimits({ ...limits, maxKcal: e.target.value })} /></label>
+        <label className="field"><span>{w("chef.maxG")}</span><input inputMode="decimal" placeholder="–" value={limits.maxWeight} onChange={(e) => setLimits({ ...limits, maxWeight: e.target.value })} /></label>
+        <label className="field"><span>{w("chef.minProteinG")}</span><input inputMode="decimal" placeholder="–" value={limits.minProtein} onChange={(e) => setLimits({ ...limits, minProtein: e.target.value })} /></label>
+        <label className="field"><span>{w("chef.maxKcal")}</span><input inputMode="decimal" placeholder="–" value={limits.maxKcal} onChange={(e) => setLimits({ ...limits, maxKcal: e.target.value })} /></label>
       </div>
       <button className="pill pill-primary pill-wide" onClick={() => mix()}>Find a mix at {pdText(pdRef)}</button>
       {options.length > 0 && (
@@ -63,13 +64,13 @@ export function ChefScreen(p: AppApi) {
                     setState((s) => ({ ...s, items: o.items, portion: null }));
                     notify("Mix applied.");
                     setTab("meal");
-                  }}>Use</button>
+                  }}>{w("chef.use")}</button>
                 </div>
               );
             })}
           </div>
           <button className="pill pill-wide" onClick={personalize} disabled={busy !== ""}>
-            <Sparkles size={15} /> Rank by my taste notes
+            <Sparkles size={15} /> {w("chef.rankByMyTasteNotes")}
           </button>
         </>
       )}

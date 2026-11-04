@@ -5892,6 +5892,2118 @@
     "daytable.carbs": {
       "text": "ugljeni hidrati",
       "checked": false
+    },
+    "menu.metrics": {
+      "text": "Metrike",
+      "checked": false
+    },
+    "menu.shareChefMealan": {
+      "text": "Podeli Chef Mealan",
+      "checked": false
+    },
+    "menu.runningCosts": {
+      "text": "Troškovi rada",
+      "checked": false
+    },
+    "menu.menu": {
+      "text": "Meni",
+      "checked": false
+    },
+    "menu.close": {
+      "text": "Zatvori",
+      "checked": false
+    },
+    "menu.me": {
+      "text": "Ja",
+      "checked": false
+    },
+    "menu.foods": {
+      "text": "Namirnice",
+      "checked": false
+    },
+    "menu.settings": {
+      "text": "Podešavanja",
+      "checked": false
+    },
+    "menu.admin": {
+      "text": "Admin",
+      "checked": false
+    },
+    "menu.superadminOnly": {
+      "text": "Samo za superadmina",
+      "checked": false
+    },
+    "menu.about": {
+      "text": "O aplikaciji",
+      "checked": false
+    },
+    "menu.whoSBehindIt": {
+      "text": "Ko stoji iza nje",
+      "checked": false
+    },
+    "menu.impressum": {
+      "text": "Impressum",
+      "checked": false
+    },
+    "menu.privacyNotice": {
+      "text": "Obaveštenje o privatnosti",
+      "checked": false
+    },
+    "menu.disclaimer": {
+      "text": "Odricanje odgovornosti",
+      "checked": false
+    },
+    "menu.howTheAppWorksFor": {
+      "text": "Kako aplikacija radi za tebe, na ovom telefonu.",
+      "checked": false
+    },
+    "menu.howChefMealanReadsTo": {
+      "text": "Kako ti Chef Mealan čita dok kuvaš. Glasovi tvog telefona: besplatno, ništa ne napušta telefon.",
+      "checked": false
+    },
+    "menu.allOfThisIsOptional": {
+      "text": "Sve ovo nije obavezno. Koristi se samo za računanje tvojih brojeva, i čuva se na ovom telefonu i na tvom nalogu, nigde drugde.",
+      "checked": false
+    },
+    "menu.beforeYourNumbers": {
+      "text": "Pre tvojih brojeva",
+      "checked": false
+    },
+    "menu.toCalculateYourDayChef": {
+      "text": "Da izračuna tvoj dan, Chef Mealan pita nekoliko stvari o tvom telu: žensko ili muško, godinu rođenja, visinu, težinu i procenat masti ako ga znaš. Kasnije i merenja koja dodaš. Evo šta se sa njima dešava.",
+      "checked": false
+    },
+    "menu.onlyThoseValuesAndThe": {
+      "text": "samo te vrednosti, i brojevi koji iz njih izlaze.",
+      "checked": false
+    },
+    "menu.onThisPhoneAndIn": {
+      "text": "na ovom telefonu i na tvom nalogu. Nigde drugde: nikad se ne prodaju, i nikad se ne dele dalje od tvog trenera.",
+      "checked": false
+    },
+    "menu.whileTheAccountExists": {
+      "text": "dok nalog postoji.",
+      "checked": false
+    },
+    "menu.exportItOrDeleteIt": {
+      "text": "izvezi ih ili obriši, sa svim ostalim, u Meni, Nalog.",
+      "checked": false
+    },
+    "menu.nothingAboutYourBodyIs": {
+      "text": "Ništa o tvom telu se ne čuva dok se ne složiš. Celo",
+      "checked": false
+    },
+    "menu.privacyNotice2": {
+      "text": "obaveštenje o privatnosti",
+      "checked": false
+    },
+    "menu.iAgree": {
+      "text": "Slažem se",
+      "checked": false
+    },
+    "menu.name": {
+      "text": "Ime",
+      "checked": false
+    },
+    "menu.yourBody": {
+      "text": "Tvoje telo",
+      "checked": false
+    },
+    "menu.birthYear": {
+      "text": "Godina rođenja",
+      "checked": false
+    },
+    "menu.yourWork": {
+      "text": "Tvoj posao",
+      "checked": false
+    },
+    "menu.yourTrainingGoesInThe": {
+      "text": "Tvoj trening ide u Nedelju treninga.",
+      "checked": false
+    },
+    "menu.units": {
+      "text": "Jedinice",
+      "checked": false
+    },
+    "menu.temperature": {
+      "text": "Temperatura",
+      "checked": false
+    },
+    "menu.bodyWeight": {
+      "text": "Telesna težina",
+      "checked": false
+    },
+    "menu.height": {
+      "text": "Visina",
+      "checked": false
+    },
+    "menu.foodAmountsStayInGrams": {
+      "text": "Količine hrane ostaju u gramima: deklaracije i brojevi na 100 g su u gramima. Energija ostaje u kcal.",
+      "checked": false
+    },
+    "menu.showProteinDensityAs": {
+      "text": "Prikaži gustinu proteina kao",
+      "checked": false
+    },
+    "menu.gProteinPerKcal": {
+      "text": "g proteina na 100 kcal",
+      "checked": false
+    },
+    "menu.signOutAnyway": {
+      "text": "Ipak se odjavi",
+      "checked": false
+    },
+    "menu.staySignedIn": {
+      "text": "Ostani prijavljen|Ostani prijavljena",
+      "checked": false
+    },
+    "menu.notEverythingIsSavedTo": {
+      "text": "Još nije sve sačuvano na tvom nalogu: veza je možda prekinuta. Odjava briše ovaj telefon, i ono što nije sačuvano odlazi sa njim. Ostani prijavljen i pokušaj ponovo kad budeš na mreži.|Još nije sve sačuvano na tvom nalogu: veza je možda prekinuta. Odjava briše ovaj telefon, i ono što nije sačuvano odlazi sa njim. Ostani prijavljena i pokušaj ponovo kad budeš na mreži.",
+      "checked": false
+    },
+    "menu.yourGoal": {
+      "text": "Tvoj cilj",
+      "checked": false
+    },
+    "menu.kcalADay": {
+      "text": "kcal dnevno",
+      "checked": false
+    },
+    "menu.gProtein": {
+      "text": "g proteina",
+      "checked": false
+    },
+    "menu.changeTheDate": {
+      "text": "Promeni datum",
+      "checked": false
+    },
+    "menu.cancel": {
+      "text": "Otkaži",
+      "checked": false
+    },
+    "menu.changeMyNumbers": {
+      "text": "Promeni moje brojeve",
+      "checked": false
+    },
+    "menu.yourDaysEachItsOwn": {
+      "text": "Tvoji dani, svaki posebno",
+      "checked": false
+    },
+    "menu.targetAnalysis": {
+      "text": "Analiza cilja",
+      "checked": false
+    },
+    "menu.changeTheGoal": {
+      "text": "Promeni cilj",
+      "checked": false
+    },
+    "menu.reset": {
+      "text": "Resetuj",
+      "checked": false
+    },
+    "menu.howYourNumbersWork": {
+      "text": "Kako rade tvoji brojevi",
+      "checked": false
+    },
+    "menu.formula": {
+      "text": "Formula",
+      "checked": false
+    },
+    "menu.change": {
+      "text": "Promeni",
+      "checked": false
+    },
+    "menu.atRest": {
+      "text": "U mirovanju.",
+      "checked": false
+    },
+    "menu.whatYourBodyBurnsDoing": {
+      "text": "Šta tvoje telo troši ne radeći ništa, po formuli koju si izabrao gore: Mifflin St Jeor, Katch McArdle ili Schofield.|Šta tvoje telo troši ne radeći ništa, po formuli koju si izabrala gore: Mifflin St Jeor, Katch McArdle ili Schofield.",
+      "checked": false
+    },
+    "menu.yourEveryday": {
+      "text": "Tvoj svakodnevni život.",
+      "checked": false
+    },
+    "menu.thatTimesHowYourWork": {
+      "text": "To puta tvoj posao: 1,3 sedeći, 1,55 na nogama, 1,75 fizički posao. Zatim tvoji koraci, svakog dana: samo ono iznad onoga što tvoj posao već pokriva, oko 10 minuta hoda na 1.000 koraka, na 3,5 MET.",
+      "checked": false
+    },
+    "menu.yourTraining": {
+      "text": "Tvoj trening.",
+      "checked": false
+    },
+    "menu.eachTrainingDayAddsWhat": {
+      "text": "Svaki dan treninga dodaje ono što košta: lako oko 3,5 MET, umereno 5, jako 8, ili vrednost same aktivnosti iz tvoje Nedelje treninga, puta tvoja težina i minuti (sredina raspona), manje ono što bi ionako potrošio u mirovanju.|Svaki dan treninga dodaje ono što košta: lako oko 3,5 MET, umereno 5, jako 8, ili vrednost same aktivnosti iz tvoje Nedelje treninga, puta tvoja težina i minuti (sredina raspona), manje ono što bi ionako potrošila u mirovanju.",
+      "checked": false
+    },
+    "menu.yourGoal2": {
+      "text": "Tvoj cilj.",
+      "checked": false
+    },
+    "menu.protein": {
+      "text": "Proteini.",
+      "checked": false
+    },
+    "menu.history": {
+      "text": "Istorija",
+      "checked": false
+    },
+    "menu.from": {
+      "text": "Od",
+      "checked": false
+    },
+    "menu.to": {
+      "text": "Do",
+      "checked": false
+    },
+    "menu.yourDaysAreSpentAt": {
+      "text": "Dane provodiš kod kuće. Chef Mealan svaki dan računa kao dan kod kuće, a tvoj trening ide u Nedelju treninga.",
+      "checked": false
+    },
+    "menu.setItUnderGoal": {
+      "text": "postavi ga pod Cilj ›",
+      "checked": false
+    },
+    "menu.howYouEatInYour": {
+      "text": "Kako jedeš, tvojim rečima",
+      "checked": false
+    },
+    "menu.allergiesStayInProfileWith": {
+      "text": "Alergije ostaju u Profilu, sa bezbednosnim pitanjima.",
+      "checked": false
+    },
+    "menu.yourUsualWeekOfTraining": {
+      "text": "Tvoja uobičajena nedelja treninga. Ponavlja se svake nedelje. Da promeniš jedan datum, otvori taj dan u Planu.",
+      "checked": false
+    },
+    "menu.yourUsualTrainingWeek": {
+      "text": "Tvoja uobičajena nedelja treninga",
+      "checked": false
+    },
+    "menu.moveToAnotherDay": {
+      "text": "Premesti na drugi dan ›",
+      "checked": false
+    },
+    "menu.copyToOtherDays": {
+      "text": "Kopiraj na druge dane ›",
+      "checked": false
+    },
+    "menu.makeItHome": {
+      "text": "Neka bude dom",
+      "checked": false
+    },
+    "menu.addItsStarterFoods": {
+      "text": "Dodaj njegove osnovne namirnice",
+      "checked": false
+    },
+    "menu.alwaysOn": {
+      "text": "uvek uključeno",
+      "checked": false
+    },
+    "menu.show": {
+      "text": "Prikaži",
+      "checked": false
+    },
+    "menu.theKitchensYouCook": {
+      "text": "Kuhinje koje kuvaš",
+      "checked": false
+    },
+    "menu.another": {
+      "text": "Druga",
+      "checked": false
+    },
+    "menu.undo": {
+      "text": "Vrati",
+      "checked": false
+    },
+    "menu.aPlateThatAlreadyHas": {
+      "text": "Tanjir koji već ima kuhinju je zadržava: sarma ostaje balkanska, kari ostaje indijski. Sve ostalo dolazi odavde.",
+      "checked": false
+    },
+    "menu.whatYouCookWith": {
+      "text": "Čime kuvaš",
+      "checked": false
+    },
+    "menu.youReACoachYour": {
+      "text": "Ti si trener. Tvoj kod, tvoji klijenti i ono što su podelili su na kartici Klijenti.",
+      "checked": false
+    },
+    "menu.openClients": {
+      "text": "Otvori Klijente",
+      "checked": false
+    },
+    "menu.setsYourTargetAndSees": {
+      "text": "postavlja tvoj cilj i vidi kako je prošlo",
+      "checked": false
+    },
+    "menu.whatYourCoachSees": {
+      "text": "Šta tvoj trener vidi",
+      "checked": false
+    },
+    "menu.thePartsOfYourSummary": {
+      "text": "Delovi Tvog pregleda koje deliš, uvek ažurni, sa onim što se promenilo. Biraš ih u Tvom pregledu; zdravstveni podaci su isključeni dok ih ne uključiš.",
+      "checked": false
+    },
+    "menu.yourWeekEachDayThe": {
+      "text": "Tvoja nedelja: svaki dan, planirani obroci naspram pojedenih, sa nazivima, PD i kcal. Od dana kada si se pridružio.|Tvoja nedelja: svaki dan, planirani obroci naspram pojedenih, sa nazivima, PD i kcal. Od dana kada si se pridružila.",
+      "checked": false
+    },
+    "menu.yourGoalAndTodayS": {
+      "text": "Tvoj cilj i današnje brojeve, i može da ih postavi za tebe.",
+      "checked": false
+    },
+    "menu.yourWeighInsAsA": {
+      "text": "Tvoja merenja kao trend: gore ili dole, u procentima tvoje težine. Kilogrami samo kad deliš podatke o telu.",
+      "checked": false
+    },
+    "menu.theCardsYouShareWith": {
+      "text": "Kartice koje deliš, sa razlogom i fotografijom.",
+      "checked": false
+    },
+    "menu.whichSituationsYouTickedOn": {
+      "text": "Koje situacije si označio u profilu i kada. Nikad tvoje reči.|Koje situacije si označila u profilu i kada. Nikad tvoje reči.",
+      "checked": false
+    },
+    "menu.whatYourCoachNeverSees": {
+      "text": "Šta tvoj trener nikad ne vidi",
+      "checked": false
+    },
+    "menu.yourPhotosAndNotesOn": {
+      "text": "Tvoje fotografije i beleške na karticama koje ne deliš, tvoja biblioteka, tvoji razgovori sa Chef Mealanom.",
+      "checked": false
+    },
+    "menu.yourBodyDataHealthAnswers": {
+      "text": "Tvoji podaci o telu, zdravstveni odgovori i alergije. Samo brojevi koji iz njih izlaze, tvoja merenja kao trend u procentima (u kilogramima samo ako deliš podatke o telu u Tvom pregledu), i koju situaciju si označio i kada. Nalaze se u delu tvog naloga koji samo ti možeš da otvoriš.|Tvoji podaci o telu, zdravstveni odgovori i alergije. Samo brojevi koji iz njih izlaze, tvoja merenja kao trend u procentima (u kilogramima samo ako deliš podatke o telu u Tvom pregledu), i koju situaciju si označila i kada. Nalaze se u delu tvog naloga koji samo ti možeš da otvoriš.",
+      "checked": false
+    },
+    "menu.gotAnInviteFromYour": {
+      "text": "Imaš pozivnicu od trenera? Unesi njen kod. Radi sa imejlom na koji je poslata.",
+      "checked": false
+    },
+    "menu.join": {
+      "text": "Pridruži se",
+      "checked": false
+    },
+    "menu.thisPhoneOnlyYourData": {
+      "text": "Samo ovaj telefon. Tvoji podaci ostaju ovde.",
+      "checked": false
+    },
+    "menu.yourData": {
+      "text": "Tvoji podaci",
+      "checked": false
+    },
+    "menu.everythingChefMealanKeepsAbout": {
+      "text": "Sve što Chef Mealan čuva o tebi na ovom telefonu, u jednoj datoteci: tvoj profil, tvoj cilj i njegova istorija, tvoje namirnice sa fotografijama i tvoje kartice.",
+      "checked": false
+    },
+    "menu.exportMyData": {
+      "text": "Izvezi moje podatke",
+      "checked": false
+    },
+    "menu.everythingChefMealanKeepsAbout2": {
+      "text": "Sve što Chef Mealan čuva o tebi, u jednoj datoteci: tvoj profil, tvoj cilj i njegova istorija, tvoje namirnice sa fotografijama, tvoje kartice, recepti od tvog trenera i ono što tvoj nalog čuva.",
+      "checked": false
+    },
+    "menu.signIn": {
+      "text": "Prijavi se",
+      "checked": false
+    },
+    "menu.questionsSomethingBrokenOrAn": {
+      "text": "Pitanja, nešto ne radi, ili ideja: piši nam.",
+      "checked": false
+    },
+    "menu.tools": {
+      "text": "Alati",
+      "checked": false
+    },
+    "menu.iAmTheCoach": {
+      "text": "Ja sam trener",
+      "checked": false
+    },
+    "menu.exportLog": {
+      "text": "Izvezi dnevnik",
+      "checked": false
+    },
+    "menu.addStarterFoods": {
+      "text": "Dodaj osnovne namirnice",
+      "checked": false
+    },
+    "menu.backup": {
+      "text": "Rezervna kopija",
+      "checked": false
+    },
+    "menu.restore": {
+      "text": "Vrati iz kopije",
+      "checked": false
+    },
+    "menu.recipes": {
+      "text": "Recepti",
+      "checked": false
+    },
+    "menu.onlyYouSeeThisMeasured": {
+      "text": "Samo ti ovo vidiš. Mereno na ovom telefonu, pri svakom otvaranju aplikacije; čuvanja su sa ovog telefona, danas.",
+      "checked": false
+    },
+    "menu.viewTheAppAs": {
+      "text": "Gledaj aplikaciju kao",
+      "checked": false
+    },
+    "menu.meEverythingYourAccountHas": {
+      "text": "Ja: sve što tvoj nalog ima. Trener: Klijenti, bez stranica vlasnika. Korisnik: bez Klijenata, Deljenja, Evals, Metrika, Troškova rada, Admina i Podataka za razvoj. Samo ovaj telefon, samo ono što se vidi: tvoji podaci i tvoja prava ostaju isti. Zaglavlje vodi nazad.",
+      "checked": false
+    },
+    "menu.chefMealanFetchesThemFrom": {
+      "text": "Chef Mealan ih preuzima sa tvog naloga, nekoliko sekundi posle otvaranja aplikacije. Broj koji ostaje znači da ih nalog nema: ponovo fotografiši, ili isprazni tanjir na kom je bila.",
+      "checked": false
+    },
+    "menu.deploy": {
+      "text": "Objava",
+      "checked": false
+    },
+    "menu.eachOpensItsPageOn": {
+      "text": "Svako otvara svoju stranicu na GitHubu; Run workflow tamo ga pokreće. Ništa se ne objavljuje iz aplikacije.",
+      "checked": false
+    },
+    "menu.chefMealanFitsTheFood": {
+      "text": "Chef Mealan uklapa hranu koju želiš u cilj koji imaš. Brojevi dolaze iz koda; model čita deklaracije, jelovnike i police; ti i tvoj trener odlučujete.",
+      "checked": false
+    },
+    "menu.pilotBarcodeDataFromOpen": {
+      "text": "Pilot. Podaci za bar kodove su iz Open Food Facts; vrednosti sa deklaracija su procene, proveri pakovanje. Tvoji podaci su u EU, na tvom nalogu.",
+      "checked": false
+    },
+    "menu.yourName": {
+      "text": "Tvoje ime",
+      "checked": false
+    },
+    "menu.nextGoal": {
+      "text": "Sledeći cilj",
+      "checked": false
+    },
+    "menu.tapAgainToReset": {
+      "text": "Dodirni ponovo da resetuješ",
+      "checked": false
+    },
+    "menu.school": {
+      "text": "Škola",
+      "checked": false
+    },
+    "menu.workAndStudy": {
+      "text": "Posao i učenje",
+      "checked": false
+    },
+    "menu.workFrom": {
+      "text": "Posao od",
+      "checked": false
+    },
+    "menu.workTo": {
+      "text": "Posao do",
+      "checked": false
+    },
+    "menu.recovery": {
+      "text": "Oporavak",
+      "checked": false
+    },
+    "menu.meals": {
+      "text": "Obroci",
+      "checked": false
+    },
+    "menu.nutrition": {
+      "text": "Ishrana",
+      "checked": false
+    },
+    "menu.yourTrainingWeek": {
+      "text": "Tvoja nedelja treninga",
+      "checked": false
+    },
+    "menu.leaveThisCoach": {
+      "text": "Napusti ovog trenera",
+      "checked": false
+    },
+    "menu.tapAgainToLeave": {
+      "text": "Dodirni ponovo da napustiš",
+      "checked": false
+    },
+    "menu.coachCode": {
+      "text": "Kod trenera",
+      "checked": false
+    },
+    "menu.deleteMyAccount": {
+      "text": "Obriši moj nalog",
+      "checked": false
+    },
+    "menu.tapAgainToDeleteEverything": {
+      "text": "Dodirni ponovo da obrišeš sve",
+      "checked": false
+    },
+    "menu.clearLog": {
+      "text": "Obriši dnevnik",
+      "checked": false
+    },
+    "menu.tapAgainToClear": {
+      "text": "Dodirni ponovo da obrišeš",
+      "checked": false
+    },
+    "menu.trainingWeek": {
+      "text": "Nedelja treninga",
+      "checked": false
+    },
+    "menu.googleCalendar": {
+      "text": "Google kalendar",
+      "checked": false
+    },
+    "menu.whereIShopAndCook": {
+      "text": "Gde kupujem i kuvam",
+      "checked": false
+    },
+    "menu.yourSummary": {
+      "text": "Tvoj pregled",
+      "checked": false
+    },
+    "menu.voiceWhileCooking": {
+      "text": "Glas dok kuvaš",
+      "checked": false
+    },
+    "menu.devData": {
+      "text": "Podaci za razvoj",
+      "checked": false
+    },
+    "menu.weighInsYourGoalAnd": {
+      "text": "Merenja, tvoj cilj i trend.",
+      "checked": false
+    },
+    "menu.weighInsYourGoalAnd2": {
+      "text": "Merenja, tvoj cilj i trend, u lb.",
+      "checked": false
+    },
+    "menu.keptAsYouGoNothing": {
+      "text": "Čuva se usput. Nema šta da se sačuva.",
+      "checked": false
+    },
+    "menu.calculateYourDailyNumbersFrom": {
+      "text": "Izračunaj dnevne brojeve iz ovog profila",
+      "checked": false
+    },
+    "menu.yourGoalAndDailyNumbers": {
+      "text": "Tvoj cilj i dnevni brojevi",
+      "checked": false
+    },
+    "menu.savingThenSigningOut": {
+      "text": "Čuvam, pa odjavljujem…",
+      "checked": false
+    },
+    "menu.signOut": {
+      "text": "Odjavi se",
+      "checked": false
+    },
+    "menu.notSetYet": {
+      "text": "Još nije postavljeno",
+      "checked": false
+    },
+    "menu.closeAboutYourGoal": {
+      "text": "Zatvori O tvom cilju",
+      "checked": false
+    },
+    "menu.aboutYourGoal": {
+      "text": "O tvom cilju ›",
+      "checked": false
+    },
+    "menu.pleaseLookAtYourNumbers": {
+      "text": "Molim te, ponovo pogledaj svoje brojeve.",
+      "checked": false
+    },
+    "menu.everythingInRange": {
+      "text": "Sve je u rasponu",
+      "checked": false
+    },
+    "menu.katchMcardle": {
+      "text": "Katch McArdle",
+      "checked": false
+    },
+    "menu.mifflinStJeor": {
+      "text": "Mifflin St Jeor",
+      "checked": false
+    },
+    "menu.howYourLifeRunsIn": {
+      "text": "Kako ti teče život u običnoj školskoj nedelji. Postavi jednom, i promeni kad se nešto promeni, na primer nova školska godina.",
+      "checked": false
+    },
+    "menu.howYourLifeRunsMost": {
+      "text": "Kako ti teče život većinu nedelja. Postavi jednom; promeni kad se život promeni.",
+      "checked": false
+    },
+    "menu.withFixedHoursMondayTo": {
+      "text": "Sa fiksnim radnim vremenom, ponedeljak do petak su radni dani u tvojoj Nedelji treninga. Tamo možeš promeniti bilo koji dan.",
+      "checked": false
+    },
+    "menu.sleepIsWhenYourBody": {
+      "text": "San je kada telo raste i pretvara sport u napredak. Većini tinejdžera treba 8 do 10 sati.",
+      "checked": false
+    },
+    "menu.sleepIsWhereTrainingTurns": {
+      "text": "U snu se trening pretvara u napredak. Vreme buđenja i odlaska na spavanje određuju i tvoj prvi i poslednji obrok, ispod.",
+      "checked": false
+    },
+    "menu.setsYourFirstMealBelow": {
+      "text": "Određuje tvoj prvi obrok, ispod: sat i po posle buđenja.",
+      "checked": false
+    },
+    "menu.before": {
+      "text": "Pre 6",
+      "checked": false
+    },
+    "menu.after": {
+      "text": "Posle 7",
+      "checked": false
+    },
+    "menu.before2": {
+      "text": "Pre 6:00",
+      "checked": false
+    },
+    "menu.after2": {
+      "text": "Posle 8:00",
+      "checked": false
+    },
+    "menu.variesWithShifts": {
+      "text": "Zavisi od smene",
+      "checked": false
+    },
+    "menu.setsYourLastMealBelow": {
+      "text": "Određuje tvoj poslednji obrok, ispod: dva sata pre spavanja.",
+      "checked": false
+    },
+    "menu.before3": {
+      "text": "Pre 22:00",
+      "checked": false
+    },
+    "menu.afterMidnight": {
+      "text": "Posle ponoći",
+      "checked": false
+    },
+    "menu.howManyMealsADay": {
+      "text": "Koliko obroka dnevno, i kada.",
+      "checked": false
+    },
+    "menu.whenYouEatTheTimes": {
+      "text": "Kada jedeš. Vremena polaze od tvog radnog vremena, buđenja i odlaska na spavanje gore; promeni bilo koje i tvoje ostaje.",
+      "checked": false
+    },
+    "menu.snacksCountAsAMeal": {
+      "text": "Užina se ovde računa kao obrok.",
+      "checked": false
+    },
+    "menu.yourMeal": {
+      "text": "Tvoj obrok",
+      "checked": false
+    },
+    "menu.howYouUsuallyEatChef": {
+      "text": "Kako obično jedeš. Chef Mealan prvo predlaže odavde.",
+      "checked": false
+    },
+    "menu.howYouUsuallyEatAnd": {
+      "text": "Kako obično jedeš i piješ. Chef Mealan prvo planira i predlaže odavde.",
+      "checked": false
+    },
+    "menu.whatEachDayOfYour": {
+      "text": "Šta donosi svaki dan tvoje školske nedelje",
+      "checked": false
+    },
+    "menu.whatEachDayOfYour2": {
+      "text": "Šta donosi svaki dan tvoje uobičajene nedelje",
+      "checked": false
+    },
+    "menu.noSchool": {
+      "text": "Bez škole",
+      "checked": false
+    },
+    "menu.dayOff": {
+      "text": "Slobodan dan",
+      "checked": false
+    },
+    "menu.theTrainingGoesAsIt": {
+      "text": "Trening ide kakav jeste, i njegovo vreme. Dan sa treningom se menja sa njim.",
+      "checked": false
+    },
+    "menu.aboutTwentyStarterFoods": {
+      "text": "Dvadesetak osnovnih namirnica",
+      "checked": false
+    },
+    "menu.whereYouLiveShopAnd": {
+      "text": "Gde živiš, kupuješ i kuvaš je dom: njegove namirnice su uvek u tvojoj pretrazi. Bilo koje drugo mesto: njegov prekidač stavlja njegove namirnice u pretragu. Prvi put dolaze i njegove osnovne namirnice.",
+      "checked": false
+    },
+    "menu.pickHomeWhereYouLive": {
+      "text": "Izaberi dom: gde živiš, kupuješ i kuvaš. Njegove osnovne namirnice dolaze sa njim, i Chef Mealan zna u kojim prodavnicama zaista možeš da kupiš.",
+      "checked": false
+    },
+    "menu.threeDishes": {
+      "text": "Tri jela",
+      "checked": false
+    },
+    "menu.twoDishes": {
+      "text": "Dva jela",
+      "checked": false
+    },
+    "menu.oneDish": {
+      "text": "Jedno jelo",
+      "checked": false
+    },
+    "menu.yourReply": {
+      "text": "Tvoj odgovor",
+      "checked": false
+    },
+    "menu.askedYouToChangeYour": {
+      "text": "Traži da promeniš brojeve",
+      "checked": false
+    },
+    "menu.approvedYourWeek": {
+      "text": "Nedelja ti je odobrena",
+      "checked": false
+    },
+    "menu.thisPhoneOnly": {
+      "text": "Samo ovaj telefon",
+      "checked": false
+    },
+    "menu.emergencyOnlyChefmealanComGoes": {
+      "text": "Samo za hitne slučajeve: chefmealan.com se vraća na ono što je bilo uživo pre poslednjeg promote",
+      "checked": false
+    },
+    "menu.sixToSeven": {
+      "text": "6 do 7",
+      "checked": false
+    },
+    "menu.sixToEight": {
+      "text": "6:00 do 8:00",
+      "checked": false
+    },
+    "menu.tenToMidnight": {
+      "text": "22:00 do ponoći",
+      "checked": false
+    },
+    "app.chooseAPortionGreaterThan": {
+      "text": "Izaberi porciju veću od nule i ne veću od ovog recepta.",
+      "checked": false
+    },
+    "app.howToReadThis": {
+      "text": "Kako ovo čitati",
+      "checked": false
+    },
+    "app.tickedPhotosStayWithThe": {
+      "text": "Označene fotografije ostaju uz namirnicu. Dodirni jednu da je izostaviš.",
+      "checked": false
+    },
+    "app.creditOpenFoodFactsCc": {
+      "text": "Izvor: Open Food Facts, CC BY-SA",
+      "checked": false
+    },
+    "app.looksLikeAFoodYou": {
+      "text": "Liči na namirnicu koju već imaš",
+      "checked": false
+    },
+    "app.updateThatOne": {
+      "text": "Ažuriraj tu",
+      "checked": false
+    },
+    "app.keepBoth": {
+      "text": "Zadrži obe",
+      "checked": false
+    },
+    "app.cancel": {
+      "text": "Otkaži",
+      "checked": false
+    },
+    "app.itKeepsItsNameMissing": {
+      "text": "Zadržava svoj naziv. Vrednosti koje nedostaju, brend ili bar kod se popune, a ove fotografije idu u njenu galeriju.",
+      "checked": false
+    },
+    "app.perG": {
+      "text": "na 100 g",
+      "checked": false
+    },
+    "app.productName": {
+      "text": "Naziv proizvoda",
+      "checked": false
+    },
+    "app.valuesFromTheReferenceTable": {
+      "text": "Vrednosti iz referentne tabele. Proveri oznaku ispod i sačuvaj.",
+      "checked": false
+    },
+    "app.brand": {
+      "text": "Brend",
+      "checked": false
+    },
+    "app.barcodeNumberIfThePack": {
+      "text": "Broj bar koda, ako ga pakovanje ima",
+      "checked": false
+    },
+    "app.lookUp": {
+      "text": "Potraži",
+      "checked": false
+    },
+    "app.lookUpFillsTheTable": {
+      "text": "Potraži popunjava tabelu iz baze proizvoda kad je pakovanje poznato. Ili je popuni ispod.",
+      "checked": false
+    },
+    "app.servingIfThePackPrints": {
+      "text": "Porcija, ako je pakovanje navodi",
+      "checked": false
+    },
+    "app.aCountedFoodWhatChef": {
+      "text": "Namirnica na komad: ono što Chef Mealan pomera dolazi u celim porcijama, 1 pločica, 2 pločice, nikad 1,3.",
+      "checked": false
+    },
+    "app.nutritionTablePerGAs": {
+      "text": "Tabela nutritivnih vrednosti, na 100 g, kao na pakovanju",
+      "checked": false
+    },
+    "app.howItFits": {
+      "text": "Kako se uklapa",
+      "checked": false
+    },
+    "app.add": {
+      "text": "Dodaj",
+      "checked": false
+    },
+    "app.confirmSaveFood": {
+      "text": "Potvrdi i sačuvaj namirnicu",
+      "checked": false
+    },
+    "app.fitsYourPlateAsIt": {
+      "text": "Uklapa se u tvoj tanjir ovakav kakav je.",
+      "checked": false
+    },
+    "app.mixIt": {
+      "text": "Kombinuj",
+      "checked": false
+    },
+    "app.nothingInYourFoodsOr": {
+      "text": "Ništa u tvojim namirnicama ni u osnovnom skupu ne stiže do cilja uz ovu.",
+      "checked": false
+    },
+    "app.aTapSavesTheFood": {
+      "text": "Dodir čuva namirnicu i stavlja kombinaciju na tanjir.",
+      "checked": false
+    },
+    "app.notQuiteTellChefMealan": {
+      "text": "Nije baš to? Reci Chef Mealanu",
+      "checked": false
+    },
+    "app.saveDailyReference": {
+      "text": "Sačuvaj dnevnu referencu",
+      "checked": false
+    },
+    "app.accessKey": {
+      "text": "Pristupni ključ",
+      "checked": false
+    },
+    "app.saveAccessKey": {
+      "text": "Sačuvaj pristupni ključ",
+      "checked": false
+    },
+    "app.whatHappened": {
+      "text": "Šta se desilo?",
+      "checked": false
+    },
+    "app.prepared": {
+      "text": "Pripremljeno",
+      "checked": false
+    },
+    "app.eaten": {
+      "text": "Pojedeno",
+      "checked": false
+    },
+    "app.notUsed": {
+      "text": "Nije korišćeno",
+      "checked": false
+    },
+    "app.taste": {
+      "text": "Ukus",
+      "checked": false
+    },
+    "app.portionPracticalNotes": {
+      "text": "Porcija i praktične beleške",
+      "checked": false
+    },
+    "app.saveFeedback": {
+      "text": "Sačuvaj utisak",
+      "checked": false
+    },
+    "app.dismiss": {
+      "text": "Odbaci",
+      "checked": false
+    },
+    "app.closeDialog": {
+      "text": "Zatvori prozor",
+      "checked": false
+    },
+    "app.photosFromOpenFoodFacts": {
+      "text": "Fotografije iz Open Food Facts",
+      "checked": false
+    },
+    "app.yourPhotosOfThisProduct": {
+      "text": "Tvoje fotografije ovog proizvoda",
+      "checked": false
+    },
+    "app.fromTheReferenceTable": {
+      "text": "Iz referentne tabele",
+      "checked": false
+    },
+    "app.servingName": {
+      "text": "Naziv porcije",
+      "checked": false
+    },
+    "app.servingGrams": {
+      "text": "Grami porcije",
+      "checked": false
+    },
+    "app.whichLine": {
+      "text": "Koji red",
+      "checked": false
+    },
+    "app.nameAsPrinted": {
+      "text": "Naziv, kako je odštampan",
+      "checked": false
+    },
+    "app.amount": {
+      "text": "Količina",
+      "checked": false
+    },
+    "app.unit": {
+      "text": "Jedinica",
+      "checked": false
+    },
+    "app.eGFibreNotDeclared": {
+      "text": "Npr. vlakna nisu navedena; kako se prodaje; sadrži mleko. Ne unosi podatke koji otkrivaju klijenta.",
+      "checked": false
+    },
+    "app.yourDailyReference": {
+      "text": "Tvoja dnevna referenca",
+      "checked": false
+    },
+    "app.notSet": {
+      "text": "Nije postavljeno",
+      "checked": false
+    },
+    "app.editDailyReference": {
+      "text": "Izmeni dnevnu referencu",
+      "checked": false
+    },
+    "app.menu": {
+      "text": "Meni",
+      "checked": false
+    },
+    "app.dismissError": {
+      "text": "Odbaci grešku",
+      "checked": false
+    },
+    "app.dismissMessage": {
+      "text": "Odbaci poruku",
+      "checked": false
+    },
+    "app.chefMealan": {
+      "text": "Chef Mealan",
+      "checked": false
+    },
+    "app.screens": {
+      "text": "Ekrani",
+      "checked": false
+    },
+    "app.pilotServerAccess": {
+      "text": "Pristup pilot serveru",
+      "checked": false
+    },
+    "app.tooSourJustRightWhat": {
+      "text": "Previše kiselo? Taman? Šta bi promenio?|Previše kiselo? Taman? Šta bi promenila?",
+      "checked": false
+    },
+    "app.yourCoach": {
+      "text": "Tvoj trener",
+      "checked": false
+    },
+    "app.myMeal": {
+      "text": "Moj obrok",
+      "checked": false
+    },
+    "app.wholeRecipeSelected": {
+      "text": "Izabran ceo recept.",
+      "checked": false
+    },
+    "app.addToPlate": {
+      "text": "Dodaj na tanjir",
+      "checked": false
+    },
+    "app.addAFood": {
+      "text": "Dodaj namirnicu",
+      "checked": false
+    },
+    "app.findAFood": {
+      "text": "Nađi namirnicu",
+      "checked": false
+    },
+    "app.checkWhatTheDatabaseSays": {
+      "text": "Proveri šta baza kaže prema pakovanju, pa sačuvaj.",
+      "checked": false
+    },
+    "app.checkWhatWasReadAgainst": {
+      "text": "Proveri ono što je pročitano prema pakovanju, pa sačuvaj.",
+      "checked": false
+    },
+    "app.nameTheFoodFillThe": {
+      "text": "Nazovi namirnicu, popuni vrednosti kao na pakovanju, sačuvaj.",
+      "checked": false
+    },
+    "app.referenceTable": {
+      "text": "Referentna tabela",
+      "checked": false
+    },
+    "app.mainPhoto": {
+      "text": "Glavna fotografija",
+      "checked": false
+    },
+    "app.makeThisTheMainPhoto": {
+      "text": "Neka ovo bude glavna fotografija",
+      "checked": false
+    },
+    "app.twoEntriesOfTheSame": {
+      "text": "Dva unosa iste namirnice",
+      "checked": false
+    },
+    "app.thisPhoneHasNewerChanges": {
+      "text": "Ovaj telefon ima novije promene; čuvam ih na tvom nalogu",
+      "checked": false
+    },
+    "app.thisPhoneHadNewerChanges": {
+      "text": "Ovaj telefon je imao novije promene; sačuvane su na tvom nalogu",
+      "checked": false
+    },
+    "app.loadedFromYourAccount": {
+      "text": "Učitano sa tvog naloga",
+      "checked": false
+    },
+    "app.savingToYourAccount": {
+      "text": "Čuvam na tvom nalogu",
+      "checked": false
+    },
+    "app.savedToYourAccount": {
+      "text": "Sačuvano na tvom nalogu",
+      "checked": false
+    },
+    "app.theServerReturnedAnUnreadable": {
+      "text": "Server je vratio nečitljiv odgovor.",
+      "checked": false
+    },
+    "app.requestFailed": {
+      "text": "Zahtev nije uspeo.",
+      "checked": false
+    },
+    "app.starterFoodsAreAlreadyIn": {
+      "text": "Osnovne namirnice su već u tvojoj biblioteci.",
+      "checked": false
+    },
+    "app.addedSetTheAmountYou": {
+      "text": "Dodato. Postavi količinu koju zaista imaš.",
+      "checked": false
+    },
+    "app.identifyingProducts": {
+      "text": "Prepoznajem proizvode…",
+      "checked": false
+    },
+    "app.readingLabel": {
+      "text": "Čitam deklaraciju…",
+      "checked": false
+    },
+    "app.productsFoundReviewTheOnes": {
+      "text": "Proizvodi pronađeni. Pregledaj one sa pročitanim vrednostima, unesi ostale.",
+      "checked": false
+    },
+    "app.productsFoundEnterEachLabel": {
+      "text": "Proizvodi pronađeni. Unesi svaku deklaraciju, ili fotografiši njenu tabelu nutritivnih vrednosti.",
+      "checked": false
+    },
+    "app.scanFailedYourSavedFoods": {
+      "text": "Skeniranje nije uspelo. Tvoje sačuvane namirnice i obrok su nepromenjeni.",
+      "checked": false
+    },
+    "app.backToChefMealanS": {
+      "text": "Nazad na deklaraciju od Chef Mealana.",
+      "checked": false
+    },
+    "app.keptForLaterItS": {
+      "text": "Sačuvano za kasnije. Na Danas je.",
+      "checked": false
+    },
+    "app.notedNotCounted": {
+      "text": "Zabeleženo, ne računa se.",
+      "checked": false
+    },
+    "app.logged": {
+      "text": "Upisano.",
+      "checked": false
+    },
+    "app.droppedForToday": {
+      "text": "Izostavljeno za danas.",
+      "checked": false
+    },
+    "app.removedFromFavourites": {
+      "text": "Uklonjeno iz omiljenih.",
+      "checked": false
+    },
+    "app.addedToFavouritesItShows": {
+      "text": "Dodato u omiljene: prikazuje se prvo na tanjiru.",
+      "checked": false
+    },
+    "app.readingYourPlate": {
+      "text": "Čitam tvoj tanjir…",
+      "checked": false
+    },
+    "app.theReadDidnTWork": {
+      "text": "Čitanje nije uspelo. Pokušaj ponovo.",
+      "checked": false
+    },
+    "app.thatDidnTWorkTry": {
+      "text": "To nije uspelo. Pokušaj ponovo.",
+      "checked": false
+    },
+    "app.halfLoggedTheOtherHalf": {
+      "text": "Pola upisano. Druga polovina je na Danas.",
+      "checked": false
+    },
+    "app.loggedItSOnToday": {
+      "text": "Upisano. Na Danas je.",
+      "checked": false
+    },
+    "app.anIdeaFromAPhoto": {
+      "text": "Ideja sa fotografije, u tvom planu i u Mojim.",
+      "checked": false
+    },
+    "app.anIdeaFromAPhoto2": {
+      "text": "Ideja sa fotografije. Čeka na vrhu Mojih dok je ne napraviš.",
+      "checked": false
+    },
+    "app.fromYourCoach": {
+      "text": "Od tvog trenera",
+      "checked": false
+    },
+    "app.onYourPlateFitTo": {
+      "text": "Na tvom tanjiru. Uklopi u moj cilj postavlja količine.",
+      "checked": false
+    },
+    "app.keptInYourRecipes": {
+      "text": "Sačuvano u tvojim receptima.",
+      "checked": false
+    },
+    "app.approved": {
+      "text": "Odobreno.",
+      "checked": false
+    },
+    "app.sentWithYourNote": {
+      "text": "Poslato sa tvojom beleškom.",
+      "checked": false
+    },
+    "app.chefMealanSChatIs": {
+      "text": "Čet sa Chef Mealanom je uključen za ovog klijenta.",
+      "checked": false
+    },
+    "app.chefMealanSChatIs2": {
+      "text": "Čet sa Chef Mealanom je isključen za ovog klijenta.",
+      "checked": false
+    },
+    "app.theDeleteDidnTAnswer": {
+      "text": "Brisanje nije odgovorilo. Prijavi se ponovo: ako su tvoji podaci još tu, ponovo dodirni Obriši moj nalog.",
+      "checked": false
+    },
+    "app.yourDataIsDeleted": {
+      "text": "Tvoji podaci su obrisani.",
+      "checked": false
+    },
+    "app.nothingWasDeletedTryAgain": {
+      "text": "Ništa nije obrisano. Pokušaj ponovo kasnije.",
+      "checked": false
+    },
+    "app.yourGoal": {
+      "text": "Tvoj cilj",
+      "checked": false
+    },
+    "coach.everythingAClientSentOr": {
+      "text": "Sve što je klijent poslao ili pitao, najnovije prvo. Dodirni jedno da odgovoriš; nestaje sa liste kad odgovoriš. Broj na Klijentima broji ovu listu.",
+      "checked": false
+    },
+    "coach.toApprove": {
+      "text": "Za odobrenje",
+      "checked": false
+    },
+    "coach.noClientsYetShareThe": {
+      "text": "Još nema klijenata. Podeli kod.",
+      "checked": false
+    },
+    "coach.codesAndSignUps": {
+      "text": "Kodovi i prijave",
+      "checked": false
+    },
+    "coach.cook": {
+      "text": "Kuvar",
+      "checked": false
+    },
+    "coach.canSendYouRecipesTo": {
+      "text": "Može da ti šalje recepte za objavu. Svaki prvo vidiš ti.",
+      "checked": false
+    },
+    "coach.safety": {
+      "text": "Bezbednost",
+      "checked": false
+    },
+    "coach.confirmChefMealanSChat": {
+      "text": "Potvrdi čet sa Chef Mealanom",
+      "checked": false
+    },
+    "coach.formula": {
+      "text": "Formula",
+      "checked": false
+    },
+    "coach.nothingYet": {
+      "text": "Još ništa.",
+      "checked": false
+    },
+    "coach.cancel": {
+      "text": "Otkaži",
+      "checked": false
+    },
+    "coach.to": {
+      "text": "Kome",
+      "checked": false
+    },
+    "coach.noClientsYet": {
+      "text": "Još nema klijenata.",
+      "checked": false
+    },
+    "coach.send": {
+      "text": "Pošalji",
+      "checked": false
+    },
+    "coach.invite": {
+      "text": "Pozovi",
+      "checked": false
+    },
+    "coach.markAsHandled": {
+      "text": "Označi kao rešeno",
+      "checked": false
+    },
+    "coach.remove": {
+      "text": "Ukloni",
+      "checked": false
+    },
+    "coach.inviteAClient": {
+      "text": "Pozovi klijenta",
+      "checked": false
+    },
+    "coach.aPersonalCodeOneEmail": {
+      "text": "Lični kod: jedan imejl, jednom, važi 30 dana.",
+      "checked": false
+    },
+    "coach.createInvite": {
+      "text": "Napravi pozivnicu",
+      "checked": false
+    },
+    "coach.sendByEmail": {
+      "text": "Pošalji imejlom",
+      "checked": false
+    },
+    "coach.copy": {
+      "text": "Kopiraj",
+      "checked": false
+    },
+    "coach.invites": {
+      "text": "Pozivnice",
+      "checked": false
+    },
+    "coach.resend": {
+      "text": "pošalji ponovo",
+      "checked": false
+    },
+    "coach.revoke": {
+      "text": "povuci",
+      "checked": false
+    },
+    "coach.askToChange": {
+      "text": "Traži izmenu",
+      "checked": false
+    },
+    "coach.approve": {
+      "text": "Odobri",
+      "checked": false
+    },
+    "coach.recipesWaitingForYou": {
+      "text": "Recepti koji te čekaju",
+      "checked": false
+    },
+    "coach.seeThePage": {
+      "text": "Pogledaj stranicu",
+      "checked": false
+    },
+    "coach.makeItLive": {
+      "text": "Objavi",
+      "checked": false
+    },
+    "coach.makeItLiveWorksAfter": {
+      "text": "Objavi radi posle Pogledaj stranicu, da uvek prvo pogledaš.",
+      "checked": false
+    },
+    "coach.sendBack": {
+      "text": "Vrati",
+      "checked": false
+    },
+    "coach.sendBackWithANote": {
+      "text": "Vrati sa beleškom",
+      "checked": false
+    },
+    "coach.back": {
+      "text": "Nazad",
+      "checked": false
+    },
+    "coach.betaSpotsLeft": {
+      "text": "Preostala beta mesta",
+      "checked": false
+    },
+    "coach.donTShowANumber": {
+      "text": "Ne prikazuj broj",
+      "checked": false
+    },
+    "coach.waitingForYou": {
+      "text": "Čeka te",
+      "checked": false
+    },
+    "coach.aLineToGoWith": {
+      "text": "Red uz to, ako želiš",
+      "checked": false
+    },
+    "coach.refresh": {
+      "text": "Osveži",
+      "checked": false
+    },
+    "coach.name": {
+      "text": "Ime",
+      "checked": false
+    },
+    "coach.emailTheySignInWith": {
+      "text": "Imejl kojim se prijavljuje",
+      "checked": false
+    },
+    "coach.addGOfCarbsOn": {
+      "text": "Dodaj 60 g ugljenih hidrata u teške dane, pirinač ili ovas posle treninga.",
+      "checked": false
+    },
+    "coach.thePhotoIsTooDark": {
+      "text": "Fotografija je pretamna. Probaj na dnevnom svetlu.",
+      "checked": false
+    },
+    "coach.yourNote": {
+      "text": "Tvoja beleška",
+      "checked": false
+    },
+    "coach.oneSpotLess": {
+      "text": "Jedno mesto manje",
+      "checked": false
+    },
+    "coach.oneSpotMore": {
+      "text": "Jedno mesto više",
+      "checked": false
+    },
+    "coach.couldNotLoadClients": {
+      "text": "Klijenti nisu mogli da se učitaju.",
+      "checked": false
+    },
+    "coach.thatDidnTWorkTry": {
+      "text": "To nije uspelo. Pokušaj ponovo.",
+      "checked": false
+    },
+    "coach.theSuggestionDidnTSend": {
+      "text": "Predlog nije poslat. Pokušaj ponovo.",
+      "checked": false
+    },
+    "coach.mifflinStJeor": {
+      "text": "Mifflin–St Jeor",
+      "checked": false
+    },
+    "coach.couldNotSetTheFormula": {
+      "text": "Formula nije mogla da se postavi.",
+      "checked": false
+    },
+    "coach.couldNotSend": {
+      "text": "Nije moglo da se pošalje.",
+      "checked": false
+    },
+    "coach.couldnTCreateTheInvite": {
+      "text": "Pozivnica nije mogla da se napravi.",
+      "checked": false
+    },
+    "out.undo": {
+      "text": "Vrati",
+      "checked": false
+    },
+    "out.askedAgain": {
+      "text": "Ponovo pitano",
+      "checked": false
+    },
+    "out.askAgain": {
+      "text": "Pitaj ponovo",
+      "checked": false
+    },
+    "out.swap": {
+      "text": "Zameni",
+      "checked": false
+    },
+    "out.moveIt": {
+      "text": "Premesti",
+      "checked": false
+    },
+    "out.change": {
+      "text": "Promeni",
+      "checked": false
+    },
+    "out.backToThePlan": {
+      "text": "Nazad na plan",
+      "checked": false
+    },
+    "out.putThemInThePlan": {
+      "text": "Stavi ih u plan",
+      "checked": false
+    },
+    "out.takeItOut": {
+      "text": "Izbaci",
+      "checked": false
+    },
+    "out.notInYourFoods": {
+      "text": "nije u tvojim namirnicama",
+      "checked": false
+    },
+    "out.scanIt": {
+      "text": "Skeniraj",
+      "checked": false
+    },
+    "out.backToThePlate": {
+      "text": "Nazad na tanjir",
+      "checked": false
+    },
+    "out.thisIsWhatIHad": {
+      "text": "Ovo sam imao|Ovo sam imala",
+      "checked": false
+    },
+    "out.photoAttached": {
+      "text": "Fotografija priložena.",
+      "checked": false
+    },
+    "out.remove": {
+      "text": "Ukloni",
+      "checked": false
+    },
+    "out.addAPhoto": {
+      "text": "Dodaj fotografiju",
+      "checked": false
+    },
+    "out.clearTheQuestion": {
+      "text": "Obriši pitanje",
+      "checked": false
+    },
+    "out.orAskInYourWords": {
+      "text": "Ili pitaj svojim rečima",
+      "checked": false
+    },
+    "out.send": {
+      "text": "Pošalji",
+      "checked": false
+    },
+    "out.nothingPlannedForTodayYet": {
+      "text": "Za danas još ništa nije planirano.",
+      "checked": false
+    },
+    "out.thePlateIsEmpty": {
+      "text": "Tanjir je prazan.",
+      "checked": false
+    },
+    "out.outMissingSomethingOrAfter": {
+      "text": "Napolju si, nešto ti fali, ili tražiš ideju.",
+      "checked": false
+    },
+    "out.makeItAVegetarianDay": {
+      "text": "Neka bude vegetarijanski dan",
+      "checked": false
+    },
+    "out.lunchFromWhatIHave": {
+      "text": "Ručak od onoga što imam kod kuće",
+      "checked": false
+    },
+    "out.somethingQuickForDinner": {
+      "text": "Nešto brzo za večeru",
+      "checked": false
+    },
+    "out.whatIsPlannedToday": {
+      "text": "Šta je planirano danas?",
+      "checked": false
+    },
+    "out.whatSLeftToday": {
+      "text": "Šta je ostalo za danas?",
+      "checked": false
+    },
+    "out.makeMyPlateASnack": {
+      "text": "Napravi od mog tanjira užinu",
+      "checked": false
+    },
+    "out.whatGoesWithThis": {
+      "text": "Šta ide uz ovo?",
+      "checked": false
+    },
+    "out.betterMatchForMyTarget": {
+      "text": "Bolje za moj cilj?",
+      "checked": false
+    },
+    "out.hotelBreakfastBuffet": {
+      "text": "Hotelski švedski sto za doručak",
+      "checked": false
+    },
+    "out.planFoodForATrip": {
+      "text": "Isplaniraj hranu za put",
+      "checked": false
+    },
+    "out.italianTonightIWantDessert": {
+      "text": "Večeras italijanski, hoću i desert",
+      "checked": false
+    },
+    "out.everySlotIsSetAlready": {
+      "text": "Svi termini su već postavljeni.",
+      "checked": false
+    },
+    "out.oneOfChefMealanS": {
+      "text": "Jedno od osnovnih jela Chef Mealana.",
+      "checked": false
+    },
+    "out.fromYourRecipes": {
+      "text": "Iz tvojih recepata.",
+      "checked": false
+    },
+    "out.chefMealanCouldNotAnswer": {
+      "text": "Chef Mealan nije mogao da odgovori.",
+      "checked": false
+    },
+    "out.matchingTheFoodsHeNames": {
+      "text": "Povezujem namirnice koje navodi sa tvojima",
+      "checked": false
+    },
+    "out.sayIt": {
+      "text": "Reci",
+      "checked": false
+    },
+    "out.slotAsBefore": {
+      "text": "Termin je kao pre.",
+      "checked": false
+    },
+    "out.slotsAsBefore": {
+      "text": "Termini su kao pre.",
+      "checked": false
+    },
+    "out.slotsSetFor": {
+      "text": "{n} termin je postavljen: {day}.|{n} termina su postavljena: {day}.|{n} termina je postavljeno: {day}.",
+      "checked": false
+    },
+    "clientweek.plannedAgainstEaten": {
+      "text": "Planirano naspram pojedenog",
+      "checked": false
+    },
+    "clientweek.close": {
+      "text": "Zatvori",
+      "checked": false
+    },
+    "clientweek.pdThatDay": {
+      "text": "PD tog dana",
+      "checked": false
+    },
+    "clientweek.weighIns": {
+      "text": "Merenja",
+      "checked": false
+    },
+    "clientweek.noWeighInsThisWeek": {
+      "text": "Nema merenja ove nedelje",
+      "checked": false
+    },
+    "clientweek.daamGoodThisWeek": {
+      "text": "DaaM dobro ove nedelje",
+      "checked": false
+    },
+    "clientweek.approveTheWeek": {
+      "text": "Odobri nedelju",
+      "checked": false
+    },
+    "clientweek.changeTheNumbers": {
+      "text": "Promeni brojeve",
+      "checked": false
+    },
+    "clientweek.sendTheNote": {
+      "text": "Pošalji belešku",
+      "checked": false
+    },
+    "clientweek.checkInDay": {
+      "text": "Dan provere",
+      "checked": false
+    },
+    "clientweek.notes": {
+      "text": "Beleške",
+      "checked": false
+    },
+    "clientweek.applyFrom": {
+      "text": "Primeni od",
+      "checked": false
+    },
+    "clientweek.pickADate": {
+      "text": "Izaberi datum",
+      "checked": false
+    },
+    "clientweek.thisWeekABarA": {
+      "text": "Ova nedelja, stubac po danu",
+      "checked": false
+    },
+    "clientweek.weekBefore": {
+      "text": "Nedelja pre",
+      "checked": false
+    },
+    "clientweek.weekAfter": {
+      "text": "Nedelja posle",
+      "checked": false
+    },
+    "clientweek.yourNote": {
+      "text": "Tvoja beleška",
+      "checked": false
+    },
+    "clientweek.pace": {
+      "text": "Tempo",
+      "checked": false
+    },
+    "clientweek.startDate": {
+      "text": "Datum početka",
+      "checked": false
+    },
+    "clientweek.noGoalYet": {
+      "text": "Još nema cilja",
+      "checked": false
+    },
+    "clientweek.theNoteDidnTSend": {
+      "text": "Beleška nije poslata. Pokušaj ponovo.",
+      "checked": false
+    },
+    "clientweek.theGoalDidnTSave": {
+      "text": "Cilj nije sačuvan. Pokušaj ponovo.",
+      "checked": false
+    },
+    "clientweek.nothingPlannedOrEaten": {
+      "text": "Ništa planirano ni pojedeno",
+      "checked": false
+    },
+    "clientweek.notEnoughWeighInsYet": {
+      "text": "Još nema dovoljno merenja za trend.",
+      "checked": false
+    },
+    "clientweek.askedToChangeTheNumbers": {
+      "text": "Zatražena promena brojeva",
+      "checked": false
+    },
+    "clientweek.approvedTheWeek": {
+      "text": "Nedelja odobrena",
+      "checked": false
+    },
+    "client.myDay": {
+      "text": "Moj dan",
+      "checked": false
+    },
+    "client.myClients": {
+      "text": "Moji klijenti",
+      "checked": false
+    },
+    "client.pickAClientOnClients": {
+      "text": "Izaberi klijenta na Klijentima",
+      "checked": false
+    },
+    "client.thenTodayPlanAndRecipes": {
+      "text": "Zatim Danas, Plan i Recepti prikazuju podatke tog klijenta, samo za čitanje, kako ih klijent vidi.",
+      "checked": false
+    },
+    "client.openClients": {
+      "text": "Otvori Klijente ›",
+      "checked": false
+    },
+    "client.yesterdayTodayAndTheDays": {
+      "text": "Juče, danas i dani nadalje",
+      "checked": false
+    },
+    "client.sharedWithYou": {
+      "text": "Podeljeno sa tobom",
+      "checked": false
+    },
+    "client.suggest": {
+      "text": "Predloži",
+      "checked": false
+    },
+    "client.aPlannedSnack": {
+      "text": "Planirana užina",
+      "checked": false
+    },
+    "client.suggestTheSnack": {
+      "text": "Predloži užinu",
+      "checked": false
+    },
+    "client.aPageFromExplorer": {
+      "text": "Stranica iz Explorera",
+      "checked": false
+    },
+    "client.pickAPage": {
+      "text": "Izaberi stranicu",
+      "checked": false
+    },
+    "client.suggestThePage": {
+      "text": "Predloži stranicu",
+      "checked": false
+    },
+    "client.suggested": {
+      "text": "Predloženo",
+      "checked": false
+    },
+    "client.whichView": {
+      "text": "Koji prikaz",
+      "checked": false
+    },
+    "client.noClientChosen": {
+      "text": "Klijent nije izabran",
+      "checked": false
+    },
+    "client.theSnack": {
+      "text": "Užina",
+      "checked": false
+    },
+    "client.skyrAndAFruit": {
+      "text": "Skyr i voće",
+      "checked": false
+    },
+    "client.atWhatTime": {
+      "text": "U koliko sati",
+      "checked": false
+    },
+    "client.whichPage": {
+      "text": "Koja stranica",
+      "checked": false
+    },
+    "client.theSuggestionDidnTSend": {
+      "text": "Predlog nije poslat. Pokušaj ponovo.",
+      "checked": false
+    },
+    "client.nothingPlannedOrEaten": {
+      "text": "Ništa planirano ni pojedeno",
+      "checked": false
+    },
+    "client.nothingPlanned": {
+      "text": "Ništa planirano",
+      "checked": false
+    },
+    "clients.clientsAreForCoachAccounts": {
+      "text": "Klijenti su za naloge trenera.",
+      "checked": false
+    },
+    "share.shareTheLink": {
+      "text": "Podeli link",
+      "checked": false
+    },
+    "share.copy": {
+      "text": "Kopiraj",
+      "checked": false
+    },
+    "share.turnYourScreenBrightnessUp": {
+      "text": "Pojačaj osvetljenje ekrana, i kod se skenira sa dužine ruke.",
+      "checked": false
+    },
+    "share.makeAnother": {
+      "text": "Napravi još jedan",
+      "checked": false
+    },
+    "share.youFindItInClients": {
+      "text": "Naći ćeš ga u Klijentima, pod Pozovi klijenta, gde možeš i da ga povučeš.",
+      "checked": false
+    },
+    "share.inviteSomeoneNow": {
+      "text": "Pozovi nekog sada",
+      "checked": false
+    },
+    "share.aPersonalCodeForOne": {
+      "text": "Lični kod za jedan Google imejl: jednom, važi 30 dana. Pokažeš ga kao QR kod; osoba ga skenira, prijavi se preko Googlea i pridruži se. Svaki napravljeni kod smanjuje Preostala beta mesta za jedno.",
+      "checked": false
+    },
+    "share.makeACode": {
+      "text": "Napravi kod",
+      "checked": false
+    },
+    "share.whatToShare": {
+      "text": "Šta deliš",
+      "checked": false
+    },
+    "share.whereTheCodeOpens": {
+      "text": "Gde kod vodi",
+      "checked": false
+    },
+    "share.name": {
+      "text": "Ime",
+      "checked": false
+    },
+    "share.nameOptional": {
+      "text": "Ime (nije obavezno)",
+      "checked": false
+    },
+    "share.theirGoogleEmail": {
+      "text": "Njihov Google imejl",
+      "checked": false
+    },
+    "share.showTheLink": {
+      "text": "Prikaži link",
+      "checked": false
+    },
+    "share.inviteNow": {
+      "text": "Pozovi sada",
+      "checked": false
+    },
+    "share.chefMealan": {
+      "text": "Chef Mealan",
+      "checked": false
+    },
+    "share.couldnTMakeTheCode": {
+      "text": "Kod nije mogao da se napravi.",
+      "checked": false
+    },
+    "cardanswer.sendTheAnswer": {
+      "text": "Pošalji odgovor",
+      "checked": false
+    },
+    "cardanswer.cancel": {
+      "text": "Otkaži",
+      "checked": false
+    },
+    "cardanswer.seen": {
+      "text": "Viđeno",
+      "checked": false
+    },
+    "cardanswer.answer": {
+      "text": "Odgovori",
+      "checked": false
+    },
+    "cardanswer.oneLineAboutThisMeal": {
+      "text": "Jedan red o ovom obroku",
+      "checked": false
+    },
+    "cardanswer.thatDidnTSendTry": {
+      "text": "Nije poslato. Pokušaj ponovo.",
+      "checked": false
+    },
+    "cardanswer.answerAgain": {
+      "text": "Odgovori ponovo",
+      "checked": false
+    },
+    "chef.yourTarget": {
+      "text": "tvoj cilj",
+      "checked": false
+    },
+    "chef.gProteinPerKcal": {
+      "text": "g proteina na 100 kcal",
+      "checked": false
+    },
+    "chef.theChefNeedsAMeal": {
+      "text": "Chefu prvo treba obrok. Dodaj namirnice, zaključaj ono što želiš da zadržiš, pa se vrati.",
+      "checked": false
+    },
+    "chef.goToMeal": {
+      "text": "Idi na Obrok",
+      "checked": false
+    },
+    "chef.target": {
+      "text": "Cilj",
+      "checked": false
+    },
+    "chef.ingredientTheChefMayChange": {
+      "text": "Sastojak koji Chef može da promeni",
+      "checked": false
+    },
+    "chef.chooseAnUnlockedFood": {
+      "text": "Izaberi otključanu namirnicu",
+      "checked": false
+    },
+    "chef.maxG": {
+      "text": "najviše g",
+      "checked": false
+    },
+    "chef.minProteinG": {
+      "text": "najmanje proteina, g",
+      "checked": false
+    },
+    "chef.maxKcal": {
+      "text": "najviše kcal",
+      "checked": false
+    },
+    "chef.use": {
+      "text": "Koristi",
+      "checked": false
+    },
+    "chef.rankByMyTasteNotes": {
+      "text": "Rangiraj po mojim beleškama o ukusu",
+      "checked": false
+    },
+    "pilot.iHaveACode": {
+      "text": "Imam kod",
+      "checked": false
+    },
+    "pilot.join": {
+      "text": "Pridruži se",
+      "checked": false
+    },
+    "pilot.iNeedACode": {
+      "text": "Treba mi kod",
+      "checked": false
+    },
+    "pilot.leaveALineAndMilan": {
+      "text": "Ostavi poruku i Milan će ti se javiti.",
+      "checked": false
+    },
+    "pilot.signOut": {
+      "text": "Odjavi se",
+      "checked": false
+    },
+    "pilot.coachCode": {
+      "text": "Kod trenera",
+      "checked": false
+    },
+    "signin.signInOnceAndYour": {
+      "text": "Prijavi se jednom, i tvoj cilj, namirnice i obroci te prate na bilo koji telefon.",
+      "checked": false
+    },
+    "signin.continueWithGoogle": {
+      "text": "Nastavi preko Googlea",
+      "checked": false
+    },
+    "signin.whatSStoredYourGoal": {
+      "text": "Šta se čuva: tvoj cilj, tvoje namirnice, tvoji obroci i ono što si rekao treneru. U EU, samo na tvom nalogu. Obriši bilo kada u Ja.|Šta se čuva: tvoj cilj, tvoje namirnice, tvoji obroci i ono što si rekla treneru. U EU, samo na tvom nalogu. Obriši bilo kada u Ja.",
+      "checked": false
+    },
+    "signin.signInFailed": {
+      "text": "Prijava nije uspela.",
+      "checked": false
+    },
+    "recipebar.sort": {
+      "text": "Poređaj",
+      "checked": false
+    },
+    "recipebar.clearAll": {
+      "text": "Obriši sve",
+      "checked": false
+    },
+    "recipebar.findARecipe": {
+      "text": "Nađi recept",
+      "checked": false
+    },
+    "recipebar.clearTheSearch": {
+      "text": "Obriši pretragu",
+      "checked": false
+    },
+    "recipebar.searchRecipes": {
+      "text": "Pretraži recepte",
+      "checked": false
+    },
+    "recipebar.searchRecipesTheFoodsIn": {
+      "text": "Pretraži recepte, namirnice u njima, ko ih je napravio",
+      "checked": false
+    },
+    "recipebar.filters": {
+      "text": "Filteri",
+      "checked": false
+    },
+    "recipebar.madeBy": {
+      "text": "Napravio",
+      "checked": false
+    },
+    "recipebar.fitsMyDay": {
+      "text": "Uklapa se u moj dan",
+      "checked": false
+    },
+    "recipebar.noCooking": {
+      "text": "Bez kuvanja",
+      "checked": false
+    },
+    "recipebar.withMyFoods": {
+      "text": "Sa mojim namirnicama",
+      "checked": false
+    },
+    "recipebar.allKitchens": {
+      "text": "Sve kuhinje",
+      "checked": false
+    },
+    "recipebar.anyMoment": {
+      "text": "Bilo kad",
+      "checked": false
+    },
+    "steps.tapAFoodToPut": {
+      "text": "Dodirni namirnicu da je staviš u korak, sa količinom",
+      "checked": false
+    },
+    "steps.whiskTheEggsWithThe": {
+      "text": "Umuti jaja sa mlekom.",
+      "checked": false
+    },
+    "langpanel.theLanguageChefMealanSpeaks": {
+      "text": "Jezik kojim ti Chef Mealan govori. Ekrani slede, deo po deo.",
+      "checked": false
+    },
+    "langpanel.deutsch": {
+      "text": "Deutsch",
+      "checked": false
+    },
+    "langpanel.afterSerbianOnceAGerman": {
+      "text": "Posle srpskog, kad ga proveri neko ko govori nemački",
+      "checked": false
+    },
+    "langpanel.comingSoon": {
+      "text": "Uskoro",
+      "checked": false
+    },
+    "langpanel.thePrivacyNoticeAndThe": {
+      "text": "Obaveštenje o privatnosti i odricanje odgovornosti ostaju na engleskom. Nazivi namirnica već dolaze na srpskom gde je region prodavnica Srbija.",
+      "checked": false
+    },
+    "langpanel.language": {
+      "text": "Jezik",
+      "checked": false
+    },
+    "langpanel.everythingInEnglish": {
+      "text": "Sve na engleskom",
+      "checked": false
+    },
+    "langpanel.srpskiLatinica": {
+      "text": "Srpski (latinica)",
+      "checked": false
+    },
+    "langpanel.chefMealanHisQuestionsHis": {
+      "text": "Chef Mealan: njegova pitanja, njegovi odgovori, bezbednosni redovi i reči kuvanja. Ekrani za sada ostaju na engleskom.",
+      "checked": false
+    },
+    "carry.howItCarriesYou": {
+      "text": "Kako te nosi",
+      "checked": false
+    },
+    "carry.heavyForYou": {
+      "text": "Teško za tebe",
+      "checked": false
+    },
+    "carry.lightForYou": {
+      "text": "Lagano za tebe",
+      "checked": false
+    },
+    "safetynote.answerItNow": {
+      "text": "Odgovori sada",
+      "checked": false
+    },
+    "safetynote.chefMealanAsAChef": {
+      "text": "Chef Mealan, samo kao kuvar.",
+      "checked": false
     }
   }
 }
