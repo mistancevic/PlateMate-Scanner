@@ -82,8 +82,8 @@ export const bandRange = (b: PdBand, t: number) => {
 };
 
 // The line under the chips: one line, the band's range for this target. Pairing is Mix it's job, not the chip's.
-export const BAND_LINE_IDLE = "Tap one to see which PD it covers.";
+export const bandLineIdle = () => w("goal.bandIdle");
 export function bandHint(b: PdBand, t: number | null): string {
-  if (!t) return BAND_LINE_IDLE;
+  if (!t) return bandLineIdle();
   return `${BAND_LABEL[b]}: PD ${bandRange(b, t)} · your target ${dec(t, 1)}`;
 }

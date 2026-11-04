@@ -1,4 +1,5 @@
 import { numLocale, w } from "../words";
+import { optWord } from "../optWords";
 import { Settings , Coffee } from "lucide-react";
 import { SetupRow } from "../components/SetupRow";
 import { setupMissing, stepMissing, type SetupStep } from "../setup";
@@ -22,9 +23,9 @@ import { placeName } from "../travel";
 
 // Me is the person's place: who I am and how I'm set up. Each row opens its panel; back comes here.
 const ME_ROWS: { id: MenuSection; name: string; icon: ReactNode; hint: (p: AppApi) => string }[] = [
-  { id: "profile", name: "Profile", icon: <User size={18} />, hint: (p) => (p.safety.declaredAt ? w("me.yourBodyDataAndThe") : w("me.yourBodyDataAndA")) },
-  { id: "goal", name: "Goal", icon: <Target size={18} />, hint: (p) => (p.state.goals.calories ? `${Math.round(p.state.goals.calories).toLocaleString(numLocale())} kcal on an average day, ${p.state.goals.protein ?? "?"} g protein every day` : w("me.calculateItOrSetIt")) },
-  { id: "life", name: "Lifestyle", icon: <Coffee size={18} />, hint: (p) => lifeHint(p) },
+  { id: "profile", get name() { return w("me.rowProfile"); }, icon: <User size={18} />, hint: (p) => (p.safety.declaredAt ? w("me.yourBodyDataAndThe") : w("me.yourBodyDataAndA")) },
+  { id: "goal", get name() { return w("me2.goal"); }, icon: <Target size={18} />, hint: (p) => (p.state.goals.calories ? w("me.goalHint", { kcal: Math.round(p.state.goals.calories).toLocaleString(numLocale()), protein: p.state.goals.protein ?? "?" }) : w("me.calculateItOrSetIt")) },
+  { id: "life", get name() { return w("me2.lifestyle"); }, icon: <Coffee size={18} />, hint: (p) => lifeHint(p) },
   { id: "week", get name() { return w("me.trainingWeek"); }, icon: <CalendarDays size={18} />, hint: (p) => planHint(p) },
   // DT178 (0.3.21, board Stories126): Google Calendar, under Training week
   { id: "calendar", get name() { return w("me.googleCalendar"); }, icon: <CalendarClock size={18} />, hint: (p) => (p.personal.calendar?.on ? w("me.onYourPlanInThe") : w("me.offYourMealsCookingAnd")) },
@@ -33,7 +34,7 @@ const ME_ROWS: { id: MenuSection; name: string; icon: ReactNode; hint: (p: AppAp
   { id: "summary", get name() { return w("me.yourSummary"); }, icon: <ClipboardList size={18} />, hint: (p) => (p.profile.coachId ? w("me.summaryHintCoach", { coach: p.coachLabel }) : w("me.everythingYouToldChefMealan")) },
   // DT209 (0.3.50, board Stories156): My coach is its own row under Your summary, not a setup step; a coach account has none
   { id: "coach", get name() { return w("me.myCoach"); }, icon: <Users size={18} />, hint: (p) => (p.profile.coachId ? `${p.coachLabel} sees what you share` : w("me.joinWithACode")) },
-  { id: "account", name: "Account", icon: <KeyRound size={18} />, hint: () => w("me.accountHint") },
+  { id: "account", get name() { return w("me.rowAccount"); }, icon: <KeyRound size={18} />, hint: () => w("me.accountHint") },
 ];
 // the two speeds: Lifestyle changes when life does, the Training week when the activity does
 function lifeHint(p: AppApi): string {
@@ -66,7 +67,7 @@ export function MeScreen(p: AppApi) {
         <SetupRow p={p} done={w("me.fullySet")} />
         <div className="plan-row">
           {/* the three numbers of the same day, the average one (11 October 2026: the PD was today's, the kcal and protein the average's) */}
-          <div><b>{pdVal(density(state.goals.protein, state.goals.calories))}</b><small>{pdTag()}, average day</small></div>
+          <div><b>{pdVal(density(state.goals.protein, state.goals.calories))}</b><small>{w("me.pdAverageDay", { pd: pdTag() })}</small></div>
           <div><b>{fmt(state.goals.calories, 0)}</b><small>{w("me.kcalAverageDay")}</small></div>
           <div><b>{fmt(state.goals.protein, 0)}</b><small>{w("me.gProtein")}</small></div>
         </div>
@@ -108,7 +109,7 @@ export function TasteSetting(p: AppApi) {
             <p className="label">{title}</p>
             <div className="moments" role="group" aria-label={title}>
               {TASTE_CHIPS[g].map((c) => { const on = (p.personal.tasteChips?.[g] ?? []).includes(c); return (
-                <button key={c} type="button" className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, tasteChips: toggleChip(p.personal.tasteChips, g, c) })}>{c}</button>
+                <button key={c} type="button" className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, tasteChips: toggleChip(p.personal.tasteChips, g, c) })}>{optWord(c)}</button>
               ); })}
             </div>
           </div>

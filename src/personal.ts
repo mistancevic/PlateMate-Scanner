@@ -1,4 +1,5 @@
 // Who the person is, for calculating their numbers. Every field optional; stored on the phone and in their account only.
+import { w } from "./words";
 import { BANDS, ALL_BANDS, goalLabel, type Band, type TrainingAge } from "./goal";
 import { ymd, isPlanDay, PE, COMMUTE, isPlan, planFromCounts, lengthOf, levelMinutes, START_MIN, countsOf, metOf, minutesOf, lifestyleFromOld, baseFactor, moveOf, MOVES, weekdaysOf, dayKindOf, WEEKDAY_NAMES, planLine, planShort, loadOf, weekdayIndex, getTodayChange, setTodayChange, dayOfLoad, type Plan, type PlanDay, type Lifestyle } from "./plan";
 export type Sex = "female" | "male";
@@ -95,10 +96,10 @@ export function withTarget(p: Personal, day: string, t: DayTarget): Personal {
 // taken at the low end of each band because planned training is counted separately, per day.
 export const LIFE: { id: Life; name: string; hint: string; factor: number }[] = [
   // the body first, the job as the example (Milan, 10 October 2026)
-  { id: "desk",     name: "Mostly sitting",                      hint: "a desk job, 9 to 5",              factor: 1.3 },
-  { id: "shift",    name: "Standing and walking some of the day", hint: "shift work, reception, a lab",    factor: 1.4 },
-  { id: "feet",     name: "On my feet most of the day",          hint: "shop, care, teaching",            factor: 1.55 },
-  { id: "physical", name: "Hard physical work",                  hint: "building, farming, carrying",     factor: 1.75 },
+  { id: "desk", get name() { return w("opt.life.desk.name"); }, get hint() { return w("opt.life.desk.hint"); },              factor: 1.3 },
+  { id: "shift", get name() { return w("opt.life.shift.name"); }, get hint() { return w("opt.life.shift.hint"); },    factor: 1.4 },
+  { id: "feet", get name() { return w("opt.life.feet.name"); }, get hint() { return w("opt.life.feet.hint"); },            factor: 1.55 },
+  { id: "physical", get name() { return w("opt.life.physical.name"); }, get hint() { return w("opt.life.physical.hint"); },     factor: 1.75 },
 ];
 // The four days, all about training. METs from the Compendium of Physical Activities (2024): a walk or mobility about 3.5,
 // a session you could talk through about 5, a hard or heavy session about 8. Only the part above rest is added.
