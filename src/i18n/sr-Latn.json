@@ -1100,6 +1100,502 @@
     "measured.yourNumbersStayAsThey": {
       "text": "Tvoji brojevi ostaju kakvi jesu dok ne izabereš. Ova kartica se i dalje ažurira iz poslednjih 14 dana.",
       "checked": false
+    },
+    "plan.thisWeek": {
+      "text": "Ova nedelja",
+      "checked": false
+    },
+    "plan.backToTheUsualPortions": {
+      "text": "Nazad na uobičajene porcije",
+      "checked": false
+    },
+    "plan.noTime": {
+      "text": "Bez vremena",
+      "checked": false
+    },
+    "plan.set": {
+      "text": "postavljeno",
+      "checked": false
+    },
+    "plan.setATime": {
+      "text": "Postavi vreme",
+      "checked": false
+    },
+    "plan.pickAMeal": {
+      "text": "Izaberi obrok",
+      "checked": false
+    },
+    "plan.skippedOnPurpose": {
+      "text": "Namerno preskočeno",
+      "checked": false
+    },
+    "plan.fitItOnThePlate": {
+      "text": "Uklopi ga na Tanjiru",
+      "checked": false
+    },
+    "plan.slotsAndTimes": {
+      "text": "Obroci i vremena ›",
+      "checked": false
+    },
+    "plan.trainingWeek": {
+      "text": "Nedelja treninga ›",
+      "checked": false
+    },
+    "plan.close": {
+      "text": "Zatvori",
+      "checked": false
+    },
+    "plan.thisDateOnlyYourTraining": {
+      "text": "Samo ovaj datum. Tvoja nedelja treninga ostaje ista.",
+      "checked": false
+    },
+    "plan.saveForThisDate": {
+      "text": "Sačuvaj za ovaj datum",
+      "checked": false
+    },
+    "plan.pdThatDay": {
+      "text": "PD tog dana",
+      "checked": false
+    },
+    "plan.whatYouAte": {
+      "text": "Pojedeno",
+      "checked": false
+    },
+    "plan.cookAgain": {
+      "text": "Skuvaj ponovo",
+      "checked": false
+    },
+    "plan.nothingWasLoggedOnThis": {
+      "text": "Tog dana ništa nije zapisano.",
+      "checked": false
+    },
+    "plan.skipped": {
+      "text": "Preskočeno",
+      "checked": false
+    },
+    "plan.undo": {
+      "text": "Poništi",
+      "checked": false
+    },
+    "plan.iAteIt": {
+      "text": "Pojeo sam|Pojela sam",
+      "checked": false
+    },
+    "plan.iAteSomethingElse": {
+      "text": "Pojeo sam nešto drugo|Pojela sam nešto drugo",
+      "checked": false
+    },
+    "plan.iSkippedIt": {
+      "text": "Preskočio sam|Preskočila sam",
+      "checked": false
+    },
+    "plan.nothingAdded": {
+      "text": "Ništa dodato",
+      "checked": false
+    },
+    "plan.addWhatYouAte": {
+      "text": "Dodaj pojedeno",
+      "checked": false
+    },
+    "plan.aDayBeforeTodayIs": {
+      "text": "Dan pre današnjeg je ono što si pojeo: računa se u vreme svog obroka. Ništa se ne pravi, ništa se ne ocenjuje.|Dan pre današnjeg je ono što si pojela: računa se u vreme svog obroka. Ništa se ne pravi, ništa se ne ocenjuje.",
+      "checked": false
+    },
+    "plan.notThisTime": {
+      "text": "Ne ovaj put",
+      "checked": false
+    },
+    "plan.tapAFoodOnceWhen": {
+      "text": "Dodirni namirnicu jednom kad je u korpi, dvaput za ne ovaj put.",
+      "checked": false
+    },
+    "plan.thePlanChangedSinceThis": {
+      "text": "Plan se promenio otkad je ovaj spisak napravljen",
+      "checked": false
+    },
+    "plan.updateTheList": {
+      "text": "Ažuriraj spisak",
+      "checked": false
+    },
+    "plan.changedFromThisList": {
+      "text": "Promenjeno u odnosu na ovaj spisak",
+      "checked": false
+    },
+    "plan.seeItInPlan": {
+      "text": "Pogledaj u Planu ›",
+      "checked": false
+    },
+    "plan.byFood": {
+      "text": "Po namirnici",
+      "checked": false
+    },
+    "plan.byMeal": {
+      "text": "Po obroku",
+      "checked": false
+    },
+    "plan.forTheseDays": {
+      "text": "Za ove dane",
+      "checked": false
+    },
+    "plan.copyTheList": {
+      "text": "Kopiraj spisak",
+      "checked": false
+    },
+    "plan.finishTheList": {
+      "text": "Završi spisak",
+      "checked": false
+    },
+    "plan.earlierLists": {
+      "text": "Raniji spiskovi",
+      "checked": false
+    },
+    "plan.newShoppingList": {
+      "text": "Nov spisak za kupovinu",
+      "checked": false
+    },
+    "plan.swap": {
+      "text": "Zameni",
+      "checked": false
+    },
+    "plan.saveInMyRecipes": {
+      "text": "Sačuvaj u Moje recepte",
+      "checked": false
+    },
+    "plan.makeItOnThePlate": {
+      "text": "Napravi ga na Tanjiru",
+      "checked": false
+    },
+    "plan.createANewMealOn": {
+      "text": "Napravi nov obrok na Tanjiru",
+      "checked": false
+    },
+    "plan.emptyThisSlot": {
+      "text": "Isprazni ovaj obrok",
+      "checked": false
+    },
+    "plan.cancel": {
+      "text": "Otkaži",
+      "checked": false
+    },
+    "plan.whereTo": {
+      "text": "Kuda",
+      "checked": false
+    },
+    "plan.from": {
+      "text": "Od",
+      "checked": false
+    },
+    "plan.to": {
+      "text": "Do",
+      "checked": false
+    },
+    "plan.saveTheTrip": {
+      "text": "Sačuvaj putovanje",
+      "checked": false
+    },
+    "plan.change": {
+      "text": "Promeni",
+      "checked": false
+    },
+    "plan.endIt": {
+      "text": "Završi",
+      "checked": false
+    },
+    "plan.weekBefore": {
+      "text": "Nedelju ranije",
+      "checked": false
+    },
+    "plan.weekAfter": {
+      "text": "Nedelju kasnije",
+      "checked": false
+    },
+    "plan.pickADay": {
+      "text": "Izaberi dan",
+      "checked": false
+    },
+    "plan.changeTheTrainingForThis": {
+      "text": "Promeni trening za ovaj datum",
+      "checked": false
+    },
+    "plan.shoppingLists": {
+      "text": "Spiskovi za kupovinu",
+      "checked": false
+    },
+    "plan.showTheList": {
+      "text": "Prikaži spisak",
+      "checked": false
+    },
+    "plan.days": {
+      "text": "Dani",
+      "checked": false
+    },
+    "plan.aTrip": {
+      "text": "Putovanje",
+      "checked": false
+    },
+    "plan.tripFrom": {
+      "text": "Putovanje od",
+      "checked": false
+    },
+    "plan.tripTo": {
+      "text": "Putovanje do",
+      "checked": false
+    },
+    "plan.yourTrip": {
+      "text": "Tvoje putovanje",
+      "checked": false
+    },
+    "plan.noNumbersYet": {
+      "text": "Još nema brojeva",
+      "checked": false
+    },
+    "plan.addASnackOrMake": {
+      "text": "Dodaj užinu, ili povećaj porcije.",
+      "checked": false
+    },
+    "plan.makeThePortionsSmallerOr": {
+      "text": "Smanji porcije, ili zameni obrok.",
+      "checked": false
+    },
+    "plan.changedForThisDate": {
+      "text": "Promenjeno za ovaj datum",
+      "checked": false
+    },
+    "plan.fromMyTrainingWeek": {
+      "text": "Iz moje nedelje treninga",
+      "checked": false
+    },
+    "plan.makeAShoppingList": {
+      "text": "Napravi spisak za kupovinu",
+      "checked": false
+    },
+    "plan.notAddedYet": {
+      "text": "Još nije dodato",
+      "checked": false
+    },
+    "plan.added": {
+      "text": "Dodato · ",
+      "checked": false
+    },
+    "plan.thisDayOnlyNoRecipe": {
+      "text": "Samo ovaj dan. Iza njega ne stoji recept.",
+      "checked": false
+    },
+    "plan.lightForYou": {
+      "text": "Lagano za tebe",
+      "checked": false
+    },
+    "plan.heavyForYou": {
+      "text": "Teško za tebe",
+      "checked": false
+    },
+    "plan.tapAMealToPut": {
+      "text": "Dodirni obrok da ga staviš na ovo mesto.",
+      "checked": false
+    },
+    "plan.onByYou": {
+      "text": "Uključeno, ti si uključio.|Uključeno, ti si uključila.",
+      "checked": false
+    },
+    "plan.offByYou": {
+      "text": "Isključeno, ti si isključio.|Isključeno, ti si isključila.",
+      "checked": false
+    },
+    "plan.todayDate": {
+      "text": "Danas, {date}",
+      "checked": false
+    },
+    "plan.date": {
+      "text": "{date}",
+      "checked": false
+    },
+    "plan.shopOpen": {
+      "text": "Spisak za kupovinu {n}, otvoren",
+      "checked": false
+    },
+    "plan.heldInSlot": {
+      "text": "Na ovom mestu je: {dish}. Dodirni drugi obrok da ga zameniš.",
+      "checked": false
+    },
+    "busy.busyInYourCalendar": {
+      "text": "Zauzet u tvom kalendaru",
+      "checked": false
+    },
+    "busy.cookItOnTheDay": {
+      "text": "Skuvaj ga tog dana",
+      "checked": false
+    },
+    "busy.fromYourCalendar": {
+      "text": "Iz tvog kalendara",
+      "checked": false
+    },
+    "shorthelp.useThis": {
+      "text": "Koristi ovo",
+      "checked": false
+    },
+    "shorthelp.swapAFood": {
+      "text": "Zameni namirnicu",
+      "checked": false
+    },
+    "shorthelp.anotherMeal": {
+      "text": "Drugi obrok",
+      "checked": false
+    },
+    "calendar.whichMeals": {
+      "text": "Koji obroci",
+      "checked": false
+    },
+    "calendar.everyMealSlot": {
+      "text": "Svaki obrok",
+      "checked": false
+    },
+    "calendar.onlyMealsIPlanned": {
+      "text": "Samo obroci koje sam isplanirao|Samo obroci koje sam isplanirala",
+      "checked": false
+    },
+    "calendar.aSlotWithAMeal": {
+      "text": "Obrok sa jelom u Planu ulazi; prazan obrok ostaje van. Isplaniraj obrok, i pojavi se za nekoliko sekundi.",
+      "checked": false
+    },
+    "calendar.chefMealanWritesYourPlan": {
+      "text": "Chef Mealan upisuje tvoj plan u svoj kalendar, pod imenom Chef Mealan, u tvom Google kalendaru. Nikad ne čita niti menja tvoje druge događaje.",
+      "checked": false
+    },
+    "calendar.on": {
+      "text": "Uključeno",
+      "checked": false
+    },
+    "calendar.whatGoesIn": {
+      "text": "Šta ulazi",
+      "checked": false
+    },
+    "calendar.eachKindIsOnOr": {
+      "text": "Svaka vrsta je uključena ili isključena. Promeni bilo kada.",
+      "checked": false
+    },
+    "calendar.theDishSName": {
+      "text": "Ime jela",
+      "checked": false
+    },
+    "calendar.whatAnEventSays": {
+      "text": "Šta događaj kaže",
+      "checked": false
+    },
+    "calendar.theNameTheTimeAnd": {
+      "text": "Ime, vreme, i link koji otvara taj dan u Planu. Nikad kcal, proteini, tvoj cilj ili bilo šta o tvom zdravlju. Kalendari se dele sa porodicom i kolegama, pa brojevi ostaju u aplikaciji.",
+      "checked": false
+    },
+    "calendar.signInWithGoogleFirst": {
+      "text": "Prvo se prijavi preko Google-a.",
+      "checked": false
+    },
+    "calendar.googleAsksYouOnceFor": {
+      "text": "Google te jednom pita za jedno pravo: da napravi Chef Mealan kalendar i upravlja događajima u njemu. Ništa drugo. Možeš ga povući u svom Google nalogu bilo kada.",
+      "checked": false
+    },
+    "calendar.turnOff": {
+      "text": "Isključi",
+      "checked": false
+    },
+    "calendar.chefMealanStopsWritingWhat": {
+      "text": "Chef Mealan prestaje da upisuje. Šta sa kalendarom?",
+      "checked": false
+    },
+    "calendar.removeTheChefMealanCalendar": {
+      "text": "Ukloni Chef Mealan kalendar",
+      "checked": false
+    },
+    "calendar.keepItAsItIs": {
+      "text": "Ostavi kako jeste",
+      "checked": false
+    },
+    "calendar.cancel": {
+      "text": "Otkaži",
+      "checked": false
+    },
+    "calendar.deletingYourAccountAlsoRemoves": {
+      "text": "Brisanje tvog naloga uklanja i Chef Mealan kalendar.",
+      "checked": false
+    },
+    "calendar.fromYourCalendarToThe": {
+      "text": "Iz tvog kalendara u aplikaciju",
+      "checked": false
+    },
+    "calendar.readWhenIMBusy": {
+      "text": "Čitaj kad sam zauzet|Čitaj kad sam zauzeta",
+      "checked": false
+    },
+    "calendar.busyAndFreeTimesOnly": {
+      "text": "Samo zauzeta i slobodna vremena. Nikad naslovi, ljudi ili mesta tvojih događaja.",
+      "checked": false
+    },
+    "calendar.withItPlanSuggestsA": {
+      "text": "Uz to, Plan predlaže: obrok pomeren van sastanka, brzu večeru posle kasnog dana, obrok za poneti na pun dan, i pita kad trening pada u zauzet blok. Predlaže; tvoja vremena se menjaju samo kad dodirneš.",
+      "checked": false
+    },
+    "calendar.aChefMealanMealYou": {
+      "text": "Chef Mealan obrok koji pomeriš u Google kalendaru, istog dana, i ovde dobija to vreme.",
+      "checked": false
+    },
+    "calendar.updateGoogleCalendar": {
+      "text": "Ažuriraj Google kalendar",
+      "checked": false
+    },
+    "calendar.shopOn": {
+      "text": "Kupovina dana",
+      "checked": false
+    },
+    "calendar.googleCalendarIsOn": {
+      "text": "Google kalendar je uključen",
+      "checked": false
+    },
+    "calendar.googleCalendar": {
+      "text": "Google kalendar",
+      "checked": false
+    },
+    "calendar.goalCheckIn": {
+      "text": "Provera cilja",
+      "checked": false
+    },
+    "calendar.breakfastLunchDinnerAtYour": {
+      "text": "Doručak, ručak, večera u tvoja vremena",
+      "checked": false
+    },
+    "calendar.cookDinnerMinutesBeforeWhen": {
+      "text": "Kuvaj večeru, 30 minuta pre, kad isplanirani obrok ima korake",
+      "checked": false
+    },
+    "calendar.yourTrainingDaysAtTheir": {
+      "text": "Tvoji dani treninga, u njihovo vreme",
+      "checked": false
+    },
+    "calendar.weighInBeforeBreakfast": {
+      "text": "Merenje, pre doručka",
+      "checked": false
+    },
+    "calendar.goalCheckInEveryWeeks": {
+      "text": "Provera cilja, na svake 4 nedelje",
+      "checked": false
+    },
+    "calendar.chefMealanStoppedWritingAnd": {
+      "text": "Chef Mealan je prestao da upisuje, i kalendar je uklonjen iz Google-a.",
+      "checked": false
+    },
+    "calendar.chefMealanStoppedWritingThe": {
+      "text": "Chef Mealan je prestao da upisuje. Kalendar ostaje u Google-u kakav jeste.",
+      "checked": false
+    },
+    "calendar.connectGoogleCalendar": {
+      "text": "Poveži Google kalendar",
+      "checked": false
+    },
+    "calendar.on2": {
+      "text": "Uključeno. ",
+      "checked": false
+    },
+    "calendar.bringingGoogleCalendarUpTo": {
+      "text": "Ažuriram Google kalendar…",
+      "checked": false
     }
   }
 }

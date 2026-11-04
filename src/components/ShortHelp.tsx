@@ -2,6 +2,7 @@
 // offers a swap for the food that wasn't there, so the recipe stays the same otherwise, and another meal for that slot. The
 // app builds each option's foods, drops one that hits a declared allergy or still needs a missing food, and shows its PD
 // against the day's target. Use this puts it in the plan for that day only (the recipe stays as it is), and the list follows.
+import { w } from "../words";
 import { useState } from "react";
 import type { AppApi } from "../screens/api";
 import type { Food, Ingredient } from "../pilot";
@@ -90,11 +91,11 @@ export function ShortHelp({ p, list, date, slot, label, title, missing, onUsed }
         const fits = target === null || (o.pd !== null && o.pd >= target - 0.05);
         return (
           <div key={k} className="shop-help-opt">
-            <small className="shop-help-kind">{o.kind === "standin" ? "Swap a food" : "Another meal"}</small>
+            <small className="shop-help-kind">{o.kind === "standin" ? w("shorthelp.swapAFood") : w("shorthelp.anotherMeal")}</small>
             <b>{o.title}</b>
             {o.why && <small>{o.why}</small>}
             <small className={fits ? "fit-ok" : "fit-under"}>{fmt(o.kcal, 0)} kcal · {o.protein} g protein · PD {pdVal(o.pd)}{fits ? " · fits" : ` · under your ${pdVal(target)}`}</small>
-            <div className="button-row"><button type="button" className="pill pill-small" disabled={using} onClick={() => use(o)}>Use this</button></div>
+            <div className="button-row"><button type="button" className="pill pill-small" disabled={using} onClick={() => use(o)}>{w("shorthelp.useThis")}</button></div>
           </div>
         );
       })}
