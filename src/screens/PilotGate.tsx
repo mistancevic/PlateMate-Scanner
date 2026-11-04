@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { w } from "../words";
 import { Mark, APP_NAME } from "../components/Mark";
 import { RequestForm } from "./LandingScreen";
 import type { AppApi } from "./api";
@@ -11,20 +12,20 @@ export function PilotGate(p: AppApi) {
     <div className="goal-screen">
       <div className="hero"><Mark size={52} color="var(--brand)" /><h2>Almost there{p.user?.name ? `, ${p.user.name.split(" ")[0]}` : ""}</h2><p>{APP_NAME} is a closed pilot. You join with the personal code from your invite.</p></div>
       <section className="card">
-        <b>I have a code</b>
+        <b>{w("pilot.iHaveACode")}</b>
         <p className="small">It works with the email it was sent to. You're signed in as {p.user?.email}.</p>
         <div className="button-row" style={{ marginTop: 8 }}>
-          <input className="code-input" value={code} placeholder="Coach code" onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={8} />
-          <button className="pill pill-small pill-primary" disabled={code.trim().length < 4} onClick={() => p.joinCoach(code)}>Join</button>
+          <input className="code-input" value={code} placeholder={w("pilot.coachCode")} onChange={(e) => setCode(e.target.value.toUpperCase())} maxLength={8} />
+          <button className="pill pill-small pill-primary" disabled={code.trim().length < 4} onClick={() => p.joinCoach(code)}>{w("pilot.join")}</button>
         </div>
       </section>
       <section className="card">
-        <b>I need a code</b>
-        <p className="small">Leave a line and Milan gets back to you.</p>
+        <b>{w("pilot.iNeedACode")}</b>
+        <p className="small">{w("pilot.leaveALineAndMilan")}</p>
         <RequestForm email={p.user?.email} name={p.user?.name} />
       </section>
       {/* not a member yet: nothing of theirs to save, the phone is cleared (DT168) */}
-      <button className="link" onClick={() => p.signOut(true)}>Sign out</button>
+      <button className="link" onClick={() => p.signOut(true)}>{w("pilot.signOut")}</button>
     </div>
   );
 }

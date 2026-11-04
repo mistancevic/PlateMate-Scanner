@@ -1,4 +1,5 @@
 import { BOOK_PAGES, BOOK_SOURCES } from "../bookPages";
+import { w } from "../words";
 import { waLink } from "../phone";
 import { useEffect, useState } from "react";
 import { useKept } from "../kept";
@@ -41,7 +42,7 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
   async function refresh() {
     if (!user || p.demo) return;
     try { setRows(await listClients(user.uid)); }
-    catch (e: any) { setError(e.message || "Could not load clients."); }
+    catch (e: any) { setError(e.message || w("coach.couldNotLoadClients")); }
   }
   // DT189: opening Clients no longer clears the badge; a row leaves Waiting for you only when handled
   useEffect(() => { refresh(); p.recountWaiting(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [user?.uid]);
@@ -54,7 +55,7 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
   const setCook = async (client: string, on: boolean) => {
     const res = await fetch("/api/cooks", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ uid: client, on }) });
     const d = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(d.error || "That didn't work. Try again.");
+    if (!res.ok) throw new Error(d.error || w("coach.thatDidnTWorkTry"));
     setCooks((x) => { const y = new Set(x); on ? y.add(client) : y.delete(client); return y; });
   };
   // what the coach writes on a client's account; on the local demo the rows change on this phone only
@@ -77,27 +78,27 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
   if (open) return (
     <ClientPage key={open.uid} row={open} coachName={coachName} ops={ops} back={() => setOpenId(null)} notify={notify} setError={setError} waitingCount={p.waiting.length}
       startOn={p.focusCard && open.feedback.some((f: any) => f.id === p.focusCard) ? "shared" : "week"}
-      today={<ClientToday p={p} row={open} head={null} today={ymd(new Date())} suggest={async (s, text) => { const note = { at: new Date().toISOString(), by: "coach" as const, name: coachName, text, suggest: s }; try { await ops.sendNote(open, [...open.notes, note]); notify(`Suggested. ${open.name.split(" ")[0]} sees it on Today as a tap.`); } catch (e: any) { setError(e.message || "The suggestion didn't send. Try again."); } }} />}
+      today={<ClientToday p={p} row={open} head={null} today={ymd(new Date())} suggest={async (s, text) => { const note = { at: new Date().toISOString(), by: "coach" as const, name: coachName, text, suggest: s }; try { await ops.sendNote(open, [...open.notes, note]); notify(`Suggested. ${open.name.split(" ")[0]} sees it on Today as a tap.`); } catch (e: any) { setError(e.message || w("coach.theSuggestionDidnTSend")); } }} />}
       tailFor={(part) => <ClientTail part={part} row={open} onSaved={refresh} setError={setError} notify={notify} confirmAi={p.confirmClientAi} sendNote={(notes) => ops.sendNote(open, notes)} coachName={coachName} focusCard={p.focusCard} onAnswered={() => p.recountWaiting()}
         cook={cooks.has(open.uid)} setCook={(on) => setCook(open.uid, on).then(() => notify(on ? `${open.name.split(" ")[0]} is a cook: they can send you recipes to publish.` : `${open.name.split(" ")[0]} is no longer a cook.`)).catch((e) => setError(e.message))} />} />
   );
   const ti = todayIndex();
   const due = rows.filter((r) => r.checkinDay === ti);
   // DT189 (0.3.31, Milan 17:42): Waiting for you at the top, one row per thing; tap opens it where it is answered
-  const openWaiting = (w: import("../coachNotes").Waiting) => {
-    if (w.kind === "card" || w.kind === "reply") p.waitingSeen(w.key);
-    p.setFocusCard(w.cardId ?? null); setOpenId(w.uid);
+  const openWaiting = (wq: import("../coachNotes").Waiting) => {
+    if (wq.kind === "card" || wq.kind === "reply") p.waitingSeen(wq.key);
+    p.setFocusCard(wq.cardId ?? null); setOpenId(wq.uid);
   };
   const weekKey = ymd(isoWeek(new Date()).monday);
   const toSend = due.filter((r) => !r.notes.some((n) => n.by === "coach" && n.week === weekKey)).length;
   return (
     <>
       {p.waiting.length > 0 && (
-        <section className="card waiting" aria-label="Waiting for you">
+        <section className="card waiting" aria-label={w("coach.waitingForYou")}>
           <b>Waiting for you ({p.waiting.length})</b>
-          <small className="muted">Everything a client sent or asked, newest first. Tap one to answer; it leaves the list when answered. The badge on Clients counts this list.</small>
-          {p.waiting.slice(0, 12).map((w) => (
-            <button key={w.key} type="button" className="menu-row" onClick={() => openWaiting(w)}><span className="menu-row-text"><b>{w.name} · {w.what}</b><small>{w.when}</small></span><span aria-hidden="true">›</span></button>
+          <small className="muted">{w("coach.everythingAClientSentOr")}</small>
+          {p.waiting.slice(0, 12).map((wq) => (
+            <button key={wq.key} type="button" className="menu-row" onClick={() => openWaiting(wq)}><span className="menu-row-text"><b>{wq.name} · {wq.what}</b><small>{wq.when}</small></span><span aria-hidden="true">›</span></button>
           ))}
         </section>
       )}
@@ -112,7 +113,7 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
         if (!waiting.length) return null;
         return (
           <>
-            <div className="approve-head"><p className="label">To approve</p><span className="approve-count">{waiting.length} to approve</span></div>
+            <div className="approve-head"><p className="label">{w("coach.toApprove")}</p><span className="approve-count">{waiting.length} to approve</span></div>
             {waiting.map((r) => <ReviewCard key={r.uid} row={r} answer={async (status, note) => { await p.answerClientReview(r.uid, status, note, r.review!); await refresh(); }} open={() => setOpenId(r.uid)} />)}
           </>
         );
@@ -120,10 +121,10 @@ export function CoachArea(p: AppApi & { demo?: ClientRow[] }) {
       {/* DT207c (0.3.48; Coach Milan 1 November 19:42): what is going on with the clients first, the week's dots and progress;
           the codes and sign-ups below, under one label */}
       <p className="label">Clients ({rows.length})</p>
-      {rows.length === 0 && <div className="strip">No clients yet. Share the code.</div>}
+      {rows.length === 0 && <div className="strip">{w("coach.noClientsYetShareThe")}</div>}
       {rows.map((r) => <ClientRowCard key={r.uid} row={r} today={false} open={() => setOpenId(r.uid)} />)}
       {!p.demo && <WaitingRecipes notify={notify} setError={setError} />}
-      {!p.demo && <p className="label coach-static">Codes and sign-ups</p>}
+      {!p.demo && <p className="label coach-static">{w("coach.codesAndSignUps")}</p>}
       {!p.demo && <Invites {...p} />}
       {!p.demo && <AccessRequests {...p} />}
       {!p.demo && <WaitingList {...p} />}
@@ -162,7 +163,7 @@ export function ClientTail({ part, row, onSaved, setError, notify, confirmAi, co
         {part !== "shared" && <>
         {setCook && (
           <label className="cook-switch">
-            <span><b>Cook</b><small>Can send you recipes to publish. You see each one first.</small></span>
+            <span><b>{w("coach.cook")}</b><small>{w("coach.canSendYouRecipesTo")}</small></span>
             <input type="checkbox" role="switch" aria-label={`${row.name.split(" ")[0]} is a cook`} checked={Boolean(cook)} onChange={(e) => setCook(e.target.checked)} />
           </label>
         )}
@@ -172,22 +173,22 @@ export function ClientTail({ part, row, onSaved, setError, notify, confirmAi, co
           if (!needs && row.flags.length === 0) return null;
           return (
             <section className="card safety-sheet">
-              <b>Safety</b>
+              <b>{w("coach.safety")}</b>
               {row.flags.length > 0 && <ul className="small">{row.flags.map((f, i) => <li key={i}>{SITUATIONS.find((x) => x.id === f.situation)?.label ?? f.situation} · {f.at}</li>)}</ul>}
               {needs && confirmAi && (
                 <div className="button-row">
                   {row.aiConfirmedAt
                     ? <button className="pill pill-small" onClick={() => confirmAi(row.uid, false).then(onSaved).catch((e) => setError(e.message))}>Chef Mealan's chat is on · switch off</button>
-                    : <button className="pill pill-small pill-primary" onClick={() => confirmAi(row.uid, true).then(onSaved).catch((e) => setError(e.message))}>Confirm Chef Mealan's chat</button>}
+                    : <button className="pill pill-small pill-primary" onClick={() => confirmAi(row.uid, true).then(onSaved).catch((e) => setError(e.message))}>{w("coach.confirmChefMealanSChat")}</button>}
                 </div>
               )}
             </section>
           );
         })()}
         <div className="formula-row">
-          <small>Formula</small>
-          {([[null, "Automatic"], ["mifflin", "Mifflin–St Jeor"], ["katch", "Katch–McArdle"], ["schofield", "Schofield"], ...(row.measured && !row.flags.some((f) => f.situation === "eating") ? [["data", `From ${row.name.split(" ")[0]}'s data`]] : [])] as [Formula | null, string][]).map(([k, l]) => (
-            <button key={l} className={`choice ${(formula ?? null) === k ? "on" : ""}`} onClick={async () => { try { await pinFormula(row.uid, k); setFormula(k); notify(k === "data" ? `${row.name}: the measured burn, fixed from today.` : `${row.name}: ${l.toLowerCase()}.`); } catch (e: any) { setError(e.message || "Could not set the formula."); } }}>{l}</button>
+          <small>{w("coach.formula")}</small>
+          {([[null, "Automatic"], ["mifflin", w("coach.mifflinStJeor")], ["katch", "Katch–McArdle"], ["schofield", "Schofield"], ...(row.measured && !row.flags.some((f) => f.situation === "eating") ? [["data", `From ${row.name.split(" ")[0]}'s data`]] : [])] as [Formula | null, string][]).map(([k, l]) => (
+            <button key={l} className={`choice ${(formula ?? null) === k ? "on" : ""}`} onClick={async () => { try { await pinFormula(row.uid, k); setFormula(k); notify(k === "data" ? `${row.name}: the measured burn, fixed from today.` : `${row.name}: ${l.toLowerCase()}.`); } catch (e: any) { setError(e.message || w("coach.couldNotSetTheFormula")); } }}>{l}</button>
           ))}
         </div>
         {(() => { const sh = sheetOf(row.goal, { weightKg: row.weightKg, trainingAge: row.trainingAge, coachLabel: "you", ...(row.review?.status === "approved" ? { approvedBy: "you", approvedAt: row.review.at } : {}) }); return sh ? <GoalSheet sheet={sh} /> : null; })()}
@@ -196,7 +197,7 @@ export function ClientTail({ part, row, onSaved, setError, notify, confirmAi, co
         </>}
         {part !== "goal" && <>
         <p className="label">Shared with you ({row.feedback.length})</p>
-        {row.feedback.length === 0 && <small>Nothing yet.</small>}
+        {row.feedback.length === 0 && <small>{w("coach.nothingYet")}</small>}
         {row.feedback.slice(0, 30).map((f: any) => {
           const items: any[] = f.meal?.items ?? [];
           const photo = photos.get(`fb:${f.id}`);
@@ -236,25 +237,25 @@ export function SendSheet(p: AppApi & { card: any; close: () => void }) {
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="card-top"><span>Send "{card.meal?.title}"</span><button className="link" onClick={close}>Cancel</button></div>
+        <div className="card-top"><span>Send "{card.meal?.title}"</span><button className="link" onClick={close}>{w("coach.cancel")}</button></div>
         <small>{items.map((i) => `${Math.round(i.grams)} g ${i.food.name}`).join(" · ")}</small>
-        <p className="label">To</p>
+        <p className="label">{w("coach.to")}</p>
         <div className="moments">
           {rows.map((r) => (
             <button key={r.uid} className={`choice ${picked.has(r.uid) ? "on" : ""}`} onClick={() => setPicked((s) => { const n = new Set(s); n.has(r.uid) ? n.delete(r.uid) : n.add(r.uid); return n; })}>{r.name}</button>
           ))}
-          {rows.length === 0 && <small>No clients yet.</small>}
+          {rows.length === 0 && <small>{w("coach.noClientsYet")}</small>}
         </div>
-        <textarea placeholder="A line to go with it, if you like" value={note} onChange={(e) => setNote(e.target.value)} />
+        <textarea placeholder={w("coach.aLineToGoWith")} value={note} onChange={(e) => setNote(e.target.value)} />
         <button className="pill pill-primary pill-wide" disabled={!picked.size || busy} onClick={async () => {
           if (!user) return;
           setBusy(true);
           try {
             for (const cu of picked) await sendRecipe(cu, { id: uid(), from: user.uid, note: note.trim(), meal: structuredClone(card.meal), sentAt: new Date().toISOString() });
             notify(`Sent to ${picked.size === 1 ? rows.find((r) => r.uid === [...picked][0])?.name : `${picked.size} clients`}.`); close();
-          } catch (e: any) { setError(e.message || "Could not send."); }
+          } catch (e: any) { setError(e.message || w("coach.couldNotSend")); }
           finally { setBusy(false); }
-        }}>Send</button>
+        }}>{w("coach.send")}</button>
       </div>
     </div>
   );
@@ -285,11 +286,11 @@ export function AccessRequests(p: AppApi) {
             <div className="button-row" style={{ marginTop: 6 }}>
               <button className="pill pill-small pill-primary" onClick={async () => {
                 const res = await fetch("/api/invites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: r.name, email: r.email }) });
-                const d = await res.json(); if (!res.ok) { p.setError(d.error || "Couldn't create the invite."); return; }
+                const d = await res.json(); if (!res.ok) { p.setError(d.error || w("coach.couldnTCreateTheInvite")); return; }
                 await fetch(`/api/access-requests/${r.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "handled" }) });
                 location.href = inviteMail(d); load();
-              }}><Send size={14} /> Invite</button>
-              <button className="link" onClick={async () => { await fetch(`/api/access-requests/${r.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "handled" }) }); p.notify("Marked as handled."); load(); }}>Mark as handled</button>
+              }}><Send size={14} /> {w("coach.invite")}</button>
+              <button className="link" onClick={async () => { await fetch(`/api/access-requests/${r.id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ status: "handled" }) }); p.notify("Marked as handled."); load(); }}>{w("coach.markAsHandled")}</button>
             </div>
           )}
         </section>
@@ -314,7 +315,7 @@ export function WaitingList(p: AppApi) {
         {list.slice(0, 100).map((x) => (
           <div className="wait-row" key={x.id}>
             <span><a href={`mailto:${x.email}`}>{x.email}</a><small>{[WHO_NAME[x.who], x.createdAt ? new Date(x.createdAt).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : ""].filter(Boolean).join(" · ")}</small></span>
-            <button type="button" className="link" onClick={async () => { await fetch(`/api/waitlist/${x.id}`, { method: "DELETE" }); p.notify(`${x.email} left the waiting list.`); load(); }}>Remove</button>
+            <button type="button" className="link" onClick={async () => { await fetch(`/api/waitlist/${x.id}`, { method: "DELETE" }); p.notify(`${x.email} left the waiting list.`); load(); }}>{w("coach.remove")}</button>
           </div>
         ))}
       </section>
@@ -352,37 +353,37 @@ export function Invites(p: AppApi) {
   const create = async (n: string, e: string) => {
     setBusy(true);
     try { const r = await fetch("/api/invites", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: n, email: e }) }); const d = await r.json(); if (!r.ok) throw new Error(d.error); setMade(d); setName(""); setEmail(""); load(); return d; }
-    catch (err: any) { p.setError(err.message || "Couldn't create the invite."); return null; } finally { setBusy(false); }
+    catch (err: any) { p.setError(err.message || w("coach.couldnTCreateTheInvite")); return null; } finally { setBusy(false); }
   };
   return (
     <>
       <section className="card">
-        <div className="card-top"><span><UserPlus size={15} /> Invite a client</span><button className="icon" aria-label="Refresh" onClick={load}><RefreshCw size={16} /></button></div>
-        <small>A personal code: one email, used once, valid 30 days.</small>
+        <div className="card-top"><span><UserPlus size={15} /> {w("coach.inviteAClient")}</span><button className="icon" aria-label={w("coach.refresh")} onClick={load}><RefreshCw size={16} /></button></div>
+        <small>{w("coach.aPersonalCodeOneEmail")}</small>
         <div className="l-form" style={{ marginTop: 8 }}>
-          <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} />
-          <input placeholder="Email they sign in with" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-          <button className="pill pill-primary" disabled={busy || !email.includes("@")} onClick={() => create(name, email)}>Create invite</button>
+          <input placeholder={w("coach.name")} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} />
+          <input placeholder={w("coach.emailTheySignInWith")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+          <button className="pill pill-primary" disabled={busy || !email.includes("@")} onClick={() => create(name, email)}>{w("coach.createInvite")}</button>
         </div>
         {made && (
           <div className="invite-made">
             <b className="code">{made.code}</b><small>for {made.email}</small>
             <div className="button-row">
-              <a className="pill pill-small pill-primary" href={inviteMail(made)}><Send size={14} /> Send by email</a>
-              <button className="pill pill-small" onClick={() => { navigator.clipboard?.writeText(made.code); p.notify("Code copied."); }}><Copy size={14} /> Copy</button>
+              <a className="pill pill-small pill-primary" href={inviteMail(made)}><Send size={14} /> {w("coach.sendByEmail")}</a>
+              <button className="pill pill-small" onClick={() => { navigator.clipboard?.writeText(made.code); p.notify("Code copied."); }}><Copy size={14} /> {w("coach.copy")}</button>
             </div>
           </div>
         )}
       </section>
       {list.length > 0 && (
         <>
-          <p className="label">Invites</p>
+          <p className="label">{w("coach.invites")}</p>
           <section className="card">
             {list.slice(0, 20).map((i) => (
               <div className="history-row" key={i.code}>
                 <div><b>{i.name || i.email}</b><small>{i.email} · {i.code}</small></div>
                 <div className="history-num"><b className={`inv-${i.status}`}>{i.status}</b>
-                  {i.status === "open" && <small><a href={inviteMail(i)}>resend</a> · <button className="link" onClick={async () => { await fetch(`/api/invites/${i.code}/revoke`, { method: "POST" }); load(); }}>revoke</button></small>}
+                  {i.status === "open" && <small><a href={inviteMail(i)}>{w("coach.resend")}</a> · <button className="link" onClick={async () => { await fetch(`/api/invites/${i.code}/revoke`, { method: "POST" }); load(); }}>{w("coach.revoke")}</button></small>}
                 </div>
               </div>
             ))}
@@ -406,10 +407,10 @@ function ReviewCard({ row, answer, open }: { row: ClientRow; answer: (status: "a
       {(r.kept ?? []).map((k) => (
         <div className="finding" key={k.id}><b>Kept on purpose: {k.title.toLowerCase()}</b><span>{k.body}</span><small>{k.source}</small></div>
       ))}
-      <label className="field"><span>A note to Client {first}, if you ask for a change</span><textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder="Add 60 g of carbs on hard days, rice or oats after training." /></label>
+      <label className="field"><span>A note to Client {first}, if you ask for a change</span><textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} placeholder={w("coach.addGOfCarbsOn")} /></label>
       <div className="button-row">
-        <button className="pill pill-small" onClick={() => answer("change", note)}>Ask to change</button>
-        <button className="pill pill-small pill-primary" onClick={() => answer("approved", note)}>Approve</button>
+        <button className="pill pill-small" onClick={() => answer("change", note)}>{w("coach.askToChange")}</button>
+        <button className="pill pill-small pill-primary" onClick={() => answer("approved", note)}>{w("coach.approve")}</button>
       </div>
       <button className="link" onClick={open}>Open Client {first}'s numbers ›</button>
     </section>
@@ -432,7 +433,7 @@ export function WaitingRecipes({ notify, setError }: { notify: (m: string) => vo
     try {
       const res = await fetch(`/api/waiting/${r.slug}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action, note }) });
       const d = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(d.error || "That didn't work. Try again.");
+      if (!res.ok) throw new Error(d.error || w("coach.thatDidnTWorkTry"));
       notify(action === "live" ? `${r.title} is live.` : `${r.title} went back with your note.`);
       setViewing(null); setNoteFor(null); setNote(""); load();
     } catch (e: any) { setError(e.message); }
@@ -440,30 +441,30 @@ export function WaitingRecipes({ notify, setError }: { notify: (m: string) => vo
   if (!list.length) return null;
   return (
     <>
-      <div className="approve-head"><p className="label">Recipes waiting for you</p><span className="approve-count">{list.length}</span></div>
+      <div className="approve-head"><p className="label">{w("coach.recipesWaitingForYou")}</p><span className="approve-count">{list.length}</span></div>
       {list.map((r) => (
         <div className="card waiting-recipe" key={r.slug}>
           <div className="pub-head"><b>{r.title}</b><span className="pub-state waiting">{r.change ? "Changes" : "New"}</span></div>
           <small className="muted">{bylineOf(r.author)} · sent {new Date(r.sentAt).toLocaleDateString()} {new Date(r.sentAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</small>
           <div className="publish-ways">
-            <button className="pill" onClick={() => { setViewing(r); setSeen((x) => new Set(x).add(r.slug)); }}>See the page</button>
-            <button className="pill pill-primary" disabled={!seen.has(r.slug)} onClick={() => answer(r, "live")}>Make it live</button>
+            <button className="pill" onClick={() => { setViewing(r); setSeen((x) => new Set(x).add(r.slug)); }}>{w("coach.seeThePage")}</button>
+            <button className="pill pill-primary" disabled={!seen.has(r.slug)} onClick={() => answer(r, "live")}>{w("coach.makeItLive")}</button>
           </div>
-          {!seen.has(r.slug) && <small className="muted">Make it live works after See the page, so you always look first.</small>}
+          {!seen.has(r.slug) && <small className="muted">{w("coach.makeItLiveWorksAfter")}</small>}
           {noteFor === r.slug ? (
             <div className="waiting-note">
-              <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder="The photo is too dark. Try daylight." aria-label="Your note" />
-              <div className="publish-ways"><button className="pill" onClick={() => setNoteFor(null)}>Cancel</button><button className="pill pill-primary" disabled={!note.trim()} onClick={() => answer(r, "back")}>Send back</button></div>
+              <textarea value={note} onChange={(e) => setNote(e.target.value)} placeholder={w("coach.thePhotoIsTooDark")} aria-label={w("coach.yourNote")} />
+              <div className="publish-ways"><button className="pill" onClick={() => setNoteFor(null)}>{w("coach.cancel")}</button><button className="pill pill-primary" disabled={!note.trim()} onClick={() => answer(r, "back")}>{w("coach.sendBack")}</button></div>
             </div>
-          ) : <button className="link" onClick={() => { setNoteFor(r.slug); setNote(""); }}>Send back with a note</button>}
+          ) : <button className="link" onClick={() => { setNoteFor(r.slug); setNote(""); }}>{w("coach.sendBackWithANote")}</button>}
         </div>
       ))}
       {viewing && (
-        <div className="rp-preview" role="dialog" aria-label="See the page">
+        <div className="rp-preview" role="dialog" aria-label={w("coach.seeThePage")}>
           <RecipeView r={viewing} member={null} photoSrc={viewing.photo} top={
             <div className="rp-preview-bar" style={{ margin: "-14px -18px 0" }}>
               <b>{bylineOf(viewing.author)}: waiting for you. Nothing is live until you make it live.</b>
-              <div className="ways"><button className="pill" onClick={() => setViewing(null)}>Back</button><button className="pill pill-primary" onClick={() => answer(viewing, "live")}>Make it live</button></div>
+              <div className="ways"><button className="pill" onClick={() => setViewing(null)}>{w("coach.back")}</button><button className="pill pill-primary" onClick={() => answer(viewing, "live")}>{w("coach.makeItLive")}</button></div>
             </div>} />
         </div>
       )}
@@ -490,13 +491,13 @@ function BetaSpots() {
   if (!owner) return null;
   return (
     <section className="card beta-spots">
-      <div className="card-top"><span>Beta spots left</span><small>{spots === null ? "not shown" : "shown on the home page and the book page"}</small></div>
+      <div className="card-top"><span>{w("coach.betaSpotsLeft")}</span><small>{spots === null ? "not shown" : "shown on the home page and the book page"}</small></div>
       <span className="rp-step">
-        <button type="button" aria-label="One spot less" disabled={spots === null || spots === 0} onClick={() => save((spots ?? 0) - 1)}>−</button>
+        <button type="button" aria-label={w("coach.oneSpotLess")} disabled={spots === null || spots === 0} onClick={() => save((spots ?? 0) - 1)}>−</button>
         <b>{spots === null ? "–" : spots}</b>
-        <button type="button" aria-label="One spot more" disabled={spots !== null && spots >= 999} onClick={() => save((spots ?? 0) + 1)}>+</button>
+        <button type="button" aria-label={w("coach.oneSpotMore")} disabled={spots !== null && spots >= 999} onClick={() => save((spots ?? 0) + 1)}>+</button>
       </span>
-      {spots !== null && <button type="button" className="link" onClick={() => save(null)}>Don't show a number</button>}
+      {spots !== null && <button type="button" className="link" onClick={() => save(null)}>{w("coach.donTShowANumber")}</button>}
       {err && <small className="muted">{err}</small>}
     </section>
   );

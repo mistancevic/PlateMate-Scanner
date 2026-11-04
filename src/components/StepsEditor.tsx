@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { w } from "../words";
 import type { Ingredient } from "../pilot";
 import { amountOf } from "../recipes";
 import { missingFoods, stepParts, tokenOf, usedIds } from "../steps";
@@ -107,13 +108,13 @@ export function StepsEditor({ steps, items, onChange }: { steps: string[]; items
             ref={(el) => fill(key, el)} onFocus={() => { lastFocus.current = key; }} onInput={() => read(key)}
             onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addRow(k); } }}
             onPaste={(e) => { e.preventDefault(); document.execCommand("insertText", false, e.clipboardData.getData("text/plain").replace(/\s*\n\s*/g, " ")); }}
-            data-placeholder={k === 0 ? "Whisk the eggs with the milk." : ""} />
+            data-placeholder={k === 0 ? w("steps.whiskTheEggsWithThe") : ""} />
         </div>
       ))}
       <button type="button" className="link st-add" onClick={() => addRow(rows.length - 1)}>+ Add a step</button>
       {shown.length > 0 && (
         <div className="st-foods">
-          <small>Tap a food to put it in the step, with its amount</small>
+          <small>{w("steps.tapAFoodToPut")}</small>
           <div className="st-chips">
             {shown.map((i) => (
               <button type="button" key={i.id} className={`st-chip${used.has(i.id) ? " used" : ""}`} onMouseDown={(e) => e.preventDefault()} onClick={() => put(i)}
