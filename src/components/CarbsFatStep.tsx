@@ -2,6 +2,7 @@
 // setup after the protein card. How the person likes to eat moves the energy left after protein between carbs and fat; we ask
 // a preference, never a belief. The card shows the fat in the 20 to 35 % range like the protein card shows protein, what the
 // carbs get, and names the days carbs fall below 45 %; Very low carb says where it sits against both and never asks to change.
+import { numLocale } from "../words";
 import { useState } from "react";
 import { dayList } from "../explorerDay";
 import { SPLITS, FAT_RANGE, CARB_RANGE, DAY_TYPES, splitOf, lowCarbsOf, type Calc, type CarbsFat, type Personal, type DayNumbers } from "../personal";
@@ -53,7 +54,7 @@ export function CarbsFatStep({ c, d, band, n, set }: { c: Calc; d: Personal; ban
           <div className="protein-top"><b>{c.fats} g</b><span>of fat a day</span></div>
           <div className="protein-bar" aria-hidden="true"><span className="protein-mark" style={{ left: `${Math.min(100, Math.max(0, ((c.fats - lo) / Math.max(1, hi - lo)) * 100))}%` }} /></div>
           <div className="protein-ends"><span>{lo} g</span><span>{hi} g</span></div>
-          <p className="protein-line">The range is 20 to 35 % of your energy (EFSA), {lo} to {hi} g on your week's {c.kcal.toLocaleString("en")} kcal. Yours is {pct(c.fats * 9, c.kcal)} %: {SPLITS.find((x) => x.id === split)!.name}. Carbs take the rest, {Math.min(...carbs) === Math.max(...carbs) ? `${carbs[0]} g` : `${Math.min(...carbs)} to ${Math.max(...carbs)} g, up and down with your training`}.{below ? ` ${below} below 45 % of the energy, the bottom of EFSA's range.` : ""}</p>
+          <p className="protein-line">The range is 20 to 35 % of your energy (EFSA), {lo} to {hi} g on your week's {c.kcal.toLocaleString(numLocale())} kcal. Yours is {pct(c.fats * 9, c.kcal)} %: {SPLITS.find((x) => x.id === split)!.name}. Carbs take the rest, {Math.min(...carbs) === Math.max(...carbs) ? `${carbs[0]} g` : `${Math.min(...carbs)} to ${Math.max(...carbs)} g, up and down with your training`}.{below ? ` ${below} below 45 % of the energy, the bottom of EFSA's range.` : ""}</p>
         </section>
       )}
     </div>

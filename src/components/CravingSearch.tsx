@@ -2,6 +2,7 @@
 // Code looks first, at once and for free: your recipes, Coach's, the members' and Chef Mealan's starters, and your foods; PD 7+
 // is a filter, shown as a chip. Chef Mealan is asked only on a tap; his idea is kept in My recipes as an idea, not made yet,
 // and the app works out every number from the foods. Picking a dish puts it on the plate, as Make it does.
+import { w } from "../words";
 import { recipeName } from "../recipeDiff";
 import { cookTitle } from "../cookWords";
 import { ThinkingCard } from "./ThinkingCard";
@@ -114,8 +115,8 @@ export function CravingSearch({ p, need, target, onFood }: { p: AppApi; need: nu
   const crave = c.text || q.trim();
   return (
     <div className="crave">
-      <input className="search crave-box" aria-label="What are you craving?" placeholder="Crêpes, sarma, chocolate PD 7+…" value={q} onChange={(e) => { setQ(e.target.value); setIdea(null); }} />
-      {!active && <small className="muted crave-hint">Finds dishes in your recipes, Coach's, the members' and {CHEF_NAME}'s, and your foods. Add PD 7+ to keep only dishes at PD 7 or more.</small>}
+      <input className="search crave-box" aria-label={w("plate.craving")} placeholder={w("plate.cravingBox")} value={q} onChange={(e) => { setQ(e.target.value); setIdea(null); }} />
+      {!active && <small className="muted crave-hint">{w("plate.cravingHint")}</small>}
       {asking && <ThinkingCard className="crave-ask crave-thinking" title={`${CHEF_NAME} is making ${/^(a|an|the|some)\b/i.test(asking) ? asking : `an idea for ${asking}`}`} sub={`From your foods${placeName(p.herePlace ?? p.region ?? "") ? `, sold in ${placeName(p.herePlace ?? p.region ?? "")}` : ""}`} />}
       {active && groups && !idea && !asking && (<>
         {c.minPd !== null && <div className="crave-chips"><button type="button" className="pill pill-small" aria-label={`Remove the filter PD ${c.minPd} and up`} onClick={() => setQ(q.replace(/\bpd\s*(?:of\s*)?(?:>=|≥|>|over|above|at least)?\s*\d{1,2}(?:[.,]\d)?\s*(?:\+|or more|and up|or higher|plus)?/i, "").replace(/\s+/g, " ").trim())}>PD {fmt(c.minPd, 1)} and up ✕</button></div>}

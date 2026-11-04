@@ -1,5 +1,5 @@
 {
-  "about": "DT203 (0.3.76): Chef Mealan in Srpski (latinica). Drafted by Claude, checked by Coach Milan in his table; a line goes into the app only when checked is true. Slots in braces stay; they can move anywhere in the sentence. didTryWork holds two lines: the swap, then the side, split by |.",
+  "about": "DT203 (0.3.76): Chef Mealan in Srpski (latinica). Drafted by Claude, checked by Coach Milan in his table; a line goes into the app only when checked is true. Slots in braces stay; they can move anywhere in the sentence. didTryWork holds two lines: the swap, then the side, split by |. Screens (DT203 release 2, 0.3.77): \"screens\" holds the words of the screens by key, same rules; a line with two forms is he|she, a count is 1|2 to 4|5 and on.",
   "chef": {
     "photoWhose": {
       "text": "{from}. Čiji je ovo tanjir, i kada?",
@@ -18,15 +18,15 @@
       "checked": false
     },
     "plateOldAte": {
-      "text": "Tvoj tanjir od {when}. {plate}. Da li si to pojeo?",
+      "text": "Tvoj tanjir od {when}: {plate}. Da li si to pojeo?|Tvoj tanjir od {when}: {plate}. Da li si to pojela?",
       "checked": false
     },
     "plateOldBeforeCook": {
-      "text": "Pre nego što počneš da kuvaš: tvoj tanjir od {when}. {plate}. Da li si to pojeo?",
+      "text": "Pre nego što počneš da kuvaš: tvoj tanjir od {when}: {plate}. Da li si to pojeo?|Pre nego što počneš da kuvaš: tvoj tanjir od {when}: {plate}. Da li si to pojela?",
       "checked": false
     },
     "plateSaveOrClear": {
-      "text": "Na tvom tanjiru je {foods}, od {ago}. {dish} počinje na svom tanjiru. Da sačuvam tvoj za kasnije, ili da ga ispraznim?",
+      "text": "Na tvom tanjiru je {foods}, {ago}. Novo jelo počinje na svom tanjiru: {dish}. Da sačuvam tvoj tanjir za kasnije, ili da ga ispraznim?",
       "checked": false
     },
     "plateAddOrNew": {
@@ -137,6 +137,396 @@
     },
     "off": {
       "text": "Razgovor sa Chef Mealanom je isključen za tvoj nalog dok ga tvoj trener ne potvrdi. Tanjiri, brojevi i tvoje namirnice rade kao i obično.",
+      "checked": false
+    }
+  },
+  "screens": {
+    "tab.today": {
+      "text": "Danas",
+      "checked": false
+    },
+    "tab.plan": {
+      "text": "Plan",
+      "checked": false
+    },
+    "tab.plate": {
+      "text": "Tanjir",
+      "checked": false
+    },
+    "tab.recipes": {
+      "text": "Recepti",
+      "checked": false
+    },
+    "tab.explorer": {
+      "text": "Explorer",
+      "checked": false
+    },
+    "tab.clients": {
+      "text": "Klijenti",
+      "checked": false
+    },
+    "meal.breakfast": {
+      "text": "Doručak",
+      "checked": false
+    },
+    "meal.lunch": {
+      "text": "Ručak",
+      "checked": false
+    },
+    "meal.snack": {
+      "text": "Užina",
+      "checked": false
+    },
+    "meal.dinner": {
+      "text": "Večera",
+      "checked": false
+    },
+    "meal.meal": {
+      "text": "Obrok",
+      "checked": false
+    },
+    "moment.regular": {
+      "text": "Običan obrok",
+      "checked": false
+    },
+    "moment.before": {
+      "text": "Pre treninga",
+      "checked": false
+    },
+    "moment.after": {
+      "text": "Posle treninga",
+      "checked": false
+    },
+    "moment.meeting": {
+      "text": "Dan sa sastancima",
+      "checked": false
+    },
+    "moment.travel": {
+      "text": "Putovanje",
+      "checked": false
+    },
+    "moment.celebration": {
+      "text": "Proslava na poslu",
+      "checked": false
+    },
+    "moment.afterwork": {
+      "text": "Druženje posle posla",
+      "checked": false
+    },
+    "day.today": {
+      "text": "danas",
+      "checked": false
+    },
+    "day.yesterday": {
+      "text": "juče",
+      "checked": false
+    },
+    "ago.minute": {
+      "text": "pre minut",
+      "checked": false
+    },
+    "ago.minutes": {
+      "text": "pre {n} minut|pre {n} minuta|pre {n} minuta",
+      "checked": false
+    },
+    "ago.hour": {
+      "text": "pre sat vremena",
+      "checked": false
+    },
+    "ago.hours": {
+      "text": "pre {n} sat|pre {n} sata|pre {n} sati",
+      "checked": false
+    },
+    "list.and": {
+      "text": "{rest} i {last}",
+      "checked": false
+    },
+    "plate.craving": {
+      "text": "Šta ti se jede?",
+      "checked": false
+    },
+    "plate.cravingSub": {
+      "text": "Dodaj svoje namirnice. Chef Mealan određuje količine.",
+      "checked": false
+    },
+    "plate.cravingBox": {
+      "text": "Palačinke, sarma, čokolada PD 7+…",
+      "checked": false
+    },
+    "plate.cravingHint": {
+      "text": "Traži jela u tvojim receptima, u receptima trenera i članova, kod Chef Mealana i u tvojim namirnicama. Dodaj PD 7+ i ostaju samo jela sa PD 7 ili više.",
+      "checked": false
+    },
+    "plate.fromMyRecipes": {
+      "text": "Iz Mojih recepata. Promeni šta želiš, pa Uklopi u moj cilj ili Ostavi kako jeste.",
+      "checked": false
+    },
+    "plate.byClock": {
+      "text": "{meal}, {time} po satu",
+      "checked": false
+    },
+    "plate.offPlan": {
+      "text": "Van plana",
+      "checked": false
+    },
+    "plate.aDish": {
+      "text": "Jelo",
+      "checked": false
+    },
+    "plate.aMix": {
+      "text": "Mešavina",
+      "checked": false
+    },
+    "plate.onThePlate": {
+      "text": "Na tanjiru",
+      "checked": false
+    },
+    "plate.empty": {
+      "text": "Isprazni tanjir",
+      "checked": false
+    },
+    "plate.emptyConfirm": {
+      "text": "Dodirni ponovo da ispraznim",
+      "checked": false
+    },
+    "plate.nothingYet": {
+      "text": "Tanjir je još prazan.",
+      "checked": false
+    },
+    "plate.addAFood": {
+      "text": "Dodaj namirnicu",
+      "checked": false
+    },
+    "plate.manual": {
+      "text": "Ručno",
+      "checked": false
+    },
+    "plate.scan": {
+      "text": "Skeniraj",
+      "checked": false
+    },
+    "plate.photoOfMeal": {
+      "text": "Slika mog obroka",
+      "checked": false
+    },
+    "plate.sayWhatYouHave": {
+      "text": "Reci šta imaš",
+      "checked": false
+    },
+    "plate.startFromRecipe": {
+      "text": "Počni od recepta",
+      "checked": false
+    },
+    "plate.screenshot": {
+      "text": "Snimak ekrana",
+      "checked": false
+    },
+    "plate.link": {
+      "text": "Link",
+      "checked": false
+    },
+    "plate.asItStands": {
+      "text": "Kako sada stoji",
+      "checked": false
+    },
+    "plate.fitsPlan": {
+      "text": "uklapa se u plan",
+      "checked": false
+    },
+    "plate.underYour": {
+      "text": "{gap} ispod tvog cilja, {target}",
+      "checked": false
+    },
+    "plate.noTarget": {
+      "text": "cilj nije postavljen",
+      "checked": false
+    },
+    "plate.energy": {
+      "text": "Energija",
+      "checked": false
+    },
+    "plate.weight": {
+      "text": "Težina",
+      "checked": false
+    },
+    "plate.protein": {
+      "text": "Proteini",
+      "checked": false
+    },
+    "plate.groupLikeThis": {
+      "text": "Grupiši ovako",
+      "checked": false
+    },
+    "plate.changeParts": {
+      "text": "Promeni delove",
+      "checked": false
+    },
+    "plate.separateFoods": {
+      "text": "Ne, posebne namirnice",
+      "checked": false
+    },
+    "plate.groupIntoParts": {
+      "text": "Grupiši u delove",
+      "checked": false
+    },
+    "plate.parts": {
+      "text": "Delovi",
+      "checked": false
+    },
+    "plate.amountChef": {
+      "text": "Chef Mealan može da promeni ovu količinu.",
+      "checked": false
+    },
+    "plate.amountStays": {
+      "text": "Ova količina ostaje.",
+      "checked": false
+    },
+    "plate.amountYours": {
+      "text": "Promeni je ako želiš.",
+      "checked": false
+    },
+    "plate.noEnergy": {
+      "text": "bez energije",
+      "checked": false
+    },
+    "plate.underPortion": {
+      "text": "{grams} g je ispod porcije. {food}: {min} do {max} g.",
+      "checked": false
+    },
+    "plate.swipe": {
+      "text": "Povuci namirnicu ulevo da je zameniš, udesno da je ukloniš.",
+      "checked": false
+    },
+    "plate.addHere": {
+      "text": "+ Dodaj namirnicu",
+      "checked": false
+    },
+    "plate.close": {
+      "text": "Zatvori",
+      "checked": false
+    },
+    "plate.fit": {
+      "text": "Uklopi u moj cilj",
+      "checked": false
+    },
+    "plate.fitAgain": {
+      "text": "Uklopi ponovo",
+      "checked": false
+    },
+    "plate.prepare": {
+      "text": "Pripremi ›",
+      "checked": false
+    },
+    "plate.keepAsIs": {
+      "text": "Ostavi kako jeste",
+      "checked": false
+    },
+    "plate.addOneFirst": {
+      "text": "Prvo dodaj jednu namirnicu. Chef Mealan gradi obrok oko nje ({meal}).",
+      "checked": false
+    },
+    "plate.quickPicks": {
+      "text": "Brzi izbor",
+      "checked": false
+    },
+    "plate.fromAllFoods": {
+      "text": "Iz svih tvojih namirnica",
+      "checked": false
+    },
+    "plate.search": {
+      "text": "Pretraži sve moje namirnice",
+      "checked": false
+    },
+    "plate.add": {
+      "text": "Dodaj",
+      "checked": false
+    },
+    "plate.onPlate": {
+      "text": "Na tanjiru",
+      "checked": false
+    },
+    "plate.seeAll": {
+      "text": "Pogledaj svu {n} namirnicu|Pogledaj sve {n} namirnice|Pogledaj svih {n} namirnica",
+      "checked": false
+    },
+    "plate.ateIt": {
+      "text": "Pojeo sam|Pojela sam",
+      "checked": false
+    },
+    "plate.saveForLater": {
+      "text": "Sačuvaj za kasnije",
+      "checked": false
+    },
+    "plate.keepWorking": {
+      "text": "Nastavi da radiš na njemu",
+      "checked": false
+    },
+    "plate.clearIt": {
+      "text": "Isprazni ga",
+      "checked": false
+    },
+    "plate.cancel": {
+      "text": "Otkaži",
+      "checked": false
+    },
+    "plate.oldHelp": {
+      "text": "Pojeo sam ga upisuje u dan: {day}, u obrok za koji je bio, u vreme kad je počet. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
+      "checked": false
+    },
+    "plate.oldHelpPhoto": {
+      "text": "Pojeo sam ga upisuje u dan: {day}, u obrok za koji je bio, u vreme kad je slika nastala. Sačuvaj za kasnije ga čuva da ga završiš drugi put, a Tanjir je slobodan. Nastavi da radiš na njemu ga otvara kakav jeste, i o ovom tanjiru se više ne pita. Isprazni ga prazni tanjir.",
+      "checked": false
+    },
+    "plate.cookAskHelp": {
+      "text": "Šta god izabereš, ovo jelo zatim počinje na svom tanjiru: {dish}. Otkaži vraća na recept.",
+      "checked": false
+    },
+    "plate.saveMine": {
+      "text": "Sačuvaj moj tanjir za kasnije",
+      "checked": false
+    },
+    "plate.clearMine": {
+      "text": "Isprazni moj tanjir",
+      "checked": false
+    },
+    "plate.saveMineHelp": {
+      "text": "Sačuvaj moj tanjir za kasnije ga čuva da ga završiš drugi put; čeka na vrhu Tanjira. Isprazni moj tanjir ga prazni. Otkaži vraća na recept.",
+      "checked": false
+    },
+    "plate.addToMine": {
+      "text": "Dodaj na moj tanjir",
+      "checked": false
+    },
+    "plate.startNew": {
+      "text": "Počni nov tanjir",
+      "checked": false
+    },
+    "plate.dropPhoto": {
+      "text": "Odbaci sliku",
+      "checked": false
+    },
+    "plate.keepMine": {
+      "text": "Zadrži moj tanjir",
+      "checked": false
+    },
+    "plate.addOrNewHelp": {
+      "text": "Dodaj na moj tanjir: nove namirnice idu uz tvoje, a tanjir zadržava ime. Počni nov tanjir: samo nove namirnice.",
+      "checked": false
+    },
+    "plate.addOrNewHelpPhoto": {
+      "text": "Dodaj na moj tanjir: nove namirnice idu uz tvoje, označene sa ~, a tanjir zadržava ime. Počni nov tanjir: samo nove namirnice.",
+      "checked": false
+    },
+    "plate.fromPhoto": {
+      "text": "{plate}, sa tvoje slike",
+      "checked": false
+    },
+    "plate.foodsCount": {
+      "text": "{n} namirnica|{n} namirnice|{n} namirnica",
+      "checked": false
+    },
+    "ago.now": {
+      "text": "sada",
       "checked": false
     }
   }

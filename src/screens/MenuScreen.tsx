@@ -1,3 +1,4 @@
+import { numLocale } from "../words";
 import { SafetyQuestion } from "../components/SafetyQuestion";
 import { LanguagePanel } from "../components/LanguagePanel";
 import { countByPlace, samePlace, getStarted } from "../places";
@@ -280,7 +281,7 @@ function ProfilePanel(p: AppApi) {
             const kcal = p.todayMacros?.kcal ?? p.state.goals.calories, pro = p.todayMacros?.protein ?? p.state.goals.protein;
             if (!kcal || !pro) return <small className="pd-unit-day">For example: 5 g of protein in 100 kcal is PD 5, or 20 % (20 of 100 kcal).</small>;
             const pd = (100 * pro) / kcal;
-            return <small className="pd-unit-day">Your day: {Math.round(pro)} g of protein in {Math.round(kcal).toLocaleString("en")} kcal. That is PD {pd.toFixed(1)}, or {Math.round(pd * 4)} % ({Math.round(pro * 4).toLocaleString("en")} of {Math.round(kcal).toLocaleString("en")} kcal).</small>;
+            return <small className="pd-unit-day">Your day: {Math.round(pro)} g of protein in {Math.round(kcal).toLocaleString(numLocale())} kcal. That is PD {pd.toFixed(1)}, or {Math.round(pd * 4)} % ({Math.round(pro * 4).toLocaleString(numLocale())} of {Math.round(kcal).toLocaleString(numLocale())} kcal).</small>;
           })()}
         </div>
         <small className={`muted saved-line ${odd ? "odd" : ""}`} role="status">{!consented ? "" : odd ? `Not kept yet: ${odd}.` : "Kept as you go. Nothing to save."}</small>
@@ -356,7 +357,7 @@ function GoalPanel(p: AppApi) {
           <section className="card next-goal" aria-label="Next goal">
             <small className="next-goal-when">NEXT, FROM {day.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).toUpperCase().replace(",", "")}</small>
             <b>{goalLabel(ng.band)}</b>
-            <small>{ng.setBy === "coach" ? `Set by ${p.coachLabel}. ` : ""}{ng.kcal.toLocaleString("en")} kcal and {ng.protein} g protein a day on average. Plan already uses it from {day.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.</small>
+            <small>{ng.setBy === "coach" ? `Set by ${p.coachLabel}. ` : ""}{ng.kcal.toLocaleString(numLocale())} kcal and {ng.protein} g protein a day on average. Plan already uses it from {day.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.</small>
             {/* a goal from the coach (canvas board CW, CW9): Reply instead of Change the date and Cancel */}
             {ng.setBy === "coach"
               ? <div className="button-row"><button className="pill pill-small" onClick={() => { const r = window.prompt(`Reply to ${p.coachLabel}`); if (r && r.trim()) { p.replyToCoach(r.trim()); p.notify(`Sent to ${p.coachLabel}.`); } }}>Reply to {p.coachLabel}</button></div>
@@ -414,7 +415,7 @@ function GoalPanel(p: AppApi) {
       {/* the formula is picked in the calculator (canvas board FX, G1a); here one line says which one is in use */}
       {canCalculate(p.personal) && !isMinor(p.personal) && (
         <section className="card you-card formula-line">
-          <span><b>Formula</b><small>{p.formula ? `${FORMULA_NAME[p.formula]}, set by ${p.coachLabel}` : p.personal.formula ? FORMULA_NAME[p.personal.formula] : `Automatic: ${p.personal.bodyFatPct ? "Katch McArdle" : "Mifflin St Jeor"} now`}{(p.formula ?? p.personal.formula) === "data" && p.personal.measuredUse ? ` · ${p.personal.measuredUse.kcal.toLocaleString("en")} kcal a day to stay the same` : p.formulaKcal ? ` · ${p.formulaKcal.toLocaleString("en")} kcal a day to stay the same` : ""}</small></span>
+          <span><b>Formula</b><small>{p.formula ? `${FORMULA_NAME[p.formula]}, set by ${p.coachLabel}` : p.personal.formula ? FORMULA_NAME[p.personal.formula] : `Automatic: ${p.personal.bodyFatPct ? "Katch McArdle" : "Mifflin St Jeor"} now`}{(p.formula ?? p.personal.formula) === "data" && p.personal.measuredUse ? ` · ${p.personal.measuredUse.kcal.toLocaleString(numLocale())} kcal a day to stay the same` : p.formulaKcal ? ` · ${p.formulaKcal.toLocaleString(numLocale())} kcal a day to stay the same` : ""}</small></span>
           <button className="link" onClick={() => openGoal("formula")}>Change</button>
         </section>
       )}
@@ -447,7 +448,7 @@ export function GoalHistory({ log }: { log: GoalEntry[] }) {
         {periods.slice(0, 20).map(({ entry: e, ...pr }) => (
           <div className="history-row" key={e.at}>
             <div><b>{e.band ? goalLabel(e.band) : "Custom"}{pr.now && <span className="now-tag">NOW</span>}</b><small>{periodLine({ entry: e, ...pr })}{SOURCE_LABEL[e.source] ? `, ${SOURCE_LABEL[e.source].charAt(0).toLowerCase()}${SOURCE_LABEL[e.source].slice(1)}` : ""}{e.weightKg ? `, at ${wText(e.weightKg, Number.isInteger(wIn(e.weightKg)) ? 0 : 1)}` : ""}</small></div>
-            <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString("en") : "?"}</b><small>kcal, {e.protein ?? "?"} g protein</small></div>
+            <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString(numLocale()) : "?"}</b><small>kcal, {e.protein ?? "?"} g protein</small></div>
           </div>
         ))}
       </section>
@@ -613,7 +614,7 @@ function PlanPanel(p: AppApi) {
     <>
       <p className="small muted page-why">Your usual week of training. It repeats every week. To change one date, open that day on Plan.</p>
       <section className="week-card" aria-label="Your training week">
-        <div className="week-card-head"><b>Your usual training week</b>{avg !== null && <small>average {avg.toLocaleString("en")} kcal</small>}</div>
+        <div className="week-card-head"><b>Your usual training week</b>{avg !== null && <small>average {avg.toLocaleString(numLocale())} kcal</small>}</div>
         {plan.map((d, i) => (
           <Fragment key={i}>
           <button type="button" className={`agenda-row ${open.includes(i) ? "on open" : ""}`} aria-expanded={open.includes(i)} onClick={() => toggle(i)}>

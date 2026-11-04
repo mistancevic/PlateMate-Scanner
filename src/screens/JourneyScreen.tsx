@@ -1,3 +1,5 @@
+import { w, wn, wIn, dec, mealV, mealName, wordV, type Val, type WordKey } from "../words";
+import type { PlateIn } from "../chefScript";
 import { plateWhenOf, capFirst, atMeal } from "../plateMode";
 import { say } from "../chefScript";
 import { ThinkingCard } from "../components/ThinkingCard";
@@ -47,7 +49,7 @@ import { FoodCard } from "../components/FoodCard";
 import { thumbnailBase64 } from "../utils/image";
 import type { AppApi } from "./api";
 import { inPlaces, basicsHere, placeName } from "../places";
-import { referenceFood } from "../reference";
+import { referenceFood, foodName } from "../reference";
 import { identityOf, basicOf } from "../foodId";
 import { sameFoods as sameRecipeFoods, diffLine as recipeDiffLine, newNameFor } from "../recipeDiff";
 import { mealShare, mealNow, routeOf, solveMeal, closedSlots, unloggedMeal, mealRange, type Add } from "../makeMeal";
@@ -75,7 +77,7 @@ import { PairedCookMode } from "../components/CookPair";
 import { stepPicOf, setStepPic } from "../photos";
 import { kitchenName } from "../travel";
 import { SayHave } from "../components/SayHave";
-import { type CookUi, type Later, resumeLine, cookStarted, plateSince, plateOldOf, whenWords, agoWords, dayWord, foodsLine, laterRow } from "../cooking";
+import { type CookUi, type Later, resumeLine, cookStarted, plateSince, plateOldOf, whenWords, dayWord, dayIn, foodsLineIn, laterRow } from "../cooking";
 import { ChefLine } from "../components/ChefLine";
 import { CookStrip } from "../components/CookStrip";
 
@@ -612,7 +614,7 @@ export function JourneyScreen(p: AppApi) {
   const lineNow = pickSlot ? `${capName(pickSlot.name)}, ${pickSlot.time}${numsOf ? ` · ${numsOf}` : ""} · By the plan${momentPart}${kindPart === " · A mix" ? "" : kindPart}`
     : p.pick === "exploring" ? `Exploring · not sized for a meal${momentPart}${kindPart === " · A mix" ? "" : kindPart}`
     : p.pick === "snack" ? `Snack · off the plan${momentPart}${kindPart === " · A mix" ? "" : kindPart}`
-    : `${mealSlot ? `${capName(mealSlot.name)}, ${mealSlot.time} by the clock · ` : ""}Off the plan · ${momentOf(p.moment).name}${kindPart}`;
+    : `${mealSlot ? `${w("plate.byClock", { meal: mealV(mealSlot.name), time: mealSlot.time })} · ` : ""}${w("plate.offPlan")} · ${w(`moment.${p.moment}` as WordKey)} · ${w(items.some((i) => i.dish) ? "plate.aDish" : "plate.aMix")}`;
   const forKey = p.pick ?? (mealSlot ? `meal:${mealSlot.id}` : "exploring");
   const forHint = pickSlot ? `${capName(pickSlot.name)}, ${pickSlot.time}: ${numsOf ? `${numsOf}, from your plan for today. ` : ""}It counts as your ${pickSlot.name.toLowerCase()}.`
     : p.pick === "exploring" ? "Exploring: nothing is sized for a meal. Pick a meal to see what your plan has for it."
@@ -869,7 +871,7 @@ export function JourneyScreen(p: AppApi) {
           return was && was.part !== part ? was : { id: was?.id ?? uid(), food: libFood(x), grams: roundGrams(Number(x.grams) || 0), locked: false, role: x.role, part };
         });
         const pd0 = pdOf(items), pd1 = pdOf(out);
-        if (pd1 === null || pd0 === null || pd1 < pd0 + 0.05) why = `It reaches PD ${pd1?.toFixed(1) ?? "?"}, no better than ${pd0?.toFixed(1) ?? "?"}.`;
+        if (pd1 === null || pd0 === null || pd1 < pd0 + 0.05) why = `It reaches PD ${pd1 != null ? dec(pd1, 1) : "?"}, no better than ${pd0 != null ? dec(pd0, 1) : "?"}.`;
         else if (!realPortions(out)) why = "One of the foods is not a real portion at this size.";
         else if (out.some((i) => blockedByAllergy(i.food, p.safety.allergies ?? []))) why = "It has a food with one of their allergies.";
       }
@@ -908,7 +910,7 @@ export function JourneyScreen(p: AppApi) {
         wholeNow = whole;
         out = scaleTo(whole, mealNeed ?? kcalOfItems(portionItems(rec, "recipe")));
         const pd1 = pdOf(out);
-        if (pd1 === null || pd1 < pdRef - 0.05) why = `It reaches PD ${pd1?.toFixed(1) ?? "?"}, under the target ${pdRef.toFixed(1)}.`;
+        if (pd1 === null || pd1 < pdRef - 0.05) why = `It reaches PD ${pd1 != null ? dec(pd1, 1) : "?"}, under the target ${dec(pdRef, 1)}.`;
         else if (!realPortions(out)) why = "One of the foods is not a real portion at this size.";
         else if (out.some((i) => blockedByAllergy(i.food, p.safety.allergies ?? []))) why = "It has a food with one of their allergies.";
       }
@@ -1286,9 +1288,9 @@ export function JourneyScreen(p: AppApi) {
           : state.photo && items.length > 0
             ? Head({ name: true, title: "", sub: `Read from your photo. Correct an amount if you know better; ${CHEF_NAME} says what to do with it below.` })
           : state.title && state.title !== "DaaM" && items.length > 0
-            ? Head({ name: true, title: "", sub: "From My recipes. Change what you like, then Fit to my target or Keep it as it is." })
+            ? Head({ name: true, title: "", sub: w("plate.fromMyRecipes") })
             : items.length > 0 ? Head({ name: true, title: "", sub: `Name it, or keep the foods' name.` })
-            : Head({ title: "What are you craving?", sub: `Add your foods. ${CHEF_NAME} sets the amounts.` })) : null;
+            : Head({ title: w("plate.craving"), sub: w("plate.cravingSub") })) : null;
   // ---- DT212 v4 and DT214 v2 (0.3.53): every question on the Plate is Chef Mealan's line and shows alone; the foods wait ----
   const since = plateSince(state);
   const plateIsOld = plateOldOf(state);
@@ -1302,8 +1304,10 @@ export function JourneyScreen(p: AppApi) {
   // Ate it: the plate to the meal it was set for, at the photo's time (or when it was started)
   const ateEarlier = (stay: boolean) => { const at = state.photo?.at ?? since?.toISOString(); const d = at ? new Date(at) : new Date(); p.ateNow(plateMeal(), slotFor(d), { photo: state.photo?.image ?? null, at, stay }); };
   const clearPlate = () => { emptyPlate(); setState((s) => ({ ...s, title: "", plateAsked: undefined })); };
-  const plateWords = since ? `${state.title && state.title !== "DaaM" ? state.title : foodsLine(items)}${state.photo ? ", from your photo" : ""}` : "";
+  // DT203 release 2 (0.3.77): the plate in words, in the language of the line it goes in
+  const plateIn: PlateIn = (l) => { const base = state.title && state.title !== "DaaM" ? state.title : foodsLineIn(l, items); return base === null ? null : state.photo ? wIn(l, "plate.fromPhoto", { plate: base }) : base; };
   const dayOf = since ? dayWord(new Date(state.photo?.at ?? since.toISOString())) : "";
+  const dayOfV: Val = (l) => (since ? dayIn(l, new Date(state.photo?.at ?? since.toISOString())) : "");
   const inQuestion = step !== "in" ? null
     // a food scanned while a cook runs
     : p.pendingFood && state.cook ? (() => { const f = p.pendingFood!, pdf = density(f.protein, f.calories); return (
@@ -1316,37 +1320,37 @@ export function JourneyScreen(p: AppApi) {
     // Start cooking with foods on the Plate
     : p.cookAsk && items.length > 0 ? (() => { const m = p.cookAsk!.meal; return plateIsOld && since ? (
       <section className="chef-ask" aria-label="Before you cook: your plate from earlier">
-        <ChefLine image={state.photo?.image} text={say("plateOldBeforeCook", whenWords(since), plateWords)} />
-        <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => { ateEarlier(true); p.answerCookAsk("ate"); }}>Ate it</button><button type="button" className="pill" onClick={() => p.answerCookAsk("save")}>Save for later</button></div>
-        <div className="ca-links"><button type="button" className="link" onClick={() => p.answerCookAsk("clear")}>Clear it</button><button type="button" className="link" onClick={() => p.answerCookAsk(null)}>Cancel</button></div>
-        <small>Whichever you pick, {m.title} then starts on its own plate. Cancel goes back to the recipe.</small>
+        <ChefLine image={state.photo?.image} text={say("plateOldBeforeCook", since, plateIn)} />
+        <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => { ateEarlier(true); p.answerCookAsk("ate"); }}>{w("plate.ateIt")}</button><button type="button" className="pill" onClick={() => p.answerCookAsk("save")}>{w("plate.saveForLater")}</button></div>
+        <div className="ca-links"><button type="button" className="link" onClick={() => p.answerCookAsk("clear")}>{w("plate.clearIt")}</button><button type="button" className="link" onClick={() => p.answerCookAsk(null)}>{w("plate.cancel")}</button></div>
+        <small>{w("plate.cookAskHelp", { dish: m.title })}</small>
       </section>) : (
       <section className="chef-ask" aria-label="Before you cook: your plate">
-        <ChefLine image={state.photo?.image} text={say("plateSaveOrClear", items.length, since ? agoWords(since) : "now", m.title)} />
-        <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => p.answerCookAsk("save")}>Save my plate for later</button><button type="button" className="pill" onClick={() => p.answerCookAsk("clear")}>Clear my plate</button></div>
-        <div className="ca-links"><button type="button" className="link" onClick={() => p.answerCookAsk(null)}>Cancel</button></div>
-        <small>Save my plate for later keeps it to finish another time; it waits at the top of the Plate. Clear my plate empties it. Cancel goes back to the recipe.</small>
+        <ChefLine image={state.photo?.image} text={say("plateSaveOrClear", items.length, since, m.title)} />
+        <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => p.answerCookAsk("save")}>{w("plate.saveMine")}</button><button type="button" className="pill" onClick={() => p.answerCookAsk("clear")}>{w("plate.clearMine")}</button></div>
+        <div className="ca-links"><button type="button" className="link" onClick={() => p.answerCookAsk(null)}>{w("plate.cancel")}</button></div>
+        <small>{w("plate.saveMineHelp")}</small>
       </section>); })()
     // foods about to land on a plate that has foods (DT131): add, or a new plate
     : p.plateAsk && items.length > 0 ? (() => {
       const a = p.plateAsk!, photo = a.kind === "photo";
-      const add = <button key="add" type="button" className={`pill${photo ? " pill-primary" : ""}`} onClick={() => p.answerPlateAsk("add")}>Add to my plate</button>;
-      const fresh = <button key="new" type="button" className={`pill${photo ? "" : " pill-primary"}`} onClick={() => p.answerPlateAsk("new")}>Start a new plate</button>;
+      const add = <button key="add" type="button" className={`pill${photo ? " pill-primary" : ""}`} onClick={() => p.answerPlateAsk("add")}>{w("plate.addToMine")}</button>;
+      const fresh = <button key="new" type="button" className={`pill${photo ? "" : " pill-primary"}`} onClick={() => p.answerPlateAsk("new")}>{w("plate.startNew")}</button>;
       return (
         <section className="chef-ask pa plate-ask" aria-label="Add to this plate, or start a new one">
           <ChefLine image={a.image} text={say("plateAddOrNew", items.length, state.title && state.title !== "DaaM" ? state.title : "", a.what, photo)} />
           <div className="ca-go pa-go">{photo ? [add, fresh] : [fresh, add]}</div>
-          <div className="ca-links"><button type="button" className="link pa-keep" onClick={() => p.answerPlateAsk(null)}>{photo ? "Drop the photo" : "Keep my plate"}</button></div>
-          <small>Add to my plate: the new foods join yours{photo ? ", marked ~" : ""}, and the plate keeps its name. Start a new plate: only the new foods.</small>
+          <div className="ca-links"><button type="button" className="link pa-keep" onClick={() => p.answerPlateAsk(null)}>{photo ? w("plate.dropPhoto") : w("plate.keepMine")}</button></div>
+          <small>{w(photo ? "plate.addOrNewHelpPhoto" : "plate.addOrNewHelp")}</small>
         </section>
       ); })()
     // a plate from an earlier meal: Did you eat it?
     : plateIsOld && since && !p.filling && !inCook ? (
       <section className="chef-ask" aria-label="Your plate from earlier">
-        <ChefLine image={state.photo?.image} text={say("plateOldAte", whenWords(since), plateWords)} />
-        <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => ateEarlier(false)}>Ate it</button><button type="button" className="pill" onClick={p.savePlate}>Save for later</button></div>
-        <div className="ca-links"><button type="button" className="link" onClick={p.keepWorking}>Keep working on it</button><button type="button" className="link" onClick={clearPlate}>Clear it</button></div>
-        <small>Ate it saves it to {dayOf}, to the meal it was set for, at {state.photo ? "the photo's time" : "the time it was started"}. Save for later keeps it to finish another time, and the Plate is free. Keep working on it opens it as it is, and this plate is not asked about again. Clear it empties the plate.</small>
+        <ChefLine image={state.photo?.image} text={say("plateOldAte", since, plateIn)} />
+        <div className="ca-go"><button type="button" className="pill pill-primary" onClick={() => ateEarlier(false)}>{w("plate.ateIt")}</button><button type="button" className="pill" onClick={p.savePlate}>{w("plate.saveForLater")}</button></div>
+        <div className="ca-links"><button type="button" className="link" onClick={p.keepWorking}>{w("plate.keepWorking")}</button><button type="button" className="link" onClick={clearPlate}>{w("plate.clearIt")}</button></div>
+        <small>{w(state.photo ? "plate.oldHelpPhoto" : "plate.oldHelp", { day: dayOfV })}</small>
       </section>)
     : null;
   // DT212 v4: plates and cooks saved for later wait under the title, with Continue; swipe left to remove
@@ -1521,10 +1525,10 @@ export function JourneyScreen(p: AppApi) {
             </div>
           );
         })()}
-        <div className="card-top"><span>On the plate</span>{/* DT219 (0.3.58): Empty plate whenever the Plate has foods or a photo */}{(items.length > 0 || !!state.photo) && <ConfirmButton className="link plate-empty-link" label={<><Trash2 size={14} /> Empty plate</>} confirmLabel="Tap again to empty" onConfirm={emptyPlate} />}</div>
+        <div className="card-top"><span>{w("plate.onThePlate")}</span>{/* DT219 (0.3.58): Empty plate whenever the Plate has foods or a photo */}{(items.length > 0 || !!state.photo) && <ConfirmButton className="link plate-empty-link" label={<><Trash2 size={14} /> {w("plate.empty")}</>} confirmLabel={w("plate.emptyConfirm")} onConfirm={emptyPlate} />}</div>
         {/* DT176 (0.3.19, board Stories124): Travel mode on: the Plate says where it serves you, and what the kitchen there allows */}
         {p.travel && <small className="travel-plate-note">{placeName(p.travel.place)}, {kitchenName(p.travel.kitchen).toLowerCase()}: {p.travel.kitchen === "hotel" ? "Chef Mealan suggests what you can buy and eat as it is, and what to order." : p.travel.kitchen === "flat" ? "Chef Mealan cooks with a stovetop, a pan and a pot." : "Chef Mealan cooks as at home."} Search finds products sold there.</small>}
-        {items.length === 0 && <small className="plate-empty">Nothing on the plate yet.</small>}
+        {items.length === 0 && <small className="plate-empty">{w("plate.nothingYet")}</small>}
         {imported && rec && !way && rec.makes && (
           <div className="in-portion">
             <div className="moments">
@@ -1556,11 +1560,11 @@ export function JourneyScreen(p: AppApi) {
         )}
         {items.length > 0 && (
           <section className={`readout readout-fit-${p.fitPd(pd)}`}>
-            <div className="readout-top"><span>{imported && pmode === "whole" && !way && (rec?.makes?.n ?? 1) >= 2 ? "The whole recipe" : mealSlot ? mealSlot.name.charAt(0).toUpperCase() + mealSlot.name.slice(1) : madeBy || (imported && mealNeed) ? `This ${mealWord}` : "As it stands"}</span><span>{pdTag()}</span></div>
+            <div className="readout-top"><span>{imported && pmode === "whole" && !way && (rec?.makes?.n ?? 1) >= 2 ? "The whole recipe" : mealSlot ? mealName(mealSlot.name) : madeBy || (imported && mealNeed) ? `This ${mealWord}` : w("plate.asItStands")}</span><span>{pdTag()}</span></div>
             <div className="readout-mid">
               <b>{pdVal(pd)}</b>
               {/* DT93, rule 3: a plate far over the meal says so, instead of going to the maths */}
-              <div><span>{tooBig ? `not a ${mealWord} yet` : pd !== null && pdRef !== null ? (pd >= pdRef - 0.05 ? "fits your plan" : `${fixed(pdRef - pd)} under your ${fixed(pdRef)}`) : "no target set"}</span><small className="rd-rows"><span>Energy</span><b>{fmt(t.calories, 0)}</b> <span>kcal</span><span>Weight</span><b>{fmt(t.weight, 0)}</b> <span>g</span><span>Protein</span><b>{fmt(t.protein, 0)}</b> <span>g</span></small></div>
+              <div><span>{tooBig ? `not a ${mealWord} yet` : pd !== null && pdRef !== null ? (pd >= pdRef - 0.05 ? w("plate.fitsPlan") : w("plate.underYour", { gap: fixed(pdRef - pd), target: fixed(pdRef) })) : w("plate.noTarget")}</span><small className="rd-rows"><span>{w("plate.energy")}</span><b>{fmt(t.calories, 0)}</b> <span>kcal</span><span>{w("plate.weight")}</span><b>{fmt(t.weight, 0)}</b> <span>g</span><span>{w("plate.protein")}</span><b>{fmt(t.protein, 0)}</b> <span>g</span></small></div>
             </div>
             {/* DT108 (0.2.92): four letters read the plate against your day, F C Fi P */}
             {/* DT116 (0.2.98) and 0.2.99: the letters with their grams, one block; sugars, saturates and salt in the tap */}
@@ -1568,20 +1572,20 @@ export function JourneyScreen(p: AppApi) {
           </section>
         )}
         {items.length > 0 && numbersOpen && p.rates && <NumbersTable n={{ calories: t.calories, protein: t.protein, fats: t.fats, carbs: t.carbs, fiber: t.fiber }} rates={p.rates} extra={extrasText(items)} weight={t.weight ?? null} day={dayNums} plan={planNow} />}
-        {items.length === 0 && <small className="ways-label">Add a food</small>}
+        {items.length === 0 && <small className="ways-label">{w("plate.addAFood")}</small>}
         <div className="ways">
           {/* RP5b (0.2.25, Milan 17:42): Manual on the left, Scan on the right, where the thumb is */}
-          <button className="pill pill-small" onClick={() => blank()}><Pencil size={15} /> Manual</button>
-          <button className="pill pill-small" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> Scan</button>
+          <button className="pill pill-small" onClick={() => blank()}><Pencil size={15} /> {w("plate.manual")}</button>
+          <button className="pill pill-small" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> {w("plate.scan")}</button>
           {/* DT127: a photo of the meal in front of you, read onto the plate as estimates */}
-          {p.ai.on && <button type="button" className="pill pill-small mp-button" onClick={p.mealCamera}><Camera size={15} /> Photo of my meal</button>}
+          {p.ai.on && <button type="button" className="pill pill-small mp-button" onClick={p.mealCamera}><Camera size={15} /> {w("plate.photoOfMeal")}</button>}
           {/* DT175 (0.3.17, board Stories122): the foods you have, said or typed, landed as estimates */}
-          {p.ai.on && !saying && <button type="button" className="pill pill-small say-button" onClick={() => setSaying(true)}><Mic size={15} /> Say what you have</button>}
+          {p.ai.on && !saying && <button type="button" className="pill pill-small say-button" onClick={() => setSaying(true)}><Mic size={15} /> {w("plate.sayWhatYouHave")}</button>}
         </div>
         {saying && <SayHave busy={!!p.busy} onCancel={() => setSaying(false)} onDone={(text) => { void p.plateFromWords(text).then((ok) => { if (ok) setSaying(false); }); }} />}
         {/* Start from a recipe (0.2.16, board IM, IM1): only on an empty plate, because a recipe fills the plate */}
         {items.length === 0 && <>
-          <small className="ways-label">Start from a recipe</small>
+          <small className="ways-label">{w("plate.startFromRecipe")}</small>
           <StartWays flow={recipeIn} />
         </>}
         {items.length + opts.length > 0 && (() => {
@@ -1614,13 +1618,13 @@ export function JourneyScreen(p: AppApi) {
                   onClick={() => { log("lock", { locked: !i.locked }); updateItem(i.id, { locked: !i.locked }); }} />
                 <span className="thumb">{i.food.photo ? <img src={i.food.photo} alt="" /> : (i.food.icon || iconFor(i.food.name))}</span>
                 <div className="row-text">
-                  <button className="name-link" onClick={() => setCardId(i.id)}>{cookName(i.food.name).short}</button>
+                  <button className="name-link" onClick={() => setCardId(i.id)}>{cookName(foodName(i.food)).short}</button>
                   {/* DT88, DT91: how to weigh it, on its own line under the name: weigh it cooked, about 200 g raw */}
                   {!partsMode && weighLine(i.food.name) && <small className="weigh">{weighLine(i.food.name)}{rawHint(i.food.name, i.grams) ? `, ${rawHint(i.food.name, i.grams)}` : ""}</small>}
                   {partsMode ? <small className="pt-chips"><PartChip value={i.part ?? ""} onPick={(v) => setPartOf(i.id, v)} /> <button type="button" className="pt-chip off" aria-pressed={false} onClick={() => setOptional(i.id, true)}>Optional</button></small>
                     : i.optional ? <small className="pt-wrap">optional, added · <button className="link pt-inline" onClick={() => leaveOpt(i.id)}>Leave it out</button></small>
                     : i.fry ? <small>{TAKEN_UP_SHORT}</small>
-                    : <small>{p.rates && i.food.calories ? <><span className="letters">{lettersOf(i.food, p.rates).join(" ")}</span> · </> : null}{i.food.calories === 0 ? "no energy" : pdText(density(i.food.protein, i.food.calories))} · {imported ? "Change it if you like." : i.locked ? "This amount stays." : `${CHEF_NAME} can change this amount.`}</small>}
+                    : <small>{p.rates && i.food.calories ? <><span className="letters">{lettersOf(i.food, p.rates).join(" ")}</span> · </> : null}{i.food.calories === 0 ? w("plate.noEnergy") : pdText(density(i.food.protein, i.food.calories))} · {imported ? w("plate.amountYours") : i.locked ? w("plate.amountStays") : w("plate.amountChef")}</small>}
                 </div>
                 {/* CT (0.2.24): eggs, bananas and a pack's pieces are counted; the size and the grams small */}
                 {isCounted(i) ? <CountAmount item={i} editable={!i.locked && !imported} open={sizeOpen === i.id} onToggle={countedOf(i) && !i.locked && !imported ? () => setSizeOpen(sizeOpen === i.id ? null : i.id) : undefined}
@@ -1678,9 +1682,9 @@ export function JourneyScreen(p: AppApi) {
                 <ChefLine text={say("oneDish")} />
                 <small className="one-dish-parts">{sugg.map((g, k) => <span key={g.part}>{k ? " · " : ""}<b>{g.part}:</b> {g.ids.map(nameOf).join(", ")}</span>)}</small>
                 <div className="button-row">
-                  <button type="button" className="pill pill-small pill-primary" onClick={() => { groupIt(); log("parts", { how: "suggested" }); }}>Group it like this</button>
-                  <button type="button" className="pill pill-small" onClick={() => { groupIt(); setPartsMode(true); }}>Change the parts</button>
-                  <button type="button" className="pill pill-small" onClick={() => setDishNo(foodsSig(items))}>No, separate foods</button>
+                  <button type="button" className="pill pill-small pill-primary" onClick={() => { groupIt(); log("parts", { how: "suggested" }); }}>{w("plate.groupLikeThis")}</button>
+                  <button type="button" className="pill pill-small" onClick={() => { groupIt(); setPartsMode(true); }}>{w("plate.changeParts")}</button>
+                  <button type="button" className="pill pill-small" onClick={() => setDishNo(foodsSig(items))}>{w("plate.separateFoods")}</button>
                 </div>
               </div>
             )}
@@ -1688,7 +1692,7 @@ export function JourneyScreen(p: AppApi) {
               ? <div className="pt-h pt-mode"><span><b>Parts</b><small>Tap a food's part to move it, or New part. Optional keeps it off the plate until added.</small></span><span className="pt-acts">
                   {naming === null ? <button className="link" onClick={() => setNaming("")}>New part</button> : <input className="pt-new" autoFocus aria-label="Name of the new part" placeholder="Sauce" value={naming} onChange={(e) => setNaming(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { const v = naming.trim().slice(0, 30); if (v) setNewParts((l) => [...l, v.charAt(0).toUpperCase() + v.slice(1)]); setNaming(null); } }} onBlur={() => setNaming(null)} />}
                   <button className="link" onClick={() => { if (plateParts.length) log("parts", { how: "set" }); setPartsMode(false); setNaming(null); setNewParts([]); }}>Done</button></span></div>
-              : items.length + opts.length >= 2 && <button className="link pt-open" onClick={() => setPartsMode(true)}>{plateParts.length ? "Parts" : "Group into parts"}</button>)}
+              : items.length + opts.length >= 2 && <button className="link pt-open" onClick={() => setPartsMode(true)}>{plateParts.length ? w("plate.parts") : w("plate.groupIntoParts")}</button>)}
             <div className="rows">
               {dishes ? groupsOf(items).map((g) => g.kind === "dish" ? <DishRow key={g.id} g={g} /> : itemRow(g.item))
                 : !grouped ? <>{items.map(itemRow)}{partsMode && opts.map(optRow)}</>
@@ -1701,16 +1705,16 @@ export function JourneyScreen(p: AppApi) {
                   {(noPart.length > 0 || noPartOpts.length > 0) && <div className="pt-group"><div className="pt-h"><span><b>Other</b></span></div>{noPart.map(itemRow)}{noPartOpts.map(optRow)}</div>}
                 </>}
             </div>
-            {items.length > 0 && !partsMode && <small className="muted swipe-line">Swipe a food left to swap it, right to remove it.</small>}
+            {items.length > 0 && !partsMode && <small className="muted swipe-line">{w("plate.swipe")}</small>}
             {items.length > 0 && !partsMode && (addHere ? (() => {
-              const w = q2.trim(), list = w ? oneList({ q: w, mine: state.foods.filter(p.inPlace), members: [], db: [], region: p.region, uid, basics: 4 }).rows.filter((r) => r.kind !== "db" && goesInDish(plateTasteOf, r.food.name)).slice(0, 8) : null;
+              const qq = q2.trim(), list = qq ? oneList({ q: qq, mine: state.foods.filter(p.inPlace), members: [], db: [], region: p.region, uid, basics: 4 }).rows.filter((r) => r.kind !== "db" && goesInDish(plateTasteOf, r.food.name)).slice(0, 8) : null;
               const mine = (f: Food) => { const on = items.some((i) => libraryId(i.food.id) === f.id); return (
                 <div className="row row-food" key={f.id}><span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
                   <div className="row-text"><b>{f.name}</b><small>Yours · {pdText(density(f.protein, f.calories))}</small></div>
                   <button className={`pill pill-small${on ? " pill-done" : ""}`} disabled={on} onClick={() => { add(f); setQ2(""); }}>{on ? "On plate" : <><Plus size={14} /> Add</>}</button></div>); };
               return (
                 <div className="add-here" aria-label="Add a food">
-                  <div className="add-here-top"><b>+ Add a food</b><button type="button" className="link" onClick={() => { setAddHere(false); setQ2(""); }}>Close</button></div>
+                  <div className="add-here-top"><b>{w("plate.addHere")}</b><button type="button" className="link" onClick={() => { setAddHere(false); setQ2(""); }}>{w("plate.close")}</button></div>
                   <ClearField value={q2} onClear={() => setQ2("")} label="Clear the search"><input className="search" autoFocus aria-label="Find a food to add" placeholder="Find a food" value={q2} onChange={(e) => setQ2(e.target.value)} /></ClearField>
                   <div className="rows">
                     {list ? list.map((r) => r.kind === "mine" ? mine(r.food) : (
@@ -1718,11 +1722,11 @@ export function JourneyScreen(p: AppApi) {
                         <div className="row-text"><b>{r.names[0]}</b><small>{rowLine(r)}</small></div>
                         <button className="pill pill-small" onClick={() => { if (r.kind === "member") p.addMemberFood(r.member, "plate"); else { const f = { ...r.food, id: uid(), reviewedAt: new Date().toISOString() }; setState((st) => ({ ...st, foods: [f, ...st.foods] })); add(f); } setQ2(""); }}><Plus size={14} /> Add</button></div>))
                       : quick.picks.filter((f) => goesInDish(plateTasteOf, f.name)).slice(0, 5).map(mine)}
-                    {list && list.length === 0 && <small className="muted">Nothing called {w} in your foods or the basic foods sold here. Scan it, or add it by hand above.</small>}
+                    {list && list.length === 0 && <small className="muted">Nothing called {qq} in your foods or the basic foods sold here. Scan it, or add it by hand above.</small>}
                   </div>
                   <small className="muted">Your foods first, then the basic foods sold where you shop.</small>
                 </div>
-              ); })() : <button type="button" className="link add-here-open" onClick={() => setAddHere(true)}>+ Add a food</button>)}
+              ); })() : <button type="button" className="link add-here-open" onClick={() => setAddHere(true)}>{w("plate.addHere")}</button>)}
             {/* IM12: a dish without parts: its optional foods in one list under the foods */}
             {!grouped && !partsMode && opts.length > 0 && (
               <div className="pt-optlist" aria-label="Optional, not on the plate">
@@ -1866,7 +1870,7 @@ export function JourneyScreen(p: AppApi) {
           {imported && rec ? (<>
             {/* PF A6 (0.2.35, Milan 23:11 and 23:21 on 17 October, back after the 0.2.27 revert): Make it as it is is not Chef
                 Mealan's work, so no hat; the two ways are his, so both carry it. Wording and icons only: the ways work as before. */}
-            <button className="pill pill-primary pill-wide" onClick={keepAsIs}>{!way && pd !== null && pdRef !== null && pd < pdRef - 0.05 ? "Prepare it as it is ›" : "Prepare it ›"}</button>
+            <button className="pill pill-primary pill-wide" onClick={keepAsIs}>{!way && pd !== null && pdRef !== null && pd < pdRef - 0.05 ? "Prepare it as it is ›" : w("plate.prepare")}</button>
             {way && <button className="pill pill-wide" onClick={backToOriginal}>Back to the original</button>}
             {!way && pd !== null && pdRef !== null && pd < pdRef - 0.05 && p.ai.on && (
               <div className="in-ways">
@@ -1881,7 +1885,7 @@ export function JourneyScreen(p: AppApi) {
             )}
           </>) : madeBy && items.length > 0 ? (<>
             {/* Chef Mealan's meal is on the plate (CH3): make it, or ask again from the plate as it was */}
-            <button className="pill pill-primary pill-wide" onClick={keepAsIs}><ChefHat size={18} /> {p.filling && plateWhen === "plan" ? `Put it in ${slotName(p.filling)}` : "Prepare it ›"}</button>
+            <button className="pill pill-primary pill-wide" onClick={keepAsIs}><ChefHat size={18} /> {p.filling && plateWhen === "plan" ? `Put it in ${slotName(p.filling)}` : w("plate.prepare")}</button>
             <button className="pill pill-wide" onClick={() => { const m = madeBy; setMadeBy(null); setState((s) => ({ ...s, items: m.from, title: m.title0, portion: null, cooking: undefined, cookingFor: undefined })); void askChef(m.from, m.tried); }}>Other ideas</button>
           </>) : state.photo?.who === "idea" && items.length > 0 ? null /* DT130: an idea's buttons are in Chef Mealan's card above */ : (<>
           {/* DT149 (0.2.130): a meal of a day gone by is what you ate: no Fit, one button puts it in at the meal's time */}
@@ -1889,18 +1893,18 @@ export function JourneyScreen(p: AppApi) {
           : p.filling && plateWhen === "plan" ? (<>
             {/* DT149: planning: the one main button puts it in the plan, before Fit and after it */}
             {items.length > 0 && <button className="pill pill-primary pill-wide put-in" onClick={keepAsIs}>Put it in {slotName(p.filling)}</button>}
-            <button className="pill pill-wide" disabled={items.length < 1} onClick={makeAMeal}><ChefHat size={18} className="hat" /> {fit ? "Fit again" : "Fit to my target"}</button>
+            <button className="pill pill-wide" disabled={items.length < 1} onClick={makeAMeal}><ChefHat size={18} className="hat" /> {fit ? w("plate.fitAgain") : w("plate.fit")}</button>
           </>) : (<>
           <button className="pill pill-primary pill-wide" disabled={items.length < 1} onClick={makeAMeal}>
             {/* DT87 (0.2.87, Milan 11:43): Fit to my target, with the chef hat at full size: the AI is behind it */}
-            <ChefHat size={18} className="hat" /> {fit ? "Fit again" : "Fit to my target"}
+            <ChefHat size={18} className="hat" /> {fit ? w("plate.fitAgain") : w("plate.fit")}
           </button>
           {/* DT94: Lock the recipe ends Craft; for a slot the plate goes in as it stands, as before */}
-          {items.length > 0 && <button className="pill pill-wide" onClick={keepAsIs}>{p.filling && p.filling.mode !== "eat" ? (fit ? `Put it in ${slotName(p.filling)}` : "Keep it as it is") : "Prepare it ›" /* DT230 (0.3.70): one door out of the Plate; it opens How to make it, How do you want to eat it, or Make when the steps are set */ /* 0.3.62 (Coach Milan 21:27, ok): a bowl opens How do you want to eat it? */}</button>}
+          {items.length > 0 && <button className="pill pill-wide" onClick={keepAsIs}>{p.filling && p.filling.mode !== "eat" ? (fit ? `Put it in ${slotName(p.filling)}` : w("plate.keepAsIs")) : w("plate.prepare") /* DT230 (0.3.70): one door out of the Plate; it opens How to make it, How do you want to eat it, or Make when the steps are set */ /* 0.3.62 (Coach Milan 21:27, ok): a bowl opens How do you want to eat it? */}</button>}
           </>)}
           </>)}
         </div>
-        {!imported && !madeBy && items.length === 0 && <small className="ways-label ways-wait">Add one food first. {CHEF_NAME} builds the {chefable ? mealWord : "meal"} around it.</small>}
+        {!imported && !madeBy && items.length === 0 && <small className="ways-label ways-wait">{w("plate.addOneFirst", { meal: chefable && mealSlot ? mealV(mealSlot.name, true) : wordV("meal.meal") })}</small>}
         {/* RP1 (0.2.25, Milan 17:42 and 19:43): the recipe's steps, to review on the Plate before you make it */}
         {imported && rec && (rec.steps?.length || rec.source?.steps?.length) ? (
           <section className="card in-steps in-steps-plate" aria-label="The recipe's steps">
@@ -1938,8 +1942,8 @@ export function JourneyScreen(p: AppApi) {
         {foodCard}
         {askChange && changedBase(askChange.its) && ChangedAsk()}
         {helperSheet}
-        <p className="label">{q.trim() ? "From all your foods" : "Quick picks"}</p>
-        <ClearField value={q} onClear={() => setQ("")} label="Clear the search"><input className="search" aria-label="Search all my foods" placeholder="Search all my foods" value={q} onChange={(e) => setQ(e.target.value)} /></ClearField>
+        <p className="label">{q.trim() ? w("plate.fromAllFoods") : w("plate.quickPicks")}</p>
+        <ClearField value={q} onClear={() => setQ("")} label="Clear the search"><input className="search" aria-label={w("plate.search")} placeholder={w("plate.search")} value={q} onChange={(e) => setQ(e.target.value)} /></ClearField>
         <div className="rows">
           {/* R9 (0.2.33, boards RS4 and RS5): while a recipe is on the plate, only foods that go with the dish; one line names what was held back */}
           {heldBack.length > 0 && plateTasteOf && <small className="muted held-back">{heldBackLine(plateTasteOf, heldBack)}</small>}
@@ -1950,8 +1954,8 @@ export function JourneyScreen(p: AppApi) {
               return (
                 <div className="row row-food" key={f.id}>
                   <span className="thumb thumb-sm">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
-                  <div className="row-text"><b>{f.favorite && <span className="fav-mark" aria-label="Favourite">★ </span>}{f.name}</b><small>{f.brand ? `${f.brand} · ` : ""}{pdText(density(f.protein, f.calories))}{why === "often" ? " · often" : ""}</small></div>
-                  <button className={`pill pill-small${inList ? " pill-done" : ""}`} disabled={inList} onClick={() => add(f)}>{inList ? "On plate" : <><Plus size={14} /> Add</>}</button>
+                  <div className="row-text"><b>{f.favorite && <span className="fav-mark" aria-label="Favourite">★ </span>}{foodName(f)}</b><small>{f.brand ? `${f.brand} · ` : ""}{pdText(density(f.protein, f.calories))}{why === "often" ? " · often" : ""}</small></div>
+                  <button className={`pill pill-small${inList ? " pill-done" : ""}`} disabled={inList} onClick={() => add(f)}>{inList ? w("plate.onPlate") : <><Plus size={14} /> {w("plate.add")}</>}</button>
                 </div>
               );
             })}
@@ -1967,7 +1971,7 @@ export function JourneyScreen(p: AppApi) {
           {state.foods.length === 0 && <small>No saved foods yet. Scan or type one above.</small>}
         </div>
         {!q.trim() && state.foods.length > quick.picks.length && (
-          <button className="link all-foods" onClick={() => setTab("foods")}>See all {state.foods.length} foods</button>
+          <button className="link all-foods" onClick={() => setTab("foods")}>{wn("plate.seeAll", state.foods.length)}</button>
         )}
 
       </>

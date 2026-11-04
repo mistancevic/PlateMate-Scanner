@@ -2,6 +2,7 @@
 // One settings map: every answer the person gives, which part of the summary it sits in, what it does, and whether Chef Mealan
 // reads it. The summary is built from it, and the test (summary.test.ts) fails when a field of Personal, Lifestyle or Safety has
 // no line here, so no setting is set with no influence and none is forgotten.
+import { dec } from "./words";
 import { placeName, kitchenName } from "./travel";
 import type { Personal } from "./personal";
 import { lifestyleOf, planOf, splitOf, splitName, lowCarbsOf, STEPS, equipmentOf, EQUIPMENT } from "./personal";
@@ -147,7 +148,7 @@ export function summaryOf(x: SummaryIn): SummaryPart[] {
     x.goal ? { key: "goal", label: "Goal", value: `${x.goal.name}, set by ${x.goal.setBy}${x.goal.at ? ` on ${day(x.goal.at)}` : ""}`, does: "Your numbers on Today, Plan and Plate follow it.", chef: true, share: "goal" } : null,
     x.avg ? { key: "avg", label: "An average day", value: `${n0(x.avg.kcal)} kcal · ${n0(x.avg.protein)} g protein · ${n0(x.avg.fats)} g fat`, does: [kc.length ? `${n0(Math.min(...kc))} to ${n0(Math.max(...kc))} kcal by day.` : "", x.protein ? `Protein ${x.protein.min} to ${x.protein.max} g: ${x.protein.lo} to ${x.protein.hi} g a kg.` : ""].filter(Boolean).join(" "), chef: true, share: "goal" } : null,
     x.goal ? row("carbsFat", PERSONAL_MAP.carbsFat, "Carbs and fat", low !== null ? `${splitName(split)}, ${low} g of carbs a day` : splitName(split), cb.length ? `Carbs move with your training: ${n0(Math.min(...cb))} to ${n0(Math.max(...cb))} g.` : undefined) : null,
-    x.avg && x.avg.kcal > 0 ? { key: "pd", label: "PD target", value: `${(Math.round((1000 * x.avg.protein) / x.avg.kcal) / 10).toFixed(1)} on an average day`, does: "Every plate and food is marked against the day's own target.", chef: true, share: "goal" } : null,
+    x.avg && x.avg.kcal > 0 ? { key: "pd", label: "PD target", value: `${dec(Math.round((1000 * x.avg.protein) / x.avg.kcal) / 10, 1)} on an average day`, does: "Every plate and food is marked against the day's own target.", chef: true, share: "goal" } : null,
     p.trainingAge ? row("trainingAge", PERSONAL_MAP.trainingAge, "Training for", (TRAINING_AGES.find((t) => t.id === p.trainingAge)?.name ?? String(p.trainingAge)).replace("–", " to ")) : null,
   ]);
   // Your day

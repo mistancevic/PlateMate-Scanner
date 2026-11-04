@@ -1,3 +1,4 @@
+import { numLocale } from "../words";
 import { CarbsFatStep } from "../components/CarbsFatStep";
 import { KitchensAndTools } from "./MenuScreen";
 import { REGIONS } from "../moments";
@@ -68,7 +69,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
     const { formula: _f, measuredUse: _m, ...r } = d; void _f; void _m;
     const base = calculate(r, band, null); if (!base) return undefined;
     const k = c.kcal - base.kcal;
-    return k === 0 ? "From your data: the same as with the formula." : `From your data: ${Math.abs(k).toLocaleString("en")} kcal ${k < 0 ? "less" : "more"} than with the formula.`;
+    return k === 0 ? "From your data: the same as with the formula." : `From your data: ${Math.abs(k).toLocaleString(numLocale())} kcal ${k < 0 ? "less" : "more"} than with the formula.`;
   })();
   const by = coach ? "coach" : "you";
   const done = () => { p.notify("Your day is set. This is Today."); onDone(); };
@@ -140,7 +141,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
   const Four = ({ kcal, protein, fats, carbs }: { kcal: number; protein: number; fats: number; carbs: number }) => (
     <div className="four" aria-label="Your day">
       <div><b>{pdVal(density(protein, kcal))}</b><small>{pdTag()}</small></div>
-      <div><b>{kcal.toLocaleString("en")}</b><small>kcal</small></div>
+      <div><b>{kcal.toLocaleString(numLocale())}</b><small>kcal</small></div>
       <div><b>{protein}</b><small>g protein</small></div>
       <div><b>{fats}</b><small>g fat</small></div>
       <div><b>{carbs}</b><small>g carbs</small></div>
@@ -367,7 +368,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               {analysisSame && <FindingList analysis={analysisSame} open={isOpen} keep={keep} />}
               <ApplyFrom />
               <button className="pill pill-primary pill-wide" disabled={!density(ownProtein, ownKcal)} onClick={() => {
-                settle(analysisSame, `${goalNow.name} · every day the same · ${ownKcal?.toLocaleString("en")} kcal`);
+                settle(analysisSame, `${goalNow.name} · every day the same · ${ownKcal?.toLocaleString(numLocale())} kcal`);
                 apply({ source: "exact", kcal: ownKcal!, protein: ownProtein!, fats: ownFats ?? 0, carbs: ownCarbs ?? 0 });
               }}>{saveLabel(analysisSame)}</button>
               {!density(ownProtein, ownKcal) && <p className="small goal-missing" role="status">Type kcal and protein above to apply.</p>}
@@ -388,7 +389,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
                   return;
                 }
                 const a = o!.avg;
-                settle(analysisEach, `${goalNow.name} · each day its own · week average ${a.kcal.toLocaleString("en")} kcal`);
+                settle(analysisEach, `${goalNow.name} · each day its own · week average ${a.kcal.toLocaleString(numLocale())} kcal`);
                 apply({ source: "exact", kcal: a.kcal, protein: a.protein, fats: a.fats, carbs: a.carbs });
               }}>{saveLabel(analysisEach)}</button>
               {!o && !c && <p className="small goal-missing" role="status">Type the kcal for at least one day to apply. Or fill in your body under Calculate for me, and the days fill in.</p>}

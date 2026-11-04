@@ -1,3 +1,4 @@
+import { numLocale } from "../words";
 import { BurnCard, Squares } from "../components/Measured";
 import { fmtKg } from "../weight";
 import { wIn, wText } from "../units";
@@ -81,7 +82,7 @@ export function ClientRowCard({ row, today, open }: { row: ClientRow; today: boo
 
 const TONE: Record<string, string> = { lived: "cw-green", plan: "cw-green", changed: "cw-amber", today: "cw-grey", none: "cw-grey" };
 const MARK: Record<SlotMark, [string, string]> = { plan: ["By the plan", "cw-green"], swapped: ["Swapped", "cw-amber"], skipped: ["Skipped on purpose", "cw-ink"], missed: ["Not eaten", "cw-amber"], open: ["Still to come", "cw-grey"] };
-const kcalText = (n: number) => `${Math.round(n).toLocaleString("en")} kcal`;
+const kcalText = (n: number) => `${Math.round(n).toLocaleString(numLocale())} kcal`;
 
 // DT210 (0.3.50, board Stories157; Coach Milan 1 November 23:28 to 23:52 Go): a client's page holds everything about the
 // client, with tabs inside it: Today and Week (read-only, with Suggest), Shared (the cards the client sent, each with Answer),
@@ -138,7 +139,7 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
       {/* DT189 (0.3.32, Milan 18:39): the badge is visible from here, so the way back says what waits one level up */}
       <div className="menu-head cw-back"><button className="link" onClick={back}>‹ Clients{waitingCount > 0 ? ` · ${waitingCount} waiting` : ""}</button><span /></div>
       <section className="card person cw-person"><span className="avatar">{row.name.slice(0, 1).toUpperCase()}</span>
-        <div><b>{name}</b><small>{[g ? goalLabel(g.id) : "No goal yet", kcalNow ? `${kcalNow.toLocaleString("en")} kcal` : null, proteinNow ? `${proteinNow} g protein` : null, wk ? `week ${wk}` : null].filter(Boolean).join(" · ")}</small><small>Check-in: {DAY_NAMES[row.checkinDay]}</small></div>
+        <div><b>{name}</b><small>{[g ? goalLabel(g.id) : "No goal yet", kcalNow ? `${kcalNow.toLocaleString(numLocale())} kcal` : null, proteinNow ? `${proteinNow} g protein` : null, wk ? `week ${wk}` : null].filter(Boolean).join(" · ")}</small><small>Check-in: {DAY_NAMES[row.checkinDay]}</small></div>
       </section>
       <div className="cp-tabs" role="tablist" aria-label={`${name}'s page`}>
         {([["today", "Today"], ["week", "Week"], ["shared", `Shared${row.feedback.length ? ` (${row.feedback.length})` : ""}`], ["goal", "Goal"]] as [ClientPart, string][]).map(([k, l]) => (
@@ -174,7 +175,7 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
         <div className="sheet-backdrop" onClick={() => setOpenDay(null)}>
           <div className="sheet cw-day-sheet" role="dialog" aria-label={longDay(day.date)} onClick={(e) => e.stopPropagation()}>
             <div className="card-top"><span>{longDay(day.date).replace(/^(\w+) /, "$1, ")}</span><button className="link" onClick={() => setOpenDay(null)}>Close</button></div>
-            <div className="past-nums"><span><b>{Math.round(day.kcal).toLocaleString("en")}</b><small>{day.target ? `of ${day.target.kcal.toLocaleString("en")} kcal` : "kcal"}</small></span><span><b>{day.protein}</b><small>{day.target ? `of ${day.target.protein} g protein` : "g protein"}</small></span><span><b>{day.kcal ? pdVal(density(day.protein, day.kcal)) : "–"}</b><small>PD that day</small></span></div>
+            <div className="past-nums"><span><b>{Math.round(day.kcal).toLocaleString(numLocale())}</b><small>{day.target ? `of ${day.target.kcal.toLocaleString(numLocale())} kcal` : "kcal"}</small></span><span><b>{day.protein}</b><small>{day.target ? `of ${day.target.protein} g protein` : "g protein"}</small></span><span><b>{day.kcal ? pdVal(density(day.protein, day.kcal)) : "–"}</b><small>PD that day</small></span></div>
             {day.slots.map((s) => {
               const [word, cls] = MARK[s.mark];
               const shared = s.eaten ? row.feedback.find((f: any) => f.notes && f.meal?.title === s.eaten && ymd(new Date(f.createdAt)) === day.date) : null;
@@ -230,12 +231,12 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
       </>)}
       {part === "goal" && (<>
       <p className="label">{name}'s goal</p>
-      <section className="card you-card"><span><b>{g ? goalLabel(g.id) : "No goal yet"}</b><small>{[row.goal?.setAt ? `Since ${new Date(row.goal.setAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}` : null, row.goal?.setBy === "coach" ? "set by you" : row.goal ? `set by ${name}` : null, kcalNow ? `${kcalNow.toLocaleString("en")} kcal` : null, proteinNow ? `${proteinNow} g protein` : null].filter(Boolean).join(" · ")}</small>{row.nextGoal && <small className="cw-next">Next: {goalLabel(row.nextGoal.band)}, from {longDay(row.nextGoal.from)}{row.nextGoal.setBy === "coach" ? ", set by you" : ""}</small>}</span></section>
+      <section className="card you-card"><span><b>{g ? goalLabel(g.id) : "No goal yet"}</b><small>{[row.goal?.setAt ? `Since ${new Date(row.goal.setAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}` : null, row.goal?.setBy === "coach" ? "set by you" : row.goal ? `set by ${name}` : null, kcalNow ? `${kcalNow.toLocaleString(numLocale())} kcal` : null, proteinNow ? `${proteinNow} g protein` : null].filter(Boolean).join(" · ")}</small>{row.nextGoal && <small className="cw-next">Next: {goalLabel(row.nextGoal.band)}, from {longDay(row.nextGoal.from)}{row.nextGoal.setBy === "coach" ? ", set by you" : ""}</small>}</span></section>
       <section className="card cw-goal">
         <b>A new goal for {name}</b>
         <div className="bands compact">{BANDS.map((b) => {
           const on = band === b.id || (b.id === "gain" && isBuild(band));
-          return <button key={b.id} type="button" className={`band-card ${on ? "on" : ""}`} aria-pressed={on} onClick={() => setBand(b.id === "gain" ? (isBuild(band) ? band : "gainsteady") : b.id)}><b>{on ? "✓ " : ""}{b.name}</b><span>{pdRange(b.range)} · {b.kcal[0].toLocaleString("en")} to {b.kcal[1].toLocaleString("en")} kcal · {b.protein[0]} to {b.protein[1]} g</span></button>;
+          return <button key={b.id} type="button" className={`band-card ${on ? "on" : ""}`} aria-pressed={on} onClick={() => setBand(b.id === "gain" ? (isBuild(band) ? band : "gainsteady") : b.id)}><b>{on ? "✓ " : ""}{b.name}</b><span>{pdRange(b.range)} · {b.kcal[0].toLocaleString(numLocale())} to {b.kcal[1].toLocaleString(numLocale())} kcal · {b.protein[0]} to {b.protein[1]} g</span></button>;
         })}</div>
         {isBuild(band) && <div className="chip-row" role="group" aria-label="Pace">{PACES.map((x) => <button key={x.id} type="button" className={`choice ${band === x.band ? "on" : ""}`} aria-pressed={band === x.band} onClick={() => setBand(x.band)}>{x.name}</button>)}</div>}
         <div className="apply-from" role="group" aria-label="Apply from">

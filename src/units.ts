@@ -1,3 +1,4 @@
+import { dec } from "./words";
 // Units (0.2.18, canvas board UN, Milan 17 October 2026, 09:33). The account always keeps kg, cm and °C; these turn
 // them into the units the person chose, for the screen only, so switching back loses nothing. Food amounts stay in
 // grams and energy in kcal: every label in our markets prints per 100 g, and the plate and PD work in grams.
@@ -24,9 +25,9 @@ export const wIn = (kg: number) => (U.weight === "lb" ? kgToLb(kg) : kg);
 // what the person typed, back to kg for the account (to 10 g, so 209.4 lb shows as 209.4 lb again)
 export const wFrom = (v: number) => (U.weight === "lb" ? Math.round(lbToKg(v) * 100) / 100 : v);
 // "95.0 kg" or "209.4 lb"; d decimals
-export const wText = (kg: number, d = 1) => `${wIn(kg).toFixed(d)} ${U.weight}`;
+export const wText = (kg: number, d = 1) => `${dec(wIn(kg), d)} ${U.weight}`;
 // a change: +0.4 kg, −0.9 lb, ±0.0 kg
-export const wDelta = (kg: number) => { const x = wIn(kg); return `${x > 0 ? "+" : x < 0 ? "−" : "±"}${Math.abs(x).toFixed(1)} ${U.weight}`; };
+export const wDelta = (kg: number) => { const x = wIn(kg); return `${x > 0 ? "+" : x < 0 ? "−" : "±"}${dec(Math.abs(x), 1)} ${U.weight}`; };
 
 // ---- height ----
 // to the nearest inch: 182 cm is 6 ft 0 in

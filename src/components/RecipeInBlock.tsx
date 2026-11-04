@@ -1,6 +1,7 @@
 // R6 (0.2.43, Milan 19:45 to 19:58, board RS14): one block to bring a recipe in from screenshots or a link, shared by the
 // Plate and Recipes. The cards (ShotsCard, LinkCard, ReadCard, ErrorCard) and the read itself are the same on both; only the
 // last step differs: the Plate puts it on the plate, Recipes saves it in My recipes.
+import { w } from "../words";
 import { useState } from "react";
 import { Image as ImageIcon, Link as LinkIcon } from "lucide-react";
 import type { Food, Ingredient, Meal } from "../pilot";
@@ -55,8 +56,8 @@ export type RecipeIn = ReturnType<typeof useRecipeIn>;
 export function StartWays({ flow }: { flow: RecipeIn }) {
   return (
     <div className="ways">
-      <label className="pill pill-small"><ImageIcon size={15} /> Screenshot<input type="file" accept="image/*" multiple hidden onChange={(e) => { void flow.addShots(e.target.files); e.target.value = ""; }} /></label>
-      <button className="pill pill-small" onClick={() => flow.setInFlow({ kind: "link", url: "" })}><LinkIcon size={15} /> Link</button>
+      <label className="pill pill-small"><ImageIcon size={15} /> {w("plate.screenshot")}<input type="file" accept="image/*" multiple hidden onChange={(e) => { void flow.addShots(e.target.files); e.target.value = ""; }} /></label>
+      <button className="pill pill-small" onClick={() => flow.setInFlow({ kind: "link", url: "" })}><LinkIcon size={15} /> {w("plate.link")}</button>
     </div>
   );
 }

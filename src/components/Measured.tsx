@@ -1,9 +1,10 @@
+import { numLocale } from "../words";
 import { useState } from "react";
 import { KCAL_PER_KG, NEED_FULL, NEED_WEIGH, SKIP_DAYS, WINDOW, gapOf, kgText, longDate, shortDate, spanOf, type Measured, type MeasuredFixed } from "../measured";
 
 // The first two weeks and the measured burn on screen (0.2.7, canvas board FT): Today (FT1, FT2), Me, Goal (FT3, FT4) and the
 // coach (FT6, FT7). One card for the person and the coach; only the words for who it is about change.
-const n = (x: number) => Math.round(x).toLocaleString("en");
+const n = (x: number) => Math.round(x).toLocaleString(numLocale());
 
 export function Squares({ m, ends = true }: { m: Measured; ends?: boolean }) {
   if (!m.squares.length) return null;

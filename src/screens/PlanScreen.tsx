@@ -1,3 +1,4 @@
+import { dec , numLocale } from "../words";
 import { shelfName } from "../reference";
 import { atMeal } from "../plateMode";
 import { plannedName } from "../recipeDiff";
@@ -268,9 +269,9 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
       {log.logged.length ? (
         <>
           <div className="past-nums">
-            <span><b>{Math.round(log.kcal).toLocaleString("en")}</b><small>{numbers ? `of ${numbers.kcal.toLocaleString("en")} kcal` : "kcal"}</small></span>
+            <span><b>{Math.round(log.kcal).toLocaleString(numLocale())}</b><small>{numbers ? `of ${numbers.kcal.toLocaleString(numLocale())} kcal` : "kcal"}</small></span>
             <span><b>{Math.round(log.protein)}</b><small>{numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></span>
-            <span><b>{log.kcal ? (Math.round((log.protein / log.kcal) * 1000) / 10).toFixed(1) : "–"}</b><small>PD that day</small></span>
+            <span><b>{log.kcal ? dec(Math.round((log.protein / log.kcal) * 1000) / 10, 1) : "–"}</b><small>PD that day</small></span>
           </div>
           <small className="setting-name past-label">What you ate</small>
           {log.logged.map((f) => {
@@ -353,7 +354,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
     return (
       <button key={x.key} type="button" className={`menu-row shop-row ${st === "got" ? "got" : st === "missing" ? "missing" : ""}`} aria-label={`${x.name}, ${shopAmount(x.name, grams)}${st === "got" ? ", in the basket" : st === "missing" ? ", not this time" : ""}`} disabled={!live} onClick={() => save(tickIn(store, l.n, x.key))}>
         {st === "got" ? <CircleCheck size={20} /> : st === "missing" ? <CircleSlash size={20} /> : <Circle size={20} />}
-        <div className="menu-row-text"><b>{x.name}</b>{(() => { const sh = shelfName({ name: x.name }, p.region, true); return sh ? <small className="shelf-name">{sh.name}</small> : null; })()}{note && <small>{x.added ? "Added · " : ""}{x.cooked ? `${x.cooked.toLocaleString("en")} g cooked · ` : ""}{x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? `${x.brand} · ` : ""}{forWhat(x)}</small>}{st === "missing" && <small className="shop-missing-note">Not this time</small>}</div>
+        <div className="menu-row-text"><b>{x.name}</b>{(() => { const sh = shelfName({ name: x.name }, p.region, true); return sh ? <small className="shelf-name">{sh.name}</small> : null; })()}{note && <small>{x.added ? "Added · " : ""}{x.cooked ? `${x.cooked.toLocaleString(numLocale())} g cooked · ` : ""}{x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? `${x.brand} · ` : ""}{forWhat(x)}</small>}{st === "missing" && <small className="shop-missing-note">Not this time</small>}</div>
         <b className="shop-grams">{shopAmount(x.name, grams)}</b>
       </button>
     );

@@ -1,4 +1,7 @@
 // What a food is, by its job on a plate. A property of the food, never a verdict: that depends on the day (see todayLine).
+import { w } from "./words";
+import { foodNameIn } from "./reference";
+import { dec } from "./words";
 import { englishName } from "./foodId";
 import { density, type Food } from "./pilot";
 import { roleOf } from "./swaps";
@@ -44,7 +47,7 @@ export function plainLine(f: Food, target: number | null): string {
   if (pd == null || target == null) return portion.trim();
   const fits = pd >= target;
   const what = job === "Flavour food" ? "It brings the taste; let a protein base carry the plate." : job === "Protein base" ? "It can carry a plate on its own." : fits ? "It fits on its own." : "Pair it with a protein base to reach your target.";
-  return `PD ${pd.toFixed(1)}, ${fits ? "on" : "below"} your ${target.toFixed(1)}. ${what}${portion}`;
+  return `PD ${dec(pd, 1)}, ${fits ? "on" : "below"} your ${dec(target, 1)}. ${what}${portion}`;
 }
 // Today, for this person: computed fresh every time, never stored.
 export function todayLine(f: Food, dayKcal: number | null, eatenKcal: number, dayName: string): string | null {
@@ -134,7 +137,8 @@ export function portionLine(f: Food, grams: number, scale = 1): string | null {
   const short = f.name.split(",")[0].trim().toLowerCase();
   if (grams > p.max && p.piece) { const n = Math.round(grams / p.piece.grams); return `${Math.round(grams)} g is ${n} ${p.piece.name}${n === 1 ? "" : "s"}. ${p.note}`.trim(); }
   if (grams > p.max) return `${Math.round(grams)} g is over ${p.scaled ? "your meal's portion" : "a portion"} of ${short}, ${p.min} to ${p.max} g.${p.note && !p.scaled ? ` ${p.note}` : ""}`;
-  return `${Math.round(grams)} g is under a portion of ${short}, ${p.min} to ${p.max} g.`;
+  // DT203 release 2 (0.3.77): in Srpski the food stands after a colon, so no word changes its ending
+  return w("plate.underPortion", { grams: Math.round(grams), food: (l) => (l === "en" ? short : foodNameIn(l, f).split(",")[0].trim()), min: p.min, max: p.max });
 }
 // DT96 (0.2.89, board Stories61; Milan 24 October 17:04): Add puts a food on the plate at its normal portion: a piece when the
 // pack prints one (1 bar, 1 can), one M egg or banana when it is counted, else the middle of its range, to 5 g. Before, every

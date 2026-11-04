@@ -1,3 +1,4 @@
+import { numLocale } from "../words";
 import { useRef, useState } from "react";
 import { DAY_TYPES, type DayNumbers, type DayType, type OwnDay, type Week } from "../personal";
 import { density } from "../pilot";
@@ -34,7 +35,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
   const mix = DAY_TYPES.filter((d) => week[d.id]).map((d) => `${week[d.id]} ${d.name.toLowerCase().replace("training, ", "").replace("rest, ", "")}`).join(", ");
   // plain English (7 October 2026): "Your week averages 2,950 kcal at PD 6.1, with 4 training days and 3 without."
   const trainingDays = 7 - (week.passive || 0);
-  const avgLine = <p className="dt-avg">Your week averages {avg.kcal.toLocaleString("en")} kcal at PD {(density(avg.protein, avg.kcal) ?? 0).toFixed(1)}{mix ? `, with ${trainingDays} training ${trainingDays === 1 ? "day" : "days"} and ${7 - trainingDays} without` : ""}.{note ? ` ${note}` : ""}</p>;
+  const avgLine = <p className="dt-avg">Your week averages {avg.kcal.toLocaleString(numLocale())} kcal at PD {(density(avg.protein, avg.kcal) ?? 0).toFixed(1)}{mix ? `, with ${trainingDays} training ${trainingDays === 1 ? "day" : "days"} and ${7 - trainingDays} without` : ""}.{note ? ` ${note}` : ""}</p>;
   const howBlock = (d: string, r: Row) => how === d && <div className="dt-how">{r.how.map((l, i) => <p key={i} className={i === r.how.length - 1 ? "dt-sum" : ""}>{l}</p>)}</div>;
   const howLink = (d: string) => <button type="button" className="link" aria-expanded={how === d} onClick={() => setHow(how === d ? null : d)}>{how === d ? "Hide" : "How ›"}</button>;
 
@@ -47,7 +48,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
             <div className="dt-cells">
               {/* DT144 (0.3.38, board Stories146): each day's PD, the number Today shows on that day */}
               <span className="dt-day"><b><i className={`load-dot load-${loadOf(w.day)}`} />{w.name}</b><small>{planShort(w.day)}</small><b className="dt-pd">PD {(density(w.protein, w.kcal) ?? 0).toFixed(1)}</b></span>
-              <b className="dt-num">{w.kcal.toLocaleString("en")}</b>
+              <b className="dt-num">{w.kcal.toLocaleString(numLocale())}</b>
               <span className="dt-num">{w.protein}</span>
               <span className="dt-num muted">{w.fats}</span>
               <span className="dt-num muted">{w.carbs}</span>
@@ -71,7 +72,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
             <div className="dt-row" key={d.id}>
               <div className="dt-cells">
                 <span className="dt-day"><b>{d.name}</b><small>{d.hint}</small></span>
-                <b className="dt-num">{r.kcal.toLocaleString("en")}</b>
+                <b className="dt-num">{r.kcal.toLocaleString(numLocale())}</b>
                 <span className="dt-num">{r.protein}</span>
                 <span className="dt-num muted">{r.fats}</span>
                 <span className="dt-num muted">{r.carbs}</span>
@@ -130,7 +131,7 @@ export function DayTable({ rows, avg, week, own, setOwn, analysis, open, keep, w
             <div className="dt-block-head"><b>{d.name}</b><small>{d.hint}</small></div>
             <div className="dt-fields">{(["kcal", "protein", "fats", "carbs"] as Field[]).map((f) => input(d.id, f, r[f], sum !== null))}</div>
             <div className="dt-src">
-              {sum !== null ? <small className="warn">These come to {sum.toLocaleString("en")}, not {r.kcal.toLocaleString("en")}: {Math.abs(sum - r.kcal)} kcal apart</small>
+              {sum !== null ? <small className="warn">These come to {sum.toLocaleString(numLocale())}, not {r.kcal.toLocaleString(numLocale())}: {Math.abs(sum - r.kcal)} kcal apart</small>
                 : o.kcal ? <small>{filled ?? "Set by you"}</small>
                 : <><small>{r.source === "calculated" ? "Calculated, nothing typed" : "Nothing typed: the average of the days you typed"}</small>{howLink(d.id)}</>}
             </div>
