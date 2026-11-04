@@ -1,4 +1,4 @@
-import { numLocale } from "../words";
+import { numLocale, w } from "../words";
 import { Settings , Coffee } from "lucide-react";
 import { SetupRow } from "../components/SetupRow";
 import { setupMissing, stepMissing, type SetupStep } from "../setup";
@@ -22,22 +22,22 @@ import { placeName } from "../travel";
 
 // Me is the person's place: who I am and how I'm set up. Each row opens its panel; back comes here.
 const ME_ROWS: { id: MenuSection; name: string; icon: ReactNode; hint: (p: AppApi) => string }[] = [
-  { id: "profile", name: "Profile", icon: <User size={18} />, hint: (p) => (p.safety.declaredAt ? "Your body data, and the health questions you answered" : "Your body data, and a few health questions") },
-  { id: "goal", name: "Goal", icon: <Target size={18} />, hint: (p) => (p.state.goals.calories ? `${Math.round(p.state.goals.calories).toLocaleString(numLocale())} kcal on an average day, ${p.state.goals.protein ?? "?"} g protein every day` : "Calculate it, or set it") },
+  { id: "profile", name: "Profile", icon: <User size={18} />, hint: (p) => (p.safety.declaredAt ? w("me.yourBodyDataAndThe") : w("me.yourBodyDataAndA")) },
+  { id: "goal", name: "Goal", icon: <Target size={18} />, hint: (p) => (p.state.goals.calories ? `${Math.round(p.state.goals.calories).toLocaleString(numLocale())} kcal on an average day, ${p.state.goals.protein ?? "?"} g protein every day` : w("me.calculateItOrSetIt")) },
   { id: "life", name: "Lifestyle", icon: <Coffee size={18} />, hint: (p) => lifeHint(p) },
-  { id: "week", name: "Training week", icon: <CalendarDays size={18} />, hint: (p) => planHint(p) },
+  { id: "week", get name() { return w("me.trainingWeek"); }, icon: <CalendarDays size={18} />, hint: (p) => planHint(p) },
   // DT178 (0.3.21, board Stories126): Google Calendar, under Training week
-  { id: "calendar", name: "Google Calendar", icon: <CalendarClock size={18} />, hint: (p) => (p.personal.calendar?.on ? "On. Your plan in the calendar Chef Mealan, 14 days ahead" : "Off. Your meals, cooking and training in your own calendar") },
-  { id: "shop", name: "Where I shop and cook", icon: <ShoppingBasket size={18} />, hint: () => "Your shops, the kitchens you cook, and what you cook with" },
+  { id: "calendar", get name() { return w("me.googleCalendar"); }, icon: <CalendarClock size={18} />, hint: (p) => (p.personal.calendar?.on ? w("me.onYourPlanInThe") : w("me.offYourMealsCookingAnd")) },
+  { id: "shop", get name() { return w("me.whereIShopAndCook"); }, icon: <ShoppingBasket size={18} />, hint: () => w("me.shopHint") },
   // DT167 (0.3.9, board Stories119): Your summary, where the steps end
-  { id: "summary", name: "Your summary", icon: <ClipboardList size={18} />, hint: (p) => (p.profile.coachId ? `Everything you told Chef Mealan, and what it does. Choose what ${p.coachLabel} sees.` : "Everything you told Chef Mealan, and what it does") },
+  { id: "summary", get name() { return w("me.yourSummary"); }, icon: <ClipboardList size={18} />, hint: (p) => (p.profile.coachId ? w("me.summaryHintCoach", { coach: p.coachLabel }) : w("me.everythingYouToldChefMealan")) },
   // DT209 (0.3.50, board Stories156): My coach is its own row under Your summary, not a setup step; a coach account has none
-  { id: "coach", name: "My coach", icon: <Users size={18} />, hint: (p) => (p.profile.coachId ? `${p.coachLabel} sees what you share` : "Join with a code") },
-  { id: "account", name: "Account", icon: <KeyRound size={18} />, hint: () => "Export my data, delete my account" },
+  { id: "coach", get name() { return w("me.myCoach"); }, icon: <Users size={18} />, hint: (p) => (p.profile.coachId ? `${p.coachLabel} sees what you share` : w("me.joinWithACode")) },
+  { id: "account", name: "Account", icon: <KeyRound size={18} />, hint: () => w("me.accountHint") },
 ];
 // the two speeds: Lifestyle changes when life does, the Training week when the activity does
 function lifeHint(p: AppApi): string {
-  if (!p.personal.lifestyle) return "How you eat, work and sleep. Set once.";
+  if (!p.personal.lifestyle) return w("me.lifeHint");
   const l = lifestyleOf(p.personal);
   // plain English (7 October 2026): "Work, fixed hours, 9 to 5"
   const wk = weekdaysOf(l);
@@ -47,10 +47,10 @@ function lifeHint(p: AppApi): string {
 }
 function planHint(p: AppApi): string {
   const plan = planOf(p.personal);
-  if (!plan) return "What each day of your usual week holds";
+  if (!plan) return w("me.weekHint");
   // the same words as Calculate for me (7 October 2026)
   const n = plan.filter((d) => d.kind !== "rest").length;
-  return n === 0 ? "No training days yet" : `${n} training ${n === 1 ? "day" : "days"} and ${7 - n} without`;
+  return n === 0 ? w("me.noTrainingDaysYet") : `${n} training ${n === 1 ? "day" : "days"} and ${7 - n} without`;
 }
 export function MeScreen(p: AppApi) {
   const { state, goal, profile, clientName } = p;
@@ -61,20 +61,20 @@ export function MeScreen(p: AppApi) {
   return (
     <>
       <section className="plan">
-        <div className="plan-top"><span>{clientName ? `${clientName}'s goal` : "My goal"}{bandName ? `: ${bandName}` : ""}</span><span>{goal?.setBy === "coach" ? `set by ${setBy}` : ""}</span></div>
+        <div className="plan-top"><span>{clientName ? `${clientName}'s goal` : w("me.myGoal")}{bandName ? `: ${bandName}` : ""}</span><span>{goal?.setBy === "coach" ? `set by ${setBy}` : ""}</span></div>
         {/* DT208 (0.3.49): the same row as on Today */}
-        <SetupRow p={p} done="Profile and plan fully set" />
+        <SetupRow p={p} done={w("me.fullySet")} />
         <div className="plan-row">
           {/* the three numbers of the same day, the average one (11 October 2026: the PD was today's, the kcal and protein the average's) */}
           <div><b>{pdVal(density(state.goals.protein, state.goals.calories))}</b><small>{pdTag()}, average day</small></div>
-          <div><b>{fmt(state.goals.calories, 0)}</b><small>kcal, average day</small></div>
-          <div><b>{fmt(state.goals.protein, 0)}</b><small>g protein</small></div>
+          <div><b>{fmt(state.goals.calories, 0)}</b><small>{w("me.kcalAverageDay")}</small></div>
+          <div><b>{fmt(state.goals.protein, 0)}</b><small>{w("me.gProtein")}</small></div>
         </div>
-        <div className="button-row"><button className="pill pill-small" onClick={() => p.openMenu("goal")}><Settings size={14} /> Goal and profile</button></div>
+        <div className="button-row"><button className="pill pill-small" onClick={() => p.openMenu("goal")}><Settings size={14} /> {w("me.goalAndProfile")}</button></div>
         {/* weigh-ins (boards W1, Y1 column 17): moved here from Today on 10 October 2026; with consent for body data, never for someone who declared an eating situation */}
         {p.safety.consentBodyAt && !weighInsOff(p.safety) && (p.travel?.weighPaused
-          ? <div className="weigh-line weigh-paused" role="note"><span><b>Weigh in</b><small>Paused while you travel in {placeName(p.travel.place)}. Your trend keeps your home mornings.</small></span></div>
-          : <WeighInLine list={p.personal.weighIns} onSave={(w) => p.setPersonal({ ...p.personal, weighIns: w })} notify={p.notify} />)}
+          ? <div className="weigh-line weigh-paused" role="note"><span><b>{w("me.weighIn")}</b><small>Paused while you travel in {placeName(p.travel.place)}. Your trend keeps your home mornings.</small></span></div>
+          : <WeighInLine list={p.personal.weighIns} onSave={(wl) => p.setPersonal({ ...p.personal, weighIns: wl })} notify={p.notify} />)}
       </section>
       {/* DT176 (0.3.19, board Stories124): Travel mode, above the steps */}
       <TravelCard p={p} />
@@ -82,10 +82,10 @@ export function MeScreen(p: AppApi) {
         {ME_ROWS.filter((r) => !(r.id === "coach" && (p.profile.role === "coach" || p.isCoach))).map((r) => {
           // DT208: a step still to set says To do and what is missing; a step done shows its usual line, no tag
           const miss = stepMissing(missing, r.id as SetupStep);
-          const hint = !miss.length ? r.hint(p) : r.id === "profile" ? `${miss.map((x) => x.label).join(", ").replace(/^./, (c) => c.toUpperCase())} missing` : "Not set yet";
+          const hint = !miss.length ? r.hint(p) : r.id === "profile" ? `${miss.map((x) => x.label).join(", ").replace(/^./, (c) => c.toUpperCase())} missing` : w("me.notSetYet");
           return (
           <button key={r.id} className="menu-row" onClick={() => p.openMenu(r.id, "me" as any)}>
-            <span className="menu-icon">{r.icon}</span><span className="menu-row-text"><b>{r.name}</b><small>{hint}</small></span>{miss.length > 0 && <span className="me-todo">To do</span>}<ChevronRight size={18} />
+            <span className="menu-icon">{r.icon}</span><span className="menu-row-text"><b>{r.name}</b><small>{hint}</small></span>{miss.length > 0 && <span className="me-todo">{w("me.toDo")}</span>}<ChevronRight size={18} />
           </button>
         ); })}
       </div>
@@ -100,10 +100,10 @@ export function TasteSetting(p: AppApi) {
   return (
     <>
       {/* R22 (0.2.50, board RS21): chips first, each one fixed meaning; your own words for what no chip says */}
-      <div className="setting taste-card" aria-label="Taste is part of the plan">
-        <small className="setting-name">Taste</small>
-        <small>Tap what is true for you. Chef Mealan reads it with every idea, every answer about a plate and every set of steps. It never changes your numbers.</small>
-        {([["like", "I like"], ["not", "Rather not"], ["how", "How I eat"]] as const).map(([g, title]) => (
+      <div className="setting taste-card" aria-label={w("me.tasteIsPartOfThe")}>
+        <small className="setting-name">{w("me.taste")}</small>
+        <small>{w("me.tapWhatIsTrueFor")}</small>
+        {([["like", w("me.iLike")], ["not", w("me.ratherNot")], ["how", w("me.howIEat")]] as const).map(([g, title]) => (
           <div key={g} className="taste-group">
             <p className="label">{title}</p>
             <div className="moments" role="group" aria-label={title}>
@@ -113,8 +113,8 @@ export function TasteSetting(p: AppApi) {
             </div>
           </div>
         ))}
-        <p className="label">In your own words</p>
-        <textarea className="taste-words" aria-label="Your taste in your own words" placeholder="Anything the chips don't say" value={state.preferences} onChange={(e) => p.setState((s) => ({ ...s, preferences: e.target.value }))} />
+        <p className="label">{w("me.inYourOwnWords")}</p>
+        <textarea className="taste-words" aria-label={w("me.yourTasteInYourOwn")} placeholder={w("me.anythingTheChipsDonT")} value={state.preferences} onChange={(e) => p.setState((s) => ({ ...s, preferences: e.target.value }))} />
       </div>
     </>
   );
