@@ -1,5 +1,5 @@
 // What a food is, by its job on a plate. A property of the food, never a verdict: that depends on the day (see todayLine).
-import { w } from "./words";
+import { w, type WordKey } from "./words";
 import { foodNameIn } from "./reference";
 import { dec } from "./words";
 import { englishName } from "./foodId";
@@ -7,6 +7,11 @@ import { density, type Food } from "./pilot";
 import { roleOf } from "./swaps";
 import { kindOf, gramsOfOne } from "./counted";
 export const JOBS = ["Protein base", "Flavour food", "Carb base", "Fat source", "Volume food", "Drink", "Mixed"] as const;
+// DT203 phase 9: a food's job on the screen, in the language chosen; the job itself stays the English id it is saved as
+const JOB_WORD: Record<string, WordKey> = { "Protein base": "job.protein", "Flavour food": "job.flavour", "Carb base": "job.carb", "Fat source": "job.fat", "Volume food": "job.volume", Drink: "job.drink", Mixed: "job.mixed", spread: "job.spread" };
+export const jobName = (j: string) => (JOB_WORD[j] ? w(JOB_WORD[j]) : j);
+// the brand line of a food: a generic food's "typical values, check your pack" in the language chosen
+export const brandName = (b: string) => (/typical values|check your pack/i.test(b) ? w("job.typical") : b);
 export type Job = (typeof JOBS)[number];
 const SPREAD = /nutella|spread|aufstrich|creme|crème|butter|peanut ?butter|erdnussmus|nussmus|honig|honey|jam|marmelade|konfit/i;
 const DRINK = /drink|juice|saft|milk\b|milch\b|cola|soda|tea\b|tee\b|coffee|kaffee|smoothie|shake|wasser|water|bier|beer|wein|wine|alkoholfrei|alcohol-free|pils\b|lager\b|radler|kombucha|lemonade|limonade|sprite|fanta|energy drink/i;

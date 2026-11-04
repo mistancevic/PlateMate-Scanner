@@ -237,30 +237,30 @@ export type Lifestyle = {
 // Life without planned activity, as a multiple of resting burn: physical activity levels after FAO/WHO/UNU 2004, at the low
 // end of each band, because planned activity is counted per day. A day off from a job on your feet counts as a sitting day.
 export const MOVES: { id: Move; name: string; hint: string; factor: number }[] = [
-  { id: "sitting",  name: "Mostly sitting", hint: "desk, driving",              factor: 1.3 },
-  { id: "feet",     name: "On your feet",   hint: "shop, care, teaching",       factor: 1.55 },
-  { id: "physical", name: "Physical",       hint: "building, farming, carrying", factor: 1.75 },
+  { id: "sitting", get name() { return w("opt.moves.sitting.name"); }, get hint() { return w("opt.moves.sitting.hint"); },              factor: 1.3 },
+  { id: "feet", get name() { return w("opt.moves.feet.name"); }, get hint() { return w("opt.moves.feet.hint"); },       factor: 1.55 },
+  { id: "physical", get name() { return w("opt.moves.physical.name"); }, get hint() { return w("opt.moves.physical.hint"); }, factor: 1.75 },
 ];
 export const HOURS: { id: Hours; name: string; hint: string }[] = [
-  { id: "fixed", name: "Fixed hours", hint: "same times every day" },
-  { id: "flexible", name: "Flexible hours", hint: "you choose when" },
-  { id: "shifts", name: "Shifts", hint: "early, late, night or rotating" },
-  { id: "none", name: "No fixed work", hint: "home, studies, retired" },
+  { id: "fixed", get name() { return w("opt.hours.fixed.name"); }, get hint() { return w("opt.hours.fixed.hint"); } },
+  { id: "flexible", get name() { return w("opt.hours.flexible.name"); }, get hint() { return w("opt.hours.flexible.hint"); } },
+  { id: "shifts", get name() { return w("opt.hours.shifts.name"); }, get hint() { return w("opt.hours.shifts.hint"); } },
+  { id: "none", get name() { return w("opt.hours.none.name"); }, get hint() { return w("opt.hours.none.hint"); } },
 ];
 // Working hours as asked since Release B: No fixed work is now At home, under Your weekdays.
 export const HOURS_SHOWN = HOURS.filter((h) => h.id !== "none");
 export const WEEKDAY_CHOICES: { id: Weekdays; name: string; hint: string }[] = [
-  { id: "work", name: "Work", hint: "a job, on site or remote work" },
-  { id: "study", name: "Study", hint: "university, school, a course" },
-  { id: "both", name: "Work and study", hint: "an apprenticeship, a job next to studies" },
-  { id: "home", name: "At home", hint: "home and family, retired, between jobs" },
+  { id: "work", get name() { return w("opt.weekday_choices.work.name"); }, get hint() { return w("opt.weekday_choices.work.hint"); } },
+  { id: "study", get name() { return w("opt.weekday_choices.study.name"); }, get hint() { return w("opt.weekday_choices.study.hint"); } },
+  { id: "both", get name() { return w("opt.weekday_choices.both.name"); }, get hint() { return w("opt.weekday_choices.both.hint"); } },
+  { id: "home", get name() { return w("opt.weekday_choices.home.name"); }, get hint() { return w("opt.weekday_choices.home.hint"); } },
 ];
 // older lifestyles had No fixed work under Working hours: that is At home now
 export const weekdaysOf = (l: Lifestyle): Weekdays => l.weekdays ?? (l.hours === "none" ? "home" : "work");
 export const STUDY_HOURS: { id: SchoolHours; name: string; hint: string }[] = [
-  { id: "mornings", name: "Mornings", hint: "done around lunch" },
-  { id: "full", name: "Full day", hint: "until the afternoon" },
-  { id: "alternating", name: "Changes every week", hint: "mornings, then afternoons" },
+  { id: "mornings", get name() { return w("opt.study_hours.mornings.name"); }, get hint() { return w("opt.study_hours.mornings.hint"); } },
+  { id: "full", get name() { return w("opt.study_hours.full.name"); }, get hint() { return w("opt.study_hours.full.hint"); } },
+  { id: "alternating", get name() { return w("opt.study_hours.alternating.name"); }, get hint() { return w("opt.study_hours.alternating.hint"); } },
 ];
 // What a day is: work, study or off. Under 18 a weekday is a school day; At home, every day is a day at home.
 export type DayKind = "work" | "study" | "off";
@@ -270,7 +270,7 @@ export function dayKindOf(d: PlanDay, l: Lifestyle, minor = false): DayKind {
   const w = weekdaysOf(l);
   return w === "home" ? "off" : w === "study" ? "study" : w === "work" ? "work" : d.study ? "study" : "work";
 }
-export const SLOTS: { id: Slot; name: string }[] = [{ id: "9-5", name: "9 to 5" }, { id: "8-4", name: "8 to 4" }, { id: "7-3", name: "7 to 3" }, { id: "my", name: "My hours" }];
+export const SLOTS: { id: Slot; name: string }[] = [{ id: "9-5", get name() { return w("opt.slots.95.name"); } }, { id: "8-4", get name() { return w("opt.slots.84.name"); } }, { id: "7-3", get name() { return w("opt.slots.73.name"); } }, { id: "my", get name() { return w("opt.slots.my.name"); } }];
 // the line under Your day in the day editor, the same on the Training week and on a date in Plan
 export function workHintOf(l: Lifestyle, minor: boolean): string | undefined {
   const wkd = weekdaysOf(l);
@@ -281,13 +281,13 @@ export function workHintOf(l: Lifestyle, minor: boolean): string | undefined {
 export const WHERE = ["Cook at home", "Meal prep for days", "Canteen at work", "Restaurants", "Takeaway", "Family dinners"];
 export const WHERE_KID = ["At home", "School lunch", "Lunch packed from home", "Bakery or shop near school", "Takeaway", "Family dinners"];
 export const SCHOOL_HOURS: { id: SchoolHours; name: string; hint: string }[] = [
-  { id: "mornings", name: "Mornings", hint: "school ends around lunch" },
-  { id: "full", name: "Full day", hint: "school until the afternoon" },
-  { id: "alternating", name: "Changes every week", hint: "mornings one week, afternoons the next" },
-  { id: "none", name: "Not in school", hint: "holidays, a gap year, home schooling" },
+  { id: "mornings", get name() { return w("opt.school_hours.mornings.name"); }, get hint() { return w("opt.school_hours.mornings.hint"); } },
+  { id: "full", get name() { return w("opt.school_hours.full.name"); }, get hint() { return w("opt.school_hours.full.hint"); } },
+  { id: "alternating", get name() { return w("opt.school_hours.alternating.name"); }, get hint() { return w("opt.school_hours.alternating.hint"); } },
+  { id: "none", get name() { return w("opt.school_hours.none.name"); }, get hint() { return w("opt.school_hours.none.hint"); } },
 ];
-export const COMMUTES: { id: Commute; name: string }[] = [{ id: "walk", name: "Walk" }, { id: "bike", name: "Bike" }, { id: "bus", name: "Bus or train" }, { id: "car", name: "Car" }];
-export const PE_WEEK: { id: "1" | "2" | "3" | "none"; name: string }[] = [{ id: "1", name: "Once a week" }, { id: "2", name: "Twice a week" }, { id: "3", name: "Three times or more" }, { id: "none", name: "None" }];
+export const COMMUTES: { id: Commute; name: string }[] = [{ id: "walk", get name() { return w("opt.commutes.walk.name"); } }, { id: "bike", get name() { return w("opt.commutes.bike.name"); } }, { id: "bus", get name() { return w("opt.commutes.bus.name"); } }, { id: "car", get name() { return w("opt.commutes.car.name"); } }];
+export const PE_WEEK: { id: "1" | "2" | "3" | "none"; name: string }[] = [{ id: "1", get name() { return w("opt.pe_week.1.name"); } }, { id: "2", get name() { return w("opt.pe_week.2.name"); } }, { id: "3", get name() { return w("opt.pe_week.3.name"); } }, { id: "none", get name() { return w("opt.pe_week.none.name"); } }];
 // DT161 (0.3.3, board Stories113): Paleo, Meat only and Other, a way of eating in the person's own words. Each fixed diet means
 // the same thing every time (DIET_MEANS); Chef Mealan reads it with every suggestion, and the kitchens' dishes follow it.
 export const DIETS = ["Everything", "Vegetarian", "Vegan", "Pescatarian", "No pork", "Paleo", "Meat only", "Other"];

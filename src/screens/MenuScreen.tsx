@@ -1,4 +1,5 @@
-import { numLocale, w, dateText, phoneLoc } from "../words";
+import { numLocale, w, dateText, phoneLoc, mealName, mealV } from "../words";
+import { optWord } from "../optWords";
 import { SafetyQuestion } from "../components/SafetyQuestion";
 import { LanguagePanel } from "../components/LanguagePanel";
 import { countByPlace, samePlace, getStarted } from "../places";
@@ -55,16 +56,16 @@ import { SettingsList, VoiceSettingsPanel } from "../components/VoiceSettings";
 // the sections that belong to the person: they live under Me, and back from them goes to Me
 const ME_SECTIONS: MenuSection[] = ["profile", "goal", "life", "week", "calendar", "shop", "coach", "summary", "account"];
 const ITEMS: { id: MenuSection; name: string; icon: ReactNode }[] = [
-  { id: "profile", name: "Profile", icon: <User size={20} /> },
-  { id: "goal", name: "Goal", icon: <Target size={20} /> },
-  { id: "life", name: "Lifestyle", icon: <Coffee size={20} /> },
+  { id: "profile", get name() { return w("me.rowProfile"); }, icon: <User size={20} /> },
+  { id: "goal", get name() { return w("me2.goal"); }, icon: <Target size={20} /> },
+  { id: "life", get name() { return w("me2.lifestyle"); }, icon: <Coffee size={20} /> },
   { id: "week", get name() { return w("menu.trainingWeek"); }, icon: <CalendarDays size={20} /> },
   { id: "calendar", get name() { return w("menu.googleCalendar"); }, icon: <CalendarClock size={20} /> },
   { id: "shop", get name() { return w("menu.whereIShopAndCook"); }, icon: <ShoppingBasket size={20} /> },
-  { id: "coach", name: "Coach", icon: <Users size={20} /> },
+  { id: "coach", get name() { return w("menu.rowCoach"); }, icon: <Users size={20} /> },
   { id: "summary", get name() { return w("menu.yourSummary"); }, icon: <ClipboardList size={20} /> },
-  { id: "account", name: "Account", icon: <KeyRound size={20} /> },
-  { id: "support", name: "Support", icon: <LifeBuoy size={20} /> },
+  { id: "account", get name() { return w("me.rowAccount"); }, icon: <KeyRound size={20} /> },
+  { id: "support", get name() { return w("menu.rowSupport"); }, icon: <LifeBuoy size={20} /> },
   { id: "about", get name() { return w("menu.about"); }, icon: <Info size={20} /> },
   { id: "evals", name: "Evals", icon: <FlaskConical size={20} /> },
   { id: "metrics", get name() { return w("menu.metrics"); }, icon: <LineChart size={20} /> },
@@ -287,7 +288,7 @@ function ProfilePanel(p: AppApi) {
         <small className={`muted saved-line ${odd ? "odd" : ""}`} role="status">{!consented ? "" : odd ? `Not kept yet: ${odd}.` : w("menu.keptAsYouGoNothing")}</small>
       </section>
       <div id="pf-health"><SafetyQuestion p={p} /></div>
-      <NextLink p={p} to="goal" from="profile" text="Goal" hint={canCalculate(d) ? w("menu.calculateYourDailyNumbersFrom") : w("menu.yourGoalAndDailyNumbers")} before={keep} />
+      <NextLink p={p} to="goal" from="profile" text={w("me2.goal")} hint={canCalculate(d) ? w("menu.calculateYourDailyNumbersFrom") : w("menu.yourGoalAndDailyNumbers")} before={keep} />
       {/* DT208: Next goes on; under it, what is still missing, the whole line a link to that field */}
       {needNow.length > 0 && <button type="button" className="setup-line" onClick={() => focusField(needNow[0].field)}><span>Still needed for your numbers: {needNow.map((x) => x.label).join(", ")}</span><ChevronRight size={18} aria-hidden="true" /></button>}
     </>
@@ -432,7 +433,7 @@ function GoalPanel(p: AppApi) {
         <small>Sources: Mifflin et al. 1990; Katch and McArdle; Schofield 1985 (FAO/WHO/UNU); FAO/WHO/UNU 2004 activity levels; Compendium of Physical Activities 2024; US Dietary Guidelines 2025–2030; ISSN position stand 2017; Morton et al. 2018.</small>
       </section>
       <GoalHistory log={p.goalLog} />
-      <NextLink p={p} to="life" from="goal" text="Lifestyle" hint="How you eat, work and sleep. Set once." />
+      <NextLink p={p} to="life" from="goal" text={w("me2.lifestyle")} hint={w("me.lifeHint")} />
     </>
   );
 }
@@ -491,23 +492,23 @@ function LifestylePanel(p: AppApi) {
     if (j === "meals") { const t = setTimeout(() => document.getElementById("meals")?.closest(".seg")?.previousElementSibling?.scrollIntoView({ block: "start" }), 150); return () => clearTimeout(t); } }, []);
   const wk = weekdaysOf(l);
   const toggle = (v: string) => save({ where: (l.where ?? []).includes(v) ? (l.where ?? []).filter((x) => x !== v) : [...(l.where ?? []), v] });
-  const asItems = (xs: string[]) => xs.map((x) => ({ id: x, name: x }));
+  const asItems = (xs: string[]) => xs.map((x) => ({ id: x, name: optWord(x) }));
   return (
     <>
       <p className="small muted page-why">{minor ? w("menu.howYourLifeRunsIn") : w("menu.howYourLifeRunsMost")}</p>
       {minor ? (
-        <Seg title={w("menu.school")} why="How much school moves you on a normal day, before any sport.">
-          <Setting name="School hours"><Options items={SCHOOL_HOURS} on={l.school} pick={(v) => save({ school: v })} /></Setting>
-          <Setting name="How you get to school" hint="Walking or cycling there and back counts as light activity on every school day."><Chips items={COMMUTES} on={l.commute} pick={(v) => save({ commute: v })} /></Setting>
-          <Setting name="Sport at school" hint="You pick the days in your Training week."><Chips items={PE_WEEK} on={l.peWeek} pick={(v) => save({ peWeek: v })} /></Setting>
+        <Seg title={w("menu.school")} why={w("life.whySchool")}>
+          <Setting name={w("life.schoolHours")}><Options items={SCHOOL_HOURS} on={l.school} pick={(v) => save({ school: v })} /></Setting>
+          <Setting name={w("life.toSchool")} hint={w("life.toSchoolHint")}><Chips items={COMMUTES} on={l.commute} pick={(v) => save({ commute: v })} /></Setting>
+          <Setting name={w("life.peSchool")} hint={w("life.peHint")}><Chips items={PE_WEEK} on={l.peWeek} pick={(v) => save({ peWeek: v })} /></Setting>
         </Seg>
       ) : (
         // Release B (7 October 2026, canvas B1 and B3): what fills the weekdays first; the questions after it follow the answer
-        <Seg title={w("menu.workAndStudy")} why="How much your weekdays move you, before any training.">
-          <Setting name="Your weekdays"><Options items={WEEKDAY_CHOICES} on={wk} pick={(v) => save({ weekdays: v, ...(v !== "home" && l.hours === "none" ? { hours: undefined } : {}) })} /></Setting>
+        <Seg title={w("menu.workAndStudy")} why={w("life.whyWeek")}>
+          <Setting name={w("life.weekdays")}><Options items={WEEKDAY_CHOICES} on={wk} pick={(v) => save({ weekdays: v, ...(v !== "home" && l.hours === "none" ? { hours: undefined } : {}) })} /></Setting>
           {(wk === "work" || wk === "both") && (
             <>
-              <Setting name="Working hours" hint={l.hours === "fixed" ? w("menu.withFixedHoursMondayTo") : undefined}>
+              <Setting name={w("life.workingHours")} hint={l.hours === "fixed" ? w("menu.withFixedHoursMondayTo") : undefined}>
                 <Options items={HOURS_SHOWN} on={l.hours === "none" ? undefined : l.hours} pick={(v) => save({ hours: v })} />
                 {l.hours === "fixed" && <Chips items={SLOTS} on={l.slot} pick={(v) => save(v === "my" ? { slot: v, workFrom: l.workFrom ?? SLOT_HOURS[l.slot ?? "9-5"]?.from ?? "09:00", workTo: l.workTo ?? SLOT_HOURS[l.slot ?? "9-5"]?.to ?? "17:00" } : { slot: v })} />}
                 {/* DT147 (0.2.128, Tester 3 works Canadian hours from Cyprus): My hours, From and To, your local time */}
@@ -519,35 +520,35 @@ function LifestylePanel(p: AppApi) {
                   </div>
                 )}
               </Setting>
-              <Setting name="At work you are"><Options items={MOVES} on={l.move ?? "sitting"} pick={(v) => save({ move: v })} /></Setting>
-              <Setting name="Work travel"><Chips items={[{ id: "none", name: "None" }, { id: "sometimes", name: "Occasionally" }, { id: "often", name: "A lot" }]} on={l.travel} pick={(v) => save({ travel: v as Lifestyle["travel"] })} /></Setting>
+              <Setting name={w("life.atWork")}><Options items={MOVES} on={l.move ?? "sitting"} pick={(v) => save({ move: v })} /></Setting>
+              <Setting name={w("life.workTravel")}><Chips items={[{ id: "none", name: "None" }, { id: "sometimes", name: "Occasionally" }, { id: "often", name: "A lot" }]} on={l.travel} pick={(v) => save({ travel: v as Lifestyle["travel"] })} /></Setting>
             </>
           )}
           {(wk === "study" || wk === "both") && (
             <>
-              <Setting name="Study hours"><Options items={STUDY_HOURS} on={l.school === "none" ? undefined : l.school} pick={(v) => save({ school: v })} /></Setting>
-              <Setting name="How you get there" hint="Walking or cycling there and back counts as light activity on every study day."><Chips items={COMMUTES} on={l.commute} pick={(v) => save({ commute: v })} /></Setting>
-              <Setting name="Sport as part of your studies" hint="For courses with sport, like a sports class at school. You pick the days in your Training week."><Chips items={PE_WEEK} on={l.peWeek} pick={(v) => save({ peWeek: v })} /></Setting>
+              <Setting name={w("life.studyHours")}><Options items={STUDY_HOURS} on={l.school === "none" ? undefined : l.school} pick={(v) => save({ school: v })} /></Setting>
+              <Setting name={w("life.getThere")} hint={w("life.getThereHint")}><Chips items={COMMUTES} on={l.commute} pick={(v) => save({ commute: v })} /></Setting>
+              <Setting name={w("life.peStudy")} hint={w("life.peStudyHint")}><Chips items={PE_WEEK} on={l.peWeek} pick={(v) => save({ peWeek: v })} /></Setting>
             </>
           )}
           {wk === "home" && <p className="small muted">{w("menu.yourDaysAreSpentAt")}</p>}
         </Seg>
       )}
       <Seg title={w("menu.recovery")} why={minor ? w("menu.sleepIsWhenYourBody") : w("menu.sleepIsWhereTrainingTurns")}>
-        <Setting name="Wake-up" hint={minor ? undefined : w("menu.setsYourFirstMealBelow")}><Chips items={minor ? [{ id: "early", name: w("menu.before") }, { id: "mid", name: w("menu.sixToSeven") }, { id: "late", name: w("menu.after") }] : [{ id: "early", name: w("menu.before2") }, { id: "mid", name: w("menu.sixToEight") }, { id: "late", name: w("menu.after2") }, { id: "varies", name: w("menu.variesWithShifts") }]} on={l.wake} pick={(v) => save({ wake: v as Lifestyle["wake"] })} /></Setting>
-        <Setting name="Bedtime" hint={minor ? undefined : w("menu.setsYourLastMealBelow")}><Chips items={[{ id: "early", name: w("menu.before3") }, { id: "mid", name: w("menu.tenToMidnight") }, { id: "late", name: w("menu.afterMidnight") }, ...(minor ? [] : [{ id: "varies", name: w("menu.variesWithShifts") }])]} on={l.bed} pick={(v) => save({ bed: v as Lifestyle["bed"] })} /></Setting>
+        <Setting name={w("life.wake")} hint={minor ? undefined : w("menu.setsYourFirstMealBelow")}><Chips items={minor ? [{ id: "early", name: w("menu.before") }, { id: "mid", name: w("menu.sixToSeven") }, { id: "late", name: w("menu.after") }] : [{ id: "early", name: w("menu.before2") }, { id: "mid", name: w("menu.sixToEight") }, { id: "late", name: w("menu.after2") }, { id: "varies", name: w("menu.variesWithShifts") }]} on={l.wake} pick={(v) => save({ wake: v as Lifestyle["wake"] })} /></Setting>
+        <Setting name={w("life.bed")} hint={minor ? undefined : w("menu.setsYourLastMealBelow")}><Chips items={[{ id: "early", name: w("menu.before3") }, { id: "mid", name: w("menu.tenToMidnight") }, { id: "late", name: w("menu.afterMidnight") }, ...(minor ? [] : [{ id: "varies", name: w("menu.variesWithShifts") }])]} on={l.bed} pick={(v) => save({ bed: v as Lifestyle["bed"] })} /></Setting>
       </Seg>
       {/* DT166 (0.3.8, board Stories118 version 2; Coach Milan 30 October 08:28): the natural order. Your work, wake-up and bedtime
           come first and set the meal times; the meal times come after them, and any time you change there stays yours. */}
       <Seg title={w("menu.meals")} why={minor ? w("menu.howManyMealsADay") : w("menu.whenYouEatTheTimes")}>
         <span id="meals" />
-        <Setting name="Meals a day" hint={minor ? w("menu.snacksCountAsAMeal") : undefined}><Chips items={(minor ? [2, 3, 4, 5] : [1, 2, 3, 4, 5]).map((n) => ({ id: n, name: n === 5 ? "5 or more" : String(n) }))} on={l.meals} pick={(n) => save({ meals: n })} /></Setting>
+        <Setting name={w("life.mealsADay")} hint={minor ? w("menu.snacksCountAsAMeal") : undefined}><Chips items={(minor ? [2, 3, 4, 5] : [1, 2, 3, 4, 5]).map((n) => ({ id: n, name: n === 5 ? w("life.fiveOrMore") : String(n) }))} on={l.meals} pick={(n) => save({ meals: n })} /></Setting>
         {/* 0.2.1: the slots Plan shows, with their times. M8 (11 October 2026): the times are what I set; the eating window
             follows from them, first meal to last, and is no longer set by hand. A window set before is where the times start. */}
-        <Setting name="Meal times" hint="When you eat each meal. Your eating window follows from them.">
+        <Setting name={w("life.mealTimes")} hint={w("life.mealTimesHint")}>
           {/* DT147 (0.2.128): one line per meal, the name left and the time right, so it never runs past the card on an iPhone */}
           <div className="time-rows slot-times">
-            {slotsOf(l).map((s) => <label key={s.id} className="time-row"><span>{l.meals === 1 ? w("menu.yourMeal") : s.name}</span><input type="time" value={s.time} aria-label={`${s.name} time`} onChange={(e) => e.target.value && save({ slotTimes: { ...(l.slotTimes ?? {}), [s.id]: e.target.value } })} /></label>)}
+            {slotsOf(l).map((s) => <label key={s.id} className="time-row"><span>{l.meals === 1 ? w("menu.yourMeal") : mealName(s.name)}</span><input type="time" value={s.time} aria-label={w("life.slotTime", { meal: mealV(s.name) })} onChange={(e) => e.target.value && save({ slotTimes: { ...(l.slotTimes ?? {}), [s.id]: e.target.value } })} /></label>)}
             {/* DT166: a time you set yourself stays; when work, wake-up or bedtime would give another, one tap takes it back */}
             {(() => { const auto = slotsOf({ ...l, slotTimes: undefined }); return slotsOf(l).filter((s) => l.slotTimes?.[s.id] && auto.find((a) => a.id === s.id)!.time !== s.time).map((s) => { const a = auto.find((x) => x.id === s.id)!.time;
               const { [s.id]: _drop, ...rest } = l.slotTimes ?? {};
@@ -560,29 +561,29 @@ function LifestylePanel(p: AppApi) {
             return <small className="setting-hint from-sleep">From your wake-up and bedtime, above: the first meal at {sw.from}, an hour and a half after you wake; the last at {sw.to}, two hours before bed; the rest evenly between. Change any time and yours stays.</small>; })()}
         </Setting>
         {/* DT134 (0.2.113, board Stories89): one meal a day eats within an hour from the meal, and the meal carries the day */}
-        {!minor && l.meals === 1 && (() => { const wq = windowOf(l)!; return <p className="window-line">One meal a day at {wq.from}. Eating window: {wq.from} to {wq.to}, an hour from your meal. It carries your whole day: about {fmt(p.state.goals.calories, 0)} kcal and {fmt(p.state.goals.protein, 0)} g protein.</p>; })()}
-        {!minor && l.meals !== 1 && (() => { const t = slotsOf(l).map((x) => x.time).sort(); return <p className="window-line">Eating window: {t[0]} to {t[t.length - 1]}. From your first and last meal.</p>; })()}
+        {!minor && l.meals === 1 && (() => { const wq = windowOf(l)!; return <p className="window-line">{w("life.windowOne", { from: wq.from, to: wq.to, kcal: fmt(p.state.goals.calories, 0), protein: fmt(p.state.goals.protein, 0) })}</p>; })()}
+        {!minor && l.meals !== 1 && (() => { const t = slotsOf(l).map((x) => x.time).sort(); return <p className="window-line">{w("life.window", { from: t[0], to: t[t.length - 1] })}</p>; })()}
       </Seg>
       <Seg title={w("menu.nutrition")} why={minor ? w("menu.howYouUsuallyEatChef") : w("menu.howYouUsuallyEatAnd")}>
-        <Setting name="Where you eat" hint="Pick all that apply."><Chips items={asItems(minor ? WHERE_KID : WHERE)} on={l.where} pick={toggle} multi /></Setting>
-        <Setting name="What you eat">
+        <Setting name={w("life.whereEat")} hint={w("life.pickAll")}><Chips items={asItems(minor ? WHERE_KID : WHERE)} on={l.where} pick={toggle} multi /></Setting>
+        <Setting name={w("life.whatEat")}>
           <Chips items={asItems(DIETS)} on={l.diet ?? "Everything"} pick={(v) => save({ diet: v })} />
           {/* DT161 (0.3.3, board Stories113): what each diet means, Meat only's effect on the numbers, Other in your words */}
-          {l.diet === "Meat only" && <small className="setting-hint diet-hint">{DIET_MEANS["Meat only"]} They bring almost no carbs, so your carbs come close to zero. Very low carb fits your numbers: <button type="button" className="link" onClick={() => p.openGoal()}>{w("menu.setItUnderGoal")}</button></small>}
-          {l.diet && l.diet !== "Meat only" && DIET_MEANS[l.diet] && <small className="setting-hint diet-hint">{DIET_MEANS[l.diet]}</small>}
+          {l.diet === "Meat only" && <small className="setting-hint diet-hint">{optWord(DIET_MEANS["Meat only"])} They bring almost no carbs, so your carbs come close to zero. Very low carb fits your numbers: <button type="button" className="link" onClick={() => p.openGoal()}>{w("menu.setItUnderGoal")}</button></small>}
+          {l.diet && l.diet !== "Meat only" && DIET_MEANS[l.diet] && <small className="setting-hint diet-hint">{optWord(DIET_MEANS[l.diet])}</small>}
           {l.diet === "Other" && <label className="field diet-other"><span>{w("menu.howYouEatInYour")}</span><input value={l.dietOther ?? ""} maxLength={120} placeholder="for example Mediterranean, no gluten" onChange={(e) => save({ dietOther: e.target.value })} /></label>}
-          {!minor && <small className="setting-hint">{CHEF_NAME} reads this with every plate and recipe it suggests.</small>}
+          {!minor && <small className="setting-hint">{w("life.readsThis")}</small>}
         </Setting>
         {/* DT167 (0.3.9): Taste, moved here from the bottom of Me */}
         <TasteSetting {...p} />
         {age !== null && age >= ALCOHOL_AGE && (
-          <Setting name="Alcohol" hint="Alcohol counts as energy, 7 kcal a gram, and slows recovery. Chef Mealan knows how often you drink: when you mention a drink or an evening out, it counts it and leaves room in the day.">
+          <Setting name={w("life.alcohol")} hint={w("life.alcoholHint")}>
             <Chips items={asItems(ALCOHOL)} on={l.alcohol} pick={(v) => save({ alcohol: v })} />
           </Setting>
         )}
       </Seg>
       <small className="muted page-why">{w("menu.allergiesStayInProfileWith")}</small>
-      <NextLink p={p} to="week" from="life" text="Training week" hint={minor ? w("menu.whatEachDayOfYour") : w("menu.whatEachDayOfYour2")} />
+      <NextLink p={p} to="week" from="life" text={w("menu.trainingWeek")} hint={minor ? w("menu.whatEachDayOfYour") : w("menu.whatEachDayOfYour2")} />
     </>
   );
 }
@@ -652,9 +653,9 @@ function PlanPanel(p: AppApi) {
           </Fragment>
         ))}
         <div className="load-key">{(["hard", "easy", "active", "passive"] as DayType[]).filter((t) => counts[t]).map((t) => <span key={t}><i className={`load-${t}`} />{LOAD_NAME[t]} {counts[t]}</span>)}</div>
-        <small className="week-card-foot">The bar shows how hard the day is{minor ? ", sport at school and after school together" : ""}. Tap a day to open it; tap it again to close.</small>
+        <small className="week-card-foot">{minor ? w("week.barFootSchool") : w("week.barFoot")}</small>
       </section>
-      <NextLink p={p} to="shop" from="week" text="Where I shop and cook" hint="Your shops, the kitchens you cook, and what you cook with" />
+      <NextLink p={p} to="shop" from="week" text={w("menu.whereIShopAndCook")} hint={w("me.shopHint")} />
     </>
   );
 }
@@ -699,7 +700,7 @@ function ShopPanel(p: AppApi) {
     </section>
     <KitchensAndTools {...p} />
       {/* DT209 (0.3.50, board Stories156; Coach Milan 1 November 22:33 to 23:52 Go): the setup steps end on Your summary; My coach is no step */}
-      <NextLink p={p} to="summary" from="shop" text="Your summary" hint="Everything you told Chef Mealan, and what it does" />
+      <NextLink p={p} to="summary" from="shop" text={w("menu.yourSummary")} hint={w("me.everythingYouToldChefMealan")} />
     </>
   );
 }

@@ -1,4 +1,5 @@
-import { dec, numLocale, w } from "../words";
+import { dec, numLocale, w, wn, wIn, mealV, mealName, dateV, dateText, type Val } from "../words";
+import { getLang } from "../lang";
 import { shelfName } from "../reference";
 import { atMeal } from "../plateMode";
 import { plannedName } from "../recipeDiff";
@@ -38,7 +39,7 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const WEEKDAY = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const addDays = (d: Date, n: number) => { const x = new Date(d); x.setDate(x.getDate() + n); x.setHours(12, 0, 0, 0); return x; };
-const SOURCE: Record<PlannedMeal["source"], string> = { mine: "my recipe", coach: "coach's recipe", starter: "starter", plate: "made on the Plate" };
+const SOURCE: Record<PlannedMeal["source"], string> = { get mine() { return w("today.srcMine"); }, get coach() { return w("today.srcCoach"); }, get starter() { return w("today.srcStarter"); }, get plate() { return w("today.srcPlate"); } };
 
 // the day looked at last, kept while the app is open, so a trip to the Plate comes back to the same day
 // DT178 (0.3.21): a link from the Chef Mealan calendar, /plan?day=2026-11-02, opens that day
@@ -94,11 +95,13 @@ export function PlanScreen(p: AppApi) {
   const minor = isMinor(p.personal);
   const changed = !!dayFor(p.personal, date)?.changed;
   const wk = isoWeek(monday), sunday = addDays(monday, 6);
-  const weekSpan = `Week ${wk.week}, ${monday.getDate()}${monday.getMonth() === sunday.getMonth() ? "" : ` ${MONTHS[monday.getMonth()]}`} to ${sunday.getDate()} ${MONTHS[sunday.getMonth()]}`;
+  const weekSpan = w("plan.weekSpan", { n: wk.week, span: (l) => l === "en" ? `${monday.getDate()}${monday.getMonth() === sunday.getMonth() ? "" : ` ${MONTHS[monday.getMonth()]}`} to ${sunday.getDate()} ${MONTHS[sunday.getMonth()]}` : monday.getMonth() === sunday.getMonth() ? `${monday.getDate()}–${sunday.getDate()}. ${sunday.toLocaleDateString("sr-Latn-RS", { month: "long" })}` : `${monday.getDate()}. ${monday.toLocaleDateString("sr-Latn-RS", { month: "long" })} – ${sunday.getDate()}. ${sunday.toLocaleDateString("sr-Latn-RS", { month: "long" })}` });
+  // DT203 phase 9: the day in a line's own language: today · danas · Thursday · četvrtak
+  const dayV: Val = isToday ? (l) => wIn(l, "plan.todayLow") : dateV(date, { weekday: "long" });
   const dayName = isToday ? "today" : WEEKDAY[(date.getDay() + 6) % 7];
   const line = [
-    numbers ? `${fmt(numbers.kcal, 0)} kcal · ${numbers.protein} g protein` : w("plan.noNumbersYet"),
-    tWhen ? tWhen.phrase : training ? "rest day" : null,
+    numbers ? w("plan.kcalProtein", { kcal: fmt(numbers.kcal, 0), protein: numbers.protein }) : w("plan.noNumbersYet"),
+    tWhen ? tWhen.phrase : training ? w("plan.restDay") : null,
   ].filter(Boolean).join(" · ");
   const target = numbers ? density(numbers.protein, numbers.kcal) : null;
   const unit = p.personal.pdUnit === "pct" ? "pct" : "pd";
@@ -116,10 +119,10 @@ export function PlanScreen(p: AppApi) {
   const fitted = isFitted(held);
   const fitDay = () => { if (!numbers) return; const next = fitPortions(held, numbers); for (const [id, m] of Object.entries(next)) p.fill(key, id, m);
     const k = sumOf(next).kcal, b = bandOf(numbers.kcal);
-    p.notify(k >= b.lo && k <= b.hi ? `${Day} is inside its range: ${fmt(k, 0)} kcal.` : `Portions fitted to ${Day === "Today" ? "today" : Day}: ${fmt(k, 0)} kcal, as close as these meals get.`); };
-  const usualDay = () => { const next = usualPortions(held); for (const [id, m] of Object.entries(next)) p.fill(key, id, m); p.notify("Back to the usual portions."); };
+    p.notify(k >= b.lo && k <= b.hi ? w("plan.insideRange", { day: (l) => { const x = (dayV as (y: typeof l) => string | null)(l); return x && x.charAt(0).toUpperCase() + x.slice(1); }, kcal: fmt(k, 0) }) : w("plan.fittedTo", { day: dayV, kcal: fmt(k, 0) })); };
+  const usualDay = () => { const next = usualPortions(held); for (const [id, m] of Object.entries(next)) p.fill(key, id, m); p.notify(w("plan.backUsual")); };
   const fillingOf = (s: Slot): Filling => ({ date: key, slotId: s.id, name: s.name, time: s.time, dayName });
-  const put = (s: Slot, m: PlannedMeal) => { p.fill(key, s.id, m); setOpen(null); p.notify(`${m.title} is ${dayName === "today" ? "today's" : `${dayName}'s`} ${s.name.toLowerCase()}.`); };
+  const put = (s: Slot, m: PlannedMeal) => { p.fill(key, s.id, m); setOpen(null); p.notify(w("plan.isSlot", { title: m.title, meal: mealV(s.name, true), day: dayV })); };
   return (
     <>
       {/* DT178 (0.3.21, board Stories126): said once, at the top, while the plan is also in Google Calendar */}
@@ -127,7 +130,7 @@ export function PlanScreen(p: AppApi) {
       <div className="week-arrows">
         <button type="button" className="week-arrow" aria-label={w("plan.weekBefore")} onClick={() => goWeek(-1)}>‹</button>
         <span className="week-arrows-mid">{weekSpan}{offset !== 0 ? <button type="button" className="link week-back" onClick={() => goWeek(0)}>{w("plan.thisWeek")}</button>
-          : key !== ymd(today) && <button type="button" className="link week-back" onClick={() => goWeek(0)}>Today</button>}</span>
+          : key !== ymd(today) && <button type="button" className="link week-back" onClick={() => goWeek(0)}>{w("tab.today")}</button>}</span>
         <button type="button" className="week-arrow" aria-label={w("plan.weekAfter")} onClick={() => goWeek(1)}>›</button>
       </div>
       <div className="day-strip" role="tablist" aria-label={w("plan.pickADay")} ref={stripRef}>
@@ -136,7 +139,7 @@ export function PlanScreen(p: AppApi) {
           const n = Object.keys(p.planned[ymd(d)] ?? {}).length;
           // SL7 (Milan 21:20): today's day is always marked, picked or not
           const isT = ymd(d) === ymd(today);
-          return <button key={ymd(d)} type="button" role="tab" className={`choice ${on ? "on" : ""} ${n ? "has" : ""} ${isT ? "is-today" : ""}`} aria-selected={on} onClick={() => setPicked(ymd(d))}>{isT ? "Today" : DAYS[(d.getDay() + 6) % 7]} {d.getDate()}</button>;
+          return <button key={ymd(d)} type="button" role="tab" className={`choice ${on ? "on" : ""} ${n ? "has" : ""} ${isT ? "is-today" : ""}`} aria-selected={on} onClick={() => setPicked(ymd(d))}>{isT ? w("tab.today") : getLang() === "sr-Latn" ? d.toLocaleDateString("sr-Latn-RS", { weekday: "short" }) : DAYS[(d.getDay() + 6) % 7]} {d.getDate()}</button>;
         })}
       </div>
       {/* 0.3.59 (Coach Milan 2 November 19:00): no cook strip on Plan; it stays on Today and the Plate */}
@@ -149,18 +152,18 @@ export function PlanScreen(p: AppApi) {
           <b>{w(isToday ? "plan.todayDate" : "plan.date", { date: (l) => (l === "en" ? `${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : date.toLocaleDateString("sr-Latn-RS", { weekday: "long", day: "numeric", month: "long" })) })}
             {!rows.some((r) => r.kind === "training") && <button type="button" className="icon today-pencil plan-pencil" aria-label={w("plan.changeTheTrainingForThis")} onClick={() => setEditing(training ?? { work: true, kind: "rest" })}><Pencil size={15} /></button>}
           </b>
-          <small>{[tWhen ? tWhen.phrase : training ? "rest day" : null, openCount ? `${openCount} ${openCount === 1 ? "slot" : "slots"} open` : "all slots set"].filter(Boolean).join(" · ")}</small>
+          <small>{[tWhen ? tWhen.phrase : training ? w("plan.restDay") : null, openCount ? wn("plan.slotsOpen", openCount) : w("plan.allSet")].filter(Boolean).join(" · ")}</small>
         </div>
         <div className="plan-row">
-          <div><b>{sum.n ? pdVal(sum.pd) : "—"}</b><small>{target !== null ? `of ${pdText(target)}, ${dayPoss} target` : pdTag()}</small></div>
+          <div><b>{sum.n ? pdVal(sum.pd) : "—"}</b><small>{target !== null ? w("plan.ofTarget", { pd: pdText(target), day: dayV }) : pdTag()}</small></div>
           {/* DT144 (0.3.38, board Stories146): the kcal says its target and its day, as Today does; the range in words under it */}
-          <div><b>{fmt(sum.kcal, 0)}</b><small>{numbers ? `of ${fmt(numbers.kcal, 0)} kcal ${isToday ? "today" : `on ${WEEKDAY[(date.getDay() + 6) % 7]}`}` : band ? `of ${fmt(band.lo, 0)} to ${fmt(band.hi, 0)} kcal` : "kcal"}</small>{numbers && band && <small className="plan-band">a planned day fits from {fmt(band.lo, 0)} to {fmt(band.hi, 0)}</small>}</div>
-          <div><b>{fmt(sum.protein, 0)}</b><small>{pr ? `of ${pr.min} to ${pr.max} g protein` : numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></div>
+          <div><b>{fmt(sum.kcal, 0)}</b><small>{numbers ? (isToday ? w("plan.ofKcalToday", { kcal: fmt(numbers.kcal, 0) }) : w("plan.ofKcalOn", { kcal: fmt(numbers.kcal, 0), day: dayV })) : band ? w("plan.ofRange", { lo: fmt(band.lo, 0), hi: fmt(band.hi, 0) }) : "kcal"}</small>{numbers && band && <small className="plan-band">{w("plan.dayFits", { lo: fmt(band.lo, 0), hi: fmt(band.hi, 0) })}</small>}</div>
+          <div><b>{fmt(sum.protein, 0)}</b><small>{pr ? w("plan.ofProteinRange", { lo: pr.min, hi: pr.max }) : numbers ? w("plan.ofProtein", { g: numbers.protein }) : w("plan.gProtein")}</small></div>
         </div>
         {off && numbers && (
           <div className="plan-off" role="status">
-            <p><b>{fmt(off.by, 0)} kcal {off.short ? "under" : "over"}</b> {dayPoss} range of {fmt(off.lo, 0)} to {fmt(off.hi, 0)} kcal. {off.short ? w("plan.addASnackOrMake") : w("plan.makeThePortionsSmallerOr")}</p>
-            <button type="button" className="pill pill-small pill-primary" onClick={fitDay}>Fit the portions to {dayName === "today" ? "today" : dayName}</button>
+            <p><b>{off.short ? w("plan.kcalUnder", { kcal: fmt(off.by, 0) }) : w("plan.kcalOver", { kcal: fmt(off.by, 0) })}</b> {w("plan.rangeOf", { day: dayV, lo: fmt(off.lo, 0), hi: fmt(off.hi, 0) })} {off.short ? w("plan.addASnackOrMake") : w("plan.makeThePortionsSmallerOr")}</p>
+            <button type="button" className="pill pill-small pill-primary" onClick={fitDay}>{w("plan.fitTo", { day: dayV })}</button>
           </div>
         )}
         {pOff && !pOff.above && <div className="plan-off" role="status"><p><b>{fmt(sum.protein, 0)} g of protein</b>, under your range of {pr!.min} to {pr!.max} g. Swap one meal for one with more protein.</p></div>}
@@ -170,7 +173,7 @@ export function PlanScreen(p: AppApi) {
       <section className="card plan-day">
         {rows.map((r, ri) => <Fragment key={r.kind === "training" ? "training" : r.slot.id}>{busyBefore(rows, dayBusy.blocks, ri)}{((r: DayRow) => {
           if (r.kind === "training") return (
-            <button type="button" key="training" className="menu-row plan-training" aria-label={`Training at ${r.time}, ${planLine(r.day)}. Change it for this date`} onClick={() => setEditing(r.day)}>
+            <button type="button" key="training" className="menu-row plan-training" aria-label={w("plan.trainingAt", { time: r.time, what: planLine(r.day) })} onClick={() => setEditing(r.day)}>
               <span className={`plan-time${r.exact ? "" : " plan-time-word"}`}>{r.exact ? r.label : r.label === "No time set" ? <>{w("plan.noTime")}<br />{w("plan.set")}</> : r.label}</span>
               <div className="menu-row-text"><small>{changed ? w("plan.changedForThisDate") : w("plan.fromMyTrainingWeek")}</small><b>{planLine({ ...r.day, when: undefined })}{r.day.minutes ? `, ${minutesWords(r.day.minutes)}` : ""}</b>{!r.exact && r.label === "No time set" && <span className="link plan-set-time">{w("plan.setATime")}</span>}</div>
               <Pencil size={18} />
@@ -183,14 +186,14 @@ export function PlanScreen(p: AppApi) {
             <div key={r.slot.id} className={`plan-slot-wrap ${fit?.state === "under" ? "plan-slot-under" : ""}`}>
               {/* R19 (0.2.47, board RS18): a planned meal is a row you tap to see it, swipe to Swap or Empty; the time is in its line */}
               {m && !m.skipped
-                ? <PlanRow className="plan-slot plan-slot-set" label={`${r.slot.name}, ${r.slot.time}`} title={plannedName(m, p.state.meals)} photo={pictureOfRecipe(m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null)}
-                    ariaLabel={`${r.slot.name} at ${r.slot.time}, ${m.title}`}
+                ? <PlanRow className="plan-slot plan-slot-set" label={`${mealName(r.slot.name)}, ${r.slot.time}`} title={plannedName(m, p.state.meals)} photo={pictureOfRecipe(m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null)}
+                    ariaLabel={w("plan.slotAt", { meal: mealV(r.slot.name), time: r.slot.time, title: m.title })}
                     sub={fit ? <>{SOURCE[m.source]}{amountText(m) ? ` · ${amountText(m)}` : ""} · {fmt(m.kcal, 0)} kcal · {fmt(m.protein, 0)} g · {pdText(fit.pd)}{fit.state === "fits" ? <span className="fit-ok"> · fits</span> : fit.state === "close" ? <span className="fit-close"> · {fit.text}</span> : fit.state === "under" ? <span className="fit-under"> · {fit.text}</span> : null}</> : null}
                     onOpen={() => { const rec = m.mealId ? p.state.meals.find((x) => x.id === m.mealId) : null; if (rec) p.openMeal(rec.id, { tab: "plan", slot: { date: key, slotId: r.slot.id, name: r.slot.name, time: r.slot.time } }); else if (m.items?.length) setViewing(r.slot); else setOpen(r.slot); }}
-                    onSwap={() => setOpen(r.slot)} onRight={() => p.fill(key, r.slot.id, null)} rightLabel="Empty" swapName={`Swap ${r.slot.name.toLowerCase()}`} rightName={`Empty ${r.slot.name.toLowerCase()}`} />
-                : <button type="button" className={`menu-row plan-slot ${m ? "plan-slot-set" : ""}`} aria-label={m ? `${r.slot.name} at ${r.slot.time}, ${m.title}` : `${r.slot.name} at ${r.slot.time}, pick a meal`} onClick={() => setOpen(r.slot)}>
+                    onSwap={() => setOpen(r.slot)} onRight={() => p.fill(key, r.slot.id, null)} rightLabel={w("plan.empty")} swapName={w("plan.swapMeal", { meal: mealV(r.slot.name, true) })} rightName={w("plan.emptyMeal", { meal: mealV(r.slot.name, true) })} />
+                : <button type="button" className={`menu-row plan-slot ${m ? "plan-slot-set" : ""}`} aria-label={w("plan.slotAt", { meal: mealV(r.slot.name), time: r.slot.time, title: m ? m.title : w("plan.pickAMealLow") })} onClick={() => setOpen(r.slot)}>
                     <div className="menu-row-text">
-                      <small>{r.slot.name}, {r.slot.time}</small>
+                      <small>{mealName(r.slot.name)}, {r.slot.time}</small>
                       {m ? <b>{plannedName(m, p.state.meals)}</b> : <b className="plan-pick">{w("plan.pickAMeal")}</b>}
                       {m?.skipped && <small className="plan-slot-sub skipped-mark">{w("plan.skippedOnPurpose")}</small>}
                     </div>
@@ -198,17 +201,17 @@ export function PlanScreen(p: AppApi) {
                   </button>}
               {/* DT79: a batch recipe in whole pieces; − and + by one, and that count is the usual one */}
               {m && !m.skipped && isBatch(m) && (
-                <div className="plan-pieces" role="group" aria-label={`${m.title}: how many`}>
-                  <button type="button" className="icon" aria-label={`One ${oneWord(m.unit ?? "portions")} less`} disabled={(m.amount ?? 1) <= 1} onClick={() => p.fill(key, r.slot.id, withPieces(m, (m.amount ?? 1) - 1))}>−</button>
+                <div className="plan-pieces" role="group" aria-label={w("plan.howMany", { title: m.title })}>
+                  <button type="button" className="icon" aria-label={w("plan.oneLess", { unit: (l) => (l === "en" ? oneWord(m.unit ?? "portions") : wIn(l, "plan.unitPortion")) })} disabled={(m.amount ?? 1) <= 1} onClick={() => p.fill(key, r.slot.id, withPieces(m, (m.amount ?? 1) - 1))}>−</button>
                   <b>{amountText(m)}</b>
-                  <button type="button" className="icon" aria-label={`One ${oneWord(m.unit ?? "portions")} more`} disabled={(m.amount ?? 1) >= (m.servings ?? 1)} onClick={() => p.fill(key, r.slot.id, withPieces(m, (m.amount ?? 1) + 1))}>+</button>
-                  <small>of the {m.servings} it makes</small>
+                  <button type="button" className="icon" aria-label={w("plan.oneMore", { unit: (l) => (l === "en" ? oneWord(m.unit ?? "portions") : wIn(l, "plan.unitPortion")) })} disabled={(m.amount ?? 1) >= (m.servings ?? 1)} onClick={() => p.fill(key, r.slot.id, withPieces(m, (m.amount ?? 1) + 1))}>+</button>
+                  <small>{w("plan.ofMakes", { n: m.servings ?? 1 })}</small>
                 </div>
               )}
               {m && fit?.state === "under" && (
                 <div className="button-row plan-slot-fix">
                   <button type="button" className="pill pill-small pill-primary" onClick={() => p.fillOnPlate({ ...fillingOf(r.slot), mealId: m.mealId }, m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: (m.portion ?? 0) * (m.amount ?? 1), savedAt: "" } : null, m.title)}>{w("plan.fitItOnThePlate")}</button>
-                  <button type="button" className="pill pill-small" onClick={() => p.openOut()}>Ask {CHEF_NAME}</button>
+                  <button type="button" className="pill pill-small" onClick={() => p.openOut()}>{w("plan.askChef")}</button>
                 </div>
               )}
               {/* DT179: a time of its own for this date, moved in Google, or cooked ahead */}
@@ -223,7 +226,7 @@ export function PlanScreen(p: AppApi) {
           <button type="button" className="link" onClick={() => p.openMenu("week")}>{w("plan.trainingWeek")}</button>
         </div>
       </section>
-      {openCount > 0 && <button type="button" className="pill pill-tall pill-primary plan-fill" onClick={() => p.openOut("fill")}><ChefHat size={18} /> Fill the open slots with {CHEF_NAME}</button>}
+      {openCount > 0 && <button type="button" className="pill pill-tall pill-primary plan-fill" onClick={() => p.openOut("fill")}><ChefHat size={18} /> {w("plan.fillOpen")}</button>}
       </>)}
       <button type="button" className="pill pill-wide plan-shop" onClick={() => setShopping(true)}><ShoppingBasket size={18} /> {shopOpen ? w("plan.shopOpen", { n: shopOpen.n }) : shopEarlier ? w("plan.shoppingLists") : w("plan.makeAShoppingList")}</button>
       {shopping && <ShopSheet p={p} close={() => setShopping(false)} showDay={(d) => { setShopping(false); const n = Math.floor((isoWeek(new Date(`${d}T12:00:00`)).monday.getTime() - thisMonday.getTime()) / (7 * 864e5)); setOffsetState(n === 1 ? 0 : n); setPicked(d); }} />}
@@ -231,18 +234,18 @@ export function PlanScreen(p: AppApi) {
         close={() => setViewing(null)} swap={() => { setOpen(viewing); setViewing(null); }}
         onPlate={() => { const m = held[viewing.id]; setViewing(null); p.fillOnPlate(fillingOf(viewing), { id: "", title: m.title, items: m.items!, portion: (m.portion ?? 0) * (m.amount ?? 1), savedAt: "" }, m.title); }}
         keep={() => { const m = held[viewing.id]; const meal = { id: uid(), title: m.title, items: m.items!, portion: m.portion ?? m.items!.reduce((n, i) => n + i.grams, 0), savedAt: new Date().toISOString() };
-          p.setState((st) => ({ ...st, meals: [...st.meals, meal] })); p.fill(key, viewing.id, { ...m, mealId: meal.id, source: "mine", note: undefined }); setViewing(null); p.notify(`${m.title} is in My recipes.`); }} /> : null}
+          p.setState((st) => ({ ...st, meals: [...st.meals, meal] })); p.fill(key, viewing.id, { ...m, mealId: meal.id, source: "mine", note: undefined }); setViewing(null); p.notify(w("plan.inMyRecipes", { title: m.title })); }} /> : null}
       {editing && (
         <div className="sheet-backdrop" onClick={() => setEditing(null)}>
-          <div className="sheet date-sheet" role="dialog" aria-label={`${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}: training`} onClick={(e) => e.stopPropagation()}>
+          <div className="sheet date-sheet" role="dialog" aria-label={w("plan.dateTraining", { date: (l) => (l === "en" ? `${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : dateText(date, { weekday: "long", day: "numeric", month: "long" })) })} onClick={(e) => e.stopPropagation()}>
             <div className="card-top"><span>{WEEKDAY[(date.getDay() + 6) % 7]}, {date.getDate()} {MONTHS[date.getMonth()]}: training</span><button type="button" className="link" onClick={() => setEditing(null)}>{w("plan.close")}</button></div>
             <p className="small date-sheet-why">{w("plan.thisDateOnlyYourTraining")}</p>
             <section className="card seg">
               <DayEditor minor={minor} weekdays={weekdaysOf(lifestyle)} peOn={!!lifestyle.peWeek && lifestyle.peWeek !== "none"} value={editing} onChange={setEditing} workHint={workHintOf(lifestyle, minor)} work={workHoursOf(lifestyle)} />
             </section>
             <div className="actions date-sheet-actions">
-              <button type="button" className="pill pill-primary action-main" onClick={() => { p.setDated(date, editing); setEditing(null); p.notify(`Changed for ${dayName === "today" ? "today" : `${dayName}, ${date.getDate()} ${MONTHS[date.getMonth()]}`} only.`); }}>{w("plan.saveForThisDate")}</button>
-              {changed && <button type="button" className="link action-cancel" onClick={() => { p.setDated(date, null); setEditing(null); }}>Back to the usual {WEEKDAY[(date.getDay() + 6) % 7]}</button>}
+              <button type="button" className="pill pill-primary action-main" onClick={() => { p.setDated(date, editing); setEditing(null); p.notify(isToday ? w("plan.changedToday") : w("plan.changedFor", { date: (l) => (l === "en" ? `${dayName}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : dateText(date, { weekday: "long", day: "numeric", month: "long" })) })); }}>{w("plan.saveForThisDate")}</button>
+              {changed && <button type="button" className="link action-cancel" onClick={() => { p.setDated(date, null); setEditing(null); }}>{w("plan.backUsualDay", { day: dateV(date, { weekday: "long" }) })}</button>}
             </div>
           </div>
         </div>
@@ -269,8 +272,8 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
       {log.logged.length ? (
         <>
           <div className="past-nums">
-            <span><b>{Math.round(log.kcal).toLocaleString(numLocale())}</b><small>{numbers ? `of ${numbers.kcal.toLocaleString(numLocale())} kcal` : "kcal"}</small></span>
-            <span><b>{Math.round(log.protein)}</b><small>{numbers ? `of ${numbers.protein} g protein` : "g protein"}</small></span>
+            <span><b>{Math.round(log.kcal).toLocaleString(numLocale())}</b><small>{numbers ? w("plan.ofKcal", { kcal: numbers.kcal.toLocaleString(numLocale()) }) : "kcal"}</small></span>
+            <span><b>{Math.round(log.protein)}</b><small>{numbers ? w("plan.ofProtein", { g: numbers.protein }) : w("plan.gProtein")}</small></span>
             <span><b>{log.kcal ? dec(Math.round((log.protein / log.kcal) * 1000) / 10, 1) : "–"}</b><small>{w("plan.pdThatDay")}</small></span>
           </div>
           <small className="setting-name past-label">{w("plan.whatYouAte")}</small>
@@ -279,7 +282,7 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
             const name = slotName(f.slot?.slotId);
             return (
               <div className="past-plate" key={f.id}>
-                <span><b>{f.meal.title}</b><small>{name ? `${name}, ` : ""}{new Date(f.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} · {Math.round(a.calories ?? 0)} kcal · {Math.round(a.protein ?? 0)} g protein</small></span>
+                <span><b>{f.meal.title}</b><small>{name ? `${mealName(name)}, ` : ""}{new Date(f.createdAt).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} · {w("plan.kcalProteinG", { kcal: Math.round(a.calories ?? 0), protein: Math.round(a.protein ?? 0) })}</small></span>
                 <button type="button" className="pill pill-small" onClick={() => { p.setState((s) => ({ ...s, items: f.meal.items.map((it) => ({ ...it, id: uid() })) })); p.setTab("journey"); }}>{w("plan.cookAgain")}</button>
               </div>
             );
@@ -329,9 +332,13 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
   const today = ymd(new Date());
   const open = openList(store);
   const dt = (d: string) => new Date(`${d}T12:00:00`);
-  const dayWord = (d: string) => `${WEEKDAY[(dt(d).getDay() + 6) % 7]} ${dt(d).getDate()}`;
-  const spanOf = (from: string, to: string) => from === to ? `${dayWord(from)} ${MONTHS[dt(from).getMonth()]}` : `${dayWord(from)}${dt(from).getMonth() === dt(to).getMonth() ? "" : ` ${MONTHS[dt(from).getMonth()]}`} to ${dayWord(to)} ${MONTHS[dt(to).getMonth()]}`;
-  const madeOn = (iso: string) => { const d = new Date(iso); return `${WEEKDAY[(d.getDay() + 6) % 7]} ${d.getDate()} ${MONTHS[d.getMonth()]}`; };
+  // DT203 phase 9: the shopping list's days in the language chosen (the phone's calendar writes the Serbian names)
+  const sr = getLang() === "sr-Latn", srD = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString("sr-Latn-RS", o);
+  const WD = (d: Date) => (sr ? srD(d, { weekday: "long" }) : WEEKDAY[(d.getDay() + 6) % 7]), MO = (d: Date) => (sr ? srD(d, { month: "long" }) : MONTHS[d.getMonth()]);
+  const dayWord = (d: string) => (sr ? `${WD(dt(d))} ${dt(d).getDate()}.` : `${WD(dt(d))} ${dt(d).getDate()}`);
+  const spanOf = (from: string, to: string) => sr ? (from === to ? srD(dt(from), { weekday: "long", day: "numeric", month: "long" }) : `${dayWord(from)}${dt(from).getMonth() === dt(to).getMonth() ? "" : ` ${MO(dt(from))}`} – ${dayWord(to)} ${MO(dt(to))}`)
+    : from === to ? `${dayWord(from)} ${MONTHS[dt(from).getMonth()]}` : `${dayWord(from)}${dt(from).getMonth() === dt(to).getMonth() ? "" : ` ${MONTHS[dt(from).getMonth()]}`} to ${dayWord(to)} ${MONTHS[dt(to).getMonth()]}`;
+  const madeOn = (iso: string) => { const d = new Date(iso); return sr ? srD(d, { weekday: "long", day: "numeric", month: "long" }) : `${WEEKDAY[(d.getDay() + 6) % 7]} ${d.getDate()} ${MONTHS[d.getMonth()]}`; };
   const start = nextStart(store, today, p.planned);
   const days = daysFrom(start, span);
   const cookOf = (id: string) => p.state.meals.find((x) => x.id === id)?.cook?.n;
@@ -341,10 +348,10 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
   const [making, setMaking] = useState(false);
   // SL4: what each food is for, and the list meal by meal; a tap goes to buy, in the basket, not this time
   const [by, setBy] = useState<"food" | "meal">("food");
-  const slotName = (date: string, slot: string) => slotsOn(lifestyleOf(p.personal), p.personal.timesOn, date).find((x) => x.id === slot)?.name ?? slot.charAt(0).toUpperCase() + slot.slice(1);
-  const short = (d: string) => DAYS[(dt(d).getDay() + 6) % 7];
+  const slotName = (date: string, slot: string) => mealName(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, date).find((x) => x.id === slot)?.name ?? slot.charAt(0).toUpperCase() + slot.slice(1));
+  const short = (d: string) => (sr ? srD(dt(d), { weekday: "short" }) : DAYS[(dt(d).getDay() + 6) % 7]);
   const forWhat = (x: ShopLine) => {
-    if (!x.uses?.length) return `${x.meals} ${x.meals === 1 ? "meal" : "meals"}`;
+    if (!x.uses?.length) return wn("shop.nMeals", x.meals);
     // one part per meal and slot: Sarma: Wed, Fri lunch
     const parts = [...new Set(x.uses.map((u) => `${u.title}\u0000${slotName(u.date, u.slot).toLowerCase()}`))];
     return parts.map((k) => { const [t, sl] = k.split("\u0000"); return `${t}: ${x.uses!.filter((u) => u.title === t && slotName(u.date, u.slot).toLowerCase() === sl).map((u) => short(u.date)).join(", ")} ${sl}`; }).join(" · ");
@@ -352,43 +359,43 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
   const row = (l: SavedList, x: ShopLine, live: boolean, grams = x.grams, note = true) => {
     const st = stateOf(l, x.key);
     return (
-      <button key={x.key} type="button" className={`menu-row shop-row ${st === "got" ? "got" : st === "missing" ? "missing" : ""}`} aria-label={`${x.name}, ${shopAmount(x.name, grams)}${st === "got" ? ", in the basket" : st === "missing" ? ", not this time" : ""}`} disabled={!live} onClick={() => save(tickIn(store, l.n, x.key))}>
+      <button key={x.key} type="button" className={`menu-row shop-row ${st === "got" ? "got" : st === "missing" ? "missing" : ""}`} aria-label={`${x.name}, ${shopAmount(x.name, grams)}${st === "got" ? w("shop.inBasket") : st === "missing" ? w("shop.notThisTimeLow") : ""}`} disabled={!live} onClick={() => save(tickIn(store, l.n, x.key))}>
         {st === "got" ? <CircleCheck size={20} /> : st === "missing" ? <CircleSlash size={20} /> : <Circle size={20} />}
-        <div className="menu-row-text"><b>{x.name}</b>{(() => { const sh = shelfName({ name: x.name }, p.region, true); return sh ? <small className="shelf-name">{sh.name}</small> : null; })()}{note && <small>{x.added ? w("plan.added") : ""}{x.cooked ? `${x.cooked.toLocaleString(numLocale())} g cooked · ` : ""}{x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? `${x.brand} · ` : ""}{forWhat(x)}</small>}{st === "missing" && <small className="shop-missing-note">{w("plan.notThisTime")}</small>}</div>
+        <div className="menu-row-text"><b>{x.name}</b>{(() => { const sh = shelfName({ name: x.name }, p.region, true); return sh ? <small className="shelf-name">{sh.name}</small> : null; })()}{note && <small>{x.added ? w("plan.added") : ""}{x.cooked ? w("shop.gCooked", { g: x.cooked.toLocaleString(numLocale()) }) : ""}{x.brand && !/typical values|generic|check your|estimate/i.test(x.brand) ? `${x.brand} · ` : ""}{forWhat(x)}</small>}{st === "missing" && <small className="shop-missing-note">{w("plan.notThisTime")}</small>}</div>
         <b className="shop-grams">{shopAmount(x.name, grams)}</b>
       </button>
     );
   };
-  const copy = async (l: SavedList) => { try { await navigator.clipboard.writeText(listText(l, spanOf(l.from, l.to))); p.notify("The list is copied. Paste it in a message or a note."); } catch { p.notify("Copying didn't work on this phone."); } };
-  const finish = (l: SavedList, carry: boolean) => { save(finishList(store, l.n, carry, new Date().toISOString())); setAsking(false); setMaking(carry); p.notify(`Shopping list ${l.n} is finished.${carry ? " What wasn't ticked waits for the next list." : ""}`); };
+  const copy = async (l: SavedList) => { try { await navigator.clipboard.writeText(listText(l, spanOf(l.from, l.to))); p.notify(w("shop.copied")); } catch { p.notify(w("shop.copyFailed")); } };
+  const finish = (l: SavedList, carry: boolean) => { save(finishList(store, l.n, carry, new Date().toISOString())); setAsking(false); setMaking(carry); p.notify(w(carry ? "shop.finishedCarry" : "shop.finished", { n: l.n })); };
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet date-sheet shop-sheet" role="dialog" aria-label={w("plan.shoppingLists")} onClick={(e) => e.stopPropagation()}>
-        <div className="card-top"><span>{reading !== null ? <button type="button" className="link" onClick={() => setReading(null)}>‹ Shopping lists</button> : w("plan.shoppingLists")}</span><button type="button" className="link" onClick={close}>{w("plan.close")}</button></div>
+        <div className="card-top"><span>{reading !== null ? <button type="button" className="link" onClick={() => setReading(null)}>‹ {w("plan.shoppingLists")}</button> : w("plan.shoppingLists")}</span><button type="button" className="link" onClick={close}>{w("plan.close")}</button></div>
         {shown ? (<>
-          <b className="shop-title">Shopping list {shown.n}</b>
-          <p className="small shop-why">Made {madeOn(shown.madeAt)}, for {spanOf(shown.from, shown.to)}: {shown.meals} planned {shown.meals === 1 ? "meal" : "meals"}.{shown.doneAt ? ` Finished ${madeOn(shown.doneAt)}.` : ""}</p>
+          <b className="shop-title">{w("shop.listN", { n: shown.n })}</b>
+          <p className="small shop-why">{wn("shop.made", shown.meals, { on: madeOn(shown.madeAt), span: spanOf(shown.from, shown.to) })}{shown.doneAt ? w("shop.finishedOn", { on: madeOn(shown.doneAt) }) : ""}</p>
           {/* DT178 (0.3.21, board Stories126): Shop on puts the list in the Chef Mealan calendar */}
           {!shown.doneAt && <ShopOn p={p} n={shown.n} value={shown.shopOn} onChange={(v) => { save({ ...store, lists: store.lists.map((l) => (l.n === shown.n ? { ...l, shopOn: v } : l)) }); calendarNudge(); }} />}
-          {shown.without.length > 0 && <p className="small shop-without">Not on the list, no foods saved: {shown.without.map((w) => `${w.title} (${WEEKDAY[(dt(w.date).getDay() + 6) % 7]})`).join(", ")}.</p>}
+          {shown.without.length > 0 && <p className="small shop-without">{w("shop.notOnList", { what: shown.without.map((x) => `${x.title} (${WD(dt(x.date))})`).join(", ") })}</p>}
           {!shown.doneAt && <p className="small shop-why">{w("plan.tapAFoodOnceWhen")}</p>}
           {/* SL7: the plan changed for this list's days since it was made: a new meal needs new shopping, whatever the reason */}
           {!shown.doneAt && planChanges(shown, p.planned).length > 0 && (
             <section className="shop-plan-changed">
               <b>{w("plan.thePlanChangedSinceThis")}</b>
-              {planChanges(shown, p.planned).map((c) => <small key={`${c.date}${c.slot}${c.kind}`}>{WEEKDAY[(dt(c.date).getDay() + 6) % 7]} {slotName(c.date, c.slot).toLowerCase()}: {c.kind === "new" ? `${c.title}, new` : c.kind === "changed" ? `${c.title}, in place of ${c.was}` : `${c.title}, no longer planned`}</small>)}
+              {planChanges(shown, p.planned).map((c) => <small key={`${c.date}${c.slot}${c.kind}`}>{WD(dt(c.date))} {slotName(c.date, c.slot).toLowerCase()}: {c.kind === "new" ? w("shop.new", { title: c.title }) : c.kind === "changed" ? w("shop.inPlaceOf", { title: c.title, was: c.was ?? "" }) : w("shop.noLonger", { title: c.title })}</small>)}
               <div className="button-row"><button type="button" className="pill pill-small" onClick={() => { const n = planChanges(shown, p.planned); save(updateList(getStore(), shown.n, p.planned, new Date().toISOString()));
-                p.notify(`Shopping list ${shown.n} is updated: ${n.length} ${n.length === 1 ? "meal" : "meals"} changed in the plan.`); }}>{w("plan.updateTheList")}</button></div>
+                p.notify(wn("shop.updated", n.length, { list: shown.n })); }}>{w("plan.updateTheList")}</button></div>
             </section>
           )}
-          {shown.updatedAt && !shown.doneAt && planChanges(shown, p.planned).length === 0 && <p className="small shop-why">Updated {madeOn(shown.updatedAt)} to follow the plan.</p>}
+          {shown.updatedAt && !shown.doneAt && planChanges(shown, p.planned).length === 0 && <p className="small shop-why">{w("shop.updatedOn", { on: madeOn(shown.updatedAt) })}</p>}
           {/* SL6: what was changed from this list stays said here (the person picked it from Chef Mealan's ideas), with the way to the day */}
           {(shown.changes ?? []).length > 0 && (
             <section className="shop-changed">
               <b>{w("plan.changedFromThisList")}</b>
               {(shown.changes ?? []).map((c) => (
                 <div key={`${c.date}${c.slot}`} className="shop-changed-row">
-                  <small>{WEEKDAY[(dt(c.date).getDay() + 6) % 7]} {slotName(c.date, c.slot).toLowerCase()} is now {c.to}{c.from ? `, in place of ${c.from}` : ""}{c.because?.length ? `, because you marked ${c.because.join(", ").toLowerCase()} Not this time` : ""}. You picked it from {CHEF_NAME}'s ideas. This day only.</small>
+                  <small>{w("shop.nowIs", { day: WD(dt(c.date)), meal: slotName(c.date, c.slot).toLowerCase(), to: c.to })}{c.from ? w("shop.inPlace", { from: c.from }) : ""}{c.because?.length ? w("shop.because", { what: c.because.join(", ").toLowerCase() }) : ""}{w("shop.pickedIdeas")}</small>
                   <button type="button" className="link" onClick={() => showDay(c.date)}>{w("plan.seeItInPlan")}</button>
                 </div>
               ))}
@@ -396,14 +403,14 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
           )}
           {shortMeals(shown).length > 0 && (
             <section className="shop-short-box">
-              <p className="small shop-short">Not this time: {[...new Set(shortMeals(shown).flatMap((m) => m.foods))].join(", ")}. Short now: {shortMeals(shown).map((m) => `${WEEKDAY[(dt(m.date).getDay() + 6) % 7]} ${slotName(m.date, m.slot).toLowerCase()}, ${m.title}`).join("; ")}.</p>
+              <p className="small shop-short">{w("shop.shortNow", { foods: [...new Set(shortMeals(shown).flatMap((m) => m.foods))].join(", "), meals: shortMeals(shown).map((m) => `${WD(dt(m.date))} ${slotName(m.date, m.slot).toLowerCase()}, ${m.title}`).join("; ") })}</p>
               {/* SL5: Chef Mealan helps each short meal, from here */}
               {!shown.doneAt && shortMeals(shown).map((m) => {
-                const label = `${WEEKDAY[(dt(m.date).getDay() + 6) % 7]} ${slotName(m.date, m.slot).toLowerCase()}`;
+                const label = `${WD(dt(m.date))} ${slotName(m.date, m.slot).toLowerCase()}`;
                 return <ShortHelp key={`${m.date}${m.slot}`} p={p} list={shown.n} date={m.date} slot={m.slot} label={label} title={m.title} missing={m.foods}
                   onUsed={(title, foods) => { const before = new Set(shown.lines.map((x) => x.key)); const next = replanMeal(getStore(), shown.n, m.date, m.slot, title, foods, m.title, m.foods); save(next);
                     const added = (openList(next)?.lines ?? []).filter((x) => x.added && !before.has(x.key)).map((x) => x.name);
-                    p.notify(`${label} is now ${title}.${added.length ? ` ${added.join(", ")} ${added.length === 1 ? "is" : "are"} on your list.` : ""}`); }} />;
+                    p.notify(w("shop.labelNow", { label, title }) + (added.length ? w(added.length === 1 ? "shop.addedOne" : "shop.addedMany", { what: added.join(", ") }) : "")); }} />;
               })}
             </section>
           )}
@@ -413,7 +420,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
               <button type="button" role="tab" aria-selected={by === "meal"} className={`seg ${by === "meal" ? "on" : ""}`} onClick={() => setBy("meal")}>{w("plan.byMeal")}</button>
             </div>
           )}
-          {shown.carried.length > 0 && (<><small className="pick-group">From list {shown.carriedFrom}</small><div className="menu-list shop-list">{shown.carried.map((x) => row(shown, x, !shown.doneAt))}</div></>)}
+          {shown.carried.length > 0 && (<><small className="pick-group">{w("shop.fromList", { n: shown.carriedFrom ?? 0 })}</small><div className="menu-list shop-list">{shown.carried.map((x) => row(shown, x, !shown.doneAt))}</div></>)}
           {by === "food" ? (<>
             {shown.carried.length > 0 && shown.lines.length > 0 && <small className="pick-group">{w("plan.forTheseDays")}</small>}
             {shown.lines.length > 0 && <div className="menu-list shop-list">{shown.lines.map((x) => row(shown, x, !shown.doneAt))}</div>}
@@ -423,24 +430,24 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
             if (!meals.length && !none.length) return null;
             return (
               <div key={d} className="shop-day">
-                <small className="pick-group">{WEEKDAY[(dt(d).getDay() + 6) % 7]} {dt(d).getDate()} {MONTHS[dt(d).getMonth()]}</small>
+                <small className="pick-group">{madeOn(`${d}T12:00:00`)}</small>
                 {meals.map((m) => {
                   const miss = m.foods.filter((f) => stateOf(shown, f.line.key) === "missing").map((f) => f.line.name);
                   return (
                     <div key={m.slot} className="menu-list shop-list shop-meal">
-                      <div className="shop-meal-head"><b>{slotName(d, m.slot)} · {m.title}</b>{miss.length > 0 && <small className="shop-missing-note">Short: {miss.join(", ")}</small>}</div>
+                      <div className="shop-meal-head"><b>{slotName(d, m.slot)} · {m.title}</b>{miss.length > 0 && <small className="shop-missing-note">{w("shop.short", { what: miss.join(", ") })}</small>}</div>
                       {m.foods.map((f) => row(shown, f.line, !shown.doneAt, f.grams, false))}
                     </div>
                   );
                 })}
-                {none.map((w) => <p key={w.title} className="small shop-without">{w.title}: no foods saved.</p>)}
+                {none.map((x) => <p key={x.title} className="small shop-without">{w("shop.noFoods", { title: x.title })}</p>)}
               </div>
             );
           })}
           {!shown.doneAt && (asking ? (
             <section className="card shop-ask">
-              <b>{notTicked(shown).length} {notTicked(shown).length === 1 ? "food isn't" : "foods aren't"} ticked. Carry {notTicked(shown).length === 1 ? "it" : "them"} to the next list?</b>
-              <div className="moments"><button type="button" className="choice" onClick={() => finish(shown, true)}>Carry {notTicked(shown).length === 1 ? "it" : "them"}</button><button type="button" className="choice" onClick={() => finish(shown, false)}>Leave {notTicked(shown).length === 1 ? "it" : "them"}</button></div>
+              <b>{wn("shop.notTicked", notTicked(shown).length)}</b>
+              <div className="moments"><button type="button" className="choice" onClick={() => finish(shown, true)}>{notTicked(shown).length === 1 ? w("shop.carryIt") : w("shop.carryThem")}</button><button type="button" className="choice" onClick={() => finish(shown, false)}>{notTicked(shown).length === 1 ? w("shop.leaveIt") : w("shop.leaveThem")}</button></div>
             </section>
           ) : (<>
             <div className="button-row"><button type="button" className="pill pill-small" onClick={() => copy(shown)}>{w("plan.copyTheList")}</button></div>
@@ -450,19 +457,19 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
           {/* DT207b (0.3.48; Coach Milan 1 November 19:42 "how do I review a shopping list from the past if I don't create a new
               one?"): with no list open, the earlier lists come first and a new list is its own button */}
         </>) : (<>
-          <b className="shop-title">Shopping list {nextN}</b>
-          <p className="small shop-why">Which days is it for? It starts {start === today ? "today" : `${dayWord(start)} ${MONTHS[dt(start).getMonth()]}`}{store.lists.some((l) => l.to >= start) ? ", with the planned meals no list has counted yet" : start === today ? "" : store.lists.length ? ", the day after your last list" : ", the first day with meals planned"}.</p>
-          <div className="moments" role="group" aria-label={w("plan.days")}>{DAY_CHOICES.map((n) => <button key={n} type="button" className={`choice ${span === n ? "on" : ""}`} onClick={() => setSpan(n)}>{n === 1 ? "1 day" : `${n} days`}</button>)}</div>
-          <p className="small shop-why">{spanOf(days[0], days[days.length - 1])}: {preview.meals} planned {preview.meals === 1 ? "meal" : "meals"}, {preview.lines.length} {preview.lines.length === 1 ? "food" : "foods"}{store.carry ? `, plus ${store.carry.lines.length} from list ${store.carry.from}` : ""}.</p>
+          <b className="shop-title">{w("shop.listN", { n: nextN })}</b>
+          <p className="small shop-why">{w("shop.whichDays", { start: start === today ? w("plan.todayLow") : madeOn(`${start}T12:00:00`) })}{store.lists.some((l) => l.to >= start) ? w("shop.notCounted") : start === today ? "" : store.lists.length ? w("shop.dayAfter") : w("shop.firstDay")}.</p>
+          <div className="moments" role="group" aria-label={w("plan.days")}>{DAY_CHOICES.map((n) => <button key={n} type="button" className={`choice ${span === n ? "on" : ""}`} onClick={() => setSpan(n)}>{wn("shop.nDays", n)}</button>)}</div>
+          <p className="small shop-why">{spanOf(days[0], days[days.length - 1])}: {wn("shop.plannedMeals", preview.meals)}, {wn("shop.nFoods", preview.lines.length)}{store.carry ? w("shop.plusFrom", { n: store.carry.lines.length, list: store.carry.from }) : ""}.</p>
           {/* DT79: a batch recipe is bought whole */}
           {(preview.batches ?? []).map((b) => <p key={b.title} className="small shop-why shop-batch">{b.cook ? <>{b.title}: cook {b.cook}, for the {b.pieces} planned.{b.cook - b.pieces > 0 ? ` ${b.cook - b.pieces} left over.` : ""}</> : <>{b.title}: {b.batches === 1 ? "one batch" : `${b.batches} batches`} of {b.n}, for the {b.pieces} planned.{b.batches * b.n - b.pieces > 0 ? ` ${b.batches * b.n - b.pieces} left over.` : ""}</>}</p>)}
-          <button type="button" className="pill pill-wide pill-primary shop-make" disabled={!preview.lines.length && !store.carry} onClick={() => save(makeList(store, p.planned, days, new Date().toISOString(), cookOf))}>Make shopping list {nextN}</button>
+          <button type="button" className="pill pill-wide pill-primary shop-make" disabled={!preview.lines.length && !store.carry} onClick={() => save(makeList(store, p.planned, days, new Date().toISOString(), cookOf))}>{w("shop.makeN", { n: nextN })}</button>
         </>)}
         {reading === null && store.lists.some((l) => l.doneAt) && (<>
           <small className="pick-group">{w("plan.earlierLists")}</small>
           <div className="menu-list shop-earlier">{store.lists.filter((l) => l.doneAt).map((l) => (
             <button key={l.n} type="button" className="menu-row" onClick={() => setReading(l.n)}>
-              <div className="menu-row-text"><b>Shopping list {l.n}</b><small>{spanOf(l.from, l.to)} · {l.lines.length + l.carried.length} {l.lines.length + l.carried.length === 1 ? "food" : "foods"} · finished {madeOn(l.doneAt!)}</small></div><ChevronRight size={18} />
+              <div className="menu-row-text"><b>{w("shop.listN", { n: l.n })}</b><small>{spanOf(l.from, l.to)} · {wn("shop.nFoods", l.lines.length + l.carried.length)} · {w("shop.finishedLow", { on: madeOn(l.doneAt!) })}</small></div><ChevronRight size={18} />
             </button>))}</div>
         </>)}
         {reading === null && !shown && !making && store.lists.some((l) => l.doneAt) && <button type="button" className="pill pill-wide pill-primary shop-new" onClick={() => setMaking(true)}>{w("plan.newShoppingList")}</button>}

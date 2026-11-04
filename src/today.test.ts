@@ -32,12 +32,12 @@ test("five bands, every edge a multiple of the target: a bit under is on plan", 
 });
 
 test("the line under the chips says the range and the partner, for the current target", async () => {
-  const { bandHint, BAND_LABEL, BAND_LINE_IDLE } = await import("./goal");
+  const { bandHint, BAND_LABEL, bandLineIdle } = await import("./goal");
   assert.equal(BAND_LABEL.below, "Low\u2212"); assert.equal(BAND_LABEL.close, "Low");
   assert.equal(bandHint("below", 5.3), "Low\u2212: PD under 3.2 \u00b7 your target 5.3");
   assert.equal(bandHint("plan", 5.3), "On plan: PD 4.8 to 8.0 \u00b7 your target 5.3");
   assert.equal(bandHint("top", 5.3), "High+: PD 13.3 and up \u00b7 your target 5.3");
-  assert.equal(bandHint("plan", null), BAND_LINE_IDLE);
+  assert.equal(bandHint("plan", null), bandLineIdle());
 });
 
 test("each day its own: life once, training per day, the average over the week", async () => {

@@ -11,7 +11,7 @@ import { log } from "../log";
 import { density, type Food } from "../pilot";
 import { displayRows } from "../labeltable";
 import { useEffect } from "react";
-import { JOBS, jobOf, plainLine, todayLine } from "../foodjob";
+import { JOBS, jobOf, plainLine, todayLine, jobName } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { Letters, NumbersTable } from "./Letters";
 import { iconFor } from "../icons";
@@ -118,12 +118,12 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
           </div>
         )}
         <div className="job-row">
-          <button className="job-chip" onClick={() => insight && setPicking(!picking)} aria-label={w("foodcard.whatThisFoodIs")}>{job.job}{job.note ? ` · ${job.note}` : ""}{job.taste && job.job !== "Flavour food" ? ` · ${job.taste}` : ""}</button>
+          <button className="job-chip" onClick={() => insight && setPicking(!picking)} aria-label={w("foodcard.whatThisFoodIs")}>{jobName(job.job)}{job.note ? ` · ${jobName(job.note)}` : ""}{job.taste && job.job !== "Flavour food" ? ` · ${job.taste}` : ""}</button>
           {job.mine && <small>{w("foodcard.yourLabel")}</small>}
         </div>
         {picking && insight && (
           <div className="moments job-pick">
-            {JOBS.map((j) => <button key={j} className={`choice ${job.job === j ? "on" : ""}`} onClick={() => { insight.setJob(j); setPicking(false); }}>{j}</button>)}
+            {JOBS.map((j) => <button key={j} className={`choice ${job.job === j ? "on" : ""}`} onClick={() => { insight.setJob(j); setPicking(false); }}>{jobName(j)}</button>)}
             {job.mine && <button className="link" onClick={() => { insight.setJob(null); setPicking(false); }}>{w("foodcard.useChefMealanSLabel")}</button>}
           </div>
         )}

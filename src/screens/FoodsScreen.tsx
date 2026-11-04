@@ -9,10 +9,10 @@ import { Camera, X, Pencil, Plus } from "lucide-react";
 import { density, candidateFood, uid } from "../pilot";
 import { findReference, referenceFood, localName, otherNames as refOtherNames, synonymsOf, shelfName } from "../reference";
 import { inPlaces, placeName } from "../places";
-import { BAND_LABEL, BAND_LINE_IDLE, bandHint } from "../goal";
+import { BAND_LABEL, bandLineIdle, bandHint } from "../goal";
 
 import { duplicatePairs } from "../dedupe";
-import { jobOf } from "../foodjob";
+import { jobOf, jobName, brandName } from "../foodjob";
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import type { ScannerMode } from "../types";
 import type { AppApi, DbProduct } from "./api";
@@ -101,7 +101,7 @@ export function FoodsScreen(p: AppApi) {
             <div className="row-text">
               <span className="name-line"><button className="name-link" onClick={() => setCardId(f.id)}>{f.favorite && <span className="fav-mark">★ </span>}{f.name}</button>{isToday((f as any).addedAt) && <span className="new-mark">{w("foods.new")}</span>}</span>
               {(() => { const sh = shelfName(f, p.region); return sh ? <small className="shelf-name">In shops in {sh.country}: {sh.name}</small> : null; })()}
-              <small>{jobOf(f).job}{f.brand ? ` by ${f.brand}` : ""}. Per 100 g: {fmt(f.calories, 0)} kcal and {fmt(f.protein)} g protein.{names.length > 1 ? ` Also ${names.slice(1).join(", ")}.` : ""}</small>
+              <small>{f.brand ? w("foods.jobBy", { job: jobName(jobOf(f).job), brand: brandName(f.brand) }) : jobName(jobOf(f).job)}. {w("foods.per100", { kcal: fmt(f.calories, 0), protein: fmt(f.protein) })}{names.length > 1 ? w("foods.also", { names: names.slice(1).join(", ") }) : ""}</small>
               <span className="row-links">
                 <button className="link" onClick={() => add(f)}>{w("foods.addToMeal")}</button>
                 <button className="link" onClick={() => p.toggleFavorite(f.id)}>{f.favorite ? "★ Favourite" : "☆ Favourite"}</button>
@@ -141,7 +141,7 @@ export function FoodsScreen(p: AppApi) {
       <>
       <section className="find">
         <div className="find-head">
-          <div className="find-title"><b>{w("foods.findAFood")}</b><small>{state.foods.length} in your foods</small></div>
+          <div className="find-title"><b>{w("foods.findAFood")}</b><small>{w("foods.inYourFoods", { n: state.foods.length })}</small></div>
           <button className={`pill pill-small add-toggle ${addOpen ? "pill-primary" : ""}`} aria-expanded={addOpen} aria-label={w("foods.addAFood")} onClick={() => setAddOpen(!addOpen)}><Plus size={15} /> {w("foods.add")}</button>
         </div>
         {addOpen && (
@@ -186,7 +186,7 @@ export function FoodsScreen(p: AppApi) {
           <button key={k} className={`chip chip-${k} ${filter === k ? "on" : ""}`} aria-pressed={filter === k} onClick={() => setFilter(filter === k ? "all" : k)}>{BAND_LABEL[k]}</button>
         ))}
       </div>
-      <p className="band-line" aria-live="polite">{filter === "all" ? BAND_LINE_IDLE : bandHint(filter, p.dayPd)}</p>
+      <p className="band-line" aria-live="polite">{filter === "all" ? bandLineIdle() : bandHint(filter, p.dayPd)}</p>
       {hiddenByChip.length > 0 && <p className="small hidden-by-chip">{hiddenByChip.length} more in your foods under {[...new Set(hiddenByChip.map((x) => BAND_LABEL[x.b]))].join(", ")}. <button className="link" onClick={() => setFilter("all")}>{w("foods.showAll")}</button></p>}
       {/* DT125 (0.2.104): one list for one word. Your foods first, then members', then the basic foods; the product database
           behind a line. One row per food, whatever anyone called it. With nothing typed, your foods as before. */}
