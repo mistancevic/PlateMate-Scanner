@@ -7,7 +7,7 @@ import { useState, type ReactNode } from "react";
 import type { ClientRow } from "../cloud";
 import { wordsOf, type DayLine, type SlotMark } from "../dayLines";
 import { DAY_NAMES, suggestTitle, answerWords, type CoachNote } from "../coachNotes";
-import { BANDS, PACES, bandOf, goalLabel, goalsForBand, isBuild } from "../goal";
+import { BANDS, PACES, bandOf, goalName, goalsForBand, isBuild } from "../goal";
 import { isoWeek, ymd } from "../plan";
 import { pdRange, pdVal } from "../ui";
 import { density } from "../pilot";
@@ -64,7 +64,7 @@ const weekNo = (row: ClientRow) => { const at = row.goal?.setAt ? Date.parse(row
 export const phaseDay = (row: ClientRow) => { const m = row.measured; if (!m?.phase || !m.start) return null; const d = Math.floor((Date.parse(`${ymd(new Date())}T12:00:00`) - Date.parse(`${m.start}T12:00:00`)) / DAY) + 1; return d >= 1 && d <= 28 ? d : null; };
 export function clientLine(row: ClientRow, today: boolean) {
   const wk = weekNo(row), pd = phaseDay(row);
-  return [row.goal?.band ? goalLabel(row.goal.band) : w("clientweek.noGoalYet"), pd ? (pd <= 14 ? `first two weeks, day ${pd} of 14` : `day ${pd}, not measured yet`) : wk ? `week ${wk}` : null, today ? "check-in today" : `check-in ${DAY_NAMES[row.checkinDay]}`].filter(Boolean).join(" · ");
+  return [row.goal?.band ? goalName(row.goal.band) : w("clientweek.noGoalYet"), pd ? (pd <= 14 ? `first two weeks, day ${pd} of 14` : `day ${pd}, not measured yet`) : wk ? `week ${wk}` : null, today ? "check-in today" : `check-in ${DAY_NAMES[row.checkinDay]}`].filter(Boolean).join(" · ");
 }
 export function ClientRowCard({ row, today, open }: { row: ClientRow; today: boolean; open: () => void }) {
   return (
@@ -119,7 +119,7 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
   const [picking, setPicking] = useState(false);
   const fromName = from === todayKey ? "today" : from === tomorrow ? "tomorrow" : longDay(from);
   const applyGoal = async () => {
-    try { await ops.setGoal(row, band, from); notify(from === todayKey ? `${name}'s goal is now ${goalLabel(band)}.` : `${goalLabel(band)} starts for ${name} on ${longDay(from)}.`); setBand(""); }
+    try { await ops.setGoal(row, band, from); notify(from === todayKey ? `${name}'s goal is now ${goalName(band)}.` : `${goalName(band)} starts for ${name} on ${longDay(from)}.`); setBand(""); }
     catch (e: any) { setError(e.message || w("clientweek.theGoalDidnTSave")); }
   };
   // weigh-ins and DaaM good in the week
@@ -139,7 +139,7 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
       {/* DT189 (0.3.32, Milan 18:39): the badge is visible from here, so the way back says what waits one level up */}
       <div className="menu-head cw-back"><button className="link" onClick={back}>‹ Clients{waitingCount > 0 ? ` · ${waitingCount} waiting` : ""}</button><span /></div>
       <section className="card person cw-person"><span className="avatar">{row.name.slice(0, 1).toUpperCase()}</span>
-        <div><b>{name}</b><small>{[g ? goalLabel(g.id) : w("clientweek.noGoalYet"), kcalNow ? `${kcalNow.toLocaleString(numLocale())} kcal` : null, proteinNow ? `${proteinNow} g protein` : null, wk ? `week ${wk}` : null].filter(Boolean).join(" · ")}</small><small>Check-in: {DAY_NAMES[row.checkinDay]}</small></div>
+        <div><b>{name}</b><small>{[g ? goalName(g.id) : w("clientweek.noGoalYet"), kcalNow ? `${kcalNow.toLocaleString(numLocale())} kcal` : null, proteinNow ? `${proteinNow} g protein` : null, wk ? `week ${wk}` : null].filter(Boolean).join(" · ")}</small><small>Check-in: {DAY_NAMES[row.checkinDay]}</small></div>
       </section>
       <div className="cp-tabs" role="tablist" aria-label={`${name}'s page`}>
         {([["today", "Today"], ["week", "Week"], ["shared", `Shared${row.feedback.length ? ` (${row.feedback.length})` : ""}`], ["goal", "Goal"]] as [ClientPart, string][]).map(([k, l]) => (
@@ -196,7 +196,7 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
         <section className="card cw-mini">
           <div><small>{w("clientweek.weighIns")}</small><small>{daysWeighed ?? weighs.length} this week</small></div>
           {daysWeighed !== null ? <b>{daysWeighed ? `${daysWeighed} ${daysWeighed === 1 ? "morning" : "mornings"} weighed` : w("clientweek.noWeighInsThisWeek")}</b> : weighs.length ? <b>{weighs.length > 1 ? `${wIn(weighs[0].kg).toFixed(1)} → ${wText(weighs[weighs.length - 1].kg)}` : wText(weighs[0].kg)}{a7 ? ` · 7-day average ${wIn(a7).toFixed(1)}` : ""}</b> : <b>{w("clientweek.noWeighInsThisWeek")}</b>}
-          {trend && <small className="cw-mini-line">{trend.verdict === "too few" ? w("clientweek.notEnoughWeighInsYet") : `${VERDICT_WORDS[trend.verdict]} for ${goalLabel(row.goal.band)}: ${pct ? fmtPct(trend.change!) : fmtKg(trend.change!)} in 3 weeks.`}</small>}
+          {trend && <small className="cw-mini-line">{trend.verdict === "too few" ? w("clientweek.notEnoughWeighInsYet") : `${VERDICT_WORDS[trend.verdict]} for ${goalName(row.goal.band)}: ${pct ? fmtPct(trend.change!) : fmtKg(trend.change!)} in 3 weeks.`}</small>}
         </section>
       )}
       {/* the measured burn, as the client sees it (0.2.7, board FT, FT7) */}
@@ -231,7 +231,7 @@ export function ClientPage({ row, coachName, ops, back, notify, setError, tailFo
       </>)}
       {part === "goal" && (<>
       <p className="label">{name}'s goal</p>
-      <section className="card you-card"><span><b>{g ? goalLabel(g.id) : w("clientweek.noGoalYet")}</b><small>{[row.goal?.setAt ? `Since ${new Date(row.goal.setAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}` : null, row.goal?.setBy === "coach" ? "set by you" : row.goal ? `set by ${name}` : null, kcalNow ? `${kcalNow.toLocaleString(numLocale())} kcal` : null, proteinNow ? `${proteinNow} g protein` : null].filter(Boolean).join(" · ")}</small>{row.nextGoal && <small className="cw-next">Next: {goalLabel(row.nextGoal.band)}, from {longDay(row.nextGoal.from)}{row.nextGoal.setBy === "coach" ? ", set by you" : ""}</small>}</span></section>
+      <section className="card you-card"><span><b>{g ? goalName(g.id) : w("clientweek.noGoalYet")}</b><small>{[row.goal?.setAt ? `Since ${new Date(row.goal.setAt).toLocaleDateString("en-GB", { day: "numeric", month: "long" })}` : null, row.goal?.setBy === "coach" ? "set by you" : row.goal ? `set by ${name}` : null, kcalNow ? `${kcalNow.toLocaleString(numLocale())} kcal` : null, proteinNow ? `${proteinNow} g protein` : null].filter(Boolean).join(" · ")}</small>{row.nextGoal && <small className="cw-next">Next: {goalName(row.nextGoal.band)}, from {longDay(row.nextGoal.from)}{row.nextGoal.setBy === "coach" ? ", set by you" : ""}</small>}</span></section>
       <section className="card cw-goal">
         <b>A new goal for {name}</b>
         <div className="bands compact">{BANDS.map((b) => {

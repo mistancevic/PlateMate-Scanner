@@ -1,4 +1,4 @@
-import { dec } from "./words";
+import { dec, w, type WordKey } from "./words";
 import { collapseLog } from "./goalHistory";
 import { macroSplit } from "./personal";
 // The goal a person sets once. A band from the goal bands (G1 to G6), or their own calories and protein.
@@ -31,6 +31,9 @@ export const isBuild = (id?: string) => id === "gain" || id === "gainsteady";
 export const paceOf = (id?: string): Pace | null => (id === "gainsteady" ? "steady" : id === "gain" ? "faster" : null);
 // the goal's name with its pace: "Build muscle · Steady"
 export const goalLabel = (id?: string) => { const b = bandOf(id); if (!b) return ""; const pc = paceOf(b.id); return pc ? `${b.name} · ${pc === "steady" ? "Steady" : "Faster"}` : b.name; };
+// DT203 phase 9 (0.3.86): the goal's name on the screens, in the language chosen; goalLabel stays English for Chef Mealan's prompts
+const BAND_WORD: Record<string, WordKey> = { recomp: "goal.band.recomp", fatloss: "goal.band.fatloss", maintain: "goal.band.maintain", gain: "goal.band.gain", gainsteady: "goal.band.gain", performance: "goal.band.performance" };
+export const goalName = (id?: string) => { const b = bandOf(id); if (!b) return ""; const pc = paceOf(b.id), n = BAND_WORD[b.id] ? w(BAND_WORD[b.id]) : b.name; return pc ? `${n} · ${pc === "steady" ? w("goal.pace.steady") : w("goal.pace.faster")}` : n; };
 export type TrainingAge = "u1" | "1to3" | "3p";
 export const TRAINING_AGES: { id: TrainingAge; name: string }[] = [{ id: "u1", name: "Under 1 year" }, { id: "1to3", name: "1–3 years" }, { id: "3p", name: "Over 3 years" }];
 // the starting pace: the longer you've trained, the slower muscle comes

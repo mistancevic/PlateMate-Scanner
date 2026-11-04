@@ -13,7 +13,7 @@ export function Letters({ n, rates, who, extra, open, setOpen, table }: { n: Num
   const ls = lettersOf(n, rates);
   return (
     <div className="readout-letters">
-      <button type="button" className="letters-row" aria-expanded={isOpen} aria-label={`The four letters for ${who}: ${ls.join(" ")}. ${isOpen ? "Close" : "Open"} the numbers`} onClick={flip}>
+      <button type="button" className="letters-row" aria-expanded={isOpen} aria-label={w(isOpen ? "letters.ariaClose" : "letters.ariaOpen", { who, ls: ls.join(" ") })} onClick={flip}>
         <span className="letters-line">{ls.map((l, k) => <span key={k} className="letters">{l}</span>)}</span>
         <span className="letters-go" aria-hidden="true">{isOpen ? "⌃" : "›"}</span>
       </button>

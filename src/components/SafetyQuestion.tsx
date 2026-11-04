@@ -1,12 +1,12 @@
 // The safety question (the door), one card for Profile, setup and the chat (DT141, 0.2.126, board Stories97; Anna's DT119;
 // Milan 28 October 18:33 Go): the situations Chef Mealan steps back from, and what to keep off every suggestion. A tick is
 // the answer and saves straight away. In setup and from the chat it ends on one button: Next, or Back to the chat.
-import { w } from "../words";
+import { w, dateText } from "../words";
 import { useState } from "react";
 import type { AppApi } from "../screens/api";
 import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, fixedLine, DOOR_WHY, type SituationId } from "../safety";
 
-const fmtDay = (iso: string) => new Date(iso).toLocaleDateString([], { day: "numeric", month: "long", year: "numeric" });
+const fmtDay = (iso: string) => dateText(new Date(iso), { day: "numeric", month: "long", year: "numeric" }, []).replace(/\.$/, "");
 export function SafetyQuestion({ p, onDone, doneLabel = "Next" }: { p: AppApi; onDone?: () => void; doneLabel?: string }) {
   // the door: situations Chef Mealan steps back from, and what to keep off every suggestion
   const [sits, setSits] = useState<SituationId[]>(p.safety.situations);

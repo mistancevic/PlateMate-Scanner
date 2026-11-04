@@ -8,7 +8,7 @@ import type { AppApi, MenuSection } from "./api";
 import { summaryOf, sharedParts, sharedRows, nextShared, changesSince, SHARE_PARTS, type SummaryIn, type SummaryPart, type ShareId, type SharedProfile, type SummaryRow } from "../summary";
 import { calculate, formulaFor, lifestyleOf } from "../personal";
 import { slotsOf } from "../slots";
-import { goalLabel } from "../goal";
+import { goalName } from "../goal";
 import { REGIONS } from "../moments";
 import { COACH_NAME } from "../components/Mark";
 import { loadSharedProfile, saveSharedProfile } from "../cloud";
@@ -21,7 +21,7 @@ export function summaryInOf(p: AppApi): SummaryIn {
   const days = calc?.weekdays ? calc.weekdays.map((d) => ({ kcal: d.kcal, carbs: d.carbs })) : [];
   return {
     personal: p.personal, safety: p.safety, tasteWords: p.state.preferences ?? "",
-    goal: band ? { band, name: goalLabel(band), setBy: p.goal?.setBy === "coach" ? (p.goal.coachName || p.coachLabel) : "you", at: p.goal?.setAt ?? null } : null,
+    goal: band ? { band, name: goalName(band), setBy: p.goal?.setBy === "coach" ? (p.goal.coachName || p.coachLabel) : "you", at: p.goal?.setAt ?? null } : null,
     avg: g.calories ? { kcal: g.calories, protein: g.protein ?? 0, fats: g.fats ?? calc?.fats ?? 0 } : null,
     days, protein: calc ? { min: calc.proteinMin, max: calc.proteinMax, lo: calc.proteinLo, hi: calc.proteinHi } : null,
     pdRef: p.pdRef, burn: calc?.bmr ?? null,

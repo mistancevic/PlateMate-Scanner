@@ -1,4 +1,4 @@
-import { numLocale, w } from "../words";
+import { numLocale, w, dateText, phoneLoc } from "../words";
 import { SafetyQuestion } from "../components/SafetyQuestion";
 import { LanguagePanel } from "../components/LanguagePanel";
 import { countByPlace, samePlace, getStarted } from "../places";
@@ -9,7 +9,7 @@ import { QrCode, FlaskConical, ChevronRight, BookOpen, ChevronLeft, Download, Up
 import { fmt, fixed, pdText, pdVal, pdTag, pdRange } from "../ui";
 import { APP_NAME, COACH_NAME } from "../components/Mark";
 import { exportLog, clearLog, readLog, log } from "../log";
-import { BANDS, bandOf, goalLabel, SOURCE_LABEL, type GoalEntry } from "../goal";
+import { BANDS, bandOf, goalName, SOURCE_LABEL, type GoalEntry } from "../goal";
 import { sheetOf, guideOf } from "../goalGuide";
 import { GoalSheet, GoalGuide } from "../components/GoalSheet";
 import { WeightTrend } from "../components/Weight";
@@ -294,7 +294,7 @@ function ProfilePanel(p: AppApi) {
   );
 }
 
-const fmtDay = (iso: string) => new Date(iso).toLocaleDateString([], { day: "numeric", month: "long", year: "numeric" });
+const fmtDay = (iso: string) => dateText(new Date(iso), { day: "numeric", month: "long", year: "numeric" }, []).replace(/\.$/, "");
 // DT168 (0.3.10): sign-out saves everything, then clears the phone. When something can't be saved, it says so and asks
 function SignOut({ p, inline }: { p: AppApi; inline?: boolean }) {
   const [state, setState] = useState<"idle" | "busy" | "unsaved">("idle");
@@ -332,7 +332,7 @@ function GoalPanel(p: AppApi) {
     <>
       <section className="plan goal-head">
         <div className="plan-top"><small className="eyebrow-line">{w("menu.yourGoal")}</small><span className="goal-src">{ownWay ? (goal?.setBy === "coach" ? `set by ${setBy}` : "your own numbers") : "calculated for you"}</span></div>
-        <b className="goal-name">{band ? goalLabel(band.id) : w("menu.notSetYet")}</b>
+        <b className="goal-name">{band ? goalName(band.id) : w("menu.notSetYet")}</b>
         {band && <span className="goal-who">{band.who}</span>}
         {p.review && p.review.status !== "closed" && ownWay && (
           <span className={`review-state ${p.review.status}`}>
@@ -356,7 +356,7 @@ function GoalPanel(p: AppApi) {
         return (
           <section className="card next-goal" aria-label={w("menu.nextGoal")}>
             <small className="next-goal-when">NEXT, FROM {day.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" }).toUpperCase().replace(",", "")}</small>
-            <b>{goalLabel(ng.band)}</b>
+            <b>{goalName(ng.band)}</b>
             <small>{ng.setBy === "coach" ? `Set by ${p.coachLabel}. ` : ""}{ng.kcal.toLocaleString(numLocale())} kcal and {ng.protein} g protein a day on average. Plan already uses it from {day.toLocaleDateString("en-GB", { day: "numeric", month: "long" })}.</small>
             {/* a goal from the coach (canvas board CW, CW9): Reply instead of Change the date and Cancel */}
             {ng.setBy === "coach"
@@ -447,7 +447,7 @@ export function GoalHistory({ log }: { log: GoalEntry[] }) {
       <section className="card history">
         {periods.slice(0, 20).map(({ entry: e, ...pr }) => (
           <div className="history-row" key={e.at}>
-            <div><b>{e.band ? goalLabel(e.band) : "Custom"}{pr.now && <span className="now-tag">NOW</span>}</b><small>{periodLine({ entry: e, ...pr })}{SOURCE_LABEL[e.source] ? `, ${SOURCE_LABEL[e.source].charAt(0).toLowerCase()}${SOURCE_LABEL[e.source].slice(1)}` : ""}{e.weightKg ? `, at ${wText(e.weightKg, Number.isInteger(wIn(e.weightKg)) ? 0 : 1)}` : ""}</small></div>
+            <div><b>{e.band ? goalName(e.band) : "Custom"}{pr.now && <span className="now-tag">NOW</span>}</b><small>{periodLine({ entry: e, ...pr })}{SOURCE_LABEL[e.source] ? `, ${SOURCE_LABEL[e.source].charAt(0).toLowerCase()}${SOURCE_LABEL[e.source].slice(1)}` : ""}{e.weightKg ? `, at ${wText(e.weightKg, Number.isInteger(wIn(e.weightKg)) ? 0 : 1)}` : ""}</small></div>
             <div className="history-num"><b>{e.kcal !== null ? e.kcal.toLocaleString(numLocale()) : "?"}</b><small>kcal, {e.protein ?? "?"} g protein</small></div>
           </div>
         ))}
@@ -826,7 +826,7 @@ function AccountPanel(p: AppApi) {
         {user?.photo ? <img className="avatar avatar-img" src={user.photo} alt="" /> : <span className="avatar">{(user?.name || "?").slice(0, 1)}</span>}
         <div><b>{user ? user.name || user.email : w("menu.thisPhoneOnly")}</b><small>{user ? user.email : "no account, data stays here"}</small></div>
       </section>
-      {user && cloudStatus.text && <p className={`small sync ${cloudStatus.ok ? "" : "sync-bad"}`}>{cloudStatus.text}{cloudStatus.at ? `, ${new Date(cloudStatus.at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}` : ""}.</p>}
+      {user && cloudStatus.text && <p className={`small sync ${cloudStatus.ok ? "" : "sync-bad"}`}>{cloudStatus.text}{cloudStatus.at ? `, ${new Date(cloudStatus.at).toLocaleTimeString(phoneLoc(), { hour: "2-digit", minute: "2-digit" })}` : ""}.</p>}
       <section className="card">
         <b>{w("menu.yourData")}</b>
         <p className="small">{w("menu.everythingChefMealanKeepsAbout2")}</p>
@@ -890,7 +890,7 @@ function DevGuard({ p }: { p: AppApi }) { return useMetricsOwner(true) ? <DevDat
 // DT231 (0.3.70, board Stories170): what this phone measured and wrote to the account, for the owner only; About keeps the version
 function DevData({ missing }: { missing: number }) {
   const x = saveStats();
-  const at = x.lastAt ? new Date(x.lastAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+  const at = x.lastAt ? new Date(x.lastAt).toLocaleTimeString(phoneLoc(), { hour: "2-digit", minute: "2-digit" }) : "";
   const block = (title: string, rows: [string, string][]) => (
     <section className="card dev-block"><b>{title}</b>{rows.map(([k, v]) => <div key={k} className="dev-row"><span>{k}</span><b>{v}</b></div>)}</section>
   );

@@ -1,4 +1,5 @@
 // A cook's words for a food (DT88, board Stories58; Milan 24 October 12:12). The food's name keeps its state after a comma,
+import { w } from "./words";
 // as the database writes it: "Penne, dry", "Chicken breast, cooked". A cook says "135 g dry penne" and weighs it dry, so the
 // screens show the short name and how to weigh it. The food and its numbers do not change; only the words on the screen.
 // DT91 (0.2.88): what a cook does with it: a food that goes in the pot raw or dry is cooked by the steps; a food sold cooked is
@@ -16,7 +17,7 @@ export function cookName(name: string): { short: string; state: CookState | null
 export function weighLine(name: string): string | null {
   const { state } = cookName(name);
   if (!state) return null;
-  return state === "uncooked" ? "weigh it raw" : state === "drained" ? "weigh it drained" : `weigh it ${state}`;
+  return state === "uncooked" || state === "raw" ? w("cook.weighRaw") : state === "drained" ? w("cook.weighDrained") : state === "dry" ? w("cook.weighDry") : state === "cooked" ? w("cook.weighCooked") : `weigh it ${state}`;
 }
 // the food as a cook says it, with its amount: 135 g dry penne, 150 g cooked chicken breast, 80 g chickpeas, drained
 export function cookPhrase(name: string, grams: number): string {

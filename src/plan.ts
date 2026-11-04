@@ -1,4 +1,5 @@
 import { workHoursOf, suggestWhen, type WorkHours } from "./slots";
+import { w } from "./words";
 // The Training week and Lifestyle, as approved on the canvas on 6 October 2026.
 // Lifestyle is set once: work, recovery, nutrition. The Training week is the usual week, Monday to Sunday, one activity a day.
 // Today reads the plan; a change for one date is kept for that date only and never touches the plan.
@@ -22,19 +23,19 @@ export const weekdayIndex = (d: Date) => (d.getDay() + 6) % 7;
 
 // METs from the Compendium of Physical Activities (2024), at easy, moderate and hard. Only the part above rest is added.
 export const KINDS: { id: Kind; name: string; hint: string; met: [number, number, number] }[] = [
-  { id: "rest",       name: "Rest",       hint: "nothing planned",                  met: [1, 1, 1] },
-  { id: "strength",   name: "Strength",   hint: "weights, machines, bodyweight",    met: [3.5, 5, 6] },
-  { id: "cardio",     name: "Cardio",     hint: "running, cycling, swimming",       met: [5, 7, 9] },
-  { id: "hiit",       name: "HIIT",       hint: "short hard intervals",             met: [6, 8, 9.5] },
-  { id: "mobility",   name: "Mobility",   hint: "joints and range of motion",       met: [2.5, 3, 3.5] },
-  { id: "stretching", name: "Stretching", hint: "slow and easy",                    met: [2.3, 2.5, 3] },
-  { id: "yoga",       name: "Yoga",       hint: "any style",                        met: [2.5, 3, 4] },
-  { id: "walk",       name: "Walk",       hint: "a real walk, not the way to work", met: [3.5, 4.3, 5] },
-  { id: "team",       name: "Team sport", hint: "football, basketball, tennis",     met: [5, 7, 8] },
+  { id: "rest", get name() { return w("plan.kind.rest"); }, get hint() { return w("plan.kindHint.rest"); },                  met: [1, 1, 1] },
+  { id: "strength", get name() { return w("plan.kind.strength"); }, get hint() { return w("plan.kindHint.strength"); },    met: [3.5, 5, 6] },
+  { id: "cardio", get name() { return w("plan.kind.cardio"); }, get hint() { return w("plan.kindHint.cardio"); },       met: [5, 7, 9] },
+  { id: "hiit", get name() { return w("plan.kind.hiit"); }, get hint() { return w("plan.kindHint.hiit"); },             met: [6, 8, 9.5] },
+  { id: "mobility", get name() { return w("plan.kind.mobility"); }, get hint() { return w("plan.kindHint.mobility"); },       met: [2.5, 3, 3.5] },
+  { id: "stretching", get name() { return w("plan.kind.stretching"); }, get hint() { return w("plan.kindHint.stretching"); },                    met: [2.3, 2.5, 3] },
+  { id: "yoga", get name() { return w("plan.kind.yoga"); }, get hint() { return w("plan.kindHint.yoga"); },                        met: [2.5, 3, 4] },
+  { id: "walk", get name() { return w("plan.kind.walk"); }, get hint() { return w("plan.kindHint.walk"); }, met: [3.5, 4.3, 5] },
+  { id: "team", get name() { return w("plan.kind.team"); }, get hint() { return w("plan.kindHint.team"); },     met: [5, 7, 8] },
   // for school kids: training with a club, a match, dance; club and match take their METs from the sport
-  { id: "club",       name: "Club training", hint: "training with your club",       met: [5, 7, 9] },
-  { id: "match",      name: "Match",      hint: "a game with your club",            met: [6, 8, 9.5] },
-  { id: "dance",      name: "Dance",      hint: "any style",                        met: [4, 5.5, 7.8] },
+  { id: "club", get name() { return w("plan.kind.club"); }, get hint() { return w("plan.kindHint.club"); },       met: [5, 7, 9] },
+  { id: "match", get name() { return w("plan.kind.match"); }, get hint() { return w("plan.kindHint.match"); },            met: [6, 8, 9.5] },
+  { id: "dance", get name() { return w("plan.kind.dance"); }, get hint() { return w("plan.kindHint.dance"); },                        met: [4, 5.5, 7.8] },
 ];
 // Which activities each person sees: adults one list, school kids another (after school).
 // Walk is not offered since 7 October 2026: all walking is in the steps, on every day. A Walk day saved before still reads.
@@ -42,13 +43,13 @@ export const ADULT_KINDS: Kind[] = ["rest", "strength", "cardio", "hiit", "mobil
 export const KID_KINDS: Kind[] = ["rest", "club", "match", "strength", "cardio", "dance", "walk", "yoga"];
 // METs by sport at easy, moderate and hard, Compendium of Physical Activities 2024 (youth values where they exist).
 export const SPORTS: { id: Sport; name: string; met: [number, number, number] }[] = [
-  { id: "football",   name: "Football",   met: [5, 7, 9.5] },
-  { id: "basketball", name: "Basketball", met: [4.5, 6.5, 8] },
-  { id: "swimming",   name: "Swimming",   met: [5.8, 8, 9.8] },
-  { id: "handball",   name: "Handball",   met: [6, 8, 10] },
-  { id: "volleyball", name: "Volleyball", met: [3, 4, 6] },
-  { id: "tennis",     name: "Tennis",     met: [5, 7.3, 8] },
-  { id: "other",      name: "Other",      met: [4, 6, 8] },
+  { id: "football", get name() { return w("plan.sport.football"); },   met: [5, 7, 9.5] },
+  { id: "basketball", get name() { return w("plan.sport.basketball"); }, met: [4.5, 6.5, 8] },
+  { id: "swimming", get name() { return w("plan.sport.swimming"); },   met: [5.8, 8, 9.8] },
+  { id: "handball", get name() { return w("plan.sport.handball"); },   met: [6, 8, 10] },
+  { id: "volleyball", get name() { return w("plan.sport.volleyball"); }, met: [3, 4, 6] },
+  { id: "tennis", get name() { return w("plan.sport.tennis"); },     met: [5, 7.3, 8] },
+  { id: "other", get name() { return w("plan.sport.other"); },      met: [4, 6, 8] },
 ];
 export const sportOf = (s?: Sport) => SPORTS.find((x) => x.id === s) ?? SPORTS[0];
 // Sport at school counts as 45 minutes at about 4 METs (Compendium 2024, youth physical education).
@@ -60,7 +61,7 @@ export const COMMUTE: Record<string, { met: number; minutes: number; name: strin
 };
 // How hard, as approved on 7 October 2026 (canvas boards T1 and T3): Light, Moderate, Hard, each with its heart-rate zones,
 // how each zone feels and what usually falls in it. The id "easy" stays, so saved plans keep reading.
-export const INTENSITIES: { id: Intensity; name: string }[] = [{ id: "easy", name: "Light" }, { id: "moderate", name: "Moderate" }, { id: "hard", name: "Hard" }];
+export const INTENSITIES: { id: Intensity; name: string }[] = [{ id: "easy", get name() { return w("plan.int.easy"); } }, { id: "moderate", get name() { return w("plan.int.moderate"); } }, { id: "hard", get name() { return w("plan.int.hard"); } }];
 export type Zone = { zone: string; feel: string; examples: string };
 export const ZONES: Record<Intensity, Zone[]> = {
   easy: [{ zone: "Zone 1", feel: "very easy, you breathe calmly", examples: "yoga, mobility, stretching, easy cycling" }],
@@ -73,7 +74,7 @@ export const ZONES: Record<Intensity, Zone[]> = {
     { zone: "Zone 5", feel: "all out, no words", examples: "sprints, the last minutes of a race" },
   ],
 };
-export const intensityWord = (x?: Intensity) => (x === "hard" ? "hard" : x === "moderate" ? "moderate" : "light");
+export const intensityWord = (x?: Intensity) => (x === "hard" ? w("plan.intLow.hard") : x === "moderate" ? w("plan.intLow.moderate") : w("plan.intLow.easy"));
 // How long, as ranges from 15 minutes. A range counts as its middle. A length saved before (30, 45, 60, 75, 90 minutes)
 // falls in the range it ends in: 30 in 15–30, 60 in 45–60, 75 and 90 in 60–90.
 export type Length = { id: string; name: string; mid: number; max: number };
@@ -87,8 +88,8 @@ export const LENGTHS: Length[] = [
 export const lengthOf = (minutes: number) => LENGTHS.find((r) => minutes <= r.max) ?? LENGTHS[LENGTHS.length - 1];
 // the starting length of each kind: Light 30–45, Moderate 45–60, Hard 60–90
 export const START_MIN: Record<Intensity, number> = { easy: 40, moderate: 55, hard: 75 };
-export const WHENS: { id: When; name: string }[] = [{ id: "morning", name: "Morning" }, { id: "day", name: "During the day" }, { id: "evening", name: "Evening" }, { id: "late", name: "Late night" }];
-export const WHENS_KID: { id: When; name: string }[] = [{ id: "afterschool", name: "Right after school" }, { id: "lateafternoon", name: "Late afternoon" }, { id: "evening", name: "Evening" }];
+export const WHENS: { id: When; name: string }[] = [{ id: "morning", get name() { return w("plan.when.morning"); } }, { id: "day", get name() { return w("plan.when.day"); } }, { id: "evening", get name() { return w("plan.when.evening"); } }, { id: "late", get name() { return w("plan.when.late"); } }];
+export const WHENS_KID: { id: When; name: string }[] = [{ id: "afterschool", get name() { return w("plan.when.afterschool"); } }, { id: "lateafternoon", get name() { return w("plan.when.lateafternoon"); } }, { id: "evening", get name() { return w("plan.when.evening"); } }];
 export const MINUTES = [30, 45, 60, 75, 90];
 export const MINUTES_KID = [60, 75, 90, 120];
 const I = (x?: Intensity) => (x === "hard" ? 2 : x === "moderate" ? 1 : 0);
@@ -98,35 +99,35 @@ export const minutesOf = (d: PlanDay) => (d.kind === "rest" ? 0 : d.minutes ?? 6
 // How hard the day is decides the numbers row when the person types their own: Rest, Light, Moderate, Hard.
 export const loadOf = (d: PlanDay): DayType => (d.kind === "rest" ? (d.pe ? "active" : "passive") : d.intensity === "hard" ? "hard" : d.intensity === "moderate" ? "easy" : "active");
 // plain English pass (7 October 2026): a day without training says so; "Rest" stays only as the row name in the own numbers table
-export const LOAD_NAME: Record<DayType, string> = { passive: "No training", active: "Light", easy: "Moderate", hard: "Hard" };
-export const LOAD_DAY: Record<DayType, string> = { passive: "A rest day.", active: "A light day.", easy: "A moderate day.", hard: "A hard day." };
-const whenWords: Record<When, string> = { morning: "in the morning", day: "during the day", evening: "in the evening", late: "late at night", afterschool: "right after school", lateafternoon: "in the late afternoon" };
+export const LOAD_NAME: Record<DayType, string> = { get passive() { return w("plan.load.passive"); }, get active() { return w("plan.int.easy"); }, get easy() { return w("plan.int.moderate"); }, get hard() { return w("plan.int.hard"); } };
+export const LOAD_DAY: Record<DayType, string> = { get passive() { return w("plan.day.passive"); }, get active() { return w("plan.day.active"); }, get easy() { return w("plan.day.easy"); }, get hard() { return w("plan.day.hard"); } };
+const whenWords: Record<When, string> = { get morning() { return w("plan.whenIn.morning"); }, get day() { return w("plan.whenIn.day"); }, get evening() { return w("plan.whenIn.evening"); }, get late() { return w("plan.whenIn.late"); }, get afterschool() { return w("plan.whenIn.afterschool"); }, get lateafternoon() { return w("plan.whenIn.lateafternoon"); } };
 const whenShort = (w: When) => [...WHENS, ...WHENS_KID].find((x) => x.id === w)!.name.toLowerCase();
 // the activity's own name: "Strength", or for a club "Football training", "Football match"
-export const activityName = (d: PlanDay) => d.kind === "club" ? `${sportOf(d.sport).name} training` : d.kind === "match" ? `${sportOf(d.sport).name} match` : kindOf(d.kind).name;
+export const activityName = (d: PlanDay) => d.kind === "club" ? w("plan.sportTraining", { sport: sportOf(d.sport).name }) : d.kind === "match" ? w("plan.sportMatch", { sport: sportOf(d.sport).name }) : kindOf(d.kind).name;
 // "Strength, hard, in the evening"
 export function planLine(d: PlanDay): string {
   const act = d.kind === "rest" ? "" : `${activityName(d)}, ${intensityWord(d.intensity)}${d.when ? `, ${whenWords[d.when]}` : ""}`;
-  if (d.pe) return act ? `${peName(d)}, then ${act.charAt(0).toLowerCase() + act.slice(1)}` : peName(d);
-  return act || "No training";
+  if (d.pe) return act ? w("plan.peThen", { pe: peName(d), act: act.charAt(0).toLowerCase() + act.slice(1) }) : peName(d);
+  return act || w("plan.load.passive");
 }
-const peName = (d: PlanDay) => (d.study ? "Sport in class" : "Sport at school");
+const peName = (d: PlanDay) => (d.study ? w("plan.peClass") : w("plan.peSchool"));
 // the agenda line: "Strength, hard · evening", "Sport at school, then football training, hard · late afternoon"
 export function planShort(d: PlanDay): string {
   const act = d.kind === "rest" ? "" : `${activityName(d)}, ${intensityWord(d.intensity)}${d.when ? ` · ${whenShort(d.when)}` : ""}`;
-  if (d.pe) return act ? `${peName(d)}, then ${act.charAt(0).toLowerCase() + act.slice(1)}` : peName(d);
-  return act || "No training";
+  if (d.pe) return act ? w("plan.peThen", { pe: peName(d), act: act.charAt(0).toLowerCase() + act.slice(1) }) : peName(d);
+  return act || w("plan.load.passive");
 }
 // Today's sentence on a study day (Release B): "Study day, then team sport in the evening."
 export function studyLine(d: PlanDay): string {
   const act = d.kind === "rest" ? "" : `${activityName(d).charAt(0).toLowerCase() + activityName(d).slice(1)}${d.when ? ` ${whenWords[d.when]}` : ""}`;
-  return `Study day${d.pe ? " with sport in class" : ""}${act ? `, then ${act}` : ""}`;
+  return (d.pe ? w("plan.studyPe") : w("plan.study")) + (act ? w("plan.then", { act }) : "");
 }
 // Today's sentence for a school kid: "School with sport at school, then football training in the late afternoon."
 export function schoolLine(d: PlanDay): string {
   const act = d.kind === "rest" ? "" : `${activityName(d).charAt(0).toLowerCase() + activityName(d).slice(1)}${d.when ? ` ${whenWords[d.when]}` : ""}`;
-  if (!d.work) return act ? `No school. ${activityName(d)}${d.when ? ` ${whenWords[d.when]}` : ""}` : "No school, and nothing planned";
-  return `School${d.pe ? " with sport at school" : ""}${act ? `, then ${act}` : ""}`;
+  if (!d.work) return act ? w("plan.noSchool") + " " + activityName(d) + (d.when ? ` ${whenWords[d.when]}` : "") : w("plan.noSchoolNothing");
+  return (d.pe ? w("plan.schoolPe") : w("plan.school")) + (act ? w("plan.then", { act }) : "");
 }
 
 // A starting plan for someone who had the old My week counts: hard days first on Monday and Thursday, then the easy ones,

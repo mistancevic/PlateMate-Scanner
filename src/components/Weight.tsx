@@ -2,7 +2,7 @@ import { dec, w } from "../words";
 import { useState } from "react";
 import { Plus, X } from "lucide-react";
 import { avg7, isWeight, trendOf, verdictNote, withWeighIn, withoutWeighIn, VERDICT_WORDS, fmtKg, type WeighIn , fmtPct } from "../weight";
-import { goalLabel } from "../goal";
+import { goalName } from "../goal";
 import { ConfirmButton } from "./Confirm";
 import { wText, wIn, wFrom, wUnit } from "../units";
 
@@ -64,7 +64,7 @@ function Chart({ t, unit = "" }: { t: ReturnType<typeof trendOf>; unit?: string 
 // Me › Goal and the coach's client page: the last 4 weeks (canvas board W2)
 export function WeightTrend({ list, band, weightKg, trainingAge, onUpdateWeight, onRemove, coach = false }: { list: WeighIn[] | undefined; band: string; weightKg?: number; trainingAge?: string; onUpdateWeight?: (kg: number) => void; onRemove?: (date: string) => void; coach?: boolean }) {
   const [showAll, setShowAll] = useState(false);
-  if (!list?.length) return coach ? null : <section className="card weight-trend"><b>{w("weight.theLastWeeks")}</b><small className="muted">Weigh in on Me a few mornings a week, and the trend shows here: your 7-day average against what {goalLabel(band) || "your goal"} expects.</small></section>;
+  if (!list?.length) return coach ? null : <section className="card weight-trend"><b>{w("weight.theLastWeeks")}</b><small className="muted">Weigh in on Me a few mornings a week, and the trend shows here: your 7-day average against what {goalName(band) || "your goal"} expects.</small></section>;
   const t = trendOf(list, band, weightKg ?? list[list.length - 1].kg, trainingAge);
   const note = verdictNote(band, t.verdict);
   const avg = avg7(list);
@@ -73,7 +73,7 @@ export function WeightTrend({ list, band, weightKg, trainingAge, onUpdateWeight,
     <section className="card weight-trend" aria-label={w("weight.theLastWeeks")}>
       <b>{w("weight.theLastWeeks")}</b>
       <Chart t={t} />
-      <div className="trend-legend"><span><i className="sw-dot" />{coach ? w("weight.weighIns") : "your weigh-ins"}</span><span><i className="sw-line" />7-day average</span><span><i className="sw-band" />expected for {goalLabel(band)}</span></div>
+      <div className="trend-legend"><span><i className="sw-dot" />{coach ? w("weight.weighIns") : "your weigh-ins"}</span><span><i className="sw-line" />7-day average</span><span><i className="sw-band" />expected for {goalName(band)}</span></div>
       {t.first !== null && t.last !== null && <div className="sheet-row"><small>7-day average</small><b>{dec(wIn(t.first), 1)} → {wText(t.last)}</b></div>}
       {t.change !== null && <div className="sheet-row"><small>{w("weight.change")}</small><b>{fmtKg(t.change)} in 3 weeks</b></div>}
       <div className="sheet-row"><small>{w("weight.expected")}</small><b>{fmtKg(t.expected[0]).replace(` ${wUnit()}`, "")} to {fmtKg(t.expected[1])}</b></div>
@@ -101,7 +101,7 @@ export function WeightTrendPct({ t, band, at }: { t: ReturnType<typeof trendOf>;
     <section className="card weight-trend" aria-label={w("weight.theLastWeeks")}>
       <b>{w("weight.theLastWeeks")}</b>
       <Chart t={t} unit=" %" />
-      <div className="trend-legend"><span><i className="sw-dot" />{w("weight.weighIns")}</span><span><i className="sw-line" />7-day average</span><span><i className="sw-band" />expected for {goalLabel(band)}</span></div>
+      <div className="trend-legend"><span><i className="sw-dot" />{w("weight.weighIns")}</span><span><i className="sw-line" />7-day average</span><span><i className="sw-band" />expected for {goalName(band)}</span></div>
       {t.change !== null && <div className="sheet-row"><small>{w("weight.change")}</small><b>{fmtPct(t.change)} in 3 weeks</b></div>}
       <div className="sheet-row"><small>{w("weight.expected")}</small><b>{fmtPct(t.expected[0]).replace(" %", "")} to {fmtPct(t.expected[1])}</b></div>
       <span className={`trend-chip ${tone}`}>{VERDICT_WORDS[t.verdict]}</span>
