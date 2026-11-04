@@ -2892,16 +2892,17 @@ export default function App() {
   // DT210: no more My day and My clients; a client is seen on their page in Clients
   const clientsView = false;
   const TITLES: Record<Tab, string> = {
-    home: "Today",
+    // 0.3.85 (Coach Milan 4 November 15:04, Go): the header says what the bar says, in the chosen language
+    home: w("tab.today"),
     journey: w("tab.plate"),
-    plan: "Plan",
-    recipes: "Recipes",
-    me: "Me",
-    clients: "Clients",
+    plan: w("tab.plan"),
+    recipes: w("tab.recipes"),
+    me: w("menu.me"),
+    clients: w("tab.clients"),
     meal: "Meal",
     chef: "Chef",
-    foods: "Foods",
-    notes: "Recipes",
+    foods: w("menu.foods"),
+    notes: w("tab.recipes"),
     more: "More",
     explorer: "Explorer",
   };
@@ -2964,7 +2965,7 @@ export default function App() {
         <button className="brand" onClick={() => { setMenuSection(null); setTalkOpen(false); setFilling(null); setTab("home"); }} aria-label={`${APP_NAME}, Today`}>
           <Mark size={28} color="var(--brand)" />
         </button>
-        <h1>{menuSection ? (ME_PAGES.includes(menuSection) ? "Me" : w("app.menu")) : TITLES[tab]}</h1>
+        <h1>{menuSection ? (ME_PAGES.includes(menuSection) ? w("menu.me") : w("app.menu")) : TITLES[tab]}</h1>
         {/* DT232 (0.3.72): while the app is viewed as Coach or User, the header says so and leads back, on every page */}
         {view !== "me" ? <button className="ref view-as" onClick={() => setViewAs("me")}>As {viewWord(view)} · Back to me</button>
         : tab !== "home" && <button className="ref" onClick={() => setGoalsOpen(true)} aria-label={w("app.editDailyReference")}>

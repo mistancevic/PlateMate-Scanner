@@ -44,7 +44,7 @@ const PORT = "3396", U = `http://127.0.0.1:${PORT}`;
     await page.locator(".lang-row.settings-soon").click({ force: true }); await page.waitForTimeout(200);
     ok(await page.evaluate(() => localStorage.getItem("chefmealan-lang")) === "sr-Latn", "Deutsch does nothing yet");
     await page.locator(".menu-head button.link").first().click(); await page.waitForTimeout(300);
-    const back = page.locator("button.menu-row").filter({ hasText: "Language" });
+    const back = page.locator("button.menu-row").filter({ hasText: /Language|Jezik/ }); // 0.3.85: the row's name is Jezik once Coach Milan ticked it
     if (await back.count()) ok(/Chef Mealan speaks Srpski \(latinica\)\. The screens are in English for now\./.test(await back.textContent()), "the Settings line says what is in Serbian so far");
     else ok(false, "back on Settings");
     await page.reload(); await page.waitForTimeout(800);
@@ -56,6 +56,11 @@ const PORT = "3396", U = `http://127.0.0.1:${PORT}`;
     const main = await page.locator("main").textContent();
     // 0.3.81: Coach Milan ticks lines in the table, so the check follows the app's file: ticked shows in Srpski, not ticked stays English
     const onPlate = JSON.parse(fs.readFileSync(path.join(__dirname, "../../src/i18n/sr-Latn.json"), "utf8")).screens["plate.onThePlate"];
+    // 0.3.85: the header says what the bar says, in Srpski too
+    await page.goto(U + "/today"); await page.waitForTimeout(1000);
+    const navToday = (await page.locator("nav button, nav a").filter({ hasText: /Danas|Today/ }).first().textContent()).trim();
+    ok((await page.locator("header h1").first().textContent()).trim() === navToday, "the header and the bar say the same: " + navToday);
+    await page.goto(U + "/plate"); await page.waitForTimeout(1200);
     if (onPlate.checked) ok(/Na tanjiru/.test(main) && !/On the plate/.test(main), "a ticked line shows in Srpski: Na tanjiru");
     else ok(/On the plate/.test(main) && !/Na tanjiru/.test(main), "a line not ticked yet stays English");
     await page.evaluate(() => { localStorage.removeItem("chefmealan-lang"); }); await page.reload(); await page.waitForTimeout(800);
