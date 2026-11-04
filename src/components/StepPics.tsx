@@ -2,6 +2,7 @@
 // the camera or the gallery (a photo while cooking, or one made in ChatGPT or Gemini with the Step Picture Checks prompts);
 // who made it is asked, and the checks show before it is kept. Watch the steps plays them, made on the phone from the
 // pictures: no video file. Labels sit under a picture, never on it; nothing under 12 px; every button 44 px or more.
+import { w } from "../words";
 import { ChefLine } from "./ChefLine";
 import { say } from "../chefScript";
 import { useEffect, useRef, useState } from "react";
@@ -14,7 +15,7 @@ import type { StepPic } from "../photos";
 
 const readFile = (f: File) => new Promise<string>((res, rej) => { const r = new FileReader(); r.onload = () => res(String(r.result)); r.onerror = () => rej(r.error); r.readAsDataURL(f); });
 const words = (step: string, items: Ingredient[]) => stepParts(tempsIn(step), items).map((p, j) => ("text" in p ? p.text : <b key={j} className="st-amt">{p.label}</b>));
-export const picLabel = (p: StepPic) => (p.by === "ai" ? "Picture drawn by AI, Beta" : "Your photo");
+export const picLabel = (p: StepPic) => (p.by === "ai" ? w("steppics.pictureDrawnByAiBeta") : w("steppics.yourPhoto"));
 
 // DT211 v8 (0.3.53, board Stories158): on the recipe a step shows its photo, from cooking; no + slot. A tap changes or removes it
 export function StepPicShown({ pic, k, onOpen }: { pic: StepPic | null; k: number; onOpen: () => void }) {
@@ -58,14 +59,14 @@ export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose, f
       <div className="cook-top"><button className="pill pill-small" style={{ height: 44 }} onClick={onClose}>✕ Close</button><b className="cook-title">Picture for step {k + 1}</b><span /></div>
       <small className="sp-step" style={{ fontSize: 15, fontWeight: 600, lineHeight: 1.45 }}>{words(step, items)}</small>
       <div className="sp-grid">
-        <button className="pill" disabled={busy} onClick={() => cam.current?.click()}>Take a photo</button>
-        <button className={`pill ${src ? "" : "pill-primary"}`} disabled={busy} onClick={() => gal.current?.click()}>From my gallery</button>
+        <button className="pill" disabled={busy} onClick={() => cam.current?.click()}>{w("steppics.takeAPhoto")}</button>
+        <button className={`pill ${src ? "" : "pill-primary"}`} disabled={busy} onClick={() => gal.current?.click()}>{w("steppics.fromMyGallery")}</button>
       </div>
       <input ref={cam} type="file" accept="image/*" capture="environment" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; void take(f); }} />
       <input ref={gal} type="file" accept="image/*" hidden onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ""; void take(f); }} />
       {/* DT211 v8 (0.3.53): the photos taken on this step while cooking it; one can be the step's photo */}
       {fromCooks.length > 0 && <>
-        <b>From your cooks</b>
+        <b>{w("steppics.fromYourCooks")}</b>
         <div className="sp-cooks">{fromCooks.slice(0, 8).map((x, i) => <button key={i} type="button" className={`publish-photo${src === x ? " on" : ""}`} aria-label={`Photo ${i + 1} from your cooks`} onClick={() => { setSrc(x); setBy("me"); }}><img src={x} alt="" /></button>)}</div>
       </>}
       {err && <small className="error">{err}</small>}
@@ -73,28 +74,28 @@ export function StepPicSheet({ k, step, items, pic, onKeep, onRemove, onClose, f
         <img className="sp-preview" src={src} alt={`The picture for step ${k + 1}`} />
         <ChefLine text={say("whoMadePhoto")} />
         <div className="sp-grid">
-          <button className={`choice ${by === "me" ? "on" : ""}`} aria-pressed={by === "me"} onClick={() => setBy("me")}>My photo</button>
-          <button className={`choice ${by === "ai" ? "on" : ""}`} aria-pressed={by === "ai"} onClick={() => setBy("ai")}>Drawn by AI</button>
+          <button className={`choice ${by === "me" ? "on" : ""}`} aria-pressed={by === "me"} onClick={() => setBy("me")}>{w("steppics.myPhoto")}</button>
+          <button className={`choice ${by === "ai" ? "on" : ""}`} aria-pressed={by === "ai"} onClick={() => setBy("ai")}>{w("steppics.drawnByAi")}</button>
         </div>
         <div className="sp-checks">
-          <b>Before you keep it</b>
+          <b>{w("steppics.beforeYouKeepIt")}</b>
           <ul>
-            <li>It shows this step, and only this step</li>
-            <li>Every food is from the recipe, and where it should be by now</li>
-            <li>Meat raw before cooking, cooked through after it</li>
-            <li>The amounts look like the grams</li>
-            <li>A real cook would do it this way</li>
+            <li>{w("steppics.itShowsThisStepAnd")}</li>
+            <li>{w("steppics.everyFoodIsFromThe")}</li>
+            <li>{w("steppics.meatRawBeforeCookingCooked")}</li>
+            <li>{w("steppics.theAmountsLookLikeThe")}</li>
+            <li>{w("steppics.aRealCookWouldDo")}</li>
           </ul>
         </div>
         <div className="sp-grid">
-          <button className="pill pill-primary" disabled={!by || busy} onClick={() => by && onKeep({ src, by })}>Keep it</button>
-          <button className="pill" disabled={busy} onClick={() => gal.current?.click()}>Choose another</button>
+          <button className="pill pill-primary" disabled={!by || busy} onClick={() => by && onKeep({ src, by })}>{w("steppics.keepIt")}</button>
+          <button className="pill" disabled={busy} onClick={() => gal.current?.click()}>{w("steppics.chooseAnother")}</button>
         </div>
-        {!by && <small className="muted">Say who made it first.</small>}
-        <small className="muted">Drawn by AI says so under the picture, in cook mode and in Watch the steps. The step's words and amounts stay what counts.</small>
+        {!by && <small className="muted">{w("steppics.sayWhoMadeItFirst")}</small>}
+        <small className="muted">{w("steppics.drawnByAiSaysSo")}</small>
       </>}
-      {pic && <button className="link" style={{ alignSelf: "flex-start", minHeight: 44 }} onClick={onRemove}>Remove this picture</button>}
-      <small className="muted">Your pictures stay with your recipe, only you can open them. Not shared with members in Beta.</small>
+      {pic && <button className="link" style={{ alignSelf: "flex-start", minHeight: 44 }} onClick={onRemove}>{w("steppics.removeThisPicture")}</button>}
+      <small className="muted">{w("steppics.yourPicturesStayWithYour")}</small>
     </div>
   );
 }
@@ -128,7 +129,7 @@ export function StepPlayer({ title, steps, items, pics, onClose, onCook }: {
         <b className="cook-title">{title}</b>
         <small className="cook-count">{clock(elapsed)}</small>
       </div>
-      <div className="cook-steps" role="tablist" aria-label="Steps">{steps.map((_, j) => (
+      <div className="cook-steps" role="tablist" aria-label={w("steppics.steps")}>{steps.map((_, j) => (
         <button key={j} role="tab" aria-selected={j === k} aria-label={`Step ${j + 1}`} className={`cook-step-btn${j === k ? " on" : ""}`} onClick={() => go(j)}>{j + 1}</button>))}</div>
       <section className="cook-card sp-frame" aria-live="polite">
         <img src={pics[k].src} alt={`Step ${k + 1}`} />
@@ -143,8 +144,8 @@ export function StepPlayer({ title, steps, items, pics, onClose, onCook }: {
         <button className="pill pill-primary" onClick={() => { if (!playing && k >= steps.length - 1 && t >= PER) { go(0); setPlaying(true); } else setPlaying(!playing); }}>{playing ? "❚❚ Pause" : k >= steps.length - 1 && t >= PER ? "↻ Again" : "▶ Play"}</button>
         <button className="pill" disabled={k >= steps.length - 1} onClick={() => go(k + 1)}>Step {Math.min(steps.length, k + 2)} ›</button>
       </div>
-      {onCook && <button className="pill pill-wide" style={{ height: 52 }} onClick={onCook}>Start cooking</button>}
-      <small className="muted cook-under">Made on your phone from the step pictures: no video file.</small>
+      {onCook && <button className="pill pill-wide" style={{ height: 52 }} onClick={onCook}>{w("steppics.startCooking")}</button>}
+      <small className="muted cook-under">{w("steppics.madeOnYourPhoneFrom")}</small>
     </div>
   );
 }

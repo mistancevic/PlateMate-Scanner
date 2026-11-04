@@ -1,4 +1,5 @@
 import { plateWhenOf, atMeal } from "../plateMode";
+import { w } from "../words";
 import { kitchenMark, markWord } from "../recipeMark";
 import { recipeName } from "../recipeDiff";
 import { portionOf } from "../pilot";
@@ -76,7 +77,7 @@ export function RecipesScreen(p: AppApi) {
     setState((s) => ({ ...s, foods: [...s.foods, ...fresh], meals: [meal, ...s.meals] }));
     recipeIn.setInFlow(null);
     log("recipe_in", { how: f.url ? "link" : "shot", result: "saved" });
-    p.landOnRecipe(meal.id, "Make it puts it on the Plate when you want to cook it.", "✓ Saved in My recipes", "recipes");
+    p.landOnRecipe(meal.id, w("recipes.makeItPutsItOn"), "✓ Saved in My recipes", "recipes");
   }
   // coaches publish recipes (canvas board R5); what is published already, by the recipe it came from
   // Cook (boards RG0 to RG5): a coach is a cook and publishes; a client is a cook when their coach switched it on, and sends
@@ -135,7 +136,7 @@ export function RecipesScreen(p: AppApi) {
     const KEY = MEMBERS_CACHE;
     if (!force) { try { const c = JSON.parse(sessionStorage.getItem(KEY) ?? "null"); if (c && c.uid === (p.user?.uid ?? "") && Date.now() - c.at < 60_000) { setMemberList(c.recipes); setOwner(Boolean(c.owner)); return; } } catch { /* no cache */ } }
     setLoadingMembers(true); setMembersErr("");
-    fetch("/api/members").then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || "Members didn't load. Try again."); setMemberList(d.recipes ?? []); setOwner(Boolean(d.owner)); try { sessionStorage.setItem(KEY, JSON.stringify({ at: Date.now(), uid: p.user?.uid ?? "", recipes: d.recipes ?? [], owner: Boolean(d.owner) })); } catch { /* no room */ } })
+    fetch("/api/members").then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || w("recipes.membersDidnTLoadTry")); setMemberList(d.recipes ?? []); setOwner(Boolean(d.owner)); try { sessionStorage.setItem(KEY, JSON.stringify({ at: Date.now(), uid: p.user?.uid ?? "", recipes: d.recipes ?? [], owner: Boolean(d.owner) })); } catch { /* no room */ } })
       .catch((e) => setMembersErr(e.message)).finally(() => setLoadingMembers(false));
   };
   // loaded when Recipes opens (from the minute's cache when there is one) and fresh when the tab is tapped again
@@ -207,16 +208,16 @@ export function RecipesScreen(p: AppApi) {
       <button type="button" className="card recipe-tile" key={m.id} onClick={() => setOpenId(m.id)} aria-label={`Open ${m.title}`}>
         {photo
           ? (coverIsDrawn(m) && own[0] === photo ? <span className="recipe-tile-cover"><img src={photo} alt="" /><span className="tile-drawn">Drawn by {CHEF_NAME}</span></span> : <img src={photo} alt="" />)
-          : <div className="recipe-tile-blank"><span><Utensils size={28} />{m.cover?.state === "tomorrow" && <small>Picture tomorrow</small>}</span></div>}
+          : <div className="recipe-tile-blank"><span><Utensils size={28} />{m.cover?.state === "tomorrow" && <small>{w("recipes.pictureTomorrow")}</small>}</span></div>}
         <div className="recipe-tile-body">
           <div className="card-top"><b className="tile-name">{recipeName(m, p.state.meals)}</b><ChevronRight size={20} className="tile-go" /></div>
           {/* R21 (0.2.49, board RS20): a tile says what one portion is; the foods are on the recipe's page */}
           <small>{(() => { const o = portionOf(m); return o ? `One ${o.word} · ${fmt(o.kcal, 0)} kcal · ${fmt(o.protein, 0)} g protein · ${pdText(o.pd)}${o.n > 1 ? ` · makes ${o.n}` : ""}` : `${m.items.length} ${m.items.length === 1 ? "food" : "foods"}`; })()}{rating ? ` · ${rating}` : ""}{n ? ` · made ${n === 1 ? "once" : `${n} times`}` : ""}</small>
           {/* DT202 (0.3.75): From the kitchen, or On paper */}
           {(() => { const k = kitchenMark(m, state.feedback); return <small className={`tile-mark ${k.cooked ? "cooked" : "paper"}`}>{markWord(k)}</small>; })()}
-          {m.idea && <small className="tile-state">{m.idea.from === "photo" ? "An idea from a photo, not made yet" : `${CHEF_NAME}'s idea, not made yet`}</small>}
+          {m.idea && <small className="tile-state">{m.idea.from === "photo" ? w("recipes.anIdeaFromAPhoto") : `${CHEF_NAME}'s idea, not made yet`}</small>}
           {m.members && <small className="tile-state live">Shared with members{m.members.named ? "" : ", without your name"}</small>}
-          {st && <small className={`tile-state ${st}`}>{st === "live" ? "Live on chefmealan.com" : st === "down" ? "Taken down" : st === "waiting" ? `Waiting for ${approver}` : st === "back" ? `Sent back by ${approver}` : "Draft"}</small>}
+          {st && <small className={`tile-state ${st}`}>{st === "live" ? w("recipes.liveOnChefmealanCom") : st === "down" ? w("recipes.takenDown") : st === "waiting" ? `Waiting for ${approver}` : st === "back" ? `Sent back by ${approver}` : "Draft"}</small>}
         </div>
       </button>
     );
@@ -306,14 +307,14 @@ export function RecipesScreen(p: AppApi) {
           const canShare = Boolean(card && p.profile.coachId);
           return (
           <section className="card dl-done rq-landed" role="status">
-            <div className="card-top"><b>{landed.title ?? "✓ Saved in Mine"}</b>{/* R6: saved from Recipes, the way back is the Recipes list */}{landed.back === "recipes" ? <button className="link" onClick={() => { setLanded(null); setOpenId(null); }}>Recipes</button> : <button className="link" onClick={() => { setLanded(null); setOpenId(null); setTab("home"); }}>Today</button>}</div>
+            <div className="card-top"><b>{landed.title ?? "✓ Saved in Mine"}</b>{/* R6: saved from Recipes, the way back is the Recipes list */}{landed.back === "recipes" ? <button className="link" onClick={() => { setLanded(null); setOpenId(null); }}>{w("recipes.recipes")}</button> : <button className="link" onClick={() => { setLanded(null); setOpenId(null); setTab("home"); }}>Today</button>}</div>
             {(landed.line || canShare) && <small className="muted">{landed.line}{canShare && <> {card!.shared ? <span className="rq-shared">✓ Shared with {p.coachLabel}</span> : <button className="link rq-share-link" onClick={() => setAskShare((x) => !x)}>Share with {p.coachLabel} ›</button>}</>}</small>}
             {canShare && !card!.shared && askShare && (
               <div className="rq-share-ask">
                 <small className="muted">What should {p.coachLabel} do with it?</small>
-                <div className="button-row">{([["look", "Look at this"], ["ok", "Was this OK?"], ["help", "Help me next time"]] as const).map(([k, l]) => (
+                <div className="button-row">{([["look", w("recipes.lookAtThis")], ["ok", w("recipes.wasThisOk")], ["help", w("recipes.helpMeNextTime")]] as const).map(([k, l]) => (
                   <button key={k} className="pill pill-small" onClick={() => { p.shareCard(card!.id, k); setAskShare(false); }}>{l}</button>
-                ))}<button className="link" onClick={() => setAskShare(false)}>Cancel</button></div>
+                ))}<button className="link" onClick={() => setAskShare(false)}>{w("recipes.cancel")}</button></div>
               </div>
             )}
           </section>); })() : null}
@@ -326,15 +327,15 @@ export function RecipesScreen(p: AppApi) {
           if (w && w !== "now" && sl) { setOpenId(null); p.fillOnPlate({ date: sl.date, slotId: sl.slotId, name: sl.name, time: sl.time, dayName: new Date(`${sl.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" }), mealId: m?.mealId ?? opened.id }, m?.items ? { id: m.mealId ?? opened.id, title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : opened, m?.title ?? opened.title); return; }
           setOpenId(null); p.openOnPlate(opened); }}
         onCookIt={() => { setOpenId(null); setLanded(null); p.openOnPlate(opened, { cook: true }); }}
-        makeAs={(() => { const w = slotWhen(), sl = cameFrom?.from.slot; if (!w || w === "now" || !sl) return null; const d = new Date(`${sl.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" });
-          return w === "plan" ? { label: "Change it on the Plate", hint: `Planned for ${d}'s ${sl.name.toLowerCase()}. Change the foods or amounts for that day; the recipe stays as it is. Make it and I ate it come on ${d}, on Today.` }
-            : { label: "Change it on the Plate", hint: `${d}'s ${sl.name.toLowerCase()} is gone by: change it to what you ate, and it is added at ${sl.time}. The recipe stays as it is.` }; })()} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
+        makeAs={(() => { const sw = slotWhen(), sl = cameFrom?.from.slot; if (!sw || sw === "now" || !sl) return null; const d = new Date(`${sl.date}T12:00:00`).toLocaleDateString("en-GB", { weekday: "long" });
+          return sw === "plan" ? { label: w("recipes.changeItOnThePlate"), hint: `Planned for ${d}'s ${sl.name.toLowerCase()}. Change the foods or amounts for that day; the recipe stays as it is. Make it and I ate it come on ${d}, on Today.` }
+            : { label: w("recipes.changeItOnThePlate"), hint: `${d}'s ${sl.name.toLowerCase()} is gone by: change it to what you ate, and it is added at ${sl.time}. The recipe stays as it is.` }; })()} onPublish={(now) => { setPublishNow(Boolean(now)); setPublishing(opened.id); }}
         onDelete={<DeleteRecipe key={`del-${opened.id}`} plan={deletePlan(opened, state, published[opened.id] ?? null)} slug={published[opened.id]?.slug ?? null} approver={approver} run={(c) => deleteRecipe(opened, c)} />}
         close={() => { const back = cameFrom && cameFrom.id === opened.id ? cameFrom.from.tab : null; setOpenId(null); setLanded(null); setCameFrom(null); if (back) p.setTab(back); }}
         tryPhoto={testOn ? async (model: string) => {
           const r = await fetch("/api/cover", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ test: true, style: "photo", model, recipeId: opened.id, title: opened.title, items: opened.items.filter((i) => i.grams > 0).map((i) => ({ name: i.food.name, grams: i.grams })) }), signal: AbortSignal.timeout(90000) });
           const d = await r.json().catch(() => ({}));
-          if (!r.ok || typeof d.image !== "string") throw new Error(d.error || (d.tomorrow ? "Twenty tests today. More tomorrow." : "No picture came back. Try again."));
+          if (!r.ok || typeof d.image !== "string") throw new Error(d.error || (d.tomorrow ? w("recipes.twentyTestsTodayMoreTomorrow") : w("recipes.noPictureCameBackTry")));
           return await resizeImageBase64(d.image, 960, 720).catch(() => d.image);
         } : null}
         membersPanel={opened.from === "coach" || opened.from === "members" ? null
@@ -350,7 +351,7 @@ export function RecipesScreen(p: AppApi) {
       {/* 0.3.59 (Coach Milan 2 November 19:00): no cook strip on Recipes; it stays on Today and the Plate */}
       {deleted && (
         <section className="card dl-done" role="status">
-          <div className="card-top"><b>{deleted.title} is deleted.</b><button className="link" onClick={() => setDeleted(null)}>OK</button></div>
+          <div className="card-top"><b>{deleted.title} is deleted.</b><button className="link" onClick={() => setDeleted(null)}>{w("recipes.ok")}</button></div>
           {deleted.line && <small className="muted">{deleted.line}</small>}
         </section>
       )}
@@ -358,19 +359,19 @@ export function RecipesScreen(p: AppApi) {
         ? <RecipeInFlow flow={recipeIn} put={(f) => void saveRead(f)} putLabel="Save in My recipes" />
         : (<>
           {(rows.length > 0 || bar.madeBy) && <RecipeBar f={bar} set={setBar} sort={sort} setSort={setSort} kitchens={kitchenLines(applyFilters(rows, { ...bar, kitchen: null }, ctx))} madeBy={madeByLines(applyFilters(rows, { ...bar, madeBy: null }, ctx), p.coachLabel)} shown={kept.length} total={rows.length} coachLabel={p.coachLabel} />}
-          <section className="card plate-card recipe-add" aria-label="Add a recipe">
-            <div className="card-top"><span>Add a recipe</span></div>
-            <small className="muted">From a link or screenshots, as on the Plate. It goes into My recipes; nothing goes on the Plate.</small>
+          <section className="card plate-card recipe-add" aria-label={w("recipes.addARecipe")}>
+            <div className="card-top"><span>{w("recipes.addARecipe")}</span></div>
+            <small className="muted">{w("recipes.fromALinkOrScreenshots")}</small>
             <StartWays flow={recipeIn} />
           </section>
           {rows.length === 0 && bar.madeBy !== MEMBERS && (
             <section className="card recipes-empty">
-              <small>Nothing here yet. Add one above, or make your first on the Plate.</small>
-              <button className="pill pill-wide pill-primary" onClick={() => { p.setKind("meal"); p.setStep("in"); setTab("journey"); }}>Make my first recipe</button>
+              <small>{w("recipes.nothingHereYetAddOne")}</small>
+              <button className="pill pill-wide pill-primary" onClick={() => { p.setKind("meal"); p.setStep("in"); setTab("journey"); }}>{w("recipes.makeMyFirstRecipe")}</button>
             </section>
           )}
-          {kept.length === 0 && bar.madeBy === MEMBERS && isIdle({ ...bar, madeBy: null }) && <section className="card recipes-empty"><small className="rc-lead">{membersLead(ahead)}</small><small>Nothing shared yet. A recipe of yours can be the first: open it, then Share with members.</small></section>}
-          {rows.length > 0 && kept.length === 0 && !(bar.madeBy === MEMBERS && isIdle({ ...bar, madeBy: null })) && <section className="card recipes-empty"><small>Nothing matches. Clear a filter or the search.</small></section>}
+          {kept.length === 0 && bar.madeBy === MEMBERS && isIdle({ ...bar, madeBy: null }) && <section className="card recipes-empty"><small className="rc-lead">{membersLead(ahead)}</small><small>{w("recipes.nothingSharedYetARecipe")}</small></section>}
+          {rows.length > 0 && kept.length === 0 && !(bar.madeBy === MEMBERS && isIdle({ ...bar, madeBy: null })) && <section className="card recipes-empty"><small>{w("recipes.nothingMatchesClearAFilter")}</small></section>}
           {membersErr && <small className="muted">{membersErr}</small>}
           {groups.map((g) => {
             // idle: two rows per group and a line for the rest (a lone group, or one of three rows or fewer, shows whole); a search or a filter: every hit
@@ -400,32 +401,32 @@ function SlotBar({ p, from, back }: { p: AppApi; from: MealFrom; back: () => voi
   if (!sl || !m || m.skipped) return null;
   const swap = () => { showPlanOn(sl.date, sl.slotId); p.setTab("plan"); };
   if (from.tab === "home" && sl.date === ymd(new Date())) return (
-    <section className="card rq-slot" aria-label="In today's plan">
+    <section className="card rq-slot" aria-label={w("recipes.inTodaySPlan")}>
       <small className="rq-slot-line">{sl.name}, {sl.time} · by the plan · today</small>
       <div className="button-row">
-        {m.items?.length ? <button type="button" className="pill pill-small pill-primary" onClick={() => { p.logPlanned(m, sl); back(); }}><Check size={14} /> I ate it</button> : null}
-        <button type="button" className="pill pill-small" onClick={() => p.fillOnPlate({ date: sl.date, slotId: sl.slotId, name: sl.name, time: sl.time, dayName: "today", mealId: m.mealId, mode: "eat" }, m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : null, m.title)}>Change it on the Plate</button>
+        {m.items?.length ? <button type="button" className="pill pill-small pill-primary" onClick={() => { p.logPlanned(m, sl); back(); }}><Check size={14} /> {w("recipes.iAteIt")}</button> : null}
+        <button type="button" className="pill pill-small" onClick={() => p.fillOnPlate({ date: sl.date, slotId: sl.slotId, name: sl.name, time: sl.time, dayName: "today", mealId: m.mealId, mode: "eat" }, m.items ? { id: m.mealId ?? "", title: m.title, items: m.items, portion: m.portion ?? 0, savedAt: "" } : null, m.title)}>{w("recipes.changeItOnThePlate")}</button>
       </div>
-      <small><button type="button" className="link in-inline" onClick={swap}>Swap it</button> · <button type="button" className="link in-inline" onClick={() => { p.fill(sl.date, sl.slotId, { ...m, skipped: true }); back(); }}>Skip it today</button></small>
+      <small><button type="button" className="link in-inline" onClick={swap}>{w("recipes.swapIt")}</button> · <button type="button" className="link in-inline" onClick={() => { p.fill(sl.date, sl.slotId, { ...m, skipped: true }); back(); }}>{w("recipes.skipItToday")}</button></small>
     </section>
   );
   const day = new Date(`${sl.date}T12:00:00`).toLocaleDateString("en", { weekday: "long" });
   // DT149 (0.2.130): a meal of a day gone by is what you ate: I ate it adds it at its time
   if (plateWhenOf({ date: sl.date, time: sl.time }) === "past") return (
-    <section className="card rq-slot" aria-label="A meal gone by">
+    <section className="card rq-slot" aria-label={w("recipes.aMealGoneBy")}>
       <small className="rq-slot-line">{day}'s {sl.name.toLowerCase()}, {sl.time} · planned, not added</small>
       <div className="button-row">
-        {m.items?.length ? <button type="button" className="pill pill-small pill-primary" onClick={() => { p.logPlanned(m, sl, atMeal(sl.date, sl.time)); back(); }}><Check size={14} /> I ate it</button> : null}
-        <button type="button" className="pill pill-small" onClick={() => { p.fill(sl.date, sl.slotId, { ...m, skipped: true }); back(); }}>I skipped it</button>
+        {m.items?.length ? <button type="button" className="pill pill-small pill-primary" onClick={() => { p.logPlanned(m, sl, atMeal(sl.date, sl.time)); back(); }}><Check size={14} /> {w("recipes.iAteIt")}</button> : null}
+        <button type="button" className="pill pill-small" onClick={() => { p.fill(sl.date, sl.slotId, { ...m, skipped: true }); back(); }}>{w("recipes.iSkippedIt")}</button>
       </div>
     </section>
   );
   return (
-    <section className="card rq-slot" aria-label="In the plan">
+    <section className="card rq-slot" aria-label={w("recipes.inThePlan")}>
       <small className="rq-slot-line">{day}'s {sl.name.toLowerCase()}, {sl.time} · in the plan</small>
       <div className="button-row">
-        <button type="button" className="pill pill-small" onClick={swap}>Swap it</button>
-        <button type="button" className="pill pill-small" onClick={() => { p.fill(sl.date, sl.slotId, null); back(); }}>Empty the slot</button>
+        <button type="button" className="pill pill-small" onClick={swap}>{w("recipes.swapIt")}</button>
+        <button type="button" className="pill pill-small" onClick={() => { p.fill(sl.date, sl.slotId, null); back(); }}>{w("recipes.emptyTheSlot")}</button>
       </div>
     </section>
   );
