@@ -1,4 +1,5 @@
 import { KINDS, INTENSITIES, WHENS, WHENS_KID, MINUTES_KID, LENGTHS, lengthOf, START_MIN, ADULT_KINDS, KID_KINDS, SPORTS, PE, type PlanDay, type Kind, type Weekdays } from "../plan";
+import { w } from "../words";
 import { Zones } from "./Zones";
 import { suggestWhen, whenAtWork, WORK_WHEN, type WorkHours } from "../slots";
 
@@ -19,7 +20,7 @@ export function DayEditor({ value, onChange, workHint, minor = false, weekdays =
   // a Walk day saved before still shows, so it can be changed
   const ids = minor ? KID_KINDS : ADULT_KINDS.includes(value.kind) ? ADULT_KINDS : [...ADULT_KINDS, value.kind];
   const kinds = ids.map((id) => KINDS.find((k) => k.id === id)!);
-  const kindName = (k: Kind) => (k === "rest" && !minor ? "No training" : KINDS.find((x) => x.id === k)!.name);
+  const kindName = (k: Kind) => (k === "rest" && !minor ? w("dayedit.noTraining") : KINDS.find((x) => x.id === k)!.name);
   const whens = minor ? WHENS_KID : WHENS;
   const Chip = ({ on, onClick, children }: { on: boolean; onClick: () => void; children: React.ReactNode }) => (
     <button type="button" className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={onClick}>{children}</button>
@@ -28,73 +29,73 @@ export function DayEditor({ value, onChange, workHint, minor = false, weekdays =
     <div className="day-editor">
       {minor ? (
         <div className="setting">
-          <small className="setting-name">School</small>
+          <small className="setting-name">{w("dayedit.school")}</small>
           <div className="chip-row">
-            <Chip on={value.work} onClick={() => set({ work: true })}>School day</Chip>
-            <Chip on={!value.work} onClick={() => set({ work: false, pe: false })}>No school</Chip>
+            <Chip on={value.work} onClick={() => set({ work: true })}>{w("dayedit.schoolDay")}</Chip>
+            <Chip on={!value.work} onClick={() => set({ work: false, pe: false })}>{w("dayedit.noSchool")}</Chip>
           </div>
           {workHint && <small className="setting-hint">{workHint}</small>}
         </div>
       ) : weekdays !== "home" && (
         <div className="setting">
-          <small className="setting-name">{weekdays === "study" ? "Study or day off" : weekdays === "both" ? "Work, study or day off" : "Work or day off"}</small>
+          <small className="setting-name">{weekdays === "study" ? w("dayedit.studyOrDayOff") : weekdays === "both" ? w("dayedit.workStudyOrDayOff") : w("dayedit.workOrDayOff")}</small>
           <div className="chip-row">
-            {weekdays !== "study" && <Chip on={value.work && (weekdays === "work" || !value.study)} onClick={() => set({ work: true, study: false, pe: false })}>Work day</Chip>}
-            {weekdays !== "work" && <Chip on={value.work && (weekdays === "study" || !!value.study)} onClick={() => set({ work: true, study: true })}>Study day</Chip>}
-            <Chip on={!value.work} onClick={() => set({ work: false, study: false, pe: false })}>Day off</Chip>
+            {weekdays !== "study" && <Chip on={value.work && (weekdays === "work" || !value.study)} onClick={() => set({ work: true, study: false, pe: false })}>{w("dayedit.workDay")}</Chip>}
+            {weekdays !== "work" && <Chip on={value.work && (weekdays === "study" || !!value.study)} onClick={() => set({ work: true, study: true })}>{w("dayedit.studyDay")}</Chip>}
+            <Chip on={!value.work} onClick={() => set({ work: false, study: false, pe: false })}>{w("dayedit.dayOff")}</Chip>
           </div>
           <small className="setting-hint day-kind-hint">Not your training: how the rest of the day goes. {weekdays === "study" ? "A study day counts as mostly sitting" : "A work day counts how you move at work"}; your training comes on top.{workHint ? ` ${workHint}` : ""}</small>
         </div>
       )}
       {!minor && peOn && value.work && (weekdays === "study" || (weekdays === "both" && value.study)) && (
         <div className="setting">
-          <small className="setting-name">Sport in class</small>
+          <small className="setting-name">{w("dayedit.sportInClass")}</small>
           <div className="chip-row">
-            <Chip on={!!value.pe} onClick={() => set({ pe: true, study: true })}>Yes</Chip>
-            <Chip on={!value.pe} onClick={() => set({ pe: false })}>No</Chip>
+            <Chip on={!!value.pe} onClick={() => set({ pe: true, study: true })}>{w("dayedit.yes")}</Chip>
+            <Chip on={!value.pe} onClick={() => set({ pe: false })}>{w("dayedit.no")}</Chip>
           </div>
           <small className="setting-hint">Counted as {PE.minutes} minutes of moderate activity.</small>
         </div>
       )}
       {minor && value.work && (
         <div className="setting">
-          <small className="setting-name">Sport at school</small>
+          <small className="setting-name">{w("dayedit.sportAtSchool")}</small>
           <div className="chip-row">
-            <Chip on={!!value.pe} onClick={() => set({ pe: true })}>Yes</Chip>
-            <Chip on={!value.pe} onClick={() => set({ pe: false })}>No</Chip>
+            <Chip on={!!value.pe} onClick={() => set({ pe: true })}>{w("dayedit.yes")}</Chip>
+            <Chip on={!value.pe} onClick={() => set({ pe: false })}>{w("dayedit.no")}</Chip>
           </div>
           <small className="setting-hint">Counted as {PE.minutes} minutes of moderate activity.</small>
         </div>
       )}
       <div className="setting">
-        <small className="setting-name">{minor ? "After school" : "Activity"}</small>
+        <small className="setting-name">{minor ? w("dayedit.afterSchool") : "Activity"}</small>
         <div className="chip-row">
           {kinds.map((k) => <Chip key={k.id} on={value.kind === k.id} onClick={() => pickKind(k.id)}>{kindName(k.id)}</Chip>)}
         </div>
-        <small className="setting-hint">{minor ? (value.kind === "rest" ? "Nothing planned. A walk or yoga is an activity; pick it instead." : `${kind.name}: ${kind.hint}.`) : value.kind === "rest" ? "No training. Your work and your steps still count." : `${kind.name}: ${kind.hint}. Walking isn't here: it's in your steps, on every day.`}</small>
+        <small className="setting-hint">{minor ? (value.kind === "rest" ? w("dayedit.nothingPlannedAWalkOr") : `${kind.name}: ${kind.hint}.`) : value.kind === "rest" ? w("dayedit.noTrainingYourWorkAnd") : `${kind.name}: ${kind.hint}. Walking isn't here: it's in your steps, on every day.`}</small>
       </div>
       {value.kind !== "rest" && (
         <>
           {(value.kind === "club" || value.kind === "match") && (
             <div className="setting">
-              <small className="setting-name">Which sport</small>
+              <small className="setting-name">{w("dayedit.whichSport")}</small>
               <div className="chip-row">
                 {SPORTS.map((x) => <Chip key={x.id} on={(value.sport ?? "football") === x.id} onClick={() => set({ sport: x.id })}>{x.name}</Chip>)}
               </div>
             </div>
           )}
           <div className="setting">
-            <small className="setting-name">How hard</small>
+            <small className="setting-name">{w("dayedit.howHard")}</small>
             {minor ? (
               <>
                 <div className="chip-row">
                   {INTENSITIES.map((x) => <Chip key={x.id} on={value.intensity === x.id} onClick={() => set({ intensity: x.id })}>{x.name}</Chip>)}
                 </div>
-                <small className="setting-hint">Light means you could chat while doing it. Hard means you couldn't.</small>
+                <small className="setting-hint">{w("dayedit.lightMeansYouCouldChat")}</small>
               </>
             ) : (
               <>
-                <div className="chip-row" role="group" aria-label="How hard">
+                <div className="chip-row" role="group" aria-label={w("dayedit.howHard")}>
                   {INTENSITIES.map((x) => <Chip key={x.id} on={(value.intensity ?? "easy") === x.id} onClick={() => set({ intensity: x.id })}>{x.name}</Chip>)}
                 </div>
                 <div className="hard-zones"><Zones level={value.intensity ?? "easy"} /></div>
@@ -102,7 +103,7 @@ export function DayEditor({ value, onChange, workHint, minor = false, weekdays =
             )}
           </div>
           <div className="setting">
-            <small className="setting-name">When</small>
+            <small className="setting-name">{w("dayedit.when")}</small>
             <div className="chip-row">
               {whens.map((x) => <Chip key={x.id} on={value.when === x.id} onClick={() => set({ when: value.when === x.id ? undefined : x.id })}>{x.name}{!minor && whenAtWork(x.id, work) && <small className="at-work"> · in work hours</small>}</Chip>)}
             </div>
@@ -110,15 +111,15 @@ export function DayEditor({ value, onChange, workHint, minor = false, weekdays =
           </div>
           {/* 0.2.5+r20 (canvas board FX, TT1): an optional clock time; Plan shows a time only when one is set */}
           <div className="setting starts-at">
-            <small className="setting-name">Starts at</small>
+            <small className="setting-name">{w("dayedit.startsAt")}</small>
             <div className="starts-at-row">
-              <input type="time" step={300} value={value.at ?? ""} aria-label="Starts at" onChange={(e) => set({ at: e.target.value || undefined })} />
-              {value.at && <button type="button" className="link" onClick={() => set({ at: undefined })}>Clear</button>}
+              <input type="time" step={300} value={value.at ?? ""} aria-label={w("dayedit.startsAt")} onChange={(e) => set({ at: e.target.value || undefined })} />
+              {value.at && <button type="button" className="link" onClick={() => set({ at: undefined })}>{w("dayedit.clear")}</button>}
             </div>
-            <small className="setting-hint">Optional. Plan shows a clock time only when you set one.</small>
+            <small className="setting-hint">{w("dayedit.optionalPlanShowsAClock")}</small>
           </div>
           <div className="setting">
-            <small className="setting-name">How long</small>
+            <small className="setting-name">{w("dayedit.howLong")}</small>
             <div className="chip-row">
               {minor
                 ? MINUTES_KID.map((m) => <Chip key={m} on={(value.minutes ?? 90) === m} onClick={() => set({ minutes: m })}>{m} min</Chip>)
