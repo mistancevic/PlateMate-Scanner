@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { w } from "../words";
 import type { Ingredient } from "../pilot";
 import { servingLabel } from "../pilot";
 import { countLabel, countOf, resize, sizesOf, stepCount, weighed, KINDS, type Count } from "../counted";
@@ -39,13 +40,13 @@ export function SizePicker({ item, onGrams }: { item: Ingredient; onGrams: (gram
   const weigh = () => { const g = Math.round(Number(typed.replace(",", "."))); if (g > 0 && g < 2000) { onGrams(g, weighed(c, g)); setTyped(""); } };
   return (
     <div className="ct-pick" role="group" aria-label={`Size of ${item.food.name}`}>
-      <b>Size</b>
+      <b>{w("count.size")}</b>
       <div className="ct-sizes">{sizesOf(c.kind).map(([s, g]) => (
         <button key={s} type="button" className={c.size === s ? "on" : ""} aria-pressed={c.size === s} onClick={() => { const r = resize(c, item.grams, s); onGrams(r.grams, r.count); }}>{s}<small>{g} g</small></button>
       ))}</div>
-      <small>{c.kind === "egg" ? "Each egg without the shell. Fit to my target moves eggs one at a time." : c.kind === "apple" ? "A whole apple, with the core. Apples vary, so the size is a guide." : "Peeled. Bananas vary more than eggs, so the size is a guide."}</small>
+      <small>{c.kind === "egg" ? w("count.eachEggWithoutTheShell") : c.kind === "apple" ? "A whole apple, with the core. Apples vary, so the size is a guide." : w("count.peeledBananasVaryMoreThan")}</small>
       {c.kind !== "egg" && (
-        <span className="ct-weigh">Weighed it? <input inputMode="numeric" aria-label={`Grams of ${k.one}, weighed`} placeholder="134" value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d.,]/g, ""))} onBlur={weigh} onKeyDown={(e) => { if (e.key === "Enter") weigh(); }} /> g {k.note}</span>
+        <span className="ct-weigh">{w("count.weighedIt")} <input inputMode="numeric" aria-label={`Grams of ${k.one}, weighed`} placeholder="134" value={typed} onChange={(e) => setTyped(e.target.value.replace(/[^\d.,]/g, ""))} onBlur={weigh} onKeyDown={(e) => { if (e.key === "Enter") weigh(); }} /> g {k.note}</span>
       )}
     </div>
   );

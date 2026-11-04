@@ -1,4 +1,5 @@
 import { ChefHat, ChevronRight } from "lucide-react";
+import { w } from "../words";
 import { ChefLine } from "./ChefLine";
 import { say } from "../chefScript";
 import { aggregate, density, uid, type Food, type Ingredient } from "../pilot";
@@ -47,13 +48,13 @@ export function WhereSheet(p: AppApi & { food: Food; close: () => void }) {
   };
   return (
     <div className="sheet-backdrop" onClick={close}>
-      <div className="sheet where-sheet" role="dialog" aria-label="Where does this go?" onClick={(e) => e.stopPropagation()}>
+      <div className="sheet where-sheet" role="dialog" aria-label={w("where.whereDoesThisGo")} onClick={(e) => e.stopPropagation()}>
         <div className="where-food"><b>{food.name}{food.brand ? `, ${food.brand}` : ""}</b><small>{pdText(foodPd)} · {fmt(food.calories, 0)} kcal and {fmt(food.protein)} g protein per 100 g · saved in My foods</small></div>
-        <div className="card-top"><span /><button type="button" className="link" onClick={close}>Close</button></div>
+        <div className="card-top"><span /><button type="button" className="link" onClick={close}>{w("where.close")}</button></div>
         <ChefLine text={say("whereGoes")} />
         <div className="menu-list where-list">
           <button type="button" className="menu-row where-row" onClick={() => { close(); p.add(food); }}>
-            <div className="menu-row-text"><b>On the plate now</b><small>I eat it now</small></div><ChevronRight size={18} />
+            <div className="menu-row-text"><b>{w("where.onThePlateNow")}</b><small>{w("where.iEatItNow")}</small></div><ChevronRight size={18} />
           </button>
           {withMeal.map((s) => {
             const m = held[s.id]; const a = after(m); const fit = fitOf({ kcal: a.kcal, protein: a.protein }, p.dayPd, unit);
@@ -66,11 +67,11 @@ export function WhereSheet(p: AppApi & { food: Food; close: () => void }) {
           })}
           {empty.map((s) => (
             <button key={s.id} type="button" className="menu-row where-row" onClick={() => newMeal(s.id)}>
-              <div className="menu-row-text"><small>{s.name}, {s.time}</small><b>A new meal with it</b><small>the slot is empty; build it on the Plate</small></div><ChevronRight size={18} />
+              <div className="menu-row-text"><small>{s.name}, {s.time}</small><b>{w("where.aNewMealWithIt")}</b><small>{w("where.theSlotIsEmptyBuild")}</small></div><ChevronRight size={18} />
             </button>
           ))}
           <button type="button" className="menu-row where-row" onClick={close}>
-            <div className="menu-row-text"><b>Just keep it in My foods</b><small>nothing planned yet</small></div><ChevronRight size={18} />
+            <div className="menu-row-text"><b>{w("where.justKeepItInMy")}</b><small>{w("where.nothingPlannedYet")}</small></div><ChevronRight size={18} />
           </button>
         </div>
         <button type="button" className="pill pill-wide" onClick={() => { close(); p.openOut(); }}><ChefHat size={18} /> Ask {CHEF_NAME} what to make of it</button>

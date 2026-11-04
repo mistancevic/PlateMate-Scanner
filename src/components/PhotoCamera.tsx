@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { w } from "../words";
 import { RefreshCw, X } from "lucide-react";
 import { useBack } from "../back";
 
@@ -23,7 +24,7 @@ export function PhotoCamera({ title, onUse, onClose }: { title: string; onUse: (
         // the names of the cameras are known once one is allowed
         if (!cams.length) { const all = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput").map((d) => d.deviceId).filter(Boolean); if (all.length > 1 && !gone) setCams(all); }
       } catch (e: any) {
-        setError(e?.name === "NotAllowedError" ? "The camera isn't allowed for Chef Mealan. Allow it in the browser, or use Upload a photo." : "The camera could not start. Use Upload a photo instead.");
+        setError(e?.name === "NotAllowedError" ? w("photocam.theCameraIsnTAllowed") : w("photocam.theCameraCouldNotStart"));
       }
     })();
     return () => { gone = true; stream?.getTracks().forEach((t) => t.stop()); };
@@ -38,24 +39,24 @@ export function PhotoCamera({ title, onUse, onClose }: { title: string; onUse: (
   return (
     <div className="photo-cam" role="dialog" aria-label={`Photo of ${title}`} onClick={(e) => e.stopPropagation()}>
       <video ref={videoRef} autoPlay playsInline muted style={shot ? { visibility: "hidden" } : undefined} />
-      {shot && <img src={shot} alt="Your photo" />}
+      {shot && <img src={shot} alt={w("photocam.yourPhoto")} />}
       <div className="cam-top">
         <div className="cam-row">
-          <button className="cam-round" aria-label="Close the camera" onClick={onClose}><X className="w-5 h-5" /></button>
+          <button className="cam-round" aria-label={w("photocam.closeTheCamera")} onClick={onClose}><X className="w-5 h-5" /></button>
           <b className="cam-title">Photo of {title}</b>
-          {cams.length > 1 && !shot ? <button className="cam-round" aria-label="Switch camera" onClick={() => setCamAt((i) => (i + 1) % cams.length)}><RefreshCw className="w-5 h-5" /></button> : <span style={{ width: 44 }} />}
+          {cams.length > 1 && !shot ? <button className="cam-round" aria-label={w("photocam.switchCamera")} onClick={() => setCamAt((i) => (i + 1) % cams.length)}><RefreshCw className="w-5 h-5" /></button> : <span style={{ width: 44 }} />}
         </div>
-        {!shot && <span className={`cam-say ${error ? "cam-error" : ""}`}>{error || "Hold the pack in front of the camera"}</span>}
+        {!shot && <span className={`cam-say ${error ? "cam-error" : ""}`}>{error || w("photocam.holdThePackInFront")}</span>}
       </div>
       <div className="cam-panel">
         <div className="cam-controls photo-cam-controls">
           {shot ? (
             <>
-              <button className="photo-cam-again" onClick={() => setShot(null)}>Take again</button>
-              <button className="cam-analyze" onClick={() => onUse(shot)}>Use this photo</button>
+              <button className="photo-cam-again" onClick={() => setShot(null)}>{w("photocam.takeAgain")}</button>
+              <button className="cam-analyze" onClick={() => onUse(shot)}>{w("photocam.useThisPhoto")}</button>
             </>
           ) : (
-            <button className="cam-shutter" aria-label="Take the photo" onClick={take} disabled={Boolean(error)}><span /></button>
+            <button className="cam-shutter" aria-label={w("photocam.takeThePhoto")} onClick={take} disabled={Boolean(error)}><span /></button>
           )}
         </div>
       </div>

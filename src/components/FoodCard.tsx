@@ -1,4 +1,5 @@
 import { placeName } from "../places";
+import { w } from "../words";
 import { shelfName } from "../reference";
 import { REGIONS } from "../moments";
 import { useRef, useState } from "react";
@@ -87,27 +88,27 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="card-top"><span>Nutrition per 100 g</span><button className="link" onClick={close}>Close</button></div>
+        <div className="card-top"><span>{w("foodcard.nutritionPerG")}</span><button className="link" onClick={close}>{w("foodcard.close")}</button></div>
         <div className="foodcard-head">
-          <button className="thumb thumb-button" onClick={() => gallery[0] && setViewAt(0)} aria-label="See the photo">{food.photo ? <img src={food.photo} alt="" /> : (food.icon || iconFor(food.name))}</button>
+          <button className="thumb thumb-button" onClick={() => gallery[0] && setViewAt(0)} aria-label={w("foodcard.seeThePhoto")}>{food.photo ? <img src={food.photo} alt="" /> : (food.icon || iconFor(food.name))}</button>
           <div><b>{food.name}</b>{(() => { const sh = places ? shelfName(food, places.home) : null; return sh ? <small className="shelf-name">In shops in {sh.country}: {sh.name}</small> : null; })()}<small>{food.brand || "no brand"}{food.barcode ? ` · ${food.barcode}` : ""}</small></div>
-          {toggleFavorite && <button className={`fav ${food.favorite ? "on" : ""}`} onClick={toggleFavorite} aria-pressed={!!food.favorite} aria-label={food.favorite ? "Remove from favourites" : "Add to favourites"}>{food.favorite ? "★" : "☆"}</button>}
+          {toggleFavorite && <button className={`fav ${food.favorite ? "on" : ""}`} onClick={toggleFavorite} aria-pressed={!!food.favorite} aria-label={food.favorite ? w("foodcard.removeFromFavourites") : w("foodcard.addToFavourites")}>{food.favorite ? "★" : "☆"}</button>}
         </div>
         {places && <SoldIn food={food} set={places.set} home={places.home} />}
         {gallery.length > 1 && (
-          <div className="food-gallery" aria-label="Photos of this product">
-            {gallery.map((src, i) => <button key={i} className="g-thumb" onClick={() => setViewAt(i)} aria-label={`Photo ${i + 1}${src === all[0] ? ", the main photo" : ""}`}><img src={src} alt="" />{src === all[0] && <span className="g-main" aria-hidden="true">★</span>}{fromDb(src) && <span className="db-globe" aria-hidden="true"><Globe size={12} /></span>}</button>)}
+          <div className="food-gallery" aria-label={w("foodcard.photosOfThisProduct")}>
+            {gallery.map((src, i) => <button key={i} className="g-thumb" onClick={() => setViewAt(i)} aria-label={src === all[0] ? w("foodcard.photoMain", { n: i + 1 }) : w("foodcard.photoN", { n: i + 1 })}><img src={src} alt="" />{src === all[0] && <span className="g-main" aria-hidden="true">★</span>}{fromDb(src) && <span className="db-globe" aria-hidden="true"><Globe size={12} /></span>}</button>)}
           </div>
         )}
-        {anyDb && <small className="credit"><Globe size={13} /> Credit: Open Food Facts, CC BY-SA</small>}
+        {anyDb && <small className="credit"><Globe size={13} /> {w("foodcard.creditOpenFoodFactsCc")}</small>}
         {/* adding photos is its own part, under the photos, one button below the other (Milan, 8 October 2026). Two ways in:
             newer Android phones open only their photo picker for a plain file field, without the camera, so the camera has
             its own button; on a computer there is no camera to offer */}
-        {addPhoto && gallery.length === 0 && <small className="photo-front">Start with the front of the pack: it becomes the food's picture.</small>}
+        {addPhoto && gallery.length === 0 && <small className="photo-front">{w("foodcard.startWithTheFrontOf")}</small>}
         {addPhoto && gallery.length < 6 && (
-          <div className="photo-add" aria-label="Add a photo">
-            {hasCamera && <button className="g-add" onClick={() => (isPhone ? camRef.current?.click() : setCamOpen(true))}><Camera size={18} /><span>Take a photo</span></button>}
-            <button className="g-add" onClick={() => fileRef.current?.click()}><ImageIcon size={18} /><span>Upload a photo</span></button>
+          <div className="photo-add" aria-label={w("foodcard.addAPhoto")}>
+            {hasCamera && <button className="g-add" onClick={() => (isPhone ? camRef.current?.click() : setCamOpen(true))}><Camera size={18} /><span>{w("foodcard.takeAPhoto")}</span></button>}
+            <button className="g-add" onClick={() => fileRef.current?.click()}><ImageIcon size={18} /><span>{w("foodcard.uploadAPhoto")}</span></button>
             {[camRef, fileRef].map((ref, k) => (
               <input key={k} ref={ref} type="file" accept="image/*" hidden {...(k === 0 ? { capture: "environment" as const } : {})} onChange={(e) => {
                 const file = e.target.files?.[0]; e.target.value = ""; if (!file || !addPhoto) return;
@@ -117,17 +118,17 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
           </div>
         )}
         <div className="job-row">
-          <button className="job-chip" onClick={() => insight && setPicking(!picking)} aria-label="What this food is">{job.job}{job.note ? ` · ${job.note}` : ""}{job.taste && job.job !== "Flavour food" ? ` · ${job.taste}` : ""}</button>
-          {job.mine && <small>your label</small>}
+          <button className="job-chip" onClick={() => insight && setPicking(!picking)} aria-label={w("foodcard.whatThisFoodIs")}>{job.job}{job.note ? ` · ${job.note}` : ""}{job.taste && job.job !== "Flavour food" ? ` · ${job.taste}` : ""}</button>
+          {job.mine && <small>{w("foodcard.yourLabel")}</small>}
         </div>
         {picking && insight && (
           <div className="moments job-pick">
             {JOBS.map((j) => <button key={j} className={`choice ${job.job === j ? "on" : ""}`} onClick={() => { insight.setJob(j); setPicking(false); }}>{j}</button>)}
-            {job.mine && <button className="link" onClick={() => { insight.setJob(null); setPicking(false); }}>Use Chef Mealan's label</button>}
+            {job.mine && <button className="link" onClick={() => { insight.setJob(null); setPicking(false); }}>{w("foodcard.useChefMealanSLabel")}</button>}
           </div>
         )}
         <section className={`readout readout-fit-${fit}`}>
-          <div className="readout-top"><span>Protein density</span><span>{pdTag()}</span></div>
+          <div className="readout-top"><span>{w("foodcard.proteinDensity")}</span><span>{pdTag()}</span></div>
           <div className="readout-mid">
             <b>{pdVal(pd)}</b>
             <div><span>{fitText}{target !== null ? `, target ${fixed(target)}` : ""}</span><small>{share !== null ? `${share} % of its energy is protein` : "no protein value"}</small></div>
@@ -138,25 +139,25 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         <p className="insight">{plainLine(food, target)}</p>
         {mix && mix.tip.case !== "fits" && mix.tip.case !== "unknown" && (
           <section className="mix-tip">
-            <div className="mix-head"><span className="pro-badge">Mix it</span><small>{mix.momentName}: {mix.tip.why}</small></div>
-            {mix.tip.mixes.length === 0 && <p className="muted">Nothing in your foods or the starter set gets there with this one.</p>}
+            <div className="mix-head"><span className="pro-badge">{w("foodcard.mixIt")}</span><small>{mix.momentName}: {mix.tip.why}</small></div>
+            {mix.tip.mixes.length === 0 && <p className="muted">{w("foodcard.nothingInYourFoodsOr")}</p>}
             {mix.tip.mixes.map((m) => (
               <button key={m.id} className="mix-chip" onClick={() => mix.take(m)}>
                 <b>{mixLabel(m)}</b>
                 <small>{pdText(m.pd)} · {m.kcal} kcal · {m.kind}{m.cooking ? " · cooking" : ""}{m.fromStarter.length ? " · from the starter set" : ""}</small>
               </button>
             ))}
-            <button className="link" onClick={mix.ask}><MessageCircle size={14} /> Not quite? Tell Chef Mealan</button>
+            <button className="link" onClick={mix.ask}><MessageCircle size={14} /> {w("foodcard.notQuiteTellChefMealan")}</button>
           </section>
         )}
         {insight && (() => { const t = todayLine(food, insight.dayKcal, insight.eaten, insight.dayName); return t ? <p className="insight insight-today">{t}</p> : null; })()}
         {insight && (
           <section className="pro-tip">
-            <span className="pro-badge">Pro tip</span>
-            {tipFresh ? <p>{food.tip!.text}</p> : tipState === "busy" ? <p className="muted">Chef Mealan is writing a tip for your goal…</p> : tipState === "failed" ? <p className="muted">No tip just now. <button className="link" onClick={() => { setTipState("busy"); insight.requestTip().then(() => setTipState("idle")).catch(() => setTipState("failed")); }}>Try again</button></p> : null}
+            <span className="pro-badge">{w("foodcard.proTip")}</span>
+            {tipFresh ? <p>{food.tip!.text}</p> : tipState === "busy" ? <p className="muted">{w("foodcard.writingTip")}</p> : tipState === "failed" ? <p className="muted">{w("foodcard.noTipJustNow")} <button className="link" onClick={() => { setTipState("busy"); insight.requestTip().then(() => setTipState("idle")).catch(() => setTipState("failed")); }}>{w("foodcard.tryAgain")}</button></p> : null}
           </section>
         )}
-        <div className="label-table label-table-read" aria-label="Nutrition table per 100 g">
+        <div className="label-table label-table-read" aria-label={w("foodcard.nutritionTablePerG")}>
           {displayRows(food).map((r, i) => (
             <div className={`lt-row ${r.sub ? "sub" : ""}`} key={r.key + i}>
               <span className="lt-name">{r.name}{r.source === "you" && <em> · added by you</em>}{r.source === "photo" && <em> · read from the photo</em>}</span>
@@ -165,9 +166,9 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
             </div>
           ))}
         </div>
-        <p className="small">{food.readyToEat ? "Ready to eat as it is." : "Needs preparation before eating."} Values from the {food.source === "label" ? "label" : food.source}, check your package.</p>
-        {dontHave && <button className="pill pill-wide pill-primary" onClick={dontHave}>Don't have it? Find something instead</button>}
-        {review && <button className="pill pill-wide" onClick={() => { close(); review(); }}>Review the label</button>}
+        <p className="small">{food.readyToEat ? w("foodcard.readyToEatAsIt") : w("foodcard.needsPreparationBeforeEating")} Values from the {food.source === "label" ? "label" : food.source}, check your package.</p>
+        {dontHave && <button className="pill pill-wide pill-primary" onClick={dontHave}>{w("foodcard.donTHaveItFind")}</button>}
+        {review && <button className="pill pill-wide" onClick={() => { close(); review(); }}>{w("foodcard.reviewTheLabel")}</button>}
       </div>
       {camOpen && addPhoto && <PhotoCamera title={food.name} onClose={() => setCamOpen(false)} onUse={(d) => { setCamOpen(false); addPhoto(d); }} />}
       {view && (() => {
@@ -177,38 +178,38 @@ export function FoodCard({ food, target, fit, close, review, dontHave, addPhoto,
         const at = viewAt ?? 0, many = gallery.length > 1;
         const go = (d: number) => { setArmed(false); setViewAt((at + d + gallery.length) % gallery.length); };
         return (
-          <div className="photo-view" role="dialog" aria-label="Photo" onClick={(e) => e.stopPropagation()}
+          <div className="photo-view" role="dialog" aria-label={w("foodcard.photo")} onClick={(e) => e.stopPropagation()}
             onTouchStart={(e) => { swipeRef.current = e.touches[0].clientX; }}
             onTouchEnd={(e) => { const x0 = swipeRef.current; swipeRef.current = null; if (x0 === null || !many) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 50) go(dx < 0 ? 1 : -1); }}>
             <div className="photo-top">
               {removePhoto ? (
                 <button className={`photo-remove ${armed ? "armed" : ""}`} onClick={(e) => { e.stopPropagation(); if (!armed) { setArmed(true); return; } if (pending) commitRef.current(); setPending(view); setArmed(false); setViewAt(null); }}>
-                  <Trash2 size={15} /> {armed ? "Tap again to remove" : "Remove"}
+                  <Trash2 size={15} /> {armed ? w("foodcard.tapAgainToRemove") : "Remove"}
                 </button>
               ) : <span />}
               {many && <b className="photo-count">{at + 1} of {gallery.length}</b>}
-              <button className="photo-close" aria-label="Close the photo" onClick={(e) => { e.stopPropagation(); setArmed(false); setViewAt(null); }}><X size={22} /></button>
+              <button className="photo-close" aria-label={w("foodcard.closeThePhoto")} onClick={(e) => { e.stopPropagation(); setArmed(false); setViewAt(null); }}><X size={22} /></button>
             </div>
-            <img src={view} alt={`Photo ${at + 1} of ${gallery.length}`} draggable={false} onClick={() => { if (!many) { setArmed(false); setViewAt(null); } }} />
-            {many && <button className="photo-arrow prev" aria-label="Previous photo" onClick={(e) => { e.stopPropagation(); go(-1); }}><ChevronLeft size={26} /></button>}
-            {many && <button className="photo-arrow next" aria-label="Next photo" onClick={(e) => { e.stopPropagation(); go(1); }}><ChevronRight size={26} /></button>}
+            <img src={view} alt={w("foodcard.photoOf", { n: at + 1, of: gallery.length })} draggable={false} onClick={() => { if (!many) { setArmed(false); setViewAt(null); } }} />
+            {many && <button className="photo-arrow prev" aria-label={w("foodcard.previousPhoto")} onClick={(e) => { e.stopPropagation(); go(-1); }}><ChevronLeft size={26} /></button>}
+            {many && <button className="photo-arrow next" aria-label={w("foodcard.nextPhoto")} onClick={(e) => { e.stopPropagation(); go(1); }}><ChevronRight size={26} /></button>}
             {many && (
               <div className="photo-strip">
-                {gallery.map((src, i) => <button key={i} className={i === at ? "on" : ""} aria-label={`Show photo ${i + 1}`} aria-current={i === at} onClick={(e) => { e.stopPropagation(); setArmed(false); setViewAt(i); }}><img src={src} alt="" /></button>)}
+                {gallery.map((src, i) => <button key={i} className={i === at ? "on" : ""} aria-label={w("foodcard.showPhoto", { n: i + 1 })} aria-current={i === at} onClick={(e) => { e.stopPropagation(); setArmed(false); setViewAt(i); }}><img src={src} alt="" /></button>)}
               </div>
             )}
             {many && setMain && (view === all[0]
               ? <span className="photo-main on">★ The main photo</span>
               : <button className="photo-main" onClick={(e) => { e.stopPropagation(); setArmed(false); const i = all.indexOf(view); if (i > 0) { setMain(i); setViewAt(0); } }}>☆ Make it the main photo</button>)}
-            {fromDb(view) && <span className="credit-light"><Globe size={13} /> Credit: Open Food Facts, CC BY-SA</span>}
-            <span>{many ? "Swipe, or tap a photo below" : "Tap the photo to close"}</span>
+            {fromDb(view) && <span className="credit-light"><Globe size={13} /> {w("foodcard.creditOpenFoodFactsCc")}</span>}
+            <span>{many ? w("foodcard.swipeOrTapAPhoto") : w("foodcard.tapThePhotoToClose")}</span>
           </div>
         );
       })()}
       {pending && (
         <div className="undo-note" role="status">
-          <span>Photo removed.</span>
-          <button className="link" onClick={(e) => { e.stopPropagation(); setPending(null); }}>Undo</button>
+          <span>{w("foodcard.photoRemoved")}</span>
+          <button className="link" onClick={(e) => { e.stopPropagation(); setPending(null); }}>{w("foodcard.undo")}</button>
         </div>
       )}
     </div>
@@ -220,13 +221,13 @@ function SoldIn({ food, set, home }: { food: Food; set: (x: string[]) => void; h
   const [adding, setAdding] = useState(false);
   const list = food.places ?? [];
   return (
-    <div className="sold-in" aria-label="Sold in">
-      <small className="setting-name">Sold in</small>
+    <div className="sold-in" aria-label={w("foodcard.soldIn")}>
+      <small className="setting-name">{w("foodcard.soldIn")}</small>
       <div className="chip-row">
         {list.map((x) => <button type="button" key={x} className="choice on" aria-label={`Not sold in ${placeName(x)}`} onClick={() => set(list.filter((y) => y !== x))}>{placeName(x)} ✕</button>)}
-        {list.length === 0 && <button type="button" className="choice on" aria-pressed="true">Everywhere</button>}
+        {list.length === 0 && <button type="button" className="choice on" aria-pressed="true">{w("foodcard.everywhere")}</button>}
         <button type="button" className={`choice ${adding ? "on" : ""}`} onClick={() => setAdding(!adding)}>+ A place</button>
-        {list.length > 0 && <button type="button" className="choice" onClick={() => set([])}>Everywhere</button>}
+        {list.length > 0 && <button type="button" className="choice" onClick={() => set([])}>{w("foodcard.everywhere")}</button>}
       </div>
       {adding && <div className="chip-row">{REGIONS.filter((r) => !list.includes(r.id) && r.id !== "elsewhere").map((r) => <button type="button" key={r.id} className={`choice ${r.id === home ? "home" : ""}`} onClick={() => { set([...list, r.id]); setAdding(false); }}>{r.name}</button>)}</div>}
     </div>

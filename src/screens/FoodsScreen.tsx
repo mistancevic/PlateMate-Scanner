@@ -1,4 +1,5 @@
 import { ClearField } from "../components/ClearField";
+import { w } from "../words";
 import { alsoSeen, seenLine, asMine, type MemberFood } from "../memberFoods";
 import type { Food } from "../pilot";
 import { oneList, rowLine } from "../oneList";
@@ -98,14 +99,14 @@ export function FoodsScreen(p: AppApi) {
           <div className="row" key={f.id}>
             <span className="thumb">{f.photo ? <img src={f.photo} alt="" /> : (f.icon || iconFor(f.name))}</span>
             <div className="row-text">
-              <span className="name-line"><button className="name-link" onClick={() => setCardId(f.id)}>{f.favorite && <span className="fav-mark">★ </span>}{f.name}</button>{isToday((f as any).addedAt) && <span className="new-mark">New</span>}</span>
+              <span className="name-line"><button className="name-link" onClick={() => setCardId(f.id)}>{f.favorite && <span className="fav-mark">★ </span>}{f.name}</button>{isToday((f as any).addedAt) && <span className="new-mark">{w("foods.new")}</span>}</span>
               {(() => { const sh = shelfName(f, p.region); return sh ? <small className="shelf-name">In shops in {sh.country}: {sh.name}</small> : null; })()}
               <small>{jobOf(f).job}{f.brand ? ` by ${f.brand}` : ""}. Per 100 g: {fmt(f.calories, 0)} kcal and {fmt(f.protein)} g protein.{names.length > 1 ? ` Also ${names.slice(1).join(", ")}.` : ""}</small>
               <span className="row-links">
-                <button className="link" onClick={() => add(f)}>Add to meal</button>
+                <button className="link" onClick={() => add(f)}>{w("foods.addToMeal")}</button>
                 <button className="link" onClick={() => p.toggleFavorite(f.id)}>{f.favorite ? "★ Favourite" : "☆ Favourite"}</button>
-                <button className="link" onClick={() => { setImage(""); setEdit(f); }}>Review</button>
-                <ConfirmButton label="Remove" confirmLabel="Tap again to remove" onConfirm={() => setState((s) => ({ ...s, foods: s.foods.filter((x) => x.id !== f.id) }))} />
+                <button className="link" onClick={() => { setImage(""); setEdit(f); }}>{w("foods.review")}</button>
+                <ConfirmButton label={w("foods.remove")} confirmLabel={w("foods.tapAgainToRemove")} onConfirm={() => setState((s) => ({ ...s, foods: s.foods.filter((x) => x.id !== f.id) }))} />
               </span>
             </div>
             <span className={`pdpill pdpill-${b}`}>{pdVal(pd)}<small>{pdTag()}</small></span>
@@ -140,25 +141,25 @@ export function FoodsScreen(p: AppApi) {
       <>
       <section className="find">
         <div className="find-head">
-          <div className="find-title"><b>Find a food</b><small>{state.foods.length} in your foods</small></div>
-          <button className={`pill pill-small add-toggle ${addOpen ? "pill-primary" : ""}`} aria-expanded={addOpen} aria-label="Add a food" onClick={() => setAddOpen(!addOpen)}><Plus size={15} /> Add</button>
+          <div className="find-title"><b>{w("foods.findAFood")}</b><small>{state.foods.length} in your foods</small></div>
+          <button className={`pill pill-small add-toggle ${addOpen ? "pill-primary" : ""}`} aria-expanded={addOpen} aria-label={w("foods.addAFood")} onClick={() => setAddOpen(!addOpen)}><Plus size={15} /> {w("foods.add")}</button>
         </div>
         {addOpen && (
-          <div className="add-strip" aria-label="Add a food: Type or Scan">
+          <div className="add-strip" aria-label={w("foods.addAFoodTypeOr")}>
             <div className="ways">
-              <button className="pill pill-small" onClick={() => { setAddOpen(false); blank(isDigits ? "" : query.trim(), "", query.trim(), isDigits ? query.trim() : ""); }}><Pencil size={15} /> Type</button>
-              <button className="pill pill-small pill-primary" onClick={() => { setAddOpen(false); setMode("label"); setCamera(true); }}><Camera size={15} /> Scan</button>
+              <button className="pill pill-small" onClick={() => { setAddOpen(false); blank(isDigits ? "" : query.trim(), "", query.trim(), isDigits ? query.trim() : ""); }}><Pencil size={15} /> {w("foods.type")}</button>
+              <button className="pill pill-small pill-primary" onClick={() => { setAddOpen(false); setMode("label"); setCamera(true); }}><Camera size={15} /> {w("foods.scan")}</button>
             </div>
           </div>
         )}
-        <ClearField value={query} onClear={() => setQuery("")} label="Clear the search"><input className="search" aria-label="Find a food" placeholder="A name, or a barcode you saved" value={query} onChange={(e) => setQuery(e.target.value)} /></ClearField>
+        <ClearField value={query} onClear={() => setQuery("")} label={w("foods.clearTheSearch")}><input className="search" aria-label={w("foods.findAFood")} placeholder={w("foods.aNameOrABarcode")} value={query} onChange={(e) => setQuery(e.target.value)} /></ClearField>
       </section>
       {(placeChips.length > 0 || allPlaces) && (
-        <div className="place-chips" role="group" aria-label="Foods from">
-          <small>Foods from</small>
+        <div className="place-chips" role="group" aria-label={w("foods.foodsFrom")}>
+          <small>{w("foods.foodsFrom")}</small>
           {p.region && <button type="button" className="choice on" aria-pressed="true" disabled>{placeName(p.region)}</button>}
           {placeChips.map((x) => { const on = p.placesActive.has(x); return <button type="button" key={x} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPlaceOn(x, !on, false)}>{placeName(x)}{!on && away.get(x) ? ` · ${away.get(x)}` : ""}</button>; })}
-          <button type="button" className={`choice ${allPlaces ? "on" : ""}`} aria-pressed={allPlaces} onClick={() => setAllPlaces(!allPlaces)}>All places</button>
+          <button type="button" className={`choice ${allPlaces ? "on" : ""}`} aria-pressed={allPlaces} onClick={() => setAllPlaces(!allPlaces)}>{w("foods.allPlaces")}</button>
         </div>
       )}
       {q && away.size > 0 && <small className="place-away">{[...away].map(([x, n]) => `${n} more in ${placeName(x)}`).join(", ")}. Tap {[...away.keys()].map(placeName).join(" or ")} to see them.</small>}
@@ -168,14 +169,14 @@ export function FoodsScreen(p: AppApi) {
       {dupOpen && <DuplicatesSheet pairs={pairs} close={() => setDupOpen(false)} merge={p.mergeInLibrary} notSame={(a, b) => { const k = [...notSame, pairKey(a, b)]; setNotSame(k); try { localStorage.setItem("chefmealan-not-same", JSON.stringify(k)); } catch {} }} />}
       {pending.length > 0 && (
         <section className="pending">
-          <p className="label">Products seen. Review or enter each one.</p>
+          <p className="label">{w("foods.productsSeenReviewOrEnter")}</p>
           {pending.map((q, i) => (
             <div className="row" key={i}>
               <div className="row-text"><b>{q.name}</b><small>{q.brand}{q.values ? " · values read from the label" : ""}</small></div>
               {q.values
-                ? <button className="pill pill-small pill-primary" onClick={() => { setEdit(candidateFood(q.values, "Photos · review required")); setPending((v: any[]) => v.filter((_, j) => j !== i)); }}>Review</button>
-                : <button className="pill pill-small" onClick={() => blank(q.name, q.brand)}>Enter label</button>}
-              <button className="icon" aria-label={`Dismiss ${q.name}`} onClick={() => setPending((v) => v.filter((_, j) => j !== i))}><X size={16} /></button>
+                ? <button className="pill pill-small pill-primary" onClick={() => { setEdit(candidateFood(q.values, "Photos · review required")); setPending((v: any[]) => v.filter((_, j) => j !== i)); }}>{w("foods.review")}</button>
+                : <button className="pill pill-small" onClick={() => blank(q.name, q.brand)}>{w("foods.enterLabel")}</button>}
+              <button className="icon" aria-label={w("foods.dismiss", { name: q.name })} onClick={() => setPending((v) => v.filter((_, j) => j !== i))}><X size={16} /></button>
             </div>
           ))}
         </section>
@@ -186,10 +187,10 @@ export function FoodsScreen(p: AppApi) {
         ))}
       </div>
       <p className="band-line" aria-live="polite">{filter === "all" ? BAND_LINE_IDLE : bandHint(filter, p.dayPd)}</p>
-      {hiddenByChip.length > 0 && <p className="small hidden-by-chip">{hiddenByChip.length} more in your foods under {[...new Set(hiddenByChip.map((x) => BAND_LABEL[x.b]))].join(", ")}. <button className="link" onClick={() => setFilter("all")}>Show all</button></p>}
+      {hiddenByChip.length > 0 && <p className="small hidden-by-chip">{hiddenByChip.length} more in your foods under {[...new Set(hiddenByChip.map((x) => BAND_LABEL[x.b]))].join(", ")}. <button className="link" onClick={() => setFilter("all")}>{w("foods.showAll")}</button></p>}
       {/* DT125 (0.2.104): one list for one word. Your foods first, then members', then the basic foods; the product database
           behind a line. One row per food, whatever anyone called it. With nothing typed, your foods as before. */}
-      {q.length >= 1 && (list.rows.length > 0 || list.db.length > 0) && <p className="label group-label">{q.length >= 1 ? `${q} · ${list.rows.length} ${list.rows.length === 1 ? "food" : "foods"}` : "Your foods"}{db.busy && q.length >= 3 ? <small> · looking in the product database…</small> : null}</p>}
+      {q.length >= 1 && (list.rows.length > 0 || list.db.length > 0) && <p className="label group-label">{q.length >= 1 ? `${q} · ${list.rows.length} ${list.rows.length === 1 ? "food" : "foods"}` : w("foods.yourFoods")}{db.busy && q.length >= 3 ? <small> · looking in the product database…</small> : null}</p>}
       <div className="rows">
         {list.rows.map((r) => r.kind === "mine" ? mineRow(r.food, r.names) : (
           <div className={`row outside-row row-${r.kind}`} key={r.key}>
@@ -198,36 +199,36 @@ export function FoodsScreen(p: AppApi) {
               <button className="name-link" onClick={() => setMfCard(r.food)}>{r.names[0]}</button>
               <small>{rowLine(r)}</small>
             </div>
-            <button className="pill pill-small" onClick={() => take(r)}><Plus size={14} /> Add</button>
+            <button className="pill pill-small" onClick={() => take(r)}><Plus size={14} /> {w("foods.add")}</button>
           </div>
         ))}
-        {state.foods.length === 0 && !q && <small>No saved foods yet. Scan or type one above.</small>}
+        {state.foods.length === 0 && !q && <small>{w("foods.noSavedFoodsYetScan")}</small>}
       </div>
-      {list.db.length > 0 && !dbOpen && <button className="link all-foods" onClick={() => setDbOpen(true)}>More from the product database ›</button>}
+      {list.db.length > 0 && !dbOpen && <button className="link all-foods" onClick={() => setDbOpen(true)}>{w("foods.moreFromTheProductDatabase")}</button>}
       {list.db.length > 0 && dbOpen && (
-        <section className="outside" aria-label="In the product database">
-          <p className="label group-label">In the product database</p>
+        <section className="outside" aria-label={w("foods.inTheProductDatabase")}>
+          <p className="label group-label">{w("foods.inTheProductDatabase")}</p>
           {list.db.map((r) => r.kind === "db" && (
             <div className="row outside-row" key={r.key}>
               <span className="thumb">{iconFor(r.food.name)}</span>
               <div className="row-text"><b className="name-plain">{r.food.name}</b><small>{rowLine(r)}</small></div>
-              <button className="pill pill-small" onClick={() => p.addFromDatabase(r.product.code)}>Add to my foods</button>
+              <button className="pill pill-small" onClick={() => p.addFromDatabase(r.product.code)}>{w("foods.addToMyFoods")}</button>
             </div>
           ))}
         </section>
       )}
       {q.length >= 2 && !db.busy && (
-        <section className="end-add" aria-label="Add it yourself">
-          <b>{nothing ? `Nothing found for "${q}".` : "Can't find what you want?"}</b>
+        <section className="end-add" aria-label={w("foods.addItYourself")}>
+          <b>{nothing ? w("foods.nothingFoundFor", { q }) : w("foods.canTFindWhatYou")}</b>
           <span>Add it yourself{isDigits ? ", the number comes with you." : `, "${q}" comes with you.`}</span>
           <div className="ways">
-            <button className="pill pill-small" onClick={() => blank(isDigits ? "" : q, "", q, isDigits ? q : "")}><Pencil size={15} /> Type</button>
-            <button className="pill pill-small pill-primary" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> Scan</button>
+            <button className="pill pill-small" onClick={() => blank(isDigits ? "" : q, "", q, isDigits ? q : "")}><Pencil size={15} /> {w("foods.type")}</button>
+            <button className="pill pill-small pill-primary" onClick={() => { setMode("label"); setCamera(true); }}><Camera size={15} /> {w("foods.scan")}</button>
           </div>
         </section>
       )}
       {state.foods.length === 0 && (
-        <div className="strip">No foods yet. Scan, type a name, or <button className="link" onClick={p.addStarter}>add twenty starter foods</button>.</div>
+        <div className="strip">{w("foods.noFoodsYetScanType")} <button className="link" onClick={p.addStarter}>{w("foods.addTwentyStarterFoods")}</button>.</div>
       )}
       </>
       {mfCard && <FoodCard rates={p.rates} food={mfCard} target={p.dayPd} fit={p.fitDay(density(mfCard.protein, mfCard.calories))} close={() => setMfCard(null)} />}
@@ -243,8 +244,8 @@ function DuplicatesSheet({ pairs, close, merge, notSame }: { pairs: [any, any][]
   return (
     <div className="sheet-backdrop" onClick={close}>
       <div className="sheet" onClick={(e) => e.stopPropagation()}>
-        <div className="card-top"><span>Possible duplicates</span><button className="link" onClick={close}>Close</button></div>
-        <p className="small">Same barcode, or the same values per 100 g with a similar name. Pick the name to keep; the photos of both stay.</p>
+        <div className="card-top"><span>{w("foods.possibleDuplicates")}</span><button className="link" onClick={close}>{w("foods.close")}</button></div>
+        <p className="small">{w("foods.sameBarcodeOrTheSame")}</p>
         {pairs.map(([a, b], i) => {
           const keep = names[i] ?? (a.barcode && !b.barcode ? 0 : b.barcode && !a.barcode ? 1 : 0);
           const pair = [a, b];
@@ -254,12 +255,12 @@ function DuplicatesSheet({ pairs, close, merge, notSame }: { pairs: [any, any][]
                 <button key={x.id} className={`dup-row ${keep === k ? "on" : ""}`} onClick={() => setNames({ ...names, [i]: k as 0 | 1 })}>
                   <span className="thumb thumb-sm">{x.photo ? <img src={x.photo} alt="" /> : "🍽️"}</span>
                   <span className="dup-text"><b>{x.name}</b><small>{x.brand || "no brand"}{x.barcode ? ` · ${x.barcode}` : ""} · {Math.round(x.calories ?? 0)} kcal · {x.protein ?? "?"} g protein</small></span>
-                  <span className="dup-pick">{keep === k ? "Keep this name" : ""}</span>
+                  <span className="dup-pick">{keep === k ? w("foods.keepThisName") : ""}</span>
                 </button>
               ))}
               <div className="button-row" style={{ marginTop: 8 }}>
-                <button className="pill pill-small pill-primary" onClick={() => { const k = pair[keep], o = pair[1 - keep]; merge(k.id, o.id, k.name); }}>Merge</button>
-                <button className="link" onClick={() => notSame(a.id, b.id)}>Not the same</button>
+                <button className="pill pill-small pill-primary" onClick={() => { const k = pair[keep], o = pair[1 - keep]; merge(k.id, o.id, k.name); }}>{w("foods.merge")}</button>
+                <button className="link" onClick={() => notSame(a.id, b.id)}>{w("foods.notTheSame")}</button>
               </div>
             </section>
           );
