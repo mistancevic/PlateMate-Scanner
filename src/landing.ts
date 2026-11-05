@@ -1,3 +1,4 @@
+import { w } from "./words";
 // The calculator on chefmealan.com (board HP, 12 October 2026): the same lift as the app, for a few fixed foods.
 // Values per 100 g: peanut butter, vanilla ice cream, potato crisps, cheese pizza, tuna in water, roasted chicken breast,
 // egg white, cottage cheese from USDA FoodData Central (SR Legacy); granola, chocolate spread, skyr, Greek yogurt (2 %)
@@ -10,24 +11,24 @@
 // 30 g of granola with 200 ml of milk, PD 4.1; milk can't lift it to the goal, and the page names the foods that can.
 export type DemoFood = { id: string; name: string; of?: string; unit?: "g" | "ml"; grams?: number; step?: number; min?: number; max?: number; kcal: number; protein: number; kind: "sweet" | "savoury"; note?: string };
 export const WANTS: DemoFood[] = [
-  { id: "granola", name: "Granola", of: "granola", grams: 30, step: 10, min: 20, max: 120, kcal: 450, protein: 9, kind: "sweet", note: "Granola looks healthy, but it brings many calories and little protein." },
-  { id: "spread", name: "Chocolate spread", of: "chocolate spread", grams: 40, step: 10, min: 10, max: 80, kcal: 539, protein: 6.3, kind: "sweet", note: "Chocolate spread alone is mostly sugar and fat." },
-  { id: "peanut", name: "Peanut butter", of: "peanut butter", grams: 30, step: 10, min: 10, max: 60, kcal: 588, protein: 25.1, kind: "sweet", note: "Peanut butter has protein, but peanut butter alone is mostly fat." },
-  { id: "icecream", name: "Ice cream", of: "ice cream", grams: 100, step: 25, min: 50, max: 200, kcal: 207, protein: 3.5, kind: "sweet", note: "Ice cream alone is mostly sugar and fat." },
-  { id: "pizza", name: "Pizza slice", of: "pizza", grams: 120, step: 30, min: 60, max: 240, kcal: 266, protein: 11.4, kind: "savoury", note: "Pizza alone is mostly dough and cheese." },
-  { id: "crisps", name: "Crisps", of: "crisps", grams: 30, step: 10, min: 10, max: 100, kcal: 536, protein: 7, kind: "savoury", note: "Crisps alone are mostly fat and starch." },
+  { id: "granola", get name() { return w("home.food.granola"); }, get of() { return w("home.food.granolaOf"); }, grams: 30, step: 10, min: 20, max: 120, kcal: 450, protein: 9, kind: "sweet", get note() { return w("home.food.granolaNote"); } },
+  { id: "spread", get name() { return w("home.food.spread"); }, get of() { return w("home.food.spreadOf"); }, grams: 40, step: 10, min: 10, max: 80, kcal: 539, protein: 6.3, kind: "sweet", get note() { return w("home.food.spreadNote"); } },
+  { id: "peanut", get name() { return w("home.food.peanut"); }, get of() { return w("home.food.peanutOf"); }, grams: 30, step: 10, min: 10, max: 60, kcal: 588, protein: 25.1, kind: "sweet", get note() { return w("home.food.peanutNote"); } },
+  { id: "icecream", get name() { return w("home.food.icecream"); }, get of() { return w("home.food.icecreamOf"); }, grams: 100, step: 25, min: 50, max: 200, kcal: 207, protein: 3.5, kind: "sweet", get note() { return w("home.food.icecreamNote"); } },
+  { id: "pizza", get name() { return w("home.food.pizza"); }, get of() { return w("home.food.pizzaOf"); }, grams: 120, step: 30, min: 60, max: 240, kcal: 266, protein: 11.4, kind: "savoury", get note() { return w("home.food.pizzaNote"); } },
+  { id: "crisps", get name() { return w("home.food.crisps"); }, get of() { return w("home.food.crispsOf"); }, grams: 30, step: 10, min: 10, max: 100, kcal: 536, protein: 7, kind: "savoury", get note() { return w("home.food.crispsNote"); } },
 ];
 // grams is the amount a page opens with for that food
 export const HAVES: DemoFood[] = [
-  { id: "milk", name: "Milk 1.5%", unit: "ml", grams: 200, step: 50, min: 50, max: 400, kcal: 47, protein: 3.4, kind: "sweet" },
-  { id: "skyr", name: "Skyr", grams: 150, step: 25, min: 25, max: 300, kcal: 63, protein: 11, kind: "sweet" },
-  { id: "yogurt", name: "Greek yogurt", grams: 150, step: 25, min: 25, max: 300, kcal: 73, protein: 10, kind: "sweet" },
-  { id: "cottage", name: "Cottage cheese", grams: 150, step: 25, min: 25, max: 300, kcal: 98, protein: 11.1, kind: "sweet" },
-  { id: "whey", name: "Whey powder", grams: 25, step: 5, min: 5, max: 60, kcal: 380, protein: 78, kind: "sweet" },
-  { id: "tuna", name: "Tuna", grams: 80, step: 20, min: 20, max: 200, kcal: 116, protein: 25.5, kind: "savoury" },
-  { id: "chicken", name: "Chicken breast", grams: 100, step: 25, min: 25, max: 250, kcal: 165, protein: 31, kind: "savoury" },
-  { id: "eggwhite", name: "Egg whites", grams: 100, step: 25, min: 25, max: 250, kcal: 52, protein: 10.9, kind: "savoury" },
-  { id: "dip", name: "Yogurt dip", grams: 100, step: 25, min: 25, max: 250, kcal: 73, protein: 10, kind: "savoury" },
+  { id: "milk", get name() { return w("home.food.milk"); }, unit: "ml", grams: 200, step: 50, min: 50, max: 400, kcal: 47, protein: 3.4, kind: "sweet" },
+  { id: "skyr", get name() { return w("home.food.skyr"); }, grams: 150, step: 25, min: 25, max: 300, kcal: 63, protein: 11, kind: "sweet" },
+  { id: "yogurt", get name() { return w("home.food.yogurt"); }, grams: 150, step: 25, min: 25, max: 300, kcal: 73, protein: 10, kind: "sweet" },
+  { id: "cottage", get name() { return w("home.food.cottage"); }, grams: 150, step: 25, min: 25, max: 300, kcal: 98, protein: 11.1, kind: "sweet" },
+  { id: "whey", get name() { return w("home.food.whey"); }, grams: 25, step: 5, min: 5, max: 60, kcal: 380, protein: 78, kind: "sweet" },
+  { id: "tuna", get name() { return w("home.food.tuna"); }, grams: 80, step: 20, min: 20, max: 200, kcal: 116, protein: 25.5, kind: "savoury" },
+  { id: "chicken", get name() { return w("home.food.chicken"); }, grams: 100, step: 25, min: 25, max: 250, kcal: 165, protein: 31, kind: "savoury" },
+  { id: "eggwhite", get name() { return w("home.food.eggwhite"); }, grams: 100, step: 25, min: 25, max: 250, kcal: 52, protein: 10.9, kind: "savoury" },
+  { id: "dip", get name() { return w("home.food.dip"); }, grams: 100, step: 25, min: 25, max: 250, kcal: 73, protein: 10, kind: "savoury" },
 ];
 export const unitOf = (f: DemoFood) => f.unit ?? "g";
 // a food at a weight: kcal, protein, PD
@@ -43,7 +44,7 @@ export function plate(want: DemoFood, wg: number, have: DemoFood, hg: number) {
 // the foods offered for a craving: the same kind; a food whose own PD is under the goal (milk) can never lift a plate to it
 export const havesFor = (want: DemoFood) => HAVES.filter((h) => h.kind === want.kind);
 // a line for a pair that is a known dish
-export const PAIR_NOTES: Record<string, string> = { "pizza|tuna": "Pizza with tuna is a pizza tonno." };
+export const PAIR_NOTES: Record<string, string> = { get "pizza|tuna"() { return w("home.pair.pizzaTuna"); } };
 // The page works for one goal only, Recomposition, the one most people pick (approved 6 October 2026).
 // PD 6.5 is where Recomposition lands for typical adults: 6.3 for a man of 75 kg, 6.8 for a woman of 65 kg.
 export const DEMO_GOAL = { name: "Recomposition", pd: 6.5 };

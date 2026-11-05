@@ -1,7 +1,7 @@
 import { BOOKS } from "../bookPages";
 import { useEffect, useRef, useState } from "react";
 import { tabOfPath } from "../back";
-import { takeIdleOut, IDLE_LINE } from "../idle";
+import { takeIdleOut } from "../idle";
 import { RecipeCard } from "./RecipePages";
 import type { PublicRecipe } from "../recipes";
 import { Check } from "lucide-react";
@@ -11,9 +11,24 @@ import { signIn } from "../cloud";
 import { pendingCode } from "../pendingCode";
 import { hit } from "../metrics";
 import { VERSION_LINE } from "../version";
+import { w, wn, type WordKey } from "../words";
+import { useLang, getLang, setLang, type Lang } from "../lang";
+import { LangSwitch, LangAsk, pageLang, langPath } from "../components/LangAsk";
+import { IDLE_DAYS } from "../idle";
+
+// DT236 v3 (0.3.93, boards Stories177 and Stories180; Coach Milan 5 November 11:36, Go): the home page in English, Srpski and
+// Deutsch (Beta). chefmealan.com stays English; chefmealan.com/sr and chefmealan.com/de; the switch in the header; the box once
+// on a phone in Serbian or German. The clips stay English until this phase of languages is done (Coach Milan 11:26).
+// a line with links in it: {wb} and {wn} become the elements given
+const withLinks = (t: string, m: Record<string, React.ReactNode>) => t.split(/(\{\w+\})/).map((x, i) => { const k = /^\{(\w+)\}$/.exec(x)?.[1]; return k && k in m ? <span key={i}>{m[k]}</span> : x; });
+// German nouns keep their capital inside a sentence
+const low = (t: string) => (getLang() === "de" ? t : t.toLowerCase());
 
 // The front door of chefmealan.com: what it is, how it works, request a code, or sign in with one.
 export function LandingScreen() {
+  useLang();
+  // the page's language: /sr and /de choose it (the app follows); on chefmealan.com a phone that chose one goes to its page
+  useEffect(() => { const l = pageLang(location.pathname); if (l) { if (l !== getLang()) setLang(l); } else if (location.pathname === "/" && getLang() !== "en") history.replaceState(null, "", langPath(getLang()) + location.search + location.hash); }, []);
   const formRef = useRef<HTMLDivElement>(null);
   const [idle] = useState(() => takeIdleOut());   // DT196: signed out after 30 days, said once
   const [err, setErr] = useState("");
@@ -40,8 +55,8 @@ export function LandingScreen() {
   const toWait = () => { waitRef.current?.scrollIntoView({ behavior: "smooth" }); };
   const toCoaches = () => coachRef.current?.scrollIntoView({ behavior: "smooth" });
   const toMain = () => (full ? toWait() : toForm());
-  const mainLabel = full ? "Join the waiting list" : "Join the beta, free";
-  const spotsLine = spots === null ? null : full ? "This round of the beta is full." : `${spots} ${spots === 1 ? "spot" : "spots"} left in this round`;
+  const mainLabel = full ? w("home.joinWait") : w("home.joinBeta");
+  const spotsLine = spots === null ? null : full ? w("home.roundFull") : wn("home.spotsLeft", spots);
   // HP10: the bar at the bottom shows while neither the button on the first screen (HP5 1d) nor the form is on screen
   const ctaRef = useRef<HTMLDivElement>(null);
   // positions on every scroll, so a fast fling past the button still shows the bar
@@ -65,21 +80,22 @@ export function LandingScreen() {
     <div className="landing">
       <header className="l-top">
         <div className="l-brand"><Mark size={30} color="var(--brand)" /><b>{APP_NAME}</b></div>
-        <span className="l-topnav"><button type="button" className="link l-coaches" onClick={toCoaches}>Coaches</button><a className="l-recipes" href="/recipes">Recipes</a><button className="pill pill-small l-signin" disabled={busy} onClick={go}>Sign in</button></span>
+        <span className="l-topnav"><button type="button" className="link l-coaches" onClick={toCoaches}>{w("home.coaches")}</button><a className="l-recipes" href="/recipes">{w("home.recipes")}</a><LangSwitch /><button className="pill pill-small l-signin" disabled={busy} onClick={go}>{w("home.signIn")}</button></span>
       </header>
+      <LangAsk />
       {idle && (
         <section className="sh-arrived">
-          <b>Signed out</b>
-          <span>{IDLE_LINE}</span>
-          <button className="pill pill-primary" disabled={busy} onClick={go}>Sign in</button>
+          <b>{w("home.signedOut")}</b>
+          <span>{w("home.idleLine", { days: IDLE_DAYS })}</span>
+          <button className="pill pill-primary" disabled={busy} onClick={go}>{w("home.signIn")}</button>
         </section>
       )}
       {/* SH73: someone who scanned a coach's QR code sees their code and the one step left */}
       {pendingCode() && (
         <section className="sh-arrived">
-          <b>Your personal code: {pendingCode()}</b>
-          <span>Sign in with Google using the email your code was made for. The code is filled in for you.</span>
-          <button className="pill pill-primary" disabled={busy} onClick={go}>Sign in</button>
+          <b>{w("home.yourCode", { code: pendingCode() ?? "" })}</b>
+          <span>{w("home.yourCodeLine")}</span>
+          <button className="pill pill-primary" disabled={busy} onClick={go}>{w("home.signIn")}</button>
         </section>
       )}
 
@@ -88,23 +104,23 @@ export function LandingScreen() {
           itself every 5.5 seconds with a crossfade; dots show which, and a tap on a dot shows that dish. Reduce motion: the first
           photo only. Only the first photo loads with the page, the others after. Each photo has its own focus, so the plate sits
           in the middle of what shows (the curry moved up, Milan 16:43). */}
-      <section className="l-photo" aria-label="The start">
+      <section className="l-photo" aria-label={w("home.theStart")}>
         <HeroPhotos />
         <div className="l-photo-words">
-          <span className="l-kicker">For people with a nutrition plan</span>
-          <h1>Live your nutrition plan, day by day.</h1>
-          <p className="l-photo-lead">Chef Mealan plans your meals with you, and finds the meal that still fits when the day surprises you.</p>
+          <span className="l-kicker">{w("home.kicker")}</span>
+          <h1>{w("home.h1")}</h1>
+          <p className="l-photo-lead">{w("home.lead")}</p>
           {err && <p className="l-photo-err">{err}</p>}
           <div className="l-photo-cta" ref={ctaRef}>
             <button className="pill pill-primary l-cta-big" onClick={toMain}>{mainLabel}</button>
             <div className="l-beta">
               {spotsLine && <p className={`l-spots ${full ? "full" : ""}`}>{spotsLine}</p>}
               {full
-                ? <p>Join the waiting list, and we write to you once, when Chef Mealan opens to everyone.</p>
-                : <p>Use it most days for four weeks, and tell us what breaks. <button type="button" className="link" onClick={toWait}>Or join the waiting list</button></p>}
+                ? <p>{w("home.waitOnce")}</p>
+                : <p>{w("home.betaLine")} <button type="button" className="link" onClick={toWait}>{w("home.orWait")}</button></p>}
             </div>
           </div>
-          <p className="l-photo-own">Milan's own cooking, at home.</p>
+          <p className="l-photo-own">{w("home.ownCooking")}</p>
         </div>
       </section>
 
@@ -113,9 +129,9 @@ export function LandingScreen() {
           centred under them on a computer too */}
       <section className="l-hero l-calc" id="try">
         <div className="l-calc-text">
-          <span className="l-eyebrow">Try it here</span>
-          <h2>Make your craving fit your plan</h2>
-          <p>Pick what you crave and a food you have at home. See how much of it makes the plate fit.</p>
+          <span className="l-eyebrow">{w("home.tryHere")}</span>
+          <h2>{w("home.calcTitle")}</h2>
+          <p>{w("home.calcLine")}</p>
         </div>
         <TryIt />
       </section>
@@ -124,177 +140,162 @@ export function LandingScreen() {
           everything lands on one plate, recipes for your day, the shopping list. Mobile first: one below another on a phone;
           on a computer the four ways in sit in a row. Each clip is the real app on test data (scripts/record-home-clips.cjs). */}
       <section className="l-steps l-ways">
-        <span className="l-eyebrow">Start from anything</span>
-        <h2>What you eat, read in seconds</h2>
-        <p className="l-ways-lead">Scan a barcode or a nutrition label, or take a photo of the meal in front of you. Each one lands on your plate.</p>
+        <span className="l-eyebrow">{w("home.waysEyebrow")}</span>
+        <h2>{w("home.waysTitle")}</h2>
+        <p className="l-ways-lead">{w("home.waysLead")}</p>
         <div className="l-ways-grid">
-          {WAYS.map((w) => (
-            <div className="l-way" key={w.id}>
-              <h3>{w.title}</h3>
-              <p>{w.line}</p>
-              <DayVideo src={`/landing/way-${w.id}.mp4`} poster={`/landing/way-${w.id}.webp`} label={`${w.title}: ${w.line}`} />
+          {WAYS.map((x) => (
+            <div className="l-way" key={x.id}>
+              <h3>{x.title}</h3>
+              <p>{x.line}</p>
+              <DayVideo src={`/landing/way-${x.id}.mp4`} poster={`/landing/way-${x.id}.webp`} label={`${x.title}: ${x.line}`} />
             </div>
           ))}
         </div>
         <div className="l-one">
           <div className="l-one-text">
-            <span className="l-eyebrow">One plate</span>
-            <h2>Everything lands on one plate</h2>
-            <p><b>PD, protein density:</b> grams of protein per 100 kcal. Your target comes from your goal, your body and your training. The big number says how the plate stands against it.</p>
-            <p><b>F C Fi P:</b> fat, carbs, fibre, protein, in the order of a food label. A capital letter: as your day needs. Small: under. A plus: more than your day. A minus: close to none.</p>
-            <p><b>Then you decide:</b> eat it, eat one portion, add a protein side, or let Chef Mealan fit it to your target.</p>
+            <span className="l-eyebrow">{w("home.onePlate")}</span>
+            <h2>{w("home.onePlateTitle")}</h2>
+            <p><b>{w("home.pdB")}</b> {w("home.pdText")}</p>
+            <p><b>{w("home.fcB")}</b> {w("home.fcText")}</p>
+            <p><b>{w("home.decideB")}</b> {w("home.decideText")}</p>
           </div>
-          <DayVideo src="/landing/way-plate.mp4" poster="/landing/way-plate.webp" label="One plate: PD, the letters and the numbers behind them" />
+          <DayVideo src="/landing/way-plate.mp4" poster="/landing/way-plate.webp" label={w("home.videoPlate")} />
         </div>
         <div className="l-two">
           <div className="l-way">
-            <span className="l-eyebrow">Plan</span>
-            <h2>Recipes for your day</h2>
-            <p>Yours, your coach's and the members', sorted for what is left of your day. Pick one for a meal of your plan.</p>
-            <DayVideo src="/landing/way-recipes.mp4" poster="/landing/way-recipes.webp" label="Recipes for your day" />
+            <span className="l-eyebrow">{w("home.plan")}</span>
+            <h2>{w("home.recipesTitle")}</h2>
+            <p>{w("home.recipesLine")}</p>
+            <DayVideo src="/landing/way-recipes.mp4" poster="/landing/way-recipes.webp" label={w("home.recipesTitle")} />
           </div>
           <div className="l-way">
-            <span className="l-eyebrow">Shop</span>
-            <h2>Your shopping list</h2>
-            <p>The planned week's foods added up, with the meals they are for. Tick as you shop.</p>
-            <DayVideo src="/landing/way-shop.mp4" poster="/landing/way-shop.webp" label="Your shopping list" />
+            <span className="l-eyebrow">{w("home.shop")}</span>
+            <h2>{w("home.shopTitle")}</h2>
+            <p>{w("home.shopLine")}</p>
+            <DayVideo src="/landing/way-shop.mp4" poster="/landing/way-shop.webp" label={w("home.shopTitle")} />
           </div>
         </div>
-        <small className="l-ways-note">Clips of the app on test data. The packs in them are made up.</small>
+        <small className="l-ways-note">{w("home.clipsPacks")}</small>
       </section>
 
       {/* HP3: cook it, the day as it goes, Explorer; each with a clip of the app as it is */}
       <section className="l-steps l-new">
         <div className="l-one">
           <div className="l-one-text">
-            <span className="l-eyebrow">Cook</span>
-            <h2>Cook it, hands free</h2>
+            <span className="l-eyebrow">{w("home.cook")}</span>
+            <h2>{w("home.cookTitle")}</h2>
             <ul className="l-list">
-              <li>One big step at a time, read aloud.</li>
-              <li>Say next, back, repeat, or start a timer.</li>
-              <li>Ask Chef in the middle: how much is left, what if the pan is too hot.</li>
-              <li>Pictures under the steps, yours or drawn.</li>
-              <li>A second phone or a tablet on the counter shows the steps.</li>
+              {(["home.cook1", "home.cook2", "home.cook3", "home.cook4", "home.cook5"] as WordKey[]).map((k) => <li key={k}>{w(k)}</li>)}
             </ul>
           </div>
-          <DayVideo src="/landing/way-cook.mp4" poster="/landing/way-cook.webp" label="Cook mode: one step at a time, read aloud" />
+          <DayVideo src="/landing/way-cook.mp4" poster="/landing/way-cook.webp" label={w("home.videoCook")} />
         </div>
         <div className="l-one">
           <div className="l-one-text">
             {/* Coach Milan 1 November 14:06: the clip is Explorer, so the label says so */}
-            <span className="l-eyebrow">Explorer · Situations</span>
-            <h2>Your day as it really goes</h2>
-            <p>A late evening at work, a party, a day away, a bad night's sleep. In Explorer, each has a page of its own, read against your own plan.</p>
-            <p className="l-list-lead">And in your plan:</p>
+            <span className="l-eyebrow">{w("home.situEyebrow")}</span>
+            <h2>{w("home.situTitle")}</h2>
+            <p>{w("home.situLine")}</p>
+            <p className="l-list-lead">{w("home.andInPlan")}</p>
             <ul className="l-list">
-              <li>Busy times from your Google Calendar: a meal in a meeting asks before or after.</li>
-              <li>Travel mode: the shops and the kitchen of the place you are in.</li>
-              <li>A day off training: what changes, and what stays.</li>
+              {(["home.situ1", "home.situ2", "home.situ3"] as WordKey[]).map((k) => <li key={k}>{w(k)}</li>)}
             </ul>
           </div>
-          <DayVideo src="/landing/way-situation.mp4" poster="/landing/way-situation.webp" label="A late evening after work, in Explorer" />
+          <DayVideo src="/landing/way-situation.mp4" poster="/landing/way-situation.webp" label={w("home.videoSitu")} />
         </div>
         <div className="l-one">
           <div className="l-one-text">
-            <span className="l-eyebrow">Explorer · The body and nutrients</span>
-            <h2>Know why, not only what</h2>
-            <p>The body, the situations and the nutrients in one place. Every line has its paper. Every page says when a thing helps and when it hurts, then reads your own days.</p>
-            <p>No condition, no test reading, no supplement. If a condition decides what you eat, your doctor does.</p>
+            <span className="l-eyebrow">{w("home.bodyEyebrow")}</span>
+            <h2>{w("home.bodyTitle")}</h2>
+            <p>{w("home.body1")}</p>
+            <p>{w("home.body2")}</p>
           </div>
-          <DayVideo src="/landing/way-explorer.mp4" poster="/landing/way-explorer.webp" label="Explorer: the body, its eight families" />
+          <DayVideo src="/landing/way-explorer.mp4" poster="/landing/way-explorer.webp" label={w("home.videoBody")} />
         </div>
-        <small className="l-ways-note">Clips of the app on test data. The names in them are made up.</small>
+        <small className="l-ways-note">{w("home.clipsNames")}</small>
       </section>
 
       {recipes.length > 0 && (
         <section className="l-kitchen">
-          <span className="l-eyebrow">From the kitchen</span>
-          <h2>Recipes with the numbers calculated</h2>
-          <p>Recipes Coach Milan has cooked and weighed, the numbers next to the photo. In the app, Chef Mealan calculates how much of each food fits your goal.</p>
+          <span className="l-eyebrow">{w("home.kitchen")}</span>
+          <h2>{w("home.kitchenTitle")}</h2>
+          <p>{w("home.kitchenLine")}</p>
           <div className="rp-grid">{recipes.map((r) => <RecipeCard key={r.slug} r={r} />)}</div>
-          <a className="l-all" href="/recipes">All recipes →</a>
+          <a className="l-all" href="/recipes">{w("home.allRecipes")}</a>
         </section>
       )}
 
       {/* HP3: the coach's section, reached from Coaches in the top bar; its button opens the beta form as a coach */}
       <section className="l-coach" id="coaches" ref={coachRef}>
-        <span className="l-eyebrow">For coaches</span>
-        <h2>Coach your clients' real days</h2>
-        <p>One account, two views: your own day, and your clients. Each client's day shows as they see it: the plan, the meals, the cards they share.</p>
+        <span className="l-eyebrow">{w("home.forCoaches")}</span>
+        <h2>{w("home.coachTitle")}</h2>
+        <p>{w("home.coachLine")}</p>
         <ul className="l-list">
-          <li>Suggest a snack or an Explorer page. The client accepts with one tap. You never change their plan.</li>
-          <li>Answer a shared meal in one line, or react with Good or Seen.</li>
-          <li>Waiting for you: what needs your answer, at the top.</li>
-          <li>The client decides what you see. Body data stays off until they switch it on.</li>
+          {(["home.coach1", "home.coach2", "home.coach3", "home.coach4"] as WordKey[]).map((k) => <li key={k}>{w(k)}</li>)}
         </ul>
-        <DayVideo src="/landing/way-coach.mp4" poster="/landing/way-coach.webp" label="My clients: Waiting for you at the top" />
-        <p className="l-coach-act"><button className="pill pill-primary" onClick={() => { setAskAs("coach"); full ? toWait() : toForm(); }}>{full ? "Join the waiting list" : "Get a coach code"}</button></p>
-        <small className="muted">Coaches in the beta: free, the same four weeks, and your clients join with your code.</small>
+        <DayVideo src="/landing/way-coach.mp4" poster="/landing/way-coach.webp" label={w("home.videoCoach")} />
+        <p className="l-coach-act"><button className="pill pill-primary" onClick={() => { setAskAs("coach"); full ? toWait() : toForm(); }}>{full ? w("home.joinWait") : w("home.getCoachCode")}</button></p>
+        <small className="muted">{w("home.coachSmall")}</small>
       </section>
 
       {/* who's behind Chef Mealan (board B, HP11, 12 October 2026): the product role first, so nobody reads Milan as a
           full-time coach; clients still know him as Coach Milan */}
       <section className="l-week l-behind">
-        <span className="l-eyebrow">Who's behind Chef Mealan</span>
+        <span className="l-eyebrow">{w("home.behind")}</span>
         <h2>Milan Stancevic</h2>
         <div className="l-split">
           <div>
             {/* Coach Milan 1 November 14:35: the line from the book's cover */}
-            <p className="l-role">Product and recipe builder, and the maker of Chef Mealan.</p>
-            <p>Milan is a senior product manager with about 20 years in software and the founder of several startups. He designs and builds Chef Mealan with AI, from the first sketch to every release.</p>
+            <p className="l-role">{w("home.role")}</p>
+            <p>{w("home.behind1")}</p>
             {/* Coach Milan 1 November 15:03: the recipe builder and cook, as on the book's cover; the coaching certificate belongs on
                 the personal page, not here */}
-            <p>Milan cooks every day for himself and his family, in Munich, and builds his own recipes, weighed. The ones he has cooked are marked From the kitchen; the numbers come from labels and food tables.</p>
-            <p>Author of <a href="/built#books">Worth Building</a> and <a href="/worthy-numbers?from=hp">Worthy Numbers</a>. Worth Eating comes next.</p>
-            <p className="l-behind-links"><a href="/built">How Chef Mealan is built ›</a><a href="/about">More about Milan ›</a></p>
+            <p>{w("home.behind2")}</p>
+            <p>{withLinks(w("home.authorOf"), { wb: <a href="/built#books">Worth Building</a>, wn: <a href="/worthy-numbers?from=hp">Worthy Numbers</a> })}</p>
+            <p className="l-behind-links"><a href="/built">{w("home.howBuilt")}</a><a href="/about">{w("home.moreMilan")}</a></p>
           </div>
           <figure className="l-hero-art">
-            <img className="l-chef" src="/landing/chef.webp" alt="Milan Stancevic, the person behind Chef Mealan, in a chef's hat" />
+            <img className="l-chef" src="/landing/chef.webp" alt={w("home.chefAlt")} />
           </figure>
         </div>
       </section>
 
       <section className="l-built">
-        <span className="l-eyebrow">How the numbers work</span>
-        <h2>Numbers you can check</h2>
+        <span className="l-eyebrow">{w("home.numbersEyebrow")}</span>
+        <h2>{w("home.numbersTitle")}</h2>
         <div className="l-grid l-grid-3">
-          <div><b>A calculator does the math</b><p>Your daily numbers and the grams on each plate come from published formulas. You can open any number and see how Chef Mealan got to it.</p></div>
-          <div><b>AI reads, a calculator decides</b><p>Chef Mealan uses AI to read labels, menus and shop shelves, and to answer you in the chat. The numbers themselves come from a calculator, not from the AI. When the AI has to guess a number from a photo, the app marks that number as an estimate.</p></div>
-          <div><b>Your data stays in the EU</b><p>Your data is stored in the EU, in Belgium and Frankfurt, in your account. You can download all of it, or delete all of it, at any time.</p></div>
-          <div><b>Papers read again</b><p>Every number Explorer credits to a study is checked against the study itself before each release.</p></div>
-          <div><b>Nothing kept for nothing</b><p>An account nobody opens for 12 months is deleted, with everything in it.</p></div>
+          {[1, 2, 3, 4, 5].map((i) => <div key={i}><b>{w(`home.n${i}b` as WordKey)}</b><p>{w(`home.n${i}p` as WordKey)}</p></div>)}
         </div>
       </section>
 
       {/* BP70 (Milan 12:41): the book gets one block here and its own page, so there is one place to update */}
       <section className="l-week l-book">
-        <span className="l-eyebrow">A free guide</span>
+        <span className="l-eyebrow">{w("home.freeGuide")}</span>
         <h2>{BOOKS["worthy-numbers"].name}</h2>
         <div className="l-split">
           <div className="l-book-text">
             <p className="l-role">{BOOKS["worthy-numbers"].kicker}. {BOOKS["worthy-numbers"].subtitle}</p>
-            <p>PD, the number no pack prints, and five more numbers about your food: what each one tells you, and how to use it at your next meal.</p>
-            <p><a className="l-book-link" href="/worthy-numbers?from=hp">See the book ›</a></p>
+            <p>{w("home.bookLine")}</p>
+            <p><a className="l-book-link" href="/worthy-numbers?from=hp">{w("home.seeBook")}</a></p>
           </div>
-          <figure className="l-hero-art"><a href="/worthy-numbers?from=hp"><img className="l-book-cover" src={BOOKS["worthy-numbers"].cover} alt={`The cover of ${BOOKS["worthy-numbers"].name}`} width={220} height={312} /></a></figure>
+          <figure className="l-hero-art"><a href="/worthy-numbers?from=hp"><img className="l-book-cover" src={BOOKS["worthy-numbers"].cover} alt={w("home.coverAlt", { name: BOOKS["worthy-numbers"].name })} width={220} height={312} /></a></figure>
         </div>
       </section>
 
       {/* Coach Milan 1 November 14:35: who it is for, written new; the line about doctors is the disclaimer, on its own */}
       <section className="l-who">
-        <span className="l-eyebrow">Who it's for</span>
-        <h2>For people who eat by a plan, and the coaches who make it</h2>
+        <span className="l-eyebrow">{w("home.whoEyebrow")}</span>
+        <h2>{w("home.whoTitle")}</h2>
         <ul className="l-list">
-          <li>You have a nutrition plan, from a coach or your own, and want to live it day by day.</li>
-          <li>You train and want your own numbers at every meal, without a food diary.</li>
-          <li>You coach, and want to see your clients' real days and suggest, not chase.</li>
+          {(["home.who1", "home.who2", "home.who3"] as WordKey[]).map((k) => <li key={k}>{w(k)}</li>)}
         </ul>
-        <p>Chef Mealan is for adults, 18 and over.</p>
+        <p>{w("home.adults")}</p>
       </section>
       <section className="l-who l-disclaimer">
-        <span className="l-eyebrow">Disclaimer</span>
-        <h2>Chef Mealan is not a doctor</h2>
-        <p>If a medical condition decides what you eat, if you're pregnant or have diabetes, or if eating is difficult for you, Chef Mealan doesn't give advice, and tells you who to talk to instead. <a href="/disclaimer">The full disclaimer ›</a></p>
+        <span className="l-eyebrow">{w("home.disclaimer")}</span>
+        <h2>{w("home.notDoctor")}</h2>
+        <p>{w("home.disclaimerLine")} <a href="/disclaimer">{w("home.fullDisclaimer")}</a></p>
       </section>
 
       {/* HP3: two forms. The beta asks for commitment and gives a code; the waiting list asks only for an email, for the paying
@@ -302,17 +303,17 @@ export function LandingScreen() {
       {(() => {
         const beta = (
           <section className="l-request" ref={formRef} key="beta">
-            <h2>{full ? "The next beta round" : "Join the beta, free"}</h2>
+            <h2>{full ? w("home.nextRound") : w("home.joinBeta")}</h2>
             {full
-              ? <p>This round is full. Leave your name and email, and Coach Milan writes to you when the next round starts.</p>
-              : <p>{spotsLine && <b className="l-spots">{spotsLine}. </b>}Use Chef Mealan most days for four weeks, and tell us what breaks. Most people join with a code from their coach. If you don't have one, leave your name and email, and Coach Milan sends you a personal code.</p>}
+              ? <p>{w("home.fullForm")}</p>
+              : <p>{spotsLine && <b className="l-spots">{spotsLine}. </b>}{w("home.betaForm")}</p>}
             <RequestForm who={askAs ?? undefined} />
           </section>
         );
         const wait = (
           <section className="l-request l-wait" id="wait" ref={waitRef} key="wait">
-            <h2>The waiting list</h2>
-            <p>For when Chef Mealan opens to everyone. No testing, no code now. We write to you once, when it opens.</p>
+            <h2>{w("home.waitTitle")}</h2>
+            <p>{w("home.waitForm")}</p>
             <WaitForm who={askAs ?? undefined} />
           </section>
         );
@@ -321,7 +322,7 @@ export function LandingScreen() {
 
       <div className={`l-sticky ${sticky ? "on" : ""}`} aria-hidden={!sticky}><button className="pill pill-primary" tabIndex={sticky ? 0 : -1} onClick={toMain}>{mainLabel}</button></div>
       <footer className="l-foot">
-        <span><a href="/about">Who's behind it</a> · <a href="/built">How Chef Mealan is built</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">Privacy</a> · <a href="/disclaimer">Disclaimer</a></span>
+        <span><a href="/about">{w("home.footBehind")}</a> · <a href="/built">{w("home.footBuilt")}</a> · <a href="/impressum">Impressum</a> · <a href="/privacy">{w("home.footPrivacy")}</a> · <a href="/disclaimer">{w("home.footDisclaimer")}</a></span>
         <span><a href="mailto:hello@chefmealan.com">hello@chefmealan.com</a> · © 2026 Milan Stancevic · {VERSION_LINE}</span>
       </footer>
     </div>
@@ -331,8 +332,8 @@ export function LandingScreen() {
 // HP2 (0.2.114): the four ways in, each with its clip
 const WAYS = [
   // HP3 (Coach Milan 1 November): two ways in, not four; the barcode and the labels are one, the group of packs leaves the page
-  { id: "barcode", title: "A barcode or a label", line: "The pack's values, or the label read from a photo, every side if you need. You check it." },
-  { id: "meal", title: "A photo of your meal", line: "Chef Mealan names the foods and estimates the grams. You correct what you know." },
+  { id: "barcode", get title() { return w("home.way.barcode"); }, get line() { return w("home.way.barcodeLine"); } },
+  { id: "meal", get title() { return w("home.way.meal"); }, get line() { return w("home.way.mealLine"); } },
 ];
 export function DayVideo({ src, poster, label, big }: { src: string; poster: string; label: string; big?: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
@@ -353,11 +354,11 @@ export function DayVideo({ src, poster, label, big }: { src: string; poster: str
 }
 // HP5 1d: Milan's own cooking behind the words. Phone and computer get their own size of each photo and their own focus.
 const HERO_PHOTOS = [
-  { k: "curry", name: "Curry with rice", phone: ["40% 100%", "auto 126%"], desk: ["62% 70%", "cover"] },
-  { k: "meatballs", name: "Meatballs in the pan" },
-  { k: "quesadilla", name: "Quesadilla" },
-  { k: "waffle", name: "Waffle" },
-  { k: "squares", name: "Chocolate squares" },
+  { k: "curry", get name() { return w("home.photo.curry"); }, phone: ["40% 100%", "auto 126%"], desk: ["62% 70%", "cover"] },
+  { k: "meatballs", get name() { return w("home.photo.meatballs"); } },
+  { k: "quesadilla", get name() { return w("home.photo.quesadilla"); } },
+  { k: "waffle", get name() { return w("home.photo.waffle"); } },
+  { k: "squares", get name() { return w("home.photo.squares"); } },
 ] as { k: string; name: string; phone?: string[]; desk?: string[] }[];
 export const HERO_EVERY_MS = 5500;
 function HeroPhotos() {
@@ -396,9 +397,9 @@ function HeroPhotos() {
       })}
       <div className="l-photo-fade" aria-hidden="true" />
       {!still && (
-        <div className="l-photo-dots" role="group" aria-label="Photos">
+        <div className="l-photo-dots" role="group" aria-label={w("home.photos")}>
           {HERO_PHOTOS.map((p, i) => (
-            <button key={p.k} type="button" aria-label={`${p.name}, photo ${i + 1} of ${HERO_PHOTOS.length}`} aria-pressed={i === at}
+            <button key={p.k} type="button" aria-label={w("home.photoOf", { name: p.name, i: i + 1, n: HERO_PHOTOS.length })} aria-pressed={i === at}
               onClick={() => { setAt(i); setTurn((n) => n + 1); }}><span /></button>
           ))}
         </div>
@@ -413,20 +414,20 @@ function TryIt() {
   const used = () => { if (!counted.current) { counted.current = true; hit("hp_calc"); } };
   // HP68 (Milan 23:35): pick a craving and a food you have, then set the weight of each; the plate's numbers follow
   const [want, setWantState] = useState(WANTS[0].id);
-  const w = WANTS.find((x) => x.id === want)!;
-  const offered = havesFor(w);
+  const cr = WANTS.find((x) => x.id === want)!;
+  const offered = havesFor(cr);
   const [have, setHaveState] = useState(offered[0].id);
   const h = offered.find((x) => x.id === have) ?? offered[0];
-  const [wg, setWg] = useState(w.grams ?? 40);
+  const [wg, setWg] = useState(cr.grams ?? 40);
   const [hg, setHg] = useState(h.grams ?? 100);
   const setWant = (id: string) => { setWantState(id); const nw = WANTS.find((x) => x.id === id)!; setWg(nw.grams ?? 40); const nh = havesFor(nw).find((x) => x.id === have) ?? havesFor(nw)[0]; setHaveState(nh.id); setHg(nh.grams ?? 100); };
   const setHave = (id: string) => { setHaveState(id); setHg(HAVES.find((x) => x.id === id)!.grams ?? 100); };
-  const a = alone(w, wg), p = plate(w, wg, h, hg);
+  const a = alone(cr, wg), p = plate(cr, wg, h, hg);
   const fits = p.pd >= DEMO_GOAL.pd;
-  const need = lift(w, h, DEMO_GOAL.pd, wg);
+  const need = lift(cr, h, DEMO_GOAL.pd, wg);
   const reach = !fits && need.grams <= (h.max ?? 300);
-  const others = offered.filter((x) => x.id !== h.id && lift(w, x, DEMO_GOAL.pd, wg).grams <= (x.max ?? 300)).map((x) => (x.name.startsWith("Greek") ? x.name : x.name.toLowerCase()));
-  const hn = h.name.toLowerCase(), wn = w.of ?? w.name.toLowerCase(), hu = unitOf(h);
+  const others = offered.filter((x) => x.id !== h.id && lift(cr, x, DEMO_GOAL.pd, wg).grams <= (x.max ?? 300)).map((x) => (x.id === "yogurt" ? x.name : low(x.name)));
+  const hn = low(h.name), wnm = cr.of ?? low(cr.name), hu = unitOf(h);
   const Pick = ({ items, on, set }: { items: { id: string; name: string }[]; on: string; set: (v: string) => void }) => (
     <div className="chip-row">{items.map((x) => <button key={x.id} type="button" className={`choice ${on === x.id ? "on" : ""}`} aria-pressed={on === x.id} onClick={() => { used(); set(x.id); }}>{x.name}</button>)}</div>
   );
@@ -435,47 +436,47 @@ function TryIt() {
     const u = unitOf(f), st = f.step ?? 10, n = part(f, value);
     return (
       <div className="l-amount">
-        <span><b>{f.name}</b><small>{n.kcal} kcal, {n.protein} g protein</small></span>
+        <span><b>{f.name}</b><small>{w("home.kcalProtein", { kcal: n.kcal, protein: n.protein })}</small></span>
         <span className="rp-step">
-          <button type="button" aria-label={`${st} ${u} less ${f.name.toLowerCase()}`} disabled={value - st < (f.min ?? st)} onClick={() => { used(); set(value - st); }}>−</button>
+          <button type="button" aria-label={w("home.less", { step: st, unit: u, food: low(f.name) })} disabled={value - st < (f.min ?? st)} onClick={() => { used(); set(value - st); }}>−</button>
           <b>{value} {u}</b>
-          <button type="button" aria-label={`${st} ${u} more ${f.name.toLowerCase()}`} disabled={value + st > (f.max ?? 300)} onClick={() => { used(); set(value + st); }}>+</button>
+          <button type="button" aria-label={w("home.more", { step: st, unit: u, food: low(f.name) })} disabled={value + st > (f.max ?? 300)} onClick={() => { used(); set(value + st); }}>+</button>
         </span>
       </div>
     );
   };
   return (
     <div className="l-try-box">
-      <div className="setting"><small className="setting-name">You crave</small><Pick items={WANTS} on={want} set={setWant} /></div>
-      <div className="setting"><small className="setting-name">You have at home</small><Pick items={offered} on={h.id} set={setHave} /></div>
+      <div className="setting"><small className="setting-name">{w("home.crave")}</small><Pick items={WANTS} on={want} set={setWant} /></div>
+      <div className="setting"><small className="setting-name">{w("home.haveAtHome")}</small><Pick items={offered} on={h.id} set={setHave} /></div>
       <div className="setting">
-        <small className="setting-name">Your plate</small>
-        <Weigh f={w} value={wg} set={setWg} />
+        <small className="setting-name">{w("home.yourPlate")}</small>
+        <Weigh f={cr} value={wg} set={setWg} />
         <Weigh f={h} value={hg} set={setHg} />
       </div>
       <div className="l-try-result" aria-live="polite">
-        <b>{fits ? "The plate fits" : `Under PD ${DEMO_GOAL.pd}`}</b>
+        <b>{fits ? w("home.plateFits") : w("home.underPd", { pd: DEMO_GOAL.pd })}</b>
         <div className="l-jump">
-          <div className="l-jump-from"><small>{wg} g of {wn} alone</small><b>PD {a.pd.toFixed(1)}</b><small>{a.kcal} kcal, {a.protein} g protein</small></div>
+          <div className="l-jump-from"><small>{w("home.alone", { g: wg, food: wnm })}</small><b>PD {a.pd.toFixed(1)}</b><small>{w("home.kcalProtein", { kcal: a.kcal, protein: a.protein })}</small></div>
           <b className="l-jump-arrow" aria-hidden="true">→</b>
-          <div className={fits ? "l-jump-to" : "l-jump-from"}><small>With {hg} {hu} of {hn}</small><b>PD {p.pd.toFixed(1)}</b><small>{p.kcal} kcal, {Math.round(p.protein)} g protein</small></div>
+          <div className={fits ? "l-jump-to" : "l-jump-from"}><small>{w("home.withFood", { g: hg, unit: hu, food: hn })}</small><b>PD {p.pd.toFixed(1)}</b><small>{w("home.kcalProtein", { kcal: p.kcal, protein: Math.round(p.protein) })}</small></div>
         </div>
-        <span>{w.note} {PAIR_NOTES[`${w.id}|${h.id}`] ?? ""} {fits ? `The ${hn} adds the protein, so the plate fits.` : reach ? `${need.grams} ${hu} of ${hn} reaches PD ${DEMO_GOAL.pd}.` : `${h.name} has too little protein for its calories to bring this plate to PD ${DEMO_GOAL.pd}.${others.length ? ` Try ${others.length > 1 ? `${others.slice(0, -1).join(", ")} or ${others[others.length - 1]}` : others[0]}.` : ""}`}</span>
-        {reach && <button type="button" className="pill pill-small" onClick={() => { used(); setHg(need.grams); }}>Use {need.grams} {hu}</button>}
-        <a className="l-pd-link" href="#what-pd" onClick={(e) => { e.preventDefault(); document.getElementById("what-pd")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}>What PD means ↓</a>
+        <span>{cr.note} {PAIR_NOTES[`${cr.id}|${h.id}`] ?? ""} {fits ? w("home.addsProtein", { food: hn }) : reach ? w("home.reaches", { g: need.grams, unit: hu, food: hn, pd: DEMO_GOAL.pd }) : `${w("home.tooLittle", { food: h.name, pd: DEMO_GOAL.pd })}${others.length ? ` ${w("home.tryFoods", { foods: others.length > 1 ? w("home.orList", { rest: others.slice(0, -1).join(", "), last: others[others.length - 1] }) : others[0] })}` : ""}`}</span>
+        {reach && <button type="button" className="pill pill-small" onClick={() => { used(); setHg(need.grams); }}>{w("home.useG", { g: need.grams, unit: hu })}</button>}
+        <a className="l-pd-link" href="#what-pd" onClick={(e) => { e.preventDefault(); document.getElementById("what-pd")?.scrollIntoView({ behavior: "smooth", block: "center" }); }}>{w("home.whatPd")}</a>
       </div>
       {/* HP68: what PD is, right below the result (Milan 23:53); Milan 23:48: no goal name, no "mostly energy" */}
       <div className="l-pd" id="what-pd">
-        <b>PD means protein density</b>
-        <p>PD is grams of protein in 100 kcal of food. A higher PD means more protein for the same calories. This calculator aims for PD {DEMO_GOAL.pd}, a usual target when you want to lose fat and build muscle at the same time. Below {DEMO_GOAL.pd}, the plate gives you the calories but too little protein.</p>
+        <b>{w("home.pdMeans")}</b>
+        <p>{w("home.pdExplain", { pd: DEMO_GOAL.pd })}</p>
       </div>
-      <small className="l-try-small">A simplified version of Chef Mealan: one goal, six cravings and typical values from food labels. Nothing you pick here is saved.</small>
+      <small className="l-try-small">{w("home.trySmall")}</small>
     </div>
   );
 }
 
 // HP3 (0.3.42): the waiting list's form. An email, which fits, and the tick that lets us write to you once, when it opens.
-const WHO_CHOICES = [["client", "I have a coach"], ["coach", "I am a coach"], ["self", "I train on my own"]] as const;
+const WHO_CHOICES = ["client", "coach", "self"] as const;
 export function WaitForm({ who: presetWho }: { who?: "client" | "coach" | "self" }) {
   const started = useRef(Date.now());
   const [email, setEmail] = useState("");
@@ -490,20 +491,20 @@ export function WaitForm({ who: presetWho }: { who?: "client" | "coach" | "self"
     try {
       const r = await fetch("/api/waitlist", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, who, consent, website: trap, elapsed: Date.now() - started.current }) });
       const d = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(d.error || "Couldn't send. Please write to hello@chefmealan.com.");
+      if (!r.ok) throw new Error(d.error || w("home.cantSend"));
       setState("sent");
     } catch (e: any) { setErr(e.message); setState("idle"); }
   }
-  if (state === "sent") return <div className="l-sent"><Check size={22} /> You're on the waiting list. We write to {email} once, when Chef Mealan opens.</div>;
+  if (state === "sent") return <div className="l-sent"><Check size={22} /> {w("home.onWait", { email })}</div>;
   return (
     <div className="l-form">
-      <input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} autoComplete="email" aria-label="Email for the waiting list" />
-      <div className="setting"><small className="setting-name">Which fits you?</small>
-        <div className="chip-row">{WHO_CHOICES.map(([k, l]) => <button key={k} type="button" className={`choice ${who === k ? "on" : ""}`} aria-pressed={who === k} onClick={() => setWho(k)}>{l}</button>)}</div>
+      <input placeholder={w("home.email")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} autoComplete="email" aria-label={w("home.emailWait")} />
+      <div className="setting"><small className="setting-name">{w("home.whichFits")}</small>
+        <div className="chip-row">{WHO_CHOICES.map((k) => <button key={k} type="button" className={`choice ${who === k ? "on" : ""}`} aria-pressed={who === k} onClick={() => setWho(k)}>{w(`home.who.${k}` as WordKey)}</button>)}</div>
       </div>
-      <label className="l-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} /> <span>Write to me when Chef Mealan opens. I can leave the list at any time by writing to hello@chefmealan.com.</span></label>
+      <label className="l-consent"><input type="checkbox" checked={consent} onChange={(e) => setConsent(e.target.checked)} /> <span>{w("home.consent")}</span></label>
       <input className="l-trap" tabIndex={-1} autoComplete="off" aria-hidden="true" value={trap} onChange={(e) => setTrap(e.target.value)} name="website" />
-      <button className="pill pill-primary pill-wide" disabled={state === "sending" || !email.includes("@") || !consent} onClick={send}>{state === "sending" ? "Sending…" : "Join the waiting list"}</button>
+      <button className="pill pill-primary pill-wide" disabled={state === "sending" || !email.includes("@") || !consent} onClick={send}>{state === "sending" ? w("home.sending") : w("home.joinWait")}</button>
       {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
     </div>
   );
@@ -525,27 +526,27 @@ export function RequestForm({ email: presetEmail, name: presetName, from, src, w
     try {
       const r = await fetch("/api/access-request", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name, email, phone, note, who, coach: who === "coach", from, src, website: trap, elapsed: Date.now() - started.current }) });
       const d = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(d.error || "Couldn't send. Please write to hello@chefmealan.com.");
+      if (!r.ok) throw new Error(d.error || w("home.cantSend"));
       setState("sent");
     } catch (e: any) { setErr(e.message); setState("idle"); }
   }
-  if (state === "sent") return <div className="l-sent"><Check size={22} /> Thanks, {name.split(" ")[0] || "you're on the list"}. Coach Milan will get back to you at {email}.</div>;
+  if (state === "sent") return <div className="l-sent"><Check size={22} /> {name.split(" ")[0] ? w("home.thanks", { name: name.split(" ")[0], email }) : w("home.thanksList", { email })}</div>;
   return (
     <div className="l-form">
-      <input placeholder="Your name" value={name} onChange={(e) => setName(e.target.value)} maxLength={80} autoComplete="name" />
-      <input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} autoComplete="email" />
+      <input placeholder={w("home.yourName")} value={name} onChange={(e) => setName(e.target.value)} maxLength={80} autoComplete="name" />
+      <input placeholder={w("home.email")} type="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={200} autoComplete="email" />
       {/* HP12: optional, for a WhatsApp message or a text about joining */}
       <label className="l-mobile">
-        <input placeholder="Mobile number, optional" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={30} autoComplete="tel" />
-        <small>Coach Milan may message you on WhatsApp or by text about joining. The number is used for nothing else.</small>
+        <input placeholder={w("home.mobile")} type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} maxLength={30} autoComplete="tel" />
+        <small>{w("home.mobileLine")}</small>
       </label>
-      <textarea placeholder="What are you after? (optional)" value={note} onChange={(e) => setNote(e.target.value)} maxLength={600} />
-      <div className="setting"><small className="setting-name">Which fits you?</small>
-        <div className="chip-row">{([["client", "I have a coach"], ["coach", "I am a coach"], ["self", "I train on my own"]] as const).map(([k, l]) => <button key={k} type="button" className={`choice ${who === k ? "on" : ""}`} aria-pressed={who === k} onClick={() => setWho(k)}>{l}</button>)}</div>
+      <textarea placeholder={w("home.after")} value={note} onChange={(e) => setNote(e.target.value)} maxLength={600} />
+      <div className="setting"><small className="setting-name">{w("home.whichFits")}</small>
+        <div className="chip-row">{WHO_CHOICES.map((k) => <button key={k} type="button" className={`choice ${who === k ? "on" : ""}`} aria-pressed={who === k} onClick={() => setWho(k)}>{w(`home.who.${k}` as WordKey)}</button>)}</div>
       </div>
       {/* only bots fill this */}
       <input className="l-trap" tabIndex={-1} autoComplete="off" aria-hidden="true" value={trap} onChange={(e) => setTrap(e.target.value)} name="website" />
-      <button className="pill pill-primary pill-wide" disabled={state === "sending" || !name.trim() || !email.includes("@")} onClick={send}>{state === "sending" ? "Sending…" : "Send"}</button>
+      <button className="pill pill-primary pill-wide" disabled={state === "sending" || !name.trim() || !email.includes("@")} onClick={send}>{state === "sending" ? w("home.sending") : w("home.send")}</button>
       {err && <p className="small" style={{ color: "var(--low)" }}>{err}</p>}
     </div>
   );

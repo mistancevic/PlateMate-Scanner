@@ -25,7 +25,8 @@ const PORT = "3319", U = `http://127.0.0.1:${PORT}`;
     // the top bar, one line
     const top = await page.locator(".l-top").boundingBox();
     const navs = await page.locator(".l-topnav > *").evaluateAll((els) => els.filter((e) => getComputedStyle(e).display !== "none").map((e) => e.textContent.trim()));
-    ok(navs.join("|") === "Coaches|Sign in" && top.height < 70, "the top bar on a phone: Coaches, Sign in, one line: " + navs.join(", ") + ", " + Math.round(top.height) + " px");
+    // DT236 v3 (0.3.93): the language switch sits between them
+    ok(navs.join("|") === "Coaches|EN|Sign in" && top.height < 70, "the top bar on a phone: Coaches, the language, Sign in, one line: " + navs.join(", ") + ", " + Math.round(top.height) + " px");
     // HP5 1d (0.3.46): the beta box on the first screen, over the photo carousel
     const cta = await txt(".l-photo");
     ok(/Join the beta, free/.test(cta) && /12 spots left in this round/.test(cta) && /Use it most days for four weeks, and tell us what breaks/.test(cta) && /Or join the waiting list/.test(cta) && /Milan's own cooking, at home\./.test(cta), "the beta box on the photo: the button, 12 spots, the commitment, the waiting list link, whose cooking");

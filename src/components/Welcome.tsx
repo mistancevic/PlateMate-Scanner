@@ -2,13 +2,18 @@ import { ConfirmButton } from "./Confirm";
 import { w } from "../words";
 import { APP_NAME } from "./Mark";
 import { ADULT_ONLY } from "../safety";
+import { LangAsk } from "./LangAsk";
+import { useLang } from "../lang";
 
 // Release A (7 October 2026, canvas board R1): Chef Mealan is for adults. After the sign-in, before anything else,
 // the welcome says what Chef Mealan does, that the AI can be wrong, and asks for one tap: 18 or older. The tap is kept with its date.
 export function Welcome({ name, onConfirm, onSignOut }: { name: string; onConfirm: () => void; onSignOut: (() => void) | null }) {
+  useLang();
   return (
     <div className="app-shell">
       <main className="gate">
+        {/* DT236 v3 (0.3.93): opened straight from a coach's invite, never on the home page: the same box once */}
+        <LangAsk onHome={false} />
         <b className="gate-brand">{APP_NAME}</b>
         <h1>{name ? w("welcome.welcomeName", { name }) : w("welcome.welcome")}</h1>
         <p className="gate-lead">{w("welcome.eatWhatYouCraveChef")}</p>

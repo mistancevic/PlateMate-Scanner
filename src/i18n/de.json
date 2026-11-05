@@ -11296,6 +11296,802 @@
     "summary.backToDe": {
       "text": "Zurück zu Deutsch",
       "checked": true
+    },
+    "home.coaches": {
+      "text": "Coaches",
+      "checked": true
+    },
+    "home.recipes": {
+      "text": "Rezepte",
+      "checked": true
+    },
+    "home.signIn": {
+      "text": "Anmelden",
+      "checked": true
+    },
+    "home.signedOut": {
+      "text": "Abgemeldet",
+      "checked": true
+    },
+    "home.idleLine": {
+      "text": "Auf diesem Handy wurde Chef Mealan {days} Tage lang nicht geöffnet, deshalb hat dich die App abgemeldet. Deine Daten sind in deinem Konto.",
+      "checked": true
+    },
+    "home.yourCode": {
+      "text": "Dein persönlicher Code: {code}",
+      "checked": true
+    },
+    "home.yourCodeLine": {
+      "text": "Melde dich mit Google an, mit der E-Mail-Adresse, für die dein Code erstellt wurde. Der Code ist schon für dich eingetragen.",
+      "checked": true
+    },
+    "home.theStart": {
+      "text": "Einstieg",
+      "checked": true
+    },
+    "home.kicker": {
+      "text": "Für alle mit einem Ernährungsplan",
+      "checked": true
+    },
+    "home.h1": {
+      "text": "Lebe deinen Ernährungsplan, Tag für Tag.",
+      "checked": true
+    },
+    "home.lead": {
+      "text": "Chef Mealan plant deine Mahlzeiten mit dir und findet die Mahlzeit, die trotzdem passt, wenn dich der Tag überrascht.",
+      "checked": true
+    },
+    "home.joinWait": {
+      "text": "Zur Warteliste anmelden",
+      "checked": true
+    },
+    "home.joinBeta": {
+      "text": "Kostenlos an der Beta teilnehmen",
+      "checked": true
+    },
+    "home.roundFull": {
+      "text": "Diese Beta-Runde ist voll.",
+      "checked": true
+    },
+    "home.spotsLeft": {
+      "text": "Noch {n} Platz in dieser Runde|Noch {n} Plätze in dieser Runde",
+      "checked": true
+    },
+    "home.waitOnce": {
+      "text": "Melde dich zur Warteliste an, und wir schreiben dir ein einziges Mal: wenn Chef Mealan für alle öffnet.",
+      "checked": true
+    },
+    "home.betaLine": {
+      "text": "Nutze die App vier Wochen lang an den meisten Tagen und sag uns, was nicht funktioniert.",
+      "checked": true
+    },
+    "home.orWait": {
+      "text": "Oder zur Warteliste anmelden",
+      "checked": true
+    },
+    "home.ownCooking": {
+      "text": "Von Milan selbst gekocht, zu Hause.",
+      "checked": true
+    },
+    "home.tryHere": {
+      "text": "Probier es hier aus",
+      "checked": true
+    },
+    "home.calcTitle": {
+      "text": "So passt dein Heißhunger in deinen Plan",
+      "checked": true
+    },
+    "home.calcLine": {
+      "text": "Wähle, worauf du Lust hast, und ein Lebensmittel, das du zu Hause hast. Sieh, wie viel davon du brauchst, damit der Teller passt.",
+      "checked": true
+    },
+    "home.waysEyebrow": {
+      "text": "Egal, womit du startest",
+      "checked": true
+    },
+    "home.waysTitle": {
+      "text": "Was du isst, in Sekunden erfasst",
+      "checked": true
+    },
+    "home.waysLead": {
+      "text": "Scanne einen Barcode oder eine Nährwerttabelle, oder fotografiere die Mahlzeit vor dir. Alles landet auf deinem Teller.",
+      "checked": true
+    },
+    "home.way.barcode": {
+      "text": "Ein Barcode oder ein Etikett",
+      "checked": true
+    },
+    "home.way.barcodeLine": {
+      "text": "Die Werte der Packung, oder das Etikett aus einem Foto gelesen, bei Bedarf von jeder Seite. Du prüfst es.",
+      "checked": true
+    },
+    "home.way.meal": {
+      "text": "Ein Foto deiner Mahlzeit",
+      "checked": true
+    },
+    "home.way.mealLine": {
+      "text": "Chef Mealan benennt die Lebensmittel und schätzt die Grammzahl. Du korrigierst, was du weißt.",
+      "checked": true
+    },
+    "home.onePlate": {
+      "text": "Ein Teller",
+      "checked": true
+    },
+    "home.onePlateTitle": {
+      "text": "Alles landet auf einem Teller",
+      "checked": true
+    },
+    "home.pdB": {
+      "text": "PD, Proteindichte:",
+      "checked": true
+    },
+    "home.pdText": {
+      "text": "Gramm Protein pro 100 kcal. Dein Zielwert ergibt sich aus deinem Ziel, deinem Körper und deinem Training. Die große Zahl zeigt, wo der Teller im Vergleich dazu steht.",
+      "checked": true
+    },
+    "home.fcB": {
+      "text": "F C Fi P:",
+      "checked": true
+    },
+    "home.fcText": {
+      "text": "Fett, Kohlenhydrate, Ballaststoffe, Protein, in der Reihenfolge einer Nährwerttabelle. Ein Großbuchstabe: so, wie dein Tag es braucht. Klein: darunter. Ein Plus: mehr, als dein Tag braucht. Ein Minus: fast nichts.",
+      "checked": true
+    },
+    "home.decideB": {
+      "text": "Dann entscheidest du:",
+      "checked": true
+    },
+    "home.decideText": {
+      "text": "essen, eine Portion essen, eine Proteinbeilage dazunehmen oder Chef Mealan an dein Ziel anpassen lassen.",
+      "checked": true
+    },
+    "home.videoPlate": {
+      "text": "Ein Teller: PD, die Buchstaben und die Zahlen dahinter",
+      "checked": true
+    },
+    "home.plan": {
+      "text": "Plan",
+      "checked": true
+    },
+    "home.recipesTitle": {
+      "text": "Rezepte für deinen Tag",
+      "checked": true
+    },
+    "home.recipesLine": {
+      "text": "Deine eigenen, die von deinem Coach und die der Mitglieder, sortiert nach dem, was von deinem Tag noch übrig ist. Wähle eins für eine Mahlzeit in deinem Plan.",
+      "checked": true
+    },
+    "home.shop": {
+      "text": "Einkaufen",
+      "checked": true
+    },
+    "home.shopTitle": {
+      "text": "Deine Einkaufsliste",
+      "checked": true
+    },
+    "home.shopLine": {
+      "text": "Die Lebensmittel der geplanten Woche zusammengerechnet, mit den Mahlzeiten, für die sie gedacht sind. Hake beim Einkaufen ab.",
+      "checked": true
+    },
+    "home.clipsPacks": {
+      "text": "Clips der App mit Testdaten. Die Packungen darin sind erfunden.",
+      "checked": true
+    },
+    "home.cook": {
+      "text": "Kochen",
+      "checked": true
+    },
+    "home.cookTitle": {
+      "text": "Freihändig kochen",
+      "checked": true
+    },
+    "home.cook1": {
+      "text": "Ein großer Schritt nach dem anderen, laut vorgelesen.",
+      "checked": true
+    },
+    "home.cook2": {
+      "text": "Sag weiter, zurück, nochmal, oder starte einen Timer.",
+      "checked": true
+    },
+    "home.cook3": {
+      "text": "Frag Chef Mealan zwischendurch: wie viel noch übrig ist, was tun, wenn die Pfanne zu heiß ist.",
+      "checked": true
+    },
+    "home.cook4": {
+      "text": "Bilder unter den Schritten, deine eigenen oder gezeichnete.",
+      "checked": true
+    },
+    "home.cook5": {
+      "text": "Ein zweites Handy oder ein Tablet auf der Arbeitsfläche zeigt die Schritte.",
+      "checked": true
+    },
+    "home.videoCook": {
+      "text": "Kochmodus: ein Schritt nach dem anderen, laut vorgelesen",
+      "checked": true
+    },
+    "home.situEyebrow": {
+      "text": "Entdecken · Situationen",
+      "checked": true
+    },
+    "home.situTitle": {
+      "text": "Dein Tag, wie er wirklich läuft",
+      "checked": true
+    },
+    "home.situLine": {
+      "text": "Ein später Abend bei der Arbeit, eine Party, ein Tag unterwegs, eine schlechte Nacht. In Entdecken hat jede Situation eine eigene Seite, abgeglichen mit deinem eigenen Plan.",
+      "checked": true
+    },
+    "home.andInPlan": {
+      "text": "Und in deinem Plan:",
+      "checked": true
+    },
+    "home.situ1": {
+      "text": "Belegte Zeiten aus deinem Google Kalender: Fällt eine Mahlzeit in einen Termin, fragt die App, ob vorher oder nachher.",
+      "checked": true
+    },
+    "home.situ2": {
+      "text": "Reisemodus: die Läden und die Küche an dem Ort, an dem du gerade bist.",
+      "checked": true
+    },
+    "home.situ3": {
+      "text": "Ein Tag ohne Training: was sich ändert und was bleibt.",
+      "checked": true
+    },
+    "home.videoSitu": {
+      "text": "Ein später Abend nach der Arbeit, in Entdecken",
+      "checked": true
+    },
+    "home.bodyEyebrow": {
+      "text": "Entdecken · Körper und Nährstoffe",
+      "checked": true
+    },
+    "home.bodyTitle": {
+      "text": "Versteh das Warum, nicht nur das Was",
+      "checked": true
+    },
+    "home.body1": {
+      "text": "Der Körper, die Situationen und die Nährstoffe an einem Ort. Hinter jeder Zeile steht eine Studie. Jede Seite sagt, wann etwas hilft und wann es schadet, und schaut sich dann deine eigenen Tage an.",
+      "checked": true
+    },
+    "home.body2": {
+      "text": "Keine Erkrankungen, keine Laborwerte, keine Nahrungsergänzungsmittel. Wenn eine Erkrankung bestimmt, was du isst, entscheidet das dein Arzt.",
+      "checked": true
+    },
+    "home.videoBody": {
+      "text": "Entdecken: der Körper, seine acht Familien",
+      "checked": true
+    },
+    "home.clipsNames": {
+      "text": "Clips der App mit Testdaten. Die Namen darin sind erfunden.",
+      "checked": true
+    },
+    "home.kitchen": {
+      "text": "Aus der Küche",
+      "checked": true
+    },
+    "home.kitchenTitle": {
+      "text": "Rezepte mit fertig berechneten Zahlen",
+      "checked": true
+    },
+    "home.kitchenLine": {
+      "text": "Rezepte, die Coach Milan gekocht und abgewogen hat, mit den Zahlen neben dem Foto. In der App berechnet Chef Mealan, wie viel von jedem Lebensmittel zu deinem Ziel passt.",
+      "checked": true
+    },
+    "home.allRecipes": {
+      "text": "Alle Rezepte →",
+      "checked": true
+    },
+    "home.forCoaches": {
+      "text": "Für Coaches",
+      "checked": true
+    },
+    "home.coachTitle": {
+      "text": "Begleite die echten Tage deiner Klienten",
+      "checked": true
+    },
+    "home.coachLine": {
+      "text": "Ein Konto, zwei Ansichten: dein eigener Tag und deine Klienten. Du siehst den Tag jedes Klienten so, wie er selbst ihn sieht: den Plan, die Mahlzeiten, die Karten, die er teilt.",
+      "checked": true
+    },
+    "home.coach1": {
+      "text": "Schlag einen Snack oder eine Seite aus Entdecken vor. Dein Klient nimmt mit einem Tippen an. Seinen Plan änderst du nie.",
+      "checked": true
+    },
+    "home.coach2": {
+      "text": "Antworte auf eine geteilte Mahlzeit mit einer Zeile, oder reagiere mit Gut oder Gesehen.",
+      "checked": true
+    },
+    "home.coach3": {
+      "text": "Wartet auf dich: Was deine Antwort braucht, steht ganz oben.",
+      "checked": true
+    },
+    "home.coach4": {
+      "text": "Dein Klient entscheidet, was du siehst. Körperdaten bleiben ausgeschaltet, bis er sie einschaltet.",
+      "checked": true
+    },
+    "home.videoCoach": {
+      "text": "Meine Klienten: Wartet auf dich ganz oben",
+      "checked": true
+    },
+    "home.getCoachCode": {
+      "text": "Coach-Code anfordern",
+      "checked": true
+    },
+    "home.coachSmall": {
+      "text": "Coaches in der Beta: kostenlos, die gleichen vier Wochen, und deine Klienten treten mit deinem Code bei.",
+      "checked": true
+    },
+    "home.behind": {
+      "text": "Wer hinter Chef Mealan steht",
+      "checked": true
+    },
+    "home.role": {
+      "text": "Produkt- und Rezeptentwickler, und der Macher von Chef Mealan.",
+      "checked": true
+    },
+    "home.behind1": {
+      "text": "Milan ist Senior Product Manager mit rund 20 Jahren in der Softwarebranche und Gründer mehrerer Startups. Er entwirft und baut Chef Mealan mit KI, von der ersten Skizze bis zu jedem Release.",
+      "checked": true
+    },
+    "home.behind2": {
+      "text": "Milan kocht jeden Tag für sich und seine Familie, in München, und entwickelt seine eigenen Rezepte, abgewogen. Die Rezepte, die er gekocht hat, sind mit Aus der Küche markiert; die Zahlen stammen von Etiketten und aus Nährwerttabellen.",
+      "checked": true
+    },
+    "home.authorOf": {
+      "text": "Autor von {wb} und {wn}. Als Nächstes kommt Worth Eating.",
+      "checked": true
+    },
+    "home.howBuilt": {
+      "text": "Wie Chef Mealan gebaut ist ›",
+      "checked": true
+    },
+    "home.moreMilan": {
+      "text": "Mehr über Milan ›",
+      "checked": true
+    },
+    "home.chefAlt": {
+      "text": "Milan Stancevic, der Mensch hinter Chef Mealan, mit Kochmütze",
+      "checked": true
+    },
+    "home.numbersEyebrow": {
+      "text": "So funktionieren die Zahlen",
+      "checked": true
+    },
+    "home.numbersTitle": {
+      "text": "Zahlen, die du prüfen kannst",
+      "checked": true
+    },
+    "home.n1b": {
+      "text": "Die Mathematik macht ein Rechner",
+      "checked": true
+    },
+    "home.n1p": {
+      "text": "Deine Tageswerte und die Gramm auf jedem Teller stammen aus veröffentlichten Formeln. Du kannst jede Zahl öffnen und sehen, wie Chef Mealan darauf gekommen ist.",
+      "checked": true
+    },
+    "home.n2b": {
+      "text": "KI liest, ein Rechner entscheidet",
+      "checked": true
+    },
+    "home.n2p": {
+      "text": "Chef Mealan nutzt KI, um Etiketten, Speisekarten und Ladenregale zu lesen und dir im Chat zu antworten. Die Zahlen selbst kommen von einem Rechner, nicht von der KI. Wenn die KI eine Zahl aus einem Foto schätzen muss, markiert die App diese Zahl als Schätzung.",
+      "checked": true
+    },
+    "home.n3b": {
+      "text": "Deine Daten bleiben in der EU",
+      "checked": true
+    },
+    "home.n3p": {
+      "text": "Deine Daten werden in der EU gespeichert, in Belgien und Frankfurt, in deinem Konto. Du kannst sie jederzeit komplett herunterladen oder komplett löschen.",
+      "checked": true
+    },
+    "home.n4b": {
+      "text": "Studien noch einmal gelesen",
+      "checked": true
+    },
+    "home.n4p": {
+      "text": "Jede Zahl, die Entdecken einer Studie zuschreibt, wird vor jedem Release mit der Studie selbst abgeglichen.",
+      "checked": true
+    },
+    "home.n5b": {
+      "text": "Nichts wird grundlos aufbewahrt",
+      "checked": true
+    },
+    "home.n5p": {
+      "text": "Ein Konto, das 12 Monate lang niemand öffnet, wird gelöscht, mit allem, was darin ist.",
+      "checked": true
+    },
+    "home.freeGuide": {
+      "text": "Ein kostenloser Leitfaden",
+      "checked": true
+    },
+    "home.bookLine": {
+      "text": "PD, die Zahl, die auf keiner Packung steht, und fünf weitere Zahlen zu deinem Essen: was dir jede sagt und wie du sie bei deiner nächsten Mahlzeit nutzt.",
+      "checked": true
+    },
+    "home.seeBook": {
+      "text": "Zum Buch ›",
+      "checked": true
+    },
+    "home.coverAlt": {
+      "text": "Das Cover von {name}",
+      "checked": true
+    },
+    "home.whoEyebrow": {
+      "text": "Für wen",
+      "checked": true
+    },
+    "home.whoTitle": {
+      "text": "Für alle, die nach Plan essen, und die Coaches, die ihn erstellen",
+      "checked": true
+    },
+    "home.who1": {
+      "text": "Du hast einen Ernährungsplan, von einem Coach oder selbst erstellt, und willst ihn Tag für Tag leben.",
+      "checked": true
+    },
+    "home.who2": {
+      "text": "Du trainierst und willst bei jeder Mahlzeit deine eigenen Zahlen, ohne Ernährungstagebuch.",
+      "checked": true
+    },
+    "home.who3": {
+      "text": "Du bist Coach und willst die echten Tage deiner Klienten sehen und Vorschläge machen, statt hinterherzulaufen.",
+      "checked": true
+    },
+    "home.adults": {
+      "text": "Chef Mealan ist für Erwachsene ab 18 Jahren.",
+      "checked": true
+    },
+    "home.disclaimer": {
+      "text": "Haftungsausschluss",
+      "checked": true
+    },
+    "home.notDoctor": {
+      "text": "Chef Mealan ist kein Arzt",
+      "checked": true
+    },
+    "home.disclaimerLine": {
+      "text": "Wenn eine Erkrankung bestimmt, was du isst, wenn du schwanger bist oder Diabetes hast, oder wenn dir das Essen schwerfällt, gibt Chef Mealan keine Ratschläge und sagt dir stattdessen, mit wem du sprechen kannst.",
+      "checked": true
+    },
+    "home.fullDisclaimer": {
+      "text": "Der vollständige Haftungsausschluss (auf Englisch) ›",
+      "checked": true
+    },
+    "home.nextRound": {
+      "text": "Die nächste Beta-Runde",
+      "checked": true
+    },
+    "home.fullForm": {
+      "text": "Diese Runde ist voll. Hinterlass deinen Namen und deine E-Mail-Adresse, und Coach Milan schreibt dir, wenn die nächste Runde startet.",
+      "checked": true
+    },
+    "home.betaForm": {
+      "text": "Nutze Chef Mealan vier Wochen lang an den meisten Tagen und sag uns, was nicht funktioniert. Die meisten steigen mit einem Code von ihrem Coach ein. Wenn du keinen hast, hinterlass deinen Namen und deine E-Mail-Adresse, und Coach Milan schickt dir einen persönlichen Code.",
+      "checked": true
+    },
+    "home.waitTitle": {
+      "text": "Die Warteliste",
+      "checked": true
+    },
+    "home.waitForm": {
+      "text": "Für den Moment, in dem Chef Mealan für alle öffnet. Kein Testen, jetzt kein Code. Wir schreiben dir ein einziges Mal, wenn es so weit ist.",
+      "checked": true
+    },
+    "home.footBehind": {
+      "text": "Wer dahintersteht",
+      "checked": true
+    },
+    "home.footBuilt": {
+      "text": "Wie Chef Mealan gebaut ist",
+      "checked": true
+    },
+    "home.footPrivacy": {
+      "text": "Datenschutzhinweis (auf Englisch)",
+      "checked": true
+    },
+    "home.photos": {
+      "text": "Fotos",
+      "checked": true
+    },
+    "home.photoOf": {
+      "text": "{name}, Foto {i} von {n}",
+      "checked": true
+    },
+    "home.photo.curry": {
+      "text": "Curry mit Reis",
+      "checked": true
+    },
+    "home.photo.meatballs": {
+      "text": "Fleischbällchen in der Pfanne",
+      "checked": true
+    },
+    "home.photo.quesadilla": {
+      "text": "Quesadilla",
+      "checked": true
+    },
+    "home.photo.waffle": {
+      "text": "Waffel",
+      "checked": true
+    },
+    "home.photo.squares": {
+      "text": "Schokoschnitten",
+      "checked": true
+    },
+    "home.crave": {
+      "text": "Du hast Lust auf",
+      "checked": true
+    },
+    "home.haveAtHome": {
+      "text": "Du hast zu Hause",
+      "checked": true
+    },
+    "home.yourPlate": {
+      "text": "Dein Teller",
+      "checked": true
+    },
+    "home.kcalProtein": {
+      "text": "{kcal} kcal, {protein} g Protein",
+      "checked": true
+    },
+    "home.less": {
+      "text": "{step} {unit} weniger {food}",
+      "checked": true
+    },
+    "home.more": {
+      "text": "{step} {unit} mehr {food}",
+      "checked": true
+    },
+    "home.plateFits": {
+      "text": "Der Teller passt",
+      "checked": true
+    },
+    "home.underPd": {
+      "text": "Unter PD {pd}",
+      "checked": true
+    },
+    "home.alone": {
+      "text": "{g} g {food} allein",
+      "checked": true
+    },
+    "home.withFood": {
+      "text": "Mit {g} {unit} {food}",
+      "checked": true
+    },
+    "home.addsProtein": {
+      "text": "{food} liefert das Protein, so passt der Teller.",
+      "checked": true
+    },
+    "home.reaches": {
+      "text": "Mit {g} {unit} {food} erreicht der Teller PD {pd}.",
+      "checked": true
+    },
+    "home.tooLittle": {
+      "text": "{food} hat im Verhältnis zu den Kalorien zu wenig Protein, um diesen Teller auf PD {pd} zu bringen.",
+      "checked": true
+    },
+    "home.tryFoods": {
+      "text": "Versuch es mit {foods}.",
+      "checked": true
+    },
+    "home.orList": {
+      "text": "{rest} oder {last}",
+      "checked": true
+    },
+    "home.useG": {
+      "text": "{g} {unit} nehmen",
+      "checked": true
+    },
+    "home.whatPd": {
+      "text": "Was PD bedeutet ↓",
+      "checked": true
+    },
+    "home.pdMeans": {
+      "text": "PD bedeutet Proteindichte",
+      "checked": true
+    },
+    "home.pdExplain": {
+      "text": "PD ist die Menge Protein in Gramm pro 100 kcal eines Lebensmittels. Eine höhere PD bedeutet mehr Protein bei gleichen Kalorien. Dieser Rechner zielt auf PD {pd} ab, ein üblicher Zielwert, wenn du gleichzeitig Fett verlieren und Muskeln aufbauen willst. Unter {pd} liefert dir der Teller die Kalorien, aber zu wenig Protein.",
+      "checked": true
+    },
+    "home.trySmall": {
+      "text": "Eine vereinfachte Version von Chef Mealan: ein Ziel, sechs Gelüste und typische Werte von Nährwertetiketten. Nichts, was du hier auswählst, wird gespeichert.",
+      "checked": true
+    },
+    "home.food.granola": {
+      "text": "Granola",
+      "checked": true
+    },
+    "home.food.granolaOf": {
+      "text": "Granola",
+      "checked": true
+    },
+    "home.food.granolaNote": {
+      "text": "Granola wirkt gesund, bringt aber viele Kalorien und wenig Protein.",
+      "checked": true
+    },
+    "home.food.spread": {
+      "text": "Schokoaufstrich",
+      "checked": true
+    },
+    "home.food.spreadOf": {
+      "text": "Schokoaufstrich",
+      "checked": true
+    },
+    "home.food.spreadNote": {
+      "text": "Schokoaufstrich allein besteht vor allem aus Zucker und Fett.",
+      "checked": true
+    },
+    "home.food.peanut": {
+      "text": "Erdnussbutter",
+      "checked": true
+    },
+    "home.food.peanutOf": {
+      "text": "Erdnussbutter",
+      "checked": true
+    },
+    "home.food.peanutNote": {
+      "text": "Erdnussbutter hat Protein, besteht allein aber vor allem aus Fett.",
+      "checked": true
+    },
+    "home.food.icecream": {
+      "text": "Eis",
+      "checked": true
+    },
+    "home.food.icecreamOf": {
+      "text": "Eis",
+      "checked": true
+    },
+    "home.food.icecreamNote": {
+      "text": "Eis allein besteht vor allem aus Zucker und Fett.",
+      "checked": true
+    },
+    "home.food.pizza": {
+      "text": "Pizzastück",
+      "checked": true
+    },
+    "home.food.pizzaOf": {
+      "text": "Pizza",
+      "checked": true
+    },
+    "home.food.pizzaNote": {
+      "text": "Pizza allein besteht vor allem aus Teig und Käse.",
+      "checked": true
+    },
+    "home.food.crisps": {
+      "text": "Chips",
+      "checked": true
+    },
+    "home.food.crispsOf": {
+      "text": "Chips",
+      "checked": true
+    },
+    "home.food.crispsNote": {
+      "text": "Chips allein bestehen vor allem aus Fett und Stärke.",
+      "checked": true
+    },
+    "home.food.milk": {
+      "text": "Milch 1,5 %",
+      "checked": true
+    },
+    "home.food.skyr": {
+      "text": "Skyr",
+      "checked": true
+    },
+    "home.food.yogurt": {
+      "text": "Joghurt griechischer Art",
+      "checked": true
+    },
+    "home.food.cottage": {
+      "text": "Hüttenkäse",
+      "checked": true
+    },
+    "home.food.whey": {
+      "text": "Whey-Pulver",
+      "checked": true
+    },
+    "home.food.tuna": {
+      "text": "Thunfisch",
+      "checked": true
+    },
+    "home.food.chicken": {
+      "text": "Hähnchenbrust",
+      "checked": true
+    },
+    "home.food.eggwhite": {
+      "text": "Eiklar",
+      "checked": true
+    },
+    "home.food.dip": {
+      "text": "Joghurt-Dip",
+      "checked": true
+    },
+    "home.pair.pizzaTuna": {
+      "text": "Pizza mit Thunfisch ist eine Pizza Tonno.",
+      "checked": true
+    },
+    "home.who.client": {
+      "text": "Ich habe einen Coach",
+      "checked": true
+    },
+    "home.who.coach": {
+      "text": "Ich bin Coach",
+      "checked": true
+    },
+    "home.who.self": {
+      "text": "Ich trainiere eigenständig",
+      "checked": true
+    },
+    "home.cantSend": {
+      "text": "Senden hat nicht geklappt. Bitte schreib an hello@chefmealan.com.",
+      "checked": true
+    },
+    "home.onWait": {
+      "text": "Du bist auf der Warteliste. Wir schreiben einmal an {email}, wenn Chef Mealan öffnet.",
+      "checked": true
+    },
+    "home.email": {
+      "text": "E-Mail",
+      "checked": true
+    },
+    "home.emailWait": {
+      "text": "E-Mail für die Warteliste",
+      "checked": true
+    },
+    "home.whichFits": {
+      "text": "Was passt zu dir?",
+      "checked": true
+    },
+    "home.consent": {
+      "text": "Schreibt mir, wenn Chef Mealan öffnet. Ich kann die Liste jederzeit verlassen, indem ich an hello@chefmealan.com schreibe.",
+      "checked": true
+    },
+    "home.sending": {
+      "text": "Wird gesendet…",
+      "checked": true
+    },
+    "home.send": {
+      "text": "Senden",
+      "checked": true
+    },
+    "home.thanks": {
+      "text": "Danke, {name}. Coach Milan meldet sich bei dir unter {email}.",
+      "checked": true
+    },
+    "home.thanksList": {
+      "text": "Danke, du bist auf der Liste. Coach Milan meldet sich bei dir unter {email}.",
+      "checked": true
+    },
+    "home.yourName": {
+      "text": "Dein Name",
+      "checked": true
+    },
+    "home.mobile": {
+      "text": "Handynummer, optional",
+      "checked": true
+    },
+    "home.mobileLine": {
+      "text": "Coach Milan schreibt dir eventuell per WhatsApp oder SMS wegen der Teilnahme. Die Nummer wird für nichts anderes genutzt.",
+      "checked": true
+    },
+    "home.after": {
+      "text": "Worum geht es dir? (optional)",
+      "checked": true
+    },
+    "home.language": {
+      "text": "Sprache",
+      "checked": true
+    },
+    "home.metaTitle": {
+      "text": "Chef Mealan: Lebe deinen Ernährungsplan, Tag für Tag",
+      "checked": true
+    },
+    "home.metaDesc": {
+      "text": "Chef Mealan plant deine Mahlzeiten mit dir. Wenn der Tag dich überrascht oder der Heißhunger kommt, findet Chef Mealan die Mahlzeit, die noch zu deinen Zahlen passt. Für Erwachsene mit Ernährungsplan.",
+      "checked": true
+    },
+    "home.footDisclaimer": {
+      "text": "Haftungsausschluss (auf Englisch)",
+      "checked": true
     }
   }
 }

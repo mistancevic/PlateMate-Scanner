@@ -2911,3 +2911,26 @@ html[lang="de"] .pill-tall { min-height: 56px; }
 html[lang="de"] .topbar { flex-wrap: wrap; row-gap: 0; padding-right: 60px; }
 html[lang="de"] .topbar .menu-button { position: absolute; right: 18px; top: calc(13px + env(safe-area-inset-top, 0px)); }
 html[lang="de"] .topbar .ref { flex: 0 0 auto; min-width: auto; overflow: visible; }
+
+/* DT236 v3 (0.3.93, boards Stories177 and Stories180): the language switch in the home page's header, the box once, and a
+   header that fits on a phone in every language (Anmelden is the longest) */
+.lang-switch { position: relative; display: inline-flex; }
+.lang-switch-btn { min-width: 44px; min-height: 44px; padding: 0 8px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface); color: var(--brand-text); font-weight: 800; font-size: 14px; }
+.lang-switch-menu { position: absolute; right: 0; top: 52px; z-index: 50; display: grid; gap: 2px; width: 200px; padding: 6px; background: var(--surface); border: 1.5px solid var(--line); border-radius: var(--r-card); box-shadow: var(--shadow-float); }
+.lang-switch-menu button { display: flex; align-items: center; gap: 6px; min-height: 44px; padding: 0 12px; border: 0; border-radius: var(--r-control); background: transparent; color: var(--ink); font-weight: 800; text-align: left; }
+.lang-switch-menu button span { display: inline-block; width: 1.1em; }
+.lang-switch-menu button.on { background: var(--tint); }
+.lang-ask { display: grid; gap: 4px; margin: 0 0 12px; padding: 12px 16px 14px; background: var(--tint); border-radius: var(--r-card); }
+.lang-ask b { font-size: var(--fs-card); } .lang-ask small { color: var(--muted); }
+.lang-ask-acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; } .lang-ask-acts .pill { min-height: 44px; }
+@media (max-width: 759px) {
+  .l-topnav { gap: 6px; }
+  .l-brand { gap: 6px; } .l-brand b { font-size: 17px; } .l-brand svg { height: 26px; width: auto; }
+  .lang-switch-btn { padding: 0 6px; }
+}
+/* the smallest phones (360 px): a little more room, so Anmelden still fits */
+@media (max-width: 380px) {
+  .l-top { margin-inline: -8px; }
+  .l-topnav { gap: 4px; } .l-brand { gap: 4px; } .l-brand b { font-size: 16px; }
+  .l-signin.pill { padding: 0 8px; }
+}

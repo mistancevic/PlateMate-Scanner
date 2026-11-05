@@ -527,17 +527,19 @@
       "id": "DT236",
       "title": "The home page in Srpski and Deutsch, the suggestion once, and the language switch",
       "epic": "lang",
-      "state": "next",
-      "why": "Coach Milan 4 November 15:25 to 16:18 (v1, v2: Stories177): chefmealan.com stays English, /sr in Srpski, a box once on a phone in Serbian, a switch in the header that shows the language that is on. 5 November 11:26 (v3, Stories180): the German home page too, /de, a box once on a phone in German (Auf Deutsch or Continue in English), the switch with EN, SR, DE; on a phone the header gets smaller gaps, a slightly smaller name and no arrow so Anmelden fits; the clips stay English on all three pages until this phase is done; the home page gets its own area in both tables. Waits for Go.",
-      "board": 180
+      "state": "done",
+      "why": "Coach Milan 4 November 15:25 to 16:18 (v1, v2: Stories177): chefmealan.com stays English, /sr in Srpski, a box once on a phone in Serbian, a switch in the header that shows the language that is on. 5 November 11:26 (v3, Stories180): the German home page too, /de, a box once on a phone in German (Auf Deutsch or Continue in English), the switch with EN, SR, DE; on a phone the header gets smaller gaps, a slightly smaller name and no arrow so Anmelden fits; the clips stay English on all three pages until this phase is done; the home page gets its own area in both tables. Waits for Go. Go 5 November 11:36 (the switch says Deutsch (Beta)). Built in 0.3.93: 199 home page lines in words (home.*), /sr and /de with their own title and search line, the switch EN SR DE, the box once on the home page and on Welcome (src/langAsk.ts, components/LangAsk.tsx), the phone header fitted. Deutsch shows at once; Srpski once Coach Milan confirms the Home page area in his table. The clips stay English. Walkthrough home-languages.cjs.",
+      "board": 180,
+      "version": "0.3.93"
     },
     {
       "id": "DT238",
       "title": "Deutsch (Beta): Claude's German drafts for testers in Munich, and the layout fixes for long words",
       "epic": "lang",
-      "state": "next",
-      "why": "Coach Milan 5 November 10:54 to 10:59: German now with the process we have; a new tester in Munich (Croatian, good German) uses the app as a plain user and says what does not make sense; nothing changes for anyone else; the pitch: a multilingual app, the next language easy to add. Claude drafted all 2,818 lines (du, Teller for Plate, PD stays) into the table Chef Mealan Deutsch (artifact Pb2nuwf2zAQZ6ReatRzkSo, drafts in its rows.json, edits in its lines collection). Sweep at 390 and 360 px against English found four breaks: Today's three buttons wrap, the Plate's An mein Ziel anpassen is cut, on 360 px the wide Plan button is cut and a long title cuts the goal line; and the code lower-cases meal names. Board Stories179 drawn 5 November: Deutsch (Beta) in Settings, drafts show without a Confirm, safety answers English until confirmed; layout fixes that work for every language. Waits for Go.",
-      "board": 179
+      "state": "done",
+      "why": "Coach Milan 5 November 10:54 to 10:59: German now with the process we have; a new tester in Munich (Croatian, good German) uses the app as a plain user and says what does not make sense; nothing changes for anyone else; the pitch: a multilingual app, the next language easy to add. Claude drafted all 2,818 lines (du, Teller for Plate, PD stays) into the table Chef Mealan Deutsch (artifact Pb2nuwf2zAQZ6ReatRzkSo, drafts in its rows.json, edits in its lines collection). Sweep at 390 and 360 px against English found four breaks: Today's three buttons wrap, the Plate's An mein Ziel anpassen is cut, on 360 px the wide Plan button is cut and a long title cuts the goal line; and the code lower-cases meal names. Board Stories179 drawn 5 November: Deutsch (Beta) in Settings, drafts show without a Confirm, safety answers English until confirmed; layout fixes that work for every language. Waits for Go. Go 5 November 11:36 (Milan: Beta, every line confirmed as Beta, the safety lines too). Built in 0.3.92: Deutsch (Beta) in Settings, de.json, the German layout fixes, cook mode in German, the coach's copy in Deutsch; deLines.test.ts and walkthrough deutsch.cjs.",
+      "board": 179,
+      "version": "0.3.92"
     },
     {
       "id": "DT235",
