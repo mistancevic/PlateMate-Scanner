@@ -547,7 +547,7 @@
       "epic": "lang",
       "state": "next",
       "board": 181,
-      "why": "Coach Milan 5 November 15:16 to 15:19, agreed: design and copy in English; every release ships in Srpski and Deutsch too. Claude drafts each new or changed line in both in the same build; German goes in as Beta, Srpski once confirmed. The tables show a group New in 0.3.xx first; each translation keeps the English it was made for, and a changed English line goes back to To confirm (Srpski) and is redrafted (German). A test stops a release with a line missing its Srpski or German. The German sweep at 390 and 360 px runs every release. Board drawn 5 November; waits for Go."
+      "why": "Coach Milan 5 November 15:16 to 15:19, agreed: design and copy in English; every release ships in Srpski and Deutsch too. Claude drafts each new or changed line in both in the same build; German goes in as Beta, Srpski once confirmed. The tables show a group New in 0.3.xx first; each translation keeps the English it was made for, and a changed English line goes back to To confirm (Srpski) and is redrafted (German). A test stops a release with a line missing its Srpski or German. The German sweep at 390 and 360 px runs every release. Board drawn 5 November; waits for Go. Milan 15:32: the group is named by version, New in 0.3.95."
     },
     {
       "id": "DT235",
