@@ -3,7 +3,8 @@ import { wIn, wUnit } from "./units";
 // and the coach agree on. The chat reads the same page, so Chef Mealan and the coach say the same thing.
 // Sources: Iraki et al. 2019 (surplus, weekly rate, protein per meal); Aragon (muscle gain by training age);
 // Helms et al. 2014 (protein when losing fat); ISSN 2017 (protein range).
-import { bandOf, goalLabel, type Goal, type TrainingAge } from "./goal";
+import { bandOf, goalLabel, goalName, type Goal, type TrainingAge } from "./goal";
+import { w, dateText, type WordKey } from "./words";
 
 export type Guide = { happens: string; training: string; food: string; watch: string; mistakes: string; switchWhen: string };
 export const GUIDE_PARTS: { key: keyof Guide; name: string }[] = [
@@ -71,17 +72,19 @@ const kg = (w: number | undefined, pctLo: number, pctHi: number) => {
   return `${f(pctLo)}–${f(pctHi)} ${wUnit()}`;
 };
 export type Sheet = { title: string; byLine: string; food: string; weight: string; counted: string; progress: string; checkIn: string };
-const FOOD: Record<string, string> = { fatloss: "about 20 % less than you burn", recomp: "about 10 % less than you burn", maintain: "as much as you burn", gainsteady: "about 5 % more than you burn", gain: "about 10 % more than you burn", performance: "about 5 % more, more of it carbs" };
-const PROGRESS: Record<string, string> = { fatloss: "weight and waist down, lifts holding", recomp: "waist down, lifts up, weight about the same", maintain: "weight in its range", gainsteady: "heavier lifts, waist about the same", gain: "weight up at the pace, lifts up, waist rising slowly", performance: "training going well, weight stable" };
+const FOOD: Record<string, string> = { fatloss: "", recomp: "", maintain: "", gainsteady: "", gain: "", performance: "" };
+const foodOf = (id: string) => (id in FOOD ? w(`sheet.food.${id}` as WordKey) : "");
+const PROGRESS: Record<string, string> = { fatloss: "", recomp: "", maintain: "", gainsteady: "", gain: "", performance: "" };
+const progressOf = (id: string) => (id in PROGRESS ? w(`sheet.progress.${id}` as WordKey) : "");
 export function weightToExpect(id: string, weightKg?: number, age?: TrainingAge): string {
-  if (id === "fatloss") return `down ${kg(weightKg, 0.5, 1)} a week`;
-  if (id === "gain") return `up ${kg(weightKg, 0.25, 0.5)} a week`;
-  if (id === "gainsteady") return age === "3p" ? `up ${kg(weightKg, 0.25, 0.5)} a month` : `up ${kg(weightKg, 0.5, 1)} a month`;
-  if (id === "recomp") return "about the same; your waist goes down";
-  if (id === "maintain") return wUnit() === "lb" ? "within 2–4 lb" : "within 1–2 kg";
-  return "stable";
+  if (id === "fatloss") return w("sheet.down", { kg: kg(weightKg, 0.5, 1) });
+  if (id === "gain") return w("sheet.upWeek", { kg: kg(weightKg, 0.25, 0.5) });
+  if (id === "gainsteady") return w("sheet.upMonth", { kg: age === "3p" ? kg(weightKg, 0.25, 0.5) : kg(weightKg, 0.5, 1) });
+  if (id === "recomp") return w("sheet.recomp");
+  if (id === "maintain") return w("sheet.within", { range: wUnit() === "lb" ? "2–4 lb" : "1–2 kg" });
+  return w("sheet.stable");
 }
-const day = (iso: string) => new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long" });
+const day = (iso: string) => dateText(new Date(iso), { day: "numeric", month: "long" });
 // every 4 weeks from the day the goal was set: the next one from today
 export function nextCheckIn(setAt: string | undefined, now = new Date()): Date {
   const start = setAt ? new Date(setAt) : now;
@@ -92,12 +95,12 @@ export function nextCheckIn(setAt: string | undefined, now = new Date()): Date {
 export function sheetOf(goal: Goal | null, opts: { weightKg?: number; trainingAge?: TrainingAge; approvedBy?: string; approvedAt?: string; coachLabel?: string; now?: Date }): Sheet | null {
   const b = goal?.band ? bandOf(goal.band) : null;
   if (!b) return null;
-  const byLine = opts.approvedBy && opts.approvedAt ? `Agreed with ${opts.approvedBy} on ${day(opts.approvedAt)}`
-    : goal!.setBy === "coach" ? `Set by ${goal!.coachName ? `Coach ${goal!.coachName.split(" ")[0]}` : opts.coachLabel ?? "your coach"} on ${day(goal!.setAt)}`
-    : `Set by you on ${day(goal!.setAt)}`;
+  const byLine = opts.approvedBy && opts.approvedAt ? w("sheet.agreed", { who: opts.approvedBy, date: day(opts.approvedAt) })
+    : goal!.setBy === "coach" ? w("sheet.setByCoach", { who: goal!.coachName ? w("sheet.coachName", { name: goal!.coachName.split(" ")[0] }) : opts.coachLabel ?? w("sheet.yourCoach"), date: day(goal!.setAt) })
+    : w("sheet.setByYou", { date: day(goal!.setAt) });
   return {
-    title: goalLabel(b.id), byLine, food: FOOD[b.id] ?? "", weight: weightToExpect(b.id, opts.weightKg, opts.trainingAge),
-    counted: "your 7-day average, not one morning", progress: PROGRESS[b.id] ?? "", checkIn: `${day(nextCheckIn(goal!.setAt, opts.now).toISOString())}, every 4 weeks`,
+    title: goalName(b.id), byLine, food: foodOf(b.id), weight: weightToExpect(b.id, opts.weightKg, opts.trainingAge),
+    counted: w("sheet.counted"), progress: progressOf(b.id), checkIn: w("sheet.checkIn", { date: day(nextCheckIn(goal!.setAt, opts.now).toISOString()) }),
   };
 }
 // what the chat gets: the goal, what to expect and the food part of its page

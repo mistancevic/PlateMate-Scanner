@@ -3,7 +3,7 @@
 // kept on the phone and in the account from its first tap. One cook runs at a time; another waits in Saved for later.
 // DT212 v4 (board Stories159): a plate can be saved for later too; both wait in the same block on the Plate for 7 days.
 // Pure functions here, so the walkthroughs and the unit tests read the same rules.
-import { wIn, wnIn } from "./words";
+import { wIn, wnIn, w, wn } from "./words";
 import { foodNameIn } from "./reference";
 import type { Lang } from "./lang";
 import { say } from "./chefScript";
@@ -169,11 +169,11 @@ const hhmm = (iso: string) => { const d = new Date(iso); return `${String(d.getH
 export function stripWords(c: Cook, now = new Date()): { lead: string; rest: string } | null {
   if (c.stage === "make" || c.stage === "eat") {
     const at = stepAt(c);
-    return { lead: "Cooking now", rest: [c.title, c.stage === "eat" ? "Eat" : at ? `step ${at.k} of ${at.n}` : ""].filter(Boolean).join(" · ") };
+    return { lead: w("cook.cookingNow"), rest: [c.title, c.stage === "eat" ? w("cook.stageEat") : at ? w("cook.stepOf", { k: at.k, n: at.n }) : ""].filter(Boolean).join(" · ") };
   }
   if (c.stage === "carry" && c.eatenAt) {
     const m = carryIn(c, now) ?? 0;
-    return { lead: `Eaten ${hhmm(c.eatenAt)}`, rest: `${c.title} · ${m > 0 ? `Chef Mealan asks how it carried you in ${m} min` : "Chef Mealan asks how it carried you"}` };
+    return { lead: w("cook.eatenAt", { time: hhmm(c.eatenAt) }), rest: `${c.title} · ${m > 0 ? w("cook.asksIn", { m }) : w("cook.asks")}` };
   }
   return null;
 }
@@ -183,7 +183,7 @@ export const stepsTicked = (c: Cook) => { const n = c.steps ?? 0; return (c.ui.t
 export function resumeLine(c: Cook): string {
   const n = c.steps ?? 0, t = (c.ui.ticks ?? []).filter((x) => /^s\d+$/.test(x) && Number(x.slice(1)) < n).length;
   const ph = Object.keys(c.ui.stepPhotos ?? {}).length + (c.ui.final ? 1 : 0);
-  const parts = [n ? `${t} of ${n} steps ticked` : "", ph ? `${ph} ${ph === 1 ? "photo" : "photos"}` : ""].filter(Boolean);
+  const parts = [n ? w("cook.stepsTicked", { t, n }) : "", ph ? wn("cook.photosN", ph) : ""].filter(Boolean);
   return say("resume", c.title, parts.join(", "));
 }
 // something to resume: a tick, a photo or an answer

@@ -1,5 +1,6 @@
-import { numLocale, w, dateText, phoneLoc, mealName, mealV } from "../words";
+import { numLocale, w, wIn as wordIn, dec, dateText, phoneLoc, mealName, mealV, type WordKey } from "../words";
 import { optWord } from "../optWords";
+import { getLang } from "../lang";
 import { SafetyQuestion } from "../components/SafetyQuestion";
 import { LanguagePanel } from "../components/LanguagePanel";
 import { countByPlace, samePlace, getStarted } from "../places";
@@ -211,7 +212,7 @@ function ProfilePanel(p: AppApi) {
     <>
       <p className="small">{w("menu.allOfThisIsOptional")}</p>
       {consented && (
-        <p className="small consent-line">You agreed to the body data on {fmtDay(p.safety.consentBodyAt!)}. It is in your export, and goes with everything else when you delete the account.</p>
+        <p className="small consent-line">{w("profile.agreedOn", { date: fmtDay(p.safety.consentBodyAt!) })}</p>
       )}
       {!consented && (
         <section className="card consent" aria-label={w("menu.beforeYourNumbers")}>
@@ -243,7 +244,7 @@ function ProfilePanel(p: AppApi) {
         </div>
         {/* DT208 (0.3.49): a field the numbers need says so when you leave it empty */}
         {left && needNow.filter((x) => ["birthYear", "height", "weight"].includes(x.field ?? "")).map((x) => <small key={x.label} className="field-need">{x.label.replace(/^./, (c) => c.toUpperCase())}: needed for your numbers.</small>)}
-        <label className="field"><span>Body fat %, if you know it</span><input inputMode="decimal" value={d.bodyFatPct ?? ""} placeholder="from a scale or a scan" onChange={(e) => setD({ ...d, bodyFatPct: num(e.target.value) })} /></label>
+        <label className="field"><span>{w("profile.bodyFatIf")}</span><input inputMode="decimal" value={d.bodyFatPct ?? ""} placeholder={w("profile.fromScale")} onChange={(e) => setD({ ...d, bodyFatPct: num(e.target.value) })} /></label>
         <div className="field"><span>{w("menu.yourWork")}</span>
           <div className="activity-list">
             {LIFE.map((l) => (
@@ -263,12 +264,12 @@ function ProfilePanel(p: AppApi) {
             <div className="field units-box" role="group" aria-label={w("menu.units")}><span>{w("menu.units")}</span>
               <b>{w("menu.temperature")}</b>
               <div className="moments">{chip("temp", "c", "°C")}{chip("temp", "f", "°F")}</div>
-              <small className="muted">{u.temp === "c" ? `Oven heat in the steps: 175 °C. A recipe in °F is converted for you: 350 °F is ${175} °C.` : `Oven heat in the steps: ${asF(175)} °F. A recipe in °C is converted for you.`}</small>
+              <small className="muted">{u.temp === "c" ? w("profile.ovenC") : w("profile.ovenF", { f: asF(175) })}</small>
               <b>{w("menu.bodyWeight")}</b>
               <div className="moments">{chip("weight", "kg", "kg")}{chip("weight", "lb", "lb")}</div>
-              <small className="muted">{u.weight === "kg" ? w("menu.weighInsYourGoalAnd") : d.weightKg ? `${Math.round(d.weightKg * 10) / 10} kg is ${(Math.round(kgToLb(d.weightKg) * 10) / 10).toFixed(1)} lb, on weigh-ins and your goal.` : w("menu.weighInsYourGoalAnd2")}</small>
+              <small className="muted">{u.weight === "kg" ? w("menu.weighInsYourGoalAnd") : d.weightKg ? w("profile.kgIsLb", { kg: Math.round(d.weightKg * 10) / 10, lb: (Math.round(kgToLb(d.weightKg) * 10) / 10).toFixed(1) }) : w("menu.weighInsYourGoalAnd2")}</small>
               <b>{w("menu.height")}</b>
-              <div className="moments">{chip("height", "cm", "cm")}{chip("height", "ftin", "ft and in")}</div>
+              <div className="moments">{chip("height", "cm", "cm")}{chip("height", "ftin", w("profile.ftIn"))}</div>
               {u.height === "ftin" && h && <small className="muted">{Math.round(d.heightCm!)} cm is {h.ft} ft {h.inch} in.</small>}
               <small className="muted">{w("menu.foodAmountsStayInGrams")}</small>
             </div>
@@ -277,12 +278,12 @@ function ProfilePanel(p: AppApi) {
         {/* M3 (0.2.5+r4, Milan's layout, 11 October 2026): each chip with its definition beside it, then the day in both forms */}
         <div className="field pd-unit"><span>{w("menu.showProteinDensityAs")}</span>
           <div className="pd-unit-row"><button type="button" className={`choice ${(d.pdUnit ?? "pd") === "pd" ? "on" : ""}`} aria-pressed={(d.pdUnit ?? "pd") === "pd"} onClick={() => setD({ ...d, pdUnit: "pd" })}>PD</button><span>{w("menu.gProteinPerKcal")}</span></div>
-          <div className="pd-unit-row"><button type="button" className={`choice ${d.pdUnit === "pct" ? "on" : ""}`} aria-pressed={d.pdUnit === "pct"} onClick={() => setD({ ...d, pdUnit: "pct" })}>%</button><span>% of calories from protein</span></div>
+          <div className="pd-unit-row"><button type="button" className={`choice ${d.pdUnit === "pct" ? "on" : ""}`} aria-pressed={d.pdUnit === "pct"} onClick={() => setD({ ...d, pdUnit: "pct" })}>%</button><span>{w("profile.pctOfCal")}</span></div>
           {(() => {
             const kcal = p.todayMacros?.kcal ?? p.state.goals.calories, pro = p.todayMacros?.protein ?? p.state.goals.protein;
-            if (!kcal || !pro) return <small className="pd-unit-day">For example: 5 g of protein in 100 kcal is PD 5, or 20 % (20 of 100 kcal).</small>;
+            if (!kcal || !pro) return <small className="pd-unit-day">{w("profile.pdExample")}</small>;
             const pd = (100 * pro) / kcal;
-            return <small className="pd-unit-day">Your day: {Math.round(pro)} g of protein in {Math.round(kcal).toLocaleString(numLocale())} kcal. That is PD {pd.toFixed(1)}, or {Math.round(pd * 4)} % ({Math.round(pro * 4).toLocaleString(numLocale())} of {Math.round(kcal).toLocaleString(numLocale())} kcal).</small>;
+            return <small className="pd-unit-day">{w("profile.pdYourDay", { g: Math.round(pro), kcal: Math.round(kcal).toLocaleString(numLocale()), pd: getLang() === "sr-Latn" ? dec(pd, 1) : pd.toFixed(1), pct: Math.round(pd * 4), part: Math.round(pro * 4).toLocaleString(numLocale()) })}</small>;
           })()}
         </div>
         <small className={`muted saved-line ${odd ? "odd" : ""}`} role="status">{!consented ? "" : odd ? `Not kept yet: ${odd}.` : w("menu.keptAsYouGoNothing")}</small>
@@ -312,7 +313,7 @@ function SignOut({ p, inline }: { p: AppApi; inline?: boolean }) {
 function NextLink({ p, to, from, text, hint, before }: { p: AppApi; to: MenuSection; from: MenuSection; text: string; hint: string; before?: () => void }) {
   return (
     <div className="next-step">
-      <button className="pill pill-primary pill-wide" onClick={() => { before?.(); p.openMenu(to, from); }}>Next: {text} <ChevronRight size={18} /></button>
+      <button className="pill pill-primary pill-wide" onClick={() => { before?.(); p.openMenu(to, from); }}>{w("menu.nextTo", { to: text })} <ChevronRight size={18} /></button>
       <small className="muted">{hint}</small>
     </div>
   );
@@ -332,9 +333,9 @@ function GoalPanel(p: AppApi) {
   return (
     <>
       <section className="plan goal-head">
-        <div className="plan-top"><small className="eyebrow-line">{w("menu.yourGoal")}</small><span className="goal-src">{ownWay ? (goal?.setBy === "coach" ? `set by ${setBy}` : "your own numbers") : "calculated for you"}</span></div>
+        <div className="plan-top"><small className="eyebrow-line">{w("menu.yourGoal")}</small><span className="goal-src">{ownWay ? (goal?.setBy === "coach" ? w("goalp.setBy", { who: setBy }) : w("goalp.ownNumbers")) : w("goalp.calculated")}</span></div>
         <b className="goal-name">{band ? goalName(band.id) : w("menu.notSetYet")}</b>
-        {band && <span className="goal-who">{band.who}</span>}
+        {band && <span className="goal-who">{wordIn(getLang(), `goal.who.${band.id}` as WordKey) ?? band.who}</span>}
         {p.review && p.review.status !== "closed" && ownWay && (
           <span className={`review-state ${p.review.status}`}>
             {p.review.status === "waiting" ? `Waiting for ${p.coachLabel}: ${p.review.kept?.length ?? 0} kept on purpose` : p.review.status === "approved" ? `Approved by ${p.review.by || p.coachLabel}, ${new Date(p.review.at).toLocaleDateString("en", { day: "numeric", month: "long" })}` : `${p.review.by || p.coachLabel} asks you to change ${p.review.kept?.length === 1 ? "one number" : "your numbers"}`}
@@ -428,8 +429,8 @@ function GoalPanel(p: AppApi) {
         <p><b>{w("menu.atRest")}</b> {w("menu.whatYourBodyBurnsDoing")}</p>
         <p><b>{w("menu.yourEveryday")}</b> {w("menu.thatTimesHowYourWork")}</p>
         <p><b>{w("menu.yourTraining")}</b> {w("menu.eachTrainingDayAddsWhat")}</p>
-        <p><b>{w("menu.yourGoal2")}</b> Minus 20 % to lose fat, minus 10 % for recomposition, plus 5 % to build muscle steadily, plus 10 % to build it faster, plus 5 % for performance.</p>
-        <p><b>{w("menu.protein")}</b> 1.6 to 2.2 g per kg if you train twice a week or more, else 1.2 to 1.6. The same every day; the energy moves with the training.</p>
+        <p><b>{w("menu.yourGoal2")}</b> {w("goalp.howGoal")}</p>
+        <p><b>{w("menu.protein")}</b> {w("goalp.howProtein")}</p>
         <small>Sources: Mifflin et al. 1990; Katch and McArdle; Schofield 1985 (FAO/WHO/UNU); FAO/WHO/UNU 2004 activity levels; Compendium of Physical Activities 2024; US Dietary Guidelines 2025–2030; ISSN position stand 2017; Morton et al. 2018.</small>
       </section>
       <GoalHistory log={p.goalLog} />
@@ -690,13 +691,13 @@ function ShopPanel(p: AppApi) {
       <small>{p.region ? w("menu.whereYouLiveShopAnd") : w("menu.pickHomeWhereYouLive")}</small>
       {p.region && (
         <div className="place-row">
-          <span><b>{REGIONS.find((r) => r.id === p.region)?.name}</b><small>Home · {homeN} foods{(REGIONS.find((r) => r.id === p.region)?.tags ?? []).includes("cy") ? ", fifty Cypriot with their Greek names" : ""}</small>
+          <span><b>{REGIONS.find((r) => r.id === p.region)?.name}</b><small>{(REGIONS.find((r) => r.id === p.region)?.tags ?? []).includes("cy") ? w("shopp.homeFoodsCy", { n: homeN }) : w("shopp.homeFoods", { n: homeN })}</small>
             {!getStarted().includes(p.region) && <small><button type="button" className="link" onClick={p.addStarter}>{w("menu.addItsStarterFoods")}</button></small>}</span>
           <small>{w("menu.alwaysOn")}</small>
         </div>
       )}
       {known.map(row)}
-      {more || !p.region ? others.map(row) : others.length > 0 && <div className="place-row"><span><b>{others.length} more places</b><small>{others.map((r) => r.name.replace(/, elsewhere$/, "")).slice(0, 4).join(", ")}…</small></span><button type="button" className="link" onClick={() => setMore(true)}>{w("menu.show")}</button></div>}
+      {more || !p.region ? others.map(row) : others.length > 0 && <div className="place-row"><span><b>{w("shopp.morePlaces", { n: others.length })}</b><small>{others.map((r) => optWord(r.name).replace(/, (elsewhere|drugde)$/, "")).slice(0, 4).join(", ")}…</small></span><button type="button" className="link" onClick={() => setMore(true)}>{w("menu.show")}</button></div>}
     </section>
     <KitchensAndTools {...p} />
       {/* DT209 (0.3.50, board Stories156; Coach Milan 1 November 22:33 to 23:52 Go): the setup steps end on Your summary; My coach is no step */}
@@ -712,7 +713,7 @@ export function KitchensAndTools(p: AppApi) {
     {/* The kitchens you cook (0.2.9, canvas board CH, CH4): the shops say what you can buy, the kitchens what you like to cook */}
     <p className="label" style={{ marginTop: 14 }}>{w("menu.theKitchensYouCook")}</p>
     <section className="card kitchens" style={{ gap: 8 }}>
-      <small>{CHEF_NAME} cooks in these first: the tastes, the herbs, how a meal is put together. Pick one or more.</small>
+      <small>{w("shopp.cooksFirst")}</small>
       <div className="moments" role="group" aria-label={w("menu.theKitchensYouCook")}>
         {KITCHENS.map((k) => { const on = (p.personal.kitchens ?? []).includes(k); return <button key={k} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, kitchens: on ? (p.personal.kitchens ?? []).filter((x) => x !== k) : [...(p.personal.kitchens ?? []), k] })}>{k}</button>; })}
       </div>
@@ -727,7 +728,7 @@ export function KitchensAndTools(p: AppApi) {
             <small className="kt-what">{KITCHEN[k].what}</small>
             <small className="kt-lead">{t.shown.length === 0 ? `No ${k} dish we list fits ${fits}. ${CHEF_NAME} cooks the kitchen your way: tell it in the chat what you cook.` : `${t.shown.length === 3 ? w("menu.threeDishes") : t.shown.length === 2 ? w("menu.twoDishes") : w("menu.oneDish")} ${CHEF_NAME} would cook you${fits ? `, all ${fits}` : ""}:`}</small>
             {t.shown.map((d, i) => (
-              <div className={`kt-dish ${last?.with === d ? "kt-new" : ""}`} key={d}><b>{d}</b>{more && <button className="link" aria-label={`Another instead of ${d}`} onClick={() => set(another(t, k, i, diet))}>{w("menu.another")}</button>}</div>
+              <div className={`kt-dish ${last?.with === d ? "kt-new" : ""}`} key={d}><b>{d}</b>{more && <button className="link" aria-label={w("shopp.anotherInstead", { dish: d })} onClick={() => set(another(t, k, i, diet))}>{w("menu.another")}</button>}</div>
             ))}
             {t.out.length > 0 && <small className="kt-out">Not for you: {t.out.map((o) => o.dish.toLowerCase()).join(", ")}. <button className="link" onClick={() => set(undo(t))}>{w("menu.undo")}</button></small>}
             {!more && t.shown.length > 0 && <small className="kt-out">{fits ? `That's every ${k} dish we have that fits ${fits}. ${CHEF_NAME} cooks the kitchen your way: tell it in the chat what you cook.` : `That's every dish we have for this kitchen. Tell ${CHEF_NAME} in the chat what you cook.`}</small>}
@@ -739,7 +740,7 @@ export function KitchensAndTools(p: AppApi) {
     {/* What you cook with (0.2.18, canvas board IM, IM10): the steps are written for these */}
     <p className="label" style={{ marginTop: 14 }}>{w("menu.whatYouCookWith")}</p>
     <section className="card cook-with" style={{ gap: 8 }}>
-      <small>{CHEF_NAME} writes the steps for what you have. A recipe that needs something you don't have says how to make it without, or that it can't.</small>
+      <small>{w("shopp.stepsForWhatYouHave")}</small>
       <div className="moments" role="group" aria-label={w("menu.whatYouCookWith")}>
         {EQUIPMENT.map(([id, name]) => { const has = equipmentOf(p.personal), on = has.includes(id); return <button key={id} className={`choice ${on ? "on" : ""}`} aria-pressed={on} onClick={() => p.setPersonal({ ...p.personal, equipment: on ? has.filter((x) => x !== id) : [...has, id] })}>{name}</button>; })}
       </div>

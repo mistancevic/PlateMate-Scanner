@@ -15,7 +15,7 @@ export function ProteinCard({ c, open: startOpen = false }: { c: Calc; open?: bo
       <div className="protein-bar" aria-hidden="true"><span className="protein-mark" style={{ left: `${at}%` }} /></div>
       <div className="protein-ends"><span>{c.proteinMin} g</span><span>{c.proteinMax} g</span></div>
       <p className="protein-line">
-        Your range is {c.proteinMin} to {c.proteinMax} g a day: {kg(c.proteinLo)} to {kg(c.proteinHi)} g for every kg you weigh, {c.trains ? "because you train regularly" : "because you don't train regularly yet"}.
+        {w(c.trains ? "protein.rangeTrains" : "protein.rangeNotYet", { min: c.proteinMin, max: c.proteinMax, lo: kg(c.proteinLo), hi: kg(c.proteinHi) })}
         {" "}{c.proteinWhy.length ? w("protein.chefMealanPutYouAt") : w("protein.chefMealanPutYouIn")}
       </p>
       {c.proteinWhy.length > 0 && <ul className="protein-why">{c.proteinWhy.map((why) => <li key={why}>{why}</li>)}</ul>}

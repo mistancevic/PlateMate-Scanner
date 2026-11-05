@@ -1,7 +1,8 @@
 // The safety question (the door), one card for Profile, setup and the chat (DT141, 0.2.126, board Stories97; Anna's DT119;
 // Milan 28 October 18:33 Go): the situations Chef Mealan steps back from, and what to keep off every suggestion. A tick is
 // the answer and saves straight away. In setup and from the chat it ends on one button: Next, or Back to the chat.
-import { w, dateText } from "../words";
+import { w, dateText, type WordKey } from "../words";
+import { optWord } from "../optWords";
 import { useState } from "react";
 import type { AppApi } from "../screens/api";
 import { SITUATIONS, SITUATION_FOR, EU_ALLERGENS, FIXED, fixedLine, DOOR_WHY, type SituationId } from "../safety";
@@ -40,7 +41,7 @@ export function SafetyQuestion({ p, onDone, doneLabel = "Next" }: { p: AppApi; o
         <div key={x.id}>
           <label className="check">
             <input type="checkbox" checked={sits.includes(x.id)} onChange={(e) => tick(x.id, e.target.checked)} />
-            <span><b>{x.label}</b>{x.detail ? <small> {x.detail}</small> : null}</span>
+            <span><b>{optWord(x.label)}</b>{x.detail ? <small> {w(`safetyq.detail.${x.id}` as WordKey)}</small> : null}</span>
           </label>
           {x.id === "allergies" && sits.includes("allergies") && (
             <div className="allergy-pick">
@@ -58,7 +59,7 @@ export function SafetyQuestion({ p, onDone, doneLabel = "Next" }: { p: AppApi; o
         <input type="checkbox" checked={none} onChange={(e) => tickNone(e.target.checked)} />
         <span><b>{w("safetyq.noneOfTheseAppliesTo")}</b><small> {w("safetyq.ifYouLeaveItOpen")}</small></span>
       </label>
-      <p className={`small ${answered ? "muted" : "notice"}`}>{answered ? `Answered${p.safety.declaredAt ? " on " + fmtDay(p.safety.declaredAt) : ""}. Each tick is saved straight away, and you can change it any time.` : w("safetyq.tickOneOrNoneA")}</p>
+      <p className={`small ${answered ? "muted" : "notice"}`}>{answered ? (p.safety.declaredAt ? w("safetyq.answeredOn", { date: fmtDay(p.safety.declaredAt) }) : w("safetyq.answered")) : w("safetyq.tickOneOrNoneA")}</p>
       {p.safety.situations.length > 0 && (
         <div className="fixed-lines">
           {p.safety.situations.map((id) => <p className="small" key={id}><b>{SITUATIONS.find((x) => x.id === id)?.label}:</b> {fixedLine(id)}</p>)}

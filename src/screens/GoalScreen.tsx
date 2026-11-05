@@ -285,7 +285,7 @@ export function GoalScreen(p: AppApi & { onDone: () => void; onLater: () => void
               </div>
               <div className="calc-part"><b>{w("goal.yourTraining")}</b><small>{w("goal.yourWeekOnlyTheDays")}</small></div>
               <TrainWeek />
-              <label className="field"><span>{w("goal.bodyFat")}</span><input inputMode="decimal" value={d.bodyFatPct ?? ""} placeholder="from a scale or a scan" onChange={(e) => setD({ ...d, bodyFatPct: num(e.target.value) })} onBlur={() => save(d)} /></label>
+              <label className="field"><span>{w("goal.bodyFat")}</span><input inputMode="decimal" value={d.bodyFatPct ?? ""} placeholder={w("profile.fromScale")} onChange={(e) => setD({ ...d, bodyFatPct: num(e.target.value) })} onBlur={() => save(d)} /></label>
               {canCalculate(d) && <button className="pill pill-small" onClick={() => { save(d); setEditing(false); }}>{w("goal.done")}</button>}
             </section>
           )}
