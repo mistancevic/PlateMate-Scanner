@@ -11296,6 +11296,802 @@
     "summary.backToDe": {
       "text": "Nazad na nemački",
       "checked": false
+    },
+    "home.coaches": {
+      "text": "Treneri",
+      "checked": false
+    },
+    "home.recipes": {
+      "text": "Recepti",
+      "checked": false
+    },
+    "home.signIn": {
+      "text": "Prijavi se",
+      "checked": false
+    },
+    "home.signedOut": {
+      "text": "Odjavljeno",
+      "checked": false
+    },
+    "home.idleLine": {
+      "text": "Chef Mealan nije otvaran na ovom telefonu {days} dana, pa te je aplikacija odjavila. Tvoji podaci su na tvom nalogu.",
+      "checked": false
+    },
+    "home.yourCode": {
+      "text": "Tvoj lični kod: {code}",
+      "checked": false
+    },
+    "home.yourCodeLine": {
+      "text": "Prijavi se preko Googlea imejlom za koji je kod napravljen. Kod je već upisan.",
+      "checked": false
+    },
+    "home.theStart": {
+      "text": "Početak",
+      "checked": false
+    },
+    "home.kicker": {
+      "text": "Za one koji imaju plan ishrane",
+      "checked": false
+    },
+    "home.h1": {
+      "text": "Živi po svom planu ishrane, dan za danom.",
+      "checked": false
+    },
+    "home.lead": {
+      "text": "Chef Mealan s tobom planira obroke i nalazi obrok koji se i dalje uklapa kad te dan iznenadi.",
+      "checked": false
+    },
+    "home.joinWait": {
+      "text": "Upiši se na listu čekanja",
+      "checked": false
+    },
+    "home.joinBeta": {
+      "text": "Pridruži se beta testu, besplatno",
+      "checked": false
+    },
+    "home.roundFull": {
+      "text": "Ovaj krug beta testa je popunjen.",
+      "checked": false
+    },
+    "home.spotsLeft": {
+      "text": "Još {n} slobodno mesto u ovom krugu|Još {n} slobodna mesta u ovom krugu|Još {n} slobodnih mesta u ovom krugu",
+      "checked": false
+    },
+    "home.waitOnce": {
+      "text": "Upiši se na listu čekanja, i pisaćemo ti samo jednom, kad se Chef Mealan otvori za sve.",
+      "checked": false
+    },
+    "home.betaLine": {
+      "text": "Koristi ga većinu dana četiri nedelje i javi nam šta ne radi.",
+      "checked": false
+    },
+    "home.orWait": {
+      "text": "Ili se upiši na listu čekanja",
+      "checked": false
+    },
+    "home.ownCooking": {
+      "text": "Milanova jela, kuvana kod kuće.",
+      "checked": false
+    },
+    "home.tryHere": {
+      "text": "Probaj ovde",
+      "checked": false
+    },
+    "home.calcTitle": {
+      "text": "Uklopi ono što ti se jede u svoj plan",
+      "checked": false
+    },
+    "home.calcLine": {
+      "text": "Izaberi šta ti se jede i namirnicu koju imaš kod kuće. Vidi koliko te namirnice treba da se tanjir uklopi.",
+      "checked": false
+    },
+    "home.waysEyebrow": {
+      "text": "Kreni od bilo čega",
+      "checked": false
+    },
+    "home.waysTitle": {
+      "text": "Ono što jedeš, pročitano za nekoliko sekundi",
+      "checked": false
+    },
+    "home.waysLead": {
+      "text": "Skeniraj bar kod ili deklaraciju, ili slikaj obrok koji je pred tobom. Šta god izabereš, stiže na tvoj tanjir.",
+      "checked": false
+    },
+    "home.way.barcode": {
+      "text": "Bar kod ili deklaracija",
+      "checked": false
+    },
+    "home.way.barcodeLine": {
+      "text": "Vrednosti sa pakovanja, ili deklaracija pročitana sa slike, sa svih strana ako treba. Ti proveravaš.",
+      "checked": false
+    },
+    "home.way.meal": {
+      "text": "Slika tvog obroka",
+      "checked": false
+    },
+    "home.way.mealLine": {
+      "text": "Chef Mealan prepoznaje namirnice i procenjuje grame. Ti ispravljaš ono što znaš.",
+      "checked": false
+    },
+    "home.onePlate": {
+      "text": "Jedan tanjir",
+      "checked": false
+    },
+    "home.onePlateTitle": {
+      "text": "Sve stiže na jedan tanjir",
+      "checked": false
+    },
+    "home.pdB": {
+      "text": "PD, gustina proteina:",
+      "checked": false
+    },
+    "home.pdText": {
+      "text": "grami proteina na 100 kcal. Koliki ti treba, zavisi od tvog cilja, tvog tela i tvog treninga. Veliki broj pokazuje gde je tanjir u odnosu na to.",
+      "checked": false
+    },
+    "home.fcB": {
+      "text": "F C Fi P:",
+      "checked": false
+    },
+    "home.fcText": {
+      "text": "F masti, C ugljeni hidrati, Fi vlakna, P proteini, redom kao na deklaraciji. Veliko slovo: koliko ti dan traži. Malo slovo: manje od toga. Plus: više nego što ti dan traži. Minus: skoro ništa.",
+      "checked": false
+    },
+    "home.decideB": {
+      "text": "Onda ti odlučuješ:",
+      "checked": false
+    },
+    "home.decideText": {
+      "text": "pojedeš ga, pojedeš jednu porciju, dodaš prilog sa proteinima, ili pustiš Chef Mealana da ga uklopi u tvoj cilj.",
+      "checked": false
+    },
+    "home.videoPlate": {
+      "text": "Jedan tanjir: PD, slova i brojevi iza njih",
+      "checked": false
+    },
+    "home.plan": {
+      "text": "Plan",
+      "checked": false
+    },
+    "home.recipesTitle": {
+      "text": "Recepti za tvoj dan",
+      "checked": false
+    },
+    "home.recipesLine": {
+      "text": "Tvoji, od tvog trenera i od članova, poređani prema onome što ti je ostalo od dana. Izaberi jedan za obrok u svom planu.",
+      "checked": false
+    },
+    "home.shop": {
+      "text": "Kupovina",
+      "checked": false
+    },
+    "home.shopTitle": {
+      "text": "Tvoj spisak za kupovinu",
+      "checked": false
+    },
+    "home.shopLine": {
+      "text": "Namirnice za isplaniranu nedelju, sabrane, uz obroke za koje su. Označavaj dok kupuješ.",
+      "checked": false
+    },
+    "home.clipsPacks": {
+      "text": "Snimci aplikacije sa test podacima. Pakovanja u njima su izmišljena.",
+      "checked": false
+    },
+    "home.cook": {
+      "text": "Kuvanje",
+      "checked": false
+    },
+    "home.cookTitle": {
+      "text": "Kuvaj, a ruke su ti slobodne",
+      "checked": false
+    },
+    "home.cook1": {
+      "text": "Korak po korak, krupno, i pročitan naglas.",
+      "checked": false
+    },
+    "home.cook2": {
+      "text": "Reci dalje, nazad, ponovi, ili pokreni tajmer.",
+      "checked": false
+    },
+    "home.cook3": {
+      "text": "Pitaj Chef Mealana dok kuvaš: koliko je još ostalo, šta ako je tiganj prevruć.",
+      "checked": false
+    },
+    "home.cook4": {
+      "text": "Slike ispod koraka, tvoje ili nacrtane.",
+      "checked": false
+    },
+    "home.cook5": {
+      "text": "Drugi telefon ili tablet na radnoj ploči prikazuje korake.",
+      "checked": false
+    },
+    "home.videoCook": {
+      "text": "Kuvanje: korak po korak, pročitan naglas",
+      "checked": false
+    },
+    "home.situEyebrow": {
+      "text": "Istraživač · Situacije",
+      "checked": false
+    },
+    "home.situTitle": {
+      "text": "Tvoj dan, onako kako stvarno teče",
+      "checked": false
+    },
+    "home.situLine": {
+      "text": "Kasno veče na poslu, žurka, dan van kuće, loše prespavana noć. U Istraživaču svaka ima svoju stranicu, u odnosu na tvoj plan.",
+      "checked": false
+    },
+    "home.andInPlan": {
+      "text": "A u tvom planu:",
+      "checked": false
+    },
+    "home.situ1": {
+      "text": "Zauzeti termini iz tvog Google kalendara: obrok koji padne u sastanak pita da li pre ili posle.",
+      "checked": false
+    },
+    "home.situ2": {
+      "text": "Režim putovanja: prodavnice i kuhinja mesta u kom si.",
+      "checked": false
+    },
+    "home.situ3": {
+      "text": "Dan bez treninga: šta se menja, a šta ostaje.",
+      "checked": false
+    },
+    "home.videoSitu": {
+      "text": "Kasno veče posle posla, u Istraživaču",
+      "checked": false
+    },
+    "home.bodyEyebrow": {
+      "text": "Istraživač · Telo i hranljive materije",
+      "checked": false
+    },
+    "home.bodyTitle": {
+      "text": "Znaj zašto, a ne samo šta",
+      "checked": false
+    },
+    "home.body1": {
+      "text": "Telo, situacije i hranljive materije na jednom mestu. Iza svakog reda stoji naučni rad. Svaka stranica kaže kad nešto pomaže, a kad šteti, a onda čita tvoje dane.",
+      "checked": false
+    },
+    "home.body2": {
+      "text": "Ništa o bolestima, nalazima ni suplementima. Ako zdravstveno stanje određuje šta jedeš, o tome odlučuje tvoj lekar.",
+      "checked": false
+    },
+    "home.videoBody": {
+      "text": "Istraživač: telo i njegovih osam grupa",
+      "checked": false
+    },
+    "home.clipsNames": {
+      "text": "Snimci aplikacije sa test podacima. Imena u njima su izmišljena.",
+      "checked": false
+    },
+    "home.kitchen": {
+      "text": "Iz kuhinje",
+      "checked": false
+    },
+    "home.kitchenTitle": {
+      "text": "Recepti sa izračunatim brojevima",
+      "checked": false
+    },
+    "home.kitchenLine": {
+      "text": "Recepti koje je trener Milan skuvao i izmerio, sa brojevima pored slike. U aplikaciji Chef Mealan računa koliko se od svake namirnice uklapa u tvoj cilj.",
+      "checked": false
+    },
+    "home.allRecipes": {
+      "text": "Svi recepti →",
+      "checked": false
+    },
+    "home.forCoaches": {
+      "text": "Za trenere",
+      "checked": false
+    },
+    "home.coachTitle": {
+      "text": "Vodi klijente kroz njihove stvarne dane",
+      "checked": false
+    },
+    "home.coachLine": {
+      "text": "Jedan nalog, dva pogleda: tvoj dan i tvoji klijenti. Dan svakog klijenta vidiš onako kako ga klijent vidi: plan, obroke, kartice koje deli.",
+      "checked": false
+    },
+    "home.coach1": {
+      "text": "Predloži užinu ili stranicu iz Istraživača. Klijent prihvata jednim dodirom. Klijentov plan nikad ne menjaš.",
+      "checked": false
+    },
+    "home.coach2": {
+      "text": "Odgovori na podeljeni obrok jednim redom, ili reaguj sa Dobro ili Viđeno.",
+      "checked": false
+    },
+    "home.coach3": {
+      "text": "Čeka te: ono na šta treba da odgovoriš, na vrhu.",
+      "checked": false
+    },
+    "home.coach4": {
+      "text": "Klijent odlučuje šta vidiš. Podaci o telu ostaju isključeni dok ih klijent ne uključi.",
+      "checked": false
+    },
+    "home.videoCoach": {
+      "text": "Moji klijenti: Čeka te, na vrhu",
+      "checked": false
+    },
+    "home.getCoachCode": {
+      "text": "Zatraži kod trenera",
+      "checked": false
+    },
+    "home.coachSmall": {
+      "text": "Treneri u beta testu: besplatno, iste četiri nedelje, a tvoji klijenti se pridružuju tvojim kodom.",
+      "checked": false
+    },
+    "home.behind": {
+      "text": "Ko stoji iza Chef Mealana",
+      "checked": false
+    },
+    "home.role": {
+      "text": "Gradi proizvode i recepte, i stvorio je Chef Mealan.",
+      "checked": false
+    },
+    "home.behind1": {
+      "text": "Milan je senior product manager sa oko 20 godina iskustva u softveru i osnivač nekoliko startapa. Chef Mealan dizajnira i pravi uz AI, od prve skice do svakog izdanja.",
+      "checked": false
+    },
+    "home.behind2": {
+      "text": "Milan svaki dan kuva za sebe i svoju porodicu, u Minhenu, i pravi sopstvene recepte, izmerene. Oni koje je skuvao nose oznaku Iz kuhinje; brojevi dolaze sa deklaracija i iz tablica nutritivnih vrednosti.",
+      "checked": false
+    },
+    "home.authorOf": {
+      "text": "Autor knjiga {wb} i {wn}. Sledeća je Worth Eating.",
+      "checked": false
+    },
+    "home.howBuilt": {
+      "text": "Kako je napravljen Chef Mealan ›",
+      "checked": false
+    },
+    "home.moreMilan": {
+      "text": "Više o Milanu ›",
+      "checked": false
+    },
+    "home.chefAlt": {
+      "text": "Milan Stancevic, čovek iza Chef Mealana, sa kuvarskom kapom",
+      "checked": false
+    },
+    "home.numbersEyebrow": {
+      "text": "Kako rade brojevi",
+      "checked": false
+    },
+    "home.numbersTitle": {
+      "text": "Brojevi koje možeš da proveriš",
+      "checked": false
+    },
+    "home.n1b": {
+      "text": "Računicu radi kalkulator",
+      "checked": false
+    },
+    "home.n1p": {
+      "text": "Tvoji dnevni brojevi i grami na svakom tanjiru dolaze iz objavljenih formula. Možeš da otvoriš bilo koji broj i vidiš kako je Chef Mealan došao do njega.",
+      "checked": false
+    },
+    "home.n2b": {
+      "text": "AI čita, kalkulator odlučuje",
+      "checked": false
+    },
+    "home.n2p": {
+      "text": "Chef Mealan koristi AI da čita deklaracije, jelovnike i police u prodavnicama, i da ti odgovara u četu. Same brojeve daje kalkulator, a ne AI. Kad AI mora da proceni broj sa slike, aplikacija taj broj označi kao procenu.",
+      "checked": false
+    },
+    "home.n3b": {
+      "text": "Tvoji podaci ostaju u EU",
+      "checked": false
+    },
+    "home.n3p": {
+      "text": "Tvoji podaci se čuvaju u EU, u Belgiji i Frankfurtu, na tvom nalogu. Možeš da ih preuzmeš sve, ili da ih obrišeš sve, kad god hoćeš.",
+      "checked": false
+    },
+    "home.n4b": {
+      "text": "Studije se ponovo čitaju",
+      "checked": false
+    },
+    "home.n4p": {
+      "text": "Svaki broj koji Istraživač pripisuje nekoj studiji proverava se u samoj studiji pre svakog izdanja.",
+      "checked": false
+    },
+    "home.n5b": {
+      "text": "Ništa se ne čuva bez razloga",
+      "checked": false
+    },
+    "home.n5p": {
+      "text": "Nalog koji niko ne otvori 12 meseci briše se, sa svim što je u njemu.",
+      "checked": false
+    },
+    "home.freeGuide": {
+      "text": "Besplatan vodič",
+      "checked": false
+    },
+    "home.bookLine": {
+      "text": "PD, broj koji ne piše ni na jednom pakovanju, i još pet brojeva o tvojoj hrani: šta ti svaki od njih govori i kako da ga iskoristiš u sledećem obroku.",
+      "checked": false
+    },
+    "home.seeBook": {
+      "text": "Pogledaj knjigu ›",
+      "checked": false
+    },
+    "home.coverAlt": {
+      "text": "Naslovna strana knjige {name}",
+      "checked": false
+    },
+    "home.whoEyebrow": {
+      "text": "Za koga je",
+      "checked": false
+    },
+    "home.whoTitle": {
+      "text": "Za one koji jedu po planu, i za trenere koji ga prave",
+      "checked": false
+    },
+    "home.who1": {
+      "text": "Imaš plan ishrane, od trenera ili svoj, i želiš da živiš po njemu dan za danom.",
+      "checked": false
+    },
+    "home.who2": {
+      "text": "Treniraš i želiš svoje brojeve uz svaki obrok, bez dnevnika ishrane.",
+      "checked": false
+    },
+    "home.who3": {
+      "text": "Trener si i želiš da vidiš stvarne dane svojih klijenata, da predlažeš, a ne da ih juriš.",
+      "checked": false
+    },
+    "home.adults": {
+      "text": "Chef Mealan je za odrasle, od 18 godina naviše.",
+      "checked": false
+    },
+    "home.disclaimer": {
+      "text": "Odricanje odgovornosti",
+      "checked": false
+    },
+    "home.notDoctor": {
+      "text": "Chef Mealan nije lekar",
+      "checked": false
+    },
+    "home.disclaimerLine": {
+      "text": "Ako zdravstveno stanje određuje šta jedeš, ako si trudna ili imaš dijabetes, ili ako ti je teško da jedeš, Chef Mealan ne daje savete, nego ti kaže s kim da razgovaraš.",
+      "checked": false
+    },
+    "home.fullDisclaimer": {
+      "text": "Ceo dokument, na engleskom ›",
+      "checked": false
+    },
+    "home.nextRound": {
+      "text": "Sledeći krug beta testa",
+      "checked": false
+    },
+    "home.fullForm": {
+      "text": "Ovaj krug je popunjen. Ostavi ime i imejl, i trener Milan će ti pisati kad počne sledeći krug.",
+      "checked": false
+    },
+    "home.betaForm": {
+      "text": "Koristi Chef Mealan većinu dana četiri nedelje i javi nam šta ne radi. Većina se pridružuje kodom od svog trenera. Ako ga nemaš, ostavi ime i imejl, i trener Milan će ti poslati lični kod.",
+      "checked": false
+    },
+    "home.waitTitle": {
+      "text": "Lista čekanja",
+      "checked": false
+    },
+    "home.waitForm": {
+      "text": "Za trenutak kad se Chef Mealan otvori za sve. Bez testiranja, bez koda za sada. Pisaćemo ti samo jednom, kad se otvori.",
+      "checked": false
+    },
+    "home.footBehind": {
+      "text": "Ko stoji iza",
+      "checked": false
+    },
+    "home.footBuilt": {
+      "text": "Kako je napravljen Chef Mealan",
+      "checked": false
+    },
+    "home.footPrivacy": {
+      "text": "Privatnost (na engleskom)",
+      "checked": false
+    },
+    "home.photos": {
+      "text": "Fotografije",
+      "checked": false
+    },
+    "home.photoOf": {
+      "text": "{name}, fotografija {i} od {n}",
+      "checked": false
+    },
+    "home.photo.curry": {
+      "text": "Kari sa pirinčem",
+      "checked": false
+    },
+    "home.photo.meatballs": {
+      "text": "Ćufte u tiganju",
+      "checked": false
+    },
+    "home.photo.quesadilla": {
+      "text": "Kesadilja",
+      "checked": false
+    },
+    "home.photo.waffle": {
+      "text": "Vafl",
+      "checked": false
+    },
+    "home.photo.squares": {
+      "text": "Čokoladne kocke",
+      "checked": false
+    },
+    "home.crave": {
+      "text": "Jede ti se",
+      "checked": false
+    },
+    "home.haveAtHome": {
+      "text": "Imaš kod kuće",
+      "checked": false
+    },
+    "home.yourPlate": {
+      "text": "Tvoj tanjir",
+      "checked": false
+    },
+    "home.kcalProtein": {
+      "text": "{kcal} kcal, {protein} g proteina",
+      "checked": false
+    },
+    "home.less": {
+      "text": "{step} {unit} manje: {food}",
+      "checked": false
+    },
+    "home.more": {
+      "text": "{step} {unit} više: {food}",
+      "checked": false
+    },
+    "home.plateFits": {
+      "text": "Tanjir se uklapa",
+      "checked": false
+    },
+    "home.underPd": {
+      "text": "Ispod PD {pd}",
+      "checked": false
+    },
+    "home.alone": {
+      "text": "Samo {food}, {g} g",
+      "checked": false
+    },
+    "home.withFood": {
+      "text": "Uz to: {food}, {g} {unit}",
+      "checked": false
+    },
+    "home.addsProtein": {
+      "text": "Protein donosi {food}, pa se tanjir uklapa.",
+      "checked": false
+    },
+    "home.reaches": {
+      "text": "{g} {unit} je dovoljno: {food} dovodi tanjir do PD {pd}.",
+      "checked": false
+    },
+    "home.tooLittle": {
+      "text": "{food}: premalo proteina za svoje kalorije, pa ovaj tanjir ne stiže do PD {pd}.",
+      "checked": false
+    },
+    "home.tryFoods": {
+      "text": "Probaj: {foods}.",
+      "checked": false
+    },
+    "home.orList": {
+      "text": "{rest} ili {last}",
+      "checked": false
+    },
+    "home.useG": {
+      "text": "Stavi {g} {unit}",
+      "checked": false
+    },
+    "home.whatPd": {
+      "text": "Šta znači PD ↓",
+      "checked": false
+    },
+    "home.pdMeans": {
+      "text": "PD znači gustina proteina",
+      "checked": false
+    },
+    "home.pdExplain": {
+      "text": "PD je broj grama proteina u 100 kcal hrane. Viši PD znači više proteina za iste kalorije. Ovaj kalkulator cilja na PD {pd}, uobičajenu ciljnu vrednost kad želiš da istovremeno gubiš mast i gradiš mišiće. Ispod {pd} tanjir ti daje kalorije, ali premalo proteina.",
+      "checked": false
+    },
+    "home.trySmall": {
+      "text": "Pojednostavljena verzija Chef Mealana: jedan cilj, šest izbora za ono što ti se jede i tipične vrednosti sa deklaracija. Ništa što ovde izabereš se ne čuva.",
+      "checked": false
+    },
+    "home.food.granola": {
+      "text": "Granola",
+      "checked": false
+    },
+    "home.food.granolaOf": {
+      "text": "granola",
+      "checked": false
+    },
+    "home.food.granolaNote": {
+      "text": "Granola izgleda zdravo, ali donosi mnogo kalorija i malo proteina.",
+      "checked": false
+    },
+    "home.food.spread": {
+      "text": "Čokoladni namaz",
+      "checked": false
+    },
+    "home.food.spreadOf": {
+      "text": "čokoladni namaz",
+      "checked": false
+    },
+    "home.food.spreadNote": {
+      "text": "Čokoladni namaz je sam po sebi uglavnom šećer i mast.",
+      "checked": false
+    },
+    "home.food.peanut": {
+      "text": "Kikiriki puter",
+      "checked": false
+    },
+    "home.food.peanutOf": {
+      "text": "kikiriki puter",
+      "checked": false
+    },
+    "home.food.peanutNote": {
+      "text": "Kikiriki puter ima proteina, ali je sam po sebi uglavnom mast.",
+      "checked": false
+    },
+    "home.food.icecream": {
+      "text": "Sladoled",
+      "checked": false
+    },
+    "home.food.icecreamOf": {
+      "text": "sladoled",
+      "checked": false
+    },
+    "home.food.icecreamNote": {
+      "text": "Sladoled je sam po sebi uglavnom šećer i mast.",
+      "checked": false
+    },
+    "home.food.pizza": {
+      "text": "Parče pice",
+      "checked": false
+    },
+    "home.food.pizzaOf": {
+      "text": "pica",
+      "checked": false
+    },
+    "home.food.pizzaNote": {
+      "text": "Pica je sama po sebi uglavnom testo i sir.",
+      "checked": false
+    },
+    "home.food.crisps": {
+      "text": "Čips",
+      "checked": false
+    },
+    "home.food.crispsOf": {
+      "text": "čips",
+      "checked": false
+    },
+    "home.food.crispsNote": {
+      "text": "Čips je sam po sebi uglavnom mast i skrob.",
+      "checked": false
+    },
+    "home.food.milk": {
+      "text": "Mleko 1,5%",
+      "checked": false
+    },
+    "home.food.skyr": {
+      "text": "Skyr",
+      "checked": false
+    },
+    "home.food.yogurt": {
+      "text": "Grčki jogurt",
+      "checked": false
+    },
+    "home.food.cottage": {
+      "text": "Zrnasti sir",
+      "checked": false
+    },
+    "home.food.whey": {
+      "text": "Whey protein",
+      "checked": false
+    },
+    "home.food.tuna": {
+      "text": "Tunjevina",
+      "checked": false
+    },
+    "home.food.chicken": {
+      "text": "Pileći file",
+      "checked": false
+    },
+    "home.food.eggwhite": {
+      "text": "Belance",
+      "checked": false
+    },
+    "home.food.dip": {
+      "text": "Dip od jogurta",
+      "checked": false
+    },
+    "home.pair.pizzaTuna": {
+      "text": "Pica sa tunjevinom je pica tonno.",
+      "checked": false
+    },
+    "home.who.client": {
+      "text": "Imam trenera",
+      "checked": false
+    },
+    "home.who.coach": {
+      "text": "Ja sam trener",
+      "checked": false
+    },
+    "home.who.self": {
+      "text": "Treniram samostalno",
+      "checked": false
+    },
+    "home.cantSend": {
+      "text": "Slanje nije uspelo. Piši nam na hello@chefmealan.com.",
+      "checked": false
+    },
+    "home.onWait": {
+      "text": "Na listi čekanja si. Pisaćemo ti na {email} samo jednom, kad se Chef Mealan otvori.",
+      "checked": false
+    },
+    "home.email": {
+      "text": "Imejl",
+      "checked": false
+    },
+    "home.emailWait": {
+      "text": "Imejl za listu čekanja",
+      "checked": false
+    },
+    "home.whichFits": {
+      "text": "Šta važi za tebe?",
+      "checked": false
+    },
+    "home.consent": {
+      "text": "Javite mi kad se Chef Mealan otvori. Sa liste mogu da izađem bilo kad, ako pišem na hello@chefmealan.com.",
+      "checked": false
+    },
+    "home.sending": {
+      "text": "Šaljem…",
+      "checked": false
+    },
+    "home.send": {
+      "text": "Pošalji",
+      "checked": false
+    },
+    "home.thanks": {
+      "text": "Hvala, {name}. Trener Milan će ti se javiti na {email}.",
+      "checked": false
+    },
+    "home.thanksList": {
+      "text": "Hvala, na listi si. Trener Milan će ti se javiti na {email}.",
+      "checked": false
+    },
+    "home.yourName": {
+      "text": "Tvoje ime",
+      "checked": false
+    },
+    "home.mobile": {
+      "text": "Broj mobilnog, nije obavezno",
+      "checked": false
+    },
+    "home.mobileLine": {
+      "text": "Trener Milan može da ti se javi preko WhatsAppa ili SMS-om u vezi sa pridruživanjem. Broj se ne koristi ni za šta drugo.",
+      "checked": false
+    },
+    "home.after": {
+      "text": "Šta želiš da postigneš? (nije obavezno)",
+      "checked": false
+    },
+    "home.language": {
+      "text": "Jezik",
+      "checked": false
+    },
+    "home.metaTitle": {
+      "text": "Chef Mealan: živi po svom planu ishrane, dan za danom",
+      "checked": false
+    },
+    "home.metaDesc": {
+      "text": "Chef Mealan sa tobom planira obroke. Kad te dan iznenadi ili ti se nešto prijede, Chef Mealan nađe obrok koji se i dalje uklapa u tvoje brojeve. Za odrasle koji imaju plan ishrane.",
+      "checked": false
+    },
+    "home.footDisclaimer": {
+      "text": "Odricanje odgovornosti (na engleskom)",
+      "checked": false
     }
   }
 }

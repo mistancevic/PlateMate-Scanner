@@ -1,4 +1,7 @@
 import { AsyncLocalStorage } from "node:async_hooks";
+import enFile from "./src/i18n/en.json" with { type: "json" };
+import srFile from "./src/i18n/sr-Latn.json" with { type: "json" };
+import deFile from "./src/i18n/de.json" with { type: "json" };
 import "dotenv/config";
 import { TASTE_CHIPS } from "./src/tasteChips";
 import express from "express";
@@ -2472,6 +2475,15 @@ async function start() {
       res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
       const base = `https://${req.get("host")}`;
       try { res.type("html").send(withMeta("How Chef Mealan is built", "A product built with AI, one release at a time: the blueprint, the Worth Building playbook in practice, and Milan Stancevic, the product builder behind Chef Mealan.", `${base}/landing/built-og.jpg?v=1`, `${base}/built`)); }
+      catch { res.sendFile(path.join(dist, "index.html")); }
+    });
+    // DT236 v3 (0.3.93): chefmealan.com/sr and chefmealan.com/de, with the page's title and search line in that language (a line
+    // shows only once confirmed in its table, else the English one), lang on the page, and the three addresses named for search engines
+    const homeIn = (l: "sr-Latn" | "de") => { const f = (l === "de" ? deFile : srFile) as any, line = (k: string) => { const x = f.screens?.[k]; return x && x.checked ? String(x.text) : (enFile as any)[k]; }; return { title: line("home.metaTitle"), desc: line("home.metaDesc") }; };
+    app.get(["/sr", "/sr/", "/de", "/de/"], (req, res) => {
+      res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+      const base = `https://${req.get("host")}`, l = req.path.startsWith("/de") ? "de" : "sr-Latn", m = homeIn(l);
+      try { res.type("html").send(withMeta(m.title, m.desc, `${base}/og.jpg?v=2`, `${base}${l === "de" ? "/de" : "/sr"}`).replace('<html lang="en">', `<html lang="${l === "de" ? "de" : "sr-Latn"}">`)); }
       catch { res.sendFile(path.join(dist, "index.html")); }
     });
     app.get("*", (_req, res) => { res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); res.sendFile(path.join(dist, "index.html")); });
