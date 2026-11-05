@@ -518,10 +518,10 @@
     },
     {
       "id": "DT234",
-      "title": "Translating in context: drafts on the preview, from the table to the page, pictures, a change log, edit in place, live lines",
+      "title": "Translating in context: drafts on the preview, from the table to the page, pictures, a change log, edit in place, live lines, a Translations page in the app",
       "epic": "lang",
       "state": "later",
-      "why": "Coach Milan 4 November 05:17 to 06:09, brainstorm. A ladder of six steps, each of value alone, each an upgrade of the one before; the last, live lines from the database with draft and live, is the best final version. Notes in docs/i18n/editing-ladder.md. Built after the 8 phases of DT203 release 2, unless Milan starts step A earlier."
+      "why": "Coach Milan 4 November 05:17 to 06:09, brainstorm. A ladder of six steps, each of value alone, each an upgrade of the one before; the last, live lines from the database with draft and live, is the best final version. Notes in docs/i18n/editing-ladder.md. Built after the 8 phases of DT203 release 2, unless Milan starts step A earlier. Coach Milan 5 November 10:12 to 10:37, added (parked): the table moves into the app as an owner page, Translations; each line opens its screen so the context is checked along the way (step B); a true In the app state (Live since 0.3.xx, or goes out at the next release; today every ticked line says next release); translators per language; Suggest English, a field for a better English line; the button says Confirm, a confirmed line shows Checked (asked for Go). Done on the way: he|she lines show both forms in the table (0.3.91)."
     },
     {
       "id": "DT235",

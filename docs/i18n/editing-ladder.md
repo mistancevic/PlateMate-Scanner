@@ -47,6 +47,17 @@ Each step has value on its own. Each later step builds on the one before it. The
 - A copy on the phone for offline. The change log (step D) is the record and the way back.
 - Worth it once German comes and more people translate.
 
+## Added 5 November 2026, 10:12 to 10:37 (Coach Milan; parked)
+- The table becomes part of the app: an owner page, Translations, in place of the separate table page.
+- Each line links to its screen, so the context is checked along the way. This is step B.
+- A true In the app state on each line: Live since 0.3.xx, or Goes out at the next release. Today the table says
+  "In the app at the next release" on every ticked line, also lines already live, because it does not know the app.
+  This is the status part of step D.
+- Translators per language: a person gets one language to translate and confirm.
+- Suggest English: a field on each line for a better English line. Claude checks it and makes the change in the app.
+- The button says Confirm. A confirmed line shows Checked. Asked Milan for Go on the table page.
+- Done on the way: lines with he|she forms show both forms in the table (0.3.91).
+
 ## Order and timing
 A, then B, C, D in any order, then E, then F. Coach Milan 06:09: start after the 8 phases; A could start earlier for the
 areas already moved (the Plate, Today) if he says so.
