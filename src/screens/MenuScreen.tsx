@@ -131,7 +131,7 @@ export function MenuScreen(p: AppApi & { section: MenuSection; setSection: (s: M
           {/* Foods lives here from 0.2.0 (X0): the library, reached day to day from the Plate's search and Quick picks */}
           <button className="menu-row" onClick={() => p.setTab("foods")}><span className="menu-icon"><BookOpen size={20} /></span><b>{w("menu.foods")}</b><ChevronRight size={18} /></button>
           {/* DT215 v3 (0.3.66, board Stories162b; Coach Milan 23:22 to 23:37): Settings, how the app works, not who you are */}
-          <button className="menu-row" onClick={() => setSection("settings")}><span className="menu-icon"><Settings size={20} /></span><span className="menu-row-text"><b>{w("menu.settings")}</b><small>Voice while cooking · Language and Units coming soon</small></span><ChevronRight size={18} /></button>
+          <button className="menu-row" onClick={() => setSection("settings")}><span className="menu-icon"><Settings size={20} /></span><span className="menu-row-text"><b>{w("menu.settings")}</b><small>{w("menu.settingsHint")}</small></span><ChevronRight size={18} /></button>
           {/* DT151 Explorer lived here; DT188 (0.3.30) put it on the bar as the fifth tab */}
           {/* DT188: Admin for the superadmin only: people and roles, coach links, the privacy tracker, the walkthroughs */}
           {p.profile.admin && <button className="menu-row" onClick={() => setSection("admin")}><span className="menu-icon"><ShieldCheck size={20} /></span><span className="menu-row-text"><b>{w("menu.admin")}</b><small>{w("menu.superadminOnly")}</small></span><ChevronRight size={18} /></button>}

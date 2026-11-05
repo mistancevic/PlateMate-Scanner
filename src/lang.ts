@@ -20,7 +20,7 @@ export function srCount(n: number, one: string, few: string, many: string): stri
   return `${n} ${a >= 11 && a <= 14 ? many : b === 1 ? one : b >= 2 && b <= 4 ? few : many}`;
 }
 // the Settings row: what is in Serbian so far
-export const langLine = (l: Lang) => (l === "sr-Latn" ? "Chef Mealan speaks Srpski (latinica). The screens are in English for now." : "English. Srpski (latinica) for Chef Mealan; Deutsch is coming.");
+export const langLine = (l: Lang) => (l === "sr-Latn" ? "Chef Mealan and the screens in Srpski. Explorer and the legal pages in English for now." : "English. Srpski (latinica) for Chef Mealan; Deutsch is coming.");
 // the language Chef Mealan answers in, on every call to our own server (the AI's answers, his tips), signed in or not
 let langFetch = false;
 export function installLangFetch() {

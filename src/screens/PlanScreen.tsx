@@ -12,7 +12,7 @@ import { shoppingList, getStore, putStore, openList, nextStart, daysFrom, makeLi
 import type { AppApi, Filling } from "./api";
 import { dayFor, getDay, lifestyleOf, isMinor } from "../personal";
 import { planLine, isoWeek, ymd, weekdaysOf, workHintOf, minutesWords, type PlanDay } from "../plan";
-import { rowsOf, slotsOf, slotsOn, trainingWhen, type Slot, type DayRow, workHoursOf } from "../slots";
+import { rowsOf, slotsOf, slotsOn, trainingWhen, trainingShown, type Slot, type DayRow, workHoursOf } from "../slots";
 import { fmt, pdVal, pdTag, pdText } from "../ui";
 import { density, aggregate, uid } from "../pilot";
 import { countOf, countLabel } from "../counted";
@@ -101,7 +101,7 @@ export function PlanScreen(p: AppApi) {
   const dayName = isToday ? "today" : WEEKDAY[(date.getDay() + 6) % 7];
   const line = [
     numbers ? w("plan.kcalProtein", { kcal: fmt(numbers.kcal, 0), protein: numbers.protein }) : w("plan.noNumbersYet"),
-    tWhen ? tWhen.phrase : training ? w("plan.restDay") : null,
+    tWhen ? trainingShown(training) ?? tWhen.phrase : training ? w("plan.restDay") : null,
   ].filter(Boolean).join(" · ");
   const target = numbers ? density(numbers.protein, numbers.kcal) : null;
   const unit = p.personal.pdUnit === "pct" ? "pct" : "pd";
@@ -152,7 +152,7 @@ export function PlanScreen(p: AppApi) {
           <b>{w(isToday ? "plan.todayDate" : "plan.date", { date: (l) => (l === "en" ? `${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : date.toLocaleDateString("sr-Latn-RS", { weekday: "long", day: "numeric", month: "long" })) })}
             {!rows.some((r) => r.kind === "training") && <button type="button" className="icon today-pencil plan-pencil" aria-label={w("plan.changeTheTrainingForThis")} onClick={() => setEditing(training ?? { work: true, kind: "rest" })}><Pencil size={15} /></button>}
           </b>
-          <small>{[tWhen ? tWhen.phrase : training ? w("plan.restDay") : null, openCount ? wn("plan.slotsOpen", openCount) : w("plan.allSet")].filter(Boolean).join(" · ")}</small>
+          <small>{[tWhen ? trainingShown(training) ?? tWhen.phrase : training ? w("plan.restDay") : null, openCount ? wn("plan.slotsOpen", openCount) : w("plan.allSet")].filter(Boolean).join(" · ")}</small>
         </div>
         <div className="plan-row">
           <div><b>{sum.n ? pdVal(sum.pd) : "—"}</b><small>{target !== null ? w("plan.ofTarget", { pd: pdText(target), day: dayV }) : pdTag()}</small></div>

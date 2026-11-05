@@ -4,6 +4,8 @@
 // out, grouped by who made them, with the lines for the Made by and Kitchen drop-downs and their counts. The allergy filter
 // is not here: the members' rows pass it before, silent and always on (membersFor).
 import { fold } from "./foodId";
+import { w, wn, type WordKey } from "./words";
+import { optWord } from "./optWords";
 import { synonymsOf } from "./reference";
 
 // what the bar needs of a recipe, the same for a recipe of yours and a member's
@@ -25,8 +27,8 @@ export type Sort = "fit" | "new" | "made" | "pd" | "quick" | "az";
 export const EMPTY: Filters = { q: "", kitchen: null, madeBy: null, moment: null, day: false, nocook: false, withMine: false };
 // "fit" keeps the order each source has today: yours with Chef Mealan's ideas first, members' at or above your PD target
 // first, then your kitchens (membersFor). The default.
-export const SORTS: { id: Sort; label: string }[] = [{ id: "fit", label: "For your day" }, { id: "new", label: "Newest" }, { id: "made", label: "Most made" }, { id: "pd", label: "Highest PD" }, { id: "quick", label: "Quickest" }, { id: "az", label: "A to Z" }];
-export const MOMENTS: { id: Moment; label: string }[] = [{ id: "breakfast", label: "Breakfast" }, { id: "lunch", label: "Lunch or dinner" }, { id: "snack", label: "Snack" }];
+export const SORTS: { id: Sort; label: string }[] = (["fit", "new", "made", "pd", "quick", "az"] as Sort[]).map((id) => ({ id, get label() { return w(`rf.sort.${id}` as WordKey); } }));
+export const MOMENTS: { id: Moment; label: string }[] = (["breakfast", "lunch", "snack"] as Moment[]).map((id) => ({ id, get label() { return w(`rf.moment.${id}` as WordKey); } }));
 // the Made by drop-down's keys: me, the coach, all members, a member's name, or the ones shared without a name
 export const ME = "me", COACH = "coach", MEMBERS = "members", NONE = "none";
 
@@ -99,22 +101,22 @@ export function madeByLines(rows: RecipeRow[], coachLabel: string): Line[] {
 }
 // "Your coach" inside a sentence reads "your coach"
 const inLine = (label: string) => label.replace(/^Your /, "your ");
-export const madeByLabel = (key: string | null, coachLabel: string) => (key === ME ? "me" : key === COACH ? inLine(coachLabel) : key === MEMBERS ? "members" : key === NONE ? "a member without a name" : key ?? "");
+export const madeByLabel = (key: string | null, coachLabel: string) => (key === ME ? w("rf.me") : key === COACH ? inLine(coachLabel) : key === MEMBERS ? w("rf.members") : key === NONE ? w("rf.noName") : key ?? "");
 // the groups of the one list: me, the coach, the members, in that order, each with its count
 export type Group = { key: Source; title: string; rows: RecipeRow[] };
 export function groupRows(rows: RecipeRow[], coachLabel: string): Group[] {
-  const g: Group[] = [{ key: "me", title: "Made by me", rows: [] }, { key: "coach", title: `Made by ${inLine(coachLabel)}`, rows: [] }, { key: "member", title: "Made by members", rows: [] }];
+  const g: Group[] = [{ key: "me", title: w("rf.madeByMe"), rows: [] }, { key: "coach", title: w("rf.madeByCoach", { coach: inLine(coachLabel) }), rows: [] }, { key: "member", title: w("rf.madeByMembers"), rows: [] }];
   for (const r of rows) g.find((x) => x.key === r.source)!.rows.push(r);
   return g.filter((x) => x.rows.length > 0);
 }
 // the line under the bar: 10 recipes; or 2 of 10 recipes · Made by: Marko · No cooking
 export function countLine(shown: number, total: number, f: Filters, coachLabel: string): string {
-  const parts = [isIdle(f) ? `${total} ${total === 1 ? "recipe" : "recipes"}` : `${shown} of ${total} ${total === 1 ? "recipe" : "recipes"}`];
-  if (f.madeBy) parts.push(`Made by: ${madeByLabel(f.madeBy, coachLabel)}`);
-  if (f.kitchen) parts.push(`Kitchen: ${f.kitchen}`);
+  const parts = [isIdle(f) ? wn("rf.count", total) : wn("rf.countOf", total, { shown })];
+  if (f.madeBy) parts.push(w("rf.madeByIs", { who: madeByLabel(f.madeBy, coachLabel) }));
+  if (f.kitchen) parts.push(w("rf.kitchenIs", { kitchen: optWord(f.kitchen) }));
   if (f.moment) parts.push(MOMENTS.find((m) => m.id === f.moment)!.label);
-  if (f.day) parts.push("Fits my day");
-  if (f.nocook) parts.push("No cooking");
-  if (f.withMine) parts.push("With my foods");
+  if (f.day) parts.push(w("recipebar.fitsMyDay"));
+  if (f.nocook) parts.push(w("recipebar.noCooking"));
+  if (f.withMine) parts.push(w("recipebar.withMyFoods"));
   return parts.join(" · ");
 }

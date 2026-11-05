@@ -45,7 +45,7 @@ const PORT = "3396", U = `http://127.0.0.1:${PORT}`;
     ok(await page.evaluate(() => localStorage.getItem("chefmealan-lang")) === "sr-Latn", "Deutsch does nothing yet");
     await page.locator(".menu-head button.link").first().click(); await page.waitForTimeout(300);
     const back = page.locator("button.menu-row").filter({ hasText: /Language|Jezik/ }); // 0.3.85: the row's name is Jezik once Coach Milan ticked it
-    if (await back.count()) ok(/Chef Mealan speaks Srpski \(latinica\)\. The screens are in English for now\./.test(await back.textContent()), "the Settings line says what is in Serbian so far");
+    if (await back.count()) ok(/Chef Mealan and the screens in Srpski\. Explorer and the legal pages in English for now\.|Chef Mealan i ekrani na srpskom\./.test(await back.textContent()), "the Settings line says what is in Serbian so far");
     else ok(false, "back on Settings");
     await page.reload(); await page.waitForTimeout(800);
     ok(await page.evaluate(() => localStorage.getItem("chefmealan-lang")) === "sr-Latn", "still Srpski after opening again");
