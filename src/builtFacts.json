@@ -1,11 +1,11 @@
 {
-  "version": "0.3.93",
+  "version": "0.3.94",
   "liveSince": "2026-09-30",
   "numberedSince": "2026-10-02",
   "walkthroughs": 161,
   "evalCases": 100,
   "evalSets": 8,
   "unitTests": 581,
-  "releases": 326,
-  "perDay": 10
+  "releases": 327,
+  "perDay": 9
 }
