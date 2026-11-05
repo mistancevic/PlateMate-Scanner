@@ -1,5 +1,5 @@
 import { dec, numLocale, w, wn, wIn, mealV, mealName, dateV, dateText, type Val } from "../words";
-import { getLang } from "../lang";
+import { getLang, locOf } from "../lang";
 import { shelfName } from "../reference";
 import { atMeal } from "../plateMode";
 import { plannedName } from "../recipeDiff";
@@ -95,7 +95,7 @@ export function PlanScreen(p: AppApi) {
   const minor = isMinor(p.personal);
   const changed = !!dayFor(p.personal, date)?.changed;
   const wk = isoWeek(monday), sunday = addDays(monday, 6);
-  const weekSpan = w("plan.weekSpan", { n: wk.week, span: (l) => l === "en" ? `${monday.getDate()}${monday.getMonth() === sunday.getMonth() ? "" : ` ${MONTHS[monday.getMonth()]}`} to ${sunday.getDate()} ${MONTHS[sunday.getMonth()]}` : monday.getMonth() === sunday.getMonth() ? `${monday.getDate()}–${sunday.getDate()}. ${sunday.toLocaleDateString("sr-Latn-RS", { month: "long" })}` : `${monday.getDate()}. ${monday.toLocaleDateString("sr-Latn-RS", { month: "long" })} – ${sunday.getDate()}. ${sunday.toLocaleDateString("sr-Latn-RS", { month: "long" })}` });
+  const weekSpan = w("plan.weekSpan", { n: wk.week, span: (l) => l === "en" ? `${monday.getDate()}${monday.getMonth() === sunday.getMonth() ? "" : ` ${MONTHS[monday.getMonth()]}`} to ${sunday.getDate()} ${MONTHS[sunday.getMonth()]}` : monday.getMonth() === sunday.getMonth() ? `${monday.getDate()}–${sunday.getDate()}. ${sunday.toLocaleDateString(locOf(l), { month: "long" })}` : `${monday.getDate()}. ${monday.toLocaleDateString(locOf(l), { month: "long" })} – ${sunday.getDate()}. ${sunday.toLocaleDateString(locOf(l), { month: "long" })}` });
   // DT203 phase 9: the day in a line's own language: today · danas · Thursday · četvrtak
   const dayV: Val = isToday ? (l) => wIn(l, "plan.todayLow") : dateV(date, { weekday: "long" });
   const dayName = isToday ? "today" : WEEKDAY[(date.getDay() + 6) % 7];
@@ -139,7 +139,7 @@ export function PlanScreen(p: AppApi) {
           const n = Object.keys(p.planned[ymd(d)] ?? {}).length;
           // SL7 (Milan 21:20): today's day is always marked, picked or not
           const isT = ymd(d) === ymd(today);
-          return <button key={ymd(d)} type="button" role="tab" className={`choice ${on ? "on" : ""} ${n ? "has" : ""} ${isT ? "is-today" : ""}`} aria-selected={on} onClick={() => setPicked(ymd(d))}>{isT ? w("tab.today") : getLang() === "sr-Latn" ? d.toLocaleDateString("sr-Latn-RS", { weekday: "short" }) : DAYS[(d.getDay() + 6) % 7]} {d.getDate()}</button>;
+          return <button key={ymd(d)} type="button" role="tab" className={`choice ${on ? "on" : ""} ${n ? "has" : ""} ${isT ? "is-today" : ""}`} aria-selected={on} onClick={() => setPicked(ymd(d))}>{isT ? w("tab.today") : getLang() !== "en" ? d.toLocaleDateString(locOf(getLang()), { weekday: "short" }) : DAYS[(d.getDay() + 6) % 7]} {d.getDate()}</button>;
         })}
       </div>
       {/* 0.3.59 (Coach Milan 2 November 19:00): no cook strip on Plan; it stays on Today and the Plate */}
@@ -149,7 +149,7 @@ export function PlanScreen(p: AppApi) {
           open slots, then the plan against the target. The target is said once, in the numbers. */}
       <section className="plan plan-head">
         <div className="plan-day-head">
-          <b>{w(isToday ? "plan.todayDate" : "plan.date", { date: (l) => (l === "en" ? `${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : date.toLocaleDateString("sr-Latn-RS", { weekday: "long", day: "numeric", month: "long" })) })}
+          <b>{w(isToday ? "plan.todayDate" : "plan.date", { date: (l) => (l === "en" ? `${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })}
             {!rows.some((r) => r.kind === "training") && <button type="button" className="icon today-pencil plan-pencil" aria-label={w("plan.changeTheTrainingForThis")} onClick={() => setEditing(training ?? { work: true, kind: "rest" })}><Pencil size={15} /></button>}
           </b>
           <small>{[tWhen ? trainingShown(training) ?? tWhen.phrase : training ? w("plan.restDay") : null, openCount ? wn("plan.slotsOpen", openCount) : w("plan.allSet")].filter(Boolean).join(" · ")}</small>
@@ -266,7 +266,7 @@ function PastDay({ p, date, dayKey, line, slots, numbers }: { p: AppApi; date: D
   return (
     <section className="card plan-day plan-past">
       <div className="plan-day-head">
-        <b>{w("plan.date", { date: (l) => (l === "en" ? `${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : date.toLocaleDateString("sr-Latn-RS", { weekday: "long", day: "numeric", month: "long" })) })}</b>
+        <b>{w("plan.date", { date: (l) => (l === "en" ? `${WEEKDAY[(date.getDay() + 6) % 7]}, ${date.getDate()} ${MONTHS[date.getMonth()]}` : date.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" })) })}</b>
         <small>{line}</small>
       </div>
       {log.logged.length ? (
@@ -333,7 +333,7 @@ function ShopSheet({ p, close, showDay }: { p: AppApi; close: () => void; showDa
   const open = openList(store);
   const dt = (d: string) => new Date(`${d}T12:00:00`);
   // DT203 phase 9: the shopping list's days in the language chosen (the phone's calendar writes the Serbian names)
-  const sr = getLang() === "sr-Latn", srD = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString("sr-Latn-RS", o);
+  const sr = getLang() !== "en", srD = (d: Date, o: Intl.DateTimeFormatOptions) => d.toLocaleDateString(locOf(getLang()), o);
   const WD = (d: Date) => (sr ? srD(d, { weekday: "long" }) : WEEKDAY[(d.getDay() + 6) % 7]), MO = (d: Date) => (sr ? srD(d, { month: "long" }) : MONTHS[d.getMonth()]);
   const dayWord = (d: string) => (sr ? `${WD(dt(d))} ${dt(d).getDate()}.` : `${WD(dt(d))} ${dt(d).getDate()}`);
   const spanOf = (from: string, to: string) => sr ? (from === to ? srD(dt(from), { weekday: "long", day: "numeric", month: "long" }) : `${dayWord(from)}${dt(from).getMonth() === dt(to).getMonth() ? "" : ` ${MO(dt(from))}`} – ${dayWord(to)} ${MO(dt(to))}`)

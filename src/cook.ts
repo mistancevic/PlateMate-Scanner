@@ -50,6 +50,15 @@ export function parseCommand(said: string): Command {
   if (/\b(ponovi|opet|još jednom|jos jednom|molim\?)\b/.test(s)) return { kind: "repeat" };
   if (/\b(nazad|prethodni|vrati)\b/.test(s)) return { kind: "back" };
   if (/\b(dalje|sledeći|sledeci|sledeće|sledece|gotovo|nastavi)\b/.test(s)) return { kind: "next" };
+  // DT238 (0.3.92): Deutsch. Wie viel (how much), weiter (next), zurück (back), nochmal (repeat), stopp (stop); Koch, for a question
+  const koch = /^(?:hey |hallo )?koch[,:]?\s*(.*)$/.exec(s);
+  if (koch) { const q = koch[1].trim(); return q.length >= 3 ? { kind: "ask", question: q } : { kind: "none", said }; }
+  const wieviel = /\bwie ?viele?(?: brauche ich| ist| sind)?(?: von)?(?: der| die| das| dem| den)? (.+)$/.exec(s);
+  if (wieviel) return { kind: "howMuch", food: wieviel[1].replace(/\b(brauche ich|noch|bitte)\b/g, "").trim() };
+  if (/(^|\s)(stopp|ende|beenden|aufhören|aufhoren)(\s|$)/.test(s)) return { kind: "stop" };
+  if (/(^|\s)(nochmal|noch einmal|wiederholen|wie bitte)(\s|$)/.test(s)) return { kind: "repeat" };
+  if (/(^|\s)(zurück|zuruck|vorheriger)(\s|$)/.test(s)) return { kind: "back" };
+  if (/(^|\s)(weiter|nächster|nachster|fertig)(\s|$)/.test(s)) return { kind: "next" };
   const go = /^(?:(?:go|jump|back|skip) to )?step (\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)$|\b(?:go|jump|back|skip) to step (\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/.exec(s);
   if (go) { const n = num(go[1] ?? go[2]); if (Number.isFinite(n) && n >= 1) return { kind: "goto", step: Math.round(n) }; }
   if (/\btimer\b|\bset (?:a )?timer\b/.test(s)) {

@@ -1,5 +1,5 @@
 // DT203 (0.3.76, board Stories175 v2; Coach Milan 3 November 19:22 to 19:39, Go both): Settings, Language opens. English,
-// Srpski (latinica), Deutsch coming soon. Choosing Srpski is kept on this phone, the Settings line says what is in Serbian, and
+// Srpski (latinica), Deutsch coming soon (Deutsch (Beta) since 0.3.92, tests/flows/deutsch.cjs). Choosing Srpski is kept on this phone, the Settings line says what is in Serbian, and
 // the app's own calls to the server say the language (x-chef-lang), so Chef Mealan's AI answers come in Serbian. English again
 // takes it back. Which of his fixed lines show in Serbian is Coach Milan's tick (src/srLines.test.ts).
 const { chromium } = require("playwright");
@@ -32,7 +32,7 @@ const PORT = "3396", U = `http://127.0.0.1:${PORT}`;
     const opts = page.locator(".lang-row");
     ok(await opts.count() === 3, "three choices");
     const t = await page.locator("main").textContent();
-    ok(/English/.test(t) && /Srpski \(latinica\)/.test(t) && /Deutsch/.test(t) && /Coming soon/.test(t), "English, Srpski (latinica), Deutsch coming soon");
+    ok(/English/.test(t) && /Srpski \(latinica\)/.test(t) && /Deutsch \(Beta\)/.test(t) && !/Coming soon/.test(t), "English, Srpski (latinica), Deutsch (Beta) (0.3.92)");
     ok(await page.locator('.lang-row[aria-checked="true"]').textContent().then((x) => /^English/.test(x)), "English is chosen at first");
     const h = await opts.evaluateAll((es) => es.map((e) => e.getBoundingClientRect().height));
     ok(h.every((x) => x >= 44), "each choice is at least 44 px: " + h.map(Math.round).join(", "));
@@ -41,8 +41,6 @@ const PORT = "3396", U = `http://127.0.0.1:${PORT}`;
     ok(await page.evaluate(() => localStorage.getItem("chefmealan-lang")) === "sr-Latn", "kept on this phone");
     await page.evaluate(() => fetch("/api/version")); await page.waitForTimeout(300);
     ok(heard[1] === "sr-Latn", "the app's calls now say the language, so his AI answers come in Serbian");
-    await page.locator(".lang-row.settings-soon").click({ force: true }); await page.waitForTimeout(200);
-    ok(await page.evaluate(() => localStorage.getItem("chefmealan-lang")) === "sr-Latn", "Deutsch does nothing yet");
     await page.locator(".menu-head button.link").first().click(); await page.waitForTimeout(300);
     const back = page.locator("button.menu-row").filter({ hasText: /Language|Jezik/ }); // 0.3.85: the row's name is Jezik once Coach Milan ticked it
     if (await back.count()) ok(/Chef Mealan and the screens in Srpski\. Explorer and the legal pages in English for now\.|Chef Mealan i ekrani na srpskom\./.test(await back.textContent()), "the Settings line says what is in Serbian so far");

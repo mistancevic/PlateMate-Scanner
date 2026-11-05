@@ -283,7 +283,7 @@ function ProfilePanel(p: AppApi) {
             const kcal = p.todayMacros?.kcal ?? p.state.goals.calories, pro = p.todayMacros?.protein ?? p.state.goals.protein;
             if (!kcal || !pro) return <small className="pd-unit-day">{w("profile.pdExample")}</small>;
             const pd = (100 * pro) / kcal;
-            return <small className="pd-unit-day">{w("profile.pdYourDay", { g: Math.round(pro), kcal: Math.round(kcal).toLocaleString(numLocale()), pd: getLang() === "sr-Latn" ? dec(pd, 1) : pd.toFixed(1), pct: Math.round(pd * 4), part: Math.round(pro * 4).toLocaleString(numLocale()) })}</small>;
+            return <small className="pd-unit-day">{w("profile.pdYourDay", { g: Math.round(pro), kcal: Math.round(kcal).toLocaleString(numLocale()), pd: getLang() !== "en" ? dec(pd, 1) : pd.toFixed(1), pct: Math.round(pd * 4), part: Math.round(pro * 4).toLocaleString(numLocale()) })}</small>;
           })()}
         </div>
         <small className={`muted saved-line ${odd ? "odd" : ""}`} role="status">{!consented ? "" : odd ? `Not kept yet: ${odd}.` : w("menu.keptAsYouGoNothing")}</small>

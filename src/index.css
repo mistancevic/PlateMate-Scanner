@@ -2893,3 +2893,21 @@ html:has(.l-photo) { overflow-x: hidden; }
 .pub-cooked { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0; min-height: 44px; cursor: pointer; }
 .pub-cooked input { width: 22px; height: 22px; margin-top: 2px; flex: none; }
 .pub-cooked span { display: flex; flex-direction: column; gap: 2px; }
+
+/* DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): German words are long. The fixes are in the layout, and
+   only for German (html[lang="de"], set by src/lang.ts), so English and Srpski do not move.
+   1. A card's row of buttons wraps: each button takes its own width, a row that does not fit goes on to the next line. */
+html[lang="de"] :is(.card, .log-card, .plan, .missed-ask, [role="dialog"]) .button-row:not(:has(> :not(.pill))) { flex-wrap: wrap; }
+html[lang="de"] :is(.card, .log-card, .plan, .missed-ask, [role="dialog"]) .button-row:not(:has(> :not(.pill))) > .pill { flex: 1 1 auto; }
+/*    Today, the day with nothing yet: the main button takes the whole row, the other two share the next */
+html[lang="de"] .next-planned .button-row.next-planned-acts > .pill.pill-primary { flex-basis: 100%; }
+/* 2. The Plate: Fit and Prepare go one under the other when they don't fit side by side */
+html[lang="de"] .ways-out { flex-wrap: wrap; }
+html[lang="de"] .ways-out .pill-wide { flex: 1 1 auto; }
+/* 3. A wide button may take two lines; its words are never cut */
+html[lang="de"] :is(.pill-wide, .pill-tall) { white-space: normal; height: auto; min-height: 48px; padding-block: 8px; line-height: 1.25; text-align: center; }
+html[lang="de"] .pill-tall { min-height: 56px; }
+/* 4. The head: when the title is long, the goal line goes under it, whole; the menu button stays top right */
+html[lang="de"] .topbar { flex-wrap: wrap; row-gap: 0; padding-right: 60px; }
+html[lang="de"] .topbar .menu-button { position: absolute; right: 18px; top: calc(13px + env(safe-area-inset-top, 0px)); }
+html[lang="de"] .topbar .ref { flex: 0 0 auto; min-width: auto; overflow: visible; }

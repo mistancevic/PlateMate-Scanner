@@ -3,7 +3,7 @@
 // reads it. The summary is built from it, and the test (summary.test.ts) fails when a field of Personal, Lifestyle or Safety has
 // no line here, so no setting is set with no influence and none is forgotten.
 import { dec, w, wn, numText, dateV, type WordKey } from "./words";
-import { getLang, inLang, type Lang } from "./lang";
+import { getLang, inLang, locOf, type Lang } from "./lang";
 import { optWord } from "./optWords";
 import { placeName, kitchenName } from "./travel";
 import type { Personal } from "./personal";
@@ -132,10 +132,10 @@ const BED_WORDS: Record<string, WordKey> = { early: "sum.bed.early", mid: "sum.b
 const WAKE_WORDS: Record<string, WordKey> = { early: "sum.wake.early", mid: "sum.wake.mid", late: "sum.wake.late", varies: "sum.wake.varies" };
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 // a day of the usual week, Monday first: Mon · pon.
-const dayShort = (i: number) => (getLang() === "sr-Latn" ? new Date(2026, 10, 2 + i).toLocaleDateString("sr-Latn-RS", { weekday: "short" }) : DAYS[i]);
+const dayShort = (i: number) => (getLang() !== "en" ? new Date(2026, 10, 2 + i).toLocaleDateString(locOf(getLang()), { weekday: "short" }) : DAYS[i]);
 const placeOf = (r: string) => optWord(placeName(r as any)), kitchenOf = (k: string) => optWord(kitchenName(k as any));
 const cap = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
-const decV = (x: number) => (getLang() === "sr-Latn" ? String(x).replace(".", ",") : String(x));
+const decV = (x: number) => (getLang() !== "en" ? String(x).replace(".", ",") : String(x));
 
 export function summaryOf(x: SummaryIn): SummaryPart[] {
   const p = x.personal, l = lifestyleOf(p), parts: SummaryPart[] = [];
@@ -189,7 +189,7 @@ export function summaryOf(x: SummaryIn): SummaryPart[] {
   ]);
   // Training week
   const plan = planOf(p);
-  const intW = (id: string) => (getLang() === "sr-Latn" && ["easy", "moderate", "hard"].includes(id) ? w(`plan.intLow.${id}` as WordKey) : id);
+  const intW = (id: string) => (getLang() !== "en" && ["easy", "moderate", "hard"].includes(id) ? w(`plan.intLow.${id}` as WordKey) : id);
   const kindOf = (d: any) => [KINDS.find((k) => k.id === d.kind)?.name ?? cap(String(d.kind ?? "")), d.intensity ? `(${intW(d.intensity)})` : ""].filter(Boolean).join(" ");
   const trainDays = plan ? plan.map((d: any, i: number) => (d.kind && d.kind !== "rest" ? `${kindOf(d)} ${dayShort(i)}` : "")).filter(Boolean) : [];
   push("week", w("summary.trainingWeek"), w("me.trainingWeek"), [plan ? row("plan", PERSONAL_MAP.plan, w("sum.usualWeek"), trainDays.length ? trainDays.join(" · ") : w("sum.noTrainingYet"), wn("sum.trainDays", trainDays.length, { m: 7 - trainDays.length })) : null]);
@@ -213,35 +213,38 @@ export function summaryOf(x: SummaryIn): SummaryPart[] {
 // DT237 (0.3.88, board Stories178 v2; Coach Milan 4 November 19:15 Go): the copy is made in English and in Srpski; the coach's
 // app shows the coach's own language, and the client's with a button. What changed is read from the English rows, so a
 // switch of language changes no row: it is one line, the language the client switched to.
-export type SharedProfile = { rows: SummaryRow[]; rowsSr?: SummaryRow[]; lang?: Lang; parts: ShareId[]; changes: ProfileChange[]; updatedAt: string };
-export type ProfileChange = { at: string; text: string; textSr?: string; share: ShareId | "share"; lang?: Lang };
+// DT238 (0.3.92): rowsDe, textDe: the same copy in Deutsch, for a coach whose app is in Deutsch
+export type SharedProfile = { rows: SummaryRow[]; rowsSr?: SummaryRow[]; rowsDe?: SummaryRow[]; lang?: Lang; parts: ShareId[]; changes: ProfileChange[]; updatedAt: string };
+export type ProfileChange = { at: string; text: string; textSr?: string; textDe?: string; share: ShareId | "share"; lang?: Lang };
 export const CHANGES_KEPT = 60;
 export function sharedRows(parts: SummaryPart[], shared: ShareId[]): SummaryRow[] {
   return parts.flatMap((p) => p.rows).filter((r) => shared.includes(r.share));
 }
 const partName = (l: Lang, id: ShareId) => inLang(l, () => SHARE_PARTS.find((p) => p.id === id)!.name);
 // the next copy for the coach: the shared rows now, with what changed against the last copy, dated
-export function nextShared(prev: SharedProfile | null, rows: SummaryRow[], shared: ShareId[], now = new Date(), more: { rowsSr?: SummaryRow[]; lang?: Lang } = {}): SharedProfile | null {
+export function nextShared(prev: SharedProfile | null, rows: SummaryRow[], shared: ShareId[], now = new Date(), more: { rowsSr?: SummaryRow[]; rowsDe?: SummaryRow[]; lang?: Lang } = {}): SharedProfile | null {
   const at = now.toISOString(), changes: ProfileChange[] = [];
   const before = new Map((prev?.rows ?? []).map((r) => [r.key, r]));
   const beforeSr = new Map((prev?.rowsSr ?? prev?.rows ?? []).map((r) => [r.key, r]));
   const sr = new Map((more.rowsSr ?? rows).map((r) => [r.key, r]));
+  const beforeDe = new Map((prev?.rowsDe ?? prev?.rows ?? []).map((r) => [r.key, r]));
+  const de = new Map((more.rowsDe ?? rows).map((r) => [r.key, r]));
   const stopped = (prev?.parts ?? []).filter((id) => !shared.includes(id));
   if (prev) {
     for (const r of rows) {
-      const b = before.get(r.key), s = sr.get(r.key) ?? r, bs = beforeSr.get(r.key) ?? b;
-      if (!b) { if ((prev.parts ?? []).includes(r.share)) changes.push({ at, text: `${r.label}: ${r.value}.`, textSr: `${s.label}: ${s.value}.`, share: r.share }); }
-      else if (b.value !== r.value) changes.push({ at, text: `${r.label}: ${b.value} → ${r.value}.`, textSr: `${s.label}: ${bs!.value} → ${s.value}.`, share: r.share });
+      const b = before.get(r.key), s = sr.get(r.key) ?? r, bs = beforeSr.get(r.key) ?? b, g = de.get(r.key) ?? r, bg = beforeDe.get(r.key) ?? b;
+      if (!b) { if ((prev.parts ?? []).includes(r.share)) changes.push({ at, text: `${r.label}: ${r.value}.`, textSr: `${s.label}: ${s.value}.`, ...(more.rowsDe ? { textDe: `${g.label}: ${g.value}.` } : {}), share: r.share }); }
+      else if (b.value !== r.value) changes.push({ at, text: `${r.label}: ${b.value} → ${r.value}.`, textSr: `${s.label}: ${bs!.value} → ${s.value}.`, ...(more.rowsDe ? { textDe: `${g.label}: ${bg!.value} → ${g.value}.` } : {}), share: r.share });
     }
-    for (const id of shared.filter((x) => !(prev.parts ?? []).includes(x))) changes.push({ at, text: inLang("en", () => w("summary.startedSharing", { part: partName("en", id) })), textSr: inLang("sr-Latn", () => w("summary.startedSharing", { part: partName("sr-Latn", id) })), share: "share" });
-    for (const id of stopped) changes.push({ at, text: inLang("en", () => w("summary.stoppedSharing", { part: partName("en", id) })), textSr: inLang("sr-Latn", () => w("summary.stoppedSharing", { part: partName("sr-Latn", id) })), share: "share" });
+    for (const id of shared.filter((x) => !(prev.parts ?? []).includes(x))) changes.push({ at, text: inLang("en", () => w("summary.startedSharing", { part: partName("en", id) })), textSr: inLang("sr-Latn", () => w("summary.startedSharing", { part: partName("sr-Latn", id) })), ...(more.rowsDe ? { textDe: inLang("de", () => w("summary.startedSharing", { part: partName("de", id) })) } : {}), share: "share" });
+    for (const id of stopped) changes.push({ at, text: inLang("en", () => w("summary.stoppedSharing", { part: partName("en", id) })), textSr: inLang("sr-Latn", () => w("summary.stoppedSharing", { part: partName("sr-Latn", id) })), ...(more.rowsDe ? { textDe: inLang("de", () => w("summary.stoppedSharing", { part: partName("de", id) })) } : {}), share: "share" });
     if (more.lang && more.lang !== (prev.lang ?? "en")) changes.push({ at, text: "", share: "share", lang: more.lang });
   }
   const same = prev && !changes.length && prev.rows.length === rows.length && rows.every((r) => before.get(r.key)?.value === r.value && before.get(r.key)?.does === r.does)
-    && JSON.stringify(prev.rowsSr ?? null) === JSON.stringify(more.rowsSr ?? null) && (prev.lang ?? "en") === (more.lang ?? prev.lang ?? "en");
+    && JSON.stringify(prev.rowsSr ?? null) === JSON.stringify(more.rowsSr ?? null) && JSON.stringify(prev.rowsDe ?? null) === JSON.stringify(more.rowsDe ?? null) && (prev.lang ?? "en") === (more.lang ?? prev.lang ?? "en");
   if (same) return null;
   // a part switched off takes its past changes with it
   const kept = (prev?.changes ?? []).filter((c) => c.share === "share" || shared.includes(c.share as ShareId));
-  return { rows, ...(more.rowsSr ? { rowsSr: more.rowsSr } : {}), ...(more.lang ? { lang: more.lang } : prev?.lang ? { lang: prev.lang } : {}), parts: shared, changes: [...kept, ...changes].slice(-CHANGES_KEPT), updatedAt: at };
+  return { rows, ...(more.rowsSr ? { rowsSr: more.rowsSr } : {}), ...(more.rowsDe ? { rowsDe: more.rowsDe } : {}), ...(more.lang ? { lang: more.lang } : prev?.lang ? { lang: prev.lang } : {}), parts: shared, changes: [...kept, ...changes].slice(-CHANGES_KEPT), updatedAt: at };
 }
 export const changesSince = (sp: SharedProfile | null | undefined, seen: string | null): ProfileChange[] => (sp?.changes ?? []).filter((c) => !seen || c.at > seen);

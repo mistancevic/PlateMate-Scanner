@@ -350,9 +350,11 @@ export function synonymsOf(word: string): string[] {
 // DT203 release 2 (0.3.77, board Stories176): a food of the table shows its Serbian name when Srpski is chosen, unless you renamed
 // it; your own foods and packs keep their names
 export function foodNameIn(l: Lang, f: { refId?: string; name: string }): string {
-  if (l !== "sr-Latn") return f.name;
+  if (l === "en") return f.name;
   const r = f.refId ? REFERENCE.find((x) => x.id === f.refId) : REFERENCE.find((x) => x.en === f.name);
-  return r && r.sr && r.en === f.name ? r.sr : f.name;
+  // DT238 (0.3.92): in Deutsch the table's German name
+  const t = r ? (l === "de" ? r.de : r.sr) : "";
+  return r && t && r.en === f.name ? t : f.name;
 }
 export const foodName = (f: { refId?: string; name: string }) => foodNameIn(getLang(), f);
 export const foodV = (f: { refId?: string; name: string }, short = false) => (l: Lang) => { const n = foodNameIn(l, f); return short ? n.split(",")[0].trim() : n; };

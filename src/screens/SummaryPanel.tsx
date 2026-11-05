@@ -115,16 +115,16 @@ export function SharePublisher(p: AppApi) {
   const uid = p.user?.uid ?? null, coachId = p.profile.coachId ?? null;
   const shared = sharedParts(p.personal.coachShare);
   const lang = useLang();
-  const both = useMemo(() => ({ en: inLang("en", () => sharedRows(summaryOf(summaryInOf(p)), shared)), sr: inLang("sr-Latn", () => sharedRows(summaryOf(summaryInOf(p)), shared)) }), [p.personal, p.safety, p.state.goals, p.state.preferences, p.goal, p.region, p.placesOn, p.pdRef, p.formula]);
+  const both = useMemo(() => ({ en: inLang("en", () => sharedRows(summaryOf(summaryInOf(p)), shared)), sr: inLang("sr-Latn", () => sharedRows(summaryOf(summaryInOf(p)), shared)), de: inLang("de", () => sharedRows(summaryOf(summaryInOf(p)), shared)) }), [p.personal, p.safety, p.state.goals, p.state.preferences, p.goal, p.region, p.placesOn, p.pdRef, p.formula]);
   const rows = both.en;
-  const key = JSON.stringify([rows.map((r) => [r.key, r.value, r.does]), both.sr.map((r) => [r.label, r.value, r.does]), shared, lang]);
+  const key = JSON.stringify([rows.map((r) => [r.key, r.value, r.does]), both.sr.map((r) => [r.label, r.value, r.does]), both.de.map((r) => [r.label, r.value, r.does]), shared, lang]);
   useEffect(() => {
     if (!uid || !coachId || !p.cloudEnabled) return;
     let gone = false;
     const t = setTimeout(async () => {
       try {
         if (prev.current === undefined) prev.current = await loadSharedProfile(uid);
-        const next = nextShared(prev.current ?? null, rows, shared, new Date(), { rowsSr: both.sr, lang });
+        const next = nextShared(prev.current ?? null, rows, shared, new Date(), { rowsSr: both.sr, rowsDe: both.de, lang });
         if (!next || gone) return;
         await saveSharedProfile(uid, next); prev.current = next;
       } catch { /* tried again on the next change */ }
@@ -149,7 +149,7 @@ export function ProfileChanges({ uid, sp, name }: { uid: string; sp: SharedProfi
   if (!changed.length) return null;
   const d = (iso: string) => dateText(new Date(iso), { day: "numeric", month: "short" });
   // in the coach's language; a switch of language is its own line
-  const textOf = (c: ProfileChange) => (c.lang ? w(c.lang === "sr-Latn" ? "summary.langToSr" : "summary.langToEn", { name }) : getLang() === "sr-Latn" ? c.textSr ?? c.text : c.text);
+  const textOf = (c: ProfileChange) => (c.lang ? w(c.lang === "sr-Latn" ? "summary.langToSr" : c.lang === "de" ? "summary.langToDe" : "summary.langToEn", { name }) : getLang() === "sr-Latn" ? c.textSr ?? c.text : getLang() === "de" ? c.textDe ?? c.text : c.text);
   return <section className="card profile-changes"><b>{w("summary.whatChangedSinceYouLast")}</b>{changed.map((c, i) => <div key={i} className="change-row"><small className="change-at">{d(c.at)}</small><small>{textOf(c)}</small></div>)}<small className="muted">{w("summary.inTheProfileBelow")}</small></section>;
 }
 export function SharedProfileCard({ name, sp }: { name: string; sp: SharedProfile | null | undefined }) {
@@ -157,9 +157,11 @@ export function SharedProfileCard({ name, sp }: { name: string; sp: SharedProfil
   const [theirs, setTheirs] = useState(false);
   if (!sp || !sp.rows?.length) return <section className="card shared-profile"><b>{w("summary.cardTitle", { name })}</b><small>{w("summary.cardNone", { name })}</small></section>;
   // DT237 v2: the card in the coach's language; a button shows it in the client's, when that is another and its copy is there
-  const other: Lang | null = sp.lang && sp.lang !== mine && (sp.lang === "en" || sp.rowsSr) ? sp.lang : null;
+  // DT238 (0.3.92): and Deutsch
+  const rowsIn = (l: Lang) => (l === "sr-Latn" ? sp.rowsSr : l === "de" ? sp.rowsDe : sp.rows);
+  const other: Lang | null = sp.lang && sp.lang !== mine && (sp.lang === "en" || rowsIn(sp.lang)) ? sp.lang : null;
   const shown: Lang = theirs && other ? other : mine;
-  const rows = shown === "sr-Latn" ? sp.rowsSr ?? sp.rows : sp.rows;
+  const rows = rowsIn(shown) ?? sp.rows;
   const notShared = SHARE_PARTS.filter((x) => !sp.parts.includes(x.id)).map((x) => x.name.toLowerCase());
   const d = (iso: string) => dateV(new Date(iso), { day: "numeric", month: "short" });
   const body = inLang(shown, () => (Object.keys(TITLES) as SummaryPart["id"][]).map((id) => ({ id, title: TITLES[id], rows: rows.filter((r) => (PART_OF[r.key] ?? "goal") === id) })).filter((x) => x.rows.length)
@@ -168,7 +170,7 @@ export function SharedProfileCard({ name, sp }: { name: string; sp: SharedProfil
     <div className="shared-profile">
       <p className="label">{w("summary.cardTitle", { name })}</p>
       <small className="muted">{w("summary.cardAsToday", { name, date: d(sp.updatedAt) })}</small>
-      {other && <div className="button-row sum-theirs"><button type="button" className="pill" aria-pressed={theirs} onClick={() => setTheirs((t) => !t)}>{theirs ? w(mine === "sr-Latn" ? "summary.backToSr" : "summary.backToEn") : w(other === "sr-Latn" ? "summary.seeInSr" : "summary.seeInEn", { name })}</button></div>}
+      {other && <div className="button-row sum-theirs"><button type="button" className="pill" aria-pressed={theirs} onClick={() => setTheirs((t) => !t)}>{theirs ? w(mine === "sr-Latn" ? "summary.backToSr" : mine === "de" ? "summary.backToDe" : "summary.backToEn") : w(other === "sr-Latn" ? "summary.seeInSr" : other === "de" ? "summary.seeInDe" : "summary.seeInEn", { name })}</button></div>}
       {body}
       {notShared.length > 0 && <section className="card"><b>{w("summary.notShared")}</b><small>{w("summary.notSharedLine", { list: notShared.join(", ").replace(/^./, (x) => x.toUpperCase()), name })}</small></section>}
       <div className="button-row"><button className="pill" onClick={() => window.print()}>{w("summary.saveAsPdfAsOf")}</button></div>

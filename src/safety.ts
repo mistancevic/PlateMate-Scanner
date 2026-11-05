@@ -3,6 +3,7 @@
 import { getLang } from "./lang";
 import { readerIsShe } from "./words";
 import srLines from "./i18n/sr-Latn.json" with { type: "json" };
+import deLines from "./i18n/de.json" with { type: "json" };
 import type { Food } from "./pilot";
 
 export type SituationId = "eating" | "pregnancy" | "diabetes" | "allergies" | "medication";
@@ -69,7 +70,9 @@ export const FIXED: Record<SituationId | "off", string> = {
 // DT203 (0.3.76): the same lines in Srpski (latinica), from Coach Milan's table; only a line he checked is used, else the English
 export function fixedLine(id: SituationId | "off"): string {
   // 0.3.91 (Coach Milan 5 November 10:12): a line with two forms, he|she, follows the sex in the profile, as the screen lines do
-  if (getLang() === "sr-Latn") { const l = (srLines as any).safety?.[id]; if (l && l.checked && typeof l.text === "string") { const p = l.text.split("|"); return p.length === 2 ? p[readerIsShe() ? 1 : 0] : l.text; } }
+  // DT238 (0.3.92): and in Deutsch (Beta), confirmed as Beta by Coach Milan 5 November 11:36
+  const lang = getLang();
+  if (lang !== "en") { const l = ((lang === "de" ? deLines : srLines) as any).safety?.[id]; if (l && l.checked && typeof l.text === "string") { const p = l.text.split("|"); return p.length === 2 ? p[readerIsShe() ? 1 : 0] : l.text; } }
   return FIXED[id];
 }
 export const PROFESSIONAL: Record<SituationId, string> = { eating: "a doctor or a therapist who works with eating", pregnancy: "your midwife or doctor", diabetes: "your doctor or diabetes nurse", allergies: "your doctor or an allergist", medication: "your doctor or pharmacist" };
