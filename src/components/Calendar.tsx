@@ -15,8 +15,8 @@ import { nextCheckIn } from "../goalGuide";
 import { getStore } from "../shopping";
 import { log } from "../log";
 
-const KIND_NAME: Record<CalKind, string> = { meals: "Meals", cooking: "Cooking", training: "Training", shopping: "Shopping", weigh: "Weigh in", checkin: "Check-in" };
-const KIND_WHY: Partial<Record<CalKind, string>> = { weigh: "Off at first: a shared calendar would show it.", checkin: "Off at first, for the same reason." };
+const KIND_NAME: Record<CalKind, string> = { get meals() { return w("calendar.kind.meals"); }, get cooking() { return w("calendar.kind.cooking"); }, get training() { return w("calendar.kind.training"); }, get shopping() { return w("calendar.kind.shopping"); }, get weigh() { return w("calendar.kind.weigh"); }, get checkin() { return w("calendar.kind.checkin"); } };
+const KIND_WHY: Partial<Record<CalKind, string>> = { get weigh() { return w("calendar.why.weigh"); }, get checkin() { return w("calendar.why.checkin"); } };
 export const timeZoneHere = () => { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"; } catch { return "UTC"; } };
 const calOf = (p: AppApi): CalSettings => p.personal.calendar ?? { on: false };
 // 0.3.22: a calendar Google just made is kept at once, on the freshest settings, so leaving the page never loses it
@@ -136,11 +136,11 @@ export function CalendarPage({ p }: { p: AppApi }) {
   const kinds = CAL_KINDS.map((k) => {
     const on = kindOn(c, k);
     const ex = k === "meals" ? w("calendar.breakfastLunchDinnerAtYour") : k === "cooking" ? w("calendar.cookDinnerMinutesBeforeWhen")
-      : k === "training" ? w("calendar.yourTrainingDaysAtTheir") : k === "shopping" ? "A shopping list, on the day you pick with Shop on"
-      : k === "weigh" ? w("calendar.weighInBeforeBreakfast") : p.profile.coachId ? `Check-in with ${p.coachLabel}, every 4 weeks` : w("calendar.goalCheckInEveryWeeks");
+      : k === "training" ? w("calendar.yourTrainingDaysAtTheir") : k === "shopping" ? w("calendar.shoppingEx")
+      : k === "weigh" ? w("calendar.weighInBeforeBreakfast") : p.profile.coachId ? w("calendar.checkInWithEvery", { coach: p.coachLabel }) : w("calendar.goalCheckInEveryWeeks");
     const row = (
       <button key={k} type="button" role="switch" aria-checked={on} className={`cal-kind ${k === "meals" && on ? "cal-kind-open" : ""}`} onClick={() => set({ kinds: { ...c.kinds, [k]: !on } })}>
-        <span><b>{k === "checkin" && p.profile.coachId ? `Check-in with ${p.coachLabel}` : KIND_NAME[k]}</b><small>{ex}</small>{KIND_WHY[k] && <small className="cal-why">{KIND_WHY[k]}</small>}</span><Switch on={on} />
+        <span><b>{k === "checkin" && p.profile.coachId ? w("calendar.checkInWith", { coach: p.coachLabel }) : KIND_NAME[k]}</b><small>{ex}</small>{KIND_WHY[k] && <small className="cal-why">{KIND_WHY[k]}</small>}</span><Switch on={on} />
       </button>
     );
     // DT179a (0.3.23, board Stories128): which meals go in, every slot or only the planned ones
@@ -206,7 +206,7 @@ export function CalendarPage({ p }: { p: AppApi }) {
         <small className="muted">{w("calendar.eachKindIsOnOr")}</small>
         {kinds}
         <button type="button" role="switch" aria-checked={dishOn(c)} className="cal-kind" onClick={() => set({ dish: !dishOn(c) })}>
-          <span><b>{w("calendar.theDishSName")}</b><small>Lunch · Chicken rice bowl, or just Lunch</small></span><Switch on={dishOn(c)} />
+          <span><b>{w("calendar.theDishSName")}</b><small>{w("calendar.dishExample")}</small></span><Switch on={dishOn(c)} />
         </button>
       </section>
       <section className="card">

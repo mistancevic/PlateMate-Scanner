@@ -64,7 +64,7 @@ function Chart({ t, unit = "" }: { t: ReturnType<typeof trendOf>; unit?: string 
 // Me › Goal and the coach's client page: the last 4 weeks (canvas board W2)
 export function WeightTrend({ list, band, weightKg, trainingAge, onUpdateWeight, onRemove, coach = false }: { list: WeighIn[] | undefined; band: string; weightKg?: number; trainingAge?: string; onUpdateWeight?: (kg: number) => void; onRemove?: (date: string) => void; coach?: boolean }) {
   const [showAll, setShowAll] = useState(false);
-  if (!list?.length) return coach ? null : <section className="card weight-trend"><b>{w("weight.theLastWeeks")}</b><small className="muted">Weigh in on Me a few mornings a week, and the trend shows here: your 7-day average against what {goalName(band) || "your goal"} expects.</small></section>;
+  if (!list?.length) return coach ? null : <section className="card weight-trend"><b>{w("weight.theLastWeeks")}</b><small className="muted">{goalName(band) ? w("weight.weighHint", { goal: goalName(band) }) : w("weight.weighHintNoGoal")}</small></section>;
   const t = trendOf(list, band, weightKg ?? list[list.length - 1].kg, trainingAge);
   const note = verdictNote(band, t.verdict);
   const avg = avg7(list);

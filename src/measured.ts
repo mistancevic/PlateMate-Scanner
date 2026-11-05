@@ -109,6 +109,6 @@ const MO = ["January", "February", "March", "April", "May", "June", "July", "Aug
 const sr = () => getLang() === "sr-Latn";
 const srMonth = (d: Date) => d.toLocaleDateString("sr-Latn-RS", { month: "long" });
 export const longDate = (ymd: string) => { const d = new Date(`${ymd}T12:00:00`); return sr() ? d.toLocaleDateString("sr-Latn-RS", { weekday: "long", day: "numeric", month: "long" }) : `${WD[d.getDay()]} ${d.getDate()} ${MO[d.getMonth()]}`; };
-export const shortDate = (ymd: string) => { const d = new Date(`${ymd}T12:00:00`); return `${WD[d.getDay()].slice(0, 3)} ${d.getDate()} ${MO[d.getMonth()].slice(0, 3)}`; };
+export const shortDate = (ymd: string) => { const d = new Date(`${ymd}T12:00:00`); return sr() ? d.toLocaleDateString("sr-Latn-RS", { weekday: "short", day: "numeric", month: "short" }) : `${WD[d.getDay()].slice(0, 3)} ${d.getDate()} ${MO[d.getMonth()].slice(0, 3)}`; };
 export const spanOf = (from: string, to: string) => { const a = new Date(`${from}T12:00:00`), b = new Date(`${to}T12:00:00`); if (sr()) return a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()}. ${srMonth(b)}` : `${a.getDate()}. ${srMonth(a)} – ${b.getDate()}. ${srMonth(b)}`; return a.getMonth() === b.getMonth() ? `${a.getDate()} to ${b.getDate()} ${MO[b.getMonth()]}` : `${a.getDate()} ${MO[a.getMonth()]} to ${b.getDate()} ${MO[b.getMonth()]}`; };
 export const kgText = (x: number) => `${dec(Math.abs(wIn(x)), 2).replace(/0$/, "").replace(/[.,]0$/, "")} ${wUnit()}`;
