@@ -1,6 +1,7 @@
 // Safety rules, version 1 (4 October 2026). Code decides; the model is told; nothing here is improvised.
 // Mealan is a chef. For people who need more than a chef it steps back, names a professional, and keeps the plate working.
 import { getLang } from "./lang";
+import { readerIsShe } from "./words";
 import srLines from "./i18n/sr-Latn.json" with { type: "json" };
 import type { Food } from "./pilot";
 
@@ -67,7 +68,8 @@ export const FIXED: Record<SituationId | "off", string> = {
 };
 // DT203 (0.3.76): the same lines in Srpski (latinica), from Coach Milan's table; only a line he checked is used, else the English
 export function fixedLine(id: SituationId | "off"): string {
-  if (getLang() === "sr-Latn") { const l = (srLines as any).safety?.[id]; if (l && l.checked && typeof l.text === "string") return l.text; }
+  // 0.3.91 (Coach Milan 5 November 10:12): a line with two forms, he|she, follows the sex in the profile, as the screen lines do
+  if (getLang() === "sr-Latn") { const l = (srLines as any).safety?.[id]; if (l && l.checked && typeof l.text === "string") { const p = l.text.split("|"); return p.length === 2 ? p[readerIsShe() ? 1 : 0] : l.text; } }
   return FIXED[id];
 }
 export const PROFESSIONAL: Record<SituationId, string> = { eating: "a doctor or a therapist who works with eating", pregnancy: "your midwife or doctor", diabetes: "your doctor or diabetes nurse", allergies: "your doctor or an allergist", medication: "your doctor or pharmacist" };

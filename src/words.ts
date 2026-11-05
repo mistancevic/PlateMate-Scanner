@@ -40,6 +40,8 @@ export function screenProblems(k: string, t: string): string[] {
 }
 
 const she = () => { try { return JSON.parse(localStorage.getItem("chefmealan-personal") || "{}").sex === "female"; } catch { return false; } };
+// 0.3.91: the safety lines pick he|she the same way
+export const readerIsShe = she;
 const srOf = (k: string): string[] | null => { const l = SR[k]; return l && l.checked && !screenProblems(k, l.text).length ? l.text.split("|") : null; };
 const srCountForm = (n: number) => { const a = Math.abs(n) % 100, b = a % 10; return a >= 11 && a <= 14 ? 2 : b === 1 ? 0 : b >= 2 && b <= 4 ? 1 : 2; };
 

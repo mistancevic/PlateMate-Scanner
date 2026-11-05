@@ -82,11 +82,11 @@
       "checked": true
     },
     "carryLater": {
-      "text": "Prošlo je oko 30 minuta: koliko te je ovo držalo sitim?",
+      "text": "Prošlo je oko 30 minuta: kako ti je prijalo?",
       "checked": true
     },
     "carryNow": {
-      "text": "Koliko te je ovo držalo sitim? Odgovori sada, ili za {minutes}, kad te pitam.",
+      "text": "Kako ti je prijalo? Odgovori sada, ili za {minutes}, kad te pitam.",
       "checked": true
     },
     "whichMeal": {
@@ -116,7 +116,7 @@
   },
   "safety": {
     "eating": {
-      "text": "Ja sam kuvar, pa ovo nije nešto o čemu bi trebalo da savetujem. Pravi sagovornik je lekar ili terapeut koji radi s ishranom. Tvoj trener vidi da si mi to rekao, ali ne i šta si napisao. I dalje ti pomažem s namirnicama, tanjirima i količinama. Brojevi su tu da te informišu, nikad da te osuđuju.",
+      "text": "Ja sam kuvar, pa ovo nije nešto o čemu bi trebalo da savetujem. Pravi sagovornik je lekar ili terapeut koji radi s ishranom. Tvoj trener vidi da si mi to rekao, ali ne i šta si napisao. I dalje ti pomažem s namirnicama, tanjirima i količinama. Brojevi su tu da te informišu, nikad da te osuđuju.|Ja sam kuvar, pa ovo nije nešto o čemu bi trebalo da savetujem. Pravi sagovornik je lekar ili terapeut koji radi s ishranom. Tvoj trener vidi da si mi to rekla, ali ne i šta si napisala. I dalje ti pomažem s namirnicama, tanjirima i količinama. Brojevi su tu da te informišu, nikad da te osuđuju.",
       "checked": true
     },
     "pregnancy": {
@@ -128,7 +128,7 @@
       "checked": true
     },
     "allergies": {
-      "text": "Zapisano. Neću predlagati ništa što sadrži ono što si naveo, i proveravam naziv i deklaraciju svake namirnice. Provera deklaracije i dalje pokazuje šta svako pakovanje sadrži, pa možeš i sam da proveriš.",
+      "text": "Zapisano. Neću predlagati ništa što sadrži ono što si naveo, i proveravam naziv i deklaraciju svake namirnice. Provera deklaracije i dalje pokazuje šta svako pakovanje sadrži, pa možeš i sam da proveriš.|Zapisano. Neću predlagati ništa što sadrži ono što si navela, i proveravam naziv i deklaraciju svake namirnice. Provera deklaracije i dalje pokazuje šta svako pakovanje sadrži, pa možeš i sama da proveriš.",
       "checked": true
     },
     "medication": {
@@ -7983,10 +7983,10 @@
     },
     "langpanel.chefMealanHisQuestionsHis": {
       "text": "Chef Mealan i ekrani. Istraživač i pravne stranice za sada ostaju na engleskom.",
-      "checked": false
+      "checked": true
     },
     "carry.howItCarriesYou": {
-      "text": "Kako se osećaš",
+      "text": "Kako ti prija",
       "checked": true
     },
     "carry.heavyForYou": {
@@ -8226,11 +8226,11 @@
       "checked": true
     },
     "today.howCarry": {
-      "text": "Kako te je nosio obrok {title}?",
+      "text": "{title}: kako ti je prijalo?",
       "checked": true
     },
     "today.carriedYou": {
-      "text": "Nosio te je:",
+      "text": "Kako ti je prijalo:",
       "checked": true
     },
     "today.pickAMealLow": {
@@ -9818,7 +9818,7 @@
       "checked": true
     },
     "life.windowOne": {
-      "text": "Jedan obrok dnevno, u {from}. Prozor za jelo: od {from} do {to}, sat od tvog obroka. On nosi ceo tvoj dan: oko {kcal} kcal i {protein} g proteina.",
+      "text": "Jedan obrok dnevno, u {from}. Prozor za jelo: od {from} do {to}, sat od tvog obroka. Taj obrok pokriva ceo tvoj dan: oko {kcal} kcal i {protein} g proteina.",
       "checked": true
     },
     "life.window": {
@@ -10771,511 +10771,511 @@
     },
     "cook.cookingNow": {
       "text": "Kuvanje u toku",
-      "checked": false
+      "checked": true
     },
     "cook.stageEat": {
       "text": "Jelo",
-      "checked": false
+      "checked": true
     },
     "cook.stepOf": {
       "text": "korak {k} od {n}",
-      "checked": false
+      "checked": true
     },
     "cook.eatenAt": {
       "text": "Pojedeno u {time}",
-      "checked": false
+      "checked": true
     },
     "cook.asksIn": {
       "text": "Chef Mealan pita kako ti je prijalo za {m} min",
-      "checked": false
+      "checked": true
     },
     "cook.asks": {
       "text": "Chef Mealan pita kako ti je prijalo",
-      "checked": false
+      "checked": true
     },
     "cook.stepsTicked": {
       "text": "{t} od {n} koraka označeno",
-      "checked": false
+      "checked": true
     },
     "cook.photosN": {
       "text": "{n} fotografija|{n} fotografije|{n} fotografija",
-      "checked": false
+      "checked": true
     },
     "profile.agreedOn": {
       "text": "Pristanak na telesne podatke dat je {date}. Nalazi se u tvom izvozu, i briše se sa svim ostalim kad obrišeš nalog.",
-      "checked": false
+      "checked": true
     },
     "profile.bodyFatIf": {
       "text": "Procenat masti, ako ga znaš",
-      "checked": false
+      "checked": true
     },
     "profile.fromScale": {
       "text": "sa vage ili skenera",
-      "checked": false
+      "checked": true
     },
     "profile.ovenC": {
       "text": "Temperatura rerne u koracima: 175 °C. Recept u °F se pretvara za tebe: 350 °F je 175 °C.",
-      "checked": false
+      "checked": true
     },
     "profile.ovenF": {
       "text": "Temperatura rerne u koracima: {f} °F. Recept u °C se pretvara za tebe.",
-      "checked": false
+      "checked": true
     },
     "profile.kgIsLb": {
       "text": "{kg} kg je {lb} lb, na merenjima i u cilju.",
-      "checked": false
+      "checked": true
     },
     "profile.ftIn": {
       "text": "ft i in",
-      "checked": false
+      "checked": true
     },
     "profile.pctOfCal": {
       "text": "% kalorija iz proteina",
-      "checked": false
+      "checked": true
     },
     "profile.pdExample": {
       "text": "Na primer: 5 g proteina u 100 kcal je PD 5, ili 20 % (20 od 100 kcal).",
-      "checked": false
+      "checked": true
     },
     "profile.pdYourDay": {
       "text": "Tvoj dan: {g} g proteina u {kcal} kcal. To je PD {pd}, ili {pct} % ({part} od {kcal} kcal).",
-      "checked": false
+      "checked": true
     },
     "goalp.setBy": {
       "text": "postavio: {who}",
-      "checked": false
+      "checked": true
     },
     "goalp.ownNumbers": {
       "text": "tvoji sopstveni brojevi",
-      "checked": false
+      "checked": true
     },
     "goalp.calculated": {
       "text": "izračunato za tebe",
-      "checked": false
+      "checked": true
     },
     "goalp.howGoal": {
       "text": "Minus 20 % za gubitak masti, minus 10 % za rekompoziciju, plus 5 % za postepenu izgradnju mišića, plus 10 % za bržu, plus 5 % za performans.",
-      "checked": false
+      "checked": true
     },
     "goalp.howProtein": {
       "text": "1,6 do 2,2 g po kg ako treniraš dvaput nedeljno ili više, inače 1,2 do 1,6. Isto svaki dan; energija se menja sa treningom.",
-      "checked": false
+      "checked": true
     },
     "shopp.homeFoods": {
       "text": "Kuća · {n} namirnica",
-      "checked": false
+      "checked": true
     },
     "shopp.homeFoodsCy": {
       "text": "Kuća · {n} namirnica, pedeset kiparskih sa grčkim imenima",
-      "checked": false
+      "checked": true
     },
     "shopp.morePlaces": {
       "text": "Još mesta: {n}",
-      "checked": false
+      "checked": true
     },
     "shopp.cooksFirst": {
       "text": "Chef Mealan prvo kuva u ovima: ukusi, začini, kako se obrok slaže. Izaberi jednu ili više.",
-      "checked": false
+      "checked": true
     },
     "shopp.stepsForWhatYouHave": {
       "text": "Chef Mealan piše korake za ono što imaš. Recept kome treba nešto što nemaš kaže kako da ga napraviš bez toga, ili da ne može.",
-      "checked": false
+      "checked": true
     },
     "shopp.anotherInstead": {
       "text": "Drugo umesto: {dish}",
-      "checked": false
+      "checked": true
     },
     "goal.who.recomp": {
       "text": "gubiš masti i gradiš mišiće u isto vreme",
-      "checked": false
+      "checked": true
     },
     "goal.who.fatloss": {
       "text": "tvoja težina ide dole",
-      "checked": false
+      "checked": true
     },
     "goal.who.maintain": {
       "text": "tvoja težina i snaga ostaju gde jesu",
-      "checked": false
+      "checked": true
     },
     "goal.who.gain": {
       "text": "tvoja težina polako raste, uglavnom kao mišići",
-      "checked": false
+      "checked": true
     },
     "goal.who.performance": {
       "text": "dovoljno hrane za težak trening ili sport izdržljivosti",
-      "checked": false
+      "checked": true
     },
     "goal.who.gainsteady": {
       "text": "postepen napredak u snazi; tvoja težina polako raste",
-      "checked": false
+      "checked": true
     },
     "safetyq.detail.eating": {
       "text": "sada ili ranije",
-      "checked": false
+      "checked": true
     },
     "safetyq.detail.allergies": {
       "text": "označi, pa reci koje",
-      "checked": false
+      "checked": true
     },
     "safetyq.detail.medication": {
       "text": "antikoagulansi, MAO inhibitori, štitna žlezda, sve što ti je lekar rekao u vezi sa hranom",
-      "checked": false
+      "checked": true
     },
     "safetyq.answeredOn": {
       "text": "Odgovoreno {date}. Svaka oznaka se odmah čuva, i možeš je promeniti kad god hoćeš.",
-      "checked": false
+      "checked": true
     },
     "safetyq.answered": {
       "text": "Odgovoreno. Svaka oznaka se odmah čuva, i možeš je promeniti kad god hoćeš.",
-      "checked": false
+      "checked": true
     },
     "weight.weighHint": {
       "text": "Meri se na Ja nekoliko jutara nedeljno, i trend se pojavljuje ovde: tvoj prosek za 7 dana prema onome što cilj {goal} očekuje.",
-      "checked": false
+      "checked": true
     },
     "weight.weighHintNoGoal": {
       "text": "Meri se na Ja nekoliko jutara nedeljno, i trend se pojavljuje ovde: tvoj prosek za 7 dana prema onome što tvoj cilj očekuje.",
-      "checked": false
+      "checked": true
     },
     "protein.rangeTrains": {
       "text": "Tvoj raspon je {min} do {max} g dnevno: {lo} do {hi} g za svaki kg koji imaš, jer redovno treniraš.",
-      "checked": false
+      "checked": true
     },
     "protein.rangeNotYet": {
       "text": "Tvoj raspon je {min} do {max} g dnevno: {lo} do {hi} g za svaki kg koji imaš, jer još ne treniraš redovno.",
-      "checked": false
+      "checked": true
     },
     "sheet.food.fatloss": {
       "text": "oko 20 % manje nego što trošiš",
-      "checked": false
+      "checked": true
     },
     "sheet.food.recomp": {
       "text": "oko 10 % manje nego što trošiš",
-      "checked": false
+      "checked": true
     },
     "sheet.food.maintain": {
       "text": "onoliko koliko trošiš",
-      "checked": false
+      "checked": true
     },
     "sheet.food.gainsteady": {
       "text": "oko 5 % više nego što trošiš",
-      "checked": false
+      "checked": true
     },
     "sheet.food.gain": {
       "text": "oko 10 % više nego što trošiš",
-      "checked": false
+      "checked": true
     },
     "sheet.food.performance": {
       "text": "oko 5 % više, više od toga ugljeni hidrati",
-      "checked": false
+      "checked": true
     },
     "sheet.progress.fatloss": {
       "text": "težina i struk dole, snaga se drži",
-      "checked": false
+      "checked": true
     },
     "sheet.progress.recomp": {
       "text": "struk dole, snaga gore, težina otprilike ista",
-      "checked": false
+      "checked": true
     },
     "sheet.progress.maintain": {
       "text": "težina u svom rasponu",
-      "checked": false
+      "checked": true
     },
     "sheet.progress.gainsteady": {
       "text": "veće težine na treningu, struk otprilike isti",
-      "checked": false
+      "checked": true
     },
     "sheet.progress.gain": {
       "text": "težina raste po planu, snaga gore, struk polako raste",
-      "checked": false
+      "checked": true
     },
     "sheet.progress.performance": {
       "text": "trening ide dobro, težina stabilna",
-      "checked": false
+      "checked": true
     },
     "sheet.down": {
       "text": "dole {kg} nedeljno",
-      "checked": false
+      "checked": true
     },
     "sheet.upWeek": {
       "text": "gore {kg} nedeljno",
-      "checked": false
+      "checked": true
     },
     "sheet.upMonth": {
       "text": "gore {kg} mesečno",
-      "checked": false
+      "checked": true
     },
     "sheet.recomp": {
       "text": "otprilike ista; struk ide dole",
-      "checked": false
+      "checked": true
     },
     "sheet.within": {
       "text": "u okviru {range}",
-      "checked": false
+      "checked": true
     },
     "sheet.stable": {
       "text": "stabilna",
-      "checked": false
+      "checked": true
     },
     "sheet.agreed": {
       "text": "Dogovoreno sa: {who}, {date}",
-      "checked": false
+      "checked": true
     },
     "sheet.setByCoach": {
       "text": "Postavio: {who}, {date}",
-      "checked": false
+      "checked": true
     },
     "sheet.setByYou": {
       "text": "Tvoj izbor, {date}",
-      "checked": false
+      "checked": true
     },
     "sheet.coachName": {
       "text": "Trener {name}",
-      "checked": false
+      "checked": true
     },
     "sheet.yourCoach": {
       "text": "tvoj trener",
-      "checked": false
+      "checked": true
     },
     "sheet.counted": {
       "text": "tvoj prosek za 7 dana, ne jedno jutro",
-      "checked": false
+      "checked": true
     },
     "sheet.checkIn": {
       "text": "{date}, na svake 4 nedelje",
-      "checked": false
+      "checked": true
     },
     "calendar.kind.meals": {
       "text": "Obroci",
-      "checked": false
+      "checked": true
     },
     "calendar.kind.cooking": {
       "text": "Kuvanje",
-      "checked": false
+      "checked": true
     },
     "calendar.kind.training": {
       "text": "Trening",
-      "checked": false
+      "checked": true
     },
     "calendar.kind.shopping": {
       "text": "Kupovina",
-      "checked": false
+      "checked": true
     },
     "calendar.kind.weigh": {
       "text": "Merenje",
-      "checked": false
+      "checked": true
     },
     "calendar.kind.checkin": {
       "text": "Provera",
-      "checked": false
+      "checked": true
     },
     "calendar.why.weigh": {
       "text": "Isključeno na početku: deljeni kalendar bi ga pokazao.",
-      "checked": false
+      "checked": true
     },
     "calendar.why.checkin": {
       "text": "Isključeno na početku, iz istog razloga.",
-      "checked": false
+      "checked": true
     },
     "calendar.shoppingEx": {
       "text": "Lista za kupovinu, na dan koji izabereš sa: Kupovina dana",
-      "checked": false
+      "checked": true
     },
     "calendar.checkInWithEvery": {
       "text": "Provera sa: {coach}, na svake 4 nedelje",
-      "checked": false
+      "checked": true
     },
     "calendar.checkInWith": {
       "text": "Provera sa: {coach}",
-      "checked": false
+      "checked": true
     },
     "calendar.dishExample": {
       "text": "Ručak · Činija piletine sa pirinčem, ili samo Ručak",
-      "checked": false
+      "checked": true
     },
     "menu.nextTo": {
       "text": "Dalje: {to}",
-      "checked": false
+      "checked": true
     },
     "rf.sort.fit": {
       "text": "Za tvoj dan",
-      "checked": false
+      "checked": true
     },
     "rf.sort.new": {
       "text": "Najnoviji",
-      "checked": false
+      "checked": true
     },
     "rf.sort.made": {
       "text": "Najčešće pravljeni",
-      "checked": false
+      "checked": true
     },
     "rf.sort.pd": {
       "text": "Najviši PD",
-      "checked": false
+      "checked": true
     },
     "rf.sort.quick": {
       "text": "Najbrži",
-      "checked": false
+      "checked": true
     },
     "rf.sort.az": {
       "text": "Od A do Ž",
-      "checked": false
+      "checked": true
     },
     "rf.moment.breakfast": {
       "text": "Doručak",
-      "checked": false
+      "checked": true
     },
     "rf.moment.lunch": {
       "text": "Ručak ili večera",
-      "checked": false
+      "checked": true
     },
     "rf.moment.snack": {
       "text": "Užina",
-      "checked": false
+      "checked": true
     },
     "rf.me": {
       "text": "ja",
-      "checked": false
+      "checked": true
     },
     "rf.members": {
       "text": "članovi",
-      "checked": false
+      "checked": true
     },
     "rf.noName": {
       "text": "član bez imena",
-      "checked": false
+      "checked": true
     },
     "rf.madeByMe": {
       "text": "Napravio sam|Napravila sam",
-      "checked": false
+      "checked": true
     },
     "rf.madeByCoach": {
       "text": "Napravio: {coach}",
-      "checked": false
+      "checked": true
     },
     "rf.madeByMembers": {
       "text": "Napravili članovi",
-      "checked": false
+      "checked": true
     },
     "rf.count": {
       "text": "{n} recept|{n} recepta|{n} recepata",
-      "checked": false
+      "checked": true
     },
     "rf.countOf": {
       "text": "{shown} od {n} recepta|{shown} od {n} recepta|{shown} od {n} recepata",
-      "checked": false
+      "checked": true
     },
     "rf.madeByIs": {
       "text": "Napravio: {who}",
-      "checked": false
+      "checked": true
     },
     "rf.kitchenIs": {
       "text": "Kuhinja: {kitchen}",
-      "checked": false
+      "checked": true
     },
     "rb.kitchen": {
       "text": "Kuhinja",
-      "checked": false
+      "checked": true
     },
     "rb.moment": {
       "text": "Trenutak",
-      "checked": false
+      "checked": true
     },
     "rb.all": {
       "text": "Sve",
-      "checked": false
+      "checked": true
     },
     "slot.trainingAt": {
       "text": "trening u {time}",
-      "checked": false
+      "checked": true
     },
     "slot.trainingNoTime": {
       "text": "trening, vreme nije podešeno",
-      "checked": false
+      "checked": true
     },
     "slot.trainingWhen.morning": {
       "text": "trening ujutru",
-      "checked": false
+      "checked": true
     },
     "slot.trainingWhen.day": {
       "text": "trening tokom dana",
-      "checked": false
+      "checked": true
     },
     "slot.trainingWhen.evening": {
       "text": "trening uveče",
-      "checked": false
+      "checked": true
     },
     "slot.trainingWhen.late": {
       "text": "trening kasno noću",
-      "checked": false
+      "checked": true
     },
     "slot.trainingWhen.afterschool": {
       "text": "trening posle škole",
-      "checked": false
+      "checked": true
     },
     "slot.trainingWhen.lateafternoon": {
       "text": "trening kasno po podne",
-      "checked": false
+      "checked": true
     },
     "coach.inv.open": {
       "text": "otvorena",
-      "checked": false
+      "checked": true
     },
     "coach.inv.used": {
       "text": "iskorišćena",
-      "checked": false
+      "checked": true
     },
     "coach.inv.expired": {
       "text": "istekla",
-      "checked": false
+      "checked": true
     },
     "coach.inv.revoked": {
       "text": "povučena",
-      "checked": false
+      "checked": true
     },
     "coach.accessRequests": {
       "text": "Zahtevi za pristup (novih: {n})",
-      "checked": false
+      "checked": true
     },
     "coach.spotsHidden": {
       "text": "ne prikazuje se",
-      "checked": false
+      "checked": true
     },
     "coach.spotsShown": {
       "text": "prikazuje se na početnoj stranici i stranici knjige",
-      "checked": false
+      "checked": true
     },
     "plate.readFromPhoto": {
       "text": "Pročitano sa tvoje slike. Ispravi količinu ako znaš bolje; Chef Mealan ispod kaže šta da radiš s tim.",
-      "checked": false
+      "checked": true
     },
     "plate.onEdge": {
       "text": "~ {name}, na granici",
-      "checked": false
+      "checked": true
     },
     "plate.gateNutrition": {
       "text": "Nutritivno",
-      "checked": false
+      "checked": true
     },
     "plate.gateDay": {
       "text": "Tvoj dan",
-      "checked": false
+      "checked": true
     },
     "plate.gateSize": {
       "text": "Veličina",
-      "checked": false
+      "checked": true
     },
     "plate.sizeEdge": {
       "text": "{meal}: oko {n} porcije, {kcal} kcal prema oko {share}, a granica je 1,5.",
-      "checked": false
+      "checked": true
     },
     "menu.settingsHint": {
       "text": "Glas tokom kuvanja · Jezik",
-      "checked": false
+      "checked": true
     },
     "langpanel.lineSr": {
       "text": "Chef Mealan i ekrani na srpskom. Istraživač i pravne stranice za sada na engleskom.",
-      "checked": false
+      "checked": true
     }
   }
 }

@@ -62,7 +62,7 @@ export function SafetyQuestion({ p, onDone, doneLabel = "Next" }: { p: AppApi; o
       <p className={`small ${answered ? "muted" : "notice"}`}>{answered ? (p.safety.declaredAt ? w("safetyq.answeredOn", { date: fmtDay(p.safety.declaredAt) }) : w("safetyq.answered")) : w("safetyq.tickOneOrNoneA")}</p>
       {p.safety.situations.length > 0 && (
         <div className="fixed-lines">
-          {p.safety.situations.map((id) => <p className="small" key={id}><b>{SITUATIONS.find((x) => x.id === id)?.label}:</b> {fixedLine(id)}</p>)}
+          {p.safety.situations.map((id) => <p className="small" key={id}><b>{optWord(SITUATIONS.find((x) => x.id === id)?.label ?? "")}:</b> {fixedLine(id)}</p>)}
         </div>
       )}
       {!p.ai.on && <p className="small notice">{p.ai.why === DOOR_WHY ? w("safetyq.answerTheQuestionToOpen") : p.ai.why}</p>}

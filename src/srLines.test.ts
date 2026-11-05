@@ -78,7 +78,12 @@ test("a ticked line shows in Serbian when Srpski is chosen; its slots filled", a
     setLang("sr-Latn");
     assert.equal(say("useInCook", "Jaje", "palačinke"), fill(sr.chef.useInCook.text, { food: "Jaje", dish: "palačinke" }));
     assert.equal(say("whatMoment"), sr.chef.whatMoment.text);
-    assert.equal(fixedLine("eating"), sr.safety.eating.text, "a ticked safety line in Serbian");
+    assert.equal(fixedLine("eating"), sr.safety.eating.text.split("|")[0], "a ticked safety line in Serbian, his form with no profile");
+    // 0.3.91: the safety lines with two forms follow the profile's sex, as the screen lines do
+    localStorage.setItem("chefmealan-personal", JSON.stringify({ sex: "female" }));
+    assert.equal(fixedLine("eating"), sr.safety.eating.text.split("|")[1], "her form");
+    assert.ok(/si mi to rekla/.test(fixedLine("eating")) && /si navela/.test(fixedLine("allergies")) || !sr.safety.allergies.checked, "rekla, navela");
+    localStorage.removeItem("chefmealan-personal");
     assert.equal(fixedLine("diabetes"), FIXED.diabetes, "an unticked safety line stays English");
     sr.chef.photoWhose.checked = true;
     assert.equal(say("photoWhose", "Read from the photo."), CHEF.photoWhose("Read from the photo."), "a line waiting for the screens stays English even ticked");
