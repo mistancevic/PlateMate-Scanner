@@ -1,4 +1,5 @@
 import { w, wn, wIn, dec, mealV, mealName, wordV, type Val, type WordKey } from "../words";
+import { locOf } from "../lang";
 import type { PlateIn } from "../chefScript";
 import { plateWhenOf, capFirst, atMeal } from "../plateMode";
 import { say } from "../chefScript";
@@ -300,7 +301,7 @@ export function JourneyScreen(p: AppApi) {
   // the same recipe, so coming back by Fit it on the Plate and putting it in again does not double it.
   const slotName = (f: NonNullable<typeof p.filling>) => `${f.dayName === "today" ? "today's" : `${f.dayName}'s`} ${f.name.toLowerCase()}`;
   // DT203 phase 9: the slot in a line's own language: today's lunch · ručak danas · ručak, četvrtak
-  const slotV = (f: NonNullable<typeof p.filling>): Val => (l) => { if (l === "en") return slotName(f); const m = (mealV(f.name, true) as (x: typeof l) => string | null)(l); if (m === null) return null; return f.dayName === "today" ? `${m} ${wIn(l, "plate.todayLow") ?? ""}`.trim() : `${m}, ${new Date(`${f.date}T12:00:00`).toLocaleDateString("sr-Latn-RS", { weekday: "long" })}`; };
+  const slotV = (f: NonNullable<typeof p.filling>): Val => (l) => { if (l === "en") return slotName(f); const m = (mealV(f.name, true) as (x: typeof l) => string | null)(l); if (m === null) return null; return f.dayName === "today" ? `${m} ${wIn(l, "plate.todayLow") ?? ""}`.trim() : `${m}, ${new Date(`${f.date}T12:00:00`).toLocaleDateString(locOf(l), { weekday: "long" })}`; };
   // DT149 (0.2.130, board Stories101 version 2): the plate's day decides what it is for: the past adds what you ate, the future
   // plans, the moment is what you eat (src/plateMode.ts)
   const plateWhen = plateWhenOf(p.filling);

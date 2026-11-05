@@ -177,9 +177,11 @@ const TASTE_RULE = "their_taste: within each kitchen, cook toward the dishes in 
 const VOICE = `Voice: at most two short sentences before any list. Second person, plain words, no jargon. When a value is an estimate, say so. Never scold, never moralise; going off plan is not a failure. No health, medical or weight-loss claims. Never state grams for something the app fits; the app's solver sets amounts.`;
 // DT203 (0.3.76, board Stories175 v2): Chef Mealan answers in the language the person chose (the phone sends it); the numbers,
 // the rules and the checks are the same in every language. English unless the phone says Srpski (latinica).
-const langOf = (req: express.Request) => (req.get("x-chef-lang") === "sr-Latn" ? "sr-Latn" : "en");
+const langOf = (req: express.Request) => { const l = req.get("x-chef-lang"); return l === "sr-Latn" || l === "de" ? l : "en"; };
 const LANG_RULE = " Language: answer in Serbian, Latin script (srpski, latinica), ekavian, with the informal ti. Keep food names as the person or the list gives them, and every number and unit as they are.";
-const voiceFor = (req: express.Request) => VOICE + (langOf(req) === "sr-Latn" ? LANG_RULE : "");
+// DT238 (0.3.92): Deutsch (Beta), with the informal du
+const LANG_RULE_DE = " Language: answer in German, with the informal du. Keep food names as the person or the list gives them, and every number and unit as they are.";
+const voiceFor = (req: express.Request) => VOICE + (langOf(req) === "sr-Latn" ? LANG_RULE : langOf(req) === "de" ? LANG_RULE_DE : "");
 // DT233 (0.3.74, board Stories173): the version this server runs, for Deploy in Dev data. Readable from the preview and from
 // chefmealan.com alike (a version number is no secret), so the owner's phone on one can see the other's.
 const SERVER_VERSION = (() => { try { return JSON.parse(fs.readFileSync(path.resolve("package.json"), "utf8")).version as string; } catch { return null; } })();

@@ -1,26 +1,31 @@
 // DT203 (0.3.76, board Stories175 v2; Coach Milan 3 November 19:22 to 19:39, Go): the language Chef Mealan speaks. English, or
 // Srpski (latinica). Kept on this phone; Settings, Language sets it. The screens stay English for now (release 2 and on).
 import { useSyncExternalStore } from "react";
-export type Lang = "en" | "sr-Latn";
+// DT238 (0.3.92, board Stories179; Coach Milan 5 November 11:36, Go): Deutsch (Beta), Claude's German for testers in Munich.
+export type Lang = "en" | "sr-Latn" | "de";
 const KEY = "chefmealan-lang";
 const subs = new Set<() => void>();
 // DT237 (0.3.88): for a moment, words in another language than the phone's: the coach's copy of Your summary is made in both
 let forced: Lang | null = null;
 export function inLang<T>(l: Lang, f: () => T): T { const was = forced; forced = l; try { return f(); } finally { forced = was; } }
-const stored = (): Lang => { try { return localStorage.getItem(KEY) === "sr-Latn" ? "sr-Latn" : "en"; } catch { return "en"; } };
+const stored = (): Lang => { try { const v = localStorage.getItem(KEY); return v === "sr-Latn" || v === "de" ? v : "en"; } catch { return "en"; } };
 export function getLang(): Lang { return forced ?? stored(); }
-export function setLang(l: Lang) { try { if (l === "en") localStorage.removeItem(KEY); else localStorage.setItem(KEY, l); } catch { /* none kept */ } subs.forEach((f) => f()); }
+// the page's language, for screen readers and for the layout rules that only German needs (DT238: html[lang="de"])
+function htmlLang() { try { document.documentElement.lang = stored() === "en" ? "en" : stored(); } catch { /* no page */ } }
+export function setLang(l: Lang) { try { if (l === "en") localStorage.removeItem(KEY); else localStorage.setItem(KEY, l); } catch { /* none kept */ } htmlLang(); subs.forEach((f) => f()); }
 export function useLang(): Lang { return useSyncExternalStore((f) => { subs.add(f); return () => { subs.delete(f); }; }, stored, () => "en"); }
-export const LANG_NAMES: Record<Lang, string> = { en: "English", "sr-Latn": "Srpski (latinica)" };
+export const LANG_NAMES: Record<Lang, string> = { en: "English", "sr-Latn": "Srpski (latinica)", de: "Deutsch (Beta)" };
+// the calendar and number style of a language: 2,450 and 5.5 · 2.450 and 5,5 · 2.450 and 5,5
+export const locOf = (l: Lang) => (l === "sr-Latn" ? "sr-Latn-RS" : l === "de" ? "de-DE" : "en-GB");
 // the phone's voice and its listening for a language
-export const speechLang = (l: Lang) => (l === "sr-Latn" ? "sr-RS" : "en-GB");
+export const speechLang = (l: Lang) => (l === "sr-Latn" ? "sr-RS" : l === "de" ? "de-DE" : "en-GB");
 // Serbian counts: 1 namirnica, 2 to 4 namirnice, 5 and on namirnica (11 to 14 are the many form)
 export function srCount(n: number, one: string, few: string, many: string): string {
   const a = Math.abs(n) % 100, b = a % 10;
   return `${n} ${a >= 11 && a <= 14 ? many : b === 1 ? one : b >= 2 && b <= 4 ? few : many}`;
 }
 // the Settings row: what is in Serbian so far
-export const langLine = (l: Lang) => (l === "sr-Latn" ? "Chef Mealan and the screens in Srpski. Explorer and the legal pages in English for now." : "English. Srpski (latinica) for Chef Mealan; Deutsch is coming.");
+export const langLine = (l: Lang) => (l === "sr-Latn" ? "Chef Mealan and the screens in Srpski. Explorer and the legal pages in English for now." : "English. Also Srpski (latinica) and Deutsch (Beta).");
 // the language Chef Mealan answers in, on every call to our own server (the AI's answers, his tips), signed in or not
 let langFetch = false;
 export function installLangFetch() {
@@ -38,3 +43,4 @@ export function installLangFetch() {
   };
 }
 installLangFetch();
+htmlLang();

@@ -11276,6 +11276,26 @@
     "langpanel.lineSr": {
       "text": "Chef Mealan i ekrani na srpskom. Istraživač i pravne stranice za sada na engleskom.",
       "checked": true
+    },
+    "langpanel.deutschLine": {
+      "text": "Chef Mealan i ekrani, beta za testere. Istraživač i pravne stranice za sada ostaju na engleskom.",
+      "checked": false
+    },
+    "langpanel.lineDe": {
+      "text": "Chef Mealan i ekrani na nemačkom (beta). Istraživač i pravne stranice za sada na engleskom.",
+      "checked": false
+    },
+    "summary.langToDe": {
+      "text": "{name}: aplikacija je sada na nemačkom. Profil vidiš na svom jeziku, srpskom.",
+      "checked": false
+    },
+    "summary.seeInDe": {
+      "text": "Vidi na nemačkom, kao {name}",
+      "checked": false
+    },
+    "summary.backToDe": {
+      "text": "Nazad na nemački",
+      "checked": false
     }
   }
 }

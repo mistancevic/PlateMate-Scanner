@@ -5,7 +5,7 @@
 // Pure functions here, so the walkthroughs and the unit tests read the same rules.
 import { wIn, wnIn, w, wn } from "./words";
 import { foodNameIn } from "./reference";
-import type { Lang } from "./lang";
+import { locOf, type Lang } from "./lang";
 import { say } from "./chefScript";
 import type { PilotState } from "./pilot";
 
@@ -214,7 +214,7 @@ const hm = (d: Date) => `${String(d.getHours()).padStart(2, "0")}:${String(d.get
 // Day and month names come from the phone's calendar (Intl), in the language's own form.
 export function dayIn(l: Lang, d: Date, now = new Date()): string | null {
   const a = new Date(d); a.setHours(12, 0, 0, 0); const b = new Date(now); b.setHours(12, 0, 0, 0);
-  const n = Math.round((b.getTime() - a.getTime()) / 86400000), loc = l === "sr-Latn" ? "sr-Latn-RS" : "en-GB";
+  const n = Math.round((b.getTime() - a.getTime()) / 86400000), loc = locOf(l);
   return n === 0 ? wIn(l, "day.today") : n === 1 ? wIn(l, "day.yesterday") : n > 1 && n < 7 ? d.toLocaleDateString(loc, { weekday: "long" }) : d.toLocaleDateString(loc, { day: "numeric", month: "long" });
 }
 export const dayWord = (d: Date, now = new Date()): string => dayIn("en", d, now)!;

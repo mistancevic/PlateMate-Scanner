@@ -1,5 +1,6 @@
 // What a food is, by its job on a plate. A property of the food, never a verdict: that depends on the day (see todayLine).
 import { w, type WordKey } from "./words";
+import type { Lang } from "./lang";
 import { foodNameIn } from "./reference";
 import { dec } from "./words";
 import { englishName } from "./foodId";
@@ -141,7 +142,7 @@ export function portionLine(f: Food, grams: number, scale = 1): string | null {
   if (grams <= p.max && grams >= p.min) return null;
   const short = f.name.split(",")[0].trim().toLowerCase();
   if (grams > p.max && p.piece) { const n = Math.round(grams / p.piece.grams); return `${Math.round(grams)} g is ${n} ${p.piece.name}${n === 1 ? "" : "s"}. ${p.note}`.trim(); }
-  const food = (l: "en" | "sr-Latn") => (l === "en" ? short : foodNameIn(l, f).split(",")[0].trim());
+  const food = (l: Lang) => (l === "en" ? short : foodNameIn(l, f).split(",")[0].trim());
   if (grams > p.max) return w(p.scaled ? "plate.overMealPortion" : "plate.overPortion", { grams: Math.round(grams), food, min: p.min, max: p.max }) + (p.note && !p.scaled ? ` ${p.note}` : "");
   // DT203 release 2 (0.3.77): in Srpski the food stands after a colon, so no word changes its ending
   return w("plate.underPortion", { grams: Math.round(grams), food: (l) => (l === "en" ? short : foodNameIn(l, f).split(",")[0].trim()), min: p.min, max: p.max });

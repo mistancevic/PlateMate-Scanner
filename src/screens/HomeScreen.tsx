@@ -1,5 +1,6 @@
 import { ChefLine } from "../components/ChefLine";
 import { w, wn, mealV, mealName, dateText, dateV, enOnly, phoneLoc, numLocale } from "../words";
+import { locOf } from "../lang";
 import { say } from "../chefScript";
 import { CookStrip } from "../components/CookStrip";
 import { travelOn, placeName as placeNameOf } from "../travel";
@@ -487,7 +488,7 @@ export function HomeScreen(p: AppApi) {
         {past.map((d) => {
           const dk = ymd(d.day), dHeld = p.planned[dk];
           const dRec = dHeld && Object.keys(dHeld).length ? dayRecord(slotsOn(lifestyleOf(p.personal), p.personal.timesOn, dk), dHeld, d.logged, dk) : null;
-          const head = w(dayLabel(d.day) === "Yesterday" ? "today.yesterdayDate" : "today.date", { date: (l) => d.day.toLocaleDateString(l === "sr-Latn" ? "sr-Latn-RS" : "en-GB", { weekday: "long", day: "numeric", month: "long" }) });
+          const head = w(dayLabel(d.day) === "Yesterday" ? "today.yesterdayDate" : "today.date", { date: (l) => d.day.toLocaleDateString(locOf(l), { weekday: "long", day: "numeric", month: "long" }) });
           return (
             <section className="card day-card" key={dk} aria-label={head}>
               <p className="card-head">{head}</p>

@@ -39,7 +39,7 @@ export function utterance(text: string, s: VoiceSettings = voiceSettings(), lang
     const v = s.voice ? all.find((x) => x.voiceURI === s.voice) : null;
     // DT203 (0.3.76): a line in another language takes a voice of that language (Serbian, else Croatian or Bosnian, which read it)
     const same = (x: SpeechSynthesisVoice) => x.lang.toLowerCase().startsWith(lang.slice(0, 2).toLowerCase());
-    const other = lang.startsWith("sr") ? all.find((x) => /^(sr|hr|bs)/i.test(x.lang)) : null;
+    const other = lang.startsWith("sr") ? all.find((x) => /^(sr|hr|bs)/i.test(x.lang)) : lang.startsWith("de") ? all.find((x) => /^de/i.test(x.lang)) : null;
     if (v && same(v)) { u.voice = v; u.lang = v.lang; } else if (other) { u.voice = other; u.lang = other.lang; }
   } catch { /* the phone's default voice */ }
   return u;
