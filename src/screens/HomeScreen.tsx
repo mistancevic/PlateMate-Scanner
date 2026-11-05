@@ -23,7 +23,7 @@ import { Picture, pictureOfRecipe } from "../components/MealPicture";
 import { PlanRow } from "../components/PlanRow";
 import { showPlanOn } from "./PlanScreen";
 import { KnowCard, ReadyCard } from "../components/Measured";
-import { slotsOf, slotsOn, rowsOf, trainingWhen, toMin, workHoursOf } from "../slots";
+import { slotsOf, slotsOn, rowsOf, trainingWhen, trainingShown, toMin, workHoursOf } from "../slots";
 import { closedSlots, WINDOW } from "../makeMeal";
 import { answersFor } from "../unlogged";
 import { dayFor, getDay } from "../personal";
@@ -457,7 +457,7 @@ export function HomeScreen(p: AppApi) {
       <DayBand day={w("today.headTomorrow")} date={longDate(tomorrow)} />
       <section className="card tomorrow-plan" aria-label={w("today.tomorrowSPlan")}>
         <p className="card-head">{w("today.whatSInThePlan")}</p>
-        {tWhen && <small className="muted plan-when">{tWhen.phrase.charAt(0).toUpperCase() + tWhen.phrase.slice(1)}</small>}
+        {tWhen && (() => { const t = trainingShown(tTraining) ?? tWhen.phrase; return <small className="muted plan-when">{t.charAt(0).toUpperCase() + t.slice(1)}</small>; })()}
         {tHeld > 0 && tSlots.map((sl) => {
           const m = tPlan[sl.id];
           const fit = m ? fitOf(m, p.dayPd, unit) : null;

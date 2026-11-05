@@ -2,6 +2,7 @@
 // in 0.2.2. The slots come from Lifestyle: meals a day gives how many, the eating window gives the first and the last time,
 // the rest sit evenly between. Times can be changed in Lifestyle; a day's training (the Training week) sits between them as a row.
 import type { Lifestyle, PlanDay, When } from "./plan";
+import { w, type WordKey } from "./words";
 
 export type Slot = { id: string; name: string; time: string };
 export type DayRow = { kind: "slot"; slot: Slot } | { kind: "training"; time: string; label: string; exact: boolean; day: PlanDay };
@@ -151,6 +152,8 @@ export function suggestWhen(usual: When, wh: WorkHours | null): When {
 }
 export const WORK_WHEN = (wh: WorkHours) => `Chef Mealan suggests training outside your work hours, ${wh.from} to ${wh.to}. Every time stays open: a break at work can be gym time.`;
 // where the row goes and what its time column says
+// DT203 phase 9 (0.3.90): the phrase stays English for Chef Mealan and Explorer; shown() is the same in the language of the screen
+export const trainingShown = (d: PlanDay | null | undefined): string | null => (!d || d.kind === "rest" ? null : isClock(d.at) ? w("slot.trainingAt", { time: d.at! }) : d.when ? w(`slot.trainingWhen.${d.when}` as WordKey) : w("slot.trainingNoTime"));
 export function trainingWhen(d: PlanDay | null | undefined): { label: string; sort: string; exact: boolean; phrase: string } | null {
   if (!d || d.kind === "rest") return null;
   if (isClock(d.at)) return { label: d.at!, sort: d.at!, exact: true, phrase: `training at ${d.at}` };

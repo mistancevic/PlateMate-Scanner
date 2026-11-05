@@ -1079,7 +1079,7 @@ export function JourneyScreen(p: AppApi) {
   };
   const gateLine = (name: string, g: GateLine) => edgeOf(g) ? (
     <div key={name} className="gate-line-row gate-edge">
-      <b>~ {name}, on the edge</b>
+      <b>{w("plate.onEdge", { name })}</b>
       <small>{edgeOf(g)}</small>
       {(g as GateLine & { hint?: string }).hint && <small className="gate-hint">{(g as GateLine & { hint?: string }).hint}</small>}
     </div>
@@ -1289,7 +1289,7 @@ export function JourneyScreen(p: AppApi) {
               : way?.kind === "side" ? `Your ${rec.title} as it is, ${Math.round((kcalOfItems(way.options[way.pick].dish) / Math.max(1, kcalOfItems(rec.items) / (rec.makes?.n ?? 1))) * 100)}% of one ${oneOf(rec)}, and ${way.options[way.pick].name} ${sideWord(way.options[way.pick].kind)}. The ${oneOf(rec)} is not changed.`
               : `From ${rec.source?.name || (rec.source?.from === "link" ? "the link" : "your screenshot")}. ${pmode === "whole" ? w("make.theWholeRecipeAsYou") : pmode === "sized" && mealNeed ? `The recipe's mix, sized for your ${mealWord}: every food scaled the same way.` : `One ${oneOf(rec)}, as the recipe makes it.`} Change what you like.` })
           : state.photo && items.length > 0
-            ? Head({ name: true, title: "", sub: `Read from your photo. Correct an amount if you know better; ${CHEF_NAME} says what to do with it below.` })
+            ? Head({ name: true, title: "", sub: w("plate.readFromPhoto") })
           : state.title && state.title !== "DaaM" && items.length > 0
             ? Head({ name: true, title: "", sub: w("plate.fromMyRecipes") })
             : items.length > 0 ? Head({ name: true, title: "", sub: `Name it, or keep the foods' name.` })
@@ -1804,10 +1804,10 @@ export function JourneyScreen(p: AppApi) {
             </>)}
             {dishNow && dishNow.status === "done" && !dishNow.makesIt && dishKept === dishSig && <div className="gate-line-row gate-yes"><b>✓ Culinary</b><small>{w("make.keptAsItIs")}</small></div>}
             {/* DT116: nutrition and your day, each its own line; the sweet spot when all three hold */}
-            {gateOn && !bigPlate && (dishNow?.status === "done" || !nutri.ok || !dayLine.ok || anyEdge) && gateLine("Nutrition", nutri)}
-            {gateOn && !bigPlate && !exploringNow && (dishNow?.status === "done" || !nutri.ok || !dayLine.ok || anyEdge) && gateLine("Your day", dayLine)}
+            {gateOn && !bigPlate && (dishNow?.status === "done" || !nutri.ok || !dayLine.ok || anyEdge) && gateLine(w("plate.gateNutrition"), nutri)}
+            {gateOn && !bigPlate && !exploringNow && (dishNow?.status === "done" || !nutri.ok || !dayLine.ok || anyEdge) && gateLine(w("plate.gateDay"), dayLine)}
             {/* DT132: the plate's size on the edge, 1.3 to 1.5 portions of its meal */}
-            {gateOn && sizeEdge && !bigPlate && share && <div className="gate-line-row gate-edge"><b>~ Size, on the edge</b><small>About {fixed(sizeNow.portions)} {mealWord} portions: {fmt(t.calories, 0)} kcal for a {mealWord} of about {fmt(share.kcal, 0)}, and the line is 1.5.</small><small className="gate-hint">{w("make.toBeClearOfIt")}</small></div>}
+            {gateOn && sizeEdge && !bigPlate && share && <div className="gate-line-row gate-edge"><b>{w("plate.onEdge", { name: w("plate.gateSize") })}</b><small>{w("plate.sizeEdge", { n: fixed(sizeNow.portions), meal: mealV(mealSlot?.name ?? "meal", true), kcal: fmt(t.calories, 0), share: fmt(share.kcal, 0) })}</small><small className="gate-hint">{w("make.toBeClearOfIt")}</small></div>}
             {sweetSpotOf(ingredientsOn.length === 0) && <small className="gate-sweet">{w("make.daamGoodSpotADish")}</small>}
             {fit && !imported && <small className="fit-note">{/^Fit /.test(fit.note) ? <><b>{w("make.fit")}</b> {fit.note.slice(4)}</> : fit.note}{fit.group && Object.entries(fit.group).some(([id, g]) => Math.round(items.find((i) => i.id === id)?.grams ?? -1) !== Math.round(g)) ? <> <button className="link pt-inline" onClick={() => { const g = fit.group!; setState((s) => ({ ...s, items: s.items.map((i) => (g[i.id] !== undefined ? { ...i, grams: g[i.id] } : i)), portion: null })); setFit(null); }}>{w("make.undo")}</button></> : null}{fit.id && fit.before !== undefined && fit.before !== Math.round(items.find((i) => i.id === fit.id)?.grams ?? -1) ? <> <button className="link pt-inline" onClick={() => { updateItem(fit.id!, { grams: fit.before! }); setFit(null); }}>{w("make.undo")}</button></> : null}</small>}
             {fitShort && !madeBy && (<>

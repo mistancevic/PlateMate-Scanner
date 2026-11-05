@@ -3,6 +3,7 @@
 // counts), Moment, three chips that stack, a sort, and a line that says what is shown of what. No tabs: Recipes is one list
 // under this bar, and who made a recipe is a filter like any other.
 import { w } from "../words";
+import { optWord } from "../optWords";
 import { useState } from "react";
 import { ClearField } from "./ClearField";
 import { EMPTY, MOMENTS, SORTS, countLine, isIdle, madeByLabel, type Filters, type Line, type Sort } from "../recipeFilter";
@@ -33,15 +34,15 @@ export function RecipeBar({ f, set, sort, setSort, kitchens, madeBy, shown, tota
       </ClearField>
       <div className="rb-chips" role="group" aria-label={w("recipebar.filters")}>
         {drop("madeBy", w("recipebar.madeBy"), madeByLabel(f.madeBy, coachLabel), madeBy, f.madeBy)}
-        {drop("kitchen", "Kitchen", f.kitchen, kitchens, f.kitchen)}
-        {drop("moment", "Moment", momentLabel, momentLines, f.moment)}
+        {drop("kitchen", w("rb.kitchen"), f.kitchen ? optWord(f.kitchen) : f.kitchen, kitchens, f.kitchen)}
+        {drop("moment", w("rb.moment"), momentLabel, momentLines, f.moment)}
         {chip(f.day, w("recipebar.fitsMyDay"), () => set({ ...f, day: !f.day }))}
         {chip(f.nocook, w("recipebar.noCooking"), () => set({ ...f, nocook: !f.nocook }))}
         {chip(f.withMine, w("recipebar.withMyFoods"), () => set({ ...f, withMine: !f.withMine }))}
       </div>
-      {sheet("madeBy", w("recipebar.madeBy"), madeBy, f.madeBy, (k) => set({ ...f, madeBy: k }), "All", String(total))}
-      {sheet("kitchen", "Kitchen", kitchens, f.kitchen, (k) => set({ ...f, kitchen: k }), w("recipebar.allKitchens"), String(total))}
-      {sheet("moment", "Moment", momentLines, f.moment, (k) => set({ ...f, moment: k as Filters["moment"] }), w("recipebar.anyMoment"), "")}
+      {sheet("madeBy", w("recipebar.madeBy"), madeBy, f.madeBy, (k) => set({ ...f, madeBy: k }), w("rb.all"), String(total))}
+      {sheet("kitchen", w("rb.kitchen"), kitchens, f.kitchen, (k) => set({ ...f, kitchen: k }), w("recipebar.allKitchens"), String(total))}
+      {sheet("moment", w("rb.moment"), momentLines, f.moment, (k) => set({ ...f, moment: k as Filters["moment"] }), w("recipebar.anyMoment"), "")}
       <div className="rb-sort" role="group" aria-label={w("recipebar.sort")}>
         <b>{w("recipebar.sort")}</b>
         {SORTS.map((s) => <button type="button" key={s.id} className={`link rb-sort-link ${sort === s.id ? "on" : ""}`} aria-pressed={sort === s.id} onClick={() => setSort(s.id)}>{s.label}</button>)}

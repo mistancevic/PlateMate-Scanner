@@ -7982,8 +7982,8 @@
       "checked": true
     },
     "langpanel.chefMealanHisQuestionsHis": {
-      "text": "Chef Mealan: njegova pitanja, njegovi odgovori, bezbednosni redovi i reči kuvanja. Ekrani za sada ostaju na engleskom.",
-      "checked": true
+      "text": "Chef Mealan i ekrani. Istraživač i pravne stranice za sada ostaju na engleskom.",
+      "checked": false
     },
     "carry.howItCarriesYou": {
       "text": "Kako se osećaš",
@@ -11095,6 +11095,186 @@
     },
     "menu.nextTo": {
       "text": "Dalje: {to}",
+      "checked": false
+    },
+    "rf.sort.fit": {
+      "text": "Za tvoj dan",
+      "checked": false
+    },
+    "rf.sort.new": {
+      "text": "Najnoviji",
+      "checked": false
+    },
+    "rf.sort.made": {
+      "text": "Najčešće pravljeni",
+      "checked": false
+    },
+    "rf.sort.pd": {
+      "text": "Najviši PD",
+      "checked": false
+    },
+    "rf.sort.quick": {
+      "text": "Najbrži",
+      "checked": false
+    },
+    "rf.sort.az": {
+      "text": "Od A do Ž",
+      "checked": false
+    },
+    "rf.moment.breakfast": {
+      "text": "Doručak",
+      "checked": false
+    },
+    "rf.moment.lunch": {
+      "text": "Ručak ili večera",
+      "checked": false
+    },
+    "rf.moment.snack": {
+      "text": "Užina",
+      "checked": false
+    },
+    "rf.me": {
+      "text": "ja",
+      "checked": false
+    },
+    "rf.members": {
+      "text": "članovi",
+      "checked": false
+    },
+    "rf.noName": {
+      "text": "član bez imena",
+      "checked": false
+    },
+    "rf.madeByMe": {
+      "text": "Napravio sam|Napravila sam",
+      "checked": false
+    },
+    "rf.madeByCoach": {
+      "text": "Napravio: {coach}",
+      "checked": false
+    },
+    "rf.madeByMembers": {
+      "text": "Napravili članovi",
+      "checked": false
+    },
+    "rf.count": {
+      "text": "{n} recept|{n} recepta|{n} recepata",
+      "checked": false
+    },
+    "rf.countOf": {
+      "text": "{shown} od {n} recepta|{shown} od {n} recepta|{shown} od {n} recepata",
+      "checked": false
+    },
+    "rf.madeByIs": {
+      "text": "Napravio: {who}",
+      "checked": false
+    },
+    "rf.kitchenIs": {
+      "text": "Kuhinja: {kitchen}",
+      "checked": false
+    },
+    "rb.kitchen": {
+      "text": "Kuhinja",
+      "checked": false
+    },
+    "rb.moment": {
+      "text": "Trenutak",
+      "checked": false
+    },
+    "rb.all": {
+      "text": "Sve",
+      "checked": false
+    },
+    "slot.trainingAt": {
+      "text": "trening u {time}",
+      "checked": false
+    },
+    "slot.trainingNoTime": {
+      "text": "trening, vreme nije podešeno",
+      "checked": false
+    },
+    "slot.trainingWhen.morning": {
+      "text": "trening ujutru",
+      "checked": false
+    },
+    "slot.trainingWhen.day": {
+      "text": "trening tokom dana",
+      "checked": false
+    },
+    "slot.trainingWhen.evening": {
+      "text": "trening uveče",
+      "checked": false
+    },
+    "slot.trainingWhen.late": {
+      "text": "trening kasno noću",
+      "checked": false
+    },
+    "slot.trainingWhen.afterschool": {
+      "text": "trening posle škole",
+      "checked": false
+    },
+    "slot.trainingWhen.lateafternoon": {
+      "text": "trening kasno po podne",
+      "checked": false
+    },
+    "coach.inv.open": {
+      "text": "otvorena",
+      "checked": false
+    },
+    "coach.inv.used": {
+      "text": "iskorišćena",
+      "checked": false
+    },
+    "coach.inv.expired": {
+      "text": "istekla",
+      "checked": false
+    },
+    "coach.inv.revoked": {
+      "text": "povučena",
+      "checked": false
+    },
+    "coach.accessRequests": {
+      "text": "Zahtevi za pristup (novih: {n})",
+      "checked": false
+    },
+    "coach.spotsHidden": {
+      "text": "ne prikazuje se",
+      "checked": false
+    },
+    "coach.spotsShown": {
+      "text": "prikazuje se na početnoj stranici i stranici knjige",
+      "checked": false
+    },
+    "plate.readFromPhoto": {
+      "text": "Pročitano sa tvoje slike. Ispravi količinu ako znaš bolje; Chef Mealan ispod kaže šta da radiš s tim.",
+      "checked": false
+    },
+    "plate.onEdge": {
+      "text": "~ {name}, na granici",
+      "checked": false
+    },
+    "plate.gateNutrition": {
+      "text": "Nutritivno",
+      "checked": false
+    },
+    "plate.gateDay": {
+      "text": "Tvoj dan",
+      "checked": false
+    },
+    "plate.gateSize": {
+      "text": "Veličina",
+      "checked": false
+    },
+    "plate.sizeEdge": {
+      "text": "{meal}: oko {n} porcije, {kcal} kcal prema oko {share}, a granica je 1,5.",
+      "checked": false
+    },
+    "menu.settingsHint": {
+      "text": "Glas tokom kuvanja · Jezik",
+      "checked": false
+    },
+    "langpanel.lineSr": {
+      "text": "Chef Mealan i ekrani na srpskom. Istraživač i pravne stranice za sada na engleskom.",
       "checked": false
     }
   }

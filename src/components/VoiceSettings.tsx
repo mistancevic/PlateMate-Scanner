@@ -80,11 +80,8 @@ export function SettingsList({ open, dev }: { open: (id: "voice" | "dev" | "lang
       </button>
       {/* DT203 (0.3.76, board Stories175 v2): Language opens; its line says what is in Serbian so far */}
       <button type="button" className="menu-row" onClick={() => open("language")}>
-        <span className="menu-icon" aria-hidden="true">🌐</span><span className="menu-row-text"><b>{w("voice.language")}</b><small>{langLine(lang)}</small></span><span aria-hidden="true">›</span>
+        <span className="menu-icon" aria-hidden="true">🌐</span><span className="menu-row-text"><b>{w("voice.language")}</b><small>{lang === "sr-Latn" ? w("langpanel.lineSr") : langLine(lang)}</small></span><span aria-hidden="true">›</span>
       </button>
-      <div className="menu-row settings-soon" aria-disabled="true">
-        <span className="menu-icon" aria-hidden="true">⚖️</span><span className="menu-row-text"><b>{w("voice.units")}</b><small>{w("voice.gramsAndMillilitresOuncesAnd")}</small></span><span className="me-todo soon">{w("voice.comingSoon")}</span>
-      </div>
       {/* DT231 (0.3.70, board Stories170; Coach Milan 3 November 10:32 to 14:38): Dev data, last, only for the admin */}
       {dev && <button type="button" className="menu-row" onClick={() => open("dev")}>
         <span className="menu-icon" aria-hidden="true">🛠️</span><span className="menu-row-text"><b>{w("voice.devData")}</b><small>{w("voice.onlyYouSeeThisOpening")}</small></span><span aria-hidden="true">›</span>

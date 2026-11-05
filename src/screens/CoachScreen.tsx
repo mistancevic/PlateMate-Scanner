@@ -1,5 +1,6 @@
 import { BOOK_PAGES, BOOK_SOURCES } from "../bookPages";
-import { w, numLocale, phoneLoc } from "../words";
+import { getLang } from "../lang";
+import { w, numLocale, phoneLoc, wIn as wordIn, type WordKey } from "../words";
 import { waLink } from "../phone";
 import { useEffect, useState } from "react";
 import { useKept } from "../kept";
@@ -274,7 +275,7 @@ export function AccessRequests(p: AppApi) {
   const open = people.filter((r) => r.status !== "handled");
   return (
     <>
-      <p className="label">Access requests ({open.length} new)</p>
+      <p className="label">{w("coach.accessRequests", { n: open.length })}</p>
       <BetaSpots />
       {people.slice(0, 20).map((r) => (
         <section className={`card request ${r.status === "handled" ? "handled" : ""}`} key={r.id}>
@@ -382,7 +383,7 @@ export function Invites(p: AppApi) {
             {list.slice(0, 20).map((i) => (
               <div className="history-row" key={i.code}>
                 <div><b>{i.name || i.email}</b><small>{i.email} · {i.code}</small></div>
-                <div className="history-num"><b className={`inv-${i.status}`}>{i.status}</b>
+                <div className="history-num"><b className={`inv-${i.status}`}>{wordIn(getLang(), `coach.inv.${i.status}` as WordKey) ?? i.status}</b>
                   {i.status === "open" && <small><a href={inviteMail(i)}>{w("coach.resend")}</a> · <button className="link" onClick={async () => { await fetch(`/api/invites/${i.code}/revoke`, { method: "POST" }); load(); }}>{w("coach.revoke")}</button></small>}
                 </div>
               </div>
@@ -491,7 +492,7 @@ function BetaSpots() {
   if (!owner) return null;
   return (
     <section className="card beta-spots">
-      <div className="card-top"><span>{w("coach.betaSpotsLeft")}</span><small>{spots === null ? "not shown" : "shown on the home page and the book page"}</small></div>
+      <div className="card-top"><span>{w("coach.betaSpotsLeft")}</span><small>{spots === null ? w("coach.spotsHidden") : w("coach.spotsShown")}</small></div>
       <span className="rp-step">
         <button type="button" aria-label={w("coach.oneSpotLess")} disabled={spots === null || spots === 0} onClick={() => save((spots ?? 0) - 1)}>−</button>
         <b>{spots === null ? "–" : spots}</b>
