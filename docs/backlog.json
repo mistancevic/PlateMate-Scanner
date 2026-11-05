@@ -524,6 +524,14 @@
       "why": "Coach Milan 4 November 05:17 to 06:09, brainstorm. A ladder of six steps, each of value alone, each an upgrade of the one before; the last, live lines from the database with draft and live, is the best final version. Notes in docs/i18n/editing-ladder.md. Built after the 8 phases of DT203 release 2, unless Milan starts step A earlier. Coach Milan 5 November 10:12 to 10:37, added (parked): the table moves into the app as an owner page, Translations; each line opens its screen so the context is checked along the way (step B); a true In the app state (Live since 0.3.xx, or goes out at the next release; today every ticked line says next release); translators per language; Suggest English, a field for a better English line; the button says Confirm, a confirmed line shows Checked (asked for Go). Done on the way: he|she lines show both forms in the table (0.3.91)."
     },
     {
+      "id": "DT238",
+      "title": "Deutsch (Beta): Claude's German drafts for testers in Munich, and the layout fixes for long words",
+      "epic": "lang",
+      "state": "next",
+      "why": "Coach Milan 5 November 10:54 to 10:59: German now with the process we have; a new tester in Munich (Croatian, good German) uses the app as a plain user and says what does not make sense; nothing changes for anyone else; the pitch: a multilingual app, the next language easy to add. Claude drafted all 2,818 lines (du, Teller for Plate, PD stays) into the table Chef Mealan Deutsch (artifact Pb2nuwf2zAQZ6ReatRzkSo, drafts in its rows.json, edits in its lines collection). Sweep at 390 and 360 px against English found four breaks: Today's three buttons wrap, the Plate's An mein Ziel anpassen is cut, on 360 px the wide Plan button is cut and a long title cuts the goal line; and the code lower-cases meal names. Board Stories179 drawn 5 November: Deutsch (Beta) in Settings, drafts show without a Confirm, safety answers English until confirmed; layout fixes that work for every language. Waits for Go.",
+      "board": 179
+    },
+    {
       "id": "DT235",
       "title": "Accessibility: WCAG 2.2 AA, checked area by area",
       "epic": "trust",
