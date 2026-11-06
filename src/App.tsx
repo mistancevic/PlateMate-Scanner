@@ -10,6 +10,16 @@ import { endTravel, daysAway, sinceWords, placeName as travelPlace, kitchenName,
 import { idleOut, lastOpen, markOpen, setIdleOut } from "./idle";
 import { servingsOf } from "./pilot";
 import * as cooking from "./cooking";
+import { recordOf, followed, secondDish } from "./dishes";
+// DT242 (0.3.96): an answer lost on the way, not one the server gave: no signal, or the browser stopped it while away
+const connectionLost = (e: unknown) => { const m = String((e as any)?.message ?? ""), n = String((e as any)?.name ?? ""); return e instanceof TypeError || n === "AbortError" || n === "TimeoutError" || /failed to fetch|load failed|networkerror|network request failed|the internet connection/i.test(m); };
+// wait until the app is in front and online again, at most two minutes
+const backInFront = (): Promise<void> => new Promise((done) => {
+  const ok = () => document.visibilityState === "visible" && navigator.onLine;
+  if (ok()) { done(); return; }
+  const t = window.setInterval(() => { if (ok()) { window.clearInterval(t); done(); } }, 500);
+  window.setTimeout(() => { window.clearInterval(t); done(); }, 120000);
+});
 import { CookStrip } from "./components/CookStrip";
 import { startMark, startWait } from "./startTimes";
 import { wholeOnPlate } from "./counted";
@@ -863,6 +873,12 @@ export default function App() {
     [photoAsk, setPhotoAsk] = useState<{ image: string; at: string } | null>(null),
     // DT219 (0.3.58): the last photo read found no foods; nothing landed on the Plate
     [photoNoFoods, setPhotoNoFoods] = useState(false),
+    // DT242 (0.3.96, board Stories182): a photo whose answer was lost twice is kept, with Try again
+    [photoLost, setPhotoLost] = useState<null | { image: string; x?: { at?: string; who?: "ate" | "now" | "idea"; replace?: boolean; more?: string[]; note?: string } }>(null),
+    // DT240 (0.3.96): a new plate came in while a cook was open: Chef Mealan asks once
+    [cookOpenAsk, setCookOpenAsk] = useState(false),
+    // DT247 (0.3.96, board Stories183): a second photo soon after a meal: Dessert to that meal, or its own snack
+    [dishAsk, setDishAsk] = useState<null | import("./screens/api").DishAsk>(null),
     // 0.3.62: the meal an Exploring photo left, for Chef Mealan's line (Sunday's dinner stays as it was)
     [exploreLeft, setExploreLeft] = useState<string | null>(null),
     // DT218 (0.3.58): Go on after eating opens the last question on this meal's card, before the 30 minutes are up
@@ -1602,6 +1618,15 @@ export default function App() {
     pendingSave.current = run;
     return () => { window.clearTimeout(t); if (pendingSave.current === run) pendingSave.current = null; };
   }, [state, goal, clientName, personal, goalLog, safety, user, planned, filesTick]);
+  // DT246 (0.3.96, board Stories182; Coach Milan 6 November 10:30 and 10:31, a): a plate already recorded follows into its
+  // meal: the foods, the amounts and the name the Plate shows are what that meal shows
+  const recordNow = recordOf(state.feedback, state);
+  useEffect(() => {
+    if (!recordNow) return;
+    const next = followed(recordNow, state.items, state.title);
+    if (next) setState((s) => ({ ...s, feedback: s.feedback.map((f) => (f.id === next.id ? next : f)) }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [recordNow?.id, state.items, state.title]);
   async function api(url: string, body?: unknown) {
     const res = await fetch(url, {
       method: body === undefined ? "GET" : "POST",
@@ -2421,7 +2446,19 @@ export default function App() {
         // DT228 v2 (0.3.63, board Stories168): the other photos of the meal and the person's words go with the photo, in one read
         const [sent, thumb, moreSent, moreThumbs] = await Promise.all([resizeImageBase64(image, 1280, 1280), thumbnailBase64(image, 640),
           Promise.all(more0.map((m) => resizeImageBase64(m, 1280, 1280))), Promise.all(more0.map((m) => thumbnailBase64(m, 480)))]);
-        const d = await api("/api/plate-photo", { image: sent, ...(moreSent.length ? { more: moreSent } : {}), ...(note ? { note } : {}), region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name) });
+        const ask = () => api("/api/plate-photo", { image: sent, ...(moreSent.length ? { more: moreSent } : {}), ...(note ? { note } : {}), region: shopRegion ?? null, library: state.foods.slice(0, 60).map((f) => f.name) });
+        // DT242 (0.3.96, board Stories182; Coach Milan 6 November 10:16 and 10:35): the answer lost on the way (another app, no
+        // signal) is asked for again once, by itself, when the app is back in front and online; only then the card, never the
+        // browser's own words
+        let d: any;
+        try { d = await ask(); }
+        catch (e) {
+          if (!connectionLost(e)) throw e;
+          await backInFront();
+          try { d = await ask(); }
+          catch (e2) { if (!connectionLost(e2)) throw e2; setPhotoLost({ image, x }); setPhotoAsk(null); setMenuSection(null); setMenuFrom(null); setTalkOpen(false); setTab("journey"); log("meal_photo_lost", {}); return false; }
+        }
+        setPhotoLost(null);
         const read = cleanRead(d);
         const { items, fresh } = read ? itemsOfRead(read, state.foods, shopRegion, uid) : { items: [], fresh: [] };
         // DT219 (0.3.58, board Stories164; Coach Milan 2 November 17:53): a read with no foods leaves the Plate as it was, the photo
@@ -2442,8 +2479,13 @@ export default function App() {
           // 0.3.62: an Exploring photo is no meal of yours: the plate leaves the meal it was for (a past dinner, a planned lunch,
           // the clock's guess) and the pencil block says Exploring; that meal stays as it was, and Chef Mealan says so
           if (who === "idea") { if (filling) { setExploreLeft(fillingName(filling)); setFilling(null); } else setExploreLeft(null); setPick("exploring"); } else setExploreLeft(null);
+          // DT240 (0.3.96, board Stories182; Coach Milan 10:14 and 10:32, b): a cook still open asks once
+          if (state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat")) setCookOpenAsk(true);
+          // DT247 (0.3.96, board Stories183): a second photo soon after a meal of today asks once
+          const second = who !== "idea" && how === "new" && !filling ? secondDish(state.feedback, new Date(at)) : null;
+          setDishAsk(second && second.prev.slot && second.prev.slot.date === ymd(new Date()) ? { dish: read.dish || "", prev: second.prev.meal.title, minutes: second.minutes, dessertFirst: second.dessertFirst, slotId: second.prev.slot.slotId, meal: second.prev.slot.name } : null);
           if (how === "add") setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items: [...s.items, ...items], portion: null, photo }));
-          else setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo }));
+          else setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: read.dishLocal || read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo, recorded: undefined, course: undefined }));
           setKind("meal"); setStep("in");
         };
         setPhotoAsk(null);
@@ -2454,6 +2496,7 @@ export default function App() {
         return true;
       } catch (e: any) { setError(e?.message || w("app.theReadDidnTWork")); return false; } finally { setBusy(""); }
     },
+    retryPhoto: () => { const l = photoLost; if (!l) return; setPhotoLost(null); void screenProps.readMealPhoto(l.image, l.x); },
     // DT175 (0.3.17, board Stories122): Say what you have: the foods named, by voice or typed, land on the Plate as estimates
     plateFromWords: async (text: string) => {
       setBusy("Chef Mealan is listing your foods…");
@@ -2463,6 +2506,7 @@ export default function App() {
         if (!read) { setError("I didn't catch a food in that. Say the foods you have, for example: eggs, spinach, feta."); return false; }
         const { items, fresh } = itemsOfRead(read, state.foods, shopRegion, uid);
         const land = (how: "add" | "new") => {
+          if (state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat")) setCookOpenAsk(true);
           if (how === "add") setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items: [...s.items, ...items], portion: null }));
           else setState((s) => ({ ...s, foods: fresh.length ? [...s.foods, ...fresh] : s.foods, items, portion: null, title: read.dish || s.title, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined, photo: undefined }));
           setKind("meal"); setStep("in");
@@ -2482,10 +2526,10 @@ export default function App() {
       const part = (m: Meal, k: number): Meal => ({ ...m, id: uid(), items: m.items.map((i) => ({ ...i, grams: Math.round((i.grams * k) / n), est: undefined })), portion: Math.round(((m.portion ?? 0) * k) / n) });
       const eaten = n > 1 ? part(meal, 1) : { ...meal, items: meal.items.map((i) => ({ ...i, est: undefined })) };
       setState((s) => ({ ...s,
-        feedback: [{ id: uid(), meal: structuredClone(eaten), status: "eaten" as const, taste: "", notes: "", createdAt: now, ...(slot ? { slot } : {}), ...(x.photo ? { photo: x.photo, photos: [x.photo] } : {}), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined, moment } as Feedback,
+        feedback: [{ id: uid(), meal: structuredClone(eaten), status: "eaten" as const, taste: "", notes: "", createdAt: now, ...(slot ? { slot } : {}), ...(s.course ? { course: s.course } : {}), ...(x.photo ? { photo: x.photo, photos: [x.photo] } : {}), dayType: dayModeOf(personal) === "each" && day.type ? day.type : undefined, moment } as Feedback,
           ...(n > 1 ? [{ id: uid(), meal: structuredClone({ ...part(meal, n - 1), title: x.portions ? `${meal.title}, the other ${n - 1 === 1 ? "portion" : `${n - 1} portions`}` : `${meal.title}, the other half` }), status: "prepared" as const, taste: "", notes: "", createdAt: now, ...(x.photo ? { photo: x.photo } : {}) } as Feedback] : []),
           ...s.feedback],
-        items: [], portion: null, title: "", photo: undefined }));
+        items: [], portion: null, title: "", photo: undefined, course: undefined }));
       if (x.stay) { notify(`Logged at ${new Date(now).toTimeString().slice(0, 5)}. It's on Today.`); return; }
       setStep("in"); setTab("home");
       notify(x.portions ? `One portion logged. The other ${n - 1 === 1 ? "portion is" : `${n - 1} portions are`} on Today.` : x.half ? w("app.halfLoggedTheOtherHalf") : x.at ? `Logged at ${new Date(x.at).toTimeString().slice(0, 5)}. It's on Today.` : w("app.loggedItSOnToday"));
@@ -2494,6 +2538,27 @@ export default function App() {
     mealCamera: () => { setTalkOpen(false); setMode("meal"); setCamera(true); },
     photoAsk, dropPhotoAsk: () => setPhotoAsk(null),
     photoNoFoods, dropNoFoods: () => setPhotoNoFoods(false), exploreLeft,
+    photoLost, dropPhotoLost: () => setPhotoLost(null),
+    recordNow: recordNow ? { cardId: recordNow.id, at: recordNow.createdAt, slot: recordNow.slot ?? null } : null,
+    cookOpenAsk: cookOpenAsk && !!state.cook && !state.cook.inView && (state.cook.stage === "make" || state.cook.stage === "eat"),
+    answerCookOpen: (how: "go" | "end") => { setCookOpenAsk(false); if (how === "end") { setState((s) => cooking.closeCook(s)); setCarryNow(null); } else screenProps.goOnCook(); },
+    dishAsk, answerDishAsk: (how: "dessert" | "snack" | null) => {
+      const a = dishAsk; setDishAsk(null); if (!a || !how) return;
+      if (how === "dessert") { setPick(`meal:${a.slotId}`); setState((s) => ({ ...s, course: "dessert" })); }
+      else { setPick("snack"); setState((s) => ({ ...s, course: undefined })); }
+    },
+    // DT247: a dish of this meal onto the Plate, to work on it; a plate not recorded yet waits in Saved for later
+    openDish: (cardId: string) => {
+      const c = state.feedback.find((f) => f.id === cardId); if (!c) return;
+      const keep = state.items.length > 0 && !recordNow;
+      setState((s0) => { const s = keep ? cooking.savePlate(s0) : s0;
+        return { ...s, items: structuredClone(c.meal.items), title: c.meal.title, portion: null, fromRecipe: undefined, recipeFoods: undefined, optional: undefined, leftOut: undefined, emptyParts: undefined, cooking: undefined, cookingFor: undefined,
+          photo: c.photo ? { image: c.photo, at: c.createdAt, who: "ate" } : undefined, plateAt: c.createdAt, plateAsked: c.createdAt,
+          recorded: { cardId: c.id, date: c.slot?.date ?? ymd(new Date(c.createdAt)), slot: c.slot?.name ?? null, at: c.createdAt }, course: c.course, pick: c.slot ? `meal:${c.slot.slotId}` : s.pick }; });
+      if (c.slot) setPickState(`meal:${c.slot.slotId}`);
+      setPlateKey((k) => k + 1); setKind("meal"); setStep("in"); setTab("journey");
+      if (keep) notify(w("dish.savedForLater"));
+    },
     carryNow,
     plateAsk, answerPlateAsk: (how: "add" | "new" | null) => { const x = plateAsk; setPlateAsk(null); if (x && how) x.apply(how); },
     saveIdea: (meal: Meal, photo: string | null, slot?: { date: string; slotId: string } | null) => {

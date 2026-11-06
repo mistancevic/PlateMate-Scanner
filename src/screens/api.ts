@@ -46,6 +46,19 @@ export interface AppApi {
   // 0.3.62: the meal an Exploring photo left (Sunday's dinner), or null
   exploreLeft: string | null;
   dropNoFoods: () => void;
+  // DT242 (0.3.96): a photo whose answer was lost twice, kept for Try again
+  photoLost: { image: string } | null;
+  dropPhotoLost: () => void;
+  retryPhoto: () => void;
+  // DT246 (0.3.96): the meal this plate is recorded in, while it follows the Plate
+  recordNow: { cardId: string; at: string; slot: { date: string; slotId: string; name: string; time: string } | null } | null;
+  // DT240 (0.3.96): a new plate came in while a cook is open
+  cookOpenAsk: boolean;
+  answerCookOpen: (how: "go" | "end") => void;
+  // DT247 (0.3.96): a second photo soon after a meal, and a dish of the meal onto the Plate
+  dishAsk: DishAsk | null;
+  answerDishAsk: (how: "dessert" | "snack" | null) => void;
+  openDish: (cardId: string) => void;
   // DT218 (0.3.58): the meal card whose last question Go on opened
   carryNow: { id: string; at: number } | null;
   // DT130: An idea kept: in Mine with the photo as its picture, at the top until made once; a slot in the plan when given
@@ -309,3 +322,5 @@ export interface AppApi {
 export type DbProduct = { code: string; name: string; brand: string; quantity: string; kcal: number | null; protein: number | null };
 // R19 (0.2.47, board RS18): where a meal's page was opened from, and the slot it is planned for
 export type MealFrom = { tab: "home" | "plan"; slot?: { date: string; slotId: string; name: string; time: string } };
+// DT247 (0.3.96): the question a second photo asks: its dish, the meal before it and how long ago
+export type DishAsk = { dish: string; prev: string; minutes: number; dessertFirst: boolean; slotId: string; meal: string };

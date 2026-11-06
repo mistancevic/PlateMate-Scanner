@@ -112,6 +112,22 @@
     "busyTraining": {
       "text": "Trening u {time} pada u zauzet blok, {block}. Da ga pomerim za {day}?",
       "checked": true
+    },
+    "cookOpen": {
+      "text": "Kuvanje je još otvoreno: {cook}. Stigao je novi tanjir. Nastaviti kuvanje ({dish}) ili ga završiti?",
+      "checked": false
+    },
+    "photoLost": {
+      "text": "Veza je prekinuta. Tvoja slika je sačuvana.",
+      "checked": false
+    },
+    "plateFills": {
+      "text": "Tvoj tanjir već popunjava ovaj obrok ({meal}): {kcal} kcal, u njegovom opsegu.",
+      "checked": false
+    },
+    "secondDish": {
+      "text": "{dish}, {minutes} posle obroka ({prev}). Desert uz obrok ({meal}) ili posebna užina?",
+      "checked": false
     }
   },
   "safety": {
@@ -12092,6 +12108,102 @@
     "home.footDisclaimer": {
       "text": "Odricanje odgovornosti (na engleskom)",
       "checked": true
+    },
+    "make.connectionLostHelp": {
+      "text": "Chef Mealan ju je sam ponovo pročitao kad se aplikacija vratila. Ni to nije uspelo.",
+      "checked": false
+    },
+    "plate.cookOpenAria": {
+      "text": "Još je otvoreno: {dish}",
+      "checked": false
+    },
+    "plate.cookOpenGo": {
+      "text": "Nastavi: {dish}",
+      "checked": false
+    },
+    "plate.cookOpenHelp": {
+      "text": "Završi ne čuva korake ovog kuvanja ({dish}). Tvoj novi tanjir ostaje kakav jeste.",
+      "checked": false
+    },
+    "plate.recordedIn": {
+      "text": "Zapisano: {day}, {meal}, {time}.",
+      "checked": false
+    },
+    "plate.recordedFollows": {
+      "text": "Tvoje izmene ovde idu i tamo.",
+      "checked": false
+    },
+    "fit.fillsAria": {
+      "text": "Tvoj tanjir već popunjava ovaj obrok",
+      "checked": false
+    },
+    "fit.ideasAnyway": {
+      "text": "Ipak ideje ›",
+      "checked": false
+    },
+    "fit.smallIdeas": {
+      "text": "Ideje su ipak tražene. Chef Mealan je potražio male dodatke, salatu ili povrće.",
+      "checked": false
+    },
+    "dish.askAria": {
+      "text": "Za koji obrok je ovo jelo",
+      "checked": false
+    },
+    "dish.dessertTo": {
+      "text": "Desert uz obrok ({meal})",
+      "checked": false
+    },
+    "dish.ownSnack": {
+      "text": "Posebna užina",
+      "checked": false
+    },
+    "dish.askHelp": {
+      "text": "Desert: računa se u obrok ({meal}), sa svojom slikom i namirnicama. Posebna užina: računa se zasebno.",
+      "checked": false
+    },
+    "dish.barAria": {
+      "text": "Jela ovog obroka",
+      "checked": false
+    },
+    "dish.mealDishes": {
+      "text": "{meal}, {n} jelo · {kcal} kcal · PD {pd}|{meal}, {n} jela · {kcal} kcal · PD {pd}|{meal}, {n} jela · {kcal} kcal · PD {pd}",
+      "checked": false
+    },
+    "dish.over": {
+      "text": "Za oko {kcal} kcal preko opsega ovog obroka ({lo} do {hi} kcal).",
+      "checked": false
+    },
+    "dish.under": {
+      "text": "Za oko {kcal} kcal ispod opsega ovog obroka ({lo} do {hi} kcal).",
+      "checked": false
+    },
+    "dish.inRange": {
+      "text": "U opsegu ovog obroka ({lo} do {hi} kcal).",
+      "checked": false
+    },
+    "dish.main": {
+      "text": "Glavno jelo",
+      "checked": false
+    },
+    "dish.dessert": {
+      "text": "Desert",
+      "checked": false
+    },
+    "dish.dish": {
+      "text": "Jelo",
+      "checked": false
+    },
+    "dish.addDish": {
+      "text": "+ Jelo",
+      "checked": false
+    },
+    "dish.fitOne": {
+      "text": "Uklapanje menja samo ovo jelo ({dish}). Drugo jelo ({other}) ostaje kako je posluženo, a ovo mu pravi mesta.",
+      "checked": false
+    },
+    "dish.savedForLater": {
+      "text": "Tvoj tanjir je sačuvan za kasnije, na vrhu Tanjira.",
+      "checked": false
     }
   }
 }

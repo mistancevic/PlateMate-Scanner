@@ -112,6 +112,22 @@
     "whoMadePhoto": {
       "text": "Wer hat es gemacht?",
       "checked": true
+    },
+    "cookOpen": {
+      "text": "Du warst beim Kochen: {cook}. Ein neuer Teller ist da. Mit {dish} weitermachen oder beenden?",
+      "checked": true
+    },
+    "photoLost": {
+      "text": "Die Verbindung ist abgebrochen. Dein Foto ist gespeichert.",
+      "checked": true
+    },
+    "plateFills": {
+      "text": "Dein Teller füllt {meal} schon: {kcal} kcal, im Zielbereich.",
+      "checked": true
+    },
+    "secondDish": {
+      "text": "{dish}, {minutes} nach {prev}. Dessert zum {meal} oder ein eigener Snack?",
+      "checked": true
     }
   },
   "safety": {
@@ -12091,6 +12107,102 @@
     },
     "home.footDisclaimer": {
       "text": "Haftungsausschluss (auf Englisch)",
+      "checked": true
+    },
+    "make.connectionLostHelp": {
+      "text": "Chef Mealan hat es von selbst noch einmal gelesen, als du zurück warst. Auch das hat nicht geklappt.",
+      "checked": true
+    },
+    "plate.cookOpenAria": {
+      "text": "{dish} ist noch offen",
+      "checked": true
+    },
+    "plate.cookOpenGo": {
+      "text": "Weiter mit {dish}",
+      "checked": true
+    },
+    "plate.cookOpenHelp": {
+      "text": "Beenden behält nichts von den Schritten für {dish}. Dein neuer Teller bleibt, wie er ist.",
+      "checked": true
+    },
+    "plate.recordedIn": {
+      "text": "Eingetragen: {day}, {meal}, {time}.",
+      "checked": true
+    },
+    "plate.recordedFollows": {
+      "text": "Deine Änderungen hier gehen auch dorthin.",
+      "checked": true
+    },
+    "fit.fillsAria": {
+      "text": "Dein Teller füllt diese Mahlzeit schon",
+      "checked": true
+    },
+    "fit.ideasAnyway": {
+      "text": "Trotzdem Ideen ›",
+      "checked": true
+    },
+    "fit.smallIdeas": {
+      "text": "Du wolltest trotzdem Ideen. Chef Mealan hat nach kleinen Ergänzungen gesucht, einem Salat oder Gemüse.",
+      "checked": true
+    },
+    "dish.askAria": {
+      "text": "Zu welcher Mahlzeit dieses Gericht gehört",
+      "checked": true
+    },
+    "dish.dessertTo": {
+      "text": "Dessert zum {meal}",
+      "checked": true
+    },
+    "dish.ownSnack": {
+      "text": "Eigener Snack",
+      "checked": true
+    },
+    "dish.askHelp": {
+      "text": "Dessert: zählt zu {meal}, mit eigenem Foto und eigenen Lebensmitteln. Eigener Snack: zählt für sich.",
+      "checked": true
+    },
+    "dish.barAria": {
+      "text": "Die Gerichte dieser Mahlzeit",
+      "checked": true
+    },
+    "dish.mealDishes": {
+      "text": "{meal}, {n} Gericht · {kcal} kcal · PD {pd}|{meal}, {n} Gerichte · {kcal} kcal · PD {pd}",
+      "checked": true
+    },
+    "dish.over": {
+      "text": "Etwa {kcal} kcal über den {lo} bis {hi} kcal dieser Mahlzeit.",
+      "checked": true
+    },
+    "dish.under": {
+      "text": "Etwa {kcal} kcal unter den {lo} bis {hi} kcal dieser Mahlzeit.",
+      "checked": true
+    },
+    "dish.inRange": {
+      "text": "In den {lo} bis {hi} kcal dieser Mahlzeit.",
+      "checked": true
+    },
+    "dish.main": {
+      "text": "Hauptgericht",
+      "checked": true
+    },
+    "dish.dessert": {
+      "text": "Dessert",
+      "checked": true
+    },
+    "dish.dish": {
+      "text": "Gericht",
+      "checked": true
+    },
+    "dish.addDish": {
+      "text": "+ Ein Gericht",
+      "checked": true
+    },
+    "dish.fitOne": {
+      "text": "Anpassen ändert nur {dish} und lässt {other} so, wie es serviert wurde: {dish} macht Platz dafür.",
+      "checked": true
+    },
+    "dish.savedForLater": {
+      "text": "Dein Teller ist für später gespeichert, oben auf dem Teller.",
       "checked": true
     }
   }

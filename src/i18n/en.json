@@ -3307,5 +3307,32 @@
   "home.language": "Language",
   "home.metaTitle": "Chef Mealan: live your nutrition plan, day by day",
   "home.metaDesc": "Chef Mealan plans your meals with you. When the day surprises you or a craving comes, Chef Mealan finds the meal that still fits your numbers. For adults with a nutrition plan.",
-  "home.footDisclaimer": "Disclaimer"
+  "home.footDisclaimer": "Disclaimer",
+  "make.connectionLostHelp": "Chef Mealan read it again by himself when you came back. That did not work either.",
+  "plate.cookOpenAria": "{dish} is still open",
+  "plate.cookOpenGo": "Go on with {dish}",
+  "plate.cookOpenHelp": "End it keeps nothing of {dish}'s steps. Your new plate stays as it is.",
+  "plate.recordedIn": "Recorded: {day}, {meal}, {time}.",
+  "plate.recordedFollows": "Your changes here go there too.",
+  "fit.fillsAria": "Your plate already fills this meal",
+  "fit.ideasAnyway": "Ideas anyway ›",
+  "fit.smallIdeas": "You asked for ideas anyway. Chef Mealan looked for small additions, a salad or vegetables.",
+  "dish.askAria": "Which meal this dish is for",
+  "dish.dessertTo": "Dessert to your {meal}",
+  "dish.ownSnack": "Its own snack",
+  "dish.askHelp": "Dessert: it counts in your {meal}, with its own photo and foods. Its own snack: it counts on its own.",
+  "dish.barAria": "The dishes of this meal",
+  "dish.mealDishes": {
+    "one": "{meal}, {n} dish · {kcal} kcal · PD {pd}",
+    "other": "{meal}, {n} dishes · {kcal} kcal · PD {pd}"
+  },
+  "dish.over": "Over the {lo} to {hi} kcal of this meal by about {kcal} kcal.",
+  "dish.under": "Under the {lo} to {hi} kcal of this meal by about {kcal} kcal.",
+  "dish.inRange": "In the {lo} to {hi} kcal of this meal.",
+  "dish.main": "Main",
+  "dish.dessert": "Dessert",
+  "dish.dish": "Dish",
+  "dish.addDish": "+ A dish",
+  "dish.fitOne": "Fit works on {dish} and keeps {other} as it was served: {dish} makes room for it.",
+  "dish.savedForLater": "Your plate is saved for later, at the top of the Plate."
 }

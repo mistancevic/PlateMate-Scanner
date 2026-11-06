@@ -2934,3 +2934,15 @@ html[lang="de"] .topbar .ref { flex: 0 0 auto; min-width: auto; overflow: visibl
   .l-topnav { gap: 4px; } .l-brand { gap: 4px; } .l-brand b { font-size: 16px; }
   .l-signin.pill { padding: 0 8px; }
 }
+/* DT246 (0.3.96): the line on a plate already recorded */
+.recorded-line { background: var(--tint); color: var(--ink); border-radius: 12px; padding: 10px 12px; margin: 0 0 10px; }
+/* DT247 (0.3.96, board Stories183): one meal, more dishes */
+.meal-dishes { display: grid; gap: 8px; padding: 12px 14px; margin: 0 0 12px; }
+.meal-dishes-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.meal-dishes .choice { min-height: 44px; height: auto; white-space: normal; text-align: left; padding: 6px 12px; }
+.dish-fit-note { display: block; margin: 6px 0; }
+/* DT242 (0.3.96): the photo kept after a lost answer */
+.mp-lost .mp-none-go .link { min-height: 44px; }
+.mm-small { display: block; margin: 0 0 8px; }
+/* 0.3.96 German sweep: a long German food name (Hähnchenbrust,) on a 360 px phone breaks inside the word, never past the row */
+html[lang="de"] .name-link { hyphens: auto; overflow-wrap: anywhere; }

@@ -7,10 +7,12 @@ import { basicOf } from "./foodId";
 import { referenceFood } from "./reference";
 import { sizeOf, type GateLine } from "./gates";
 
-export type PhotoFood = { name: string; grams: number; low: number; high: number; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber: number | null; confidence: "high" | "medium" | "low" };
+// DT244 (0.3.96, board Stories182; Coach Milan 6 November 10:38 and 10:39): local, the name in the app's language (Srpski or
+// German, also in Travel mode); name stays English, kept as the food's other name (aliases) for search and the food table
+export type PhotoFood = { name: string; local?: string; grams: number; low: number; high: number; calories: number | null; protein: number | null; fats: number | null; carbs: number | null; fiber: number | null; confidence: "high" | "medium" | "low" };
 // DT228 v2 (0.3.63): a food whose kind the read cannot tell, with two to four kinds it could be and Chef Mealan's question
 export type Which = { name: string; question: string; options: { name: string; calories: number; protein: number; fats: number | null; carbs: number | null; fiber: number | null }[] };
-export type PhotoRead = { dish: string; foods: PhotoFood[]; unsure: { name: string; options: [number, number] } | null; which?: Which | null };
+export type PhotoRead = { dish: string; dishLocal?: string; foods: PhotoFood[]; unsure: { name: string; options: [number, number] } | null; which?: Which | null };
 export type Estimate = { low: number; high: number };
 
 // what the server returns, checked: names, numbers, at most eight foods, grams in sense
@@ -20,13 +22,15 @@ export function cleanRead(d: any): PhotoRead | null {
   const foods: PhotoFood[] = d.foods.slice(0, 8).map((f: any) => {
     const grams = num(f?.grams, 1) ?? 100;
     const low = Math.min(grams, num(f?.low, 1) ?? Math.round(grams * 0.7)), high = Math.max(grams, num(f?.high, 1) ?? Math.round(grams * 1.3));
-    return { name: String(f?.name ?? "").trim().slice(0, 60), grams, low, high, calories: num(f?.calories, 0, 900), protein: num(f?.protein, 0, 100), fats: num(f?.fats, 0, 100), carbs: num(f?.carbs, 0, 100), fiber: num(f?.fiber, 0, 60), confidence: f?.confidence === "high" || f?.confidence === "low" ? f.confidence : "medium" };
+    const local = typeof f?.local === "string" ? f.local.replace(/\s+/g, " ").trim().slice(0, 60) : "";
+    return { name: String(f?.name ?? "").trim().slice(0, 60), ...(local && local.toLowerCase() !== String(f?.name ?? "").trim().toLowerCase() ? { local } : {}), grams, low, high, calories: num(f?.calories, 0, 900), protein: num(f?.protein, 0, 100), fats: num(f?.fats, 0, 100), carbs: num(f?.carbs, 0, 100), fiber: num(f?.fiber, 0, 60), confidence: f?.confidence === "high" || f?.confidence === "low" ? f.confidence : "medium" };
   }).filter((f: PhotoFood) => f.name);
   if (!foods.length) return null;
   const u = d.unsure && typeof d.unsure === "object" ? d.unsure : null;
   const a = num(u?.options?.[0], 1), b = num(u?.options?.[1], 1);
   const unsure = u && typeof u.name === "string" && a !== null && b !== null && a !== b && foods.some((f) => f.name.toLowerCase() === String(u.name).toLowerCase()) ? { name: String(u.name).slice(0, 60), options: [Math.min(a, b), Math.max(a, b)] as [number, number] } : null;
-  return { dish: String(d.dish ?? "").trim().slice(0, 60), foods, unsure, which: whichOf(d.which, foods, num) };
+  const dishLocal = typeof d.dishLocal === "string" ? d.dishLocal.replace(/\s+/g, " ").trim().slice(0, 60) : "";
+  return { dish: String(d.dish ?? "").trim().slice(0, 60), ...(dishLocal ? { dishLocal } : {}), foods, unsure, which: whichOf(d.which, foods, num) };
 }
 // DT228 v2: the question about a food's kind, checked: it names a food of the read; two to four kinds, each with its values
 function whichOf(w: any, foods: PhotoFood[], num: (x: unknown, lo?: number, hi?: number) => number | null): Which | null {
@@ -44,7 +48,8 @@ function whichOf(w: any, foods: PhotoFood[], num: (x: unknown, lo?: number, hi?:
 // a food of the read as a food of yours: the table's food when the name is a basic food (its values win), else an estimate
 // with the read's values; a food already in the library is reused
 export function foodOfRead(f: PhotoFood, library: Food[], region: string | null | undefined, uid: () => string): { food: Food; fresh: boolean } {
-  const have = library.find((x) => x.name.toLowerCase() === f.name.toLowerCase());
+  const same = (a: string | undefined, b: string | undefined) => !!a && !!b && a.toLowerCase() === b.toLowerCase();
+  const have = library.find((x) => same(x.name, f.name) || (x.aliases ?? []).some((a) => same(a, f.name)) || same(x.name, f.local));
   if (have) return { food: have, fresh: false };
   const r = basicOf({ name: f.name });
   if (r) {
@@ -52,7 +57,8 @@ export function foodOfRead(f: PhotoFood, library: Food[], region: string | null 
     if (twin) return { food: twin, fresh: false };
     return { food: referenceFood(r, region, uid), fresh: true };
   }
-  const food = { id: uid(), name: f.name, brand: "estimate", basis: "100g", source: "estimate", notes: "Read from a photo of the meal. Values are a chef's estimate per 100 g.", reviewedAt: new Date().toISOString(), readyToEat: true,
+  // DT244: a food of the table keeps the table's name (shown in your language by foodName); an estimate is named in your language
+  const food = { id: uid(), name: f.local || f.name, ...(f.local ? { aliases: [f.name] } : {}), brand: "estimate", basis: "100g", source: "estimate", notes: "Read from a photo of the meal. Values are a chef's estimate per 100 g.", reviewedAt: new Date().toISOString(), readyToEat: true,
     calories: f.calories ?? 0, protein: f.protein ?? 0, fats: f.fats, carbs: f.carbs, fiber: f.fiber } as Food;
   return { food, fresh: true };
 }
