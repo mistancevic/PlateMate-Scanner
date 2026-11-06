@@ -550,6 +550,68 @@
       "why": "Coach Milan 5 November 15:16 to 15:19, agreed: design and copy in English; every release ships in Srpski and Deutsch too. Claude drafts each new or changed line in both in the same build; German goes in as Beta, Srpski once confirmed. The tables show a group New in 0.3.xx first; each translation keeps the English it was made for, and a changed English line goes back to To confirm (Srpski) and is redrafted (German). A test stops a release with a line missing its Srpski or German. The German sweep at 390 and 360 px runs every release. Board drawn 5 November; waits for Go. Milan 15:32: the group is named by version, New in 0.3.95."
     },
     {
+      "id": "DT240",
+      "title": "An open cook asks once when a new plate comes in",
+      "epic": "plate",
+      "state": "next",
+      "why": "b) Go on with Test, or End it (Milan 6 November 10:32). Board drawn 6 November, waits for Go.",
+      "board": 182
+    },
+    {
+      "id": "DT241",
+      "title": "A finished dish from a photo is never cooked",
+      "epic": "plate",
+      "state": "next",
+      "why": "Prepare it and Start cooking only for a recipe with steps, or the raw foods of a recipe (Milan 10:14). Board drawn 6 November, waits for Go.",
+      "board": 182
+    },
+    {
+      "id": "DT242",
+      "title": "A photo read while away: read again once, then a card with Try again",
+      "epic": "plate",
+      "state": "next",
+      "why": "Never the browser's Failed to fetch (Milan 10:35, yes). Board drawn 6 November, waits for Go.",
+      "board": 182
+    },
+    {
+      "id": "DT243",
+      "title": "Phase 10: every line still in the code into the language files, flow by flow",
+      "epic": "plate",
+      "state": "next",
+      "why": "Words only, no board (Milan 10:35, yes)."
+    },
+    {
+      "id": "DT244",
+      "title": "Food names from a photo in the app's language",
+      "epic": "plate",
+      "state": "next",
+      "why": "Also in Travel mode; English always kept as second name, in the background for now (Milan 10:38 and 10:39). Test photos in three languages before release. Board drawn 6 November, waits for Go.",
+      "board": 182
+    },
+    {
+      "id": "DT245",
+      "title": "A plate that already fills the meal says so; a failed idea gets Put it on the plate",
+      "epic": "plate",
+      "state": "next",
+      "why": "a) (Milan 10:34). Board drawn 6 November, waits for Go.",
+      "board": 182
+    },
+    {
+      "id": "DT246",
+      "title": "A recorded meal follows the Plate's changes",
+      "epic": "plate",
+      "state": "next",
+      "why": "a), with a line on the Plate saying which meal (Milan 10:31). Board drawn 6 November, waits for Go.",
+      "board": 182
+    },
+    {
+      "id": "DT247",
+      "title": "Two dishes in one meal: a main and a dessert",
+      "epic": "plate",
+      "state": "later",
+      "why": "Milan 6 November 10:43, to brainstorm: eating out or at home, a savory dish and then a dessert, or two dishes; the app has one plate per meal today."
+    },
+    {
       "id": "DT235",
       "title": "Accessibility: WCAG 2.2 AA, checked area by area",
       "epic": "trust",
