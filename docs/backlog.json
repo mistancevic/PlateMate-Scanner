@@ -553,24 +553,24 @@
       "id": "DT240",
       "title": "An open cook asks once when a new plate comes in",
       "epic": "plate",
-      "state": "next",
-      "why": "b) Go on with Test, or End it (Milan 6 November 10:32). Board drawn 6 November, waits for Go.",
+      "state": "done",
+      "why": "b) Go on with Test, or End it (Milan 6 November 10:32). Board drawn 6 November, waits for Go. Built in 0.3.96 (Go 6 November 12:24).",
       "board": 182
     },
     {
       "id": "DT241",
       "title": "A finished dish from a photo is never cooked",
       "epic": "plate",
-      "state": "next",
-      "why": "Prepare it and Start cooking only for a recipe with steps, or the raw foods of a recipe (Milan 10:14). Board drawn 6 November, waits for Go.",
+      "state": "done",
+      "why": "Prepare it and Start cooking only for a recipe with steps, or the raw foods of a recipe (Milan 10:14). Board drawn 6 November, waits for Go. Built in 0.3.96 (Go 6 November 12:24).",
       "board": 182
     },
     {
       "id": "DT242",
       "title": "A photo read while away: read again once, then a card with Try again",
       "epic": "plate",
-      "state": "next",
-      "why": "Never the browser's Failed to fetch (Milan 10:35, yes). Board drawn 6 November, waits for Go.",
+      "state": "done",
+      "why": "Never the browser's Failed to fetch (Milan 10:35, yes). Board drawn 6 November, waits for Go. Built in 0.3.96 (Go 6 November 12:24).",
       "board": 182
     },
     {
@@ -584,32 +584,32 @@
       "id": "DT244",
       "title": "Food names from a photo in the app's language",
       "epic": "plate",
-      "state": "next",
-      "why": "Also in Travel mode; English always kept as second name, in the background for now (Milan 10:38 and 10:39). Test photos in three languages before release. Board drawn 6 November, waits for Go.",
+      "state": "done",
+      "why": "Also in Travel mode; English always kept as second name, in the background for now (Milan 10:38 and 10:39). Test photos in three languages before release. Board drawn 6 November, waits for Go. Built in 0.3.96 (Go 6 November 12:24).",
       "board": 182
     },
     {
       "id": "DT245",
       "title": "A plate that already fills the meal says so; a failed idea gets Put it on the plate",
       "epic": "plate",
-      "state": "next",
-      "why": "a) (Milan 10:34). Board drawn 6 November, waits for Go.",
+      "state": "done",
+      "why": "a) (Milan 10:34). Board drawn 6 November, waits for Go. Built in 0.3.96 (Go 6 November 12:24).",
       "board": 182
     },
     {
       "id": "DT246",
       "title": "A recorded meal follows the Plate's changes",
       "epic": "plate",
-      "state": "next",
-      "why": "a), with a line on the Plate saying which meal (Milan 10:31). Board drawn 6 November, waits for Go.",
+      "state": "done",
+      "why": "a), with a line on the Plate saying which meal (Milan 10:31). Board drawn 6 November, waits for Go. Built in 0.3.96 (Go 6 November 12:24).",
       "board": 182
     },
     {
       "id": "DT247",
       "title": "Two dishes in one meal: a main and a dessert",
       "epic": "plate",
-      "state": "next",
-      "why": "a) Chef Mealan asks once: Dessert to your dinner, or its own snack; within an hour of the meal, Dessert to your dinner is the main button. a) Fit to my target works on one dish; the other counts as it is. One meal, two dishes, each with its own photo, foods and checks; the meal line adds them up (Milan 6 November: \"Ok. A. We will test it\"). Board drawn 6 November, waits for Go.",
+      "state": "done",
+      "why": "a) Chef Mealan asks once: Dessert to your dinner, or its own snack; within an hour of the meal, Dessert to your dinner is the main button. a) Fit to my target works on one dish; the other counts as it is. One meal, two dishes, each with its own photo, foods and checks; the meal line adds them up (Milan 6 November: \"Ok. A. We will test it\"). Board drawn 6 November, waits for Go. Built in 0.3.96 (Go 6 November 12:24).",
       "board": 183
     },
     {

@@ -106,6 +106,9 @@ const PORT = "3195", B = `http://127.0.0.1:${PORT}`;
     ok(/eggs, spinach, feta and half an onion/.test(await sh.locator(".say-words").textContent()), "the words show as they come");
     await sh.getByRole("button", { name: "Done" }).click(); await page.waitForTimeout(900);
     ok(saidReq && /eggs, spinach, feta and half an onion/.test(saidReq.text) && Array.isArray(saidReq.library), "Done sends the words and the names of your foods");
+    // DT240 (0.3.96, board Stories182): the recipe's cook is still open, so the new plate asks once first; End it, the foods show
+    ok(await page.locator(".cook-open-ask").count() === 1, "the cook still open asks once (DT240)");
+    await page.locator(".cook-open-ask").getByRole("button", { name: "End it" }).click(); await page.waitForTimeout(600);
     const plateText = await page.textContent("body");
     ok(/Eggs/.test(plateText) && /Spinach/.test(plateText) && /Feta/.test(plateText) && /Onion/.test(plateText), "the four foods land on the plate");
     ok(await page.getByRole("button", { name: "Fit to my target" }).count() > 0 && await page.locator(".say-have").count() === 0, "Fit to my target is next; the listening card is gone");

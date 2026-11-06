@@ -253,6 +253,8 @@ export type Feedback = {
   carry?: { how: "light" | "fine" | "heavy"; at: string; moment?: { meal: string; day?: "training" | "rest"; training?: "before" | "after" }; sig?: string };
   // eaten for a slot of the plan (0.2.3, canvas S Today through the day): by the plan; a card without a slot is extra
   slot?: { date: string; slotId: string; name: string; time: string };
+  // DT247 (0.3.96): a dish you said is the dessert of its meal
+  course?: "dessert";
 };
 export type PilotState = {
   version: 1;
@@ -292,6 +294,10 @@ export type PilotState = {
     more?: string[]; note?: string; which?: import("./mealPhoto").Which | null };
   // DT212 (0.3.53): a plate from an earlier meal you chose to keep working on is not asked about again (its plateAt)
   plateAsked?: string;
+  // DT246 (0.3.96): the meal this plate is recorded in; while it is the same plate, its changes go there too
+  recorded?: import("./dishes").Recorded;
+  // DT247 (0.3.96): this plate is the dessert of its meal
+  course?: "dessert";
   // DT214 (0.3.53, board Stories162): the cook that runs, and the plates and cooks saved for later (see cooking.ts)
   cook?: import("./cooking").Cook;
   later?: import("./cooking").Later[];

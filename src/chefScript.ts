@@ -3,7 +3,7 @@
 // numbers and names are filled in by code. src/chefScript.test.ts checks that no ChefLine is written anywhere but here.
 import { getLang, srCount, type Lang } from "./lang";
 import deLines from "./i18n/de.json" with { type: "json" };
-import { wIn, wnIn } from "./words";
+import { wIn, wnIn, mealV } from "./words";
 import { whenWords, whenIn, agoWords, agoIn } from "./cooking";
 import srLines from "./i18n/sr-Latn.json" with { type: "json" };
 const n = (k: number, one: string, many = `${one}s`) => `${k} ${k === 1 ? one : many}`;
@@ -41,6 +41,11 @@ export const CHEF = {
   busyLate: (until: string, meal: string, time: string, free: number, quick: string, aheadDay: string | null) => `Busy until ${until}. ${meal} at ${time} leaves ${free ? `${free} minutes` : "no time"} to cook. A quick ${quick}${aheadDay ? `, or cook on ${aheadDay} and warm it up` : ""}?`,
   busyCarry: (block: string, meal: string) => `Booked from ${block}. Take ${meal} along?`,
   busyTraining: (time: string, block: string, day: string) => `Training at ${time} is in a busy block, ${block}. Move it for ${day}?`,
+  // ---- DT240 to DT247 (0.3.96, boards Stories182 and Stories183; Go 6 November 12:24) ----
+  cookOpen: (cook: string, dish: string) => `You were cooking ${cook}. A new plate came in. Go on with ${dish}, or end it?`,
+  photoLost: () => "The connection was lost. Your photo is kept.",
+  plateFills: (meal: string, kcal: string) => `Your plate already fills this ${meal.toLowerCase()}: ${kcal} kcal, in its range.`,
+  secondDish: (dish: string, minutes: number, prev: string, meal: string) => `${dish}, ${n(minutes, "minute")} after your ${prev}. Dessert to your ${meal.toLowerCase()}, or its own snack?`,
 } as const;
 export type ChefLineName = keyof typeof CHEF;
 // DT203 (0.3.76): his lines in Srpski (latinica), in src/i18n/sr-Latn.json, written in Coach Milan's table. A line goes into the
@@ -59,6 +64,10 @@ export const SR_SLOTS: Partial<Record<ChefLineName, SrSlots>> = {
   plateOldAte: (at: Date, plate: PlateIn) => ({ when: whenIn(local(), at), plate: plate(local()) }),
   plateOldBeforeCook: (at: Date, plate: PlateIn) => ({ when: whenIn(local(), at), plate: plate(local()) }),
   plateSaveOrClear: (foods: number, since: Date | null, dish: string) => ({ foods: wnIn(local(), "plate.foodsCount", foods), ago: since ? agoIn(local(), since) : wIn(local(), "ago.now"), dish }),
+  // DT240 to DT247 (0.3.96): the meal's name and the minutes in the language on this phone
+  cookOpen: (cook: string, dish: string) => ({ cook, dish }),
+  plateFills: (meal: string, kcal: string) => ({ meal: mealV(meal, true)(local()), kcal }),
+  secondDish: (dish: string, minutes: number, prev: string, meal: string) => ({ dish, minutes: getLang() === "de" ? `${minutes} ${minutes === 1 ? "Minute" : "Minuten"}` : srCount(minutes, "minut", "minuta", "minuta"), prev, meal: mealV(meal, true)(local()) }),
 };
 // the slots each line takes, by name: the Serbian line names each of them once or more, and no other (the release check, the table)
 export const SR_ALLOWED: Partial<Record<ChefLineName, string[]>> = {
@@ -66,6 +75,7 @@ export const SR_ALLOWED: Partial<Record<ChefLineName, string[]>> = {
   plateAddOrNew: ["foods", "title", "what"], scanWhileCooking: ["dish", "food"], useInCook: ["food", "dish"], resume: ["dish", "done"],
   howManyAte: ["made"], carryNow: ["minutes"], busyMeal: ["meal", "time", "block", "day"], busyLate: ["until", "meal", "time", "free", "quick"],
   busyCarry: ["block", "meal"], busyTraining: ["time", "block", "day"],
+  cookOpen: ["cook", "dish"], plateFills: ["meal", "kcal"], secondDish: ["dish", "minutes", "prev", "meal"],
 };
 export const slotsOf = (t: string) => [...new Set([...t.matchAll(/\{(\w+)\}/g)].map((m) => m[1]))].sort();
 // a slot the line misses, or one it names that the app does not fill; empty when the line fits

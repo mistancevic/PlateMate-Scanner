@@ -6,6 +6,7 @@ export type LogEvent =
   | "account_delete" // Delete my account: done, data gone, stopped, or no answer
   | "carry"          // How did it carry you?, 30 minutes after a meal: data.how = light | fine | heavy
   | "meal_photo"     // DT127 (0.2.108): a photo of the meal read onto the Plate: data.foods, data.unsure
+  | "meal_photo_lost" // DT242 (0.3.96): the answer to a plate photo was lost twice; the card with Try again showed
   | "calendar_on"    // DT178 (0.3.21): Google Calendar connected: data.events
   | "calendar_off"   // DT178 (0.3.21): Google Calendar off: data.removed
   | "calendar_busy"  // DT179 (0.3.23): Read when I'm busy on or off: data.on

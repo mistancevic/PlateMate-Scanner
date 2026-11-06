@@ -91,6 +91,9 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(600);
   ok(await page.locator(".mp-button").count() === 1, "DT127: the Plate has Photo of my meal next to Manual and Scan");
   await snap(".mp-button");
+  // DT247 (0.3.96, board Stories183): a second photo minutes after the lunch asks once; here it is more of that lunch
+  ok(await page.locator(".dish-ask").count() === 1, "DT247: the second photo asks once: dessert to your lunch, or its own snack");
+  await page.locator(".dish-ask .ca-go button").filter({ hasText: /^Dessert to your/ }).click(); await page.waitForTimeout(600);
   const big = await text(".mp-say");
   ok(/^Chef Mealan: Be aware: this plate is about 2 portions of your (lunch|dinner), about [\d,]+ to [\d,]+ kcal for a (lunch|dinner) of about [\d,]+\. Eat one portion and keep the rest\./.test(big), "DT133: the big plate in portions, by code from the size line: " + big);
   ok((await page.locator(".mp-say .button-row button").allTextContents()).slice(0, 2).join() === "Ate one portion,Ate it all", "DT133: Ate one portion first, then Ate it all");
@@ -102,6 +105,8 @@ const BIG = { dish: "Schnitzel with fries", foods: [
   read = READ;
   await page.locator("nav button").filter({ hasText: "Plate" }).click(); await page.waitForTimeout(600);
   await snap(".mp-button");
+  // DT247: again minutes after a meal: it asks once; its own snack this time
+  await page.locator(".dish-ask .ca-go button").filter({ hasText: "Its own snack" }).click(); await page.waitForTimeout(400);
   await page.getByRole("button", { name: "Not mine" }).click(); await page.waitForTimeout(400);
   const s5 = await st();
   ok(s5.items.length === 0 && !s5.photo, "DT127: Not mine empties the plate and drops the photo");

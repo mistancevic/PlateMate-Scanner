@@ -10,7 +10,7 @@ import { say } from "./chefScript";
 import type { PilotState } from "./pilot";
 
 // what the Plate holds: the foods and everything that belongs to them
-export const PLATE_KEYS = ["items", "pick", "title", "portion", "fromRecipe", "optional", "leftOut", "emptyParts", "cooking", "cookingFor", "recipeFoods", "openRecipe", "plateAt", "photo", "plateAsked"] as const;
+export const PLATE_KEYS = ["items", "pick", "title", "portion", "fromRecipe", "optional", "leftOut", "emptyParts", "cooking", "cookingFor", "recipeFoods", "openRecipe", "plateAt", "photo", "plateAsked", "recorded", "course"] as const;
 export type PlateSnap = Partial<Pick<PilotState, (typeof PLATE_KEYS)[number]>>;
 export const EMPTY_PLATE: PlateSnap = { items: [], title: "", portion: null };
 

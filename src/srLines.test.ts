@@ -23,7 +23,7 @@ test("each Serbian line names exactly the slots the app fills", () => {
 });
 
 test("the slots the app fills match the slots each line is allowed", () => {
-  const dummy: Record<string, unknown[]> = { scanWhileCooking: ["a", "b"], useInCook: ["a", "b"], carryNow: [5], didTryWork: ["side"], plateOldAte: [new Date(), () => "x"], plateOldBeforeCook: [new Date(), () => "x"], plateSaveOrClear: [2, new Date(), "x"] };
+  const dummy: Record<string, unknown[]> = { cookOpen: ["a", "b"], plateFills: ["Dinner", "700"], secondDish: ["a", 5, "b", "Dinner"], scanWhileCooking: ["a", "b"], useInCook: ["a", "b"], carryNow: [5], didTryWork: ["side"], plateOldAte: [new Date(), () => "x"], plateOldBeforeCook: [new Date(), () => "x"], plateSaveOrClear: [2, new Date(), "x"] };
   for (const [k, f] of Object.entries(SR_SLOTS)) {
     if (k === "didTryWork") continue; // a choice of two lines, not a slot
     assert.deepEqual(Object.keys(f!(...dummy[k])).sort(), [...(SR_ALLOWED[k as keyof typeof CHEF] ?? [])].sort(), k);
