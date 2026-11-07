@@ -20928,6 +20928,34 @@
     "guide.part.switchWhen": {
       "text": "Kada promeniti",
       "checked": false
+    },
+    "cookmode.readyCount": {
+      "text": "Pripremi sve",
+      "checked": false
+    },
+    "cookmode.readyHead": {
+      "text": "PRIPREMI SVE · {k} OD {n}",
+      "checked": false
+    },
+    "cookmode.readyTitle": {
+      "text": "Izvadi ono što ti treba",
+      "checked": false
+    },
+    "cookmode.readySay": {
+      "text": "Pripremi sve.",
+      "checked": false
+    },
+    "cookmode.allReady": {
+      "text": "Sve je spremno.",
+      "checked": false
+    },
+    "cookmode.step1Next": {
+      "text": "Sledi korak 1.",
+      "checked": false
+    },
+    "cookmode.toStep1": {
+      "text": "Korak 1 ›",
+      "checked": false
     }
   }
 }

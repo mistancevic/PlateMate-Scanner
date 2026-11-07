@@ -47,6 +47,7 @@ const SECOND = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, 
     await page.locator("button").filter({ hasText: start }).first().click(); await page.waitForTimeout(1200);
     // DT250 (0.3.99): an English recipe in Srpski or German asks once first; here it is cooked as written
     const ask = page.locator(".rq-lang-cook"); if (await ask.count()) { await ask.locator(".ca-go button").nth(1).click(); await page.waitForTimeout(1200); }
+    await require("./ready.cjs")(page);
   };
   try {
     // DT248: Srpski, an English recipe

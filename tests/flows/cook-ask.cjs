@@ -69,7 +69,7 @@ const PORT = "3195", B = `http://127.0.0.1:${PORT}`;
     await toRecipe();
     // DT211 v8 (0.3.53): Start cooking in the recipe's Steps block opens cook mode
     await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(1200);
-    const cm = page.locator(".cook-mode");
+    const cm = page.locator(".cook-mode"); await require("./ready.cjs")(page);
     await cm.getByRole("button", { name: "Turn voice on" }).click(); await page.waitForTimeout(300);
     await say("next"); await say("next"); await say("next");
     ok(/4 of 6/.test(await cm.locator(".cook-count").textContent()), "on step 4");

@@ -2958,3 +2958,17 @@ html[lang="de"] .name-link { hyphens: auto; overflow-wrap: anywhere; }
 .rq-lang-switch .choice { min-height: 44px; height: auto; white-space: normal; }
 .rq-lang-came { margin: 0; line-height: 1.45; } .rq-lang-came .link { min-height: 44px; }
 .rq-lang-offer, .rq-lang-cook { margin: 0 0 12px; }
+/* DT251 (0.3.104, board Stories186): Get it ready, before step 1. One food a row, 48 px to tap; the one being read is tinted. */
+.cook-ready { display: grid; gap: 8px; }
+.cook-ready-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.cook-ready-top small { font-size: 13px; font-weight: 900; letter-spacing: .06em; color: var(--muted); }
+.cook-ready-skip { min-height: 44px; }
+.cook-ready-title { font-size: 24px; line-height: 1.25; color: var(--navy); }
+.cook-ready-list { display: grid; gap: 2px; }
+.cook-ready-food { display: flex; gap: 12px; align-items: center; min-height: 48px; padding: 6px 10px; border: 0; border-radius: 12px; background: none; text-align: left; font: inherit; font-size: 18px; color: var(--ink); cursor: pointer; }
+.cook-ready-food.on { background: var(--tint); outline: 2px solid var(--brand); }
+.cook-ready-food.put .cook-ready-name { color: var(--muted); }
+.cook-ready-box { width: 26px; height: 26px; flex: none; border-radius: 8px; border: 2px solid var(--brand); display: grid; place-items: center; font-weight: 900; color: #fff; }
+.cook-ready-food.put .cook-ready-box { background: var(--brand); }
+.cook-ready-say { margin-left: auto; }
+.cook-ready-done { margin: 4px 0 0; font-size: 16px; }
