@@ -6,14 +6,20 @@ import { TOKEN, stepText, shortName } from "./steps";
 import { w, wn } from "./words";
 
 // a timer from the step's own words: "for 12 minutes", "6 to 8 minutes" (the first, to check early), "1 hour", "30 seconds"
-const WORDS: Record<string, number> = { a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, fifteen: 15, twenty: 20, thirty: 30, forty: 40, "forty-five": 45, sixty: 60 };
-const NUM = "(\\d+(?:[.,]\\d+)?|½|a|an|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|fifteen|twenty|thirty|forty-five|forty|sixty)";
+// DT255 (0.3.110, board Stories190; Coach Milan 7 November 22:25, Go): the numbers and units in Srpski and German too, so a
+// step's "10 minuta" or "10 Minuten" gets its timer and "tajmer pet minuta", "eine halbe Stunde" set one
+const WORDS: Record<string, number> = { a: 1, an: 1, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10, eleven: 11, twelve: 12, fifteen: 15, twenty: 20, thirty: 30, forty: 40, "forty-five": 45, sixty: 60,
+  jedan: 1, jedna: 1, jedno: 1, dva: 2, dve: 2, tri: 3, "četiri": 4, cetiri: 4, pet: 5, "šest": 6, sest: 6, sedam: 7, osam: 8, devet: 9, deset: 10, jedanaest: 11, dvanaest: 12, petnaest: 15, dvadeset: 20, trideset: 30, "četrdeset": 40, cetrdeset: 40, pola: 0.5,
+  ein: 1, eine: 1, eins: 1, zwei: 2, drei: 3, vier: 4, "fünf": 5, funf: 5, sechs: 6, sieben: 7, acht: 8, neun: 9, zehn: 10, elf: 11, "zwölf": 12, zwolf: 12, "fünfzehn": 15, funfzehn: 15, zwanzig: 20, "dreißig": 30, dreissig: 30, vierzig: 40, halbe: 0.5, halb: 0.5 };
+const WORD_ALT = Object.keys(WORDS).sort((x, y) => y.length - x.length).join("|");
+const NUM = `(\\d+(?:[.,]\\d+)?|½|${WORD_ALT})`;
 const num = (s: string) => (s === "½" ? 0.5 : WORDS[s.toLowerCase()] ?? Number(s.replace(",", ".")));
-const UNIT = "(hours?|hrs?|h|minutes?|mins?|seconds?|secs?)\\b";
-const unitSec = (u: string) => (/^h/i.test(u) ? 3600 : /^m/i.test(u) ? 60 : 1);
+const UNITS = ["hours", "hour", "hrs", "hr", "h", "minutes", "minute", "mins", "min", "seconds", "second", "secs", "sec", "sati", "sata", "sat", "minuta", "minute", "minut", "sekundi", "sekunde", "sekunda", "sekund", "stunden", "stunde", "std", "minuten", "sekunden", "sek"];
+const UNIT = `(${[...new Set(UNITS)].sort((x, y) => y.length - x.length).join("|")})(?![\\p{L}])`;
+const unitSec = (u: string) => (/^(h|sat|stund|std)/i.test(u) ? 3600 : /^m/i.test(u) ? 60 : 1);
 export function secondsIn(text: string): number | null {
   const t = text.replace(TOKEN, (_, __, name: string) => name);
-  const m = new RegExp(`\\b${NUM}(?:\\s*(?:-|to|or|–)\\s*${NUM})?\\s*${UNIT}`, "i").exec(t);
+  const m = new RegExp(`(?<![\\p{L}\\d])${NUM}(?:\\s*(?:-|to|or|–|do|ili|bis|oder)\\s*${NUM})?\\s*${UNIT}`, "iu").exec(t);
   if (!m) return null;
   const s = Math.round(num(m[1]) * unitSec(m[3]));
   return s >= 10 && s <= 6 * 3600 ? s : null;
@@ -45,6 +51,10 @@ export function parseCommand(said: string): Command {
   // DT203 (0.3.76): Srpski. Koliko (how much), dalje (next), nazad (back), ponovi (repeat), stani (stop); Chef, kuvaru for a question
   const kuvar = /^(?:hej )?(?:kuvaru|chef)[,:]?\s*(.*)$/.exec(s);
   if (kuvar && /^kuvaru/.test(s.replace(/^hej /, ""))) { const q = kuvar[1].trim(); return q.length >= 3 ? { kind: "ask", question: q } : { kind: "none", said }; }
+  // DT255: what is left, and a step by its number, before koliko takes the words
+  if (/(^| )(šta|sta|koliko) je (još |jos )?ostalo( |$)|(^| )(šta|sta) (još |jos )?sledi( |$)/.test(s)) return { kind: "left" };
+  const korak = new RegExp(`(?:^| )(?:idi na |pređi na |predji na |na )?korak (\\d+|${WORD_ALT})$`, "u").exec(s);
+  if (korak) { const n = num(korak[1]); if (Number.isFinite(n) && n >= 1) return { kind: "goto", step: Math.round(n) }; }
   const koliko = /\bkoliko(?: je| ima| treba)?(?: mi)? (.+)$/.exec(s);
   if (koliko) return { kind: "howMuch", food: koliko[1].replace(/\b(treba|je|ima|još|molim)\b/g, "").trim() };
   if (/\b(stani|stop|kraj|završi|zavrsi|izađi|izadji)\b/.test(s)) return { kind: "stop" };
@@ -54,6 +64,10 @@ export function parseCommand(said: string): Command {
   // DT238 (0.3.92): Deutsch. Wie viel (how much), weiter (next), zurück (back), nochmal (repeat), stopp (stop); Koch, for a question
   const koch = /^(?:hey |hallo )?koch[,:]?\s*(.*)$/.exec(s);
   if (koch) { const q = koch[1].trim(); return q.length >= 3 ? { kind: "ask", question: q } : { kind: "none", said }; }
+  // DT255: was fehlt noch, and a step by its number, before wie viel takes the words
+  if (/(^| )(was fehlt noch|was noch fehlt|was kommt noch|wie viele schritte noch|wie viel fehlt noch)( |$)/.test(s)) return { kind: "left" };
+  const schritt = new RegExp(`(?:^| )(?:zu |gehe zu |geh zu |zum )?schritt (\\d+|${WORD_ALT})$`, "u").exec(s);
+  if (schritt) { const n = num(schritt[1]); if (Number.isFinite(n) && n >= 1) return { kind: "goto", step: Math.round(n) }; }
   const wieviel = /\bwie ?viele?(?: brauche ich| ist| sind)?(?: von)?(?: der| die| das| dem| den)? (.+)$/.exec(s);
   if (wieviel) return { kind: "howMuch", food: wieviel[1].replace(/\b(brauche ich|noch|bitte)\b/g, "").trim() };
   if (/(^|\s)(stopp|ende|beenden|aufhören|aufhoren)(\s|$)/.test(s)) return { kind: "stop" };
@@ -62,7 +76,7 @@ export function parseCommand(said: string): Command {
   if (/(^|\s)(weiter|nächster|nachster|fertig)(\s|$)/.test(s)) return { kind: "next" };
   const go = /^(?:(?:go|jump|back|skip) to )?step (\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)$|\b(?:go|jump|back|skip) to step (\d+|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b/.exec(s);
   if (go) { const n = num(go[1] ?? go[2]); if (Number.isFinite(n) && n >= 1) return { kind: "goto", step: Math.round(n) }; }
-  if (/\btimer\b|\bset (?:a )?timer\b/.test(s)) {
+  if (/\btimer\b|\bset (?:a )?timer\b|(^| )tajmer( |$)|(^| )(kurzzeit)?wecker( |$)/.test(s)) {
     const sec = secondsIn(s);
     return sec ? { kind: "timer", seconds: sec } : { kind: "none", said };
   }
@@ -77,13 +91,30 @@ export function parseCommand(said: string): Command {
 // how much of a food: from the amounts being cooked, and the step it first comes in
 const plain = (s: string) => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
 const stem = (w: string) => w.replace(/(ies)$/, "y").replace(/(es|s)$/, "");
+// DT255: a food's word whatever its ending: pasulja is pasulj, luka luk, ulja ulje, pirinča pirinač, Zwiebeln Zwiebel
+const sameWord = (a: string, b: string) => {
+  if (a === b) return true;
+  const m = Math.min(a.length, b.length); if (m < 3) return false;
+  let c = 0; while (c < m && a[c] === b[c]) c++;
+  return c === m || (m >= 4 && c >= m - 1) || (m >= 6 && c >= m - 2);
+};
+// DT255: the name to say for a food: its own, unless the steps call it in another language (a translated recipe: Bohnen
+// for Pasulj); a step's word in another case (na ulju) is the same food, so its own name (ulje) is said
+export function shownName(i: Ingredient, stepName?: string): string {
+  const own = shortName(i.food);
+  if (!stepName) return own;
+  const a = plain(own).split(" "), b = plain(stepName).split(" ");
+  return a.some((x) => x.length > 2 && b.some((y) => sameWord(x, y))) ? own : stepName;
+}
 export function howMuch(food: string, steps: string[], items: Ingredient[]): string {
-  const want = plain(food).split(" ").filter((w) => w.length > 2 && !["the", "and", "some"].includes(w)).map(stem);
+  const want = plain(food).split(" ").filter((w) => w.length > 2 && !["the", "and", "some", "von", "der", "die", "das", "den", "dem"].includes(w)).map(stem);
   if (!want.length) return w("cookmode.sayTheFood");
-  const score = (i: Ingredient) => { const words = plain(`${i.food.name} ${i.food.brand ?? ""}`).split(" ").map(stem); return want.filter((w) => words.some((x) => x === w || (w.length > 3 && x.startsWith(w)))).length; };
+  // DT255: a food is also known by the name its steps give it (a translated recipe: Bohnen for Pasulj)
+  const named = new Map<string, string>(); for (const s of steps) for (const m of s.matchAll(TOKEN)) if (!named.has(m[1])) named.set(m[1], m[2]);
+  const score = (i: Ingredient) => { const words = plain(`${i.food.name} ${i.food.brand ?? ""} ${named.get(i.id) ?? ""}`).split(" ").map(stem); return want.filter((w) => words.some((x) => x === w || (w.length > 3 && x.startsWith(w)) || sameWord(w, x))).length; };
   const best = items.filter((i) => i.grams > 0).map((i) => ({ i, s: score(i) })).filter((x) => x.s > 0).sort((a, b) => b.s - a.s)[0];
   if (!best) return w("cookmode.notInRecipe", { food: food.charAt(0).toUpperCase() + food.slice(1) });
-  const tok = `[[i:${best.i.id}|${shortName(best.i.food)}]]`;
+  const tok = `[[i:${best.i.id}|${shownName(best.i, named.get(best.i.id))}]]`;
   const amount = stepText(tok, items);
   const at = steps.findIndex((x) => new RegExp(`\\[\\[i:${best.i.id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\|`).test(x));
   const cap1 = amount.charAt(0).toUpperCase() + amount.slice(1);
