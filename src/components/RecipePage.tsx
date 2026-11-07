@@ -1,4 +1,4 @@
-import { StepPicShown, StepPicSheet, StepPlayer } from "./StepPics";
+import { StepPicShown, StepPicSheet, StepPlayer, CoverVideo } from "./StepPics";
 import { w, wn, wIn, wordV, dateText, mealV, type Val, type WordKey } from "../words";
 import { kitchenMark, markWord, markLine } from "../recipeMark";
 import { YourCooks, EatLog, cookPhotosFor } from "./YourCooks";
@@ -152,6 +152,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
   // DT175a (0.3.18): the step whose picture is being added or changed, and Watch the steps
   const [picAt, setPicAt] = useState<number | null>(null);
   const [watching, setWatching] = useState(false);
+  // DT254: the step pictures as the cover's video, when every step has one (not while editing)
+  const video = !edit && (meal.steps?.length ?? 0) > 0 && allStepPics(meal, meal.steps!) ? meal.steps!.map((x) => stepPicOf(meal, x)!) : null;
   const save = () => {
     if (!edit) return;
     const missing = edit.items.find((i) => fresh.includes(i.id) && !(i.grams > 0));
@@ -230,7 +232,11 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
         : serves > 1 ? <small className="rq-label muted">{w("recipe.wholeByWeight", { n: serves })}</small> : null}
       {top}
       {/* R8: the photos first */}
-      {drawn
+      {/* DT254 (0.3.105, board Stories187): a recipe whose every step has a picture: the cover is its video */}
+      {video && (drawn || sel === 0 || list.length === 0)
+        ? <CoverVideo title={meal.title} pics={video} cover={list[0] ?? video[video.length - 1].src} coverAlt={w("recipe.coverOf", { title: meal.title })} onWords={() => setWatching(true)}
+            marks={<>{list.length > 0 && !drawn && <span className="rph-cover">{w("recipe.cover")}</span>}{(drawn || (list[0] && isDrawnPhoto(meal, list[0]))) && <span className="rq-drawn">{w("recipe.drawnByChef")}</span>}</>} />
+        : drawn
         ? <figure className="rq-hero"><img src={list[0]} alt={w("recipe.pictureOfBy", { title: meal.title })} /><span className="rq-drawn">{w("recipe.drawnByChef")}</span></figure>
         : list.length > 0
         ? <figure className="rq-hero"><img src={list[sel]} alt={sel === 0 ? w("recipe.coverOf", { title: meal.title }) : w("recipe.photoOf", { n: sel + 1, title: meal.title })} />{sel === 0 && <span className="rph-cover">{w("recipe.cover")}</span>}{isDrawnPhoto(meal, list[sel]) && <span className="rq-drawn">{w("recipe.drawnByChef")}</span>}</figure>
@@ -287,7 +293,8 @@ export function RecipePage({ meal, cards, foods, cook, state, pub, approver, dir
       {tryPhoto && <TryPhoto meal={meal} tryPhoto={tryPhoto} use={(img) => { const list = recipePhotosOf(meal).filter((x) => x !== img); onPatch({ ...withRecipePhotos([img, ...list].slice(0, MAX_RECIPE_PHOTOS)), coverSig: sig(img) }); }} />}
       {landing}
       {/* DT175a (0.3.18, board Stories123 v2): Watch the steps, when every step has its picture */}
-      {!edit && (meal.steps?.length ?? 0) > 0 && allStepPics(meal, meal.steps!) && (() => {
+      {/* DT254: the cover is the video now; the card stays only where the cover cannot be (a photo other than the cover shown) */}
+      {!video && !edit && (meal.steps?.length ?? 0) > 0 && allStepPics(meal, meal.steps!) && (() => {
         const pics = meal.steps!.map((t) => stepPicOf(meal, t)!), ai = pics.some((p) => p.by === "ai");
         return (
           <section className="card watch-card" aria-label={w("recipe.watchTheSteps")}>

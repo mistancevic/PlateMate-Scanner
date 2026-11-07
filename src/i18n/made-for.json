@@ -5238,6 +5238,10 @@
     "screen.cookmode.readySay": {"en":"Get it ready.","area":"Cooking","where":"Cooking","release":"0.3.104"},
     "screen.cookmode.allReady": {"en":"All ready.","area":"Cooking","where":"Cooking","release":"0.3.104"},
     "screen.cookmode.step1Next": {"en":"Step 1 next.","area":"Cooking","where":"Cooking","release":"0.3.104"},
-    "screen.cookmode.toStep1": {"en":"Step 1 ›","area":"Cooking","where":"Cooking","release":"0.3.104"}
+    "screen.cookmode.toStep1": {"en":"Step 1 ›","area":"Cooking","where":"Cooking","release":"0.3.104"},
+    "screen.recipe.videoStepOf": {"en":"STEP {n} OF {of} · NO SOUND · TAP FOR THE WORDS","area":"Recipes","where":"Recipes","release":"0.3.105"},
+    "screen.recipe.videoTapWords": {"en":"The steps of {title}, playing. Tap for the words","area":"Recipes","where":"Recipes","release":"0.3.105"},
+    "screen.recipe.videoPlay": {"en":"Play the steps of {title}","area":"Recipes","where":"Recipes","release":"0.3.105"},
+    "screen.recipe.videoWatchWords": {"en":"Watch with the words ›","area":"Recipes","where":"Recipes","release":"0.3.105"}
   }
 }
