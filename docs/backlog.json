@@ -682,6 +682,14 @@
       "state": "done",
       "why": "Coach Milan 7 November 22:17 to 22:20, from the DT203 gaps: cook mode in Srpski or German does not set a timer by voice, says nothing for what is left, goes to no step by number, finds a food only as written, and a step's minutes get no timer button. Board 190 drawn 22:22, Go 22:25; built in 0.3.110.",
       "board": 190
+    },
+    {
+      "id": "DT256",
+      "title": "Cook the original's steps when they work with your foods",
+      "epic": "recipes",
+      "state": "next",
+      "why": "Coach Milan 7 November 23:59 to 8 November 00:01: his Chicken rice bowl from a screenshot had the six steps and the green line, and Start cooking was grey. Start cooking cooks the original's steps as written when they fit; the first cook makes them the recipe's own, so step pictures and the cover video work. Board 191 drawn 00:03, waits for Go.",
+      "board": 191
     }
   ]
 }
