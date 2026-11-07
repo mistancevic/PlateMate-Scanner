@@ -7,7 +7,11 @@ import type { Meal } from "./pilot";
 import { textLang, type Lang } from "./lang";
 import { TOKEN } from "./steps";
 
-export type RecipeTr = { lang: Lang; from: Lang; title: string; steps: string[]; foods?: Record<string, string>; at: string; auto?: boolean };
+export type RecipeTr = { lang: Lang; from: Lang; title: string; steps: string[]; foods?: Record<string, string>; at: string; auto?: boolean; v?: number };
+// 0.3.100 (Coach Milan 08:52, Go 08:54): version 2 translates the food names in the steps' tokens and the words around the numbers
+// (8 minuta); a translation made before is offered again
+export const TR_V = 2;
+const current = (m: Meal, lang: Lang) => !!m.tr && m.tr.lang === lang && (m.tr.v ?? 1) >= TR_V;
 
 // the words of a step, with each food's token read as its name
 const plainStep = (s: string) => s.replace(TOKEN, (_m, _id, name) => name);
@@ -16,23 +20,25 @@ export const recipeLangOf = (m: Pick<Meal, "title" | "steps">): Lang => textLang
 // the recipe as it shows in this language: its translation, unless the original is asked for
 export function shownMeal(m: Meal, lang: Lang): Meal {
   const tr = m.tr;
-  if (!tr || tr.lang !== lang || m.trShow === "orig") return m;
+  if (!tr || !current(m, lang) || m.trShow === "orig") return m;
   const steps = m.steps ?? [];
   const meta = m.stepPicMeta?.map((x, k) => (x && x.step === steps[k] && tr.steps[k] ? { ...x, step: tr.steps[k] } : x));
   return {
     ...m, title: tr.title || m.title, steps: tr.steps.length === steps.length ? tr.steps : steps,
     items: m.items.map((i) => (tr.foods?.[i.id] && !i.food.refId ? { ...i, food: { ...i.food, name: tr.foods[i.id] } } : i)),
     ...(meta ? { stepPicMeta: meta } : {}),
+    // the foods the steps were written for, by the same names, so a renamed food is no changed food (0.3.100)
+    ...(m.stepsFor ? { stepsFor: m.stepsFor.map((n) => { const it = m.items.find((i) => i.food.name === n && !i.food.refId && tr.foods?.[i.id]); return it ? tr.foods![it.id] : n; }) } : {}),
   };
 }
-export const showsTranslation = (m: Meal, lang: Lang) => !!m.tr && m.tr.lang === lang && m.trShow !== "orig";
+export const showsTranslation = (m: Meal, lang: Lang) => current(m, lang) && m.trShow !== "orig";
 
 // the language to offer a translation from: a recipe with steps, in another language than the app's, not translated into it
 // yet and not kept as it is for this language; null when there is nothing to offer
 export function offerFrom(m: Meal, lang: Lang): Lang | null {
   if (!m.steps?.length) return null;
   const from = recipeLangOf(m);
-  if (from === lang || (m.tr && m.tr.lang === lang) || (m.trNo ?? []).includes(lang)) return null;
+  if (from === lang || current(m, lang) || (m.trNo ?? []).includes(lang)) return null;
   return from;
 }
 
