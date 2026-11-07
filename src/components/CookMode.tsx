@@ -7,7 +7,7 @@ import { ChefLine } from "./ChefLine";
 import { say as chefSay } from "../chefScript";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Ingredient } from "../pilot";
-import { stepParts, stepText, tokenOf } from "../steps";
+import { stepParts, stepText, tokenOf, TOKEN } from "../steps";
 import { tempsIn } from "../units";
 import { utterance, voiceSettings } from "../voiceSettings";
 import { VoiceSettingsPanel } from "./VoiceSettings";
@@ -123,8 +123,12 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   // DT251: a food of Get it ready as it reads ("150 g basmati rice"), and as it is said ("150 grams basmati rice")
   const sayFood = (j: number, first = false) => {
     const i = readyFoods[j]; if (!i) return;
-    sayParts([{ text: first ? w("cookmode.readySay") : "", lang: voiceFor(w("cookmode.readySay")) }, { text: spoken(tokenOf(i), items), lang: recipeVoice() }]);
+    sayParts([{ text: first ? w("cookmode.readySay") : "", lang: voiceFor(w("cookmode.readySay")) }, { text: spoken(readyToken(i), items), lang: recipeVoice() }]);
   };
+  // DT251 fix (0.3.106; Coach Milan 13:51 Go): a food is named as the steps on screen name it (a translated recipe: Bohnen, not
+  // pasulj); a food no step names keeps its own short name
+  const stepName = new Map<string, string>(); for (const s of steps) for (const mt of s.matchAll(TOKEN)) if (!stepName.has(mt[1])) stepName.set(mt[1], mt[2]);
+  const readyToken = (i: Ingredient) => (stepName.has(i.id) ? `[[i:${i.id}|${stepName.get(i.id)}]]` : tokenOf(i));
   const sayAllReady = () => say(`${w("cookmode.allReady")} ${w("cookmode.step1Next")}`);
   useEffect(() => { if (prep && pAt >= 0) sayFood(pAt, pAt === 0 && put.size === 0); }, [pAt, prep, voice]); // eslint-disable-line react-hooks/exhaustive-deps
   const nextUnput = (from: number, s: Set<string>) => { for (let j = 0; j < readyFoods.length; j++) { const x = (from + j) % readyFoods.length; if (!s.has(readyFoods[x].id)) return x; } return -1; };
@@ -305,7 +309,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
               {readyFoods.map((i, j) => { const isPut = put.has(i.id), cur = j === pAt; return (
                 <button type="button" key={i.id} className={`cook-ready-food${isPut ? " put" : ""}${cur ? " on" : ""}`} aria-pressed={isPut} aria-current={cur ? "step" : undefined} onClick={() => tapFood(j)}>
                   <span className="cook-ready-box" aria-hidden="true">{isPut ? "✓" : ""}</span>
-                  <span className="cook-ready-name">{stepParts(tokenOf(i), items).map((p, x) => ("text" in p ? p.text : <b key={x}>{p.label}</b>))}</span>
+                  <span className="cook-ready-name">{stepParts(readyToken(i), items).map((p, x) => ("text" in p ? p.text : <b key={x}>{p.label}</b>))}</span>
                   {cur && on && <span className="cook-ready-say" aria-hidden="true">🔊</span>}
                 </button>); })}
             </div>
