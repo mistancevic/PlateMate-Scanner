@@ -2982,3 +2982,11 @@ html[lang="de"] .name-link { hyphens: auto; overflow-wrap: anywhere; }
 .rq-video-rest { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; } .rq-video-rest .link { min-height: 44px; } .rq-video-rest small { margin-left: auto; }
 /* the tile of a recipe with a steps video: ▶ in the middle of its cover */
 .recipe-tile-cover .tile-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: 52px; height: 52px; border-radius: 50%; background: rgba(255,255,255,.95); color: var(--brand); font-size: 21px; display: grid; place-items: center; box-shadow: 0 2px 10px rgba(0,0,0,.25); }
+/* 0.3.107 (every Srpski line in): three of German's fixes for Srpski too, found by the Srpski sweep at 360 px. The PD band chips
+   on Foods wrap; a wide button may take two lines, its words never cut; a long goal line in the head goes under the title. */
+html[lang="sr-Latn"] .chips:has(> .chip-top) { flex-wrap: wrap; }
+html[lang="sr-Latn"] :is(.pill-wide, .pill-tall) { white-space: normal; height: auto; min-height: 48px; padding-block: 8px; line-height: 1.25; text-align: center; }
+html[lang="sr-Latn"] .pill-tall { min-height: 56px; }
+html[lang="sr-Latn"] .topbar { flex-wrap: wrap; row-gap: 0; padding-right: 60px; }
+html[lang="sr-Latn"] .topbar .menu-button { position: absolute; right: 18px; top: calc(13px + env(safe-area-inset-top, 0px)); }
+html[lang="sr-Latn"] .topbar .ref { flex: 0 0 auto; min-width: auto; overflow: visible; }
