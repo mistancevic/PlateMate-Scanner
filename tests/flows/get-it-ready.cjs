@@ -15,7 +15,7 @@ const recipe = { id: "m-sa", title: "Salmon and rice", items, portion: 460, step
   const b = await chromium.launch(process.env.CHROME ? { executablePath: process.env.CHROME } : {});
   let fail = 0; const ok = (c, m) => { console.log((c ? "ok   " : "FAIL ") + m); if (!c) fail++; };
   const errs = [];
-  const open = async (lang, width = 390) => {
+  const open = async (lang, width = 390, meal = recipe) => {
     const ctx = await b.newContext({ viewport: { width, height: 844 } });
     const page = await ctx.newPage(); page.on("pageerror", (e) => errs.push(e.message));
     await page.clock.install({ time: new Date("2026-11-07T18:40:00") });
@@ -30,7 +30,7 @@ const recipe = { id: "m-sa", title: "Salmon and rice", items, portion: 460, step
       Object.defineProperty(navigator, "wakeLock", { value: { request: async () => ({ release: async () => {} }) }, configurable: true });
       window.__recs = [];
       window.SpeechRecognition = function () { const me = this; window.__recs.push(me); me.start = () => { me.on = true; }; me.stop = () => { me.on = false; }; };
-    }, [{ ...seed, meals: [recipe] }, lang]);
+    }, [{ ...seed, meals: [meal] }, lang]);
     await require("./adult.cjs")(page);
     await page.goto(B + "/my-recipes"); await page.waitForTimeout(1000);
     await page.getByText("Salmon and rice").first().click(); await page.waitForTimeout(800);
@@ -70,6 +70,12 @@ const recipe = { id: "m-sa", title: "Salmon and rice", items, portion: 460, step
     page = await open(null);
     await page.locator(".cook-ready-skip").click(); await page.waitForTimeout(300);
     ok(await page.locator(".cook-ready").count() === 0 && /1 of 2/.test(await page.locator(".cook-mode .cook-count").textContent()), "Step 1 › skips it: step 1");
+    await page.context().close();
+
+    // a recipe shown translated: the foods as the German steps name them (0.3.106, Coach Milan 13:51)
+    page = await open("de", 390, { ...recipe, tr: { lang: "de", from: "en", title: "Lachs und Reis", steps: ["Koche den [[i:rc|Reis]] 12 Minuten in Salzwasser.", "Backe den [[i:sa|Lachs]] 12 Minuten bei 200 °C."], at: "2026-11-07T08:00:00Z", v: 2 } });
+    const tf = page.locator(".cook-ready-food");
+    ok(/180 g Lachs/.test(await tf.nth(0).textContent()) && /150 g Reis/.test(await tf.nth(1).textContent()) && /120 g broccoli/.test(await tf.nth(2).textContent()), "translated: 180 g Lachs, 150 g Reis as the steps name them; a food no step names keeps its name");
     await page.context().close();
 
     // Deutsch at 360: the head and the voice in German, the food in the recipe's language
