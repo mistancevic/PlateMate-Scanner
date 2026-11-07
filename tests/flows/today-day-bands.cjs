@@ -54,7 +54,7 @@ const U = "http://127.0.0.1:3240";
     ok(JSON.stringify(bands) === JSON.stringify(["TodayMonday, October 19", "TomorrowTuesday, October 20", "Earlierthe last two days"]), "three bands: " + bands.join(" | "));
     ok(await page.locator(".plan-day").count() === 0, "no small blue day line inside the cards");
     const st = await page.locator(".day-band").first().evaluate((e) => { const c = getComputedStyle(e); return { pos: c.position, bg: c.backgroundColor, line: c.borderBottomColor, w: c.borderBottomWidth }; });
-    ok(st.pos !== "sticky" && st.bg === "rgba(0, 0, 0, 0)" && st.line === "rgb(46, 123, 232)" && st.w === "3px", "the day is a header, not a button: no fill, a blue line under it, in the page");
+    ok(st.pos !== "sticky" && st.bg === "rgba(0, 0, 0, 0)" && st.line === "rgb(42, 114, 217)" && st.w === "3px", "the day is a header, not a button: no fill, a blue line under it, in the page");
     const order = await page.evaluate(() => { const at = (sel) => { const e = document.querySelector(sel); return e ? e.getBoundingClientRect().top + scrollY : -1; }; const bs = [...document.querySelectorAll(".day-band")].map((e) => e.getBoundingClientRect().top + scrollY); return { today: bs[0], plan: at("section.cooking"), know: at(".ft-know"), tomorrow: bs[1], tCard: at(".tomorrow-plan"), earlier: bs[2], days: at(".days .day-card") }; });
     ok(order.today < order.plan && order.plan < order.know && order.know < order.tomorrow && order.tomorrow < order.tCard && order.tCard < order.earlier && order.earlier < order.days, "Today (plan, Getting to know you), then Tomorrow, then Earlier (the last few days)");
     const asks = page.locator(".missed-ask");

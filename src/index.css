@@ -11,13 +11,13 @@
   --line: #d1dcf0;        /* Line: borders, dividers, tracks */
   /* Text */
   --ink: #172742;         /* Ink: all main text */
-  --muted: #5b6b8a;       /* Muted: times, meta, small print, placeholders */
+  --muted: #53627f;       /* Muted: times, meta, small print, placeholders (0.3.109: 4.5:1 on the tinted cards too) */
   --navy: #123a7a;        /* Navy: text on Selected */
   /* Blue */
-  --brand: #2e7be8;       /* Blue: the main step, filled buttons, the day header line */
+  --brand: #2a72d9;       /* Blue: the main step, filled buttons, the day header line (0.3.109: white text on it 4.5:1) */
   --brand-text: #1f5fc7;  /* Blue text: links, outlined button text, meal names you tap */
   /* Meaning: a fill, a soft background, its text */
-  --top: #13916a;         /* Good: fits, on plan */
+  --top: #0f7d5b;         /* Good: fits, on plan (0.3.109: white text on it 4.5:1) */
   --good-soft: #e3f4ea;   /* Good soft: behind a good note */
   --good-text: #155c34;   /* Good text: text on Good soft */
   --mid: #f6b94a;         /* Close: close to target, the zone, warning borders */
@@ -30,7 +30,7 @@
   --high: #35cf9e;        /* High: the zone chart only */
   --plan: var(--brand);
   /* The same colours, for see-through use: rgba(var(--ink-rgb), .18) */
-  --ink-rgb: 23, 39, 66; --brand-rgb: 46, 123, 232; --base-rgb: 238, 243, 252; --surface-rgb: 255, 255, 255; --high-rgb: 53, 207, 158; --black-rgb: 0, 0, 0;
+  --ink-rgb: 23, 39, 66; --brand-rgb: 42, 114, 217; --base-rgb: 238, 243, 252; --surface-rgb: 255, 255, 255; --high-rgb: 53, 207, 158; --black-rgb: 0, 0, 0;
   /* Shadows: one under the main step, one under what floats (a sheet, a dialog, a toast) */
   --shadow-main: 0 4px 10px rgba(var(--brand-rgb), .25);
   --shadow-float: 0 12px 30px rgba(var(--ink-rgb), .18);
@@ -90,7 +90,7 @@ label.check input { width: auto; margin: 0; accent-color: var(--brand); }
 .fields.three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .fields .field input { padding: 11px 12px; }
 .link { color: var(--brand-text); font-weight: 700; font-size: var(--fs-label); padding: 0; }
-.link-danger { color: var(--low); }
+.link-danger { color: var(--low-text); }
 
 /* ---------------- Shell ---------------- */
 .app-shell { min-height: 100dvh; display: flex; flex-direction: column; }
@@ -109,11 +109,11 @@ main { flex: 1; width: 100%; max-width: 640px; margin: 0 auto; padding: 8px 18px
 .meal-name { font-size: var(--fs-title); font-weight: 900; border: 0; background: transparent; padding: 8px 0 10px; border-radius: 0; }
 .meal-name:focus { box-shadow: none; border-bottom: 2px solid var(--brand); }
 .readout { background: var(--brand); color: var(--surface); border-radius: var(--r-panel); padding: 18px 20px 16px; margin-bottom: 14px; }
-.readout-top { display: flex; justify-content: space-between; font-size: var(--fs-label); font-weight: 700; opacity: 0.85; margin-bottom: 4px; }
+.readout-top { display: flex; justify-content: space-between; font-size: var(--fs-label); font-weight: 700; margin-bottom: 4px; }
 .readout-mid { display: flex; align-items: center; gap: 16px; }
 .readout-mid > b { flex: none; font-size: var(--fs-hero); font-weight: 900; line-height: 0.95; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
 .readout-mid > div { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; font-size: var(--fs-body); font-weight: 900; line-height: 1.25; }
-.readout-mid > div small { color: var(--surface); opacity: 0.85; font-size: var(--fs-label); font-weight: 600; line-height: 1.35; }
+.readout-mid > div small { color: var(--surface); font-size: var(--fs-label); font-weight: 600; line-height: 1.35; }
 .readout-row { display: flex; justify-content: space-between; gap: 10px; margin-top: 14px; font-size: var(--fs-label); font-weight: 400; opacity: 0.9; font-variant-numeric: tabular-nums; }
 .readout-row b { font-weight: 700; font-size: var(--fs-body); }
 .readout-empty { opacity: 0.9; }
@@ -184,7 +184,7 @@ button.dot { cursor: pointer; width: 14px; height: 14px; }
 .chip-inmeal { background: var(--surface); color: var(--brand-text); border-color: var(--line); opacity: 1; }
 .chip-inmeal.on { border-color: var(--brand); background: var(--tint); }
 .pdpill { display: inline-flex; align-items: baseline; gap: 3px; height: 36px; padding: 0 12px; border-radius: var(--r-chip); color: var(--surface); font-size: var(--fs-card); font-weight: 900; line-height: 36px; font-variant-numeric: tabular-nums; }
-.pdpill small { color: var(--surface); opacity: 0.9; font-size: var(--fs-caps); font-weight: 700; }
+.pdpill small { color: inherit; font-size: var(--fs-caps); font-weight: 700; }
 .pdpill-high { background: var(--high); } .pdpill-mid { background: var(--mid); } .pdpill-low { background: var(--low); }
 .pdpill-below { background: var(--low); } .pdpill-close { background: var(--mid); } .pdpill-plan { background: var(--plan); } .pdpill-top { background: var(--top); }
 .portion { margin: 6px 0 4px; }
@@ -557,7 +557,7 @@ main { padding-bottom: calc(160px + env(safe-area-inset-bottom, 0px)); }
 .l-trap { position: absolute !important; left: -5000px !important; width: 1px; height: 1px; opacity: 0; }
 .l-sent { display: flex; gap: 8px; align-items: center; margin-top: 14px; font-weight: 700; color: var(--brand-text); }
 .l-foot { display: flex; flex-direction: column; gap: 6px; padding: 24px 0 8px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
-.l-foot a { color: var(--brand-text); }
+.l-foot a { color: var(--brand-text); text-decoration: underline; text-underline-offset: 2px; }
 .request.handled { opacity: .55; }
 @media (min-width: 760px) {
   .l-hero { grid-template-columns: 1.1fr 1fr; padding-top: 30px; }
@@ -1651,7 +1651,7 @@ button.recipe-tile { display: block; width: 100%; text-align: left; font: inheri
 
 /* A recipe from a screenshot or a link (0.2.16, canvas board IM) */
 .plate-card .card-top { align-items: center; }
-.plate-card .plate-empty-link { display: inline-flex; align-items: center; gap: 4px; color: var(--low); font-size: var(--fs-label); font-weight: 700; padding: 2px 4px; }
+.plate-card .plate-empty-link { display: inline-flex; align-items: center; gap: 4px; color: var(--low-text); font-size: var(--fs-label); font-weight: 700; padding: 2px 4px; }
 .plate-card .ways-label { display: block; color: var(--muted); font-weight: 700; font-size: var(--fs-small); margin: 2px 0 -4px; }
 .in-card .card-top span { color: var(--ink); }
 .in-thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -2265,11 +2265,11 @@ button.mp-card { width: 100%; text-align: left; font: inherit; color: inherit; }
 
 /* DT129 (0.2.109, board Stories86): right of PD, Energy, Weight, Protein with the plate's numbers right aligned */
 .readout-mid small.rd-rows { display: inline-grid; grid-template-columns: auto auto auto; column-gap: 5px; align-items: baseline; white-space: nowrap; margin-top: 4px; }
-.rd-rows > span:nth-child(3n+1) { font-size: var(--fs-small); opacity: .9; padding-right: 4px; }
+.rd-rows > span:nth-child(3n+1) { font-size: var(--fs-small); padding-right: 4px; }
 .rd-rows > b { font-size: var(--fs-card); font-weight: 900; text-align: right; font-variant-numeric: tabular-nums; }
-.rd-rows > span:nth-child(3n) { font-size: var(--fs-small); opacity: .9; }
+.rd-rows > span:nth-child(3n) { font-size: var(--fs-small); }
 /* the quick line: four letters, wide apart, › to open the numbers */
-.readout-letters .letters-row { flex-direction: row; align-items: center; padding: 8px 12px; background: rgba(255,255,255,.2); }
+.readout-letters .letters-row { flex-direction: row; align-items: center; padding: 8px 12px; background: rgba(var(--ink-rgb), .18); }
 .letters-line { display: flex; align-items: center; }
 .letters-line .letters { font-size: var(--fs-section); }
 .letters-line .letters + .letters::before { content: "│"; opacity: .5; padding: 0 12px; font-family: inherit; font-weight: 400; }
@@ -2495,7 +2495,7 @@ input.another-day { margin: 6px 0 2px; max-width: 220px; }
 .sum-label { color: var(--muted); font-weight: 700; }
 .sum-does { color: var(--ink); opacity: .8; font-weight: 600; }
 .sum-chef { width: 56px; flex-shrink: 0; text-align: right; font-weight: 700; color: var(--muted); }
-.sum-chef.on { color: #13916a; }
+.sum-chef.on { color: var(--good-text); }
 .sum-tag { display: inline-block; margin-left: 6px; padding: 1px 7px; border-radius: 9px; font-size: 10.5px; font-weight: 800; vertical-align: 1px; }
 .sum-health { background: #fdebd3; color: #8a4b00; }
 .sum-next { margin-top: 14px; }
@@ -2995,3 +2995,7 @@ html[lang="sr-Latn"] .pill-tall { min-height: 56px; }
 html[lang="sr-Latn"] .topbar { flex-wrap: wrap; row-gap: 0; padding-right: 60px; }
 html[lang="sr-Latn"] .topbar .menu-button { position: absolute; right: 18px; top: calc(13px + env(safe-area-inset-top, 0px)); }
 html[lang="sr-Latn"] .topbar .ref { flex: 0 0 auto; min-width: auto; overflow: visible; }
+
+/* 0.3.109 (Coach Milan 7 November 21:03): text 4.5:1 on its colour (WCAG 2.2 AA 1.4.3). The PD band chips Low− and Low are
+   coral and amber: their words are ink, not white. Checked by axe in tests/flows/accessibility.cjs at every release. */
+.chip-below, .chip-close, .chip-high, .pdpill-below, .pdpill-close, .pdpill-high, .pdpill-mid, .pdpill-low { color: var(--ink); }
