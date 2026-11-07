@@ -43,7 +43,7 @@ const U = "http://127.0.0.1:3243";
     await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(700);
     return page;
   };
-  const TOKENS = ["#eef3fc", "#ffffff", "#dae6fb", "#f6f8fc", "#d1dcf0", "#172742", "#5b6b8a", "#123a7a", "#2e7be8", "#1f5fc7", "#13916a", "#e3f4ea", "#155c34", "#f6b94a", "#fff4e0", "#8a5a00", "#f0705c", "#fdecea", "#a33a2b", "#35cf9e", "#000000"];
+  const TOKENS = ["#eef3fc", "#ffffff", "#dae6fb", "#f6f8fc", "#d1dcf0", "#172742", "#53627f", "#123a7a", "#2a72d9", "#1f5fc7", "#0f7d5b", "#e3f4ea", "#155c34", "#f6b94a", "#fff4e0", "#8a5a00", "#f0705c", "#fdecea", "#a33a2b", "#35cf9e", "#000000"];
   const SIZES = [84, 24, 18, 16, 15, 13, 12.5, 11.5], WEIGHTS = ["400", "600", "700", "900"];
   const audit = (page, screen) => page.evaluate(([screen, TOKENS, SIZES, WEIGHTS]) => {
     const hex = (c) => { const m = c.match(/rgba?\(([^)]*)\)/); if (!m) return null; const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number); if (p.length > 3 && p[3] === 0) return null; return "#" + p.slice(0, 3).map((x) => Math.round(x).toString(16).padStart(2, "0")).join(""); };

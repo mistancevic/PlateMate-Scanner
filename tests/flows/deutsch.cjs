@@ -21,6 +21,8 @@ const cut = () => [...document.querySelectorAll("button, .pill")].filter((e) => 
   const open = async (width, lang) => {
     const ctx = await b.newContext({ viewport: { width, height: 844 }, locale: "de-DE", timezoneId: "Europe/Berlin" });
     const page = await ctx.newPage(); page.on("pageerror", (e) => errs.push(e.message));
+    // midday, so Today has a next meal and its three buttons at any hour the walkthrough runs
+    await page.clock.setFixedTime(new Date("2026-11-07T11:30:00"));
     await page.addInitScript(({ s, lang }) => { if (sessionStorage.getItem("seeded")) return; sessionStorage.setItem("seeded", "1"); localStorage.setItem("platemate-pilot-v1", JSON.stringify(s));
       localStorage.setItem("chefmealan-goal", JSON.stringify({ band: "maintain", setBy: "you", setAt: "2026-10-01T08:00:00Z", source: "quick" })); if (lang) localStorage.setItem("chefmealan-lang", lang); }, { s: seed, lang });
     await require("./adult.cjs")(page);

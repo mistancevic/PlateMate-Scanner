@@ -46,7 +46,7 @@ const U = "http://127.0.0.1:3242";
     await page.locator("nav button").filter({ hasText: "Today" }).click(); await page.waitForTimeout(700);
     return page;
   };
-  const filled = (page, scope = "main") => page.locator(scope).locator("button.pill, a.pill").evaluateAll((bs) => bs.filter((b) => { const r = b.getBoundingClientRect(); return r.width > 4 && /rgb\(46, 123, 232\)|rgb\(31, 95, 199\)/.test(getComputedStyle(b).backgroundColor); }).map((b) => b.textContent.trim()));
+  const filled = (page, scope = "main") => page.locator(scope).locator("button.pill, a.pill").evaluateAll((bs) => bs.filter((b) => { const r = b.getBoundingClientRect(); return r.width > 4 && /rgb\(42, 114, 217\)|rgb\(31, 95, 199\)/.test(getComputedStyle(b).backgroundColor); }).map((b) => b.textContent.trim()));
   const row = (loc) => loc.evaluateAll((bs) => bs.map((b) => { const r = b.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width)]; }));
   try {
     // ---- B and C on Today, 13:00 ----
@@ -105,7 +105,7 @@ const U = "http://127.0.0.1:3242";
     await p4.goto(U + "/built"); await p4.waitForTimeout(1500);
     ok(await p4.locator(".bt-sub a").first().evaluate((a) => getComputedStyle(a).textDecorationLine === "underline"), "H: a link inside a sentence is underlined");
     // BP1 (0.3.51): one filled button per part of the page: Try it at the top, Notify me at the books, Email Milan at the end
-    const btns = await p4.locator(".bt-btn").evaluateAll((bs) => bs.map((x) => [x.textContent.trim(), /rgb\(46, 123, 232\)/.test(getComputedStyle(x).backgroundColor)]));
+    const btns = await p4.locator(".bt-btn").evaluateAll((bs) => bs.map((x) => [x.textContent.trim(), /rgb\(42, 114, 217\)/.test(getComputedStyle(x).backgroundColor)]));
     ok(JSON.stringify(btns.filter((x) => x[1]).map((x) => x[0])) === JSON.stringify(["Try it: the calculator on the home page", "Notify me", "Email Milan"]), "H: one filled button per part: " + JSON.stringify(btns));
     ok(errs.length === 0, `no page errors${errs.length ? ": " + errs.join(" | ") : ""}`);
   } catch (e) { ok(false, "ran to the end: " + e.message.split("\n")[0]); }
