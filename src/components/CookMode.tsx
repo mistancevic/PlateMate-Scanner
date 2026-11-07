@@ -7,7 +7,7 @@ import { ChefLine } from "./ChefLine";
 import { say as chefSay } from "../chefScript";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { Ingredient } from "../pilot";
-import { stepParts, stepText } from "../steps";
+import { stepParts, stepText, tokenOf } from "../steps";
 import { tempsIn } from "../units";
 import { utterance, voiceSettings } from "../voiceSettings";
 import { VoiceSettingsPanel } from "./VoiceSettings";
@@ -47,6 +47,13 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   const first = Math.max(0, steps.findIndex((_, k) => !ticks.has(k)));
   const [k, setK] = useState(ticks.size >= steps.length ? 0 : first);
   const [done, setDone] = useState(false);
+  // DT251 (0.3.104, board Stories186; Coach Milan 7 November 08:07 to 12:28, Go): Get it ready. A cook that starts at the
+  // beginning opens on the foods first: each with its amount, read aloud one at a time; next ticks it and goes on, repeat says
+  // it again, a tap ticks one too. All ticked: All ready, then step 1. Step 1 › skips it at any time.
+  const readyFoods = items.filter((i) => i.grams > 0);
+  const [prep, setPrep] = useState(ticks.size === 0 && readyFoods.length > 0);
+  const [put, setPut] = useState<Set<string>>(() => new Set());
+  const [pAt, setPAt] = useState(0);
   // DT217 v2 (0.3.56, board Stories163): the move in this step being read; the whole step stays on screen above the moves
   const [m, setM] = useState(0);
   const movesOf = (j: number) => movesFor(steps[j] ?? "", moves?.[j]?.m);
@@ -63,7 +70,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   const hasEars = !!Speech();
   const on = voice === "on";
   // the newest values, for the speech callbacks
-  const live = useRef({ k, m, done, on, steps, items }); live.current = { k, m, done, on, steps, items };
+  const live = useRef({ k, m, done, on, steps, items, prep, put, pAt }); live.current = { k, m, done, on, steps, items, prep, put, pAt };
 
   // 0.3.54: what the phone is saying, so the microphone does not take its own voice for the cook's (see isEcho in cook.ts)
   const voiceOut = useRef<{ speaking: boolean; tail: boolean; text: string; timers: number[] }>({ speaking: false, tail: false, text: "", timers: [] });
@@ -106,13 +113,32 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   }, []);
   // DT177: the other screen moved: this one follows, once per change, without sending it back
   const fromOther = useRef(false);
-  useEffect(() => { const r = link.remoteStep; if (!r) return; if (r.k !== live.current.k || live.current.done) { fromOther.current = true; setDone(false); setK(Math.max(0, Math.min(steps.length - 1, r.k))); setM(0); } }, [link.remoteStep?.rev]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { const r = link.remoteStep; if (!r) return; if (r.k !== live.current.k || live.current.done || live.current.prep) { fromOther.current = true; setDone(false); setPrep(false); setK(Math.max(0, Math.min(steps.length - 1, r.k))); setM(0); } }, [link.remoteStep?.rev]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (fromOther.current) { fromOther.current = false; return; } link.onStep?.(k); }, [k]); // eslint-disable-line react-hooks/exhaustive-deps
   // ticks from the other screen join this one's
   useEffect(() => { setDoneSet((d) => { let ch = false; const n = new Set(d); ticks.forEach((t) => { if (!n.has(t)) { n.add(t); ch = true; } }); return ch ? n : d; }); }, [ticks]);
   // a step is read aloud when it shows; with moves, one move at a time, the first with the step's number (DT217)
   const sayMove = (j: number, mi: number) => { const mv = movesOf(j); const head = mi === 0 ? w("cookmode.sayStep", { n: j + 1 }) : ""; sayParts([{ text: head, lang: head === wIn("en", "cookmode.sayStep", { n: j + 1 }) ? speechLang("en") : appVoice() }, { text: spoken(mv[Math.min(mi, mv.length - 1)], items), lang: recipeVoice() }]); };
-  useEffect(() => { if (!done) sayMove(k, m); }, [k, m, done, voice]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { if (!done && !prep) sayMove(k, m); }, [k, m, done, voice, prep]); // eslint-disable-line react-hooks/exhaustive-deps
+  // DT251: a food of Get it ready as it reads ("150 g basmati rice"), and as it is said ("150 grams basmati rice")
+  const sayFood = (j: number, first = false) => {
+    const i = readyFoods[j]; if (!i) return;
+    sayParts([{ text: first ? w("cookmode.readySay") : "", lang: voiceFor(w("cookmode.readySay")) }, { text: spoken(tokenOf(i), items), lang: recipeVoice() }]);
+  };
+  const sayAllReady = () => say(`${w("cookmode.allReady")} ${w("cookmode.step1Next")}`);
+  useEffect(() => { if (prep && pAt >= 0) sayFood(pAt, pAt === 0 && put.size === 0); }, [pAt, prep, voice]); // eslint-disable-line react-hooks/exhaustive-deps
+  const nextUnput = (from: number, s: Set<string>) => { for (let j = 0; j < readyFoods.length; j++) { const x = (from + j) % readyFoods.length; if (!s.has(readyFoods[x].id)) return x; } return -1; };
+  const putFood = (j: number) => {
+    const s = new Set(live.current.put); s.add(readyFoods[j].id); setPut(s); setHeard(null);
+    const n = nextUnput(j + 1, s); setPAt(n); if (n < 0) sayAllReady();
+  };
+  const tapFood = (j: number) => {
+    const s = new Set(live.current.put);
+    if (s.has(readyFoods[j].id)) { s.delete(readyFoods[j].id); setPut(s); if (live.current.pAt < 0) setPAt(j); return; }
+    if (j === live.current.pAt) return putFood(j);
+    s.add(readyFoods[j].id); setPut(s); if (nextUnput(0, s) < 0) { setPAt(-1); sayAllReady(); }
+  };
+  const toSteps = () => { setHeard(null); setPrep(false); };
   // the timers count down; one that ends rings, buzzes and says which
   useEffect(() => { if (!timers.length) return; const t = setInterval(() => setNow(Date.now()), 500); return () => clearInterval(t); }, [timers.length]);
   useEffect(() => {
@@ -125,12 +151,13 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
   const go = (to: number, mi = 0) => { setHeard(null); const j = Math.max(0, Math.min(steps.length - 1, to)); setK(j); setM(Math.max(0, Math.min(movesOf(j).length - 1, mi))); };
   // DT217: Next and Back go move by move; Next on a step's last move ticks the step, as before
   const next = () => {
+    if (live.current.prep) { const j = live.current.pAt; return j < 0 ? toSteps() : putFood(j); }
     const { k: at, m: mi } = live.current;
     if (mi < movesOf(at).length - 1) { setHeard(null); setM(mi + 1); return; }
     onTick(at); setDoneSet((d) => new Set(d).add(at)); if (at >= steps.length - 1) { setDone(true); say(w("cookmode.doneEnjoyYourMeal")); } else go(at + 1);
   };
-  const back = () => { const { k: at, m: mi } = live.current; if (live.current.done) { setDone(false); return; } if (mi > 0) { setHeard(null); setM(mi - 1); return; } if (at > 0) go(at - 1, movesOf(at - 1).length - 1); };
-  const repeat = () => { setHeard(null); sayMove(live.current.k, live.current.m); };
+  const back = () => { if (live.current.prep) { const j = live.current.pAt; setHeard(null); setPAt(j < 0 ? readyFoods.length - 1 : Math.max(0, j - 1)); return; } const { k: at, m: mi } = live.current; if (live.current.done) { setDone(false); return; } if (mi > 0) { setHeard(null); setM(mi - 1); return; } if (at > 0) go(at - 1, movesOf(at - 1).length - 1); };
+  const repeat = () => { setHeard(null); if (live.current.prep) { if (live.current.pAt < 0) sayAllReady(); else sayFood(live.current.pAt); return; } sayMove(live.current.k, live.current.m); };
   const startTimer = (seconds: number, name: string) => {
     setTimers((ts) => [...ts, { id: Date.now() + Math.random(), name, ends: Date.now() + seconds * 1000, total: seconds, rang: false }]);
     setNow(Date.now());
@@ -167,7 +194,7 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
     if (c.kind === "repeat") return repeat();
     if (c.kind === "stop") return close();
     if (c.kind === "ask") return void askChef(c.question);
-    if (c.kind === "goto") { if (c.step > steps.length) { const a = wn("cookmode.recipeSteps", steps.length); setHeard({ said, answer: a }); say(a); return; } setDone(false); return go(c.step - 1); }
+    if (c.kind === "goto") { if (c.step > steps.length) { const a = wn("cookmode.recipeSteps", steps.length); setHeard({ said, answer: a }); say(a); return; } setDone(false); setPrep(false); return go(c.step - 1); }
     // the next step in the recipe's own language
     if (c.kind === "left") { const l = leftSay(at, steps, items); setHeard({ said, answer: l.next ? `${l.head} ${l.next}` : l.head }); sayParts([{ text: l.head, lang: voiceFor(l.head) }, { text: l.next ? spoken(l.next, items) : "", lang: recipeVoice() }]); return; }
     const answer = c.kind === "howMuch" ? howMuch(c.food, steps, items)
@@ -223,11 +250,11 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
       <div className="cook-top">
         <button className="pill pill-small" style={{ minHeight: 44 }} onClick={close}>{link.closeLabel ?? w("cookmode.close")}</button>
         <b className="cook-title">{title}</b>
-        <small className="cook-count">{done ? w("cookmode.doneLow") : w("cookmode.nOf", { k: k + 1, n: steps.length })}</small>
+        <small className="cook-count">{done ? w("cookmode.doneLow") : prep ? w("cookmode.readyCount") : w("cookmode.nOf", { k: k + 1, n: steps.length })}</small>
       </div>
       {/* DT175a (0.3.18, board Stories123 v2): the bar is the steps, each a button 44 px high: tap to jump, a tick when done */}
-      <div className="cook-steps" role="tablist" aria-label={w("cookmode.steps")}>{steps.map((_, j) => { const cur = !done && j === k, d = doneSet.has(j); return (
-        <button key={j} role="tab" aria-selected={cur} aria-label={d ? w("cookmode.stepNDone", { n: j + 1 }) : w("cookmode.stepN", { n: j + 1 })} className={`cook-step-btn${cur ? " on" : ""}${d ? " done" : ""}`} onClick={() => { setDone(false); go(j); }}>{j + 1}{d && !cur ? " ✓" : ""}</button>); })}</div>
+      <div className="cook-steps" role="tablist" aria-label={w("cookmode.steps")}>{steps.map((_, j) => { const cur = !done && !prep && j === k, d = doneSet.has(j); return (
+        <button key={j} role="tab" aria-selected={cur} aria-label={d ? w("cookmode.stepNDone", { n: j + 1 }) : w("cookmode.stepN", { n: j + 1 })} className={`cook-step-btn${cur ? " on" : ""}${d ? " done" : ""}`} onClick={() => { setDone(false); setPrep(false); go(j); }}>{j + 1}{d && !cur ? " ✓" : ""}</button>); })}</div>
       {link.top}
       {timers.length > 0 && (
         <div className="cook-timers" aria-label={w("cookmode.timers")}>
@@ -269,6 +296,23 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
         </>
       ) : (
         <>
+          {prep ? (
+          <section className="cook-card cook-ready" aria-live="polite">
+            <div className="cook-ready-top"><small>{w("cookmode.readyHead", { k: Math.min(put.size + 1, readyFoods.length), n: readyFoods.length })}</small>
+              {pAt >= 0 && <button type="button" className="pill pill-small cook-ready-skip" onClick={toSteps}>{w("cookmode.toStep1")}</button>}</div>
+            <b className="cook-ready-title">{w("cookmode.readyTitle")}</b>
+            <div className="cook-ready-list" role="group" aria-label={w("cookmode.readyTitle")}>
+              {readyFoods.map((i, j) => { const isPut = put.has(i.id), cur = j === pAt; return (
+                <button type="button" key={i.id} className={`cook-ready-food${isPut ? " put" : ""}${cur ? " on" : ""}`} aria-pressed={isPut} aria-current={cur ? "step" : undefined} onClick={() => tapFood(j)}>
+                  <span className="cook-ready-box" aria-hidden="true">{isPut ? "✓" : ""}</span>
+                  <span className="cook-ready-name">{stepParts(tokenOf(i), items).map((p, x) => ("text" in p ? p.text : <b key={x}>{p.label}</b>))}</span>
+                  {cur && on && <span className="cook-ready-say" aria-hidden="true">🔊</span>}
+                </button>); })}
+            </div>
+            {pAt < 0 && <><p className="cook-ready-done"><b>{w("cookmode.allReady")}</b> {w("cookmode.step1Next")}</p>
+              <button type="button" className="pill pill-primary pill-wide" onClick={toSteps}>{w("cookmode.toStep1")}</button></>}
+          </section>
+          ) : (
           <section className={`cook-card cook-step${pics[k] ? " has-pic" : ""}`} aria-live="polite">
             {pics[k] && <><img className="cook-pic" src={pics[k]!.src} alt={w("cookmode.stepN", { n: k + 1 })} /><small className="cook-pic-label">{pics[k]!.by === "ai" ? w("cookmode.pictureDrawnByAiBeta") : link.stepPhoto?.kept ? w("cookmode.yourPhotoKeptWithThe") : w("cookmode.yourPhoto")}
               {/* DT223 (0.3.60): your photo of the step can be taken again */}
@@ -293,10 +337,11 @@ export function CookMode({ title, steps, items, ticks, onTick, onClose, ask = nu
               {link.look && <button className="pill cook-look" disabled={!!heard?.working} onClick={() => void lookNow()}>{w("cookmode.chefLookButton")}</button>}
             </div> : null}
           </section>
+          )}
           <div className="cook-buttons">
-            <button className="pill" disabled={k === 0 && m === 0} onClick={back}>{w("cookmode.back")}</button>
+            <button className="pill" disabled={prep ? pAt === 0 : k === 0 && m === 0} onClick={back}>{w("cookmode.back")}</button>
             <button className="pill" onClick={repeat}>{w("cookmode.repeat")}</button>
-            <button className="pill pill-primary" onClick={next}>{k === steps.length - 1 && m >= mvs.length - 1 ? w("cookmode.done") : w("cookmode.next2")}</button>
+            <button className="pill pill-primary" onClick={next}>{prep ? (pAt < 0 ? w("cookmode.toStep1") : w("cookmode.next2")) : k === steps.length - 1 && m >= mvs.length - 1 ? w("cookmode.done") : w("cookmode.next2")}</button>
           </div>
           {heard && (
             <section className="cook-card cook-heard" aria-live="polite">

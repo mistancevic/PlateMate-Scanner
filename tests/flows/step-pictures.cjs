@@ -97,7 +97,7 @@ const PORT = "3196", B = `http://127.0.0.1:${PORT}`;
     if (await page.getByRole("button", { name: "Clear my plate" }).count()) { await page.getByRole("button", { name: "Clear my plate" }).click(); await page.waitForTimeout(1200); }
     ok(/Make: Chicken rice bowl/.test(await page.locator("h2").first().textContent().catch(() => "")), "Start cooking from the player goes straight to Make, cook mode open");
     // cook mode: the picture on top, step buttons
-    const cm = page.locator(".cook-mode");
+    const cm = page.locator(".cook-mode"); await require("./ready.cjs")(page);
     await cm.getByRole("button", { name: "Turn voice on" }).click(); await page.waitForTimeout(200);
     ok(await cm.locator("img.cook-pic").count() === 1 && /Picture drawn by AI, Beta/.test(await cm.locator(".cook-pic-label").textContent()), "cook mode: the step's picture on top, its label under it");
     ok(await cm.locator(".cook-step-btn").count() === 6 && Math.min(...await cm.locator(".cook-step-btn").evaluateAll((bs) => bs.map((b) => b.getBoundingClientRect().height))) >= 44, "six step buttons, 44 px high");

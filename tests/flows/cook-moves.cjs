@@ -57,7 +57,7 @@ const PORT = "3345", B = `http://127.0.0.1:${PORT}`;
     ok(r.steps.length === 3 && /Whisk 104 g eggs/.test(r.steps[0]) && !r.way, "Lock it and cook keeps the new steps with the recipe; the bowl way is gone");
     // ---- DT217 v2: the whole step on top, the moves under it ----
     await page.getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(600);
-    const cm = page.locator(".cook-mode");
+    const cm = page.locator(".cook-mode"); await require("./ready.cjs")(page);
     ok(/Whisk 104 g eggs and 100 g milk and 35 g flour until smooth\./.test(await cm.locator(".cook-text").textContent()), "the whole step stays on top");
     ok(/READ ALOUD, ONE AT A TIME · 1 OF 4/.test(await cm.locator(".cook-moves-head").textContent()) && await cm.locator(".cook-move").count() === 4, "under it the moves: 1 of 4");
     ok(JSON.stringify(await cm.locator(".cook-move").allTextContents()) === JSON.stringify(["▶Add 104 g eggs.", "Add 100 g milk.", "Add 35 g flour.", "Whisk them until smooth."]), "one food a move, then the action: " + JSON.stringify(await cm.locator(".cook-move").allTextContents()));
@@ -87,7 +87,7 @@ const PORT = "3345", B = `http://127.0.0.1:${PORT}`;
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500);
     await page.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }).first().click(); await page.waitForTimeout(500);
     await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(900);
-    const c2 = page.locator(".cook-mode");
+    const c2 = page.locator(".cook-mode"); await require("./ready.cjs")(page);
     ok(await c2.locator(".cook-moves").count() === 0 && await c2.getByRole("button", { name: /Start 12 min timer/ }).count() === 1, "step 1, one food: the step itself, with its timer");
     // DT223 (0.3.60, board Stories165): a step without a picture has Add a photo of this step; the photo is kept with the recipe
     ok(await c2.locator(".cook-add-pic").count() === 1 && /📷 Add a photo of this step/.test(await c2.locator(".cook-add-pic").textContent()), "DT223: a step without a picture: Add a photo of this step");

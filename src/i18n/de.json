@@ -20928,6 +20928,34 @@
     "guide.part.switchWhen": {
       "text": "Wann wechseln",
       "checked": true
+    },
+    "cookmode.readyCount": {
+      "text": "Alles bereitlegen",
+      "checked": true
+    },
+    "cookmode.readyHead": {
+      "text": "ALLES BEREITLEGEN · {k} VON {n}",
+      "checked": true
+    },
+    "cookmode.readyTitle": {
+      "text": "Leg dir zurecht, was du brauchst",
+      "checked": true
+    },
+    "cookmode.readySay": {
+      "text": "Alles bereitlegen.",
+      "checked": true
+    },
+    "cookmode.allReady": {
+      "text": "Alles bereit.",
+      "checked": true
+    },
+    "cookmode.step1Next": {
+      "text": "Als Nächstes Schritt 1.",
+      "checked": true
+    },
+    "cookmode.toStep1": {
+      "text": "Schritt 1 ›",
+      "checked": true
     }
   }
 }

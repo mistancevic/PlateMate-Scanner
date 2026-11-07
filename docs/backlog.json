@@ -647,8 +647,8 @@
       "id": "DT251",
       "title": "Get it ready: cook mode reads the foods before step 1",
       "epic": "cooking",
-      "state": "now",
-      "why": "Coach Milan 7 November 08:07 and 08:26: a step before step 1 that lists every food with its amount; by voice one at a time (next, repeat), ticked as you put each out; then step 1. Board to draw. Board drawn 7 November 09:07, waits for Go.",
+      "state": "done",
+      "why": "Coach Milan 7 November 08:07 and 08:26: a step before step 1 that lists every food with its amount; by voice one at a time (next, repeat), ticked as you put each out; then step 1. Board to draw. Board drawn 7 November 09:07; Go 12:28; built in 0.3.104.",
       "board": 186
     },
     {
@@ -664,6 +664,14 @@
       "epic": "home",
       "state": "next",
       "why": "Coach Milan 7 November 08:29 to 08:37: tell visitors the app speaks their language, a block among the clips with its own video, showing Srpski and Deutsch. After DT251. Order agreed 08:29: DT243, DT251, DT253, then EV1. Clip order (11:21 to 11:23): the English page now, English then Srpski then Deutsch (Beta), a recipe from a Serbian link offered in German. Later, when this language phase is done and Deutsch is out of Beta: the /sr page gets the clip starting in Srpski, then Deutsch; the /de page starting in Deutsch, then Srpski."
+    },
+    {
+      "id": "DT254",
+      "title": "The cover is the recipe's video: plays once, then rests",
+      "epic": "recipes",
+      "state": "next",
+      "why": "Coach Milan 7 November 12:16: put the video made from the step photos and the final meal on the recipe page as the cover, like a YouTube channel of recipes. He picked C at 12:28: it plays once without sound when the page opens, then rests on the cover with Again. Board 187 drawn 12:46, waits for Go.",
+      "board": 187
     }
   ]
 }

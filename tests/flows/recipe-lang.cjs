@@ -58,7 +58,7 @@ const recipe = (x = {}) => ({ id: "m-pr", title: "Prebranac", items, portion: 37
     ok(/Slice the onion/.test(await steps(page)), "and back to English");
     for (const c of await page.locator(".rq-lang-switch button").all()) { const r = await c.boundingBox(); ok(r && r.height >= 44, "the switch is 44 px"); break; }
     // translated: Start cooking asks nothing; cook mode reads English
-    await page.locator(".rq-start button").filter({ hasText: "Start cooking" }).click(); await page.waitForTimeout(1500);
+    await page.locator(".rq-start button").filter({ hasText: "Start cooking" }).click(); await page.waitForTimeout(1500); await require("./ready.cjs")(page);
     ok(await page.locator(".cook-mode").count() === 1 && /Slice the onion/.test(await page.locator(".cook-mode").innerText()), "cook mode shows the English steps");
     ok(page.asked.length === 1, "translated once");
     await page.context().close();
@@ -68,7 +68,7 @@ const recipe = (x = {}) => ({ id: "m-pr", title: "Prebranac", items, portion: 37
     await page.locator(".rq-start button").filter({ hasText: "Start cooking" }).click(); await page.waitForTimeout(600);
     const ask = page.locator(".rq-lang-cook");
     ok(await ask.count() === 1 && /This recipe is in Srpski\. Cook it in English\?/.test(await ask.innerText()), "Start cooking asks once: Cook it in English?");
-    await ask.getByRole("button", { name: "Cook it as written" }).click(); await page.waitForTimeout(1500);
+    await ask.getByRole("button", { name: "Cook it as written" }).click(); await page.waitForTimeout(1500); await require("./ready.cjs")(page);
     ok(await page.locator(".cook-mode").count() === 1 && /Iseci luk/.test(await page.locator(".cook-mode").innerText()), "Cook it as written: cook mode in Srpski");
     ok((await saved(page)).trNo?.includes("en") && page.asked.length === 0, "it is kept as written, nothing translated");
     await page.goto(B + "/my-recipes/m-pr"); await page.waitForTimeout(1200);
@@ -78,7 +78,7 @@ const recipe = (x = {}) => ({ id: "m-pr", title: "Prebranac", items, portion: 37
     // Start cooking: Cook it in English
     page = await open({ ...seed, meals: [recipe()] });
     await page.locator(".rq-start button").filter({ hasText: "Start cooking" }).click(); await page.waitForTimeout(600);
-    await page.locator(".rq-lang-cook").getByRole("button", { name: "Cook it in English" }).click(); await page.waitForTimeout(2000);
+    await page.locator(".rq-lang-cook").getByRole("button", { name: "Cook it in English" }).click(); await page.waitForTimeout(2000); await require("./ready.cjs")(page);
     ok(page.asked.length === 1 && await page.locator(".cook-mode").count() === 1 && /Slice the onion/.test(await page.locator(".cook-mode").innerText()), "Cook it in English: translated, and cook mode in English");
     await page.context().close();
 

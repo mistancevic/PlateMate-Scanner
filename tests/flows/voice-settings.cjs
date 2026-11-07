@@ -59,7 +59,7 @@ const PORT = "3394", B = `http://127.0.0.1:${PORT}`;
     await page.locator("nav button").filter({ hasText: "Recipes" }).click(); await page.waitForTimeout(500);
     await page.locator(".recipe-tile").filter({ hasText: "Chicken rice bowl" }).first().click(); await page.waitForTimeout(500);
     await page.locator(".rq-steps").getByRole("button", { name: "Start cooking", exact: true }).click(); await page.waitForTimeout(900);
-    const cm = page.locator(".cook-mode");
+    const cm = page.locator(".cook-mode"); await require("./ready.cjs")(page);
     await cm.getByRole("button", { name: /Next/ }).click(); await page.waitForTimeout(300);
     sp = await page.evaluate(() => window.__spoken);
     const last = sp[sp.length - 1];

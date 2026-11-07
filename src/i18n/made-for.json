@@ -5231,6 +5231,13 @@
     "screen.guide.part.food": {"en":"Food","area":"Me and setup","where":"Me","release":"0.3.103"},
     "screen.guide.part.watch": {"en":"What to watch","area":"Me and setup","where":"Me","release":"0.3.103"},
     "screen.guide.part.mistakes": {"en":"Common mistakes","area":"Me and setup","where":"Me","release":"0.3.103"},
-    "screen.guide.part.switchWhen": {"en":"When to switch","area":"Me and setup","where":"Me","release":"0.3.103"}
+    "screen.guide.part.switchWhen": {"en":"When to switch","area":"Me and setup","where":"Me","release":"0.3.103"},
+    "screen.cookmode.readyCount": {"en":"Get it ready","area":"Cooking","where":"Cooking","release":"0.3.104"},
+    "screen.cookmode.readyHead": {"en":"GET IT READY · {k} OF {n}","area":"Cooking","where":"Cooking","release":"0.3.104"},
+    "screen.cookmode.readyTitle": {"en":"Put out what you need","area":"Cooking","where":"Cooking","release":"0.3.104"},
+    "screen.cookmode.readySay": {"en":"Get it ready.","area":"Cooking","where":"Cooking","release":"0.3.104"},
+    "screen.cookmode.allReady": {"en":"All ready.","area":"Cooking","where":"Cooking","release":"0.3.104"},
+    "screen.cookmode.step1Next": {"en":"Step 1 next.","area":"Cooking","where":"Cooking","release":"0.3.104"},
+    "screen.cookmode.toStep1": {"en":"Step 1 ›","area":"Cooking","where":"Cooking","release":"0.3.104"}
   }
 }
