@@ -45,7 +45,8 @@ import { PublishSheet, unpublishedOf, type Published } from "../components/Publi
 import { localAs, isPreviewHost } from "../recipes";
 import { useMetricsOwner } from "./MenuScreen";
 import { resizeImageBase64 } from "../utils/image";
-import { RecipePage, type PubState } from "../components/RecipePage";
+import { type PubState } from "../components/RecipePage";
+import { LangRecipePage } from "../components/RecipeLang";
 import { fromDraft } from "../steps";
 import { recipePhotosOf, recipeHasPhotos, sig } from "../photos";
 import { coverIsDrawn, isDrawnPhoto } from "../covers";
@@ -299,7 +300,7 @@ export function RecipesScreen(p: AppApi) {
   // R8 to R11: the recipe's page; publishing opens the Publish sheet over it
   if (opened) return (
     <>
-      <RecipePage key={opened.id} meal={opened} saved={savedOf(opened.id)} plannedLine={batchLine(opened, p.planned)} plannedCount={plannedCountOf(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
+      <LangRecipePage aiOn={p.ai.on} translate={(id) => p.translateRecipe(id)} key={opened.id} meal={opened} saved={savedOf(opened.id)} plannedLine={batchLine(opened, p.planned)} plannedCount={plannedCountOf(opened, p.planned)} cards={state.feedback} foods={state.foods} cook={isCoach} state={isCoach ? pubState(opened.id, Boolean(opened.publish)) : null}
         pub={published[opened.id] ?? null} approver={approver} direct={cook.direct} unpublished={isCoach ? unpublishedOf(opened, published[opened.id] ?? null, state.feedback) : []}
         onPatch={(patch) => patchMeal(opened.id, patch)} onRename={(t) => p.renameMeal(opened.id, t)}
         landing={landed && landed.id === opened.id ? (() => {

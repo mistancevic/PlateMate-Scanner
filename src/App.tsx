@@ -1,7 +1,7 @@
 import { numLocale } from "./words";
 import { w } from "./words";
 import { eatsForReq, installEats, type Eats } from "./eats";
-import { useLang } from "./lang";
+import { useLang, getLang } from "./lang";
 import { TravelBanner } from "./components/Travel";
 import { CalendarSync } from "./components/Calendar";
 import { askToken, dropCalendar } from "./calendarSync";
@@ -11,6 +11,7 @@ import { idleOut, lastOpen, markOpen, setIdleOut } from "./idle";
 import { servingsOf } from "./pilot";
 import * as cooking from "./cooking";
 import { recordOf, followed, secondDish } from "./dishes";
+import { recipeLangOf, trProblems, offerFrom } from "./recipeLang";
 // DT242 (0.3.96): an answer lost on the way, not one the server gave: no signal, or the browser stopped it while away
 const connectionLost = (e: unknown) => { const m = String((e as any)?.message ?? ""), n = String((e as any)?.name ?? ""); return e instanceof TypeError || n === "AbortError" || n === "TimeoutError" || /failed to fetch|load failed|networkerror|network request failed|the internet connection/i.test(m); };
 // wait until the app is in front and online again, at most two minutes
@@ -2169,6 +2170,32 @@ export default function App() {
   setPdUnit(personal.pdUnit);
   setUnits(personal.units);
   const ai = aiState(safety, personal.birthYear, Boolean(profile.coachId) || profile.role === "coach");
+  // DT250 (0.3.99, board Stories185; Coach Milan 7 November, Go 08:05): Chef Mealan translates a recipe into the app's language,
+  // once; the translation is kept with it. A step's food tokens and every number must come back as they were.
+  const translateRecipe = async (id: string, auto = false): Promise<boolean> => {
+    const m = state.meals.find((x) => x.id === id); const lang = getLang();
+    if (!m || !m.steps?.length) return false;
+    try {
+      const d = await api("/api/recipe/translate", { to: lang, title: m.title, steps: m.steps, foods: m.items.filter((i) => !i.food.refId).map((i) => ({ id: i.id, name: i.food.name })) });
+      const steps: string[] = Array.isArray(d?.steps) ? d.steps : [];
+      if (trProblems(m.steps, steps).length) throw new Error("check");
+      const tr = { lang, from: recipeLangOf(m), title: String(d.title || m.title), steps, foods: Object.fromEntries((d.foods ?? []).map((f: { id: string; name: string }) => [f.id, f.name])), at: new Date().toISOString(), ...(auto ? { auto: true } : {}) };
+      setState((s) => ({ ...s, meals: s.meals.map((x) => (x.id === id ? { ...x, tr, trShow: "tr" as const } : x)) }));
+      log("recipe_translate", { auto, from: tr.from, to: lang });
+      return true;
+    } catch { if (!auto) setError(w("recipe.trFailed")); log("recipe_translate", { auto, failed: true }); return false; }
+  };
+  // c): a recipe that just came in from a link or a screenshot, in another language, is read into yours; the original is kept
+  const trTried = useRef(new Set<string>());
+  useEffect(() => {
+    if (!ai.on) return;
+    const lang = getLang(), now = Date.now();
+    for (const m of state.meals) {
+      if (!m.source || trTried.current.has(m.id) || now - new Date(m.source.at).getTime() > 10 * 60000 || !offerFrom(m, lang)) continue;
+      trTried.current.add(m.id); void translateRecipe(m.id, true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.meals, ai.on]);
   const updateSafety = (fn: (s: Safety) => Safety) => { const next = fn(getSafety()); storeSafety(next); setSafetyState(next); };
   // A cover drawn by Chef Mealan (0.2.11, board CO, CO1; 0.2.18, board IM, IM11): a recipe kept without a photo gets one
   // try, right away, one recipe at a time. A try that doesn't draw waits for Draw a picture on the recipe page, with the
@@ -2496,6 +2523,7 @@ export default function App() {
         return true;
       } catch (e: any) { setError(e?.message || w("app.theReadDidnTWork")); return false; } finally { setBusy(""); }
     },
+    translateRecipe,
     retryPhoto: () => { const l = photoLost; if (!l) return; setPhotoLost(null); void screenProps.readMealPhoto(l.image, l.x); },
     // DT175 (0.3.17, board Stories122): Say what you have: the foods named, by voice or typed, land on the Plate as estimates
     plateFromWords: async (text: string) => {

@@ -45,6 +45,8 @@ const SECOND = "data:image/jpeg;base64," + fs.readFileSync(path.join(__dirname, 
     await page.goto(B + "/my-recipes"); await page.waitForTimeout(1000);
     await page.getByText("Salmon and rice").first().click(); await page.waitForTimeout(800);
     await page.locator("button").filter({ hasText: start }).first().click(); await page.waitForTimeout(1200);
+    // DT250 (0.3.99): an English recipe in Srpski or German asks once first; here it is cooked as written
+    const ask = page.locator(".rq-lang-cook"); if (await ask.count()) { await ask.locator(".ca-go button").nth(1).click(); await page.waitForTimeout(1200); }
   };
   try {
     // DT248: Srpski, an English recipe

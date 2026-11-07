@@ -46,8 +46,13 @@ export const CHEF = {
   photoLost: () => "The connection was lost. Your photo is kept.",
   plateFills: (meal: string, kcal: string) => `Your plate already fills this ${meal.toLowerCase()}: ${kcal} kcal, in its range.`,
   secondDish: (dish: string, minutes: number, prev: string, meal: string) => `${dish}, ${n(minutes, "minute")} after your ${prev}. Dessert to your ${meal.toLowerCase()}, or its own snack?`,
+  // DT250 (0.3.99, board Stories185): a recipe in another language than the app's; from and to are languages (Lang)
+  recipeOther: (from: Lang, to: Lang) => `This recipe is ${inLangWord("en", from)}. Show it ${inLangWord("en", to)}?`,
+  cookOther: (from: Lang, to: Lang) => `This recipe is ${inLangWord("en", from)}. Cook it ${inLangWord("en", to)}?`,
 } as const;
 export type ChefLineName = keyof typeof CHEF;
+// DT250: "in English", "na engleskom", "auf Englisch": a language as the words of a line put it
+export function inLangWord(l: Lang, of: Lang): string { return wIn(l, of === "sr-Latn" ? "lang.inSr" : of === "de" ? "lang.inDe" : "lang.inEn") ?? wIn("en", of === "sr-Latn" ? "lang.inSr" : of === "de" ? "lang.inDe" : "lang.inEn")!; }
 // DT203 (0.3.76): his lines in Srpski (latinica), in src/i18n/sr-Latn.json, written in Coach Milan's table. A line goes into the
 // app only once he ticked it; until then it stays English. Slots in braces ({dish}) take the values below, in his order.
 // A line whose slots are English words made elsewhere (a day name, "yesterday", a calendar block) waits for the screens.
@@ -67,6 +72,8 @@ export const SR_SLOTS: Partial<Record<ChefLineName, SrSlots>> = {
   // DT240 to DT247 (0.3.96): the meal's name and the minutes in the language on this phone
   cookOpen: (cook: string, dish: string) => ({ cook, dish }),
   plateFills: (meal: string, kcal: string) => ({ meal: (mealV(meal, true) as (l: Lang) => string | null)(local()) ?? meal, kcal }),
+  recipeOther: (from: Lang, to: Lang) => ({ from: inLangWord(local(), from), to: inLangWord(local(), to) }),
+  cookOther: (from: Lang, to: Lang) => ({ from: inLangWord(local(), from), to: inLangWord(local(), to) }),
   secondDish: (dish: string, minutes: number, prev: string, meal: string) => ({ dish, minutes: getLang() === "de" ? `${minutes} ${minutes === 1 ? "Minute" : "Minuten"}` : srCount(minutes, "minut", "minuta", "minuta"), prev, meal: (mealV(meal, true) as (l: Lang) => string | null)(local()) ?? meal }),
 };
 // the slots each line takes, by name: the Serbian line names each of them once or more, and no other (the release check, the table)
@@ -75,7 +82,7 @@ export const SR_ALLOWED: Partial<Record<ChefLineName, string[]>> = {
   plateAddOrNew: ["foods", "title", "what"], scanWhileCooking: ["dish", "food"], useInCook: ["food", "dish"], resume: ["dish", "done"],
   howManyAte: ["made"], carryNow: ["minutes"], busyMeal: ["meal", "time", "block", "day"], busyLate: ["until", "meal", "time", "free", "quick"],
   busyCarry: ["block", "meal"], busyTraining: ["time", "block", "day"],
-  cookOpen: ["cook", "dish"], plateFills: ["meal", "kcal"], secondDish: ["dish", "minutes", "prev", "meal"],
+  cookOpen: ["cook", "dish"], plateFills: ["meal", "kcal"], secondDish: ["dish", "minutes", "prev", "meal"], recipeOther: ["from", "to"], cookOther: ["from", "to"],
 };
 export const slotsOf = (t: string) => [...new Set([...t.matchAll(/\{(\w+)\}/g)].map((m) => m[1]))].sort();
 // a slot the line misses, or one it names that the app does not fill; empty when the line fits

@@ -50,6 +50,8 @@ export interface AppApi {
   photoLost: { image: string } | null;
   dropPhotoLost: () => void;
   retryPhoto: () => void;
+  // DT250 (0.3.99): Chef Mealan translates a recipe into the app's language, once; false when it did not work
+  translateRecipe: (id: string, auto?: boolean) => Promise<boolean>;
   // DT246 (0.3.96): the meal this plate is recorded in, while it follows the Plate
   recordNow: { cardId: string; at: string; slot: { date: string; slotId: string; name: string; time: string } | null } | null;
   // DT240 (0.3.96): a new plate came in while a cook is open
