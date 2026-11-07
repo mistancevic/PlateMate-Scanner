@@ -15,6 +15,15 @@ function htmlLang() { try { document.documentElement.lang = stored() === "en" ? 
 export function setLang(l: Lang) { try { if (l === "en") localStorage.removeItem(KEY); else localStorage.setItem(KEY, l); } catch { /* none kept */ } htmlLang(); subs.forEach((f) => f()); }
 export function useLang(): Lang { return useSyncExternalStore((f) => { subs.add(f); return () => { subs.delete(f); }; }, stored, () => "en"); }
 export const LANG_NAMES: Record<Lang, string> = { en: "English", "sr-Latn": "Srpski (latinica)", de: "Deutsch (Beta)" };
+// DT253 (board Stories188): the languages in order, from the names above. The home page's switch and its language block both
+// read this list, so a new language in LANG_NAMES shows in both by itself.
+export const LANGS = Object.keys(LANG_NAMES) as Lang[];
+// a language as a chip: its name without the part in brackets; (Beta) stays as a mark. Srpski (latinica) is Srpski; Deutsch
+// (Beta) is Deutsch, with Beta
+export function langChip(l: Lang): { name: string; beta: boolean } {
+  const m = /^(.*?)\s*\((.*)\)$/.exec(LANG_NAMES[l]);
+  return m ? { name: m[1], beta: m[2] === "Beta" } : { name: LANG_NAMES[l], beta: false };
+}
 // the calendar and number style of a language: 2,450 and 5.5 · 2.450 and 5,5 · 2.450 and 5,5
 export const locOf = (l: Lang) => (l === "sr-Latn" ? "sr-Latn-RS" : l === "de" ? "de-DE" : "en-GB");
 // the phone's voice and its listening for a language

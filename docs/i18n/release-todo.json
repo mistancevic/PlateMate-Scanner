@@ -1,1 +1,82 @@
-[]
+[
+  {
+    "id": "screen.home.langEyebrow",
+    "kind": "screen",
+    "key": "home.langEyebrow",
+    "en": "In your language",
+    "forms": "plain",
+    "slots": [],
+    "area": "Home page",
+    "where": "The home page"
+  },
+  {
+    "id": "screen.home.langTitle",
+    "kind": "screen",
+    "key": "home.langTitle",
+    "en": "Chef Mealan is multilingual",
+    "forms": "plain",
+    "slots": [],
+    "area": "Home page",
+    "where": "The home page"
+  },
+  {
+    "id": "screen.home.lang1",
+    "kind": "screen",
+    "key": "home.lang1",
+    "en": "The whole app in your language: switch it in Menu, Settings.",
+    "forms": "plain",
+    "slots": [],
+    "area": "Home page",
+    "where": "The home page"
+  },
+  {
+    "id": "screen.home.lang2",
+    "kind": "screen",
+    "key": "home.lang2",
+    "en": "A recipe from a link or a screenshot comes in your language; the original stays one tap away.",
+    "forms": "plain",
+    "slots": [],
+    "area": "Home page",
+    "where": "The home page"
+  },
+  {
+    "id": "screen.home.lang3",
+    "kind": "screen",
+    "key": "home.lang3",
+    "en": "A recipe in another language: Chef Mealan offers it in yours, once.",
+    "forms": "plain",
+    "slots": [],
+    "area": "Home page",
+    "where": "The home page"
+  },
+  {
+    "id": "screen.home.lang4",
+    "kind": "screen",
+    "key": "home.lang4",
+    "en": "Cooking: the steps read aloud in your language, and it listens in it.",
+    "forms": "plain",
+    "slots": [],
+    "area": "Home page",
+    "where": "The home page"
+  },
+  {
+    "id": "screen.home.langNote",
+    "kind": "screen",
+    "key": "home.langNote",
+    "en": "Deutsch is in Beta: a German speaker checks it as we go. More languages join this list as they come.",
+    "forms": "plain",
+    "slots": [],
+    "area": "Home page",
+    "where": "The home page"
+  },
+  {
+    "id": "screen.home.videoLang",
+    "kind": "screen",
+    "key": "home.videoLang",
+    "en": "Chef Mealan in English, Srpski and Deutsch",
+    "forms": "plain",
+    "slots": [],
+    "area": "Home page",
+    "where": "The home page"
+  }
+]
