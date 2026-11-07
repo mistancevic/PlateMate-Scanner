@@ -674,6 +674,14 @@
       "state": "done",
       "why": "Coach Milan 7 November 12:16: put the video made from the step photos and the final meal on the recipe page as the cover, like a YouTube channel of recipes. He picked C at 12:28: it plays once without sound when the page opens, then rests on the cover with Again. Board 187 drawn 12:46; 13:06 ▶ in the middle of the cover, on the tile and on the page. Go 13:24; built in 0.3.105.",
       "board": 187
+    },
+    {
+      "id": "DT255",
+      "title": "Voice commands in Srpski and German: timers, what is left, steps, foods in any ending",
+      "epic": "cooking",
+      "state": "next",
+      "why": "Coach Milan 7 November 22:17 to 22:20, from the DT203 gaps: cook mode in Srpski or German does not set a timer by voice, says nothing for what is left, goes to no step by number, finds a food only as written, and a step's minutes get no timer button. Board 190 drawn 22:22, waits for Go.",
+      "board": 190
     }
   ]
 }
